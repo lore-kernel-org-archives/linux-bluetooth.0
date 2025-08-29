@@ -1,157 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D68224B09;
-	Fri, 29 Aug 2025 19:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205C424503F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 19:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756497084; cv=none; b=I4P70kSM/UbuEPJGCwvWVZTRmf7sNrLXJa/F0QKIaAhPuiG8DubsD/C9agQ3S+ZRu+yJ3Huj+5I2d3HUrLvpOnNfkEl9Z3BhMCURd09D66U5iIbaxtPsXX++qmGBNnpqn3gqIcqfc2bI6zRIxTBrUEsWUcAdKhZ13ZtkbGQ2R54=
+	t=1756497349; cv=none; b=cpGRMvCbNx8ta2h/umZSezUvvvR79xXkjMkvOH0MehO5nGSVRCEEb4u+KJ/dk/h6YljJ5Ig1HGmLHGtJBE26HoQV9ZQEGt0Og+XYuwZDxuq4KNOUW4nQUvG1wv4aeCg41cbQQ6Ou2aFc52wCCmJcB6vXjPHLJg9dAujLqogRtbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756497084; c=relaxed/simple;
-	bh=iE1fOPe+H/DOT9l+qqw7zhT3aTQ0dSMmo1kdS8d+f20=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FVoFiEY1/cOidwb5l7UbAnM/1QTc+m0Y7YN/xOXHOdRctYzwsNfS7hnUsAKBHvkXvCYayeo7cea5hHIWUJXK3zcXvhmP3Sr9eTLPQ7u1OIVF83kOvmXuo+mBEaRN2g12kJkIXRIGdCzrY1zXvXEkhf15h9XTeQQE+5677mu/DNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPYEnPUU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756497349; c=relaxed/simple;
+	bh=8JECnoabdjb0uQlY/N8esVx2WITbwLtcWxlkweqWQhY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=KAKKahUYHyryDWeeY7oudpeV29hSF1sE7dC20EkinStQ1GCoo2dn8zgWMOy3zTlAFaofRSJv/T20uCCqYAOEWtf0MUvrwISFTwBOfM5rpEkQ1r9ybFpm58B1YYOS6Ml5Mh9OMcYYEANi9I/npesUdF3SgrJdoThvV5yz23yuX4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XrfkukSA; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPYEnPUU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 346BBC4CEF0;
-	Fri, 29 Aug 2025 19:51:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756497082;
-	bh=iE1fOPe+H/DOT9l+qqw7zhT3aTQ0dSMmo1kdS8d+f20=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uPYEnPUUg4/LuQVFtqhOOS0tGS/0OVJpM+KchdKwqnpfkH0/J3whjo1E0NBxW4gpi
-	 uJDXfPT2+7W9SvWuvKxITtr+9wgDa0PLPjlOlPveFqy+zGxeJXRW3bmLtv6e6tXZkm
-	 Lt0jKmNEbrsoJG57fd3KAzrHhMHII+VJCvAN8o9yIncXsE2LjVvdVRlbplw8VmHBsq
-	 nEieoqr4Hd58x1XnW+1xWPl9IbBCsaBFlrOtBOQRsS5iKDBvoMcj7GYIAOBvWu/48K
-	 9ZUoI9CDe2TXQXinfy+0J0W3S8zuoPtSs1TE+Ci/Y2CLPC2Ymd1DL36wGlg46kmRHz
-	 JZChNYlMpZoRQ==
-Date: Fri, 29 Aug 2025 14:51:19 -0500
-From: Rob Herring <robh@kernel.org>
-To: Janne Grunau <j@jannau.net>
-Cc: Sven Peter <sven@kernel.org>, Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	Neal Gompa <neal@gompa.dev>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Hector Martin <marcan@marcan.st>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Mark Kettenis <kettenis@openbsd.org>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Jassi Brar <jassisinghbrar@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Sasha Finkelstein <fnkl.kernel@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	van Spriel <arend@broadcom.com>, Lee Jones <lee@kernel.org>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Martin =?utf-8?Q?Povi=C5=A1er?= <povik+lin@cutebit.org>,
-	Vinod Koul <vkoul@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pm@vger.kernel.org, iommu@lists.linux.dev,
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-pwm@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-clk@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-sound@vger.kernel.org,
-	linux-spi@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 00/37] arm64: Add initial device trees for Apple M2
- Pro/Max/Ultra devices
-Message-ID: <20250829195119.GA1206685-robh@kernel.org>
-References: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XrfkukSA"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7722c8d2694so943552b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 12:55:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756497346; x=1757102146; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oLzXbxT5zWshdFr+t+uVo3oHhRX6q/JQTvDdR3xkEIU=;
+        b=XrfkukSAYju7IsJDYcgj1GDjAiQJAdJ98ui2p0/kgj1pABbIksPBL0U+igwRrfyjQ5
+         QWYmm5iYs0Lfeg/F4gi7e+zytaevIzxcOtJZBQ5SA5lT5PMpgY77CsoF/DXm/tZE8YwT
+         WZnkQHoE+PxolcEX0VgzFxua46F5Uftk8Q11SKWUBsbojjNHSBb0V7gwz/PI7ZZ2hw0x
+         9wvT/16viC+1NtD0z+6LaxUILbqI0+U236QHQtROBNYZxEzZc6oE2gK35nL6f8Gbo9V6
+         wEIrZ9b4iWs97Pit5uefU5gq1H3z+/a8eaHycwd/1ATaSodhDseFQ7Cp3Ud2d7Ipep7T
+         5M8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756497346; x=1757102146;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oLzXbxT5zWshdFr+t+uVo3oHhRX6q/JQTvDdR3xkEIU=;
+        b=mOMVXVzvbYGL9u95XpHDq4zkCMoFrZDpsWW9vzsRQTMEzQSXSIicZ61Q1wTfTke//S
+         HWD86knKyuP8Mu1342/QGmepGuS+GFWBEabOP3BbrvLtK667FBjSRhyKmYvgabXNMNhy
+         hRIKQUu+RvqgPz2cupblGihI2kGNj3Cv47t6/eCvb6ocpeQjVIVTeZKszBMl5zrQrC0S
+         43hhyAjQqbux98j3SfkcXRtFwvHlrZEI4h86RX1L/jksVx8op5uvRo9CMhS20B2E2BCL
+         XA3SMcZliJ/IXdAPDLJYF+MaNa0TaJ3ozMP6kGuYdrMe2Ne/dKD3ji1wGn/eaUZh6VDj
+         Zn8Q==
+X-Gm-Message-State: AOJu0YwJBWobB02rQfeuFzYLvfyDlUmKDLKGOzSfSnnFmFwn2QDvEVmP
+	3YILc2nM3oHi+fWq8c1HyEL3yMK97u0Yt7DjQVGrurzyJfHm3ELhDzIhtprVhkc0
+X-Gm-Gg: ASbGncvG8qO+c56GMHei70Gq4WZo0oGrGbOArkejAZlq+/wMSGYRBIGEynHexaYTwFu
+	snfHZKJ3vHSbwNIKXFWRPZSbAGlL5pCisQ3SEZX9BHmSXJ58544DD+u781rL/V10OGrmhN3qlXG
+	pL9yQB9ig10SO7docE2WR+OjqLyXyq1E+DtxjdB+GwpiLA0CZBary1AXqWxCb3fzmUVzJTv54uO
+	j85xbPmYbPft/4EI/TV69Xbrlj+2R1IJU8AEsJYuhbLwI9qr4fhid/q0X352IiGGMkwAWXuGPaA
+	4UmoqoRH6JJzWcPijd2uY8rBSAO+XjBLbDrxASqIG6gUCMKsOh5q0EQ6w2g3grTFZr/e/5N7wHW
+	X0V+bXa9CDFDMjnRVtzsDGRRHCrOjN8SubLpLDs0p
+X-Google-Smtp-Source: AGHT+IHwKREsmNx2RbF5QuhPfkYZL0GE3tjkYrY8STWH1KkP8SvIhV10nhkUJjJFZJ/2eAfdIE7kyQ==
+X-Received: by 2002:a05:6a00:4b4e:b0:771:ed83:557c with SMTP id d2e1a72fcca58-771ed835a5dmr23062526b3a.2.1756497346036;
+        Fri, 29 Aug 2025 12:55:46 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.126.214])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a26a0b3sm3227356b3a.10.2025.08.29.12.55.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Aug 2025 12:55:45 -0700 (PDT)
+Message-ID: <68b205c1.050a0220.12fc02.de25@mx.google.com>
+Date: Fri, 29 Aug 2025 12:55:45 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6715360362712077163=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1,1/3] Bluetooth: MGMT: Fix possible deadlock in mgmt_remove_adv_monitor_complete
+In-Reply-To: <20250829192104.2010557-1-luiz.dentz@gmail.com>
+References: <20250829192104.2010557-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Thu, Aug 28, 2025 at 04:01:19PM +0200, Janne Grunau wrote:
-> This series adds device trees for Apple's M2 Pro, Max and Ultra based
-> devices. The M2 Pro (t6020), M2 Max (t6021) and M2 Ultra (t6022) SoCs
-> follow design of the t600x family so copy the structure of SoC *.dtsi
-> files.
-> 
-> t6020 is a cut-down version of t6021, so the former just includes the
-> latter and disables the missing bits.
-> 
-> t6022 is two connected t6021 dies. The implementation seems to use
-> t6021 and disables blocks based on whether it is useful to carry
-> multiple instances. The disabled blocks are mostly on the second die.
-> MMIO addresses on the second die have a constant offset. The interrupt
-> controller is multi-die aware. This setup can be represented in the
-> device tree with two top level "soc" nodes. The MMIO offset is applied
-> via "ranges" and devices are included with preprocessor macros to make
-> the node labels unique and to specify the die number for the interrupt
-> definition.
-> 
-> The devices itself are very similar to their M1 Pro, M1 Max and M1 Ultra
-> counterparts. The existing device templates are SoC agnostic so the new
-> devices can reuse them and include their t602{0,1,2}.dtsi file. The
-> minor differences in pinctrl and gpio numbers can be easily adjusted.
-> 
-> With the t602x SoC family Apple introduced two new devices:
-> 
-> The M2 Pro Mac mini is similar to the larger M1 and M2 Max Mac Studio. The
-> missing SDHCI card reader and two front USB3.1 type-c ports and their
-> internal USB hub can be easily deleted.
-> 
-> The M2 Ultra Mac Pro (tower and rack-mount cases) differs from all other
-> devices but may share some bits with the M2 Ultra Mac Studio. The PCIe
-> implementation on the M2 Ultra in the Mac Pro differs slightly. Apple
-> calls the PCIe controller "apcie-ge" in their device tree. The
-> implementation seems to be mostly compatible with the base t6020 PCIe
-> controller. The main difference is that there is only a single port with
-> with 8 or 16 PCIe Gen4 lanes. These ports connect to a Microchip
-> Switchtec PCIe switch with 100 lanes to which all internal PCIe devices
-> and PCIe slots connect too.
-> 
-> This series does not include PCIe support for the Mac Pro for two
-> reasons:
-> - the linux switchtec driver fails to probe and the downstream PCIe
->   connections come up as PCIe Gen1
-> - some of the internal devices require PERST# and power control to come
->   up. Since the device are connected via the PCIe switch the PCIe
->   controller can not do this. The PCI slot pwrctrl can be utilized for
->   power control but misses integration with PERST# as proposed in [1].
-> 
-> This series depends on "[PATCH v2 0/5] Apple device tree sync from
-> downstream kernel" [2] due to the reuse of the t600x device templates
-> (patch dependencies and DT compilation) and 4 page table level support
-> in apple-dart and io-pgtable-dart [3] since the dart instances report
-> 42-bit IAS (IOMMU device attach fails without the series).
-> 
-> After discussion with the devicetree maintainers we agreed to not extend
-> lists with the generic compatibles anymore [1]. Instead either the first
-> compatible SoC or t8103 is used as fallback compatible supported by the
-> drivers. t8103 is used as default since most drivers and bindings were
-> initially written for M1 based devices.
+--===============6715360362712077163==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-An issue here is any OS without the compatibles added to the drivers 
-won't work. Does that matter here? Soon as you need any new drivers or 
-significant driver changes it won't. The compatible additions could be 
-backported to stable. They aren't really any different than new PCI IDs 
-which get backported.
+This is automated email and please do not reply to this email!
 
-Rob
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=997029
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.55 seconds
+GitLint                       PENDING   0.40 seconds
+SubjectPrefix                 PASS      0.20 seconds
+BuildKernel                   PASS      23.91 seconds
+CheckAllWarning               PASS      26.80 seconds
+CheckSparse                   WARNING   29.84 seconds
+BuildKernel32                 PASS      24.02 seconds
+TestRunnerSetup               PASS      475.32 seconds
+TestRunner_l2cap-tester       PASS      24.60 seconds
+TestRunner_iso-tester         PASS      38.68 seconds
+TestRunner_bnep-tester        PASS      5.77 seconds
+TestRunner_mgmt-tester        FAIL      129.14 seconds
+TestRunner_rfcomm-tester      PASS      9.33 seconds
+TestRunner_sco-tester         PASS      14.54 seconds
+TestRunner_ioctl-tester       PASS      9.94 seconds
+TestRunner_mesh-tester        FAIL      11.43 seconds
+TestRunner_smp-tester         PASS      8.50 seconds
+TestRunner_userchan-tester    PASS      6.18 seconds
+IncrementalBuild              PENDING   0.45 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.105 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.125 seconds
+Mesh - Send cancel - 2                               Timed out    1.998 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6715360362712077163==--
