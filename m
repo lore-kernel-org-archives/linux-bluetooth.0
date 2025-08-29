@@ -1,35 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542ED32C30C;
-	Fri, 29 Aug 2025 16:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32744A23;
+	Fri, 29 Aug 2025 19:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756485601; cv=none; b=HJ+cT82S4gijMWHRJ1A1k1P07D6NbE49k7Gw/kq9SfzP9KXS3kkSLVL/NLBiSem8xMhI9hGucm30Hg5fc+3GDfLu5KehXAfzjmjZIZV1DICk4qiUi0XLD6CIvVyR9YgGKsldHxw8eIOGzmx3qtFJIDWYXFQ89A7TOXml75vftbk=
+	t=1756494743; cv=none; b=Ww8gfOFtjOJfDkh5W/0q50bmnA4BrsCrsCrAvPxweQ4EIIBN6LA+NHUqTWUsZEOVhCFqE239EF4WBI8Pm44fDqLUFpDLGHPMiwlGTxe0QrFaqNgMEsoR8tf6+naLRT2ZqVPia+TTjTkhJZyv2a9ghblo/SuyvZV5SGHYVlUUI5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756485601; c=relaxed/simple;
-	bh=zvnB3Z6Dj3LY/2TUuCgT841hX93QqREtHKDShkn81yU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Npn+cL3Jj4ZIYYShcTqdcdsO3wGNGRdzCYhT+cK2oG7gHMJxGViDOO0Zv5uXUsvdLwbEa7k2wfaqOGQ982OAoojgQHzVO+sezT0THim8iQqSssXM3ob+Wy7drSy5hwVZESkVAwRuvL1+Exmj+70NRATIAyDkmGVpjmxyE+v/MR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MKd3xnHK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756494743; c=relaxed/simple;
+	bh=xpI5ehQpgkg/VoesxnCvFaPbWVKsstPUrT/FYr8jYbU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OPMqEkcq5pGFsFh0P/W+d3FcED7jl6qm6TSHUT+3E+SDcKb39ocEt3Hd1lauY/JPmQTOsAith/HDpElHl45dHfzGrlKJtl+37TUrWHMSFP715lXwAQxBkh50Kr1UDGsIFu/fnsZyh8wqcdiA/HW33tKO+3n5/4FcmfyVxOIqNIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EEScj7Ao; arc=none smtp.client-ip=209.85.221.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MKd3xnHK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32F98C4CEF5;
-	Fri, 29 Aug 2025 16:40:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756485601;
-	bh=zvnB3Z6Dj3LY/2TUuCgT841hX93QqREtHKDShkn81yU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MKd3xnHKYvT8XbW6rYUQMjx8oJzM4P758YuW8JhXCsvRvYj+6SaSsNlj0Sv/7rt+A
-	 tAnTMRrdEET528XVEVmu3g5iOYF22g4M3gEQ8aGL3dqYausrzQwr5kas2sCVcSx+vl
-	 6cW9bONA5lR/jwZf+UHfIqcnbpuhq1w+H+z2LR1FNz2vyaQg42KYONkrFsfI2KDXjT
-	 4+oNe6EhZ9gVH+qJvsnTxepRi8DjyYGx3xHPaLLz1Z+8fr4I3nc0Qva7tflwTc+QgZ
-	 Kyu+cxIMDaNrG/pQjo5gmVFeBvkgu24uC7xdtjxdORZlt+HY1D8CvYMAvWZlMjyX4u
-	 SwXCHaR0f/xjQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 340E5383BF75;
-	Fri, 29 Aug 2025 16:40:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EEScj7Ao"
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-54003fb8be9so581643e0c.1;
+        Fri, 29 Aug 2025 12:12:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756494740; x=1757099540; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lv9pQLpTht4+b30fMm1psRIJSTWM6neQVSDae5ds2JQ=;
+        b=EEScj7AolE3KRp8HF/JUEsjLyaCTI2hJijJi9PVmciIhoRaUFKXamHktBP8tqyXpuG
+         7q0080kFVeXAKGN7CwQPSbj8GTMSUQXA26zpdXlaVr7ReGk/I1It/JOqL3SAcKpiIxNN
+         b2G2/CpyZ5WSTnvXsa88ntVD71x8WWJg+CkwUr4gW7IIu9uLPjsp1LuUPwbOsgoKjFDw
+         fEWLr75kdwBlswBSslpccJ/Ylg3D10otJsHkOzkXwNAd0HTFLBuamAavPW9+ytWXvAsw
+         +3O0cLpNU9rIf6Uwhg8JWBloJCjLe3YfI08WnE+TmsUNPW40nDyM/+htC6keVOUnWi0S
+         HePg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756494740; x=1757099540;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Lv9pQLpTht4+b30fMm1psRIJSTWM6neQVSDae5ds2JQ=;
+        b=iT4YfGGIhlyxyZmSN2tLRSofNWMpmccT/AnqL9I+j6kgU7afF362yQFw3FonScxuDb
+         jseJKwK952GyxAzb5Q5Fx1Zdr3dOTofCvFNeonZcfmG83BE0jdZp9t2dxT8I3iKe6eTH
+         Gl5ZwrtGLTdW5PW5PLmcsXepuQVEvi1RRoOTbpU0N7jfx9mROVRCT7yInfqcx5tR9nSB
+         Qkyd6R9n9C0Byl3TGG9MTi0Uj1HaBonJ4Ao8Mh99ZJz2c8hV0cQbjDJULQUqgdWLvQvg
+         cbci8ov4ILI6TOEIy2I7CM4suAOkmm0uIYFLS0FeVAE21t5KJZ/KL37PxZC8EBSaPeGF
+         o4CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWALT1NXc1jhaV2Z7Hss6x3tiLzmAy/lg+zqxtDg0zRhDJCLaJazI2+WHNms9l/o/yM3whTYvo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPDrYAy17F7FZraEit1HhGhW9QtyFCmIKIy6oYKy7o1vSlELm4
+	B7qdF76Ux7Xma7aVhtXUZTZl+rSOsvG69P16sgiajwyKc01QxLoW4FtyitB4ROxm
+X-Gm-Gg: ASbGncsARjolcOD2ZZc0ms1dQfuYYPh1V5MM1Jug2Gg9Fa80dpoVUKLqrapq9YYpBHl
+	4fYiPnwIY6WWePD1OW6XiaEK98v4VQDGFNGf6ewQjRcfSgSUbIfKAt6Jhvvp8CEYTmILBMgMcIE
+	Bmy82JRmxiD/Zcq4/k0//KCZTxggDv2NE9guH7tW4r757B9Ub8IYqD20Ucgua38e4I5sLkyA5sa
+	rFtbZyCzP40KK/f1eDoRxmFjPggADTfy5zIsmadnG3bym68k/yqVSQHMhlYBRwNh4V7pDXEwmGy
+	y2L1Nfcigo8Hq008+JcOnx6gXUIVzdTVLZgqrVJ0glNFc2f8YdSNtK/ctdIwPt6Clnt7KY7hl2A
+	49U/LJDVAUG4JyedO6U0gxCbj554NMk5QbYUx+CNSzssrxzHHo85mlKRQkz5GGYjcoTWtR1BC/K
+	wZRnCFfoZhPzOi6yjcUvYynyHdsnWDawbaFG50pMw=
+X-Google-Smtp-Source: AGHT+IECuIfPzTKAoKLnb5CCkqctpSjM4duv5G7WWCZ4jAtAQ9D+zyG5Bwm9OD6S6aWTtrYYwHepAw==
+X-Received: by 2002:a05:6122:251d:b0:544:93b6:a096 with SMTP id 71dfb90a1353d-54493b6a1a3mr971147e0c.8.1756494740458;
+        Fri, 29 Aug 2025 12:12:20 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-54491464b7dsm1331889e0c.15.2025.08.29.12.12.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Aug 2025 12:12:19 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-08-29
+Date: Fri, 29 Aug 2025 15:12:10 -0400
+Message-ID: <20250829191210.1982163-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,44 +73,32 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: remove duplicate h4_recv_buf() in header
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175648560766.2276001.11700293691359487684.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Aug 2025 16:40:07 +0000
-References: 
- <be8edf7f8ba8dea6c61272b02fb20a4ac7e1c5a5.1756179634.git.calvin@wbinvd.org>
-In-Reply-To: 
- <be8edf7f8ba8dea6c61272b02fb20a4ac7e1c5a5.1756179634.git.calvin@wbinvd.org>
-To: Calvin Owens <calvin@wbinvd.org>
-Cc: linux-kernel@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- sean.wang@mediatek.com, amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com,
- linux-bluetooth@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, johan.hedberg@intel.com
 
-Hello:
+The following changes since commit 5189446ba995556eaa3755a6e875bc06675b88bd:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  net: ipv4: fix regression in local-broadcast routes (2025-08-28 10:52:30 +0200)
 
-On Mon, 25 Aug 2025 21:11:08 -0700 you wrote:
-> The "h4_recv.h" header contains a duplicate h4_recv_buf() that is nearly
-> but not quite identical to the h4_recv_buf() in hci_h4.c.
-> 
-> This duplicated header was added in commit 07eb96a5a7b0 ("Bluetooth:
-> bpa10x: Use separate h4_recv_buf helper"). I wasn't able to find any
-> explanation for duplicating the code in the discussion:
-> 
-> [...]
+are available in the Git repository at:
 
-Here is the summary with links:
-  - Bluetooth: remove duplicate h4_recv_buf() in header
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0e272fc7e17d
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-08-29
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to 862c628108562d8c7a516a900034823b381d3cba:
 
+  Bluetooth: Fix use-after-free in l2cap_sock_cleanup_listen() (2025-08-29 14:51:06 -0400)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - vhci: Prevent use-after-free by removing debugfs files early
+ - L2CAP: Fix use-after-free in l2cap_sock_cleanup_listen()
+
+----------------------------------------------------------------
+Ivan Pravdin (1):
+      Bluetooth: vhci: Prevent use-after-free by removing debugfs files early
+
+Kuniyuki Iwashima (1):
+      Bluetooth: Fix use-after-free in l2cap_sock_cleanup_listen()
+
+ drivers/bluetooth/hci_vhci.c | 57 +++++++++++++++++++++++++++++++-------------
+ net/bluetooth/l2cap_sock.c   |  3 +++
+ 2 files changed, 44 insertions(+), 16 deletions(-)
