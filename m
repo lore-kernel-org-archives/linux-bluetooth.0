@@ -1,152 +1,128 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12D238FA3
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Aug 2025 01:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6EA27280B;
+	Sat, 30 Aug 2025 05:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756516822; cv=none; b=eRMc1I7qf5YB8R9KlSkug0kp20ytN9dkcPEpEJ0KPBYf5V+nijzM5jLG1RgkJxe8QgblVRDfz4W72RnstXz5riETsLyS07kUw1fItqao2Yh6xo5Frac3QEcI89hB37XA0+7INU1zMLYSlWkscpcYfY/Gc0TDjxTvGYRirAIryTI=
+	t=1756530709; cv=none; b=ivVfz8PylqP+5gRoGj046KNZW1naWsW5JNtyMC1sg47bhp9XkEjVCNjYJ9qfMnIl947lWYtI1fVhdmIcIlsFUGh93pxyvma5fsPF2YRllSlhP86AKTUCpn0WrvXKMCL4dFqZeSAzZfqhz9orkRAAoqEW9dg9qEHCtlaLeaowNbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756516822; c=relaxed/simple;
-	bh=EFL40s4Sy0ByXwynvRZWeYbD1VphHFDR6nT+iDGy4+o=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=cMJ1elGWyZ/iDS4UfTpJFp19XBRTBrpT8MNydj5zhfZ6rEEHlfZXB0QtPo32RP5b7ZJBVvp+uCfq+3v8FssjSKSJsV4u6sQ7ZW6PWuUE5x0eqOkN0QXybI9omK4Ev4BYb83KmUFplwSIiKknyHQcUcatyqXhm/T5hrvo3xLLYAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJbIwEs9; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJbIwEs9"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7722f2f2aa4so1507146b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 18:20:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756516820; x=1757121620; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q56lH1HckNE9X/14hhGgFIC7ILfTWpaAOeQ1Mmdpdj4=;
-        b=iJbIwEs9lQJ0ovhb05idNqg8bNWcrZVhbLajN+tviw2b2rJ/g7bLi7krZf8mzUmOn5
-         DwLJndWvKOJTzYWJr8E0e+vnsO1NpG6udl4zuAJG1Ui3c7OjlisTYZfww4opX48kuoNF
-         BXFB78XXUGspcK/b43uKx0Xcf4LxN29YwANPlaKfsw5nlSnRCMKddZlGIvvOx550l97x
-         bO9R7627EsaEWp6//ds8WmgayI8nbwNUYSagSSbO9pubwUBfpZMmFAtbwj53eDKZ5J92
-         z33Ry+6QJL23md8hJ+nnqjTh2Uu4jlJLzEbwz/p/h1Ei10STZGQu7eTSkvnfrwH4Hii1
-         w9vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756516820; x=1757121620;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q56lH1HckNE9X/14hhGgFIC7ILfTWpaAOeQ1Mmdpdj4=;
-        b=J+9wcKsovMG2LmpnEfO4s3YYWXv8Wo21PAwbjMg+x83+ySj7sZ6QHhpB9rPq1IJhfB
-         nRBk2Pgqw8/NUCsleqUDUSv6XTdbgW/eCTDZ8+MQQgMFunjYEc1Epwdp6xo7/xUJLGps
-         Mg8XRCuDB2DCV91YyJCSKFL2MPE/9C492WmWgNq8tVGAqqWLJrOYdo3xySCIr8yHcWqx
-         QPEEPk+oMHPyiypxD9TZ63p0S3wr57zanDtcz2M9d7HlWHNRDvVZBTpFrnlY+q8nbqNm
-         M3BlDl5mQtwdUi/+6RgAaQGfJN89TRcI7uo2AIE5YrWKmRjxCWIqJLQ+KRWVizQz+DDE
-         Z5XA==
-X-Gm-Message-State: AOJu0YzHEK6OE+OZTOV6VzNjjUHRREljzEaY6au/bOzqHeUQGfcMJx2h
-	xHRfE2sHGKfXe1v3PATPKX/H8f0sqie6uVepvjzcQpzeml50maHlS/40HwwI8i/w
-X-Gm-Gg: ASbGncs55ByKrBe31SW6lnn7deMT7Okc0R8QnBP98Vbsg/Wx3xw5Q+3H7XpgHD+e9aR
-	qR3udPKFsgytVNL5B4w3rhc4q1hZtUKNOUCV4u42JifJ7Sl/7p5y7Yun0C5IOED7iwymknsO9cs
-	jpF0lmLnTmxrQ98FkkG+poxoiz8KrBPBTIp/CDAG2rMQmG6clm6njZz+6Z7vnhzGWaAUtMltCQ0
-	W6lvZ8HX/UqQ3hm8wtOYFuhNr7yBBSt/IfP/SmWq9AJ4zKEYcUERto5IgZmWrPxz/8w/PcHqE/5
-	IbAMUs1lbZCcmKxpHW8cfw7B0RIET7cWknKc2eiApUp29bUcbef4Na4ftRFIW7/Uib1DdZwSCEW
-	emzgNP+3OJm6uX2cTK5J1x7wxtag9lHTWl+SaKbk=
-X-Google-Smtp-Source: AGHT+IHLurM8lZ9skFKVr/sFCEfzmTPjvsYnROSrVhFsASJsnhwxuT2qcgvsJMfjDM77jEduTSsZQg==
-X-Received: by 2002:a05:6a00:983:b0:772:d15:5f55 with SMTP id d2e1a72fcca58-7723e406214mr845865b3a.32.1756516819762;
-        Fri, 29 Aug 2025 18:20:19 -0700 (PDT)
-Received: from [172.17.0.2] ([20.171.51.210])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a269f27sm3697103b3a.12.2025.08.29.18.20.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Aug 2025 18:20:19 -0700 (PDT)
-Message-ID: <68b251d3.050a0220.12855.f704@mx.google.com>
-Date: Fri, 29 Aug 2025 18:20:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8369062851341986900=="
+	s=arc-20240116; t=1756530709; c=relaxed/simple;
+	bh=FA+LaNAtSrDw22JkgVZ/MEEYs9lp2qPOgwnL7mosRHg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kOFRislzesuTGhZlRAioa3P8hN3rx/mUx+FOucUdHw4Q4XONZt31cTQSqAb0EtvQuf8L3eU4f0ceQIJIrQR0mfyF9J81p7VUWmHwvLbFd6EseL13mTR/8ntoE5dQg2W7o8seTdXQSH+BXV0KNst9nC5mZnHJVtew+YP6wcUgfkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af7fb.dynamic.kabel-deutschland.de [95.90.247.251])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AED366004C2C9;
+	Sat, 30 Aug 2025 07:11:10 +0200 (CEST)
+Message-ID: <84fd4012-966b-4983-b015-ffce06509b5e@molgen.mpg.de>
+Date: Sat, 30 Aug 2025 07:11:10 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, calvin@wbinvd.org
-Subject: RE: Bluetooth: btmtksdio: Fix build after header cleanup
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btmtksdio: Fix build after header cleanup
+To: Calvin Owens <calvin@wbinvd.org>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ oe-kbuild-all@lists.linux.dev, Marcel Holtmann <marcel@holtmann.org>,
+ Sean Wang <sean.wang@mediatek.com>, linux-mediatek@lists.infradead.org
+References: <202508300413.OnIedvRh-lkp@intel.com>
+ <b78a4255d17adbb74140aa23f89cb7653af96c75.1756513671.git.calvin@wbinvd.org>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
 In-Reply-To: <b78a4255d17adbb74140aa23f89cb7653af96c75.1756513671.git.calvin@wbinvd.org>
-References: <b78a4255d17adbb74140aa23f89cb7653af96c75.1756513671.git.calvin@wbinvd.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============8369062851341986900==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=997085
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.40 seconds
-GitLint                       PENDING   0.28 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      24.20 seconds
-CheckAllWarning               PASS      26.93 seconds
-CheckSparse                   PASS      29.87 seconds
-BuildKernel32                 PASS      24.17 seconds
-TestRunnerSetup               PASS      476.47 seconds
-TestRunner_l2cap-tester       PASS      24.76 seconds
-TestRunner_iso-tester         PASS      38.67 seconds
-TestRunner_bnep-tester        PASS      5.90 seconds
-TestRunner_mgmt-tester        FAIL      126.23 seconds
-TestRunner_rfcomm-tester      PASS      9.26 seconds
-TestRunner_sco-tester         PASS      14.81 seconds
-TestRunner_ioctl-tester       PASS      10.05 seconds
-TestRunner_mesh-tester        FAIL      11.43 seconds
-TestRunner_smp-tester         PASS      8.55 seconds
-TestRunner_userchan-tester    PASS      6.26 seconds
-IncrementalBuild              PENDING   0.82 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.106 seconds
-LL Privacy - Add Device 3 (AL is full)               Failed       0.212 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.141 seconds
-Mesh - Send cancel - 2                               Timed out    1.998 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Dear Calvin,
 
 
+Thank you for your patch, and addressing the regression right away.
 
----
-Regards,
-Linux Bluetooth
+Am 30.08.25 um 02:50 schrieb Calvin Owens:
+> Syzbot found a randconfig which fails after my recent patch:
+> 
+>      drivers/bluetooth/btmtksdio.c:442:33: error: array type has incomplete element type ‘struct h4_recv_pkt’
+>        442 | static const struct h4_recv_pkt mtk_recv_pkts[] = {
+>            |                                 ^~~~~~~~~~~~~
+>      drivers/bluetooth/btmtksdio.c:443:11: error: ‘H4_RECV_ACL’ undeclared here (not in a function)
+>        443 |         { H4_RECV_ACL,      .recv = btmtksdio_recv_acl },
+>            |           ^~~~~~~~~~~
+>      drivers/bluetooth/btmtksdio.c:444:11: error: ‘H4_RECV_SCO’ undeclared here (not in a function)
+>        444 |         { H4_RECV_SCO,      .recv = hci_recv_frame },
+>            |           ^~~~~~~~~~~
+>      drivers/bluetooth/btmtksdio.c:445:11: error: ‘H4_RECV_EVENT’ undeclared here (not in a function)
+>        445 |         { H4_RECV_EVENT,    .recv = btmtksdio_recv_event },
+> 
+> ...because we can have BT_MTKSDIO=y with BT_HCIUART_H4=n, and the
+> definitions used here are gated on BT_HCIUART_H4 in hci_uart.h.
+
+The drivers below seem to be affected:
+
+     drivers/bluetooth/bpa10x.c:     { H4_RECV_EVENT,   .recv = 
+hci_recv_frame },
+     drivers/bluetooth/btmtksdio.c:  { H4_RECV_EVENT,    .recv = 
+btmtksdio_recv_event },
+     drivers/bluetooth/btmtkuart.c:  { H4_RECV_EVENT,    .recv = 
+btmtkuart_recv_event },
+     drivers/bluetooth/btnxpuart.c:  { H4_RECV_EVENT,        .recv = 
+hci_recv_frame },
+
+> I think the simplest way to fix this is to remove the gate on the
+> definitions in hci_uart.h. Since the constants are macros, there's no
+> runtime cost to doing so, and nothing seems to rely on their absence in
+> the BT_HCIUART_H4=n case.
+
+Looking at the implementation, it looks like they only work with the H4 
+protocol? So maybe, that should be denoted in the Kconfig files?
+
+> I let randconfig builds run for awhile in drivers/bluetooth/ and didn't
+> hit anything else, so hopefully this was the only fallout.
+> 
+> Fixes: 74bcec450eea ("Bluetooth: remove duplicate h4_recv_buf() in header")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202508300413.OnIedvRh-lkp@intel.com/
+> Signed-off-by: Calvin Owens <calvin@wbinvd.org>
+> ---
+>   drivers/bluetooth/hci_uart.h | 2 --
+>   1 file changed, 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> index 5ea5dd80e297..fd0624988aba 100644
+> --- a/drivers/bluetooth/hci_uart.h
+> +++ b/drivers/bluetooth/hci_uart.h
+> @@ -121,7 +121,6 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
+>   void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
+>   			 unsigned int oper_speed);
+>   
+> -#ifdef CONFIG_BT_HCIUART_H4
+>   int h4_init(void);
+>   int h4_deinit(void);
+>   
+> @@ -165,7 +164,6 @@ struct h4_recv_pkt {
+>   struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+>   			    const unsigned char *buffer, int count,
+>   			    const struct h4_recv_pkt *pkts, int pkts_count);
+> -#endif
+>   
+>   #ifdef CONFIG_BT_HCIUART_BCSP
+>   int bcsp_init(void);
+
+It’s a valid fix.
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
---===============8369062851341986900==--
+Kind regards,
+
+Paul
