@@ -1,423 +1,227 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E98C2D0C64
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Aug 2025 17:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC842DE1FC
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Aug 2025 19:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756574965; cv=none; b=NTvPrE7+pjt3zxrQbZj86tgWHk0KGUztMQk7OkPVwNEI/XlrmmgOk5QzcNwqFLFdKcEjy8/S6DRQlXC7A5p/SBc4am7Ybi8EVmMe5tkoN6yJDAYToWnCEurwMHVeGOeFNJlvHm3sdoigvj4i6HnvbhTtAyzyrX47SZ2crsfESPg=
+	t=1756582341; cv=none; b=Z7/QwxQCO6kJQqTSmB8emffr7ZbPEDARlf5I3ykbNAgi/yWSAyjcQdQgRRa+oORZfsgjQuwybVjmnQ8YBuM0BG0QpX/o023K0qYk9orBx+oF+ebFVIn7fTQGJLZ+InYn7DKIjZUjfURN4JegWFdqYe7qwpFVX5LSvPGgmC6HwWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756574965; c=relaxed/simple;
-	bh=8lI7XrnXcwI8I1CcQQDuAugMF3T9TugA+2rT2skzMoo=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=fWvDNxC0MyCxdeuwZKR52C9iVFnn3CALwRoSDX9Vv5vMDwxLKW5yfhoI5+vrVJCqKFlc9HNf5antpCE3Gxaz1+a688C6DLC6FsLE6eJs7C+s4fJ5YGS/QVxWut1tyy+oEObKgZ01gAGgyBYSQka4/ph5j6hB0XaTUxn10TyG+vI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j+MfQS3Z; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1756582341; c=relaxed/simple;
+	bh=A7kOwLXfXYTqy6VkkzPnhYvUhmrg8KJbNZ7bE1IEsE8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E7aFKWwf9lKhJOP58ALP6Toq8TA+UFieCFmvs8NLG56oWDbw9tI4Kn1yBFFIFJNSDoFmpbPDkK5K3Zh3hX2NtU42/caa2CKR1pk4OxySudIVnQf29lZCJL47vPiue6oyqGFirlIYHUOnkKOdEbO8Gp6y/o6oQLDY75A9FogZhzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=h/6JcrGn; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j+MfQS3Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756574964; x=1788110964;
-  h=date:from:to:cc:subject:message-id;
-  bh=8lI7XrnXcwI8I1CcQQDuAugMF3T9TugA+2rT2skzMoo=;
-  b=j+MfQS3Zm9WIEjjZdq7pNSUso9+0j7VDvWOhz2idTKFO7+V6TaWefZpb
-   ViJ+VI8WnGPq4BQ9A3HUKpbm+dtCw87H7d+JpZ24PaivmRNGsh6Q68WUH
-   FwF+tPO5L+WH+fiJejH3+761VefH1tNpzbqGBYEVKxlmyQu2RKEqre813
-   5Heca6foPNvhmG2oTelBCsePNh53IZq1xdPQlixNoh9GDIUNll0zj8imZ
-   s5zhzX09R+mGCYEbokc/ncYSrPL0g7TpESKXbSGS76bZLjsY9fV8GcZs0
-   7bZh+r7Wq9Ac904nphvi0Qv73PUpQcy9cN0OfiR00561Mwt2lREIpGEcG
-   g==;
-X-CSE-ConnectionGUID: Q3t4hmJKTryVXCoqib/3PA==
-X-CSE-MsgGUID: zrQFgiXSQT6vRkgRXzSeYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11537"; a="58981779"
-X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="58981779"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2025 10:29:23 -0700
-X-CSE-ConnectionGUID: bEijporaT/mJ8BWst0tYqA==
-X-CSE-MsgGUID: QmUAXTDLRqW+qDgkjaZGrQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="175900196"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by fmviesa004.fm.intel.com with ESMTP; 30 Aug 2025 10:29:21 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1usPNm-000VZj-2V;
-	Sat, 30 Aug 2025 17:29:04 +0000
-Date: Sun, 31 Aug 2025 01:27:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD REGRESSION
- 02925b3b935e2203077ec974b93bf2d5f84ab754
-Message-ID: <202508310142.DigBIrAX-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="h/6JcrGn"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-24457f581aeso27546035ad.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 30 Aug 2025 12:32:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=wbinvd.org; s=wbinvd; t=1756582339; x=1757187139; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XHChkfQMkbV7SjUtwakYhLoytq+CyhHZTNbhfb0dUvg=;
+        b=h/6JcrGnse1Mp0iw65iCsiiT72hHFcS6W9+o/iHUpXmLtUQXcvikjKZaj1WtYXHHjr
+         ftSQ1D6FkoXEN61T9QdLGlazmgdG0jR8VdXlk7P7NGnfDH2lyOgXWMxRVTi2EMqll6/j
+         //ulEanWKPs0z7fE32y5yFWrmGL2rMyJ9ZBlKBZ9o8iq8wQwMghKwLFE0+6fal3wknu3
+         ezdUvEoODTv2+4BYmdd3x2tt+5mzfR/fouNCHWRlBlqByEsUREtB+Qn/n7A386/ew8vG
+         RpmRBZaH/Czgvc8k+ulZQkEnf8ZIAzgAfYQW4OAmBVAPvdiQ3+9RKClvIjrgLMin+9Ii
+         D6Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756582339; x=1757187139;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XHChkfQMkbV7SjUtwakYhLoytq+CyhHZTNbhfb0dUvg=;
+        b=FFx4eZZFcR7Aj9q5ETLxNF8t1apamrCgc1dzDHjNlYwxNN8lxZgozditi/jPAI77jg
+         SpLY9wLIFGsGEMhTZXZ68/Y2WbAQ0PBP3OIz9+9Z22QPPV6PnN/yJx4uQK87lunliTLy
+         x7HNB/X/Eqn7Xg5309qYeFo5DO8tWnmloBSKTA+G9ddV/Hll2r+OZUN7iqtrhKDoPzr4
+         TcajhyOQ05N3QVkfIEnmf8ED4y19GU26kZE9EsaTyVps80GZnrbl985Y/VxFKSB87Ah2
+         LhmViZ3tOSlgGsODuaq9vNCP4MaWG/+t4SkiJbIpD+hizBLGf+IofvC6w9oTb49v/70a
+         1PhA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9H4Y9l+KouyD36PBetWiGp9CxwLssYoCAJLu7nM4wxufNrPxaHNmbH/FIst3dIaoIz5pw4axOZ4JQnscmjKA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKdoOXQDV6NSJroWp2DPWnrwsDjOYKoA/jWpATzKCU9LnsEjO4
+	idPcyrj12uAv8EFuFmgaeTk7uZLtc0oPfp257zzE1llwPbyQDVAln5+aHXwwYrmFODo=
+X-Gm-Gg: ASbGnctg9cMe9MyFRrLVfEA+h07DRl0XZYebsC7m1R6hHoOA+OZ9w6SZMSCvOjOk5TY
+	n672zhrBQDwi8mFfQhQDGfQyTAAsJtlqM2WPS2M1sm1XGeqnh039kzHfvBppLI7PdZU3AGbTSUB
+	8DkuWJCyBE1bm4KAqYB+ykHCCjUES0Z1nQ+bgBBmihRJ9fctPo1mHn9ZPxmPtQrQeWQoxo/jxyl
+	nXMmbJtTGn61nna5X8Sbwl6/kHqY0wk3v7HewMhMh4aIe2ypDJbVUPJp+vk35QZiDIWw59qP77x
+	utsspvVrGnzD2wYGxLwF2Ovp4bRJKWgN22jhAJlY8govJG6d9tl27GMkF8mI4uncl1HNNY36kxu
+	SgycK2uHMTpU7igggTRDXrjUcXNQ595e2iZ8=
+X-Google-Smtp-Source: AGHT+IH+3miFeIR6tQUL0wfehVSxT31HOSJPjvKC8CX71Xx5VWWJuBvRY0vS/CA50IGWE4dB1x1ywg==
+X-Received: by 2002:a17:902:ebc9:b0:246:b15f:8d9d with SMTP id d9443c01a7336-24944a1ca58mr35922805ad.14.1756582338796;
+        Sat, 30 Aug 2025 12:32:18 -0700 (PDT)
+Received: from mozart.vkv.me ([192.184.167.117])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24903702396sm59584335ad.14.2025.08.30.12.32.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Aug 2025 12:32:18 -0700 (PDT)
+Date: Sat, 30 Aug 2025 12:32:15 -0700
+From: Calvin Owens <calvin@wbinvd.org>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	oe-kbuild-all@lists.linux.dev,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH] Bluetooth: btmtksdio: Fix build after header cleanup
+Message-ID: <aLNRvzXE4O9dKZoN@mozart.vkv.me>
+References: <202508300413.OnIedvRh-lkp@intel.com>
+ <b78a4255d17adbb74140aa23f89cb7653af96c75.1756513671.git.calvin@wbinvd.org>
+ <84fd4012-966b-4983-b015-ffce06509b5e@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <84fd4012-966b-4983-b015-ffce06509b5e@molgen.mpg.de>
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 02925b3b935e2203077ec974b93bf2d5f84ab754  Bluetooth: Fix use-after-free in l2cap_sock_cleanup_listen()
+On Saturday 08/30 at 07:11 +0200, Paul Menzel wrote:
+> Dear Calvin,
+> 
+> 
+> Thank you for your patch, and addressing the regression right away.
+> 
+> Am 30.08.25 um 02:50 schrieb Calvin Owens:
+> > Syzbot found a randconfig which fails after my recent patch:
+> > 
+> >      drivers/bluetooth/btmtksdio.c:442:33: error: array type has incomplete element type ‘struct h4_recv_pkt’
+> >        442 | static const struct h4_recv_pkt mtk_recv_pkts[] = {
+> >            |                                 ^~~~~~~~~~~~~
+> >      drivers/bluetooth/btmtksdio.c:443:11: error: ‘H4_RECV_ACL’ undeclared here (not in a function)
+> >        443 |         { H4_RECV_ACL,      .recv = btmtksdio_recv_acl },
+> >            |           ^~~~~~~~~~~
+> >      drivers/bluetooth/btmtksdio.c:444:11: error: ‘H4_RECV_SCO’ undeclared here (not in a function)
+> >        444 |         { H4_RECV_SCO,      .recv = hci_recv_frame },
+> >            |           ^~~~~~~~~~~
+> >      drivers/bluetooth/btmtksdio.c:445:11: error: ‘H4_RECV_EVENT’ undeclared here (not in a function)
+> >        445 |         { H4_RECV_EVENT,    .recv = btmtksdio_recv_event },
+> > 
+> > ...because we can have BT_MTKSDIO=y with BT_HCIUART_H4=n, and the
+> > definitions used here are gated on BT_HCIUART_H4 in hci_uart.h.
+> 
+> The drivers below seem to be affected:
+> 
+>     drivers/bluetooth/bpa10x.c:     { H4_RECV_EVENT,   .recv =
+> hci_recv_frame },
+>     drivers/bluetooth/btmtksdio.c:  { H4_RECV_EVENT,    .recv =
+> btmtksdio_recv_event },
+>     drivers/bluetooth/btmtkuart.c:  { H4_RECV_EVENT,    .recv =
+> btmtkuart_recv_event },
+>     drivers/bluetooth/btnxpuart.c:  { H4_RECV_EVENT,        .recv =
+> hci_recv_frame },
+>
+> > I think the simplest way to fix this is to remove the gate on the
+> > definitions in hci_uart.h. Since the constants are macros, there's no
+> > runtime cost to doing so, and nothing seems to rely on their absence in
+> > the BT_HCIUART_H4=n case.
+> 
+> Looking at the implementation, it looks like they only work with the H4
+> protocol? So maybe, that should be denoted in the Kconfig files?
 
-Error/Warning (recently discovered and may have been fixed):
+Thanks for looking Paul.
 
-    https://lore.kernel.org/oe-kbuild-all/202508300413.OnIedvRh-lkp@intel.com
+Yes, my fix will cause a link error with other randconfigs, which my
+'make randconfig drivers/bluetooth/' test loop missed after I made the
+function prototype always defined, whoops.
 
-    drivers/bluetooth/bpa10x.c:77:33: error: array type has incomplete element type 'struct h4_recv_pkt'
-    drivers/bluetooth/bpa10x.c:77:33: warning: 'bpa10x_recv_pkts' defined but not used [-Wunused-variable]
-    drivers/bluetooth/bpa10x.c:77:49: error: array has incomplete element type 'const struct h4_recv_pkt'
-    drivers/bluetooth/bpa10x.c:78:11: error: 'H4_RECV_ACL' undeclared here (not in a function)
-    drivers/bluetooth/bpa10x.c:78:4: error: use of undeclared identifier 'H4_RECV_ACL'
-    drivers/bluetooth/bpa10x.c:79:11: error: 'H4_RECV_SCO' undeclared here (not in a function)
-    drivers/bluetooth/bpa10x.c:79:4: error: use of undeclared identifier 'H4_RECV_SCO'
-    drivers/bluetooth/bpa10x.c:80:11: error: 'H4_RECV_EVENT' undeclared here (not in a function)
-    drivers/bluetooth/bpa10x.c:80:4: error: use of undeclared identifier 'H4_RECV_EVENT'
-    drivers/bluetooth/bpa10x.c:99:23: error: call to undeclared function 'h4_recv_buf'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    drivers/bluetooth/bpa10x.c:99:37: error: implicit declaration of function 'h4_recv_buf' [-Werror=implicit-function-declaration]
-    drivers/bluetooth/btmtksdio.c:442:33: error: array type has incomplete element type 'struct h4_recv_pkt'
-    drivers/bluetooth/btmtksdio.c:442:33: warning: 'mtk_recv_pkts' defined but not used [-Wunused-variable]
-    drivers/bluetooth/btmtksdio.c:442:46: error: array has incomplete element type 'const struct h4_recv_pkt'
-    drivers/bluetooth/btmtksdio.c:443:11: error: 'H4_RECV_ACL' undeclared here (not in a function)
-    drivers/bluetooth/btmtksdio.c:443:22: error: field name not in record or union initializer
-    drivers/bluetooth/btmtksdio.c:443:4: error: 'H4_RECV_ACL' undeclared here (not in a function); did you mean 'IP_RECVTTL'?
-    drivers/bluetooth/btmtksdio.c:443:4: error: use of undeclared identifier 'H4_RECV_ACL'
-    drivers/bluetooth/btmtksdio.c:444:11: error: 'H4_RECV_SCO' undeclared here (not in a function)
-    drivers/bluetooth/btmtksdio.c:444:4: error: 'H4_RECV_SCO' undeclared here (not in a function)
-    drivers/bluetooth/btmtksdio.c:444:4: error: use of undeclared identifier 'H4_RECV_SCO'
-    drivers/bluetooth/btmtksdio.c:445:11: error: 'H4_RECV_EVENT' undeclared here (not in a function)
-    drivers/bluetooth/btmtksdio.c:445:4: error: 'H4_RECV_EVENT' undeclared here (not in a function); did you mean 'BPF_PERF_EVENT'?
-    drivers/bluetooth/btmtksdio.c:445:4: error: use of undeclared identifier 'H4_RECV_EVENT'
-    drivers/bluetooth/btmtksdio.c:493:34: error: dereferencing pointer to incomplete type 'const struct h4_recv_pkt'
-    drivers/bluetooth/btmtksdio.c:493:34: error: invalid use of undefined type 'struct h4_recv_pkt'
-    drivers/bluetooth/btmtksdio.c:493:34: error: subscript of pointer to incomplete type 'const struct h4_recv_pkt'
-    drivers/bluetooth/btmtksdio.c:493:48: error: invalid use of undefined type 'struct h4_recv_pkt'
-    drivers/bluetooth/btmtksdio.c:493:52: error: invalid use of undefined type 'const struct h4_recv_pkt'
-    drivers/bluetooth/btmtkuart.c:231:33: error: array type has incomplete element type 'struct h4_recv_pkt'
-    drivers/bluetooth/btmtkuart.c:231:33: warning: 'mtk_recv_pkts' defined but not used [-Wunused-variable]
-    drivers/bluetooth/btmtkuart.c:231:46: error: array has incomplete element type 'const struct h4_recv_pkt'
-    drivers/bluetooth/btmtkuart.c:232:11: error: 'H4_RECV_ACL' undeclared here (not in a function)
-    drivers/bluetooth/btmtkuart.c:232:4: error: use of undeclared identifier 'H4_RECV_ACL'
-    drivers/bluetooth/btmtkuart.c:233:11: error: 'H4_RECV_SCO' undeclared here (not in a function)
-    drivers/bluetooth/btmtkuart.c:233:4: error: use of undeclared identifier 'H4_RECV_SCO'
-    drivers/bluetooth/btmtkuart.c:234:11: error: 'H4_RECV_EVENT' undeclared here (not in a function)
-    drivers/bluetooth/btmtkuart.c:234:4: error: use of undeclared identifier 'H4_RECV_EVENT'
-    drivers/bluetooth/btmtkuart.c:371:18: error: call to undeclared function 'h4_recv_buf'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    drivers/bluetooth/btmtkuart.c:371:32: error: implicit declaration of function 'h4_recv_buf' [-Werror=implicit-function-declaration]
-    drivers/bluetooth/btmtkuart.c:371:32: error: implicit declaration of function 'h4_recv_buf' [-Wimplicit-function-declaration]
-    drivers/bluetooth/btnxpuart.c:1741:33: error: array type has incomplete element type 'struct h4_recv_pkt'
-    drivers/bluetooth/btnxpuart.c:1741:33: warning: 'nxp_recv_pkts' defined but not used [-Wunused-variable]
-    drivers/bluetooth/btnxpuart.c:1741:46: error: array has incomplete element type 'const struct h4_recv_pkt'
-    drivers/bluetooth/btnxpuart.c:1742:11: error: 'H4_RECV_ACL' undeclared here (not in a function)
-    drivers/bluetooth/btnxpuart.c:1742:4: error: 'H4_RECV_ACL' undeclared here (not in a function); did you mean 'IP_RECVTTL'?
-    drivers/bluetooth/btnxpuart.c:1742:4: error: use of undeclared identifier 'H4_RECV_ACL'
-    drivers/bluetooth/btnxpuart.c:1743:11: error: 'H4_RECV_SCO' undeclared here (not in a function)
-    drivers/bluetooth/btnxpuart.c:1743:4: error: 'H4_RECV_SCO' undeclared here (not in a function)
-    drivers/bluetooth/btnxpuart.c:1743:4: error: use of undeclared identifier 'H4_RECV_SCO'
-    drivers/bluetooth/btnxpuart.c:1744:11: error: 'H4_RECV_EVENT' undeclared here (not in a function)
-    drivers/bluetooth/btnxpuart.c:1744:4: error: 'H4_RECV_EVENT' undeclared here (not in a function); did you mean 'BPF_PERF_EVENT'?
-    drivers/bluetooth/btnxpuart.c:1744:4: error: use of undeclared identifier 'H4_RECV_EVENT'
-    drivers/bluetooth/btnxpuart.c:1745:11: error: 'H4_RECV_ISO' undeclared here (not in a function)
-    drivers/bluetooth/btnxpuart.c:1745:4: error: 'H4_RECV_ISO' undeclared here (not in a function); did you mean 'IP_RECVTOS'?
-    drivers/bluetooth/btnxpuart.c:1745:4: error: use of undeclared identifier 'H4_RECV_ISO'
-    drivers/bluetooth/btnxpuart.c:1759:19: error: call to undeclared function 'h4_recv_buf'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    drivers/bluetooth/btnxpuart.c:1759:19: error: implicit declaration of function 'h4_recv_buf'; did you mean 'sg_set_buf'? [-Werror=implicit-function-declaration]
-    drivers/bluetooth/btnxpuart.c:1759:26: error: implicit declaration of function 'h4_recv_buf' [-Werror=implicit-function-declaration]
+We do need the dependencies here, as you note. The btmtksdio case syzbot
+found is the odd one out because it only uses the constants, and doesn't
+call h4_recv_buf().
 
-Error/Warning ids grouped by kconfigs:
+Hopefully this gets it all:
 
-recent_errors
-|-- i386-buildonly-randconfig-004-20250830
-|   |-- drivers-bluetooth-btmtkuart.c:error:H4_RECV_ACL-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtkuart.c:error:H4_RECV_EVENT-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtkuart.c:error:H4_RECV_SCO-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtkuart.c:error:array-type-has-incomplete-element-type-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtkuart.c:error:implicit-declaration-of-function-h4_recv_buf
-|   `-- drivers-bluetooth-btmtkuart.c:warning:mtk_recv_pkts-defined-but-not-used
-|-- i386-randconfig-003-20250830
-|   |-- drivers-bluetooth-btmtksdio.c:error:array-has-incomplete-element-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtksdio.c:error:subscript-of-pointer-to-incomplete-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtksdio.c:error:use-of-undeclared-identifier-H4_RECV_ACL
-|   |-- drivers-bluetooth-btmtksdio.c:error:use-of-undeclared-identifier-H4_RECV_EVENT
-|   |-- drivers-bluetooth-btmtksdio.c:error:use-of-undeclared-identifier-H4_RECV_SCO
-|   |-- drivers-bluetooth-btmtkuart.c:error:array-has-incomplete-element-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtkuart.c:error:call-to-undeclared-function-h4_recv_buf-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- drivers-bluetooth-btmtkuart.c:error:use-of-undeclared-identifier-H4_RECV_ACL
-|   |-- drivers-bluetooth-btmtkuart.c:error:use-of-undeclared-identifier-H4_RECV_EVENT
-|   `-- drivers-bluetooth-btmtkuart.c:error:use-of-undeclared-identifier-H4_RECV_SCO
-|-- i386-randconfig-004-20250830
-|   |-- drivers-bluetooth-bpa1.c:error:array-has-incomplete-element-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-bpa1.c:error:call-to-undeclared-function-h4_recv_buf-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- drivers-bluetooth-bpa1.c:error:use-of-undeclared-identifier-H4_RECV_ACL
-|   |-- drivers-bluetooth-bpa1.c:error:use-of-undeclared-identifier-H4_RECV_EVENT
-|   `-- drivers-bluetooth-bpa1.c:error:use-of-undeclared-identifier-H4_RECV_SCO
-|-- i386-randconfig-011-20250830
-|   |-- drivers-bluetooth-bpa1.c:error:H4_RECV_ACL-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-bpa1.c:error:H4_RECV_EVENT-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-bpa1.c:error:H4_RECV_SCO-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-bpa1.c:error:array-type-has-incomplete-element-type-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-bpa1.c:error:implicit-declaration-of-function-h4_recv_buf
-|   |-- drivers-bluetooth-bpa1.c:warning:bpa1_recv_pkts-defined-but-not-used
-|   |-- drivers-bluetooth-btmtkuart.c:error:H4_RECV_ACL-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtkuart.c:error:H4_RECV_EVENT-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtkuart.c:error:H4_RECV_SCO-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtkuart.c:error:array-type-has-incomplete-element-type-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtkuart.c:error:implicit-declaration-of-function-h4_recv_buf
-|   |-- drivers-bluetooth-btmtkuart.c:warning:mtk_recv_pkts-defined-but-not-used
-|   |-- drivers-bluetooth-btnxpuart.c:error:H4_RECV_ACL-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btnxpuart.c:error:H4_RECV_EVENT-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btnxpuart.c:error:H4_RECV_ISO-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btnxpuart.c:error:H4_RECV_SCO-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btnxpuart.c:error:array-type-has-incomplete-element-type-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btnxpuart.c:error:implicit-declaration-of-function-h4_recv_buf
-|   `-- drivers-bluetooth-btnxpuart.c:warning:nxp_recv_pkts-defined-but-not-used
-|-- nios2-randconfig-002-20250830
-|   |-- drivers-bluetooth-btmtksdio.c:error:H4_RECV_ACL-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtksdio.c:error:H4_RECV_EVENT-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtksdio.c:error:H4_RECV_SCO-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtksdio.c:error:array-type-has-incomplete-element-type-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtksdio.c:error:dereferencing-pointer-to-incomplete-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtksdio.c:error:field-name-not-in-record-or-union-initializer
-|   |-- drivers-bluetooth-btmtksdio.c:error:invalid-use-of-undefined-type-struct-h4_recv_pkt
-|   `-- drivers-bluetooth-btmtksdio.c:warning:mtk_recv_pkts-defined-but-not-used
-|-- sparc-randconfig-001-20250830
-|   |-- drivers-bluetooth-btmtksdio.c:error:H4_RECV_ACL-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtksdio.c:error:H4_RECV_EVENT-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtksdio.c:error:H4_RECV_SCO-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btmtksdio.c:error:array-type-has-incomplete-element-type-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtksdio.c:error:invalid-use-of-undefined-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtksdio.c:error:invalid-use-of-undefined-type-struct-h4_recv_pkt
-|   `-- drivers-bluetooth-btmtksdio.c:warning:mtk_recv_pkts-defined-but-not-used
-|-- sparc-randconfig-r054-20250830
-|   |-- drivers-bluetooth-btnxpuart.c:error:H4_RECV_ACL-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btnxpuart.c:error:H4_RECV_EVENT-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btnxpuart.c:error:H4_RECV_ISO-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btnxpuart.c:error:H4_RECV_SCO-undeclared-here-(not-in-a-function)
-|   |-- drivers-bluetooth-btnxpuart.c:error:array-type-has-incomplete-element-type-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btnxpuart.c:error:implicit-declaration-of-function-h4_recv_buf
-|   `-- drivers-bluetooth-btnxpuart.c:warning:nxp_recv_pkts-defined-but-not-used
-|-- x86_64-randconfig-077-20250830
-|   |-- drivers-bluetooth-btmtksdio.c:error:array-has-incomplete-element-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtksdio.c:error:subscript-of-pointer-to-incomplete-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtksdio.c:error:use-of-undeclared-identifier-H4_RECV_ACL
-|   |-- drivers-bluetooth-btmtksdio.c:error:use-of-undeclared-identifier-H4_RECV_EVENT
-|   |-- drivers-bluetooth-btmtksdio.c:error:use-of-undeclared-identifier-H4_RECV_SCO
-|   |-- drivers-bluetooth-btmtkuart.c:error:array-has-incomplete-element-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btmtkuart.c:error:call-to-undeclared-function-h4_recv_buf-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- drivers-bluetooth-btmtkuart.c:error:use-of-undeclared-identifier-H4_RECV_ACL
-|   |-- drivers-bluetooth-btmtkuart.c:error:use-of-undeclared-identifier-H4_RECV_EVENT
-|   |-- drivers-bluetooth-btmtkuart.c:error:use-of-undeclared-identifier-H4_RECV_SCO
-|   |-- drivers-bluetooth-btnxpuart.c:error:array-has-incomplete-element-type-const-struct-h4_recv_pkt
-|   |-- drivers-bluetooth-btnxpuart.c:error:call-to-undeclared-function-h4_recv_buf-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- drivers-bluetooth-btnxpuart.c:error:use-of-undeclared-identifier-H4_RECV_ACL
-|   |-- drivers-bluetooth-btnxpuart.c:error:use-of-undeclared-identifier-H4_RECV_EVENT
-|   |-- drivers-bluetooth-btnxpuart.c:error:use-of-undeclared-identifier-H4_RECV_ISO
-|   `-- drivers-bluetooth-btnxpuart.c:error:use-of-undeclared-identifier-H4_RECV_SCO
-`-- xtensa-randconfig-002-20250830
-    |-- drivers-bluetooth-btmtkuart.c:error:H4_RECV_ACL-undeclared-here-(not-in-a-function)
-    |-- drivers-bluetooth-btmtkuart.c:error:H4_RECV_EVENT-undeclared-here-(not-in-a-function)
-    |-- drivers-bluetooth-btmtkuart.c:error:H4_RECV_SCO-undeclared-here-(not-in-a-function)
-    |-- drivers-bluetooth-btmtkuart.c:error:array-type-has-incomplete-element-type-struct-h4_recv_pkt
-    |-- drivers-bluetooth-btmtkuart.c:error:implicit-declaration-of-function-h4_recv_buf
-    `-- drivers-bluetooth-btmtkuart.c:warning:mtk_recv_pkts-defined-but-not-used
+-----8<-----
+From: Calvin Owens <calvin@wbinvd.org>
+Subject: [PATCH v2] Bluetooth: Fix build after header cleanup
 
-elapsed time: 1448m
+Some Kconfig dependencies are needed after my recent cleanup, since
+the core code has its own option.
 
-configs tested: 188
-configs skipped: 4
+Since btmtksdio does not actually call h4_recv_buf(), move the
+definitions it uses outside the BT_HCIUART_H4 gate in hci_uart.h to
+avoid adding a dependency for btmtksdio.
 
-tested configs:
-alpha                             allnoconfig    gcc-15.1.0
-alpha                            allyesconfig    clang-19
-alpha                            allyesconfig    gcc-15.1.0
-arc                              allmodconfig    clang-19
-arc                              allmodconfig    gcc-15.1.0
-arc                               allnoconfig    gcc-15.1.0
-arc                              allyesconfig    clang-19
-arc                              allyesconfig    gcc-15.1.0
-arc                   randconfig-001-20250830    gcc-8.5.0
-arc                   randconfig-002-20250830    gcc-8.5.0
-arm                              allmodconfig    clang-19
-arm                              allmodconfig    gcc-15.1.0
-arm                               allnoconfig    clang-22
-arm                              allyesconfig    clang-19
-arm                         orion5x_defconfig    gcc-15.1.0
-arm                   randconfig-001-20250830    gcc-11.5.0
-arm                   randconfig-002-20250830    clang-22
-arm                   randconfig-003-20250830    clang-19
-arm                   randconfig-004-20250830    clang-22
-arm64                            allmodconfig    clang-19
-arm64                             allnoconfig    gcc-15.1.0
-arm64                 randconfig-001-20250830    gcc-10.5.0
-arm64                 randconfig-002-20250830    clang-22
-arm64                 randconfig-003-20250830    gcc-8.5.0
-arm64                 randconfig-004-20250830    clang-22
-csky                              allnoconfig    gcc-15.1.0
-csky                  randconfig-001-20250830    gcc-10.5.0
-csky                  randconfig-002-20250830    gcc-15.1.0
-hexagon                          allmodconfig    clang-17
-hexagon                          allmodconfig    clang-19
-hexagon                           allnoconfig    clang-22
-hexagon                          allyesconfig    clang-19
-hexagon                          allyesconfig    clang-22
-hexagon               randconfig-001-20250830    clang-22
-hexagon               randconfig-002-20250830    clang-22
-i386                             allmodconfig    clang-20
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    clang-20
-i386                              allnoconfig    gcc-12
-i386                             allyesconfig    clang-20
-i386                             allyesconfig    gcc-12
-i386        buildonly-randconfig-001-20250830    clang-20
-i386        buildonly-randconfig-002-20250830    clang-20
-i386        buildonly-randconfig-003-20250830    clang-20
-i386        buildonly-randconfig-004-20250830    gcc-12
-i386        buildonly-randconfig-005-20250830    clang-20
-i386        buildonly-randconfig-006-20250830    clang-20
-i386                                defconfig    clang-20
-i386                  randconfig-001-20250830    clang-20
-i386                  randconfig-002-20250830    clang-20
-i386                  randconfig-003-20250830    clang-20
-i386                  randconfig-004-20250830    clang-20
-i386                  randconfig-005-20250830    clang-20
-i386                  randconfig-006-20250830    clang-20
-i386                  randconfig-007-20250830    clang-20
-i386                  randconfig-011-20250830    gcc-12
-i386                  randconfig-012-20250830    gcc-12
-i386                  randconfig-013-20250830    gcc-12
-i386                  randconfig-014-20250830    gcc-12
-i386                  randconfig-015-20250830    gcc-12
-i386                  randconfig-016-20250830    gcc-12
-i386                  randconfig-017-20250830    gcc-12
-loongarch                        allmodconfig    clang-19
-loongarch                         allnoconfig    clang-22
-loongarch             randconfig-001-20250830    clang-22
-loongarch             randconfig-002-20250830    clang-18
-m68k                             allmodconfig    clang-19
-m68k                             allmodconfig    gcc-15.1.0
-m68k                              allnoconfig    gcc-15.1.0
-m68k                             allyesconfig    clang-19
-m68k                             allyesconfig    gcc-15.1.0
-m68k                        m5272c3_defconfig    gcc-15.1.0
-microblaze                       allmodconfig    clang-19
-microblaze                       allmodconfig    gcc-15.1.0
-microblaze                        allnoconfig    gcc-15.1.0
-microblaze                       allyesconfig    clang-19
-microblaze                       allyesconfig    gcc-15.1.0
-microblaze                          defconfig    gcc-15.1.0
-mips                              allnoconfig    gcc-15.1.0
-mips                          ath25_defconfig    gcc-15.1.0
-mips                       bmips_be_defconfig    gcc-15.1.0
-mips                           ip28_defconfig    gcc-15.1.0
-nios2                             allnoconfig    gcc-11.5.0
-nios2                             allnoconfig    gcc-15.1.0
-nios2                               defconfig    gcc-11.5.0
-nios2                 randconfig-001-20250830    gcc-11.5.0
-nios2                 randconfig-002-20250830    gcc-8.5.0
-openrisc                          allnoconfig    clang-22
-openrisc                          allnoconfig    gcc-15.1.0
-openrisc                            defconfig    gcc-12
-parisc                            allnoconfig    clang-22
-parisc                            allnoconfig    gcc-15.1.0
-parisc                              defconfig    gcc-15.1.0
-parisc                randconfig-001-20250830    gcc-10.5.0
-parisc                randconfig-002-20250830    gcc-11.5.0
-parisc64                            defconfig    gcc-15.1.0
-powerpc                           allnoconfig    clang-22
-powerpc                           allnoconfig    gcc-15.1.0
-powerpc                      katmai_defconfig    gcc-15.1.0
-powerpc               randconfig-001-20250830    gcc-15.1.0
-powerpc               randconfig-002-20250830    clang-22
-powerpc               randconfig-003-20250830    clang-22
-powerpc                     tqm8548_defconfig    gcc-15.1.0
-powerpc64             randconfig-001-20250830    clang-17
-powerpc64             randconfig-002-20250830    gcc-14.3.0
-powerpc64             randconfig-003-20250830    clang-22
-riscv                             allnoconfig    clang-22
-riscv                             allnoconfig    gcc-15.1.0
-riscv                               defconfig    gcc-12
-riscv             nommu_k210_sdcard_defconfig    gcc-15.1.0
-riscv                 randconfig-001-20250830    gcc-11.5.0
-riscv                 randconfig-001-20250830    gcc-8.5.0
-riscv                 randconfig-002-20250830    clang-22
-riscv                 randconfig-002-20250830    gcc-11.5.0
-s390                             allmodconfig    clang-18
-s390                             allmodconfig    gcc-15.1.0
-s390                              allnoconfig    clang-22
-s390                             allyesconfig    gcc-15.1.0
-s390                                defconfig    gcc-12
-s390                  randconfig-001-20250830    clang-22
-s390                  randconfig-001-20250830    gcc-11.5.0
-s390                  randconfig-002-20250830    gcc-11.5.0
-s390                  randconfig-002-20250830    gcc-8.5.0
-sh                               allmodconfig    gcc-15.1.0
-sh                                allnoconfig    gcc-15.1.0
-sh                               allyesconfig    gcc-15.1.0
-sh                                  defconfig    gcc-12
-sh                    randconfig-001-20250830    gcc-11.5.0
-sh                    randconfig-002-20250830    gcc-11.5.0
-sh                    randconfig-002-20250830    gcc-15.1.0
-sparc                            allmodconfig    gcc-15.1.0
-sparc                             allnoconfig    gcc-15.1.0
-sparc                               defconfig    gcc-15.1.0
-sparc                 randconfig-001-20250830    gcc-11.5.0
-sparc                 randconfig-001-20250830    gcc-13.4.0
-sparc                 randconfig-002-20250830    gcc-11.5.0
-sparc                 randconfig-002-20250830    gcc-8.5.0
-sparc64                             defconfig    gcc-12
-sparc64               randconfig-001-20250830    gcc-11.5.0
-sparc64               randconfig-002-20250830    clang-20
-sparc64               randconfig-002-20250830    gcc-11.5.0
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-22
-um                               allyesconfig    clang-19
-um                               allyesconfig    gcc-12
-um                                  defconfig    gcc-12
-um                             i386_defconfig    gcc-12
-um                    randconfig-001-20250830    gcc-11.5.0
-um                    randconfig-001-20250830    gcc-12
-um                    randconfig-002-20250830    gcc-11.5.0
-um                    randconfig-002-20250830    gcc-12
-um                           x86_64_defconfig    gcc-12
-x86_64                            allnoconfig    clang-20
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20250830    clang-20
-x86_64      buildonly-randconfig-002-20250830    gcc-12
-x86_64      buildonly-randconfig-003-20250830    clang-20
-x86_64      buildonly-randconfig-004-20250830    gcc-12
-x86_64      buildonly-randconfig-005-20250830    gcc-12
-x86_64      buildonly-randconfig-006-20250830    gcc-12
-x86_64                              defconfig    clang-20
-x86_64                              defconfig    gcc-11
-x86_64                                  kexec    clang-20
-x86_64                randconfig-001-20250830    gcc-11
-x86_64                randconfig-002-20250830    gcc-11
-x86_64                randconfig-003-20250830    gcc-11
-x86_64                randconfig-004-20250830    gcc-11
-x86_64                randconfig-005-20250830    gcc-11
-x86_64                randconfig-006-20250830    gcc-11
-x86_64                randconfig-007-20250830    gcc-11
-x86_64                randconfig-008-20250830    gcc-11
-x86_64                randconfig-071-20250830    gcc-12
-x86_64                randconfig-072-20250830    gcc-12
-x86_64                randconfig-073-20250830    gcc-12
-x86_64                randconfig-074-20250830    gcc-12
-x86_64                randconfig-075-20250830    gcc-12
-x86_64                randconfig-076-20250830    gcc-12
-x86_64                randconfig-077-20250830    gcc-12
-x86_64                randconfig-078-20250830    gcc-12
-x86_64                               rhel-9.4    clang-20
-x86_64                          rhel-9.4-func    clang-20
-x86_64                    rhel-9.4-kselftests    clang-20
-x86_64                          rhel-9.4-rust    clang-20
-xtensa                            allnoconfig    gcc-15.1.0
-xtensa                randconfig-001-20250830    gcc-11.5.0
-xtensa                randconfig-001-20250830    gcc-12.5.0
-xtensa                randconfig-002-20250830    gcc-11.5.0
-xtensa                randconfig-002-20250830    gcc-15.1.0
+The rest I touched (bpa10x, btmtkuart, and btnxpuart) do really call
+h4_recv_buf(), so the dependency is required, add it for them.
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Fixes: 74bcec450eea ("Bluetooth: remove duplicate h4_recv_buf() in header")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202508300413.OnIedvRh-lkp@intel.com/
+Signed-off-by: Calvin Owens <calvin@wbinvd.org>
+---
+ drivers/bluetooth/Kconfig    | 6 ++++++
+ drivers/bluetooth/hci_uart.h | 8 ++++----
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 4ab32abf0f48..7df69ccb6600 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -312,7 +312,9 @@ config BT_HCIBCM4377
+ 
+ config BT_HCIBPA10X
+ 	tristate "HCI BPA10x USB driver"
++	depends on BT_HCIUART
+ 	depends on USB
++	select BT_HCIUART_H4
+ 	help
+ 	  Bluetooth HCI BPA10x USB driver.
+ 	  This driver provides support for the Digianswer BPA 100/105 Bluetooth
+@@ -437,8 +439,10 @@ config BT_MTKSDIO
+ 
+ config BT_MTKUART
+ 	tristate "MediaTek HCI UART driver"
++	depends on BT_HCIUART
+ 	depends on SERIAL_DEV_BUS
+ 	depends on USB || !BT_HCIBTUSB_MTK
++	select BT_HCIUART_H4
+ 	select BT_MTK
+ 	help
+ 	  MediaTek Bluetooth HCI UART driver.
+@@ -483,7 +487,9 @@ config BT_VIRTIO
+ 
+ config BT_NXPUART
+ 	tristate "NXP protocol support"
++	depends on BT_HCIUART
+ 	depends on SERIAL_DEV_BUS
++	select BT_HCIUART_H4
+ 	select CRC32
+ 	select CRC8
+ 	help
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 5ea5dd80e297..cbbe79b241ce 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -121,10 +121,6 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
+ void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
+ 			 unsigned int oper_speed);
+ 
+-#ifdef CONFIG_BT_HCIUART_H4
+-int h4_init(void);
+-int h4_deinit(void);
+-
+ struct h4_recv_pkt {
+ 	u8  type;	/* Packet type */
+ 	u8  hlen;	/* Header length */
+@@ -162,6 +158,10 @@ struct h4_recv_pkt {
+ 	.lsize = 2, \
+ 	.maxlen = HCI_MAX_FRAME_SIZE \
+ 
++#ifdef CONFIG_BT_HCIUART_H4
++int h4_init(void);
++int h4_deinit(void);
++
+ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 			    const unsigned char *buffer, int count,
+ 			    const struct h4_recv_pkt *pkts, int pkts_count);
+-- 
+2.47.2
+
