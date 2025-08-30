@@ -1,112 +1,98 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E114A1E;
-	Sat, 30 Aug 2025 23:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6514A1E
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Aug 2025 23:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756596920; cv=none; b=Npwl0/BLvd0TosXAiYfGl/5QyT+14u4fTUSr3dd7/EKcVT36wykytHjWs1LGRDNQ2Kf8+co6EgQ5maquYmXZqDcH08/MSI9JScLuk3tX/WfB8cc4U1mtKky/u7RRFDYPzNz3md6v2LeMSZ7KEqA9LQTYn91nwL0IjhhcXYRR2Ek=
+	t=1756597078; cv=none; b=qO34TuPnCG6XRX31HTiW++UThMGBbPRX6lireHtMwnkP5by9IHIVNHchbImQ6QJ+Ur+W8CLGbZneu3laDYFzLLHoSLJHLOp5FFsooLfaBPspx5Z7FWoN8ggf9Zto4amK5cOZipFI8qB61tfb+Q5M2e73w1qXHgAlvd+VzEIZyh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756596920; c=relaxed/simple;
-	bh=A1A15SP7EAbPOSRwf/khWmHfDr0hulG0ibBvo2Kw4rU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=DuLGSfbRDDEOq/6yqjfppeiE9FhFi7jPxbo7UIXM/DfDMcnyYZWtpeOLjapsWAygkdw0N9Xx4ghLNINM02yBJgg887M9VTQ8sfWTYX8XioHWUM1kPgNq0BymTtPUY73IrrsqAlhC1y0LFmyjx+dhR3lsjgk5VbQVmLm+BdltIPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LpyZHil7; arc=none smtp.client-ip=209.85.128.48
+	s=arc-20240116; t=1756597078; c=relaxed/simple;
+	bh=XX0F1G4NfPBJFQFWzLaes7z2HYqxGRGHZ3qxM08GhxM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=IyoIwbvZJwgSTTaExo4zt2NtOkHjVMAfiBEUMftM16NZDrnAeWT1zvd4BYWLkZ+B6vZB0Mer2XLfUhhAwwzaMe2q5WTM33pxyotZOItFHbp7dl7z2ZuWTMupOb+n26yiaqZMyy/9y3G/60mRqUQNi+XmPqJrbUyENJoGMQ5WvQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OJZz7CJD; arc=none smtp.client-ip=209.85.166.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LpyZHil7"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45b87a13242so4352755e9.0;
-        Sat, 30 Aug 2025 16:35:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OJZz7CJD"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3f4d7feef27so2038075ab.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 30 Aug 2025 16:37:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756596917; x=1757201717; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ilggsvN1L5HlGEcAmG/8+r/KQS8Juj2kUTzaRgImlTY=;
-        b=LpyZHil7LYL3yTBsn+wnIK7MlzkSKkyPBPRymM9xZTxggb46ad/yBSPVM106mKh8Hy
-         MwMI6kqGWtsBGiHh5v1POeUoyudTkB8zKXUQ/IezX5hOs7bcmeRdDwsk6spYj25eurlX
-         D5UZPnQrL1JFfNTFLrniAktHuJuk1JbDOmUwjjX8AG0g+bHoHkPtlkUW2g4JHZvmEwLJ
-         fUxNFoO/8G5v7BI9Agp6jRJDoC2ih1V9dQJFjBeELroFbtkMMDup46Ht/S1Dd76Z5hXj
-         56Bl3QSq2abYj4GX/IpSiMQq7emULu8nWpMmHOcpCkwN9B5RRQeu+ijWF22wS4UKmi1z
-         KmsA==
+        d=gmail.com; s=20230601; t=1756597075; x=1757201875; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XX0F1G4NfPBJFQFWzLaes7z2HYqxGRGHZ3qxM08GhxM=;
+        b=OJZz7CJDJtRZMhwkHioJjENUGjwasJUJDIbZo0JqkFzaXwm4gQi/PPEJsFacV6rDBf
+         x6zUUsqJ9A0hHbeosjk/pie5fgBwPKiaaBdbbbbsywIrQBXgxHHK3XFP4/69fCLAfrdO
+         HMCaeCRtxI0wejWz03zWQlV6MT3vJFA+h1yrlEzNdrMXA+13TuVZUcSa4w6on5U9aQ33
+         mrOJZiOnsRhbB6oFjQwka7l6GLbtIFfoj/UDl5jCPqrgHmMvijO+6hOnHA8H5rzj8Zpk
+         sfd4BewnIW6HSKiqEJdagRXpwuaIf4EcmrbPkRc2w9EezoZ3x3klSyNUyLgvfEkQP3hX
+         9RzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756596917; x=1757201717;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ilggsvN1L5HlGEcAmG/8+r/KQS8Juj2kUTzaRgImlTY=;
-        b=cU6nprbvqdyKn19ZfGlg1z5MynwbZz2LGYP7ZyQg7NhSwFAq5/yzELeuxoT9MLuLY9
-         /TOaBAL7v9wN2r6x4hFQrFhA9QNbNqkxpEQDiE6B5FNv9O+jy29Ri81QI++ZFEzIMlLV
-         ZbXXCGtQjsjhCqhvWW+o8VhBGNolMpTO4KHOjZWsR/FovY1ya5G5DirurtoynXbzwIge
-         cdLAO/3eQLCPAd1WugcGzTe3WmtzVDGmruk3akEStGxJIYVA+BEa6aP4a95obb9/yLTM
-         splLgO32nflL6g+aKIyZQ/4s9Gbb+e4pIDVFLaBYZsL3ULnljR2mlRqttvbUmNHm/gPL
-         CqIw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1wY+SM71YDJlu5Z2f3iOvjnibfI5/SeIiW2Kv3uWSMaunwfU4CtIcdUPlDF/+EjSldIpkTChNPI9nVRk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNCSkmGY5NqMqNrM5HjgJ3YO6lX9fYm+ei6KbOShwpOVS+N7Ch
-	Etdc+z8dv9lyUHDNvx3rGqlSWBFiMZUkdQE0nIb7TqPT6PpvHEW3cqnUydFGQWFJ
-X-Gm-Gg: ASbGncuTZ5DA9mqdAjTUfYM5RY7FZOzlXjmED867tcP1ZIZZWmM7liZGQ43cARiyUq+
-	G5uDzswtpFanxtvT/bLer0Tdkr5FlkKqliSYe+HLZsEHYgQGl4q5vu3CzvOwre5AV2tErQ939Kt
-	7NAX1TJliXG6KemU9LpVy0Okr3Sq6HBAsdR6/HIG7tuxnToHyuWb5Gp6FxuUq3+xCAHZRkC2MTc
-	cauWm4VfL2mYhFSnTu9r4DyvaZCAGnuM8BQxhMXzJIeAhHq1Y/2mV+yGcjrQyC6iYj3aiWQ4HXo
-	QS42puZvRBMW0orkwMKHCff6R/nHgs5D/QXtuW5LTqSbBo13WHmzlhTwOFm43uOuhCnCvd5E0LO
-	ap1UIzby1RhSu40ieLEsVmfVRozP2oQ3NGSeNn4XCg1WuN64o+awYh5SJt9ZtYiQKTgiU7nF5Un
-	yd
-X-Google-Smtp-Source: AGHT+IFC1PTyg8i6C7QQ2+jCR+abwCDoKUvnDq/7ssf8LETuYb1s4YZQ/Ac1VpSuHyQkf9SPA+iDbA==
-X-Received: by 2002:a05:600c:5303:b0:45b:86ee:415f with SMTP id 5b1f17b1804b1-45b86ee43ebmr20851225e9.6.1756596916721;
-        Sat, 30 Aug 2025 16:35:16 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:3fd:be60:4077:be40:d68a:2e71? ([2a01:e0a:3fd:be60:4077:be40:d68a:2e71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b7e8876c9sm95167305e9.11.2025.08.30.16.35.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Aug 2025 16:35:16 -0700 (PDT)
-Message-ID: <02cf444e-d05f-4af9-89ce-96276e29be14@gmail.com>
-Date: Sun, 31 Aug 2025 01:35:15 +0200
+        d=1e100.net; s=20230601; t=1756597075; x=1757201875;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XX0F1G4NfPBJFQFWzLaes7z2HYqxGRGHZ3qxM08GhxM=;
+        b=VEH0Zz4ir9BilmMFOaB7eM24qNxXQqMLYDlGWiMY5IPWez4ZRNsLuVbbnPmBzvvn4k
+         D/pjeH4WM3y7Y2jI+G0YXLTgS2P8JaJv4sxs5WKQ66kqbJyyAKR92nrRr9Ph8Vu7ey4m
+         cO2FIt0R/CLPzkOSkTxmN89zFOinV8pX6cAh0ZNiKnRytNT6QNsO/78ornbc/sTQkroK
+         qWw4ir356KELJupgdVmkmjPEvIIi1gFBp3nzM4+pv0m+xuNUsGWNBldAYRa/pW0tS53X
+         7LQ9CvSGOK7X/d/Sj4ApAlkXllPyrYfOv4Ov1fY4vUrFXWaJsBj3wNVj6n9/8PhwQv81
+         60Dg==
+X-Gm-Message-State: AOJu0Yz92P4/sJpMCw+/vAPthk6C+xd9pUWIu5X1oK/h68MLn6+QWxVV
+	LXotluqjGLpSaS3ZqcrH4/e2yzF9qVuojYpmuoArDq7tfox0v81rEqTrA+NPQA==
+X-Gm-Gg: ASbGncukuuqBvlWiY0c0jkBFNU9B5mXrioTKHna3wYoSUm9BByJbFLxT++767cxwW2h
+	HYE3Ecptkv/YxlRQ6PGYAVVkMJxOgQs5kc6mn17GkZ572aLTw8TlrqnZle0izTLx9RDWUB2wHWf
+	UEOLrTrZY8mvb2mNOP+0KeL8w0lNd2zcORZKfGhTjvpsRtP4T18+Is6Lf5By10qZkdulPiClhFa
+	hvV8YqDuRgRHqxmTZ+NeLjrDnUX8XAwjSjgixndH50ZFWR3szTk+8oDK6Mi5fV2ZLRxwq9gd5tD
+	nOctO7WdLoMIqCvy44KkRG97jAQO7iXVsIWjRtSZT2sRyrUxmQklhKAYMq5lZRFnTO76/dM6L0X
+	nEmyCjK+WT04RMI9bW0GCAT4ifi+EdmSBkfjEkTdarm9sFLbtng==
+X-Google-Smtp-Source: AGHT+IHX9X4kIqL3nmyxldt180a7uYBb8iLIrGbnB1ied3spGd6sINtxrK2yojf8qPim/LvlH0XMPQ==
+X-Received: by 2002:a05:6e02:144c:b0:3ef:2fe3:9a08 with SMTP id e9e14a558f8ab-3f402ab5f52mr70183605ab.28.1756597075436;
+        Sat, 30 Aug 2025 16:37:55 -0700 (PDT)
+Received: from [172.17.0.2] ([64.236.133.98])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f39fd0bsm945352173.70.2025.08.30.16.37.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Aug 2025 16:37:54 -0700 (PDT)
+Message-ID: <68b38b52.050a0220.2339e6.1ba1@mx.google.com>
+Date: Sat, 30 Aug 2025 16:37:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7327869442603425274=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
-From: 3 <elespink@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add support for Mercusys MA530 Bluetooth
- adapter
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, elespink@gmail.com
+Subject: RE: Bluetooth: btusb: Add support for Mercusys MA530 Bluetooth adapter
+In-Reply-To: <02cf444e-d05f-4af9-89ce-96276e29be14@gmail.com>
+References: <02cf444e-d05f-4af9-89ce-96276e29be14@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
- From 5d970b05c726749908540bf7d5ee34d634bf16c2 Mon Sep 17 00:00:00 2001
-From: elespink <elespink@gmail.com>
-Date: Sun, 31 Aug 2025 01:06:10 +0200
-Subject: [PATCH] Bluetooth: btusb: Add support for Mercusys MA530 Bluetooth
-  adapter
+--===============7327869442603425274==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add support for a Realtek-based Mercusys MA530 Bluetooth 5.3 USB dongle
-which works with USB ID 2c4e:0115. This device was not recognized by the
-kernel with the original device list and thus was non-functional.
+This is an automated email and please do not reply to this email.
 
-The device is misreported in lsusb as "Mercucys INC Meucusys MA530 Adapter".
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+
+Please resolve the issue and submit the patches again.
+
+
 ---
-  drivers/bluetooth/btusb.c | 4 ++++
-  1 file changed, 4 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8085fabadde8..94984791e454 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -597,6 +597,10 @@ static const struct usb_device_id quirks_table[] = {
-      { USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
-        .driver_info = BTUSB_REALTEK },
-
-+    /* Mercusys MA530 Adapter */
-+    { USB_DEVICE(0x2c4e, 0x0115), .driver_info = BTUSB_REALTEK |
-+                             BTUSB_WIDEBAND_SPEECH },
-+
-      /* MediaTek Bluetooth devices */
-      { USB_VENDOR_AND_INTERFACE_INFO(0x0e8d, 0xe0, 0x01, 0x01),
-        .driver_info = BTUSB_MEDIATEK |
--- 
-2.51.0
+Regards,
+Linux Bluetooth
 
 
+--===============7327869442603425274==--
