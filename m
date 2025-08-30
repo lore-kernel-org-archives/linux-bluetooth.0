@@ -1,16 +1,16 @@
 Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6EA27280B;
-	Sat, 30 Aug 2025 05:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7221A4315F
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Aug 2025 06:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756530709; cv=none; b=ivVfz8PylqP+5gRoGj046KNZW1naWsW5JNtyMC1sg47bhp9XkEjVCNjYJ9qfMnIl947lWYtI1fVhdmIcIlsFUGh93pxyvma5fsPF2YRllSlhP86AKTUCpn0WrvXKMCL4dFqZeSAzZfqhz9orkRAAoqEW9dg9qEHCtlaLeaowNbg=
+	t=1756533638; cv=none; b=n7PFGyzJt+BhsoL/k71ZUgsUCXR0FkHY7FGh5oNPlL2FeUuIWXhgE5pgQFmNTYxWMllj4MezredIubRElzgCv2gh7HZbpVg64Ujby9dvamnqXXTMXQBIx7MBKyIdX9am+KNeWJ0CRSgv6nsgx/5zGJu10F6BbW0uQ29ZyFDeBr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756530709; c=relaxed/simple;
-	bh=FA+LaNAtSrDw22JkgVZ/MEEYs9lp2qPOgwnL7mosRHg=;
+	s=arc-20240116; t=1756533638; c=relaxed/simple;
+	bh=qXfZKy7nSZjfRlxnLsDJiWGC+6djC2rfJYh58IC8wyg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kOFRislzesuTGhZlRAioa3P8hN3rx/mUx+FOucUdHw4Q4XONZt31cTQSqAb0EtvQuf8L3eU4f0ceQIJIrQR0mfyF9J81p7VUWmHwvLbFd6EseL13mTR/8ntoE5dQg2W7o8seTdXQSH+BXV0KNst9nC5mZnHJVtew+YP6wcUgfkk=
+	 In-Reply-To:Content-Type; b=S7az1mu4ejAF+iVYdu0SDZ6I/cSCBnntEtezDb2cmayzAl92PS1CAzmx6yYbHtjBRRXuPhhi1NCFshF8p0swYAITwCBYlf9PSF+AZtNgXsJsEUklrPoZYzv2Bf2HH69ju2HcYgnqS+lR4GCJCwl7SaCnsjBfvcLpJmWbzZ7uqDg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
@@ -19,10 +19,10 @@ Received: from [192.168.0.192] (ip5f5af7fb.dynamic.kabel-deutschland.de [95.90.2
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AED366004C2C9;
-	Sat, 30 Aug 2025 07:11:10 +0200 (CEST)
-Message-ID: <84fd4012-966b-4983-b015-ffce06509b5e@molgen.mpg.de>
-Date: Sat, 30 Aug 2025 07:11:10 +0200
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4BBF16004C2C4;
+	Sat, 30 Aug 2025 08:00:13 +0200 (CEST)
+Message-ID: <3934b1ee-5e4e-4513-bebe-afe9ee1b4fcd@molgen.mpg.de>
+Date: Sat, 30 Aug 2025 08:00:12 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,97 +30,148 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btmtksdio: Fix build after header cleanup
-To: Calvin Owens <calvin@wbinvd.org>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- oe-kbuild-all@lists.linux.dev, Marcel Holtmann <marcel@holtmann.org>,
- Sean Wang <sean.wang@mediatek.com>, linux-mediatek@lists.infradead.org
-References: <202508300413.OnIedvRh-lkp@intel.com>
- <b78a4255d17adbb74140aa23f89cb7653af96c75.1756513671.git.calvin@wbinvd.org>
+Subject: Re: [bluetooth-next PATCH] Bluetooth: hci_bcm: Configure sleep mode
+ on RPM suspend/resume
+To: Marek Vasut <marex@denx.de>
+Cc: linux-bluetooth@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, kernel@dh-electronics.com
+References: <20240629172235.29901-1-marex@denx.de>
 Content-Language: en-US
 From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <b78a4255d17adbb74140aa23f89cb7653af96c75.1756513671.git.calvin@wbinvd.org>
+In-Reply-To: <20240629172235.29901-1-marex@denx.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Dear Calvin,
+Dear Marek,
 
 
-Thank you for your patch, and addressing the regression right away.
+Thank you for your patch. I was made aware of it by Hans’ recent review. 
+Some minor nits. Probably, you need to resend the patch anyway.
 
-Am 30.08.25 um 02:50 schrieb Calvin Owens:
-> Syzbot found a randconfig which fails after my recent patch:
+Am 29.06.24 um 19:22 schrieb Marek Vasut:
+> The Infineon CYW43439 Bluetooth device enters suspend mode right after
+> receiving the Set_Sleepmode_Param sleep_mode=1 HCI command, even if the
+> BT_DEV_WAKE input is HIGH, i.e. device ought to be awake. This triggers
+> a timeout of any follow up HCI command, in case of regular boot, that is
+
+follow-up
+
+> HCI_OP_RESET command issued from hci_init1_sync() .
 > 
->      drivers/bluetooth/btmtksdio.c:442:33: error: array type has incomplete element type ‘struct h4_recv_pkt’
->        442 | static const struct h4_recv_pkt mtk_recv_pkts[] = {
->            |                                 ^~~~~~~~~~~~~
->      drivers/bluetooth/btmtksdio.c:443:11: error: ‘H4_RECV_ACL’ undeclared here (not in a function)
->        443 |         { H4_RECV_ACL,      .recv = btmtksdio_recv_acl },
->            |           ^~~~~~~~~~~
->      drivers/bluetooth/btmtksdio.c:444:11: error: ‘H4_RECV_SCO’ undeclared here (not in a function)
->        444 |         { H4_RECV_SCO,      .recv = hci_recv_frame },
->            |           ^~~~~~~~~~~
->      drivers/bluetooth/btmtksdio.c:445:11: error: ‘H4_RECV_EVENT’ undeclared here (not in a function)
->        445 |         { H4_RECV_EVENT,    .recv = btmtksdio_recv_event },
-> 
-> ...because we can have BT_MTKSDIO=y with BT_HCIUART_H4=n, and the
-> definitions used here are gated on BT_HCIUART_H4 in hci_uart.h.
+> Rework the code such that during probe, the device is configured to not
+> enter sleep mode by issuing Set_Sleepmode_Param sleep_mode=0 instead of
+> sleep_mode=1 in bcm_setup(). Upon RPM suspend, issue Set_Sleepmode_Param
+> with sleep_mode=1 to allow the device to enter the sleep mode when the
+> BT_DEV_WAKE signal is deasserted, which is deasserted soon after in the
+> RPM suspend callback. Upon RPM resume, assert BT_DEV_WAKE to resume the
+> chip from sleep mode and then issue Set_Sleepmode_Param sleep_mode=0 to
+> yet again prevent the device from entering sleep mode until the next RPM
+> suspend.
 
-The drivers below seem to be affected:
+How did you test this? It’d be great if you gave more details.
 
-     drivers/bluetooth/bpa10x.c:     { H4_RECV_EVENT,   .recv = 
-hci_recv_frame },
-     drivers/bluetooth/btmtksdio.c:  { H4_RECV_EVENT,    .recv = 
-btmtksdio_recv_event },
-     drivers/bluetooth/btmtkuart.c:  { H4_RECV_EVENT,    .recv = 
-btmtkuart_recv_event },
-     drivers/bluetooth/btnxpuart.c:  { H4_RECV_EVENT,        .recv = 
-hci_recv_frame },
-
-> I think the simplest way to fix this is to remove the gate on the
-> definitions in hci_uart.h. Since the constants are macros, there's no
-> runtime cost to doing so, and nothing seems to rely on their absence in
-> the BT_HCIUART_H4=n case.
-
-Looking at the implementation, it looks like they only work with the H4 
-protocol? So maybe, that should be denoted in the Kconfig files?
-
-> I let randconfig builds run for awhile in drivers/bluetooth/ and didn't
-> hit anything else, so hopefully this was the only fallout.
-> 
-> Fixes: 74bcec450eea ("Bluetooth: remove duplicate h4_recv_buf() in header")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202508300413.OnIedvRh-lkp@intel.com/
-> Signed-off-by: Calvin Owens <calvin@wbinvd.org>
+> Signed-off-by: Marek Vasut <marex@denx.de>
 > ---
->   drivers/bluetooth/hci_uart.h | 2 --
->   1 file changed, 2 deletions(-)
+> Cc: Hans de Goede <hdegoede@redhat.com>
+> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: kernel@dh-electronics.com
+> Cc: linux-bluetooth@vger.kernel.org
+> ---
+>   drivers/bluetooth/hci_bcm.c | 32 +++++++++++++++++++++++++++++---
+>   1 file changed, 29 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-> index 5ea5dd80e297..fd0624988aba 100644
-> --- a/drivers/bluetooth/hci_uart.h
-> +++ b/drivers/bluetooth/hci_uart.h
-> @@ -121,7 +121,6 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
->   void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
->   			 unsigned int oper_speed);
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 89d4c2224546f..fde5e0136c392 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -389,13 +389,19 @@ static const struct bcm_set_sleep_mode default_sleep_params = {
+>   	.pulsed_host_wake = 1,
+>   };
 >   
-> -#ifdef CONFIG_BT_HCIUART_H4
->   int h4_init(void);
->   int h4_deinit(void);
+> -static int bcm_setup_sleep(struct hci_uart *hu)
+> +static int bcm_setup_sleep(struct hci_uart *hu, bool sync, int mode)
+>   {
+>   	struct bcm_data *bcm = hu->priv;
+>   	struct sk_buff *skb;
+>   	struct bcm_set_sleep_mode sleep_params = default_sleep_params;
 >   
-> @@ -165,7 +164,6 @@ struct h4_recv_pkt {
->   struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
->   			    const unsigned char *buffer, int count,
->   			    const struct h4_recv_pkt *pkts, int pkts_count);
-> -#endif
+>   	sleep_params.host_wake_active = !bcm->dev->irq_active_low;
+> +	sleep_params.sleep_mode = mode;
+> +
+> +	if (!sync) {
+> +		return __hci_cmd_send(hu->hdev, 0xfc27, sizeof(sleep_params),
+> +				      &sleep_params);
+> +	}
 >   
->   #ifdef CONFIG_BT_HCIUART_BCSP
->   int bcsp_init(void);
+>   	skb = __hci_cmd_sync(hu->hdev, 0xfc27, sizeof(sleep_params),
+>   			     &sleep_params, HCI_INIT_TIMEOUT);
+> @@ -412,7 +418,7 @@ static int bcm_setup_sleep(struct hci_uart *hu)
+>   }
+>   #else
+>   static inline int bcm_request_irq(struct bcm_data *bcm) { return 0; }
+> -static inline int bcm_setup_sleep(struct hci_uart *hu) { return 0; }
+> +static inline int bcm_setup_sleep(struct hci_uart *hu, bool sync, int mode) { return 0; }
 
-It’s a valid fix.
+Without an IDE, I always wonder, if an enum or macro should be used for 
+modes, so readers do not need to look up what 0 and 1 mean.
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+>   #endif
+>   
+>   static int bcm_set_diag(struct hci_dev *hdev, bool enable)
+> @@ -647,7 +653,7 @@ static int bcm_setup(struct hci_uart *hu)
+>   		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hu->hdev->quirks);
+>   
+>   	if (!bcm_request_irq(bcm))
+> -		err = bcm_setup_sleep(hu);
+> +		err = bcm_setup_sleep(hu, true, 0);
+>   
+>   	return err;
+>   }
+> @@ -767,6 +773,16 @@ static int bcm_suspend_device(struct device *dev)
+>   	bt_dev_dbg(bdev, "");
+>   
+>   	if (!bdev->is_suspended && bdev->hu) {
+> +		err = bcm_setup_sleep(bdev->hu, false, 1);
+> +		/*
+> +		 * If the sleep mode cannot be enabled, the BT device
+> +		 * may consume more power, but this should not prevent
+> +		 * RPM suspend from completion. Warn about this, but
+> +		 * attempt to suspend anyway.
+> +		 */
+> +		if (err)
+> +			dev_err(dev, "Failed to enable sleep mode\n");
+
+Please print out the returned error, and maybe give suggestion, what the 
+user should do in this case.
+
+> +
+>   		hci_uart_set_flow_control(bdev->hu, true);
+>   
+>   		/* Once this returns, driver suspends BT via GPIO */
+> @@ -810,6 +826,16 @@ static int bcm_resume_device(struct device *dev)
+>   		bdev->is_suspended = false;
+>   
+>   		hci_uart_set_flow_control(bdev->hu, false);
+> +
+> +		err = bcm_setup_sleep(bdev->hu, false, 0);
+> +		/*
+> +		 * If the sleep mode cannot be disabled, the BT device
+> +		 * may fail to respond to commands at times, or may be
+> +		 * completely unresponsive. Warn user about this, but
+> +		 * attempt to resume anyway in best effort manner.
+> +		 */
+> +		if (err)
+> +			dev_err(dev, "Failed to disable sleep mode\n");
+
+Ditto.
+
+>   	}
+>   
+>   	return 0;
+
+Overall this looks good.
 
 
 Kind regards,
