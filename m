@@ -1,80 +1,139 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA3123B60A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 22:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0635B1A76DE
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Aug 2025 00:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756504892; cv=none; b=hozlhJFyYuU1seFW5BWECPNoRsNgC/Inb6VI6BaFU7/SfeaDti5oitFxtRW8n8f1PoNwPDsngCJb4vEXKlo6hRT+FsijfioJfKvINubERoS8y26O/10Uv1yW0RJV57Z6Syn7XuCLDZghIFhEz7bvraXlj+84xMebsCaOehnOZRo=
+	t=1756515048; cv=none; b=KurNHuJ/i/Xr5vnqjkdiSGOm5Hqn6isqjD58mou4kIDkW7GI7l/patob3EPMHSVhexlKhrW0y/4AkVs3H7OpUPb2AswlUJQwlRSdhst+iqUUVqLpmVmYgN1uidQolN8bCNLVkpq8TkbCvUKKhA8qUyLj+kTjqUNGG/K4q1hhloU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756504892; c=relaxed/simple;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	h=Message-ID:Date:MIME-Version:To:From:Content-Type; b=auFG5b/UybCq6hKgIkZyx1fe+JdrQGHCHudxmPc8bqngkO34sb645QaSDV9a+PFI2MADK0yQMU4vaONIIaPx98KfCCUGBPsm5HblmAh/2X5BVQoXa5LsKQHH8YszRwq5fIqKEXaXBEZJ6LV+XcgF7+7c/ktsqUlMH5PVI4/WsPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de; spf=pass smtp.mailfrom=online.de; dkim=pass (2048-bit key) header.d=online.de header.i=cito@online.de header.b=WN1haNfI; arc=none smtp.client-ip=212.227.126.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=online.de
+	s=arc-20240116; t=1756515048; c=relaxed/simple;
+	bh=nyBd3svYSA8ZWsKGuTLD0ccws/tYPuOWANWLsrbj49M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cALAHt4Zj/GRkvDTnph0pLnF2CGH2rmy6tWkGgkUEJJiDPXEF0UO47kKH9+/0oyqHf4xVoWYfAzo4G3s/EGR9c6A5gMHUyE6m8H2mZpisiP3vf5/UKBq+jItkjbNFU2dWsP9JV/d7069lhC5tscAtpc4GrS76iyNhtSwAY/VUGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=UAvKffAU; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=online.de header.i=cito@online.de header.b="WN1haNfI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=online.de;
-	s=s42582890; t=1756504882; x=1757109682; i=cito@online.de;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:From:
-	 Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=WN1haNfIjxBNNP8eYznj9ehGLUsj6k3k9i/afNtkozClz76lvaXSO3Dozq55nHpb
-	 klzPQddJmO8Rdk95pzk+kPsbXR/K9gXowwfcjuCrfT9+43fv9Ot+Rj+Ch8SxhrPIQ
-	 nRxcSH/f7xtGx+1pEh8LDtDtdwDolPwkIqApRryd3QG86DbtEPAYwB4DbXlzp28yH
-	 ouQSC0h2Eg/4cNIMIpCeIRlYKnMh9ZSWcuxuZVF4LEd21/nmICTZsvIUjba2n6r97
-	 rSia1xX7hxe2h6HUiZavvXEIrvbMsxGekjRuSMLUt3XxG33c2axOOSq6o9DQeIxsH
-	 L+6zNikIMVZb1m42/Q==
-X-UI-Sender-Class: 6003b46c-3fee-4677-9b8b-2b628d989298
-Received: from [192.168.1.10] ([176.199.209.231]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1Ma1oK-1uxfbZ3w2e-00PA7N for <linux-bluetooth@vger.kernel.org>; Sat, 30 Aug
- 2025 00:01:21 +0200
-Message-ID: <2eae071a-7cf8-4961-a17c-e094a0868494@online.de>
-Date: Sat, 30 Aug 2025 00:01:21 +0200
+	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="UAvKffAU"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2445824dc27so23080205ad.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 17:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=wbinvd.org; s=wbinvd; t=1756515046; x=1757119846; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P2SbNmp2jN3W5ifKkr2ZRQIsE+bXPrNXTTlRWUPsyEw=;
+        b=UAvKffAUMg8b8oHs4FRXEAuqUKfnu/CfcPw9r7GWdLx41PAVJYXLc+h3JgR/CPYSBx
+         vU9EEUpvr/8z+nGuTrwtKYAl2pXIRfD2iKT/uT2Kt2RiMrlQJlfsMQqDMW1FkcahQEYm
+         aYQDp9zUX9Fx6Elf4IY/cACL49Wm4J9QW0YFuZIKixdqMZ96O3E8I1vEDZl43UDV/RJI
+         flaA7fo/iQtEhlsYB6B8FSKeqZXHv+iimTyW7NB8k+nODUE6/3166TbFHd1Lujr89sq1
+         FzJEgPUanHLNrKipa3qVhjUdG5P8vg8pqZbhg2HPHoHjOzNaMHHJJgbeHqXCQr4FMAe3
+         BD2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756515046; x=1757119846;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P2SbNmp2jN3W5ifKkr2ZRQIsE+bXPrNXTTlRWUPsyEw=;
+        b=bOfhEntA4xmZPYVpjU0vJwwJxPoCuNzI3IO+7BRLt/evr21SQV2OOAT7iawYOIVitG
+         9vfAhWeJJTWXtQ6lFaFnae80hKRm0nvYnWM0VdqUowcknzTv7L8w8BoNy5zRFEG12Pa2
+         5d3O+J05czCmoIjn+VSlw9NUQThWirjmAb44g5jz1bCB/cjqsAc4/L6s+okOG8txh2QP
+         mh3GtrUAKC++p45MD5nVRUnmVYq2CUokQ4WEFapuAzgHLLpRw7xihNOQ4Voops46eIur
+         jTA0rQnDx727Dy3CRpQ9537KRHiNHM0x2uVZC3oujaMuLx/S0iYrjDDV4ehk1vTbklUn
+         DBbA==
+X-Gm-Message-State: AOJu0Yz7Jca0TR8Omi4xPS6O1ipx0LKai5naMlgEuLGbV5bXatd/rwwX
+	vFiSnQ6UP6O98ZDveeGQUGTR0krf37r9LGFT8gbwnFnujmoHQbpeIrQdBHXAIpLlncY=
+X-Gm-Gg: ASbGncuUfMY1Xzj8Zh1h/jXhCA8/mt6DT/8F7zPm0NnJ4AsnbgvU/9jPoWeILeV+Z46
+	K1Hkplj3GziRIZ2IoJpzQutMmosvxg+KdB2Z0kK/blsC8toAoCNe9lYtDF/HQ51YbElhnXhzDyM
+	POe/xDxMhpbyv4+BXsPeOuY2sOQDQ8G8aLonWJwfGrg7xLAw8CKOU2kdxZT1LerL2dNraMfW4w8
+	ICPEtIXyC54JereuE7IHLjVqP1/lqsVGaUJM+WmmUX2Eo3gHjkUlcD0hL/EqAmQBGh8muBdc+AR
+	7ZiZ9VAugApendRjucw1sL7fWpKaKLVKRDE3nruVaU8Ixl2fx6R5OJ4dT/Bh3g2y+lNIhZMeNAV
+	Bf5Ra1eae6eH1Na0hR3m3r5jr
+X-Google-Smtp-Source: AGHT+IEgjacSF3MiNjBgqMzAV1pQjZuDMZIwv0mu4RkXIH4CsWBoPGHGROsvLiA4PPniQpoHC2qUVQ==
+X-Received: by 2002:a17:903:190:b0:246:e8cc:8cef with SMTP id d9443c01a7336-24944870a4emr8537915ad.3.1756515046144;
+        Fri, 29 Aug 2025 17:50:46 -0700 (PDT)
+Received: from mozart.vkv.me ([192.184.167.117])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-249063961desm37008335ad.103.2025.08.29.17.50.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Aug 2025 17:50:45 -0700 (PDT)
+From: Calvin Owens <calvin@wbinvd.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	oe-kbuild-all@lists.linux.dev,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH] Bluetooth: btmtksdio: Fix build after header cleanup
+Date: Fri, 29 Aug 2025 17:50:29 -0700
+Message-ID: <b78a4255d17adbb74140aa23f89cb7653af96c75.1756513671.git.calvin@wbinvd.org>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <202508300413.OnIedvRh-lkp@intel.com>
+References: <202508300413.OnIedvRh-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-bluetooth@vger.kernel.org
-From: Christoph Zwerschke <cito@online.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:1Ggym75rN90y+NmcRupK3EV/q67NspWsx8fJUHdnafDrqrh/yJH
- aIhcGr3l9VVgJQbtkYXmboK1ldsyQfUblZhdV4OrTR6VJhudR4KLaYK6eOaeNSN0P77+Ie/
- LaE7M8IGLr9WsYmS/C+N/IU8BHJCS96C2/+NNIZZ6DOi+orqRKWS5E+cbnJ29o1X3YAr2nf
- nDKwz/YYocjQnrC46VdiA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:wHOvErHSZNY=;7dU1CRCLuZ0hgs1Qk7k8wbi4QEl
- ADwvN/MUyh6CoAiAwCPPuUDhR5lupzI7JPzQP9uwsFUPZbcVejEoCKrYo9rGToEXlm5UtgzBt
- l9oJJuQyh5S1fkpikIU50LQCHWbboCru3onWlhHvtF/LEIg3G5G/nKgRWGXgiEX9w4j4D0kWm
- flv2hN7gQ7DYIvEnPlMjkw5O7IgJ+jzKlISgMxYuYXs49vUN17pulqyHi6E3vXuXp2Pg7g8zD
- ukxVAQ2WWXlUoVKXvpHVg3BPqweq/Hp03KrH94zPXfSAeetib7m1pwIHgzyRUL8RRE4MypJgo
- nPE1g7Bhu5UPoM6I0+zAYlycaPsa+0HTYVpt6/PEsTbc1/9m53ObdnXm/0pKhu/mer6DRf4O2
- yA7NMcAa02R5ExhYrG6GE5A/BIo4m2MarKPhbR8p5pdrSJ4/zQt2/2QKTWUhIgFwAyL4kyyAb
- odkQKsu6hff56CCpoOqKPK2l8raxeH9cQkWYpt/XXGRumLVQ6wIZ0xz5LzojM0whx95XdD1Vw
- pqomcfQI0sfCZ70GyMFcqWprwFiCS8Ej7t4n146TEwT1B10PgeKYtbQGCIpsfbPaaPOTeU7By
- wQtZ9wqlKJDrawVUrJx9BUEVCM0Z6Jx4OvkAEyLUw9AuN5PB+pGqdLAKTLZCKMl6rP/m4TWhB
- XElV/pcWzOEYdYgmC86yviqUen5L7ZCdT2Svk5xJJF6MFnpE0mH/4jCJGUr25iUPo7tfzlA9I
- WMeG5h9mxpR9YpiSd/aJn+IQ9weXAkDQpx42PohH0mVoFvbHtAyUEbtkgPgtDNeKc9ExIYhqC
- i8meN4bsI7kLc74GAlON/0uQjeIBfKHBUu1+/XDc6DkFHod1lBJP2b4u7ahCWnbjG9YvMxYTz
- VdMIBwGMKkUl32lsDSaZx+izZOoOOh1V5lal9xl/CN7Xj50x98C4FgL09OnZsXrBQEt+WCBu5
- umFXP011/SuSI3vTJmDo8i6q7GuWqd+Z+vuc8RXS+roq2IBKWCXDWBvAJkmgFZhdBV/vfcVmS
- usCzvD4I8eCBofpJiwHLvru7TSiA7J+xTsdxT0ai3BM9BILHgYD6A3Q87Ia9AddjnBICP+wSi
- bP6wWmovt+as4GFR6soMorYO35SjUpPEgNqPogU5pClYI/t04aD8qCTrp7FEe9zrP3Z0rDqAY
- PTYk5WrikkZNXKwHMSJvd3kHWGpD8Ag6oMYfYBqWjBRLcIak4amjpAS9ef908TK/s54KxR+ay
- t8muTOUHjCDdRHXJj4LSN3C7g8oEzyBx9nY8W6olcMviJi+ShRP4OKuYaQSdwwiqnYdX5sBWI
- oZkWsk5OQKlOH24QprxqT3oA1ZasieNwX+DEggllCkgpitOGGMP7WYSzuhKkyKOHCYIoMpAKN
- WJfK0Ch7o1c/AJ0kcfAs+PyayuYmBIGk3TX29hnFG6VGyyZ+6uo0B5vq8cUWf+RbfAr873Wj0
- umQ9tGqD3iZeJYWyYkwGVqvIU0zTVpNXEuHs0cugZpRUEUeaUl5lPmt2/MJrFroFkP/751RC5
- KTYldHNt08V97VwPMs9+5/YnS098/ZRPNN0x/hG6g++EmCdH5QQM60gWfRoJYw0iXCAs3DXc8
- lSS2kXVTfkwFb9cdtJjxWcuVlid4Iagg0DuVJl7un6nbsHgLQlXnYc4/rgB0cL8LCj6tU1EZv
- P/gWVz0emAKm9iSCQKN9cWqecA7WzZy05E21C29eOnUKXz/IaVeaSfxWFwPFKgstk=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Syzbot found a randconfig which fails after my recent patch:
+
+    drivers/bluetooth/btmtksdio.c:442:33: error: array type has incomplete element type ‘struct h4_recv_pkt’
+      442 | static const struct h4_recv_pkt mtk_recv_pkts[] = {
+          |                                 ^~~~~~~~~~~~~
+    drivers/bluetooth/btmtksdio.c:443:11: error: ‘H4_RECV_ACL’ undeclared here (not in a function)
+      443 |         { H4_RECV_ACL,      .recv = btmtksdio_recv_acl },
+          |           ^~~~~~~~~~~
+    drivers/bluetooth/btmtksdio.c:444:11: error: ‘H4_RECV_SCO’ undeclared here (not in a function)
+      444 |         { H4_RECV_SCO,      .recv = hci_recv_frame },
+          |           ^~~~~~~~~~~
+    drivers/bluetooth/btmtksdio.c:445:11: error: ‘H4_RECV_EVENT’ undeclared here (not in a function)
+      445 |         { H4_RECV_EVENT,    .recv = btmtksdio_recv_event },
+
+...because we can have BT_MTKSDIO=y with BT_HCIUART_H4=n, and the
+definitions used here are gated on BT_HCIUART_H4 in hci_uart.h.
+
+I think the simplest way to fix this is to remove the gate on the
+definitions in hci_uart.h. Since the constants are macros, there's no
+runtime cost to doing so, and nothing seems to rely on their absence in
+the BT_HCIUART_H4=n case.
+
+I let randconfig builds run for awhile in drivers/bluetooth/ and didn't
+hit anything else, so hopefully this was the only fallout.
+
+Fixes: 74bcec450eea ("Bluetooth: remove duplicate h4_recv_buf() in header")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202508300413.OnIedvRh-lkp@intel.com/
+Signed-off-by: Calvin Owens <calvin@wbinvd.org>
+---
+ drivers/bluetooth/hci_uart.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 5ea5dd80e297..fd0624988aba 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -121,7 +121,6 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
+ void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
+ 			 unsigned int oper_speed);
+ 
+-#ifdef CONFIG_BT_HCIUART_H4
+ int h4_init(void);
+ int h4_deinit(void);
+ 
+@@ -165,7 +164,6 @@ struct h4_recv_pkt {
+ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 			    const unsigned char *buffer, int count,
+ 			    const struct h4_recv_pkt *pkts, int pkts_count);
+-#endif
+ 
+ #ifdef CONFIG_BT_HCIUART_BCSP
+ int bcsp_init(void);
+-- 
+2.49.1
 
