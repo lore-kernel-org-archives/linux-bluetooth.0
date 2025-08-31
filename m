@@ -1,99 +1,98 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B25155C82;
-	Sun, 31 Aug 2025 10:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6AF5255F53
+	for <linux-bluetooth@vger.kernel.org>; Sun, 31 Aug 2025 11:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756637861; cv=none; b=iHuSO2p4zD3JmmK2bl+8430rgIvbKwQt5L91Y9/pSUmImjSyM9rTT2DWslWYFfJYepydJHXYcCEJlPdzvZp5DuIU3VigYVy1kNfIam6oIPDeWJYw7aVJrmfBhoqXd4d8JaOUhwj9D4yRGgfd/3uM14OaKMVkVyWLwSroi7vLLLM=
+	t=1756638787; cv=none; b=YR614J1mwjIBcv4WNy2tCjh8ZBIlSC8p8+B4raPJtGrHshK7OUJQ8zL+NzhZL82SyvxblA02VIhSxE2bhfzWT85Vdc1Yx7nXXpfY3DPqX7WAU0OVS6zfmp3a1hljzhwU/8dUCFFwZ/gjTUwYnw6n3Z4LSlfV5HzozB17vUNfrn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756637861; c=relaxed/simple;
-	bh=7I/zKGdibjpLrai/riJum7CU+tVh0qF1rSsygLIC03Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rV730//OFmwMjlWW+Z32M5S0mmzvlLHPJEt/aKJ63RFbugr/zKxktnfqKV3w0PV+l7DjDH6L3aPYlaqW4HTq8ePlLQ+zACXzg9W4W4GDVrPybj2abaaMzZoMUbeJj8WqgJ0yAEcgJcyYjLtFq4BxoLttI/EpubiMmWfgRV889Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af79b.dynamic.kabel-deutschland.de [95.90.247.155])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7CDEB60288278;
-	Sun, 31 Aug 2025 12:57:25 +0200 (CEST)
-Message-ID: <a80e0cb6-0c2a-4b83-9461-5e2dfc7f6d29@molgen.mpg.de>
-Date: Sun, 31 Aug 2025 12:57:25 +0200
+	s=arc-20240116; t=1756638787; c=relaxed/simple;
+	bh=6KHVTKJMWUZ+afzThiRFgmWVYVeqQo1A4QN3YOuWp0w=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Oe5ZOTgPrcLlY3i6C9puTk4/atAQ8+JyyW8rqInuzJIE6e82p/sHRX+slBmi1dGXNKd5FSYX8x3D2aek1ypJMu0oHmMrFXkiFySCro+JvhWJYyeHI2AagdVEee5OnEQSNVXHKJHxJyE7mjJZwqpES7l0IP5ldhXKFoIlWklxAfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c05ICKiH; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c05ICKiH"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-70a9f5dfa62so31205616d6.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Aug 2025 04:13:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756638784; x=1757243584; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6KHVTKJMWUZ+afzThiRFgmWVYVeqQo1A4QN3YOuWp0w=;
+        b=c05ICKiHXIve7Nqmockhn0pTmT4mPsfH/6Loqg1tnwSUclVGkild+xSDt6sKs3Evn1
+         qgD56Tc1V9BrCNyNb1DEO3CCTPrnSurfkOBTspphSe2Nfw2D92BZE0H2YmBIwUEXcdzC
+         XXCRhy5D9L7gw/xVMomR2ayapWG4np7oJY/HHfgQhWgGNc9QEl4gJtD24dw918d1EDDP
+         njrojj0ToCCjQAg6cmPTCi3dnxScRwf5V56iizcWL3zI5SYFLfRaQIsxymk46ahrVZ9g
+         7aji1tXZaMZsXyuVykvNnU4fYmM20qCUT97yBmar+4bVUHAmlchWZIqbcylqr/ZgOxdF
+         VjUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756638784; x=1757243584;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6KHVTKJMWUZ+afzThiRFgmWVYVeqQo1A4QN3YOuWp0w=;
+        b=QaziZCRpxhnWzfEKDfKTvFxOZJ234JZTLFPNmnzkS5IwXNfNzS+ehgjZ7hUnsngc72
+         PIAb9csmbBthYpkpkbeFRhADZ1ObgmWA0xd4FNh/4kVXyX8zI2xUrdnwew7aZp2j/KQ5
+         xKj3JczteG1O/HPBnIqDLqY1n0ciit40NmWyy6TLRHkc40ZQ4GUSCM5PKhkLy3ysVt60
+         KAXP95OW7oDFZJWqQLp9i3TYTU+AFuaxJeQoazWwrNz7OvCKYRyX91MkN1eUr3ptaiHS
+         3bOJHckgTtGhEAayZdr5hAbchWlhwfeVCCrJyhgCb2E70Gxg8j3LSrSECEETdpUO+RZ7
+         RMBA==
+X-Gm-Message-State: AOJu0YxRKKflCyYIRtQW86dALFQI6UnWaqE2i3klpwchxJMMFDAfRIja
+	jOf9aqr4waG5udZnr+E2CLVXKKpDW6yoYnf7z44FjMz7Ht+hmBcp1XRkXGGXnfZg
+X-Gm-Gg: ASbGncvdquayCYNwgB3Vh2P20l1HyJA3WxmRn15wRbQ3EpoGAShHw4XWZB4zvEXa447
+	NbHzfQMjcBQMHKUnonl8ooc7ZhpreAOWJRIPZtmmznXTiO4ZDYa0PCXYn2/h70zK+emi2CqZLIN
+	GK3f2lQw+noLoHvcuekP9zsI5O0c/BFNeFVj2Srg9asheooQhoWub92UbIE8f7HAFZPEvSOFdzh
+	ddxiDPaqT8wvJtmRBdTfN/MR6idtGKCgzoplUQrWzDyxU6dniX3+vCuHvqJr6SoiqY2u+DLqFAy
+	QkNyI0/2jGSRM0U4VBFuRpyy0tWaI+RzCTXujvsu/wcU6WOe6tfn9r+B0CZ31s0hSCnuWbBeoGu
+	/WuQp4xkD7osksKgu7/TtLmYa7RXWsPqbD82IsSo=
+X-Google-Smtp-Source: AGHT+IFgSMB6djZIkMjaCwBuo87pscKKPk12sZE+0dwrCnvfqxRXfyQANMipjgTGcZ1fxUcAM/WvGQ==
+X-Received: by 2002:a05:6214:240c:b0:70d:6de2:50d3 with SMTP id 6a1803df08f44-70fac97a438mr53653946d6.64.1756638784488;
+        Sun, 31 Aug 2025 04:13:04 -0700 (PDT)
+Received: from [172.17.0.2] ([48.211.213.34])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70fb2452f78sm21206156d6.0.2025.08.31.04.13.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 Aug 2025 04:13:03 -0700 (PDT)
+Message-ID: <68b42e3f.050a0220.565a0.5951@mx.google.com>
+Date: Sun, 31 Aug 2025 04:13:03 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7536521379785179913=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: Add support for Mercusys MA530
- Bluetooth adapter
-To: elespink@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
-References: <12b048b5-aadd-4b06-a9a7-8480f27c65af@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, elespink@gmail.com
+Subject: RE: Bluetooth: btusb: Add support for Mercusys MA530 Bluetooth adapter
 In-Reply-To: <12b048b5-aadd-4b06-a9a7-8480f27c65af@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <12b048b5-aadd-4b06-a9a7-8480f27c65af@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear lespink,
+--===============7536521379785179913==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+This is an automated email and please do not reply to this email.
 
-Thank you for your patch.
+Dear Submitter,
 
-Am 31.08.25 um 12:50 schrieb 3:
->  From becb0b090d9783afddf7d43d739ee69b82fbb32a Mon Sep 17 00:00:00 2001
-> From: lespink <lespinks9@gmail.com>
-> Date: Sun, 31 Aug 2025 12:35:47 +0200
-> Subject: [PATCH] Bluetooth: btusb: Add support for Mercusys MA530 Bluetooth adapter
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Please use `git send-email` or `b4` to send the patch, as currently it’s 
-not formatted correctly.
-
-> Add support for a Realtek-based Mercusys MA530 Bluetooth 5.3 USB dongle
-> which works with USB ID 2c4e:0115. This device was not recognized by the
-
-… having the id 2c4e:0115.
-
-(Maybe add that id to the summary/title too.)
-
-> kernel with the original device list and thus was non-functional.
-
-According to `git log drivers/bluetooth` it’s common to paste the 
-information from `/sys/kernel/debug/usb/devices` to the commit message.
-
-> Signed-off-by: lespink <lespinks9@gmail.com>
-> ---
->   drivers/bluetooth/btusb.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 8085fabadde8..84ebeb317dda 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -593,6 +593,10 @@ static const struct usb_device_id quirks_table[] = {
->       { USB_DEVICE(0x0489, 0xe130), .driver_info = BTUSB_REALTEK |
->                                BTUSB_WIDEBAND_SPEECH },
-> 
-> +    /* Mercusys MA530 Adapter */
-> +    { USB_DEVICE(0x2c4e, 0x0115), .driver_info = BTUSB_REALTEK |
-> +                             BTUSB_WIDEBAND_SPEECH },
-> +
->       /* Realtek Bluetooth devices */
->       { USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
->         .driver_info = BTUSB_REALTEK },
-> -- 
-> 2.51.0
-
-The diff looks fine.
+----- Output -----
 
 
-Kind regards,
+Please resolve the issue and submit the patches again.
 
-Paul
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7536521379785179913==--
