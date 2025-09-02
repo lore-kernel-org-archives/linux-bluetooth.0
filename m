@@ -1,191 +1,246 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00E1208CA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Sep 2025 14:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E328314B6C;
+	Tue,  2 Sep 2025 15:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756825021; cv=none; b=rTe0KOhiIYKkwKOKVdQb5o9Zdha8vRYGD1amchTGjID5HbsmcVF+ANMp6UqZMkCa+GlOdsvEblfneHT0wRAmJy+buHgdEhZdS7grv+96XIkMWtyKd6dqW8FQ4NF0qQVm+P/8scYOG1ZKiQws8dY/N23L/eq97luMa4kLAk9nZlk=
+	t=1756826970; cv=none; b=JtoaetKwej7URl9zhP2p6xaqGzY3/9ysLctjd/9DPb+oq9N/X/o8bLUW0aN9N486NQGUXmNxrB1zjGrbi9jRYKpsglpO/ikW7nixbJLAiW0/RgVnMP7Wf2pupHVWWO2AcBBDWaOUMMQ81zkbnZoPDwKGtrHrKr/QE9qE/ZoCmOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756825021; c=relaxed/simple;
-	bh=cLHPa43mBD+5VmDy96O+60RyAyaQhs1VVN82mXol668=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mRuOsD8mxx9R7inINT7xYI5gqgHiudWyGQjIc/snHYrHqdtNi2tIiBreCmavtqPw2TUdf5U3u/60IH97HkDN8QUGh283bAWq2hpQ3c8tU9YhT7JP5O2uN/HXQ/EzOnTTEeFyIjjhsYl1XY70KKS81A9hn6ZAb/VbEdnY6ui16GA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=JbZ17kxS; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
+	s=arc-20240116; t=1756826970; c=relaxed/simple;
+	bh=h/7pKLheTp60yfS64v6Q3yrnFtkNU0n6rfzoGNGi9Iw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GASL/i4I20aeiZIfnKAF6Dbnta/5dXxcVPa3Ikfvb9Ojqv3aU8fDo/qf1lUYfIX4xfrBZnkTFZOfjfUOxT/CvcZYiZBbV2pw6r7uqBWU2EdEVOvOemWOgC6Qoldo1GhxhaSESWbc5Og1DS/16PkFmem2YkTvwSJGQnd4mFwDbh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RhMxOzD7; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="JbZ17kxS"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-77251d7cca6so1982000b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Sep 2025 07:56:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RhMxOzD7"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-336dc57f562so20003851fa.1;
+        Tue, 02 Sep 2025 08:29:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1756825019; x=1757429819; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iQAoY+64PekjTVVz5Aci7Us6O8LqMJNZMBqivTa7EXM=;
-        b=JbZ17kxSmWqbf/pXzPjmWnbIloE0ShLmh2q3o0U0YWI9RsHOyJ51GWToX44fjHhRC5
-         +F2tsW16pEDPFKLelAzVFWIVB+Gfn0Br7Cv/S6/iVtICS3Z66QQQQaNqHOPyojxvcEjJ
-         jojVx2hInEoBFcyQvfRjzGeO/sCdA97wGJfwmNvlUmpe+6CpfD4D+Sjfiy4quL1bP++5
-         3v9/8NbC30rGX8pM7Lfco7qqtHd9JatAcCgPyeqpHAQhT/rkACHSjuGoPvgKe81o0ZrX
-         PgqN0vL7fJqHeDmAgaGlgFQpUPN+jl5ipPVP81/zkyaoVOgmtT5e3bXP97t7gS3ypZhh
-         fIow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756825019; x=1757429819;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1756826966; x=1757431766; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iQAoY+64PekjTVVz5Aci7Us6O8LqMJNZMBqivTa7EXM=;
-        b=vyRg1kMutAvKcqaANsGoBbM9RP0QrxpbzeqwBwDUZU4rf85ARkKdChOSgrR28cgcu0
-         Syr/ygh736PmtWjINLL3WGBx0fi44zinv+azDvyZ7O/9gyTVl9xA47eISYvfJJMKysav
-         J97b+axs10YhF3XeFgts9DUiKyxl70y2nl12uVNFAhDhz+VcDAVSaGqULzs86WnchSSO
-         RfxzUnl6nGKjEMk4ywJL+o/38i4BlAU70+a0mIfkBRldhr+/Y2dohaJ0KVyBwSkF0sw4
-         NSX96uasqi6pjMxjnWIoQQ7McXaAjPqQJtEf7OXZv3UyEN3Z4KV/eTAGO1moVfGy7aZZ
-         0SAQ==
-X-Gm-Message-State: AOJu0YytetqxV7WIDU+1WyHBLHhyld1So/e/zL+f/NFz7YjxGOv0EjRs
-	cepAF4diyUAAYLiAMsFscmzMkMAJuqC7bG/H2E9tqxiGmgVxson4xft9tegwp6LrVCc=
-X-Gm-Gg: ASbGncuYFGgpSogtv7Vq73LPYNGEsTCpoQ7lbqUGINoFues6VL4EQkgjsxqUGoO18ZS
-	vBJQM1r1bVcIQnf6UR9iYCVfqXp16uTPF6slZDZZt7lbuLISmjanVDdNzGCStXwt9hwCFwoeRAj
-	WO0z89NqwSPRgSLPJ0Om/zpmSiX9hziOO7YGxfbl+Fu4wyClcadEqhHV25uugbJlepwy1hU5ogE
-	T9duqb81iptC/0Tw2KhPWGeJ9OkQLmywQC/fiIKBC+5L+y2YY6AtD0373cTRCbFNOc2xjGBbrIp
-	7oGMyVY9TwS4mG1Ty9sefFcKzj8vlhbhYJ5G+aok4JLiS/5sqmv8vT3A8D3MrZy3+/BNBG/YcbB
-	FhFeGe975VFZ1vFMIgw9AXjCc
-X-Google-Smtp-Source: AGHT+IG4NJOSwfNOiJPCZCADKuS/Hi0VsrUQ00UwdvcAjo/IiTHURdMNRbeFN9pERyT8kiit7L+DiA==
-X-Received: by 2002:a05:6a00:1748:b0:76e:7aee:35f1 with SMTP id d2e1a72fcca58-7723e3fcb56mr15007816b3a.29.1756825018957;
-        Tue, 02 Sep 2025 07:56:58 -0700 (PDT)
-Received: from mozart.vkv.me ([192.184.167.117])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a26bfe2sm14027937b3a.14.2025.09.02.07.56.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 07:56:58 -0700 (PDT)
-Date: Tue, 2 Sep 2025 07:56:58 -0700
-From: Calvin Owens <calvin@wbinvd.org>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	open list <linux-kernel@vger.kernel.org>,
-	linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-	lkft-triage@lists.linaro.org,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>, pmenzel@molgen.mpg.de,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Ben Copeland <benjamin.copeland@linaro.org>
-Subject: Re: next-20250901 drivers bluetooth bpa10x.c:77:33: error: array
- type has incomplete element type 'struct h4_recv_pkt'
-Message-ID: <aLcFuqRuB2NFu-ZE@mozart.vkv.me>
-References: <CA+G9fYsgiqTo7t3e36P5cysc+jEX5Fub1quTj+fuKGM8jkxbFA@mail.gmail.com>
+        bh=45D3H8+xv+cJQOWaurVBdJjz0km7uhmNmdRtwG5A/1w=;
+        b=RhMxOzD7DL1nUu+JmYC4SZwZNUQGFjYVlPM1a7vi/OoaQk/WtE3caOJzBRfTnlbFeY
+         grZrRgp8ubJzGexiEmlxAGKcJBFbsspyjBiYuSDZVQcp7G/AFxfwySFCNTw6NLD7FYV2
+         Hd4kPQ79+vRgD6G6izuDrUSwoLm26QJdlEUkMdZh3W0AF+sgGvFUTGGvHjt5vl9NozwV
+         1TsPCCPMEjrASSjPbbbz6hx+rvs+IoHxHevDfZnSKtQwR4JHiNsYSK7koyZ0DToGujdG
+         6oEj0ODua3NK/L1AsvwlJ35d6UbpP7MfeE9Z43tOi4in049EWS03aePOLzd4JcPkhCqy
+         E4Vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756826966; x=1757431766;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=45D3H8+xv+cJQOWaurVBdJjz0km7uhmNmdRtwG5A/1w=;
+        b=fWvMSzig3oR31qElk27TNAIPdZVOUqrC//C5dBQIDxs2P1eVi6J+m1m9QRhM1yvhU0
+         MSZn8cQeO5hrfqre/OhYsSzvMWgA4GFtQci3NGsmUb6VInCxhletxZR4bUupj9ZECoI3
+         QoxTAxUFPzK3ZyvdA5tZ1NDqu+kjoBN8FTZt02uH1diATtBFz15+zuNt8kt9J3o6BaKN
+         hKn4W5hGub+iFV5/3fU7wKO5/nTl5Kfz/cz69oJ7FNABE2mF1foJw0k99P/Lbs3V3if9
+         rA8xEbGeEqx9ZHUDgX8WyAG7MekZbFae2O36cOhJObSmzyVfbQ3qmMkg9Ut3oQP/7gNJ
+         mS/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW+4EL5bhQPtXmaJ/4ITaVs6VrKYeUDqLmemSG2SXFCD8qKLqqd1QYyBznrc7anc82FebOSdAPYGLUYjXlxw1w=@vger.kernel.org, AJvYcCWDFk4Coggs89XL2Bf/Ppo+H2Ct72xhkoprslfQjeqh95qN4OcJUHsBw3SnUSicdZDWOE5QJOiP2THOcNIJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuivZhmqPqPHZfQh8HboAjt2II1ZX0Lv48U5AU6n3+uAhp4LMi
+	aoPd1IUJq/TDv4XZmMItQtzG4Q2QM1r6M/Djft1ne6BnLjsI4xVc3RD3H7UFdG0q2cWg/QBNZpm
+	U+V5ngrEFa+bM9UCsKx5rOjdm/ocTFUM=
+X-Gm-Gg: ASbGncstkC4zEoCdpDxKBdu/Tv5vcvKZrOh2BlOojri78d13eo3wSssXR3tWINGBV6L
+	w+Z1QkCVe+br7lsmQyqls+MvzP9lSX9/8tp4BoA8QQtevZGLZA07cou4myb/3ih/DFRlCsgicWN
+	Md5GXhSQr/c0AxMi3sUMN4SQH1bpY+DcrRuRYY0U81LqgiD/TcD+DMxGbqyXQK7SC5KnrIoxnoG
+	8QmxFkZ45uNa4eFpxDp6S0o7RFl8qUV+x9aR19QIFKbWQ==
+X-Google-Smtp-Source: AGHT+IHJ+ifO3wbwufUVcTFDMp7vzAFqN/JcOC4u8JhOqaNrPYiCiSR9o2M3s+tthdJTnwxOiQhxQf4CM1nG6ewI/aE=
+X-Received: by 2002:a05:651c:551:b0:336:e22d:804a with SMTP id
+ 38308e7fff4ca-336e22da0cdmr26270971fa.17.1756826966207; Tue, 02 Sep 2025
+ 08:29:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYsgiqTo7t3e36P5cysc+jEX5Fub1quTj+fuKGM8jkxbFA@mail.gmail.com>
+References: <202508300413.OnIedvRh-lkp@intel.com> <b78a4255d17adbb74140aa23f89cb7653af96c75.1756513671.git.calvin@wbinvd.org>
+ <84fd4012-966b-4983-b015-ffce06509b5e@molgen.mpg.de> <aLNRvzXE4O9dKZoN@mozart.vkv.me>
+In-Reply-To: <aLNRvzXE4O9dKZoN@mozart.vkv.me>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 2 Sep 2025 11:29:13 -0400
+X-Gm-Features: Ac12FXxpABT60qjwT9pgH_IdUsZUdnJMAR-u1w75YMCcYqqH0yYBL57h5ICrG1c
+Message-ID: <CABBYNZJBDgQHwmx82H2XJ-LCeOsxc77PPo6NA4zzT0dt7Uxddw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btmtksdio: Fix build after header cleanup
+To: Calvin Owens <calvin@wbinvd.org>
+Cc: Paul Menzel <pmenzel@molgen.mpg.de>, linux-kernel@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, oe-kbuild-all@lists.linux.dev, 
+	Marcel Holtmann <marcel@holtmann.org>, Sean Wang <sean.wang@mediatek.com>, 
+	linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tuesday 09/02 at 15:00 +0530, Naresh Kamboju wrote:
-> The following build warnings / errors are noticed on powerpc ppc6xx_defconfig
-> with gcc-13 toolchain running on Linux next-20250901 and next-20250902.
-> 
-> Regression Analysis:
-> - New regression? yes
-> - Reproducibility? yes
-> 
-> First seen on next-20250901
-> Bad: next-20250901 and next-20250902
-> Good: next-20250829
-> 
-> Build regression: next-20250901 drivers bluetooth bpa10x.c:77:33:
-> error: array type has incomplete element type 'struct h4_recv_pkt'
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> 
-> Powerpc:
->   build:
->     * gcc-13-ppc6xx_defconfig
->     * gcc-8-ppc6xx_defconfig
+Hi Calvin,
 
-Hi Naresh,
-
-This should fix it:
-https://lore.kernel.org/all/aLNRvzXE4O9dKZoN@mozart.vkv.me/
-
-Thanks,
-Calvin
-
-> Build error:
-> drivers/bluetooth/bpa10x.c:77:33: error: array type has incomplete
-> element type 'struct h4_recv_pkt'
->    77 | static const struct h4_recv_pkt bpa10x_recv_pkts[] = {
->       |                                 ^~~~~~~~~~~~~~~~
-> drivers/bluetooth/bpa10x.c:78:11: error: 'H4_RECV_ACL' undeclared here
-> (not in a function)
->    78 |         { H4_RECV_ACL,     .recv = hci_recv_frame },
->       |           ^~~~~~~~~~~
-> drivers/bluetooth/bpa10x.c:79:11: error: 'H4_RECV_SCO' undeclared here
-> (not in a function)
->    79 |         { H4_RECV_SCO,     .recv = hci_recv_frame },
->       |           ^~~~~~~~~~~
-> drivers/bluetooth/bpa10x.c:80:11: error: 'H4_RECV_EVENT' undeclared
-> here (not in a function)
->    80 |         { H4_RECV_EVENT,   .recv = hci_recv_frame },
->       |           ^~~~~~~~~~~~~
-> drivers/bluetooth/bpa10x.c: In function 'bpa10x_rx_complete':
-> drivers/bluetooth/bpa10x.c:99:37: error: implicit declaration of
-> function 'h4_recv_buf' [-Werror=implicit-function-declaration]
->    99 |                 data->rx_skb[idx] = h4_recv_buf(hdev, data->rx_skb[idx],
->       |                                     ^~~~~~~~~~~
-> In file included from include/linux/array_size.h:5,
->                  from include/linux/kernel.h:16,
->                  from drivers/bluetooth/bpa10x.c:9:
-> include/linux/compiler.h:197:82: error: expression in static assertion
-> is not an integer
->   197 | #define __BUILD_BUG_ON_ZERO_MSG(e, msg, ...)
-> ((int)sizeof(struct {_Static_assert(!(e), msg);}))
->       |
->                   ^
-> include/linux/compiler.h:202:33: note: in expansion of macro
-> '__BUILD_BUG_ON_ZERO_MSG'
->   202 | #define __must_be_array(a)
-> __BUILD_BUG_ON_ZERO_MSG(!__is_array(a), \
->       |                                 ^~~~~~~~~~~~~~~~~~~~~~~
-> include/linux/array_size.h:11:59: note: in expansion of macro '__must_be_array'
->    11 | #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) +
-> __must_be_array(arr))
->       |
-> ^~~~~~~~~~~~~~~
-> drivers/bluetooth/bpa10x.c:103:49: note: in expansion of macro 'ARRAY_SIZE'
->   103 |
-> ARRAY_SIZE(bpa10x_recv_pkts));
->       |                                                 ^~~~~~~~~~
-> drivers/bluetooth/bpa10x.c: At top level:
-> drivers/bluetooth/bpa10x.c:77:33: warning: 'bpa10x_recv_pkts' defined
-> but not used [-Wunused-variable]
->    77 | static const struct h4_recv_pkt bpa10x_recv_pkts[] = {
->       |                                 ^~~~~~~~~~~~~~~~
-> cc1: some warnings being treated as errors
-> 
-> 
-> ## Source
-> * Kernel version: 6.17.0-rc4
-> * Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
-> * Git describe: next-20250902
-> * Git commit: 3db46a82d467bd23d9ebc473d872a865785299d8
-> * Architectures: powerpc
-> * Toolchains: gcc-13
-> * Kconfigs: ppc6xx_defconfig
-> 
-> ## Build
-> * Build log: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250902/testrun/29725581/suite/build/test/gcc-13-ppc6xx_defconfig/log
-> * Build details:
-> https://regressions.linaro.org/lkft/linux-next-master/next-20250901/log-parser-build-gcc/gcc-compiler-drivers_bluetooth_bpax_c-error-array-type-has-incomplete-element-type-struct-h_recv_pkt/
-> * Build plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/builds/328DwMMwNOpSAj0qnRpJavgtz9C
-> * Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/328DwMMwNOpSAj0qnRpJavgtz9C/
-> * Kernel config:
-> https://storage.tuxsuite.com/public/linaro/lkft/builds/328DwMMwNOpSAj0qnRpJavgtz9C/config
-> 
+On Sat, Aug 30, 2025 at 3:32=E2=80=AFPM Calvin Owens <calvin@wbinvd.org> wr=
+ote:
+>
+> On Saturday 08/30 at 07:11 +0200, Paul Menzel wrote:
+> > Dear Calvin,
+> >
+> >
+> > Thank you for your patch, and addressing the regression right away.
+> >
+> > Am 30.08.25 um 02:50 schrieb Calvin Owens:
+> > > Syzbot found a randconfig which fails after my recent patch:
+> > >
+> > >      drivers/bluetooth/btmtksdio.c:442:33: error: array type has inco=
+mplete element type =E2=80=98struct h4_recv_pkt=E2=80=99
+> > >        442 | static const struct h4_recv_pkt mtk_recv_pkts[] =3D {
+> > >            |                                 ^~~~~~~~~~~~~
+> > >      drivers/bluetooth/btmtksdio.c:443:11: error: =E2=80=98H4_RECV_AC=
+L=E2=80=99 undeclared here (not in a function)
+> > >        443 |         { H4_RECV_ACL,      .recv =3D btmtksdio_recv_acl=
+ },
+> > >            |           ^~~~~~~~~~~
+> > >      drivers/bluetooth/btmtksdio.c:444:11: error: =E2=80=98H4_RECV_SC=
+O=E2=80=99 undeclared here (not in a function)
+> > >        444 |         { H4_RECV_SCO,      .recv =3D hci_recv_frame },
+> > >            |           ^~~~~~~~~~~
+> > >      drivers/bluetooth/btmtksdio.c:445:11: error: =E2=80=98H4_RECV_EV=
+ENT=E2=80=99 undeclared here (not in a function)
+> > >        445 |         { H4_RECV_EVENT,    .recv =3D btmtksdio_recv_eve=
+nt },
+> > >
+> > > ...because we can have BT_MTKSDIO=3Dy with BT_HCIUART_H4=3Dn, and the
+> > > definitions used here are gated on BT_HCIUART_H4 in hci_uart.h.
+> >
+> > The drivers below seem to be affected:
+> >
+> >     drivers/bluetooth/bpa10x.c:     { H4_RECV_EVENT,   .recv =3D
+> > hci_recv_frame },
+> >     drivers/bluetooth/btmtksdio.c:  { H4_RECV_EVENT,    .recv =3D
+> > btmtksdio_recv_event },
+> >     drivers/bluetooth/btmtkuart.c:  { H4_RECV_EVENT,    .recv =3D
+> > btmtkuart_recv_event },
+> >     drivers/bluetooth/btnxpuart.c:  { H4_RECV_EVENT,        .recv =3D
+> > hci_recv_frame },
+> >
+> > > I think the simplest way to fix this is to remove the gate on the
+> > > definitions in hci_uart.h. Since the constants are macros, there's no
+> > > runtime cost to doing so, and nothing seems to rely on their absence =
+in
+> > > the BT_HCIUART_H4=3Dn case.
+> >
+> > Looking at the implementation, it looks like they only work with the H4
+> > protocol? So maybe, that should be denoted in the Kconfig files?
+>
+> Thanks for looking Paul.
+>
+> Yes, my fix will cause a link error with other randconfigs, which my
+> 'make randconfig drivers/bluetooth/' test loop missed after I made the
+> function prototype always defined, whoops.
+>
+> We do need the dependencies here, as you note. The btmtksdio case syzbot
+> found is the odd one out because it only uses the constants, and doesn't
+> call h4_recv_buf().
+>
+> Hopefully this gets it all:
+>
+> -----8<-----
+> From: Calvin Owens <calvin@wbinvd.org>
+> Subject: [PATCH v2] Bluetooth: Fix build after header cleanup
+>
+> Some Kconfig dependencies are needed after my recent cleanup, since
+> the core code has its own option.
+>
+> Since btmtksdio does not actually call h4_recv_buf(), move the
+> definitions it uses outside the BT_HCIUART_H4 gate in hci_uart.h to
+> avoid adding a dependency for btmtksdio.
+>
+> The rest I touched (bpa10x, btmtkuart, and btnxpuart) do really call
+> h4_recv_buf(), so the dependency is required, add it for them.
+>
+> Fixes: 74bcec450eea ("Bluetooth: remove duplicate h4_recv_buf() in header=
+")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202508300413.OnIedvRh-lkp@i=
+ntel.com/
+> Signed-off-by: Calvin Owens <calvin@wbinvd.org>
+> ---
+>  drivers/bluetooth/Kconfig    | 6 ++++++
+>  drivers/bluetooth/hci_uart.h | 8 ++++----
+>  2 files changed, 10 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> index 4ab32abf0f48..7df69ccb6600 100644
+> --- a/drivers/bluetooth/Kconfig
+> +++ b/drivers/bluetooth/Kconfig
+> @@ -312,7 +312,9 @@ config BT_HCIBCM4377
+>
+>  config BT_HCIBPA10X
+>         tristate "HCI BPA10x USB driver"
+> +       depends on BT_HCIUART
+>         depends on USB
+> +       select BT_HCIUART_H4
+>         help
+>           Bluetooth HCI BPA10x USB driver.
+>           This driver provides support for the Digianswer BPA 100/105 Blu=
+etooth
+> @@ -437,8 +439,10 @@ config BT_MTKSDIO
+>
+>  config BT_MTKUART
+>         tristate "MediaTek HCI UART driver"
+> +       depends on BT_HCIUART
+>         depends on SERIAL_DEV_BUS
+>         depends on USB || !BT_HCIBTUSB_MTK
+> +       select BT_HCIUART_H4
+>         select BT_MTK
+>         help
+>           MediaTek Bluetooth HCI UART driver.
+> @@ -483,7 +487,9 @@ config BT_VIRTIO
+>
+>  config BT_NXPUART
+>         tristate "NXP protocol support"
+> +       depends on BT_HCIUART
+>         depends on SERIAL_DEV_BUS
+> +       select BT_HCIUART_H4
+>         select CRC32
+>         select CRC8
+>         help
+> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> index 5ea5dd80e297..cbbe79b241ce 100644
+> --- a/drivers/bluetooth/hci_uart.h
+> +++ b/drivers/bluetooth/hci_uart.h
+> @@ -121,10 +121,6 @@ void hci_uart_set_flow_control(struct hci_uart *hu, =
+bool enable);
+>  void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
+>                          unsigned int oper_speed);
+>
+> -#ifdef CONFIG_BT_HCIUART_H4
+> -int h4_init(void);
+> -int h4_deinit(void);
+> -
+>  struct h4_recv_pkt {
+>         u8  type;       /* Packet type */
+>         u8  hlen;       /* Header length */
+> @@ -162,6 +158,10 @@ struct h4_recv_pkt {
+>         .lsize =3D 2, \
+>         .maxlen =3D HCI_MAX_FRAME_SIZE \
+>
+> +#ifdef CONFIG_BT_HCIUART_H4
+> +int h4_init(void);
+> +int h4_deinit(void);
+> +
+>  struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+>                             const unsigned char *buffer, int count,
+>                             const struct h4_recv_pkt *pkts, int pkts_coun=
+t);
 > --
-> Linaro LKFT
-> https://lkft.linaro.org
+> 2.47.2
+
+Please send a v2 then otherwise this is no pickup by the likes of CI
+and patchwork.
+
+>
+
+
+--=20
+Luiz Augusto von Dentz
