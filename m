@@ -1,126 +1,138 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A0B3314DC
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Sep 2025 17:53:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADCD2F069E;
+	Thu,  4 Sep 2025 22:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757008401; cv=none; b=SqENGf9O713e/HPc50/RVApArdmgZ+L4S/VLotfaO7H6E1fWfRbOEQSXy/s4pm3NE+vyuaev3RxDN6PQSFy78DILbOCyL5s7j2hrIhL6f16K0jqoch7+OqnDu1Dhq5DLMHrKZpVYiYZq0wq9pB1Eent4hYxgS0j+T6O/SVM4L2E=
+	t=1757026344; cv=none; b=HwnpQdFMa6uwdnByciT+z5gj5LRtMI29EK+I4Co0bymv6byeg24B7SrraC92Od8vitgVNpZK0nH7wxvrPK9Pt0DrBCMqG6PubtatQFr7nwZ0nrUfYmGu1XKtqytCWorz4zdLUmPGu4ab3VxeDdHhMEjNDTLyfe7dDveTyJxuRq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757008401; c=relaxed/simple;
-	bh=9klZQOOxdLR0ejS+YQPkol3r8E1o/EJAo928SfkIhK0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=I2AqiWv2yNqvs2whSHbYJ/kJ6OUiQuEcjMfBEYOAlbRSreGbO+7kPPE5ouU3dfMHYvwA92Xs+Dkiy+xekQ6MeT6/oxT9D8j8jA62Jty4A+P8Fw9kJQPDX7E3qfE0YH0sIyUbuHL7076EyfftmcpXiAc5k9zZw6iPc3Mecms9OEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f33PyER9; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1757026344; c=relaxed/simple;
+	bh=2MViS1nqSpyNjI/P7K/k2Spz+R3IZ3I4vxgoMymb5Uo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ifBDuZ7HlphKbl5jCsc8FsUSMkx8CAk/E3X2KkU4Y3Vcsl2TWBQIG26gKvd0wz11CLF2tWlM/0+D0pA3qBgqONiSTf4z/0KiHxX2URaEyGUYelac4kp2lBsXZdLVkBys/L7FsYM0rJ8QWk7xbQJlvcJqxFRbXwsqQhs/3wkUnlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=roBVwgBQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f33PyER9"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-32b4c6a2a98so1266995a91.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Sep 2025 10:53:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757008399; x=1757613199; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pIfYuPowD5QemLBid5oc/tKK5T0r+Layl8LOZmmfA4g=;
-        b=f33PyER95dViOYCjlGceq3bHSz2cKBAcQA+T5rxhhkxlESxo2SbkFBkxh2h9hOMe66
-         gmyM0MEWEC8n+cnCAbNbhR/c4aBYYByZFtnuH3GEuZg81jmtUWDjc5LLDGmk7FdTvRKb
-         3myjF974X/48A/lHsdyi5a38nPn+Ezp/kbuqOBV1DNKVSEoeHXWYx6xXviZx6koEFpIN
-         tL863nDzHKTvTjRdBohSiLQxEB5FI5QQNQKgFlXLysLpkAMQkz/V/Y+d66GYfkBvNYas
-         2wUsd0aZbB55w85j+c5gkRlVuNIAsFer4hnph03SRl4YbfEGkXcT2xr3dzX+un5r2iGq
-         PDtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757008399; x=1757613199;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pIfYuPowD5QemLBid5oc/tKK5T0r+Layl8LOZmmfA4g=;
-        b=J0cwDzkUd2C+V7ygQrsbB2drPyIWbHBZUR3y+ds2P+ZhsxeIXq8a6mBy9KfNIBPPr/
-         Kjdd8mULahU0bjpddc7OWjq4d9v3RhpRE8dTsC0RqZMKJGCAvRabnJpQN4hMOtJi49zF
-         vJ+FWVQFJPTknkEEcjuaV/vCeLFiKmP4HUTWpGy173GSxUHcOaqj3aOr+GgfAm1Er21A
-         BXbqZ5aoisgaxTkCmg8U6dH23YuWPBGUMMKTGXQ9LqaDRgNN8Wuy/Wg6tvQjOGwYYvay
-         OGiVe0dGhafsrR1fYwYsKedtaCqIifEuKA1OkvVXL7E/MEdWOMny68iYyKI5jZEXiImp
-         6qeg==
-X-Gm-Message-State: AOJu0YyB0pUWMHoq2WAf9IIAWd3wH9+QZrhJwGinyzCuFzi7SufjnydN
-	8BAjBb0em2+TD2r7AOLKYp6GiWj0NOXzVFGF37L9uecQ8QAc6FzdAynVlQuKNw==
-X-Gm-Gg: ASbGncv2tp5eM1mrmmmdyESImi0RxVWWQJ5PJNA+kQhIOAodmKQvcDmufL6dzVo9FWz
-	MFsPzduyJWvwiYa/ndHZwCeKPSxuz6EXvJwurbmC7nXcc3idaOAfc3SwALMkU/nVHTB83Ao0V6z
-	HEz7rydp4kgR63Zsj1YstUUBjGSeJSORS2NsMRXI+/o/5ZRCN5bUlwo7//PUgYXALdB1pnlVsx4
-	mwi21RrizML6det1UKrTb4CUWZxqazmXZHRGXS2HFIssXEXlDOf5yCReLZHx4prwtoXfoyDLFrw
-	b/MuZVe6k2TQZMYrCwFezCeD46sdhuUHw4d7YeiQrYGfdewSLHBUc6IgeOoa/qdyx9h8uHI5g9e
-	6SamfS5VyWTk6gwvEQtaMpIMR9royVfnqQWEWrjU=
-X-Google-Smtp-Source: AGHT+IFHWUKuNWHeRM73S8AVlZq60jm0YEngYFH2JPDKR+UKWw7XdjfyqYg9yTGoPNKbLhD4UEsCsw==
-X-Received: by 2002:a17:90a:c105:b0:32b:9506:1780 with SMTP id 98e67ed59e1d1-32b95061914mr4132102a91.9.1757008399157;
-        Thu, 04 Sep 2025 10:53:19 -0700 (PDT)
-Received: from [172.17.0.2] ([172.182.212.7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-329d8ca7aa0sm9289793a91.19.2025.09.04.10.53.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 10:53:18 -0700 (PDT)
-Message-ID: <68b9d20e.170a0220.2fec96.4c46@mx.google.com>
-Date: Thu, 04 Sep 2025 10:53:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1289935661119997090=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="roBVwgBQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38DDFC4CEF0;
+	Thu,  4 Sep 2025 22:52:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757026343;
+	bh=2MViS1nqSpyNjI/P7K/k2Spz+R3IZ3I4vxgoMymb5Uo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=roBVwgBQdHjRYDAC6Yyl8gcjTa1sebepK19RtdZM5Kr+BJYNj5zWJeB02etY8KIyI
+	 b+RcIMOwSoGmpxXqnXcfjEYxksz+RXpt+pf2VjEB1VgJcIRHBceav+UIWYbNx2fE3K
+	 7+WEHceX9Cz41lRwl8VloRIumOdI4m0IKDa6VphbPJDeULrt3x0bJuAUukQ6/WKuL0
+	 REQt3WpNlSm3UUve2h7bV157b/yJ+NQBKzl9CGFniIjjyb7AShIWGiI11Zck6rcSys
+	 VyQI9wmTi+B2BLN4VmdvCQSrI8EEXTLBevvUrwyGOOOrG/WVf+G3vDakrZ7qQCvomP
+	 m3ZuahDyWvLeg==
+Date: Fri, 5 Sep 2025 00:52:20 +0200
+From: Andi Shyti <andi.shyti@kernel.org>
+To: Janne Grunau <j@jannau.net>
+Cc: Sven Peter <sven@kernel.org>, Alyssa Rosenzweig <alyssa@rosenzweig.io>, 
+	Neal Gompa <neal@gompa.dev>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Hector Martin <marcan@marcan.st>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
+	Robin Murphy <robin.murphy@arm.com>, Linus Walleij <linus.walleij@linaro.org>, 
+	Mark Kettenis <kettenis@openbsd.org>, Jassi Brar <jassisinghbrar@gmail.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Sasha Finkelstein <fnkl.kernel@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, van Spriel <arend@broadcom.com>, Lee Jones <lee@kernel.org>, 
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>, Stephen Boyd <sboyd@kernel.org>, 
+	Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck <linux@roeck-us.net>, 
+	Michael Turquette <mturquette@baylibre.com>, Martin =?utf-8?Q?Povi=C5=A1er?= <povik+lin@cutebit.org>, 
+	Vinod Koul <vkoul@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, asahi@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-pm@vger.kernel.org, iommu@lists.linux.dev, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-bluetooth@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, linux-pwm@vger.kernel.org, linux-watchdog@vger.kernel.org, 
+	linux-clk@vger.kernel.org, dmaengine@vger.kernel.org, linux-sound@vger.kernel.org, 
+	linux-spi@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 10/37] dt-bindings: i2c: apple,i2c: Add apple,t6020-i2c
+ compatible
+Message-ID: <f5o23zrqe2ei3bmwlxokhtkgfpeki6ctoq3ahd4f66utfu5hdk@6q55hvy4hvq4>
+References: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net>
+ <20250828-dt-apple-t6020-v1-10-507ba4c4b98e@jannau.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2] main.conf: Add FilterDiscoverable option
-In-Reply-To: <20250904163343.688862-1-luiz.dentz@gmail.com>
-References: <20250904163343.688862-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250828-dt-apple-t6020-v1-10-507ba4c4b98e@jannau.net>
 
---===============1289935661119997090==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Janne,
 
-This is automated email and please do not reply to this email!
+On Thu, Aug 28, 2025 at 04:01:29PM +0200, Janne Grunau wrote:
+> After discussion with the devicetree maintainers we agreed to not extend
+> lists with the generic compatible "apple,i2c" anymore [1]. Use
+> "apple,t8103-i2c" as fallback compatible as it is the SoC the driver
+> and bindings were written for.
+> 
+> This block is compatible with t8103, so just add the new per-SoC
+> compatible using apple,t8103-i2c as base.
+> 
+> [1]: https://lore.kernel.org/asahi/12ab93b7-1fc2-4ce0-926e-c8141cfe81bf@kernel.org/
+> 
+> Signed-off-by: Janne Grunau <j@jannau.net>
 
-Dear submitter,
+Acked-by: Andi Shyti <andi.shyti@kernel.org>
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=998967
+Andi
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.33 seconds
-GitLint                       PENDING   0.52 seconds
-BuildEll                      PASS      19.74 seconds
-BluezMake                     PASS      2535.74 seconds
-MakeCheck                     PASS      19.73 seconds
-MakeDistcheck                 PASS      186.00 seconds
-CheckValgrind                 PASS      235.81 seconds
-CheckSmatch                   PASS      308.71 seconds
-bluezmakeextell               PASS      130.27 seconds
-IncrementalBuild              PENDING   0.41 seconds
-ScanBuild                     PASS      914.51 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1289935661119997090==--
+> ---
+>  .../devicetree/bindings/i2c/apple,i2c.yaml         | 27 +++++++++++++---------
+>  1 file changed, 16 insertions(+), 11 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/i2c/apple,i2c.yaml b/Documentation/devicetree/bindings/i2c/apple,i2c.yaml
+> index fed3e1b8c43f67b8f5a19e5c1e046b0e17ab8017..500a965bdb7a84e4997b52e8c19dcc1a7ee0cff7 100644
+> --- a/Documentation/devicetree/bindings/i2c/apple,i2c.yaml
+> +++ b/Documentation/devicetree/bindings/i2c/apple,i2c.yaml
+> @@ -20,17 +20,22 @@ allOf:
+>  
+>  properties:
+>    compatible:
+> -    items:
+> -      - enum:
+> -          - apple,s5l8960x-i2c
+> -          - apple,t7000-i2c
+> -          - apple,s8000-i2c
+> -          - apple,t8010-i2c
+> -          - apple,t8015-i2c
+> -          - apple,t8103-i2c
+> -          - apple,t8112-i2c
+> -          - apple,t6000-i2c
+> -      - const: apple,i2c
+> +    oneOf:
+> +      - items:
+> +          - const: apple,t6020-i2c
+> +          - const: apple,t8103-i2c
+> +      - items:
+> +          - enum:
+> +              # Do not add additional SoC to this list.
+> +              - apple,s5l8960x-i2c
+> +              - apple,t7000-i2c
+> +              - apple,s8000-i2c
+> +              - apple,t8010-i2c
+> +              - apple,t8015-i2c
+> +              - apple,t8103-i2c
+> +              - apple,t8112-i2c
+> +              - apple,t6000-i2c
+> +          - const: apple,i2c
+>  
+>    reg:
+>      maxItems: 1
+> 
+> -- 
+> 2.51.0
+> 
