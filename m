@@ -1,126 +1,145 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25DFD306B1B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Sep 2025 15:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9BC3209
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Sep 2025 23:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757087373; cv=none; b=tlAZjY0kAWD3rZL/qBmrH8Pz25qGf7PwYKqoZ1fjPxJlSgiCAULWcMJr1alooLE7qnFCLvzRuB8EbqhhIVz3vPBnB/jWaaVkJe/U5shY3EiRFeCsNKqMsYm8LH/A4oB7MZliAjj4nbM5Iml/DZZ9oIopcZ0ByUtuS4fQzpTP47Y=
+	t=1757114256; cv=none; b=a9+9QkrctyW2wSZxsHE/I5DBPtoEN/+23r7ssptFVaj5HbJ9/Pn4QnYqCFFle4QPl3DQBb/tFn7Swkf+zIlO99yUzvxktTDS7lvZb7+J8m9Luhh4GPzLSN0BavAeeYKfKoj5rKU4xVw4vXKD6ORsVtX3L8KwCrv8jN+u7shGFA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757087373; c=relaxed/simple;
-	bh=f+JTcE3DRLPcOY8am3KMCMPe88wWg+At3qN8c009RkU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ut0qj6NAcf+nlAo5Odl33rCptyVORmWhXcu7c98KecH14LToI4oySQYq+a2/wGGyHKlXgWWh/ILwgQFmfVNa909Yd1EQpuRl0ikcWCa0k9UyHtvqK2gRnQ8r16Tv986YYbsfB5VjIGE4JMHma8RV0rSk3IWpn9Bitd0eO/Z1rbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A18dbmat; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1757114256; c=relaxed/simple;
+	bh=n7sJek9O5lto7BJ6wBUHPtjNqfpt1tla3+PP+jtgFWQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JGoeRZDtIgogdDW4hHTSucZWoAH3aWxDMRa8jCT6UQs44iz8dBcCfYEYBpYnO0Iw14uvLNJ2qXXmlaKmTpoiqd73qrvymP4AdgdcmM1IOXyCIh6tFdSEi5xCw17YS6aTXXcWnaV1W11OvThd+xar+SOBJdgmLhxWgH7p0m2bG38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avniDjzr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A18dbmat"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-244580523a0so23878845ad.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Sep 2025 08:49:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757087371; x=1757692171; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Kdntula2IPeGyawy4hqpxOilgiC8j4J/eBWbMYyUvc=;
-        b=A18dbmatsQE6JZbgNt1vChwarhShOS4FNZ+7rR7JoyZhv1z5ILZILYJyjM5Qsdd8Rr
-         hVU/5eBIMpd2CstMr1sBhRMHIAgHYBxpDEssQY4u15WGdpSViysCeFyogDOKsIVUv0Pv
-         yZVgiUt48OG5s+uZISqnFjjm12PBlmt3g22o/YDC0JQGei0lsKCmQMuwndY4v1YE5p1h
-         XmOW8FWVWVDeA51syZmVBXhwUNOstyGUxea/PbcLaMJQZIMgDTO9bSXWlYojc3a9kPzG
-         CT2l1zvQZZS1K+JbM+7aRGwIqNRVOuIlatRqBJtFZuwX1Px2S0mxR3HB2T7SO1Ie0vtO
-         SpCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757087371; x=1757692171;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3Kdntula2IPeGyawy4hqpxOilgiC8j4J/eBWbMYyUvc=;
-        b=LQ9c9kmE2JELgZ4DtiSZesEkI5EBQ0DkW5AYIFG9pfkz4OvzThWqZRzzfoGD/Ry9iI
-         S8CGnXj3mVccuSBZDzfDV3w4f2fp/DxFsU+/vBGPMM8V3ZvE1BVp3K7dWYcaxxVi4KT1
-         Pgljl+GPFgcRndiZzQRP+5vT8li7vb/2bEUR3DlomKwFfpGgyDbZuUADPgNqPDaCTkM+
-         q00VatdSQhfaSXBpomTNbnzZIDi93vZZP78r0vTO3PfO8Unshp/IiqKkz3Hso1vh7vV4
-         xeZhOukZdaTCyEGemb0y16p9ybxZFO2oNJb01/+IDE/kgddqOAVPip+1swTcWpmdyzrq
-         19qw==
-X-Gm-Message-State: AOJu0Yyah9U4tEnMTjp6lWFBkd8xL3NpCmG3SCXb2g46NfRuc6Ey/260
-	bs+iwcDSGoJ83Vx6Ewnxsc7DI23i3UzlHSYz7p7xv9kr/xrbejQKWYe5JdwDIw==
-X-Gm-Gg: ASbGncsas45dnp/1K56eJVDNsthCdwP7sDriOFd0cruoc0kzV86eMqjbj/nlHAI6rPr
-	TZKmlD3SI2uTlrZG4mYJUI25HdZpgqHcDPj61u9E06kC0Zgf/tpT1iMIAfiNnVAwK3Bv0lNnwY4
-	375TuLZxJIgAdEzUo42M4i2spucFXaXJng+hPOxe9F6JrOzc3lqufngEXaOBWj5s4er/svT8EfN
-	10gjrvipydSTLHaoHJXpiagN5U9GXeuA2HX4oqhmO66ReMa9qDVxxl8fyPzGlchuh6mWFq7MydJ
-	EdBYYpWheKno4SvotmtgBYY4bH3YGMUbbkihsFLqUs/xuwk4hTK+3per8C/fl4Hg3WfZEHrbiVf
-	231g3ziIzzaCUTXorhFzcvvWb3j7pg6zksSuZ9Q==
-X-Google-Smtp-Source: AGHT+IHnqElgvg4KHWluhafufyJYWk1krS3dimNOEhleQuMPP5ZKOfAcpwIa+uBh1zGOC6lC30Jkuw==
-X-Received: by 2002:a17:903:28c:b0:240:3eb9:5363 with SMTP id d9443c01a7336-24944a70227mr317491805ad.27.1757087370967;
-        Fri, 05 Sep 2025 08:49:30 -0700 (PDT)
-Received: from [172.17.0.2] ([52.234.41.64])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24b0d881afasm111234725ad.47.2025.09.05.08.49.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Sep 2025 08:49:30 -0700 (PDT)
-Message-ID: <68bb068a.170a0220.328de.b024@mx.google.com>
-Date: Fri, 05 Sep 2025 08:49:30 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2066449337176671573=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="avniDjzr"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 33EFBC4CEFB
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Sep 2025 23:17:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757114256;
+	bh=n7sJek9O5lto7BJ6wBUHPtjNqfpt1tla3+PP+jtgFWQ=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=avniDjzrZrTWNRwbLdBcnUSzUq6t071zfNcefyt4peoMZlx4UFhE+CP3CELc6Z267
+	 Be9Q81ClnWBMiXnnaDf+iF4zX4nD5Owq5s/A/6P1iZVm5kGbNN4UU0skIR/kwsF1aw
+	 86CBk2SGbXti4xbkjoLV5poFQAjnhSaSFOLyrqt7TgEhMqnWqoHGQEA0YAA4B+tavj
+	 +PAgh/INRHbdWhN5a4W79aO/GcHgFViCWcDGiML3kgf4VQvao4Eaz0SYjS7KwyoOLr
+	 UboJDt4XbVlwZCMioV/ynsFaID5vaHCNLLEm77YK4ONf6G+HiAxUzwTUwG2UQ1B2xO
+	 tcGHtbTg46ziA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 29EC1C41613; Fri,  5 Sep 2025 23:17:36 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 80791] "Bluetooth: hci0: ACL packet for unknown connection
+ handle" must be hidden behind "debug"
+Date: Fri, 05 Sep 2025 23:17:35 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: jcubic@onet.pl
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-80791-62941-IK2G0ByQ3Z@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-80791-62941@https.bugzilla.kernel.org/>
+References: <bug-80791-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ] unit/test-hfp: Fix MINIMAL_SLC_SESSION
-In-Reply-To: <20250905142115.942982-1-frederic.danis@collabora.com>
-References: <20250905142115.942982-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============2066449337176671573==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D80791
 
-This is automated email and please do not reply to this email!
+Jakub Jankiewicz (jcubic@onet.pl) changed:
 
-Dear submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jcubic@onet.pl
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=999363
+--- Comment #11 from Jakub Jankiewicz (jcubic@onet.pl) ---
+I have a similar issue. My hardware:
 
----Test result---
+laptop Lenovo Legion Pro 5 16IAX10 Ultra 7 255HX (from 2025)
 
-Test Summary:
-CheckPatch                    PENDING   0.45 seconds
-GitLint                       PENDING   0.39 seconds
-BuildEll                      PASS      20.08 seconds
-BluezMake                     PASS      2848.12 seconds
-MakeCheck                     PASS      22.66 seconds
-MakeDistcheck                 PASS      184.89 seconds
-CheckValgrind                 PASS      235.26 seconds
-CheckSmatch                   PASS      306.09 seconds
-bluezmakeextell               PASS      128.71 seconds
-IncrementalBuild              PENDING   0.52 seconds
-ScanBuild                     PASS      926.21 seconds
+System Fedora 42 Xfce.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+uname -a
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+Linux jcubic 6.16.4-200.fc42.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Aug 28 19:47=
+:10
+UTC 2025 x86_64 GNU/Linux
 
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+My Bluetooth Adapter:
 
+Bus 003 Device 007: ID 0489:e111 Foxconn / Hon Hai Wireless_Device
 
+dmesg output
 
----
-Regards,
-Linux Bluetooth
+[   49.567615] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[  599.542960] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 1437.569560] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 3859.566676] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 4453.577203] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 4567.071519] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 4924.313398] usb 3-10: USB disconnect, device number 5
+[ 5240.053501] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 5628.063962] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 5949.560492] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 6101.594003] perf: interrupt took too long (2534 > 2500), lowering
+kernel.perf_event_max_sample_rate to 78000
+[ 7169.561230] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 7223.579889] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 9081.183509] perf: interrupt took too long (3191 > 3167), lowering
+kernel.perf_event_max_sample_rate to 62000
+[ 9387.061556] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[ 9403.597909] i915 0000:00:02.0: [drm] *ERROR* Atomic update failure on pi=
+pe A
+(start=3D1409651 end=3D1409652) time 125 us, min 1574, max 1600, scanline s=
+tart
+1572, end 1573
+[ 9674.574688] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[10152.077253] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[11119.576619] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[12687.069915] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
+[14921.072319] perf: interrupt took too long (3990 > 3988), lowering
+kernel.perf_event_max_sample_rate to 50000
+[20399.081113] Bluetooth: hci0: ACL packet for unknown connection handle 38=
+37
 
+All Bluetooth entries marked in red
 
---===============2066449337176671573==--
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
