@@ -1,99 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8800437426D;
-	Fri,  5 Sep 2025 15:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2401C6B4
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Sep 2025 15:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757084578; cv=none; b=unrn2s8vPecEH8TdzMOJA2F5sbm80kwCh/wetLJU2kWZ12MvZe8ULV/mvKPXOBH1NHeOMtZnJNWY6Lq7SPewUUEVy/Ev/bLnCweBp9tQZ/YCBcW2Ws1ME2ixtlfYjJQM6KHDT2Uq3IPiQSAB3ZYfGzSDfvRf9JLgvO7V5UCNN4U=
+	t=1757085326; cv=none; b=GMJQGEn+shBdqBldITEVV60EQhmaZu1m9qKf4IQpMyy65c/M6Pohu5fisMbqL2E/XpF4Xgg6fmbKY4JOlE7jyj3Ye1XkWeJk7iMdzlP9vc1rAwBA59/ZBsCQmIcuaSc2I+ToOWAXZ3RPq6hkNqLlMP8ZTjvzOEOBAn66mtpqRlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757084578; c=relaxed/simple;
-	bh=fXAlkg6U4rjB2T88uzlB0xsdi6LWa2QU3tBer2f0tLE=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=enzxGhEpONlHCfTsxkxr3LohLyM30xX60IEW9b78b0R+vyMw5mvkGX57VDAJxCWOn4N+AIh9a6B2O2oOKa2T0vD9CmqAmNwU028IzKRzfaf4ipom4jFY8b3u5r6n3mFwvE2UdiU3MVmHrWGw1Fq5k8t55tb+0L73WGNpj7tDcY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nrXh5JC8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757085326; c=relaxed/simple;
+	bh=EipGUq7ECYod56Uy18KT3H52du/qQ63K3LHae5F+aAg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lALA2CgmpN3P7LmOYGlhes4CC/vpatSmFSjVJEnaFbMN7KoPHVwcGX1xZhChaFBRI7kPHvujEgVtahEIcG/LUsftgH0xKpVpHN3nqaNtlMyaSVEAuOOOK2KMTYs/Gc3zCeD7iA6al5GdRBVLGWJ8pItqOSerNkglais6eJed1Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qmgi+qOY; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nrXh5JC8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0750C4CEF1;
-	Fri,  5 Sep 2025 15:02:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757084578;
-	bh=fXAlkg6U4rjB2T88uzlB0xsdi6LWa2QU3tBer2f0tLE=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=nrXh5JC8NNluI3p5jaLqySzGJpmeKgwV9Zu67Olq4VBiL2OHhcKZp17i1qxOAByjZ
-	 IZ4BCOyAB4ZZgxu5fMVQ+gBrLQb/M77HHt6Pfvdmmbrb0gC5kFv2DggICl9HnpqV02
-	 iVXgMMfQUTS64BpH9F8/DUQ0kpxwpbRoVVZsdjWg3YbcIJmoiqRkfxX56L+OSBGI8w
-	 MNd7Gk13vdIAKKNRRKjk8kHQ5BkwPmP6Fzka3zSdZjAnlil3fc0Y7eeGv9JKI3sGys
-	 Jx6VoHtvtf3rU5cudLlcScxlSJT+J4E1IOSyA/AjtvsJypal4QQDn9r61B6dFx9KXV
-	 8T6H4OovQB4+g==
-Date: Fri, 05 Sep 2025 10:02:57 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qmgi+qOY"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4b2fa418ef3so20571571cf.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Sep 2025 08:15:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757085323; x=1757690123; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8qJrgi6aX7Xf5YGH0+4pztXvyng7jB4w7bSrl1ZzF4w=;
+        b=Qmgi+qOYEUaDQQFenZVedx6olznXq+eMJRC/cIqbnNdsE1dgs0bo9yeOoxroWmRujt
+         4EY73sOg1MozwwulYbgZokc6tJTxIZ3cXYgCDqF4zqC14fqdc3PNdxTwspRgheFdNGRh
+         KVqzd4tgskV6l0RE1etrPPYyjjgJ7f/8xuiQaGZQxdUZvW+NfK37AD5DZlzTJuJjHi9P
+         SDjUNIoLffUSdFQA0ks7npz1jVelh8L16Dy8dOIt6thql0iU6PtQXS2f6luobGMyu4QX
+         UtwF6KJkwSSee583u52mDgwRp5NJeGjUxm+IYj/BL2wbUf7+lOy5Fr8JmCOGbUDv/+w3
+         3cjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757085323; x=1757690123;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8qJrgi6aX7Xf5YGH0+4pztXvyng7jB4w7bSrl1ZzF4w=;
+        b=RlM3Cn5eaeWDnlJi6K92GHyy3Rw5mvKzw/WH1D6hxiSzI5Bh4eATbz+dqpNURfGm1c
+         5XYWsV5OnxcCsUTcuQaQnHJEUtTP3ZaFJ3X8Y2H9vTJduEnvHkTzdm1y5PHhUWZ8oKIh
+         FkhOebhBrMbhZM99kBCldcIEGtTpMODzbTC2s/evmwGQZYlW+dBs8yAmbXZz7j38O1yi
+         hhujmUbGztsU/8eWNRlpPX1VZ4VfzlZXKOUdO4ccngStXmLLmMzZ0jt9ROhcMKBKay+d
+         FUIDke9mqLYkyAQr0HSVSvjCjyqZfx5rVuMZWgx0f1dPzJK12/kCWQB298y2OPPGCiw2
+         eULA==
+X-Gm-Message-State: AOJu0YwM5bhDHnBELo6vSkCTCwoy9CpGqcIwkYZX2Kxi8c7kNl8GNTGD
+	OwLe6IMOlDPbr36N13Zh4fPLa3j0EeM61r+HqQqL2A6nSAyeHwsfgveghRoADw==
+X-Gm-Gg: ASbGncv8+FMkeMaKZGcqcXXzmnitpLkPgnLuUyjND9n/0k6bRV5hmnXTXWYI8XCMA9P
+	IniVhPWN8PWsitegR+MvYAcIge4bmQO99r5vkE1DK049k9uBC0bokX5ytnvO7AGec1oqCGVVAFU
+	ArEAYoZxxSnK5jVaiJc6afbY+KZyeRJQ/g5wBYWyIOo5iguIyRGxkDSJjc8aDjwecRHrF5mySoz
+	VBPi7STS/jNit92iP5FmY6C6qzOZv+jk6jq47VV6bYtPuWauHEfWXsgG1AEIXvg65tF3ELqfMOg
+	RRDFF9NcfmGxBYCqVc25slMRnSW4lSpLCC+/Ruh2SPLXJ7wnW4okpBdEfAGmaIpkY31OrXbwava
+	DPB9sj71kpMTXIlDI47oD/rIQS/+J
+X-Google-Smtp-Source: AGHT+IHJCWMtzqvb0WQkSR8tqDqK1+fwoOt7Yf/z8b2elmRPTl/LtV6awktT6OMOMyxLMrwZqGoWYw==
+X-Received: by 2002:a05:622a:229c:b0:4b5:f2c3:e756 with SMTP id d75a77b69052e-4b5f2c3eb94mr12268121cf.73.1757085323170;
+        Fri, 05 Sep 2025 08:15:23 -0700 (PDT)
+Received: from [172.17.0.2] ([74.235.126.85])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b48f653a08sm47882291cf.14.2025.09.05.08.15.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Sep 2025 08:15:22 -0700 (PDT)
+Message-ID: <68bafe8a.050a0220.174628.07cb@mx.google.com>
+Date: Fri, 05 Sep 2025 08:15:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6945532208791986176=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Chris Lu <chris.lu@mediatek.com>, 
- linux-mediatek <linux-mediatek@lists.infradead.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Sean Wang <sean.wang@mediatek.com>, Marcel Holtmann <marcel@holtmann.org>, 
- Jiande Lu <jiande.lu@mediatek.com>, 
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
- linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
- linux-kernel <linux-kernel@vger.kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Hao Qin <Hao.qin@mediatek.com>, 
- Luiz Von Dentz <luiz.dentz@gmail.com>, 
- devicetree <devicetree@vger.kernel.org>, Deren Wu <deren.Wu@mediatek.com>
-To: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-In-Reply-To: <20250905084433.26999-1-ot_zhangchao.zhang@mediatek.com>
-References: <20250905084433.26999-1-ot_zhangchao.zhang@mediatek.com>
-Message-Id: <175708448180.930634.147702031291534747.robh@kernel.org>
-Subject: Re: [PATCH v7] dt-bindings: net: mediatek,mt7925-bluetooth.yaml
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: [BlueZ] client/assistant: Use strnlen() instead of strlen()
+In-Reply-To: <20250905134942.80833-1-r.smirnov@omp.ru>
+References: <20250905134942.80833-1-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6945532208791986176==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=999352
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.28 seconds
+BuildEll                      PASS      20.90 seconds
+BluezMake                     PASS      2708.44 seconds
+MakeCheck                     PASS      20.14 seconds
+MakeDistcheck                 PASS      193.26 seconds
+CheckValgrind                 PASS      244.36 seconds
+CheckSmatch                   PASS      314.61 seconds
+bluezmakeextell               PASS      132.62 seconds
+IncrementalBuild              PENDING   0.23 seconds
+ScanBuild                     PASS      944.35 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-On Fri, 05 Sep 2025 16:44:33 +0800, Zhangchao Zhang wrote:
-> Reset BT via BT_KILL_1V2_L hardware pin.
-> 
-> On the M.2 standard hardware pin interface, the MTK chip
-> has a pin called BT_KILL_1V2_L or W_DISABLE#2, it uses
-> function-level device reset (FLDR) to reset Bluetooth.
-> When it is pulled low, it can external shut down the BT
-> function, it is defined as 5 on the MT7925 chip, and is
-> defined as 248 on the device tree pio controller.
-> 
-> Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-> ---
->  .../bluetooth/mediatek,mt7925-bluetooth.yaml  | 47 +++++++++++++++++++
->  MAINTAINERS                                   |  1 +
->  2 files changed, 48 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7925-bluetooth.yaml
-> 
 
-My bot found errors running 'make dt_binding_check' on your patch:
+---
+Regards,
+Linux Bluetooth
 
-yamllint warnings/errors:
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7925-bluetooth.example.dtb: bluetooth (mediatek,mt7925-bluetooth): Unevaluated properties are not allowed ('#gpio-cells' was unexpected)
-	from schema $id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7925-bluetooth.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250905084433.26999-1-ot_zhangchao.zhang@mediatek.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+--===============6945532208791986176==--
