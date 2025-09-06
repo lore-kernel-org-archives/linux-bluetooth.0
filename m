@@ -1,122 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A157C1CA84;
-	Sat,  6 Sep 2025 07:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC9820F079;
+	Sat,  6 Sep 2025 11:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757142960; cv=none; b=LWo4q+rfUZfTCF4Lx6aQQIbi5qGcCMExP9i9K4g12AQNusykvmriQ+t11P2qjY43f1Q6C35j0uhnfJHN0gdZnq7Kd1IwWVb93e+m6T3F/Wp8DRT5QGSDLXf1ckznMCyvx6XRj1MMFypIV3rblHo5DR6ZlKI2BIgtAMsQrioSWC8=
+	t=1757156743; cv=none; b=raflhqdEm1/HtihCALtyYO8rRUcXUxHAuFNPMzQN8M1nPwJlki8aLDsU9TlEm5IcghRMI6jOV34nUSiC/dEuO0Q8kj8KGWnDcV8Iuf73kSO/JNPeJ+GmKyPgrpmB5zRuspFBgHLKVL8zj9LrbIQbzOUzL/oOXf+z8Ayl+yAwUFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757142960; c=relaxed/simple;
-	bh=48WfLyxBdPPFUaU6BIhe6s3CGo0PCs0tkHoG79/gQJs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hzODq/2HPJPXDcf+keNVv+REt/HFpXWg86FvIl3BpMKCVDp9fJcKDRhv8dGAuQ0gJd8qS+rhRNqEmFhLmXhS8wGYhPXOEdrbtu7KwI9eC69CrGpyDHIaEFVJNGmQo5D3DK8IpOvkTQ1FApG6hxVvcHWPnXj/LPuI4XiBFHEC/jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3i8BBq8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757156743; c=relaxed/simple;
+	bh=qMYBvVdJ1HSlHVvYz/hS01oKPmqpmnjHlzwp0s/H3Mk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FKQWIalOkuTLuXPTlNgPruTrCVMDe5GNzgNf7pp+A2Bwgg21SLxmBUtGHnoM9bu3/5WcRVhzqQnYDn2N8+UnZtpz4pdjyTwvcmsVYDA62xr9touZZpue61gHnBaocxBZ0C8orDLCeHrO8gl9o/pZ2s5oZZEnvTqddvkijXJVIYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aSL7H53b; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3i8BBq8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D94FC4CEE7;
-	Sat,  6 Sep 2025 07:15:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757142960;
-	bh=48WfLyxBdPPFUaU6BIhe6s3CGo0PCs0tkHoG79/gQJs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=m3i8BBq8I4ts5m9rIz8i55qkpsq58G++OTNRGZq0B92v0eHlma/mt7FpeKcTzSXyy
-	 knaFXDGC7xppE8dw35LEkZUPMWFg9FFCxSamFtWUkyaQ51BaPcW3XXM5CtiAKwr/cT
-	 uflS1OqCavMKXzYEZn/ZvbYLyJAHHfSsCo4x+lwdLEbIA0uFqE4HGQKanZhR2GiijI
-	 +gHkbFo9Yfy64AnEMuyjF4brs9coEi1fJnCXAwETLuOWKnOfRPqS8sE7d1hlr9ksmW
-	 jBggg/FHsZtwKEQR8dsOUG7dH0a7pDURobDKb2Eu+KNG+UIi2I7Z4X5s8doXTnGNfU
-	 51CzC5TJTMA+Q==
-Message-ID: <12269301-f7e1-4eb6-afa3-a301453c50f6@kernel.org>
-Date: Sat, 6 Sep 2025 09:15:54 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aSL7H53b"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757156742; x=1788692742;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qMYBvVdJ1HSlHVvYz/hS01oKPmqpmnjHlzwp0s/H3Mk=;
+  b=aSL7H53bhm7/uuZTm8A6I2ZrU2D3bsaVpzhPuE+tfxW0aBrFNRt3ory1
+   Xou5EkhJHFMLmt9wWofH+1FfNMAoB0NYsSh3l3mPCLt3xGNwTDnJflzIN
+   P1eg1I/NOeDMyzinX10odD1dXe0tCSo/amyLjD1qEWMCCkuv//cVAd3a/
+   lO9OomlLLuGxKvT7xVdx1N+WrvsmPTfiHGCyIZrH3MrPXzsoWNRuOLsZl
+   RV/aoowlsflZU34FbIcgHm+IzQeEu5xih4Lyhj8VprUoErRzQlnI40wt2
+   B296Pdy2rtnI3HHl22o6r4goz3+4dNbL0dWEjoUOLQ2ploYADB6SwO7oa
+   A==;
+X-CSE-ConnectionGUID: HR06TIhmTB6x/JE2RlpV1A==
+X-CSE-MsgGUID: NA6UrYlUQWuZlPFnTEBc2Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11544"; a="47058313"
+X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
+   d="scan'208";a="47058313"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2025 04:05:31 -0700
+X-CSE-ConnectionGUID: nGcxIybSS1qxAhsECIbVLQ==
+X-CSE-MsgGUID: /xIRjD2aS3+C7ekmIsiaOQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
+   d="scan'208";a="196028943"
+Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 06 Sep 2025 04:05:27 -0700
+Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uuqjV-0001NR-1N;
+	Sat, 06 Sep 2025 11:05:25 +0000
+Date: Sat, 6 Sep 2025 19:04:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Luiz Von Dentz <luiz.dentz@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Sean Wang <sean.wang@mediatek.com>,
+	Jiande Lu <jiande.lu@mediatek.com>,
+	Deren Wu <deren.Wu@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
+	Hao Qin <Hao.qin@mediatek.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	linux-mediatek <linux-mediatek@lists.infradead.org>,
+	Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
+Subject: Re: [PATCH v7 1/1] Bluetooth: mediatek: add gpio pin to reset bt
+Message-ID: <202509061837.tyzBvcs9-lkp@intel.com>
+References: <20250905084059.26959-2-ot_zhangchao.zhang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7] dt-bindings: net: mediatek,mt7925-bluetooth.yaml
-To: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>,
- Marcel Holtmann <marcel@holtmann.org>, Luiz Von Dentz
- <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Cc: Sean Wang <sean.wang@mediatek.com>, Jiande Lu <jiande.lu@mediatek.com>,
- Deren Wu <deren.Wu@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
- Hao Qin <Hao.qin@mediatek.com>,
- linux-bluetooth <linux-bluetooth@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- linux-mediatek <linux-mediatek@lists.infradead.org>,
- devicetree <devicetree@vger.kernel.org>
-References: <20250905084433.26999-1-ot_zhangchao.zhang@mediatek.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250905084433.26999-1-ot_zhangchao.zhang@mediatek.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250905084059.26959-2-ot_zhangchao.zhang@mediatek.com>
 
-On 05/09/2025 10:44, Zhangchao Zhang wrote:
-> Reset BT via BT_KILL_1V2_L hardware pin.
-> 
-> On the M.2 standard hardware pin interface, the MTK chip
-> has a pin called BT_KILL_1V2_L or W_DISABLE#2, it uses
-> function-level device reset (FLDR) to reset Bluetooth.
-> When it is pulled low, it can external shut down the BT
-> function, it is defined as 5 on the MT7925 chip, and is
-> defined as 248 on the device tree pio controller.
-> 
-> Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-> ---
->  .../bluetooth/mediatek,mt7925-bluetooth.yaml  | 47 +++++++++++++++++++
+Hi Zhangchao,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on bluetooth/master]
+[also build test ERROR on bluetooth-next/master linus/master v6.17-rc4 next-20250905]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Zhangchao-Zhang/Bluetooth-mediatek-add-gpio-pin-to-reset-bt/20250905-164341
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20250905084059.26959-2-ot_zhangchao.zhang%40mediatek.com
+patch subject: [PATCH v7 1/1] Bluetooth: mediatek: add gpio pin to reset bt
+config: x86_64-buildonly-randconfig-001-20250906 (https://download.01.org/0day-ci/archive/20250906/202509061837.tyzBvcs9-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250906/202509061837.tyzBvcs9-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509061837.tyzBvcs9-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/bluetooth/btmtk.c:370:34: error: incompatible pointer types passing 'struct device_node *' to parameter of type 'struct device *' [-Werror,-Wincompatible-pointer-types]
+     370 |         reset_gpio = gpiod_get_optional(hdev->dev.of_node, "reset", GPIOD_OUT_HIGH);
+         |                                         ^~~~~~~~~~~~~~~~~
+   include/linux/gpio/consumer.h:72:66: note: passing argument to parameter 'dev' here
+      72 | struct gpio_desc *__must_check gpiod_get_optional(struct device *dev,
+         |                                                                  ^
+   1 error generated.
 
 
-You need to finally read submitting patches document.
+vim +370 drivers/bluetooth/btmtk.c
 
-You already got comments before, multiple times, but you still ignoring
-them.
+   363	
+   364	static int btmtk_hw_gpio_reset(struct hci_dev *hdev, struct btmtk_data *reset_work)
+   365	{
+   366		struct gpio_desc *reset_gpio;
+   367	
+   368		/* Find device node*/
+   369		hdev->dev.of_node = of_find_compatible_node(NULL, NULL, "mediatek,mt7925-bluetooth");
+ > 370		reset_gpio = gpiod_get_optional(hdev->dev.of_node, "reset", GPIOD_OUT_HIGH);
+   371		if (IS_ERR(reset_gpio))
+   372			return PTR_ERR(reset_gpio);
+   373	
+   374		if (!reset_gpio)
+   375			return -ENODEV;
+   376	
+   377		if (test_and_set_bit(BTMTK_HW_RESET_ACTIVE, &reset_work->flags)) {
+   378			bt_dev_err(hdev, "last reset failed? Not resetting again");
+   379			gpiod_put(reset_gpio);
+   380			return -EBUSY;
+   381		}
+   382		gpiod_set_value_cansleep(reset_gpio, 0);
+   383		msleep(100);
+   384		gpiod_set_value_cansleep(reset_gpio, 1);
+   385		gpiod_put(reset_gpio);
+   386		return 0;
+   387	}
+   388	
 
-Best regards,
-Krzysztof
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
