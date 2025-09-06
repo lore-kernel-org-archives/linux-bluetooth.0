@@ -1,145 +1,180 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9BC3209
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Sep 2025 23:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D1AF507
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Sep 2025 04:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757114256; cv=none; b=a9+9QkrctyW2wSZxsHE/I5DBPtoEN/+23r7ssptFVaj5HbJ9/Pn4QnYqCFFle4QPl3DQBb/tFn7Swkf+zIlO99yUzvxktTDS7lvZb7+J8m9Luhh4GPzLSN0BavAeeYKfKoj5rKU4xVw4vXKD6ORsVtX3L8KwCrv8jN+u7shGFA8=
+	t=1757132275; cv=none; b=k6AQtKo2/8S0obhyAm+bb2lTbgUWj3PxGeN4pp7yi6Md0/+u/nqM8uFzcqjCHMqLG04MsSwjYTPwVNSzCim/sakGnJGmQbjHWsBYpzcX9WfLIu26FWoCTEjhvNCIndtYwRIcXqJrbPboTKLf06vu8w5zmyQiraIWPOA0OFQAe/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757114256; c=relaxed/simple;
-	bh=n7sJek9O5lto7BJ6wBUHPtjNqfpt1tla3+PP+jtgFWQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JGoeRZDtIgogdDW4hHTSucZWoAH3aWxDMRa8jCT6UQs44iz8dBcCfYEYBpYnO0Iw14uvLNJ2qXXmlaKmTpoiqd73qrvymP4AdgdcmM1IOXyCIh6tFdSEi5xCw17YS6aTXXcWnaV1W11OvThd+xar+SOBJdgmLhxWgH7p0m2bG38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avniDjzr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757132275; c=relaxed/simple;
+	bh=Zh2MO+pZAX/dW8tigjBwYGxND8ZeQUt6TpRswnAADIg=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=FcwRH5ogAh7RVtHYesOZmj6CRcEYqYPk4TRJ1v4lJ07mGyX9rfcxvUDnJBtU+Kax0sKWFR/0zgixwE6eIMAfeW0nBRtAfWFaarSH5Z6fl89YRIXKProKl5vLUeV6uV2txDvABypWWvhQsk0BJICpz4MGYn7esxRCfjtaWogLY0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e67lDsSl; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="avniDjzr"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 33EFBC4CEFB
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Sep 2025 23:17:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757114256;
-	bh=n7sJek9O5lto7BJ6wBUHPtjNqfpt1tla3+PP+jtgFWQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=avniDjzrZrTWNRwbLdBcnUSzUq6t071zfNcefyt4peoMZlx4UFhE+CP3CELc6Z267
-	 Be9Q81ClnWBMiXnnaDf+iF4zX4nD5Owq5s/A/6P1iZVm5kGbNN4UU0skIR/kwsF1aw
-	 86CBk2SGbXti4xbkjoLV5poFQAjnhSaSFOLyrqt7TgEhMqnWqoHGQEA0YAA4B+tavj
-	 +PAgh/INRHbdWhN5a4W79aO/GcHgFViCWcDGiML3kgf4VQvao4Eaz0SYjS7KwyoOLr
-	 UboJDt4XbVlwZCMioV/ynsFaID5vaHCNLLEm77YK4ONf6G+HiAxUzwTUwG2UQ1B2xO
-	 tcGHtbTg46ziA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 29EC1C41613; Fri,  5 Sep 2025 23:17:36 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 80791] "Bluetooth: hci0: ACL packet for unknown connection
- handle" must be hidden behind "debug"
-Date: Fri, 05 Sep 2025 23:17:35 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: jcubic@onet.pl
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-80791-62941-IK2G0ByQ3Z@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-80791-62941@https.bugzilla.kernel.org/>
-References: <bug-80791-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e67lDsSl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757132273; x=1788668273;
+  h=date:from:to:cc:subject:message-id;
+  bh=Zh2MO+pZAX/dW8tigjBwYGxND8ZeQUt6TpRswnAADIg=;
+  b=e67lDsSln64R8JJLsTwDqtnL/TCmYeatL+mGK+jZzA93bbpYfrEpaGOw
+   krD6sc2bCCdn4sm0ZhIdxLDoe1KqfZyhkS20/jc0m5WWKg0N29WsPKPTa
+   tr56jDJCpXrzweYtw29s/EKBhWiIxb/g9tt/rbWjSP+fsn9mdWxNj/mRC
+   0R+UrzoXiiXZ27mZIWmhE3QSmCB1m8DcNTD2BauAm17RtXarnrQ7tMEM0
+   hDyJQP91Z69R/ZVrZnogOcYH1j99FGTVlOxWtJgx/Km30Kd2mIqE8Syxq
+   wRTgOcB5qKHBeSoo4RNk46MrrD2s4i+vLCA0n/3yT3mWp2732MdY9dqKP
+   A==;
+X-CSE-ConnectionGUID: 0IR1rOxvRa+awH4uFqXpiw==
+X-CSE-MsgGUID: AncUv9GwS96NLKH082EJqg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11544"; a="70181351"
+X-IronPort-AV: E=Sophos;i="6.18,243,1751266800"; 
+   d="scan'208";a="70181351"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2025 21:17:52 -0700
+X-CSE-ConnectionGUID: Ucc/fBalT1WtSrIXEmQU2w==
+X-CSE-MsgGUID: qAzkyY3YSdiNpNl6KUnFWg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,243,1751266800"; 
+   d="scan'208";a="177514729"
+Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 05 Sep 2025 21:17:51 -0700
+Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uukN3-0001CJ-1l;
+	Sat, 06 Sep 2025 04:17:49 +0000
+Date: Sat, 06 Sep 2025 12:17:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 24fca13e2eb2021c8a1c11b77b62325ba4883096
+Message-ID: <202509061257.wl3u65Dt-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D80791
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 24fca13e2eb2021c8a1c11b77b62325ba4883096  Bluetooth: btusb: Add new VID/PID 13d3/3633 for MT7922
 
-Jakub Jankiewicz (jcubic@onet.pl) changed:
+elapsed time: 2133m
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |jcubic@onet.pl
+configs tested: 103
+configs skipped: 1
 
---- Comment #11 from Jakub Jankiewicz (jcubic@onet.pl) ---
-I have a similar issue. My hardware:
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-laptop Lenovo Legion Pro 5 16IAX10 Ultra 7 255HX (from 2025)
+tested configs:
+alpha                             allnoconfig    gcc-15.1.0
+alpha                            allyesconfig    gcc-15.1.0
+arc                               allnoconfig    gcc-15.1.0
+arc                   randconfig-001-20250905    gcc-11.5.0
+arc                   randconfig-002-20250905    gcc-13.4.0
+arm                               allnoconfig    clang-22
+arm                         nhk8815_defconfig    clang-22
+arm                   randconfig-001-20250905    clang-22
+arm                   randconfig-002-20250905    clang-22
+arm                   randconfig-003-20250905    clang-16
+arm                   randconfig-004-20250905    gcc-14.3.0
+arm64                             allnoconfig    gcc-15.1.0
+arm64                 randconfig-001-20250905    clang-22
+arm64                 randconfig-002-20250905    clang-17
+arm64                 randconfig-003-20250905    clang-17
+arm64                 randconfig-004-20250905    clang-22
+csky                              allnoconfig    gcc-15.1.0
+csky                  randconfig-001-20250905    gcc-15.1.0
+csky                  randconfig-002-20250905    gcc-13.4.0
+hexagon                          allmodconfig    clang-17
+hexagon                           allnoconfig    clang-22
+hexagon                          allyesconfig    clang-22
+hexagon               randconfig-001-20250905    clang-22
+hexagon               randconfig-002-20250905    clang-22
+i386                             allmodconfig    gcc-13
+i386                              allnoconfig    gcc-13
+i386                             allyesconfig    gcc-13
+i386        buildonly-randconfig-001-20250905    clang-20
+i386        buildonly-randconfig-002-20250905    clang-20
+i386        buildonly-randconfig-003-20250905    clang-20
+i386        buildonly-randconfig-004-20250905    gcc-13
+i386        buildonly-randconfig-005-20250905    clang-20
+i386        buildonly-randconfig-006-20250905    clang-20
+i386                                defconfig    clang-20
+loongarch                        allmodconfig    clang-19
+loongarch                         allnoconfig    clang-22
+loongarch                 loongson3_defconfig    clang-22
+loongarch             randconfig-001-20250905    clang-18
+loongarch             randconfig-002-20250905    clang-18
+m68k                             allmodconfig    gcc-15.1.0
+m68k                              allnoconfig    gcc-15.1.0
+m68k                             allyesconfig    gcc-15.1.0
+m68k                        mvme16x_defconfig    gcc-15.1.0
+microblaze                       allmodconfig    gcc-15.1.0
+microblaze                        allnoconfig    gcc-15.1.0
+microblaze                       allyesconfig    gcc-15.1.0
+mips                              allnoconfig    gcc-15.1.0
+mips                           jazz_defconfig    clang-17
+mips                   sb1250_swarm_defconfig    gcc-15.1.0
+nios2                             allnoconfig    gcc-11.5.0
+nios2                 randconfig-001-20250905    gcc-10.5.0
+nios2                 randconfig-002-20250905    gcc-11.5.0
+openrisc                          allnoconfig    gcc-15.1.0
+parisc                            allnoconfig    gcc-15.1.0
+parisc                randconfig-001-20250905    gcc-15.1.0
+parisc                randconfig-002-20250905    gcc-8.5.0
+powerpc                           allnoconfig    gcc-15.1.0
+powerpc                      cm5200_defconfig    clang-22
+powerpc               randconfig-001-20250905    gcc-8.5.0
+powerpc               randconfig-002-20250905    clang-22
+powerpc               randconfig-003-20250905    gcc-8.5.0
+powerpc64             randconfig-001-20250905    clang-22
+powerpc64             randconfig-002-20250905    clang-22
+powerpc64             randconfig-003-20250905    gcc-14.3.0
+riscv                             allnoconfig    gcc-15.1.0
+riscv                 randconfig-001-20250905    gcc-14.3.0
+riscv                 randconfig-002-20250905    clang-22
+s390                             allmodconfig    clang-18
+s390                              allnoconfig    clang-22
+s390                             allyesconfig    gcc-15.1.0
+s390                  randconfig-001-20250905    gcc-9.5.0
+s390                  randconfig-002-20250905    clang-22
+sh                               allmodconfig    gcc-15.1.0
+sh                                allnoconfig    gcc-15.1.0
+sh                               allyesconfig    gcc-15.1.0
+sh                    randconfig-001-20250905    gcc-15.1.0
+sh                    randconfig-002-20250905    gcc-15.1.0
+sh                           se7712_defconfig    gcc-15.1.0
+sparc                            allmodconfig    gcc-15.1.0
+sparc                             allnoconfig    gcc-15.1.0
+sparc                 randconfig-001-20250905    gcc-8.5.0
+sparc                 randconfig-002-20250905    gcc-15.1.0
+sparc64               randconfig-001-20250905    gcc-8.5.0
+sparc64               randconfig-002-20250905    clang-22
+um                               allmodconfig    clang-19
+um                                allnoconfig    clang-22
+um                               allyesconfig    gcc-13
+um                    randconfig-001-20250905    clang-22
+um                    randconfig-002-20250905    gcc-13
+x86_64                            allnoconfig    clang-20
+x86_64                           allyesconfig    clang-20
+x86_64      buildonly-randconfig-001-20250905    clang-20
+x86_64      buildonly-randconfig-002-20250905    clang-20
+x86_64      buildonly-randconfig-003-20250905    gcc-13
+x86_64      buildonly-randconfig-004-20250905    clang-20
+x86_64      buildonly-randconfig-005-20250905    clang-20
+x86_64      buildonly-randconfig-006-20250905    gcc-13
+x86_64                              defconfig    gcc-11
+x86_64                          rhel-9.4-rust    clang-20
+xtensa                            allnoconfig    gcc-15.1.0
+xtensa                  audio_kc705_defconfig    gcc-15.1.0
+xtensa                randconfig-001-20250905    gcc-8.5.0
+xtensa                randconfig-002-20250905    gcc-8.5.0
 
-System Fedora 42 Xfce.
-
-uname -a
-
-Linux jcubic 6.16.4-200.fc42.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Aug 28 19:47=
-:10
-UTC 2025 x86_64 GNU/Linux
-
-My Bluetooth Adapter:
-
-Bus 003 Device 007: ID 0489:e111 Foxconn / Hon Hai Wireless_Device
-
-dmesg output
-
-[   49.567615] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[  599.542960] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 1437.569560] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 3859.566676] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 4453.577203] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 4567.071519] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 4924.313398] usb 3-10: USB disconnect, device number 5
-[ 5240.053501] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 5628.063962] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 5949.560492] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 6101.594003] perf: interrupt took too long (2534 > 2500), lowering
-kernel.perf_event_max_sample_rate to 78000
-[ 7169.561230] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 7223.579889] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 9081.183509] perf: interrupt took too long (3191 > 3167), lowering
-kernel.perf_event_max_sample_rate to 62000
-[ 9387.061556] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[ 9403.597909] i915 0000:00:02.0: [drm] *ERROR* Atomic update failure on pi=
-pe A
-(start=3D1409651 end=3D1409652) time 125 us, min 1574, max 1600, scanline s=
-tart
-1572, end 1573
-[ 9674.574688] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[10152.077253] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[11119.576619] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[12687.069915] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-[14921.072319] perf: interrupt took too long (3990 > 3988), lowering
-kernel.perf_event_max_sample_rate to 50000
-[20399.081113] Bluetooth: hci0: ACL packet for unknown connection handle 38=
-37
-
-All Bluetooth entries marked in red
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
