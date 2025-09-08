@@ -1,159 +1,74 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEC41EE033
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Sep 2025 12:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D6647F4A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Sep 2025 21:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757333079; cv=none; b=Th2huAKnG6YZueNLomizDIYNV+R09xrIUX2LbHlAPOuNbdwyyx0Uz0IxVr6hEBBZP0LhYwwHDCJVRBb41vZA/OXxiw6BBkkZUJeme5xsVcF/tfKk4n2o46prl8vPBGL1XNBjNHEyDFd2Srvb84gbybr6KfAn1e5iWrHSvSBA/jk=
+	t=1757365815; cv=none; b=h1u7I1sxsDUT4t/kNHeMG97wIk26UwpG52P6J248Eze2C+ESwHTnNHfiFIMWzmLD/DOIQYFDNyflA5RBa1dvZeVevB0rBad5aSdhvyuE4ezy4dVz6vt+n96f4cucjZUSM5CFcwnixQs1N5XN9j2axqm8MTT1MwyalHUtx3NqsIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757333079; c=relaxed/simple;
-	bh=+bv3S5yLOFzB2JEuxVxutMAnxRwYMP64O7TmMRHXN7w=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QEHamSchYZV6eW7xBqx+9KO20FNIwQCdkgsCoUz1/C/4IyZestHYkibIRlFhMirZtLf/BDMB09PnMFjEUSIJTNWmqEU9YoZqSviJodys80vmFnBTxiI575dfJa6MsEwhYdEfMTctqFPI6AZcjetrmOtZHRBWs/te1nAG0RaFvzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 069AE58B141
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Sep 2025 11:30:41 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 134A842FF4;
-	Mon,  8 Sep 2025 11:30:34 +0000 (UTC)
-Message-ID: <9cdb3f9d63725c9146a4b6060dca58d7989e6fac.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v2] main.conf: Add FilterDiscoverable option
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 08 Sep 2025 13:30:33 +0200
-In-Reply-To: <20250904163343.688862-1-luiz.dentz@gmail.com>
-References: <20250904163343.688862-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=arc-20240116; t=1757365815; c=relaxed/simple;
+	bh=l6XwXUPlz0UFMTgYR/TkTarO/YWo/NyM4hp1SEkWc0w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Xym1kGolKh33XU2EWYKrx5/NfJI6WSZUaqGWyeF4en9mU27vIJ6fQmG3h8bnDjOEOYHlYqF+/nxdHzPO8dUdSPo2eL1i11rLpLns5Jjt5s6U4Qj0S5EFQ9roYM0I3wwKAJgK/T785PRQ3e3++0hg75hSxWo+e3z24UpGRlOZf5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uj83teUN; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uj83teUN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBE38C4CEF1;
+	Mon,  8 Sep 2025 21:10:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757365815;
+	bh=l6XwXUPlz0UFMTgYR/TkTarO/YWo/NyM4hp1SEkWc0w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Uj83teUNJmF0Md2bhp82nBc3+wZRi2kpa1f4wmcS2HMuqSA4utawYxAvN1uvEkaMn
+	 qkSyx8KUas5gOKKhonHjJfxVD7NodWzQaGF3hK9hXMEOj3p8K4wl/HHAdD4xUlYyuw
+	 zfQeFA/S+fI5lG92PiirnoafaaNRgfuE3Rj8XkqK7h1lyphreCCPjZfWDWb8ifs3RS
+	 ObxK1YN4JlMzyRUPaSwYdV20alr7r3n7onNWbUgMevkA71hLzHmCf/RUlliepcwt5/
+	 6MTTihtZPBYCRNeYFGjU/CDblNwdZbumOZvXRYHDh7jyB0+SlKeIpBoTfLJHdR3L9U
+	 FlGhz7oG/Ui0w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD40383BF69;
+	Mon,  8 Sep 2025 21:10:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeegudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkffuhffvffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepieekleetvddtheekieehieegledujeeggffffefhteetheekhfdvhedtgeeujeehnecuffhomhgrihhnpegsrhdrphgrghgvnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpnhgspghrtghpthhtohepvddprhgtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: hadess@hadess.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix hci_resume_advertising_sync
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175736581823.53470.3148274535105183249.git-patchwork-notify@kernel.org>
+Date: Mon, 08 Sep 2025 21:10:18 +0000
+References: <20250905143341.908473-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250905143341.908473-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-On Thu, 2025-09-04 at 12:33 -0400, Luiz Augusto von Dentz wrote:
+Hello:
+
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Fri,  5 Sep 2025 10:33:41 -0400 you wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->=20
-> This adds FilterDiscoverable option which can be use to control if
-> devices in non-discoverable mode shall be filtered or not, the
-> default
-> is true to adhere to core spec:
+> 
+> hci_resume_advertising_sync is suppose to resume all instance paused by
+> hci_pause_advertising_sync, this logic is used for procedures are only
+> allowed when not advertising, but instance 0x00 was not being
+> re-enabled.
+> 
+> [...]
 
-This needs more explanation as to where the filter is defined.
+Here is the summary with links:
+  - [v1] Bluetooth: hci_sync: Fix hci_resume_advertising_sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a0a2dcf8479f
 
-What happens if no filter is defined and FilterDiscoverable is set to
-true?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-In which circumstances would a system builder, integrator or admin want
-to set this to false?
 
-> =C2=A09.2. Discovery modes and procedures
->=20
-> =C2=A0All devices shall be in either non-discoverable mode or one of the
-> =C2=A0discoverable modes. A device in the discoverable mode shall be in
-> =C2=A0either the general discoverable mode or the limited discoverable
-> mode.
-> =C2=A0A device in the non-discoverable mode is not discoverable. Devices
-> =C2=A0operating in either the general discoverable mode or the limited
-> =C2=A0discoverable mode can be found by the discovering device.
-> ---
-> =C2=A0src/adapter.c | 4 +++-
-> =C2=A0src/btd.h=C2=A0=C2=A0=C2=A0=C2=A0 | 1 +
-> =C2=A0src/main.c=C2=A0=C2=A0=C2=A0 | 4 ++++
-> =C2=A0src/main.conf | 5 +++++
-> =C2=A04 files changed, 13 insertions(+), 1 deletion(-)
->=20
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 549a6c0b8324..dc5ba65d73fa 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -7239,8 +7239,10 @@ static bool device_is_discoverable(struct
-> btd_adapter *adapter,
-> =C2=A0
-> =C2=A0	if (bdaddr_type =3D=3D BDADDR_BREDR || adapter-
-> >filtered_discovery)
-> =C2=A0		discoverable =3D true;
-> -	else
-> +	else if (btd_opts.filter_discoverable)
-> =C2=A0		discoverable =3D eir->flags & (EIR_LIM_DISC |
-> EIR_GEN_DISC);
-> +	else
-> +		discoverable =3D true;
-> =C2=A0
-> =C2=A0	/*
-> =C2=A0	 * Mark as not discoverable if no client has requested
-> discovery and
-> diff --git a/src/btd.h b/src/btd.h
-> index 18a5eb88696a..5c952bf17956 100644
-> --- a/src/btd.h
-> +++ b/src/btd.h
-> @@ -142,6 +142,7 @@ struct btd_opts {
-> =C2=A0	bool		refresh_discovery;
-> =C2=A0	bool		experimental;
-> =C2=A0	bool		testing;
-> +	bool		filter_discoverable;
-> =C2=A0	struct queue	*kernel;
-> =C2=A0
-> =C2=A0	uint16_t	did_source;
-> diff --git a/src/main.c b/src/main.c
-> index a542d0fc50b0..1c7390e6329d 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -91,6 +91,7 @@ static const char *supported_options[] =3D {
-> =C2=A0	"Testing",
-> =C2=A0	"KernelExperimental",
-> =C2=A0	"RemoteNameRequestRetryDelay",
-> +	"FilterDiscoverable",
-> =C2=A0	NULL
-> =C2=A0};
-> =C2=A0
-> @@ -1062,6 +1063,8 @@ static void parse_general(GKeyFile *config)
-> =C2=A0	parse_config_u32(config, "General",
-> "RemoteNameRequestRetryDelay",
-> =C2=A0					&btd_opts.name_request_retry
-> _delay,
-> =C2=A0					0, UINT32_MAX);
-> +	parse_config_bool(config, "General", "FilterDiscoverable",
-> +						&btd_opts.filter_dis
-> coverable);
-> =C2=A0}
-> =C2=A0
-> =C2=A0static void parse_gatt_cache(GKeyFile *config)
-> @@ -1239,6 +1242,7 @@ static void init_defaults(void)
-> =C2=A0	btd_opts.refresh_discovery =3D TRUE;
-> =C2=A0	btd_opts.name_request_retry_delay =3D
-> DEFAULT_NAME_REQUEST_RETRY_DELAY;
-> =C2=A0	btd_opts.secure_conn =3D SC_ON;
-> +	btd_opts.filter_discoverable =3D true;
-> =C2=A0
-> =C2=A0	btd_opts.defaults.num_entries =3D 0;
-> =C2=A0	btd_opts.defaults.br.page_scan_type =3D 0xFFFF;
-> diff --git a/src/main.conf b/src/main.conf
-> index 86759d53c1f2..55618be5c923 100644
-> --- a/src/main.conf
-> +++ b/src/main.conf
-> @@ -148,6 +148,11 @@
-> =C2=A0# The value is in seconds. Default is 300, i.e. 5 minutes.
-> =C2=A0#RemoteNameRequestRetryDelay =3D 300
-> =C2=A0
-> +# Filter out non-discoverable devices based on discoverable flags
-> (General or
-> +# Limited).
-> +# Defaults to true
-> +#FilterDiscoverable =3D true
-> +
-> =C2=A0[BR]
-> =C2=A0# The following values are used to load default adapter parameters
-> for BR/EDR.
-> =C2=A0# BlueZ loads the values into the kernel before the adapter is
-> powered if the
