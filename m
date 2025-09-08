@@ -1,74 +1,217 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D6647F4A
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Sep 2025 21:10:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3222E8B95
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Sep 2025 21:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757365815; cv=none; b=h1u7I1sxsDUT4t/kNHeMG97wIk26UwpG52P6J248Eze2C+ESwHTnNHfiFIMWzmLD/DOIQYFDNyflA5RBa1dvZeVevB0rBad5aSdhvyuE4ezy4dVz6vt+n96f4cucjZUSM5CFcwnixQs1N5XN9j2axqm8MTT1MwyalHUtx3NqsIY=
+	t=1757367181; cv=none; b=nc2pDsLHHOP/FY1hPHEth3TgqRRawHw8KpphrFFFqCg8tLGHkbrCmau+xcfYbDY/M406wyUw8AYcYTLQHE8KOAiexWky5wDxfusqNdQpcxIOLIQJGXDNX4pXGww+6ZHB9IgulmHCN1Dhm5/kMFixtynQm2GshgrqD9RKbdHlaxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757365815; c=relaxed/simple;
-	bh=l6XwXUPlz0UFMTgYR/TkTarO/YWo/NyM4hp1SEkWc0w=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Xym1kGolKh33XU2EWYKrx5/NfJI6WSZUaqGWyeF4en9mU27vIJ6fQmG3h8bnDjOEOYHlYqF+/nxdHzPO8dUdSPo2eL1i11rLpLns5Jjt5s6U4Qj0S5EFQ9roYM0I3wwKAJgK/T785PRQ3e3++0hg75hSxWo+e3z24UpGRlOZf5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uj83teUN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757367181; c=relaxed/simple;
+	bh=/6hO2LCAOi/ZJuN8q+oiHJc26KrccoioyQyN6/YHteY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=usofsRXX17Pg/fNGSHJGeiaH44T4baivvlj9UXvJclFgDBoWKq9rvk87aOH49Y3O0jm+s1A+OXbLAMBhTJMaZE3+K4dsiprAoPrNwpmmzo9nR5hWlZiPGqdDzfq6VAu+TrW5opl6sLZAEmg91SX4fppefTRe/2vMb/NHXrqZS2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=noNOipus; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uj83teUN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBE38C4CEF1;
-	Mon,  8 Sep 2025 21:10:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757365815;
-	bh=l6XwXUPlz0UFMTgYR/TkTarO/YWo/NyM4hp1SEkWc0w=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Uj83teUNJmF0Md2bhp82nBc3+wZRi2kpa1f4wmcS2HMuqSA4utawYxAvN1uvEkaMn
-	 qkSyx8KUas5gOKKhonHjJfxVD7NodWzQaGF3hK9hXMEOj3p8K4wl/HHAdD4xUlYyuw
-	 zfQeFA/S+fI5lG92PiirnoafaaNRgfuE3Rj8XkqK7h1lyphreCCPjZfWDWb8ifs3RS
-	 ObxK1YN4JlMzyRUPaSwYdV20alr7r3n7onNWbUgMevkA71hLzHmCf/RUlliepcwt5/
-	 6MTTihtZPBYCRNeYFGjU/CDblNwdZbumOZvXRYHDh7jyB0+SlKeIpBoTfLJHdR3L9U
-	 FlGhz7oG/Ui0w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD40383BF69;
-	Mon,  8 Sep 2025 21:10:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="noNOipus"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-33ca74c62acso16855321fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Sep 2025 14:32:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757367177; x=1757971977; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nmvO+sfHK1kwOwJ4u/HJO+BHX/Gfm2u4OTyaKWy/y50=;
+        b=noNOipuse7WKgEShZfkQyJ6QqAqsoopjy6coe1S4MEHFr+nm71HdbHRFNCZ8UcQ90V
+         80qCbK1dpnRGqhv6iZVrJcpkQO6ZQ52V51Gm8eOLFnG109RjlmnwcHGVcSLHmfpShlCV
+         TUuPyWEMuKA4QscWl8JC4aiTyejI8iohzNfLUxH5AwylC9HMjQ3Acwh3VlhShQoNL5cj
+         hhMmY/Ysr7ipyleVGoZa9mFL9YdJJiwgss1YycZrhBmoowQlU/IuNqbx6GVCWSdwA+xh
+         B3PqEoHLGUZGoV75+HysN7yI0Gt+fPapBlfP0QlRQGCHyHv2jFyvNAYjScx/4UZgeTHI
+         h0LQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757367177; x=1757971977;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nmvO+sfHK1kwOwJ4u/HJO+BHX/Gfm2u4OTyaKWy/y50=;
+        b=v2DlX2m1qrMqRqImBggVQlhBpPh7vvmMHOTzc7TfKfNihXe4mLRah6DCpm8RmwXDvH
+         NyBDGT5eTDVsgCr9BI5KKrdP/URnp3aoMC7h177Eqgll3hPJDttdSUwB1zPKYoheSXY1
+         qzvm5ummxLF7tvq0KEQx/fEtA+k9eQT9EEl6TRLn6yIS15vX33MW1yEcLv/jp1L4uvBN
+         z7PDzBjLuanpPMjU+GkaQyACXhYVnF9E2Nho8jmpQiwZ7AJwUi2QZcoYGBgV9NE2ZfJn
+         O4ehDNGwN+NehWq2Zav3ZrY+kn2wjSYhxcxPPD2BaJBNyiYeS4leLuyF2iaeRXPI0JUQ
+         VV4g==
+X-Gm-Message-State: AOJu0Yyynq+CqRSJzO3IK0wcq1sflJkf+aezZT27GYVwG1qd3hX8ZT1M
+	nUsbZOBjGmBx2SJZfkrTTXC5tXDbvAWXK/Uv7CfXbQS8Wy79kFZhYj8/7fYK37Wm0O9aZi2F0x/
+	6Zr0rVRXWCBYcJx/d1TYsIaa8Oa/1tefwyhhyGbwlSw==
+X-Gm-Gg: ASbGncvmdUfEr+wXM7NYWcWeq+FF0NKVwdsJOAEz0Q3g8hMlYPUPdMHzyhcl9zUJIYQ
+	vzJ6bSkWgj0K68xBkGHHLgpdbfd86Kdqa6MzLGpIzLBYTXJer/Hq8QTfHX+5ndNFyUF9VOaU2Xk
+	T5mnmlEiFyLl3lJ3fCIxkpjP8g6JCSJmRWKkb/9D8ydW/Tn4PRZNev5bKf9OwWjL8cG3IlwH1iR
+	tAuKaYqsxKm9dzbEk0WX4capi2+19wh/sfcs8okWNqjgw==
+X-Google-Smtp-Source: AGHT+IF6uOEwCg4swg2O3cc0SPQ1NhlEZzbWPwwfqrPpZKy9MSXiobRjkdFnxzhGWtjD7IFBBvOnhX4RMuaKNxXAwdk=
+X-Received: by 2002:a05:651c:b0b:b0:337:f9dc:d81e with SMTP id
+ 38308e7fff4ca-33b4d8cb121mr25478491fa.17.1757367177060; Mon, 08 Sep 2025
+ 14:32:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix hci_resume_advertising_sync
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175736581823.53470.3148274535105183249.git-patchwork-notify@kernel.org>
-Date: Mon, 08 Sep 2025 21:10:18 +0000
-References: <20250905143341.908473-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250905143341.908473-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20250904163343.688862-1-luiz.dentz@gmail.com> <9cdb3f9d63725c9146a4b6060dca58d7989e6fac.camel@hadess.net>
+In-Reply-To: <9cdb3f9d63725c9146a4b6060dca58d7989e6fac.camel@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 8 Sep 2025 17:32:45 -0400
+X-Gm-Features: Ac12FXxyjFQQZGY1OF9UZWqo9h_2qSwXw7393xl-t6b9e1nNSftZd6ck_TzraHk
+Message-ID: <CABBYNZ+QEUQ2wCD8h4E6Aez2fB228_pnxz00E5gqy0hRXbY4-Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] main.conf: Add FilterDiscoverable option
+To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Bastien,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Mon, Sep 8, 2025 at 7:30=E2=80=AFAM Bastien Nocera <hadess@hadess.net> w=
+rote:
+>
+> On Thu, 2025-09-04 at 12:33 -0400, Luiz Augusto von Dentz wrote:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This adds FilterDiscoverable option which can be use to control if
+> > devices in non-discoverable mode shall be filtered or not, the
+> > default
+> > is true to adhere to core spec:
+>
+> This needs more explanation as to where the filter is defined.
+>
+> What happens if no filter is defined and FilterDiscoverable is set to
+> true?
 
-On Fri,  5 Sep 2025 10:33:41 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> hci_resume_advertising_sync is suppose to resume all instance paused by
-> hci_pause_advertising_sync, this logic is used for procedures are only
-> allowed when not advertising, but instance 0x00 was not being
-> re-enabled.
-> 
-> [...]
+Well that is the current behavior where non-discoverable devices are
+not enumerated, the behavior of filters are bypass the discoverable
+flag:
 
-Here is the summary with links:
-  - [v1] Bluetooth: hci_sync: Fix hci_resume_advertising_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a0a2dcf8479f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+When discovery filter is set, Device objects will be created as new
+devices with matching criteria are discovered regardless of they are
+connectable or discoverable which enables listening to non-connectable
+and non-discoverable devices.
+[]https://gist.github.com/Vudentz/0e7b34b596c7bf91e4bfd76fe46f9662
 
 
+> In which circumstances would a system builder, integrator or admin want
+> to set this to false?
+
+Id wouldn't recommend setting to false except if the system is being
+used with specific use case that requires to ignore the remote
+discoverable settings or for testing bad or unintended behavior, well
+perhaps it would have been clearer if I just include the above in the
+documentation.
+
+>
+> >  9.2. Discovery modes and procedures
+> >
+> >  All devices shall be in either non-discoverable mode or one of the
+> >  discoverable modes. A device in the discoverable mode shall be in
+> >  either the general discoverable mode or the limited discoverable
+> > mode.
+> >  A device in the non-discoverable mode is not discoverable. Devices
+> >  operating in either the general discoverable mode or the limited
+> >  discoverable mode can be found by the discovering device.
+> > ---
+> >  src/adapter.c | 4 +++-
+> >  src/btd.h     | 1 +
+> >  src/main.c    | 4 ++++
+> >  src/main.conf | 5 +++++
+> >  4 files changed, 13 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index 549a6c0b8324..dc5ba65d73fa 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -7239,8 +7239,10 @@ static bool device_is_discoverable(struct
+> > btd_adapter *adapter,
+> >
+> >       if (bdaddr_type =3D=3D BDADDR_BREDR || adapter-
+> > >filtered_discovery)
+> >               discoverable =3D true;
+> > -     else
+> > +     else if (btd_opts.filter_discoverable)
+> >               discoverable =3D eir->flags & (EIR_LIM_DISC |
+> > EIR_GEN_DISC);
+> > +     else
+> > +             discoverable =3D true;
+> >
+> >       /*
+> >        * Mark as not discoverable if no client has requested
+> > discovery and
+> > diff --git a/src/btd.h b/src/btd.h
+> > index 18a5eb88696a..5c952bf17956 100644
+> > --- a/src/btd.h
+> > +++ b/src/btd.h
+> > @@ -142,6 +142,7 @@ struct btd_opts {
+> >       bool            refresh_discovery;
+> >       bool            experimental;
+> >       bool            testing;
+> > +     bool            filter_discoverable;
+> >       struct queue    *kernel;
+> >
+> >       uint16_t        did_source;
+> > diff --git a/src/main.c b/src/main.c
+> > index a542d0fc50b0..1c7390e6329d 100644
+> > --- a/src/main.c
+> > +++ b/src/main.c
+> > @@ -91,6 +91,7 @@ static const char *supported_options[] =3D {
+> >       "Testing",
+> >       "KernelExperimental",
+> >       "RemoteNameRequestRetryDelay",
+> > +     "FilterDiscoverable",
+> >       NULL
+> >  };
+> >
+> > @@ -1062,6 +1063,8 @@ static void parse_general(GKeyFile *config)
+> >       parse_config_u32(config, "General",
+> > "RemoteNameRequestRetryDelay",
+> >                                       &btd_opts.name_request_retry
+> > _delay,
+> >                                       0, UINT32_MAX);
+> > +     parse_config_bool(config, "General", "FilterDiscoverable",
+> > +                                             &btd_opts.filter_dis
+> > coverable);
+> >  }
+> >
+> >  static void parse_gatt_cache(GKeyFile *config)
+> > @@ -1239,6 +1242,7 @@ static void init_defaults(void)
+> >       btd_opts.refresh_discovery =3D TRUE;
+> >       btd_opts.name_request_retry_delay =3D
+> > DEFAULT_NAME_REQUEST_RETRY_DELAY;
+> >       btd_opts.secure_conn =3D SC_ON;
+> > +     btd_opts.filter_discoverable =3D true;
+> >
+> >       btd_opts.defaults.num_entries =3D 0;
+> >       btd_opts.defaults.br.page_scan_type =3D 0xFFFF;
+> > diff --git a/src/main.conf b/src/main.conf
+> > index 86759d53c1f2..55618be5c923 100644
+> > --- a/src/main.conf
+> > +++ b/src/main.conf
+> > @@ -148,6 +148,11 @@
+> >  # The value is in seconds. Default is 300, i.e. 5 minutes.
+> >  #RemoteNameRequestRetryDelay =3D 300
+> >
+> > +# Filter out non-discoverable devices based on discoverable flags
+> > (General or
+> > +# Limited).
+> > +# Defaults to true
+> > +#FilterDiscoverable =3D true
+> > +
+> >  [BR]
+> >  # The following values are used to load default adapter parameters
+> > for BR/EDR.
+> >  # BlueZ loads the values into the kernel before the adapter is
+> > powered if the
+
+
+
+--=20
+Luiz Augusto von Dentz
