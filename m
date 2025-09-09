@@ -1,48 +1,88 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CAE3002C1
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Sep 2025 20:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C7A26158C;
+	Tue,  9 Sep 2025 21:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757451056; cv=none; b=tTaaUoiuuScUoq5y1FH+qZLY9/ZjjEJ+Y0WNeKRNLdUhCds64FBeIABE53L9MAxjkHqlTlKQrQQEu8MoTJHhd7IxXYCZ1jKaBx+fsGyWzwMR4CiuE1GUEIwXgQ6hxNgRb4bFruN8qwYFAUIDW+c9WsQqakgYCmdP5xVyP4T0JFk=
+	t=1757451605; cv=none; b=YD1CcWJuCAXsKWYYFyeguj6ipCUuXH7dZFe8WxymMW8mdhikSTMLFhhFFTi64ZbdfidhjxQc3tSM1fzvFO6Z8+7fom1SNvn2Gvg4aMTOlcuLGeSvI3mPpmx3e5nFrQKVQddpIyeootP1k+xIw9ViIlvZU+VHCnl7QwzhKSsYNqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757451056; c=relaxed/simple;
-	bh=YoQJTHoVRDVWN4a6xtKSH+oBJO4mO1QeyDFeq9NDnhY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jolu11EXTehRBcUxSx+UUU+crG9DB4ysoFvbIEysQOnDwzn0yZNgM+18sc3WP+N0VeTvzAL6e38K7rFnJJm/+vRdz0nZNFjU3hFE/2cX1s5lL1TDENM403h86TYJs1mjVzqkULz1jWFqPxegePyTAeDVsZGoTpm7usWOUt8lYAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=K8T+VcFL; arc=none smtp.client-ip=192.30.252.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1757451605; c=relaxed/simple;
+	bh=DmT6TAnU5o7Mz3+aKVn3N2cbvOSTQaGKFU9aQ/7Z3IE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IBvJ6F5soqDnyy2YNskB8nTUERaNg1ZVtbW2hGiobYUGwZzt7AYy9l5rB16TSbaqaRlKuD5Wc8di9Ljw6QKhxy5sNQmUuWIZVwxkjfOuoRmTPdXy0ZQMzDGLnXO3SiU+P64//ISF18f6/bc4HJ4vyCFwvlJGSPxVDOB9pI4H8y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OyBHWsDt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="K8T+VcFL"
-Received: from github.com (hubbernetes-node-b0b59b4.va3-iad.github.net [10.48.132.44])
-	by smtp.github.com (Postfix) with ESMTPA id 0B9E18C09E5
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Sep 2025 13:50:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1757451054;
-	bh=p+CCbUUpdKESuKDbx8niZb25FIyCHv2AegZlhnH9Bks=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=K8T+VcFLhe8Y/45EUrOqAkn4mA6w2QLGuplDtow/tRYAKxMlHby+pTUsd0XguxdZn
-	 X6f7jcayNeEpwo+J4vOueOVK05CrieVo3TGHfgvRRotx8YzJN1pMDRZQyVJpvH0nTa
-	 ms9S3J1njWOwOLUXYFbumo2BnmhzPgj05FPJ3icw=
-Date: Tue, 09 Sep 2025 13:50:54 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1000203/be5fb9-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OyBHWsDt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2050C4CEF4;
+	Tue,  9 Sep 2025 21:00:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757451604;
+	bh=DmT6TAnU5o7Mz3+aKVn3N2cbvOSTQaGKFU9aQ/7Z3IE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OyBHWsDth0JMWWD7a7fXc0DpZYkNpOKRdW1EdsQNVIt4Lfi5FO9awyEwm+3bm5p4T
+	 fj/qDBFQBjUiK4BfK+OZn5hCNkKH3P4joKr1D6Eyp25P/+qhEzXC8WhUUXV4fi7V04
+	 xO+nlY5bL3ehhAYwqWMHBaFYhDdbEmDJILFuC2CTw0txVuoIZQU+e4mm01fOunJPSQ
+	 VFxZ32t/N1KB9QKAGX9XW3yyx6q9494nmXO6DAAxkC7+xj49bG5w4wwsvFvbjK4iRv
+	 U1OP52zb9rZwWeILGLOM2DIKq1JZuvKSUeoqf0Ez9TUF0KYU+Z5xAQFX0JpWnJ9GoV
+	 dlO3raKwtL3UQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 341DC383BF6C;
+	Tue,  9 Sep 2025 21:00:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bluetooth-next] Bluetooth: bcsp: receive data only if
+ registered
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175745160701.815420.2318120410651085608.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Sep 2025 21:00:07 +0000
+References: <20250830200339.36429-2-ipravdin.official@gmail.com>
+In-Reply-To: <20250830200339.36429-2-ipravdin.official@gmail.com>
+To: Ivan Pravdin <ipravdin.official@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, mmandlik@google.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+4ed6852d4da4606c93da@syzkaller.appspotmail.com
 
-  Branch: refs/heads/1000203
-  Home:   https://github.com/bluez/bluez
+Hello:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Sat, 30 Aug 2025 16:03:40 -0400 you wrote:
+> Currently, bcsp_recv() can be called even when the BCSP protocol has not
+> been registered. This leads to a NULL pointer dereference, as shown in
+> the following stack trace:
+> 
+>     KASAN: null-ptr-deref in range [0x0000000000000108-0x000000000000010f]
+>     RIP: 0010:bcsp_recv+0x13d/0x1740 drivers/bluetooth/hci_bcsp.c:590
+>     Call Trace:
+>      <TASK>
+>      hci_uart_tty_receive+0x194/0x220 drivers/bluetooth/hci_ldisc.c:627
+>      tiocsti+0x23c/0x2c0 drivers/tty/tty_io.c:2290
+>      tty_ioctl+0x626/0xde0 drivers/tty/tty_io.c:2706
+>      vfs_ioctl fs/ioctl.c:51 [inline]
+>      __do_sys_ioctl fs/ioctl.c:907 [inline]
+>      __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
+>      do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>      do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>      entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> [...]
+
+Here is the summary with links:
+  - [bluetooth-next] Bluetooth: bcsp: receive data only if registered
+    https://git.kernel.org/bluetooth/bluetooth-next/c/6c7e4432e56e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
