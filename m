@@ -1,78 +1,151 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD102C11CB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 22:05:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D753925F798
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 23:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757541917; cv=none; b=CfZG/9HSLdRF3LXTqrTUoEsW702D5QqmysQQPhq4leyCsRG8KMzuTTwKRm4rSJuQbKJ4zGGvTbUNBqgJ6sgsumE1X0eDjwQR70Oe6bZrsq6dwaxieXEn0GZvs4CIXoEhZkwpG/ipcjrVk9zTNYCdrKqYv6mrZ5prOh3M6XX2k/A=
+	t=1757546979; cv=none; b=cI1cInM775nlH29gkH5XIB7pFPR8s1MuPSRpSo9VO67PbqWZyLO9Qvgvqeg/xvA0SCDnhG++FB2/Dcsjyg5M6LTzxW9YzSUVQPwwaNZwP79h4lRHOsc1i2HlfHttQ1AXsrM1dqu1RXFK7nQmvfjFdfqLOV3Ortu+PoacvMrh4KE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757541917; c=relaxed/simple;
-	bh=juvWc6Fz2ejLk2xVqWgb6Ieylu3p8Bar3NM/Jpq/Ado=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mwZm64u2RVGyHmc8ZmOD3XLNKxxSsx+xxMn2JGwjR3R+tjHZIPhpZ6oSCbIga6K6o0qc4L3TJT8zScR6vjHSXvptP9mYqAbDYaSdiShN2ZOuwArhs7ZxmD47QyAxMlHi2/cJ3r7kvG8siO6DChWLbBzGjZUo72fYDFsZAi2XI/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mv4NLZ6y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757546979; c=relaxed/simple;
+	bh=giqX8D1e03WEb190csFinToB6mmpK+SueWukzwTLrtw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I9YRf5CX9ByevW99fgbi4T2tQJQUTkEzaUV0cYJVo47t8dxwczxkutp8seIK+5DvpBOtZU/WfllKP0BA1WKLiiHtghCCygbhoLyoloDY6lcaAtkRNKqpLX146EtsYa2L7NzbI7ZMhF5IF4ggg2atrykHfgKt0mTZbIsvMmlRMjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuWj9VRP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mv4NLZ6y"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CECCCC4CEF9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 22:05:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuWj9VRP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E691C113D0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 23:29:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757541914;
-	bh=juvWc6Fz2ejLk2xVqWgb6Ieylu3p8Bar3NM/Jpq/Ado=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=mv4NLZ6yBtLdKdjvH0PRmBcSF4kHPkM1pmNf/f9NY+IyRLIVY+VdYyegojko96zLb
-	 M8AAs53mwzvtW1JyvUhmRMD3i1IL9PkpjhawAsA6i4kMy4Zv5Va9AVCC5up2In7I39
-	 YXZqdEP8O8ncCtf9nml8RxQJ5YbJpNTdjFPHrnh0U/jr3ZSzsuZtlG6mUVUJFZH1a6
-	 +lYFTvKr7UagNFIvBK6xXLrkhuoBrE5TY9/efuPwj+Im7IJjsubO77yNH6R8Enf1Y9
-	 N9F458jAh0oZIsVKkquKD++zzBS6hieSq68oc8aB951K6MtB95WzWK4U0gP4LGBGix
-	 ZNa4VZEHKPtKA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id C3D65C3279F; Wed, 10 Sep 2025 22:05:14 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 80791] "Bluetooth: hci0: ACL packet for unknown connection
- handle" must be hidden behind "debug"
-Date: Wed, 10 Sep 2025 22:05:14 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: jcubic@onet.pl
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-80791-62941-EijKej2Hmf@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-80791-62941@https.bugzilla.kernel.org/>
-References: <bug-80791-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1757546979;
+	bh=giqX8D1e03WEb190csFinToB6mmpK+SueWukzwTLrtw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=UuWj9VRPzw1PvbSaCVy7gV5XIu21brGl+BUVHFYgg27kHS3pblH2z9FZm0Zjxv25q
+	 vM6pT5R7jh5OKkI2NzxgMyQx5Fv8tw3d/fDKigI8SHueZNQxBPhV/8lB1uJ3ajTG9s
+	 xUvNcX9o7L4/f1V7B0FTzSx33FWb6to8itCzKX1wbdB4WAu7Kpl/1brpLB1O/G3tDn
+	 TxiZM+HCqDW8zkFyLasBq+7lhQXG5SZiejGqiHT2kol1gyw9+pY3SzmoJ0bhzIwZT0
+	 0XZFkApfr8uVDYBu9rbQ39gXBGSk8G3BnLFiRb/55HfKgaFrdWxUE1VeN1tzfFAXpY
+	 4lPsVBhr+WVCA==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b0418f6fc27so15584066b.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 16:29:39 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXhXElJrYBtqxeaicJsgFua0HomFKD7fZFid/eVReYH2pX9FKhiEunDC47k2sCFnHGVpnHENMWm4V35NwX9LqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQSMQtj33W81r45CkGT7tCtA4sDNhttXzllX3IAiThZcx3mLAO
+	rOu0/3amAyfnxmE+3tMKjbDEa/iO03fFL0Ns59XnMhZLGi3VVd9KMWkS/5SPMSGVZef/SIGs790
+	asG0KgZNRMmQM17aBjE+Cp9VqMW/sSjc=
+X-Google-Smtp-Source: AGHT+IGlGgx50+D2ydI5vBqV6/W+PuaO1JZSUd97+Jrqkz/eIi6Qj2v1ae31SM3Fqif/p17XncOr6qKwTf/VY8KBwGc=
+X-Received: by 2002:a17:907:808:b0:afe:bdcb:9e62 with SMTP id
+ a640c23a62f3a-b04b16c4a55mr1764621066b.33.1757546977956; Wed, 10 Sep 2025
+ 16:29:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250905084059.26959-1-ot_zhangchao.zhang@mediatek.com>
+ <20250905084059.26959-2-ot_zhangchao.zhang@mediatek.com> <a7589659-0352-4d47-a3cf-f2433cc512ec@kernel.org>
+In-Reply-To: <a7589659-0352-4d47-a3cf-f2433cc512ec@kernel.org>
+From: Sean Wang <sean.wang@kernel.org>
+Date: Wed, 10 Sep 2025 18:29:24 -0500
+X-Gmail-Original-Message-ID: <CAGp9Lzrp-cfn_GiLrHCU629wEAxWy=egOMrRh6thYbymu+QXjA@mail.gmail.com>
+X-Gm-Features: Ac12FXyyVN5Jiq60xJ95u5ez5XUlTPRrkZuzl25f4dRSg1MxKAtg591tBXMalW4
+Message-ID: <CAGp9Lzrp-cfn_GiLrHCU629wEAxWy=egOMrRh6thYbymu+QXjA@mail.gmail.com>
+Subject: Re: [PATCH v7 1/1] Bluetooth: mediatek: add gpio pin to reset bt
+To: Krzysztof Kozlowski <krzk@kernel.org>, Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	Luiz Von Dentz <luiz.dentz@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Jiande Lu <jiande.lu@mediatek.com>, 
+	Deren Wu <deren.Wu@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, 
+	Hao Qin <Hao.qin@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D80791
+Hi Krzysztof,
 
---- Comment #12 from Jakub Jankiewicz (jcubic@onet.pl) ---
-I think this is a real bug, I've just noticed with latest Kernel 6.16.5 (Fe=
-dora
-testing 6.16.5-200.fc42.x86_64), the music I play via Bluetooth speakers is
-interrupted when this happens. And it happens a lot. So this is a bug in the
-driver that needs to be fixed, not hidden.
+Sorry again for the confusion. I believe Zhangchao is still new to the
+upstream process, and we=E2=80=99ll work together to improve this. Since th=
+is
+series has become a bit hard to follow, would you agree that it might
+be better for us to restart with a clean patch that addresses the
+review comments? A clean version would make it easier for reviewers to
+focus on the current issues without being distracted by earlier
+mistakes.
 
---=20
-You may reply to this email to add a comment.
+Hi Zhangchao,
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Please note that both btusb.c (with DT and ACPI) and btmtksdio.c (with
+DT) already support reset_gpio. Our goal should be to benefit from
+these existing mechanisms while ensuring that this patch does not
+introduce any regressions. If the current mechanisms do not fully meet
+your requirements, it=E2=80=99s important to clearly explain why, so we can
+adapt the existing framework rather than creating a separate one.
+
+And please remember to carefully respect and respond to reviewer
+feedback, reviewers volunteer their time and experience to help us
+keep the subsystem clean and consistent. It=E2=80=99s a valuable opportunit=
+y
+for us to learn and to ensure smoother integration.
+
+                          Sean
+
+On Fri, Sep 5, 2025 at 3:44=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.org=
+> wrote:
+>
+> On 05/09/2025 10:40, Zhangchao Zhang wrote:
+> > Makes the platform Bluetooth to be reset by hardware pin,
+> > it provides two methods to do it for mediatek controller,
+> > and it has been tested locally many times and can reset normally.
+> >
+> > When an exception occurs, resetting Bluetooth by hardware pin
+> > is more stable than resetting Bluetooth by software.
+> > If the corresponding pin is not found in dts,
+> > bluetooth can also be reset successfully.
+> >
+> > Co-developed: Hao Qin <hao.qin@mediatek.com>
+> > Co-developed: Chris Lu <chris.lu@mediatek.com>
+> > Co-developed: Jiande Lu <jiande.lu@mediatek.com>
+> > Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
+> > ---
+> >  drivers/bluetooth/btmtk.c | 32 ++++++++++++++++++++++++++++++++
+> >  1 file changed, 32 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> > index 4390fd571dbd..29d6a93f255d 100644
+> > --- a/drivers/bluetooth/btmtk.c
+> > +++ b/drivers/bluetooth/btmtk.c
+> > @@ -6,6 +6,8 @@
+> >  #include <linux/firmware.h>
+> >  #include <linux/usb.h>
+> >  #include <linux/iopoll.h>
+> > +#include <linux/gpio/consumer.h>
+> > +#include <linux/of.h>
+> >  #include <linux/unaligned.h>
+> >
+> >  #include <net/bluetooth/bluetooth.h>
+> > @@ -359,11 +361,41 @@ int btmtk_set_bdaddr(struct hci_dev *hdev, const =
+bdaddr_t *bdaddr)
+> >  }
+> >  EXPORT_SYMBOL_GPL(btmtk_set_bdaddr);
+> >
+> > +static int btmtk_hw_gpio_reset(struct hci_dev *hdev, struct btmtk_data=
+ *reset_work)
+> > +{
+> > +     struct gpio_desc *reset_gpio;
+> > +
+> > +     /* Find device node*/
+> > +     hdev->dev.of_node =3D of_find_compatible_node(NULL, NULL, "mediat=
+ek,mt7925-bluetooth");
+>
+> Nothing improved.
+>
+> You just keep ignoring comments.
+>
+> NAK
+>
+> Best regards,
+> Krzysztof
+>
