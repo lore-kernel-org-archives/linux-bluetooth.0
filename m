@@ -1,151 +1,177 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D753925F798
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 23:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89EF5522F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 23:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757546979; cv=none; b=cI1cInM775nlH29gkH5XIB7pFPR8s1MuPSRpSo9VO67PbqWZyLO9Qvgvqeg/xvA0SCDnhG++FB2/Dcsjyg5M6LTzxW9YzSUVQPwwaNZwP79h4lRHOsc1i2HlfHttQ1AXsrM1dqu1RXFK7nQmvfjFdfqLOV3Ortu+PoacvMrh4KE=
+	t=1757547057; cv=none; b=mIjwIX/HnoxId6X6lz3LwYCHb8PT+DnSa6tuG/lH695FX+AxIxvMpanZS3v772cdGuJrrUt+sgBZBugvmMGwKKYIQBoeQmADUBNoFhobyaqJ1ZNoSOvaVm1w95nc6Cg4bNTC0lwibMsk9kAXYcL1HfngTdcPRQdR9+sdFPoYeco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757546979; c=relaxed/simple;
-	bh=giqX8D1e03WEb190csFinToB6mmpK+SueWukzwTLrtw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I9YRf5CX9ByevW99fgbi4T2tQJQUTkEzaUV0cYJVo47t8dxwczxkutp8seIK+5DvpBOtZU/WfllKP0BA1WKLiiHtghCCygbhoLyoloDY6lcaAtkRNKqpLX146EtsYa2L7NzbI7ZMhF5IF4ggg2atrykHfgKt0mTZbIsvMmlRMjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuWj9VRP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757547057; c=relaxed/simple;
+	bh=J0nvga6PiNOGipU03S5+02xfwJqtNWLUIOuFOvH/zMo=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=BTH5C3/C4LUxGfz6vdvEfTe2TB8S/DasrPzDpBkUfbZNtpaDfDjOC3/eAeIcgoQrizkHOXngejWVEcUniCZt6FhHeiezo/EllMqyiCJyEa5HdLNJD6G02jcpJprTDiHtydvpz9TX6xK1FW8fUNb6OO5h4sNU4eJwumFdXTr6c+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PpislYvA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuWj9VRP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E691C113D0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 23:29:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PpislYvA"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2DE18C4CEEB
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 23:30:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757546979;
-	bh=giqX8D1e03WEb190csFinToB6mmpK+SueWukzwTLrtw=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=UuWj9VRPzw1PvbSaCVy7gV5XIu21brGl+BUVHFYgg27kHS3pblH2z9FZm0Zjxv25q
-	 vM6pT5R7jh5OKkI2NzxgMyQx5Fv8tw3d/fDKigI8SHueZNQxBPhV/8lB1uJ3ajTG9s
-	 xUvNcX9o7L4/f1V7B0FTzSx33FWb6to8itCzKX1wbdB4WAu7Kpl/1brpLB1O/G3tDn
-	 TxiZM+HCqDW8zkFyLasBq+7lhQXG5SZiejGqiHT2kol1gyw9+pY3SzmoJ0bhzIwZT0
-	 0XZFkApfr8uVDYBu9rbQ39gXBGSk8G3BnLFiRb/55HfKgaFrdWxUE1VeN1tzfFAXpY
-	 4lPsVBhr+WVCA==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b0418f6fc27so15584066b.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Sep 2025 16:29:39 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXhXElJrYBtqxeaicJsgFua0HomFKD7fZFid/eVReYH2pX9FKhiEunDC47k2sCFnHGVpnHENMWm4V35NwX9LqU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQSMQtj33W81r45CkGT7tCtA4sDNhttXzllX3IAiThZcx3mLAO
-	rOu0/3amAyfnxmE+3tMKjbDEa/iO03fFL0Ns59XnMhZLGi3VVd9KMWkS/5SPMSGVZef/SIGs790
-	asG0KgZNRMmQM17aBjE+Cp9VqMW/sSjc=
-X-Google-Smtp-Source: AGHT+IGlGgx50+D2ydI5vBqV6/W+PuaO1JZSUd97+Jrqkz/eIi6Qj2v1ae31SM3Fqif/p17XncOr6qKwTf/VY8KBwGc=
-X-Received: by 2002:a17:907:808:b0:afe:bdcb:9e62 with SMTP id
- a640c23a62f3a-b04b16c4a55mr1764621066b.33.1757546977956; Wed, 10 Sep 2025
- 16:29:37 -0700 (PDT)
+	s=k20201202; t=1757547057;
+	bh=J0nvga6PiNOGipU03S5+02xfwJqtNWLUIOuFOvH/zMo=;
+	h=From:To:Subject:Date:From;
+	b=PpislYvA1tLINVkfVqdBtIhV53xQ3pAyvCQjWPdRaWAAksjuQa3A4qavLX/6jTZjz
+	 Iv2ffAXCMPQFCEysco0TAUcR1Bvw9RfubZ1uuR1B/Thx6+Hu1w7Cz/04hJNQNMuEAI
+	 M7JYQ/kuLc1p2gxGiIzOH/e7SxzmkJZwm+FlnEd261d+JgAE6BCnii079CQgY9KiVF
+	 rD+eBY3O4/DgN0K/uBNS0w3leBpWFxi85OVS8Ik1CVkM7WF5O/6y0e7J8SwETSBte2
+	 DdVHYeJkeH9OClqYz/XqlQAmpkaMxsD48XDtd06OqrA9nZoVkrX4ITWzj9Kyrf1c6V
+	 gFEOQUMz0hEnQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 1D37EC3279F; Wed, 10 Sep 2025 23:30:57 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220564] New: Wrong indentification of Bluetooth in Lenovo
+ Legion Pro 5 and 0489:e111 Foxconn / Hon Hai Wireless_Device
+Date: Wed, 10 Sep 2025 23:30:56 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: jcubic@onet.pl
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-220564-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250905084059.26959-1-ot_zhangchao.zhang@mediatek.com>
- <20250905084059.26959-2-ot_zhangchao.zhang@mediatek.com> <a7589659-0352-4d47-a3cf-f2433cc512ec@kernel.org>
-In-Reply-To: <a7589659-0352-4d47-a3cf-f2433cc512ec@kernel.org>
-From: Sean Wang <sean.wang@kernel.org>
-Date: Wed, 10 Sep 2025 18:29:24 -0500
-X-Gmail-Original-Message-ID: <CAGp9Lzrp-cfn_GiLrHCU629wEAxWy=egOMrRh6thYbymu+QXjA@mail.gmail.com>
-X-Gm-Features: Ac12FXyyVN5Jiq60xJ95u5ez5XUlTPRrkZuzl25f4dRSg1MxKAtg591tBXMalW4
-Message-ID: <CAGp9Lzrp-cfn_GiLrHCU629wEAxWy=egOMrRh6thYbymu+QXjA@mail.gmail.com>
-Subject: Re: [PATCH v7 1/1] Bluetooth: mediatek: add gpio pin to reset bt
-To: Krzysztof Kozlowski <krzk@kernel.org>, Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	Luiz Von Dentz <luiz.dentz@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Jiande Lu <jiande.lu@mediatek.com>, 
-	Deren Wu <deren.Wu@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, 
-	Hao Qin <Hao.qin@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	linux-mediatek <linux-mediatek@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Krzysztof,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220564
 
-Sorry again for the confusion. I believe Zhangchao is still new to the
-upstream process, and we=E2=80=99ll work together to improve this. Since th=
-is
-series has become a bit hard to follow, would you agree that it might
-be better for us to restart with a clean patch that addresses the
-review comments? A clean version would make it easier for reviewers to
-focus on the current issues without being distracted by earlier
-mistakes.
+            Bug ID: 220564
+           Summary: Wrong indentification of Bluetooth in Lenovo Legion
+                    Pro 5 and 0489:e111 Foxconn / Hon Hai Wireless_Device
+           Product: Drivers
+           Version: 2.5
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: jcubic@onet.pl
+        Regression: No
 
-Hi Zhangchao,
+I commented on https://bugzilla.kernel.org/show_bug.cgi?id=3D80791
 
-Please note that both btusb.c (with DT and ACPI) and btmtksdio.c (with
-DT) already support reset_gpio. Our goal should be to benefit from
-these existing mechanisms while ensuring that this patch does not
-introduce any regressions. If the current mechanisms do not fully meet
-your requirements, it=E2=80=99s important to clearly explain why, so we can
-adapt the existing framework rather than creating a separate one.
+But I think that this is something unrelated, since the error message:
 
-And please remember to carefully respect and respond to reviewer
-feedback, reviewers volunteer their time and experience to help us
-keep the subsystem clean and consistent. It=E2=80=99s a valuable opportunit=
-y
-for us to learn and to ensure smoother integration.
+hci0: ACL packet for unknown connection handle 3837
 
-                          Sean
+in my case it may be an error in the driver, I have a flood of errors in lo=
+gs.
+I have a new laptop from 2025 (Lenovo Legion Pro 5 16IAX10 Ultra 7 255HX) a=
+nd
+the system I have (fedora 42 xfce) with kernel 6.16.5-200.fc42.x86_64 detec=
+ts
+something as MTP Wireless Device. There is an icon on the desktop. I think =
+that
+this is because of wrong detected Bluetooth device in the Bluetooth driver.=
+ The
+laptop don't have any MTP device.
 
-On Fri, Sep 5, 2025 at 3:44=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.org=
-> wrote:
->
-> On 05/09/2025 10:40, Zhangchao Zhang wrote:
-> > Makes the platform Bluetooth to be reset by hardware pin,
-> > it provides two methods to do it for mediatek controller,
-> > and it has been tested locally many times and can reset normally.
-> >
-> > When an exception occurs, resetting Bluetooth by hardware pin
-> > is more stable than resetting Bluetooth by software.
-> > If the corresponding pin is not found in dts,
-> > bluetooth can also be reset successfully.
-> >
-> > Co-developed: Hao Qin <hao.qin@mediatek.com>
-> > Co-developed: Chris Lu <chris.lu@mediatek.com>
-> > Co-developed: Jiande Lu <jiande.lu@mediatek.com>
-> > Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-> > ---
-> >  drivers/bluetooth/btmtk.c | 32 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 32 insertions(+)
-> >
-> > diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> > index 4390fd571dbd..29d6a93f255d 100644
-> > --- a/drivers/bluetooth/btmtk.c
-> > +++ b/drivers/bluetooth/btmtk.c
-> > @@ -6,6 +6,8 @@
-> >  #include <linux/firmware.h>
-> >  #include <linux/usb.h>
-> >  #include <linux/iopoll.h>
-> > +#include <linux/gpio/consumer.h>
-> > +#include <linux/of.h>
-> >  #include <linux/unaligned.h>
-> >
-> >  #include <net/bluetooth/bluetooth.h>
-> > @@ -359,11 +361,41 @@ int btmtk_set_bdaddr(struct hci_dev *hdev, const =
-bdaddr_t *bdaddr)
-> >  }
-> >  EXPORT_SYMBOL_GPL(btmtk_set_bdaddr);
-> >
-> > +static int btmtk_hw_gpio_reset(struct hci_dev *hdev, struct btmtk_data=
- *reset_work)
-> > +{
-> > +     struct gpio_desc *reset_gpio;
-> > +
-> > +     /* Find device node*/
-> > +     hdev->dev.of_node =3D of_find_compatible_node(NULL, NULL, "mediat=
-ek,mt7925-bluetooth");
->
-> Nothing improved.
->
-> You just keep ignoring comments.
->
-> NAK
->
-> Best regards,
-> Krzysztof
->
+gio mount -l shows:
+
+Volume(0): Wireless Device
+  Type: GProxyVolume (GProxyVolumeMonitorMTP)
+
+
+mtp-detect returns:
+
+libmtp version: 1.1.19
+Listing raw device(s)
+Device 0 (VID=3D0489 and PID=3De111) is a Vizio (for Lenovo) LIFETAB S9714.
+   Found 1 device(s):
+   Vizio (for Lenovo): LIFETAB S9714 (0489:e111) @ bus 3, dev 6
+Attempting to connect device(s)
+PTP_ERROR_IO: failed to open session, trying again after resetting USB
+interface
+LIBMTP libusb: Attempt to reset device
+LIBMTP PANIC: failed to open session on second attempt
+Unable to open raw device 0
+OK.
+
+lsusb:
+Bus 003 Device 006: ID 0489:e111 Foxconn / Hon Hai Wireless_Device
+
+
+I've enabled debugging with /sys/kernel/debug/dynamic_debug/control
+
+This is part of the logs from btmon:
+
+> ACL Data RX: Handle 3837 flags 0x02 dlen 143         #26475 [hci0] 238.82=
+1952
+      Channel: 259 len 139 [PSM 0 mode Basic (0x00)] {chan 65535}
+        32 00 9f d2 95 00 01 00 e6 0a 03 00 00 00 00 00  2...............
+        00 dd 9a 00 00 00 00 00 00 08 0a 00 00 00 00 00  ................
+        00 d7 04 00 00 71 cc 00 00 e9 11 00 00 00 00 00  .....q..........
+        00 fe 0e 01 00 00 00 00 00 9e d2 95 00 6a d2 95  .............j..
+        00 07 d6 50 00 fc 07 00 00 00 00 c0 df ff 3f 00  ...P..........?.
+        00 02 00 20 00 02 00 00 00 02 00 20 00 02 00 00  ... ....... ....
+        00 02 00 20 00 02 00 00 00 02 00 20 00 02 00 09  ... ....... ....
+        00 5c 01 00 00 02 00 09 00 00 00 00 00 02 00 20  .\.............=20
+        00 02 00 00 00 02 00 20 00 02 00                 ....... ...=20=20=
+=20=20=20
+> HCI Event: Number of Completed Pack.. (0x13) plen 5  #26476 [hci0] 238.85=
+4712
+        Num handles: 1
+        Handle: 50
+        Count: 1
+bluetoothd[1539]: < ACL Data TX.. flags 0x02 dlen 850  #26477 [hci0] 238.85=
+4861
+      Channel: 3778 len 846 [PSM 0 mode Basic (0x00)] {chan 65535}
+
+This is output of journalctl -k
+
+wrz 11 00:38:50 jcubic kernel: hdev 0000000021bf8090 len 147
+wrz 11 00:38:50 jcubic kernel: hci0 ACL data packet
+wrz 11 00:38:50 jcubic kernel: hci0: len 143 handle 0x0efd flags 0x0002
+wrz 11 00:38:50 jcubic kernel: Bluetooth: hci0: ACL packet for unknown
+connection handle 3837
+wrz 11 00:38:50 jcubic kernel: hci0 Event packet
+wrz 11 00:38:50 jcubic kernel: hci0: event 0x13
+wrz 11 00:38:50 jcubic kernel: hci0: num 1
+
+I listen to music almost non-stop with Bluetooth speakers, and the error ha=
+ppen
+during short music interruption. I think that it started to happen after I'=
+ve
+upgraded to testing kernel in Fedora.
+
+This is a related bug in Fedora:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D2392938
+
+I hope that the provided info is enough, I used Grok (LLM) to help with
+debugging.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
