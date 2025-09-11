@@ -1,43 +1,46 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BC9321423
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 10:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640E2320CC5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 10:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757586646; cv=none; b=dgfNekzaYc+AI1nxrAHJC6RuetG+J+wLEhSHga8Gy6EeN+3vge86gwE9m4enaI2nd3oHnUltMs8nOMuxba3Sst5TcbtT5mFshLsAaYRgHW5/8VKzJUpnQKpeFw9g9t8HQToROI+23Fz1OppEmrv57NTYqNKADlqGxU4DphivKgc=
+	t=1757586646; cv=none; b=dE/CtR+GmPxSR2p1mP6Mksaoa5P4gVus2mREmM5eeYjHlj+wNwEpUFnFZaekURcWbuZxqdJh5FT43JS1WWryCM41jZOKHg0NudDBjshVnsomg3Tyk4yn116upUv3/wJuDA4jxBLULV7GLj4zBmszPsM7enjowj9IvuCwL6pJdws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757586646; c=relaxed/simple;
-	bh=f7dAUauJOhGAUeD/vQaAF/NOdilz5RVEXSG8m8he4Yo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Tb3dU4ob0i5CqsV1ymDfiAtcN/10mX6uebX1rMdhB/YYa3yqTyXN/Pr8/qhgzCIzEZ+89NeO0QVybhpHma8cG+QCXGeAthIXRHWi2c0dLrAQO6zxPW9OrjC2tolixHJnVyMSDMLeE97K0WlmVvbe4AhOTTm4ORUw9r0UKjnG+hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VqIcOWZU; arc=none smtp.client-ip=148.251.105.195
+	bh=jX5y4QRJubQoLt92GRz67nJ8Kqmm4GLUii6jvpQT/Tc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qLAcFwQ5XoT85plAMK4aY/ZXmPq577CTUHUdaHOttaefZ6+mdy88mGhV9LUCYu/KzFlquPehB+VG1NsShUwWxdJTxuO9ghONCbAEy0ygO+BA4YKUPnaj9PP1v87GLtG9eC3VZn46PvUDUbz8v+KA07T0h2geLFShEYXfe7TC8ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=TzVIw5Mh; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VqIcOWZU"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="TzVIw5Mh"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1757586642;
-	bh=f7dAUauJOhGAUeD/vQaAF/NOdilz5RVEXSG8m8he4Yo=;
-	h=From:To:Subject:Date:From;
-	b=VqIcOWZUGcgJCew/O046qo68Y0wjERUAr6oB4NcVzN9BKQpyAsElnmWFcxsoDnNgv
-	 Tr4PE8d+aK7je3YCo7XLc+dF6RymVomyLpg8EtTAK+Arx8u/4wUnVpmn2Frz8lb1ki
-	 xLcmk6mFei6uvl5yjClrVB/6B4F4nrTqwevn2UpILtbDRcFBAPGCqIeBgRtTyxtpaP
-	 G/Lei0uzUaQlGbPWzKQZBUdkKvz9yu8cOgN1obetOoIzRO6QHg7dBH8gXDN4tl+GjM
-	 F9AjKZdC6/4Zt1ayhVB/hlO2ZogS0conZSOHZ/oMLpNPgvp4y9MraCPZqPoHkQLXgC
-	 kVXPV7wzOwrYA==
+	bh=jX5y4QRJubQoLt92GRz67nJ8Kqmm4GLUii6jvpQT/Tc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=TzVIw5Mh1VXYV4NUCTBuIxnvCgIcG0G9clXNvvKWNEE/QvWQvE8jnhH/vIdWz1kyB
+	 KXve1t93LbOCM+3WemaVfwlNBRRQ9JYsH8vl4QWwsliqttcuBi7DUmvfh7cDQpvRVx
+	 Qcld1XPS5e0GFeRhi0wQ6/FZYBwnbJS7Uxd9Kgtq09SxzHMtWdx8pVQxDrKGZ+kTAB
+	 DVtE56suKtmqZR0C11BclqXwD92PbbCOww9Zx8vliyWqlHtFwy1iUpzd4dJ3bXhke9
+	 X8VgvN/qNz/sk+TRSkDxRlqjDgkl/qtzTj95R0gNYaYYQdIOIpsze/Xpoks5c0pbih
+	 QTZcdH2Wd2yrQ==
 Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-E0e2-6802-CeeF-9413.rev.sfr.net [IPv6:2a02:8428:af44:1001:e0e2:6802:ceef:9413])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0CC3117E0100
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5A17B17E04D6
 	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 12:30:42 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] shared/hfp: Add Operator name support
-Date: Thu, 11 Sep 2025 12:28:37 +0200
-Message-ID: <20250911102840.2090361-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ 2/4] unit/test-hfp: Add Operator name test for HF
+Date: Thu, 11 Sep 2025 12:28:38 +0200
+Message-ID: <20250911102840.2090361-2-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250911102840.2090361-1-frederic.danis@collabora.com>
+References: <20250911102840.2090361-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -47,139 +50,135 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Send AT+COPS=3,0 at the end of the SLC creation to set the format of
-the operator selection to long alphanumeric, then query the currently
-selected operator name from the AG.
+This add the following test:
+- HFP/HF/PSI/BV-04-C
+  Verify that the HF can query the currently selected operator name.
 
-Register +COPS handler to call the update_operator callback on event.
+Improve MINIMAL_SLC_SESSION macro to be able to set the service, call,
+callsetup and callheld indicators at connection time.
 ---
- src/shared/hfp.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++--
- src/shared/hfp.h |  1 +
- 2 files changed, 83 insertions(+), 2 deletions(-)
+ unit/test-hfp.c | 50 +++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 40 insertions(+), 10 deletions(-)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index d01915ab1..f94df90f1 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -1710,7 +1710,30 @@ static void ciev_cb(struct hfp_context *context, void *user_data)
- 	set_indicator_value(index, val, hfp->ag_ind, hfp);
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index 371415a68..8ab6c7bf5 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -699,7 +699,7 @@ static void test_hf_robustness(gconstpointer data)
+ 	context_quit(context);
  }
  
--static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
-+static void cops_cb(struct hfp_context *context, void *user_data)
-+{
-+	struct hfp_hf *hfp = user_data;
-+	unsigned int mode, val;
-+	char name[255];
-+
-+	DBG(hfp, "");
-+
-+	if (!hfp_context_get_number(context, &mode))
-+		return;
-+
-+	if (!hfp_context_get_number(context, &val))
-+		return;
-+
-+	if (!hfp_context_get_string(context, name, sizeof(name))) {
-+		DBG(hfp, "hf: Could not get string");
-+		return;
-+	}
-+
-+	if (hfp->callbacks && hfp->callbacks->update_operator)
-+		hfp->callbacks->update_operator(name, hfp->callbacks_data);
-+}
-+
-+static void cops_resp(enum hfp_result result, enum hfp_error cme_err,
- 	void *user_data)
- {
- 	struct hfp_hf *hfp = user_data;
-@@ -1718,7 +1741,7 @@ static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
- 	DBG(hfp, "");
+-#define MINIMAL_SLC_SESSION \
++#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
+ 	raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
+ 		' ', '0', '\r', '\n'), \
+ 	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+@@ -722,10 +722,15 @@ static void test_hf_robustness(gconstpointer data)
+ 	frg_pdu('\r', '\n'), \
+ 	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+ 	raw_pdu('\r', '\n', '+', 'C', 'I', 'N', 'D', ':', ' '), \
+-	frg_pdu('0', ',', '0', ',', '0', ',', '0', ',', '5'), \
+-	frg_pdu(',', '0', ',', '5', '\r', '\n'), \
++	frg_pdu(service, ',', call, ',', callsetup, ',', callheld, ','), \
++	frg_pdu('5', ',', '0', ',', '5', '\r', '\n'), \
+ 	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+-	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n')
++	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
++	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
++	raw_pdu('\r', '\n', '+', 'C', 'O', 'P', 'S', ':', ' '), \
++	frg_pdu('0', ',', '0', ',', '\"', 'T', 'E', 'S', 'T'), \
++	frg_pdu('\"', '\r', '\n'), \
++	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n')
  
- 	if (result != HFP_RESULT_OK) {
--		DBG(hfp, "hf: CMER error: %d", result);
-+		DBG(hfp, "hf: COPS? error: %d", result);
- 		goto failed;
+ static void hf_session_ready_cb(enum hfp_result res, enum hfp_error cme_err,
+ 							void *user_data)
+@@ -745,7 +750,13 @@ static void hf_update_indicator(enum hfp_indicator indicator, uint32_t val,
+ 	if (!context->session.completed) {
+ 		switch (indicator) {
+ 		case HFP_INDICATOR_SERVICE:
+-			g_assert_cmpint(val, ==, 0);
++			if (g_str_equal(test_name, "/HFP/HF/PSI/BV-03-C") ||
++				g_str_equal(test_name, "/HFP/HF/TRS/BV-01-C") ||
++				g_str_equal(test_name,
++						"/hfp_hf/test_session_minimal"))
++				g_assert_cmpint(val, ==, 0);
++			else
++				g_assert_cmpint(val, ==, 1);
+ 			break;
+ 		case HFP_INDICATOR_CALL:
+ 			g_assert_cmpint(val, ==, 0);
+@@ -789,9 +800,22 @@ static void hf_update_indicator(enum hfp_indicator indicator, uint32_t val,
  	}
+ }
  
-@@ -1726,8 +1749,65 @@ static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
- 		hfp->callbacks->session_ready(HFP_RESULT_OK, 0,
- 						hfp->callbacks_data);
- 
-+	return;
++static void hf_update_operator(const char *operator_name, void *user_data)
++{
++	struct context *context = user_data;
++	const char *test_name = context->data->test_name;
 +
-+failed:
-+	if (hfp->callbacks->session_ready)
-+		hfp->callbacks->session_ready(result, cme_err,
-+						hfp->callbacks_data);
++	if (tester_use_debug())
++		tester_debug("operator updated: %s", operator_name);
++
++	if (g_str_equal(test_name, "/HFP/HF/PSI/BV-04-C"))
++		g_assert_cmpstr(operator_name, ==, "TEST");
 +}
 +
-+static void cops_conf_resp(enum hfp_result result, enum hfp_error cme_err,
-+	void *user_data)
-+{
-+	struct hfp_hf *hfp = user_data;
-+
-+	DBG(hfp, "");
-+
-+	if (result != HFP_RESULT_OK) {
-+		DBG(hfp, "hf: COPS= error: %d", result);
-+		goto failed;
-+	}
-+
-+	/* SLC creation done, continue with default setup */
-+	if (!hfp_hf_send_command(hfp, cops_resp, hfp,
-+		"AT+COPS?")) {
-+		DBG(hfp, "hf: Could not send AT+COPS?");
-+		result = HFP_RESULT_ERROR;
-+		goto failed;
-+	}
-+
-+	return;
-+
-+failed:
-+	if (hfp->callbacks->session_ready)
-+		hfp->callbacks->session_ready(result, cme_err,
-+						hfp->callbacks_data);
-+}
-+
-+static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
-+	void *user_data)
-+{
-+	struct hfp_hf *hfp = user_data;
-+
-+	DBG(hfp, "");
-+
-+	if (result != HFP_RESULT_OK) {
-+		DBG(hfp, "hf: CMER error: %d", result);
-+		goto failed;
-+	}
-+
-+	/* SLC creation done, continue with default setup */
-+	if (!hfp_hf_send_command(hfp, cops_conf_resp, hfp,
-+		"AT+COPS=3,0")) {
-+		DBG(hfp, "hf: Could not send AT+COPS=3,0");
-+		result = HFP_RESULT_ERROR;
-+		goto failed;
-+	}
-+
- 	/* Register unsolicited results handlers */
- 	hfp_hf_register(hfp, ciev_cb, "+CIEV", hfp, NULL);
-+	hfp_hf_register(hfp, cops_cb, "+COPS", hfp, NULL);
- 
- 	return;
- 
-diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index e6f7bbbb6..27f6d2d7c 100644
---- a/src/shared/hfp.h
-+++ b/src/shared/hfp.h
-@@ -190,6 +190,7 @@ struct hfp_hf_callbacks {
- 							void *user_data);
- 	void (*update_indicator)(enum hfp_indicator indicator, uint32_t val,
- 							void *user_data);
-+	void (*update_operator)(const char *operator_name, void *user_data);
+ static struct hfp_hf_callbacks hf_session_callbacks = {
+ 	.session_ready = hf_session_ready_cb,
+ 	.update_indicator = hf_update_indicator,
++	.update_operator = hf_update_operator,
  };
  
- struct hfp_hf *hfp_hf_new(int fd);
+ static void test_hf_session_done(enum hfp_result res, enum hfp_error cme_err,
+@@ -996,13 +1020,13 @@ int main(int argc, char *argv[])
+ 
+ 	define_hf_test("/hfp_hf/test_session_minimal", test_hf_session,
+ 			NULL, test_hf_session_done,
+-			MINIMAL_SLC_SESSION,
++			MINIMAL_SLC_SESSION('0', '0', '0', '0'),
+ 			data_end());
+ 
+ 	/* Transfer Signal Strength Indication - HF */
+ 	define_hf_test("/HFP/HF/PSI/BV-01-C", test_hf_session,
+ 			NULL, test_hf_session_done,
+-			MINIMAL_SLC_SESSION,
++			MINIMAL_SLC_SESSION('1', '0', '0', '0'),
+ 			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+ 			frg_pdu(' ', '5', ',', '3', '\r', '\n'),
+ 			data_end());
+@@ -1010,7 +1034,7 @@ int main(int argc, char *argv[])
+ 	/* Transfer Roaming Status Indication - HF */
+ 	define_hf_test("/HFP/HF/PSI/BV-02-C", test_hf_session,
+ 			NULL, test_hf_session_done,
+-			MINIMAL_SLC_SESSION,
++			MINIMAL_SLC_SESSION('1', '0', '0', '0'),
+ 			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+ 			frg_pdu(' ', '6', ',', '1', '\r', '\n'),
+ 			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+@@ -1020,15 +1044,21 @@ int main(int argc, char *argv[])
+ 	/* Transfer Battery Level Indication - HF */
+ 	define_hf_test("/HFP/HF/PSI/BV-03-C", test_hf_session,
+ 			NULL, test_hf_session_done,
+-			MINIMAL_SLC_SESSION,
++			MINIMAL_SLC_SESSION('0', '0', '0', '0'),
+ 			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+ 			frg_pdu(' ', '7', ',', '3', '\r', '\n'),
+ 			data_end());
+ 
++	/* Transfer Operator name - HF */
++	define_hf_test("/HFP/HF/PSI/BV-04-C", test_hf_session,
++			NULL, test_hf_session_done,
++			MINIMAL_SLC_SESSION('1', '0', '0', '0'),
++			data_end());
++
+ 	/* Transfer Registration Status - HF */
+ 	define_hf_test("/HFP/HF/TRS/BV-01-C", test_hf_session,
+ 			NULL, test_hf_session_done,
+-			MINIMAL_SLC_SESSION,
++			MINIMAL_SLC_SESSION('0', '0', '0', '0'),
+ 			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+ 			frg_pdu(' ', '1', ',', '1', '\r', '\n'),
+ 			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
 -- 
 2.43.0
 
