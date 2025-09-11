@@ -1,98 +1,83 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E84242927
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 19:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598084A04
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 19:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757620188; cv=none; b=PbAOA4z6PfB0OQCMdwAgveJnh+vgqU7FFGGySt1GDNfiZZiGAUI9y+4AcHMRAnbZMr2fQa5wORr8OYMdJqicYDg0ILQrVGXpk3UYVSTLnIUJivaWMqwoQhFpBjqcfSkpTtg1XZkMS/q/zcLckwaWnWHU43umLKYqLBDvDIZhqIE=
+	t=1757620205; cv=none; b=ERpd5viQxmfHLp0F2xa2htwP4Xx9Qy1iojMv73ayIFzoW0ow+Drtekh5NumelDKSjXhdN+cxi/acTossr5tecTv+uszGFAIWIDKgpK9U5oqnokhQEB48CAsoEvgazmm5MfOUtF+gi9H5q8Ojil/pTlJKDP09rzgWsCub/V9OccI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757620188; c=relaxed/simple;
-	bh=qQzV8hDH6uNDpXRdIaf+xblSmOhzbSTJz4hFtUcNdrU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OkPk0jzQh+UiHDXqQ1QUZKMBLydUawLFixwWPSOXlyHAxX++bCAFMOYlZh2iOzXzHZ/ded4TVUInKnGyL2Hz+BaAAFkgt1fT0Q34N3r2p6XWKn6fsmjuEsLouyZzL9+NS+wQfp951qyQv14Mrn2X54Z2XXM/ZS3p2mUocdgOzo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OmqrPeR3; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1757620205; c=relaxed/simple;
+	bh=g4WhvLB9lsJzHYHWVq2MBXKZDNc+3h2NPKWaH2tBO68=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HolcRb2lQmr61I4m+hhlMVSiiBsWGynwVsMc7dRhLypFWnJuszqpat3BMXgq+Z7XF7yxuYsQHjXZdY69GwtJr3DouWzoeEia2V7UY9dg14tdhkJL8lNrHnwO8PD2VJyOLhHdP+krAM0k5/KOhHv0dElUTBJ4y27c4Wm0RdcvsVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nn7E1wG6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OmqrPeR3"
-Received: from github.com (hubbernetes-node-7a93ea8.va3-iad.github.net [10.48.133.35])
-	by smtp.github.com (Postfix) with ESMTPA id 28A97E0DE2
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 12:49:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1757620186;
-	bh=M84aetAeU3aWC0ymH3+bBRFLK0aCj2K2OX3OmyOotzc=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=OmqrPeR3XjyEXmY+GGm7yY77KCFE0/GuKRdkkYgAHyj7NzC6KgxEJ9U5MSrMatJUJ
-	 8YRA2HiSTfUn8z7l3sTQuCPU6J82fMBbYSK2OYG9BGIEWhd64xUfYdLPmSj8IEeA2G
-	 9GZtU/d1ix9Ngp3DIXdUPlfoM8mDSoOm0OnmSqtQ=
-Date: Thu, 11 Sep 2025 12:49:46 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/441f95-befdac@github.com>
-Subject: [bluez/bluez] a887b1: audio: Add support for specific error codes for
- A2...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nn7E1wG6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3956C4CEF0;
+	Thu, 11 Sep 2025 19:50:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757620204;
+	bh=g4WhvLB9lsJzHYHWVq2MBXKZDNc+3h2NPKWaH2tBO68=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Nn7E1wG6L69MMdaqigX/EXMFNEsMPJmSnX0jHdbbEEzJGF9/cI4ygjCQzU6nf/6Vi
+	 xv09CCHq/7Qt+L4s0mLD36kDpcAUObs+oASsA9G9FdJTyc03AZlou6dlllpmnc+Ipf
+	 3brkivFxJyRI0tGztm9wfLt3WZ8qwSZTCZ/iga9I47rLvbcOlSRsZRyWbc73OA+JYY
+	 1kDIsFqxY5rkhlt5S7W9/flOdKCAi9TYqOf5SKVfxXNm9arjrlphKidHjAU4L6phev
+	 A4K+/f8wWdmbbzK+uwswGPw1aPXfR9fkjCdrIBAtfCBgqRGR48k/yiAJmkFcyv9m3J
+	 Gt0vlsY+9O6mQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B1CB3383BF69;
+	Thu, 11 Sep 2025 19:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 1/2] audio: Add support for specific error codes
+ for
+ A2DP configuration
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175762020750.2297358.16857140842997847569.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Sep 2025 19:50:07 +0000
+References: <20250911151930.1632922-1-pwaago@cisco.com>
+In-Reply-To: <20250911151930.1632922-1-pwaago@cisco.com>
+To: =?utf-8?b?UGVyIFdhYWfDuCA8cHdhYWdvQGNpc2NvLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: a887b1a1b91fcb7fc1ddc052cafe1818230d97db
-      https://github.com/bluez/bluez/commit/a887b1a1b91fcb7fc1ddc052cafe1=
-818230d97db
-  Author: Per Waag=C3=B8 <pwaago@cisco.com>
-  Date:   2025-09-11 (Thu, 11 Sep 2025)
+Hello:
 
-  Changed paths:
-    M profiles/audio/a2dp.c
-    M profiles/audio/a2dp.h
-    M profiles/audio/avdtp.c
-    M profiles/audio/media.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  audio: Add support for specific error codes for A2DP configuration
+On Thu, 11 Sep 2025 17:19:29 +0200 you wrote:
+> The A2DP specification defines error codes that shall be used if
+> the codec capabilities contain improper settings. This change allows
+> clients to trigger the sending of these specific error codes by
+> returning the corresponding error messages from
+> MediaEndpoint1.SetConfiguration.
+> 
+> This update is fully backwards compatible: clients passing other error
+> messages will continue to receive the default error code as before. On
+> older BlueZ versions, these new errors will also result in the default
+> error code, enabling clients to implement support for the new errors
+> without breaking compatibility.
+> 
+> [...]
 
-The A2DP specification defines error codes that shall be used if
-the codec capabilities contain improper settings. This change allows
-clients to trigger the sending of these specific error codes by
-returning the corresponding error messages from
-MediaEndpoint1.SetConfiguration.
+Here is the summary with links:
+  - [BlueZ,v2,1/2] audio: Add support for specific error codes for A2DP configuration
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a887b1a1b91f
+  - [BlueZ,v2,2/2] doc: Document error codes for A2DP MediaEndpoints
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=befdacd236c3
 
-This update is fully backwards compatible: clients passing other error
-messages will continue to receive the default error code as before. On
-older BlueZ versions, these new errors will also result in the default
-error code, enabling clients to implement support for the new errors
-without breaking compatibility.
-
-This change enables passing A2DP/SNK/AVP/* and A2DP/SRC/AVP/*
-qualification tests.
-
-
-  Commit: befdacd236c3a761d766da9f95bd7763cd216425
-      https://github.com/bluez/bluez/commit/befdacd236c3a761d766da9f95bd7=
-763cd216425
-  Author: Per Waag=C3=B8 <pwaago@cisco.com>
-  Date:   2025-09-11 (Thu, 11 Sep 2025)
-
-  Changed paths:
-    M doc/org.bluez.MediaEndpoint.rst
-
-  Log Message:
-  -----------
-  doc: Document error codes for A2DP MediaEndpoints
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/441f95a9c146...befdacd236=
-c3
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
