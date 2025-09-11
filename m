@@ -1,538 +1,212 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A15238166
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 15:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5714352FCD;
+	Thu, 11 Sep 2025 15:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757605946; cv=none; b=BpsxtD8Kd+hcX8BdhVN4sH9gywYLk4HJxWJWLNn8FXrchhafGbRfxM6HZsXT88eWzCYva7uPxLchuzJwQqtPk+JfH3SFLJvGTEi5dLcUwUawAWlMPE7g9Y31z2fwX6dcVXJbrvJu1+OjJJ7tfCr5JdfsKLsOGNl+W4gRh1r5Al4=
+	t=1757606019; cv=none; b=kRlJo7c6sR+LuU75FeYUXWM6l7360GOsD9BH02RQPujIIDofl6MLSRNyxG9w9u/lDu4HLpmmX8Qn2o7qdeBjZUtAAIHJdiS1cxqt19gA7fvU8W35YKlhKZP2lki73a/0ZeDsPQ1ZWDoeIWjb6pameeRlp+BU8h3eiDG5MC/Rq6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757605946; c=relaxed/simple;
-	bh=UzH0eYPwsUYlZSxY/65PT5ULT89b8WwXTmxY273tsJI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qil+xH0hn9utaSykrtDR9YmjM/eSXYL2TBegve5qgvpgzJznjF0dpHljanSXjjxP5LyZWnUhF3fsOdadYYyzuzCTq0WaKdxMFuiid/lq8IZztzPYNUvHDeS+G9GUc83ZqnQ/7NsZwhx4Nf0Ac5GGjS8eQ/G3itbavRlqIa+gJwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bH0h3UwI; arc=none smtp.client-ip=209.85.208.169
+	s=arc-20240116; t=1757606019; c=relaxed/simple;
+	bh=ejic9Ydpl1s5IMxgmzFSXx4gOtoiK+zcM93t1lGVahQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=kOUXz/Pb5oVBeENv5ciVHgvdPWyLoBD6CDAxw0OIw+qxMvRwyLR0uToNueEX2ctT3VAGAlikrrvXd8UZtLApaO/E9emrP6TXKc/HQxkoyQK0KlOMElAghTe9QsA7e/zR6yhIM3nplnfVO5AFb3M8HiOFMg3bzzun7e9YSJE6AGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EAEPN/vA; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bH0h3UwI"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-336b88c5362so8489631fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 08:52:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAEPN/vA"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-723bc91d7bbso7414347b3.3;
+        Thu, 11 Sep 2025 08:53:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757605942; x=1758210742; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CtdROpwVGdhPhIY3ZlJuc2l4ffeTLnne6/qeiEsU5Vo=;
-        b=bH0h3UwIN6LDH6PmTYMYI0ZpCRnrpy812RQL3m6z/WSlY311dPLKdImlmIyRLri46k
-         Ybz4U4UqINKGhfev1NQsuM5GRY1nL4cyTklNLElQP99OeTiJI4yghJ5G9B9pPvoZMGwS
-         cSKIDrg0dhBfIVoU3tHMsEdY/j2UCjzoFNTZEvaVI43eTSHQ4Oso5imbrVunjOgpW7Sm
-         sxyJ60HEc5NGUIATGTebB1oUPDAYKf1n4sMokBmrDA1HCvPJ36P6lUaiWW+iq//QfbZL
-         HmC7zXxgoOv0al6Xx90yiHi2kGrg4T5LABOs7mUkILxtgi4In42NHm+AHIR//MPpiaKn
-         98cg==
+        d=gmail.com; s=20230601; t=1757606016; x=1758210816; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XC8JzkTbSTTeU/T/H/KX2J99FzXAX5f+4Bnm1UuSlfM=;
+        b=EAEPN/vAuCjYC2P7prKZtozK/Ham/uS5NE9L8ebW64xnBuDE5PsoTYertLh9SOvILE
+         DIaUo/lV69mrEdoUCwqIr+wvWFdukPn/PaxnNw+d2cljfkijUZmEG3FoSE5lo76Qc+I7
+         TjqR9Q04hoh++MjmvXR2FUxCqX7Alekf9gtk0ammBXvCKUCcakniy0MFLecKjkSpPLO5
+         sDOvHQhwZeqoZEEjgBLz2/wo6tksR4PV7EZAY5WtftzOVRQ2LarZHEAlfHwvM+zpTFDM
+         +25YoZNEkfbrGcQAQTesQW9hccisDqpAumwuDYfdi9GoMidR4En/EAFTa960B3VCziqU
+         +8vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757605942; x=1758210742;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CtdROpwVGdhPhIY3ZlJuc2l4ffeTLnne6/qeiEsU5Vo=;
-        b=fxouHAocuC6OJTRJhHl8N+LYkdV9jvCFRiRPEApBu3NiKYytm6noCsFlo+gFj3a8H0
-         ZO0Hb8E7I1xjB8wf4PPv1vUboGgnnAi0UPg1+tTljJFDABaHfbeYneGr2sNOR/bdo4rT
-         KqxcQS3SfzlSSXlYifs7SWaGq8b4Qn5kSLSOZyNVS3Kqmb/whlIK4VlaKY06VKDwz27s
-         sJ1dA4r27peHo4NJijAJUfv8KZyBdvRuW6/xwi0/OaL9e9SC4AQdv3p95qaxzqWtPr8F
-         EDb7Q4Ngr9E4X8hXtWB2nmQyXDE70mv51sq9IJ/lMHoNb5D0AsVNNYpRr2peWB075UVI
-         mf2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX0HJ/V/M12QWUX8YM5nlZBRrqGeNFJHJq6fshDbT1a89VQB6NVMrVrUUZN6BjoXiS9DSnj819jPxrzOZHA/UI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8t8sKw+IG8nihrd4OEbjnXBI2XJoZgNK9I3f35O9naIMMi0Qg
-	Qgoe/ufe8X3TR73gIS9KoX77BF1scRHbCGoPu1hiHM0yQKmNR0rnk9gYwOW8bX/TEda4R+32US0
-	vnmAts6bIhvG+Or17ijTOufgQO2C0WSo=
-X-Gm-Gg: ASbGnctLltnKLiuvsdKlVf4hcl9/Zmod3BQbkcLXMtJclExUbL6QZpgylDCTZRzq4Lp
-	GTE3Gb6y+jX5riiTxBnoYlZK9OJzXtk4nUVErgQt7sH2xqdnoHnmqHlFbIDEpmk9foF4aCSeOiw
-	KnlPwyGwn1W0uxOZVpfjyY5D0tZsM+9ZIkzE+I7jCrm816q2zV7RXa3TKp5PjZdGTduaO/eqqNO
-	KkkwGvPSqvRSGOk8SUtud6quwZ9/jkDMtOMLXVv7+UR0Q==
-X-Google-Smtp-Source: AGHT+IGrN/8EMGOTxERB/bPazYY6mlndAYQhg99/jbJ5ZeybUgWCbwqkUcP8nib4/oXNcbf5J+ILw6Ls+TnN4AAdrak=
-X-Received: by 2002:a2e:b8c1:0:b0:332:3fd0:15fb with SMTP id
- 38308e7fff4ca-33b47e182fbmr53571971fa.0.1757605942018; Thu, 11 Sep 2025
- 08:52:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757606016; x=1758210816;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XC8JzkTbSTTeU/T/H/KX2J99FzXAX5f+4Bnm1UuSlfM=;
+        b=pqoMHMRD4ckMNnaPcp2DCZX7DvpYLv5JAPnB5V8TjCutO9hao/GBYU4eK9E+P7+4fV
+         dygllE06J/HAHgErv5my1NshJ5ieIMdGrGbZRGa8OivgJLfqXmQuh7mSBAXZ/aZP4TIm
+         8Y1zbH+/dPMyIyTqcgy7aOpn22yQuu7c8owhYVEI4Dk43Z4LG6776vEG12Ip9ka34IFu
+         EXxwRF6kLS/rmJRlOnOvov5m6Jjtb4sXzG+G+Sl9zE3oSuUXNttyXuQoFm5jb/u5GxJN
+         bko/fFREZyPsiw+5i/4QEPXfuM6AuB2wOyA11OQN7oxwmKoJeW3Ex0AfdM6saWPjqdH3
+         Yvvg==
+X-Forwarded-Encrypted: i=1; AJvYcCWrEGEyX2dK+w1k0gu3fSGKuIhHu8E7sQZSPGAgF8IZQCoShLsgF0w2JyacjD3ttExpuR8jHGISC+PgGOiEK/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxS0KiPosoroMNqsZ5RkOFnxHHA42d2XlAqz+BMc7uIVg7me/wJ
+	yKedLE9v3LVoLCN4zXQZJcjd9lCHy8ecLYgrXMv8XHJe9WzlbT9If4g+YpnfjuTUxGpYqB+jrV6
+	oVJNzSQEQz1LJgJAAXQRbj1wAIbEq/grHXN3c0cA=
+X-Gm-Gg: ASbGncvvBX0vVY/FRmh/p8dlGADmjIegxxK2I6MXCGCXbQRbkq+s+WUMUkUgf71ePOe
+	JXbODeXpWxrZHyRZln+B9RjLIwFIbvP+FriXQ3Qt6IuX+I1De/VAZl9c5CCBanBzz/kjgeWLx8B
+	nwz0LjxIog4IRKic6rbOpjcZQOaRUgcX71PBve3kY+FpkyCnjOzIh1JoNAnctieVbTTQEX5BQSf
+	qIK17TGKPKTH/d3
+X-Google-Smtp-Source: AGHT+IHyJ401KlRoqnSKNwW3P85G3S4uk5dfmuqVQZWgvq7RFgnXBcf8Ob5//SNxMjw4AhITN4kpBDfS93WYccV+Z7c=
+X-Received: by 2002:a05:690c:3392:b0:71f:ede3:fc40 with SMTP id
+ 00721157ae682-727f534c72dmr162088207b3.40.1757606016240; Thu, 11 Sep 2025
+ 08:53:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911135301.1538126-1-pwaago@cisco.com> <CABBYNZLBJ_Q6S+OGam-Q92Agbe0HK5dX4WxFrFpnntcDhu1gow@mail.gmail.com>
- <PH0PR11MB5596318A1EFBC5DF72C41D5CCF09A@PH0PR11MB5596.namprd11.prod.outlook.com>
-In-Reply-To: <PH0PR11MB5596318A1EFBC5DF72C41D5CCF09A@PH0PR11MB5596.namprd11.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 11 Sep 2025 11:52:09 -0400
-X-Gm-Features: Ac12FXxjGOW2832pzr-ahvyuX9_nKNbF1uENCsGjYEUpwee7X75HpSF3Xm2HL2w
-Message-ID: <CABBYNZ+==BYte8=C5jLwDrMs-GJkvOOxAXRMPO2Zv=2zxk8C2Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] audio: Add support for specific error codes for
- A2DP configuration
-To: "Per Waago (pwaago)" <pwaago@cisco.com>
-Cc: Pauli Virtanen <pav@iki.fi>, 
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: cen zhang <zzzccc427@gmail.com>
+Date: Thu, 11 Sep 2025 23:53:22 +0800
+X-Gm-Features: Ac12FXwwTCx1WdZ3n6mj5YIOSrHpP2qnz1AmFSQnSzVgUCDGoDI59rurvBNEkpQ
+Message-ID: <CAFRLqsWnWnDaY2a23HctbxLKquvw7Ax30YB-tdBmS59RtQ4JBw@mail.gmail.com>
+Subject: [BUG]: slab-use-after-free Write in sco_conn_put
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, johan.hedberg@gmail.com, marcel@holtmann.org
+Cc: linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, 
+	zhenghaoran154@gmail.com, r33s3n6@gmail.com, linux-bluetooth@vger.kernel.org, 
+	"gality369@gmail.com" <gality369@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Per,
+Hello maintainers,
 
-On Thu, Sep 11, 2025 at 11:12=E2=80=AFAM Per Waago (pwaago) <pwaago@cisco.c=
-om> wrote:
->
-> Hi Luiz, thanks for reviewing.
->
-> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > Sent: Thursday, September 11, 2025 16:43
-> > To: Per Waago (pwaago); Pauli Virtanen
-> > Cc: linux-bluetooth@vger.kernel.org
-> > Subject: Re: [PATCH BlueZ] audio: Add support for specific error codes =
-for A2DP configuration
-> >
-> > Hi Per,
-> >
-> > On Thu, Sep 11, 2025 at 9:56=E2=80=AFAM Per Waag=C3=B8 <pwaago@cisco.co=
-m> wrote:
-> > >
-> > > The A2DP specification defines error codes that shall be used if
-> > > the codec capabilities contain improper settings. This change allows
-> > > clients to trigger the sending of these specific error codes by
-> > > returning the corresponding error messages from
-> > > MediaEndpoint1.SetConfiguration.
-> > >
-> > > This update is fully backwards compatible: clients passing other erro=
-r
-> > > messages will continue to receive the default error code as before. O=
-n
-> > > older BlueZ versions, these new errors will also result in the defaul=
-t
-> > > error code, enabling clients to implement support for the new errors
-> > > without breaking compatibility.
-> >
-> > While I can see the value for debugging I doubt we could do any
-> > handling of these errors, so the result would be the same regardless
-> > of what error is sent back it is not recoverable.
-> >
->
-> The main motivation for adding them is to be able to pass the
-> mandatory qualification tests, which now checks the errors codes
-> returned from SetConfiguration in detail. I don't think they are very
-> useful otherwise.
->
-> The errors are specified in table 5.5 in the A2DP spec:
-> https://www.bluetooth.com/specifications/specs/html/?src=3Da2dp_v1-4-1_17=
-52513648/A2DP_v1.4.1/out/en/index-en.html#UUID-0ba19ee9-7277-1068-d2dc-b9e6=
-38cca568_Table_5.5
->
-> I included all of them for completeness. In that table, it is also stated
-> which codecs they apply to. Some are SBC-specific, some apply to all code=
-cs or
-> other codecs.
+I would like to report  a use-after-free (UAF) vulnerability
+identified in the Bluetooth SCO (Synchronous Connection
+Oriented) connection handling code using
+our customized syzkaller on 6.17.0-rc5.
+The bug occurs due to concurrent access to freed
+sco_conn structures during connection failure scenarios.
 
-Ok this is very annoying if PTS suddenly adds a new test case that
-checks error codes that otherwise are only useful for debugging. I'd
-say that it probably needs a configuration entry to skip these tests,
-btw this seems to be introduced in 1.4.1:
+After my superficial analysis, the situation when race occurs may be as follows:
 
-https://www.bluetooth.com/specifications/specs/html/?src=3Da2dp_v1-4-1_1752=
-513648/A2DP_v1.4.1/out/en/index-en.html#UUID-05a1c924-2070-eb38-c2cc-a9ffa1=
-78bdb9
+CONCURRENT CLEANUP PATHS:
+   - Path A: Socket close operation (Task 31374) triggers sco_sock_release()
+   - Path B: HCI connection failure triggers hci_abort_conn_sync() in
+workqueue (Task 352)
 
-BlueZ SDP record is still 1.4 (a2dp_ver =3D 0x0104), it seems 1.4.1 is
-an errata only change but that introduces new error codes which is
-really intrusive to say the least.
+RACE CONDITION SEQUENCE:
+   a) Task 31374 releases socket, eventually leading to sco_conn_free()
+   b) sco_conn_free() sets hcon->sco_data = NULL and calls kfree(conn)
+   c) Task 352 (workqueue) executes hci_conn_failed() -> sco_connect_cfm()
+   d) sco_connect_cfm() calls sco_conn_del(hcon, bt_to_errno(status))
+   e) sco_conn_del() attempts to access already-freed sco_conn via
+hcon->sco_data
 
-> > @Pauli Virtanen Perhaps you can give some feedback regarding these
-> > codes, would pipewire be interested in generating specific error
-> > codes? Some of them seems to be SBC specific like bitpool.
-> >
-> > > This change enables passing A2DP/SNK/AVP/* and A2DP/SRC/AVP/*
-> > > qualification tests.
-> > > ---
-> > >  doc/org.bluez.MediaEndpoint.rst | 37 ++++++++++++++++
-> > >  profiles/audio/a2dp.c           | 78 ++++++++++++++++++++++++++++++-=
---
-> > >  profiles/audio/a2dp.h           |  5 ++-
-> > >  profiles/audio/avdtp.c          |  4 +-
-> > >  profiles/audio/media.c          | 20 +++++----
-> > >  src/error.h                     | 38 ++++++++++++++++
-> > >  6 files changed, 165 insertions(+), 17 deletions(-)
-> > >
-> > > diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEnd=
-point.rst
-> > > index 474cc1160..2721d473e 100644
-> > > --- a/doc/org.bluez.MediaEndpoint.rst
-> > > +++ b/doc/org.bluez.MediaEndpoint.rst
-> > > @@ -54,6 +54,43 @@ be configured and the properties must contain the =
-following properties:
-> > >
-> > >         See **org.bluez.MediaTransport(5)** QoS property.
-> > >
-> > > +       Possible errors:
-> > > +               :org.bluez.Error.A2DP.InvalidCodecType:
-> > > +               :org.bluez.Error.A2DP.NotSupportedCodecType:
-> > > +               :org.bluez.Error.A2DP.InvalidSamplingFrequency:
-> > > +               :org.bluez.Error.A2DP.NotSupportedSamplingFrequency:
-> > > +               :org.bluez.Error.A2DP.InvalidChannelMode:
-> > > +               :org.bluez.Error.A2DP.NotSupportedChannelMode:
-> > > +               :org.bluez.Error.A2DP.InvalidSubbands:
-> > > +               :org.bluez.Error.A2DP.NotSupportedSubbands:
-> > > +               :org.bluez.Error.A2DP.InvalidAllocationMethod:
-> > > +               :org.bluez.Error.A2DP.NotSupportedAllocationMethod:
-> > > +               :org.bluez.Error.A2DP.InvalidMinimumBitpoolValue:
-> > > +               :org.bluez.Error.A2DP.NotSupportedMinimumBitpoolValue=
-:
-> > > +               :org.bluez.Error.A2DP.InvalidMaximumBitpoolValue:
-> > > +               :org.bluez.Error.A2DP.NotSupportedMaximumBitpoolValue=
-:
-> > > +               :org.bluez.Error.A2DP.InvalidInvalidLayer:
-> > > +               :org.bluez.Error.A2DP.NotSupportedLayer:
-> > > +               :org.bluez.Error.A2DP.NotSupporterdCRC:
-> > > +               :org.bluez.Error.A2DP.NotSupporterdMPF:
-> > > +               :org.bluez.Error.A2DP.NotSupporterdVBR:
-> > > +               :org.bluez.Error.A2DP.InvalidBitRate:
-> > > +               :org.bluez.Error.A2DP.NotSupportedBitRate:
-> > > +               :org.bluez.Error.A2DP.InvalidObjectType:
-> > > +               :org.bluez.Error.A2DP.NotSupportedObjectType:
-> > > +               :org.bluez.Error.A2DP.InvalidChannels:
-> > > +               :org.bluez.Error.A2DP.NotSupportedChannels:
-> > > +               :org.bluez.Error.A2DP.InvalidVersion:
-> > > +               :org.bluez.Error.A2DP.NotSupportedVersion:
-> > > +               :org.bluez.Error.A2DP.NotSupportedMaximumSUL:
-> > > +               :org.bluez.Error.A2DP.InvalidBlockLength:
-> > > +               :org.bluez.Error.A2DP.InvalidCPType:
-> > > +               :org.bluez.Error.A2DP.InvalidCPFormat:
-> > > +               :org.bluez.Error.A2DP.InvalidCodecParameter:
-> > > +               :org.bluez.Error.A2DP.NotSupportedCodecParameter:
-> > > +               :org.bluez.Error.A2DP.InvalidDRC:
-> > > +               :org.bluez.Error.A2DP.NotSupportedDRC:
-> >
-> > Introducing a error domain for A2DP is probably a good idea, but this
-> > only applies to endpoints that are A2DP specific, so this need to be
-> > adjusted to e.g.: possible for A2DP or something like that, also I
-> > don't know how the client would be able to tell it can return these
-> > errors? Or the expectation is that the client can start sending them
-> > immediately since the old behavior will convert them to
-> > AVDTP_UNSUPPORTED_CONFIGURATION anyway?
-> >
->
-> That was what I thought. The clients can just start sending these, and
-> they will be converted to the correct error code if bluez supports it
-> or to AVDTP_UNSUPPORTED_CONFIGURATION otherwise.
->
-> > While at it split the commit to have the documentation changes as a
-> > separate change.
->
-> Will adjust text and split into a separate commit.
->
-> >
-> > >  array{byte} SelectConfiguration(array{byte} capabilities)
-> > >  `````````````````````````````````````````````````````````
-> > >
-> > > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> > > index c0a53eae9..661843a89 100644
-> > > --- a/profiles/audio/a2dp.c
-> > > +++ b/profiles/audio/a2dp.c
-> > > @@ -157,6 +157,73 @@ static GSList *servers =3D NULL;
-> > >  static GSList *setups =3D NULL;
-> > >  static unsigned int cb_id =3D 0;
-> > >
-> > > +struct a2dp_error {
-> > > +       const char *error_name;
-> > > +       uint8_t error_code;
-> > > +};
-> > > +
-> > > +#define A2DP_ERROR_PREFIX ERROR_INTERFACE ".A2DP."
-> > > +
-> > > +static struct a2dp_error config_errors[] =3D {
-> > > +       {"InvalidCodecType", A2DP_INVALID_CODEC_TYPE},
-> > > +       {"NotSupportedCodecType", A2DP_NOT_SUPPORTED_CODEC_TYPE},
-> > > +       {"InvalidSamplingFrequency", A2DP_INVALID_SAMPLING_FREQUENCY}=
-,
-> > > +       {"NotSupportedSamplingFrequency",
-> > > +                               A2DP_NOT_SUPPORTED_SAMPLING_FREQUENCY=
-},
-> > > +       {"InvalidChannelMode", A2DP_INVALID_CHANNEL_MODE},
-> > > +       {"NotSupportedChannelMode", A2DP_NOT_SUPPORTED_CHANNEL_MODE},
-> > > +       {"InvalidSubbands", A2DP_INVALID_SUBBANDS},
-> > > +       {"NotSupportedSubbands", A2DP_NOT_SUPPORTED_SUBBANDS},
-> > > +       {"InvalidAllocationMethod", A2DP_INVALID_ALLOCATION_METHOD},
-> > > +       {"NotSupportedAllocationMethod", A2DP_NOT_SUPPORTED_ALLOCATIO=
-N_METHOD},
-> > > +       {"InvalidMinimumBitpoolValue",
-> > > +                               A2DP_INVALID_MINIMUM_BITPOOL_VALUE},
-> > > +       {"NotSupportedMinimumBitpoolValue",
-> > > +                               A2DP_NOT_SUPPORTED_MINIMUM_BITPOOL_VA=
-LUE},
-> > > +       {"InvalidMaximumBitpoolValue", A2DP_INVALID_MAXIMUM_BITPOOL_V=
-ALUE},
-> > > +       {"NotSupportedMaximumBitpoolValue",
-> > > +                               A2DP_NOT_SUPPORTED_MAXIMUM_BITPOOL_VA=
-LUE},
-> > > +       {"InvalidInvalidLayer", A2DP_INVALID_INVALID_LAYER},
-> > > +       {"NotSupportedLayer", A2DP_NOT_SUPPORTED_LAYER},
-> > > +       {"NotSupporterdCRC", A2DP_NOT_SUPPORTERD_CRC},
-> > > +       {"NotSupporterdMPF", A2DP_NOT_SUPPORTERD_MPF},
-> > > +       {"NotSupporterdVBR", A2DP_NOT_SUPPORTERD_VBR},
-> > > +       {"InvalidBitRate", A2DP_INVALID_BIT_RATE},
-> > > +       {"NotSupportedBitRate", A2DP_NOT_SUPPORTED_BIT_RATE},
-> > > +       {"InvalidObjectType", A2DP_INVALID_OBJECT_TYPE},
-> > > +       {"NotSupportedObjectType", A2DP_NOT_SUPPORTED_OBJECT_TYPE},
-> > > +       {"InvalidChannels", A2DP_INVALID_CHANNELS},
-> > > +       {"NotSupportedChannels", A2DP_NOT_SUPPORTED_CHANNELS},
-> > > +       {"InvalidVersion", A2DP_INVALID_VERSION},
-> > > +       {"NotSupportedVersion", A2DP_NOT_SUPPORTED_VERSION},
-> > > +       {"NotSupportedMaximumSUL", A2DP_NOT_SUPPORTED_MAXIMUM_SUL},
-> > > +       {"InvalidBlockLength", A2DP_INVALID_BLOCK_LENGTH},
-> > > +       {"InvalidCPType", A2DP_INVALID_CP_TYPE},
-> > > +       {"InvalidCPFormat", A2DP_INVALID_CP_FORMAT},
-> > > +       {"InvalidCodecParameter", A2DP_INVALID_CODEC_PARAMETER},
-> > > +       {"NotSupportedCodecParameter", A2DP_NOT_SUPPORTED_CODEC_PARAM=
-ETER},
-> > > +       {"InvalidDRC", A2DP_INVALID_DRC},
-> > > +       {"NotSupportedDRC", A2DP_NOT_SUPPORTED_DRC}
-> > > +};
-> > > +
-> > > +uint8_t a2dp_parse_config_error(const char *error_name)
-> > > +{
-> > > +       size_t prefix_length;
-> > > +       size_t i;
-> > > +
-> > > +       prefix_length =3D strlen(A2DP_ERROR_PREFIX);
-> > > +       if (strncmp(A2DP_ERROR_PREFIX, error_name, prefix_length))
-> > > +               return AVDTP_UNSUPPORTED_CONFIGURATION;
-> > > +
-> > > +       error_name +=3D prefix_length;
-> > > +       for (i =3D 0; i < ARRAY_SIZE(config_errors); i++) {
-> > > +               if (strcmp(config_errors[i].error_name, error_name) =
-=3D=3D 0)
-> > > +                       return config_errors[i].error_code;
-> > > +       }
-> > > +
-> > > +       return AVDTP_UNSUPPORTED_CONFIGURATION;
-> > > +}
-> > > +
-> > >  static struct a2dp_setup *setup_ref(struct a2dp_setup *setup)
-> > >  {
-> > >         setup->ref++;
-> > > @@ -688,11 +755,10 @@ done:
-> > >         return FALSE;
-> > >  }
-> > >
-> > > -static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean r=
-et)
-> > > +static void endpoint_setconf_cb(struct a2dp_setup *setup, uint8_t er=
-ror_code)
-> > >  {
-> > > -       if (ret =3D=3D FALSE)
-> > > -               setup_error_init(setup, AVDTP_MEDIA_CODEC,
-> > > -                                       AVDTP_UNSUPPORTED_CONFIGURATI=
-ON);
-> > > +       if (error_code !=3D 0)
-> > > +               setup_error_init(setup, AVDTP_MEDIA_CODEC, error_code=
-);
-> > >
-> > >         auto_config(setup);
-> > >         setup_unref(setup);
-> > > @@ -865,11 +931,11 @@ static gboolean endpoint_getcap_ind(struct avdt=
-p *session,
-> > >         return TRUE;
-> > >  }
-> > >
-> > > -static void endpoint_open_cb(struct a2dp_setup *setup, gboolean ret)
-> > > +static void endpoint_open_cb(struct a2dp_setup *setup, uint8_t error=
-_code)
-> > >  {
-> > >         int err =3D error_to_errno(setup->err);
-> > >
-> > > -       if (ret =3D=3D FALSE) {
-> > > +       if (error_code !=3D 0) {
-> > >                 setup->stream =3D NULL;
-> > >                 finalize_setup_errno(setup, -EPERM, finalize_config, =
-NULL);
-> > >                 goto done;
-> > > diff --git a/profiles/audio/a2dp.h b/profiles/audio/a2dp.h
-> > > index c698bc983..afa02c12d 100644
-> > > --- a/profiles/audio/a2dp.h
-> > > +++ b/profiles/audio/a2dp.h
-> > > @@ -15,7 +15,8 @@ struct a2dp_setup;
-> > >
-> > >  typedef void (*a2dp_endpoint_select_t) (struct a2dp_setup *setup, vo=
-id *ret,
-> > >                                         int size);
-> > > -typedef void (*a2dp_endpoint_config_t) (struct a2dp_setup *setup, gb=
-oolean ret);
-> > > +typedef void (*a2dp_endpoint_config_t) (struct a2dp_setup *setup,
-> > > +                                       uint8_t error_code);
-> > >
-> > >  struct a2dp_endpoint {
-> > >         const char *(*get_name) (struct a2dp_sep *sep, void *user_dat=
-a);
-> > > @@ -70,6 +71,8 @@ unsigned int a2dp_select_capabilities(struct avdtp =
-*session,
-> > >  unsigned int a2dp_config(struct avdtp *session, struct a2dp_sep *sep=
-,
-> > >                                 a2dp_config_cb_t cb, GSList *caps,
-> > >                                 void *user_data);
-> > > +uint8_t a2dp_parse_config_error(const char *error_name);
-> > > +
-> > >  unsigned int a2dp_resume(struct avdtp *session, struct a2dp_sep *sep=
-,
-> > >                                 a2dp_stream_cb_t cb, void *user_data)=
-;
-> > >  unsigned int a2dp_suspend(struct avdtp *session, struct a2dp_sep *se=
-p,
-> > > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> > > index 30648251f..ed4e22b26 100644
-> > > --- a/profiles/audio/avdtp.c
-> > > +++ b/profiles/audio/avdtp.c
-> > > @@ -1494,8 +1494,8 @@ static void setconf_cb(struct avdtp *session, s=
-truct avdtp_stream *stream,
-> > >         struct conf_rej rej;
-> > >
-> > >         if (err !=3D NULL) {
-> > > -               rej.error =3D AVDTP_UNSUPPORTED_CONFIGURATION;
-> > > -               rej.category =3D err->err.error_code;
-> > > +               rej.error =3D err->err.error_code;
-> > > +               rej.category =3D AVDTP_UNSUPPORTED_CONFIGURATION;
-> > >                 avdtp_send(session, session->in_cmd.transaction,
-> > >                            AVDTP_MSG_TYPE_REJECT, AVDTP_SET_CONFIGURA=
-TION,
-> > >                            &rej, sizeof(rej));
-> > > diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> > > index 9b3042c18..332f643bb 100644
-> > > --- a/profiles/audio/media.c
-> > > +++ b/profiles/audio/media.c
-> > > @@ -333,7 +333,7 @@ static void endpoint_reply(DBusPendingCall *call,=
- void *user_data)
-> > >         DBusMessage *reply;
-> > >         DBusMessageIter args, props;
-> > >         DBusError err;
-> > > -       gboolean value;
-> > > +       uint8_t error_code;
-> > >         void *ret =3D NULL;
-> > >         int size =3D -1;
-> > >
-> > > @@ -356,8 +356,12 @@ static void endpoint_reply(DBusPendingCall *call=
-, void *user_data)
-> > >
-> > >                 if (dbus_message_is_method_call(request->msg,
-> > >                                         MEDIA_ENDPOINT_INTERFACE,
-> > > -                                       "SetConfiguration"))
-> > > +                                       "SetConfiguration")) {
-> > >                         endpoint_remove_transport(endpoint, request->=
-transport);
-> > > +                       error_code =3D a2dp_parse_config_error(err.na=
-me);
-> > > +                       ret =3D &error_code;
-> > > +                       size =3D 1;
-> > > +               }
-> > >
-> > >                 dbus_error_free(&err);
-> > >                 goto done;
-> > > @@ -390,8 +394,8 @@ static void endpoint_reply(DBusPendingCall *call,=
- void *user_data)
-> > >         }
-> > >
-> > >         size =3D 1;
-> > > -       value =3D TRUE;
-> > > -       ret =3D &value;
-> > > +       error_code =3D 0;
-> > > +       ret =3D &error_code;
-> > >
-> > >  done:
-> > >         dbus_message_unref(reply);
-> > > @@ -634,9 +638,9 @@ static void config_cb(struct media_endpoint *endp=
-oint, void *ret, int size,
-> > >                                                         void *user_da=
-ta)
-> > >  {
-> > >         struct a2dp_config_data *data =3D user_data;
-> > > -       gboolean *ret_value =3D ret;
-> > > +       uint8_t *ret_value =3D ret;
-> > >
-> > > -       data->cb(data->setup, ret_value ? *ret_value : FALSE);
-> > > +       data->cb(data->setup, ret_value ? *ret_value : 1);
-> > >  }
-> > >
-> > >  static int set_config(struct a2dp_sep *sep, uint8_t *configuration,
-> > > @@ -1098,7 +1102,7 @@ static void pac_config_cb(struct media_endpoint=
- *endpoint, void *ret, int size,
-> > >                                                         void *user_da=
-ta)
-> > >  {
-> > >         struct pac_config_data *data =3D user_data;
-> > > -       gboolean *ret_value =3D ret;
-> > > +       uint8_t *error_code =3D ret;
-> > >         struct media_transport *transport;
-> > >
-> > >         /* If transport was cleared, configuration was cancelled */
-> > > @@ -1106,7 +1110,7 @@ static void pac_config_cb(struct media_endpoint=
- *endpoint, void *ret, int size,
-> > >         if (!transport)
-> > >                 return;
-> > >
-> > > -       data->cb(data->stream, ret_value ? 0 : -EINVAL);
-> > > +       data->cb(data->stream, error_code =3D=3D 0 ? 0 : -EINVAL);
-> > >  }
-> > >
-> > >  static struct media_transport *pac_ucast_config(struct bt_bap_stream=
- *stream,
-> > > diff --git a/src/error.h b/src/error.h
-> > > index 47602d39b..8157795c2 100644
-> > > --- a/src/error.h
-> > > +++ b/src/error.h
-> > > @@ -88,3 +88,41 @@ DBusMessage *btd_error_profile_unavailable(DBusMes=
-sage *msg);
-> > >  DBusMessage *btd_error_failed(DBusMessage *msg, const char *str);
-> > >  DBusMessage *btd_error_bredr_errno(DBusMessage *msg, int err);
-> > >  DBusMessage *btd_error_le_errno(DBusMessage *msg, int err);
-> > > +
-> > > +enum a2dp_error_codes : uint8_t {
-> > > +       A2DP_INVALID_CODEC_TYPE =3D 0xc1,
-> > > +       A2DP_NOT_SUPPORTED_CODEC_TYPE =3D 0xc2,
-> > > +       A2DP_INVALID_SAMPLING_FREQUENCY =3D 0xc3,
-> > > +       A2DP_NOT_SUPPORTED_SAMPLING_FREQUENCY =3D 0xc4,
-> > > +       A2DP_INVALID_CHANNEL_MODE =3D 0xc5,
-> > > +       A2DP_NOT_SUPPORTED_CHANNEL_MODE =3D 0xc6,
-> > > +       A2DP_INVALID_SUBBANDS =3D 0xc7,
-> > > +       A2DP_NOT_SUPPORTED_SUBBANDS =3D 0xc8,
-> > > +       A2DP_INVALID_ALLOCATION_METHOD =3D 0xc9,
-> > > +       A2DP_NOT_SUPPORTED_ALLOCATION_METHOD =3D 0xca,
-> > > +       A2DP_INVALID_MINIMUM_BITPOOL_VALUE =3D 0xcb,
-> > > +       A2DP_NOT_SUPPORTED_MINIMUM_BITPOOL_VALUE =3D 0xcc,
-> > > +       A2DP_INVALID_MAXIMUM_BITPOOL_VALUE =3D 0xcd,
-> > > +       A2DP_NOT_SUPPORTED_MAXIMUM_BITPOOL_VALUE =3D 0xce,
-> > > +       A2DP_INVALID_INVALID_LAYER =3D 0xcf,
-> > > +       A2DP_NOT_SUPPORTED_LAYER =3D 0xd0,
-> > > +       A2DP_NOT_SUPPORTERD_CRC =3D 0xd1,
-> > > +       A2DP_NOT_SUPPORTERD_MPF =3D 0xd2,
-> > > +       A2DP_NOT_SUPPORTERD_VBR =3D 0xd3,
-> > > +       A2DP_INVALID_BIT_RATE =3D 0xd4,
-> > > +       A2DP_NOT_SUPPORTED_BIT_RATE =3D 0xd5,
-> > > +       A2DP_INVALID_OBJECT_TYPE =3D 0xd6,
-> > > +       A2DP_NOT_SUPPORTED_OBJECT_TYPE =3D 0xd7,
-> > > +       A2DP_INVALID_CHANNELS =3D 0xd8,
-> > > +       A2DP_NOT_SUPPORTED_CHANNELS =3D 0xd9,
-> > > +       A2DP_INVALID_VERSION =3D 0xda,
-> > > +       A2DP_NOT_SUPPORTED_VERSION =3D 0xdb,
-> > > +       A2DP_NOT_SUPPORTED_MAXIMUM_SUL =3D 0xdc,
-> > > +       A2DP_INVALID_BLOCK_LENGTH =3D 0xdd,
-> > > +       A2DP_INVALID_CP_TYPE =3D 0xe0,
-> > > +       A2DP_INVALID_CP_FORMAT =3D 0xe1,
-> > > +       A2DP_INVALID_CODEC_PARAMETER =3D 0xe2,
-> > > +       A2DP_NOT_SUPPORTED_CODEC_PARAMETER =3D 0xe3,
-> > > +       A2DP_INVALID_DRC =3D 0xe4,
-> > > +       A2DP_NOT_SUPPORTED_DRC =3D 0xe5,
-> > > +};
-> >
-> > Hmm, I guess there should be part of a2dp.h since this error header is
-> > about D-Bus not A2DP codes.
-> >
->
-> Ok, will move them to a2dp.h
->
+The detail KASAN report as follow:
+==================================================================
+BUG: KASAN: slab-use-after-free in sco_conn_free net/bluetooth/sco.c:87 [inline]
+BUG: KASAN: slab-use-after-free in kref_put include/linux/kref.h:65 [inline]
+BUG: KASAN: slab-use-after-free in sco_conn_put+0xdd/0x410
+net/bluetooth/sco.c:107
+Write of size 8 at addr ffff88811cb96b50 by task kworker/u17:4/352
 
+CPU: 1 UID: 0 PID: 352 Comm: kworker/u17:4 Not tainted
+6.17.0-rc5-g717368f83676 #4 PREEMPT(voluntary)
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: hci13 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x10b/0x170 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0x191/0x550 mm/kasan/report.c:482
+ kasan_report+0xc4/0x100 mm/kasan/report.c:595
+ sco_conn_free net/bluetooth/sco.c:87 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ sco_conn_put+0xdd/0x410 net/bluetooth/sco.c:107
+ sco_connect_cfm+0xb4/0xae0 net/bluetooth/sco.c:1441
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2082 [inline]
+ hci_conn_failed+0x20a/0x2e0 net/bluetooth/hci_conn.c:1313
+ hci_conn_unlink+0x55f/0x810 net/bluetooth/hci_conn.c:1121
+ hci_conn_del+0xb6/0x1110 net/bluetooth/hci_conn.c:1147
+ hci_abort_conn_sync+0x8c5/0xbb0 net/bluetooth/hci_sync.c:5689
+ hci_cmd_sync_work+0x281/0x380 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0x77e/0x1040 kernel/workqueue.c:3319
+ worker_thread+0xbee/0x1200 kernel/workqueue.c:3400
+ kthread+0x3c7/0x870 kernel/kthread.c:463
+ ret_from_fork+0x13a/0x1e0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
---=20
-Luiz Augusto von Dentz
+Allocated by task 31370:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x30/0x70 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:388 [inline]
+ __kasan_kmalloc+0x82/0x90 mm/kasan/common.c:405
+ kasan_kmalloc include/linux/kasan.h:260 [inline]
+ __do_kmalloc_node mm/slub.c:4382 [inline]
+ __kmalloc_noprof+0x22f/0x390 mm/slub.c:4394
+ kmalloc_noprof include/linux/slab.h:909 [inline]
+ sk_prot_alloc+0xae/0x220 net/core/sock.c:2239
+ sk_alloc+0x34/0x5a0 net/core/sock.c:2295
+ bt_sock_alloc+0x3c/0x330 net/bluetooth/af_bluetooth.c:151
+ sco_sock_alloc net/bluetooth/sco.c:562 [inline]
+ sco_sock_create+0xc0/0x350 net/bluetooth/sco.c:593
+ bt_sock_create+0x161/0x3b0 net/bluetooth/af_bluetooth.c:135
+ __sock_create+0x3ad/0x780 net/socket.c:1589
+ sock_create net/socket.c:1647 [inline]
+ __sys_socket_create net/socket.c:1684 [inline]
+ __sys_socket+0xd5/0x330 net/socket.c:1731
+ __do_sys_socket net/socket.c:1745 [inline]
+ __se_sys_socket net/socket.c:1743 [inline]
+ __x64_sys_socket+0x7a/0x90 net/socket.c:1743
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc7/0x240 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 31374:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x30/0x70 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:576
+ poison_slab_object mm/kasan/common.c:243 [inline]
+ __kasan_slab_free+0x3d/0x50 mm/kasan/common.c:275
+ kasan_slab_free include/linux/kasan.h:233 [inline]
+ slab_free_hook mm/slub.c:2428 [inline]
+ slab_free mm/slub.c:4701 [inline]
+ kfree+0x199/0x3b0 mm/slub.c:4900
+ sk_prot_free net/core/sock.c:2278 [inline]
+ __sk_destruct+0x4aa/0x630 net/core/sock.c:2373
+ sco_sock_release+0x2ad/0x300 net/bluetooth/sco.c:1333
+ __sock_release net/socket.c:649 [inline]
+ sock_close+0xb8/0x230 net/socket.c:1439
+ __fput+0x3d1/0x9e0 fs/file_table.c:468
+ task_work_run+0x206/0x2a0 kernel/task_work.c:227
+ get_signal+0x1201/0x1410 kernel/signal.c:2807
+ arch_do_signal_or_restart+0x34/0x740 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop+0x68/0xc0 kernel/entry/common.c:40
+ exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
+ syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
+ do_syscall_64+0x1dd/0x240 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff88811cb96800
+ which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 848 bytes inside of
+ freed 1024-byte region [ffff88811cb96800, ffff88811cb96c00)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x11cb90
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x200000000000040(head|node=0|zone=2)
+page_type: f5(slab)
+raw: 0200000000000040 ffff888100042dc0 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
+head: 0200000000000040 ffff888100042dc0 dead000000000122 0000000000000000
+head: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
+head: 0200000000000003 ffffea000472e401 00000000ffffffff 00000000ffffffff
+head: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff88811cb96a00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88811cb96a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88811cb96b00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                 ^
+ ffff88811cb96b80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88811cb96c00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+Best regards,
+Cen Zhang
