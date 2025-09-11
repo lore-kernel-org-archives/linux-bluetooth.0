@@ -1,128 +1,178 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759E57D07D;
-	Thu, 11 Sep 2025 06:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0004E2580E4
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 10:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757570877; cv=none; b=QEIjZCHMU5jFVNyNIIVwEVnor348ZXunXh26OJCUN60B++8u96oXKED6w3lWIdREx4SUz/Qu9dmLjzH96b3b5lQEKmBypfNuYL/qJBHTU5LO+rIJpa/RaEkE0aqv2isfiCVz1pY7E5X6l/qB5BZThYkJZnn4R+5ITcdm4qhJsFc=
+	t=1757586447; cv=none; b=Yt0Rn11MSeufK8B7vW7SU946yWmbYJmiusE2/P7IEKnh4tAvNqbfwjbDQ1149x6j1GryyQFCoEB7XpaSznuF1y+R1S/L3xidYu9p3ba7Uii2EwxrBSS3A19nD9gcUH+Kna3+CzL/rBFtBUSpMP/lqauxBgSWd73xaVRJdz1/c/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757570877; c=relaxed/simple;
-	bh=231mElAF275+Xy84TFjozLG6O+OvmlKY8XpeW81PPiE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wt//9Jj4gvxb06hPlwkTg2IoTO8/l01tFyeAwWxwc75SMPe49eEZFOefMZ/eGC13XMwfwJvVPUOXDKVR7dHNrlqc6NksxePvwIcBmW2dB3kBf57LRzotpAq5IAfXbqHZr/bvAFZQw875JNBqyeKsg5WlsKRb3IM765Wdn9A1YFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SSLeu6V/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757586447; c=relaxed/simple;
+	bh=Tpy4ickjdhJAzfF7JuSSTmpsyKbM8CngMtPyuvm7yJs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jDmc3eoFpQhxtvIAbP1WXS19eYpUNjljtT7AN6IwA631hlVrrApbrIHrlFjspIt++SYCVXVYy7QNrNok1yGVFy4xe5LnPUXb+eSYUjhEgGGsCcH/CsvHe6RcXSbhj5iNXaWLe+uJR9nwRoKYkqAi56FalTZ8stpwpnryrGF6JKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBxOZIft; arc=none smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SSLeu6V/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E184C4CEF1;
-	Thu, 11 Sep 2025 06:07:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757570877;
-	bh=231mElAF275+Xy84TFjozLG6O+OvmlKY8XpeW81PPiE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SSLeu6V/qUzjE9+Q+VLT3/O1D3FqmeboDYJjLm8v3IINxiuKd0MtObD1uRXtwN7Xg
-	 z0nT2eScldr67f5nZkvLOTVw5FVE9zAOJg2PCOhzIvrphnoBwr35QFKLwuFswhDnvl
-	 I99BlEEFSYyL1GtyHYAAa9OFWacNuFNW5wgnc8cM93nXWv9TbCtGcqHwB818R9YGj6
-	 qUWgn+c2jkAGdsSjoccDLIVf/dKK4Vmbz/cG7sjW1ThuizRPqpwjGezk7lG5Y1/IFx
-	 COl0ksJpJxIaAjV348dbmeJUF0Zi0RP8s9TMcOgMfMecFAxmevLlYsoE1L4Cfp1iVe
-	 ZoLAZ+XfiabQA==
-Message-ID: <0760036f-db69-487c-94b9-a6e405dee0e8@kernel.org>
-Date: Thu, 11 Sep 2025 08:07:51 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBxOZIft"
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-32170a988a1so446228fac.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 03:27:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757586445; x=1758191245; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=96fqw7FRePezKm4ZHE0s+atlWdvNKcIU7VIxvyArpWE=;
+        b=UBxOZIfthuV7sVv5+eUIT/+p6yEZDTsq637ffZkWQ0fdZaIzM6BDgXpjJe7Sb8L2wt
+         J+HagiNkKkL3uSm8MSs+9c2l89XUhZiipInoS4PrKgigZ24W0OnyGCW1xJdi9BTZaXas
+         imBEtY54WLHPlzwAVOWd5735Zu6oFI+rkfwnZBcNZZIoZ7vNkqwLCP3rGEmdkuOl6gcf
+         twC1PVv1ZAMiJV1zRyZZdGKzMZYpul7bhfvhDzVgRz0JP2SytqBrR0nf+XnZ9Y+NqzY0
+         r0OxeKy8kSGTePAmDThqRRUC/Q/U3U3RQs8jqPpcK8K9xtP/cgwPHQUePBZ2vKEXP5D3
+         +bIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757586445; x=1758191245;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=96fqw7FRePezKm4ZHE0s+atlWdvNKcIU7VIxvyArpWE=;
+        b=GCE3azcVKmDUdNoT5O3rji5MKdIvx5RvsYHIOL95sOj6tHWv52LVyYplhhUczM1GAO
+         OGFQo1nerKlr9o9rL/BLSlA/qfoyKP1dvhuZZGdN1T9xPbCb5X/BxIUQo4FKN8s6LdSM
+         B4lqrRKdcu0LdQVrEbABMwErxJjON7Eej8tLRcUkJFnKHHhxWM6KybFLviTG4Cnu0Lf+
+         5E/BuexleMB3/k6HLLkiPgYcgN4s0Su59ftmEVevpJD70RuQe2jHZXl0NuEpkZdJX1jt
+         ZspjP5DxD2DBUNUKp+0FAfasv5+Fnj2LT9QTreUaXv7Wsgq/HL7pIBdf5BcSZ9aA10AD
+         8ucQ==
+X-Gm-Message-State: AOJu0Yx8SkSEojGoHWuLoO+2O+bJ5FcoHAcFAtPhbQ3jRHlstLfawpvW
+	fwnzWMXWH+FyVgQnWs4k9bvCDIOZh2uR0j/TAtC7orgiMh3/fJnnbNCxlYFpH+NS/5AiqfEZlan
+	odBqfq4HyXxMtu128OlGK0lgbNq+0nIm08xxu
+X-Gm-Gg: ASbGncuXEJDqx3EzpQtgJkiPnNraKxm9UHH8Ob+zpWpn6JYJjKg70o3LT1hBQRSTLxD
+	icPPIOskXjEBP/gkw5HtQ+cT7t7INHEaN3+6xVqgCl/REv1NBBZrlY4eozs0RnRCqJEBSPNFbeC
+	0+Y1inF/TUad8LN8VBESk+HEmxxGvrf9XK37LOp4KkSQ3sqJ2o0c1k1j1D0Cg5Ke9WrUS0qJIof
+	vPgEQl5Vy/+2YRqYUWPQjqa/jzCDwbLoAjWRzyubFpfRcFLErsd
+X-Google-Smtp-Source: AGHT+IE4MxF4RYLSz3jRLkFx5Ayjj1pHxWl3khJ1WiEqbT36/vwUWAFgikfKQDh/MXK8MXX7T0Al64looMU2mCsWhEU=
+X-Received: by 2002:a05:6870:7025:b0:321:2680:2f77 with SMTP id
+ 586e51a60fabf-32264e267fdmr9565513fac.35.1757586444894; Thu, 11 Sep 2025
+ 03:27:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 1/1] Bluetooth: mediatek: add gpio pin to reset bt
-To: Sean Wang <sean.wang@kernel.org>,
- Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- Luiz Von Dentz <luiz.dentz@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Sean Wang <sean.wang@mediatek.com>, Jiande Lu <jiande.lu@mediatek.com>,
- Deren Wu <deren.Wu@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
- Hao Qin <Hao.qin@mediatek.com>,
- linux-bluetooth <linux-bluetooth@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- linux-mediatek <linux-mediatek@lists.infradead.org>
-References: <20250905084059.26959-1-ot_zhangchao.zhang@mediatek.com>
- <20250905084059.26959-2-ot_zhangchao.zhang@mediatek.com>
- <a7589659-0352-4d47-a3cf-f2433cc512ec@kernel.org>
- <CAGp9Lzrp-cfn_GiLrHCU629wEAxWy=egOMrRh6thYbymu+QXjA@mail.gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <CAGp9Lzrp-cfn_GiLrHCU629wEAxWy=egOMrRh6thYbymu+QXjA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20221122140222.1541731-1-dimitri.ledkov@canonical.com>
+ <8802b5d1-abf1-4ceb-8532-7d8f393f1be6@molgen.mpg.de> <bd507f6c-cea9-41aa-98f7-a5cc81dd77e4@molgen.mpg.de>
+In-Reply-To: <bd507f6c-cea9-41aa-98f7-a5cc81dd77e4@molgen.mpg.de>
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Thu, 11 Sep 2025 12:27:13 +0200
+X-Gm-Features: AS18NWCsxdmkiek6CKdhB1-2Fin5CE0lrEyAmKjT6Yhi_E1lwFN6LnPki4ySguA
+Message-ID: <CAO8sHcnTzioN=WMAf35EQ-4iEwuUmmeEPQ9L=WsxzeF1_rn3XQ@mail.gmail.com>
+Subject: Re: [PATCH v5 RESEND] Bluetooth: btintel: Correctly declare all
+ module firmware files
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/09/2025 01:29, Sean Wang wrote:
-> Hi Krzysztof,
-> 
-> Sorry again for the confusion. I believe Zhangchao is still new to the
-> upstream process, and we’ll work together to improve this. Since this
-> series has become a bit hard to follow, would you agree that it might
-> be better for us to restart with a clean patch that addresses the
-> review comments? A clean version would make it easier for reviewers to
-> focus on the current issues without being distracted by earlier
-> mistakes.
+Hi Paul,
 
-No. If you cannot send v7 of patchset as real patchset, sending again v1
-won't change anything.
+Was this patch applied in the end? If not, is there anything else I should =
+do?
 
-For seven versions contributor did not bother to respond to feedback and
-did not care to read submitting patches how this process looks like.
+Cheers,
 
-Effect is this totally broken v7.
+Daan De Meyer
 
-This patch introduces undocumented ABI which kernel tools, if used, also
-point out.
 
-Best regards,
-Krzysztof
+On Wed, 27 Aug 2025 at 07:31, Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+> [Cc: Remove Dimitri=E2=80=99s bouncing address]
+>
+> Am 27.08.25 um 07:29 schrieb Paul Menzel:
+> > Dear Daan,
+> >
+> >
+> > Thank you for the patch.
+> >
+> > Am 26.08.25 um 22:29 schrieb DaanDeMeyer:
+> >> From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+> >>
+> >> Strictly encode patterns of supported hw_variants of firmware files
+> >> the kernel driver supports requesting. This now includes many missing
+> >> and previously undeclared module firmware files for 0x07, 0x08,
+> >> 0x11-0x14, 0x17-0x1b hw_variants.
+> >>
+> >> This especially affects environments that only install firmware files
+> >> declared and referenced by the kernel modules. In such environments,
+> >> only the declared firmware files are copied resulting in most Intel
+> >> Bluetooth devices not working. I.e. host-only dracut-install initrds,
+> >> or Ubuntu Core kernel snaps.
+> >>
+> >> BugLink: https://bugs.launchpad.net/bugs/1970819
+> >> Cc: stable@vger.kernel.org # 4.15+
+> >> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+> >> ---
+> >> Notes:
+> >>      Changes since v4:
+> >>      - Add missing "intel/" prefix for 0x17+ firmware
+> >>      - Add Cc stable for v4.15+ kernels
+> >>      Changes since v3:
+> >>      - Hopefully pacify trailing whitespace from GitLint in this optio=
+nal
+> >>        portion of the commit.
+> >>      Changes since v2:
+> >>      - encode patterns for 0x17 0x18 0x19 0x1b hw_variants
+> >>      - rebase on top of latest rc tag
+> >>      Changes since v1:
+> >>      - encode strict patterns of supported firmware files for each of =
+the
+> >>        supported hw_variant generations.
+> >>
+> >>   drivers/bluetooth/btintel.c | 26 ++++++++++++++++++++++----
+> >>   1 file changed, 22 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> >> index a657e9a3e96a..d0e22fe09567 100644
+> >> --- a/drivers/bluetooth/btintel.c
+> >> +++ b/drivers/bluetooth/btintel.c
+> >> @@ -2656,7 +2656,25 @@ MODULE_AUTHOR("Marcel Holtmann
+> >> <marcel@holtmann.org>");
+> >>   MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSIO=
+N);
+> >>   MODULE_VERSION(VERSION);
+> >>   MODULE_LICENSE("GPL");
+> >> -MODULE_FIRMWARE("intel/ibt-11-5.sfi");
+> >> -MODULE_FIRMWARE("intel/ibt-11-5.ddc");
+> >> -MODULE_FIRMWARE("intel/ibt-12-16.sfi");
+> >> -MODULE_FIRMWARE("intel/ibt-12-16.ddc");
+> >> +/* hw_variant 0x07 0x08 */
+> >> +MODULE_FIRMWARE("intel/ibt-hw-37.7.*-fw-*.*.*.*.*.bseq");
+> >> +MODULE_FIRMWARE("intel/ibt-hw-37.7.bseq");
+> >> +MODULE_FIRMWARE("intel/ibt-hw-37.8.*-fw-*.*.*.*.*.bseq");
+> >> +MODULE_FIRMWARE("intel/ibt-hw-37.8.bseq");
+> >> +/* hw_variant 0x0b 0x0c */
+> >> +MODULE_FIRMWARE("intel/ibt-11-*.sfi");
+> >> +MODULE_FIRMWARE("intel/ibt-12-*.sfi");
+> >> +MODULE_FIRMWARE("intel/ibt-11-*.ddc");
+> >> +MODULE_FIRMWARE("intel/ibt-12-*.ddc");
+> >> +/* hw_variant 0x11 0x12 0x13 0x14 */
+> >> +MODULE_FIRMWARE("intel/ibt-17-*-*.sfi");
+> >> +MODULE_FIRMWARE("intel/ibt-18-*-*.sfi");
+> >> +MODULE_FIRMWARE("intel/ibt-19-*-*.sfi");
+> >> +MODULE_FIRMWARE("intel/ibt-20-*-*.sfi");
+> >> +MODULE_FIRMWARE("intel/ibt-17-*-*.ddc");
+> >> +MODULE_FIRMWARE("intel/ibt-18-*-*.ddc");
+> >> +MODULE_FIRMWARE("intel/ibt-19-*-*.ddc");
+> >> +MODULE_FIRMWARE("intel/ibt-20-*-*.ddc");
+> >> +/* hw_variant 0x17 0x18 0x19 0x1b, read and use cnvi/cnvr */
+> >> +MODULE_FIRMWARE("intel/ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].=
+sfi");
+> >> +MODULE_FIRMWARE("intel/ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].=
+ddc");
+> >
+> > Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> >
+> >
+> > Kind regards,
+> >
+> > Paul
