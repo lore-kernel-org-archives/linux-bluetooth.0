@@ -1,68 +1,87 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96ACA1482F2;
-	Thu, 11 Sep 2025 10:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D83A2550CA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 11:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757587744; cv=none; b=LAlq4yE9MNetn1OGBVkSdofcsFsr+e7oLzYnMR0yncMUx9Ovl0HNuDmBduRUk6iJAU6m+wYgbn6GI6tMd0KGG0vPXTKBhmDQPLetI+sR54pG54WXPn8GnH44NqdqTEG2QhX2FOzNY1cB1hKWfcalzr3i9cHShCgZsKXf+LVlvIA=
+	t=1757589576; cv=none; b=ppkO5U9EiHouOnl+DuzaqQZMzjiaqi3I9uepRNAsm2d9WiZ4/BxgsNAZ0CvzJQEljuCk4Qy91E+PKfjoUIzg9NJvNO1lj6mZBhyQV0augjss0/xsv5aGNfDwiRvendt0duWjqggA0B7rsKh51oxG3k/COZPDqu8KMnXqXs/SWzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757587744; c=relaxed/simple;
-	bh=ITrH6lyOjMzKseNpUrMdJmZBuQriZvDKMVXZV9cGMsY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LweV7CTbYL9YcPyPbt4Rsdt6HLSGd0tC30o60QIlnaV0aAhVGrjDTM5eLKciJFGtctIpm4eTTOsV+yPrTOUiLBUjzJJgmTfyOAK1wM/g6AzPBkvsIkuDBxhdikerUrhi/7Cj8eL5ykaEAqbZ/LOKjp7MZLuKFtTQ1hYllCd+ibY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6146760213AFC;
-	Thu, 11 Sep 2025 12:48:54 +0200 (CEST)
-Message-ID: <585a858b-1701-4b05-b36a-a6f1a602324d@molgen.mpg.de>
-Date: Thu, 11 Sep 2025 12:48:53 +0200
+	s=arc-20240116; t=1757589576; c=relaxed/simple;
+	bh=cb18xh6s7O91snfz/0ZRDfWiI/J7nR4NlCykWqVSXio=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PzA/n+WlGDZuMf1PS8O+xrAstbkYfcZoRMgnHEfShrOp0je7FbnGrgintdhrw3d6js9cBdBzrJKrE1Ou6wmEn7JYatVI3HUD6k/W4MkDtLGw6XExxxUCLwVLeXdopR4jvfJn+OZh2tzpw9P144IuETEW4x8uDhu9+cZ/302zuyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ermnv2v2; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ermnv2v2"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6416C4CEF7
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 11:19:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757589575;
+	bh=cb18xh6s7O91snfz/0ZRDfWiI/J7nR4NlCykWqVSXio=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=Ermnv2v2X5AU+vXZVnEFBUw6hxSz+shbTK0vgecymTxLIddXivWpooXpe0eM8ZtLK
+	 HE7Z/Scejls+0ndswGzk0xtS/0XTWPVv1hhpzdPCGGQJ0m5rL+Q/dsjyqxgTs7wJTF
+	 8I2llq6jS4ThkVLKjpwSLdLajQx1c7Dqus0AUTvNy8W7eBYD39+HcMKP8DPqyRje7S
+	 cttWMrlSibfyuhPXIRWxA6nEj78aZ8yC3RuZTcushcg4v2Xono194HQX7K9vkbBHmZ
+	 ctIfcOO6eN+Tv5s+95BKy+nAfJKOYhsFMjsJ4yYNqQGiDwlITaG9OFIPPE5ZA9lFh1
+	 0N3ZGEYzOv4uQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id AE369C41612; Thu, 11 Sep 2025 11:19:35 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 80791] "Bluetooth: hci0: ACL packet for unknown connection
+ handle" must be hidden behind "debug"
+Date: Thu, 11 Sep 2025 11:19:35 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-80791-62941-FYUYJUR9xy@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-80791-62941@https.bugzilla.kernel.org/>
+References: <bug-80791-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 RESEND] Bluetooth: btintel: Correctly declare all
- module firmware files
-To: Daan De Meyer <daan.j.demeyer@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>
-References: <20221122140222.1541731-1-dimitri.ledkov@canonical.com>
- <8802b5d1-abf1-4ceb-8532-7d8f393f1be6@molgen.mpg.de>
- <bd507f6c-cea9-41aa-98f7-a5cc81dd77e4@molgen.mpg.de>
- <CAO8sHcnTzioN=WMAf35EQ-4iEwuUmmeEPQ9L=WsxzeF1_rn3XQ@mail.gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <CAO8sHcnTzioN=WMAf35EQ-4iEwuUmmeEPQ9L=WsxzeF1_rn3XQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D80791
 
-Dear Daan,
+--- Comment #13 from Artem S. Tashkinov (aros@gmx.com) ---
+(In reply to Jakub Jankiewicz from comment #12)
+> I think this is a real bug, I've just noticed with latest Kernel 6.16.5
+> (Fedora testing 6.16.5-200.fc42.x86_64), the music I play via Bluetooth
+> speakers is interrupted when this happens. And it happens a lot. So this =
+is
+> a bug in the driver that needs to be fixed, not hidden.
 
+Open a new bug report and specify your HW.
 
-Am 11.09.25 um 12:27 schrieb Daan De Meyer:
+Also make sure Windows is not affected.
 
-> Was this patch applied in the end? If not, is there anything else I
-> should do?
-It does not look like it. I cannot find your resent patch in patchwork 
-[1], so I believe the maintainers are going to miss it. Maybe resend as 
-v6, so Patchwork picks it up? (I have no idea, how Patchwork works.)
+If it's a regression, please bisect:
 
+https://docs.kernel.org/admin-guide/bug-bisect.html
 
-Kind regards,
+--=20
+You may reply to this email to add a comment.
 
-Paul
-
-
-[1]: 
-https://patchwork.kernel.org/project/bluetooth/patch/20221122140222.1541731-1-dimitri.ledkov@canonical.com/
+You are receiving this mail because:
+You are the assignee for the bug.=
