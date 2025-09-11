@@ -1,178 +1,185 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0004E2580E4
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 10:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BC9321423
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 10:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757586447; cv=none; b=Yt0Rn11MSeufK8B7vW7SU946yWmbYJmiusE2/P7IEKnh4tAvNqbfwjbDQ1149x6j1GryyQFCoEB7XpaSznuF1y+R1S/L3xidYu9p3ba7Uii2EwxrBSS3A19nD9gcUH+Kna3+CzL/rBFtBUSpMP/lqauxBgSWd73xaVRJdz1/c/s=
+	t=1757586646; cv=none; b=dgfNekzaYc+AI1nxrAHJC6RuetG+J+wLEhSHga8Gy6EeN+3vge86gwE9m4enaI2nd3oHnUltMs8nOMuxba3Sst5TcbtT5mFshLsAaYRgHW5/8VKzJUpnQKpeFw9g9t8HQToROI+23Fz1OppEmrv57NTYqNKADlqGxU4DphivKgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757586447; c=relaxed/simple;
-	bh=Tpy4ickjdhJAzfF7JuSSTmpsyKbM8CngMtPyuvm7yJs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jDmc3eoFpQhxtvIAbP1WXS19eYpUNjljtT7AN6IwA631hlVrrApbrIHrlFjspIt++SYCVXVYy7QNrNok1yGVFy4xe5LnPUXb+eSYUjhEgGGsCcH/CsvHe6RcXSbhj5iNXaWLe+uJR9nwRoKYkqAi56FalTZ8stpwpnryrGF6JKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBxOZIft; arc=none smtp.client-ip=209.85.160.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1757586646; c=relaxed/simple;
+	bh=f7dAUauJOhGAUeD/vQaAF/NOdilz5RVEXSG8m8he4Yo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Tb3dU4ob0i5CqsV1ymDfiAtcN/10mX6uebX1rMdhB/YYa3yqTyXN/Pr8/qhgzCIzEZ+89NeO0QVybhpHma8cG+QCXGeAthIXRHWi2c0dLrAQO6zxPW9OrjC2tolixHJnVyMSDMLeE97K0WlmVvbe4AhOTTm4ORUw9r0UKjnG+hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VqIcOWZU; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBxOZIft"
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-32170a988a1so446228fac.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 03:27:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757586445; x=1758191245; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=96fqw7FRePezKm4ZHE0s+atlWdvNKcIU7VIxvyArpWE=;
-        b=UBxOZIfthuV7sVv5+eUIT/+p6yEZDTsq637ffZkWQ0fdZaIzM6BDgXpjJe7Sb8L2wt
-         J+HagiNkKkL3uSm8MSs+9c2l89XUhZiipInoS4PrKgigZ24W0OnyGCW1xJdi9BTZaXas
-         imBEtY54WLHPlzwAVOWd5735Zu6oFI+rkfwnZBcNZZIoZ7vNkqwLCP3rGEmdkuOl6gcf
-         twC1PVv1ZAMiJV1zRyZZdGKzMZYpul7bhfvhDzVgRz0JP2SytqBrR0nf+XnZ9Y+NqzY0
-         r0OxeKy8kSGTePAmDThqRRUC/Q/U3U3RQs8jqPpcK8K9xtP/cgwPHQUePBZ2vKEXP5D3
-         +bIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757586445; x=1758191245;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=96fqw7FRePezKm4ZHE0s+atlWdvNKcIU7VIxvyArpWE=;
-        b=GCE3azcVKmDUdNoT5O3rji5MKdIvx5RvsYHIOL95sOj6tHWv52LVyYplhhUczM1GAO
-         OGFQo1nerKlr9o9rL/BLSlA/qfoyKP1dvhuZZGdN1T9xPbCb5X/BxIUQo4FKN8s6LdSM
-         B4lqrRKdcu0LdQVrEbABMwErxJjON7Eej8tLRcUkJFnKHHhxWM6KybFLviTG4Cnu0Lf+
-         5E/BuexleMB3/k6HLLkiPgYcgN4s0Su59ftmEVevpJD70RuQe2jHZXl0NuEpkZdJX1jt
-         ZspjP5DxD2DBUNUKp+0FAfasv5+Fnj2LT9QTreUaXv7Wsgq/HL7pIBdf5BcSZ9aA10AD
-         8ucQ==
-X-Gm-Message-State: AOJu0Yx8SkSEojGoHWuLoO+2O+bJ5FcoHAcFAtPhbQ3jRHlstLfawpvW
-	fwnzWMXWH+FyVgQnWs4k9bvCDIOZh2uR0j/TAtC7orgiMh3/fJnnbNCxlYFpH+NS/5AiqfEZlan
-	odBqfq4HyXxMtu128OlGK0lgbNq+0nIm08xxu
-X-Gm-Gg: ASbGncuXEJDqx3EzpQtgJkiPnNraKxm9UHH8Ob+zpWpn6JYJjKg70o3LT1hBQRSTLxD
-	icPPIOskXjEBP/gkw5HtQ+cT7t7INHEaN3+6xVqgCl/REv1NBBZrlY4eozs0RnRCqJEBSPNFbeC
-	0+Y1inF/TUad8LN8VBESk+HEmxxGvrf9XK37LOp4KkSQ3sqJ2o0c1k1j1D0Cg5Ke9WrUS0qJIof
-	vPgEQl5Vy/+2YRqYUWPQjqa/jzCDwbLoAjWRzyubFpfRcFLErsd
-X-Google-Smtp-Source: AGHT+IE4MxF4RYLSz3jRLkFx5Ayjj1pHxWl3khJ1WiEqbT36/vwUWAFgikfKQDh/MXK8MXX7T0Al64looMU2mCsWhEU=
-X-Received: by 2002:a05:6870:7025:b0:321:2680:2f77 with SMTP id
- 586e51a60fabf-32264e267fdmr9565513fac.35.1757586444894; Thu, 11 Sep 2025
- 03:27:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VqIcOWZU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1757586642;
+	bh=f7dAUauJOhGAUeD/vQaAF/NOdilz5RVEXSG8m8he4Yo=;
+	h=From:To:Subject:Date:From;
+	b=VqIcOWZUGcgJCew/O046qo68Y0wjERUAr6oB4NcVzN9BKQpyAsElnmWFcxsoDnNgv
+	 Tr4PE8d+aK7je3YCo7XLc+dF6RymVomyLpg8EtTAK+Arx8u/4wUnVpmn2Frz8lb1ki
+	 xLcmk6mFei6uvl5yjClrVB/6B4F4nrTqwevn2UpILtbDRcFBAPGCqIeBgRtTyxtpaP
+	 G/Lei0uzUaQlGbPWzKQZBUdkKvz9yu8cOgN1obetOoIzRO6QHg7dBH8gXDN4tl+GjM
+	 F9AjKZdC6/4Zt1ayhVB/hlO2ZogS0conZSOHZ/oMLpNPgvp4y9MraCPZqPoHkQLXgC
+	 kVXPV7wzOwrYA==
+Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-E0e2-6802-CeeF-9413.rev.sfr.net [IPv6:2a02:8428:af44:1001:e0e2:6802:ceef:9413])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0CC3117E0100
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 12:30:42 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/4] shared/hfp: Add Operator name support
+Date: Thu, 11 Sep 2025 12:28:37 +0200
+Message-ID: <20250911102840.2090361-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20221122140222.1541731-1-dimitri.ledkov@canonical.com>
- <8802b5d1-abf1-4ceb-8532-7d8f393f1be6@molgen.mpg.de> <bd507f6c-cea9-41aa-98f7-a5cc81dd77e4@molgen.mpg.de>
-In-Reply-To: <bd507f6c-cea9-41aa-98f7-a5cc81dd77e4@molgen.mpg.de>
-From: Daan De Meyer <daan.j.demeyer@gmail.com>
-Date: Thu, 11 Sep 2025 12:27:13 +0200
-X-Gm-Features: AS18NWCsxdmkiek6CKdhB1-2Fin5CE0lrEyAmKjT6Yhi_E1lwFN6LnPki4ySguA
-Message-ID: <CAO8sHcnTzioN=WMAf35EQ-4iEwuUmmeEPQ9L=WsxzeF1_rn3XQ@mail.gmail.com>
-Subject: Re: [PATCH v5 RESEND] Bluetooth: btintel: Correctly declare all
- module firmware files
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Paul,
+Send AT+COPS=3,0 at the end of the SLC creation to set the format of
+the operator selection to long alphanumeric, then query the currently
+selected operator name from the AG.
 
-Was this patch applied in the end? If not, is there anything else I should =
-do?
+Register +COPS handler to call the update_operator callback on event.
+---
+ src/shared/hfp.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++--
+ src/shared/hfp.h |  1 +
+ 2 files changed, 83 insertions(+), 2 deletions(-)
 
-Cheers,
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index d01915ab1..f94df90f1 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -1710,7 +1710,30 @@ static void ciev_cb(struct hfp_context *context, void *user_data)
+ 	set_indicator_value(index, val, hfp->ag_ind, hfp);
+ }
+ 
+-static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
++static void cops_cb(struct hfp_context *context, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++	unsigned int mode, val;
++	char name[255];
++
++	DBG(hfp, "");
++
++	if (!hfp_context_get_number(context, &mode))
++		return;
++
++	if (!hfp_context_get_number(context, &val))
++		return;
++
++	if (!hfp_context_get_string(context, name, sizeof(name))) {
++		DBG(hfp, "hf: Could not get string");
++		return;
++	}
++
++	if (hfp->callbacks && hfp->callbacks->update_operator)
++		hfp->callbacks->update_operator(name, hfp->callbacks_data);
++}
++
++static void cops_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	void *user_data)
+ {
+ 	struct hfp_hf *hfp = user_data;
+@@ -1718,7 +1741,7 @@ static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	DBG(hfp, "");
+ 
+ 	if (result != HFP_RESULT_OK) {
+-		DBG(hfp, "hf: CMER error: %d", result);
++		DBG(hfp, "hf: COPS? error: %d", result);
+ 		goto failed;
+ 	}
+ 
+@@ -1726,8 +1749,65 @@ static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
+ 		hfp->callbacks->session_ready(HFP_RESULT_OK, 0,
+ 						hfp->callbacks_data);
+ 
++	return;
++
++failed:
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(result, cme_err,
++						hfp->callbacks_data);
++}
++
++static void cops_conf_resp(enum hfp_result result, enum hfp_error cme_err,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "");
++
++	if (result != HFP_RESULT_OK) {
++		DBG(hfp, "hf: COPS= error: %d", result);
++		goto failed;
++	}
++
++	/* SLC creation done, continue with default setup */
++	if (!hfp_hf_send_command(hfp, cops_resp, hfp,
++		"AT+COPS?")) {
++		DBG(hfp, "hf: Could not send AT+COPS?");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	return;
++
++failed:
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(result, cme_err,
++						hfp->callbacks_data);
++}
++
++static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "");
++
++	if (result != HFP_RESULT_OK) {
++		DBG(hfp, "hf: CMER error: %d", result);
++		goto failed;
++	}
++
++	/* SLC creation done, continue with default setup */
++	if (!hfp_hf_send_command(hfp, cops_conf_resp, hfp,
++		"AT+COPS=3,0")) {
++		DBG(hfp, "hf: Could not send AT+COPS=3,0");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
+ 	/* Register unsolicited results handlers */
+ 	hfp_hf_register(hfp, ciev_cb, "+CIEV", hfp, NULL);
++	hfp_hf_register(hfp, cops_cb, "+COPS", hfp, NULL);
+ 
+ 	return;
+ 
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index e6f7bbbb6..27f6d2d7c 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -190,6 +190,7 @@ struct hfp_hf_callbacks {
+ 							void *user_data);
+ 	void (*update_indicator)(enum hfp_indicator indicator, uint32_t val,
+ 							void *user_data);
++	void (*update_operator)(const char *operator_name, void *user_data);
+ };
+ 
+ struct hfp_hf *hfp_hf_new(int fd);
+-- 
+2.43.0
 
-Daan De Meyer
-
-
-On Wed, 27 Aug 2025 at 07:31, Paul Menzel <pmenzel@molgen.mpg.de> wrote:
->
-> [Cc: Remove Dimitri=E2=80=99s bouncing address]
->
-> Am 27.08.25 um 07:29 schrieb Paul Menzel:
-> > Dear Daan,
-> >
-> >
-> > Thank you for the patch.
-> >
-> > Am 26.08.25 um 22:29 schrieb DaanDeMeyer:
-> >> From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-> >>
-> >> Strictly encode patterns of supported hw_variants of firmware files
-> >> the kernel driver supports requesting. This now includes many missing
-> >> and previously undeclared module firmware files for 0x07, 0x08,
-> >> 0x11-0x14, 0x17-0x1b hw_variants.
-> >>
-> >> This especially affects environments that only install firmware files
-> >> declared and referenced by the kernel modules. In such environments,
-> >> only the declared firmware files are copied resulting in most Intel
-> >> Bluetooth devices not working. I.e. host-only dracut-install initrds,
-> >> or Ubuntu Core kernel snaps.
-> >>
-> >> BugLink: https://bugs.launchpad.net/bugs/1970819
-> >> Cc: stable@vger.kernel.org # 4.15+
-> >> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-> >> ---
-> >> Notes:
-> >>      Changes since v4:
-> >>      - Add missing "intel/" prefix for 0x17+ firmware
-> >>      - Add Cc stable for v4.15+ kernels
-> >>      Changes since v3:
-> >>      - Hopefully pacify trailing whitespace from GitLint in this optio=
-nal
-> >>        portion of the commit.
-> >>      Changes since v2:
-> >>      - encode patterns for 0x17 0x18 0x19 0x1b hw_variants
-> >>      - rebase on top of latest rc tag
-> >>      Changes since v1:
-> >>      - encode strict patterns of supported firmware files for each of =
-the
-> >>        supported hw_variant generations.
-> >>
-> >>   drivers/bluetooth/btintel.c | 26 ++++++++++++++++++++++----
-> >>   1 file changed, 22 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> >> index a657e9a3e96a..d0e22fe09567 100644
-> >> --- a/drivers/bluetooth/btintel.c
-> >> +++ b/drivers/bluetooth/btintel.c
-> >> @@ -2656,7 +2656,25 @@ MODULE_AUTHOR("Marcel Holtmann
-> >> <marcel@holtmann.org>");
-> >>   MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSIO=
-N);
-> >>   MODULE_VERSION(VERSION);
-> >>   MODULE_LICENSE("GPL");
-> >> -MODULE_FIRMWARE("intel/ibt-11-5.sfi");
-> >> -MODULE_FIRMWARE("intel/ibt-11-5.ddc");
-> >> -MODULE_FIRMWARE("intel/ibt-12-16.sfi");
-> >> -MODULE_FIRMWARE("intel/ibt-12-16.ddc");
-> >> +/* hw_variant 0x07 0x08 */
-> >> +MODULE_FIRMWARE("intel/ibt-hw-37.7.*-fw-*.*.*.*.*.bseq");
-> >> +MODULE_FIRMWARE("intel/ibt-hw-37.7.bseq");
-> >> +MODULE_FIRMWARE("intel/ibt-hw-37.8.*-fw-*.*.*.*.*.bseq");
-> >> +MODULE_FIRMWARE("intel/ibt-hw-37.8.bseq");
-> >> +/* hw_variant 0x0b 0x0c */
-> >> +MODULE_FIRMWARE("intel/ibt-11-*.sfi");
-> >> +MODULE_FIRMWARE("intel/ibt-12-*.sfi");
-> >> +MODULE_FIRMWARE("intel/ibt-11-*.ddc");
-> >> +MODULE_FIRMWARE("intel/ibt-12-*.ddc");
-> >> +/* hw_variant 0x11 0x12 0x13 0x14 */
-> >> +MODULE_FIRMWARE("intel/ibt-17-*-*.sfi");
-> >> +MODULE_FIRMWARE("intel/ibt-18-*-*.sfi");
-> >> +MODULE_FIRMWARE("intel/ibt-19-*-*.sfi");
-> >> +MODULE_FIRMWARE("intel/ibt-20-*-*.sfi");
-> >> +MODULE_FIRMWARE("intel/ibt-17-*-*.ddc");
-> >> +MODULE_FIRMWARE("intel/ibt-18-*-*.ddc");
-> >> +MODULE_FIRMWARE("intel/ibt-19-*-*.ddc");
-> >> +MODULE_FIRMWARE("intel/ibt-20-*-*.ddc");
-> >> +/* hw_variant 0x17 0x18 0x19 0x1b, read and use cnvi/cnvr */
-> >> +MODULE_FIRMWARE("intel/ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].=
-sfi");
-> >> +MODULE_FIRMWARE("intel/ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].=
-ddc");
-> >
-> > Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> >
-> >
-> > Kind regards,
-> >
-> > Paul
