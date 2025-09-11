@@ -1,134 +1,68 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC553101AD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 10:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96ACA1482F2;
+	Thu, 11 Sep 2025 10:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757587374; cv=none; b=tvUujIgqQyh4o8jHaJ51AcuxZdE4Qf4VyGv+F4HfQnY99uLCZjKitx5A6g+hOvEuBbaPOYiIl8wJydLWJzSW17IOwHw/EOynpeN4LhqHzutIokRHANMAc7So8dISWcVz9hhfzPkuHUMttZVsQ1yxdZnn87hQG5jHLE24PZ8ObAk=
+	t=1757587744; cv=none; b=LAlq4yE9MNetn1OGBVkSdofcsFsr+e7oLzYnMR0yncMUx9Ovl0HNuDmBduRUk6iJAU6m+wYgbn6GI6tMd0KGG0vPXTKBhmDQPLetI+sR54pG54WXPn8GnH44NqdqTEG2QhX2FOzNY1cB1hKWfcalzr3i9cHShCgZsKXf+LVlvIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757587374; c=relaxed/simple;
-	bh=G8i5itB5n+rNsyurbAu8GhdhbevR0oAWEYRNzA/D9B0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=NC5jnNmfwEPxhw3+5fgIF8h+T5yKDgqbqeLd6cdAOPLvd+t2kxqjxZPKwatIWcwFOvjq8Rupwr/qizt/anG7WkuiDumtGS+nb6/Vo80w4jsqBtsn2Kdacza0inKcgHf+d/L9/Egll0f5JhPIbtEgf9a5X7ytorWa7x23EWEe1os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=erJNcdJA; arc=none smtp.client-ip=192.30.252.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="erJNcdJA"
-Received: from github.com (hubbernetes-node-31b3d7a.va3-iad.github.net [10.48.178.39])
-	by smtp.github.com (Postfix) with ESMTPA id 0384A8C06E5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 03:42:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1757587372;
-	bh=7BbyYTpJQzVSemj11D3Emh1NEaAFbW4ogfsnQmwytbM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=erJNcdJAq9uWYzXarzZApz06lazevBf/VO/x86b8cFKCW1xBGndMqsxxWS3GdDRs9
-	 VwNc4TNRSCuerIgXEJaQXwGeUJQesvFkoVOpEhPUmxC4LPWqS1CNaEce3ji/xzyjae
-	 w8CiCYZxDoNKY/JxS23/nQnTDdhZ0yrEa31//9Q0=
-Date: Thu, 11 Sep 2025 03:42:52 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1001291/000000-6b4247@github.com>
-Subject: [bluez/bluez] b79d2c: shared/hfp: Add Operator name support
+	s=arc-20240116; t=1757587744; c=relaxed/simple;
+	bh=ITrH6lyOjMzKseNpUrMdJmZBuQriZvDKMVXZV9cGMsY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LweV7CTbYL9YcPyPbt4Rsdt6HLSGd0tC30o60QIlnaV0aAhVGrjDTM5eLKciJFGtctIpm4eTTOsV+yPrTOUiLBUjzJJgmTfyOAK1wM/g6AzPBkvsIkuDBxhdikerUrhi/7Cj8eL5ykaEAqbZ/LOKjp7MZLuKFtTQ1hYllCd+ibY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6146760213AFC;
+	Thu, 11 Sep 2025 12:48:54 +0200 (CEST)
+Message-ID: <585a858b-1701-4b05-b36a-a6f1a602324d@molgen.mpg.de>
+Date: Thu, 11 Sep 2025 12:48:53 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-
-  Branch: refs/heads/1001291
-  Home:   https://github.com/bluez/bluez
-  Commit: b79d2cb9de144e30c87ce89af547e5f787b2cc03
-      https://github.com/bluez/bluez/commit/b79d2cb9de144e30c87ce89af547e=
-5f787b2cc03
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-11 (Thu, 11 Sep 2025)
-
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
-
-  Log Message:
-  -----------
-  shared/hfp: Add Operator name support
-
-Send AT+COPS=3D3,0 at the end of the SLC creation to set the format of
-the operator selection to long alphanumeric, then query the currently
-selected operator name from the AG.
-
-Register +COPS handler to call the update_operator callback on event.
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 RESEND] Bluetooth: btintel: Correctly declare all
+ module firmware files
+To: Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+References: <20221122140222.1541731-1-dimitri.ledkov@canonical.com>
+ <8802b5d1-abf1-4ceb-8532-7d8f393f1be6@molgen.mpg.de>
+ <bd507f6c-cea9-41aa-98f7-a5cc81dd77e4@molgen.mpg.de>
+ <CAO8sHcnTzioN=WMAf35EQ-4iEwuUmmeEPQ9L=WsxzeF1_rn3XQ@mail.gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CAO8sHcnTzioN=WMAf35EQ-4iEwuUmmeEPQ9L=WsxzeF1_rn3XQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-  Commit: 89e0dd83a8b141ef7229a0e825a0b0a8bc93168f
-      https://github.com/bluez/bluez/commit/89e0dd83a8b141ef7229a0e825a0b=
-0a8bc93168f
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-11 (Thu, 11 Sep 2025)
-
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add Operator name test for HF
-
-This add the following test:
-- HFP/HF/PSI/BV-04-C
-  Verify that the HF can query the currently selected operator name.
-
-Improve MINIMAL_SLC_SESSION macro to be able to set the service, call,
-callsetup and callheld indicators at connection time.
+Dear Daan,
 
 
-  Commit: 8c0d2fc8cb841a8943ee6127b77dbd48f4c282fb
-      https://github.com/bluez/bluez/commit/8c0d2fc8cb841a8943ee6127b77db=
-d48f4c282fb
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-11 (Thu, 11 Sep 2025)
+Am 11.09.25 um 12:27 schrieb Daan De Meyer:
 
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
-
-  Log Message:
-  -----------
-  shared/hfp: Add Call Line Identification support
-
-Send AT+CLIP=3D1 at the end of the SLC creation to enable CLIP event.
-Register +CLIP handler to call the update_call_line_id callback on event.=
+> Was this patch applied in the end? If not, is there anything else I
+> should do?
+It does not look like it. I cannot find your resent patch in patchwork 
+[1], so I believe the maintainers are going to miss it. Maybe resend as 
+v6, so Patchwork picks it up? (I have no idea, how Patchwork works.)
 
 
-During incoming call notifications, i.e. after +CIEV:<callsetup>,1
-event which creates a new call object, the reception of +CLIP event
-will update the line_id and type of the call object.
+Kind regards,
+
+Paul
 
 
-  Commit: 6b424722aa82bf6b389dd6c675e94e19c8d86519
-      https://github.com/bluez/bluez/commit/6b424722aa82bf6b389dd6c675e94=
-e19c8d86519
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-11 (Thu, 11 Sep 2025)
-
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add Call Line Identification test for HF
-
-This add the following test:
-- HFP/HF/CLI/BV-01-C
-  Verify that the HF receives the caller ID.
-
-
-Compare: https://github.com/bluez/bluez/compare/b79d2cb9de14%5E...6b42472=
-2aa82
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+[1]: 
+https://patchwork.kernel.org/project/bluetooth/patch/20221122140222.1541731-1-dimitri.ledkov@canonical.com/
