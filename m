@@ -1,266 +1,246 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E369133EAFD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 17:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757611722; cv=none; b=etLqjkEFkVXFTx5foU1Zd8iK9YQy+iJrex7mMRAZyp1cnGmYzNR/bU1+U52Tg2v9dwqbb3I2XItFFkZxEN72hGe08w7VXllDmJDW+DeyazGqve3AFEKEy6/ynNTokMpp06iABQar7G8GWUiPrGw/lBQlRysUQFg58M9oMkfNfKc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757611722; c=relaxed/simple;
-	bh=nH2aLqhCK8ypdfninp40Tt7P/pZ089e/Oe7Sic31Ydo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DpqlBgE5m1WU6ReQ/2jD3kRpkUruNCvdL5tibRPhA7RneIKub+aWs4yqtjja/y5ekujrR3tYR5IDTxmy0NYCT9JCDMWU/MIBKb7oHqSwjL/J6D/wg6FhR3MRk+4C3L/IErBDsWg8FI5vGjno9oyDTgv9BtEKpPMTMxnrgeB5ZRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CCJtF28z; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9126220698
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 17:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757611985; cv=pass; b=gfdRvl46lNIqr91sjoQ3KAOP8zlKB5zfmaZq+PXS+WsDTd0jJ7dkZnqFrBXQxvLT7/FI1JK5GtBdCXqoSTnQfGt7NRwSP5vD7ZwI7FPUueqkWV5wWe+g3ciWNnd+yWaJ5y3ND4ivSAGLgufCaoCs2amXe3MD2Qh4TCgTnr39s3g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757611985; c=relaxed/simple;
+	bh=KBUO6xp/dbmiwgD8vtRnJUB6gvl4/Hk8H5/MqcLMqAo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nG+JV63ff/e9gCH2EHBN8Nulkbk8fwNwjBTvmgVtK/a1urLS3gZhswfR99cACSDVS57RjwqumCM38li5gRF0jxO3yJsn1zeW8q+NtGXUSvr+4ynpLK3Yr82CPK+AkFGYxg5W84klcKkzKzrJ7mBLsJdY75k2Qq0NALWH06mLHno=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=iaeR1TSI; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCJtF28z"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-33730e1cda7so9761291fa.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 10:28:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757611719; x=1758216519; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lUzroxIC6bLYOXw5ZA6YYmbGnvHhCSpz1G7yMKYYcsE=;
-        b=CCJtF28zuKddiWR7Z4QcDHr/6eDQDd/CQKHzLa63HUESPPwrYpWOCk10nWRXHib17H
-         GMd9+tFdLqlOmR1r7MJRM17q2rpkLz1IvSz4IFu3jKM5msSLK8HmFcUFZ2mPi8ygB91K
-         mi4vpcUUYnVEOobScZcSgWOvys/4BTnh/fAbEroGRL9InzOYHYGkRhpsxfg/KAOMc/M1
-         Xjt750LlOFU1YHHokXt4eNFgczw46T5f4CsC/p52D3gnt41X5UVM1k6occdTslZTES70
-         hR2VumtwssyFxrhbmfoA3j9O3SxMMio12o8JA6NQ6yscVu/WEmJRUNybQgn3Ryv9BuKV
-         YM/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757611719; x=1758216519;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lUzroxIC6bLYOXw5ZA6YYmbGnvHhCSpz1G7yMKYYcsE=;
-        b=xT2yaZfbQVJ0O3KFqeur3KOpOAWIUzSQZt7IUIzAgHQgRwK2bgvs69Hd1wIAVgGtdH
-         orCmBqLt5InN0S8nThXZrmBX5+QtQ6UQWt9OHCkfbuHv8G8Ujk0ik8miakvZa1h6sFEy
-         pAVsieIERoePbfNpzHy6Q5EhCWNuwq9yTrOxUgmjIPWbjluIeRGfsHn7tEUU7qPPyZBR
-         P1wu+/jnRDDiRENMqvTB+Q6BAX/w9WU+R1RWlYE+YwK1WVSvLqFh/yWFtnHJltTZC7uh
-         8IfrtB3M5rB7Ogm/R8NG/Xt7WUe3/8X1SyEJEOeBaIYFvDQWhL5jKBpAzq2DKiKNNVVK
-         3xSw==
-X-Gm-Message-State: AOJu0Yyu6RsyxebpubxAgUmfOeaBOtSbDiJKTBfG4HUj/FG+j9d6VZbU
-	EWEriQ8UNC+28U8BA+vxbLlAV4kbznTYwY1DNuOkM7aYgUU8mMK06dfdokP3Kek5V7adVFTrq5o
-	3MpQcoBzRCd+0Sr3ijmsBYAAgK3eD1MpJ8q9k
-X-Gm-Gg: ASbGncuNmytUzwh4KpMhiWzWhCxL9HyefGW3dLyYwkh8trIZERaa2NhMaoLOulypwBa
-	ItZf5rDRhlOdb6ug1vsdNI/fS6ALYI+uqI8ycCThhaJ5mUg7hFPk6dMzjrx6u8Yqj0ClrTj2YLU
-	BZLgFqNW1CW13/8RfxfaX9GIe77XnejOd7olEdz59/Z1oYmdVErcdnqvJnQb+UU/K0DWWdQrJft
-	FKryXMCJGJHcwiF1j+Z+IIyjjNT8aw2Aad3EzvEU0JG4Q==
-X-Google-Smtp-Source: AGHT+IHfN+LkqTRdLXhPKiMUv+7+q88xPCIgE7YWfoElldiIFSzV7Wq1VYX80KjxHxIkSExSTZGq3B4wi8qJbPrHgDM=
-X-Received: by 2002:a05:651c:f12:b0:336:de32:4a7e with SMTP id
- 38308e7fff4ca-33b58cbe81bmr49237231fa.38.1757611718594; Thu, 11 Sep 2025
- 10:28:38 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="iaeR1TSI"
+ARC-Seal: i=1; a=rsa-sha256; t=1757611979; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=G0viXzGabnLEQ2qDOsV+VDqF5t1jO8PQFP6QSvkc/BmlL0U5vgDtyXVE9jOQ55oBzJuytwUan+zno0Q24sQ0Rj99YfxDdtzi42AnkC0nZBRzGe/+1GADOlBfZGNj9gb7kgYx6pD7/8SJ25bkXs9dc/Ff9ntAwriOfVnUzbmVkV8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1757611979; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=wIGEPlqmVdt+6rqxK8VWf8g/ld5CE8cOHgaJAXGXKQM=; 
+	b=aWsQGJ/VyKBTWMcwTN7JVrv0k97O0uZq22mRWOY6bzOKS3XIjgRDrG2tzzGot5hqvkPTJw8CwxIKLSJgarFkpuNxb6Mw6X3lQd9hDH88sGjGZkmwk3+l4ZJ8IYVY3SAf0LGwjraDLiKspV1R1MxyoFvJaahx8XVlSl7X5oiLcOM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
+	dmarc=pass header.from=<frederic.danis@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757611979;
+	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=wIGEPlqmVdt+6rqxK8VWf8g/ld5CE8cOHgaJAXGXKQM=;
+	b=iaeR1TSI8tL/p1Sm/TZN1KAdoVRUIEDdH4GPm5kKDoDx/tadMAt6Q1r4pH1i+7yq
+	Hu5xzuge8G2tTcRdpjyb6bBRiSJfeiWrOxrib6CDag6DF/8Ndcu4lFdyc697JdprsEv
+	GawhesGxPsORNAu/Kne+uLtPetHu1coBkC+23gvI=
+Received: by mx.zohomail.com with SMTPS id 1757611977740307.97256053164074;
+	Thu, 11 Sep 2025 10:32:57 -0700 (PDT)
+Message-ID: <b4e36f0d-130e-49f8-b2b3-dde10a5ef3cb@collabora.com>
+Date: Thu, 11 Sep 2025 19:32:55 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911102840.2090361-1-frederic.danis@collabora.com> <20250911102840.2090361-2-frederic.danis@collabora.com>
-In-Reply-To: <20250911102840.2090361-2-frederic.danis@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 11 Sep 2025 13:28:26 -0400
-X-Gm-Features: Ac12FXydCZjqHx7yjBJwanOM4UtyDpgNihlMvPnsITKE5C8E-RE6iWrMvmGW2Kc
-Message-ID: <CABBYNZ+fnsntwwbZY=u0_5J6O5oxCQhBq8Y-HcnaXXsDtTE-9A@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH BlueZ 2/4] unit/test-hfp: Add Operator name test for HF
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20250911102840.2090361-1-frederic.danis@collabora.com>
+ <20250911102840.2090361-2-frederic.danis@collabora.com>
+ <CABBYNZ+fnsntwwbZY=u0_5J6O5oxCQhBq8Y-HcnaXXsDtTE-9A@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
+In-Reply-To: <CABBYNZ+fnsntwwbZY=u0_5J6O5oxCQhBq8Y-HcnaXXsDtTE-9A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-Hi Fr=C3=A9d=C3=A9ric,
+Hi Luiz,
 
-On Thu, Sep 11, 2025 at 6:37=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
+On 11/09/2025 19:28, Luiz Augusto von Dentz wrote:
+> Hi Frédéric,
 >
-> This add the following test:
-> - HFP/HF/PSI/BV-04-C
->   Verify that the HF can query the currently selected operator name.
->
-> Improve MINIMAL_SLC_SESSION macro to be able to set the service, call,
-> callsetup and callheld indicators at connection time.
-> ---
->  unit/test-hfp.c | 50 +++++++++++++++++++++++++++++++++++++++----------
->  1 file changed, 40 insertions(+), 10 deletions(-)
->
-> diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-> index 371415a68..8ab6c7bf5 100644
-> --- a/unit/test-hfp.c
-> +++ b/unit/test-hfp.c
-> @@ -699,7 +699,7 @@ static void test_hf_robustness(gconstpointer data)
->         context_quit(context);
->  }
->
-> -#define MINIMAL_SLC_SESSION \
+> On Thu, Sep 11, 2025 at 6:37 AM Frédéric Danis
+> <frederic.danis@collabora.com> wrote:
+>> This add the following test:
+>> - HFP/HF/PSI/BV-04-C
+>>    Verify that the HF can query the currently selected operator name.
+>>
+>> Improve MINIMAL_SLC_SESSION macro to be able to set the service, call,
+>> callsetup and callheld indicators at connection time.
+>> ---
+>>   unit/test-hfp.c | 50 +++++++++++++++++++++++++++++++++++++++----------
+>>   1 file changed, 40 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+>> index 371415a68..8ab6c7bf5 100644
+>> --- a/unit/test-hfp.c
+>> +++ b/unit/test-hfp.c
+>> @@ -699,7 +699,7 @@ static void test_hf_robustness(gconstpointer data)
+>>          context_quit(context);
+>>   }
+>>
+>> -#define MINIMAL_SLC_SESSION \
+>> +#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
+> WARNING:MACRO_ARG_UNUSED: Argument 'service' is not used in function-like macro
+> #10: FILE: unit/test-hfp.c:702:
 > +#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
-
-WARNING:MACRO_ARG_UNUSED: Argument 'service' is not used in function-like m=
-acro
-#10: FILE: unit/test-hfp.c:702:
-+#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
-     raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
-         ' ', '0', '\r', '\n'), \
-     frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-
-WARNING:MACRO_ARG_UNUSED: Argument 'call' is not used in function-like macr=
-o
-#10: FILE: unit/test-hfp.c:702:
-+#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
-     raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
-         ' ', '0', '\r', '\n'), \
-     frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-
-WARNING:MACRO_ARG_UNUSED: Argument 'callsetup' is not used in
-function-like macro
-#10: FILE: unit/test-hfp.c:702:
-+#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
-     raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
-         ' ', '0', '\r', '\n'), \
-     frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-
-WARNING:MACRO_ARG_UNUSED: Argument 'callheld' is not used in function-like =
-macro
-#10: FILE: unit/test-hfp.c:702:
-+#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
-     raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
-         ' ', '0', '\r', '\n'), \
-     frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-
-- total: 0 errors, 4 warnings, 108 lines checked
-
-
->         raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
->                 ' ', '0', '\r', '\n'), \
->         frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-> @@ -722,10 +722,15 @@ static void test_hf_robustness(gconstpointer data)
->         frg_pdu('\r', '\n'), \
->         frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
->         raw_pdu('\r', '\n', '+', 'C', 'I', 'N', 'D', ':', ' '), \
-> -       frg_pdu('0', ',', '0', ',', '0', ',', '0', ',', '5'), \
-> -       frg_pdu(',', '0', ',', '5', '\r', '\n'), \
-> +       frg_pdu(service, ',', call, ',', callsetup, ',', callheld, ','), =
-\
-> +       frg_pdu('5', ',', '0', ',', '5', '\r', '\n'), \
->         frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-> -       raw_pdu('\r', '\n', 'O', 'K', '\r', '\n')
-> +       raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-> +       raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-> +       raw_pdu('\r', '\n', '+', 'C', 'O', 'P', 'S', ':', ' '), \
-> +       frg_pdu('0', ',', '0', ',', '\"', 'T', 'E', 'S', 'T'), \
-> +       frg_pdu('\"', '\r', '\n'), \
-> +       frg_pdu('\r', '\n', 'O', 'K', '\r', '\n')
+>       raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
+>           ' ', '0', '\r', '\n'), \
+>       frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
 >
->  static void hf_session_ready_cb(enum hfp_result res, enum hfp_error cme_=
-err,
->                                                         void *user_data)
-> @@ -745,7 +750,13 @@ static void hf_update_indicator(enum hfp_indicator i=
-ndicator, uint32_t val,
->         if (!context->session.completed) {
->                 switch (indicator) {
->                 case HFP_INDICATOR_SERVICE:
-> -                       g_assert_cmpint(val, =3D=3D, 0);
-> +                       if (g_str_equal(test_name, "/HFP/HF/PSI/BV-03-C")=
- ||
-> +                               g_str_equal(test_name, "/HFP/HF/TRS/BV-01=
--C") ||
-> +                               g_str_equal(test_name,
-> +                                               "/hfp_hf/test_session_min=
-imal"))
-> +                               g_assert_cmpint(val, =3D=3D, 0);
-> +                       else
-> +                               g_assert_cmpint(val, =3D=3D, 1);
->                         break;
->                 case HFP_INDICATOR_CALL:
->                         g_assert_cmpint(val, =3D=3D, 0);
-> @@ -789,9 +800,22 @@ static void hf_update_indicator(enum hfp_indicator i=
-ndicator, uint32_t val,
->         }
->  }
+> WARNING:MACRO_ARG_UNUSED: Argument 'call' is not used in function-like macro
+> #10: FILE: unit/test-hfp.c:702:
+> +#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
+>       raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
+>           ' ', '0', '\r', '\n'), \
+>       frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
 >
-> +static void hf_update_operator(const char *operator_name, void *user_dat=
-a)
-> +{
-> +       struct context *context =3D user_data;
-> +       const char *test_name =3D context->data->test_name;
-> +
-> +       if (tester_use_debug())
-> +               tester_debug("operator updated: %s", operator_name);
-> +
-> +       if (g_str_equal(test_name, "/HFP/HF/PSI/BV-04-C"))
-> +               g_assert_cmpstr(operator_name, =3D=3D, "TEST");
-> +}
-> +
->  static struct hfp_hf_callbacks hf_session_callbacks =3D {
->         .session_ready =3D hf_session_ready_cb,
->         .update_indicator =3D hf_update_indicator,
-> +       .update_operator =3D hf_update_operator,
->  };
+> WARNING:MACRO_ARG_UNUSED: Argument 'callsetup' is not used in
+> function-like macro
+> #10: FILE: unit/test-hfp.c:702:
+> +#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
+>       raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
+>           ' ', '0', '\r', '\n'), \
+>       frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
 >
->  static void test_hf_session_done(enum hfp_result res, enum hfp_error cme=
-_err,
-> @@ -996,13 +1020,13 @@ int main(int argc, char *argv[])
+> WARNING:MACRO_ARG_UNUSED: Argument 'callheld' is not used in function-like macro
+> #10: FILE: unit/test-hfp.c:702:
+> +#define MINIMAL_SLC_SESSION(service, call, callsetup, callheld) \
+>       raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
+>           ' ', '0', '\r', '\n'), \
+>       frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
 >
->         define_hf_test("/hfp_hf/test_session_minimal", test_hf_session,
->                         NULL, test_hf_session_done,
-> -                       MINIMAL_SLC_SESSION,
-> +                       MINIMAL_SLC_SESSION('0', '0', '0', '0'),
->                         data_end());
->
->         /* Transfer Signal Strength Indication - HF */
->         define_hf_test("/HFP/HF/PSI/BV-01-C", test_hf_session,
->                         NULL, test_hf_session_done,
-> -                       MINIMAL_SLC_SESSION,
-> +                       MINIMAL_SLC_SESSION('1', '0', '0', '0'),
->                         frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':')=
-,
->                         frg_pdu(' ', '5', ',', '3', '\r', '\n'),
->                         data_end());
-> @@ -1010,7 +1034,7 @@ int main(int argc, char *argv[])
->         /* Transfer Roaming Status Indication - HF */
->         define_hf_test("/HFP/HF/PSI/BV-02-C", test_hf_session,
->                         NULL, test_hf_session_done,
-> -                       MINIMAL_SLC_SESSION,
-> +                       MINIMAL_SLC_SESSION('1', '0', '0', '0'),
->                         frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':')=
-,
->                         frg_pdu(' ', '6', ',', '1', '\r', '\n'),
->                         frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':')=
-,
-> @@ -1020,15 +1044,21 @@ int main(int argc, char *argv[])
->         /* Transfer Battery Level Indication - HF */
->         define_hf_test("/HFP/HF/PSI/BV-03-C", test_hf_session,
->                         NULL, test_hf_session_done,
-> -                       MINIMAL_SLC_SESSION,
-> +                       MINIMAL_SLC_SESSION('0', '0', '0', '0'),
->                         frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':')=
-,
->                         frg_pdu(' ', '7', ',', '3', '\r', '\n'),
->                         data_end());
->
-> +       /* Transfer Operator name - HF */
-> +       define_hf_test("/HFP/HF/PSI/BV-04-C", test_hf_session,
-> +                       NULL, test_hf_session_done,
-> +                       MINIMAL_SLC_SESSION('1', '0', '0', '0'),
-> +                       data_end());
-> +
->         /* Transfer Registration Status - HF */
->         define_hf_test("/HFP/HF/TRS/BV-01-C", test_hf_session,
->                         NULL, test_hf_session_done,
-> -                       MINIMAL_SLC_SESSION,
-> +                       MINIMAL_SLC_SESSION('0', '0', '0', '0'),
->                         frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':')=
-,
->                         frg_pdu(' ', '1', ',', '1', '\r', '\n'),
->                         frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':')=
-,
-> --
-> 2.43.0
->
->
+> - total: 0 errors, 4 warnings, 108 lines checked
 
+Yes, I saw this, it is due to argument usage is done in the next hunk, 
+and checkpatch failsto parse it.
+>>          raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
+>>                  ' ', '0', '\r', '\n'), \
+>>          frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+>> @@ -722,10 +722,15 @@ static void test_hf_robustness(gconstpointer data)
+>>          frg_pdu('\r', '\n'), \
+>>          frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+>>          raw_pdu('\r', '\n', '+', 'C', 'I', 'N', 'D', ':', ' '), \
+>> -       frg_pdu('0', ',', '0', ',', '0', ',', '0', ',', '5'), \
+>> -       frg_pdu(',', '0', ',', '5', '\r', '\n'), \
+>> +       frg_pdu(service, ',', call, ',', callsetup, ',', callheld, ','), \
+>> +       frg_pdu('5', ',', '0', ',', '5', '\r', '\n'), \
+>>          frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+>> -       raw_pdu('\r', '\n', 'O', 'K', '\r', '\n')
+>> +       raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+>> +       raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+>> +       raw_pdu('\r', '\n', '+', 'C', 'O', 'P', 'S', ':', ' '), \
+>> +       frg_pdu('0', ',', '0', ',', '\"', 'T', 'E', 'S', 'T'), \
+>> +       frg_pdu('\"', '\r', '\n'), \
+>> +       frg_pdu('\r', '\n', 'O', 'K', '\r', '\n')
+>>
+>>   static void hf_session_ready_cb(enum hfp_result res, enum hfp_error cme_err,
+>>                                                          void *user_data)
+>> @@ -745,7 +750,13 @@ static void hf_update_indicator(enum hfp_indicator indicator, uint32_t val,
+>>          if (!context->session.completed) {
+>>                  switch (indicator) {
+>>                  case HFP_INDICATOR_SERVICE:
+>> -                       g_assert_cmpint(val, ==, 0);
+>> +                       if (g_str_equal(test_name, "/HFP/HF/PSI/BV-03-C") ||
+>> +                               g_str_equal(test_name, "/HFP/HF/TRS/BV-01-C") ||
+>> +                               g_str_equal(test_name,
+>> +                                               "/hfp_hf/test_session_minimal"))
+>> +                               g_assert_cmpint(val, ==, 0);
+>> +                       else
+>> +                               g_assert_cmpint(val, ==, 1);
+>>                          break;
+>>                  case HFP_INDICATOR_CALL:
+>>                          g_assert_cmpint(val, ==, 0);
+>> @@ -789,9 +800,22 @@ static void hf_update_indicator(enum hfp_indicator indicator, uint32_t val,
+>>          }
+>>   }
+>>
+>> +static void hf_update_operator(const char *operator_name, void *user_data)
+>> +{
+>> +       struct context *context = user_data;
+>> +       const char *test_name = context->data->test_name;
+>> +
+>> +       if (tester_use_debug())
+>> +               tester_debug("operator updated: %s", operator_name);
+>> +
+>> +       if (g_str_equal(test_name, "/HFP/HF/PSI/BV-04-C"))
+>> +               g_assert_cmpstr(operator_name, ==, "TEST");
+>> +}
+>> +
+>>   static struct hfp_hf_callbacks hf_session_callbacks = {
+>>          .session_ready = hf_session_ready_cb,
+>>          .update_indicator = hf_update_indicator,
+>> +       .update_operator = hf_update_operator,
+>>   };
+>>
+>>   static void test_hf_session_done(enum hfp_result res, enum hfp_error cme_err,
+>> @@ -996,13 +1020,13 @@ int main(int argc, char *argv[])
+>>
+>>          define_hf_test("/hfp_hf/test_session_minimal", test_hf_session,
+>>                          NULL, test_hf_session_done,
+>> -                       MINIMAL_SLC_SESSION,
+>> +                       MINIMAL_SLC_SESSION('0', '0', '0', '0'),
+>>                          data_end());
+>>
+>>          /* Transfer Signal Strength Indication - HF */
+>>          define_hf_test("/HFP/HF/PSI/BV-01-C", test_hf_session,
+>>                          NULL, test_hf_session_done,
+>> -                       MINIMAL_SLC_SESSION,
+>> +                       MINIMAL_SLC_SESSION('1', '0', '0', '0'),
+>>                          frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+>>                          frg_pdu(' ', '5', ',', '3', '\r', '\n'),
+>>                          data_end());
+>> @@ -1010,7 +1034,7 @@ int main(int argc, char *argv[])
+>>          /* Transfer Roaming Status Indication - HF */
+>>          define_hf_test("/HFP/HF/PSI/BV-02-C", test_hf_session,
+>>                          NULL, test_hf_session_done,
+>> -                       MINIMAL_SLC_SESSION,
+>> +                       MINIMAL_SLC_SESSION('1', '0', '0', '0'),
+>>                          frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+>>                          frg_pdu(' ', '6', ',', '1', '\r', '\n'),
+>>                          frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+>> @@ -1020,15 +1044,21 @@ int main(int argc, char *argv[])
+>>          /* Transfer Battery Level Indication - HF */
+>>          define_hf_test("/HFP/HF/PSI/BV-03-C", test_hf_session,
+>>                          NULL, test_hf_session_done,
+>> -                       MINIMAL_SLC_SESSION,
+>> +                       MINIMAL_SLC_SESSION('0', '0', '0', '0'),
+>>                          frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+>>                          frg_pdu(' ', '7', ',', '3', '\r', '\n'),
+>>                          data_end());
+>>
+>> +       /* Transfer Operator name - HF */
+>> +       define_hf_test("/HFP/HF/PSI/BV-04-C", test_hf_session,
+>> +                       NULL, test_hf_session_done,
+>> +                       MINIMAL_SLC_SESSION('1', '0', '0', '0'),
+>> +                       data_end());
+>> +
+>>          /* Transfer Registration Status - HF */
+>>          define_hf_test("/HFP/HF/TRS/BV-01-C", test_hf_session,
+>>                          NULL, test_hf_session_done,
+>> -                       MINIMAL_SLC_SESSION,
+>> +                       MINIMAL_SLC_SESSION('0', '0', '0', '0'),
+>>                          frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+>>                          frg_pdu(' ', '1', ',', '1', '\r', '\n'),
+>>                          frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':'),
+>> --
+>> 2.43.0
+>>
+>>
+>
+Regards,
 
---=20
-Luiz Augusto von Dentz
+Fred
+
+-- 
+Frédéric Danis
+Senior Software Engineer
+
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
+Registered in England & Wales, no. 5513718
+
