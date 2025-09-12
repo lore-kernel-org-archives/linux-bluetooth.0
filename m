@@ -1,94 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC5F134BD;
-	Fri, 12 Sep 2025 06:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4972D374B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 07:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757657975; cv=none; b=X7pYdzTJOpdaWp2TbcJS6Nkyj24dzj893fNKUzf4mZnkSIHtBJKnFJxcgQbGm/jJhiouxHvz7m/+kuls99BtBlwt4HcwDSPkchsscIn/3sfnto8Mn5zWvG8c6iO7eco5gcWd8aCaSGGc/GyoyfdotE9X0CWJ6AnL1zvBcF3C93g=
+	t=1757663745; cv=none; b=pU8OnySEEdMV8WfmKcLxJx+2LZkxpcHyeRjt3W2TgeeFo8/7OPLobUwCFmUhnAU7daZQI7pOHYumnQtQiXWTTPiPFeYIEHRoLJvuE3MxcdneSxOVSNNdMXsc+PXZX7Yom5znKHPzUwtCue3fURnbSCtPSQs+obu7czeghvW1E38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757657975; c=relaxed/simple;
-	bh=o8hk3zQNATXcYNezfLWUb6kcglAXSeb1kRjCzbDhJIw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YzgtSpF6mXwH7jDAD0UqGaW4ZaBURKsxuu4G0cKnTfdcHrUTsyR7kP0VkgByDFvoYyoSaetRZQXv7ZELQvPeFo1jEMDbOyxe34CD8LU4fszuk7WG64CWy/fUc+P7FmVOExaLT00SGdPUUOYH6Y+MTzdayE9Nxs4l92uAz5Mvqug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TAfBsjAS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757663745; c=relaxed/simple;
+	bh=ztNbIMrcsh4ruTKptD+2ccrVk4m3JYKdVglNGVQW8vk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ax7/REC0hAEjSIF19Ix0vbCB8zr5KqNxppmZhRuTlNUxSZ0rjqJ4C6lHIFJqHe1RvfJJ7mtqcengTB1xH7z0jbL+florbu34otQw4Gz/fAs2mDCAIzN7r6pvmFT9P+8OAzWjQarS0EshKIGbJaHmHIfARRKuNJJHgJPEGSFm/I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FCtW0T5c; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TAfBsjAS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1432C4CEF4;
-	Fri, 12 Sep 2025 06:19:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757657974;
-	bh=o8hk3zQNATXcYNezfLWUb6kcglAXSeb1kRjCzbDhJIw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TAfBsjASg0j47G0aj71WpPiHwEzVjLh8frxE9MTlUre9o4kgdD0AT9C2l8NxGKnp8
-	 7IFEcYbPKl8ue4IGOaLDKbEJWbquIJXUUac3GR9E8dEo3Jh7cz5KyP8qh3mPDlVArz
-	 meCJadPxluLfi2gaQmclFasUpdycrQpAxtv6mRtBuVlbMKoWoMt6LIpZ7jlivjF0dg
-	 SBAPM4eomEn87Qqye6+Q6x4eBzcUHZ4H1iHg9AmOB6gpsAuvBFvm28piizL42FE7pD
-	 /GR042vD8YIz4ZS/9nvYqbhp9jXT7LOUgXCQDvL0U4FZWriZxiFMJkIGihya5dMtB1
-	 KwwnUs4bBEHfQ==
-Date: Fri, 12 Sep 2025 08:19:32 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch, 
-	andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com, broonie@kernel.org, 
-	chunkuang.hu@kernel.org, conor+dt@kernel.org, davem@davemloft.net, 
-	dmitry.torokhov@gmail.com, edumazet@google.com, flora.fu@mediatek.com, heiko@sntech.de, 
-	houlong.wei@mediatek.com, jeesw@melfas.com, kernel@collabora.com, krzk+dt@kernel.org, 
-	kuba@kernel.org, lgirdwood@gmail.com, linus.walleij@linaro.org, 
-	louisalexis.eyraud@collabora.com, luiz.dentz@gmail.com, maarten.lankhorst@linux.intel.com, 
-	marcel@holtmann.org, matthias.bgg@gmail.com, mchehab@kernel.org, 
-	minghsiu.tsai@mediatek.com, mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com, 
-	robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch, 
-	support.opensource@diasemi.com, tiffany.lin@mediatek.com, tzimmermann@suse.de, 
-	yunfei.dong@mediatek.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, linux-rockchip@lists.infradead.org, linux-sound@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 06/12] dt-bindings: display: mediatek,ufoe: Add
- mediatek,gce-client-reg property
-Message-ID: <20250912-innocent-polite-cricket-05dbd8@kuoka>
-References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
- <20250911151001.108744-7-ariel.dalessandro@collabora.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FCtW0T5c"
+Received: from github.com (hubbernetes-node-6d3c578.ash1-iad.github.net [10.56.15.52])
+	by smtp.github.com (Postfix) with ESMTPA id 4CA7760068B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 00:55:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1757663743;
+	bh=1dyM2NxiEwxcM9Uqj5I4UMrJUUE9sd1a3+Lno9rKFbA=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=FCtW0T5cV5EjWmOQmR0HnB0xBcVcjK8eUJ8+E+dVdBTYIcylVo+6SEZf2Tqljji1G
+	 INfLbocUvzsXgjkzyM2kzZ2M+pLtxPy1mqI5tu19a3P5AIs0JcI4lZw07K4sVUAyOr
+	 L+IwWeens6Atp+jRatGcWHtZ2Q31+NwG8pCOSA6I=
+Date: Fri, 12 Sep 2025 00:55:43 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/990883/2eb941-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250911151001.108744-7-ariel.dalessandro@collabora.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Thu, Sep 11, 2025 at 12:09:55PM -0300, Ariel D'Alessandro wrote:
-> Currently, users of Mediatek UFOe (Unified Frame Optimization engine) DT
-> bindings set mediatek,gce-client-reg node property, which is missing from
-> the DT schema.
-> 
-> For example, device tree arch/arm64/boot/dts/mediatek/mt8173.dtsi is
-> causing the following dtb check error:
-> 
-> ```
-> $ make CHECK_DTBS=y mediatek/mt8173-elm.dtb
->    SCHEMA  Documentation/devicetree/bindings/processed-schema.json
->    DTC [C] arch/arm64/boot/dts/mediatek/mt8173-elm.dtb
-> [...]
+  Branch: refs/heads/990883
+  Home:   https://github.com/bluez/bluez
 
-You can drop above 4 lines, they are obvious. Your "dtbs_check error"
-message already defined that.
-
-> arch/arm64/boot/dts/mediatek/mt8173-elm.dtb: ufoe@1401a000
-> (mediatek,mt8173-disp-ufoe): 'mediatek,gce-client-reg' does not match
-> any of the regexes: '^pinctrl-[0-9]+$'
-
-The warning message should not be wrapped, so this should be two lines.
-Maybe entire warning should be in one line, at least that's what I would
-do, after dropping "arch/arm64/boot/dts/".
-
-Anyway, no need to resend just for these. Thanks for the update.
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Best regards,
-Krzysztof
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
