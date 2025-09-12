@@ -1,76 +1,83 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2551B7DA66
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 00:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F0C168BD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 01:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757637172; cv=none; b=joAoQdJh5SEBsFD3wf0H+3Q1VvTiIQWqqhovtC2BZub2U/qtwks9wTcLq0Sq/mdd/GQYx2Y92SPDRQ9AkSWzTZrrCY2M47+5nQXwIZ1fLoUhX+MFC3glceZx//eGuuf56m/LhiWxGXlV2w0U1saAHqUNjrmkQdGpYAVP5N8SKQI=
+	t=1757639211; cv=none; b=HLXFoo5Qd69AER6YI4T1bzWjvCAVakS5ErDkDH4tAkhae4zpbsnUq3vqBPwJcL+Yn4BVNB+47w0mrtUjAPAnwtHXqqoTctxflBI/na9tN5qgfAe8DnatytFsYU7GAQixoZ+y6Up6VGXNBI+4+/GGjt49w0c7hJVcZEXVMg8eUoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757637172; c=relaxed/simple;
-	bh=efDa0WnX2uvaHnXaFbWUj9P3wFRzmzslAOIS4EOaJ+o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mt0OEABpSdihqGIiiTHbce/92PStEQgUnBDrli8mqQqWubc3WQhVL5wOeeAq7xTQl5yExKQO3tLYnvlDsPb8Nrgeze2czogUeFDP8oiaWKTWM6mmH+CISKvkvlz5n/DWkNi51irvmomR37O+iSBM8fPAiW10dUK+sJbszwhQbY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3AF0E43ADC;
-	Fri, 12 Sep 2025 00:32:42 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
+	s=arc-20240116; t=1757639211; c=relaxed/simple;
+	bh=reZixicf+fKhTcvbMpTWxyoAKljwqGsYJQpYPxHWGQg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jGEkYRYYIOkKTulDFnLuwks4khNFQxQF5CrNtmFCAEcrlv/6b/dMG32nmJSjGlr6Jp9TO6df3FOPOSCBQRQZELMP7hKCEKh6+qR4eGVnRiQxkWjVJCbf4VtEFDhC+QNNV2Giew3t0gtcIwJVBRaX0OWYZOcQK6WUBmpJIj604vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=EFn8c+ZR; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="EFn8c+ZR"
+Received: from github.com (hubbernetes-node-46e71a5.va3-iad.github.net [10.48.220.97])
+	by smtp.github.com (Postfix) with ESMTPA id 8B6FD4E082F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Sep 2025 18:06:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1757639209;
+	bh=12M0gEXA/aizyxkgJn7nO0oHAMg5Vwx6ovpPYPH/lUE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=EFn8c+ZRzKS7m8D0ydnWXGZdCvFi7beiiVEwY7ECFS7Pk8ILq/j3MkPtasDWz7KUQ
+	 Qjsmc1u2xL+IYVJ6YTdrNeY2MgtEwC133TTlorTdzW61T+t7iztEReLZ9hakP/eTYY
+	 7WQl9dE6Zm3PnlLLCZ085SsZqdXk6Us6K8fZ6HhQ=
+Date: Thu, 11 Sep 2025 18:06:49 -0700
+From: hadess <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Arun Raghavan <arun@accosted.net>
-Subject: [PATCH BlueZ] transport: Fix build with A2DP support disabled
-Date: Fri, 12 Sep 2025 02:32:19 +0200
-Message-ID: <20250912003233.931520-1-hadess@hadess.net>
-X-Mailer: git-send-email 2.51.0
+Message-ID: <bluez/bluez/push/refs/heads/1001555/000000-9ddeab@github.com>
+Subject: [bluez/bluez] 9ddeab: transport: Fix build with A2DP support disabled
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvjeeivdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeelheefueejfeeiledvgeekteeggfevkeeigefffffhvefftdevieekuddvuddtleenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegrrhhunhesrggttghoshhtvggurdhnvght
-X-GND-Sasl: hadess@hadess.net
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1001555
+  Home:   https://github.com/bluez/bluez
+  Commit: 9ddeabfc7d7e6228fef78a0b018fb41b99885387
+      https://github.com/bluez/bluez/commit/9ddeabfc7d7e6228fef78a0b018fb=
+41b99885387
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-09-12 (Fri, 12 Sep 2025)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: Fix build with A2DP support disabled
 
 $ ./bootstrap-configure --disable-a2dp && make
 [...]
-profiles/audio/transport.c: In function ‘media_transport_update_delay’:
-profiles/audio/transport.c:2653:33: error: implicit declaration of function ‘a2dp_avdtp_get’ [-Wimplicit-function-declaration]
- 2653 |                 a2dp->session = a2dp_avdtp_get(transport->device);
+profiles/audio/transport.c: In function =E2=80=98media_transport_update_d=
+elay=E2=80=99:
+profiles/audio/transport.c:2653:33: error: implicit declaration of functi=
+on =E2=80=98a2dp_avdtp_get=E2=80=99 [-Wimplicit-function-declaration]
+ 2653 |                 a2dp->session =3D a2dp_avdtp_get(transport->devic=
+e);
       |                                 ^~~~~~~~~~~~~~
-profiles/audio/transport.c:2653:31: error: assignment to ‘struct avdtp *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
- 2653 |                 a2dp->session = a2dp_avdtp_get(transport->device);
+profiles/audio/transport.c:2653:31: error: assignment to =E2=80=98struct =
+avdtp *=E2=80=99 from =E2=80=98int=E2=80=99 makes pointer from integer wi=
+thout a cast [-Wint-conversion]
+ 2653 |                 a2dp->session =3D a2dp_avdtp_get(transport->devic=
+e);
       |                               ^
 
 Reported-by: Arun Raghavan <arun@accosted.net>
-Fixes: 0bb66d3d1abd ("transport: fix A2DP Delay values missing from DBus")
----
- profiles/audio/transport.c | 2 ++
- 1 file changed, 2 insertions(+)
+Fixes: 0bb66d3d1abd ("transport: fix A2DP Delay values missing from DBus"=
+)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index ab149bcd728b..2fceb5121a34 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -2643,6 +2643,7 @@ void *media_transport_get_stream(struct media_transport *transport)
- void media_transport_update_delay(struct media_transport *transport,
- 							uint16_t delay)
- {
-+#ifdef HAVE_A2DP
- 	struct a2dp_transport *a2dp = transport->data;
- 
- 	/* Check if delay really changed */
-@@ -2657,6 +2658,7 @@ void media_transport_update_delay(struct media_transport *transport,
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
- 					transport->path,
- 					MEDIA_TRANSPORT_INTERFACE, "Delay");
-+#endif /* HAVE_A2DP */
- }
- 
- struct btd_device *media_transport_get_dev(struct media_transport *transport)
--- 
-2.51.0
 
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
