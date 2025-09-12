@@ -1,46 +1,61 @@
-Received: from mail-b.studer.dev (mail-b.studer.dev [3.21.136.164])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10017322DA1
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 18:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.21.136.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C483472613
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 18:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757702183; cv=none; b=hcmd6qYVxxnW3MstKSQsFHH8Qe2Cm9+LbLmIE1BWPQVxNpAJlIaRJ5/opVrhQBudZDWecAWU/dODTa7eHbCGnPHeR6iRnY1ZRwend07mFcQizo+hVQeAwdR0sf6lvz+Q/3/Bs5Y9MinPHp+2GgBC39nwWMMx520XFPYluuohmzE=
+	t=1757702759; cv=none; b=A2OU2Qnz46iW6pWcclnDCleX/jpsAZlBfIZC1ydcI6Gy2i1EJhSOeBj4YUADzestK0IbW/zPKdD7kx90OPIW4w7/TdvQfLPZ2ZIQfe55DiOgedt5uIt7B3L1BcGowYxWxbgjJ+R005K/HFS0lTwoyVwXmILbLIMP4ph6Vw3hWKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757702183; c=relaxed/simple;
-	bh=EPXoaoRHMvjN3Gijk9qwNSBN61oEuuJ2AoXpzmuNSuM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fxtrONqOI4HPjMb/XvrARkNFokIKY7w+xJw5YiWTy0ih+Z8Ifq0gdIwJ86E0FpUDpRr3a7DGtqWUvU1Vvep1ckgqTuMayERSvgA+/Ms/JIPHUNPrmB1HsluErCXbRfrKzqktuAFlJyTa4lqRHQAicPMvKnGsuE6DCIIa0wobuW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=studer.dev; spf=pass smtp.mailfrom=studer.dev; dkim=pass (2048-bit key) header.d=studer.dev header.i=@studer.dev header.b=qdUodavZ; arc=none smtp.client-ip=3.21.136.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=studer.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=studer.dev
+	s=arc-20240116; t=1757702759; c=relaxed/simple;
+	bh=nr/qJphWo4ELccT4sVghkhSEHvGuSjkxkUE6/Plzm/0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=DTMSW67ymkUlQiUDu1QdUJJFnDZnY7EiiixJIVrjxlsWqeCtJ2WP30CNMaRzqGAOTfMeatsojdR6DRwzPH7GFkSYMjGZjSMYVdapPdt4Y10De3LkjoWCbuoDx7HAAPcCQ+DhTIPQvSF21jWJ85Zpt99NGvHE6MmNCHJRyNYcFhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fi+8g0Ul; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=studer.dev header.i=@studer.dev header.b="qdUodavZ"
-Received: from mail.studer.dev (mail.studer.dev [168.62.161.121])
-	by mail-b.studer.dev (Postfix) with ESMTPSA id 9933540024
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 18:27:36 +0000 (UTC)
-dkim-signature: v=1; a=rsa-sha256; d=studer.dev; s=hmail;
-	c=relaxed/relaxed; q=dns/txt; h=From:Subject:Date:Message-ID:To:CC:MIME-Version:Content-Transfer-Encoding;
-	bh=vCcxI9AT6ZOQorPVfdfOttI0gUyEfSelZOyQFsvdfdQ=;
-	b=qdUodavZdlNE4q42n1r7H5ndKLbz5iCzj4Jui2uSsGfvmlNzj0AFaxlDH/HS2P/s0XAHCwQDL+hIJG/2Y3RRgK8yuU+QSk53wvEY7S6v1oORisMORwG9MoLMFSLRUoTEMuNx888lW18ytxIMnd5ab9co61iQBI5ul7tHSVCXLuB+l0w4k+saDSr7sXDVv4U4UMT8zJ1kw6cZKVBbADnPaHCSAXV7z29ho3OkT/f7ytS/eJS2gwKbgvtfZq
-	lmjDPDNYTBbS4Yy7b1iGfcUVXQIo1OwgexTAUovfDiBHm/M+sgVQAUJmv4jULR82+c/7Ozj+GwyF7l1ZIwrx/sN8rimQ==
-Received: from alex-framework.localdomain (Unknown [38.42.217.75])
-	by mail.studer.dev with ESMTPSA
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256)
-	; Fri, 12 Sep 2025 18:27:35 +0000
-From: Alex Studer <alex@studer.dev>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fi+8g0Ul"
+Received: from github.com (hubbernetes-node-8ac9acf.va3-iad.github.net [10.48.205.42])
+	by smtp.github.com (Postfix) with ESMTPA id EAF2F8C046C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 11:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1757702756;
+	bh=evPgsc8uNua/7SiPGx9DeGhp+KdZ80Ec05oaLDhTyGM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=fi+8g0Ulg/f0y5mrf/NEH3rSGcj4mqrrj3Eu7lBdtQEwpCgSXMLNea6WlN+7qbPwZ
+	 FboZ7t3QFx23MBih6609aFRxxU4+om8gVqFN0zN/IvPVcE8e+jgh7ITkm8JzY9eiDp
+	 HegkdxZePsGYDGBwco3YyuoSP0mndodLqktQ+URE=
+Date: Fri, 12 Sep 2025 11:45:56 -0700
+From: Alex Studer <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Alex Studer <alex@studer.dev>
-Subject: [PATCH BlueZ] profiles/audio/a2dp: Clear suspend timer on A2DP stream free
-Date: Fri, 12 Sep 2025 14:20:34 -0400
-Message-ID: <20250912182033.1260032-2-alex@studer.dev>
-X-Mailer: git-send-email 2.51.0
+Message-ID: <bluez/bluez/push/refs/heads/1001921/000000-484885@github.com>
+Subject: [bluez/bluez] 484885: profiles/audio/a2dp: Clear suspend timer on
+ A2DP s...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1001921
+  Home:   https://github.com/bluez/bluez
+  Commit: 48488578b35ed19e92f6f9e50fe7551ccc0f510e
+      https://github.com/bluez/bluez/commit/48488578b35ed19e92f6f9e50fe7551ccc0f510e
+  Author: Alex Studer <alex@studer.dev>
+  Date:   2025-09-12 (Fri, 12 Sep 2025)
+
+  Changed paths:
+    M profiles/audio/a2dp.c
+
+  Log Message:
+  -----------
+  profiles/audio/a2dp: Clear suspend timer on A2DP stream free
 
 When an A2DP stream is created in start_ind, a timer is set, suspending
 the AVDTP stream if there have been no users within 5 seconds. However,
@@ -56,27 +71,7 @@ This was causing random segfaults when connecting my Sony WH-1000XM5
 headphones.
 
 Signed-off-by: Alex Studer <alex@studer.dev>
----
- profiles/audio/a2dp.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 661843a89..4e1362913 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -636,6 +636,11 @@ static void a2dp_stream_free(void *data)
- {
- 	struct a2dp_stream *stream = data;
- 
-+	if (stream->suspend_timer) {
-+		timeout_remove(stream->suspend_timer);
-+		stream->suspend_timer = 0;
-+	}
-+
- 	avdtp_unref(stream->session);
- 	free(stream);
- }
--- 
-2.51.0
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
