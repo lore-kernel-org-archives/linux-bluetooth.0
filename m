@@ -1,155 +1,184 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F9E2848B4;
-	Fri, 12 Sep 2025 09:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA072EA467
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 10:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757669507; cv=none; b=UKZIA24I3cgOiR5xHITFq3td6ODh/lt5xPLFJQ++49ANkIiaOES2EGOgDtfIJxTJriAkU6LLZwARKPefdt67vDKXDrhTqxPpY3ugHqeflgWfPnZKe7FmJvt82CstGHTy22fUV5daefjy7tqFoncbF+Tl8qDLxo7JYYFNN1KR/fc=
+	t=1757673393; cv=none; b=foWXFImQadXfSWfmHhlS+Q2wRvcODaHGbou+mrufYYeYxIgWxjGtj35FNrHy5A1qfHASqGw8x5FxeHMKrJrM93ZxGUFJc5eEIWdfmDzV3rXhTKl9ZkxAmY8b8SJ8GJM0gTeb9OuADnFhf16XF0dizx6b1XwZLxFLJ57Q+8aGSDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757669507; c=relaxed/simple;
-	bh=cZZSj/PLAmvPikniIesMdJfhqh3VOpUH71TpGrecZ8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tIUScZ6Gzx9bxdDLH7qle5FByA8HOy260Awo0S7Oxp4PHfo+Ao6tQmigQBbIokDw0n6b0hp6GeL5M5lk5HzJ2BvuStC1kygrHoCX5vof//FsXAzmY+OrKjvhDBl4NyqVaa0zCR/EMPEbydokKZyLJO15Mdm+U2v+NSDoqSEsKsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oDl2A0LO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757673393; c=relaxed/simple;
+	bh=TuWkHpyzyZ6Bu+T+2g4gbUag/jNCmBa35lf9QWsjyKY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QBvnivoUYZ+UOah1mk/jHvWDsGHFMzB1OcFJ6BhcGlr7BnzLX4mL6jGwQdN4JOOL9oEg2Y17V1W8vf+jrJbP9Ig1q4Zy8WeG+0Vy7yNK4tpD8PTD6KaVMYRtdr7ZZNYhWQjcTRITFhfsAq8y17kzC8iiRmEArEgdePT6DG+WoTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=km21yKmu; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oDl2A0LO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB683C4CEF1;
-	Fri, 12 Sep 2025 09:31:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757669506;
-	bh=cZZSj/PLAmvPikniIesMdJfhqh3VOpUH71TpGrecZ8M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oDl2A0LOXO/1X2zNKv7aRnP0NHdkbAsbDDgwtZzvwmo12fpeFM2E3/tK2+Vtp6jDf
-	 LtHjqH3FhqX9XCd49ZEoi9d2wFua1A1xl2NpXDXII2TJgNe2FaEGcY3H9R3K+d/kSk
-	 i5GbpzjLt0Me2HD69Wbc5uGIc3TwgDS6JZFlUf4XXoZCI/2uPJn9w8cEPAn3NjkatI
-	 mrNqigkcd6DbPU1UEsK3MA+M2bqLjMfjb8ArXgRSIyAq3CjGnxkE8s7LGICh/mIf7j
-	 5pUu4Qe144CAGGymifmDXQ3yvwNpleByOIrvrEZ2XoQVUNyLe8+LbR96tJeBNXKw/y
-	 Se8H2lBXfymbQ==
-Date: Fri, 12 Sep 2025 11:31:43 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
-To: Janne Grunau <j@jannau.net>
-Cc: Sven Peter <sven@kernel.org>, Alyssa Rosenzweig <alyssa@rosenzweig.io>, 
-	Neal Gompa <neal@gompa.dev>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Hector Martin <marcan@marcan.st>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Linus Walleij <linus.walleij@linaro.org>, 
-	Mark Kettenis <kettenis@openbsd.org>, Andi Shyti <andi.shyti@kernel.org>, 
-	Jassi Brar <jassisinghbrar@gmail.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Sasha Finkelstein <fnkl.kernel@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	van Spriel <arend@broadcom.com>, Lee Jones <lee@kernel.org>, Stephen Boyd <sboyd@kernel.org>, 
-	Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck <linux@roeck-us.net>, 
-	Michael Turquette <mturquette@baylibre.com>, Martin =?utf-8?Q?Povi=C5=A1er?= <povik+lin@cutebit.org>, 
-	Vinod Koul <vkoul@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, asahi@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pm@vger.kernel.org, iommu@lists.linux.dev, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-bluetooth@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, linux-pwm@vger.kernel.org, linux-watchdog@vger.kernel.org, 
-	linux-clk@vger.kernel.org, dmaengine@vger.kernel.org, linux-sound@vger.kernel.org, 
-	linux-spi@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 20/37] dt-bindings: pwm: apple,s5l-fpwm: Add t6020-fpwm
- compatible
-Message-ID: <ahxdf3l6zvmjp2nlgklg3go7biaimuz7qh5upnhohrrbrg62e6@gmi3pmbccwwe>
-References: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net>
- <20250828-dt-apple-t6020-v1-20-507ba4c4b98e@jannau.net>
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="km21yKmu"
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id DECD2414A7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 10:36:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1757673378;
+	bh=3IOksmbooBoQMbqX50TTRZDhxdBTTHIG3yT2qmnv/kk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=km21yKmuagLlOr7rCqhQOWVaSxWUsB16xTqW3VofWStWUBYXrH6jnA39HiHlGF1Ii
+	 Ci2sImUfrN6uGkQKb94+INkgvp9WmVCwEuDuaOpvMfxvTRkEP5jYxb9lKp8h2DOpyE
+	 YxFp7YYEmP42Pt8GhI+cP9Rn7RgmT4Au1S1b8QDMfXwiP9RqHW4hrPlmGj75E+PUOX
+	 ljxsEq7wdLG0dJVKNg36Zsx/79n69YlAdIhd9p1+500qsiSbS0IPkvrxfMxxL0Npl5
+	 b/LJC6OvHps44ZHjiJRLJ+TDV5nAok2Qi+kgSHOMqt/61lVAzVLST6t6ytVvGiYcDQ
+	 pBezMwmeKrAnA==
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b00e4aff77fso3122466b.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Sep 2025 03:36:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757673377; x=1758278177;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3IOksmbooBoQMbqX50TTRZDhxdBTTHIG3yT2qmnv/kk=;
+        b=YXg6dGKRFT9VfvKsNOb8THM6navBSgSriVTbKsenHR+CyJjQDLvtvbbPb/0VJikK/W
+         fQcgJrpTCrHySQc9Yy/BNeqyxJc/IhDAxo7XrE9GCoNcyXsiPA3EtfWb4egFvDfdtItV
+         w2UuT0l3/2O7x7h6XqhgmD3ueUDKHUiQ5TLB/Kycbs4BTnUoPtHykmJOpzOxhhNvvfmY
+         2rxGqrQRjsJL3bYo1D4gp2eNlwIxyja0YpYAjYuZc4sLE9dHpT1eQ7RQEDQXovAaWXN1
+         NGoDfrRG6yJkJ+VOGwlGnW3RkE+im1s5f2epxDVytXkeU8gy93LV7vqEncLWh08qf9T8
+         BvRg==
+X-Gm-Message-State: AOJu0YwenK8mC/sGduRWqnxPBAhwP3gdtaQSskNYV569reda515uthae
+	tKrU76o2goEszK75UkaB2RiyEY/5qn1sH/deqal1TehbhHhgoj76bAjEwzadD6xQuZ/f6fmxFXK
+	k4A9U1KDpd+6S56Oy5ClmFWNK1MLD2Gl4IkNSdiMoo5wOgVkpGL4zfQR7K5h4GHqPMPzh8f6Ts4
+	N0Rw5AZgkcC7tOYseRZA==
+X-Gm-Gg: ASbGncttrZPDYyzrkqnviPh9Bjx2E1zPJQg/UUFC1YiOrhizDAM81BVCnxH8sQd/lOJ
+	mN5qaV9ViTvsVsyHTpZt08q5nA/PbXlXWTLOZjG/JdPoW3QpiEAOn/VQONXePTN+6Clgo+30IzB
+	jEH4ll0N87bzx7IlsKXJI4ILGONQsE2oG7oSVf0t6jDvQS7+2Mf1u8cCxws84fs69QwquHD32bn
+	vN03ym/WpfNrWU6KyadR2nBRjgFOPe2wMk6pdIQ7Pn6BHWlGwg6Z4n7e0c9PO07cQQ0UbiWKg6T
+	OY8RJJMi7s5iDgnBo7ixulnxgHqUuKhZWD4GOmSFCVYQO6+/kf1irDRNcYFrbITO1H5wgVq9nia
+	W1CKoQobPvFaNSW9tw20GEeUfQfrOQUdKmI7hu82LChl4
+X-Received: by 2002:a17:907:3e1f:b0:b01:7e4e:9bf4 with SMTP id a640c23a62f3a-b07c3829474mr115292766b.8.1757673377146;
+        Fri, 12 Sep 2025 03:36:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFeIMjmnlDpRaN9VRmaC76LHsUAtQtJmcpS0kzy76Lilr2qR6F9gZPshlrkgHIS+llNAlY23Q==
+X-Received: by 2002:a17:907:3e1f:b0:b01:7e4e:9bf4 with SMTP id a640c23a62f3a-b07c3829474mr115291766b.8.1757673376689;
+        Fri, 12 Sep 2025 03:36:16 -0700 (PDT)
+Received: from aglinserer-MS-7C91.pigl.home (188-23-192-136.adsl.highway.telekom.at. [188.23.192.136])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07b32dd57csm339605366b.52.2025.09.12.03.36.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Sep 2025 03:36:16 -0700 (PDT)
+From: Andreas Glinserer <andreas.glinserer@canonical.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andreas Glinserer <andreas.glinserer@canonical.com>
+Subject: [PATCH BlueZ] src/adapter: add timeout for missing discovery
+Date: Fri, 12 Sep 2025 12:35:50 +0200
+Message-ID: <20250912103550.49240-1-andreas.glinserer@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hd4ybrkt7tr5jevb"
-Content-Disposition: inline
-In-Reply-To: <20250828-dt-apple-t6020-v1-20-507ba4c4b98e@jannau.net>
+Content-Transfer-Encoding: 8bit
 
+Add a timeout to detect when the controller stops sending discovery
+events. Without this, the system silently discovering new devices
+and the scan list gradually empties due to DEFAULT_TEMPORARY_TIMEOUT.
 
---hd4ybrkt7tr5jevb
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH 20/37] dt-bindings: pwm: apple,s5l-fpwm: Add t6020-fpwm
- compatible
-MIME-Version: 1.0
+When the timeout triggers, issue MGMT_OP_STOP_DISCOVERY to restart the
+event loop and resume discovery.
 
-Hello,
+Link: https://github.com/bluez/bluez/issues/1554
+---
+ src/adapter.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-On Thu, Aug 28, 2025 at 04:01:39PM +0200, Janne Grunau wrote:
-> The PWM controller on Apple's M2 Pro/Max SoCs behaves in the same way as
-> on previous M1 and M2 SoCs. Add its per SoC compatible.
->=20
-> At the same time fix the order of existing entries. The sort order logic
-> is having SoC numeric code families in release order, and SoCs within
-> each family in release order:
->=20
-> - t8xxx (Apple HxxP/G series, "phone"/"tablet" chips)
->   - t8103 (Apple H13G/M1)
->   - t8112 (Apple H14G/M2)
-> - t6xxx (Apple HxxJ series, "desktop" chips)
->   - t6000/t6001/t6002 (Apple H13J(S/C/D) / M1 Pro/Max/Ultra)
->   - t6020/t6021/t6022 (Apple H14J(S/C/D) / M2 Pro/Max/Ultra)
->=20
-> Note that SoCs of the t600[0-2] / t602[0-2] family share the
-> t6000 / t6020 compatible where the hardware is 100% compatible, which is
-> usually the case in this highly related set of SoCs.
->=20
-> Signed-off-by: Janne Grunau <j@jannau.net>
-> ---
->  Documentation/devicetree/bindings/pwm/apple,s5l-fpwm.yaml | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/pwm/apple,s5l-fpwm.yaml b/=
-Documentation/devicetree/bindings/pwm/apple,s5l-fpwm.yaml
-> index 142157bff0cd851c85fbf0132d734d470c5a0761..04519b0c581d0e9fb1ae6aa21=
-9a4e850027de6a2 100644
-> --- a/Documentation/devicetree/bindings/pwm/apple,s5l-fpwm.yaml
-> +++ b/Documentation/devicetree/bindings/pwm/apple,s5l-fpwm.yaml
-> @@ -17,8 +17,9 @@ properties:
->      items:
->        - enum:
->            - apple,t8103-fpwm
-> -          - apple,t6000-fpwm
->            - apple,t8112-fpwm
-> +          - apple,t6000-fpwm
-> +          - apple,t6020-fpwm
->        - const: apple,s5l-fpwm
-> =20
->    reg:
+diff --git a/src/adapter.c b/src/adapter.c
+index dc5ba65d7..1ec665c73 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -342,6 +342,7 @@ struct btd_adapter {
+ 
+ 	struct queue *exp_pending;
+ 	struct queue *exps;
++	unsigned int last_discovery_timeout_id;		/* Timeout for discovery stop if no cb is coming */
+ };
+ 
+ static char *adapter_power_state_str(uint32_t power_state)
+@@ -1727,6 +1728,11 @@ static void discovery_cleanup(struct btd_adapter *adapter, int timeout)
+ 		adapter->discovery_idle_timeout = 0;
+ 	}
+ 
++	if (adapter->last_discovery_timeout_id > 0) {
++		timeout_remove(adapter->last_discovery_timeout_id);
++		adapter->last_discovery_timeout_id = 0;
++	}
++
+ 	g_slist_free_full(adapter->discovery_found,
+ 						invalidate_rssi_and_tx_power);
+ 	adapter->discovery_found = NULL;
+@@ -1833,6 +1839,8 @@ static struct discovery_client *discovery_complete(struct btd_adapter *adapter,
+ 	return client;
+ }
+ 
++static bool time_since_last_discovery_cb(gpointer user_data);
++
+ static void start_discovery_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -1900,6 +1908,20 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
+ 	trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT * 2);
+ }
+ 
++static bool time_since_last_discovery_cb(gpointer user_data)
++{
++	struct btd_adapter *adapter = user_data;
++	struct mgmt_cp_start_discovery cp;
++	DBG("");
++	cp.type =  get_scan_type(adapter);
++	
++	mgmt_send(adapter->mgmt, MGMT_OP_STOP_DISCOVERY,
++		adapter->dev_id, sizeof(cp), &cp,
++		NULL, NULL, NULL);
++
++	return FALSE;
++}
++
+ static bool start_discovery_timeout(gpointer user_data)
+ {
+ 	struct btd_adapter *adapter = user_data;
+@@ -1909,6 +1931,9 @@ static bool start_discovery_timeout(gpointer user_data)
+ 	DBG("");
+ 
+ 	adapter->discovery_idle_timeout = 0;
++	adapter->last_discovery_timeout_id = timeout_add_seconds(
++		IDLE_DISCOV_TIMEOUT * 3, time_since_last_discovery_cb,
++		adapter, NULL);
+ 
+ 	/* If we're doing filtered discovery, it must be quickly restarted */
+ 	adapter->no_scan_restart_delay = !!adapter->current_discovery_filter;
+@@ -2009,6 +2034,11 @@ static void trigger_start_discovery(struct btd_adapter *adapter, guint delay)
+ 	if (!btd_adapter_get_powered(adapter))
+ 		return;
+ 
++	if (adapter->last_discovery_timeout_id > 0) {
++		timeout_remove(adapter->last_discovery_timeout_id);
++		adapter->last_discovery_timeout_id = 0;
++	}
++
+ 	adapter->discovery_idle_timeout = timeout_add_seconds(delay,
+ 					start_discovery_timeout, adapter, NULL);
+ }
+@@ -2053,6 +2083,11 @@ static void suspend_discovery(struct btd_adapter *adapter)
+ 		adapter->discovery_idle_timeout = 0;
+ 	}
+ 
++	if (adapter->last_discovery_timeout_id > 0) {
++		timeout_remove(adapter->last_discovery_timeout_id);
++		adapter->last_discovery_timeout_id = 0;
++	}
++
+ 	if (adapter->discovery_enable == 0x00)
+ 		return;
+ 
+-- 
+2.43.0
 
-The patch is fine for me. There was no merge plan sketched out in the
-cover letter and I don't spot any dependencies this patch is a part of.
-So I applied this patch to
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/ukleinek/linux.git pwm/for=
--next
-
-as 6.18-rc1 material.
-
-Best regards
-Uwe
-
---hd4ybrkt7tr5jevb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmjD6HwACgkQj4D7WH0S
-/k5dDwf/ZhdoZ04wcFscsQjfQPV9sY5Kzs8OxPgL+m4AV85SDwzSuZybeACCfsL2
-U+r2uMlK/Q21DJwXbTJjmnyAe19XWYtcvtUfKd50OAsoPnpijd6XN/VzkpPwSI1v
-MM1rZmYLCNhucLOPo87uqSwtHmOGOiHGefUgolr3pa9kl2VjNfe2U9byQTQegxaK
-CxeDN6bZEPo8n7PoU1mmnwFDouEZD1xzQt3FdvPpL2XORk2Ye5r89n1q02uTLbkj
-EsQ7IOSbpp2UDyIkxF0ESV6nWtpLn7AIB0rNABUH7JZA9FQ29vzAc9a3FRiLJsUa
-2cvxXsdWOdhpncFiR4L1mRq39BoLAQ==
-=7x/6
------END PGP SIGNATURE-----
-
---hd4ybrkt7tr5jevb--
