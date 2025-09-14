@@ -1,87 +1,73 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061E220322
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Sep 2025 12:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757852435; cv=none; b=dx9V79nw6fVuRPtWuveE1RAmyWAo3dwMS/avczspilnV36VsoXaTwpXOocgs9FHr9XWLyWib4Kqju9GtixPRGuh2zWuQ0r8itOuGZFfdKUMySY/ATx18Ulk/tocr7ksmTLuy1teppJ4qgGDhZwxY8qdsVPgEfjU6rqr6bFlHnjU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757852435; c=relaxed/simple;
-	bh=pl9JM18xNnaIdi5sbrSRI1YFMiAtTUnHIrAYWwkK6PY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=feUneAyhMuHMls+SmlHtp5oxTVd1VQmyR82icB5Y6qK5Uqk+EVfezJnolKjt8m0orCPQCO/gp1mTbADv87yq1HBO+M6bhIGKEsyx6R88nihwFxUIOCeCyJv2cBpMK/di2Pqn8LASTxD97/xLpuJBgvEe6rl3l4uylbOc+qkLBkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ey53npWU; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E05626AD9
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Sep 2025 12:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757854580; cv=pass; b=klL/33T5CqcVge5Ia1evXnw90l8A89I/CrFlhMyCZroH2H/oNzoyHFTmL0aAjRuM/aJfZHarn1xz23TpdESA7jh+GDnno2WTqIHbmtsIy28wVwvziojEAIecfdsYRmsb/TI7mseQ9Z0dgkPxctaHUum5LA+FH4HRp1FMX2h9LtI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757854580; c=relaxed/simple;
+	bh=DeLm6lvLdDH3McJDN9mMBbsI10UeNz/VKsWhXSG7HLI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t7WSaV0ZFs+G7BcvUhn41hu+RUt33kPaZkn+elx7jC3EDzaToH8iVejp3D+PyG6oVmGsGZFyU+hVtP3Z7V690++YLh0clisupwo/6Ll8wDWNo0bLAUHyD9WcTeej+UuUC8r22Ih1mNkK7LSJ88K1htcbNuxf6gcLzjq7iD2a2QU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=Jid3EcB/; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ey53npWU"
-Received: from github.com (hubbernetes-node-d89bf7d.ac4-iad.github.net [10.52.173.33])
-	by smtp.github.com (Postfix) with ESMTPA id 2411E7009E8
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Sep 2025 05:20:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1757852433;
-	bh=UaAczJHe44uhvx9S4HYFxvh0SlPJVWLPKrg/HuAaEX4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=ey53npWU4H0vExTWQXrYKDrCBHCQbtqgeWkgvBWGd8LszXhW1COwjQzoq+iblMF5z
-	 hxu+y38C+lRcUtermYxN2t5w6iQyno6bAcB0AJ+ClZaPFZ1UQOidBgOtYt+llCXfbS
-	 RsnYG/WP+Iis69oh4OuBwKBkQlPASk0PrvciRAfc=
-Date: Sun, 14 Sep 2025 05:20:33 -0700
-From: Pauli Virtanen <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="Jid3EcB/"
+Received: from monolith.lan (unknown [193.138.7.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4cPp7S2mDvz49Px6;
+	Sun, 14 Sep 2025 15:56:04 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1757854564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UYyK5o6gBtP/CVRhD2sLIbAB9TJMeWwM7QqTJHrbpWw=;
+	b=Jid3EcB/kTarUx840Rgv6mQ+WVxbqhWKLJndzeThmZmX7itSD/xKzeJgwi135NPH3G9BI9
+	WZP7hRWeDoh9sufXFhlpitmqnDafLYeGdGAp+TMLoOQxwnebbvczLh2hCuwfo1aD9ANG/X
+	ox3FoBoXrJaKvtxTnNf+m1h1Ogzv+7oDm20K9u4pKfg1jYrfQ3fz5Kt4YMV6UjIlPJk43v
+	TR42ostP0ljc3yhXGPue33jVN1kwL23X2xG9cu86zJW/9uBj5zhY8ONYKmGHsITx4R16ab
+	b3mc4GjC7uaJg3E6dOsLLbgfsW2e5Zd7B3pg8te51sKrOWrMegkWC6loCpoOaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1757854564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UYyK5o6gBtP/CVRhD2sLIbAB9TJMeWwM7QqTJHrbpWw=;
+	b=iu+TH19TISk2VjvBSSgFkOTfYzgNKQzHAaRjk2CQLWwVXH1fQrxmX/UDzRQlGL+/K//cvh
+	k9Lt7bxYqywQT4jZpVHgZuM+zSVtJa9hMFuvZbO6ZCdyqO4gU+bFqAbJJH7Yc97M7YE/E1
+	oNZoHbh6rQuP9nf8dqcqfgiY8GV09VCUOiEbO1vB7PKROH6l3cgO2pI/UFw9eWm7w20izI
+	U39iidwti3xiYCU78Zpm7BJU9GESH8wxGIzfkzHSAmFlfNkF4j//xw9+AnqgyJ3t5mEFMJ
+	mF3qWE+gUrBkA0FjUwQnQ0AIxymOkQuOer8OMDZ3cy2v3wD2q7EYN6lcuQqKjQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1757854564; a=rsa-sha256;
+	cv=none;
+	b=gBLuB2yd03ZCsb0gEbbl9T2k6uDsV/1Da8rioAeyX7Z7IOtgTpdpp3x3P3O4MJ2Rbv31pN
+	6sqjMXtkNcFr9G4DCy2FRVLxVWiTsNggBZs9j2Jn2iHJkI+JI5QJpsv3B6JXW/HwslXD/u
+	1mI6WbyGT5Z/CymukWecu6Q1uHrLaPlEvMjdCTapH8ThqlsadBgtls6h0Iv+N1CmXghVQo
+	mrxMLeZa6CWuMYBNeuCWuPbj58cyJ1fFggGn++Hi5ezRyMPYPnCXBkLa5IAXI5OliQ6XbQ
+	dpgOPuVs2xua6mDeRPRhVO7Vhvc8ZBhwE8U2GJmAn2VASTDgC+97NP16cvZZsg==
+From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1002158/000000-249126@github.com>
-Subject: [bluez/bluez] a5513f: shared/io: add helper for asynchronous
- shutdown() ...
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2] avdtp: wait for L2CAP Disconnect Rsp before CLOSING->IDLE
+Date: Sun, 14 Sep 2025 15:56:02 +0300
+Message-ID: <82a0baea3c6d33392719fd4530e2763f2131eddc.1757854496.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-
-  Branch: refs/heads/1002158
-  Home:   https://github.com/bluez/bluez
-  Commit: a5513fa0d83aa3ece6c6f9c8ebc3ac65b16fbeea
-      https://github.com/bluez/bluez/commit/a5513fa0d83aa3ece6c6f9c8ebc3ac65b16fbeea
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-09-14 (Sun, 14 Sep 2025)
-
-  Changed paths:
-    M src/shared/io-ell.c
-    M src/shared/io-glib.c
-    M src/shared/io-mainloop.c
-    M src/shared/io.h
-
-  Log Message:
-  -----------
-  shared/io: add helper for asynchronous shutdown() with SO_LINGER
-
-Add io_glib_shutdown_linger() for socket shutdown with wait for
-remote ACK via SO_LINGER. E.g. wait for L2CAP Disconnect Rsp.
-
-We don't want to block the main loop for the linger timeout, so call
-shutdown() in a separate thread, as socket API seems to provide only the
-blocking way to do it.
-
-Implement it with Glib source API, as that's more convenient for the
-AVDTP plugin that needs this.
-
-
-  Commit: 24912664b9093d88a14d2effae32951a36b02dba
-      https://github.com/bluez/bluez/commit/24912664b9093d88a14d2effae32951a36b02dba
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-09-14 (Sun, 14 Sep 2025)
-
-  Changed paths:
-    M profiles/audio/avdtp.c
-
-  Log Message:
-  -----------
-  avdtp: wait for L2CAP Disconnect Rsp before CLOSING->IDLE
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
 Delay CLOSING->IDLE until remote acknowledges L2CAP channel closure.
 
@@ -157,8 +143,45 @@ Works:
 
 Fixes: https://github.com/bluez/bluez/issues/1471
 Fixes: aa118e965b ("a2dp: Don't wait to reconfigure")
+---
 
+Notes:
+    v2:
+    - SHUT_WR is a much simpler way to do it. This leaves dealing with any
+      L2CAP timeouts to the kernel.
 
-Compare: https://github.com/bluez/bluez/compare/a5513fa0d83a%5E...24912664b909
+ profiles/audio/avdtp.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 30648251f..2f6eaf2ea 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -752,6 +752,8 @@ static void transport_cb(int cond, void *data)
+ 	struct avdtp_stream *stream = data;
+ 	struct avdtp_local_sep *sep = stream->lsep;
+ 
++	DBG("");
++
+ 	if (stream->close_int && sep->cfm && sep->cfm->close)
+ 		sep->cfm->close(stream->session, sep, stream, NULL,
+ 				sep->user_data);
+@@ -2922,7 +2924,14 @@ static gboolean avdtp_close_resp(struct avdtp *session,
+ {
+ 	avdtp_stream_set_state(stream, AVDTP_STATE_CLOSING);
+ 
+-	close_stream(stream);
++	/* Delay CLOSING->IDLE until remote acknowledges L2CAP channel closure.
++	 *
++	 * It is not explicitly stated in AVDTP v1.3 Sec. 6.13, but some devices
++	 * refuse commands sent immediately after L2CAP Disconnect Req, so wait
++	 * until Rsp.
++	 */
++	if (stream->io)
++		shutdown(g_io_channel_unix_get_fd(stream->io), SHUT_WR);
+ 
+ 	return TRUE;
+ }
+-- 
+2.51.0
+
