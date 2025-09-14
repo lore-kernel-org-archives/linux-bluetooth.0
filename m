@@ -1,159 +1,84 @@
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A1C2857CD;
-	Sun, 14 Sep 2025 16:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47E91D7E4A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Sep 2025 21:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757866986; cv=none; b=oiuSXwLlq0vXPFiGgYKNlW5Nl+JDzRzH0qym6bzlkpBxxZse1o6japn6fgsSguKdnMY8fN4SDI9SUVRfDSs7iOEUoGxOXdL1u0K17khHi4hecHcGhjGUqmgr8qbkvwUOVV3Y+6GhA/qpJg3xERGaBOcikKsE6Kpk0iMcsuxIczw=
+	t=1757887120; cv=none; b=uMyz/MvowtLIPM8aH3HNMDXYtNYYbadxWrTOaePSO6AELFJ3Qk++fhO7Jjd3XJOy9nYVqZ8R8WH2N8rA5akdLnTCoR2dn2ckgqf/hWy7AB2imS3Bz2E/FX1LzYQQ1ZcEp/4c3CK/q9ynr4md9lK1jDNnHqwkPhd5s4NzzEsvw98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757866986; c=relaxed/simple;
-	bh=dQxeITb5hY6qfYJHe0khMY48r+n3JwUcweNzQW8TgQM=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=F+B1Nm33z32rc80mYZmIq8deKbJ5idn7fT40zqT4OZ2PN4TV4OPjyPdCzB6YTUBS7XDGsyIGPacCyJFgCi65Tfe+WpZ0khpq+ciuqHqZeOCSk45qF9TcvR1erHge06ErDT2kYfMPR9rpf3uTmQQjIXsMUqVPYj+IJDBJcGLHlwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jannau.net; spf=pass smtp.mailfrom=jannau.net; dkim=pass (2048-bit key) header.d=jannau.net header.i=@jannau.net header.b=o6BzjhQT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=e9vHFZqc; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jannau.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jannau.net
+	s=arc-20240116; t=1757887120; c=relaxed/simple;
+	bh=UvlnF3+rZz7CGVddl4X2mUUMuAsV5q8sTkJuxRu3p44=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Won3vec36+ho8mPyfxD9XcD5XzGA2sXwulXn5AUHsK19g/jvRQdfSjiJ7hxMRGG9t7feJqjBbkxqJxkEUTdy5g3OS7SDBqExxgPTJSzHVicMD67jGWAi10MqMuGNR9H/hB0RuxEw1nyQKwGFwUz4v2rzU4mhH/lwoL0flPevB7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gI78MIiM; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jannau.net header.i=@jannau.net header.b="o6BzjhQT";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="e9vHFZqc"
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.phl.internal (Postfix) with ESMTP id 2AD5AEC0A77;
-	Sun, 14 Sep 2025 12:23:04 -0400 (EDT)
-Received: from phl-imap-09 ([10.202.2.99])
-  by phl-compute-01.internal (MEProxy); Sun, 14 Sep 2025 12:23:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jannau.net; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1757866984;
-	 x=1757953384; bh=GczAxd/yOSl3eyN3svqHIDHZRTOmApw3DytFsK5tSX8=; b=
-	o6BzjhQTP5L8iMh5iwoe0nwR2vEB6NL2HM1yh20N1T67qvJxkbtvyHVSHcfBozG5
-	xt/2Sb0flapuO8VrdLs0hzh9IUHcUAaIdWmptEaQjAyKBDiL4f1TwkJUE/QkmTPv
-	uEvaxkyBEwhsFb3zYNFQLfZzpjvJ2CzDI1qdWMlAa9XvtA/4wUo6xvd8ap+MIPbJ
-	zQttLtiY3z7wCHKR3j+XyhxvHQ2URGvdhNCMu9JBdh9zHmVFdZwOm7Eb65kOuOsv
-	42Ti13OeB1AZSydiu5rzfv3zAaDIsOo7Q9WzO0RyrEkNtg8RXftXWhwGVJzoejTi
-	zD/lZUHhekmAxVc00k0Vcw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1757866984; x=
-	1757953384; bh=GczAxd/yOSl3eyN3svqHIDHZRTOmApw3DytFsK5tSX8=; b=e
-	9vHFZqcSBnE7AlrCG++OwRj8Z/hghx12ugNsgf1QNu+TD7vYLFRX4qshSWfMCNgs
-	PRIbxCAmbZy14eBNjGHuh68RX3/3hUtWJZists/pjouPAibe9m368whsGYq8H0SP
-	CHq9PcFJsxX1EeJK/JvpwMdO05iNczBDkig5EgSKj+io5tgCS3wkaiDSkUnliM7q
-	pFKnibyhFCQkOnF2F9amLC0EtFXYC3I1vhJm7YH+AuC9zbZVfehJohp3wtVVQZOF
-	nf4bFSPrK3jJpEYpnRSSEUyIdpmgqhY5OriElkSqGnulubkeH/qfPtTn/2TkT6X8
-	g+uJloEzpl+PnlXX3VytA==
-X-ME-Sender: <xms:6OvGaFqpOjQHw1xk3ksYXbQCpUffVgQBGYEx1tnN57wACc3Q20EXng>
-    <xme:6OvGaHoTD2QANLuMeB62khLtZ0rwZKi1ayIJy-Zz9CClkesL9Hb-66tJl72q5rnjm
-    nGH2pDrl32oicMAW5U>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdefhedvkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdflrghnnhgv
-    ucfirhhunhgruhdfuceojhgrnhhnvgesjhgrnhhnrghurdhnvghtqeenucggtffrrghtth
-    gvrhhnpefhjeehgfelteeggfehveejffeiffetiefhfedvgedvhfeuhefhfeevvedujeej
-    ueenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepjhgrnhhnvgesjhgrnhhnrghurdhnvghtpdhn
-    sggprhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepthiiih
-    hmmhgvrhhmrghnnhesshhushgvrdguvgdprhgtphhtthhopeguvghvihgtvghtrhgvvges
-    vhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegumhgrvghnghhinhgvsehvgh
-    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohht
-    hhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgtlhhkse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqghhpihhosehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqihdvtgesvhhgvg
-    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhg
-    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhpmhesvhhgvghrrd
-    hkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:6OvGaLO6OGSABlTgyVpCBq4izaQXqPCLnwPq1zJn6Wb8CqmwFXIu9g>
-    <xmx:6OvGaHfsyb22a_XpgwB4rkFxKLcTn8av3ij_3k9M2ALzaMizaBQkvA>
-    <xmx:6OvGaH5xxovP0RM7_DjTNkipNuxf-ldkaY53k1ywEIWhwMbdjL9iMQ>
-    <xmx:6OvGaHI5Xb6MzhkDL3DMaJRpOPyCFgroir9wessjpzB6xBDGQzbhyw>
-    <xmx:6OvGaFA97CvX_IKWQ_UH_Jswf1GDUi8s5cO4sx4IrLCj-6mCdJcqRJ2w>
-Feedback-ID: i449149f6:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id EAFF03020073; Sun, 14 Sep 2025 12:23:03 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gI78MIiM"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-571a58b385aso2333699e87.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Sep 2025 14:58:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757887117; x=1758491917; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UvlnF3+rZz7CGVddl4X2mUUMuAsV5q8sTkJuxRu3p44=;
+        b=gI78MIiMihqNMc5KRkhSZXVuP1iwXxdB6RxcguLrlNKvSMfpaKh98hNY0oLek1EF54
+         vGddofVSbiaJ8IGt71N3Abh6EwbM5ykJQ124lNDcpdKEbVLGFw/QganH0dHuC5koOL13
+         a5+gGpi1N73O4i+FWAWLU96qs0X/jmcCRvxXEudfqntyG5EN2OFYkkyL3gGcWM/1gjXF
+         iI8Io+lYQv5ke8MsOYWsm7VRs2EQttQ1LZDXGdx24rSKD7wWNpDasXV+q0xH0NNyC6Re
+         qu4gor64gcbXeV+B1lduS8LxYjb0R4MzPetGnj69+le7wuTq5zJPjfwvM10YUhgkoxX/
+         OZPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757887117; x=1758491917;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UvlnF3+rZz7CGVddl4X2mUUMuAsV5q8sTkJuxRu3p44=;
+        b=a1Zw9Myzmfy/wLEQvx3aEcV1HNEqgL6w9Joxkbzuag8GsH27J0EBoMSCy7IsIGDOBR
+         45AKdpirK0uCs23d2D92W+udGYnIG96IQxwl5z/7qCK5M538UgvfpczxmMSmdJXdOnBw
+         SxuXQQ1FoUpyOafkwmK7MH97rdlZ4sk7YHiRFKNnZ8jGSeI06vyHBa7H40paiQ+ihlA2
+         9Q5wNQ22ArZoo83vgUOhAnX4IQ3seOyAZUKoGQlsEi5xNQRu2kv7egBxQUwoiriu64dC
+         AtsW9BkJpSlEaCHNK66Uap3P9K8Xh7e1Fy7Kg9I/wBcm7U3ozfdpjmYbwAFtdDv0ZkEq
+         EnWw==
+X-Gm-Message-State: AOJu0Yy0R+34AMbAcmJgGD/0NcgoJZheg2a+L9HQ+4ZZyO6e9FZaIX3+
+	hSy2P35obBtsx77vd16iEpx2yk+hWQ8Th7rV9esdcmFPD7hPDhOJOJSb
+X-Gm-Gg: ASbGnctre6lAqUTFP2uRyxEHmweeAgqVPvPcH1mdm3eWM41TfRfRlC9/Tg4Z1nWoIJ9
+	H1sHuNkAYWY2+fIcbEVxxv/qKq8kSh3b2V6ZLnctnRHw39Qs1vBXKxX+Eqjgxi8IEoN6GzlX/9Y
+	g8dtqtm4R8ZYqNjXc1WidMMZdgh6viG8paHaRHnLBm2oDWmzC3Xat+TftMdMUhyo8WijGAmO5q/
+	ogvhoIZoyZQIPNUlmLjbIpPzPnzFzIOncFpIKb1tIrn9dVwqK/p8BV5vuILLpcff3tM+lAgKoWt
+	bg6mePjPe3/iT6gA8KmJOmKZEGaUpH+A7X6NOolD/y3gWtcaZXCLeOcQ4y5gUQs17wZFU2iikto
+	Q3QSAW/+zcu4zxWz/N/3j44KkcJwKvbfU4VXX0IjWoUm0dDd0dREvIW+QaYiiLX1oXokIFimzRw
+	hPjXN46Dry9qJsQ2mVks6B4S0cttCW
+X-Google-Smtp-Source: AGHT+IGJtiArclfpnZR/AYL+TYQgdfD2ZZbK1HnYr9bqm1J9zEm/Ss0m5DcAFiEQjl3Wm9UdoMD6DA==
+X-Received: by 2002:a05:6512:130f:b0:55f:3e8f:ac0b with SMTP id 2adb3069b0e04-57048beb359mr2700163e87.6.1757887116346;
+        Sun, 14 Sep 2025 14:58:36 -0700 (PDT)
+Received: from localhost.localdomain (46.205.200.168.nat.ftth.dynamic.t-mobile.pl. [46.205.200.168])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-56e6460d65asm3115501e87.100.2025.09.14.14.58.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Sep 2025 14:58:35 -0700 (PDT)
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To: pwaago@cisco.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH BlueZ v2 2/2] doc: Document error codes for A2DP MediaEndpoints
+Date: Sun, 14 Sep 2025 23:57:51 +0200
+Message-ID: <20250914215751.73206-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250911151930.1632922-2-pwaago@cisco.com>
+References: <20250911151930.1632922-2-pwaago@cisco.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: ATYmlVkkxBG-
-Date: Sun, 14 Sep 2025 18:22:36 +0200
-From: "Janne Grunau" <janne@jannau.net>
-To: "Sven Peter" <sven@kernel.org>,
- "Alyssa Rosenzweig" <alyssa@rosenzweig.io>,
- "Neal Gompa" <neal@gompa.dev>, "Rob Herring" <robh@kernel.org>,
- "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "Hector Martin" <marcan@marcan.st>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- "Viresh Kumar" <viresh.kumar@linaro.org>,
- "Thomas Gleixner" <tglx@linutronix.de>, "Joerg Roedel" <joro@8bytes.org>,
- "Will Deacon" <will@kernel.org>, "Robin Murphy" <robin.murphy@arm.com>,
- "Linus Walleij" <linus.walleij@linaro.org>,
- "Mark Kettenis" <kettenis@openbsd.org>,
- "Andi Shyti" <andi.shyti@kernel.org>,
- "Jassi Brar" <jassisinghbrar@gmail.com>,
- "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
- "Maxime Ripard" <mripard@kernel.org>,
- "Thomas Zimmermann" <tzimmermann@suse.de>,
- "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
- "Sasha Finkelstein" <fnkl.kernel@gmail.com>,
- "Marcel Holtmann" <marcel@holtmann.org>,
- "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
- "Johannes Berg" <johannes@sipsolutions.net>,
- "van Spriel" <arend@broadcom.com>, "Lee Jones" <lee@kernel.org>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
- "Stephen Boyd" <sboyd@kernel.org>,
- "Wim Van Sebroeck" <wim@linux-watchdog.org>,
- "Guenter Roeck" <linux@roeck-us.net>,
- "Michael Turquette" <mturquette@baylibre.com>,
- =?UTF-8?Q?Martin_Povi=C5=A1er?= <povik+lin@cutebit.org>,
- "Vinod Koul" <vkoul@kernel.org>, "Liam Girdwood" <lgirdwood@gmail.com>,
- "Mark Brown" <broonie@kernel.org>, "Marc Zyngier" <maz@kernel.org>,
- "Ulf Hansson" <ulf.hansson@linaro.org>,
- "Keith Busch" <kbusch@kernel.org>, "Jens Axboe" <axboe@kernel.dk>,
- "Christoph Hellwig" <hch@lst.de>, "Sagi Grimberg" <sagi@grimberg.me>,
- "Jaroslav Kysela" <perex@perex.cz>, "Takashi Iwai" <tiwai@suse.com>,
- "Janne Grunau" <j@jannau.net>
-Cc: asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pm@vger.kernel.org, iommu@lists.linux.dev, linux-gpio@vger.kernel.org,
- linux-i2c@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-pwm@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-clk@vger.kernel.org, dmaengine@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-spi@vger.kernel.org,
- linux-nvme@lists.infradead.org
-Message-Id: <175786548038.4027671.16854298573806924090.b4-ty@jananu.net>
-In-Reply-To: <20250828-dt-apple-t6020-v1-31-bb8e1b87edef@jannau.net>
-References: <20250828-dt-apple-t6020-v1-31-bb8e1b87edef@jannau.net>
-Subject: Re: (subset) [PATCH 31/37] spi: apple: Add "apple,t8103-spi" compatible
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+> :org.bluez.Error.A2DP.InvalidInvalidLayer:
 
-On Thu, 28 Aug 2025 16:52:09 +0200, Janne Grunau wrote:
-> After discussion with the devicetree maintainers we agreed to not extend
-> lists with the generic compatible "apple,spi" anymore [1]. Use
-> "apple,t8103-spi" as base compatible as it is the SoC the driver and
-> bindings were written for.
-> 
-> [1]: https://lore.kernel.org/asahi/12ab93b7-1fc2-4ce0-926e-c8141cfe81bf@kernel.org/
-> 
-> [...]
+It seems that there is a typo (duplicated "Invalid") in the error name.
 
-Applied, thanks!
-
-[31/37] spi: apple: Add "apple,t8103-spi" compatible
-        commit: 3f2ed0057369d07c20c7ab48c1c46dc77eb436c2
-[32/37] spi: dt-bindings: apple,spi: Add t6020-spi compatible
-        commit: ffea30e9e6178eeb7d9c165b0b0b2d2e7c5f4fbf
-
-Best regards,
--- 
-Janne Grunau <j@jananu.net>
+Regards,
+Arek
