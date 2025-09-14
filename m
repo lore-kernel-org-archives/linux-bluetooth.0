@@ -1,126 +1,151 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA627274FDC
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Sep 2025 06:56:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D061BC58
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Sep 2025 07:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757833000; cv=none; b=ZzIqSk38zuUJTWN8Gei0MFtIhzLyVWFSh3s8+ixOCDyGIqEq+yUOw0MoQx4RR5yUipsG8lEzgVhTX58RFWeVKaY91FGfsyCSfm1CrkVtUPbBE+TRCKLFizVkjSMqpdTsCmifQC0vHRKdesVbmVdYFJh8/sqPRiVSnRqs4yMisDs=
+	t=1757835143; cv=none; b=r9IC0l4HRrq9M4W/fAqF/jM0iYcoQGUmauM29d0IsxZE5AG+djQynRXBisYQm2flOUbxnVrECoOrkfcw3O+rwqll7Gc/pc+uZVsyWQ3oNyrO52/h+xOHKmMMgsntiGUy9o0tTeXDfD6q7E/HBDJEQTNRaOzsM0L9aodCCeRVEoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757833000; c=relaxed/simple;
-	bh=Q812AXx6dejqCWgirZNijQXyD/Rb4pPDTgkvtVVfJtc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mTlIfV7/QsXJnDwW9HJNy2qgby3bdlQqXqtAJi8ODMP8MvTG8r8ocqp/D1WhtKN+f7l/O2mkdIvFbDIaL8Qbat7GXYx4t5OmdCsEwL47DJoyiNqMI5vZ6/BfrFxJ4cvMneX78G3NJNrOw3HNJt1NtzPVrdg0OpBKOXkprNQI244=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U+W4DQlK; arc=none smtp.client-ip=209.85.210.173
+	s=arc-20240116; t=1757835143; c=relaxed/simple;
+	bh=DCL5HWB19AMGV0SrLIf6zYTrvZNMPWX3uifEAouc+Y8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=BDDTZawBrWPPrEXiXpknUkEDVE1GJaTgGddhOX27uJyPSzsvuZjZRcd6PP2zZj3MStag5AMQpNQU5RP02o7ovtt83sGinG7FmLrk+6VgCiWPfml8Ee8HFo1aP0kilhJVp8UJELK51By3fFYp69Aoqt8aaxXOyBn0xZshnRppWXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I2Sm+MCO; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+W4DQlK"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7725de6b57dso3977519b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 13 Sep 2025 23:56:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I2Sm+MCO"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b5eee40cc0so34557011cf.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Sep 2025 00:32:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757832998; x=1758437798; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=j3j+6RFJp8fBl5UFi4n25Nhq071AJDVG4+e0E5+b4Qw=;
-        b=U+W4DQlKYhCsMuDEhJw3Bj0AzjKY0PDui+fN5SISBCuL2fXCJXRHbF1AJgL4NtBqPN
-         dmXD8WzYcbNozXJh7co8cC2f+wP7lZl91sj5xRuxjQ7RtoWxVb5HyKnh9+BaKfeAaNnC
-         a6Vno9HpBYoxzq6rSuiXd7sj2GrZEGDBfBUWGRL1H2bB2OqUc5HPrDJniCflaY4ECd6w
-         CxAX+cV+fvyNQlCT/cIFGMQATHZ29NMnxIDRN1LKEGbEhjgYb3w/RA+sIb+ndkjEcOMd
-         v7QFc14esfwfdGKGrSgVknb5GWjhw2xQoZ4L2PBUpOGpZ0VU3bvkU0CnUTf7zJXa7xqo
-         yeFQ==
+        d=gmail.com; s=20230601; t=1757835140; x=1758439940; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZVGIzixByoXngMF8miEQktZz4BIdzZ4nI/EPl89Yixo=;
+        b=I2Sm+MCO4pvmwe1CZm20LeU/ga4cSmuLQ98CkSkeXrZXSXM1dcD+9mQveomrZIDG5l
+         0tAqS5dDtdx745FgcN5gMEzvaU1T4Ytsif9UfNHxlq/UyTLwV/PSckigdwUsayaWw5fB
+         c3tDonj0avmPthuaNjxJtVzSPG8qU4YJAxuO+PrHBssGfz9e9aDVpB/zbzhP6UacNr2j
+         e7dZ/7qRzUfgbdMWU/YYbvuL9aM1wBCM76j0mEVDD9CJCdd9BAnhmHYUQRco6/HosXrF
+         QJU2PZTDGW6MbWuytwY1l6CSFGmMHh6z8wlmuzKO5pmekub++x4TudUbCDy8uVj1IIa/
+         QT4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757832998; x=1758437798;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1757835140; x=1758439940;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=j3j+6RFJp8fBl5UFi4n25Nhq071AJDVG4+e0E5+b4Qw=;
-        b=GFeP+7ojRSNzT1o+MWYQybIu9GdyxQAz9EfX0kkuA/yoyYIXc25MdM9PWk2DtXtz2S
-         bQv8ESRbDLIwOf8maMFGDjHbHs0w9sxovR7w8iyzEEsmgVb7ZmKy7YB3KuM+7K9VNMRG
-         v83Y7L0gE+kHbfOuJ3N/nc7CDl78QGocoSHGJHuW7FBQJKSnzKxjTEdtTTtVrNFQ8lL8
-         glR3KbTcJTsXLFLmrplP887PLXo63+cAFXdd/RkPrtB8OvB0CqMiBSVP6gJmYYwOAvn8
-         UnjjlK8AqelkwD8rPBcxkZvj8h8FnijzdqzPy5VsC+EWXdYOkGlywk4CbtFgytehfGzK
-         xfMA==
-X-Gm-Message-State: AOJu0Yw0WGdBqIfkGCPcu3vn7Gz+kT7zmgX0OUrusNjQ8H9bFPwUcxyc
-	VS0K3HFJ9qgM/uklHo/n1dAtLYY5xRrVry1CGCGQVY5RSg39ful5nlFS7CXrpETT
-X-Gm-Gg: ASbGnctseLJlMoXu95ySKpiq08sh7yHbkbwQJzZ4dekR2SbJtKMnv+ydtvD2Sc41HAP
-	mrlATOABiA77TIUcRFWtVHfMiYQElI8tGXNxdTvYvTikj5Rp2HrL1RM12IkTGONLcEg/vwp3YNw
-	oqfoCJ7yU6CcKGpX6vK/9bsWvuXjiF2CxKmmJu1gpa/iwVoLDu3YnknAQNatveCYG5b9ZMc3awG
-	3Tbp/oJZhWDhNNAGwokyD4QHguzoQGp9af4wouH/i/QlMqyrvndQ42Tczle6Dqw9LxYHQqKPGYN
-	h27YBji7Ws4gmgQ2EGrXvRz1Tge4q8PA1+hoAXswYhl5rgsGLexloUTfJ3FiY62dC48XrzNT48D
-	D2UNWfX31bqi89jOQIo9tyZCpT4Dl5Tk=
-X-Google-Smtp-Source: AGHT+IGznuor/LGxwCbRZQ1XmIF0s2BXLDSzFLDiBks6mLGDvb81hNwtxuW7F5JOgR4jeZyqmWNTwQ==
-X-Received: by 2002:a05:6a00:3d51:b0:772:5513:ba3b with SMTP id d2e1a72fcca58-77612077d87mr9562392b3a.5.1757832998188;
-        Sat, 13 Sep 2025 23:56:38 -0700 (PDT)
-Received: from localhost ([159.117.70.219])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-77607b18ec7sm10171435b3a.54.2025.09.13.23.56.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Sep 2025 23:56:37 -0700 (PDT)
-From: Nai-Chen Cheng <bleach1827@gmail.com>
-Date: Sun, 14 Sep 2025 14:56:18 +0800
-Subject: [PATCH] Bluetooth: hci_bcm: use str_low_high() helper instead of
- ternary operator
+        bh=ZVGIzixByoXngMF8miEQktZz4BIdzZ4nI/EPl89Yixo=;
+        b=Rwhzku89aHR1HG0X2bbTXDV0jzQmV1zYm88gt24SFfIAz0UFAFccR4U7hBXR8zRTIp
+         B3Q6ABy65QfVq6q/E73AfxglUgyY6pnt2Jvbbl4KIuMQjx7P9OKa5GPlVGvx0RlKdtjU
+         g/Ior3KCF4ON0HFU8DlSIUz+kDKc7vN023/EIRHTUIjneO6rBnjhNIigxSuBRm21i/vd
+         51Ag5HIDIl3T+xA1CrdigMRTKEQM6qg/XAZhmsG9gjXTeEdyzCMh3roN7XrdXbWpyQD9
+         IJqbIwNHwdkBq9RFz1nAjTJVcF+UWr5vNolyz1CSu/Pkj+h+bPI6aUP7056sH7rexP2G
+         2sHg==
+X-Gm-Message-State: AOJu0YwI+URrcBjL4Wwydxtipc+MosSTJg9X0gSroN/UafLIX/OffGj6
+	pDrpfC9gx25S6U3Z4IWtcs3PxZcC7qxMNbc4659Okptir3J6ynmHRXDXNPipBw==
+X-Gm-Gg: ASbGncvqpfIe26JUv/bkc4hG50H5fIPUSmyfw3nAOrywvKovhiqvj2z+5CMhpQ9fsdR
+	Tnj9skxqvtuyysnETMrnwuIJrwsBF9gFQ6W4Z+b4/w4YugqruvW7Vst8wVyzL6i7/vIkrdBCm8i
+	1veevZgXOVoxbYX2n8CubvzPSpK3CRXvBN0zE5cfm3m/SCnfOy6O+DIInnjADq52lddjG4V9H9b
+	q3iC8dF0P47jNjWep/IIhf+2pIO8WL4wrJ9uW1LFobcjCkKV4bGcuqRHNbuYyd7j0EhWXTegeae
+	75Dv3I6BHrzQjOdqCA6w9vIYqiFsYl3EEmYoycu/vG41r/G3bJUEbzftTXvoWpB6lpzkc83F5qI
+	oRTNf1fS6gTHqPWDjUcud6dYOZRtmIqdioW5w4g==
+X-Google-Smtp-Source: AGHT+IHV178cRbjGtDOVvxAOGEZpLlnRJu8biHNI9UOMtQbbQp88GHva7ssgPyQ+iVKkwo7mIMyrcw==
+X-Received: by 2002:ac8:5a09:0:b0:4b5:e35c:4900 with SMTP id d75a77b69052e-4b77d1af74emr95412751cf.80.1757835140159;
+        Sun, 14 Sep 2025 00:32:20 -0700 (PDT)
+Received: from [172.17.0.2] ([68.154.54.41])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-820cef10761sm546210685a.58.2025.09.14.00.32.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Sep 2025 00:32:19 -0700 (PDT)
+Message-ID: <68c66f83.050a0220.1b1f43.486b@mx.google.com>
+Date: Sun, 14 Sep 2025 00:32:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5766600438915282610=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, bleach1827@gmail.com
+Subject: RE: Bluetooth: hci_bcm: use str_low_high() helper instead of ternary operator
+In-Reply-To: <20250914-bluetooth-hci_bcm-string-choice-helper-v1-1-05e05bf0e21f@gmail.com>
+References: <20250914-bluetooth-hci_bcm-string-choice-helper-v1-1-05e05bf0e21f@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5766600438915282610==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250914-bluetooth-hci_bcm-string-choice-helper-v1-1-05e05bf0e21f@gmail.com>
-X-B4-Tracking: v=1; b=H4sIABFnxmgC/x3N0QrCMAxA0V8ZeTbQFgfOXxGRNsYlMNuRdiKM/
- bvFx/Ny7w6VTbnCddjB+KNVS+7wpwFIYp4Z9dkNwYXRTf6Madm4ldIEhfSR6I21meYZSYoSo/C
- ysmGM7EaayF9SgB5bjV/6/Y9u9+P4AeoxQfJ4AAAA
-X-Change-ID: 20250914-bluetooth-hci_bcm-string-choice-helper-aae05c9c18b2
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kernel-mentees@lists.linux.dev, Nai-Chen Cheng <bleach1827@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1757832995; l=1308;
- i=bleach1827@gmail.com; s=20250730; h=from:subject:message-id;
- bh=Q812AXx6dejqCWgirZNijQXyD/Rb4pPDTgkvtVVfJtc=;
- b=KFujJ9fybEPgVWX3e1HODwtSS+x2VXNY21xe436FpBVJyjq65+B8JpNBYc09NOVfTF6ClgkUd
- qkNZqgIwnraBHy710hekebvsj59+EQdtU/Ti6iez22l7o+TI9SHmg96
-X-Developer-Key: i=bleach1827@gmail.com; a=ed25519;
- pk=jahFPRplw20Aaim8fIt8SxlFMqkHbJ+s8zYBGbtHH5g=
 
-Replace the ternary operator: 'dev->irq_active_low ? "low" : "high"'
-with the str_low_high() helper function. This enhances code readability
-and maintains consistency.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Nai-Chen Cheng <bleach1827@gmail.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1002134
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.32 seconds
+GitLint                       PENDING   0.23 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      23.86 seconds
+CheckAllWarning               PASS      26.46 seconds
+CheckSparse                   PASS      29.79 seconds
+BuildKernel32                 PASS      23.84 seconds
+TestRunnerSetup               PASS      473.81 seconds
+TestRunner_l2cap-tester       PASS      24.75 seconds
+TestRunner_iso-tester         PASS      41.27 seconds
+TestRunner_bnep-tester        PASS      5.95 seconds
+TestRunner_mgmt-tester        FAIL      125.43 seconds
+TestRunner_rfcomm-tester      PASS      9.38 seconds
+TestRunner_sco-tester         PASS      14.56 seconds
+TestRunner_ioctl-tester       PASS      9.85 seconds
+TestRunner_mesh-tester        FAIL      11.44 seconds
+TestRunner_smp-tester         PASS      8.49 seconds
+TestRunner_userchan-tester    PASS      6.27 seconds
+IncrementalBuild              PENDING   0.60 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.104 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.131 seconds
+Mesh - Send cancel - 2                               Timed out    1.996 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/hci_bcm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index f96617b85d8777972137ca146ab99a3d8da12584..65740b86c49c42b65a67cbd892daec2358a09394 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -26,6 +26,7 @@
- #include <linux/dmi.h>
- #include <linux/pm_runtime.h>
- #include <linux/serdev.h>
-+#include <linux/string_choices.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -1213,7 +1214,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 	if (irq_polarity != -1) {
- 		dev->irq_active_low = irq_polarity;
- 		dev_warn(dev->dev, "Overwriting IRQ polarity to active %s by module-param\n",
--			 dev->irq_active_low ? "low" : "high");
-+			 str_low_high(dev->irq_active_low));
- 	}
- 
- 	return 0;
 
----
-base-commit: f83a4f2a4d8c485922fba3018a64fc8f4cfd315f
-change-id: 20250914-bluetooth-hci_bcm-string-choice-helper-aae05c9c18b2
-
-Best regards,
--- 
-Nai-Chen Cheng <bleach1827@gmail.com>
-
+--===============5766600438915282610==--
