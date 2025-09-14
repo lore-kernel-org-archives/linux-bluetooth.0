@@ -1,59 +1,64 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1DA259C83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB28F25A2BB
 	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Sep 2025 12:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757851675; cv=pass; b=sn+giFv7yLDBcjy5mliafC8pZEOT1+pC7FHEwAdPBuvrdLSk39NrZl7AdBgXfWco5woIGh9Secw8q3aR/Ehm4+F9bqvq2JVveg25hSmy6sMsVQzWCN4iOZN5379T0bU6MMwHVku6AeP9rVKNhTpLiviVeSBP6krpo3pTXpPOYqw=
+	t=1757851675; cv=pass; b=DsRl3chSxjVCpvBTp83gwFSzipAc7I5bs4HgG/Wh2oagGwk5QKToSeostd3CwZMkPyho7CINZUvZ0hOc07tY+cYFKJrTT2kmq2Oan5CZAhUuyo0jx47gaDxYNjb70bbIePBgjfASKMY22AMS1JbYe0TBz+i5hUfqY3uJpy38vyA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757851675; c=relaxed/simple;
-	bh=q1WVDYLTCsPdgZG76sUBMlrpavWiKwlx2IhlEbgP5Yc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eIMgeyft/vQPp5bILC44JB91xJfT/8J57ECDblMYWWfRsHCLe86PGmBrRyyjPv7z3Wvx3+hYGsrabS7rk5A9X1yloX3zhZ36QW3JQYCt3Bm4xZDcZqlClXuxXPi0twrvartPKfAm5hyOnmGO015gHK3/8ewSdHQz23HnXHiSVss=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=g/eOTuOd; arc=pass smtp.client-ip=195.140.195.201
+	bh=nDsEMF/glmYKF66+zOKDGAWQhA+o9OQlLitPjx5vyr4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=M7Th26A6LOpJ1tVAAyKF/DS1WzVeIG/OTV+MNHY/sTMgSPdYdz4cJkGhwXH4RYlDYfeKNI9YCHZ1njZ/I3p6mSV35/ODOd4n0HuMpkZ4I4vDvywUw8sp4yh84iYjtv/fGcGN9Bumd1E3BqI/9h6AQKpC+SOjhUEMoI5T5VhHcxM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=p0aGUVmO; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="g/eOTuOd"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="p0aGUVmO"
 Received: from monolith.lan (unknown [193.138.7.198])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4cPn3g42g2zyVW;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4cPn3g6LznzyY9;
 	Sun, 14 Sep 2025 15:07:43 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1757851663;
+	t=1757851664;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=kprIr3WEHZYMHqw09tPUkDK1T/JB58XnSCe6roAscvg=;
-	b=g/eOTuOduCAw6h79D932HR79vXuF48+fthFlfzef2q6Dn37pdZ6SexxZEPy8UMQ+ouGwau
-	Tebl83xWB8jAIs7En+tnd5S3kesjCw/7qSIPrVBZXb6IkG2B2mARaY2YS90qEPssA9RzyX
-	0LjfB1tNSLgB3NqP0z5qYmVHI53HKGI=
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1757851663; a=rsa-sha256; cv=none;
-	b=CAr28PoE9rEkzvW/bXyYPX4jy7xdpktz+aNwkuLCn14hP8skBM9/9S9v+3G3oT/7MmgDj5
-	Oiqo7UL/Bv24ndQS9JFYpz+iibCmdN0g6j5fCaAh0E/Ajf4d/XOYmqV0ZHe9Czi5/pytxH
-	nzo5FkS90XJLNHY5Gjw9u5rCGlmOOYQ=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gLa25zg9lun4rV3/Suq32R+O9XgxDnVzpnL7xYQyO9M=;
+	b=p0aGUVmO3mn4yhd7KkyxHmvJVndc53KpBepPKQKBoCM3/qoTAcCqM7ySDqh2e60Ki1UuwU
+	6LeAbOpgtRd8vq8B0166jXLCd7O4RdHKdaqWiavMcm8CROt/+bSNN9jLpaWu+/Fps3BkoO
+	ORFAKOhkbdpSYrFkl9LJLCyCq49sJrI=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1757851664; a=rsa-sha256; cv=none;
+	b=Fg/XIFYVfjsVpWshMtXOSYjlcPQBsh5u7El2cuJyd47ZIClq2LaNRnHiEyhR9y7kGu+Jmj
+	05fQxXxXV5HuPKYiD/nsCkf0ljA8KSkxfAvv4aCZ7IITlCPC3AM33IxqwXDZIphoWJK62C
+	2xjEqVWPtWnVBM5uypo4cnW8+UNzMds=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1757851663;
+	s=meesny; t=1757851664;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=kprIr3WEHZYMHqw09tPUkDK1T/JB58XnSCe6roAscvg=;
-	b=WdHY1oFAOI5I6nlKRK7KxIkNhKAC1n290hpcl/dfgb+qiO5YZ7ItohFMVyv7K2IMR7IwyA
-	+AQooAhgtu0uXto9NtS4UjtatIokQ0MvDnPd6Mw0fZeocrdkMDRLY2rFvPIKPx/ZkB0ykY
-	Vl5vGtW+7uE9aWvb95hxOWC+hob1UTY=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gLa25zg9lun4rV3/Suq32R+O9XgxDnVzpnL7xYQyO9M=;
+	b=nxaUrJ4g51N8ADesqbeoMJL5eU4t9/oCtVik/xP6Jq0hqvRW9d0TcsHPW0uN61BggFo2XF
+	Q3OFt2dxkMG2sOQGSIIT0VOPlmQzBmU6lfUzeNAGpWl6v1xfaGWtTHIdeIfjB4OoPgEEZp
+	nmA9Dgnw/5ia9C0gRuu9BZpLCUoECsM=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 1/2] shared/io: add helper for asynchronous shutdown() with SO_LINGER
-Date: Sun, 14 Sep 2025 15:07:40 +0300
-Message-ID: <467c9a64b1ed7e311728f07f4065de92c33622eb.1757851523.git.pav@iki.fi>
+Subject: [PATCH BlueZ 2/2] avdtp: wait for L2CAP Disconnect Rsp before CLOSING->IDLE
+Date: Sun, 14 Sep 2025 15:07:41 +0300
+Message-ID: <87beb3f61310a7b8ab915aba56f4792e7e1031e1.1757851523.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <467c9a64b1ed7e311728f07f4065de92c33622eb.1757851523.git.pav@iki.fi>
+References: <467c9a64b1ed7e311728f07f4065de92c33622eb.1757851523.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,158 +67,147 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add io_glib_shutdown_linger() for socket shutdown with wait for
-remote ACK via SO_LINGER. E.g. wait for L2CAP Disconnect Rsp.
+Delay CLOSING->IDLE until remote acknowledges L2CAP channel closure.
 
-We don't want to block the main loop for the linger timeout, so call
-shutdown() in a separate thread, as socket API seems to provide only the
-blocking way to do it.
+It is not explicitly stated in AVDTP v1.3 Sec. 6.13, but some devices
+refuse commands sent immediately after L2CAP Disconnect Req, so wait
+until Rsp.
 
-Implement it with Glib source API, as that's more convenient for the
-AVDTP plugin that needs this.
+Fails:
+
+> ACL Data RX: Handle 6 flags 0x02 dlen 6
+      Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
+      AVDTP: Close (0x08) Response Accept (0x02) type 0x00 label 0 nosp 0
+< ACL Data TX: Handle 6 flags 0x00 dlen 12
+      L2CAP: Disconnection Request (0x06) ident 16 len 4
+        Destination CID: 65
+        Source CID: 65
+< ACL Data TX: Handle 6 flags 0x00 dlen 22
+      Channel: 64 len 18 [PSM 25 mode Basic (0x00)] {chan 0}
+      AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 1 nosp 0
+        ACP SEID: 7
+        INT SEID: 1
+        Service Category: Media Transport (0x01)
+        Service Category: Media Codec (0x07)
+          Media Type: Audio (0x00)
+          Media Codec: MPEG-2,4 AAC (0x02)
+            Object Type: MPEG-4 AAC LC (0x40)
+            Frequency: 44100 (0x100)
+            Channels: 2 (0x04)
+            Bitrate: 220000bps
+            VBR: No
+        Service Category: Delay Reporting (0x08)
+> ACL Data RX: Handle 6 flags 0x02 dlen 12
+      L2CAP: Disconnection Response (0x07) ident 16 len 4
+        Destination CID: 65
+        Source CID: 65
+> ACL Data RX: Handle 6 flags 0x02 dlen 8
+      Channel: 64 len 4 [PSM 25 mode Basic (0x00)] {chan 0}
+      AVDTP: Set Configuration (0x03) Response Reject (0x03) type 0x00 label 1 nosp 0
+        Service Category: Reserved (0x29)
+        Error code: UNSUPPORTED_CONFIGURATION (0x29)
+
+Works:
+
+> ACL Data RX: Handle 4 flags 0x02 dlen 6
+      Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
+      AVDTP: Close (0x08) Response Accept (0x02) type 0x00 label 12 nosp 0
+< ACL Data TX: Handle 4 flags 0x00 dlen 12
+      L2CAP: Disconnection Request (0x06) ident 16 len 4
+        Destination CID: 65
+        Source CID: 65
+> ACL Data RX: Handle 4 flags 0x02 dlen 12
+      L2CAP: Disconnection Response (0x07) ident 16 len 4
+        Destination CID: 65
+        Source CID: 65
+< ACL Data TX: Handle 4 flags 0x00 dlen 22
+      Channel: 64 len 18 [PSM 25 mode Basic (0x00)] {chan 0}
+      AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 13 nosp 0
+        ACP SEID: 9
+        INT SEID: 2
+        Service Category: Media Transport (0x01)
+        Service Category: Media Codec (0x07)
+          Media Type: Audio (0x00)
+          Media Codec: MPEG-2,4 AAC (0x02)
+            Object Type: MPEG-4 AAC LC (0x40)
+            Frequency: 44100 (0x100)
+            Channels: 2 (0x04)
+            Bitrate: 220000bps
+            VBR: No
+        Service Category: Delay Reporting (0x08)
+> ACL Data RX: Handle 4 flags 0x02 dlen 6
+      Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
+      AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 13 nosp 0
+
+Fixes: https://github.com/bluez/bluez/issues/1471
+Fixes: aa118e965b ("a2dp: Don't wait to reconfigure")
 ---
- src/shared/io-ell.c      |  6 +++
- src/shared/io-glib.c     | 89 ++++++++++++++++++++++++++++++++++++++++
- src/shared/io-mainloop.c |  6 +++
- src/shared/io.h          |  3 ++
- 4 files changed, 104 insertions(+)
+ profiles/audio/avdtp.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/io-ell.c b/src/shared/io-ell.c
-index 4d64cf3c5..e7baed0d3 100644
---- a/src/shared/io-ell.c
-+++ b/src/shared/io-ell.c
-@@ -315,3 +315,9 @@ unsigned int io_glib_add_err_watch(void *giochannel, io_glib_err_func_t func,
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 30648251f..3613dff2d 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -79,6 +79,7 @@
+ #define ABORT_TIMEOUT 2
+ #define DISCONNECT_TIMEOUT 1
+ #define START_TIMEOUT 1
++#define TRANSPORT_L2CAP_CLOSE_TIMEOUT 2
+ 
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+ 
+@@ -752,6 +753,8 @@ static void transport_cb(int cond, void *data)
+ 	struct avdtp_stream *stream = data;
+ 	struct avdtp_local_sep *sep = stream->lsep;
+ 
++	DBG("");
++
+ 	if (stream->close_int && sep->cfm && sep->cfm->close)
+ 		sep->cfm->close(stream->session, sep, stream, NULL,
+ 				sep->user_data);
+@@ -765,6 +768,26 @@ static void transport_cb(int cond, void *data)
+ 		avdtp_stream_set_state(stream, AVDTP_STATE_IDLE);
+ }
+ 
++static void close_stream_linger_finish(void *data)
++{
++	DBG("");
++
++	transport_cb(G_IO_HUP, data);
++}
++
++static void close_stream_linger(struct avdtp_stream *stream)
++{
++	/* Close and wait for L2CAP Disconnection Rsp via socket linger */
++	if (stream->io_id)
++		g_source_remove(stream->io_id);
++
++	stream->io_id = io_glib_shutdown_linger(stream->io, SHUT_RDWR,
++					TRANSPORT_L2CAP_CLOSE_TIMEOUT,
++					close_stream_linger_finish, stream);
++	if (!stream->io_id)
++		transport_cb(G_IO_HUP, stream);
++}
++
+ static int get_send_buffer_size(int sk)
  {
- 	return 0;
- }
-+
-+unsigned int io_glib_shutdown_linger(void *giochannel, int how, int timeout,
-+				io_destroy_func_t func, void *user_data)
-+{
-+	return 0;
-+}
-diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-index 81cd1122b..efb7b9f5c 100644
---- a/src/shared/io-glib.c
-+++ b/src/shared/io-glib.c
-@@ -461,3 +461,92 @@ unsigned int io_glib_add_err_watch(void *giochannel,
- 					G_IO_ERR | G_IO_HUP | G_IO_NVAL,
- 					err_watch_callback, data, g_free);
- }
-+
-+/*
-+ * shutdown() socket, enabling SO_LINGER to wait for close ACK, with
-+ * asynchronous callback.
-+ */
-+
-+struct shutdown_linger {
-+	GSource			source;
-+	io_destroy_func_t	func;
-+	void			*user_data;
-+	int			how;
-+	GIOChannel		*io;
-+	GThread			*thread;
-+};
-+
-+static gpointer shutdown_linger_thread(gpointer data)
-+{
-+	struct shutdown_linger *source = data;
-+
-+	shutdown(g_io_channel_unix_get_fd(source->io), source->how);
-+	g_source_set_ready_time(&source->source, 0);
-+	g_source_unref(&source->source);
-+	return NULL;
-+}
-+
-+static gboolean shutdown_linger_dispatch(GSource *gsource, GSourceFunc callback,
-+							gpointer user_data)
-+{
-+	struct shutdown_linger *source = (void *)gsource;
-+
-+	if (source->func)
-+		source->func(source->user_data);
-+	return FALSE;
-+}
-+
-+static void shutdown_linger_finalize(GSource *gsource)
-+{
-+	struct shutdown_linger *source = (void *)gsource;
-+
-+	if (source->thread == g_thread_self())
-+		g_thread_unref(source->thread);
-+	else
-+		g_thread_join(source->thread);
-+
-+	g_io_channel_unref(source->io);
-+}
-+
-+unsigned int io_glib_shutdown_linger(void *giochannel, int how, int timeout,
-+				io_destroy_func_t func, void *user_data)
-+{
-+	static GSourceFuncs source_funcs = {
-+		.dispatch = shutdown_linger_dispatch,
-+		.finalize = shutdown_linger_finalize,
-+	};
-+	struct linger linger = {
-+		.l_onoff = 1,
-+		.l_linger = timeout,
-+	};
-+	GIOChannel *io = giochannel;
-+	struct shutdown_linger *source;
-+	guint id;
-+	int fd;
-+
-+	if (!io)
-+		return 0;
-+
-+	fd = g_io_channel_unix_get_fd(io);
-+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &linger, sizeof(linger))) {
-+		shutdown(fd, how);
-+		return 0;
-+	}
-+
-+	source = (void *)g_source_new(&source_funcs, sizeof(*source));
-+
-+	g_source_set_name(&source->source, "shutdown_linger");
-+	source->func = func;
-+	source->user_data = user_data;
-+	source->how = how;
-+	source->io = g_io_channel_ref(io);
-+
-+	g_source_ref(&source->source);  /* unref in thread */
-+	source->thread = g_thread_new("shutdown_linger", shutdown_linger_thread,
-+								source);
-+
-+	id = g_source_attach(&source->source, NULL);
-+	g_source_unref(&source->source);
-+
-+	return id;
-+}
-diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
-index 8fd49935e..abe76de1d 100644
---- a/src/shared/io-mainloop.c
-+++ b/src/shared/io-mainloop.c
-@@ -321,3 +321,9 @@ unsigned int io_glib_add_err_watch(void *giochannel, io_glib_err_func_t func,
+ 	int size;
+@@ -2922,7 +2945,13 @@ static gboolean avdtp_close_resp(struct avdtp *session,
  {
- 	return 0;
+ 	avdtp_stream_set_state(stream, AVDTP_STATE_CLOSING);
+ 
+-	close_stream(stream);
++	/* Delay CLOSING->IDLE until remote acknowledges L2CAP channel closure.
++	 *
++	 * It is not explicitly stated in AVDTP v1.3 Sec. 6.13, but some devices
++	 * refuse commands sent immediately after L2CAP Disconnect Req, so wait
++	 * until Rsp.
++	 */
++	close_stream_linger(stream);
+ 
+ 	return TRUE;
  }
-+
-+unsigned int io_glib_shutdown_linger(void *giochannel, int how, int timeout,
-+				io_destroy_func_t func, void *user_data)
-+{
-+	return 0;
-+}
-diff --git a/src/shared/io.h b/src/shared/io.h
-index 87c3c001c..7909b1707 100644
---- a/src/shared/io.h
-+++ b/src/shared/io.h
-@@ -37,3 +37,6 @@ bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
- typedef void (*io_glib_err_func_t)(int cond, void *user_data);
- unsigned int io_glib_add_err_watch(void *giochannel, io_glib_err_func_t func,
- 							void *user_data);
-+
-+unsigned int io_glib_shutdown_linger(void *giochannel, int how, int timeout,
-+				io_destroy_func_t func, void *user_data);
 -- 
 2.51.0
 
