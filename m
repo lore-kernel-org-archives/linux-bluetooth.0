@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA154233D85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734012192F9
 	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Sep 2025 16:34:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757954077; cv=none; b=b2pl+UFPmgZs0AmoHdOpzjTtzXc6hHYWlrsLJtDNp+EGNG61WWTl49sUgeDJqLlvK4DH8vS4cdoi3T1H15qH4m8Q0XVyONg4PZ50jeWpMXuePjLYACmqO5YWn1v6HuTcjJ7zIkumaxczByhiC+p+8lIVlDPtENIbaDECjbk0dto=
+	t=1757954078; cv=none; b=Ab5KvIJyikarQCiEupdfur+Y/wdySj70yjR/UzVXn1jnbPJ08NoYBEZWEY7Gir/cAcwEXiVctnAixwszrY9rf/yufOYrxwLZ28fHT1OiiaDmurZr0QTpBhd3GiXoql0ZWs5e+5YQ/h9Ys9LxguwqKO1TAnwAN/vmqp1ssX+crdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757954077; c=relaxed/simple;
-	bh=1qQHA3Y+RYnF0jeKXcKICtjEt+7l1Wc0NLAGvTBH1YU=;
+	s=arc-20240116; t=1757954078; c=relaxed/simple;
+	bh=fPo4e/cLWrFF/K1TO+6A5bAw8lPx+4ePESxAotXWoVM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TTxMkXzXz9wiKEZ06+3bxB+CfI0jLP28OmdfxrA7r80blxbBtqN2iqLvOZrqQErCJxlmL1lncS/2j9Zz0vOYmsqurXStSPHs1/xAIErv+qBzE0kIy6LMCesdRcRtO8N7vEtL/QScnhZUH5UsBzPxnpJAdGQcz9sLY3X6/zji8S8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=qD73kgUM; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=LhSMYFk/G92ceduUAAmLUJ/E0OskxXlJXCILGwt5hAgIKJxFZ+KZSyLTN5vqRA82/Nvu20/zxgRp2jsKVxcGNTBTpkhnpehtUS7prX2waEUCqdW5sg3/1+HfcBm58ZjCL+e3XkLY/1IADf8AVnbMu8VAoB8YtAQ7RpJVE+gbePs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=W6yowKJn; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="qD73kgUM"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="W6yowKJn"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1757954074;
-	bh=1qQHA3Y+RYnF0jeKXcKICtjEt+7l1Wc0NLAGvTBH1YU=;
+	s=mail; t=1757954073;
+	bh=fPo4e/cLWrFF/K1TO+6A5bAw8lPx+4ePESxAotXWoVM=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=qD73kgUMHUDmmtnxVd/REsGxunabZL2t1DPIngLSfRcWVX5abhrnbIbzPJRKrMyNd
-	 h57TdmzMSlS9gQp1sEjbCL44kixD35R//0pvVhS0PT12wBpRVlbdLA9ctaC7RIaDR6
-	 pDnnRUjzbDP990Mpim0sYLxzDTvh4WcalEsYcRYE1OxiTpx6WMGbgm6uAxBtF0yv4z
-	 KFre9VCz0MAoqZQ48s9AYtpXbCEXf2Xz02Z+95PZ9tLmopVoBbRPXLl70S+cCWFYYb
-	 6eVFKkF5vlh8M8Gonu9Ip3SlwPMjxkXPTbGEzdOMMtJbYhMWxPJmP2aRjX4nhTqF6q
-	 l1+V+0iYqq0oQ==
+	b=W6yowKJnhqawWeCVMl1zVR2kKMlblfssoeZpu3M2o5itjB6cCZ5SiULd1iw9FPxbq
+	 hJ0Wgvb9wpEyoKn7LKwc3TOt7MflAFGsfVYnvqrT4xKAeldmkS1x2PZ4BfBt3heBsB
+	 A8vCRtSjPqgsnqVVo3/ho/dHXN8fqhV8H5JWZBPbaXT9/fvuVp3AtCGAvXnl0Qys+y
+	 k1Ag3j+DjFKsYJTalyYbyfEQ5gFFgwiuy5RNgm6JpTrY3g5gNgbpB9xZX0su3hTnKM
+	 xVt7HfkwFH6mKOgSO6i78ffzOpITc72e9lJZ4ofEXfuP9gL8QhBnnvFegGzW4T7E0D
+	 Xc7TZOyjeB4wQ==
 Received: from fdanis-ThinkPad-X1.. (2A02-8428-af44-1001-ed13-78a5-a1e8-7185.rev.sfr.net [IPv6:2a02:8428:af44:1001:ed13:78a5:a1e8:7185])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id F03EC17E132A
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id A7F3217E124A
 	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Sep 2025 18:34:33 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 4/4] unit/test-hfp: Add Call Line Identification test for HF
-Date: Mon, 15 Sep 2025 18:34:27 +0200
-Message-ID: <20250915163427.3589748-4-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2 3/4] shared/hfp: Add Call Line Identification support
+Date: Mon, 15 Sep 2025 18:34:26 +0200
+Message-ID: <20250915163427.3589748-3-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250915163427.3589748-1-frederic.danis@collabora.com>
 References: <20250915163427.3589748-1-frederic.danis@collabora.com>
@@ -50,83 +50,423 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-This add the following test:
-- HFP/HF/CLI/BV-01-C
-  Verify that the HF receives the caller ID.
+Send AT+CLIP=1 at the end of the SLC creation to enable CLIP event.
+Register +CLIP handler to call the update_call_line_id callback on event.
+
+During incoming call notifications, i.e. after +CIEV:<callsetup>,1
+event which creates a new call object, the reception of +CLIP event
+will update the line_id and type of the call object.
 ---
-v1->v2 : Move some changes to patch 3 to fix unit/test-hfp in this patch
+v1->v2 : Move changes from patch 4 to fix unit/test-hfp
 
- unit/test-hfp.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ src/shared/hfp.c | 238 ++++++++++++++++++++++++++++++++++++++++++++++-
+ src/shared/hfp.h |  20 ++++
+ unit/test-hfp.c  |   3 +-
+ 3 files changed, 257 insertions(+), 4 deletions(-)
 
-diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-index f22a687d5..060230196 100644
---- a/unit/test-hfp.c
-+++ b/unit/test-hfp.c
-@@ -813,10 +813,44 @@ static void hf_update_operator(const char *operator_name, void *user_data)
- 		g_assert_cmpstr(operator_name, ==, "TEST");
- }
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index f94df90f1..29b467ae3 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -18,6 +18,7 @@
+ #include <string.h>
+ #include <stdarg.h>
+ #include <ctype.h>
++#include <limits.h>
  
-+static void hf_call_added(uint id, enum hfp_call_status status,
-+							void *user_data)
-+{
-+	struct context *context = user_data;
-+	const char *test_name = context->data->test_name;
-+
-+	if (tester_use_debug())
-+		tester_debug("call %d added: status %u", id, status);
-+
-+	if (g_str_equal(test_name, "/HFP/HF/CLI/BV-01-C")) {
-+		g_assert_cmpint(id, ==, 1);
-+		g_assert_cmpint(status, ==, CALL_STATUS_INCOMING);
-+	}
-+}
-+
-+static void hf_call_line_id_updated(uint id, const char *number,
-+							unsigned int type,
-+							void *user_data)
-+{
-+	struct context *context = user_data;
-+	const char *str;
-+
-+	if (tester_use_debug())
-+		tester_debug("call %d line id updated: %s, %u", id, number,
-+									type);
-+	g_assert_cmpint(id, ==, 1);
-+	g_assert_cmpstr(number, ==, "1234567");
-+	g_assert_cmpint(type, ==, 129);
-+	str = hfp_hf_call_get_number(context->hfp_hf, id);
-+	g_assert_cmpstr(number, ==, str);
-+}
-+
- static struct hfp_hf_callbacks hf_session_callbacks = {
- 	.session_ready = hf_session_ready_cb,
- 	.update_indicator = hf_update_indicator,
- 	.update_operator = hf_update_operator,
-+	.call_added = hf_call_added,
-+	.call_line_id_updated = hf_call_line_id_updated,
+ #include "src/shared/util.h"
+ #include "src/shared/ringbuf.h"
+@@ -29,7 +30,7 @@
+ 	hfp_debug(_hfp->debug_callback, _hfp->debug_data, "%s:%s() " fmt, \
+ 						__FILE__, __func__, ## arg)
+ 
+-#define HFP_HF_FEATURES	(HFP_HF_FEAT_ESCO_S4_T2)
++#define HFP_HF_FEATURES	(HFP_HF_FEAT_CLIP | HFP_HF_FEAT_ESCO_S4_T2)
+ 
+ struct hfp_gw {
+ 	int ref_count;
+@@ -100,6 +101,7 @@ struct hfp_hf {
+ 	bool roaming;
+ 	uint8_t battchg;
+ 
++	struct queue *calls;
  };
  
- static void test_hf_session_done(enum hfp_result res, enum hfp_error cme_err,
-@@ -1024,6 +1058,18 @@ int main(int argc, char *argv[])
- 			MINIMAL_SLC_SESSION('0', '0', '0', '0'),
- 			data_end());
+ struct cmd_handler {
+@@ -128,6 +130,15 @@ struct event_handler {
+ 	hfp_hf_result_func_t callback;
+ };
  
-+	/* Calling Line Identification - HF */
-+	define_hf_test("/HFP/HF/CLI/BV-01-C", test_hf_session,
-+			NULL, test_hf_session_done,
-+			MINIMAL_SLC_SESSION('1', '0', '0', '0'),
-+			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
-+				'3', ',', '1', '\r', '\n'),
-+			frg_pdu('\r', '\n', 'R', 'I', 'N', 'G', '\r', '\n'),
-+			frg_pdu('\r', '\n', '+', 'C', 'L', 'I', 'P', ':',
-+				'\"', '1', '2', '3', '4', '5', '6', '7', '\"',
-+				',', '1', '2', '9', ',', ',', '\r', '\n'),
-+			data_end());
++struct hf_call {
++	uint id;
++	enum hfp_call_status status;
++	char *line_id;
++	uint type;
 +
- 	/* Transfer Signal Strength Indication - HF */
- 	define_hf_test("/HFP/HF/PSI/BV-01-C", test_hf_session,
- 			NULL, test_hf_session_done,
++	struct hfp_hf *hfp;
++};
++
+ static void hfp_debug(hfp_debug_func_t debug_func, void *debug_data,
+ 						const char *format, ...)
+ {
+@@ -1303,6 +1314,7 @@ struct hfp_hf *hfp_hf_new(int fd)
+ 
+ 	hfp->event_handlers = queue_new();
+ 	hfp->cmd_queue = queue_new();
++	hfp->calls = queue_new();
+ 	hfp->writer_active = false;
+ 
+ 	if (!io_set_read_handler(hfp->io, hf_can_read_data, hfp,
+@@ -1329,6 +1341,18 @@ struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp)
+ 	return hfp;
+ }
+ 
++static void remove_call_cb(void *user_data)
++{
++	struct hf_call *call = user_data;
++	struct hfp_hf *hfp = call->hfp;
++
++	if (hfp->callbacks && hfp->callbacks->call_removed)
++		hfp->callbacks->call_removed(call->id, hfp->callbacks_data);
++
++	free(call->line_id);
++	free(call);
++}
++
+ void hfp_hf_unref(struct hfp_hf *hfp)
+ {
+ 	if (!hfp)
+@@ -1361,6 +1385,9 @@ void hfp_hf_unref(struct hfp_hf *hfp)
+ 	queue_destroy(hfp->cmd_queue, free);
+ 	hfp->cmd_queue = NULL;
+ 
++	queue_destroy(hfp->calls, remove_call_cb);
++	hfp->calls = NULL;
++
+ 	if (!hfp->in_disconnect) {
+ 		free(hfp);
+ 		return;
+@@ -1568,6 +1595,44 @@ bool hfp_hf_disconnect(struct hfp_hf *hfp)
+ 	return io_shutdown(hfp->io);
+ }
+ 
++static bool call_id_match(const void *data, const void *match_data)
++{
++	const struct hf_call *call = data;
++	uint id = PTR_TO_UINT(match_data);
++
++	return (call->id == id);
++}
++
++static uint next_call_index(struct hfp_hf *hfp)
++{
++	for (uint i = 1; i < UINT_MAX; i++) {
++		if (!queue_find(hfp->calls, call_id_match, UINT_TO_PTR(i)))
++			return i;
++	}
++
++	return 0;
++}
++
++static struct hf_call *call_new(struct hfp_hf *hfp, unsigned int id,
++						enum hfp_call_status status,
++						char *number)
++{
++	struct hf_call *call;
++
++	call = new0(struct hf_call, 1);
++	call->id = id;
++	call->status = status;
++	call->line_id = number;
++	call->hfp = hfp;
++	queue_push_tail(hfp->calls, call);
++
++	if (hfp->callbacks && hfp->callbacks->call_added)
++		hfp->callbacks->call_added(call->id, call->status,
++						hfp->callbacks_data);
++
++	return call;
++}
++
+ static void ciev_service_cb(uint8_t val, void *user_data)
+ {
+ 	struct hfp_hf *hfp = user_data;
+@@ -1599,9 +1664,40 @@ static void ciev_call_cb(uint8_t val, void *user_data)
+ 	}
+ }
+ 
++static bool call_outgoing_match(const void *data, const void *match_data)
++{
++	const struct hf_call *call = data;
++
++	return (call->status == CALL_STATUS_DIALING ||
++				    call->status == CALL_STATUS_ALERTING);
++}
++
++static bool call_incoming_match(const void *data, const void *match_data)
++{
++	const struct hf_call *call = data;
++
++	return (call->status == CALL_STATUS_INCOMING);
++}
++
++static bool call_setup_match(const void *data, const void *match_data)
++{
++	return (call_outgoing_match(data, match_data) ||
++				    call_incoming_match(data, match_data));
++}
++
++static bool call_active_match(const void *data, const void *match_data)
++{
++	const struct hf_call *call = data;
++
++	return (call->status == CALL_STATUS_ACTIVE);
++}
++
+ static void ciev_callsetup_cb(uint8_t val, void *user_data)
+ {
+ 	struct hfp_hf *hfp = user_data;
++	struct hf_call *call;
++	uint id;
++	enum hfp_call_status status;
+ 
+ 	DBG(hfp, "%u", val);
+ 
+@@ -1610,6 +1706,57 @@ static void ciev_callsetup_cb(uint8_t val, void *user_data)
+ 		DBG(hfp, "hf: Incorrect call setup state: %u", val);
+ 		return;
+ 	}
++
++	switch (val) {
++	case CIND_CALLSETUP_NONE:
++		/* remove call in setup phase */
++		queue_remove_all(hfp->calls, call_setup_match, hfp,
++							remove_call_cb);
++		break;
++	case CIND_CALLSETUP_INCOMING:
++		if (queue_length(hfp->calls) != 0) {
++			DBG(hfp, "hf: Call already exists");
++			return;
++		}
++
++		id = next_call_index(hfp);
++		if (id == 0) {
++			DBG(hfp, "hf: No new call index available");
++			return;
++		}
++		call_new(hfp, id, CALL_STATUS_INCOMING, NULL);
++		break;
++	case CIND_CALLSETUP_DIALING:
++	case CIND_CALLSETUP_ALERTING:
++		if (val == CIND_CALLSETUP_DIALING)
++			status = CALL_STATUS_DIALING;
++		else
++			status = CALL_STATUS_ALERTING;
++
++		if (queue_find(hfp->calls, call_active_match, NULL)) {
++			DBG(hfp, "hf: Error: active call");
++			return;
++		}
++
++		call = queue_find(hfp->calls, call_outgoing_match, NULL);
++		if (call && call->status != status) {
++			call->status = status;
++			if (hfp->callbacks &&
++				hfp->callbacks->call_status_updated)
++				hfp->callbacks->call_status_updated(call->id,
++							call->status,
++							hfp->callbacks_data);
++			return;
++		}
++
++		id = next_call_index(hfp);
++		if (id == 0) {
++			DBG(hfp, "hf: No new call index available");
++			return;
++		}
++		call_new(hfp, id, status, NULL);
++		break;
++	}
+ }
+ 
+ static void ciev_callheld_cb(uint8_t val, void *user_data)
+@@ -1733,7 +1880,45 @@ static void cops_cb(struct hfp_context *context, void *user_data)
+ 		hfp->callbacks->update_operator(name, hfp->callbacks_data);
+ }
+ 
+-static void cops_resp(enum hfp_result result, enum hfp_error cme_err,
++static void clip_cb(struct hfp_context *context, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++	char number[255];
++	unsigned int type;
++	struct hf_call *call;
++
++	DBG(hfp, "");
++
++	if (!hfp_context_get_string(context, number, sizeof(number))) {
++		DBG(hfp, "hf: Could not get string");
++		return;
++	}
++
++	if (!hfp_context_get_number(context, &type))
++		return;
++
++	call = queue_find(hfp->calls, call_incoming_match, NULL);
++	if (!call) {
++		DBG(hfp, "hf: no incoming call");
++		return;
++	}
++
++	if (call->line_id && strcmp(call->line_id, number) == 0 &&
++		call->type == type)
++		return;
++
++	if (call->line_id)
++		free(call->line_id);
++	call->line_id = strdup(number);
++	call->type = type;
++
++	if (hfp->callbacks && hfp->callbacks->call_line_id_updated)
++		hfp->callbacks->call_line_id_updated(call->id, call->line_id,
++							call->type,
++							hfp->callbacks_data);
++}
++
++static void clip_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	void *user_data)
+ {
+ 	struct hfp_hf *hfp = user_data;
+@@ -1741,7 +1926,7 @@ static void cops_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	DBG(hfp, "");
+ 
+ 	if (result != HFP_RESULT_OK) {
+-		DBG(hfp, "hf: COPS? error: %d", result);
++		DBG(hfp, "hf: CLIP error: %d", result);
+ 		goto failed;
+ 	}
+ 
+@@ -1757,6 +1942,34 @@ failed:
+ 						hfp->callbacks_data);
+ }
+ 
++static void cops_resp(enum hfp_result result, enum hfp_error cme_err,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "");
++
++	if (result != HFP_RESULT_OK) {
++		DBG(hfp, "hf: COPS? error: %d", result);
++		goto failed;
++	}
++
++	/* SLC creation done, continue with default setup */
++	if (!hfp_hf_send_command(hfp, clip_resp, hfp,
++		"AT+CLIP=1")) {
++		DBG(hfp, "hf: Could not send AT+CLIP=1");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	return;
++
++failed:
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(result, cme_err,
++						hfp->callbacks_data);
++}
++
+ static void cops_conf_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	void *user_data)
+ {
+@@ -1807,6 +2020,7 @@ static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
+ 
+ 	/* Register unsolicited results handlers */
+ 	hfp_hf_register(hfp, ciev_cb, "+CIEV", hfp, NULL);
++	hfp_hf_register(hfp, clip_cb, "+CLIP", hfp, NULL);
+ 	hfp_hf_register(hfp, cops_cb, "+COPS", hfp, NULL);
+ 
+ 	return;
+@@ -2135,3 +2349,21 @@ bool hfp_hf_session(struct hfp_hf *hfp)
+ 	return hfp_hf_send_command(hfp, slc_brsf_resp, hfp,
+ 					"AT+BRSF=%u", HFP_HF_FEATURES);
+ }
++
++const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id)
++{
++	struct hf_call *call;
++
++	DBG(hfp, "");
++
++	if (!hfp)
++		return false;
++
++	call = queue_find(hfp->calls, call_id_match, UINT_TO_PTR(id));
++	if (!call) {
++		DBG(hfp, "hf: no call with id: %u", id);
++		return false;
++	}
++
++	return call->line_id;
++}
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index 27f6d2d7c..fec63c150 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -114,6 +114,16 @@ enum hfp_call_held {
+ 	CIND_CALLHELD_HOLD
+ };
+ 
++enum hfp_call_status {
++	CALL_STATUS_ACTIVE = 0,
++	CALL_STATUS_HELD,
++	CALL_STATUS_DIALING,
++	CALL_STATUS_ALERTING,
++	CALL_STATUS_INCOMING,
++	CALL_STATUS_WAITING,
++	CALL_STATUS_RESPONSE_AND_HOLD
++};
++
+ struct hfp_context;
+ 
+ typedef void (*hfp_result_func_t)(struct hfp_context *context,
+@@ -191,6 +201,14 @@ struct hfp_hf_callbacks {
+ 	void (*update_indicator)(enum hfp_indicator indicator, uint32_t val,
+ 							void *user_data);
+ 	void (*update_operator)(const char *operator_name, void *user_data);
++
++	void (*call_added)(uint id, enum hfp_call_status status,
++							void *user_data);
++	void (*call_removed)(uint id, void *user_data);
++	void (*call_status_updated)(uint id, enum hfp_call_status status,
++							void *user_data);
++	void (*call_line_id_updated)(uint id, const char *number, uint type,
++							void *user_data);
+ };
+ 
+ struct hfp_hf *hfp_hf_new(int fd);
+@@ -216,3 +234,5 @@ bool hfp_hf_session_register(struct hfp_hf *hfp,
+ 				struct hfp_hf_callbacks *callbacks,
+ 				void *callbacks_data);
+ bool hfp_hf_session(struct hfp_hf *hfp);
++
++const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id);
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index 8ab6c7bf5..f22a687d5 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -730,7 +730,8 @@ static void test_hf_robustness(gconstpointer data)
+ 	raw_pdu('\r', '\n', '+', 'C', 'O', 'P', 'S', ':', ' '), \
+ 	frg_pdu('0', ',', '0', ',', '\"', 'T', 'E', 'S', 'T'), \
+ 	frg_pdu('\"', '\r', '\n'), \
+-	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n')
++	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
++	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n')
+ 
+ static void hf_session_ready_cb(enum hfp_result res, enum hfp_error cme_err,
+ 							void *user_data)
 -- 
 2.43.0
 
