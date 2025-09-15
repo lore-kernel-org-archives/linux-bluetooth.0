@@ -1,150 +1,65 @@
-Received: from aer-iport-6.cisco.com (aer-iport-6.cisco.com [173.38.203.68])
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85ED2C0F72
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Sep 2025 07:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.38.203.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A44427A91D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Sep 2025 08:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757923028; cv=none; b=fwz112wQgTftC1FrLBU62EN4TUb0aoBGSkM29vcZO2AAVmKi3rofXLN1fP9e+qr6yMy8KFw9hCDG5LW8s6WhYdw/Tg+92g6C1xE25ZLwu5FqRq2J34iBizrALWJcLhtmUk25QaThtgcFl+yy4xyBLuQNfcdvf3u2hoOIa3yB/Nw=
+	t=1757923278; cv=none; b=h86PKNLVbTv2Np2Dt29MMYOXvywrRs3FL731+xqJyhuG3bivCYrtzSSk0BKJ5CO6lMhDp4ATy9A/vVT313bOB6EsDCkPdc7+vrxrGnZkih3EDVNlk9e/G0LuYtx4oiNhZYeitMytZUzBbqkyhtud0hDSs8c9nLqSjCMhqRr5qwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757923028; c=relaxed/simple;
-	bh=J/KvBoZ/IoA/chDeQUSop4dSo5XqDgw0zVxhEeCYC7k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XbOSfPFdYiaO9zsQockxryb7UeP3h5Lx7CBdX1ztqPs6mkx/a47ehw1Rkb4LSq6mnuZ5ftNu9BYsQ98bLYQbl2SCUEjtrspAU42RBoUetLG2b5CeNarGwTMyqZc+tHfC65zj8Wruk6nYpoME1p4k2cT0hQ69IWqPihgohD3auv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b=c31nIE81; arc=none smtp.client-ip=173.38.203.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+	s=arc-20240116; t=1757923278; c=relaxed/simple;
+	bh=x/EfwogDzJKuZwHcRdQ+Tiypn2/7J6rx4imMqKkD18g=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jGnJ8+XVqd00GXRSoEjtRX+SHxUr3GOSzeC/lSQCegVNxUaGhKC/TkV+OPjlkUMpLJ3Z727nXx84jc6v5/uTdLliJn4QjDk5gWxqTtYWh+GI3YOIgkN6AZemokTZuZOLZ7OrmvNLVpx7YLC69YZq34UTE5xiW3EidvYaM5ZUOtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ROSDt0gf; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b="c31nIE81"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=2850; q=dns/txt;
-  s=iport01; t=1757923026; x=1759132626;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=yvX/FtzwgmmjmdPHxakj6YRkticu7sQgIvyBJqPBVOc=;
-  b=c31nIE81P0e694yUJJT4d3ui/xZrdtnoPRBZpkrqejPgBvqDWD+IhMft
-   ReMP4zfMXbgwMC//l7Uza0zhPjFrO1nDkWTdZ/EEQh6lkGENqHQwsrVYw
-   6mZVymUf5pEmpRMMkxGYSo1fm3jMyFePtj0ARu6xHm7+gBs9HPVd6SXtn
-   xRbp1jzhJjbH2TmQ5keBePKk+GgOnj/E21pc6InP6gAfKt7Nby57UXKii
-   W8+C1hMDhhSARlDDcwoPiJKHRbfG6VyZaF5EyP0wrtSEOTaEBMlKgcrFL
-   YuR0adHpKLJqNWO2RkHam7gGExehQ+CrimzSIkYdxyYkhQH6tu4Z87viF
-   A==;
-X-CSE-ConnectionGUID: Sp8gfbicTV21p3ixfub/ow==
-X-CSE-MsgGUID: ix21xhdLSYSmjtK6LlBPGg==
-X-IPAS-Result: =?us-ascii?q?A0BqAADgxcdo/9BK/pBaHAEBAQEBAQcBARIBAQQEAQGBf?=
- =?us-ascii?q?wcBAQsBgkZsaEONOadygX8PAQEBD1EEAQGFB4wxAiY0CQ4BAgQBAQEBAwIDA?=
- =?us-ascii?q?QEBAQEBAQEBAQELAQEFAQEBAgEHBYEOE4Zchl02AUaEUoJzA7AsgiyBAYR82?=
- =?us-ascii?q?gGBKYFJAY1McIR3JxuCDYJQgT5vhRCFdwSDOJAwi1ZIgR4DWSwBVRMNCgsHB?=
- =?us-ascii?q?YFjAzUMCy4VbjIdgSeFDIQdK0+FAoRrJGsPBoEVg1sGhQFAAwsYDUgRLDcUG?=
- =?us-ascii?q?wY+bgeYQnsUyVmEJqFXGjOqa5kGpFiEaYFoPIFZcBWDI1EZD8tfRG4CBwsBA?=
- =?us-ascii?q?QMJgjmRLgEB?=
-IronPort-Data: A9a23:F2VGQKDQfh8vQhVW/2riw5YqxClBgxIJ4kV8jS/XYbTApD0m0WMBn
- TAbXDrSb6yDYzHzc4twYY+z/UJUvpKHyIAxOVdlrnsFo1CmBibm6XV1Cm+qYkt+++WaFBoPA
- /02M4eGdIZuCCaF/H9BC5C5xVFkz6aEW7HgP+DNPyF1VGdMRTwo4f5Zs7ZRbrVA357gU2thh
- fuo+5eCYA78h2YvWo4pw/vrRC1H7ayaVAww5jTSVdgT1HfCmn8cCo4oJK3ZBxPQXolOE+emc
- P3Ixbe/83mx109F5gSNy+uTnuUiG9Y+DCDW4pZkc/HKbitq+kTe5p0G2M80Mi+7vdkmc+dZk
- 72hvbToIesg0zaldO41C3G0GAkmVUFKFSOuzXWX6aSuI0P6n3TE+O0+A088PIYkxLwuGTpP5
- fIFIncKcUXW7w626OrTpuhEj8k5ac2uN4QFtzQ4knfSDO0tRtbIRKCiCd1whWtswJoTQbCBO
- 4xDMWoHgBfoO3WjPn8PF5s3k+CAjXjkeDoeo1WQzUYyyzOKlVwpiui8WDbTUt2aH5xFnkq8n
- VP9+mblIU8+MPan5jXQpxpAgceKx0sXQrk6ELy+6+4vilmOy3AUDwEWfUW0rOP/iUOkXd9bb
- UsO9UITQbMa/UGxC924VBqirTvc4VgXWsFbFKsx7wTlJrfo3jt1z1MsFlZpAOHKfudvLdD2/
- jdlR+/UOAE=
-IronPort-HdrOrdr: A9a23:tI9+E6wwJ4oFRFQfLXMaKrPwJb1zdoMgy1knxilNoNJuHvBw8P
- re/sjzuiWbtN98YhsdcLO7Scq9qBHnlKKdiLN5VdyftWLd11dAQrsO0WKb+V3d8+mUzJ846U
- +mGJIObeHNMQ==
-X-Talos-CUID: =?us-ascii?q?9a23=3AFATXgmvs3pzJagzDxTGYZg2l6Iseai3Swn3RKHO?=
- =?us-ascii?q?GUz9xE7yFR0Kav6R7xp8=3D?=
-X-Talos-MUID: 9a23:lToTmwUJ95Blvovq/D783mhyNMtM2JWVDUIRsssiv+O8GiMlbg==
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.18,265,1751241600"; 
-   d="scan'208";a="31180289"
-Received: from aer-l-core-07.cisco.com ([144.254.74.208])
-  by aer-iport-6.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 15 Sep 2025 07:55:55 +0000
-Received: from pwaago-l-systems.rd.cisco.com (unknown [10.47.92.97])
-	by aer-l-core-07.cisco.com (Postfix) with ESMTP id 46E3318000224;
-	Mon, 15 Sep 2025 07:55:55 +0000 (GMT)
-From: =?UTF-8?q?Per=20Waag=C3=B8?= <pwaago@cisco.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ROSDt0gf"
+Received: from github.com (hubbernetes-node-25b17b4.ash1-iad.github.net [10.56.169.31])
+	by smtp.github.com (Postfix) with ESMTPA id 84F6860081C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Sep 2025 01:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1757923276;
+	bh=3Qdxbr/ELB1W98hPFcIu2AXJfMelHF4/Y7ovjBdi1tw=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ROSDt0gfHsCY0E9+IHx0XQGz3IQ9SVi4CFVTnWEqvLrxDI8OlUxHsezIqz9ZXrtb9
+	 k9uf+ie+0vXW7dAq1JeAI235+pHwcLB9Y+W88tT5uZpz96+Ou+jlNpv0HWw60p0fop
+	 vmgrP5wWEu74/ibVqnRg0ZTJnpZfOj7lMwgvejBM=
+Date: Mon, 15 Sep 2025 01:01:16 -0700
+From: "github-actions[bot]" <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Per=20Waag=C3=B8?= <pwaago@cisco.com>
-Subject: [PATCH BlueZ] audio: Fix typos in A2DP error messages
-Date: Mon, 15 Sep 2025 09:55:53 +0200
-Message-ID: <20250915075553.1636970-1-pwaago@cisco.com>
-X-Mailer: git-send-email 2.43.0
+Message-ID: <bluez/bluez/push/refs/heads/1002338/000000-d4b7bc@github.com>
+Subject: [bluez/bluez] d4b7bc: audio: Fix typos in A2DP error messages
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Outbound-SMTP-Client: 10.47.92.97, [10.47.92.97]
-X-Outbound-Node: aer-l-core-07.cisco.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
----
- doc/org.bluez.MediaEndpoint.rst | 8 ++++----
- profiles/audio/a2dp.c           | 8 ++++----
- profiles/audio/a2dp.h           | 8 ++++----
- 3 files changed, 12 insertions(+), 12 deletions(-)
+  Branch: refs/heads/1002338
+  Home:   https://github.com/bluez/bluez
+  Commit: d4b7bcdcd41a12be0c167b86e11c457f87b3b7e6
+      https://github.com/bluez/bluez/commit/d4b7bcdcd41a12be0c167b86e11c4=
+57f87b3b7e6
+  Author: Per Waag=C3=B8 <pwaago@cisco.com>
+  Date:   2025-09-15 (Mon, 15 Sep 2025)
 
-diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoint.rst
-index bbe00b637..c1ce1d562 100644
---- a/doc/org.bluez.MediaEndpoint.rst
-+++ b/doc/org.bluez.MediaEndpoint.rst
-@@ -69,11 +69,11 @@ Possible errors for A2DP endpoints:
- 	:org.bluez.Error.A2DP.NotSupportedMinimumBitpoolValue:
- 	:org.bluez.Error.A2DP.InvalidMaximumBitpoolValue:
- 	:org.bluez.Error.A2DP.NotSupportedMaximumBitpoolValue:
--	:org.bluez.Error.A2DP.InvalidInvalidLayer:
-+	:org.bluez.Error.A2DP.InvalidLayer:
- 	:org.bluez.Error.A2DP.NotSupportedLayer:
--	:org.bluez.Error.A2DP.NotSupporterdCRC:
--	:org.bluez.Error.A2DP.NotSupporterdMPF:
--	:org.bluez.Error.A2DP.NotSupporterdVBR:
-+	:org.bluez.Error.A2DP.NotSupportedCRC:
-+	:org.bluez.Error.A2DP.NotSupportedMPF:
-+	:org.bluez.Error.A2DP.NotSupportedVBR:
- 	:org.bluez.Error.A2DP.InvalidBitRate:
- 	:org.bluez.Error.A2DP.NotSupportedBitRate:
- 	:org.bluez.Error.A2DP.InvalidObjectType:
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 661843a89..6661a95d2 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -183,11 +183,11 @@ static struct a2dp_error config_errors[] = {
- 	{"InvalidMaximumBitpoolValue", A2DP_INVALID_MAXIMUM_BITPOOL_VALUE},
- 	{"NotSupportedMaximumBitpoolValue",
- 				A2DP_NOT_SUPPORTED_MAXIMUM_BITPOOL_VALUE},
--	{"InvalidInvalidLayer", A2DP_INVALID_INVALID_LAYER},
-+	{"InvalidLayer", A2DP_INVALID_LAYER},
- 	{"NotSupportedLayer", A2DP_NOT_SUPPORTED_LAYER},
--	{"NotSupporterdCRC", A2DP_NOT_SUPPORTERD_CRC},
--	{"NotSupporterdMPF", A2DP_NOT_SUPPORTERD_MPF},
--	{"NotSupporterdVBR", A2DP_NOT_SUPPORTERD_VBR},
-+	{"NotSupportedCRC", A2DP_NOT_SUPPORTED_CRC},
-+	{"NotSupportedMPF", A2DP_NOT_SUPPORTED_MPF},
-+	{"NotSupportedVBR", A2DP_NOT_SUPPORTED_VBR},
- 	{"InvalidBitRate", A2DP_INVALID_BIT_RATE},
- 	{"NotSupportedBitRate", A2DP_NOT_SUPPORTED_BIT_RATE},
- 	{"InvalidObjectType", A2DP_INVALID_OBJECT_TYPE},
-diff --git a/profiles/audio/a2dp.h b/profiles/audio/a2dp.h
-index bcdb4d43f..e742b5dfc 100644
---- a/profiles/audio/a2dp.h
-+++ b/profiles/audio/a2dp.h
-@@ -102,11 +102,11 @@ enum a2dp_error_codes {
- 	A2DP_NOT_SUPPORTED_MINIMUM_BITPOOL_VALUE = 0xcc,
- 	A2DP_INVALID_MAXIMUM_BITPOOL_VALUE = 0xcd,
- 	A2DP_NOT_SUPPORTED_MAXIMUM_BITPOOL_VALUE = 0xce,
--	A2DP_INVALID_INVALID_LAYER = 0xcf,
-+	A2DP_INVALID_LAYER = 0xcf,
- 	A2DP_NOT_SUPPORTED_LAYER = 0xd0,
--	A2DP_NOT_SUPPORTERD_CRC = 0xd1,
--	A2DP_NOT_SUPPORTERD_MPF = 0xd2,
--	A2DP_NOT_SUPPORTERD_VBR = 0xd3,
-+	A2DP_NOT_SUPPORTED_CRC = 0xd1,
-+	A2DP_NOT_SUPPORTED_MPF = 0xd2,
-+	A2DP_NOT_SUPPORTED_VBR = 0xd3,
- 	A2DP_INVALID_BIT_RATE = 0xd4,
- 	A2DP_NOT_SUPPORTED_BIT_RATE = 0xd5,
- 	A2DP_INVALID_OBJECT_TYPE = 0xd6,
--- 
-2.43.0
+  Changed paths:
+    M doc/org.bluez.MediaEndpoint.rst
+    M profiles/audio/a2dp.c
+    M profiles/audio/a2dp.h
 
+  Log Message:
+  -----------
+  audio: Fix typos in A2DP error messages
+
+
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
