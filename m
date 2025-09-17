@@ -1,126 +1,167 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16DD8F58
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Sep 2025 00:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3CA275B1F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Sep 2025 13:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758068977; cv=none; b=q0KnTCjRd/Bi+HbaNIV8VGIaubaE9+pv3HCB41idjeqbMSRV0IgfSIj2uGtWqZf7n0LXUiodxZ8MqpvEMfZMbMVp74cqfitVwN97quFHz6EBDXLk3thNmHGH6TUbuTzxJPbKQkr9EEMCY0PdBlnN4LTtITachmEW2qsJy07eNTM=
+	t=1758115759; cv=none; b=O4fky99gQpZllPxXHc7JEnwdxLmhY5/P5Y8B1b0qVS2KG8EVJ3QIl5VQqasfhWB881Ky38DaJeubpLKi9myRKtctVyB4srETYkk/ooa3+ci+u8umcdRq464qxPjNIalcZcqx/1pqxiodiNz0PzgD66rD5ifh0hHkF3D8DF51X0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758068977; c=relaxed/simple;
-	bh=5zw3ifZH3Vt7i1v8P/CycVMJ5zk+LKnEg1Ipr23sVqY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=E96QCsQnME0T72tyPYm7KK6d/z2FUE7/be2QySl9W96WpfxZcmBI8VXwFpHoVvyoLAJ9wtkQZQ0rLfl5l8GlxHSRK0D0gVVSVLwdP27WU0pA82QatZEQ/dXfoTRHdQ2x89ukJRvrFmZhpxtpn9XGOtcIf4hF8RwVa6R/Y8qgDyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hiq7vCay; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758115759; c=relaxed/simple;
+	bh=Ni39+iuj54kuAzF+hvYxmVnOWdhGtwaj9PnWd76pGUE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OMWxJjaSm+VoK7/69whS+20eaGpkna6OJ75rZ0+sZM58zFYg0p7pZti1WZJgnjD0ShPD3uXTDCoTbaWK8o+vRGLNW0mT6TKxEsyaaXFglmpUjx3HylyOdpoTEPfcp1LVTKemp4y2fxHXNDzT7kD0DRmXr+c6dqpPc2lGDu6du1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hwaqAq3p; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hiq7vCay"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-8877b60f7a5so203285539f.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Sep 2025 17:29:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758068975; x=1758673775; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xWzrs+kQccthOYtaAimC8rr3YT0vKVLTreC2tcJwbks=;
-        b=hiq7vCayqu/wDCChcEiMn6BP99UTnZ+5rWw7vPsxSPN+NxqB1h5fS5AcY6piBls2/1
-         l1VvOZT+9cR7P5IZGFIyIJYdQqgwMUWO2N/yihrV0W3W8ZTDnY/ZY54taBgecxTMy91p
-         /4oWzWNDvP9BwRpgztMdIUAijj12xJBXI9/VwOj0rBl67cgu9w387LQCAvLhuLk+R/21
-         l98e9ZiZ4w7cXEPvKQlnFcF0MNxjEEQBf3Tc11R8sF4x3ccqrrAWM/sm2GPGid6oc/tA
-         xWpl3QiL8nI41cC7l5Sr36MwUCrGjxY9OT1LQhiUybOld6x5hEU8ifatQ2DrrGBqgJFE
-         fuMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758068975; x=1758673775;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xWzrs+kQccthOYtaAimC8rr3YT0vKVLTreC2tcJwbks=;
-        b=avrK0ePdcc7SIHFmNKZ2eOCXKfmPr//elT17y0mj99V1V7flAfsQYMHB+0iTqnOb39
-         /dUnG7iRLrCvbcbMxYrmkvtv3VKYReTG6/dqeGI057JvNiWctlPXnvzVTn8r4dbu2Wvn
-         sZTA8xfKK7D6BQwPb5SVca964Kfyy4pAY4dw41qsFb06SLnQbapvWGeRNzCQ8tuH2O7j
-         yRMN8ebXM5oVBT0o4uu8zP4kcGpHDmWhP2mP/Fri40bh6gS4buYxXAqEW+jS/ZkjEh2M
-         zgMNu70ZisoJiEMlT68FgKtN/PQo3ahw+psMQd04fTuJ0LP3+lQP1xT2ZJY2zgNvBEBQ
-         cJWg==
-X-Gm-Message-State: AOJu0Yxdhc3a9k7BJ4UJ7DXc73/9ODwhgRZa3Awd0TkMRF3tFA48nFx7
-	vOAkQXO4fhwIpAvl8cMyPQTjeF0H9/sOgCCmUbpVuyTzb19Up4mpu0xRfOWXeA==
-X-Gm-Gg: ASbGncueVIpjJURCW4Q1Lhj5rDCyr8LZyooDs68NDfAI59eYVOJbSrHJiwmsh4Cgztx
-	3/d4wx3l1pTjUGtDGyauatpCl6ZqctJ16OyLYCTIOJ7VhN3OG8Ra+LFfNdmFnC89Un6dXEmF5jQ
-	GqmQSXdv5REo5SqLpzf3kogq8qm5d+t/KJyg+3ZMR0/0LcCNmQoEQQU5BzzqHAlcr1M6KGj27WK
-	lkw3EJt0xBylxNNi/DVCpxb1GMlFeVsx5h0pJKK/P88ugWaH13SfoZuc95V3cGsnW4+ky9YchaS
-	Ur3Ycr9M0kyGK6alMeT62HQG6ilFszeAcfm5ROzpTOiioNe+9vK5xi9Tm+Hr7G9PGmyE38FRAhW
-	SivUpSsfZqzeGK3ZomrEX3IoVI2/B
-X-Google-Smtp-Source: AGHT+IFhpsnNCcAqRcePPB//4TyqOFinTWqgKsM+pafcak4FTdD7uO1hhJb3cy9A7+GT4AZBqTZqoQ==
-X-Received: by 2002:a05:6e02:1aa3:b0:40b:db4:839b with SMTP id e9e14a558f8ab-4241a4b9a0bmr3122915ab.5.1758068974457;
-        Tue, 16 Sep 2025 17:29:34 -0700 (PDT)
-Received: from [172.17.0.2] ([64.236.160.16])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5120ef21180sm4488520173.55.2025.09.16.17.29.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 17:29:33 -0700 (PDT)
-Message-ID: <68ca00ed.050a0220.28a04b.5b45@mx.google.com>
-Date: Tue, 16 Sep 2025 17:29:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6765143587056299529=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hwaqAq3p"
+Received: from github.com (unknown [10.55.88.32])
+	by smtp.github.com (Postfix) with ESMTPA id E16EB20C12
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Sep 2025 06:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1758115756;
+	bh=xzZAkg5Cqwk60Xkb4k1led74ahpzIuvMy5NaXooHcco=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=hwaqAq3pl7jFpkZBHJKX1o1w30u6iHQHMz0csKpujjmqBnxW7NayIsBxewfuQNb53
+	 CN7vqwAdZ52sN04YRuUN9pWKEoT7unJEv1C0xoihs0wtzbh21EHko4d195JQd3r0ab
+	 ASioIxW+knz4QPQfnxVn64fNgulrQEEGuwDJtiSg=
+Date: Wed, 17 Sep 2025 06:29:16 -0700
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/4d7d25-c6dcf6@github.com>
+Subject: [bluez/bluez] b8d3e4: shared/hfp: Add Operator name support
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: [BlueZ] transport: Fix build with VCP support disabled
-In-Reply-To: <20250916230017.2216629-1-hadess@hadess.net>
-References: <20250916230017.2216629-1-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
---===============6765143587056299529==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: b8d3e4c510b81e152f70618f17698329ebe48335
+      https://github.com/bluez/bluez/commit/b8d3e4c510b81e152f70618f17698=
+329ebe48335
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-09-15 (Mon, 15 Sep 2025)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M src/shared/hfp.c
+    M src/shared/hfp.h
+    M unit/test-hfp.c
 
-Dear submitter,
+  Log Message:
+  -----------
+  shared/hfp: Add Operator name support
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1003112
+Send AT+COPS=3D3,0 at the end of the SLC creation to set the format of
+the operator selection to long alphanumeric, then query the currently
+selected operator name from the AG.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.26 seconds
-GitLint                       PENDING   0.31 seconds
-BuildEll                      PASS      20.09 seconds
-BluezMake                     PASS      2604.18 seconds
-MakeCheck                     PASS      20.57 seconds
-MakeDistcheck                 PASS      187.46 seconds
-CheckValgrind                 PASS      239.57 seconds
-CheckSmatch                   PASS      309.80 seconds
-bluezmakeextell               PASS      129.70 seconds
-IncrementalBuild              PENDING   0.36 seconds
-ScanBuild                     PASS      908.08 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Register +COPS handler to call the update_operator callback on event.
 
 
+  Commit: fb32f3a27fbddabfa678c19f82297d7e4509c73c
+      https://github.com/bluez/bluez/commit/fb32f3a27fbddabfa678c19f82297=
+d7e4509c73c
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-09-15 (Mon, 15 Sep 2025)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M unit/test-hfp.c
+
+  Log Message:
+  -----------
+  unit/test-hfp: Add Operator name test for HF
+
+This add the following test:
+- HFP/HF/PSI/BV-04-C
+  Verify that the HF can query the currently selected operator name.
+
+Improve MINIMAL_SLC_SESSION macro to be able to set the service, call,
+callsetup and callheld indicators at connection time.
 
 
---===============6765143587056299529==--
+  Commit: 889139e0a1af317d0964b8ef989e974709ccff0f
+      https://github.com/bluez/bluez/commit/889139e0a1af317d0964b8ef989e9=
+74709ccff0f
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-09-15 (Mon, 15 Sep 2025)
+
+  Changed paths:
+    M src/shared/hfp.c
+    M src/shared/hfp.h
+    M unit/test-hfp.c
+
+  Log Message:
+  -----------
+  shared/hfp: Add Call Line Identification support
+
+Send AT+CLIP=3D1 at the end of the SLC creation to enable CLIP event.
+Register +CLIP handler to call the update_call_line_id callback on event.=
+
+
+During incoming call notifications, i.e. after +CIEV:<callsetup>,1
+event which creates a new call object, the reception of +CLIP event
+will update the line_id and type of the call object.
+
+
+  Commit: 430b8b1b024b4f452aa1f641137c9b132c812435
+      https://github.com/bluez/bluez/commit/430b8b1b024b4f452aa1f641137c9=
+b132c812435
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-09-15 (Mon, 15 Sep 2025)
+
+  Changed paths:
+    M unit/test-hfp.c
+
+  Log Message:
+  -----------
+  unit/test-hfp: Add Call Line Identification test for HF
+
+This add the following test:
+- HFP/HF/CLI/BV-01-C
+  Verify that the HF receives the caller ID.
+
+
+  Commit: c6dcf6b714501768ab7ea293e75d945be0eec188
+      https://github.com/bluez/bluez/commit/c6dcf6b714501768ab7ea293e75d9=
+45be0eec188
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-09-17 (Wed, 17 Sep 2025)
+
+  Changed paths:
+    M configure.ac
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: Fix build with VCP support disabled
+
+$ $ ./bootstrap-configure --enable-a2dp --enable-avrcp --enable-experimen=
+tal --enable-asha --disable-vcp && make
+[...]
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transpor=
+t_bap_set_volume':
+profiles/audio/transport.c:2275:(.text.transport_bap_set_volume+0x11): un=
+defined reference to `bt_audio_vcp_set_volume'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transpor=
+t_bap_get_volume':
+profiles/audio/transport.c:2266:(.text.transport_bap_get_volume+0x9): und=
+efined reference to `bt_audio_vcp_get_volume'
+
+Reported-by: Arun Raghavan <arun@accosted.net>
+Fixes: af8266af13c8 ("audio: connect VCP profile client to MediaTransport=
+")
+
+
+Compare: https://github.com/bluez/bluez/compare/4d7d25b70245...c6dcf6b714=
+50
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
