@@ -1,167 +1,81 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3CA275B1F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Sep 2025 13:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72429302CDC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Sep 2025 13:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758115759; cv=none; b=O4fky99gQpZllPxXHc7JEnwdxLmhY5/P5Y8B1b0qVS2KG8EVJ3QIl5VQqasfhWB881Ky38DaJeubpLKi9myRKtctVyB4srETYkk/ooa3+ci+u8umcdRq464qxPjNIalcZcqx/1pqxiodiNz0PzgD66rD5ifh0hHkF3D8DF51X0A=
+	t=1758115806; cv=none; b=dhkGQzNCqpqEeYiWt9bYhSvqN658AO6SlpcCB27CwJBcz/+G/lqg+9XaYsFPcp2Df2M2TrVDchKeEY1VrgNUFuQ0TIAzy2zeFeniaFd7t+fAY+AnzYGKJFoNgdwddHXE4xgmoYjBE8R8VZPnGdLso5i2pyBu3GhYQpOkFfnMA6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758115759; c=relaxed/simple;
-	bh=Ni39+iuj54kuAzF+hvYxmVnOWdhGtwaj9PnWd76pGUE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OMWxJjaSm+VoK7/69whS+20eaGpkna6OJ75rZ0+sZM58zFYg0p7pZti1WZJgnjD0ShPD3uXTDCoTbaWK8o+vRGLNW0mT6TKxEsyaaXFglmpUjx3HylyOdpoTEPfcp1LVTKemp4y2fxHXNDzT7kD0DRmXr+c6dqpPc2lGDu6du1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hwaqAq3p; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1758115806; c=relaxed/simple;
+	bh=F7uNYarpzKYibDbGBqv7HJUzU8mxu82IAbTQ/XM6nqE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=k0vCoe/wUcmyrZeSwVbvhBP3uQo5YqUzwfibBUlG9j2TegjiL2MH9GmS5s9X6npuXMCDnHCcGMuFylh0fsv365uKTiZlweFKt4L/VE4xEH+97eodpPspy19/VLAcvLmYgOVIhcvj4X9bT3ETS8+qcyLWQLNDHIVXCilHCZluNe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oWFG1NIl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hwaqAq3p"
-Received: from github.com (unknown [10.55.88.32])
-	by smtp.github.com (Postfix) with ESMTPA id E16EB20C12
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Sep 2025 06:29:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1758115756;
-	bh=xzZAkg5Cqwk60Xkb4k1led74ahpzIuvMy5NaXooHcco=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=hwaqAq3pl7jFpkZBHJKX1o1w30u6iHQHMz0csKpujjmqBnxW7NayIsBxewfuQNb53
-	 CN7vqwAdZ52sN04YRuUN9pWKEoT7unJEv1C0xoihs0wtzbh21EHko4d195JQd3r0ab
-	 ASioIxW+knz4QPQfnxVn64fNgulrQEEGuwDJtiSg=
-Date: Wed, 17 Sep 2025 06:29:16 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/4d7d25-c6dcf6@github.com>
-Subject: [bluez/bluez] b8d3e4: shared/hfp: Add Operator name support
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oWFG1NIl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0FE6C4CEF0;
+	Wed, 17 Sep 2025 13:30:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758115806;
+	bh=F7uNYarpzKYibDbGBqv7HJUzU8mxu82IAbTQ/XM6nqE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oWFG1NIlqMCLz6voVn3GmkX/fxDVKrsZkONB/W64CuuAYuhbmMqc7RiIMma5bL4Oy
+	 zRqOwy0qJmavTCb/HmRKrNlRSliINypb6DNwhJfqD9diEQKvlz3YToNIW0GI9Pf5oi
+	 MqeUBkf8vE3dBMEmmHjlNWcRAv0ue0Hwz2hPbYel57dSMrEIdPh9GlONt/FjKPGp7G
+	 yQouMcyBtex3+F8Yx41R0v9MZ0zjTrpr+KyZVkbVmYs+ZYnQ7jJtwxH2fd813pHx0J
+	 k7vesS9uT9fkxU3fFvdx+WDF9S+JJf2TiyVcYB8P2E40YMtrhoFjpwV92pqtKd4UIJ
+	 WWmORZX0REbUg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB03139D0C1A;
+	Wed, 17 Sep 2025 13:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 1/4] shared/hfp: Add Operator name support
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175811580676.1623615.4409282341891803844.git-patchwork-notify@kernel.org>
+Date: Wed, 17 Sep 2025 13:30:06 +0000
+References: <20250915163427.3589748-1-frederic.danis@collabora.com>
+In-Reply-To: <20250915163427.3589748-1-frederic.danis@collabora.com>
+To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: b8d3e4c510b81e152f70618f17698329ebe48335
-      https://github.com/bluez/bluez/commit/b8d3e4c510b81e152f70618f17698=
-329ebe48335
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-15 (Mon, 15 Sep 2025)
+Hello:
 
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
-    M unit/test-hfp.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  shared/hfp: Add Operator name support
+On Mon, 15 Sep 2025 18:34:24 +0200 you wrote:
+> Send AT+COPS=3,0 at the end of the SLC creation to set the format of
+> the operator selection to long alphanumeric, then query the currently
+> selected operator name from the AG.
+> 
+> Register +COPS handler to call the update_operator callback on event.
+> ---
+> v1->v2 : Move changes from patch 2 to fix unit/test-hfp
+> 
+> [...]
 
-Send AT+COPS=3D3,0 at the end of the SLC creation to set the format of
-the operator selection to long alphanumeric, then query the currently
-selected operator name from the AG.
+Here is the summary with links:
+  - [BlueZ,v2,1/4] shared/hfp: Add Operator name support
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b8d3e4c510b8
+  - [BlueZ,v2,2/4] unit/test-hfp: Add Operator name test for HF
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fb32f3a27fbd
+  - [BlueZ,v2,3/4] shared/hfp: Add Call Line Identification support
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=889139e0a1af
+  - [BlueZ,v2,4/4] unit/test-hfp: Add Call Line Identification test for HF
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=430b8b1b024b
 
-Register +COPS handler to call the update_operator callback on event.
-
-
-  Commit: fb32f3a27fbddabfa678c19f82297d7e4509c73c
-      https://github.com/bluez/bluez/commit/fb32f3a27fbddabfa678c19f82297=
-d7e4509c73c
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-15 (Mon, 15 Sep 2025)
-
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add Operator name test for HF
-
-This add the following test:
-- HFP/HF/PSI/BV-04-C
-  Verify that the HF can query the currently selected operator name.
-
-Improve MINIMAL_SLC_SESSION macro to be able to set the service, call,
-callsetup and callheld indicators at connection time.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 889139e0a1af317d0964b8ef989e974709ccff0f
-      https://github.com/bluez/bluez/commit/889139e0a1af317d0964b8ef989e9=
-74709ccff0f
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-15 (Mon, 15 Sep 2025)
-
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  shared/hfp: Add Call Line Identification support
-
-Send AT+CLIP=3D1 at the end of the SLC creation to enable CLIP event.
-Register +CLIP handler to call the update_call_line_id callback on event.=
-
-
-During incoming call notifications, i.e. after +CIEV:<callsetup>,1
-event which creates a new call object, the reception of +CLIP event
-will update the line_id and type of the call object.
-
-
-  Commit: 430b8b1b024b4f452aa1f641137c9b132c812435
-      https://github.com/bluez/bluez/commit/430b8b1b024b4f452aa1f641137c9=
-b132c812435
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-15 (Mon, 15 Sep 2025)
-
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add Call Line Identification test for HF
-
-This add the following test:
-- HFP/HF/CLI/BV-01-C
-  Verify that the HF receives the caller ID.
-
-
-  Commit: c6dcf6b714501768ab7ea293e75d945be0eec188
-      https://github.com/bluez/bluez/commit/c6dcf6b714501768ab7ea293e75d9=
-45be0eec188
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-09-17 (Wed, 17 Sep 2025)
-
-  Changed paths:
-    M configure.ac
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Fix build with VCP support disabled
-
-$ $ ./bootstrap-configure --enable-a2dp --enable-avrcp --enable-experimen=
-tal --enable-asha --disable-vcp && make
-[...]
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transpor=
-t_bap_set_volume':
-profiles/audio/transport.c:2275:(.text.transport_bap_set_volume+0x11): un=
-defined reference to `bt_audio_vcp_set_volume'
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transpor=
-t_bap_get_volume':
-profiles/audio/transport.c:2266:(.text.transport_bap_get_volume+0x9): und=
-efined reference to `bt_audio_vcp_get_volume'
-
-Reported-by: Arun Raghavan <arun@accosted.net>
-Fixes: af8266af13c8 ("audio: connect VCP profile client to MediaTransport=
-")
-
-
-Compare: https://github.com/bluez/bluez/compare/4d7d25b70245...c6dcf6b714=
-50
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
