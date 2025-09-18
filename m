@@ -1,126 +1,128 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60EBA2D29D7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Sep 2025 18:48:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE8621B9E7;
+	Thu, 18 Sep 2025 19:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758221291; cv=none; b=KW2Op4YuVQ/KKPiKZ2Nu9X0J8ui+T3TfmqknXF3rhvoC5CVdciahXdeLW+cW/8LZvovMBuI4ZxEj5tGWVZ+49hQgqCIFL5hBCl73MpYbnDsyg+ZixJvQj1xz6sdHG/yCLYAjeKE7/Syoa5fMfaYNuFG+3r/lAxyi93hkeQWlnZg=
+	t=1758223993; cv=none; b=qOD9q2ldcS0dBKvCKfAbGyrgHq9BMJQ9+SjwM05+f8DhrQCXEmCbNjIYaJP0xtUjwaD7fiSPnfYdUVZBpvrDh+UGTh4Qkc3PxBg97D7rNzcGJekrLf9a16bq4H2ix47vlhk/dvcSWhWwCCYPENCGXSJwZ7jjYwtN7XvLtZm5wWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758221291; c=relaxed/simple;
-	bh=Vygkoc5zMv6UuxyVN2IvGIhDWtrCMV2qlUnMbMh3wnw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=V506ltpMx8+7WqZPBSm3ti9CFIe9XMLNUQtp2N9/ONU9XK8nVhcK4reEeyvlBzLtqxd7RyMGiUmQn4pqQL//BvssSKCevJ3G+bStG1h8kATtlyYslYuQ8Pk9Cgdo0HySO6OYWZl+i5nJ1KnxYZNyjEuyN8DXJRXbGJCeKiG9d/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M8obkoQw; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758223993; c=relaxed/simple;
+	bh=SiTsMJ0sXAvpCnRX8FDPv8MfV2YWSlcEA47DenlZULY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fGhViwm+q2NMeUEu8m7/lJLhrFTxPZKdVYccF8r4IdjBUh+DTeKFxa3tWjq6INQZSV1rJfpZkEYVG4TzvWXZWDR15GevwTUDVspB0r5gGWlUkSQ+nHJyykfswEBmUjQQkR6dm8lNsTQhH8VIV9x4HeCuGHXuh4QDdDLDKi+FwSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YlGWVZsw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M8obkoQw"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b523fb676efso1147074a12.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Sep 2025 11:48:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758221289; x=1758826089; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ERVBlhyj7NFVn+5ykwzw/cHBolzTWHKcft1ti0Fksds=;
-        b=M8obkoQwp7MqTCvjrDqPSIRGMKmSZ27q5Z2JK199ntENRgjQPqAU0BBP24LU7vsevv
-         TKYZsK5vhCQHnkBRJ54u3glQA1PcAVevGKMuptYMzSnQFnXzVFJSBcpdXqwI1/949XRX
-         vkzVCHOhvU2n5+jbMRQd/wTT8BjhnjVVcIX6JSBNi+pm7UC+ppE8LoorJtCUEEXqncTh
-         6cCNNfpzrqR1X6hblWlSzINCovU0KGSzKxmHR6wa5tR1aj2GKti1J3assnNgLn9sDA/W
-         ozEPQHi3g5XotrPPwd0ulD7BHHDTg821EjYU074yx2wmmsuEJFlZ0rvsDjniVHbhJ9Md
-         MPNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758221289; x=1758826089;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ERVBlhyj7NFVn+5ykwzw/cHBolzTWHKcft1ti0Fksds=;
-        b=RvluHTH4aIPESTAtRDC2e0Rlck5K94gBtb8BH7kVHJCf0pJuWaRT9qB2fBY81CNfl0
-         w2XRwTQHXlo+JAXHKEsuOf2qgd96Ug+yGcIOivAqllG2o0j2XVEJD9gDlaCmLpiJtxmO
-         XOcUCclzN8Nr+qmyK62uVB8l1Dj1UD6SxWOyxmUvA6+eDIsn4+Zy5luCYVnJ0XjJmiJs
-         CrZV/VLqNk93BLE/RM7fMQEFyiT/B6YEGvzkyk/TZe2Zj/ZCPO1iT0yM4rBcfKO+mO3V
-         ALDNLnbejNiodnnO+aQ6gjcelP6Kf5UKBduA8/qS+eu1EH27QuOwSNmhwGcUGqv1W0ES
-         clSw==
-X-Gm-Message-State: AOJu0YxadqYCk8HsdrBh8AII9msgU+VKnNZpBIcdMOfk/a4JfKPJsHbw
-	f4oWhxAxPc2rwc0Q7zBsJofc4Bl6YamscOg86hrxe1YwCpu+2w+2bZgoS06E5Q==
-X-Gm-Gg: ASbGnctd3nL9eDIK7uYhkdznzDCNB4BK+Cqe1gaELVFbaZjPIHZHKFg/5QHcZEiYdH4
-	9cRFhcL7/ASEr01mO1UObgxJBgVtnLz2PAUyTDJ4/luiJvHoqW0VImev0csoROw+00Fjel/HxiU
-	jzhCfKXOmYpFIIbDufMBJ6LJdy0CTwWYKCahzx3Dexh8PdqNKZb0XZ0xrCqu/rR2ELj+iNOdAFp
-	v1EuqUN+2nKyqy0hIA0HZUmego+vxe9b/5440KHKS+7iJ2c8mMf5sdPsPIhomCSZ00Dyb2VR9gX
-	E+1CS20EOwQiClhWInrv0g1z3+149jc101NeNIwPiQzOi5SBFedtDxzqvCNDT3vGT4j97y+pNIc
-	BHkgBjmCvFb2AuwgEgUa6WBod1FMx6YJafY0z2GiNjb287yTc
-X-Google-Smtp-Source: AGHT+IGjAqEiRs3FUslcoWet+M9UTnIB6DavzdAhxZS+t9yLk9F/GnW4MJwAqRwL/WYQb5elo8QKXw==
-X-Received: by 2002:a17:902:dac2:b0:25c:e895:6a75 with SMTP id d9443c01a7336-269ba4f020amr7739985ad.28.1758221289246;
-        Thu, 18 Sep 2025 11:48:09 -0700 (PDT)
-Received: from [172.17.0.2] ([172.215.209.68])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2698033cd5csm31564675ad.136.2025.09.18.11.48.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 11:48:08 -0700 (PDT)
-Message-ID: <68cc53e8.170a0220.3c5b59.fb66@mx.google.com>
-Date: Thu, 18 Sep 2025 11:48:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8066143972004828216=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YlGWVZsw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6849EC4CEE7;
+	Thu, 18 Sep 2025 19:33:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758223993;
+	bh=SiTsMJ0sXAvpCnRX8FDPv8MfV2YWSlcEA47DenlZULY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=YlGWVZsw4RvC4JibN0EA6ibUfzsD04RlN5WeB4D1zYQJ9gFHptEmnMVPmNBfSr3bB
+	 HH0XQZaLMzje1GGD7MwYt/JCmyf05k0dQ6elVo0kMqFC6RFQERQ2PASS0IlJFTGjkC
+	 TM63BT3RirjMC9mwtoe83aVhq5IgPpoiCWPo3XrZAvth7Ae6b/S0KHw5UclcLM357T
+	 vBP+w/K7TuYScKef3bSEN7M147yQI0P5i48fs3CaLS+hEszfe9jT4ZharfxIxLD6Rf
+	 OBJrM7gKQOK0jhPAl/N8uNKTH4OqrvrxhtqD04A7yLGkDGjRLWIlXn6DNb0lwSs5lw
+	 A4+l3vl0alafw==
+From: Sven Peter <sven@kernel.org>
+To: Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+	Neal Gompa <neal@gompa.dev>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Hector Martin <marcan@marcan.st>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Mark Kettenis <kettenis@openbsd.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Sasha Finkelstein <fnkl.kernel@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	van Spriel <arend@broadcom.com>,
+	Lee Jones <lee@kernel.org>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Michael Turquette <mturquette@baylibre.com>,
+	=?UTF-8?q?Martin=20Povi=C5=A1er?= <povik+lin@cutebit.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Janne Grunau <j@jannau.net>
+Cc: Sven Peter <sven@kernel.org>,
+	asahi@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-pwm@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	linux-clk@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	linux-spi@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: (subset) [PATCH 00/37] arm64: Add initial device trees for Apple M2 Pro/Max/Ultra devices
+Date: Thu, 18 Sep 2025 21:32:52 +0200
+Message-Id: <175822390213.30186.12188566922096991002.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net>
+References: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] media: fix pac_config_cb() error code return
-In-Reply-To: <a9a2cc5fe58b706247b74adeaa5f0b774432f837.1758215957.git.pav@iki.fi>
-References: <a9a2cc5fe58b706247b74adeaa5f0b774432f837.1758215957.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============8066143972004828216==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, 28 Aug 2025 16:01:19 +0200, Janne Grunau wrote:
+> This series adds device trees for Apple's M2 Pro, Max and Ultra based
+> devices. The M2 Pro (t6020), M2 Max (t6021) and M2 Ultra (t6022) SoCs
+> follow design of the t600x family so copy the structure of SoC *.dtsi
+> files.
+> 
+> t6020 is a cut-down version of t6021, so the former just includes the
+> latter and disables the missing bits.
+> 
+> [...]
 
-This is automated email and please do not reply to this email!
+Applied to git@github.com:AsahiLinux/linux.git (apple-soc/drivers-6.18), thanks!
 
-Dear submitter,
+[03/37] pmdomain: apple: Add "apple,t8103-pmgr-pwrstate"
+        https://github.com/AsahiLinux/linux/commit/442816f97a4f
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1003939
+Best regards,
+-- 
+Sven Peter <sven@kernel.org>
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.40 seconds
-GitLint                       PENDING   0.40 seconds
-BuildEll                      PASS      20.67 seconds
-BluezMake                     PASS      2785.04 seconds
-MakeCheck                     PASS      19.86 seconds
-MakeDistcheck                 PASS      189.94 seconds
-CheckValgrind                 PASS      244.07 seconds
-CheckSmatch                   PASS      312.08 seconds
-bluezmakeextell               PASS      130.50 seconds
-IncrementalBuild              PENDING   0.46 seconds
-ScanBuild                     PASS      933.84 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8066143972004828216==--
