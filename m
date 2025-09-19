@@ -1,154 +1,55 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34632FF67D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 08:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701382BE63D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 08:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758271003; cv=none; b=BAVherRs5zKIhFdU5N9gM51tc+QCSrWydxmbPzr8AsZOLLJD+RUIbg1FWuGQYkZ6FjufiSrWHq1qldahy2RcI7TpIUJ/YdK19JX9w9MhrTY9yth/89opwC2LxH59VxI79k9eGQ59GMrod/BXoJgwjZ5dvkFKIj0OTXZruy3yPW4=
+	t=1758271423; cv=none; b=WFCeeq7Sb0AdslbK8e27dIP+rd6d0E6UwWv7glLOR67pqIpAXjhyfwnIP/YZbJdfNe9vbvHoBfQGK7qXEXfG1DCePCsiCLvmWErS39DbWs5TdzEpearn5dTbnJQbACaSSiwwUX9DZvEOn/dcgcFnwXtLSni9aLTIQgBeZSrO58g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758271003; c=relaxed/simple;
-	bh=7lWA6IJlDFqXHpymBtCjDW7YI3uPcTh5qY/ryeQPJRE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OLnXwU9wQ6eZgchJp7dVq8ZZYnhROdf/GqdhKkLN4fWtry5ps3hvaGoUd8sqPOuEjunSi9qKT4KEW5n6xEyAN+A0Wjn3m8YcL6yEKYUX1J+FkX3ECo6sMoUzxbmJ8HxHbKmoyCBuL0oefSILd0zT/Qf9fcqIlQrcrjD/JRvMddo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Fx6vw00V; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Fx6vw00V"
-Received: from github.com (hubbernetes-node-ec1602c.ac4-iad.github.net [10.52.180.34])
-	by smtp.github.com (Postfix) with ESMTPA id 108DB7005EC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 01:36:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1758271001;
-	bh=ocyeG6irew5ysRAIYmwz/UwlntODw8kSfdbTtaMGNwE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Fx6vw00Vcj5BrXR092bMlUfskHPwJ4qAJvaXVBPyhEJ4MxkVQhp7guXmvtZfB/iTb
-	 AYxVj6eR6pE6RVy2S96LqUtYKTirNXd0NFjhIpAXc1HYE6R4kxXTiNhfvomNRdsBW6
-	 2lOdYOGNa7a+v4n39cJq5bcTsUEI+NBp+cGFfXsE=
-Date: Fri, 19 Sep 2025 01:36:41 -0700
-From: fdanis-oss <noreply@github.com>
+	s=arc-20240116; t=1758271423; c=relaxed/simple;
+	bh=6cPDwmbXb+blwSJD2ID6J03/nEuAFQ1G4glGjfXZVss=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=jKZWMtxx5hoVy4cP4BsLOMAdjIZ6CH2ut8W/6VaPSenc22UE/jLwglzZwEtUgicsq2nWl+idiw4uSqlDGxahtytw93G4jKy8AQpUzpCQL8kyY2sq4wJPbahfEdiYZMRZBVl5wgT+i1kJ86hRA120RxW8/XuGnrDqboAE7+2dl9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 11B4C1FDA2
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 08:43:32 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1004133/000000-33e7ae@github.com>
-Subject: [bluez/bluez] 4d9636: shared/hfp: Add Call answer support
+Subject: [PATCH BlueZ] doc: Fix typo in PreferredBearer property
+Date: Fri, 19 Sep 2025 10:43:21 +0200
+Message-ID: <20250919084324.2799981-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegkeejiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepffelueffjedvueefffdvjeejvdehkefgledtjefhiedtteetgfejvdeuvdfhjeeunecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: hadess@hadess.net
 
-  Branch: refs/heads/1004133
-  Home:   https://github.com/bluez/bluez
-  Commit: 4d96363ea28d66becdddcacc023b54854ce46d4a
-      https://github.com/bluez/bluez/commit/4d96363ea28d66becdddcacc023b5=
-4854ce46d4a
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-19 (Fri, 19 Sep 2025)
+---
+ doc/org.bluez.Device.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
+diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
+index 61c394dd2d0b..593ff06643f3 100644
+--- a/doc/org.bluez.Device.rst
++++ b/doc/org.bluez.Device.rst
+@@ -418,7 +418,7 @@ Indicate the preferred bearer when initiating a connection, only available for
+ dual-mode devices.
+ 
+ When changing from "bredr" to "le" the device will be removed from the
+-'auto-connect' list so it won't automatically be connected when adverting.
++'auto-connect' list so it won't automatically be connected when advertising.
+ 
+ Note: Changes only take effect when the device is disconnected.
+ 
+-- 
+2.51.0
 
-  Log Message:
-  -----------
-  shared/hfp: Add Call answer support
-
-This also manage the +CIEV:<call>,=E2=80=A6 event to create, remove or up=
-date
-calls.
-
-
-  Commit: b4089c456cb595fb5fdeac76aa7ddde79811a7b8
-      https://github.com/bluez/bluez/commit/b4089c456cb595fb5fdeac76aa7dd=
-de79811a7b8
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-19 (Fri, 19 Sep 2025)
-
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add Answer Incoming Call tests for HF
-
-This add the following tests:
-- HFP/HF/ICA/BV-04-C
-  Verify the incoming call is answered from HF, no in-band ring.
-- HFP/HF/ICA/BV-06-C
-  Verify the incoming call is answered from AG, no in-band ring.
-
-
-  Commit: 5f5d1bafcc1891208b72bf7957368cee3dd907ed
-      https://github.com/bluez/bluez/commit/5f5d1bafcc1891208b72bf7957368=
-cee3dd907ed
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-19 (Fri, 19 Sep 2025)
-
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
-
-  Log Message:
-  -----------
-  shared/hfp: Add Call hangup support
-
-
-  Commit: 57d12dc73e8f9e62b406173ff2ff8ee0f119851b
-      https://github.com/bluez/bluez/commit/57d12dc73e8f9e62b406173ff2ff8=
-ee0f119851b
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-19 (Fri, 19 Sep 2025)
-
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add Reject Incoming Call tests for HF
-
-This add the following tests:
-- /HFP/HF/ICR/BV-01-C
-  Verify that the HF can reject an incoming call after being alerted.
-- /HFP/HF/ICR/BV-02-C
-  Verify that the AG, upon the corresponding action, rejects an incoming
-  call and properly indicates this event to the HF.
-
-
-  Commit: 33e7ae8f480f7f42f16dcbcb7a60dff060c26fdf
-      https://github.com/bluez/bluez/commit/33e7ae8f480f7f42f16dcbcb7a60d=
-ff060c26fdf
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-09-19 (Fri, 19 Sep 2025)
-
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add Terminate Call tests for HF
-
-This add the following tests:
-- /HFP/HF/TCA/BV-01-C
-  Verify that the HF can terminate an ongoing call in the AG.
-- /HFP/HF/TCA/BV-02-C
-  Verify that the AG, upon the corresponding action, terminates an
-  ongoing call. The AG then indicates this event to the HF.
-- /HFP/HF/TCA/BV-04-C
-  Verify that the HF can release a call after dialing and prior to
-  call completion.
-
-/HFP/HF/TCA/BV-03-C (Verify that after a call is terminated from the
-remote party, the HF receives the proper indication from the AG) is
-similar to /HFP/HF/TCA/BV-02-C for the HF side.
-
-
-Compare: https://github.com/bluez/bluez/compare/4d96363ea28d%5E...33e7ae8=
-f480f
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
