@@ -1,65 +1,66 @@
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83F7256C70
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 19:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056FF5C96
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 19:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758309748; cv=none; b=s5CT48sG3UMdUFDtma0VsGnpSCmerhRSDSmQgJ+KeA5jTMVMYelWJ+kcPdFEjztve1rDEDYDmUEuOgCh7qghc6vIf+DoUMp6JrujGeKk5E3K4hzD1J1x24VeQKdUQt8rjGj/LMlK+j6TlbE3NRNgN4NApPRRUFFhXiIuPSRqJaI=
+	t=1758311210; cv=none; b=BnotW4NIh1TVjs2i3kmDmd6omi2q+kmpU62G7OSevoQumiztM0Yvz4owd0ehLEWEGQDgFTtgWBJpzF6k+g/OIddrpcBm2yh7P5cfXGZpimqsNZR7D83aT74GYo0usVerEtwCwjGc9ZSe/2H5r+bMtn8SIuMypSBPrWC7o5hWf9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758309748; c=relaxed/simple;
-	bh=ea3ivsncHmFrHJRfs/pN/L3lYIBA+nVAtNBD8y7he3Y=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Un0RiOxv3Ytao5sYDAnVYxuq1+C2rN/a1KGOZoRQMhAVrpXdtnVSdGi4EykXgzoI7v0hbwC5tFtW5jiKgqRKnXjZzost5ApgtDD9ZZ5Hv9rgEJPBsCfUknXKDkLehTKtlvEk5dXLgMbCOYLJ6dTslhyA7/1kDVN7f+9c5wBtrhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OB7nLHPh; arc=none smtp.client-ip=209.85.217.41
+	s=arc-20240116; t=1758311210; c=relaxed/simple;
+	bh=SgM87T3uhbC6p4DSdFsOh7SbFFc+iLeuUHCprKpOrIY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DGEzqsH1dwI6Bm0CcWMdi9FIM2IS9LqUd3/7LcrKZ8CS1jfVdn1xQuhB9ngtPqnelKZwGqKcAHNNyyhAaZetWAZ0rMcvoebkQ0sNYgeLRgmhzF9jNe6ze5qEjnPEUOgysL/uL91fGRc7xobm1cHWxqmgI8jg790LZArzF8C5dvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cI9FkkHc; arc=none smtp.client-ip=209.85.221.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OB7nLHPh"
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-50f8bf5c518so1851115137.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 12:22:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cI9FkkHc"
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-544ad727e87so1888178e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 12:46:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758309745; x=1758914545; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758311207; x=1758916007; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=e1P0RtEa6t27SoGABOnQMD5mcT/MYHJwExqh2nCz0Os=;
-        b=OB7nLHPh2eZab0KX2ZZLp/1J3HrwL0vebK59zVKdmLtDO3y46cLGPI1dOBz41vnAJf
-         Vs+zTbQqY7L/22N7MU7J0+vVJJbFL+A9QADVLa+QtYk8WvswHD8j2/ezztp4tm65gl8n
-         iSxcDLC0LjdazjWmxZ86n94zXrJeCDhn8aXJNLHdCiomv9kG5RvJJPqsiYoNmtkb9cCm
-         oQIk2UG9drN1oBO6y571XKDZWv0qBZHyoyenpixczt7prWyAeriwGtk9D5OOUwGd08wS
-         xRv0dyUTcvOK1RcLVRtd3KZmXCLKXSYN8RMP1YOqbYumXSbzdIoqRVCM2TRSiXF6+7KZ
-         gpWQ==
+        bh=CRUiHDx7N2hxU1hPc7AkoVh0mqY7+3R0O0ZkjY5doCA=;
+        b=cI9FkkHcQzLpuOdXHI7Ol+agCKxdoIFmz3gHYz3/BCJlsXcrEoa26kIxnws+cWHl08
+         yg6RCX56u45NB5CCUAgFtoFpTbRWnRqSEnOlVulAzuuTYaU87Io4rvv71jnhGh5jQxqz
+         +lfq1a+l5DwDA0z/3Z66Epxclk2fgwveCsWZa7izJlI77QPxRdLsp79v9pYmugN7jszH
+         0uweBZv5kY8zzIGqYloHo8IMnkVlhZsOighEubJ20RJqNvlfmagdUYlWgFcOe9kOY+wI
+         Lsot+usBtOk8h/SymesLIb/Jz3WcrqqnYees6b8Ta0er+4KOxyzc+Rn7FbE7XEHizBa/
+         pGQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758309745; x=1758914545;
+        d=1e100.net; s=20230601; t=1758311207; x=1758916007;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e1P0RtEa6t27SoGABOnQMD5mcT/MYHJwExqh2nCz0Os=;
-        b=mPwoJoqeA7WtWz+AlBzSbvp0AT063nP8gwxW8ZPDRxsCAp4yiAqOkLN8o0B7Rz5U+i
-         V5lx2t1I9PAbMEjbzomVFvVlzQZKtL/zLM1PNCU0gZWGTKwoWluJ/pr03AFNWgPw9cp1
-         fQAXBxydv31qsdOS2K+43md0j74rMBzrSSgMhYyGN41MN8fPFRJvfv2ZZNHi6fTDbX82
-         qlG9eaowcRyExvo84yqLtuMLMQW8Eq+Xog234EAB71g+Y8jS4YSU/f3Kx08RtYBN10Jy
-         Ad0fDmNL0Sjp6vw17E102/rZqqZ/INHmSvRWivwR6UGh+AH/ZMlAv+yBZ8yrlGRJGcM3
-         e/Gw==
-X-Gm-Message-State: AOJu0Ywjs+pIHCaBbPXvwpJQyhYR0GGJRAzHyEDORgaDyk9K2aAkv/qM
-	xByTA9FDMQ6ghp62MPX68AYjOLrFaxmnl/ypcbYQGSrrGt3icCHM9pIU1hF3wVZE
-X-Gm-Gg: ASbGnctI2xnEvSWJcN+MYnJIo7Fl6bFvHGfmuO9vmquEep3cwRS7kyFVQH/gf2oUaAL
-	Kye26mnTKy+hsaioHJAWEOyaSlPeX+FpamY7KLoCS4D8L7kv4WnvuQkrwGsdJ+PHmKeGDKNd9Q5
-	6vGbRJRNf6FmTgklgFOcMSAR6CxFmhL2Lb7z7CshK810ECQEagzfzDp/SIykKjiEkNRvSD/NaeY
-	utYggGfHB0l/jEey5WNGTmYIC+BIYlVXHWclIZPYfJqBHDf0eW9i8Nxk8eq8GVSQ4pEz4PfiyKa
-	PAnnLesH6eDbyV9arFypmArOXCXFOPsGX6x2lbHgGf2ofAeCLMAQedmyhvA8tqe9maAY+TJTDab
-	NFP3gihY5O4PCK89vi6dHRAELv3638zmPWCRtGwgftejoBMusqsb+DUkMB8dDEKdyLw==
-X-Google-Smtp-Source: AGHT+IF+NctWTN94P3HF+fudV+ffOtIo8R0qfV6HibFkBT2zAg3THGJQOaCM1nspZUR1ogDtyR8T5w==
-X-Received: by 2002:a05:6102:3ec4:b0:52f:12b3:4505 with SMTP id ada2fe7eead31-588f0af3c22mr1539257137.23.1758309744879;
-        Fri, 19 Sep 2025 12:22:24 -0700 (PDT)
+        bh=CRUiHDx7N2hxU1hPc7AkoVh0mqY7+3R0O0ZkjY5doCA=;
+        b=tjD0VeBizmHdmsi8mCn0Gv5oin/G6kWA6avm3AivO/vKGW+K1ZF2MEFfVSsiskOoNc
+         JLu661c+T+92KzdNiGFiMo8TX5F4te+RQANioh8EhALORYTq7x5rv32T9W8c89k42+HW
+         Z9m4cPwGgYOWf1h4Yq/krh4BqL3rqeHgbhJSHKZbfXkTsqKAuul9/cJEWn8Jdc1TCtKd
+         xzMav4HJCPNgAAhAKXLuk91iJTivttg0eb4idzoVwn4FAQQ856cFy8oLZWpFh0l1XPxa
+         sBWxb2rNECDikgjdivUR3Q3RdEuqH/tbLNq+MOnJZLcP5AdfFDmzNSUNyBRBnBSxQByQ
+         p7Fg==
+X-Gm-Message-State: AOJu0YzLTuqAotJ9+BdKclbdhGFqQyd5UPOdkuLFwZ8setb6VmrasZac
+	iI1HHzd2/CzhB/zIWql1pyivBRNASisnFeAJvmzzCsj25KQjJaOPcGX80liBsQ==
+X-Gm-Gg: ASbGnctgEGSpJAZGp2QgQDX9rTsd+6x3fNMJw+NFjsDF1DNIW7WSYIs3QyHb6TdOVKP
+	p04a5Y/L8kV9cGNtgSi5ol3cOPQElZneX8mV5qN5ifxxGg7kJyhyAlBwGu4/6xFT3ZC2jkGaB9Q
+	zHpPopetyNhMEri+v8C+A4Ct/hDctqEwa8/oPXaujuA+QBtvFyFmBuMUfsoXq+yatKN9H5EhYdd
+	xoc7DaNpDzltmSAaiItMarfpsegcnvrSfQ013iX6DiHYExdhUNndorhw/U7/oRmiFY3doQxnu0T
+	KZVYVRKU+06UiLf+W/zN/Bov5Fa36iKRoGUCdvULh9JJEDpeIlL/qqi9BQJL0Mekjp04ueyRY57
+	EdbZwk9EYU23citL/MDkd90baqCl2a+2t6iVau5m7mrsl1v+6lePgBTQrJMF6MHS3bm0bFN28o/
+	HD
+X-Google-Smtp-Source: AGHT+IELTFjUj4NfX12dO9ikyJTR172/SXQk/kH2DnKvOg+XzX9Pqy7SMK+85EGGNOE6bUw7kvvMQw==
+X-Received: by 2002:a05:6122:e46:b0:54a:93be:46fc with SMTP id 71dfb90a1353d-54a93be4a66mr108430e0c.0.1758311207163;
+        Fri, 19 Sep 2025 12:46:47 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-57a05ef52b3sm1559865137.13.2025.09.19.12.22.22
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-54a729b9222sm1321135e0c.22.2025.09.19.12.46.45
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Sep 2025 12:22:24 -0700 (PDT)
+        Fri, 19 Sep 2025 12:46:46 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH v1] fixup! Bluetooth: MGMT: Fix possible UAFs
-Date: Fri, 19 Sep 2025 15:22:13 -0400
-Message-ID: <20250919192213.2371373-1-luiz.dentz@gmail.com>
+Date: Fri, 19 Sep 2025 15:46:37 -0400
+Message-ID: <20250919194637.2389984-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -73,37 +74,39 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/mgmt.c      | 29 ++++++++++++++++++++++++++++-
- net/bluetooth/mgmt_util.c |  7 ++++---
+ net/bluetooth/mgmt.c      | 81 ++++++++++++++++++++++++++-------------
+ net/bluetooth/mgmt_util.c |  7 ++--
  net/bluetooth/mgmt_util.h |  2 +-
- 3 files changed, 33 insertions(+), 5 deletions(-)
+ 3 files changed, 59 insertions(+), 31 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b9c53810bf06..91920584a551 100644
+index b9c53810bf06..ee7068fb9fb5 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1357,6 +1357,7 @@ static int set_powered_sync(struct hci_dev *hdev, void *data)
+@@ -1356,17 +1356,19 @@ static void mgmt_set_powered_complete(struct hci_dev *hdev, void *data, int err)
+ static int set_powered_sync(struct hci_dev *hdev, void *data)
  {
  	struct mgmt_pending_cmd *cmd = data;
- 	struct mgmt_mode *cp;
-+	int err;
+-	struct mgmt_mode *cp;
++	struct mgmt_mode cp;
  
  	/* Make sure cmd still outstanding. */
  	if (!mgmt_pending_valid(hdev, cmd, false))
-@@ -1366,7 +1367,11 @@ static int set_powered_sync(struct hci_dev *hdev, void *data)
+ 		return -ECANCELED;
+ 
+-	cp = cmd->param;
++	memcpy(&cp, cmd->param, sizeof(cp));
++
++	mutex_unlock(&hdev->mgmt_pending_lock);
  
  	BT_DBG("%s", hdev->name);
  
 -	return hci_set_powered_sync(hdev, cp->val);
-+	err = hci_set_powered_sync(hdev, cp->val);
-+
-+	mutex_unlock(&hdev->mgmt_pending_lock);
-+
-+	return err;
++	return hci_set_powered_sync(hdev, cp.val);
  }
  
  static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
-@@ -1546,6 +1551,8 @@ static int set_discoverable_sync(struct hci_dev *hdev, void *data)
+@@ -1546,6 +1548,8 @@ static int set_discoverable_sync(struct hci_dev *hdev, void *data)
  	if (!mgmt_pending_valid(hdev, data, false))
  		return -ECANCELED;
  
@@ -112,7 +115,7 @@ index b9c53810bf06..91920584a551 100644
  	BT_DBG("%s", hdev->name);
  
  	return hci_update_discoverable_sync(hdev);
-@@ -1746,6 +1753,8 @@ static int set_connectable_sync(struct hci_dev *hdev, void *data)
+@@ -1746,6 +1750,8 @@ static int set_connectable_sync(struct hci_dev *hdev, void *data)
  	if (!mgmt_pending_valid(hdev, data, false))
  		return -ECANCELED;
  
@@ -121,52 +124,138 @@ index b9c53810bf06..91920584a551 100644
  	BT_DBG("%s", hdev->name);
  
  	return hci_update_connectable_sync(hdev);
-@@ -1979,6 +1988,8 @@ static int set_ssp_sync(struct hci_dev *hdev, void *data)
+@@ -1965,19 +1971,21 @@ static void set_ssp_complete(struct hci_dev *hdev, void *data, int err)
+ static int set_ssp_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_mode *cp;
++	struct mgmt_mode cp;
+ 	bool changed = false;
+ 	int err;
  
- 	err = hci_write_ssp_mode_sync(hdev, cp->val);
+ 	if (!mgmt_pending_valid(hdev, cmd, false))
+ 		return -ECANCELED;
  
+-	cp = cmd->param;
++	memcpy(&cp, cmd->param, sizeof(cp));
+ 
+-	if (cp->val)
 +	mutex_unlock(&hdev->mgmt_pending_lock);
 +
++	if (cp.val)
+ 		changed = !hci_dev_test_and_set_flag(hdev, HCI_SSP_ENABLED);
+ 
+-	err = hci_write_ssp_mode_sync(hdev, cp->val);
++	err = hci_write_ssp_mode_sync(hdev, cp.val);
+ 
  	if (!err && changed)
  		hci_dev_clear_flag(hdev, HCI_SSP_ENABLED);
+@@ -2098,15 +2106,17 @@ static void set_le_complete(struct hci_dev *hdev, void *data, int err)
+ static int set_le_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_mode *cp;
++	struct mgmt_mode cp;
+ 	u8 val;
+ 	int err;
  
-@@ -2108,6 +2119,8 @@ static int set_le_sync(struct hci_dev *hdev, void *data)
- 	cp = cmd->param;
- 	val = !!cp->val;
+ 	if (!mgmt_pending_valid(hdev, cmd, false))
+ 		return -ECANCELED;
  
-+	mutex_unlock(&hdev->mgmt_pending_lock);
+-	cp = cmd->param;
+-	val = !!cp->val;
++	memcpy(&cp, cmd->param, sizeof(cp));
++	val = !!cp.val;
 +
++	mutex_unlock(&hdev->mgmt_pending_lock);
+ 
  	if (!val) {
  		hci_clear_adv_instance_sync(hdev, NULL, 0x00, true);
+@@ -2169,30 +2179,33 @@ static void set_mesh_complete(struct hci_dev *hdev, void *data, int err)
+ static int set_mesh_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_cp_set_mesh *cp;
++	struct mgmt_cp_set_mesh cp;
+ 	size_t len;
  
-@@ -2190,6 +2203,8 @@ static int set_mesh_sync(struct hci_dev *hdev, void *data)
+ 	if (!mgmt_pending_valid(hdev, cmd, false))
+ 		return -ECANCELED;
  
- 	len -= sizeof(*cp);
- 
+-	cp = cmd->param;
++	memcpy(&cp, cmd->param, sizeof(cp));
++
 +	mutex_unlock(&hdev->mgmt_pending_lock);
 +
+ 	len = cmd->param_len;
+ 
+ 	memset(hdev->mesh_ad_types, 0, sizeof(hdev->mesh_ad_types));
+ 
+-	if (cp->enable)
++	if (cp.enable)
+ 		hci_dev_set_flag(hdev, HCI_MESH);
+ 	else
+ 		hci_dev_clear_flag(hdev, HCI_MESH);
+ 
+-	hdev->le_scan_interval = __le16_to_cpu(cp->period);
+-	hdev->le_scan_window = __le16_to_cpu(cp->window);
++	hdev->le_scan_interval = __le16_to_cpu(cp.period);
++	hdev->le_scan_window = __le16_to_cpu(cp.window);
+ 
+-	len -= sizeof(*cp);
++	len -= sizeof(cp);
+ 
  	/* If filters don't fit, forward all adv pkts */
  	if (len <= sizeof(hdev->mesh_ad_types))
- 		memcpy(hdev->mesh_ad_types, cp->ad_types, len);
-@@ -3939,6 +3954,8 @@ static int set_name_sync(struct hci_dev *hdev, void *data)
+-		memcpy(hdev->mesh_ad_types, cp->ad_types, len);
++		memcpy(hdev->mesh_ad_types, cp.ad_types, len);
+ 
+ 	hci_update_passive_scan_sync(hdev);
+ 	return 0;
+@@ -3927,15 +3940,17 @@ static void set_name_complete(struct hci_dev *hdev, void *data, int err)
+ static int set_name_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_cp_set_local_name *cp;
++	struct mgmt_cp_set_local_name cp;
+ 
+ 	if (!mgmt_pending_valid(hdev, cmd, false))
+ 		return -ECANCELED;
+ 
+-	cp = cmd->param;
++	memcpy(&cp, cmd->param, sizeof(cp));
++
++	mutex_unlock(&hdev->mgmt_pending_lock);
+ 
+ 	if (lmp_bredr_capable(hdev)) {
+-		hci_update_name_sync(hdev, cp->name);
++		hci_update_name_sync(hdev, cp.name);
  		hci_update_eir_sync(hdev);
  	}
  
+@@ -4126,15 +4141,18 @@ static void set_default_phy_complete(struct hci_dev *hdev, void *data, int err)
+ static int set_default_phy_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_cp_set_phy_configuration *cp;
++	struct mgmt_cp_set_phy_configuration cp;
+ 	struct hci_cp_le_set_default_phy cp_phy;
+ 	u32 selected_phys;
+ 
+ 	if (!mgmt_pending_valid(hdev, cmd, false))
+ 		return -ECANCELED;
+ 
+-	cp = cmd->param;
+-	selected_phys = __le32_to_cpu(cp->selected_phys);
++	memcpy(&cp, cmd->param, sizeof(cp));
++
 +	mutex_unlock(&hdev->mgmt_pending_lock);
 +
- 	/* The name is stored in the scan response data and so
- 	 * no need to update the advertising data here.
- 	 */
-@@ -4162,6 +4179,8 @@ static int set_default_phy_sync(struct hci_dev *hdev, void *data)
- 	if (selected_phys & MGMT_PHY_LE_CODED_RX)
- 		cp_phy.rx_phys |= HCI_LE_SET_PHY_CODED;
++	selected_phys = __le32_to_cpu(cp.selected_phys);
  
-+	mutex_unlock(&hdev->mgmt_pending_lock);
-+
- 	cmd->skb =  __hci_cmd_sync(hdev, HCI_OP_LE_SET_DEFAULT_PHY,
- 				   sizeof(cp_phy), &cp_phy, HCI_CMD_TIMEOUT);
+ 	memset(&cp_phy, 0, sizeof(cp_phy));
  
-@@ -5273,6 +5292,8 @@ static int mgmt_add_adv_patterns_monitor_sync(struct hci_dev *hdev, void *data)
+@@ -5273,6 +5291,8 @@ static int mgmt_add_adv_patterns_monitor_sync(struct hci_dev *hdev, void *data)
  	if (!mgmt_pending_valid(hdev, cmd, false))
  		return -ECANCELED;
  
@@ -175,7 +264,7 @@ index b9c53810bf06..91920584a551 100644
  	return hci_add_adv_monitor(hdev, cmd->user_data);
  }
  
-@@ -5860,6 +5881,8 @@ static int start_discovery_sync(struct hci_dev *hdev, void *data)
+@@ -5860,6 +5880,8 @@ static int start_discovery_sync(struct hci_dev *hdev, void *data)
  	if (!mgmt_pending_valid(hdev, data, false))
  		return -ECANCELED;
  
@@ -184,7 +273,7 @@ index b9c53810bf06..91920584a551 100644
  	return hci_start_discovery_sync(hdev);
  }
  
-@@ -6083,6 +6106,8 @@ static int stop_discovery_sync(struct hci_dev *hdev, void *data)
+@@ -6083,6 +6105,8 @@ static int stop_discovery_sync(struct hci_dev *hdev, void *data)
  	if (!mgmt_pending_valid(hdev, data, false))
  		return -ECANCELED;
  
@@ -193,15 +282,30 @@ index b9c53810bf06..91920584a551 100644
  	return hci_stop_discovery_sync(hdev);
  }
  
-@@ -6358,6 +6383,8 @@ static int set_adv_sync(struct hci_dev *hdev, void *data)
- 	else
- 		hci_dev_clear_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
+@@ -6344,16 +6368,19 @@ static void set_advertising_complete(struct hci_dev *hdev, void *data, int err)
+ static int set_adv_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_mode *cp;
++	struct mgmt_mode cp;
+ 	u8 val;
  
+ 	if (!mgmt_pending_valid(hdev, cmd, false))
+ 		return -ECANCELED;
+ 
+-	cp = cmd->param;
+-	val = !!cp->val;
++	memcpy(&cp, cmd->param, sizeof(cp));
+ 
+-	if (cp->val == 0x02)
 +	mutex_unlock(&hdev->mgmt_pending_lock);
 +
- 	cancel_adv_timeout(hdev);
- 
- 	if (val) {
++	val = !!cp.val;
++
++	if (cp.val == 0x02)
+ 		hci_dev_set_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
+ 	else
+ 		hci_dev_clear_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
 diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
 index be6d9b8db51b..258c22d38809 100644
 --- a/net/bluetooth/mgmt_util.c
