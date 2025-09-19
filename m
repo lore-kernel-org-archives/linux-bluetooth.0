@@ -1,128 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE8621B9E7;
-	Thu, 18 Sep 2025 19:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837FF2EC574
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 08:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758223993; cv=none; b=qOD9q2ldcS0dBKvCKfAbGyrgHq9BMJQ9+SjwM05+f8DhrQCXEmCbNjIYaJP0xtUjwaD7fiSPnfYdUVZBpvrDh+UGTh4Qkc3PxBg97D7rNzcGJekrLf9a16bq4H2ix47vlhk/dvcSWhWwCCYPENCGXSJwZ7jjYwtN7XvLtZm5wWk=
+	t=1758270252; cv=none; b=HTawGaMj3/eIadi/phcOP7nkn/+IWujaEOvUV0R6JLh9LgZ7gHDSUZoTHKSm3envIGx98ERba75ntjFpv4DfISfyU+0Mji+PUhXey9GZ2RrQ42PPzVv9Hatr0ua5Vx07bTJbWnvvS1Uy9XkBA8JnUJt+0AboGbDxljml8dpJjEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758223993; c=relaxed/simple;
-	bh=SiTsMJ0sXAvpCnRX8FDPv8MfV2YWSlcEA47DenlZULY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fGhViwm+q2NMeUEu8m7/lJLhrFTxPZKdVYccF8r4IdjBUh+DTeKFxa3tWjq6INQZSV1rJfpZkEYVG4TzvWXZWDR15GevwTUDVspB0r5gGWlUkSQ+nHJyykfswEBmUjQQkR6dm8lNsTQhH8VIV9x4HeCuGHXuh4QDdDLDKi+FwSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YlGWVZsw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758270252; c=relaxed/simple;
+	bh=ILiTp9MT40P/I7SY6LoUgwpbksRtRkHuaa+LsxPLf90=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Type; b=iu8ZJlOtZ2KpY0YKG+4EEfp08CcFDLUqrvqIO+bHwNATugZBZN13A6ldCpNzcR3uquiwTqIzbV48Mt4p8Ck0Ts589ZqImGp99L1G/Y31NLQAwMDMh5uNGSjOeEm4ZLPr7b9nvpKWEC+r+oScRTQE+OYyjJ3fPdFfYdxBvSGM3ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=lZFgViZ4; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YlGWVZsw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6849EC4CEE7;
-	Thu, 18 Sep 2025 19:33:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758223993;
-	bh=SiTsMJ0sXAvpCnRX8FDPv8MfV2YWSlcEA47DenlZULY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YlGWVZsw4RvC4JibN0EA6ibUfzsD04RlN5WeB4D1zYQJ9gFHptEmnMVPmNBfSr3bB
-	 HH0XQZaLMzje1GGD7MwYt/JCmyf05k0dQ6elVo0kMqFC6RFQERQ2PASS0IlJFTGjkC
-	 TM63BT3RirjMC9mwtoe83aVhq5IgPpoiCWPo3XrZAvth7Ae6b/S0KHw5UclcLM357T
-	 vBP+w/K7TuYScKef3bSEN7M147yQI0P5i48fs3CaLS+hEszfe9jT4ZharfxIxLD6Rf
-	 OBJrM7gKQOK0jhPAl/N8uNKTH4OqrvrxhtqD04A7yLGkDGjRLWIlXn6DNb0lwSs5lw
-	 A4+l3vl0alafw==
-From: Sven Peter <sven@kernel.org>
-To: Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	Neal Gompa <neal@gompa.dev>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Hector Martin <marcan@marcan.st>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Mark Kettenis <kettenis@openbsd.org>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Jassi Brar <jassisinghbrar@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Sasha Finkelstein <fnkl.kernel@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	van Spriel <arend@broadcom.com>,
-	Lee Jones <lee@kernel.org>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Michael Turquette <mturquette@baylibre.com>,
-	=?UTF-8?q?Martin=20Povi=C5=A1er?= <povik+lin@cutebit.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Janne Grunau <j@jannau.net>
-Cc: Sven Peter <sven@kernel.org>,
-	asahi@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linux-pwm@vger.kernel.org,
-	linux-watchdog@vger.kernel.org,
-	linux-clk@vger.kernel.org,
-	dmaengine@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: (subset) [PATCH 00/37] arm64: Add initial device trees for Apple M2 Pro/Max/Ultra devices
-Date: Thu, 18 Sep 2025 21:32:52 +0200
-Message-Id: <175822390213.30186.12188566922096991002.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net>
-References: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="lZFgViZ4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1758270248;
+	bh=ILiTp9MT40P/I7SY6LoUgwpbksRtRkHuaa+LsxPLf90=;
+	h=From:To:Subject:Date:From;
+	b=lZFgViZ4LwoBpByPbkW+cYgqfZYT64Es1pnjnIkVY/8xSaO1Azt/trs+vmaWVZZVQ
+	 D1vc/ZVBVNa1ldoIfaJZw5h0+qFBkX0yOiZTtoKv7glNAT1PExNXRoehnDyjXwWZy3
+	 0JDZnMc/nvavkoQlvVFhnZllr5v39oNvPT5I1NE4I1M0BpU3/mFIzRcJ5cu+ljlOIg
+	 A3WVbkqBU0B3Uw8NK5dcXYZ6+FLDxWNfMsunYg+KmKCVhRNo5bMMTQTFLGrbIj5vBI
+	 OyI1C3cU9duOM3qeQQ4te0eQzEXM4f+HN7CymIYg8zpeiYHG0GPrzM9Vn8a6+MiWnE
+	 DWR8lyDR82iBg==
+Received: from fdanis-ThinkPad-X1.. (unknown [IPv6:2a02:8428:af44:1001:17f0:5da3:acf8:a3c1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 57F8317E0202
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 10:24:08 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/5] shared/hfp: Add Call answer support
+Date: Fri, 19 Sep 2025 10:23:30 +0200
+Message-ID: <20250919082334.1443310-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Thu, 28 Aug 2025 16:01:19 +0200, Janne Grunau wrote:
-> This series adds device trees for Apple's M2 Pro, Max and Ultra based
-> devices. The M2 Pro (t6020), M2 Max (t6021) and M2 Ultra (t6022) SoCs
-> follow design of the t600x family so copy the structure of SoC *.dtsi
-> files.
-> 
-> t6020 is a cut-down version of t6021, so the former just includes the
-> latter and disables the missing bits.
-> 
-> [...]
+This also manage the +CIEV:<call>,… event to create, remove or update
+calls.
+---
+ src/shared/hfp.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/hfp.h |  4 +++
+ 2 files changed, 83 insertions(+)
 
-Applied to git@github.com:AsahiLinux/linux.git (apple-soc/drivers-6.18), thanks!
-
-[03/37] pmdomain: apple: Add "apple,t8103-pmgr-pwrstate"
-        https://github.com/AsahiLinux/linux/commit/442816f97a4f
-
-Best regards,
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index 29b467ae3..7e35f239a 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -1651,9 +1651,36 @@ static void ciev_service_cb(uint8_t val, void *user_data)
+ 							hfp->callbacks_data);
+ }
+ 
++static bool update_call_to_active(struct hfp_hf *hfp)
++{
++	const struct queue_entry *entry;
++	struct hf_call *call;
++
++	for (entry = queue_get_entries(hfp->calls); entry;
++					entry = entry->next) {
++		call = entry->data;
++
++		if (call->status == CALL_STATUS_DIALING ||
++			call->status == CALL_STATUS_ALERTING ||
++			call->status == CALL_STATUS_INCOMING) {
++			call->status = CALL_STATUS_ACTIVE;
++			if (hfp->callbacks &&
++				hfp->callbacks->call_status_updated)
++				hfp->callbacks->call_status_updated(
++					call->id,
++					call->status,
++					hfp->callbacks_data);
++			return true;
++		}
++	}
++
++	return false;
++}
++
+ static void ciev_call_cb(uint8_t val, void *user_data)
+ {
+ 	struct hfp_hf *hfp = user_data;
++	uint id;
+ 
+ 	DBG(hfp, "%u", val);
+ 
+@@ -1662,6 +1689,32 @@ static void ciev_call_cb(uint8_t val, void *user_data)
+ 		DBG(hfp, "hf: Incorrect call state: %u", val);
+ 		return;
+ 	}
++
++	switch (val) {
++	case CIND_CALL_NONE:
++		/* Remove all calls */
++		queue_remove_all(hfp->calls, NULL, hfp, remove_call_cb);
++		break;
++	case CIND_CALL_IN_PROGRESS:
++		{
++			/* Find incoming, dialing or alerting call to change
++			 * it to active
++			 */
++			if (update_call_to_active(hfp))
++				return;
++
++			/* else create new already active call */
++			id = next_call_index(hfp);
++			if (id == 0) {
++				DBG(hfp, "hf: No new call index available");
++				return;
++			}
++			call_new(hfp, id, CALL_STATUS_ACTIVE, NULL);
++		}
++		break;
++	default:
++		DBG(hfp, "hf: Unsupported call state: %u", val);
++	}
+ }
+ 
+ static bool call_outgoing_match(const void *data, const void *match_data)
+@@ -2367,3 +2420,29 @@ const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id)
+ 
+ 	return call->line_id;
+ }
++
++bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
++				hfp_response_func_t resp_cb,
++				void *user_data)
++{
++	struct hf_call *call;
++
++	DBG(hfp, "");
++
++	if (!hfp)
++		return false;
++
++	call = queue_find(hfp->calls, call_id_match, UINT_TO_PTR(id));
++	if (!call) {
++		DBG(hfp, "hf: no call with id: %u", id);
++		return false;
++	}
++
++	if (call->status != CALL_STATUS_INCOMING) {
++		DBG(hfp, "hf: %d not in incoming call state: %u",
++							call->status);
++		return false;
++	}
++
++	return hfp_hf_send_command(hfp, resp_cb, user_data, "ATA");
++}
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index fec63c150..c623e48e6 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -236,3 +236,7 @@ bool hfp_hf_session_register(struct hfp_hf *hfp,
+ bool hfp_hf_session(struct hfp_hf *hfp);
+ 
+ const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id);
++
++bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
++				hfp_response_func_t resp_cb,
++				void *user_data);
 -- 
-Sven Peter <sven@kernel.org>
+2.43.0
 
