@@ -1,72 +1,63 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA59F265CA8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 19:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBD3286894
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 19:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758309007; cv=none; b=RFsgawFDaAMJsnCJILEVRKZZGEOQekf8E3R8vC6m+/NEDLe/7KqevLy9ACueYQwP0aTSyZ5Fr4KK7eC2OOjTufl6KnAFoGwYyUgSb+3JaiAv0hZdffdp+rd4OUGTtsrgagxCgtkSlAwM9datR1F7X+hItRspLNfzSQ5ZvNfF/E4=
+	t=1758309541; cv=none; b=aDP7qMO8THYNyYL1q790Mp6DHS7Q9lYqSnQ7cAJF/6cYtBwUm1ncugTrjXn22zjeLEEoh0MXukzlDuNPsf6BhpGawLyR+fTeTLmIJqs2MstVOvbMoMm8M0xzQi3F+oXUvCUTEbHDvxEM1fCPKByJWfgo5XBIq+3+gPmcekKh/vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758309007; c=relaxed/simple;
-	bh=FJoaR6ZTublyn5JvFogUc214q86p13oDjHbROtHw1Ww=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gNbZaop9IaUxIx9GemOO6ZBWx/Sc47qc8xfEDq2EFPviddniFZpPzaKBgkZa3OUpUePHXl7+8CPwg9mFExVC1ZhtDGZ56KfVC7TkE+5JAqnqET28lnALrC5n3K1olHMCQhdWBzTH7R6Ll2IUwiu5gHFefS29iQlO0jO69UaTRxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HgIKxzgN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758309541; c=relaxed/simple;
+	bh=0fDrWSbduihdvJ4p4Jcg5Dh+5wdUxk3zMzFWbOsxUc0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=MD7+aaCo6aD+Ulo56RsHmhEGkplWZXS8XPtBljQX45ZFj+muWwmn6bqDpY4m7clj9b4vTa6JSoglGd+ulO1UsRHzwxEV9/u4PIokLmTuQPoiFGRdPFaHP/mInB7+6MK3uzRp+cPKg7RAUuL+FSA+y2RovjHxmhlYDu20DzSargU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=H5Pw+394; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HgIKxzgN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F73DC4CEF0;
-	Fri, 19 Sep 2025 19:10:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758309007;
-	bh=FJoaR6ZTublyn5JvFogUc214q86p13oDjHbROtHw1Ww=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HgIKxzgNYLSC1q2B9C9EyhS8hPYf5Oe9P9yXANuKvlMEsZnJUadrj75SubyhJlhfg
-	 8840UwoXBaDPVrznUI3sg67sclPwB6ZTJvs8LAZEpV2r8FdvvidXifL3hnow7MLdWW
-	 WshIQiHmG/I0+kVwPx+oFTthD6cYVYuHgIhg644WFcd7N/tJ3UxWyV8Fi3EbS1bZQd
-	 g0El/n7Ft4h4TkdlOjJQyHa+4JQEMmWdHsUY5l8+37QUzHM3E1JlG800CoPYCU+qER
-	 slexSzwsHa6oYOgO59Gn9xcwrvnID9gfo4iRhRv4xlRmTKTDVy66IQtG9EWPnSSW4s
-	 qEteFqb+DFpSQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB15639D0C20;
-	Fri, 19 Sep 2025 19:10:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="H5Pw+394"
+Received: from github.com (hubbernetes-node-910bf76.ac4-iad.github.net [10.52.153.34])
+	by smtp.github.com (Postfix) with ESMTPA id 09BDB2029E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 12:18:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1758309539;
+	bh=Sp/XDcrRzClKy1D3TqdWk6zM1vV5LzFxIC+LU7Brh1s=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=H5Pw+394Kmukzy2QbwVjRlnJVhTvGWPxDixwO2+DSyAYIjK3pejSg+okLYEjJ9IQW
+	 2WsNABm04v+qHS6qaet+6cMsFomxjsHMYjkfdCuuFjLsk9plDNqFO53lGdoE6rxNVr
+	 ICgwYtWwNkUi7NZNgSZSyXxt4Dmm+D4pYILeJZh4=
+Date: Fri, 19 Sep 2025 12:18:59 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/da5daf-6b0a08@github.com>
+Subject: [bluez/bluez] 6b0a08: media: fix pac_config_cb() error code return
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] media: fix pac_config_cb() error code return
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175830900675.3668548.3358858369461816193.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Sep 2025 19:10:06 +0000
-References: 
- <a9a2cc5fe58b706247b74adeaa5f0b774432f837.1758215957.git.pav@iki.fi>
-In-Reply-To: 
- <a9a2cc5fe58b706247b74adeaa5f0b774432f837.1758215957.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 6b0a08776ae44a9102d7c6875a77e83dc6a11a37
+      https://github.com/bluez/bluez/commit/6b0a08776ae44a9102d7c6875a77e83dc6a11a37
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-09-19 (Fri, 19 Sep 2025)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/audio/media.c
 
-On Thu, 18 Sep 2025 20:19:35 +0300 you wrote:
-> Fixes: a887b1a1b91f ("audio: Add support for specific error codes for A2DP configuration")
-> ---
->  profiles/audio/media.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+  Log Message:
+  -----------
+  media: fix pac_config_cb() error code return
 
-Here is the summary with links:
-  - [BlueZ] media: fix pac_config_cb() error code return
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6b0a08776ae4
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: a887b1a1b91f ("audio: Add support for specific error codes for A2DP configuration")
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
