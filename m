@@ -1,61 +1,90 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428ED2C028E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 08:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADD62BE63A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 08:57:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758271751; cv=none; b=XSKcZNl+s7j9WX7rhTHZOcI/WNnVPb/1lqfzeCvp7ksV39iuh1jAlbQ10SmA6iwhlz/i6WyJzMq3fRNeAivqlDquDUUBXkYrfdjbrIpBMnTALtRQf0mAUA4XlRubM3SVL91nAwDbZCPc7wVUFme3zByzCIO/nGk+oqHxKaJup4U=
+	t=1758272265; cv=none; b=bNf1Qg+evSxPwf4H1xM2hCatDhqgbR27wH4iaFvprXS0Bq0JKPLJhk6dgd5p8688R+lucuN8nP5jlb3tuT/AdHfRrbN7VX/gvim3Hk+ySU1XdzKhTkNbkSVD/EVvavWI67T+Ik8+YPsOXMWgzLnavMhq8Nnk1gtfdDdJ8upAnNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758271751; c=relaxed/simple;
-	bh=wp/IEyaZ0ZkGKZkzE4Wet4KJjZJf6O/yg3UZuBLXkSI=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=dm1PlLq6iICPQe89Xps3OKM+r7ocjtBiWGoUW/6pFNxR4RK/CBi+FdDq/P929rExEcw+0x55qi1wTm3QgquxhmZnZPvQE3C2GbULGAlpCeB+C3vxznI6c+t1uR5lszsAUwICDiLWdjjz8fDHSJ34Kvr5Szf3UFZB2FfSMvYq+t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Aw1aCYFW; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1758272265; c=relaxed/simple;
+	bh=JZ8ALzi4l89b67PM7h3d2OpqJrjHcj142Sm+/TmRQXc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E4Rk+xpwX16nGVcQsv/fwbXwrpZdMOcvBPLmdkCfq0sNmtUHYLbumEAKYj02PHzPbBd4JzmpShP84sjYY87PsflveE8fB3LhgGCyyM48O/j6PSXgtYIJWGzDsswpuf6vPOUlNRQ0KgCicvgAftu1zNI9U2hFIf+NNOFAeu1Q0nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wf0DDs2u; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Aw1aCYFW"
-Received: from github.com (hubbernetes-node-026b7a5.ash1-iad.github.net [10.56.178.19])
-	by smtp.github.com (Postfix) with ESMTPA id 5AAF0920293
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 01:49:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1758271749;
-	bh=H9tyu5Qu8IseJqdxXHIQo3YHagR+GKMAEzxiXCLIQ4k=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Aw1aCYFWI4sFf9UHuGmpE/UXFvsurer8Gy4HMa/SjZHSsgBl8YbiMHrh7tlPkR+uk
-	 +iawhcTTAlbQS2uK4Y0S4hSUA5sWSEhPHcJCxxquYZh3y+3u33/kbOBGazGMRBF7Hi
-	 IijYwyPGONtXg6dAf++P4M9p0E7+ijvFoU02zVQA=
-Date: Fri, 19 Sep 2025 01:49:09 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1004140/000000-d7a7d9@github.com>
-Subject: [bluez/bluez] d7a7d9: doc: Fix typo in PreferredBearer property
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wf0DDs2u"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b5516ee0b0bso557352a12.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 01:57:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758272263; x=1758877063; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=IVX4Bv4ex+uyVv1pbESwXdzZsofD0/jfymFeQrylr4k=;
+        b=Wf0DDs2uizMTfq3zfvBcKXu5ATpz+VEOd8RMG064DgUkkDalD60y+yLLeBEiWtKQHy
+         ClYMfxp3q3aQUl6fh6aLBhPK6SjnL6vo0imXY3afGA9TmkfaDjaJ1ttGhFe3PhFfg1/u
+         mD4paJW5zfBi5T6W4B57CTwrG+wb9HSJwtYzKQtBp6+/BkN8clV72/fN6ASniYsiHh1l
+         nn3ZBwGpcfOUFi+PA80U7f7sC5BIKplCLKTBU0pVMHtF3QyDEf4OqLDfCL6yfNiLEEup
+         c2ULObJPLklcWFN+v8ERY88+k2l3lmrcLrOFEM8KP+YZOjtJKIuuzcdx1pV2D7SecLA0
+         KXqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758272263; x=1758877063;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IVX4Bv4ex+uyVv1pbESwXdzZsofD0/jfymFeQrylr4k=;
+        b=iZQJH6Yma1My2+f4N+jSZl+epC9hvCtnowZDNCLZuETKLA3DH3g7kAOZNPE7ISs9zS
+         I0tPIeX+lEQBeDrqVg5GzLQmDNCBzbhL7LxiRP7i9lJmHrQZrymsBOTntaPOpzDBo3hq
+         k3vxf+u4L9CPrMUETlKTW5GgQnd5Lu8b6XF6/24ztdpy8Ig3QPZIhiCp0RqUM9ddpkFg
+         mfPCoP7XA2WxQSn5rgZiZdkVxygGGpPNrUtDtdD2e/EMV5cYeHRQilsiw2121avUO03V
+         9p8P1E7OEqP/grcHsyiW25Ap4NOFFHW4CTFv6XAW9VX9z0XWmpFMXwi0nzAgE7EBH6Ex
+         xCVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX83TI2fj4EBkqMo8eoQzolYdcQsb1gpEo65dxRjGSM3UD84hMHtVH5JjlhYqWEv14IZ8vO4LTx/RIP7eqydZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrOZucbcLGRC31dP47QFAYU7cHsO7Z7yPzVPoBDGVueYwfwWEt
+	i74D6V6p/Ud9g14NmcXpsjGgh0thHHWFH0lMI0DOEkccg7+6i8zHeefbqSl5foY8No3Sw9xaqGD
+	qZNtlnEid+IlbT0soFop4DLyT9/kxa0Y=
+X-Gm-Gg: ASbGncuHcdYab8WU+p4VaEioHrlk9tP7HMmpZ3P43X3ZQ3l3wahOOqAoyDhgwMbJAgc
+	g9wof5dqTCQei6PPs4f0uey0b5FfmGR6dLYAFala/jNlaPif0N72uo1wgjBqSQp7lgsT2XxCbOT
+	xzS1888mWVLgPTwOlADskFgDMhExgJaoY8kAYB002fvTpEqZqq6nvBbYsD3pBKmnpcwasaNUQ/C
+	zUALaBxVG5ydgTfuReW
+X-Google-Smtp-Source: AGHT+IHUvEeTq8dbZhTVSYIaod2IJCP9IAd80QKZqmcoGD/pxowUWYdmJQVUNvAlNGoK2mzZTyBH/w0E0uCfSxtDO4k=
+X-Received: by 2002:a17:903:2f08:b0:267:a231:34d0 with SMTP id
+ d9443c01a7336-269ba527e91mr32353655ad.42.1758272263501; Fri, 19 Sep 2025
+ 01:57:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <CAFRLqsWnWnDaY2a23HctbxLKquvw7Ax30YB-tdBmS59RtQ4JBw@mail.gmail.com>
+In-Reply-To: <CAFRLqsWnWnDaY2a23HctbxLKquvw7Ax30YB-tdBmS59RtQ4JBw@mail.gmail.com>
+From: haoran zheng <zhenghaoran154@gmail.com>
+Date: Fri, 19 Sep 2025 16:57:34 +0800
+X-Gm-Features: AS18NWC4ROcPlc2EncCLRhcJUzB7R-S8-CSg44ldda1VIZQG8MqmarJKmJUInTc
+Message-ID: <CAKa5YKgAP5L+uBr3R0Au_n_s4N73y0NPFVh0y1XYPaAJyuCB5w@mail.gmail.com>
+Subject: Re: [BUG]: slab-use-after-free Write in sco_conn_put
+To: cen zhang <zzzccc427@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, johan.hedberg@gmail.com, marcel@holtmann.org, 
+	linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, r33s3n6@gmail.com, 
+	linux-bluetooth@vger.kernel.org, "gality369@gmail.com" <gality369@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-  Branch: refs/heads/1004140
-  Home:   https://github.com/bluez/bluez
-  Commit: d7a7d96408562dee2ba8e0bfde53582ca7ad012a
-      https://github.com/bluez/bluez/commit/d7a7d96408562dee2ba8e0bfde53582ca7ad012a
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-09-19 (Fri, 19 Sep 2025)
+> RACE CONDITION SEQUENCE:
+>    a) Task 31374 releases socket, eventually leading to sco_conn_free()
+>    b) sco_conn_free() sets hcon->sco_data = NULL and calls kfree(conn)
+>    c) Task 352 (workqueue) executes hci_conn_failed() -> sco_connect_cfm()
+>    d) sco_connect_cfm() calls sco_conn_del(hcon, bt_to_errno(status))
+>    e) sco_conn_del() attempts to access already-freed sco_conn via
+> hcon->sco_data
 
-  Changed paths:
-    M doc/org.bluez.Device.rst
+I think this vulnerability should be located at sco_pi(conn->sk)->conn = NULL;
 
-  Log Message:
-  -----------
-  doc: Fix typo in PreferredBearer property
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Specifically, when sco_sock_release is called in the Free Path,
+conn->sk is set to NULL under the protection of sco_conn_lock(conn),
+and the TOCTOU problem occurs at line 87 of sco.c. When performing the
+if (conn->sk) judgment, conn->sk has not been free yet. However, when
+sco_sock_release is called After the judgment is executed, resulting
+in conn->sk being free, it causes Use After Free.
