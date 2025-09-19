@@ -1,55 +1,61 @@
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701382BE63D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 08:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428ED2C028E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 08:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758271423; cv=none; b=WFCeeq7Sb0AdslbK8e27dIP+rd6d0E6UwWv7glLOR67pqIpAXjhyfwnIP/YZbJdfNe9vbvHoBfQGK7qXEXfG1DCePCsiCLvmWErS39DbWs5TdzEpearn5dTbnJQbACaSSiwwUX9DZvEOn/dcgcFnwXtLSni9aLTIQgBeZSrO58g=
+	t=1758271751; cv=none; b=XSKcZNl+s7j9WX7rhTHZOcI/WNnVPb/1lqfzeCvp7ksV39iuh1jAlbQ10SmA6iwhlz/i6WyJzMq3fRNeAivqlDquDUUBXkYrfdjbrIpBMnTALtRQf0mAUA4XlRubM3SVL91nAwDbZCPc7wVUFme3zByzCIO/nGk+oqHxKaJup4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758271423; c=relaxed/simple;
-	bh=6cPDwmbXb+blwSJD2ID6J03/nEuAFQ1G4glGjfXZVss=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=jKZWMtxx5hoVy4cP4BsLOMAdjIZ6CH2ut8W/6VaPSenc22UE/jLwglzZwEtUgicsq2nWl+idiw4uSqlDGxahtytw93G4jKy8AQpUzpCQL8kyY2sq4wJPbahfEdiYZMRZBVl5wgT+i1kJ86hRA120RxW8/XuGnrDqboAE7+2dl9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 11B4C1FDA2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 08:43:32 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
+	s=arc-20240116; t=1758271751; c=relaxed/simple;
+	bh=wp/IEyaZ0ZkGKZkzE4Wet4KJjZJf6O/yg3UZuBLXkSI=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=dm1PlLq6iICPQe89Xps3OKM+r7ocjtBiWGoUW/6pFNxR4RK/CBi+FdDq/P929rExEcw+0x55qi1wTm3QgquxhmZnZPvQE3C2GbULGAlpCeB+C3vxznI6c+t1uR5lszsAUwICDiLWdjjz8fDHSJ34Kvr5Szf3UFZB2FfSMvYq+t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Aw1aCYFW; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Aw1aCYFW"
+Received: from github.com (hubbernetes-node-026b7a5.ash1-iad.github.net [10.56.178.19])
+	by smtp.github.com (Postfix) with ESMTPA id 5AAF0920293
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Sep 2025 01:49:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1758271749;
+	bh=H9tyu5Qu8IseJqdxXHIQo3YHagR+GKMAEzxiXCLIQ4k=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Aw1aCYFWI4sFf9UHuGmpE/UXFvsurer8Gy4HMa/SjZHSsgBl8YbiMHrh7tlPkR+uk
+	 +iawhcTTAlbQS2uK4Y0S4hSUA5sWSEhPHcJCxxquYZh3y+3u33/kbOBGazGMRBF7Hi
+	 IijYwyPGONtXg6dAf++P4M9p0E7+ijvFoU02zVQA=
+Date: Fri, 19 Sep 2025 01:49:09 -0700
+From: hadess <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] doc: Fix typo in PreferredBearer property
-Date: Fri, 19 Sep 2025 10:43:21 +0200
-Message-ID: <20250919084324.2799981-1-hadess@hadess.net>
-X-Mailer: git-send-email 2.51.0
+Message-ID: <bluez/bluez/push/refs/heads/1004140/000000-d7a7d9@github.com>
+Subject: [bluez/bluez] d7a7d9: doc: Fix typo in PreferredBearer property
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegkeejiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepffelueffjedvueefffdvjeejvdehkefgledtjefhiedtteetgfejvdeuvdfhjeeunecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: hadess@hadess.net
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
----
- doc/org.bluez.Device.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Branch: refs/heads/1004140
+  Home:   https://github.com/bluez/bluez
+  Commit: d7a7d96408562dee2ba8e0bfde53582ca7ad012a
+      https://github.com/bluez/bluez/commit/d7a7d96408562dee2ba8e0bfde53582ca7ad012a
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-09-19 (Fri, 19 Sep 2025)
 
-diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
-index 61c394dd2d0b..593ff06643f3 100644
---- a/doc/org.bluez.Device.rst
-+++ b/doc/org.bluez.Device.rst
-@@ -418,7 +418,7 @@ Indicate the preferred bearer when initiating a connection, only available for
- dual-mode devices.
- 
- When changing from "bredr" to "le" the device will be removed from the
--'auto-connect' list so it won't automatically be connected when adverting.
-+'auto-connect' list so it won't automatically be connected when advertising.
- 
- Note: Changes only take effect when the device is disconnected.
- 
--- 
-2.51.0
+  Changed paths:
+    M doc/org.bluez.Device.rst
 
+  Log Message:
+  -----------
+  doc: Fix typo in PreferredBearer property
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
