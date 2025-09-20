@@ -1,61 +1,126 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C0829AAFD
-	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Sep 2025 09:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADDF189
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Sep 2025 10:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758360400; cv=none; b=aQsj2/5padmgDA3qcul0JO8pmN5U0V99joEbxXliDFyu7S5U5wMLJYBcetYH3BsIqdiP7p4kOTEkOI6uU7jXuxuDzomlnPPfFkQXy4HhRoj6u4LCKoipA/mjA+bxPSnhLgA8CRddlJ3JmAFMqWhgcwhaPXZyt3614dGu9vLWRd0=
+	t=1758364948; cv=none; b=ME1LpyVUQariid07KkjsCjdaj/5+486QZNvhCi5J+iUpMDVBJOfXyE8GLIPFUZhEZbSmhBQH+DqOe8R8wb8iCSDW7Rb1HQcnNcXzjslCRa2CtYJE4/O44ykOKfhCQzCev/XeHp5jn5axbsqfAcxa+28/YTZsbt/bKXd/1pD7KjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758360400; c=relaxed/simple;
-	bh=xJHPFRQTsz1u5mh9NO9AtjlIa72X/gzgE31geA4tnIQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lhEc1OAFzuLmUW+Nriq3icC7MMYB5pnSC9oHVjt31K5J9if0vpl6y2QJ9pyXw0DHM4l9Htn0//dX0P2BHVl3DDCRLoAgkK921x4XQ1vI6NPL1npN9jBEGkxFY2LG9FLpEasF7Pm72/LNWPLUu4u/KHuYkHnJRZzHL0p6Dxwx6n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dLPuun4Y; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1758364948; c=relaxed/simple;
+	bh=cilEpw3vtndU0FDaAOZSQtTDCtEQP53zy3wTWfK2i5A=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=M4jsCAEGg75dgO/pFzz7v50A0LU8+ET4I/sZ0beThouw0o9+zHfEnl465EGeUmWeRK7TxUKcdBWhkL+vT0RKh+19HrQ230CQhYHKV7frrGG3l550+V3zruwhTvFJRwe99uU7dGgGS5+acNGquf5BVUxrjfJX72cvNdYjbwZjDFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UMkX8w77; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dLPuun4Y"
-Received: from github.com (hubbernetes-node-eb34e4d.ac4-iad.github.net [10.52.170.40])
-	by smtp.github.com (Postfix) with ESMTPA id 1450E203FB
-	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Sep 2025 02:26:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1758360398;
-	bh=rl6emzYljV9VVOC+O7Ff8UXObUonoG0zaWgm37cH02U=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=dLPuun4YcQAFQqapCCnj6swttnybiZg0kAmToOTaZ08OX0p8Ssrb/qNjKyB7M2ig0
-	 7or3nOAf7JuIP5ojjMIxlB3NQdUq02fwZFRZQ2d3CGDGZF4Zk01w0UHbYjWQMKJWDz
-	 ja/pV6wq41JtGhIChu9cxaJBo+zRrtEK4a1pJ5Yw=
-Date: Sat, 20 Sep 2025 02:26:38 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1004473/000000-deb76e@github.com>
-Subject: [bluez/bluez] deb76e: doc: iso: add BT_PKT_SEQNUM documentation
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UMkX8w77"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4b7a8ceaad3so26420971cf.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Sep 2025 03:42:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758364946; x=1758969746; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=t1jPQkVjofamHSOJSQc5DEsD2i8uOgJlvEeqzoWt4Fo=;
+        b=UMkX8w77S2iiTT3NLrCtH5e6B6383N1OfbpK93KYujsvPZgQHusrdnEiJ8sPngfpk1
+         /fWq2AfHu1bJn6hsiAuVBi4f8fipYzgNIxEDC1HXqYOs0rNITAFCfRwkm3KWekuYsw+e
+         odpeTvwn3sbJSnB7JsMTriYXFMxsmNmq1pLNNrJgM+64nz72dIbf8WrDWI7cWbTQGSJm
+         Ximjqv3J8lb4xCUTvRrnBSZjSOBQvPA2AnVi4UwGammM/RjNEnBOYmyoQG/bwD65wVpP
+         YBA8RY/MXjO9qBnkdUy4J5QrqwKggHv4Q3G5uu4tWXYGntDvWGkb9xrVGo/a/q877mw6
+         8+MA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758364946; x=1758969746;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t1jPQkVjofamHSOJSQc5DEsD2i8uOgJlvEeqzoWt4Fo=;
+        b=m6/kn70IrScQrKsWe7XCs4i4VeQCbKt6M/SCePHCIwUqOSGjLtlv4eM0HgTbC59vvq
+         mh4ghuhps9sS8afcAOzztTGnFtZ1RuFfYLKCiAJD7siAz/A9qZl5WhN2HBS1Ls0+3gDy
+         5s8qrcDeToCVRXkoUGdE0jfBKIixAox9/b4u63BmlLrwaUPKsQCP9c88VXg7Q3msy/tM
+         3vmbchZ0YrgyMkQlB+iTCa82qxKRSGOgTauc2O1EcTV5TneVw8vHixtQpSbjeOQCn2XH
+         jgsYHAV1Ndhnd/mDpCXtU42YnQRrJlGzDcWGYCFr2nRFYI9Nb4uSu1FWcVIbtvd0hEqj
+         jDiA==
+X-Gm-Message-State: AOJu0YxKQXycvVUTAWXE5OilUXnAgPknhO5rtb/gR3yg72nsOHOOYxT1
+	rq2KNVauoTL+9PWK2Ba8YBdTjrPksikyQ1nK3qbnX3ebHvbFBcU39FuBU4awBg==
+X-Gm-Gg: ASbGncswqDWVv4s2fhNr/z2O9B2kL3VA/+GDmYnUcmjSRx0nctkhfDwgucobbYgjzz8
+	ElxycxuRilSHTvMIyLA1Dp/N5KakfXHM+5EFqyVrS/zuhUd+d+FU8ERp26jxuF/7YPhz6Nt9uxz
+	BUbcfz7it2GHIiyZ2nJB1NHIwqvp+1+AEovAL8ZmDMggAacHtXez+5WhivkwCvhjy2hyG36s/8D
+	QGR4Ic1ksHczT+893/gNtCxubaSvgcISOdDce27clMPFnL48A9XvxnLmoy0rJW9ey/ZrqE0CVXG
+	Uj/3bKUi5vOF2pXhZaDg3aJWm9lR1kKYEDp7Jt22rxvmlVh9zkRZmjfv9ZIt86vQ4WLSBpfqSrp
+	P5eSx6TvX29zCTZBsTkn5uMc5B7bBxFw=
+X-Google-Smtp-Source: AGHT+IFSGXSbzWIPgyZ+zyNtACrBLblCWj0tmuO/1VG34SmTG8r/3co+nRMbwrJ61Fhk2HF7xPOHTw==
+X-Received: by 2002:ac8:7d0c:0:b0:4b5:e9bb:8478 with SMTP id d75a77b69052e-4c072e26e9bmr79359561cf.63.1758364945814;
+        Sat, 20 Sep 2025 03:42:25 -0700 (PDT)
+Received: from [172.17.0.2] ([172.178.119.114])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-83633732305sm484463585a.63.2025.09.20.03.42.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 20 Sep 2025 03:42:25 -0700 (PDT)
+Message-ID: <68ce8511.050a0220.1b8b2b.0c8d@mx.google.com>
+Date: Sat, 20 Sep 2025 03:42:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7867250803952770376=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ] doc: iso: add BT_PKT_SEQNUM documentation
+In-Reply-To: <5ad48176668987b22fb71be24cf4e478d0869dc2.1758360020.git.pav@iki.fi>
+References: <5ad48176668987b22fb71be24cf4e478d0869dc2.1758360020.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============7867250803952770376==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1004473
-  Home:   https://github.com/bluez/bluez
-  Commit: deb76e3ebea82fa1b070bd15e00854f2a4087d7c
-      https://github.com/bluez/bluez/commit/deb76e3ebea82fa1b070bd15e00854f2a4087d7c
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-09-20 (Sat, 20 Sep 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M doc/iso.rst
+Dear submitter,
 
-  Log Message:
-  -----------
-  doc: iso: add BT_PKT_SEQNUM documentation
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1004473
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.22 seconds
+GitLint                       PENDING   0.31 seconds
+BuildEll                      PASS      19.96 seconds
+BluezMake                     PASS      2712.96 seconds
+MakeCheck                     PASS      20.40 seconds
+MakeDistcheck                 PASS      185.02 seconds
+CheckValgrind                 PASS      235.21 seconds
+CheckSmatch                   PASS      306.44 seconds
+bluezmakeextell               PASS      128.20 seconds
+IncrementalBuild              PENDING   0.21 seconds
+ScanBuild                     PASS      913.65 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7867250803952770376==--
