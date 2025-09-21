@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8194022332E
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Sep 2025 19:14:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485872367AD
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Sep 2025 19:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758482097; cv=pass; b=YoTYl7hroyqB7izZUdD9lj5SR7tPt+kRBG3iVxVC6IvsrzKia8PuuFUnu1YDSoXU3Tif1Gm2U8SrNlL6iqkhrlFi+t83+T+AGIeCyd1qEM0DCEu6uNS3Vs2IHp7WXNV5oLUtPviPLDQRKSgfYz0JsaVwzdy5SunTfIt4FebHcwI=
+	t=1758482099; cv=pass; b=mfd2fFHiio4rbwJ4dJjWt8ybGCuXYWkKRgS8zTFgy120/RlhcVxIdLJPaxdN64X7QTvdim+b5Uol5nCNOErWAa+pu65Dv6kSLfr7VzLVicTdTwiwVBRx+nfrvZ0Jw2ippU+RzQQMv7lQIDo9/a92j+TezQhqD97IdeALqVEIlpE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758482097; c=relaxed/simple;
-	bh=YSywxIIhkPP/MU51AXNQ20fCOMy3ZHCf4E15e5YSUaQ=;
+	s=arc-20240116; t=1758482099; c=relaxed/simple;
+	bh=GU6yWcZ7BpmEPwflXuX2Uwh6vSdVpm1t93c4KMRuOug=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LdhN7mbqG3TmWoFgvBPJzKrgUVyN8RZFR1ljUbZ75sF9aqwM2Q0G8Xtjxh9ZqcaCm2H+6Fdz0t+bBbPegqUGHlwVu5K/o8JHkuzvbEpIr5KTk2vA5Xu1y8FaVAKKn30CFovYViTUKe+3eMD5U+q895W/fWSlAFHr3P8L49spGk0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=bTZCVaz/; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=Ydw8b9V0uTlJUyX14zcMmyK4oRdKWap5oRWfgxX6umumqgHYsGHPyCGnocq8m43i9CFKe+vZxt/JriW93ZWLPOTyMefnSmtg3jbh/X1whoB20k9X1DAiVGg5BH5vO0ZHKXzE/xi1lZXwbFuQq/BiG1aHy2dlOU8SIW2zFjDiy+I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=upIRhbeo; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="bTZCVaz/"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="upIRhbeo"
 Received: from monolith.lan (unknown [193.138.7.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4cVGCC1g89z107f;
-	Sun, 21 Sep 2025 22:14:47 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4cVGCD0vsBz10FB;
+	Sun, 21 Sep 2025 22:14:48 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1758482087;
+	t=1758482088;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NS2y/wzJ8rvyv1b78MGY3BGT9sCcJH6GwjqD/8KYLVI=;
-	b=bTZCVaz/swa88z0e3sfntfOdkRpFcCfZ9+A40ZFDKrt3Ci0pM7m9IM1QIEHeY6kt3QwNGH
-	PgauGKzOH9Wz/f+6lR9DGeCR2+iGCRzsxdP666qcDe6aosZejCqb8+Yhol6cDuPFCNK+EO
-	EJL9UYXpJW8NwVEKfdEXujdUjGvOxzQ=
+	bh=uybWzJ79SmFxYswaF/6OAP1vNtTIvMSV8cphJieLFJ0=;
+	b=upIRhbeoYfSrFLxkcmWgYBM8n5Y0MTonRBrugKoX97ZUhcTSp9diC1sDjB/+xXRiojSwyR
+	n0JRJyyJsNA0Y1iIgVZSiPgRIS0bh/xz+YrRLPZBbehgqbbs1V75OVKSTjiwbMynEfUWAT
+	a6vzog4BxCbg5qduN6/CijK5M55CW0I=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1758482087;
+	s=meesny; t=1758482088;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NS2y/wzJ8rvyv1b78MGY3BGT9sCcJH6GwjqD/8KYLVI=;
-	b=rLqbS/XOuab5nZb7tGDgErJXVQ0zkBXOc+hnuiWbHbTXTCdk80+R+2wlIFSnYm/3LSk/jD
-	GF6taJGmn1AaxRzo00ubYWXHnvnmoVmQEvaA616LjMs3jUTI98KscZ1xEivrHOq7Mc697/
-	ru71S1fCy5Ono5i6B+/1zfCiAqEOook=
+	bh=uybWzJ79SmFxYswaF/6OAP1vNtTIvMSV8cphJieLFJ0=;
+	b=KcAk1kvruE2vxTOMCZHbNd/ICMkDJl5O56Fiw/XbaHyzpV+O5WME7Rr49yI6Er105n5r1g
+	3fYJ6oxUR81BK5sTeMp7E2vVUQ7oIhHvr/Vw2uCjmCZvnGKEmIzEvngrJrmi5oUfqojV/Q
+	P7yhFOqIhzF2sEHjDTzuaXLfx6BpoUg=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1758482087; a=rsa-sha256; cv=none;
-	b=ylW80Tqaw5d/bDRMT92J2ub9XtjapZMTc7Wc/zd1NezdplNKUhxoMx0p2OGwI+79WcaALI
-	3sQ0zHfodHG0FNlC/QZgADJQH3ygAeOcgPUFEVcE3h13zKUMMABjfB42dL/dIaauscXiVN
-	OMHt8fm6gG00r6hDx4m99g7XluYPZUE=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1758482088; a=rsa-sha256; cv=none;
+	b=TyM7hltZ8FR1ltJOcVyWsEjgiytcQmQ8sBMMqOG4vz6Fw7OQ/7B6NmX534cXCcXv4NKHuw
+	amRaME4jyNuMP0As9nUgBWRTACDdE9mmKLSNdTVqLJYSIdmssnsx0VdvBS06fyI0TTdt4k
+	VDhHn8jl5KKSBPn0+8OwzWwqGJdXa1k=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [RFC PATCH 04/24] Bluetooth: hci_sync: hci_cmd_sync_queue_once() return -EEXIST if exists
-Date: Sun, 21 Sep 2025 22:14:19 +0300
-Message-ID: <5dc5f5691f7a8fb6a79f607caaefcdb2c9a734cd.1758481869.git.pav@iki.fi>
+Subject: [RFC PATCH 07/24] Bluetooth: hci_event: extend conn_hash lookup RCU critical sections
+Date: Sun, 21 Sep 2025 22:14:22 +0300
+Message-ID: <5084aac899a44776ff8e31d3a4035557a72c953a.1758481869.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1758481869.git.pav@iki.fi>
 References: <cover.1758481869.git.pav@iki.fi>
@@ -67,105 +67,84 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-hci_cmd_sync_queue_once() needs to indicate whether a queue item was
-added, so caller can know if callbacks will be called.
+When doing hci_conn_hash lookups with only RCU, extend critical section
+to cover also the handling of the return value.
 
-Change the function to return -EEXIST if queue item already exists, and
-modify all callsites to handle that.
+This avoids any concurrent hci_conn_del from deleting the conn before we
+are done dereferencing it.
 
+Fixes: 95118dd4edfec ("Bluetooth: hci_event: Use of a function table to handle LE subevents")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/hci_sync.c | 37 ++++++++++++++++++++++++++-----------
- 1 file changed, 26 insertions(+), 11 deletions(-)
+ net/bluetooth/hci_event.c | 33 ++++++++++++++++++++-------------
+ 1 file changed, 20 insertions(+), 13 deletions(-)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 78af430be381..64e26fbf1543 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -780,7 +780,7 @@ int hci_cmd_sync_queue_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
- 			    void *data, hci_cmd_sync_work_destroy_t destroy)
- {
- 	if (hci_cmd_sync_lookup_entry(hdev, func, data, destroy))
--		return 0;
-+		return -EEXIST;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d790b0d4eb9a..56f3f69404c6 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6616,25 +6616,31 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev, void *data,
+ 	latency = le16_to_cpu(ev->latency);
+ 	timeout = le16_to_cpu(ev->timeout);
  
- 	return hci_cmd_sync_queue(hdev, func, data, destroy);
- }
-@@ -3255,6 +3255,8 @@ static int update_passive_scan_sync(struct hci_dev *hdev, void *data)
- 
- int hci_update_passive_scan(struct hci_dev *hdev)
- {
-+	int err;
++	hci_dev_lock(hdev);
 +
- 	/* Only queue if it would have any effect */
- 	if (!test_bit(HCI_UP, &hdev->flags) ||
- 	    test_bit(HCI_INIT, &hdev->flags) ||
-@@ -3264,8 +3266,9 @@ int hci_update_passive_scan(struct hci_dev *hdev)
- 	    hci_dev_test_flag(hdev, HCI_UNREGISTER))
- 		return 0;
+ 	hcon = hci_conn_hash_lookup_handle(hdev, handle);
+-	if (!hcon || hcon->state != BT_CONNECTED)
+-		return send_conn_param_neg_reply(hdev, handle,
+-						 HCI_ERROR_UNKNOWN_CONN_ID);
++	if (!hcon || hcon->state != BT_CONNECTED) {
++		send_conn_param_neg_reply(hdev, handle,
++					  HCI_ERROR_UNKNOWN_CONN_ID);
++		goto unlock;
++	}
  
--	return hci_cmd_sync_queue_once(hdev, update_passive_scan_sync, NULL,
--				       NULL);
-+	err = hci_cmd_sync_queue_once(hdev, update_passive_scan_sync, NULL,
-+				      NULL);
-+	return (err == -EEXIST) ? 0 : err;
- }
+-	if (max > hcon->le_conn_max_interval)
+-		return send_conn_param_neg_reply(hdev, handle,
+-						 HCI_ERROR_INVALID_LL_PARAMS);
++	if (max > hcon->le_conn_max_interval) {
++		send_conn_param_neg_reply(hdev, handle,
++					  HCI_ERROR_INVALID_LL_PARAMS);
++		goto unlock;
++	}
  
- int hci_write_sc_support_sync(struct hci_dev *hdev, u8 val)
-@@ -6910,8 +6913,11 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
+-	if (hci_check_conn_params(min, max, latency, timeout))
+-		return send_conn_param_neg_reply(hdev, handle,
+-						 HCI_ERROR_INVALID_LL_PARAMS);
++	if (hci_check_conn_params(min, max, latency, timeout)) {
++		send_conn_param_neg_reply(hdev, handle,
++					  HCI_ERROR_INVALID_LL_PARAMS);
++		goto unlock;
++	}
  
- int hci_connect_acl_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
--	return hci_cmd_sync_queue_once(hdev, hci_acl_create_conn_sync, conn,
--				       NULL);
-+	int err;
+ 	if (hcon->role == HCI_ROLE_MASTER) {
+ 		struct hci_conn_params *params;
+ 		u8 store_hint;
+ 
+-		hci_dev_lock(hdev);
+-
+ 		params = hci_conn_params_lookup(hdev, &hcon->dst,
+ 						hcon->dst_type);
+ 		if (params) {
+@@ -6647,8 +6653,6 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev, void *data,
+ 			store_hint = 0x00;
+ 		}
+ 
+-		hci_dev_unlock(hdev);
+-
+ 		mgmt_new_conn_param(hdev, &hcon->dst, hcon->dst_type,
+ 				    store_hint, min, max, latency, timeout);
+ 	}
+@@ -6662,6 +6666,9 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev, void *data,
+ 	cp.max_ce_len = 0;
+ 
+ 	hci_send_cmd(hdev, HCI_OP_LE_CONN_PARAM_REQ_REPLY, sizeof(cp), &cp);
 +
-+	err = hci_cmd_sync_queue_once(hdev, hci_acl_create_conn_sync, conn,
-+				      NULL);
-+	return (err == -EEXIST) ? 0 : err;
++unlock:
++	hci_dev_unlock(hdev);
  }
  
- static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
-@@ -6947,8 +6953,11 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
- 
- int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
--	return hci_cmd_sync_queue_once(hdev, hci_le_create_conn_sync, conn,
--				       create_le_conn_complete);
-+	int err;
-+
-+	err = hci_cmd_sync_queue_once(hdev, hci_le_create_conn_sync, conn,
-+				      create_le_conn_complete);
-+	return (err == -EEXIST) ? 0 : err;
- }
- 
- int hci_cancel_connect_sync(struct hci_dev *hdev, struct hci_conn *conn)
-@@ -7106,8 +7115,11 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 
- int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
--	return hci_cmd_sync_queue_once(hdev, hci_le_pa_create_sync, conn,
--				       create_pa_complete);
-+	int err;
-+
-+	err = hci_cmd_sync_queue_once(hdev, hci_le_pa_create_sync, conn,
-+				      create_pa_complete);
-+	return (err == -EEXIST) ? 0 : err;
- }
- 
- static void create_big_complete(struct hci_dev *hdev, void *data, int err)
-@@ -7169,6 +7181,9 @@ static int hci_le_big_create_sync(struct hci_dev *hdev, void *data)
- 
- int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
--	return hci_cmd_sync_queue_once(hdev, hci_le_big_create_sync, conn,
--				       create_big_complete);
-+	int err;
-+
-+	err = hci_cmd_sync_queue_once(hdev, hci_le_big_create_sync, conn,
-+				      create_big_complete);
-+	return (err == -EEXIST) ? 0 : err;
- }
+ static void hci_le_direct_adv_report_evt(struct hci_dev *hdev, void *data,
 -- 
 2.51.0
 
