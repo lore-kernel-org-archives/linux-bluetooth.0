@@ -1,27 +1,27 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8B62F37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7662326E708
 	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Sep 2025 19:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758482188; cv=pass; b=tEVOxiQtg7qiNMMz/wtB42TRqA4bcvWI9flKAtwt2nLPwklC0Uy372GQoEHGTHDowLVnEmDwBLYYi6TZ/4UyIhZ/ELZihq7aN3trpmeKUw1zt4UHJByUEofKWbf213Q5ZS63ciqav7wvaf9SKOjR6RT1arwLayvvUkhYKaHCQ/0=
+	t=1758482189; cv=pass; b=qDqpuZStmgDaiZlXWMZDJo0S3NBzXZA9YXMm5Jwq4qTz6qh17hRLst6NRDZBqr39/14NYzJCR8iCs/FW3c8heQYGwqlT2Bs2PVVEcnTxPllOMniTRLycfAmhiMUFX7Nj/ccOXlFzhFfjhYZ1U1U1OKokPZuzV1iPnZhOBNxzwO8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758482188; c=relaxed/simple;
-	bh=J9AGxjyMXkfaEL0XELxlfmoPoDKedldfBDbMTbbvIV0=;
+	s=arc-20240116; t=1758482189; c=relaxed/simple;
+	bh=K+IyUd+KtD504tXLv3B4em2gSWE1PHarbsc9+EupIik=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=afgyS3dt0k7ITm1EJAoyaCe8YhWB8YwmdAoYematMBiXBhiAytEinFaFduAEhMTP8FU/SfozEcH+AhUCTYt4RBd2GMj539SfnYDJiSh1m5bjh7tfq+LyaVJPHLJlg9vyMb2tj3bAtua9v/wyzM3tqqQrL4qlEByLpfrq0A4HLpo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=AUHetMAD; arc=pass smtp.client-ip=185.185.170.37
+	 MIME-Version; b=Sd3jdi6HYPTOeHvQQgW/OSLr8YHYtn3jhKbHit6fPyqcvedOuZvNaEw42UX8tvmQnoNZg7T6IfXlxCwD18ZS4/9VNwqCK2B0zEGybzksMj3cKhbZw1bynNdYDT5E3+XJuGzJJ40kCfSEzz4HZc5AnCYG+9fdDPmZL44SfsufgLc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=SLpkocr6; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="AUHetMAD"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="SLpkocr6"
 Received: from monolith.lan (unknown [193.138.7.138])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4cVGF26FmZz49QMh;
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4cVGF246Jrz49QKm;
 	Sun, 21 Sep 2025 22:16:22 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
 	t=1758482182;
@@ -29,40 +29,40 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ao1/U3YWDMQBhoOl/mwnjELq3upwDLxV570cbArlqpk=;
-	b=AUHetMADBFpNkH4gbiFJ26M4DJzyRopns8JSJhQk5k51TkfuAmsNUyV/GVNX+R1p8es2UE
-	NgMXzuG0l854V3cS9MZ6xH4uzmbGcob4fja+awraiDoJvz7zjroI0Y82xXkU8tKF78K+Dt
-	2kKMMADc2IPc6DuvEQcy5G733xk9nVTWi+IbcEiQ44W1NnK7t9QE8kovjuY/n414LRegkD
-	tyNtIFNcSAaa8T02SOkknjc0gFaubrpfsP5J7pwQ4Pp5jEUFy95dniITIIvevrglTuf9+B
-	IKP7hT7j0PlBK5/9+88RKV89Uafp0eYr2couDDj2+XuyfqJ/F9MaOVISzD6X6Q==
+	bh=AgctL1QaSVzoDXS7S7ldc7AgBdd5KLA5mX2gADBq0zI=;
+	b=SLpkocr6PESgo4KXCwlr100qB8HCexFzO6B6ggGrzff/l2hQu3lbr1xehA3lutl3fBmLcb
+	zg0zT+GNrEccl209oHxbbrP+wZ6GGnL92r1bEETcbEFMVamL81LPcBRPzu7H1fTgl0LqkQ
+	30T268DlsBI9lWTnYceJYcx1iRlnI55JEEpZUua4/On9BXv3w0kaJGMweFVQUURwmwpuZd
+	npXQR1GRUuoHJnRS+z6f6PDTbpXvtCxwNyP0esN6o0bkMnxoo96ELD4JV7G6nsu3YFd2t4
+	pJBk8dxAi1BYE0alBNSwTr1YoaUfx51DV1Rdt83dTaFg9ilJxdy/r+T0CrYOoQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
 	s=lahtoruutu; t=1758482182;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ao1/U3YWDMQBhoOl/mwnjELq3upwDLxV570cbArlqpk=;
-	b=ilQTEZDvATy1tIxn4kdoWxRa5eIzOTxd/HHgFqYbcChc5ir7LUi1jttYgy9fWmzk018TQY
-	vTqd1RGgiqigmS/wl7S/Li8WP6r5nzJIi9oiFRZHUUJz+vOEoKlZzGneDfFAjNcDbq4Xow
-	UmULsEnC8hHNIz0v3IVkhp/MTWFKvbgCuo/9jNf5BUwkr04jWO0XqZdmcWLG3ySSDr3Ykz
-	jZwfZHJg0m3OUCTR/ASEwu0d/VXSZW+lbyK7LI7CfKtkzM2U8uqsjU5T3XG/o/tBNyJYYQ
-	7jZMekmt1y2Y+nWLGDYP69GImbHuY/Xb40t+hw4n8hi6Fv69TnEBQdvE5/nf8Q==
+	bh=AgctL1QaSVzoDXS7S7ldc7AgBdd5KLA5mX2gADBq0zI=;
+	b=ohlZhWUFbCerk/D4CcO6nZyI3Jm1irvZF9PlANkFA3Px8V6cTFMZFjmMUkiIlK6wnBGhUj
+	VEYYcV7jx12TLX7MqkX4/EjjbaC7kQzHO/e3N39BgKubjgNbWJ1opsxyC2taQK02plIAMA
+	JWE68EyPgjG2nRZUc26C8uyipbf7u5kz/sCIR9ivUGdtXNeOp2nfNq5B0irDb9iu2kICja
+	QzF0WDU3pSMa+fz6nxKTKS1Fe5yNTiBHJWjV3C40h/P3EOHvhX+jJvgiUHIfCVSUuIBv1f
+	klY6q/fwfLBwyssROcrR34omSSZcPfwVFGosA5ac2USR9Y6q6Ji5VK/syrd0BA==
 ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1758482182; a=rsa-sha256;
 	cv=none;
-	b=WDg2iMoF0iJYg0/ZAbhSoUbDo3/FS9bp3ObtglnGVfhvqhHIngtQATTsfarBjGcdBxh6NF
-	zkH67HpRMcISA0X9zgJOKAIhTSfXqzCBa5TkixqDXc1k76vIGZUSWnnUA6gk2xaL1MMKBd
-	11x++g1uuEZP0o39ggxbSkxZFMoxzC/UIfND8tXpccxP+Xk91/OTaTUfyN7kDesOliNc9E
-	7IjjW89oqs1xTLaYqelK+kLaeACIWQN2pTWCsUgMwoidwhtEza+xA98o6uIWLqoI3Kqlvm
-	sZF8QpmMF4WQpzYpDAEuSomdwSPGRam28OjofSZiarpuEUThWRIzi2jLwnYp1A==
+	b=BZlPmbyKhgrj8e5TQ98MOlEXU/88ne1FOnU8DF8UXgCv7oE5JwyX4WqVok5xEXfq9FLPm9
+	boJC6EsFzEUu/nhCMoeLb2WuLG63s5p14eD1fg0QJhq6+RYEIMfXu2Q4IGrYzKOAqru2ee
+	8ibLef0YnlcNkxVDUp69tremDdhEmZ65e8Ffoh5jLCLJ5fNO2egfZOouoQSMPwPUswrbDy
+	Cu0o6SOTlF9f7lUWNuTGe0Yqrr8Y9KxH7Ekm+YkGgBWLaLNHB38CMz53payB1ikMiTFQqm
+	pqL0Uc/U/lIa9yv4XUjYnsKT2lCpWyXiCy4FysgTY4wZqg3ErvRR1AV7OKwhbg==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [RFC PATCH 22/24] Bluetooth: hci_sync: lock properly in hci_le_pa/big_create_sync
-Date: Sun, 21 Sep 2025 22:16:06 +0300
-Message-ID: <72b17f12919aa7be73df14ff607e7c8d94ea8f4c.1758481869.git.pav@iki.fi>
+Subject: [RFC PATCH 20/24] Bluetooth: hci_sync: add hdev lock lockdep asserts in subroutines
+Date: Sun, 21 Sep 2025 22:16:04 +0300
+Message-ID: <4eb414164ef56dc3ad61abcc2bcbbe76d3a5ce43.1758481869.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1758481869.git.pav@iki.fi>
 References: <cover.1758481869.git.pav@iki.fi>
@@ -74,111 +74,107 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-hci_dev_lock_sync() should be held while accessing hci_conn, and its
-validity needs to be checked after any waiting subroutines.
+Subroutines taking hci_conn* arguments require hci_dev_lock_sync() is
+held.
 
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/hci_sync.c | 39 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 35 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_sync.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 2d79667f16cd..0717d53c2e33 100644
+index 3f0f9d9d8071..f4d984cee655 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -7153,14 +7153,22 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 	struct bt_iso_qos *qos = &conn->iso_qos;
- 	int err;
+@@ -5575,6 +5575,8 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ {
+ 	struct hci_cp_disconnect cp;
  
--	if (!hci_conn_valid(hdev, conn))
-+	hci_dev_lock_sync(hdev);
++	hci_assert_lock_sync_held(hdev);
 +
-+	if (!hci_conn_valid(hdev, conn)) {
-+		hci_dev_unlock_sync(hdev);
- 		return -ECANCELED;
-+	}
- 
--	if (conn->sync_handle != HCI_SYNC_HANDLE_INVALID)
-+	if (conn->sync_handle != HCI_SYNC_HANDLE_INVALID) {
-+		hci_dev_unlock_sync(hdev);
- 		return -EINVAL;
-+	}
- 
--	if (hci_dev_test_and_set_flag(hdev, HCI_PA_SYNC))
-+	if (hci_dev_test_and_set_flag(hdev, HCI_PA_SYNC)) {
-+		hci_dev_unlock_sync(hdev);
- 		return -EBUSY;
-+	}
- 
- 	/* Stop scanning if SID has not been set and active scanning is enabled
- 	 * so we use passive scanning which will be scanning using the allow
-@@ -7173,6 +7181,11 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 	}
- 
-+	if (!hci_conn_valid(hdev, conn)) {
-+		err = -ECANCELED;
-+		goto done;
-+	}
+ 	if (conn->type == BIS_LINK || conn->type == PA_LINK) {
+ 		/* This is a BIS connection, hci_conn_del will
+ 		 * do the necessary cleanup.
+@@ -5608,6 +5610,8 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
+ 				      struct hci_conn *conn, u8 reason)
+ {
++	hci_assert_lock_sync_held(hdev);
 +
- 	/* Mark HCI_CONN_CREATE_PA_SYNC so hci_update_passive_scan_sync can
- 	 * program the address in the allow list so PA advertisements can be
- 	 * received.
-@@ -7181,6 +7194,11 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 
- 	hci_update_passive_scan_sync(hdev);
- 
-+	if (!hci_conn_valid(hdev, conn)) {
-+		err = -ECANCELED;
-+		goto done;
-+	}
-+
- 	/* SID has not been set listen for HCI_EV_LE_EXT_ADV_REPORT to update
- 	 * it.
+ 	/* Return reason if scanning since the connection shall probably be
+ 	 * cleanup directly.
  	 */
-@@ -7192,6 +7210,11 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 			goto done;
- 	}
+@@ -5625,6 +5629,8 @@ static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
+ static int hci_connect_cancel_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 				   u8 reason)
+ {
++	hci_assert_lock_sync_held(hdev);
++
+ 	if (conn->type == LE_LINK)
+ 		return hci_le_connect_cancel_sync(hdev, conn, reason);
  
-+	if (!hci_conn_valid(hdev, conn)) {
-+		err = -ECANCELED;
-+		goto done;
-+	}
+@@ -5674,6 +5680,8 @@ static int hci_reject_sco_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ {
+ 	struct hci_cp_reject_sync_conn_req cp;
+ 
++	hci_assert_lock_sync_held(hdev);
 +
  	memset(&cp, 0, sizeof(cp));
- 	cp.options = qos->bcast.options;
- 	cp.sid = conn->sid;
-@@ -7221,6 +7244,8 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 				      0, NULL, HCI_CMD_TIMEOUT);
+ 	bacpy(&cp.bdaddr, &conn->dst);
+ 	cp.reason = reason;
+@@ -5693,6 +5701,8 @@ static int hci_le_reject_cis_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ {
+ 	struct hci_cp_le_reject_cis cp;
  
- done:
-+	hci_dev_unlock_sync(hdev);
++	hci_assert_lock_sync_held(hdev);
 +
- 	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.handle = cpu_to_le16(conn->handle);
+ 	cp.reason = reason;
+@@ -5706,6 +5716,8 @@ static int hci_reject_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ {
+ 	struct hci_cp_reject_conn_req cp;
  
- 	/* Update passive scan since HCI_PA_SYNC flag has been cleared */
-@@ -7268,8 +7293,12 @@ static int hci_le_big_create_sync(struct hci_dev *hdev, void *data)
- 	struct bt_iso_qos *qos = &conn->iso_qos;
- 	int err;
- 
--	if (!hci_conn_valid(hdev, conn))
-+	hci_dev_lock_sync(hdev);
++	hci_assert_lock_sync_held(hdev);
 +
-+	if (!hci_conn_valid(hdev, conn)) {
-+		hci_dev_unlock_sync(hdev);
- 		return -ECANCELED;
-+	}
+ 	if (conn->type == CIS_LINK)
+ 		return hci_le_reject_cis_sync(hdev, conn, reason);
  
- 	set_bit(HCI_CONN_CREATE_BIG_SYNC, &conn->flags);
+@@ -5730,6 +5742,8 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ 	bool disconnect = false;
+ 	struct hci_conn *c;
  
-@@ -7302,6 +7331,8 @@ static int hci_le_big_create_sync(struct hci_dev *hdev, void *data)
- 	if (err == -ETIMEDOUT)
- 		hci_le_big_terminate_sync(hdev, cp->handle);
- 
-+	hci_dev_unlock_sync(hdev);
++	hci_assert_lock_sync_held(hdev);
 +
- 	return err;
- }
+ 	switch (conn->state) {
+ 	case BT_CONNECTED:
+ 	case BT_CONFIG:
+@@ -6407,6 +6421,8 @@ static int hci_le_ext_directed_advertising_sync(struct hci_dev *hdev,
+ 	bdaddr_t random_addr;
+ 	u8 own_addr_type;
+ 
++	hci_assert_lock_sync_held(hdev);
++
+ 	err = hci_update_random_address_sync(hdev, false, conn_use_rpa(conn),
+ 					     &own_addr_type);
+ 	if (err)
+@@ -6474,6 +6490,8 @@ static int hci_le_directed_advertising_sync(struct hci_dev *hdev,
+ 	u8 own_addr_type;
+ 	u8 enable;
+ 
++	hci_assert_lock_sync_held(hdev);
++
+ 	if (ext_adv_capable(hdev))
+ 		return hci_le_ext_directed_advertising_sync(hdev, conn);
+ 
+@@ -6543,6 +6561,8 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
+ 	u8 data[sizeof(*cp) + sizeof(*p) * 3];
+ 	u32 plen;
+ 
++	hci_assert_lock_sync_held(hdev);
++
+ 	cp = (void *)data;
+ 	p = (void *)cp->data;
  
 -- 
 2.51.0
