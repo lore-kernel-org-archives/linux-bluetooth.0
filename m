@@ -1,85 +1,94 @@
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6BE310777
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Sep 2025 17:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758563389; cv=none; b=c30oAR/uwxjual/HBj2iw4NBIL8ncr1jj22RMMLqGOS5a6D1tNu8NcRwpxioybmlrnC5Bn5z8EFZJTJp53sVbSN56XXJkfwHsKBD2UDCnoZNdjb8Rj4UgxF+PtCsQUy3JZ9vXVlXhJ3dvhEZ+MzK2YOt6EWWyUXcCMdWicpdsOI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758563389; c=relaxed/simple;
-	bh=4F5TBMXar4Cc1GJddDqJOtbvhaXI4D/VkEDBimDiBxs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MEgUNrWIeGkaDT4nMkNiQvHuy5dR/8s/EhI1lLDrcWjMzydc37BJobVa/RzoKSHOlHYVKRRysN8JylFiO/h0G4hZGl/2mpBoOMnzR7k40zkzq8iy4+YpXSttHLHiN/3yrm9GnBkN4d5FL7IkD6Os373ZVGD5ZBBC89Ibv4AiN9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f7VO+2ps; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3ED313526
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Sep 2025 18:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758564696; cv=pass; b=GrwMFarG7yQ4+XoELJ8sSxy3j3IQQXZW3wj5sASt9XRas1UDixBdAOJa6rj54W0Y+9RxfSMib34eWtU8zkV0t3k8juLyPbey5nutHqjfVaPXknxcrLj9l0IcWdBiQMu1e2ViDn5+YJ+tVUeR0bPCE65cZy5nCkLAZvlo6Lqdr2o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758564696; c=relaxed/simple;
+	bh=jpuw9iX+EZA6yUHJBZ7CjZaRSuZSqm+frEdEJA5XKVg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XgzuJnopnPjy5sKt4sCANaTPBy46y+N/MRMZEVT5aqqpuXgr6/bdBwsbPHTIDifVieXQLKlNTXeP3mZ8PQHPv0Qyww9OLmFSl+jdY0v+VpthXH1lnElhkJXgqA41nwG5egOnx1jI7AuzGAkyrydM+NVVTRBEf5AuMD0JvamnCMs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=cDNNkwIg; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7VO+2ps"
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-ea5d7191a64so2572038276.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Sep 2025 10:49:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758563387; x=1759168187; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4F5TBMXar4Cc1GJddDqJOtbvhaXI4D/VkEDBimDiBxs=;
-        b=f7VO+2psOx36TL6KkXgOmnUeKDmKDG4QQDNEhGmYJFJkfz2OyCV6xKG/PZhHXH3RSz
-         KaT22x9M47KZa3OpH208e5lVJCWvWVHcKgYOXTFjBUAZ3VxOnlbfOyrpstuYSy6hcYqe
-         B4GL7DTianrGVE84om4ubZSq+LJu+BQGCRTKGMEKDXLVCYArlDwsZd8D71zzthqPB0Xz
-         TvrW6EnTN1kxgr6AHGFJ86LmD2++H60HuXEs4Y4rIkBo+8XFGPl3j1dlV8OFUIVurPBA
-         kk8W0pi5+/bAvnKVQS9Pv8KdpeqGy/sZV/g1fnOIr2TzFnhtlvun712UJCS5D0Qokgzy
-         5xhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758563387; x=1759168187;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4F5TBMXar4Cc1GJddDqJOtbvhaXI4D/VkEDBimDiBxs=;
-        b=L14gD2IRx/VKGYmtPDGiUuWELUo0JKXoIzBgUmpOdani3G0Aw0AEdiLx8y63nDy7zT
-         bE0n1DauqXWzRG7VCxQcQXD25Zev8ug2CVJyoaCH02TveGr44jZR3d1lihaB5CBb6ZI1
-         WYsTRSs4zZNQg0bmVmfsQwxOo784gVGS1ty9xwdMfCTTX+Alu0aaxv976HW0gk/xNqKZ
-         XtTIMqjtK+KQZMoiUSU794fEIpEXadnRUtZOLwmRjQwLapanY0r38UU5zGkc/XeBGwzc
-         Rv8nc3HgP72q9H2kMedOmP/yAGipPZENuJZJ8AtiK1mliOcW39YITMdoNx/xFwYiP1Q7
-         GHeA==
-X-Gm-Message-State: AOJu0Yz+t+JyHEdS1od5zscjzl920DAKDsTnFmomC7vAycQY4w0EyMI2
-	sBPlR08s9iblWVaQx024rxNmL7DVddY31zM6n2TsGqFfUL9wE96AK1aoZBr5K3ZatNHILoLbmf8
-	apEVt4hQ0N95bBOT9fi6XKo0UpbCv1HxIvaVu
-X-Gm-Gg: ASbGncu0QnVfFDz5dxcgNgj6Gps34A6tjPJQfo6PVOcU9kbGoD7Uh1NukJMb56w738q
-	DKCooJYZCjTqXX7yNjTv1iyDehfIcNZK3IY120OelYyMeN07RCK9qGI23Y2HgrHmnrMqsvi/eY7
-	yZ94Xz7IsUZT0FidD05G+ePaZnca5vtmVcdI2q+BBOWZgh4q2xMCKMWxzuY8sJE3mMxSQxR+G42
-	fEFubsH
-X-Google-Smtp-Source: AGHT+IFU9WoU061b33DEC5U1jirUjgFnWb2PizopyLlO+KNFuTnY1PSQh/CMP5gqF1hJQTvuMUU1TvIiqw++0b4Qf2M=
-X-Received: by 2002:a05:690c:2702:b0:74e:a5d3:d95 with SMTP id
- 00721157ae682-74ea5d3206amr47625007b3.22.1758563386556; Mon, 22 Sep 2025
- 10:49:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="cDNNkwIg"
+Received: from monolith.lan (unknown [193.138.7.138])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4cVrlf0pT0z49QMJ;
+	Mon, 22 Sep 2025 21:11:25 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1758564686;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VnyqrQQVB17l3OF2vl7cQZzHv6Zj/EhQElE0vYlv0AQ=;
+	b=cDNNkwIg/wtWRCPudYhS64Uvd8mU61AWFGynT49YrAsw4wGuuk+m9ergyyxq4TFGmVi2rk
+	rXumWWctfJuTxd4qGYPP9b2Bu6xr6a/q1RY2hO8xAAvLbiWEAOjDahKe1pkkv3Nz7Eq5F5
+	T7GUoo3506RLF0jwuyD+tO9GfNhagebc412RX5KCtBdtCVfG5LAwDKvHFGFw6Zbe3slJqr
+	n1ftCT7iGZ/o8I8z8DhRryhtxI58tUmBCrV1uyIdgDDR9mlUNECWZ2S8/ph0temdEBvdhc
+	FQsSDu1gvR8F8FCtINCFW6uiJXO0CRRdO/2HFlozdIqhckoSAVVOrZ+QZaJ8hA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1758564686;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VnyqrQQVB17l3OF2vl7cQZzHv6Zj/EhQElE0vYlv0AQ=;
+	b=W2pecwFHm7BJGQ0PyEAs63JOCm5hogN9J+6YFjDs/A5U+HMc6tzKhcOzXzWepQ9tdrqi6K
+	Qw3kh7R+4PnYaUW537M4Bv01tRqNl0gHfFYlp0LUdYxm5bEgINRYkPGMR/QbY1BU/XNFAa
+	OACFFrVVxGWExci7KkPjQJIOE+l/545zo2R/zIgL9JTdV8D12n5KcLR0JW6zAMZRcMv+zz
+	OQgmqNAB1s7V/lOO9e3ZDFQcGTGHR0788B5Rlc8tuKEbn8jHWaOQeACLDB22V5Y8NdSWfn
+	zMt3twi0gk8r1lMQ3HSAJIi+zWwd4ZkKLuihdSKB+cpOWIoriiFnevUNc4Y4wA==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1758564686; a=rsa-sha256;
+	cv=none;
+	b=rsiryBG+fPukYvVpZs/AW+YkoqCYJKCuYefjc/D+zQcEzJREc+4/m2y6cLKZk3sNo7ClKe
+	ZozaF1+7xKeVoKU2bCZd33qkNnZwqV7N45BDm0PleHgvVlIG/CnH/UWes6X661vk7KOjCI
+	48B2B+WKmkWRxpav7zY4x42S0S6qRbEueuEhWYZAxYmoBwXGBQJPrgVi/D368DTXhPlwSr
+	eqztXaPMr0EM14L0G8JYpz/cJjW/gnAusC69gL06sKjJvPaeKRVnjEB6kf+xwHGGPA7y0G
+	KSaAZJw4nT5CKw+eYgZA0nBuSygUQ0w5g6LRWDmASuDCS8nICnbtfoanh7dTDQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH 1/2] Bluetooth: ISO: free rx_skb if not consumed
+Date: Mon, 22 Sep 2025 21:11:21 +0300
+Message-ID: <0c01df0dbdda659b4b75e5422f6f54bb8cf7f169.1758564480.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <83RZ2T.A5U3789G2QAM2@gmail.com>
-In-Reply-To: <83RZ2T.A5U3789G2QAM2@gmail.com>
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Date: Mon, 22 Sep 2025 19:49:34 +0200
-X-Gm-Features: AS18NWCKWt2s_MKe6oHqjA3RjEB4m5T1he6JAVhQtA9gFyK6dcpy4CrwUGTScl8
-Message-ID: <CAGFh027M9zaPu6Z8n+YNcEbAz0+emMEsAwSmiKVBcSv3NAUg0Q@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: btusb: Check for unexpected bytes when
- defragmenting HCI frames
-To: Julian <hattshire@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-> It initially froze while scanning for more than 30 seconds, but after a
-> little bit of USB Hokey-Pokey, it works better now. However, when using
-> headphones, there is some choppiness in the audio during scanning, as
-> if it might freeze again.
+If iso_conn is freed when RX is incomplete, free any leftover skb piece.
 
-This patch is only for the dongle initialization failure. There might
-be some other issues with this chip. I guess that when this patch will
-land in the mainline (if it will) we might see more bug reports from
-people trying to actually use it. It's rather impossible that this
-chip does not have any other quirk :) However, I do not work for
-Ugreen or Barrot so please do not expect that I will fix any of such
-issues. Anyway I might submit patches fixing things related to my use
-cases (if free time will allow).
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
+ net/bluetooth/iso.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 5c68c0ea7d97..d63d4d6f874c 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -111,6 +111,8 @@ static void iso_conn_free(struct kref *ref)
+ 	/* Ensure no more work items will run since hci_conn has been dropped */
+ 	disable_delayed_work_sync(&conn->timeout_work);
+ 
++	kfree_skb(conn->rx_skb);
++
+ 	kfree(conn);
+ }
+ 
+-- 
+2.51.0
+
