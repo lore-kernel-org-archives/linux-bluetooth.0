@@ -1,122 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-g3-154.zohomail360.com (sender4-g3-154.zohomail360.com [136.143.188.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672F73101DF;
-	Tue, 23 Sep 2025 21:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758664116; cv=none; b=pPCaZiJF4AJQaCd5KXIpssD61TMyDHtVyQ6qE1iIKYZnUHGsKfsy4QcWOMeUucxW594eVrTdDtIbWeshH7OYIzTtJk3ZqVZ2K0WIYYto9TaNoCIyLkXMs2WVHDtfwPue4wHNIggN3GC/Os8I+8GU9KQDsuw4O7qGQAFDE+UNAEc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758664116; c=relaxed/simple;
-	bh=ynSU1sjv/APhbJJAUkW92GPfKCAkcMDj27Y78DB5+JA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DLEAptKn1blAZ14XCaG1/zINag3OEYY9yQFCarRjch0zZaLT91bD344H2sXHNb1vDQO/3G1kmD4xR+Y47rxVj1a2KTXO6hjhNtVC96fRekh/nnokIRu8NiMd/5DaHeMnueTV9nwvNILfGLO5ezpjQPQY0X2k9ZLSDLjIvX5Np7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPtHV0im; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF334194A59
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Sep 2025 00:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.154
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758674104; cv=pass; b=NbTaIGBXxiPAc68jCSSA+FH/IBlsu3C4Z3yoOBH/hA4Os6t4TcVwdeFnDrFoaWNzLWLMn3uOFjB3JCYAtJ9VvCo7vkC+i7jo5FQQZblHSjgpQqwjztWnT/rQ80PlUMwKsEjKz5RxR2ja6LWHxMS/6uxLj6zLxMVVNR0mVwWqM5c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758674104; c=relaxed/simple;
+	bh=QITABnn7vkey7WTQFSlE1DTizBL6lOq+4IqZ1t1vC4Q=;
+	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type; b=blkUtjRJ7BfdmL8lahbm4N4+GsRcMbfh/xdo2v9uc8hbiQeD11BNU7i02mjYnM/HmuxF+n596DD1d/cdy/Px5JUjlBCif/N+DlalOJNgrJM9Jk/F+rmGERXLdPkDQWbRJ2LOsbewULoVblX+cZB47FqPaFhrMkLvgkkq14qmABs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=maguitec.com.mx; spf=pass smtp.mailfrom=bounce-zem.maguitec.com.mx; dkim=pass (1024-bit key) header.d=maguitec.com.mx header.i=@maguitec.com.mx header.b=GAXu1BPd; arc=pass smtp.client-ip=136.143.188.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=maguitec.com.mx
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce-zem.maguitec.com.mx
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPtHV0im"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B63F5C4CEF7;
-	Tue, 23 Sep 2025 21:48:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758664115;
-	bh=ynSU1sjv/APhbJJAUkW92GPfKCAkcMDj27Y78DB5+JA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gPtHV0imNsUTP1wQzviVh4zQi3BxZ5/9R0MrNEIhtqcEaB/XUpHIKkKeRanyeehY0
-	 ievQlqwU2fZZUxcrIHQrV7w6FvObgnmnDdd72mY1KwpPiDV5r/F0fQ9+ksRhi/Xr8F
-	 uWlhIVqm6YSkGT2vYircLvEly2pCXJIHPJF6FMjpkEzH1H2herK4Njygc3EfE0lrL3
-	 ozpyW40XNqKw7fH7eq/7gsEIlJFf2Vr/ijD2RX5ii7SfLIKdyN2mPOP4BKWK/XqoB6
-	 yAYE6NoqRCOrl51Qu9pWtpQJ6IvHxKM1uhTLUVw8OMgZxIgorvSJ1zgyjRohNZMKx1
-	 8GX+dWpLaH69g==
-Date: Tue, 23 Sep 2025 16:48:34 -0500
-From: Rob Herring <robh@kernel.org>
-To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
-	andrew-ct.chen@mediatek.com,
-	angelogioacchino.delregno@collabora.com, broonie@kernel.org,
-	chunkuang.hu@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
-	dmitry.torokhov@gmail.com, edumazet@google.com,
-	flora.fu@mediatek.com, heiko@sntech.de, houlong.wei@mediatek.com,
-	jeesw@melfas.com, kernel@collabora.com, krzk+dt@kernel.org,
-	kuba@kernel.org, lgirdwood@gmail.com, linus.walleij@linaro.org,
-	louisalexis.eyraud@collabora.com, luiz.dentz@gmail.com,
-	maarten.lankhorst@linux.intel.com, marcel@holtmann.org,
-	matthias.bgg@gmail.com, mchehab@kernel.org,
-	minghsiu.tsai@mediatek.com, mripard@kernel.org,
-	p.zabel@pengutronix.de, pabeni@redhat.com, sean.wang@kernel.org,
-	simona@ffwll.ch, support.opensource@diasemi.com,
-	tiffany.lin@mediatek.com, tzimmermann@suse.de,
-	yunfei.dong@mediatek.com, devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-sound@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 00/12] MediaTek dt-bindings sanitization (MT8173)
-Message-ID: <20250923214834.GC91441-robh@kernel.org>
-References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
+	dkim=pass (1024-bit key) header.d=maguitec.com.mx header.i=@maguitec.com.mx header.b="GAXu1BPd"
+ARC-Seal: i=1; a=rsa-sha256; t=1758674101; cv=none; 
+	d=us.zohomail360.com; s=zohoarc; 
+	b=Uw/dWri560u5sZV2mQPWOzVqi74s7Yta3Y0N16Wb2s5bx8gRPbH7H49iHKQDU4Hnm3dSMhJjfsjWVwr6IiBqls+Te3UOWpVcNqUqel44C6ITH0IsfUcwTX4NtQw/Ujlf+UpEr5Zg1krAQcyoUZQHEh1poh8TEHP/ZR9B1ynMhEE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=us.zohomail360.com; s=zohoarc; 
+	t=1758674101; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:MIME-Version:Message-ID:Reply-To:Reply-To:Subject:Subject:To:To:Message-Id:Cc; 
+	bh=QITABnn7vkey7WTQFSlE1DTizBL6lOq+4IqZ1t1vC4Q=; 
+	b=ryzGKfwdP8W1c3Wi12bpXk7LF5xAK6LZoJnXTz2OgKk0M2YQ9DreZ1DFSby5XeYrlb6SAGpeBpHWQwVYBF+f3iho32b5hJNway52kgcdjO6B+MQfrB7/u/Gbb4odWzuS66gQTxiYdm9qLs4vq9xXzoM4O/wUQiZ8TLDFWap2Td8=
+ARC-Authentication-Results: i=1; mx.us.zohomail360.com;
+	dkim=pass  header.i=maguitec.com.mx;
+	spf=pass  smtp.mailfrom=investorrelations+9ada6fd0-98d8-11f0-ace3-525400721611_vt1@bounce-zem.maguitec.com.mx;
+	dmarc=pass header.from=<investorrelations@maguitec.com.mx>
+Received: by mx.zohomail.com with SMTPS id 1758671653599526.2888629548822;
+	Tue, 23 Sep 2025 16:54:13 -0700 (PDT)
+DKIM-Signature: a=rsa-sha256; b=GAXu1BPdkzWa329PH7QQSfkwTrMVzwttAu9rzxRWCiXT5lxFwT+T2S8j9M/9gO1psrUh0uJY0eddjkMMo7IVpEFrnLE8KvGFG5Eb+7f0pENoSO8ebc1Vt7LoVVO+EklCDJ6ubOx8MWJqzCdfxydYETG+aL8V5qSgLIj9BLpEUkY=; c=relaxed/relaxed; s=15205840; d=maguitec.com.mx; v=1; bh=QITABnn7vkey7WTQFSlE1DTizBL6lOq+4IqZ1t1vC4Q=; h=date:from:reply-to:to:message-id:subject:mime-version:content-type:content-transfer-encoding:date:from:reply-to:to:message-id:subject;
+Date: Tue, 23 Sep 2025 16:54:13 -0700 (PDT)
+From: Al Sayyid Sultan <investorrelations@maguitec.com.mx>
+Reply-To: investorrelations@alhaitham-investment.ae
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <2d6f.1aedd99b146bc1ac.m1.9ada6fd0-98d8-11f0-ace3-525400721611.19978ffc74d@bounce-zem.maguitec.com.mx>
+Subject: Thematic Funds Letter Of Intent
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+content-transfer-encoding-Orig: quoted-printable
+content-type-Orig: text/plain;\r\n\tcharset="utf-8"
+Original-Envelope-Id: 2d6f.1aedd99b146bc1ac.m1.9ada6fd0-98d8-11f0-ace3-525400721611.19978ffc74d
+X-JID: 2d6f.1aedd99b146bc1ac.s1.9ada6fd0-98d8-11f0-ace3-525400721611.19978ffc74d
+TM-MAIL-JID: 2d6f.1aedd99b146bc1ac.m1.9ada6fd0-98d8-11f0-ace3-525400721611.19978ffc74d
+X-App-Message-ID: 2d6f.1aedd99b146bc1ac.m1.9ada6fd0-98d8-11f0-ace3-525400721611.19978ffc74d
+X-Report-Abuse: <abuse+2d6f.1aedd99b146bc1ac.m1.9ada6fd0-98d8-11f0-ace3-525400721611.19978ffc74d@zeptomail.com>
+X-ZohoMailClient: External
 
-On Thu, Sep 11, 2025 at 12:09:49PM -0300, Ariel D'Alessandro wrote:
-> This patch series continues the effort to address Device Tree validation
-> warnings for MediaTek platforms, with a focus on MT8173. It follows the
-> initial cleanup series by Angelo [0].
-> 
-> Similarly to the ongoing MT8183 work done by Julien Massot, this patchset
-> eliminates several of the remaining warnings by improving or converting DT
-> bindings to YAML, adding missing properties, and updating device tree files
-> accordingly.
-> 
-> [0] https://www.spinics.net/lists/kernel/msg5780177.html
-> 
-> Changes in v2:
-> * Wrapped commit messages to 75 columns line wrap.
-> * Replaced "YAML" by "DT schema" in patches subject and content.
-> * mt8173-mdp: Fixed properties: compatible, clocks, iommus and
->   mediatek,vpu.
-> * mt8173-vpu: Fixed line wrap. Dropped memory-region property description.
-> * mediatek,mmsys: Dropped patch as it's not a binding issue.
-> * mediatek,od: Rewrote commit log with details on DT schema users missing
->   the related property. Rewrote mediatek,gce-client-reg property.
-> * mediatek,ufoe: Rewrote commit log with details on DT schema users missing
->   the related property. Rewrote mediatek,gce-client-reg property.
-> * marvell,sd8897-bt: Moved to net/bluetooth/. Added missing ref to
->   bluetooth-controller.yaml. Dropped example. Updated reference in another
->   file. Minor fixes in properties.
-> * mediatek,mt8173-rt5650: Dropped unnecessary quotes and unused label.
-> * dlg,da9211: Dropped enable-gpios description. Rewrote generic example
->   node names. Minor fixes in properties.
-> * melfas,mip4_ts: Dropped unnecessary quotes. Added "active high" to
->   ce-gpios property description.
-> * mediatek,jpeg: Dropped patch as it doesn't apply.
-> 
-> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-> 
-> Ariel D'Alessandro (12):
->   dt-bindings: media: Convert MediaTek mt8173-mdp bindings to DT schema
->   dt-bindings: media: Convert MediaTek mt8173-vpu bindings to DT schema
->   dt-bindings: net: Convert Marvell 8897/8997 bindings to DT schema
->   dt-bindings: ASoC: Convert MediaTek RT5650 codecs bindings to DT
->     schema
->   dt-bindings: display: mediatek,od: Add mediatek,gce-client-reg
->     property
->   dt-bindings: display: mediatek,ufoe: Add mediatek,gce-client-reg
->     property
->   arm64: dts: mediatek: mt8173: Fix mt8173-pinctrl node names
->   dt-bindings: pinctrl: mt65xx: Allow gpio-line-names
->   dt-bindings: regulator: Convert Dialog DA9211 Regulators to DT schema
->   arm64: dts: mediatek: mt8173-elm: Drop unused bank supply
->   dt-bindings: soc: mediatek: pwrap: Add power-domains property
->   dt-bindings: input: Convert MELFAS MIP4 Touchscreen to DT schema
+To: linux-bluetooth@vger.kernel.org
+Date: 24-09-2025
+Thematic Funds Letter Of Intent
 
-As we're close to the merge window, I applied patches 2, 8, and 11.
+It's a pleasure to connect with you
 
-Rob
+Having been referred to your investment by my team, we would be=20
+honored to review your available investment projects for onward=20
+referral to my principal investors who can allocate capital for=20
+the financing of it.
+
+kindly advise at your convenience
+
+Best Regards,
+
+Respectfully,
+Al Sayyid Sultan Yarub Al Busaidi
+Director
