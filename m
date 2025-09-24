@@ -1,180 +1,200 @@
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540512D5923
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Sep 2025 09:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8513B301477
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Sep 2025 11:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758705929; cv=none; b=HF+TG63ZI23DIdY15zxwf3zcSxmriwPB5mVEaK/FAxF0gneIdgg0ADj2u12Bmx+GYCIoX02v+P9ZLyCauICVvf2EyjAodWdMeiDGtzfC0xD69Wb+PuT01vIKyU+88R49L1TWTOFXBUYKZldeAo8Xdl5MUhurlhSjmp3U2797ip8=
+	t=1758715172; cv=none; b=nYNLPB7Aj30h9AxXH5jwUZcjp4alQRWiMwMFiLIoZrBBwkIaQ2MAuwXEl3aZuYty235sEP7/5dcBCIsUXIXViQfVRrohJHFdMmSnl9+BhU6BAEVmQTqRSEKZuL0rqJ0z0xneOPMA6owt8JCEKUgyUNA3f2Q/7wRWuoz4p5dkXAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758705929; c=relaxed/simple;
-	bh=pS+IlvLEaIJ4tBBXKqLLbtg8/zzsidU12L3xTeivLQY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fuw2ZO2zZvjNIO4Z8YINqdKaPVO6UsG+XYOyC1lejZ8SGNwUE07NT7mFrr4qWIHEHsKgkjgCiRyDJWg5LczIwRYTsQ0iHleYCuEJJhgXntnhogKWq2zVD/uD1lETle6FbBNELvJqUMxr+20HSpjLdEy+yltmQ0qMKskBWRN8PFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hxM4ZsY0; arc=none smtp.client-ip=209.85.219.175
+	s=arc-20240116; t=1758715172; c=relaxed/simple;
+	bh=RhnZDstkSyn9NCjV5BXAuD2SyORPxGwmKdcF/ZwFcK0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=QTYyc0ymQ8D3niOaFpY3SafeXDKKdGB3oVbVKNBfGFyoFDpvqhn3O/UXgJ9NwsIqL9C13+k2F5xM66pawWw9Wg4bmoa3sGaexvZWWvS8smOqSuBrOkCuByJPUHVkVE+rI2fux/k/XfWAOBlKBgACfMsQAvI29tn6GZAc/2gbj+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R8WGmGFi; arc=none smtp.client-ip=209.85.128.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxM4ZsY0"
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-ea63e86b79aso4999076276.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Sep 2025 02:25:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R8WGmGFi"
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-71d603b674aso45984057b3.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Sep 2025 04:59:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758705923; x=1759310723; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xXhsS4TYQDsQipG2bqEWA0Eq2yU/6y2r8vtgidiAyQw=;
-        b=hxM4ZsY0zUsVz4eGDPkHTpxow0CjiXfYlrmCkCHPxFSleH0VLs211s9q6TsLLmLUzc
-         x+fxDt79x7S2cYDS3k0y42xC9xf163D5UMoMnKr2KmtCd08OlMOc0hicJFYzVV73lb5H
-         PSBdKvw2xuKD9LLV8o5RlZVHkEUwnXQGWl5d1q6V1N7QXigknrQaR7RbU2O/BdFvdEvh
-         w2rkzgUAM5VdaR+QsRDDWXTqWTfZQnI2sSQrW6a7MxwNE+JkxE4geeJHP05fil1Ei8sr
-         7KlBGbFERMgBKumREjexFJR3FwRbUSwGWDnDsglk81H2e3nwi1j+QPFdF4QW+sOpx62H
-         xkEg==
+        d=gmail.com; s=20230601; t=1758715165; x=1759319965; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UKk+fABFWQAXetRztc6X+KLn2zwUXlziXeAusSSGig4=;
+        b=R8WGmGFip7KpjsQDbVoaa2EZF/ZeMNl4/HfSAN6/HtLsPzEOgIWMyCAvoNznizECjD
+         Hbb7mW0OgxL4XVnH7agc0etA1Qtu9g6T50FTZtXHIcOlHEKUrMZp/LLTOTs/4qgAaiwd
+         dx++Y0c0M5nMjeoHy7v3BbyMVhc+ZyDNlKoHokALHUp8ZsTUatnyiX2pK00nYc4gm0B9
+         mspw8gly9JPvgKcC9rbHeE9+62P2cZ7VsDeqHUY/Ci1FmwkJH9Vw/DCwJRDFVvp1S4T0
+         oFoQvgIUWhnnpx4qLTXfJ5L09z3bQpsd9jGwaA1uY8y6l32AlqdK01SjowE2Ror3nrUh
+         /dfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758705923; x=1759310723;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xXhsS4TYQDsQipG2bqEWA0Eq2yU/6y2r8vtgidiAyQw=;
-        b=j0FaY7AysltJ2vPaw4qPUVB//hMd+VyjiWxu/2JLmcLOpoX/7azd//k33JzLN4U1lu
-         zRprgNwGoQk39DbtAY/J3lTSbVpURiA11BGyEvQpGsHgbOeRdwhX57fFJ573gAy43mg7
-         VeJl7PLq3icyCiAs5BR4lSQ3Nox5522KTXEDXt0jzqtqZ00leIVVEve6+p9nOe4/O1Bv
-         A2u8NftNS27Ds74oVhWgKEnkMF2bFBn2WR/IICjTABTuhYyfldtkzZil7AZlRafxXxn1
-         gekgEawSqpuFipG8oVdQ2hJ5PZpKXa8thf+kxw0ZxS/KdtlIpRjkADSsUpnU1JzuWnaL
-         UTpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUW/9Xx5tmGbSsiCPWQ3na5aOrRIreOmYcBaXi3xqQeXPEmsMH/pzSHncZzMaLgqz00GDsnhOoiaHBXJoiLlmU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRTCzu4QGNebrnSMBFHnRIp5SmUpRBGkhtTructbOd4oiGhYff
-	h7/ham1P69P4AM79ku03/sfb58c5wMJTNdrS4k9L0c5/oyNSSa0RUzifvMv3R0P12jIyKEqZ5vZ
-	zjSJz80OEKipayCJtYSV7CTBAI3IdbUU=
-X-Gm-Gg: ASbGncs2Zn2MVQaVTWiIKdjCbnFOXuiVTBdTEAdcUDuQjcB0X46N+Mko4BAtmzzHqW1
-	FTnEl15UJT+/eBAQnMhCat65LWhdnSyQxjsU/Nax1lLhrjh9sozHyis/iGldKCArlU9hwUPDGDT
-	NixVxXohQumEnjYtpe+pSCNGu/J0ZgNg1ahw1QCGictscRs9uF9TrdS9Coe798JnWVDGyKNa0Ij
-	gj8+Q==
-X-Google-Smtp-Source: AGHT+IG5RI+CkthhygK6O+jFB5eU/qgMHmvyydgjwwNBaUBcmyupjXedBsilOUmrjVzf6mx+TypvmUbYWwiicAaFSeU=
-X-Received: by 2002:a05:6902:120b:b0:eb3:782c:66b1 with SMTP id
- 3f1490d57ef6-eb3782c691emr761557276.21.1758705922959; Wed, 24 Sep 2025
- 02:25:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758715165; x=1759319965;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UKk+fABFWQAXetRztc6X+KLn2zwUXlziXeAusSSGig4=;
+        b=eMbq8+phW0Rmm18gKBAH5CaqjoUt+f9VYY5V1K3I1elNnHYr63ljxFez0Bw/WehuEC
+         fnO0Vcr906JZxWn7Tzl9G8D2dJU3oZveAL2kIyzckb3dbTk+QQz6LkDm+39lmCDXSRct
+         VAWdpRRTOGF11cbQqJS/xFIwhwMm/En3or0VQSeY0kC7zRxN9dw80JN8f75vLVCXMvsY
+         4uK9iZ09WSwxCLV3/WUkv+XIYA79U6dJr1Jt5iAXqsyIn0zlacbPRPVIQs/gkhoqMkYA
+         uUUuhZeqk+8tlTYuTikaFZCIDXz2/6kg8aGY63iwqek1ptty12f0LcSCull/5p3mosKN
+         VQDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUohLI/GSTQuWTkviuZj+BKzEUtZ4wuwCk8MtJXf14eDGi3IOqfkxpqXxdmZGRhbCmzTWbq7/WfHfA7fEfhUgs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz467ePqQeueXukDWnjnoBq/wClfUY+nfZRW9GRwdlzue4YdUwt
+	HUTmvTpOHHuPEcOcKjNdDHyqnabZRfzNlh1uN07j/Dnkf+qocQKnujrhz4igTvAsYHWnjXzdh0h
+	QmWE2kCwAd6RNYrcdQFqSg/Y27TS8UX4=
+X-Gm-Gg: ASbGncvKrxx5+Qi7A+9szNe3Tq4tgVstchnw9y/smYux4n30WtAGVP4HdS0tkHo/tBg
+	L+UyUMHN1m6baFpcSlalb//DRQTXo/zjfvRtcpYLRXKQecfLLSVxO/STzszOoPZILXezADhd+ri
+	tlMvjFYbnVn6IDBPD8zv8QR63/tTA/4351TIlDLZ5cdg9z/cYxQ37hJP6iQ7kWR7pmty2yzx3SI
+	870Mg==
+X-Google-Smtp-Source: AGHT+IGq9gXJm3DdUgOwDnFVgjubj0wrxcJoEjbl0tGpFewKUqC+l6hwMClNtpIpXyR+PClD6Jn5VPhTGcTKhWmoAbU=
+X-Received: by 2002:a05:690c:88f:b0:732:41ef:4025 with SMTP id
+ 00721157ae682-758a5a541cdmr61248997b3.41.1758715165291; Wed, 24 Sep 2025
+ 04:59:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFRLqsUm4M2HTQuO7ORXVE4tScuSTjhjeAVek-7JTBgb9i3wrQ@mail.gmail.com>
-In-Reply-To: <CAFRLqsUm4M2HTQuO7ORXVE4tScuSTjhjeAVek-7JTBgb9i3wrQ@mail.gmail.com>
 From: Cen Zhang <zzzccc427@gmail.com>
-Date: Wed, 24 Sep 2025 17:25:11 +0800
-X-Gm-Features: AS18NWCBKCgMedF-9O18pbVUzamgu5CuffRutkm7TCJjhDTyaUIOmSLWoJWAw5w
-Message-ID: <CAFRLqsVNSj=MCNWVsoXA335LAhvz=oELZi8kg+yFnwWW9A3jrg@mail.gmail.com>
-Subject: Re: [BUG] Bluetooth: hci_sync: Fix race in hci_cmd_sync_dequeue_once
- causing list corruption GPF
+Date: Wed, 24 Sep 2025 19:59:13 +0800
+X-Gm-Features: AS18NWBcb6DXzUV94H3EtOhThJrlFt8J6Cv6Jc4lZR-D2PB6v1LNuhmrfZogChw
+Message-ID: <CAFRLqsVv0R282+xQE4sRM+Tkb0=J_s4Xi0N0K2Cvz++T9fHAPw@mail.gmail.com>
+Subject: [BUG] Bluetooth: race in hci_cmd_sync_dequeue_once cause list corrup
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, johan.hedberg@gmail.com, marcel@holtmann.org
-Cc: linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, 
-	zhenghaoran154@gmail.com, r33s3n6@gmail.com, linux-bluetooth@vger.kernel.org, 
-	"gality369@gmail.com" <gality369@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+Hi maintainers,
 
-Apologies for the previous mail =E2=80=94 the bug report formatting was not=
- correct.
+I hit a crash in the Bluetooth subsystem while running syzkaller on
+v6.17-rc5 (commit e5bbb70171d1). The problem seems to be a race
+in hci_cmd_sync_dequeue_once() that leads to list corruption.
 
-Sorry for the noise and thank you for your understanding.
+hci_cmd_sync_dequeue_once() does:
+  (1) hci_cmd_sync_lookup_entry()  // lock/unlock, return entry
+  (2) hci_cmd_sync_cancel_entry()  // re-take lock, list_del()/kfree()
+
+Between (1) and (2), the worker thread (hci_cmd_sync_work()) can:
+  lock cmd_sync_work_lock
+  list_del() the same entry
+  unlock
+
+This leads to a double list_del and wild memory access.
+
+The c reproducer:
+https://github.com/zzzcccyyyggg/Syzkaller-log/blob/main/hci_cmd_sync_dequeue_once/repro.c
+
+The detail KASAN report as follows:
+
+==================================================================
+BUG: KASAN: slab-use-after-free in
+hci_acl_create_conn_sync+0x134a/0x16e0 net/bluetooth/hci_sync.c:6861
+Write of size 2 at addr ffff8881199b0038 by task kworker/u17:0/74
+
+CPU: 2 UID: 0 PID: 74 Comm: kworker/u17:0 Not tainted
+6.17.0-rc5-ge5bbb70171d1-dirty #20 PREEMPT(voluntary)
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: hci0 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0xca/0x130 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0x171/0x7f0 mm/kasan/report.c:482
+ kasan_report+0x139/0x170 mm/kasan/report.c:595
+ hci_acl_create_conn_sync+0x134a/0x16e0 net/bluetooth/hci_sync.c:6861
+ hci_cmd_sync_work+0x798/0xaf0 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0x7a8/0x1030 kernel/workqueue.c:3319
+ worker_thread+0xb97/0x11d0 kernel/workqueue.c:3400
+ kthread+0x3d4/0x800 kernel/kthread.c:463
+ ret_from_fork+0x13b/0x1e0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Allocated by task 60621:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:388 [inline]
+ __kasan_kmalloc+0x72/0x90 mm/kasan/common.c:405
+ kmalloc_noprof include/linux/slab.h:905 [inline]
+ kzalloc_noprof include/linux/slab.h:1039 [inline]
+ __hci_conn_add+0x647/0x51d0 net/bluetooth/hci_conn.c:949
+ hci_conn_add_unset net/bluetooth/hci_conn.c:1061 [inline]
+ hci_connect_acl+0x650/0xe60 net/bluetooth/hci_conn.c:1672
+ hci_connect_sco+0x61/0x1c90 net/bluetooth/hci_conn.c:1734
+ sco_connect net/bluetooth/sco.c:339 [inline]
+ sco_sock_connect+0x638/0x1ed0 net/bluetooth/sco.c:658
+ __sys_connect_file net/socket.c:2086 [inline]
+ __sys_connect+0x277/0x350 net/socket.c:2105
+ __do_sys_connect net/socket.c:2111 [inline]
+ __se_sys_connect net/socket.c:2108 [inline]
+ __x64_sys_connect+0x7a/0x90 net/socket.c:2108
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd2/0x200 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 76:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:576
+ poison_slab_object mm/kasan/common.c:243 [inline]
+ __kasan_slab_free+0x41/0x50 mm/kasan/common.c:275
+ kasan_slab_free include/linux/kasan.h:233 [inline]
+ slab_free_hook mm/slub.c:2428 [inline]
+ slab_free mm/slub.c:4701 [inline]
+ kfree+0x189/0x390 mm/slub.c:4900
+ bt_link_release+0x49/0x60 net/bluetooth/hci_sysfs.c:16
+ device_release+0x9c/0x1c0
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x16f/0x270 lib/kobject.c:737
+ hci_conn_del_sysfs+0x1e2/0x380 net/bluetooth/hci_sysfs.c:62
+ hci_conn_cleanup net/bluetooth/hci_conn.c:173 [inline]
+ hci_conn_del+0x1f91/0x37a0 net/bluetooth/hci_conn.c:1211
+ hci_conn_failed+0x662/0x820 net/bluetooth/hci_conn.c:1314
+ hci_conn_complete_evt+0xf2b/0x3330 net/bluetooth/hci_event.c:3215
+ hci_event_func net/bluetooth/hci_event.c:7569 [inline]
+ hci_event_packet+0x17cd/0x2da0 net/bluetooth/hci_event.c:7623
+ hci_rx_work+0x982/0x2210 net/bluetooth/hci_core.c:4071
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0x7a8/0x1030 kernel/workqueue.c:3319
+ worker_thread+0xb97/0x11d0 kernel/workqueue.c:3400
+ kthread+0x3d4/0x800 kernel/kthread.c:463
+ ret_from_fork+0x13b/0x1e0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+The buggy address belongs to the object at ffff8881199b0000
+ which belongs to the cache kmalloc-4k of size 4096
+The buggy address is located 56 bytes inside of
+ freed 4096-byte region [ffff8881199b0000, ffff8881199b1000)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1199b0
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+anon flags: 0x200000000000040(head|node=0|zone=2)
+page_type: f5(slab)
+raw: 0200000000000040 ffff888100043040 0000000000000000 dead000000000001
+raw: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
+head: 0200000000000040 ffff888100043040 0000000000000000 dead000000000001
+head: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
+head: 0200000000000003 ffffea0004666c01 00000000ffffffff 00000000ffffffff
+head: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff8881199aff00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff8881199aff80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff8881199b0000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                        ^
+ ffff8881199b0080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8881199b0100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+Thanks for taking a look.
 
 Best regards,
 Cen Zhang
-
-Cen Zhang <zzzccc427@gmail.com> =E4=BA=8E2025=E5=B9=B49=E6=9C=8824=E6=97=A5=
-=E5=91=A8=E4=B8=89 17:22=E5=86=99=E9=81=93=EF=BC=9A
->
-> hci_cmd_sync_dequeue_once() used to: (1) call
-> hci_cmd_sync_lookup_entry() which takes and releases
-> cmd_sync_work_lock, returning a raw pointer to the entry (2) later
-> call hci_cmd_sync_cancel_entry() (re=E2=80=91taking the lock) and
-> list_del()/kfree() the same entry
->
-> Between (1) and (2) the cmd_sync worker thread (hci_cmd_sync_work())
-> can concurrently:
->
-> lock cmd_sync_work_lock
-> list_del() and remove the same entry
-> unlocked
->
-> So the list entry was accessed after it had already been deleted,
-> leading to a wild memory access.
-> The detailed stack trace is shown below.
->
-> Oops: general protection fault, probably for non-canonical address
-> 0xff7aaf8000000004: 0000 [#1] SMP KASAN PTI
-> KASAN: maybe wild-memory-access in range [0xfbd59c0000000020-0xfbd59c0000=
-000027]
-> CPU: 0 UID: 0 PID: 323 Comm: kworker/u17:6 Not tainted
-> 6.17.0-rc5-ge5bbb70171d1-dirty #21 PREEMPT(voluntary)
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/0=
-1/2014
-> Workqueue: hci11 hci_conn_timeout
-> RIP: 0010:__list_del include/linux/list.h:195 [inline]
-> RIP: 0010:__list_del_entry include/linux/list.h:218 [inline]
-> RIP: 0010:list_del include/linux/list.h:229 [inline]
-> RIP: 0010:_hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:647 [inline=
-]
-> RIP: 0010:hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:851 [inline]
-> RIP: 0010:hci_cmd_sync_dequeue_once+0x660/0x950 net/bluetooth/hci_sync.c:=
-870
-> Code: c6 fc 48 8b 03 48 89 44 24 28 4c 8d 78 08 4d 89 fe 49 c1 ee 03
-> 48 b9 00 00 00 00 00 fc ff df 4d 8d 24 0e 4c 89 e0 48 c1 e8 03 <0f> b6
-> 04 08 84 c0 0f 85 4d 02 00 00 45 0f b6 24 24 31 ff 44 89 e6
-> RSP: 0018:ffff88811a597b10 EFLAGS: 00010a02
-> RAX: 1f7ab38000000004 RBX: ffff88810d76df80 RCX: dffffc0000000000
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-> RBP: dead000000000122 R08: ffff88811a597aef R09: 1ffff110234b2f5d
-> R10: dffffc0000000000 R11: ffffed10234b2f5e R12: fbd59c0000000021
-> R13: 1ffffda20435db7e R14: 1bd5a00000000021 R15: dead000000000108
-> FS:  0000000000000000(0000) GS:ffff88826d216000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fb9aea860b8 CR3: 0000000102d50000 CR4: 00000000000006f0
-> Call Trace:
->  <TASK>
->  hci_cancel_connect_sync+0x1bb/0x2e0
->  hci_abort_conn+0x4b5/0x9a0 net/bluetooth/hci_conn.c:2958
->  hci_conn_timeout+0x3a8/0x540 net/bluetooth/hci_conn.c:579
->  process_one_work kernel/workqueue.c:3236 [inline]
->  process_scheduled_works+0x7a8/0x1030 kernel/workqueue.c:3319
->  worker_thread+0xb97/0x11d0 kernel/workqueue.c:3400
->  kthread+0x3d4/0x800 kernel/kthread.c:463
->  ret_from_fork+0x13b/0x1e0 arch/x86/kernel/process.c:148
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->  </TASK>
->
-> After our analysis,may be we can fix this by making these two
-> operations in hci_cmd_sync_dequeue_once() atomic =E2=80=94 i.e. protectin=
-g
-> both under the same lock as below:
->
->  bool hci_cmd_sync_dequeue_once(struct hci_dev *hdev,
->                                hci_cmd_sync_work_func_t func,
->                                void *data, hci_cmd_sync_work_destroy_t de=
-stroy)
->  {
-> -       struct hci_cmd_sync_work_entry *entry;
-> -
-> -       entry =3D hci_cmd_sync_lookup_entry(hdev, func, data, destroy);
-> -       if (!entry)
-> -               return false;
-> -
-> -       hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
-> -       return true;
-> +       struct hci_cmd_sync_work_entry *entry;
-> +
-> +       mutex_lock(&hdev->cmd_sync_work_lock);
-> +       entry =3D _hci_cmd_sync_lookup_entry(hdev, func, data, destroy);
-> +       if (!entry) {
-> +               mutex_unlock(&hdev->cmd_sync_work_lock);
-> +               return false;
-> +       }
-> +       _hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
-> +       mutex_unlock(&hdev->cmd_sync_work_lock);
-> +       return true;
->  }
