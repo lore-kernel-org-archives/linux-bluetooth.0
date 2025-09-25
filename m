@@ -1,104 +1,62 @@
-Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C8713BC3F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Sep 2025 12:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FEE26E6E1;
+	Thu, 25 Sep 2025 13:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758803877; cv=none; b=rYzfwlNYMKSIy7Yi8fdfj1e/3JaxTXYGZ2yzz/yq4IhEFPjtKWrcleix7H8Lld9SU+NnApPWaHPI8/cXSswEsGOT3KC7ZoVWs5B80zJ504AhKtYQIRDwY0g0QinpMrdbyZx+MIl18ORuwiMu626uC87RnXtpTk69to/ZjAuzYrE=
+	t=1758807610; cv=none; b=qH5P+vwLPUZQRQhrcrDVu8trb2zIBAYkAy4/GLyEeINdbNdvBtWUbqYnugK628MDHh+pg2ANKa/cFrbt2iM92eCUXjObyySL15V7WTaSzQ0eWJOmyEp6W/Z45AzcpBWdU13JhZ39u45Pj1SNKMbw9sw0cecuJKpOFx8k5l6wYBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758803877; c=relaxed/simple;
-	bh=sKcOPTxnCJ5a4uUqyFcDkFbORkBcdmjDCZ5NAf7dLyg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s3YsiWGgy/eHb2hHUo9sOnU5ok5Xb6Dm+/6c5WpqADtWUqn3vQEM4qdpWByThf7Qyp/+mhCdO6AYjMa1yOVWAxhzNMHT9Qw12Hx2eSKLZ1rXdqUl3pEMshyqCfCW6HTYzDaUnDk/GTbSPjufRksqcVdPHNHv+w3gQo4mzjMX5xA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=wX2sVrxu; arc=none smtp.client-ip=44.202.169.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+	s=arc-20240116; t=1758807610; c=relaxed/simple;
+	bh=JnOwVIpGpVzxV4Y6Wdml0j81r/GFoPs26eqDZ9ooP6Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UbPcJLHh8YPsG3oC+Y1Xnnea9Nad5bY5dph4hw6xwLosordqvJkQyhw3HZ2cbuHnsEoU7nwk+e23yW8pI2aFAzFZdn80NOFgU94Y/H7l4KJxP91lgcDzGEwbT27crD5uh9rPcX2znzVKhIpVkD6tCIk+mfgg0rFqlSasOlKljDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SQP6B6mL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="wX2sVrxu"
-Received: from eig-obgw-5006b.ext.cloudfilter.net ([10.0.29.217])
-	by cmsmtp with ESMTPS
-	id 1iJfvt63Lv7241lEKvrpZG; Thu, 25 Sep 2025 12:37:48 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id 1lEIvwHzH0HUD1lEIvaOYT; Thu, 25 Sep 2025 12:37:46 +0000
-X-Authority-Analysis: v=2.4 cv=TIhFS0la c=1 sm=1 tr=0 ts=68d5379a
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=TDP2S4RWD7HzL5QBIXWMeQ==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
- a=n6cUM9N_SOF4ly-ecgYA:9 a=QEXdDO2ut3YA:10 a=xYX6OU9JNrHFPr8prv8u:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jHQEQP6ZDcTVOhUjzvTyaPCqzaUVdzFlGtFP2wFxfNw=; b=wX2sVrxudqIgwgpYFfECf9gNBn
-	b6lrLbgF43by0ZF23koUMsxB99bIXyy+VYpGG86IgUkI/4tdEkll8bJWtmbgMpEMYTUg8kMKklChU
-	6jdE7Fug5TwxiF2UZ0RMhbDUvU8LRqSEJLxehPiqHJ8519ItDFJRHbCx354gGYLfxaHjqKRrJu/L2
-	qI/4f5BdOb4j7G1wGT9Iw0k+RdUtha4PLgvhxTnVMWtG+J59LSFjqNGmXtplhEhrAivjkSPRek8bO
-	YAbiC4oqx6Ia7C0lgJx0Xu5Up1xKGkPo5Ut+sayd9aNc/aowxGIM05Dw/lDbMTQXkibwPt8GjPnfm
-	MSW6ktNw==;
-Received: from [83.214.222.209] (port=59262 helo=[192.168.1.104])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.98.1)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1v1lEH-00000002lYu-2Gu8;
-	Thu, 25 Sep 2025 07:37:45 -0500
-Message-ID: <8497d3e4-fa7f-436c-9e94-b669c7be73f1@embeddedor.com>
-Date: Thu, 25 Sep 2025 14:37:39 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SQP6B6mL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43366C4CEF0;
+	Thu, 25 Sep 2025 13:40:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758807610;
+	bh=JnOwVIpGpVzxV4Y6Wdml0j81r/GFoPs26eqDZ9ooP6Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SQP6B6mLiiOnGee5X4RiregiXVrJVROcuMAMU/yjJK/4Z8s6w5ZBfA+W4ktyWOyT1
+	 qWyKib5Sx9U8Ufqfunua1A1T9p0xrUVQZ83/OxIRJO32kIWMkT8ywyKTP33K8hhklx
+	 ko6idbSacmtrnYajNUP1od+TXaTcMPYBJvy/zsoxSVe9O3gFwZ/PyWWDFUsKvpTvOv
+	 q/+fXoRpldLw0drS6Bedvmbjspl2b6aZVRrMMra3AKTmDR7OgaBLLaZiGrvqlr+H7V
+	 9IV1mWn5wAhBTV5kPZj+gR894jLm1gJGITLznB3WOKJLi3uJjS2IqOqzk/w4VnmwVc
+	 oKKjH/zCrRskQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7111C39D0C21;
+	Thu, 25 Sep 2025 13:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+Content-Transfer-Encoding: 8bit
 Subject: Re: [PATCH v2][next] Bluetooth: Avoid a couple dozen
  -Wflex-array-member-not-at-end warnings
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175880760625.2984149.17268227498282852314.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Sep 2025 13:40:06 +0000
 References: <aMAZ7wIeT1sDZ4_V@kspp>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 In-Reply-To: <aMAZ7wIeT1sDZ4_V@kspp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 83.214.222.209
-X-Source-L: No
-X-Exim-ID: 1v1lEH-00000002lYu-2Gu8
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.1.104]) [83.214.222.209]:59262
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 5
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfLmhbrIgNlFCyZTXnnWEGeZFYMYU9EOAvvXAy37q9RdSbwJsAh2l1XwJ6jU1ESfX4rswEEDfDh7OXke4iDFtxi/7a7WSy+4hp4XiebvXz56RLQ5eWngc
- U381hdLpGI+rwzheF0s7KZsnxLXE75dtLIPw7Ya0aPXwIvs66DOz35x3ZguMETNApJCl6BXvzyl6J7y0TJ9IpVLw1qDlWe9jPvKSb94SFhkfs+isG2ItOtCS
+To: Gustavo A. R. Silva <gustavoars@kernel.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
 
-Hi all,
+Hello:
 
-Friendly ping: who can take this, please? :)
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Thanks!
--Gustavo
-
-On 9/9/25 14:13, Gustavo A. R. Silva wrote:
+On Tue, 9 Sep 2025 14:13:35 +0200 you wrote:
 > -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
 > getting ready to enable it, globally.
 > 
@@ -108,58 +66,15 @@ On 9/9/25 14:13, Gustavo A. R. Silva wrote:
 > 30 net/bluetooth/mgmt_config.c:16:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 > 1 net/bluetooth/mgmt_config.c:22:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 > 
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
-> Changes in v2:
->   - Use __struct_group() instead of TRAILING_OVERLAP().
-> 
-> v1:
->   - Link: https://lore.kernel.org/linux-hardening/aLSCu8U62Hve7Dau@kspp/
-> 
->   include/net/bluetooth/mgmt.h | 9 +++++++--
->   net/bluetooth/mgmt_config.c  | 4 ++--
->   2 files changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 3575cd16049a..74edea06985b 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -53,10 +53,15 @@ struct mgmt_hdr {
->   } __packed;
->   
->   struct mgmt_tlv {
-> -	__le16 type;
-> -	__u8   length;
-> +	/* New members MUST be added within the __struct_group() macro below. */
-> +	__struct_group(mgmt_tlv_hdr, __hdr, __packed,
-> +		__le16 type;
-> +		__u8   length;
-> +	);
->   	__u8   value[];
->   } __packed;
-> +static_assert(offsetof(struct mgmt_tlv, value) == sizeof(struct mgmt_tlv_hdr),
-> +	      "struct member likely outside of __struct_group()");
->   
->   struct mgmt_addr_info {
->   	bdaddr_t	bdaddr;
-> diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-> index 6ef701c27da4..c4063d200c0a 100644
-> --- a/net/bluetooth/mgmt_config.c
-> +++ b/net/bluetooth/mgmt_config.c
-> @@ -13,13 +13,13 @@
->   
->   #define HDEV_PARAM_U16(_param_name_) \
->   	struct {\
-> -		struct mgmt_tlv entry; \
-> +		struct mgmt_tlv_hdr entry; \
->   		__le16 value; \
->   	} __packed _param_name_
->   
->   #define HDEV_PARAM_U8(_param_name_) \
->   	struct {\
-> -		struct mgmt_tlv entry; \
-> +		struct mgmt_tlv_hdr entry; \
->   		__u8 value; \
->   	} __packed _param_name_
->   
+> [...]
+
+Here is the summary with links:
+  - [v2,next] Bluetooth: Avoid a couple dozen -Wflex-array-member-not-at-end warnings
+    https://git.kernel.org/bluetooth/bluetooth-next/c/33c9dc51e8b4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
