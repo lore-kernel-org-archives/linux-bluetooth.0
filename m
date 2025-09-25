@@ -1,202 +1,160 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD6C2DCF77
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Sep 2025 14:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA312E8E08;
+	Thu, 25 Sep 2025 22:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758811895; cv=none; b=I6L/qbMUkGb5pH6C+y2wRW7jozljOlfSYn0Idq7uFzPU0CqTgR0YX6mSMVlHiSO1zKSemj0yILigxNqwG1kRv5SMGMMcrhnE7VR8BpOnwtBKfHG5P5t+x/4U48ncYuYS6FuJxS72PkeDTzHdeS3Ie8ORL6poBIKykii+E1Djrn4=
+	t=1758840913; cv=none; b=KZ6VOLFzqWjjFLTbt4YauI4HnDl9MCOOOtEmAHiSzZtrqdbVNBo/C1gdFBwBQx5xtavrp814gpKVMBf0c9Dc3jbsYGigS6G+zjtZh4f9+DXqSUwaL0kkAw++pBkW1x5avmXTQWBiVvA+LPgqFmxhCvcowYJfKlQYLYXr7xJCkkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758811895; c=relaxed/simple;
-	bh=L6SoP4wBSH0ij3fkHsK/XGeobwPmQwNQKMsaS359wKU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SMLfkllZO/7nl6T1Os2IERij8lC/HzoXlDciqM0v769i+MDTjuCVfy1vNXbnlqxpiVnDayDq5ZztbeFOsXm4mjDIUWpWz+bMeRgUak76tAMDt6GRiQd8ox1dE/WSFjQaF3ZvAX9jj40hQcQRxiyjg/sR3qY0qGMBhzUQvoSon/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CrvdK3h6; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758840913; c=relaxed/simple;
+	bh=Wcm+0+MGr0QhGbbKqE9by5FkhaqCe/1wQYUpEehdWbc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FUbdsKY8wnHgz/4uSZAohqAX6Pbhj0SvP02J8r6ECKMJWC7zXdXPsE13NruTu28b80P6GIh8Jk6XrOdgeWRKzTrJBPn5jH2DK19AYyCdqMNpqyatceDUYd7/5OfmaUGZPiaocllViXEnOQ4X0fq4eQh8W7BpveE8GT71hoQhTpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lzzZ21HT; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CrvdK3h6"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-8e3eaa30c71so1000244241.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Sep 2025 07:51:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758811893; x=1759416693; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=77xQ9AagyxgspcAnYMbL71tYk6pS3T6xKIIrKpqNykw=;
-        b=CrvdK3h69jRSFuqJbRMdWhrh2KfupcYHnfNrNStgPsiBydcJjbtZa1GwWG64vPWR/a
-         VKWuvLz144nzmS5kduvQ+W/dF8Agm2te0tfGiU0H0Ux5cbVJXMwdWYh7rBPkfN69emt9
-         LITDM49fwjUCo184+hgSeJne5XseWcRWgzyz3xizf843/03EXSnQyuj/Dqg8Mcq7KfhS
-         Ml2G3hxIsaQdPUveCr8hwmrXNDVCF+MGZfJJpt++LQ+V0oFH1EBEwuuE2ZUC0r4+tyW6
-         UPZn8HHPVfD1tatuPmaxEPG3pIANqKjJAKgcsBbXQ5RFApMaMlMAxZWiEARighPfFNCF
-         fVIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758811893; x=1759416693;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=77xQ9AagyxgspcAnYMbL71tYk6pS3T6xKIIrKpqNykw=;
-        b=Mv6Pn1h7Xnnm0qWUYLlhdvnwaXGF1P+hSHNzNwj5H15wsvcpyQna7XNb4xhOduWUXb
-         sQIP6ZZ+P8WqX/1Iq6z35qt68/sjfof2IHETjMtUWRo+RiKEF0CGvGjUVE2XUhSoryII
-         dnW7EFBGf2HZymZGNwIWyMoL078Ug33auhDRNWQFfcss7s1C56mkkIirlJ9+TQ7MPK8j
-         kDSFgex+zNQ/hqqBrpgDp5bAlWdycrKrXtWMiCOX0xSOzhsFGKp8snxnCEWmbqYl1/RF
-         8z88GDJVXnIyANfgiS0fZd2ea3CGXyXTOhQP58lhj943Yki2OEkJF+YJXy2BnmhNW4lK
-         /SJg==
-X-Gm-Message-State: AOJu0YxcrrAZTuPvYFxWWpiXuF6vPPpC/hfcUpubCvp0akQRQ9cRTC/7
-	KXF0tmCxe2HNELIVp91UvOnqvoVP2Ok4Adp/FwAJT/91k6pBzOMpK4T2
-X-Gm-Gg: ASbGncte70+yyhGeOY2TCmYklKn/tj2HK8I9j3W1h/hr8iBQpTA/eHdorg60tS3CAi6
-	eZ/fzBhu1vfUWeGsb2H24wkgKBjorJr6GCdWZ453WdWZgQrORzpENR3rTLS0j+lsskCrgqb9kuV
-	Sbz5SOEW1RdknUZfmGfHprMw6GigFgpEp2QgJLwKXhnau5vFQ6JX0pIYWbWs/M2AI2OjxG5Lv/R
-	T0ENqUrAw6VkjsLf9herJzda8zXwLQped759SsJBv1iccwLgv6m/5pjDJZZn2WYkOF9Z/fJxb8o
-	u9kGTcvY7gY/+A7nfpoUDqpkNb+briLhQRKZ+XQ1mggYDUMJDrkCmVXIfp8320ZlB/s2EB6mPMD
-	Jo9ZsOXl9RzIq6INyy94MuXavqAJVU7E4yyOWwBiNf30CTyQuDtiqa5JmvWQaWCEMIA==
-X-Google-Smtp-Source: AGHT+IGy7QOLPhjvgEYnjRf/nkzcywrd7/bdhmB77Qy7xQJ6U5Qldt7e18Cqi6fey2pThQDiRaJnYg==
-X-Received: by 2002:a05:6102:4190:b0:534:cfe0:f861 with SMTP id ada2fe7eead31-5accd215f2amr1571674137.18.1758811892531;
-        Thu, 25 Sep 2025 07:51:32 -0700 (PDT)
-Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5ae302edafasm573619137.4.2025.09.25.07.51.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 07:51:31 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth-next 2025-09-25
-Date: Thu, 25 Sep 2025 10:51:24 -0400
-Message-ID: <20250925145124.500357-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lzzZ21HT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758840910; x=1790376910;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Wcm+0+MGr0QhGbbKqE9by5FkhaqCe/1wQYUpEehdWbc=;
+  b=lzzZ21HTRGBJUdf5vB71H/iSq09A9L6XizR843EXIsbc5Kllk0F4OAd/
+   C0lkBXxGs2KR13OnaLiP+FYx2eifo85Ig8qB8vK1qef/tGhsARmTOmeDC
+   6V0V4M18044F9nTS9m8vjtuLSNRz3H36VlCF3Jdw87RDWuJOjQU9E2A5J
+   eTvVBocmcoQFpL9aUimtv/+axjeQKVzhurbGxnafNdOQjtV84oBKBpVjA
+   TI8nxmRvHeiuPVqF5jKEYX8XW9cfaZ30jhO2XxOjOMQGv/lH5Amp36y2z
+   3ZR0gXrUVRYN9kaZzR4KG/5DO5PqYCwc/JK7AJtCLnXnuDCrKxNlp+3d2
+   A==;
+X-CSE-ConnectionGUID: fkGM2C/OS9m0EJ79jm1yBg==
+X-CSE-MsgGUID: w2UL1p/9Q6aJLYaD9/2FkQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="64985621"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="64985621"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 15:55:10 -0700
+X-CSE-ConnectionGUID: 3ZgUONWAQ9KZXqtUzThLIQ==
+X-CSE-MsgGUID: m4VRglUzTn60fiyCen3W5Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,293,1751266800"; 
+   d="scan'208";a="176586918"
+Received: from lkp-server02.sh.intel.com (HELO 84c55410ccf6) ([10.239.97.151])
+  by orviesa006.jf.intel.com with ESMTP; 25 Sep 2025 15:55:06 -0700
+Received: from kbuild by 84c55410ccf6 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v1ure-0005gz-38;
+	Thu, 25 Sep 2025 22:55:02 +0000
+Date: Fri, 26 Sep 2025 06:55:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Luiz Von Dentz <luiz.dentz@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: oe-kbuild-all@lists.linux.dev, Krzysztof Kozlowski <krzk@kernel.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Deren Wu <deren.Wu@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
+	Hao Qin <Hao.qin@mediatek.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	linux-mediatek <linux-mediatek@lists.infradead.org>,
+	Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
+Subject: Re: [PATCH v8] Bluetooth: mediatek: add gpio pin to reset bt
+Message-ID: <202509260623.nZX7ipvc-lkp@intel.com>
+References: <20250925092058.16648-1-ot_zhangchao.zhang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250925092058.16648-1-ot_zhangchao.zhang@mediatek.com>
 
-The following changes since commit 12de5f0f6c2d7aad7e60aada650fcfb374c28a5e:
+Hi Zhangchao,
 
-  Merge branch 'net-gso-restore-outer-ip-ids-correctly' (2025-09-25 12:42:52 +0200)
+kernel test robot noticed the following build errors:
 
-are available in the Git repository at:
+[auto build test ERROR on bluetooth/master]
+[also build test ERROR on bluetooth-next/master linus/master v6.17-rc7 next-20250925]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-09-25
+url:    https://github.com/intel-lab-lkp/linux/commits/Zhangchao-Zhang/Bluetooth-mediatek-add-gpio-pin-to-reset-bt/20250925-172508
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20250925092058.16648-1-ot_zhangchao.zhang%40mediatek.com
+patch subject: [PATCH v8] Bluetooth: mediatek: add gpio pin to reset bt
+config: sh-randconfig-001-20250926 (https://download.01.org/0day-ci/archive/20250926/202509260623.nZX7ipvc-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 12.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250926/202509260623.nZX7ipvc-lkp@intel.com/reproduce)
 
-for you to fetch changes up to 8d0a1577fe0db496fa3cc674e5ebff28ebbdebd4:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509260623.nZX7ipvc-lkp@intel.com/
 
-  Bluetooth: Avoid a couple dozen -Wflex-array-member-not-at-end warnings (2025-09-25 10:08:04 -0400)
+All errors (new ones prefixed by >>):
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
+   drivers/bluetooth/btusb.c: In function 'btusb_mtk_reset':
+>> drivers/bluetooth/btusb.c:2769:19: error: 'struct btusb_data' has no member named 'rest_gpio'; did you mean 'reset_gpio'?
+    2769 |         if (data->rest_gpio) {
+         |                   ^~~~~~~~~
+         |                   reset_gpio
 
-core:
 
- - MAINTAINERS: add a sub-entry for the Qualcomm bluetooth driver
- - Avoid a couple dozen -Wflex-array-member-not-at-end warnings
- - bcsp: receive data only if registered
- - HCI: Fix using LE/ACL buffers for ISO packets
- - hci_core: Detect if an ISO link has stalled
- - ISO: Don't initiate CIS connections if there are no buffers
- - ISO: Use sk_sndtimeo as conn_timeout
+vim +2769 drivers/bluetooth/btusb.c
 
-drivers:
+  2740	
+  2741	static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
+  2742	{
+  2743		struct btusb_data *data = hci_get_drvdata(hdev);
+  2744		struct btmtk_data *btmtk_data = hci_get_priv(hdev);
+  2745		int err;
+  2746	
+  2747		/* It's MediaTek specific bluetooth reset mechanism via USB */
+  2748		if (test_and_set_bit(BTMTK_HW_RESET_ACTIVE, &btmtk_data->flags)) {
+  2749			bt_dev_err(hdev, "last reset failed? Not resetting again");
+  2750			return -EBUSY;
+  2751		}
+  2752	
+  2753		err = usb_autopm_get_interface(data->intf);
+  2754		if (err < 0)
+  2755			return err;
+  2756	
+  2757		/* Release MediaTek ISO data interface */
+  2758		btusb_mtk_release_iso_intf(hdev);
+  2759	
+  2760		btusb_stop_traffic(data);
+  2761		usb_kill_anchored_urbs(&data->tx_anchor);
+  2762	
+  2763		/* Toggle the hard reset line. The MediaTek device is going to
+  2764		 * yank itself off the USB and then replug. The cleanup is handled
+  2765		 * correctly on the way out (standard USB disconnect), and the new
+  2766		 * device is detected cleanly and bound to the driver again like
+  2767		 * it should be.
+  2768		 */
+> 2769		if (data->rest_gpio) {
+  2770			gpiod_set_value_cansleep(data->reset_gpio, 1);
+  2771			msleep(200);
+  2772			gpiod_set_value_cansleep(data->reset_gpio, 0);
+  2773			return 0;
+  2774		}
+  2775	
+  2776		err = btmtk_usb_subsys_reset(hdev, btmtk_data->dev_id);
+  2777	
+  2778		usb_queue_reset_device(data->intf);
+  2779		clear_bit(BTMTK_HW_RESET_ACTIVE, &btmtk_data->flags);
+  2780	
+  2781		return err;
+  2782	}
+  2783	
 
- - btusb: Check for unexpected bytes when defragmenting HCI frames
- - btusb: Add new VID/PID 13d3/3627 for MT7925
- - btusb: Add new VID/PID 13d3/3633 for MT7922
- - btusb: Add USB ID 2001:332a for D-Link AX9U rev. A1
- - btintel: Add support for BlazarIW core
- - btintel_pcie: Add support for _suspend() / _resume()
- - btintel_pcie: Define hdev->wakeup() callback
- - btintel_pcie: Add Bluetooth core/platform as comments
- - btintel_pcie: Add id of Scorpious, Panther Lake-H484
- - btintel_pcie: Refactor Device Coredump
-
-----------------------------------------------------------------
-Arkadiusz Bokowy (1):
-      Bluetooth: btusb: Check for unexpected bytes when defragmenting HCI frames
-
-Bartosz Golaszewski (1):
-      MAINTAINERS: add a sub-entry for the Qualcomm bluetooth driver
-
-Calvin Owens (2):
-      Bluetooth: remove duplicate h4_recv_buf() in header
-      Bluetooth: Fix build after header cleanup
-
-Chandrashekar Devegowda (2):
-      Bluetooth: btintel_pcie: Add support for _suspend() / _resume()
-      Bluetooth: btintel_pcie: Define hdev->wakeup() callback
-
-Chris Lu (2):
-      Bluetooth: btusb: Add new VID/PID 13d3/3627 for MT7925
-      Bluetooth: btusb: Add new VID/PID 13d3/3633 for MT7922
-
-Gustavo A. R. Silva (1):
-      Bluetooth: Avoid a couple dozen -Wflex-array-member-not-at-end warnings
-
-Ivan Pravdin (1):
-      Bluetooth: bcsp: receive data only if registered
-
-Kiran K (4):
-      Bluetooth: btintel: Add support for BlazarIW core
-      Bluetooth: btintel_pcie: Add Bluetooth core/platform as comments
-      Bluetooth: btintel_pcie: Add id of Scorpious, Panther Lake-H484
-      Bluetooth: btintel_pcie: Refactor Device Coredump
-
-Luiz Augusto von Dentz (16):
-      Bluetooth: btintel_pcie: Move model comment before its definition
-      Bluetooth: ISO: Don't initiate CIS connections if there are no buffers
-      Bluetooth: HCI: Fix using LE/ACL buffers for ISO packets
-      Bluetooth: ISO: Use sk_sndtimeo as conn_timeout
-      Bluetooth: hci_core: Detect if an ISO link has stalled
-      Bluetooth: MGMT: Fix not exposing debug UUID on MGMT_OP_READ_EXP_FEATURES_INFO
-      Bluetooth: Add function and line information to bt_dbg
-      Bluetooth: hci_core: Print number of packets in conn->data_q
-      Bluetooth: hci_core: Print information of hcon on hci_low_sent
-      Bluetooth: hci_sync: Fix hci_resume_advertising_sync
-      Bluetooth: hci_event: Fix UAF in hci_conn_tx_dequeue
-      Bluetooth: hci_event: Fix UAF in hci_acl_create_conn_sync
-      Bluetooth: MGMT: Fix possible UAFs
-      Bluetooth: SCO: Fix UAF on sco_conn_free
-      Bluetooth: ISO: Fix possible UAF on iso_conn_free
-      Bluetooth: hci_sync: Fix using random address for BIG/PA advertisements
-
-Pauli Virtanen (2):
-      Bluetooth: ISO: free rx_skb if not consumed
-      Bluetooth: ISO: don't leak skb in ISO_CONT RX
-
-Thorsten Blum (2):
-      Bluetooth: Annotate struct hci_drv_rp_read_info with __counted_by_le()
-      Bluetooth: btintel_pcie: Use strscpy() instead of strscpy_pad()
-
-Zenm Chen (1):
-      Bluetooth: btusb: Add USB ID 2001:332a for D-Link AX9U rev. A1
-
- MAINTAINERS                       |   7 +
- drivers/bluetooth/Kconfig         |   6 +
- drivers/bluetooth/bpa10x.c        |   2 +-
- drivers/bluetooth/btintel.c       |   3 +
- drivers/bluetooth/btintel_pcie.c  | 328 +++++++++++++++++++++-----------------
- drivers/bluetooth/btintel_pcie.h  |   2 +
- drivers/bluetooth/btmtksdio.c     |   2 +-
- drivers/bluetooth/btmtkuart.c     |   2 +-
- drivers/bluetooth/btnxpuart.c     |   2 +-
- drivers/bluetooth/btusb.c         |  23 +++
- drivers/bluetooth/h4_recv.h       | 153 ------------------
- drivers/bluetooth/hci_bcsp.c      |   3 +
- drivers/bluetooth/hci_uart.h      |   8 +-
- include/net/bluetooth/bluetooth.h |   3 +-
- include/net/bluetooth/hci.h       |   1 +
- include/net/bluetooth/hci_core.h  |  32 +++-
- include/net/bluetooth/hci_drv.h   |   2 +-
- include/net/bluetooth/mgmt.h      |   9 +-
- net/bluetooth/hci_conn.c          |  27 ++--
- net/bluetooth/hci_core.c          |  52 ++++--
- net/bluetooth/hci_event.c         |  46 ++++--
- net/bluetooth/hci_sync.c          |  17 +-
- net/bluetooth/iso.c               |  34 +++-
- net/bluetooth/mgmt.c              | 254 +++++++++++++++++++----------
- net/bluetooth/mgmt_config.c       |   4 +-
- net/bluetooth/mgmt_util.c         |  24 +++
- net/bluetooth/mgmt_util.h         |   2 +
- net/bluetooth/sco.c               |   7 +
- 28 files changed, 604 insertions(+), 451 deletions(-)
- delete mode 100644 drivers/bluetooth/h4_recv.h
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
