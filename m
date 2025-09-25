@@ -1,178 +1,274 @@
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9481552FD;
-	Thu, 25 Sep 2025 09:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E508A20E6
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Sep 2025 09:54:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758792070; cv=none; b=rXb5oqgJ3uAdqJbQS2+POeLEpIxhhGtGCofRYyymlPDoBwAsAhqzkbi3Rvi3s6B+LsjDxsP5nNKc446ikUaTflDCtChqwrU6A6xMhkU8HzmSDAarZkDZLFSc49R6MQ9IGezD2o2fDIynUJULHUon1o8vzkNYGQMUT8Q6Tfei6sc=
+	t=1758794067; cv=none; b=bSUh0YT/HAthQq+kl/0Cf/g6Dy+2emQ/eeaxOe4+I4ke90hLJoQg6QGPyUbGlX3GQXpBiy69BX30bn5AO5eoakphb4a4yyHyidS2RLn/MNK1tEt5R4fKy7RnSaf1fvDyNewe6Q5SKVAZ0IzI23L8oK3ndYRsaf9jpEPChbdaH5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758792070; c=relaxed/simple;
-	bh=lAbfl7+UbM9HlefeX5KUTqP4T+8HBqdnQz9rGseRamM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aq3VS5l8VfcpyIuHvwPrsGjkRHyZWU2lIlgJLDzfkhieyRNf6JIFGM8cA/5I/+Lzc/9dp/CZ6bEyumXCXUhoI4ZA8O2M3fsEIr+JuPiwBX8ZMbnDv37y6/hpbCxBgpFEe/qi6hWUlP6nTTHbiotHJ0UzImQ0XyldYpQnRiUjuDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=gM2tBBXc; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1758794067; c=relaxed/simple;
+	bh=cRhmJIp+vVng+iUZQP7+NyoLqv1nlWapiBTrn8V1ifM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=M2d/qc9nZxfvuk9JAycM/08CAdqeSeQzp252lMGkbcJUG08GdLnaG7qfhS9gK8Tjv1zYXPiFBJNjcJQ2PnAEmowgCvPvIjvughSEzgtALY4ryxhiGSh4n7gcAvdDINR8gTebQBD4L+qrTYmstqiFpng3K4BegT/QVK1fnMmjjdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gweoIaLE; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="gM2tBBXc"
-X-UUID: f5ac9ed899f011f08d9e1119e76e3a28-20250925
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=FgEHFJuF/mtaLrGbvxhy8JWKLeF9SIUBYeavxyw4rFQ=;
-	b=gM2tBBXcDFLBigD8IsMeGBlT1AW8XhlrUStF5RIRc28zrhJrz9GE9r4S8PQJwJ/WjxRHEeMIJ9Kci7giKume8MYdjjLL40KAjwUFL1FcPbG7SXqH/0A8cbVJXpvjSrLdxz5t29AU6LlKg6RdAq9uO0AcrLksA1fjwKA1qYw1Lpg=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:5fa55448-817f-42db-8c7f-7617cc395867,IP:0,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:-5
-X-CID-META: VersionHash:a9d874c,CLOUDID:3259ef6c-8443-424b-b119-dc42e68239b0,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
-	0,EDM:-3,IP:nil,URL:0,File:130,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,
-	OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: f5ac9ed899f011f08d9e1119e76e3a28-20250925
-Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw01.mediatek.com
-	(envelope-from <ot_zhangchao.zhang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 985007173; Thu, 25 Sep 2025 17:21:04 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Thu, 25 Sep 2025 17:21:02 +0800
-Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1748.10 via Frontend Transport; Thu, 25 Sep 2025 17:21:01 +0800
-From: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Matthias Brugger
-	<matthias.bgg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-CC: Krzysztof Kozlowski <krzk@kernel.org>, Sean Wang <sean.wang@mediatek.com>,
-	Deren Wu <deren.Wu@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, Hao Qin
-	<Hao.qin@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel
-	<linux-arm-kernel@lists.infradead.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Zhangchao Zhang
-	<ot_zhangchao.zhang@mediatek.com>
-Subject: [PATCH v8] Bluetooth: mediatek: add gpio pin to reset bt
-Date: Thu, 25 Sep 2025 17:20:58 +0800
-Message-ID: <20250925092058.16648-1-ot_zhangchao.zhang@mediatek.com>
-X-Mailer: git-send-email 2.46.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gweoIaLE"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-76e4fc419a9so895978b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Sep 2025 02:54:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758794065; x=1759398865; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cRhmJIp+vVng+iUZQP7+NyoLqv1nlWapiBTrn8V1ifM=;
+        b=gweoIaLEzRko8NatMIsaexBKhejwANoFPdYyWEDqIlj8QCNECrNH2elPaG/VcB3/yq
+         oYsG4eBK1GcefSFo6SyX84XFaxvaNVLT+o8dXz8cyH2ONx5nwK/6P9+8dGZdQKZXkwA9
+         N4GRP5nrle0PF9+EZb0W+M2nyGpT/R5p6wtJ2VUfzo16v2uD9/tI9Qh1Ihm2MITdhkTR
+         tR0HpSLUbToOd/c0nGMOyhT3bt7BplG1gS52wVgcvf8xC1olPW1Qw8qOgJXfKagDG3YX
+         /4a/Q/V0e5bRYt5sPBueMPcODk+ZNA6t0T/k+q6d1qzE21CkFzfVFa2sVX/yb6vurv/d
+         GDbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758794065; x=1759398865;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cRhmJIp+vVng+iUZQP7+NyoLqv1nlWapiBTrn8V1ifM=;
+        b=Q5PErjDCP3ddxJpZ/TovOyKadsHYEPT7IfYS3vX7TLdcXRAZCd60V5WV5E++ZID0Zy
+         /l4dO7nFmrywZiPyq27KsfvW24PGOrhgiBAVGgMP+uINonqA9xU8ens/QSChldchKIqz
+         8IBUW9a22OAUbihvZ/v96a1zA7fmXN0GDUgX/MA9UwuhhOJPLpWJr0FzZPJjVRI/aPjj
+         xp2DMZESwnrTpcXEE9FVrHg3kOvqFpcqDqNfCa+f/ZKsLh2Yl52KPSkF1pxyybHrK6+7
+         nf2QaLDNLLWy9JwHVYslFwH+gc5Qv3+hcKNC0C6LMiVakbAdQ9pU1CZuqBM6e2ptUNg6
+         wMwA==
+X-Gm-Message-State: AOJu0YwAKax/iYopH46kgP+Bn9ASnsBm9RRkyHPOGfVaWv3vrDcewmvO
+	+uvJhNpZPHoqqcq/IqCL3t9Di2ENX3gfcTMvseyh8Y4/eUzzEzMUELmY0SUJDg==
+X-Gm-Gg: ASbGncuNSGD9GeltyeyP4AKxf9aE97Ob0wYZzBswDrPBG0WrM1pC/Vdd3bxDdsmWlEe
+	c4w+kJh63ijg5GtpdnG0TOPMbnZjBgR/EIktrM9xY+BSGZYJf8js9hv/fNe1+voE0nD4n3Ub6xm
+	QSUKVgsbOc9AxyiYnA8xPGvcHaciQRtBmQAAznnVGEryqg+zKxdOrBowJwwYQQrA2T12ZOH5XCz
+	gsR/jZnGOMql0i3GRqCmZqSShvHxUVnEONgNSyTYyUhG+28PDJOY6NgkvBq1E0s25FAuKfPiuyO
+	q/1x9jsLmigO0CRpEGr3ZdYpvC4kijTag2fuPqTq2OdBNyfTqfPkYKM3wNlCpUAaHneTuhZfKV0
+	Kn8gE/IE5v4WMH7ufT7eBTnrUqLaE7w==
+X-Google-Smtp-Source: AGHT+IHk8NBTHPY6+VXPXzq8Ks/IlQVd+nP+pp033IuhX5h8MdF4PCwNLGOE2kOJfB9HYMdTuK6czg==
+X-Received: by 2002:a05:6a00:2ea5:b0:77f:45fc:9619 with SMTP id d2e1a72fcca58-780fcdc5b29mr3443511b3a.2.1758794064959;
+        Thu, 25 Sep 2025 02:54:24 -0700 (PDT)
+Received: from [172.17.0.2] ([172.182.212.53])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-781023d5c73sm1452690b3a.41.2025.09.25.02.54.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Sep 2025 02:54:24 -0700 (PDT)
+Message-ID: <68d51150.050a0220.44736.3d33@mx.google.com>
+Date: Thu, 25 Sep 2025 02:54:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5337271754781501937=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ot_zhangchao.zhang@mediatek.com
+Subject: RE: [v8] Bluetooth: mediatek: add gpio pin to reset bt
+In-Reply-To: <20250925092058.16648-1-ot_zhangchao.zhang@mediatek.com>
+References: <20250925092058.16648-1-ot_zhangchao.zhang@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Support the platform Bluetooth to be reset by hardware pin,
-when a Bluetooth exception occurs, attempt to reset the
-Bluetooth module using the hardware reset pin, as this
-method is generally more stable and reliable than a
-software reset. If the hardware reset pin is not specified
-in the device tree, fall back to the existing software
-reset mechanism to ensure backward compatibility.
+--===============5337271754781501937==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Co-developed: Sean Wang <Sean.Wang@mediatek.com>
-Co-developed: Hao Qin <hao.qin@mediatek.com>
-Co-developed: Chris Lu <chris.lu@mediatek.com>
-Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTAwNjA3OAoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgUEVORElORyAgIDAuNTEgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+RU5ESU5HICAgMC4zMSBzZWNvbmRzClN1YmplY3RQcmVmaXggICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAwLjA3IHNlY29uZHMKQnVpbGRLZXJuZWwgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDIxLjM4IHNlY29uZHMKQ2hlY2tBbGxXYXJuaW5nICAgICAgICAgICAgICAgRkFJTCAgICAgIDIz
+LjYxIHNlY29uZHMKQ2hlY2tTcGFyc2UgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDI1Ljkz
+IHNlY29uZHMKQnVpbGRLZXJuZWwzMiAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDIxLjI0IHNl
+Y29uZHMKVGVzdFJ1bm5lclNldHVwICAgICAgICAgICAgICAgRkFJTCAgICAgIDQ1OC44OSBzZWNv
+bmRzClRlc3RSdW5uZXJfbDJjYXAtdGVzdGVyICAgICAgIEZBSUwgICAgICAwLjA5IHNlY29uZHMK
+VGVzdFJ1bm5lcl9pc28tdGVzdGVyICAgICAgICAgRkFJTCAgICAgIDAuMDkgc2Vjb25kcwpUZXN0
+UnVubmVyX2JuZXAtdGVzdGVyICAgICAgICBGQUlMICAgICAgMC4wOSBzZWNvbmRzClRlc3RSdW5u
+ZXJfbWdtdC10ZXN0ZXIgICAgICAgIEZBSUwgICAgICAwLjA5IHNlY29uZHMKVGVzdFJ1bm5lcl9y
+ZmNvbW0tdGVzdGVyICAgICAgRkFJTCAgICAgIDAuMDkgc2Vjb25kcwpUZXN0UnVubmVyX3Njby10
+ZXN0ZXIgICAgICAgICBGQUlMICAgICAgMC4wOSBzZWNvbmRzClRlc3RSdW5uZXJfaW9jdGwtdGVz
+dGVyICAgICAgIEZBSUwgICAgICAwLjA5IHNlY29uZHMKVGVzdFJ1bm5lcl9tZXNoLXRlc3RlciAg
+ICAgICAgRkFJTCAgICAgIDAuMDkgc2Vjb25kcwpUZXN0UnVubmVyX3NtcC10ZXN0ZXIgICAgICAg
+ICBGQUlMICAgICAgMC4wOSBzZWNvbmRzClRlc3RSdW5uZXJfdXNlcmNoYW4tdGVzdGVyICAgIEZB
+SUwgICAgICAwLjA5IHNlY29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEVORElO
+RyAgIDAuODIgc2Vjb25kcwoKRGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMK
+VGVzdDogQ2hlY2tQYXRjaCAtIFBFTkRJTkcKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0
+Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBHaXRMaW50IC0g
+UEVORElORwpEZXNjOiBSdW4gZ2l0bGludApPdXRwdXQ6CgojIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMKVGVzdDogQnVpbGRLZXJuZWwgLSBGQUlMCkRlc2M6IEJ1aWxkIEtlcm5lbCBmb3Ig
+Qmx1ZXRvb3RoCk91dHB1dDoKCmRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmM6IEluIGZ1bmN0aW9u
+IOKAmGJ0dXNiX210a19yZXNldOKAmToKZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYzoyNzkyOjEy
+OiBlcnJvcjog4oCYc3RydWN0IGJ0dXNiX2RhdGHigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhy
+ZXN0X2dwaW/igJk7IGRpZCB5b3UgbWVhbiDigJhyZXNldF9ncGlv4oCZPwogMjc5MiB8ICBpZiAo
+ZGF0YS0+cmVzdF9ncGlvKSB7CiAgICAgIHwgICAgICAgICAgICBefn5+fn5+fn4KICAgICAgfCAg
+ICAgICAgICAgIHJlc2V0X2dwaW8KbWFrZVs0XTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxk
+OjI4NzogZHJpdmVycy9ibHVldG9vdGgvYnR1c2Iub10gRXJyb3IgMQptYWtlWzRdOiAqKiogV2Fp
+dGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlWzNdOiAqKiogW3NjcmlwdHMvTWFrZWZp
+bGUuYnVpbGQ6NTU0OiBkcml2ZXJzL2JsdWV0b290aF0gRXJyb3IgMgptYWtlWzJdOiAqKiogW3Nj
+cmlwdHMvTWFrZWZpbGUuYnVpbGQ6NTU0OiBkcml2ZXJzXSBFcnJvciAyCm1ha2VbMl06ICoqKiBX
+YWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2VbMV06ICoqKiBbL2dpdGh1Yi93b3Jr
+c3BhY2Uvc3JjL3NyYy9NYWtlZmlsZToyMDAzOiAuXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZp
+bGU6MjQ4OiBfX3N1Yi1tYWtlXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IwpUZXN0OiBDaGVja0FsbFdhcm5pbmcgLSBGQUlMCkRlc2M6IFJ1biBsaW51eCBrZXJuZWwgd2l0
+aCBhbGwgd2FybmluZyBlbmFibGVkCk91dHB1dDoKCmRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmM6
+IEluIGZ1bmN0aW9uIOKAmGJ0dXNiX210a19yZXNldOKAmToKZHJpdmVycy9ibHVldG9vdGgvYnR1
+c2IuYzoyNzkyOjEyOiBlcnJvcjog4oCYc3RydWN0IGJ0dXNiX2RhdGHigJkgaGFzIG5vIG1lbWJl
+ciBuYW1lZCDigJhyZXN0X2dwaW/igJk7IGRpZCB5b3UgbWVhbiDigJhyZXNldF9ncGlv4oCZPwog
+Mjc5MiB8ICBpZiAoZGF0YS0+cmVzdF9ncGlvKSB7CiAgICAgIHwgICAgICAgICAgICBefn5+fn5+
+fn4KICAgICAgfCAgICAgICAgICAgIHJlc2V0X2dwaW8KbWFrZVs0XTogKioqIFtzY3JpcHRzL01h
+a2VmaWxlLmJ1aWxkOjI4NzogZHJpdmVycy9ibHVldG9vdGgvYnR1c2Iub10gRXJyb3IgMQptYWtl
+WzRdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlWzNdOiAqKiogW3Nj
+cmlwdHMvTWFrZWZpbGUuYnVpbGQ6NTU0OiBkcml2ZXJzL2JsdWV0b290aF0gRXJyb3IgMgptYWtl
+WzJdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NTU0OiBkcml2ZXJzXSBFcnJvciAyCm1h
+a2VbMl06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2VbMV06ICoqKiBb
+L2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy9NYWtlZmlsZToyMDAzOiAuXSBFcnJvciAyCm1ha2U6
+ICoqKiBbTWFrZWZpbGU6MjQ4OiBfX3N1Yi1tYWtlXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1NwYXJzZSAtIEZBSUwKRGVzYzogUnVuIHNwYXJzZSB0
+b29sIHdpdGggbGludXgga2VybmVsCk91dHB1dDoKCm5ldC9ibHVldG9vdGgvYWZfYmx1ZXRvb3Ro
+LmM6MjQ4OjI1OiB3YXJuaW5nOiBjb250ZXh0IGltYmFsYW5jZSBpbiAnYnRfYWNjZXB0X2VucXVl
+dWUnIC0gZGlmZmVyZW50IGxvY2sgY29udGV4dHMgZm9yIGJhc2ljIGJsb2NrCm5ldC9ibHVldG9v
+dGgvaGNpX2NvcmUuYzo4NTo5OiB3YXJuaW5nOiBjb250ZXh0IGltYmFsYW5jZSBpbiAnX19oY2lf
+ZGV2X2dldCcgLSBkaWZmZXJlbnQgbG9jayBjb250ZXh0cyBmb3IgYmFzaWMgYmxvY2sKbmV0L2Js
+dWV0b290aC9oY2lfY29yZS5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlICh0aHJvdWdoIGluY2x1
+ZGUvbGludXgvbm90aWZpZXIuaCwgaW5jbHVkZS9saW51eC9tZW1vcnlfaG90cGx1Zy5oLCBpbmNs
+dWRlL2xpbnV4L21tem9uZS5oLCBpbmNsdWRlL2xpbnV4L2dmcC5oLCBpbmNsdWRlL2xpbnV4L3hh
+cnJheS5oLCBpbmNsdWRlL2xpbnV4L3JhZGl4LXRyZWUuaCwgLi4uKToKLi9pbmNsdWRlL2xpbnV4
+L3NyY3UuaDo0MDA6OTogd2FybmluZzogY29udGV4dCBpbWJhbGFuY2UgaW4gJ2hjaV9kZXZfcHV0
+X3NyY3UnIC0gdW5leHBlY3RlZCB1bmxvY2sKbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYzogbm90
+ZTogaW4gaW5jbHVkZWQgZmlsZSAodGhyb3VnaCBpbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2Nv
+cmUuaCk6Ci4vaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaS5oOjI2NTg6NDc6IHdhcm5pbmc6IGFy
+cmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXMKLi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmg6
+Mjc0NDo0Mzogd2FybmluZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJlcwpkcml2ZXJzL2Js
+dWV0b290aC9oY2lfYWc2eHguYzoyNTc6MjQ6IHdhcm5pbmc6IHJlc3RyaWN0ZWQgX19sZTMyIGRl
+Z3JhZGVzIHRvIGludGVnZXIKZHJpdmVycy9ibHVldG9vdGgvaGNpX21ydmwuYzoxNzA6MjM6IHdh
+cm5pbmc6IHJlc3RyaWN0ZWQgX19sZTE2IGRlZ3JhZGVzIHRvIGludGVnZXIKZHJpdmVycy9ibHVl
+dG9vdGgvaGNpX21ydmwuYzoyMDM6MjM6IHdhcm5pbmc6IHJlc3RyaWN0ZWQgX19sZTE2IGRlZ3Jh
+ZGVzIHRvIGludGVnZXIKZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYzogSW4gZnVuY3Rpb24g4oCY
+YnR1c2JfbXRrX3Jlc2V04oCZOgpkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jOjI3OTI6MTI6IGVy
+cm9yOiDigJhzdHJ1Y3QgYnR1c2JfZGF0YeKAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHJlc3Rf
+Z3Bpb+KAmTsgZGlkIHlvdSBtZWFuIOKAmHJlc2V0X2dwaW/igJk/CiAyNzkyIHwgIGlmIChkYXRh
+LT5yZXN0X2dwaW8pIHsKICAgICAgfCAgICAgICAgICAgIF5+fn5+fn5+fgogICAgICB8ICAgICAg
+ICAgICAgcmVzZXRfZ3BpbwptYWtlWzRdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6Mjg3
+OiBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5vXSBFcnJvciAxCm1ha2VbM106ICoqKiBbc2NyaXB0
+cy9NYWtlZmlsZS5idWlsZDo1NTQ6IGRyaXZlcnMvYmx1ZXRvb3RoXSBFcnJvciAyCm1ha2VbMl06
+ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo1NTQ6IGRyaXZlcnNdIEVycm9yIDIKbWFrZVsy
+XTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbmV0L2JsdWV0b290aC9oY2lf
+Y29kZWMuYzogbm90ZTogaW4gaW5jbHVkZWQgZmlsZToKLi9pbmNsdWRlL25ldC9ibHVldG9vdGgv
+aGNpX2NvcmUuaDoxNTM6MzU6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXMK
+bmV0L2JsdWV0b290aC9zY28uYzogbm90ZTogaW4gaW5jbHVkZWQgZmlsZToKLi9pbmNsdWRlL25l
+dC9ibHVldG9vdGgvaGNpX2NvcmUuaDoxNTM6MzU6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhpYmxl
+IHN0cnVjdHVyZXMKbWFrZVsxXTogKioqIFsvZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjL01ha2Vm
+aWxlOjIwMDM6IC5dIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToyNDg6IF9fc3ViLW1ha2Vd
+IEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkS2VybmVs
+MzIgLSBGQUlMCkRlc2M6IEJ1aWxkIDMyYml0IEtlcm5lbCBmb3IgQmx1ZXRvb3RoCk91dHB1dDoK
+CmRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmM6IEluIGZ1bmN0aW9uIOKAmGJ0dXNiX210a19yZXNl
+dOKAmToKZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYzoyNzkyOjEyOiBlcnJvcjog4oCYc3RydWN0
+IGJ0dXNiX2RhdGHigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhyZXN0X2dwaW/igJk7IGRpZCB5
+b3UgbWVhbiDigJhyZXNldF9ncGlv4oCZPwogMjc5MiB8ICBpZiAoZGF0YS0+cmVzdF9ncGlvKSB7
+CiAgICAgIHwgICAgICAgICAgICBefn5+fn5+fn4KICAgICAgfCAgICAgICAgICAgIHJlc2V0X2dw
+aW8KbWFrZVs0XTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjI4NzogZHJpdmVycy9ibHVl
+dG9vdGgvYnR1c2Iub10gRXJyb3IgMQptYWtlWzRdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hl
+ZCBqb2JzLi4uLgptYWtlWzNdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NTU0OiBkcml2
+ZXJzL2JsdWV0b290aF0gRXJyb3IgMgptYWtlWzJdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVp
+bGQ6NTU0OiBkcml2ZXJzXSBFcnJvciAyCm1ha2VbMl06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlz
+aGVkIGpvYnMuLi4uCm1ha2VbMV06ICoqKiBbL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy9NYWtl
+ZmlsZToyMDAzOiAuXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MjQ4OiBfX3N1Yi1tYWtl
+XSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBUZXN0UnVubmVy
+U2V0dXAgLSBGQUlMCkRlc2M6IFNldHVwIGtlcm5lbCBhbmQgYmx1ZXogZm9yIHRlc3QtcnVubmVy
+Ck91dHB1dDoKS2VybmVsOiAKZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYzogSW4gZnVuY3Rpb24g
+4oCYYnR1c2JfbXRrX3Jlc2V04oCZOgpkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jOjI3OTI6MTI6
+IGVycm9yOiDigJhzdHJ1Y3QgYnR1c2JfZGF0YeKAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHJl
+c3RfZ3Bpb+KAmTsgZGlkIHlvdSBtZWFuIOKAmHJlc2V0X2dwaW/igJk/CiAyNzkyIHwgIGlmIChk
+YXRhLT5yZXN0X2dwaW8pIHsKICAgICAgfCAgICAgICAgICAgIF5+fn5+fn5+fgogICAgICB8ICAg
+ICAgICAgICAgcmVzZXRfZ3BpbwptYWtlWzRdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6
+Mjg3OiBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5vXSBFcnJvciAxCm1ha2VbNF06ICoqKiBXYWl0
+aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2VbM106ICoqKiBbc2NyaXB0cy9NYWtlZmls
+ZS5idWlsZDo1NTQ6IGRyaXZlcnMvYmx1ZXRvb3RoXSBFcnJvciAyCm1ha2VbMl06ICoqKiBbc2Ny
+aXB0cy9NYWtlZmlsZS5idWlsZDo1NTQ6IGRyaXZlcnNdIEVycm9yIDIKbWFrZVsxXTogKioqIFsv
+Z2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjL01ha2VmaWxlOjIwMDM6IC5dIEVycm9yIDIKbWFrZTog
+KioqIFtNYWtlZmlsZToyNDg6IF9fc3ViLW1ha2VdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjClRlc3Q6IFRlc3RSdW5uZXJfbDJjYXAtdGVzdGVyIC0gRkFJTApEZXNjOiBS
+dW4gbDJjYXAtdGVzdGVyIHdpdGggdGVzdC1ydW5uZXIKT3V0cHV0OgoKQ291bGQgbm90IGFjY2Vz
+cyBLVk0ga2VybmVsIG1vZHVsZTogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQpxZW11LXN5c3Rl
+bS14ODZfNjQ6IGZhaWxlZCB0byBpbml0aWFsaXplIEtWTTogTm8gc3VjaCBmaWxlIG9yIGRpcmVj
+dG9yeQpxZW11LXN5c3RlbS14ODZfNjQ6IEJhY2sgdG8gdGNnIGFjY2VsZXJhdG9yCnFlbXU6IGNv
+dWxkIG5vdCBvcGVuIGtlcm5lbCBmaWxlICcvZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjL2FyY2gv
+eDg2L2Jvb3QvYnpJbWFnZSc6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFRlc3RSdW5uZXJfaXNvLXRlc3RlciAtIEZBSUwKRGVz
+YzogUnVuIGlzby10ZXN0ZXIgd2l0aCB0ZXN0LXJ1bm5lcgpPdXRwdXQ6CgpDb3VsZCBub3QgYWNj
+ZXNzIEtWTSBrZXJuZWwgbW9kdWxlOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CnFlbXUtc3lz
+dGVtLXg4Nl82NDogZmFpbGVkIHRvIGluaXRpYWxpemUgS1ZNOiBObyBzdWNoIGZpbGUgb3IgZGly
+ZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDogQmFjayB0byB0Y2cgYWNjZWxlcmF0b3IKcWVtdTog
+Y291bGQgbm90IG9wZW4ga2VybmVsIGZpbGUgJy9naXRodWIvd29ya3NwYWNlL3NyYy9zcmMvYXJj
+aC94ODYvYm9vdC9iekltYWdlJzogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQojIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogVGVzdFJ1bm5lcl9ibmVwLXRlc3RlciAtIEZBSUwK
+RGVzYzogUnVuIGJuZXAtdGVzdGVyIHdpdGggdGVzdC1ydW5uZXIKT3V0cHV0OgoKQ291bGQgbm90
+IGFjY2VzcyBLVk0ga2VybmVsIG1vZHVsZTogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQpxZW11
+LXN5c3RlbS14ODZfNjQ6IGZhaWxlZCB0byBpbml0aWFsaXplIEtWTTogTm8gc3VjaCBmaWxlIG9y
+IGRpcmVjdG9yeQpxZW11LXN5c3RlbS14ODZfNjQ6IEJhY2sgdG8gdGNnIGFjY2VsZXJhdG9yCnFl
+bXU6IGNvdWxkIG5vdCBvcGVuIGtlcm5lbCBmaWxlICcvZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3Jj
+L2FyY2gveDg2L2Jvb3QvYnpJbWFnZSc6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFRlc3RSdW5uZXJfbWdtdC10ZXN0ZXIgLSBG
+QUlMCkRlc2M6IFJ1biBtZ210LXRlc3RlciB3aXRoIHRlc3QtcnVubmVyCk91dHB1dDoKCkNvdWxk
+IG5vdCBhY2Nlc3MgS1ZNIGtlcm5lbCBtb2R1bGU6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkK
+cWVtdS1zeXN0ZW0teDg2XzY0OiBmYWlsZWQgdG8gaW5pdGlhbGl6ZSBLVk06IE5vIHN1Y2ggZmls
+ZSBvciBkaXJlY3RvcnkKcWVtdS1zeXN0ZW0teDg2XzY0OiBCYWNrIHRvIHRjZyBhY2NlbGVyYXRv
+cgpxZW11OiBjb3VsZCBub3Qgb3BlbiBrZXJuZWwgZmlsZSAnL2dpdGh1Yi93b3Jrc3BhY2Uvc3Jj
+L3NyYy9hcmNoL3g4Ni9ib290L2J6SW1hZ2UnOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CiMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBUZXN0UnVubmVyX3JmY29tbS10ZXN0
+ZXIgLSBGQUlMCkRlc2M6IFJ1biByZmNvbW0tdGVzdGVyIHdpdGggdGVzdC1ydW5uZXIKT3V0cHV0
+OgoKQ291bGQgbm90IGFjY2VzcyBLVk0ga2VybmVsIG1vZHVsZTogTm8gc3VjaCBmaWxlIG9yIGRp
+cmVjdG9yeQpxZW11LXN5c3RlbS14ODZfNjQ6IGZhaWxlZCB0byBpbml0aWFsaXplIEtWTTogTm8g
+c3VjaCBmaWxlIG9yIGRpcmVjdG9yeQpxZW11LXN5c3RlbS14ODZfNjQ6IEJhY2sgdG8gdGNnIGFj
+Y2VsZXJhdG9yCnFlbXU6IGNvdWxkIG5vdCBvcGVuIGtlcm5lbCBmaWxlICcvZ2l0aHViL3dvcmtz
+cGFjZS9zcmMvc3JjL2FyY2gveDg2L2Jvb3QvYnpJbWFnZSc6IE5vIHN1Y2ggZmlsZSBvciBkaXJl
+Y3RvcnkKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFRlc3RSdW5uZXJfc2Nv
+LXRlc3RlciAtIEZBSUwKRGVzYzogUnVuIHNjby10ZXN0ZXIgd2l0aCB0ZXN0LXJ1bm5lcgpPdXRw
+dXQ6CgpDb3VsZCBub3QgYWNjZXNzIEtWTSBrZXJuZWwgbW9kdWxlOiBObyBzdWNoIGZpbGUgb3Ig
+ZGlyZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDogZmFpbGVkIHRvIGluaXRpYWxpemUgS1ZNOiBO
+byBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDogQmFjayB0byB0Y2cg
+YWNjZWxlcmF0b3IKcWVtdTogY291bGQgbm90IG9wZW4ga2VybmVsIGZpbGUgJy9naXRodWIvd29y
+a3NwYWNlL3NyYy9zcmMvYXJjaC94ODYvYm9vdC9iekltYWdlJzogTm8gc3VjaCBmaWxlIG9yIGRp
+cmVjdG9yeQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogVGVzdFJ1bm5lcl9p
+b2N0bC10ZXN0ZXIgLSBGQUlMCkRlc2M6IFJ1biBpb2N0bC10ZXN0ZXIgd2l0aCB0ZXN0LXJ1bm5l
+cgpPdXRwdXQ6CgpDb3VsZCBub3QgYWNjZXNzIEtWTSBrZXJuZWwgbW9kdWxlOiBObyBzdWNoIGZp
+bGUgb3IgZGlyZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDogZmFpbGVkIHRvIGluaXRpYWxpemUg
+S1ZNOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDogQmFjayB0
+byB0Y2cgYWNjZWxlcmF0b3IKcWVtdTogY291bGQgbm90IG9wZW4ga2VybmVsIGZpbGUgJy9naXRo
+dWIvd29ya3NwYWNlL3NyYy9zcmMvYXJjaC94ODYvYm9vdC9iekltYWdlJzogTm8gc3VjaCBmaWxl
+IG9yIGRpcmVjdG9yeQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogVGVzdFJ1
+bm5lcl9tZXNoLXRlc3RlciAtIEZBSUwKRGVzYzogUnVuIG1lc2gtdGVzdGVyIHdpdGggdGVzdC1y
+dW5uZXIKT3V0cHV0OgoKQ291bGQgbm90IGFjY2VzcyBLVk0ga2VybmVsIG1vZHVsZTogTm8gc3Vj
+aCBmaWxlIG9yIGRpcmVjdG9yeQpxZW11LXN5c3RlbS14ODZfNjQ6IGZhaWxlZCB0byBpbml0aWFs
+aXplIEtWTTogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQpxZW11LXN5c3RlbS14ODZfNjQ6IEJh
+Y2sgdG8gdGNnIGFjY2VsZXJhdG9yCnFlbXU6IGNvdWxkIG5vdCBvcGVuIGtlcm5lbCBmaWxlICcv
+Z2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjL2FyY2gveDg2L2Jvb3QvYnpJbWFnZSc6IE5vIHN1Y2gg
+ZmlsZSBvciBkaXJlY3RvcnkKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFRl
+c3RSdW5uZXJfc21wLXRlc3RlciAtIEZBSUwKRGVzYzogUnVuIHNtcC10ZXN0ZXIgd2l0aCB0ZXN0
+LXJ1bm5lcgpPdXRwdXQ6CgpDb3VsZCBub3QgYWNjZXNzIEtWTSBrZXJuZWwgbW9kdWxlOiBObyBz
+dWNoIGZpbGUgb3IgZGlyZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDogZmFpbGVkIHRvIGluaXRp
+YWxpemUgS1ZNOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDog
+QmFjayB0byB0Y2cgYWNjZWxlcmF0b3IKcWVtdTogY291bGQgbm90IG9wZW4ga2VybmVsIGZpbGUg
+Jy9naXRodWIvd29ya3NwYWNlL3NyYy9zcmMvYXJjaC94ODYvYm9vdC9iekltYWdlJzogTm8gc3Vj
+aCBmaWxlIG9yIGRpcmVjdG9yeQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDog
+VGVzdFJ1bm5lcl91c2VyY2hhbi10ZXN0ZXIgLSBGQUlMCkRlc2M6IFJ1biB1c2VyY2hhbi10ZXN0
+ZXIgd2l0aCB0ZXN0LXJ1bm5lcgpPdXRwdXQ6CgpDb3VsZCBub3QgYWNjZXNzIEtWTSBrZXJuZWwg
+bW9kdWxlOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDogZmFp
+bGVkIHRvIGluaXRpYWxpemUgS1ZNOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CnFlbXUtc3lz
+dGVtLXg4Nl82NDogQmFjayB0byB0Y2cgYWNjZWxlcmF0b3IKcWVtdTogY291bGQgbm90IG9wZW4g
+a2VybmVsIGZpbGUgJy9naXRodWIvd29ya3NwYWNlL3NyYy9zcmMvYXJjaC94ODYvYm9vdC9ieklt
+YWdlJzogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMKVGVzdDogSW5jcmVtZW50YWxCdWlsZCAtIFBFTkRJTkcKRGVzYzogSW5jcmVtZW50YWwg
+YnVpbGQgd2l0aCB0aGUgcGF0Y2hlcyBpbiB0aGUgc2VyaWVzCk91dHB1dDoKCgoKLS0tClJlZ2Fy
+ZHMsCkxpbnV4IEJsdWV0b290aAoK
 
-V7-->V8 modifications:
--Currently, the universal reset GPIO can be found by configuring DTS.
-   USB bus can get the device node and reset GPIO in the probe phase.
-   It is fully compatible with other vendors' methods of getting reset
-   GPIO. Therefore, the previous complex methods of adding the compatible
-   string in btmtk.c to get GPIO is discarded. Abi files and yaml files
-   are no longer needed. When a Bluetooth exception occurs, the existence
-   of GPIO will be determined first. This change improves the robustness
-   of Bluetooth recovery on platforms that support hardware reset, while
-   maintaining support for platforms that do not.
-
-V6-->V7 modifications:
--Change the gpio_direction_output interface to the gpiod_set_value_cansleep
-   and gpiod_put interface.
--Remove the schedule_delayed_work asynchronous operation.
--Delete the #gpio-cell attribute in the yaml file, remove the #gpio-cell
-   in the required field, and simplify the contents of the descriptions.
-
-V5-->V6 modifications:
--Add specific revisions in the changes from v4 to v5.
--Add hardware pin title and descriptions to dt-binding submission
-   information.
--Modify the title descriptions in the dt-binding file.
--Add 7925 what is it.
--Wrap the descriptions of MT7925 chip uses the USB bus appropriately.
--Change the compatible string to mediatek,mt7925-bluetooth in
-   the dt-binding file and driver code.
--Drop gpio-controlelr properties in the dt-binding file.
--Modify the descriptions of the reset-gpios
-   properties in the dt-binding file.
--Change the node information of reset-gpios in bluetooth
-   from high level valid to low level valid.
-
-V4-->V5 modifications:
--Correct the spelling error of word provides mentioned in V1.
--Drop the xhci0 node and status property in the dt-binding file.
--Modify the bt_reset tag node to bluetooth in the dt-binding file.
--Add #gpio-cell descriptions to properties, nodes and requests.
--Make a separate patch for the changes to dt-binding.
-
-V3-->V4 modifications:
--Modify submission information why use hardware pin to reset Bluetooth.
--Write historical commit information into the cover letter.
--Modify dt binding format information and
-   the explanation text in the dt-binding file.
-
-V2-->V3 modifications:
--Changed the capitalization of co-developer names,
-   using the correct capitalization of abbreviations and full
-   name, and corrected obvious spelling errors.
--Add a revision history.
--Remove the "BT Driver" in the prefix.
--Add the bt-binding document, include inforamtion related to reset
-   pin and compatibility matching.
--Add a comment before the schedule_delayed_work function call,
-   although schedule_delayed_work is asynchronous, there is no risk.
-   Even if it is not completed within 200ms, it will only postpone
-   the subsequent probe and will not have any impact.
--Add a comment before the btmtk_reset_by_gpio function call,
-   if the compatibility filed or pin cannot be found in the dts
-   files, it can still reset bluetooth using software reset.
-
-V2 modifications:
--Modify gpio to GPIO, SW to software,
-   and fix other obvious spelling errors.
----
- drivers/bluetooth/btusb.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ef44817cad34..fcf90442a2fd 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2745,6 +2745,19 @@ static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
- 	btusb_stop_traffic(data);
- 	usb_kill_anchored_urbs(&data->tx_anchor);
- 
-+	/* Toggle the hard reset line. The MediaTek device is going to
-+	 * yank itself off the USB and then replug. The cleanup is handled
-+	 * correctly on the way out (standard USB disconnect), and the new
-+	 * device is detected cleanly and bound to the driver again like
-+	 * it should be.
-+	 */
-+	if (data->rest_gpio) {
-+		gpiod_set_value_cansleep(data->reset_gpio, 1);
-+		msleep(200);
-+		gpiod_set_value_cansleep(data->reset_gpio, 0);
-+		return 0;
-+	}
-+
- 	err = btmtk_usb_subsys_reset(hdev, btmtk_data->dev_id);
- 
- 	usb_queue_reset_device(data->intf);
--- 
-2.45.2
-
+--===============5337271754781501937==--
