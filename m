@@ -1,182 +1,179 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779DC38DEC;
-	Fri, 26 Sep 2025 10:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA32520408A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Sep 2025 15:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758881467; cv=none; b=lVUd/qNmemF2WRVUqebVYxdbUXGk3Qsl4x7o4yZdelpfiq/lK3hY/cXkqm4gy4ZKeLEqY63bUJu0UX/fkbV4J4jdLjH9wPTPqnNFfVfuAFWsG70fXbyWaPFVaItC0me0H9AZl1BurM+LkUCdVyLZZs0LGxiF4mMFl8bfsM+QV78=
+	t=1758900403; cv=none; b=MMaWUxEk41/jzKhemCGMPmw0w1k4xXKLYMIOF/KkGLAOH9Evpc5Y7gK8GVQyQ15K9J6nhfER34GOpDy3LJjfk5zgaMw8fvgbnBZwB3thD/tkXuaW44Fuk0XcFUsET4cV8KsIVKEgzQ76dueKrCznLU5G3tixJkSkhsM6C8la2sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758881467; c=relaxed/simple;
-	bh=Em0SlgY4fGTNNNCgpLDDkO1H4m/u3MwuWWF7DgCiX9k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JYLaoxkDeJvpBPJb2MRQZxoqckpa/y/UiLGjgWH3rqhkkFbnIUueO1TjFPvCLBEBlWayyRXEvk+JjEoYOW6E55BGf7VRnorg7Hoxb9hBG7GBoIktJVlxaCGPKc7n0vTYYP28zcR4+3tb2BRDdu/Q4UZWF86gVIzHzcRxo0ItljQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=sD1ZH08U; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1758900403; c=relaxed/simple;
+	bh=XLC6wT4qg0xyEfhd0UOrN51ia6O+vuNcU1da/gd0tQc=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=Nwd5XOs+0bjeIcMze06Ey3FVIaiA6YW2afZekW5pn9pmd710HvAKuFHXW7MO9jMq62tzJuKKKNzxeUfOXkmqY46TSsRIgdaUlFkthkUaUG3Klio2jIGX2i4ifMofQhPb2xZUTTuAJ1/+AHijjKQ3BnBBcjPCcVMxBBIsav+WWDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hFYN0FSd; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="sD1ZH08U"
-X-UUID: 1440be3a9ac111f0b33aeb1e7f16c2b6-20250926
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=nahzOWRsnAxDDWbnoY7+EEzku1ZXFizlLixWhDklayU=;
-	b=sD1ZH08UQWFLI0+88n+/vkigrs7enZS3ZZNARiJnPAMZSOxFVqKn2nF0+0IeqFJFAMqMuc0biRbIg6JzfAgjeeCWJSPhLhPFhaFD/3Kusv2TvkLnBGpvN5kJu0Ml5J+R6Hzyd3wejmce/dx9EpdA3caBwScrP4NhHvQToWIXITQ=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:015f70c3-5c3d-4b77-affb-0638d9b8f23f,IP:0,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:-5
-X-CID-META: VersionHash:a9d874c,CLOUDID:d0f3b6e9-2ff9-4246-902c-2e3f7acb03c4,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
-	0,EDM:-3,IP:nil,URL:0,File:130,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,
-	OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 1440be3a9ac111f0b33aeb1e7f16c2b6-20250926
-Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw02.mediatek.com
-	(envelope-from <ot_zhangchao.zhang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1994878395; Fri, 26 Sep 2025 18:10:50 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Fri, 26 Sep 2025 18:10:48 +0800
-Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1748.10 via Frontend Transport; Fri, 26 Sep 2025 18:10:47 +0800
-From: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Matthias Brugger
-	<matthias.bgg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-CC: Krzysztof Kozlowski <krzk@kernel.org>, Sean Wang <sean.wang@mediatek.com>,
-	Deren Wu <deren.Wu@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, Hao Qin
-	<Hao.qin@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel
-	<linux-arm-kernel@lists.infradead.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Zhangchao Zhang
-	<ot_zhangchao.zhang@mediatek.com>
-Subject: [PATCH v9] Bluetooth: mediatek: add gpio pin to reset bt
-Date: Fri, 26 Sep 2025 18:10:46 +0800
-Message-ID: <20250926101046.26559-1-ot_zhangchao.zhang@mediatek.com>
-X-Mailer: git-send-email 2.46.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hFYN0FSd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758900402; x=1790436402;
+  h=date:from:to:cc:subject:message-id;
+  bh=XLC6wT4qg0xyEfhd0UOrN51ia6O+vuNcU1da/gd0tQc=;
+  b=hFYN0FSdC3cHJlEvHwdV+Z0yNiomCbgehgbaJPXfNDYfpAA7GTtvwqhJ
+   jm4vBkZxW9rqOmZlTL5cxnPcFA90TtJqQGxtYlQRhathOFh1OUWS7dklf
+   vIcBRRJQLYLTcP7M9gTWCdlW/KJMTNrbj4HpP296E602af6NkZoqAll+2
+   rpM1oBE2VktYGHNV1ltTqAIhIFyyxdXn35xMMET07HnwwBwvPVDebRsIz
+   jX5W37brDoEPwFylmEc+5ojuNRypOpYaQTduAoqxFmv0E7n2+lSWzLCfY
+   X1QCQJVLccuoytUe/yqQCXj8OB7rmg81F7RvhitbfOdz0K0yAaPSVBOUi
+   A==;
+X-CSE-ConnectionGUID: eTo3M0d4QWi1vqHaPbIaWA==
+X-CSE-MsgGUID: +mmjNSuUTZug8Uc7LjDrRA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11565"; a="61154392"
+X-IronPort-AV: E=Sophos;i="6.18,295,1751266800"; 
+   d="scan'208";a="61154392"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 08:26:41 -0700
+X-CSE-ConnectionGUID: IIA34b2SQCaBuRUUw/vtWg==
+X-CSE-MsgGUID: zxfTXZDQQkmih5h2K0MDhw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,295,1751266800"; 
+   d="scan'208";a="177690735"
+Received: from lkp-server02.sh.intel.com (HELO 84c55410ccf6) ([10.239.97.151])
+  by orviesa008.jf.intel.com with ESMTP; 26 Sep 2025 08:26:40 -0700
+Received: from kbuild by 84c55410ccf6 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v2ALF-0006MH-2K;
+	Fri, 26 Sep 2025 15:26:37 +0000
+Date: Fri, 26 Sep 2025 23:26:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 8d0a1577fe0db496fa3cc674e5ebff28ebbdebd4
+Message-ID: <202509262359.zXMEL5OU-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-Support the platform Bluetooth to be reset by hardware pin,
-when a Bluetooth exception occurs, attempt to reset the
-Bluetooth module using the hardware reset pin, as this
-method is generally more stable and reliable than a
-software reset. If the hardware reset pin is not specified
-in the device tree, fall back to the existing software
-reset mechanism to ensure backward compatibility.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 8d0a1577fe0db496fa3cc674e5ebff28ebbdebd4  Bluetooth: Avoid a couple dozen -Wflex-array-member-not-at-end warnings
 
-Co-developed: Sean Wang <Sean.Wang@mediatek.com>
-Co-developed: Hao Qin <hao.qin@mediatek.com>
-Co-developed: Chris Lu <chris.lu@mediatek.com>
-Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
+elapsed time: 1470m
 
-V8-->V9 modifications:
--Corrected the if judgment in the patch from data->rest_gpio
-   to data->reset_gpio.
+configs tested: 102
+configs skipped: 1
 
-V7-->V8 modifications:
--Currently, the universal reset GPIO can be found by configuring DTS.
-   USB bus can get the device node and reset GPIO in the probe phase.
-   It is fully compatible with other vendors' methods of getting reset
-   GPIO. Therefore, the previous complex methods of adding the compatible
-   string in btmtk.c to get GPIO is discarded. Abi files and yaml files
-   are no longer needed. When a Bluetooth exception occurs, the existence
-   of GPIO will be determined first. This change improves the robustness
-   of Bluetooth recovery on platforms that support hardware reset, while
-   maintaining support for platforms that do not.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-V6-->V7 modifications:
--Change the gpio_direction_output interface to the gpiod_set_value_cansleep
-   and gpiod_put interface.
--Remove the schedule_delayed_work asynchronous operation.
--Delete the #gpio-cell attribute in the yaml file, remove the #gpio-cell
-   in the required field, and simplify the contents of the descriptions.
+tested configs:
+alpha                             allnoconfig    gcc-15.1.0
+alpha                            allyesconfig    gcc-15.1.0
+arc                               allnoconfig    gcc-15.1.0
+arc                   randconfig-001-20250926    gcc-8.5.0
+arc                   randconfig-002-20250926    gcc-9.5.0
+arm                               allnoconfig    clang-22
+arm                   randconfig-001-20250926    clang-22
+arm                   randconfig-002-20250926    clang-17
+arm                   randconfig-003-20250926    clang-22
+arm                   randconfig-004-20250926    clang-22
+arm                           sama7_defconfig    clang-22
+arm64                             allnoconfig    gcc-15.1.0
+arm64                 randconfig-001-20250926    gcc-8.5.0
+arm64                 randconfig-002-20250926    gcc-12.5.0
+arm64                 randconfig-003-20250926    gcc-9.5.0
+arm64                 randconfig-004-20250926    clang-22
+csky                              allnoconfig    gcc-15.1.0
+csky                  randconfig-001-20250926    gcc-15.1.0
+csky                  randconfig-002-20250926    gcc-14.3.0
+hexagon                          alldefconfig    clang-22
+hexagon                          allmodconfig    clang-17
+hexagon                           allnoconfig    clang-22
+hexagon                          allyesconfig    clang-22
+hexagon               randconfig-001-20250926    clang-22
+hexagon               randconfig-002-20250926    clang-22
+i386        buildonly-randconfig-001-20250926    clang-20
+i386        buildonly-randconfig-002-20250926    clang-20
+i386        buildonly-randconfig-003-20250926    clang-20
+i386        buildonly-randconfig-004-20250926    clang-20
+i386        buildonly-randconfig-005-20250926    clang-20
+i386        buildonly-randconfig-006-20250926    clang-20
+i386                  randconfig-011-20250925    clang-20
+i386                  randconfig-012-20250925    gcc-14
+i386                  randconfig-013-20250925    clang-20
+i386                  randconfig-014-20250925    clang-20
+i386                  randconfig-015-20250925    gcc-13
+i386                  randconfig-016-20250925    clang-20
+i386                  randconfig-017-20250925    gcc-14
+loongarch                        allmodconfig    clang-19
+loongarch                         allnoconfig    clang-22
+loongarch             randconfig-001-20250926    gcc-15.1.0
+loongarch             randconfig-002-20250926    clang-22
+m68k                             allmodconfig    gcc-15.1.0
+m68k                              allnoconfig    gcc-15.1.0
+m68k                             allyesconfig    gcc-15.1.0
+m68k                         apollo_defconfig    gcc-15.1.0
+microblaze                       allmodconfig    gcc-15.1.0
+microblaze                        allnoconfig    gcc-15.1.0
+microblaze                       allyesconfig    gcc-15.1.0
+mips                              allnoconfig    gcc-15.1.0
+mips                         rt305x_defconfig    clang-22
+nios2                             allnoconfig    gcc-11.5.0
+nios2                 randconfig-001-20250926    gcc-11.5.0
+nios2                 randconfig-002-20250926    gcc-8.5.0
+openrisc                          allnoconfig    gcc-15.1.0
+parisc                            allnoconfig    gcc-15.1.0
+parisc                randconfig-001-20250926    gcc-10.5.0
+parisc                randconfig-002-20250926    gcc-10.5.0
+powerpc                           allnoconfig    gcc-15.1.0
+powerpc                 canyonlands_defconfig    clang-22
+powerpc                     mpc512x_defconfig    clang-22
+powerpc               randconfig-001-20250926    clang-22
+powerpc               randconfig-002-20250926    clang-18
+powerpc               randconfig-003-20250926    clang-22
+powerpc64             randconfig-001-20250926    clang-22
+powerpc64             randconfig-002-20250926    clang-16
+powerpc64             randconfig-003-20250926    gcc-15.1.0
+riscv                             allnoconfig    gcc-15.1.0
+riscv                 randconfig-001-20250926    clang-22
+riscv                 randconfig-002-20250926    clang-22
+s390                             allmodconfig    clang-18
+s390                              allnoconfig    clang-22
+s390                             allyesconfig    gcc-15.1.0
+s390                  randconfig-001-20250926    clang-22
+s390                  randconfig-002-20250926    gcc-8.5.0
+sh                               allmodconfig    gcc-15.1.0
+sh                                allnoconfig    gcc-15.1.0
+sh                               allyesconfig    gcc-15.1.0
+sh                    randconfig-001-20250926    gcc-12.5.0
+sh                    randconfig-002-20250926    gcc-15.1.0
+sh                           se7712_defconfig    gcc-15.1.0
+sparc                            allmodconfig    gcc-15.1.0
+sparc                             allnoconfig    gcc-15.1.0
+sparc                 randconfig-001-20250926    gcc-14.3.0
+sparc                 randconfig-002-20250926    gcc-15.1.0
+sparc64               randconfig-001-20250926    gcc-12.5.0
+sparc64               randconfig-002-20250926    clang-22
+um                               allmodconfig    clang-19
+um                                allnoconfig    clang-22
+um                               allyesconfig    gcc-14
+um                    randconfig-001-20250926    clang-22
+um                    randconfig-002-20250926    clang-22
+x86_64      buildonly-randconfig-001-20250926    clang-20
+x86_64      buildonly-randconfig-002-20250926    clang-20
+x86_64      buildonly-randconfig-003-20250926    gcc-14
+x86_64      buildonly-randconfig-004-20250926    gcc-14
+x86_64      buildonly-randconfig-005-20250926    gcc-14
+x86_64      buildonly-randconfig-006-20250926    gcc-14
+xtensa                            allnoconfig    gcc-15.1.0
+xtensa                       common_defconfig    gcc-15.1.0
+xtensa                randconfig-001-20250926    gcc-14.3.0
+xtensa                randconfig-002-20250926    gcc-8.5.0
 
-V5-->V6 modifications:
--Add specific revisions in the changes from v4 to v5.
--Add hardware pin title and descriptions to dt-binding submission
-   information.
--Modify the title descriptions in the dt-binding file.
--Add 7925 what is it.
--Wrap the descriptions of MT7925 chip uses the USB bus appropriately.
--Change the compatible string to mediatek,mt7925-bluetooth in
-   the dt-binding file and driver code.
--Drop gpio-controlelr properties in the dt-binding file.
--Modify the descriptions of the reset-gpios
-   properties in the dt-binding file.
--Change the node information of reset-gpios in bluetooth
-   from high level valid to low level valid.
-
-V4-->V5 modifications:
--Correct the spelling error of word provides mentioned in V1.
--Drop the xhci0 node and status property in the dt-binding file.
--Modify the bt_reset tag node to bluetooth in the dt-binding file.
--Add #gpio-cell descriptions to properties, nodes and requests.
--Make a separate patch for the changes to dt-binding.
-
-V3-->V4 modifications:
--Modify submission information why use hardware pin to reset Bluetooth.
--Write historical commit information into the cover letter.
--Modify dt binding format information and
-   the explanation text in the dt-binding file.
-
-V2-->V3 modifications:
--Changed the capitalization of co-developer names,
-   using the correct capitalization of abbreviations and full
-   name, and corrected obvious spelling errors.
--Add a revision history.
--Remove the "BT Driver" in the prefix.
--Add the bt-binding document, include inforamtion related to reset
-   pin and compatibility matching.
--Add a comment before the schedule_delayed_work function call,
-   although schedule_delayed_work is asynchronous, there is no risk.
-   Even if it is not completed within 200ms, it will only postpone
-   the subsequent probe and will not have any impact.
--Add a comment before the btmtk_reset_by_gpio function call,
-   if the compatibility filed or pin cannot be found in the dts
-   files, it can still reset bluetooth using software reset.
-
-V2 modifications:
--Modify gpio to GPIO, SW to software,
-   and fix other obvious spelling errors.
----
- drivers/bluetooth/btusb.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ef44817cad34..f972332840f5 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2745,6 +2745,19 @@ static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
- 	btusb_stop_traffic(data);
- 	usb_kill_anchored_urbs(&data->tx_anchor);
- 
-+	/* Toggle the hard reset line. The MediaTek device is going to
-+	 * yank itself off the USB and then replug. The cleanup is handled
-+	 * correctly on the way out (standard USB disconnect), and the new
-+	 * device is detected cleanly and bound to the driver again like
-+	 * it should be.
-+	 */
-+	if (data->reset_gpio) {
-+		gpiod_set_value_cansleep(data->reset_gpio, 1);
-+		msleep(200);
-+		gpiod_set_value_cansleep(data->reset_gpio, 0);
-+		return 0;
-+	}
-+
- 	err = btmtk_usb_subsys_reset(hdev, btmtk_data->dev_id);
- 
- 	usb_queue_reset_device(data->intf);
--- 
-2.45.2
-
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
