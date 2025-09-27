@@ -1,115 +1,93 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2C872626;
-	Sat, 27 Sep 2025 14:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DEA2D73A2
+	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Sep 2025 15:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758983167; cv=none; b=JGfvS5XDgfrgiDpieW3dFGQbilqFuTZiPFxnM5FSsFYS76oieddhSfU+cl3zFrDytbfVbui3ETz7uzU9X6DXsIOr2Yx4lRBAZbrPsGhHpqDPvC7MNus3XTZrn2Y5hix+UintlOsqWbvjW3Mikl74pzCiss7A8VoQhUtEyG7h+FA=
+	t=1758987286; cv=none; b=shu6cgZDp488WXWUEvO+yOKRJHPnxg+OWvWWIkXDoLB5eavqb2FH5sLo9gejzctMLMB7HxhJ71FzjfyK+E2DhRAM05GN8QmqTicJONqex6Cez6d48tTndaBFMX8IDR9gzYYWAXy8DoOrDz1qqiTUui+v/dopeAdgT2xlMJ/x7mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758983167; c=relaxed/simple;
-	bh=n/PVGorZLSQLGMwrHBtk4qWsWt34WPfYXLx6kPx2/ys=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IryiPWCC41bbC9F+2i2g3CkL1bT/ixp7j3z2PJ8apIstjIqb45Xgmg8JtBi2uTlJEoNu5D0/cL/auox++CNBmwT62p27LocCxKOXVqMmCY6jU26V4yKTJF4ZpfHLjbteIi0++t+wN8GPNpXQqHRHsubSRVel2sj+0amc5oqMcu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.179.198.146] (unknown [24.40.139.188])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id C9AB661CCD7D6;
-	Sat, 27 Sep 2025 16:25:40 +0200 (CEST)
-Message-ID: <7926abe4-f824-4ff3-808e-e31b7869a7d6@molgen.mpg.de>
-Date: Sat, 27 Sep 2025 16:25:39 +0200
+	s=arc-20240116; t=1758987286; c=relaxed/simple;
+	bh=1NyzohdQmVFa2JZ1JpySWMhbjvJCfx19LHiQMzBXbeE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OsRRleSZnJYksn0VihHEE3WRodfwZBgy0gQ+q0hyPxYrx01/q0OS2yfwTr85RelhRuXy2A8mWjDN8M1oX6x1M7XbXMIGSeTApWH2s/y9E+Wi0Mf77GIYOwYrfD/rRc2bgHLq5XQ1q/UP/kBOjy3p8u59z3JP6WIgOfTngQr0BD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fZnKgDOm; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZnKgDOm"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-370f3111dedso19017771fa.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Sep 2025 08:34:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758987283; x=1759592083; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1NyzohdQmVFa2JZ1JpySWMhbjvJCfx19LHiQMzBXbeE=;
+        b=fZnKgDOmNO2+q7SF65F9Gc738TakS4nJA3T9Evx8SbZ4DhWVrMtKdhxRMqTn4ejzFf
+         gXRI+n9NTRaKEG2WPjSyw4e3Q+fJcfj3ob4YGMgR6eZW+0IuI5CWqgqWhkOZmy/sqfuh
+         o82ZaZ8146fFIvYWVUu58cntuMAMOdZ785G8NUMP6/kOOs+rGM7Wxz6iiVYBsLlVzea2
+         CFdxnYmRPErVbT1dsn7xzMZs0pOZE6X5cQWyijmBjNsGWycEuvxPNMhIkd+59F7e0ZP3
+         CEA79gCYvLr48wBG3TaOx2Zs3T4CM8gLJibVcA0UyZ8ijnNeGwM/FiRaE2md1yuGq0Q0
+         4BtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758987283; x=1759592083;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1NyzohdQmVFa2JZ1JpySWMhbjvJCfx19LHiQMzBXbeE=;
+        b=bQSnBvV5dsLcYzkN7QtE8HIwK480qphEH30yYtqM6FJCptUneL/8NH/zlDZcQEO02/
+         mwkc1TsQLdkaksoRR91t41taaIR2U7owYyGR5JL8TnPb4Jh0IqMOuRC2TOknbekZCbAB
+         LKAFLEUteB2FwtjP6p9qAWd8NM/uZRuDZdgShKq77eDHIuuC+8vy+Xmwp3oTczaV3nZF
+         xyEr8HMHgOTuMqo4Pona9AAxpjl46+LH9uyp3I1Ba5c2L93XDRja2mU9ZDfc1aNM9iLq
+         pEN9+60YDf6V5r62YcLz+IbrVJQu4yQsh8sF0tRGtGvmVrHaX1OAINNDFVyDvM6ie1rv
+         6fGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHr/l5D7MAo1hU8eHaq9aCdz1m8IYenJCvEMGhs4cfXZh413JmgPdd/m/5dI9HuIWto0oKvYQnj9E5Zv13zmc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycBLhULDZigkRnpOJ7GDGiTppGy5nkSP8mVDLoR2LN1o90Kd9z
+	mAqQDl8qy3y65sPnV6PMHGrFiL7grYmdl8M92/QPyiVGfy8wqFtTxRgkFxRKcKzBgwHc1Y8zhIf
+	oOty3OpdLha6jKXMoZl8w9+NcmcyLv9TApg==
+X-Gm-Gg: ASbGncu01upPF8Sjg737jJ+XPK4X09s1nnT0vdt3SeY+o5JZdJkC24p+bnMOnPtDlm0
+	CU5WxTSO0LnzgI6r3lztoSYrtmmydIr1wQn+Z328IFiMb+puSgF1fl0mSDKipkhENQhF4tf3kQu
+	iYIYSd/YW+c31bOd2OC1n7tSUHw0jftj05jCqds4PM/mtOBlpLbVEv+MPCZJ6XgjH5pvqSjVL63
+	g2PlYSIGSoCKo5s
+X-Google-Smtp-Source: AGHT+IFIV8oIu6Oj1Pp1lnbMHoF9GdCsUDzDv0uNr9W3DhIQe/zD2dAbhVOoRTo8GVxP6GDf0o+SLlO/CQEr38ubHyQ=
+X-Received: by 2002:a2e:bcd0:0:b0:36b:9ecc:cb5a with SMTP id
+ 38308e7fff4ca-36fb24aa72fmr33790481fa.22.1758987282373; Sat, 27 Sep 2025
+ 08:34:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: Add one more ID 0x13d3:0x3612 for
- Realtek 8852CE
-To: Levi Zim <rsworktech@outlook.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20250927-ble-13d3-3612-v1-1-c62bbb0bc77c@outlook.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250927-ble-13d3-3612-v1-1-c62bbb0bc77c@outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250925145124.500357-1-luiz.dentz@gmail.com> <20250926144343.5b2624f6@kernel.org>
+In-Reply-To: <20250926144343.5b2624f6@kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sat, 27 Sep 2025 11:34:30 -0400
+X-Gm-Features: AS18NWB27mOMiB1EngWQFWE_xBLp4JBJePuK0Mn4tVah9yp5rIMATLFfal63ZDM
+Message-ID: <CABBYNZJEJ2U_w8CN5h65nvRMvm2wWHHRng2J8x1Cpwd8YL4f-w@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth-next 2025-09-25
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Levi,
+Hi Jakub,
 
+On Fri, Sep 26, 2025 at 5:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 25 Sep 2025 10:51:24 -0400 Luiz Augusto von Dentz wrote:
+> > bluetooth-next pull request for net-next:
+>
+> I'm getting a conflict when pulling this. Looks like it's based on
+> the v1 of the recent net PR rather than the reworked version?
+>
+> Sorry for the delay
 
-Thank you for your patch. For the summary/title “one more” is not necessary.
-
-
-Am 27.09.25 um 04:29 schrieb Levi Zim via B4 Relay:
-> From: Levi Zim <rsworktech@outlook.com>
-> 
-> Devices with ID 13d3:3612 are found in ASUS TUF Gaming A16 (2025)
-> and ASUS TX Gaming FA608FM.
-> 
-> The corresponding device info from /sys/kernel/debug/usb/devices is
-> 
-> T:  Bus=03 Lev=02 Prnt=03 Port=02 Cnt=02 Dev#=  6 Spd=12   MxCh= 0
-> D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3612 Rev= 0.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Radio
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> 
-> Signed-off-by: Levi Zim <rsworktech@outlook.com>
-> ---
->   drivers/bluetooth/btusb.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 8085fabadde8ff01171783b59226589757bbbbbc..d1e62b3158166a33153a6dfaade03fd3fb7d8231 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -552,6 +552,8 @@ static const struct usb_device_id quirks_table[] = {
->   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x13d3, 0x3592), .driver_info = BTUSB_REALTEK |
->   						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x13d3, 0x3612), .driver_info = BTUSB_REALTEK |
-> +						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x0489, 0xe122), .driver_info = BTUSB_REALTEK |
->   						     BTUSB_WIDEBAND_SPEECH },
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Should I rebase it again?
 
 
-Kind regards,
-
-Paul
+--=20
+Luiz Augusto von Dentz
