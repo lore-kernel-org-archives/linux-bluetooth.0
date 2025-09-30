@@ -1,60 +1,67 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBA01547F2;
-	Tue, 30 Sep 2025 05:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D8330595C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Sep 2025 14:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759210789; cv=none; b=XJkDHLmjVf3pzyABE17Dpv2HHNoNKlFBJc7gbpOdK1F+TahFOLaK56UHYFhR5Nn9ZW97fHVu6ShWK+MbAIiq+6OE36BNrwbEh4WNxkTtU1/hsOas4EySQW8V/WCodZx67LLfQ9q5plbTAVd1C4razaVcoaIbzbn5mir2lwhDSCc=
+	t=1759243601; cv=none; b=gwL280d73O8P+muk337GYfRyQheOKkDKY5IZpTDADHra+rUrdkaI0nM4L6cP7643CG+K7RSVdz/iS9ttbdXOw0fYUHOeTbHvEaHH7fPLMpfh6NWkD9uIDF+derM8FTULQxdNiOUZT+Bc9r/Ikgz5j6BbJdD1xeRGZ3g20Ew4pEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759210789; c=relaxed/simple;
-	bh=3oj05juDFPgELUBimpQP1rb8UThndbpdgpeKr0IrN/A=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pgnqDkXunGt5+BD8nIRlwNgLwBnM0jRayGyjMYVL/DdYxxrKsCDVwVyERINo/jZi5d11UQ8+LKRCHSRn2S/Swan5YwuWntC3UZiVXMciWeGo8nRY3sHDDr9TE3GdhBa5qGSsyo836yb62GD2yWJQAMlesCVjgD5+22NZtUVI7Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=YbPtVfvo; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1759243601; c=relaxed/simple;
+	bh=hEmjL2pLRLP8fV874pgyPAYY7dsYFZhWqMMulLDbezk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=N1vsaI+IuFD0DQQ2KJ5e12n4BzQWq5WyM83sM+N58LX2C2xYTcbC/87ctlFr7lcKxDqUu4JZzg8u2O44F+rwgRbl1yCGhVRpvA5Dx8IvdZv1TXLdHmgFt8EyIy819dJnTHPWHDu1GsVdJmmPp7nWSvPARudSbEb4baHHxlslqvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8dMwQSp; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="YbPtVfvo"
-X-UUID: d9fbfa089dbf11f0b33aeb1e7f16c2b6-20250930
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=NvsO9T4H7Ag6wzXS0PXVlhDNJ8GuyE8WgvH3PAzr4T4=;
-	b=YbPtVfvofccXGAxs8qE8tQHwvFAV3XTceaSBMwE0DfLJm0FATs70lmA2QEECsVhHwzaCgaPLdfUFOnaZWX630CtMgLRxHz9Vte26qYNNynGQBxXYdsxAvcl7VCW9fIcllHmaj26t9CSUFVf7Ov+vZqol0bvcd2tHYfi24Wu8Kpk=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:fc1d02b1-7775-44f1-ab9e-aad728e98e4b,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:03c1d2f8-ebfe-43c9-88c9-80cb93f22ca4,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
-	0,EDM:-3,IP:nil,URL:0,File:130,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,
-	OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: d9fbfa089dbf11f0b33aeb1e7f16c2b6-20250930
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw02.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 606992304; Tue, 30 Sep 2025 13:39:36 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Tue, 30 Sep 2025 13:39:34 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1748.10 via Frontend Transport; Tue, 30 Sep 2025 13:39:34 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
-	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v1] Bluetooth: btmtksdio: Add pmctrl handling for BT closed state during reset
-Date: Tue, 30 Sep 2025 13:39:33 +0800
-Message-ID: <20250930053933.1685847-1-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8dMwQSp"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-54bc04b9d07so2597927e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Sep 2025 07:46:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759243598; x=1759848398; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RYc01ibJm6UhHLCWc2tBXOcv8KsVKinMPAdNFo+A8ZM=;
+        b=Z8dMwQSpq9eIk08TCvYTdlWdR/ka536cqwkGplbk5zVhcOBGm0LBSb0YliqJmOUc9l
+         biQOZIZMof70FvsXBjhgBUWSAXZVv05Vc1EZRrJV+9UrX2l/4Xb0EkkdeHN5G5lBm5XJ
+         Lt+3VSGEzPJLbayrcz4R0vTvBA5r266znw4GBdO+BD7Oofwmuva9r44dzbSrt9Nq3uig
+         GSEulM/Vz/rRi6a+DSVLJ0qUSx027l/FEvU2qDL/7qUFmAL9p3MRlhzAsedx1TY244bu
+         5fpsdzLN4zEQyCyaxZhwOBS5ueOuCFHdnb0gb+mgr+wUM5UHTVlEmv0Mbt4Jq/jBYK3J
+         OmWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759243598; x=1759848398;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RYc01ibJm6UhHLCWc2tBXOcv8KsVKinMPAdNFo+A8ZM=;
+        b=vZbxlX56DJnYI0//t5a3VUFsrvcXfPNBAlel1ty9lxacK2etapk2zPwDpGM9WlsJkJ
+         +39ZHQ5QBsYHtwvR+SUEhJZoMkZ12y8R27I8MRH2uVkJS7xZ1x2fb6+hNysLiCNRnBu6
+         DHtDDS07dWscTdO3WbyKaF52G5rkdq6y4EJ6kVSSvvSN6d39kBXaOfGzNsHMvQE7/JAN
+         qgfEN6r/USwoR1kO3qESwnJjO9+UsDNbbwBOvgdWtgmMKPme00Kq2M7fFdqKimc6W0Ak
+         soTQBIemVSoYk0/XzDyxP93HZd3PHgfDH+p2DN9T/A6PB6swTdw0v3GJHzQ/0bfsE5bV
+         igkg==
+X-Gm-Message-State: AOJu0YyHaaulX7GtRd0sqTLrQaSQQlaeIM6+v2UdPoA5IlHc7TVwe/12
+	0/8Pw1KA4aO9jG61oUsnjx0K0NwLNtAPDSOAIRx4PoUEB3zqYG/BU800YEFXeg==
+X-Gm-Gg: ASbGncs5OOpEhxFAmBos+mCiCRGTf7PzaGULMBJK5F3OkQJdWeHGvv2XRIESOLEUCF/
+	KVqRlH+IbJKtyZG//aFqC6myU3+KuBHwGSWVvFZF4L/OUfpamZ5koGzKe/qjN8wf27CVlZ3q2/y
+	47WBLXwfK3reFjNDtwozA5Yxd7VuXr3qBz+weEXHFabeyz6wXAkGsV3r2v+5im7cwEqjdlJzha9
+	II4AVnPVx3sw8Fg3/X0WEel1dcUOTDQLpwh7ikfj9hCiTzpaq+YIDQxKh3lzygzAlnhp/pGtoMv
+	roekZSRDdQHyAWz7nJuyxzftEo01HX4XSgJ9bOqUsyaJNjffeH04D3gEiytxf7iGuJzPzYusDpR
+	vab1ox21HbRJbg8kK/34f0VWYaLEzzm74+bBI9P7i3xWBbdelqGZVD/502erLzta1t1maG7sBmZ
+	x82xbXf0pabHI/QWP5K6s7bc2t
+X-Google-Smtp-Source: AGHT+IEK9L4MjoqZZoRKYk1ugOjB8d7IvA7iGOe6MXlJGAE70Sjety9MoUdQQ3ZZJ37jRho7uMn7Qw==
+X-Received: by 2002:ac5:c7c7:0:b0:54c:da0:f708 with SMTP id 71dfb90a1353d-54c0da10569mr3296670e0c.9.1759243597643;
+        Tue, 30 Sep 2025 07:46:37 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-54bed8a4e77sm2914671e0c.10.2025.09.30.07.46.36
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Sep 2025 07:46:36 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] device: Fix privacy
+Date: Tue, 30 Sep 2025 10:46:27 -0400
+Message-ID: <20250930144627.1676420-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,54 +69,106 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-This patch adds logic to handle power management control when the
-Bluetooth function is closed during the SDIO reset sequence.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Specifically, if BT is closed before reset, the driver enables the
-SDIO function and sets driver pmctrl. After reset, if BT remains
-closed, the driver sets firmware pmctrl and disables the SDIO function.
+In order for devices to properly be programmed into the adapter
+resolving list they need to set the flag DEVICE_FLAG_ADDRESS_RESOLUTION
+but that is only done if device_address_is_private return true but
+currently it doesn't check the rpa flag which indicates that the address
+has been updated to its identity.
 
-These changes ensure proper power management and device state consistency
-across the reset flow.
+While at it this also update the rpa flag to privacy to better indicate
+the feature rather than just the address type and then introduces
+device_set_privacy/device_get_privacy and replaces the usage of
+device_address_is_private with device_get_privacy whenever the features
+itself needs to be checked, rather than the current address type in use.
 
-Fixes: 8fafe702253d ("Bluetooth: mt7921s: support bluetooth reset mechanism")
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Fixes: https://github.com/bluez/bluez/issues/1079
 ---
- drivers/bluetooth/btmtksdio.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ src/adapter.c |  4 ++--
+ src/device.c  | 16 ++++++++++++----
+ src/device.h  |  3 ++-
+ 3 files changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 50abefba6d04..62db31bd6592 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -1270,6 +1270,12 @@ static void btmtksdio_reset(struct hci_dev *hdev)
+diff --git a/src/adapter.c b/src/adapter.c
+index dc5ba65d73fa..3afcb9277129 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5091,7 +5091,7 @@ static void load_devices(struct btd_adapter *adapter)
+ 			goto free;
  
- 	sdio_claim_host(bdev->func);
+ 		if (irk_info)
+-			device_set_rpa(device, true);
++			device_set_privacy(device, true);
  
-+	/* set drv_pmctrl if BT is closed before doing reset */
-+	if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state)) {
-+		sdio_enable_func(bdev->func);
-+		btmtksdio_drv_pmctrl(bdev);
-+	}
+ 		btd_device_set_temporary(device, false);
+ 		adapter_add_device(adapter, device);
+@@ -5752,7 +5752,7 @@ void adapter_set_device_flags(struct btd_adapter *adapter,
+ 
+ 	/* Set Address Resolution if it has not been set the flag yet. */
+ 	if (ll_privacy && btd_opts.defaults.le.addr_resolution &&
+-			device_address_is_private(device) &&
++			device_get_privacy(device) &&
+ 			!(flags & DEVICE_FLAG_ADDRESS_RESOLUTION))
+ 		flags |= DEVICE_FLAG_ADDRESS_RESOLUTION & supported & ~pending;
+ 
+diff --git a/src/device.c b/src/device.c
+index 8b3e78995881..9f0e8e673529 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -204,7 +204,7 @@ struct btd_device {
+ 	uint8_t		conn_bdaddr_type;
+ 	bdaddr_t	bdaddr;
+ 	uint8_t		bdaddr_type;
+-	bool		rpa;
++	bool		privacy;
+ 	char		*path;
+ 	struct btd_bearer *bredr;
+ 	struct btd_bearer *le;
+@@ -4995,9 +4995,17 @@ void device_set_class(struct btd_device *device, uint32_t class)
+ 						DEVICE_INTERFACE, "Icon");
+ }
+ 
+-void device_set_rpa(struct btd_device *device, bool value)
++void device_set_privacy(struct btd_device *device, bool value)
+ {
+-	device->rpa = value;
++	device->privacy = value;
++}
 +
- 	sdio_writel(bdev->func, C_INT_EN_CLR, MTK_REG_CHLPCR, NULL);
- 	skb_queue_purge(&bdev->txq);
- 	cancel_work_sync(&bdev->txrx_work);
-@@ -1285,6 +1291,12 @@ static void btmtksdio_reset(struct hci_dev *hdev)
- 		goto err;
- 	}
- 
-+	/* set fw_pmctrl back if BT is closed after doing reset */
-+	if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state)) {
-+		btmtksdio_fw_pmctrl(bdev);
-+		sdio_disable_func(bdev->func);
-+	}
++bool device_get_privacy(struct btd_device *device)
++{
++	if (device->privacy)
++		return true;
 +
- 	clear_bit(BTMTKSDIO_PATCH_ENABLED, &bdev->tx_state);
- err:
- 	sdio_release_host(bdev->func);
++	return device_address_is_private(device);
+ }
+ 
+ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+@@ -5005,7 +5013,7 @@ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+ {
+ 	bool auto_connect = device->auto_connect;
+ 
+-	device_set_rpa(device, true);
++	device_set_privacy(device, true);
+ 
+ 	if (!bacmp(bdaddr, &device->bdaddr) &&
+ 					bdaddr_type == device->bdaddr_type)
+diff --git a/src/device.h b/src/device.h
+index 9e7c30ad7186..6fbbdb1f2d28 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -29,7 +29,8 @@ bool device_is_name_resolve_allowed(struct btd_device *device);
+ void device_name_resolve_fail(struct btd_device *device);
+ void device_set_class(struct btd_device *device, uint32_t class);
+ bool device_address_is_private(struct btd_device *dev);
+-void device_set_rpa(struct btd_device *device, bool value);
++void device_set_privacy(struct btd_device *device, bool value);
++bool device_get_privacy(struct btd_device *device);
+ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+ 							uint8_t bdaddr_type);
+ void device_set_bredr_support(struct btd_device *device);
 -- 
-2.45.2
+2.51.0
 
