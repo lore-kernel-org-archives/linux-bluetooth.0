@@ -1,84 +1,196 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9020B258EDF
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Oct 2025 19:24:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61245347B4
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Oct 2025 19:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759346641; cv=none; b=rlMJULLqryUTKsa2H2b0IN1gHd4ddL1nTEQiIbkgx1oNZXTGMQL170mJotu8qfdXNNhLuboO76S7KGwhz3xoQ/gMHUWcHLRZAU4y/GmO0NyQrPZa4AFy4hX0JmqgrvoqB+H3YB5KiGqVz94wZoqv4Qh9ueF0+OvawEajnkh73Kw=
+	t=1759347664; cv=none; b=aqbyBuEVdLkuOqAOtkxhMiEuF/EOZiWeOMrblWyJLEab9/gQ0sQ1WR0KN63YQw7QOXUvtPMEZOxmcQSjvJeEHfiIO7J1bRbKC0BwUtBkrxSqRk524Zogt5zYwlPH1bf3XBuni3rdkLIgthjo3lq1oWIonYK1e5eBWqA355iNYpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759346641; c=relaxed/simple;
-	bh=zDlXcK6DqqvOMVSECg7jPS0NjAf3Smgd2H9j8yssHUU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RKQhMFyu3joB4m4HmZjFq9WZIC/FnqQwJUOa/QBEho0e1NXXGYk9Qegy6EHgeyF9LNDgA40Hcv+werI1QrzSoVD9ymfL3zX061pYI0iNy9f6O/deA8alJQyJ4/M72pzfk0Q7n9eCovreAm/1x0HWfxrb32yL6FLqCjshR0/kGC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Kh3+XXqm; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1759347664; c=relaxed/simple;
+	bh=M7R3FufmR/Ms4MORWfiKiWlhmwo3v7q0DmcqzAmN6/c=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=uMgGtM56Y5tgrdM/vUIsr7YiFDVrE+k7LnThVHYUfmeDJfOGsBaJvBtzddYTKZnfIZrc/b/AoQY5c/7ZVAUWDhdvMBy/JC8QiLKGfog65So1PW6Z1b+Hr7UuDs0zdqjedf/2DNsAPaNPHbC0bpUMiPhQFgXwJe7pRc+0BR+QGe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jOrji7qL; arc=none smtp.client-ip=209.85.217.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Kh3+XXqm"
-Received: from github.com (hubbernetes-node-407bfdf.ash1-iad.github.net [10.56.225.23])
-	by smtp.github.com (Postfix) with ESMTPA id AAD8092106D
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Oct 2025 12:23:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1759346639;
-	bh=XqUGl1IrTcE0EZGsDx2K33JkW0OtPx/nzyIwMQ6fqLU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Kh3+XXqmoW1h/QlhyfhTPjbzw4RLwCdWBRDOoolZNgz5qBgzpJQlcPsI+MtjMyGVH
-	 YqBbHOW3CqzYtd/2E7NXSsWe/RWY0AuQBis3XFbnOR2saflyOTkQmcmugoOje7LQos
-	 2mEd0l7OomaPl2ld+DWSZlh7iC3emaUY1TBBBz5w=
-Date: Wed, 01 Oct 2025 12:23:59 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jOrji7qL"
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-556f7e21432so185240137.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Oct 2025 12:41:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759347659; x=1759952459; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QECU1yQzdNd81rwe9PcZHiB6uStuR0pAlQVxOgvxsDg=;
+        b=jOrji7qL/poD84G60W5j5gkBvEZBi5UC8FebXOTANEL6bFDTdEFyLHzhh7Hs8CII7H
+         KyWt6hZnVxSaCRyj5f4jeTc6c3Qj6VuK+qjDDKt8DxrAWXrslr4NshoLo9HWU5Mql7Vn
+         kHwQ54JpQm2dQt8i6lTrDfaL0drcss9jpWGeJqtxeypG6Pj9ycqd6LAXe3UCdiS122zr
+         wYr+8YS/PcIW4ZuY5LnlWCe9gF3xYNyvkyZd+Z2HyQhTq1wPODB9XYGdTBbtNI9MYTds
+         uU2ICSdcrpAycw9Q1qOX6aDdNYLo9JhGt9xAS/JDgmGHPGLK4pRo5D5hpODNHsNyxl0J
+         cHww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759347659; x=1759952459;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QECU1yQzdNd81rwe9PcZHiB6uStuR0pAlQVxOgvxsDg=;
+        b=NSCE7rls51p4SQj1YmeestJDd9frGAr24dUQFUTTP45ocr0lqY+MKPgTIRxmyXxxqh
+         B2ICGCVi/XKzEkLNdcUsnMpNfomjAR12Oaokbf/hBODETnwsfocwTLCxVyvDzhHr3iyt
+         GtrurKGxThAuhs7HCenftT+hLjClKF34KgI30fd5vJDMSO8I1kIaSy2FyGeA9k5wCuok
+         p26epxymIjny2OYQbiHeFWWsQKqJx2DBYIYHE3XpLj/L4IGdaU/ebZwjttBsY7/cRnOQ
+         L5GgoEQCrfHdIORIPS48/wYXw1ObDffWcDAqAo5M6PbYzJU1EsigFN8FGiiugzEgwi+T
+         DjkA==
+X-Gm-Message-State: AOJu0YwoOBvHnYDTaZ/AOokhPQy2WEjJDZOOAW+YDk7KgD3KWsJYIIY9
+	4hzJUQjc9Iph/LJABkcKo4FNbsi6ObHiklIiEmtH9Xqd/hTWnT3FipMMT+1GRyJn
+X-Gm-Gg: ASbGncu0hgGybjrtHAypcwPt8iu/PPdJLuk7lSnWep7tO5X3txRkIVdpiBT06mXdEbt
+	UFZ4BcevrzMtaj2PEjflOqWrDKHORxvDrIDJgVgNAOQWC1BE6SkeUFNhCj0yhISKdJ3e+2VlJXH
+	+PywvYzDO87cdZgw9loCGptSI2GndQ72gJ7dVCg9/pDLg+JtYywzcMoULUufY7x75AQ3YHPgJPP
+	GpxRjtWKoZIgnqonMOfs3Hsms1PgjfuDoQCks2hPExEx1NBpWn7BQXwhuYIRpSExKSuoFL/DmIX
+	nYVCwtDyBkWGRIgQtMKBBD5i8Z6rLq0m9XashL5t5tdm7hhpY9lHtGdFuiBS5VzSqeqBGHNXfOO
+	ti9kowiGRn9FCG6alt8TpHabRVZ/7rvbowBlS8dD6OVKPh7aAsX7lOFrlCnlwoISxraikBRMDhR
+	txOP/5L8eoeiA1/g==
+X-Google-Smtp-Source: AGHT+IEQzA4xjK16ahsbXCffmTVRbL8NjFVRBiSl0tv2dFLOmbUdy8SMjBkDNfJpVmSxNDoxG7tZvA==
+X-Received: by 2002:a05:6102:c13:b0:55d:cfa5:9d52 with SMTP id ada2fe7eead31-5d3fe6e6b73mr2393249137.27.1759347659509;
+        Wed, 01 Oct 2025 12:40:59 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5d40c68c57bsm120152137.9.2025.10.01.12.40.58
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Oct 2025 12:40:58 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1007799/000000-a9f981@github.com>
-Subject: [bluez/bluez] 93fb4c: shared/bass: Fix permissions not requiring
- encryption
+Subject: [PATCH BlueZ v1] lib: Fix headers that are used to interface with kernel syscalls
+Date: Wed,  1 Oct 2025 15:40:49 -0400
+Message-ID: <20251001194049.86963-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1007799
-  Home:   https://github.com/bluez/bluez
-  Commit: 93fb4c0f7e7617d0a6081d25accc935c54f9faea
-      https://github.com/bluez/bluez/commit/93fb4c0f7e7617d0a6081d25accc935c54f9faea
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-10-01 (Wed, 01 Oct 2025)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M src/shared/bass.c
+This fixes the headers that are used to interface with kernel syscalls
+which seems to be broken for a very long time due bluetooth not having
+proper uapi in the kernel and libbluetooth not licensing the headers
+according to the same headers in the kernel.
 
-  Log Message:
-  -----------
-  shared/bass: Fix permissions not requiring encryption
+Fixes: https://github.com/bluez/bluez/issues/989
+---
+ lib/bluetooth/bluetooth.h | 2 +-
+ lib/bluetooth/bnep.h      | 2 +-
+ lib/bluetooth/cmtp.h      | 2 +-
+ lib/bluetooth/hci.h       | 2 +-
+ lib/bluetooth/hidp.h      | 2 +-
+ lib/bluetooth/iso.h       | 2 +-
+ lib/bluetooth/l2cap.h     | 2 +-
+ lib/bluetooth/mgmt.h      | 2 +-
+ lib/bluetooth/rfcomm.h    | 2 +-
+ lib/bluetooth/sco.h       | 2 +-
+ 10 files changed, 10 insertions(+), 10 deletions(-)
 
-Both Broadcast Audio Scan Control Point and Broadcast Receive State do
-require encryption:
+diff --git a/lib/bluetooth/bluetooth.h b/lib/bluetooth/bluetooth.h
+index 88a5d8b66134..a16523815442 100644
+--- a/lib/bluetooth/bluetooth.h
++++ b/lib/bluetooth/bluetooth.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/lib/bluetooth/bnep.h b/lib/bluetooth/bnep.h
+index a0d39058c6e4..f8a08b46ec08 100644
+--- a/lib/bluetooth/bnep.h
++++ b/lib/bluetooth/bnep.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/lib/bluetooth/cmtp.h b/lib/bluetooth/cmtp.h
+index 7ba8bfc3bf6f..47ec4119a6f9 100644
+--- a/lib/bluetooth/cmtp.h
++++ b/lib/bluetooth/cmtp.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/lib/bluetooth/hci.h b/lib/bluetooth/hci.h
+index 732477ec4b55..754c32cd8913 100644
+--- a/lib/bluetooth/hci.h
++++ b/lib/bluetooth/hci.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/lib/bluetooth/hidp.h b/lib/bluetooth/hidp.h
+index da42a1b9ecbf..aacd398562c2 100644
+--- a/lib/bluetooth/hidp.h
++++ b/lib/bluetooth/hidp.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/lib/bluetooth/iso.h b/lib/bluetooth/iso.h
+index 1e9f79ce5d4c..e0b22eced82d 100644
+--- a/lib/bluetooth/iso.h
++++ b/lib/bluetooth/iso.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/lib/bluetooth/l2cap.h b/lib/bluetooth/l2cap.h
+index 62cc04b57ae9..ca6bcaac8805 100644
+--- a/lib/bluetooth/l2cap.h
++++ b/lib/bluetooth/l2cap.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/lib/bluetooth/mgmt.h b/lib/bluetooth/mgmt.h
+index 2b45010d1b0b..ba539ad0db1d 100644
+--- a/lib/bluetooth/mgmt.h
++++ b/lib/bluetooth/mgmt.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+diff --git a/lib/bluetooth/rfcomm.h b/lib/bluetooth/rfcomm.h
+index 0347ddc36770..354263135ea7 100644
+--- a/lib/bluetooth/rfcomm.h
++++ b/lib/bluetooth/rfcomm.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/lib/bluetooth/sco.h b/lib/bluetooth/sco.h
+index 307d81f813ff..c27f7530bd4c 100644
+--- a/lib/bluetooth/sco.h
++++ b/lib/bluetooth/sco.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+-- 
+2.51.0
 
-https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/24670-BASS-html5/out/en/index-en.html#UUID-dd95da9a-6ac0-3f45-7e34-13fa9e04d41c
-
-
-  Commit: a9f981ae30d04a0395eb650e0571339d92d0b0cd
-      https://github.com/bluez/bluez/commit/a9f981ae30d04a0395eb650e0571339d92d0b0cd
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-10-01 (Wed, 01 Oct 2025)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Set QoS.Encryption if QoS.BCode is set
-
-QoS.Encryption must be set in order for the daemon to interpret the
-QoS.BCode as valid.
-
-
-Compare: https://github.com/bluez/bluez/compare/93fb4c0f7e76%5E...a9f981ae30d0
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
