@@ -1,227 +1,132 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F3726A0D5
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Oct 2025 19:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9AA1DA62E
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Oct 2025 20:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759348070; cv=none; b=Hsf8UEBOLIoDFyvF3Am/sTxdJeq8BBbaJxnIpE3qZ5wD+/x5xmwfstLvKXumvwcbQwMLYZk9ZY2K2+IbVWq8wmmtP0gISMABUY1G2859eFiKUs5Tkmw50PNAY8MfTKzgtastLh5PhjEFoJV39mJIEF3lXCLcwu8RVqBEZDr3Bhc=
+	t=1759351173; cv=none; b=TaTIhDl0QpC6hVLKZe1tBfNb81i2j2qVcKx5sqej3ZLTV/yjAArTG1NpAyHmPJigUaJMdV1BYjxIxqRThzvheplyC19R5c7DEU2FwiiDfokj2MY8JLab3l7CHu7JgKeQdVmPIGor07Cy2Gbnx+ZrCexod9aGuds4AgsTs2CIEEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759348070; c=relaxed/simple;
-	bh=JhPo/MyP2mNgd3eqcHzP1S4NsWwErCOpdg2Amum/rxE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KEOfNZwCr+T9+1hJxobajmHvmdWbWuNUcn/nfXJwdva0tsCyYOebeYqhWW3WWUOm0UJgCMOzB7fuEytjnE7Pf9dS5mbRNF7TVSD9cbr/uYgHMJrgmX6VMPMEIOUkwFxFWE97NblErSU8dFUAHFLlcnX1zw/fIav0hC6H4GinRo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q0udJ/ed; arc=none smtp.client-ip=209.85.167.42
+	s=arc-20240116; t=1759351173; c=relaxed/simple;
+	bh=YtNFUU6zgQZBFMYE4wz5Z1BlDp+NVYbi2JU3R9qlR78=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=EqGcV9BDExVpOlD9LjINvKc0SNywWjog5JJkE7OMV2Uber6xOgtjsRnXb9TuG5mtNhGB7I3zdFIV6f+X7Pc3qBKMh4/chik0xk0kd77ehw4AdewMlSEtCyZp14bF0Dz4F+VJ9Klw9TrGVCQhb7pz/jjG2rInpiUOR8CRPeCx74s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PPaEnf02; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0udJ/ed"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-58984c363ceso1305467e87.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Oct 2025 12:47:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PPaEnf02"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-271d1305ad7so2972175ad.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Oct 2025 13:39:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759348066; x=1759952866; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J7xaTGxyUWzEb8mHahlXuQm/k1B8ff6K/pkxdE8ekSs=;
-        b=Q0udJ/edY7i9os02hAiezaHmOXnVzdVYBCE/He+fpsBgKRbWucg+IqEOvqwv2ItG+1
-         3cSyUF6mTDNxJoHv3nCHPYCmoW8oDI/MOAlBz8RLNBLzGYIMLv4fW2upUYWnK5G83rD7
-         CLfKceqAUgAm+oERWgbf1DfmY25D2Ss+a/glhn7Inm9a7ZSyK5PaIXfwcImUp3pHHonx
-         iGuMwlu281rAmh7ercGeIOdmF19Rax2HIvATbCjChPahf9HR00u/I92nxrK+O6cAWp2Z
-         tgP0aFfv3Qrh+0Hk71+TGjwS4fdDCKpnVEAgY/jVo/HQTB127KrqWipvDDVBUnBIbbvK
-         yuUg==
+        d=gmail.com; s=20230601; t=1759351171; x=1759955971; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YtNFUU6zgQZBFMYE4wz5Z1BlDp+NVYbi2JU3R9qlR78=;
+        b=PPaEnf02ZxqTWTivk5vzmOBmsT2PNsKDweaIJ3/UmEDIX1y5JqJuJvaPE+4xTyGD7/
+         FqMFEGtUeEXxsK8JlarFCZf4Wt4u0guAfHpfFjMiWMB9/UvR84assIjf2AW3BSD7T0ek
+         sAnc8xVPVDMhs+XlefPIIqUKqnwsQjPfp+P9lPlVTnSx5+hs8aZTvTTxpTNOg0CmzvZV
+         cdQyqNeZbosQx91LikOPUrTDyFWMHuvC2qlDEQEp47pEZi+RT9CSRgxZ/7DLuF2WTd14
+         JFgJ0FgCzBGP5j/QYZXaO90ySRoF+RERuszwENH0eH6U0oWjN3peCARFKDws95/EMeDS
+         zX4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759348066; x=1759952866;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J7xaTGxyUWzEb8mHahlXuQm/k1B8ff6K/pkxdE8ekSs=;
-        b=D8zAWy+y2I7ltUbqNW7IvE3Lcy2mfyAplI4jpBOKIOwP8DnpJnOvoQsFu8n7mXCEk6
-         +0letdVnohbDPhffL5DaW03kSv6iyAlVst0vPInS227TFEVb+dUZi1X+VoEM5BsMaGuC
-         Qql4hORoSqHcZqSj/UTF9bUOi5YPe2eUt4Gspd+nn0cy9Zx4L3iY/wwTvIr1YvM8Yh8g
-         zd4mW7Y5BNFgvW8CCc2sMdSIOnUfBF1fq5TpsH0RVjlacJidXhbVpW3qH7Rwpo1lDkqp
-         unKAJHNwCtvDHJKveoiK7v9tSQDbQGsEMS3dj8gWs3Be6Mxy0VPywrRanfaJ0oNJNwjH
-         3hNA==
-X-Forwarded-Encrypted: i=1; AJvYcCUO+R7V81/0zpP4nBDfpPNSfM4lRHuSSYgwaTeMXxGwkpFUGELy6Zpr1NPIHppUZorytCfbD9P60++Ead2GOws=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yys/zRJMfnM8Ih8mzQnhMAut+Oga2yAeIWDrPAc4ChBnapIWrWG
-	zK3qmHmuAoQVFgwrIEjNIOcdFP2u99gu3Fb9NH8//3COBq9hFF0RYYAqVrnhJcgBEXSzkzkv8Pm
-	ns37fQTla1EpZXlU9W5qn7CnlVeB8hqY=
-X-Gm-Gg: ASbGncvtLp+CA3JZ8BQigjWXk+o9zEpltSs5YUkDS//asDUJs3vqEeU+XJbKGmUMdT1
-	2AE9DP+JOle7yoVqN3I2H3W5gyMeFhTabOIAVfsIJqaaNXgjNZpgb3Ym5HaY6ufl9aMU9N5AVcL
-	wi7Z6lC5ZtpzSK8R6fRIKdUVU/Vuvs+Fggwy2ysoHqfqxT4SD1LQW5M5UrOLzAq0ADVrIne+NZD
-	2KN95bEg3sILDcZHcKUTSMSyEvcrw==
-X-Google-Smtp-Source: AGHT+IGCoZuRaL19s9GMSYFkaQAy3BOuSK/+LKMfGOwteOSOsCrTpPKyzQdVN/E1hCl5/oRF3HVaRhQ6DVIbzrcjv9Y=
-X-Received: by 2002:a05:6512:401a:b0:581:4d9e:500e with SMTP id
- 2adb3069b0e04-58b00b4491cmr247343e87.3.1759348065680; Wed, 01 Oct 2025
- 12:47:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759351171; x=1759955971;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YtNFUU6zgQZBFMYE4wz5Z1BlDp+NVYbi2JU3R9qlR78=;
+        b=ZYFAcbt80x5EOb+n91ROzBdx+XdFAGysGxEibShe5fu+ocorigQgGmJXDPPe1apUSW
+         9DBuZKZ4wj+EhtviRFD7WHB8KNZJnToIcxv8KpRvzzOya5LD/WKDm0qrQeo15G1Mpl7k
+         IaFV1AGDkZgjSWS+GurPQxCfkrX0Q0Ty11JLN58oqnH5BT6CQS1qwDO8bL1R5IqJ/Nxe
+         kcoxBW3Y9/V/2CMYHOI844dqoFGgHaa/WVm/7YzZLnHZU3sKq5/A3WVrEF15bM8HtPpT
+         NUhhTwgk51ChXhND7KbFZXzWbxHAln4eM4Csmi2ZHJc0VwIS9R2dWnz+T1RelPOVex6V
+         +y5g==
+X-Gm-Message-State: AOJu0YxaedQbqZL9iskHjto/xr1t/gja5++pu/9Xm3EBAGs7EkmXfUA5
+	tKHtOOGtFZTNitq3SWHQ+BikQAjvA1XIKcaQakTmOpKVIpsr0PljCFcseYsovg==
+X-Gm-Gg: ASbGncvs4LDWk7I8mNvqZvZgyl2w7T+7Xg57AlWGW4kgz3MTlqTtDlcCRdvtXsq/Hm7
+	i1Ev3BSxnnMY/IP+JbSSsdjFVoWfk8kyB/WgGJ9rgxGy0aU6lh+eWYkUnqOej1j6pmavDoWiQm7
+	y71Z5GqQ/6/UE5FANygjI/I4/x1QgHthy+aZtWQ7IHJtMe67kvB96Yo7J3ErDHw+QfB1TSaaaHB
+	OMZflqBbOgKXWS4Zfw3BisjFf2H3nr1mG0bUq6Wr4dlJWO97wA58H6oc1V95hnZp9FwAQyMdjpJ
+	6xKa2gcpQ7IlgV/hvtvoKdAv1z95TywoqJzAEXgaSw6BQYD/lQyOSo/JIseIgbR19ux0WlFLL2g
+	ZwcPCioHugvME1eczQBMq9ePffuIUvZekzgw7fwozN3AKXA+dhVfiPrY3bDAVb1w=
+X-Google-Smtp-Source: AGHT+IF+KYqkDH5bjNj1gJESQEThN2XmtLWagcubZ4YMA0U1y2VokvEG+aeyL6804t/S1a8jAvn7zA==
+X-Received: by 2002:a17:902:ea0f:b0:27e:f005:7d0f with SMTP id d9443c01a7336-28e7f32fa44mr59858195ad.44.1759351170667;
+        Wed, 01 Oct 2025 13:39:30 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.229.53])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-28e8d1d5635sm4609235ad.102.2025.10.01.13.39.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Oct 2025 13:39:30 -0700 (PDT)
+Message-ID: <68dd9182.170a0220.2e7a98.2ac7@mx.google.com>
+Date: Wed, 01 Oct 2025 13:39:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4096605771159723260=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721152219.517-1-quic_fgiancan@quicinc.com>
- <cb652fe10b31e3b8421df5a85a9151839598a3f0.camel@hadess.net>
- <8ab1a298-c519-4013-b808-e707ff6f1a6c@quicinc.com> <863117cb7a91e2ed7460f24b1b8b25b8b031829b.camel@hadess.net>
- <CABBYNZLNTBinoOgaeZ3+i2D6tRXmuB=KGXxCrhu=3wOsPxFyrw@mail.gmail.com> <4243f713-3bee-41a1-b718-ee0cdc2d8e9c@quicinc.com>
-In-Reply-To: <4243f713-3bee-41a1-b718-ee0cdc2d8e9c@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 1 Oct 2025 15:47:33 -0400
-X-Gm-Features: AS18NWArcY8ss3PrXVxs1R4Fa80MwsYi2i1sP2xWeSISqi3m8kcvi6Z7I7-5yM0
-Message-ID: <CABBYNZKz=EbmNcux7BkrbdvhSfQamDpt+JAJx16_i1nUYxvQng@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/3] Keep component `bluetoothd` isolated
-To: Francesco Giancane <quic_fgiancan@quicinc.com>
-Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/2] shared/bass: Fix permissions not requiring encryption
+In-Reply-To: <20251001191352.77542-1-luiz.dentz@gmail.com>
+References: <20251001191352.77542-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Francesco,
+--===============4096605771159723260==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-On Tue, Jul 22, 2025 at 12:27=E2=80=AFPM Francesco Giancane
-<quic_fgiancan@quicinc.com> wrote:
->
-> Hello,
->
-> On 22/07/2025 15:21, Luiz Augusto von Dentz wrote:
-> > Hi Bastien,
-> >
-> > On Tue, Jul 22, 2025 at 10:10=E2=80=AFAM Bastien Nocera <hadess@hadess.=
-net> wrote:
-> >> On Tue, 2025-07-22 at 14:26 +0100, Francesco Giancane wrote:
-> >>> Hello!
-> >>>
-> >>> On 22/07/2025 13:54, Bastien Nocera wrote:
-> >>>> On Mon, 2025-07-21 at 16:22 +0100, Francesco Giancane wrote:
-> >>>>> Hi,
-> >>>>>
-> >>>>> I am posting this patch series to better decouple `bluetoothd`
-> >>>>> daemon
-> >>>>> and `libbluetooth`, as mentioned in the subject.
-> >>>>>
-> >>>>> I am introducing this change to make new BlueZ more granular.
-> >>>>> This will allow more control on which components are actually
-> >>>>> selected
-> >>>>> to build.
-> >>>>>
-> >>>>> Major use case for this change is fixing circular dependencies
-> >>>>> when
-> >>>>> bootstrapping new builds where the whole build root is to be
-> >>>>> recreated
-> >>>>> (e.g. Yocto Project).
-> >>>>> In these scenarios, to have Bluetooth support enabled in Python,
-> >>>>> `libbluetooth` is required at build time to be present but the
-> >>>>> direct
-> >>>>> chain of dependencies would require a Python installation
-> >>>>> available,
-> >>>>> thus introducing circular dependency.
-> >>>>> Separating the library and header files from the rest allows
-> >>>>> build
-> >>>>> systems to break the dependency loop.
-> >>>> FWIW, I'm currently porting bluez to meson (currently stuck on
-> >>>> porting
-> >>>> ell with its gazillion of SSL certificate tests), which would make
-> >>>> python a pre-requirement for bluez (if meson ended up being the
-> >>>> only
-> >>>> build system).
-> >>>>
-> >>>> What part of Python itself has Bluetooth support? Wouldn't it also
-> >>>> be
-> >>>> possible to make that part of Python separate so it can be built
-> >>>> after
-> >>>> bluez?
-> >>> Python uses autoconf to detect compile-time dependencies.
-> >>>
-> >>> They implemented Bluetooth network management with standard socket()
-> >>> calls.
-> >>>
-> >>> This code path is enabled at compile time only if it detects
-> >>> bluetooth.h
-> >>> header.
-> >>>
-> >>> So for python to support Bluetooth in std library, libbluetooth
-> >>> should
-> >>> be already deployed.
-> >>>
-> >>> With this current patch series I posted, you can build a "lite"
-> >>> version
-> >>> of bluez to ship just enough
-> >>>
-> >>> the library and the headers so that python can have bluetooth support
-> >>> (building a full BlueZ package requires
-> >>>
-> >>> python too... hence the circular dependency).
-> >> Right, so you're trying to do:
-> >> - bluez (lib and headers only)
-> >> - python (with Bluetooth support)
-> >> - bluez (full)
-> >>
-> >> And if meson were the only build system, you'd need to do:
-> >> - python (without Bluetooth support)
-> >> - bluez (full)
-> >> - python (with Bluetooth support)
-> >>
-> >> I guess having a minimal uapi header upstream would allow to do:
-> >> - python (with Bluetooth support)
-> >> - bluez (full)
-> > +1
-> >
-> >> Definitely the best option.
-> >>
-> >> I think it might be best to only migrate to the upstream kernel uapi
-> >> the minimum needed to build Python with Bluetooth support, and extend
-> >> it as needed afterwards.
-> > What sort of Bluetooth support does Python have built-in? I thought
-> > that would use D-Bus like pybluez, etc, but perhaps it has some HCI
-> > and SDP functionality that came built-in with libbluetooth, but its
-> > usability is very limited without the daemon, in fact it probably not
-> > really recommended to do HCI or SDP on the application side nowadays
-> > since we now have management interface that abstract HCI and SDP is
-> > sort of legacy with LE Audio catching up with BR/EDR that will
-> > probably be deprecated at some point, so perhaps we shall work with
-> > Python folks to drop the usage of libbluetooth completely once we have
-> > the UAPI headers.
->
-> The library requiring bluetooth headers to be available for Python (and
-> thus enabling
->
-> bluetooth support in python) is:
->
-> https://pypi.org/project/bleak/
->
-> >> In the short-term, why not apply your bluez patches to your bluetoothd
-> >> recipe rather than upstream? That should also motivate developers to
-> >> land the "correct" fix upstream ;)
-> > Yeah, going with intermediate solution will sort of introduce a new
-> > dependency in the form of lib only support which will serve as excuse
-> > not to adopt UAPI as soon as they are available.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTAwNzc5OQoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgUEVORElORyAgIDAuNTMgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+RU5ESU5HICAgMC4zNSBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAxOS44NyBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAg
+ICAyNjg2LjQxIHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDIwLjgyIHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDE2
+OS4xMSBzZWNvbmRzCkNoZWNrVmFsZ3JpbmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAyMzcu
+Nzkgc2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBQQVNTICAgICAgMzA1LjE2
+IHNlY29uZHMKYmx1ZXptYWtlZXh0ZWxsICAgICAgICAgICAgICAgUEFTUyAgICAgIDEyNy40MSBz
+ZWNvbmRzCkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIFBFTkRJTkcgICAwLjM5IHNlY29u
+ZHMKU2NhbkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDkyNi41OCBzZWNvbmRz
+CgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNo
+IC0gUEVORElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgoKIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQRU5ESU5HCkRlc2M6IFJ1
+biBnaXRsaW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBN
+YWtlQ2hlY2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrCk91dHB1dDoKCi4vdGVz
+dC1kcml2ZXI6IGxpbmUgMTA3OiAzMDYzOCBBYm9ydGVkICAgICAgICAgICAgICAgICAoY29yZSBk
+dW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4mMQptYWtlWzNdOiAqKiogW01ha2VmaWxlOjk5Mzc6
+IHRlc3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6MTAwNDU6IGNo
+ZWNrLVRFU1RTXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTA0Njc6IGNoZWNrLWFt
+XSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTA0Njk6IGNoZWNrXSBFcnJvciAyCiMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlRGlzdGNoZWNrIC0gRkFJTApEZXNj
+OiBSdW4gQmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0OgoKUGFja2FnZSBjdXBzIHdhcyBub3Qg
+Zm91bmQgaW4gdGhlIHBrZy1jb25maWcgc2VhcmNoIHBhdGguClBlcmhhcHMgeW91IHNob3VsZCBh
+ZGQgdGhlIGRpcmVjdG9yeSBjb250YWluaW5nIGBjdXBzLnBjJwp0byB0aGUgUEtHX0NPTkZJR19Q
+QVRIIGVudmlyb25tZW50IHZhcmlhYmxlCk5vIHBhY2thZ2UgJ2N1cHMnIGZvdW5kCi4uLy4uL3Rl
+c3QtZHJpdmVyOiBsaW5lIDEwNzogNTEwODggQWJvcnRlZCAgICAgICAgICAgICAgICAgKGNvcmUg
+ZHVtcGVkKSAiJEAiID4gJGxvZ19maWxlIDI+JjEKbWFrZVs0XTogKioqIFtNYWtlZmlsZTo5OTM3
+OiB0ZXN0LXN1aXRlLmxvZ10gRXJyb3IgMQptYWtlWzNdOiAqKiogW01ha2VmaWxlOjEwMDQ1OiBj
+aGVjay1URVNUU10gRXJyb3IgMgptYWtlWzJdOiAqKiogW01ha2VmaWxlOjEwNDY3OiBjaGVjay1h
+bV0gRXJyb3IgMgptYWtlWzFdOiAqKiogW01ha2VmaWxlOjEwNDY5OiBjaGVja10gRXJyb3IgMgpt
+YWtlOiAqKiogW01ha2VmaWxlOjEwMzkwOiBkaXN0Y2hlY2tdIEVycm9yIDEKIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlMCkRlc2M6IFJ1biBC
+bHVleiBNYWtlIENoZWNrIHdpdGggVmFsZ3JpbmQKT3V0cHV0OgoKdG9vbHMvbWdtdC10ZXN0ZXIu
+YzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjkwNDo1OiBu
+b3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXIt
+dHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTI5MDQgfCBpbnQgbWFp
+bihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+Ci4vdGVzdC1kcml2ZXI6
+IGxpbmUgMTA3OiA2OTUxNiBBYm9ydGVkICAgICAgICAgICAgICAgICAoY29yZSBkdW1wZWQpICIk
+QCIgPiAkbG9nX2ZpbGUgMj4mMQptYWtlWzNdOiAqKiogW01ha2VmaWxlOjk5Mzc6IHRlc3Qtc3Vp
+dGUubG9nXSBFcnJvciAxCm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6MTAwNDU6IGNoZWNrLVRFU1RT
+XSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTA0Njc6IGNoZWNrLWFtXSBFcnJvciAy
+Cm1ha2U6ICoqKiBbTWFrZWZpbGU6MTA0Njk6IGNoZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJbmNyZW1lbnRhbEJ1aWxkIC0gUEVORElORwpEZXNjOiBJ
+bmNyZW1lbnRhbCBidWlsZCB3aXRoIHRoZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgoK
+CgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-I guess we should probably create a github issue or perhaps update the
-issue https://github.com/bluez/bluez/issues/989 to avoid having this
-conversation lost in the email threads, also I may take the lead in
-doing the uapi conversion if no-one has started doing it already,
-since that may prevent people from using the kernel interfaces just
-because they cannot use the headers due to improper license.
-
-> >
-> >> Cheers
-> >>
-> >>> Francesco
-> >>>
-> >>>>> `--enable-bluetoothd` flag is added to the `configure` script and
-> >>>>> it is keeping the same behavior as other flags.
-> >>>>>
-> >>>>> Francesco Giancane (3):
-> >>>>>     configure.ac: introduce `--enable-bluetoothd` flag
-> >>>>>     Makefile.am: build `bluetoothd` if enabled
-> >>>>>     README: document `--enable-bluetoothd` flag
-> >>>>>
-> >>>>>    Makefile.am  |  8 ++++++++
-> >>>>>    README       | 14 ++++++++++++++
-> >>>>>    configure.ac |  4 ++++
-> >>>>>    3 files changed, 26 insertions(+)
-> >
-
-
-
---=20
-Luiz Augusto von Dentz
+--===============4096605771159723260==--
