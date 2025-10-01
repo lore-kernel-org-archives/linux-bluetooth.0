@@ -1,125 +1,178 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2202B1E5B63;
-	Wed,  1 Oct 2025 06:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949801474CC
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Oct 2025 06:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759299540; cv=none; b=rdDnB7ZFzUG+ZlnHvToEi6jJW47OVmjfLddRYRFEtFXofkxI539Iu5BIQMIdjFjk6iYlsKPxhVwURF/XQYx7L3wAM06dD+N9J8KDXUjAncc3hx4BOuu2w1X+Jt7uxu52F3q9YGGShE4f5lPlr3XUYAxb4hahz5WYfDfunYUZR9E=
+	t=1759301679; cv=none; b=ewbcqBxQpkhoEzS+G6PQ6MFeRDLSHLxHPfhc3i4jfgphU57WxPz3oBNDYa8HrDu+vPua92P4Gukhrkx2Wd8G4dpA3fbUc0jePDSPCMgwbDE8Rh/EuiSMgJ4Jfp7Z4NuGMKn6sa/+fapJhtlriZcBnnzy28rLYVC32OQxzCNtfuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759299540; c=relaxed/simple;
-	bh=tE+0yJepW2V2w1DRVBg8Ox3t6Pll9UqKyDXb0OgrRTc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IklxDGfB0OHB3nAK+Vy/bWhCVTurJClyF099mZqWALTV6551YHYJlctdfF00AWYcuBZqrMyLJrm8YTBUtz6J6jTh+m8u0+pJYv1WOTp44yy0D1VxpS7ojYxkqtj8Zo/zsS10aCI00lhx8fKrVgPvS1z6ID7WehQGhl8hbilqrvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.212] (p57bd9782.dip0.t-ipconnect.de [87.189.151.130])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1759301679; c=relaxed/simple;
+	bh=eSedF+3HbLC/IMX3GTnfpeMHk6XuK9fj/lRYKTq07V0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Type; b=O8OHjk+GP6mHETp0s0/8qTxI8LJFSpDyi3+PPHFKNNb3pclTZj4zY6GfwbhOStCsJFBtJXokMG9PD3jTwVAm/1fK2eAxNP/ovOQApOo5h1ZxAj1YOXMsDAgSj845pAB9gv9RevXiTD3dtGTjBlBxQgtNd+py0NOdXsSnF4lJE0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=eJv+YlWU; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="eJv+YlWU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1759301675;
+	bh=eSedF+3HbLC/IMX3GTnfpeMHk6XuK9fj/lRYKTq07V0=;
+	h=From:To:Subject:Date:From;
+	b=eJv+YlWUXdcRpU70CdaX7sOgQrndTY2sHLGERPApW4v0vVrOlhtczn1o6DlQ94njK
+	 MWbPN5ttpQ27Wvys+oaaaeu1yZ4Rih6qzDSNYGKItmOr5MTr+L6js56qfyNq4wUtbp
+	 dHMEl5OUYxio9Gkt9yaAt7eiyWSr1W8QDBzkj9cQ7uIpHWss/NdwGBY0NOiPFXDy5U
+	 wkLiQZI5uULsIRPylsUtIyJIJk7FsMtDlM4mt0vOcnfw4Kjssfdw5VsvWGeK1qCRXb
+	 75kCQy61EZNg49hlHMu3daFqWmx7I1PF1LChnY4cdg/bGDOi1rhxARjl2ARva4BCNH
+	 9GtcmZpqafyGQ==
+Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-2e77-3033-4926-5452.rev.sfr.net [IPv6:2a02:8428:af44:1001:2e77:3033:4926:5452])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D634E6028F357;
-	Wed, 01 Oct 2025 08:18:40 +0200 (CEST)
-Message-ID: <bb5a2f4f-bf3d-4f3f-a8ef-e787d2912dc3@molgen.mpg.de>
-Date: Wed, 1 Oct 2025 08:18:39 +0200
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 77F9917E005F
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Oct 2025 08:54:35 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/6] shared/hfp: Add dial support
+Date: Wed,  1 Oct 2025 08:54:24 +0200
+Message-ID: <20251001065429.268068-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/2] Bluetooth: btusb: Add new VID/PID 0489/e170 for
- MT7922
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Von Dentz <luiz.dentz@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Will Lee <will-cy.Lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>,
- Steve Lee <steve.lee@mediatek.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
-References: <20251001060437.2298529-1-chris.lu@mediatek.com>
- <20251001060437.2298529-3-chris.lu@mediatek.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251001060437.2298529-3-chris.lu@mediatek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Dear Chris,
+If no number, NULL or empry string, is passed to hfp_hf_dial() this
+will try to call the last dialed phone number using AT+BLDN.
 
+If the phone number starts with '>' and is followed by a number nnn…,
+up to 10 digits, it will call the phone number in memory entry nnn….
 
-Thank you for your patch. Same comments as in patch 1/1.
+Else it will performed a voice call to the number provided.
+---
+ src/shared/hfp.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++--
+ src/shared/hfp.h |  3 +++
+ 2 files changed, 60 insertions(+), 2 deletions(-)
 
-Am 01.10.25 um 08:04 schrieb Chris Lu:
-> Add VID 0489 & PID e170 for MediaTek MT7922 USB Bluetooth chip.
-> 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below.
-> 
-> T:  Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e170 Rev= 1.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=000000000
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-> 
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-> ---
->   drivers/bluetooth/btusb.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index a2cde2284163..6834592f3c39 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -687,6 +687,8 @@ static const struct usb_device_id quirks_table[] = {
->   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x0489, 0xe153), .driver_info = BTUSB_MEDIATEK |
->   						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x0489, 0xe170), .driver_info = BTUSB_MEDIATEK |
-> +						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x04ca, 0x3804), .driver_info = BTUSB_MEDIATEK |
->   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index 133bff248..c7a04b536 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -102,6 +102,7 @@ struct hfp_hf {
+ 	uint8_t battchg;
+ 
+ 	struct queue *calls;
++	char *dialing_number;
+ };
+ 
+ struct cmd_handler {
+@@ -1388,6 +1389,11 @@ void hfp_hf_unref(struct hfp_hf *hfp)
+ 	queue_destroy(hfp->calls, remove_call_cb);
+ 	hfp->calls = NULL;
+ 
++	if (hfp->dialing_number) {
++		free(hfp->dialing_number);
++		hfp->dialing_number = NULL;
++	}
++
+ 	if (!hfp->in_disconnect) {
+ 		free(hfp);
+ 		return;
+@@ -1622,7 +1628,8 @@ static struct hf_call *call_new(struct hfp_hf *hfp, unsigned int id,
+ 	call = new0(struct hf_call, 1);
+ 	call->id = id;
+ 	call->status = status;
+-	call->line_id = number;
++	if (number)
++		call->line_id = strdup(number);
+ 	call->hfp = hfp;
+ 	queue_push_tail(hfp->calls, call);
+ 
+@@ -1807,7 +1814,11 @@ static void ciev_callsetup_cb(uint8_t val, void *user_data)
+ 			DBG(hfp, "hf: No new call index available");
+ 			return;
+ 		}
+-		call_new(hfp, id, status, NULL);
++		call_new(hfp, id, status, hfp->dialing_number);
++		if (hfp->dialing_number) {
++			free(hfp->dialing_number);
++			hfp->dialing_number = NULL;
++		}
+ 		break;
+ 	}
+ }
+@@ -2421,6 +2432,50 @@ const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id)
+ 	return call->line_id;
+ }
+ 
++bool hfp_hf_dial(struct hfp_hf *hfp, const char *number,
++				hfp_response_func_t resp_cb,
++				void *user_data)
++{
++	const char *c;
++	int count = 0;
++
++	DBG(hfp, "");
++
++	if (!hfp)
++		return false;
++
++	if (number == NULL || strlen(number) == 0)
++		return hfp_hf_send_command(hfp, resp_cb, user_data,
++								"AT+BLDN");
++
++	if (number[0] == '>') {
++		for (c = number + 1; *c != '\0'; c++) {
++			if (!(*c >= '0' && *c <= '9'))
++				return false;
++			count++;
++		}
++		if (count < 1 || count > 10)
++			return false;
++	} else {
++		for (c = number; *c != '\0'; c++) {
++			if (!(*c >= '0' && *c <= '9') &&
++				!(*c >= 'A' && *c <= 'D') &&
++				*c != '#' && *c != '*' &&
++				*c != '+' && *c != ',')
++				return false;
++			count++;
++		}
++		if (count < 1 || count > 80)
++			return false;
++	}
++
++	if (hfp->dialing_number)
++		free(hfp->dialing_number);
++	hfp->dialing_number = strdup(number);
++
++	return hfp_hf_send_command(hfp, resp_cb, user_data, "ATD%s;", number);
++}
++
+ bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
+ 				hfp_response_func_t resp_cb,
+ 				void *user_data)
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index 4b171ad88..21214eee4 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -237,6 +237,9 @@ bool hfp_hf_session(struct hfp_hf *hfp);
+ 
+ const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id);
+ 
++bool hfp_hf_dial(struct hfp_hf *hfp, const char *number,
++				hfp_response_func_t resp_cb,
++				void *user_data);
+ bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
+ 				hfp_response_func_t resp_cb,
+ 				void *user_data);
+-- 
+2.43.0
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
