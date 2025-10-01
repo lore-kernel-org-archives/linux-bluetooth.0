@@ -1,16 +1,16 @@
 Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0464F13C8E8;
-	Wed,  1 Oct 2025 06:17:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2202B1E5B63;
+	Wed,  1 Oct 2025 06:18:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759299465; cv=none; b=qbIVz43lHdINOlZNH4Z3Yatw3j2D1Ll4J+5F6cX8dh/Ry85Dda2r7L7Ugbpa0uOxmpf/xI1mFDQH+7qdwNXCZ37r49GnUAwIiHesxoEt+CNxAWApuAQhjZ8IOq5DFXewIPpymxzqwp1iOV7igi3/DtnOEwu9UllUeeai2bLzjlg=
+	t=1759299540; cv=none; b=rdDnB7ZFzUG+ZlnHvToEi6jJW47OVmjfLddRYRFEtFXofkxI539Iu5BIQMIdjFjk6iYlsKPxhVwURF/XQYx7L3wAM06dD+N9J8KDXUjAncc3hx4BOuu2w1X+Jt7uxu52F3q9YGGShE4f5lPlr3XUYAxb4hahz5WYfDfunYUZR9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759299465; c=relaxed/simple;
-	bh=hxRvqUOFSmtT+K2+YA99pKt6+80fagkdz+VHNZ+rY8E=;
+	s=arc-20240116; t=1759299540; c=relaxed/simple;
+	bh=tE+0yJepW2V2w1DRVBg8Ox3t6Pll9UqKyDXb0OgrRTc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ci5yqp/FyktKhSyDMJ2hSGxFC1GyDNhOTuVZP50Qw+JxmR/6hY+ydl/rKmXkS+zxrGtzzNpSA1zGeEcmj8JyHYbMBK/Yht/0RwcVD6IeEjBFgBTBimEm8Yf9JTGOQENRKTTuKumlbejbnfkZbnox151XORaDZ8t7Jlbtxgrlq0M=
+	 In-Reply-To:Content-Type; b=IklxDGfB0OHB3nAK+Vy/bWhCVTurJClyF099mZqWALTV6551YHYJlctdfF00AWYcuBZqrMyLJrm8YTBUtz6J6jTh+m8u0+pJYv1WOTp44yy0D1VxpS7ojYxkqtj8Zo/zsS10aCI00lhx8fKrVgPvS1z6ID7WehQGhl8hbilqrvo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
@@ -19,10 +19,10 @@ Received: from [192.168.2.212] (p57bd9782.dip0.t-ipconnect.de [87.189.151.130])
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id EB7A26028F357;
-	Wed, 01 Oct 2025 08:17:03 +0200 (CEST)
-Message-ID: <632b054e-2c67-4d6d-9e61-435d1566fc4d@molgen.mpg.de>
-Date: Wed, 1 Oct 2025 08:17:02 +0200
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D634E6028F357;
+	Wed, 01 Oct 2025 08:18:40 +0200 (CEST)
+Message-ID: <bb5a2f4f-bf3d-4f3f-a8ef-e787d2912dc3@molgen.mpg.de>
+Date: Wed, 1 Oct 2025 08:18:39 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,8 +30,8 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] Bluetooth: btusb: Add new VID/PID 0489/e135 for
- MT7920
+Subject: Re: [PATCH v1 2/2] Bluetooth: btusb: Add new VID/PID 0489/e170 for
+ MT7922
 To: Chris Lu <chris.lu@mediatek.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
  Johan Hedberg <johan.hedberg@gmail.com>,
@@ -40,31 +40,27 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
  Steve Lee <steve.lee@mediatek.com>, linux-bluetooth@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
 References: <20251001060437.2298529-1-chris.lu@mediatek.com>
- <20251001060437.2298529-2-chris.lu@mediatek.com>
+ <20251001060437.2298529-3-chris.lu@mediatek.com>
 Content-Language: en-US
 From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251001060437.2298529-2-chris.lu@mediatek.com>
+In-Reply-To: <20251001060437.2298529-3-chris.lu@mediatek.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Dear Chris,
 
 
-Thank you for your patch. In the summary *new* could be left out in the 
-future. Maybe also put MT7920 in the front:
-
-Bluetooth: btusb: MT7920: Add VID:PID 0489:e135
-
+Thank you for your patch. Same comments as in patch 1/1.
 
 Am 01.10.25 um 08:04 schrieb Chris Lu:
-> Add VID 0489 & PID e135 for MediaTek MT7920 USB Bluetooth chip.
+> Add VID 0489 & PID e170 for MediaTek MT7922 USB Bluetooth chip.
 > 
 > The information in /sys/kernel/debug/usb/devices about the Bluetooth
 > device is listed as the below.
 > 
 > T:  Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
 > D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e135 Rev= 1.00
+> P:  Vendor=0489 ProdID=e170 Rev= 1.00
 > S:  Manufacturer=MediaTek Inc.
 > S:  Product=Wireless_Device
 > S:  SerialNumber=000000000
@@ -99,8 +95,8 @@ Am 01.10.25 um 08:04 schrieb Chris Lu:
 > E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
 > E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
 > I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 > 
 > Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 > ---
@@ -108,18 +104,18 @@ Am 01.10.25 um 08:04 schrieb Chris Lu:
 >   1 file changed, 2 insertions(+)
 > 
 > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 4be34c556db8..a2cde2284163 100644
+> index a2cde2284163..6834592f3c39 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
-> @@ -621,6 +621,8 @@ static const struct usb_device_id quirks_table[] = {
->   	/* Additional MediaTek MT7920 Bluetooth devices */
->   	{ USB_DEVICE(0x0489, 0xe134), .driver_info = BTUSB_MEDIATEK |
+> @@ -687,6 +687,8 @@ static const struct usb_device_id quirks_table[] = {
 >   						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x0489, 0xe135), .driver_info = BTUSB_MEDIATEK |
+>   	{ USB_DEVICE(0x0489, 0xe153), .driver_info = BTUSB_MEDIATEK |
+>   						     BTUSB_WIDEBAND_SPEECH },
+> +	{ USB_DEVICE(0x0489, 0xe170), .driver_info = BTUSB_MEDIATEK |
 > +						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x13d3, 0x3620), .driver_info = BTUSB_MEDIATEK |
+>   	{ USB_DEVICE(0x04ca, 0x3804), .driver_info = BTUSB_MEDIATEK |
 >   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x13d3, 0x3621), .driver_info = BTUSB_MEDIATEK |
+>   	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
 
 Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
