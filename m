@@ -1,126 +1,74 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EFA1DB54C
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 17:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267AD34BA40;
+	Thu,  2 Oct 2025 19:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759427588; cv=none; b=bwqw0QKThVjNvmF2Z0v5tNyHprIphs4fpdZqs4BEdW8miqU8t+UbH9QpGVUg3e9qg119t+ckXBYBlqQ3oXctqQy9NrDqyxcux6NOPjMHfs+URklrjIM1tWg59vu0kgrYgWqsh76sliFEHaTtfUY9BmDpj2z/OcKODs/DlNX5klY=
+	t=1759432484; cv=none; b=ZIrvm0os+u687aDbwY8reAFiE9Z2X4+XVT6IpvdXhXqrkCT4ailJtjt78NJmB8nZAyF+UBHtg2khUxPmle7KtuOWLJs5Jw3fOVRBImizifeKvbSnEnUPULLVXHRBt1DXjrJkV413sc8CzRYpDxKRdJbtrn5lRbR603mTdiLxWBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759427588; c=relaxed/simple;
-	bh=N0q0iCa7dSWdh/9hiVKxiUZ9Pss3nQL1+IjcFFi0038=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=TdAinur6fGYvR6k7r+ZwmYinwJH0iCfSay7zoK1zE9+7NGkT4QWGivbGY0WAgnW8hennte5x8JR0uR68O54yUhip+gy/E/wXLEzHhlc3GL8DE9thmhXeLJXdHFzrbWm1VMXC3bxys+4tR6QCocfs38qWv0h5ip83p6VKM7WKgd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m8oAgOVg; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1759432484; c=relaxed/simple;
+	bh=92MLjJs609HrhHYwGgr4oKlRLugL7eBkUYYYfFKDQz8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GFSlCLJ9EKVp9GDMY5Tf17YvQaawA+LX/rHw7eRfAS6NLJ+GyO+G5/0iIWWfGqGqTEGjFtgk+Vd1Yy4XFZNvmdKVueeVEca5XwEOT9CYPC2CKWVn3QtbnT04ff+z1tIrWmuKDWrjk74WjYaFotB6bmqJxVsG19kMvTD7IQvyvE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EHmK4qwC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m8oAgOVg"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7833765433cso1878147b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Oct 2025 10:53:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759427586; x=1760032386; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aPwiSZPTTTsNxxaWyMOZ4N2qsAZcY3XjAqIllITkkls=;
-        b=m8oAgOVgVm9SlSAiknBs/5fjNzp8hE5pN9jdRKcPChxKKqbyQnUDAZIqvg3rp4dGdH
-         X2qPXlMov2UyTviT4ey27BQZN0ycIfBmCCSruIPuB2C7qQWhFdAdSsZQ9a2WY1tc/gez
-         Y4ZYHkMAbFC83XjcOOeqwp93fdOjZyeu5vWcIh/U1+3DcZ2eKxnmQ0FiU6oipmdvZMKP
-         KDcGIy8t6G7DnHDhOWqUPYZf0ksBLO/sW56Xk6aXDl5WOZ042gG2CcZW543SjBz3Irij
-         GVMPQxedRjzSVZyW0z96Ts5Gvy0vOT2rr/TCjPrYvhaqYfuqZH8TSzXyHLUCl7WwQD98
-         kOOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759427586; x=1760032386;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aPwiSZPTTTsNxxaWyMOZ4N2qsAZcY3XjAqIllITkkls=;
-        b=JZaASsrY2pnIkGak5dPxFILPqRgHGuN7P232FbdQzUFgUGqeZK8r33OF5yVyiTyy3x
-         DFSvhhvDLwLczBlmtNzVu6xqWd9a38+l2M2n7+JXo8HIhRG6Axa2xg5+hLyohTl0KWCy
-         r35LFaZmiXe63OvQpr5ZdKmQyCv6LWpuD26zNHudSXfHSwSttvE8pZyGSuPSd/dVruOb
-         P3xoaRDkI99hZF8r1rZoW2gDDU4h0ycrMY3jyOlD1MUpbXIaal2Tsq72Dt4psVndbcRn
-         Zgr8MUPbOMkL0qXRoAVGFZOJX/nfKRQu+3ZBSwZnLsOJIcFbLeHh2rqbJAzsmarBpWWm
-         IRGg==
-X-Gm-Message-State: AOJu0Yy+TbxquyL56AJOzIaJ2ENCcw/yDwX19P8EFLGT+fAFiXi9o/7G
-	r70/9vVB43cnwnBO6M2KDyG7JNxhg396IjYELARfl7YPIabdwKG+ros4dysQvQ==
-X-Gm-Gg: ASbGncv+kE63TMc8PGiazWgUuHvA9NVHuP3kESp+iwtxlSpbGk2CSwBxa8y90NPPgeh
-	7k9gcmWyDcH2EIbCC6z2dQxAaX441O7+iNY7R1JuSQxK8ZiLHWuVi8dcztOZPClRV17xannVT0c
-	l2sUAbWe20V9vMcq55AkNBJOdm+n+jWvblRjgP7adjszvRp5wCs8CSW7hwN9BGj6l3ityrqEVur
-	JL+JoECyB3OPu5xQPXjtTmBMO9aYxErB2MzKHfmPT1wdwWJdRf7gieYskvz15++MWZIgfpeuJU8
-	0X9zowOuIzj6iTGNktbi/iRyFHI/LEAUw4Z1g57wSU+KgH3cK6C58OuF4QSPxXUnjntkVv6FVPe
-	pvJqSRkPWtw6TYAv7BNZRS1aCxVMpkFITxmR6IbGRAG/L1GAA9Ui6
-X-Google-Smtp-Source: AGHT+IGXTzcImhhL9knJbx97k6QuhuEib9fZ/Lkv9viZNxiAi/oKfZf7MSYswKQ0P5C0M9yd8E8/yQ==
-X-Received: by 2002:a05:6a00:2e18:b0:781:1a62:4a35 with SMTP id d2e1a72fcca58-78c98a7ec0amr552806b3a.0.1759427585783;
-        Thu, 02 Oct 2025 10:53:05 -0700 (PDT)
-Received: from [172.17.0.2] ([52.161.55.196])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78b0206f619sm2644020b3a.67.2025.10.02.10.53.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Oct 2025 10:53:05 -0700 (PDT)
-Message-ID: <68debc01.a70a0220.15a923.b3c6@mx.google.com>
-Date: Thu, 02 Oct 2025 10:53:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5319244285411671582=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EHmK4qwC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66B9FC4CEF4;
+	Thu,  2 Oct 2025 19:14:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759432483;
+	bh=92MLjJs609HrhHYwGgr4oKlRLugL7eBkUYYYfFKDQz8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EHmK4qwC7dftjxl8hzowrFB4APNOBVDoF0Mnb3aALqn3KUPLSe6sNadA0qsYwHMKk
+	 RysMe7tFnvHiLKF8xkyixOJrbeZ1CKCF2KdKdLoBTQRhHTmHVANIUcXnYLMNgTaiXI
+	 DQDxfucCPSOs+8t1hudYLx3OmcU1TUTcimMDAXCi6bZt+6yBILLBdMVp45gKuL3wrR
+	 7FKnNhtPzCYXM6Ocf0MKIukjGlZZ7fNoo3X+oMAElJHk+IH3Eyk+bmXkvCQnfAY/pP
+	 MsYcghuEGkK7Hp1SZNm1M/4cHxCiI9IyNt92uTWL6JPWfXy5XBuMDR+GVoefmFXkZS
+	 PDMYTTf4BY5wg==
+Date: Thu, 2 Oct 2025 14:14:42 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+Cc: andrew+netdev@lunn.ch, conor+dt@kernel.org, kernel@collabora.com,
+	krzk+dt@kernel.org, angelogioacchino.delregno@collabora.com,
+	luiz.dentz@gmail.com, kuba@kernel.org, devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH v3] dt-bindings: net: Convert Marvell 8897/8997 bindings
+ to DT schema
+Message-ID: <175943240204.235529.17735630695826458855.robh@kernel.org>
+References: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ] shared/hfp: Fix issues found by codacy
-In-Reply-To: <20251002161119.937608-1-frederic.danis@collabora.com>
-References: <20251002161119.937608-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5319244285411671582==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1008059
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.93 seconds
-GitLint                       PENDING   0.43 seconds
-BuildEll                      PASS      20.09 seconds
-BluezMake                     PASS      2703.80 seconds
-MakeCheck                     PASS      20.15 seconds
-MakeDistcheck                 PASS      185.88 seconds
-CheckValgrind                 PASS      237.01 seconds
-CheckSmatch                   PASS      309.45 seconds
-bluezmakeextell               PASS      127.31 seconds
-IncrementalBuild              PENDING   0.33 seconds
-ScanBuild                     PASS      909.99 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
 
 
+On Wed, 01 Oct 2025 15:33:20 -0300, Ariel D'Alessandro wrote:
+> Convert the existing text-based DT bindings for Marvell 8897/8997
+> (sd8897/sd8997) bluetooth devices controller to a DT schema.
+> 
+> While here, bindings for "usb1286,204e" (USB interface) are dropped from
+> the DT   schema definition as these are currently documented in file [0].
+> 
+> [0] Documentation/devicetree/bindings/net/btusb.txt
+> 
+> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> ---
+>  .../net/bluetooth/marvell,sd8897-bt.yaml      | 79 ++++++++++++++++++
+>  .../devicetree/bindings/net/btusb.txt         |  2 +-
+>  .../bindings/net/marvell-bt-8xxx.txt          | 83 -------------------
+>  3 files changed, 80 insertions(+), 84 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/marvell,sd8897-bt.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+> 
 
----
-Regards,
-Linux Bluetooth
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-
---===============5319244285411671582==--
+You'll probably have to resend this after rc1.
