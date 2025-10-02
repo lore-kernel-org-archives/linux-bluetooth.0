@@ -1,103 +1,133 @@
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA318238C0A
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 15:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84E5244679
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 16:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759420754; cv=none; b=P++4ZaH/Rpbk0rgxAxCUHeHTeBaPO6f0aPNt4wx7KXBz/6QdWYPmZ6ClwyJztLK0YOMUQVHZv4lq1Ea9i29sOYZdp2egrBKarJVoNkN/toDr8mVRmtguRjA29OWSWFnVmLogxUQzN4N2fIQK4LkHBSEJR1mT2ImuDdUYad0TpXY=
+	t=1759421491; cv=none; b=tTXa0BObofg7FxiXcJS2GpAfoy1rzQlPGq7oUN7NVavkp7mDZhGRoRWYKWZq/9PIsRB/THPPrhAtwxFJflScrQAMV2r379xOQ5xFqAPoUDMaBhsW7xYUnVuDkkwXexr0zZjK5cdJLDZUZYF/QAiQd5zLqS+fb+TqmOSkv0flTa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759420754; c=relaxed/simple;
-	bh=p8zJXE/TxvmLVJJEMydEmEGRGy1q17AXH9ICU36aeNE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BM6/89p0F7LvxproEDRhniTNWDq4HZe9yC6zfoSrCLGZK6h1DfgwMAH1srwPzO9IPG45eSFvTnLJGfsjla05RgMfFd3XF4nVGl6xTn0FUEVPynM5XmL8XmSdWhnjIGI4Gt7776C40FjxXATebM8jgkofqKQ4HE+T8Ah6Z9zHsEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O0IL1jdD; arc=none smtp.client-ip=209.85.222.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1759421491; c=relaxed/simple;
+	bh=nU5P5BNeSHEbtPSkX2qcSJ8KdYhGJm0vl57dus2hV+Q=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CEZnQQziHtEjMhi1h3YTLffv3nBTmIlFLA6yRVKO7hSR6H617BYKn2DwWAwZzhIgHWNf1nLZ5lKG0DzoLPyQzp9Y0N7bjn71lJewfYVJ3idrEow60WQ+oA3bryIJZ330t2Wu6wtIBHTvLe2XvW0FeUPQ7XMsNqwyNzPd36C8968=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=mkU9MlPn; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O0IL1jdD"
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-904d71faab6so890322241.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Oct 2025 08:59:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759420750; x=1760025550; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RC+8kIqRaXCMTLhxqkEOpX/jlNHck0RTjV4aGnXLp2M=;
-        b=O0IL1jdDiJuEtl6tCsVZSc25BN+RgACqNp68cg+2Q1JMR7H2nMeexOKPahgeKkkCiO
-         /WK4tMySwidgQJo0NDLheeYrU+8gXSzrdn0TSFyrcNMnVJdfiK4x/wz+SCe86RMOdpF4
-         RcMukkDSZIHseFx572/fcZMaaYVjG428EW31c3/X3GPNCjihtyQMH0IamqqlPQ47uaIs
-         mVtwE51Oq+5SnPGJbq6GLQAq04LX46kuJYulj6Yjn/eJhyo4oVLxkGM3tbnYtD+bHT30
-         am58fVin00NSOXgWqQZXw2pgC/q0dRGNwnNBbCllVrH6pcdz4sLpbQVkPDwhyIUDRc4K
-         c5sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759420750; x=1760025550;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RC+8kIqRaXCMTLhxqkEOpX/jlNHck0RTjV4aGnXLp2M=;
-        b=WYfCvMSXyk7Ht2ojbL/BP9bneTSd433q94n1+p7Fw9vWdXuiC06xEusr1Xolv+b6mZ
-         luW4ZwcSIaP8uYFjcuKo1rHaHEi+hJ4xGA3DHBl4wgHE1ABTCn4QjNXYwPWxn/iHIoGt
-         GRiiAqTuJPDktOl4ChEVIB64ORcbR7l0fKSX7t/j1mdNO7uSDVdhbWst2IDHFD6Wprbu
-         Thq4pKFBrNYNz567Owrh+A6fyDgZSt2ShPdj8rW3CD7MNlbnrc4oMjT0lQXalu9MsjNn
-         5hzGdT7T1zoSJAL4qASHQbEx/UCLIF6JmgFMlwoDznomkOe/eOCkr4FsopJ87/PVrMJr
-         nUpw==
-X-Gm-Message-State: AOJu0YzelaeaXOlviPa4XE8dV7xbU0XeT2578SCyipOj5Iss28KJF7qr
-	L/EXXIWOEy+PryxHlxErCuvrjTc/3UWCfDe5XlU1i4LqAo6hBK7vJi2E0K9g6yP3
-X-Gm-Gg: ASbGncvplDWUsuZDrE4Ty0grpsnd1W+7xD4+qSY2VdVQHdDjKtUjYugLAMBIXu2u705
-	7fZNGmZDm0562XaKAXSF0V86YElui/I/Eb12+WH/jbI6fH3TC+FCbRsCGSYNAOdf9rXLZ6Hj6Lu
-	E6AreVCWp5z8gNncFmXhw4/V2YzjkEKOHp3otKWfLX3CuWDBvZyW7gF8cO96s85Gu1xlhdFmpbX
-	QbTu5fdibnAu9QsQGGBRhooxwQq/GT1tviNtGZJYqAKTXL9DLEco/NVVLxr72A6i/GGrS5+JoYs
-	cTpuZfx1pKgWdBq36Ow8D+qERULiGuYW+YW0wk2GPsFiN0vY4OIsqkPArIkpqP+jnvkk28QZQL2
-	7JKuvxoPXJRErr7RSlkQXvS11KLPU6E0V3jzi3e4D984GD+ifnc46zOC2HTZmjwjfnesMZpfi3R
-	ooyB4P+xJ0KXrMrA==
-X-Google-Smtp-Source: AGHT+IG0FKVVomi0n2aBSb3YNkQINekmwHxjwFleRa/HLOUFCe7fwP3YW9js2Puf9c5qDat8TJqXEg==
-X-Received: by 2002:a05:6122:1687:b0:552:15a3:e764 with SMTP id 71dfb90a1353d-5522cf8c050mr3439343e0c.0.1759420749892;
-        Thu, 02 Oct 2025 08:59:09 -0700 (PDT)
-Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5523ce69923sm578545e0c.11.2025.10.02.08.59.07
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Oct 2025 08:59:09 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="mkU9MlPn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1759421487;
+	bh=nU5P5BNeSHEbtPSkX2qcSJ8KdYhGJm0vl57dus2hV+Q=;
+	h=From:To:Subject:Date:From;
+	b=mkU9MlPnnYDqm7AHWH8DU2NW4Ovbcu0UtDxyNKHdz4Qy5LL3Xg0wa61yQTduqwnXm
+	 Bd7F8L+E+/B/nYKv1kcbYUMDNn1M23GF0DFHNvnqpQDRRPEiC1ACG1t0skrzuJiauq
+	 Kwmh8RhP18tiri7zAcMXdmIgkiZPJAZTH9UPUlLLbMzDqX4ej98IxguWMrlwL30QUp
+	 VVgoI1ooKT5NiRyQ6rjVjlAFHqCMpbEz16KN1m5Ipku9bOnnSLSEzTY/qROK14bDLD
+	 qsWUsBWfuFaZsapF9lTeWHEApgj4zGJkPPbg9hzgcTCSUXBL6+XYdmsgpbpO7OrzKc
+	 m1DZtGQYlUY2w==
+Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-2772-9836-E14c-d5b5.rev.sfr.net [IPv6:2a02:8428:af44:1001:2772:9836:e14c:d5b5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8B47E17E12BB
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 18:11:27 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 2/2] client/player: Set QoS.Encryption if QoS.BCode is set
-Date: Thu,  2 Oct 2025 11:58:55 -0400
-Message-ID: <20251002155855.241787-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251002155855.241787-1-luiz.dentz@gmail.com>
-References: <20251002155855.241787-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] shared/hfp: Fix issues found by codacy
+Date: Thu,  2 Oct 2025 18:11:19 +0200
+Message-ID: <20251002161119.937608-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-QoS.Encryption must be set in order for the daemon to interpret the
-QoS.BCode as valid.
+Move debug string after check of hfp pointer.
+Add missing argument in debug trace.
 ---
- client/player.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/shared/hfp.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/client/player.c b/client/player.c
-index 598ad7f6dfd7..bb193dafeba0 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -1870,6 +1870,10 @@ static void append_bcast_qos(DBusMessageIter *iter, struct endpoint_config *cfg)
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index 133bff248..94adccada 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -2391,11 +2391,11 @@ bool hfp_hf_session_register(struct hfp_hf *hfp,
  
- 	if (cfg->ep->bcode->iov_len != 0) {
- 		const char *key = "BCode";
-+		uint8_t encryption = 0x01;
+ bool hfp_hf_session(struct hfp_hf *hfp)
+ {
+-	DBG(hfp, "");
+-
+ 	if (!hfp)
+ 		return false;
+ 
++	DBG(hfp, "");
 +
-+		g_dbus_dict_append_entry(iter, "Encryption", DBUS_TYPE_BYTE,
-+						&encryption);
+ 	if (!hfp_hf_register(hfp, slc_brsf_cb, "+BRSF", hfp, NULL))
+ 		return false;
  
- 		bt_shell_printf("BCode:\n");
- 		bt_shell_hexdump(cfg->ep->bcode->iov_base,
+@@ -2407,15 +2407,15 @@ const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id)
+ {
+ 	struct hf_call *call;
+ 
+-	DBG(hfp, "");
+-
+ 	if (!hfp)
+-		return false;
++		return NULL;
++
++	DBG(hfp, "");
+ 
+ 	call = queue_find(hfp->calls, call_id_match, UINT_TO_PTR(id));
+ 	if (!call) {
+ 		DBG(hfp, "hf: no call with id: %u", id);
+-		return false;
++		return NULL;
+ 	}
+ 
+ 	return call->line_id;
+@@ -2427,11 +2427,11 @@ bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
+ {
+ 	struct hf_call *call;
+ 
+-	DBG(hfp, "");
+-
+ 	if (!hfp)
+ 		return false;
+ 
++	DBG(hfp, "");
++
+ 	call = queue_find(hfp->calls, call_id_match, UINT_TO_PTR(id));
+ 	if (!call) {
+ 		DBG(hfp, "hf: no call with id: %u", id);
+@@ -2440,7 +2440,7 @@ bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
+ 
+ 	if (call->status != CALL_STATUS_INCOMING) {
+ 		DBG(hfp, "hf: %d not in incoming call state: %u",
+-							call->status);
++							id, call->status);
+ 		return false;
+ 	}
+ 
+@@ -2453,11 +2453,11 @@ bool hfp_hf_call_hangup(struct hfp_hf *hfp, uint id,
+ {
+ 	struct hf_call *call;
+ 
+-	DBG(hfp, "");
+-
+ 	if (!hfp)
+ 		return false;
+ 
++	DBG(hfp, "");
++
+ 	call = queue_find(hfp->calls, call_id_match, UINT_TO_PTR(id));
+ 	if (!call) {
+ 		DBG(hfp, "hf: no call with id: %u", id);
 -- 
-2.51.0
+2.43.0
 
