@@ -1,133 +1,85 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84E5244679
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 16:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109AF24DD11
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 16:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759421491; cv=none; b=tTXa0BObofg7FxiXcJS2GpAfoy1rzQlPGq7oUN7NVavkp7mDZhGRoRWYKWZq/9PIsRB/THPPrhAtwxFJflScrQAMV2r379xOQ5xFqAPoUDMaBhsW7xYUnVuDkkwXexr0zZjK5cdJLDZUZYF/QAiQd5zLqS+fb+TqmOSkv0flTa0=
+	t=1759421820; cv=none; b=j6azFMY8DZUJ++fonKHDLGmFj3WxBmkrZ1hxC2Cd46HpmPvfuKVGh2oImqlWdMg1Bfc/OdBsu45n9ClX0gMbTisq+ZHwZiY9rWi0BOgUSxLJ+f/0TS/XOe9vDb6Z4ocTvAkBgWpQXAv6aSEhh3P7pQMyYd6yyuKGxi8N+xulIBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759421491; c=relaxed/simple;
-	bh=nU5P5BNeSHEbtPSkX2qcSJ8KdYhGJm0vl57dus2hV+Q=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CEZnQQziHtEjMhi1h3YTLffv3nBTmIlFLA6yRVKO7hSR6H617BYKn2DwWAwZzhIgHWNf1nLZ5lKG0DzoLPyQzp9Y0N7bjn71lJewfYVJ3idrEow60WQ+oA3bryIJZ330t2Wu6wtIBHTvLe2XvW0FeUPQ7XMsNqwyNzPd36C8968=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=mkU9MlPn; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1759421820; c=relaxed/simple;
+	bh=eL3xzYZaj017pQyrNVq784v7CYR63ZOeNEY6XmFtSXU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=h4t9aDaPkOuyUW+tqz+2ixO8hiczR5vBGifOmmz+3IZOoQz3j6370p0GamRtPzOnVACDwlsLHc1evhSyx84tOYQOHthnjjgUFudOlkFCDl5xzCu0kzSn/vUMidqWaL8APrcrSjwqLPpj5Lu3YjqN5eULArt/TbuG/qAT8Hibyac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ENSbl4fD; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="mkU9MlPn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1759421487;
-	bh=nU5P5BNeSHEbtPSkX2qcSJ8KdYhGJm0vl57dus2hV+Q=;
-	h=From:To:Subject:Date:From;
-	b=mkU9MlPnnYDqm7AHWH8DU2NW4Ovbcu0UtDxyNKHdz4Qy5LL3Xg0wa61yQTduqwnXm
-	 Bd7F8L+E+/B/nYKv1kcbYUMDNn1M23GF0DFHNvnqpQDRRPEiC1ACG1t0skrzuJiauq
-	 Kwmh8RhP18tiri7zAcMXdmIgkiZPJAZTH9UPUlLLbMzDqX4ej98IxguWMrlwL30QUp
-	 VVgoI1ooKT5NiRyQ6rjVjlAFHqCMpbEz16KN1m5Ipku9bOnnSLSEzTY/qROK14bDLD
-	 qsWUsBWfuFaZsapF9lTeWHEApgj4zGJkPPbg9hzgcTCSUXBL6+XYdmsgpbpO7OrzKc
-	 m1DZtGQYlUY2w==
-Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-2772-9836-E14c-d5b5.rev.sfr.net [IPv6:2a02:8428:af44:1001:2772:9836:e14c:d5b5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8B47E17E12BB
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 18:11:27 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ENSbl4fD"
+Received: from github.com (hubbernetes-node-516eb8c.ash1-iad.github.net [10.56.174.24])
+	by smtp.github.com (Postfix) with ESMTPA id 2DFDB600300
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 09:16:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1759421818;
+	bh=Ek8jWJC74ndDKEUkz2AECL7V0pHNMCmEvKpAaAxsp1k=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ENSbl4fDgbtuG07B1Vlp06KPA4ullaJEe48p8JDLN2sjVL5d05BAejzegFPWhYZ+C
+	 I6z/PdJXU10xW4y6Pab1wQetTH9zgKCY4NL/iOLT9F97E8+m1nx245hxL0FCyZJa+y
+	 3S8XSSAgZAXg27JXcDZlvbcd/ZHkMEb4MW7FXf0k=
+Date: Thu, 02 Oct 2025 09:16:58 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/hfp: Fix issues found by codacy
-Date: Thu,  2 Oct 2025 18:11:19 +0200
-Message-ID: <20251002161119.937608-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+Message-ID: <bluez/bluez/push/refs/heads/1008056/000000-f272cc@github.com>
+Subject: [bluez/bluez] 079973: shared/bass: Fix permissions not requiring
+ encryption
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Move debug string after check of hfp pointer.
-Add missing argument in debug trace.
----
- src/shared/hfp.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+  Branch: refs/heads/1008056
+  Home:   https://github.com/bluez/bluez
+  Commit: 0799730e63f64dd806ac483be87271145eb85dfd
+      https://github.com/bluez/bluez/commit/0799730e63f64dd806ac483be87271145eb85dfd
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-02 (Thu, 02 Oct 2025)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 133bff248..94adccada 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -2391,11 +2391,11 @@ bool hfp_hf_session_register(struct hfp_hf *hfp,
- 
- bool hfp_hf_session(struct hfp_hf *hfp)
- {
--	DBG(hfp, "");
--
- 	if (!hfp)
- 		return false;
- 
-+	DBG(hfp, "");
-+
- 	if (!hfp_hf_register(hfp, slc_brsf_cb, "+BRSF", hfp, NULL))
- 		return false;
- 
-@@ -2407,15 +2407,15 @@ const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id)
- {
- 	struct hf_call *call;
- 
--	DBG(hfp, "");
--
- 	if (!hfp)
--		return false;
-+		return NULL;
-+
-+	DBG(hfp, "");
- 
- 	call = queue_find(hfp->calls, call_id_match, UINT_TO_PTR(id));
- 	if (!call) {
- 		DBG(hfp, "hf: no call with id: %u", id);
--		return false;
-+		return NULL;
- 	}
- 
- 	return call->line_id;
-@@ -2427,11 +2427,11 @@ bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
- {
- 	struct hf_call *call;
- 
--	DBG(hfp, "");
--
- 	if (!hfp)
- 		return false;
- 
-+	DBG(hfp, "");
-+
- 	call = queue_find(hfp->calls, call_id_match, UINT_TO_PTR(id));
- 	if (!call) {
- 		DBG(hfp, "hf: no call with id: %u", id);
-@@ -2440,7 +2440,7 @@ bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
- 
- 	if (call->status != CALL_STATUS_INCOMING) {
- 		DBG(hfp, "hf: %d not in incoming call state: %u",
--							call->status);
-+							id, call->status);
- 		return false;
- 	}
- 
-@@ -2453,11 +2453,11 @@ bool hfp_hf_call_hangup(struct hfp_hf *hfp, uint id,
- {
- 	struct hf_call *call;
- 
--	DBG(hfp, "");
--
- 	if (!hfp)
- 		return false;
- 
-+	DBG(hfp, "");
-+
- 	call = queue_find(hfp->calls, call_id_match, UINT_TO_PTR(id));
- 	if (!call) {
- 		DBG(hfp, "hf: no call with id: %u", id);
--- 
-2.43.0
+  Changed paths:
+    M src/shared/bass.c
+    M unit/test-bass.c
 
+  Log Message:
+  -----------
+  shared/bass: Fix permissions not requiring encryption
+
+Both Broadcast Audio Scan Control Point and Broadcast Receive State do
+require encryption:
+
+https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/24670-BASS-html5/out/en/index-en.html#UUID-dd95da9a-6ac0-3f45-7e34-13fa9e04d41c
+
+
+  Commit: f272ccf09b8fded83dad440f29ea55a4fc40ba9f
+      https://github.com/bluez/bluez/commit/f272ccf09b8fded83dad440f29ea55a4fc40ba9f
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-02 (Thu, 02 Oct 2025)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Set QoS.Encryption if QoS.BCode is set
+
+QoS.Encryption must be set in order for the daemon to interpret the
+QoS.BCode as valid.
+
+
+Compare: https://github.com/bluez/bluez/compare/0799730e63f6%5E...f272ccf09b8f
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
