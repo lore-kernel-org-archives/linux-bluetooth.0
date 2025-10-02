@@ -1,69 +1,69 @@
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5C13126DA
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 13:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396A32EB84A
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Oct 2025 13:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759412462; cv=none; b=BjlRcC9+T+u+thwVAW4a/BjnZruvZY+YuG5f/fR+dpYJ5ikmHng0Xt/ORzIIQnx7vUTFdYHjeDFwqOzrqK4r1UN6LgAn8QWCsYrmAOetkhe3gtZTFbPj0CynEn0B8T3Od9dCpQEBzCtjlsmmF296SnnC4PHgEvEjfIt6eIQZrtM=
+	t=1759412467; cv=none; b=eMLQj0qddzgSTPQarfXXH9WxfadieLxG9Uk8ylygnMW4KiMyuN1Zqlg5t/EAmCSBn8MjUTxKh6P1faZKvAlVtrV7OZueUyM7GmqB/0roSiYXhrKelevhj6gBjVpIrgi3ekEq+Q2RFMatNabIwjLYwJtYloX6x2mrbjk/lB+cZjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759412462; c=relaxed/simple;
-	bh=Vp8+nDxvW86pQu8RGuVwHY6xJ8y4xgUYXaw5TvhL5dk=;
+	s=arc-20240116; t=1759412467; c=relaxed/simple;
+	bh=p8zJXE/TxvmLVJJEMydEmEGRGy1q17AXH9ICU36aeNE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JNW0aqHe1NtR8qFiS4Dt6WJQE8G20H46jhprF/3M8Ov2S0uzeYKVH/TjRTRCUzgvmLKwSgtNjQIxj0B9difIRqTW5kqxS5D1dwxRmSwJfL4wgHdDo/WBr8L2fmasG/bD4pNVmVkR2eJvCp1ybtqKz/51G/I7YQyjH8NSm02Fqao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=US2yabiN; arc=none smtp.client-ip=209.85.221.173
+	 MIME-Version; b=G87nTtRRfNGPYMy+Q4RXSJpyOibOWrEdCvoMLBixOK316SYA0y0DpwHtaV3+98W7w0iARzqkxOUCJEp6+wS4SvA0QaTgj+SpxvfZGMuswKkw/PsC/gUl7benskCWeMugGiabxd+ZhOSDjt/2BcLwP2ZqTyzi+5TX304Da0d2RBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FdiIJmFW; arc=none smtp.client-ip=209.85.222.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="US2yabiN"
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5522bd69e14so577148e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Oct 2025 06:41:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FdiIJmFW"
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-8e1d6fd99c1so373171241.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Oct 2025 06:41:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759412459; x=1760017259; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1759412463; x=1760017263; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=k4KmjXlprKlKWtD6bAGA48qdfhbb68+3/VncPBUfg2M=;
-        b=US2yabiNxR+hKs8Jy4owjjGqewx06zWdhyL6bvktgYoRIiPn1ZL2tbb2fEtjafbzZ6
-         QzI9czY+Wo2JqV7EwfwJPoLk+fm1XycVURMPqHxpp9xFMUKOHiozJ7MWIEOXtVcVmzkx
-         2P7V7OwNl7V77YgbOEnh08hTFGPUEVQcg5HWFJPvAR9VrA/KpswgUu2SYJ8hfi6RjagV
-         lWqQaA3ysoHqHp/ykZRoY3wEvIo8uRA72dGWnZr1d/vuqDRLJkSPmjz9uFlURdZ1B7t2
-         18EgAqMiBJow+G9YUeJPWihfT9PLngUGpA6eP+h6x0fhizDvPcAgyZEaDRz144LDV5V1
-         YTpg==
+        bh=RC+8kIqRaXCMTLhxqkEOpX/jlNHck0RTjV4aGnXLp2M=;
+        b=FdiIJmFWVdAbP4hUKHOTryg2S2v+QzkvtEF52Tes52yal5WMdFlmbioH691JDOrn9y
+         GdS9lw+U/LusPgBQBG3l5BqAG2zP55pT6hDYKrCBGQecVE6OzJfToadoD0bVSsd1gAxh
+         ebXedmJn69P8s+Atsinh03i0/Ql5ZIzANJJX4CFB0W06HM8os+USLfO1wDZCAJ3+2qC8
+         j14XnHf9Hgp+gHtMUKrQyGICqajEEfI8H9HT8Tm90LJW62A4aYcnF065V9YvBkQ0d3ft
+         +e5iTignJeX84UMPjf1Dixli2TqdrqQvfNg+wJ1r/HA4lcOqASVDwipswQCpOzqFzDgG
+         4L3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759412459; x=1760017259;
+        d=1e100.net; s=20230601; t=1759412463; x=1760017263;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k4KmjXlprKlKWtD6bAGA48qdfhbb68+3/VncPBUfg2M=;
-        b=dr8mYM7WW8Gk7v8Yt2/nSmeY9Gbovo5X5rGpiZNIosinskWP/Nh8vW8XtR1whF1aTa
-         TChPZbmOP3MWZfS1JtiD788t+qFLInSEZvPcAY46X3ogj5RB7C1vGSzGf6Vlru++qPrk
-         rkZcBuiLfEU+uSd58PgiFjSsdoCYdE+V7Gop/YxXulT/gxt70laNkL8BjLaHDmFmCBil
-         2CTEx0dfux5dOp6nzcqjTfxOrXkc9wIK3123BVV9BCY/Jt64jrYObjxxgNPvlUM0twaN
-         plYfHlMIdOzEFH2j6e9LNhPm4gWCIxWURBWuUdyXgry1zgYFbpu+QGM7xnXHaxPO2WX2
-         GenA==
-X-Gm-Message-State: AOJu0YxJ7ILEk4T2sSCwS4Mdei7IbLILfB4MfcCVqm75mtkB2TLsuEVl
-	xqqrE/KiUCxaAbr3mQTQPKmHS4qZhfVZB6ELUOH9AEbpOnvUaE/SpUEhdb2m6PEG
-X-Gm-Gg: ASbGnctkQLLl3JnZTqRUVo9mKrfDMqU5qY4BDKOpYNBF5AQsJ94LV5ESuBmoHbwqVhA
-	Ways8aPVqwUok0EN7EbIJD3tHVyRvQnb61rN6IQgfveW0CdENsbvNZsBW9w/4cOt4+yEZW0Gfh8
-	9Ul9/pBkUEID8XSUoTu2Wt11Ss3r6v6c1oFJJv3XY0sla9QpFwIDBsOKKI0Lmbbu5R+JdZ38b24
-	AT3G3s459t3RFUVdOVPrkYf2/6NEfwTGjEki6WP+3+26HMAEfMkAe0Mu6jBm2SO+N/vcIcv3i3R
-	BOMgeXX6/1gMguvsCjOvsz+xO/z6w1lqICxDZ9PEFhlNTXEgqmCTsgnqrasMgf4ZLDgs5kHlKMH
-	eRTk4ZRh4t6qxDPSgHRWP7U/ZF8pywB579NLIiPyKraL860UwL7kBeCWG6f8NKSdqz2dyFEJ9Cm
-	RxkAW77Fv8JH9KWg==
-X-Google-Smtp-Source: AGHT+IFCAYlEjTCzj5jSnLgpd4v+9zgzZG/bX+BXnL9U42nVawXB80uhsyY1KEARAoTiRrDZgXw4cg==
-X-Received: by 2002:a05:6122:458e:b0:53c:6d68:1d2f with SMTP id 71dfb90a1353d-5522d3a2a16mr3554751e0c.13.1759412458837;
-        Thu, 02 Oct 2025 06:40:58 -0700 (PDT)
+        bh=RC+8kIqRaXCMTLhxqkEOpX/jlNHck0RTjV4aGnXLp2M=;
+        b=s/rys2XHG/Vuq0ldSboOe4xymNKpE9ein9JE/82nQqpY66JxsTikYdgBZqPvNI79k6
+         JQaSWzSJFUwWeVtLO5TSrMeb/fFKqs+ZXWxv0wUrPBFrdEMmqUreI+Ui3XTOR8MM6USQ
+         hcsK02T/ml80SuxzxiiMkBCaSM8jeUyMMnZ3fms71/eSRsAGEQnX3fsN32Ydm4tJtkq6
+         2RAsKXGDKKLckXrP7t2OvWFsUjQ5yu32iVaCG4K2pMlR1GlGRUCm7nMZB1DJdVnrXs1u
+         QiMEhudh/ByYSrblhtauUiezqpZ0b+2aTHsB+YcLbdi62bo18tE6kBtj+M2QyVBQSwmr
+         VMeQ==
+X-Gm-Message-State: AOJu0Yz6QLDysNf0H2CbJDt8jMZ/tBjiD4dTy8dm5QFwbC5zQd9+eVyn
+	cUJbh/n73aAkV3xPNfw5JlFMKFB80WSNgmUaKdjXKDQ+W3Hy0GQc37lrdjxSsU1b
+X-Gm-Gg: ASbGncvFLi8R7xr6OBPuDUng5YrZb/fLbpLL+Wc0GhXVdJn02OSxg53G9qHBktO+80h
+	NbcQDCPT9EBpp/Tc5QmnnJHheDmFTl6qw9pmb7hncRrF5IAKiv7X+FPTOQZUVUuSt16W8gG5Tc2
+	oWF7EzHr+Yy9ZXa7EBidSjQZTF4sr5SF/ExtAqsijBhY8GJNG1cxdr0gv16BBS64URmx3MwfRDW
+	NWJfIhJ/JUctmnEOjIiTj1yiZ6lov3bF93R1GdPmo15W8bNuqOgh8hNrarAmdsMY5naHIz2+Hf7
+	eVLtKGpe2YsQZvN88+jntOU+bz9TqcFFl6YzJKrQ8wjDte/nZaj/L52dG4Cf+D1R/WikdQnToKm
+	czpXn4J/8DLcn9zfSI5cuVCWQS6LlvfCc55VDuzMXmNBNtK8SEeByRMBrKwU0Iv1gb8qPFj1lSi
+	g6W6K2N6MX1q/QYnQ0qGJBuvF1
+X-Google-Smtp-Source: AGHT+IEwhFdpeGlnVTGhYbUx8owlPDTVz1WrPVvizwo+HDz/ufZTkdTI6EBxN9YTP75lnFJ6vKgL7A==
+X-Received: by 2002:a05:6102:f09:b0:5a1:8e46:5c92 with SMTP id ada2fe7eead31-5d3fe50f2d9mr2936196137.14.1759412463361;
+        Thu, 02 Oct 2025 06:41:03 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5523cf6558esm490157e0c.22.2025.10.02.06.40.56
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5523cf6558esm490157e0c.22.2025.10.02.06.40.59
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Oct 2025 06:40:58 -0700 (PDT)
+        Thu, 02 Oct 2025 06:41:01 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/3] shared/bass: Fix permissions not requiring encryption
-Date: Thu,  2 Oct 2025 09:40:42 -0400
-Message-ID: <20251002134043.196760-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/3] client/player: Set QoS.Encryption if QoS.BCode is set
+Date: Thu,  2 Oct 2025 09:40:43 -0400
+Message-ID: <20251002134043.196760-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251002134043.196760-1-luiz.dentz@gmail.com>
 References: <20251002134043.196760-1-luiz.dentz@gmail.com>
@@ -77,36 +77,27 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Both Broadcast Audio Scan Control Point and Broadcast Receive State do
-require encryption:
-
-https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/24670-BASS-html5/out/en/index-en.html#UUID-dd95da9a-6ac0-3f45-7e34-13fa9e04d41c
+QoS.Encryption must be set in order for the daemon to interpret the
+QoS.BCode as valid.
 ---
- src/shared/bass.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ client/player.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/shared/bass.c b/src/shared/bass.c
-index 4b4fe8adf762..19cc9531d617 100644
---- a/src/shared/bass.c
-+++ b/src/shared/bass.c
-@@ -1223,7 +1223,7 @@ static void bcast_recv_new(struct bt_bass_db *bdb, int i)
- 	bt_uuid16_create(&uuid, BCAST_RECV_STATE_UUID);
- 	bcast_recv_state->attr =
- 		gatt_db_service_add_characteristic(bdb->service, &uuid,
--				BT_ATT_PERM_READ,
-+				BT_ATT_PERM_READ | BT_ATT_PERM_READ_ENCRYPT,
- 				BT_GATT_CHRC_PROP_READ |
- 				BT_GATT_CHRC_PROP_NOTIFY,
- 				bass_bcast_recv_state_read, NULL,
-@@ -1252,7 +1252,7 @@ static void bass_new(struct bt_bass_db *bdb)
- 	bdb->bcast_audio_scan_cp =
- 		gatt_db_service_add_characteristic(bdb->service,
- 				&uuid,
--				BT_ATT_PERM_WRITE,
-+				BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_ENCRYPT,
- 				BT_GATT_CHRC_PROP_WRITE |
- 				BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP,
- 				NULL, bass_bcast_audio_scan_cp_write,
+diff --git a/client/player.c b/client/player.c
+index 598ad7f6dfd7..bb193dafeba0 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -1870,6 +1870,10 @@ static void append_bcast_qos(DBusMessageIter *iter, struct endpoint_config *cfg)
+ 
+ 	if (cfg->ep->bcode->iov_len != 0) {
+ 		const char *key = "BCode";
++		uint8_t encryption = 0x01;
++
++		g_dbus_dict_append_entry(iter, "Encryption", DBUS_TYPE_BYTE,
++						&encryption);
+ 
+ 		bt_shell_printf("BCode:\n");
+ 		bt_shell_hexdump(cfg->ep->bcode->iov_base,
 -- 
 2.51.0
 
