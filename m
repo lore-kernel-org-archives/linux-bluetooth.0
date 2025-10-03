@@ -1,69 +1,69 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3AA22259D
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 15:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18330285419
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 15:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759505682; cv=none; b=iqygMsgTEY8Gy8mivoVDOge3ZAQ1MaQM7karZky9jVMW0fz7PojQ9ug85ES2nG+6nItNQWYJEqP3xIaRirv5UCR9ejzxp/EYlLMPGaKzRUcLWuxjeFmWCLn5O9GUZgz5RWQjn4D0l8JM5GlmTaWHUkFw6Zc25sGKokHaowRd6AY=
+	t=1759505684; cv=none; b=U3ghYDTJ+0Dd5DdX9gb9vjQ3PFGczqQH313wOJF2HVviqKCxYvzyod1oAS195Hl2XMcEdhVt8pUt4A/NZ8CGVyKii3K3zQVqvPRYLsCuPfIvK3et3UsYnpAkvsBBcdi2xzcbmXKEChYqKaSAY58sBKkTug6E98sYcNvH9ufx1Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759505682; c=relaxed/simple;
-	bh=BquCFfq7uOWbSG/G1lJaNvYAz/zW5IYi2LUZhBCG6ns=;
+	s=arc-20240116; t=1759505684; c=relaxed/simple;
+	bh=Hs8Xqj9RVXgUNIqKATxwzsRSQmVtqnVbrf41v97H1UM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TLgwRv1+mmqz5SvhR79QGL+PQ6tXdKZTU0r/si+ytEAJK5liO9vwMFVrKyy/RekjpcylBwo1/uN91pP2JNrXFHKKeoQ76yX4bgJ1C/7C2Mn1FfufXuWXpS1G11VJqZgjfbN7bVloDZHpavf0iMHRFr+8BrdUoE1BEQ1wJoxXGjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XsKKVfHA; arc=none smtp.client-ip=209.85.221.169
+	 MIME-Version; b=Z+Mg/nGzrsfvtcrYUMqzUeGNIdav8jdFhU6Dwdo9zU5eHzFZ6v7l5C3LSUKvmUiRMjlyfGty/XpB9LntHD3BMpavX4CTbYFtVDJGx2ekt3EinK9jd3FqyHqttBnk3e6B3oh0dvCcM++HBbMHZxrmpSgUPJnAVCsMa+ltu0377JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NsAS7uPT; arc=none smtp.client-ip=209.85.222.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XsKKVfHA"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5522bd69e14so1388604e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Oct 2025 08:34:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NsAS7uPT"
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-890190c7912so1070151241.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Oct 2025 08:34:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759505679; x=1760110479; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1759505681; x=1760110481; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yFZ/dZGY3W4K0m0eKwmb4Sa9B6xoAJjJc2FgTgcc0Z0=;
-        b=XsKKVfHAHYtqHOFf0k+s0uZ2I5KaUgNJn/vtSMzyuwHi1Ko0Oke/mwlW632QJVSNg0
-         kNMXPgevGdkj+sca9Guf3ksW/1ENF86jUeiBnu7ej0dFIQ915fCBSa3dcMiGtOQZqp9V
-         JwmsciiuHBuLAKvvGNm1+hEWgZFsgZPtkhO9y7M7sgOCInPVqAy7LlsdZJZKp88VbtvE
-         jQ2f+e7lNXDhtHa39w7y/V5EIxS4nwfTnejLn1TERRcDz6wKrHUwU5xBuxtrXBTI5ajw
-         Xp+9QHBuLDk0joWxzDWW4OWIEefV1SMbKzhI35M0p0RKEDlzJ1G9F+Q/xl+d1tNcOfa8
-         3H9w==
+        bh=0GKtOen/U31mWvc4u/3KF3C/k545S/UQBOVM7GbAI/M=;
+        b=NsAS7uPTXNi6efuim+oDd7IMiJcAl8cnsalJNRw0bHT9oKS0LfJHUIM9pdgVoFcbvZ
+         YHb1K7NYzUiQBkZUPFp6ggDe33vC6fFcmI4zOVMZVoeN1hUsOTB1/bqHDhpvxEM1YkVd
+         jtNsJVg9LGA8lWtBNDvuTYmbUn54lwq7ZCNl6X/B1ot9xwaVzXlPHrJcu201rFTu2Oh8
+         OAqC106jy/vRIkN+JVI9eQJ0pBmdPcNmbMBFZO3rJSckhkig5htO1DR6uTOMM7MogXF4
+         J/oGlHbmMt6bSgP+JFycg33K8LJtdO0IbXW/HpkPu2jjVcLLk5P1DqUqxkq6dNhRsdFh
+         wbhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759505679; x=1760110479;
+        d=1e100.net; s=20230601; t=1759505681; x=1760110481;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yFZ/dZGY3W4K0m0eKwmb4Sa9B6xoAJjJc2FgTgcc0Z0=;
-        b=eNOcs8eg5MSjT3cgGNp2e9HKOzTsemAhlPi1Equ6rkj/GGFpqYg+wBDPAgFhn0UIVY
-         Oze+N6ua5L2jbySmDwf84GYqU2GyeZg456zJECjRE397qno5mLjeSkhz7hkBjLirCufv
-         ZftaNt+hW+Wxu/YGtFNIvxd2Sya+21enBdNTK1It8cwAmQ/xIlQ38/Jbz49eeNrRkKeu
-         enjxJtpf8vAougoM5AkX3y10pHNc78dVr6pds+LydpVQDs+np/2VmyBo+yzmh0MeROOZ
-         Tfo4vGhX+x9sSFe1wubEntn7KfMKsnN+zpEIwCs/KFW2WQ8DvTbgTELgNHgvZJiZflTx
-         VIFg==
-X-Gm-Message-State: AOJu0Ywv4F0qMvi3VyLEWsgt2pKfxqebHREnHMgkuZA7NxTbn6Fd131s
-	zx6Nxiz5Lt52T21d/63qZWoExBL9ooxzuGUVJQlgte49a3t9dLxlZ6k8KjcKzUEH
-X-Gm-Gg: ASbGncuVdNbKPl/eup28TdV0crA4APhOEe75zLEriAh6yLneAyPzXamhNSt3J5tCU7c
-	Q6uqcqQPh/E2ZlMIo4j0hUf52mh86jaJ3qrd03mj265x2uY50GV7kgz6/Bo7v7Mw89qn9V2g3tB
-	DG6ceYW2r3G0G9MBaa19zF8URWunkDln6094DAZ6DB1nSZVx5qLNdWAP7mmM/h72H3/b4+kwc4d
-	6LKbX+ZHbEpend4kGyye0ek5PTgYgbzObYnkADywgrrlrtA1hj5413Xeyz9/RtDSnyibB+qbNm9
-	U45mJCpu1AeGvuiTfQjamJhaI4qitCSdYXJkCd7NB0vHlWh1tWvEgxMZaRu8Rliwn2lF+CN/Sh5
-	+icxw/rYNdl+TWkNRQQbLXUa7utv7aMkH4kmEGF6lA3RTg8AQFxtfRGCsKoWQ0X67uM8TEYMr3D
-	kNHowuRbecUqVtXGuxAtvosbm8
-X-Google-Smtp-Source: AGHT+IFL9LHTQKtTShH6PHAAaoGCaiohP775Z0/EILBfB8N+v3vuJpHIqiJiNU7Ar1IWiZqVuZwhww==
-X-Received: by 2002:a05:6102:6881:b0:5b2:d28a:8937 with SMTP id ada2fe7eead31-5d41cffa5f8mr1466722137.12.1759505679270;
-        Fri, 03 Oct 2025 08:34:39 -0700 (PDT)
+        bh=0GKtOen/U31mWvc4u/3KF3C/k545S/UQBOVM7GbAI/M=;
+        b=VanyzOIgps7eWMqwQBAl2WsXgBngsPztzB9W2mqjeNe/O4sibwe8A00soVf4eWPWSF
+         IZLp/3X/Urm1QEYVJQSISPv9v2vBluAGLQVYGmcIsypBXdOW3n8+cC9TGyHLK0SLnQFI
+         KP7Ba9X5Im7tYfJQumHLOrHqdRRWY/m2sw8gdD63x+MWE2OnV9QIABbm7Mp8OUjV/AR/
+         zec+oyEMIcupw6yuC1esmUZUvWbl8FsKiotFx5YLIrD8fL3fzOJ5XyOG+nPBEjfyRhul
+         oQCoMUJda+1Od4zl4VZMo3oQ9XfBXokXH8WvNQD0kvURqWSLiuGSkfp3tV8OO+/owQPl
+         Bh0g==
+X-Gm-Message-State: AOJu0YxSzptacU/Wa4oS9YinK/kWZhtcoCoRF7LAsprnEEtBU8vxdKSM
+	TE2MZkUBLFjer7W1CjkIun93TjVojVwLj1BwQiLSFP3CrKsr256s9rBjeGaLGo+o
+X-Gm-Gg: ASbGncs0qinOXexF34OxbsDPcxBABayWrzXOMYS3z+qYFV1+/QUvhxTZicxmaX3u/+v
+	qxXydWV7DYKSHbCSPb9RyNyPABoPWCTR6/2+oczVkZyho5CtqS4Z8QwHQJOScr/4ZPM+TfhcuhH
+	LZykFUbqQNL+wm67g90Fz7PCIPYFYZ1ZdR1ubMazyy18hEWqMHii/eKjOFGw5WGLM0AEnrnR7tv
+	n812uU3j/KeGe10w5XFJwN7LEwXtx1ICwg5zz+Hyt5hnwi4Vz7314wAjiq0UOvvkJGj+Kyy6HUZ
+	tgBGyZ+qeOSQKlHqtvHP3n5hjUxI6mceGEgbFZW7QIToaTp58agTWE5MN0cIjrqADU3KCEFVs9j
+	az7MM0kWKOlwSv3ccYlEJesYqrqIHlVdCMojGOwpVis4MS4HgOrY5yJt0ihM8QbmBbCee4VeiiY
+	Y3xg9giHPr8NfIxg==
+X-Google-Smtp-Source: AGHT+IGgRXzTFu9AFxGy6QVg1p5cI4hXnTPUKXHrYWQgRdOZYuK0PMXuY9IHZaDSzbcJyOwR9CM2TA==
+X-Received: by 2002:a05:6102:50a4:b0:523:b5c8:2b0b with SMTP id ada2fe7eead31-5d41d047c2emr1383723137.12.1759505681249;
+        Fri, 03 Oct 2025 08:34:41 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-92eb67dec87sm994090241.11.2025.10.03.08.34.34
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-92eb67dec87sm994090241.11.2025.10.03.08.34.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Oct 2025 08:34:34 -0700 (PDT)
+        Fri, 03 Oct 2025 08:34:39 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 2/5] Bluetooth: hci_core: Introduce HCI_CONN_FLAG_PAST
-Date: Fri,  3 Oct 2025 11:34:21 -0400
-Message-ID: <20251003153424.470938-2-luiz.dentz@gmail.com>
+Subject: [PATCH v1 3/5] Bluetooth: ISO: Add support to bind to trigger PAST
+Date: Fri,  3 Oct 2025 11:34:22 -0400
+Message-ID: <20251003153424.470938-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251003153424.470938-1-luiz.dentz@gmail.com>
 References: <20251003153424.470938-1-luiz.dentz@gmail.com>
@@ -77,110 +77,200 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces a new device flag so userspace can indicate if it
-wants to enable PAST Receiver for a specific device.
+This makes it possible to bind to a different destination address
+after being connected (BT_CONNECTED, BT_CONNECT2) which then triggers
+PAST Sender proceedure to transfer the PA Sync to the destination
+address.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_sync.c         | 55 +++++++++++++++++++++++++++++++-
- 2 files changed, 55 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_sync.h |  1 +
+ net/bluetooth/hci_sync.c         | 74 ++++++++++++++++++++++++++++++++
+ net/bluetooth/iso.c              | 62 ++++++++++++++++++--------
+ 3 files changed, 120 insertions(+), 17 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 894e01717b55..2a765a0521b4 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -166,6 +166,7 @@ enum hci_conn_flags {
- 	HCI_CONN_FLAG_REMOTE_WAKEUP = BIT(0),
- 	HCI_CONN_FLAG_DEVICE_PRIVACY = BIT(1),
- 	HCI_CONN_FLAG_ADDRESS_RESOLUTION = BIT(2),
-+	HCI_CONN_FLAG_PAST = BIT(3),
- };
- typedef u8 hci_conn_flags_t;
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index e352a4e0ef8d..3133f40fa9f9 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -188,3 +188,4 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
  
+ int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn);
+ int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn);
++int hci_past_sync(struct hci_conn *conn, struct hci_conn *le);
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 277b2c096195..5051413f1a97 100644
+index 5051413f1a97..aad9689af610 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -4324,6 +4324,10 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
- 	if (ll_privacy_capable(hdev))
- 		hdev->conn_flags |= HCI_CONN_FLAG_ADDRESS_RESOLUTION;
- 
-+	/* Mark PAST if supported */
-+	if (past_capable(hdev))
-+		hdev->conn_flags |= HCI_CONN_FLAG_PAST;
-+
- 	/* If the controller supports Extended Scanner Filter
- 	 * Policies, enable the corresponding event.
- 	 */
-@@ -7024,10 +7028,41 @@ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
- 	hci_dev_unlock(hdev);
+@@ -7228,3 +7228,77 @@ int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn)
+ 	return hci_cmd_sync_queue_once(hdev, hci_le_big_create_sync, conn,
+ 				       create_big_complete);
  }
- 
-+static int hci_le_past_params_sync(struct hci_dev *hdev, struct hci_conn *conn,
-+				   struct hci_conn *acl, struct bt_iso_qos *qos)
++
++struct past_data {
++	struct hci_conn *conn;
++	struct hci_conn *le;
++};
++
++static void past_complete(struct hci_dev *hdev, void *data, int err)
 +{
-+	struct hci_cp_le_past_params cp;
-+	int err;
++	struct past_data *past = data;
 +
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = cpu_to_le16(acl->handle);
-+	/* An HCI_LE_Periodic_Advertising_Sync_Transfer_Received event is sent
-+	 * to the Host. HCI_LE_Periodic_Advertising_Report events will be
-+	 * enabled with duplicate filtering enabled.
-+	 */
-+	cp.mode = 0x03;
-+	cp.skip = cpu_to_le16(qos->bcast.skip);
-+	cp.sync_timeout = cpu_to_le16(qos->bcast.sync_timeout);
-+	cp.cte_type = qos->bcast.sync_cte_type;
++	bt_dev_dbg(hdev, "err %d", err);
 +
-+	/* HCI_LE_PAST_PARAMS command returns a command complete event so it
-+	 * cannot wait for HCI_EV_LE_PAST_RECEIVED.
-+	 */
-+	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_PAST_PARAMS,
-+				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-+	if (err)
-+		return err;
-+
-+	/* Wait for HCI_EV_LE_PAST_RECEIVED event */
-+	return __hci_cmd_sync_status_sk(hdev, HCI_OP_NOP, 0, NULL,
-+					HCI_EV_LE_PAST_RECEIVED,
-+					conn->conn_timeout, NULL);
++	kfree(past);
 +}
 +
- static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
++static int hci_le_past_set_info_sync(struct hci_dev *hdev, void *data)
++{
++	struct past_data *past = data;
++	struct hci_cp_le_past_set_info cp;
++
++	if (!hci_conn_valid(hdev, past->conn) ||
++	    !hci_conn_valid(hdev, past->le))
++		return -ECANCELED;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = past->le->handle;
++	cp.adv_handle = past->conn->iso_qos.bcast.bis;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_PAST_SET_INFO,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++static int hci_le_past_sync(struct hci_dev *hdev, void *data)
++{
++	struct past_data *past = data;
++	struct hci_cp_le_past cp;
++
++	if (!hci_conn_valid(hdev, past->conn) ||
++	    !hci_conn_valid(hdev, past->le))
++		return -ECANCELED;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = past->le->handle;
++	cp.sync_handle = cpu_to_le16(past->conn->sync_handle);
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_PAST,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++int hci_past_sync(struct hci_conn *conn, struct hci_conn *le)
++{
++	struct past_data *data;
++
++	if (conn->type != BIS_LINK && conn->type != PA_LINK)
++		return -EINVAL;
++
++	if (!past_sender_capable(conn->hdev))
++		return -EOPNOTSUPP;
++
++	data = kmalloc(sizeof(*data), GFP_KERNEL);
++	if (!data)
++		return -ENOMEM;
++
++	data->conn = conn;
++	data->le = le;
++
++	if (conn->role == HCI_ROLE_MASTER)
++		return hci_cmd_sync_queue_once(conn->hdev,
++					       hci_le_past_set_info_sync, data,
++					       past_complete);
++
++	return hci_cmd_sync_queue_once(conn->hdev, hci_le_past_sync, data,
++					       past_complete);
++}
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 7f66f287c14e..318b5b914cc4 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -987,20 +987,13 @@ static int iso_sock_bind_bc(struct socket *sock, struct sockaddr *addr,
+ 	return 0;
+ }
+ 
+-static int iso_sock_bind_pa_sk(struct sock *sk, struct sockaddr_iso *sa,
++static int iso_sock_rebind_bis(struct sock *sk, struct sockaddr_iso *sa,
+ 			       int addr_len)
  {
- 	struct hci_cp_le_pa_create_sync cp;
--	struct hci_conn *conn = data;
-+	struct hci_conn *conn = data, *le;
- 	struct bt_iso_qos *qos = &conn->iso_qos;
- 	int err;
+ 	int err = 0;
  
-@@ -7059,6 +7094,24 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
+-	if (sk->sk_type != SOCK_SEQPACKET) {
+-		err = -EINVAL;
+-		goto done;
+-	}
+-
+-	if (addr_len != sizeof(*sa) + sizeof(*sa->iso_bc)) {
+-		err = -EINVAL;
+-		goto done;
+-	}
++	if (!test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags))
++		return -EBADFD;
  
- 	hci_update_passive_scan_sync(hdev);
+ 	if (sa->iso_bc->bc_num_bis > ISO_MAX_NUM_BIS) {
+ 		err = -EINVAL;
+@@ -1023,6 +1016,42 @@ static int iso_sock_bind_pa_sk(struct sock *sk, struct sockaddr_iso *sa,
+ 	return err;
+ }
  
-+	/* Check if PAST is possible:
-+	 *
-+	 * 1. Check if an ACL connection with the destination address exists
-+	 * 2. Check if that HCI_CONN_FLAG_PAST has been set which indicates that
-+	 *    user really intended to use PAST.
++static int iso_sock_rebind_bc(struct sock *sk, struct sockaddr_iso *sa,
++			      int addr_len)
++{
++	struct hci_conn *le;
++
++	if (sk->sk_type != SOCK_SEQPACKET)
++		return -EINVAL;
++
++	/* Check if it is really a Broadcast address being requested */
++	if (addr_len != sizeof(*sa) + sizeof(*sa->iso_bc))
++		return -EINVAL;
++
++	/* Check if the address hasn't changed then perhaps only the number of
++	 * bis has changed.
 +	 */
-+	le = hci_conn_hash_lookup_le(hdev, &conn->dst, conn->dst_type);
-+	if (le) {
-+		struct hci_conn_params *params;
++	if (!bacmp(&iso_pi(sk)->dst, &sa->iso_bc->bc_bdaddr) ||
++	    !bacmp(&sa->iso_bc->bc_bdaddr, BDADDR_ANY))
++		return iso_sock_rebind_bis(sk, sa, addr_len);
 +
-+		params = hci_conn_params_lookup(hdev, &le->dst, le->dst_type);
-+		if (params && params->flags & HCI_CONN_FLAG_PAST) {
-+			err = hci_le_past_params_sync(hdev, conn, le, qos);
-+			if (!err)
-+				goto done;
-+		}
-+	}
++	/* Check if the address type is of LE type */
++	if (!bdaddr_type_is_le(sa->iso_bc->bc_bdaddr_type))
++		return -EINVAL;
 +
- 	/* SID has not been set listen for HCI_EV_LE_EXT_ADV_REPORT to update
- 	 * it.
- 	 */
++	/* Lookup existing LE connection to rebind to */
++	le = hci_conn_hash_lookup_le(iso_pi(sk)->conn->hcon->hdev,
++				     &sa->iso_bc->bc_bdaddr,
++				     le_addr_type(sa->iso_bc->bc_bdaddr_type));
++	if (!le)
++		return -EINVAL;
++
++	BT_DBG("sk %p %pMR type %u", sk, &sa->iso_bc->bc_bdaddr,
++	       sa->iso_bc->bc_bdaddr_type);
++
++	return hci_past_sync(iso_pi(sk)->conn->hcon, le);
++}
++
+ static int iso_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			 int addr_len)
+ {
+@@ -1038,13 +1067,12 @@ static int iso_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 
+ 	lock_sock(sk);
+ 
+-	/* Allow the user to bind a PA sync socket to a number
+-	 * of BISes to sync to.
+-	 */
+-	if ((sk->sk_state == BT_CONNECT2 ||
+-	     sk->sk_state == BT_CONNECTED) &&
+-	    test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags)) {
+-		err = iso_sock_bind_pa_sk(sk, sa, addr_len);
++	if ((sk->sk_state == BT_CONNECT2 || sk->sk_state == BT_CONNECTED) &&
++	    addr_len > sizeof(*sa)) {
++		/* Allow the user to rebind to a different address using
++		 * PAST procedures.
++		 */
++		err = iso_sock_rebind_bc(sk, sa, addr_len);
+ 		goto done;
+ 	}
+ 
 -- 
 2.51.0
 
