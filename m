@@ -1,69 +1,69 @@
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEE72BD03
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 16:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB8524E4A1
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 16:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759508262; cv=none; b=fRqCc/8L0zXuh2Dt3ROjAUvEvfCWEbxHV61nbtdgTIiJVDQDAwCSUnHdOa9MRA2XhgprtuDZQwUIPpphyWrgNnnUcKGjF8ioyDLXhnSLT5E7T7qHmfUZ39pLLPYjNM8ZnEj7QJgOJ6uUNalZ8FqV48UWcWUBmNelfGsRshyiSBA=
+	t=1759508265; cv=none; b=kbsUqhvq6IZDYFheoH5vXs4CxWDKWYP1bPTsNp4ZJ/LMxr4/NIJcFGoUJIyfYTQMleqnlqgjsDujMZ9Iv1IF2jnvLBMmoX2sWva6lETHUQHmcthr8J9CLJHBgvXVgnHmo/RUPk5usMpNsIZ878V/SUmy53s6RCyxdwZk8K8lDK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759508262; c=relaxed/simple;
-	bh=iBTG2+HBcwYh/csVwwIyITNINNKTyNoNU3e02d3YD9I=;
+	s=arc-20240116; t=1759508265; c=relaxed/simple;
+	bh=VlEBFPSdDxQRIGkNnCu/m1VZ3G/+ruSZXYumU9JTvOQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k13r5xxNry1TeQm9FIbE5yxCa7HjqwiURZE5qvew6Jc/w1lnxXvHT0uiKpSyeNIR1GME5yORewGnfb10CNDtcXX+VwVe3K0rLJgTDRD3t78i3zNdMmV5HUkKtHQ2G4TuQHgKWtXjDbEHbSCvAFOczYlqGnb/LoUZI8NrIY/RiN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ck5n8hWh; arc=none smtp.client-ip=209.85.217.54
+	 MIME-Version; b=SWmEJThvdcCYMr5c0LNCiyMBpgDIdAqlY+ohOqoG3OsuEnIQzK51Y+LspDZTi79QBZsZ5f0xjNl6hGGjSahcc3E7iHB/YH12v8K8bdBNpnQHFhk5OAm2XyECBE4cS+JRUaTyIhLvNA9CSxt5m6tDA2k88vs7H6B0CXshgy+LPcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ji8at+TZ; arc=none smtp.client-ip=209.85.217.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ck5n8hWh"
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-583a520bd81so1105913137.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Oct 2025 09:17:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ji8at+TZ"
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-574d36a8c11so959692137.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Oct 2025 09:17:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759508259; x=1760113059; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1759508261; x=1760113061; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TLhrwMvn5ibD/qSs/PSA0cVFcC4/pZEwVecQnlwzsqY=;
-        b=Ck5n8hWhdYd5GDGj1AnZWYxYBmB6am6rVOhU0RBr6nOuPW9p/oC0aA2eyWs+FYMYF9
-         i36bLLYL5SDOmmTwyrSamWz6CD3YMVL4xN3VWkIM0TM+qaikQbxHnr3FTMsv4o46llQK
-         z9GrxYrjtlZdunpIc0GTlFBoo1/LZAP4EOOBxVQ3nGjc5ZDFONuAMFGBQNSYLTsd8QXd
-         OFZcZRlO2vbqcAfReMxHq0E1nUpl29gsvQyyS/+wvIXMnCiududEJ7gw7gMYeGuUBUHJ
-         870JDmxDgby/6SRc6KNgzzJSvDY5MPoyQM9Dd1sILUbhEJIORScfs2mJXsXmHoa2Dm6w
-         AoJQ==
+        bh=vJFBjNzEzQRYGQ+lIH/FNTKEoayWFYaKZfb0gWVWjjw=;
+        b=ji8at+TZA9r2DiyfHve4KgwokNYrVIEDL5BCpOuL/JlVLM10dYl/WQUGWWe0iaG1nY
+         gBf+DB7+NM59vg2kkaQ0oJomliLkT9htTvRGk/+EUoVqhIt3vum/RtRylz03ZuCEEavI
+         RAxR7LVBPcLY2ZRhE+bncKqCE6CXOu6Ry759mgHeaosAjopaI1T7sjjSjrGMUWxYs4TE
+         19w647iTuL/+tWLcC5tIbrmwdSbYUqRN0QxtmDQqywC9qe6Cjnj8hOHFeoL47g0dlGD4
+         zDXZhluzC8kN1Hymj8k8Vzzt2sKVf3Dd0pBHEYOlyX5lyDKmCSZaix1RQlgJBLg6eP4M
+         /lJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759508259; x=1760113059;
+        d=1e100.net; s=20230601; t=1759508261; x=1760113061;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TLhrwMvn5ibD/qSs/PSA0cVFcC4/pZEwVecQnlwzsqY=;
-        b=YqosdH7lbyp7v5hMfio1/Y/FiLCOi5zdHGVacI4v6XvhsSsTKHU5VB0oR+tT1Od122
-         1zEy6hiP1TlIxvBAk3e5v7rzl70HrVu2gasjlb6HE8PJGsas3MF3cwWruharhsv4u/ru
-         t8PAp8kkzIIO+NBvpiNXoU9LOwVcZ98TuSrDR/sSaGCUmp3zTuvn/FF50HKugH+wcRXc
-         uNywDmCVsibHHZ5/i+m/DPzUVkUZBrsu/qCz6wJs4sUxvLYDYq/PpO4vVpkdrqoWs2js
-         D1IBvHDDIkASAPBGVPKR1sIHdSabrTwO5Aqu37XWPHdS/BaBwC7zCHz47fHJc0bUBX6T
-         RpbA==
-X-Gm-Message-State: AOJu0YzDsqjFBTT/78h1qc77lRIb9aI9JpPw3keqns3SSkscfpg6o3Je
-	rBaRCuZ9bG9gR2pNlCs/qgdKqiGMvXYRav6tAIEtNlROEXCcHDJKliEvxWHhqHA3
-X-Gm-Gg: ASbGncvMwSz826fJ6vC4QIn4crZ6MRGY4biavc0ax3wWpJx9fxhNiEq3ak38pyJo3pU
-	XFMWZDLwzdkwssMdrbuM7zlyng7UMdzdmf7hj/shafJ6vWnDsCthl6GgsEpurVg0QJM5HvWpQ3B
-	z5MCkMjSjSklPJxslmEyYMnw6d3OTuK1L1NJmXPYZjgdpLAbCg4Ps0gzogWUj2T0lFo8b7TXitW
-	0lT1NcatDFyAiKBIFPQX7leuqOuHkoa+TsOkZqUiFLxlS2BqPfrpFsSV4aoCXU6kE46AbJ7KZMZ
-	5X9PCru0riSIRHKi+4xjVC3hl7CrASu0l7pYYaSy0QDFr8+He36ejiUaTFGyAaddi4tBmjiD6Mq
-	P4zMVM9aOsHkMC0LsOUojY0OhHbzxxYNYRsL3xhPJnct0Njup55QG+uoCkiFCa/ksdkQDctiguA
-	3/PjHkHRf+T5N132Ctb3+lJDdSxsM28tliRfE=
-X-Google-Smtp-Source: AGHT+IH+mtsV1PrMPecWfZSHPt+G5W+wlLwSUc7/1cMvfrw+4rWcr8yaZISRibB8slyASmIStirdIQ==
-X-Received: by 2002:a05:6102:dcc:b0:5bc:e09d:dc03 with SMTP id ada2fe7eead31-5d41d118d75mr1435687137.16.1759508258437;
-        Fri, 03 Oct 2025 09:17:38 -0700 (PDT)
+        bh=vJFBjNzEzQRYGQ+lIH/FNTKEoayWFYaKZfb0gWVWjjw=;
+        b=O3QZYeUfTp/oopcIwfSdrlIlPbqkb39EwJje5AE2pjTnsc8L6t82IxkOWLgN4fsVO/
+         sOCHU3q2ynNNpCLlZ1BfIXW25RQH5tVMHj1MBZvnh2wE1WOZ9QQUZDwXpMryqci3BpGR
+         jaA65pCZ/LLigqJ7Aw+vAgQ3n45CsGFhCYqaF121vI/MgO2J2BjD9DuZgF2FZRSEcniv
+         rgcqJnfpNn+98JvlaSd46N87qGwXBwKJsiYstXUbntF9UEhhvq8b8I1XJ3QoRyYx+wl0
+         URHXP5GUaJWXskNI7vUyEi6lkSVNO8MpwcqypU8KV0mejXwuMZZIu0g877rSSyW+lvXW
+         XY+A==
+X-Gm-Message-State: AOJu0Yx6w2s5Peb7ky4laW5AJr1y+OpWH8MpP9/PeE5Hi6Ut4VIGKgN6
+	fBM4PlRZ5K7LCGXVEvPK4hpWOMLy1aez+FO97GmELgExVAtMs3KPVMvRbYmbYbqe
+X-Gm-Gg: ASbGnctpqTUmYBcm1N7MOVeDSbZ1L8hsdfYHj/yzTIAqh8iUmrIWIJJS7ExKEedW+KF
+	pL+p/LJ/4E4Xa5NVJ2dl32zHwt6FJB91fLaHK+QyJelj7VeSVDBv7aEA9692tU6aAPIR07v64Vy
+	obttkbdPXKVoxe7FyIfYcrgoAVfem9eG8wg71v4b/6LbOjDSc1N3vfEwgC7tAlJrWygmUM/NSrx
+	OLmeXkcpBCEbO5bdZBTjwEkvsOPh0zTzRTqRrrHPZm3l0VjEBK5o+Z5MzMIJIODxTBRFdxl4qlA
+	kVfg4B0iqPmfGJNc71N+TINlghcx8GqkZ5hYQjQePQkp3iP7yyIB8bkKSZNDMnKHJ2iyEuNozth
+	76m68GzUMtEG8/hOJSX3ZMteyt9HoVX+jqT90IF8jiR+y5YQkJL99COACYNlmS2h7xcp8B2Dw2q
+	ssjE/rhNxgv2deIQ==
+X-Google-Smtp-Source: AGHT+IGWq7Jq5wlS8u9gCWQ7siTGrcXURiWO9Wq5HYnbsZKHSWqVBrjL65M7HC30UOG+/EqE30S4wQ==
+X-Received: by 2002:a05:6102:5086:b0:51f:66fc:53b8 with SMTP id ada2fe7eead31-5d41d10c1e6mr1321520137.25.1759508261179;
+        Fri, 03 Oct 2025 09:17:41 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5d40c4eb764sm1364253137.1.2025.10.03.09.17.32
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5d40c4eb764sm1364253137.1.2025.10.03.09.17.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Oct 2025 09:17:34 -0700 (PDT)
+        Fri, 03 Oct 2025 09:17:39 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/3] emulator: Add initial support for PAST
-Date: Fri,  3 Oct 2025 12:17:20 -0400
-Message-ID: <20251003161721.508678-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/3] iso-tester: Add tests for PAST procedures
+Date: Fri,  3 Oct 2025 12:17:21 -0400
+Message-ID: <20251003161721.508678-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251003161721.508678-1-luiz.dentz@gmail.com>
 References: <20251003161721.508678-1-luiz.dentz@gmail.com>
@@ -77,587 +77,403 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
----
- client/scripts/broadcast-sink.bt |   2 +-
- emulator/btdev.c                 | 333 +++++++++++++++++++++++++++++--
- emulator/bthost.c                |  43 ++++
- emulator/bthost.h                |   3 +-
- 4 files changed, 358 insertions(+), 23 deletions(-)
+This introduces the following tests that test PAST procedures both as
+a sender, either for colocated broadcast source or a third peer, and as
+receiver:
 
-diff --git a/client/scripts/broadcast-sink.bt b/client/scripts/broadcast-sink.bt
-index b912231b248f..b26dc44ac237 100644
---- a/client/scripts/broadcast-sink.bt
-+++ b/client/scripts/broadcast-sink.bt
-@@ -4,4 +4,4 @@ y
- a
- 3
- 4
--scan on
-\ No newline at end of file
-+scan on
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 1a0f9ef2de58..8c72a24290c6 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -52,9 +52,10 @@
- #define has_bredr(btdev)	(!((btdev)->features[4] & 0x20))
- #define has_le(btdev)		(!!((btdev)->features[4] & 0x40))
- 
--#define ACL_HANDLE 42
--#define ISO_HANDLE 257
--#define SCO_HANDLE 257
-+#define ACL_HANDLE BIT(0)
-+#define SCO_HANDLE BIT(8)
-+#define CIS_HANDLE SCO_HANDLE
-+#define BIS_HANDLE BIT(9)
- #define SYNC_HANDLE 1
- #define INV_HANDLE 0xffff
- 
-@@ -72,8 +73,10 @@ struct hook {
- struct btdev_conn {
- 	uint16_t handle;
- 	uint8_t  type;
-+	uint8_t  past_mode;
- 	struct btdev *dev;
- 	struct btdev_conn *link;
-+	struct queue *links;
- 	void *data;
+ISO Broadcaster PAST Info - Success
+ISO Broadcaster PAST Sender - Success
+ISO Broadcaster PAST Receiver - Success
+---
+ tools/iso-tester.c | 225 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 213 insertions(+), 12 deletions(-)
+
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index 0eeab4fd7108..08386f259b47 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -488,6 +488,7 @@ struct iso_client_data {
+ 	const struct iovec *recv;
+ 	bool server;
+ 	bool bcast;
++	bool past;
+ 	bool defer;
+ 	bool disconnect;
+ 	bool ts;
+@@ -1381,6 +1382,27 @@ static const struct iso_client_data bcast_16_2_1_send = {
+ 	.base_len = sizeof(base_lc3_16_2_1),
  };
  
-@@ -386,7 +389,7 @@ static inline struct btdev *find_btdev_by_bdaddr_type(const uint8_t *bdaddr,
- 		if (!dev)
- 			continue;
- 
--		if (bdaddr_type == 0x01)
-+		if (bdaddr_type == 0x01 || bdaddr_type == 0x03)
- 			cmp = memcmp(dev->random_addr, bdaddr, 6);
- 		else
- 			cmp = memcmp(dev->bdaddr, bdaddr, 6);
-@@ -395,7 +398,7 @@ static inline struct btdev *find_btdev_by_bdaddr_type(const uint8_t *bdaddr,
- 			return dev;
- 
- 		/* Check for instance own Random addresses */
--		if (bdaddr_type == 0x01) {
-+		if (bdaddr_type == 0x01 || bdaddr_type == 0x03) {
- 			adv = queue_find(dev->le_ext_adv, match_adv_addr,
- 								bdaddr);
- 			if (adv)
-@@ -566,10 +569,15 @@ static void conn_remove(void *data)
- 	if (conn->link) {
- 		struct btdev_conn *link = conn->link;
- 
--		conn_unlink(conn, conn->link);
--		conn_remove(link);
-+		if (link->link == conn) {
-+			conn_unlink(conn, conn->link);
-+			conn_remove(link);
-+		} else
-+			queue_remove(link->links, conn);
- 	}
- 
-+	queue_destroy(conn->links, conn_remove);
++static const struct iso_client_data past_16_2_1_send = {
++	.qos = QOS_OUT_16_2_1,
++	.expect_err = 0,
++	.send = &send_16_2_1,
++	.bcast = true,
++	.past = true,
++	.base = base_lc3_16_2_1,
++	.base_len = sizeof(base_lc3_16_2_1),
++};
 +
- 	queue_remove(conn->dev->conns, conn);
- 
- 	free(conn->data);
-@@ -1225,7 +1233,7 @@ static struct btdev_conn *find_bis_index(const struct btdev *remote,
- 		conn = entry->data;
- 
- 		/* Skip if not a broadcast */
--		if (conn->type != HCI_ISODATA_PKT || conn->link)
-+		if (conn->type != HCI_ISODATA_PKT && conn->handle < BIS_HANDLE)
- 			continue;
- 
- 		if (!index)
-@@ -1247,11 +1255,22 @@ static struct btdev_conn *conn_link_bis(struct btdev *dev, struct btdev *remote,
- 	if (!bis)
- 		return NULL;
- 
--	conn = conn_add_bis(dev, ISO_HANDLE, bis->data);
-+	conn = conn_add_bis(dev, BIS_HANDLE, bis->data);
- 	if (!conn)
- 		return NULL;
- 
--	bis->link = conn;
-+	if (!bis->link) {
-+		bis->link = conn;
-+	} else {
-+		if (!bis->links)
-+			bis->links = queue_new();
++static const struct iso_client_data past_16_2_1 = {
++	.qos = QOS_OUT_16_2_1,
++	.expect_err = 0,
++	.recv = &send_16_2_1,
++	.bcast = true,
++	.past = true,
++	.big = true,
++	.base = base_lc3_16_2_1,
++	.base_len = sizeof(base_lc3_16_2_1),
++};
 +
-+		if (!queue_push_tail(bis->links, conn)) {
-+			conn_remove(conn);
-+			return NULL;
-+		}
-+	}
-+
- 	conn->link = bis;
+ static const struct iso_client_data bcast_enc_16_2_1_send = {
+ 	.qos = QOS_OUT_ENC_16_2_1,
+ 	.expect_err = 0,
+@@ -1446,6 +1468,16 @@ static const struct iso_client_data bcast_16_2_1_recv = {
+ 	.big = true,
+ };
  
- 	util_debug(dev->debug_callback, dev->debug_data,
-@@ -5466,6 +5485,9 @@ static void le_pa_sync_estabilished(struct btdev *dev, struct btdev *remote,
- 	struct le_ext_adv *ext_adv;
- 	uint16_t sync_handle = SYNC_HANDLE;
- 
-+	if (!remote)
-+		return;
++static const struct iso_client_data past_16_2_1_recv = {
++	.qos = QOS_IN_16_2_1,
++	.expect_err = 0,
++	.recv = &send_16_2_1,
++	.bcast = true,
++	.past = true,
++	.server = true,
++	.big = true,
++};
 +
- 	per_adv = queue_find(dev->le_per_adv, match_dev, remote);
- 	if (!per_adv)
+ static const struct iso_client_data bcast_16_2_1_recv2 = {
+ 	.qos = QOS_IN_16_2_1,
+ 	.expect_err = 0,
+@@ -1594,6 +1626,7 @@ static void client_connectable_complete(uint16_t opcode, uint8_t status,
+ {
+ 	struct test_data *data = user_data;
+ 	static uint8_t client_num;
++	const struct iso_client_data *isodata = data->test_data;
+ 
+ 	if (opcode != BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE)
  		return;
-@@ -6025,6 +6047,258 @@ static void set_le_50_commands(struct btdev *btdev)
- 	btdev->cmds = cmd_le_5_0;
- }
- 
-+static void le_past_received_event(struct btdev_conn *acl,
-+					struct bt_hci_evt_le_past_recv *ev,
-+					struct le_per_adv *pa)
-+{
-+	struct btdev *remote;
-+
-+	le_meta_event(acl->dev, BT_HCI_EVT_LE_PAST_RECEIVED, ev, sizeof(*ev));
-+
-+	if (ev->status != BT_HCI_ERR_SUCCESS)
-+		return;
-+
-+	remote = find_btdev_by_bdaddr_type(pa->addr, pa->addr_type);
-+	if (!remote)
-+		return;
-+
-+	switch (acl->past_mode) {
-+	case 0x01:
-+		/* HCI_LE_Periodic_Advertising_Report events will be
-+		 * disabled.
-+		 */
-+		break;
-+	case 0x02:
-+		/* HCI_LE_Periodic_Advertising_Report events will be enabled
-+		 * with duplicate filtering disabled.
-+		 */
-+	case 0x03:
-+		/* HCI_LE_Periodic_Advertising_Report events will be enabled
-+		 * with duplicate filtering enabled.
-+		 */
-+		send_pa(acl->dev, remote, 0, pa->sync_handle);
-+		break;
-+	}
-+}
-+
-+static void le_past_received(struct btdev_conn *acl, struct le_per_adv *pa)
-+{
-+	struct btdev *dev = acl->dev;
-+	struct bt_hci_evt_le_past_recv ev;
-+	struct le_per_adv *cp;
-+	uint16_t sync_handle = SYNC_HANDLE;
-+
-+	/* 0x00:
-+	 * No attempt is made to synchronize to the periodic advertising and no
-+	 * HCI_LE_Periodic_Advertising_Sync_Transfer_Received event is sent to
-+	 * the Host.
-+	 */
-+	if (!acl->past_mode)
-+		return;
-+
-+	memset(&ev, 0, sizeof(ev));
-+	ev.status = BT_HCI_ERR_SUCCESS;
-+
-+	/* Create a copy of the PA sync */
-+	cp = le_per_adv_new(dev, pa->addr_type, pa->addr, pa->sid);
-+	if (!cp) {
-+		ev.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
-+		goto done;
-+	}
-+
-+	/* Find the next available sync handle */
-+	while (queue_find(dev->le_per_adv, match_sync_handle,
-+					UINT_TO_PTR(sync_handle)))
-+		sync_handle++;
-+
-+	cp->sync_handle = sync_handle;
-+
-+	ev.handle = cpu_to_le16(acl->handle);
-+	ev.sync_handle = cpu_to_le16(cp->sync_handle);
-+	ev.sid = cpu_to_le16(cp->sid);
-+	ev.addr_type = cp->addr_type;
-+	memcpy(ev.addr, cp->addr, sizeof(ev.addr));
-+	ev.phy = 0x01;
-+	ev.interval = acl->dev->le_pa_min_interval;
-+	ev.clock_accuracy = 0x07;
-+
-+done:
-+	le_past_received_event(acl, &ev, pa);
-+}
-+
-+static int cmd_past(struct btdev *dev, const void *data, uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_past *cmd = data;
-+	struct bt_hci_rsp_le_past rsp;
-+	struct le_per_adv *pa;
-+	struct btdev_conn *acl = NULL;
-+
-+	memset(&rsp, 0, sizeof(rsp));
-+
-+	rsp.status = BT_HCI_ERR_SUCCESS;
-+	rsp.handle = cmd->handle;
-+
-+	pa = queue_find(dev->le_per_adv, match_sync_handle,
-+				UINT_TO_PTR(le16_to_cpu(cmd->sync_handle)));
-+	if (!pa) {
-+		/* If the periodic advertising train corresponding to the
-+		 * Sync_Handle parameter does not exist, the Controller shall
-+		 * return the error code Unknown Advertising Identifier (0x42).
-+		 */
-+		rsp.status = BT_HCI_ERR_UNKNOWN_ADVERTISING_ID;
-+		goto done;
-+	}
-+
-+	acl = queue_find(dev->conns, match_handle,
-+				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
-+	if (!acl) {
-+		/* If the Connection_Handle parameter does not identify a
-+		 * current connection, the Controller shall return the error
-+		 * code Unknown Connection Identifier (0x02).
-+		 */
-+		rsp.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		goto done;
-+	}
-+
-+done:
-+	cmd_complete(dev, BT_HCI_CMD_LE_PAST, &rsp, sizeof(rsp));
-+
-+	if (rsp.status == BT_HCI_ERR_SUCCESS)
-+		le_past_received(acl->link, pa);
-+
-+	return 0;
-+}
-+
-+static void le_past_info_received(struct btdev_conn *acl, struct le_ext_adv *ea)
-+{
-+	struct btdev *dev = acl->dev;
-+	struct bt_hci_evt_le_past_recv ev;
-+	struct le_per_adv *pa;
-+	uint16_t sync_handle = SYNC_HANDLE;
-+
-+	/* 0x00:
-+	 * No attempt is made to synchronize to the periodic advertising and no
-+	 * HCI_LE_Periodic_Advertising_Sync_Transfer_Received event is sent to
-+	 * the Host.
-+	 */
-+	if (!acl->past_mode)
-+		return;
-+
-+	memset(&ev, 0, sizeof(ev));
-+	ev.status = BT_HCI_ERR_SUCCESS;
-+
-+	/* Create a copy using EA parameters */
-+	pa = le_per_adv_new(dev, ea->own_addr_type,
-+			    ea->own_addr_type ? ea->random_addr :
-+			    acl->link->dev->bdaddr, ea->sid);
-+	if (!pa) {
-+		ev.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
-+		goto done;
-+	}
-+
-+	/* Find the next available sync handle */
-+	while (queue_find(dev->le_per_adv, match_sync_handle,
-+					UINT_TO_PTR(sync_handle)))
-+		sync_handle++;
-+
-+	pa->sync_handle = sync_handle;
-+
-+	ev.handle = cpu_to_le16(acl->handle);
-+	ev.sync_handle = cpu_to_le16(pa->sync_handle);
-+	ev.sid = cpu_to_le16(pa->sid);
-+	ev.addr_type = pa->addr_type;
-+	memcpy(ev.addr, pa->addr, sizeof(ev.addr));
-+	ev.phy = 0x01;
-+	ev.interval = acl->dev->le_pa_min_interval;
-+	ev.clock_accuracy = 0x07;
-+
-+done:
-+	le_past_received_event(acl, &ev, pa);
-+}
-+
-+static int cmd_past_set_info(struct btdev *dev, const void *data, uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_past_set_info *cmd = data;
-+	struct bt_hci_rsp_le_past_set_info rsp;
-+	struct le_ext_adv *ea;
-+	struct btdev_conn *acl = NULL;
-+
-+	memset(&rsp, 0, sizeof(rsp));
-+
-+	rsp.status = BT_HCI_ERR_SUCCESS;
-+	rsp.handle = cmd->handle;
-+
-+	ea = queue_find(dev->le_ext_adv, match_ext_adv_handle,
-+					UINT_TO_PTR(cmd->adv_handle));
-+	if (!ea) {
-+		/* If the advertising set corresponding to the
-+		 * Advertising_Handle parameter does not exist, the Controller
-+		 * shall return the error code Unknown Advertising Identifier
-+		 * (0x42).
-+		 */
-+		rsp.status = BT_HCI_ERR_UNKNOWN_ADVERTISING_ID;
-+		goto done;
-+	}
-+
-+	if (!dev->le_pa_enable) {
-+		/* If periodic advertising is not currently in progress for the
-+		 * advertising set, the Controller shall return the error code
-+		 * Command Disallowed (0x0C).
-+		 */
-+		rsp.status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+		goto done;
-+	}
-+
-+	acl = queue_find(dev->conns, match_handle,
-+				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
-+	if (!acl) {
-+		/* If the Connection_Handle parameter does not identify a
-+		 * current connection, the Controller shall return the error
-+		 * code Unknown Connection Identifier (0x02).
-+		 */
-+		rsp.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		goto done;
-+	}
-+
-+done:
-+	cmd_complete(dev, BT_HCI_CMD_LE_PAST_SET_INFO, &rsp, sizeof(rsp));
-+
-+	if (rsp.status == BT_HCI_ERR_SUCCESS)
-+		le_past_info_received(acl->link, ea);
-+
-+	return 0;
-+}
-+
-+static int cmd_past_params(struct btdev *dev, const void *data, uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_past_params *cmd = data;
-+	struct bt_hci_rsp_le_past_set_info rsp;
-+	struct btdev_conn *acl = NULL;
-+
-+	memset(&rsp, 0, sizeof(rsp));
-+
-+	rsp.status = BT_HCI_ERR_SUCCESS;
-+	rsp.handle = cmd->handle;
-+
-+	acl = queue_find(dev->conns, match_handle,
-+				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
-+	if (!acl) {
-+		/* If the Connection_Handle parameter does not identify a
-+		 * current connection, the Controller shall return the error
-+		 * code Unknown Connection Identifier (0x02).
-+		 */
-+		rsp.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		goto done;
-+	}
-+
-+	acl->past_mode = cmd->mode;
-+
-+done:
-+	cmd_complete(dev, BT_HCI_CMD_LE_PAST_PARAMS, &rsp, sizeof(rsp));
-+
-+	return 0;
-+}
-+
- static int cmd_read_size_v2(struct btdev *dev, const void *data,
- 							uint8_t len)
- {
-@@ -6062,19 +6336,19 @@ static int find_cig(struct btdev *dev, uint8_t cig_id)
- static uint16_t make_cis_handle(uint8_t cig_idx, uint8_t cis_idx)
- {
- 	/* Put CIG+CIS idxs to handle so don't need to track separately */
--	return ISO_HANDLE + cig_idx*CIS_SIZE + cis_idx;
-+	return CIS_HANDLE + cig_idx*CIS_SIZE + cis_idx;
- }
- 
- static int parse_cis_handle(uint16_t handle, int *cis_idx)
- {
- 	int cig_idx;
- 
--	if (handle < ISO_HANDLE || handle >= ISO_HANDLE + CIS_SIZE*CIG_SIZE)
-+	if (handle < CIS_HANDLE || handle >= CIS_HANDLE + CIS_SIZE*CIG_SIZE)
- 		return -1;
- 
--	cig_idx = (handle - ISO_HANDLE) / CIS_SIZE;
-+	cig_idx = (handle - CIS_HANDLE) / CIS_SIZE;
- 	if (cis_idx)
--		*cis_idx = (handle - ISO_HANDLE) % CIS_SIZE;
-+		*cis_idx = (handle - CIS_HANDLE) % CIS_SIZE;
- 
- 	return cig_idx;
- }
-@@ -6514,7 +6788,7 @@ static int cmd_create_big_complete(struct btdev *dev, const void *data,
- 	for (i = 0; i < cmd->num_bis; i++) {
- 		struct btdev_conn *conn;
- 
--		conn = conn_add_bis(dev, ISO_HANDLE + i, bis);
-+		conn = conn_add_bis(dev, BIS_HANDLE + i, bis);
- 		if (!conn) {
- 			queue_remove(dev->le_big, big);
- 			le_big_free(big);
-@@ -6691,17 +6965,28 @@ static int cmd_big_create_sync_complete(struct btdev *dev, const void *data,
- 	struct bt_hci_bis *bis;
- 	int i;
- 	uint16_t sync_handle = le16_to_cpu(cmd->sync_handle);
--	struct le_per_adv *per_adv = queue_find(dev->le_per_adv,
--			match_sync_handle, UINT_TO_PTR(sync_handle));
-+	struct le_per_adv *per_adv;
- 	struct le_big *big;
- 
--	if  (!per_adv)
-+	memset(&pdu.ev, 0, sizeof(pdu.ev));
-+
-+	per_adv = queue_find(dev->le_per_adv, match_sync_handle,
-+					UINT_TO_PTR(sync_handle));
-+	if  (!per_adv) {
-+		pdu.ev.status = BT_HCI_ERR_UNKNOWN_ADVERTISING_ID;
-+		le_meta_event(dev, BT_HCI_EVT_LE_BIG_SYNC_ESTABILISHED, &pdu,
-+					sizeof(pdu.ev));
- 		return 0;
-+	}
- 
- 	remote = find_btdev_by_bdaddr_type(per_adv->addr,
- 						per_adv->addr_type);
--	if (!remote)
-+	if (!remote) {
-+		pdu.ev.status = BT_HCI_ERR_UNKNOWN_ADVERTISING_ID;
-+		le_meta_event(dev, BT_HCI_EVT_LE_BIG_SYNC_ESTABILISHED, &pdu,
-+					sizeof(pdu.ev));
- 		return 0;
-+	}
- 
- 	big = le_big_new(dev, cmd->handle);
- 	if (!big) {
-@@ -6711,8 +6996,6 @@ static int cmd_big_create_sync_complete(struct btdev *dev, const void *data,
- 		return 0;
+@@ -1606,7 +1639,8 @@ static void client_connectable_complete(uint16_t opcode, uint8_t status,
+ 	if (status)
+ 		tester_setup_failed();
+ 	else if (data->client_num == client_num) {
+-		tester_setup_complete();
++		if (!isodata || !isodata->past)
++			tester_setup_complete();
+ 		client_num = 0;
  	}
+ }
+@@ -1641,6 +1675,8 @@ static void iso_new_conn(uint16_t handle, void *user_data)
+ {
+ 	struct test_data *data = user_data;
+ 	struct bthost *host;
++	const struct iso_client_data *isodata = data->test_data;
++	static uint8_t client_num;
  
--	memset(&pdu.ev, 0, sizeof(pdu.ev));
--
- 	for (i = 0; i < cmd->num_bis; i++) {
- 		conn = conn_link_bis(dev, remote, i);
- 		if (!conn)
-@@ -6992,6 +7275,9 @@ static int cmd_config_data_path(struct btdev *dev, const void *data,
+ 	tester_print("New client connection with handle 0x%04x", handle);
+ 
+@@ -1649,6 +1685,14 @@ static void iso_new_conn(uint16_t handle, void *user_data)
+ 	host = hciemu_client_get_host(data->hciemu);
+ 	bthost_add_iso_hook(host, data->handle, bthost_recv_data, data,
+ 				bthost_iso_disconnected);
++
++	if (!isodata->past || data->client_num == 1)
++		return;
++
++	client_num++;
++
++	if (client_num == data->client_num)
++		tester_test_passed();
  }
  
- #define CMD_LE_52 \
-+	CMD(BT_HCI_CMD_LE_PAST, cmd_past, NULL), \
-+	CMD(BT_HCI_CMD_LE_PAST_SET_INFO, cmd_past_set_info, NULL), \
-+	CMD(BT_HCI_CMD_LE_PAST_PARAMS, cmd_past_params, NULL), \
- 	CMD(BT_HCI_CMD_LE_READ_BUFFER_SIZE_V2, cmd_read_size_v2, NULL), \
- 	CMD(BT_HCI_CMD_LE_READ_ISO_TX_SYNC, cmd_read_iso_tx_sync, NULL), \
- 	CMD(BT_HCI_CMD_LE_SET_EVENT_MASK, cmd_le_set_event_mask, NULL), \
-@@ -7036,6 +7322,9 @@ static const struct btdev_cmd cmd_le_5_2[] = {
- 
- static void set_le_52_commands(struct btdev *btdev)
+ static uint8_t iso_accept_conn(uint16_t handle, void *user_data)
+@@ -1664,10 +1708,73 @@ static uint8_t iso_accept_conn(uint16_t handle, void *user_data)
+ static void acl_new_conn(uint16_t handle, void *user_data)
  {
-+	btdev->commands[40] |= BIT(6);	/* LE PAST */
-+	btdev->commands[40] |= BIT(7);	/* LE PA Set Info Transfer */
-+	btdev->commands[41] |= BIT(1);	/* LE PAST Parameters */
- 	btdev->commands[41] |= 0x20;	/* LE Read Buffer Size v2 */
- 	btdev->commands[41] |= 0x40;	/* LE Read ISO TX Sync */
- 	btdev->commands[41] |= 0x80;	/* LE Set CIG Parameters */
-@@ -7317,6 +7606,8 @@ static void set_bredrle_features(struct btdev *btdev)
+ 	struct test_data *data = user_data;
++	const struct iso_client_data *isodata = data->test_data;
  
- 	if (btdev->type >= BTDEV_TYPE_BREDRLE52) {
- 		btdev->le_features[1] |= 0x20;  /* LE PER ADV */
-+		btdev->le_features[3] |= BIT(0);  /* LE PAST Sender */
-+		btdev->le_features[3] |= BIT(1);  /* LE PAST Receiver */
- 		btdev->le_features[3] |= 0x10;  /* LE CIS Central */
- 		btdev->le_features[3] |= 0x20;  /* LE CIS Peripheral */
- 		btdev->le_features[3] |= 0x40;  /* LE ISO Broadcaster */
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index c85f751cc7a8..8a6d397fe346 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -1834,6 +1834,24 @@ static void evt_le_big_sync_established(struct bthost *bthost,
+ 	tester_print("New ACL connection with handle 0x%04x", handle);
+ 
+ 	data->acl_handle = handle;
++
++	if (!isodata->past)
++		return;
++
++	tester_setup_complete();
++
++	if (!isodata->server) {
++		struct bthost *host;
++
++		host = hciemu_client_get_host(data->hciemu);
++		bthost_set_past_mode(host, data->acl_handle, 0x03);
++	}
++}
++
++static void setup_connect_recv(struct test_data *data, struct bthost *host)
++{
++	const uint8_t *bdaddr;
++
++	bdaddr = hciemu_get_central_bdaddr(data->hciemu);
++	bthost_set_connect_cb(host, acl_new_conn, data);
++	bthost_hci_connect(host, bdaddr, BDADDR_LE_PUBLIC);
++}
++
++static void setup_past_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	struct bthost *host = user_data;
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		tester_setup_failed();
++		return;
++	}
++
++	tester_print("Set device flags status 0x%02x", status);
++
++	setup_connect_recv(data, host);
++}
++
++static void setup_past_recv(struct test_data *data, struct bthost *host)
++{
++	struct mgmt_cp_add_device add;
++	struct mgmt_cp_set_device_flags set;
++
++	memset(&add, 0, sizeof(add));
++	bacpy(&add.addr.bdaddr,
++		(bdaddr_t *)hciemu_get_client_bdaddr(data->hciemu));
++	add.addr.type = BDADDR_LE_PUBLIC;
++	add.action = 0x01; /* Allow incoming connection */
++
++	mgmt_send(data->mgmt, MGMT_OP_ADD_DEVICE, data->mgmt_index,
++				sizeof(add), &add, NULL, NULL, NULL);
++
++	memset(&set, 0, sizeof(set));
++	bacpy(&set.addr.bdaddr,
++		(bdaddr_t *)hciemu_get_client_bdaddr(data->hciemu));
++	set.addr.type = BDADDR_LE_PUBLIC;
++	set.current_flags = BIT(3);
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_DEVICE_FLAGS, data->mgmt_index,
++				sizeof(set), &set, setup_past_complete, host,
++				NULL);
+ }
+ 
+ static void setup_powered_callback(uint8_t status, uint16_t length,
+@@ -1716,18 +1823,17 @@ static void setup_powered_callback(uint8_t status, uint16_t length,
+ 				bthost_set_base(host, isodata->base,
+ 							isodata->base_len);
+ 
+-			if (isodata->big)
++			if (isodata->big && (!isodata->past ||
++						i + 1 == data->client_num))
+ 				bthost_create_big(host, 1,
+ 						isodata->qos.bcast.encryption,
+ 						isodata->qos.bcast.bcode);
+ 
+-		} else if (!isodata->send && isodata->recv) {
+-			const uint8_t *bdaddr;
++			if (isodata->past)
++				setup_past_recv(data, host);
+ 
+-			bdaddr = hciemu_get_central_bdaddr(data->hciemu);
+-			bthost_set_connect_cb(host, acl_new_conn, data);
+-			bthost_hci_connect(host, bdaddr, BDADDR_LE_PUBLIC);
+-		}
++		} else if (!isodata->send && isodata->recv)
++			setup_connect_recv(data, host);
  	}
  }
  
-+static void evt_le_big_info_adv_report(struct bthost *bthost,
-+						const void *data, uint8_t size)
-+{
-+	const struct bt_hci_evt_le_big_info_adv_report *ev = data;
-+	struct {
-+		struct bt_hci_cmd_le_big_create_sync cp;
-+		struct bt_hci_bis_sync index[1];
-+	} cmd;
+@@ -1739,7 +1845,7 @@ static void setup_powered(const void *test_data)
+ 
+ 	tester_print("Powering on controller");
+ 
+-	if (!isodata || !isodata->bcast)
++	if (!isodata || !isodata->bcast || isodata->past)
+ 		mgmt_send(data->mgmt, MGMT_OP_SET_CONNECTABLE, data->mgmt_index,
+ 					sizeof(param), param,
+ 					NULL, NULL, NULL);
+@@ -1750,7 +1856,7 @@ static void setup_powered(const void *test_data)
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
+ 				sizeof(param), param, NULL, NULL, NULL);
+ 
+-	if (isodata && isodata->server && !isodata->bcast)
++	if (isodata && ((isodata->server && !isodata->bcast) || isodata->past))
+ 		mgmt_send(data->mgmt, MGMT_OP_SET_ADVERTISING,
+ 				data->mgmt_index, sizeof(param), param, NULL,
+ 				NULL, NULL);
+@@ -2520,6 +2626,9 @@ static gboolean iso_pollout(GIOChannel *io, GIOCondition cond,
+ 	const struct iso_client_data *isodata = data->test_data;
+ 	unsigned int count;
+ 
++	if (isodata->past && !data->handle)
++		return TRUE;
 +
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.cp.handle = 0x01;
-+	cmd.cp.sync_handle = ev->sync_handle;
-+	cmd.cp.encryption = ev->encryption;
-+	cmd.cp.num_bis = 1;
-+
-+	send_command(bthost, BT_HCI_CMD_LE_BIG_CREATE_SYNC, &cmd, sizeof(cmd));
-+}
-+
- static void evt_le_meta_event(struct bthost *bthost, const void *data,
- 								uint8_t len)
- {
-@@ -1876,6 +1894,9 @@ static void evt_le_meta_event(struct bthost *bthost, const void *data,
- 	case BT_HCI_EVT_LE_BIG_SYNC_ESTABILISHED:
- 		evt_le_big_sync_established(bthost, evt_data, len - 1);
- 		break;
-+	case BT_HCI_EVT_LE_BIG_INFO_ADV_REPORT:
-+		evt_le_big_info_adv_report(bthost, evt_data, len - 1);
-+		break;
- 	default:
- 		bthost_debug(bthost, "Unsupported LE Meta event 0x%2.2x",
- 								*event);
-@@ -3624,6 +3645,28 @@ void bthost_set_pa_enable(struct bthost *bthost, uint8_t enable)
- 	send_command(bthost, BT_HCI_CMD_LE_SET_PA_ENABLE, &cp, sizeof(cp));
+ 	data->io_id[0] = 0;
+ 
+ 	tester_print("POLLOUT event received");
+@@ -2533,6 +2642,8 @@ static gboolean iso_pollout(GIOChannel *io, GIOCondition cond,
+ 		iso_send_data(data, io);
+ 
+ 	if (isodata->bcast) {
++		if (isodata->past)
++			return FALSE;
+ 		tester_test_passed();
+ 		return FALSE;
+ 	}
+@@ -2588,6 +2699,42 @@ static void trigger_force_suspend(void *user_data)
+ 					hook_set_event_mask, data);
  }
  
-+void bthost_set_past_mode(struct bthost *bthost, uint16_t handle, uint8_t mode)
++static int iso_rebind_bcast_dst(struct test_data *data, int sk)
 +{
-+	struct bt_hci_cmd_le_past_params cp;
++	struct hciemu_client *client;
++	const uint8_t *dst;
++	struct sockaddr_iso *addr = NULL;
++	int err;
 +
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = cpu_to_le16(handle);
-+	cp.mode = mode;
++	client = hciemu_get_client(data->hciemu, 0);
 +
-+	send_command(bthost, BT_HCI_CMD_LE_PAST_PARAMS, &cp, sizeof(cp));
++	/* Bind to local address */
++	addr = malloc(sizeof(*addr) + sizeof(*addr->iso_bc));
++	memset(addr, 0, sizeof(*addr) + sizeof(*addr->iso_bc));
++	addr->iso_family = AF_BLUETOOTH;
++
++	/* Bind to destination address in case of broadcast */
++	dst = hciemu_client_bdaddr(client);
++	if (!dst) {
++		tester_warn("No destination bdaddr");
++		return -ENODEV;
++	}
++
++	bacpy(&addr->iso_bc->bc_bdaddr, (void *) dst);
++	addr->iso_bc->bc_bdaddr_type = BDADDR_LE_PUBLIC;
++
++	err = bind(sk, (struct sockaddr *) addr, sizeof(*addr) +
++						sizeof(*addr->iso_bc));
++	if (err)
++		tester_warn("bind: %s (%d)", strerror(errno), errno);
++	else
++		tester_print("PAST in progress...");
++
++	free(addr);
++
++	return err;
 +}
 +
-+void bthost_past_set_info(struct bthost *bthost, uint16_t handle)
-+{
-+	struct bt_hci_cmd_le_past_set_info cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = cpu_to_le16(handle);
-+	cp.adv_handle = 0x01;
-+
-+	send_command(bthost, BT_HCI_CMD_LE_PAST_SET_INFO, &cp, sizeof(cp));
-+}
-+
- void bthost_create_big(struct bthost *bthost, uint8_t num_bis,
- 				uint8_t enc, const uint8_t *bcode)
+ static gboolean iso_connect(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
  {
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 743615838c25..3e828a198c1a 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -119,8 +119,10 @@ void bthost_set_ext_adv_enable(struct bthost *bthost, uint8_t enable);
- void bthost_set_pa_params(struct bthost *bthost);
- void bthost_set_pa_data(struct bthost *bthost, const uint8_t *data,
- 								uint8_t len);
-+void bthost_set_past_mode(struct bthost *bthost, uint16_t handle, uint8_t mode);
- void bthost_set_base(struct bthost *bthost, const uint8_t *data, uint8_t len);
- void bthost_set_pa_enable(struct bthost *bthost, uint8_t enable);
-+void bthost_past_set_info(struct bthost *bthost, uint16_t handle);
- void bthost_create_big(struct bthost *bthost, uint8_t num_bis, uint8_t enc,
- 				const uint8_t *bcode);
- bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr);
-@@ -130,7 +132,6 @@ void bthost_set_cig_params(struct bthost *bthost, uint8_t cig_id,
- void bthost_create_cis(struct bthost *bthost, uint16_t cis_handle,
- 						uint16_t acl_handle);
+@@ -2616,8 +2763,11 @@ static gboolean iso_connect(GIOChannel *io, GIOCondition cond,
+ 	if (!isodata->bcast) {
+ 		ret = check_ucast_qos(&qos, &isodata->qos,
+ 				      isodata->mconn ? &isodata->qos_2 : NULL);
+-	} else if (!isodata->server)
++	} else if (!isodata->server) {
+ 		ret = check_bcast_qos(&qos, &isodata->qos);
++		if (ret && isodata->past)
++			ret = iso_rebind_bcast_dst(data, sk) == 0;
++	}
  
--
- void bthost_set_scan_params(struct bthost *bthost, uint8_t scan_type,
- 				uint8_t addr_type, uint8_t filter_policy);
- void bthost_set_scan_enable(struct bthost *bthost, uint8_t enable);
+ 	if (!ret) {
+ 		tester_warn("Unexpected QoS parameter");
+@@ -3025,6 +3175,17 @@ fail:
+ 	return err;
+ }
+ 
++static gboolean test_listen_past(gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	struct bthost *host;
++
++	host = hciemu_client_get_host(data->hciemu);
++	bthost_past_set_info(host, data->acl_handle);
++
++	return FALSE;
++}
++
+ static void setup_listen_many(struct test_data *data, uint8_t n, uint8_t *num,
+ 								GIOFunc *func)
+ {
+@@ -3070,7 +3231,18 @@ static void setup_listen_many(struct test_data *data, uint8_t n, uint8_t *num,
+ 		host = hciemu_client_host(client);
+ 
+ 		bthost_set_cig_params(host, 0x01, 0x01, &isodata->qos);
+-		bthost_create_cis(host, 257, data->acl_handle);
++		bthost_create_cis(host, 256, data->acl_handle);
++	} else if (isodata->past) {
++		if (!data->acl_handle) {
++			tester_print("ACL handle not set");
++			tester_test_failed();
++			return;
++		}
++
++		/* Wait for listen to take effect before initiating PAST
++		 * procedure.
++		 */
++		data->io_id[i] = g_timeout_add(250, test_listen_past, data);
+ 	}
+ }
+ 
+@@ -3518,6 +3690,18 @@ static void test_bcast(const void *test_data)
+ 	setup_connect(data, 0, iso_connect_cb);
+ }
+ 
++static void test_past(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	uint8_t num[1] = { 1 };
++	GIOFunc funcs[1] = { iso_accept2_cb };
++
++	if (data->client_num > 1)
++		setup_listen_many(data, 1, num, funcs);
++	else
++		setup_connect(data, 0, iso_connect_cb);
++}
++
+ static void test_bcast_reconnect(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -3593,6 +3777,13 @@ static void test_bcast_recv2_defer(const void *test_data)
+ 	setup_listen_many(data, 2, num, funcs);
+ }
+ 
++static void test_past_recv(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	setup_listen(data, 0, iso_accept_cb);
++}
++
+ static void test_connect2_suspend(const void *test_data)
+ {
+ 	test_connect2(test_data);
+@@ -3980,6 +4171,12 @@ int main(int argc, char *argv[])
+ 
+ 	test_iso("ISO Broadcaster - Success", &bcast_16_2_1_send, setup_powered,
+ 							test_bcast);
++	test_iso("ISO Broadcaster PAST Info - Success", &past_16_2_1_send,
++							setup_powered,
++							test_past);
++	test_iso2("ISO Broadcaster PAST Sender - Success", &past_16_2_1,
++							setup_powered,
++							test_past);
+ 	test_iso("ISO Broadcaster Encrypted - Success", &bcast_enc_16_2_1_send,
+ 							setup_powered,
+ 							test_bcast);
+@@ -4003,6 +4200,10 @@ int main(int argc, char *argv[])
+ 	test_iso("ISO Broadcaster Receiver - Success", &bcast_16_2_1_recv,
+ 							setup_powered,
+ 							test_bcast_recv);
++	test_iso("ISO Broadcaster PAST Receiver - Success",
++							&past_16_2_1_recv,
++							setup_powered,
++							test_past_recv);
+ 	test_iso("ISO Broadcaster Receiver SID auto - Success",
+ 							&bcast_16_2_1_recv_sid,
+ 							setup_powered,
 -- 
 2.51.0
 
