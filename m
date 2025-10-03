@@ -1,94 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5695F1EB5D6
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 09:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544C61AF0A4
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 13:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759483624; cv=none; b=sNe38QoTXVyCSQf4q6knxDnohNeBl0AsnGNrXI3IwG9PggnUdoDV4yQ7ERZNRgzGM0jNLOlsAeqAyyr9METyLoK8gvXj1bagNyaJnwwz/yeqf4wTNrgZzfqvZGP5lcdf/Hy1YO5WIpL25agF84EmFE82RGDDZ3xzHyQI5sFTHYM=
+	t=1759497015; cv=none; b=f+l+Znw38B4nhxRtPlOEcmg6UD6ERoIUHpFl0uZURygKySVvs4GjWg5uCC0QOq0gl6+RtMowGq3w/vfrvzAm7h9yqVqSf5FuAzaKhK9+JqSbxPsXmXQGOHdNTF+fsgg32M6IHJ5Dn/toarNmOoVWtGQQiFazpV9rEDKIkn1gkus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759483624; c=relaxed/simple;
-	bh=NcFztfkOXZJMgA5I2UBtcDgGaGOZnmO57zJ80JIbl/I=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=A19k4Hj568Gt6p5nsDlYbf/vKAdm7AlJDC/yD3lj8I+GzVqghOs/FhcJkfocphBWJi+75VyOzrWeEV4wmEH2L83lWFZK+cMM5sBsdt3tDC13dDxvKooBTjf4CKwOYGyT94BXm9jQDoCD0EYtkIPPegb1JypbmvgV7xKrSQDSz30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RpgixT4b; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759497015; c=relaxed/simple;
+	bh=I3z53h4oxzNVpihvB8ChcPNOklYwAmQgiI0At3pSWb8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZsKRmXQp7J6S6iAqPOLdg8MBmgfaSp4Z7+OE0u0L/WttmrKSf/qUv6lXW7Z0yCR0iKt+c7d9/HHvTwOJmxjBRM7Y6LTfDpVjX2R5cn8bSYVHN9CYrejGGkXVD27rLVxvIZ4Pb5+Lhg5wFGcobcmASv8R1FOFKRRgbvw+4/kua5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMMnu3zF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RpgixT4b"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BDB13C4CEFD
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 09:27:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMMnu3zF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD9E1C4CEF5;
+	Fri,  3 Oct 2025 13:10:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759483622;
-	bh=NcFztfkOXZJMgA5I2UBtcDgGaGOZnmO57zJ80JIbl/I=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=RpgixT4bHjoL8Qdci40wTnMJWeBnqaD6PGnS7G3KBhn8jW522z/44R0hUTFGWCp0p
-	 eCT7xIqxXyAFpyGwF9jResTA9rwNOcV3DhFrdPLGnXlL/Qn1KtLI51KJoFrPOG4EN+
-	 LksqFmVRXmPB7xQsnAZareKJjzDp/z4PivJ8qy8YIGLD+gJAnXLN0TP+Wb/yycnwxu
-	 sJy7MpmfIwAO/fwE8v4p6ptscem6Pa/XVyF5Xaje5l6Ipo9pnslFTfyM3QUyVm18P3
-	 FhQPEH0wzEIsjYCAEGB7jPIoEe1MS5foD6Ytbb1j2awvMCuIYDMTpnVIUej1kZp0VD
-	 rNyum/m3JgucA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id AE3A9C41614; Fri,  3 Oct 2025 09:27:02 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date: Fri, 03 Oct 2025 09:26:58 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pverda@ziggo.nl
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-YBK8NWVpTq@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1759497014;
+	bh=I3z53h4oxzNVpihvB8ChcPNOklYwAmQgiI0At3pSWb8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GMMnu3zFEw+9wmy6xuG0GNoK6kmMvRKFf4ObBZX5/0JWEUwMNR6xR5ibVymP4ajLz
+	 5gW93fTOsWkCRcKXQogftB0PJkSV/O1lxKZukZu2GbQEvhh8sW0TV5fqmLt3giQfU9
+	 ajvc4Ea3wMoynux22tZzp+k1So5zS74iLgfDNH0gO2jhP52FrbU92jtTqyKPqGYMlM
+	 O5S+DmvDcjENhBsdSJ1NQWTHkiAwgea/Mz9Jksg3wOcanaUl/CF5keM4cyIVkZ5V+h
+	 kO85v9FxhEYD7OIAsEE3JOjRY0ExC9og1j2AIVwT9oZHWVvckpa/LUx8sMpQmsbyLI
+	 ceCDBB5d3k31Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 711B039D0C1A;
+	Fri,  3 Oct 2025 13:10:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: HCI: Fix tracking of advertisement
+ set/instance
+ 0x00
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175949700627.4115234.7584241190986847936.git-patchwork-notify@kernel.org>
+Date: Fri, 03 Oct 2025 13:10:06 +0000
+References: <20251002195313.303358-1-luiz.dentz@gmail.com>
+In-Reply-To: <20251002195313.303358-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+Hello:
 
---- Comment #282 from pverda@ziggo.nl ---
-About CSR dongles:=20
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-I have tested my Chinese CSR clone dongle with the new kernel. I have used
-kernel 6.15.10 and it worked perfectly. However, I did need to remove the
-barrot quirk in order to let it work. It also needs module option
-enable_autosuspend=3D0. The dongle in question is:
-idVendor=3D0a12, idProduct=3D0001, bcdDevice=3D25.20
-OUI: 00:1A:7D =3D Cyber Blue (HK) Ltd - Shenzhen
-HCI Version: 4.0 (0x6)  Revision: 0x3120
-LMP Version: 4.0 (0x6)  Subversion: 0x22bb
+On Thu,  2 Oct 2025 15:53:13 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This fixes the state tracking of advertisement set/instance 0x00 which
+> is considered a legacy instance and is not tracked individually by
+> adv_instances list, previously it was assumed that hci_dev itself would
+> track it via HCI_LE_ADV but that is a global state not specifc to
+> instance 0x00, so to fix it a new flag is introduced that only tracks the
+> state of instance 0x00.
+> 
+> [...]
 
-I also have an older dongle that started to work somewhere during the
-kernel/module updates. I don't know precisely when. This dongle is a blueto=
-oth
-2.0 type. It does not need module option enable_autosuspend=3D0 and does no=
-t need
-the removal of the barrot quirk. This dongle is:
-idVendor=3D0a12, idProduct=3D0001, bcdDevice=3D19.15
-OUI: 00:1F:81 =3D Accel Semiconductor Corp - Shanghai
-HCI Version: 2.0 (0x3)  Revision: 0x44
-LMP Version: 2.0 (0x3)  Subversion: 0x3
+Here is the summary with links:
+  - [v2] Bluetooth: HCI: Fix tracking of advertisement set/instance 0x00
+    https://git.kernel.org/bluetooth/bluetooth-next/c/164e3e096390
 
---=20
-You may reply to this email to add a comment.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+
