@@ -1,166 +1,166 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590932D878D
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 17:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEAEE12E1E9
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 19:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759513035; cv=pass; b=r6C6h2dQmrn4qP9iIob2TRXiWITScRdkNA22eBUgI0XbTEnr35l6U39lqSOYYM5unr/tqFrZBzalTyxb94YZyq4mjCroDFk61hbZP2mwNTcdP8oxq/2/VZVZbWG2vylCDE4ERxPyu3+FLz7a4J6a7rAsnMuzNRQ5tlD1kMlG4q0=
+	t=1759518464; cv=pass; b=peLQ8P1RerYrdN8M+yrzq4TIg5dmrH4ll1mWKfO04sZ7+eZhVoff87S+Zok0EgzOBouj0nuOTrKt+VYWYiZc7820zO2clZujbWHjk6PQ40CJP9OHZA3OtgdCemdT7nDUswMLw8X+hJ89zulokfw2KhWRdzo83qCMlNZiBHabe14=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759513035; c=relaxed/simple;
-	bh=M/ytuXgeK77/7NFNSpqr40GSPvCb+3x36WcyltjOq4Y=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hyCFB363hI9luISfyDjuXOxGQ5ZMEsi80Ou4/Mt7dr++nq55PG9g4DajkOxKcFntZHFQoE7LF1ZdWlJBYkhIaVWk/MCr/WdvaC39zq0dNAF55PHBIti73O1izD8BEu+zVv650VNMWe0d4Tg93C7JX/C2cN2+piK3n1Ti6BByVgQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=atsmZi+k; arc=pass smtp.client-ip=185.185.170.37
+	s=arc-20240116; t=1759518464; c=relaxed/simple;
+	bh=WpfcRXSs6+Fu1GcfHsfcCqF2WTDmjp4174lNzm8fTsI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WWu/4duzqlLtYtcWBPZyTkdPKFCtVg6bLQbj6wScrkOmPe/QgEJ/T8DrzQZgDL8o/pZv20IBf2tfzagubRzULs3yCVviieHKMx1fgsN50FUN4fRz8OK01FHAAJksxRIJo8xCvaTN85bl2zwUmxGdcmHYSh0Swg9BuheLTGC0XsY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=cHObfZ+I; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="atsmZi+k"
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="cHObfZ+I"
+Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a01d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4cdbSy5Pxzz49Q4h;
-	Fri,  3 Oct 2025 20:37:06 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1759513026;
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4cddTP1LZszyRk;
+	Fri,  3 Oct 2025 22:07:37 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1759518457;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/zEYGR3qrQTXM0tX91j/702xNw26XBRdyE0/YDtnDAU=;
-	b=atsmZi+klcRRhFAj6B7PFm2NoaObOw5euxTEZSMB1/BNFohUjcLr6J7e3glu4sEUb7oPG3
-	vfySGIE4RnZcGC/9uuaRdcZ9ZQyAMI4bdvO7HtV08Ao8siQMfWsNIdTnOHqsCdNyRD27PF
-	1ToiZBsbAMHaXQr7f3lG3lMkmHqF5/WpN3LvKVGi/NbsE8pHKeDbPZ5+DORls2nnuUc/x2
-	7XZdKit81mNX9TtQQT+ggiDvsdMn4LlsUTYvXRgBDV3/HWwr5kRooohhZZiksIz9OdU/+R
-	ny6S+lk4VM8KjYzUbFpC4isbHRYIwl6VbOXkwwFGTfoDr40V1juA51mgPnK1aw==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=s+aDxbwXA4E0xiDC63cvhDfNyOWczpxns15cuEax5cw=;
+	b=cHObfZ+IEZPZhzlPA98h7edf5eRsgzzqOB5iuuDkGmi/ACnjTiW1cqJCsdFDn5MoBIBf2Z
+	X+d++1CZIHPK6ODS+Sj1Xs03anPfluks5gscpyNCigFKwwfizhJnilHu1QYLoZscvxckAo
+	nLAsX9NX7JjNvPW2Cpco8dIkfLxh9Cg=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1759513026;
+	s=meesny; t=1759518457;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/zEYGR3qrQTXM0tX91j/702xNw26XBRdyE0/YDtnDAU=;
-	b=fwQoSAsFSdZrjhmgCi+XNHsjY/PuSBk5C4GjiW0xVgFVPQ4dKsq8xn8qi0n2a6DtHtWkIg
-	/5IKrSLuV4He1BlBEkepShhpOTSLoQiMX5be8iE/Xag4H9gQFTvVYIoKpj/L75UPFy1tQh
-	feUKP28tTVsqDTK1ZiM1IABpTdqy/CBT+8K51ywfzDlJ01oi+ZVCrrK3Dc8upololVWCl4
-	a+5//C/QtGqsqyN8BW6d5oIpd6yRJyjN9M3cTXGQ+NQndW3MMGkAeeJjTquZaY7saQx650
-	c/gjFXMUeLDfa5jf/FaVmKLpBVBhn76d9zZFfMoZCmTOL9jJyoX8hBWLDJdEmw==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1759513026; a=rsa-sha256;
-	cv=none;
-	b=OrykowqSrz7VJoMLp/6x52nC9fMxkI1tkDY8Sc/gHwVOitIAcr5SPUsgDrmP+NlBwuZsb4
-	xHYTNJpcvP2uMm+byuVwH9n9GjKF62gwwh1B5e+lPnNlBQDViLV1EYaqfM0l7YtP+NkHMX
-	eS6tUyGP8a6VdBgYY+ezL9fe3IycUHXSEW+98gEoMSiYKjVMarym5Xqs6fvb5INqZZTO+a
-	Wc/9266aZtAsIfNZYAVJhwZnt/aD7x+1sD9ffkmWDaorC7162kV27iH6b/tHoASWfUP8re
-	iVezAsJjsY2/YbiK1DbPiSi7MgPFbZsDamdubFZuu7rN6GrEu8NqObCz3UHFWA==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=s+aDxbwXA4E0xiDC63cvhDfNyOWczpxns15cuEax5cw=;
+	b=XgDct8xtzxcREsltcmCoiLQ1FMiajELe/3FRIbVOWM2Xfzjip9wJIaqNG2w1x7z9uYiOzM
+	YhXtOJS1qYo6z3Y5r+zeG/zbup9vIhFnxM7WsmffbeWk/Rl/cBZiQnXNiuYQPLhRNeX9IA
+	twKHsEfr0IeYkfe40HJ12hOpLY3Sil8=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1759518457; a=rsa-sha256; cv=none;
+	b=Jk6uLn78Yjbhx+GMwDdl+qH20nJsPITjzlWO3kpX4CZ42R0G33JLULsaQQmdTkPKGewi0F
+	cABLnHS5u86e5MYhbA2leJLJTi0Vi3NSF73kJbR54hGa53rQwLNYg4V9DDthjw5AYtIYmW
+	eQ8SQ+/NnRuQUw4WtswM/bFxcsLAHbU=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <dc169498016816be47233eb761285899164e654d.camel@iki.fi>
-Subject: Re: [PATCH v1 3/5] Bluetooth: ISO: Add support to bind to trigger
- PAST
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org
-Date: Fri, 03 Oct 2025 20:37:06 +0300
-In-Reply-To: <998ff7d8bb8c26f449ddc869fdd7c525b2868d19.camel@iki.fi>
-References: <20251003153424.470938-1-luiz.dentz@gmail.com>
-		 <20251003153424.470938-3-luiz.dentz@gmail.com>
-	 <998ff7d8bb8c26f449ddc869fdd7c525b2868d19.camel@iki.fi>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH] Bluetooth: MGMT: fix crash in set_mesh_sync and set_mesh_complete
+Date: Fri,  3 Oct 2025 22:07:32 +0300
+Message-ID: <f206fc905f5c747b309d6063acd0128189661576.1759517776.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-pe, 2025-10-03 kello 20:30 +0300, Pauli Virtanen kirjoitti:
-> Hi Luiz,
->=20
-> pe, 2025-10-03 kello 11:34 -0400, Luiz Augusto von Dentz kirjoitti:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >=20
-> > This makes it possible to bind to a different destination address
-> > after being connected (BT_CONNECTED, BT_CONNECT2) which then triggers
-> > PAST Sender proceedure to transfer the PA Sync to the destination
-> > address.
-> >=20
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> >  include/net/bluetooth/hci_sync.h |  1 +
-> >  net/bluetooth/hci_sync.c         | 74 ++++++++++++++++++++++++++++++++
-> >  net/bluetooth/iso.c              | 62 ++++++++++++++++++--------
-> >  3 files changed, 120 insertions(+), 17 deletions(-)
-> >=20
-[clip]
-> > =20
-> > +static int iso_sock_rebind_bc(struct sock *sk, struct sockaddr_iso *sa=
-,
-> > +			      int addr_len)
-> > +{
-> > +	struct hci_conn *le;
-> > +
-> > +	if (sk->sk_type !=3D SOCK_SEQPACKET)
-> > +		return -EINVAL;
-> > +
-> > +	/* Check if it is really a Broadcast address being requested */
-> > +	if (addr_len !=3D sizeof(*sa) + sizeof(*sa->iso_bc))
-> > +		return -EINVAL;
-> > +
-> > +	/* Check if the address hasn't changed then perhaps only the number o=
-f
-> > +	 * bis has changed.
-> > +	 */
-> > +	if (!bacmp(&iso_pi(sk)->dst, &sa->iso_bc->bc_bdaddr) ||
-> > +	    !bacmp(&sa->iso_bc->bc_bdaddr, BDADDR_ANY))
-> > +		return iso_sock_rebind_bis(sk, sa, addr_len);
-> > +
-> > +	/* Check if the address type is of LE type */
-> > +	if (!bdaddr_type_is_le(sa->iso_bc->bc_bdaddr_type))
-> > +		return -EINVAL;
->=20
-> hci_dev_lock(hdev) here otherwise le may be deleted concurrently I
-> think
+There is a BUG: KASAN: stack-out-of-bounds in set_mesh_sync due to
+memcpy from badly declared on-stack flexible array.
 
-Actually it probably needs to be taken in the caller iso_sock_bind(),
-as it must be taken before lock_sock(sk) for proper lock ordering
+Another crash is in set_mesh_complete() due to double list_del via
+mgmt_pending_valid + mgmt_pending_remove.
 
---=20
-Pauli Virtanen
+Use DEFINE_FLEX to declare the flexible array right, and don't memcpy
+outside bounds.
+
+As mgmt_pending_valid removes the cmd from list, use mgmt_pending_free,
+and also report status on error.
+
+Fixes: 302a1f674c00d ("Bluetooth: MGMT: Fix possible UAFs")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
+ include/net/bluetooth/mgmt.h |  2 +-
+ net/bluetooth/mgmt.c         | 26 +++++++++++++++-----------
+ 2 files changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 74edea06985b..bca0333f1e99 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -853,7 +853,7 @@ struct mgmt_cp_set_mesh {
+ 	__le16 window;
+ 	__le16 period;
+ 	__u8   num_ad_types;
+-	__u8   ad_types[];
++	__u8   ad_types[] __counted_by(num_ad_types);
+ } __packed;
+ #define MGMT_SET_MESH_RECEIVER_SIZE	6
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a3d16eece0d2..24e335e3a727 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2175,19 +2175,24 @@ static void set_mesh_complete(struct hci_dev *hdev, void *data, int err)
+ 	sk = cmd->sk;
+ 
+ 	if (status) {
++		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_MESH_RECEIVER,
++				status);
+ 		mgmt_pending_foreach(MGMT_OP_SET_MESH_RECEIVER, hdev, true,
+ 				     cmd_status_rsp, &status);
+-		return;
++		goto done;
+ 	}
+ 
+-	mgmt_pending_remove(cmd);
+ 	mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_MESH_RECEIVER, 0, NULL, 0);
++
++done:
++	mgmt_pending_free(cmd);
+ }
+ 
+ static int set_mesh_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_cp_set_mesh cp;
++	DEFINE_FLEX(struct mgmt_cp_set_mesh, cp, ad_types, num_ad_types,
++		    sizeof(hdev->mesh_ad_types));
+ 	size_t len;
+ 
+ 	mutex_lock(&hdev->mgmt_pending_lock);
+@@ -2197,27 +2202,26 @@ static int set_mesh_sync(struct hci_dev *hdev, void *data)
+ 		return -ECANCELED;
+ 	}
+ 
+-	memcpy(&cp, cmd->param, sizeof(cp));
++	len = cmd->param_len;
++	memcpy(cp, cmd->param, min(__struct_size(cp), len));
+ 
+ 	mutex_unlock(&hdev->mgmt_pending_lock);
+ 
+-	len = cmd->param_len;
+-
+ 	memset(hdev->mesh_ad_types, 0, sizeof(hdev->mesh_ad_types));
+ 
+-	if (cp.enable)
++	if (cp->enable)
+ 		hci_dev_set_flag(hdev, HCI_MESH);
+ 	else
+ 		hci_dev_clear_flag(hdev, HCI_MESH);
+ 
+-	hdev->le_scan_interval = __le16_to_cpu(cp.period);
+-	hdev->le_scan_window = __le16_to_cpu(cp.window);
++	hdev->le_scan_interval = __le16_to_cpu(cp->period);
++	hdev->le_scan_window = __le16_to_cpu(cp->window);
+ 
+-	len -= sizeof(cp);
++	len -= sizeof(struct mgmt_cp_set_mesh);
+ 
+ 	/* If filters don't fit, forward all adv pkts */
+ 	if (len <= sizeof(hdev->mesh_ad_types))
+-		memcpy(hdev->mesh_ad_types, cp.ad_types, len);
++		memcpy(hdev->mesh_ad_types, cp->ad_types, len);
+ 
+ 	hci_update_passive_scan_sync(hdev);
+ 	return 0;
+-- 
+2.51.0
+
