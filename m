@@ -1,351 +1,131 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CF01C700C
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 17:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759512630; cv=pass; b=l1zsxa0RVTRg2caOSGELS3qq5t29DmlpqmsYG5yZxeM/JrnGfR4m8/q46mAX1sItMFY7A5Ap2AdxcY9pkaJupXpj5KDbH/1S1yDl4uBcFA/5asxoPWVWZegMRYB7/13Kk1A7p2OpKDx6xDhqfIB9f21xLyB8mKGECEjONa+0Wds=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759512630; c=relaxed/simple;
-	bh=SYbIChKh0bwF2Dxpx59t5+CI4cH+575QwoNdNXnatNs=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bxOjQNbcTuqHpfaX3oMRdGSFcEfapI92JEEow0NpijY7hwdcZeXYlV6kYMXnb9ZUAG74CiQmRBoOebna7m9DnpdzCl9MIXJVWqCTSKdczrwF/9kC7QZL8ct6gOssSA9EP85ObhQV7NCb6Sv70jUzqZi2oU+EpjiOqN9SX/3+KNA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=g2SIr0aW; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C8F2C234B
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 17:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759512850; cv=none; b=pUTxCtxImss8ncb+4htRYgQlb7IqS4swP4++cfY8lLdxNF3zX+3watdaO4HGTWdn3L0zUyT6oQ/ramjIrxjrB9IVYPg1a9tG7Mzhnx5ABauL/yxxMZY4qSLIw1w3ZkwrCvBZI7qQnWtEraBmaFgVoDq+6prlzCSjTwizixlV8Vw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759512850; c=relaxed/simple;
+	bh=1JswXpoSrSK7qSoGjwvMM4Szzwzyf2bpieTBgIIaTsk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lN5sPsQ4TNRHxt6tGgj4yrF6RqZW9Di0c+V0u6GDJfMdFXJOsZuGGBsiEnK7vBs+Cbjvg7RV2dtKJJdGyWeiJYqD8nSFXZjOaGXf9tixzap/kezd9oHhRhZqYEiBgFUD9JuP6jXxzrMD3G1JUCD91qumPZnUgEYZt881CcZu5Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E6enUg4l; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="g2SIr0aW"
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4cdbK26ZbDz49QFl;
-	Fri,  3 Oct 2025 20:30:14 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1759512615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=04FNavaW2Li4UsgfTdtkz0KSNZQ2m4jswtLfoF+W93w=;
-	b=g2SIr0aW2sanMmhH3i8NuzcSLWX8s1RSEMn/RE9Jpe0Qm0GruuF+4AvS9RbdYU9F5vFX0W
-	pO+nigpB26wnsK1KdWhD4IW3ewp1I2rXt7cfW4kWUikI/7opATZ2lrPdmW7WwX8YmbkFUM
-	LmjCnwYnHepOl9hysb4GwREPYgL41veLASY+xkkI8+bwGWYSRaA5BUq053eTtAMrqw7w+q
-	upXNuekdfB6hLtwDtdZbkpzcgM3Qkk4MVflFk7nbyUPjWnvn1jnV+9tNhTdaXAbxR9ElKC
-	vwXxdyo8nWjjyx+It8fiZs0jOMhPEUWO68+vvf29HzsaIDwq9NC9QiMLgEfbmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1759512615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=04FNavaW2Li4UsgfTdtkz0KSNZQ2m4jswtLfoF+W93w=;
-	b=whqUhhrhAK8LCwdtzSAjZTBjbgZOxIri28qcY0290OW3Sh8utcm0axCJ/+A/nIMkkZKROt
-	vMY0BMErmtfrU8fckKXqfxoOJ8KmkyRH1bWLy9afG6GRwar3R/PdIgZusCw37C/O8e5R7u
-	F6QaVWArpDk0DyJNTucliVwUq2kf0ebf0J+1yQjcqQFiY4sk58v8Gy8D+SFHGgU2E2sMee
-	sYsQXMXFgtY+RcwzgBRZ2/ZGYZKpxp5L/GkciESBEe311AZANPB/nPdcdNK5WNdrMUisr4
-	UXJV47XTOfOY4zcaFhylGz0Tld3KWaMUoAtrBJ3wC34ZF5eCgtK1beyPAQ0yQw==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1759512615; a=rsa-sha256;
-	cv=none;
-	b=etuR7LfYVjDtszinPl6qgrWnJq6WjNH8XzBx2l4ZXvMIei/xRyvGuDXXR2AvBhrbVPVp7r
-	/nSVS1Is6YGldIsrAEj3V2j6OUXql2SVUkCr9ducQAUTbAEJIqs2UssnGPp2doUgRsEJEn
-	+gApmk01CDxA1IzkVMiwxYd3lINvT8YrmYKwSDRZepIjeaEFLkRV0EWEouvBCUYROPooFL
-	VlA2hOot/E8YNFkAxSs+23tQi5Jb4YQQXAQHAoFEKOkU0X2qx1k85Z3XR5o4VNlhz5xB3C
-	kk17Kf80gi4Xxowj4SyvdKm2vwVAPkwZ8lgRQoddZWZNO6gyNl87zs+rhHf7bQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <998ff7d8bb8c26f449ddc869fdd7c525b2868d19.camel@iki.fi>
-Subject: Re: [PATCH v1 3/5] Bluetooth: ISO: Add support to bind to trigger
- PAST
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org
-Date: Fri, 03 Oct 2025 20:30:14 +0300
-In-Reply-To: <20251003153424.470938-3-luiz.dentz@gmail.com>
-References: <20251003153424.470938-1-luiz.dentz@gmail.com>
-	 <20251003153424.470938-3-luiz.dentz@gmail.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E6enUg4l"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-77f68fae1a8so3439865b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Oct 2025 10:34:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759512846; x=1760117646; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kKMiBo1PKmq2dBeNdxTwgDF4hSSsCKx1yFp1CZIAFQs=;
+        b=E6enUg4lq9AldEeAS/4sU/rZNFiccJzzT2YDCcxN1FvFD6wLub+Zkn5wjcfjAIhlz5
+         MkrVDTB7NSFIwcdiZ2NGpVGqW9K9Ac7CpIJFBEjbmJ8wJE2g+kd9kHxsfyG0dNx3dtQ6
+         VOYx2jkxkQvJdUbIJcYIX+cVrTqpAI5CBfQQunqJmkSClXSdtCSfYUJKtoREbGbOsE48
+         42tv21CYhoK+O/0smwh/wH7Iu2CmYlG8C62pSAZltzxYk/gGZBjFtym9fb5wHB85i78j
+         bWbEBvLX9YgkCM5bmlQZRSPOdQvqBvrp3BaZVUl6HPlu37gk57qZc0DJg1fumaCKj/Y/
+         LG0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759512846; x=1760117646;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kKMiBo1PKmq2dBeNdxTwgDF4hSSsCKx1yFp1CZIAFQs=;
+        b=sFLAdEHcEate4fIM/jAQRz7WU3AuK8qgWTe3N5KSurF/88c+PUh6hGb6SeoV/zSmoj
+         3X8+pl3j+IDN8FmkhjHdEcjuBV2uJ8c4DH9fFo/uCyh8dwKyHC043/2P1BbJ0PJzDJP9
+         U2e3Q0M6ewUlgU5f7PKZIYcDsjHAzVAMKwgfzih+QfyAUMf7IfHKa89vl6xSkfo//UXM
+         kNrvBQaIf3jUoGFQKgXTGzNQiahdyyyJsarLHNwzno7L8YH30wFZLqb2gqHOOm2AYgt1
+         HODWp4C9esrc/gceSabp6lPKrY7kcdT9wQZFyvF3Wa/IxT4UOET/5oZ4KEHLbnDSSGck
+         U0FQ==
+X-Gm-Message-State: AOJu0YyP1oI1F6vHXHm7nHWCcr0uWTwC5y+olWwj+moDfSotxX+WIsc6
+	4FH3sdkXMZzgKZe8HeGxiEb8Hv/FIrT45oaaLGHPg4+rGF2HCaIv4N9/fI5F8A==
+X-Gm-Gg: ASbGncuASz7P/WPhs9mOHxsFxGv9QmGKWoc34819CY4Cgqswap8KgE6Elgr0fvlnZsA
+	Y/1M2TYfHERQsTvYxq5MQNd0M6/+t+J/6LeJ95lzQKcInJdGpvITyAKk88iL5MgG8+IB3QdRIr6
+	XXWyvDEmdMqN4uIEMJN6s2tUTXtJLpLAPAcbqItEkFVr+7/RtSi5Z7Ob+KegqTpGD50ZkLWIZpA
+	z210PY9klUuGpQdyd6dsoH+aqs+l4XQV+wNQuZ2EBoy1GJq+4W9Xx7zgQo+fiPTe3kGcyYUgbe2
+	Xlqa1/x+UiPmONegtRib0ybKpjsq9l2FBwrKwGiwhfjSp+blBhpV14q18d7al65gWEpU245lp3w
+	dDdPepx9q46VD2Cnr0YqQHoVgecr/pCLacRX8TR4X0J8iTo72RA==
+X-Google-Smtp-Source: AGHT+IH9P+lF3/wSY0OBZEIMmaMc88CQPARsPO9qmM05dDx1zg756kHEwpLyyn7O9C2bGArnM0hobQ==
+X-Received: by 2002:a05:6a20:1586:b0:24a:b9e:4a6c with SMTP id adf61e73a8af0-32b620d7ed0mr5152969637.44.1759512846452;
+        Fri, 03 Oct 2025 10:34:06 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.6.67])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6099f5b861sm5130772a12.41.2025.10.03.10.34.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Oct 2025 10:34:05 -0700 (PDT)
+Message-ID: <68e0090d.630a0220.3b80f4.35fe@mx.google.com>
+Date: Fri, 03 Oct 2025 10:34:05 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1561051715234074378=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/3] monitor: Use PAST to refer to Periodic Advertising Sync Transfer
+In-Reply-To: <20251003161721.508678-1-luiz.dentz@gmail.com>
+References: <20251003161721.508678-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============1561051715234074378==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-pe, 2025-10-03 kello 11:34 -0400, Luiz Augusto von Dentz kirjoitti:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->=20
-> This makes it possible to bind to a different destination address
-> after being connected (BT_CONNECTED, BT_CONNECT2) which then triggers
-> PAST Sender proceedure to transfer the PA Sync to the destination
-> address.
->=20
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  include/net/bluetooth/hci_sync.h |  1 +
->  net/bluetooth/hci_sync.c         | 74 ++++++++++++++++++++++++++++++++
->  net/bluetooth/iso.c              | 62 ++++++++++++++++++--------
->  3 files changed, 120 insertions(+), 17 deletions(-)
->=20
-> diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci=
-_sync.h
-> index e352a4e0ef8d..3133f40fa9f9 100644
-> --- a/include/net/bluetooth/hci_sync.h
-> +++ b/include/net/bluetooth/hci_sync.h
-> @@ -188,3 +188,4 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, str=
-uct hci_conn *conn,
-> =20
->  int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn);
->  int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn);
-> +int hci_past_sync(struct hci_conn *conn, struct hci_conn *le);
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 5051413f1a97..aad9689af610 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -7228,3 +7228,77 @@ int hci_connect_big_sync(struct hci_dev *hdev, str=
-uct hci_conn *conn)
->  	return hci_cmd_sync_queue_once(hdev, hci_le_big_create_sync, conn,
->  				       create_big_complete);
->  }
-> +
-> +struct past_data {
-> +	struct hci_conn *conn;
-> +	struct hci_conn *le;
-> +};
-> +
-> +static void past_complete(struct hci_dev *hdev, void *data, int err)
-> +{
-> +	struct past_data *past =3D data;
-> +
-> +	bt_dev_dbg(hdev, "err %d", err);
+This is automated email and please do not reply to this email!
 
-Looks like past_data should hold references, otherwise it's UAF below:
+Dear submitter,
 
-hci_conn_put(past->conn);
-hci_conn_put(past->le);
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1008324
 
-> +
-> +	kfree(past);
-> +}
-> +
-> +static int hci_le_past_set_info_sync(struct hci_dev *hdev, void *data)
-> +{
-> +	struct past_data *past =3D data;
-> +	struct hci_cp_le_past_set_info cp;
+---Test result---
 
-hci_dev_lock(hdev) here otherwise it's UAF if conn/le are deleted
-concurrently
+Test Summary:
+CheckPatch                    PENDING   0.41 seconds
+GitLint                       PENDING   0.28 seconds
+BuildEll                      PASS      20.08 seconds
+BluezMake                     PASS      2501.35 seconds
+MakeCheck                     PASS      19.76 seconds
+MakeDistcheck                 PASS      183.23 seconds
+CheckValgrind                 PASS      233.31 seconds
+CheckSmatch                   WARNING   304.06 seconds
+bluezmakeextell               PASS      126.84 seconds
+IncrementalBuild              PENDING   0.36 seconds
+ScanBuild                     PASS      897.27 seconds
 
-> +
-> +	if (!hci_conn_valid(hdev, past->conn) ||
-> +	    !hci_conn_valid(hdev, past->le))
-> +		return -ECANCELED;
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +	cp.handle =3D past->le->handle;
-> +	cp.adv_handle =3D past->conn->iso_qos.bcast.bis;
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-hci_dev_unlock(hdev)
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-> +
-> +	return __hci_cmd_sync_status(hdev, HCI_OP_LE_PAST_SET_INFO,
-> +				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +}
-> +
-> +static int hci_le_past_sync(struct hci_dev *hdev, void *data)
-> +{
-> +	struct past_data *past =3D data;
-> +	struct hci_cp_le_past cp;
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1931:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3837:52: warning: array of flexible structuresemulator/btdev.c:459:29: warning: Variable length array is used.emulator/bthost.c:678:28: warning: Variable length array is used.emulator/bthost.c:679:32: warning: Variable length array is used.emulator/bthost.c:896:28: warning: Variable length array is used.emulator/bthost.c:930:28: warning: Variable length array is used.emulator/bthost.c:931:32: warning: Variable length array is used.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
-hci_dev_lock(hdev) also here
 
-> +
-> +	if (!hci_conn_valid(hdev, past->conn) ||
-> +	    !hci_conn_valid(hdev, past->le))
-> +		return -ECANCELED;
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +	cp.handle =3D past->le->handle;
-> +	cp.sync_handle =3D cpu_to_le16(past->conn->sync_handle);
-> +
 
-hci_dev_unlock(hdev)
+---
+Regards,
+Linux Bluetooth
 
-> +	return __hci_cmd_sync_status(hdev, HCI_OP_LE_PAST,
-> +				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +}
-> +
-> +int hci_past_sync(struct hci_conn *conn, struct hci_conn *le)
-> +{
-> +	struct past_data *data;
-> +
-> +	if (conn->type !=3D BIS_LINK && conn->type !=3D PA_LINK)
-> +		return -EINVAL;
-> +
-> +	if (!past_sender_capable(conn->hdev))
-> +		return -EOPNOTSUPP;
-> +
-> +	data =3D kmalloc(sizeof(*data), GFP_KERNEL);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	data->conn =3D conn;
-> +	data->le =3D le;
 
-data->conn =3D hci_conn_get(conn);
-data->le =3D hci_conn_get(le);
-
-> +
-> +	if (conn->role =3D=3D HCI_ROLE_MASTER)
-> +		return hci_cmd_sync_queue_once(conn->hdev,
-> +					       hci_le_past_set_info_sync, data,
-> +					       past_complete);
-> +
-> +	return hci_cmd_sync_queue_once(conn->hdev, hci_le_past_sync, data,
-> +					       past_complete);
-
-`data` is leaked here if command was already queued or queueing fails.
-
-> +}
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index 7f66f287c14e..318b5b914cc4 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -987,20 +987,13 @@ static int iso_sock_bind_bc(struct socket *sock, st=
-ruct sockaddr *addr,
->  	return 0;
->  }
-> =20
-> -static int iso_sock_bind_pa_sk(struct sock *sk, struct sockaddr_iso *sa,
-> +static int iso_sock_rebind_bis(struct sock *sk, struct sockaddr_iso *sa,
->  			       int addr_len)
->  {
->  	int err =3D 0;
-> =20
-> -	if (sk->sk_type !=3D SOCK_SEQPACKET) {
-> -		err =3D -EINVAL;
-> -		goto done;
-> -	}
-> -
-> -	if (addr_len !=3D sizeof(*sa) + sizeof(*sa->iso_bc)) {
-> -		err =3D -EINVAL;
-> -		goto done;
-> -	}
-> +	if (!test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags))
-> +		return -EBADFD;
-> =20
->  	if (sa->iso_bc->bc_num_bis > ISO_MAX_NUM_BIS) {
->  		err =3D -EINVAL;
-> @@ -1023,6 +1016,42 @@ static int iso_sock_bind_pa_sk(struct sock *sk, st=
-ruct sockaddr_iso *sa,
->  	return err;
->  }
-> =20
-> +static int iso_sock_rebind_bc(struct sock *sk, struct sockaddr_iso *sa,
-> +			      int addr_len)
-> +{
-> +	struct hci_conn *le;
-> +
-> +	if (sk->sk_type !=3D SOCK_SEQPACKET)
-> +		return -EINVAL;
-> +
-> +	/* Check if it is really a Broadcast address being requested */
-> +	if (addr_len !=3D sizeof(*sa) + sizeof(*sa->iso_bc))
-> +		return -EINVAL;
-> +
-> +	/* Check if the address hasn't changed then perhaps only the number of
-> +	 * bis has changed.
-> +	 */
-> +	if (!bacmp(&iso_pi(sk)->dst, &sa->iso_bc->bc_bdaddr) ||
-> +	    !bacmp(&sa->iso_bc->bc_bdaddr, BDADDR_ANY))
-> +		return iso_sock_rebind_bis(sk, sa, addr_len);
-> +
-> +	/* Check if the address type is of LE type */
-> +	if (!bdaddr_type_is_le(sa->iso_bc->bc_bdaddr_type))
-> +		return -EINVAL;
-
-hci_dev_lock(hdev) here otherwise le may be deleted concurrently I
-think
-
-> +
-> +	/* Lookup existing LE connection to rebind to */
-> +	le =3D hci_conn_hash_lookup_le(iso_pi(sk)->conn->hcon->hdev,
-> +				     &sa->iso_bc->bc_bdaddr,
-> +				     le_addr_type(sa->iso_bc->bc_bdaddr_type));
-> +	if (!le)
-> +		return -EINVAL;
-> +
-> +	BT_DBG("sk %p %pMR type %u", sk, &sa->iso_bc->bc_bdaddr,
-> +	       sa->iso_bc->bc_bdaddr_type);
-> +
-> +	return hci_past_sync(iso_pi(sk)->conn->hcon, le);
-
-hci_dev_unlock(hdev);
-
-> +}
-> +
->  static int iso_sock_bind(struct socket *sock, struct sockaddr *addr,
->  			 int addr_len)
->  {
-> @@ -1038,13 +1067,12 @@ static int iso_sock_bind(struct socket *sock, str=
-uct sockaddr *addr,
-> =20
->  	lock_sock(sk);
-> =20
-> -	/* Allow the user to bind a PA sync socket to a number
-> -	 * of BISes to sync to.
-> -	 */
-> -	if ((sk->sk_state =3D=3D BT_CONNECT2 ||
-> -	     sk->sk_state =3D=3D BT_CONNECTED) &&
-> -	    test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags)) {
-> -		err =3D iso_sock_bind_pa_sk(sk, sa, addr_len);
-> +	if ((sk->sk_state =3D=3D BT_CONNECT2 || sk->sk_state =3D=3D BT_CONNECTE=
-D) &&
-> +	    addr_len > sizeof(*sa)) {
-> +		/* Allow the user to rebind to a different address using
-> +		 * PAST procedures.
-> +		 */
-> +		err =3D iso_sock_rebind_bc(sk, sa, addr_len);
->  		goto done;
->  	}
-> =20
+--===============1561051715234074378==--
