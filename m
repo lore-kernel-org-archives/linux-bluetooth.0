@@ -1,78 +1,108 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544C61AF0A4
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 13:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EEA15E8B
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 13:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759497015; cv=none; b=f+l+Znw38B4nhxRtPlOEcmg6UD6ERoIUHpFl0uZURygKySVvs4GjWg5uCC0QOq0gl6+RtMowGq3w/vfrvzAm7h9yqVqSf5FuAzaKhK9+JqSbxPsXmXQGOHdNTF+fsgg32M6IHJ5Dn/toarNmOoVWtGQQiFazpV9rEDKIkn1gkus=
+	t=1759498686; cv=none; b=td7gvj5rzlFipKxmzUeHOwGL9BcjdxLff0ThP0B5DBYdx5UyGDLVNQLQn0FyQ+vpiglPYW6V1NyL5NJd+2f5HLlJlTW+vChteFQUEVnqJwp45SH3xByQiqQ0TuZs4ZgC7Lve/Zk+J8SvZFXtiqqvDU+NRAfoMKGEmBk5z65teTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759497015; c=relaxed/simple;
-	bh=I3z53h4oxzNVpihvB8ChcPNOklYwAmQgiI0At3pSWb8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZsKRmXQp7J6S6iAqPOLdg8MBmgfaSp4Z7+OE0u0L/WttmrKSf/qUv6lXW7Z0yCR0iKt+c7d9/HHvTwOJmxjBRM7Y6LTfDpVjX2R5cn8bSYVHN9CYrejGGkXVD27rLVxvIZ4Pb5+Lhg5wFGcobcmASv8R1FOFKRRgbvw+4/kua5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMMnu3zF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759498686; c=relaxed/simple;
+	bh=2pmyEop6Zijxc9PO1JLBitmHPv8GpcEmMMIj4ht1oUQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b9tLo4Xb0fajoHt/DSgEM7U3pZeHy76+ZG/eRxSF54QqvT8T6FarhBeArJ2o3LNqUK8OkGQsxbtM17N39BC+DGNWItbD8cuhQB7KUs/W8538MuBkTOloTw2KBL9B1Im42e4SjbvGAUhQXhynYmJ78JgoAbyv+/cvOcmahzxYiYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZNpsvWG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMMnu3zF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD9E1C4CEF5;
-	Fri,  3 Oct 2025 13:10:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZNpsvWG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A577C116B1
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Oct 2025 13:38:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759497014;
-	bh=I3z53h4oxzNVpihvB8ChcPNOklYwAmQgiI0At3pSWb8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GMMnu3zFEw+9wmy6xuG0GNoK6kmMvRKFf4ObBZX5/0JWEUwMNR6xR5ibVymP4ajLz
-	 5gW93fTOsWkCRcKXQogftB0PJkSV/O1lxKZukZu2GbQEvhh8sW0TV5fqmLt3giQfU9
-	 ajvc4Ea3wMoynux22tZzp+k1So5zS74iLgfDNH0gO2jhP52FrbU92jtTqyKPqGYMlM
-	 O5S+DmvDcjENhBsdSJ1NQWTHkiAwgea/Mz9Jksg3wOcanaUl/CF5keM4cyIVkZ5V+h
-	 kO85v9FxhEYD7OIAsEE3JOjRY0ExC9og1j2AIVwT9oZHWVvckpa/LUx8sMpQmsbyLI
-	 ceCDBB5d3k31Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 711B039D0C1A;
-	Fri,  3 Oct 2025 13:10:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1759498683;
+	bh=2pmyEop6Zijxc9PO1JLBitmHPv8GpcEmMMIj4ht1oUQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GZNpsvWG+NWIn7O/yvfTHV1s6evBcvlhFsmkOt5jeFeV+co/Rfk4bYvu2k129Auyq
+	 LgKcKI/wn259mKalCxbKqx3JtgNwJ3qJxwoQfE77Fdsfo+9kHO/78sMvm7OW8uTUOH
+	 e7QgLRk64J+ydxC5awDZlBLHHSuReP8bARSUNh+QXbVraa8Y6f5Wv5d8W9MwnIUJ1P
+	 jL2awPmKc3HNLJGS4qkDrOqR6fWMGnuFZoYogKL1i8oAwtGmzv18USvJdsJZ/oY6Wt
+	 hETD29Lz+c9w4bSG1E+zcWHKa6ZyW7wv+4dkw61k+NlOG2nNWWtZWQ9nxHW4LpID5b
+	 0kt+/gZl7iB9w==
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-636535e4b1aso234017a12.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Oct 2025 06:38:03 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWX9FTlwyRv/qwTfRRWfb9AjAPvo9dYM7Bf96MHRNSzjGLTVb0U+UxQPw9K6CdxSX/EVyB+pTyPDbRKoWQKT4w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIGPZBQYvWsp6IIPVZuwyp4OoxAUt8bGlxUDnCcCSkbakvTXfq
+	JX47xQS3IvkYm1rczJl6614esA6wlAvsgDbOXEsKsKz17ZyxSOzjYlgWMUSpqFO3giJhCo+RgW+
+	kpmUuUpqxoNx+MUw1Ig5/10pOPmLTBQ==
+X-Google-Smtp-Source: AGHT+IFfN6sSJIriH9Ll5BV1c1HgV9f2BYxa3Ss/f40JFYNyE+Fo873QiRh98/8opdRwv/J+A2EYfUUUK5pmVOC4e1g=
+X-Received: by 2002:a17:907:7206:b0:b40:7305:b93d with SMTP id
+ a640c23a62f3a-b49c128064emr438127966b.2.1759498681661; Fri, 03 Oct 2025
+ 06:38:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: HCI: Fix tracking of advertisement
- set/instance
- 0x00
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175949700627.4115234.7584241190986847936.git-patchwork-notify@kernel.org>
-Date: Fri, 03 Oct 2025 13:10:06 +0000
-References: <20251002195313.303358-1-luiz.dentz@gmail.com>
-In-Reply-To: <20251002195313.303358-1-luiz.dentz@gmail.com>
+References: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
+ <175943240204.235529.17735630695826458855.robh@kernel.org> <CABBYNZKSFCes1ag0oiEptKpifb=gqLt1LQ+mdvF8tYRj8uDDuQ@mail.gmail.com>
+In-Reply-To: <CABBYNZKSFCes1ag0oiEptKpifb=gqLt1LQ+mdvF8tYRj8uDDuQ@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 3 Oct 2025 08:37:50 -0500
+X-Gmail-Original-Message-ID: <CAL_Jsq+Y6uuyiRo+UV-nz+TyjQzxx4H12auHHy6RdsLtThefhA@mail.gmail.com>
+X-Gm-Features: AS18NWA85pWm_cEAdPpLk9qTIKFIIE56dO54pRBpeMMRWMqKc4pJeIF8bKT_Mng
+Message-ID: <CAL_Jsq+Y6uuyiRo+UV-nz+TyjQzxx4H12auHHy6RdsLtThefhA@mail.gmail.com>
+Subject: Re: [PATCH v3] dt-bindings: net: Convert Marvell 8897/8997 bindings
+ to DT schema
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Cc: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>, andrew+netdev@lunn.ch, 
+	conor+dt@kernel.org, kernel@collabora.com, krzk+dt@kernel.org, 
+	angelogioacchino.delregno@collabora.com, kuba@kernel.org, 
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, edumazet@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Thu, Oct 2, 2025 at 2:18=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi,
+>
+> On Thu, Oct 2, 2025 at 3:14=E2=80=AFPM Rob Herring (Arm) <robh@kernel.org=
+> wrote:
+> >
+> >
+> > On Wed, 01 Oct 2025 15:33:20 -0300, Ariel D'Alessandro wrote:
+> > > Convert the existing text-based DT bindings for Marvell 8897/8997
+> > > (sd8897/sd8997) bluetooth devices controller to a DT schema.
+> > >
+> > > While here, bindings for "usb1286,204e" (USB interface) are dropped f=
+rom
+> > > the DT   schema definition as these are currently documented in file =
+[0].
+> > >
+> > > [0] Documentation/devicetree/bindings/net/btusb.txt
+> > >
+> > > Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> > > ---
+> > >  .../net/bluetooth/marvell,sd8897-bt.yaml      | 79 +++++++++++++++++=
++
+> > >  .../devicetree/bindings/net/btusb.txt         |  2 +-
+> > >  .../bindings/net/marvell-bt-8xxx.txt          | 83 -----------------=
+--
+> > >  3 files changed, 80 insertions(+), 84 deletions(-)
+> > >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/m=
+arvell,sd8897-bt.yaml
+> > >  delete mode 100644 Documentation/devicetree/bindings/net/marvell-bt-=
+8xxx.txt
+> > >
+> >
+> > Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> >
+> > You'll probably have to resend this after rc1.
+>
+> In that case I'd like to have a Fixes tag so I can remember to send it
+> as rc1 is tagged.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+A Fixes tag is not appropriate for a conversion to DT schema.
 
-On Thu,  2 Oct 2025 15:53:13 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This fixes the state tracking of advertisement set/instance 0x00 which
-> is considered a legacy instance and is not tracked individually by
-> adv_instances list, previously it was assumed that hci_dev itself would
-> track it via HCI_LE_ADV but that is a global state not specifc to
-> instance 0x00, so to fix it a new flag is introduced that only tracks the
-> state of instance 0x00.
-> 
-> [...]
-
-Here is the summary with links:
-  - [v2] Bluetooth: HCI: Fix tracking of advertisement set/instance 0x00
-    https://git.kernel.org/bluetooth/bluetooth-next/c/164e3e096390
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Rob
