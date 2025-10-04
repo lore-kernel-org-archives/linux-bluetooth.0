@@ -1,167 +1,475 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC14CA5E
-	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Oct 2025 16:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759594288; cv=none; b=qn8WgtHnzpir1yOYYR0Zkg6V+YgtFYbLWVXOzH/dVppvqcQH94ZOzJZRXnfIpbxekQOhXVPHZXUMiKfYyyApAEI6AxqnckrDtvU3dCO8jnO7Lp2FQGocKxe4mgFkb/W/jNBuEEPxwpmNvlrjkhp4+s4AKZIMrQyIHB09Lhu72Sw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759594288; c=relaxed/simple;
-	bh=SxkAkB4sjVB5gnO6NAa283JuH/v+ztggRmT7Lz0fdRs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qAa4+kEka5i7BXQQo+gzrDS7RfxgYWCZooTR/0ws7idqVsMS7c97RTCH84dG8W5jf2Yl07enqMhSN0tLlX/6Nscwd73lsMAwK2T0kK4quN2v2vTrTUrOD7uRd/KzEr9r/2WUUkxy7qbPnlVSqNASNntkYLqe1A25iK5tdUsftL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.44.203] (unknown [185.238.219.94])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A66127E7EC
+	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Oct 2025 16:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759594604; cv=pass; b=Ou5YSTdFK5vbCoZjleVZUfuRqAX91cxEhPhudK3cm7eYJYjrRclN+49w0VN83xVeclx+9RpdgJOD2mObzvFSz6Kkvlo/tyRvzsB42Ogn3bg3Tn844KEWFPAZ26ymxgyQofuNeYGKfJz4C45ADe2KSp921pRqWht5g0O/mlwp0oc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759594604; c=relaxed/simple;
+	bh=2hXH9P9X7hTfPqyDM6s51hzOSJZwRFTQyZ0o6yhivS8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rUtQBri9oMk7Dkkbe9rXIleTnYbT0ES4bkkMpMCxodSWmjuhGMQYjRG2HyQDBArBPF6T6q0KG5HKUW0B4oQVDzazjYswTMezq+o+PEYXC62jirEDlzOkJRvnfLgyLOR6z3GkwpZSIq6AQKzkFcHH3SYeuXrO3dkz0j+fz3+Tfdk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=okcXuLWL; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="okcXuLWL"
+Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a02d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 76C3061E647BA;
-	Sat, 04 Oct 2025 18:11:09 +0200 (CEST)
-Message-ID: <f899159a-3373-45f5-855a-b8d6e6d237ce@molgen.mpg.de>
-Date: Sat, 4 Oct 2025 18:11:04 +0200
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4cf9df20mTzyRk;
+	Sat,  4 Oct 2025 19:16:38 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1759594598;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ah4Q9PIcPv4LrBb/6PtXQhbmnqsHEOitWzqmwFXK2Ek=;
+	b=okcXuLWLfDFhw/RInjNQAfLEHUKqwnSS9fqNBnsDcVg+AwsI3B/QPbTd8qYfLaYyHibDle
+	3HvseSS1BapBqvAPmxcK3J3IGOytxm5mkw9RikCEc56EQPzcEXDeLaBNj7jeiGf1grEVyZ
+	tGjMOz5XBx7SgW7/DU2Nugzn8Lq7KIY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1759594598;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ah4Q9PIcPv4LrBb/6PtXQhbmnqsHEOitWzqmwFXK2Ek=;
+	b=A0WTuP3TIa43UqH1aipbzKEcjtHoqlfNmxTgv8/463I9hPF3Kc24Avv6oEEYLs5Zdm4e4n
+	159wKqC5yV+QZD79MnoNMnYz1mPHmeMuOYYfkERYkmNxTknX2yqLQAScnU2moOFG4ytXAM
+	EaY+LdTIwbM4jhgOriBzI4xAby5PLOQ=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1759594598; a=rsa-sha256; cv=none;
+	b=w/PNasMdYhyTNO/0kFpvl9JKmOmJQlxAzohG+Mc6h/ZLYXfe307u/HsYC69LMsKnDkoSK3
+	nTaIjodhFz1M4B2WBqmJSPYGYKY4kuglchWjYBlGCFooM0AYh6GOWIlR8bXmCh/iCzxoaV
+	HaG+T0UWoqWfmfWlA7Rv9Ft9VYNzswE=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH] Bluetooth: hci_core: lookup hci_conn on RX path on protocol side
+Date: Sat,  4 Oct 2025 19:16:32 +0300
+Message-ID: <7800021eedeb9a335091e88a9547eaa98777bb82.1759594217.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: MGMT: fix crash in set_mesh_sync and
- set_mesh_complete
-To: Pauli Virtanen <pauli.virtanen@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-References: <f206fc905f5c747b309d6063acd0128189661576.1759517776.git.pav@iki.fi>
- <eea69851-226e-4e39-aadd-42453fa1bf27@molgen.mpg.de>
- <851c70ee159d777610c906ca882fcab2f5efd80e.camel@iki.fi>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <851c70ee159d777610c906ca882fcab2f5efd80e.camel@iki.fi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Dear Pauli,
+The hdev lock/lookup/unlock/use pattern in the packet RX path doesn't
+ensure hci_conn* is not concurrently modified/deleted. This locking
+appears to be leftover from before conn_hash started using RCU
+commit bf4c63252490b ("Bluetooth: convert conn hash to RCU")
+and not clear if it had purpose since then.
 
+Currently, there are code paths that delete hci_conn* from elsewhere
+than the ordered hdev->workqueue where the RX work runs in. E.g.
+commit 5af1f84ed13a ("Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync")
+introduced some of these, and there probably were a few others before
+it.  It's better to do the locking so that even if these run
+concurrently no UAF is possible.
 
-Am 04.10.25 um 18:04 schrieb Pauli Virtanen:
-> la, 2025-10-04 kello 17:46 +0200, Paul Menzel kirjoitti:
+Move the lookup of hci_conn and associated socket-specific conn to
+protocol recv handlers, and do them within a single critical section
+to cover hci_conn* usage and lookup.
 
->> Am 03.10.25 um 21:07 schrieb Pauli Virtanen:
->>> There is a BUG: KASAN: stack-out-of-bounds in set_mesh_sync due to
->>> memcpy from badly declared on-stack flexible array.
->>>
->>> Another crash is in set_mesh_complete() due to double list_del via
->>> mgmt_pending_valid + mgmt_pending_remove.
->>>
->>> Use DEFINE_FLEX to declare the flexible array right, and don't memcpy
->>> outside bounds.
->>>
->>> As mgmt_pending_valid removes the cmd from list, use mgmt_pending_free,
->>> and also report status on error.
->>>
->>> Fixes: 302a1f674c00d ("Bluetooth: MGMT: Fix possible UAFs")
->>> Signed-off-by: Pauli Virtanen <pav@iki.fi>
->>> ---
->>>    include/net/bluetooth/mgmt.h |  2 +-
->>>    net/bluetooth/mgmt.c         | 26 +++++++++++++++-----------
->>>    2 files changed, 16 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
->>> index 74edea06985b..bca0333f1e99 100644
->>> --- a/include/net/bluetooth/mgmt.h
->>> +++ b/include/net/bluetooth/mgmt.h
->>> @@ -853,7 +853,7 @@ struct mgmt_cp_set_mesh {
->>>    	__le16 window;
->>>    	__le16 period;
->>>    	__u8   num_ad_types;
->>> -	__u8   ad_types[];
->>> +	__u8   ad_types[] __counted_by(num_ad_types);
->>>    } __packed;
->>>    #define MGMT_SET_MESH_RECEIVER_SIZE	6
->>>    
->>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->>> index a3d16eece0d2..24e335e3a727 100644
->>> --- a/net/bluetooth/mgmt.c
->>> +++ b/net/bluetooth/mgmt.c
->>> @@ -2175,19 +2175,24 @@ static void set_mesh_complete(struct hci_dev *hdev, void *data, int err)
->>>    	sk = cmd->sk;
->>>    
->>>    	if (status) {
->>> +		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_MESH_RECEIVER,
->>> +				status);
->>>    		mgmt_pending_foreach(MGMT_OP_SET_MESH_RECEIVER, hdev, true,
->>>    				     cmd_status_rsp, &status);
->>> -		return;
->>> +		goto done;
->>>    	}
->>>    
->>> -	mgmt_pending_remove(cmd);
->>>    	mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_MESH_RECEIVER, 0, NULL, 0);
->>> +
->>> +done:
->>> +	mgmt_pending_free(cmd);
->>>    }
->>>    
->>>    static int set_mesh_sync(struct hci_dev *hdev, void *data)
->>>    {
->>>    	struct mgmt_pending_cmd *cmd = data;
->>> -	struct mgmt_cp_set_mesh cp;
->>> +	DEFINE_FLEX(struct mgmt_cp_set_mesh, cp, ad_types, num_ad_types,
->>> +		    sizeof(hdev->mesh_ad_types));
->>>    	size_t len;
->>>    
->>>    	mutex_lock(&hdev->mgmt_pending_lock);
->>> @@ -2197,27 +2202,26 @@ static int set_mesh_sync(struct hci_dev *hdev, void *data)
->>>    		return -ECANCELED;
->>>    	}
->>>    
->>> -	memcpy(&cp, cmd->param, sizeof(cp));
->>> +	len = cmd->param_len;
->>> +	memcpy(cp, cmd->param, min(__struct_size(cp), len));
->>>    
->>>    	mutex_unlock(&hdev->mgmt_pending_lock);
->>>    
->>> -	len = cmd->param_len;
->>> -
->>>    	memset(hdev->mesh_ad_types, 0, sizeof(hdev->mesh_ad_types));
->>>    
->>> -	if (cp.enable)
->>> +	if (cp->enable)
->>>    		hci_dev_set_flag(hdev, HCI_MESH);
->>>    	else
->>>    		hci_dev_clear_flag(hdev, HCI_MESH);
->>>    
->>> -	hdev->le_scan_interval = __le16_to_cpu(cp.period);
->>> -	hdev->le_scan_window = __le16_to_cpu(cp.window);
->>> +	hdev->le_scan_interval = __le16_to_cpu(cp->period);
->>> +	hdev->le_scan_window = __le16_to_cpu(cp->window);
->>>    
->>> -	len -= sizeof(cp);
->>> +	len -= sizeof(struct mgmt_cp_set_mesh);
->>>    
->>>    	/* If filters don't fit, forward all adv pkts */
->>>    	if (len <= sizeof(hdev->mesh_ad_types))
->>> -		memcpy(hdev->mesh_ad_types, cp.ad_types, len);
->>> +		memcpy(hdev->mesh_ad_types, cp->ad_types, len);
->>>    
->>>    	hci_update_passive_scan_sync(hdev);
->>>    	return 0;
->>
->> Would it be possible to make this two commits? Either way:
->>
->> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> 
-> Both issues were introduced in 302a1f674c00d, which is why also the fix
-> here is a single patch.
+Fixes: 5af1f84ed13a ("Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
-Hmm, for me this is not a strong reason. In my humble opinion, two 
-commits would make it patch smaller and easier to review, and would 
-improve bisect/pinpoint results and allow easier reverts.
+Notes:
+    This patch only fixes races concerning hci_conn access on RX path.
+    
+    What still looks suspicious here is data races on sco_data and iso_data.
+    
+    Eg. sco_conn_free() holds no lock when it sets conn->hcon->sco_data = NULL;
+    so things like
+    
+    Task 1: conn = LOAD(hcon->sco_data)
+        Task 2: sco_conn_put(same conn)
+        Task 2: STORE(hcon->sco_data, NULL)
+        Task 2: kfree(conn)
+    Task 1: sco_conn_hold_unless_zero(conn) -> UAF
+    
+    IIUC *_hold_unless_zero is meant to be used with RCU or rwlock.
+    
+    In L2CAP access to hcon->l2cap_data is protected by hdev->lock
+    (except in l2cap_disconn_ind see
+    https://lore.kernel.org/linux-bluetooth/68e12ad7.050a0220.bce5e.000e.GAE@google.com/ )
 
+ include/net/bluetooth/hci_core.h | 20 ++++++---
+ net/bluetooth/hci_core.c         | 73 +++++++++++---------------------
+ net/bluetooth/iso.c              | 30 ++++++++++---
+ net/bluetooth/l2cap_core.c       | 23 +++++++---
+ net/bluetooth/sco.c              | 35 +++++++++++----
+ 5 files changed, 108 insertions(+), 73 deletions(-)
 
-Kind regards,
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 2924c2bf2a98..6ccc00153d2f 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -856,11 +856,12 @@ extern struct mutex hci_cb_list_lock;
+ /* ----- HCI interface to upper protocols ----- */
+ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ int l2cap_disconn_ind(struct hci_conn *hcon);
+-void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
++int l2cap_recv_acldata(struct hci_dev *hdev, u16 handle, struct sk_buff *skb,
++		       u16 flags);
+ 
+ #if IS_ENABLED(CONFIG_BT_BREDR)
+ int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
+-void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
++int sco_recv_scodata(struct hci_dev *hdev, u16 handle, struct sk_buff *skb);
+ #else
+ static inline int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 				  __u8 *flags)
+@@ -868,23 +869,30 @@ static inline int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	return 0;
+ }
+ 
+-static inline void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
++static inline int sco_recv_scodata(struct hci_dev *hdev, u16 handle,
++				   struct sk_buff *skb)
+ {
++	kfree_skb(skb);
++	return -ENOENT;
+ }
+ #endif
+ 
+ #if IS_ENABLED(CONFIG_BT_LE)
+ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
+-void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
++int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb,
++	     u16 flags);
+ #else
+ static inline int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 				  __u8 *flags)
+ {
+ 	return 0;
+ }
+-static inline void iso_recv(struct hci_conn *hcon, struct sk_buff *skb,
+-			    u16 flags)
++
++static inline int iso_recv(struct hci_dev *hdev, u16 handle,
++			   struct sk_buff *skb, u16 flags)
+ {
++	kfree_skb(skb);
++	return -ENOENT;
+ }
+ #endif
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 3418d7b964a1..31fc853080a3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3832,13 +3832,14 @@ static void hci_tx_work(struct work_struct *work)
+ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_acl_hdr *hdr;
+-	struct hci_conn *conn;
+ 	__u16 handle, flags;
++	int err;
+ 
+ 	hdr = skb_pull_data(skb, sizeof(*hdr));
+ 	if (!hdr) {
+ 		bt_dev_err(hdev, "ACL packet too small");
+-		goto drop;
++		kfree_skb(skb);
++		return;
+ 	}
+ 
+ 	handle = __le16_to_cpu(hdr->handle);
+@@ -3850,36 +3851,27 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	hdev->stat.acl_rx++;
+ 
+-	hci_dev_lock(hdev);
+-	conn = hci_conn_hash_lookup_handle(hdev, handle);
+-	hci_dev_unlock(hdev);
+-
+-	if (conn) {
+-		hci_conn_enter_active_mode(conn, BT_POWER_FORCE_ACTIVE_OFF);
+-
+-		/* Send to upper protocol */
+-		l2cap_recv_acldata(conn, skb, flags);
+-		return;
+-	} else {
++	err = l2cap_recv_acldata(hdev, handle, skb, flags);
++	if (err == -ENOENT)
+ 		bt_dev_err(hdev, "ACL packet for unknown connection handle %d",
+ 			   handle);
+-	}
+-
+-drop:
+-	kfree_skb(skb);
++	else if (err)
++		bt_dev_dbg(hdev, "ACL packet recv for handle %d failed: %d",
++			   handle, err);
+ }
+ 
+ /* SCO data packet */
+ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_sco_hdr *hdr;
+-	struct hci_conn *conn;
+ 	__u16 handle, flags;
++	int err;
+ 
+ 	hdr = skb_pull_data(skb, sizeof(*hdr));
+ 	if (!hdr) {
+ 		bt_dev_err(hdev, "SCO packet too small");
+-		goto drop;
++		kfree_skb(skb);
++		return;
+ 	}
+ 
+ 	handle = __le16_to_cpu(hdr->handle);
+@@ -3891,34 +3883,28 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	hdev->stat.sco_rx++;
+ 
+-	hci_dev_lock(hdev);
+-	conn = hci_conn_hash_lookup_handle(hdev, handle);
+-	hci_dev_unlock(hdev);
++	hci_skb_pkt_status(skb) = flags & 0x03;
+ 
+-	if (conn) {
+-		/* Send to upper protocol */
+-		hci_skb_pkt_status(skb) = flags & 0x03;
+-		sco_recv_scodata(conn, skb);
+-		return;
+-	} else {
++	err = sco_recv_scodata(hdev, handle, skb);
++	if (err == -ENOENT)
+ 		bt_dev_err_ratelimited(hdev, "SCO packet for unknown connection handle %d",
+ 				       handle);
+-	}
+-
+-drop:
+-	kfree_skb(skb);
++	else if (err)
++		bt_dev_dbg(hdev, "SCO packet recv for handle %d failed: %d",
++			   handle, err);
+ }
+ 
+ static void hci_isodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_iso_hdr *hdr;
+-	struct hci_conn *conn;
+ 	__u16 handle, flags;
++	int err;
+ 
+ 	hdr = skb_pull_data(skb, sizeof(*hdr));
+ 	if (!hdr) {
+ 		bt_dev_err(hdev, "ISO packet too small");
+-		goto drop;
++		kfree_skb(skb);
++		return;
+ 	}
+ 
+ 	handle = __le16_to_cpu(hdr->handle);
+@@ -3928,22 +3914,13 @@ static void hci_isodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	bt_dev_dbg(hdev, "len %d handle 0x%4.4x flags 0x%4.4x", skb->len,
+ 		   handle, flags);
+ 
+-	hci_dev_lock(hdev);
+-	conn = hci_conn_hash_lookup_handle(hdev, handle);
+-	hci_dev_unlock(hdev);
+-
+-	if (!conn) {
++	err = iso_recv(hdev, handle, skb, flags);
++	if (err == -ENOENT)
+ 		bt_dev_err(hdev, "ISO packet for unknown connection handle %d",
+ 			   handle);
+-		goto drop;
+-	}
+-
+-	/* Send to upper protocol */
+-	iso_recv(conn, skb, flags);
+-	return;
+-
+-drop:
+-	kfree_skb(skb);
++	else if (err)
++		bt_dev_dbg(hdev, "ISO packet recv for handle %d failed: %d",
++			   handle, err);
+ }
+ 
+ static bool hci_req_is_complete(struct hci_dev *hdev)
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 954e1916506b..e81bee686df9 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -2308,14 +2308,31 @@ static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
+ 	iso_conn_del(hcon, bt_to_errno(reason));
+ }
+ 
+-void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
++int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
+ {
+-	struct iso_conn *conn = hcon->iso_data;
++	struct hci_conn *hcon;
++	struct iso_conn *conn;
+ 	struct skb_shared_hwtstamps *hwts;
+ 	__u16 pb, ts, len, sn;
+ 
+-	if (!conn)
+-		goto drop;
++	hci_dev_lock(hdev);
++
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon) {
++		hci_dev_unlock(hdev);
++		kfree_skb(skb);
++		return -ENOENT;
++	}
++
++	conn = iso_conn_hold_unless_zero(hcon->iso_data);
++	hcon = NULL;
++
++	hci_dev_unlock(hdev);
++
++	if (!conn) {
++		kfree_skb(skb);
++		return -EINVAL;
++	}
+ 
+ 	pb     = hci_iso_flags_pb(flags);
+ 	ts     = hci_iso_flags_ts(flags);
+@@ -2371,7 +2388,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 			hci_skb_pkt_status(skb) = flags & 0x03;
+ 			hci_skb_pkt_seqnum(skb) = sn;
+ 			iso_recv_frame(conn, skb);
+-			return;
++			goto done;
+ 		}
+ 
+ 		if (pb == ISO_SINGLE) {
+@@ -2449,6 +2466,9 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 
+ drop:
+ 	kfree_skb(skb);
++done:
++	iso_conn_put(conn);
++	return 0;
+ }
+ 
+ static struct hci_cb iso_cb = {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 805c752ac0a9..318374a579e9 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7509,13 +7509,24 @@ struct l2cap_conn *l2cap_conn_hold_unless_zero(struct l2cap_conn *c)
+ 	return c;
+ }
+ 
+-void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
++int l2cap_recv_acldata(struct hci_dev *hdev, uint16_t handle,
++		       struct sk_buff *skb, u16 flags)
+ {
++	struct hci_conn *hcon;
+ 	struct l2cap_conn *conn;
+ 	int len;
+ 
+-	/* Lock hdev to access l2cap_data to avoid race with l2cap_conn_del */
+-	hci_dev_lock(hcon->hdev);
++	/* Lock hdev for hci_conn, and race on l2cap_data vs. l2cap_conn_del */
++	hci_dev_lock(hdev);
++
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon) {
++		hci_dev_unlock(hdev);
++		kfree_skb(skb);
++		return -ENOENT;
++	}
++
++	hci_conn_enter_active_mode(hcon, BT_POWER_FORCE_ACTIVE_OFF);
+ 
+ 	conn = hcon->l2cap_data;
+ 
+@@ -7523,12 +7534,13 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 		conn = l2cap_conn_add(hcon);
+ 
+ 	conn = l2cap_conn_hold_unless_zero(conn);
++	hcon = NULL;
+ 
+-	hci_dev_unlock(hcon->hdev);
++	hci_dev_unlock(hdev);
+ 
+ 	if (!conn) {
+ 		kfree_skb(skb);
+-		return;
++		return -EINVAL;
+ 	}
+ 
+ 	BT_DBG("conn %p len %u flags 0x%x", conn, skb->len, flags);
+@@ -7642,6 +7654,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ unlock:
+ 	mutex_unlock(&conn->lock);
+ 	l2cap_conn_put(conn);
++	return 0;
+ }
+ 
+ static struct hci_cb l2cap_cb = {
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index ab0cf442d57b..298c2a9ab4df 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1458,22 +1458,39 @@ static void sco_disconn_cfm(struct hci_conn *hcon, __u8 reason)
+ 	sco_conn_del(hcon, bt_to_errno(reason));
+ }
+ 
+-void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
++int sco_recv_scodata(struct hci_dev *hdev, u16 handle, struct sk_buff *skb)
+ {
+-	struct sco_conn *conn = hcon->sco_data;
++	struct hci_conn *hcon;
++	struct sco_conn *conn;
+ 
+-	if (!conn)
+-		goto drop;
++	hci_dev_lock(hdev);
++
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon) {
++		hci_dev_unlock(hdev);
++		kfree_skb(skb);
++		return -ENOENT;
++	}
++
++	conn = sco_conn_hold_unless_zero(hcon->sco_data);
++	hcon = NULL;
++
++	hci_dev_unlock(hdev);
++
++	if (!conn) {
++		kfree_skb(skb);
++		return -EINVAL;
++	}
+ 
+ 	BT_DBG("conn %p len %u", conn, skb->len);
+ 
+-	if (skb->len) {
++	if (skb->len)
+ 		sco_recv_frame(conn, skb);
+-		return;
+-	}
++	else
++		kfree_skb(skb);
+ 
+-drop:
+-	kfree_skb(skb);
++	sco_conn_put(conn);
++	return 0;
+ }
+ 
+ static struct hci_cb sco_cb = {
+-- 
+2.51.0
 
-Paul
