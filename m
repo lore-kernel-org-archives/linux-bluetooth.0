@@ -1,39 +1,35 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79451231829;
-	Mon,  6 Oct 2025 08:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B78E2D6603
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Oct 2025 15:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759740437; cv=none; b=r7VRqc0bcXsttt5B4Kd7UjezoKYBr8Xc94kmEv8+sdz3lAcT9ppjZiSWssS7oZH+BQ/mzawFPt9EytdzFYHXDcqAw7bUlS8FtDEBcIvJ7EWA3HEcjrmnie2YV4iOHos2vOjeTEd6UJ8ljkOFIMfwg2lfFlPsqlzbH4abfFWsex8=
+	t=1759764015; cv=none; b=jmWvOl/l7uFg2ntji7ePEquEnpPLcUsrGL+sv2Qtu9jF8hnywTGQLsMvowpHzq1mopa7rO6AKSOF0CSFMYQe9rm+Gdvt6pVH7QzKFalmFjVkLmP/P1dJxOOrM8GuWcueiuUIGHrtIrNi76yhGnSQX5sG78abgOQoDe7XRMTgv/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759740437; c=relaxed/simple;
-	bh=IzIhp5dUepY9MmY78wLvtgLm9Fvq7PK6A4cvqTgpA/g=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=b5dDKYI6HU3+r+NxNnSB9UOu9wrYsvNxO1U2pfPxNOjal37e/9khhIwJHVuJt1A/OM2yqHx2/dqltoJK8oYdMtijMOvcxwY7EjQ+D+lPdYmJ2TudI32P3NqcxbVTHPhZqQ/zEjoIcGUuLMpi81p7Qj6iX0xtSFaA+CEYhBdL36c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=A0Mqpbu4; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1759764015; c=relaxed/simple;
+	bh=Y4tW5pHASIGqeKANyRXUPqDdu9ltnNOAVI41WgfPFgQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KniDMGr3endTigSzuJZyFQWe6vegEdlgFycQEWfRuOSObTCs3s/TPMv4yKE79jVdDZWQPYLpegyILBnR58gh1yxJcH+xV3gJZZfIQe8Gg/IWSZQn3l1WHsTq4ly87t9hrx+i0uMruleJtGtwnG9mRrf5pUMrfoaeVb3z1e++8yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tc65q5Mp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="A0Mqpbu4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=Cc
-	wnoxPqYyXU1wNy7MHuZsxfu9hybasnCZholcU269Q=; b=A0Mqpbu4Pjkt6ZmbpU
-	lBNruBx4xAXmmpEpid/hmvqdpT3jbpIWdDUJOPjKJ/LtmpthQf6z96vt7i+Gsr93
-	9bJKLi7x10xu2PWqrig3K80gJOjDcpteMi8qeKlRNLHYfVG+7X2ep2T9DMQgkmaf
-	AFfluPut7bzJvJ6ioc48widSY=
-Received: from 163.com (unknown [])
-	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wDHbzj4geNoWg8PCQ--.40488S2;
-	Mon, 06 Oct 2025 16:46:49 +0800 (CST)
-From: Chingbin Li <liqb365@163.com>
-To: pmenzel@molgen.mpg.de,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] Bluetooth: btusb: Add new VID/PID 2b89/6275 for RTL8761BUV
-Date: Mon,  6 Oct 2025 16:46:47 +0800
-Message-ID: <20251006084647.19902-1-liqb365@163.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tc65q5Mp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43447C4CEF5;
+	Mon,  6 Oct 2025 15:20:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759764015;
+	bh=Y4tW5pHASIGqeKANyRXUPqDdu9ltnNOAVI41WgfPFgQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Tc65q5MpkquVTvI0agH0gQyN9kLVW0LUQAnLDS+zSh4ET46fnxjusVPh0ftWlgqau
+	 KgEXGwfQVaG5erO+HAjZRTFMB8aZJgEUw0hbGSaU8D5KL3Nzga6geMyUcTAmokV7IN
+	 NOrac1yqTCaVK9oWMh3sBaNslAvjJsELgMMog6XZzIFs5rfM1JykbepeG/OIRJfI5N
+	 F/JIqSgSSoOV5mP9sLNVzcswTV53+XpZyoimC9qP908MiN5bR4hedMWE6NGHvj3VyM
+	 6FKTW/qeF2obtU9PSnMAqVpJt6LxqKXhXaXF/D8jW/gTb0fMKRw8vvFh6OlPz8arZ+
+	 Q1qRsTwx8HbFA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E9139D0C1A;
+	Mon,  6 Oct 2025 15:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,66 +37,43 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDHbzj4geNoWg8PCQ--.40488S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7uF47KF4xWF47ZFW5Xw43KFg_yoW8Kr4DpF
-	4UJ3ZxZF1fKF1UGr9IkF18CayrW34xu342g3ZrGw1fXFZ5Aan7J3WUAryfXrsayr4Sg3ZY
-	qFnrC3yFkr17JrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Ul_MfUUUUU=
-X-CM-SenderInfo: xoltujiwv6il2tof0z/1tbiURPecGjjdy3PvwAAsN
+Subject: Re: [PATCH] Bluetooth: MGMT: fix crash in set_mesh_sync and
+ set_mesh_complete
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175976400501.1408757.8167211615664126968.git-patchwork-notify@kernel.org>
+Date: Mon, 06 Oct 2025 15:20:05 +0000
+References: 
+ <f206fc905f5c747b309d6063acd0128189661576.1759517776.git.pav@iki.fi>
+In-Reply-To: 
+ <f206fc905f5c747b309d6063acd0128189661576.1759517776.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
-Add VID 2b89 & PID 6275 for Realtek RTL8761BUV USB Bluetooth chip.
+Hello:
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  6 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=2b89 ProdID=6275 Rev= 2.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00E04C239987
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+On Fri,  3 Oct 2025 22:07:32 +0300 you wrote:
+> There is a BUG: KASAN: stack-out-of-bounds in set_mesh_sync due to
+> memcpy from badly declared on-stack flexible array.
+> 
+> Another crash is in set_mesh_complete() due to double list_del via
+> mgmt_pending_valid + mgmt_pending_remove.
+> 
+> Use DEFINE_FLEX to declare the flexible array right, and don't memcpy
+> outside bounds.
+> 
+> [...]
 
-Signed-off-by: Chingbin Li <liqb365@163.com>
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Here is the summary with links:
+  - Bluetooth: MGMT: fix crash in set_mesh_sync and set_mesh_complete
+    https://git.kernel.org/bluetooth/bluetooth-next/c/fea4150ae678
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5e9ebf0c5312..3ca17d283d26 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -781,6 +781,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x2b89, 0x8761), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x2b89, 0x6275), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Additional Realtek 8821AE Bluetooth devices */
- 	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
