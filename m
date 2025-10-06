@@ -1,43 +1,38 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56CFA261588
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Oct 2025 08:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79451231829;
+	Mon,  6 Oct 2025 08:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759739754; cv=none; b=sjAB0hJ+JynN8rOl/AT9DdTgqDM8nJtIF3im3E41yfRIL6tPft4KESRWooY/L3oKN/LqMN16j9m1L47LlrY1B4p2WZiRVPifj8SrwHBA9ppYKtTQE3KbdgY0s2nMRzmHcEAjVzmdjnLuknLPhmCiScVm46xOnWmBg35CdGUjoWA=
+	t=1759740437; cv=none; b=r7VRqc0bcXsttt5B4Kd7UjezoKYBr8Xc94kmEv8+sdz3lAcT9ppjZiSWssS7oZH+BQ/mzawFPt9EytdzFYHXDcqAw7bUlS8FtDEBcIvJ7EWA3HEcjrmnie2YV4iOHos2vOjeTEd6UJ8ljkOFIMfwg2lfFlPsqlzbH4abfFWsex8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759739754; c=relaxed/simple;
-	bh=tDc0IXCsjbz+wZJxX4tHjcbS+PUGTn1yPQHSNPPeuo4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Type; b=Do0Znga+RmNo6Z1hNhBHg3IXqRxoH/+qdodwQKyRN1woNMrZHKJp5KjXsXD+hbTX5xXHavN4viKT2tbiRileOHPauil0MCvvDw6kGnvlFnC4nHys3luOs74dR1mk35HwNWW1vIxFD1xbKR+rMhdyF0s+egn3rPhyurSm5ML2bKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VbMTcLEx; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1759740437; c=relaxed/simple;
+	bh=IzIhp5dUepY9MmY78wLvtgLm9Fvq7PK6A4cvqTgpA/g=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=b5dDKYI6HU3+r+NxNnSB9UOu9wrYsvNxO1U2pfPxNOjal37e/9khhIwJHVuJt1A/OM2yqHx2/dqltoJK8oYdMtijMOvcxwY7EjQ+D+lPdYmJ2TudI32P3NqcxbVTHPhZqQ/zEjoIcGUuLMpi81p7Qj6iX0xtSFaA+CEYhBdL36c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=A0Mqpbu4; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VbMTcLEx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1759739750;
-	bh=tDc0IXCsjbz+wZJxX4tHjcbS+PUGTn1yPQHSNPPeuo4=;
-	h=From:To:Subject:Date:From;
-	b=VbMTcLEx22SnMuM3E8t0bMvHP/HvP/ekTWpEARixvT3EBl7qbK+hNb87f/efZKfEj
-	 6O+sgC8z/fKOCGLhWryFjhSa02GYkElaUyOL/inxCdZXyfAFRKWUdG9rvjhFVEi7og
-	 7UYP80YuYrsIktmu5RNxWb2tM+V1GEwZa6ShLvwAQEIJmStOAcXkM/e3fijx9CZZjY
-	 PCo/53N/2st/YaZGJbmVRPA7yKnlHC8u+38aTDZOwq9z6thd4sA4jgV5tXSLBSxcbC
-	 cdVpm0/n09wbwdfB4PjiavvcOagp9F4BbSxU/TMD6JciSF/0M2d/jozowEK0wjyfeV
-	 F8Oa47WH24oAw==
-Received: from fdanis-ThinkPad-X1.. (2a02-8428-AF44-1001-5648-D00b-bBF7-38Db.rev.sfr.net [IPv6:2a02:8428:af44:1001:5648:d00b:bbf7:38db])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5DE3B17E11FD
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Oct 2025 10:35:50 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Revert "Bluetooth: L2CAP: convert timeouts to secs_to_jiffies()"
-Date: Mon,  6 Oct 2025 10:35:44 +0200
-Message-ID: <20251006083544.22408-1-frederic.danis@collabora.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="A0Mqpbu4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=Cc
+	wnoxPqYyXU1wNy7MHuZsxfu9hybasnCZholcU269Q=; b=A0Mqpbu4Pjkt6ZmbpU
+	lBNruBx4xAXmmpEpid/hmvqdpT3jbpIWdDUJOPjKJ/LtmpthQf6z96vt7i+Gsr93
+	9bJKLi7x10xu2PWqrig3K80gJOjDcpteMi8qeKlRNLHYfVG+7X2ep2T9DMQgkmaf
+	AFfluPut7bzJvJ6ioc48widSY=
+Received: from 163.com (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wDHbzj4geNoWg8PCQ--.40488S2;
+	Mon, 06 Oct 2025 16:46:49 +0800 (CST)
+From: Chingbin Li <liqb365@163.com>
+To: pmenzel@molgen.mpg.de,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] Bluetooth: btusb: Add new VID/PID 2b89/6275 for RTL8761BUV
+Date: Mon,  6 Oct 2025 16:46:47 +0800
+Message-ID: <20251006084647.19902-1-liqb365@163.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -45,63 +40,67 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDHbzj4geNoWg8PCQ--.40488S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7uF47KF4xWF47ZFW5Xw43KFg_yoW8Kr4DpF
+	4UJ3ZxZF1fKF1UGr9IkF18CayrW34xu342g3ZrGw1fXFZ5Aan7J3WUAryfXrsayr4Sg3ZY
+	qFnrC3yFkr17JrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Ul_MfUUUUU=
+X-CM-SenderInfo: xoltujiwv6il2tof0z/1tbiURPecGjjdy3PvwAAsN
 
-This reverts commit c9d84da18d1e0d28a7e16ca6df8e6d47570501d4. It
-replaces in L2CAP calls to msecs_to_jiffies() to secs_to_jiffies()
-and updates the constants accordingly. But the constants are also
-used in LCAP Configure Request and L2CAP Configure Response which
-expect values in milliseconds.
-This may prevent correct usage of L2CAP channel.
+Add VID 2b89 & PID 6275 for Realtek RTL8761BUV USB Bluetooth chip.
 
-To fix it, keep those constants in milliseconds and so revert this
-change.
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  6 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=2b89 ProdID=6275 Rev= 2.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00E04C239987
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+Signed-off-by: Chingbin Li <liqb365@163.com>
 ---
- include/net/bluetooth/l2cap.h | 4 ++--
- net/bluetooth/l2cap_core.c    | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 4bb0eaedda18..00e182a22720 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -38,8 +38,8 @@
- #define L2CAP_DEFAULT_TX_WINDOW		63
- #define L2CAP_DEFAULT_EXT_WINDOW	0x3FFF
- #define L2CAP_DEFAULT_MAX_TX		3
--#define L2CAP_DEFAULT_RETRANS_TO	2    /* seconds */
--#define L2CAP_DEFAULT_MONITOR_TO	12   /* seconds */
-+#define L2CAP_DEFAULT_RETRANS_TO	2000    /* 2 seconds */
-+#define L2CAP_DEFAULT_MONITOR_TO	12000   /* 12 seconds */
- #define L2CAP_DEFAULT_MAX_PDU_SIZE	1492    /* Sized for AMP packet */
- #define L2CAP_DEFAULT_ACK_TO		200
- #define L2CAP_DEFAULT_MAX_SDU_SIZE	0xFFFF
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 805c752ac0a9..d08320380ad6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -282,7 +282,7 @@ static void __set_retrans_timer(struct l2cap_chan *chan)
- 	if (!delayed_work_pending(&chan->monitor_timer) &&
- 	    chan->retrans_timeout) {
- 		l2cap_set_timer(chan, &chan->retrans_timer,
--				secs_to_jiffies(chan->retrans_timeout));
-+				msecs_to_jiffies(chan->retrans_timeout));
- 	}
- }
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5e9ebf0c5312..3ca17d283d26 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -781,6 +781,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x2b89, 0x8761), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x2b89, 0x6275), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
  
-@@ -291,7 +291,7 @@ static void __set_monitor_timer(struct l2cap_chan *chan)
- 	__clear_retrans_timer(chan);
- 	if (chan->monitor_timeout) {
- 		l2cap_set_timer(chan, &chan->monitor_timer,
--				secs_to_jiffies(chan->monitor_timeout));
-+				msecs_to_jiffies(chan->monitor_timeout));
- 	}
- }
- 
+ 	/* Additional Realtek 8821AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
 -- 
 2.43.0
 
