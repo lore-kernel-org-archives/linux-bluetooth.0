@@ -1,142 +1,76 @@
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA16113B280
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Oct 2025 00:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25CA19E83C;
+	Mon,  6 Oct 2025 03:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759711294; cv=none; b=Up9gTGsoNd2Bk57MI8caZGKJiu2nFRYqCgwCSAwsjDm9Kqlhx5+SGUevgMTjYyp1QMKfz5cF3oJnSbKco15tOgwVKqRR6XewnuH9p8TsiKSkrUi2aioxF5BtVGJdKozOBw8dG3TxavPOGuwwp4qyouZtq7VXd93R98AgZbGW0J0=
+	t=1759720116; cv=none; b=MtU7S2eSrC04yDR8A2e+hDOJERnBBm28RP8vEDAFdiP+lduVAxEkITFnTngBoCiWvwrXXi3dknQerWf2LRi+h0B5RavqrSSJy2RTKoTw4lFN5FAp86bz9mQJhtdpvhiuJoJr/Y8CEI0FZSyhHWZKTtOmK9JMWhbpQCf1+rC8/XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759711294; c=relaxed/simple;
-	bh=kENviifOEPihXOmLhqQ0qvbDcg6Wg68yfn29YEOFpvQ=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ivNmPYcbhBh57DnumKBwlL9TugnAaDvQ6jJhuqcZ+L+8mqVpPjdNRaC3DyFIZA9uFJjwUzRM3EQRxI3zkAds63pM35vQH3H30It2knIWh6TyxoS9yRT+rzatfLX8Zxxh05BWKJHdh/SxBxjFp5f3HOUgpKBCXxi84ZBKpkUvNyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=fail smtp.mailfrom=iki.fi; arc=none smtp.client-ip=185.67.36.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=iki.fi
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id CB093240027
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Oct 2025 02:39:33 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4cg0lS3pqbz9rxB
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Oct 2025 02:39:32 +0200 (CEST)
-Message-ID: <501816a0c5cc19ec7a2f1527cb5aa8012f33210d.camel@iki.fi>
-Subject: Re: [PATCH 0/9] Bluetooth: avoid concurrent deletion of hci_conn
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 06 Oct 2025 00:39:33 +0000
-In-Reply-To: <cover.1759511032.git.pav@iki.fi>
-References: <cover.1759511032.git.pav@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1759720116; c=relaxed/simple;
+	bh=vfSIvl6/GkrSHfKsccvYeAqdNzEkhewgrRNtGC4SeM4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P1LVNBARsN9Kyap7ojdVTh3RSnVUFxRggdqQNwh9Pnu4747djHw9MLQKK3+WRUH7+HY08NUhdhN+bZWdjFuKpbnz7Nw42LKVVDXLkGDbO7IDD/idNHSo1VrU0+x0VxspjE+uwPvVsG+gQac4ZvMa8N82yJjQZIxImvbT+d9BpNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=C1TtITTB; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="C1TtITTB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Message-ID:MIME-Version:
+	Content-Type; bh=0u3X6cbMUB3hZGnkQUCH2FqUSPSC5bwDf/auwFkVBps=;
+	b=C1TtITTBi5orDp6BF1PvM99IX3mGW/S2khT5jgmM7YOwOQV4/w1KanBEcQLIdg
+	SIBZp60nbOvoe3SZrWLs9fzwVrKjZrdGkPA42uZgbCvl+3lm3eCywp3NvzReD5ng
+	kTjS3POzUn96ZvxkntKNvbcYSHDumMtArPQA+h3sdB9Ow=
+Received: from localhost (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wDX15mVMuNoHtR_CQ--.65018S2;
+	Mon, 06 Oct 2025 11:08:06 +0800 (CST)
+Date: Mon, 6 Oct 2025 11:08:05 +0800
+From: Chingbin Li <liqb365@163.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btusb: Add new VID/PID 2b89/6275 for
+ RTL8761BUV
+Message-ID: <2tzwvc2d7kydrvfpljkplvitx3ynoo44757x7owuvd7o5bgbet@xqeytlbki4oq>
+References: <aOIyJOnP55mmZUut@9950x-Ubunbu-24-04-dev>
+ <72f869f4-8320-4bdb-a7ba-714e46928a69@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <72f869f4-8320-4bdb-a7ba-714e46928a69@molgen.mpg.de>
+X-CM-TRANSID:_____wDX15mVMuNoHtR_CQ--.65018S2
+X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvj4Ri8nODUUUU
+X-CM-SenderInfo: xoltujiwv6il2tof0z/1tbiUQXecGjjKiqIKgABsS
 
-pe, 2025-10-03 kello 20:08 +0300, Pauli Virtanen kirjoitti:
-> This contains the simpler fixes from
-> https://lore.kernel.org/linux-bluetooth/cover.1758481869.git.pav@iki.fi/
->=20
-> hdev has two workqueues that run concurrently, and both may delete
-> hci_conn. hci_conn* pointers then require either (i) hdev/rcu lock
-> covering lookup and usage, or (ii) hci_conn_get reference held.
->=20
-> If neither is done, it's likely there are corner cases that hit UAF,
-> especially if controller misbehaves.
+Thanks, Paul. I will.
 
-It may be possible to relax the requirements to also allow
+On Sun, Oct 05, 2025 at 11:12:08AM +0200, Paul Menzel wrote:
+> Dear Chingbin,
+> 
+> 
+> Thank you for your patch.
+> 
+> Am 05.10.25 um 10:53 schrieb Chingbin Li:
+> >  From 5676b7b1029c11ec99b119a3b56945ba8a766c0a Mon Sep 17 00:00:00 2001
+> > From: Chingbin Li <liqb365@163.com>
+> > Date: Sun, 5 Oct 2025 16:28:28 +0800
+> > Subject: [PATCH] Bluetooth: btusb: Add new VID/PID 2b89/6275 for RTL8761BUV
+> 
+> Having these additional lines is incorrect. Please use `git send-email` or
+> b4 to submit your patch.
+> 
+> […]
+> 
+> 
+> Kind regards,
+> 
+> Paul
 
-(iii) work executing in hdev->workqueue can assume hci_conn* is not
-deleted concurrently.
-
-This is possible if something like the following can be made to work.
-However, it may be better to just fix the locking without such trick to
-keep it simpler, as there are not that many changes needed and we
-anyway need to lock & get in hci_sync.
-
-
-struct hci_conn_del_sync_work {
-	struct work_struct work;
-	struct hci_conn *conn;
-};
-
-void hci_conn_del_sync_work(struct work_struct *work)
-{
-	struct hci_conn_del_sync_work *del =3D container_of(...);
-	struct hci_dev *hdev =3D del->conn->hdev;
-
-	hci_dev_lock(hdev);
-	if (hci_conn_valid(hdev, del->conn)
-		hci_conn_del(del->conn);
-	hci_dev_unlock(hdev);
-	hci_conn_put(del->conn);
-}
-
-void hci_conn_del_sync(struct hci_dev *hdev, struct hci_conn *conn)
-{
-	struct hci_conn_del_sync_work del;
-
-	INIT_WORK(&del.work, hci_conn_del_sync_work);
-	del.conn =3D hci_conn_get(conn);
-
-	queue_work(hdev->workqueue, &del.work);
-	flush_work(&del.work);
-}
-
->=20
-> Correct code in several places to follow the patterns (1)
->=20
->     take lock
->     conn =3D hci_conn_hash_lookup(...)
->     if (conn)
-> 	do_something(conn)
->     release lock
->=20
-> or (2)
->=20
->     take lock
->     conn =3D hci_conn_hash_lookup(...)
->     if (conn)
-> 	conn =3D hci_conn_get(conn)
->     release lock
->     do_something_carefully(conn)
->     hci_conn_put(conn)
->=20
-> Generally do_something_carefully should do (3)
->=20
->     take lock
->     if (hci_conn_valid(hdev, conn))
-> 	do_something(conn)
->     release lock
->=20
-> hci_conn_valid() shouldn't be called unless refcount on conn is known to
-> be held, as the pointer may otherwise already be freed, and even though
-> hci_conn_valid() doesn't dereference the comparison of freed pointer it
-> does is strictly speaking undefined behavior (kalloc is not guaranteed
-> to not reuse addresses).
->=20
-> Some of the code touched here is missing locks for (3), those need to be
-> addressed in separate series.
->=20
-> Pauli Virtanen (9):
->   Bluetooth: hci_event: extend hdev lock in
->     hci_le_remote_conn_param_req_evt
->   Bluetooth: hci_conn: take hdev lock in set_cig_params_sync
->   Bluetooth: mgmt: take lock and hold reference when handling hci_conn
->   Bluetooth: L2CAP: fix hci_conn_valid() usage
->   Bluetooth: hci_sync: extend conn_hash lookup RCU critical sections
->   Bluetooth: hci_sync: make hci_cmd_sync_run* indicate if item was added
->   Bluetooth: hci_sync: hci_cmd_sync_queue_once() return -EEXIST if
->     exists
->   Bluetooth: hci_conn: hold reference in abort_conn_sync
->   Bluetooth: hci_sync: hold references in hci_sync callbacks
->=20
->  net/bluetooth/hci_conn.c   |  22 +++++-
->  net/bluetooth/hci_event.c  |  33 +++++----
->  net/bluetooth/hci_sync.c   | 144 ++++++++++++++++++++++++++++++-------
->  net/bluetooth/l2cap_core.c |   8 ++-
->  net/bluetooth/mgmt.c       |  42 +++++++++--
->  5 files changed, 202 insertions(+), 47 deletions(-)
