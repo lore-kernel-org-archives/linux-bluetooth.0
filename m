@@ -1,75 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E436F2D77F7
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Oct 2025 15:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8BD23DEB6
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Oct 2025 17:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759764018; cv=none; b=NWM04rvCUQMpvqfhljnKfTcoi69O5+ffDz1ctFV2CUpjG4RWB3DcTb9GyZC7X/gCx9jXHaeOUcP7i6gP273Wclof2bCcIXEwcSzSx7BhugHk4j8Z/aLJ9egUAgXbzks/QPHy+Iy8CsSpCzxzjWYRdSmpN2cHif257MVLf3jgj+M=
+	t=1759771287; cv=none; b=UQnwFMWD/5TID0GOg3Pmb00vVHBhEVKzlD6qIXqqtW9ZnxuW6Z6tD4PTjxeiZxnbU0OGCDnP5oQoMTcU/mVpA9j4WO92ypdQZzNRxlmoDOSCapsPW3qUMU1buvgp9gsW57YHXziOqJBR7p2cWdyj+rErFwYrlzH3OiyYxEf88gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759764018; c=relaxed/simple;
-	bh=HUfc+dCZB5OMdcHgfyrVuw0I+GdH/7rbKrXXGn3sAns=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HZfnUvVe7uzE6zEmn56KdqIqg22L3GNic5dAWqcNgWrgv0Pp66Fzy7dTJfJl/6MYlldQ3A0L/Ob2qOLyEzX9pIdvvtahMeTOMf22V1oVVLMEvXlnl4SV89jB2huOPPQo63nzCSAi7y80ZeBOhsak7r1fuubTjQUDEiRPqeZTCvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJalR50i; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759771287; c=relaxed/simple;
+	bh=GxwecgAhCYFKHy6xZibUthnIopksHNXHtVkNOvFiti0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wea4Cq59yRTOb+7hNERDWD5lOwZZGyXuklBN7jpwWc8I8MdkjQ2LExKBWvJniixV7OxqCt7jkde41FwOLZTOD7Uyq5C2RpFqg2DKoIZBiHnqODZwT2Mc3m7kkIqrgcacVn/KgaoJsdstA9gouunqxfpRZPpLHDu19/bgTh2HgIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=byGj7G1Q; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJalR50i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 744A9C4CEF5;
-	Mon,  6 Oct 2025 15:20:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759764016;
-	bh=HUfc+dCZB5OMdcHgfyrVuw0I+GdH/7rbKrXXGn3sAns=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MJalR50iNLpMm2rZx+yA5RJb88ooip8/yVyR8CGl7IpCu410Sg4LcTnnakZ+jox0i
-	 I6zc6AjsqGQbQGTQsLD3JwP6XFcw3Ssfe8AbHKn5Bx9Q3FRVJdAhDxk/ZvedKIE3L1
-	 DPEw0lF2x7/hec3UUIHZwOIYK0kpi2a0uFUhUg9j7lC2QekQK304bT7JPkCiIp+I3K
-	 FpuGbK8plr9wqF0Xg6dhan7YS9m9YInzitoCx9bURX+3oLSL1lKnR6aZW+Rnm9PgT0
-	 ykQZhKrlSpbsWbR5oiXWTW0OJQoH+mZ9g8FAiAO4elLLW7+67OM36vb5lu0D3CqK1G
-	 TFtJ0QehggRTQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F9A39D0C1A;
-	Mon,  6 Oct 2025 15:20:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="byGj7G1Q"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-36ba647ac9fso42206121fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Oct 2025 10:21:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759771284; x=1760376084; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Se0cxel0Jn3xk+mIGXRSV6/sl49L1oxhQS5tH5NnoTM=;
+        b=byGj7G1Qa4FCkz+78deE88Ce+mrTahHdS4rEONfUdODOMII3dtKiatuwxlxOtrbsjc
+         MWrRtbG34jfgKH07xkI3Ib8i8Pa8xJfSZ/Dn/MP8xbWeXWzO5DOLGaLPFJOKgHs3EZgv
+         sxxsricaBvjzw78rm5CijlK4iL0o/uCdixz/5Evnn+61y8n7dVcDxVrOLdhD7okfS2Yw
+         tsvhbtcQH/KtmPhksNMrl57pSOd4SeFj7xgY1JtwUDGssu8x6+euG3LjEpWcYM0z5auw
+         FX+Rw7PjHAIXYNx8MiFFLwVvGF31bCDXR6NQvUTO4yM3KQsKAWzhXCsgO2jYwEIezu87
+         mCEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759771284; x=1760376084;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Se0cxel0Jn3xk+mIGXRSV6/sl49L1oxhQS5tH5NnoTM=;
+        b=IbmyykuycoE3rBQbrbYiC/IMbpf2mRUVjr/uM7k7cUkomTY1x4A6nfQjQT4CYhaz3i
+         2ZHhKVJN5zlGNG6nKydIduYs0aiheqImfItHmUsPD9K/9DGTcfkDXd5Y/46Q6TtvQMkD
+         ijSLobBc4KVes3ShvsSGUMSncTKF5/0xBAUqD1XDaCGseazViNXyyZR7KXyE2o5xAuU0
+         5HLuX+ShXDNqCsMqrEmSEjGuMJvBoXyMlTv3y0qvLOa4ETwOvSWUHQtyLiw+rOCxSUu6
+         hFAd3RLPPjYomr1FECCLfNGkexaqV5qKVp93NrPxN2YFxUb/+A9aaEYZS//usURuQZhT
+         LFFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqREPU4nu8dmLqmOziRAWXQWTgnrKnLKh4tsq0om80ASn7gKyBb4tdebfAkjcE+24dZ2SX21ghuZA8UtMo5Ik=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJvcmGRICWS7zEQq528EO2gDBQAahbusrHBrpiozTk79kfWoeJ
+	iVX75kArTMScD7ZUymhWRgT8T+TTVs01KMzDMGxBGwUg9+V1kYPALS/McIzntEXUVdR9msk5j8z
+	ieZ/T3vkIEx1eWRalgy/Gq+ofqOgWgc4=
+X-Gm-Gg: ASbGncuoL1qUit4zWEWJAvHbQbmd3z8hENQhoeRz7NEvDov+pNcKVi7/uY/TBuUlY8H
+	Gs2+v6rVZBMpHvHTe8DD+ItlnS59dyp4XLvuF/XFiM+bCLbBjoEZX8NOeQWtEBhYMgU9+W5+Vsl
+	pK3D+oEhFnrex2lUYNm367Ivv8Koy5NRVKFYQRxkMU+tm6AkzcqNFPGnCYnhXG/SwUg5A+xbD/Q
+	QpQ0jgntnzVARXme6DcqWi5QLagKlGvQVOikhaU
+X-Google-Smtp-Source: AGHT+IE1iXszFPocGfX7qXHVJT5YVBxPcMPiwoag2yynKKs8nHxqcOtoAdp0YPRayW+7Uew9/xRJq589UqWPgfxUMVw=
+X-Received: by 2002:a2e:bc12:0:b0:36c:47c8:b61c with SMTP id
+ 38308e7fff4ca-374c38704a4mr36772641fa.34.1759771283500; Mon, 06 Oct 2025
+ 10:21:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Revert "Bluetooth: L2CAP: convert timeouts to
- secs_to_jiffies()"
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175976400624.1408757.15464847653644285909.git-patchwork-notify@kernel.org>
-Date: Mon, 06 Oct 2025 15:20:06 +0000
-References: <20251006083544.22408-1-frederic.danis@collabora.com>
-In-Reply-To: <20251006083544.22408-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+References: <20251003205837.10748-1-pascal.giard@etsmtl.ca>
+In-Reply-To: <20251003205837.10748-1-pascal.giard@etsmtl.ca>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 6 Oct 2025 13:21:07 -0400
+X-Gm-Features: AS18NWAO9zoHMAD2MKmfqNz5oZt9LQCbRQbrV_fdxB9ddan3XJEslyqug-Mo_i0
+Message-ID: <CABBYNZJVUoVnJPdOXARvk7T_9EsvomJ_oe_ZZ_QZMTQBVjNDHw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add filter for Qualcomm debug packets
+To: Pascal Giard <evilynux@gmail.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Pascal Giard <pascal.giard@etsmtl.ca>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Pascal,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Fri, Oct 3, 2025 at 4:59=E2=80=AFPM Pascal Giard <evilynux@gmail.com> wr=
+ote:
+>
+> Some Qualcomm Bluetooth controllers, e.g., QCNFA765 send debug packets
+> as ACL frames with header 0x2EDC. The kernel misinterprets these as
+> malformed ACL packets, causing repeated errors:
+>
+>   Bluetooth: hci0: ACL packet for unknown connection handle 3804
+>
+> This can occur hundreds of times per minute, greatly cluttering logs.
+> On my computer, I am observing approximately 7 messages per second
+> when streaming audio to a speaker.
+>
+> For Qualcomm controllers exchanging over UART, hci_qca.c already
+> filters out these debug packets. This patch is for controllers
+> not going through UART, but USB.
+>
+> This patch filters these packets in btusb_recv_acl() before they reach
+> the HCI layer, redirecting them to hci_recv_diag().
+>
+> Tested on: Thinkpad T14 gen2 (AMD) with QCNFA765, kernel 6.16.9
+>
+> Signed-off-by: Pascal Giard <pascal.giard@etsmtl.ca>
+> ---
+>  drivers/bluetooth/btusb.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 5e9ebf0c5312..900400646315 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -68,6 +68,9 @@ static struct usb_driver btusb_driver;
+>  #define BTUSB_ACTIONS_SEMI             BIT(27)
+>  #define BTUSB_BARROT                   BIT(28)
+>
+> +/* Qualcomm firmware debug packets header */
+> +#define QCA_DEBUG_HEADER       0x2EDC
+> +
+>  static const struct usb_device_id btusb_table[] =3D {
+>         /* Generic Bluetooth USB device */
+>         { USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
+> @@ -1229,6 +1232,12 @@ static int btusb_recv_intr(struct btusb_data *data=
+, void *buffer, int count)
+>
+>  static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
+>  {
+> +       /* Drop QCA firmware debug packets sent as ACL frames */
+> +       if (skb->len >=3D 2) {
+> +               if (get_unaligned_le16(skb->data) =3D=3D QCA_DEBUG_HEADER=
+)
+> +                       return hci_recv_diag(data->hdev, skb);
+> +       }
 
-On Mon,  6 Oct 2025 10:35:44 +0200 you wrote:
-> This reverts commit c9d84da18d1e0d28a7e16ca6df8e6d47570501d4. It
-> replaces in L2CAP calls to msecs_to_jiffies() to secs_to_jiffies()
-> and updates the constants accordingly. But the constants are also
-> used in LCAP Configure Request and L2CAP Configure Response which
-> expect values in milliseconds.
-> This may prevent correct usage of L2CAP channel.
-> 
-> [...]
+Well it turns out that handle 0x2EDC is actually a valid handle, so we
+can't just reclassify these packets just because Qualcomm thinks that
+it could reserve it for its own, so this needs to be using
+classify_pkt_type to reclassify the packets to the handle 0x2EDC to
+HCI_DIAG_PKT for the models affected.
 
-Here is the summary with links:
-  - Revert "Bluetooth: L2CAP: convert timeouts to secs_to_jiffies()"
-    https://git.kernel.org/bluetooth/bluetooth-next/c/014b7133fa7b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>         /* Only queue ACL packet if intr_interval is set as it means
+>          * force_poll_sync has been enabled.
+>          */
+> --
+> 2.51.0
+>
 
 
+--=20
+Luiz Augusto von Dentz
