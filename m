@@ -1,69 +1,69 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959033A1D2
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Oct 2025 22:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFC33A1D2
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Oct 2025 22:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759876345; cv=none; b=ENVgMS1cAZJh0uGtx732gmyp8PlZjGUcuqR7661EL1XU1EPJ0v5exhd5PjeFtXYpZAYw9VHmbYmB7bkhavKajfZ+Zp7/OzliOl/6iPE7bqPQ5GQ9w+rjb6LSMOKKDmJnexHQm+SqwPVeHo4f2Au+/FKz2+jLpRw0/PzVM7UeVjo=
+	t=1759876347; cv=none; b=dVVT26j+yezgw8Cg7Bxpl+e4D+S26VrEbQsm6yfP+xjfjjxVo0hryDkeDTT2Yhr15GYn0LQWrY3uP/15+lTPdhRTCdmvQxLCSuNr/QsuqyjdP7XdIbVrNjUYVwDM+ZIismHltQKroDZrRNxBRp6DOcyjE9PMwEzqXszFRdC7I+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759876345; c=relaxed/simple;
-	bh=Rnf3ixJYLmYH3ak8lq+WxR2Lm5/OINZo3EyhClmtkt8=;
+	s=arc-20240116; t=1759876347; c=relaxed/simple;
+	bh=JoH3pdOYhe1gtXdYZDtJ053/aEeR3gmPrqcpUGTjRk0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z4Q69CWZmolsCo4/u+FWjtgCVXo2ICrjlYXZSP0JFAdmSZhziw3hqLBtXrtqbnLTm9z/fzcZ424XQAUmuZgeLtezt+ZrHdGW7UbjPEjr2qp4Ev4XK4/TLF3kl5qw2mysYm7DpLynA5Vs+yXDfmOxLHegalo+GCxCFvLvzFVdzhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yi7ydkzZ; arc=none smtp.client-ip=209.85.217.51
+	 MIME-Version; b=npqUJnM1U0Vl1vgE/xVirbZBhRodEk9p8rVilJ79v9/Fm5RpUti1wrtqCmE+Uk7jO2gIf51vh+43pg3OX8Ika5VHhZspL9Cr5jWhYPotzjnfTgzp+n/5gUeF/AdaXXwesMHbJg8amdLoRhoDlqPR+eC0pKJ9vwSIaQ/0+2iXOQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hNHZ4rI3; arc=none smtp.client-ip=209.85.222.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yi7ydkzZ"
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-5d4018cb45fso3014575137.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Oct 2025 15:32:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hNHZ4rI3"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-8fb58f2b820so4173099241.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Oct 2025 15:32:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759876342; x=1760481142; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1759876345; x=1760481145; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=k2vvWmSsFqFxIrp/OGyrTp81ndaqIGu30fgcruBwND0=;
-        b=Yi7ydkzZKt6kyBsUTwFdiDulYpYI9NZcmwdF6LkaUsDX0RhLIfHWy+W4BnJKki+W2r
-         wsUZSTtth+tz31SeMudefxBiZqf1AS7/JzPrNxe3j7UX9jsLtCxUD1sF+eHdvPmP31kZ
-         MZyw05xHcrp7Uun6CI6amooAKyiMEFK/5MM0X3+ApZXLTDI2wt1k6cK5Il7O6dWaZ/IH
-         tQBXIqn9OIHkqExTePfi4FHPLs4P/LVMZjeDCwZrwT0j9kwEcepoQM2+1wsbfRU6xIVb
-         1CoqXk/iPOpKfgChK0v6NuQns3XGyPjqp43LdC8LxNFKW0aHWGtXTOWURiPhkWKiC9fD
-         Q57A==
+        bh=juyZgXv8HadGLFnYHn3OcgB7dxjnZnCPpyBctYkAdNs=;
+        b=hNHZ4rI3T53OL0B0b4EYqoB9LBHppcUcmna2PSX+7XY1s4xagYkAeNc73geXU6WZd3
+         sbEX4qjGhP+qNS6C37eHNpSeUh7DQKWhf2ESRppjo1Cb4A7rl93eXnvdjEiZfnHGyqxx
+         /oDrb4pJklng/+syz0Z4ya2LTOSqsxKVZWQ8vITN6tqNTlyeGdEsl3M2lO4M/axodaiL
+         +y6CAnn1Ce+fFo19wmslFiRr/0ArGhfVHYgb6iloc9/DE3wmGQK06He6rt6rH5tjjEZK
+         DxaII0AiMzzMAWu3Rtq6vdzEhVwr1+pBAkfpFTds4exS47StbKIqEi/8wLwR0bW65FU/
+         RjKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759876342; x=1760481142;
+        d=1e100.net; s=20230601; t=1759876345; x=1760481145;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k2vvWmSsFqFxIrp/OGyrTp81ndaqIGu30fgcruBwND0=;
-        b=A9wzWzFIRjGKWGZggZuoYNq0TGqkXfImR2yZ9FoKzpsR9zSR6Zgc1c38BPuqQ/DUcz
-         IsPhdGCx/NUhwYpSCvDWEVNDs1LybVbaWhJFDlywBjHXAJMrsgScRivMz8LNIZIaZkZe
-         bKsIeHNZhrqiJFOt7NCiQX1APzJ71MBCBfDIyor9FA77wFzWa6AzvsuIoGZB73qxYTDW
-         o/3rem5kgaZF9Ukmz8uc1iGEcOj8YdxUjsAqhc4GEE48y7NI/oa3nsgzyXp6xbH5PtYJ
-         jrNSNzZTDHqUXxK9jxr6rxsSJI3s29maXDcPUI5fLHfBWtZHoDbbwmHJMffcW2MwP7BO
-         J6uw==
-X-Gm-Message-State: AOJu0YysVH/VARuHc44NBfgSGk/GV9IWR2PORT9yjino7kI7/4hPnekY
-	oyZ33vtC2QkpOgvUIMms83o/E2SR+e4HekYwY+Oafvw957vgMSL0Lmv+2X8dyDfS
-X-Gm-Gg: ASbGnctOvuezj8b6subhLSI/BxZgGmXa8WluDz7qhQxYVb7600L+OvRdFIviJeRbbTT
-	u/DuCnUwWsM2gbG60b5Ev7Zo2ftBZTLv35Sv0bHPSo/y6K/ru21NyyJKPmnH0bwiPWD42+cibmk
-	a3TO/VctlbkXSt6l85dSlagBCNwoZo+8KBq4gWJ7w8+9/QIvcYiPf2y8o2Kg0Q+VIQSrcfThH8o
-	kbxkKx9ndC5FqaglUzmPa4SYJT4QiA/j6QmWY6FzE5BIQK3dXaoIxjJ/o2MqQTXSSWmz9h0dk/9
-	30mwZfwTsjUOsb7e3aMhLBopHK7kEOgg+KFtm6LLhMjmNR7L7uUnlqFhNj97gD6q5Q6B9DfX7aj
-	MbeIRQVluspAAqIDHLqIxAStj2UYhARiWC4k40S9EPQ3oy5DOI0ZdjzyabyUVHz6d3VECii6XZF
-	LPPPs9creMasmv9pB1mebyPBdi
-X-Google-Smtp-Source: AGHT+IFfo7Zq68n5O+C8+ZKHV3t2QuVCzdBbBEzWNVPoKplWx6yFts2NbotVQw7GGMKXkwre1dfz0Q==
-X-Received: by 2002:a05:6102:dcf:b0:533:ff66:698c with SMTP id ada2fe7eead31-5d5e22162camr551580137.2.1759876341743;
-        Tue, 07 Oct 2025 15:32:21 -0700 (PDT)
+        bh=juyZgXv8HadGLFnYHn3OcgB7dxjnZnCPpyBctYkAdNs=;
+        b=fmP2WYQOrj7nKc3Dr+5T7jOH65VIAbVfLo7HcHg7X5N5geu8x1ulrKnbtBuf591BkN
+         TFERm6icoBCyRM49CbPj0zCRAhzsxIdZTILZC1gTLn5Rai6HmlF8O+5ATXoaJfyVg/f6
+         k4R/Wu+tDSYEKa/8NFQVAezE1c5EdhZNjU5vM3Q32qA8+nYwR/naS2+cuVp/acfuZ/v/
+         DrwGpFjaLc4oMBT4RFrKHUgOHVz9YDFLXNJXTgX2GD0tb8BRWgsFCx1PAcKgbI31DkFk
+         i8jdrLAvaOdgKyR2ByEsz5jRUvUheqxv1ShdyBFX5jd3BLLEPs4A5Rlo19ci13snGYSZ
+         mjeg==
+X-Gm-Message-State: AOJu0YwXIPKhz4Qe8Gk0nuaN3dXuUNir957pLf4prAV28xSQol+6MYs3
+	x7Qja5vAOFAkSrN84XdomLFe7C31XmKGNaKbePxtrIgYqRkWssVSHFo/622sGS3X
+X-Gm-Gg: ASbGnct6GZw/yhmhRVA/pmvr3CSPe4tWHAxwuwi9zb6XlPZth+bmNrHoP9JOzja2cqu
+	J9nIZ8xbw+mgUG5Q/RdmNz6S1kuFpfftGbSkDGAR7KlzADnke/Kj1av18aV12s3FXyLvgPwUffi
+	c1zqofB3c4PqXwqHFxFw+k2GC0dJca7qRLln6AAul8aq5CNEQJLEGwoePDHcfGTngqnykpXeNny
+	eyK550I8X2qIW0QveMqoltPay2Aa2z3szNOEPloanBtRIQ5HNALzC4/9Ybq/PJywuU1hiqvo3nA
+	tx7mFGDKwlPxaFIp9mRZeRGZQbo6cqYlw48QwRv/iwAB0/4mUkAn3mmkuTSYmleGSKk/HDSu26b
+	vWDMAp/KnFhHfedC2RwPK4wP19OuKOvwpDsIwb5Gvjel1l05cAW904CYOAP2pblJyUgVsaJ+czV
+	2svUJS+yXYUQxMTg==
+X-Google-Smtp-Source: AGHT+IHwcHDIbQIkICqsvPHj0CErCzLZRUf543X/UEBBe/fy2ERKzdUwxV4WRvcXkhi7RoDl9OqGlA==
+X-Received: by 2002:a05:6102:1626:b0:51f:66fc:53af with SMTP id ada2fe7eead31-5d5e23a4727mr574699137.34.1759876344654;
+        Tue, 07 Oct 2025 15:32:24 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-92eb4da21c3sm3859567241.7.2025.10.07.15.32.18
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-92eb4da21c3sm3859567241.7.2025.10.07.15.32.21
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Oct 2025 15:32:20 -0700 (PDT)
+        Tue, 07 Oct 2025 15:32:23 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 6/8] Bluetooth: MGMT: Allow use of Set Device Flags without Add Device
-Date: Tue,  7 Oct 2025 18:31:53 -0400
-Message-ID: <20251007223155.1539954-6-luiz.dentz@gmail.com>
+Subject: [PATCH v3 7/8] Bluetooth: ISO: Fix not updating BIS sender source address
+Date: Tue,  7 Oct 2025 18:31:54 -0400
+Message-ID: <20251007223155.1539954-7-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251007223155.1539954-1-luiz.dentz@gmail.com>
 References: <20251007223155.1539954-1-luiz.dentz@gmail.com>
@@ -77,200 +77,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-In certain cases setting devices flags like HCI_CONN_FLAG_PAST it
-shouldn't require to do Add Device first since it may not need to add
-an auto-connect policy, so this instead just automatically creates
-a hci_conn_params if one cannot be found using HCI_AUTO_CONN_DISABLED.
+The source address for a BIS sender/Broadcast Source shall be updated
+with the advertisement address since in case privacy is enabled it may
+use an RPA rather than an identity address.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/mgmt.c | 148 ++++++++++++++++++++++---------------------
- 1 file changed, 76 insertions(+), 72 deletions(-)
+ net/bluetooth/iso.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4b7cab707d69..02d52b413abf 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5118,6 +5118,69 @@ static void device_flags_changed(struct sock *sk, struct hci_dev *hdev,
- 	mgmt_event(MGMT_EV_DEVICE_FLAGS_CHANGED, hdev, &ev, sizeof(ev), sk);
- }
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 3283139b3e7b..a8986c69bd19 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -2027,6 +2027,25 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 	BT_DBG("conn %p", conn);
  
-+static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
-+{
-+	struct hci_conn *conn;
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, addr);
-+	if (!conn)
-+		return false;
-+
-+	if (conn->dst_type != type)
-+		return false;
-+
-+	if (conn->state != BT_CONNECTED)
-+		return false;
-+
-+	return true;
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+static struct hci_conn_params *hci_conn_params_set(struct hci_dev *hdev,
-+						   bdaddr_t *addr, u8 addr_type,
-+						   u8 auto_connect)
-+{
-+	struct hci_conn_params *params;
-+
-+	params = hci_conn_params_add(hdev, addr, addr_type);
-+	if (!params)
-+		return NULL;
-+
-+	if (params->auto_connect == auto_connect)
-+		return params;
-+
-+	hci_pend_le_list_del_init(params);
-+
-+	switch (auto_connect) {
-+	case HCI_AUTO_CONN_DISABLED:
-+	case HCI_AUTO_CONN_LINK_LOSS:
-+		/* If auto connect is being disabled when we're trying to
-+		 * connect to device, keep connecting.
+ 	if (sk) {
++		/* Attempt to update source address in case of BIS Sender if
++		 * the advertisement is using a random address.
 +		 */
-+		if (params->explicit_connect)
-+			hci_pend_le_list_add(params, &hdev->pend_le_conns);
-+		break;
-+	case HCI_AUTO_CONN_REPORT:
-+		if (params->explicit_connect)
-+			hci_pend_le_list_add(params, &hdev->pend_le_conns);
-+		else
-+			hci_pend_le_list_add(params, &hdev->pend_le_reports);
-+		break;
-+	case HCI_AUTO_CONN_DIRECT:
-+	case HCI_AUTO_CONN_ALWAYS:
-+		if (!is_connected(hdev, addr, addr_type))
-+			hci_pend_le_list_add(params, &hdev->pend_le_conns);
-+		break;
-+	}
++		if (conn->hcon->type == BIS_LINK &&
++		    conn->hcon->role == HCI_ROLE_MASTER &&
++		    !bacmp(&conn->hcon->dst, BDADDR_ANY)) {
++			struct hci_conn *bis = conn->hcon;
++			struct adv_info *adv;
 +
-+	params->auto_connect = auto_connect;
-+
-+	bt_dev_dbg(hdev, "addr %pMR (type %u) auto_connect %u",
-+		   addr, addr_type, auto_connect);
-+
-+	return params;
-+}
-+
- static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 			    u16 len)
- {
-@@ -5161,9 +5224,16 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 	params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
- 					le_addr_type(cp->addr.type));
- 	if (!params) {
--		bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
--			    &cp->addr.bdaddr, le_addr_type(cp->addr.type));
--		goto unlock;
-+		/* Create a new hci_conn_params if it doesn't exist */
-+		params = hci_conn_params_set(hdev, &cp->addr.bdaddr,
-+					     le_addr_type(cp->addr.type),
-+					     HCI_AUTO_CONN_DISABLED);
-+		if (!params) {
-+			bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
-+				    &cp->addr.bdaddr,
-+				    le_addr_type(cp->addr.type));
-+			goto unlock;
++			adv = hci_find_adv_instance(bis->hdev,
++						    bis->iso_qos.bcast.bis);
++			if (adv && bacmp(&adv->random_addr, BDADDR_ANY)) {
++				lock_sock(sk);
++				iso_pi(sk)->src_type = BDADDR_LE_RANDOM;
++				bacpy(&iso_pi(sk)->src, &adv->random_addr);
++				release_sock(sk);
++			}
 +		}
- 	}
- 
- 	supported_flags = hdev->conn_flags;
-@@ -7550,68 +7620,6 @@ static int get_clock_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 	return err;
- }
- 
--static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
--{
--	struct hci_conn *conn;
--
--	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, addr);
--	if (!conn)
--		return false;
--
--	if (conn->dst_type != type)
--		return false;
--
--	if (conn->state != BT_CONNECTED)
--		return false;
--
--	return true;
--}
--
--/* This function requires the caller holds hdev->lock */
--static int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr,
--			       u8 addr_type, u8 auto_connect)
--{
--	struct hci_conn_params *params;
--
--	params = hci_conn_params_add(hdev, addr, addr_type);
--	if (!params)
--		return -EIO;
--
--	if (params->auto_connect == auto_connect)
--		return 0;
--
--	hci_pend_le_list_del_init(params);
--
--	switch (auto_connect) {
--	case HCI_AUTO_CONN_DISABLED:
--	case HCI_AUTO_CONN_LINK_LOSS:
--		/* If auto connect is being disabled when we're trying to
--		 * connect to device, keep connecting.
--		 */
--		if (params->explicit_connect)
--			hci_pend_le_list_add(params, &hdev->pend_le_conns);
--		break;
--	case HCI_AUTO_CONN_REPORT:
--		if (params->explicit_connect)
--			hci_pend_le_list_add(params, &hdev->pend_le_conns);
--		else
--			hci_pend_le_list_add(params, &hdev->pend_le_reports);
--		break;
--	case HCI_AUTO_CONN_DIRECT:
--	case HCI_AUTO_CONN_ALWAYS:
--		if (!is_connected(hdev, addr, addr_type))
--			hci_pend_le_list_add(params, &hdev->pend_le_conns);
--		break;
--	}
--
--	params->auto_connect = auto_connect;
--
--	bt_dev_dbg(hdev, "addr %pMR (type %u) auto_connect %u",
--		   addr, addr_type, auto_connect);
--
--	return 0;
--}
--
- static void device_added(struct sock *sk, struct hci_dev *hdev,
- 			 bdaddr_t *bdaddr, u8 type, u8 action)
- {
-@@ -7723,17 +7731,13 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 	/* If the connection parameters don't exist for this device,
- 	 * they will be created and configured with defaults.
- 	 */
--	if (hci_conn_params_set(hdev, &cp->addr.bdaddr, addr_type,
--				auto_conn) < 0) {
-+	params = hci_conn_params_set(hdev, &cp->addr.bdaddr, addr_type,
-+				     auto_conn);
-+	if (!params) {
- 		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
- 					MGMT_STATUS_FAILED, &cp->addr,
- 					sizeof(cp->addr));
- 		goto unlock;
--	} else {
--		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
--						addr_type);
--		if (params)
--			current_flags = params->flags;
- 	}
- 
- 	cmd = mgmt_pending_new(sk, MGMT_OP_ADD_DEVICE, hdev, data, len);
++
+ 		iso_sock_ready(conn->sk);
+ 	} else {
+ 		hcon = conn->hcon;
 -- 
 2.51.0
 
