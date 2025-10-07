@@ -1,111 +1,157 @@
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72274258EF3
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Oct 2025 22:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CEB258CFA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Oct 2025 22:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759876350; cv=none; b=pq0oWogomUZGfl0tge/zS2gTxob8k8vURMs3BaMnD05vWsYA5guWAVWYpjPulE4tt8Qp7EPx7Y5GRaj43QlRmWgPJ5cRI96ww4TRjpXtpCqHjSEx8popsfmbZMV2JdWHDGdjsvf0A6OX8eECPR5mxsHdM/R7uSx8Yn+t7rPUBwk=
+	t=1759877930; cv=none; b=LtEGFgUpKypbVNPY5uX2E3qd20Ycaw5D/MvGk78vWUZDAtLjRpNbTT3A0JVpy3yYufS06s621JOKpKbsllZ5CbU/xRilCmumbSc0ikVi64g/iCRLtQ01Xhy+k0TI6AEXNOIEkx59xbYvsr2+Ai0GKVD0kiN1HKkxy53C0ilOzUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759876350; c=relaxed/simple;
-	bh=LCZDqZxlE39PVUJuO01qlM8EAFpTFFdU5IMZGgqE/J0=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R+z3dmnkhynk49BlL5Yh+4UTAl+ELrVEzjZe5X1deVqMegorher13GcS5wrGwc46mOhlXjdHT4lwTEGk7xxKe25L8Jo2MLa0q88unkIxJpalAAWCItCvygUQybCB21Y63IcLhBisBA3Nsq44dION8kz8WmHd3h2Z5cli2bMFTQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QQs1359R; arc=none smtp.client-ip=209.85.217.43
+	s=arc-20240116; t=1759877930; c=relaxed/simple;
+	bh=UPwKEKKsOnJp065WN6kx15ZJxbUpeEBnmO43kHgbZNY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=L/H1FXaiRbtTScsIrd+Q39sAAVotmsJ+b4sVZ35WvlbZbMT8hZoH+TQ6AOE6JZLN321sYRMlHNT2CIrhJGOtSZ13cTIAhrL4PkUeqhvR9HePHBq/4dulCyuE6ze+4z3ewnxQdBkPaBfNWICi7wOnLfnGiJQ1hhUcypehch2wtvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SvxbKI4+; arc=none smtp.client-ip=209.85.215.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QQs1359R"
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-5838680e242so2468690137.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Oct 2025 15:32:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SvxbKI4+"
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b523fb676efso5716395a12.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Oct 2025 15:58:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759876347; x=1760481147; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UKU3n5pbNcEgjyxG1Zq4RSVp6Cp658mxEd/PzAnnX2w=;
-        b=QQs1359RdLHUTq8ftCRnO5zFA+oOFzredbfoEOSVQuP8RyOrk4mOZAGZ1dLXHySTlj
-         beCG1r9/wXIBZrkZHUsCsj325rnKRGw7DoH/gEVZie/H+roBxSla6y8tUDDGFeEH9Oth
-         DsUxM8Bz9kprt4EFVwA+iIRVWbGiny+06YMrlHRszJ+hTYlmwrwzd6mBXFZomG22Sbai
-         4GChlj+0PKfNe6quHf0FuTHAS9IKHkda/Bz9qXTaf1E9HI/RY+I8iWtg9/h+Gd0k5ttn
-         VJ3KCVSPRnQqyZ6jRjlcELNR5+uv7EdLGBtZzzE1i0WppPV8AlKbqvZ5sZHYB1qH4lcw
-         wURQ==
+        d=gmail.com; s=20230601; t=1759877927; x=1760482727; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9/NhFPPEeQyBv7keJSdVZsqZCARih2S9EemGv7oo3hc=;
+        b=SvxbKI4+qqvH7ToWp1sqQqcS59XXf40ZES5PbsxBUlEc2NMC0FctLKgPy/M7IdiYhM
+         2e+N9IyJK0MDIThFHDJ/FEJlSHgqZZxXSEceyHKSGbbKn/w08GuhdbI/ktaGPR4WUxvB
+         V+alvM2qkuhP6rmmlgF/Rrkbbgvo/p4FvrA8Ym2m2ScwbvWHu/qBcjIJH9ScoliHqy1e
+         4CKYOTSgJHqybnGqywIjycnqFz8qs03rbnqjrIYEPZ7NbWCRwYfReNw4MOMVFadPjany
+         /I6azcVyKlmbCYvaPf0F39pACcyt2i1w2bxVeeomP3NPjbVt9jNfb1kRI01u1FEi6JV0
+         srOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759876347; x=1760481147;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UKU3n5pbNcEgjyxG1Zq4RSVp6Cp658mxEd/PzAnnX2w=;
-        b=iiCbAxmLAZ9CUVb0HrCvmVHMVwbFqwFJB7Jo4MfE/N6hPCZDW30LWjw//Y0hBvfMjk
-         2R5rdDvCNm9xVl/4S/sXRuP9F3QrivjY+QFD3sUQD/mAmDjA/eNxOuXJmiFWC9CTSmg+
-         A+M70zgjyTbX2jK1aVZnyF5Y+rfT9XJS5jJUEP/D20EkrACxDvVCi6BXIjKs+7TGQQKt
-         12kjO+hapkzUXJgguLTO7Sav4GfFvGYG/qqY7iFS0k8BuIAqOgLFYQbtA5UFWPwTkiR0
-         R0tHffN7IYk5/EFxyG4WMLgDHIMyJqJ/hBQNpsdoKgKAwQ94LL3uLFVEkWPKQy/Tr9d3
-         7Z4w==
-X-Gm-Message-State: AOJu0Yw9/cycAz1fv8E7BY7sSUpmkOJco5StqEkzw9AKuy47G+eUymTs
-	IR6nCaXxjVOLC2aXUT3SmkLkpDOA2Btonqxy8tgHOPllkjan6EtFoGxV33ZF6fR7
-X-Gm-Gg: ASbGncscMMHVz1d/yBzycvdZLMMohkYadhEkzOIDV7OvAfsWlrWTdB3hbHo8lNxbW+o
-	Gi56j4cVTbmVy/WrDOFBHWZHZa9RQtI/0/DZCOfIxOJbdbXdUmeEg5c0CkZCrwIlN8mXJ2OC+6D
-	XM+2eNUZreKsSwclwTBumrjjqDtrf4NzdUlo3VFyvzy/DcfJAUj0EP2WXpbFqyXAFmb/htwT9Wy
-	5oNxvJgG+j36wgJwZL7PfydjlLCoX+khn5TrjfVTwA077fEaimWnOhtaMRGRsXXCSvKPScfsAp2
-	EMhRpue2VHOvWHTbv4BYx7BLKVJRcR/xSMCLIGpGyuJiKQF+PstgtYDBPVuTAiurr0n+Mch8xcQ
-	AbUZOY288kLDsAJ9cz2tsNX5sqgd3O7/wE7b734seLfi/q6JwSTRzN+e++B5kJ+AOIW9zjqnni+
-	mSq1RNIgl0XIaFfA==
-X-Google-Smtp-Source: AGHT+IHP76J9XZH5ugYsPI/r2iqD9gfQgmKqlJoJf0OSsnVXomC1s8lAm0q/jRwMWq4kWX+GnBqr3Q==
-X-Received: by 2002:a05:6102:4427:b0:5c3:d964:a689 with SMTP id ada2fe7eead31-5d5e23d9a99mr486681137.32.1759876346695;
-        Tue, 07 Oct 2025 15:32:26 -0700 (PDT)
-Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-92eb4da21c3sm3859567241.7.2025.10.07.15.32.24
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1759877927; x=1760482727;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9/NhFPPEeQyBv7keJSdVZsqZCARih2S9EemGv7oo3hc=;
+        b=VJ1RcaUJT3LwJWvjk+h3hctVobrXboF49NvAC1JVqLY4GnOihLs2CLOQscfEASeoL+
+         pTrTQTperVNsgKD2bDM13CqXU/WmRsajU4Gn3MHz5oxj3sYmbeJK9v+C4gIB+X5xAhen
+         qmGkiLWNKDUx/6LF/UQEIGHnLlwUw91bambzCeyZTMHIIyYrTQGyhavxf9PbGrj8QKf2
+         K//VRM4beqb0J/j1cr+6JS4nFdYSQuzM/q/aDL4AiVSjDu5vbPDGhZfpKlMhV8dJDeeR
+         KTSj8M4yjhJFFhrowQeaRot1Ylr0wLCSbtBd3otwxKukBIj026IKpw5nvbe5UJ6EE8Rc
+         28TA==
+X-Gm-Message-State: AOJu0YxLCCM3rPMpW1x4ENTVcNL1brcGx6htv30kOdWzN+awwHInkpNO
+	VXItEbc7yLYJuUe05TpUFnh/XZAv8vgHmBavKGNoT8SQQ5jSoQ10pPru6cAX4g==
+X-Gm-Gg: ASbGnct3JTBRPJELVeOz4jvPUBJNJMQTJ6uLGA6YLV+dlR/1vqT8fSdsNmHynJ0nsTD
+	qG6IcY1Sht7zhPFHalx5z2oah8m+W57zRfxTtNBJVVpLDh5/9t19bITwFp9o5uXy1ruYZHg4sCc
+	s6sjfG4Eniwh0q6Vy9OcEjgDbHVFSo5+xYexgAQABdxDjx5nOCAMSIfcl3N0trCwWL3Z6GtAy//
+	vivY3TaxGxd4D6PUcYU2yr8q3iwL8FoN8ligQEAVlwtKTjWksmAJf/ur3qGaXlvKU1F55OECm2/
+	7VbPy994bL/Gcv+h5pEtKWR4cGTEqNdWRfFgvi29UldjP7hmzmOq8pk+7iJ/o/6CPAzwhxlIQ9i
+	rREGvzOmlPHkrLrvm9lea2geHLW2rloN2LtqtcimT/8TuVJGzI0cO6HY=
+X-Google-Smtp-Source: AGHT+IGmgKAGV5rbycdFGAhXILkD9MAAoaB5mmAJaDWMpMyJKQ+gxME+xM4eyZKcul9MpoxrK0Efuw==
+X-Received: by 2002:a17:903:2305:b0:24f:8286:9e5d with SMTP id d9443c01a7336-290272cf65dmr16793305ad.26.1759877926967;
+        Tue, 07 Oct 2025 15:58:46 -0700 (PDT)
+Received: from [172.17.0.2] ([172.215.216.227])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-28e8d110ceasm178421585ad.15.2025.10.07.15.58.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Oct 2025 15:32:25 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 8/8] Bluetooth: ISO: Fix another instance of dst_type handling
-Date: Tue,  7 Oct 2025 18:31:55 -0400
-Message-ID: <20251007223155.1539954-8-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251007223155.1539954-1-luiz.dentz@gmail.com>
-References: <20251007223155.1539954-1-luiz.dentz@gmail.com>
+        Tue, 07 Oct 2025 15:58:46 -0700 (PDT)
+Message-ID: <68e59b26.170a0220.3598f1.e4ab@mx.google.com>
+Date: Tue, 07 Oct 2025 15:58:46 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7432106986291334137=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v3,1/8] Bluetooth: HCI: Add initial support for PAST
+In-Reply-To: <20251007223155.1539954-1-luiz.dentz@gmail.com>
+References: <20251007223155.1539954-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============7432106986291334137==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Socket dst_type cannot be directly assigned to hci_conn->type since
-there domain is different which may lead to the wrong address type being
-used.
+This is automated email and please do not reply to this email!
 
-Fixes: 6a5ad251b7cd ("Bluetooth: ISO: Fix possible circular locking dependency")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1009205
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.38 seconds
+GitLint                       PENDING   0.37 seconds
+SubjectPrefix                 PASS      0.58 seconds
+BuildKernel                   PASS      24.35 seconds
+CheckAllWarning               PASS      27.04 seconds
+CheckSparse                   WARNING   31.08 seconds
+BuildKernel32                 PASS      24.43 seconds
+TestRunnerSetup               PASS      490.77 seconds
+TestRunner_l2cap-tester       PASS      24.53 seconds
+TestRunner_iso-tester         PASS      70.20 seconds
+TestRunner_bnep-tester        PASS      6.15 seconds
+TestRunner_mgmt-tester        FAIL      118.58 seconds
+TestRunner_rfcomm-tester      PASS      9.45 seconds
+TestRunner_sco-tester         PASS      14.59 seconds
+TestRunner_ioctl-tester       PASS      10.16 seconds
+TestRunner_mesh-tester        FAIL      12.35 seconds
+TestRunner_smp-tester         PASS      8.69 seconds
+TestRunner_userchan-tester    PASS      6.45 seconds
+IncrementalBuild              PENDING   0.67 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_sync.c:7281:19: warning: incorrect type in assignment (different base types)net/bluetooth/hci_sync.c:7281:19:    expected restricted __le16 [addressable] [usertype] handlenet/bluetooth/hci_sync.c:7281:19:    got unsigned short [usertype] handlenet/bluetooth/hci_sync.c:7281:19: warning: incorrect type in assignment (different base types)net/bluetooth/hci_sync.c:7281:19:    expected restricted __le16 [addressable] [usertype] handlenet/bluetooth/hci_sync.c:7281:19:    got unsigned short [usertype] handlenet/bluetooth/hci_sync.c:7281:19: warning: incorrect type in assignment (different base types)net/bluetooth/hci_sync.c:7281:19:    expected restricted __le16 [addressable] [usertype] handlenet/bluetooth/hci_sync.c:7281:19:    got unsigned short [usertype] handlenet/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_sync.c:7281:19: warning: incorrect type in assignment (different base types)net/bluetooth/hci_sync.c:7281:19:    expected restricted __le16 [addressable] [usertype] handlenet/bluetooth/hci_sync.c:7281:19:    got unsigned short [usertype] handle
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.110 seconds
+LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.167 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.703 seconds
+Mesh - Send cancel - 2                               Timed out    1.995 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- net/bluetooth/iso.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index a8986c69bd19..ab2b4de383ce 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -2143,7 +2143,13 @@ static void iso_conn_ready(struct iso_conn *conn)
- 		}
- 
- 		bacpy(&iso_pi(sk)->dst, &hcon->dst);
--		iso_pi(sk)->dst_type = hcon->dst_type;
-+
-+		/* Convert from HCI to three-value type */
-+		if (hcon->dst_type == ADDR_LE_DEV_PUBLIC)
-+			iso_pi(sk)->dst_type = BDADDR_LE_PUBLIC;
-+		else
-+			iso_pi(sk)->dst_type = BDADDR_LE_RANDOM;
-+
- 		iso_pi(sk)->sync_handle = iso_pi(parent)->sync_handle;
- 		memcpy(iso_pi(sk)->base, iso_pi(parent)->base, iso_pi(parent)->base_len);
- 		iso_pi(sk)->base_len = iso_pi(parent)->base_len;
--- 
-2.51.0
 
+--===============7432106986291334137==--
