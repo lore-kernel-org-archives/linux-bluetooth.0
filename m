@@ -1,67 +1,72 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9373A1D2
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Oct 2025 22:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3623A1D2
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Oct 2025 22:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759876331; cv=none; b=nlJCg1FnazMOw3Tz7hCgcQnmJqinvSRC1g2s7VT3e8esG1myIBAKFYokdZm37V5igP90QZep8srA9yDLIDreSGY//9lw1U3HLIMMtk3X5V8ip7V4X3qy2zHcD6JYoRSX85O+kIk1y6s43KEwELttO/+c94eU6gHnb2C5djhC5hY=
+	t=1759876334; cv=none; b=suOfyfkOPKs+kOpFI/GVm2e6/xVSgPNkIB3yaycYnI65rW2SxbEoMgHPOi8koiAOg0FQnVAksJ9lAUxYcBzWPC/LvKh1x9kBFnd8yXgJIU/EeogOPa9kei5x/X50e70mWmUYDHsz5NCI+75aggTDMnu2BF68Iril9sGs5Klz7RE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759876331; c=relaxed/simple;
-	bh=SIg0rr7qDPq7SPesLWuZiUrtZm5K/Fzjc85w8/EyqHo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Dflqcfnf5hK4kiDyhra522hGAnPprijzu6WYMICJBAStrM9pByCOeIjH1/jbCQeKyHYV6OIuMvDRCuq+UzDwfy7bdwxxcfzszwzSclqLy17HgvGfH4/19vVFWDlEnEiNcOy/SJjDW5yWeQQHabjJ3TE2aW3ZhBjmtc6lwomZHZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k8zazorO; arc=none smtp.client-ip=209.85.221.176
+	s=arc-20240116; t=1759876334; c=relaxed/simple;
+	bh=BquCFfq7uOWbSG/G1lJaNvYAz/zW5IYi2LUZhBCG6ns=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rDB0L6HNojTKR9HgzcD8rdulhkZtkBXrZdTTFnGSXbbA1699Fanu2PjRJKNRkHBenOblSJQ70ASTxvS17Cv6fryHC11BztJki5CeNf/7Ni37H4Ylp7x8BY32a1E+cZKckmbwrgRSgc3JDmrFywIttVetJrKNCspH8I1Irs85GAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NXcWvYTn; arc=none smtp.client-ip=209.85.222.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8zazorO"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-54bbb587d6dso4018444e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Oct 2025 15:32:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NXcWvYTn"
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-8e3d93c0626so263486241.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Oct 2025 15:32:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759876328; x=1760481128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tHBvGIoAj5TFs/PgBRgLUR4Cqowd5PhtF4geXnM7ts8=;
-        b=k8zazorO0FWKhYvs+r9btFbUQ/32zjY8H6bZDdwcdh0WgV8RBfE7JmQcUPk9rNQA2Y
-         /QOBLWTrRqXXs1Vw+Qe6Ce6AM4NpDKvssZHQ6O8yCD9zVqiypagmL0fXC76uV8UM7Yqb
-         xqC4uW/g9sHqkrCoNVknU9nOVgf3TIKBU5735NGyvcqUVon4MZxPtL5ballsHe2+Mq4R
-         U69WttPWxuXtKqHsy2eExAglIeBdIxjNMhjlxFmsgQ48d5fCGP1SyhHg10FxYiD83ilg
-         WSt927TQg1MBAXBcxRFO6Q95+k7AEqUgK+UlnVQ0ipBuXFMQ/dY7ie7gqzFIQzXSEGAg
-         CxkA==
+        d=gmail.com; s=20230601; t=1759876330; x=1760481130; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yFZ/dZGY3W4K0m0eKwmb4Sa9B6xoAJjJc2FgTgcc0Z0=;
+        b=NXcWvYTnxFYqS3pyHCR03TGjP3hFnmwSqozG42MFMRJaPwFLXystqU19Qfjm7rVjyb
+         kkLlFeUAfL/1R9FfogUnh5jiB0MciNyq8qsPrYbxsCO9xRBCIc034ePjl2lNtInazS/q
+         6WfL1XwZzdaHmybwVNg+y2VLQ9/hQi96g4AVb03oJhCu7Imn2BpeLBvxb1/OuBUFIAa5
+         +hDZ4sZBWR2Mv4NIB//H33Ejef8sHR5n7Rc1VL7OIcFQhK1+YR4Q7JUSIRso1KVcCZqt
+         2Rz7KV/VKIeG53ADmBsZgFI5QRgiT8MGt+Ov5si2X54psI/jIFpIt2ykb9EhWtAuBLtx
+         tsPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759876328; x=1760481128;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tHBvGIoAj5TFs/PgBRgLUR4Cqowd5PhtF4geXnM7ts8=;
-        b=ooQek5pU0zad9wZ2MbMAujr/WT1Wq1kEgQETnWekbYtqoajzfi8LCRDF9UauaPcIbr
-         qqZZ8/EIk+DyJMJcWNgBJzG3MtITiTv8rMoy92LFkb7Ef/vL0mWAYGSRYEDmBVeTDTD3
-         2yC/Hmxwa8sLKPLuLqC28i3Dnri/0MpFKYUuGD1sQ+zrjD9BlduAheC0iVG+xrUOQwx9
-         s8inmbCFSDiElM/Aq0KAzmAeN94FOZ+r/ob92VTnyKBtakSZ0EE88cChthWECKHVJhYs
-         uk9x/13PSVGdbvEABURaOPnZrb7a7bjIBExj8ytfN0cZAY5SNo1sRPsY+etqvgwE8/Cn
-         TxlA==
-X-Gm-Message-State: AOJu0YzqGjMcMhbpoPDGdKTwxCI9kjTN0ydgnyBvW3Ceg3QFE/jfyILq
-	3jXSahTyR192RAtW6uj/fmzPk9k0my8P4zuHc2vNXrVDwo26elGcv4DXhKXTXaQ4
-X-Gm-Gg: ASbGncvMQ4ULRdLVBemKl15e1KuSsrVtIsblTrvXBaWznlFG/kUw+KD3PB9IyDO0DBh
-	hM4tyQigljkn4cx6K45mhPTwj/dyLIGsluixlu0oPsTNV84V0cQDvBHiICnTdvxbvyZ6uWIf5w+
-	7pq23UvFTnv7Z/wNmDXKk6stSjr8kpwjRlJBW2aLys3a3QHvn/idC2HLyY838HFdpcwUft9Sshe
-	AxyCo4PwYk3FpyhnExn+4tE6kgl47C3PuoKXUO2x+G2mVOecBFN5FcitQq46bVrYVhhtR3bzKnN
-	B6BUSu4y1jym+5Dcwjn2lWCnK7k5djyUC95UQ5oB+Ml1uxUdHmZFpl+J7IKrLoY85TQo6eDvXKu
-	N9CPPykg8jGDbP19kWTpXsEKx4L6FFj/mKlHRFqgS6k3TSLgNGS4adKrPtORvA5abq5bc9JEOqx
-	run4p8zhcT1Gt2HA==
-X-Google-Smtp-Source: AGHT+IE1ZTYi2gkHWxI6+066ndPaJULf55u9BqQwotilvu8UD3sJ9zhG+hpn8B9oHULD5QgRW/5fow==
-X-Received: by 2002:a05:6122:1821:b0:54a:c54a:6d96 with SMTP id 71dfb90a1353d-554b8ade733mr660457e0c.4.1759876327758;
-        Tue, 07 Oct 2025 15:32:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759876330; x=1760481130;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yFZ/dZGY3W4K0m0eKwmb4Sa9B6xoAJjJc2FgTgcc0Z0=;
+        b=Zx4AwpHOy3ki22WlVVdEifJST1NUnEsQgfWKOWlY25J0Ho4s1Oz2S911SGl64VMfo8
+         PvCJsOI2qMabTapXwG8eUD00mQx/CHSNYFjvzHrieqRahZAP06VQVDkXht5D529bHZk8
+         9Mfr6I/fn7s6MMO24kNqltYS6hMx0+FGdRvy40GUudGN67l5YnJDRZNPYRu4omPtXHMg
+         bbhsVYVn9q4/pf6v/pdOtzof+wWxHWRPK62A6dRt9V6IrmWC3Dbw+ybCYk/q2Pchhy7m
+         U1nvy/fQ0iRJ7xpiICpWWXtr6zItDIGMjwefwh/AoMoh9DcgvOKxPS0HdKFeHdm6v0eg
+         kadw==
+X-Gm-Message-State: AOJu0Yw4jYf3gVEHIbK2aclK/kICDPqHWMRYmPCspeX1JEnsQNscqZ0B
+	WiVOPxEQWaR3ssH2+cIE1/0ZmtJlxDxLJAKc6bTTpAVkAqM33Khwrnj6q/g1vB//
+X-Gm-Gg: ASbGncux1g9lBcBiau30JQh5YYEYf9TPARmi1u+AdWIVCr8aftduSRVUOzRqmhakrJP
+	NAHKfspjB7yH0MO1PfA4LXC7ec1f11Dwxap52PO34+tFKt7k1CgL4XOhkHZp3YStfj3D/FdaF2S
+	K5Q29gHiXDX6c97yPmNugj7PWuFD+9rX3yMuwcgl+mfM7e3TJQeoBGcYhHiBw4sldKYXc0/ZC70
+	fVY3PGkIDMiyWAdR9XD9CJfV2hJ6J8VXijlpeCIIPBeXXDJhvRCf56vOf8LxWRJJs+/r7LzEiJR
+	Xlmuo9EFrPXuPzG+3rRRsuFmwYQfiv2B/NpYyupE1J0EgywCZvNdorJUEhAC7/3+DiLMLmbBoez
+	gRpTa5FhuVBbmNtT9ZVMpeCFagIOdcJP502/E/QpCC1mwZpJeAmlC23Q5i4djdj9M7jaOu+7z7Y
+	6n5fAvJdz3/DVvFQ==
+X-Google-Smtp-Source: AGHT+IGpjies92rU49anKzU0onTRG8nEu992kQjreCTDqNfaM3X83KQw/Qborf6K0pmk1PWlLOHYbQ==
+X-Received: by 2002:a05:6102:5c11:b0:5b8:e08f:eb38 with SMTP id ada2fe7eead31-5d5d4ddfb86mr1942765137.14.1759876330106;
+        Tue, 07 Oct 2025 15:32:10 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-92eb4da21c3sm3859567241.7.2025.10.07.15.32.04
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-92eb4da21c3sm3859567241.7.2025.10.07.15.32.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Oct 2025 15:32:06 -0700 (PDT)
+        Tue, 07 Oct 2025 15:32:08 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 1/8] Bluetooth: HCI: Add initial support for PAST
-Date: Tue,  7 Oct 2025 18:31:48 -0400
-Message-ID: <20251007223155.1539954-1-luiz.dentz@gmail.com>
+Subject: [PATCH v3 2/8] Bluetooth: hci_core: Introduce HCI_CONN_FLAG_PAST
+Date: Tue,  7 Oct 2025 18:31:49 -0400
+Message-ID: <20251007223155.1539954-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251007223155.1539954-1-luiz.dentz@gmail.com>
+References: <20251007223155.1539954-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -72,352 +77,110 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds PAST related commands (HCI_OP_LE_PAST,
-HCI_OP_LE_PAST_SET_INFO and HCI_OP_LE_PAST_PARAMS) and events
-(HCI_EV_LE_PAST_RECEIVED) along with handling of PAST sender and
-receiver features bits including new MGMG settings (
-HCI_EV_LE_PAST_RECEIVED and MGMT_SETTING_PAST_RECEIVER) which
-userspace can use to determine if PAST is supported by the
-controller.
+This introduces a new device flag so userspace can indicate if it
+wants to enable PAST Receiver for a specific device.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci.h      | 54 ++++++++++++++++++++++
- include/net/bluetooth/hci_core.h | 12 +++++
- include/net/bluetooth/mgmt.h     |  2 +
- net/bluetooth/hci_event.c        | 79 ++++++++++++++++++++++++++++----
- net/bluetooth/hci_sync.c         |  3 ++
- net/bluetooth/iso.c              | 25 ++++++++++
- net/bluetooth/mgmt.c             | 12 +++++
- 7 files changed, 177 insertions(+), 10 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_sync.c         | 55 +++++++++++++++++++++++++++++++-
+ 2 files changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 8d0e703bc929..a998f8edbb53 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -647,6 +647,8 @@ enum {
- #define HCI_LE_EXT_ADV			0x10
- #define HCI_LE_PERIODIC_ADV		0x20
- #define HCI_LE_CHAN_SEL_ALG2		0x40
-+#define HCI_LE_PAST_SENDER		0x01
-+#define HCI_LE_PAST_RECEIVER		0x02
- #define HCI_LE_CIS_CENTRAL		0x10
- #define HCI_LE_CIS_PERIPHERAL		0x20
- #define HCI_LE_ISO_BROADCASTER		0x40
-@@ -2068,6 +2070,44 @@ struct hci_cp_le_set_privacy_mode {
- 	__u8  mode;
- } __packed;
- 
-+#define HCI_OP_LE_PAST			0x205a
-+struct hci_cp_le_past {
-+	__le16 handle;
-+	__le16 service_data;
-+	__le16 sync_handle;
-+} __packed;
-+
-+struct hci_rp_le_past {
-+	__u8   status;
-+	__le16 handle;
-+} __packed;
-+
-+#define HCI_OP_LE_PAST_SET_INFO		0x205b
-+struct hci_cp_le_past_set_info {
-+	__le16 handle;
-+	__le16 service_data;
-+	__u8   adv_handle;
-+} __packed;
-+
-+struct hci_rp_le_past_set_info {
-+	__u8   status;
-+	__le16 handle;
-+} __packed;
-+
-+#define HCI_OP_LE_PAST_PARAMS		0x205c
-+struct hci_cp_le_past_params {
-+	__le16  handle;
-+	__u8    mode;
-+	__le16  skip;
-+	__le16  sync_timeout;
-+	__u8    cte_type;
-+} __packed;
-+
-+struct hci_rp_le_past_params {
-+	__u8   status;
-+	__le16 handle;
-+} __packed;
-+
- #define HCI_OP_LE_READ_BUFFER_SIZE_V2	0x2060
- struct hci_rp_le_read_buffer_size_v2 {
- 	__u8    status;
-@@ -2795,6 +2835,20 @@ struct hci_evt_le_ext_adv_set_term {
- 	__u8	num_evts;
- } __packed;
- 
-+#define HCI_EV_LE_PAST_RECEIVED		0x18
-+struct hci_ev_le_past_received {
-+	__u8   status;
-+	__le16 handle;
-+	__le16 service_data;
-+	__le16 sync_handle;
-+	__u8   sid;
-+	__u8   bdaddr_type;
-+	bdaddr_t  bdaddr;
-+	__u8   phy;
-+	__le16 interval;
-+	__u8   clock_accuracy;
-+} __packed;
-+
- #define HCI_EVT_LE_CIS_ESTABLISHED	0x19
- struct hci_evt_le_cis_established {
- 	__u8  status;
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2924c2bf2a98..894e01717b55 100644
+index 894e01717b55..2a765a0521b4 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -2045,6 +2045,18 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define sync_recv_capable(dev) \
- 	((dev)->le_features[3] & HCI_LE_ISO_SYNC_RECEIVER)
- #define sync_recv_enabled(dev) (le_enabled(dev) && sync_recv_capable(dev))
-+#define past_sender_capable(dev) \
-+	((dev)->le_features[3] & HCI_LE_PAST_SENDER)
-+#define past_receiver_capable(dev) \
-+	((dev)->le_features[3] & HCI_LE_PAST_RECEIVER)
-+#define past_capable(dev) \
-+	(past_sender_capable(dev) || past_receiver_capable(dev))
-+#define past_sender_enabled(dev) \
-+	(le_enabled(dev) && past_sender_capable(dev))
-+#define past_receiver_enabled(dev) \
-+	(le_enabled(dev) && past_receiver_capable(dev))
-+#define past_enabled(dev) \
-+	(past_sender_enabled(dev) || past_receiver_enabled(dev))
+@@ -166,6 +166,7 @@ enum hci_conn_flags {
+ 	HCI_CONN_FLAG_REMOTE_WAKEUP = BIT(0),
+ 	HCI_CONN_FLAG_DEVICE_PRIVACY = BIT(1),
+ 	HCI_CONN_FLAG_ADDRESS_RESOLUTION = BIT(2),
++	HCI_CONN_FLAG_PAST = BIT(3),
+ };
+ typedef u8 hci_conn_flags_t;
  
- #define mws_transport_config_capable(dev) (((dev)->commands[30] & 0x08) && \
- 	(!hci_test_quirk((dev), HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG)))
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 74edea06985b..bf2b82f111ca 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -119,6 +119,8 @@ struct mgmt_rp_read_index_list {
- #define MGMT_SETTING_ISO_BROADCASTER	BIT(20)
- #define MGMT_SETTING_ISO_SYNC_RECEIVER	BIT(21)
- #define MGMT_SETTING_LL_PRIVACY		BIT(22)
-+#define MGMT_SETTING_PAST_SENDER	BIT(23)
-+#define MGMT_SETTING_PAST_RECEIVER	BIT(24)
- 
- #define MGMT_OP_READ_INFO		0x0004
- #define MGMT_READ_INFO_SIZE		0
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 1dabf5a7ae18..f1735a7e48a7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5903,6 +5903,71 @@ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
-+static int hci_le_pa_term_sync(struct hci_dev *hdev, __le16 handle)
-+{
-+	struct hci_cp_le_pa_term_sync cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = handle;
-+
-+	return hci_send_cmd(hdev, HCI_OP_LE_PA_TERM_SYNC, sizeof(cp), &cp);
-+}
-+
-+static void hci_le_past_received_evt(struct hci_dev *hdev, void *data,
-+				     struct sk_buff *skb)
-+{
-+	struct hci_ev_le_past_received *ev = data;
-+	int mask = hdev->link_mode;
-+	__u8 flags = 0;
-+	struct hci_conn *pa_sync, *conn;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
-+
-+	hci_dev_lock(hdev);
-+
-+	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
-+
-+	conn = hci_conn_hash_lookup_create_pa_sync(hdev);
-+	if (!conn) {
-+		bt_dev_err(hdev,
-+			   "Unable to find connection for dst %pMR sid 0x%2.2x",
-+			   &ev->bdaddr, ev->sid);
-+		goto unlock;
-+	}
-+
-+	conn->sync_handle = le16_to_cpu(ev->sync_handle);
-+	conn->sid = HCI_SID_INVALID;
-+
-+	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, PA_LINK,
-+				      &flags);
-+	if (!(mask & HCI_LM_ACCEPT)) {
-+		hci_le_pa_term_sync(hdev, ev->sync_handle);
-+		goto unlock;
-+	}
-+
-+	if (!(flags & HCI_PROTO_DEFER))
-+		goto unlock;
-+
-+	/* Add connection to indicate PA sync event */
-+	pa_sync = hci_conn_add_unset(hdev, PA_LINK, BDADDR_ANY,
-+				     HCI_ROLE_SLAVE);
-+
-+	if (IS_ERR(pa_sync))
-+		goto unlock;
-+
-+	pa_sync->sync_handle = le16_to_cpu(ev->sync_handle);
-+
-+	if (ev->status) {
-+		set_bit(HCI_CONN_PA_SYNC_FAILED, &pa_sync->flags);
-+
-+		/* Notify iso layer */
-+		hci_connect_cfm(pa_sync, ev->status);
-+	}
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_le_conn_update_complete_evt(struct hci_dev *hdev, void *data,
- 					    struct sk_buff *skb)
- {
-@@ -6379,16 +6444,6 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
--static int hci_le_pa_term_sync(struct hci_dev *hdev, __le16 handle)
--{
--	struct hci_cp_le_pa_term_sync cp;
--
--	memset(&cp, 0, sizeof(cp));
--	cp.handle = handle;
--
--	return hci_send_cmd(hdev, HCI_OP_LE_PA_TERM_SYNC, sizeof(cp), &cp);
--}
--
- static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
- 					   struct sk_buff *skb)
- {
-@@ -7180,6 +7235,10 @@ static const struct hci_le_ev {
- 	/* [0x12 = HCI_EV_LE_EXT_ADV_SET_TERM] */
- 	HCI_LE_EV(HCI_EV_LE_EXT_ADV_SET_TERM, hci_le_ext_adv_term_evt,
- 		  sizeof(struct hci_evt_le_ext_adv_set_term)),
-+	/* [0x18 = HCI_EVT_LE_PAST_RECEIVED] */
-+	HCI_LE_EV(HCI_EV_LE_PAST_RECEIVED,
-+		  hci_le_past_received_evt,
-+		  sizeof(struct hci_ev_le_past_received)),
- 	/* [0x19 = HCI_EVT_LE_CIS_ESTABLISHED] */
- 	HCI_LE_EV(HCI_EVT_LE_CIS_ESTABLISHED, hci_le_cis_established_evt,
- 		  sizeof(struct hci_evt_le_cis_established)),
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 28ad08cd7d70..277b2c096195 100644
+index 277b2c096195..5051413f1a97 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -4393,6 +4393,9 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
- 	if (ext_adv_capable(hdev))
- 		events[2] |= 0x02;	/* LE Advertising Set Terminated */
+@@ -4324,6 +4324,10 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
+ 	if (ll_privacy_capable(hdev))
+ 		hdev->conn_flags |= HCI_CONN_FLAG_ADDRESS_RESOLUTION;
  
-+	if (past_receiver_capable(hdev))
-+		events[2] |= 0x80;	/* LE PAST Received */
++	/* Mark PAST if supported */
++	if (past_capable(hdev))
++		hdev->conn_flags |= HCI_CONN_FLAG_PAST;
 +
- 	if (cis_capable(hdev)) {
- 		events[3] |= 0x01;	/* LE CIS Established */
- 		if (cis_peripheral_capable(hdev))
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 954e1916506b..7f66f287c14e 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -80,6 +80,7 @@ static struct bt_iso_qos default_qos;
- static bool check_ucast_qos(struct bt_iso_qos *qos);
- static bool check_bcast_qos(struct bt_iso_qos *qos);
- static bool iso_match_sid(struct sock *sk, void *data);
-+static bool iso_match_sid_past(struct sock *sk, void *data);
- static bool iso_match_sync_handle(struct sock *sk, void *data);
- static bool iso_match_sync_handle_pa_report(struct sock *sk, void *data);
- static void iso_sock_disconn(struct sock *sk);
-@@ -2084,6 +2085,16 @@ static bool iso_match_sid(struct sock *sk, void *data)
- 	return ev->sid == iso_pi(sk)->bc_sid;
+ 	/* If the controller supports Extended Scanner Filter
+ 	 * Policies, enable the corresponding event.
+ 	 */
+@@ -7024,10 +7028,41 @@ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
+ 	hci_dev_unlock(hdev);
  }
  
-+static bool iso_match_sid_past(struct sock *sk, void *data)
++static int hci_le_past_params_sync(struct hci_dev *hdev, struct hci_conn *conn,
++				   struct hci_conn *acl, struct bt_iso_qos *qos)
 +{
-+	struct hci_ev_le_past_received *ev = data;
++	struct hci_cp_le_past_params cp;
++	int err;
 +
-+	if (iso_pi(sk)->bc_sid == HCI_SID_INVALID)
-+		return true;
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = cpu_to_le16(acl->handle);
++	/* An HCI_LE_Periodic_Advertising_Sync_Transfer_Received event is sent
++	 * to the Host. HCI_LE_Periodic_Advertising_Report events will be
++	 * enabled with duplicate filtering enabled.
++	 */
++	cp.mode = 0x03;
++	cp.skip = cpu_to_le16(qos->bcast.skip);
++	cp.sync_timeout = cpu_to_le16(qos->bcast.sync_timeout);
++	cp.cte_type = qos->bcast.sync_cte_type;
 +
-+	return ev->sid == iso_pi(sk)->bc_sid;
++	/* HCI_LE_PAST_PARAMS command returns a command complete event so it
++	 * cannot wait for HCI_EV_LE_PAST_RECEIVED.
++	 */
++	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_PAST_PARAMS,
++				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++	if (err)
++		return err;
++
++	/* Wait for HCI_EV_LE_PAST_RECEIVED event */
++	return __hci_cmd_sync_status_sk(hdev, HCI_OP_NOP, 0, NULL,
++					HCI_EV_LE_PAST_RECEIVED,
++					conn->conn_timeout, NULL);
 +}
 +
- static bool iso_match_sync_handle(struct sock *sk, void *data)
+ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
  {
- 	struct hci_evt_le_big_info_adv_report *ev = data;
-@@ -2103,6 +2114,7 @@ static bool iso_match_sync_handle_pa_report(struct sock *sk, void *data)
- int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- {
- 	struct hci_ev_le_pa_sync_established *ev1;
-+	struct hci_ev_le_past_received *ev1a;
- 	struct hci_evt_le_big_info_adv_report *ev2;
- 	struct hci_ev_le_per_adv_report *ev3;
- 	struct sock *sk;
-@@ -2116,6 +2128,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 	 * SID to listen to and once sync is established its handle needs to
- 	 * be stored in iso_pi(sk)->sync_handle so it can be matched once
- 	 * receiving the BIG Info.
-+	 * 1a. HCI_EV_LE_PAST_RECEIVED: alternative to 1.
- 	 * 2. HCI_EVT_LE_BIG_INFO_ADV_REPORT: When connect_ind is triggered by a
- 	 * a BIG Info it attempts to check if there any listening socket with
- 	 * the same sync_handle and if it does then attempt to create a sync.
-@@ -2135,6 +2148,18 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 		goto done;
- 	}
+ 	struct hci_cp_le_pa_create_sync cp;
+-	struct hci_conn *conn = data;
++	struct hci_conn *conn = data, *le;
+ 	struct bt_iso_qos *qos = &conn->iso_qos;
+ 	int err;
  
-+	ev1a = hci_recv_event_data(hdev, HCI_EV_LE_PAST_RECEIVED);
-+	if (ev1a) {
-+		sk = iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
-+				  iso_match_sid_past, ev1a);
-+		if (sk && !ev1a->status) {
-+			iso_pi(sk)->sync_handle = le16_to_cpu(ev1a->sync_handle);
-+			iso_pi(sk)->bc_sid = ev1a->sid;
-+		}
+@@ -7059,6 +7094,24 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
+ 
+ 	hci_update_passive_scan_sync(hdev);
+ 
++	/* Check if PAST is possible:
++	 *
++	 * 1. Check if an ACL connection with the destination address exists
++	 * 2. Check if that HCI_CONN_FLAG_PAST has been set which indicates that
++	 *    user really intended to use PAST.
++	 */
++	le = hci_conn_hash_lookup_le(hdev, &conn->dst, conn->dst_type);
++	if (le) {
++		struct hci_conn_params *params;
 +
-+		goto done;
++		params = hci_conn_params_lookup(hdev, &le->dst, le->dst_type);
++		if (params && params->flags & HCI_CONN_FLAG_PAST) {
++			err = hci_le_past_params_sync(hdev, conn, le, qos);
++			if (!err)
++				goto done;
++		}
 +	}
 +
- 	ev2 = hci_recv_event_data(hdev, HCI_EVT_LE_BIG_INFO_ADV_REPORT);
- 	if (ev2) {
- 		/* Check if BIGInfo report has already been handled */
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a3d16eece0d2..4b7cab707d69 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -852,6 +852,12 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 	if (ll_privacy_capable(hdev))
- 		settings |= MGMT_SETTING_LL_PRIVACY;
- 
-+	if (past_sender_capable(hdev))
-+		settings |= MGMT_SETTING_PAST_SENDER;
-+
-+	if (past_receiver_capable(hdev))
-+		settings |= MGMT_SETTING_PAST_RECEIVER;
-+
- 	settings |= MGMT_SETTING_PHY_CONFIGURATION;
- 
- 	return settings;
-@@ -937,6 +943,12 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	if (ll_privacy_enabled(hdev))
- 		settings |= MGMT_SETTING_LL_PRIVACY;
- 
-+	if (past_sender_enabled(hdev))
-+		settings |= MGMT_SETTING_PAST_SENDER;
-+
-+	if (past_receiver_enabled(hdev))
-+		settings |= MGMT_SETTING_PAST_RECEIVER;
-+
- 	return settings;
- }
- 
+ 	/* SID has not been set listen for HCI_EV_LE_EXT_ADV_REPORT to update
+ 	 * it.
+ 	 */
 -- 
 2.51.0
 
