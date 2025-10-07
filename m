@@ -1,69 +1,69 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537142E093E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Oct 2025 14:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E190A1CF96
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Oct 2025 14:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759848593; cv=none; b=P86nk2UxhWgvyAmjlPZ/OF4soGGrcQfRfhOeAt5o7jJ6OadMlcZazGjNnkWUFcmOTHonx4nOgMAZ16Gd92povn2gtj+OrRptjh67yrIgexPYfRVOCbM9IIYrKPIwT7LZO5vNvH1rJckJ3O+cbEogFZnh2B4RjGTi99tgIw/ofns=
+	t=1759848594; cv=none; b=tGsp914oDs2xJi+UkjoDBufkgdCDs6O5O6boRFUdFXNNUXaqHy9Lu1pHtaHc3fKxz0yxVpsCOYZzBehseLLixlfC3h3eg3z5fVV/iLJXM5uiAQqVe46myDaoH8BSsHIU3PFEFAyLkm7Ye5Obx9jLlTjs3aillF0OtPjEg19Htkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759848593; c=relaxed/simple;
-	bh=em72GBZ9B9fgzuzmFMSUemqXMsOXxM47u0RyLVWpda8=;
+	s=arc-20240116; t=1759848594; c=relaxed/simple;
+	bh=rxmLxYBSPEquvgD1yTuUu9zVLsvt02rIY2rqHBXTVHA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ibRJpvtAsAa9DAEAY9Cc09/BdENSZAieFc5B8NyM1CK0PpjzWds/Kqr+XJsHvGINMQkVQQLPfh0nAvbMHwiu3A/YgUVsDHDRTqU2Hc2BvJA+rx7S1/jXjaFHchqRTWPlPEq8RX8cQCnp+0rmXKDOEB2ZZQEdb6E5qtFEYMI8Zmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZJTp9TSt; arc=none smtp.client-ip=209.85.221.176
+	 MIME-Version; b=aqA1INDuyE3dfPQaxX8DBAirJW3C+lk+LUt+UQ/vSWJGR7P/hAVoNIc2aV1PhSxNRIYHuk5i0Z8rmLk9JYuSeKEcDc8qIyUxMdz/3Vqvt9OxXznEi0beKbnStV0BYJVRot68bezFdpmNPqvHS1ZGWtr/MuOpTVOvELvWEwoWL3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NHgIz31P; arc=none smtp.client-ip=209.85.221.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZJTp9TSt"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-554a627a257so505977e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Oct 2025 07:49:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NHgIz31P"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-54a80b26f88so2462835e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Oct 2025 07:49:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759848589; x=1760453389; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1759848591; x=1760453391; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jMKU29f+BPJY+GGpOcKT46vnVoRx9HHGgycxJmZFv50=;
-        b=ZJTp9TSteSaeTgZdoTOJU62qOlVLZurmx6jJgVXp38fzoXyMorUAlBVVNcXeEHsDvY
-         vtu+WpTGcPihDJV+rn6u/hKQwRCPf2eWOTw04hzKDpr3eClf9EJCIFrAUuCa+Vk7m1Kd
-         mdh9fuqe5HCrqEH0khGRAVSzB9/nGp5cbdTOB53agUI4Z81dXO4WYLtwThSwAHODw/8e
-         O9dvb7cFkb+53y/QgoKyxTgn5eH08y+79mAF3fHCYvCneWieLSVgX9mNhR3N0KU2Mq5z
-         6CbPfTz5p1SJ0+fwOYZYbIKXLx70UcXPsUQNKkOIeCAMwb3sVdRLhPJWPiiNpDf+cGyd
-         o4Jg==
+        bh=AKnoWh6BYCQ9tOyfjv/tkYKUuXlQmomm00kWmj4R2PM=;
+        b=NHgIz31PN5CgrUnFf8iouvuQmcPAK6bfYqNZIco2/J8UHacpFyehL95DBYY9jdhTSK
+         2fQIjXKpHIVXuHhSJWOs94QVEbAVnGMT5J9rUSpGkhqPOwfAZaMgZ95XZRL+EOmcCEKq
+         kov+FCpkE+/ZlY20EtlaFmZcbjmN39h74jVXRf4PpmopomRbYS8o6XV0je8rNXDnEn5s
+         PpJaOQ+z2U0pUtK8o5yZpZrwK0YtWw6Zn0Sus46Iz2pOQilA4KNmnYzLrZgcf4eg7utU
+         joI+YKqnK+MJYhR5nMkfdtsINSrYoYmaTi6Ee2STSs+ghOPpo53EkH4p5RsgmwEgPS9g
+         fllA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759848589; x=1760453389;
+        d=1e100.net; s=20230601; t=1759848591; x=1760453391;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jMKU29f+BPJY+GGpOcKT46vnVoRx9HHGgycxJmZFv50=;
-        b=dIpAg48etAQxF2qDTnD3ccPePKKNXDmIexA7Xaclbm0xrGxFV/cMcn1zzp1vWFoEGO
-         YtVCoR0edXwt879wOLjfu0Rli8cCDVrNKiieWzWbXi52Dbe7P8pzkNr4ZcoHbD1WIoFH
-         px/sVREzSCcZJ8a//XHb8+bbF5s8CjtfHbakEq1HQYTEUugACLza20vCFc1gqfz2J0zQ
-         ntdbPgtZtTUS1gxTR8Ad8r8cSBmwhbzCbyLxCV/Vi2a3Pq6uAvjgSOq1Sut2OPAau7OB
-         JX/kGMCb3ImsOac9qmwVjmpML9y9NpddtTAhqEea5OHpk0ShXUi5GSaPN18YA2BXC00f
-         hOfg==
-X-Gm-Message-State: AOJu0Yw7qmZwNHJ+14LBuCxSGPbBao+E9ptcskvkh//eAh8cbv+IYLpY
-	gmcKditSRDTJdKhppKsGbiCjZ/oGs/GiiByBoXkdlIRbUHJv+VMurVicJGuUFw==
-X-Gm-Gg: ASbGncts1VjdpN+lxmGTjYvnq3XByGzI5q9CD28JUlLh3tKqFro61w3JMO0Kp98Nm1e
-	FIoIDDobioNYtX1EwqR6BxtjQ3SwtBnK2bYpgorXHmBEx6To48IyP9CSldASoeqIcyPdYDavRUW
-	qknM2PmXfT5O2FGeduakqAlWbCyiGbW1BEBlr8qar7DkaaYHnP+9vTtblkbr+ADi3dYkgUJ0tvG
-	bBfoogKNYaLNOMUHkEnMxxLm+cTcu/tkHu1RUv6bWzvSKnLwgZoGyy6lOn5/rjwDIOUAe8Ffd0r
-	kXTF37A87rU4WDavKrw1WYNzeEauEywfxrkDoaAAUUwd4Yyvc9AwPAydC4v83Re4132/6ZHyXWs
-	3IhSHtfDpizfAkFzGFmGTpilX1Kiur/cOBI9+Q3HpPjVvYHlpuMQtA+N/rG8geEDEcKtGaRDJI6
-	jmGsIL5+8pwXLlJg==
-X-Google-Smtp-Source: AGHT+IFKzw6T+ik1k+rs40lUbgPD55K/vpycYlJiISa4swmfEuLrNyAjFTJpSleAUk7a2ls3n2/MnA==
-X-Received: by 2002:a05:6122:d29:b0:554:afe3:1fb1 with SMTP id 71dfb90a1353d-554afe32079mr1026990e0c.14.1759848589335;
-        Tue, 07 Oct 2025 07:49:49 -0700 (PDT)
+        bh=AKnoWh6BYCQ9tOyfjv/tkYKUuXlQmomm00kWmj4R2PM=;
+        b=fxVaev14E7rsukR+ojqLRq0cteB8wzvUVuZjNEedBOkB7UKL3FLg9hm/oICLU3I6O8
+         legyWDEdi7MR/PDVEgDlX6ytV+vxVEqsxknvfpIG0KVlPTOe6lRzvns01l1E87Q+VUMr
+         slxq1OYLqPdkAuvziscqoBgfigRB35WQZT4n0ST+i2wvXDOWKJgi8eLUPMTP63RpU730
+         W2hRfCsiTpSgS0NUtgVON70HPOW7i0xDMa/F4OsDoX2ino6i02evyJ0GyMK1jGZLSwSj
+         LPysXenTTdAUOnVsGzeZMpjjKrptTL5ng89kOiTL4uOL7VdMhDm81woUEr856DKKK4od
+         OPvg==
+X-Gm-Message-State: AOJu0YzCz9o0acBhrarOR7L57OZikiz0M/hpCO47H9fD/9dB3YrMohEX
+	hKHRMcrz23x+fMkP6q2nXXcfS0IUiAWq1ieKhGss+3AafMfE6MDioheetsp93w==
+X-Gm-Gg: ASbGncsRY4koLMGiVg7pc+SHfXiT8EHHXVcgLHvzQ86G4iy6LIvV0woDXUGQ7/RfCpO
+	sLLQEN7UxJMkxANgYYcFNO5CuRnOiwuHu9xg5QFM+R+bn1OsoGhfsShfqKPAPdFptHf1ORwesiK
+	M1qLufNcMyQiqo3GHWdsn4VFxVhzBwwiB/7GDSgfntEPmwUgzkS30Rd5Mv7o57t5fC/Okd0HBVJ
+	tBI7438mACBMaBuVy/pFSESkZEWlvhadjmWv12aiEQ7K6Q6rTZg+JJSJEW1FBYgocHccieOAY38
+	vZFdXeafH1WNZcsx5cOTNsDEOoaHTns+FAclb9kddrDlW9WfO8d7dRRUlqCPx4ZsjQ8Au/WZEAC
+	5VYaoyQjJA0FYQ8/cs0W1k7LZHv/9uwHhC867Z/XDJdOv2pdfCWRwpmiZHdqekjm80enJwvjTMt
+	bsDHdnjqUXt4kA8m5Ds+/PY09h
+X-Google-Smtp-Source: AGHT+IFEsTr9QPGEQer0TU68RCNDHZssD8lIAGiDaRlj6OKz5aiS3Vlbxjv+8Cy/xw7UZ3BiTbLhug==
+X-Received: by 2002:a05:6122:32c5:b0:54a:92f1:f9e4 with SMTP id 71dfb90a1353d-5524ea0edb6mr5618095e0c.9.1759848591118;
+        Tue, 07 Oct 2025 07:49:51 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5523ce64af0sm3731864e0c.8.2025.10.07.07.49.47
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5523ce64af0sm3731864e0c.8.2025.10.07.07.49.49
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Oct 2025 07:49:47 -0700 (PDT)
+        Tue, 07 Oct 2025 07:49:50 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/7] Bluetooth: HCI: Always use the identity address when initializing a connection
-Date: Tue,  7 Oct 2025 10:49:27 -0400
-Message-ID: <20251007144930.1378274-4-luiz.dentz@gmail.com>
+Subject: [PATCH v2 5/7] Bluetooth: ISO: Attempt to resolve broadcast address
+Date: Tue,  7 Oct 2025 10:49:28 -0400
+Message-ID: <20251007144930.1378274-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251007144930.1378274-1-luiz.dentz@gmail.com>
 References: <20251007144930.1378274-1-luiz.dentz@gmail.com>
@@ -77,296 +77,196 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes sure hci_conn is initialized with the identity address if
-a matching IRK exists which avoids the trouble of having to do it at
-multiple places which seems to be missing (e.g. CIS, BIS and PA).
+Broadcasters maybe using RPAs which can change over time and not
+matching the address used as destination in the socket, so this
+attempts to resolve the addresses then match with the socket
+address, in case that uses an indentity address, or then match the
+IRKs if both broadcaster and socket are using RPAs.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  4 +--
- net/bluetooth/hci_conn.c         | 43 ++++++++++++++++++++------------
- net/bluetooth/hci_event.c        | 20 +++++++--------
- net/bluetooth/hci_sync.c         |  2 +-
- 4 files changed, 40 insertions(+), 29 deletions(-)
+ net/bluetooth/iso.c | 58 ++++++++++++++++++++++++++++++---------------
+ 1 file changed, 39 insertions(+), 19 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2a765a0521b4..c1889e1aa477 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1563,9 +1563,9 @@ int hci_le_create_cis_pending(struct hci_dev *hdev);
- int hci_conn_check_create_cis(struct hci_conn *conn);
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index d4c8772152bd..83cda8dad4d8 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -87,8 +87,8 @@ static void iso_sock_disconn(struct sock *sk);
  
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
--			      u8 role, u16 handle);
-+			      u8 dst_type, u8 role, u16 handle);
- struct hci_conn *hci_conn_add_unset(struct hci_dev *hdev, int type,
--				    bdaddr_t *dst, u8 role);
-+				    bdaddr_t *dst, u8 dst_type, u8 role);
- void hci_conn_del(struct hci_conn *conn);
- void hci_conn_hash_flush(struct hci_dev *hdev);
+ typedef bool (*iso_sock_match_t)(struct sock *sk, void *data);
  
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 111f0e37b672..88485b6aeedc 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -911,10 +911,12 @@ static int hci_conn_hash_alloc_unset(struct hci_dev *hdev)
- 			       U16_MAX, GFP_ATOMIC);
- }
+-static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
+-				 enum bt_sock_state state,
++static struct sock *iso_get_sock(struct hci_dev *hdev, bdaddr_t *src,
++				 bdaddr_t *dst, enum bt_sock_state state,
+ 				 iso_sock_match_t match, void *data);
  
--static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type,
-+				       bdaddr_t *dst, u8 dst_type,
- 				       u8 role, u16 handle)
+ /* ---- ISO timers ---- */
+@@ -638,8 +638,8 @@ static struct sock *__iso_get_sock_listen_by_sid(bdaddr_t *ba, bdaddr_t *bc,
+  * match func data - pass -1 to ignore
+  * Returns closest match.
+  */
+-static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
+-				 enum bt_sock_state state,
++static struct sock *iso_get_sock(struct hci_dev *hdev, bdaddr_t *src,
++				 bdaddr_t *dst, enum bt_sock_state state,
+ 				 iso_sock_match_t match, void *data)
  {
- 	struct hci_conn *conn;
-+	struct smp_irk *irk = NULL;
+ 	struct sock *sk = NULL, *sk1 = NULL;
+@@ -651,8 +651,25 @@ static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
+ 			continue;
  
- 	switch (type) {
- 	case ACL_LINK:
-@@ -926,12 +928,14 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
- 	case PA_LINK:
- 		if (!hdev->iso_mtu)
- 			return ERR_PTR(-ECONNREFUSED);
-+		irk = hci_get_irk(hdev, dst, dst_type);
- 		break;
- 	case LE_LINK:
- 		if (hdev->le_mtu && hdev->le_mtu < HCI_MIN_LE_MTU)
- 			return ERR_PTR(-ECONNREFUSED);
- 		if (!hdev->le_mtu && hdev->acl_mtu < HCI_MIN_LE_MTU)
- 			return ERR_PTR(-ECONNREFUSED);
-+		irk = hci_get_irk(hdev, dst, dst_type);
- 		break;
- 	case SCO_LINK:
- 	case ESCO_LINK:
-@@ -949,7 +953,15 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
- 	if (!conn)
- 		return ERR_PTR(-ENOMEM);
- 
--	bacpy(&conn->dst, dst);
-+	/* If and IRK exists use its identity address */
-+	if (!irk) {
-+		bacpy(&conn->dst, dst);
-+		conn->dst_type = dst_type;
-+	} else {
-+		bacpy(&conn->dst, &irk->bdaddr);
-+		conn->dst_type = irk->addr_type;
-+	}
+ 		/* Match Broadcast destination */
+-		if (bacmp(dst, BDADDR_ANY) && bacmp(&iso_pi(sk)->dst, dst))
+-			continue;
++		if (bacmp(dst, BDADDR_ANY) && bacmp(&iso_pi(sk)->dst, dst)) {
++			struct smp_irk *irk1, *irk2;
 +
- 	bacpy(&conn->src, &hdev->bdaddr);
- 	conn->handle = handle;
- 	conn->hdev  = hdev;
-@@ -1047,7 +1059,7 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
- }
++			/* Check if destination is an RPA that we can resolve */
++			irk1 = hci_find_irk_by_rpa(hdev, dst);
++			if (!irk1)
++				continue;
++
++			/* Match with identity address */
++			if (bacmp(&iso_pi(sk)->dst, &irk1->bdaddr)) {
++				/* Check if socket destination address is also
++				 * an RPA and if the IRK matches.
++				 */
++				irk2 = hci_find_irk_by_rpa(hdev,
++							   &iso_pi(sk)->dst);
++				if (!irk2 || irk1 != irk2)
++					continue;
++			}
++		}
  
- struct hci_conn *hci_conn_add_unset(struct hci_dev *hdev, int type,
--				    bdaddr_t *dst, u8 role)
-+				    bdaddr_t *dst, u8 dst_type, u8 role)
- {
- 	int handle;
+ 		/* Use Match function if provided */
+ 		if (match && !match(sk, data))
+@@ -1992,6 +2009,7 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 	struct hci_ev_le_pa_sync_established *ev2 = NULL;
+ 	struct hci_ev_le_per_adv_report *ev3 = NULL;
+ 	struct hci_conn *hcon;
++	struct hci_dev *hdev;
  
-@@ -1057,16 +1069,16 @@ struct hci_conn *hci_conn_add_unset(struct hci_dev *hdev, int type,
- 	if (unlikely(handle < 0))
- 		return ERR_PTR(-ECONNREFUSED);
+ 	BT_DBG("conn %p", conn);
  
--	return __hci_conn_add(hdev, type, dst, role, handle);
-+	return __hci_conn_add(hdev, type, dst, dst_type, role, handle);
- }
+@@ -2002,13 +2020,15 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 		if (!hcon)
+ 			return;
  
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
--			      u8 role, u16 handle)
-+			      u8 dst_type, u8 role, u16 handle)
- {
- 	if (handle > HCI_CONN_HANDLE_MAX)
- 		return ERR_PTR(-EINVAL);
++		hdev = hcon->hdev;
++
+ 		if (test_bit(HCI_CONN_BIG_SYNC, &hcon->flags)) {
+ 			/* A BIS slave hcon is notified to the ISO layer
+ 			 * after the Command Complete for the LE Setup
+ 			 * ISO Data Path command is received. Get the
+ 			 * parent socket that matches the hcon BIG handle.
+ 			 */
+-			parent = iso_get_sock(&hcon->src, &hcon->dst,
++			parent = iso_get_sock(hdev, &hcon->src, &hcon->dst,
+ 					      BT_LISTEN, iso_match_big_hcon,
+ 					      hcon);
+ 		} else if (test_bit(HCI_CONN_BIG_SYNC_FAILED, &hcon->flags)) {
+@@ -2016,12 +2036,12 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 						 HCI_EVT_LE_BIG_SYNC_ESTABLISHED);
  
--	return __hci_conn_add(hdev, type, dst, role, handle);
-+	return __hci_conn_add(hdev, type, dst, dst_type, role, handle);
- }
- 
- static void hci_conn_cleanup_child(struct hci_conn *conn, u8 reason)
-@@ -1398,14 +1410,13 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	if (conn) {
- 		bacpy(&conn->dst, dst);
- 	} else {
--		conn = hci_conn_add_unset(hdev, LE_LINK, dst, role);
-+		conn = hci_conn_add_unset(hdev, LE_LINK, dst, dst_type, role);
- 		if (IS_ERR(conn))
- 			return conn;
- 		hci_conn_hold(conn);
- 		conn->pending_sec_level = sec_level;
- 	}
- 
--	conn->dst_type = dst_type;
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->conn_timeout = conn_timeout;
- 	conn->le_adv_phy = phy;
-@@ -1575,7 +1586,7 @@ static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
- 		     memcmp(conn->le_per_adv_data, base, base_len)))
- 		return ERR_PTR(-EADDRINUSE);
- 
--	conn = hci_conn_add_unset(hdev, BIS_LINK, dst, HCI_ROLE_MASTER);
-+	conn = hci_conn_add_unset(hdev, BIS_LINK, dst, 0, HCI_ROLE_MASTER);
- 	if (IS_ERR(conn))
- 		return conn;
- 
-@@ -1621,7 +1632,8 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 
- 	BT_DBG("requesting refresh of dst_addr");
- 
--	conn = hci_conn_add_unset(hdev, LE_LINK, dst, HCI_ROLE_MASTER);
-+	conn = hci_conn_add_unset(hdev, LE_LINK, dst, dst_type,
-+				  HCI_ROLE_MASTER);
- 	if (IS_ERR(conn))
- 		return conn;
- 
-@@ -1632,7 +1644,6 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 
- 	conn->state = BT_CONNECT;
- 	set_bit(HCI_CONN_SCANNING, &conn->flags);
--	conn->dst_type = dst_type;
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->pending_sec_level = sec_level;
- 	conn->conn_timeout = conn_timeout;
-@@ -1669,7 +1680,8 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 
- 	acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
- 	if (!acl) {
--		acl = hci_conn_add_unset(hdev, ACL_LINK, dst, HCI_ROLE_MASTER);
-+		acl = hci_conn_add_unset(hdev, ACL_LINK, dst, 0,
-+					 HCI_ROLE_MASTER);
- 		if (IS_ERR(acl))
- 			return acl;
- 	}
-@@ -1738,7 +1750,7 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 
- 	sco = hci_conn_hash_lookup_ba(hdev, type, dst);
- 	if (!sco) {
--		sco = hci_conn_add_unset(hdev, type, dst, HCI_ROLE_MASTER);
-+		sco = hci_conn_add_unset(hdev, type, dst, 0, HCI_ROLE_MASTER);
- 		if (IS_ERR(sco)) {
- 			hci_conn_drop(acl);
- 			return sco;
-@@ -1930,7 +1942,7 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
- 	cis = hci_conn_hash_lookup_cis(hdev, dst, dst_type, qos->ucast.cig,
- 				       qos->ucast.cis);
- 	if (!cis) {
--		cis = hci_conn_add_unset(hdev, CIS_LINK, dst,
-+		cis = hci_conn_add_unset(hdev, CIS_LINK, dst, dst_type,
- 					 HCI_ROLE_MASTER);
- 		if (IS_ERR(cis))
- 			return cis;
-@@ -2121,12 +2133,11 @@ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
- 
- 	bt_dev_dbg(hdev, "dst %pMR type %d sid %d", dst, dst_type, sid);
- 
--	conn = hci_conn_add_unset(hdev, PA_LINK, dst, HCI_ROLE_SLAVE);
-+	conn = hci_conn_add_unset(hdev, PA_LINK, dst, dst_type, HCI_ROLE_SLAVE);
- 	if (IS_ERR(conn))
- 		return conn;
- 
- 	conn->iso_qos = *qos;
--	conn->dst_type = dst_type;
- 	conn->sid = sid;
- 	conn->state = BT_LISTEN;
- 	conn->conn_timeout = msecs_to_jiffies(qos->bcast.sync_timeout * 10);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f1735a7e48a7..ba0a7b41611f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2267,7 +2267,7 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
- 	} else {
- 		if (!conn) {
- 			conn = hci_conn_add_unset(hdev, ACL_LINK, &cp->bdaddr,
--						  HCI_ROLE_MASTER);
-+						  0, HCI_ROLE_MASTER);
- 			if (IS_ERR(conn))
- 				bt_dev_err(hdev, "connection err: %ld", PTR_ERR(conn));
- 		}
-@@ -3123,7 +3123,8 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 						      &ev->bdaddr,
- 						      BDADDR_BREDR)) {
- 			conn = hci_conn_add_unset(hdev, ev->link_type,
--						  &ev->bdaddr, HCI_ROLE_SLAVE);
-+						  &ev->bdaddr, 0,
-+						  HCI_ROLE_SLAVE);
- 			if (IS_ERR(conn)) {
- 				bt_dev_err(hdev, "connection err: %ld", PTR_ERR(conn));
- 				goto unlock;
-@@ -3299,7 +3300,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
- 	conn = hci_conn_hash_lookup_ba(hdev, ev->link_type,
- 			&ev->bdaddr);
- 	if (!conn) {
--		conn = hci_conn_add_unset(hdev, ev->link_type, &ev->bdaddr,
-+		conn = hci_conn_add_unset(hdev, ev->link_type, &ev->bdaddr, 0,
- 					  HCI_ROLE_SLAVE);
- 		if (IS_ERR(conn)) {
- 			bt_dev_err(hdev, "connection err: %ld", PTR_ERR(conn));
-@@ -5660,14 +5661,13 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 		if (status)
- 			goto unlock;
- 
--		conn = hci_conn_add_unset(hdev, LE_LINK, bdaddr, role);
-+		conn = hci_conn_add_unset(hdev, LE_LINK, bdaddr, bdaddr_type,
-+					  role);
- 		if (IS_ERR(conn)) {
- 			bt_dev_err(hdev, "connection err: %ld", PTR_ERR(conn));
- 			goto unlock;
+ 			/* Get reference to PA sync parent socket, if it exists */
+-			parent = iso_get_sock(&hcon->src, &hcon->dst,
++			parent = iso_get_sock(hdev, &hcon->src, &hcon->dst,
+ 					      BT_LISTEN,
+ 					      iso_match_pa_sync_flag,
+ 					      NULL);
+ 			if (!parent && ev)
+-				parent = iso_get_sock(&hcon->src,
++				parent = iso_get_sock(hdev, &hcon->src,
+ 						      &hcon->dst,
+ 						      BT_LISTEN,
+ 						      iso_match_big, ev);
+@@ -2029,7 +2049,7 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 			ev2 = hci_recv_event_data(hcon->hdev,
+ 						  HCI_EV_LE_PA_SYNC_ESTABLISHED);
+ 			if (ev2)
+-				parent = iso_get_sock(&hcon->src,
++				parent = iso_get_sock(hdev, &hcon->src,
+ 						      &hcon->dst,
+ 						      BT_LISTEN,
+ 						      iso_match_sid, ev2);
+@@ -2037,7 +2057,7 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 			ev3 = hci_recv_event_data(hcon->hdev,
+ 						  HCI_EV_LE_PER_ADV_REPORT);
+ 			if (ev3)
+-				parent = iso_get_sock(&hcon->src,
++				parent = iso_get_sock(hdev, &hcon->src,
+ 						      &hcon->dst,
+ 						      BT_LISTEN,
+ 						      iso_match_sync_handle_pa_report,
+@@ -2045,7 +2065,7 @@ static void iso_conn_ready(struct iso_conn *conn)
  		}
  
--		conn->dst_type = bdaddr_type;
--
- 		/* If we didn't have a hci_conn object previously
- 		 * but we're in central role this must be something
- 		 * initiated using an accept list. Since accept list based
-@@ -5949,7 +5949,7 @@ static void hci_le_past_received_evt(struct hci_dev *hdev, void *data,
- 		goto unlock;
+ 		if (!parent)
+-			parent = iso_get_sock(&hcon->src, BDADDR_ANY,
++			parent = iso_get_sock(hdev, &hcon->src, BDADDR_ANY,
+ 					      BT_LISTEN, NULL, NULL);
  
- 	/* Add connection to indicate PA sync event */
--	pa_sync = hci_conn_add_unset(hdev, PA_LINK, BDADDR_ANY,
-+	pa_sync = hci_conn_add_unset(hdev, PA_LINK, BDADDR_ANY, 0,
- 				     HCI_ROLE_SLAVE);
+ 		if (!parent)
+@@ -2182,7 +2202,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	 */
+ 	ev1 = hci_recv_event_data(hdev, HCI_EV_LE_PA_SYNC_ESTABLISHED);
+ 	if (ev1) {
+-		sk = iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
++		sk = iso_get_sock(hdev, &hdev->bdaddr, bdaddr, BT_LISTEN,
+ 				  iso_match_sid, ev1);
+ 		if (sk && !ev1->status) {
+ 			iso_pi(sk)->sync_handle = le16_to_cpu(ev1->handle);
+@@ -2194,7 +2214,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
  
- 	if (IS_ERR(pa_sync))
-@@ -6482,7 +6482,7 @@ static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
- 		goto unlock;
+ 	ev1a = hci_recv_event_data(hdev, HCI_EV_LE_PAST_RECEIVED);
+ 	if (ev1a) {
+-		sk = iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
++		sk = iso_get_sock(hdev, &hdev->bdaddr, bdaddr, BT_LISTEN,
+ 				  iso_match_sid_past, ev1a);
+ 		if (sk && !ev1a->status) {
+ 			iso_pi(sk)->sync_handle = le16_to_cpu(ev1a->sync_handle);
+@@ -2207,7 +2227,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	ev2 = hci_recv_event_data(hdev, HCI_EVT_LE_BIG_INFO_ADV_REPORT);
+ 	if (ev2) {
+ 		/* Check if BIGInfo report has already been handled */
+-		sk = iso_get_sock(&hdev->bdaddr, bdaddr, BT_CONNECTED,
++		sk = iso_get_sock(hdev, &hdev->bdaddr, bdaddr, BT_CONNECTED,
+ 				  iso_match_sync_handle, ev2);
+ 		if (sk) {
+ 			sock_put(sk);
+@@ -2216,10 +2236,10 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 		}
  
- 	/* Add connection to indicate PA sync event */
--	pa_sync = hci_conn_add_unset(hdev, PA_LINK, BDADDR_ANY,
-+	pa_sync = hci_conn_add_unset(hdev, PA_LINK, BDADDR_ANY, 0,
- 				     HCI_ROLE_SLAVE);
+ 		/* Try to get PA sync socket, if it exists */
+-		sk = iso_get_sock(&hdev->bdaddr, bdaddr, BT_CONNECT2,
++		sk = iso_get_sock(hdev, &hdev->bdaddr, bdaddr, BT_CONNECT2,
+ 				  iso_match_sync_handle, ev2);
+ 		if (!sk)
+-			sk = iso_get_sock(&hdev->bdaddr, bdaddr,
++			sk = iso_get_sock(hdev, &hdev->bdaddr, bdaddr,
+ 					  BT_LISTEN,
+ 					  iso_match_sync_handle,
+ 					  ev2);
+@@ -2258,7 +2278,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 		u8 *base;
+ 		struct hci_conn *hcon;
  
- 	if (IS_ERR(pa_sync))
-@@ -6923,7 +6923,7 @@ static void hci_le_cis_req_evt(struct hci_dev *hdev, void *data,
+-		sk = iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
++		sk = iso_get_sock(hdev, &hdev->bdaddr, bdaddr, BT_LISTEN,
+ 				  iso_match_sync_handle_pa_report, ev3);
+ 		if (!sk)
+ 			goto done;
+@@ -2308,7 +2328,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 			hcon->le_per_adv_data_len = 0;
+ 		}
+ 	} else {
+-		sk = iso_get_sock(&hdev->bdaddr, BDADDR_ANY,
++		sk = iso_get_sock(hdev, &hdev->bdaddr, BDADDR_ANY,
+ 				  BT_LISTEN, NULL, NULL);
+ 	}
  
- 	cis = hci_conn_hash_lookup_handle(hdev, cis_handle);
- 	if (!cis) {
--		cis = hci_conn_add(hdev, CIS_LINK, &acl->dst,
-+		cis = hci_conn_add(hdev, CIS_LINK, &acl->dst, acl->dst_type,
- 				   HCI_ROLE_SLAVE, cis_handle);
- 		if (IS_ERR(cis)) {
- 			hci_le_reject_cis(hdev, ev->cis_handle);
-@@ -7040,7 +7040,7 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 				bt_dev_dbg(hdev, "ignore too large handle %u", handle);
- 				continue;
- 			}
--			bis = hci_conn_add(hdev, BIS_LINK, BDADDR_ANY,
-+			bis = hci_conn_add(hdev, BIS_LINK, BDADDR_ANY, 0,
- 					   HCI_ROLE_SLAVE, handle);
- 			if (IS_ERR(bis))
- 				continue;
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 571e07f81523..b5e58cbf0d46 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -7013,7 +7013,7 @@ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
- 		goto unlock;
- 
- 	/* Add connection to indicate PA sync error */
--	pa_sync = hci_conn_add_unset(hdev, PA_LINK, BDADDR_ANY,
-+	pa_sync = hci_conn_add_unset(hdev, PA_LINK, BDADDR_ANY, 0,
- 				     HCI_ROLE_SLAVE);
- 
- 	if (IS_ERR(pa_sync))
 -- 
 2.51.0
 
