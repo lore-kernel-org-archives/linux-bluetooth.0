@@ -1,274 +1,126 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17E929B77C
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 09:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EAA244670
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759914944; cv=none; b=hjji3UuSdpfytV52F/bOkeBahlwZJzjE78cRoSHNAt7aaekSPMdyv9fq+EE+9rxtWNQQkqfIO2SqLUBVMuqwRYdsm1axrlUUqcgBCuRWbmK49CxnoO5wjIJBjSQP+ODLWc60YFLvCT9XHuseUj69z6pnZ2urMiJhtCKihYjafvA=
+	t=1759919662; cv=none; b=RA0SWD4EcjM5nGKFfL61ANteF/I0ZaysDXXM93qQhfsLXfeNwEUEwslBoj0lp1p396GSzHGTouR9vaeyeGItEDBSAdxpu+IGGbhJt9haSlE1Pw74bp3L6mMiZfAZjSC9YTcDMrXbRS1aoKESQZBIrwlV9/EJOBwWBNeDo3XqRSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759914944; c=relaxed/simple;
-	bh=8Ti0GWBXo+YaZYsNtM/vIzsfurzdcIdnYNWJDyhKnVQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=E4hbhZwb8/v8kbLXsf6HlIW6WZUPEYjCSQzKh/B1QdBKNUWgWzUdmmWI7wNo7ZJ8A3AgS0fkqS0Y9S5CbBmArIORMB0XLsyAe9u0s1Rebh/3KgiH7wd2RLIzb4WJ33fki44zAx5u1gYtpK8KG+Kt3crlTOutLhkC98y64BOxm04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DR3wa/tU; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1759919662; c=relaxed/simple;
+	bh=DPNbG/hraJvQjl1AvsI49vaQETET9v+UHfZvTAfE0LQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=W3fuVmE0gJbRmk527mfcxQN0uUj8JK6wi32RtUAuRGvfzVPCbqB6k0qeaLQ/X0mkSByzj6wZOccj3+8+gkzL1oJsS6oEk5TAElSP4GrQFwOgbQi7JYDCuCZXlhT7cwLmhJTm503sJud8nFtldWp3eQbhPuxy9tmAmbRG4Onr/No=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AoP3b3gf; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DR3wa/tU"
-Received: from github.com (hubbernetes-node-8f1328a.ash1-iad.github.net [10.56.225.69])
-	by smtp.github.com (Postfix) with ESMTPA id D6B0C1405B4
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 02:15:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1759914941;
-	bh=pXN/7HPGml/Ak5WQ2Pb8gEHEvk+EIkmPFiqAiS8PTxg=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=DR3wa/tUWQ5kmu3Q4E54MOdE745+3lKyArOiDD+tv2yO0ZUN2W4tNNdCRIX8l8YQe
-	 1ajDqFhmfb0PCmkACbmBbvfVpim6tuPLHWKZtqvs3UWRk+axfP76sth6pVdBxhgYrq
-	 FKNMjca1yzShsxQYWCOKq9Wi9O6AZYEax6zs+f48=
-Date: Wed, 08 Oct 2025 02:15:41 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1009311/000000-45dd1c@github.com>
-Subject: [bluez/bluez] 9c0695: build: Add meson wrap for libell
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AoP3b3gf"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7841da939deso6756426b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Oct 2025 03:34:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759919660; x=1760524460; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qqf9swFePvOQR9D0KTEPjTrVUCcBV+E7Uerwx0FiyeY=;
+        b=AoP3b3gfZnr773uDVklIIDosDw2xd+yke0abycYsINneXJyWjpB3+67BVmz5hrMJ/6
+         niZgfqoXGgYt3vSzBkn71r9jYhWEzwLbVq1j+qxZWl5dUCNtJwRGcKNyLSJ17zdi9cN+
+         mkPo7JGXPsX63mJyFZoiJS7dcuT140qELm76XJEXlvZLWY/TW+QCdxkF2kOKdYTuLOTg
+         mXMVoekZNtJypQLfsDAGsA0Y/NTPJQxNBHEH5mXehOOXKlCQEkzFHOilm6CHIUCG4Ypb
+         HHGlVx+3qbDtOViY8di3gzIN4k6p3wH65E+H904DuNryVec7XCCSWXe8+S+424ePHnT4
+         JOCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759919660; x=1760524460;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qqf9swFePvOQR9D0KTEPjTrVUCcBV+E7Uerwx0FiyeY=;
+        b=VRm5eXRz+Y3EppUB5mNF/+F2o3lu2ux1Y5zGeYfQA7+zkIxhi8DMxNvP+QFxtVSVMH
+         ds6sufd2OBpVk8M0ONyxmhHYp4muAS8Dg4j67kJtzwUM5Rko80NquEBjNmCXxC9nVycw
+         n+8Dt6efNsU7m34TZXI1oA3LRxDlQTldPjs1YvDl20I1Ds07rDry93yhvD5O7xHD7f3H
+         XgsSR7GFRJ/mtdR0TC92UMDzr2ffJ76XMk2d13b1h2JCQfqWZ345xCa609SJ49v9xCe8
+         39FT5kVn/CdkV/VEULvN7zSGgHw2AGlLr+zmcuZmeCcHjzUZGfYkSH6Dri0zJUZR/T+X
+         3/LQ==
+X-Gm-Message-State: AOJu0YytkL42UxRMcU7MOpMKRDmLDWr/F5VfkQLMST6/PfCILlKNcGlR
+	euwX8jQYF5V+JmnKxCArgTqwIU5TRg3FUI1xF51sdYkSLxrnwfzPQTXYdLxI4A==
+X-Gm-Gg: ASbGncs7TOVo4YegKHl3x+GP9aAYuvCnM8bSG0LpBznM4bkHj83ukI2ut/JyXi3BY1Y
+	S3gi5Gve7ieH50pDLb3i+gkU05Pl3mCQ34czk3P/pVv/7VeU9IDhAjynFQbKSQmkJsVtCrMRD1Z
+	PIHfX3LBLC1yNBsktmmx5pYKoT7CCCcsrggzvFDse/FRXiENFn+P3flE12vNnLz+QskLdJtSZ78
+	S2WnQ2wCaSDD/UED8B93OgcPYKUhFgpIG5UzBVapeMXQbYDZtYCyOmyXrhLHcGjCcQDuQR3ffEo
+	ORmVx6F3hdN1FddTp9UaRh/pOJ2Oex2MDmmyA0jhUyhtdjjvAr0/g1AG1zYtnmYAMUdx5FuZuKx
+	8IcseUBxDjX5cI8dHKj4JIhbF2VQ0fBmA3OfUL39WbiWfniG5RsjO
+X-Google-Smtp-Source: AGHT+IEaAczkecv1+tyI1OOKmEgjfRueA+q2M55IR8fZIQVvN32ePYmwspMPu0YAod9BNQBJoC451Q==
+X-Received: by 2002:a05:6a00:391a:b0:782:ec0f:d273 with SMTP id d2e1a72fcca58-79385326060mr3608910b3a.1.1759919659633;
+        Wed, 08 Oct 2025 03:34:19 -0700 (PDT)
+Received: from [172.17.0.2] ([68.220.59.248])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78b02053b84sm18395422b3a.53.2025.10.08.03.34.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Oct 2025 03:34:19 -0700 (PDT)
+Message-ID: <68e63e2b.050a0220.1fc712.d98f@mx.google.com>
+Date: Wed, 08 Oct 2025 03:34:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3468980643243457834=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: build: Add meson build system
+In-Reply-To: <20251008085034.2178394-2-hadess@hadess.net>
+References: <20251008085034.2178394-2-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3468980643243457834==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1009311
-  Home:   https://github.com/bluez/bluez
-  Commit: 9c0695f0180d42e4fe7116bd7a32ce957cfe3b08
-      https://github.com/bluez/bluez/commit/9c0695f0180d42e4fe7116bd7a32ce957cfe3b08
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-10-08 (Wed, 08 Oct 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    A subprojects/ell.wrap
-    A subprojects/packagefiles/0001-build-Add-meson-build-system.patch
+Dear submitter,
 
-  Log Message:
-  -----------
-  build: Add meson wrap for libell
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1009311
 
-Rather than relying on libell being able to build with meson from
-upstream, apply the meson build patches on top of the latest upstream
-release.
+---Test result---
 
-The build should still fallback to the system libell if available, and
-will fail to build if a system libell is not available, and no network
-access is available, as in many build systems.
+Test Summary:
+CheckPatch                    PENDING   0.37 seconds
+GitLint                       PENDING   0.40 seconds
+BuildEll                      PASS      20.38 seconds
+BluezMake                     PASS      2817.42 seconds
+MakeCheck                     PASS      20.71 seconds
+MakeDistcheck                 PASS      188.96 seconds
+CheckValgrind                 PASS      241.60 seconds
+CheckSmatch                   PASS      313.19 seconds
+bluezmakeextell               PASS      132.31 seconds
+IncrementalBuild              PENDING   0.35 seconds
+ScanBuild                     PASS      948.15 seconds
 
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Commit: 34f0c5d430c1a7e5b7fb509f0e70e07d6832f560
-      https://github.com/bluez/bluez/commit/34f0c5d430c1a7e5b7fb509f0e70e07d6832f560
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-10-08 (Wed, 08 Oct 2025)
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Changed paths:
-    A attrib/meson.build
-    A btio/meson.build
-    A client/meson.build
-    A completion/meson.build
-    A doc/meson.build
-    A emulator/meson.build
-    A gdbus/meson.build
-    A gobex/meson.build
-    A lib/meson.build
-    A mesh/meson.build
-    A meson.build
-    A meson_options.txt
-    A monitor/meson.build
-    A obexd/meson.build
-    A peripheral/meson.build
-    A plugins/meson.build
-    A profiles/meson.build
-    A src/meson.build
-    A src/shared/meson.build
-    A test/meson.build
-    A tools/mesh/meson.build
-    A tools/meson.build
-    M tools/mpris-proxy.service.in
-    A unit/meson.build
-
-  Log Message:
-  -----------
-  build: Add meson build system
-
-The options default were selected to try and match the existing
-autotools default as best as possible. Further commits will likely
-change those defaults, but at least it should be clear what defaults
-were changed from.
-
-However, a number of options were removed:
-
---enable-pie is replaced by the meson base option "b_pie":
-https://mesonbuild.com/Builtin-options.html#base-options
-
---enable-maintainer-mode is replaced by the "debug" build-types:
-https://mesonbuild.com/Builtin-options.html#core-options
-
---enable-debug and --disable-optimization are replaced by the
-debug build type:
-https://mesonbuild.com/Builtin-options.html#details-for-buildtype
-
-Each of the sanitisers have their own b_sanitize option:
-- asan: b_sanitize=address
-- lsan: b_sanitize=leak
-- ubsan: b_sanitize=address,undefined
-https://mesonbuild.com/Builtin-options.html#base-options
-
---enable-coverage is replaced by the b_coverage option:
-https://mesonbuild.com/Builtin-options.html#base-options
-
---enable-valgrind can be replicated by running the test suite with:
-meson test --setup valgrind
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: c1097719198cd4a13bdb32499c5afda8b4410012
-      https://github.com/bluez/bluez/commit/c1097719198cd4a13bdb32499c5afda8b4410012
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-10-08 (Wed, 08 Oct 2025)
 
-  Changed paths:
-    M client/meson.build
-    M emulator/meson.build
-    M lib/meson.build
-    M mesh/meson.build
-    M meson.build
-    M meson_options.txt
-    M monitor/meson.build
-    M obexd/meson.build
-    M peripheral/meson.build
-    M plugins/meson.build
-    M profiles/meson.build
-    M src/meson.build
-    M tools/mesh/meson.build
-    M tools/meson.build
-    M unit/meson.build
-
-  Log Message:
-  -----------
-  build: Make more use of 'feature' options
-
-This allows finer control around what is built and what is not,
-trying to build as much as possible by default.
-
-This also makes it easier to enable all the "auto" features which would
-then fail if dependencies are missing (maximalist builds, for testing),
-or disable everything by default, and only enable select options, which
-minimises side-effects for distributions.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: a8645a329c692d8ea1d606b753adfc630dd9f979
-      https://github.com/bluez/bluez/commit/a8645a329c692d8ea1d606b753adfc630dd9f979
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-10-08 (Wed, 08 Oct 2025)
-
-  Changed paths:
-    M meson.build
-    M meson_options.txt
-
-  Log Message:
-  -----------
-  build: Separate systemd and libsystemd dependencies
-
-One is to install systemd service files, the other to enable deeper
-logind integration into obexd.
-
-
-  Commit: 43ff2d1628a4974d49659b9462d3188f204ae752
-      https://github.com/bluez/bluez/commit/43ff2d1628a4974d49659b9462d3188f204ae752
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-10-08 (Wed, 08 Oct 2025)
-
-  Changed paths:
-    M tools/meson.build
-
-  Log Message:
-  -----------
-  tools: Install gatttool if deprecated tools are enabled
-
-Fixes:
-https://bugzilla.redhat.com/show_bug.cgi?id=1141909
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=720486
-
-
-  Commit: 9bdf87cbc0ff1847a911d5b44fe9ad239097a541
-      https://github.com/bluez/bluez/commit/9bdf87cbc0ff1847a911d5b44fe9ad239097a541
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-10-08 (Wed, 08 Oct 2025)
-
-  Changed paths:
-    M tools/meson.build
-
-  Log Message:
-  -----------
-  tools: Install avinfo tool by default
-
-It's used for checking which audio codecs are supported by a Bluetooth
-audio device, which is more useful now that PulseAudio/PipeWire support
-alternative codecs like LDAC or aptX).
-
-Fixes:
-https://bugzilla.redhat.com/show_bug.cgi?id=1699680
-
-
-  Commit: f96b08b3231737d3b1ece35683e9ca5ac3c1a26c
-      https://github.com/bluez/bluez/commit/f96b08b3231737d3b1ece35683e9ca5ac3c1a26c
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-10-08 (Wed, 08 Oct 2025)
-
-  Changed paths:
-    M tools/meson.build
-
-  Log Message:
-  -----------
-  tools: Install btmgmt along with other tools
-
-btmgmt is not installed by default, but it is useful for debugging
-some issues and to set the MAC address on HCIs which don't have their
-MAC address configured.
-
-
-  Commit: ff3841bf986ee7ccb544c108d5d327f16f96da6f
-      https://github.com/bluez/bluez/commit/ff3841bf986ee7ccb544c108d5d327f16f96da6f
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-10-08 (Wed, 08 Oct 2025)
-
-  Changed paths:
-    M emulator/meson.build
-
-  Log Message:
-  -----------
-  emulator: Install the emulator if built
-
-It's useful for testing.
-
-
-  Commit: 45dd1c371333326ea256dc0fa55c2177879ed331
-      https://github.com/bluez/bluez/commit/45dd1c371333326ea256dc0fa55c2177879ed331
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-10-08 (Wed, 08 Oct 2025)
-
-  Changed paths:
-    M meson.build
-    M meson_options.txt
-
-  Log Message:
-  -----------
-  build: Add option to allow disabling bluetoothd
-
-This makes it possible to build, for example, just the library, or the
-command-line client, without also building and installing bluetoothd.
-
-
-Compare: https://github.com/bluez/bluez/compare/9c0695f0180d%5E...45dd1c371333
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============3468980643243457834==--
