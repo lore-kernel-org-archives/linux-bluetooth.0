@@ -1,29 +1,29 @@
 Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0819C241663
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8A52F6178
 	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759921200; cv=none; b=hS6sAYFrRqVg5bLGreYM6DEbgpq04YYO+ar9hjcQft19313FyQvdYGxS9xMcRG1qXAZj1nVUSNY17WgbdZ0GJYLwjt72wXOL7u5XEk2GMUZ0g/VVgvhPdpJlO672FPRyha9RhIijuHXbh7C/nsjwPl7cM94VItdoRvo9G/w91EU=
+	t=1759921201; cv=none; b=CYkfI3KGUMpdiDZYQ6blXhR9WN2/E8RQ4JJ55apeu/iyvc5esjOFLEOozK9tEjF6/xg7beXoSCvxH+QAPVzUQRxniiv144tQSdHGJ/R2HvsdH2PeL2XSPDOLt9tMTDt0opXuC4BXakCZG2pyCZ3eeG5rj/8kg/wpnX+OLxBO84s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759921200; c=relaxed/simple;
-	bh=lMsXoTkEgHsGKpEHhNta42TA2Qxr3KAutn8nGwXfskk=;
+	s=arc-20240116; t=1759921201; c=relaxed/simple;
+	bh=W8Wu2094D9nITRxp+9tPEzZHfnZcte3e+0LA8WHX9UA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N0FC5EHjchrUw3ZqtzimcO+Y/SehRmrJglIkG3qeHsSYBMQqSmZLKQuSH6fUQwHmJDvPB7UcroauoDvtOmX4N4Mxdcy+5gDejkFk1gknbccJR/IC7DwZBa4foCmWh/wDZzJtwbiDzcT4Ml37sboBHRL6N0w6YmsYfmhZy6UgPjQ=
+	 MIME-Version; b=Gr+Gk3fesqILTdp2G0eMBdjBI+O3Ep6vYQXP1kY78grrXF5/BNZH64+XO9OMNgJqVsl6UKyOmlBVvwkOEfj3TNrMYjP+Gvy5cQiZhS47vveq4YPfmt3yW4o5hntH60pvSHuedZ1sfzu3F05BxfGtwuJ0dtiduA96bYlkOPlRUfk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 53296581616
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 59F54582DCC
 	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:41:49 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1964D43B21
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C059143AFB
 	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:41:41 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 04/10] build: Separate systemd and libsystemd dependencies
-Date: Wed,  8 Oct 2025 12:40:19 +0200
-Message-ID: <20251008104132.2206963-5-hadess@hadess.net>
+Subject: [PATCH BlueZ v3 03/10] build: Make more use of 'feature' options
+Date: Wed,  8 Oct 2025 12:40:18 +0200
+Message-ID: <20251008104132.2206963-4-hadess@hadess.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251008104132.2206963-1-hadess@hadess.net>
 References: <20251008104132.2206963-1-hadess@hadess.net>
@@ -36,41 +36,664 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-One is to install systemd service files, the other to enable deeper
-logind integration into obexd.
----
- meson.build       | 3 ++-
- meson_options.txt | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+This allows finer control around what is built and what is not,
+trying to build as much as possible by default.
 
+This also makes it easier to enable all the "auto" features which would
+then fail if dependencies are missing (maximalist builds, for testing),
+or disable everything by default, and only enable select options, which
+minimises side-effects for distributions.
+---
+ client/meson.build     |  2 +-
+ emulator/meson.build   |  2 +-
+ lib/meson.build        |  2 +-
+ mesh/meson.build       |  6 ++--
+ meson.build            | 30 +++++++++----------
+ meson_options.txt      | 66 +++++++++++++++++++++---------------------
+ monitor/meson.build    |  2 +-
+ obexd/meson.build      |  8 ++---
+ peripheral/meson.build |  2 +-
+ plugins/meson.build    |  6 ++--
+ profiles/meson.build   | 36 +++++++++++------------
+ src/meson.build        |  6 ++--
+ tools/mesh/meson.build |  2 +-
+ tools/meson.build      | 24 +++++++--------
+ unit/meson.build       |  4 +--
+ 15 files changed, 98 insertions(+), 100 deletions(-)
+
+diff --git a/client/meson.build b/client/meson.build
+index 52397d1e17de..77bc9c5d9473 100644
+--- a/client/meson.build
++++ b/client/meson.build
+@@ -40,7 +40,7 @@ client_man_pages = [
+   'bluetoothctl-hci.1'
+ ]
+ 
+-if get_option('manpages').enabled()
++if rst2man.found()
+   foreach man_page: client_man_pages
+     man_page_name = man_page.substring(0, -2)
+     custom_target(man_page,
+diff --git a/emulator/meson.build b/emulator/meson.build
+index 59c72c4dbd4d..bc038becc567 100644
+--- a/emulator/meson.build
++++ b/emulator/meson.build
+@@ -6,7 +6,7 @@ emulator_sources = files(
+   'smp.c',
+ )
+ 
+-if get_option('tests')
++if get_option('tests').enabled()
+   executable('btvirt',
+     sources: [ 'main.c',
+       'serial.c',
+diff --git a/lib/meson.build b/lib/meson.build
+index f31c8c3a58c5..aac809ab1c70 100644
+--- a/lib/meson.build
++++ b/lib/meson.build
+@@ -22,7 +22,7 @@ lib_headers = [
+   'bluetooth/hidp.h'
+   ]
+ 
+-if get_option('library')
++if get_option('library').enabled()
+   lib_bluetooth = shared_library('bluetooth',
+     sources: lib_headers + lib_sources,
+     version: '3.19.15',
+diff --git a/mesh/meson.build b/mesh/meson.build
+index 8c6f5631a9db..5b8fd2e6a94f 100644
+--- a/mesh/meson.build
++++ b/mesh/meson.build
+@@ -1,11 +1,11 @@
+-if get_option('datafiles')
++if get_option('datafiles').enabled()
+   install_data('bluetooth-mesh.conf',
+     install_dir: dbusdir)
+   install_data('mesh-main.conf',
+     install_dir: configdir)
+ endif
+ 
+-if get_option('systemd')
++if systemd_dep.found()
+   configure_file(
+     input: 'bluetooth-mesh.service.in',
+     output: 'bluetooth-mesh.service',
+@@ -59,7 +59,7 @@ executable('bluetooth-meshd',
+   install_dir: pkglibexecdir
+ )
+ 
+-if get_option('manpages').enabled()
++if rst2man.found()
+   bluetooth_meshd_rst = configure_file(
+     input: 'bluetooth-meshd.rst.in',
+     output: 'bluetooth-meshd.rst',
 diff --git a/meson.build b/meson.build
-index 25a5bb780edc..5fce108e4317 100644
+index 653359841d2c..25a5bb780edc 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -135,7 +135,8 @@ readline_dep = dependency('readline',
-   required: get_option('client').enabled() or
-     get_option('mesh').enabled())
- systemd_dep = dependency('systemd', required: get_option('systemd'))
--libsystemd_dep = dependency('libsystemd', required: get_option('systemd'))
-+libsystemd_dep = dependency('libsystemd',
-+  required: get_option('obex').enabled() and get_option('logind').enabled())
+@@ -95,10 +95,8 @@ if get_option('buildtype').contains('debug')
+ 
+   add_project_arguments(common_flags, language: 'c')
+ 
+-  if get_option('valgrind')
+-    config_h.set('HAVE_VALGRIND_MEMCHECK_H',
+-      cc.has_header('valgrind/memcheck.h', required: false))
+-  endif
++  config_h.set('HAVE_VALGRIND_MEMCHECK_H',
++    cc.has_header('valgrind/memcheck.h', required: get_option('valgrind').enabled()))
+ endif
+ 
+ test_cflags = [
+@@ -124,8 +122,8 @@ config_h.set10('HAVE_DECL_SOF_TIMESTAMPING_TX_COMPLETION',
+ config_h.set10('HAVE_DECL_SCM_TSTAMP_COMPLETION',
+   cc.has_header_symbol('linux/errqueue.h', 'SCM_TSTAMP_COMPLETION', prefix: '#include <time.h>'))
+ 
+-udev_required = get_option('udev').enabled() or get_option('sixaxis') or
+-    get_option('hid2hci')
++udev_required = get_option('udev').enabled() or get_option('sixaxis').enabled() or
++    get_option('hid2hci').enabled()
+ udev_dep = dependency('udev', version:'>= 196', required: udev_required)
+ udevlib_dep = dependency('libudev', required: udev_required)
+ 
+@@ -140,7 +138,7 @@ systemd_dep = dependency('systemd', required: get_option('systemd'))
+ libsystemd_dep = dependency('libsystemd', required: get_option('systemd'))
  ell_dep = dependency('ell',
    version: '>= 0.39',
-   required: get_option('btpclient').enabled() or get_option('mesh').enabled(),
+-  required: get_option('btpclient') or get_option('mesh').enabled(),
++  required: get_option('btpclient').enabled() or get_option('mesh').enabled(),
+   fallback : ['ell', 'libell_dep'],
+   default_options: [
+     'default_library=static',
+@@ -229,18 +227,18 @@ if cups_dep.found()
+ endif
+ 
+ external_plugins_link_args = ''
+-if get_option('external-plugins')
++if get_option('external-plugins').enabled()
+   external_plugins_link_args = [
+     '-Wl,--export-dynamic',
+     '-Wl,--version-script=' + meson.project_source_root() / 'src/bluetooth.ver'
+   ]
+ endif
+ 
+-config_h.set('HAVE_A2DP', get_option('a2dp'))
+-config_h.set('HAVE_AVRCP', get_option('avrcp'))
+-config_h.set('HAVE_ASHA', get_option('asha'))
+-config_h.set('HAVE_VCP', get_option('vcp'))
+-config_h.set10('EXTERNAL_PLUGINS', get_option('external-plugins'))
++config_h.set('HAVE_A2DP', get_option('a2dp').enabled())
++config_h.set('HAVE_AVRCP', get_option('avrcp').enabled())
++config_h.set('HAVE_ASHA', get_option('asha').enabled())
++config_h.set('HAVE_VCP', get_option('vcp').enabled())
++config_h.set10('EXTERNAL_PLUGINS', get_option('external-plugins').enabled())
+ config_h.set_quoted('VERSION', meson.project_version())
+ 
+ configure_file(
+@@ -258,7 +256,7 @@ subdir('src')
+ if get_option('client').enabled()
+   subdir('client')
+ endif
+-if get_option('monitor')
++if get_option('monitor').enabled()
+   subdir('monitor')
+ endif
+ subdir('emulator')
+@@ -274,10 +272,10 @@ endif
+ if get_option('mesh').enabled()
+   subdir('mesh')
+ endif
+-if get_option('manpages').enabled()
++if rst2man.found()
+   subdir('doc')
+ endif
+-if get_option('tests')
++if not get_option('tests').disabled()
+   subdir('test')
+   subdir('unit')
+ endif
 diff --git a/meson_options.txt b/meson_options.txt
-index aae4f377f0a2..6a39e2ceabec 100644
+index 2d9231b120ca..aae4f377f0a2 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -6,7 +6,8 @@ option('tests', type: 'feature', value: 'auto', description: 'Enable testing too
- option('tools', type: 'feature', value: 'enabled', description: 'Enable Bluetooth tools')
- option('monitor', type: 'feature', value: 'enabled', description: 'Enable Bluetooth monitor')
+@@ -1,18 +1,18 @@
+-option('valgrind', type: 'boolean', value: false, description: 'Enable valgrind memory checks')
+-option('backtrace', type: 'boolean', value: false, description: 'Enable backtrace support')
+-option('library', type: 'boolean', value: true, description: 'Install Bluetooth library')
+-option('examples', type: 'boolean', value: false, description: 'Enable test/example scripts')
+-option('tests', type: 'boolean', value: false, description: 'Enable testing tools')
+-option('tools', type: 'boolean', value: true, description: 'Enable Bluetooth tools')
+-option('monitor', type: 'boolean', value: true, description: 'Enable Bluetooth monitor')
++option('valgrind', type: 'feature', value: 'disabled', description: 'Enable valgrind memory checks')
++option('backtrace', type: 'feature', value: 'disabled', description: 'Enable backtrace support')
++option('library', type: 'feature', value: 'enabled', description: 'Install Bluetooth library')
++option('examples', type: 'feature', value: 'auto', description: 'Enable test/example scripts')
++option('tests', type: 'feature', value: 'auto', description: 'Enable testing tools')
++option('tools', type: 'feature', value: 'enabled', description: 'Enable Bluetooth tools')
++option('monitor', type: 'feature', value: 'enabled', description: 'Enable Bluetooth monitor')
  option('client', type: 'feature', value: 'enabled', description: 'Enable command line client')
--option('systemd', type: 'feature', value: 'enabled', description: 'Enable systemd integration')
-+option('systemd', type: 'feature', value: 'enabled', description: 'Install systemd service files')
-+option('logind', type: 'feature', value: 'enabled', description: 'Enable logind integration in obexd')
+-option('systemd', type: 'boolean', value: true, description: 'Enable systemd integration')
++option('systemd', type: 'feature', value: 'enabled', description: 'Enable systemd integration')
  option('udev', type: 'feature', value: 'enabled', description: 'Enable udev device support')
- option('datafiles', type: 'feature', value: 'enabled', description: 'Install configuration and data files')
+-option('datafiles', type: 'boolean', value: true, description: 'Install configuration and data files')
++option('datafiles', type: 'feature', value: 'enabled', description: 'Install configuration and data files')
  option('manpages', type: 'feature', value: 'auto', description: 'Enable building of manual pages')
+-option('experimental', type: 'boolean', value: false, description: 'Enable experimental tools')
+-option('deprecated', type: 'boolean', value: false, description: 'Enable deprecated tools')
+-option('external-plugins', type: 'boolean', value: true, description: 'Enable support for external plugins')
++option('experimental', type: 'feature', value: 'disabled', description: 'Enable experimental tools')
++option('deprecated', type: 'feature', value: 'disabled', description: 'Enable deprecated tools')
++option('external-plugins', type: 'feature', value: 'enabled', description: 'Enable support for external plugins')
+ 
+ option('dbusconfdir', type: 'string', value: '', description: 'D-Bus configuration directory')
+ option('dbussystembusdir', type: 'string', value: '', description: 'D-Bus system bus services dir')
+@@ -23,29 +23,29 @@ option('zsh-completion-dir', type:'string', value: '', description: 'Path to ins
+ option('udevdir', type: 'string', value: '', description: 'udev directory')
+ option('cups_serverbin', type: 'string', value: '', description: 'CUPS directory')
+ 
+-option('nfc', type: 'boolean', value: false, description: 'Enable NFC pairing')
+-option('sap', type: 'boolean', value: false, description: 'Enable SAP profile')
+-option('a2dp', type: 'boolean', value: true, description: 'Enable A2DP profile')
+-option('avrcp', type: 'boolean', value: true, description: 'Enable AVRCP profile')
+-option('network', type: 'boolean', value: true, description: 'Enable network profiles')
+-option('hid', type: 'boolean', value: true, description: 'Enable HID profile')
+-option('hog', type: 'boolean', value: true, description: 'Enable HoG profile')
+-option('health', type: 'boolean', value: false, description: 'Enable health profiles')
+-option('bap', type: 'boolean', value: true, description: 'Enable BAP profile')
+-option('bass', type: 'boolean', value: true, description: 'Enable BASS service')
+-option('mcp', type: 'boolean', value: true, description: 'Enable MCP profile')
+-option('ccp', type: 'boolean', value: true, description: 'Enable CCP profile')
+-option('vcp', type: 'boolean', value: true, description: 'Enable VCP profile')
+-option('micp', type: 'boolean', value: true, description: 'Enable MICP profile')
+-option('csip', type: 'boolean', value: true, description: 'Enable CSIP profile')
+-option('asha', type: 'boolean', value: true, description: 'Enable ASHA support')
++option('nfc', type: 'feature', value: 'disabled', description: 'Enable NFC pairing')
++option('sap', type: 'feature', value: 'disabled', description: 'Enable SAP profile')
++option('a2dp', type: 'feature', value: 'auto', description: 'Enable A2DP profile')
++option('avrcp', type: 'feature', value: 'auto', description: 'Enable AVRCP profile')
++option('network', type: 'feature', value: 'auto', description: 'Enable network profiles')
++option('hid', type: 'feature', value: 'auto', description: 'Enable HID profile')
++option('hog', type: 'feature', value: 'auto', description: 'Enable HoG profile')
++option('health', type: 'feature', value: 'disabled', description: 'Enable health profiles')
++option('bap', type: 'feature', value: 'auto', description: 'Enable BAP profile')
++option('bass', type: 'feature', value: 'auto', description: 'Enable BASS service')
++option('mcp', type: 'feature', value: 'auto', description: 'Enable MCP profile')
++option('ccp', type: 'feature', value: 'auto', description: 'Enable CCP profile')
++option('vcp', type: 'feature', value: 'auto', description: 'Enable VCP profile')
++option('micp', type: 'feature', value: 'auto', description: 'Enable MICP profile')
++option('csip', type: 'feature', value: 'auto', description: 'Enable CSIP profile')
++option('asha', type: 'feature', value: 'auto', description: 'Enable ASHA support')
+ option('cups', type: 'feature', value: 'auto', description: 'Enable CUPS printer support')
+ option('mesh', type: 'feature', value: 'auto', description: 'Enable Mesh profile support')
+ option('midi', type: 'feature', value: 'auto', description: 'Enable MIDI support')
+ option('obex', type: 'feature', value: 'auto', description: 'Enable OBEX profile support')
+-option('btpclient', type: 'boolean', value: true, description: 'Enable BTP client')
+-option('sixaxis', type: 'boolean', value: true, description: 'Enable sixaxis plugin')
+-option('hid2hci', type: 'boolean', value: true, description: 'Enable hid2hci tool')
+-option('logger', type: 'boolean', value: false, description: 'Enable HCI logger service')
+-option('admin', type: 'boolean', value: true, description: 'Enable admin policy plugin')
++option('btpclient', type: 'feature', value: 'auto', description: 'Enable BTP client')
++option('sixaxis', type: 'feature', value: 'auto', description: 'Enable sixaxis plugin')
++option('hid2hci', type: 'feature', value: 'auto', description: 'Enable hid2hci tool')
++option('logger', type: 'feature', value: 'disabled', description: 'Enable HCI logger service')
++option('admin', type: 'feature', value: 'auto', description: 'Enable admin policy plugin')
+ option('phonebook', type: 'combo', choices: [ 'dummy', 'ebook' ], value: 'dummy', description: 'Obexd phonebook plugin')
+diff --git a/monitor/meson.build b/monitor/meson.build
+index ad78e176d978..4f9a764167be 100644
+--- a/monitor/meson.build
++++ b/monitor/meson.build
+@@ -36,7 +36,7 @@ executable('btmon',
+   install: true
+ )
+ 
+-if get_option('manpages').enabled()
++if rst2man.found()
+   custom_target(
+     input: 'btmon.rst',
+     output: 'btmon.1',
+diff --git a/obexd/meson.build b/obexd/meson.build
+index cb658b24ed08..30952590f54d 100644
+--- a/obexd/meson.build
++++ b/obexd/meson.build
+@@ -1,10 +1,10 @@
+-if get_option('datafiles')
++if get_option('datafiles').enabled()
+   install_data('src/obex.conf',
+     install_dir: dbusconfdir / 'dbus-1/system.d'
+   )
+ endif
+ 
+-if get_option('systemd')
++if systemd_dep.found()
+   configure_file(
+     input: 'src/obex.service.in',
+     output: 'obex.service',
+@@ -50,7 +50,7 @@ obexd_builtin_sources = [
+   'client/mns.c',
+ ]
+ 
+-if get_option('experimental')
++if get_option('experimental').enabled()
+   obexd_builtin_modules += 'pcsuite'
+   obexd_builtin_sources += 'plugins/pcsuite.c'
+ endif
+@@ -111,7 +111,7 @@ executable('obexd',
+     '-DPLUGINDIR="@0@"'.format(obex_plugindir),
+     '-D_FILE_OFFSET_BITS=64',
+     '-DCONFIGDIR="@0@"'.format(configdir),
+-    get_option('systemd') ? '-DSYSTEMD' : ''
++    libsystemd_dep.found() ? '-DSYSTEMD' : ''
+   ],
+   link_args: external_plugins_link_args,
+   install: true,
+diff --git a/peripheral/meson.build b/peripheral/meson.build
+index 21d6296829ea..31e5435763ef 100644
+--- a/peripheral/meson.build
++++ b/peripheral/meson.build
+@@ -1,4 +1,4 @@
+-if get_option('tests')
++if get_option('tests').enabled()
+   executable('btsensor',
+     sources: [
+       'main.c',
+diff --git a/plugins/meson.build b/plugins/meson.build
+index 019e7083df16..5485ef8eca44 100644
+--- a/plugins/meson.build
++++ b/plugins/meson.build
+@@ -12,17 +12,17 @@ builtin_sources = files(
+ 
+ builtin_deps = []
+ 
+-if get_option('admin')
++if get_option('admin').enabled()
+   builtin_modules += 'admin'
+   builtin_sources += files('admin.c')
+ endif
+ 
+-if get_option('nfc')
++if get_option('nfc').enabled()
+   builtin_modules += 'neard'
+   builtin_sources += files('neard.c')
+ endif
+ 
+-if get_option('sixaxis')
++if get_option('sixaxis').enabled()
+   builtin_modules += 'sixaxis'
+   builtin_sources += files('sixaxis.c')
+   builtin_deps += udev_dep
+diff --git a/profiles/meson.build b/profiles/meson.build
+index 8ac37b9e6cc8..656126b67efa 100644
+--- a/profiles/meson.build
++++ b/profiles/meson.build
+@@ -15,7 +15,7 @@ builtin_sources += files(
+   'battery/battery.c'
+ )
+ 
+-if get_option('sap')
++if get_option('sap').enabled()
+   builtin_modules += 'sap'
+   builtin_sources += files(
+     'sap/main.c',
+@@ -25,7 +25,7 @@ if get_option('sap')
+   )
+ endif
+ 
+-if get_option('a2dp')
++if get_option('a2dp').enabled()
+   builtin_modules += 'a2dp'
+   builtin_sources += files(
+     'audio/source.c',
+@@ -35,7 +35,7 @@ if get_option('a2dp')
+   )
+ endif
+ 
+-if get_option('avrcp')
++if get_option('avrcp').enabled()
+   builtin_modules += 'avrcp'
+   builtin_sources += files(
+     'audio/control.c',
+@@ -45,7 +45,7 @@ if get_option('avrcp')
+   )
+ endif
+ 
+-if get_option('network')
++if get_option('network').enabled()
+   builtin_modules += 'network'
+   builtin_sources += files(
+     'network/manager.c',
+@@ -58,7 +58,7 @@ if get_option('network')
+   )
+ endif
+ 
+-if get_option('hid')
++if get_option('hid').enabled()
+   builtin_modules += 'input'
+   builtin_sources += files(
+     'input/manager.c',
+@@ -71,7 +71,7 @@ if get_option('hid')
+   )
+ endif
+ 
+-if get_option('hog')
++if get_option('hog').enabled()
+   builtin_modules += 'hog'
+   builtin_sources += files(
+     'input/hog.c',
+@@ -83,7 +83,7 @@ if get_option('hog')
+   )
+ endif
+ 
+-if get_option('health')
++if get_option('health').enabled()
+   builtin_modules += 'health'
+   builtin_sources += files(
+     'health/mcap.c',
+@@ -94,7 +94,7 @@ if get_option('health')
+   )
+ endif
+ 
+-if get_option('midi').enabled()
++if alsa_dep.found()
+   builtin_modules += 'midi'
+   builtin_sources += files(
+     'midi/midi.c',
+@@ -103,54 +103,54 @@ if get_option('midi').enabled()
+   builtin_deps += alsa_dep
+ endif
+ 
+-if get_option('bap')
++if get_option('bap').enabled()
+   builtin_modules += 'bap'
+   builtin_sources += files('audio/bap.c')
+ endif
+ 
+-if get_option('bass')
++if get_option('bass').enabled()
+   builtin_modules += 'bass'
+   builtin_sources += files('audio/bass.c')
+ endif
+ 
+-if get_option('mcp')
++if get_option('mcp').enabled()
+   builtin_modules += 'mcp'
+   builtin_sources += files('audio/mcp.c')
+ endif
+ 
+-if get_option('vcp')
++if get_option('vcp').enabled()
+   builtin_modules += 'vcp'
+   builtin_sources += files('audio/vcp.c')
+ endif
+ 
+-if get_option('micp')
++if get_option('micp').enabled()
+   builtin_modules += 'micp'
+   builtin_sources += files('audio/micp.c')
+ endif
+ 
+-if get_option('ccp')
++if get_option('ccp').enabled()
+   builtin_modules += 'ccp'
+   builtin_sources += files('audio/ccp.c')
+ endif
+ 
+-if get_option('csip')
++if get_option('csip').enabled()
+   builtin_modules += 'csip'
+   builtin_sources += files('audio/csip.c')
+ endif
+ 
+-if get_option('asha')
++if get_option('asha').enabled()
+   builtin_modules += 'asha'
+   builtin_sources += files('audio/asha.c')
+ endif
+ 
+-if get_option('tools')
++if get_option('tools').enabled()
+   executable('iapd',
+     sources: 'iap/main.c',
+     dependencies: [ libgdbus_internal_dep, glib_dep, dbus_dep ]
+   )
+ endif
+ 
+-if get_option('cups').enabled()
++if cups_dep.found()
+   executable('bluetooth',
+     sources: [
+       'cups/main.c',
+diff --git a/src/meson.build b/src/meson.build
+index a2aaad756b10..f7e144b346c3 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -1,6 +1,6 @@
+ subdir('shared')
+ 
+-if get_option('datafiles')
++if get_option('datafiles').enabled()
+   install_data('bluetooth.conf',
+     install_dir: dbusconfdir / 'dbus-1/system.d'
+   )
+@@ -9,7 +9,7 @@ if get_option('datafiles')
+   )
+ endif
+ 
+-if get_option('systemd')
++if systemd_dep.found()
+   configure_file(
+     input: 'bluetooth.service.in',
+     output: 'bluetooth.service',
+@@ -87,7 +87,7 @@ executable('bluetoothd',
+   install_dir: pkglibexecdir
+ )
+ 
+-if get_option('manpages').enabled()
++if rst2man.found()
+   bluetoothd_rst = configure_file(
+     input: 'bluetoothd.rst.in',
+     output: 'bluetoothd.rst',
+diff --git a/tools/mesh/meson.build b/tools/mesh/meson.build
+index 85bfb00977f3..eb4039909b5c 100644
+--- a/tools/mesh/meson.build
++++ b/tools/mesh/meson.build
+@@ -1,4 +1,4 @@
+-if get_option('tools') and readline_dep.found()
++if get_option('tools').enabled() and readline_dep.found()
+   executable('mesh-cfgclient',
+     sources: [ '../mesh-cfgclient.c',
+       'cfgcli.c',
+diff --git a/tools/meson.build b/tools/meson.build
+index 59e4f7d52824..5e73b048c118 100644
+--- a/tools/meson.build
++++ b/tools/meson.build
+@@ -1,6 +1,6 @@
+ tools_man_pages = []
+ 
+-if get_option('logger')
++if get_option('logger').enabled()
+   executable('btmon-logger',
+     [ 'btmon-logger.c' ],
+     dependencies: libshared_mainloop_dep,
+@@ -8,7 +8,7 @@ if get_option('logger')
+     install_dir: pkglibexecdir
+   )
+ 
+-  if get_option('systemd')
++  if systemd_dep.found()
+     configure_file(
+       input: 'bluetooth-logger.service.in',
+       output: 'bluetooth-logger.service',
+@@ -39,7 +39,7 @@ tester_tools = [
+   'hci'
+ ]
+ 
+-if get_option('tests')
++if get_option('tests').enabled()
+   foreach tool: tester_tools
+     executable(tool + '-tester',
+       sources: [ tool + '-tester.c', emulator_sources ],
+@@ -48,7 +48,7 @@ if get_option('tests')
+   endforeach
+ endif
+ 
+-if get_option('btpclient')
++if get_option('btpclient').enabled()
+   executable('btpclient',
+     sources: [ 'btpclient.c', '../src/shared/btp.c' ],
+     include_directories: '..',
+@@ -65,7 +65,7 @@ if get_option('btpclient')
+   )
+ endif
+ 
+-if get_option('hid2hci')
++if get_option('hid2hci').enabled()
+   executable('hid2hci',
+     sources: 'hid2hci.c',
+     dependencies: udevlib_dep,
+@@ -76,7 +76,7 @@ if get_option('hid2hci')
+     install_dir: udevdir / 'rules.d',
+     rename: '97-hid2hci.rules'
+   )
+-  if get_option('manpages').enabled()
++  if rst2man.found()
+     tools_man_pages += 'hid2hci.1'
+   endif
+ endif
+@@ -113,7 +113,7 @@ inst_tools_names = [
+   'isotest'
+ ]
+ 
+-if get_option('tools')
++if get_option('tools').enabled()
+   foreach tool: tools_names
+     executable(tool,
+       sources: tool + '.c',
+@@ -129,7 +129,7 @@ if get_option('tools')
+     )
+   endforeach
+ 
+-  if get_option('manpages').enabled()
++  if rst2man.found()
+     tools_man_pages += [
+       'rctest.1',
+       'l2ping.1',
+@@ -196,7 +196,7 @@ if get_option('tools')
+         include_directories: '..',
+         install: true
+       )
+-      if get_option('deprecated')
++      if get_option('deprecated').enabled()
+         executable('meshctl',
+           sources: [
+             'meshctl.c',
+@@ -227,7 +227,7 @@ if get_option('tools')
+     endif
+   endif
+ 
+-  if get_option('deprecated')
++  if get_option('deprecated').enabled()
+     executable('gatttool',
+       sources: gatttool_sources,
+       dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, readline_dep ],
+@@ -299,7 +299,7 @@ if get_option('tools')
+       )
+     endforeach
+ 
+-    if get_option('manpages').enabled()
++    if rst2man.found()
+       tools_man_pages += [
+         'hciattach.1',
+         'hciconfig.1',
+@@ -312,7 +312,7 @@ if get_option('tools')
+     endif
+   endif
+ 
+-  if get_option('systemd')
++  if systemd_dep.found()
+     configure_file(
+       input: 'mpris-proxy.service.in',
+       output: 'mpris-proxy.service',
+diff --git a/unit/meson.build b/unit/meson.build
+index e416c19758f7..9059f2e15074 100644
+--- a/unit/meson.build
++++ b/unit/meson.build
+@@ -47,7 +47,7 @@ tests2 = [
+   [ 'test-avctp.c', '../src/log.c', 'avctp.c' ],
+ ]
+ 
+-if get_option('obex').enabled()
++if ical_dep.found()
+   tests2 += [
+     [ 'test-gobex.c', 'util.c', gobex_sources ],
+     [ 'test-gobex-packet.c', 'util.c', gobex_sources ],
+@@ -85,7 +85,7 @@ exe = executable('test-gattrib',
+ )
+ test('test-gattrib', exe)
+ 
+-if get_option('midi').enabled()
++if alsa_dep.found()
+   exe = executable('test-midi',
+     sources: [ 'test-midi.c', '../profiles/midi/libmidi.c' ],
+     c_args: [ '-DMIDI_TEST' ],
 -- 
 2.51.0
 
