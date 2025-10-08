@@ -1,29 +1,32 @@
 Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082162F5A20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0819C241663
 	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759921199; cv=none; b=DYjWL5zyNBAksubrAacTqxmNMfGPLf4j1drMdtZN1JY2YQLwW6WXA88bw6QyHM3q+adA9UFrtfXYtizKVmu9w65B4bZoYjC8IkzKN/kzfVTI2euLR9wJSqCDUR4jcBmE10pvYxQBA5r7+fSbWr9NvnMrDAnXc+274FDWmmnsiqM=
+	t=1759921200; cv=none; b=hS6sAYFrRqVg5bLGreYM6DEbgpq04YYO+ar9hjcQft19313FyQvdYGxS9xMcRG1qXAZj1nVUSNY17WgbdZ0GJYLwjt72wXOL7u5XEk2GMUZ0g/VVgvhPdpJlO672FPRyha9RhIijuHXbh7C/nsjwPl7cM94VItdoRvo9G/w91EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759921199; c=relaxed/simple;
-	bh=3g5tsTsxaeS44gs+2fAphc3J6aIL8hSv3JcO6c6SBh8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=e26eV4z7DjthoTl56Cv0SQuk8Gfz4N05dm+wPTNsyRU+dfIC9y9Gts/dy9GGD7Uq1nEA5hTa3MUTewtdhFNGR5kHldM3YW0Umkjw9uOK6awegTKn6lvoMP4V7+gY4wr3oRvXG7VcNygaPHaj3q1ZqO/Dz47Hmfoog7kv/yyYHgQ=
+	s=arc-20240116; t=1759921200; c=relaxed/simple;
+	bh=lMsXoTkEgHsGKpEHhNta42TA2Qxr3KAutn8nGwXfskk=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=N0FC5EHjchrUw3ZqtzimcO+Y/SehRmrJglIkG3qeHsSYBMQqSmZLKQuSH6fUQwHmJDvPB7UcroauoDvtOmX4N4Mxdcy+5gDejkFk1gknbccJR/IC7DwZBa4foCmWh/wDZzJtwbiDzcT4Ml37sboBHRL6N0w6YmsYfmhZy6UgPjQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 89453582DC9
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:41:48 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EF37143B0B
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:41:40 +0000 (UTC)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 53296581616
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:41:49 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1964D43B21
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:41:41 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 00/10] build: Add meson build system
-Date: Wed,  8 Oct 2025 12:40:15 +0200
-Message-ID: <20251008104132.2206963-1-hadess@hadess.net>
+Subject: [PATCH BlueZ v3 04/10] build: Separate systemd and libsystemd dependencies
+Date: Wed,  8 Oct 2025 12:40:19 +0200
+Message-ID: <20251008104132.2206963-5-hadess@hadess.net>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251008104132.2206963-1-hadess@hadess.net>
+References: <20251008104132.2206963-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -33,88 +36,41 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-Changes since v2:
-- Fixed the 2 FIXMEs
-- Note that the last patch should not be applied right now, meson 1.9.0
-  is not widely available, but that's a necessary patch to restore
-  parity with the autotools output
+One is to install systemd service files, the other to enable deeper
+logind integration into obexd.
+---
+ meson.build       | 3 ++-
+ meson_options.txt | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-Changes since v1:
-- A couple of bug fixes in the base patch (and we found a few bugs
-  in the upstream code along the way)
-- Added the option to disable bluetoothd build
-- The ell subproject was replaced by a Meson Wrap, this means that
-  tarball builds of bluez would require either an internet connection
-  or a system installation of ell.
-
-This version does not rely on forks of upstream projects, so I would
-consider this ready for merging.
-
-Bastien Nocera (10):
-  build: Add meson wrap for libell
-  build: Add meson build system
-  build: Make more use of 'feature' options
-  build: Separate systemd and libsystemd dependencies
-  tools: Install gatttool if deprecated tools are enabled
-  tools: Install avinfo tool by default
-  tools: Install btmgmt along with other tools
-  emulator: Install the emulator if built
-  build: Add option to allow disabling bluetoothd
-  build: Add License field to pkg-config file
-
- attrib/meson.build                            |  17 +
- btio/meson.build                              |   1 +
- client/meson.build                            |  54 +
- completion/meson.build                        |   3 +
- doc/meson.build                               |  41 +
- emulator/meson.build                          |  36 +
- gdbus/meson.build                             |  19 +
- gobex/meson.build                             |   8 +
- lib/meson.build                               |  54 +
- mesh/meson.build                              |  75 ++
- meson.build                                   | 297 ++++++
- meson_options.txt                             |  53 +
- monitor/meson.build                           |  47 +
- obexd/meson.build                             | 121 +++
- peripheral/meson.build                        |  13 +
- plugins/meson.build                           |  29 +
- profiles/meson.build                          | 170 ++++
- src/meson.build                               | 103 ++
- src/shared/meson.build                        |  80 ++
- subprojects/ell.wrap                          |  11 +
- .../0001-build-Add-meson-build-system.patch   | 922 ++++++++++++++++++
- test/meson.build                              |  41 +
- tools/mesh/meson.build                        |  16 +
- tools/meson.build                             | 341 +++++++
- tools/mpris-proxy.service.in                  |   2 +-
- unit/meson.build                              | 114 +++
- 26 files changed, 2667 insertions(+), 1 deletion(-)
- create mode 100644 attrib/meson.build
- create mode 100644 btio/meson.build
- create mode 100644 client/meson.build
- create mode 100644 completion/meson.build
- create mode 100644 doc/meson.build
- create mode 100644 emulator/meson.build
- create mode 100644 gdbus/meson.build
- create mode 100644 gobex/meson.build
- create mode 100644 lib/meson.build
- create mode 100644 mesh/meson.build
- create mode 100644 meson.build
- create mode 100644 meson_options.txt
- create mode 100644 monitor/meson.build
- create mode 100644 obexd/meson.build
- create mode 100644 peripheral/meson.build
- create mode 100644 plugins/meson.build
- create mode 100644 profiles/meson.build
- create mode 100644 src/meson.build
- create mode 100644 src/shared/meson.build
- create mode 100644 subprojects/ell.wrap
- create mode 100644 subprojects/packagefiles/0001-build-Add-meson-build-system.patch
- create mode 100644 test/meson.build
- create mode 100644 tools/mesh/meson.build
- create mode 100644 tools/meson.build
- create mode 100644 unit/meson.build
-
+diff --git a/meson.build b/meson.build
+index 25a5bb780edc..5fce108e4317 100644
+--- a/meson.build
++++ b/meson.build
+@@ -135,7 +135,8 @@ readline_dep = dependency('readline',
+   required: get_option('client').enabled() or
+     get_option('mesh').enabled())
+ systemd_dep = dependency('systemd', required: get_option('systemd'))
+-libsystemd_dep = dependency('libsystemd', required: get_option('systemd'))
++libsystemd_dep = dependency('libsystemd',
++  required: get_option('obex').enabled() and get_option('logind').enabled())
+ ell_dep = dependency('ell',
+   version: '>= 0.39',
+   required: get_option('btpclient').enabled() or get_option('mesh').enabled(),
+diff --git a/meson_options.txt b/meson_options.txt
+index aae4f377f0a2..6a39e2ceabec 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -6,7 +6,8 @@ option('tests', type: 'feature', value: 'auto', description: 'Enable testing too
+ option('tools', type: 'feature', value: 'enabled', description: 'Enable Bluetooth tools')
+ option('monitor', type: 'feature', value: 'enabled', description: 'Enable Bluetooth monitor')
+ option('client', type: 'feature', value: 'enabled', description: 'Enable command line client')
+-option('systemd', type: 'feature', value: 'enabled', description: 'Enable systemd integration')
++option('systemd', type: 'feature', value: 'enabled', description: 'Install systemd service files')
++option('logind', type: 'feature', value: 'enabled', description: 'Enable logind integration in obexd')
+ option('udev', type: 'feature', value: 'enabled', description: 'Enable udev device support')
+ option('datafiles', type: 'feature', value: 'enabled', description: 'Install configuration and data files')
+ option('manpages', type: 'feature', value: 'auto', description: 'Enable building of manual pages')
 -- 
 2.51.0
 
