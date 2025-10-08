@@ -1,29 +1,29 @@
 Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07532309B9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05D81339A4
 	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 09:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759914053; cv=none; b=NX0Di9bXyoCJe1I9rCvaZvDXKjPWRyHznvUp3WfpwPToEYxjf+2pg4ZXquHL8kxa9CYE7eM1HGVERtj1skDV0v6whQHTIYhToB/Vhmr/g7KcDfnFTQkMjFZ6YYLTPnYlmGDZXu3KERmoEStVlrHiUYQjMK2ETPuR0gCutYqHFKc=
+	t=1759914054; cv=none; b=RQa7vuVnGfl2hceExw5tpy7e8t9zsnSRrPAs9ikMMBnyd7whyfjYiUkFq6571ydUowhjjNPt4We9BKRUpJXBek0Y/msgzDlGsMCRk+ILje9ZVUAir67Hon5d32cosQufE+j+QNKaPFdDSlEoh7p4PHv/bVHZVbTc5dAleezdAqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759914053; c=relaxed/simple;
-	bh=TgJi9f8ma1vwi4h6Eit43AkdGNS5hMfkTXsOr62fz9A=;
+	s=arc-20240116; t=1759914054; c=relaxed/simple;
+	bh=B6/Pc9TqGlPQzIzC1VgDBOitUGeTMuEJQKkBMVX5hRw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jxZy2NY7H/4WfFyj6+44kk+zbMOXDOsqMBW+a70uZoby0TH11cu+ImK7lDcHZB7mbOMTtzc2TEgfHmPiFNASq/g4XblqkXN3/lHsN1lg1U49cm9fH+ERbgQKJNKNdHlwpS3fx3n62GqDDeS+R9OXrwNBAvbfIjwfwNZXWSy7b5Q=
+	 MIME-Version; b=GW/ClNt7VfTJba+bLsPuq/w0HhrCrQoR7GIfe0YpCNYH/vLae5F+LZxIf8Sanv0Pb/0NKiNIoJ9XglQklmzh3ZjPVqtw8SqSUHpsr7BGMYZz5onXbF9u2jrIhEsLu46cueMEg7SKn9YxK9TmgAqMfT9xqfyMsamFpqNWGHWVVpM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 5C3BF584F38
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 08:50:51 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 185FD44170
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 636D9584F34
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 08:50:50 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7174543984
 	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 08:50:43 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/9] build: Make more use of 'feature' options
-Date: Wed,  8 Oct 2025 10:40:50 +0200
-Message-ID: <20251008085034.2178394-4-hadess@hadess.net>
+Subject: [PATCH BlueZ v2 1/9] build: Add meson wrap for libell
+Date: Wed,  8 Oct 2025 10:40:48 +0200
+Message-ID: <20251008085034.2178394-2-hadess@hadess.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251008085034.2178394-1-hadess@hadess.net>
 References: <20251008085034.2178394-1-hadess@hadess.net>
@@ -36,664 +36,965 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-This allows finer control around what is built and what is not,
-trying to build as much as possible by default.
+Rather than relying on libell being able to build with meson from
+upstream, apply the meson build patches on top of the latest upstream
+release.
 
-This also makes it easier to enable all the "auto" features which would
-then fail if dependencies are missing (maximalist builds, for testing),
-or disable everything by default, and only enable select options, which
-minimises side-effects for distributions.
+The build should still fallback to the system libell if available, and
+will fail to build if a system libell is not available, and no network
+access is available, as in many build systems.
 ---
- client/meson.build     |  2 +-
- emulator/meson.build   |  2 +-
- lib/meson.build        |  2 +-
- mesh/meson.build       |  6 ++--
- meson.build            | 30 +++++++++----------
- meson_options.txt      | 66 +++++++++++++++++++++---------------------
- monitor/meson.build    |  2 +-
- obexd/meson.build      |  8 ++---
- peripheral/meson.build |  2 +-
- plugins/meson.build    |  6 ++--
- profiles/meson.build   | 36 +++++++++++------------
- src/meson.build        |  6 ++--
- tools/mesh/meson.build |  2 +-
- tools/meson.build      | 24 +++++++--------
- unit/meson.build       |  4 +--
- 15 files changed, 98 insertions(+), 100 deletions(-)
+ subprojects/ell.wrap                          |  11 +
+ .../0001-build-Add-meson-build-system.patch   | 922 ++++++++++++++++++
+ 2 files changed, 933 insertions(+)
+ create mode 100644 subprojects/ell.wrap
+ create mode 100644 subprojects/packagefiles/0001-build-Add-meson-build-system.patch
 
-diff --git a/client/meson.build b/client/meson.build
-index 52397d1e17de..77bc9c5d9473 100644
---- a/client/meson.build
-+++ b/client/meson.build
-@@ -40,7 +40,7 @@ client_man_pages = [
-   'bluetoothctl-hci.1'
- ]
- 
--if get_option('manpages').enabled()
-+if rst2man.found()
-   foreach man_page: client_man_pages
-     man_page_name = man_page.substring(0, -2)
-     custom_target(man_page,
-diff --git a/emulator/meson.build b/emulator/meson.build
-index 59c72c4dbd4d..bc038becc567 100644
---- a/emulator/meson.build
-+++ b/emulator/meson.build
-@@ -6,7 +6,7 @@ emulator_sources = files(
-   'smp.c',
- )
- 
--if get_option('tests')
-+if get_option('tests').enabled()
-   executable('btvirt',
-     sources: [ 'main.c',
-       'serial.c',
-diff --git a/lib/meson.build b/lib/meson.build
-index ef0c7669c273..78325b12fdeb 100644
---- a/lib/meson.build
-+++ b/lib/meson.build
-@@ -22,7 +22,7 @@ lib_headers = [
-   'bluetooth/hidp.h'
-   ]
- 
--if get_option('library')
-+if get_option('library').enabled()
-   lib_bluetooth = shared_library('bluetooth',
-     sources: lib_headers + lib_sources,
-     version: '3.19.15',
-diff --git a/mesh/meson.build b/mesh/meson.build
-index 8c6f5631a9db..5b8fd2e6a94f 100644
---- a/mesh/meson.build
-+++ b/mesh/meson.build
-@@ -1,11 +1,11 @@
--if get_option('datafiles')
-+if get_option('datafiles').enabled()
-   install_data('bluetooth-mesh.conf',
-     install_dir: dbusdir)
-   install_data('mesh-main.conf',
-     install_dir: configdir)
- endif
- 
--if get_option('systemd')
-+if systemd_dep.found()
-   configure_file(
-     input: 'bluetooth-mesh.service.in',
-     output: 'bluetooth-mesh.service',
-@@ -59,7 +59,7 @@ executable('bluetooth-meshd',
-   install_dir: pkglibexecdir
- )
- 
--if get_option('manpages').enabled()
-+if rst2man.found()
-   bluetooth_meshd_rst = configure_file(
-     input: 'bluetooth-meshd.rst.in',
-     output: 'bluetooth-meshd.rst',
-diff --git a/meson.build b/meson.build
-index 653359841d2c..25a5bb780edc 100644
---- a/meson.build
-+++ b/meson.build
-@@ -95,10 +95,8 @@ if get_option('buildtype').contains('debug')
- 
-   add_project_arguments(common_flags, language: 'c')
- 
--  if get_option('valgrind')
--    config_h.set('HAVE_VALGRIND_MEMCHECK_H',
--      cc.has_header('valgrind/memcheck.h', required: false))
--  endif
-+  config_h.set('HAVE_VALGRIND_MEMCHECK_H',
-+    cc.has_header('valgrind/memcheck.h', required: get_option('valgrind').enabled()))
- endif
- 
- test_cflags = [
-@@ -124,8 +122,8 @@ config_h.set10('HAVE_DECL_SOF_TIMESTAMPING_TX_COMPLETION',
- config_h.set10('HAVE_DECL_SCM_TSTAMP_COMPLETION',
-   cc.has_header_symbol('linux/errqueue.h', 'SCM_TSTAMP_COMPLETION', prefix: '#include <time.h>'))
- 
--udev_required = get_option('udev').enabled() or get_option('sixaxis') or
--    get_option('hid2hci')
-+udev_required = get_option('udev').enabled() or get_option('sixaxis').enabled() or
-+    get_option('hid2hci').enabled()
- udev_dep = dependency('udev', version:'>= 196', required: udev_required)
- udevlib_dep = dependency('libudev', required: udev_required)
- 
-@@ -140,7 +138,7 @@ systemd_dep = dependency('systemd', required: get_option('systemd'))
- libsystemd_dep = dependency('libsystemd', required: get_option('systemd'))
- ell_dep = dependency('ell',
-   version: '>= 0.39',
--  required: get_option('btpclient') or get_option('mesh').enabled(),
-+  required: get_option('btpclient').enabled() or get_option('mesh').enabled(),
-   fallback : ['ell', 'libell_dep'],
-   default_options: [
-     'default_library=static',
-@@ -229,18 +227,18 @@ if cups_dep.found()
- endif
- 
- external_plugins_link_args = ''
--if get_option('external-plugins')
-+if get_option('external-plugins').enabled()
-   external_plugins_link_args = [
-     '-Wl,--export-dynamic',
-     '-Wl,--version-script=' + meson.project_source_root() / 'src/bluetooth.ver'
-   ]
- endif
- 
--config_h.set('HAVE_A2DP', get_option('a2dp'))
--config_h.set('HAVE_AVRCP', get_option('avrcp'))
--config_h.set('HAVE_ASHA', get_option('asha'))
--config_h.set('HAVE_VCP', get_option('vcp'))
--config_h.set10('EXTERNAL_PLUGINS', get_option('external-plugins'))
-+config_h.set('HAVE_A2DP', get_option('a2dp').enabled())
-+config_h.set('HAVE_AVRCP', get_option('avrcp').enabled())
-+config_h.set('HAVE_ASHA', get_option('asha').enabled())
-+config_h.set('HAVE_VCP', get_option('vcp').enabled())
-+config_h.set10('EXTERNAL_PLUGINS', get_option('external-plugins').enabled())
- config_h.set_quoted('VERSION', meson.project_version())
- 
- configure_file(
-@@ -258,7 +256,7 @@ subdir('src')
- if get_option('client').enabled()
-   subdir('client')
- endif
--if get_option('monitor')
-+if get_option('monitor').enabled()
-   subdir('monitor')
- endif
- subdir('emulator')
-@@ -274,10 +272,10 @@ endif
- if get_option('mesh').enabled()
-   subdir('mesh')
- endif
--if get_option('manpages').enabled()
-+if rst2man.found()
-   subdir('doc')
- endif
--if get_option('tests')
-+if not get_option('tests').disabled()
-   subdir('test')
-   subdir('unit')
- endif
-diff --git a/meson_options.txt b/meson_options.txt
-index 2d9231b120ca..aae4f377f0a2 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -1,18 +1,18 @@
--option('valgrind', type: 'boolean', value: false, description: 'Enable valgrind memory checks')
--option('backtrace', type: 'boolean', value: false, description: 'Enable backtrace support')
--option('library', type: 'boolean', value: true, description: 'Install Bluetooth library')
--option('examples', type: 'boolean', value: false, description: 'Enable test/example scripts')
--option('tests', type: 'boolean', value: false, description: 'Enable testing tools')
--option('tools', type: 'boolean', value: true, description: 'Enable Bluetooth tools')
--option('monitor', type: 'boolean', value: true, description: 'Enable Bluetooth monitor')
-+option('valgrind', type: 'feature', value: 'disabled', description: 'Enable valgrind memory checks')
-+option('backtrace', type: 'feature', value: 'disabled', description: 'Enable backtrace support')
-+option('library', type: 'feature', value: 'enabled', description: 'Install Bluetooth library')
-+option('examples', type: 'feature', value: 'auto', description: 'Enable test/example scripts')
-+option('tests', type: 'feature', value: 'auto', description: 'Enable testing tools')
-+option('tools', type: 'feature', value: 'enabled', description: 'Enable Bluetooth tools')
-+option('monitor', type: 'feature', value: 'enabled', description: 'Enable Bluetooth monitor')
- option('client', type: 'feature', value: 'enabled', description: 'Enable command line client')
--option('systemd', type: 'boolean', value: true, description: 'Enable systemd integration')
-+option('systemd', type: 'feature', value: 'enabled', description: 'Enable systemd integration')
- option('udev', type: 'feature', value: 'enabled', description: 'Enable udev device support')
--option('datafiles', type: 'boolean', value: true, description: 'Install configuration and data files')
-+option('datafiles', type: 'feature', value: 'enabled', description: 'Install configuration and data files')
- option('manpages', type: 'feature', value: 'auto', description: 'Enable building of manual pages')
--option('experimental', type: 'boolean', value: false, description: 'Enable experimental tools')
--option('deprecated', type: 'boolean', value: false, description: 'Enable deprecated tools')
--option('external-plugins', type: 'boolean', value: true, description: 'Enable support for external plugins')
-+option('experimental', type: 'feature', value: 'disabled', description: 'Enable experimental tools')
-+option('deprecated', type: 'feature', value: 'disabled', description: 'Enable deprecated tools')
-+option('external-plugins', type: 'feature', value: 'enabled', description: 'Enable support for external plugins')
- 
- option('dbusconfdir', type: 'string', value: '', description: 'D-Bus configuration directory')
- option('dbussystembusdir', type: 'string', value: '', description: 'D-Bus system bus services dir')
-@@ -23,29 +23,29 @@ option('zsh-completion-dir', type:'string', value: '', description: 'Path to ins
- option('udevdir', type: 'string', value: '', description: 'udev directory')
- option('cups_serverbin', type: 'string', value: '', description: 'CUPS directory')
- 
--option('nfc', type: 'boolean', value: false, description: 'Enable NFC pairing')
--option('sap', type: 'boolean', value: false, description: 'Enable SAP profile')
--option('a2dp', type: 'boolean', value: true, description: 'Enable A2DP profile')
--option('avrcp', type: 'boolean', value: true, description: 'Enable AVRCP profile')
--option('network', type: 'boolean', value: true, description: 'Enable network profiles')
--option('hid', type: 'boolean', value: true, description: 'Enable HID profile')
--option('hog', type: 'boolean', value: true, description: 'Enable HoG profile')
--option('health', type: 'boolean', value: false, description: 'Enable health profiles')
--option('bap', type: 'boolean', value: true, description: 'Enable BAP profile')
--option('bass', type: 'boolean', value: true, description: 'Enable BASS service')
--option('mcp', type: 'boolean', value: true, description: 'Enable MCP profile')
--option('ccp', type: 'boolean', value: true, description: 'Enable CCP profile')
--option('vcp', type: 'boolean', value: true, description: 'Enable VCP profile')
--option('micp', type: 'boolean', value: true, description: 'Enable MICP profile')
--option('csip', type: 'boolean', value: true, description: 'Enable CSIP profile')
--option('asha', type: 'boolean', value: true, description: 'Enable ASHA support')
-+option('nfc', type: 'feature', value: 'disabled', description: 'Enable NFC pairing')
-+option('sap', type: 'feature', value: 'disabled', description: 'Enable SAP profile')
-+option('a2dp', type: 'feature', value: 'auto', description: 'Enable A2DP profile')
-+option('avrcp', type: 'feature', value: 'auto', description: 'Enable AVRCP profile')
-+option('network', type: 'feature', value: 'auto', description: 'Enable network profiles')
-+option('hid', type: 'feature', value: 'auto', description: 'Enable HID profile')
-+option('hog', type: 'feature', value: 'auto', description: 'Enable HoG profile')
-+option('health', type: 'feature', value: 'disabled', description: 'Enable health profiles')
-+option('bap', type: 'feature', value: 'auto', description: 'Enable BAP profile')
-+option('bass', type: 'feature', value: 'auto', description: 'Enable BASS service')
-+option('mcp', type: 'feature', value: 'auto', description: 'Enable MCP profile')
-+option('ccp', type: 'feature', value: 'auto', description: 'Enable CCP profile')
-+option('vcp', type: 'feature', value: 'auto', description: 'Enable VCP profile')
-+option('micp', type: 'feature', value: 'auto', description: 'Enable MICP profile')
-+option('csip', type: 'feature', value: 'auto', description: 'Enable CSIP profile')
-+option('asha', type: 'feature', value: 'auto', description: 'Enable ASHA support')
- option('cups', type: 'feature', value: 'auto', description: 'Enable CUPS printer support')
- option('mesh', type: 'feature', value: 'auto', description: 'Enable Mesh profile support')
- option('midi', type: 'feature', value: 'auto', description: 'Enable MIDI support')
- option('obex', type: 'feature', value: 'auto', description: 'Enable OBEX profile support')
--option('btpclient', type: 'boolean', value: true, description: 'Enable BTP client')
--option('sixaxis', type: 'boolean', value: true, description: 'Enable sixaxis plugin')
--option('hid2hci', type: 'boolean', value: true, description: 'Enable hid2hci tool')
--option('logger', type: 'boolean', value: false, description: 'Enable HCI logger service')
--option('admin', type: 'boolean', value: true, description: 'Enable admin policy plugin')
-+option('btpclient', type: 'feature', value: 'auto', description: 'Enable BTP client')
-+option('sixaxis', type: 'feature', value: 'auto', description: 'Enable sixaxis plugin')
-+option('hid2hci', type: 'feature', value: 'auto', description: 'Enable hid2hci tool')
-+option('logger', type: 'feature', value: 'disabled', description: 'Enable HCI logger service')
-+option('admin', type: 'feature', value: 'auto', description: 'Enable admin policy plugin')
- option('phonebook', type: 'combo', choices: [ 'dummy', 'ebook' ], value: 'dummy', description: 'Obexd phonebook plugin')
-diff --git a/monitor/meson.build b/monitor/meson.build
-index ad78e176d978..4f9a764167be 100644
---- a/monitor/meson.build
-+++ b/monitor/meson.build
-@@ -36,7 +36,7 @@ executable('btmon',
-   install: true
- )
- 
--if get_option('manpages').enabled()
-+if rst2man.found()
-   custom_target(
-     input: 'btmon.rst',
-     output: 'btmon.1',
-diff --git a/obexd/meson.build b/obexd/meson.build
-index cb658b24ed08..30952590f54d 100644
---- a/obexd/meson.build
-+++ b/obexd/meson.build
-@@ -1,10 +1,10 @@
--if get_option('datafiles')
-+if get_option('datafiles').enabled()
-   install_data('src/obex.conf',
-     install_dir: dbusconfdir / 'dbus-1/system.d'
-   )
- endif
- 
--if get_option('systemd')
-+if systemd_dep.found()
-   configure_file(
-     input: 'src/obex.service.in',
-     output: 'obex.service',
-@@ -50,7 +50,7 @@ obexd_builtin_sources = [
-   'client/mns.c',
- ]
- 
--if get_option('experimental')
-+if get_option('experimental').enabled()
-   obexd_builtin_modules += 'pcsuite'
-   obexd_builtin_sources += 'plugins/pcsuite.c'
- endif
-@@ -111,7 +111,7 @@ executable('obexd',
-     '-DPLUGINDIR="@0@"'.format(obex_plugindir),
-     '-D_FILE_OFFSET_BITS=64',
-     '-DCONFIGDIR="@0@"'.format(configdir),
--    get_option('systemd') ? '-DSYSTEMD' : ''
-+    libsystemd_dep.found() ? '-DSYSTEMD' : ''
-   ],
-   link_args: external_plugins_link_args,
-   install: true,
-diff --git a/peripheral/meson.build b/peripheral/meson.build
-index 21d6296829ea..31e5435763ef 100644
---- a/peripheral/meson.build
-+++ b/peripheral/meson.build
-@@ -1,4 +1,4 @@
--if get_option('tests')
-+if get_option('tests').enabled()
-   executable('btsensor',
-     sources: [
-       'main.c',
-diff --git a/plugins/meson.build b/plugins/meson.build
-index 019e7083df16..5485ef8eca44 100644
---- a/plugins/meson.build
-+++ b/plugins/meson.build
-@@ -12,17 +12,17 @@ builtin_sources = files(
- 
- builtin_deps = []
- 
--if get_option('admin')
-+if get_option('admin').enabled()
-   builtin_modules += 'admin'
-   builtin_sources += files('admin.c')
- endif
- 
--if get_option('nfc')
-+if get_option('nfc').enabled()
-   builtin_modules += 'neard'
-   builtin_sources += files('neard.c')
- endif
- 
--if get_option('sixaxis')
-+if get_option('sixaxis').enabled()
-   builtin_modules += 'sixaxis'
-   builtin_sources += files('sixaxis.c')
-   builtin_deps += udev_dep
-diff --git a/profiles/meson.build b/profiles/meson.build
-index 8ac37b9e6cc8..656126b67efa 100644
---- a/profiles/meson.build
-+++ b/profiles/meson.build
-@@ -15,7 +15,7 @@ builtin_sources += files(
-   'battery/battery.c'
- )
- 
--if get_option('sap')
-+if get_option('sap').enabled()
-   builtin_modules += 'sap'
-   builtin_sources += files(
-     'sap/main.c',
-@@ -25,7 +25,7 @@ if get_option('sap')
-   )
- endif
- 
--if get_option('a2dp')
-+if get_option('a2dp').enabled()
-   builtin_modules += 'a2dp'
-   builtin_sources += files(
-     'audio/source.c',
-@@ -35,7 +35,7 @@ if get_option('a2dp')
-   )
- endif
- 
--if get_option('avrcp')
-+if get_option('avrcp').enabled()
-   builtin_modules += 'avrcp'
-   builtin_sources += files(
-     'audio/control.c',
-@@ -45,7 +45,7 @@ if get_option('avrcp')
-   )
- endif
- 
--if get_option('network')
-+if get_option('network').enabled()
-   builtin_modules += 'network'
-   builtin_sources += files(
-     'network/manager.c',
-@@ -58,7 +58,7 @@ if get_option('network')
-   )
- endif
- 
--if get_option('hid')
-+if get_option('hid').enabled()
-   builtin_modules += 'input'
-   builtin_sources += files(
-     'input/manager.c',
-@@ -71,7 +71,7 @@ if get_option('hid')
-   )
- endif
- 
--if get_option('hog')
-+if get_option('hog').enabled()
-   builtin_modules += 'hog'
-   builtin_sources += files(
-     'input/hog.c',
-@@ -83,7 +83,7 @@ if get_option('hog')
-   )
- endif
- 
--if get_option('health')
-+if get_option('health').enabled()
-   builtin_modules += 'health'
-   builtin_sources += files(
-     'health/mcap.c',
-@@ -94,7 +94,7 @@ if get_option('health')
-   )
- endif
- 
--if get_option('midi').enabled()
-+if alsa_dep.found()
-   builtin_modules += 'midi'
-   builtin_sources += files(
-     'midi/midi.c',
-@@ -103,54 +103,54 @@ if get_option('midi').enabled()
-   builtin_deps += alsa_dep
- endif
- 
--if get_option('bap')
-+if get_option('bap').enabled()
-   builtin_modules += 'bap'
-   builtin_sources += files('audio/bap.c')
- endif
- 
--if get_option('bass')
-+if get_option('bass').enabled()
-   builtin_modules += 'bass'
-   builtin_sources += files('audio/bass.c')
- endif
- 
--if get_option('mcp')
-+if get_option('mcp').enabled()
-   builtin_modules += 'mcp'
-   builtin_sources += files('audio/mcp.c')
- endif
- 
--if get_option('vcp')
-+if get_option('vcp').enabled()
-   builtin_modules += 'vcp'
-   builtin_sources += files('audio/vcp.c')
- endif
- 
--if get_option('micp')
-+if get_option('micp').enabled()
-   builtin_modules += 'micp'
-   builtin_sources += files('audio/micp.c')
- endif
- 
--if get_option('ccp')
-+if get_option('ccp').enabled()
-   builtin_modules += 'ccp'
-   builtin_sources += files('audio/ccp.c')
- endif
- 
--if get_option('csip')
-+if get_option('csip').enabled()
-   builtin_modules += 'csip'
-   builtin_sources += files('audio/csip.c')
- endif
- 
--if get_option('asha')
-+if get_option('asha').enabled()
-   builtin_modules += 'asha'
-   builtin_sources += files('audio/asha.c')
- endif
- 
--if get_option('tools')
-+if get_option('tools').enabled()
-   executable('iapd',
-     sources: 'iap/main.c',
-     dependencies: [ libgdbus_internal_dep, glib_dep, dbus_dep ]
-   )
- endif
- 
--if get_option('cups').enabled()
-+if cups_dep.found()
-   executable('bluetooth',
-     sources: [
-       'cups/main.c',
-diff --git a/src/meson.build b/src/meson.build
-index a2aaad756b10..f7e144b346c3 100644
---- a/src/meson.build
-+++ b/src/meson.build
-@@ -1,6 +1,6 @@
- subdir('shared')
- 
--if get_option('datafiles')
-+if get_option('datafiles').enabled()
-   install_data('bluetooth.conf',
-     install_dir: dbusconfdir / 'dbus-1/system.d'
-   )
-@@ -9,7 +9,7 @@ if get_option('datafiles')
-   )
- endif
- 
--if get_option('systemd')
-+if systemd_dep.found()
-   configure_file(
-     input: 'bluetooth.service.in',
-     output: 'bluetooth.service',
-@@ -87,7 +87,7 @@ executable('bluetoothd',
-   install_dir: pkglibexecdir
- )
- 
--if get_option('manpages').enabled()
-+if rst2man.found()
-   bluetoothd_rst = configure_file(
-     input: 'bluetoothd.rst.in',
-     output: 'bluetoothd.rst',
-diff --git a/tools/mesh/meson.build b/tools/mesh/meson.build
-index 85bfb00977f3..eb4039909b5c 100644
---- a/tools/mesh/meson.build
-+++ b/tools/mesh/meson.build
-@@ -1,4 +1,4 @@
--if get_option('tools') and readline_dep.found()
-+if get_option('tools').enabled() and readline_dep.found()
-   executable('mesh-cfgclient',
-     sources: [ '../mesh-cfgclient.c',
-       'cfgcli.c',
-diff --git a/tools/meson.build b/tools/meson.build
-index 59e4f7d52824..5e73b048c118 100644
---- a/tools/meson.build
-+++ b/tools/meson.build
-@@ -1,6 +1,6 @@
- tools_man_pages = []
- 
--if get_option('logger')
-+if get_option('logger').enabled()
-   executable('btmon-logger',
-     [ 'btmon-logger.c' ],
-     dependencies: libshared_mainloop_dep,
-@@ -8,7 +8,7 @@ if get_option('logger')
-     install_dir: pkglibexecdir
-   )
- 
--  if get_option('systemd')
-+  if systemd_dep.found()
-     configure_file(
-       input: 'bluetooth-logger.service.in',
-       output: 'bluetooth-logger.service',
-@@ -39,7 +39,7 @@ tester_tools = [
-   'hci'
- ]
- 
--if get_option('tests')
-+if get_option('tests').enabled()
-   foreach tool: tester_tools
-     executable(tool + '-tester',
-       sources: [ tool + '-tester.c', emulator_sources ],
-@@ -48,7 +48,7 @@ if get_option('tests')
-   endforeach
- endif
- 
--if get_option('btpclient')
-+if get_option('btpclient').enabled()
-   executable('btpclient',
-     sources: [ 'btpclient.c', '../src/shared/btp.c' ],
-     include_directories: '..',
-@@ -65,7 +65,7 @@ if get_option('btpclient')
-   )
- endif
- 
--if get_option('hid2hci')
-+if get_option('hid2hci').enabled()
-   executable('hid2hci',
-     sources: 'hid2hci.c',
-     dependencies: udevlib_dep,
-@@ -76,7 +76,7 @@ if get_option('hid2hci')
-     install_dir: udevdir / 'rules.d',
-     rename: '97-hid2hci.rules'
-   )
--  if get_option('manpages').enabled()
-+  if rst2man.found()
-     tools_man_pages += 'hid2hci.1'
-   endif
- endif
-@@ -113,7 +113,7 @@ inst_tools_names = [
-   'isotest'
- ]
- 
--if get_option('tools')
-+if get_option('tools').enabled()
-   foreach tool: tools_names
-     executable(tool,
-       sources: tool + '.c',
-@@ -129,7 +129,7 @@ if get_option('tools')
-     )
-   endforeach
- 
--  if get_option('manpages').enabled()
-+  if rst2man.found()
-     tools_man_pages += [
-       'rctest.1',
-       'l2ping.1',
-@@ -196,7 +196,7 @@ if get_option('tools')
-         include_directories: '..',
-         install: true
-       )
--      if get_option('deprecated')
-+      if get_option('deprecated').enabled()
-         executable('meshctl',
-           sources: [
-             'meshctl.c',
-@@ -227,7 +227,7 @@ if get_option('tools')
-     endif
-   endif
- 
--  if get_option('deprecated')
-+  if get_option('deprecated').enabled()
-     executable('gatttool',
-       sources: gatttool_sources,
-       dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, readline_dep ],
-@@ -299,7 +299,7 @@ if get_option('tools')
-       )
-     endforeach
- 
--    if get_option('manpages').enabled()
-+    if rst2man.found()
-       tools_man_pages += [
-         'hciattach.1',
-         'hciconfig.1',
-@@ -312,7 +312,7 @@ if get_option('tools')
-     endif
-   endif
- 
--  if get_option('systemd')
-+  if systemd_dep.found()
-     configure_file(
-       input: 'mpris-proxy.service.in',
-       output: 'mpris-proxy.service',
-diff --git a/unit/meson.build b/unit/meson.build
-index cf3e80d69439..88a4a4ac1d89 100644
---- a/unit/meson.build
-+++ b/unit/meson.build
-@@ -47,7 +47,7 @@ tests2 = [
-   [ 'test-avctp.c', '../src/log.c', 'avctp.c' ],
- ]
- 
--if get_option('obex').enabled()
-+if ical_dep.found()
-   tests2 += [
-     [ 'test-gobex.c', 'util.c', gobex_sources ],
-     [ 'test-gobex-packet.c', 'util.c', gobex_sources ],
-@@ -82,7 +82,7 @@ exe = executable('test-gattrib',
- )
- test('test-gattrib', exe)
- 
--if get_option('midi').enabled()
-+if alsa_dep.found()
-   exe = executable('test-midi',
-     sources: [ 'test-midi.c', '../profiles/midi/libmidi.c' ],
-     c_args: [ '-DMIDI_TEST' ],
+diff --git a/subprojects/ell.wrap b/subprojects/ell.wrap
+new file mode 100644
+index 000000000000..3e9590b4066f
+--- /dev/null
++++ b/subprojects/ell.wrap
+@@ -0,0 +1,11 @@
++[wrap-file]
++directory = ell-0.80
++source_url = https://www.kernel.org/pub/linux/libs/ell/ell-0.80.tar.xz
++source_filename = ell-0.80.tar.xz
++source_hash = 6efc70ae6d3e2ca1ec255ecd855a3d5fadefe59897f4307816e3ba7a771f3d00
++
++# Maintained in https://github.com/hadess/ell/tree/wip/hadess/add-meson
++diff_files = 0001-build-Add-meson-build-system.patch
++
++[provide]
++dependency_names = ell
+diff --git a/subprojects/packagefiles/0001-build-Add-meson-build-system.patch b/subprojects/packagefiles/0001-build-Add-meson-build-system.patch
+new file mode 100644
+index 000000000000..9099ede533fb
+--- /dev/null
++++ b/subprojects/packagefiles/0001-build-Add-meson-build-system.patch
+@@ -0,0 +1,922 @@
++From b9e8cba23617d6a047816fad7b0dae862f4a97f4 Mon Sep 17 00:00:00 2001
++From: Bastien Nocera <hadess@hadess.net>
++Date: Thu, 17 Jul 2025 11:31:22 +0200
++Subject: [PATCH] build: Add meson build system
++
++--enable-pie is replaced by the meson base option "b_pie":
++https://mesonbuild.com/Builtin-options.html#base-options
++
++--enable-maintainer-mode is replaced by the "debug" build-types:
++https://mesonbuild.com/Builtin-options.html#core-options
++
++--enable-debug and --disable-optimization are replaced by the
++debug build type:
++https://mesonbuild.com/Builtin-options.html#details-for-buildtype
++
++Each of the sanitisers have their own b_sanitize option:
++- asan: b_sanitize=address
++- lsan: b_sanitize=leak
++- ubsan: b_sanitize=address,undefined
++https://mesonbuild.com/Builtin-options.html#base-options
++
++--enable-coverage is replaced by the b_coverage option:
++https://mesonbuild.com/Builtin-options.html#base-options
++---
++ ell/meson.build              | 187 +++++++++++++
++ examples/meson.build         |  32 +++
++ meson.build                  |  69 +++++
++ meson_options.txt            |   5 +
++ tools/meson.build            |  18 ++
++ unit/gen-cert-expired-pem.sh |  14 +
++ unit/meson.build             | 501 +++++++++++++++++++++++++++++++++++
++ unit/xxd.sh                  |   3 +
++ 8 files changed, 829 insertions(+)
++ create mode 100644 ell/meson.build
++ create mode 100644 examples/meson.build
++ create mode 100644 meson.build
++ create mode 100644 meson_options.txt
++ create mode 100644 tools/meson.build
++ create mode 100755 unit/gen-cert-expired-pem.sh
++ create mode 100644 unit/meson.build
++ create mode 100755 unit/xxd.sh
++
++diff --git a/ell/meson.build b/ell/meson.build
++new file mode 100644
++index 000000000000..ba61a39a8cc3
++--- /dev/null
+++++ b/ell/meson.build
++@@ -0,0 +1,187 @@
+++lib_headers = [
+++  'ell.h',
+++  'util.h',
+++  'test.h',
+++  'strv.h',
+++  'utf8.h',
+++  'queue.h',
+++  'hashmap.h',
+++  'string.h',
+++  'settings.h',
+++  'main.h',
+++  'idle.h',
+++  'signal.h',
+++  'timeout.h',
+++  'io.h',
+++  'ringbuf.h',
+++  'log.h',
+++  'checksum.h',
+++  'netlink.h',
+++  'genl.h',
+++  'rtnl.h',
+++  'dbus.h',
+++  'dbus-service.h',
+++  'dbus-client.h',
+++  'hwdb.h',
+++  'cipher.h',
+++  'random.h',
+++  'uintset.h',
+++  'base64.h',
+++  'pem.h',
+++  'tls.h',
+++  'uuid.h',
+++  'key.h',
+++  'file.h',
+++  'dir.h',
+++  'net.h',
+++  'dhcp.h',
+++  'dhcp6.h',
+++  'cert.h',
+++  'ecc.h',
+++  'ecdh.h',
+++  'time.h',
+++  'gpio.h',
+++  'path.h',
+++  'icmp6.h',
+++  'acd.h',
+++  'tester.h',
+++  'cleanup.h',
+++  'netconfig.h',
+++  'sysctl.h',
+++  'minheap.h',
+++  'notifylist.h'
+++]
+++
+++lib_sources = [
+++  'private.h',
+++  'useful.h',
+++  'missing.h',
+++  'util.c',
+++  'test-private.h',
+++  'test.c',
+++  'test-dbus.c',
+++  'strv.c',
+++  'utf8.c',
+++  'queue.c',
+++  'hashmap.c',
+++  'string.c',
+++  'settings.c',
+++  'main-private.h',
+++  'main.c',
+++  'idle.c',
+++  'signal.c',
+++  'timeout.c',
+++  'io.c',
+++  'ringbuf.c',
+++  'log.c',
+++  'checksum.c',
+++  'netlink-private.h',
+++  'netlink.c',
+++  'genl.c',
+++  'rtnl-private.h',
+++  'rtnl.c',
+++  'dbus-private.h',
+++  'dbus.c',
+++  'dbus-message.c',
+++  'dbus-util.c',
+++  'dbus-service.c',
+++  'dbus-client.c',
+++  'dbus-name-cache.c',
+++  'dbus-filter.c',
+++  'gvariant-private.h',
+++  'gvariant-util.c',
+++  'siphash-private.h',
+++  'siphash.c',
+++  'hwdb.c',
+++  'cipher.c',
+++  'random.c',
+++  'uintset.c',
+++  'base64.c',
+++  'asn1-private.h',
+++  'pem-private.h',
+++  'pem.c',
+++  'tls-private.h',
+++  'tls.c',
+++  'tls-record.c',
+++  'tls-extensions.c',
+++  'tls-suites.c',
+++  'uuid.c',
+++  'key.c',
+++  'file.c',
+++  'dir.c',
+++  'net-private.h',
+++  'net.c',
+++  'dhcp-private.h',
+++  'dhcp.c',
+++  'dhcp-transport.c',
+++  'dhcp-lease.c',
+++  'dhcp6-private.h',
+++  'dhcp6.c',
+++  'dhcp6-transport.c',
+++  'dhcp6-lease.c',
+++  'dhcp-util.c',
+++  'dhcp-server.c',
+++  'cert-private.h',
+++  'cert.c',
+++  'cert-crypto.c',
+++  'ecc-private.h',
+++  'ecc.h',
+++  'ecc-external.c',
+++  'ecc.c',
+++  'ecdh.c',
+++  'time.c',
+++  'time-private.h',
+++  'gpio.c',
+++  'path.c',
+++  'icmp6.c',
+++  'icmp6-private.h',
+++  'acd.c',
+++  'tester.c',
+++  'netconfig.c',
+++  'sysctl.c',
+++  'minheap.c',
+++  'notifylist.c'
+++]
+++
+++linux_headers = [
+++  '../linux/gpio.h'
+++]
+++
+++libell = library('ell',
+++  sources: lib_headers + lib_sources + linux_headers,
+++  include_directories: include_directories('..'),
+++  implicit_include_directories: false,
+++  gnu_symbol_visibility: 'hidden',
+++  version: '0.2.0',
+++  install: get_option('default_library') != 'static'
+++)
+++
+++libell_dep = declare_dependency(include_directories: include_directories('..'),
+++  link_with: libell)
+++
+++if get_option('default_library') != 'static'
+++  install_headers(lib_headers,
+++    subdir: 'ell'
+++  )
+++
+++  pkgconfig = import('pkgconfig')
+++  pkgconfig.generate(
+++    name: 'ell',
+++    description: 'Embedded Linux library',
+++    version: meson.project_version(),
+++    libraries: libell,
+++    # FIXME requires meson 1.9.0
+++    # license: meson.project_license()
+++  )
+++endif
+++
+++libell_private = static_library('ell_private',
+++  sources: lib_headers + lib_sources + linux_headers,
+++  include_directories: include_directories('..'),
+++  implicit_include_directories: false,
+++  install: false
+++)
+++
+++libell_private_dep = declare_dependency(
+++  link_with: libell_private
+++)
++diff --git a/examples/meson.build b/examples/meson.build
++new file mode 100644
++index 000000000000..831abb58be46
++--- /dev/null
+++++ b/examples/meson.build
++@@ -0,0 +1,32 @@
+++examples = [
+++  'dbus-service',
+++  'https-client-test',
+++  'https-server-test',
+++  'dbus-client',
+++  'dhcp-client',
+++  'dhcp6-client',
+++  'dhcp-server',
+++  'acd-client',
+++  'netconfig-test',
+++]
+++
+++if get_option('examples')
+++  foreach example: examples
+++    exe = executable(example,
+++      '@0@.c'.format(example),
+++      include_directories: include_directories('..'),
+++      dependencies: libell_private_dep,
+++      install: false
+++    )
+++  endforeach
+++endif
+++
+++if get_option('glib') and get_option('examples')
+++  exe = executable('glib-eventloop',
+++    'glib-eventloop.c',
+++    include_directories: include_directories('..'),
+++    dependencies: [ libell_private_dep, glib_dep ],
+++    install: false
+++  )
+++endif
+++
++diff --git a/meson.build b/meson.build
++new file mode 100644
++index 000000000000..8609c766a3e4
++--- /dev/null
+++++ b/meson.build
++@@ -0,0 +1,69 @@
+++# SPDX-License-Identifier: LGPL-2.1-or-later
+++project(
+++  'ell', 'c',
+++  version: '0.80',
+++  license: 'LGPL-2.1-or-later',
+++  default_options: [
+++    'buildtype=debugoptimized',
+++    'default_library=shared'
+++  ],
+++  meson_version: '>= 1.3.0'
+++)
+++
+++cc = meson.get_compiler('c')
+++find_program('awk', required: true)
+++config_h = configuration_data()
+++
+++checked_funcs = [
+++  'explicit_bzero',
+++  'rawmemchr',
+++]
+++
+++foreach func: checked_funcs
+++  config_h.set('HAVE_' + func.to_upper(), cc.has_function(func))
+++endforeach
+++
+++required_funcs = [
+++  'getrandom',
+++  'signalfd',
+++  'timerfd_create',
+++  'epoll_create'
+++]
+++
+++foreach func: required_funcs
+++  cc.has_function(func, required: true)
+++endforeach
+++
+++required_headers = [
+++  'linux/types.h',
+++  'linux/if_alg.h'
+++]
+++
+++foreach header: required_headers
+++  cc.has_header(header, required: true)
+++endforeach
+++
+++glib_dep = dependency('glib-2.0', version: '>= 2.32', required: get_option('glib'))
+++openssl = find_program('openssl', required: get_option('cert-tests'))
+++sh = find_program('sh', required: get_option('cert-tests'))
+++xxd = find_program('xxd', required: get_option('cert-tests'))
+++
+++if openssl.found()
+++  r = run_command(openssl, 'list', '-providers', check: false)
+++  if r.returncode() == 0
+++    openssl_legacy = [ '-provider', 'legacy', '-provider', 'default' ]
+++  else
+++    openssl_legacy = ''
+++  endif
+++endif
+++
+++add_project_arguments('-DHAVE_CONFIG_H', language: 'c')
+++configure_file(
+++  output: 'config.h',
+++  configuration: config_h
+++)
+++
+++subdir('ell')
+++subdir('tools')
+++subdir('unit')
+++subdir('examples')
++diff --git a/meson_options.txt b/meson_options.txt
++new file mode 100644
++index 000000000000..5effa15916b4
++--- /dev/null
+++++ b/meson_options.txt
++@@ -0,0 +1,5 @@
+++option('glib', type: 'boolean', value: true, description: 'Enable ell/glib main loop example')
+++option('tests', type: 'boolean', value: true, description: 'Enable unit tests compilation')
+++option('cert-tests', type: 'boolean', value: true, description: 'Enable OpenSSL cert tests')
+++option('tools', type: 'boolean', value: true, description: 'Enable extra tools compilation')
+++option('examples', type: 'boolean', value: true, description: 'Enable code examples compilation')
++diff --git a/tools/meson.build b/tools/meson.build
++new file mode 100644
++index 000000000000..01505f266631
++--- /dev/null
+++++ b/tools/meson.build
++@@ -0,0 +1,18 @@
+++tools = [
+++  'certchain-verify',
+++  'genl-discover',
+++  'genl-watch',
+++  'genl-request',
+++  'gpio'
+++]
+++
+++if get_option('tools')
+++  foreach tool: tools
+++      exe = executable(tool,
+++        '@0@.c'.format(tool),
+++        include_directories: include_directories('..'),
+++        dependencies: libell_private_dep,
+++        install: false
+++      )
+++  endforeach
+++endif
++diff --git a/unit/gen-cert-expired-pem.sh b/unit/gen-cert-expired-pem.sh
++new file mode 100755
++index 000000000000..f3e0b9d28424
++--- /dev/null
+++++ b/unit/gen-cert-expired-pem.sh
++@@ -0,0 +1,14 @@
+++#!/bin/sh -e
+++
+++echo -n > cert-ca-index.txt
+++OUTDIR=`mktemp -d`
+++openssl ca -batch \
+++	-config "$4" -name example \
+++	-cert "$2" \
+++	-keyfile "$3" \
+++	-outdir $OUTDIR \
+++	-rand_serial -extensions cert_ext \
+++	-extfile "$5" -md sha256 \
+++	-startdate 000101120000Z -enddate 010101120000Z \
+++	-preserveDN -notext -in "$1" -out "$6"
+++rm -rf $OUTDIR cert-ca-index.txt*
++diff --git a/unit/meson.build b/unit/meson.build
++new file mode 100644
++index 000000000000..be9f2655f010
++--- /dev/null
+++++ b/unit/meson.build
++@@ -0,0 +1,501 @@
+++tests = [
+++  'test-unit',
+++  'test-queue',
+++  'test-hashmap',
+++  'test-endian',
+++  'test-string',
+++  'test-utf8',
+++  'test-main',
+++  'test-io',
+++  'test-ringbuf',
+++  'test-checksum',
+++  'test-settings',
+++  'test-netlink',
+++  'test-genl-msg',
+++  'test-rtnl',
+++  'test-siphash',
+++  'test-cipher',
+++  'test-random',
+++  'test-util',
+++  'test-uintset',
+++  'test-base64',
+++  'test-uuid',
+++  'test-pbkdf2',
+++  'test-dhcp',
+++  'test-dhcp6',
+++  'test-dir-watch',
+++  'test-ecc',
+++  'test-ecdh',
+++  'test-time',
+++  'test-path',
+++  'test-net',
+++  'test-sysctl',
+++  'test-minheap',
+++  'test-notifylist',
+++  'test-hwdb',
+++  'test-dbus',
+++  'test-dbus-util',
+++  'test-dbus-message',
+++  'test-dbus-message-fds',
+++  'test-dbus-properties',
+++  'test-dbus-service',
+++  'test-dbus-watch',
+++  'test-gvariant-util',
+++  'test-gvariant-message'
+++]
+++
+++gen_headers = []
+++test_pem_cert_deps = []
+++
+++if get_option('cert-tests')
+++  tests += [
+++    'test-pem',
+++    'test-tls',
+++    'test-key'
+++  ]
+++
+++  cert_server_key_pem_tgt = custom_target('cert-server-key.pem',
+++    output: 'cert-server-key.pem',
+++    command: [ openssl, 'genrsa', '-out', '@OUTPUT@' ]
+++  )
+++
+++  ec_cert_server_key_pem_tgt = custom_target('ec-cert-server-key.pem',
+++    output: 'ec-cert-server-key.pem',
+++    command: [ openssl, 'ecparam', '-out', '@OUTPUT@', '-name', 'secp384r1', '-genkey' ]
+++  )
+++
+++  cert_server_key_pkcs8_pem_tgt = custom_target('cert-server-key-pkcs8.pem',
+++    input: cert_server_key_pem_tgt,
+++    output: 'cert-server-key-pkcs8.pem',
+++    command: [ openssl, 'pkcs8', '-topk8', '-nocrypt', '-in', '@INPUT@', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_server_csr_tgt = custom_target('cert-server.csr',
+++    input: cert_server_key_pem_tgt,
+++    output: 'cert-server.csr',
+++    command: [ openssl, 'req', '-new', '-extensions', 'cert_ext',
+++      '-config', files('gencerts.cnf'),
+++      '-subj', '/O=Foo Example Organization/CN=Foo Example Organization/emailAddress=foo@mail.example',
+++      '-key', '@INPUT@', '-out', '@OUTPUT@' ]
+++  )
+++
+++  ec_cert_server_csr_tgt = custom_target('ec-cert-server.csr',
+++    input: ec_cert_server_key_pem_tgt,
+++    output: 'ec-cert-server.csr',
+++    command: [ openssl, 'req', '-new', '-extensions', 'cert_ext',
+++      '-config', files('gencerts.cnf'),
+++      '-subj', '/O=Foo Example Organization/CN=Foo Example Organization/emailAddress=foo@mail.example',
+++      '-key', '@INPUT@', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_ca_key_pem_tgt = custom_target('cert-ca-key.pem',
+++    output: 'cert-ca-key.pem',
+++    command: [ openssl, 'genrsa', '-out', '@OUTPUT@', '2048' ]
+++  )
+++
+++  cert_ca_pem_tgt = custom_target('cert-ca.pem',
+++    input: cert_ca_key_pem_tgt,
+++    output: 'cert-ca.pem',
+++    command: [ openssl, 'req', '-x509', '-new', '-nodes', '-extensions', 'ca_ext',
+++      '-config', files('gencerts.cnf'), '-subj', '/O=International Union of Example Organizations/CN=Certificate issuer guy/emailAddress=ca@mail.example',
+++      '-key', '@INPUT@', '-sha256', '-days', '10000', '-out', '@OUTPUT@' ],
+++  )
+++
+++  cert_server_pem_tgt = custom_target('cert-server.pem',
+++    input: [ cert_server_csr_tgt, cert_ca_pem_tgt, cert_ca_key_pem_tgt ],
+++    output: 'cert-server.pem',
+++    command: [ openssl, 'x509', '-req', '-extensions', 'server_ext',
+++      '-extfile', files('gencerts.cnf'),
+++      '-in', '@INPUT0@', '-CA', '@INPUT1@',
+++      '-CAkey', '@INPUT2@',
+++      '-CAserial', 'cert-ca.srl',
+++      '-CAcreateserial', '-sha256', '-days', '10000', '-out', '@OUTPUT@' ]
+++  )
+++
+++  ec_cert_ca_key_pem_tgt = custom_target('ec-cert-ca-key.pem',
+++    output: 'ec-cert-ca-key.pem',
+++    command: [ openssl, 'ecparam', '-out', '@OUTPUT@', '-name', 'secp384r1', '-genkey' ]
+++  )
+++
+++  ec_cert_ca_pem_tgt = custom_target('ec-cert-ca.pem',
+++  input: ec_cert_ca_key_pem_tgt,
+++  output: 'ec-cert-ca.pem',
+++  command: [ openssl, 'req', '-x509', '-new', '-nodes', '-extensions', 'ca_ext',
+++    '-config', files('gencerts.cnf'), '-subj', '/O=International Union of Example Organizations/CN=Certificate issuer guy/emailAddress=ca@mail.example',
+++    '-key', '@INPUT@', '-sha256', '-days', '10000', '-out', '@OUTPUT@' ]
+++  )
+++
+++  ec_cert_server_pem_tgt = custom_target('ec-cert-server.pem',
+++    input: [ ec_cert_server_csr_tgt, ec_cert_ca_pem_tgt, ec_cert_ca_key_pem_tgt ],
+++    output: 'ec-cert-server.pem',
+++    command: [ openssl, 'x509', '-req', '-extensions', 'server_ext',
+++      '-extfile', files('gencerts.cnf'),
+++      '-in', '@INPUT0@', '-CA', '@INPUT1@',
+++      '-CAkey', '@INPUT2@',
+++      '-CAserial', 'cert-ca.srl',
+++      '-CAcreateserial', '-sha256', '-days', '10000', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_client_key_pkcs1_pem_tgt = custom_target('cert-client-key-pkcs1.pem',
+++    output: 'cert-client-key-pkcs1.pem',
+++    command: [ openssl, 'genrsa', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_client_key_pkcs8_pem_tgt = custom_target('cert-client-key-pkcs8.pem',
+++    input: cert_client_key_pkcs1_pem_tgt,
+++    output: 'cert-client-key-pkcs8.pem',
+++    command: [ openssl, 'pkcs8', '-topk8', '-nocrypt', '-in', '@INPUT@', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_client_key_pkcs8_md5_des_pem_tgt = custom_target('cert-client-key-pkcs8-md5-des.pem',
+++    input: cert_client_key_pkcs8_pem_tgt,
+++    output: 'cert-client-key-pkcs8-md5-des.pem',
+++    command: [ openssl, 'pkcs8', '-in', '@INPUT@', '-out', '@OUTPUT@',
+++      '-topk8', '-v1', 'PBE-MD5-DES', '-passout', 'pass:abc', openssl_legacy ]
+++  )
+++
+++  cert_client_key_pkcs8_v2_des_pem_tgt = custom_target('cert-client-key-pkcs8-v2-des.pem',
+++    input: cert_client_key_pkcs8_pem_tgt,
+++    output: 'cert-client-key-pkcs8-v2-des.pem',
+++    command: [ openssl, 'pkcs8', '-in', '@INPUT@', '-out', '@OUTPUT@',
+++      '-topk8', '-v2', 'des-cbc', '-v2prf', 'hmacWithSHA1', '-passout', 'pass:abc',
+++      openssl_legacy ]
+++  )
+++
+++  cert_client_key_pkcs8_v2_des_ede3_pem_tgt = custom_target('cert-client-key-pkcs8-v2-des-ede3.pem',
+++    input: cert_client_key_pkcs8_pem_tgt,
+++    output: 'cert-client-key-pkcs8-v2-des-ede3.pem',
+++    command: [ openssl, 'pkcs8', '-in', '@INPUT@', '-out', '@OUTPUT@',
+++        '-topk8', '-v2', 'des-ede3-cbc', '-v2prf', 'hmacWithSHA224', '-passout', 'pass:abc' ]
+++  )
+++
+++  cert_client_key_pkcs8_v2_aes128_pem_tgt = custom_target('cert-client-key-pkcs8-v2-aes128.pem',
+++    input: cert_client_key_pkcs8_pem_tgt,
+++    output: 'cert-client-key-pkcs8-v2-aes128.pem',
+++    command: [ openssl, 'pkcs8', '-in', '@INPUT@', '-out', '@OUTPUT@',
+++      '-topk8', '-v2', 'aes128', '-v2prf', 'hmacWithSHA256', '-passout', 'pass:abc' ]
+++  )
+++
+++  cert_client_key_pkcs8_sha1_des_pem_tgt = custom_target('cert-client-key-pkcs8-sha1-des.pem',
+++    input: cert_client_key_pkcs8_pem_tgt,
+++    output: 'cert-client-key-pkcs8-sha1-des.pem',
+++    command: [ openssl, 'pkcs8', '-in', '@INPUT@', '-out', '@OUTPUT@',
+++      '-topk8', '-v1', 'PBE-SHA1-DES', '-passout', 'pass:abc', openssl_legacy ]
+++  )
+++
+++  cert_client_key_pkcs8_v2_aes256_pem_tgt = custom_target('cert-client-key-pkcs8-v2-aes256.pem',
+++    input: cert_client_key_pkcs8_pem_tgt,
+++    output: 'cert-client-key-pkcs8-v2-aes256.pem',
+++    command: [ openssl, 'pkcs8', '-in', '@INPUT@', '-out', '@OUTPUT@',
+++      '-topk8', '-v2', 'aes256', '-v2prf', 'hmacWithSHA512', '-passout', 'pass:abc' ]
+++  )
+++
+++  cert_client_csr_tgt = custom_target('cert-client.csr',
+++    input: cert_client_key_pkcs1_pem_tgt,
+++    output: 'cert-client.csr',
+++    command: [ openssl, 'req', '-new', '-extensions', 'cert_ext',
+++      '-config', files('gencerts.cnf'),
+++      '-subj', '/O=Bar Example Organization/CN=Bar Example Organization/emailAddress=bar@mail.example',
+++      '-key', '@INPUT@', '-out', '@OUTPUT@'
+++    ]
+++  )
+++
+++  cert_client_pem_tgt = custom_target('cert-client.pem',
+++    input: [ cert_client_csr_tgt, cert_ca_pem_tgt, cert_ca_key_pem_tgt ],
+++    output: 'cert-client.pem',
+++    command: [ openssl, 'x509', '-req', '-extensions', 'cert_ext',
+++      '-extfile', files('gencerts.cnf'),
+++      '-in', '@INPUT0@', '-CA', '@INPUT1@',
+++      '-CAkey', '@INPUT2@',
+++      '-CAserial', 'cert-ca.srl',
+++      '-CAcreateserial', '-sha256', '-days', '10000', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_client_crt_tgt = custom_target('cert-client.crt',
+++    input: cert_client_pem_tgt,
+++    output: 'cert-client.crt',
+++    command: [ openssl, 'x509', '-in', '@INPUT@', '-out', '@OUTPUT@', '-outform', 'der' ]
+++  )
+++
+++  cert_intca_key_pem_tgt = custom_target('cert-intca-key.pem',
+++    output: 'cert-intca-key.pem',
+++    command: [ openssl, 'genrsa', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_intca_csr_tgt = custom_target('cert-intca.csr',
+++    input: cert_intca_key_pem_tgt,
+++    output: 'cert-intca.csr',
+++    command: [ openssl, 'req', '-new', '-extensions', 'int_ext',
+++      '-config', files('gencerts.cnf'),
+++      '-subj', '/O=International Union of Example Organizations/CN=Certificate issuer guy/emailAddress=ca@mail.example',
+++      '-key', '@INPUT@', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_intca_pem_tgt = custom_target('cert-intca.pem',
+++    input: [ cert_intca_csr_tgt, cert_ca_pem_tgt, cert_ca_key_pem_tgt ],
+++    output: 'cert-intca.pem',
+++    command: [ openssl, 'x509', '-req', '-extensions', 'int_ext',
+++      '-extfile', files('gencerts.cnf'),
+++      '-in', '@INPUT0@', '-CA', '@INPUT1@',
+++      '-CAkey', '@INPUT2@',
+++      '-CAserial', 'cert-ca.srl',
+++      '-CAcreateserial', '-sha256', '-days', '10000', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cat = find_program('cat')
+++
+++  cert_chain_pem_tgt = custom_target('cert-chain.pem',
+++    input: [ cert_intca_pem_tgt, cert_ca_pem_tgt ],
+++    output: 'cert-chain.pem',
+++    capture: true,
+++    command: [ cat, '@INPUT@' ]
+++  )
+++
+++  cert_entity_int_key_pem_tgt = custom_target('cert-entity-int-key.pem',
+++    output: 'cert-entity-int-key.pem',
+++    command: [ openssl, 'genrsa', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_entity_int_csr_tgt = custom_target('cert-entity-int.csr',
+++    input: cert_entity_int_key_pem_tgt,
+++    output: 'cert-entity-int.csr',
+++    command: [ openssl, 'req', '-new', '-extensions', 'cert_ext',
+++      '-config', files('gencerts.cnf'),
+++      '-subj', '/O=Baz Example Organization/CN=Baz Example Organization/emailAddress=baz@mail.example',
+++      '-key', '@INPUT@', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_entity_int_pem_tgt = custom_target('cert-entity-int.pem',
+++    input: [ cert_entity_int_csr_tgt, cert_intca_pem_tgt, cert_intca_key_pem_tgt ],
+++    output: 'cert-entity-int.pem',
+++    command: [ openssl, 'x509', '-req', '-extensions', 'cert_ext',
+++      '-extfile', files('gencerts.cnf'),
+++      '-in', '@INPUT0@', '-CA', '@INPUT1@',
+++      '-CAkey', '@INPUT2@',
+++      '-CAserial', 'cert-intca.srl',
+++      '-CAcreateserial', '-sha256', '-days', '10000', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_ca2_pem_tgt = custom_target('cert-ca2.pem',
+++    input: cert_ca_key_pem_tgt,
+++    output: 'cert-ca2.pem',
+++    command: [ openssl, 'req', '-x509', '-new', '-nodes', '-extensions', 'ca_no_akid_ext',
+++      '-config', files('gencerts.cnf'),
+++      '-subj', '/O=International Union of Example Organizations/CN=Certificate issuer guy/emailAddress=ca-no-akid@mail.example',
+++      '-key', '@INPUT@', '-sha256', '-days', '10000', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_client_key_pkcs1_des_pem_tgt = custom_target('cert-client-key-pkcs1-des.pem',
+++    input: cert_client_key_pkcs1_pem_tgt,
+++    output: 'cert-client-key-pkcs1-des.pem',
+++    command: [ openssl, 'rsa', '-in', '@INPUT@', '-out', '@OUTPUT@', '-des', '-passout', 'pass:abc', openssl_legacy ],
+++  )
+++
+++  cert_no_keyid_csr_tgt = custom_target('cert-no-keyid.csr',
+++    input: cert_client_key_pkcs1_pem_tgt,
+++    output: 'cert-no-keyid.csr',
+++    command: [ openssl, 'req', '-new',
+++      '-config', files('gencerts.cnf'),
+++      '-subj', '/O=Baz Example Organization/CN=Baz Example Organization/emailAddress=baz@mail.example',
+++      '-key', '@INPUT@', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_no_keyid_pem_tgt = custom_target('cert-no-keyid.pem',
+++    input: [ cert_no_keyid_csr_tgt, cert_ca2_pem_tgt, cert_ca_key_pem_tgt ],
+++    output: 'cert-no-keyid.pem',
+++    command: [ openssl, 'x509', '-req', '-extensions', 'no_keyid_ext',
+++      '-extfile', files('gencerts.cnf'),
+++      '-in', '@INPUT0@', '-CA', '@INPUT1@',
+++      '-CAkey', '@INPUT2@',
+++      '-CAserial', 'cert-ca2.srl',
+++      '-CAcreateserial', '-sha256', '-days', '10000', '-out', '@OUTPUT@' ]
+++  )
+++
+++  cert_expired_csr_tgt = custom_target('cert-expired.csr',
+++    input: cert_client_key_pkcs1_pem_tgt,
+++    output: 'cert-expired.csr',
+++    command: [ openssl, 'req', '-new', '-extensions', 'cert_ext',
+++      '-config', files('gencerts.cnf'),
+++      '-subj', '/O=Bar Example Organization/CN=Bar Example Organization/emailAddress=bar@mail.example',
+++      '-key', '@INPUT@', '-out', '@OUTPUT@' ]
+++  )
+++
+++  echo = find_program('echo')
+++
+++  cert_ca_cnf_tgt = custom_target('cert-ca.cnf',
+++    output: 'cert-ca.cnf',
+++    capture: true,
+++    command: [ echo, '-e',
+++      '[example]\ndatabase=cert-ca-index.txt\nserial=cert-ca.srl\npolicy=dummy\n[dummy]' ]
+++  )
+++
+++  cert_entity_pkcs12_rc2_sha1_p12_tgt = custom_target('cert-entity-pkcs12-rc2-sha1.p12',
+++    input: [ cert_entity_int_key_pem_tgt, cert_entity_int_pem_tgt, cert_chain_pem_tgt ],
+++    output: 'cert-entity-pkcs12-rc2-sha1.p12',
+++    command: [ openssl, 'pkcs12', '-inkey', '@INPUT0@', '-in', '@INPUT1@', '-certfile', '@INPUT2@', '-out', '@OUTPUT@', '-export',
+++      '-passout', 'pass:abc', '-certpbe', 'PBE-SHA1-RC2-40', '-keypbe', 'PBE-SHA1-RC2-128', '-macalg', 'sha1', openssl_legacy ]
+++  )
+++
+++  cert_entity_combined_pem_tgt = custom_target('cert-entity-combined.pem',
+++    input: cert_entity_pkcs12_rc2_sha1_p12_tgt,
+++    output: 'cert-entity-combined.pem',
+++    command: [ openssl, 'pkcs12', '-in', '@INPUT@', '-out', '@OUTPUT@', '-passin', 'pass:abc', '-passout', 'pass:abc', openssl_legacy ]
+++  )
+++
+++  gen_cert_expired_pem_sh = find_program('gen-cert-expired-pem.sh')
+++  cert_expired_pem_tgt = custom_target('cert-expired.pem',
+++    input: [ cert_expired_csr_tgt, cert_ca_pem_tgt, cert_ca_key_pem_tgt, cert_ca_cnf_tgt, files('gencerts.cnf') ],
+++    output: 'cert-expired.pem',
+++    command: [ gen_cert_expired_pem_sh, '@INPUT0@', '@INPUT1@', '@INPUT2@', '@INPUT3@', '@INPUT4@', '@OUTPUT@' ]
+++  )
+++
+++  cert_entity_pkcs12_nomac_p12_tgt = custom_target('cert-entity-pkcs12-nomac.p12',
+++    input: [ cert_entity_int_key_pem_tgt, cert_entity_int_pem_tgt ],
+++    output: 'cert-entity-pkcs12-nomac.p12',
+++    command: [ openssl, 'pkcs12', '-inkey', '@INPUT0@', '-in', '@INPUT1@', '-out', '@OUTPUT@', '-export', '-passout', 'pass:abc', '-nomac' ]
+++  )
+++
+++  cert_entity_pkcs12_des_sha256_p12_tgt = custom_target('cert-entity-pkcs12-des-sha256.p12',
+++    input: [ cert_entity_int_key_pem_tgt, cert_entity_int_pem_tgt, cert_chain_pem_tgt ],
+++    output: 'cert-entity-pkcs12-des-sha256.p12',
+++    command: [ openssl, 'pkcs12', '-inkey', '@INPUT0@', '-in', '@INPUT1@', '-certfile', '@INPUT2@', '-out', '@OUTPUT@', '-export',
+++      '-passout', 'pass:abc', '-certpbe', 'PBE-SHA1-3DES', '-keypbe', 'PBE-SHA1-2DES', '-macalg', 'sha256' ]
+++  )
+++
+++  cert_entity_pkcs12_rc4_sha384_p12_tgt = custom_target('cert-entity-pkcs12-rc4-sha384.p12',
+++    input: [ cert_entity_int_key_pem_tgt, cert_entity_int_pem_tgt, cert_chain_pem_tgt ],
+++    output: 'cert-entity-pkcs12-rc4-sha384.p12',
+++    command: [ openssl, 'pkcs12', '-inkey', '@INPUT0@', '-in', '@INPUT1@', '-certfile', '@INPUT2@', '-out', '@OUTPUT@', '-export',
+++      '-passout', 'pass:abc', '-certpbe', 'PBE-SHA1-RC4-128', '-keypbe', 'PBE-SHA1-RC2-40', '-macalg', 'sha384', openssl_legacy ]
+++  )
+++
+++  cert_entity_pkcs12_pkcs5_sha512_p12_tgt = custom_target('cert-entity-pkcs12-pkcs5-sha512.p12',
+++    input: [ cert_entity_int_key_pem_tgt, cert_entity_int_pem_tgt, cert_chain_pem_tgt ],
+++    output: 'cert-entity-pkcs12-pkcs5-sha512.p12',
+++    command: [ openssl, 'pkcs12', '-inkey', '@INPUT0@', '-in', '@INPUT1@', '-certfile', '@INPUT2@', '-out', '@OUTPUT@', '-export',
+++      '-passout', 'pass:abc', '-certpbe', 'des-cbc', '-keypbe', 'des-cbc', '-macalg', 'sha512', openssl_legacy ]
+++  )
+++
+++  key_ciphertext_dat_tgt = custom_target('key-ciphertext.dat',
+++    input: [ 'plaintext.txt', cert_client_pem_tgt ],
+++    output: 'key-ciphertext.dat',
+++    command: [ openssl, 'rsautl', '-encrypt', '-pkcs', '-in', '@INPUT0@', '-certin',
+++      '-inkey', '@INPUT1@', '-out', '@OUTPUT@' ]
+++  )
+++
+++  key_signature_dat_tgt = custom_target('key-signature.dat',
+++    input: 'plaintext.txt',
+++    output: 'key-signature.dat',
+++    command: [ openssl, 'rsautl', '-sign', '-pkcs', '-in', '@INPUT@',
+++      '-inkey', cert_client_key_pkcs1_pem_tgt, '-out', '@OUTPUT@' ]
+++  )
+++
+++  pem_rsa_files = [
+++    [ 'cert-client-key-pkcs1-des3.pem', '-des3' ],
+++    [ 'cert-client-key-pkcs1-aes128.pem', '-aes128' ],
+++    [ 'cert-client-key-pkcs1-aes192.pem', '-aes192' ],
+++    [ 'cert-client-key-pkcs1-aes256.pem', '-aes256' ],
+++  ]
+++
+++  foreach file: pem_rsa_files
+++    test_pem_cert_deps += custom_target(file[0],
+++      input: cert_client_key_pkcs1_pem_tgt,
+++      output: file[0],
+++      command: [ openssl, 'rsa', '-in', '@INPUT@', '-out', '@OUTPUT@', file[1], '-passout', 'pass:abc' ]
+++    )
+++  endforeach
+++
+++  built_headers = [
+++    [ 'plaintext.txt', 'key-plaintext.h' ],
+++    [ key_ciphertext_dat_tgt, 'key-ciphertext.h' ],
+++    [ key_signature_dat_tgt, 'key-signature.h' ]
+++  ]
+++
+++  xxd_sh = find_program('xxd.sh')
+++
+++  foreach header: built_headers
+++    gen_headers += custom_target(header[1],
+++      input: header[0],
+++      output: header[1],
+++      command: [ xxd_sh,'@INPUT@', '@OUTPUT@' ]
+++    )
+++  endforeach
+++
+++  cert_verifs = [
+++    [ cert_server_pem_tgt, cert_ca_pem_tgt ],
+++    [ ec_cert_server_pem_tgt, ec_cert_ca_pem_tgt ],
+++    [ cert_client_pem_tgt, cert_ca_pem_tgt ],
+++    [ cert_intca_pem_tgt, cert_ca_pem_tgt ],
+++    [ cert_entity_int_pem_tgt, cert_chain_pem_tgt ],
+++    [ cert_no_keyid_pem_tgt, cert_ca2_pem_tgt ]
+++  ]
+++  foreach cert_verif: cert_verifs
+++    test(cert_verif[0].full_path() + '-verify',
+++      openssl,
+++      args: [ 'verify', '-CAfile', cert_verif[1].full_path(), cert_verif[0].full_path() ]
+++    )
+++  endforeach
+++
+++  test_pem_cert_deps += [
+++    # test_pem
+++    cert_client_key_pkcs8_md5_des_pem_tgt,
+++    cert_client_key_pkcs8_sha1_des_pem_tgt,
+++    cert_client_key_pkcs8_v2_des_pem_tgt,
+++    cert_client_key_pkcs8_v2_des_ede3_pem_tgt,
+++    cert_client_key_pkcs8_v2_aes128_pem_tgt,
+++    cert_client_key_pkcs8_v2_aes256_pem_tgt,
+++    cert_client_key_pkcs1_des_pem_tgt,
+++    cert_client_key_pkcs1_pem_tgt,
+++    cert_client_key_pkcs1_des_pem_tgt,
+++    cert_client_key_pkcs8_pem_tgt,
+++    cert_client_key_pkcs8_sha1_des_pem_tgt,
+++    cert_client_pem_tgt,
+++    cert_client_crt_tgt,
+++    cert_entity_combined_pem_tgt,
+++    cert_entity_pkcs12_nomac_p12_tgt,
+++    cert_entity_pkcs12_rc2_sha1_p12_tgt,
+++    cert_entity_pkcs12_des_sha256_p12_tgt,
+++    cert_entity_pkcs12_rc4_sha384_p12_tgt,
+++    cert_entity_pkcs12_pkcs5_sha512_p12_tgt,
+++    # test_key
+++    cert_ca_pem_tgt,
+++    cert_server_pem_tgt,
+++    cert_intca_pem_tgt,
+++    cert_entity_int_pem_tgt,
+++    cert_client_pem_tgt,
+++    cert_client_key_pkcs8_pem_tgt,
+++    # test_tls
+++    cert_chain_pem_tgt,
+++    cert_expired_pem_tgt,
+++    cert_ca2_pem_tgt,
+++    cert_no_keyid_pem_tgt,
+++    ec_cert_ca_pem_tgt,
+++    ec_cert_server_pem_tgt,
+++    cert_server_key_pkcs8_pem_tgt
+++  ]
+++endif
+++
+++# Mocking l_getrandom() to get a stable random seed
+++libell_private_ecdh_dep = declare_dependency(
+++  link_with: libell_private,
+++  link_args: '-Wl,-wrap,l_getrandom'
+++)
+++
+++if get_option('tests') or get_option('cert-tests')
+++  foreach test_name: tests
+++    dep = test_name == 'test-ecdh' ? libell_private_ecdh_dep : libell_private_dep
+++    exe = executable(test_name,
+++      [ '@0@.c'.format(test_name), gen_headers, test_pem_cert_deps ],
+++      include_directories: include_directories('..'),
+++      c_args: [
+++        '-DUNITDIR="@0@/unit/"'.format(meson.project_source_root()),
+++        '-DCERTDIR="@0@/unit/"'.format(meson.project_build_root())
+++      ],
+++      dependencies: dep,
+++      install: false
+++    )
+++
+++    test(test_name, exe,
+++      protocol: 'tap')
+++  endforeach
+++endif
++diff --git a/unit/xxd.sh b/unit/xxd.sh
++new file mode 100755
++index 000000000000..3fd26d2bce90
++--- /dev/null
+++++ b/unit/xxd.sh
++@@ -0,0 +1,3 @@
+++#!/bin/sh
+++
+++xxd -i < "$1" > "$2"
++-- 
++2.51.0
++
 -- 
 2.51.0
 
