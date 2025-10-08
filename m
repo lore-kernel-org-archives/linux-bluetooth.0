@@ -1,69 +1,101 @@
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5002A22D4F6
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130182E7BDC
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759920113; cv=none; b=Dvghv1x6r4dRqVDOslC6LKNmumxuP78exoVH/Hh9GSCoIQ4UQa9Ybwe9xVg+ynC54kEGavWNSZ9ZcZVIG+w+U/ohu+Fx7v6Ajh4U6unFtQJoK627QwAoPdfALL5SNXwt5PMwAvkYgHQha5GTHM2dQucePqoIzf1Z8St1ILhYRFI=
+	t=1759920654; cv=none; b=rpB4MbyIXL4esWmrqHSjpdIpLbiWwVUj64kTeXpOVYJ+lzeqVNj+ZU/BU+cWL5YHzIcVo7VvsQxCf+GGD0UO4GUDg+AkRQML0gZHhheCTow1h3P0P5cLiSGXdB7wuBelB99sUCkAGImNocCXSizqoMwzWLK1nuAVKIadAVSkyEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759920113; c=relaxed/simple;
-	bh=AX+ACQCCZBrBmQhvFvUdzncelacVxWgniZ3vnMtpV5U=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JuBUx4249XC1/atLudSNQLfscKeyNUrxWRcz4WpiU/lqboXO4ONNWXeQA1/iDEV431pxjMPYhyvJPEajm2j2+Mu6VFkuyo9Q1w4IhqOXEig8o8NFcZpZQ4L9O5QVUrzUR4wln7CD6+gdEv+oK/nuAWwnjM6XBANyNZrE6NuucE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B7F4543B28
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Oct 2025 10:41:43 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 10/10] build: Add License field to pkg-config file
-Date: Wed,  8 Oct 2025 12:40:25 +0200
-Message-ID: <20251008104132.2206963-11-hadess@hadess.net>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251008104132.2206963-1-hadess@hadess.net>
-References: <20251008104132.2206963-1-hadess@hadess.net>
+	s=arc-20240116; t=1759920654; c=relaxed/simple;
+	bh=yAU01cXq3UL7tkSmhYlp7vc643VYupXcThkqULAJ2zU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=qHGZ6t2/Xiv9lHfA/+XXJ+xNck942DpTxmQXRsvddtvsjIGpZ02JsRAEpziVBOUrN6IXBUmnUqibhncWUoR82uLesmiMELEN5KR7Iu7LTKAPWFofI5CRQNB4V4riqBCmYfzjm/UZ5odOoB5dqTjVoq4DUOf5z24XdQWGelO9IR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=djEw89C4; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="djEw89C4"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-7946137e7a2so80249936d6.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Oct 2025 03:50:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759920652; x=1760525452; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=yAU01cXq3UL7tkSmhYlp7vc643VYupXcThkqULAJ2zU=;
+        b=djEw89C41XDxK9gEW2pVvAq87qdfvO+5pAcD21415QzTIqhzD41TaHPad/xZ2X4GLd
+         0odoeKeywmXo43G8UY4bld+IiQIMw4nENch6mEdUzU05plEPUGUdAyRE/tHQFOcKfHhJ
+         MUR470wLvUMKpyiDAluNAaz1yoGDR+La08DCCDCdWYeTouHUWRwlrnRkzA09TD5nPeby
+         5Gc235w+1TirKLy2gjv00qEaLB+Htje9uAage0TeOtI7wpW9WSCmogKdZk6ewAILcstp
+         9tjF0u9U1djUGxPPM2p1aLM20dYVRn+3PkyYWonHTGzmIiGQXpIHE23ZL4PxTT2qtK93
+         VxoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759920652; x=1760525452;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yAU01cXq3UL7tkSmhYlp7vc643VYupXcThkqULAJ2zU=;
+        b=YWkSml6c+UY3jtLDky0ST4vn7/Nh9TZDdLZAmXZsc9HoWwNPtLOhlWdpnBkCWr9TX1
+         qvfy2B40+xN5b2WjGRMIbzTb0oFMgddmL2lmWGLg9SX163pUTqGLh3ThCu2C4LlOaq4p
+         m+llKXcsc6pYcy11jQDiD/gS/lVc8zHzvBeYv/Yk8VWmpp57y+YVkHlsc+CFZqOOfjFa
+         DJ9dW+9QtTeCILvFThZtoNUcV58VUkPXcdt4/mpE5uRBPnLZuesMxl/OKK5Ibz8FeMC5
+         FHrO0CM1+++eI+TjTpG7JQJPIdvKE/N60gTBXUyTUxFYqob1JnXcgnnlPQbGleIO2NRP
+         jtvQ==
+X-Gm-Message-State: AOJu0YxAaJEocCniEjCgHshkitl7mECclcJaF9LCduyyirKXmmuIFqAo
+	qs5Uzr2DncsO8Ow5UtZw0fFwJXhqntdVwxBCM1zxCD13DWrl7/be1wqGkkmWNw==
+X-Gm-Gg: ASbGncue23zcEwKdowozfFE14TAUW3fgPrlSUaFs5g0yxosKKf0iAKvoIh09uPIcu6t
+	+MKzqDsKqyGpS4xTzXy8zIegjld8/SD47VMZMzx/ynVu4Me5NvUvpkVBNMTk1SmXv/N1ugj0V34
+	E1hWjbgf1emScgv7U7F8jG2RcLEC+kcb8F7wb4G/dmw6KdB0DLdvgFTq7R6Vta1U1NaR7jLNzzC
+	Jhar0tVInoVJ2GV9WW/qp9GkIgbuZW0yxVyP0Ulu++A0Fy65C4Uew7BWjAMGRyfi4eh8pV4r6zt
+	3aAKBmC027RxGsaE5NCBaMXRcDB+O6qu3pYe+i9mMZb0znRk2hToPiurVBQTLhVVKlkcwjuXaLc
+	EcBIGKh5+dzY3ceID6Vmr/zAd9J2h8/VDH2AGW/Mo8eFY3QLpkLA=
+X-Google-Smtp-Source: AGHT+IH2+Hrl64bs7qWjekVbQcJXh63A4XuHQpoYJPCfqjP+ntvDCoszdWbX78GIX1AjNYMpMgBwgw==
+X-Received: by 2002:a05:6214:1946:b0:78d:304d:2cd with SMTP id 6a1803df08f44-87b2eff072amr34937506d6.49.1759920651824;
+        Wed, 08 Oct 2025 03:50:51 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.87.179])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-878be61fc21sm159028526d6.63.2025.10.08.03.50.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Oct 2025 03:50:51 -0700 (PDT)
+Message-ID: <68e6420b.0c0a0220.6e177.4c81@mx.google.com>
+Date: Wed, 08 Oct 2025 03:50:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0465308559194481323=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: [BlueZ,v3,10/10] build: Add License field to pkg-config file
+In-Reply-To: <20251008104132.2206963-11-hadess@hadess.net>
+References: <20251008104132.2206963-11-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-And require a much newer version of meson.
+--===============0465308559194481323==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: lib/meson.build: does not exist in index
+error: meson.build: does not exist in index
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- lib/meson.build | 1 +
- meson.build     | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/lib/meson.build b/lib/meson.build
-index aac809ab1c70..a0bc18bc0654 100644
---- a/lib/meson.build
-+++ b/lib/meson.build
-@@ -39,6 +39,7 @@ if get_option('library').enabled()
-     description: 'Bluetooth protocol stack for Linux',
-     version: meson.project_version(),
-     libraries: lib_bluetooth,
-+    license: 'GPL-2.0-or-later'
-   )
- endif
- 
-diff --git a/meson.build b/meson.build
-index c429864b9c8b..05efc4141d97 100644
---- a/meson.build
-+++ b/meson.build
-@@ -3,7 +3,7 @@ project(
-   'bluez', 'c',
-   version: '5.83',
-   license: 'LGPL-2.1-or-later AND GPL-2.0-or-later',
--  meson_version: '>= 1.3.0'
-+  meson_version: '>= 1.9.0'
- )
- 
- datadir = get_option('datadir')
--- 
-2.51.0
 
+--===============0465308559194481323==--
