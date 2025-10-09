@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986371B423B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 19:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9771B423B
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 19:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760038820; cv=none; b=M6RwRm0+NSE4g4GbxyEl7ujTvoC2O6KjamzklIePl5mTI3xok9e+9Gv1sD1tt9JR0XTJ0cZVbMa0NOPdZEbEbJl06L7rJ2rQXi0QwP9tw8A+UNBARZFLPvPVNT4qXrSBeLlXo8WoJ/dfy6NxinrtJtk2lbfB19zX/z4y5UYU33M=
+	t=1760038822; cv=none; b=lrjhNnXJQnxNUaGYkLgL8l3+fGuyNBs3XhECB0oKiasCGs4CIKjICyG5Mk/op1thtEPMXQgz/DAywsbNu22gmDTl+s6WsXVc7hXFDXo5RoykoTvJKo9RVmsiR6g3cBS27WwpcqUBkJ7H7cv95yf3EeFAH0bp8RDBBh6ykvnpwX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760038820; c=relaxed/simple;
-	bh=BnQ26LLDu19C/pvd/qPWWbPv6QmF9v7aY9kKMVUCvxw=;
+	s=arc-20240116; t=1760038822; c=relaxed/simple;
+	bh=P6jKw1Yw3LvQjlnIBJLVm0Q3mGqcEL+tIR9AE0Khyuc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=K32Mm/9s0b0A9w04no9+kGv9T2iV05ZiV6DqI80iAq4RsmN1wROOZKP94UIkU4EwjK+XWujrwXbCKEiVIRW1ziCpH4Owiq8txZpZ4AXPWqGH9YnwKr2IoD0z1p6baVxAf8dvvWC7LYeDXWrDIHizWw3auM3Wx5YF/BmGY0N7GC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNp3MvwT; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=igSmgbhkFunvxBTk+2Heeyty6d2IY/NHf38bAtSGpKVvHU1o1FZ95tV/eVQhI6MuKXp1wee8FUsGA0xQGRd67e0+U88sNTJDy/ywg0FCupwN0KdGwiMcWB+BuKx3qxZoNMU2IYj8WE012d4opJ+V9Nig3Y0Iy/QNxW5mUSjtuz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ej7Gp9CA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNp3MvwT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D718C4CEE7;
-	Thu,  9 Oct 2025 19:40:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ej7Gp9CA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78DEDC4CEE7;
+	Thu,  9 Oct 2025 19:40:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760038820;
-	bh=BnQ26LLDu19C/pvd/qPWWbPv6QmF9v7aY9kKMVUCvxw=;
+	s=k20201202; t=1760038821;
+	bh=P6jKw1Yw3LvQjlnIBJLVm0Q3mGqcEL+tIR9AE0Khyuc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SNp3MvwTfU7MEYM72mx/8kNIR32/JJQz2ix9Gv5p6LB8hvzjW6DAm2vAogaOd2mEH
-	 CnYxPpd5JQseXs2W9SO3p9qHOxlAHNk/1ZeBeu571ZhYgUwgkhI3KZhfUP0B1hh4yk
-	 aGSbAWlTNpq5MCELfu5tyAH7GczUExrcyeU9Ss7YdAdy+bMuroIWZni2AK5g++rJCv
-	 PKeaKc7JdWjaKsucL/xtnIOlVkH2dMNOfYWG3D3u0c5RT6Y6kBE8yHS8Cs5PR782WU
-	 eBf7s1jBrzt+O6uFL2n0IdLwk8ME2OnfeNA63X2iT1wiygCU70L1cVGI/7t6GiZpN8
-	 Fl+S+2xsP4geQ==
+	b=ej7Gp9CAmJMZmnwkgpFWoFZZbeShXC0yi6kK7Lj2WvkvvTfRtff+7ufIdIfn/Bt4r
+	 sbZwF0v0LwVx8YA5350w/YV7ce3C/ftBDkMEyzIAfsrNqus8SE2tpeYFSssXss3ecj
+	 8XcNqwtY9ocbs2qjDHoilNCrNgKsCEXCMRJQHMqwzM1DhCNASuaNTPrK6mTVLI2mG/
+	 UsjAqVonSpOj7b5I7f/1HFxUSZHN4FLc325TrDuxozIWvxQV5oCK0VlN7T/Yq75Xxf
+	 webWD3NydTfq/A2J4ZMMIL9dDBaUa/lF0pqak/QT9NKw0crc36aYWYzztuT4+iUYPE
+	 XQttqR6KnVjnw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C7D3A55FA1;
-	Thu,  9 Oct 2025 19:40:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD983A55FA1;
+	Thu,  9 Oct 2025 19:40:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,13 +37,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] shared/hfp: Fix issues found by codacy
+Subject: Re: [PATCH BlueZ] gobex: Fix abort for SRM operation
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <176003880799.253496.18243950355038159229.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Oct 2025 19:40:07 +0000
-References: <20251002161119.937608-1-frederic.danis@collabora.com>
-In-Reply-To: <20251002161119.937608-1-frederic.danis@collabora.com>
+ <176003880948.253496.12188013630292036172.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Oct 2025 19:40:09 +0000
+References: <20251009071159.359476-1-frederic.danis@collabora.com>
+In-Reply-To: <20251009071159.359476-1-frederic.danis@collabora.com>
 To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -52,16 +52,54 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu,  2 Oct 2025 18:11:19 +0200 you wrote:
-> Move debug string after check of hfp pointer.
-> Add missing argument in debug trace.
-> ---
->  src/shared/hfp.c | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
+On Thu,  9 Oct 2025 09:11:59 +0200 you wrote:
+> The OBEX Abort operation currently triggers an OBEX session
+> which prevents further OBEX operations:
+> 
+> obexd[327475]: obexd/client/transfer.c:obc_transfer_register()
+>                0x50e000001380 registered
+>                /org/bluez/obex/client/session0/transfer0
+> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
+>                ref=3
+> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
+>                ref=4
+> obexd[327475]: obexd/client/session.c:session_process_transfer()
+>                Transfer(0x50e000001380) started
+> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+>                ref=3
+> obexd[327475]: Transfer(0x50e000001380) Error: Transfer cancelled by user
+> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
+>                ref=4
+> obexd[327475]: obexd/client/transfer.c:obc_transfer_unregister()
+>                0x50e000001380 unregistered
+>                /org/bluez/obex/client/session0/transfer0
+> obexd[327475]: obexd/client/transfer.c:obc_transfer_free() 0x50e000001380
+> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+>                ref=3
+> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+>                ref=2
+> obexd[327475]: Unknown header offset for opcode 0x10
+> obexd[327475]: obexd/client/session.c:obc_session_shutdown()
+>                0x50c0000010c0
+> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
+>                ref=3
+> obexd[327475]: obexd/client/pbap.c:pbap_remove()
+>                /org/bluez/obex/client/session0
+> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+>                ref=2
+> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+>                ref=1
+> obexd[327475]: obexd/client/session.c:session_unregistered()
+>                Session(0x50c0000010c0) unregistered
+>                /org/bluez/obex/client/session0
+> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+>                ref=0
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ] shared/hfp: Fix issues found by codacy
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=24c568a3b689
+  - [BlueZ] gobex: Fix abort for SRM operation
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=273bf9cec70d
 
 You are awesome, thank you!
 -- 
