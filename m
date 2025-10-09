@@ -1,106 +1,116 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44441B423B;
-	Thu,  9 Oct 2025 07:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1B32D0267
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 07:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759993301; cv=none; b=IBLYUSJ3H0ROCuPMICcs2HmicRsoGCEapfJXxjzI9c9MTK9kVKXRCbsj9gJSqU3FCpMBSLSFmx5TW3zo9k3aCCNNse2KXyrv3tgL3pZBecTOdGsu4+Wf7KMXOs6ExhhOnljvSIRU0zCwiiVLIsiYV8Zg+NZVgUprQfTF8tw65zM=
+	t=1759993929; cv=none; b=jy46xWpmQe/5QqPgAX3cwFR6r8PkgHJ+ozGpngfyciAVkco94jrdijbtEGUKZ1/aAsMPX90LjFU0TarLcegxkGrKCl2CTJtgMAhRz/HEHxhlGjtbRXIYFdHSV8FZ514mnfx+UyDH5Foxu52d84BnHXu0zP8yxMr5Yb8wDavTPyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759993301; c=relaxed/simple;
-	bh=wyXto7zF5l8jpzborrAqVA8LX2KMVMDyUHOgy1rr0Kg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gXM22a3srWRGuYo+llSMtTIL36HijYHyHrFc3+jEVndkVICsn53AKAB78JMQDWTmbO8BqPRKufc7EhQ1MgbwbjeMaEq+TYMr7zKyBmuBqoDnC4b0/SvuB8bFqnI2Rj0szXfw05v4+2T2rVWyWFJe0QvAa5+1xlFddIhpYypEBdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.5] (ip5f5af0f4.dynamic.kabel-deutschland.de [95.90.240.244])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1759993929; c=relaxed/simple;
+	bh=iWPaSXOTko956EdDF6nIy8L8I8aIOCV6eECNiT+6HxU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u4KZRRewwjSO+BSPRPlXReipRe8ANPiShhHKLiW7ejzEKwTCHnfKNDM3ZXCsVMhD492oVdS7Xil1gippdKCxIwtxNkC7mQCDiN0V5lMKLfKcwRxNnASQh6CSYIiDARoSolXp+nmcnJf4gqdSNy6QxFGheR4h2HokqY8iLqH/7B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=bQd5ojlM; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="bQd5ojlM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1759993924;
+	bh=iWPaSXOTko956EdDF6nIy8L8I8aIOCV6eECNiT+6HxU=;
+	h=From:To:Subject:Date:From;
+	b=bQd5ojlMtnZMAxm7/pVG7AqIozk6RYHm4AIOWA4STddXOWToesoEBlQmk7rK3CM4M
+	 hUbLe6CG+5W2+ckWtWscGjaP/vDCUu4byLS9JGLrnSYEqG045RCzb/Gs4uTZ7h206y
+	 i5bAw7OvZArjn8JrNYnwteRIDNwQigjn+UvcYw+vf7JGPez1oBVJmpz/HkdvbutI7V
+	 p/EXLTzXC2mRbPWs2FO6LgZB4hskk7uEpxAxs7/KfvYbaFxYiiaDtgYE7ZTY1BB9zX
+	 OTqivmltxyktZgzRjBBVvhNgxKCNugjiKYR2kZtF7q9qLUi6P9Lulfct1FKJNbHc7X
+	 zSeZElBv4dgXg==
+Received: from fdanis-ThinkPad-X1.. (2A02-8428-aF44-1001-AB6e-1eE8-0E0E-15D0.rev.sfr.net [IPv6:2a02:8428:af44:1001:ab6e:1ee8:e0e:15d0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id F3D5D6028F350;
-	Thu, 09 Oct 2025 09:01:18 +0200 (CEST)
-Message-ID: <572c2a33-18dd-4bf0-8c41-e051d75f481b@molgen.mpg.de>
-Date: Thu, 9 Oct 2025 09:01:18 +0200
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9ECDF17E0125
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 09:12:04 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] gobex: Fix abort for SRM operation
+Date: Thu,  9 Oct 2025 09:11:59 +0200
+Message-ID: <20251009071159.359476-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Bluetooth: bfusb: Fix buffer over-read in rx
- processing loop
-To: Seungjin Bae <eeodqql09@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Kyungtae Kim <Kyungtae.Kim@dartmouth.edu>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-kernel@vger.kernel.org,
- linux-bluetooth@vger.kernel.org
-References: <77bde79f-2080-4e40-a013-52b480c0928c@molgen.mpg.de>
- <20251009025701.3756598-2-eeodqql09@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251009025701.3756598-2-eeodqql09@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Dear Seungjin,
+The OBEX Abort operation currently triggers an OBEX session
+which prevents further OBEX operations:
 
+obexd[327475]: obexd/client/transfer.c:obc_transfer_register()
+               0x50e000001380 registered
+               /org/bluez/obex/client/session0/transfer0
+obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
+               ref=3
+obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
+               ref=4
+obexd[327475]: obexd/client/session.c:session_process_transfer()
+               Transfer(0x50e000001380) started
+obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+               ref=3
+obexd[327475]: Transfer(0x50e000001380) Error: Transfer cancelled by user
+obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
+               ref=4
+obexd[327475]: obexd/client/transfer.c:obc_transfer_unregister()
+               0x50e000001380 unregistered
+               /org/bluez/obex/client/session0/transfer0
+obexd[327475]: obexd/client/transfer.c:obc_transfer_free() 0x50e000001380
+obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+               ref=3
+obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+               ref=2
+obexd[327475]: Unknown header offset for opcode 0x10
+obexd[327475]: obexd/client/session.c:obc_session_shutdown()
+               0x50c0000010c0
+obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
+               ref=3
+obexd[327475]: obexd/client/pbap.c:pbap_remove()
+               /org/bluez/obex/client/session0
+obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+               ref=2
+obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+               ref=1
+obexd[327475]: obexd/client/session.c:session_unregistered()
+               Session(0x50c0000010c0) unregistered
+               /org/bluez/obex/client/session0
+obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
+               ref=0
 
-Thank you for the patch.
+As its highest bit is always set to 1, and so its value located after
+G_OBEX_RSP_CONTINUE, the G_OBEX_OP_ABORT is part of the operations
+constants.
 
-Am 09.10.25 um 04:57 schrieb pip-izony:
-> From: Seungjin Bae <eeodqql09@gmail.com>
-> 
-> The bfusb_rx_complete() function parses incoming URB data in a while loop.
-> The logic does not sufficiently validate the remaining buffer size(count)
-> across loop iterations, which can lead to a buffer over-read.
-> 
-> For example, with 4-bytes remaining buffer, if the first iteration takes
-> the `hdr & 0x4000` branch, 2-bytes are consumed. On the next iteration,
-> only 2-bytes remain, but the else branch is trying to access the third
-> byte(buf[2]). This causes an out-of-bounds read and a potential kernel
-> panic.
-> 
-> This patch fixes the vulnerability by adding checks to ensure enough
-> data remains in the buffer before it is accessed.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Seungjin Bae <eeodqql09@gmail.com>
-> ---
->   v1 -> v2: Fixing the error function name
->   v2 -> v3: Addressing feedback from Paul Menzel
-> 
->   drivers/bluetooth/bfusb.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-> index 8df310983bf6..90ca5ab2acc3 100644
-> --- a/drivers/bluetooth/bfusb.c
-> +++ b/drivers/bluetooth/bfusb.c
-> @@ -360,6 +360,12 @@ static void bfusb_rx_complete(struct urb *urb)
->   			count -= 2;
->   			buf   += 2;
->   		} else {
-> +			if (count < 3) {
-> +				bt_dev_err(data->hdev,
-> +				       "block header is too short (count=%d, expected=3)",
+This has been tested for PBAP and BIP-AVRCP with Android 15 and 16.
+---
+ gobex/gobex.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Why not: block header count %d < 3 (too short)
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 0e33ececf..df80d79f3 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -382,7 +382,7 @@ static void check_srm_final(GObex *obex, guint8 op)
+ 	case G_OBEX_OP_CONNECT:
+ 		return;
+ 	default:
+-		if (op <= G_OBEX_RSP_CONTINUE)
++		if (op <= G_OBEX_RSP_CONTINUE || op == G_OBEX_OP_ABORT)
+ 			return;
+ 	}
+ 
+-- 
+2.43.0
 
-> +				       count);
-> +				break;
-> +			}
->   			len = (buf[2] == 0) ? 256 : buf[2];
->   			count -= 3;
->   			buf   += 3;
-
-Either way:
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
