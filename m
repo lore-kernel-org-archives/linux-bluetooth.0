@@ -1,98 +1,187 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772492627EC
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 19:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3F235966
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 20:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760039941; cv=none; b=gF0/UA0WtLKKQTTYSBkJrBRgJax+3NkqSOYqmog8sIgIo7ls9mtFrqeg/URWOATgWQe4t9TG0mQ8yogO8zS8c7GDZO3kFBk353rmOekb7ymbCstwcKP/ZiJYTap1rIsxLR+yIT/RcCtnhB9yZspe6R/03dY+3rxSVUxprG0yVvs=
+	t=1760040933; cv=none; b=Vpsl/CjL16pts8g32wQXNJ1O7uMP0VeZ/4n60sLXOpv46Rv3hOjHDuFpvAL2OWFx1JVGgx4UPGMVp26qwpdgzL9EWiAwq0z3CxDcdik6v8NTr1ejYVxzNGD/BFdXaK6UPfM/mU4zgcH4C+rGhvlHOHuCbGaVivuws1DMX1fajYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760039941; c=relaxed/simple;
-	bh=qh1Ck5XNx/JSzkctQFKberJjeHoW7DyqY5m+jPcyFwQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dPJwhMJFs/TEaFWyL5xkFjkfsNf8/NKHKdcBsp7C1Uke1iQRvM4sV9g9TIvJ1I/ljauUSQrTW1GdrCxpkCpwo+FZcYs5aYHURZXhMu2LeYNY5q+t8YJ4H2n1J1DrLjhwRoqrWk6G7bTMXR0SKqLSCSprQnsEyNUQsPm/SD0IJCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=QSjb4X9H; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1760040933; c=relaxed/simple;
+	bh=SpOx22Sd1ThvoXnRAWynZ0nEvQR6xRdJGDE5OcjGS04=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RX9pdmevxAAw5ece2HnoiGOcy64v6vTipkUxcLczWXHOMK9RfVh62czzHH8nJEukqYexkF3wxHM0E8GKK2B3GXHDJCsDOTDK3IHwQdW7D9/7aoCSECpc0jUQ0C5XupQTIxag5715H8Jfl1kWanhjQ38+CBh5pmdhuVREpFDleJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=W/srrRug; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="QSjb4X9H"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1760039929;
-	bh=qh1Ck5XNx/JSzkctQFKberJjeHoW7DyqY5m+jPcyFwQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=QSjb4X9HQgDBg346TsD6aS8NyuoTPDyJe67NFSZWdryFHg9ydmXNYQtQhadvUeXce
-	 OmPFqqs3MCP8z5RdF7ZCsW9ISwdwMJ/oUm3aKaYxRw0Z0NVODCM+mfgdoP66+oNOF3
-	 lrFk6imhPtiHiJQlk6hQdE9m5dF/7qmNW7QrJupc6FcR4CTLqzLrlXoz2OqDuq1HQh
-	 87tiZHc+h/zlWYsVCrIcTNdU8xOYoLJaKtYOf+jRMqgAXQhuLae64mcBXR63TdaDRZ
-	 eMVLBsFt+8rx7hYbEfDFRz6Er7rCgPYGHKa7lR58xT7FI5aGPKCqHHn9QYUXslXwCE
-	 NU2GvD2ACK6KA==
-Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-aB6e-1eE8-0e0E-15d0.rev.sfr.net [IPv6:2a02:8428:af44:1001:ab6e:1ee8:e0e:15d0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9FA3F17E13A5
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 21:58:49 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="W/srrRug"
+Received: from github.com (hubbernetes-node-0ad56d2.va3-iad.github.net [10.48.206.70])
+	by smtp.github.com (Postfix) with ESMTPA id 07D304E0C73
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 13:15:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1760040931;
+	bh=bEPBtDSo5mCsxb66RtkDEwNjJbgWI9L250l6vTtBVxI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=W/srrRugZvxcEwbpDclM4Niik9AtYlxIduPd+NHPLVGn7V/pWLulVIevHcl0RoWpF
+	 jo9/2W/KsR18nlk/gDWihwQyq/ILUthmdwWt3qbuUaOxBEFvSu/Mch3CRWDOFWWo2j
+	 1uH7NBFnGjCv3DN6Au6OUidbkXNNUkKh3SHjm2vo=
+Date: Thu, 09 Oct 2025 13:15:31 -0700
+From: fdanis-oss <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 6/6] unit/test-hfp: Add incoming call interrupted test
-Date: Thu,  9 Oct 2025 21:58:42 +0200
-Message-ID: <20251009195842.776231-6-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251009195842.776231-1-frederic.danis@collabora.com>
-References: <20251009195842.776231-1-frederic.danis@collabora.com>
+Message-ID: <bluez/bluez/push/refs/heads/1009862/000000-ed829b@github.com>
+Subject: [bluez/bluez] 542c2d: shared/hfp: Add dial support
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1009862
+  Home:   https://github.com/bluez/bluez
+  Commit: 542c2d403576cc99b8068878c4c4298ee30ac5da
+      https://github.com/bluez/bluez/commit/542c2d403576cc99b8068878c4c42=
+98ee30ac5da
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-10-09 (Thu, 09 Oct 2025)
+
+  Changed paths:
+    M src/shared/hfp.c
+    M src/shared/hfp.h
+
+  Log Message:
+  -----------
+  shared/hfp: Add dial support
+
+If no number, NULL or empry string, is passed to hfp_hf_dial() this
+will try to call the last dialed phone number using AT+BLDN.
+
+If the phone number starts with '>' and is followed by a number nnn=E2=80=
+=A6,
+up to 10 digits, it will call the phone number in memory entry nnn=E2=80=A6=
+.
+
+Else it will performed a voice call to the number provided.
+
+
+  Commit: cfe29d34378b3f3cdccdf1a62e20965df44ed979
+      https://github.com/bluez/bluez/commit/cfe29d34378b3f3cdccdf1a62e209=
+65df44ed979
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-10-09 (Thu, 09 Oct 2025)
+
+  Changed paths:
+    M unit/test-hfp.c
+
+  Log Message:
+  -----------
+  unit/test-hfp: Add dial tests for HF
+
+This add the following tests:
+- /HFP/HF/OCL/BV-01-C
+  Initiate a call placed to the last number
+- /HFP/HF/OCL/BV-02-C
+  Handling ERROR response to a call placed to last number
+- /HFP/HF/OCM/BV-01-C
+  Initiate a request to place a call with a memory location
+- /HFP/HF/OCM/BV-02-C
+  Handling ERROR response to a call placed to an empty memory location
+- /HFP/HF/OCN/BV-01-C
+  HF places a call with a phone number
+
+
+  Commit: 8ab6653d176b51346594b5a2e2717b9349e7792e
+      https://github.com/bluez/bluez/commit/8ab6653d176b51346594b5a2e2717=
+b9349e7792e
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-10-09 (Thu, 09 Oct 2025)
+
+  Changed paths:
+    M src/shared/hfp.c
+    M src/shared/hfp.h
+
+  Log Message:
+  -----------
+  shared/hfp: Add in-band ring tone setting support
+
+
+  Commit: 648338f6df71047227114ca7163dbbdf5ca9d4c4
+      https://github.com/bluez/bluez/commit/648338f6df71047227114ca7163db=
+bdf5ca9d4c4
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-10-09 (Thu, 09 Oct 2025)
+
+  Changed paths:
+    M unit/test-hfp.c
+
+  Log Message:
+  -----------
+  unit/test-hfp: Add Answer Incoming Call with In-Band Ring tests for HF
+
+This add the following tests:
+- /HFP/HF/ICA/BV-01-C
+  Verify the incoming call is answered from HF, in-band ring tone.
+- /HFP/HF/ICA/BV-02-C
+  Verify that the AG can change its in-band ring tone setting.
+- /HFP/HF/ICA/BV-03-C
+  Verify that the HF alerts of an incoming call using the local ring
+  signal regardless of the presence of the in-band ring tone.
+- /HFP/HF/ICA/BV-04-C-full
+  duplicate of /HFP/HF/ICA/BV-04-C test with full SLC setup.
+
+/HFP/HF/ICA/BV-05-C (Verify that the HF alerts an incoming call using
+a locally generated alert signal and can answer an incoming call in
+the AG when the AG does not use an in-band ring tone as an alert
+mechanism for the HF and the IUT allows an Audio Connection to be
+present) is similar to /HFP/HF/TCA/BV-02-C/HFP/HF/ICA/BV-04-C-full for
+the HF side.
+
+
+  Commit: 1791b7797e78da0fb4c5c5d2840180bc68cae7ab
+      https://github.com/bluez/bluez/commit/1791b7797e78da0fb4c5c5d284018=
+0bc68cae7ab
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-10-09 (Thu, 09 Oct 2025)
+
+  Changed paths:
+    M unit/test-hfp.c
+
+  Log Message:
+  -----------
+  unit/test-hfp: Add incoming call prior to connection test
+
+This add the following test:
+- /HFP/HF/ICA/BV-07-C
+  Verify that HF can connect to an AG that is receiving an in-coming
+  call.
+
+
+  Commit: ed829bab477556592f789698a3082768a99940e4
+      https://github.com/bluez/bluez/commit/ed829bab477556592f789698a3082=
+768a99940e4
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-10-09 (Thu, 09 Oct 2025)
+
+  Changed paths:
+    M unit/test-hfp.c
+
+  Log Message:
+  -----------
+  unit/test-hfp: Add incoming call interrupted test
 
 This add the following test:
 - /HFP/HF/CIT/BV-01-C
   Verify that HF responds as expected when a normal incoming call
   process is interrupted from the remote party.
----
- unit/test-hfp.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-index 2d8f4396d..3973df5cf 100644
---- a/unit/test-hfp.c
-+++ b/unit/test-hfp.c
-@@ -930,7 +930,8 @@ static void hf_call_added(uint id, enum hfp_call_status status,
- 	if (tester_use_debug())
- 		tester_debug("call %d added: status %u", id, status);
- 
--	if (g_str_equal(test_name, "/HFP/HF/CLI/BV-01-C") ||
-+	if (g_str_equal(test_name, "/HFP/HF/CIT/BV-01-C") ||
-+		g_str_equal(test_name, "/HFP/HF/CLI/BV-01-C") ||
- 		g_str_equal(test_name, "/HFP/HF/ICA/BV-01-C") ||
- 		g_str_equal(test_name, "/HFP/HF/ICA/BV-02-C") ||
- 		g_str_equal(test_name, "/HFP/HF/ICA/BV-03-C") ||
-@@ -1339,6 +1340,20 @@ int main(int argc, char *argv[])
- 			MINIMAL_SLC_SESSION('0', '0', '0', '0'),
- 			data_end());
- 
-+	/* Incoming call interrupted - HF */
-+	define_hf_test("/HFP/HF/CIT/BV-01-C", test_hf_session,
-+			NULL, test_hf_session_done,
-+			MINIMAL_SLC_SESSION('1', '0', '0', '0'),
-+			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
-+				'3', ',', '1', '\r', '\n'),
-+			frg_pdu('\r', '\n', 'R', 'I', 'N', 'G', '\r', '\n'),
-+			frg_pdu('\r', '\n', '+', 'C', 'L', 'I', 'P', ':',
-+				'\"', '1', '2', '3', '4', '5', '6', '7', '\"',
-+				',', '1', '2', '9', ',', ',', '\r', '\n'),
-+			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
-+				'3', ',', '0', '\r', '\n'),
-+			data_end());
-+
- 	/* Calling Line Identification - HF */
- 	define_hf_test("/HFP/HF/CLI/BV-01-C", test_hf_session,
- 			NULL, test_hf_session_done,
--- 
-2.43.0
 
+Compare: https://github.com/bluez/bluez/compare/542c2d403576%5E...ed829ba=
+b4775
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
