@@ -1,119 +1,126 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9AF2367D5
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 07:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAC1241CB7
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 08:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759994255; cv=none; b=b3BWZNhAD6hXyqB9gRZFsINIwjepvM3CVFirD2hi+cOgteTdzZq51Yk0Z4ggWzT0v4NlzVET6ML6Amw9pVrUQ8Km+ZO8AwWZjazOfjArPN6Suz8H1apOOLsn279jIT0yqVZt3X6TuYz333AtoQwN55EmAJpltXOmSBxl9g6T25U=
+	t=1760000172; cv=none; b=Pgek6s0dTtPtxNpuC/C2C223EcGM1TZrwVmLkde4SWm5vbHSISadMp7HNa7/nOMvQobL97nC3lOhA1JSJp6zCxb4+zcRM9KsdTCyFGen51FO7vEjLfyYqS2zOlgp6r3cmce8rj8ArvHVckFmPRD81D1LfQDO5mf/D8VWQ+hnQk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759994255; c=relaxed/simple;
-	bh=+dRlqEXFi0ODynm6xdOjE+eAbg7mtnR57ygzsiZ+aH8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=W0PiKcEjI9tcxo22SYKZtFQeDEbGvCDlR4T2IXTRnOLzfo6nkhlRKNqVC3vBqzuNAX2X8ceBGR72aXPBr1RSAmLlQwEqaO3NR7DZpstn4H7ehxSpLmQAU195BHY24n3AGdeegoYwZOED9Ka/MbWi1ggdUQScpR3pQgYMk7e0U1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ht4u17/p; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1760000172; c=relaxed/simple;
+	bh=gBjRttb9jkMw1wAIFANTDuYZJo4dZrbPiJEIBRKWUvE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=uGY8jriTd88liUL0Uu5dwciwckNMnkg+9vtJ4OQ+Bg7wfkitDsq+oy22LUldyQLSjXjvxKZJRFSLeoDpFDveziicBWooXC7odMqAGB7OWTrWZd0tclBDP3J2EON4kaXtpe7KoZQ7QqyK7Iy1LuPWGWzvDWU7THjeo2hBbjshrLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P630OQuy; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ht4u17/p"
-Received: from github.com (hubbernetes-node-2202043.ac4-iad.github.net [10.52.125.49])
-	by smtp.github.com (Postfix) with ESMTPA id 86071640D5B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 00:17:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1759994252;
-	bh=XJuWQQwI6Xz28E9SVOpBvA6KaM/zRxtwy4yedPnPHi0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=ht4u17/pcZ8FL3pmgRu2ZeC9aTDFuRbup3w0BUhWNCSwNQm0szVBIZnTCgdrcn582
-	 WIuQxw2Ofmqnc73q+j6Mm10bGhs0WiM/2JWoplEGX7Tc7gQt3cBCxObPcslNkKJdUF
-	 S7wK7XUrPFcvrqoCpq6NHDMYdTSbcdZouDmVibs4=
-Date: Thu, 09 Oct 2025 00:17:32 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1009611/000000-b659e4@github.com>
-Subject: [bluez/bluez] b659e4: gobex: Fix abort for SRM operation
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P630OQuy"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-912d4135379so28061739f.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Oct 2025 01:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760000169; x=1760604969; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ufNwUgfLN3leddZGV5zpmIuh/lkIRl2PYrFb55TqC+8=;
+        b=P630OQuyrYY283jLTGwiICtR7J+yCHahrwpA8kAe+TZAsC/iO7Cj2QDZUK/uhRGB0e
+         j7IS1yEUFFgWtYPbm8XFkl3J558EX0KQqMXFUTB+ZAsiFcb7lAZ8X1y35nKPSKtRt9cj
+         NlQJKmQ10YnC01IN6l0kwu/zH59fzpZ3Je87MW2MzuL47sZ70rwrCQDFdxR0yGF1oivZ
+         rBzgqWWEMdh7TgnBf/esu+8lMLe394ejb+6Royr96s2cajWVvFPbdiavcPT+uFXv38hP
+         lU67PLsWHA/JyTtirNy5pXfx8KCDHu1/yQkd9OvjriDBipLroKS58OwLTc0jj//eBAoo
+         KbdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760000169; x=1760604969;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ufNwUgfLN3leddZGV5zpmIuh/lkIRl2PYrFb55TqC+8=;
+        b=aqMnFrs09I7s8QMEOPVyJ4wfWKhvkghadyRZtxWor4Cxy3bB/gCyH5U9TetAFcmZqj
+         MonEr6c2BS5vMbxf3hGwpCeDfXh6CX8chS4uncfKpEl5bg39JbCekGd84r6un2etHJZD
+         Zh1GDFvdy0RQgsFspZTYiVtfdp5IxLcqy7N1GCT+WJmmIyvL2MYOSKSIBv+MaeT2HdZQ
+         8y5nRmsDHLWaZ/ZJTFflVgZPIAL7e9E5OX3oZBZu9MIA52mrNzm1fMwSNDuN/JxiJ09v
+         jIBh+1axXiw3jmxvuGsCdQOntKlu4vgoNeNjGVEDoMvPCJGUX1wOkwpYAZI+niFtS757
+         H97g==
+X-Gm-Message-State: AOJu0Ywz3qv1GNnAs0tUU172guYqhcBt9TcE/Z0j3JHwEq5cws48cp1Y
+	YtvOwDkShi9A/kjMIp0LBBvV1z7ireirD0YtuvexFvnrzWhUeWektJ6dJ5K+Bg==
+X-Gm-Gg: ASbGncs/H3IcbgQnDodCOyHtJRdMxDbWJU1xNuPMFMCWNyOKPHfZ1AaqeqORmhpR7UJ
+	4xUThrfeNa0xD7bKugraeOtoAiulRJETf6TGCJeokfx9rK0Sjuol3r+g+Z9mS1iHO1NHoKCNtVb
+	Zi8hjIVUPptVs9KMl/3Mt8+CwEe9eBbQ0cs1g1qtaddLD5DMm6Nyf23LvHyl57lvrwwhCxV2NBR
+	lmsaeoSfsRNEQmHHwWSi8Mqlt5SByxng2RvZtNfgt0QYvnqnkBQ/2N+bWO8z/4tYDGccdg8EuXG
+	xzFAiBREyPEl2oankRnZFt/NOLpvU++GB1kQtcB1FPrLxpmaCJrxe5GBfHpyGmP/19pNYX1Peh3
+	Y/h6ZVKfsN7XFNDn8yOB0H6M2icaWa3JNgxhQTU8zLcS5DxNsNGpTrj4=
+X-Google-Smtp-Source: AGHT+IFk8hMZm/23m0WvU0pdGNb55RKFQrCj2hQd9H3I80pTIUW79BrjgOxFFbe88rcZa+6Jb7cxUg==
+X-Received: by 2002:a05:6602:13c9:b0:887:54d4:a8c8 with SMTP id ca18e2360f4ac-93bd1987b63mr717256439f.12.1760000169143;
+        Thu, 09 Oct 2025 01:56:09 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.133.241])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-93bdb306b65sm75883939f.16.2025.10.09.01.56.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Oct 2025 01:56:08 -0700 (PDT)
+Message-ID: <68e778a8.5d0a0220.c6285.1bd3@mx.google.com>
+Date: Thu, 09 Oct 2025 01:56:08 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4367064401037126613=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ] gobex: Fix abort for SRM operation
+In-Reply-To: <20251009071159.359476-1-frederic.danis@collabora.com>
+References: <20251009071159.359476-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1009611
-  Home:   https://github.com/bluez/bluez
-  Commit: b659e42a7c6a5c383d626d89ee7d6514a102194c
-      https://github.com/bluez/bluez/commit/b659e42a7c6a5c383d626d89ee7d6=
-514a102194c
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-10-09 (Thu, 09 Oct 2025)
+--===============4367064401037126613==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M gobex/gobex.c
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  gobex: Fix abort for SRM operation
+Dear submitter,
 
-The OBEX Abort operation currently triggers an OBEX session
-which prevents further OBEX operations:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1009611
 
-obexd[327475]: obexd/client/transfer.c:obc_transfer_register()
-               0x50e000001380 registered
-               /org/bluez/obex/client/session0/transfer0
-obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
-               ref=3D3
-obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
-               ref=3D4
-obexd[327475]: obexd/client/session.c:session_process_transfer()
-               Transfer(0x50e000001380) started
-obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:=
+---Test result---
 
-               ref=3D3
-obexd[327475]: Transfer(0x50e000001380) Error: Transfer cancelled by user=
+Test Summary:
+CheckPatch                    PENDING   0.29 seconds
+GitLint                       PENDING   0.30 seconds
+BuildEll                      PASS      18.02 seconds
+BluezMake                     PASS      4218.86 seconds
+MakeCheck                     PASS      19.77 seconds
+MakeDistcheck                 PASS      173.56 seconds
+CheckValgrind                 PASS      229.21 seconds
+CheckSmatch                   PASS      270.76 seconds
+bluezmakeextell               PASS      123.13 seconds
+IncrementalBuild              PENDING   0.38 seconds
+ScanBuild                     PASS      838.78 seconds
 
-obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
-               ref=3D4
-obexd[327475]: obexd/client/transfer.c:obc_transfer_unregister()
-               0x50e000001380 unregistered
-               /org/bluez/obex/client/session0/transfer0
-obexd[327475]: obexd/client/transfer.c:obc_transfer_free() 0x50e000001380=
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:=
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-               ref=3D3
-obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:=
-
-               ref=3D2
-obexd[327475]: Unknown header offset for opcode 0x10
-obexd[327475]: obexd/client/session.c:obc_session_shutdown()
-               0x50c0000010c0
-obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
-               ref=3D3
-obexd[327475]: obexd/client/pbap.c:pbap_remove()
-               /org/bluez/obex/client/session0
-obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:=
-
-               ref=3D2
-obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:=
-
-               ref=3D1
-obexd[327475]: obexd/client/session.c:session_unregistered()
-               Session(0x50c0000010c0) unregistered
-               /org/bluez/obex/client/session0
-obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:=
-
-               ref=3D0
-
-As its highest bit is always set to 1, and so its value located after
-G_OBEX_RSP_CONTINUE, the G_OBEX_OP_ABORT is part of the operations
-constants.
-
-This has been tested for PBAP and BIP-AVRCP with Android 15 and 16.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
 
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4367064401037126613==--
