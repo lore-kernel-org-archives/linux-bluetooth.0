@@ -1,149 +1,104 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445792ED15C
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 15:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760025500; cv=pass; b=gw1QZ1v0CKuAYVI3sDRqswiB+8w4UQXA8Ei8Iq6QrsB7M1iV95AoYn/JOvMPVzCbsw6fU4QRt6vIh6q7ppC8bcje/a7gLEgHHD2DbXYO1knrD0/ohrd+l+LSxqpSM55BXUau1No8nMiJqUf7fQryAsliAoG4b91DS/ltNg4d3wo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760025500; c=relaxed/simple;
-	bh=l45Efr801OCaGWkdA4pbRIc6bqt0gFaTpCZ8A4Phd38=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b/pY8pXWF9IMu+K88N6W6KZ/BR0YjYNSFN0xYEE46JUdSwNDUKGcroAKD5X186gSqKBJLeQOI9c+kFBinTpjHTa5SuQI35fBJEog4J1inS7TqLivfg9WWCVXG5pxpTZl22SGyGdjSmAHtCLDtbd2zrNq0sbz3wAlL4qkiPvSiPA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=YRcwxzJs; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34142282E1
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 16:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760026882; cv=none; b=OQsRenLLtri+L+kCMdyTvi/zxz7mG83Ddo3nmhmZ59gpoGwAekVctu/l7cOldNpWd7AB5qi1BdwA1hcXvMEh/oZQriRKd0IpDmNkTx29hNXTa86PbyIjeyr7LcdZaj42OKF2NKhS1dZVAI3qeiXKG+LUGte6f8Tll+xc5phZVGE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760026882; c=relaxed/simple;
+	bh=dMR5MWgAyHm9SkZ0drnohm+311naRTx5K0NN2Zjdxyc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=R54uyZot3MOL6EJuidcxEjD6EWMH8cPyNYIPopHeee15JhBnMSzg0y1Z8c5shAmUjUZwabgwZhqneVt4vFHuplc5I4hCAt4/w84dFPP5H1SbAddL7N1U5bhFqVZetY/02W5Qg3WB1HTb3OLxWfFr8/X07Gaa3/4z8hK52Rt2ucU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=htSuftz6; arc=none smtp.client-ip=209.85.222.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="YRcwxzJs"
-ARC-Seal: i=1; a=rsa-sha256; t=1760025494; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=P6EAQK+F3dmKV4zmz3Z5++Fn/K+/PATWMS5w7pyWXIohSC+5mXsLObe6kiyUVnqUzdQvDDsXut/QzXDE4XrPSXFK5pGS0sOj5D49ZuWFAMwKawo7FYkGWfkHH9d7LP3YEX3qgVEX4kyetZRFHkCrlv1dZVn/eT7RdyBbomDg4vA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1760025494; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=sr9BvipH10qAjWy7UhGw3G84jz2wi3yN6qQyFSDevqw=; 
-	b=jP1rwcLBkmcrg5Zr0vQUFGs1wI/5JGw9A0DfOJUGtoJm/UCFfvG1N66IXB7mIpOb97uDyJ3pqQNiK+nTBLndzByPoYTUw+TJMl92G6LqlikKKYdDqs/fTX0oP1HnbPw56XkinZnI5mxfujcuDzenG0TR9hNZ/dszfuOl1HYhJow=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
-	dmarc=pass header.from=<frederic.danis@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1760025494;
-	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=sr9BvipH10qAjWy7UhGw3G84jz2wi3yN6qQyFSDevqw=;
-	b=YRcwxzJs3YJZt8A+GwVEWRfDocjDoBDdALjb6qZo32VTdVsw/Scrmjf7fg0UYg8n
-	jwjklUtaUC4TmEtWAg8LZlHYB+7yNJx4cxvuRuIBfHP6NUxycfdgKOqZMAW+KdMaNnx
-	jhCFAREpsbyz5EpHMVyXu5HuV48PMOIKeJ025oAA=
-Received: by mx.zohomail.com with SMTPS id 1760025492578213.1716743414372;
-	Thu, 9 Oct 2025 08:58:12 -0700 (PDT)
-Message-ID: <7c9a5707-af06-4540-8add-fc2901fac610@collabora.com>
-Date: Thu, 9 Oct 2025 17:58:08 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="htSuftz6"
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-930989f9f81so405027241.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Oct 2025 09:21:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760026879; x=1760631679; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KOfiJtH+MMKlRL3K70Jdp/KnIs7rinxUyP+McD79owY=;
+        b=htSuftz64w51oR8gHZWSbMydqETDB1UOd9YxNHdwKFuFRYu/7VwH1I3qmfMX3oaVZ+
+         amGyJnpXNLkYcUd4YMsiZgAc2WZmjcZauxBkAhPaciYRJyvVe0MhsPT84LBPnQE1mpMi
+         OrCLfyFmQ9k99ns3CeSFzPL9cDvPalJHDQjnfazgu7R4N1Ksx/Km0r1PbaqPdgJuC4MB
+         r/zBYvcIEga9wRNKi4KlqP2G0Ep3bjU06n0LtjqjXyCJjhc8S7jB36FYYysrwROQgGro
+         2ZgROH77K3OgEU5tloXc9f4M7B9p09A3YP61cNzc0gmYLVVAU5+qZ7rp2QJ1LLLlr/cD
+         m3lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760026879; x=1760631679;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KOfiJtH+MMKlRL3K70Jdp/KnIs7rinxUyP+McD79owY=;
+        b=aB0x7GpJGtF3EicO+/rHXzMOAxFeP1tCgq9ThDTJ3So4axMl5jQUFQ34Qv+w64AdvE
+         lHxTcCtODgG/Vd9o5K4bCOwyS9afVhCIC7YojoQ+ZsqQhBjQ2WkZfJ22pXs/KxHzORbl
+         fJp8qsGgpMPSgv4T4dTo3q5m7NEeL3dkzdShDCJGhfJ88RPXQhW54IUtxBK+nzkcJUyt
+         lV+LRCEQQbVgfXVY+Bx2r1wJvmVUpIn+nIUEkJfVHzC798Tkkzx1aNtqJcmoN543uzIs
+         FcUUQRus/cc1l4hWvsCeV63Y5RuU11iVASCnWrLy9Fr8BpSXkvP35519gpLV2bGu09Te
+         kiMA==
+X-Gm-Message-State: AOJu0YylZlOuq+wTZ9OzoTvm5lQQulMW2QjM2XU2LL9O0v78J/ifn1M3
+	L6I6n/VugVBx/VbCEa/kZ9nNsG8d9mZM8lVVauk2oDqjxXspBT+UFhc+G6Dmlhjj
+X-Gm-Gg: ASbGncunrJRJ/1/L2riBP9Ggv9c5h5iQh+QdS1xB4yVi46Bmxf7V1xjakvDsw73jovr
+	YL1AkqucTurg9PmM3Dhq0VX1JeFr+l916sE3w92q/Ouz6JwcQIaGFqsngg1n1fxo+OpSISssaj0
+	dQ6GqJJ+SybiqTH+RCzqCVJU05Fjkdu9aw2ZLrihHRQft172XDhMclnZZofTAk5spXKlTSkV43m
+	SgFMy4eYbi5pBgYIi4VMqED3TNarcOXDiqX11sYXv6egp/xaf5As+xakyz/gN93kZzUPaoAdKd8
+	KfMjw65/3tgaCmKjN+0EOEZWVZrQIAUecZmsRXbYll/MPjhInlDXCvjfGslk+g4/5ItDctQR/GN
+	nzL8X46a7T6KOqFIqqo9g1uAsN50GrwlQv3Xw+ybVlHMKjSMZhQZntkTU60rluMq05ZMVcxQeJa
+	ykcLlxYEGm/tZtywB7bP/qJo+d
+X-Google-Smtp-Source: AGHT+IE6gWbYFGsWimrYYRBwzGDgJmLvMmiCVtl6YJYH5Id/ttRtOFtlO5CIeX4EIZZfLSfbgFh1aw==
+X-Received: by 2002:a05:6122:2a44:b0:531:19f4:ec19 with SMTP id 71dfb90a1353d-554b8b7ec45mr3653070e0c.9.1760026879296;
+        Thu, 09 Oct 2025 09:21:19 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5523ce69b52sm5454703e0c.12.2025.10.09.09.21.18
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Oct 2025 09:21:18 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/3] monitor: Fix instance where BN is printed as PTO
+Date: Thu,  9 Oct 2025 12:21:09 -0400
+Message-ID: <20251009162111.221677-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ] gobex: Fix abort for SRM operation
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <20251009071159.359476-1-frederic.danis@collabora.com>
- <CABBYNZJo4z67N4RbNAgfdMpJ1swQt3360ytCTddkzBhHrMzxrA@mail.gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
-In-Reply-To: <CABBYNZJo4z67N4RbNAgfdMpJ1swQt3360ytCTddkzBhHrMzxrA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 09/10/2025 17:53, Luiz Augusto von Dentz wrote:
-> Hi Frederic,
->
-> On Thu, Oct 9, 2025 at 3:13 AM Frédéric Danis
-> <frederic.danis@collabora.com> wrote:
->> The OBEX Abort operation currently triggers an OBEX session
->> which prevents further OBEX operations:
->>
->> obexd[327475]: obexd/client/transfer.c:obc_transfer_register()
->>                 0x50e000001380 registered
->>                 /org/bluez/obex/client/session0/transfer0
->> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
->>                 ref=3
->> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
->>                 ref=4
->> obexd[327475]: obexd/client/session.c:session_process_transfer()
->>                 Transfer(0x50e000001380) started
->> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
->>                 ref=3
->> obexd[327475]: Transfer(0x50e000001380) Error: Transfer cancelled by user
->> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
->>                 ref=4
->> obexd[327475]: obexd/client/transfer.c:obc_transfer_unregister()
->>                 0x50e000001380 unregistered
->>                 /org/bluez/obex/client/session0/transfer0
->> obexd[327475]: obexd/client/transfer.c:obc_transfer_free() 0x50e000001380
->> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
->>                 ref=3
->> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
->>                 ref=2
->> obexd[327475]: Unknown header offset for opcode 0x10
->> obexd[327475]: obexd/client/session.c:obc_session_shutdown()
->>                 0x50c0000010c0
->> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0:
->>                 ref=3
->> obexd[327475]: obexd/client/pbap.c:pbap_remove()
->>                 /org/bluez/obex/client/session0
->> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
->>                 ref=2
->> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
->>                 ref=1
->> obexd[327475]: obexd/client/session.c:session_unregistered()
->>                 Session(0x50c0000010c0) unregistered
->>                 /org/bluez/obex/client/session0
->> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010c0:
->>                 ref=0
->>
->> As its highest bit is always set to 1, and so its value located after
->> G_OBEX_RSP_CONTINUE, the G_OBEX_OP_ABORT is part of the operations
->> constants.
->>
->> This has been tested for PBAP and BIP-AVRCP with Android 15 and 16.
->> ---
->>   gobex/gobex.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/gobex/gobex.c b/gobex/gobex.c
->> index 0e33ececf..df80d79f3 100644
->> --- a/gobex/gobex.c
->> +++ b/gobex/gobex.c
->> @@ -382,7 +382,7 @@ static void check_srm_final(GObex *obex, guint8 op)
->>          case G_OBEX_OP_CONNECT:
->>                  return;
->>          default:
->> -               if (op <= G_OBEX_RSP_CONTINUE)
->> +               if (op <= G_OBEX_RSP_CONTINUE || op == G_OBEX_OP_ABORT)
-> Let's move it to a case statement as it was done with G_OBEX_OP_CONNECT.
-The case for G_OBEX_OP_CONNECT is switched from obex->srm->op, while the 
-test for G_OBEX_OP_ABORT is done on the op function parameter.
-I don't think it's useful to create a switch here.
->
->>                          return;
->>          }
->>
->> --
->> 2.43.0
->>
->>
->
+This fixes 2 instance where BN is printed as PTO.
+---
+ monitor/packet.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/monitor/packet.c b/monitor/packet.c
+index d0cf7c5630c6..dd808deaa79f 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -12503,7 +12503,7 @@ static void le_big_sync_estabilished_evt(struct timeval *tv, uint16_t index,
+ 	print_usec_interval("Transport Latency", evt->latency);
+ 	print_field("NSE: %u", evt->nse);
+ 	print_field("BN: %u", evt->bn);
+-	print_field("PTO: %u", evt->bn);
++	print_field("PTO: %u", evt->pto);
+ 	print_field("IRC: %u", evt->irc);
+ 	print_field("Maximum PDU: %u", evt->max_pdu);
+ 	print_slot_125("ISO Interval", evt->interval);
+@@ -12548,7 +12548,7 @@ static void le_big_info_evt(struct timeval *tv, uint16_t index,
+ 	print_field("NSE: %u", evt->nse);
+ 	print_slot_125("ISO Interval", evt->iso_interval);
+ 	print_field("BN: %u", evt->bn);
+-	print_field("PTO: %u", evt->bn);
++	print_field("PTO: %u", evt->pto);
+ 	print_field("IRC: %u", evt->irc);
+ 	print_field("Maximum PDU: %u", evt->max_pdu);
+ 	print_usec_interval("SDU Interval", evt->sdu_interval);
 -- 
-Frédéric Danis
-Senior Software Engineer
-
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
-Registered in England & Wales, no. 5513718
+2.51.0
 
