@@ -1,193 +1,152 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B96635
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 17:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EE554654
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Oct 2025 17:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760030144; cv=none; b=J+E9WzeauPgDsK3gDCnjAIUjxfteVcNHgnxHD06Ia003Db3RiA4EguSOecJgmr11Qoaw9ClgZkyx3q1Zyj1DYqxjipQoXFUwZkhmksqfo4MaTZ2KoMdX0fxwXj2F4o2C4JR9lRSSftVlAX5RplUBcz3gV8jr1lJAReCN2LhKpL8=
+	t=1760031251; cv=none; b=ATI7AmNVWG+IqtWtpDbTtClJog9yzD5iH/7UOTmAFtq+AE2A9LgkIES+OlT4q2SGh5twcZdV0FjKQYOVMzcIFzPZ7pLlry4jZIBHr3mESsl5vXXCiLidKmX98nLl6p65kAFRGL+bnd1U7giEfDYv8r/qCx5B5q8YT9P+cuvF4Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760030144; c=relaxed/simple;
-	bh=j09wdoMIS18gvx/+rsuPIqBvgFgCYx4FXCbiSAa/BtQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SMLATVJUN5njncgxL2s0bcTShtOuGLDd2gTGOiF95xOVt+74xvIc+lWnUYKMyoTDPn87pZhgZhC4Mj2TRLkKgrhhKfg4Llweh9lBPRkNRATfw1fMM66Vh9jPPSBhX7lkNQMWlSDgKKkzlg3rVuaPwn8JBOszlvMyvEL6HECwBcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SYC7LDpx; arc=none smtp.client-ip=209.85.167.52
+	s=arc-20240116; t=1760031251; c=relaxed/simple;
+	bh=hPiRoLR/v8fe1RUygoTbjojjmg4hFQCCtoSel6OKozQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lwA5mvjJiYAAJkv/nN802M2DxxzQIM+mejuugqSXe/hUGhJeOb7lPEPhRpUZbio0k1AtpU/Spq4aYPsM0WbNTXq368zd0PV5hYpYpgBkrCf8tPaoxa4mrm72vJwxr8Vcsh/Sl52+hiA2JG9EgW8Qo8Tl+6JEC/NTS4gmGOgRHeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=deNBdpA+; arc=none smtp.client-ip=209.85.219.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SYC7LDpx"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-57a604fecb4so1503949e87.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Oct 2025 10:15:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="deNBdpA+"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-79a7d439efbso12202646d6.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Oct 2025 10:34:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760030137; x=1760634937; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=elbeML06AHUvNr9LWqjkzs3Ca71mVa2DMgAnKuBZXMg=;
-        b=SYC7LDpxlASlAQ8ftIx8di6XX0gC3IFotm/DDAVV3Tyg/xlazdAi0D9cUnS/SZfFjC
-         XpB1qB7bqGTJxau4oKezqw7THM9l+oiXhfTPJotI9+WkW5g6kAmfOxu69TVOT4TkBdAE
-         vhz+CNIb/L8oAUiNIQWS5NgtH0NfXH2QnZXihW+ZwaCb3yDDaE/Pb5tf+pNWadjjXPLt
-         dzZweG9kqwqVta/9WIw0UVFGaZg2fIb4Va+Uv8k2NPVUAt+s5KaWkW0w4071G9bADCY0
-         ExLjZ076awFIkCsw/9zW25w4BPKGGEaeRaf/uxfIlboxoLyo1TMdEGiHsFWU1DyAdd5o
-         bVsg==
+        d=gmail.com; s=20230601; t=1760031248; x=1760636048; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=q6wQhZtNBHlUOm/w/8K+IKZEYq1v0T4iWSgyalD9rJg=;
+        b=deNBdpA+RjgUAcsw0//uckrAyKdpzVuXR7fwXlSqZWerYq++KreIWaWxo6S64sSnWc
+         GOB6WHf8ESUbYPsCmGMfT1G2pCzD05n0LO7KCYWEm0H1q4Ck3e8th0Z8AMCb2shM8dDE
+         pPdvERNoklh+ZoyTl4fJ9VD6kiGL+Bq8LsqaAzlSd9+Qlnxvy7811Tlojn+IvBUh4EFt
+         bzyogdRY/4a7JmdjxRk+Xz4dIvpABae3C7UeQWGRMF4mEAmBq4re70mDB1Jnzr//Xd75
+         mQ9cv1251zAukZX5mdWjcZqWmYhzvZwWlWFxlUE+OXQ2pS4s//MHN0RltoRB6RSVORYs
+         T4rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760030137; x=1760634937;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=elbeML06AHUvNr9LWqjkzs3Ca71mVa2DMgAnKuBZXMg=;
-        b=mv/HHo5PJnDgW4o2XUztjpMNPE2cx8t/92tt1GIrjoob1q0EhQwC9ZVOWKPXDHDZSn
-         HRvK9PVrA1eXr46rWafSM6OgjOuz2mYONyxCYRT97RMOjp3wZ9Y1MfnRu9dAXyRi5B+2
-         ulBRmZtJ8yMPQVmQXEqk/9CDLXkBxz0aFnVyi2y1HofgLzGTohFUR7XBA28yh4QYg0Lz
-         7GJ2qCtiCVcGaskKQ8Bo8RFJ+peOluWPFj74VQOGLB6YP5VFF7BR8GcJFvtIxuTZFF94
-         aglrW/OBBlRL4shfh9B9u05YlstNMTa/dVbR4HOd6N3xfyLGaGxuC/7uxQoMYddFhwsf
-         94/g==
-X-Gm-Message-State: AOJu0YwgdQ/jynFl8kq+aEg6SHapjtLEhg8SPN134jgc+jkj9IMSp52C
-	fLra8/5raARHij/3jJFNvvJEYUKUv0T+FHe+Y48HHppgu0Z33P3i6O2EAm66rBUfW4lhsIGH622
-	k4TEUkvaPlK2AFx9W4hEURUGzM8q2xOk=
-X-Gm-Gg: ASbGncsSoVVNBZtpmqUz4VQtAM9ELcR+HzNVKc2BMnOS0V70Ldp4LTEP45UaZy6L0+d
-	7NT9/IRZe+j1Qwad5kz3wrI5x64fP376YEUb+M67a/F7zYxle3jh9p7ulWFaK1Uy2cX8Tk+RtSh
-	CjXloySK9f+UjwOzvmCh6DJBtkdcRUIUpGouplnMCCCFeuxwGp5skarprguuF3NwA/NUHuFGfbe
-	VjbtdosW8PUzx4NwoCsiDQfdatUhY4PCGJbo1e1
-X-Google-Smtp-Source: AGHT+IEwJSMwNcQeBIRVFTHaq5NpdweXaIDXUeQwakcc16c6rEOnoBk+i+5SBK64FmQ8c290Ny5Af6E16wZuvlvF1Q0=
-X-Received: by 2002:a05:651c:b27:b0:372:921b:4b8a with SMTP id
- 38308e7fff4ca-37609cea71emr24415191fa.4.1760030137364; Thu, 09 Oct 2025
- 10:15:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760031248; x=1760636048;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q6wQhZtNBHlUOm/w/8K+IKZEYq1v0T4iWSgyalD9rJg=;
+        b=TI9iFCNW4FJsE/seKWWOFk7Uhfr1tVWZ4EgEPI7rWwLiswdFTMrEBD3RFahP4aHake
+         pPxBmT+CfU47sFVsNo0hTSr5A2eL+yTeba38PXlZM7otwhmJs8dWaU8OnoX4ORv8KXNr
+         O3IBgTftnLdFj0EQzfaa0jWWk6Pqw5A23V1E6H5D3yV++90OZ6SMAkuABbkKSjBaGIQB
+         Q98LdIXDnA4kgHnoCjEC586LqwDXIm1lh+2TpGvw/TQklB6E2rJbRlvcIKA8yupC9nfB
+         XH95g8AKyYJq3awAulmgwSjLTWCWnKmjV3Bw5GGLl0qBcQvBd//SxRSopuYRNHb0RBVD
+         BQBw==
+X-Gm-Message-State: AOJu0YyV8NgJv7cTKC+oZqeqnkb5h+nsyocdfybm0J8wwTgfZnxpPxHL
+	U7b4XtTm/6xxLVMg9t3cISuIb6AzoUSTPKUAgFNPgrJ31z3RHpvl6MuFUXpjUA==
+X-Gm-Gg: ASbGncv/jixt1M0D4ESOqhc0ywcGdkdM8rnov6C1tG5cvc3TxEjC77L5VcjK6s3LwC1
+	5CcmsFNmZBkNFSrZhXoGj6dyfPtJjQFumkFEJt6Lq0DN2iSDqgmTgjJBchml/ZQ/wu6y5fcZAbl
+	4J4wDDre0MO+G/BWf+jU83FLw0T1bmsNKFYlcDfzSvghVoE8nU2kOkNdDdfpshIA58nS09tu2y6
+	m0rHltJ33mTOPPSWQmt8JQMurWQhwlMaOo0LOe9ts5IeKUqkma0AJA2DTM9pjyTLCMPmFYk4WwX
+	I/rCBzaT5Y4x6tYCLB26H4WeolM34KLBKAB7It70Qi5IWXU9f2y8a4afavVtJJaXStcPVmfD3kW
+	d+AE6EFDV0Cyy9dN/U+wNFCKtRBngTadD24hCv6l8YVDJKYDq2lv5Ui1sbP579nw0vg==
+X-Google-Smtp-Source: AGHT+IFrYx47ydujOWPC69EoZm7ZT8IDBqISfnT8ORZlVJEgfK5EMMhxRxu0JAfYL7yOPyTJLz+crg==
+X-Received: by 2002:a05:6214:c49:b0:874:34d2:db8b with SMTP id 6a1803df08f44-87b2107df8dmr146454476d6.28.1760031247917;
+        Thu, 09 Oct 2025 10:34:07 -0700 (PDT)
+Received: from [172.17.0.2] ([145.132.102.179])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87bc35ad1b7sm10006d6.58.2025.10.09.10.34.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Oct 2025 10:34:07 -0700 (PDT)
+Message-ID: <68e7f20f.050a0220.25afa2.003f@mx.google.com>
+Date: Thu, 09 Oct 2025 10:34:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6409205466577442627=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251009071159.359476-1-frederic.danis@collabora.com>
- <CABBYNZJo4z67N4RbNAgfdMpJ1swQt3360ytCTddkzBhHrMzxrA@mail.gmail.com> <7c9a5707-af06-4540-8add-fc2901fac610@collabora.com>
-In-Reply-To: <7c9a5707-af06-4540-8add-fc2901fac610@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 9 Oct 2025 13:15:25 -0400
-X-Gm-Features: AS18NWDcMO_5bAJxO9xNOCL_3t9A81u9XHOy1QEHZeCyCdDAjPIY_Fw4RiOMkGo
-Message-ID: <CABBYNZKe8LLk7XJ86qX2gK+S-aHS99DDVX7HnSteiv71ARWrSg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gobex: Fix abort for SRM operation
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, eeodqql09@gmail.com
+Subject: RE: [v4] Bluetooth: bfusb: Fix buffer over-read in rx processing loop
+In-Reply-To: <20251009164817.3762787-2-eeodqql09@gmail.com>
+References: <20251009164817.3762787-2-eeodqql09@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Frederic,
+--===============6409205466577442627==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 9, 2025 at 11:58=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
->
-> Hi Luiz,
->
-> On 09/10/2025 17:53, Luiz Augusto von Dentz wrote:
-> > Hi Frederic,
-> >
-> > On Thu, Oct 9, 2025 at 3:13=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
-> > <frederic.danis@collabora.com> wrote:
-> >> The OBEX Abort operation currently triggers an OBEX session
-> >> which prevents further OBEX operations:
-> >>
-> >> obexd[327475]: obexd/client/transfer.c:obc_transfer_register()
-> >>                 0x50e000001380 registered
-> >>                 /org/bluez/obex/client/session0/transfer0
-> >> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0=
-:
-> >>                 ref=3D3
-> >> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0=
-:
-> >>                 ref=3D4
-> >> obexd[327475]: obexd/client/session.c:session_process_transfer()
-> >>                 Transfer(0x50e000001380) started
-> >> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010=
-c0:
-> >>                 ref=3D3
-> >> obexd[327475]: Transfer(0x50e000001380) Error: Transfer cancelled by u=
-ser
-> >> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0=
-:
-> >>                 ref=3D4
-> >> obexd[327475]: obexd/client/transfer.c:obc_transfer_unregister()
-> >>                 0x50e000001380 unregistered
-> >>                 /org/bluez/obex/client/session0/transfer0
-> >> obexd[327475]: obexd/client/transfer.c:obc_transfer_free() 0x50e000001=
-380
-> >> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010=
-c0:
-> >>                 ref=3D3
-> >> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010=
-c0:
-> >>                 ref=3D2
-> >> obexd[327475]: Unknown header offset for opcode 0x10
-> >> obexd[327475]: obexd/client/session.c:obc_session_shutdown()
-> >>                 0x50c0000010c0
-> >> obexd[327475]: obexd/client/session.c:obc_session_ref() 0x50c0000010c0=
-:
-> >>                 ref=3D3
-> >> obexd[327475]: obexd/client/pbap.c:pbap_remove()
-> >>                 /org/bluez/obex/client/session0
-> >> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010=
-c0:
-> >>                 ref=3D2
-> >> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010=
-c0:
-> >>                 ref=3D1
-> >> obexd[327475]: obexd/client/session.c:session_unregistered()
-> >>                 Session(0x50c0000010c0) unregistered
-> >>                 /org/bluez/obex/client/session0
-> >> obexd[327475]: obexd/client/session.c:obc_session_unref() 0x50c0000010=
-c0:
-> >>                 ref=3D0
-> >>
-> >> As its highest bit is always set to 1, and so its value located after
-> >> G_OBEX_RSP_CONTINUE, the G_OBEX_OP_ABORT is part of the operations
-> >> constants.
-> >>
-> >> This has been tested for PBAP and BIP-AVRCP with Android 15 and 16.
-> >> ---
-> >>   gobex/gobex.c | 2 +-
-> >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/gobex/gobex.c b/gobex/gobex.c
-> >> index 0e33ececf..df80d79f3 100644
-> >> --- a/gobex/gobex.c
-> >> +++ b/gobex/gobex.c
-> >> @@ -382,7 +382,7 @@ static void check_srm_final(GObex *obex, guint8 op=
-)
-> >>          case G_OBEX_OP_CONNECT:
-> >>                  return;
-> >>          default:
-> >> -               if (op <=3D G_OBEX_RSP_CONTINUE)
-> >> +               if (op <=3D G_OBEX_RSP_CONTINUE || op =3D=3D G_OBEX_OP=
-_ABORT)
-> > Let's move it to a case statement as it was done with G_OBEX_OP_CONNECT=
-.
-> The case for G_OBEX_OP_CONNECT is switched from obex->srm->op, while the
-> test for G_OBEX_OP_ABORT is done on the op function parameter.
-> I don't think it's useful to create a switch here.
+This is automated email and please do not reply to this email!
 
-My bad, I didn't pay attention to what opcode it was tested in the
-switch statement.
+Dear submitter,
 
-> >
-> >>                          return;
-> >>          }
-> >>
-> >> --
-> >> 2.43.0
-> >>
-> >>
-> >
->
-> --
-> Fr=C3=A9d=C3=A9ric Danis
-> Senior Software Engineer
->
-> Collabora Ltd.
-> Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United K=
-ingdom
-> Registered in England & Wales, no. 5513718
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1009817
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.31 seconds
+GitLint                       PENDING   0.28 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      24.63 seconds
+CheckAllWarning               PASS      27.40 seconds
+CheckSparse                   PASS      31.09 seconds
+BuildKernel32                 PASS      24.65 seconds
+TestRunnerSetup               PASS      492.93 seconds
+TestRunner_l2cap-tester       PASS      24.15 seconds
+TestRunner_iso-tester         PASS      72.15 seconds
+TestRunner_bnep-tester        PASS      6.16 seconds
+TestRunner_mgmt-tester        FAIL      113.15 seconds
+TestRunner_rfcomm-tester      PASS      9.37 seconds
+TestRunner_sco-tester         PASS      14.31 seconds
+TestRunner_ioctl-tester       PASS      9.98 seconds
+TestRunner_mesh-tester        FAIL      12.37 seconds
+TestRunner_smp-tester         PASS      8.55 seconds
+TestRunner_userchan-tester    PASS      7.28 seconds
+IncrementalBuild              PENDING   0.51 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.106 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.181 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.775 seconds
+Mesh - Send cancel - 2                               Timed out    1.997 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
---=20
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6409205466577442627==--
