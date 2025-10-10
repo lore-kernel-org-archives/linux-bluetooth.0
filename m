@@ -1,63 +1,64 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8302F9DA2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 15:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A572FA0DB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 15:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760108601; cv=none; b=jZnriiQaqEo8CYdD2BsRAO1RN2ZBMuuErXYIp92oBTzujC/o2XLF5kG+SCXn4u8oje6BwTmyP2JX5e8LmOl1jCM6jeQVQEN3QifnDkNn0WUHFcUkDB/+b02X1a42rvDI2CDF+YFPEtj5DtHXjdXjvdCe4og5QBaqDaosfWSMwfs=
+	t=1760108606; cv=none; b=gzZt/nFud/e6JsTCBmVHHu9MuDb1X3PwF3fDfLhukiI4p4Xq0bDFIoRXViadNrG4UyNMHo3GHIsLUo7Q+BqboTUxpB3Q5mU40TcQ4rdf0W6D7xKuabT/IKHwnyn83uZmEM/PIP16Rb//+uFRN2HuSikS2diErbBM55kyJONkhhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760108601; c=relaxed/simple;
-	bh=kyxULOv2H236l1ucHIwcTRr5nnWT32c4Zye+wWGrJ6s=;
+	s=arc-20240116; t=1760108606; c=relaxed/simple;
+	bh=p4TRIPhh7eCXg4oL8eEB5Ly0L/lmhP7XDzG06yVs7As=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qmE8SHFQT+AgMdxliljenDC/jVSOoP3W0SLCH08vU74HmLqfRDkceYnqaiUwb4Wbtbwf5AsusV1+zoXs3bMWNirqbrxQpS2nLY+b6vj5qAdCQKQ1SRPiTI5D4Y60/iqA5NA6kH7fhRud/9jGlBT5PLVazv46AyP+IlGeHwNBsWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Su+5/5Ih; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version; b=imozT/xrbpM6PO6VlkEXCjLRoIGyse/XsQSwr8qqshL87y7OeuJ0+tiTBoIvJSgy7f4n5e6QbN7Ii0SNsfGFPGI+OeQIRaPWRdR3OmCDWjRwslu8l4GnCZeDXva6ZXZbERQeomtIJ/blCHDgNiDbjtK1IbG/NKsFOV+MssyI3cA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lrfMpSKU; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Su+5/5Ih"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-781ea2cee3fso2194377b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 08:03:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrfMpSKU"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-782e93932ffso2065928b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 08:03:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760108599; x=1760713399; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760108604; x=1760713404; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=scjH6AQBXgOEyOguxVYTHq5LOFFjJgFpmI1fsS6Z7tY=;
-        b=Su+5/5IhGDJljNWqvdLuLQXyqkbWvf2cbmnmjD7zjzywNoFV80FhOQIm/b1p1OfZBO
-         vk35gqHf8PUvH/ZZZHgIP2CqeRLDHJsFqgGadCIn/QPG9BdjsEyUeONZUs5FXCQVI7RC
-         RG25CKozBZaN7DTNR3oeC9qh2I1a9rbdjMu7EXSaSX7/uUvdAaEcqJBsqS3cTqqrUOu1
-         6U02NccwfSNp51o9E7nod/5yynsZc2sWPPERn1Vdb5j+zTCejT4bOhSggOC7uprHxnxZ
-         v7ZZwhwP9IXbF2Ijr+rUpD+wAcq1rD+2wN9oHLUK/ZsYoo6T9wHP1XBuaxfpPIS5m9Rc
-         20Rw==
+        bh=pWjvp+vOFGL8T/NXTev+NZf62jPu9HyIJqL4GkC+d9Y=;
+        b=lrfMpSKUbUjEpAhkOdhyxOzbwWCStTQD5zINmPlgCaAjvcDQNF8b6fqSOzagx+8xrL
+         yn4rCuIJnksruMQkHfOJxaxTNFJKkRL3QfYMVFNwLW11Fuf6ToX6EHivKBDbyqN0HWNv
+         wndMKDHC/YrMBQK5ZGhAuP7r7mba9cc1xDXYr7VWrTnTTCiSnEx0UFoSGO6pMnore1sg
+         SaaORTKpLNnHa2JXAe0hTiXD/uiPd39mkzaKA5j7jWTNvvolT5t3CFIxDsKhqeOEY8h/
+         fWdSEGTjIRIOVr+LC0My0gzVc4cTYtncixbekm3uiazrk/cipyZSFCqcFOeNxwGDF5nF
+         H4fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760108599; x=1760713399;
+        d=1e100.net; s=20230601; t=1760108604; x=1760713404;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=scjH6AQBXgOEyOguxVYTHq5LOFFjJgFpmI1fsS6Z7tY=;
-        b=uHmLmNr0rdg1CSZnVA8K/NGoWZhCrn6bq0D+a7PR16MrvJ+6dEBGA2//lfwNaXduuK
-         q0i9Mhq9zHLUKZ69LIWelR5H5o21zoLLbMf0eonqz4QJaKxhCSTHHjtjXlntAlQPT8tS
-         mBlEkAIL7rYlfbBp0F/gtueCCk1m5Zv0ur8Hftkfj/ANr0r3pxFWKcd9MxRTJH8H4xoA
-         tU3vMwRxFf+yu/g/2b9StzIm2l4ZSxEZPPnGOHufz0E52DXuZk3OPfV2LTMXzBLX7+BH
-         q8VqkfKbM9El/Wrxkcnb0gXIhC6+xC+DTjLhIDZMFpEACdqIdSe0GwEzG+UuOzb0pzjj
-         P/cg==
-X-Forwarded-Encrypted: i=1; AJvYcCVrdbWR5HPDPkCgui9HzFF5bKH1c0AinPKatbbqwiSwvQAJnWdJom6m5DNLk2EnCl9N06YIcaU7Kf3axsH20KA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywi9dzAFjXplM/FE2uGZKXu01F/zQd4LJwfwO6R2uZoZFJXSbHS
-	vkcraj4EZPNqItYR+jW2xqRasNDcMu3OoQaJ8DK9sAkUO6E487e92YJcmJjhn5eekQGBMQ==
-X-Gm-Gg: ASbGncugFcN6Dq96+60AE8vSvAb+0VxoPyhX8FUO7sVCU0Je17he4bgwUAu6P/lFomM
-	Qalw8l6ofCWk8M94VZCVK2It9coIvePpRPD9UuZSOrWYPHQ93CbYZPw01PTnONgXsEj2ruKfWfo
-	th1NjiD7RbQrZPIprDTX4k0lI/dWczv2xFI69OSQcH5g++IyghqgG6+0mnte6UjyfQoT5/TKuqw
-	UwfpKwlMmNg6CbYd7jeAPY/h13+y+KdbfKN/PFv0mq2zmZHCHEWDIbP/JPD3qbijymFQGYj/BIx
-	j48xlUZY9Z5x1Y/sXeGSAKVuuGRqkbx2dauX6iK8PlXs1f/wVO6CmrWsB9SDPWbV1w6os7fMIcf
-	MkGx8FGE9wxdR+EpTFXsL4SfJuhiTX6U0JSj9YEqkSS3vnH/LmenNKHxKaFRai9EvOtcE
-X-Google-Smtp-Source: AGHT+IE1TkwVHA7tUUhpnxMC0Ew+qral7pJWbGGXX+m1f8imGiLvrl15HPVZo6jvgfFxLbQ7GCafnA==
-X-Received: by 2002:a05:6a20:7d8a:b0:2fb:62bb:dec with SMTP id adf61e73a8af0-32da83db679mr15075982637.39.1760108598855;
-        Fri, 10 Oct 2025 08:03:18 -0700 (PDT)
+        bh=pWjvp+vOFGL8T/NXTev+NZf62jPu9HyIJqL4GkC+d9Y=;
+        b=ZhZeTtXiPTZTkBESHEvdBsuf/LIgREuKDbFfH22dM8ZXN29FmfpAXvQ50ZUsyAPnrU
+         4rUNwLAAdoFkNTYpbwb48054u+lMzWeEyd9Nd07ESZ/Mgu63588fkcwgmNDRO/Z6Hb37
+         rsu3szq4d/7/Pgb6wKhminFzANMAH8ZPERqICwUEkKiUH93F7wkOaSSz26zhy3xjM8tI
+         jvFNgbrzOwZXHVdBS6JPpN9K3kBC4aeYlz1KF6hQVw1p0s5YFDXeW6jIA7gF9r4j6tgq
+         8hjIXFA4vNtBxSZHYChkspi4VGVRNPd4eMPmryW+vmJby0a7EezYqiOlZWfv4WzRDdPD
+         F5AQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWban4B4cnOv5fYjpXGXlUrkS3GzS1dCdZsomYvMCKopQIggJRscAHYQJ0Wq65eL8wJaZfR3sUsaXJ/RQef7l8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywsyx3cwlgeV9jED5Da10jvEfR5jlsPc0BHNKSys87fM0fsUeNf
+	t6NXI8eTlhFotqUZyeFpNtOWq5bkhW2bx5HtXBMmnEQAUPNQXtNQ5Aj8
+X-Gm-Gg: ASbGncvFdSrch3KgdvJFMHXtd2/s7suCtOBfzS82/hitT07vzfltah/oW9PrclDDidw
+	RnzWfzAPWn8WExJtQmXJ72vx1F0iP6jmXlfAJOMOoUum/qwWjOqYezCJatHISApUWt45yO4B2Ol
+	boO0xd8mVrrcLkH2RBHXUpO/+yNYlsiQROtWVAJMKMW5tUSmoupJf0KqMehegtYWXlf6rhuT64a
+	PXG9lzr8iZyLKOXQopvgof0L21YTPYi0FcKyq0+98+cPv4qAeg0AvU1nplCSeDNneMqjQ+RSX5f
+	WSLJZBwU0mnfUJYgsJ0OebPme901vL0tL4MWKtxvnyvsajo59DeeFnrnH9fWw+K7Cr7rPBkVY+F
+	eUIHxgTgDqZuH6Y2xZjGmOeiHkV2NuYFkTHmxPI95owvVcbT6hQhn3kdmjdSojDDkBuiEz0yh1Y
+	MHRHM=
+X-Google-Smtp-Source: AGHT+IELW+N04rDkMObEwVIfZgJNbEyKA3LpK3B2L+BmTESRw/chxA53UDFR+d8y2R41yQMRdNNmzQ==
+X-Received: by 2002:a05:6a00:992:b0:78c:99a8:b748 with SMTP id d2e1a72fcca58-79382a7d3femr15159457b3a.0.1760108603729;
+        Fri, 10 Oct 2025 08:03:23 -0700 (PDT)
 Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b639cbcsm3266359b3a.18.2025.10.10.08.03.14
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b639cbcsm3266359b3a.18.2025.10.10.08.03.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Oct 2025 08:03:18 -0700 (PDT)
+        Fri, 10 Oct 2025 08:03:23 -0700 (PDT)
 From: Jeongjun Park <aha310510@gmail.com>
 To: stable@vger.kernel.org
 Cc: gregkh@linuxfoundation.org,
@@ -78,9 +79,9 @@ Cc: gregkh@linuxfoundation.org,
 	viresh.kumar@linaro.org,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH 6.1.y 04/12] clocksource/drivers/sp804: Do not use timer namespace for timer_shutdown() function
-Date: Sat, 11 Oct 2025 00:02:44 +0900
-Message-Id: <20251010150252.1115788-5-aha310510@gmail.com>
+Subject: [PATCH 6.1.y 05/12] timers: Replace BUG_ON()s
+Date: Sat, 11 Oct 2025 00:02:45 +0900
+Message-Id: <20251010150252.1115788-6-aha310510@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251010150252.1115788-1-aha310510@gmail.com>
 References: <20251010150252.1115788-1-aha310510@gmail.com>
@@ -92,60 +93,72 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+From: Thomas Gleixner <tglx@linutronix.de>
 
-[ Upstream commit 6e1fc2591f116dfb20b65cf27356475461d61bd8 ]
+[ Upstream commit 82ed6f7ef58f9634fe4462dd721902c580f01569 ]
 
-A new "shutdown" timer state is being added to the generic timer code. One
-of the functions to change the timer into the state is called
-"timer_shutdown()". This means that there can not be other functions
-called "timer_shutdown()" as the timer code owns the "timer_*" name space.
+The timer code still has a few BUG_ON()s left which are crashing the kernel
+in situations where it still can recover or simply refuse to take an
+action.
 
-Rename timer_shutdown() to evt_timer_shutdown() to avoid this conflict.
+Remove the one in the hotplug callback which checks for the CPU being
+offline. If that happens then the whole hotplug machinery will explode in
+colourful ways.
 
-Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+Replace the rest with WARN_ON_ONCE() and conditional returns where
+appropriate.
+
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Tested-by: Guenter Roeck <linux@roeck-us.net>
-Reviewed-by: Guenter Roeck <linux@roeck-us.net>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Link: https://lkml.kernel.org/r/20221106212702.182883323@goodmis.org
-Link: https://lore.kernel.org/all/20221105060155.592778858@goodmis.org/
-Link: https://lore.kernel.org/r/20221110064147.158230501@goodmis.org
-Link: https://lore.kernel.org/r/20221123201624.634354813@linutronix.de
+Link: https://lore.kernel.org/r/20221123201624.769128888@linutronix.de
 Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 ---
- drivers/clocksource/timer-sp804.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ kernel/time/timer.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/clocksource/timer-sp804.c b/drivers/clocksource/timer-sp804.c
-index e6a87f4af2b5..cd1916c05325 100644
---- a/drivers/clocksource/timer-sp804.c
-+++ b/drivers/clocksource/timer-sp804.c
-@@ -155,14 +155,14 @@ static irqreturn_t sp804_timer_interrupt(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
--static inline void timer_shutdown(struct clock_event_device *evt)
-+static inline void evt_timer_shutdown(struct clock_event_device *evt)
+diff --git a/kernel/time/timer.c b/kernel/time/timer.c
+index e09852be4e63..7094b916c854 100644
+--- a/kernel/time/timer.c
++++ b/kernel/time/timer.c
+@@ -1208,7 +1208,8 @@ EXPORT_SYMBOL(timer_reduce);
+  */
+ void add_timer(struct timer_list *timer)
  {
- 	writel(0, common_clkevt->ctrl);
+-	BUG_ON(timer_pending(timer));
++	if (WARN_ON_ONCE(timer_pending(timer)))
++		return;
+ 	__mod_timer(timer, timer->expires, MOD_TIMER_NOTPENDING);
  }
+ EXPORT_SYMBOL(add_timer);
+@@ -1227,7 +1228,8 @@ void add_timer_on(struct timer_list *timer, int cpu)
+ 	struct timer_base *new_base, *base;
+ 	unsigned long flags;
  
- static int sp804_shutdown(struct clock_event_device *evt)
- {
--	timer_shutdown(evt);
-+	evt_timer_shutdown(evt);
- 	return 0;
- }
+-	BUG_ON(timer_pending(timer) || !timer->function);
++	if (WARN_ON_ONCE(timer_pending(timer) || !timer->function))
++		return;
  
-@@ -171,7 +171,7 @@ static int sp804_set_periodic(struct clock_event_device *evt)
- 	unsigned long ctrl = TIMER_CTRL_32BIT | TIMER_CTRL_IE |
- 			     TIMER_CTRL_PERIODIC | TIMER_CTRL_ENABLE;
+ 	new_base = get_timer_cpu_base(timer->flags, cpu);
  
--	timer_shutdown(evt);
-+	evt_timer_shutdown(evt);
- 	writel(common_clkevt->reload, common_clkevt->load);
- 	writel(ctrl, common_clkevt->ctrl);
- 	return 0;
+@@ -2047,8 +2049,6 @@ int timers_dead_cpu(unsigned int cpu)
+ 	struct timer_base *new_base;
+ 	int b, i;
+ 
+-	BUG_ON(cpu_online(cpu));
+-
+ 	for (b = 0; b < NR_BASES; b++) {
+ 		old_base = per_cpu_ptr(&timer_bases[b], cpu);
+ 		new_base = get_cpu_ptr(&timer_bases[b]);
+@@ -2065,7 +2065,8 @@ int timers_dead_cpu(unsigned int cpu)
+ 		 */
+ 		forward_timer_base(new_base);
+ 
+-		BUG_ON(old_base->running_timer);
++		WARN_ON_ONCE(old_base->running_timer);
++		old_base->running_timer = NULL;
+ 
+ 		for (i = 0; i < WHEEL_SIZE; i++)
+ 			migrate_timer_list(new_base, old_base->vectors + i);
 --
