@@ -1,91 +1,122 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C152F1FC7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 14:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637AA2F5A39
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 15:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760105687; cv=none; b=qZxc2cINdEpZaj4u1ohKb5ry7HZjh2yp30RiqhTXTY4CRsLCGSDfcM8moOkPDTMd54+Q8ppAGZdJwzN9bwfvd56rU+M7mN0yu7amCEh8Is4+SxUfBsZDGENwb871eQ9PDbGCfklo2B/1VxSc1NXa6pV7deeX6LgvILvQQf2w+YI=
+	t=1760108582; cv=none; b=Y64JhD7b3BK3/R4E+Kb5X/CL2LX1l8pwmpJyjTkHycRlLOy19tNrOjEi1VACE1VSfVyZoTwaeRwBurXzoRLdLU0/bxegGN8kl/lz+igfVbNRhqq7Wyvj0XwjBNmVAz9ErgysP/J/uZDsVYaxGGUkHG18+yuCrajazgvomWSvL4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760105687; c=relaxed/simple;
-	bh=lMKY8BbnPEpRg7LUAK5PI8lqe0pRWOMrjtkxaktTBEg=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lddM0nwwYv4dvquGEW1GLz+p+5xOGiJWZQ2D7rwd5suDHsqES3uPhLtclZBDKEC6BKVc2l3PcwXOgy704C5AWTEHBvndSd3OLujOiv0sIia+nfdLbPwGvjeXcXWmPVWwlQARY8efRlGMGvMNpgSr/lDzWwDZXMUdkiI2Vh+3704=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Vb9TKb38; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1760108582; c=relaxed/simple;
+	bh=UHFjEVHBo1yIOaVlRsqK18HPUDEo7fXT8pgeeEEdaXo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Sd+BXDCMOmli6sOiowjdxUXaIKBvxtAbIqx2Vsz9IfPNyyAu12mnBk3YbWz7i8tgAemMp/DKeU4dAABJ9LH9SVvrzK8bbIO60Hy0HYD1ceynEPyFWT5W7ZJxI1KYyZ8vwhd4gN9dZi8lAaq2I/Q9G71S9HrgM499bqj+CR/hiUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiROp3PP; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Vb9TKb38"
-Received: from github.com (hubbernetes-node-0f776bc.ash1-iad.github.net [10.56.196.49])
-	by smtp.github.com (Postfix) with ESMTPA id 28F4F141371
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 07:14:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1760105685;
-	bh=KgERaKtjLKlZ+3o1MhJVzQYFjMoKM/6l/HaHyqX+etc=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Vb9TKb38Z9jiW8J5Z/2L/mHhEVHBUFcAchHPrI4gyaQNzCUZtchmj+36pGQn7L9vk
-	 vrZZbEL7jmwzFccZ68ieXIZfMZ8ldBosl8Y6n7ei1/q0QaFGjflMBORUaioLu52yU2
-	 7AV8bN/yTjbYUzXuF1wmaff8XKlN1gp8/HHlzz/w=
-Date: Fri, 10 Oct 2025 07:14:45 -0700
-From: Adrian Dudau <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1010113/000000-a0533d@github.com>
-Subject: [bluez/bluez] a0533d: tools: Add raw advertising data support to
- BlueZ
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiROp3PP"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-793021f348fso2069308b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 08:03:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760108580; x=1760713380; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=elZCS9zUDdalSz9uVOKCoOd4+j5ifaZJHKjwRqdAu9k=;
+        b=UiROp3PP13YG7bgCW6IxIzbr5baWsZomFwoTJOi3pCx27e/TBEhpoliOhlYot0en9k
+         O1gyHbVsRk5xLL2fEIfFt4mkiw7LD+8BNPpbVS401O2En/tuMRw7UJ1IqFmlafnrCUMk
+         W1069ZjRwbPfmDe07ZFGOVQlrWczibnBgSQwjPfYKh41Zs4LQizqLl/MyZ9g7tly1Dso
+         iDOC5uXKSbEE0D6OaIVQmv6MNBZ3vZRx4aRQd7u8JXL0vEXsvv3J91VA8jWscZI/eb5F
+         lNffj4UCgk/N+HTy+H4s8pNiKE3kqmq+sPyybIANE4w1SgK+6CNQB6zPewHLZqqgsz0S
+         SPAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760108580; x=1760713380;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=elZCS9zUDdalSz9uVOKCoOd4+j5ifaZJHKjwRqdAu9k=;
+        b=VCOyZ584PnNYnukWrNFmnGfBEeXS+C1Tt7b0HjU1hXcvp0vlJK5McbIV982WQnroYa
+         Z0zsarsqMippNxN3AJnc9yjaiRkFP4uDA1ZrdkN3juIvN43JMEY4tGVZuDK02ohDuNzG
+         B/O3rPN7HxPCD71dOQLSst3jbsh2h5P8OsxxbmGd+Bd/3aIznSEpNzJ3vk+Brsmlwp92
+         Z7+u1PCovOoJ5fBsnGIADr6OljG3/YOkjEU0pIvk/873bPN5uh+dmDq7CGMOWlxwnDoW
+         jWpBRYsM/s8uc8xOLJ5qhD/1BwLZ+BROYiPJI3Bxk1amJIX/d9lBuH9Qa8DcEmz8NSOV
+         +Oqw==
+X-Forwarded-Encrypted: i=1; AJvYcCWMJ7341HGC9KydN6DJuO0Zu49LLtcand/G8sUpxBjS7yVI8etGzuZHnvRvK0rzriKd3fEOq9xDONGsJ8kbxWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaeOcaAVTddb7E2mRJ9vqiIynMqXEacay7n7Sv13n0WbTnKelL
+	y5gVbD0i6qj5oapa1u00RVQ5klN7fO9r8RBc5oaaWzEqAAR8BmmDQqDj
+X-Gm-Gg: ASbGncuuGnk8mbNQPpwjk25DwjWuEm6mZZTz4ZBS6v15xQpgZpsubYS7nW3nOBkeURc
+	IfL+KB3id4jlnGmyZisRlIScAf4szKyh1YcJXYn9Jky+B+muD/9hJUWD/t1PM/NMPTx2R55UfSh
+	PxE0njQJreS5e5IIAuVErPyt3jpM+GRv06pfIOtjpOu4JeRbs9Pk3XkNWRsh/CJujZEQtD+AmPi
+	pmzcCDWbgagi1lq0y6cOah1tJYvRJWfE75UTXAR68/y4hseJM/nglOaxqw5Xovf/TFsSHEMnO6T
+	1CquKqPzpWXh2Ol0GnJwiekKk1jaFLsCUG9ZQzWcuwTAMxNf9dTMdsfZHTm7cYoeb9c5n/iu2Si
+	y8UxwDIx7LnHchaNS6+FlZQdWqqTU6+NoHjwtqK7MiFCWFAvYcZSjfoQpjL9yIYXW8eJV
+X-Google-Smtp-Source: AGHT+IEiheifxj1cVZ8u0uGr35LMFjwn1oypAqpQX6zfZ7PxZ09jYE7B7OTz14SyZcJabP5tV0n5Rg==
+X-Received: by 2002:a05:6a00:2e19:b0:78c:984b:7a92 with SMTP id d2e1a72fcca58-79385ddca48mr14271231b3a.12.1760108578879;
+        Fri, 10 Oct 2025 08:02:58 -0700 (PDT)
+Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b639cbcsm3266359b3a.18.2025.10.10.08.02.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Oct 2025 08:02:58 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: stable@vger.kernel.org
+Cc: gregkh@linuxfoundation.org,
+	tglx@linutronix.de,
+	Julia.Lawall@inria.fr,
+	akpm@linux-foundation.org,
+	anna-maria@linutronix.de,
+	arnd@arndb.de,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@roeck-us.net,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	maz@kernel.org,
+	peterz@infradead.org,
+	rostedt@goodmis.org,
+	sboyd@kernel.org,
+	viresh.kumar@linaro.org
+Subject: [PATCH 6.1.y 00/12] timers: Provide timer_shutdown[_sync]()
+Date: Sat, 11 Oct 2025 00:02:40 +0900
+Message-Id: <20251010150252.1115788-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1010113
-  Home:   https://github.com/bluez/bluez
-  Commit: a0533d5282ad0e9736990abb81d577737707dc65
-      https://github.com/bluez/bluez/commit/a0533d5282ad0e9736990abb81d577737707dc65
-  Author: Adrian Dudau <adrian-constantin.dudau@nxp.com>
-  Date:   2025-10-10 (Fri, 10 Oct 2025)
+The "timers: Provide timer_shutdown[_sync]()" patch series implemented a
+useful feature that addresses various bugs caused by attempts to rearm
+shutdown timers.
 
-  Changed paths:
-    M src/adapter.c
-    M src/device.c
-    M src/device.h
-    M src/eir.c
-    M src/eir.h
-    M src/shared/ad.c
-    M src/shared/ad.h
-    M tools/btpclient.c
+https://lore.kernel.org/all/20221123201306.823305113@linutronix.de/
 
-  Log Message:
-  -----------
-  tools: Add raw advertising data support to BlueZ
+However, this patch series was not fully backported to versions prior to
+6.2, requiring separate patches for older kernels if these bugs were
+encountered.
 
-This patch introduces support for storing and exposing raw advertising
-data from Bluetooth Low Energy devices through D-Bus properties and
-internal APIs.
+The biggest problem with this is that even if these bugs were discovered
+and patched in the upstream kernel, if the maintainer or author didn't
+create a separate backport patch for versions prior to 6.2, the bugs would
+remain untouched in older kernels.
 
-Key changes:
-- Add raw_data fields to eir_data and bt_ad structures
-- Implement bt_ad_set_raw_data(), bt_ad_clear_raw_data(),
-  bt_ad_has_raw_data(), and bt_ad_get_raw_data() APIs
-- Expose RawAdvertisingData D-Bus property on device objects
-- Store raw advertising data during EIR parsing
-- Update BTP client to include raw advertising data in device found events
+Therefore, to reduce the hassle of having to write a separate patch, we
+should backport the remaining unbackported commits from the
+"timers: Provide timer_shutdown[_sync]()" patch series to versions prior
+to 6.2.
 
-The RawAdvertisingData property is marked with G_DBUS_PROPERTY_FLAG_TESTING
-for debugging and protocol testing purposes. This enables applications to
-access complete raw advertising packet contents for custom parsing,
-compliance testing, and troubleshooting scenarios.
-
-The raw data format follows the Extended Inquiry Response Data Format
-as described in BLUETOOTH CORE SPECIFICATION Version 6.1 | Vol 3, Part C.
-
-Signed-off-by: Adrian Dudau <adrian-constantin.dudau@nxp.com>
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+ Documentation/RCU/Design/Requirements/Requirements.rst      |   2 +-
+ Documentation/core-api/local_ops.rst                        |   2 +-
+ Documentation/kernel-hacking/locking.rst                    |  17 ++++---
+ Documentation/timers/hrtimers.rst                           |   2 +-
+ Documentation/translations/it_IT/kernel-hacking/locking.rst |  14 +++--
+ Documentation/translations/zh_CN/core-api/local_ops.rst     |   2 +-
+ arch/arm/mach-spear/time.c                                  |   8 +--
+ drivers/bluetooth/hci_qca.c                                 |  10 +++-
+ drivers/clocksource/arm_arch_timer.c                        |  12 ++---
+ drivers/clocksource/timer-sp804.c                           |   6 +--
+ include/linux/timer.h                                       |   2 +
+ kernel/time/timer.c                                         | 311 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------------------
+ 12 files changed, 299 insertions(+), 89 deletions(-)
