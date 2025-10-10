@@ -1,63 +1,63 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323D02F9C37
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 15:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8302F9DA2
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 15:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760108596; cv=none; b=R2zBC4bMuanW5g+q++QRWal2P1SZ6h1IMGUTDsZTrp2zDU4Ve0fzZtBaStoijq+KZmuX+V2WqQOAn0NHI6SThmgO6QovOgZL04cprhQaJHMOj0h4nPnIRdH71NJPxztz/GNkr+D3RHdM10ocjX8D4exz4k8tfvU2qC4fj/QoaiI=
+	t=1760108601; cv=none; b=jZnriiQaqEo8CYdD2BsRAO1RN2ZBMuuErXYIp92oBTzujC/o2XLF5kG+SCXn4u8oje6BwTmyP2JX5e8LmOl1jCM6jeQVQEN3QifnDkNn0WUHFcUkDB/+b02X1a42rvDI2CDF+YFPEtj5DtHXjdXjvdCe4og5QBaqDaosfWSMwfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760108596; c=relaxed/simple;
-	bh=YY7i+ekw8WEClpFqVZfbZbIPcOFXG9mqoVtYSHhdgrE=;
+	s=arc-20240116; t=1760108601; c=relaxed/simple;
+	bh=kyxULOv2H236l1ucHIwcTRr5nnWT32c4Zye+wWGrJ6s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QgsUE1F4lJy6xtmpIOzbK8EfO3uXp1z6LcmZ9tXmEM7m5ruqFJHBR9v8Wt1kJa1qgmCaGlOwry9WXC2EEAm+TuyhA9p71b/HrJ7QycLbBXHpGLYoyGwtDE6aTH1omRX3EIvn+4o4oHYt9xkopmKgOUoi/bbmAbSTMzUu0o301G0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H2lX6zS2; arc=none smtp.client-ip=209.85.210.180
+	 MIME-Version; b=qmE8SHFQT+AgMdxliljenDC/jVSOoP3W0SLCH08vU74HmLqfRDkceYnqaiUwb4Wbtbwf5AsusV1+zoXs3bMWNirqbrxQpS2nLY+b6vj5qAdCQKQ1SRPiTI5D4Y60/iqA5NA6kH7fhRud/9jGlBT5PLVazv46AyP+IlGeHwNBsWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Su+5/5Ih; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2lX6zS2"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-793021f348fso2069542b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 08:03:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Su+5/5Ih"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-781ea2cee3fso2194377b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 08:03:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760108594; x=1760713394; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760108599; x=1760713399; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lru4V+cwKFfxLK/nzfZUd/f7wkQ+5dEE9KWoaatQVPo=;
-        b=H2lX6zS254lP6QiTChrWguTZXkBxQe3sQ/Ux3HyneGGx2Z6nWRZS1T/0E7DfiUnOSh
-         tB0JmpvO3/PMfdw7pEsfz5lhF+YvwHZMmxPFpD6oT44nXUdZBWb7TvX0yLS8Iy3l31ql
-         bN0G6x9iB7Z2iWPJ23atcp9ZHC+0MCdOP7roi5FZhUkZ8Xu6vaRzuzj0yDcTy6O0wtv2
-         k7TczfjpIcun4laPXNizNW9ymMvS7F6AFXEyMn5HukbZUkIa44gcSaj0BXawFoHVU9dE
-         keKKwNunzugLtmAvRmIN/hNQD7o4n1b2pyzmtgK/sx+iWwTlJb2DDtH3nnfWpcqhbc4k
-         3fOw==
+        bh=scjH6AQBXgOEyOguxVYTHq5LOFFjJgFpmI1fsS6Z7tY=;
+        b=Su+5/5IhGDJljNWqvdLuLQXyqkbWvf2cbmnmjD7zjzywNoFV80FhOQIm/b1p1OfZBO
+         vk35gqHf8PUvH/ZZZHgIP2CqeRLDHJsFqgGadCIn/QPG9BdjsEyUeONZUs5FXCQVI7RC
+         RG25CKozBZaN7DTNR3oeC9qh2I1a9rbdjMu7EXSaSX7/uUvdAaEcqJBsqS3cTqqrUOu1
+         6U02NccwfSNp51o9E7nod/5yynsZc2sWPPERn1Vdb5j+zTCejT4bOhSggOC7uprHxnxZ
+         v7ZZwhwP9IXbF2Ijr+rUpD+wAcq1rD+2wN9oHLUK/ZsYoo6T9wHP1XBuaxfpPIS5m9Rc
+         20Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760108594; x=1760713394;
+        d=1e100.net; s=20230601; t=1760108599; x=1760713399;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Lru4V+cwKFfxLK/nzfZUd/f7wkQ+5dEE9KWoaatQVPo=;
-        b=VfvlJhpYGu8wFrCR0N+k6UltpG0rBkFNU/YZkTU9LT7SBZBXcCHIhwRw6wSFENhVIv
-         BeBy+E/hYL/0bSRjE2XoA/bdGVeXTWMCfOsLVhE6/EMCgtF/+0Ng0di9YsFkIQ/hNv8c
-         wUKwlHESOOBQ+DdEqZr1zqiQCohV1WichW8N+5WrPPA0tFcWS43edQyOEWgoytMCELd3
-         OTQLpoNZqZ5AL+AgTwRpvWwJJrVmii0RS6KHBkTmQsb7k5YgHViYyWsZF0YsCa1DzaNi
-         J1/TQnoSLEVnTDP54Z6H3j2M0uG1IZQUavC7QfwvWOg0W/C/9mdzKXJvd0IdiK5E3uC5
-         Sm8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWxy49qcKn5HyoCT2pDkXzbyqsIXqV3KVWX4trzNThv5HOFFePqBCMGwrkV17ukK3wCx3ZGLkFfqzWS5aIDcTw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfSXE2Tv3SkG8hqi8WIiMGJDQ7c6G0SBNXJ8T39rN5oZVQhfEL
-	QrkNk45BMVK9N9n+HJ1CDmOsDETJr7OHLdRr++k/e4Snf61DpTks7Rcb
-X-Gm-Gg: ASbGncvaCNX4P20ReORRkPLCbXb+rlopRyf/94lAmLex82FOyxf3zNo7b+1xVIWhu2k
-	RF7Zawx1P9VArD5yoRYzdh87aRQEJgzA5ETUFPaFZFpmy/mLV/lwe6jiv5A0BIOhWev29Z2M7oM
-	IPoOnmnwJAsF630hvwx/LPTrXwp7yl6QXIns0PDOl55cV7lf8FxqTQszfFjbZVqUgybJYRpyZFF
-	BtbdEm7yQSq50//dfsWSNFH7z27IZxx9ewGzcycrcllTuKKTdw7E6gcHNV2It1r5sOQIZoBLanT
-	+71IcEwTVCmnZm0uWRkzC8VpwpKoYlXAIk7zL2+tigId6N2SOeUX3FJqLGigyqpb5ZvnR+EjDLu
-	cxJZynOV4qwmcpg3XC9B8W+qVPN7oJUm3yvbbQlna/t/1RIN9NALkJQwSfp6lRp2ncWmf
-X-Google-Smtp-Source: AGHT+IHDmtdSQ4BVOHtxe7GHClewheJPvHGauzysjfnwSn3tHptitjBMctHoN7F9QTbHybnsnanBLA==
-X-Received: by 2002:a05:6a00:391a:b0:77e:8130:fda with SMTP id d2e1a72fcca58-79385ddc9f9mr15581102b3a.13.1760108594064;
-        Fri, 10 Oct 2025 08:03:14 -0700 (PDT)
+        bh=scjH6AQBXgOEyOguxVYTHq5LOFFjJgFpmI1fsS6Z7tY=;
+        b=uHmLmNr0rdg1CSZnVA8K/NGoWZhCrn6bq0D+a7PR16MrvJ+6dEBGA2//lfwNaXduuK
+         q0i9Mhq9zHLUKZ69LIWelR5H5o21zoLLbMf0eonqz4QJaKxhCSTHHjtjXlntAlQPT8tS
+         mBlEkAIL7rYlfbBp0F/gtueCCk1m5Zv0ur8Hftkfj/ANr0r3pxFWKcd9MxRTJH8H4xoA
+         tU3vMwRxFf+yu/g/2b9StzIm2l4ZSxEZPPnGOHufz0E52DXuZk3OPfV2LTMXzBLX7+BH
+         q8VqkfKbM9El/Wrxkcnb0gXIhC6+xC+DTjLhIDZMFpEACdqIdSe0GwEzG+UuOzb0pzjj
+         P/cg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrdbWR5HPDPkCgui9HzFF5bKH1c0AinPKatbbqwiSwvQAJnWdJom6m5DNLk2EnCl9N06YIcaU7Kf3axsH20KA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi9dzAFjXplM/FE2uGZKXu01F/zQd4LJwfwO6R2uZoZFJXSbHS
+	vkcraj4EZPNqItYR+jW2xqRasNDcMu3OoQaJ8DK9sAkUO6E487e92YJcmJjhn5eekQGBMQ==
+X-Gm-Gg: ASbGncugFcN6Dq96+60AE8vSvAb+0VxoPyhX8FUO7sVCU0Je17he4bgwUAu6P/lFomM
+	Qalw8l6ofCWk8M94VZCVK2It9coIvePpRPD9UuZSOrWYPHQ93CbYZPw01PTnONgXsEj2ruKfWfo
+	th1NjiD7RbQrZPIprDTX4k0lI/dWczv2xFI69OSQcH5g++IyghqgG6+0mnte6UjyfQoT5/TKuqw
+	UwfpKwlMmNg6CbYd7jeAPY/h13+y+KdbfKN/PFv0mq2zmZHCHEWDIbP/JPD3qbijymFQGYj/BIx
+	j48xlUZY9Z5x1Y/sXeGSAKVuuGRqkbx2dauX6iK8PlXs1f/wVO6CmrWsB9SDPWbV1w6os7fMIcf
+	MkGx8FGE9wxdR+EpTFXsL4SfJuhiTX6U0JSj9YEqkSS3vnH/LmenNKHxKaFRai9EvOtcE
+X-Google-Smtp-Source: AGHT+IE1TkwVHA7tUUhpnxMC0Ew+qral7pJWbGGXX+m1f8imGiLvrl15HPVZo6jvgfFxLbQ7GCafnA==
+X-Received: by 2002:a05:6a20:7d8a:b0:2fb:62bb:dec with SMTP id adf61e73a8af0-32da83db679mr15075982637.39.1760108598855;
+        Fri, 10 Oct 2025 08:03:18 -0700 (PDT)
 Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b639cbcsm3266359b3a.18.2025.10.10.08.03.10
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b639cbcsm3266359b3a.18.2025.10.10.08.03.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Oct 2025 08:03:13 -0700 (PDT)
+        Fri, 10 Oct 2025 08:03:18 -0700 (PDT)
 From: Jeongjun Park <aha310510@gmail.com>
 To: stable@vger.kernel.org
 Cc: gregkh@linuxfoundation.org,
@@ -78,9 +78,9 @@ Cc: gregkh@linuxfoundation.org,
 	viresh.kumar@linaro.org,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH 6.1.y 03/12] clocksource/drivers/arm_arch_timer: Do not use timer namespace for timer_shutdown() function
-Date: Sat, 11 Oct 2025 00:02:43 +0900
-Message-Id: <20251010150252.1115788-4-aha310510@gmail.com>
+Subject: [PATCH 6.1.y 04/12] clocksource/drivers/sp804: Do not use timer namespace for timer_shutdown() function
+Date: Sat, 11 Oct 2025 00:02:44 +0900
+Message-Id: <20251010150252.1115788-5-aha310510@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251010150252.1115788-1-aha310510@gmail.com>
 References: <20251010150252.1115788-1-aha310510@gmail.com>
@@ -94,14 +94,14 @@ Content-Transfer-Encoding: 8bit
 
 From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
 
-[ Upstream commit 73737a5833ace25a8408b0d3b783637cb6bf29d1 ]
+[ Upstream commit 6e1fc2591f116dfb20b65cf27356475461d61bd8 ]
 
 A new "shutdown" timer state is being added to the generic timer code. One
 of the functions to change the timer into the state is called
 "timer_shutdown()". This means that there can not be other functions
 called "timer_shutdown()" as the timer code owns the "timer_*" name space.
 
-Rename timer_shutdown() to arch_timer_shutdown() to avoid this conflict.
+Rename timer_shutdown() to evt_timer_shutdown() to avoid this conflict.
 
 Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
@@ -109,56 +109,43 @@ Tested-by: Guenter Roeck <linux@roeck-us.net>
 Reviewed-by: Guenter Roeck <linux@roeck-us.net>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Acked-by: Marc Zyngier <maz@kernel.org>
-Link: https://lkml.kernel.org/r/20221106212702.002251651@goodmis.org
-Link: https://lore.kernel.org/all/20221105060155.409832154@goodmis.org/
-Link: https://lore.kernel.org/r/20221110064146.981725531@goodmis.org
-Link: https://lore.kernel.org/r/20221123201624.574672568@linutronix.de
+Link: https://lkml.kernel.org/r/20221106212702.182883323@goodmis.org
+Link: https://lore.kernel.org/all/20221105060155.592778858@goodmis.org/
+Link: https://lore.kernel.org/r/20221110064147.158230501@goodmis.org
+Link: https://lore.kernel.org/r/20221123201624.634354813@linutronix.de
 Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 ---
- drivers/clocksource/arm_arch_timer.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/clocksource/timer-sp804.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index fee1c4bf1021..ddcbf2b19651 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -687,8 +687,8 @@ static irqreturn_t arch_timer_handler_virt_mem(int irq, void *dev_id)
- 	return timer_handler(ARCH_TIMER_MEM_VIRT_ACCESS, evt);
+diff --git a/drivers/clocksource/timer-sp804.c b/drivers/clocksource/timer-sp804.c
+index e6a87f4af2b5..cd1916c05325 100644
+--- a/drivers/clocksource/timer-sp804.c
++++ b/drivers/clocksource/timer-sp804.c
+@@ -155,14 +155,14 @@ static irqreturn_t sp804_timer_interrupt(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
  }
  
--static __always_inline int timer_shutdown(const int access,
--					  struct clock_event_device *clk)
-+static __always_inline int arch_timer_shutdown(const int access,
-+					       struct clock_event_device *clk)
+-static inline void timer_shutdown(struct clock_event_device *evt)
++static inline void evt_timer_shutdown(struct clock_event_device *evt)
  {
- 	unsigned long ctrl;
- 
-@@ -701,22 +701,22 @@ static __always_inline int timer_shutdown(const int access,
- 
- static int arch_timer_shutdown_virt(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_VIRT_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_VIRT_ACCESS, clk);
+ 	writel(0, common_clkevt->ctrl);
  }
  
- static int arch_timer_shutdown_phys(struct clock_event_device *clk)
+ static int sp804_shutdown(struct clock_event_device *evt)
  {
--	return timer_shutdown(ARCH_TIMER_PHYS_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_PHYS_ACCESS, clk);
+-	timer_shutdown(evt);
++	evt_timer_shutdown(evt);
+ 	return 0;
  }
  
- static int arch_timer_shutdown_virt_mem(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_MEM_VIRT_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_MEM_VIRT_ACCESS, clk);
- }
+@@ -171,7 +171,7 @@ static int sp804_set_periodic(struct clock_event_device *evt)
+ 	unsigned long ctrl = TIMER_CTRL_32BIT | TIMER_CTRL_IE |
+ 			     TIMER_CTRL_PERIODIC | TIMER_CTRL_ENABLE;
  
- static int arch_timer_shutdown_phys_mem(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_MEM_PHYS_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_MEM_PHYS_ACCESS, clk);
- }
- 
- static __always_inline void set_next_event(const int access, unsigned long evt,
+-	timer_shutdown(evt);
++	evt_timer_shutdown(evt);
+ 	writel(common_clkevt->reload, common_clkevt->load);
+ 	writel(ctrl, common_clkevt->ctrl);
+ 	return 0;
 --
