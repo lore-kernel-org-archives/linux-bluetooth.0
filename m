@@ -1,63 +1,64 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A556B2FB62A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 15:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF772FB967
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 15:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760108635; cv=none; b=pxebjIDU1RIgyXQOM6/RbnaUbWjYm0DP9VfqSPzWrl+nmt7xHVaKXLbVpmgPpRVkbaukd9ZX6MLdOTXDPz4USUUn5aw9gnqXmANLY+lCXHW+icYxgVM8mINTwuETssHatwVdS5rzsho00aljxXCB1QkvhZR5ZW+svnalZxM0zso=
+	t=1760108640; cv=none; b=FH+xCbUG5aZrRSIN4pr6MuSc47FmSL08N1nWBhiamfpLanz5nwh8pd/OYRjSODa26OyKjHNk6sRIiyips3sz3e2TB1PqrtpappdgBggbA4bPo8XAsWZ9HyEH9Nkhbd4dN24xTr81AZ4TlQRfUTk0P+NNES86cNevYWlxYcZK8jE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760108635; c=relaxed/simple;
-	bh=e1DK8j+FiXmlj1eFN8Izgd5UcqsQJns59AycqwDqK3Q=;
+	s=arc-20240116; t=1760108640; c=relaxed/simple;
+	bh=wtM3KGXEQuicJ8O+1w9NeLqs1Q3c/AYVobYXG6O4xkU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rPo1C4UUYtk7/DWq516HV7bIrsuCX1S6RpdMe4+dU8lH1un2F88TRplNJJOlTYM9rzfccTcaAIMPy9HoUh64Y0C+s21ivqOXPbU8lQnNeAYlZFdiF95NUMUMSAiLNOo0NlVXopEr7mUk3h4Jg4gkSD81v9myEZCYDIP8u2HkR10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M8yg2lEK; arc=none smtp.client-ip=209.85.210.172
+	 MIME-Version; b=Crm69TFVHRszOXRaoSpbl6r0ukYNmIQrGQkngvdbsqAnTzFqcxp3PEneeWUtJPQMywFk5w8yj+jcm7tRuNlukQ0XX01MLd/kSkV/h1boaB5Qpf7XNBDxDWHV3K8+8ROBNRFp6pdm1/mhoQdAJnYYNQQu5MG7LAi5aq2d+nwDPXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mAsA5XFC; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M8yg2lEK"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-77f67ba775aso3249966b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 08:03:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mAsA5XFC"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-781001e3846so2139629b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 08:03:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760108633; x=1760713433; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760108638; x=1760713438; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UGmuQqZjeUhbRmxIHTmmKtGFb/p0zxMormCTfTuA8dI=;
-        b=M8yg2lEK0eQ8LABS4EHF3G0aJHw0OO9hjmn7LMbj8YoIrf0ZAKiZClHet5XquX34p8
-         VLhGv3r26y59xEjMUaR8ZT+Y+CJhhYp88SbYQ7vRAMD/afi0Edq2C9UtCjNssYRHFMWO
-         RMSDJRpubVBdpm4j79o5URT4OI+Qjz4r2cO+5aKxT9GjiuUVHQ0VIM3T/0txvVCj3YNI
-         ZG3kG79jddBzjBzycdS8wPMbCAc69wDV2O1QXYB5c8NYXsbRzM+mBj7BZLjKm3FsbqHH
-         onm5sHpkwst+yp1/g32p0gLMnlqrc1OTS0khf0bJGPRGtB49u1jx6eH/vLsGLSlBYlgB
-         GbBg==
+        bh=avVd2rCSlmy3mzSueRF3eaj+JsVil8OR/Q+bsjGDE3A=;
+        b=mAsA5XFCTxYVzysL5NVpD1wZXp+XChV0uF2ldflFpa+zYSSukIxbSNlJ0La6Ye0GQ6
+         8pti4wD1xjGtiAKABlc4OBOCYVFPGcXrk0TUIYYRSmy0nTmziep8oDRwAgCogmIiGDpr
+         kmYX8NHduTUiv2YbDSCg93l8rPIhtjUS/SbW4X/fOz6KQyMSyDvEozgOM6o4qshmoT5h
+         VZUfng6v+E5oN+UJT1ywO5764iWQq5NeG1e391o0r/1Kc4Df4L4n2/sZALKMnGUtfhf8
+         VcpjtZz1sW6jIQCoryQs8RQ1/5uA1Wk/ZaGBygN0y7D/2+aR0lWOTuahdah7MyCyFjVm
+         lKnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760108633; x=1760713433;
+        d=1e100.net; s=20230601; t=1760108638; x=1760713438;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UGmuQqZjeUhbRmxIHTmmKtGFb/p0zxMormCTfTuA8dI=;
-        b=ARDel+/OaVydJhUOHqlntQ/9bX/xiOmIIzMmrGH0K4q4oHANH1FkjuPT5MZaObi5vU
-         siP04zQY21JmPqhmY4ycr05yI5cCtKIbBM6zGlzVB+FglYtA1jIXTkjtyqAoouq56b10
-         e2asH6074vxe4Tlkueu48ADWEDe9hqcIrcfh5lNOefdK/pJUSQjka6c4G2eztyXP50lF
-         iOhZo9aI1mf/Ah829mcIda34ze71GJ78qY2xQKn/brKaI8zaYB7VnGyGzeuqNX0TNFLi
-         XQKfOkP2Cnwys4juURMRYZWU0CJ4TqLwrVJF6eAz05N+cybs3iXXHOujf7QXyZpQ2Uoj
-         OJVA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9XfLHrEJY68vSdxnjXq+BF8/axs9v2kdpgD8LmDP4EBKvC/plDrnQpSmEsYGU1z94QrZM5g6cZS/QeBGftSs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbMN/K2Lx2Pepmiu0VIABOf8rjlg39+uPTC5OSAJ0NuhiNS/NR
-	lxhNWLqE79UJD7qghTnT5U0x6t/wYPfPl+0qUCEMGFLy7HG5JNrfqux4
-X-Gm-Gg: ASbGnctx+6uB06aOkACZ9qoCm+fsnIHQE4mXFIKoySFPjOPPhEWCrK88qQiSeQcN8qE
-	N0Mkq9yF2SkFQ7ytsvFaVtPDmZRcztanMSPxkD6rGRcbrvbLXfvc2XfPsLSYHuq2xmE/TgydJeY
-	PFvd1N+Ig+CIVSxaysSs7iX1WB+OKIO4vN1gKB1qMvVS1JAebtngjokQAVHuNHiKmiHxz/Rg/lf
-	M6mtsqDdRKLLHlvZSr0hHBEB0k/rFSua/3fVaUlewCGbPHDDfj4+1RGvVShDKl4sZqW4W44iBzN
-	aMYEwN06VIlPz8Ko6V+0aXD9YUW3dDfDgMMMze3KSUSKIa9PqeHb112X3wwioqcN/Grc8jqBOB5
-	OIP35gilZQRzbpwC06MwinqLaZ7Np5cXvvCx0ycUt4icWiskxZe9KWEtmlrXpjMRFZ4/l
-X-Google-Smtp-Source: AGHT+IGjzwugYg2s6sAV1EGo1X7orkT1LFT21fxzMkAVvt7JQEZDZ/htyUsq6DK7NaGUctCAjKtjzA==
-X-Received: by 2002:a05:6a00:1495:b0:776:20c2:d58b with SMTP id d2e1a72fcca58-79387435d86mr15675430b3a.24.1760108632753;
-        Fri, 10 Oct 2025 08:03:52 -0700 (PDT)
+        bh=avVd2rCSlmy3mzSueRF3eaj+JsVil8OR/Q+bsjGDE3A=;
+        b=xElxYuiH5GABc+1O8bZETc0DkqV+D5vo8HBjvUzO0cfrRmX5yeh07WA1gXgmTytO0x
+         SpiHw2covei2ZumLMvaYJEWNsk8udBuI9SnW0M4y0MufYsI0P1JKYxStH0DB+jiNX1xo
+         rY55/0RDTyM1SR3BRzUMiDttgMFBY2x1YRoiapXZgRmPMUICrrDX130HfmoQyQxnzS/8
+         COJ+ruv4mxJM7Dv/XbjbNAHX015nIeih9X5QNaA2tXaDzDMA7wDa7qKQTSmoN/utFKEk
+         FOiGCgEGO3QltaHbirqqsdUv/tTxCr9ErMUvBGLmEDqqCvfULBEV2KfeDxzZx7ZjRF/v
+         7VuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUBeD2NgF+dugpbZdR6bCSN9Luxuxwu9fYBeFRmWAWMUXS1AL8cVYzGs+dBO0ozOb+bajTB42RzgohXlgzyxSU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAxWMADvDtcaMNQ49p7i9XFH5nhgkvPGaY/5zgQ5SQHLFQUvyb
+	L+MYoQUA5G2V+S9TbXDqs1yIaX3yY79AwpfMN6m4xO+Jacy1YoTD4m8/qBb3IQLzdVdiHg==
+X-Gm-Gg: ASbGncvAdtw/zBRhu2nXIHL1x8DSbypLHtVOYdKb6+cYthi41JGOGpEKkrl5kNUNDvO
+	L9JaTXd9EWU43oUjX1xZpKHquDiU6LKokFWktCXc9IgLAifp9lkQv+/A8gaUMTaWDu0Kerb1Hnq
+	VKWSSUXy0V3tZDQujluT5JdbKHIpAXyxYXr+58CmUpD6j9RuA1uFNe3ZQeH3LN3G+ng9roQQDaa
+	VCc7XGfCyLTbq7Q13VSgthUN51GtYEmsEOvtBHB6/GnC3sIjxxDQVmj42F8BmmcelU7Ti9Pq/WY
+	uXf0GiXvOW0y/98Y04rjrvN4tFkQ897CXV8oI8OR+m0NE1o5CUDH2YmUp7YMFDEvT878IsEQ4yO
+	V4hzEytwssHOWKlnW0FDRURdv3l4zcMqu1xcEO+y4f+djAQLrYhS5kr9pOG5CHV+jPMVKLGIW+G
+	a9vkk=
+X-Google-Smtp-Source: AGHT+IFXN/diK2DPzXd7rBmdO25/OaDRNzyiRkMUMQPIXVhrYKhY4WRAMZUZSE4jYyFbxCO9D8yEqw==
+X-Received: by 2002:a05:6a20:2451:b0:24a:b9e:4a6c with SMTP id adf61e73a8af0-32da845e56amr16399655637.44.1760108637682;
+        Fri, 10 Oct 2025 08:03:57 -0700 (PDT)
 Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b639cbcsm3266359b3a.18.2025.10.10.08.03.48
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b639cbcsm3266359b3a.18.2025.10.10.08.03.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Oct 2025 08:03:52 -0700 (PDT)
+        Fri, 10 Oct 2025 08:03:57 -0700 (PDT)
 From: Jeongjun Park <aha310510@gmail.com>
 To: stable@vger.kernel.org
 Cc: gregkh@linuxfoundation.org,
@@ -78,9 +79,9 @@ Cc: gregkh@linuxfoundation.org,
 	viresh.kumar@linaro.org,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH 6.1.y 11/12] timers: Update the documentation to reflect on the new timer_shutdown() API
-Date: Sat, 11 Oct 2025 00:02:51 +0900
-Message-Id: <20251010150252.1115788-12-aha310510@gmail.com>
+Subject: [PATCH 6.1.y 12/12] Bluetooth: hci_qca: Fix the teardown problem for real
+Date: Sat, 11 Oct 2025 00:02:52 +0900
+Message-Id: <20251010150252.1115788-13-aha310510@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251010150252.1115788-1-aha310510@gmail.com>
 References: <20251010150252.1115788-1-aha310510@gmail.com>
@@ -90,90 +91,77 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+From: Thomas Gleixner <tglx@linutronix.de>
 
-[ Upstream commit a31323bef2b66455920d054b160c17d4240f8fd4 ]
+[ Upstream commit e0d3da982c96aeddc1bbf1cf9469dbb9ebdca657 ]
 
-In order to make sure that a timer is not re-armed after it is stopped
-before freeing, a new shutdown state is added to the timer code. The API
-timer_shutdown_sync() and timer_shutdown() must be called before the
-object that holds the timer can be freed.
+While discussing solutions for the teardown problem which results from
+circular dependencies between timers and workqueues, where timers schedule
+work from their timer callback and workqueues arm the timers from work
+items, it was discovered that the recent fix to the QCA code is incorrect.
 
-Update the documentation to reflect this new workflow.
+That commit fixes the obvious problem of using del_timer() instead of
+del_timer_sync() and reorders the teardown calls to
 
-[ tglx: Updated to the new semantics and updated the zh_CN version ]
+   destroy_workqueue(wq);
+   del_timer_sync(t);
 
-Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+This makes it less likely to explode, but it's still broken:
+
+   destroy_workqueue(wq);
+   /* After this point @wq cannot be touched anymore */
+
+   ---> timer expires
+         queue_work(wq) <---- Results in a NULL pointer dereference
+			      deep in the work queue core code.
+   del_timer_sync(t);
+
+Use the new timer_shutdown_sync() function to ensure that the timers are
+disarmed, no timer callbacks are running and the timers cannot be armed
+again. This restores the original teardown sequence:
+
+   timer_shutdown_sync(t);
+   destroy_workqueue(wq);
+
+which is now correct because the timer core silently ignores potential
+rearming attempts which can happen when destroy_workqueue() drains pending
+work before mopping up the workqueue.
+
+Fixes: 72ef98445aca ("Bluetooth: hci_qca: Use del_timer_sync() before freeing")
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Tested-by: Guenter Roeck <linux@roeck-us.net>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Link: https://lore.kernel.org/r/20221110064147.712934793@goodmis.org
-Link: https://lore.kernel.org/r/20221123201625.375284489@linutronix.de
+Acked-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Link: https://lore.kernel.org/all/87iljhsftt.ffs@tglx
+Link: https://lore.kernel.org/r/20221123201625.435907114@linutronix.de
 Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 ---
- Documentation/RCU/Design/Requirements/Requirements.rst  | 2 +-
- Documentation/core-api/local_ops.rst                    | 2 +-
- Documentation/kernel-hacking/locking.rst                | 5 +++++
- Documentation/translations/zh_CN/core-api/local_ops.rst | 2 +-
- 4 files changed, 8 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_qca.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/RCU/Design/Requirements/Requirements.rst b/Documentation/RCU/Design/Requirements/Requirements.rst
-index 546f23abeca3..49387d823619 100644
---- a/Documentation/RCU/Design/Requirements/Requirements.rst
-+++ b/Documentation/RCU/Design/Requirements/Requirements.rst
-@@ -1858,7 +1858,7 @@ unloaded. After a given module has been unloaded, any attempt to call
- one of its functions results in a segmentation fault. The module-unload
- functions must therefore cancel any delayed calls to loadable-module
- functions, for example, any outstanding mod_timer() must be dealt
--with via timer_delete_sync() or similar.
-+with via timer_shutdown_sync() or similar.
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 66f416f59a8d..204ba1de624d 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -710,9 +710,15 @@ static int qca_close(struct hci_uart *hu)
+ 	skb_queue_purge(&qca->tx_wait_q);
+ 	skb_queue_purge(&qca->txq);
+ 	skb_queue_purge(&qca->rx_memdump_q);
++	/*
++	 * Shut the timers down so they can't be rearmed when
++	 * destroy_workqueue() drains pending work which in turn might try
++	 * to arm a timer.  After shutdown rearm attempts are silently
++	 * ignored by the timer core code.
++	 */
++	timer_shutdown_sync(&qca->tx_idle_timer);
++	timer_shutdown_sync(&qca->wake_retrans_timer);
+ 	destroy_workqueue(qca->workqueue);
+-	del_timer_sync(&qca->tx_idle_timer);
+-	del_timer_sync(&qca->wake_retrans_timer);
+ 	qca->hu = NULL;
  
- Unfortunately, there is no way to cancel an RCU callback; once you
- invoke call_rcu(), the callback function is eventually going to be
-diff --git a/Documentation/core-api/local_ops.rst b/Documentation/core-api/local_ops.rst
-index a84f8b0c7ab2..0b42ceaaf3c4 100644
---- a/Documentation/core-api/local_ops.rst
-+++ b/Documentation/core-api/local_ops.rst
-@@ -191,7 +191,7 @@ Here is a sample module which implements a basic per cpu counter using
- 
-     static void __exit test_exit(void)
-     {
--            timer_delete_sync(&test_timer);
-+            timer_shutdown_sync(&test_timer);
-     }
- 
-     module_init(test_init);
-diff --git a/Documentation/kernel-hacking/locking.rst b/Documentation/kernel-hacking/locking.rst
-index c447d55fa080..3bbb11ba647a 100644
---- a/Documentation/kernel-hacking/locking.rst
-+++ b/Documentation/kernel-hacking/locking.rst
-@@ -1007,6 +1007,11 @@ calling add_timer() at the end of their timer function).
- Because this is a fairly common case which is prone to races, you should
- use timer_delete_sync() (``include/linux/timer.h``) to
- 
-+Before freeing a timer, timer_shutdown() or timer_shutdown_sync() should be
-+called which will keep it from being rearmed. Any subsequent attempt to
-+rearm the timer will be silently ignored by the core code.
-+
-+
- Locking Speed
- =============
- 
-diff --git a/Documentation/translations/zh_CN/core-api/local_ops.rst b/Documentation/translations/zh_CN/core-api/local_ops.rst
-index 22493b9b829c..eb5423f60f17 100644
---- a/Documentation/translations/zh_CN/core-api/local_ops.rst
-+++ b/Documentation/translations/zh_CN/core-api/local_ops.rst
-@@ -185,7 +185,7 @@ UP之间没有不同的行为，在你的架构的 ``local.h`` 中包括 ``asm-g
- 
-     static void __exit test_exit(void)
-     {
--            timer_delete_sync(&test_timer);
-+            timer_shutdown_sync(&test_timer);
-     }
- 
-     module_init(test_init);
+ 	kfree_skb(qca->rx_skb);
 --
