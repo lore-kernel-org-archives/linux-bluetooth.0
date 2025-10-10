@@ -1,64 +1,64 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335F82FA0D3
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 15:03:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE962FB092
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 15:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760108616; cv=none; b=jjblnixijg1YuLLrwNM/MCknt0OalI+eDlVuuWjxjS3/KX78obGtTU03u/ll3GVE6HJ4EZ5+CeEfaK6+YP8nqf6ffL13RNCtkJ6tbVu/shgG49XLj7lz7zqEFBPocHfSJMMk2rvK3FHZBso6O25pg2nSQz2LRc61uemMKWhPK58=
+	t=1760108620; cv=none; b=FuL4N2NR9bh/sNdneQpdmQ0ZD3bOB/BCbM1sOwYU8ZFwNBITVdBkcF22z2XmjnPiM+jEbguunikxJj3aFPYtW5CzVfRjWqK4UgzpptGp3MK/8iLo/m5cdeLBRvfgePfncQC2WbQXOYyX1KX0lYpFJuB67O8o74/XnDBSYFenKSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760108616; c=relaxed/simple;
-	bh=A7NZvw6BwM3JH9LFTZM0pkj7MM2Mf/KMJNxtIByaxbs=;
+	s=arc-20240116; t=1760108620; c=relaxed/simple;
+	bh=FfeWAFL01yrxGNZ9KQqmQL8U/+v/91/EffrzfYdxZZA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=moxFD0aDz4TL6Ak6EMT7XosPRARdmDFrH3bWUHQDmR8UpUV9EunWWcG0dXbovWztGB1AqaPyA0u2p9ea59EJeH0nHLAG+oNlhGFcG4oMB5vTVVJUvIxi5VNL6kX7qcPiQXZTiHEm2xJutpZ77QnTRuzPxKYpdZPV2eH+eD214ZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e6warcY/; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=qDwT9hGaSpjOFhFjYtqE6R1+fOLKGzzg3dzYpVKdIjLqUuZ+Itp7DPLpagXHoaOXwFOCo3p5JKy0YnVZyWG11gW8q3ho0CKm5c4tAbRPPhmD46AHivzaOf6WLmZ5EcGMGyc/MFhEwBCkVUSg6pc9TeiLkevfc/Vi78+ePHd4aqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PwMKTOWj; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e6warcY/"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-76e2ea933b7so2171254b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 08:03:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PwMKTOWj"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-78af9ebe337so1707830b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Oct 2025 08:03:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760108613; x=1760713413; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760108618; x=1760713418; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HIvAwaANSEMHidUC241SU/ATL2QFU3HABzkGaIq1H88=;
-        b=e6warcY/j+AhOFiEH4LxHlRbQra3smYT+AJbRdxXjSayLeYaTRub0OiFUHuEIS52nb
-         Mi0FnAxiiAmFgaI8swivggiAWSufyciL59z+wXYbN3JeF3mA7m5g9MRmxqI4f9WbPCda
-         ufYyXRiROflhNoEN91DU/Eud0MU+xoPfw/LNgFOp3b5SuNoVOYzKLM8VULC0Ayn0Rp/B
-         cuqAy1ztcUNMIqHBSTGaxzCfzwY5FmiBC1kR2R0Gs9BsrWTUXNczFRGZJRaPmBWUEklt
-         umGnkTKc1zcC6A4r8p8imJXOURI4ySBbkmIgcgZ8XhDb2ZxtlmfOp7xmzf7AsPcmADGq
-         5WSw==
+        bh=j0bNeek1LW81/KG2/Q/uicdT1bV3tR+ITFKGtccSqSg=;
+        b=PwMKTOWjlKiSl8aZ4Tlq2h2zXpGg1JGTXK+2+563ZeXzobtQwUekS+fZ6BRV/ryzIE
+         ppH+oHxz7/46gEn1NADzkUBktoRhQyDNMICbXNroThOcPE4sL76b63ns+fsaueVqhGm9
+         F0iSIW0DYN/LatDho76W58TtqfbzaN2AOpRZCACsHNH43sr/GY2OQb91KukM4QxBP9+k
+         LiVa29UQdMiYwcsvGbX2pCvOPZfq3PGRDwyjswKcjYEIuq3IQlos3Pza52wMqN6B71vK
+         BkbNaqQvpW257zoB0e0Dgubf/14DC4z+uzsGYx5+yrIv3HxVvAUPVdmkzgKxkXQPtKIY
+         8GNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760108613; x=1760713413;
+        d=1e100.net; s=20230601; t=1760108618; x=1760713418;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HIvAwaANSEMHidUC241SU/ATL2QFU3HABzkGaIq1H88=;
-        b=AgZviZzGMvcJvhD80x2hmIXTY/+FpvJ6EClIWOFwQ7OjyMwcKRvJodll8oHcVHHMP0
-         AYBkxekh+bjxNF0f5AfW7RvyDjqyBUUJLMIgJfC+pg7PvB0cbts5BSs2z7Wrr9pgIUSk
-         el9aGZyBdYFYxnpgJOYn2gSMsdbM1lswxeR6MhCGu34+w7720BSbJsDPmVVbYE6TquBQ
-         C0YGQ3/FBO+oZZDNOnHHbyNfNeHtbMDgC5fqNKwNBswxpHMpF7/ZAXfKfa3TZB2AqG7o
-         IS+UrNvDPepo1VbffJ00FqfpEUCFvGTk52WG70X3Y88bsz5bNRQxYhh4Hpqbo7sJlfgY
-         Em7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUpg0nGyf10TUTnfQZV/TNEJhYIObax6Pck3YCvNOvzk+82U9KZCzrxhXMXc2F5DB9lLPQCxfUzjHY4BeZ7E8Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuFIjcBAMAJWuIbLYK8iLjiSqJZ0vX877b1azl1bjLPQJWfd/9
-	AhLwYSPISFDbHtSVBVAoxXKsF5wKxBF5M2ZwnP7N8tZc9SnZyf4lDGsx
-X-Gm-Gg: ASbGnctMMz3YnPwqp82dIKT3GD3eUB1605Xozw3hzRfGsZ+dNiAytgupYqfi/u0Z7qc
-	4PRTl5WGZa4tbf/uNtRG42preQL0LWLKh/EnoeYie1AWIOF7WSLVjulEWh9Tksm6OGKOJbvbvX7
-	zoDf4kbwaDlXV+ePfjrH7JGa3Cleer2dW76qd3YbAJvKo8IdPMVY6b1v3OVbovsq8YPdLPCIQPB
-	Goq+0CVQmGhXIaf/RxXuoolI+wahlEJ9ai0N0nN/AcflVKNINxB0WuoEQQHl6rV32VxtdZwXR2b
-	lg0PoqENBbjcKiw+l5xdp9PlfRgP56OOUcL9EBHawRpluDhHAmZqXsb/WPw72Rv0tKUW30q42tv
-	WLcLMQg0Z2cYACvC3M+zAPFSu+Vw5K/pJ8EV+9sv7idV0cF1u+zYG7zRfSs8wpbogDYRfdjF26R
-	K/Dqo=
-X-Google-Smtp-Source: AGHT+IFN002D5LEzhcshovKTWIIkwy/kzSyTHAsoxU09irX5bD+tuMRXLGgMawISEMPJETPlzJXvNA==
-X-Received: by 2002:a05:6a20:6a22:b0:246:3a6:3e47 with SMTP id adf61e73a8af0-32da8e2ba5cmr14348517637.12.1760108613238;
-        Fri, 10 Oct 2025 08:03:33 -0700 (PDT)
+        bh=j0bNeek1LW81/KG2/Q/uicdT1bV3tR+ITFKGtccSqSg=;
+        b=XVQ0U9gN3pMq3suwJbs+sxtWLisC2OL+cwwyrpKfq5x9VqIIK5EdjBwouLLXLscSg2
+         9YOI/a+I7lvyEHeLY5OBhsElknuPO4DKjhJlQFKmAvOZGgmBUyyqdfAw8zutq8EXnqU6
+         xmu/wrCuAj/OGgSahh5wb1VHEPsUco//+wzHrOraKw01HSv0mu9TyX3Kg4hhaxhCfhOE
+         HWyU++wYPxW/+LRR1lEy5fOakqPsgN0fDZaA9DiEQsFKUnd6fjKexpRsHYQpjhBxagHn
+         +eCff0uNn90dqzC3Q7aR8h7wwOMXDsXOhGBz+cZIV33jzu5MHNPkkoERtxfMYsXTAQ2X
+         CbQA==
+X-Forwarded-Encrypted: i=1; AJvYcCVfEUXWkxn2ua1047NrlmL43qtcMj/SNSi4ps7g7OcVaPHk5AOMomRIYqNP1Pog7YlMD+h6po49/rabhP729xs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+1RABP6Gs2AS5NAuhqE5WR0XemgA4M/uG3husERJghR//BA6+
+	pLzZg8XBSmYVD+YV7UGRJiAfQpyC5Aox1Go6tLG5sONFcSkHguhQtB0T
+X-Gm-Gg: ASbGncsTvE9fZ7KrUmkwxIlF1r6LN25C7UIVsjngRJ+q6NsPTUP40NMju4wEAwfSUQO
+	On0DSR0uu6MPx/ImIyu6aswyeEKu3/MxT39FvuX+IhyInCxtaAW/uCJeB1Ep+Jv7vYdVfG9t2IV
+	uUsxDqA+txENuIZrnYJZ7EeNmAgMua+D9+0/b5P7LAcjyzATHwilDt+ATwrMVl6/2QJes0gmBTq
+	gbZcD8K1huzsOplmeirONfd9tyRMmzOxrGKimzTPukax+Dhpfs/ZlMGsdrtIKVN1exF6tBt3pr9
+	Nym9ZYzoyFyA7t5Kg3fe5ry06mFCAWK+HMSV17IwzLhCRGJPKL24887YiQbpHPe/dS67qavLfS2
+	EcbgqlHdYd3ggzuAEwe98SzrFQ0SQeev1z3XBy0f95dtb/7N1Np4+nxv5o3g9j1d2x6TCYu20Bk
+	MVl5ilxtrSXIxkLg==
+X-Google-Smtp-Source: AGHT+IESNC8RkQTBaynIxPs6OR43ASsf0mjK4WexzZ/IzmWVAMQfi+tV6noR5/B9CBVHAqdLTCbbEg==
+X-Received: by 2002:a05:6a00:3c84:b0:781:1e80:f0c6 with SMTP id d2e1a72fcca58-79387440a4dmr15774554b3a.17.1760108617993;
+        Fri, 10 Oct 2025 08:03:37 -0700 (PDT)
 Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b639cbcsm3266359b3a.18.2025.10.10.08.03.29
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b639cbcsm3266359b3a.18.2025.10.10.08.03.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Oct 2025 08:03:32 -0700 (PDT)
+        Fri, 10 Oct 2025 08:03:37 -0700 (PDT)
 From: Jeongjun Park <aha310510@gmail.com>
 To: stable@vger.kernel.org
 Cc: gregkh@linuxfoundation.org,
@@ -79,9 +79,9 @@ Cc: gregkh@linuxfoundation.org,
 	viresh.kumar@linaro.org,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH 6.1.y 07/12] timers: Silently ignore timers with a NULL function
-Date: Sat, 11 Oct 2025 00:02:47 +0900
-Message-Id: <20251010150252.1115788-8-aha310510@gmail.com>
+Subject: [PATCH 6.1.y 08/12] timers: Split [try_to_]del_timer[_sync]() to prepare for shutdown mode
+Date: Sat, 11 Oct 2025 00:02:48 +0900
+Message-Id: <20251010150252.1115788-9-aha310510@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251010150252.1115788-1-aha310510@gmail.com>
 References: <20251010150252.1115788-1-aha310510@gmail.com>
@@ -95,7 +95,7 @@ Content-Transfer-Encoding: 8bit
 
 From: Thomas Gleixner <tglx@linutronix.de>
 
-[ Upstream commit d02e382cef06cc73561dd32dfdc171c00dcc416d ]
+[ Upstream commit 8553b5f2774a66b1f293b7d783934210afb8f23c ]
 
 Tearing down timers which have circular dependencies to other
 functionality, e.g. workqueues, where the timer can schedule work and work
@@ -106,18 +106,11 @@ rearming of the timer. The mechanism to do so is to set timer->function to
 NULL and use this as an indicator for the timer arming functions to ignore
 the (re)arm request.
 
-In preparation for that replace the warnings in the relevant code paths
-with checks for timer->function == NULL. If the pointer is NULL, then
-discard the rearm request silently.
+Split the inner workings of try_do_del_timer_sync(), del_timer_sync() and
+del_timer() into helper functions to prepare for implementing the shutdown
+functionality.
 
-Add debug_assert_init() instead of the WARN_ON_ONCE(!timer->function)
-checks so that debug objects can warn about non-initialized timers.
-
-The warning of debug objects does not warn if timer->function == NULL.  It
-warns when timer was not initialized using timer_setup[_on_stack]() or via
-DEFINE_TIMER(). If developers fail to enable debug objects and then waste
-lots of time to figure out why their non-initialized timer is not firing,
-they deserve it. Same for initializing a timer with a NULL function.
+No functional change.
 
 Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
@@ -127,151 +120,221 @@ Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
 Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
 Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
-Link: https://lore.kernel.org/r/87wn7kdann.ffs@tglx
+Link: https://lore.kernel.org/r/20221123201625.195147423@linutronix.de
 Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 ---
- kernel/time/timer.c | 57 +++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 52 insertions(+), 5 deletions(-)
+ kernel/time/timer.c | 143 ++++++++++++++++++++++++++++----------------
+ 1 file changed, 92 insertions(+), 51 deletions(-)
 
 diff --git a/kernel/time/timer.c b/kernel/time/timer.c
-index 7094b916c854..3b6624cd9507 100644
+index 3b6624cd9507..0b76a2ab42e3 100644
 --- a/kernel/time/timer.c
 +++ b/kernel/time/timer.c
-@@ -1017,7 +1017,7 @@ __mod_timer(struct timer_list *timer, unsigned long expires, unsigned int option
- 	unsigned int idx = UINT_MAX;
- 	int ret = 0;
- 
--	BUG_ON(!timer->function);
-+	debug_assert_init(timer);
- 
- 	/*
- 	 * This is a common optimization triggered by the networking code - if
-@@ -1044,6 +1044,14 @@ __mod_timer(struct timer_list *timer, unsigned long expires, unsigned int option
- 		 * dequeue/enqueue dance.
- 		 */
- 		base = lock_timer_base(timer, &flags);
-+		/*
-+		 * Has @timer been shutdown? This needs to be evaluated
-+		 * while holding base lock to prevent a race against the
-+		 * shutdown code.
-+		 */
-+		if (!timer->function)
-+			goto out_unlock;
-+
- 		forward_timer_base(base);
- 
- 		if (timer_pending(timer) && (options & MOD_TIMER_REDUCE) &&
-@@ -1070,6 +1078,14 @@ __mod_timer(struct timer_list *timer, unsigned long expires, unsigned int option
- 		}
- 	} else {
- 		base = lock_timer_base(timer, &flags);
-+		/*
-+		 * Has @timer been shutdown? This needs to be evaluated
-+		 * while holding base lock to prevent a race against the
-+		 * shutdown code.
-+		 */
-+		if (!timer->function)
-+			goto out_unlock;
-+
- 		forward_timer_base(base);
- 	}
- 
-@@ -1128,8 +1144,12 @@ __mod_timer(struct timer_list *timer, unsigned long expires, unsigned int option
-  * mod_timer_pending() is the same for pending timers as mod_timer(), but
-  * will not activate inactive timers.
-  *
-+ * If @timer->function == NULL then the start operation is silently
-+ * discarded.
-+ *
-  * Return:
-- * * %0 - The timer was inactive and not modified
-+ * * %0 - The timer was inactive and not modified or was in
-+ *	  shutdown state and the operation was discarded
-  * * %1 - The timer was active and requeued to expire at @expires
-  */
- int mod_timer_pending(struct timer_list *timer, unsigned long expires)
-@@ -1155,8 +1175,12 @@ EXPORT_SYMBOL(mod_timer_pending);
-  * same timer, then mod_timer() is the only safe way to modify the timeout,
-  * since add_timer() cannot modify an already running timer.
-  *
-+ * If @timer->function == NULL then the start operation is silently
-+ * discarded. In this case the return value is 0 and meaningless.
-+ *
-  * Return:
-- * * %0 - The timer was inactive and started
-+ * * %0 - The timer was inactive and started or was in shutdown
-+ *	  state and the operation was discarded
-  * * %1 - The timer was active and requeued to expire at @expires or
-  *	  the timer was active and not modified because @expires did
-  *	  not change the effective expiry time
-@@ -1176,8 +1200,12 @@ EXPORT_SYMBOL(mod_timer);
-  * modify an enqueued timer if that would reduce the expiration time. If
-  * @timer is not enqueued it starts the timer.
-  *
-+ * If @timer->function == NULL then the start operation is silently
-+ * discarded.
-+ *
-  * Return:
-- * * %0 - The timer was inactive and started
-+ * * %0 - The timer was inactive and started or was in shutdown
-+ *	  state and the operation was discarded
-  * * %1 - The timer was active and requeued to expire at @expires or
-  *	  the timer was active and not modified because @expires
-  *	  did not change the effective expiry time such that the
-@@ -1200,6 +1228,9 @@ EXPORT_SYMBOL(timer_reduce);
-  * The @timer->expires and @timer->function fields must be set prior
-  * to calling this function.
-  *
-+ * If @timer->function == NULL then the start operation is silently
-+ * discarded.
-+ *
-  * If @timer->expires is already in the past @timer will be queued to
-  * expire at the next timer tick.
-  *
-@@ -1228,7 +1259,9 @@ void add_timer_on(struct timer_list *timer, int cpu)
- 	struct timer_base *new_base, *base;
- 	unsigned long flags;
- 
--	if (WARN_ON_ONCE(timer_pending(timer) || !timer->function))
-+	debug_assert_init(timer);
-+
-+	if (WARN_ON_ONCE(timer_pending(timer)))
- 		return;
- 
- 	new_base = get_timer_cpu_base(timer->flags, cpu);
-@@ -1239,6 +1272,13 @@ void add_timer_on(struct timer_list *timer, int cpu)
- 	 * wrong base locked.  See lock_timer_base().
- 	 */
- 	base = lock_timer_base(timer, &flags);
-+	/*
-+	 * Has @timer been shutdown? This needs to be evaluated while
-+	 * holding base lock to prevent a race against the shutdown code.
-+	 */
-+	if (!timer->function)
-+		goto out_unlock;
-+
- 	if (base != new_base) {
- 		timer->flags |= TIMER_MIGRATING;
- 
-@@ -1252,6 +1292,7 @@ void add_timer_on(struct timer_list *timer, int cpu)
- 
- 	debug_timer_activate(timer);
- 	internal_add_timer(base, timer);
-+out_unlock:
- 	raw_spin_unlock_irqrestore(&base->lock, flags);
- }
+@@ -1298,20 +1298,14 @@ void add_timer_on(struct timer_list *timer, int cpu)
  EXPORT_SYMBOL_GPL(add_timer_on);
-@@ -1541,6 +1582,12 @@ static void expire_timers(struct timer_base *base, struct hlist_head *head)
  
- 		fn = timer->function;
+ /**
+- * timer_delete - Deactivate a timer
++ * __timer_delete - Internal function: Deactivate a timer
+  * @timer:	The timer to be deactivated
+  *
+- * The function only deactivates a pending timer, but contrary to
+- * timer_delete_sync() it does not take into account whether the timer's
+- * callback function is concurrently executed on a different CPU or not.
+- * It neither prevents rearming of the timer. If @timer can be rearmed
+- * concurrently then the return value of this function is meaningless.
+- *
+  * Return:
+  * * %0 - The timer was not pending
+  * * %1 - The timer was pending and deactivated
+  */
+-int timer_delete(struct timer_list *timer)
++static int __timer_delete(struct timer_list *timer)
+ {
+ 	struct timer_base *base;
+ 	unsigned long flags;
+@@ -1327,25 +1321,37 @@ int timer_delete(struct timer_list *timer)
  
-+		if (WARN_ON_ONCE(!fn)) {
-+			/* Should never happen. Emphasis on should! */
-+			base->running_timer = NULL;
-+			continue;
-+		}
+ 	return ret;
+ }
+-EXPORT_SYMBOL(timer_delete);
+ 
+ /**
+- * try_to_del_timer_sync - Try to deactivate a timer
+- * @timer:	Timer to deactivate
++ * timer_delete - Deactivate a timer
++ * @timer:	The timer to be deactivated
+  *
+- * This function tries to deactivate a timer. On success the timer is not
+- * queued and the timer callback function is not running on any CPU.
++ * The function only deactivates a pending timer, but contrary to
++ * timer_delete_sync() it does not take into account whether the timer's
++ * callback function is concurrently executed on a different CPU or not.
++ * It neither prevents rearming of the timer.  If @timer can be rearmed
++ * concurrently then the return value of this function is meaningless.
+  *
+- * This function does not guarantee that the timer cannot be rearmed right
+- * after dropping the base lock. That needs to be prevented by the calling
+- * code if necessary.
++ * Return:
++ * * %0 - The timer was not pending
++ * * %1 - The timer was pending and deactivated
++ */
++int timer_delete(struct timer_list *timer)
++{
++	return __timer_delete(timer);
++}
++EXPORT_SYMBOL(timer_delete);
 +
- 		if (timer->flags & TIMER_IRQSAFE) {
- 			raw_spin_unlock(&base->lock);
- 			call_timer_fn(timer, fn, baseclk);
++/**
++ * __try_to_del_timer_sync - Internal function: Try to deactivate a timer
++ * @timer:	Timer to deactivate
+  *
+  * Return:
+  * * %0  - The timer was not pending
+  * * %1  - The timer was pending and deactivated
+  * * %-1 - The timer callback function is running on a different CPU
+  */
+-int try_to_del_timer_sync(struct timer_list *timer)
++static int __try_to_del_timer_sync(struct timer_list *timer)
+ {
+ 	struct timer_base *base;
+ 	unsigned long flags;
+@@ -1362,6 +1368,27 @@ int try_to_del_timer_sync(struct timer_list *timer)
+ 
+ 	return ret;
+ }
++
++/**
++ * try_to_del_timer_sync - Try to deactivate a timer
++ * @timer:	Timer to deactivate
++ *
++ * This function tries to deactivate a timer. On success the timer is not
++ * queued and the timer callback function is not running on any CPU.
++ *
++ * This function does not guarantee that the timer cannot be rearmed right
++ * after dropping the base lock. That needs to be prevented by the calling
++ * code if necessary.
++ *
++ * Return:
++ * * %0  - The timer was not pending
++ * * %1  - The timer was pending and deactivated
++ * * %-1 - The timer callback function is running on a different CPU
++ */
++int try_to_del_timer_sync(struct timer_list *timer)
++{
++	return __try_to_del_timer_sync(timer);
++}
+ EXPORT_SYMBOL(try_to_del_timer_sync);
+ 
+ #ifdef CONFIG_PREEMPT_RT
+@@ -1438,45 +1465,15 @@ static inline void del_timer_wait_running(struct timer_list *timer) { }
+ #endif
+ 
+ /**
+- * timer_delete_sync - Deactivate a timer and wait for the handler to finish.
++ * __timer_delete_sync - Internal function: Deactivate a timer and wait
++ *			 for the handler to finish.
+  * @timer:	The timer to be deactivated
+  *
+- * Synchronization rules: Callers must prevent restarting of the timer,
+- * otherwise this function is meaningless. It must not be called from
+- * interrupt contexts unless the timer is an irqsafe one. The caller must
+- * not hold locks which would prevent completion of the timer's callback
+- * function. The timer's handler must not call add_timer_on(). Upon exit
+- * the timer is not queued and the handler is not running on any CPU.
+- *
+- * For !irqsafe timers, the caller must not hold locks that are held in
+- * interrupt context. Even if the lock has nothing to do with the timer in
+- * question.  Here's why::
+- *
+- *    CPU0                             CPU1
+- *    ----                             ----
+- *                                     <SOFTIRQ>
+- *                                       call_timer_fn();
+- *                                       base->running_timer = mytimer;
+- *    spin_lock_irq(somelock);
+- *                                     <IRQ>
+- *                                        spin_lock(somelock);
+- *    timer_delete_sync(mytimer);
+- *    while (base->running_timer == mytimer);
+- *
+- * Now timer_delete_sync() will never return and never release somelock.
+- * The interrupt on the other CPU is waiting to grab somelock but it has
+- * interrupted the softirq that CPU0 is waiting to finish.
+- *
+- * This function cannot guarantee that the timer is not rearmed again by
+- * some concurrent or preempting code, right after it dropped the base
+- * lock. If there is the possibility of a concurrent rearm then the return
+- * value of the function is meaningless.
+- *
+  * Return:
+  * * %0	- The timer was not pending
+  * * %1	- The timer was pending and deactivated
+  */
+-int timer_delete_sync(struct timer_list *timer)
++static int __timer_delete_sync(struct timer_list *timer)
+ {
+ 	int ret;
+ 
+@@ -1506,7 +1503,7 @@ int timer_delete_sync(struct timer_list *timer)
+ 		lockdep_assert_preemption_enabled();
+ 
+ 	do {
+-		ret = try_to_del_timer_sync(timer);
++		ret = __try_to_del_timer_sync(timer);
+ 
+ 		if (unlikely(ret < 0)) {
+ 			del_timer_wait_running(timer);
+@@ -1516,6 +1513,50 @@ int timer_delete_sync(struct timer_list *timer)
+ 
+ 	return ret;
+ }
++
++/**
++ * timer_delete_sync - Deactivate a timer and wait for the handler to finish.
++ * @timer:	The timer to be deactivated
++ *
++ * Synchronization rules: Callers must prevent restarting of the timer,
++ * otherwise this function is meaningless. It must not be called from
++ * interrupt contexts unless the timer is an irqsafe one. The caller must
++ * not hold locks which would prevent completion of the timer's callback
++ * function. The timer's handler must not call add_timer_on(). Upon exit
++ * the timer is not queued and the handler is not running on any CPU.
++ *
++ * For !irqsafe timers, the caller must not hold locks that are held in
++ * interrupt context. Even if the lock has nothing to do with the timer in
++ * question.  Here's why::
++ *
++ *    CPU0                             CPU1
++ *    ----                             ----
++ *                                     <SOFTIRQ>
++ *                                       call_timer_fn();
++ *                                       base->running_timer = mytimer;
++ *    spin_lock_irq(somelock);
++ *                                     <IRQ>
++ *                                        spin_lock(somelock);
++ *    timer_delete_sync(mytimer);
++ *    while (base->running_timer == mytimer);
++ *
++ * Now timer_delete_sync() will never return and never release somelock.
++ * The interrupt on the other CPU is waiting to grab somelock but it has
++ * interrupted the softirq that CPU0 is waiting to finish.
++ *
++ * This function cannot guarantee that the timer is not rearmed again by
++ * some concurrent or preempting code, right after it dropped the base
++ * lock. If there is the possibility of a concurrent rearm then the return
++ * value of the function is meaningless.
++ *
++ * Return:
++ * * %0	- The timer was not pending
++ * * %1	- The timer was pending and deactivated
++ */
++int timer_delete_sync(struct timer_list *timer)
++{
++	return __timer_delete_sync(timer);
++}
+ EXPORT_SYMBOL(timer_delete_sync);
+ 
+ static void call_timer_fn(struct timer_list *timer,
 --
