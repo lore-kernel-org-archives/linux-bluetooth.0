@@ -1,131 +1,117 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B91200C2
-	for <linux-bluetooth@vger.kernel.org>; Sat, 11 Oct 2025 20:08:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760213317; cv=none; b=fDte5dBcJ3r9ZuoxO704nd4NFV+2Zu5NV5kxWo6tDhkt0lDmaCZQMjIRmxptg0KSHPgvlivawomc5eYaFxrjdzTK3oQ2iNF0z8FdofHT1p4OAT5QovDxDeWrjrT1O4ip0LAeMkWszg/ClzZXwa7kMFTc40x3dXHCcQ9fzL1cKrs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760213317; c=relaxed/simple;
-	bh=ETrjDlOL8XK0aZyeEEw6+aLTbXvvqIp00fhJ9DoLB9A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=o7ZKHLR+G71nXJea+Zni3Cn11W9yf3jgtvRwDVvC4Qd9aqXRghip8Y18CZzeLPMwvV9cCKdujlu+CF60WngYiO4ICFsGWgnu/l7WxflVZHXjB++O/muOT9tS8TPn8I9NBS6iBDrlGNAhfE/ODwDRYDRlIx/oOKbfZpbN1nkjBFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mFhSGBsh; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395482153D2
+	for <linux-bluetooth@vger.kernel.org>; Sat, 11 Oct 2025 23:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760225395; cv=pass; b=QPvy05Ldl8QOmxD2WWrL3jIDLY3dWNy0ng907mtzxkKG3+ggVlsqjWQqRdUHK9GaDU23PGXLAbB7jZD424E5RZDNBxUeWhlqBGWArg41vPnXO6h3goMsBpdjs3wtUvquW4uJetpL2rr6b5OjhEUQqTtiFYHYTGp5LcxA4cg+icw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760225395; c=relaxed/simple;
+	bh=U7i3RxwyJzVvaV0vpvdONd6TutciE70gP+uod2EKCEY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uk33pnBIu1BIpV5S8QdGubOUn602Fctbr382uwxwFtTblbJQs3j1vPWqoW91diE8S9iimdXIHgovCRI88MA3cJmD4ZZ5YplAblJZKx9bpQGhXDFa7mWplhhruAfh5yczeigqbuF1lbwWXVckI/W5Viyv0NEkyWRLfrVmGxc/eZk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=xxM4FmYP; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFhSGBsh"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-27eec33b737so46726945ad.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Oct 2025 13:08:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760213315; x=1760818115; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=l+bPSfRHOJeSnzWiDSS27EnDjKJ4L6fIJpBa9mrTAeA=;
-        b=mFhSGBshlh3eAHm2/3iZjYltVt5gdak2z+oFoE41pYvz54VTH5GmDEoNNHKjWVSpb5
-         9Rw/u0TRRBK/Obd+H/zob/Xc3GCV9P+hPXSc3ZO1Cu/cizDesucfHKgRAuYg1j7UB/bS
-         UQreOL2gl+vA0MbOKnXD+wDfDx52LxTFulXv9gRAoqZKbAti5TpE7RMArY/Ach3bIUYQ
-         ut4hyKf9cmHk/bJ5xcDhcGGEQsQMxpRMcYQNQwiEHTQKmDv4Hyers236023cbDYCzTYI
-         /PtARQh9WCbatbg1X3ORzjiUSza4+PgenR6m31Lfxq533PXO5tm1McjbUUawTg2A0I3O
-         uVIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760213315; x=1760818115;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l+bPSfRHOJeSnzWiDSS27EnDjKJ4L6fIJpBa9mrTAeA=;
-        b=mOlsd/KHCEp26AxaUKvR6fStNdeEEI0pU+s9p8vzxfPcKn0KU45m8HbawtPCuuiG6V
-         +WEunbl/qZghpixMEssOsPTd1YD5aUqSSpUW4qQxqjkB8lJMwsDwBSDevawlov6tFiPX
-         FIdZ2QXeKTU65/p7QVZhuKMmV9W6a8hFXAr2zXWajt4T9xw/brUaFVGH9rFTnkbPD1b2
-         kQCsmYHlzq+G5QA74uxmPuup6kjU44+Q1udD0RCD78XbAT1kK2vYEFjt49fMkK7yPO3e
-         vQ5GpBN1o3wEvZmxonXldMBZtvL22nmWPskm5oG8rsElFiBCl7F7YgEm5S67/Tc0PwNX
-         J9dQ==
-X-Gm-Message-State: AOJu0YwtLiUfmgbKUw3BoFDfKQLnD33Y/FcNuoh6BKPsvj8hjXfFT7Uo
-	2NgR5gUdtbAZV0nitoZAoU91X3qJJ8fVxhFIpPiQNAakdAjubYFNJ4vM80ntZg==
-X-Gm-Gg: ASbGncslPavRZ9r5tKVJYgDTLcbEW5CBS3a8MxXVeArvrS+fOWr3xv8WkBRkaegu1f8
-	3t0wZJ3p6eX/Il3/mvWFHmcSUkns5AzJUQew2maNL6o3WLH5NuS2X4XCpA0JA6MAsg6WJ8tYbto
-	jtcDvkwecedcuvQX+P2nlETjeYpKtnogcRDMR5icOylgB0fEce7JVaW/66yICaW+etzkduJA0ub
-	s51FreuPSYDhmRDVpD+im4uX+UB4dm/Vhgo3etvn67T6+IWUepugiRnNSQS7qPsWr0694svqMPk
-	I22sxn8+IUiiqS/vb4Nqoc6zosrhhPeJcExDQk1/tPnJLOfdJliE4w/075B/V+WdpMjaqfwsBg9
-	caIQy4o8cxgUjHZ0f89PLzacRzsgc7RniJhJML4dlsFO2W6ZvtQyOzTN5oYkd
-X-Google-Smtp-Source: AGHT+IF5wwHjC36cBZ8XMtBSbxWbbVHi7Wk3Z8gYXw94aAtJ+kLoBBQSMAA/ymlTyuMHNnCO584NTA==
-X-Received: by 2002:a17:903:1a23:b0:271:479d:3de3 with SMTP id d9443c01a7336-290272152eamr219382105ad.12.1760213315137;
-        Sat, 11 Oct 2025 13:08:35 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.191.164])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034f362efsm91058035ad.89.2025.10.11.13.08.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Oct 2025 13:08:34 -0700 (PDT)
-Message-ID: <68eab942.170a0220.d49f.4623@mx.google.com>
-Date: Sat, 11 Oct 2025 13:08:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7364069707802668137=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="xxM4FmYP"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4ckfw76vLxzyS6;
+	Sun, 12 Oct 2025 02:29:43 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1760225384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+6mah4TtVYOLslvus0rkeF0R/GHTlRHUXgOiKeHO5YE=;
+	b=xxM4FmYP6lWbKtQwulvYbqVPokK4sqqd8ljbQNDCwhFtlLymXWiVP52HcGCduUryxXXIL7
+	JfvkhGtc1/XmcSiaeGq1FndQJt3Pr3D+Nq7aKhnp6tY52e0lMSAkvbVmzGNa8Q1o5TkyKk
+	KwQgIpwHaT7cXl9I6gVbb8Arhe1bpnU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1760225384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+6mah4TtVYOLslvus0rkeF0R/GHTlRHUXgOiKeHO5YE=;
+	b=zLFUG3xEpG9W2KwxMcs19H+enNOMhPtNRecRBVNSA0Xol8UIV+6eIqPr3SqT9kJHbZ+TXe
+	cOEid0CiNBZYSRafJhM0bfYPxmUbwW+g+WdNajzzYEjyveFGnPbdR77TI/f53rA0uG89bn
+	YwOWovEN68y0BFgllckTBAPcCQiTzXs=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1760225384; a=rsa-sha256; cv=none;
+	b=Ne72HOc2L7RHmEnNZabGLy6f1W8WEMPDW0ZXUY9cJEPjiiWjX9GbuGzh2v6huew2xbEfvE
+	vMtplZBSG233Pcw+y2cKO28wzxLdP5BwoEvkv1ImV+q21D1UDYDRV6KTYNWIoh7w/zr6cw
+	D5hxIPj8AVJQyC1ot8Du90f47lUy2tA=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] shared/bap: fix crash when setting initial metadata of a stream
+Date: Sun, 12 Oct 2025 02:29:39 +0300
+Message-ID: <a2c50d6cae8f2c4a092172ac7dee870405954a7e.1760225372.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] shared/bap: check pac cc and metadata length before use
-In-Reply-To: <6fc999ce7a1a375d52171f7934dbfff0335baba7.1760208260.git.pav@iki.fi>
-References: <6fc999ce7a1a375d52171f7934dbfff0335baba7.1760208260.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7364069707802668137==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+bt_bap_stream_metadata() when stream is IDLE causes IDLE->IDLE
+transition and crashes due to UAF. This occurs if SelectProperties
+provides a Metadata.
 
-This is automated email and please do not reply to this email!
+Fix by not updating state if stream is IDLE.
 
-Dear submitter,
+Log:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1010380
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.38 seconds
-GitLint                       PENDING   0.30 seconds
-BuildEll                      PASS      19.86 seconds
-BluezMake                     PASS      2584.72 seconds
-MakeCheck                     PASS      20.02 seconds
-MakeDistcheck                 PASS      183.18 seconds
-CheckValgrind                 PASS      236.33 seconds
-CheckSmatch                   WARNING   306.91 seconds
-bluezmakeextell               PASS      127.36 seconds
-IncrementalBuild              PENDING   0.40 seconds
-ScanBuild                     PASS      913.90 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+ERROR: AddressSanitizer: heap-use-after-free
+READ of size 8 at 0x7ca9d83ec448 thread T0
+    #0 0x000000927dce in bt_bap_stream_metadata src/shared/bap.c:6525
+    #1 0x00000056ae75 in setup_config profiles/audio/bap.c:1790
+    #2 0x00000056b865 in bap_config_setup profiles/audio/bap.c:1831
+0x7ca9d83ec448 is located 8 bytes inside of 160-byte region [0x7ca9d83ec440,0x7ca9d83ec4e0)
+freed by thread T0 here:
+    #0 0x7fc9da2e5beb in free.part.0 (/lib64/libasan.so.8+0xe5beb)
+    #1 0x0000008e3481 in bap_stream_free src/shared/bap.c:1259
+    #2 0x0000008e4586 in bt_bap_stream_unref src/shared/bap.c:1342
+    #3 0x0000008e4b6e in bap_ucast_detach src/shared/bap.c:1366
+    #4 0x0000008e6b63 in bap_stream_state_changed src/shared/bap.c:1496
+    #5 0x0000008ec17d in bap_ucast_set_state src/shared/bap.c:1857
+    #6 0x0000008e75e4 in stream_set_state src/shared/bap.c:1543
+    #7 0x0000008f268c in stream_metadata src/shared/bap.c:2250
+    #8 0x0000008f2801 in bap_ucast_metadata src/shared/bap.c:2274
+    #9 0x000000927d3f in bt_bap_stream_metadata src/shared/bap.c:6523
 ---
-Regards,
-Linux Bluetooth
+ src/shared/bap.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 9b7395223..5a7d0af00 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2246,8 +2246,14 @@ static uint8_t stream_metadata(struct bt_bap_stream *stream, struct iovec *meta,
+ 	util_iov_free(stream->meta, 1);
+ 	stream->meta = util_iov_dup(meta, 1);
+ 
+-	/* Force state change to the same state to update the metadata */
+-	stream_set_state(stream, bt_bap_stream_get_state(stream));
++	switch (bt_bap_stream_get_state(stream)) {
++	case BT_BAP_STREAM_STATE_IDLE:
++		/* Initial metadata */
++		break;
++	default:
++		/* Force state change to the same state to update metadata */
++		stream_set_state(stream, bt_bap_stream_get_state(stream));
++	}
+ 
+ 	return 0;
+ }
+-- 
+2.51.0
 
---===============7364069707802668137==--
