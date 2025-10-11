@@ -1,66 +1,61 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395482153D2
-	for <linux-bluetooth@vger.kernel.org>; Sat, 11 Oct 2025 23:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760225395; cv=pass; b=QPvy05Ldl8QOmxD2WWrL3jIDLY3dWNy0ng907mtzxkKG3+ggVlsqjWQqRdUHK9GaDU23PGXLAbB7jZD424E5RZDNBxUeWhlqBGWArg41vPnXO6h3goMsBpdjs3wtUvquW4uJetpL2rr6b5OjhEUQqTtiFYHYTGp5LcxA4cg+icw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760225395; c=relaxed/simple;
-	bh=U7i3RxwyJzVvaV0vpvdONd6TutciE70gP+uod2EKCEY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uk33pnBIu1BIpV5S8QdGubOUn602Fctbr382uwxwFtTblbJQs3j1vPWqoW91diE8S9iimdXIHgovCRI88MA3cJmD4ZZ5YplAblJZKx9bpQGhXDFa7mWplhhruAfh5yczeigqbuF1lbwWXVckI/W5Viyv0NEkyWRLfrVmGxc/eZk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=xxM4FmYP; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A307A2940B
+	for <linux-bluetooth@vger.kernel.org>; Sat, 11 Oct 2025 23:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760225493; cv=none; b=eYOBXvoRRgDmV9zAHePXAEQrRvbmYsEAZL7gZS3HGPrNtRMJYqFzZ/zMekM02c9tVJ+E03XHaFvausa9NdjOgZUYYHzneOEBI+JDT1nW5oK7FGeacwDMB97PLL1/ZHoMKp1A7nOjhHCg86JjKKzRvp5/rna+pRjy7ydaK3DLar4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760225493; c=relaxed/simple;
+	bh=SCllP0Jj22BPywP+62a9BWg3XWrxqY565gNhVqAvEkg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=nFjN31abCfyKcnBKcU29sZ/8QCdmoGUWMX3UCLc7Hkboiu1Cgaq8N+ACCVsFBaEXgGYmItLje1soAG8Gxa0aahF5hG1tgP5gwDRO6FykivIynatY7rFt+wObeprG7ot2d6+v58QZhKZj86pPhtnsEKRrKk5jq3eN0sElq8MWTxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=KewBbYh3; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="xxM4FmYP"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4ckfw76vLxzyS6;
-	Sun, 12 Oct 2025 02:29:43 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1760225384;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+6mah4TtVYOLslvus0rkeF0R/GHTlRHUXgOiKeHO5YE=;
-	b=xxM4FmYP6lWbKtQwulvYbqVPokK4sqqd8ljbQNDCwhFtlLymXWiVP52HcGCduUryxXXIL7
-	JfvkhGtc1/XmcSiaeGq1FndQJt3Pr3D+Nq7aKhnp6tY52e0lMSAkvbVmzGNa8Q1o5TkyKk
-	KwQgIpwHaT7cXl9I6gVbb8Arhe1bpnU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1760225384;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+6mah4TtVYOLslvus0rkeF0R/GHTlRHUXgOiKeHO5YE=;
-	b=zLFUG3xEpG9W2KwxMcs19H+enNOMhPtNRecRBVNSA0Xol8UIV+6eIqPr3SqT9kJHbZ+TXe
-	cOEid0CiNBZYSRafJhM0bfYPxmUbwW+g+WdNajzzYEjyveFGnPbdR77TI/f53rA0uG89bn
-	YwOWovEN68y0BFgllckTBAPcCQiTzXs=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1760225384; a=rsa-sha256; cv=none;
-	b=Ne72HOc2L7RHmEnNZabGLy6f1W8WEMPDW0ZXUY9cJEPjiiWjX9GbuGzh2v6huew2xbEfvE
-	vMtplZBSG233Pcw+y2cKO28wzxLdP5BwoEvkv1ImV+q21D1UDYDRV6KTYNWIoh7w/zr6cw
-	D5hxIPj8AVJQyC1ot8Du90f47lUy2tA=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="KewBbYh3"
+Received: from github.com (hubbernetes-node-b19dffe.ash1-iad.github.net [10.56.163.44])
+	by smtp.github.com (Postfix) with ESMTPA id B5BF01401B3
+	for <linux-bluetooth@vger.kernel.org>; Sat, 11 Oct 2025 16:31:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1760225490;
+	bh=gkAtTG/wSnXV130LAef13NW5orwXo/0Afq3bbCs+Txc=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=KewBbYh3tqUbgGw0RzmkpECiFJn/WNyIg6QnEql4nZN5+UtBAfWD+P66h9L5YsrCa
+	 n3irQ7YIcMcZ0gZg4Dkb9boLwESF9cVOkhPc3VlkGgX1AkEgdckGPJ7Cnogj27uRcX
+	 SFrmE56brZZc2GO5oIp9Ti5J+P8+L7vZzT5xcPwo=
+Date: Sat, 11 Oct 2025 16:31:30 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] shared/bap: fix crash when setting initial metadata of a stream
-Date: Sun, 12 Oct 2025 02:29:39 +0300
-Message-ID: <a2c50d6cae8f2c4a092172ac7dee870405954a7e.1760225372.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.0
+Message-ID: <bluez/bluez/push/refs/heads/1010398/000000-b5a4f8@github.com>
+Subject: [bluez/bluez] b5a4f8: shared/bap: fix crash when setting initial
+ metadat...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1010398
+  Home:   https://github.com/bluez/bluez
+  Commit: b5a4f80bfe7d44d4ce4622b812d640abe26fed3d
+      https://github.com/bluez/bluez/commit/b5a4f80bfe7d44d4ce4622b812d640abe26fed3d
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-10-11 (Sat, 11 Oct 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: fix crash when setting initial metadata of a stream
 
 bt_bap_stream_metadata() when stream is IDLE causes IDLE->IDLE
 transition and crashes due to UAF. This occurs if SelectProperties
@@ -87,31 +82,7 @@ freed by thread T0 here:
     #7 0x0000008f268c in stream_metadata src/shared/bap.c:2250
     #8 0x0000008f2801 in bap_ucast_metadata src/shared/bap.c:2274
     #9 0x000000927d3f in bt_bap_stream_metadata src/shared/bap.c:6523
----
- src/shared/bap.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 9b7395223..5a7d0af00 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -2246,8 +2246,14 @@ static uint8_t stream_metadata(struct bt_bap_stream *stream, struct iovec *meta,
- 	util_iov_free(stream->meta, 1);
- 	stream->meta = util_iov_dup(meta, 1);
- 
--	/* Force state change to the same state to update the metadata */
--	stream_set_state(stream, bt_bap_stream_get_state(stream));
-+	switch (bt_bap_stream_get_state(stream)) {
-+	case BT_BAP_STREAM_STATE_IDLE:
-+		/* Initial metadata */
-+		break;
-+	default:
-+		/* Force state change to the same state to update metadata */
-+		stream_set_state(stream, bt_bap_stream_get_state(stream));
-+	}
- 
- 	return 0;
- }
--- 
-2.51.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
