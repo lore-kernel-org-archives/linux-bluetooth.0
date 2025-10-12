@@ -1,88 +1,131 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A307A2940B
-	for <linux-bluetooth@vger.kernel.org>; Sat, 11 Oct 2025 23:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818808479
+	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Oct 2025 00:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760225493; cv=none; b=eYOBXvoRRgDmV9zAHePXAEQrRvbmYsEAZL7gZS3HGPrNtRMJYqFzZ/zMekM02c9tVJ+E03XHaFvausa9NdjOgZUYYHzneOEBI+JDT1nW5oK7FGeacwDMB97PLL1/ZHoMKp1A7nOjhHCg86JjKKzRvp5/rna+pRjy7ydaK3DLar4=
+	t=1760230094; cv=none; b=Wf6Lu47ynq2pTP4iPmPKz+ZD3G61aP810+74tV8YjnT866QOaYFeXOf1KxBWhYgymFET7CA+X9jnPhcxWGCdWYsUR6pKbPMSz347flqGiPCJZWeNYuHAgw8pbzprswpAVtQEUJGhqpQBAj0xhTbaqSdpYG55W3yM6ddIcjtg9To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760225493; c=relaxed/simple;
-	bh=SCllP0Jj22BPywP+62a9BWg3XWrxqY565gNhVqAvEkg=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=nFjN31abCfyKcnBKcU29sZ/8QCdmoGUWMX3UCLc7Hkboiu1Cgaq8N+ACCVsFBaEXgGYmItLje1soAG8Gxa0aahF5hG1tgP5gwDRO6FykivIynatY7rFt+wObeprG7ot2d6+v58QZhKZj86pPhtnsEKRrKk5jq3eN0sElq8MWTxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=KewBbYh3; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1760230094; c=relaxed/simple;
+	bh=pVl8O5ptrj4mHBbMr7nw0FzikuywUNtLXuKdK260jXE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=H2/ECngqa2R4ovYwFT1G9xe338tyfLn3Qq7N5siGKTgVVH/cxLuN81o8KdAlMWYKIWaps+49Zd0k5yhWwuG+Fj6BRAJsHoGuu32ZnMTVTrH//qOjxpPg1QdmZpdF+3VA7kjtQ7XyNOqrxIcbJZmPPPm197h2CMONU3WSmFgYrEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=idy+S37f; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="KewBbYh3"
-Received: from github.com (hubbernetes-node-b19dffe.ash1-iad.github.net [10.56.163.44])
-	by smtp.github.com (Postfix) with ESMTPA id B5BF01401B3
-	for <linux-bluetooth@vger.kernel.org>; Sat, 11 Oct 2025 16:31:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1760225490;
-	bh=gkAtTG/wSnXV130LAef13NW5orwXo/0Afq3bbCs+Txc=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=KewBbYh3tqUbgGw0RzmkpECiFJn/WNyIg6QnEql4nZN5+UtBAfWD+P66h9L5YsrCa
-	 n3irQ7YIcMcZ0gZg4Dkb9boLwESF9cVOkhPc3VlkGgX1AkEgdckGPJ7Cnogj27uRcX
-	 SFrmE56brZZc2GO5oIp9Ti5J+P8+L7vZzT5xcPwo=
-Date: Sat, 11 Oct 2025 16:31:30 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1010398/000000-b5a4f8@github.com>
-Subject: [bluez/bluez] b5a4f8: shared/bap: fix crash when setting initial
- metadat...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="idy+S37f"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8572d7b2457so448744285a.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Oct 2025 17:48:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760230089; x=1760834889; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=aMzh9pKpyzAI9fgkXE0PDoQvhdSlvccuIuAISiET8MQ=;
+        b=idy+S37f2ekNqE7LuZuyPS63XbWLgA8sQCNFtkFjWwmTNTDpBPeTRleL7PHOpn8ATc
+         qoRCs2qxTgtGMJl8YatLgT5tWkx13QzY2c6dyqaAGwYNEEBAsgErgZqmRgTDXw1jjBg8
+         PVNt2pwPf+Nw+gIsirTlQlZEJ91TU5A+verCdNOC6wi85dp52kunOjDOnWZqpdlIOvxx
+         CoUI1xtiur5fKLZB+LxEwMuZFET9GxgjipF2LElGy/d+iHQVw3imA+df3prf1/zSmxC2
+         jqCEFAZqqCGuesb6qR5z1Ob6nnHr4S/Dw8vj9lZ6TBVocjlByo+D4nrKJd+4Fr6qmYqY
+         JUzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760230089; x=1760834889;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aMzh9pKpyzAI9fgkXE0PDoQvhdSlvccuIuAISiET8MQ=;
+        b=wi5WXmVROOOTun5fpEZ8+mTgNeE0x5QQxyc4CnrvvtHngSFjfLLiyK7cmyB5WYlCn6
+         lsLfHMuGACCAdYyhI5RmUfN6dXT2ozT9IXS12PnhcD0Ovdf1lCQrymb2jg6cTzhcqsaL
+         pLrDNbiNB79hbFTeykjQXjXmoT0VERhVcq+/1RImFUSDzUehl+en6jhWMZYATevtca1b
+         nVpe2cr6lblIpfK7H0sJ9XEdvUecEKCkgnJ4dzkO/9ZzhjygAHz41rLAfWpZp60zsGVw
+         mHq28B0NCnvFP4/BNZhpB2X704Ck8qCsp65zdcYJN8hiVf0FgqzQjmIdbVj1oVmDB8Fn
+         mUbQ==
+X-Gm-Message-State: AOJu0YwG6bGEF93ByPO9VXvWjm1XaCUiDjcAn07j51ArpPMKD+pnrf1l
+	zMe5DS61t5GDMjV58/vG8DdySYKHEe3Htr00OZOfyBCRCpuqNnp7Ph3s2JnXtg==
+X-Gm-Gg: ASbGncsVHTSCUCZ6y8XvZfxxsN+PWXIYxJIPfxPxz9vZbegdGFC1apBs/yIAadK0KeO
+	IplcvtvN2Eo37Mf1sF+QV6yf3PlPURjIeg4a2YALz682F5wJq6e8TkuXB05btHrYOz7eYKhINN4
+	0KeQ/Gd3s7dtkRQ1WtOJhpfOHnxOEciVk0VSmY3nNwXmIKo4Q6w1FFB1YIHQpG5vDba0xbNgCRe
+	VJug2kax1FKys6Kolwoq0jpdzUw248fNYtnmx+95FLctrBSPTvCq8SyS2RE2dLo+5JHTLAfhR+4
+	3T7YxA9skX2/KepMvnk65jrBnYkRQOElclSPyX415Eizk53y3w6YvsjLfla8FpfXEbZtUY72eeK
+	hq+9ZTyoxHN9KcIJIGciTAeKdl59diyI49MzqusejPuw2s/JOTabLtKhCXL5pTxtfxSbJ
+X-Google-Smtp-Source: AGHT+IFWQjj1zv+pkJeZxRkkbKJQty0FTNhKBcJ6gvyLzKNB5R/qfeCTAWc5J6WqFe4g4MFFVZfF9A==
+X-Received: by 2002:a05:620a:4083:b0:80e:d31:1ea9 with SMTP id af79cd13be357-8836de0a5e7mr2350141085a.11.1760230089118;
+        Sat, 11 Oct 2025 17:48:09 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.127.226])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8849f3d8b39sm704053185a.8.2025.10.11.17.48.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Oct 2025 17:48:08 -0700 (PDT)
+Message-ID: <68eafac8.050a0220.30de1b.36a4@mx.google.com>
+Date: Sat, 11 Oct 2025 17:48:08 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0135234332147814443=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ] shared/bap: fix crash when setting initial metadata of a stream
+In-Reply-To: <a2c50d6cae8f2c4a092172ac7dee870405954a7e.1760225372.git.pav@iki.fi>
+References: <a2c50d6cae8f2c4a092172ac7dee870405954a7e.1760225372.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0135234332147814443==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1010398
-  Home:   https://github.com/bluez/bluez
-  Commit: b5a4f80bfe7d44d4ce4622b812d640abe26fed3d
-      https://github.com/bluez/bluez/commit/b5a4f80bfe7d44d4ce4622b812d640abe26fed3d
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-10-11 (Sat, 11 Oct 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M src/shared/bap.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  shared/bap: fix crash when setting initial metadata of a stream
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1010398
 
-bt_bap_stream_metadata() when stream is IDLE causes IDLE->IDLE
-transition and crashes due to UAF. This occurs if SelectProperties
-provides a Metadata.
+---Test result---
 
-Fix by not updating state if stream is IDLE.
+Test Summary:
+CheckPatch                    PENDING   0.22 seconds
+GitLint                       PENDING   0.26 seconds
+BuildEll                      PASS      20.06 seconds
+BluezMake                     PASS      2759.64 seconds
+MakeCheck                     PASS      20.63 seconds
+MakeDistcheck                 PASS      185.84 seconds
+CheckValgrind                 PASS      235.65 seconds
+CheckSmatch                   WARNING   306.49 seconds
+bluezmakeextell               PASS      127.99 seconds
+IncrementalBuild              PENDING   0.34 seconds
+ScanBuild                     PASS      910.83 seconds
 
-Log:
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-ERROR: AddressSanitizer: heap-use-after-free
-READ of size 8 at 0x7ca9d83ec448 thread T0
-    #0 0x000000927dce in bt_bap_stream_metadata src/shared/bap.c:6525
-    #1 0x00000056ae75 in setup_config profiles/audio/bap.c:1790
-    #2 0x00000056b865 in bap_config_setup profiles/audio/bap.c:1831
-0x7ca9d83ec448 is located 8 bytes inside of 160-byte region [0x7ca9d83ec440,0x7ca9d83ec4e0)
-freed by thread T0 here:
-    #0 0x7fc9da2e5beb in free.part.0 (/lib64/libasan.so.8+0xe5beb)
-    #1 0x0000008e3481 in bap_stream_free src/shared/bap.c:1259
-    #2 0x0000008e4586 in bt_bap_stream_unref src/shared/bap.c:1342
-    #3 0x0000008e4b6e in bap_ucast_detach src/shared/bap.c:1366
-    #4 0x0000008e6b63 in bap_stream_state_changed src/shared/bap.c:1496
-    #5 0x0000008ec17d in bap_ucast_set_state src/shared/bap.c:1857
-    #6 0x0000008e75e4 in stream_set_state src/shared/bap.c:1543
-    #7 0x0000008f268c in stream_metadata src/shared/bap.c:2250
-    #8 0x0000008f2801 in bap_ucast_metadata src/shared/bap.c:2274
-    #9 0x000000927d3f in bt_bap_stream_metadata src/shared/bap.c:6523
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0135234332147814443==--
