@@ -1,29 +1,29 @@
 Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E2B2FB612
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805EF2FB616
 	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Oct 2025 08:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760345286; cv=none; b=lXPLWU/Yn6QmjFEJwXKEj+JJtbt5ewpHiOLx7cgG8C+580jouQwW+73ri0MLVGVBXIlM1NjjenbD+pAaoB9RlS7CFDuCIXkGLDoVWgvxzhAvUomAoXcMFHtTnLMc41m9kV2s4LMHUrHbQkdpd1LfOR7BGoNBG7Bzs+MJ+jqQ79g=
+	t=1760345286; cv=none; b=BtcNWCSIAMyPkw56ruObdLlKvemyaDZtXiu28hxsySYguF5DOt9ak8E6UKOrIIZJDkzsyPuyjCMTBWxTu9BqNANLIqrGR9J7FNrkbN9ck6ukBzUSnLOjC7zF9M0rfER8xRGLPfrAAG8aH5yBiAETlIyHXi+mGAbjnR6VXm6KjjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1760345286; c=relaxed/simple;
-	bh=x4ixRCWIFEpab/FSds5n2STuUq4zi0BbmbJbqyShtnM=;
+	bh=opfzhPW9GwIGipeBNvo5QFVuKN1DcbhNFhcqppwdhMk=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TKzMeS+B/CgRZQcmRM6Uu1ay+dsleWnlsEel5M2SqvcVvYetz5H8S/OCDVoOCmol4/jFk3urw742xOlcLpkhfQoYbiGtEYeCMSl/wqrY5BnyoM70iF4mGH/pAEXlIBuplg4phskSNS7gG1br/mNrnVmlkPBHvjAYr9EXlptEfm8=
+	 MIME-Version; b=MLA5leZNcNjRbdL7UXxR+AUIFheYx1vV1g2k+2uJLfHmkl+cgSidZ0PvLU4esVpNyH9ADa6A5SPOuQNAUeSS5q+NZqYUaY8Ty6dGXe8arZl6LmOznttwLn7YJj3iy8zu1ox/Sgc8N0QX1XWkRmVHPJDnrkgORggMxpaNrFL3clQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 617B7582126
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Oct 2025 08:33:17 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BEF4443345
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Oct 2025 08:33:09 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 7123B582122
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Oct 2025 08:33:16 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 04BC141CFA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Oct 2025 08:33:08 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 9/9] build: Add option to allow disabling bluetoothd
-Date: Mon, 13 Oct 2025 10:32:19 +0200
-Message-ID: <20251013083259.3152260-10-hadess@hadess.net>
+Subject: [PATCH BlueZ v5 6/9] tools: Install avinfo tool by default
+Date: Mon, 13 Oct 2025 10:32:16 +0200
+Message-ID: <20251013083259.3152260-7-hadess@hadess.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251013083259.3152260-1-hadess@hadess.net>
 References: <20251013083259.3152260-1-hadess@hadess.net>
@@ -36,55 +36,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-This makes it possible to build, for example, just the library, or the
-command-line client, without also building and installing bluetoothd.
----
- meson.build       | 12 +++++++++---
- meson_options.txt |  1 +
- 2 files changed, 10 insertions(+), 3 deletions(-)
+It's used for checking which audio codecs are supported by a Bluetooth
+audio device, which is more useful now that PulseAudio/PipeWire support
+alternative codecs like LDAC or aptX).
 
-diff --git a/meson.build b/meson.build
-index 58e17c947570..b5f9be1532fa 100644
---- a/meson.build
-+++ b/meson.build
-@@ -253,7 +253,9 @@ subdir('attrib')
- subdir('btio')
- subdir('plugins')
- subdir('profiles')
--subdir('src')
-+if get_option('daemon').enabled()
-+  subdir('src')
-+endif
- if get_option('client').enabled()
-   subdir('client')
+Fixes:
+https://bugzilla.redhat.com/show_bug.cgi?id=1699680
+---
+ tools/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/meson.build b/tools/meson.build
+index 3e8f7ad439dd..66156ab0224b 100644
+--- a/tools/meson.build
++++ b/tools/meson.build
+@@ -82,7 +82,6 @@ if get_option('hid2hci').enabled()
  endif
-@@ -284,8 +286,12 @@ endif
- # Fix permissions on install
- install = find_program('install')
- sh = find_program('sh')
--meson.add_install_script(sh, '-c', 'install -dm755 ${DESTDIR}/' + configdir)
--meson.add_install_script(sh, '-c', 'install -dm700 ${DESTDIR}/' + storagedir)
-+if get_option('daemon').enabled()
-+  meson.add_install_script(sh, '-c', 'install -dm755 ${DESTDIR}/' + configdir)
-+endif
-+if get_option('daemon').enabled() or get_option('mesh').enabled()
-+  meson.add_install_script(sh, '-c', 'install -dm700 ${DESTDIR}/' + storagedir)
-+endif
- if get_option('mesh').enabled()
-   meson.add_install_script(sh, '-c', 'install -dm700 ${DESTDIR}/' + meshstoragedir)
- endif
-diff --git a/meson_options.txt b/meson_options.txt
-index 6a39e2ceabec..9e9587f3ef6e 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -6,6 +6,7 @@ option('tests', type: 'feature', value: 'auto', description: 'Enable testing too
- option('tools', type: 'feature', value: 'enabled', description: 'Enable Bluetooth tools')
- option('monitor', type: 'feature', value: 'enabled', description: 'Enable Bluetooth monitor')
- option('client', type: 'feature', value: 'enabled', description: 'Enable command line client')
-+option('daemon', type: 'feature', value: 'enabled', description: 'Enable bluetoothd daemon')
- option('systemd', type: 'feature', value: 'enabled', description: 'Install systemd service files')
- option('logind', type: 'feature', value: 'enabled', description: 'Enable logind integration in obexd')
- option('udev', type: 'feature', value: 'enabled', description: 'Enable udev device support')
+ 
+ tools_names = [
+-  'avinfo',
+   'avtest',
+   'scotest',
+   'hwdb',
+@@ -103,6 +102,7 @@ tools_names = [
+ ]
+ 
+ inst_tools_names = [
++  'avinfo',
+   'rctest',
+   'l2test',
+   'l2ping',
 -- 
 2.51.0
 
