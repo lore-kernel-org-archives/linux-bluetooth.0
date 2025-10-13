@@ -1,87 +1,82 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADF62C0296
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Oct 2025 17:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607F22BEC2D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Oct 2025 17:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760377144; cv=none; b=rcUqrJ7EKkaJULBd2QHwQWrEXVq8IAMCa7WsmmflEdYYi9fQ67/wtWSwAuzGElpvwrCtn7ItEJU0DfYt0OTP+oCaEjJjltntJOPtr3kMzVGQKAqTDKzJGsn/uYQOJ4GevDh44CTaA63jNZuI+5iO42Lyx4P4ywI+Q2I04naf4lg=
+	t=1760377221; cv=none; b=R7p6mkQgfBvTMu1YOzEK8E+pRfp79MS3zjFQ7BgsS1+PL+Zg+ZaSzBX+VB42PMCFzDzyKx48UG9gHyehMIAMLuLPpFFXQN9+ACzIv8k9rhQ3fj7zc3xd1qnrS5GMobZb/lEkJqUhPc/jocsjap8o6aW5diq8TPnOx1PQYj/OOko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760377144; c=relaxed/simple;
-	bh=nHMk72Il0qsaJfSTr3Rwbw8XO4c+NuKrvF1iIh5yA34=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iacbdb7nV/2zmlRwJ48fuI59FER6FKugfJfhTpwLGEGOfrUvsNmQqByt5bXiTQT62CYPzlqnp4LyOq9qU/gEWdKGrv3TC8H1v8TT3xz4wLjb629/4oH9CZquegltrXChatyXY06xQAyAyKO9YTi/6mOZv94FAIDyTLdMm2xEoc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=WllSJpD+; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1760377221; c=relaxed/simple;
+	bh=xN592BRmhMa89b2Dbzq9kvuGT3puWHFnU4mLnuJFJAg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QZSGKP3ykhR8ykTf7fZaH9TOfqp4jthpZgM4QRa7NJ5Sk7uM4s2UopzGnXhU5kjMdxE9OZWcKERXeJHHHyOoSzH4ODnIfdO0vcL1jpwVfo2SRS4NM9jaBslzbEC3rBqxIr64KtTQYPOA+1X+RlkaASFP5yGayu7xm6F9DzUihKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FEubL8LH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="WllSJpD+"
-Received: from github.com (unknown [10.59.94.34])
-	by smtp.github.com (Postfix) with ESMTPA id 291AF140B25
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Oct 2025 10:39:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1760377142;
-	bh=tfV6QbC89r9N9RTlU63c/wx2BmvtQxVBCkCg7DL9VRo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=WllSJpD+G/gyHxu2iIBuS0iJ4Y2SPH4fMjO9oAEW6gaaxBulXVQEpunTX9B4MvZQl
-	 PD1QqJDOzKyhM8DiFWLn/N49RYkV2NMuiZRN7qLQlvSnJuY/t7USU/296Z7m8QMtJM
-	 lk1r0dX8ZNMdGlA+gtVWNyT7AJD2SFS+g2NddwfY=
-Date: Mon, 13 Oct 2025 10:39:02 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/b3dd59-3e17f8@github.com>
-Subject: [bluez/bluez] 05f3aa: bthost: handle L2CAP_DISCONN_RSP and remove
- l2cap_...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FEubL8LH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DE66C4CEE7;
+	Mon, 13 Oct 2025 17:40:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760377221;
+	bh=xN592BRmhMa89b2Dbzq9kvuGT3puWHFnU4mLnuJFJAg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FEubL8LHOdFLqOV3vEA/wJlxRaxJBvXlYLE0GvkzXRTyGjSpuyxCKPqVH3i1GBB7E
+	 Lsy6uZL7ZubBi2oJZ38jApcvg5d8POIKJPlf+7OxEM3lzSzkEvTyVdHDu4npCa7YQh
+	 +YKm+D4KklgzM1tMYXkgyMLTSA+GtvlG58gLRhv93KOl5xuLBmpt8Av0PBH0KsXBbZ
+	 O/BiFJL0SFXUAJeN98TBSJ3ZrPtUHEg6X5Lym8BsEmDX7sa+6nxDPn1soeD8vj7KFU
+	 kL3Qhq24MskGEaOlEE+xsgvQqr4vPEiZFhpBYEoReJ6ECZ2bV37sUCYor3DoewFFff
+	 sBxCpesvGgkRg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34828380A956;
+	Mon, 13 Oct 2025 17:40:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 0/4] Add 6lowpan-tester
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176037720704.3150041.6926741718800601678.git-patchwork-notify@kernel.org>
+Date: Mon, 13 Oct 2025 17:40:07 +0000
+References: <cover.1759702519.git.pav@iki.fi>
+In-Reply-To: <cover.1759702519.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 05f3aab743f097d1f8f10de77201e579e29d110a
-      https://github.com/bluez/bluez/commit/05f3aab743f097d1f8f10de77201e579e29d110a
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-10-13 (Mon, 13 Oct 2025)
+Hello:
 
-  Changed paths:
-    M emulator/bthost.c
-    M emulator/bthost.h
-    M tools/l2cap-tester.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  bthost: handle L2CAP_DISCONN_RSP and remove l2cap_conns
+On Mon,  6 Oct 2025 01:17:38 +0300 you wrote:
+> Make a basic tester for the net/bluetooth/6lowpan.c implementation.
+> 
+> This module doesn't look like it's much used and locking around
+> l2cap_chan / hci_conn there looks suspicious, so probably some tests are
+> useful.
+> 
+> Here just simple connection / disconnection and packet RX tests are
+> added.  Some issues appear to be there:
+> 
+> [...]
 
-Handle L2CAP disconnection response. On receiving disconnection request
-or response, remove the associated connection.
+Here is the summary with links:
+  - [BlueZ,1/4] bthost: handle L2CAP_DISCONN_RSP and remove l2cap_conns
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=05f3aab743f0
+  - [BlueZ,2/4] bthost: handle L2CAP_FLOW_CONTROL_CREDIT_IND
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3e17f888c840
+  - [BlueZ,3/4] tools: add 6lowpan-tester
+    (no matching commit)
+  - [BlueZ,4/4] doc: enable 6lowpan in tester.config and explain in test-runner.rst
+    (no matching commit)
 
-Change disconnect handler signature to take also the handle and CID.
-
-
-  Commit: 3e17f888c840270472ec618b3c3b27472288669c
-      https://github.com/bluez/bluez/commit/3e17f888c840270472ec618b3c3b27472288669c
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-10-13 (Mon, 13 Oct 2025)
-
-  Changed paths:
-    M emulator/bthost.c
-
-  Log Message:
-  -----------
-  bthost: handle L2CAP_FLOW_CONTROL_CREDIT_IND
-
-Parse L2CAP_FLOW_CONTROL_CREDIT_IND and track credits, instead of
-sending reject response.  Nothing is done with the credit counts
-currently.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/b3dd59987455...3e17f888c840
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
