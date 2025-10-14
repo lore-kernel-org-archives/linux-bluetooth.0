@@ -1,66 +1,71 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F262EFDA2
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 19:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0D32EFDA2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 19:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760471350; cv=none; b=Ez2dHe4HrI1NkUGoUdyfnwY50bCzzMLHFhWb6xFk9oxRWHzsc1KewSdQopfQJo49SsVn40+uXSHv4fnHbe2t4idbXudbOqKuaHHVUdHHdE3ghOQYf9GV9Xjn/LqFF7CgUdypfFeOAmVvHna0zSwSOOUtRl0ypgeEePwX6ED9fBM=
+	t=1760471353; cv=none; b=lw4jbXxwx74fhi5a4lnKcPVPpjctM98Rs7xlGWv27jxYFeGNLOSLboMuH4GZ7Jt5lUqu7w/Q+Xub1jZWP6tsmMA8aYi59EzBcpknSiIJXGPACAv8doclA4LxKAoIFD1pib3SPlT8I5LjOsV83hYveqHZOIqoIJZlf/kg4VJf3Sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760471350; c=relaxed/simple;
-	bh=OCi+9BdbMVfw+r3BjpSKNzTbsTKwzgaZRfsDj2Qrq9c=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=u6W6BgIwRNKEpcy58hsXDi0y3dhT8EsTHHdC3jOIyN8L0IB8cppzOWTbPmTfnlnofd8ool6vJ96ALQjTSmkxk7676bau8VcoAXGBySUNrK7gkJzne62nhR1i07g3s7TFMHP/ngMIVtiO+VGbYxtfz8vDSH+djSuML/ZuQBxfVXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NAAjF0zE; arc=none smtp.client-ip=209.85.221.181
+	s=arc-20240116; t=1760471353; c=relaxed/simple;
+	bh=NAn2NgUHQ3dmvMSaEIWq0SiPipKf1HyX6O/8TgoS8O0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=F0VGA/Ps6RcXoLHFTT7O2v3Gvl5VEeDv1M65V9kSY/rsBcP4agJCiVJ11wjBuQtOdQC1FxtxkQH0bcgRsHMxMEyh5UPmgHy33NFR0s2jl5x+yvtm7oHImw4hVk1y3Ujrj8OsS/iBLB5q7xV81GeBcOl+hhXUEF8NUoZgIIeRNeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X32yeIAt; arc=none smtp.client-ip=209.85.217.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NAAjF0zE"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-54bc04b9d07so2043744e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 12:49:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X32yeIAt"
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-5d6266f1a33so855262137.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 12:49:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760471347; x=1761076147; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LwNmgwNOsf1TUnXGz5Q/BxH13xe/NAAQpPcN96/Vadc=;
-        b=NAAjF0zEFHl/BMWN05ShAAua7lxOaVuk1zpJFmQHaCIfmyqPrMFP2ROS1Xb6XCaC7v
-         dPhZa2hkd+s/N+UA+Zo0iO0TElL3HzCmuk7qYnFsbuO4fHeeFjGGQkbGDJD8yClKcSU+
-         7erjeTqkrLpsfVADBQxlSObS5wjYY5IxVmyp+28Wr7g3gVEZBxoX6rUCYqcFyhOrRGu7
-         0OXCptptICXcpbKyed9nWaYkBzrAqRnyw1zh57Xnf439z7w7cONEnJddwlgPqCiRUt8I
-         81s4LMKNAEm+KLMCvx4IzJMrTZoQfQD8SXT7RtIK+sAYZW1a9mKirNyg72DdBLCcecd3
-         /T9Q==
+        d=gmail.com; s=20230601; t=1760471349; x=1761076149; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=htkUluOE9iQ+4zuU84nqUe0HiWQFTKo/HXyw2hqXNJk=;
+        b=X32yeIAtb6OwJC+PgCssJ4k38MpfkvVGe1US5QkGWUD1IjqQ4xEcm8LxZivXgGVEdH
+         JzbjeNpDBc6/+hSCG6rxd5MlbH+FvulWUpK3bCKM4B7BQZIvKdLKCQfjhRFHS65uRASW
+         wKVW7/SIXU9rZwx7fWqs0vGLYEMbQG1FFM2hv8vLYZKC+4Po8h/j0uMmS86vjWW1Exwl
+         KlV6MILHVn5wBEpfrLotI5COqbOiod9h9IgrL8ZKYDYtp9Ht5RBtgl4QjAW5Vq+ynIL6
+         lv/qy/XI/3ruZfOxF1U21+UvPF2cSZtEpC+tEa076SB1ov2LBqdm7AksfEKiXQRBdryX
+         G+ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760471347; x=1761076147;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LwNmgwNOsf1TUnXGz5Q/BxH13xe/NAAQpPcN96/Vadc=;
-        b=poQZXKj4pal2RU8rnncC3xAR939t/kCtQxyrerwFCSrD9VDhUhsfdT508V4WkVJyxm
-         UMcbgcnF2/Qi2iF7E1w7bX3vRIxPMDdSTVZuUWapDbIWur13y7Bzf8UBsqzKYGfNulBw
-         TsLlUhne335hsXe8M35UqSvmHZ4K+NYioBhTIulTpZsUWbZZleagFFrYj9v63tciYy3V
-         fZtuC67um19IXO2GNqak3cpUBPYi9tsmJHuKIzjxHQW9FGOPNUrroIvnlL38qgCPCokE
-         sS8q/bR5iu2SojCDsNeZrXhdBk8vZ5BwBcmrBH1skd7jPcj1O9qpCHB7HqHvMNyJlLMV
-         uflw==
-X-Gm-Message-State: AOJu0Ywl2zooVgiLeWtRah6vI3QjhLGFFM3ocEnMzhXg77FbDsKlsDVa
-	/7fIc24+q6Egp/uNaA2Z4sglAoYIzezcPKx1NLn4u5Ipfh6gxjSYWs/OqjNaGliV
-X-Gm-Gg: ASbGncuv+GXOFyiHY8Fj3rShPBFNBtivA7GZRke9RFfTviOkJ33i5O2t3ypRIDw9l3o
-	P/XqL3PMcbQv9uF9S52aJOCR7G3b8JI6nld98fFyvi7CERJIsS/alAUMABglv9FFFvPFRQ7BxC9
-	dpmwbkTAIxnGxKQm0A8bincVIYbdDuZOgaMeTaat1Ura7dN+ntetYid84InHO7MbXJJPbDp9QJ6
-	EqpuoCjGGFhp5w9K2PwZ+uolRcJDODq5vSuTtSi+w+Z/ObAYXiXm98iK+NsOg2LuzVbIjgrRqpw
-	643Swytol53q8q9k0Xfx/MmFg0PFKZIX3izY/SDw837avbw0cB0Pz1vA0NcQapDrzNnNFo1yLMA
-	973LIf/Q5GYIS3hKFvE98e+oCgQ4K+cXAZJKYPRW6gSLpBpkfCMdXQig=
-X-Google-Smtp-Source: AGHT+IGkvwtywegrS2T22BC7wV1KOJgZC5WRquMuqjthtOKuS84TsSXkX9XgsQ2GjyZ5W7ptTLlZzQ==
-X-Received: by 2002:a05:6102:390b:b0:5d6:fce:4443 with SMTP id ada2fe7eead31-5d60fce44d4mr3613866137.43.1760471346965;
-        Tue, 14 Oct 2025 12:49:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760471349; x=1761076149;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=htkUluOE9iQ+4zuU84nqUe0HiWQFTKo/HXyw2hqXNJk=;
+        b=Q+SND1eQsKFMHhw8kyvuyfN2Jtt5CDOuD5Dn5PqVqut4ooobyOUu6pRybi0SfUemsK
+         oghCpEYTVUni6ck0AIhHiTOc13clSwV6hJhWBAJwbMQm3e3m2nAWNBFwdbzVmwaXYcKp
+         7z1tjPvm297B6lmAvhzbVA/DubywsVPWo979Do+zKcFelQ/HxlFpKUoGJz+C0yMaMlpe
+         SHLWenL4hm+BR8jN4eTXNyqp1TThAxM+qcin4P1jXMgiTBQA+YHsWYBkjC0hNPQaIDge
+         R+jpb7L82ngDpvIANtY/Fqxrpo4cHaMuzFqZOzj/BeC5YUQlAIDp7RdXliqGzPg/St5P
+         pt7A==
+X-Gm-Message-State: AOJu0YyloDsTQLsuB1AmOC+5cLE1IAQUJ7MLSvago2xbsJKmdda+uc6n
+	61pcjsNr/6/1io+Dkwcfn11oS/ZOJAKWQBUKU4ZFsmX1O4MFmGjeiLrmk/luIiFA
+X-Gm-Gg: ASbGncuj5/qm/cRnTdkEJ8Ab4nC3xeQ2ft8hYO/dviL0nQvpCb3vORmVTm/jc/jZsYg
+	mCLeKQpd3YYUy0v8dMg4I4LSd34pHBd5yoT6NETL7i7OfUEcIjGf9G7Zb9I0TUAHwNSQitiUuTN
+	cEWKImYM7gMaP1MAo4ek5UXGuLIxmwtjsy7HhB8CaSZ30TGGMS5fMF5i7uxjL8uUW9Fl4UFTVj3
+	gE8gW0NvGIR+41lSjXuphwIYxdFr+xqJbIeRPjwsQqaj6IyhKiCp5zEcrEVXUULq7xYphSAQxIu
+	7fpkae5J5vBHly74zSwQYPvHMn42R++nnSBznIstzkYyHxYhmBEGUDZCbsOwpWEDTKliZddOVQs
+	32lRMKBEHbInQnk8Xm43TwZkxC+5U+Xg98fR6sgMbnfki
+X-Google-Smtp-Source: AGHT+IEKYG8mTOsU2oGRTP/I+1bDZFkZIUbGugyZd8pHmCu2yhuwvRhDdMH4dOr145QEalXLPbOBig==
+X-Received: by 2002:a05:6102:14a2:b0:534:cfe0:f83e with SMTP id ada2fe7eead31-5d5e22161c5mr8359945137.3.1760471349358;
+        Tue, 14 Oct 2025 12:49:09 -0700 (PDT)
 Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-554d80d9bf0sm4570763e0c.18.2025.10.14.12.49.04
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-554d80d9bf0sm4570763e0c.18.2025.10.14.12.49.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Oct 2025 12:49:05 -0700 (PDT)
+        Tue, 14 Oct 2025 12:49:07 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] client/player: Add 'auto' option to transport.acquire
-Date: Tue, 14 Oct 2025 15:48:54 -0400
-Message-ID: <20251014194855.384197-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/2] client/player: Add 'auto' option to transport.select
+Date: Tue, 14 Oct 2025 15:48:55 -0400
+Message-ID: <20251014194855.384197-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251014194855.384197-1-luiz.dentz@gmail.com>
+References: <20251014194855.384197-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,50 +76,174 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables transport.acquire auto which enables to overwrite the
-default behavior of prompting when endpoint is registering without
-setting auto accept.
+This enables transport.select auto which enables to auto select the
+broadcast transport configured with the local endpoints, the selecting
+process will also dealt with linking the transport so it needs a timer
+that waits all transports to be configure to then start linking and
+finally select.
 ---
- client/player.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ client/player.c | 98 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 85 insertions(+), 13 deletions(-)
 
 diff --git a/client/player.c b/client/player.c
-index a8d05cf175c9..4f8293ce7842 100644
+index 4f8293ce7842..54fcbb7601c0 100644
 --- a/client/player.c
 +++ b/client/player.c
-@@ -134,6 +134,7 @@ static GList *local_endpoints = NULL;
- static GList *transports = NULL;
+@@ -43,6 +43,7 @@
+ #include "src/shared/shell.h"
+ #include "src/shared/io.h"
+ #include "src/shared/queue.h"
++#include "src/shared/timeout.h"
+ #include "src/shared/bap-debug.h"
+ #include "print.h"
+ #include "player.h"
+@@ -115,6 +116,8 @@ struct endpoint {
+ 	uint8_t iso_group;
+ 	uint8_t iso_stream;
+ 	struct queue *acquiring;
++	struct queue *selecting;
++	unsigned int selecting_id;
+ 	struct queue *transports;
+ 	DBusMessage *msg;
+ 	struct preset *preset;
+@@ -135,6 +138,7 @@ static GList *transports = NULL;
  static struct queue *ios = NULL;
  static uint8_t bcast_code[] = BCAST_CODE;
-+static bool auto_acquire = false;
+ static bool auto_acquire = false;
++static bool auto_select = false;
  
  struct transport {
  	GDBusProxy *proxy;
-@@ -5072,10 +5073,8 @@ static void transport_property_changed(GDBusProxy *proxy, const char *name,
- 
- 	dbus_message_iter_get_basic(iter, &str);
- 
--	if (strcmp(str, "pending"))
--		return;
--
--	transport_acquire(proxy, true);
-+	if (!strcmp(str, "pending") || !strcmp(str, "broadcasting"))
-+		transport_acquire(proxy, !auto_acquire);
+@@ -1096,6 +1100,76 @@ static void confirm_response(const char *input, void *user_data)
+ 									NULL);
  }
  
- static void property_changed(GDBusProxy *proxy, const char *name,
-@@ -5224,6 +5223,11 @@ static void cmd_acquire_transport(int argc, char *argv[])
++static bool match_proxy(const void *data, const void *user_data)
++{
++	const struct transport *transport = data;
++	const GDBusProxy *proxy = user_data;
++
++	return transport->proxy == proxy;
++}
++
++static struct transport *find_transport(GDBusProxy *proxy)
++{
++	return queue_find(ios, match_proxy, proxy);
++}
++
++static bool ep_selecting_process(void *user_data)
++{
++	struct endpoint *ep = user_data;
++	struct transport_select_args *args;
++	const struct queue_entry *entry;
++
++	if (queue_isempty(ep->selecting))
++		return true;
++
++	args = g_new0(struct transport_select_args, 1);
++
++	for (entry = queue_get_entries(ep->selecting); entry;
++					entry = entry->next) {
++		GDBusProxy *link;
++
++		link = g_dbus_proxy_lookup(transports, NULL, entry->data,
++					BLUEZ_MEDIA_TRANSPORT_INTERFACE);
++		if (!link)
++			continue;
++
++		if (find_transport(link))
++			continue;
++
++		if (!args->proxy) {
++			args->proxy = link;
++			continue;
++		}
++
++		if (!args->links)
++			args->links = queue_new();
++
++		/* Enqueue all links */
++		queue_push_tail(args->links, link);
++	}
++
++	queue_destroy(ep->selecting, NULL);
++	ep->selecting = NULL;
++
++	transport_set_links(args);
++
++	return true;
++}
++
++static void ep_set_selecting(struct endpoint *ep, const char *path)
++{
++	bt_shell_printf("Transport %s selecting\n", path);
++
++	if (!ep->selecting)
++		ep->selecting = queue_new();
++
++	queue_push_tail(ep->selecting, strdup(path));
++
++	if (!ep->selecting_id)
++		ep->selecting_id = timeout_add(1000, ep_selecting_process, ep,
++						NULL);
++}
++
+ static DBusMessage *endpoint_set_configuration(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -1133,6 +1207,9 @@ static DBusMessage *endpoint_set_configuration(DBusConnection *conn,
+ 	queue_push_tail(ep->transports, strdup(path));
+ 
+ 	if (ep->auto_accept) {
++		if (auto_select && ep->broadcast)
++			ep_set_selecting(ep, path);
++
+ 		bt_shell_printf("Auto Accepting...\n");
+ 		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ 	}
+@@ -2936,7 +3013,10 @@ static void endpoint_free(void *data)
+ 	if (ep->codec == 0xff)
+ 		free(ep->preset);
+ 
++	timeout_remove(ep->selecting_id);
++
+ 	queue_destroy(ep->acquiring, NULL);
++	queue_destroy(ep->selecting, free);
+ 	queue_destroy(ep->transports, free);
+ 
+ 	g_free(ep->path);
+@@ -5205,19 +5285,6 @@ static void cmd_show_transport(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
+-static bool match_proxy(const void *data, const void *user_data)
+-{
+-	const struct transport *transport = data;
+-	const GDBusProxy *proxy = user_data;
+-
+-	return transport->proxy == proxy;
+-}
+-
+-static struct transport *find_transport(GDBusProxy *proxy)
+-{
+-	return queue_find(ios, match_proxy, proxy);
+-}
+-
+ static void cmd_acquire_transport(int argc, char *argv[])
+ {
  	GDBusProxy *proxy;
+@@ -5446,6 +5513,11 @@ static void cmd_select_transport(int argc, char *argv[])
+ 	struct transport_select_args *args;
  	int i;
  
 +	if (argc == 2 && !strcmp(argv[1], "auto")) {
-+		auto_acquire = true;
++		auto_select = true;
 +		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
 +	}
 +
+ 	args = g_new0(struct transport_select_args, 1);
+ 
  	for (i = 1; i < argc; i++) {
- 		proxy = g_dbus_proxy_lookup(transports, NULL, argv[i],
- 					BLUEZ_MEDIA_TRANSPORT_INTERFACE);
 -- 
 2.51.0
 
