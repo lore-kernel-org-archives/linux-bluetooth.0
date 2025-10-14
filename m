@@ -1,66 +1,62 @@
-Received: from mail.commetrax.com (mail.commetrax.com [141.95.18.165])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from o3.sgmail.github.com (o3.sgmail.github.com [192.254.112.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA612BD597
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 07:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.95.18.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D002831A7FE
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 13:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.254.112.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760428608; cv=none; b=P5SZAvGTPWGyrPaaKxBori5BuFU/RCsURnUJhjibpILcT35BWwuaa5ZrXF2qzIO5GVpZEFj9uif8N7xLAJzob6i6ntAd5PeSduvGGu7vmgO158LYSzyD/P9zwWjsXmg1jCIpk4edyjVW/htaFFcyjzdYhMjQuouHPKO5pjH5OiE=
+	t=1760447409; cv=none; b=akwtRICELyTP86AbIpSiA9ymRwn9znJUkPB0yLkDPa9mWNHf2cCHX9dhMFEmmMC2K2TyZAopEoMldMBDG78wWgYJYBGadqHK05rR47AYnxF7KtSrWoaik6X4ttwEIgv6z+bGG7VUbfpF6sy1FyaI+iJIVVFUNTztO9qXvc+Ddjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760428608; c=relaxed/simple;
-	bh=M2z+nFeXqIRcbI6rcgrOtIQjqLLid9ZQ1XheJsIeFLM=;
-	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type; b=iFZQYGJ3rECaLm9SldnVKjQjJP+nGB+6bWIA/PPjG6ZlYxlFIW+kSHKnAF9rbMbb4b2QO8kgD/Yx01M+d8RsdF0QR0vm+0SaREQZYpiAIYHHAwuzZ/GYqCQEkEvXlSo/tv26PL35UFY8YLnswqj8K/1wVQqXW+rpdFMkWBq4DUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=commetrax.com; spf=pass smtp.mailfrom=commetrax.com; dkim=pass (2048-bit key) header.d=commetrax.com header.i=@commetrax.com header.b=P9W09GbN; arc=none smtp.client-ip=141.95.18.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=commetrax.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=commetrax.com
+	s=arc-20240116; t=1760447409; c=relaxed/simple;
+	bh=0eia0lBhTzETUexiotLFAbUAxJuxjv8e1fFD1kdni54=;
+	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=JeB8V8SRZMph8nlkPFtbkUWeVA6a2K5J69CjG0GFpFNjEN5K038MD0aREGH/p/Ru+FRnFskgRjXaCWe60CCeW6/AlZGtTQNRKo2tyNlAhUGCKtNg8oxtMhnzrhALPbDdEpOUUXGUTrKjCgNSOTFV+glT9hc35UzqNwWtcnl469U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=quVwPKJ7; arc=none smtp.client-ip=192.254.112.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=commetrax.com header.i=@commetrax.com header.b="P9W09GbN"
-Received: by mail.commetrax.com (Postfix, from userid 1002)
-	id 7AD8923F7C; Tue, 14 Oct 2025 09:56:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=commetrax.com;
-	s=mail; t=1760428599;
-	bh=M2z+nFeXqIRcbI6rcgrOtIQjqLLid9ZQ1XheJsIeFLM=;
-	h=Date:From:To:Subject:From;
-	b=P9W09GbNnKbbiDQLsgqgpYGTliPMWKzl08jvuldyh07b+tlZd859jkNbtbYkDknUc
-	 xpRts442fj0QIF9j668BBaaTyQ0rYEfiQ+TPZxSbV4uqypYmoA7snGL47ZvAAB2+St
-	 0U2T9Nj2QkcaX+lHn+wk2yTAk+xahj087dv86FgkUGBQSSZLSUUxTdttXchMRQnE8Y
-	 /wwAYoVyVO/4V/D3Y/kMn6X3vC8BFr5DyqvgjyOw6gZY8DzozvFBy3jJewaijEz93K
-	 8o4CB9+ty42pMZRlNWEK66ZSfjKEqVW+p4tHagLDDGQePmOzCIA3TNjqrG4g4J2vst
-	 s9qZkz965oFMQ==
-Received: by mail.commetrax.com for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 07:55:46 GMT
-Message-ID: <20251014084500-0.1.c9.16nlj.0.en8gaeqdou@commetrax.com>
-Date: Tue, 14 Oct 2025 07:55:46 GMT
-From: "Luke Walsh" <luke.walsh@commetrax.com>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Welders ready to work
-X-Mailer: mail.commetrax.com
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="quVwPKJ7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	h=date:from:subject:mime-version:content-type:content-transfer-encoding:
+	list-unsubscribe:to:cc:content-type:date:from:subject:to;
+	s=smtpapi; bh=h21boJ+k4rcup2otex9IwMIt1yHrOEIcPyUb/Dk01cg=;
+	b=quVwPKJ7uvBBtEZJDv0sZIia7PwkePhSMRu4Up7OtQ+XqNYvPNXiCYWACIOAkCA1jXvc
+	0P9J/wdUyGvuKZIIgoW52uD9FBfjfiJRkNmyoly4pjCb/24iLDxZ2mTjUqV2viyFEuq1vT
+	wEbgkkk+8WDraZ4rPIReKNapetWBLzLHQ=
+Received: by recvd-868874bfdf-q8mh5 with SMTP id recvd-868874bfdf-q8mh5-1-68EE4BAE-BF
+	2025-10-14 13:10:06.770873717 +0000 UTC m=+5932115.866418625
+Received: from out-24.smtp.github.com (unknown)
+	by geopod-ismtpd-20 (SG)
+	with ESMTP id gfiJGgLfRSOj3isrgWNokQ
+	for <linux-bluetooth@vger.kernel.org>;
+	Tue, 14 Oct 2025 13:10:06.733 +0000 (UTC)
+Received: from github.com (hubbernetes-node-f76d6ec.ac4-iad.github.net [10.52.223.64])
+	by smtp.github.com (Postfix) with ESMTPA id B7989640620
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 06:09:59 -0700 (PDT)
+Date: Tue, 14 Oct 2025 13:10:06 +0000 (UTC)
+From: BluezTestBot <noreply@github.com>
+Message-ID: <bluez/bluez/push/refs/heads/1002158/249126-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+X-SG-EID: 
+ =?us-ascii?Q?u001=2EyVDaIUJfOTIVaBYkJvNzXFDwUvSfXABmYIMG7o2yQ0XjHiQN8HeKlKfUQ?=
+ =?us-ascii?Q?+TD5y9uUDiSc3WCQ=2FbFOxbFL1vD49bkkVvMEgga?=
+ =?us-ascii?Q?9M9lP68d5e100KpLGjvX=2F6SQcmbfUa6ppds1HWA?=
+ =?us-ascii?Q?qK=2FDHx0zrzhFObXvTwgnP7TXC8Z8o8jKzYDur3s?=
+ =?us-ascii?Q?qNOe34OVLGcsV8FjNqQ1Q2FG5kB2Ab4pX9k4qKP?=
+ =?us-ascii?Q?OvxfdCH1MkTYFcWA6sL6RbuCURPpoBzQvNXH0nS?= =?us-ascii?Q?cNd3?=
+To: linux-bluetooth@vger.kernel.org
+X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
 
-Hello,
+  Branch: refs/heads/1002158
+  Home:   https://github.com/bluez/bluez
 
-we support companies in carrying out industrial projects by providing wel=
-ding and assembly of steel structures =E2=80=93 both on-site and in-house=
-=2E
-
-In practice, this means we enter with a ready team of welders and fitters=
-, take responsibility for preparing the components, their installation an=
-d quality control.=20
-
-The client receives a complete, safe and timely delivered structure.
-
-If you have projects that require steel solutions, we would be happy to t=
-alk about how we can take over this part of the work and relieve your tea=
-m.
-
-Would you be open to a short conversation?
-
-
-Best regards
-Luke Walsh
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
