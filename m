@@ -1,62 +1,120 @@
-Received: from o3.sgmail.github.com (o3.sgmail.github.com [192.254.112.98])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D002831A7FE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 13:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.254.112.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F262EFDA2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 19:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760447409; cv=none; b=akwtRICELyTP86AbIpSiA9ymRwn9znJUkPB0yLkDPa9mWNHf2cCHX9dhMFEmmMC2K2TyZAopEoMldMBDG78wWgYJYBGadqHK05rR47AYnxF7KtSrWoaik6X4ttwEIgv6z+bGG7VUbfpF6sy1FyaI+iJIVVFUNTztO9qXvc+Ddjc=
+	t=1760471350; cv=none; b=Ez2dHe4HrI1NkUGoUdyfnwY50bCzzMLHFhWb6xFk9oxRWHzsc1KewSdQopfQJo49SsVn40+uXSHv4fnHbe2t4idbXudbOqKuaHHVUdHHdE3ghOQYf9GV9Xjn/LqFF7CgUdypfFeOAmVvHna0zSwSOOUtRl0ypgeEePwX6ED9fBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760447409; c=relaxed/simple;
-	bh=0eia0lBhTzETUexiotLFAbUAxJuxjv8e1fFD1kdni54=;
-	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=JeB8V8SRZMph8nlkPFtbkUWeVA6a2K5J69CjG0GFpFNjEN5K038MD0aREGH/p/Ru+FRnFskgRjXaCWe60CCeW6/AlZGtTQNRKo2tyNlAhUGCKtNg8oxtMhnzrhALPbDdEpOUUXGUTrKjCgNSOTFV+glT9hc35UzqNwWtcnl469U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=quVwPKJ7; arc=none smtp.client-ip=192.254.112.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
+	s=arc-20240116; t=1760471350; c=relaxed/simple;
+	bh=OCi+9BdbMVfw+r3BjpSKNzTbsTKwzgaZRfsDj2Qrq9c=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=u6W6BgIwRNKEpcy58hsXDi0y3dhT8EsTHHdC3jOIyN8L0IB8cppzOWTbPmTfnlnofd8ool6vJ96ALQjTSmkxk7676bau8VcoAXGBySUNrK7gkJzne62nhR1i07g3s7TFMHP/ngMIVtiO+VGbYxtfz8vDSH+djSuML/ZuQBxfVXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NAAjF0zE; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="quVwPKJ7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	h=date:from:subject:mime-version:content-type:content-transfer-encoding:
-	list-unsubscribe:to:cc:content-type:date:from:subject:to;
-	s=smtpapi; bh=h21boJ+k4rcup2otex9IwMIt1yHrOEIcPyUb/Dk01cg=;
-	b=quVwPKJ7uvBBtEZJDv0sZIia7PwkePhSMRu4Up7OtQ+XqNYvPNXiCYWACIOAkCA1jXvc
-	0P9J/wdUyGvuKZIIgoW52uD9FBfjfiJRkNmyoly4pjCb/24iLDxZ2mTjUqV2viyFEuq1vT
-	wEbgkkk+8WDraZ4rPIReKNapetWBLzLHQ=
-Received: by recvd-868874bfdf-q8mh5 with SMTP id recvd-868874bfdf-q8mh5-1-68EE4BAE-BF
-	2025-10-14 13:10:06.770873717 +0000 UTC m=+5932115.866418625
-Received: from out-24.smtp.github.com (unknown)
-	by geopod-ismtpd-20 (SG)
-	with ESMTP id gfiJGgLfRSOj3isrgWNokQ
-	for <linux-bluetooth@vger.kernel.org>;
-	Tue, 14 Oct 2025 13:10:06.733 +0000 (UTC)
-Received: from github.com (hubbernetes-node-f76d6ec.ac4-iad.github.net [10.52.223.64])
-	by smtp.github.com (Postfix) with ESMTPA id B7989640620
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 06:09:59 -0700 (PDT)
-Date: Tue, 14 Oct 2025 13:10:06 +0000 (UTC)
-From: BluezTestBot <noreply@github.com>
-Message-ID: <bluez/bluez/push/refs/heads/1002158/249126-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NAAjF0zE"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-54bc04b9d07so2043744e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 12:49:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760471347; x=1761076147; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LwNmgwNOsf1TUnXGz5Q/BxH13xe/NAAQpPcN96/Vadc=;
+        b=NAAjF0zEFHl/BMWN05ShAAua7lxOaVuk1zpJFmQHaCIfmyqPrMFP2ROS1Xb6XCaC7v
+         dPhZa2hkd+s/N+UA+Zo0iO0TElL3HzCmuk7qYnFsbuO4fHeeFjGGQkbGDJD8yClKcSU+
+         7erjeTqkrLpsfVADBQxlSObS5wjYY5IxVmyp+28Wr7g3gVEZBxoX6rUCYqcFyhOrRGu7
+         0OXCptptICXcpbKyed9nWaYkBzrAqRnyw1zh57Xnf439z7w7cONEnJddwlgPqCiRUt8I
+         81s4LMKNAEm+KLMCvx4IzJMrTZoQfQD8SXT7RtIK+sAYZW1a9mKirNyg72DdBLCcecd3
+         /T9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760471347; x=1761076147;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LwNmgwNOsf1TUnXGz5Q/BxH13xe/NAAQpPcN96/Vadc=;
+        b=poQZXKj4pal2RU8rnncC3xAR939t/kCtQxyrerwFCSrD9VDhUhsfdT508V4WkVJyxm
+         UMcbgcnF2/Qi2iF7E1w7bX3vRIxPMDdSTVZuUWapDbIWur13y7Bzf8UBsqzKYGfNulBw
+         TsLlUhne335hsXe8M35UqSvmHZ4K+NYioBhTIulTpZsUWbZZleagFFrYj9v63tciYy3V
+         fZtuC67um19IXO2GNqak3cpUBPYi9tsmJHuKIzjxHQW9FGOPNUrroIvnlL38qgCPCokE
+         sS8q/bR5iu2SojCDsNeZrXhdBk8vZ5BwBcmrBH1skd7jPcj1O9qpCHB7HqHvMNyJlLMV
+         uflw==
+X-Gm-Message-State: AOJu0Ywl2zooVgiLeWtRah6vI3QjhLGFFM3ocEnMzhXg77FbDsKlsDVa
+	/7fIc24+q6Egp/uNaA2Z4sglAoYIzezcPKx1NLn4u5Ipfh6gxjSYWs/OqjNaGliV
+X-Gm-Gg: ASbGncuv+GXOFyiHY8Fj3rShPBFNBtivA7GZRke9RFfTviOkJ33i5O2t3ypRIDw9l3o
+	P/XqL3PMcbQv9uF9S52aJOCR7G3b8JI6nld98fFyvi7CERJIsS/alAUMABglv9FFFvPFRQ7BxC9
+	dpmwbkTAIxnGxKQm0A8bincVIYbdDuZOgaMeTaat1Ura7dN+ntetYid84InHO7MbXJJPbDp9QJ6
+	EqpuoCjGGFhp5w9K2PwZ+uolRcJDODq5vSuTtSi+w+Z/ObAYXiXm98iK+NsOg2LuzVbIjgrRqpw
+	643Swytol53q8q9k0Xfx/MmFg0PFKZIX3izY/SDw837avbw0cB0Pz1vA0NcQapDrzNnNFo1yLMA
+	973LIf/Q5GYIS3hKFvE98e+oCgQ4K+cXAZJKYPRW6gSLpBpkfCMdXQig=
+X-Google-Smtp-Source: AGHT+IGkvwtywegrS2T22BC7wV1KOJgZC5WRquMuqjthtOKuS84TsSXkX9XgsQ2GjyZ5W7ptTLlZzQ==
+X-Received: by 2002:a05:6102:390b:b0:5d6:fce:4443 with SMTP id ada2fe7eead31-5d60fce44d4mr3613866137.43.1760471346965;
+        Tue, 14 Oct 2025 12:49:06 -0700 (PDT)
+Received: from lvondent-mobl5 ([50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-554d80d9bf0sm4570763e0c.18.2025.10.14.12.49.04
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 12:49:05 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] client/player: Add 'auto' option to transport.acquire
+Date: Tue, 14 Oct 2025 15:48:54 -0400
+Message-ID: <20251014194855.384197-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-X-SG-EID: 
- =?us-ascii?Q?u001=2EyVDaIUJfOTIVaBYkJvNzXFDwUvSfXABmYIMG7o2yQ0XjHiQN8HeKlKfUQ?=
- =?us-ascii?Q?+TD5y9uUDiSc3WCQ=2FbFOxbFL1vD49bkkVvMEgga?=
- =?us-ascii?Q?9M9lP68d5e100KpLGjvX=2F6SQcmbfUa6ppds1HWA?=
- =?us-ascii?Q?qK=2FDHx0zrzhFObXvTwgnP7TXC8Z8o8jKzYDur3s?=
- =?us-ascii?Q?qNOe34OVLGcsV8FjNqQ1Q2FG5kB2Ab4pX9k4qKP?=
- =?us-ascii?Q?OvxfdCH1MkTYFcWA6sL6RbuCURPpoBzQvNXH0nS?= =?us-ascii?Q?cNd3?=
-To: linux-bluetooth@vger.kernel.org
-X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1002158
-  Home:   https://github.com/bluez/bluez
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This enables transport.acquire auto which enables to overwrite the
+default behavior of prompting when endpoint is registering without
+setting auto accept.
+---
+ client/player.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/client/player.c b/client/player.c
+index a8d05cf175c9..4f8293ce7842 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -134,6 +134,7 @@ static GList *local_endpoints = NULL;
+ static GList *transports = NULL;
+ static struct queue *ios = NULL;
+ static uint8_t bcast_code[] = BCAST_CODE;
++static bool auto_acquire = false;
+ 
+ struct transport {
+ 	GDBusProxy *proxy;
+@@ -5072,10 +5073,8 @@ static void transport_property_changed(GDBusProxy *proxy, const char *name,
+ 
+ 	dbus_message_iter_get_basic(iter, &str);
+ 
+-	if (strcmp(str, "pending"))
+-		return;
+-
+-	transport_acquire(proxy, true);
++	if (!strcmp(str, "pending") || !strcmp(str, "broadcasting"))
++		transport_acquire(proxy, !auto_acquire);
+ }
+ 
+ static void property_changed(GDBusProxy *proxy, const char *name,
+@@ -5224,6 +5223,11 @@ static void cmd_acquire_transport(int argc, char *argv[])
+ 	GDBusProxy *proxy;
+ 	int i;
+ 
++	if (argc == 2 && !strcmp(argv[1], "auto")) {
++		auto_acquire = true;
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	}
++
+ 	for (i = 1; i < argc; i++) {
+ 		proxy = g_dbus_proxy_lookup(transports, NULL, argv[i],
+ 					BLUEZ_MEDIA_TRANSPORT_INTERFACE);
+-- 
+2.51.0
+
