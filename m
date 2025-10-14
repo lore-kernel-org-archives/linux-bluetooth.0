@@ -1,91 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3080B3002B4
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 20:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94732308F39
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 20:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760474432; cv=none; b=U57oiSvx8ceFJTH1SJ5nn24NvzriqHFKYUkyu7L3HLErbQoyHVeOcDBMDLeJez9RwKxTNXJ9XycvSpDwZNV/8SAaY1vKEqvI+BcOg/ckbMl6appny16wXisM7daMl6GgIlGldNB0+/eNkKc7VUUEEHoJgYIF+f4hDsv5CgtDosk=
+	t=1760475512; cv=none; b=J8dYlq6E9YwXNug7b3MeDPZabO/XdxfmGc8PyKgVdNr/f/Ou0ed/5qvScLbtOKx0+cLnJ4wzfomOaxnI2B5VfO5uDVQZvYgEgg/zzUt83LddGFfeYf4Zqp9GzCPx8l1BvI8Fjb8AXx09NbeU0q5/dApRUvAnMBCy1Ok8P7usTdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760474432; c=relaxed/simple;
-	bh=+L41MMJ8taBdR9X1x2XG3VrLA8N2Yt6JcFonFxAaeak=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZR6E18QzfRD71RrziezKcXQiZVzD+mz5lcVpBVs7N+CoSbimUneGz55ERuwvd2SicZ798aV19mPnOzGeg073D2pNs7uBaSdDY5C34Jh+OnMAg0k4e4Kk+n+LV9dVb01OWdauUdqbkSOJWKrrtgAyuol+FlCC53LepKGW228ZhNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaMv5NZp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760475512; c=relaxed/simple;
+	bh=mHMYxOIZegyZJPKMp8sZt+Ll6z9pPtG0WsBxWlSDdEI=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ngzeaRAHwMDdYoRNEbvZgHqnYvK19Z25k30h16orGPlKCRU4HWP9SLpTH9Rj4K9yfC1bsv+p102LvqpxVfeevO8rdQ8LVbi6RJNVsgr6ojgXuCbPJRQB+0x7QBD3sgXGe4EhWBxIboShyl497rdV0DVZFxLgvjTeWBcwHjjF6bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FApPUe5q; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UaMv5NZp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07851C4CEE7;
-	Tue, 14 Oct 2025 20:40:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760474432;
-	bh=+L41MMJ8taBdR9X1x2XG3VrLA8N2Yt6JcFonFxAaeak=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UaMv5NZp2uLWDBjEbfR62Ok0635SPKDKeCCbY6XjSVUXB00I7+iQ7VVOuVxd1e9fj
-	 6T6+FCmsdsIi/gOe7hP5bMxgDEh7PD79RGP0gL0Cc7gJG1PKRCsR0GW+k3LznSZ13a
-	 TmZspshhViOcYPLtEdeWBFQO5x6U0/26RV93OdQzjh6BAvRY4qUU/9CEohuFLkQXH9
-	 QOVfh4Dov5fQ3sKCbdd9uozPYQkOL2Xmm3VB9Hf11HkZcjTX370x5pyBbYGtuTmY7c
-	 AYqOq4gUzn7bzhQPuCatsE62pFDdqZ2yOkrplxcUd1fWtYxpPPgI4b1cwsv8mXNHMd
-	 ieys1j3Utu9rw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 72FCE380AAF2;
-	Tue, 14 Oct 2025 20:40:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FApPUe5q"
+Received: from github.com (hubbernetes-node-1edca12.va3-iad.github.net [10.48.12.42])
+	by smtp.github.com (Postfix) with ESMTPA id A36708C06F1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 13:58:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1760475509;
+	bh=zHGE2WG2L0bRUSIHlytQYf8a3z1QmuwDp8RYl8OF0A8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=FApPUe5qzDU4AsK1l2Vtipe1fTBb1VzCa2QCbTou3q5lYkL/Pt7dGj4mTNGKy3Bk/
+	 6amwbRi9QdBOkr4mEuJGtf+OZ+NLiqqbesxzG/kv+bZKkQXi+fU3vj2m7cloEnjimI
+	 vDGEMQ+lyZfA4ZSQ9oM+ecZLWUKmVSHk6EgGt8EM=
+Date: Tue, 14 Oct 2025 13:58:29 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1011519/000000-3f1f13@github.com>
+Subject: [bluez/bluez] c27221: monitor: Use PAST to refer to Periodic
+ Advertising...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 1/8] Bluetooth: HCI: Add initial support for PAST
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176047441699.88862.3293407258426025596.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Oct 2025 20:40:16 +0000
-References: <20251014013308.174151-1-luiz.dentz@gmail.com>
-In-Reply-To: <20251014013308.174151-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1011519
+  Home:   https://github.com/bluez/bluez
+  Commit: c27221c2d730ca794182c18eb615cf56cada6d48
+      https://github.com/bluez/bluez/commit/c27221c2d730ca794182c18eb615cf56cada6d48
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-14 (Tue, 14 Oct 2025)
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M monitor/bt.h
+    M monitor/packet.c
 
-On Mon, 13 Oct 2025 21:33:01 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds PAST related commands (HCI_OP_LE_PAST,
-> HCI_OP_LE_PAST_SET_INFO and HCI_OP_LE_PAST_PARAMS) and events
-> (HCI_EV_LE_PAST_RECEIVED) along with handling of PAST sender and
-> receiver features bits including new MGMG settings (
-> HCI_EV_LE_PAST_RECEIVED and MGMT_SETTING_PAST_RECEIVER) which
-> userspace can use to determine if PAST is supported by the
-> controller.
-> 
-> [...]
+  Log Message:
+  -----------
+  monitor: Use PAST to refer to Periodic Advertising Sync Transfer
 
-Here is the summary with links:
-  - [v4,1/8] Bluetooth: HCI: Add initial support for PAST
-    https://git.kernel.org/bluetooth/bluetooth-next/c/9694b70e91bc
-  - [v4,2/8] Bluetooth: hci_core: Introduce HCI_CONN_FLAG_PAST
-    https://git.kernel.org/bluetooth/bluetooth-next/c/5518b6d3b39f
-  - [v4,3/8] Bluetooth: ISO: Add support to bind to trigger PAST
-    https://git.kernel.org/bluetooth/bluetooth-next/c/bac683543e72
-  - [v4,4/8] Bluetooth: HCI: Always use the identity address when initializing a connection
-    https://git.kernel.org/bluetooth/bluetooth-next/c/65a0aadac242
-  - [v4,5/8] Bluetooth: ISO: Attempt to resolve broadcast address
-    https://git.kernel.org/bluetooth/bluetooth-next/c/18339e7d7e44
-  - [v4,6/8] Bluetooth: MGMT: Allow use of Set Device Flags without Add Device
-    https://git.kernel.org/bluetooth/bluetooth-next/c/12de14315ad7
-  - [v4,7/8] Bluetooth: ISO: Fix not updating BIS sender source address
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e7dbb54d27b2
-  - [v4,8/8] Bluetooth: ISO: Fix another instance of dst_type handling
-    https://git.kernel.org/bluetooth/bluetooth-next/c/19c922bc098a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This simplify the command and event names and their structs to just
+use PAST in place of other terminology currently in use.
 
 
+  Commit: bdc72a05b97ca045ae47f20a3e2fad59c8a308e1
+      https://github.com/bluez/bluez/commit/bdc72a05b97ca045ae47f20a3e2fad59c8a308e1
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-14 (Tue, 14 Oct 2025)
+
+  Changed paths:
+    M client/scripts/broadcast-sink.bt
+    M emulator/btdev.c
+    M emulator/bthost.c
+    M emulator/bthost.h
+
+  Log Message:
+  -----------
+  emulator: Add initial support for PAST
+
+
+  Commit: f33bc8d4146c436a71d586cf614b3f59c41806fc
+      https://github.com/bluez/bluez/commit/f33bc8d4146c436a71d586cf614b3f59c41806fc
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-14 (Tue, 14 Oct 2025)
+
+  Changed paths:
+    M tools/iso-tester.c
+
+  Log Message:
+  -----------
+  iso-tester: Add tests for PAST procedures
+
+This introduces the following tests that test PAST procedures both as
+a sender, either for colocated broadcast source or a third peer, and as
+receiver:
+
+ISO Broadcaster PAST Info - Success
+ISO Broadcaster PAST Info RPA - Success
+ISO Broadcaster PAST Sender - Success
+ISO Broadcaster PAST Receiver - Success
+
+
+  Commit: 2e978a27aa7ef663ef778cc8f42b9cad57b2e761
+      https://github.com/bluez/bluez/commit/2e978a27aa7ef663ef778cc8f42b9cad57b2e761
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-14 (Tue, 14 Oct 2025)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Add support for PAST MGMT settings and flags
+
+This adds parising support for PAST MGMT settings and device flags.
+
+
+  Commit: 861a807eb867ec5337c84554363926a1c22c895a
+      https://github.com/bluez/bluez/commit/861a807eb867ec5337c84554363926a1c22c895a
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-14 (Tue, 14 Oct 2025)
+
+  Changed paths:
+    M doc/mgmt.rst
+    M lib/bluetooth/mgmt.h
+
+  Log Message:
+  -----------
+  MGMT: Add PAST Settings and Flags
+
+This adds PAST Settings and Flags definitions and documentation.
+
+
+  Commit: 3f1f131476d2f1cb6bbbb15f26244f99f90c8cef
+      https://github.com/bluez/bluez/commit/3f1f131476d2f1cb6bbbb15f26244f99f90c8cef
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-14 (Tue, 14 Oct 2025)
+
+  Changed paths:
+    M doc/iso.rst
+
+  Log Message:
+  -----------
+  iso.rst: Add documentation for PAST/rebind
+
+This documents how to use PAST procedures by doing bind on already
+connected socket.
+
+
+Compare: https://github.com/bluez/bluez/compare/c27221c2d730%5E...3f1f131476d2
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
