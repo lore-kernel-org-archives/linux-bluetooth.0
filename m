@@ -1,71 +1,35 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687382C11EA
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 20:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3080B3002B4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 20:40:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760474067; cv=none; b=CApfRMGAWAJVM9gcJtAZ4FxoDU/mx7htZGMfC2D+J42H09wld8zKowecgI/J8iRUt0EG9vamloRsUp062KIlY4HP4p79I3sMydcxlpSehcNepxOuJf0mGbhamZ+mFUvCLXaC/XJ2GLS1jMYcfIxlVJ+4VlOmAL+JgtsD3x9rmhw=
+	t=1760474432; cv=none; b=U57oiSvx8ceFJTH1SJ5nn24NvzriqHFKYUkyu7L3HLErbQoyHVeOcDBMDLeJez9RwKxTNXJ9XycvSpDwZNV/8SAaY1vKEqvI+BcOg/ckbMl6appny16wXisM7daMl6GgIlGldNB0+/eNkKc7VUUEEHoJgYIF+f4hDsv5CgtDosk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760474067; c=relaxed/simple;
-	bh=dxKRR5Oct9OvsapPKQ8CB/sGKQzOTBjWbqT44dtrars=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j63U3i2HZZpn3wzkh18+wWG8F8MgQKaQQYifzCE9+MxBXbc63HkX9UIS+MpcK6CyW4EhkOTpG2quhG3Rpo0rXivZatRfCTfKnLyjHEbN+eIzv4b7byW5yhfxDYsKgdrsa8r7pj0aH6vPlr5/r0X8iNHX5CQW+LutnoelJ3b3OaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wj7M3AE2; arc=none smtp.client-ip=209.85.221.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760474432; c=relaxed/simple;
+	bh=+L41MMJ8taBdR9X1x2XG3VrLA8N2Yt6JcFonFxAaeak=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZR6E18QzfRD71RrziezKcXQiZVzD+mz5lcVpBVs7N+CoSbimUneGz55ERuwvd2SicZ798aV19mPnOzGeg073D2pNs7uBaSdDY5C34Jh+OnMAg0k4e4Kk+n+LV9dVb01OWdauUdqbkSOJWKrrtgAyuol+FlCC53LepKGW228ZhNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaMv5NZp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wj7M3AE2"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-54aa30f4093so1949008e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Oct 2025 13:34:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760474064; x=1761078864; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=doJ7U7lzUHIr7jQNVm67JsaWry9+16XGOO/Jng0d4n4=;
-        b=Wj7M3AE2x5w90amsqJ3VgEuj3oXAtFdRliMD6zcjDoc/4zKNmlxIZZZw4kWM5cxkLa
-         ygCHHytN0cetxd5CRMG9TF/uZgpiBPOKhx+TmG9gWO3o/f4KjoScDVIkJaa8GYMDgFl+
-         8liAotQ0ZfT99WYX0LCoeE47x1lvBzqbYYO3f9ijKXiOEFJwhAeyiY7hIcdE4h1xVnDo
-         muSs9dtRxV7Y6rxZkrtgdSJ56uwQAi2GFyqzA0yDVctEsu857t7EwQ/ldUwWZGFv5G2z
-         nZsxX7ptsTaNTSnqaYz2Ee/4ifZ26X/iYY0vr4gNU2NM8O3Rez1teuHpgmEBiywC4Ue7
-         4A0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760474064; x=1761078864;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=doJ7U7lzUHIr7jQNVm67JsaWry9+16XGOO/Jng0d4n4=;
-        b=RKnmShMgM770WaBwmj0gqP0BX3rX73nnbh86rtMS/VqBV/ACzRKslBMPw6H1Jp0nA6
-         ejAsvqkUrxpVYCoBCHwAGwYynWjqcsbarwaMLjdWedZThTsq2iULHZ4j2xEXww5kOrzB
-         R4j9chj9T2rVcgWiSINU6qj21c4vctZ77czR9aR6JmJb6MnqrJKlrWiPiBgD1ddm7ee5
-         n29Z3S2KEDCEuEUx1k+DR6mJo7z+4yxkkXnml+p6mtkKFtlAWJNtmX7xEmB3GewLd7Uo
-         JpKkwlASVt22+EA/9VXVNbVuAH4aoG6HKXn61oXg3PE024GR71rG4HfqhKR1VRLzEpZP
-         qRtA==
-X-Gm-Message-State: AOJu0YxGa1wvRYTrzO75JfoQOtjH2MGsWoAUlslEsWsB4GPDeoHON77u
-	iW8VP1syYnQpbQilcTLjTgOYO+5lSf/cetoG4PGdFBq+9l86JZmSs6z3VUHrf1zD
-X-Gm-Gg: ASbGncuX+Tl9iYj6rDmTNwItHmY1lJP6YuWcJLMCPcfTOtGLF5eFFD6NEgmwwVc6rga
-	FQ2OwExcZqpdA3VJQ+amQO5GbtZfdGzIi+I8hU5DISdyQF+WB4YcmngBz+Lwjw+WN4XGRHH+Hsg
-	LwG2s3wU+q8Frl/39Nx/r3IProYIz9ymHshv2Fc5AL+lqucVhZVmJKvmu9Nili587GPd+nhcMns
-	1UxbMGiOLGsTryqoc6IfSvTxdaPKdZ2bFXOGYjV9oZAqKWkfUKWf1WnXgHS6wkBOJ+T5HzyJDqK
-	Iok2SZ/ipujEZoHJueZKoTNW94MucUwEVZtsu9GaJ5yyc6aPrJQXDv0hL90lA4w1Lyh2LtL1zMW
-	KkXLMLkS1aVIZuW4Nn9GtdcgWoL/nrZduzYc8RjLAvgY2
-X-Google-Smtp-Source: AGHT+IF9IyyTDbiHLS3L4HJ74gbKf5lDR8G1xDcD5MyRQvSwZj4yv3naOeokGrJIXxOunMsPS1DeuQ==
-X-Received: by 2002:a05:6122:c95:b0:54a:a569:9564 with SMTP id 71dfb90a1353d-554b8ab6630mr8661200e0c.6.1760474064550;
-        Tue, 14 Oct 2025 13:34:24 -0700 (PDT)
-Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-554d80a456csm4434116e0c.14.2025.10.14.13.34.23
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Oct 2025 13:34:23 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 6/6] iso.rst: Add documentation for PAST/rebind
-Date: Tue, 14 Oct 2025 16:34:00 -0400
-Message-ID: <20251014203400.453454-6-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251014203400.453454-1-luiz.dentz@gmail.com>
-References: <20251014203400.453454-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UaMv5NZp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07851C4CEE7;
+	Tue, 14 Oct 2025 20:40:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760474432;
+	bh=+L41MMJ8taBdR9X1x2XG3VrLA8N2Yt6JcFonFxAaeak=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UaMv5NZp2uLWDBjEbfR62Ok0635SPKDKeCCbY6XjSVUXB00I7+iQ7VVOuVxd1e9fj
+	 6T6+FCmsdsIi/gOe7hP5bMxgDEh7PD79RGP0gL0Cc7gJG1PKRCsR0GW+k3LznSZ13a
+	 TmZspshhViOcYPLtEdeWBFQO5x6U0/26RV93OdQzjh6BAvRY4qUU/9CEohuFLkQXH9
+	 QOVfh4Dov5fQ3sKCbdd9uozPYQkOL2Xmm3VB9Hf11HkZcjTX370x5pyBbYGtuTmY7c
+	 AYqOq4gUzn7bzhQPuCatsE62pFDdqZ2yOkrplxcUd1fWtYxpPPgI4b1cwsv8mXNHMd
+	 ieys1j3Utu9rw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 72FCE380AAF2;
+	Tue, 14 Oct 2025 20:40:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,46 +37,55 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 1/8] Bluetooth: HCI: Add initial support for PAST
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176047441699.88862.3293407258426025596.git-patchwork-notify@kernel.org>
+Date: Tue, 14 Oct 2025 20:40:16 +0000
+References: <20251014013308.174151-1-luiz.dentz@gmail.com>
+In-Reply-To: <20251014013308.174151-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-This documents how to use PAST procedures by doing bind on already
-connected socket.
----
- doc/iso.rst | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-diff --git a/doc/iso.rst b/doc/iso.rst
-index 2ad9c73e4eb8..4d315132f911 100644
---- a/doc/iso.rst
-+++ b/doc/iso.rst
-@@ -125,6 +125,26 @@ Broadcast Sink (Receiver) example:
-     /* Bind to Broadcaster address */
-     bind(iso_socket, (struct sockaddr *)addr, addr_len);
- 
-+Broadcast Source (Broadcaster) or Broadcast Sink (Receiver) Periodic
-+Advertising Sync Transfer (PAST):
-+
-+.. code-block::
-+
-+    struct sockaddr_iso *addr;
-+    size_t addr_len;
-+
-+    addr_len = sizeof(*addr) + sizeof(*addr->iso_bc);
-+
-+    memset(addr, 0, addr_len);
-+    addr->iso_family = AF_BLUETOOTH;
-+
-+    /* Set destination address to PAST destination address */
-+    bacpy(&addr->iso_bc->bc_bdaddr, (void *) bdaddr);
-+    addr->iso_bc->bc_bdaddr_type = bdaddr_type;
-+
-+    /* Rebind already connected socket to PAST address */
-+    bind(iso_socket, (struct sockaddr *)addr, addr_len);
-+
- SOCKET OPTIONS (SOL_BLUETOOTH)
- ==============================
- 
+On Mon, 13 Oct 2025 21:33:01 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds PAST related commands (HCI_OP_LE_PAST,
+> HCI_OP_LE_PAST_SET_INFO and HCI_OP_LE_PAST_PARAMS) and events
+> (HCI_EV_LE_PAST_RECEIVED) along with handling of PAST sender and
+> receiver features bits including new MGMG settings (
+> HCI_EV_LE_PAST_RECEIVED and MGMT_SETTING_PAST_RECEIVER) which
+> userspace can use to determine if PAST is supported by the
+> controller.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v4,1/8] Bluetooth: HCI: Add initial support for PAST
+    https://git.kernel.org/bluetooth/bluetooth-next/c/9694b70e91bc
+  - [v4,2/8] Bluetooth: hci_core: Introduce HCI_CONN_FLAG_PAST
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5518b6d3b39f
+  - [v4,3/8] Bluetooth: ISO: Add support to bind to trigger PAST
+    https://git.kernel.org/bluetooth/bluetooth-next/c/bac683543e72
+  - [v4,4/8] Bluetooth: HCI: Always use the identity address when initializing a connection
+    https://git.kernel.org/bluetooth/bluetooth-next/c/65a0aadac242
+  - [v4,5/8] Bluetooth: ISO: Attempt to resolve broadcast address
+    https://git.kernel.org/bluetooth/bluetooth-next/c/18339e7d7e44
+  - [v4,6/8] Bluetooth: MGMT: Allow use of Set Device Flags without Add Device
+    https://git.kernel.org/bluetooth/bluetooth-next/c/12de14315ad7
+  - [v4,7/8] Bluetooth: ISO: Fix not updating BIS sender source address
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e7dbb54d27b2
+  - [v4,8/8] Bluetooth: ISO: Fix another instance of dst_type handling
+    https://git.kernel.org/bluetooth/bluetooth-next/c/19c922bc098a
+
+You are awesome, thank you!
 -- 
-2.51.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
