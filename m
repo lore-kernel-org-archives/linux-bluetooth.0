@@ -1,106 +1,210 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5857F223DEA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Oct 2025 20:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2982046BA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Oct 2025 21:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760560122; cv=none; b=qJt/0SmljBsDzNkqmmP8B8nHXuC0CABb55M/jT+NpyzLFO5aKpIK0vWOQWv8bG1HX54fYMm7edWD6VBWaFXaxWj2aHZLlKde1OJveaGZp/aF75xbf/u+PB7tjftaQhtD4RNnI3f+fpeTq/QUJK8kQJj/Vr0ktZ8Axy5JvpYoIqI=
+	t=1760562352; cv=none; b=VBF7I3pVw3RStkasgux/xUjECteXL/JJjZWyNYCk1dvoj6F/ul8sxJYOJAYJpFnIIVDvL7vqbm16QPh0R85uY8/joshGQCbkIucG08e9cl5ehfdzmh5Yn8jQ8w3VyJpTQWvQYM1c0zinfp1CGXR5+Dk/nJUUgL5NM6hB/EKcdLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760560122; c=relaxed/simple;
-	bh=wBmpLOp63/GtJn0niIeRp5e+luDBwVuNO0F5JohPX1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lzPGUD1rPOColzrqDTf+GLFZn/3mjbUrKep+VJXDxhFYdX8kVAApqrv/JbYNTb0vI41pOhGSjsGpAfy2nNKH2t6WIQ9f02DtMg4qBSKbbZCuoI6KW7ME3cefPqvVEDDAH+4Id+sdckekagiBf04eacnbk1c4AQp4K36QbUUFock=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.0.33.25] (unknown [62.214.191.67])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id B7D3A60213AEE;
-	Wed, 15 Oct 2025 22:28:18 +0200 (CEST)
-Message-ID: <c31398c7-4476-4e3e-b773-0143e53bd301@molgen.mpg.de>
-Date: Wed, 15 Oct 2025 22:28:12 +0200
+	s=arc-20240116; t=1760562352; c=relaxed/simple;
+	bh=zfmlfvR4JYWmfwz+oajUeY3CaTFd6BkEM/Y50y46ipI=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=WxCks3DQtjyWyr+kKxj7jq8LiIkusifcm0ENbm14nAvh40jR3cL7mvgFkJhVDDfj9sbOu1LABlfxOieQinhmueWoSRMviX1fs+SchD0Eduqc1Y26uqOnhpPRohcWfccjsBhakB6BwJma16uQgUo/ylKcKb+a3tm3TdMR4aQuQVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PLilgHY4; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PLilgHY4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760562351; x=1792098351;
+  h=date:from:to:cc:subject:message-id;
+  bh=zfmlfvR4JYWmfwz+oajUeY3CaTFd6BkEM/Y50y46ipI=;
+  b=PLilgHY4X4+f/mxXAaPhDXcF42lrylK5eRZURXhC0EExrSCmsUA5V6LH
+   0Pkk2gRp8xIKR0Yk/TP7KCJjOdYNOV5rimVwlpfaa/bv8JjyyNyHWXIGI
+   8ACq3zovuyMU8Q0oXT5+O8sQmYWarFWwWsnjOKQCcDZ78zJRNQE5pKb9u
+   UkcUf/4sjpsk2BSJWkuefZG+TrRfuYupebgVLDEUPwF8MyY7hORljSMYk
+   Sdzib0w4/a434+oauiGhBXtfNw7gBo3/al+rtQstNWgDbOAM7lzcM1XDG
+   uPKxOT4eJYSgpw9sPAbtzKv24OdWRqdU5xdgVJas2VIiqhpjAimA2CVjB
+   A==;
+X-CSE-ConnectionGUID: 7Q8Vt3feQuaeTpTWotKovQ==
+X-CSE-MsgGUID: LNrxsA5kRSaKF0Srfoa82Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="62642967"
+X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
+   d="scan'208";a="62642967"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 14:05:50 -0700
+X-CSE-ConnectionGUID: TP/TfYZzTS+Y08VAcUEkGA==
+X-CSE-MsgGUID: WvcV/fuOR+2p0kJIjoEVSQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
+   d="scan'208";a="182684713"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by fmviesa008.fm.intel.com with ESMTP; 15 Oct 2025 14:05:49 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v98gt-0004EN-0d;
+	Wed, 15 Oct 2025 21:05:47 +0000
+Date: Thu, 16 Oct 2025 05:05:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 19c922bc098afd03ce8f3051598a9b4e28770097
+Message-ID: <202510160503.gw6gsNPj-lkp@intel.com>
+User-Agent: s-nail v14.9.25
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Fix event packet loss issue
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com,
- Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-References: <20251015101436.2579377-1-kiran.k@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251015101436.2579377-1-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Dear Kiran,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 19c922bc098afd03ce8f3051598a9b4e28770097  Bluetooth: ISO: Fix another instance of dst_type handling
 
+elapsed time: 1452m
 
-Thank you for the patch.
+configs tested: 133
+configs skipped: 5
 
-Am 15.10.25 um 12:14 schrieb Kiran K:
-> In the current btintel_pcie driver implementation, when an interrupt is
-> received, the driver checks for the alive cause before the TX/RX cause.
-> Handling the alive cause involves resetting the TX/RX queue indices.
-> This flow works correctly when the causes are mutually exclusive.
-> However, if both cause bits are set simultaneously, the alive cause
-> resets the queue indices, resulting in an event packet drop and a
-> command timeout. To fix this issue, the driver is modified to handle all
-> other causes before checking for the alive cause.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-Please share a test case.
+tested configs:
+alpha                             allnoconfig    gcc-15.1.0
+alpha                            allyesconfig    gcc-15.1.0
+alpha                               defconfig    gcc-15.1.0
+arc                              allmodconfig    gcc-15.1.0
+arc                               allnoconfig    gcc-15.1.0
+arc                              allyesconfig    gcc-15.1.0
+arc                                 defconfig    gcc-15.1.0
+arc                         haps_hs_defconfig    gcc-15.1.0
+arc                   randconfig-001-20251015    gcc-8.5.0
+arc                   randconfig-002-20251015    gcc-8.5.0
+arm                              allmodconfig    gcc-15.1.0
+arm                               allnoconfig    clang-22
+arm                              allyesconfig    gcc-15.1.0
+arm                                 defconfig    clang-22
+arm                   randconfig-001-20251015    clang-22
+arm                   randconfig-002-20251015    clang-22
+arm                   randconfig-003-20251015    gcc-8.5.0
+arm                   randconfig-004-20251015    clang-22
+arm64                            allmodconfig    clang-19
+arm64                             allnoconfig    gcc-15.1.0
+arm64                               defconfig    gcc-15.1.0
+arm64                 randconfig-001-20251015    clang-22
+arm64                 randconfig-002-20251015    gcc-13.4.0
+arm64                 randconfig-003-20251015    clang-22
+arm64                 randconfig-004-20251015    clang-22
+csky                              allnoconfig    gcc-15.1.0
+csky                                defconfig    gcc-15.1.0
+csky                  randconfig-001-20251015    gcc-15.1.0
+csky                  randconfig-002-20251015    gcc-9.5.0
+hexagon                           allnoconfig    clang-22
+hexagon                          allyesconfig    clang-22
+hexagon                             defconfig    clang-22
+hexagon               randconfig-001-20251015    clang-22
+hexagon               randconfig-002-20251015    clang-19
+i386                             allmodconfig    gcc-14
+i386                              allnoconfig    gcc-14
+i386                             allyesconfig    gcc-14
+i386        buildonly-randconfig-001-20251015    gcc-13
+i386        buildonly-randconfig-002-20251015    gcc-14
+i386        buildonly-randconfig-003-20251015    clang-20
+i386        buildonly-randconfig-004-20251015    clang-20
+i386        buildonly-randconfig-005-20251015    clang-20
+i386        buildonly-randconfig-006-20251015    clang-20
+i386                                defconfig    clang-20
+loongarch                        allmodconfig    clang-19
+loongarch                         allnoconfig    clang-22
+loongarch                           defconfig    clang-19
+loongarch             randconfig-001-20251015    gcc-15.1.0
+loongarch             randconfig-002-20251015    gcc-15.1.0
+m68k                             allmodconfig    gcc-15.1.0
+m68k                              allnoconfig    gcc-15.1.0
+m68k                             allyesconfig    gcc-15.1.0
+m68k                                defconfig    gcc-15.1.0
+m68k                       m5475evb_defconfig    gcc-15.1.0
+microblaze                       allmodconfig    gcc-15.1.0
+microblaze                        allnoconfig    gcc-15.1.0
+microblaze                       allyesconfig    gcc-15.1.0
+microblaze                          defconfig    gcc-15.1.0
+mips                              allnoconfig    gcc-15.1.0
+mips                           mtx1_defconfig    clang-22
+nios2                             allnoconfig    gcc-11.5.0
+nios2                               defconfig    gcc-11.5.0
+nios2                 randconfig-001-20251015    gcc-8.5.0
+nios2                 randconfig-002-20251015    gcc-8.5.0
+openrisc                          allnoconfig    gcc-15.1.0
+openrisc                         allyesconfig    gcc-15.1.0
+openrisc                            defconfig    gcc-15.1.0
+parisc                            allnoconfig    gcc-15.1.0
+parisc                           allyesconfig    gcc-15.1.0
+parisc                              defconfig    gcc-15.1.0
+parisc                randconfig-001-20251015    gcc-9.5.0
+parisc                randconfig-002-20251015    gcc-8.5.0
+parisc64                            defconfig    gcc-15.1.0
+powerpc                          allmodconfig    gcc-15.1.0
+powerpc                           allnoconfig    gcc-15.1.0
+powerpc                          allyesconfig    clang-22
+powerpc                     ksi8560_defconfig    gcc-15.1.0
+powerpc                     ppa8548_defconfig    gcc-15.1.0
+powerpc               randconfig-001-20251015    gcc-15.1.0
+powerpc               randconfig-002-20251015    gcc-12.5.0
+powerpc               randconfig-003-20251015    clang-22
+powerpc64             randconfig-001-20251015    clang-22
+powerpc64             randconfig-002-20251015    clang-22
+powerpc64             randconfig-003-20251015    gcc-13.4.0
+riscv                            allmodconfig    clang-22
+riscv                             allnoconfig    gcc-15.1.0
+riscv                            allyesconfig    clang-16
+riscv                               defconfig    clang-22
+riscv                 randconfig-001-20251015    gcc-10.5.0
+riscv                 randconfig-002-20251015    clang-22
+s390                             allmodconfig    clang-18
+s390                              allnoconfig    clang-22
+s390                             allyesconfig    gcc-15.1.0
+s390                                defconfig    clang-22
+s390                  randconfig-001-20251015    gcc-12.5.0
+s390                  randconfig-002-20251015    clang-22
+sh                               allmodconfig    gcc-15.1.0
+sh                                allnoconfig    gcc-15.1.0
+sh                               allyesconfig    gcc-15.1.0
+sh                                  defconfig    gcc-15.1.0
+sh                ecovec24-romimage_defconfig    gcc-15.1.0
+sh                    randconfig-001-20251015    gcc-11.5.0
+sh                    randconfig-002-20251015    gcc-11.5.0
+sh                           se7724_defconfig    gcc-15.1.0
+sparc                            allmodconfig    gcc-15.1.0
+sparc                             allnoconfig    gcc-15.1.0
+sparc                               defconfig    gcc-15.1.0
+sparc                 randconfig-001-20251015    gcc-8.5.0
+sparc                 randconfig-002-20251015    gcc-13.4.0
+sparc64                             defconfig    clang-20
+sparc64               randconfig-001-20251015    clang-22
+sparc64               randconfig-002-20251015    gcc-11.5.0
+um                               allmodconfig    clang-19
+um                                allnoconfig    clang-22
+um                               allyesconfig    gcc-14
+um                                  defconfig    clang-22
+um                             i386_defconfig    gcc-14
+um                    randconfig-001-20251015    clang-22
+um                    randconfig-002-20251015    clang-22
+um                           x86_64_defconfig    clang-22
+x86_64                            allnoconfig    clang-20
+x86_64                           allyesconfig    clang-20
+x86_64      buildonly-randconfig-001-20251015    clang-20
+x86_64      buildonly-randconfig-002-20251015    gcc-14
+x86_64      buildonly-randconfig-003-20251015    clang-20
+x86_64      buildonly-randconfig-004-20251015    clang-20
+x86_64      buildonly-randconfig-005-20251015    gcc-14
+x86_64      buildonly-randconfig-006-20251015    gcc-13
+x86_64                              defconfig    gcc-14
+x86_64                          rhel-9.4-rust    clang-20
+xtensa                            allnoconfig    gcc-15.1.0
+xtensa                randconfig-001-20251015    gcc-9.5.0
+xtensa                randconfig-002-20251015    gcc-15.1.0
 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-> Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
-> ---
->   drivers/bluetooth/btintel_pcie.c | 11 ++++++-----
->   1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index 6d3963bd56a9..a075d8ec4677 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -1467,11 +1467,6 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
->   	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP1)
->   		btintel_pcie_msix_gp1_handler(data);
->   
-> -	/* This interrupt is triggered by the firmware after updating
-> -	 * boot_stage register and image_response register
-> -	 */
-> -	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0)
-> -		btintel_pcie_msix_gp0_handler(data);
->   
->   	/* For TX */
->   	if (intr_fh & BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0) {
-> @@ -1487,6 +1482,12 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
->   			btintel_pcie_msix_tx_handle(data);
->   	}
->   
-> +	/* This interrupt is triggered by the firmware after updating
-> +	 * boot_stage register and image_response register
-> +	 */
-> +	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0)
-> +		btintel_pcie_msix_gp0_handler(data);
-> +
->   	/*
->   	 * Before sending the interrupt the HW disables it to prevent a nested
->   	 * interrupt. This is done by writing 1 to the corresponding bit in
-
-The diff looks good.
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
