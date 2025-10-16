@@ -1,69 +1,69 @@
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BDE2DC773
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Oct 2025 21:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B62F21CA00
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Oct 2025 21:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760648433; cv=none; b=tOfpfxHNp/iIitg0h0jaZWoQOFH1As8JpMRnfBvd3DsFvXpfmgkJBa8E95hUhuB8sxkRVxEDF+nm6XnE4OhhZKkBBFREOWMpegxfAlgkpHcHYJ1+D82IDRddNbZWDeb5f6+0aJhBMvSC+yF0OkujopKciEvrlOz/yjwUO0q7nb8=
+	t=1760648434; cv=none; b=LAOqiP+Fv1UUuVoHtJvdYhF7V/J2M+ktXnLTfG7U5dA6dAyOtoCFwX9X0BuYFnoCgc+H++YPnP7YiZRaT/7yHDuM2OIakVP34N4liWpGp7dOXPHdAbhKXdKfV36Agp2NjHxFBNvwwEQ6i1UAh5Im+XsyL4IL1Cm/CQUoNUiXl+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760648433; c=relaxed/simple;
-	bh=gjiiKM3N6T/YDmBEsjnWkymjtix668NAS97cnNaOMZ8=;
+	s=arc-20240116; t=1760648434; c=relaxed/simple;
+	bh=Zhx6I4Ef4aK31jccG4/OyNQNBokh+PDk5duKrkzys8w=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rrlIPYINM7C5L0XxK4V6psA7Wn0KAE+TENWhWGZGX3ItOVPPir9d/6CoPvO4MeMdkRobf4N38Ul1l0Jiqrl3NF9E9FccTNWP97otYPJCGbME61p3st4Rnpc9kODk98+KgbdTEPJsSwXQHK39W/ZRYQyky3qp9W8NAaBpxSd/ksw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AORzSSCy; arc=none smtp.client-ip=209.85.222.54
+	 MIME-Version; b=jsIH402zHQQ8V+OqbvcfAdVu1DkaZ2ZNEQkiSqNEfdnqqR3lgKTRBmqyzXtI6x5tTcmPO2lPKDIP9/Yu7/0pOJ4DAR2KNwGPV/vykLpKm9OMh64VAm6/he5PebdK41orcng1zelaRllm09z1pz2B8xAJruSc8Vy0BK9kdlW+0zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TE/6STFn; arc=none smtp.client-ip=209.85.221.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AORzSSCy"
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-931043679fbso368727241.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Oct 2025 14:00:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TE/6STFn"
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-551b9d94603so392023e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Oct 2025 14:00:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760648430; x=1761253230; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760648431; x=1761253231; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=JehWMDGwgVRRgmxC5yPf+RbYRdDl7YkMvu8U6uFk79w=;
-        b=AORzSSCymGmI8GZ9DxmF3kRayCyFr23aAiYtJM3x5I+KxtvFXZEcbSR0pJARwev6Ed
-         wIgAuTP5hJE2smSBmCBumQ01hUh9JzVQpegy14X8Nv/VnGonpsElxbigY+RbVHIfkVwI
-         63fjrIMjDrXzhmRPncVn2sI1vJYPx+GZlIsCUZv7x+Ec5WdTPtnzXQjhXCIau40w5jLu
-         0CB8HffRgypoQkFPVNJShbKEENQXUd9oZQpwEfjtj1kZANej4p30cKejomtIcm0MYHWZ
-         pAJcNJzOT1CNZXfgvwTBFYqk3k8gJIJVjR6BVOB+lZbVY4/I7AONInV4oKl2r5DhsH66
-         34ZQ==
+        bh=EfdVVKoj2sADQBQjrXjKVAOeL+Zvfw2HqUcCJQjjBts=;
+        b=TE/6STFnu2WL6OsJoG1SeF39IDHtdN945SVmw+8llGqv9FhTvnSPfapAEGJ+A9n/6o
+         whyLrDb1QkdXz6OlQNzJx8wuAAEFtQViQSOWQzAjb/+k5Zcg30p5jwGlHp2WojWfflN8
+         3NxLMnH9zdAsygr5CmN2qblSqvlwNfPKEXBeGrf7gJVTg+5PuINiZXxvuBlj2R4QUgis
+         JlB0FYNh5GD8w0grMQ6iUkXaEvWMVvh0+xEC6PReX12ILBJ7aFXOSN8/YCUMRXZJi91G
+         BX5oG7/tpxKBhTuOxSeyUiNtfHQ64B2WLY1gzjHcoOFl6Drp2JF0rxy5ki7tiU7G8LN4
+         0uLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760648430; x=1761253230;
+        d=1e100.net; s=20230601; t=1760648431; x=1761253231;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JehWMDGwgVRRgmxC5yPf+RbYRdDl7YkMvu8U6uFk79w=;
-        b=LFevbMo5wl6fwxgiSHn/XOg5fbSpMjENFkDtoPr4/ArPHnGWlERSILD85MdEumuGwn
-         5EqDa+Yzxk+YdGYCnmDxZVzZL1QO7q2WASPv1jEceeUk3LoAP2VINKLGgsw5qWkJdbQd
-         Z31Fuf/Dkc7fqiCwD+FAw7qJmyJLvPzr0eZflSanxWAG/tGo9Dy2vlaVr1Ha9a2Vzcb6
-         yXolCrEQJ2E7wlrzJXsVTarZWnw+VPKY8VSz8s+oBkRDW+nrFAGzgaY0l80xOG5fQPP0
-         on0QMvJLxWOojxyzaZEIns4JOitm3VBy5dSvpz0ZzxTgstQ5/UHrXn6qaY+E+o9SaV24
-         PGtw==
-X-Gm-Message-State: AOJu0YylOrbBacrtwOeBjfAH76PVEymWPAI6TFjtQsT+YzMziKwpyAwp
-	F/XTC4Wvc3PBrxHJ3FG0HlGIUrhYJQztJ683oLx4B68a5fPfjHjdsAREDin4S9Yt
-X-Gm-Gg: ASbGncvggGUoCHlSdOkZPotYAhwe+37EdtWL1/iuvuNQGYl73xIRMXe4nv+4ouZ/h+s
-	CbgX2Cw0Xl68E0wGTkN40Y79MGsMp7w1BvuyT4/gJ31TLJKoxsvLxtQqw47zPT5276Aa4YdO0M/
-	cfyziAdvMkVBwGNuIVx2BthIthuGr3O6nTEMgdQ7TIn0xwN+KbWJG2ZGVb02ahrpQLBPoglvDIQ
-	vAKc1uB6qPxD/Sl1x4PcOTBaHpiP8/imy9X5bEKlhlB/tXgr9JVNwZ+2txRnBcV1Kd3TqySmbvF
-	PP3Vtm9RMuaA7JAMas3zw2CYedi01ormqWv86kQwJ45DJW1W6POIOs/mh4t0uQdAL+mR9ycKy3C
-	sboiiBfTsBVr7TdvhupaDPK7YAPPT11ZR/Dangb+6uxw3GYCYI4VWBqlN+4F8prKD+7NFohcg1f
-	053aM=
-X-Google-Smtp-Source: AGHT+IHIhWRIrywzcsNPi3vdHDNqZvtj1HTVlDst6jh25ONpuYL7XVIfh7WfGwt2Napvp6r/R/lB3Q==
-X-Received: by 2002:a05:6102:610b:10b0:5d7:ddf6:b3b7 with SMTP id ada2fe7eead31-5d7ddf6b9f2mr595580137.8.1760648429578;
-        Thu, 16 Oct 2025 14:00:29 -0700 (PDT)
+        bh=EfdVVKoj2sADQBQjrXjKVAOeL+Zvfw2HqUcCJQjjBts=;
+        b=o//bGlY3LduFeNHKr94p9QbK2bdJ1j9gQwC7OJNdSWrJ+p1JgmcAF5M+5yVmtHMGn+
+         IIVoPt8koARa0/mQp8pmDj2jx8QY5FplNwdJZXLyTwAWVx8qE/OFqdKaGErSkMVxtfCM
+         C4miWjQD9zj3dWiD++KQ6Y9qGmB7zEGeCaVrpjSh3VlnRaB1tuCnkWVH0MeseJNMy7K0
+         9vijDf46put1CZjcxecvsgFCI62vfSh2/OEMdN0a/uhaD1POshbB880Kxg4HfgLN6FTm
+         DY97sY1eUPSV5NXb1V2E9usTd4KGqZsyMBg2HLRwiQNlJc2doAQ0e9IffJRHKqlnqkrN
+         NPqA==
+X-Gm-Message-State: AOJu0Yzs0/JF3zOUXqCARDI2MKW5GoasVtOMd5ABwecFFTPPRl39CRkZ
+	rI9fB0EAzKsaq7HXZt37WWCelNYM5/c4iIJ4g99uNCOR0jJrN86r+mYly1zROTks
+X-Gm-Gg: ASbGncurpxZipvTivmz+yGANc3+eTgPy5iGAIF2OGNqvyCc7KRMoPn55Yo63NvqJbCm
+	h0tEbSf4jqBYKzHhml7M0CpyG+nsB4907DFV1DVwuUg0SHQw6KrSBcnZdPMiy9ZZhBvCNoiY89e
+	+IhPxrzBaHcNPDvZ9Q5rq+snTdssjD37kq5/ygSyPgCKSyC60E4qsw5+U67rUOycndE0+oytLMm
+	eNPad+BeXtwfmgHbRJXICDXOJ3Ytz/7Z74FjgBQLJj9SPCVibahm4aJWzRWj4Rmimd/CLsu59WQ
+	Fi9UXOC2sGn/QIiVKHaVxWNf6dZFvfqnb6Lo4OblDioVv+50/4fdbOI/tOrC+dqzjdLoNwLt8Tu
+	SpBNXJfE/9aNFH5/JZp7ON2rBDOcPJjDQDvXPMG83I+aBk/uGgOtlHaBjEocI0SSs3yT2WpFi/2
+	H6YPadNnz1RmIfIw==
+X-Google-Smtp-Source: AGHT+IGfhmRSpD5gBq6fP5YPBh1NK+2JkIIHYkRZrJ3/Kpbq/ZjaRsBn8t6pjRl7rajPmN4CI5PAUA==
+X-Received: by 2002:a05:6123:2e6:b0:554:a881:c198 with SMTP id 71dfb90a1353d-5564ed887a0mr835431e0c.1.1760648431180;
+        Thu, 16 Oct 2025 14:00:31 -0700 (PDT)
 Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-554d80d9bf0sm6590304e0c.18.2025.10.16.14.00.27
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-554d80d9bf0sm6590304e0c.18.2025.10.16.14.00.29
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 14:00:28 -0700 (PDT)
+        Thu, 16 Oct 2025 14:00:30 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 02/13] device: Add initial support for setting DEVICE_FLAG_PAST
-Date: Thu, 16 Oct 2025 17:00:08 -0400
-Message-ID: <20251016210019.191878-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 03/13] bass: Add support for setting DEVICE_FLAG_PAST
+Date: Thu, 16 Oct 2025 17:00:09 -0400
+Message-ID: <20251016210019.191878-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251016210019.191878-1-luiz.dentz@gmail.com>
 References: <20251016210019.191878-1-luiz.dentz@gmail.com>
@@ -77,185 +77,43 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces device_set_past_support which can be used by drivers
-to indicate that DEVICE_FLAG_PAST shall be changed.
+This attempts to check if setting DEVICE_FLAG_PAST is possible based on
+the MGMT settings.
 ---
- src/adapter.c | 31 +++++++++++++++++++++++--------
- src/adapter.h |  2 +-
- src/device.c  | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- src/device.h  |  3 +++
- 4 files changed, 74 insertions(+), 9 deletions(-)
+ profiles/audio/bass.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 1ee2f3a08164..4452034630f8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5640,6 +5640,8 @@ static void add_device_complete(uint8_t status, uint16_t length,
- 	struct btd_adapter *adapter = user_data;
- 	struct btd_device *dev;
- 	char addr[18];
-+	uint32_t flags;
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index e4d343a1fc02..73bdf52128f9 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -30,6 +30,7 @@
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/uuid.h"
+ #include "bluetooth/iso.h"
++#include "bluetooth/mgmt.h"
+ 
+ #include "src/dbus-common.h"
+ #include "src/shared/util.h"
+@@ -1253,8 +1254,17 @@ static void bass_data_add(struct bass_data *data)
+ 
+ 	queue_push_tail(sessions, data);
+ 
+-	if (data->service)
++	if (data->service) {
++		struct btd_adapter *adapter = device_get_adapter(data->device);
++		bool initiator = btd_service_is_initiator(data->service);
 +
- 
- 	if (length < sizeof(*rp)) {
- 		btd_error(adapter->dev_id,
-@@ -5669,8 +5671,7 @@ static void add_device_complete(uint8_t status, uint16_t length,
- 	DBG("%s (%u) added to kernel connect list", addr, rp->addr.type);
- 
- 	if (btd_opts.device_privacy) {
--		uint32_t flags = btd_device_get_current_flags(dev);
--
-+		flags = btd_device_get_current_flags(dev);
- 		/* Set Device Privacy Mode if it has not set the flag yet. */
- 		if (!(flags & DEVICE_FLAG_DEVICE_PRIVACY)) {
- 			/* Include the pending flags, or they may get
-@@ -5682,8 +5683,18 @@ static void add_device_complete(uint8_t status, uint16_t length,
- 						DEVICE_FLAG_DEVICE_PRIVACY,
- 						set_device_privacy_complete,
- 						dev);
-+			return;
- 		}
- 	}
-+
-+	/* Check if any flag was marked as pending before ADD_DEVICE
-+	 * complete then set it now
-+	 */
-+	flags = btd_device_get_pending_flags(dev);
-+	if (flags)
-+		adapter_set_device_flags(adapter, dev, flags,
-+						set_device_privacy_complete,
-+						dev);
- }
- 
- void adapter_auto_connect_add(struct btd_adapter *adapter,
-@@ -5725,7 +5736,7 @@ void adapter_auto_connect_add(struct btd_adapter *adapter,
- 	adapter->connect_list = g_slist_append(adapter->connect_list, device);
- }
- 
--void adapter_set_device_flags(struct btd_adapter *adapter,
-+int adapter_set_device_flags(struct btd_adapter *adapter,
- 				struct btd_device *device, uint32_t flags,
- 				mgmt_request_func_t func, void *user_data)
- {
-@@ -5737,14 +5748,15 @@ void adapter_set_device_flags(struct btd_adapter *adapter,
- 	uint8_t bdaddr_type;
- 	bool ll_privacy = btd_adapter_has_settings(adapter,
- 						MGMT_SETTING_LL_PRIVACY);
-+	unsigned int id;
- 
- 	if (!btd_has_kernel_features(KERNEL_CONN_CONTROL) ||
--				(supported | flags) != supported)
--		return;
-+			(supported && (supported | flags) != supported))
-+		return -EINVAL;
- 
- 	/* Check if changing flags are pending */
- 	if ((current ^ flags) == (flags & pending))
--		return;
-+		return -EINPROGRESS;
- 
- 	/* Set Device Privacy Mode if it has not set the flag yet. */
- 	if (btd_opts.device_privacy && !(flags & DEVICE_FLAG_DEVICE_PRIVACY))
-@@ -5764,9 +5776,12 @@ void adapter_set_device_flags(struct btd_adapter *adapter,
- 	cp.addr.type = bdaddr_type;
- 	cp.current_flags = cpu_to_le32(flags);
- 
--	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_DEVICE_FLAGS, adapter->dev_id,
--		  sizeof(cp), &cp, func, user_data, NULL))
-+	id = mgmt_send(adapter->mgmt, MGMT_OP_SET_DEVICE_FLAGS, adapter->dev_id,
-+			  sizeof(cp), &cp, func, user_data, NULL);
-+	if (id != 0)
- 		btd_device_set_pending_flags(device, flags);
-+
-+	return id == 0 ? -EBUSY : 0;
- }
- 
- static void device_flags_changed_callback(uint16_t index, uint16_t length,
-diff --git a/src/adapter.h b/src/adapter.h
-index ad81a10b1bb1..dd0c90d9cb3a 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -237,7 +237,7 @@ void adapter_connect_list_remove(struct btd_adapter *adapter,
- typedef void (*adapter_set_device_flags_func_t)(uint8_t status, uint16_t length,
- 						const void *param,
- 						void *user_data);
--void adapter_set_device_flags(struct btd_adapter *adapter,
-+int adapter_set_device_flags(struct btd_adapter *adapter,
- 				struct btd_device *device, uint32_t flags,
- 				adapter_set_device_flags_func_t func,
- 				void *user_data);
-diff --git a/src/device.c b/src/device.c
-index 8d74ae0ea0ff..3e907858b9d3 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1733,6 +1733,53 @@ void device_set_wake_allowed(struct btd_device *device, bool wake_allowed,
- 					set_wake_allowed_complete, device);
- }
- 
-+static void set_past_complete(uint8_t status, uint16_t length,
-+					 const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_set_device_flags *rp = param;
-+	struct btd_device *dev = user_data;
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Set device flags return status: %s",
-+					mgmt_errstr(status));
-+		return;
+ 		btd_service_set_user_data(data->service, data);
++		if ((!initiator && btd_adapter_has_settings(adapter,
++				MGMT_SETTING_PAST_RECEIVER)) || (initiator &&
++				btd_adapter_has_settings(adapter,
++				MGMT_SETTING_PAST_SENDER)))
++			device_set_past_support(data->device, true);
 +	}
-+
-+	if (length < sizeof(*rp)) {
-+		error("Too small Set Device Flags complete event: %d", length);
-+		return;
-+	}
-+
-+	btd_device_flags_changed(dev, dev->supported_flags, dev->pending_flags);
-+}
-+
-+void device_set_past_support(struct btd_device *device, bool value)
-+{
-+	uint32_t flags;
-+	int err;
-+
-+	if (btd_device_flags_enabled(device, DEVICE_FLAG_PAST) == value)
-+		return;
-+
-+	DBG("value %s", value ? "true" : "false");
-+
-+	flags = device->current_flags;
-+
-+	/* Include the pending flags, or they may get overwritten. */
-+	flags |= device->pending_flags;
-+
-+	if (value)
-+		flags |= DEVICE_FLAG_PAST;
-+	else
-+		flags &= ~DEVICE_FLAG_PAST;
-+
-+	err = adapter_set_device_flags(device->adapter, device, flags,
-+					set_past_complete, device);
-+
-+	if (err)
-+		error("Failed to set past support: %s", strerror(-err));
-+}
-+
- static gboolean
- dev_property_get_wake_allowed(const GDBusPropertyTable *property,
- 			     DBusMessageIter *iter, void *data)
-diff --git a/src/device.h b/src/device.h
-index 9ff9cdfefc28..6ed8affa0d4a 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -158,6 +158,9 @@ void device_set_wake_support(struct btd_device *device, bool wake_support);
- void device_set_wake_override(struct btd_device *device, bool wake_override);
- void device_set_wake_allowed(struct btd_device *device, bool wake_allowed,
- 			     guint32 id);
-+
-+void device_set_past_support(struct btd_device *device, bool value);
-+
- void device_set_refresh_discovery(struct btd_device *dev, bool refresh);
+ }
  
- typedef void (*disconnect_watch) (struct btd_device *device, gboolean removal,
+ static bool match_data(const void *data, const void *match_data)
 -- 
 2.51.0
 
