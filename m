@@ -1,377 +1,169 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61DD2DE704
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Oct 2025 06:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EEB24A06D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Oct 2025 06:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760596600; cv=none; b=gQ55IqhS6bOIycYYpykRLJmMPjS1V6N99Xa1fZQLQ+o4LRBU8mq2ljA0gOnL9rbsD5fnUlSNKm0Pihb+Nh2rlWguO63oRPH5QfvNXK4+7E2eJCa5c13rDVHKvg5t5UqYbKRiNr6ui9aC1ssUzW7NRWT5dR1fw8eD2iBUkKsr1yo=
+	t=1760596925; cv=none; b=Wm4czvMKn+DDU07PwzWycob57QTZkb9XL6ub2ITMXsEcbWlKJ3JFnroo87VS3EIX+OD+ToE5xwfKWjQ6Z+8d8breZhDkd5EU3X/9pB4ZsyQEACZQa06/o2l2wOzw7O8TcTYDPfq6TaoFnFhhzM1A3sqAeRqPum4VkLDERmdr3Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760596600; c=relaxed/simple;
-	bh=4spb3EfjgtgTZVIR37hYwBdXQkeaAaG5O/Owv4ftt1k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IcGlDKwwfSnl9CZuXXaGsnPENN9lyVSISXLepwYOF9NF9INo2ViaqvIlupbEDi+h9NLhsYrLyBM+rMt3IAXqhP51FUkPshT+V5Cv8Ed9kkwzS5xXhfXZT0HSLgPocdS1JLhymc0jVuyck0bSsdsZbDTg6QSQBgVz5cEP2tVR9os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.212] (p5dc5567b.dip0.t-ipconnect.de [93.197.86.123])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 493116028F35E;
-	Thu, 16 Oct 2025 08:36:16 +0200 (CEST)
-Message-ID: <1854c81e-ae4e-434c-a034-0b9fce554b66@molgen.mpg.de>
-Date: Thu, 16 Oct 2025 08:36:15 +0200
+	s=arc-20240116; t=1760596925; c=relaxed/simple;
+	bh=jlBVib1g9oNtIrmPoqp3cCSNOvlFaUpXrvcjfUGK/Ks=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=IvDAEt+mtXMprdxpWMZqGb011njgtGs9PaLpgrJdYrsV20PwORuMLL+eAunWdoSBY3ux07y/NM2+ibNSTagl3dv+RXjAZlkVreBs8J3+XkdCiSL4fw2OdwtM8C9dicQIXz7/4y8/sf9R2TS3BOnWQMvt67F3ykcD303HUXHC7PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H24B6BbR; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H24B6BbR"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b550a522a49so303648a12.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Oct 2025 23:42:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760596922; x=1761201722; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MWeGi8BGa298I2VSMgIupxGZfJdK1/p/GAhCbq3HElw=;
+        b=H24B6BbRXxfQqed982HCFTr4nI+0A91ZKnHPhNWThKbU4sOVdiBHYCi5RF4j7xM6nf
+         IePNgwXTxjH3UecE/V2Z6q08jphkWuvr/8qpzoBHAbQNrGLJf3ATj8E1KatLT3F/YJvP
+         N8Q6SYHfDpUT5HTzC8lI/otHiUJZ08KIiIGs+bmnrljknIhw9gd5HnGvF17dZ7mmrURP
+         NmcPtexn/ouEVj3LoBneKQDzTzhAh4eOz2x75VvN8NdGbOc/jzQ6gSCM3uZVDCzbajGL
+         nmYs6eYe6den0VmAvWVtjvEoyH8TjlHBph8Zgf4yuN1+EqTGM+It9HwvUuOLr6phU+9K
+         Vyrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760596922; x=1761201722;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MWeGi8BGa298I2VSMgIupxGZfJdK1/p/GAhCbq3HElw=;
+        b=kQm3DE2huXdf1ljDukMnmUv0BounSKEQK9Sq15Qycwz2WtV0PeAPzlXumId0R61iPb
+         kmc6/Z1xqemWxwbLMiqx4jXfDie/c7cLpryayJLyhXbCCxqP8+kau1B8RBbPeW2lWaBE
+         5P1Qub0G4t4o6lOGP5zfa++mRRvirY9pLqevt8jh+P9B46onGZvlI+0flCv2pz5XZX6g
+         XO9DLhOZZVEJqgrxLauOh9MWY1VKdYz0QDWFc9BSqnkmwQWfzox/7swrVSbKAMqN6/0q
+         tG4FLj99KZLwaA+DchSuONbJaZSCvKRJSgnxXhRyy4p/lEeDPulZTx9dK7YS9kXGUgA/
+         9oVA==
+X-Gm-Message-State: AOJu0YwIxFtMXk1BFPKen9rXqM3qAvqM7Q4WsI0NW1yuqojSD2CiYhLk
+	1fJm280iVlE4k/91C7H374DKje9iw9OB3wxjdVlztUTDgY3FKtj7AmERBFqbBA==
+X-Gm-Gg: ASbGncvbaFTfV+9ZTJUfpSn0lhwmfxiu/NuI5wNnJ2hnrCy/lvSbNtAJ3bj5hTIwg8y
+	eAYdXT0O47KAcqQXBKgi+JgQ0oPcb6Ve6TuQvCdmJDnj39vteZi3NPHMcBuwTIWglU/9+KQJtYK
+	vTxVRhUA/426V9QU7Ost5iNHIm936riibBYxppmwIK8Xi2diEOIaKLh/SLy5FH7AmkkyNuS6emP
+	wAvc9bqMtGaIgkKVqtPHUBdyHvK0SkInuXhTbmUv3JLL/pf4y3Vb0RgIk5MCaKZ8q/uR8T4LySO
+	MxVYr/oiwcZDU0ByuC5QnA2z14DIey+s6rRxmrbNbQkMj3NMYbAIyuROWorQg+S+Y1dNLt2EZLT
+	X8zjV7+EfsJ5y/WTrbagzOX7NpDGc21+cUv2O/7gCo1TvcfjCM5bOVl0dToUdTIQ9QjwGcYYckt
+	vB2ivupsy3BAvLSlcupg==
+X-Google-Smtp-Source: AGHT+IHCxkpwLm0ccoeT0/hG/O9L3WtvgxoOUk4DeQwDoR8g8gG/QCkEViThq8WHnQ0xrWcV+/YMTg==
+X-Received: by 2002:a17:903:41c9:b0:24f:dbe7:73a2 with SMTP id d9443c01a7336-290272c1a81mr458293485ad.31.1760596922514;
+        Wed, 15 Oct 2025 23:42:02 -0700 (PDT)
+Received: from [172.17.0.2] ([128.24.160.168])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29099310a6csm18062085ad.8.2025.10.15.23.42.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Oct 2025 23:42:02 -0700 (PDT)
+Message-ID: <68f093ba.170a0220.369d8a.68fa@mx.google.com>
+Date: Wed, 15 Oct 2025 23:42:02 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4549020580643442297=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Add support for smart trigger
- dump
-To: Kiran K <kiran.k@intel.com>, Vijay Satija <vijay.satija@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chandrashekar.devegowda@intel.com, chethan.tumkur.narayan@intel.com
-References: <20251016055755.2587652-1-kiran.k@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v1] Bluetooth: btintel_pcie: Add support for smart trigger dump
 In-Reply-To: <20251016055755.2587652-1-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20251016055755.2587652-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============4549020580643442297==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Dear Kiran, dear Vijay,
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1012167
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.41 seconds
+GitLint                       PENDING   0.41 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      24.40 seconds
+CheckAllWarning               PASS      26.82 seconds
+CheckSparse                   PASS      30.46 seconds
+BuildKernel32                 PASS      24.46 seconds
+TestRunnerSetup               PASS      488.24 seconds
+TestRunner_l2cap-tester       PASS      24.47 seconds
+TestRunner_iso-tester         FAIL      44.55 seconds
+TestRunner_bnep-tester        PASS      6.18 seconds
+TestRunner_mgmt-tester        FAIL      127.07 seconds
+TestRunner_rfcomm-tester      PASS      9.34 seconds
+TestRunner_sco-tester         PASS      14.39 seconds
+TestRunner_ioctl-tester       FAIL      10.54 seconds
+TestRunner_mesh-tester        FAIL      11.42 seconds
+TestRunner_smp-tester         PASS      8.45 seconds
+TestRunner_userchan-tester    PASS      6.41 seconds
+IncrementalBuild              PENDING   0.69 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+No test result found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 482 (98.4%), Failed: 4, Not Run: 4
+
+Failed Test Cases
+Pair Device - Legacy Success 1                       Failed       0.214 seconds
+Pair Device - Sec Mode 3 Success 1                   Failed       0.169 seconds
+Pair Device - Legacy Reject 2                        Failed       2.168 seconds
+Read Exp Feature - Success                           Failed       0.107 seconds
+##############################
+Test: TestRunner_ioctl-tester - FAIL
+Desc: Run ioctl-tester with test-runner
+Output:
+Total: 28, Passed: 26 (92.9%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Connection List                                      Failed       1.066 seconds
+Connection Info                                      Failed       0.141 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.852 seconds
+Mesh - Send cancel - 2                               Timed out    1.999 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Thank you for the patch.
 
-Am 16.10.25 um 07:57 schrieb Kiran K:
-> Based on the debug configuration, firmware can raise MSIX interrupt with
-
-MSI-X
-
-> firmware trigger cause bit set on specific events like Disconnection,
-> Connection Timeout, Page Timeout etc.
-> 
-> Upon receiving an MSIX interrupt with the firmware trigger cause bit
-
-MSI-X
-
-> set, the driver performs the following actions:
-> 
-> 1. Reads Device Memory: Retrieves data from the device memory,
->     constructs an HCI vendor event, and sends it to the monitor. This
->     event includes details about the trigger, such as connection timeout or
->     page timeout.
-> 
-> 2. Dumps Device Coredump: Generates a coredump containing firmware
->     traces for further analysis.
-
-Please give an example how to retrieve the coredump.
-
-Maybe also paste the new debug logs.
-
-> Signed-off-by: Vijay Satija <vijay.satija@intel.com>
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->   drivers/bluetooth/btintel.h      |   1 +
->   drivers/bluetooth/btintel_pcie.c | 154 +++++++++++++++++++++++++++++++
->   drivers/bluetooth/btintel_pcie.h |   9 +-
->   3 files changed, 163 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index 431998049e68..bb2bf0b17336 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -53,6 +53,7 @@ struct intel_tlv {
->   } __packed;
->   
->   #define BTINTEL_HCI_OP_RESET	0xfc01
-> +#define BTINTEL_HCI_OP_DEBUG	0xfcd9
->   
->   #define BTINTEL_CNVI_BLAZARI		0x900
->   #define BTINTEL_CNVI_BLAZARIW		0x901
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index 6d3963bd56a9..438c67f317b5 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -121,6 +121,21 @@ struct btintel_pcie_removal {
->   	struct work_struct work;
->   };
->   
-> +struct btintel_pcie_trigger_evt {
-> +	u8 type;
-> +	u8 len;
-> +	__le32 addr;
-> +	__le32 size;
-> +} __packed;
-> +
-> +struct btintel_pcie_fwtrigger_evt {
-> +	__le32 reserved;
-> +	u8	type; /* Debug Trigger event */
-> +	__le16	len;
-> +	u8	event_type;
-> +	__le16	event_id;
-> +} __packed;
-> +
->   static LIST_HEAD(btintel_pcie_recovery_list);
->   static DEFINE_SPINLOCK(btintel_pcie_recovery_lock);
->   
-> @@ -677,6 +692,11 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
->   		sizeof(*tlv) + strlen(vendor) +
->   		sizeof(*tlv) + strlen(driver);
->   
-> +	if (data->dmp_hdr.trigger_reason == BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT) {
-> +		data_len += sizeof(*tlv) + sizeof(data->dmp_hdr.event_type);
-> +		data_len += sizeof(*tlv) + sizeof(data->dmp_hdr.event_id);
-> +	}
-> +
->   	/*
->   	 * sizeof(u32) - signature
->   	 * sizeof(data_len) - to store tlv data size
-> @@ -724,6 +744,15 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
->   	p = btintel_pcie_copy_tlv(p, BTINTEL_CNVI_TOP, &data->dmp_hdr.cnvi_top,
->   				  sizeof(data->dmp_hdr.cnvi_top));
->   
-> +	if (data->dmp_hdr.trigger_reason == BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT) {
-> +		p = btintel_pcie_copy_tlv(p, BTINTEL_EVENT_TYPE,
-> +					  &data->dmp_hdr.event_type,
-> +					  sizeof(data->dmp_hdr.event_type));
-> +		p = btintel_pcie_copy_tlv(p, BTINTEL_EVENT_ID,
-> +					  &data->dmp_hdr.event_id,
-> +					  sizeof(data->dmp_hdr.event_id));
-> +	}
-> +
->   	memcpy(p, dbgc->bufs[0].data, dbgc->count * BTINTEL_PCIE_DBGC_BUFFER_SIZE);
->   	dev_coredumpv(&hdev->dev, pdata, dump_size, GFP_KERNEL);
->   	return 0;
-> @@ -1298,6 +1327,75 @@ static void btintel_pcie_read_hwexp(struct btintel_pcie_data *data)
->   	kfree(buf);
->   }
->   
-> +static int btintel_pcie_dump_fwtrigger_event(struct btintel_pcie_data *data)
-> +{
-> +	struct btintel_pcie_fwtrigger_evt *evt;
-> +	struct hci_event_hdr *hdr;
-> +	struct sk_buff *skb;
-> +	int len, err;
-
-Make `len` `unsigned int`?
-
-> +	u32 val;
-> +	u8 *buf;
-> +
-> +	if (!data->debug_evt_size || !data->debug_evt_addr)
-> +		return -EINVAL;
-> +
-> +	len = data->debug_evt_size;
-> +
-> +	buf = kzalloc(len, GFP_KERNEL);
-> +	if (!buf)
-> +		return -ENOMEM;
-> +
-> +	btintel_pcie_mac_init(data);
-> +
-> +	err = btintel_pcie_read_device_mem(data, buf, data->debug_evt_addr,
-> +					   data->debug_evt_size);
-> +	if (err)
-> +		goto exit_on_error;
-> +
-> +	evt = (void *)buf;
-> +	data->dmp_hdr.event_type  = evt->event_type;
-> +	data->dmp_hdr.event_id  = le16_to_cpu(evt->event_id);
-
-Please just use one space before the = above.
+---
+Regards,
+Linux Bluetooth
 
 
-Kind regards,
-
-Paul
-
-
-> +
-> +	bt_dev_dbg(data->hdev, "event type: 0x%2.2x event id: 0x%4.4x",
-> +		   data->dmp_hdr.event_type, data->dmp_hdr.event_id);
-> +
-> +	skb = bt_skb_alloc(sizeof(*hdr) + len, GFP_KERNEL);
-> +	if (!skb) {
-> +		err = -ENOMEM;
-> +		goto exit_on_error;
-> +	}
-> +	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
-> +	hdr = skb_put(skb, sizeof(*hdr));
-> +	hdr->evt = 0xff;
-> +	hdr->plen = len;
-> +	skb_put_data(skb, buf, len);
-> +
-> +	/* copy Intel specific pcie packet type */
-> +	val = BTINTEL_PCIE_HCI_EVT_PKT;
-> +	memcpy(skb_push(skb, BTINTEL_PCIE_HCI_TYPE_LEN), &val,
-> +	       BTINTEL_PCIE_HCI_TYPE_LEN);
-> +
-> +	btintel_pcie_recv_frame(data, skb);
-> +
-> +exit_on_error:
-> +	kfree(buf);
-> +	return err;
-> +}
-> +
-> +static void btintel_pcie_msix_fw_trigger_handler(struct btintel_pcie_data *data)
-> +{
-> +	bt_dev_dbg(data->hdev, "Received firmware smart trigger cause");
-> +
-> +	if (test_and_set_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags))
-> +		return;
-> +
-> +	/* Trigger device core dump when there is FW assert */
-> +	if (!test_and_set_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags))
-> +		data->dmp_hdr.trigger_reason  = BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT;
-> +
-> +	queue_work(data->workqueue, &data->rx_work);
-> +}
-> +
->   static void btintel_pcie_msix_hw_exp_handler(struct btintel_pcie_data *data)
->   {
->   	bt_dev_err(data->hdev, "Received hw exception interrupt");
-> @@ -1321,6 +1419,11 @@ static void btintel_pcie_rx_work(struct work_struct *work)
->   					struct btintel_pcie_data, rx_work);
->   	struct sk_buff *skb;
->   
-> +	if (test_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags)) {
-> +		btintel_pcie_dump_fwtrigger_event(data);
-> +		clear_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags);
-> +	}
-> +
->   	if (test_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags)) {
->   		btintel_pcie_dump_traces(data->hdev);
->   		clear_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags);
-> @@ -1467,6 +1570,9 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
->   	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP1)
->   		btintel_pcie_msix_gp1_handler(data);
->   
-> +	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG)
-> +		btintel_pcie_msix_fw_trigger_handler(data);
-> +
->   	/* This interrupt is triggered by the firmware after updating
->   	 * boot_stage register and image_response register
->   	 */
-> @@ -1555,6 +1661,7 @@ static struct btintel_pcie_causes_list causes_list[] = {
->   	{ BTINTEL_PCIE_MSIX_FH_INT_CAUSES_1,	BTINTEL_PCIE_CSR_MSIX_FH_INT_MASK,	0x01 },
->   	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0,	BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x20 },
->   	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x23 },
-> +	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x25 },
->   };
->   
->   /* This function configures the interrupt masks for both HW_INT_CAUSES and
-> @@ -2031,6 +2138,49 @@ static void btintel_pcie_synchronize_irqs(struct btintel_pcie_data *data)
->   		synchronize_irq(data->msix_entries[i].vector);
->   }
->   
-> +static int btintel_pcie_get_debug_info_addr(struct hci_dev *hdev)
-> +{
-> +	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-> +	struct btintel_pcie_trigger_evt *evt;
-> +	u8 param[1] = {0x10};
-> +	struct sk_buff *skb;
-> +	int err = 0;
-> +
-> +	skb = __hci_cmd_sync(hdev, BTINTEL_HCI_OP_DEBUG, 1, param,
-> +			     HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "Reading Intel read debug info address command failed (%ld)",
-> +			   PTR_ERR(skb));
-> +		/* Not all Intel products supports this command */
-> +		if (PTR_ERR(skb) == -EOPNOTSUPP)
-> +			return 0;
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	/* Check the status */
-> +	if (skb->data[0]) {
-> +		bt_dev_err(hdev, "Reading Intel read debug info command failed (0x%2.2x)",
-> +			   skb->data[0]);
-> +		err = -EIO;
-> +		goto exit_error;
-> +	}
-> +
-> +	/* Consume Command Complete Status field */
-> +	skb_pull(skb, 1);
-> +
-> +	evt = (void *)skb->data;
-> +
-> +	data->debug_evt_addr = le32_to_cpu(evt->addr);
-> +	data->debug_evt_size = le32_to_cpu(evt->size);
-> +
-> +	bt_dev_dbg(hdev, "config type: %u config len: %u debug event addr: 0x%8.8x size: 0x%8.8x",
-> +		   evt->type, evt->len, data->debug_evt_addr,
-> +		   data->debug_evt_size);
-> +exit_error:
-> +	kfree_skb(skb);
-> +	return err;
-> +}
-> +
->   static int btintel_pcie_setup_internal(struct hci_dev *hdev)
->   {
->   	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-> @@ -2128,6 +2278,10 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
->   	if (ver_tlv.img_type == 0x02 || ver_tlv.img_type == 0x03)
->   		data->dmp_hdr.fw_git_sha1 = ver_tlv.git_sha1;
->   
-> +	err = btintel_pcie_get_debug_info_addr(hdev);
-> +	if (err)
-> +		goto exit_error;
-> +
->   	btintel_print_fseq_info(hdev);
->   exit_error:
->   	kfree_skb(skb);
-> diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-> index 04b21f968ad3..ef9983891f4b 100644
-> --- a/drivers/bluetooth/btintel_pcie.h
-> +++ b/drivers/bluetooth/btintel_pcie.h
-> @@ -101,6 +101,7 @@ enum msix_hw_int_causes {
->   	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0	= BIT(0),	/* cause 32 */
->   	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP1	= BIT(1),	/* cause 33 */
->   	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP	= BIT(3),	/* cause 35 */
-> +	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG	= BIT(5),	/* cause 37 */
->   };
->   
->   /* PCIe device states
-> @@ -118,6 +119,7 @@ enum {
->   	BTINTEL_PCIE_CORE_HALTED,
->   	BTINTEL_PCIE_HWEXP_INPROGRESS,
->   	BTINTEL_PCIE_COREDUMP_INPROGRESS,
-> +	BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS,
->   	BTINTEL_PCIE_RECOVERY_IN_PROGRESS,
->   	BTINTEL_PCIE_SETUP_DONE
->   };
-> @@ -133,7 +135,9 @@ enum btintel_pcie_tlv_type {
->   	BTINTEL_DUMP_TIME,
->   	BTINTEL_FW_BUILD,
->   	BTINTEL_VENDOR,
-> -	BTINTEL_DRIVER
-> +	BTINTEL_DRIVER,
-> +	BTINTEL_EVENT_TYPE,
-> +	BTINTEL_EVENT_ID
->   };
->   
->   /* causes for the MBOX interrupts */
-> @@ -429,6 +433,8 @@ struct btintel_pcie_dump_header {
->   	u32		wrap_ctr;
->   	u16		trigger_reason;
->   	int		state;
-> +	u8		event_type;
-> +	u16		event_id;
->   };
->   
->   /* struct btintel_pcie_data
-> @@ -513,6 +519,7 @@ struct btintel_pcie_data {
->   	u32	alive_intr_ctxt;
->   	struct btintel_pcie_dbgc	dbgc;
->   	struct btintel_pcie_dump_header dmp_hdr;
-> +	u32	debug_evt_addr, debug_evt_size;
->   };
->   
->   static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
-
+--===============4549020580643442297==--
