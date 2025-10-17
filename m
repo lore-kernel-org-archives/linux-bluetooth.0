@@ -1,127 +1,85 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from manage.vyzra.com (unknown [104.128.60.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C05A334693
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Oct 2025 03:30:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752A1331A44
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Oct 2025 13:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.128.60.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760671823; cv=none; b=dYcazXidIDhqb7ySbypHuEvNonHKfJT5OJFPKNdovfT8ENa1btrVRE0neKIDDbSPDdYEiwOKcfAx7lqr4AbvTkF3wjqydT8QaVpy60NN3LKN690FKLQtV49o5EIIhfok7j7TAa4aA4IRmt77QczuDgR/CXzAVReEbUVyqp/Yxis=
+	t=1760706306; cv=none; b=jge8RE6H2wLArImM+2osBtij4wyueEvW1kE24FKlYxrXwmHecooAiGGLyJ8O/llwRVXz5AlsND0ts7ik2vE8ViOLThEzB+q+wdiSyK45KV6ObJi9HNJdiafPoTVbpOy2k28dc8IJ10worcnuhqP4Z9AGTYMBzXNsi176oMZsBKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760671823; c=relaxed/simple;
-	bh=3MqXNJKRMp8loRYFtyFxwjWp0GnKONXmz8BQ7T+WXnc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=mqDgQ3O27YI/IVYOdEQ48p81KAKntmxxMb9ZKl/VFUQtlFEw6yoWbv2r98nw0Ahe0XvR7R5vdMRq9DzG1DQ0qbn36Fzu857alBNOs/gLsRjrB91c9IgBb1Jt3w3i/u0G4BAie0tNS0ZBefk8uBbR8BID8ojlcHT7O03pP2LfkDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFp+jj9w; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760706306; c=relaxed/simple;
+	bh=biLnUx9jTTyVdIbdiavoTAgEZeIqqOihfb373MH/e18=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dY5vGrgwLpikE5ufdXk2iwZf8G4KnfBdrJl5IFbNTgNQnESUtMMtzzwd9Rw0wnh9FddW/ay2cc+ZkxkAUASgpljlTYQDKjNkHzUoI5siUaVYLBrtJZgFv99bNcL77V5utZR/ZiY53anE9cAVbth9rXJfFrSJ1kAdD5dTg/I2SoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debtmanager.org; spf=none smtp.mailfrom=manage.vyzra.com; dkim=fail (0-bit key) header.d=debtmanager.org header.i=@debtmanager.org header.b=oFXHwDFd reason="key not found in DNS"; arc=none smtp.client-ip=104.128.60.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debtmanager.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=manage.vyzra.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFp+jj9w"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-88f26db50b4so207170385a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Oct 2025 20:30:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760671820; x=1761276620; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=707Yd9tX73WgegB1gWRKujN2Y+pbyTooOObncAIhdxQ=;
-        b=LFp+jj9waVgeH/3+ZzdALlYi3/6w/RZn7dQn08PVBq1z6h5wUyCfExFB9kVK8XzuRg
-         f9yS2B2vGD3K2VZCZLy7YJb5crpA0AMPAb9u5HfDYvQcSb/KO+NG+WYsb3pnepTuRen8
-         dsroeBIECmXWCKbqPuB3bMgki6ERMeeaczAGQ79RYj4RQ8OkV513A/jgFgMLfrDbiOuc
-         sNJwFVBO1eQ3OqazCr+FTNe9EqN+cCMHVKrs3izW1wel4wnb64FZfVyHjaM1DtMsgueR
-         sjkB/BX/RcAd94xIUIP816M19S75ENT3ozpY/sFpR0QJY9NAciPoinQ7ymhFHBUNiWAW
-         mV5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760671820; x=1761276620;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=707Yd9tX73WgegB1gWRKujN2Y+pbyTooOObncAIhdxQ=;
-        b=ffRJu5cAZ6kFAHybzm2MWoGesDB8xZIWMaEvugZXmf0Z4ThmdeAgidbyUdf4QnqbFC
-         hf/MUEsZOtuvYhDJKSOLOYNBdGd4OiuPEigBoGuJYCjBbBhNo6nbKs3SLGh0jXd4hkED
-         z8KncwylxF1bLHYGkHkrYvSZ3DVoTNC+lNeH6RZ2xHWJFz+7MgL9biWRFdiSi8rO1C+b
-         gRYuDbVstHIBHF01uw4Y6dqGYM0pqH1PFVEVr20MDpL1tViB+cHkhBPtaSEOym8T4Pzp
-         lqBNfaXuq6r3GcfmZA1A0MwtjM/MarRusKuJ5qQIw4mTRzvds22Qp+ugbg6xhAP/8SOB
-         Wj5w==
-X-Gm-Message-State: AOJu0YzUXqBNtxxOUXOAFrqU90eANQV8zTOZuBHMSErWFudbXY9q3ycQ
-	cqPx0VXR9lg1KlxFdj86dx2WMvaAbe8LeKvwp8eZJKCGHhOQgxQuId3IzjPifA==
-X-Gm-Gg: ASbGncvypj7B0bByX9L0uf0jT39EIPkzv2Qjz/D2cr6/uOkcHuq03dn5NLYuEM9uTp9
-	d6slnu/W9knZRsEzDwCfJwQ+gb3+G3DNQiw+M/33Agk5Yj5EJdI2EhezI9bKUqyanudNAxlMXBS
-	Y6ujfo7dKeRFoDDx0oeoELHVyTY3pFPTSovAzKpwBSstkwEVq0U0OO5uzgsbe67FfuDYsKGGK4+
-	X+uMBLDnU9phdyTIZ1VoR87yF6r0jJtfmla8LnviJRd4WbxXwqJ7mYdRczAdclUhc1dWlitAJ8T
-	VZbVD6mk5D9jsYL78SnZzBZmbbCsHzGwCVj3jVoXJS/yO5nQlxQXd/LSki/Bp9xlFEQet+JQz25
-	QSotalQxfQVntN6/mJvPQjcJ082JpestGdwWR+2DBwHvnAR2bGd8eEvTepvSBxDQDdrpWr+/00c
-	fd9vuD62RFikcJG5iWdSA=
-X-Google-Smtp-Source: AGHT+IHRqhqUqnX+OeJIr3LAJwq6KphmkHoKGp57BQevxDokOxqY3LUXoX9x1hTw8tEMuyGfjuBtoQ==
-X-Received: by 2002:a05:620a:28cf:b0:850:8afd:f715 with SMTP id af79cd13be357-89070603b76mr268425785a.72.1760671819803;
-        Thu, 16 Oct 2025 20:30:19 -0700 (PDT)
-Received: from [172.17.0.2] ([172.178.117.216])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-88f38bf4678sm343148585a.59.2025.10.16.20.30.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Oct 2025 20:30:19 -0700 (PDT)
-Message-ID: <68f1b84b.050a0220.1c557.9eed@mx.google.com>
-Date: Thu, 16 Oct 2025 20:30:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0214968108176777706=="
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=debtmanager.org header.i=@debtmanager.org header.b="oFXHwDFd"
+Received: from debtmanager.org (unknown [103.237.86.103])
+	by manage.vyzra.com (Postfix) with ESMTPA id DB8C14AA2153
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Oct 2025 07:45:31 -0500 (CDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=debtmanager.org;
+	s=DKIM2021; t=1760705132; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:mime-version:mime-version:
+	 content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
+	bh=Aj8bDacQlJB5qNMC5+yWWged1+K/M8YReXQkzUminbQ=;
+	b=oFXHwDFdM1D8grynRgdA6n8jb7dCZEcndKGrebnYsavYOKOmj0j0DwbTXiqryjmeOnGCU2
+	u4+3K+dn3OEkIThV1vVm7tUjYUP3ESmVlfM0//JAq/5a9ulu7IyeQQUHGhDrq7xjF86csP
+	Lku0WWGai/lzLHKYWWBYItfCE4clCyTFGIh3Kwamt/d5qARIWbl2RABGakMbKwhJGbMCbj
+	eZ/7Y74MRLpra98U8JjR0BoD/bchRKfhO4cXTY5yPUWEvJzFhmgkRcfmOePZRlTS3B/OyG
+	E1DVaHoMT/6vbeutoh4DsEb5v0FtkatBbAUcrEDLawNsBPRfdRXrOJuHJYZihA==
+Reply-To: vlad.dinu@rdslink.ro
+From: "Vlad Dinu" <info@debtmanager.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: *** Urgent Change ***
+Date: 17 Oct 2025 05:45:31 -0700
+Message-ID: <20251017054531.299549E676A2D659@debtmanager.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, andrew.smirnov@gmail.com
-Subject: RE: [BlueZ,1/2] shared/uhid.c: Fix 32-bit integer truncation
-In-Reply-To: <20251017015759.46326-1-andrew.smirnov@gmail.com>
-References: <20251017015759.46326-1-andrew.smirnov@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -0.10
 
---===============0214968108176777706==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello,
 
-This is automated email and please do not reply to this email!
+I am Vlad Dinu, the newly appointed Director of IMF Legal=20
+Affairs, Security and Investigation. I have been given the=20
+responsibility to look into all the payments that are still=20
+pending and owed to fund beneficiaries / scam victims worldwide.
 
-Dear submitter,
+This action was taken because there have been issues with some=20
+banks not being able to send or release money to the correct=20
+beneficiary accounts. We have found out that some directors in=20
+different organizations are moving pending funds to their own=20
+chosen accounts instead of where they should go.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1012592
+During my investigation, I discovered that an account was=20
+reported to redirect your funds to a bank in Sweden.
+The details of that account are provided below. I would like you=20
+to confirm if you are aware of this new information, as we are=20
+now planning to send the payment to the account mentioned.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.29 seconds
-BuildEll                      PASS      20.16 seconds
-BluezMake                     PASS      2607.85 seconds
-MakeCheck                     PASS      20.61 seconds
-MakeDistcheck                 PASS      186.94 seconds
-CheckValgrind                 PASS      240.86 seconds
-CheckSmatch                   PASS      309.19 seconds
-bluezmakeextell               PASS      131.24 seconds
-IncrementalBuild              PENDING   0.29 seconds
-ScanBuild                     PASS      929.03 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+NAME OF BENEFICIARY: ERIK KASPERSSON
+BANK NAME: SWEDBANK AB
+ADDRESS: REPSLAGAREGATAN 23A, 582 22 LINK=C3=96PING, SWEDEN
+SWIFT CODE: SWEDSESS
+ACCOUNT NUMBER: 84806-31282205
 
 
+A payment instruction has been issued by the Department of=20
+Treasury for an immediate release of your payment to the bank=20
+account above without further prejudice. We cannot approve or=20
+schedule payment to the 
 
----
-Regards,
-Linux Bluetooth
+given bank account without your confirmation. May we proceed with=20
+the transfer to the Beneficiary: Erik Kaspersson, bank account in=20
+Sweden?
 
+I await your urgent response.
 
---===============0214968108176777706==--
+Mr. Vlad Dinu.
