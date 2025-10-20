@@ -1,82 +1,71 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29235354AD4
-	for <linux-bluetooth@vger.kernel.org>; Sun, 19 Oct 2025 16:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9D1208D0;
+	Mon, 20 Oct 2025 11:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760892363; cv=none; b=jyXsbXoBuPbQlkGWRvRMMDmdiD3+d0LxT/VwqxCdzkovyZYDaiF2hMhzxVq9h91KxJ+ifdGx2KpWVIZGGHOGqZvYeetn4TngR1cecLXbyyFRLTNsA9SKrnegXdVUZj7f0iyayyLAYj1mYZtwGICYYFCKkfPe8Wc5bzqWoE1ZFkM=
+	t=1760959036; cv=none; b=N+a+gv+1hcOkh6E1lInT8AUpTr9iBChvd/jdonOdSHwATbR4uZh6/X8uTcCuQnMOGHfidmBuyOIx9WavjUw7rjL0Rat5yvRdU0eIQ7OZL3F0+pA/UqcrEZdhDsXE9MHX1XMuSCnKFVmXwK5ij31spYXTkyMHTsxAOqPNRfBOCKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760892363; c=relaxed/simple;
-	bh=B1Of6Sywi/SIDHNGhe+4STYq+zbvJXipe35pcGBqDzE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OQRup8VhKbb1bU33gC2TeuzykZHfJ+ti3DkFFoN7AbapSP9qfg+QLxNyAlvFsdFS+6JKuk5UtDjt7sCh2KRAODTpMfpCIMqVwDHt6wCb+vdi9KKZPkjZvPdLlgwkTc5q8WVpkBoMFbwqRJkFSO8Wst8B4UELKRGLjMw68jKls6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tE/1EKfq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760959036; c=relaxed/simple;
+	bh=TSbmKbsnr+avsjQaaO7wq/0jRqFL/RY167AdevoNFQk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=acW1/VD6g68kad3DoW8R0iBWNgwXs0FEyrZj3lXQ/QdXFqMuOnmjrS4PCNmkMpfFHDOnzPwuFmEyIl3JKul0Fd555w6qJbo7hiGtmX8iL5EKG0UOCd5NvIFllsBo+Y/XX3rjs3ZGw9GOAIIEQn9jVKPg0TxhW+FW6YMMhLtHOwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=T+/gzaFU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tE/1EKfq"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BC93C4CEF1
-	for <linux-bluetooth@vger.kernel.org>; Sun, 19 Oct 2025 16:45:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760892359;
-	bh=B1Of6Sywi/SIDHNGhe+4STYq+zbvJXipe35pcGBqDzE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=tE/1EKfqdG8zcibojRMiKZvWi0cOzFGGhuSx70q7aRgbOpbKjTl/aw8o/cFBiw018
-	 8zxByoLhXM5Wqhzhlzsa+FhQu8mChF2UNMos/QpnUu/DeKVFz4y1hPGQeUcI1QZfSx
-	 0wLvDdR+teHjuzRQ2TtxsW2179R1rPLK+fq51xL5fMXnE8DTyzWjsLb1tpFOPK7j2U
-	 JsHYNAXxN6sDdlOfrhuE0/GMMU5HrRXHIejt4LaTpLgDgGYkdInLUYU/iDMIlWBvB0
-	 fJryUzEgzs+26WKZFwWOWtyJhvZCvHwpR0YBTMfRVEtBU7G51LBXgmXPRKYvAKDLKo
-	 ebbtPhHV0L0PQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 7EF5CC53BC5; Sun, 19 Oct 2025 16:45:59 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220564] Wrong indentification of Bluetooth in Lenovo Legion Pro
- 5 16IAX10 and 0489:e111 Foxconn / Hon Hai Wireless_Device
-Date: Sun, 19 Oct 2025 16:45:59 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jeremy53561@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-220564-62941-5nerDysePa@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220564-62941@https.bugzilla.kernel.org/>
-References: <bug-220564-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="T+/gzaFU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70B32C113D0;
+	Mon, 20 Oct 2025 11:17:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1760959036;
+	bh=TSbmKbsnr+avsjQaaO7wq/0jRqFL/RY167AdevoNFQk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T+/gzaFUI/5qXMrR+Ex4Rn67ne7yv//C6OyMcA3Jc5ad69gm4sDsuUdk+ycejc5qd
+	 Cj9bKQcErNjiZNbVeITNp/g4gJA9BuGPjulpoYV/1b1yVMf3F3Pyo1kVOG+QnjMkrA
+	 CgncLTbyrKXfk7eBIee1OQM2DGJ8dC3J3XJzI5jI=
+Date: Mon, 20 Oct 2025 13:17:13 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: stable@vger.kernel.org, tglx@linutronix.de, Julia.Lawall@inria.fr,
+	akpm@linux-foundation.org, anna-maria@linutronix.de, arnd@arndb.de,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux@roeck-us.net, luiz.dentz@gmail.com, marcel@holtmann.org,
+	maz@kernel.org, peterz@infradead.org, rostedt@goodmis.org,
+	sboyd@kernel.org, viresh.kumar@linaro.org
+Subject: Re: [PATCH 6.1.y 00/12] timers: Provide timer_shutdown[_sync]()
+Message-ID: <2025102001-unlaced-playroom-f60b@gregkh>
+References: <20251010150252.1115788-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251010150252.1115788-1-aha310510@gmail.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220564
+On Sat, Oct 11, 2025 at 12:02:40AM +0900, Jeongjun Park wrote:
+> The "timers: Provide timer_shutdown[_sync]()" patch series implemented a
+> useful feature that addresses various bugs caused by attempts to rearm
+> shutdown timers.
+> 
+> https://lore.kernel.org/all/20221123201306.823305113@linutronix.de/
+> 
+> However, this patch series was not fully backported to versions prior to
+> 6.2, requiring separate patches for older kernels if these bugs were
+> encountered.
+> 
+> The biggest problem with this is that even if these bugs were discovered
+> and patched in the upstream kernel, if the maintainer or author didn't
+> create a separate backport patch for versions prior to 6.2, the bugs would
+> remain untouched in older kernels.
+> 
+> Therefore, to reduce the hassle of having to write a separate patch, we
+> should backport the remaining unbackported commits from the
+> "timers: Provide timer_shutdown[_sync]()" patch series to versions prior
+> to 6.2.
 
-jeremy (jeremy53561@gmail.com) changed:
+Thanks for doing this, all now queued up.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |jeremy53561@gmail.com
-
---- Comment #3 from jeremy (jeremy53561@gmail.com) ---
-https://github.com/LuanAdemi/mediatek7925e-bluetooth-fix/tree/main?tab=3Dre=
-adme-ov-file#quick-install
-See if that fixes this issue
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+greg k-h
