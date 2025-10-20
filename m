@@ -1,48 +1,81 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5D03195F7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Oct 2025 13:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018E317C203
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Oct 2025 14:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760967428; cv=none; b=Q+NKGePwZPwbOFMNnhuT0O+WFS8mkry4UDGsO/883+0xaOz/Z8Zo6lIoNj+2noGRQaXu3h1mZsXYYXQ8DEjqTbgk2RwYau7N3B2za3EfAj4i+dxXTVBAO1JuPBv0iStnMy1h1QAfn/dmSLr7S7v1k5Xbz1GrJgjyLoXt79G+0gE=
+	t=1760969769; cv=none; b=myrVEsiN8CVzlcGI7MZHf8hLuyvhkoW+/ifmSWzs2CdEtnOjk5xqNJp/jS9bFmFA1PMkCMXG7d8ITXg6hvS1T4QxFGD6WOHIE50A2j0t9Ee3QJ1tXvKdEJyWYH9ehQSiANJ9BljWU1mg6SQcU/ldZl/SMBeXAoJ7HNmNiP3cZTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760967428; c=relaxed/simple;
-	bh=8q4G21USgJntGaffDLomIcZGpI8EHgaPCZynEcYe+04=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jlswLeFKLD8kydWtCU+9Gxe0RxURJdO40Mn5UiscrvvrPTbtYo6UQnXN7lL/5Zre775dZnctxLlmV5vxiIhRZrU360yXfB0naGneGwv0Vt8xpzEdqYg8RarS6mZBrHiytY43S+catZCGkryC92PBGjXXPypsmzGZBpHZIQkacAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=PycVxImg; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1760969769; c=relaxed/simple;
+	bh=H501Wu+JWvKrBDPBu+75Hjg1nBYSvPyHUuK7IQd3goQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gIG2OKca1LLDwHsLGb67KiU5nlA8KHGIKt7b0J0HdxO8pC4qlAUPK8yYDhIMWvddmJf52krVM+n65V2iDfgysrUlNL+z9z7hcmsIY3LovHlVkjjN2lPw7Sb156p1ikRoEHaLfdKncLfGiUjCzfbsCD/giKzlRA5EgxGxG7MXLkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1/6dQEL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="PycVxImg"
-Received: from github.com (hubbernetes-node-1c89b84.ash1-iad.github.net [10.56.200.75])
-	by smtp.github.com (Postfix) with ESMTPA id 86BFA9212D8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Oct 2025 06:37:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1760967426;
-	bh=jwd3l1QjJ4ZaUYoL37rEugFJdOOlw3I5aESHOHZ+QWQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=PycVxImgRJUj6IPF38vDxi8NM1zebW5leNSUDVbSyFy9/BPNQb9DnB08XYK5HUWJ3
-	 5I9Lz66ukHd+wdS3fTMiTEQtyMtH2nPjnnbVHLNYqtwI3qhyf9GuwMHcNoNVtV79y2
-	 T60C1RspGV7i3mMDFcikvmmZoKiXIkRKj8kwvwAg=
-Date: Mon, 20 Oct 2025 06:37:06 -0700
-From: BluezTestBot <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1/6dQEL"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 81F62C4CEF9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Oct 2025 14:16:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760969767;
+	bh=H501Wu+JWvKrBDPBu+75Hjg1nBYSvPyHUuK7IQd3goQ=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=Y1/6dQELig/ZKChd5PFnoKBGpw2N7boLVfoOg8YsRZ6i3LP2UjaKqc/zAo3BkaISu
+	 0C84DPvrLmHY77ohsEPPiI2JaFtK6Muy2E5PKVXNpkW3CWXbxOBBjkiGwQjAQI0ZKc
+	 EJp3BWm71WWpEGkjble65n0WywWOLnipfE97A9FTifxiNnnOZiGlxn4Rg8VJ6Qq/HP
+	 LMv/n0pOTOVhldX6fQi8BeOdlBxAA96Ru6Fa6kbIDNC7+utzYS6Eim/fGRPuYBfOQj
+	 j/rB0mTVj02pJP/Ujfor/lU1TeiiUIBDffkp1cEmNBEeNRwrRRMQfmDVLM7u3vWZiG
+	 DwXwoNZwwpGCw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 724F3C3279F; Mon, 20 Oct 2025 14:16:07 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1008955/c5216a-000000@github.com>
-Subject: [bluez/bluez]
+Subject: [Bug 220682] Bluetooth adapter (MediaTek MT7925, USB ID 0489:e111)
+ stops working after user logs in to the GNOME
+Date: Mon, 20 Oct 2025 14:16:07 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: jeremy53561@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-220682-62941-ft0iKYjfyZ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220682-62941@https.bugzilla.kernel.org/>
+References: <bug-220682-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
 
-  Branch: refs/heads/1008955
-  Home:   https://github.com/bluez/bluez
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220682
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+jeremy (jeremy53561@gmail.com) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jeremy53561@gmail.com
+
+--- Comment #3 from jeremy (jeremy53561@gmail.com) ---
+Some additional information and possible solution at
+https://github.com/LuanAdemi/mediatek7925e-bluetooth-fix/tree/main
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
