@@ -1,71 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9D1208D0;
-	Mon, 20 Oct 2025 11:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C2221348
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Oct 2025 13:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760959036; cv=none; b=N+a+gv+1hcOkh6E1lInT8AUpTr9iBChvd/jdonOdSHwATbR4uZh6/X8uTcCuQnMOGHfidmBuyOIx9WavjUw7rjL0Rat5yvRdU0eIQ7OZL3F0+pA/UqcrEZdhDsXE9MHX1XMuSCnKFVmXwK5ij31spYXTkyMHTsxAOqPNRfBOCKo=
+	t=1760966425; cv=none; b=Llws7ju4C7FmeJD+VsPCnmqIvIvec0/sLwgBHIZwOdkBPVT51zeKjX9GDAL3GDQQF2B6qKyaCNZhOtGM2DXOZVuSvwi+fEq5hDKakUEzLlXgoK3i/2RmsjiHE/oYgrGibJJuID/lUiBOd36yIlnui1isNf1oExTdsLPzJu3aDrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760959036; c=relaxed/simple;
-	bh=TSbmKbsnr+avsjQaaO7wq/0jRqFL/RY167AdevoNFQk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=acW1/VD6g68kad3DoW8R0iBWNgwXs0FEyrZj3lXQ/QdXFqMuOnmjrS4PCNmkMpfFHDOnzPwuFmEyIl3JKul0Fd555w6qJbo7hiGtmX8iL5EKG0UOCd5NvIFllsBo+Y/XX3rjs3ZGw9GOAIIEQn9jVKPg0TxhW+FW6YMMhLtHOwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=T+/gzaFU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760966425; c=relaxed/simple;
+	bh=x2trk/dHTg43pgjpzlHthSa5AKI9wJz7Z3eL4FugguA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=R/EhErgK8CHpsEhIC2ug+iyW6asNCY5ofxL8NlW3lyh0VvfXQXpeiI/f419Rd2PUTzf8AqVvII0wFGeyKXQHUFmxiINi9e2OcDofZMZKy+gRU/PfrgunZyNuzlXxJkHJ8iWotM9kVNfO9TgqbXUYAs0h44LSDO43adkjhMTQ+OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QtrXQHCd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="T+/gzaFU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70B32C113D0;
-	Mon, 20 Oct 2025 11:17:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1760959036;
-	bh=TSbmKbsnr+avsjQaaO7wq/0jRqFL/RY167AdevoNFQk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T+/gzaFUI/5qXMrR+Ex4Rn67ne7yv//C6OyMcA3Jc5ad69gm4sDsuUdk+ycejc5qd
-	 Cj9bKQcErNjiZNbVeITNp/g4gJA9BuGPjulpoYV/1b1yVMf3F3Pyo1kVOG+QnjMkrA
-	 CgncLTbyrKXfk7eBIee1OQM2DGJ8dC3J3XJzI5jI=
-Date: Mon, 20 Oct 2025 13:17:13 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: stable@vger.kernel.org, tglx@linutronix.de, Julia.Lawall@inria.fr,
-	akpm@linux-foundation.org, anna-maria@linutronix.de, arnd@arndb.de,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux@roeck-us.net, luiz.dentz@gmail.com, marcel@holtmann.org,
-	maz@kernel.org, peterz@infradead.org, rostedt@goodmis.org,
-	sboyd@kernel.org, viresh.kumar@linaro.org
-Subject: Re: [PATCH 6.1.y 00/12] timers: Provide timer_shutdown[_sync]()
-Message-ID: <2025102001-unlaced-playroom-f60b@gregkh>
-References: <20251010150252.1115788-1-aha310510@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QtrXQHCd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A506AC116B1;
+	Mon, 20 Oct 2025 13:20:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760966424;
+	bh=x2trk/dHTg43pgjpzlHthSa5AKI9wJz7Z3eL4FugguA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QtrXQHCd9hYG6uYdt28z6bgHbd7clCbLUIFXLca4V7ZhinKDpk8fsgMiy/0MArdMc
+	 nGcfhvwkUeRbaZLq5Cik5YS7+HfJIf2PpAmsi+nlpJtLyjzplXGYTHxh0NhuIyo35B
+	 iHgIIWay+F2nban03SsRWyeQiNYOohKfFc0+lyE36QWrP1QoCDvQC2jxqaYTQcsjWH
+	 de5feOVQ9yuPlLBjx5cEhhWFKVeFzFuPymXmt1qwqnSVO3RQqqyy8yibXYW1WLHB6I
+	 tMhhW/fqmbumMXr/ihUWNwYZqP3gekd6MUOspj46lw8pIBCB9j35Z648hLnw0VltJ3
+	 XaNZ9UaU/Ch2Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB06F3A40FF4;
+	Mon, 20 Oct 2025 13:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251010150252.1115788-1-aha310510@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/2] shared/uhid.c: Fix 32-bit integer truncation
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176096640676.201781.10627457273791946085.git-patchwork-notify@kernel.org>
+Date: Mon, 20 Oct 2025 13:20:06 +0000
+References: <20251017015759.46326-1-andrew.smirnov@gmail.com>
+In-Reply-To: <20251017015759.46326-1-andrew.smirnov@gmail.com>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
 
-On Sat, Oct 11, 2025 at 12:02:40AM +0900, Jeongjun Park wrote:
-> The "timers: Provide timer_shutdown[_sync]()" patch series implemented a
-> useful feature that addresses various bugs caused by attempts to rearm
-> shutdown timers.
-> 
-> https://lore.kernel.org/all/20221123201306.823305113@linutronix.de/
-> 
-> However, this patch series was not fully backported to versions prior to
-> 6.2, requiring separate patches for older kernels if these bugs were
-> encountered.
-> 
-> The biggest problem with this is that even if these bugs were discovered
-> and patched in the upstream kernel, if the maintainer or author didn't
-> create a separate backport patch for versions prior to 6.2, the bugs would
-> remain untouched in older kernels.
-> 
-> Therefore, to reduce the hassle of having to write a separate patch, we
-> should backport the remaining unbackported commits from the
-> "timers: Provide timer_shutdown[_sync]()" patch series to versions prior
-> to 6.2.
+Hello:
 
-Thanks for doing this, all now queued up.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-greg k-h
+On Thu, 16 Oct 2025 18:57:58 -0700 you wrote:
+> Id paramter given to bt_uhid_set_report_reply() and
+> bt_uhid_get_report_reply() corresponds to a 32-bit tag value passed to
+> us from the kernel side of UHID. Specifying this parameter as uint8_t
+> breaks the synchronization after 255 request and renders the attached
+> BLE device inoperable.
+> 
+> Fixes: 92ed637ab2bc ("shared/uhid: Add dedicated functions for each UHID opcode")
+> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [BlueZ,1/2] shared/uhid.c: Fix 32-bit integer truncation
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c2d072641aa9
+  - [BlueZ,2/2] hog-lib: Fix 32-bit integer truncation
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=50487180813d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
