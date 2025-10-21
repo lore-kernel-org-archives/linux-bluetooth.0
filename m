@@ -1,142 +1,143 @@
-Received: from delivery.antispam.mailspamprotection.com (delivery.antispam.mailspamprotection.com [185.56.87.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01864414;
-	Tue, 21 Oct 2025 20:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.56.87.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761080018; cv=pass; b=W1GY6OqYZBukv+EtJqHUFmGaLKhV+t92ix4s9Cf60bmx3wxuei7v/cBRLXS+pTTtqPllwma6yN9BEJuXOKqL5K9qUfDJ9k8YcSFPckRikNPJEnXov82jc9dReuD6Q7V1nNvCHGqvAEu7ZVt0npJtrfcuV+fiw0fHq7ZPrtUoI50=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761080018; c=relaxed/simple;
-	bh=4PU5mV895pNdIV2Sn7TJY2lTLez4n2dKmgx6ITLpx+g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NNER7lO/dtjpL4E1h1hzRYqYAqqo0Lgb4RSU8Q72Pze575ep8ACpp98zeGed6PhPY8zET10cavpjaOOG1pGh0RfII5nhePoRNcYcvXuZHvpmU50Bbzf45zCjIpFiOB1P1Tg8GVYx+lneqhsI6HJoMMEpFHNt2bKdk7NSaOwuSKY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it; spf=pass smtp.mailfrom=valla.it; dkim=pass (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b=bl3SOocf; dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b=K5h34oCB; arc=pass smtp.client-ip=185.56.87.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valla.it
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F73E280024
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Oct 2025 21:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761081618; cv=none; b=AjzPnWgrVAKicHiSgO1cCAGxEMvSMy97Wnhp4DLlXk3NtCXfF+udCR5Ct329mt4YiZEYy+WWl/adJArp0eqsLy4JS4Znq1gRDGTHh9p65mfmESMpJHHcw8rFyf7TAkETMXWjyll1sd5vImufl23IT2Ii8LZEKQ9Sw7wGc7S2wyY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761081618; c=relaxed/simple;
+	bh=d+JgfX7f+chDjmnMm5X4qjo+aMhbpyauVERzrs1GJsE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uFDEuwJcHauXEeov7zUZAz6AOI8oCqx392OEtv5/sEz3zzrp4ghpRoYDhmILJI9GoMV5+zdW0BS0o2Q8Gg+2PgyQ/+t5zEh6Ul1XvfcuTaoq+0H24iD2jL1dSK0p7876kZTvDrbL5YPkAtw+hd9PxOLgqesREhahM6haArU6NWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=PDCyzPdo; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b="bl3SOocf";
-	dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b="K5h34oCB"
-ARC-Seal: i=1; cv=none; a=rsa-sha256; d=outgoing.instance-europe-west4-txv0.prod.antispam.mailspamprotection.com; s=arckey; t=1761080013;
-	 b=BJN0+a+w4rc0x8pe0LM/+J2gJ57LKDujQfG/8WGgUtT0QmwMEh9YgrB4UOAEn4nzYtnpMNoB2O
-	  pJA+MBs8bDLYDvYzc3U/LsqWBna0fhWgYxXf9FtfaaGnc2kf9vGqap2n8sLURSX6mBuDXa1r9+
-	  jW4Is95U2EZluVNPdcLpwfJA7S19dTQTM446JUT7G/Wf9ElQEGiq3BAuNyFynN7ROyk/qOmtao
-	  nQ4gH1KEPYjwSlMSc23z33o7IJg0yaItMu+IK+TNCTZM6MvQaUYDoP/ElqqDXS7FfoZRyNHocT
-	  2f4u2PXkJBgHyRlN4JYu+5U2H6SO6EIQHgZ+6WFXG2BONQ==;
-ARC-Authentication-Results: i=1; outgoing.instance-europe-west4-txv0.prod.antispam.mailspamprotection.com; smtp.remote-ip=35.214.173.214;
-	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
-	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
-	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
-	arc=none
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed; d=outgoing.instance-europe-west4-txv0.prod.antispam.mailspamprotection.com; s=arckey; t=1761080013;
-	bh=4PU5mV895pNdIV2Sn7TJY2lTLez4n2dKmgx6ITLpx+g=;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	  Cc:To:From:DKIM-Signature:DKIM-Signature;
-	b=DCXVrHfAbYFHND6qaRJWIKhuWtc6q+2b2a9HPDOCjoHAUyNIy6Bs8pD5ybSYZ0yV7gb6Q+EoxX
-	  XXMOUKkMvu+rMKFjf+ynnY8Ov0FI2+VzkRh/atVKGhjCTcTQlS0wy5as8WD0jkSG4vxazIJvk0
-	  MGJAUoM4rLoT+9K1uX4a4/vGhm4LtX2VA5OHjnKc3p7FKDG5nQi4csjv2qrjP6A56sCll8NlMj
-	  bGu5pGSFGaY86ENcWWtCLjLUzVx7Gm6Z1DQhzRgb67vLRoCAZgIHQQqN29hzBK6Bq3xz2Rp/x8
-	  YGY6i0R1O2Vrz5suUwVGeKPXBx2xDHfX7Yj2hQVhbKolug==;
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=antispam.mailspamprotection.com; s=default; h=CFBL-Feedback-ID:CFBL-Address
-	:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Reply-To:List-Unsubscribe;
-	bh=mdvj68vJAADYdOaJIVC1HFGHYHSapuI24Ot8joNe8mU=; b=bl3SOocf4ZEj3hJvUQjwe5a9lu
-	5OhJPj9S4W++A0nbtO/PdfREAytbmgBIPw0abhTdlFTCwi01Ak05WfgJn1FkQ0ys+qiPH2Nu3zsn5
-	hC/voSrK0fJhQ1LjZhHW4VcBua4wRsusvq0A1Gx7GOiok/9xYe5fjyU7IPvr8NYtjkFA=;
-Received: from 214.173.214.35.bc.googleusercontent.com ([35.214.173.214] helo=esm19.siteground.biz)
-	by instance-europe-west4-txv0.prod.antispam.mailspamprotection.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <francesco@valla.it>)
-	id 1vBJMG-00000001OOp-0QuD;
-	Tue, 21 Oct 2025 20:53:31 +0000
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=valla.it;
-	s=default; h=Date:Subject:Cc:To:From:list-help:list-unsubscribe:
-	list-subscribe:list-post:list-owner:list-archive;
-	bh=mdvj68vJAADYdOaJIVC1HFGHYHSapuI24Ot8joNe8mU=; b=K5h34oCB5B3ChRxrAccEeGlGgi
-	jpXypSdHvbCnoPY1iIItCUo+uqQggb+biHq4ei5mezF8kog73p93ALyDqpTufshqmAmqmOwuRV/Hi
-	VAwhmfjvDHqZqggVypMiOs3GHgaLzW5x5pRjIAIXKC8ZqssYoKS2P3hvFGM14YhjZ44w=;
-Received: from [95.239.58.48] (port=65022 helo=fedora.fritz.box)
-	by esm19.siteground.biz with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <francesco@valla.it>)
-	id 1vBJM0-000000006uc-3Qsx;
-	Tue, 21 Oct 2025 20:53:12 +0000
-From: Francesco Valla <francesco@valla.it>
-To: Calvin Owens <calvin@wbinvd.org>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject:
- [BUG] Erratic behavior in btnxpuart on v6.18-rc2 - and a possible solution
-Date: Tue, 21 Oct 2025 22:53:12 +0200
-Message-ID: <6837167.ZASKD2KPVS@fedora.fritz.box>
+	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="PDCyzPdo"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b4fb8d3a2dbso4261026a12.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Oct 2025 14:20:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=wbinvd.org; s=wbinvd; t=1761081615; x=1761686415; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NKBpLJe6dQK72erPWdp1puVpkmn6KWf/pa47Xj36tzc=;
+        b=PDCyzPdoAcpczZytXqY37LK21YrZ/0RQv5XO14ufgTKJzJTcFjVr3LQtK/wSKjqbBb
+         OhNeRm1mbniRmP0yWFD71HGWACJEbLT3BfFbPWAvAhIQWl5k/PkymuSEy7LrX0IFuyMJ
+         abJRcNhoQyontR+b+VLU6G1KQhIaSiHYZMf217Qm/L+G/5fM9gIV7zq/HJVWef4FVxJw
+         UGeQ9mCsEOI6J2wU79H1hDw/nrdth5v5eerEKe21dq4uV9NNPtzjtGt0oVthH5LlyBTu
+         K8Km+XTlVkwaosFANyEzmlHCJwTg3+E7zdKd2BsEVz5qBWmSE6mlBdtbxqoPnj2Y0MCF
+         U/iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761081615; x=1761686415;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NKBpLJe6dQK72erPWdp1puVpkmn6KWf/pa47Xj36tzc=;
+        b=bepN2y9drPHbpUjVuwefwwdcnryPX4czOnQC+Hm+57KvaMgWxGoxmdjSPqnHFWaBLx
+         wva4isHtI3YWQWZpZSYCBsrhfRKhVzbO5VO3rjgIc4T+3R+q19iANUH0zcC07IcwyQch
+         jDOnmZZS7LhrZS9CyPJfM0XKsuDsMkh06wfMb3Dfmn8NTNzaigfGgODSPvIPxHEwRAL5
+         zhWYWp6xlgO1WLx8fw6iWLkXLKPmFtB+SFJlt/tIrMUgHzIMSCBjzy9weemwi2YNxiYE
+         1oRPvVloZNgsg6dld4x7cjs+nOi0eYi6hs+ORkH6qwVcs63IulddNHRn5ipRTyMcY6e1
+         TfRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUIFQhg2L8RmbSm+et1Kr7TF5y3bumeTujlLfCLROI8985J6EadOZ51sdAcXGvFKx415vu2gvKqkz8SjHMub0A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/0GKdD+bcGfIfX6KiCmEyZTDDnbvpPolH2RQC8FNoy9MOPnax
+	0tgL0YvTZJCYpfmS9sGogi0OvqUDUiVJWEBQGWgthSgdf19CmjJ1QvTTbre35KiyeH9qBWu/X6i
+	NrlKE
+X-Gm-Gg: ASbGncs5gDWbIE72Q/em7eWHEGkjPVXOPW3TZEO0TX3mKKdTZ0BMyILfXZ0AbsRf1LJ
+	dR8wi9pJK9eq6SHri/oDoCC8ZOzk0NiJs6lmoqgeCXrvSwIC/w9274hN+9IecLAX6uL90uQwX//
+	YlvnKKzTP77eBg2PJWn6V85ucRZhRSuPD2QozFQ8KXTPYMCcVmPb9xAPLtzXik1QWs7vGfRBr+X
+	RGCBpsBUrVkrkoAE5qpbpVQBKnD5+N4QyOZ75/XOhRp/ytCu6z1QFhISYD11a9gSLdS/zscAWze
+	OCUOxtFsvdKHVM4W5U0cm16DigmHch4PY4tbfyjdCr1QOsRQXF8A5AVJ2QvibJL3VYZ9y7rxclQ
+	4+czOKsjDRSMzLNgCF3OnB2dAR/vCJZQv4DWbz+WWb0sUJaphAd3ql8MNe+Lin6v95jvt5c00lB
+	Ig8A==
+X-Google-Smtp-Source: AGHT+IF7SOcnQpWdfQ59cqPsx+uS0pX16PxatoEuSqjtpKrk7k2OwEb2NGWnYl5hAvgls3IoLhSOIw==
+X-Received: by 2002:a17:902:d587:b0:269:8fa3:c227 with SMTP id d9443c01a7336-290c9c8a5f1mr191001155ad.8.1761081615550;
+        Tue, 21 Oct 2025 14:20:15 -0700 (PDT)
+Received: from mozart.vkv.me ([192.184.167.117])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6a76b5d0b4sm11102371a12.29.2025.10.21.14.20.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 14:20:15 -0700 (PDT)
+Date: Tue, 21 Oct 2025 14:20:13 -0700
+From: Calvin Owens <calvin@wbinvd.org>
+To: Francesco Valla <francesco@valla.it>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [BUG] Erratic behavior in btnxpuart on v6.18-rc2 - and a
+ possible solution
+Message-ID: <aPf5DZVYrc2YAXXT@mozart.vkv.me>
+References: <6837167.ZASKD2KPVS@fedora.fritz.box>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - esm19.siteground.biz
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - valla.it
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-SGantispam-id: e1c565c38749307d116ccccf7363c19c
-AntiSpam-DLS: false
-AntiSpam-DLSP: 
-AntiSpam-DLSRS: 
-AntiSpam-TS: 1.0
-CFBL-Address: feedback@antispam.mailspamprotection.com; report=arf
-CFBL-Feedback-ID: 1vBJMG-00000001OOp-0QuD-feedback@antispam.mailspamprotection.com
-Authentication-Results: outgoing.instance-europe-west4-txv0.prod.antispam.mailspamprotection.com;
-	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
-	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
-	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
-	arc=none
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6837167.ZASKD2KPVS@fedora.fritz.box>
 
-Hello,
+On Tuesday 10/21 at 22:53 +0200, Francesco Valla wrote:
+> Hello,
+> 
+> while testing Bluetooth on my NXP i.MX93 FRDM, which is equipped with an IW612
+> Bluetooth chipset from NXP, I encountered an erratic bug during initialization.
+> 
+> While the firmware download always completed without errors, subsequent HCI
+> communication would fail most of the time with:
+> 
+>     Frame reassembly failed (-84)
+> 
+> After some debug, I found the culprit to be this patch that was integrated as
+> part of the current (v6.18) cycle:
+> 
+>     93f06f8f0daf Bluetooth: remove duplicate h4_recv_buf() in header [1]
+> 
+> The reason is simple: the h4_recv_buf() function from hci_h4.c, which is now
+> used instead the "duplicated" one in the (now removed) h4_recv_buf.h, assumes
+> that the private drvdata for the input struct hci_dev is a pointer to a
+> struct hci_uart, but that's not the case for the btnxpuart driver. In this
+> case, the information about padding and alignment are pretty random and
+> depend on the content of the data that was incorrectly casted as a
+> struct hci_uart.
+> 
+> The bug should impact also the other platforms that were touched by the
+> same patch. 
 
-while testing Bluetooth on my NXP i.MX93 FRDM, which is equipped with an IW612
-Bluetooth chipset from NXP, I encountered an erratic bug during initialization.
+Hi Francesco,
 
-While the firmware download always completed without errors, subsequent HCI
-communication would fail most of the time with:
+Thanks for investigating, this makes sense to me.
 
-    Frame reassembly failed (-84)
+Funny enough, I specifically tested this on btnxpuart and saw no
+problems. I suppose some kconfig difference or some other innocuous
+patch moved structure fields around such that it triggered for you?
+Not that it really matters...
 
-After some debug, I found the culprit to be this patch that was integrated as
-part of the current (v6.18) cycle:
+> For the time being, I'd then propose to revert the commit.
 
-    93f06f8f0daf Bluetooth: remove duplicate h4_recv_buf() in header [1]
+Adding back all the duplicate code is not the right way forward, IMHO.
+There must be some way to "mask" the problematic behavior for the
+drivers which stash the different structure in drvdata, right?
 
-The reason is simple: the h4_recv_buf() function from hci_h4.c, which is now
-used instead the "duplicated" one in the (now removed) h4_recv_buf.h, assumes
-that the private drvdata for the input struct hci_dev is a pointer to a
-struct hci_uart, but that's not the case for the btnxpuart driver. In this
-case, the information about padding and alignment are pretty random and
-depend on the content of the data that was incorrectly casted as a
-struct hci_uart.
+Any thoughts from anybody else? I should have time to spin something up
+tomorrow, if nobody beats me to it.
 
-The bug should impact also the other platforms that were touched by the
-same patch. 
+Thanks,
+Calvin
 
-For the time being, I'd then propose to revert the commit.
-
-Thank you
-
-Regards,
-Francesco Valla
-
-[1] https://lore.kernel.org/linux-bluetooth/be8edf7f8ba8dea6c61272b02fb20a4ac7e1c5a5.1756179634.git.calvin@wbinvd.org/
-
-
-
- 
-
-
-
+> Thank you
+> 
+> Regards,
+> Francesco Valla
+> 
+> [1] https://lore.kernel.org/linux-bluetooth/be8edf7f8ba8dea6c61272b02fb20a4ac7e1c5a5.1756179634.git.calvin@wbinvd.org/
+> 
+> 
+> 
+>  
+> 
+> 
+> 
