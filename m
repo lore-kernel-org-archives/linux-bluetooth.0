@@ -1,157 +1,307 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from delivery.antispam.mailspamprotection.com (delivery.antispam.mailspamprotection.com [185.56.87.0])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72B9283FF1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Oct 2025 21:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761082204; cv=none; b=aqJi6ji8wdbUZsdV2cUjCIqDIBqj1f+4tHBuVK8sYhR3ood/PwphfE66EkL/CdXwQw6l1yi/t/pPh0rUK5NMJwq641UpQvEZpVlnFd1OpIKTYheJVj2x6S2vvH3czfjm/WhRvKzXFO3HZepQZORVzuWEVD+zaWiNX1WdXJ/W6U8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761082204; c=relaxed/simple;
-	bh=dwqMl/vbpfqiF6alkHk5Yx63NAGPmT9VgqTEeDD6a4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=upmePwN0/fiNT+PQA58nSy+7dJJ+eaRVwXaZhJca8ExhuGzZdu745uTaDcB/Xmrr6fiAIR63APId0Ov2dFYe6dY4551hy/fsg1wX2sGuVqPI57z6oSm/GFbB7K1SqkmO3EpEWb3GsuozmJWrs05YKhjAOifK28U7YEBn/pEHr3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=T5pb4ClE; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49BE2690D1;
+	Tue, 21 Oct 2025 22:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.56.87.0
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761084455; cv=pass; b=Nb49Z0wGTFjCkOVpATnDEZEoVG0+OR4v+UfTxdWHGQoq933n41TGEokEvTXoZUxxTvyaRwoGRqW00c0ZZPmEpOxLaMHu4mxJHABU5hxVRIju+hQ91/3a96gJmZMPMkkpIKs5Bz8G9wCoQ9FCifUeiTXK2OLdXobtWz31OQB5BwA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761084455; c=relaxed/simple;
+	bh=z8lTYmn/IjleiyKM3+XordSbBa5Pmo7yUKfsFcwffCg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ocueWwxy5pzuEIusVKOIJkXRahvqU4KH0H4RIyUuSgjCjYPMB9O+L5MQozwK5xsS5kWap1ePKfgDPMkWEWySeVdFmb6cOkuRJlS4i8WAtlTdfpoCzM/2ROx42Z5ctj2yxTMBbHBDxPU42RGAEUAm5T8Mn/1zANyxtcVBepZftT0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it; spf=pass smtp.mailfrom=valla.it; dkim=pass (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b=Yu/uGOfa; dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b=nP4cWOwF; arc=pass smtp.client-ip=185.56.87.0
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valla.it
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="T5pb4ClE"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b6a0a7f3a47so5647017a12.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Oct 2025 14:30:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1761082202; x=1761687002; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EpZNM3XgwJ16I+fZmWCMaO7DLj0Pq/ew1phxLV7Le84=;
-        b=T5pb4ClEb04hNTu5kowJOKmmnkqS42iBHe9aJGyrRtUI4gFgVq9LUOAC6sT6sUMPUI
-         UMGfPJ6fL4Uhu1Vm1e1QlvbB8O3G4xAJchX0U9rGOiJRSirn72OOgAcAtpmH+IUk156E
-         GlRzyOtpHJgUoChL7ldReZORVpjHRJdl03Sg6ajh/DEk9ochw9YpncIInAlfUrCnE8YG
-         Z+k9BSCnHKZO1dKWNHaXCY8bSxq3ceiDGz2gCYRKDL3HStK6r69mN6MVR0nC91ne3Qo4
-         UUmz9IAQHGR7Gz/REAjmz2bBBrwhvU7Rez/qOX/EhQ4v68tH69u3sf4neUJQNmppgwRc
-         juUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761082202; x=1761687002;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EpZNM3XgwJ16I+fZmWCMaO7DLj0Pq/ew1phxLV7Le84=;
-        b=hrrLobmPyS1BOQ+vImh/NU1UkH9isN8Kfcjw2AhZtNFPCt8TSaUILBoe/OBUI19Xoo
-         1xKOHB92sYMoVdmDz5RQaQv11yzMoykLsRRo2iyP381WeaZBS67HYD5Uc4VC2INEttcX
-         hFRvj1usuj+FbBW8jTQwaTEyAW6aFx9vKe5Jk9F+sfu7hhssGyO+D+7Sgtf8DZIgeelt
-         nOlf8BtDXKSNXv7yzrLg8x/cKTjzAEiLRNNLvjW9/RcGRF6YblzByak8EmOFoWXXUAqo
-         GrVgtbxTjJS+M7pO9emHhk95vke4WnLinBtqqY56pxE7UtaWfaW05LpPViRIADqEBsmq
-         yMwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXOCB/5f3aJc64sc0MQWwCmVUYAn76MSNyJUr3YNFqnWB1LhZwka2y/rRDCAOCoVNI4Ql70wlSn93YmLD9Wauc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu7/3+wthbUCjClJKVdNm1ldX9kjE/7VYuBI2tPv1TYHGfgyUm
-	b3Ep1JMzGybh7P/GXc/0pVGIVrgJN3NAHdV0R/8Eb9E3KxG5OczpuSPo8yktIIYGWKNvOoHYhYJ
-	Ovsdh
-X-Gm-Gg: ASbGnctBCbHue2t6zGBysQjPOMTQHg3vt0TAQ/TLQcySc9YejJ01FFdIX42r7skGDlE
-	IDMSXvTn/IwGGZWjMKfsJ6sSKoANGslcLHzVtIjA4BOAYsOvsNS8vZ5lU+VYT+BRzp+6hKcugeO
-	IH9RSik49II2GxfgKtJTyOhyB08NZDZCMEnPxSXdfKKpCnVbxAHIzCl5GWM4V3Bn6bxKWXmenra
-	UIvqpkAqhPFsiLLPBUiGcEQx+AkaMPMTBiHsoz965iO0mYAlrhB8emt+0gb4WPVMm7OQQtFS4vy
-	vDDDCf8WXBFMmMDuakSxfvnv1fC0JwjOUtx7uT5pAR/mN8cdR0ShsisDJ2UBeqcAKn66Sb17IcU
-	QZnuFQUO9NM42uv09vBPmBmHhYz23scxZA1DPHeAHjNkrBqGT1DgRIavUyKfbcsXA4omwkHe0+9
-	rBpFJSxM+7P+hR
-X-Google-Smtp-Source: AGHT+IFQPQVLF62iSQjgKED/7MJICfhrVLj1XS5eTii3vZpdYHBP+K2MnZ4pOMVYwQSUDUzd3dAjAg==
-X-Received: by 2002:a17:903:3bc4:b0:26d:353c:75d4 with SMTP id d9443c01a7336-290c99a9669mr215805815ad.0.1761082202003;
-        Tue, 21 Oct 2025 14:30:02 -0700 (PDT)
-Received: from mozart.vkv.me ([192.184.167.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471d5850sm118793665ad.66.2025.10.21.14.30.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 14:30:01 -0700 (PDT)
-Date: Tue, 21 Oct 2025 14:29:59 -0700
-From: Calvin Owens <calvin@wbinvd.org>
-To: Francesco Valla <francesco@valla.it>
+	dkim=pass (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b="Yu/uGOfa";
+	dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b="nP4cWOwF"
+ARC-Seal: i=1; cv=none; a=rsa-sha256; d=outgoing.instance-europe-west4-qjnz.prod.antispam.mailspamprotection.com; s=arckey; t=1761084453;
+	 b=vixKUkUrm6fxCu+uyjiYiCfaJkxaBA3oubjnRi8A+700vZGUvTt943r04p0k+cb1wr6zKEDUH6
+	  xYzJDr6nYAvrbNbXdky0YGDKHFWTkOAuh3foUVf5+3OgqMO4nF33K7DPAnNBkEPtKrN9R906Gy
+	  6+fHosCcqt3IkZvTKfVLM8N5i5bqBAAoM6260EndDrfmTeK4GPivlI7DLLE39C8vbIGhZIGfgj
+	  ++TH+VBtxMrhWaOcBTA5u0qT6yv+2St+j8xteOh0bH/HwBRPefE8ub1UvSFWkzxW714TARDz1u
+	  dd95wT0ukf7vV/EBaAghaIIk1jRzEuobj3DKjKYzhau2Yw==;
+ARC-Authentication-Results: i=1; outgoing.instance-europe-west4-qjnz.prod.antispam.mailspamprotection.com; smtp.remote-ip=35.214.173.214;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed; d=outgoing.instance-europe-west4-qjnz.prod.antispam.mailspamprotection.com; s=arckey; t=1761084453;
+	bh=z8lTYmn/IjleiyKM3+XordSbBa5Pmo7yUKfsFcwffCg=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	  Message-ID:Date:Subject:Cc:To:From:DKIM-Signature:DKIM-Signature;
+	b=v2U1U1MbBGVfo8LL4/DnmbWP2sHyZGQwplIA1HqEUdq8DtAt6sFK4TgKoeRwM5Tkj1pQ/z8vvB
+	  WBefqSwZskohHPgVhkkSVwRykxuMMnPs+g2BA9sDeLPMcdYAU9POP/0Foix9DGGf8Z3t+dLTbg
+	  vgTKeyRgGocUCqTXb0FfRC75pS3zqdJXtqARObzpCngW9upYgtk3yyoypBboN0tek3enAUKwTs
+	  uAtsTteASTaAwxze5Sq4ybASlJRemALRgGRdzjv2ZzlmisDnmkNu0DkQ87FHRmoc+Dh1Yd991I
+	  ul85+1lnjSGXg27MNytMWm4PIUANs2M6uncDgPZBvFCNwg==;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=antispam.mailspamprotection.com; s=default; h=CFBL-Feedback-ID:CFBL-Address
+	:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Reply-To:List-Unsubscribe;
+	bh=EPZOChOksZI5m9+TlSbFkGPQEFsrhm2ZHMS2Z33YhXc=; b=Yu/uGOfaoX5qXm6T447Ff9QzYi
+	db+QJbI44qrbOwPKFOhc4gahNvFPOvGUZMW4ma3SQgyEjgRWQD5ZzF2akWi8SlrHUnhdbT9hMmF5W
+	eEsVd9tvfEwmO2TaBcnh1m89ltcfSO/J88Rs1MPu24zUa0LSyWJOF9o4TZPXt/BtOdlM=;
+Received: from 214.173.214.35.bc.googleusercontent.com ([35.214.173.214] helo=esm19.siteground.biz)
+	by instance-europe-west4-qjnz.prod.antispam.mailspamprotection.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1vBKVq-00000005w9w-2xHW;
+	Tue, 21 Oct 2025 22:07:29 +0000
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=valla.it;
+	s=default; h=Date:Subject:Cc:To:From:list-help:list-unsubscribe:
+	list-subscribe:list-post:list-owner:list-archive;
+	bh=EPZOChOksZI5m9+TlSbFkGPQEFsrhm2ZHMS2Z33YhXc=; b=nP4cWOwFctK573Zdz4YS5fQNd4
+	XOqvj6fKkRcIAHu7eR6nAAYQC+nJUvegGhE9CIVk1pOvnXI1VvMyikpZH+0lLjkklqkV61PkgL/ys
+	gMmynQS6YCEnteF5db1Rm7tMZ9RSNEaMkqhNgDCtGnL5lBDGS1mdgUqmP8MKQxTLF8CE=;
+Received: from [95.239.58.48] (port=60623 helo=fedora.fritz.box)
+	by esm19.siteground.biz with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1vBKVa-00000000PRL-4C5j;
+	Tue, 21 Oct 2025 22:07:11 +0000
+From: Francesco Valla <francesco@valla.it>
+To: Calvin Owens <calvin@wbinvd.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [BUG] Erratic behavior in btnxpuart on v6.18-rc2 - and a
- possible solution
-Message-ID: <aPf7Vz5K6P7frdlf@mozart.vkv.me>
-References: <6837167.ZASKD2KPVS@fedora.fritz.box>
- <aPf5DZVYrc2YAXXT@mozart.vkv.me>
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Paul Menzel <pmenzel@molgen.mpg.de>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject:
+ Re: [BUG] Erratic behavior in btnxpuart on v6.18-rc2 - and a possible
+ solution
+Date: Wed, 22 Oct 2025 00:07:10 +0200
+Message-ID: <2569250.XAFRqVoOGU@fedora.fritz.box>
+In-Reply-To: <aPf7Vz5K6P7frdlf@mozart.vkv.me>
+References:
+ <6837167.ZASKD2KPVS@fedora.fritz.box> <aPf5DZVYrc2YAXXT@mozart.vkv.me>
+ <aPf7Vz5K6P7frdlf@mozart.vkv.me>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aPf5DZVYrc2YAXXT@mozart.vkv.me>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - esm19.siteground.biz
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - valla.it
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-SGantispam-id: c8993f67c266e8dbc9b7c02c1db19444
+AntiSpam-DLS: false
+AntiSpam-DLSP: 
+AntiSpam-DLSRS: 
+AntiSpam-TS: 1.0
+CFBL-Address: feedback@antispam.mailspamprotection.com; report=arf
+CFBL-Feedback-ID: 1vBKVq-00000005w9w-2xHW-feedback@antispam.mailspamprotection.com
+Authentication-Results: outgoing.instance-europe-west4-qjnz.prod.antispam.mailspamprotection.com;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
 
-On Tuesday 10/21 at 14:20 -0700, Calvin Owens wrote:
-> On Tuesday 10/21 at 22:53 +0200, Francesco Valla wrote:
-> > Hello,
+On Tuesday, 21 October 2025 at 23:29:59 Calvin Owens <calvin@wbinvd.org> wrote:
+> On Tuesday 10/21 at 14:20 -0700, Calvin Owens wrote:
+> > On Tuesday 10/21 at 22:53 +0200, Francesco Valla wrote:
+> > > Hello,
+> > > 
+> > > while testing Bluetooth on my NXP i.MX93 FRDM, which is equipped with an IW612
+> > > Bluetooth chipset from NXP, I encountered an erratic bug during initialization.
+> > > 
+> > > While the firmware download always completed without errors, subsequent HCI
+> > > communication would fail most of the time with:
+> > > 
+> > >     Frame reassembly failed (-84)
+> > > 
+> > > After some debug, I found the culprit to be this patch that was integrated as
+> > > part of the current (v6.18) cycle:
+> > > 
+> > >     93f06f8f0daf Bluetooth: remove duplicate h4_recv_buf() in header [1]
+> > > 
+> > > The reason is simple: the h4_recv_buf() function from hci_h4.c, which is now
+> > > used instead the "duplicated" one in the (now removed) h4_recv_buf.h, assumes
+> > > that the private drvdata for the input struct hci_dev is a pointer to a
+> > > struct hci_uart, but that's not the case for the btnxpuart driver. In this
+> > > case, the information about padding and alignment are pretty random and
+> > > depend on the content of the data that was incorrectly casted as a
+> > > struct hci_uart.
+> > > 
+> > > The bug should impact also the other platforms that were touched by the
+> > > same patch. 
 > > 
-> > while testing Bluetooth on my NXP i.MX93 FRDM, which is equipped with an IW612
-> > Bluetooth chipset from NXP, I encountered an erratic bug during initialization.
+> > Hi Francesco,
 > > 
-> > While the firmware download always completed without errors, subsequent HCI
-> > communication would fail most of the time with:
+> > Thanks for investigating, this makes sense to me.
 > > 
-> >     Frame reassembly failed (-84)
+> > Funny enough, I specifically tested this on btnxpuart and saw no
+> > problems. I suppose some kconfig difference or some other innocuous
+> > patch moved structure fields around such that it triggered for you?
+> > Not that it really matters...
 > > 
-> > After some debug, I found the culprit to be this patch that was integrated as
-> > part of the current (v6.18) cycle:
+> > > For the time being, I'd then propose to revert the commit.
 > > 
-> >     93f06f8f0daf Bluetooth: remove duplicate h4_recv_buf() in header [1]
-> > 
-> > The reason is simple: the h4_recv_buf() function from hci_h4.c, which is now
-> > used instead the "duplicated" one in the (now removed) h4_recv_buf.h, assumes
-> > that the private drvdata for the input struct hci_dev is a pointer to a
-> > struct hci_uart, but that's not the case for the btnxpuart driver. In this
-> > case, the information about padding and alignment are pretty random and
-> > depend on the content of the data that was incorrectly casted as a
-> > struct hci_uart.
-> > 
-> > The bug should impact also the other platforms that were touched by the
-> > same patch. 
+> > Adding back all the duplicate code is not the right way forward, IMHO.
+> > There must be some way to "mask" the problematic behavior for the
+> > drivers which stash the different structure in drvdata, right?
 > 
-> Hi Francesco,
+> Actually, the right approach is probably to tweak these drivers to do
+> what the Intel driver does:
 > 
-> Thanks for investigating, this makes sense to me.
+> https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/bluetooth/hci_intel.c#n869
 > 
-> Funny enough, I specifically tested this on btnxpuart and saw no
-> problems. I suppose some kconfig difference or some other innocuous
-> patch moved structure fields around such that it triggered for you?
-> Not that it really matters...
+>     static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+>     {
+>             struct hci_uart *hu = hci_get_drvdata(hdev);
+>             struct intel_data *intel = hu->priv;
 > 
-> > For the time being, I'd then propose to revert the commit.
-> 
-> Adding back all the duplicate code is not the right way forward, IMHO.
-> There must be some way to "mask" the problematic behavior for the
-> drivers which stash the different structure in drvdata, right?
+> I'll spin that up unless I hear better from anyone else :)
+>
 
-Actually, the right approach is probably to tweak these drivers to do
-what the Intel driver does:
+Hi, thanks for the quick response!
 
-https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/bluetooth/hci_intel.c#n869
+That was my first thought, but the Intel driver actually _uses_ the hci_uart
+structure, while btnxpuart and such would only piggy-back on it to be able to
+use h4_recv_buf() (and struct hci_uart is huge!).
 
-    static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-    {
-            struct hci_uart *hu = hci_get_drvdata(hdev);
-            struct intel_data *intel = hu->priv;
+One possible solution would be to define an "inner" __h4_recv_buf() function
+that accepts alignment and padding as arguments, and use that directly on
+drivers that don't use struct hci_uart (PoC attached - I don't like the
+__h4_recv_buf name but I don't really know how it should be called).
 
-I'll spin that up unless I hear better from anyone else :)
+Regards,
+Francesco
 
-> Any thoughts from anybody else? I should have time to spin something up
-> tomorrow, if nobody beats me to it.
-> 
-> Thanks,
-> Calvin
-> 
-> > Thank you
-> > 
-> > Regards,
-> > Francesco Valla
-> > 
-> > [1] https://lore.kernel.org/linux-bluetooth/be8edf7f8ba8dea6c61272b02fb20a4ac7e1c5a5.1756179634.git.calvin@wbinvd.org/
-> > 
-> > 
-> > 
-> >  
-> > 
-> > 
-> > 
+---
+
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index d5153fed0518..02511ef1a841 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1756,8 +1756,9 @@ static size_t btnxpuart_receive_buf(struct serdev_device *serdev,
+ 
+        ps_start_timer(nxpdev);
+ 
+-       nxpdev->rx_skb = h4_recv_buf(nxpdev->hdev, nxpdev->rx_skb, data, count,
+-                                    nxp_recv_pkts, ARRAY_SIZE(nxp_recv_pkts));
++       nxpdev->rx_skb = __h4_recv_buf(nxpdev->hdev, nxpdev->rx_skb, data, count,
++                                      nxp_recv_pkts, ARRAY_SIZE(nxp_recv_pkts),
++                                      0, NULL);
+        if (IS_ERR(nxpdev->rx_skb)) {
+                int err = PTR_ERR(nxpdev->rx_skb);
+                /* Safe to ignore out-of-sync bootloader signatures */
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 9070e31a68bf..c83c266ba506 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -151,27 +151,32 @@ int __exit h4_deinit(void)
+        return hci_uart_unregister_proto(&h4p);
+ }
+ 
+-struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+-                           const unsigned char *buffer, int count,
+-                           const struct h4_recv_pkt *pkts, int pkts_count)
++struct sk_buff *__h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
++                             const unsigned char *buffer, int count,
++                             const struct h4_recv_pkt *pkts, int pkts_count,
++                             u8 alignment, u8 *padding)
+ {
+-       struct hci_uart *hu = hci_get_drvdata(hdev);
+-       u8 alignment = hu->alignment ? hu->alignment : 1;
+-
+        /* Check for error from previous call */
+        if (IS_ERR(skb))
+                skb = NULL;
+ 
++       if (alignment == 0)
++               alignment = 1;
++
++       WARN_ON_ONCE(alignment > 1 && !padding);
++
+        while (count) {
+                int i, len;
+ 
+                /* remove padding bytes from buffer */
+-               for (; hu->padding && count > 0; hu->padding--) {
+-                       count--;
+-                       buffer++;
++               if (padding) {
++                       for (; *padding && count > 0; *padding = *padding - 1) {
++                               count--;
++                               buffer++;
++                       }
++                       if (!count)
++                               break;
+                }
+-               if (!count)
+-                       break;
+ 
+                if (!skb) {
+                        for (i = 0; i < pkts_count; i++) {
+@@ -252,16 +257,20 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+                        }
+ 
+                        if (!dlen) {
+-                               hu->padding = (skb->len + 1) % alignment;
+-                               hu->padding = (alignment - hu->padding) % alignment;
++                               if (padding) {
++                                       *padding = (skb->len + 1) % alignment;
++                                       *padding = (alignment - *padding) % alignment;
++                               }
+ 
+                                /* No more data, complete frame */
+                                (&pkts[i])->recv(hdev, skb);
+                                skb = NULL;
+                        }
+                } else {
+-                       hu->padding = (skb->len + 1) % alignment;
+-                       hu->padding = (alignment - hu->padding) % alignment;
++                       if (padding) {
++                               *padding = (skb->len + 1) % alignment;
++                               *padding = (alignment - *padding) % alignment;
++                       }
+ 
+                        /* Complete frame */
+                        (&pkts[i])->recv(hdev, skb);
+@@ -271,4 +280,16 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 
+        return skb;
+ }
++EXPORT_SYMBOL_GPL(__h4_recv_buf);
++
++struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
++                           const unsigned char *buffer, int count,
++                           const struct h4_recv_pkt *pkts, int pkts_count)
++{
++       struct hci_uart *hu = hci_get_drvdata(hdev);
++       u8 alignment = hu->alignment ? hu->alignment : 1;
++
++       return __h4_recv_buf(hdev, skb, buffer, count, pkts, pkts_count,
++                            alignment, &hu->padding);
++}
+ EXPORT_SYMBOL_GPL(h4_recv_buf);
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index cbbe79b241ce..0b61ee953fa4 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -162,6 +162,11 @@ struct h4_recv_pkt {
+ int h4_init(void);
+ int h4_deinit(void);
+ 
++struct sk_buff *__h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
++                             const unsigned char *buffer, int count,
++                             const struct h4_recv_pkt *pkts, int pkts_count,
++                             u8 alignment, u8 *padding);
++
+ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+                            const unsigned char *buffer, int count,
+                            const struct h4_recv_pkt *pkts, int pkts_count);
+
+
+
+
