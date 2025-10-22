@@ -1,76 +1,61 @@
-Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344C620ADD6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 18:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC97342C95
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 18:27:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761156058; cv=none; b=F4V6nmuUzKa1qWn1U22bENnR4gmz8LJWHkZ/2N3VlmoQFdcj/BwpSEnhPAaq/Ae+VG86bY6JFZEE1qgygbz+KrhPkqqApewYWh7BbwQh2AbN1qsYz0KNxcO9gPLMAGUFxLKZf0WScfHc4AQURq7SXxfaKRos94qrudAIF1qVVzk=
+	t=1761157671; cv=none; b=S8mqblvScb6StPXx9cSSkZIRf2vdSZUjoKTzXqpKWzLbx3zCFwi9dG/R7S3WNa2o2AQ/FteLtiOfBr4jPErb5Xo3R9cJL98QABXJRwpDG91A8UDy8w8VN7NXhUgw6/qY6ttIgnbWiqx6VgWU3UWkwspo5l4CHYfOlBp5Wn7NRcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761156058; c=relaxed/simple;
-	bh=xBdxVqrEmso6MmGopgg38KKAkzGwEiJyUZAEQsS9Vig=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Ri5BDTeIE862iBdbgiMbpn3E7zQs8VQutsTYsPQ0UhkjxJLtx36ZBLXipWTf10hxIg5hHYgYmbrrnDm9KbsZjXk9oINXxNn9MpzobWER/DvloiNDiQiFQBx0x/bc5z6hVfZgjkK0s4abCB+QLedsjL/KlyU5LTTWuSQ4vuqWYk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dU3SueRz; arc=none smtp.client-ip=209.85.217.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761157671; c=relaxed/simple;
+	bh=ITRMuJ0r6S1FgRG3tbdBDAdrkAQEHCMhhGDh8n54zYA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=diJe+FhwDP9+jdu0eipgwnvXarmA9vdB8E2qIJDfd1ylR7cKOxAJ/tAbgtQohPNGDU3k/LPx2OWufjd/OWt5fayk4hzYxsVa/TTeu1OpFUwpHWtbaoorCbFoKL6r6xTnRTiGcWoFhBAopT7Bbo423lNkDqXIsxcMWBn5Dvs6NAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fP1hzX9Q; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dU3SueRz"
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-5db1aa8c93eso726892137.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 11:00:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761156055; x=1761760855; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fBp0yEJeh/Kk2t5z0N7twi2GNHuXMKbFqDW/4zhYdMg=;
-        b=dU3SueRzGa7RUdInq6dOLO9cdo6TNLBq7rwQVMVJC0JznDxFZvvMQt5Brb+rr2bCYS
-         I+ZWJ1aQvigH1YgXaoNbeDoKMVcMWW+SYX/7eVKUp+qiCSTE6byoUFFruQmuhntYiMpe
-         rzou1z51UK9mHYmYV35nuh9sHAHf3fboYDFuhJ2wGCMKQmSN5Om+0MfCAwoCgzJpzIbO
-         9MKDvcCZ5q1nX6HGBpB86exrUBPGUsD5c/nIi2faWbzXM8mPH1QNfYWpDsCEJ6zugiNl
-         SvMzpTQrakZKtiEzKdm/8DgreSHCQiAJ3FUjKxR5F8FyXCAj9F1YQbJ7MEAuAK3x3km7
-         icrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761156055; x=1761760855;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fBp0yEJeh/Kk2t5z0N7twi2GNHuXMKbFqDW/4zhYdMg=;
-        b=ujJ+TOdSAircnByk9D3SrzaHQrdOAmXshz3hL/hYyVoKmrbAnEhFmwpi4AAP14k8rW
-         Og9mX/Yq1567+0gGXbhkGt0CT0jp4Pplymo1qhxndbhkO6NGIlkex1XyLpE+UwYS9cNA
-         VKuqsSSE2LnvbjxZmRVhgDSxzGudk6dTmx8v0gCb8l3vnQdotXS3tkMbljqhHSA6hm0B
-         Lhm7lIIqMb145mGYue676ZhfrTBPNXv/qZP54zsqiQKPPNkzmh+8XQveBH+MPdJdNXYV
-         5UFdq2ggpUzLnY+Jdhv9+Ohuce4UOZpUj0sRP7MCk4GkAhCR2aahcT+zEAqvMU5xGEn4
-         o4Xw==
-X-Gm-Message-State: AOJu0Yyp+v/wHkj3m+t0kl6V9DR7Jn9ATO2vacBubmnLQVCOloHkSNPb
-	L36BFik7N/C1VmDIPJOrdtKtb0iqTOzOanL0C+eTpbBfMrHlMeukxdX1hBnlHA==
-X-Gm-Gg: ASbGnctUwEe4wvyOkmJHIqlfd2b91eDPCIuD2CWyoVGTJxKRjH2OdmbM5ZC7THM2HwF
-	OxibEIaHomEMxcUCZygqeQ+RtXZCsY+AzRJfbuvsYmFyr5FEkO5FasOvtAnPmGlMkHzvMvwqU4w
-	JhzBDuhRoyh3lZKnX78GskT7Qz9nQ94e6N0ww8NHwgEJ+051PAexxKMjj3ToamOe/UG6WOGj/+X
-	wqpN82cbPOxlD0TZEOl1E3bIbANkuKP6yMQ4JpzZHxNf0GX+GosgORKPSG03aKI54KSwqBDksTs
-	hdcC5R98uBkvoFwzYnTZYa3u80KJ5Uch7rpzVhd9ynWOIDN9RrGp0xL9ocNhlDm3XbVEIx0oS8m
-	cV7zZuGwoKOR7GEuAAEelEPBhPLqvE8gGWxIHr2rNPA+f+pB6t/5aOdQ1y7+RAgIm70FzTshHh0
-	KqaQgCu5YEWISwSg==
-X-Google-Smtp-Source: AGHT+IHWJdJmeb7wei0axj7tpQW+kf3Da6fy/7LPfJnZkwODwR2lMQPAaWYEyo46REECWhr/UQWF6A==
-X-Received: by 2002:a05:6102:5111:b0:5d5:f766:333e with SMTP id ada2fe7eead31-5d7dd5934demr5688680137.15.1761156055381;
-        Wed, 22 Oct 2025 11:00:55 -0700 (PDT)
-Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5d96c25dd39sm4973496137.10.2025.10.22.11.00.53
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 11:00:54 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fP1hzX9Q"
+Received: from github.com (hubbernetes-node-33a737e.ac4-iad.github.net [10.52.223.73])
+	by smtp.github.com (Postfix) with ESMTPA id A252364083A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 11:27:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1761157668;
+	bh=gSDhzG6lBbLLojZ2vO0SoDbg0hEyg0+fhSavUhQZyNM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=fP1hzX9QtlO07egqztl6zR6ZTsh6EECFZrPxSBJUAgr1DIn2LJMOBLZcgveSk8Imn
+	 cp1rISNhOf+mSQ1v//jnPD/Ivh5/SuJoKWHjPO4zdfjh46z0q4nM81B+qd+Cj9zNSO
+	 jJjq42xUTPNLWJ+0oLuEVE45nuhWlbZXndFkEiqs=
+Date: Wed, 22 Oct 2025 11:27:48 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] monitor: Print data if LTV and data length don't match
-Date: Wed, 22 Oct 2025 14:00:44 -0400
-Message-ID: <20251022180044.1471032-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.0
+Message-ID: <bluez/bluez/push/refs/heads/1014654/000000-fd9000@github.com>
+Subject: [bluez/bluez] fd9000: monitor: Print data if LTV and data length
+ don't m...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1014654
+  Home:   https://github.com/bluez/bluez
+  Commit: fd9000c2076e3184caed19e4e147b8f5140cfaa9
+      https://github.com/bluez/bluez/commit/fd9000c2076e3184caed19e4e147b8f5140cfaa9
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-22 (Wed, 22 Oct 2025)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Print data if LTV and data length don't match
 
 If data length and LTV don't match this should be made visible so
 issues like the data coming as all zeros as bellow can be detected:
@@ -97,23 +82,7 @@ Versus:
         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
         00 00 00 00 00 00 00 00 00 00                    ..........
----
- monitor/packet.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index dd808deaa79f..22708689fe03 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -4133,7 +4133,7 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
- 		eir += field_len + 1;
- 	}
- 
--	if (len < eir_len && eir[0] != 0)
-+	if (len < eir_len)
- 		packet_hexdump(eir, eir_len - len);
- }
- 
--- 
-2.51.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
