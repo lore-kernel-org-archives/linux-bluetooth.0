@@ -1,152 +1,105 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A252F25F1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 20:03:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74651F584C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 20:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761163413; cv=none; b=ikmeBiQ6WdalKcCgtyDu1nA2QH4jkJZS3E1V4gtXt6XLW4y6FyyKmOuCsR5aJEqTfLlSsAhIAmP/BErvDnJ78+y4S1OGlyCvW7h/DxHtNBdSsgGxYdhOGpsCEd+a6SVp+7XmVpxoPTJQOLfLs+QqCi1DO84WYoheYMFV9fjBp/Y=
+	t=1761164141; cv=none; b=jSqgFIMmexW4JkPO+xpenLNXo3eDU7lEfTyAh3Vh6B3lMSE6kYXkFJEauqM4aEjjRVkgzHmSOZH7OWimT1arVXPkgdiAb5zD6ihhTGONngeqk/7vO9HvBSC3kfNWuV07uzeDWoUYehlc97zeeWcRBHaDEihyGPXrhFy2ZA4npDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761163413; c=relaxed/simple;
-	bh=5IGNJ9XhzfCWxkMBvnoIJDL0C7pZ8ZUoCut1EdvYF1A=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=YnWKqYtKkxY4OHewACLk0JpATqmYWjv3QaXC25z9X0PQdYd12FA6d7p9Fjed0RKoIJDQgupzGPowYRjllpXHuC11nFmu2CIglj+583JElfgVVLfdtMrDMsMbCwvn0ay6DJWNU065uTqhLckRyqo/eR14sYwNT9QItu4L0BRzpHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ow88qvvw; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761164141; c=relaxed/simple;
+	bh=nJa8lixAfkJqE1yH4ah2JLYgOwgIo+lylR/oZEJT4Pw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RPUePeR3xCI89u7IPrGEQltpBrNQxKdbJV5tus/Rx18etJLGviaV3KtSsedwcnufvTg2IV+ZKgFnxGjH5deQmzGjGoViePEapaC2P1rh6C3KvaCp9BWCTJL/otqKTkiq2ePW2Qmfe/GfeLTt3hia6U3zbzmnTFOJTdIGB+/N7A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZPt84FOy; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ow88qvvw"
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-557a56aa93fso7156e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 13:03:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761163410; x=1761768210; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gOGKGXZNbSis78oDvAId+88LAPkbTA/nb9pl2Fe/C8U=;
-        b=Ow88qvvwku6507Gd1kn4UYPo/mSXnX63PtpIzdsOsmv64uSnwGU1rpnLhadjeG4wrH
-         JI1sWtPs6XKTo3h1LPptd+lZGWvxqkBcUCZ4JZktfIPEcoeDG4G8st9IsACnn7/6KBBm
-         01Cs7gyiKja2EE3ndXWdghU+pqmlFohLEPgXNhID7l1HAnjsEKDbUz2Y0tj8Dne1jsmH
-         S9MpzVvVw6LckybVWKCBmYWmapWv6fX4tWQLnYSau7J38klxpbLBx7qAewx3RjLeZsoC
-         2KTMJLH+yWCPSJkpwE2eJzPTLK9XcaMDujABbNbN7MR9XUL0dJyFatLTqBYcqiKKYm6h
-         uWvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761163410; x=1761768210;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gOGKGXZNbSis78oDvAId+88LAPkbTA/nb9pl2Fe/C8U=;
-        b=hbILIiSIGyls2Rd7VnmkAn+CrgM3kvNIb0GKGqYXBfGKtvYMUMBGradvAgmEMD3GGr
-         Mqw9TJu7L9zegI64eUt4aGVqvhqbAVQnRZBHfY0PGjggwEwq1Iy+sdpIdfUW/5L2u75e
-         fiCjvKjNSj27oUfvU8fsufik8Jy7wXf6BJRC5N3AZTzQ1hm9z1S9wcMu4QOPpN61EtLa
-         cy9N4jR6KbgJX3HKynDt1iureh5RSU1PMEJ1wy2wImIwFbX8liMNMMvfepnSpqjmDtIV
-         6X2BRo2jhUzoRfyiZopnIWEP17naoC5MyAdPKnOgSKBBg3dlFE9lPrM3y27haAPd7nSc
-         Vo/Q==
-X-Gm-Message-State: AOJu0Yzlr9VXOnzbasPdzuthrhJg63hn6dVzqsCA2SNiSLcmgHNMJRJl
-	/kDElT9jaHoVjNZo21EwxKzSsT/p18BRKICwlk+/vBKrT9kIXQer7VxCnSF1xQ==
-X-Gm-Gg: ASbGncvSmjV8g/ChHAiMgz1rYD+CeR+LDYRzPwLQSYKLOGKl5e2g08UlYjyP4hknARQ
-	pXUyW+ge7YlXfRraEtnjn+cxQNcwgpWTC7tImRBU5TZyPQan555ZOYhfiCVcLaiVICmgV6WExDf
-	N+3CHLqnETQWKQ+GEOG+ezYourkre/AgPybta+pLhomdtrRTC+k3g4vsCG7Y1a5nKS75HVvg+79
-	r/7eIDBqQWyv39Depd2KP5oEHyJuDhPIcXAL9WHLauAOcEypWI/p52rhvK+vMhElz51VCuFXG/3
-	GHknnr4ZAaDg7BswYHs9X3dlQvTOVk6unlM85YEBP/rrLx+xpRDEi7e4ZFLtTj+wLt3ifRLTZ7B
-	z3rJm8XixbFmX4OsAoly0+yJYusjBlmf2p9gON9BUWsrCWykua9+ZaVCCD8xUfh8fIrGiOYGHqO
-	LOmm8=
-X-Google-Smtp-Source: AGHT+IHlAnMWgsRxN9qFAHyx4B+KxBL+ysCqqnoZEl95unw9eNxuh5wKU4Od70Zs5XxY9ivGS6MfqQ==
-X-Received: by 2002:a05:6122:3a16:b0:557:2551:7e9f with SMTP id 71dfb90a1353d-55725518d19mr846177e0c.14.1761163409578;
-        Wed, 22 Oct 2025 13:03:29 -0700 (PDT)
-Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-557bef22a6csm10002e0c.26.2025.10.22.13.03.28
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 13:03:28 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZPt84FOy"
+Received: from github.com (hubbernetes-node-a55f3c5.ac4-iad.github.net [10.52.202.57])
+	by smtp.github.com (Postfix) with ESMTPA id 101EB400DEC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 13:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1761164139;
+	bh=cWJdgcq1BRxny5h9Ibu86ycTai4CE9guAsig6Mv0yCA=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ZPt84FOyXq9C5C3OGTYHLGujW9ZgMoLtkhsxJPJ7WkFxaYC1TbSS0aSp8OiXh6pAc
+	 NC2oY41aoj27++4Ols2rRLct47SjqX1t3P1nWL6RtsJIJFyYmACkRaYgylAqber61V
+	 f0NGyc3kNnV9tVIPJ4zVxLG6zLuSfNPqiaoC2KNE=
+Date: Wed, 22 Oct 2025 13:15:38 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_core: Fix tracking of periodic advertisement
-Date: Wed, 22 Oct 2025 16:03:19 -0400
-Message-ID: <20251022200319.1529849-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.0
+Message-ID: <bluez/bluez/push/refs/heads/master/39b541-9faf12@github.com>
+Subject: [bluez/bluez] 0ff04a: ioctl-tester: Fix handle value
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 0ff04a94a69ccd1783f446f59de6050d79ca3604
+      https://github.com/bluez/bluez/commit/0ff04a94a69ccd1783f446f59de6050d79ca3604
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-22 (Wed, 22 Oct 2025)
 
-Periodic advertising enabled flag cannot be tracked by the enabled
-flag since advertising and periodic advertising each can be
-enabled/disabled separately from one another causing the states to be
-inconsistent when for example an advertising set is disabled its
-enabled flag is set to false which is then used for periodic which has
-not being disabled.
+  Changed paths:
+    M tools/ioctl-tester.c
 
-Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_event.c        | 7 +++++--
- net/bluetooth/hci_sync.c         | 4 ++--
- 3 files changed, 8 insertions(+), 4 deletions(-)
+  Log Message:
+  -----------
+  ioctl-tester: Fix handle value
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a0ad136b2108..18396e36908b 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -245,6 +245,7 @@ struct adv_info {
- 	bool	enabled;
- 	bool	pending;
- 	bool	periodic;
-+	bool	periodic_enabled;
- 	__u8	mesh;
- 	__u8	instance;
- 	__u8	handle;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ba0a7b41611f..bae8c219341a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1607,7 +1607,7 @@ static u8 hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev, void *data,
- 
- 		hci_dev_set_flag(hdev, HCI_LE_ADV);
- 
--		if (adv && !adv->periodic)
-+		if (adv)
- 			adv->enabled = true;
- 		else if (!set->handle)
- 			hci_dev_set_flag(hdev, HCI_LE_ADV_0);
-@@ -3964,8 +3964,11 @@ static u8 hci_cc_le_set_per_adv_enable(struct hci_dev *hdev, void *data,
- 		hci_dev_set_flag(hdev, HCI_LE_PER_ADV);
- 
- 		if (adv)
--			adv->enabled = true;
-+			adv->periodic_enabled = true;
- 	} else {
-+		if (adv)
-+			adv->periodic_enabled = false;
-+
- 		/* If just one instance was disabled check if there are
- 		 * any other instance enabled before clearing HCI_LE_PER_ADV.
- 		 * The current periodic adv instance will be marked as
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 67514159193c..754e411babfb 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -1607,7 +1607,7 @@ int hci_disable_per_advertising_sync(struct hci_dev *hdev, u8 instance)
- 
- 	/* If periodic advertising already disabled there is nothing to do. */
- 	adv = hci_find_adv_instance(hdev, instance);
--	if (!adv || !adv->periodic || !adv->enabled)
-+	if (!adv || !adv->periodic_enabled)
- 		return 0;
- 
- 	memset(&cp, 0, sizeof(cp));
-@@ -1672,7 +1672,7 @@ static int hci_enable_per_advertising_sync(struct hci_dev *hdev, u8 instance)
- 
- 	/* If periodic advertising already enabled there is nothing to do. */
- 	adv = hci_find_adv_instance(hdev, instance);
--	if (adv && adv->periodic && adv->enabled)
-+	if (adv && adv->periodic_enabled)
- 		return 0;
- 
- 	memset(&cp, 0, sizeof(cp));
--- 
-2.51.0
+Recent changes to emulator has changed the ACL handles to start at
+handle 0x0001 in order to use dedicated ranges for different link
+types.
 
+
+  Commit: 9faf1244a93217775e31ed5ef3b656d4430b63e1
+      https://github.com/bluez/bluez/commit/9faf1244a93217775e31ed5ef3b656d4430b63e1
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-22 (Wed, 22 Oct 2025)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Print data if LTV and data length don't match
+
+If data length and LTV don't match this should be made visible so
+issues like the data coming as all zeros as bellow can be detected:
+
+> HCI Event: LE Meta Event (0x3e) plen 50
+      LE Periodic Advertising Report (0x0f)
+        Sync handle: 64
+        TX power: 127 dbm (0x7f)
+        RSSI: -55 dBm (0xc9)
+        CTE Type: No Constant Tone Extension (0xff)
+        Data status: Complete
+        Data length: 0x2a
+
+Versus:
+
+> HCI Event: LE Meta Event (0x3e) plen 50
+      LE Periodic Advertising Report (0x0f)
+        Sync handle: 64
+        TX power: 127 dbm (0x7f)
+        RSSI: -55 dBm (0xc9)
+        CTE Type: No Constant Tone Extension (0xff)
+        Data status: Complete
+        Data length: 0x2a
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+        00 00 00 00 00 00 00 00 00 00                    ..........
+
+
+Compare: https://github.com/bluez/bluez/compare/39b541edb273...9faf1244a932
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
