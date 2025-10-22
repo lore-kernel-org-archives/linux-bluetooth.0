@@ -1,132 +1,163 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721DB295516
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 22:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAB8303C9C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 23:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761172729; cv=none; b=u9ea1RWlbUH8dvyZAus8Ghlus90D0cWLv1fguPEbZ+qAjP76N3iI4ByuWZNqIRzKerEYNzgT1XXgShNtCv4TItQiK081geJy8bfwOSOHdSdMxzrScXryxFe9Yeu369swXo5EiK7ghdqn0YVJyUB04oy8/yzxS6y0xWlRGc3dh38=
+	t=1761175928; cv=none; b=t3tiejcXooJS4bsWRvC9CG+voeI7bVCydCgh2HFFqcumkzoICV8uNo0ABlITtv/4di2tAJK9Am7Ie/0K/HPmiv7zdxVetngwdonBZiIwW1mtwXc0J+kZCNGj6PoTaRYgvViFvbjdjHlXscM6+VtqhRIKCiCJsCAQAdCwOIG015w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761172729; c=relaxed/simple;
-	bh=ULKv6OA6DP41wT5L4cbEcKCtaPLTWzh9900cBvwjo/M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WNNZlBGQGasL9tI/BKMjqvJagvwBYCA0Q7vgMmo4CNK5A1r8TAWbEdJmPSESZmexXJGtgxg6vupveft+tUvHFPmZeoGu/Qhw3OwqSVrOQUo4LU8Od4IbkKhqg0aBjCGPvxF4//QLuhVoC4SLKT6gu2BIJsepJaCmsNSeD5zY2No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R/TVuzfV; arc=none smtp.client-ip=209.85.222.173
+	s=arc-20240116; t=1761175928; c=relaxed/simple;
+	bh=eNQ7UFbupXD7c52/BvOel5SC/FgEZNDJi8tWPP+y4/A=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=joIUeI01/qGjkkTZeHHDkBZHGD306fgaAsuHsHmUtxb4LSKf+0DEXyaRBe4TsUTWvNDroRXCnEJN8rXWJ+dONf+6nuc3LSpDcO+f0UNXiS43B3SZBF8TOPCoJ/a1AWTZ4WViXYHiCOL0dOyWt2XhgogbuYqU/vv9YVSj6fS1iLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fwIKbpWQ; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/TVuzfV"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-88e525f912fso15105685a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 15:38:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwIKbpWQ"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7a226a0798cso151835b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 16:32:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761172726; x=1761777526; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5VocPRDtVk+dIE3iw2ib7QtB3Kc3D8UgJbJMrfJb3wI=;
-        b=R/TVuzfVwi9fOhdMrqNAFxbxvXM8zSXaPBUkEUb1fCuM2OTalT6qao+D2Aqx6nXrua
-         Xas+ZUG0SH8YH0kWz/gTGsBT+Ql1SIlO5ci5s6Quv7E7KoxKu0JPCvDtsRERo2ZoUWZi
-         8S4ghdPZEAW3IN9b1QilRHGSAtdWkvyYf0h21hA9XizEH+HOq2G/Y2K2Rtk8iAY9nPVT
-         Kqu1ONF/jJcFu+6ExSyV2YzF+yRBP+NwmeO104eCWWKs+NISz3J7HidGCG0mN6JmpMM8
-         AnnaOsmn2l1yKqNHRK2I3SvvyFvLCfj7D/baTLwbM+rclPAnhCqxLwZUsaQYLuSv6ukA
-         OxEg==
+        d=gmail.com; s=20230601; t=1761175924; x=1761780724; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zN4EuI0juel3rSksFmWzqvPtntuY103rJQjOX46aVgA=;
+        b=fwIKbpWQvpHBPPt7n+vR4BoouUnevpKj8mDoaPE4oMigiqV9Y99GDmbE5C2kYS8TRh
+         tuAnvtIBte4wf+tFGm3ITiOeTP8UQ4Pvi3H/8daDq1PqJwPetaCiH9ih7serEd2qoK3B
+         JE+dRwv7qN6kCWeCScM+ZU3ILSZ+nx6Hvgw/WfUdfdMEwO56JgDVJHKAX+X94I4a72VM
+         hFMEWfCQE0QIVpLMLT+X1JVMXw6yuENq5vYID7HDUUqiMJZaZ6gn2/5412eFQB0MjkAY
+         b9I9Ynr0+hJpKxjOzVwDgllSLfGN6WooxRbAo+ZTtcu1zjFwwEdWl2sU8XgZqUyWrWvJ
+         xyAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761172726; x=1761777526;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1761175924; x=1761780724;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5VocPRDtVk+dIE3iw2ib7QtB3Kc3D8UgJbJMrfJb3wI=;
-        b=ImigraQmyPUk+LNpxCurremvYENKn4E0/ecqYdn6CxqOxqMJ0C/fbJHUqbSDKr/Koo
-         OtqgOcWxzVXwjWTSJYcKD4KW9eo7l7wPKfuNuMpNR7reZxsUF0TYYMVHB9M+8cz1uNq+
-         WeOgvX618zQCS5ZUDiYwKmgtUQ3DW04dpwOuVxtr3GXDrSU8y50158UHqH1slkxiuIFo
-         skUxNRTO05MuB/wtADbf1g8RYRg4DMyX9dWGckMqBdSGfbfadZ9n6l/8s338NaEbo4Pg
-         9eiO6Tq7qLEamO8r+cL7j+0YvyuPtYYA4pIp43onJjrGtvG1GzphADSqkuyoa7H5Xlo5
-         XJYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVTHnZuSmr5J6ym5N5AtH1odcJDE7whWpiJL64l+quhCLFyNmXfLATLAHy26kraqo1x+W2QRMWEUBwePCRE77Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxQS6oiUlO/TT3BtLBYhnAMDQ+Kb/nD/JftcTZeiQJccBJCZh0
-	rDdDR8Oc7W3KXce2GqT1kEk7moIyFwaHmzDz78VOE0IV9eu8k5s9pbHo
-X-Gm-Gg: ASbGncs1G5kDtdiuCQnyNL+/lamRgJ+ihtwC7zsqt23O/pGs1VowUq3qyq77AH/NDmt
-	NzruI64Z6oO5MCLUwipgCgVvHIOY82Bn/EYXVrUG8TC61qLRt3SP00/FNNRD+JJoKa0Z9dl1sIt
-	A+3pnzhcmJzJ0hH59CzY2Ztqxhk1INSusfn4EBCWZv5GTPdWUkHtElnOKfr3G4WwmMrdygVkxz0
-	aprdv3xV0+DzwaiAMhWB701mr+BDNp8XQlp/0m9pgFKew2EY6SZUQqZIn1aT6htQW19nOXEt2H+
-	kSr0HFzDQOKXHrIKNFDzMJOiGY6S6G6hWT0iLAP9MfWs97aOXmfbj6y2XwdqBCrJzyywSbVvImP
-	TIvJlgjqcFGbzf0JXerem5pKN2fgRYjfotHFhI5mdGW3PVusk/we12xrrBbYEX7Pn2z61/v58p1
-	fpGg67eeyR5/0zUzjGM83e
-X-Google-Smtp-Source: AGHT+IEwf7KTlPfmIBbi2nVEJKfKO6Y8rFXq7vPh5m0MioYFQ+fvpto6UGE7cIpu3l0BBWVrrjj6eQ==
-X-Received: by 2002:a05:620a:1724:b0:893:5433:741b with SMTP id af79cd13be357-89c105a9550mr92282885a.40.1761172726364;
-        Wed, 22 Oct 2025 15:38:46 -0700 (PDT)
-Received: from rpthibeault-XPS-13-9305.. ([23.233.177.113])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-89c0e586d32sm30609585a.18.2025.10.22.15.38.45
+        bh=zN4EuI0juel3rSksFmWzqvPtntuY103rJQjOX46aVgA=;
+        b=t7JqjTlGsj6CQbZYkV3BMUQ1xDKc4nOrgdgoPq/MVOxhfe12ynMsAxOHT851/BRL8i
+         XAVEFcrQOwMwmexUz22tBjM3MFZ3R/GVqh0jP47DCKUTX5/OX9FQ4PJ/V3c1+ZSsPHHf
+         pl5Z1tH4P0LB9JuDSNVqTNikKedBuTOZQrWpFqRSE/6x97+bhKZty4bGbXQ/RGyYNlSi
+         R8o5OJMXNiY3+IBnLahRFSmVzJcjRl8wYfvAVSUfxetA0w12DUp0GqylectZaTJyDQCI
+         /dx59OXfyXarODNls06Hlj0alqRhgGtZsRRMi2rs31k1f6at9PEMusF+YLSst8pIwAfC
+         JESQ==
+X-Gm-Message-State: AOJu0YxIlVe+e8CoHXGZCGyx1ZqQy9pDcJ2myIIMRnjAIhNVSGK2xAoB
+	KA0QfgUyt/ksoA4EsT/N7eeHc8QjktsvvQvJDl73MR0ZFb6HVtpTKJLfI4RBjw==
+X-Gm-Gg: ASbGncvsSLlYMivyjZGAWT+3cUUGzuLoiH4oz1bspmnGASmUd0QFq7WkkZJIJFu01q0
+	YvJGRP/ic1udGFMfE1lve0ySG8LmX+iCtbgwlOB3GVIZgRshiGqjFvKZl8YTTwid4WmOmfOwrtM
+	w4haWKMFLtuBpPbfVT1uz+TIyFgiWmt5SOlgHbVNOHYTzZxpgNTiApUFNtY2NRdWgvpCcJXVEMl
+	AzPNRwnIawjJPYiiivI68gwyrw8238TheJGscDgbhwER/H7O9JSTD2yiQbY3Tpl9JZbvyiGWEKj
+	jToKo1Jq4xZB3q7kwlOZOQr73AD8PhdzT/viDt8qYJbFJiXcKlNAaSLpxWtEFquBwdjaVJSvxT4
+	ySyTSOlb9Ir3FASJlB854wqNj+XW9SPPQ8Kfn5T1MVSkv29EphSLG3x1J6H7akJ6yXYfxuIu+x6
+	cZrc845J5Q9LOHavSw
+X-Google-Smtp-Source: AGHT+IH4AsgOqUQy3Hy3N0wQ7Vehi+Bid39pWdQL6X9mCPE6gYPeuaX2ShyuBH36z8/pGv8J3QH9MA==
+X-Received: by 2002:a05:6a00:99a:b0:77e:325b:f614 with SMTP id d2e1a72fcca58-7a220a50280mr26446826b3a.12.1761175924254;
+        Wed, 22 Oct 2025 16:32:04 -0700 (PDT)
+Received: from [172.17.0.2] ([128.24.163.66])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a274a9e580sm412433b3a.17.2025.10.22.16.32.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 15:38:46 -0700 (PDT)
-From: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com,
-	linux-kernel-mentees@lists.linux.dev,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	khalid@kernel.org
-Subject: [PATCH] Bluetooth: hci_event: validate HCI event packet Parameter Total Length
-Date: Wed, 22 Oct 2025 18:34:16 -0400
-Message-ID: <20251022223417.139332-2-rpthibeault@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Wed, 22 Oct 2025 16:32:03 -0700 (PDT)
+Message-ID: <68f96973.a70a0220.114d4e.1a6d@mx.google.com>
+Date: Wed, 22 Oct 2025 16:32:03 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4960163588916649074=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, rpthibeault@gmail.com
+Subject: RE: Bluetooth: hci_event: validate HCI event packet Parameter Total Length
+In-Reply-To: <20251022223417.139332-2-rpthibeault@gmail.com>
+References: <20251022223417.139332-2-rpthibeault@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-There is a BUG: KMSAN: uninit-value in hci_cmd_complete_evt() due to a
-malformed HCI event packet received from userspace.
+--===============4960163588916649074==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The existing code in hci_event_packet() checks that the buffer is large
-enough to contain the event header, and checks that the hdr's Event Code
-is valid, but does not check the hdr's Parameter Total Length. So,
-syzbot’s event packet passes through and uses the un-init values in
-hci_event_func() => hci_cmd_complete_evt().
+This is automated email and please do not reply to this email!
 
-Reported-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=a9a4bedfca6aa9d7fa24
-Tested-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
-Fixes: a9de9248064bf ("[Bluetooth] Switch from OGF+OCF to using only opcodes")
-Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1014723
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.33 seconds
+GitLint                       PENDING   0.43 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      22.80 seconds
+CheckAllWarning               PASS      25.23 seconds
+CheckSparse                   WARNING   28.22 seconds
+BuildKernel32                 PASS      23.38 seconds
+TestRunnerSetup               PASS      462.08 seconds
+TestRunner_l2cap-tester       PASS      24.04 seconds
+TestRunner_iso-tester         FAIL      32.30 seconds
+TestRunner_bnep-tester        PASS      6.20 seconds
+TestRunner_mgmt-tester        FAIL      120.11 seconds
+TestRunner_rfcomm-tester      PASS      9.40 seconds
+TestRunner_sco-tester         PASS      14.44 seconds
+TestRunner_ioctl-tester       PASS      10.10 seconds
+TestRunner_mesh-tester        FAIL      12.41 seconds
+TestRunner_smp-tester         PASS      8.51 seconds
+TestRunner_userchan-tester    PASS      6.43 seconds
+IncrementalBuild              PENDING   1.01 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+No test result found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.111 seconds
+LL Privacy - Start Discovery 1 (Disable RL)          Failed       0.173 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.767 seconds
+Mesh - Send cancel - 2                               Timed out    1.999 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- net/bluetooth/hci_event.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d790b0d4eb9a..5e1498cc04cd 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -7565,7 +7565,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_req_complete_t req_complete = NULL;
- 	hci_req_complete_skb_t req_complete_skb = NULL;
- 	struct sk_buff *orig_skb = NULL;
--	u8 status = 0, event, req_evt = 0;
-+	u8 status = 0, event, req_evt = 0, len;
- 	u16 opcode = HCI_OP_NOP;
- 
- 	if (skb->len < sizeof(*hdr)) {
-@@ -7585,6 +7585,13 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		goto done;
- 	}
- 
-+	len = hdr->plen;
-+	if (len != skb->len - HCI_EVENT_HDR_SIZE) {
-+		bt_dev_warn(hdev, "Unexpected HCI Parameter Length 0x%2.2x",
-+			    len);
-+		goto done;
-+	}
-+
- 	/* Only match event if command OGF is not for LE */
- 	if (hdev->req_skb &&
- 	    hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) != 0x08 &&
--- 
-2.43.0
 
+--===============4960163588916649074==--
