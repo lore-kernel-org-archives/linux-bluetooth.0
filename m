@@ -1,74 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4096A2F363B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 21:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B53227EC7C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 21:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761168567; cv=none; b=dWbpGhLsnFoCTXdwueAL9aucW94gn4i9Szi+3WDy91qcQbRE5qIUP2PPwJvyfjajGGLAQzSJeto1XhGSdRnNl7P1JjxRgJXxGKWyJ2HaHKUuVqUZuadlbaX//xa6aJKtm8ELs8R5VfPH6WPjueJa4z124G8ZM4NCd2egH4QXgBM=
+	t=1761168857; cv=none; b=EiN46hdpjOh01qXpDzoUw7/waL58s3nDvenam6sU/1U5T++anTTCvKKxATCmQ5PUB8yOdLGG4A4Ey9Lz+D5oBwYBnud6rpMgvy25QENOOc6WVs+h1QpNMLaHCJwzdTD8v2+HK00A8k64XK09zVirpHBviqzZnfFie47U03zKGNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761168567; c=relaxed/simple;
-	bh=Y7PmT0Sz08nQvW4OgnQgy70TA8HgSBSsG66g0H6wacw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=laCnpDYJdjAiOjCEaS6bPUlw9P8aJUohoOINUrwvqv7/3Twt3OqPs8ZTlumdAdnLLm/+zXpWzqDDXabtUAEJV2fS6fG8L/UCDRfqN8bgDoPQQtkwYjmAHvp7+pKsltUxX/vTsr41To6KgDTo0u8mYDZCm1pmmAF4dr6FZdh39oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JgOSRmn4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761168857; c=relaxed/simple;
+	bh=yChirZpFzJxy3Q98HJXVS+oKtrLM4C9hVspQvIEc6eE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=QTzJsQYrbvAVTZioX8H2wLd+JZNbDFSjqGeeLlrHONnq4JbxzPO8kkgrgN2nAGlVFxVqGAZeLH0qrIl9OraLil/s2nvbzwiDAVU+wThC7C4m6AMmntyC9FVBfeGtDqu5UWEdCvYtsiWL33SwypgbaIUqRTnatj+M5XDacHdaevI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ExtwBIVi; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JgOSRmn4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1297C4CEFD;
-	Wed, 22 Oct 2025 21:29:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761168566;
-	bh=Y7PmT0Sz08nQvW4OgnQgy70TA8HgSBSsG66g0H6wacw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JgOSRmn4tYqjIwsK3YW7vSSqfjc+0z7bymfu5Ww7WXIUDBtN7vAF3MyIjkE8qBCRH
-	 zP+tYW2YVhM5/9t2pe5V4deoGJRPoi2hS/8FypxUBp4VPiwPoob/2NbmWk9M9X6Nai
-	 BUHlUgEbaKHqru2B9kzysduHTLX+KYsWHHA62oyYyo+X+85SkFTi60akVNUb1biHZR
-	 K8o322CxL264B8ji3Px0Qu9dMofR1ZoSgWrvEiYMt7AzMYK6fUoy/dIw2qQxw2Ys3R
-	 dzEjI/IcWOy4BaFxtmezuJ+IqQSa96TNUR7D0aiGjv6D6OPu+t5ULsHCDlWpkh2Ic9
-	 1wZ+nCdOhurHg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD513809A00;
-	Wed, 22 Oct 2025 21:29:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ExtwBIVi"
+Received: from github.com (hubbernetes-node-3294be7.ash1-iad.github.net [10.56.159.37])
+	by smtp.github.com (Postfix) with ESMTPA id 5BCDE60050D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 14:34:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1761168855;
+	bh=hpxlswco/f7jJ10S5q1MfoCzabzAHW0rdLo+7bCRadg=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ExtwBIViyfZZ/i8JaPtVwFegCn4fEfNeWTVt3QGb4660aspXJ4v1nrUuCiE1N+6Q0
+	 /t+TAKGuNJiTjoLPE2KK9l5cZgJ1XZDxGTMbO9MGG7qlPf2RmNo2ClhVDcEiiYMXdp
+	 JdYhd4Dz/9K7V+vrvQOsjIfdtChj3OKYMKAcDp5A=
+Date: Wed, 22 Oct 2025 14:34:15 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1014654/fd9000-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] ioctl-tester: Fix handle value
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176116854749.2074360.4645008966541568010.git-patchwork-notify@kernel.org>
-Date: Wed, 22 Oct 2025 21:29:07 +0000
-References: <20251022133814.1404453-1-luiz.dentz@gmail.com>
-In-Reply-To: <20251022133814.1404453-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1014654
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Wed, 22 Oct 2025 09:38:14 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Recent changes to emulator has changed the ACL handles to start at
-> handle 0x0001 in order to use dedicated ranges for different link
-> types.
-> ---
->  tools/ioctl-tester.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-
-Here is the summary with links:
-  - [BlueZ,v1] ioctl-tester: Fix handle value
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0ff04a94a69c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
