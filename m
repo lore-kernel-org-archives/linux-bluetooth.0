@@ -1,191 +1,190 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADE217332C;
-	Thu, 23 Oct 2025 20:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF1127781E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 21:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761251765; cv=none; b=Vpkbh1MHRzbXY37/ypS3FEPbyZyW+00/U10Ip5k2VoBV9KtADQ725Ly1Qir+tlCE+omU1Q+WTaddXOIfR02Z3LVSxviHFN5nwoNc6LF2mbqBf7DJyOu2G6qtPa+LgWG66VXKjQ/9bc/f72lfMets3hGxzQrXt4ZsB6vkvDGrNUI=
+	t=1761253526; cv=none; b=vGnYEspa22RqxlSX1iNRLtkiz0eAI8L8nkc02idHhrtapIWbNpvN7xAc9w3Bye+wbysfJN2XRh2GL9V/tJZXKjZjzMTTCcdTPgiB8QJU+b1/onENgjJiElH2aXP+JCvXHCKBTkf2YiOqRusFFQijYE5UUmKCk7Hg0r2sFh+qfm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761251765; c=relaxed/simple;
-	bh=XwBegz7tJEXFtipnq5Ve4Laqk1DLcrjbKOAQT8d1YWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=HrHS4brBU/9HYTaN0kdhE0MPdrfKAtJ1JLILvjM7I14HQwEa6hl15npPrghgOMRAL6QXUUDekGZuLg5Z3BCrGq+NHWzNaXfCLuorSjPd711RNmOguJPNRprPi05hkTX1FUAqyxxPHVO9dqzJlNgroXmJxU6yo0wy75Zb8iv7SQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fwf6vDmh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761253526; c=relaxed/simple;
+	bh=uNN9PPr/yTFHzxK8MQ3XHv/YvwCSmF0U+8ouACnxjAk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WV4HnkhcjnCQncDxm48bWzbCbLol+cDL5RB35G2ir1PyQz3ya0cQ+CCEuF7tpqkQxYCDLNGHNOh3eptQ1p/JwvgtEWzn7ocihi580bqdaDN/vGyIjf88X+HWf6nyfXIVzL0P5OCjSnbNujEQTPklNDnbP2RpvlzhJZ6xMkyZgo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbQ9+78i; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fwf6vDmh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B063BC4CEE7;
-	Thu, 23 Oct 2025 20:36:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761251764;
-	bh=XwBegz7tJEXFtipnq5Ve4Laqk1DLcrjbKOAQT8d1YWw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=Fwf6vDmhHygtIw266Mza2L/w4Y4OEMdWFL9Srl47Ljq9RM/ghx3LLqTVxkVcK2Wmx
-	 tEX36tQ/N8vPUPrLcnBQmjmo8COXFOzsnGQp6UG/x5ntmlK8yVOfW5haczGNE9M0Cc
-	 p96vQbViTQmj/W+YrOJatUrsUkUgm6FN8dlooPScA8SyFsSzihmmVGtfB/CS5DK6iy
-	 Qbz/fA/g54Sk2Amn2HsA7XW0iwSLvnrZkV1cscr8qsmSwGnSExkwf+WfGb8eu4hvif
-	 M5mtlqxVBBqu04n+yUpYDUNOZX59sG3bw+yj+5FDrlEuA0lzcE6bg5xh+HBkSX4alq
-	 CJTgPOtmL0L0A==
-Date: Thu, 23 Oct 2025 15:36:03 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: "Devegowda, Chandrashekar" <chandrashekar.devegowda@intel.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"bhelgaas@google.com" <bhelgaas@google.com>,
-	"Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-	"Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
-	"K, Kiran" <kiran.k@intel.com>,
-	"Ben Ami, Golan" <golan.ben.ami@intel.com>,
-	"Berg, Johannes" <johannes.berg@intel.com>
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Support function level reset
-Message-ID: <20251023203603.GA1312405@bhelgaas>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbQ9+78i"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-378d50e1cccso15468801fa.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 14:05:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761253520; x=1761858320; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=862okFpfVZvhmXzSNmyjfrfI1Xm8aQ7K46jS7eTHfAM=;
+        b=MbQ9+78ijwayERorwWr8N805GGfvAwCcoWQxfghPCkoFwEg9j0sZ9CyzaYoj6N3kFs
+         Zzr3KsuZXg5GRzn7S8gjvH+fQ+9UTworBMwnQ6AGjUnBr15OcDtaLRsYKwI69IFBgZS/
+         Pr8GYeLApEmyJcAPwEWGOiI2opqoN6FPMAO22l9pThwbzfJ6PWSFprQS70DbiOd0VZ4n
+         5NBj4ERfKkMCur3qRriANvVbSMLYjSKlWGND6WswtBADsLeAq8FpD703RktdgbiOqjqu
+         RwJrhUvDpRtGPrh1LMcuEYqiw38OoqW7tfC9v6SUC8SJZN+MpVdmQBn02epKnRezWbI9
+         I8+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761253520; x=1761858320;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=862okFpfVZvhmXzSNmyjfrfI1Xm8aQ7K46jS7eTHfAM=;
+        b=SoexXHIw/rLsHeXMuZvuB6r54rkbmtVoq0HEKWUPC3rG0Qm51lw9nSoqmSX0OfH8GU
+         A32DNUZf8X37k89mIFf9e4arT2VCiiytKAv633nGFF63awtSN7zgAmtpgGlcwrvJGqus
+         vCSLFaO9xgx3T5p6V8vlfVWtjXVI0tmsGWmFcxx8CSnl0ByQlMIbI4bUT6/KZs6+DU1l
+         zrXUSFLS5NLy1QJmq10UJKRREPsBLlc1oehOWeEN5qnj2FiSexS2tUQpFhB1J/XmlToj
+         egOX15/14v1WgNrn8m5IifEbxv6uPsxLcqzEaeFR/qtEZiZTQ+imr6rSwDe9sdgrKqI+
+         97AQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVzMxNyX/ROpyQ09/2mxO+HXEZRRW3j6EGVPzCvUtS+Uget4uk1JB71HD9E+S4qIsGulKNAutjYM1UxG5ZshaM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNaozeRg9WVuKNbOFQEIGoOFjW3h1UT1gbFNs5EpBJEln3/zdG
+	6EgQ+UIFvjzTUDa+R68EYpxZXZkyMhvTkpkFSrqq0Yte4eml92XvsbHOpIzYhEWP7qsIsNDk8nE
+	Xa/iNE6n/QG+nnfJCU31J3B4P2z4V65GO/OInuvw=
+X-Gm-Gg: ASbGncvIGOENbxXi+/WwXnHDcrR62ZbyaLDEssBkMEPmuXBdv0aWv4nnZUisJxlonB8
+	DxTbtatxjyVK16JCwIbtd1zUbJZK5qFqZWwzl2T9ppoaDYg9uhWmYtpSt7rfGGgbn9MgTuDtojr
+	9Xm5s5RYL2/IYlgKvNFwgteufeRhI939HV6y25HJEK613WC/PavtJgGASOwJtb2ma2N59E7+aEE
+	eRHurz87PhaKIyTB7grXgR+3bnEu5U5vddKVxtulPd2jrVaDYg5x6/G4R8mw6As3ieU/w==
+X-Google-Smtp-Source: AGHT+IG9hVStadcHgcH9pwqipVZ8q236Yr5ZSYyiWguCrs1hAdh+Ks2DDRtnidEtfFSfFhuAguYEPWv9H0ksKC0iQco=
+X-Received: by 2002:a05:651c:908:b0:376:2802:84b0 with SMTP id
+ 38308e7fff4ca-37797a8ed3fmr71073181fa.46.1761253519780; Thu, 23 Oct 2025
+ 14:05:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <IA3PR11MB9016B8132E2E11806B58A0F7FCF0A@IA3PR11MB9016.namprd11.prod.outlook.com>
+References: <20251022223417.139332-2-rpthibeault@gmail.com>
+In-Reply-To: <20251022223417.139332-2-rpthibeault@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 23 Oct 2025 17:05:06 -0400
+X-Gm-Features: AWmQ_blXZO5mFjarWLO1_mPPNpv69dkFfEOsfq92hPD4abmuqgith-oR4ByY-LI
+Message-ID: <CABBYNZJtp0wqL_SJEk0wVo4DuadrBirmJ5VOe_TyE_RN8jOJNA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_event: validate HCI event packet Parameter
+ Total Length
+To: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com, 
+	linux-kernel-mentees@lists.linux.dev, skhan@linuxfoundation.org, 
+	david.hunter.linux@gmail.com, khalid@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 23, 2025 at 09:42:16AM +0000, Devegowda, Chandrashekar wrote:
-> > On Tue, Mar 18, 2025 at 10:55:06AM -0400, Luiz Augusto von Dentz wrote:
-> > > On Fri, Mar 14, 2025 at 3:40 PM Bjorn Helgaas <helgaas@kernel.org> wrote:
-> > > > On Fri, Mar 14, 2025 at 12:16:13PM +0200, Chandrashekar Devegowda
-> > wrote:
-> > > > > Support function level reset (flr) on hardware exception to
-> > > > > recover controller. Driver also implements the back-off time
-> > > > > of 5 seconds and the maximum number of retries are limited
-> > > > > to 5 before giving up.
-> > > >
-> > > > Sort of weird that the commit log mentions FLR, but it's not
-> > > > mentioned in the patch itself except for
-> > > > BTINTEL_PCIE_FLR_RESET_MAX_RETRY.  Apparently the assumption
-> > > > is that DSM_SET_RESET_METHOD_PCIE performs an FLR.
-> > > >
-> > > > Since this is an ACPI _DSM, presumably this mechanism only
-> > > > works for devices built into the platform, not for any
-> > > > potential plug-in devices that would not be described via
-> > > > ACPI.  I guess this driver probably already only works for
-> > > > built-in devices because it also uses DSM_SET_WDISABLE2_DELAY
-> > > > and DSM_SET_RESET_METHOD.
-> > > >
-> > > > There is a generic PCI core way to do FLR (pcie_reset_flr()),
-> > > > so I assume the _DSM exists because the device needs some
-> > > > additional device-specific work around the FLR.
-> > > >
-> > > > > +static void btintel_pcie_removal_work(struct work_struct *wk) {
-> > > > > +     struct btintel_pcie_removal *removal =
-> > > > > +             container_of(wk, struct btintel_pcie_removal, work);
-> > > > > +     struct pci_dev *pdev = removal->pdev;
-> > > > > +     struct pci_bus *bus;
-> > > > > +     struct btintel_pcie_data *data;
-> > > > > +
-> > > > > +     data = pci_get_drvdata(pdev);
-> > > > > +
-> > > > > +     pci_lock_rescan_remove();
-> > > > > +
-> > > > > +     bus = pdev->bus;
-> > > > > +     if (!bus)
-> > > > > +             goto out;
-> > > > > +
-> > > > > +     btintel_acpi_reset_method(data->hdev);
-> > > > > +     pci_stop_and_remove_bus_device(pdev);
-> > > > > +     pci_dev_put(pdev);
-> > > > > +
-> > > > > +     if (bus->parent)
-> > > > > +             bus = bus->parent;
-> > > > > +     pci_rescan_bus(bus);
-> > > >
-> > > > This remove and rescan by a driver that's bound to the device
-> > > > subverts the driver model.  pci_stop_and_remove_bus_device()
-> > > > detaches the driver from the device.  After the driver is
-> > > > detached, we should not be running any driver code.
-> > >
-> > > Yeah, this self removal was sort of bugging me as well, although
-> > > I'm not familiar enough with the pci subsystem, having the
-> > > driver remove and continue running code like pci_rescan_bus
-> > > seems wrong as we may end up with multiple instances of the same
-> > > driver.
-> > >
-> > > > There are a couple other drivers that remove their own device
-> > > > (ath9k, iwlwifi, asus_wmi, eeepc-laptop), but I think those
-> > > > are broken and it's a mistake to add this pattern to more
-> > > > drivers.
-> > > >
-> > > > What's the reason for doing the remove and rescan?  The PCI
-> > > > core doesn't reset the device when you do this, so it's not a
-> > > > "bigger hammer reset".
-> > >
-> > > I guess it was more of the expectation of Chandru to have a sort
-> > > of hard reset, driver remove+probe, instead of a soft reset
-> > > where the driver will just need to reinit itself after
-> > > performing pcie_reset_flr.
-> > 
-> > If the object is just to reinitialize the driver, I think this
-> > hack of removing and rescanning is a bad way to do it.  If you
-> > reset the device, you now know the state of the device and you can
-> > make the driver state match it.  If necessary you can always reuse
-> > part or all of the .remove() and .probe() methods yourself,
-> > without this dance of calling pci_stop_and_remove_bus_device() and
-> > pci_rescan_bus().
-> 
-> I’m sharing insights from our recent work on the PLDR for the BT
-> driver. The above method supports FLR effectively, but for PLDR it
-> is required to unload Wifi driver before doing PLDR via ACPI method.
+Hi Raphael,
 
-IIUC "PLDR" is an ACPI method that does a reset, and you want to reset
-a BT device.
+On Wed, Oct 22, 2025 at 6:38=E2=80=AFPM Raphael Pinsonneault-Thibeault
+<rpthibeault@gmail.com> wrote:
+>
+> There is a BUG: KMSAN: uninit-value in hci_cmd_complete_evt() due to a
+> malformed HCI event packet received from userspace.
+>
+> The existing code in hci_event_packet() checks that the buffer is large
+> enough to contain the event header, and checks that the hdr's Event Code
+> is valid, but does not check the hdr's Parameter Total Length. So,
+> syzbot=E2=80=99s event packet passes through and uses the un-init values =
+in
+> hci_event_func() =3D> hci_cmd_complete_evt().
 
-> Currently, calling pci_rescan_bus() successfully rebinds both the
-> WiFi and BT drivers. This approach follows the method used for the
-> WiFi driver, as seen here:
-> 
-> https://elixir.bootlin.com/linux/v6.18-rc1/source/drivers/net/wireless/intel/iwlwifi/pcie/gen1_2/trans.c#L2182
+It does checks the length:
 
-It looks like this is a multi-function device, iwlwifi is bound to
-function 0, and btintel is bound to function 1.
+    if (skb->len < ev->min_len) {
+        bt_dev_err(hdev, "unexpected event 0x%2.2x length: %u < %u",
+               event, skb->len, ev->min_len);
+        return;
+    }
 
-Then it looks like iwl_trans_pcie_removal_wk() starts with the wifi
-device, finds the corresponding BT device, removes the BT device, runs
-PLDR on the wifi device, removes the wifi device, and rescans to find
-both devices again:
+> Reported-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3Da9a4bedfca6aa9d7fa24
+> Tested-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
+> Fixes: a9de9248064bf ("[Bluetooth] Switch from OGF+OCF to using only opco=
+des")
+> Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+> ---
+>  net/bluetooth/hci_event.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index d790b0d4eb9a..5e1498cc04cd 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -7565,7 +7565,7 @@ void hci_event_packet(struct hci_dev *hdev, struct =
+sk_buff *skb)
+>         hci_req_complete_t req_complete =3D NULL;
+>         hci_req_complete_skb_t req_complete_skb =3D NULL;
+>         struct sk_buff *orig_skb =3D NULL;
+> -       u8 status =3D 0, event, req_evt =3D 0;
+> +       u8 status =3D 0, event, req_evt =3D 0, len;
+>         u16 opcode =3D HCI_OP_NOP;
+>
+>         if (skb->len < sizeof(*hdr)) {
+> @@ -7585,6 +7585,13 @@ void hci_event_packet(struct hci_dev *hdev, struct=
+ sk_buff *skb)
+>                 goto done;
+>         }
+>
+> +       len =3D hdr->plen;
+> +       if (len !=3D skb->len - HCI_EVENT_HDR_SIZE) {
+> +               bt_dev_warn(hdev, "Unexpected HCI Parameter Length 0x%2.2=
+x",
+> +                           len);
+> +               goto done;
+> +       }
 
-  iwl_trans_pcie_removal_wk
-    wifi = removal->pdev			# WiFi device
-    bt = pci_get_slot(...)			# BT device
-    pci_stop_and_remove_bus_device(bt)
-    iwl_trans_pcie_set_product_reset(wifi)	# do PLDR on WiFi
-    pci_stop_and_remove_bus_device(wifi)
-    pci_rescan_bus
+Looks like a big hammer for a uninitialized value, which I assume is
+from the following code:
 
-It seems problematic to me for the WiFi driver to remove the BT
-driver.  What if BT was active at the time?  Why is it ok to yank the
-rug out from under it?
+    if (i =3D=3D ARRAY_SIZE(hci_cc_table)) {
+        /* Unknown opcode, assume byte 0 contains the status, so
+         * that e.g. __hci_cmd_sync() properly returns errors
+         * for vendor specific commands send by HCI drivers.
+         * If a vendor doesn't actually follow this convention we may
+         * need to introduce a vendor CC table in order to properly set
+         * the status.
+         */
+        *status =3D skb->data[0];
+    }
 
-Why does the BT driver have to be unloaded before resetting the WiFi
-device?  Why does the WiFi driver have to be unloaded before resetting
-the BT device?
+That one is accessing skb->data without first checking it like
+hci_cc_skb_pull like all other event handlers are doing, if that is
+really the case then something like the following should make it go
+away:
 
-Theoretically, the functions of a PCI multi-function device are
-independent and really don't have any influence on each other.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bae8c219341a..e71fbdebffae 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4219,6 +4219,13 @@ static void hci_cmd_complete_evt(struct hci_dev
+*hdev, void *data,
+        }
 
-If you had a single driver that claimed both devices, that driver
-could coordinate this since it would know about both and could
-synchronize their activity when needed.
+        if (i =3D=3D ARRAY_SIZE(hci_cc_table)) {
++               if (!skb->len) {
++                       bt_dev_err(hdev, "unexpected cc 0x%4.4x with no sta=
+tus",
++                                  *opcode);
++                       *status =3D HCI_ERROR_UNSPECIFIED;
++                       return;
++               }
++
+                /* Unknown opcode, assume byte 0 contains the status, so
+                 * that e.g. __hci_cmd_sync() properly returns errors
+                 * for vendor specific commands send by HCI drivers.
 
-Maybe you could have a wrapper driver that claims both and delegates
-each function to either iwlwifi or btintel as needed?  Since the
-wrapper, iwlwifi, and btintel would be linked into a single module,
-you could arrange callbacks between them to synchronize and handle
-these resets.
+> +
+>         /* Only match event if command OGF is not for LE */
+>         if (hdev->req_skb &&
+>             hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) !=3D 0x08 &&
+> --
+> 2.43.0
+>
 
-If you reset the device, you know the state of the device afterward,
-and the driver should be able to initialize its own data structures
-accordingly.  This should not require any PCI device removal or
-rescan.
 
-Bjorn
+--=20
+Luiz Augusto von Dentz
