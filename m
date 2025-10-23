@@ -1,190 +1,84 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF1127781E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 21:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7E6EEB3;
+	Thu, 23 Oct 2025 21:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761253526; cv=none; b=vGnYEspa22RqxlSX1iNRLtkiz0eAI8L8nkc02idHhrtapIWbNpvN7xAc9w3Bye+wbysfJN2XRh2GL9V/tJZXKjZjzMTTCcdTPgiB8QJU+b1/onENgjJiElH2aXP+JCvXHCKBTkf2YiOqRusFFQijYE5UUmKCk7Hg0r2sFh+qfm4=
+	t=1761255627; cv=none; b=Tfki8JpZB25h8ZyFDSSIJuburjw/1ikKKQcl2E0My1jbNfd/ChPDuwoytt0qgNVL1STyWYpVAwOxa3tAgwCKlngvBLY9/UfWfI3uvemjaBO8pE8Ky9R029gXd79ieV2e1RzFAKSGhFAA3K3WHyePNFTLQFDY3/f1bEIQs/B3fOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761253526; c=relaxed/simple;
-	bh=uNN9PPr/yTFHzxK8MQ3XHv/YvwCSmF0U+8ouACnxjAk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WV4HnkhcjnCQncDxm48bWzbCbLol+cDL5RB35G2ir1PyQz3ya0cQ+CCEuF7tpqkQxYCDLNGHNOh3eptQ1p/JwvgtEWzn7ocihi580bqdaDN/vGyIjf88X+HWf6nyfXIVzL0P5OCjSnbNujEQTPklNDnbP2RpvlzhJZ6xMkyZgo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbQ9+78i; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761255627; c=relaxed/simple;
+	bh=5qCzJg0hCt3HBb3QIW58eH+hgYTu6FwAxvg34Yv5VZo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BG/cJYsNUtkuO5k9l+fLjO2LCgV72AY8Y9/+4Vua1P4FymuHaJPKsOFCiAo55cDzouRfZkrsLsM+46kCXAkCPmIpATmwVOGnSD6XAlSpQV/z+O4er5wgeQ44c+B1lOReESu0F4yk/W8m4EgC2/fLHIZvRL5I/6fdjtSlkrneBKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBJKwggN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbQ9+78i"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-378d50e1cccso15468801fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 14:05:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761253520; x=1761858320; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=862okFpfVZvhmXzSNmyjfrfI1Xm8aQ7K46jS7eTHfAM=;
-        b=MbQ9+78ijwayERorwWr8N805GGfvAwCcoWQxfghPCkoFwEg9j0sZ9CyzaYoj6N3kFs
-         Zzr3KsuZXg5GRzn7S8gjvH+fQ+9UTworBMwnQ6AGjUnBr15OcDtaLRsYKwI69IFBgZS/
-         Pr8GYeLApEmyJcAPwEWGOiI2opqoN6FPMAO22l9pThwbzfJ6PWSFprQS70DbiOd0VZ4n
-         5NBj4ERfKkMCur3qRriANvVbSMLYjSKlWGND6WswtBADsLeAq8FpD703RktdgbiOqjqu
-         RwJrhUvDpRtGPrh1LMcuEYqiw38OoqW7tfC9v6SUC8SJZN+MpVdmQBn02epKnRezWbI9
-         I8+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761253520; x=1761858320;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=862okFpfVZvhmXzSNmyjfrfI1Xm8aQ7K46jS7eTHfAM=;
-        b=SoexXHIw/rLsHeXMuZvuB6r54rkbmtVoq0HEKWUPC3rG0Qm51lw9nSoqmSX0OfH8GU
-         A32DNUZf8X37k89mIFf9e4arT2VCiiytKAv633nGFF63awtSN7zgAmtpgGlcwrvJGqus
-         vCSLFaO9xgx3T5p6V8vlfVWtjXVI0tmsGWmFcxx8CSnl0ByQlMIbI4bUT6/KZs6+DU1l
-         zrXUSFLS5NLy1QJmq10UJKRREPsBLlc1oehOWeEN5qnj2FiSexS2tUQpFhB1J/XmlToj
-         egOX15/14v1WgNrn8m5IifEbxv6uPsxLcqzEaeFR/qtEZiZTQ+imr6rSwDe9sdgrKqI+
-         97AQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVzMxNyX/ROpyQ09/2mxO+HXEZRRW3j6EGVPzCvUtS+Uget4uk1JB71HD9E+S4qIsGulKNAutjYM1UxG5ZshaM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNaozeRg9WVuKNbOFQEIGoOFjW3h1UT1gbFNs5EpBJEln3/zdG
-	6EgQ+UIFvjzTUDa+R68EYpxZXZkyMhvTkpkFSrqq0Yte4eml92XvsbHOpIzYhEWP7qsIsNDk8nE
-	Xa/iNE6n/QG+nnfJCU31J3B4P2z4V65GO/OInuvw=
-X-Gm-Gg: ASbGncvIGOENbxXi+/WwXnHDcrR62ZbyaLDEssBkMEPmuXBdv0aWv4nnZUisJxlonB8
-	DxTbtatxjyVK16JCwIbtd1zUbJZK5qFqZWwzl2T9ppoaDYg9uhWmYtpSt7rfGGgbn9MgTuDtojr
-	9Xm5s5RYL2/IYlgKvNFwgteufeRhI939HV6y25HJEK613WC/PavtJgGASOwJtb2ma2N59E7+aEE
-	eRHurz87PhaKIyTB7grXgR+3bnEu5U5vddKVxtulPd2jrVaDYg5x6/G4R8mw6As3ieU/w==
-X-Google-Smtp-Source: AGHT+IG9hVStadcHgcH9pwqipVZ8q236Yr5ZSYyiWguCrs1hAdh+Ks2DDRtnidEtfFSfFhuAguYEPWv9H0ksKC0iQco=
-X-Received: by 2002:a05:651c:908:b0:376:2802:84b0 with SMTP id
- 38308e7fff4ca-37797a8ed3fmr71073181fa.46.1761253519780; Thu, 23 Oct 2025
- 14:05:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBJKwggN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB27AC4CEE7;
+	Thu, 23 Oct 2025 21:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761255626;
+	bh=5qCzJg0hCt3HBb3QIW58eH+hgYTu6FwAxvg34Yv5VZo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hBJKwggNlS5Z/APUyqIyD/y3+ODXl8giHzG1gqnyTHY6Kx57RGM/6Bv+Q+hNMOJsx
+	 zDGzvBYt9sYkNhQoz9P7Mq5aoI1w5n+wbOLQhWlYJHlROaaHm0GwS2ZB1p9r46g6TF
+	 fVkqgs1y2mkXPHJWVeypsX5K8S5DlGCGpkBd2eFNn3JsD1f9CbVE4dKINgGj22vkWC
+	 4hQLBnrCMLX7UFvzJ4Y3cIr2y7g8XIuKEev3HUd2iDuK4QpaBqtNRagn/WuAlzeyqZ
+	 XlU+BzVIciG55ec82SLKs7S+ObDRCYdigBA275Spv2uU5gLCLWCEbZcPtNde9jMKCq
+	 55dNZJhb5ITzA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B33380A960;
+	Thu, 23 Oct 2025 21:40:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251022223417.139332-2-rpthibeault@gmail.com>
-In-Reply-To: <20251022223417.139332-2-rpthibeault@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 23 Oct 2025 17:05:06 -0400
-X-Gm-Features: AWmQ_blXZO5mFjarWLO1_mPPNpv69dkFfEOsfq92hPD4abmuqgith-oR4ByY-LI
-Message-ID: <CABBYNZJtp0wqL_SJEk0wVo4DuadrBirmJ5VOe_TyE_RN8jOJNA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_event: validate HCI event packet Parameter
- Total Length
-To: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com, 
-	linux-kernel-mentees@lists.linux.dev, skhan@linuxfoundation.org, 
-	david.hunter.linux@gmail.com, khalid@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: fix corruption in h4_recv_buf() after cleanup
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176125560702.3260295.10385824633115850837.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Oct 2025 21:40:07 +0000
+References: 
+ <ab6fa50055fa0c39e5501c123c36e662eb48ae61.1761245114.git.calvin@wbinvd.org>
+In-Reply-To: 
+ <ab6fa50055fa0c39e5501c123c36e662eb48ae61.1761245114.git.calvin@wbinvd.org>
+To: Calvin Owens <calvin@wbinvd.org>
+Cc: linux-kernel@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
+ sean.wang@mediatek.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, amitkumar.karwar@nxp.com,
+ neeraj.sanjaykale@nxp.com, yang.li@amlogic.com, pmenzel@molgen.mpg.de,
+ linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ francesco@valla.it
 
-Hi Raphael,
+Hello:
 
-On Wed, Oct 22, 2025 at 6:38=E2=80=AFPM Raphael Pinsonneault-Thibeault
-<rpthibeault@gmail.com> wrote:
->
-> There is a BUG: KMSAN: uninit-value in hci_cmd_complete_evt() due to a
-> malformed HCI event packet received from userspace.
->
-> The existing code in hci_event_packet() checks that the buffer is large
-> enough to contain the event header, and checks that the hdr's Event Code
-> is valid, but does not check the hdr's Parameter Total Length. So,
-> syzbot=E2=80=99s event packet passes through and uses the un-init values =
-in
-> hci_event_func() =3D> hci_cmd_complete_evt().
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-It does checks the length:
+On Thu, 23 Oct 2025 11:47:19 -0700 you wrote:
+> Thanks to Francesco Valla's investigation, the reason for the duplicate
+> code I recently cleaned up is finally clear: a different structure is
+> stored in drvdata for the drivers which used that duplicate function,
+> but h4_recv_buf() assumes drvdata is always an hci_uart structure.
+> 
+> Consequently, alignment and padding are now randomly corrupted for
+> btmtkuart, btnxpuart, and bpa10x in h4_recv_buf(), causing erratic
+> breakage.
+> 
+> [...]
 
-    if (skb->len < ev->min_len) {
-        bt_dev_err(hdev, "unexpected event 0x%2.2x length: %u < %u",
-               event, skb->len, ev->min_len);
-        return;
-    }
+Here is the summary with links:
+  - Bluetooth: fix corruption in h4_recv_buf() after cleanup
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1aaa18cc80c5
 
-> Reported-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3Da9a4bedfca6aa9d7fa24
-> Tested-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
-> Fixes: a9de9248064bf ("[Bluetooth] Switch from OGF+OCF to using only opco=
-des")
-> Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-> ---
->  net/bluetooth/hci_event.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index d790b0d4eb9a..5e1498cc04cd 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -7565,7 +7565,7 @@ void hci_event_packet(struct hci_dev *hdev, struct =
-sk_buff *skb)
->         hci_req_complete_t req_complete =3D NULL;
->         hci_req_complete_skb_t req_complete_skb =3D NULL;
->         struct sk_buff *orig_skb =3D NULL;
-> -       u8 status =3D 0, event, req_evt =3D 0;
-> +       u8 status =3D 0, event, req_evt =3D 0, len;
->         u16 opcode =3D HCI_OP_NOP;
->
->         if (skb->len < sizeof(*hdr)) {
-> @@ -7585,6 +7585,13 @@ void hci_event_packet(struct hci_dev *hdev, struct=
- sk_buff *skb)
->                 goto done;
->         }
->
-> +       len =3D hdr->plen;
-> +       if (len !=3D skb->len - HCI_EVENT_HDR_SIZE) {
-> +               bt_dev_warn(hdev, "Unexpected HCI Parameter Length 0x%2.2=
-x",
-> +                           len);
-> +               goto done;
-> +       }
-
-Looks like a big hammer for a uninitialized value, which I assume is
-from the following code:
-
-    if (i =3D=3D ARRAY_SIZE(hci_cc_table)) {
-        /* Unknown opcode, assume byte 0 contains the status, so
-         * that e.g. __hci_cmd_sync() properly returns errors
-         * for vendor specific commands send by HCI drivers.
-         * If a vendor doesn't actually follow this convention we may
-         * need to introduce a vendor CC table in order to properly set
-         * the status.
-         */
-        *status =3D skb->data[0];
-    }
-
-That one is accessing skb->data without first checking it like
-hci_cc_skb_pull like all other event handlers are doing, if that is
-really the case then something like the following should make it go
-away:
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bae8c219341a..e71fbdebffae 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4219,6 +4219,13 @@ static void hci_cmd_complete_evt(struct hci_dev
-*hdev, void *data,
-        }
-
-        if (i =3D=3D ARRAY_SIZE(hci_cc_table)) {
-+               if (!skb->len) {
-+                       bt_dev_err(hdev, "unexpected cc 0x%4.4x with no sta=
-tus",
-+                                  *opcode);
-+                       *status =3D HCI_ERROR_UNSPECIFIED;
-+                       return;
-+               }
-+
-                /* Unknown opcode, assume byte 0 contains the status, so
-                 * that e.g. __hci_cmd_sync() properly returns errors
-                 * for vendor specific commands send by HCI drivers.
-
-> +
->         /* Only match event if command OGF is not for LE */
->         if (hdev->req_skb &&
->             hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) !=3D 0x08 &&
-> --
-> 2.43.0
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
