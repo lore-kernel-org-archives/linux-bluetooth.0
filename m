@@ -1,108 +1,128 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097FD18FC80
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 05:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC50242D70;
+	Thu, 23 Oct 2025 05:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761196574; cv=none; b=m0xB/Rlt+FGjyu4X/FJBJ9ueEdC3wfhGgsDF0gP2KUU9GiYEcAoEkuIwQCyDHbmC0HDYKjWyIQCH8IJkNSbxxRH7yaX68pNsOf2Gb4QX0rBAk/+X2WRSeH3NtqFOguIoENnhV6zTjiA+7phbOherKNrbTtKzdav/wJ0/7ByT3GU=
+	t=1761197267; cv=none; b=EjgNX+ju2ybK0oYGtcde4EP0qstsMvwvHrqv92e7FuD0pu3imb5LFbg1cqOrE0KxZ22a0f6/cqrcg2q1Qh784VVQ4JIgPx7jLTTHSA6gCjPXs8YqDSvZRW1T5OHdEvhD8/ecnMTgfnmlQyc53KUoa4TTUCJVO0dz9nc/+oqIsmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761196574; c=relaxed/simple;
-	bh=Hu4CiVFpG2E9IzyrmzgMZHBAa9lZV7Srj7W/2uMKaWY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=KCXPgoBkQXUDEt2lVH1Wzh5sXsbMoUNIompVpui22p120YJdk+ysTqEauC/3pEfoGPmL5SyTDll8kot0/w/AcWzCadTSrpMj9skWlealIxto7T2HHAKLWAkxZCgg3EDrzHKmvB3+x5gEVZ5GXmXB7TE0mxqebku1abxAzJk1R1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=GawNSz/T; arc=none smtp.client-ip=192.30.252.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1761197267; c=relaxed/simple;
+	bh=aiwbxwHPtjAGXkZym9GSo7vFIP/SVAmN+sjMmeRKakY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PlAmPEW8BEcNOGQa6oEbG6JAXYA4d6FPdorWe0ES/qIEhWiX7xmmF7WnEe7AUVZlJZzIxTLXKYt5HaTK7Adde2034lTaZrW33gN5wyTa76YBNM9vpsUs0MS7YEisDiV850G/2WQzgdjQAvfzDqpYmfDrm7MAztaoa6nz8OApOfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=NbQBN8NZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GawNSz/T"
-Received: from github.com (hubbernetes-node-bcb3747.va3-iad.github.net [10.48.221.70])
-	by smtp.github.com (Postfix) with ESMTPA id 1197FE04C1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Oct 2025 22:16:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1761196570;
-	bh=7UzXOttgzrpInylzuBEhhhK9y/M8x3LN9/KOikq9opo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=GawNSz/TPV/EFifxCsD3t1JoU51tRpSJNAT02ZaYXfO+cPtuUH2a1HD/+Ty+8gSv9
-	 Vm7VQXBCIKla2954bN/ILNNIJ78IuM40AX3MmBRzm1UuwGJS30i/xK3Kog9X7SbHHF
-	 Vk/9KuNGQiKkMuEWCaE+cg1ILvTXKQciW8DzXsfk=
-Date: Wed, 22 Oct 2025 22:16:10 -0700
-From: Alfred Wingate <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1014817/000000-708285@github.com>
-Subject: [bluez/bluez] 296105: build: Support setting the cups_serverbin
- directory
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="NbQBN8NZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E490C4CEE7;
+	Thu, 23 Oct 2025 05:27:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1761197266;
+	bh=aiwbxwHPtjAGXkZym9GSo7vFIP/SVAmN+sjMmeRKakY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NbQBN8NZ5uEZ7gyXUxgzT8v2up/CFXuDsFOdLplFJyX5mpqEoMi+n9TpFQLyWhO/p
+	 i+Ql4IZUubm6iRu2orCpjtU4mO9btqYej5h3XMwz5mNsAWAEg4pR4SdCMjjxqQEfZr
+	 T5dYL1IUg+l10VeMz/TqTmNwv/J8uHhWdySaeg9Q=
+Date: Thu, 23 Oct 2025 07:27:43 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com,
+	linux-kernel-mentees@lists.linux.dev, skhan@linuxfoundation.org,
+	david.hunter.linux@gmail.com, khalid@kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_event: validate HCI event packet
+ Parameter Total Length
+Message-ID: <2025102329-rimmed-jailhouse-3d39@gregkh>
+References: <20251022223417.139332-2-rpthibeault@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251022223417.139332-2-rpthibeault@gmail.com>
 
-  Branch: refs/heads/1014817
-  Home:   https://github.com/bluez/bluez
-  Commit: 296105922d043027dfd06fd176d3bd25f43545ee
-      https://github.com/bluez/bluez/commit/296105922d043027dfd06fd176d3bd25f43545ee
-  Author: Alfred Wingate <parona@protonmail.com>
-  Date:   2025-10-23 (Thu, 23 Oct 2025)
+On Wed, Oct 22, 2025 at 06:34:16PM -0400, Raphael Pinsonneault-Thibeault wrote:
+> There is a BUG: KMSAN: uninit-value in hci_cmd_complete_evt() due to a
+> malformed HCI event packet received from userspace.
+> 
+> The existing code in hci_event_packet() checks that the buffer is large
+> enough to contain the event header, and checks that the hdr's Event Code
+> is valid, but does not check the hdr's Parameter Total Length. So,
+> syzbot’s event packet passes through and uses the un-init values in
+> hci_event_func() => hci_cmd_complete_evt().
+> 
+> Reported-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=a9a4bedfca6aa9d7fa24
+> Tested-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
+> Fixes: a9de9248064bf ("[Bluetooth] Switch from OGF+OCF to using only opcodes")
+> Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+> ---
+>  net/bluetooth/hci_event.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index d790b0d4eb9a..5e1498cc04cd 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -7565,7 +7565,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+>  	hci_req_complete_t req_complete = NULL;
+>  	hci_req_complete_skb_t req_complete_skb = NULL;
+>  	struct sk_buff *orig_skb = NULL;
+> -	u8 status = 0, event, req_evt = 0;
+> +	u8 status = 0, event, req_evt = 0, len;
+>  	u16 opcode = HCI_OP_NOP;
+>  
+>  	if (skb->len < sizeof(*hdr)) {
+> @@ -7585,6 +7585,13 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+>  		goto done;
+>  	}
+>  
+> +	len = hdr->plen;
+> +	if (len != skb->len - HCI_EVENT_HDR_SIZE) {
+> +		bt_dev_warn(hdev, "Unexpected HCI Parameter Length 0x%2.2x",
+> +			    len);
+> +		goto done;
+> +	}
+> +
+>  	/* Only match event if command OGF is not for LE */
+>  	if (hdev->req_skb &&
+>  	    hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) != 0x08 &&
+> -- 
+> 2.43.0
+> 
+> 
 
-  Changed paths:
-    M configure.ac
+Hi,
 
-  Log Message:
-  -----------
-  build: Support setting the cups_serverbin directory
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
 
-This will be needed in the follow up change that tries to fix distcheck
-properly.
+You are receiving this message because of the following common error(s)
+as indicated below:
 
-Signed-off-by: Alfred Wingate <parona@protonmail.com>
+- You have marked a patch with a "Fixes:" tag for a commit that is in an
+  older released kernel, yet you do not have a cc: stable line in the
+  signed-off-by area at all, which means that the patch will not be
+  applied to any older kernel releases.  To properly fix this, please
+  follow the documented rules in the
+  Documentation/process/stable-kernel-rules.rst file for how to resolve
+  this.
 
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
 
-  Commit: 5075f61e0e6521a40609dfb65a81f94b222e228a
-      https://github.com/bluez/bluez/commit/5075f61e0e6521a40609dfb65a81f94b222e228a
-  Author: Alfred Wingate <parona@protonmail.com>
-  Date:   2025-10-23 (Thu, 23 Oct 2025)
+thanks,
 
-  Changed paths:
-    M Makefile.am
-
-  Log Message:
-  -----------
-  build: Fix distcheck by hardcoding non absolute paths
-
-To make sure it doesn't fail lets hardcode every path that could come
-from pkg-config.
-(I managed to hit issues from dbus **and** cups as I have them installed)
-
-You can learn more about this type of issue here.
-https://bugzilla.redhat.com/show_bug.cgi?id=1123963
-
-See-Also: 9cc8b97b8 ("build: obexd: Fix make distcheck")
-Signed-off-by: Alfred Wingate <parona@protonmail.com>
-
-
-  Commit: 70828589dcd6e43220729d6659b65bbc82c9e97b
-      https://github.com/bluez/bluez/commit/70828589dcd6e43220729d6659b65bbc82c9e97b
-  Author: Alfred Wingate <parona@protonmail.com>
-  Date:   2025-10-23 (Thu, 23 Oct 2025)
-
-  Changed paths:
-    M Makefile.obexd
-
-  Log Message:
-  -----------
-  build: obexd: Revert "Fix make distcheck"
-
-Bug: https://github.com/bluez/bluez/issues/806
-Reverts: 9cc8b97b8 ("build: obexd: Fix make distcheck")
-Signed-off-by: Alfred Wingate <parona@protonmail.com>
-
-
-Compare: https://github.com/bluez/bluez/compare/296105922d04%5E...70828589dcd6
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+greg k-h's patch email bot
