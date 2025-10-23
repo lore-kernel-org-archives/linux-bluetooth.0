@@ -1,151 +1,183 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5012A314B82
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 13:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5B4314D3C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 13:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761225510; cv=none; b=ZLb5nbrSnCrXmIuxmmGcAZJZjtK9U1BsqGMi+NJFI9JeRAtsjFWcb0JCVhoDMGVmTSft10lZBXYjRM+Zi9U/ywa41UNoQwJAyziZ3pgmeycoTKBUvHc7gegX88Q140LmKuPvib8v5duLYheJM1RW1YTyaJCczqb7OMkGzN3o0Lc=
+	t=1761226126; cv=none; b=bkNgKOA1u69kib8h4iymbcHMCDJXw6Y3UrsZbarGRmkrB/cdoUO2UvmkL8wEq6a5FtIvRRqi25hOIQcjg5l1D333nsGu+v7PBotToa/IyVtDFLHvDU8XOmdOYUtV3q3qUEnveRbRIHDBD+3tkELNXR3yqc2mQwhcqwdAJu/N2TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761225510; c=relaxed/simple;
-	bh=Io1p8sRPePbI/yYp7eF8xFBiYUfxl05DJQuwL9i9Yvk=;
+	s=arc-20240116; t=1761226126; c=relaxed/simple;
+	bh=hmVR+fiEzrsjdMyOgu35shuQSdS39zxfjo3swR4tGCc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VCOmDdLZYy3Df8X4CPJ2u+1ZECQs2rNufXdeTonoEgkUvHln+Fc6wGQSlDKzAQlzuSuoBmhkrNxLnS/lqSkXmuXFffDIUrhu6+umc7wGvBxF0Kp/JV1S0jHBpbPYyDk6CXY/jfFd9bvfR93u08N9b+SLTVOoAUnijujm1CwX49Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j92iaoNz; arc=none smtp.client-ip=209.85.208.181
+	 To:Cc:Content-Type; b=O0QUQJYYYocGjXpSIEpiUjtg4OP9XcRr7BVM5FieqKztXtY8s/bN7bdGnqhcinFGjMPVl8nQPYwVTUx/NxLb7PuqkvPE/YVoqazl4ZZ8itI50XT6fRikqcSYHvdlBSd/ZDH4cVrYdA846p37p5OIwyCpOVnunwYrsiS/lAqsOAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LGYl2ix0; arc=none smtp.client-ip=209.85.208.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j92iaoNz"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-378cfbf83f2so10191621fa.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 06:18:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LGYl2ix0"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-378de7d3057so4516521fa.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 06:28:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761225506; x=1761830306; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761226120; x=1761830920; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2Gn0u6F4FcwNzytioOd4AYhSpwnJiVIhDhy5I+5Dm0E=;
-        b=j92iaoNzR+bkh5B+2ju2qto4umPie1qtKjZzigSL4zq48/OQXjS0aye6ay2Mq3Lu7P
-         B4Z5GgsDoOpzlwErlHStPa1TDQmqeLE8nqKCaxCTvtNdhONWOejUosWLj6RzrTc6t52g
-         EHauXdLZ+TG2MK5nhMWkJtH3IEXEExBxqZKsqfxJnyfvnsMkaXZy5TF6aLgvnxnCFR7f
-         KGN7obtEUTgt702sLDFXFdKAgxYmQbR427kfG7iH3ZJgpQMyFp/BqB0snIxJrETp/HPF
-         A/GBNWKEmIyz59NxiKqp2mOflTWGnE7R054P1O3PlnkQwGE9XvYjPMA2pADa28g2PIr9
-         roVA==
+        bh=YeWUpQ9d5rLaLQIFIM8mSdAbOusqmLG6a/19UiQhHB0=;
+        b=LGYl2ix0C6i59o3PSKo30nHYl8dF9RMXTx8BKLRZ3NSOYF1e9N3CwRu3E7vRG6V/Oz
+         6yWf9iCA+Fe0PLScQ4kTS3BeuyIAUemciSXQIkGkXnn/kugdiC/YxOKaAl1Ywp5tgWHE
+         qTG2CDlJv4OF4nBnO37zphLCF9pJWH1FTqong9fWPM/zth0qbMHfbBpsR9kWKSlG+bFG
+         7+n5OBpubsx8TJ8iS80tnY5LhH3b4sG+31XhzdafBl+NbRugqDhPLkAFL4mCBYcugmch
+         9jQ8Eh/rPd/SAmkEdgL3oKUSC8CklAtjrsEzH5poW9fPBnZ5pA32odhQ3op3KefWB/oK
+         h4Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761225506; x=1761830306;
+        d=1e100.net; s=20230601; t=1761226120; x=1761830920;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2Gn0u6F4FcwNzytioOd4AYhSpwnJiVIhDhy5I+5Dm0E=;
-        b=L/ukDFBCVfrbbKzsTVGGVLEeGNz2MFaXnt7uHKp2DsMytX5u3SthPRIQaw47ioeTgs
-         3OzcO17Z/ahux8pABnX1Sa7vlZs3AFfk0ohwTykRaC4z8WhiyK7J8FfsQWHa6sYrsigm
-         3ONMRtC8YuaiKvFSo3vfiZhNcwNLyeED85BKvIARi7fjLPOwmO4yvUfIEjeHaGuGZubF
-         kk3KJK/F2WP4Qd/xlzMtV0WqUH51wvb+emN9iygPBQheEax4599T/kuePscB5KJR48m9
-         STMIsx11JdD3OIcpderFU3aiId1a0sDeXZTWhs+y+ejg6U17JuAYu6wIdaYPOy98UnNN
-         K54A==
-X-Forwarded-Encrypted: i=1; AJvYcCUSGL/Bf+7vJcV7/BYshQQjGDNLJpiCwHtqX3VJ1iRvV2yHtEPV3PB7TmYpgY+dNI+c4Tx4TlmOztQmpCCP8Eo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpWQzTAA37vXxPBiCOhOxwi04lxemr/NRDoYvbGkhTADgSwJS3
-	kDr7rYQsfI+tuiMeWKTvWwRvlWNsbaFToHl92VWVNP7WgC0ktXomBjz6R0mNLp0Dt50G7vPz1le
-	BMdd3ATPi8ZmTZBDom7ezvOwVTzNaQGs=
-X-Gm-Gg: ASbGncsFVHSJT32+UfYjEjOECUdlPH6xhl7wcn3olk+/mqH8NYEgrXg6pD8CNFtO3Jd
-	f27cVEZId7MRImIweoeJBxyTe0g3NIY4lDzjs3n2SZfkBF0yHVkJaUhEFirmG33gxfr3EP0UmNT
-	EGjx8cefIdFa98YYqL69rx2mJHnIEvSeLvRb+WRofGLeQmsmxn8fckrhL9YfqNg2Nm2hIt2s+K6
-	fAcmeP0YiUau25fg/baOMQYtBmlNOiBl5VrJN8DYDjJjSrAdMsXib7+DME6dcMIxRI/ow==
-X-Google-Smtp-Source: AGHT+IF9mkLH9nWY6msPEXtSzp21zHIILiGGoh+1t404Gr2SEQ44oMEc/FKkF7qZ2Yh4aplYXJXL04MuqXK8NskaD18=
-X-Received: by 2002:a05:651c:25cb:20b0:378:d312:52c0 with SMTP id
- 38308e7fff4ca-378d312536cmr9636841fa.5.1761225506011; Thu, 23 Oct 2025
- 06:18:26 -0700 (PDT)
+        bh=YeWUpQ9d5rLaLQIFIM8mSdAbOusqmLG6a/19UiQhHB0=;
+        b=BAOWUIfN4kMjTn2YO5C68XHC+73u0Ac/nXf3+gjK58zHezgLuwXyqrbtAWwsuk0qzQ
+         fvlDbdAbMXOk0+ROoN29PR4P3k6gAMXi4A/4HzjrZ4vO/Se2ThZkeNAreUT13tO42CtC
+         pnwl2CJr8OE5u5snATRjWT95rLwMh35wK428yUqerYaLJ+pkx1tCp4RkIDCljxYW95C5
+         EUcTu3hN/6K8RuyO1275alu1XWvA6VdTzKKHY4H8EhwpEUJAOhVtkKbDBubIMegEPMhP
+         dyjDQq7GoLr5yHfxfphRK/eaB1bGpmjGxa3Hk2bQjKcW234UYB39K8cKu31PBvxGNloU
+         COag==
+X-Gm-Message-State: AOJu0Yz7VZRJunKBVl65u1sE3ZD73LRoA3CwvihKyJqvbs+lr6SN01b5
+	gLSMz6a/4SkUOpoC/j+3vL/Psamsk3bpf6mksINXT8Vcd7uD3HcW0EEOGFkD2ka6LmOCA88mkXR
+	O0C66ilP4DkNSqd0PFXHtYunsZKh6ATdapyzh
+X-Gm-Gg: ASbGncvJUPZpYF12P7PpRwPkCngzUZzeGZiltzM01ZZbxRlcA2JeFrONZasipo7Ll8A
+	3p4rWjsDDK4K7K+NhCATDuTt5n+0kamXvQKSshJs7bebEl8NFwFs7Jl8SFVwu4/bn1sWnDKCPiK
+	xZXntZEuIvTQ1RBs0Vji8HUemGQTqK1j8AFWGoDMCexeWs1MMOxTEMKCdgqHisdRkkDApK6feG0
+	oZl1VTtxDP6vRybMQxq1KmRZD6UJpfIHNO/7DK1aT6+8FSboq7LH8AmTNOa16z4TQABxA==
+X-Google-Smtp-Source: AGHT+IFJwE82Bdj4Tz5WfGgLHa+ytuFX0BQyJNk+P/QiV4vO3pofwa2SKtqJSoC3nZozNwgvwK8pO8NgzYM2gn1KfIo=
+X-Received: by 2002:a2e:a584:0:b0:36a:297a:7d73 with SMTP id
+ 38308e7fff4ca-3779782a1d8mr83418521fa.5.1761226120181; Thu, 23 Oct 2025
+ 06:28:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251020151255.1807712-1-Ilia.Gavrilov@infotecs.ru>
-In-Reply-To: <20251020151255.1807712-1-Ilia.Gavrilov@infotecs.ru>
+References: <20251022155822.88438-1-r.smirnov@omp.ru>
+In-Reply-To: <20251022155822.88438-1-r.smirnov@omp.ru>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 23 Oct 2025 09:18:13 -0400
-X-Gm-Features: AS18NWAOr4vPXVJkPYtTy29M3zZKn1wN4ylPEGtp4Ibczfl2RaoyytNjp5Xysuc
-Message-ID: <CABBYNZKUNecJNPmrVFdkkOhG1A8C_32pUOdh0ZDWkCNkAugDdQ@mail.gmail.com>
-Subject: Re: [PATCH net] Bluetooth: MGMT: Fix OOB access in parse_adv_monitor_pattern()
-To: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Date: Thu, 23 Oct 2025 09:28:27 -0400
+X-Gm-Features: AS18NWBHBaSNecNHXIdCS4sIZQV3dwOxCZkknHGNi_Qs_iXPCYtmZaQHgRcSM7E
+Message-ID: <CABBYNZJ4dODys_fogdWqTeGQNUbAH394f3REDzZDdjpETpLL6A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] battery: improve the display of the charge level
+To: Roman Smirnov <r.smirnov@omp.ru>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ilia,
+Hi Roman,
 
-On Mon, Oct 20, 2025 at 11:12=E2=80=AFAM Ilia Gavrilov
-<Ilia.Gavrilov@infotecs.ru> wrote:
+On Wed, Oct 22, 2025 at 11:59=E2=80=AFAM Roman Smirnov <r.smirnov@omp.ru> w=
+rote:
 >
-> In the parse_adv_monitor_pattern() function, the value of
-> the 'length' variable is currently limited to HCI_MAX_EXT_AD_LENGTH(251).
-> The size of the 'value' array in the mgmt_adv_pattern structure is 31.
-> If the value of 'pattern[i].length' is set in the user space
-> and exceeds 31, the 'patterns[i].value' array can be accessed
-> out of bound when copied.
+> At the moment, the charge level of the connected devices can
+> fluctuate in the range of several values. This is due to changes
+> in the conditions in which the battery is located (for example,
+> heating or cooling).
 >
-> Increasing the size of the 'value' array in
-> the 'mgmt_adv_pattern' structure will break the userspace.
-> Considering this, and to avoid OOB access revert the limits for 'offset'
-> and 'length' back to the value of HCI_MAX_AD_LENGTH.
->
-> Found by InfoTeCS on behalf of Linux Verification Center
-> (linuxtesting.org) with SVACE.
->
-> Fixes: db08722fc7d4 ("Bluetooth: hci_core: Fix missing instances using HC=
-I_MAX_AD_LENGTH")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+> Save the last 4 charge levels. Choose the lowest one.
+
+This sounds more like a work around a device that doesn't calibrate
+its sensor and end up with fluctuating value, so Id only apply such
+logic to them but in order to do that we need some logic that detects
+it is fluctuating to begin with, perhaps by checking if the battery is
+discharging and its value increases over time it is probably an
+indication that it is fluctuating. Btw, I wonder if such logic exists
+in other subsystems that display the battery level so we can follow a
+more tried method rather than inventing our own.
+
+> Fixes: https://github.com/bluez/bluez/issues/1612
 > ---
->  include/net/bluetooth/mgmt.h | 2 +-
->  net/bluetooth/mgmt.c         | 6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
+>  src/battery.c | 26 ++++++++++++++++++++++++--
+>  1 file changed, 24 insertions(+), 2 deletions(-)
 >
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 74edea06985b..4b07ce6dfd69 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -780,7 +780,7 @@ struct mgmt_adv_pattern {
->         __u8 ad_type;
->         __u8 offset;
->         __u8 length;
-> -       __u8 value[31];
-> +       __u8 value[HCI_MAX_AD_LENGTH];
-
-Why not use HCI_MAX_EXT_AD_LENGTH above? Or perhaps even make it
-opaque since the actual size is defined by length - offset.
-
->  } __packed;
+> diff --git a/src/battery.c b/src/battery.c
+> index 59e4fc570..370a5c1d0 100644
+> --- a/src/battery.c
+> +++ b/src/battery.c
+> @@ -33,10 +33,13 @@
+>  #define BATTERY_PROVIDER_MANAGER_INTERFACE "org.bluez.BatteryProviderMan=
+ager1"
 >
->  #define MGMT_OP_ADD_ADV_PATTERNS_MONITOR       0x0052
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index a3d16eece0d2..500033b70a96 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -5391,9 +5391,9 @@ static u8 parse_adv_monitor_pattern(struct adv_moni=
-tor *m, u8 pattern_count,
->         for (i =3D 0; i < pattern_count; i++) {
->                 offset =3D patterns[i].offset;
->                 length =3D patterns[i].length;
-> -               if (offset >=3D HCI_MAX_EXT_AD_LENGTH ||
-> -                   length > HCI_MAX_EXT_AD_LENGTH ||
-> -                   (offset + length) > HCI_MAX_EXT_AD_LENGTH)
-> +               if (offset >=3D HCI_MAX_AD_LENGTH ||
-> +                   length > HCI_MAX_AD_LENGTH ||
-> +                   (offset + length) > HCI_MAX_AD_LENGTH)
->                         return MGMT_STATUS_INVALID_PARAMS;
+>  #define BATTERY_MAX_PERCENTAGE 100
+> +#define LAST_CHARGES_SIZE 4
 >
->                 p =3D kmalloc(sizeof(*p), GFP_KERNEL);
+>  struct btd_battery {
+>         char *path; /* D-Bus object path */
+>         uint8_t percentage; /* valid between 0 to 100 inclusively */
+> +       uint8_t *last_charges; /* last received charge percentages */
+> +       uint8_t lru_charge_id; /* oldest received charge id */
+>         char *source; /* Descriptive source of the battery info */
+>         char *provider_path; /* The provider root path, if any */
+>  };
+> @@ -92,6 +95,12 @@ static struct btd_battery *battery_new(const char *pat=
+h, const char *source,
+>         battery =3D new0(struct btd_battery, 1);
+>         battery->path =3D g_strdup(path);
+>         battery->percentage =3D UINT8_MAX;
+> +       battery->last_charges =3D new0(uint8_t, LAST_CHARGES_SIZE);
+> +       battery->lru_charge_id =3D 0;
+> +
+> +       for (uint8_t id =3D 0; id < LAST_CHARGES_SIZE; id++)
+> +               battery->last_charges[id] =3D UINT8_MAX;
+> +
+>         if (source)
+>                 battery->source =3D g_strdup(source);
+>         if (provider_path)
+> @@ -105,6 +114,9 @@ static void battery_free(struct btd_battery *battery)
+>         if (battery->path)
+>                 g_free(battery->path);
+>
+> +       if (battery->last_charges)
+> +               g_free(battery->last_charges);
+> +
+>         if (battery->source)
+>                 g_free(battery->source);
+>
+> @@ -219,6 +231,8 @@ bool btd_battery_unregister(struct btd_battery *batte=
+ry)
+>
+>  bool btd_battery_update(struct btd_battery *battery, uint8_t percentage)
+>  {
+> +       uint8_t min_charge =3D BATTERY_MAX_PERCENTAGE;
+> +
+>         DBG("path =3D %s", battery->path);
+>
+>         if (!queue_find(batteries, NULL, battery)) {
+> @@ -231,10 +245,18 @@ bool btd_battery_update(struct btd_battery *battery=
+, uint8_t percentage)
+>                 return false;
+>         }
+>
+> -       if (battery->percentage =3D=3D percentage)
+> +       battery->last_charges[battery->lru_charge_id] =3D percentage;
+> +       battery->lru_charge_id =3D (battery->lru_charge_id + 1) % LAST_CH=
+ARGES_SIZE;
+> +
+> +       for (uint8_t id =3D 0; id < LAST_CHARGES_SIZE; id++) {
+> +               if (battery->last_charges[id] < min_charge)
+> +                       min_charge =3D battery->last_charges[id];
+> +       }
+> +
+> +       if (battery->percentage =3D=3D min_charge)
+>                 return true;
+>
+> -       battery->percentage =3D percentage;
+> +       battery->percentage =3D min_charge;
+>         g_dbus_emit_property_changed(btd_get_dbus_connection(), battery->=
+path,
+>                                      BATTERY_INTERFACE, "Percentage");
+>
 > --
-> 2.39.5
-
+> 2.43.0
+>
+>
 
 
 --=20
