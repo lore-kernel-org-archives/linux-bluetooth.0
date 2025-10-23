@@ -1,140 +1,211 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9FE30EF9E;
-	Thu, 23 Oct 2025 12:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D18E3148A3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 12:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761221131; cv=none; b=T5Kh7B9YpX1u1rSkY1Pnw4NbZSQLXuP1lL1/CBgOYwj+7SiqM6TIFyfbUoZ/OGkNWJgMgw+gZI1bm6GOVs7fTX2aeFGwXBN7N03TTzUWncpAaeaRZl/ox7GPRqNm3SBJnBZmTNnP9/l4yEC5538ZLJtakzv9n4dBC1vvS4Ckm8w=
+	t=1761223822; cv=none; b=eWn2feWB7yndnJXT18+jjeOO86dD+Q8CmoVcvxpbTCQuw49aPao4vEcpDSV115d0V9N6uniqVr49kJCONu/gUEdzfwdhsGy3hod62rGJo+rb3R6VKZ9S8vu+7BktHW5p/v7Zc/JTaBm6Omu7wlXKfJamzpyWfP9swMBV3h4CiBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761221131; c=relaxed/simple;
-	bh=zZuQXSTIkvfO+rEfdYOWf8tCjPjJZkwTd/3fAJkapCE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oCXP4eS+aMh4Skp6Jr9aOSKvEZj2IHBT+1uKvC3e+v4chZPhEoya2iSXNgbbeFuehajEPVAJrDy47yVCPD5n6+P3g8Yer0M5G8kmzf4Ll+dQWGVS8Kmux0lUZIJbK7B0JEo/UNKSln7EtCzANEQZKiviPcRD50JbV3h0PgljfqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCucqQbN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761223822; c=relaxed/simple;
+	bh=W5/W3ofAfp43vxkCIuiwjeOk+39XQ4Cjn0XzPzMI6Bk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=q253IlU92t6E0aWm7gdifrdDKuE0J7K/q4WZgSGFGs+gA70QqErNXDKavArvGmCpuWezXUpiGjhqaW4bAavVGsqMMtFGr+plhKu0EY9H/Q/9YBE/D9EJtfjyUJtNBS6gW0o9ev+PbnV+hIVTYnbqqHOcIbF+darsgQaLQfpv8+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+2bJ6Mz; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCucqQbN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F82C4CEE7;
-	Thu, 23 Oct 2025 12:05:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761221131;
-	bh=zZuQXSTIkvfO+rEfdYOWf8tCjPjJZkwTd/3fAJkapCE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sCucqQbNIW0hCXaOQIzqi181nZXFIgKvHtqsWFsvJUnGa+i7fLZ1bn6lmrLKxjHTn
-	 /fINNTcf3UHx73XFSwNwpmdj4t03U6y9S5Qsu2ZYL5PektTCn4Vg0NcYErGGVVBcVL
-	 xJb8zfQfiBH++Hp5QaStXs2lbvRwTY8RaB7c5faQ4lnGvtLX8HX6V+yuZ2Pr34IkeX
-	 FuUzjvUCzO0F8fcfDoAFhn743GVxsInYBpyNrm61l0zZsZ+VU44Lf+JOksQBGjqAbO
-	 ZqV6ZxgzYVfxJ2k46cDqz487hdeqGzymut932V54i+z4va4B2wicbi3ch0zxy7z0CO
-	 GP9jeC7SLPSzw==
-Received: from johan by xi.lan with local (Exim 4.98.2)
-	(envelope-from <johan@kernel.org>)
-	id 1vBu4X-000000001Tz-1noL;
-	Thu, 23 Oct 2025 14:05:37 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: rfcomm: fix modem control handling
-Date: Thu, 23 Oct 2025 14:05:30 +0200
-Message-ID: <20251023120530.5685-1-johan@kernel.org>
-X-Mailer: git-send-email 2.49.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+2bJ6Mz"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-430c97cbe0eso8046635ab.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Oct 2025 05:50:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761223819; x=1761828619; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=W5/W3ofAfp43vxkCIuiwjeOk+39XQ4Cjn0XzPzMI6Bk=;
+        b=D+2bJ6MzYioTA6maBfernWAXsBHXUGr1LGwE0X8r4dedCYmJawtrs0JuMq1epQaaED
+         dth6l6SMSJNM1+41V5f09N4FFkUPCVwrx58kiXzkddz9LGwfAjROGGuI2RJAobPZ8d+I
+         36MY6IEJMv8hOPQ2nYB+ccu+QXd2DN+GSwFUUPwakvgWTVMJf+sjoEmZ7yfricdaEJva
+         611ImnKJIbUJYtvihGbYF/dIYvU42O8VbxkxA2OGjCZAd/5cg52+KowuH17g0CqwSLob
+         Sr8nDf2zLOhPlWy4DmSUHKkfefU80SYIIsIq6bBJ3TXvqZmc2swboVeqbDThTHqPObS1
+         Qf5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761223819; x=1761828619;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W5/W3ofAfp43vxkCIuiwjeOk+39XQ4Cjn0XzPzMI6Bk=;
+        b=J45A0pNdOptWlhBPS7GutGkn/Tql5WlrcQ3svEgc3EKkEA9NOYDazLzhD4TiChzeaR
+         U/zt8+J4jpLY8MX4xc6oavlEZL5IOF/2XzQvksSf2a+cRkwWSMuhuVW27miITUq4oZ8O
+         t8CqpWwbbxRn/EZg0GRUpLF4um4vYz7Gb7ZIfluYf83EF8G2+7rTF1S3L1O5YNsnw2Yd
+         r12jjslpqW/ih+h7LbXwy0np32/LSg1SWdhxoUoi3e+fF/ehTdHaTsepygEl7/dF74YM
+         kOx1Q0zAcIVR0TFU0z7Jbn8eUy+flfZpq87HoMmByy8I+uW79tyLL0a4Rh/u+8TZ2rXa
+         OzHA==
+X-Gm-Message-State: AOJu0Yy6Xl9QFzf7gs09XlDQglnZIJlRp7SujWONUsbbA8Y8tq3eLRRm
+	zyE7o3BhnZFQlZnl4a6K/EUgNRfOu52hU1NMBlqDpfHFM4Tc5aq4O/3reG0fLg==
+X-Gm-Gg: ASbGncsZn7zXgGa2YeFNbrYRJ3xSso0H4RBcwPusS1Vn832oaIXki0powHg75+ZhW3E
+	UKiGcgJJC5ubBGVvnnBDYpe366JOFKLxq8CWMDqnsHVtOsOoQZ+OObnQG4ZqMugyF5VPXLujl7j
+	ArYPVbFC8FOTtteO7pLkSLmr4FLHRM499xVxGgqhtdhygxwgmu3whNMhx1JG+xw8K4JXP7YDEQt
+	FL/JVsZlJV24gxyqNWvStjm9RyFfvSCTtVIUCT/iPGkojXMY0oMiMGQbfqYIgXC2sRQVtxbAXl8
+	ZcNBTMI7nSthUtfsTCh5DUUQpFi9ow7HS7MMVIAvRnKkJ7AV7CNcB09kKj8x1U1X/kG7hIJgBA4
+	jmdP49K5ROaZHlkEwN1WHcG4cpVtiV7sgBunU68Z4aCIKCEPpBVMY8nh0SMgA3Qs7cof+/lDOi0
+	AFbnQxfxs=
+X-Google-Smtp-Source: AGHT+IGjz+5dOoIn7N9F36BW511PYPczjXQIBtPGZUjqNlf1zheUmt/MbtDjVukkYGLNBN6GaYqjdQ==
+X-Received: by 2002:a05:6e02:2704:b0:427:6e7f:89f8 with SMTP id e9e14a558f8ab-431dc1605f2mr31162645ab.10.1761223819205;
+        Thu, 23 Oct 2025 05:50:19 -0700 (PDT)
+Received: from [172.17.0.2] ([132.196.80.130])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5ac8d1c2f7fsm189264173.46.2025.10.23.05.50.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Oct 2025 05:50:18 -0700 (PDT)
+Message-ID: <68fa248a.020a0220.229540.044f@mx.google.com>
+Date: Thu, 23 Oct 2025 05:50:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4278137792419299893=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, johan@kernel.org
+Subject: RE: Bluetooth: rfcomm: fix modem control handling
+In-Reply-To: <20251023120127.5274-1-johan@kernel.org>
+References: <20251023120127.5274-1-johan@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The RFCOMM driver confuses the local and remote modem control signals,
-which specifically means that the reported DTR and RTS state will
-instead reflect the remote end (i.e. DSR and CTS).
+--===============4278137792419299893==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-This issue dates back to the original driver (and a follow-on update)
-merged in 2002, which resulted in a non-standard implementation of
-TIOCMSET that allowed controlling also the TS07.10 IC and DV signals by
-mapping them to the RI and DCD input flags, while TIOCMGET failed to
-return the actual state of DTR and RTS.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTAxNDk3OQoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgUEVORElORyAgIDAuMzggc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+RU5ESU5HICAgMC4yOCBzZWNvbmRzClN1YmplY3RQcmVmaXggICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAwLjA4IHNlY29uZHMKQnVpbGRLZXJuZWwgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDE3LjcyIHNlY29uZHMKQ2hlY2tBbGxXYXJuaW5nICAgICAgICAgICAgICAgRkFJTCAgICAgIDE5
+LjM4IHNlY29uZHMKQ2hlY2tTcGFyc2UgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDIxLjE2
+IHNlY29uZHMKQnVpbGRLZXJuZWwzMiAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDE2Ljg4IHNl
+Y29uZHMKVGVzdFJ1bm5lclNldHVwICAgICAgICAgICAgICAgUEFTUyAgICAgIDQ4OC4zMSBzZWNv
+bmRzClRlc3RSdW5uZXJfbDJjYXAtdGVzdGVyICAgICAgIFBBU1MgICAgICAyMy45MSBzZWNvbmRz
+ClRlc3RSdW5uZXJfaXNvLXRlc3RlciAgICAgICAgIEZBSUwgICAgICA2MC4xNiBzZWNvbmRzClRl
+c3RSdW5uZXJfYm5lcC10ZXN0ZXIgICAgICAgIFBBU1MgICAgICA2LjM0IHNlY29uZHMKVGVzdFJ1
+bm5lcl9tZ210LXRlc3RlciAgICAgICAgRkFJTCAgICAgIDEyNS41MCBzZWNvbmRzClRlc3RSdW5u
+ZXJfcmZjb21tLXRlc3RlciAgICAgIFBBU1MgICAgICA5LjM2IHNlY29uZHMKVGVzdFJ1bm5lcl9z
+Y28tdGVzdGVyICAgICAgICAgUEFTUyAgICAgIDE0LjQ3IHNlY29uZHMKVGVzdFJ1bm5lcl9pb2N0
+bC10ZXN0ZXIgICAgICAgUEFTUyAgICAgIDEwLjA5IHNlY29uZHMKVGVzdFJ1bm5lcl9tZXNoLXRl
+c3RlciAgICAgICAgRkFJTCAgICAgIDExLjM2IHNlY29uZHMKVGVzdFJ1bm5lcl9zbXAtdGVzdGVy
+ICAgICAgICAgUEFTUyAgICAgIDguNDUgc2Vjb25kcwpUZXN0UnVubmVyX3VzZXJjaGFuLXRlc3Rl
+ciAgICBQQVNTICAgICAgNi4zOCBzZWNvbmRzCkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAg
+IFBFTkRJTkcgICAxLjA3IHNlY29uZHMKCkRldGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjClRlc3Q6IENoZWNrUGF0Y2ggLSBQRU5ESU5HCkRlc2M6IFJ1biBjaGVja3BhdGNoLnBs
+IHNjcmlwdApPdXRwdXQ6CgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogR2l0
+TGludCAtIFBFTkRJTkcKRGVzYzogUnVuIGdpdGxpbnQKT3V0cHV0OgoKIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkS2VybmVsIC0gRkFJTApEZXNjOiBCdWlsZCBLZXJu
+ZWwgZm9yIEJsdWV0b290aApPdXRwdXQ6CgpuZXQvYmx1ZXRvb3RoL3JmY29tbS90dHkuYzogSW4g
+ZnVuY3Rpb24g4oCYcmZjb21tX3R0eV90aW9jbWdldOKAmToKbmV0L2JsdWV0b290aC9yZmNvbW0v
+dHR5LmM6MTA2MjozMDogZXJyb3I6IOKAmGRsY+KAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4g
+dGhpcyBmdW5jdGlvbikKIDEwNjIgfCAgcmZjb21tX2RsY19nZXRfbW9kZW1fc3RhdHVzKGRsYywg
+JnYyNF9zaWcpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+Cm5ldC9i
+bHVldG9vdGgvcmZjb21tL3R0eS5jOjEwNjI6MzA6IG5vdGU6IGVhY2ggdW5kZWNsYXJlZCBpZGVu
+dGlmaWVyIGlzIHJlcG9ydGVkIG9ubHkgb25jZSBmb3IgZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJz
+IGluCm1ha2VbNV06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDoyODc6IG5ldC9ibHVldG9v
+dGgvcmZjb21tL3R0eS5vXSBFcnJvciAxCm1ha2VbNF06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5i
+dWlsZDo1NTY6IG5ldC9ibHVldG9vdGgvcmZjb21tXSBFcnJvciAyCm1ha2VbNF06ICoqKiBXYWl0
+aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2VbM106ICoqKiBbc2NyaXB0cy9NYWtlZmls
+ZS5idWlsZDo1NTY6IG5ldC9ibHVldG9vdGhdIEVycm9yIDIKbWFrZVsyXTogKioqIFtzY3JpcHRz
+L01ha2VmaWxlLmJ1aWxkOjU1NjogbmV0XSBFcnJvciAyCm1ha2VbMl06ICoqKiBXYWl0aW5nIGZv
+ciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2VbMV06ICoqKiBbL2dpdGh1Yi93b3Jrc3BhY2Uvc3Jj
+L3NyYy9NYWtlZmlsZToyMDExOiAuXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MjQ4OiBf
+X3N1Yi1tYWtlXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBD
+aGVja0FsbFdhcm5pbmcgLSBGQUlMCkRlc2M6IFJ1biBsaW51eCBrZXJuZWwgd2l0aCBhbGwgd2Fy
+bmluZyBlbmFibGVkCk91dHB1dDoKCm5ldC9ibHVldG9vdGgvcmZjb21tL3R0eS5jOiBJbiBmdW5j
+dGlvbiDigJhyZmNvbW1fdHR5X3Rpb2NtZ2V04oCZOgpuZXQvYmx1ZXRvb3RoL3JmY29tbS90dHku
+YzoxMDYyOjMwOiBlcnJvcjog4oCYZGxj4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlz
+IGZ1bmN0aW9uKQogMTA2MiB8ICByZmNvbW1fZGxjX2dldF9tb2RlbV9zdGF0dXMoZGxjLCAmdjI0
+X3NpZyk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn4KbmV0L2JsdWV0
+b290aC9yZmNvbW0vdHR5LmM6MTA2MjozMDogbm90ZTogZWFjaCB1bmRlY2xhcmVkIGlkZW50aWZp
+ZXIgaXMgcmVwb3J0ZWQgb25seSBvbmNlIGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4K
+bWFrZVs1XTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjI4NzogbmV0L2JsdWV0b290aC9y
+ZmNvbW0vdHR5Lm9dIEVycm9yIDEKbWFrZVs0XTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxk
+OjU1NjogbmV0L2JsdWV0b290aC9yZmNvbW1dIEVycm9yIDIKbWFrZVs0XTogKioqIFdhaXRpbmcg
+Zm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZVszXTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1
+aWxkOjU1NjogbmV0L2JsdWV0b290aF0gRXJyb3IgMgptYWtlWzJdOiAqKiogW3NjcmlwdHMvTWFr
+ZWZpbGUuYnVpbGQ6NTU2OiBuZXRdIEVycm9yIDIKbWFrZVsyXTogKioqIFdhaXRpbmcgZm9yIHVu
+ZmluaXNoZWQgam9icy4uLi4KbWFrZVsxXTogKioqIFsvZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3Jj
+L01ha2VmaWxlOjIwMTE6IC5dIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToyNDg6IF9fc3Vi
+LW1ha2VdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
+U3BhcnNlIC0gRkFJTApEZXNjOiBSdW4gc3BhcnNlIHRvb2wgd2l0aCBsaW51eCBrZXJuZWwKT3V0
+cHV0OgoKbmV0L2JsdWV0b290aC9yZmNvbW0vdHR5LmM6IEluIGZ1bmN0aW9uIOKAmHJmY29tbV90
+dHlfdGlvY21nZXTigJk6Cm5ldC9ibHVldG9vdGgvcmZjb21tL3R0eS5jOjEwNjI6MzA6IGVycm9y
+OiDigJhkbGPigJkgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCiAxMDYy
+IHwgIHJmY29tbV9kbGNfZ2V0X21vZGVtX3N0YXR1cyhkbGMsICZ2MjRfc2lnKTsKICAgICAgfCAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fgpuZXQvYmx1ZXRvb3RoL3JmY29tbS90dHku
+YzoxMDYyOjMwOiBub3RlOiBlYWNoIHVuZGVjbGFyZWQgaWRlbnRpZmllciBpcyByZXBvcnRlZCBv
+bmx5IG9uY2UgZm9yIGVhY2ggZnVuY3Rpb24gaXQgYXBwZWFycyBpbgptYWtlWzVdOiAqKiogW3Nj
+cmlwdHMvTWFrZWZpbGUuYnVpbGQ6Mjg3OiBuZXQvYmx1ZXRvb3RoL3JmY29tbS90dHkub10gRXJy
+b3IgMQptYWtlWzRdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NTU2OiBuZXQvYmx1ZXRv
+b3RoL3JmY29tbV0gRXJyb3IgMgptYWtlWzRdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBq
+b2JzLi4uLgpuZXQvYmx1ZXRvb3RoL2FmX2JsdWV0b290aC5jOjI0ODoyNTogd2FybmluZzogY29u
+dGV4dCBpbWJhbGFuY2UgaW4gJ2J0X2FjY2VwdF9lbnF1ZXVlJyAtIGRpZmZlcmVudCBsb2NrIGNv
+bnRleHRzIGZvciBiYXNpYyBibG9jawptYWtlWzNdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVp
+bGQ6NTU2OiBuZXQvYmx1ZXRvb3RoXSBFcnJvciAyCm1ha2VbMl06ICoqKiBbc2NyaXB0cy9NYWtl
+ZmlsZS5idWlsZDo1NTY6IG5ldF0gRXJyb3IgMgptYWtlWzJdOiAqKiogV2FpdGluZyBmb3IgdW5m
+aW5pc2hlZCBqb2JzLi4uLgpkcml2ZXJzL2JsdWV0b290aC9oY2lfYWc2eHguYzoyNTc6MjQ6IHdh
+cm5pbmc6IHJlc3RyaWN0ZWQgX19sZTMyIGRlZ3JhZGVzIHRvIGludGVnZXIKZHJpdmVycy9ibHVl
+dG9vdGgvaGNpX21ydmwuYzoxNzA6MjM6IHdhcm5pbmc6IHJlc3RyaWN0ZWQgX19sZTE2IGRlZ3Jh
+ZGVzIHRvIGludGVnZXIKZHJpdmVycy9ibHVldG9vdGgvaGNpX21ydmwuYzoyMDM6MjM6IHdhcm5p
+bmc6IHJlc3RyaWN0ZWQgX19sZTE2IGRlZ3JhZGVzIHRvIGludGVnZXIKZHJpdmVycy9ibHVldG9v
+dGgvaGNpX25va2lhLmM6Mjc5OjIzOiB3YXJuaW5nOiBpbmNvcnJlY3QgdHlwZSBpbiBhc3NpZ25t
+ZW50IChkaWZmZXJlbnQgYmFzZSB0eXBlcykKZHJpdmVycy9ibHVldG9vdGgvaGNpX25va2lhLmM6
+Mjc5OjIzOiAgICBleHBlY3RlZCB1bnNpZ25lZCBzaG9ydCBbdXNlcnR5cGVdIGJhdWQKZHJpdmVy
+cy9ibHVldG9vdGgvaGNpX25va2lhLmM6Mjc5OjIzOiAgICBnb3QgcmVzdHJpY3RlZCBfX2xlMTYg
+W3VzZXJ0eXBlXQpkcml2ZXJzL2JsdWV0b290aC9oY2lfbm9raWEuYzoyODI6MjY6IHdhcm5pbmc6
+IGluY29ycmVjdCB0eXBlIGluIGFzc2lnbm1lbnQgKGRpZmZlcmVudCBiYXNlIHR5cGVzKQpkcml2
+ZXJzL2JsdWV0b290aC9oY2lfbm9raWEuYzoyODI6MjY6ICAgIGV4cGVjdGVkIHVuc2lnbmVkIHNo
+b3J0IFt1c2VydHlwZV0gc3lzX2Nsawpkcml2ZXJzL2JsdWV0b290aC9oY2lfbm9raWEuYzoyODI6
+MjY6ICAgIGdvdCByZXN0cmljdGVkIF9fbGUxNiBbdXNlcnR5cGVdCm1ha2VbMV06ICoqKiBbL2dp
+dGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy9NYWtlZmlsZToyMDExOiAuXSBFcnJvciAyCm1ha2U6ICoq
+KiBbTWFrZWZpbGU6MjQ4OiBfX3N1Yi1tYWtlXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIwpUZXN0OiBCdWlsZEtlcm5lbDMyIC0gRkFJTApEZXNjOiBCdWlsZCAzMmJpdCBL
+ZXJuZWwgZm9yIEJsdWV0b290aApPdXRwdXQ6CgpuZXQvYmx1ZXRvb3RoL3JmY29tbS90dHkuYzog
+SW4gZnVuY3Rpb24g4oCYcmZjb21tX3R0eV90aW9jbWdldOKAmToKbmV0L2JsdWV0b290aC9yZmNv
+bW0vdHR5LmM6MTA2MjozMDogZXJyb3I6IOKAmGRsY+KAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2Ug
+aW4gdGhpcyBmdW5jdGlvbikKIDEwNjIgfCAgcmZjb21tX2RsY19nZXRfbW9kZW1fc3RhdHVzKGRs
+YywgJnYyNF9zaWcpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+Cm5l
+dC9ibHVldG9vdGgvcmZjb21tL3R0eS5jOjEwNjI6MzA6IG5vdGU6IGVhY2ggdW5kZWNsYXJlZCBp
+ZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9ubHkgb25jZSBmb3IgZWFjaCBmdW5jdGlvbiBpdCBhcHBl
+YXJzIGluCm1ha2VbNV06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDoyODc6IG5ldC9ibHVl
+dG9vdGgvcmZjb21tL3R0eS5vXSBFcnJvciAxCm1ha2VbNF06ICoqKiBbc2NyaXB0cy9NYWtlZmls
+ZS5idWlsZDo1NTY6IG5ldC9ibHVldG9vdGgvcmZjb21tXSBFcnJvciAyCm1ha2VbNF06ICoqKiBX
+YWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2VbM106ICoqKiBbc2NyaXB0cy9NYWtl
+ZmlsZS5idWlsZDo1NTY6IG5ldC9ibHVldG9vdGhdIEVycm9yIDIKbWFrZVsyXTogKioqIFtzY3Jp
+cHRzL01ha2VmaWxlLmJ1aWxkOjU1NjogbmV0XSBFcnJvciAyCm1ha2VbMl06ICoqKiBXYWl0aW5n
+IGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2VbMV06ICoqKiBbL2dpdGh1Yi93b3Jrc3BhY2Uv
+c3JjL3NyYy9NYWtlZmlsZToyMDExOiAuXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MjQ4
+OiBfX3N1Yi1tYWtlXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0
+OiBUZXN0UnVubmVyX2lzby10ZXN0ZXIgLSBGQUlMCkRlc2M6IFJ1biBpc28tdGVzdGVyIHdpdGgg
+dGVzdC1ydW5uZXIKT3V0cHV0OgpObyB0ZXN0IHJlc3VsdCBmb3VuZAojIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMKVGVzdDogVGVzdFJ1bm5lcl9tZ210LXRlc3RlciAtIEZBSUwKRGVzYzog
+UnVuIG1nbXQtdGVzdGVyIHdpdGggdGVzdC1ydW5uZXIKT3V0cHV0OgpUb3RhbDogNDkwLCBQYXNz
+ZWQ6IDQ4MyAoOTguNiUpLCBGYWlsZWQ6IDMsIE5vdCBSdW46IDQKCkZhaWxlZCBUZXN0IENhc2Vz
+ClJlYWQgRXhwIEZlYXR1cmUgLSBTdWNjZXNzICAgICAgICAgICAgICAgICAgICAgICAgICAgRmFp
+bGVkICAgICAgIDAuMTA1IHNlY29uZHMKTEwgUHJpdmFjeSAtIEFkZCBEZXZpY2UgMiAoMiBEZXZp
+Y2VzIHRvIEFMKSAgICAgICAgICBGYWlsZWQgICAgICAgMC4xODIgc2Vjb25kcwpMTCBQcml2YWN5
+IC0gU2V0IEZsYWdzIDIgKEVuYWJsZSBSTCkgICAgICAgICAgICAgICAgIEZhaWxlZCAgICAgICAw
+LjE1NCBzZWNvbmRzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBUZXN0UnVu
+bmVyX21lc2gtdGVzdGVyIC0gRkFJTApEZXNjOiBSdW4gbWVzaC10ZXN0ZXIgd2l0aCB0ZXN0LXJ1
+bm5lcgpPdXRwdXQ6ClRvdGFsOiAxMCwgUGFzc2VkOiA4ICg4MC4wJSksIEZhaWxlZDogMiwgTm90
+IFJ1bjogMAoKRmFpbGVkIFRlc3QgQ2FzZXMKTWVzaCAtIFNlbmQgY2FuY2VsIC0gMSAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBUaW1lZCBvdXQgICAgMS44Nzggc2Vjb25kcwpNZXNoIC0g
+U2VuZCBjYW5jZWwgLSAyICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFRpbWVkIG91dCAg
+ICAxLjk5NiBzZWNvbmRzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJbmNy
+ZW1lbnRhbEJ1aWxkIC0gUEVORElORwpEZXNjOiBJbmNyZW1lbnRhbCBidWlsZCB3aXRoIHRoZSBw
+YXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRv
+b3RoCgo=
 
-Note that the bogus control of input signals in tiocmset() is just
-dead code as those flags will have been masked out by the tty layer
-since 2003.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Johan Hovold <johan@kernel.org>
----
-
-Changes in v2
- - fix a compilation issue discovered before sending v1 but never folded
-   into the actual patch...
-
-
- net/bluetooth/rfcomm/tty.c | 26 +++++++++++---------------
- 1 file changed, 11 insertions(+), 15 deletions(-)
-
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 376ce6de84be..b783526ab588 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -643,8 +643,8 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
- 		tty_port_tty_hangup(&dev->port, true);
- 
- 	dev->modem_status =
--		((v24_sig & RFCOMM_V24_RTC) ? (TIOCM_DSR | TIOCM_DTR) : 0) |
--		((v24_sig & RFCOMM_V24_RTR) ? (TIOCM_RTS | TIOCM_CTS) : 0) |
-+		((v24_sig & RFCOMM_V24_RTC) ? TIOCM_DSR : 0) |
-+		((v24_sig & RFCOMM_V24_RTR) ? TIOCM_CTS : 0) |
- 		((v24_sig & RFCOMM_V24_IC)  ? TIOCM_RI : 0) |
- 		((v24_sig & RFCOMM_V24_DV)  ? TIOCM_CD : 0);
- }
-@@ -1055,10 +1055,14 @@ static void rfcomm_tty_hangup(struct tty_struct *tty)
- static int rfcomm_tty_tiocmget(struct tty_struct *tty)
- {
- 	struct rfcomm_dev *dev = tty->driver_data;
-+	struct rfcomm_dlc *dlc = dev->dlc;
-+	u8 v24_sig;
- 
- 	BT_DBG("tty %p dev %p", tty, dev);
- 
--	return dev->modem_status;
-+	rfcomm_dlc_get_modem_status(dlc, &v24_sig);
-+
-+	return (v24_sig & (TIOCM_DTR | TIOCM_RTS)) | dev->modem_status;
- }
- 
- static int rfcomm_tty_tiocmset(struct tty_struct *tty, unsigned int set, unsigned int clear)
-@@ -1071,23 +1075,15 @@ static int rfcomm_tty_tiocmset(struct tty_struct *tty, unsigned int set, unsigne
- 
- 	rfcomm_dlc_get_modem_status(dlc, &v24_sig);
- 
--	if (set & TIOCM_DSR || set & TIOCM_DTR)
-+	if (set & TIOCM_DTR)
- 		v24_sig |= RFCOMM_V24_RTC;
--	if (set & TIOCM_RTS || set & TIOCM_CTS)
-+	if (set & TIOCM_RTS)
- 		v24_sig |= RFCOMM_V24_RTR;
--	if (set & TIOCM_RI)
--		v24_sig |= RFCOMM_V24_IC;
--	if (set & TIOCM_CD)
--		v24_sig |= RFCOMM_V24_DV;
- 
--	if (clear & TIOCM_DSR || clear & TIOCM_DTR)
-+	if (clear & TIOCM_DTR)
- 		v24_sig &= ~RFCOMM_V24_RTC;
--	if (clear & TIOCM_RTS || clear & TIOCM_CTS)
-+	if (clear & TIOCM_RTS)
- 		v24_sig &= ~RFCOMM_V24_RTR;
--	if (clear & TIOCM_RI)
--		v24_sig &= ~RFCOMM_V24_IC;
--	if (clear & TIOCM_CD)
--		v24_sig &= ~RFCOMM_V24_DV;
- 
- 	rfcomm_dlc_set_modem_status(dlc, v24_sig);
- 
--- 
-2.49.1
-
+--===============4278137792419299893==--
