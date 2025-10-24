@@ -1,69 +1,69 @@
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBFE2F7468
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 20:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90652F7AC4
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 20:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761338462; cv=none; b=JC+1BkFc8a9Ux1D4dOqk/K8A8GdV10Z3OYr6GMPikY4g/GO8WN/KQfM3+KIAeTe0BsXp8+pudQTCOyQlTAvqGrXO3wUWPZcKOAPMUfMB/s/FeOUyoUM3LjVLo1/GiOe/d565Uq/ce0rYuGMGkVZ1MnIj3ZAQmwLDsJ9G4nCcm3U=
+	t=1761338464; cv=none; b=E0ymuVTfvJMFSOLdXenZCQcaVekGIXeP9XVaL6CokWvbwoIYdvFfpJl2kEsVHbX8wBjYlrbQalMMJxZdvwsnLzN10gnluezu8IDg8vIZnoqWCMJGJvT7z3445rDbmhHhGmlAr3QwJdMT41EAxLOgfUmv4YuijamlPObz2qGBJl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761338462; c=relaxed/simple;
-	bh=llqDBDmOJK/CKIPTIM8yL1+6QhVHbwgrXQi40KhoIpw=;
+	s=arc-20240116; t=1761338464; c=relaxed/simple;
+	bh=7trz3xUvtb/Ve8icmn1LkB09Tf0pwVltuoyViYUMIp0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z8zc8AIorJePrmhGbxdG4id68+SbCsMajEd5Irt13UF3lRYpr26D4rXRG8K4iirsHmJV2mRHLoCCJTsABFLU9iaU97l/ExpGqWiucLZiIWddSl68o4bJsxqegd75YDUWl4sOzeuAK529qJYM9xkROlhGeq+KSe1mctlRD3cWrYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B0v2aUgC; arc=none smtp.client-ip=209.85.217.54
+	 MIME-Version; b=KHWMt+WGmYxetcZWIS+U5hDpEtXCKC5Hd8LMlvKVBvCLFFS7brU7pj3ttdFCsmAiKFWDsNanbofE8L18HGusuiOjPi0OL6HsjLSDFK5Rp3SrsLzzoIKjfaMhPKCM/xlGBPmtDRAn0ZpVl6wfwct00OPRuuWfqL5BUe85aRMWezY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f3Uzs0qN; arc=none smtp.client-ip=209.85.222.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B0v2aUgC"
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-5d6266f1a33so1626165137.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 13:41:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f3Uzs0qN"
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-934a3f11a44so2018433241.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 13:41:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761338459; x=1761943259; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761338460; x=1761943260; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UEUdPpa50PFjMbWXhvz0VvuyCuuWRmBGJYgNoclhc68=;
-        b=B0v2aUgCs8fcFF3nxJG1u3BHMRnxrIIsCxxWY7APKQFZyRbcR0rcOlaL0JDRRC4Dw7
-         S1//Py39PqcZ7tXc6vdOwxFMhvv7/sXQEWwP/nNu4jqaoj2ZiAoUxCiS7k2gTXxwhecl
-         xMtc4px55K0HQaYOnVjuPSicVDqfxzbKW0srcSKb80Ns4QSEkMJFS2y4O0Pwn7GIGDI3
-         iH5yCzMcH5Fs2P3+QmHH9+Je/wXJXHwM7Csjw/idTi+V8JbWlMRh/JkvRZlNE04cZ++k
-         C1AyXcNAbuavCKpJBVHe8qoCJtvMrpmbOsug9mvlyQu76ErCKFkS/wmVItJ7oPYIqO3g
-         DrLw==
+        bh=osxLypg02uEY3loO6nURiV153bLVW4LM2c+mKbTzvFU=;
+        b=f3Uzs0qNpBiNF8i1H/PC6H5SP0w3MRb4xqFJT0iP6Q/AcFEFhYtht5KxShag3i75KO
+         9DWrzSplRnbJZ60X3ksfzsRQ8OOIXclbubWXlMKAFqV3ShfgBBU3BCEdWi1JawNmfU6a
+         4IQWEaQSwXeTxO/ngRNVH1MyD4LKUsVgX/9/chKHC5HqyofAOE9JXVl15HBtoJHBLxIL
+         IG0FlU0/ey0wVEzm5Oo2G7DzEHrkAqtEcO3J6zerT83JeWGUyiTpoHaBhNncRelqa8ZL
+         XxDur5jUwG33JGK2ppvJN5w21+wMzF0hG6KG8fmFvkw0CBGywRvPfKwBElCJEIqGKuV6
+         K9VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761338459; x=1761943259;
+        d=1e100.net; s=20230601; t=1761338460; x=1761943260;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UEUdPpa50PFjMbWXhvz0VvuyCuuWRmBGJYgNoclhc68=;
-        b=mem4C372f0/qR94Bkl9ZAW+uu83z9WH4xhzpy9sk8xj/MFi5MKinBD9n2WDrnr2t3v
-         89nUDmSI0N1Inpct4kjh3f+upZBSDtcZV5pa654qlQYA3rrWihCTrPA7/G6AiAuM/pL5
-         ba52Y/MNud8q18fQ5Gmzb0L6w8SAterU9lCs24X+wbJybL995BRskm0yjqd8uwktPRUo
-         QlgW5Kj3aQBjqkp66nc6C+ulHhPIR3wztwrkFiQPaXbGuY3YJVWpIGo5XgFn7pUJNA7B
-         OTpLBogl4a0bBpuniAOvP6JkvEBRcpItLdLcthGX+FbABsukZRFcNWWCoXuTmAucsXzK
-         d00A==
-X-Gm-Message-State: AOJu0YxUKcUhO9PIQ0S7zID453caREeJ1848IBr7AWB4h4zQXbLyZEKr
-	RBR3GG2DE3O+W78hH20z0HIGOBIX87KMr4vSj3xhx6ekDBDIzYLOtx0pZr07tQ==
-X-Gm-Gg: ASbGncsOKxtsUlDRhSIemcbYbd9T9kHjnoFhklLvWfQtTp3OMCmsLNX5hbFqX4+qnnC
-	2SscGGwVqADDudu+PrvINGuGfmY4uaLajYdGxg7sbvdU1aH626ZnjIEIUNbzYkGTm/ztoFqpMcZ
-	Wi0EJ+d8/+S38leQ5Rb59hUlRQrHEzvUo/lcvbgBnYeemiqI1+CJ8h6RlDPRu3aA/hlPNZFu6dd
-	Tb0g/eFBjWQhAZTZbjrv8KcsRJjlxSOu5j2u40OaS0csvlIBaqOpPOCUji82l+DhaXnKYXrV6GQ
-	H1ZZhD6rYS8jdRsuaxFMRRHb/iV/rATnjRLyEfwkOb3gLLTkQhxCxA2BthbD6W8hFPC0JGNAkkn
-	NojForSX4+ipeJMbJSdHrwlIDg5USHoobMFLBMUuFr/C9zDyJ27UaZUz+xUJMCs1dXvuP0Ax/jk
-	A3Z0gLDf/ppWmblg==
-X-Google-Smtp-Source: AGHT+IHsimm4Yfn5rpzJHTV0GKy0i3v+tW4CSy6TP7KGcIUyPclJaOdhl5s9GLro0ApqugvyBf5SrA==
-X-Received: by 2002:a05:6102:3e8e:b0:5d5:f6ae:38dc with SMTP id ada2fe7eead31-5d7dd6b7f8emr8945689137.39.1761338458774;
-        Fri, 24 Oct 2025 13:40:58 -0700 (PDT)
+        bh=osxLypg02uEY3loO6nURiV153bLVW4LM2c+mKbTzvFU=;
+        b=cO65Xmzjon+pfvxwTXHhDawvp4OoEsLZlAfWjznjEjy/hdy1NNYvZ5U16DKMEUGifO
+         cMZo9iiYrPTXL7H4OOL3D4vOpge8ueJsTvhtZZ/vdk6krLDANb/mzz+Lq4X9dHS6NrJm
+         ILs7ho/u+oBWzhEZKIPrbFChl7gk770eyzowRfWJsicWdOSLMC9hS9X0PUJBcpvhYl1t
+         iqQs9w77FVQwDO7wJqDRyCtAuRcqYz+MgIO19J4nxxli06tsuspHEa8K/Oeo4UPezLFO
+         rXmIIrt/2soIwNqXbu+V5Vg39sg0eKuaE0gC0VEp/DIL9LISbC6L3908hUo2ww5iQ/8m
+         4jAA==
+X-Gm-Message-State: AOJu0YzPFAGtLzY1HX6wQoTU9wl2ffyjFsqGEx/X0vJ/H9fysXFujZo5
+	s7ZZ86vTgqlqGmWKf0IkfODJ6LDOpm29f5CHq/V3Ra9d05eG+E7tNbPBFOiTEw==
+X-Gm-Gg: ASbGnctFeZzJJZV3u0wAo9V+zt/x97D3OoX4u3Jtpqm63UNHcd/2V63UUoaaHjzn3A+
+	z8aV7qK/c8cjfSR4C2H5WXFndZ2QkeQcGDrkyXnAj6EPhNMq5aebAHQDuqlsFc+AcHucV0x9AIS
+	VhL3sG9Pq8v0sYYqFBa/cPg+tpXYXFyvOgUntdyBdgwKE4bt1Wht0n03U5l+iZTJ/aThTKu09jU
+	ukja8Iw+OAiERFs/t4NEuwewrHhipNxU9St9hoxJeu9TRc508mbhOs5GAETDW3WgozWZOGkhL3I
+	R+UUDr/Ik/iFQkGxlf8SE7hUdkPKtY0EBvlTDEhmG5+j2PQrZ0w0lUUnrbbMMw8i+MZk79ClEKp
+	CHGkx7Bh2IYV9pjlNFrnABSbM82R+EFOmRbQOgXg36eL4XWUrW97no5UxI+WEPsiD8GAuWfUYIW
+	J9t08=
+X-Google-Smtp-Source: AGHT+IHmzJ4PirnLHHxz1nFShe6HZTeci46oEWMyEUBVWFf6ksO5xE/TZ9oZtMse20BsJNThLq3c0A==
+X-Received: by 2002:a05:6122:20a2:b0:54a:9fc0:40ab with SMTP id 71dfb90a1353d-5564ee2f377mr9591020e0c.2.1761338460535;
+        Fri, 24 Oct 2025 13:41:00 -0700 (PDT)
 Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-557ddb2f98asm73501e0c.10.2025.10.24.13.40.57
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-557ddb2f98asm73501e0c.10.2025.10.24.13.40.59
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 13:40:57 -0700 (PDT)
+        Fri, 24 Oct 2025 13:40:59 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 06/12] MediaAssistant: Add Device option to Push
-Date: Fri, 24 Oct 2025 16:40:33 -0400
-Message-ID: <20251024204039.693918-6-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 07/12] gatt-database: Add btd_gatt_database_get and btd_gatt_database_get_adapter
+Date: Fri, 24 Oct 2025 16:40:34 -0400
+Message-ID: <20251024204039.693918-7-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251024204039.693918-1-luiz.dentz@gmail.com>
 References: <20251024204039.693918-1-luiz.dentz@gmail.com>
@@ -77,44 +77,90 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables MediaAssistant.Push to work with local broadcast sources.
+This adds btd_gatt_database_get and btd_gatt_database_get_adapter
+that makes it possible to resolve the btd_gatt_database and btd_adapter
+respectively when only the gatt_db is available.
 ---
- doc/org.bluez.MediaAssistant.rst | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ src/gatt-database.c | 35 +++++++++++++++++++++++++++++++++++
+ src/gatt-database.h |  4 ++++
+ 2 files changed, 39 insertions(+)
 
-diff --git a/doc/org.bluez.MediaAssistant.rst b/doc/org.bluez.MediaAssistant.rst
-index 64e689f8621d..8650d8abb379 100644
---- a/doc/org.bluez.MediaAssistant.rst
-+++ b/doc/org.bluez.MediaAssistant.rst
-@@ -40,6 +40,11 @@ Values:
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index eea3f600a8b0..ff5fa3bcc8b2 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -209,6 +209,8 @@ struct device_info {
+ 	uint8_t bdaddr_type;
+ };
  
- 		See QoS property.
- 
-+	:object Device [ISO only, State=local only]:
++static struct queue *dbs = NULL;
 +
-+		Push to a specific device. Device must be connected and with
-+		an active BASS session.
+ static void ccc_cb_free(void *data)
+ {
+ 	struct ccc_cb_data *ccc_cb = data;
+@@ -4123,6 +4125,11 @@ bredr:
+ 	if (!database->db_id)
+ 		goto fail;
+ 
++	if (!dbs)
++		dbs = queue_new();
 +
- Properties
- ----------
++	queue_push_tail(dbs, database);
++
+ 	return database;
  
-@@ -52,6 +57,7 @@ Indicates the state of the assistant object. Possible values are:
- :"pending": assistant object was pushed (stream information was sent to the peer)
- :"requesting": remote device requires Broadcast_Code
- :"active": remote device started receiving stream
-+:"local": assistant object was created for a local stream
+ fail:
+@@ -4143,6 +4150,34 @@ void btd_gatt_database_destroy(struct btd_gatt_database *database)
+ 	gatt_database_free(database);
+ }
  
- array{byte} Metadata [readwrite, ISO Only, experimental]
- ````````````````````````````````````````````````````````
-@@ -59,7 +65,7 @@ array{byte} Metadata [readwrite, ISO Only, experimental]
- Indicates stream Metadata.
++static bool match_db(const void *data, const void *user_data)
++{
++	const struct btd_gatt_database *database = data;
++	const struct gatt_db *db = user_data;
++
++	return database->db == db;
++}
++
++struct btd_gatt_database *btd_gatt_database_get(struct gatt_db *db)
++{
++	struct btd_gatt_database *database;
++
++	database = queue_find(dbs, match_db, db);
++	if (!database)
++		return NULL;
++
++	return database;
++}
++
++struct btd_adapter *
++btd_gatt_database_get_adapter(struct btd_gatt_database *database)
++{
++	if (!database)
++		return NULL;
++
++	return database->adapter;
++}
++
+ struct gatt_db *btd_gatt_database_get_db(struct btd_gatt_database *database)
+ {
+ 	if (!database)
+diff --git a/src/gatt-database.h b/src/gatt-database.h
+index 30ae68e7e9a0..998e3c452b16 100644
+--- a/src/gatt-database.h
++++ b/src/gatt-database.h
+@@ -13,7 +13,11 @@ struct btd_gatt_database;
+ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter);
+ void btd_gatt_database_destroy(struct btd_gatt_database *database);
  
- dict QoS [readwrite, ISO only, experimental]
--`````````````````````````````````````````````````````
-+````````````````````````````````````````````
- 
- Indicates stream QoS capabilities.
- 
++struct btd_gatt_database *btd_gatt_database_get(struct gatt_db *db);
+ struct gatt_db *btd_gatt_database_get_db(struct btd_gatt_database *database);
++struct btd_adapter *
++btd_gatt_database_get_adapter(struct btd_gatt_database *database);
++
+ void btd_gatt_database_att_disconnected(struct btd_gatt_database *database,
+ 						struct btd_device *device);
+ void btd_gatt_database_server_connected(struct btd_gatt_database *database,
 -- 
 2.51.0
 
