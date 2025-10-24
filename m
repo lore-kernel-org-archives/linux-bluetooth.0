@@ -1,161 +1,105 @@
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74519307AC4;
-	Fri, 24 Oct 2025 08:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA992FB63F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 09:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761296218; cv=none; b=uC54VbCKtfATDfSBNfkvpvSJBxMfWzWyrYTEzhb+MzQQ8zltS2XGc5B3SS2cZrNf4bSjCMO+fIqaMxRvD7pxmp+3d0YoDyi1okH5a1uw4+NGHG9sqKWyl67OovJsx1ldeat4OEnq9c+xRwnmxOmkIu6M/FLLN/K9EjwPIluxsfo=
+	t=1761298496; cv=none; b=jzPUW5MnFo0TcYgQxCmOC4knzJRnWkrq0K+7xOVSixvEHApmFM+zTRr/FaB2dQrNFpnfp2G/U+7JLSnKqbS64bkdulTkQzRaRxJNIeqz4co+s6f+6lgwgRyUBwFQUo2UyevBcRbZonWpWg8MoSoFzecSRMZfmWFQUKqIUylELc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761296218; c=relaxed/simple;
-	bh=8MUGiBaLgC629PZoPqwQRzUuxycUZinfow4Niq33llo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=uDIx0wgal9U6OfWs2fmb5cf1t9rCemrbAoU7cBlPIELrJHM8mnpVyDAX0CgwdQsXVpYJUF4/+bSBgsBPKGCkjvWiPyuQ/ImcXP2KuX48qF4crYsXbG5b3QjoQMMGMSLv84mOLyTyUSusQMIiFk0ExUHiQ0Vl6VDM0yZIkjca994=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=i3op79m3; arc=none smtp.client-ip=91.244.183.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
+	s=arc-20240116; t=1761298496; c=relaxed/simple;
+	bh=+RSyZ1n3T7e7Ix+gWfQOv6UODr2rYEehIz1Hcsrmutc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GtS/PIqTUeewspOgkz56Yce/1FFN5vHyBj4fEDUTatuz2hOBxcZT1VzRvqXI2o/86s8XgR12hr628VChgBiyeYH60VMkC6kb8uGhgOaXjdJf4LoA6QYIQCycC1l2lgcACkveRYZjLmnCGHUXOsZKke+uIxMLrklvYz1Ap6WhMok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=fqWHmftH; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="i3op79m3"
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id 7045B10B8170;
-	Fri, 24 Oct 2025 11:56:51 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 7045B10B8170
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1761296211; bh=8MUGiBaLgC629PZoPqwQRzUuxycUZinfow4Niq33llo=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=i3op79m30YlhF21BMWOcF04//FOFjasmpLuRwuYdCSadkntAdgZ/Wh/5KzdOasooy
-	 Mc+aqRdJ71OQQCuwHf7kro4KNQO55oDRkZLp0/BO3Wx1jHsHTiIASPEcM7eiN+DkJh
-	 BIlk2vsoSbVAP5I02kaPuFIJWzuId8KiJqKbKf6c=
-Received: from msk-exch-02.infotecs-nt (msk-exch-02.infotecs-nt [10.0.7.192])
-	by mx0.infotecs-nt (Postfix) with ESMTP id 6CB683109F02;
-	Fri, 24 Oct 2025 11:56:51 +0300 (MSK)
-From: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH net] Bluetooth: MGMT: Fix OOB access in
- parse_adv_monitor_pattern()
-Thread-Topic: [PATCH net] Bluetooth: MGMT: Fix OOB access in
- parse_adv_monitor_pattern()
-Thread-Index: AQHcQdQDH+4einvhvkqzls1fGNBfVLTPiQWAgAAe4ICAAAYDAIABJGoA
-Date: Fri, 24 Oct 2025 08:56:50 +0000
-Message-ID: <19f34b57-a7b7-41e5-8c6c-9e99d7607032@infotecs.ru>
-References: <20251020151255.1807712-1-Ilia.Gavrilov@infotecs.ru>
- <CABBYNZKUNecJNPmrVFdkkOhG1A8C_32pUOdh0ZDWkCNkAugDdQ@mail.gmail.com>
- <3935eaf3-3a58-4b2d-b0ee-4c6c641b5343@infotecs.ru>
- <CABBYNZJLtTiFZ-1LchJ7Cy1JT=vuDmkkRHjrUY92jC740ihs5w@mail.gmail.com>
-In-Reply-To: <CABBYNZJLtTiFZ-1LchJ7Cy1JT=vuDmkkRHjrUY92jC740ihs5w@mail.gmail.com>
-Accept-Language: ru-RU, en-US
-Content-Language: ru-RU
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4EDD695305789B4F89E79E3ED00B420C@infotecs.ru>
-Content-Transfer-Encoding: base64
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="fqWHmftH"
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 970EE3FCD2
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 09:34:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1761298484;
+	bh=zhCihfgUjRaaCuzCpxsPBvIGXLPXaa+Q11wGf0X+Jiw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=fqWHmftHbgirLVoH/9g1SBt4kTHUOvxXmonQSd+0g4uyXyeQIUqjCWBqgNH8ON2/j
+	 Cw3TQ51mdxJ5D2Bcez1i1V7l3jaKf3/jqnsk3k3+pmu/+zZ75i0fvzau5wrJFS8mLY
+	 IcSsx5ECNEdTtnSnXQn2ryM9/18mXiTE7+H5mB+m5SWqgby/8E9/8TsThr6oZGH2WV
+	 IE9W4oCHtAp5XMQ1kwV/7gUdb6s8sqhrXm87rnPlJs/SKvuzN2OrGhff9vK5H5kENf
+	 5p+d+XuJKUdo9c/vXA7Ua7KFfaXDW6c1kz47L1kMHcnl4kGTV56k1/b/b66fjK1o7q
+	 E3R9yUBYCS/sQEp/lIpxiG6tgJs2GTzqGE7W1bCtfsvjZOxEi+QNHWJ6Y3gicv/N8r
+	 AWuB9uSU28539UN1m9vTv2iHd0kH8q6wdvs5u4HYV5nWqmH/dSmMI43I27WgTChNuq
+	 KICMkHPK3wFiHBEaAgkjs9uMrRly3BDyauZ0a7BrmgBcX9rxvTESwbah7MiiWA1uR5
+	 iHuXJEalBLC0mz7sK4DrJEIeKFxCR2+DNcWlccz69ieg8HdxHqJxiHwur0BR5J6d7r
+	 4HGlWkBqF+P11Ld6tVCFhoXP3QOIG5Bjy4sWEeFYj6YvlN497oqP5x3kMhhVCWyBOd
+	 IH1cnin0VnGsNoVf0UqU91zY=
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b6d731278e2so47667366b.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 02:34:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761298483; x=1761903283;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zhCihfgUjRaaCuzCpxsPBvIGXLPXaa+Q11wGf0X+Jiw=;
+        b=JTxA/G4qJryxzfqv2znSChu9WOpyT8naQp1p0P32XMTExl5KqEHjZWHs2IxXwp5y4A
+         SBYcsHPe0dcKI8CiVQ9nYHaZe8HOomF3GFJg2IK802tl9+lgKUXvvvag8DoTd2i++uhX
+         IFRXUSK9yMBSiSr3nEia4kDgCSBVmOS3IKwQ4FWh38fQhUrTUONnaCymkLZSHKLRbRaj
+         ZP3GvnRsL7Ks040h0ixapLTgbZHef2c2Fl1+3Bu+6336PKisUrAaksKIQtplJwhu8zuO
+         uf0+aIlJhMvLnTwuDxXuT4W505Kvsswo1qjeDbb/KQrSdbEUjoLWXbm9EtQk2j/4NgnX
+         v8iA==
+X-Gm-Message-State: AOJu0Yxa1W5iPQO999RTY1SdKESrvKp6Y/9VPdVcqMTGNdF2zp/ym7L9
+	H89bVRRfMlwd+CK1Q0yI+tzjp1c2mOfiiVaquYqY9CViuqdXv0OJY9+HPsmzvDlxPGFnPyPG3q1
+	KzNIrnMgsU5VDt7dBMrKrmI8qZzHcdobRssFrgJ7X/cpJJpcDo47WQSsCOTdS26GFq3W/ZzrQVq
+	Qdw9DSmNPEvWHQeSpUJA==
+X-Gm-Gg: ASbGncvkscXhUcJe9r5dSYYZokjswKY0SMPkRRtivYEYAvEmZqzP5BUZG0lFmVZl+4M
+	lkzkk9bDBokAoq59ROOVJfBFtHtb8oB8aQjq2iFrNVKumx+G7/AeyLbmpe3r7Uu6Jy5Fq+Ag3dt
+	7kDQiHhvEAeNXZKYSkwI3H0SfpaYnikxoi5S6MRsZXSBG+Evdqa629n/j1yKsCtgF4XikJ6TgyT
+	w8tRo0/LgHcoj1w1jLzVxTlvePKPSqzfwCaBvs124XJIHkdcwIovj1v9i2RJrfx9SMaPujj7sgN
+	uTrKlDNjz4BMfQPpd+dJwixqwCYZd8uoYynaNxZXg+oqFqDWjqKgwmvw5QdVf6ZMOZIGqnYCbkG
+	k+L3ZDBTeRex9SVQZW+NzD09MCB3h6qkDx3CG7h+1+XkUlgURKRh2/74h5z0CV3qzh7zq8kwYdS
+	Ob
+X-Received: by 2002:a17:907:3f14:b0:b6d:603b:490f with SMTP id a640c23a62f3a-b6d603b4ad3mr328164066b.35.1761298483597;
+        Fri, 24 Oct 2025 02:34:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHxwceYtWd+d2FdJuSt2YOGFpXWFq2ug23y/yn7itxd2RRQT9QK503yrH91b2dMal7tw4kkGg==
+X-Received: by 2002:a17:907:3f14:b0:b6d:603b:490f with SMTP id a640c23a62f3a-b6d603b4ad3mr328162066b.35.1761298483091;
+        Fri, 24 Oct 2025 02:34:43 -0700 (PDT)
+Received: from framework.. (2a02-8428-32a8-2801-a6e0-ca89-98fb-e4fb.rev.sfr.net. [2a02:8428:32a8:2801:a6e0:ca89:98fb:e4fb])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d5144efd3sm494497166b.69.2025.10.24.02.34.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Oct 2025 02:34:42 -0700 (PDT)
+From: Antoine Lassagne <antoine.lassagne@canonical.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Antoine Lassagne <antoine.lassagne@canonical.com>
+Subject: [PATCH BlueZ 0/1] obex: forward nicer failure messages to dbus
+Date: Fri, 24 Oct 2025 11:34:34 +0200
+Message-ID: <20251024093435.169217-1-antoine.lassagne@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 5
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2025/10/24 07:22:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2025/10/24 06:56:00 #27793616
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 8bit
 
-T24gMTAvMjMvMjUgMTg6MzAsIEx1aXogQXVndXN0byB2b24gRGVudHogd3JvdGU6DQo+IEhpIEls
-aWEsDQo+IA0KPiBPbiBUaHUsIE9jdCAyMywgMjAyNSBhdCAxMTowOOKAr0FNIElsaWEgR2F2cmls
-b3YNCj4gPElsaWEuR2F2cmlsb3ZAaW5mb3RlY3MucnU+IHdyb3RlOg0KPj4NCj4+IEhpLCBMdWl6
-LCB0aGFuayB5b3UgZm9yIHRoZSByZXZpZXcuDQo+Pg0KPj4gT24gMTAvMjMvMjUgMTY6MTgsIEx1
-aXogQXVndXN0byB2b24gRGVudHogd3JvdGU6DQo+Pj4gSGkgSWxpYSwNCj4+Pg0KPj4+IE9uIE1v
-biwgT2N0IDIwLCAyMDI1IGF0IDExOjEy4oCvQU0gSWxpYSBHYXZyaWxvdg0KPj4+IDxJbGlhLkdh
-dnJpbG92QGluZm90ZWNzLnJ1PiB3cm90ZToNCj4+Pj4NCj4+Pj4gSW4gdGhlIHBhcnNlX2Fkdl9t
-b25pdG9yX3BhdHRlcm4oKSBmdW5jdGlvbiwgdGhlIHZhbHVlIG9mDQo+Pj4+IHRoZSAnbGVuZ3Ro
-JyB2YXJpYWJsZSBpcyBjdXJyZW50bHkgbGltaXRlZCB0byBIQ0lfTUFYX0VYVF9BRF9MRU5HVEgo
-MjUxKS4NCj4+Pj4gVGhlIHNpemUgb2YgdGhlICd2YWx1ZScgYXJyYXkgaW4gdGhlIG1nbXRfYWR2
-X3BhdHRlcm4gc3RydWN0dXJlIGlzIDMxLg0KPj4+PiBJZiB0aGUgdmFsdWUgb2YgJ3BhdHRlcm5b
-aV0ubGVuZ3RoJyBpcyBzZXQgaW4gdGhlIHVzZXIgc3BhY2UNCj4+Pj4gYW5kIGV4Y2VlZHMgMzEs
-IHRoZSAncGF0dGVybnNbaV0udmFsdWUnIGFycmF5IGNhbiBiZSBhY2Nlc3NlZA0KPj4+PiBvdXQg
-b2YgYm91bmQgd2hlbiBjb3BpZWQuDQo+Pj4+DQo+Pj4+IEluY3JlYXNpbmcgdGhlIHNpemUgb2Yg
-dGhlICd2YWx1ZScgYXJyYXkgaW4NCj4+Pj4gdGhlICdtZ210X2Fkdl9wYXR0ZXJuJyBzdHJ1Y3R1
-cmUgd2lsbCBicmVhayB0aGUgdXNlcnNwYWNlLg0KPj4+PiBDb25zaWRlcmluZyB0aGlzLCBhbmQg
-dG8gYXZvaWQgT09CIGFjY2VzcyByZXZlcnQgdGhlIGxpbWl0cyBmb3IgJ29mZnNldCcNCj4+Pj4g
-YW5kICdsZW5ndGgnIGJhY2sgdG8gdGhlIHZhbHVlIG9mIEhDSV9NQVhfQURfTEVOR1RILg0KPj4+
-Pg0KPj4+PiBGb3VuZCBieSBJbmZvVGVDUyBvbiBiZWhhbGYgb2YgTGludXggVmVyaWZpY2F0aW9u
-IENlbnRlcg0KPj4+PiAobGludXh0ZXN0aW5nLm9yZykgd2l0aCBTVkFDRS4NCj4+Pj4NCj4+Pj4g
-Rml4ZXM6IGRiMDg3MjJmYzdkNCAoIkJsdWV0b290aDogaGNpX2NvcmU6IEZpeCBtaXNzaW5nIGlu
-c3RhbmNlcyB1c2luZyBIQ0lfTUFYX0FEX0xFTkdUSCIpDQo+Pj4+IENjOiBzdGFibGVAdmdlci5r
-ZXJuZWwub3JnDQo+Pj4+IFNpZ25lZC1vZmYtYnk6IElsaWEgR2F2cmlsb3YgPElsaWEuR2F2cmls
-b3ZAaW5mb3RlY3MucnU+DQo+Pj4+IC0tLQ0KPj4+PiAgaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL21n
-bXQuaCB8IDIgKy0NCj4+Pj4gIG5ldC9ibHVldG9vdGgvbWdtdC5jICAgICAgICAgfCA2ICsrKy0t
-LQ0KPj4+PiAgMiBmaWxlcyBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0p
-DQo+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvbWdtdC5oIGIv
-aW5jbHVkZS9uZXQvYmx1ZXRvb3RoL21nbXQuaA0KPj4+PiBpbmRleCA3NGVkZWEwNjk4NWIuLjRi
-MDdjZTZkZmQ2OSAxMDA2NDQNCj4+Pj4gLS0tIGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL21nbXQu
-aA0KPj4+PiArKysgYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvbWdtdC5oDQo+Pj4+IEBAIC03ODAs
-NyArNzgwLDcgQEAgc3RydWN0IG1nbXRfYWR2X3BhdHRlcm4gew0KPj4+PiAgICAgICAgIF9fdTgg
-YWRfdHlwZTsNCj4+Pj4gICAgICAgICBfX3U4IG9mZnNldDsNCj4+Pj4gICAgICAgICBfX3U4IGxl
-bmd0aDsNCj4+Pj4gLSAgICAgICBfX3U4IHZhbHVlWzMxXTsNCj4+Pj4gKyAgICAgICBfX3U4IHZh
-bHVlW0hDSV9NQVhfQURfTEVOR1RIXTsNCj4+Pg0KPj4+IFdoeSBub3QgdXNlIEhDSV9NQVhfRVhU
-X0FEX0xFTkdUSCBhYm92ZT8gT3IgcGVyaGFwcyBldmVuIG1ha2UgaXQNCj4+PiBvcGFxdWUgc2lu
-Y2UgdGhlIGFjdHVhbCBzaXplIGlzIGRlZmluZWQgYnkgbGVuZ3RoIC0gb2Zmc2V0Lg0KPj4+DQo+
-Pg0KPj4gQXMgSSBzZWUgaXQsIHVzZXIgcHJvZ3JhbXMgcmVseSBvbiB0aGlzIHNpemUgb2YgdGhl
-IHN0cnVjdHVyZSwgYW5kIGlmIHRoZSBzaXplIGlzIGNoYW5nZWQsIHRoZXkgd2lsbCBiZSBicm9r
-ZW4uDQo+PiBFeGNlcnB0IGZyb20gYmx1ZXogdG9vbHMgc291cmNlczoNCj4+IC4uLg0KPj4gc3Ry
-dWN0dXJlIG9mIG1nbXRfYWR2X3BhdHRlcm4gew0KPj4gdWludDhfdCBhZCB0eXBlOw0KPj4gICAg
-ICAgICB1aW50OF90IG9mZnNldDsNCj4+ICAgICAgICAgbGVuZ3RoIG9mIHVpbnQ4X3Q7DQo+PiAg
-ICAgICAgIHVpbnQ4X3QgdmFsdWVbMzFdOw0KPj4gfSBfX3BhY2tlZDsNCj4+IC4uLg0KPiANCj4g
-V2VsbCBpdCBpcyBicm9rZW4gZm9yIEVBIGFscmVhZHksIHNvIHRoZSBxdWVzdGlvbiBpcyBzaG91
-bGQgd2UgbGVhdmUNCj4gaXQgdG8ganVzdCBoYW5kbGUgbGVnYWN5IGFkdmVydGlzZW1lbnQgb3Ig
-bm90PyANCg0KRnJvbSBhIHNlY3VyaXR5IHBvaW50IG9mIHZpZXcsIGl0IGlzIGJldHRlciB0byBm
-aXggdGhlIHByb2JsZW0gb2YgT09CIGFjY2VzcyBvZiB0aGUgJ3ZhbHVlJyBhcnJheQ0KaW4gYWxs
-IGtlcm5lbHMgc3RhcnRpbmcgZnJvbSB2ZXJzaW9uIDYuNisuDQoNClRoZXJlIGFyZSB0d28gc29s
-dXRpb25zOiANCjEpIFRoZSBzaW1wbGVzdCBzb2x1dGlvbi4gSW5jcmVhc2UgdGhlIHNpemUgdG8g
-dGhlICd2YWx1ZScgYXJyYXkgaW4gdGhlICdtZ210X2Fkdl9wYXR0ZXJuJyBzdHJ1Y3R1cmUsDQpi
-dXQgdGhpcyB0eXBlIG9mIGNvbW1hbmQgd2lsbCBub3Qgd29yazoNCg0KJGJ0bWdtdA0KJG1lbnUg
-bW9uaXRvcg0KJGFkZC1wYXR0ZXJuIDE2OjA6MDEwMjAzMDQwNTA2MDcwODA5MDANCg0KMikgRG8g
-YXMgc3VnZ2VzdGVkIGluIHRoaXMgcGF0Y2gNCg0KIA0KPiBBdCBzb21lIHBvaW50IEkgd2FzDQo+
-IGFjdHVhbGx5IGp1c3QgY29uc2lkZXJpbmcgcmVtb3ZpbmcvZGVwcmVjYXRpbmcgdGhlIHN1cHBv
-cnQgb2YgdGhpcw0KPiBjb21tYW5kIGFsdG9nZXRoZXIgc2luY2UgdGhlcmUgZXhpc3RzIGEgc3Rh
-bmRhcmQgd2F5IHRvIGRvDQo+IGFkdmVydGlzZW1lbnQgbW9uaXRvcmluZyBjYWxsZWQgTW9uaXRv
-cmluZyBBZHZlcnRpc2VycyBpbnRyb2R1Y2VkIGluDQo+IDYuMDoNCj4gDQo+IGh0dHBzOi8vd3d3
-LmJsdWV0b290aC5jb20vY29yZS1zcGVjaWZpY2F0aW9uLTYtZmVhdHVyZS1vdmVydmlldy8/dXRt
-X3NvdXJjZT1pbnRlcm5hbCZ1dG1fbWVkaXVtPWJsb2cmdXRtX2NhbXBhaWduPXRlY2huaWNhbCZ1
-dG1fY29udGVudD1ub3ctYXZhaWxhYmxlLW5ldy12ZXJzaW9uLW9mLXRoZS1ibHVldG9vdGgtY29y
-ZS1zcGVjaWZpY2F0aW9uDQo+IA0KDQpJdCBzZWVtcyB0byBtZSB0aGF0IGl0J3MgYmV0dGVyIHRv
-IHJlbW92ZS9kZXByZWNhdGUgdGhlIHN1cHBvcnQgb2YgdGhlIGNvbW1hbmQNCmluIHRoZSBuZXh0
-IHZlcnNpb24gb2YgdGhlIGtlcm5lbC4NCg0KPiBUaGUgdGhlIHN0YW5kYXJkIG1vbml0b3Jpbmcg
-bGlzdCBkb2Vzbid0IHNlZW0gdG8gYmUgYWJsZSB0byBkbw0KPiBmaWx0ZXJpbmcgb24gdGhlIGRh
-dGEgaXRzZWxmLCB3aGljaCBJIHRoaW5rIHRoZSB3aGVyZSB0aGUgZGVjaXNpb24NCj4gYmFzZWQg
-ZmlsdGVyaW5nIHVzZWQsIHNvIGl0IGlzIG5vdCByZWFsbHkgY29tcGF0aWJsZSB3aXRoIHRoZSBN
-Uw0KPiB2ZW5kb3IgY29tbWFuZHMuDQo+IA0KPj4NCj4+Pj4gIH0gX19wYWNrZWQ7DQo+Pj4+DQo+
-Pj4+ICAjZGVmaW5lIE1HTVRfT1BfQUREX0FEVl9QQVRURVJOU19NT05JVE9SICAgICAgIDB4MDA1
-Mg0KPj4+PiBkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9tZ210LmMgYi9uZXQvYmx1ZXRvb3Ro
-L21nbXQuYw0KPj4+PiBpbmRleCBhM2QxNmVlY2UwZDIuLjUwMDAzM2I3MGE5NiAxMDA2NDQNCj4+
-Pj4gLS0tIGEvbmV0L2JsdWV0b290aC9tZ210LmMNCj4+Pj4gKysrIGIvbmV0L2JsdWV0b290aC9t
-Z210LmMNCj4+Pj4gQEAgLTUzOTEsOSArNTM5MSw5IEBAIHN0YXRpYyB1OCBwYXJzZV9hZHZfbW9u
-aXRvcl9wYXR0ZXJuKHN0cnVjdCBhZHZfbW9uaXRvciAqbSwgdTggcGF0dGVybl9jb3VudCwNCj4+
-Pj4gICAgICAgICBmb3IgKGkgPSAwOyBpIDwgcGF0dGVybl9jb3VudDsgaSsrKSB7DQo+Pj4+ICAg
-ICAgICAgICAgICAgICBvZmZzZXQgPSBwYXR0ZXJuc1tpXS5vZmZzZXQ7DQo+Pj4+ICAgICAgICAg
-ICAgICAgICBsZW5ndGggPSBwYXR0ZXJuc1tpXS5sZW5ndGg7DQo+Pj4+IC0gICAgICAgICAgICAg
-ICBpZiAob2Zmc2V0ID49IEhDSV9NQVhfRVhUX0FEX0xFTkdUSCB8fA0KPj4+PiAtICAgICAgICAg
-ICAgICAgICAgIGxlbmd0aCA+IEhDSV9NQVhfRVhUX0FEX0xFTkdUSCB8fA0KPj4+PiAtICAgICAg
-ICAgICAgICAgICAgIChvZmZzZXQgKyBsZW5ndGgpID4gSENJX01BWF9FWFRfQURfTEVOR1RIKQ0K
-Pj4+PiArICAgICAgICAgICAgICAgaWYgKG9mZnNldCA+PSBIQ0lfTUFYX0FEX0xFTkdUSCB8fA0K
-Pj4+PiArICAgICAgICAgICAgICAgICAgIGxlbmd0aCA+IEhDSV9NQVhfQURfTEVOR1RIIHx8DQo+
-Pj4+ICsgICAgICAgICAgICAgICAgICAgKG9mZnNldCArIGxlbmd0aCkgPiBIQ0lfTUFYX0FEX0xF
-TkdUSCkNCj4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIE1HTVRfU1RBVFVTX0lO
-VkFMSURfUEFSQU1TOw0KPj4+Pg0KPj4+PiAgICAgICAgICAgICAgICAgcCA9IGttYWxsb2Moc2l6
-ZW9mKCpwKSwgR0ZQX0tFUk5FTCk7DQo+Pj4+IC0tDQo+Pj4+IDIuMzkuNQ0KPj4+DQo+Pj4NCj4+
-Pg0KPj4NCj4gDQo+IA0KDQo=
+From github issue https://github.com/bluez/bluez/issues/1568
+
+This patche improves the error message forwarded to dbus
+when an OBEX operation fails. Instead of just forwarding the
+response code in hex, we now forward a human readable string.
+
+Antoine Lassagne (1):
+  obex: forward nicer failure messages to dbus
+
+ obexd/client/session.c |   3 +-
+ tools/parser/obex.c    | 103 +------------------------------------
+ tools/parser/opcodes.h | 114 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 117 insertions(+), 103 deletions(-)
+ create mode 100644 tools/parser/opcodes.h
+
+-- 
+2.43.0
+
