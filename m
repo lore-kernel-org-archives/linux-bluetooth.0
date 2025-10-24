@@ -1,69 +1,66 @@
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12EC315777
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 14:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280101EEA5F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 16:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761316844; cv=none; b=nxCkqVI9uQxx50bsA327G+VH/HLAAL/6AvknjtDbQppSM9Vo/T3D3gn+ju2DocVhFvuuze2PoNVtlzATtCCPWXYn7AxgFZSfHZxdIynEGRravXYKb5m7Yhtk03JjiRNX1XBfvlpWzWV4wERSQfY6ionfE+8/tzocV4ev93lvYfA=
+	t=1761323169; cv=none; b=INd7az++nh60h9ObLfUORAQ4qAHstQOEalbEG3sqHJoG3rgzumcxnd2xFQn5s8PzXiZXqJO2/h9fLroHS5F8zLCVVoPVfx9YfZsSCvWW+QsrH9eiBiWImgCZw0G0Q7qV2BT5fmjBUg3Dr+9U1YicYZqeso2XK4cw4elYPYvmb+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761316844; c=relaxed/simple;
-	bh=v08xknFFTGOEj5jvOzGYy91+6zcHC7QaFdvE1yN8qQo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tIi3mA864dTFqXZ0Dmd/mJydf8OqkBq6vs1MgNwdWy5JZ/u5T6sIGYJAmGK3ntrtKIMIUa96ICJVRMGdhfOcZbdyeiCGKF1o1YzUGY4uwjO7HC2NcGw0DPuWZKtrESe0pYM7Av9vuNLg5xxdtOn2Qz+WmX88R26vcY03mJcHeOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lgjxzeek; arc=none smtp.client-ip=209.85.222.52
+	s=arc-20240116; t=1761323169; c=relaxed/simple;
+	bh=/wZxtbhhp/fZSAxoaFMBpK9zHu9WYI+O1xLg7sOVpA0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gf+VwtsZu9EJYfNQLfA0k/u+l96lF3LbV7IpLswsI5VeVXSNu6RzQFLnOooTw3A5aMCNiTZLiklJXr9KfOtcRXv1V8JRFJvFJb+KPWx3m0dOwZZjfGT+Y14xGqZRpFZRa8P4vaabVQ/ApA0d/3KeAn9++WJ4tveZXw/TFaXebk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SfV0B6Op; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lgjxzeek"
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-934ad40c2c2so814562241.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 07:40:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SfV0B6Op"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-556a4651cfcso803067e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 09:26:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761316842; x=1761921642; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7hC3pW8YG1jqy0I870M9s3ez7qPAIgDcYoaMDRv/PTc=;
-        b=LgjxzeekVCq5GuAgiMfZ2JxDpHe8Xx1EDScNDL16578SAwUsl0GDHihCaU/gcwhtCq
-         37U8BCK4O7R6QeUafsETa1l5gPgRBG0s15pBZYMUIknFOn+SBvzKoeXZD37Vc/FSAxR5
-         TrFLoLbAggqWnekT9gLgHhSzuiAbMksBA1P/xuThUsn+58Nw+uqlIkTPSUKOofGw5cBA
-         ygxdFU/JT9LVrU6UyITPaUQeJCfH+ou73/K4V6ba8ff4Gm9zI8sBhocGyXF4LVffipdx
-         jD0Bk8DHZ9CpyM9wCer46IkFh/EbcYVkqCr4P+znTTXi/MPRcgdmuKb98sP7rtPrm1VR
-         YUfQ==
+        d=gmail.com; s=20230601; t=1761323164; x=1761927964; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EsTo5GNmHpEVYtCUH4QrdfN7DdS3/zVcmlk1BgnNuIk=;
+        b=SfV0B6OpVVLIaFazBScMLU9c5r8oQMLC6JNijhyv9AeKb6ex1M09cZd4r4DrYtxtN/
+         dt69bWIQPPAus6GPRE2d5Cd1Ogvs+wqhPxPQwDFgtrHngFt86rS5QCZ+8ujvTtJKPD5w
+         IuMIvQxVBsRLc5IBUl4+jNTqCE1/LKU7HbpjPP8/Q8N/X6ZWWbvbE5CTPDfvEPpWLK7C
+         BE1GHBFTKWlDSdywWf9KHpV/cpamdSvmBV63kZL1JJIVpEkwJN2hiNYG4DGWagX1DNkX
+         f78/TWPlyE98a1+HFWr6KRkOLI+NNesL0d2CWNbqqHhelpi+FER9HfCBUHBdBQzn0Xs6
+         3drg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761316842; x=1761921642;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7hC3pW8YG1jqy0I870M9s3ez7qPAIgDcYoaMDRv/PTc=;
-        b=rF5jPh38Q5TVxMOo/wofM9sWJkSD5mTyiKmGsTZjw7cofc9TTBeSSFkfjrJd5UuIPZ
-         dzhRxVVEM836FrGbunNQP7XFRFsa5Jf/SbVTSEFrXpkDilCXPLxFD/IGOsEHImVJiTHM
-         Htu1D8aJKlVGnXBRFyWrF2sAMVTR4ZZqyzDmQ154fc/FPzflFjznlRwJRor/aLv7OjsK
-         pdxd5ox9qy/2KErLlfZbkQ+c/3OvHwdFQ3uh/ew6kdIfwmoL+8OK2nVeVRlQJ514fwZ6
-         KEazfnSAUehC2J52AKRJbvnla0CsA1Do5zFiS5R/UKNq0bDSWuU9RhXbMQEyCVJabrN+
-         Z4Qg==
-X-Gm-Message-State: AOJu0YxSXyOjNkyqH0ZWs2NJrOICnPp44BQ0cS04GE4YcGbBXCRnpMYR
-	r95B4PVgy7ejPav4WQwM5oJzJqUILVWM28EZwciUhk8JJx2hGWXU0BfJ
-X-Gm-Gg: ASbGncvMPGqh9YHlMKy+VefatqW11PJNhkc2UsWbAWt1SPXWq3GP6L9lEOAGUHfIJQC
-	LU9SifhLR91gH6AJREWSOMzUH3gA75EISPMCb1cYmWMbr2NexIcqBL6c3tprk41sUqhGFW/ri22
-	rX3D7MxvIfN4COM6TEdiz5GhbaRnTf7FEE+HRlKNW97545tbdNrnwSrNv2ftmCHKblTaWwR1Soi
-	01lg/KEUpMAa9AuRWFZ93gK474LoGK31GmSOCofVrDBwC3sN+abuIzEHcP5CSyi1npSz8bxevrJ
-	I2rfbdvYIRsGCAd+w+ITUdB0bXBeUUPgWXVCCIpdTVbm1tbqXbW1436Jiky4hAUt+1u3vpJ7yVI
-	xKMk/HlVSL6DqUgGmCROejGs6Ezf+62mA7FAxMwzbOHuqkAjPrUXUV7an3lOxQ5AMCvNKJkq2aI
-	wog6fEHV8LJ5WbjQ==
-X-Google-Smtp-Source: AGHT+IHDFx0Dwy8ZuT3MuN2G8gNP1MbR2kNZtG+WI4dHqp1lZZDo6L4k7tHg+/hI57FVOEzeOtdtKA==
-X-Received: by 2002:a05:6122:920:b0:557:d6d4:2f51 with SMTP id 71dfb90a1353d-557d6d432a7mr373074e0c.8.1761316841684;
-        Fri, 24 Oct 2025 07:40:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761323164; x=1761927964;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EsTo5GNmHpEVYtCUH4QrdfN7DdS3/zVcmlk1BgnNuIk=;
+        b=KnlH2G6r6H2XTxWo4AZ5Uj14wqW0Vn9HFEWKOu9fG4JE4KdruaGfIPBdr/6I64W3QJ
+         r9xqzxnpN72omofb0AYEcJMDkLxL5kJRZuVxUErKifKgbsSEEPHbY/b07AIHXXB+p1cG
+         zDek58DtVfzprsb3ATjuCcqdZwIXbOwKp6x2jbgz0hBeWXwgsgkzeNbLfhyjFiwe+sNf
+         QdAX3hADxJJquK3WPxiIgVKW6Vyf/C7JCCdNl1OcIZrzOzxsdYid0LztnuHJOkq4BTND
+         CD5a0fg+9rMhxVXMjFuSoXJLrK3qihy1sNLn1Q0SCtQbzsAh9vfVFWNJZxvyQ/t47+TG
+         ohtw==
+X-Gm-Message-State: AOJu0YzKHxi0jnYiVI7ZECRV1KYPztmSQ6xN42aAyXYXVRYBFO4Rousw
+	Ibg9v61jzrlmL970qFZjgtKb5sZVSdPc0gOLSDviEA9eiqrQjUxnCDzASFobbw==
+X-Gm-Gg: ASbGncuB88YouJRzGBz8dLLcHvcw0j77NYEyN9l67nZuukQoKMctV7A+IraT0wh3XVb
+	QT/AaZuCwsWRCTuSHTuCut/kMf1QuutWEHVodpZOzXOC7ca0aH4guOCIkrdFQRML9IVnxgrfG/f
+	PlNqNHie45k42wJy0qVztKB5BYHV3ARguZ9gTsrxuRVVp3uLWcsfwTeQIp5jAkb6C1agqf9Na5H
+	tQdx7RMJMfuHh/DuwrrBYAD8V4D6W0A+lIEkmMUJ9cL5OvShHgY+2LgRCcNITbYxBNmhcNxyn4Y
+	12bwzzjRnzTlLlUuPSlbpIHU0rCXi5YwSiR0K9TLsB8nnFNKGM1FUdH3ABGZtH8e7ePs8/iBRCM
+	AQv3PkP9wkUfPqb85VCTX2K5hXagZW1aZSi70rIlzGveaXboW1aTbJT4BUSdSjU+25JKa5RUpwy
+	3mTmK5RKNXHM7X3Q==
+X-Google-Smtp-Source: AGHT+IE/g1DAIPH1Dxs0rws9IYS/0W9/qIwuPoutvKwFdwbRx5I+LC+B57zz29ISeOy4RN2YDXPfmw==
+X-Received: by 2002:a05:6122:860d:b0:557:cc2d:edf3 with SMTP id 71dfb90a1353d-557cc2df3bfmr1182534e0c.11.1761323164197;
+        Fri, 24 Oct 2025 09:26:04 -0700 (PDT)
 Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-557bdbe3bc6sm2129464e0c.18.2025.10.24.07.40.39
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-557bef22a61sm2386516e0c.24.2025.10.24.09.26.02
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 07:40:40 -0700 (PDT)
+        Fri, 24 Oct 2025 09:26:03 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-10-24
-Date: Fri, 24 Oct 2025 10:40:32 -0400
-Message-ID: <20251024144033.355820-1-luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] bass: Fix handling of BT_BASS_MOD_SRC
+Date: Fri, 24 Oct 2025 12:25:53 -0400
+Message-ID: <20251024162553.469037-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -71,91 +68,223 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The following changes since commit 1ab665817448c31f4758dce43c455bd4c5e460aa:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  virtio-net: drop the multi-buffer XDP packet in zerocopy (2025-10-23 17:30:40 -0700)
+If BT_BASS_MOD_SRC is received and the sync_state is set to
+BT_BASS_SYNCHRONIZED_TO_PA it doesn't necessarily mean that the device
+shall be removed, specially in case the assistant and broadcast source
+are the same device.
 
-are available in the Git repository at:
+In order to fix this behavior this attempts to free the setups that were
+used for the BIS being modified, then if all setups are freed in the
+process proceed to disconnect the service and then check if the
+device is still considered connected after that, only if is not
+connected then remove it.
+---
+ profiles/audio/bass.c | 139 +++++++++++++++++++++++++-----------------
+ 1 file changed, 82 insertions(+), 57 deletions(-)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-10-24
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index d42740ca4afb..6501d361e6ee 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -335,6 +335,25 @@ static bool link_enabled(const void *data, const void *match_data)
+ 			bt_bap_stream_get_io(stream));
+ }
+ 
++static void setup_free(void *data)
++{
++	struct bass_setup *setup = data;
++
++	DBG("setup %p", setup);
++
++	util_iov_free(setup->qos.bcast.bcode, 1);
++	util_iov_free(setup->meta, 1);
++	util_iov_free(setup->config, 1);
++	free(setup->path);
++
++	/* Clear bis index from the bis sync bitmask, if it
++	 * has been previously set.
++	 */
++	bt_bass_clear_bis_sync(setup->dg->src, setup->bis);
++
++	free(setup);
++}
++
+ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
+ 				uint8_t new_state, void *user_data)
+ {
+@@ -426,6 +445,8 @@ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
+ 	case BT_BAP_STREAM_STATE_IDLE:
+ 		bt_bass_clear_bis_sync(dg->src, bis);
+ 		setup->stream = NULL;
++		queue_remove(setup->dg->setups, setup);
++		setup_free(setup);
+ 		break;
+ 	}
+ }
+@@ -695,23 +716,6 @@ static void bap_attached(struct bt_bap *bap, void *user_data)
+ 	btd_service_set_user_data(service, dg);
+ }
+ 
+-static void setup_free(void *data)
+-{
+-	struct bass_setup *setup = data;
+-
+-	DBG("setup %p", setup);
+-
+-	util_iov_free(setup->qos.bcast.bcode, 1);
+-	util_iov_free(setup->meta, 1);
+-	util_iov_free(setup->config, 1);
+-	free(setup->path);
+-
+-	/* Clear bis index from the bis sync bitmask, if it
+-	 * has been previously set.
+-	 */
+-	bt_bass_clear_bis_sync(setup->dg->src, setup->bis);
+-}
+-
+ static bool match_device(const void *data, const void *match_data)
+ {
+ 	const struct bass_data *bdata = data;
+@@ -720,6 +724,41 @@ static bool match_device(const void *data, const void *match_data)
+ 	return bdata->device == device;
+ }
+ 
++static void delegator_free(struct bass_delegator *dg)
++{
++	DBG("%p", dg);
++
++	if (dg->io_id)
++		g_source_remove(dg->io_id);
++
++	if (dg->io) {
++		g_io_channel_shutdown(dg->io, TRUE, NULL);
++		g_io_channel_unref(dg->io);
++	}
++
++	queue_destroy(dg->setups, setup_free);
++
++	/* Update Broadcast Receive State characteristic value and notify
++	 * peers.
++	 */
++	if (bt_bass_set_pa_sync(dg->src, BT_BASS_NOT_SYNCHRONIZED_TO_PA))
++		DBG("Failed to update Broadcast Receive State characteristic");
++
++	/* Unregister BAP stream state changed callback. */
++	bt_bap_state_unregister(dg->bap, dg->state_id);
++
++	bt_bap_bcode_cb_unregister(dg->bap, dg->bcode_id);
++
++	if (dg->timeout)
++		g_source_remove(dg->timeout);
++
++	queue_destroy(dg->bcode_reqs, free);
++
++	free(dg->bcode);
++
++	free(dg);
++}
++
+ static void bap_detached(struct bt_bap *bap, void *user_data)
+ {
+ 	struct btd_service *service;
+@@ -755,37 +794,7 @@ static void bap_detached(struct bt_bap *bap, void *user_data)
+ 	if (!dg)
+ 		return;
+ 
+-	DBG("%p", dg);
+-
+-	if (dg->io_id)
+-		g_source_remove(dg->io_id);
+-
+-	if (dg->io) {
+-		g_io_channel_shutdown(dg->io, TRUE, NULL);
+-		g_io_channel_unref(dg->io);
+-	}
+-
+-	queue_destroy(dg->setups, setup_free);
+-
+-	/* Update Broadcast Receive State characteristic value and notify
+-	 * peers.
+-	 */
+-	if (bt_bass_set_pa_sync(dg->src, BT_BASS_NOT_SYNCHRONIZED_TO_PA))
+-		DBG("Failed to update Broadcast Receive State characteristic");
+-
+-	/* Unregister BAP stream state changed callback. */
+-	bt_bap_state_unregister(dg->bap, dg->state_id);
+-
+-	bt_bap_bcode_cb_unregister(dg->bap, dg->bcode_id);
+-
+-	if (dg->timeout)
+-		g_source_remove(dg->timeout);
+-
+-	queue_destroy(dg->bcode_reqs, free);
+-
+-	free(dg->bcode);
+-
+-	free(dg);
++	delegator_free(dg);
+ 
+ 	btd_service_set_user_data(service, NULL);
+ }
+@@ -1468,22 +1477,37 @@ static int handle_mod_src_req(struct bt_bcast_src *bcast_src,
+ 
+ 	switch (sync_state) {
+ 	case BT_BASS_SYNCHRONIZED_TO_PA:
+-		if (params->pa_sync == PA_SYNC_NO_SYNC) {
+-			struct btd_adapter *adapter =
+-					device_get_adapter(dg->device);
++		bass_update_bis_sync(dg, bcast_src);
+ 
++		/* Check if there are any setups left since it means the PA
++		 * should be no longer synchronized.
++		 */
++		if (queue_isempty(dg->setups)) {
++			/* IO is no longer needed since there are no setups */
+ 			g_io_channel_shutdown(dg->io, TRUE, NULL);
+ 			g_io_channel_unref(dg->io);
+ 			dg->io = NULL;
+ 
+-			bt_bass_set_pa_sync(dg->src,
+-				BT_BASS_NOT_SYNCHRONIZED_TO_PA);
++			if (!dg->service)
++				return 0;
+ 
+-			/* Remove device of BIS source*/
+-			btd_adapter_remove_device(adapter, dg->device);
+-		} else {
+-			bass_update_bis_sync(dg, bcast_src);
++			/* Disconnect service so BAP driver is cleanup
++			 * properly.
++			 */
++			btd_service_disconnect(dg->service);
++
++			/* If the device is no longer consider connected
++			 * it means no other service was connected so it
++			 * has no longer any use and can be safely removed.
++			 */
++			if (!btd_device_is_connected(dg->device)) {
++				struct btd_adapter *adapter;
++
++				adapter = device_get_adapter(dg->device);
++				btd_adapter_remove_device(adapter, dg->device);
++			}
+ 		}
++
+ 		break;
+ 	case BT_BASS_NOT_SYNCHRONIZED_TO_PA:
+ 		if (params->pa_sync == PA_SYNC_NO_PAST) {
+@@ -1720,6 +1744,7 @@ static void bass_remove(struct btd_service *service)
+ 
+ 	bass_data_remove(data);
+ }
++
+ static int bass_accept(struct btd_service *service)
+ {
+ 	struct btd_device *device = btd_service_get_device(service);
+-- 
+2.51.0
 
-for you to fetch changes up to 91d35ec9b3956d6b3cf789c1593467e58855b03a:
-
-  Bluetooth: rfcomm: fix modem control handling (2025-10-24 10:32:19 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - fix corruption in h4_recv_buf() after cleanupCen Zhang (1):
- - hci_sync: fix race in hci_cmd_sync_dequeue_once
- - btmtksdio: Add pmctrl handling for BT closed state during reset
- - Revert "Bluetooth: L2CAP: convert timeouts to secs_to_jiffies()"
- - rfcomm: fix modem control handling
- - btintel_pcie: Fix event packet loss issue
- - ISO: Fix BIS connection dst_type handling
- - HCI: Fix tracking of advertisement set/instance 0x00
- - ISO: Fix another instance of dst_type handling
- - hci_conn: Fix connection cleanup with BIG with 2 or more BIS
- - hci_core: Fix tracking of periodic advertisement
- - MGMT: fix crash in set_mesh_sync and set_mesh_complete
-
-----------------------------------------------------------------
-Calvin Owens (1):
-      Bluetooth: fix corruption in h4_recv_buf() after cleanup
-
-Cen Zhang (1):
-      Bluetooth: hci_sync: fix race in hci_cmd_sync_dequeue_once
-
-Chris Lu (1):
-      Bluetooth: btmtksdio: Add pmctrl handling for BT closed state during reset
-
-Frédéric Danis (1):
-      Revert "Bluetooth: L2CAP: convert timeouts to secs_to_jiffies()"
-
-Johan Hovold (1):
-      Bluetooth: rfcomm: fix modem control handling
-
-Kiran K (1):
-      Bluetooth: btintel_pcie: Fix event packet loss issue
-
-Luiz Augusto von Dentz (5):
-      Bluetooth: ISO: Fix BIS connection dst_type handling
-      Bluetooth: HCI: Fix tracking of advertisement set/instance 0x00
-      Bluetooth: ISO: Fix another instance of dst_type handling
-      Bluetooth: hci_conn: Fix connection cleanup with BIG with 2 or more BIS
-      Bluetooth: hci_core: Fix tracking of periodic advertisement
-
-Pauli Virtanen (1):
-      Bluetooth: MGMT: fix crash in set_mesh_sync and set_mesh_complete
-
- drivers/bluetooth/bpa10x.c       |  4 +++-
- drivers/bluetooth/btintel_pcie.c | 11 ++++++-----
- drivers/bluetooth/btmtksdio.c    | 12 ++++++++++++
- drivers/bluetooth/btmtkuart.c    |  4 +++-
- drivers/bluetooth/btnxpuart.c    |  4 +++-
- drivers/bluetooth/hci_ag6xx.c    |  2 +-
- drivers/bluetooth/hci_aml.c      |  2 +-
- drivers/bluetooth/hci_ath.c      |  2 +-
- drivers/bluetooth/hci_bcm.c      |  2 +-
- drivers/bluetooth/hci_h4.c       |  6 +++---
- drivers/bluetooth/hci_intel.c    |  2 +-
- drivers/bluetooth/hci_ll.c       |  2 +-
- drivers/bluetooth/hci_mrvl.c     |  6 +++---
- drivers/bluetooth/hci_nokia.c    |  4 ++--
- drivers/bluetooth/hci_qca.c      |  2 +-
- drivers/bluetooth/hci_uart.h     |  2 +-
- include/net/bluetooth/hci.h      |  1 +
- include/net/bluetooth/hci_core.h |  1 +
- include/net/bluetooth/l2cap.h    |  4 ++--
- include/net/bluetooth/mgmt.h     |  2 +-
- net/bluetooth/hci_conn.c         |  7 +++++++
- net/bluetooth/hci_event.c        | 11 +++++++++--
- net/bluetooth/hci_sync.c         | 21 +++++++++++++--------
- net/bluetooth/iso.c              | 10 ++++++++--
- net/bluetooth/l2cap_core.c       |  4 ++--
- net/bluetooth/mgmt.c             | 26 +++++++++++++++-----------
- net/bluetooth/rfcomm/tty.c       | 26 +++++++++++---------------
- 27 files changed, 113 insertions(+), 67 deletions(-)
