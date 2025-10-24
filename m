@@ -1,158 +1,141 @@
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29921DFE22
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 17:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410E21C860E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 17:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761325626; cv=none; b=o9pVUknFrjnpx7Fbx5079XRysWAiwJ5X7MOtP6IzyUp/kA/M8vWaKlgGE9D4nx+v5n46FjOdn/wmyuPfvPomzabRc8tw+0dP4GStshrehIgJK/YM8ze3U/6sFEoZmNnyFKQ4jRYco9DESRnJ+r+FEG6BpE0dv65UTxX0Av8Gijs=
+	t=1761325852; cv=none; b=jmAQOywalj7P21Xzn/vREj97KqaZmSp4IuxuJ8xyYsdaCUfA7r3ikglO8jKVNcYXgCBNN5h/hT/Xq4eDs8bkgt0KZ991rDUqCcbqgTIUJpYT0936usPmQmyxJ0V2vM4tnvEd8cKinSoL3fb+rmDd6kw30IVG+THBOO43Luk2rtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761325626; c=relaxed/simple;
-	bh=vRK0g8RY4RB4B2UyvARSUQDa7G/ZiQqUz+6+Ilte9Uc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=dhCClqaRW8EbsUp5R9sTQnRX5lQz8kecbxmkNOTlcXh6Bvy99v8+oA+SYHpuKQfWcRPIqmSYu/BPsScW8BUIRxg61uG2Uwl91bmiNh6h8iVwD6mlnjnL+c+R54M/1CL5f/7Lfj/AegDIu9ABeXSF9NUptpHejkUljHyqhKq1xv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FyGskJ4W; arc=none smtp.client-ip=209.85.217.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761325852; c=relaxed/simple;
+	bh=GdOKVcVxWIYVdHeYTzUFacYZkQbUVpcSXn4/u82IQ4A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CF3RpP0rI+uYdvaly0SyArmfzpctEHiHr6zKFVZdeluKArQ7AicqlsbLhPHDqVcrrETli/mN1VJvZ/IQeQ1YHuKrcq1r4i3R6Ei3QKMFuroPpi4Lef9yIY7FwaBn8Dj6d+1JjQTVTvXcFM+RoNB3RLqkwqObU+qwiqwDC15KTJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZUSYZykY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FyGskJ4W"
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-5d980e08e06so1467619137.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 10:07:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761325623; x=1761930423; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=C28/YgqZbvDG4zpIJhtkaSA+aDlgHKDZ6KOT2trmSYA=;
-        b=FyGskJ4Wo4PTQBoQNRafurvDySg5QRVJ7kfDEvt3UiTnl4vAwNML8v2KGmw7n28+zs
-         gDYc0cgRahRIEao5ujuBVN4Wlc7d85it8otoOwaf2u7Bx454NZqoC7Y6edicvr+uN1G4
-         Rl6f0nW+sWZBdF+rbVGuA21K7841eDdr0QiUr+ZR0EQIQrdazYPOBqnRLkrhmnZGBZ+J
-         MXXVw1sWsq6LoHlrQ+hWvsSqslSsRUc79rK9sk5a/1PFNZ3PX9brsosnUy07B8jsuuWK
-         ikY+x9bYXvRvnvKdN4qERn5TVkFAwrSOld0Vtb/stZBt2yVUr2NkNWsROhod62bT2Fs1
-         MmoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761325623; x=1761930423;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C28/YgqZbvDG4zpIJhtkaSA+aDlgHKDZ6KOT2trmSYA=;
-        b=DtbYgOL4Ok/Jm3PWdhbhHBb2B3k+BbpzBAojoBcUjlg+Lxk7hvEwtq80RqCRBUK7EU
-         HYlvIop5XObFewl2YG0xnYGwx9leEJ/qujLhDNpcx7h7YtW3Wesww17G48wmcUa5GZ79
-         wTeX4o8H031EgJ/jOTQ6xJoxrlyjcPBmBGStuR6Osj2PKxSQwzj7tjt+Pk5E6/Mmtn8f
-         RR/ZMh7PJA7zJclOeVo0W+1ehvcqfLxvve18vrEhz9s1FEGXiAcFL294f6U2LM3N1+vs
-         6obRfRwYU5eAvSnsubcNUcBgdtVOIJzpX1BO0U6SCMDgqTgSW55jemLJBfuSv4RNilFq
-         H6PA==
-X-Gm-Message-State: AOJu0YzeFEBhJJxdCSVOOVxdh8VSGs6jNMkncRcnjoBlfcPiSXOCEIJR
-	yIyZBklNTLrV3NdxsucW7wt43VuVf0/6mfhLGpxmqk4Yaa9nEN1g+axYsFQUvA==
-X-Gm-Gg: ASbGncsf2I3t7nCahWrhkybpZwyKgk7Nz4YOCuFTBbNLNvd9VQ/X9VGu0qNkuPxzYy/
-	tYGFiYd+hszeMq9QpCdj88VIcl9y+UbTTZ2eKtIMbeZz6C9nPu2M6Xwz4abIKUuXQyzcJvi1fks
-	7YYqS0HutfMUR2XKXkqhw3OZPVn5I7D2QqlYi5MEkXIcRUxnt7mlPHgX6NofZuq7eyuKEyoaH0L
-	GJO7NP0J8wCLdEA9WTJ366aMzy/NwEAXhnPsC4JSVXOI/Pc3i2SLKSAO7ClMx/qK99n6QENSRHI
-	vpc3ijLuZKH963V0nd5rR2/kz62J0jB5xt+qMYPbjrp48VZYmfm9q9/8/pgg7iMXlmF/x7NpbPi
-	GAvXkwoiKEGCDDFjLPiS7zLuQZdfiD3ErQ+U9fL2va/z5feeqrd6ezrntzaxEXOan3iK/g1vpBL
-	MZgZnvSg4xZZj0ApjbeGhJYdwA0k6zCA==
-X-Google-Smtp-Source: AGHT+IGK7JhffFzTGbJRjVSL49CGP79gqRs7Xocf44EP9twGiQ3KMV49OhWYo/YzlV1zt71iq4KiJQ==
-X-Received: by 2002:a05:6102:3255:10b0:5d7:dddb:3e5d with SMTP id ada2fe7eead31-5d7dddb3e88mr6962343137.0.1761325623290;
-        Fri, 24 Oct 2025 10:07:03 -0700 (PDT)
-Received: from [172.17.0.2] ([135.119.239.129])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87f9de7df29sm39816486d6.18.2025.10.24.10.07.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 10:07:02 -0700 (PDT)
-Message-ID: <68fbb236.050a0220.13e81a.cb1d@mx.google.com>
-Date: Fri, 24 Oct 2025 10:07:02 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5622321296851388560=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZUSYZykY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDDEEC4CEFB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 17:10:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761325851;
+	bh=GdOKVcVxWIYVdHeYTzUFacYZkQbUVpcSXn4/u82IQ4A=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ZUSYZykY9yk3dmtM/dB3+gcFHK+xBS4dbrjv02L5CrvD9DPMJEnKwiRf0MO/lxP5E
+	 jwPhF27oZDwHnE9Ckv8EfBE5cNuIaLYNlxsvd5fTgZ40KRllKLsMJ3b0zWjVwbX2P7
+	 yohudETHBhH0QKZgy6CXpLN6Zz7I0jKNOYY31JVYLWYdD90I5GhfC4caOaunyDnHLY
+	 56nCGNc7z8jtE/uZ3c9/lyMUR9Zn/LNO5bRePOruiivyW1RInOhJ8BHy0LcCWu+/uH
+	 ClPZ1Lkz7BlU9HV6BtOXUWJjo/N6Mv7HgYClTCHWiG11h7rFrjwtbwd6dM2zd51b2E
+	 8qA/+OzvRVtkg==
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-63c4b41b38cso4918733a12.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 10:10:51 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWvcTBvxsaBsXpDE47KOF95WwYy0Z3O6qVg9UZLByJ2StDh1bCFh9p/hxSFGkyGHeqcdG1NNLHHbs8SG9TGPbc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzk+pH1conpBnOp7HoS3dQd96bo02e5jBsyP9SczCd+OQ3sGVHy
+	V23JZqv6f6wyF0AIwKRNKdBmwhibC9+G1iUuRCGNuCJj4tuKMzY5vaUVPTWeNnH8W0t+tflHVXT
+	YPXNYIFaYUHHjsA2DhuQzVok7QAgUIg==
+X-Google-Smtp-Source: AGHT+IG/3WEThz7PazPn+Pa/kjHjCobatN9xX8Xpu3xgx4wz+CQWm8nO+WeSfGQCmjID3LuEq7En1oyBdhiGX59jKTE=
+X-Received: by 2002:a17:906:3c9:b0:b6d:7f68:7874 with SMTP id
+ a640c23a62f3a-b6d7f6878famr57952766b.44.1761325850450; Fri, 24 Oct 2025
+ 10:10:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, rpthibeault@gmail.com
-Subject: RE: [v2] Bluetooth: hci_event: validate skb length for unknown CC opcode
-In-Reply-To: <20251024162912.221224-2-rpthibeault@gmail.com>
-References: <20251024162912.221224-2-rpthibeault@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
+ <175943240204.235529.17735630695826458855.robh@kernel.org>
+ <CABBYNZKSFCes1ag0oiEptKpifb=gqLt1LQ+mdvF8tYRj8uDDuQ@mail.gmail.com>
+ <CAL_Jsq+Y6uuyiRo+UV-nz+TyjQzxx4H12auHHy6RdsLtThefhA@mail.gmail.com>
+ <CABBYNZKxGNXS2m7_VAf1d_Ci3uW4xG2NamXZ0UVaHvKvHi07Jg@mail.gmail.com> <CAL_Jsq+aO8Fdq_7PHvh0aTb00qvGdKe2RDRotYcWjqGHppyL4g@mail.gmail.com>
+In-Reply-To: <CAL_Jsq+aO8Fdq_7PHvh0aTb00qvGdKe2RDRotYcWjqGHppyL4g@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 24 Oct 2025 12:10:38 -0500
+X-Gmail-Original-Message-ID: <CAL_Jsq+vOKpR+YZWdsT5o=CrB=MT1ZeK0=_HuLG33p_wnj-MNA@mail.gmail.com>
+X-Gm-Features: AWmQ_blrtMIqgkYEu8hw0I_RorB-tKtgwstXs8EHR-BCdkzmS79EpyfM_OAhwFY
+Message-ID: <CAL_Jsq+vOKpR+YZWdsT5o=CrB=MT1ZeK0=_HuLG33p_wnj-MNA@mail.gmail.com>
+Subject: Re: [PATCH v3] dt-bindings: net: Convert Marvell 8897/8997 bindings
+ to DT schema
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>, andrew+netdev@lunn.ch, 
+	conor+dt@kernel.org, kernel@collabora.com, krzk+dt@kernel.org, 
+	angelogioacchino.delregno@collabora.com, kuba@kernel.org, 
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, edumazet@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============5622321296851388560==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, Oct 8, 2025 at 2:22=E2=80=AFPM Rob Herring <robh@kernel.org> wrote:
+>
+> On Fri, Oct 3, 2025 at 9:33=E2=80=AFAM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Rob,
+> >
+> > On Fri, Oct 3, 2025 at 9:38=E2=80=AFAM Rob Herring <robh@kernel.org> wr=
+ote:
+> > >
+> > > On Thu, Oct 2, 2025 at 2:18=E2=80=AFPM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > Hi,
+> > > >
+> > > > On Thu, Oct 2, 2025 at 3:14=E2=80=AFPM Rob Herring (Arm) <robh@kern=
+el.org> wrote:
+> > > > >
+> > > > >
+> > > > > On Wed, 01 Oct 2025 15:33:20 -0300, Ariel D'Alessandro wrote:
+> > > > > > Convert the existing text-based DT bindings for Marvell 8897/89=
+97
+> > > > > > (sd8897/sd8997) bluetooth devices controller to a DT schema.
+> > > > > >
+> > > > > > While here, bindings for "usb1286,204e" (USB interface) are dro=
+pped from
+> > > > > > the DT   schema definition as these are currently documented in=
+ file [0].
+> > > > > >
+> > > > > > [0] Documentation/devicetree/bindings/net/btusb.txt
+> > > > > >
+> > > > > > Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.=
+com>
+> > > > > > ---
+> > > > > >  .../net/bluetooth/marvell,sd8897-bt.yaml      | 79 +++++++++++=
++++++++
+> > > > > >  .../devicetree/bindings/net/btusb.txt         |  2 +-
+> > > > > >  .../bindings/net/marvell-bt-8xxx.txt          | 83 -----------=
+--------
+> > > > > >  3 files changed, 80 insertions(+), 84 deletions(-)
+> > > > > >  create mode 100644 Documentation/devicetree/bindings/net/bluet=
+ooth/marvell,sd8897-bt.yaml
+> > > > > >  delete mode 100644 Documentation/devicetree/bindings/net/marve=
+ll-bt-8xxx.txt
+> > > > > >
+> > > > >
+> > > > > Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> > > > >
+> > > > > You'll probably have to resend this after rc1.
+> > > >
+> > > > In that case I'd like to have a Fixes tag so I can remember to send=
+ it
+> > > > as rc1 is tagged.
+> > >
+> > > A Fixes tag is not appropriate for a conversion to DT schema.
+> >
+> > Ok, but then how do you justify merging it for an RC?
+>
+> I don't.
+>
+> > Or I'm
+> > misunderstanding and that should just be merged to bluetooth-next and
+> > wait for the next merge window?
+>
+> Yes, this is 6.19 material.
+>
+> > In that case I can just merge it right
+> > away.
+>
+> That's up to you.
 
-This is automated email and please do not reply to this email!
+Luiz, Are you going to pick this up or do you want it resent?
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1015551
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.27 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      25.09 seconds
-CheckAllWarning               PASS      27.18 seconds
-CheckSparse                   WARNING   30.91 seconds
-BuildKernel32                 PASS      24.74 seconds
-TestRunnerSetup               PASS      494.84 seconds
-TestRunner_l2cap-tester       PASS      23.99 seconds
-TestRunner_iso-tester         PASS      84.28 seconds
-TestRunner_bnep-tester        PASS      6.12 seconds
-TestRunner_mgmt-tester        FAIL      115.41 seconds
-TestRunner_rfcomm-tester      PASS      9.33 seconds
-TestRunner_sco-tester         PASS      14.49 seconds
-TestRunner_ioctl-tester       PASS      9.86 seconds
-TestRunner_mesh-tester        FAIL      11.47 seconds
-TestRunner_smp-tester         PASS      8.52 seconds
-TestRunner_userchan-tester    PASS      6.49 seconds
-IncrementalBuild              PENDING   0.83 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.105 seconds
-LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.158 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.025 seconds
-Mesh - Send cancel - 2                               Timed out    1.995 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5622321296851388560==--
+Rob
