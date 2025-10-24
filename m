@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC4C76026;
-	Fri, 24 Oct 2025 17:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CCE344045;
+	Fri, 24 Oct 2025 17:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761327028; cv=none; b=WNoqj75RsKgOw2NUooxKm1PcaZodm0pIPAQgH185meIPS8rUP9TclPWKV+YFty/ZMU3MDGkxK4k5hgPQ6KQiD96YybTY1N0lFytrvSIR+0txAIhe2JN7WgsMJeiHll0O9DvVTLeTR9VgU+yA6mz4SSPExYCJAqOCpzZUR06dKo4=
+	t=1761327028; cv=none; b=OcZ1EK9uiF5T5RL0Q5u/96IpYxqquGfrA6YcvNNqdfz9V3lG5qlALi9VsDlpBxoQ0Eh5gnp3C7BHoR3fEi57MM2wQWlAoJI45T+wygddzzPpA0CPF2Z7Jr7FmzYe2EptHJdKjrj65f+I8K49Cpg6zB+1ZJHGNycF97DdZkLMy10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1761327028; c=relaxed/simple;
-	bh=srsHMANt5Lk/UaQ7m5DJ4Z4en71AEbC71W6CSZjih38=;
+	bh=drm/TfgoPBtAPCtcEc+4TmIotN9G0M9XeP/tAhy85r0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Gr7g5g6K+1b3P8fb4Q6SbR8Hsf+OG8aJwTAngx32SrPfuBgNHEaf5NRyxuQWLdm0JhCnRqLh8ju+gvpmss0M7EDtOnSUMqlv+/zsznu6rkpMNeGdteODfwIWUD1XaogJZPsHw54DU+5OJ+igk2sx4PKGDQbypipLolKxam3O968=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=duBXUyKi; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=ltSAGR0UBUiXhScZFSjtBcbNNLQ6XkMFFFU/1tUZCuplncb4Xtvrh6RrL7wT856fmJ//SjoWHdxQshjCIbFvbJYw9e1cH6B5IDvWHVYVI4WigkAXNmcFCjakx5JwAPrS91JMTQK3Pb9Hhrd4oBPzh2CoUv2muQO3FiU0FG+1rTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t6WKWomU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="duBXUyKi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65C20C4CEF1;
-	Fri, 24 Oct 2025 17:30:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t6WKWomU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0812C4CEF7;
+	Fri, 24 Oct 2025 17:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761327026;
-	bh=srsHMANt5Lk/UaQ7m5DJ4Z4en71AEbC71W6CSZjih38=;
+	s=k20201202; t=1761327027;
+	bh=drm/TfgoPBtAPCtcEc+4TmIotN9G0M9XeP/tAhy85r0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=duBXUyKiWqIYFbG9OikTq2XGFolLTL1gvY3rGyNfr/yFroYIrSgY33+1eKUBq3JIb
-	 Y2cJqqoVEuRrvCfzTo0fsNeQf/yWkrKsIggljYxOpkseixlpQ5gN/vKJEMKbRfWlJt
-	 /OChc+XrxyXpaOCrQYp717hPtHRcYpOhjFMcpLaTx4Q5vBXjTD+IZ5c1/2dpubh348
-	 iFdD2p+qKJMllZUg5Bllq7UL+kKDZA355GFsA8p3c0Rbpvroto3zwHGmUMFA7Sxgm5
-	 H6dv7G3qP1WFRn5Yx3VRUeQ4ndhDYtdOBMgvtmDzCf/0b/44mijvaBzbW1aqa5JrAC
-	 9KflvqB5OeHmA==
+	b=t6WKWomUXQSVoOppq5JV2QVxiKGC3RT8AEHiidqOozt/awzht3mOFMYqTtvtOtKvn
+	 JJcCwyDZNqmkguuO7yZAZl9xL5AbsMwioWzBdpXg5IP9h43tBWwwhKCduIkPbtyj4f
+	 Q2nYrOf/q7iRV89r/dM6ziO9ZCPck9eyGbJZHnJ97aUZAyt4bXal3qnXPHwVnnugib
+	 y5yXIuHbYuqbWDpQ0DZDYYQVO2zfqDmgwPxAsR//7bj6RSutmC6zr+XhAGpF+tcMSC
+	 HUS6M7+A1Hd3dekYBdn6HwzTCyyx52uEAZxiBgPpJEgMjXO3g77k0521gAPv24xF1Y
+	 cOtCcLwn2o6mg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FC5380AA4A;
-	Fri, 24 Oct 2025 17:30:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFBF380AA4A;
+	Fri, 24 Oct 2025 17:30:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,42 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] dt-bindings: net: Convert Marvell 8897/8997 bindings
- to DT
- schema
+Subject: Re: [PATCH v2] Bluetooth: hci_event: validate skb length for unknown
+ CC
+ opcode
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <176132700625.4002741.4029402760245569227.git-patchwork-notify@kernel.org>
-Date: Fri, 24 Oct 2025 17:30:06 +0000
-References: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
-In-Reply-To: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
-To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-Cc: andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com,
- conor+dt@kernel.org, davem@davemloft.net, edumazet@google.com,
- krzk+dt@kernel.org, kuba@kernel.org, luiz.dentz@gmail.com, pabeni@redhat.com,
- robh@kernel.org, devicetree@vger.kernel.org, kernel@collabora.com,
+ <176132700750.4002741.10364505901519162594.git-patchwork-notify@kernel.org>
+Date: Fri, 24 Oct 2025 17:30:07 +0000
+References: <20251024162912.221224-2-rpthibeault@gmail.com>
+In-Reply-To: <20251024162912.221224-2-rpthibeault@gmail.com>
+To: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
+ syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com,
+ linux-kernel-mentees@lists.linux.dev, skhan@linuxfoundation.org,
+ david.hunter.linux@gmail.com, khalid@kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed,  1 Oct 2025 15:33:20 -0300 you wrote:
-> Convert the existing text-based DT bindings for Marvell 8897/8997
-> (sd8897/sd8997) bluetooth devices controller to a DT schema.
+On Fri, 24 Oct 2025 12:29:10 -0400 you wrote:
+> In hci_cmd_complete_evt(), if the command complete event has an unknown
+> opcode, we assume the first byte of the remaining skb->data contains the
+> return status. However, parameter data has previously been pulled in
+> hci_event_func(), which may leave the skb empty. If so, using skb->data[0]
+> for the return status uses un-init memory.
 > 
-> While here, bindings for "usb1286,204e" (USB interface) are dropped from
-> the DT   schema definition as these are currently documented in file [0].
-> 
-> [0] Documentation/devicetree/bindings/net/btusb.txt
+> The fix is to check skb->len before using skb->data.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] dt-bindings: net: Convert Marvell 8897/8997 bindings to DT schema
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f63037a3f252
+  - [v2] Bluetooth: hci_event: validate skb length for unknown CC opcode
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a91f1b634866
 
 You are awesome, thank you!
 -- 
