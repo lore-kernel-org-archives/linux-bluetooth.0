@@ -1,69 +1,69 @@
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5582F83BC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 20:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBFE2F7468
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 20:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761338460; cv=none; b=TBJAeMX1FCl/pnIRLYvYiKYCIt3PGikOLSulyNdUP8k8zvcKswXzEVe4FJ1fWz0TBE5iKaOOYNLtJpGvAQVScBm4DNDOyEcrwfYGMxoNCG1eUQIdKuqykwic62Z0WLBLYqkI7AjaqqF2d9pbNxS/1N+ka1stMsYtCRZ5ZStcgys=
+	t=1761338462; cv=none; b=JC+1BkFc8a9Ux1D4dOqk/K8A8GdV10Z3OYr6GMPikY4g/GO8WN/KQfM3+KIAeTe0BsXp8+pudQTCOyQlTAvqGrXO3wUWPZcKOAPMUfMB/s/FeOUyoUM3LjVLo1/GiOe/d565Uq/ce0rYuGMGkVZ1MnIj3ZAQmwLDsJ9G4nCcm3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761338460; c=relaxed/simple;
-	bh=eCo2Cf3Ofb7fSiPFlinAHJlWxFDhNz+BXuKUVG2wrgU=;
+	s=arc-20240116; t=1761338462; c=relaxed/simple;
+	bh=llqDBDmOJK/CKIPTIM8yL1+6QhVHbwgrXQi40KhoIpw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PJrKl8fn3suSUUVWk9GDVLhvFpRijEaizfzkk9YsK8f1jsVeh5v5wxNmF3Sgyo78xutEByuX33RHjPxowFjHjDvcwGEacrbaecgQwSYQJOuXk8C46IXCD5t2pig5PzaHdv6LBIBNEsbpOCiAl6thcUurxkwpn65mGhdyfrbHg9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vvcgz4Hc; arc=none smtp.client-ip=209.85.222.41
+	 MIME-Version; b=Z8zc8AIorJePrmhGbxdG4id68+SbCsMajEd5Irt13UF3lRYpr26D4rXRG8K4iirsHmJV2mRHLoCCJTsABFLU9iaU97l/ExpGqWiucLZiIWddSl68o4bJsxqegd75YDUWl4sOzeuAK529qJYM9xkROlhGeq+KSe1mctlRD3cWrYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B0v2aUgC; arc=none smtp.client-ip=209.85.217.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vvcgz4Hc"
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-932c411d355so1205645241.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 13:40:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B0v2aUgC"
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-5d6266f1a33so1626165137.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 13:41:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761338457; x=1761943257; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761338459; x=1761943259; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=h6Aig4JBxxv13woSLti0Y0cFt6aQG+7ndxx0Jt2/YRo=;
-        b=Vvcgz4Hcmy2t+fk+MMEgy6umbLIxirFGGMoCkUfggVIoyO4Vbtv3lRZGRwS4jDrYry
-         L8q2Or73q933cdVJCHzpa9SciQrKKB35SsOL5HEOE3TIjgnIHU/CHpMulBofF4Kodt1S
-         J6o1MAAdyCqARkq/5dKrDTxNC7wAH5XXT9NQQ8cvcm6KG8kWW+agZSXm4DAsuvSsG26z
-         K+ee1iAEngFGpVQ+fpfeJW4YTmtNcnNYjbGe52phpQjnJc522S3fQ2b1f6nOc63tZyz6
-         hNVXLEu/e4T0QgfWbcU5IHij24RvGXadk+Em1H1VtnwJn1sb8i1qVT0OyJsq8bWWxVUZ
-         rWQA==
+        bh=UEUdPpa50PFjMbWXhvz0VvuyCuuWRmBGJYgNoclhc68=;
+        b=B0v2aUgCs8fcFF3nxJG1u3BHMRnxrIIsCxxWY7APKQFZyRbcR0rcOlaL0JDRRC4Dw7
+         S1//Py39PqcZ7tXc6vdOwxFMhvv7/sXQEWwP/nNu4jqaoj2ZiAoUxCiS7k2gTXxwhecl
+         xMtc4px55K0HQaYOnVjuPSicVDqfxzbKW0srcSKb80Ns4QSEkMJFS2y4O0Pwn7GIGDI3
+         iH5yCzMcH5Fs2P3+QmHH9+Je/wXJXHwM7Csjw/idTi+V8JbWlMRh/JkvRZlNE04cZ++k
+         C1AyXcNAbuavCKpJBVHe8qoCJtvMrpmbOsug9mvlyQu76ErCKFkS/wmVItJ7oPYIqO3g
+         DrLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761338457; x=1761943257;
+        d=1e100.net; s=20230601; t=1761338459; x=1761943259;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h6Aig4JBxxv13woSLti0Y0cFt6aQG+7ndxx0Jt2/YRo=;
-        b=jnZ9PUs0VTE2HlFFndpQ01buC1Hl/ySGN3b414w57Oa9wHxTXYR+Q639ywh5VIDRD8
-         AvaSPvpNGYeg8uxcb6eqfAz0auX5oqnD/WDgzSRWPxk6yq9Tag4CExBc/TgzTk+E7qcK
-         hCWpWFkkxXCFiULVRoRLYJLkk5w9aH3ki/A0+mEBXT6MOifjy8ump3yHNL3YblwHI5th
-         NsVCZFSuG7oY0Cs1oK44psNnIAwLiV/n7mBLcaFsu1QeF4A7+hx/qGwNJWewCd9JsS2l
-         Z7h7/MKaQ4bmFGOqcDjBCN9AXRpM0VGoj7YGjT7/AeEXYucMAzk7WpjC7ArBkFQwLL16
-         xdjA==
-X-Gm-Message-State: AOJu0YyW1KeADsPLqxqA3Wn7GfNXkVhdEvn0Y7UY8mAML5tAuZgZRNdV
-	bO5hRCKDXYJ1PPUoxzfp6FMgPDatTy5guN20cq9CLJsOS6tvi06YeRFRC6XQWQ==
-X-Gm-Gg: ASbGnctAi1xfV/xzPpzQ4dej0P/P302CY8w3s04f27JdMI6RxC1KKKDrME1EJBrlfHr
-	MTXAspNFOV80m6Vdnj8DTZ/l/dJk2eNovb0J9mPiHN+/eSLhmG0y47lMZ2Q450pEW32uOoWF2sO
-	akOOxScM9SNn1gzaKidrY7LTqM1nuhK74V1YobFVcVSbW7xact8fO6PPxxTP6zf7akzUcsJs+Vt
-	7pcPm2Perdp0hXW5MdRkOYJIHyx/7gU9jUAmsdmjJhiDLbd1+ipqiiBkop27q3KftHL7RNewR5Z
-	+k+XXMF/1DWs7mVNc+GTClDAu8+mpqRjkJVLv/6FVX/GYiXpFu2PGBztKUdFZ12fWl08REIuyix
-	tsRioKTbAjnMAtjrPTHCUB5x9b3BTtdR3FlNVR9cAS6AaCZMGliDPfL7XMOEnBUIL3cZ3ho8+R4
-	42G68=
-X-Google-Smtp-Source: AGHT+IGJn4JgSMGOO2+0rufCCU30zGplpgaDIpI0uv6bsL6segNjzf0L4uH4YTKdFTx5JB1UcZhnAg==
-X-Received: by 2002:a05:6122:322b:b0:557:c86a:6065 with SMTP id 71dfb90a1353d-557c86a6223mr2158489e0c.1.1761338457003;
-        Fri, 24 Oct 2025 13:40:57 -0700 (PDT)
+        bh=UEUdPpa50PFjMbWXhvz0VvuyCuuWRmBGJYgNoclhc68=;
+        b=mem4C372f0/qR94Bkl9ZAW+uu83z9WH4xhzpy9sk8xj/MFi5MKinBD9n2WDrnr2t3v
+         89nUDmSI0N1Inpct4kjh3f+upZBSDtcZV5pa654qlQYA3rrWihCTrPA7/G6AiAuM/pL5
+         ba52Y/MNud8q18fQ5Gmzb0L6w8SAterU9lCs24X+wbJybL995BRskm0yjqd8uwktPRUo
+         QlgW5Kj3aQBjqkp66nc6C+ulHhPIR3wztwrkFiQPaXbGuY3YJVWpIGo5XgFn7pUJNA7B
+         OTpLBogl4a0bBpuniAOvP6JkvEBRcpItLdLcthGX+FbABsukZRFcNWWCoXuTmAucsXzK
+         d00A==
+X-Gm-Message-State: AOJu0YxUKcUhO9PIQ0S7zID453caREeJ1848IBr7AWB4h4zQXbLyZEKr
+	RBR3GG2DE3O+W78hH20z0HIGOBIX87KMr4vSj3xhx6ekDBDIzYLOtx0pZr07tQ==
+X-Gm-Gg: ASbGncsOKxtsUlDRhSIemcbYbd9T9kHjnoFhklLvWfQtTp3OMCmsLNX5hbFqX4+qnnC
+	2SscGGwVqADDudu+PrvINGuGfmY4uaLajYdGxg7sbvdU1aH626ZnjIEIUNbzYkGTm/ztoFqpMcZ
+	Wi0EJ+d8/+S38leQ5Rb59hUlRQrHEzvUo/lcvbgBnYeemiqI1+CJ8h6RlDPRu3aA/hlPNZFu6dd
+	Tb0g/eFBjWQhAZTZbjrv8KcsRJjlxSOu5j2u40OaS0csvlIBaqOpPOCUji82l+DhaXnKYXrV6GQ
+	H1ZZhD6rYS8jdRsuaxFMRRHb/iV/rATnjRLyEfwkOb3gLLTkQhxCxA2BthbD6W8hFPC0JGNAkkn
+	NojForSX4+ipeJMbJSdHrwlIDg5USHoobMFLBMUuFr/C9zDyJ27UaZUz+xUJMCs1dXvuP0Ax/jk
+	A3Z0gLDf/ppWmblg==
+X-Google-Smtp-Source: AGHT+IHsimm4Yfn5rpzJHTV0GKy0i3v+tW4CSy6TP7KGcIUyPclJaOdhl5s9GLro0ApqugvyBf5SrA==
+X-Received: by 2002:a05:6102:3e8e:b0:5d5:f6ae:38dc with SMTP id ada2fe7eead31-5d7dd6b7f8emr8945689137.39.1761338458774;
+        Fri, 24 Oct 2025 13:40:58 -0700 (PDT)
 Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-557ddb2f98asm73501e0c.10.2025.10.24.13.40.55
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-557ddb2f98asm73501e0c.10.2025.10.24.13.40.57
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 13:40:55 -0700 (PDT)
+        Fri, 24 Oct 2025 13:40:57 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 05/12] shared/bap: Fix bt_bap_stream_io_get_qos for broadcast streams
-Date: Fri, 24 Oct 2025 16:40:32 -0400
-Message-ID: <20251024204039.693918-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 06/12] MediaAssistant: Add Device option to Push
+Date: Fri, 24 Oct 2025 16:40:33 -0400
+Message-ID: <20251024204039.693918-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251024204039.693918-1-luiz.dentz@gmail.com>
 References: <20251024204039.693918-1-luiz.dentz@gmail.com>
@@ -77,73 +77,44 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes bt_bap_stream_io_get_qos work with broadcast streams.
+This enables MediaAssistant.Push to work with local broadcast sources.
 ---
- src/shared/bap.c | 38 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 37 insertions(+), 1 deletion(-)
+ doc/org.bluez.MediaAssistant.rst | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 6573ea39c93b..427d18627def 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -6800,6 +6800,36 @@ static void bap_stream_get_out_qos(void *data, void *user_data)
- 	*qos = &stream->qos;
- }
+diff --git a/doc/org.bluez.MediaAssistant.rst b/doc/org.bluez.MediaAssistant.rst
+index 64e689f8621d..8650d8abb379 100644
+--- a/doc/org.bluez.MediaAssistant.rst
++++ b/doc/org.bluez.MediaAssistant.rst
+@@ -40,6 +40,11 @@ Values:
  
-+static void bap_stream_bcast_get_out_qos(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *stream = data;
-+	struct bt_bap_qos **qos = user_data;
-+
-+	if (!stream)
-+		return;
-+
-+	if (!qos || *qos || stream->ep->dir != BT_BAP_BCAST_SINK ||
-+				!stream->qos.bcast.io_qos.sdu)
-+		return;
-+
-+	*qos = &stream->qos;
-+}
-+
-+static void bap_stream_bcast_get_in_qos(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *stream = data;
-+	struct bt_bap_qos **qos = user_data;
-+
-+	if (!stream)
-+		return;
-+
-+	if (!qos || *qos || stream->ep->dir != BT_BAP_BCAST_SOURCE ||
-+				!stream->qos.bcast.io_qos.sdu)
-+		return;
-+
-+	*qos = &stream->qos;
-+}
-+
- bool bt_bap_stream_io_get_qos(struct bt_bap_stream *stream,
- 					struct bt_bap_qos **in,
- 					struct bt_bap_qos **out)
-@@ -6816,13 +6846,19 @@ bool bt_bap_stream_io_get_qos(struct bt_bap_stream *stream,
- 		bap_stream_get_out_qos(stream, out);
- 		queue_foreach(stream->links, bap_stream_get_in_qos, in);
- 		break;
-+	case BT_BAP_BCAST_SOURCE:
-+		bap_stream_bcast_get_in_qos(stream, in);
-+		break;
-+	case BT_BAP_BCAST_SINK:
-+		bap_stream_bcast_get_out_qos(stream, out);
-+		break;
- 	default:
- 		return false;
- 	}
+ 		See QoS property.
  
- 	DBG(stream->bap, "in %p out %p", in ? *in : NULL, out ? *out : NULL);
++	:object Device [ISO only, State=local only]:
++
++		Push to a specific device. Device must be connected and with
++		an active BASS session.
++
+ Properties
+ ----------
  
--	return in && out;
-+	return (in && *in) || (out && *out);
- }
+@@ -52,6 +57,7 @@ Indicates the state of the assistant object. Possible values are:
+ :"pending": assistant object was pushed (stream information was sent to the peer)
+ :"requesting": remote device requires Broadcast_Code
+ :"active": remote device started receiving stream
++:"local": assistant object was created for a local stream
  
- static void bap_stream_get_dir(void *data, void *user_data)
+ array{byte} Metadata [readwrite, ISO Only, experimental]
+ ````````````````````````````````````````````````````````
+@@ -59,7 +65,7 @@ array{byte} Metadata [readwrite, ISO Only, experimental]
+ Indicates stream Metadata.
+ 
+ dict QoS [readwrite, ISO only, experimental]
+-`````````````````````````````````````````````````````
++````````````````````````````````````````````
+ 
+ Indicates stream QoS capabilities.
+ 
 -- 
 2.51.0
 
