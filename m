@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E043043CA;
-	Sat, 25 Oct 2025 16:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C01301701;
+	Sat, 25 Oct 2025 16:16:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761408812; cv=none; b=ZYtF/iVSNwo57xpUw6PIuE39zHDF9FyyyfqcfZj7IDtTEITxKyfhrJdwwSoU9UZZTtp7OZIF2ppISJV2d3RJdpgqy8ZmeQOCY1n1uXLOOwF5/3YKCx9uqONjNlnukGNwSh0cOWf/gYIlgTlaIMAk+dby1PDJASeIS2SKjt2NgQc=
+	t=1761408967; cv=none; b=jqiw7GZTlFVWbbclbEXTetMgkslANdEDzU3OACzwiSmkjjwxyCuhoKKd6ZopfU2pnm17fTyvBQkskpgibw82j3/x/V7DSK6hkRDjdnn9bu7jAsY4jNSOyzfy0ZEuYElrJgO8MtihAycftd4+6sOkQ8hCr6lZDgcf+Jfw3Hp9JcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761408812; c=relaxed/simple;
-	bh=DYOrhNcQ4crAX0MKCWdJSKTYdoZPKS7Hyu4Vvr8Unw4=;
+	s=arc-20240116; t=1761408967; c=relaxed/simple;
+	bh=QwO0iTE43pGFIY/hJQqlLOWK3XWSU6LqZkqpYUjdzOQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tCEvEpaZflsSlmBroGo8BWeELzp4PAbvwa89UYPFk/YzJ0xpqyvl5DiDWgDEZsGHRsetr1xEIFGScNzpbQ64Hgg1aF63Yd8Vu513/YM+FjPN71rZ5+e7nZrqOS8f3w7JgCeQ3jBAbuAkpA8iNBvLtxkWyOhMWrM9sPhLTQ35tHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y7GTliBw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=oyPtJMNeCSUyMJl7CSnOeuaQFbq+A/2Upcbak5LWg4AyK/C03jc3azkjIXVrWhuEYXF2vKo3u1S2rXDHZOJhVhH5feSCDSZS0e2zSZYvJFHYgZp5ti0SyAkZeJ5q6IsSouEIYs5lT1vDxmzO+p2M8loEI2w7MgFBpxFV/Slks0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pD+rQOS9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y7GTliBw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7CC5C4CEF5;
-	Sat, 25 Oct 2025 16:13:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pD+rQOS9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32865C4CEFB;
+	Sat, 25 Oct 2025 16:16:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761408812;
-	bh=DYOrhNcQ4crAX0MKCWdJSKTYdoZPKS7Hyu4Vvr8Unw4=;
+	s=k20201202; t=1761408966;
+	bh=QwO0iTE43pGFIY/hJQqlLOWK3XWSU6LqZkqpYUjdzOQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Y7GTliBwi7ZkXX29boIQZL177eW9RLxoMTxmuVoLJPtORhb4ZWKT/kJTwcXuJC1KL
-	 ICHL4vPJNvnwIfmRp2j3GiJGVE2rQCeiunes02LaAsVmyzYLOZet4V37GOboCUf/Uu
-	 ZVsK5ps8Mfr2fabqXA3eM1tDjhow/y9SQSwbYPSBtlCfsY5AG9N+qyb+2nblM1R2SM
-	 PxIkf7v55IrfWUWv6y8+Xi0z05V5kCaCNd+urfbEmiXqSeO2tVmggAOhd9OOyEAQZi
-	 t1NWv2YCjzZhomD7Gd5RxWS0WkYTi3ikpqSq99+AfC9WgLw55hZrTSSM6tW2C1f+dc
-	 bOSFTD0MEsSww==
+	b=pD+rQOS98ZIH6hyWS5FfnxwFB+lCHluS7lRzqKCsYr/e13EH1XgI5rlLImwCvn7uN
+	 UdLm8/YXx3c9GoF5Wxl73+GwKON0ZqPIw67XR46iGWr5Eojyf+Sm69NGVztFT5joLi
+	 o/KfyyzUt35SsRcZYCT/Y85QKIGi+RY22NUY+udXtwO0JRgLCfCHzXAWuAYU8dfXnE
+	 cm53nO/h+hWXZDBNEaD5i88N2re8mgtsutMYUe4iBF6M9mkMCkExH6Wu2rYK+vEQ+m
+	 9vYk+Owxf0czMEK3VomEPhWFlL2R8cuQgo8PACGbwjcYbVqZWQ+1rcoAy1uR6wRSkd
+	 y36vqvJqQeB3A==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Kiran K <kiran.k@intel.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] Bluetooth: ISO: Don't initiate CIS connections if there are no buffers
-Date: Sat, 25 Oct 2025 11:55:11 -0400
-Message-ID: <20251025160905.3857885-80-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17] Bluetooth: btintel_pcie: Define hdev->wakeup() callback
+Date: Sat, 25 Oct 2025 11:56:27 -0400
+Message-ID: <20251025160905.3857885-156-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -53,13 +54,20 @@ X-stable-base: Linux 6.17.5
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 
-[ Upstream commit d79c7d01f1c8bcf9a48337c8960d618fbe31fc0c ]
+[ Upstream commit 3e94262921990e2884ff7a49064c12fb6d3a0733 ]
 
-If the controller has no buffers left return -ENOBUFF to indicate that
-iso_cnt might be out of sync.
+Implement hdev->wakeup() callback to support Wake On BT feature.
 
+Test steps:
+1. echo enabled > /sys/bus/pci/devices/0000:00:14.7/power/wakeup
+2. connect bluetooth hid device
+3. put the system to suspend - rtcwake -m mem -s 300
+4. press any key on hid to wake up the system
+
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -67,47 +75,62 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 LLM Generated explanations, may be completely bogus:
 
 YES
-- The new guard in `net/bluetooth/iso.c:465` refuses to start a CIS if
-  the socket has a TX SDU configured but the controller reports zero ISO
-  credits even though there are no active ISO links
-  (`hci_iso_count(hdev)` from `include/net/bluetooth/hci_core.h:1093`),
-  signalling that the controller/host credit accounting has fallen out
-  of sync. Without this check the connection succeeds but
-  `hci_sched_iso()` never sends data because `hdev->iso_cnt` stays at
-  zero, so user-space observes a “successful” connect that cannot carry
-  audio.
-- The controller credit bookkeeping is expected to reset to `iso_pkts`
-  when the buffer sizes are read (`net/bluetooth/hci_event.c:3770`) and
-  to be restored on teardown (`net/bluetooth/hci_conn.c:1195`), so
-  hitting this corner case indicates a real bug in the running system;
-  returning `-ENOBUFS` makes that failure explicit instead of letting
-  the socket hang.
-- Change scope is tiny (one extra check and error return in a single
-  file) and it relies only on fields and helpers that have existed since
-  ISO support shipped, so it backports cleanly and carries minimal
-  regression risk.
+- `drivers/bluetooth/btintel_pcie.c:2350` introduces
+  `btintel_pcie_wakeup()`, which just calls
+  `device_may_wakeup(&data->pdev->dev)`; this mirrors the existing
+  pattern in other Bluetooth transports (for example
+  `drivers/bluetooth/btusb.c:3758`) and safely queries whether userspace
+  enabled PCIe wakeups for the device that is already stored at
+  `drivers/bluetooth/btintel_pcie.c:2411`.
+- Hooking that helper via `hdev->wakeup = btintel_pcie_wakeup;` at
+  `drivers/bluetooth/btintel_pcie.c:2382` lets the HCI core mark the
+  controller as remote‑wakeup capable (`net/bluetooth/hci_core.c:2661`)
+  and, during system suspend, actually run the wake-capable
+  configuration instead of bailing out early
+  (`net/bluetooth/hci_sync.c:6214`). Without this patch, the Intel PCIe
+  controller never programs accept lists/event masks for wake-on-
+  Bluetooth even when `/sys/bus/pci/.../power/wakeup` is set to
+  `enabled`, so Bluetooth HID devices cannot wake the machine—an obvious
+  user-visible regression for WoBT capable hardware.
+- The change is self-contained: it neither alters suspend/resume
+  sequencing nor touches shared subsystems beyond wiring the standard
+  callback, and it relies only on long-standing primitives
+  (`device_may_wakeup`, `hci_get_drvdata`) already present in stable
+  releases beginning with v6.10 where `btintel_pcie` first appeared.
+- Because it fixes a real functionality gap with minimal, well-
+  understood code and matches existing drivers’ behaviour, the risk of
+  regression is low while the benefit (restoring Wake-on-BT support) is
+  high, making this patch a strong candidate for stable backporting.
 
- net/bluetooth/iso.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/bluetooth/btintel_pcie.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 88602f19decac..247f6da31f9f3 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -460,6 +460,13 @@ static int iso_connect_cis(struct sock *sk)
- 		goto unlock;
- 	}
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 58cff211ec2c1..a91e768c0c4c0 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2341,6 +2341,13 @@ static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
+ 	btintel_pcie_reset(hdev);
+ }
  
-+	/* Check if there are available buffers for output/TX. */
-+	if (iso_pi(sk)->qos.ucast.out.sdu && !hci_iso_count(hdev) &&
-+	    (hdev->iso_pkts && !hdev->iso_cnt)) {
-+		err = -ENOBUFS;
-+		goto unlock;
-+	}
++static bool btintel_pcie_wakeup(struct hci_dev *hdev)
++{
++	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
 +
- 	/* Just bind if DEFER_SETUP has been set */
- 	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
- 		hcon = hci_bind_cis(hdev, &iso_pi(sk)->dst,
++	return device_may_wakeup(&data->pdev->dev);
++}
++
+ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ {
+ 	int err;
+@@ -2366,6 +2373,7 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ 	hdev->set_diag = btintel_set_diag;
+ 	hdev->set_bdaddr = btintel_set_bdaddr;
+ 	hdev->reset = btintel_pcie_reset;
++	hdev->wakeup = btintel_pcie_wakeup;
+ 
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0) {
 -- 
 2.51.0
 
