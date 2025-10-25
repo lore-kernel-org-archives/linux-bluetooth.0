@@ -1,132 +1,157 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C81F1DA62E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 22:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D513043D3;
+	Sat, 25 Oct 2025 16:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761343650; cv=none; b=pLzixnorN4jV+4drypzLbnCvdhKJuBYSZ1a8xFFwkJS/t9LBEkf828w5YTxSDzd/qiW4nP0MyIraw19tK4nstR8HzaJtW5kpprm3X/cOFwFxRvWzqRT4JKXBkpjCkqRrqqNsjXFbgFBawkb/Q8MTlRlXHnTbvoiHXTo2sxgY50s=
+	t=1761408555; cv=none; b=hTaLBcmdggmyxLnURhCM36B7zfQAeeKQUHMoce+y+PnyyrhPdJMGVmWOD7/CytTQVBSu5lyc16l1eelxINKyCVV1+QiclQJ0YTbDr3MunWsXxPNSI/jPY5LC/EXgHtJHbq4aSfUfjCSKHqlVfS++s9c6BH2i3t2mbTiVL3LcgAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761343650; c=relaxed/simple;
-	bh=6q3Ez++GFIelpgsLgfkuBn0J8O9f3VG06ldKUEkC7DE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=qvMKik1P/zVOPg4/Cg/dseb2xT25oZP2GBFswmaoE3YKmj1Syssylf2hqliga2WyXZZmUBSqJ+gMAuL6B67sN6I4Kc8AzqaEpf9VbTSFn1D6kTAkggfPWbvA1hAsye1tDGX/MHtHubvJj2IWCiFoXUUDev0sG5frsuxHQ93HGG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KYgxgj5w; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761408555; c=relaxed/simple;
+	bh=icD1TZNA1EsLuesdMyVBsqPYejWcRPtFGUvapHk92HI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bb35cKMclc6VwxsEGVOd2NKGn27um8TK3DGh7WcacmO+9PqfiJTY84UPZ0+wqjDtytpC24B8QpsPtVsv6PeMtQvVnFgVkknjyNgE4zQzFAI6dDkpR62uGYXaNsUz0XzBz0qASAtslLcADiHVqyLdj6S9Zymtq0sEIjJezeJEgWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HUK+21xA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KYgxgj5w"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-87c13813464so33558906d6.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Oct 2025 15:07:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761343647; x=1761948447; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4YudlxwpGmlO5/sn0hrYGeKgdAhh+9K+VU8DvPc4PpU=;
-        b=KYgxgj5wXbpd8l/tDdZDwg9pINrKoV7W2m1rysFCaIFTQQhy/C8VOQaDUjApA6lbiv
-         loK4dkwyuzzkRA1rJVEfjSoG4CvJTPjMRA+I09DQkRi28+kfmhlR+PyYi6Vg+rqvTV/M
-         FMU++EvyP47Aw50dkdThrL/z95SdixRW0wQXCjRY3WpSNbS8JI+/Ak0jrQ3Wk3ovX88q
-         rW3CQasy7iGMLXzzEMhmKvqeL9fH19q0TZo80AqgT9QGzXNeO60zriDIMOsDRa2wGyGO
-         dMKj3vhZcnc69h/xMH++q6Zf+pmQ6X8MiY1yyOxr7ZhhEMFx3TYfjXR+ibPu6GH/DW2L
-         r70w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761343647; x=1761948447;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4YudlxwpGmlO5/sn0hrYGeKgdAhh+9K+VU8DvPc4PpU=;
-        b=FHd802X1emD/fR2RHYxPYfKIiqhAbb0bJ2tzLYyigIdoppFkR5Ls6THim4zxrNAdkP
-         2mDFPoKfirRkZyKTVbdN5LlvcMU6cjuCeL4utNUCwCPknTFBHsGEAc0dOjK28T9uSaM+
-         Jb8qHHMYH31bIK4qevYCCSqkwwx0TLGBD4ZF63rntKfoXU08rfEK1idFlmzJ1TfyNWaX
-         bWBi4qFL6XbuNRx1poW7SSxdU8+A4QzXIIcZIoleZlnRD9igWhcV7Ce6c381hEowZEua
-         Dkhpml4WDfhrnNTGAdNYJqyJmqw2B2BM00ycbV3pY9isVSugfi/fYbV3HlrT7OL2ilhq
-         1jNw==
-X-Gm-Message-State: AOJu0Yym3LwqQJMZDCkKl4a0muGObHFWBO2sSgE1YjvfV6RE835PhZGY
-	gflhBxqNCcryM7uu1hQwt9g0/XxYe1G668Xu9/EgFrZjpgcCk3SiPL4S1niMHQ==
-X-Gm-Gg: ASbGnctny7HiOdSLU+qapMgnABYMyKa3mQdFL3siz7rsLjHCV4YiSNLwjOcbTpXqo52
-	Ctz1raQADF1Oo8xHBXsFpyvz/IBFmQl9gNpDagv6/JJRLVjpxGAKleZiS1lU8eZySPfeMUHFWw2
-	90DBcLvo21ysL8vvOnOj9Rh86zAaX+SgXbJfkaYUezfGsKMpHXlmPS7IsUxb2pecYu9y3SPW3uz
-	3uqU6v2jQ9PvNDosgwBxfC/mkxVPTd5t6ZX2TywM9AXIOPqeIf7ci+861W/Uky2vsIMq18h7CiH
-	k1IeWC4L0a0GoTWAa1nABPopkkNoQnDPr1M1XxpUYPYmoUlEetuNDIsqoiWHyMTRZBZSB9fC8QL
-	HZrKF5iuzcVaRsm1W9WJ6VsK1skLQw2daSc0Ji0CtPv71mjAbhtgwpCW9Wi6X0YIo3fKcJOdqGJ
-	RN5GRQ54KAHnAhgRRs2A==
-X-Google-Smtp-Source: AGHT+IHDSe1gIA7QMKxUHL96JWgFIvj2OBsfuRdV1mu9VQ5PE/YqlvboIDZJyzp3Vb5tnm6WS3RYqQ==
-X-Received: by 2002:a05:6214:2406:b0:87d:e77e:4df1 with SMTP id 6a1803df08f44-87de77e4e55mr191646816d6.60.1761343646903;
-        Fri, 24 Oct 2025 15:07:26 -0700 (PDT)
-Received: from [172.17.0.2] ([145.132.103.19])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87fc4934fa1sm2186686d6.32.2025.10.24.15.07.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Oct 2025 15:07:26 -0700 (PDT)
-Message-ID: <68fbf89e.050a0220.1fcc29.0dbe@mx.google.com>
-Date: Fri, 24 Oct 2025 15:07:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4665709264732576748=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HUK+21xA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8376C113D0;
+	Sat, 25 Oct 2025 16:09:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761408555;
+	bh=icD1TZNA1EsLuesdMyVBsqPYejWcRPtFGUvapHk92HI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=HUK+21xAk0VU7vPmZYFfWHG0duvuP1r1dYAv9rOg2N8+xsRzWP/6XRVX2T8W6DGnC
+	 jYatBumvwSLkpMVvkf90x6+6R+JNY4OaYeOexLraR+x/4LCjwje8tIKYclEPJ1YWOz
+	 snv5ySnTJ2lD2BT9cisZbSbn0F09MV7Pi3PNyIsUdJg7k6xAUdQ21h9aQl698cZQaI
+	 ZMJ3QOZ0StdFx+NfkSDBrJh9MgPfDglSK9PXtwtcGzSDzp2qHaDhBgpKkqZ5ZbpNMF
+	 RYF8s+d4icd5KvH7ck8NhExUU8tfj5172yV42IG7sl/ICOobEHeuntW0Uxl61pCuNi
+	 wSvnYeSdDAdow==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Chris Lu <chris.lu@mediatek.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH AUTOSEL 6.17-6.12] Bluetooth: btusb: Add new VID/PID 13d3/3633 for MT7922
+Date: Sat, 25 Oct 2025 11:53:56 -0400
+Message-ID: <20251025160905.3857885-5-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
+References: <20251025160905.3857885-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2,01/12] device: Add initial support for setting DEVICE_FLAG_PAST
-In-Reply-To: <20251024204039.693918-1-luiz.dentz@gmail.com>
-References: <20251024204039.693918-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.17.5
+Content-Transfer-Encoding: 8bit
 
---===============4665709264732576748==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Chris Lu <chris.lu@mediatek.com>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit 70cd38d22d4659ca8133c7124528c90678215dda ]
 
-Dear submitter,
+Add VID 13d3 & PID 3633 for MediaTek MT7922 USB Bluetooth chip.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1015647
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
----Test result---
+T:  Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3633 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.24 seconds
-BuildEll                      PASS      20.34 seconds
-BluezMake                     PASS      2693.38 seconds
-MakeCheck                     PASS      20.63 seconds
-MakeDistcheck                 PASS      190.09 seconds
-CheckValgrind                 PASS      241.66 seconds
-CheckSmatch                   WARNING   316.05 seconds
-bluezmakeextell               PASS      131.28 seconds
-IncrementalBuild              PENDING   0.29 seconds
-ScanBuild                     PASS      945.85 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Regards,
-Linux Bluetooth
 
+LLM Generated explanations, may be completely bogus:
 
---===============4665709264732576748==--
+YES
+- `drivers/bluetooth/btusb.c:704` adds the IMC Networks VID/PID pair
+  `13d3:3633` to `quirks_table` with the existing `BTUSB_MEDIATEK |
+  BTUSB_WIDEBAND_SPEECH` flags, so the MT7922-based dongle can be
+  recognized as an already-supported MediaTek device variant.
+- During probe, devices that match `quirks_table` inherit the
+  `driver_info` bits (`drivers/bluetooth/btusb.c:3962-3968`); without
+  this entry the new dongle only matches the generic class entry, leaves
+  `driver_info` zero, and skips all MediaTek-specific handling.
+- The MediaTek flag is what triggers allocation of the vendor private
+  data and wires up the MTK callbacks
+  (`drivers/bluetooth/btusb.c:4055-4160`), including `btusb_mtk_setup`,
+  suspend/resume hooks, and the wideband speech capability
+  (`drivers/bluetooth/btusb.c:4255-4256`). Missing those pieces is known
+  to make MT79xx adapters either fail to initialize or lose SCO/WBS
+  features, so the absence manifests as a real user-visible regression
+  on that hardware.
+- Change scope is limited to a single new table entry, touching no
+  shared logic, so regression risk is negligible while fixing a concrete
+  compatibility problem; identical patches for neighboring MT7922/MT7925
+  IDs already live in stable kernels, making this consistent with past
+  backports.
+
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b231caa84757c..5e9ebf0c53125 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -701,6 +701,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3615), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3633), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x35f5, 0x7922), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 
+-- 
+2.51.0
+
