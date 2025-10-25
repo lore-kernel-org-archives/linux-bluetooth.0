@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E886B31DDB6;
-	Sat, 25 Oct 2025 16:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D9D3218B3;
+	Sat, 25 Oct 2025 16:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761409730; cv=none; b=J3sVjrLS3qJ/QImnGE16ZBJEWCVFAgXy6IUdzbBx+eGGKKTjFHSRjn02Bx5efgrUqI9y7Oi2wxbVpY4WzXTSOXCBVIy2ela9+Dk1I+Qi/AsYFUC1Fk+jDnZzNPPGWivI+cpV++YiA9TaHgcCkChsNtA2uJ3Fq2NMvBp76CVZGws=
+	t=1761409747; cv=none; b=UEUPw2+cmlVgb/BliUB/l54puT3PzCIOVQzaofZPOYTPp7WwNZdR09pybvVpO1FUI9fnCd4XRbPs48CftCNysU2ytZAXMpBFRN86ADjlQYPouO+3wSu2HIXzQx7dZuF6wVPU1D1SgTc+Yiear2zGopmZ3UAOswrAvyIZAVXktzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761409730; c=relaxed/simple;
-	bh=ICEVXZZwVL6vwRTEshSvhyGw5kE+B0uJknae4Y+OU7I=;
+	s=arc-20240116; t=1761409747; c=relaxed/simple;
+	bh=/qxi8hH+CcMDXpSa5nTwJ0H57z0b1pcxUcrzbUEntpc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=spiFNToztnGuq92k17zLKQhPRoxDiH9D93aG38lhVSFAJ8WheHaMhIqfuYTqWn1c/OFbTZgsNSg3JbR2uEkzzVXX1aWzndACKlxdvHxVk2Yf3bCO9tg6FPrilNEyBBcKASkSO2HUDwCD04VGY3YoYLisW41L/rvzGf866y0XABY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+W3+AA3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=PXdH6uZ+7bmsTZ8ov4WxbqtLqyA6S2twNZ6wBxgHnTfF7kom5uqmjeapYjRE8lMRBA1PgZhxC+vgU0Qw8H3CLTkre9tznapcQWVjMNCzwzFEAhf/uoGREFPHd41jA5ZOwDqzJb3ABWLSLHuy6ZNxmJRGKraPH0HYvtgEaLB7CEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTl7vdtJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+W3+AA3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF6D7C4CEF5;
-	Sat, 25 Oct 2025 16:28:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTl7vdtJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5D42C4CEFF;
+	Sat, 25 Oct 2025 16:29:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761409729;
-	bh=ICEVXZZwVL6vwRTEshSvhyGw5kE+B0uJknae4Y+OU7I=;
+	s=k20201202; t=1761409747;
+	bh=/qxi8hH+CcMDXpSa5nTwJ0H57z0b1pcxUcrzbUEntpc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X+W3+AA3ir4jByMeSIVoEj4LkbvKDw0TNiFK731YXrIxbI9qvLFZ37KlYecH6g81g
-	 0fw/PcZqukQS7eiin+RXx0ywL+0XuclO0wcyZ85WsFLXkcj3rGYOruS+7Wlhi4iqTf
-	 yueQiJVERDJvUuL30u7MC24lArcTbqZSNPEeHpzxjPfspZjVHU0TfqJr+sLMNT+/7O
-	 +ATGBn4J+gnOlbGRzlVP4snWwK1EDjDXaZZH+dd4E1OowMjigqiO543+6QWLmzj1hr
-	 JJjFUzNurAI/pcJZ+D448/JCXztVPre7y5oENlR55f8jXEtBV4y0Mh7+EfZcFG0pSP
-	 LXOo8BCoEgbiw==
+	b=jTl7vdtJmjeEFd2EV6UmhXpOc3NOjFt2R7dAn9rm387KCl1MogAUMVvirTf5xQNWv
+	 bZd1L4bmmaec1BPCx/7wesIx50lPUnXjeSFVWLEo8MHTstaGoLgcHs30AaSZJYvWC6
+	 YS85lF5GVDoznJ2EnBbvkbbb8tdKdezVXa0oYPMmr4Czu3wiRT0FaNDYBkNG+phsoq
+	 n0fUM9qGnYkv0SmMstCFcgGpkGgEd7HKNZFHrOXIC+VvB1c1jrILp2DTnHAw2fMXb4
+	 xHxRG3jpzxpq7vAYH+bcHe05d7jPPMaLsmlxWvB+Q9oj3y97e2/TPGek8+w24WwQ3j
+	 O4HslXIShbV1Q==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	cen zhang <zzzccc427@gmail.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] Bluetooth: ISO: Use sk_sndtimeo as conn_timeout
-Date: Sat, 25 Oct 2025 12:01:11 -0400
-Message-ID: <20251025160905.3857885-440-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-5.4] Bluetooth: SCO: Fix UAF on sco_conn_free
+Date: Sat, 25 Oct 2025 12:01:18 -0400
+Message-ID: <20251025160905.3857885-447-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251025160905.3857885-1-sashal@kernel.org>
 References: <20251025160905.3857885-1-sashal@kernel.org>
@@ -55,236 +56,162 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-[ Upstream commit 339a87883a14d6a818ca436fed41aa5d10e0f4bd ]
+[ Upstream commit ecb9a843be4d6fd710d7026e359f21015a062572 ]
 
-This aligns the usage of socket sk_sndtimeo as conn_timeout when
-initiating a connection and then use it when scheduling the
-resulting HCI command, similar to what has been done in bf98feea5b65
-("Bluetooth: hci_conn: Always use sk_timeo as conn_timeout").
+BUG: KASAN: slab-use-after-free in sco_conn_free net/bluetooth/sco.c:87 [inline]
+BUG: KASAN: slab-use-after-free in kref_put include/linux/kref.h:65 [inline]
+BUG: KASAN: slab-use-after-free in sco_conn_put+0xdd/0x410
+net/bluetooth/sco.c:107
+Write of size 8 at addr ffff88811cb96b50 by task kworker/u17:4/352
 
+CPU: 1 UID: 0 PID: 352 Comm: kworker/u17:4 Not tainted
+6.17.0-rc5-g717368f83676 #4 PREEMPT(voluntary)
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: hci13 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x10b/0x170 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0x191/0x550 mm/kasan/report.c:482
+ kasan_report+0xc4/0x100 mm/kasan/report.c:595
+ sco_conn_free net/bluetooth/sco.c:87 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ sco_conn_put+0xdd/0x410 net/bluetooth/sco.c:107
+ sco_connect_cfm+0xb4/0xae0 net/bluetooth/sco.c:1441
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2082 [inline]
+ hci_conn_failed+0x20a/0x2e0 net/bluetooth/hci_conn.c:1313
+ hci_conn_unlink+0x55f/0x810 net/bluetooth/hci_conn.c:1121
+ hci_conn_del+0xb6/0x1110 net/bluetooth/hci_conn.c:1147
+ hci_abort_conn_sync+0x8c5/0xbb0 net/bluetooth/hci_sync.c:5689
+ hci_cmd_sync_work+0x281/0x380 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0x77e/0x1040 kernel/workqueue.c:3319
+ worker_thread+0xbee/0x1200 kernel/workqueue.c:3400
+ kthread+0x3c7/0x870 kernel/kthread.c:463
+ ret_from_fork+0x13a/0x1e0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Allocated by task 31370:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x30/0x70 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:388 [inline]
+ __kasan_kmalloc+0x82/0x90 mm/kasan/common.c:405
+ kasan_kmalloc include/linux/kasan.h:260 [inline]
+ __do_kmalloc_node mm/slub.c:4382 [inline]
+ __kmalloc_noprof+0x22f/0x390 mm/slub.c:4394
+ kmalloc_noprof include/linux/slab.h:909 [inline]
+ sk_prot_alloc+0xae/0x220 net/core/sock.c:2239
+ sk_alloc+0x34/0x5a0 net/core/sock.c:2295
+ bt_sock_alloc+0x3c/0x330 net/bluetooth/af_bluetooth.c:151
+ sco_sock_alloc net/bluetooth/sco.c:562 [inline]
+ sco_sock_create+0xc0/0x350 net/bluetooth/sco.c:593
+ bt_sock_create+0x161/0x3b0 net/bluetooth/af_bluetooth.c:135
+ __sock_create+0x3ad/0x780 net/socket.c:1589
+ sock_create net/socket.c:1647 [inline]
+ __sys_socket_create net/socket.c:1684 [inline]
+ __sys_socket+0xd5/0x330 net/socket.c:1731
+ __do_sys_socket net/socket.c:1745 [inline]
+ __se_sys_socket net/socket.c:1743 [inline]
+ __x64_sys_socket+0x7a/0x90 net/socket.c:1743
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc7/0x240 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 31374:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x30/0x70 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:576
+ poison_slab_object mm/kasan/common.c:243 [inline]
+ __kasan_slab_free+0x3d/0x50 mm/kasan/common.c:275
+ kasan_slab_free include/linux/kasan.h:233 [inline]
+ slab_free_hook mm/slub.c:2428 [inline]
+ slab_free mm/slub.c:4701 [inline]
+ kfree+0x199/0x3b0 mm/slub.c:4900
+ sk_prot_free net/core/sock.c:2278 [inline]
+ __sk_destruct+0x4aa/0x630 net/core/sock.c:2373
+ sco_sock_release+0x2ad/0x300 net/bluetooth/sco.c:1333
+ __sock_release net/socket.c:649 [inline]
+ sock_close+0xb8/0x230 net/socket.c:1439
+ __fput+0x3d1/0x9e0 fs/file_table.c:468
+ task_work_run+0x206/0x2a0 kernel/task_work.c:227
+ get_signal+0x1201/0x1410 kernel/signal.c:2807
+ arch_do_signal_or_restart+0x34/0x740 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop+0x68/0xc0 kernel/entry/common.c:40
+ exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
+ syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
+ do_syscall_64+0x1dd/0x240 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Reported-by: cen zhang <zzzccc427@gmail.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-YES – this patch fixes a real regression in the ISO connection paths and
-is low‑risk for stable
+YES
+**Why It Matters**
+- The crash comes from `sco_conn_free` writing through `conn->sk` even
+  after the socket is destroyed; that code (net/bluetooth/sco.c:80-93)
+  assumes `conn->sk` still points to a live socket and dereferences it,
+  matching the KASAN trace in the commit message.
+- In the orphan-socket path (`sco_sock_release` → `sco_sock_kill`,
+  net/bluetooth/sco.c:1332-1344 and :494-506) the connection’s back
+  pointer was never cleared, so the destructor path would free the
+  socket while the connection still held a stale pointer, leading to the
+  observed UAF.
 
-- The ISO helpers started passing `conn->conn_timeout` into the
-  synchronous HCI waits in v6.10 (commit bf98feea5b65), but the CIS/BIS
-  creation paths never stored a timeout, leaving the field zero. Every
-  call to `__hci_cmd_sync_status_sk()` that waits for
-  `HCI_LE_CREATE_CIS`, `HCI_OP_LE_BIG_CREATE_SYNC`, etc. therefore times
-  out immediately (`wait_event_timeout(..., 0)` returns 0) and the host
-  aborts the command, breaking CIS/BIS bring-up. See the wait sites in
-  `net/bluetooth/hci_sync.c:6723`, `net/bluetooth/hci_sync.c:7060`, and
-  `net/bluetooth/hci_sync.c:7158`.
+**How The Fix Helps**
+- The new block in `sco_sock_kill` (net/bluetooth/sco.c:501-505)
+  acquires the per-connection spinlock and sets `conn->sk = NULL` before
+  the final `sock_put(sk)`. As a result, `sco_conn_free` now sees a NULL
+  pointer and skips the dereference, eliminating the UAF.
+- This mirrors the already-safe release path in `sco_chan_del`, which
+  has long cleared `conn->sk` under the same lock
+  (net/bluetooth/sco.c:242-247), so the fix simply brings the orphan
+  cleanup path in line with existing, proven logic.
 
-- The patch threads the socket’s send timeout through all ISO connection
-  constructors: new `u16 timeout` parameters in `hci_bind_cis/bis()` and
-  `hci_connect_cis/bis()` and the internal helper `hci_add_bis()` now
-  store the value in `conn->conn_timeout`
-  (`net/bluetooth/hci_conn.c:1581`, `net/bluetooth/hci_conn.c:1938`,
-  `net/bluetooth/hci_conn.c:2199`, `net/bluetooth/hci_conn.c:2326`). The
-  ISO socket code passes `READ_ONCE(sk->sk_sndtimeo)` into those helpers
-  (`net/bluetooth/iso.c:373`, `net/bluetooth/iso.c:383`,
-  `net/bluetooth/iso.c:471`, `net/bluetooth/iso.c:480`), so the HCI
-  command waits now honor the per-socket timeout instead of timing out
-  instantly.
+**Risk Assessment**
+- Patch is self-contained and tiny: one guarded assignment under an
+  existing spinlock in a single file, with no ABI or behavioral changes
+  for healthy sockets.
+- It specifically targets a genuine crash seen on 6.17-rc5, affecting
+  failing/aborted SCO connections; leaving it unfixed keeps a
+  reproducible UAF around kernel worker threads.
+- The locking used is already standard for this structure, so the
+  regression surface is negligible—other code that needs `conn->sk`
+  already holds the same lock and tolerates NULL.
 
-- Default ISO connection timeout is still sourced from
-  `ISO_CONN_TIMEOUT`, now expressed as `secs_to_jiffies(20)` in
-  `net/bluetooth/iso.c:91`, matching the value assigned to
-  `sk->sk_sndtimeo` (`net/bluetooth/iso.c:913`); this is consistent with
-  the intent of the earlier regression fix. No other subsystems are
-  touched.
+**Backport Notes**
+- No new helpers or dependencies are introduced, so the change applies
+  cleanly to maintained stable branches that still share this SCO logic.
+- Given the real-world crash, low risk, and narrow scope, this is an
+  excellent candidate for stable backporting.
 
-- The change is confined to the Bluetooth ISO stack, mirrors the earlier
-  ACL/SCO fix, and does not introduce new dependencies. Without it,
-  CIS/BIS connection establishment remains broken on any stable kernel
-  that picked up bf98feea5b65 (v6.10 and newer), so backporting is
-  strongly advised.
+ net/bluetooth/sco.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
- include/net/bluetooth/hci_core.h | 10 ++++++----
- net/bluetooth/hci_conn.c         | 20 ++++++++++++--------
- net/bluetooth/iso.c              | 16 ++++++++++------
- 3 files changed, 28 insertions(+), 18 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6560b32f31255..a068beae93186 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1587,16 +1587,18 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 				 __u16 setting, struct bt_codec *codec,
- 				 u16 timeout);
- struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
--			      __u8 dst_type, struct bt_iso_qos *qos);
-+			      __u8 dst_type, struct bt_iso_qos *qos,
-+			      u16 timeout);
- struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
- 			      struct bt_iso_qos *qos,
--			      __u8 base_len, __u8 *base);
-+			      __u8 base_len, __u8 *base, u16 timeout);
- struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
--				 __u8 dst_type, struct bt_iso_qos *qos);
-+				 __u8 dst_type, struct bt_iso_qos *qos,
-+				 u16 timeout);
- struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
- 				 __u8 dst_type, __u8 sid,
- 				 struct bt_iso_qos *qos,
--				 __u8 data_len, __u8 *data);
-+				 __u8 data_len, __u8 *data, u16 timeout);
- struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
- 		       __u8 dst_type, __u8 sid, struct bt_iso_qos *qos);
- int hci_conn_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index e524bb59bff23..f44286e59d316 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1540,7 +1540,7 @@ static int qos_set_bis(struct hci_dev *hdev, struct bt_iso_qos *qos)
- /* This function requires the caller holds hdev->lock */
- static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
- 				    __u8 sid, struct bt_iso_qos *qos,
--				    __u8 base_len, __u8 *base)
-+				    __u8 base_len, __u8 *base, u16 timeout)
- {
- 	struct hci_conn *conn;
- 	int err;
-@@ -1582,6 +1582,7 @@ static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index d382d980fd9a7..ab0cf442d57b9 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -498,6 +498,13 @@ static void sco_sock_kill(struct sock *sk)
  
- 	conn->state = BT_CONNECT;
- 	conn->sid = sid;
-+	conn->conn_timeout = timeout;
+ 	BT_DBG("sk %p state %d", sk, sk->sk_state);
  
- 	hci_conn_hold(conn);
- 	return conn;
-@@ -1922,7 +1923,8 @@ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
- }
- 
- struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
--			      __u8 dst_type, struct bt_iso_qos *qos)
-+			      __u8 dst_type, struct bt_iso_qos *qos,
-+			      u16 timeout)
- {
- 	struct hci_conn *cis;
- 
-@@ -1937,6 +1939,7 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
- 		cis->dst_type = dst_type;
- 		cis->iso_qos.ucast.cig = BT_ISO_QOS_CIG_UNSET;
- 		cis->iso_qos.ucast.cis = BT_ISO_QOS_CIS_UNSET;
-+		cis->conn_timeout = timeout;
- 	}
- 
- 	if (cis->state == BT_CONNECTED)
-@@ -2176,7 +2179,7 @@ static void create_big_complete(struct hci_dev *hdev, void *data, int err)
- 
- struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
- 			      struct bt_iso_qos *qos,
--			      __u8 base_len, __u8 *base)
-+			      __u8 base_len, __u8 *base, u16 timeout)
- {
- 	struct hci_conn *conn;
- 	struct hci_conn *parent;
-@@ -2197,7 +2200,7 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
- 						   base, base_len);
- 
- 	/* We need hci_conn object using the BDADDR_ANY as dst */
--	conn = hci_add_bis(hdev, dst, sid, qos, base_len, eir);
-+	conn = hci_add_bis(hdev, dst, sid, qos, base_len, eir, timeout);
- 	if (IS_ERR(conn))
- 		return conn;
- 
-@@ -2250,13 +2253,13 @@ static void bis_mark_per_adv(struct hci_conn *conn, void *data)
- struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
- 				 __u8 dst_type, __u8 sid,
- 				 struct bt_iso_qos *qos,
--				 __u8 base_len, __u8 *base)
-+				 __u8 base_len, __u8 *base, u16 timeout)
- {
- 	struct hci_conn *conn;
- 	int err;
- 	struct iso_list_data data;
- 
--	conn = hci_bind_bis(hdev, dst, sid, qos, base_len, base);
-+	conn = hci_bind_bis(hdev, dst, sid, qos, base_len, base, timeout);
- 	if (IS_ERR(conn))
- 		return conn;
- 
-@@ -2299,7 +2302,8 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
- }
- 
- struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
--				 __u8 dst_type, struct bt_iso_qos *qos)
-+				 __u8 dst_type, struct bt_iso_qos *qos,
-+				 u16 timeout)
- {
- 	struct hci_conn *le;
- 	struct hci_conn *cis;
-@@ -2323,7 +2327,7 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
- 	hci_iso_qos_setup(hdev, le, &qos->ucast.in,
- 			  le->le_rx_phy ? le->le_rx_phy : hdev->le_rx_def_phys);
- 
--	cis = hci_bind_cis(hdev, dst, dst_type, qos);
-+	cis = hci_bind_cis(hdev, dst, dst_type, qos, timeout);
- 	if (IS_ERR(cis)) {
- 		hci_conn_drop(le);
- 		return cis;
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 247f6da31f9f3..9b263d061e051 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -91,8 +91,8 @@ static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
- 				 iso_sock_match_t match, void *data);
- 
- /* ---- ISO timers ---- */
--#define ISO_CONN_TIMEOUT	(HZ * 40)
--#define ISO_DISCONN_TIMEOUT	(HZ * 2)
-+#define ISO_CONN_TIMEOUT	secs_to_jiffies(20)
-+#define ISO_DISCONN_TIMEOUT	secs_to_jiffies(2)
- 
- static void iso_conn_free(struct kref *ref)
- {
-@@ -369,7 +369,8 @@ static int iso_connect_bis(struct sock *sk)
- 	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
- 		hcon = hci_bind_bis(hdev, &iso_pi(sk)->dst, iso_pi(sk)->bc_sid,
- 				    &iso_pi(sk)->qos, iso_pi(sk)->base_len,
--				    iso_pi(sk)->base);
-+				    iso_pi(sk)->base,
-+				    READ_ONCE(sk->sk_sndtimeo));
- 		if (IS_ERR(hcon)) {
- 			err = PTR_ERR(hcon);
- 			goto unlock;
-@@ -378,7 +379,8 @@ static int iso_connect_bis(struct sock *sk)
- 		hcon = hci_connect_bis(hdev, &iso_pi(sk)->dst,
- 				       le_addr_type(iso_pi(sk)->dst_type),
- 				       iso_pi(sk)->bc_sid, &iso_pi(sk)->qos,
--				       iso_pi(sk)->base_len, iso_pi(sk)->base);
-+				       iso_pi(sk)->base_len, iso_pi(sk)->base,
-+				       READ_ONCE(sk->sk_sndtimeo));
- 		if (IS_ERR(hcon)) {
- 			err = PTR_ERR(hcon);
- 			goto unlock;
-@@ -471,7 +473,8 @@ static int iso_connect_cis(struct sock *sk)
- 	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
- 		hcon = hci_bind_cis(hdev, &iso_pi(sk)->dst,
- 				    le_addr_type(iso_pi(sk)->dst_type),
--				    &iso_pi(sk)->qos);
-+				    &iso_pi(sk)->qos,
-+				    READ_ONCE(sk->sk_sndtimeo));
- 		if (IS_ERR(hcon)) {
- 			err = PTR_ERR(hcon);
- 			goto unlock;
-@@ -479,7 +482,8 @@ static int iso_connect_cis(struct sock *sk)
- 	} else {
- 		hcon = hci_connect_cis(hdev, &iso_pi(sk)->dst,
- 				       le_addr_type(iso_pi(sk)->dst_type),
--				       &iso_pi(sk)->qos);
-+				       &iso_pi(sk)->qos,
-+				       READ_ONCE(sk->sk_sndtimeo));
- 		if (IS_ERR(hcon)) {
- 			err = PTR_ERR(hcon);
- 			goto unlock;
++	/* Sock is dead, so set conn->sk to NULL to avoid possible UAF */
++	if (sco_pi(sk)->conn) {
++		sco_conn_lock(sco_pi(sk)->conn);
++		sco_pi(sk)->conn->sk = NULL;
++		sco_conn_unlock(sco_pi(sk)->conn);
++	}
++
+ 	/* Kill poor orphan */
+ 	bt_sock_unlink(&sco_sk_list, sk);
+ 	sock_set_flag(sk, SOCK_DEAD);
 -- 
 2.51.0
 
