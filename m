@@ -1,157 +1,252 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1242D24A7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Oct 2025 08:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E9A1E1DFC;
+	Mon, 27 Oct 2025 10:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761554506; cv=none; b=d7zh2/vTFMZCMGI9c/BkA0ZDKb1wCL8mqEgMbwXcx/4QipsfZa2AZ3YMATyIkllzWDOIPsMFAZNWON4LDixuoIEpUvqDuDuiG+JW4fp0AcoLnJVb7qUi0jKNa5er/vF3X38FrZZAERwugYLmxExjB03cG7CKoVgBHGIQ/B1IpoA=
+	t=1761559708; cv=none; b=DxnmE119fZ3+kij9G1ZMPElgnIQ+VwI04+dvEzHtA7wxBV8kuJF+Nb1np6eS/bPvGt1+4Mwxg0kDRnoEygKvazjnwG95Zdckb4wdbNcW4YF6bJb1rnKfDr+qKAPLWjcY8Y2Cm+Baf4HugKVp40H4sV8JZWjxyei7xXhP+M7Tqu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761554506; c=relaxed/simple;
-	bh=3mpJXernIW0AHIgOJwNxHUyTBrcyw4mbMdmm3oTC7Cg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=sMpKfQ7okq0G+2Z7p1lnN1EyjoKGr2dxCpd3w7OQJQJniwtv9bKvHUwjwbbzjOfiwVIbrB0Fle2S6rO/gcmOXWkfCWdEVs+Op0pAIlJztcXUa3jbwpfamOXQcaI8OwxCB70PXx1L6Fgk12xz/F5Hdw6mSxK3+wicLr/W9MeWMN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kxdpE/iB; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761559708; c=relaxed/simple;
+	bh=6cQdiRpHxGaSASPH+29ugh5AbQWjEi4s33N7R1Ic96I=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=reMtAcbFI0nL11JfPlctAzQfRuOJMUSkPR+LiiCsG0m1wpqVY7L/HD8orGyFq6TqS9/oxTU6JUgmkudD8SJHv16tkl87jlG8dAvUHxnbk94UzJY1tTjUpbu828VvNPOmYNPThG0jTj8zrr8Wiqp4uzuALUcqbbM9FxIEhCxbCPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=blGwpcR/; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kxdpE/iB"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7a28226dd13so3127046b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Oct 2025 01:41:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761554504; x=1762159304; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=waVIV+XSzpiiscSBVMAm/ShX/0TxrQHgqwGfq9bK+8A=;
-        b=kxdpE/iBVVDQEZVoGVg0DFZW0fCoGZwMkonhHLnYjdps0MjtN82uQj27q8rstLi2wy
-         IwGrghHYVFtyDErUAPiUOFxCXi0BL2EO4Auu/4aFb1VLpN1RlFrXI+jAOd/Y9Q755LDQ
-         rG/9QclUkz7x3Quj27eVETRxn3yn6oIMrtTf/8gcFokbcuGilwjNHW1Q+vvbYyJFe3TK
-         gX5gs1f6r2y4Hd4Sa7pICi2Gme2Ot6EEWFBtbEPGpf0HaEjJkpypsX0QZL8zrhnd+fbO
-         V9MU6Q/J35slWys9MIuYSo/0RwkxfffFFvxAXfJTWLATF2U3Vm4V8VfJ2HyiBg4v1iaD
-         vMwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761554504; x=1762159304;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=waVIV+XSzpiiscSBVMAm/ShX/0TxrQHgqwGfq9bK+8A=;
-        b=Bp41Sj7mVLlaVo45/oc/rThZ4bYutY9F6huJm1ptml5EAmm9++Fv5zEEF/SCb3KLlE
-         +c3fnHw7MNM19LSKrgMa8PtuUeRc/SmxUL963A/TmnGJ1JvtfRkwLwpl3U8PdfWnlKLw
-         v5PTaZ10cMsERwrKmYecQPLXAMB7+4+7vYeZEvqkJ6YtY2zkdCmW/Xgyil4EXywF8NdW
-         9eW2F6R4mGWLfXfcWXn4obx6Z3WA8jyoZaV0ZfF55Oakm3+hoUdMxM6h19iQn2MyGpI7
-         bU8UsbMKgojYd1XFb0U86wgZpckutpf8oM2bSya53u0VUwvgbbNbhkTwGE3tKcD1X+po
-         WVng==
-X-Gm-Message-State: AOJu0YxsrPB3uC1i8l50NNFVqHnhy8MecqcVGiVD8tGoG6SwfX5cd7it
-	+MF3VBJMc0nAKlqu8aD89GvRQ8wh/qu/OBf6K9o/H/lM4ArQd/OSeCcK0/M22g==
-X-Gm-Gg: ASbGncuR8YTmHtJdu3MUgP7XFZt8CLlPiNUVz/46cmlFhy3T46Xi1Q9gMtBPWUl2G/O
-	SSo+pzyLGyK9wZPBEkrvrG5Nt8NyMnO4CKm7TWPRBesNCpgx4+bv/wZNY9O/lAoMC8o8zdtcLgD
-	Qrlx/8lg5jw7UbI4wwiACtdL7yud9RWHmXJbg9h9RYg1sCHybWjUps12J//hSjfFiWCrUsMC+4W
-	cRWlwHCLsnVkfo0XaRg+WHXzD6wa6fIcW+gp8haXnhxJwaogCuxsVpDMxCTkSmAIh79BCyVYlMB
-	27ZrtxmOfKRnLdgr2OjmFcCZqvsZIwt2GHootT7XLGJq3d5R6qGQZ5yhKlk0AWvwnevHVLIx14r
-	iiPso+s+Ye4GYGZiFBHInvUu/t1+z3WbvY/UXroF8uvOk97NpyP3+xFuUdfBbos+ROKdo3pwn6v
-	ce4PNZstk=
-X-Google-Smtp-Source: AGHT+IE1VctIL4oND/EjNrYy+V9bRFYbWczMlXEu7u3lsc12k94u/gx8tUkRtUV2CeLxCq7iUiqUIQ==
-X-Received: by 2002:a05:6a00:22d4:b0:7a2:1bfe:ac75 with SMTP id d2e1a72fcca58-7a220b1995cmr42421945b3a.16.1761554503603;
-        Mon, 27 Oct 2025 01:41:43 -0700 (PDT)
-Received: from [172.17.0.2] ([172.182.211.24])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a414049c01sm7237963b3a.37.2025.10.27.01.41.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 01:41:43 -0700 (PDT)
-Message-ID: <68ff3047.050a0220.c12d5.291b@mx.google.com>
-Date: Mon, 27 Oct 2025 01:41:43 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0722570742126107336=="
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="blGwpcR/"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=DNc7Rk44kEIOfqYX6DTwbrnkDvExScI7F/8Nc7y8mkw=;
+	t=1761559707; x=1762769307; b=blGwpcR/lO8s54fKp8tYzM4vDPleLA0aEcf84bCJPow3BBT
+	A8ueA9/2Z4T5nZicHYIEHbc2wH3NASU5mkzZxwRLr4ITsLjvBKkhf7vuEwgJv9KUm6q1x4zeLqvvk
+	fciCJLcG35dGD8sxhH/sCnt/cbuiFP06L0s3kME2h/zeli4eLv2CVvsJ3Diw+qEazvJvCj5qD/vVm
+	hjOz9adK3DjtFkAr4C/gOW8INNEZk94uKd5CSAmvZdD0eZWmLmCm9WHoiFFdW5xq3+bskVRvutyP1
+	SmAnBuTV8cz9RC2rmj4yGu0XBofauUz7Tre9LgxVoId+EQeBQcYQc17G17XNYufQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vDK9H-0000000AQMF-1ssO;
+	Mon, 27 Oct 2025 11:08:23 +0100
+Message-ID: <7acf9a2f2cec5d00fc1581ad3a12b1f4b580b349.camel@sipsolutions.net>
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Support function level reset
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Bjorn Helgaas <helgaas@kernel.org>, "Devegowda, Chandrashekar"
+	 <chandrashekar.devegowda@intel.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "linux-bluetooth@vger.kernel.org"	 <linux-bluetooth@vger.kernel.org>,
+ "linux-pci@vger.kernel.org"	 <linux-pci@vger.kernel.org>,
+ "bhelgaas@google.com" <bhelgaas@google.com>,  "Srivatsa, Ravishankar"
+ <ravishankar.srivatsa@intel.com>, "Tumkur Narayan, Chethan"
+ <chethan.tumkur.narayan@intel.com>, "K, Kiran" <kiran.k@intel.com>, "Ben
+ Ami, Golan" <golan.ben.ami@intel.com>
+Date: Mon, 27 Oct 2025 11:08:22 +0100
+In-Reply-To: <20251023203603.GA1312405@bhelgaas>
+References: <20251023203603.GA1312405@bhelgaas>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, max.chou@realtek.com
-Subject: RE: Bluetooth: btrtl: Add the support for RTL8761CUV
-In-Reply-To: <20251027081044.11158-1-max.chou@realtek.com>
-References: <20251027081044.11158-1-max.chou@realtek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-malware-bazaar: not-scanned
 
---===============0722570742126107336==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+So I've been asked to chime in here, mostly on behalf of iwlwifi, and
+I'll actually respond to two of your messages a bit.
 
-Dear submitter,
+(from your previous email first:)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1016089
+> Sort of weird that the commit log mentions FLR, but it's not mentioned
+> in the patch itself except for BTINTEL_PCIE_FLR_RESET_MAX_RETRY.
+> Apparently the assumption is that DSM_SET_RESET_METHOD_PCIE performs
+> an FLR.
 
----Test result---
+It's not just weird, it's simply wrong. This is not about FLR at all.
 
-Test Summary:
-CheckPatch                    PENDING   0.43 seconds
-GitLint                       PENDING   0.30 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      24.77 seconds
-CheckAllWarning               PASS      27.18 seconds
-CheckSparse                   PASS      30.85 seconds
-BuildKernel32                 PASS      24.55 seconds
-TestRunnerSetup               PASS      492.90 seconds
-TestRunner_l2cap-tester       PASS      23.58 seconds
-TestRunner_iso-tester         FAIL      47.56 seconds
-TestRunner_bnep-tester        PASS      6.04 seconds
-TestRunner_mgmt-tester        FAIL      114.33 seconds
-TestRunner_rfcomm-tester      PASS      9.22 seconds
-TestRunner_sco-tester         PASS      14.30 seconds
-TestRunner_ioctl-tester       PASS      9.97 seconds
-TestRunner_mesh-tester        FAIL      11.40 seconds
-TestRunner_smp-tester         PASS      8.47 seconds
-TestRunner_userchan-tester    PASS      6.44 seconds
-IncrementalBuild              PENDING   0.55 seconds
+> Since this is an ACPI _DSM, presumably this mechanism only works for
+> devices built into the platform, not for any potential plug-in devices
+> that would not be described via ACPI.  I guess this driver probably
+> already only works for built-in devices because it also uses
+> DSM_SET_WDISABLE2_DELAY and DSM_SET_RESET_METHOD.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+It ... depends. Sometimes it can work even for discrete devices if the
+platform ACPI is prepared for it. But if you just take it into a
+platform not prepared to handle it, then yes, obviously it cannot work.
+The driver overall should and can work for discrete devices plugged into
+an arbitrary platform (I have one plugged into an ARM board), but it
+generally will not have all the platform integration features. (Though
+some people are actually asking about DT support. I guess taken to the
+logical conclusion for the reset discussion at hand that would mean
+having a voltage regulator or so linked that the driver can use to power
+off and on the device.)
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+> There is a generic PCI core way to do FLR (pcie_reset_flr()), so I
+> assume the _DSM exists because the device needs some additional
+> device-specific work around the FLR.
 
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-No test result found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+Nah, FLR was misleading. This is not related to FLR, see below for a
+more complete discussion.
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.102 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+(the email I'm responding to:)
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.107 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+> IIUC "PLDR" is an ACPI method that does a reset, and you want to reset
+> a BT device.
+
+Not really.
+
+PLDR is a Windows-ism, we really shouldn't even use this name.
+
+(PLDR means "product level device reset", which is really trying to
+reset more than each function. There's some magic required in Windows to
+achieve this at their driver abstraction level.)
+
+From a hardware perspective, it has a number of shared components [1],
+as well as BT and WiFi functions on the device. Doing function reset on
+either will only reset the individual function parts, not the shared
+components.
+
+[1] I could go into more details but it's not really for this discussion
 
 
+To actually do that reset we need ACPI help, first calling the product
+reset DSM (see iwl_trans_pcie_set_product_reset()) to enable the right
+kind of reset among the various options, and then calling _RST on the
+corresponding _PRR object. I _think_ this might even be specified
+somewhere, so maybe pci_dev_acpi_reset() should try to find a _PRR
+object, and we could remove this code? But I'm no ACPI expert. AFAICT
+there's no _RST method on the object itself, only on the corresponding
+_PRR object.
 
----
-Regards,
-Linux Bluetooth
+> > Currently, calling pci_rescan_bus() successfully rebinds both the
+> > WiFi and BT drivers. This approach follows the method used for the
+> > WiFi driver, as seen here:
+> >=20
+> > https://elixir.bootlin.com/linux/v6.18-rc1/source/drivers/net/wireless/=
+intel/iwlwifi/pcie/gen1_2/trans.c#L2182
+>=20
+> It looks like this is a multi-function device, iwlwifi is bound to
+> function 0, and btintel is bound to function 1.
+
+Yes.
+
+> Then it looks like iwl_trans_pcie_removal_wk() starts with the wifi
+> device, finds the corresponding BT device, removes the BT device, runs
+> PLDR on the wifi device, removes the wifi device, and rescans to find
+> both devices again:
+
+More or less, yes, see also above for a full discussion.
+
+>   iwl_trans_pcie_removal_wk
+>     wifi =3D removal->pdev			# WiFi device
+>     bt =3D pci_get_slot(...)			# BT device
+>     pci_stop_and_remove_bus_device(bt)
+>     iwl_trans_pcie_set_product_reset(wifi)	# do PLDR on WiFi
+>     pci_stop_and_remove_bus_device(wifi)
+>     pci_rescan_bus
+>=20
+> It seems problematic to me for the WiFi driver to remove the BT
+> driver.  What if BT was active at the time?  Why is it ok to yank the
+> rug out from under it?
+
+So first of all, it's not really different from unbinding it via sysfs,
+so this is necessarily always supported. There's even PCIe hotplug, as
+you surely know, and this device could be behind a Thunderbolt port
+(I've actually done this in the, albeit fairly distant, past, when
+admittedly BT was still USB.)
+
+From a hardware perspective, the reason to do this is if one side (BT or
+WiFi) detects that there's an error in a shared hardware components.
+This may be either side, but it's not always predictable which side will
+first detect the error, say WiFi is mostly idle then it won't
+necessarily detect it.
+
+Crucially though, the hardware is basically dead at this point anyway -
+both BT and WiFi will be affected. One of them might just not know it
+yet, and might not even notice until eventually getting a command
+timeout to a random command, which might not be triggered until
+"something happens" such as userspace triggering a scan.
+
+> Why does the BT driver have to be unloaded before resetting the WiFi
+> device?  Why does the WiFi driver have to be unloaded before resetting
+> the BT device?
+
+See above, I think.
+
+> Theoretically, the functions of a PCI multi-function device are
+> independent and really don't have any influence on each other.
+
+"Theoretically", see above.
+
+> If you had a single driver that claimed both devices, that driver
+> could coordinate this since it would know about both and could
+> synchronize their activity when needed.
+
+Yes, but it'd be very complex to maintain that across two unrelated
+subsystems, and wouldn't actually _help_ much.
+
+> Maybe you could have a wrapper driver that claims both and delegates
+> each function to either iwlwifi or btintel as needed?  Since the
+> wrapper, iwlwifi, and btintel would be linked into a single module,
+> you could arrange callbacks between them to synchronize and handle
+> these resets.
+
+While it would be possible to build such a driver, it'd be rather
+complex to maintain, and wouldn't actually help anything.
+
+> If you reset the device, you know the state of the device afterward,
+> and the driver should be able to initialize its own data structures
+> accordingly.  This should not require any PCI device removal or
+> rescan.
+
+Obviously, we know the state of the device, but ... it _does_ require
+PCI removal *and* rescan, because the device completely falls off the
+bus and needs to be rediscovered. The drivers also fundamentally have to
+be unbound from it, since all state of the device (including BAR setup)
+is lost. I'm fairly certain that if you were to query even the device
+IDs after the reset, you'd see 0xFFFFFFFF, but in truth I don't fully
+understand how this works at the PCIe bus level.
+
+In any case, I didn't see any other way to do this when I implemented
+it, and don't see it now either.
 
 
---===============0722570742126107336==--
+(going back to your earlier email:)
+
+> This remove and rescan by a driver that's bound to the device subverts
+> the driver model.  pci_stop_and_remove_bus_device() detaches the
+> driver from the device.  After the driver is detached, we should not
+> be running any driver code.
+
+I mean, I _guess_ you could argue that? I don't really think of it that
+way - the code that is running to do all this isn't actually part of the
+driver context of this module. Now, if you're going to argue that a
+"driver module" cannot have code (other than init/exit I guess) running
+outside of the driver context I suppose you could do that, but that's
+probably broken by half the modules in the tree anyway.
+
+I also don't think that it's actually possible for the driver to unbind
+itself within the context of the driver model, so in effect you're
+arguing that a driver is also not allowed to call device_reprobe() for
+it's own device, which I'd think some calls do today. The code here is
+just a slightly more complex PCI-specific case of this because of the
+device hardware behaviour described above.
+
+Do we have to be careful with this vs. say module unload? Obviously,
+just like anything else that isn't pure driver code, which also has to
+be careful, just against remove() callback rather than module exit. But
+this code isn't really tied to the driver model, it's running outside of
+that context.
+
+
+I hope this clarifies things. I apologise on behalf of the BT team for
+misleading you on pretty much all of the terminology.
+
+johannes
