@@ -1,252 +1,178 @@
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E9A1E1DFC;
-	Mon, 27 Oct 2025 10:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3423043D9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Oct 2025 13:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761559708; cv=none; b=DxnmE119fZ3+kij9G1ZMPElgnIQ+VwI04+dvEzHtA7wxBV8kuJF+Nb1np6eS/bPvGt1+4Mwxg0kDRnoEygKvazjnwG95Zdckb4wdbNcW4YF6bJb1rnKfDr+qKAPLWjcY8Y2Cm+Baf4HugKVp40H4sV8JZWjxyei7xXhP+M7Tqu0=
+	t=1761572144; cv=none; b=eyfDp8zdtfEcET1ufGc33Alrw5paQHIagelTCNIjzs2hHvrQUn0FyqbjhEt1ZrjILoKwZ0LI5WLZShKbY1byjZYeCQRk/pqGvbKt7lnA7skwktaypsVt/8QDBtQ80dLOiHSXrzPefYEFnskWl+esa2Ucjgd4G0ty1yiEkV3z1vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761559708; c=relaxed/simple;
-	bh=6cQdiRpHxGaSASPH+29ugh5AbQWjEi4s33N7R1Ic96I=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=reMtAcbFI0nL11JfPlctAzQfRuOJMUSkPR+LiiCsG0m1wpqVY7L/HD8orGyFq6TqS9/oxTU6JUgmkudD8SJHv16tkl87jlG8dAvUHxnbk94UzJY1tTjUpbu828VvNPOmYNPThG0jTj8zrr8Wiqp4uzuALUcqbbM9FxIEhCxbCPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=blGwpcR/; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1761572144; c=relaxed/simple;
+	bh=G8I7MYOKAADcUiNhrxg4rHdSnpHAvfS12L4GSyQ1JFI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kcDbMr0o4YYxNOrtcKCyRWiNauvLqCS4UoC81M6eTCZq+I/xiF6jL053zT7k8oVPJdK+r5cHGjH0EXQB7NtJ32vywo/HTT6R0yiNyONcmiCOP1LcTgr4IVOQpu12Fmv5ZS4tKhuwBr4vh2CTKy/Yn2MEaopCEZqxvxBCUx5DNeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nAIcy4F/; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="blGwpcR/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=DNc7Rk44kEIOfqYX6DTwbrnkDvExScI7F/8Nc7y8mkw=;
-	t=1761559707; x=1762769307; b=blGwpcR/lO8s54fKp8tYzM4vDPleLA0aEcf84bCJPow3BBT
-	A8ueA9/2Z4T5nZicHYIEHbc2wH3NASU5mkzZxwRLr4ITsLjvBKkhf7vuEwgJv9KUm6q1x4zeLqvvk
-	fciCJLcG35dGD8sxhH/sCnt/cbuiFP06L0s3kME2h/zeli4eLv2CVvsJ3Diw+qEazvJvCj5qD/vVm
-	hjOz9adK3DjtFkAr4C/gOW8INNEZk94uKd5CSAmvZdD0eZWmLmCm9WHoiFFdW5xq3+bskVRvutyP1
-	SmAnBuTV8cz9RC2rmj4yGu0XBofauUz7Tre9LgxVoId+EQeBQcYQc17G17XNYufQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1vDK9H-0000000AQMF-1ssO;
-	Mon, 27 Oct 2025 11:08:23 +0100
-Message-ID: <7acf9a2f2cec5d00fc1581ad3a12b1f4b580b349.camel@sipsolutions.net>
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Support function level reset
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Bjorn Helgaas <helgaas@kernel.org>, "Devegowda, Chandrashekar"
-	 <chandrashekar.devegowda@intel.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "linux-bluetooth@vger.kernel.org"	 <linux-bluetooth@vger.kernel.org>,
- "linux-pci@vger.kernel.org"	 <linux-pci@vger.kernel.org>,
- "bhelgaas@google.com" <bhelgaas@google.com>,  "Srivatsa, Ravishankar"
- <ravishankar.srivatsa@intel.com>, "Tumkur Narayan, Chethan"
- <chethan.tumkur.narayan@intel.com>, "K, Kiran" <kiran.k@intel.com>, "Ben
- Ami, Golan" <golan.ben.ami@intel.com>
-Date: Mon, 27 Oct 2025 11:08:22 +0100
-In-Reply-To: <20251023203603.GA1312405@bhelgaas>
-References: <20251023203603.GA1312405@bhelgaas>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nAIcy4F/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761572142; x=1793108142;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=G8I7MYOKAADcUiNhrxg4rHdSnpHAvfS12L4GSyQ1JFI=;
+  b=nAIcy4F/qeSAJt9rvrgCpjvVcyqbUTeQkvg1nKZPjOVNz9OKhpFCD/Vd
+   xaODUGm0TSIhxmc0DJoWoPjLTkg8cZX1mNs497AXzv06mxjZIkuet6N2V
+   /0UulzvItgvlej5s19JpU0NwHZOZ6gXik/X0S/ip6NSQ6SYS3XY4xFqT6
+   0cqElCZRTW+fQmcIKctiJjqmavhlmH9p2nSpnrWscivl6oE8QzmHhR2Mr
+   8GhhTsCKAGgV9NwJswFA+5KYRROPwENwDGKtwsC90dGmo8q4VCSBnLYpS
+   gsjoMRnJfSe+bCcitVpfFoKbquINtCx+Nramko25s/ewmuiRKCaoMbM/S
+   A==;
+X-CSE-ConnectionGUID: HsyCeH4MS+WWd0VZOZmcHw==
+X-CSE-MsgGUID: 55pU7e2fQDeBgvt48Ql3BQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="74250077"
+X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
+   d="scan'208";a="74250077"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 06:35:42 -0700
+X-CSE-ConnectionGUID: DLCoqoqJT7aiU6Mnlnl3og==
+X-CSE-MsgGUID: uWrY6G3cTv6Z38089zaNyg==
+X-ExtLoop1: 1
+Received: from klitkey1-mobl1.ger.corp.intel.com (HELO kekkonen.fi.intel.com) ([10.245.244.31])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 06:35:40 -0700
+Received: from punajuuri.localdomain (unknown [192.168.240.130])
+	by kekkonen.fi.intel.com (Postfix) with ESMTP id 47A0111FADA;
+	Mon, 27 Oct 2025 15:35:38 +0200 (EET)
+Received: from sailus by punajuuri.localdomain with local (Exim 4.98.2)
+	(envelope-from <sakari.ailus@linux.intel.com>)
+	id 1vDNNq-00000001eH8-17jf;
+	Mon, 27 Oct 2025 15:35:38 +0200
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6 krs, Bertel Jungin Aukio 5, 02600 Espoo
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH 1/1] Bluetooth: Remove redundant pm_runtime_mark_last_busy() calls
+Date: Mon, 27 Oct 2025 15:35:38 +0200
+Message-ID: <20251027133538.393138-1-sakari.ailus@linux.intel.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
 
-Hi,
+pm_runtime_put_autosuspend(), pm_runtime_put_sync_autosuspend(),
+pm_runtime_autosuspend() and pm_request_autosuspend() now include a call
+to pm_runtime_mark_last_busy(). Remove the now-reduntant explicit call to
+pm_runtime_mark_last_busy().
 
-So I've been asked to chime in here, mostly on behalf of iwlwifi, and
-I'll actually respond to two of your messages a bit.
+Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+---
+ drivers/bluetooth/btmtksdio.c | 1 -
+ drivers/bluetooth/hci_bcm.c   | 6 +-----
+ drivers/bluetooth/hci_h5.c    | 2 --
+ drivers/bluetooth/hci_intel.c | 3 ---
+ 4 files changed, 1 insertion(+), 11 deletions(-)
 
-(from your previous email first:)
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index 62db31bd6592..fba3ab6d30a5 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -615,7 +615,6 @@ static void btmtksdio_txrx_work(struct work_struct *work)
+ 
+ 	sdio_release_host(bdev->func);
+ 
+-	pm_runtime_mark_last_busy(bdev->dev);
+ 	pm_runtime_put_autosuspend(bdev->dev);
+ }
+ 
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index fff845ed44e3..9286a5f40f55 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -326,7 +326,6 @@ static irqreturn_t bcm_host_wake(int irq, void *data)
+ 	bt_dev_dbg(bdev, "Host wake IRQ");
+ 
+ 	pm_runtime_get(bdev->dev);
+-	pm_runtime_mark_last_busy(bdev->dev);
+ 	pm_runtime_put_autosuspend(bdev->dev);
+ 
+ 	return IRQ_HANDLED;
+@@ -710,7 +709,6 @@ static int bcm_recv(struct hci_uart *hu, const void *data, int count)
+ 		mutex_lock(&bcm_device_lock);
+ 		if (bcm->dev && bcm_device_exists(bcm->dev)) {
+ 			pm_runtime_get(bcm->dev->dev);
+-			pm_runtime_mark_last_busy(bcm->dev->dev);
+ 			pm_runtime_put_autosuspend(bcm->dev->dev);
+ 		}
+ 		mutex_unlock(&bcm_device_lock);
+@@ -748,10 +746,8 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
+ 
+ 	skb = skb_dequeue(&bcm->txq);
+ 
+-	if (bdev) {
+-		pm_runtime_mark_last_busy(bdev->dev);
++	if (bdev)
+ 		pm_runtime_put_autosuspend(bdev->dev);
+-	}
+ 
+ 	mutex_unlock(&bcm_device_lock);
+ 
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 43371f389fd2..96e20a66ecd1 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -616,7 +616,6 @@ static int h5_recv(struct hci_uart *hu, const void *data, int count)
+ 
+ 	if (hu->serdev) {
+ 		pm_runtime_get(&hu->serdev->dev);
+-		pm_runtime_mark_last_busy(&hu->serdev->dev);
+ 		pm_runtime_put_autosuspend(&hu->serdev->dev);
+ 	}
+ 
+@@ -658,7 +657,6 @@ static int h5_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+ 
+ 	if (hu->serdev) {
+ 		pm_runtime_get_sync(&hu->serdev->dev);
+-		pm_runtime_mark_last_busy(&hu->serdev->dev);
+ 		pm_runtime_put_autosuspend(&hu->serdev->dev);
+ 	}
+ 
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index 1d6e09508f1f..20baf2895dec 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -280,7 +280,6 @@ static irqreturn_t intel_irq(int irq, void *dev_id)
+ 
+ 	/* Host/Controller are now LPM resumed, trigger a new delayed suspend */
+ 	pm_runtime_get(&idev->pdev->dev);
+-	pm_runtime_mark_last_busy(&idev->pdev->dev);
+ 	pm_runtime_put_autosuspend(&idev->pdev->dev);
+ 
+ 	return IRQ_HANDLED;
+@@ -371,7 +370,6 @@ static void intel_busy_work(struct work_struct *work)
+ 	list_for_each_entry(idev, &intel_device_list, list) {
+ 		if (intel->hu->tty->dev->parent == idev->pdev->dev.parent) {
+ 			pm_runtime_get(&idev->pdev->dev);
+-			pm_runtime_mark_last_busy(&idev->pdev->dev);
+ 			pm_runtime_put_autosuspend(&idev->pdev->dev);
+ 			break;
+ 		}
+@@ -1003,7 +1001,6 @@ static int intel_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+ 	list_for_each_entry(idev, &intel_device_list, list) {
+ 		if (hu->tty->dev->parent == idev->pdev->dev.parent) {
+ 			pm_runtime_get_sync(&idev->pdev->dev);
+-			pm_runtime_mark_last_busy(&idev->pdev->dev);
+ 			pm_runtime_put_autosuspend(&idev->pdev->dev);
+ 			break;
+ 		}
+-- 
+2.47.3
 
-> Sort of weird that the commit log mentions FLR, but it's not mentioned
-> in the patch itself except for BTINTEL_PCIE_FLR_RESET_MAX_RETRY.
-> Apparently the assumption is that DSM_SET_RESET_METHOD_PCIE performs
-> an FLR.
-
-It's not just weird, it's simply wrong. This is not about FLR at all.
-
-> Since this is an ACPI _DSM, presumably this mechanism only works for
-> devices built into the platform, not for any potential plug-in devices
-> that would not be described via ACPI.  I guess this driver probably
-> already only works for built-in devices because it also uses
-> DSM_SET_WDISABLE2_DELAY and DSM_SET_RESET_METHOD.
-
-It ... depends. Sometimes it can work even for discrete devices if the
-platform ACPI is prepared for it. But if you just take it into a
-platform not prepared to handle it, then yes, obviously it cannot work.
-The driver overall should and can work for discrete devices plugged into
-an arbitrary platform (I have one plugged into an ARM board), but it
-generally will not have all the platform integration features. (Though
-some people are actually asking about DT support. I guess taken to the
-logical conclusion for the reset discussion at hand that would mean
-having a voltage regulator or so linked that the driver can use to power
-off and on the device.)
-
-> There is a generic PCI core way to do FLR (pcie_reset_flr()), so I
-> assume the _DSM exists because the device needs some additional
-> device-specific work around the FLR.
-
-Nah, FLR was misleading. This is not related to FLR, see below for a
-more complete discussion.
-
-(the email I'm responding to:)
-
-> IIUC "PLDR" is an ACPI method that does a reset, and you want to reset
-> a BT device.
-
-Not really.
-
-PLDR is a Windows-ism, we really shouldn't even use this name.
-
-(PLDR means "product level device reset", which is really trying to
-reset more than each function. There's some magic required in Windows to
-achieve this at their driver abstraction level.)
-
-From a hardware perspective, it has a number of shared components [1],
-as well as BT and WiFi functions on the device. Doing function reset on
-either will only reset the individual function parts, not the shared
-components.
-
-[1] I could go into more details but it's not really for this discussion
-
-
-To actually do that reset we need ACPI help, first calling the product
-reset DSM (see iwl_trans_pcie_set_product_reset()) to enable the right
-kind of reset among the various options, and then calling _RST on the
-corresponding _PRR object. I _think_ this might even be specified
-somewhere, so maybe pci_dev_acpi_reset() should try to find a _PRR
-object, and we could remove this code? But I'm no ACPI expert. AFAICT
-there's no _RST method on the object itself, only on the corresponding
-_PRR object.
-
-> > Currently, calling pci_rescan_bus() successfully rebinds both the
-> > WiFi and BT drivers. This approach follows the method used for the
-> > WiFi driver, as seen here:
-> >=20
-> > https://elixir.bootlin.com/linux/v6.18-rc1/source/drivers/net/wireless/=
-intel/iwlwifi/pcie/gen1_2/trans.c#L2182
->=20
-> It looks like this is a multi-function device, iwlwifi is bound to
-> function 0, and btintel is bound to function 1.
-
-Yes.
-
-> Then it looks like iwl_trans_pcie_removal_wk() starts with the wifi
-> device, finds the corresponding BT device, removes the BT device, runs
-> PLDR on the wifi device, removes the wifi device, and rescans to find
-> both devices again:
-
-More or less, yes, see also above for a full discussion.
-
->   iwl_trans_pcie_removal_wk
->     wifi =3D removal->pdev			# WiFi device
->     bt =3D pci_get_slot(...)			# BT device
->     pci_stop_and_remove_bus_device(bt)
->     iwl_trans_pcie_set_product_reset(wifi)	# do PLDR on WiFi
->     pci_stop_and_remove_bus_device(wifi)
->     pci_rescan_bus
->=20
-> It seems problematic to me for the WiFi driver to remove the BT
-> driver.  What if BT was active at the time?  Why is it ok to yank the
-> rug out from under it?
-
-So first of all, it's not really different from unbinding it via sysfs,
-so this is necessarily always supported. There's even PCIe hotplug, as
-you surely know, and this device could be behind a Thunderbolt port
-(I've actually done this in the, albeit fairly distant, past, when
-admittedly BT was still USB.)
-
-From a hardware perspective, the reason to do this is if one side (BT or
-WiFi) detects that there's an error in a shared hardware components.
-This may be either side, but it's not always predictable which side will
-first detect the error, say WiFi is mostly idle then it won't
-necessarily detect it.
-
-Crucially though, the hardware is basically dead at this point anyway -
-both BT and WiFi will be affected. One of them might just not know it
-yet, and might not even notice until eventually getting a command
-timeout to a random command, which might not be triggered until
-"something happens" such as userspace triggering a scan.
-
-> Why does the BT driver have to be unloaded before resetting the WiFi
-> device?  Why does the WiFi driver have to be unloaded before resetting
-> the BT device?
-
-See above, I think.
-
-> Theoretically, the functions of a PCI multi-function device are
-> independent and really don't have any influence on each other.
-
-"Theoretically", see above.
-
-> If you had a single driver that claimed both devices, that driver
-> could coordinate this since it would know about both and could
-> synchronize their activity when needed.
-
-Yes, but it'd be very complex to maintain that across two unrelated
-subsystems, and wouldn't actually _help_ much.
-
-> Maybe you could have a wrapper driver that claims both and delegates
-> each function to either iwlwifi or btintel as needed?  Since the
-> wrapper, iwlwifi, and btintel would be linked into a single module,
-> you could arrange callbacks between them to synchronize and handle
-> these resets.
-
-While it would be possible to build such a driver, it'd be rather
-complex to maintain, and wouldn't actually help anything.
-
-> If you reset the device, you know the state of the device afterward,
-> and the driver should be able to initialize its own data structures
-> accordingly.  This should not require any PCI device removal or
-> rescan.
-
-Obviously, we know the state of the device, but ... it _does_ require
-PCI removal *and* rescan, because the device completely falls off the
-bus and needs to be rediscovered. The drivers also fundamentally have to
-be unbound from it, since all state of the device (including BAR setup)
-is lost. I'm fairly certain that if you were to query even the device
-IDs after the reset, you'd see 0xFFFFFFFF, but in truth I don't fully
-understand how this works at the PCIe bus level.
-
-In any case, I didn't see any other way to do this when I implemented
-it, and don't see it now either.
-
-
-(going back to your earlier email:)
-
-> This remove and rescan by a driver that's bound to the device subverts
-> the driver model.  pci_stop_and_remove_bus_device() detaches the
-> driver from the device.  After the driver is detached, we should not
-> be running any driver code.
-
-I mean, I _guess_ you could argue that? I don't really think of it that
-way - the code that is running to do all this isn't actually part of the
-driver context of this module. Now, if you're going to argue that a
-"driver module" cannot have code (other than init/exit I guess) running
-outside of the driver context I suppose you could do that, but that's
-probably broken by half the modules in the tree anyway.
-
-I also don't think that it's actually possible for the driver to unbind
-itself within the context of the driver model, so in effect you're
-arguing that a driver is also not allowed to call device_reprobe() for
-it's own device, which I'd think some calls do today. The code here is
-just a slightly more complex PCI-specific case of this because of the
-device hardware behaviour described above.
-
-Do we have to be careful with this vs. say module unload? Obviously,
-just like anything else that isn't pure driver code, which also has to
-be careful, just against remove() callback rather than module exit. But
-this code isn't really tied to the driver model, it's running outside of
-that context.
-
-
-I hope this clarifies things. I apologise on behalf of the BT team for
-misleading you on pretty much all of the terminology.
-
-johannes
