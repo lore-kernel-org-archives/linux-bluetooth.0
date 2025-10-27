@@ -1,96 +1,139 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9C92D5410
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Oct 2025 05:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9CD27FD62;
+	Mon, 27 Oct 2025 06:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761544475; cv=none; b=JjWAAhkFXV5/wp1qJXmtKJxs76yk/GbMXtxmfwf5c4Ry+MFCohvVDFL1hQvhmke7nW+0nlejQ18OeBgt15JNAx4CEdTcKHlhTm0sPjPjZOSu3539p2N6aeLKAe4yr9KHHwZZRqMQqsAdF2f8iTPd2b1WTvp0FplWDqs33QxjXJE=
+	t=1761545417; cv=none; b=mODdmOGCW9HYboIIHOgVeZPLFjfQoswAAZw6tvJVOYtqT7SP9qjcnVAVRqD8Rfjb6/1ncVqhAuXAYkMj2JxOoVfci6Gl+nOiyiI/3jfUodwcHlLnbOJobC4b+3wlCiWpmIOvBixpYPYLKsA6DMwlzsWixwAmRFFf3hq2JSSwEPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761544475; c=relaxed/simple;
-	bh=+FXJ1mNHayUl1UXm4PfVW7u9O0w1zItt9AcmsoI71hQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pLlJbEw474kVpc/UXJCqeuMVuSuaojFIJm9nZYy8V9YyaJCHooxMojovV9cZ+cEJu/hEo3wGQuWfF0pfBvxsHzddE12+6GZ7k9ocwDmp0kZJkRNBk6HIZOQV/HE9YXpTdU2d4R5aS2qEkxVf7scfehkWm9imo5Ml4JszsP95ROU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-430d082fc3dso145557555ab.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Oct 2025 22:54:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761544472; x=1762149272;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QqdGyCg0oq3/m1WbNEFikel3sZ+B8S0et7KY38/GQkI=;
-        b=e90WEF0BD1VC/6QpjSLTm17qTzYP8BaDOx7rKxsGydoWZeRTzQr956Pm6p7f73EqpB
-         MVmHPyk5L4QB0xNDhsjn+V5QFmDeWALV1LTK1CfNYAgnRWtX+QXvLKqosaBx7keSMCll
-         cEkGMU/lnr0NeuI3dU7j2PGvrE1tN/aNzMjkSPb/6yXOSWiTeNbDGzVrsAfT96EIFMFw
-         4IxaTOLYdNGfDagy4MK/V7djZkP5EQVjMkTp/kU+ajaw+I2bQyI1zsw/f6VBgNd75G8l
-         cUbziYJ7KlGY5gw1ud7C9yXoMubUjwamtGpOBqenGTwra8aaW3PshX4VZesy+IhVLxzv
-         1xwQ==
-X-Gm-Message-State: AOJu0YyPiXUz4tCA7RDiKmA660dqBhfviV3LPSMiZMY4ikgMdVB0wJ/q
-	qkQhG4Qrh9Xti0qghqd2NOvH6Ijr8zLXEtiCBH36f9D3TkWD01GyZWPoqJW3SOz8g0Xor3Vpn15
-	oN4l7+bI89w85pgVNMoiom5b9vT9kRhuAuClFWqSC5Zwhm+9hXJ4azw1d7wg=
-X-Google-Smtp-Source: AGHT+IHbDXs4+j5PZo+jsU1Z/67z7lyxmFJnOcDUy26n8NFoeQJsLfx0/deMBOiG6/lVra5buqr6r9O3mVXQb4VzzckVMrhi9XqN
+	s=arc-20240116; t=1761545417; c=relaxed/simple;
+	bh=h9JriAPmuh1uotOOsR61tvnQRtT3bWSd8EoDy0CKcTg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=J4XJG8EsYh91jOUlHvpP3Rs77gAgo4Gcv8RgDv9iHNIJjUlBMNNFFmffmw20Ufr+f0mOosjcoPKxmF9ZCvWypCHBitNRg45AElsFoWZl5NEYU5nfB6IgSKVaFm2KWFNMpMQFqyWFKFr/sLyqVqbBWyBMOmXcXrX0fE/luWsifEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pLt0AUNJ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pLt0AUNJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EA627C4CEF1;
+	Mon, 27 Oct 2025 06:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761545417;
+	bh=h9JriAPmuh1uotOOsR61tvnQRtT3bWSd8EoDy0CKcTg=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=pLt0AUNJjmhxOLN1H/SFXF8xuwr9SvFsN11D85hsnFQoWZYfQf6E5jzWEko53KhS+
+	 JVf6xU1y9G3K7uE58Qg33epTHg9Imw4U8ClDekMoI5ZXppXsuiPz8oLubUBDmTcC5T
+	 5hpzZs9iSOtjARGdQrVeUpoImH+WyBqjZgPaDqTQAMLKYrqW2BDK8edrM5BDvDdFG1
+	 VvqvH5gdTCW274mPpjBfio+LTdBf86ccdd7wWwZDNXaj9v8mTrdldymZ12/GZVfwSA
+	 BgMeM3Q6xlkxERdGlgchrwrFbYOwfWdoLtJdUpgMx27supoZJrk6/ihyhpnsXUG2rV
+	 estC6iX5qwfiA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA96CCF9EB;
+	Mon, 27 Oct 2025 06:10:16 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Mon, 27 Oct 2025 14:10:02 +0800
+Subject: [PATCH v4] Bluetooth: iso: fix socket matching ambiguity between
+ BIS and CIS
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:268a:b0:430:ac49:b3b1 with SMTP id
- e9e14a558f8ab-431ebee1c2amr159659995ab.12.1761544472677; Sun, 26 Oct 2025
- 22:54:32 -0700 (PDT)
-Date: Sun, 26 Oct 2025 22:54:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68ff0918.050a0220.3344a1.0288.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (Oct 2025)
-From: syzbot <syzbot+list958732057695567d6dd0@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251027-bis_cis_coexist-v4-1-81c4e890fa6d@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIALkM/2gC/3XOyw6CMBAF0F8xXTumD2rFlf9hiCl9wCRCTUsaD
+ OHfLWyMCxezuIs59y4kuYgukethIdFlTBjGEqrjgZhej50DtCUTTrmkSjBoMT3MdsHNmCZQTOm
+ q4laaipPy9YrO47yL96ZkH8MAUx+d/jqS1oApQObAwGopWssuhtXipodn6NCcTBg2rC8NIb73d
+ Vls5P8hWRSM+bq1Z+q8YvwHa9Z1/QAWhjGH7QAAAA==
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1761545415; l=2169;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=P7v3HOIQyUuNYvPT/4u/6kC7UJH3I86TvRUHKxEURak=;
+ b=2eH6P+2UC+a61nkUhEGrcM/JDCJpYPDeuW9w1KPe4+iDMakQn3d/PMwjsPd/0f7QE90F8ZNPO
+ 1zg9zdUDP6KB1yX0jd1GRZnxnSwNRmQ3VCTndaFnH/0zDWPs4gjDEvJ
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-Hello bluetooth maintainers/developers,
+From: Yang Li <yang.li@amlogic.com>
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+When both BIS and CIS links exist, their sockets are in
+the BT_LISTEN state.
+dump sock:
+  sk 000000001977ef51 state 6
+  src 10:a5:62:31:05:cf dst 00:00:00:00:00:00
+  sk 0000000031d28700 state 7
+  src 10:a5:62:31:05:cf dst00:00:00:00:00:00
+  sk 00000000613af00e state 4   # listen sock of bis
+  src 10:a5:62:31:05:cf dst 54:00:00:d4:99:30
+  sk 000000001710468c state 9
+  src 10:a5:62:31:05:cf dst 54:00:00:d4:99:30
+  sk 000000005d97dfde state 4   #listen sock of cis
+  src 10:a5:62:31:05:cf dst 00:00:00:00:00:00
 
-During the period, 2 new issues were detected and 0 were fixed.
-In total, 41 issues are still open and 92 have already been fixed.
+To locate the CIS socket correctly, check both the BT_LISTEN
+state and whether dst addr is BDADDR_ANY.
 
-Some of the still happening issues:
+Link: https://github.com/bluez/bluez/issues/1224
 
-Ref  Crashes Repro Title
-<1>  44172   Yes   KASAN: slab-use-after-free Read in l2cap_unregister_user
-                   https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
-<2>  7533    Yes   WARNING in call_timer_fn
-                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<3>  3609    Yes   general protection fault in lock_sock_nested
-                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
-<4>  2145    Yes   general protection fault in h5_recv
-                   https://syzkaller.appspot.com/bug?extid=b5691bb559396b262064
-<5>  825     Yes   WARNING in hci_conn_timeout (2)
-                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
-<6>  378     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
-                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-<7>  352     Yes   possible deadlock in l2cap_conn_del
-                   https://syzkaller.appspot.com/bug?extid=b71bb48c13bf3fed3692
-<8>  315     No    WARNING in l2cap_chan_del
-                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
-<9>  126     No    BUG: corrupted list in hci_cmd_sync_dequeue_once
-                   https://syzkaller.appspot.com/bug?extid=5250d87dea2afdb718a5
-<10> 101     Yes   WARNING in hci_recv_frame
-                   https://syzkaller.appspot.com/bug?extid=3e07a461b836821ff70e
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+Changes in v4:
+- Rebase code.
+- Link to v3: https://lore.kernel.org/r/20250731-bis_cis_coexist-v3-1-1f9bd60ef712@amlogic.com
+---
+ net/bluetooth/iso.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index aa63c8955a53..74ec7d125c88 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -2021,6 +2021,11 @@ static bool iso_match_pa_sync_flag(struct sock *sk, void *data)
+ 	return test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags);
+ }
+ 
++static bool iso_match_dst(struct sock *sk, void *data)
++{
++	return !bacmp(&iso_pi(sk)->dst, (bdaddr_t *)data);
++}
++
+ static void iso_conn_ready(struct iso_conn *conn)
+ {
+ 	struct sock *parent = NULL;
+@@ -2105,7 +2110,7 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 
+ 		if (!parent)
+ 			parent = iso_get_sock(hdev, &hcon->src, BDADDR_ANY,
+-					      BT_LISTEN, NULL, NULL);
++					      BT_LISTEN, iso_match_dst, BDADDR_ANY);
+ 
+ 		if (!parent)
+ 			return;
+@@ -2374,7 +2379,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 		}
+ 	} else {
+ 		sk = iso_get_sock(hdev, &hdev->bdaddr, BDADDR_ANY,
+-				  BT_LISTEN, NULL, NULL);
++				  BT_LISTEN, iso_match_dst, BDADDR_ANY);
+ 	}
+ 
+ done:
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+base-commit: f63037a3f252522504774c98960282fb776ef3ca
+change-id: 20250731-bis_cis_coexist-717a442d5c42
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
 
-You may send multiple commands in a single email message.
