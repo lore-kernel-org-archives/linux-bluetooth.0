@@ -1,77 +1,132 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D86D2773F0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 20:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420E62DF6F8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 21:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761770098; cv=none; b=lhW2vUG0WAq1kFPdumjPK+mEGfv3HlsBCfUNkYc81XUu6YGb5Kd9a0AfgKSPW578DlFMgIgFXk/YALRQjK5fZ1hpmu54VcE6hHAtGxzlXPrjPHZlc2Bne69HrjC9qCtWRE2DJEY9w43GnPmD98+2FwnksjUGvCRV6BZXxy0HvGA=
+	t=1761774729; cv=none; b=JB1+NMy23xzU50JEBO4ZAHe6R73QMv83HbUWCVeRIl5QXBk1yAXjXncvmpHNMug/esAgI/3HkHQYPuS3qdSiwIcyl1oJ1u91NAjW10rNMS9rM+g4WKtq8PALOG+DlQ/M5B125oNGbghaZtrHTK5n5GRSrKt7g+Gmzov0Q2mmKmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761770098; c=relaxed/simple;
-	bh=cxl6rEn2K9PceDjtOhePRTOAvjehGHKVYCB7hQExRTQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=BJOVeXlqjN6oX5x4yGDrtsbwoMCDz22YuAxu+YT8QmEHQEGvAMGAzitxpYPHP9CaZdvkwU4Sg1QpYfmQqI0wpWp3ss+l5fMSq8jmzesC/+qHbFRVjo/UE+KyyS19EKmHB8lFaKTGNedetWWv5AViQlCC1QNUfCwnE71ighLQGJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NO74ypV9; arc=none smtp.client-ip=192.30.252.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1761774729; c=relaxed/simple;
+	bh=8O+qn3YibUmwlaL0hb99GxWvbRqr+h2GIe3yrjf9kiQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=dF1+MtPtEzwSunTrlCXVNIrHqtBlwihgQMrUk0bpot76anyX3n96XpaNZKWx01cQmBMzBBrJdt6BOUmt5O61Udr0NI9DutqCJpEe1/9DspExZ/D2+vYNqVxLWpEGfrFb/8x1Q6el/oLeAVhmrjPIdFzvQDEuheQlqKDkf7UCmfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iKds1LYw; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NO74ypV9"
-Received: from github.com (hubbernetes-node-8e358e2.va3-iad.github.net [10.48.219.68])
-	by smtp.github.com (Postfix) with ESMTPA id 1E6518C113E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 13:34:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1761770095;
-	bh=jF/7lz/HBy14PX0Xk2y4uWxYwes92glXrxyh1bTSPo4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=NO74ypV9v9YFjLY75u680EsQG6/ikIla50PRIzzqbTQWS4XigO5DzxlgZgnB2gNq7
-	 bmt/Jg+SVjI/+scjFpFR7rxdI3R3lGdXHrNPuqFy+0LEmassx/sfNSOZiGY+I0HbbH
-	 CI3VBnxah7q6mK3B8BKfltDk5Oak+xT7NAGqdbuk=
-Date: Wed, 29 Oct 2025 13:34:55 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1017464/000000-802172@github.com>
-Subject: [bluez/bluez] 802172: monitor: Add decoding support for LL Extended
- Feat...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iKds1LYw"
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-432107e48deso1104835ab.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 14:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761774724; x=1762379524; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=HuOxGmnLX5cZ9Xsv+3AsA3/3dpYl1jqMREed796qI2s=;
+        b=iKds1LYwfwV144Iqo2ZmJcr50AsL7dTx4uDXiKMJ3p+rkYyLtyZb+4F80mCj1JEDcv
+         WLXX/U4bN16gaH0+xfwQUGPwpdgCoKanrP4xraK57p2xLwSrZYEA60qGz23wrMSaP+kp
+         BvDpd8uaCgHE5x4Uvb6ei1sbBgWw+Xyrv6og7tbkti7u8RV2tm6dgHu3jlpemJSf/PS3
+         jqoD58JUy8qw3qdJubf85yz+dVpqgAYhvRlCCdOIv0xZCUC4D+ndUrrwqRjPWG3kRZxr
+         1Pe9DNplg8qlz3IvBDj+4FZCk2LtNBNhR7NsGmw6G921GTyY/KAoq0T4HD3d+krzcCHr
+         CXhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761774724; x=1762379524;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HuOxGmnLX5cZ9Xsv+3AsA3/3dpYl1jqMREed796qI2s=;
+        b=npLLek7yBU/v/IzUttw0lW8gd4JpFrYabAL9N0GP/W3gKdWoZDsGsrsh0rLOy1SG2W
+         Uw/9Pp4czjhXHq/EY/WK8PEpYb3I+zqPEPIgC3Y+SzP991sedlv4mLKecA4nA9wZN0/A
+         RbyluLYHjdTOG9ViDmpHEfZAK1YU4HaHsUkyXaFmKcYF5YrDtan5TtwSmoMY/nUcmufz
+         5Af63XCc0QBQu9HfhABM+zXvwMNrltqh6AYZxrHbpdsiRNW9GdhiEsSEOu5zGe/RVSPH
+         v2O8Ort+ViFpFLs+MLBKhCH5bUKrNh402W6w3clgrwipn8De3a9D9gD91a3ONOK0jB2y
+         0riQ==
+X-Gm-Message-State: AOJu0YxdTrPjWsDifRlBuwqpOguYWHtFOCBxV1Se7Tgj/guij8A6ONHT
+	rr8rLlESiKEDUy5afqe+ES6er+BdNtUhQKEXwn/jvN15IuovVrau28gmvP6Pjw==
+X-Gm-Gg: ASbGncsh9DYFMtSgTA8BiQqD/a6ZlhDOK5rDJmORfZk76Syg7qKpiGhE8YvT2IqOeB7
+	P9TkcClAwk73q8BNv7W/0AnrfPDcuxHOy+ZNSN0olHzf8MCco3dtZxA1Sj9vyYXvOrEPY/jU+EU
+	ZRa0j4zB0ynxz76dVzuMRY3YGvMKCvCVs0cNa7AXthWqa/R9JQhNcdYP47smqJmpaO7n8pGKiZK
+	eo7hpnnGtTZtxAsPQRZGtZuXQm7EtTtFWVKmxJy7Uh0Zs77fiysC4dU69saBkntchg354sopnIA
+	YBZzR18VWETo+gNatM26xvTVpnb/0NKxw5NyEy1eSKvKEbHNaxCU15iYVNgoBG9eMflLvnJEq5l
+	e6dTmbaeD/ML4ekFC9q42qjJ3sXuppO9/BHrtDLj9aytwrdMQ3J+N5aZaTO9NCLDwKuF+HwGrhu
+	xa9np+
+X-Google-Smtp-Source: AGHT+IEKcMWfIo8uxI2bS5DkXr8XRF4SLiffc5Ul/UPTZWPScRBNeNuVzq4BZLN33F0wLAZsGxHaqA==
+X-Received: by 2002:a05:6e02:97:b0:431:d864:364a with SMTP id e9e14a558f8ab-4330153dd7cmr12611505ab.17.1761774723815;
+        Wed, 29 Oct 2025 14:52:03 -0700 (PDT)
+Received: from [172.17.0.2] ([52.154.20.53])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5aea78e1abesm5880643173.24.2025.10.29.14.52.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Oct 2025 14:52:03 -0700 (PDT)
+Message-ID: <69028c83.020a0220.b5d6b.9d3a@mx.google.com>
+Date: Wed, 29 Oct 2025 14:52:03 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0420985110027353786=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] monitor: Add decoding support for LL Extended Feature Set
+In-Reply-To: <20251029201624.75933-1-luiz.dentz@gmail.com>
+References: <20251029201624.75933-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1017464
-  Home:   https://github.com/bluez/bluez
-  Commit: 80217266537e6e557617d03b61a60254e985b18e
-      https://github.com/bluez/bluez/commit/80217266537e6e557617d03b61a60=
-254e985b18e
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-10-29 (Wed, 29 Oct 2025)
+--===============0420985110027353786==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M monitor/bt.h
-    M monitor/packet.c
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  monitor: Add decoding support for LL Extended Feature Set
+Dear submitter,
 
-This adds support for decoding LL Extended Feature Set introduced in 6.0
-that adds the following:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1017464
 
-Commands:
+---Test result---
 
- - HCI_LE_Read_All_Local_Supported_=C2=ADFeatures(0x2087)(Feature:47,1)
- - HCI_LE_Read_All_Remote_Features(0x2088)(Feature:47,2)
+Test Summary:
+CheckPatch                    PENDING   0.32 seconds
+GitLint                       PENDING   0.33 seconds
+BuildEll                      PASS      20.22 seconds
+BluezMake                     PASS      2757.45 seconds
+MakeCheck                     PASS      20.90 seconds
+MakeDistcheck                 PASS      185.78 seconds
+CheckValgrind                 PASS      244.36 seconds
+CheckSmatch                   WARNING   311.73 seconds
+bluezmakeextell               PASS      130.06 seconds
+IncrementalBuild              PENDING   0.30 seconds
+ScanBuild                     PASS      922.94 seconds
 
-Events:
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
- - HCI_LE_Read_All_Remote_Features_Complete(0x2b)(Mask bit:42)
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1931:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3852:52: warning: array of flexible structuresmonitor/bt.h:3840:40: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
 
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0420985110027353786==--
