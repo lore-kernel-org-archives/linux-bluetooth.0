@@ -1,110 +1,92 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D860D2C026C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 13:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC516279DAD;
+	Wed, 29 Oct 2025 14:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761743645; cv=none; b=jrzm1uWQVg+PDYlT1Q0SyEawo7p2AMkwOWJHoH7YiLasF8Za68k+9O1/+DW2zOx8z+ZUs1W9lHwxDEo0h/869DlABkQSxvEC0hbwQvPMDcmFFgUAnW8/NUErMbJcf+ZxTZ1D6pwPmhgzoi75MiFUWI38ZhThpfFlDc3Jkq3GqyA=
+	t=1761748025; cv=none; b=buSD8RU7NOoTosvszDJMKnOQuyHmGXdEb+dBS6qD7ptFWdgjxjPkH6MT5IIhyz1VRjwo2eksidtpu/fMFJuF5fUTgI53TJyRmNnGwlmGLEwf/Y1sLTrGnmSXL4My6ysDRtuSD1YstnZ8dt7yxd6tx9JADPte/3t5t0TW8GIGQoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761743645; c=relaxed/simple;
-	bh=HXh8XVhftIlOuBLfg8NVk9leceRLV9HU/K4pAv4S7GA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UG9lvFvxmObEgR/OZ9AtsAIMM9T9tA+sSPK47+W30/1YHU5u0BSh9Q0YeEqE5DxvjWaA8nRMCJp1ZV8x/ALIF1OyzhXGFTFpbRLxEP4MIOyYFYiGNDnflzgJhqRmjFiQQ889nz+Uj46s+ow4MqNLcVi/IBBr+DzDV35Tbn9eisY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=hlOtlWVn; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="hlOtlWVn"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-378d50e1c82so71002681fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 06:14:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1761743641; x=1762348441; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cqA6GSygQlCbGGE92uS1aB1PWjkaAYd841Sg4SieyII=;
-        b=hlOtlWVnpwS3XHlygstKeC9HQVK9qNA2JkqB1DjoDbBqjJI28RY8aBgzwcu5zobn6v
-         sjQKZ51sZzwj9Yo3JpjAfR/gZAs04ZPoLxvUkc0MZf4YpTU9O0erq77GdSZybw37WnP7
-         IfJ5EgphNSGdC4Kr55/1gLYQkQ2fb+iRbNM4z7fVFcxL5D0bt72gcgGRbSX1tc4Pz0He
-         f4lSbcZRI3eg6XPKLdtuJiQ+PJAuk5eTwYBfPhc8LP4zZtl2al59/lFALKr+pI86Jqow
-         isqLqslnToa664tkOsZ4Texuq9tE6N7j0k/gFF8LE/O0HEo88CCre1sa+lOpNVE/vQ9A
-         rZQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761743641; x=1762348441;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cqA6GSygQlCbGGE92uS1aB1PWjkaAYd841Sg4SieyII=;
-        b=RrWzS5hRXMi+mmfCQCTD2iYH2nYE8xuKH20N11/ctFxhv6fDaGNMTw1zWZF+7/KedN
-         F6XemJv6OQPO2JYkEmHwzj8Tu5etQQe5dTYy3s+yFC7ZPy1FJaZB1k/MxjJeB7ZcPvWq
-         yoCcJWXQN5st6hgbeI+UFvUhaFSv4tFiKWAIis1SRB/90TPuzvbZzKXGkbErop1j56bR
-         /yh+gkJyvWcPhULp9VXMHqfZ3H9acP4jbzYFBIvTaobXCWawp1TUr46L+/fSGMnRg0Mg
-         QeaTvV0Zimh4vGHvQZOu/yNjrx9JIheAT5yymrLDDItyCP3L9cRUX9Xve1Lgn5sbhi/L
-         f+iQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaoYqE30IJuBZvOiG7qRlv/dX/vVDdhCSgnCGzEJIsLeekn8718QRQl9Wf1z4Q84jrlx7+H3octb1CZotcjOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+DzxosqM05Y0OQTN1BemgmUyhRLTAxo0iYkF59hL/i+vIuuM9
-	xYr7N8IQ2x+sPVH2N0W28hsZe0EfRym8Cn/mlzAaZRZ3SJA4DIprWtkDiyziI11tFEqlCSU3ttZ
-	dIreAgCuLX6nll0LJ1kTCeOZz7wvfJuKCIIKP5v5N8g==
-X-Gm-Gg: ASbGncsgU0Pxeb9ovosKBlNk6nodMMWJ5uXXiVivHrUHBeOiYGK8H5e98e7WwsEdY90
-	nswmE6ZYdqVJ+mlWq+SQBh2wMNdBMa1OVJ9E2NpaZQbDAZ41HPUY8LEzAHGjKpEcQr6U+VwHbWb
-	oGc+K9CLYjGkazY/Afja2PM59yaE2IA+C3kYpy3eVBirLq0UF0vK+5Ztdn2UQLVzama/4wQkW/f
-	WZz13lAQ8S/tgZSrGg7QTtglqe1lRCGWxs4nW6DgIWsiEWDRvhkA13diM5IcOf5lhj2zpxIOl/I
-	G/FFH1wAMTURPOty0N9l3OJqTiQ=
-X-Google-Smtp-Source: AGHT+IEDeO7pOWXIiKISaidNbH4GhhTTnet358H+WU8HbsJA+qhtiRiRxFILoq29B6HEL7w4GKQI73DKFNYwKm/mQwI=
-X-Received: by 2002:a05:651c:1107:10b0:36f:4c94:b583 with SMTP id
- 38308e7fff4ca-37a052cfe5emr7976601fa.16.1761743640602; Wed, 29 Oct 2025
- 06:14:00 -0700 (PDT)
+	s=arc-20240116; t=1761748025; c=relaxed/simple;
+	bh=dbygQzHttqjNpSjAjnD19UM0SjBDk0tlkiBX6toMasA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=VuoU09bVl8ra+F9OVq11snhpUrpLahp06OPMyZZYAwgM5ED/8JRFfBsJX5+Q0g0XQJQz6CCwjeT+8+1Df/mzPRms5tcHH4LSJ1puvGIcgXSxIHFlMNY8gCu5f0Zy0aNWvFPTcYBAm7nQSrLTs9+RTUpAswTfJm8YJDWC48yHDeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [10.101.2.66] (ip-217-65-134-37.ptr.icomera.net [217.65.134.37])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AAFAD6020D324;
+	Wed, 29 Oct 2025 15:26:44 +0100 (CET)
+Message-ID: <ff745987-6e62-40e2-b2c1-ed35c0b9ffe4@molgen.mpg.de>
+Date: Wed, 29 Oct 2025 14:26:43 +0000
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251029-dt-bindings-qcom-bluetooth-v2-0-dd8709501ea1@linaro.org>
-In-Reply-To: <20251029-dt-bindings-qcom-bluetooth-v2-0-dd8709501ea1@linaro.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 29 Oct 2025 14:13:47 +0100
-X-Gm-Features: AWmQ_bm2G7-iNhdxoXC19qDeGT6XRmVTZTDbAiHUQ68hSenSjedNVmrrWyCNe44
-Message-ID: <CAMRc=MeGLUvyM5GGv=eFpKd8_KCcSOnfKXCtZqJwpTGuRTixxA@mail.gmail.com>
-Subject: Re: [PATCH v2 00/11] Bluetooth: dt-bindings: qualcomm: Split binding
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: MAINTAINERS: Add Bartosz Golaszewski as
+ Qualcomm hci_qca maintainer
 To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20251028155320.135347-3-krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
+ <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251028155320.135347-3-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 29, 2025 at 8:44=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
+Dear Krzysztof,
+
+
+Thank you for your patch.
+
+Am 28.10.25 um 16:53 schrieb Krzysztof Kozlowski:
+> There are no dedicated maintainers of Qualcomm hci_qca Bluetooth
+> drivers, but there should be, because these are actively used on many
+> old and new platforms.  Bartosz Golaszewski agreed to take care of this
+> code.
+> 
+> Cc: Bartosz Golaszewski <brgl@bgdev.pl>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Link: https://lore.kernel.org/r/CAMRc=MdqAATOcDPhd=u0vOb8nLxSRd7N8rLGLO8F5Ywq3+=JCw@mail.gmail.com/
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> 
+> ---
+> 
 > Changes in v2:
-> - Drop in few commits the properties (supplies) from
->   qualcomm-bluetooth.yaml which are not used by devices left there,
->   instead of removing them in final patch (qcom,wcn7850-bt).
-> - Fix dt_binding_check error - missing gpio.h header in the example.
-> - Drop maintainers update - split into separate patch.
-> - Add also Bartosz as maintainer of two bindings because he was working
->   with these in the past.
-> - Link to v1: https://patch.msgid.link/20251028-dt-bindings-qcom-bluetoot=
-h-v1-0-524a978e3cda@linaro.org
->
-> One big Qualcomm Bluetooth schema is hardly manageable: it lists all
-> possible properties (19 supplies).  Split qcom,qca6390-bt to separate
-> bindings, so device schema will be easier to read/maintain and list only
-> relevant properties.
->
-> What's more it messes up old (pre-PMU) and new (post-PMU) description in
-> one place adding to the total mess.
->
-> Best regards,
-> Krzysztof
->
+> Don't orphan, add Bartosz.
+> ---
+>   MAINTAINERS | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8abdc0e50699..8a2c5fb0ba55 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -21145,6 +21145,7 @@ F:	Documentation/devicetree/bindings/net/qcom,bam-dmux.yaml
+>   F:	drivers/net/wwan/qcom_bam_dmux.c
+>   
+>   QUALCOMM BLUETOOTH DRIVER
+> +M:	Bartosz Golaszewski <brgl@bgdev.pl>
+>   L:	linux-arm-msm@vger.kernel.org
+>   S:	Maintained
+>   F:	drivers/bluetooth/btqca.[ch]
 
-Thanks for doing this. I would argue that the deprecation of the
-legacy supplies could happen before the split but that's not really
-important and would probably be harder to read.
+Bartosz, thank you for stepping up!
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
