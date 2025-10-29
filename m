@@ -1,133 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822141EB9E3;
-	Wed, 29 Oct 2025 16:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DAD351FC7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 17:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761755196; cv=none; b=VOmr7exqd4PhNcqrqx5ynAS6p29NWmtfvOMYi0iOl2w2Oi8SXGpzJSM0LKkH13dM6WRjRjG+QAnpBzH+pWBqk5sPXHRjXcXFtOueVRICeDRnYkeA+msAvCXmjTcW0YnXKZbCQlqki8ZMO3p8XedxYdlpIiNoBp0oCtut7LLjEu4=
+	t=1761759696; cv=none; b=OSe8t/1Qxszyqw14dYKcN7FmHQc4oxuT7tztligx/ZQ6b1BpW9J4XgZi+O8BzY65iwTnITRhU9Ye+2NG4/saQNCV5km2SQXUK+f7Ezp2iZOBXD6L2c+DVPIK9eCp/4nB+eVfVdIvEcn4z0JYioYNulOoI1t/4uKw3LKylgGW+GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761755196; c=relaxed/simple;
-	bh=wELtySEeo9db8uxyOMgc0Q4pI1hleFdPzhwEcqjQAKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=HWNUbsRIf6lPyx1nz+JeJRnM+iYgyF+zV6f54A7LoXVMFdeDHRzjiWVd7yE/gG9fMRqTRVXyX9sFKnvTGVpBrGn5btTVySirY/THiu1CNH9Tm0k9g2DewljpeMz+lzOM6Xcx7GSk1yKuzOlhMXJRSx8Iqrx/q3cJTDLABTST2XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNQeEbed; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761759696; c=relaxed/simple;
+	bh=Na4vPgKmid4FMLS307q9qmzwvFHM7Swm9obvkkVxCdo=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NCjfdzpwbOTEQXNYuv7/h0lVT8h77m6xoAphc+GMHn0MuVUwdybpDil1nubl2rCs21qv7CgqHgFxp4mH2lQC6Wu/xbhCNIp6mMyUPUBmH7bXcu2efAAXpie22eJmiv2IK4Zv/K+g2HtixRJyPzc532M8QQlEcg1IaXX/9uzT024=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Agh5ssrd; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNQeEbed"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6E25C4CEF7;
-	Wed, 29 Oct 2025 16:26:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761755196;
-	bh=wELtySEeo9db8uxyOMgc0Q4pI1hleFdPzhwEcqjQAKg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=nNQeEbedZ/rb0FOdu2gxMiMcN5/Wtl3se9dzfrlWWlr7PDAiLjb2iyDZBymDKGOQA
-	 /Bf6qayv2V/Sj96bvStIxqTGTPUVj2Kp7aCh6Qs1HTwpvzFoa528ELUCb/qt0cmcNN
-	 IpdEtVJ/T0FgNcRigZBQCIUCXxBTcsRY+uIX0g8k6QKhbUBhkb0NBeTTRkHkKwrayD
-	 CjRHu2pktrMdcxovl2bl3ggypdNDM6YbVie7pHYec2GzJNEUgJFuYT7PNt2xhPKJoB
-	 Q38K/NSAWrKl4y69k2tpUFPlImC4aZFIaX1o238spVuWeTYGTjAwrDTtn2y6+kEKsa
-	 dMwPWgg5bQObw==
-Date: Wed, 29 Oct 2025 11:26:34 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: "Devegowda, Chandrashekar" <chandrashekar.devegowda@intel.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"bhelgaas@google.com" <bhelgaas@google.com>,
-	"Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-	"Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
-	"K, Kiran" <kiran.k@intel.com>,
-	"Ben Ami, Golan" <golan.ben.ami@intel.com>
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Support function level reset
-Message-ID: <20251029162634.GA1565820@bhelgaas>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Agh5ssrd"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59TFrNSI4135361
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 17:41:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=Na4vPgKmid4FMLS307q9qm
+	zwvFHM7Swm9obvkkVxCdo=; b=Agh5ssrdgUaSZGHBpvQyJzP09oBsWtvHkz7e5f
+	vMzgry4M+TkLO6MNit2xombpIQPc9IP02jYEuVQuvjp8QllG2RKZqwJ3tePYzmg7
+	LAt+QxW1AdFKempS4tS6bYviGRJO0jRXso3WyDN+wTNwaAuFgWFj7N6L1T6+YTwW
+	S97KMoyZXOtxZFpm78QJj5T3LQqqylcJWtEi6hJGXexqvvkYvB63fdzMDLB1KWom
+	JCW4yBuHf45GTOjxcBvdkI71Wgne1PMwILG9+EypviH+CG/mx0+PFph4Mnyh0H+j
+	uwYZMvz5VRr+XUoVyiyoHM/jIWsOu1IOhbGWzQzo/2/w6Zcw==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a3ff9sqdt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 17:41:32 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 59THfVMB031871
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 17:41:31 GMT
+Received: from nasanex01c.na.qualcomm.com (10.45.79.139) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.24; Wed, 29 Oct 2025 10:41:31 -0700
+Received: from nasanex01c.na.qualcomm.com ([fe80::4cf6:99fc:3209:f4b8]) by
+ nasanex01c.na.qualcomm.com ([fe80::4cf6:99fc:3209:f4b8%13]) with mapi id
+ 15.02.1748.024; Wed, 29 Oct 2025 10:41:31 -0700
+From: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Harish Bandi (QUIC)" <quic_hbandi@quicinc.com>,
+        "Mohammed Sameer Mulla
+ (QUIC)" <quic_mohamull@quicinc.com>,
+        "Anubhav Gupta (QUIC)"
+	<quic_anubhavg@quicinc.com>
+Subject: Enable SDP logging
+Thread-Topic: Enable SDP logging
+Thread-Index: AdxInCI/V1vnRKrcQoCAV7sbsZ7NEw==
+Date: Wed, 29 Oct 2025 17:41:31 +0000
+Message-ID: <fe4bfce13d684757bb506301a08c5bf5@quicinc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <44428a7c1e1d4565556335d6fb28919053da5d4d.camel@sipsolutions.net>
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: qoF8msPZJCw9HnbW1lRcbxOizBd-9kVE
+X-Proofpoint-GUID: qoF8msPZJCw9HnbW1lRcbxOizBd-9kVE
+X-Authority-Analysis: v=2.4 cv=Cf4FJbrl c=1 sm=1 tr=0 ts=690251cc cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=xqWC_Br6kY4A:10 a=CXhX_D7DexwA:10 a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=SPzTFMxfSesD9TQGdw8A:9 a=CjuIK1q_8ugA:10
+ a=HhbK4dLum7pmb74im6QT:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI5MDE0MCBTYWx0ZWRfX95McJTumLulV
+ Ygru5cMTb6hDP0r8a+rTU4yEFUeNZGEUNgTeCUVTaEivnOOVF0teFxsnPnlzKfVfuVSNzfz8Rrx
+ 4R2k5PMRjqZwfZmJBhhN8NoG4H9ePUuJ8b6zNtUhT+8h1BXJXhYlni2WViZxgURjJPaljlg6dz3
+ E8xPsn83mLrrvfg9EUHcw2tmT8jjSuebUxGmtrVPB+BY2KnQs7i8bH+toFbWyC0JozX54l6i//4
+ HZaZr6b36X2FxvFBDuDtaNCGKwtSahYFet2KvQ5evGy6SUgmXuiQVByrC71WdGTCQIoREJd3lio
+ Hy1eKo20To3e0IW1qlsP+8tjFMipNQKYpaiPTHP7CcH3bTqxcplrqZlXGtBzDzkoyNuIs+kIbjW
+ QwAFWxBorljNlrlzmJzVecGDua0Ufg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-10-29_07,2025-10-29_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 suspectscore=0 phishscore=0 malwarescore=0 impostorscore=0
+ clxscore=1011 priorityscore=1501 lowpriorityscore=0 spamscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2510290140
 
-On Wed, Oct 29, 2025 at 11:38:31AM +0100, Johannes Berg wrote:
-> On Tue, 2025-10-28 at 16:06 -0500, Bjorn Helgaas wrote:
-> > > Obviously, we know the state of the device, but ... it _does_ require
-> > > PCI removal *and* rescan, because the device completely falls off the
-> > > bus and needs to be rediscovered. The drivers also fundamentally have to
-> > > be unbound from it, since all state of the device (including BAR setup)
-> > > is lost. I'm fairly certain that if you were to query even the device
-> > > IDs after the reset, you'd see 0xFFFFFFFF, but in truth I don't fully
-> > > understand how this works at the PCIe bus level.
-> > 
-> > It might be different for other buses, but the PCI core really doesn't
-> > do anything to the device during removal or rescan.  It does turn off
-> > power management interrupts from the device and the like, but I'm
-> > pretty sure it doesn't reset the device or do anything to make it
-> > start responding to PCI transactions again.
-> 
-> OK, fair. I have hit various weird issues with cached config space in
-> the past (such as [1], which we never resolved), so I guess I'm possibly
-> being ultra careful here in what I'm assuming or not.
-> 
-> [1] https://lore.kernel.org/linux-pci/20230605203519.bc4232207449.Idbaa55b93f780838af44ebccb84c36f60716df04@changeid/
-> 
-> > Obviously remove and rescan reinitializes the *driver* because the PCI
-> > core calls the driver .remove() method, reads the Vendor and Device
-> > IDs, reads and if necessary programs the BARs, and calls the driver
-> > .probe() method.
-> 
-> Right. So I guess in effect you're saying that device_reprobe() ought to
-> be sufficient.
-> 
-> For WiFi, this code goes back to another issue we had (somewhat
-> intentionally) where under certain circumstances during initialisation
-> the firmware can do a product reset without the driver being aware, and
-> then the driver just has to detect it by PCIe transactions failing with
-> 0xFFFF'FFFF being read all the time. It's going to be hard to test this
-> case now, but we can still test the product reset.
+Hi,
+I need help to enable SDP logging when '-d' option is set.=20
+In most sdp related code files, there are 'SDPDBG()' logs added but we cann=
+ot see these prints while collecting logs.
+Additionally, these logs depending on below macro to be defined -=20
 
-I think there are also some cases (maybe mostly embedded arm and
-arm64?) where PCIe failures cause synchronous aborts or SError 
-interrupts instead of just returning 0xFFFF'FFFF data.  Maybe nothing
-you can do about that other than adding delay after initialization or
-something.
+#ifdef SDP_DEBUG
+#define SDPDBG(fmt, arg...) syslog(LOG_DEBUG, "%s: " fmt "\n", __func__ , #=
+# arg)
+#else
+#define SDPDBG(fmt...)
+#endif
 
-> For BT detecting the error and initiation product reset, it does seem
-> that doing (only) device_reprobe() for both functions is actually
-> sufficient. I believe the FLR code in BT is broken though, so we're
-> going to (re-)check all of this.
-> 
-> > I think it's really the PLDR that's making the difference here, not
-> > the remove and rescan.  I guess you could experimentally read some
-> > config registers after the PLDR and before the remove/rescan.
-> 
-> Yeah, just need to find real hardware with all the BIOS integration to
-> run it ;-) (Most of our testing uses VMs.)
-> 
-> > Since you know the other device is dead already, I don't have a
-> > problem with resetting the shared parts of the device, so you do need
-> > some way to poke the other driver to reinit.  But I think using the
-> > PCI core remove/rescan to do that makes it more complicated than
-> > necessary and distracts from what's really happening.
-> 
-> Fair. I think the easiest way to achieve this is still device_reprobe()
-> on the other device - eventually even if we tell the other driver then
-> it still will simply call device_reprobe() on itself, so there's no big
-> difference.
+But this macro 'SDP_DEBUG' is not defined in any file.=20
+Is there any way to enable logs without need to change or update code local=
+ly.
 
-I hadn't heard of device_reprobe() until you pointed it out, but this
-usage doesn't really seem to fit the intended purpose since the
-probing critera haven't changed:
-
- * This function detaches the attached driver (if any) for the given
- * device and restarts the driver probing process.  It is intended
- * to use if probing criteria changed during a devices lifetime and
- * driver attachment should change accordingly.
-
-But I definitely like it better than remove/rescan.  I suppose either
-way results in udev remove/add events that are really spurious.  And
-maybe PM artifacts like what you tripped over at [1] (although there
-may still be a harmful PCI core race there).
-
-Bjorn
+Thanks,
+Amisha
