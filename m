@@ -1,158 +1,159 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95F5189906
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 03:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C3431062C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 07:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761707862; cv=none; b=iGYDaYeq/LqjtIpkYFF/dPwinj+YRPUrsgJcYDypSRHtYFNWtBFAaeqQCPBfCnhi+fGGM0Xhhm6cIQ0JW5cVMrXt46/VL13Pjdxe+8nsZrTJWLmQ9fDnrP0FMTV0ypNScwGtaLtXSMts0J/YNZ/93N1qEV6ZXM8xzvePD9WVz/4=
+	t=1761723855; cv=none; b=PRhLUMw0DnzpZQC1kqmcLCKTsOSAML6XvAfnw0twP9NwDOYSigxlQbK1Y4hoi5ubtR83bD29khyVrdT4OLagyVObqm4McG5GShXjmHRkq2AAfGpblkNQMWRJWhQSbVDD+JoWmcHcyHR6FrYsZ6u4nDKWBM/oC9/M7/NRSvudkQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761707862; c=relaxed/simple;
-	bh=08B+9jj85qtUenM85KLBopOTQeR9eP6MVFBOnJepqeY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=JSwHEO8ectX2QpJRIPhMP4FR7KX039IdzyPZgpgOnVQQBz235FMpMkPuxtcVog6WyfAbVqlcq1ivSLXLLmxzmnrabBjYT5MHr0r8LiHlFqb9aK1g65puJ8JBaCmm4x4hxOOjltiFwohvNXzVti8TV+JWrjRTJvDknWVTOlkM7dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KstbA9Ah; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761723855; c=relaxed/simple;
+	bh=3IoFdlCCWikmDiMq6UlyJQjQlHbAeU4jDpT1gAwPsqo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=uUoupBzMUVY6Kjzq+591oYY2VGC6Mq7loYvnh6/BfXqBPD//pXRIGstMu8oh5+qZBCx5LBhfpOZeiFDqfDTyqSrzbchUGhleTg6mwruyRbKLBtGdw+aHHqEagcxCo/aMDBGj6RaZGWfx1zZ2JQ6oi3OsX0/z06+t+Bb3Six5xLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=b6xabFrq; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KstbA9Ah"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-292fd52d527so68577255ad.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Oct 2025 20:17:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b6xabFrq"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-429a8a27db6so202107f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 00:44:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761707860; x=1762312660; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=2mCS4TVVIVqdwvmDa/ryStkCnKaR+gVmAIbzCMeQ9/c=;
-        b=KstbA9AhzJae8ccTv+mYln/kWM3OwXI00KgaLiRyk/Udycde0cpf0bZdktuwJ9lroS
-         ED+RCKDPQZCYyTFxfGuS1An08fBUd/ELid/iTHDDKcnHAUTmT5kHuPYL6EE8FHZ0KeLd
-         qqkTnWRmFdH/l+Qil0JqiUC4vwV7ojNy0PUVXVuY0GDRJ2VDW6IJ57UMldLw2RJ+v+NI
-         LC1sLN1g3NExp47DhpbXCDv8m4KVs1lVyLkY1ySZaJhWzArfYZa87ptucvvQkQL4s7Va
-         2R52bwm8RgxbinuU6dOkS8pbfP0EXQNEQQdHr1tJGo3IdDPFHLHtnySN6qLETtH8RiQA
-         NYWQ==
+        d=linaro.org; s=google; t=1761723852; x=1762328652; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8IBQ8J86W+Ho0NRPhuUdL74YHKcBwQvPsUVrTbS+Yw=;
+        b=b6xabFrqHt3HUHqj0PqPtfbpeYTuIsrd8OZFYdZ6hlVMEBtScRuXRecgXrn13ss3yG
+         UY5YAbX+xA6sX4FGlGlHbmjC9IderpDrzClG8bBZ5ywnlTOPfbr0OdiEWNXp5SE/x1pq
+         PxhffAKN0L+sfofmXT59WNO+SoSXa/nE/wIrNMA4A3nUBkMOvb41OhzL8OJX0UB1GIUb
+         OLnwv/9qd0cdWb35MyfOrW39zGaGRrjl5GeSo/pgi2wIKqbAVZceVOxteh0p3RQRg+yX
+         8OR8weKDg/iRqLUlN8F76GPEc+KEGn37PePMRFqIJR6u4njC+USeQ2ste7JnGMWOzl5l
+         gFZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761707860; x=1762312660;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1761723852; x=1762328652;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2mCS4TVVIVqdwvmDa/ryStkCnKaR+gVmAIbzCMeQ9/c=;
-        b=pGSoWlRBcpFSg+3jumyZXYxt0lfDxwMCe9Fb7Qyj6qbapnU5MZSP2ZYkiF/+x+CD7O
-         tYl0xsxCFKIYVHM82Ec8bvyypUPBXLw6cC+fVgFZ5merMoE9c362QeHg6PNo9Oy72BeZ
-         MC0rTP5IplfdgjqGrUg4/GlE6Im1dWOJvNHsti8os3teiK1mqsJyf0KSfII4TQ4c2sAG
-         XaFCySNK/AFJL10OGLx1P8+bSD1G5tTT9EYW535gqypD6hm0eJlbgIeofvd3V86wXTa3
-         Ke+AtdsfEflhHNPcf5uKfskdwk3p1MqrWrzuJYEf+7WJcfLl6vR7ml6CteXsp7RuVt4e
-         2Msw==
-X-Gm-Message-State: AOJu0Yx0POR/BEfkggfPyIPhWW2IkY/vanHAWxBQW9zfBEnYmYd5KvkF
-	sNv1jdjPXfRlxB80ELpx0+piLE/+2NX04Ni4NcOgkn8X7i4KZUuItbP/ptWhBw==
-X-Gm-Gg: ASbGncusdmMJjGAHft1t/MN3RoJ+SXHg+VeS7pK7R/jpIAvHAknnwqvZBbvRwPJ0hrj
-	onvEy8pxHasrUfRrnsY5rbiQlTle8kiemtCDOWb48S8KsMg2X5skeJ60rcv1qHMTmrd01voDg3O
-	0cjKfgVUFF7u1cbNQNEkBAZpJxaONvQ39CCppi65Q3rXC0QDtOJDMvDxKjBZ5zIpdvutuuv8ziy
-	i7WYQgd5XhEkLZ1fzubF/RggP37Rkr8swIQkbqqQaahUzgpTBRU8Q2qcj5WTFxmTE8VI1H4NnD/
-	sgRjaJ7jUQQvlKqJRDomteAqOKxTlLJaYHK9lYufLBOHmJbYxRhlYxEZKZwSt86u/a9TxbU1s8U
-	O14c4DtbpaSmiYyb2dntbfbO486titV94u2EbooxtDdCXD0HxqkQ15C4ki1D9T4W/af3J+UsT+Z
-	9F7ISgZ01F
-X-Google-Smtp-Source: AGHT+IEiupx7gTo0XNCP/+wUKYXd5dmMr7yl5Q/kNSqdFZOedihIHpKc9UUpwRe/tZ5CORd7+IWjwQ==
-X-Received: by 2002:a17:902:c40b:b0:293:e12:1bec with SMTP id d9443c01a7336-294dee2c381mr20709635ad.20.1761707859727;
-        Tue, 28 Oct 2025 20:17:39 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.220.195])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d412ebsm135360575ad.78.2025.10.28.20.17.39
+        bh=Q8IBQ8J86W+Ho0NRPhuUdL74YHKcBwQvPsUVrTbS+Yw=;
+        b=gH1mRfvHQfXjBzPVNu+93s3Vu6ZoVtmxZ6TSkH/Sc2Ssj9eT+kAuQCDIWXf4soOeoE
+         yOMuall8wRG7yRzGK+NptkIqA1sKy59XRgkha8QJKzWgfXaEzaYfI1DUATgOYPrG7T+a
+         RhTI2J9T8Ip3Y/5MtYgnciqjGWi/JrHdsl7EDfeL4uzaqlgzIRUSwR8FqXjBnNviynSQ
+         eG4MIlVAKVg6pbbX6WTOjIi7BcC6xOILS8Nb3LDsbzhA2L8bfQSc9M9FOfKniumrlODO
+         xvhM7DGqXICfE8Oi1PM2JPGLI3L8j3M30BWSelb6dfb9QTwqwTgCymsiX/mmg/bqdGEt
+         rUmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVaW1PDbk74goX4iZtEnWW9gWNviHrh+zVUhpI2WzTig8wgux0fkIlQMI8zyW4dvc4S9mHEhhLa5r3y/zNgKic=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7fbZAV1HRbyffUNPVjSe0LtbCAF9I242F+5N03D5V79G9t8aq
+	sb9FnRsDAr8e2Ql7Ox5xdJtHjWU3gY/j28EzpGtzkVHhkBrp9ytzfE9zzuf+MOjydLU=
+X-Gm-Gg: ASbGnctdRdRNRatRAsvdkxnikShx84oRuvLUsRZHC53kCJ/8KV6U/16iLSj9EyqVg6u
+	fyzaPGBdI7FOieP4NSSMMPwhCY11CO6uyhCE6S8vjtbROVrszUUbbGfea2ZsMzKcfL42NqdC4V1
+	RkOu9hBRk3LEXtj1cywGsa6nbQrmrOKJvPJnWrdPluXKZruEQKUSdPmzV+z5++3+6hWNzB6EQ8P
+	4RW8qoOhaw/iZoarhwl2NtX3kPdb8y3lKZKU885TJUrPa+HshpKqzdJ4ewL4IySQcjDnvPTWBl6
+	SGM+Qz2n0Lonc5H3+LnugfZDW9E49TomMYUOI+WuRgFGYqRsUxZKJ1rgJ5aMX6QDSZiphipyakf
+	A003t4259L4Na5LatQ+SvUkYrMfVstWULEgjWC5swIseUIAUdrzhsK9AcaMk0qcdRuA9DTqUR1p
+	AIID8rtgU6C5sGxRTf
+X-Google-Smtp-Source: AGHT+IGBHPa9FWFsafhuKEepgyEqFikPWuXR6pV71zYWo/nrRIC5j5YSfmvpV/MNFmMibpTqG4Fwgw==
+X-Received: by 2002:a05:6000:2501:b0:426:fff3:5d1a with SMTP id ffacd0b85a97d-429aefbc37fmr786825f8f.6.1761723851637;
+        Wed, 29 Oct 2025 00:44:11 -0700 (PDT)
+Received: from [127.0.1.1] ([178.197.219.123])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952d5c9dsm25861146f8f.26.2025.10.29.00.44.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 20:17:39 -0700 (PDT)
-Message-ID: <69018753.170a0220.328a95.10d9@mx.google.com>
-Date: Tue, 28 Oct 2025 20:17:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2188259314879588039=="
+        Wed, 29 Oct 2025 00:44:11 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v2 00/11] Bluetooth: dt-bindings: qualcomm: Split binding
+Date: Wed, 29 Oct 2025 08:43:50 +0100
+Message-Id: <20251029-dt-bindings-qcom-bluetooth-v2-0-dd8709501ea1@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_shuaz@quicinc.com
-Subject: RE: Bluetooth: btusb: add default nvm file
-In-Reply-To: <20251029022955.827475-2-quic_shuaz@quicinc.com>
-References: <20251029022955.827475-2-quic_shuaz@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2188259314879588039==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALbFAWkC/43NQQ7CIBCF4auYWTsGsGjrynuYLijQdpLKKGCja
+ Xp3sSdw+b3F/xZIPpJPcNktEP1MiTgUqP0O7GjC4JFcMSihtBSqRpexo+AoDAmflu/YTS+fmfO
+ IjekrqYU+WWmhBB7R9/Te4re2eKSUOX62r1n+1r+ys0SBWlWmOdf+aJ25ThRM5APHAdp1Xb8O+
+ krdxQAAAA==
+X-Change-ID: 20251028-dt-bindings-qcom-bluetooth-9af415056c1c
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+ Rocky Liao <quic_rjliao@quicinc.com>, Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+ linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2732;
+ i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
+ bh=3IoFdlCCWikmDiMq6UlyJQjQlHbAeU4jDpT1gAwPsqo=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBpAcW9JcAU4Jps6oHo8yAuEB6OiU62FLtEhPgRP
+ y+C/MI5QDGJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaQHFvQAKCRDBN2bmhouD
+ 1zGeD/9qqgK7KwutWXihmzCHS66coHJAOFSOzS9UxyPLqLU7Bl3icWq10OYkLFbWLhoCkCHl1hF
+ YamWAOO9frPgA5npKuxAN2CxVRFTt7Ejy3moEDcgVx8JrvQThIx2xD/j5d3JanZEcM4Z8F22Blh
+ eeup/DRldPw4tj6VVO9W0E9eWE5C7YJnJUkAbAAydOGlq0r8Pgx+l+q7vC1bsdo2my20xxEv6Wr
+ NJQt5MjeRvtoJU9+D6khR2wpIXdl0faLqCg4zDxx2wl6W5i+zWvASUjhQBdTFZdpT07/0aj0bQz
+ HFSy3r3pw2RG0N5h1mUbLMFPEi8DrKQUpnmixC+UJethTvyq3Oe9x4uimf+vrL9E/1K9fDncf1T
+ i5zNLE/wTCXbpExIBV5DOVNdm9oxZuhxrfpLLIhSr8VujHatGpOYU5baguobNYtKuoUHNKHi2LI
+ fwl7CYlHE5IMmGmBAn63EoG1HSubPbh5WdI3EAKCpCpacHIVAp8mMiOL6DG5S3fK3580V2nSMhy
+ yscLiIeuVpxO8bxRv4sxNsz4uT8eUHp4wP4f6k51Gx18PAlBDt46cWs4t70Eo83+pkSI5E4crIc
+ xZ+k4WdkNfGEjwctaEGDwx4z7wuMaqPnpZCjEIT6vyu0yU3I9TiVNCBJWLKwyX1X5Nf66FPweJ/
+ EBpIoQJJBahg+GQ==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
+ fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-This is automated email and please do not reply to this email!
+Changes in v2:
+- Drop in few commits the properties (supplies) from
+  qualcomm-bluetooth.yaml which are not used by devices left there,
+  instead of removing them in final patch (qcom,wcn7850-bt).
+- Fix dt_binding_check error - missing gpio.h header in the example.
+- Drop maintainers update - split into separate patch.
+- Add also Bartosz as maintainer of two bindings because he was working
+  with these in the past.
+- Link to v1: https://patch.msgid.link/20251028-dt-bindings-qcom-bluetooth-v1-0-524a978e3cda@linaro.org
 
-Dear submitter,
+One big Qualcomm Bluetooth schema is hardly manageable: it lists all
+possible properties (19 supplies).  Split qcom,qca6390-bt to separate
+bindings, so device schema will be easier to read/maintain and list only
+relevant properties.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1017003
+What's more it messes up old (pre-PMU) and new (post-PMU) description in
+one place adding to the total mess.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.37 seconds
-GitLint                       PENDING   0.34 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      24.75 seconds
-CheckAllWarning               PASS      27.34 seconds
-CheckSparse                   PASS      30.51 seconds
-BuildKernel32                 PASS      24.44 seconds
-TestRunnerSetup               PASS      496.49 seconds
-TestRunner_l2cap-tester       PASS      23.79 seconds
-TestRunner_iso-tester         FAIL      33.35 seconds
-TestRunner_bnep-tester        PASS      6.21 seconds
-TestRunner_mgmt-tester        FAIL      111.65 seconds
-TestRunner_rfcomm-tester      PASS      9.13 seconds
-TestRunner_sco-tester         PASS      14.17 seconds
-TestRunner_ioctl-tester       PASS      9.79 seconds
-TestRunner_mesh-tester        FAIL      11.50 seconds
-TestRunner_smp-tester         PASS      8.38 seconds
-TestRunner_userchan-tester    PASS      6.38 seconds
-IncrementalBuild              PENDING   0.81 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-No test result found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.097 seconds
-LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.141 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.058 seconds
-Mesh - Send cancel - 2                               Timed out    1.997 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+Best regards,
+Krzysztof
 
 ---
-Regards,
-Linux Bluetooth
+Krzysztof Kozlowski (11):
+      dt-bindings: bluetooth: qcom,qca2066-bt: Split to separate schema
+      dt-bindings: bluetooth: qcom,qca9377-bt: Split to separate schema
+      dt-bindings: bluetooth: qcom,qca6390-bt: Split to separate schema
+      dt-bindings: bluetooth: qcom,wcn3950-bt: Split to separate schema
+      dt-bindings: bluetooth: qcom,wcn3990-bt: Split to separate schema
+      dt-bindings: bluetooth: qcom,wcn6750-bt: Split to separate schema
+      dt-bindings: bluetooth: qcom,wcn6750-bt: Deprecate old supplies
+      dt-bindings: bluetooth: qcom,wcn6855-bt: Split to separate schema
+      dt-bindings: bluetooth: qcom,wcn6855-bt: Deprecate old supplies
+      dt-bindings: bluetooth: qcom,wcn7850-bt: Split to separate schema
+      dt-bindings: bluetooth: qcom,wcn7850-bt: Deprecate old supplies
 
+ .../net/bluetooth/qcom,bluetooth-common.yaml       |  25 ++
+ .../bindings/net/bluetooth/qcom,qca2066-bt.yaml    |  49 ++++
+ .../bindings/net/bluetooth/qcom,qca6390-bt.yaml    |  64 +++++
+ .../bindings/net/bluetooth/qcom,qca9377-bt.yaml    |  58 +++++
+ .../bindings/net/bluetooth/qcom,wcn3950-bt.yaml    |  67 ++++++
+ .../bindings/net/bluetooth/qcom,wcn3990-bt.yaml    |  66 ++++++
+ .../bindings/net/bluetooth/qcom,wcn6750-bt.yaml    |  91 ++++++++
+ .../bindings/net/bluetooth/qcom,wcn6855-bt.yaml    |  99 ++++++++
+ .../bindings/net/bluetooth/qcom,wcn7850-bt.yaml    |  94 ++++++++
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml | 259 ---------------------
+ MAINTAINERS                                        |   1 +
+ 11 files changed, 614 insertions(+), 259 deletions(-)
+---
+base-commit: c9d6ae701ace298035b6529eb10083d356cf2ae7
+change-id: 20251028-dt-bindings-qcom-bluetooth-9af415056c1c
 
---===============2188259314879588039==--
+Best regards,
+-- 
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
