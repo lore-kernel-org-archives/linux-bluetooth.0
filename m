@@ -1,112 +1,153 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DAD351FC7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 17:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02532E22BD;
+	Wed, 29 Oct 2025 20:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761759696; cv=none; b=OSe8t/1Qxszyqw14dYKcN7FmHQc4oxuT7tztligx/ZQ6b1BpW9J4XgZi+O8BzY65iwTnITRhU9Ye+2NG4/saQNCV5km2SQXUK+f7Ezp2iZOBXD6L2c+DVPIK9eCp/4nB+eVfVdIvEcn4z0JYioYNulOoI1t/4uKw3LKylgGW+GM=
+	t=1761768954; cv=none; b=WHWPUtXLUZjCT6yagf5ZbnoK2ahrd6n0km5KZeO03kVXX+x+ysCYcGy8OunvUde3YP7jZfAvbqxbqyW3SKrZr/NeRzqFMw/3mKxI5FPse/DehHl8YZtMN1yP7ZuWezRIzhEAOtl1r92e5/rQ0e8GhVoNAEf1G81Kl4buK8VPuDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761759696; c=relaxed/simple;
-	bh=Na4vPgKmid4FMLS307q9qmzwvFHM7Swm9obvkkVxCdo=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NCjfdzpwbOTEQXNYuv7/h0lVT8h77m6xoAphc+GMHn0MuVUwdybpDil1nubl2rCs21qv7CgqHgFxp4mH2lQC6Wu/xbhCNIp6mMyUPUBmH7bXcu2efAAXpie22eJmiv2IK4Zv/K+g2HtixRJyPzc532M8QQlEcg1IaXX/9uzT024=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Agh5ssrd; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Agh5ssrd"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59TFrNSI4135361
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 17:41:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=Na4vPgKmid4FMLS307q9qm
-	zwvFHM7Swm9obvkkVxCdo=; b=Agh5ssrdgUaSZGHBpvQyJzP09oBsWtvHkz7e5f
-	vMzgry4M+TkLO6MNit2xombpIQPc9IP02jYEuVQuvjp8QllG2RKZqwJ3tePYzmg7
-	LAt+QxW1AdFKempS4tS6bYviGRJO0jRXso3WyDN+wTNwaAuFgWFj7N6L1T6+YTwW
-	S97KMoyZXOtxZFpm78QJj5T3LQqqylcJWtEi6hJGXexqvvkYvB63fdzMDLB1KWom
-	JCW4yBuHf45GTOjxcBvdkI71Wgne1PMwILG9+EypviH+CG/mx0+PFph4Mnyh0H+j
-	uwYZMvz5VRr+XUoVyiyoHM/jIWsOu1IOhbGWzQzo/2/w6Zcw==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a3ff9sqdt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 17:41:32 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 59THfVMB031871
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Oct 2025 17:41:31 GMT
-Received: from nasanex01c.na.qualcomm.com (10.45.79.139) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.24; Wed, 29 Oct 2025 10:41:31 -0700
-Received: from nasanex01c.na.qualcomm.com ([fe80::4cf6:99fc:3209:f4b8]) by
- nasanex01c.na.qualcomm.com ([fe80::4cf6:99fc:3209:f4b8%13]) with mapi id
- 15.02.1748.024; Wed, 29 Oct 2025 10:41:31 -0700
-From: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Harish Bandi (QUIC)" <quic_hbandi@quicinc.com>,
-        "Mohammed Sameer Mulla
- (QUIC)" <quic_mohamull@quicinc.com>,
-        "Anubhav Gupta (QUIC)"
-	<quic_anubhavg@quicinc.com>
-Subject: Enable SDP logging
-Thread-Topic: Enable SDP logging
-Thread-Index: AdxInCI/V1vnRKrcQoCAV7sbsZ7NEw==
-Date: Wed, 29 Oct 2025 17:41:31 +0000
-Message-ID: <fe4bfce13d684757bb506301a08c5bf5@quicinc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1761768954; c=relaxed/simple;
+	bh=HDfewOV5mACxbjXjrW/oald4KFBK1ql0agAzRq4tGg4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=of9v1cDNu12n+wm3BF6pomOfQG5GderqfR7+aokEn+BBAt3zV3r32uOx0xa/QY8dfsU9aBrwQgL6Da1BVa/U6QWRHSy8AMyrHhe3TEGnKKu4WZhPWSxxbxQZB3fE/yK8cArSxGF6loE+1Tl3Hdbv3ehzyPdKKgphnnNJtZSy8QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.214] (p57bd9c51.dip0.t-ipconnect.de [87.189.156.81])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5914B617C4FA6;
+	Wed, 29 Oct 2025 21:15:31 +0100 (CET)
+Message-ID: <9778a6a1-ffb0-4972-a2e7-893128a51e52@molgen.mpg.de>
+Date: Wed, 29 Oct 2025 21:15:28 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: qoF8msPZJCw9HnbW1lRcbxOizBd-9kVE
-X-Proofpoint-GUID: qoF8msPZJCw9HnbW1lRcbxOizBd-9kVE
-X-Authority-Analysis: v=2.4 cv=Cf4FJbrl c=1 sm=1 tr=0 ts=690251cc cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=xqWC_Br6kY4A:10 a=CXhX_D7DexwA:10 a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=SPzTFMxfSesD9TQGdw8A:9 a=CjuIK1q_8ugA:10
- a=HhbK4dLum7pmb74im6QT:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI5MDE0MCBTYWx0ZWRfX95McJTumLulV
- Ygru5cMTb6hDP0r8a+rTU4yEFUeNZGEUNgTeCUVTaEivnOOVF0teFxsnPnlzKfVfuVSNzfz8Rrx
- 4R2k5PMRjqZwfZmJBhhN8NoG4H9ePUuJ8b6zNtUhT+8h1BXJXhYlni2WViZxgURjJPaljlg6dz3
- E8xPsn83mLrrvfg9EUHcw2tmT8jjSuebUxGmtrVPB+BY2KnQs7i8bH+toFbWyC0JozX54l6i//4
- HZaZr6b36X2FxvFBDuDtaNCGKwtSahYFet2KvQ5evGy6SUgmXuiQVByrC71WdGTCQIoREJd3lio
- Hy1eKo20To3e0IW1qlsP+8tjFMipNQKYpaiPTHP7CcH3bTqxcplrqZlXGtBzDzkoyNuIs+kIbjW
- QwAFWxBorljNlrlzmJzVecGDua0Ufg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-10-29_07,2025-10-29_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 suspectscore=0 phishscore=0 malwarescore=0 impostorscore=0
- clxscore=1011 priorityscore=1501 lowpriorityscore=0 spamscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2510290140
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: rfcomm: fix modem control handling
+To: Johan Hovold <johan@kernel.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20251023120530.5685-1-johan@kernel.org>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251023120530.5685-1-johan@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
-I need help to enable SDP logging when '-d' option is set.=20
-In most sdp related code files, there are 'SDPDBG()' logs added but we cann=
-ot see these prints while collecting logs.
-Additionally, these logs depending on below macro to be defined -=20
+Dear Johan,
 
-#ifdef SDP_DEBUG
-#define SDPDBG(fmt, arg...) syslog(LOG_DEBUG, "%s: " fmt "\n", __func__ , #=
-# arg)
-#else
-#define SDPDBG(fmt...)
-#endif
 
-But this macro 'SDP_DEBUG' is not defined in any file.=20
-Is there any way to enable logs without need to change or update code local=
-ly.
+Thank you for your patch.
 
-Thanks,
-Amisha
+
+Am 23.10.25 um 14:05 schrieb Johan Hovold:
+> The RFCOMM driver confuses the local and remote modem control signals,
+> which specifically means that the reported DTR and RTS state will
+> instead reflect the remote end (i.e. DSR and CTS).
+> 
+> This issue dates back to the original driver (and a follow-on update)
+> merged in 2002, which resulted in a non-standard implementation of
+> TIOCMSET that allowed controlling also the TS07.10 IC and DV signals by
+> mapping them to the RI and DCD input flags, while TIOCMGET failed to
+> return the actual state of DTR and RTS.
+> 
+> Note that the bogus control of input signals in tiocmset() is just
+> dead code as those flags will have been masked out by the tty layer
+> since 2003.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+
+There is a linux-history git archive [1], if somebody wants dig further. 
+But not relevant for the tag used by the stable folks.
+
+Is there any way to test your change, to read DTR and RTS state?
+
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Johan Hovold <johan@kernel.org>
+> ---
+> 
+> Changes in v2
+>   - fix a compilation issue discovered before sending v1 but never folded
+>     into the actual patch...
+> 
+> 
+>   net/bluetooth/rfcomm/tty.c | 26 +++++++++++---------------
+>   1 file changed, 11 insertions(+), 15 deletions(-)
+> 
+> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+> index 376ce6de84be..b783526ab588 100644
+> --- a/net/bluetooth/rfcomm/tty.c
+> +++ b/net/bluetooth/rfcomm/tty.c
+> @@ -643,8 +643,8 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
+>   		tty_port_tty_hangup(&dev->port, true);
+>   
+>   	dev->modem_status =
+> -		((v24_sig & RFCOMM_V24_RTC) ? (TIOCM_DSR | TIOCM_DTR) : 0) |
+> -		((v24_sig & RFCOMM_V24_RTR) ? (TIOCM_RTS | TIOCM_CTS) : 0) |
+> +		((v24_sig & RFCOMM_V24_RTC) ? TIOCM_DSR : 0) |
+> +		((v24_sig & RFCOMM_V24_RTR) ? TIOCM_CTS : 0) |
+>   		((v24_sig & RFCOMM_V24_IC)  ? TIOCM_RI : 0) |
+>   		((v24_sig & RFCOMM_V24_DV)  ? TIOCM_CD : 0);
+>   }
+> @@ -1055,10 +1055,14 @@ static void rfcomm_tty_hangup(struct tty_struct *tty)
+>   static int rfcomm_tty_tiocmget(struct tty_struct *tty)
+>   {
+>   	struct rfcomm_dev *dev = tty->driver_data;
+> +	struct rfcomm_dlc *dlc = dev->dlc;
+> +	u8 v24_sig;
+>   
+>   	BT_DBG("tty %p dev %p", tty, dev);
+>   
+> -	return dev->modem_status;
+> +	rfcomm_dlc_get_modem_status(dlc, &v24_sig);
+> +
+> +	return (v24_sig & (TIOCM_DTR | TIOCM_RTS)) | dev->modem_status;
+>   }
+>   
+>   static int rfcomm_tty_tiocmset(struct tty_struct *tty, unsigned int set, unsigned int clear)
+> @@ -1071,23 +1075,15 @@ static int rfcomm_tty_tiocmset(struct tty_struct *tty, unsigned int set, unsigne
+>   
+>   	rfcomm_dlc_get_modem_status(dlc, &v24_sig);
+>   
+> -	if (set & TIOCM_DSR || set & TIOCM_DTR)
+> +	if (set & TIOCM_DTR)
+>   		v24_sig |= RFCOMM_V24_RTC;
+> -	if (set & TIOCM_RTS || set & TIOCM_CTS)
+> +	if (set & TIOCM_RTS)
+>   		v24_sig |= RFCOMM_V24_RTR;
+> -	if (set & TIOCM_RI)
+> -		v24_sig |= RFCOMM_V24_IC;
+> -	if (set & TIOCM_CD)
+> -		v24_sig |= RFCOMM_V24_DV;
+>   
+> -	if (clear & TIOCM_DSR || clear & TIOCM_DTR)
+> +	if (clear & TIOCM_DTR)
+>   		v24_sig &= ~RFCOMM_V24_RTC;
+> -	if (clear & TIOCM_RTS || clear & TIOCM_CTS)
+> +	if (clear & TIOCM_RTS)
+>   		v24_sig &= ~RFCOMM_V24_RTR;
+> -	if (clear & TIOCM_RI)
+> -		v24_sig &= ~RFCOMM_V24_IC;
+> -	if (clear & TIOCM_CD)
+> -		v24_sig &= ~RFCOMM_V24_DV;
+>   
+>   	rfcomm_dlc_set_modem_status(dlc, v24_sig);
+>   
+
+
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://web.git.kernel.org/pub/scm/linux/kernel/git/history/history.git/
