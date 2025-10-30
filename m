@@ -1,67 +1,72 @@
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63EA36334B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 17:01:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C3634D93C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 17:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761843720; cv=none; b=irCwSz0kOyEPS9PDU1iIkAvRN2TIieGOqT50nfckCNZDPtslMqZYY7XPzOTUqEWx5HHNmDz9yh2CkLkX3SghvOAfwJAf6Uy55B7y5NpoFNyXanNEqU5C1zF/iZ1wqa65bJFp8BNi0zFxHdBQV+/lCkVLMsidBGajIXdl3ch643k=
+	t=1761843728; cv=none; b=uQXWLLPc8fJyUcoSzsHxcbXagCUnoGkmSkNETR/wbNLah2REWxBlYM9tUYx0GLMGRxUrbJuKdG9XIbJCoiV4fb0/4sbk0HYrMW8BZpx9LBTWj+kfYR5+i6r0FnS7VqWxpC2CxXUD1qp0cgqkS+rGBnqGyRAoIYcA7yL78WQJZqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761843720; c=relaxed/simple;
-	bh=LpJ2UN/YwkLzcjhS5OmWWMj7FhR2ZFaafCK0TgpPcIA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gcEQZyPIhBS/gCVHz5NfW3sHVP+XOV8YczOvGFu6x9NhgIfTzd3YmKM1X5vQI6EEy3Xad7LYrL2GziKm6NsGccITLnLfzmdahFKK9pmljVKnDw2dwJunFMn0PtONivbmkxs7AesUihxDQcF+U72+J2IoU9wiG7hc+wmAIotq+jE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1nHjTET; arc=none smtp.client-ip=209.85.217.52
+	s=arc-20240116; t=1761843728; c=relaxed/simple;
+	bh=P4sVJs6TvIwOIW2e2Pns+l2C0s5WyImyZ8xUb1FLRzY=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Rz0zVzA02cSQwLXrkGb+fyiWNaoWIdOi2mV6X/vLN8QAC574n6W8REWzRDlb4fJ/Acda8rCjtAq7wswacjhQUVAYPIRbE1q3r+t1yU+UXH1tX6j4Rx9pJKHXr9ud2qyPAO+yRu8qmLbnh+tnehxhw0PVYfHbo9Hl02XMs1rKDDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f0IxmXp8; arc=none smtp.client-ip=209.85.217.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1nHjTET"
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-5d758dba570so951161137.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 10:01:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f0IxmXp8"
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-5d967b67003so1546355137.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 10:01:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761843695; x=1762448495; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cp8wJEq0bGfyJZWtmhouJEynMd76HtulbeysoHrepF4=;
-        b=V1nHjTET3AOfsrZ4/6KZtcFRqfa77FuL0lwJnscNgS0HM+UeYSkyhvS39YHK01V3Uk
-         TKFzsv0GoQJTH+EyGgqexS7Atg8/hPUAFiYmd4fzFjD9kpoImKohnhSUhVgtGQmXf1FK
-         ccZQHGy1UKx4coKrEjMF2J+FeSnR6XSdVgidPanB8AD6wLL5XrBbeeSmUeBZpB+ld51L
-         chXI7NIwtAFuhCGI+CGvAOZGzRPHF/Sqofc5rI26To54/R6oxn0DzkPxtBhm4f0CXZcs
-         nd69Anl6E0QB5lYVRlCHL0hMEeOKTcHynAlyauV74f9ptcVEJPFKRrgvqBtcUflou/Q6
-         IadQ==
+        d=gmail.com; s=20230601; t=1761843701; x=1762448501; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I51elFZXgkbCyenDZZVaSGBFbw1PPbSY/OrMUb2uVr4=;
+        b=f0IxmXp8/DdaA1yw96GiVyPUF7H/klAGLH+geSUhBnAMm1GTPLICUVTAzmeZrLuDL+
+         47FPmvT/FWh7oiocQ37I+cyxeW5Gou6ig4qoLzgEu2JurB9rOg/z5oOkGrGERn3XQeSy
+         C8NHri5f5HTnO8xmuY7waaohbQ1cfOjm4p2IMUCoA9PSNQbK7Cha+G6Zj8SZw/oDmCF3
+         vrWaTB61Chi2UITKq8T5DeCnK+Ak+Wtp8D6X4a7Gpaxpj1buj9OQVxhqQKPCboBdSda4
+         +ZvUIAgSDFjzhgzD224nMlh3bnHqVDLXsw7OMtESj9XR3O4Gur0Tl985yLLbJpeAvtQ0
+         qRBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761843695; x=1762448495;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cp8wJEq0bGfyJZWtmhouJEynMd76HtulbeysoHrepF4=;
-        b=Fov/EG9WMAjK3y99GjRAnTB2+pkyQ4PVcMsLEU3Jnzncu50VN8ZbhLsk7c8Xeb5mT2
-         Om6G84JlmGhN38CynhcISRQaAsCGRkGIKktYqazTQcnI6SGyDls13ZQQLRbtGBA/sH7U
-         sA9CNh6in34DTaoawIxeQxw7+VMrnox5S+fpF4HQz3XwWNKNtbJgChXka8h8ux7ZPVcV
-         lDzQSh8vsc3kzugtwjgDCnAWYOmQzv/srtK4VZxB+WszRqC1kTeC08KDrJbqLM59dZ4W
-         fwpucrdWBYEwhoQPkyzwepl2UcBv+PlSQPJvL+R5JnHesmgd+aluXSo1t5A9KSJcfbqg
-         ZTtQ==
-X-Gm-Message-State: AOJu0Yy2LTfzUMVypDCPrcP0K+cwQcD5tNKvZAyc2FhDpHWske6+tdgz
-	k+RLvCDs+fbOfp7gZeGwcNdP6Dujj7pcsI2vjLAW5/3rGcKN+ACQogw9eDDrhT4X
-X-Gm-Gg: ASbGncsP4uZvGIW4laIxISBrmkqP4MTzokDvkmI/IjPfoYYIGKNHzu06t8Wy/OQ8N2M
-	3Olr94vEGoj3i1KOmxRw/K1l8wKU5PeRQ+jv0i+huxniBW3YwtKM1xTqxzPZAws6pILXfYyxzvR
-	nlyhdeLj/wm27b+TZsq/Rw7ZXZ18OH6Ie2nxCiCf6l950QnpUS442qgTHdjQaI0Dr35R93hIewk
-	Cq+JFMkfOduoYpuybJ8TCTJi2a5xTGp7UiNzqmmbsyjvA8D0y7mL0wcmqtPsL1S96z+oEQX/067
-	v5maJ2JKs67nilSe478sTOCiHddZIkKDopGHnKHn7I+4AdFJWabRIvs97L4Lrr7rNmP1CizdEjh
-	CA66UsHU2bYJVDQ/klWP49k36n4OA9lL2IcG+Xc2Kr8CjR6snT3OZo5qI8It6WELtpUOMtvMclJ
-	603eMbs5f9lLJDH7+h/zGKlq31
-X-Google-Smtp-Source: AGHT+IHFegvOeGHfNC4Mw0w+AU7+9kft938pI1aaCMfR+ox1pmhVvU1M+AkB5D8nkEMYoGATC5SRew==
-X-Received: by 2002:a05:6102:290f:b0:5db:23ed:3840 with SMTP id ada2fe7eead31-5dbb13590bdmr52442137.37.1761843694133;
-        Thu, 30 Oct 2025 10:01:34 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761843701; x=1762448501;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I51elFZXgkbCyenDZZVaSGBFbw1PPbSY/OrMUb2uVr4=;
+        b=av2fS/mG/7NToWSVBu+ETcRRv6t+tQ7jyrL/FOeukvgVnoYKnYiXCf27zwtQT6rxab
+         VaWCWl8AITot377GCMP15jCYvEzSXDPsOeJN4o76dEgfcEMTg7CvROXJM0aO5YGhKr4u
+         rXLvvTLCWL3L9j+f/Aj+Cgs0UTmhJG74mYAbFusIKjgAPH+fi4YgDGkswVs7Q+MVO3u3
+         R5Qe+NHaJN8pVwXzhNr67fqQZMR+D0NyNFJfwPBbcDwC4A01OHUHHfPBJ6czHt6Uba2+
+         0T2+Dk8Z4dPnpwI+QLRr4ZWAbJNIVtv2RSf0ZwBTNsYmaC0JluP/2lwmJZ8D6w45bc8C
+         hwvw==
+X-Gm-Message-State: AOJu0YwzGjWWlmXRD1WFXDJM+nWR9MPN5LRIKHnTCNDVGGdBVOo7SR1r
+	p9ZYhEWAU835H9BhK4PFyVNL+2Bb5ePRf9erQl7YPlr78BoJfPBpRE+5woOBBVje
+X-Gm-Gg: ASbGncupefEvLpqnWOndhDY0D1JVACmI/Xs1V+biI6ixxF0eWvQ65xDZp+bqY+JlLZd
+	pNIoWvVjuhGX65piEHr4+bQ0KMVbFhU8qL0zv5k43lDnDJL8WPopb8eTXceCxFmR0nNBsNvFCeE
+	hDrhr2GxrCnjlKBdgbaCMp18UBa54Krw/6rYCZtQMJCS1lVstYaMkmyeidr1r0NwWX17yTCjrPp
+	fhdQJYKjTRc98Exu4cMkav6XHT7QOIjvvSqRg73z+Jk+tWRzVLwreYLc2eY/R1ctsuR6AUuEIzq
+	pFPCmE0OkrZiVwzLZemjtPrX+0srom86ajuqlQbdkDFUD8n+TjcADEnimOvSCD67SRBqgSN6s2R
+	Y2WxoV8uc5skIcQBniuAbOgictQ5PrU6EsmuWddYzKo7CwIYrh3FFlqftgUzmZ82TR3lVN9UlDV
+	TRniI=
+X-Google-Smtp-Source: AGHT+IF+tSizRwAnMDBQ0k++xccFax4QAICuU/D/cIZ2UExkgjPN2saGhZyLNagAe0mVcoAZhFX/IA==
+X-Received: by 2002:a05:6102:32c1:b0:5d4:1e69:fdbe with SMTP id ada2fe7eead31-5dbb11f99b7mr111746137.3.1761843696381;
+        Thu, 30 Oct 2025 10:01:36 -0700 (PDT)
 Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9350197756csm811781241.11.2025.10.30.10.01.32
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9350197756csm811781241.11.2025.10.30.10.01.34
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 10:01:32 -0700 (PDT)
+        Thu, 30 Oct 2025 10:01:35 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] bthost: Fix crash on bthost_past_set_info
-Date: Thu, 30 Oct 2025 13:01:25 -0400
-Message-ID: <20251030170126.251566-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/2] btdev: Fix crash on BIG cleanup
+Date: Thu, 30 Oct 2025 13:01:26 -0400
+Message-ID: <20251030170126.251566-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251030170126.251566-1-luiz.dentz@gmail.com>
+References: <20251030170126.251566-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,37 +79,65 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 This fixes the following crash:
 
-Invalid read of size 1
-   at 0x401DEFE: send_command (bthost.c:1101)
-   by 0x4021F01: bthost_past_set_info (bthost.c:3758)
-   by 0x4006038: test_listen_past (iso-tester.c:3246)
-   by 0x494984A: ??? (in /usr/lib64/libglib-2.0.so.0.8400.4)
-   by 0x4943862: ??? (in /usr/lib64/libglib-2.0.so.0.8400.4)
-   by 0x494C7A7: ??? (in /usr/lib64/libglib-2.0.so.0.8400.4)
-   by 0x494CA4E: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.8400.4)
-   by 0x402CC4D: mainloop_run (mainloop-glib.c:65)
-   by 0x402D224: mainloop_run_with_signal (mainloop-notify.c:196)
-   by 0x402C445: tester_run (tester.c:1084)
-   by 0x4005609: main (iso-tester.c:4335)
- Address 0x40 is not stack'd, malloc'd or (recently) free'd
+Invalid read of size 8
+   at 0x400F26F: le_big_free (btdev.c:606)
+   by 0x4024636: queue_remove_all (queue.c:341)
+   by 0x40246C2: queue_destroy (queue.c:60)
+   by 0x401B7C9: btdev_destroy (btdev.c:7820)
+   by 0x400CFBF: hciemu_client_destroy (hciemu.c:301)
+   by 0x4024636: queue_remove_all (queue.c:341)
+   by 0x40246C2: queue_destroy (queue.c:60)
+   by 0x400DA91: hciemu_unref (hciemu.c:441)
+   by 0x40072F2: test_post_teardown (iso-tester.c:701)
+   by 0x402BB0A: tester_teardown_complete (tester.c:713)
+   by 0x402BB41: default_teardown (tester.c:266)
+   by 0x402B43B: teardown_callback (tester.c:434)
 ---
- emulator/bthost.c | 3 +++
- 1 file changed, 3 insertions(+)
+ emulator/btdev.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 79d8305d78cf..faabbaa36a4a 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -3751,6 +3751,9 @@ void bthost_past_set_info(struct bthost *bthost, uint16_t handle)
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 8c72a24290c6..c53db7040d39 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -6863,7 +6863,7 @@ static int cmd_term_big_complete(struct btdev *dev, const void *data,
  {
- 	struct bt_hci_cmd_le_past_set_info cp;
+ 	const struct bt_hci_cmd_le_term_big *cmd = data;
+ 	struct bt_hci_evt_le_big_terminate rsp;
+-	struct le_big *big;
++	struct le_big *big, *rbig;
+ 	struct btdev_conn *conn;
+ 	struct btdev *remote = NULL;
  
-+	if (!bthost)
-+		return;
-+
- 	memset(&cp, 0, sizeof(cp));
- 	cp.handle = cpu_to_le16(handle);
- 	cp.adv_handle = 0x01;
+@@ -6875,7 +6875,6 @@ static int cmd_term_big_complete(struct btdev *dev, const void *data,
+ 
+ 	big = queue_find(dev->le_big, match_big_handle,
+ 			UINT_TO_PTR(cmd->handle));
+-
+ 	if (!big)
+ 		return 0;
+ 
+@@ -6892,14 +6891,17 @@ static int cmd_term_big_complete(struct btdev *dev, const void *data,
+ 
+ 			remote = conn->link->dev;
+ 
+-			big = queue_find(remote->le_big, match_bis, conn->link);
+-			if (big) {
++			rbig = queue_find(remote->le_big, match_bis,
++							conn->link);
++			if (rbig) {
+ 				memset(&evt, 0, sizeof(evt));
+-				evt.big_handle = big->handle;
++				evt.big_handle = rbig->handle;
+ 				evt.reason = cmd->reason;
+ 				le_meta_event(remote,
+ 						BT_HCI_EVT_LE_BIG_SYNC_LOST,
+ 						&evt, sizeof(evt));
++				queue_remove(remote->le_big, rbig);
++				le_big_free(rbig);
+ 			}
+ 		}
+ 
 -- 
 2.51.0
 
