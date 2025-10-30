@@ -1,104 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D09837A3C0;
-	Thu, 30 Oct 2025 17:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312EC226D00
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 17:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761844981; cv=none; b=FxdRC7l0gKammsm0HAqPGljlKym9rFXrNjbguo/gzLf7m0ePZ5rzMtAS5PKSmdtc6WlSpKAxN7NHWvCjVzUXj6NTrTn8eK83Get0JxlgLkyEq+3ehztQlwWvlUahQQa8ZIVvQr7JG7LAnd9UTTDS1r7Rp7ZFNELBBxlGc/4k2Sc=
+	t=1761845467; cv=none; b=YshPgdsnQB89HNfLAzecjmZvqFf1AvbqQKfbsFcQm/ocStGO2HdI40eVAFWFNxmngANghC8W3rBHArtGY+XFufruDVQBnptoNXrYCll91xlmwwv+FDRHJq+PFgBsB1Q4ip7E8IbOVI7kBIL+o9BxuxpphVSSEQIoLvVB0ER1l6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761844981; c=relaxed/simple;
-	bh=5JXVFNlMTvdINtFW0DXyg4zvly79j27nW9MHNXzH3gQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TWzjISrXHDM56AXnvNVzWtKBXyhJfQHsEut2sHKztnVRrjeBOm3zn4cAcRl5BoCnvjZJ4AvLP72BgPyoyKFPADBYeSUrF0SDXc8FweIdH1rudLrAij57/hl6HSBC/+8rpokbQhFG65YdVHfzbNfPwo+DTAyaKFgTjKoA7ZAhaJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ekDPxfxb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761845467; c=relaxed/simple;
+	bh=x8+EmNuy/rsyZ5Vp5sKG377wOeDwpzPVjNt5DW/mHeo=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=BDI2c9hISt+XKQLyXJtOK7uwe039cjkADANYJEE65Up0Plq4nJYjwK2ZgEFzC30tc44qZzIPGOAgP96kpG3iPW2nCcFELKyhkoIRgmOOUTQriD/ym+zfECm9rMgLmHOK4REMO7hFKLUfNgJ/TjiuvCDCAAsCIiB/EPAvTFfPAbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=e+zPVaeB; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ekDPxfxb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B953C4CEF1;
-	Thu, 30 Oct 2025 17:23:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761844980;
-	bh=5JXVFNlMTvdINtFW0DXyg4zvly79j27nW9MHNXzH3gQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ekDPxfxbY8/F3xn0eGyDZwX+LhpUsp96t2p5jcHv1VOrbWltNqYe1hJrPE46ST+iw
-	 Fx5A9ppwTBXR+5mLjA/A4D8WxPeK9U2qQJvY1T0OL/nY1Dgf5v5JX+6GPaQRRqFpKH
-	 WXYA/cKfVrQBgsjk2/+ZmfRpm/huKtlIAA/RMvv3d4rcusu5kyJc9OtIf01wvdbDhH
-	 kVIoKCdXCHedQdewx9Ywq1phFxb2Tw5gxZ+7xcf2UgDeRPorrTNynn4GqiKnAu3SDS
-	 66ba9TAx60jfWo33JecrjVZVxQo9qx8UfPmFkxUHqimhotZKzKD29ootdbv6+v89Tn
-	 l0kqj64jsj9AQ==
-Date: Thu, 30 Oct 2025 12:22:53 -0500
-From: Rob Herring <robh@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 00/11] Bluetooth: dt-bindings: qualcomm: Split binding
-Message-ID: <20251030172253.GA4166743-robh@kernel.org>
-References: <20251029-dt-bindings-qcom-bluetooth-v2-0-dd8709501ea1@linaro.org>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="e+zPVaeB"
+Received: from github.com (hubbernetes-node-5ef803c.ac4-iad.github.net [10.52.211.90])
+	by smtp.github.com (Postfix) with ESMTPA id 287FD401325
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 10:31:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1761845465;
+	bh=WdfMgg23I0FZYsY1IQw8pkOkWPJ1s4NujGlsoJlUWQM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=e+zPVaeBuxDnnlKU4G7aoRlTJAl7aYuTB1baWPm/qINKZIZi6RG+OF0cUA1iHeIl3
+	 /hxriWim5pDfke4VqxEhnlzThenDFC1hVh4iY8/Tymr7pdrJj5PN7wNCda+aHL5ADE
+	 hWSG6NJYAMevrPbcccqteHJ9a1NWb9PuTx6OUzdc=
+Date: Thu, 30 Oct 2025 10:31:05 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1017831/000000-31dd96@github.com>
+Subject: [bluez/bluez] 31dd96: monitor: Add decoding support for LL Extended
+ Feat...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251029-dt-bindings-qcom-bluetooth-v2-0-dd8709501ea1@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Wed, Oct 29, 2025 at 08:43:50AM +0100, Krzysztof Kozlowski wrote:
-> Changes in v2:
-> - Drop in few commits the properties (supplies) from
->   qualcomm-bluetooth.yaml which are not used by devices left there,
->   instead of removing them in final patch (qcom,wcn7850-bt).
-> - Fix dt_binding_check error - missing gpio.h header in the example.
-> - Drop maintainers update - split into separate patch.
-> - Add also Bartosz as maintainer of two bindings because he was working
->   with these in the past.
-> - Link to v1: https://patch.msgid.link/20251028-dt-bindings-qcom-bluetooth-v1-0-524a978e3cda@linaro.org
-> 
-> One big Qualcomm Bluetooth schema is hardly manageable: it lists all
-> possible properties (19 supplies).  Split qcom,qca6390-bt to separate
-> bindings, so device schema will be easier to read/maintain and list only
-> relevant properties.
-> 
-> What's more it messes up old (pre-PMU) and new (post-PMU) description in
-> one place adding to the total mess.
-> 
-> Best regards,
-> Krzysztof
-> 
-> ---
-> Krzysztof Kozlowski (11):
->       dt-bindings: bluetooth: qcom,qca2066-bt: Split to separate schema
->       dt-bindings: bluetooth: qcom,qca9377-bt: Split to separate schema
->       dt-bindings: bluetooth: qcom,qca6390-bt: Split to separate schema
->       dt-bindings: bluetooth: qcom,wcn3950-bt: Split to separate schema
->       dt-bindings: bluetooth: qcom,wcn3990-bt: Split to separate schema
->       dt-bindings: bluetooth: qcom,wcn6750-bt: Split to separate schema
->       dt-bindings: bluetooth: qcom,wcn6750-bt: Deprecate old supplies
->       dt-bindings: bluetooth: qcom,wcn6855-bt: Split to separate schema
->       dt-bindings: bluetooth: qcom,wcn6855-bt: Deprecate old supplies
->       dt-bindings: bluetooth: qcom,wcn7850-bt: Split to separate schema
->       dt-bindings: bluetooth: qcom,wcn7850-bt: Deprecate old supplies
-> 
->  .../net/bluetooth/qcom,bluetooth-common.yaml       |  25 ++
->  .../bindings/net/bluetooth/qcom,qca2066-bt.yaml    |  49 ++++
->  .../bindings/net/bluetooth/qcom,qca6390-bt.yaml    |  64 +++++
->  .../bindings/net/bluetooth/qcom,qca9377-bt.yaml    |  58 +++++
->  .../bindings/net/bluetooth/qcom,wcn3950-bt.yaml    |  67 ++++++
->  .../bindings/net/bluetooth/qcom,wcn3990-bt.yaml    |  66 ++++++
->  .../bindings/net/bluetooth/qcom,wcn6750-bt.yaml    |  91 ++++++++
->  .../bindings/net/bluetooth/qcom,wcn6855-bt.yaml    |  99 ++++++++
->  .../bindings/net/bluetooth/qcom,wcn7850-bt.yaml    |  94 ++++++++
->  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml | 259 ---------------------
->  MAINTAINERS                                        |   1 +
->  11 files changed, 614 insertions(+), 259 deletions(-)
+  Branch: refs/heads/1017831
+  Home:   https://github.com/bluez/bluez
+  Commit: 31dd968405b8e9079f22d8c1b02cd9504c82d033
+      https://github.com/bluez/bluez/commit/31dd968405b8e9079f22d8c1b02cd=
+9504c82d033
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-30 (Thu, 30 Oct 2025)
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+  Changed paths:
+    M monitor/bt.h
+    M monitor/packet.c
 
+  Log Message:
+  -----------
+  monitor: Add decoding support for LL Extended Feature Set
+
+This adds support for decoding LL Extended Feature Set introduced in 6.0
+that adds the following:
+
+Commands:
+
+ - HCI_LE_Read_All_Local_Supported_=C2=ADFeatures(0x2087)(Feature:47,1)
+ - HCI_LE_Read_All_Remote_Features(0x2088)(Feature:47,2)
+
+Events:
+
+ - HCI_LE_Read_All_Remote_Features_Complete(0x2b)(Mask bit:42)
+
+
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
