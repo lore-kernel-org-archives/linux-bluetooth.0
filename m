@@ -1,186 +1,99 @@
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048E42F12BE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 19:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C26303A0F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 19:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761853752; cv=none; b=SFeZGMdtM3s11R9JEluMwFhsFvP1dQI7nC7qiM6V0yFlHHnah0dB+NUIxlW9ofigrcyJl307K9ueWN5kD1chIzxP6N88bsAwwotQoeonX/fWzLWIlLK8W+wJeJ5WH1/cEHvnA/cQlf01tAnl4uwOEBxNDk/HvGWgsevGBO0qgOU=
+	t=1761854000; cv=none; b=IG3fg5oa2HyZOIV0NbylgjRSOKuuaEE7YmBP0LM69Uq2jTlaQz8Nkei/qmqqlTAoAwxu8KhVNszSGnkzf8Kyk1MNNoqOh0LN7efY0qYh1Y+VZ3Y7ConcocPmMAyMUzcFtxxyD4LlHJVW8m/kwko66wOeFhEvulj7O5eJFOA7EzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761853752; c=relaxed/simple;
-	bh=37037wikTRPGL7MMfl0omM4AKg8VNhDO/bneVEK5Sdk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Up04IRZwDGUoOqa2wP2Aw1UaZWxKTfTvVVLB5g5WaGTIT/sB+5V/QL+iOuVcEezFeDR2MgpUHJr+1oovYVfP+AhVIySCH/D+3qWmnf9TL625TlHgI1Fc2eEXUETNpvG0Mj3kNkDstMCegLx7oesjrQ8+HfeM78NhWmV+RElCnqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EIa3Cc5+; arc=none smtp.client-ip=209.85.217.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761854000; c=relaxed/simple;
+	bh=3E/o4f1EXdOF0yhioaaqlL5mcjvxlHW9pzOJgxBd58c=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GQYZpm6sMhX6vbHsl4BDOCnh4+B+HSBQerLfjTMb3SlUETxQpRhJeU1mbQ6uOAyCu72CtJV8mvYE/XtllaS55/SzsaaY226DfHJB1Il6VN83U2/uhyeBGRGEG0ZSrdhoUTwEGqoTyo2F37TFEHnteRfhADgzIC+eczmklvgcOEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gwdiI3TX; arc=none smtp.client-ip=192.30.252.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EIa3Cc5+"
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-5db24071011so2751900137.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 12:49:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761853749; x=1762458549; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Plmn8l0r5LYsz0fkaRH/lwJYboJy0i5jqwW9oEmKOTo=;
-        b=EIa3Cc5+ASa5hDNieHpxsXzC5Exg0al1BLivGiORCypXfbztM1Nf/34J2cnlKIkG+R
-         K+yvw045nfI65SAGtAru7sv1sWuvioWDv699t3QT0d01+c/3eTttGUDaCYuxrQNJqZdC
-         HNF+XzvNuK1Mtej46RDJ6H+x/9tMgBEOB6sZSgk8apmFTLmnplDMboFB+UXZxrVY8WIl
-         PCwdHCRzJReOz75+4Q5INF5zhPdLpsp4qC0WRGh6NRLcEXppE3V7bR3xyx6Sx8wwF2kj
-         K4BxTCZXHVJPwP0wXCkO6ZJpZICi0Mn3VORv95gj7EKPFGUxr4FSXzlm7ENa+z9OmGpD
-         XcUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761853749; x=1762458549;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Plmn8l0r5LYsz0fkaRH/lwJYboJy0i5jqwW9oEmKOTo=;
-        b=cKLQcAI6bQLG3bj/vneWcszpppfqVtF9DOZ376AaAyFeFhqGw86CXhEQRd7lnbzCh8
-         +bLkB1ahk6OeL/OpxKYYSF5RMOqjFNRoQ6xi3/8Vz9/gtmSXhMGcg4KZRP8a/nEN5Fdq
-         WCCVNqVOno+s9WmiPNmqk5hG3jQOytJCxoxfo4uQf2uw+kustbJRLvUpeTke97222XIL
-         JFSpSBlWW0v4fzzfNuqDykfAflM5bcyqTaPV3Q9wTpkPWcLEA5YF7SiQU1pAbiMJcmR1
-         bAajW9jvRqljfdSEr/H/BofzL9Tkh74IbJ9Gonh9W7MMojE9dKVThD0S+/iwSx5CUB1C
-         +qKw==
-X-Gm-Message-State: AOJu0YwkIgV1GVc6w9ajUgTsX0RMwXnIeQktqfX3DMNov5EZEdecxdTC
-	oOCxTy3Vi/jQ6XJ9QaEFppdYYzphywnbi6wl9Imj+sW9d2rHARQtzhGXqnriUBEv
-X-Gm-Gg: ASbGncuiHE3a26W6CCYAgvvh/d6H55ne6cG1YPK1iCqJGb7eMpu2dI4rXL+ZKByKOJ1
-	zC/Gl0BujpEYmPswez3CkSGirHwPY9JMwcnC1ZCPFiuuO1LnTHVS5E8IzJSzAV3OvW0Cg+IZ1cY
-	CNMkoH1oxCcIMQGjAhFW5v26iQ7IpLhjul3bwvD/fm3ktfALnsrv8UV83yRtMJC0dAW/8wfy38N
-	BETl8cYIdTNBlD7rhg+ivRRav60kFnapvXuvcqlrH4Z+ZTJngk6AG1S05t+TZ21YROg89W/FrUs
-	fhppwBuX1o3k5u/Xzl308VCqLrl/DObP3Jj+T3IBvIYIb/2boVFR8uonI+3JkQ23yC7RdSXhT3r
-	6keyWwU+b7O1nu/Vun4WqUj3kwJbuePNBzD3LzHMBXLSedBXgX4zo3HAR1OGrfuJXpvC66HtrWz
-	/nKLpODZ+HgWzrQQ==
-X-Google-Smtp-Source: AGHT+IEL1UHzjK7F/hFlXS0NEkr7vOBDSb9xDCBb7jTdJ6XpclajNaSFVXiCzlxpIIKqNYpJWTUMew==
-X-Received: by 2002:a05:6102:38c9:b0:5a5:57f0:f426 with SMTP id ada2fe7eead31-5dba0e22bd0mr1757402137.5.1761853748987;
-        Thu, 30 Oct 2025 12:49:08 -0700 (PDT)
-Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9350188a408sm991144241.6.2025.10.30.12.49.07
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 12:49:08 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gwdiI3TX"
+Received: from github.com (hubbernetes-node-75cc943.ash1-iad.github.net [10.56.174.27])
+	by smtp.github.com (Postfix) with ESMTPA id 11ECB601295
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 12:53:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1761853998;
+	bh=xOmMjGm746a55BPL42i9amPZ37UGwx+KAQdBxoTOZbQ=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=gwdiI3TXY/b4mwWJ1t764HOOyCQVQezDo1pm3USrQwpYHuxtUGruM7k29237EefUu
+	 VK6HgpoYsl8mERguoTpxm5LbV3bYb65EXh6AVCbO7gmYlWMIMpwtGVH1h4DGZ8daKF
+	 OvtRD7vX7U+2ziLD4xbfIi4I4sLS//Fq2mm1qjyU=
+Date: Thu, 30 Oct 2025 12:53:18 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 2/2] monitor: Add decoding support for LL_FEATURE_EXT_{REQ,RSP}
-Date: Thu, 30 Oct 2025 15:48:56 -0400
-Message-ID: <20251030194856.296603-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251030194856.296603-1-luiz.dentz@gmail.com>
-References: <20251030194856.296603-1-luiz.dentz@gmail.com>
+Message-ID: <bluez/bluez/push/refs/heads/1017886/000000-1a9f88@github.com>
+Subject: [bluez/bluez] 3c046e: monitor: Add decoding support for LL Extended
+ Feat...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1017886
+  Home:   https://github.com/bluez/bluez
+  Commit: 3c046e5ff7f7092170f5603f4ec429fac1d74518
+      https://github.com/bluez/bluez/commit/3c046e5ff7f7092170f5603f4ec42=
+9fac1d74518
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-30 (Thu, 30 Oct 2025)
+
+  Changed paths:
+    M monitor/bt.h
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Add decoding support for LL Extended Feature Set
+
+This adds support for decoding LL Extended Feature Set introduced in 6.0
+that adds the following:
+
+Commands:
+
+ - HCI_LE_Read_All_Local_Supported_=C2=ADFeatures(0x2087)(Feature:47,1)
+ - HCI_LE_Read_All_Remote_Features(0x2088)(Feature:47,2)
+
+Events:
+
+ - HCI_LE_Read_All_Remote_Features_Complete(0x2b)(Mask bit:42)
+
+
+  Commit: 1a9f88452d23aff75adff896bed064ec0e6c0c77
+      https://github.com/bluez/bluez/commit/1a9f88452d23aff75adff896bed06=
+4ec0e6c0c77
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-10-30 (Thu, 30 Oct 2025)
+
+  Changed paths:
+    M monitor/bt.h
+    M monitor/ll.c
+    M monitor/packet.c
+    M monitor/packet.h
+
+  Log Message:
+  -----------
+  monitor: Add decoding support for LL_FEATURE_EXT_{REQ,RSP}
 
 This adds support for LL_FEATURE_EXT_{REQ,RSP} which is used to
 exchange LL Features.
----
- monitor/bt.h     | 14 ++++++++++++++
- monitor/ll.c     | 24 ++++++++++++++++++++++++
- monitor/packet.c |  5 +++++
- monitor/packet.h |  1 +
- 4 files changed, 44 insertions(+)
 
-diff --git a/monitor/bt.h b/monitor/bt.h
-index 9ca3e7c88fb1..1c753b694883 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -239,6 +239,20 @@ struct bt_ll_cis_term_ind {
- 	uint8_t  reason;
- } __attribute__ ((packed));
- 
-+#define BT_LL_FEATURE_EXT_REQ	0x2b
-+struct bt_ll_feature_ext_req {
-+	uint8_t  max_page;
-+	uint8_t  page;
-+	uint8_t  features[24];
-+} __attribute__ ((packed));
-+
-+#define BT_LL_FEATURE_EXT_RSP	0x2c
-+struct bt_ll_feature_ext_rsp {
-+	uint8_t  max_page;
-+	uint8_t  page;
-+	uint8_t  features[24];
-+} __attribute__ ((packed));
-+
- #define LMP_ESC4(x) ((127 << 8) | (x))
- 
- #define BT_LMP_NAME_REQ			1
-diff --git a/monitor/ll.c b/monitor/ll.c
-index 34dddcb0bb74..4d65d183f958 100644
---- a/monitor/ll.c
-+++ b/monitor/ll.c
-@@ -741,6 +741,24 @@ static void cis_term_ind(const void *data, uint8_t size)
- 	packet_print_error("Reason", ind->reason);
- }
- 
-+static void feature_ext_req(const void *data, uint8_t size)
-+{
-+	const struct bt_ll_feature_ext_req *req = data;
-+
-+	print_field("Max page: %u", req->max_page);
-+	print_field("Page: %u", req->page);
-+	packet_print_features_ext_ll(req->page, req->features);
-+}
-+
-+static void feature_ext_rsp(const void *data, uint8_t size)
-+{
-+	const struct bt_ll_feature_ext_req *rsp = data;
-+
-+	print_field("Max page: %u", rsp->max_page);
-+	print_field("Page: %u", rsp->page);
-+	packet_print_features_ext_ll(rsp->page, rsp->features);
-+}
-+
- struct llcp_data {
- 	uint8_t opcode;
- 	const char *str;
-@@ -790,6 +808,12 @@ static const struct llcp_data llcp_table[] = {
- 	{ BT_LL_CIS_TERMINATE_IND, "LL_CIS_TERMINATE_IND", cis_term_ind,
- 					sizeof(struct bt_ll_cis_term_ind),
- 					true },
-+	{ BT_LL_FEATURE_REQ, "LL_FEATURE_EXT_REQ", feature_ext_req,
-+					sizeof(struct bt_ll_feature_ext_req),
-+					true },
-+	{ BT_LL_CIS_RSP, "LL_FEATURE_EXT_RSP", feature_ext_rsp,
-+					sizeof(struct bt_ll_feature_ext_rsp),
-+					true },
- 	{ }
- };
- 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b4da6653f4a2..ceed85318b3b 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -2918,6 +2918,11 @@ void packet_print_features_ll(const uint8_t *features)
- 	print_features(0, features, 0x01);
- }
- 
-+void packet_print_features_ext_ll(uint8_t page, const uint8_t *features)
-+{
-+	print_features(page, features, 0x01);
-+}
-+
- void packet_print_features_msft(const uint8_t *features)
- {
- 	print_features(0, features, 0xf0);
-diff --git a/monitor/packet.h b/monitor/packet.h
-index 154a08efacc5..2990b795bd3e 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -78,6 +78,7 @@ void packet_print_rssi(const char *label, int8_t rssi);
- void packet_print_ad(const void *data, uint8_t size);
- void packet_print_features_lmp(const uint8_t *features, uint8_t page);
- void packet_print_features_ll(const uint8_t *features);
-+void packet_print_features_ext_ll(uint8_t page, const uint8_t *features);
- void packet_print_features_msft(const uint8_t *features);
- void packet_print_channel_map_lmp(const uint8_t *map);
- void packet_print_channel_map_ll(const uint8_t *map);
--- 
-2.51.0
 
+Compare: https://github.com/bluez/bluez/compare/3c046e5ff7f7%5E...1a9f884=
+52d23
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
