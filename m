@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E0C2D24BF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 22:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76B933BBA1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Oct 2025 22:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761863430; cv=none; b=StmyaB0BHEfxt5tR7adUB/0z2aENwWDPQQLHF3O5LnADC/P1qQEoBnkIr3ONn+ZImCPrOTfqdBIkRBPBtQitGbLrtqKoaV/BOTu6Otl1Hc5E5FJz4h+Qm0+jXyhlxxJ7+lyaiRVPbSeKKXq1oai+TrCqcuiA5/VGJqT1vzDlFqc=
+	t=1761863432; cv=none; b=nssJ5dno5XBulN3V21m6dNO+pdoYcQm9DucCqkyQq3FE1eRodnKZZ1g0BrvQmntCpFAhRA/i2+WABfNhozSWYhcZUBPgMPm+OHoBxL+EiLPt62aV5oOrTi6OWeX2KBqeCbZot6RlTqgaSmCzFod+Cl5steMj8/KC7GtPPeA9mkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761863430; c=relaxed/simple;
-	bh=6Qi2xNf9z+TDHUzS6roD6ofwJPN8xSvekI8XrSvpFV0=;
+	s=arc-20240116; t=1761863432; c=relaxed/simple;
+	bh=GqxWEyGMLfFJEWz//ZTdzklGgEnVgbHREuFAglOEN/c=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=h96L6tkzL9JpcJtEM6PEnofsj7NDc+N99cUfTZSyhi5ky1FgcBrkbgRsm+luacOJfkEwkzgntwE6BWjJB2T9nxTdyPJ4hwebxn7RwDpUSWh9S307sh894V6EoObxZBeFmeT/8woQZmO8LXCv4SlT9fjWS1QJU3PpVOzg3yBuG4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kg2/gWQD; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=XxJu6ZDuurTVGtjYmPFzOYr7k8z/MEHDIWxfh/8cuy4cB9eaIsfFNQ3i3ecrRQc2pNm5zNO0k3aPGMSNLc9GCzPltg9dFRzU7g/qspskEq2WbRCKFynklzuniapLFW8qfCn4vqXP31YcQakVz3chQzdqugu9zTt3EyOy82seUm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/qLLD6a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kg2/gWQD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAEEAC4CEF1;
-	Thu, 30 Oct 2025 22:30:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/qLLD6a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B047C4CEF1;
+	Thu, 30 Oct 2025 22:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761863430;
-	bh=6Qi2xNf9z+TDHUzS6roD6ofwJPN8xSvekI8XrSvpFV0=;
+	s=k20201202; t=1761863431;
+	bh=GqxWEyGMLfFJEWz//ZTdzklGgEnVgbHREuFAglOEN/c=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Kg2/gWQDsdOmbzajSE13I5+KUx0M4YCmxF/xAed3bWdrR8m4YWKKzHdUk5XH4HRnu
-	 W8scFdkBCs+bFat6zLw5ZNx0B45AiIqi4l9s/DglCATqB/ZteSWDZaPAc+LOaTNGq4
-	 vcT/FuVeCToL2kEefABKDSzp8Bjtd2DaUpXqEkPepF5Pt9dvDTEhaWwtzZRo4+Ygk0
-	 NgT8ZoMKG7KEZGAb1Y9gbyKDov0Ug2LB3ujigMJ7efCAORbHGkIQj9QNwqXh9cWz22
-	 OG9SbAGd25wl62PWW6dI1Bp1Jsft6878+WkkxWZlkbQ+oYodMaF9InuKMIH6yjRXDb
-	 RAd0boylSCzHw==
+	b=M/qLLD6aHnjp1psUNbD22qZ5mMkAWP501C9pfPuIgw/TVI9so33ZoEIOPcBoyXnw5
+	 9zXMGEDuy/GKh4QHiJJlqilYoEeWg+cWJrrlHRl47tJTvid+/mZmH8SznybxSc/i/s
+	 N2OdEg1g9cOj13zJ7MY9Iv87zL0uO3QWHG3JFK8hi0/1RQlKEB0eYQ0AzSHgaYMRx/
+	 ftoPOUe6TSYWKdn85CLJpeTw2OvXWDv7esikkiFKaDK6QEzelM1HpbPF86Wb+6O8R7
+	 UM1MSkMZp6OxbmsoYlpHgrWkdnDEE3hoJfUFo5gGRvZ1BRnoTnLRfiSfG61UjGPGe2
+	 fx2tli7D/wWzw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0F83A78A6E;
-	Thu, 30 Oct 2025 22:30:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 340703A78A6E;
+	Thu, 30 Oct 2025 22:30:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,15 +37,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v3 1/2] monitor: Add decoding support for LL
- Extended
- Feature Set
+Subject: Re: [PATCH BlueZ v1 1/2] bthost: Fix crash on bthost_past_set_info
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <176186340650.4061108.10347184025067875924.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Oct 2025 22:30:06 +0000
-References: <20251030194856.296603-1-luiz.dentz@gmail.com>
-In-Reply-To: <20251030194856.296603-1-luiz.dentz@gmail.com>
+ <176186340774.4061108.6067209446487123402.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Oct 2025 22:30:07 +0000
+References: <20251030170126.251566-1-luiz.dentz@gmail.com>
+In-Reply-To: <20251030170126.251566-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -54,21 +52,32 @@ Hello:
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 30 Oct 2025 15:48:55 -0400 you wrote:
+On Thu, 30 Oct 2025 13:01:25 -0400 you wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> This adds support for decoding LL Extended Feature Set introduced in 6.0
-> that adds the following:
+> This fixes the following crash:
 > 
-> Commands:
+> Invalid read of size 1
+>    at 0x401DEFE: send_command (bthost.c:1101)
+>    by 0x4021F01: bthost_past_set_info (bthost.c:3758)
+>    by 0x4006038: test_listen_past (iso-tester.c:3246)
+>    by 0x494984A: ??? (in /usr/lib64/libglib-2.0.so.0.8400.4)
+>    by 0x4943862: ??? (in /usr/lib64/libglib-2.0.so.0.8400.4)
+>    by 0x494C7A7: ??? (in /usr/lib64/libglib-2.0.so.0.8400.4)
+>    by 0x494CA4E: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.8400.4)
+>    by 0x402CC4D: mainloop_run (mainloop-glib.c:65)
+>    by 0x402D224: mainloop_run_with_signal (mainloop-notify.c:196)
+>    by 0x402C445: tester_run (tester.c:1084)
+>    by 0x4005609: main (iso-tester.c:4335)
+>  Address 0x40 is not stack'd, malloc'd or (recently) free'd
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v3,1/2] monitor: Add decoding support for LL Extended Feature Set
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1479b279a016
-  - [BlueZ,v3,2/2] monitor: Add decoding support for LL_FEATURE_EXT_{REQ,RSP}
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=32d740d87970
+  - [BlueZ,v1,1/2] bthost: Fix crash on bthost_past_set_info
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=229d411e5a71
+  - [BlueZ,v1,2/2] btdev: Fix crash on BIG cleanup
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bb82243a6c27
 
 You are awesome, thank you!
 -- 
