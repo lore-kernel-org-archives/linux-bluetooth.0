@@ -1,115 +1,153 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25EA0280325;
-	Fri, 31 Oct 2025 08:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94F71F5434
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Oct 2025 08:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761898548; cv=none; b=TQA+mudao2nHN4wlnjtrQ/0ip1REaa9tnT0GZxGWIv11BMzCvQ3TxPUArergziZ05UH0n3pR0t+lLRvobn5wmO1wTYWjFeJwy3Q5LsirpO9zQfnIvFfd2d9drTOARka2p84T4M1GAxfCSpvxeHJoj1w1COPcTWBYl/5BPNRzyTM=
+	t=1761900052; cv=none; b=FcTYsA/OaOpAc7APj7AOQgilpgdqoXZxx7BUnlBwU1j0r0jBVttGVWnajnp2XqPWTTbJ0MKkN3RT+80rZkLIB7i0Ws78hzIR5NowhVd+BzRr37a7kz7OTx6cdbqr/9Pkm/mUlAtqOSsG7m5yw6dHrJh+RPUzSeVLHBRMJLckRUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761898548; c=relaxed/simple;
-	bh=BQEfkHAA/cvrsQwoFjP1JCUVNTwO17DlLYDFoE4HyC4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=nco1KG/Jn/cMIMgCqt9xZ6u/RGmrQorO/7kGbNIz7ukSg33FTln+PNRuzMON34mGNNFjkrC/v0fKtXEqZr3KZue4OkDkoOtqgSjO/ppsvkaJp/D9DaxZG31Bgd5TVv7yvvISDt8tQldnM+PYXXEEvxWQ/b1UnqQvFLZ4Y1xw65A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: c35c19e2b63111f0a38c85956e01ac42-20251031
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:eed4762e-8c93-4ab9-950e-9de796f78dfd,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:6a368bf88c433b2fdc9f1f42fedcc099,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|15|50,EDM:-3,IP:nil
-	,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:
-	1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: c35c19e2b63111f0a38c85956e01ac42-20251031
-X-User: lilinmao@kylinos.cn
-Received: from llmserver.local [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <lilinmao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1474029217; Fri, 31 Oct 2025 16:15:29 +0800
-From: Linmao Li <lilinmao@kylinos.cn>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	Linmao Li <lilinmao@kylinos.cn>
-Subject: [PATCH] Bluetooth: btusb: Prevent autosuspend when le_scan_disable work is pending
-Date: Fri, 31 Oct 2025 16:15:25 +0800
-Message-Id: <20251031081525.2275894-1-lilinmao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1761900052; c=relaxed/simple;
+	bh=2C0srtA5BINKpiVKWy3J35KpuRunrJN0AJwA06rtpTM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=gmKEVOR1aYkUuSltPYnE36B8uwMM6vqxmUr0AuVUzbjYel2YngANHoi8pAEc8vgxj0aBvXgxkh3Hte9TBfgpkhBrbZhC7yQdOt47YtHt5xUocU9NRAUmxzr3iBDoeFOLYJZ9S4Sr+MxiQL+cZsVcl+mkBEfdEuJtJyFH/VoDpok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jBKJTG0j; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jBKJTG0j"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-94822ad1baeso76786739f.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Oct 2025 01:40:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761900050; x=1762504850; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hX/9Cpc3xZLvJuyTVw1cDV2Wxow6aR4ki06ek9hP1K8=;
+        b=jBKJTG0jfIRXmhyRb8XejNKARtnfXc/zJY4z7wQo3D0dkv5yNQx9k8P/R8ixylQS73
+         8Qn3QJlUloO1CtyQs6bCJPUxsa5ugm36b9SfKBSu+FmRISxhNs0noKxqYO1EgssUk2EL
+         bK7BNOVBnJEG7/DGibJEV8xeS3dtMh8H7G3ngGmw38lp+X/kHIK2LOtMbGteLD6+w6za
+         fE+3M+bASHi/92s8qn3N0x9S3d8TOE0Bg6YoGXURRyQBx6qH1NvqMo0XmfUxI8BUxe3C
+         Wp3ylfwI6siW0GBOC/QTSLLaFI5mJpUMV1Mlpkh2NQyROlFM6CNHu8KZWwR9BfLoMiLR
+         X9kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761900050; x=1762504850;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hX/9Cpc3xZLvJuyTVw1cDV2Wxow6aR4ki06ek9hP1K8=;
+        b=f2BTk3120vFYSntpWII6jCvFZ12e8Ni33oHVWFzrgsldiwN4Q/x0rJ/kk60ZRv+P43
+         rFNBvz8eDdxdI75gJUSjsCLS+qJo3DHkyXT679ArRA5mFPwXfw3iuqqinajmN3CqVZGA
+         MadEQk3noZqkgZHBDS1bhCICp/fHu0VQm6qU7EFjWkArRBrSSxN+dEbPoTpKq2T2+Nnc
+         ZVMvJni6tht0FuxlLzN0L4hf1SAQR4H6TnvZ5udw9phBB71MjeoqqOBmuKDSD0oOUKei
+         CXRxgs+quM/h9u0SrbES1T4l0bq/UpxI/puny4mG9pxUX5o0g8tW8haKHy38OvXAXcyv
+         b8pQ==
+X-Gm-Message-State: AOJu0YxvBvFzTcpnEATM0Lzug90ZpNdRgeBej09/1hbV1z4OEcEYQgic
+	whsP/Gxo4hdxZdG4T9eRBMdtUEO6NvpmSP5Ht27XiO77xQfugAhnBMtztxOaAw==
+X-Gm-Gg: ASbGncs/gYf7AYubZO/98QPWe/EVeHrlv2WD9fCcRH0zfd+6GSUptORSO1GmCAq7xIS
+	xP2YSallP4anctx5qQlipUDmZPOnrff0vazNQ0YqvU+Y3lu/xUp2zQWgP4kAH6Kygb310ZV0C0b
+	JeYzMNgP/2UQLyXOdu4xaYD19Nen+YbNNE4ZF7cTUq7LNOs86Zmt+7mauKItZL1MmPjs203bDRu
+	BEIfctTsq5ZOj5pJav9gp2MCQjOhDM7kq8qNaA7sF3w0e1krnmE10tz73cdjh/AuV63VgM+NYOI
+	Ob0snsxg5zgcSyfAXEyk1IK7k8HGfGxU2Vow71Bvfo6vs3g+s2z6yqCt7XzU4HPOFyfcYt9cAxB
+	UcBNXUn3vzmoMURKxgiWVtLCYPrRALA9wpZIaHYBcU1HNYTII/awY+QOn+Yf0gLETQ7XN9Q4i/A
+	3UAGU/1w==
+X-Google-Smtp-Source: AGHT+IE14hlmb2TvviODz6Xv/DdUXMIR9cl9Yvp8t8w9L+p+HSdli6ANw7i0HJgtQI2FwNX+fX/x8A==
+X-Received: by 2002:a05:6602:1651:b0:887:6ce4:8e07 with SMTP id ca18e2360f4ac-948229fc636mr456885239f.9.1761900049733;
+        Fri, 31 Oct 2025 01:40:49 -0700 (PDT)
+Received: from [172.17.0.2] ([64.236.133.98])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-94827b96185sm36756239f.6.2025.10.31.01.40.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Oct 2025 01:40:49 -0700 (PDT)
+Message-ID: <69047611.6b0a0220.1afad4.074b@mx.google.com>
+Date: Fri, 31 Oct 2025 01:40:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7382408181746101799=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, lilinmao@kylinos.cn
+Subject: RE: Bluetooth: btusb: Prevent autosuspend when le_scan_disable work is pending
+In-Reply-To: <20251031081525.2275894-1-lilinmao@kylinos.cn>
+References: <20251031081525.2275894-1-lilinmao@kylinos.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When USB autosuspend occurs while le_scan_disable work is scheduled,
-HCI commands sent by the work fail with timeout, leaving LE scan in
-an inconsistent state.
+--===============7382408181746101799==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Scenario:
-  T=0:     LE scan starts, le_scan_disable work queued (+10240ms)
-  T=8s:    Autosuspend check: tx_in_flight=0, suspend proceeds
-  T=10s:   le_scan_disable work executes on suspended device
-           → HCI command 0x2042 times out
+This is automated email and please do not reply to this email!
 
-The tx_in_flight check only protects actively transmitted URBs, missing
-the window where work is queued but hasn't submitted its URB yet.
+Dear submitter,
 
-Fix by checking delayed_work_pending(&hdev->le_scan_disable) during
-autosuspend. Return -EBUSY if pending to block suspend until work
-completes. Only set BTUSB_SUSPENDING after all checks pass to avoid
-leaving the flag set if suspend is aborted.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1018064
 
-Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.29 seconds
+GitLint                       PENDING   0.30 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      25.33 seconds
+CheckAllWarning               PASS      28.14 seconds
+CheckSparse                   PASS      31.58 seconds
+BuildKernel32                 PASS      25.30 seconds
+TestRunnerSetup               PASS      500.55 seconds
+TestRunner_l2cap-tester       PASS      23.96 seconds
+TestRunner_iso-tester         PASS      95.04 seconds
+TestRunner_bnep-tester        PASS      6.24 seconds
+TestRunner_mgmt-tester        FAIL      115.21 seconds
+TestRunner_rfcomm-tester      PASS      9.38 seconds
+TestRunner_sco-tester         PASS      14.35 seconds
+TestRunner_ioctl-tester       PASS      10.06 seconds
+TestRunner_mesh-tester        FAIL      11.46 seconds
+TestRunner_smp-tester         PASS      12.43 seconds
+TestRunner_userchan-tester    PASS      6.69 seconds
+IncrementalBuild              PENDING   0.84 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.106 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.172 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.996 seconds
+Mesh - Send cancel - 2                               Timed out    1.997 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btusb.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5e9ebf0c5312..a344ea1dc466 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4389,6 +4389,7 @@ static void btusb_disconnect(struct usb_interface *intf)
- static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
-+	struct hci_dev *hdev = data->hdev;
- 
- 	BT_DBG("intf %p", intf);
- 
-@@ -4402,14 +4403,19 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 		return 0;
- 
- 	spin_lock_irq(&data->txlock);
--	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
--		set_bit(BTUSB_SUSPENDING, &data->flags);
--		spin_unlock_irq(&data->txlock);
--	} else {
-+	if (PMSG_IS_AUTO(message) && data->tx_in_flight) {
- 		spin_unlock_irq(&data->txlock);
- 		data->suspend_count--;
- 		return -EBUSY;
- 	}
-+	spin_unlock_irq(&data->txlock);
-+
-+	if (PMSG_IS_AUTO(message) && delayed_work_pending(&hdev->le_scan_disable)) {
-+		data->suspend_count--;
-+		return -EBUSY;
-+	}
-+
-+	set_bit(BTUSB_SUSPENDING, &data->flags);
- 
- 	cancel_work_sync(&data->work);
- 
--- 
-2.25.1
 
+--===============7382408181746101799==--
