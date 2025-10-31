@@ -1,153 +1,201 @@
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2FD1E9B0D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Oct 2025 12:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026E93446C4
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Oct 2025 14:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761915017; cv=none; b=VfToo753giZmZLAGQCP98bkiNgdBnxH6eaba9NU1bE4FPj6x7nLMpJmhMnF3XLOUTXKy3uQicclatIAK0Qhi1NosSPAnreWiJ1YrGI3nnsnWM0gAdSeHCS2FVvvp1yJay6pjkMWiyk8tNVtybkQfV31vayGq5s4bsmM84BFuCrE=
+	t=1761921339; cv=none; b=IRjoz+vbW9Wk1OxLDogeXr90kZNFVzQZk4fsX46rfanvC/bHEKKn5LOscU1ad3UMkqrHRjbKvaZ6TvphJYSJKHmbj/ZOxUdLkkSNcvCsxpvmCmhARUF2+Nnq4Lpl0cfw4RJnFE4P4YPFXm/sDtUvfTpWvuGuWZadkH6NfSZJWWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761915017; c=relaxed/simple;
-	bh=0yJ0lPkIROw81sbJhbPi9MidTIyAndY8Qs3t1posHoo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=avgPsUF9GAsdgTv/ZQrjldACvmQ6TcKj0Blh4HoPrVREW6HRGNoaLCEfxkzjfk0YmRWX6Zm3glKG5MCPMKQJYnFQorJ5o7zKdN7t7nNreuGVSX1NfVRgVmBdtW9TilWZaiSD+J+R4TEdfRgQj5+sBQB4Efn0EemPvEJBex/G9JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j3bje4KV; arc=none smtp.client-ip=209.85.166.45
+	s=arc-20240116; t=1761921339; c=relaxed/simple;
+	bh=AMSI4zE2Da2CoHXVBxERvsBwEjjKt58XBoEtfuiGLlo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vp8EWzwkG9sY9qd/+KCvHGm9+TTxSOWUj2ag3hGrbNSsgTVobnz6B1N4BkxVvV5TpdtzBt+GdOcGHofRTmNSTe2Cc12KVQ2vZsQZsRootljLytvdjahIiS50w1/RDJ8vKSPQ4WdbUyUZDy82oCPjec1WVtRI5SPjIeMIIKFsVzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mqJAZPms; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j3bje4KV"
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-93e8834d80aso92263339f.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Oct 2025 05:50:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqJAZPms"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-378d50e1cccso24960751fa.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Oct 2025 07:35:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761915015; x=1762519815; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=M4OzpDSRuKueomkXUj8YuHjDur56ZZx44TFplEi/rF0=;
-        b=j3bje4KVqQBdERojiQpenmQHFo+2RpNvtu5NthaSFHtmQNShdRuswQA+1uUK9wjkQh
-         yFd14SSNMg9s0LiKf+8dXnfwiRRv6UHkDgPYkyR/h0paSAvbbXkN7hrle0GxF9fZs+xN
-         3b7rattlfhu3+YrzN7iPaP/7JEDuj3sva0wx+puv7IZHI0MuGH9AUtzU3T6zf86CjZ/f
-         ECEIXbAqQT2DH8Ua1XNrQtEtTGnRIxyVXj656MZki0DmUy5cU2tUpjRznkSZvHtjRaEW
-         4Xc7lwPf99W8Ps90avI1VR5dMnyl4rTJmysAchyTDAMZndtkKCwsCjjlWjRQMAHcgbLa
-         7b5A==
+        d=gmail.com; s=20230601; t=1761921336; x=1762526136; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hhKJuz27wu9b2Q/v2pjgIV8qqd+0+y6WrGE4BcakU/8=;
+        b=mqJAZPmsRxzGMJwtLEKgI5sUKxRZs9gdb80UtKbdOCNnffo3CSsnVrW+nq5Rh2Vifw
+         CZJuFpBXFPTnNk25sxRg9KZhrKHR8qDTBGSgvBk1+0IWwhTEsS1AmhOSHidpxybATzgZ
+         yN+j5wlLSC7VNuRc2O9+p7/G9n/u1mHiM+YmildIMBMHr8wnMy5z16I+zOcYpUJIdXr8
+         2skuFjg2/4GN9cgg1DaTQbZoK9kupSwJUxADC+LQm648tPfZBwSK79MVqdP87VDIOtqf
+         Yob6FDQ+hhcjtjg4H2Glx2ViyoQM5rGftAvhh97iLL4r9cKERI0/b4aWJWLZt1/yyl17
+         Ri0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761915015; x=1762519815;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M4OzpDSRuKueomkXUj8YuHjDur56ZZx44TFplEi/rF0=;
-        b=u6Vge4p2FW3FWAmPtMz4ktFqaxDUrRBQiXk+qLhod8bT8V2bHb33SYVNv29wtDm44F
-         t4XbpuYYNZcxFLG5VqAxMbG/Bq34tR1rRQumFycu3pdCqsjaiezDtKD92AWnT4FZ0XVY
-         sQ5oLsum7U20SI3zg4aSDw6DAfV/fZX20Dn/3lb+/JXykaIUoY0F2fzyFC5XtFiFKCji
-         3AaEF9Yus93bD0CmR2J8vu0x409Ix68YVp09yc3X0s33RiavJIq0IcfBirHM4UJ7MsT8
-         bStP6x9UxnBshm9OnlQXQkMSrcVi8LzaxFTSmbyntrQgZPZiq3fMuzw/JoO9uhDvsAtx
-         b7Mg==
-X-Gm-Message-State: AOJu0YwUBjMxTvqCWAcEZJ7W38dTc6sCon2q9nAKPa9RcgDq4s3ODEKp
-	nGiOp7WAa4b9D5UL8BZ68Tvqg85g7GHKtPKwkpn+iU/LYTpNP616CTPPSbSeTw==
-X-Gm-Gg: ASbGnctGFKio1lL/HBS8nRIIt0vLLZbIZ2JqF6Py2PqOA4RNMe6uEnG7uNrhxneNPcF
-	2GLZ5tqM8GWOzrYycFTQNXySH5Mnno+QxLXui3T9TRgukX/arvYb7SCn2sl8yO4sypOhhJyZty1
-	5m/ArTtwS4C4KvPrPQ/u9jv69mcdnLyrM7Ij3dNJATlu5bp0u/0VdisNCt6lYb2FZ8WgTpsjyGu
-	yabP1AsyZ/2vpCTJ6q5yDtlU7Gd2//F5awNoI1I6hfGX0WaMEOaSSrR5L7DBxbPnHvhrSkocJC3
-	fp+0UKfxnC3KG/JMtnaSjAttSjnFeprsXz450kwUUSiTuxtxMIfToyBsYgfW8v/NYXzJUdi8+SP
-	LYvWigshqkf1mhsjs85rmozDA/B1ZuUE44yAGXFDXjQPHrXf4jRoAEKxTfvUHqnTVTlZFv25iCO
-	FGseF2VGeAhVRrZT6C
-X-Google-Smtp-Source: AGHT+IF/tYRQkcVQ6fR52yJR6ZbI8els6aGEODvWXZfm5utJF1Kt8G0CqiadLdD6LGtJFzkvkQW68g==
-X-Received: by 2002:a05:6e02:194d:b0:42d:8525:ac81 with SMTP id e9e14a558f8ab-4330d1d7af8mr50752265ab.17.1761915014794;
-        Fri, 31 Oct 2025 05:50:14 -0700 (PDT)
-Received: from [172.17.0.2] ([64.236.143.37])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b6a55b0cd7sm671687173.35.2025.10.31.05.50.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Oct 2025 05:50:14 -0700 (PDT)
-Message-ID: <6904b086.050a0220.262d3d.0ea6@mx.google.com>
-Date: Fri, 31 Oct 2025 05:50:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2470459472616598926=="
+        d=1e100.net; s=20230601; t=1761921336; x=1762526136;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hhKJuz27wu9b2Q/v2pjgIV8qqd+0+y6WrGE4BcakU/8=;
+        b=gMbLIqKgp1HOQhyhj8xxdIpLacaEMHmNDDkQoLddJKvpUC1WVty+UgMNqydpLbHdr2
+         /R9HrAge6644Ha25+SyihhNAPr75FHeMTkRG0zOQrRfyrkB7eRfHRm/HjxQA7sRZdFUs
+         rDzOgXdeMF0EY09/aQacS665TDVWK6mru6do+F0KpD6RPWXJ925TYwnOtTqXfPFZLOLE
+         CmKHE6UO9BalB+yI6B0QCfdqRMhcW87uaOnllBdVmvV4B3qeP/tkHAgMu/xfHRXySvfN
+         /5GBMFqlyYSgJbyTeklfmd1uSJUCGWjnhnwtNFaQW5UAOwrFhTvJH8tsW47g5pNCoa1W
+         S3Tg==
+X-Gm-Message-State: AOJu0Yy0JZSNhSZeh6JCfqE1e5TTadHKOhy9jgDYQ4eDOkY3+BqlOKkP
+	JMhxOlVwNFSFrN9T8rOtMsPGe4wkkLhb2i+CQDag6nyOW8Pt2Qe3Waq87+pg3sP0mrXqamTHM9l
+	vs2AYV6YaBx3/78AeaPVVyoHPl81MxUUyDdN8A7o=
+X-Gm-Gg: ASbGncsNvNJt3x+j3W0QVFQj7UVJkmiXxU+YDlvBE+lTNu2EuB0CnOPIa7Xiz+VoM9+
+	sBsBoCR4aVeHTu6kBy5aA1ABallq+K1/Bt/9jKLVCSaFOa66reksrwLDuqu9WUKngOZTlZHTsYb
+	GRkZ5dKrRLemQfwADOcvz0imx1gln0NzqJR+Bo6O0ydxqfLFJCJENQnkhZAm3zBy2uXfic1o5Sb
+	SWB7kCxDWhZX6facdIzy4WRp8Ndx82WoGRx5IAocdzU0vKTwwMswodkjOs=
+X-Google-Smtp-Source: AGHT+IE59eDz+HM23HuvxjomEE9A/DkvQf7SFbgGyB96I8VG23RpWREEs1gOfdNBEcb7IlhV8UI/s5eCTPxUgw0+bZE=
+X-Received: by 2002:a05:651c:4093:b0:36e:f1ae:d4bc with SMTP id
+ 38308e7fff4ca-37a18d9b72bmr9194001fa.14.1761921335672; Fri, 31 Oct 2025
+ 07:35:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, Markus.Elfring@web.de
-Subject: RE: Bluetooth: btmrvl_sdio: Use pointer from memcpy() call for assignment in btmrvl_sdio_host_to_card()
-In-Reply-To: <578671da-c290-422d-8f30-55448d024d55@web.de>
-References: <578671da-c290-422d-8f30-55448d024d55@web.de>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20251031081525.2275894-1-lilinmao@kylinos.cn>
+In-Reply-To: <20251031081525.2275894-1-lilinmao@kylinos.cn>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 31 Oct 2025 10:35:22 -0400
+X-Gm-Features: AWmQ_bmuXGhzGerZwZFRtPGqD7WF3harKpEvUmZcQ9sLxynctPfun-jmZXTsBxA
+Message-ID: <CABBYNZJZeP1eFZXrVPMAhEtdNVSWkuAkyopLcrUG6wbQpvgsww@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Prevent autosuspend when
+ le_scan_disable work is pending
+To: Linmao Li <lilinmao@kylinos.cn>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============2470459472616598926==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+On Fri, Oct 31, 2025 at 4:15=E2=80=AFAM Linmao Li <lilinmao@kylinos.cn> wro=
+te:
+>
+> When USB autosuspend occurs while le_scan_disable work is scheduled,
+> HCI commands sent by the work fail with timeout, leaving LE scan in
+> an inconsistent state.
+>
+> Scenario:
+>   T=3D0:     LE scan starts, le_scan_disable work queued (+10240ms)
+>   T=3D8s:    Autosuspend check: tx_in_flight=3D0, suspend proceeds
+>   T=3D10s:   le_scan_disable work executes on suspended device
+>            =E2=86=92 HCI command 0x2042 times out
+>
+> The tx_in_flight check only protects actively transmitted URBs, missing
+> the window where work is queued but hasn't submitted its URB yet.
+>
+> Fix by checking delayed_work_pending(&hdev->le_scan_disable) during
+> autosuspend. Return -EBUSY if pending to block suspend until work
+> completes. Only set BTUSB_SUSPENDING after all checks pass to avoid
+> leaving the flag set if suspend is aborted.
 
-Dear submitter,
+Hmm, we could also just cancel the work then, in face we do have
+hci_suspend_sync->hci_stop_discovery_sync->cancel_delayed_work(&hdev->le_sc=
+an_disable);
+but perhaps it is not being called always because HCI_LE_SCAN is not
+enabled, so I wonder if we should do something like:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1018196
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 1cbdd2ce03f2..59618fde7bcb 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5464,6 +5464,11 @@ int hci_stop_discovery_sync(struct hci_dev *hdev)
 
----Test result---
+        bt_dev_dbg(hdev, "state %u", hdev->discovery.state);
 
-Test Summary:
-CheckPatch                    PENDING   0.36 seconds
-GitLint                       PENDING   0.37 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      25.10 seconds
-CheckAllWarning               PASS      27.70 seconds
-CheckSparse                   PASS      31.40 seconds
-BuildKernel32                 PASS      25.11 seconds
-TestRunnerSetup               PASS      497.33 seconds
-TestRunner_l2cap-tester       PASS      23.75 seconds
-TestRunner_iso-tester         PASS      49.25 seconds
-TestRunner_bnep-tester        PASS      6.14 seconds
-TestRunner_mgmt-tester        FAIL      113.36 seconds
-TestRunner_rfcomm-tester      PASS      9.23 seconds
-TestRunner_sco-tester         PASS      14.38 seconds
-TestRunner_ioctl-tester       PASS      10.09 seconds
-TestRunner_mesh-tester        FAIL      11.43 seconds
-TestRunner_smp-tester         PASS      8.53 seconds
-TestRunner_userchan-tester    PASS      6.50 seconds
-IncrementalBuild              PENDING   0.96 seconds
++       /* Always stop le_scan_disable since that works as discovery timer =
+for
++        * the rounds of discovery irrespective of the discovery type.
++        */
++       cancel_delayed_work(&hdev->le_scan_disable);
++
+        if (d->state =3D=3D DISCOVERY_FINDING || d->state =3D=3D DISCOVERY_=
+STOPPING) {
+                if (test_bit(HCI_INQUIRY, &hdev->flags)) {
+                        err =3D __hci_cmd_sync_status(hdev, HCI_OP_INQUIRY_=
+CANCEL,
+@@ -5472,14 +5477,9 @@ int hci_stop_discovery_sync(struct hci_dev *hdev)
+                                return err;
+                }
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+-               if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
+-                       cancel_delayed_work(&hdev->le_scan_disable);
+-
+-                       err =3D hci_scan_disable_sync(hdev);
+-                       if (err)
+-                               return err;
+-               }
+-
++               err =3D hci_scan_disable_sync(hdev);
++               if (err)
++                       return err;
+        } else {
+                err =3D hci_scan_disable_sync(hdev);
+                if (err)
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+We may as well rename/reworkd le_scan_disable to discovery.work since
+that acts as I commented above it works as discovery timer not just
+le_scan_disable.
 
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+> Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+> ---
+>  drivers/bluetooth/btusb.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 5e9ebf0c5312..a344ea1dc466 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -4389,6 +4389,7 @@ static void btusb_disconnect(struct usb_interface *=
+intf)
+>  static int btusb_suspend(struct usb_interface *intf, pm_message_t messag=
+e)
+>  {
+>         struct btusb_data *data =3D usb_get_intfdata(intf);
+> +       struct hci_dev *hdev =3D data->hdev;
+>
+>         BT_DBG("intf %p", intf);
+>
+> @@ -4402,14 +4403,19 @@ static int btusb_suspend(struct usb_interface *in=
+tf, pm_message_t message)
+>                 return 0;
+>
+>         spin_lock_irq(&data->txlock);
+> -       if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
+> -               set_bit(BTUSB_SUSPENDING, &data->flags);
+> -               spin_unlock_irq(&data->txlock);
+> -       } else {
+> +       if (PMSG_IS_AUTO(message) && data->tx_in_flight) {
+>                 spin_unlock_irq(&data->txlock);
+>                 data->suspend_count--;
+>                 return -EBUSY;
+>         }
+> +       spin_unlock_irq(&data->txlock);
+> +
+> +       if (PMSG_IS_AUTO(message) && delayed_work_pending(&hdev->le_scan_=
+disable)) {
+> +               data->suspend_count--;
+> +               return -EBUSY;
+> +       }
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.104 seconds
-LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.169 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.867 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
 
 
+> +
+> +       set_bit(BTUSB_SUSPENDING, &data->flags);
+>
+>         cancel_work_sync(&data->work);
+>
+> --
+> 2.25.1
+>
 
----
-Regards,
-Linux Bluetooth
 
-
---===============2470459472616598926==--
+--=20
+Luiz Augusto von Dentz
