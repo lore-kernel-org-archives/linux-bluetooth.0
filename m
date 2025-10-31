@@ -1,76 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB0F2FDC29;
-	Fri, 31 Oct 2025 19:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F9C1F130A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Oct 2025 19:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761940237; cv=none; b=fW/VTa6sZ3cqHXY+8VYFjCxVm+u/MUKgfgXBlz5DDim8nuMc5m1b9X184S9bzmFvs8jruF8gV2FK3ECtL88Qh0ovzVf3NT7IyI/tK42RthgI8NPbPrSPqQN6nyEdn9w49eCigfFMF7ozvMV+RikkIYGPqyoe/hETVnuDx/FvRQk=
+	t=1761940672; cv=none; b=fGBVciA0R8T4Kunb16LvCGfAgyyr5gEzTQn0lPVUAxoCGQyg1oQbA8t4rAUnEoPLCu2hA7GuMaZAefZLPgBDMzKmWilsKDFV5lwtKKzAeDJ46cvNBmkjNRdfxW1Mzmge98lVyNcB0PRgjw8Ho2mp1bU/BrniqbBERO29x5jevq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761940237; c=relaxed/simple;
-	bh=eT8QXRHOo7iIwxd5VToUWvH42mgEJKnN5q2AXWdRfVQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iGScTFdCK0e7d1FqlP/3c9G0r7KvgRZFezsZ9IB7F1jzNTwb4RXXUtgqJFmQW7faEvvBVRHNGb5R7S9kMdpViBM03UhB9plNhEp/14NcJsByNkB2k0ueuEnaYI7skO4mALH+U3AFZ3ZdPxeT30VKCyvpR5Mb4boIEPAXIjL0Iyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGfNznsi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761940672; c=relaxed/simple;
+	bh=t4cTt6X776zw1yU+ipT0DKKNUFG+Ia4tj0suzVAussI=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=kGm/F0MSEUWL1ko1Y6EXIb1vS6Rse/ZU7uxN0aCoKFfu7fF0IknCNK80FdyktP/z8IIhdTRRGKMfs+622odEAu8vLWdMMtnmCevsoLZ+DKHwxqYkcWfedde5beZ4hxRvI/bOwMHxQVqetOVTSTtGaxnbAhhZF0nmZqWsiQUQPB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=N0Ud5Gnb; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGfNznsi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66BA6C4CEE7;
-	Fri, 31 Oct 2025 19:50:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761940236;
-	bh=eT8QXRHOo7iIwxd5VToUWvH42mgEJKnN5q2AXWdRfVQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tGfNznsiNnkR5t1aUQNwc6xNU0oMW2DCU/dB9RAwQk4pvWYLqfCNuz7VTDrMRg8KB
-	 dT5YZcJ8nAxdiMkg0NXnIk27MTTWmcpU1Iy/72kAD05dnX6jUh1nVozqUfYYKWw17g
-	 0fS5XyN6Wybu8hMiFirtZXEJ+8hW1V8yAPrB1g8XMymexnpVB8Pz8PYVCN25MODKJ5
-	 8pdfIeQpPeu5V+fSBfi4mIgn4c7gmdF0UZZlM+v2dT8HfpHMYNPiZdvsEIokrvF7+4
-	 QJESOf01Z7N8GgDAyqnsrF03gHqNThCcGJWnWqb22a3ULOP1yHATl9wmh0Bfw5Qzvv
-	 fOYJS9DjSpgfw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD003809A00;
-	Fri, 31 Oct 2025 19:50:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="N0Ud5Gnb"
+Received: from github.com (hubbernetes-node-1ebb270.ash1-iad.github.net [10.56.157.30])
+	by smtp.github.com (Postfix) with ESMTPA id B764B1411C3
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Oct 2025 12:57:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1761940670;
+	bh=1EpAFlyIJKkgTmMwUhodVcQrLjfqIxANgWboET2JiXg=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=N0Ud5GnbmPKlk207ooDXBaqUsw3ddmPavCGHTJTOS8+TXvB18vXTx75aQwEHkc8Bn
+	 26HiNbYlutg8bVj0EFGlMKvbfGT+Dn901Fja4ThdDMAuGSyI69U6wfhjRwHUBu71wH
+	 s6lPqqGfZkg/03AtgsCvR1q2RI8VQR7V9UJKEbGM=
+Date: Fri, 31 Oct 2025 12:57:50 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1007812/1fbdb2-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2025-10-31
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176194021251.620269.13809650718943764430.git-patchwork-notify@kernel.org>
-Date: Fri, 31 Oct 2025 19:50:12 +0000
-References: <20251031170959.590470-1-luiz.dentz@gmail.com>
-In-Reply-To: <20251031170959.590470-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1007812
+  Home:   https://github.com/bluez/bluez
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 31 Oct 2025 13:09:59 -0400 you wrote:
-> The following changes since commit e5763491237ffee22d9b554febc2d00669f81dee:
-> 
->   Merge tag 'net-6.18-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-10-30 18:35:35 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-10-31
-> 
-> [...]
-
-Here is the summary with links:
-  - [GIT,PULL] bluetooth 2025-10-31
-    https://git.kernel.org/netdev/net/c/284987ab6c97
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
