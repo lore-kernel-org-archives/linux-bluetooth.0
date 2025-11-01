@@ -1,99 +1,175 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AADC119E7D1;
-	Sat,  1 Nov 2025 16:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5E81DFE26;
+	Sat,  1 Nov 2025 17:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762015576; cv=none; b=cl1RdJ6H4buX9CYxSdZNEliJCyeOKd0ZSNKZauS6tuDCLS/BscyFjczwcAPlck5XLqKn1xwF/aXQ/HPaUiW1QiznOMs1mYv+DhUE5iyT9/+izokjqixvofPVwErlrjDit3UgJdWxP3i9Wju3u3QviRuz4Lw+o9y4cFzte/tNLvA=
+	t=1762016488; cv=none; b=BoAVWqhmM4x++pdAHlnJ24zQ2Fg9GMSQdu/fXM1PjoPSmXO0Kv5ODBaxW3H7JJePD4UuSKajLn7yUkMclNj4X7oNnAQwaRQahKDBui7oDjnfoVS8i+ZiXmHUyNFsD9asiKQC1h7h6o0enq/MOHb9nDppIWedLbgIljzYYCtXmVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762015576; c=relaxed/simple;
-	bh=XtmwiW1VCOZqDOB1Vuv6C2ZsXjbCzk3HUdA344goqDI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=jAf/P2S2LmX0PraOi99R5Kd/mv0AJ32wr+09MmmPaU7Y9ZOEBjYfUC/9+oyWzVSfnc8A4wuqpZL+ZFRnq581vxZb7P7RxpdYki83BX3eVZE5dVLh2XNMXoZjmJtw7j9bJU/3wvwrE2LlxiMjV7DV75Usn2MFUYuLI34xfS3zCDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.5] (ip5f5af736.dynamic.kabel-deutschland.de [95.90.247.54])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D098D61CC3FF7;
-	Sat, 01 Nov 2025 17:46:05 +0100 (CET)
-Message-ID: <bdd501d8-d3cf-4741-9a51-f052c3c5d4c9@molgen.mpg.de>
-Date: Sat, 1 Nov 2025 17:46:05 +0100
+	s=arc-20240116; t=1762016488; c=relaxed/simple;
+	bh=6cgCz2XhKQjeiHjZ9yJcICIYarnhGGJs7JtPlEcxyPE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PKRhTogapy1RoH2Yvik1egaVO8WxLAGYx0RW7PSQvQ3JbnjVQOYkd3To6mdvyAhjAgEDGv1zZhw8KbKTJ03yIO6uTbRwE/QOV+PQNdzADp2OasGRrZXvMv//X4sTMrMyFcx3ZZirT5G8UCZ2auP6ybbHaHCq/aibIWdCqG0s/OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=M+ZGUhmV; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="M+ZGUhmV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=bt
+	PNQ78ofuz9BQtjwT/RO+d80HvZGd3wPR//jV3fT5U=; b=M+ZGUhmVALYPfSK3Ez
+	zjS2Eo2eLx4bjjXoPHRIYNL1x/2olUx/CyZbFz9O2BmqzQG/NYZ7cH4NhMt4abU1
+	m3aKbFVi10Dxj4KcXQM7zPZCHsjtNPRz9QiWdR/ijmYtm1a1bfsDdct0jk+K/gOF
+	U3MpOZCuf/Uq+DIgqTNAbioGU=
+Received: from localhost (unknown [])
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wAXIUrZPAZpK7S+Aw--.48439S2;
+	Sun, 02 Nov 2025 01:01:14 +0800 (CST)
+From: Cen Zhang <zzzccc427@163.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	johan.hedberg@gmail.com,
+	marcel@holtmann.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	r33s3n6@gmail.com,
+	gality369@gmail.com,
+	zhenghaoran154@gmail.com,
+	zzzccc427@163.com
+Subject: [PATCH v4] Bluetooth: sco: Serialize state check in sco_sock_connect to fix UAF
+Date: Sat,  1 Nov 2025 17:01:10 +0000
+Message-ID: <20251101170110.179111-1-zzzccc427@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] Bluetooth: 6lowpan: reset link-local header on ipv6
- recv path
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- johan.hedberg@gmail.com, luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
-References: <639c5cb6ceb49ffd63952dc69d0d48b022aaec3b.1761998763.git.pav@iki.fi>
- <37c918cc-9b02-4901-87ce-753a6b9c90bd@molgen.mpg.de>
-Content-Language: en-US
-In-Reply-To: <37c918cc-9b02-4901-87ce-753a6b9c90bd@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAXIUrZPAZpK7S+Aw--.48439S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxCF17KrWrtF4ktF1xKw45KFg_yoWrJw1DpF
+	ZrKa9xK34UJrn3uFsayFW8Wrs5ArnYvFy2kr10gwn5Aas5KFWFyr48tryUtrZ8CrWvyF45
+	Za1UKF43KF4DWrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pimhF7UUUUU=
+X-CM-SenderInfo: 5222uujfuslqqrwthudrp/1tbiXQP4hGkGO84QCQAAsh
 
-[Remove bouncing jukka.rissanen@linux.intel.com]
+Concurrent sco_sock_connect() calls could race on the same socket since the
+state checks (BT_OPEN/BT_BOUND) were done without holding the socket lock.
+This allowed two parallel connects to proceed and end up binding two
+separate sco_conn objects to the same sk. Later, when sk->conn had been
+updated to point to the second conn, closing the socket could free the
+second conn and the socket, while the first conn's connect confirm path
+still referenced the stale sk/conn, triggering a KASAN use-after-free.
 
-Am 01.11.25 um 16:52 schrieb Paul Menzel:
-> Dear Pauli,
-> 
-> 
-> Thank you for your patch.
-> 
-> Am 01.11.25 um 13:09 schrieb Pauli Virtanen:
->> Bluetooth 6lowpan.c netdev has header_ops, so it must set link-local
->> header for RX skb, otherwise things crash, eg. with AF_PACKET SOCK_RAW
->>
->> Add missing skb_reset_mac_header() for uncompressed ipv6 RX path.
->>
->> For the compressed one, it is done in lowpan_header_decompress().
->>
->> Log: (BlueZ 6lowpan-tester Client Recv Raw - Success)
->> ------
->> kernel BUG at net/core/skbuff.c:212!
->> Call Trace:
->> <IRQ>
->> ...
->> packet_rcv (net/packet/af_packet.c:2152)
->> ...
->> <TASK>
->> __local_bh_enable_ip (kernel/softirq.c:407)
->> netif_rx (net/core/dev.c:5648)
->> chan_recv_cb (net/bluetooth/6lowpan.c:294 net/bluetooth/6lowpan.c:359)
->> ------
->>
->> Fixes: 18722c247023 ("Bluetooth: Enable 6LoWPAN support for BT LE devices")
->> Signed-off-by: Pauli Virtanen <pav@iki.fi>
->> ---
->>   net/bluetooth/6lowpan.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
->> index f0c862091bff..f1d29fa4b411 100644
->> --- a/net/bluetooth/6lowpan.c
->> +++ b/net/bluetooth/6lowpan.c
->> @@ -289,6 +289,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
->>           local_skb->pkt_type = PACKET_HOST;
->>           local_skb->dev = dev;
->> +        skb_reset_mac_header(local_skb);
->>           skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
->>           if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
-> 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> 
-> 
-> Kind regards,
-> 
-> Paul
+Fix by taking lock_sock(sk) before checking sk->sk_state and sk->sk_type,
+performing the destination address assignment under the lock, and releasing
+it before invoking sco_connect() (which will acquire the lock as needed).
+This serializes concurrent connect attempts for the same sk and prevents the
+interleaving that caused the double-attachment and subsequent UAF.
+
+Thread 1:               Thread 2:               Thread3:
+check sk_state          check sk_state
+sco_sock_connect(sk)    sco_sock_connect(sk)    sco_connect_cfm(sk->conn)
+conn1->sk = sk
+                        conn2->sk = sk
+sk->conn = conn1
+                        sk->conn = conn2
+                        sco_sock_release
+                        free conn2 and sk
+                                                sco_connect_cfm
+                                                sco_conn_del
+                                                sco_conn_free
+                                                UAF on sk 
+
+The representative KASAN report excerpt:
+
+  BUG: KASAN: slab-use-after-free in sco_conn_free net/bluetooth/sco.c:94
+  ...
+  Write of size 8 at addr ffff88810d2be350 by task kworker/u25:1/88
+  ...
+  Call Trace:
+  sco_conn_free net/bluetooth/sco.c:94 [inline]
+  kref_put include/linux/kref.h:65 [inline]
+  sco_conn_put+0x49d/0xfc0 net/bluetooth/sco.c:115
+  sco_conn_del+0x46d/0x8d0 net/bluetooth/sco.c:280
+  sco_connect_cfm+0x83d/0x1ee0 net/bluetooth/sco.c:1468
+  hci_connect_cfm include/net/bluetooth/hci_core.h:2082 [inline]
+  ...
+  Allocated by task 294:
+  ...
+  sco_sock_create+0x22d/0xc00 net/bluetooth/sco.c:616
+  ...
+  Freed by task 295:
+  __sk_destruct+0x4b0/0x630 net/core/sock.c:2373
+  sock_put include/net/sock.h:1962 [inline]
+  sco_sock_kill+0x64d/0x9b0 net/bluetooth/sco.c:526
+  sco_sock_release+0x770/0xa50 net/bluetooth/sco.c:1359
+  ...
+
+Reported-by: Cen Zhang <zzzccc427@163.com>
+Signed-off-by: Cen Zhang <zzzccc427@163.com>
+
+---
+v2 and v3:
+ - Fix the patch format
+---
+
+---
+v4:
+ - fix the subject prefix to "Bluetooth: SCO: ..."
+ - in sco_chan_add(), also check sco_pi(sk)->conn and return -EBUSY if the
+   socket is already attached
+ - in sco_connect(), if sco_chan_add() fails, drop the hci_conn ref
+---
+
+---
+ net/bluetooth/sco.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index ab0cf442d..b73ee71c6 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -298,7 +298,7 @@ static int sco_chan_add(struct sco_conn *conn, struct sock *sk,
+ 	int err = 0;
+ 
+ 	sco_conn_lock(conn);
+-	if (conn->sk)
++	if (conn->sk || sco_pi(sk)->conn)
+ 		err = -EBUSY;
+ 	else
+ 		__sco_chan_add(conn, sk, parent);
+@@ -356,6 +356,7 @@ static int sco_connect(struct sock *sk)
+ 	err = sco_chan_add(conn, sk, NULL);
+ 	if (err) {
+ 		release_sock(sk);
++		hci_conn_drop(hcon);
+ 		goto unlock;
+ 	}
+ 
+@@ -651,13 +652,18 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr *addr, int alen
+ 	    addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
+ 
+-	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND)
++	lock_sock(sk);
++
++	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND){
++		release_sock(sk);
+ 		return -EBADFD;
++	}
+ 
+-	if (sk->sk_type != SOCK_SEQPACKET)
+-		err = -EINVAL;
++	if (sk->sk_type != SOCK_SEQPACKET){
++		release_sock(sk);
++		return -EINVAL;
++	}
+ 
+-	lock_sock(sk);
+ 	/* Set destination address and psm */
+ 	bacpy(&sco_pi(sk)->dst, &sa->sco_bdaddr);
+ 	release_sock(sk);
+-- 
+2.34.1
 
