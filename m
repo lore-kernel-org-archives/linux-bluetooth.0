@@ -1,97 +1,142 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A7834D3A7;
-	Sat,  1 Nov 2025 16:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD7F2222A0;
+	Sat,  1 Nov 2025 16:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762015016; cv=none; b=PKA8gL9eQcbIQHVCJ8J4HSzgPjPYhLjoLqFZTbkLZPIt9UUwvLWVswXoSU1VgXHYwollXiUriE5abuPqUhyzRDH3VCw8sGhFlzZ3buUFuWJn5gW3lnZVNTYWvjh07uc77aj6bgqXLeyW4vnnr4mYXGMF+5fTsJCDi/rx62P4pEU=
+	t=1762015526; cv=none; b=JB8p2HVPbSBoP07xbz6KGzlxa6cDfGfW36tVNnvwa6uoUzfPoXvntbj0059gY0sSQ3wvc4swm5/qnJ4597TOzTMIJy1vW+Jc4vE2ghwjA+Wv367XVN+VHOrWhjz/o84aUo3eoM5l0oAe1FnyjGZC4P2K/IBCCdn19nqqd/3JFI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762015016; c=relaxed/simple;
-	bh=g0ChhHcKt6YzFKTS0xvRxpNkWjx/u5cIu5EPQYFzzWM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=MaPi/9mUT+cjdYsiPTlS6loSmbvtYiGuYuzsW8oETYL1iNGlgKz/UhKVAchX9VRUTJPRyo1ZBXwkzupQpLkFCAXw3jztoKd1E0K+MJRCNjIo5Q0fxhQ+wQCSBf+RUOlhg0NWYGfufxPHi+odUBtZucxDW1n/5K/C6zTCFRH4V3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=YWg8618f reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="YWg8618f"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=L/9D6uIGwDP+WjGZhkAhyVm31eVL9to0o7VaEgGtNjI=; b=Y
-	Wg8618frS1S5ztIumDCuaWsVIRclH7qZvGOMxXNiDYk5N7qmMx3vXaBUEppmHC1H
-	ORfyo8SyrztTR6YMJQ/y1aKwjfSpGbG5xmDouEV8QAMf8QGlOFFNzDBa1lffwa00
-	DoHqJ0oBP9lyS03I2BSfAc6BdMY0bBfsi7H2upbXJ4=
-Received: from zzzccc427$163.com ( [1.203.169.43] ) by
- ajax-webmail-wmsvr-40-101 (Coremail) ; Sun, 2 Nov 2025 00:36:34 +0800 (CST)
-Date: Sun, 2 Nov 2025 00:36:34 +0800 (CST)
-From: zzzccc427  <zzzccc427@163.com>
-To: "Pauli Virtanen" <pav@iki.fi>
-Cc: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, johan.hedberg@gmail.com,
-	marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, baijiaju1990@gmail.com,
-	r33s3n6@gmail.com, gality369@gmail.com, zhenghaoran154@gmail.com
-Subject: Re:Re: [PATCH v3] bluetooth: sco: Serialize state check in
- sco_sock_connect to fix UAF
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
-In-Reply-To: <9430e38fd2fb34abfac0d90bc84880667749294d.camel@iki.fi>
-References: <20251101104522.174388-1-zzzccc427@163.com>
- <9430e38fd2fb34abfac0d90bc84880667749294d.camel@iki.fi>
-X-NTES-SC: AL_Qu2dAPyau0Ei4iSbYOkfmUYQj+02WsKwufkl3oJUPJ18jCvpyi4wRH1KAWP3/Nm0DhKsgiO9VTR++/hcc5VJUZ0ijh/DJPHJvlQLB7CVvXbfGw==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1762015526; c=relaxed/simple;
+	bh=qJGD6tDr1othNmjYN9MvajfXQaLzM+a7hQcmxLl7frw=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Zy2pZkBh6YXC9omnIP2AWzCtLKg94vXweK967rvY73MLQarOAqn4Q7ZkvYgJOyfGcRxZZoKcPM7NAnvpNo5Ryf+BcezSFQOsENptugvqudoXRLYn9ZliEL4AFAnjDrK4tgbGI5qcPq5StBPtb8jvTKxFPsSSNRtym/YNJnu5bpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.5] (ip5f5af736.dynamic.kabel-deutschland.de [95.90.247.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 13FE061CC3FF7;
+	Sat, 01 Nov 2025 17:45:15 +0100 (CET)
+Message-ID: <f816807e-cda2-4393-b2a8-80d5c1f4b31c@molgen.mpg.de>
+Date: Sat, 1 Nov 2025 17:45:13 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <534d8927.34d1.19a4047200e.Coremail.zzzccc427@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:ZSgvCgD3t8ISNwZpz3AYAA--.531W
-X-CM-SenderInfo: 5222uujfuslqqrwthudrp/xtbBYwr4hGkGMEcnsgADsb
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/4] Bluetooth: 6lowpan: fix BDADDR_LE vs ADDR_LE_DEV
+ address type confusion
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ johan.hedberg@gmail.com, luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
+References: <639c5cb6ceb49ffd63952dc69d0d48b022aaec3b.1761998763.git.pav@iki.fi>
+ <0d953f217feaafb4ba40281c3ab87e18ad28bae7.1761998763.git.pav@iki.fi>
+ <88de4c86-8696-42d2-a9a5-192202c6d90e@molgen.mpg.de>
+Content-Language: en-US
+In-Reply-To: <88de4c86-8696-42d2-a9a5-192202c6d90e@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-SGkgUGF1bGksCnRoYW5rcyBmb3IgdGhlIHJldmlldyBhbmQgdGhlIGRldGFpbGVkIGV4cGxhbmF0
-aW9uLgo+VGhpcyBsb29rcyBjb3JyZWN0IGluIHByaW5jaXBsZSwgc2tfc3RhdGUgc2hhbGwgYmUg
-YWNjZXNzZWQgb25seSB1bmRlcgo+bG9jay4KPgo+SG93ZXZlciwgdGhlIGxvY2sgaXMgcmVsZWFz
-ZWQgYmVmb3JlIHNjb19jb25uZWN0LCBzbyBsb29rcyBsaWtlIHR3bwo+Y29ubmVjdCBjYWxscyBj
-YW4gc3RpbGwgYmUgYXQgdGhpcyBwb2ludCBhdCB0aGUgc2FtZSB0aW1lLCBzbyBBRkFJQ1MKPnRo
-ZSBhYm92ZSBvbmx5IHJlc3RyaWN0cyB0aGUgdGltZSB3aW5kb3cgZm9yIHRoZSByYWNlLgo+Cj5Q
-cm9iYWJseSBzb21ldGhpbmcgYWxvbmcgdGhlIGZvbGxvd2luZyBpcyBtb3JlIHN1cmUuIEl0J3Mg
-aW1wb3J0YW50IHRoZQo+Y2hlY2sgaXMgdW5kZXIgc2FtZSBsb2NrX3NvY2soKSBpbiBzY29fY29u
-bmVjdCB3aGVyZSBza19zdGF0ZSBpcwo+bW9kaWZpZWQ7IGluIGFkZGl0aW9uIHNrX3N0YXRlIGNo
-ZWNrIGNvdWxkIGJlIGFkZGVkIChvciBtYXliZSBtb3ZlZCkKPmFsc28gdGhlcmUuCj4KPmRpZmYg
-LS1naXQgYS9uZXQvYmx1ZXRvb3RoL3Njby5jIGIvbmV0L2JsdWV0b290aC9zY28uYwo+aW5kZXgg
-YWIwY2Y0NDJkNTdiLi4wNmMyMGQ5OTUyMWQgMTAwNjQ0Cj4tLS0gYS9uZXQvYmx1ZXRvb3RoL3Nj
-by5jCj4rKysgYi9uZXQvYmx1ZXRvb3RoL3Njby5jCj5AQCAtMjk4LDcgKzI5OCw3IEBAIHN0YXRp
-YyBpbnQgc2NvX2NoYW5fYWRkKHN0cnVjdCBzY29fY29ubiAqY29ubiwKPnN0cnVjdCBzb2NrICpz
-aywKPiBpbnQgZXJyID0gMDsKPgo+IHNjb19jb25uX2xvY2soY29ubik7Cj4tIGlmIChjb25uLT5z
-aykKPisgaWYgKGNvbm4tPnNrIHx8IHNjb19waShzayktPmNvbm4pCj4gZXJyID0gLUVCVVNZOwo+
-IGVsc2UKPiBfX3Njb19jaGFuX2FkZChjb25uLCBzaywgcGFyZW50KTsKPkBAIC0zNTYsNiArMzU2
-LDcgQEAgc3RhdGljIGludCBzY29fY29ubmVjdChzdHJ1Y3Qgc29jayAqc2spCj4gZXJyID0gc2Nv
-X2NoYW5fYWRkKGNvbm4sIHNrLCBOVUxMKTsKPiBpZiAoZXJyKSB7Cj4gcmVsZWFzZV9zb2NrKHNr
-KTsKPisgaGNpX2Nvbm5fZHJvcChoY29uKTsKPiBnb3RvIHVubG9jazsKPiB9Cj4KWW91J3JlIHJp
-Z2h0IKGqIG15IHYzIG9ubHkgcmVkdWNlZCB0aGUgcmFjZSB3aW5kb3cgYmVjYXVzZSBJIHdhcyBy
-ZWxlYXNpbmcKdGhlIHNvY2tldCBsb2NrIGJlZm9yZSBjYWxsaW5nIHNjb19jb25uZWN0KCksIHNv
-IHR3byBjb25jdXJyZW50IGNvbm5lY3QoKQpjYWxscyBjb3VsZCBzdGlsbCByZWFjaCBzY29fY29u
-bmVjdCgpIGF0IHJvdWdobHkgdGhlIHNhbWUgdGltZS4KPlRoZSB0ZXN0IGJvdCBhbHNvIHNheXM6
-Cj4KPiJCbHVldG9vdGg6ICIgcHJlZml4IGlzIG5vdCBzcGVjaWZpZWQgaW4gdGhlIHN1YmplY3QK
-Pgo+VGhlIHBhdGNoIHN1YmplY3Qgc2hvdWxkIHN0YXJ0ICJCbHVldG9vdGg6IFNDTzoiIG5vdCAi
-Ymx1ZXRvb3RoOiBzY286Ii4KPgo+VGhlIGZvbGxvd2luZyBlcnJvcnMgaW4gdGVzdCBib3QgYWZh
-aWsgYXJlIGtub3duIHByZS1leGlzdGluZyBmYWlsdXJlcywKPmFuZCBjYW4gYmUgaWdub3JlZCBo
-ZXJlOgo+Cj5GYWlsZWQgVGVzdCBDYXNlcwo+UmVhZCBFeHAgRmVhdHVyZSAtIFN1Y2Nlc3MgRmFp
-bGVkIDAuMTAyCj5zZWNvbmRzCj5MTCBQcml2YWN5IC0gQWRkIERldmljZSAzIChBTCBpcyBmdWxs
-KSBGYWlsZWQgMC4xOTYKPnNlY29uZHMKPk1lc2ggLSBTZW5kIGNhbmNlbCAtIDEgVGltZWQgb3V0
-IDIuMDIyCj5zZWNvbmRzCj5NZXNoIC0gU2VuZCBjYW5jZWwgLSAyIFRpbWVkIG91dCAxLjk5Ngo+
-c2Vjb25kcwpUaGFua3MgYWdhaW4gZm9yIHRoZSBndWlkYW5jZSx0aGlzIGhlbHBzIG1lIGEgbG90
-IQpJJ2xsIHNlbmQgYSB2NCB0aGF0IGRvZXMgdGhlIGZvbGxvd2luZzoKICAtIGZpeCB0aGUgc3Vi
-amVjdCBwcmVmaXggdG8gIkJsdWV0b290aDogU0NPOiAuLi4iCiAgLSBpbiBzY29fY2hhbl9hZGQo
-KSwgYWxzbyBjaGVjayBzY29fcGkoc2spLT5jb25uIGFuZCByZXR1cm4gLUVCVVNZIGlmIHRoZQog
-ICAgc29ja2V0IGlzIGFscmVhZHkgYXR0YWNoZWQsIGFzIHlvdSBzdWdnZXN0ZWQ6CiAgICAgICAg
-aWYgKGNvbm4tPnNrIHx8IHNjb19waShzayktPmNvbm4pCiAgICAgICAgICAgICAgICBlcnIgPSAt
-RUJVU1k7CiAgLSBpbiBzY29fY29ubmVjdCgpLCBpZiBzY29fY2hhbl9hZGQoKSBmYWlscywgZHJv
-cCB0aGUgaGNpX2Nvbm4gcmVmCiAgICAoaGNpX2Nvbm5fZHJvcChoY29uKSkgYmVmb3JlIHJldHVy
-bmluZwoKQmVzdCByZWdhcmRzLApDZW4gWmhhbmc=
+[Remove bouncing jukka.rissanen@linux.intel.com]
+
+Am 01.11.25 um 17:24 schrieb Paul Menzel:
+> Dear Pauli,
+> 
+> 
+> Thank you for your patch.
+> 
+> Am 01.11.25 um 13:09 schrieb Pauli Virtanen:
+>> Bluetooth 6lowpan.c confuses BDADDR_LE and ADDR_LE_DEV address types,
+>> e.g. debugfs "connect" command takes the former, and "disconnect" and
+>> "connect" to already connected device take the latter.  This is due to
+>> using same value both for l2cap_chan_connect and hci_conn_hash_lookup_le
+>> which take different dst_type values.
+>>
+>> Fix address type passed to hci_conn_hash_lookup_le().
+>>
+>> Retain the debugfs API difference between "connect" and "disconnect"
+>> commands since it's been like this since 2015 and nobody apparently
+>> complained.
+>>
+>> Fixes: f5ad4ffceba0 ("Bluetooth: 6lowpan: Use hci_conn_hash_lookup_le() when possible")
+>> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+>> ---
+>>   net/bluetooth/6lowpan.c | 28 ++++++++++++++++++++++++----
+>>   1 file changed, 24 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+>> index f1d29fa4b411..0d8c2e2e9a6c 100644
+>> --- a/net/bluetooth/6lowpan.c
+>> +++ b/net/bluetooth/6lowpan.c
+>> @@ -957,10 +957,11 @@ static struct l2cap_chan *bt_6lowpan_listen(void)
+>>   }
+>>   static int get_l2cap_conn(char *buf, bdaddr_t *addr, u8 *addr_type,
+>> -              struct l2cap_conn **conn)
+>> +              struct l2cap_conn **conn, bool disconnect)
+>>   {
+>>       struct hci_conn *hcon;
+>>       struct hci_dev *hdev;
+>> +    int le_addr_type;
+>>       int n;
+>>       n = sscanf(buf, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu",
+>> @@ -971,13 +972,32 @@ static int get_l2cap_conn(char *buf, bdaddr_t *addr, u8 *addr_type,
+>>       if (n < 7)
+>>           return -EINVAL;
+>> +    if (disconnect) {
+>> +        /* The "disconnect" debugfs command has used different address
+>> +         * type constants than "connect" since 2015. Let's retain that
+>> +         * for now even though it's obviously buggy...
+>> +         */
+>> +        *addr_type += 1;
+>> +    }
+>> +
+>> +    switch (*addr_type) {
+>> +    case BDADDR_LE_PUBLIC:
+>> +        le_addr_type = ADDR_LE_DEV_PUBLIC;
+>> +        break;
+>> +    case BDADDR_LE_RANDOM:
+>> +        le_addr_type = ADDR_LE_DEV_RANDOM;
+>> +        break;
+>> +    default:
+>> +        return -EINVAL;
+>> +    }
+>> +
+>>       /* The LE_PUBLIC address type is ignored because of BDADDR_ANY */
+>>       hdev = hci_get_route(addr, BDADDR_ANY, BDADDR_LE_PUBLIC);
+>>       if (!hdev)
+>>           return -ENOENT;
+>>       hci_dev_lock(hdev);
+>> -    hcon = hci_conn_hash_lookup_le(hdev, addr, *addr_type);
+>> +    hcon = hci_conn_hash_lookup_le(hdev, addr, le_addr_type);
+>>       hci_dev_unlock(hdev);
+>>       hci_dev_put(hdev);
+>> @@ -1104,7 +1124,7 @@ static ssize_t lowpan_control_write(struct file *fp,
+>>       buf[buf_size] = '\0';
+>>       if (memcmp(buf, "connect ", 8) == 0) {
+>> -        ret = get_l2cap_conn(&buf[8], &addr, &addr_type, &conn);
+>> +        ret = get_l2cap_conn(&buf[8], &addr, &addr_type, &conn, false);
+>>           if (ret == -EINVAL)
+>>               return ret;
+>> @@ -1141,7 +1161,7 @@ static ssize_t lowpan_control_write(struct file 
+>> *fp,
+>>       }
+>>       if (memcmp(buf, "disconnect ", 11) == 0) {
+>> -        ret = get_l2cap_conn(&buf[11], &addr, &addr_type, &conn);
+>> +        ret = get_l2cap_conn(&buf[11], &addr, &addr_type, &conn, true);
+>>           if (ret < 0)
+>>               return ret;
+> 
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> 
+> 
+> Kind regards,
+> 
+> Paul
+
