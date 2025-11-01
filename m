@@ -1,29 +1,29 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2430126ED22;
-	Sat,  1 Nov 2025 18:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B832FBDE1;
+	Sat,  1 Nov 2025 18:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762021187; cv=none; b=kAsJQzSrmbVRGXa6PlCDZM7iCpNQEZ6edY6pmy0GQueENirJoxYKoMHlUdFOBS+McXQMH6OrsO1iLgmR7zKjOsgF1CWPm6/xq7tdX+3dcyaXdV/vYRXykfJwOYzfDWU/Df++xdfDTDYQkOnwb1Rudu8qG4va1p82zFkItGuykIo=
+	t=1762021406; cv=none; b=dWWFjxTxpYdYtPNdFdjRQiVo3bmGZmciwkLcNQUMno5NqqoS8N5WCpzASxheNx7r76cQ6ZRS7NYrbi4736BQduCY5X8thEJbNXbE8S1AuwZUMHX5yncoN79ijHOOCfHYM07PfR3u7kUpy39TxmP7rc07IuvrjmC4ze+gA2YvVjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762021187; c=relaxed/simple;
+	s=arc-20240116; t=1762021406; c=relaxed/simple;
 	bh=5ZJ9zxycQjbx/i+FbyQoNKRQ1fZvPwQuacxljfYzA6E=;
-	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=ONFjH/OAPlgGp7et2q0d0ooc/ce5EKoywvo7YNV3t7M5zS72SANxqGdSCCrMSpHAmREd3eD6lEYSKATmF8GXFKNBItwsAljpeUIudpgOGqYadkH+1T5PvN676irA7dJ2UtZoJEL9JkG0oWusrfwTUeTExwbvh+R+WOZpHopTUSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=K14XynHM reason="signature verification failed"; arc=none smtp.client-ip=117.135.210.3
+	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=mNvNr+T92ivtAhCmD9t1wryPZhHuFWcGFT9O0GgTL18Ffx774xy4hsjvSI0v74nSWSUmCTA71pJwsbvDRQbAwxXS/+nkZx4QImIkjv7tVEmpZ+p/8PeSV8UEyx1vqG9MJJ53mh/azd5fOLeeIlVflHWSuMcnXhxFzwSzV6Lg2FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=f9eoXozD reason="signature verification failed"; arc=none smtp.client-ip=117.135.210.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="K14XynHM"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="f9eoXozD"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
 	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=ytZeTGg9AuhPLhuwQJhIE9vbEd8h71Yi4qBw+NJiqJI=; b=K
-	14XynHM3yiQWfFYBrVAsLF4m/u3Z+B6/brNuMxvNVCk+siK/hrTLeUiMGgp8QPS+
-	TzAWAHdLXZMjv2lewjxoahJamcNE1+j9/fniF/fDvz3rj8ZzisdYFchzoLQd+gM7
-	6vKNxeddUjZMBrqDV952/q+8MXVQjbDSwDxvcSO7XU=
+	Message-ID; bh=ytZeTGg9AuhPLhuwQJhIE9vbEd8h71Yi4qBw+NJiqJI=; b=f
+	9eoXozDjWunme8g7a1vs2/8BQnKRtTO+2iPOYpC9Isbq0omR4tF0wVMQ6naj72+U
+	uiTdO06gNcS6GmpFlZil06SOuHNg6VgcguBrg7m2bg4Pj+/TZqMG4SnZhJ08FaZB
+	lMPcj2TpDsA2Me/NWjIdLqTJWxm6WyZFPq+VeHPftE=
 Received: from zzzccc427$163.com ( [1.203.169.43] ) by
- ajax-webmail-wmsvr-40-101 (Coremail) ; Sun, 2 Nov 2025 02:19:11 +0800 (CST)
-Date: Sun, 2 Nov 2025 02:19:11 +0800 (CST)
+ ajax-webmail-wmsvr-40-101 (Coremail) ; Sun, 2 Nov 2025 02:23:03 +0800 (CST)
+Date: Sun, 2 Nov 2025 02:23:03 +0800 (CST)
 From: zzzccc427  <zzzccc427@163.com>
 To: luiz.dentz@gmail.com, pav@iki.fi, johan.hedberg@gmail.com,
 	marcel@holtmann.org
@@ -31,10 +31,11 @@ Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	baijiaju1990@gmail.com, r33s3n6@gmail.com, gality369@gmail.com,
 	zhenghaoran154@gmail.com
 Subject: [BUG] Bluetooth: Mistakenly sco_conn_put in sco_conn_del() leading
+ UAF
 X-Priority: 3
 X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
  20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
-X-NTES-SC: AL_Qu2dAPyZvkku5ySeZOkfmUYQj+02WsKwufkl3oJUPJ18jCvpyi4wRH1KAWP3/Nm0DhKsgiO9VTR++/hcc5VJUZ0iEnv0u41whcMSbwNbzHILTw==
+X-NTES-SC: AL_Qu2dAPyZvksj5SabZekfmUYQj+02WsKwufkl3oJUPJ18jCvpyi4wRH1KAWP3/Nm0DhKsgiO9VTR++/hcc5VJUZ0iGxJTtM50mcyb70Cq7fz6jA==
 Content-Transfer-Encoding: base64
 Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
@@ -43,10 +44,10 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <24c397a7.356e.19a40a512ed.Coremail.zzzccc427@163.com>
+Message-ID: <44091d60.3570.19a40a89dd8.Coremail.zzzccc427@163.com>
 X-Coremail-Locale: zh_CN
-X-CM-TRANSID:ZSgvCgCXBr0fTwZpuXEYAA--.524W
-X-CM-SenderInfo: 5222uujfuslqqrwthudrp/1tbiXR-4hGkGO858pQAEs5
+X-CM-TRANSID:ZSgvCgD3H9wHUAZpvXEYAA--.514W
+X-CM-SenderInfo: 5222uujfuslqqrwthudrp/1tbiXR34hGkGTVYsNgAAsS
 X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
 SGkgbWFpbnRhaW5lcnMsCgpJIHdvdWxkIGxpa2UgdG8gcmVwb3J0IGEgY29uY3VycmVuY3kgVUFG
