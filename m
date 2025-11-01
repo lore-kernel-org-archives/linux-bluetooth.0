@@ -1,27 +1,27 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BC82F656B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B502F6179;
 	Sat,  1 Nov 2025 12:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761998990; cv=pass; b=B/kJQrFMsqZTDeCdKZKj6uPhgKlnzFC0OcDPEtEHtaMeVqXhAVIzQ3hsmVDJlIYhUFTjSb4BMFsfkwTv8vaKLpWcXqz7j6hvPchDx01BBcecrKUDFhH3ATrUvMiXGT81J1hC9R7q7EcFr6is4Fd5l72myt/HkbsWS/cHxzpyqi4=
+	t=1761998990; cv=pass; b=W/eRxnpJITuB5MeTZ0+JSwayCaiXEn8OrCwATD+VfAADL0kEBu3zDeP9PFrjJFxR0DU8jOxtVQxZKQE19XeKpG8YS1uRveCJPZko+vUe7A6RmIraeYlCXehVc+CKtTkpWWTNXZCjpeutKcqd8M7pP9zs2tbpLXEqAi70cz63xuw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1761998990; c=relaxed/simple;
-	bh=5GowbXN/EZgrbesrJCZ9k1SNps28aEbmEIF6Zf82dw4=;
+	bh=POBYKPjz+HjPdNm1RGyl0i9MVjsXU1hPNfD6ENXLYfk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y94qKdbKHG218iWDn//3mC8ttoyo1MJFI0ISRgn3bpwCYXz3UvbdMy2rMEiAgLse8SUiokfDmpqII0mcZ4u8MkNtBoKFb8wRrK/MIx3abBo2Ip/Rfz5L83QNRyTciN8yQpy+bQ7MkZroflXFfYxlYk/z0iSZERVGzps6DQJoxzQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=ZaVGJZWF; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=WK7JiHY2; arc=pass smtp.client-ip=185.185.170.37
+	 MIME-Version; b=WxI2ryfG79Fp6F0ISrVuNjq2tU/ebmkRUllyd0CBxfJ5DHE+P97yaHMSctt9oUGK6rSWiIfSwY/T0k/LPjN7VM+jnLnLt+w9fpdo7TjghWJgmWn1o5HL/syDBiTsRZUleVQ5gMasXxmqnSfEtYoGwEMtaUjqaGxjBnKPWNOT9Sk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=UekZp21W; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=WyECfwsD; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="ZaVGJZWF";
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="WK7JiHY2"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="UekZp21W";
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="WyECfwsD"
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4czGqh1k6Mz49PyQ;
+	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4czGqh070Yz49PyD;
 	Sat,  1 Nov 2025 14:09:36 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
 	t=1761998976;
@@ -29,46 +29,46 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1UyxUSOD5Goq2WwP89cAoxH8CRpexkFCcQYkQp3UH/4=;
-	b=ZaVGJZWFYcxwx3luj4RiM2tRcMl1kuOm01VMcTC66KldxYu5pCTuBEvzzZWjRD0B6+b+/a
-	npvI+XXlT5AZ6nwTpCUIQmXuOmUbcnpCByX7AqNiJcVkwawTronwEaJDc+Nm9d6yA57xGz
-	yucPy5skyw73Ox2fthO+MNLdbmB8SaoVwtYK/HA/vVVhm96g1AWeWZV5/B3Gsjhr2GIyr3
-	njwCzXAh4t29P9UQIwsoUWu55GbGxAoKAI232QB018kEQfoGElkS2ShbvjwaGmkbImJ6K0
-	dSD9uhWGl93lwzDyLteqwns3Zli70xDlsEHR8L1dUDf42Hi17DQdfTfcsj7HdQ==
+	bh=ciJLRxCGAN9L4RCpr1nkQTsT25MWPZtGIl9nybisvQo=;
+	b=UekZp21W51190QayawxGU8msc4vNyybEWg6n2R1SLVKCtv7yk/Te6lcnLJ9eH/HAX5HSzi
+	aFc0oOHacR5jU8q+q0kchKXkpmqlnKtHqEds09k7jTkmyVdyPpeTZezGJgxxO1OL/eQCgd
+	2BiiwejcBVoMSIwaiQq1hYm35MAY9nsXyr0Fs+eq/gtnAlen/Y+JD0oNfVvUdvUXzqxsgy
+	5pHPz8Tt7VpYWWtVD/6cQhbNWdNxb2+vqAr2/cIFMLuxaUtnq50/WZShjK/v2zX+82aWsy
+	RT5Dn8KtQw6hfvTKdBsPq4h6PBEvv7YyPuHhkCKYQuxt9TWMFkNSQiQkEttFPg==
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4czGqT0Ts3zycD;
-	Sat,  1 Nov 2025 14:09:24 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4czGqW1XqQzyxF;
+	Sat,  1 Nov 2025 14:09:27 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1761998966;
+	t=1761998968;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1UyxUSOD5Goq2WwP89cAoxH8CRpexkFCcQYkQp3UH/4=;
-	b=WK7JiHY2nwa4+eilVqBXe/rwsVr1dDjcra/pN/oGo2yZuHch2RxskJrkIQBhlHstVvSG9c
-	1pAlcKp9A4DUzdnQtqly7j57Bf5u0PjqHvojsaah64A7+k6RGh6DZTow0fG/XQXLzD7Hor
-	NEHjZ/DMsXHsvdSt3ebObHGVRNrl6pA=
+	bh=ciJLRxCGAN9L4RCpr1nkQTsT25MWPZtGIl9nybisvQo=;
+	b=WyECfwsDECOxTBPgMwvP7SK8rBuxjpKzvh86HTGhhSiZH8uPZktLrTxmSSb74j4wzMSzgi
+	dSyBW51w2LTLSmP/YrYUC6DLpdG8UIcZmsRiiV36Rl997W0GjpIBiKJekGWUfOT942ngw5
+	+ZZ1c3PcC/mi3X8Fw/Wo9L/GebP/lts=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1761998966;
+	s=meesny; t=1761998968;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1UyxUSOD5Goq2WwP89cAoxH8CRpexkFCcQYkQp3UH/4=;
-	b=JBgFtYoXoRJIVyuUY+PzdExMDdR717gyhsL12IwlGdgqS4TESIJzUTo75euulBouAr4/ej
-	2aPkSfeySKBl67KaOUlNL476Iqjf1ntr/f1TBnHpO9WMPMEktuAYCYnemEBpVqXK7xmh/U
-	KlVixqAicA4iX7rn4I8XZKqyMo6UhJQ=
+	bh=ciJLRxCGAN9L4RCpr1nkQTsT25MWPZtGIl9nybisvQo=;
+	b=IOWtuQXXjiin07+WAD1NCqtskCQCt8lFVVrda2IsAyG9rBMRyBgVShfsyELLU56wzi3x4H
+	N61YY0rXEBEfsjAyrvMletb5e666mF5vfVD4Navu8FMw3I4m0vZeo5CBsXV3wpeRjGyHSu
+	i9hl/yR++o+wCq2N7aTTXN4XTHul+3c=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1761998966; a=rsa-sha256; cv=none;
-	b=AqWCSc+0hO1X9Kl/wHYyx0jU5x+zgoN8SEU1mdlDFfQsnvzRwl1Lt4T8c20Nhc9yDLJWtK
-	aDHqCO9ndFCZwo7H1s8WeBeaew6yXXNFq9ZOnsfDwv7ZxBsKqTwaJc6zKDcIp7Vpm3YxmY
-	i2u6enzOJbbfb+TWb6BR8jmyIlA8bss=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1761998968; a=rsa-sha256; cv=none;
+	b=Ts4nvjCK9eKho7u3aAn1vPEStKsmzi50rg+4UXra2e3RB09fcWxxuX6zxEJ7huZxj/GLco
+	8WlR03TWQ2ZN8iGklvyd6A5siH2VtACVwMp2N7971zRxw4FUc0QMGRmAaY8fZK1Qq5lxOC
+	WWZmjJ8imL3Zkot4yFXXzx9hNIXa+9w=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>,
@@ -77,9 +77,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	luiz.dentz@gmail.com,
 	jukka.rissanen@linux.intel.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: 6lowpan: fix BDADDR_LE vs ADDR_LE_DEV address type confusion
-Date: Sat,  1 Nov 2025 14:09:12 +0200
-Message-ID: <0d953f217feaafb4ba40281c3ab87e18ad28bae7.1761998763.git.pav@iki.fi>
+Subject: [PATCH 3/4] Bluetooth: 6lowpan: Don't hold spin lock over sleeping functions
+Date: Sat,  1 Nov 2025 14:09:13 +0200
+Message-ID: <8736a4ce03f143b7a63cb99ab425e5403eafa9e4.1761998763.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <639c5cb6ceb49ffd63952dc69d0d48b022aaec3b.1761998763.git.pav@iki.fi>
 References: <639c5cb6ceb49ffd63952dc69d0d48b022aaec3b.1761998763.git.pav@iki.fi>
@@ -91,93 +91,144 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Bluetooth 6lowpan.c confuses BDADDR_LE and ADDR_LE_DEV address types,
-e.g. debugfs "connect" command takes the former, and "disconnect" and
-"connect" to already connected device take the latter.  This is due to
-using same value both for l2cap_chan_connect and hci_conn_hash_lookup_le
-which take different dst_type values.
+disconnect_all_peers() calls sleeping function (l2cap_chan_close) under
+spinlock.  Holding the lock doesn't actually do any good -- we work on a
+local copy of the list, and the lock doesn't protect against peer->chan
+having already been freed.
 
-Fix address type passed to hci_conn_hash_lookup_le().
+Fix by taking refcounts of peer->chan instead.  Clean up the code and
+old comments a bit.
 
-Retain the debugfs API difference between "connect" and "disconnect"
-commands since it's been like this since 2015 and nobody apparently
-complained.
+Also take l2cap_chan_lock() which is required for l2cap_chan_close().
 
-Fixes: f5ad4ffceba0 ("Bluetooth: 6lowpan: Use hci_conn_hash_lookup_le() when possible")
+Log: (bluez 6lowpan-tester Client Connect - Disable)
+------
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:575
+...
+<TASK>
+...
+l2cap_send_disconn_req (net/bluetooth/l2cap_core.c:938 net/bluetooth/l2cap_core.c:1495)
+...
+? __pfx_l2cap_chan_close (net/bluetooth/l2cap_core.c:809)
+do_enable_set (net/bluetooth/6lowpan.c:1048 net/bluetooth/6lowpan.c:1068)
+------
+
+Fixes: 90305829635d ("Bluetooth: 6lowpan: Converting rwlocks to use RCU")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/6lowpan.c | 28 ++++++++++++++++++++++++----
- 1 file changed, 24 insertions(+), 4 deletions(-)
+ net/bluetooth/6lowpan.c | 78 ++++++++++++++++++++++++++---------------
+ 1 file changed, 50 insertions(+), 28 deletions(-)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index f1d29fa4b411..0d8c2e2e9a6c 100644
+index 0d8c2e2e9a6c..f64bc4dc2b54 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -957,10 +957,11 @@ static struct l2cap_chan *bt_6lowpan_listen(void)
+@@ -53,6 +53,11 @@ static bool enable_6lowpan;
+ static struct l2cap_chan *listen_chan;
+ static DEFINE_MUTEX(set_lock);
+ 
++enum {
++	LOWPAN_PEER_CLOSING,
++	LOWPAN_PEER_MAXBITS
++};
++
+ struct lowpan_peer {
+ 	struct list_head list;
+ 	struct rcu_head rcu;
+@@ -61,6 +66,8 @@ struct lowpan_peer {
+ 	/* peer addresses in various formats */
+ 	unsigned char lladdr[ETH_ALEN];
+ 	struct in6_addr peer_addr;
++
++	DECLARE_BITMAP(flags, LOWPAN_PEER_MAXBITS);
+ };
+ 
+ struct lowpan_btle_dev {
+@@ -1014,41 +1021,56 @@ static int get_l2cap_conn(char *buf, bdaddr_t *addr, u8 *addr_type,
+ static void disconnect_all_peers(void)
+ {
+ 	struct lowpan_btle_dev *entry;
+-	struct lowpan_peer *peer, *tmp_peer, *new_peer;
+-	struct list_head peers;
++	struct lowpan_peer *peer;
++	int nchans;
+ 
+-	INIT_LIST_HEAD(&peers);
+-
+-	/* We make a separate list of peers as the close_cb() will
+-	 * modify the device peers list so it is better not to mess
+-	 * with the same list at the same time.
++	/* l2cap_chan_close() cannot be called from RCU, and lock ordering
++	 * chan->lock > devices_lock prevents taking write side lock, so copy
++	 * then close.
+ 	 */
+ 
+ 	rcu_read_lock();
+-
+-	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
+-		list_for_each_entry_rcu(peer, &entry->peers, list) {
+-			new_peer = kmalloc(sizeof(*new_peer), GFP_ATOMIC);
+-			if (!new_peer)
+-				break;
+-
+-			new_peer->chan = peer->chan;
+-			INIT_LIST_HEAD(&new_peer->list);
+-
+-			list_add(&new_peer->list, &peers);
+-		}
+-	}
+-
++	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list)
++		list_for_each_entry_rcu(peer, &entry->peers, list)
++			clear_bit(LOWPAN_PEER_CLOSING, peer->flags);
+ 	rcu_read_unlock();
+ 
+-	spin_lock(&devices_lock);
+-	list_for_each_entry_safe(peer, tmp_peer, &peers, list) {
+-		l2cap_chan_close(peer->chan, ENOENT);
++	do {
++		struct l2cap_chan *chans[64];
++		int i;
+ 
+-		list_del_rcu(&peer->list);
+-		kfree_rcu(peer, rcu);
+-	}
+-	spin_unlock(&devices_lock);
++		nchans = 0;
++
++		rcu_read_lock();
++
++		list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
++			list_for_each_entry_rcu(peer, &entry->peers, list) {
++				struct l2cap_chan *chan;
++
++				if (test_and_set_bit(LOWPAN_PEER_CLOSING,
++						     peer->flags))
++					continue;
++
++				chan = l2cap_chan_hold_unless_zero(peer->chan);
++				if (!chan)
++					continue;
++
++				chans[nchans++] = chan;
++				if (nchans >= ARRAY_SIZE(chans))
++					goto done;
++			}
++		}
++
++done:
++		rcu_read_unlock();
++
++		for (i = 0; i < nchans; ++i) {
++			l2cap_chan_lock(chans[i]);
++			l2cap_chan_close(chans[i], ENOENT);
++			l2cap_chan_unlock(chans[i]);
++			l2cap_chan_put(chans[i]);
++		}
++	} while (nchans);
  }
  
- static int get_l2cap_conn(char *buf, bdaddr_t *addr, u8 *addr_type,
--			  struct l2cap_conn **conn)
-+			  struct l2cap_conn **conn, bool disconnect)
- {
- 	struct hci_conn *hcon;
- 	struct hci_dev *hdev;
-+	int le_addr_type;
- 	int n;
- 
- 	n = sscanf(buf, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu",
-@@ -971,13 +972,32 @@ static int get_l2cap_conn(char *buf, bdaddr_t *addr, u8 *addr_type,
- 	if (n < 7)
- 		return -EINVAL;
- 
-+	if (disconnect) {
-+		/* The "disconnect" debugfs command has used different address
-+		 * type constants than "connect" since 2015. Let's retain that
-+		 * for now even though it's obviously buggy...
-+		 */
-+		*addr_type += 1;
-+	}
-+
-+	switch (*addr_type) {
-+	case BDADDR_LE_PUBLIC:
-+		le_addr_type = ADDR_LE_DEV_PUBLIC;
-+		break;
-+	case BDADDR_LE_RANDOM:
-+		le_addr_type = ADDR_LE_DEV_RANDOM;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
- 	/* The LE_PUBLIC address type is ignored because of BDADDR_ANY */
- 	hdev = hci_get_route(addr, BDADDR_ANY, BDADDR_LE_PUBLIC);
- 	if (!hdev)
- 		return -ENOENT;
- 
- 	hci_dev_lock(hdev);
--	hcon = hci_conn_hash_lookup_le(hdev, addr, *addr_type);
-+	hcon = hci_conn_hash_lookup_le(hdev, addr, le_addr_type);
- 	hci_dev_unlock(hdev);
- 	hci_dev_put(hdev);
- 
-@@ -1104,7 +1124,7 @@ static ssize_t lowpan_control_write(struct file *fp,
- 	buf[buf_size] = '\0';
- 
- 	if (memcmp(buf, "connect ", 8) == 0) {
--		ret = get_l2cap_conn(&buf[8], &addr, &addr_type, &conn);
-+		ret = get_l2cap_conn(&buf[8], &addr, &addr_type, &conn, false);
- 		if (ret == -EINVAL)
- 			return ret;
- 
-@@ -1141,7 +1161,7 @@ static ssize_t lowpan_control_write(struct file *fp,
- 	}
- 
- 	if (memcmp(buf, "disconnect ", 11) == 0) {
--		ret = get_l2cap_conn(&buf[11], &addr, &addr_type, &conn);
-+		ret = get_l2cap_conn(&buf[11], &addr, &addr_type, &conn, true);
- 		if (ret < 0)
- 			return ret;
- 
+ struct set_enable {
 -- 
 2.51.1
 
