@@ -1,91 +1,84 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D992C3262
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Nov 2025 12:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761999036; cv=pass; b=ndLHiYXJrh4UuUJhl/Om+rDGNGzzKKjB9LN2QXs+VcG6aJH88ADpihLagoa49VPJchYwSb1J23N8AAJkEDXykqHCsHXDKp0OtWYhaka9gzyd+gV8XKjD86CtD7Mp/TB8uxdp+VTTvLd3K1Zol0ebkO8d+CRUvtxL/EPQroHprsU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761999036; c=relaxed/simple;
-	bh=3pkszyuEAWG+Dw30yl3qxMmSGSgSdczEaEnVWWfqIHk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eP2yOe/F2wuOe6XHslpXyj1hgwCitSKtT/pzXrV8VaLwSlIJ6p5YUC4FNK0qJZVGMyXZHBvMSULKXC8QFHAPHt1+SIukp2UnULfzaeYYxrOF4se2j3vetUfjCumH5F3NgqnGtWjC/15ypEdKAKoWe3I6MYpW8LNc0VNaQ5NXa2I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=ZFELTwlG; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A558F2F3614
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Nov 2025 12:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762000045; cv=none; b=Tu9zsG/V6XDFOvN+1VhdUA27Ll2Z/lHcP5fCHJ4vvI/aJZZEsPb81I7LLdlDlyW13ji5pDAjUcK++xAJq9ZBbkkPjcPi0aqjYjNjTBHJV3GOvWQpmZAXu4bQc7LM5pZR/fc0sQwpt7xPBryEqQT4CwJyI2qLhpkzvZngNPi9j9s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762000045; c=relaxed/simple;
+	bh=Wc7QSIo+5cjUB2DnCjRZaskxKX7OCK+e2T5FHCey7Mg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OtweJ/I82WdX0cx/FkM4hvVkdWEukrF5vK3hDSGynYLUfPmLkprU5EctJtzKuGNHHgJlBgDp7VnyC0+LC8UqCzzGJa8qW+pR6K1THxLJQ5nO9i4U08QT7EBLEBjDlhI7WaFBy80b/wl0q9xKRWRZjKxn7XNqwFTv14ptDKBJ5HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=UXd6Ffcv; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="ZFELTwlG"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4czGrm1y3jzyxF;
-	Sat,  1 Nov 2025 14:10:32 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1761999032;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6rynr9I2jrGYgjXhcG40UBJ3IQcI+VAtwlvWx+ENmAQ=;
-	b=ZFELTwlGBaQkQxWr1xO0gj8S9BIRTQE0Mwj7XWf+qzT4VXEckypSUdJFCwbaVl36x/JWTc
-	07oJlNhRPiKhw4lFVng/WKt/LWHbXoaoHLuW8KB2cQVpmPqIkNltnijsLlu8aFyAXDdrWr
-	HIPhu7VK1IuXrHSDCQaV1dukQJCRD2k=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1761999032;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6rynr9I2jrGYgjXhcG40UBJ3IQcI+VAtwlvWx+ENmAQ=;
-	b=NSgV+hUybSwrwFm+QwFsa6W79F7Yn5NHJn/1WEr7/fjGjPz4feq2YmJEtVoTHPoP8ZoRSa
-	krQrqg477iSuit5IXz8iSpqoI0g2xKez/lvZaq6JzRyn6RK/Ymc3wVvU00IoKJGQ39Tey6
-	O89P/rFBkeoGTg0czb+qdZnWS/xFARQ=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1761999032; a=rsa-sha256; cv=none;
-	b=IxLHQxwZD/I+pHq6GWd7jco6ZOk6dimBk+F2oLBmLKnmozOZTA471x3pXLUsVD090bnMIB
-	vvEidDLTmjCwsvxrKulqCZOD/9wAFoAIlUD/nWXuAMkPImCcYCxmiLFnZtAI4LK2WBfEsE
-	xNwmUubfQM+l2wtylwTHS1hLvZX+Opo=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="UXd6Ffcv"
+Received: from github.com (hubbernetes-node-d648dfb.ac4-iad.github.net [10.52.210.43])
+	by smtp.github.com (Postfix) with ESMTPA id B2131400A1E
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Nov 2025 05:27:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1762000042;
+	bh=JP81kp2y+2Jm2F7ubstXM7bmb8TBq3pt8W5YkeFuuPA=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=UXd6FfcvAOjGHsthqjWFdUi/Fq2EHxcJHT+W6yF16y82meNRciLERXPRHq0+EdVaE
+	 dhVG9DDt59nX0VjUAsNRUFDJ7KPlaC55L6AJ9rFvBjGQ2NjA+Bb04kW+r2xhpq925p
+	 c2JNFW/dH8ahwumxcYZikXsi+3tRpfGe9tBr1oTI=
+Date: Sat, 01 Nov 2025 05:27:22 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 2/2] 6lowpan-tester: re-enable previously crashing test
-Date: Sat,  1 Nov 2025 14:10:12 +0200
-Message-ID: <6bf7ab8a1a6ad7f8485d10cc3d19e621adf79365.1761998984.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <2fc1c535e6642706aad81d08bd3f8b14ee4f56c7.1761998984.git.pav@iki.fi>
-References: <2fc1c535e6642706aad81d08bd3f8b14ee4f56c7.1761998984.git.pav@iki.fi>
+Message-ID: <bluez/bluez/push/refs/heads/1018491/000000-5d2fa5@github.com>
+Subject: [bluez/bluez] 8bf503: 6lowpan-tester: add test for header compression
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1018491
+  Home:   https://github.com/bluez/bluez
+  Commit: 8bf5032a5fcab675f1a13d6f166dc5b8b2e91270
+      https://github.com/bluez/bluez/commit/8bf5032a5fcab675f1a13d6f166dc5b8b2e91270
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-01 (Sat, 01 Nov 2025)
+
+  Changed paths:
+    M tools/6lowpan-tester.c
+
+  Log Message:
+  -----------
+  6lowpan-tester: add test for header compression
+
+Add smoke test for IPV6 header compression:
+
+Client Recv IPHC Dgram - Success
+Client Recv IPHC Raw - Success
+
+
+  Commit: 5d2fa518afa551de2e6a034ab62aaf3c5c6008e3
+      https://github.com/bluez/bluez/commit/5d2fa518afa551de2e6a034ab62aaf3c5c6008e3
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-01 (Sat, 01 Nov 2025)
+
+  Changed paths:
+    M tools/6lowpan-tester.c
+
+  Log Message:
+  -----------
+  6lowpan-tester: re-enable previously crashing test
 
 Enable test that previously crashed kernel, since there's a patch now:
 
 Client Recv Raw - Success
----
- tools/6lowpan-tester.c | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/tools/6lowpan-tester.c b/tools/6lowpan-tester.c
-index 7fdacefeb..65dba173b 100644
---- a/tools/6lowpan-tester.c
-+++ b/tools/6lowpan-tester.c
-@@ -337,7 +337,6 @@ static const struct client_data client_recv_raw = {
- 	.send_expect_data_len = sizeof(dgram_data) - 1,
- 	.sk_type = SOCK_RAW,
- 	.disconnect = true,
--	.skip_by_default_reason = "kernel BUG at net/core/skbuff.c:212"
- };
- 
- static const uint8_t iphc_dgram_data[64+2] = {
--- 
-2.51.1
 
+Compare: https://github.com/bluez/bluez/compare/8bf5032a5fca%5E...5d2fa518afa5
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
