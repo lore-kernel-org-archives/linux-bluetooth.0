@@ -1,232 +1,307 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2013F2472BD
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Nov 2025 11:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66CD2F5A19
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Nov 2025 11:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761997444; cv=none; b=EMD9YOFwQQhEHONriSGLSM5fg6uFcy/yHi0D5iXfWGnwDkWR8nYLRAZFQN9HLSCZ7wKdxbEVcEvLcJ8ySiG9cwZZe6g8scWYL6tWPzsjvnRB4YcvAHUVsypIK4x47CgiKcgjNAJ2on0LA5C5IeF/MX/oVbjB2nFFgzv85ZtQ6Ro=
+	t=1761997963; cv=none; b=KOXxqrwa/4zX1GEIPjyYluGI/vwDQo6urbC+3/TKnXD0H+INQhfXMIckxrU9kqE1yfN1/YQB7E8mOCy5pyq3imUGE2klGF3Sy/KhUq/UeL9Pzi/69vN24UoUs1wDyEtWwxxgSX2k+6REbWpMZDYEY0MHk411udXCo8sKS+I79n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761997444; c=relaxed/simple;
-	bh=4gs1+rH7V+gQqecSgZCuSSQpwLB68rGT+qeJIMzOCtQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VO9FMvmobyud8jBpQCq5S+O9LN/oFiHkKM/MA1i47vuKl1uSr2dhHDHOieJ/9faCBNJEiUXV5JI9Fs3EQq5esaysAZOs8q0Fjpiv2WpTFI2yqKoLPYXGa3AEXGmN8Wlkdv/qo7aRpMC/HZOuqV4xoeCBWwPNied5Vttvu0CPOS0=
+	s=arc-20240116; t=1761997963; c=relaxed/simple;
+	bh=rvZP7pZ2U80JgFvC3KSgJkOIy5tdTbkj7jPOWCOUDCI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GdYjNZXpAlr3pCcbQyjXrkwtKup11SqKc7V+C3nTMyhptACVqKNfRu63+Td/p7iAb66VUxfaMabpTxna3JH1zgq9WkFEjwLc0yCsschrFgFpFOpdFQOYHHTtmeepgiXWSpHJ6NHovOHFSyT17V/iNVxsmwfKeX0yiTRjelVjREQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from msexch01.omp.ru (10.188.4.12) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
+Received: from localhost.localdomain (178.204.178.115) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 1 Nov
- 2025 14:43:43 +0300
-Received: from msexch01.omp.ru ([fe80::485b:1c4a:fb7f:c753]) by
- msexch01.omp.ru ([fe80::485b:1c4a:fb7f:c753%5]) with mapi id 15.02.1258.012;
- Sat, 1 Nov 2025 14:43:43 +0300
+ 2025 14:52:22 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
-To: "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, "hadess@hadess.net"
-	<hadess@hadess.net>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v3] battery: improve the display of the charge level
-Thread-Topic: [PATCH BlueZ v3] battery: improve the display of the charge
- level
-Thread-Index: AQHcSBlgKqZAMIJLnE29sX8MAqY0EbTXc96AgAAN7gCABgVBAA==
-Date: Sat, 1 Nov 2025 11:43:43 +0000
-Message-ID: <b1148450635a6796fde4a8d3ae4955c3472bbcbe.camel@omp.ru>
-References: <20251028144320.104871-1-r.smirnov@omp.ru>
-	 <399171165c10f8edc9b39d16e06ec3d59a2beeb7.camel@hadess.net>
-	 <CABBYNZKmU3k6H4AsY-2TUVdFGQ0-rSD4=WRmi2KCKMyjz=vy4g@mail.gmail.com>
-In-Reply-To: <CABBYNZKmU3k6H4AsY-2TUVdFGQ0-rSD4=WRmi2KCKMyjz=vy4g@mail.gmail.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-kse-serverinfo: msexch01.omp.ru, 9
-x-kse-antivirus-interceptor-info: scan successful
-x-kse-antivirus-info: Clean, bases: 11/1/2025 9:02:00 AM
-x-kse-attachment-filter-triggered-rules: Clean
-x-kse-attachment-filter-triggered-filters: Clean
-x-kse-bulkmessagesfiltering-scan-result: InTheLimit
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2733EB3304092C4783D37509808A7109@omp.ru>
-Content-Transfer-Encoding: base64
+To: <linux-bluetooth@vger.kernel.org>
+CC: Roman Smirnov <r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v4 1/2] shared/battery: improve the display of the charge level
+Date: Sat, 1 Nov 2025 14:51:58 +0300
+Message-ID: <20251101115201.97961-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/01/2025 11:40:25
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 197715 [Nov 01 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 74 0.3.74
+ 076026cf5b16801374fbd5d19166f5aeefca6115
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {Tracking_repetitive_subdir_in_url}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.204.178.115 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;github.com:7.1.1;178.204.178.115:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.204.178.115
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/01/2025 11:45:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/1/2025 9:02:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-T24gVHVlLCAyMDI1LTEwLTI4IGF0IDExOjQ3IC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
-IHdyb3RlOg0KPiBIaSBCYXN0aWVuLA0KPiANCj4gT24gVHVlLCBPY3QgMjgsIDIwMjUgYXQgMTE6
-MDHigK9BTSBCYXN0aWVuIE5vY2VyYSA8aGFkZXNzQGhhZGVzcy5uZXQ+IHdyb3RlOg0KPiA+IA0K
-PiA+IEhleSwNCj4gPiANCj4gPiBHb2luZyB0byBtYWtlIGEgZmV3IGNvbW1lbnRzIGlubGluZS4g
-VGhvc2Ugd291bGQgYmUgaW4gYWRkaXRpb24gdG8NCj4gPiBMdWl6JyBjb21tZW50cywgYW5kIG5v
-dCBtZWFudCB0byByZXBsYWNlIHRoZW0uDQo+ID4gDQo+ID4gT24gVHVlLCAyMDI1LTEwLTI4IGF0
-IDE3OjQzICswMzAwLCBSb21hbiBTbWlybm92IHdyb3RlOg0KPiA+ID4gVGhlIGJhdHRlcnkgY2hh
-cmdlIGxldmVsIG1heSBmbHVjdHVhdGUgZHVlIHRvIHVuY2FsaWJyYXRlZA0KPiA+ID4gc2Vuc29y
-cy4gQ29tbWl0IHNtb290aHMgb3V0IHN1Y2ggZmx1Y3R1YXRpb25zLg0KPiA+ID4gDQo+ID4gPiBU
-aGUgYWxnb3JpdGhtIGZvciBkZXRlcm1pbmluZyB1bmNhbGlicmF0ZWQgc2Vuc29ycyBjb25zaXN0
-cyBvZg0KPiA+ID4gZmluZGluZyB0aGUgbnVtYmVyIG9mIGNoYW5nZXMgaW4gY2hhcmdlIGRpcmVj
-dGlvbiAoaS5lLiwgInNwaWtlcyIpLg0KPiA+ID4gSWYgdGhlIG51bWJlciBvZiBzcGlrZXMgaXMg
-emVybywgdGhlIGRldmljZSBpcyBjaGFyZ2luZyBvcg0KPiA+ID4gZGlzY2hhcmdpbmcuDQo+ID4g
-PiBJZiB0aGVyZSBpcyBvbmUgc3Bpa2UsIGl0IG1heSBtZWFuIHRoYXQgdGhlIGRldmljZSBoYXMg
-c3RhcnRlZA0KPiA+ID4gY2hhcmdpbmcNCj4gPiA+IG9yIGhhcyBiZWVuIGRpc2Nvbm5lY3RlZCBm
-cm9tIGNoYXJnaW5nLiBJZiB0aGVyZSBhcmUgdHdvIG9yIG1vcmUNCj4gPiA+IHNwaWtlcywNCj4g
-PiA+IHRoaXMgaXMgYSBjbGVhciBpbmRpY2F0aW9uIG9mIGFuIHVuY2FsaWJyYXRlZCBzZW5zb3Iu
-DQo+ID4gPiANCj4gPiA+IENoZWNrIHRoYXQgdGhlIGJhdHRlcnkgY2hhcmdlIGlzIGZsdWN0dWF0
-aW5nLiBJZiB0aGUgYmF0dGVyeSBjaGFyZ2UNCj4gPiA+IGlzIGZsdWN0dWF0aW5nLCB1c2UgdGhl
-IGF2ZXJhZ2UgY2hhcmdlIHZhbHVlLCBvdGhlcndpc2UgdXNlIHRoZQ0KPiA+ID4gY3VycmVudA0K
-PiA+ID4gdmFsdWUuDQo+ID4gPiANCj4gPiA+IEZpeGVzOiBodHRwczovL2dpdGh1Yi5jb20vYmx1
-ZXovYmx1ZXovaXNzdWVzLzE2MTINCj4gPiA+IC0tLQ0KPiA+ID4gVjIgLT4gVjM6IEEgcXVldWUg
-aXMgdXNlZCBpbnN0ZWFkIG9mIGFuIGFycmF5IGZvciB0aGUgbGFzdCBjaGFyZ2VzLA0KPiA+ID4g
-YSBidWcgd2l0aCB0aGUgc3Bpa2VzIHZhcmlhYmxlIGluY3JlbWVudCBoYXMgYmVlbiBmaXhlZCwg
-YW5kIHRoZQ0KPiA+ID4gZmx1Y3R1YXRpb24gY2hlY2sgaXMgY2FsbGVkIGVhY2ggdGltZSBhIG5l
-dyBiYXR0ZXJ5IGNoYXJnZSBhcHBlYXJzLg0KPiA+ID4gDQo+ID4gPiBWMSAtPiBWMjogU21vb3Ro
-aW5nIGlzIG9ubHkgYXBwbGllZCB0byB1bmNhbGlicmF0ZWQgc2Vuc29ycywgdGhlDQo+ID4gPiBs
-YXN0IDggdmFsdWVzIGFyZSBzYXZlZCBpbnN0ZWFkIG9mIDQsIGFuZCB0aGUgYXZlcmFnZSB2YWx1
-ZSBpcyB1c2VkDQo+ID4gPiBmb3Igc21vb3RoaW5nIGluc3RlYWQgb2YgdGhlIG1pbmltdW0gdmFs
-dWUuDQo+ID4gPiANCj4gPiA+IMKgc3JjL2JhdHRlcnkuYyB8IDcwDQo+ID4gPiArKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiA+IMKgMSBmaWxl
-IGNoYW5nZWQsIDcwIGluc2VydGlvbnMoKykNCj4gPiA+IA0KPiA+ID4gZGlmZiAtLWdpdCBhL3Ny
-Yy9iYXR0ZXJ5LmMgYi9zcmMvYmF0dGVyeS5jDQo+ID4gPiBpbmRleCA1OWU0ZmM1NzAuLjMzMDc5
-OTc1YyAxMDA2NDQNCj4gPiA+IC0tLSBhL3NyYy9iYXR0ZXJ5LmMNCj4gPiA+ICsrKyBiL3NyYy9i
-YXR0ZXJ5LmMNCj4gPiA+IEBAIC0zMywxMCArMzMsMTUgQEANCj4gPiA+IMKgI2RlZmluZSBCQVRU
-RVJZX1BST1ZJREVSX01BTkFHRVJfSU5URVJGQUNFDQo+ID4gPiAib3JnLmJsdWV6LkJhdHRlcnlQ
-cm92aWRlck1hbmFnZXIxIg0KPiA+ID4gDQo+ID4gPiDCoCNkZWZpbmUgQkFUVEVSWV9NQVhfUEVS
-Q0VOVEFHRSAxMDANCj4gPiA+ICsjZGVmaW5lIExBU1RfQ0hBUkdFU19TSVpFIDgNCj4gPiA+ICsj
-ZGVmaW5lIE1BWF9DSEFSR0VfU1RFUCA1DQo+ID4gPiANCj4gPiA+IMKgc3RydWN0IGJ0ZF9iYXR0
-ZXJ5IHsNCj4gPiA+IMKgwqDCoMKgwqAgY2hhciAqcGF0aDsgLyogRC1CdXMgb2JqZWN0IHBhdGgg
-Ki8NCj4gPiA+IMKgwqDCoMKgwqAgdWludDhfdCBwZXJjZW50YWdlOyAvKiB2YWxpZCBiZXR3ZWVu
-IDAgdG8gMTAwIGluY2x1c2l2ZWx5ICovDQo+ID4gPiArwqDCoMKgwqAgc3RydWN0IHF1ZXVlICps
-YXN0X2NoYXJnZXM7IC8qIGxhc3QgY2hhcmdlcyByZWNlaXZlZCAqLw0KPiA+IA0KPiA+IEluc3Rl
-YWQgb2Ygb3Blbi1jb2RpbmcgYSBxdWV1ZSwgSSB0aGluayB0aGF0IGEgR0FycmF5IHdvdWxkIGJl
-IGJldHRlcjoNCj4gPiBodHRwczovL2RvY3MuZ3RrLm9yZy9nbGliL3N0cnVjdC5BcnJheS5odG1s
-DQo+IA0KPiBXZSBkb24ndCByZWNvbW1lbmQgdXNpbmcgZ2xpYiBzcGVjaWZpYyBzdHJ1Y3R1cmVz
-IG9uIG5ldyBjb2RlLCB3ZQ0KPiBkb24ndCB3YW50IG5ldyBkZXBlbmRlbmNpZXMgZXZlbiBpZiBp
-dCBpcyBhbHJlYWR5IHN1cHBvcnRlZCBvbiB0aGUNCj4gcmVxdWlyZWQgdmVyc2lvbi4NCj4gDQo+
-ID4gLSBsaW1pdCAtPmxlbiB0byBMQVNUX0NIQVJHRVNfU0laRQ0KPiA+IC0gYWJpbGl0eSB0byBh
-ZGQgaXRlbXMgZnJvbSBlaXRoZXIgc2lkZSwgdHJ1bmNhdGUgdGhlIHF1ZXVlIG9yIHJlbW92ZQ0K
-PiA+IGFuIGFyYml0cmFyeSBpdGVtDQo+ID4gDQo+ID4gPiArwqDCoMKgwqAgZmxvYXQgYXZnX2No
-YXJnZTsgLyogYXZlcmFnZSBiYXR0ZXJ5IGNoYXJnZSAqLw0KPiA+ID4gK8KgwqDCoMKgIGJvb2wg
-aXNfZmx1Y3R1YXRpbmc7IC8qIHRydWUsIGlmIHRoZSBiYXR0ZXJ5IHNlbnNvcg0KPiA+ID4gZmx1
-Y3R1YXRlcyAqLw0KPiA+ID4gwqDCoMKgwqDCoCBjaGFyICpzb3VyY2U7IC8qIERlc2NyaXB0aXZl
-IHNvdXJjZSBvZiB0aGUgYmF0dGVyeSBpbmZvICovDQo+ID4gPiDCoMKgwqDCoMKgIGNoYXIgKnBy
-b3ZpZGVyX3BhdGg7IC8qIFRoZSBwcm92aWRlciByb290IHBhdGgsIGlmIGFueSAqLw0KPiA+ID4g
-wqB9Ow0KPiA+ID4gQEAgLTkyLDYgKzk3LDEwIEBAIHN0YXRpYyBzdHJ1Y3QgYnRkX2JhdHRlcnkg
-KmJhdHRlcnlfbmV3KGNvbnN0IGNoYXINCj4gPiA+ICpwYXRoLCBjb25zdCBjaGFyICpzb3VyY2Us
-DQo+ID4gPiDCoMKgwqDCoMKgIGJhdHRlcnkgPSBuZXcwKHN0cnVjdCBidGRfYmF0dGVyeSwgMSk7
-DQo+ID4gPiDCoMKgwqDCoMKgIGJhdHRlcnktPnBhdGggPSBnX3N0cmR1cChwYXRoKTsNCj4gPiA+
-IMKgwqDCoMKgwqAgYmF0dGVyeS0+cGVyY2VudGFnZSA9IFVJTlQ4X01BWDsNCj4gPiA+ICvCoMKg
-wqDCoCBiYXR0ZXJ5LT5sYXN0X2NoYXJnZXMgPSBxdWV1ZV9uZXcoKTsNCj4gPiA+ICvCoMKgwqDC
-oCBiYXR0ZXJ5LT5hdmdfY2hhcmdlID0gMDsNCj4gPiA+ICvCoMKgwqDCoCBiYXR0ZXJ5LT5pc19m
-bHVjdHVhdGluZyA9IGZhbHNlOw0KPiA+ID4gKw0KPiA+ID4gwqDCoMKgwqDCoCBpZiAoc291cmNl
-KQ0KPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYmF0dGVyeS0+c291cmNlID0gZ19z
-dHJkdXAoc291cmNlKTsNCj4gPiA+IMKgwqDCoMKgwqAgaWYgKHByb3ZpZGVyX3BhdGgpDQo+ID4g
-PiBAQCAtMTA1LDYgKzExNCw5IEBAIHN0YXRpYyB2b2lkIGJhdHRlcnlfZnJlZShzdHJ1Y3QgYnRk
-X2JhdHRlcnkNCj4gPiA+ICpiYXR0ZXJ5KQ0KPiA+ID4gwqDCoMKgwqDCoCBpZiAoYmF0dGVyeS0+
-cGF0aCkNCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdfZnJlZShiYXR0ZXJ5LT5w
-YXRoKTsNCj4gPiA+IA0KPiA+ID4gK8KgwqDCoMKgIGlmIChiYXR0ZXJ5LT5sYXN0X2NoYXJnZXMp
-DQo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHF1ZXVlX2Rlc3Ryb3koYmF0dGVyeS0+
-bGFzdF9jaGFyZ2VzLCBOVUxMKTsNCj4gPiA+ICsNCj4gPiA+IMKgwqDCoMKgwqAgaWYgKGJhdHRl
-cnktPnNvdXJjZSkNCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdfZnJlZShiYXR0
-ZXJ5LT5zb3VyY2UpOw0KPiA+ID4gDQo+ID4gPiBAQCAtMjE3LDggKzIyOSw0OSBAQCBib29sIGJ0
-ZF9iYXR0ZXJ5X3VucmVnaXN0ZXIoc3RydWN0IGJ0ZF9iYXR0ZXJ5DQo+ID4gPiAqYmF0dGVyeSkN
-Cj4gPiA+IMKgwqDCoMKgwqAgcmV0dXJuIHRydWU7DQo+ID4gPiDCoH0NCj4gPiA+IA0KPiA+ID4g
-K3N0YXRpYyB2b2lkIGNoZWNrX2ZsdWN0dWF0aW9ucyhzdHJ1Y3QgYnRkX2JhdHRlcnkgKmJhdHRl
-cnkpDQo+ID4gDQo+ID4gSW5zdGVhZCBvZiBoYXZpbmcgdGhpcyBmdW5jdGlvbiwgYW5kIHF1aXRl
-IGNvbXBsaWNhdGVkIGhhbmRsaW5nIG9mIHRoYXQNCj4gPiBzYW1lIHF1ZXVlIG9mIGJhdHRlcnkg
-bGV2ZWxzIGluIGJ0ZF9iYXR0ZXJ5X3VwZGF0ZSgpLCBpdCB3b3VsZCBiZSBncmVhdA0KPiA+IGlm
-IHRoZSBjb2RlIHdhcyBjb250YWluZWQgYWxsIHdpdGhpbiBhIGZ1bmN0aW9uIChvciB0d28pIGFu
-ZCB1c2VkIG5vbi0NCj4gPiBCbHVlWiBzcGVjaWZpYyBkYXRhIHR5cGVzLg0KPiA+IA0KPiA+IFNv
-IHRoYXQgdGhlIGNvZGUgY291bGQgYmUgc3BsaXQgb2ZmIGludG8gaXRzIG93biBiYXR0ZXJ5IGhl
-bHBlciwgYW5kDQo+ID4gY291bGQgaGF2ZSBhIHVuaXQgdGVzdCBzaG93aW5nIGEgZmV3IGRpZmZl
-cmVudCBjYXNlcy4NCj4gDQo+IEkgZ3Vlc3MgeW91IGFyZSBzdWdnZXN0aW5nIHNvbWV0aGluZyB0
-byBnbyBpbnRvIHNyYy9zaGFyZWQgKGUuZy4NCj4gYmF0dGVyeS5jOmJ0X2JhdHRlcnkpIHNvIGl0
-IGNhbiBiZSB1bml0IHRlc3RlZCwgd2hpbGUgSSB0aGluayB0aGlzDQo+IHdvdWxkIGJlIG5pY2Ug
-dG8gaGF2ZSBJZCBsZWF2ZSB0aGlzIHRvIFJvbWFuIHRvIGRlY2lkZSBzaW5jZSBpdCBtYXkNCj4g
-cmVxdWlyZSBzb21lIHdvcmsgdG8gcHV0IGl0IHRvZ2V0aGVyIGFuZCB0aGVuIGdlbmVyYXRlIHRl
-c3QgY2FzZXMgdGhhdA0KPiBjb3ZlciBmbHVjdHVhdGlvbiBhbmQgb3RoZXIgdGhpbmdzIHdlIG1p
-Z2h0IHdhbnQgdG8gY2hlY2sgd2l0aCB0aGUNCj4gY29kZS4NCj4gDQo+ID4gPiArew0KPiA+ID4g
-K8KgwqDCoMKgIGNvbnN0IHN0cnVjdCBxdWV1ZV9lbnRyeSAqZW50cnk7DQo+ID4gPiArwqDCoMKg
-wqAgdWludDhfdCBzcGlrZXMgPSAwOw0KPiA+ID4gK8KgwqDCoMKgIGludDhfdCBzdGVwOw0KPiA+
-ID4gK8KgwqDCoMKgIGludDhfdCBkaXJlY3Rpb24gPSAwOw0KPiA+ID4gK8KgwqDCoMKgIGludDhf
-dCBwcmV2X2RpcmVjdGlvbjsNCj4gPiA+ICvCoMKgwqDCoCB1aW50OF90ICpwcmV2X2NoYXJnZTsN
-Cj4gPiA+ICvCoMKgwqDCoCB1aW50OF90ICpuZXh0X2NoYXJnZTsNCj4gPiA+ICsNCj4gPiA+ICvC
-oMKgwqDCoCBmb3IgKGVudHJ5ID0gcXVldWVfZ2V0X2VudHJpZXMoYmF0dGVyeS0+bGFzdF9jaGFy
-Z2VzKTsNCj4gPiA+IGVudHJ5LT5uZXh0Ow0KPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoCBlbnRy
-eSA9IGVudHJ5LT5uZXh0KSB7DQo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHByZXZf
-ZGlyZWN0aW9uID0gZGlyZWN0aW9uOw0KPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBw
-cmV2X2NoYXJnZSA9IGVudHJ5LT5kYXRhOw0KPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCBuZXh0X2NoYXJnZSA9IGVudHJ5LT5uZXh0LT5kYXRhOw0KPiA+ID4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBzdGVwID0gKm5leHRfY2hhcmdlIC0gKnByZXZfY2hhcmdlOw0KPiANCj4gSXQg
-bWlnaHQgYmUgYSBnb29kIGlkZWEgdG8gc3RvcmUgdGhlIHZhbHVlcyBhcyBwb2ludGVycyAodXNp
-bmcNCj4gVUlOVF9UT19QVFIvUFRSX1RPX1VJTlQpLCB0aGF0IHdheSB3ZSBhdm9pZCB0aGlzIGtp
-bmQgb2YgY29uc3RydWN0DQo+IGFib3ZlIHdoZXJlIHlvdSBoYXZlIHRvIHVzZSBwb2ludGVycyBh
-bmQgcmlzayBoYXZpbmcgTlVMTCBwb2ludGVycw0KPiBidWdzIGZvciBleGFtcGxlLg0KPiANCj4g
-PiA+ICsNCj4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyoNCj4gPiA+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCAqIFRoZSBiYXR0ZXJ5IGNoYXJnZSBmbHVjdHVhdGVzIHRvbyBt
-dWNoLA0KPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogd2hpY2ggbWF5IGluZGlj
-YXRlIGEgYmF0dGVyeSBwcm9ibGVtLCBzbw0KPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgICogdGhlIGFjdHVhbCB2YWx1ZSBzaG91bGQgYmUgZGlzcGxheWVkLg0KPiA+ID4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgICovDQo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGlmIChhYnMoc3RlcCkgPj0gTUFYX0NIQVJHRV9TVEVQKSB7DQo+ID4gPiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBiYXR0ZXJ5LT5pc19mbHVjdHVhdGluZyA9IGZh
-bHNlOw0KPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0
-dXJuOw0KPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9DQo+ID4gPiArDQo+ID4gPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChzdGVwID4gMCkNCj4gPiA+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGRpcmVjdGlvbiA9IDE7DQo+ID4gPiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVsc2UgaWYgKHN0ZXAgPCAwKQ0KPiA+ID4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZGlyZWN0aW9uID0gLTE7DQo+ID4gPiAr
-DQo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChkaXJlY3Rpb24gIT0gcHJldl9k
-aXJlY3Rpb24gJiYgcHJldl9kaXJlY3Rpb24pDQo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBzcGlrZXMrKzsNCj4gPiA+ICvCoMKgwqDCoCB9DQo+ID4gPiAr
-DQo+ID4gPiArwqDCoMKgwqAgYmF0dGVyeS0+aXNfZmx1Y3R1YXRpbmcgPSAoc3Bpa2VzID4gMSkg
-PyB0cnVlIDogZmFsc2U7DQo+ID4gPiArfQ0KPiA+ID4gKw0KPiA+ID4gwqBib29sIGJ0ZF9iYXR0
-ZXJ5X3VwZGF0ZShzdHJ1Y3QgYnRkX2JhdHRlcnkgKmJhdHRlcnksIHVpbnQ4X3QNCj4gPiA+IHBl
-cmNlbnRhZ2UpDQo+ID4gPiDCoHsNCj4gPiA+ICvCoMKgwqDCoCB1aW50OF90ICpwX3BlcmNlbnRh
-Z2U7DQo+ID4gPiArDQo+ID4gPiDCoMKgwqDCoMKgIERCRygicGF0aCA9ICVzIiwgYmF0dGVyeS0+
-cGF0aCk7DQo+ID4gPiANCj4gPiA+IMKgwqDCoMKgwqAgaWYgKCFxdWV1ZV9maW5kKGJhdHRlcmll
-cywgTlVMTCwgYmF0dGVyeSkpIHsNCj4gPiA+IEBAIC0yMzEsNiArMjg0LDIzIEBAIGJvb2wgYnRk
-X2JhdHRlcnlfdXBkYXRlKHN0cnVjdCBidGRfYmF0dGVyeQ0KPiA+ID4gKmJhdHRlcnksIHVpbnQ4
-X3QgcGVyY2VudGFnZSkNCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiBm
-YWxzZTsNCj4gPiA+IMKgwqDCoMKgwqAgfQ0KPiA+ID4gDQo+ID4gPiArwqDCoMKgwqAgaWYgKCFi
-YXR0ZXJ5LT5hdmdfY2hhcmdlKQ0KPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBiYXR0
-ZXJ5LT5hdmdfY2hhcmdlID0gcGVyY2VudGFnZTsNCj4gPiA+ICsNCj4gPiA+ICvCoMKgwqDCoCAv
-KiBleHBvbmVudGlhbCBzbW9vdGhpbmcgKi8NCj4gPiA+ICvCoMKgwqDCoCBiYXR0ZXJ5LT5hdmdf
-Y2hhcmdlID0gYmF0dGVyeS0+YXZnX2NoYXJnZSAqIDAuNyArIHBlcmNlbnRhZ2UNCj4gPiA+ICog
-MC4zOw0KPiA+IA0KPiA+IE1hZ2ljIG51bWJlcnMgc2hvdWxkIGJlICNkZWZpbmUncyBjb25zdGFu
-dHMuDQo+ID4gDQo+ID4gQXMgTHVpeiBtZW50aW9uZWQsIGl0IHdvdWxkIGJlIGdyZWF0IGlmIHRo
-ZXJlIHdhcyBzb21lIHByaW9yIGFydA0KPiA+IHJlZmVyZW5jZWQsIHBlcmhhcHMgdGhlIHJlZmVy
-ZW5jZSBpbXBsZW1lbnRhdGlvbiBpbiBhbm90aGVyDQo+ID4gYXBwbGljYXRpb24uDQo+ID4gDQo+
-ID4gT3IgYW4gZXhwbGFuYXRpb24gYXMgdG8gd2h5IHRoaXMgY291bGQgbmVlZHMgdG8gbGl2ZSBo
-ZXJlIGluc3RlYWQgb2YsDQo+ID4gc2F5LCB1cG93ZXIsIHdoaWNoIGRlYWxzIHdpdGggaGV1cmlz
-dGljcywgZG9kZ3kgaGFyZHdhcmUsIGV0Yy4NCj4gDQo+IFRoaXMgaXMgYSBnb29kIHF1ZXN0aW9u
-LCB3aGF0IGlzIHRoZSBhbGdvcml0aG0gdXBvd2VyIHVzZWQgZm9yDQo+IGhhbmRsaW5nIHRoZSBi
-YXR0ZXJ5IGxldmVsPw0KPiANCkkgY2hlY2tlZCBob3cgdXBvd2VyIHdvcmtzLCBhbmQgaXQgZG9l
-cyBub3QgaGFuZGxlIHN1Y2ggY2FzZXMuIEZvcg0KZXhhbXBsZSwgaGVyZSB0aGUgY2hhcmdlIHBl
-cmNlbnRhZ2UgaXMgdGFrZW4gZGlyZWN0bHkgZnJvbSBzeXNmczoNCkxpbms6IGh0dHBzOi8vZ2l0
-bGFiLmZyZWVkZXNrdG9wLm9yZy91cG93ZXIvdXBvd2VyLy0vYmxvYi9tYXN0ZXIvc3JjL2xpbnV4
-L3VwLWRldmljZS1zdXBwbHktYmF0dGVyeS5jP3JlZl90eXBlPWhlYWRzI0w1MTQNCg0KSWYgdGhl
-IGJhdHRlcnkgZG9lcyBub3Qgc2VuZCB0aGUgY2hhcmdlIHBlcmNlbnRhZ2UgdG8gc3lzZnMsIHVw
-b3dlcg0KY2FsY3VsYXRlcyBpdCBiYXNlZCBvbiB0aGUgZW5lcmd5LmN1ciB2YXJpYWJsZSwgd2hp
-Y2ggaXMgYWxzbyByZWFkDQpmcm9tIHN5c2ZzOg0KTGluazogaHR0cHM6Ly9naXRsYWIuZnJlZWRl
-c2t0b3Aub3JnL3Vwb3dlci91cG93ZXIvLS9ibG9iL21hc3Rlci9zcmMvdXAtZGV2aWNlLWJhdHRl
-cnkuYz9yZWZfdHlwZT1oZWFkcyNMMzE2DQpMaW5rOiBodHRwczovL2dpdGxhYi5mcmVlZGVza3Rv
-cC5vcmcvdXBvd2VyL3Vwb3dlci8tL2Jsb2IvbWFzdGVyL3NyYy9saW51eC91cC1kZXZpY2Utc3Vw
-cGx5LWJhdHRlcnkuYz9yZWZfdHlwZT1oZWFkcyNMNDkzDQoNClRoZSBvbmx5IHBsYWNlIHdoZXJl
-IHRoZSBhY2N1bXVsYXRlZCBzdGF0aXN0aWNzIGFyZSB1c2VkIGlzIGhlcmU6DQpMaW5rOiBodHRw
-czovL2dpdGxhYi5mcmVlZGVza3RvcC5vcmcvdXBvd2VyL3Vwb3dlci8tL2Jsb2IvbWFzdGVyL3Ny
-Yy91cC1kZXZpY2UtYmF0dGVyeS5jP3JlZl90eXBlPWhlYWRzI0w5OQ0KSG93ZXZlciwgSSBkaWRu
-J3QgZmluZCBhbnl0aGluZyBpbnRlcmVzdGluZyBoZXJlIGVpdGhlci4NCg0KSW4gbXkgb3Bpbmlv
-biwgY2hhcmdlIGxldmVsIGF2ZXJhZ2luZyBzaG91bGQgYmUgaW1wbGVtZW50ZWQgaW4gYmx1ZXos
-DQphcyB0aGVyZSBhcmUgYXBwbGljYXRpb25zIHRoYXQgYWNjZXNzIGJsdWV6IGRpcmVjdGx5Og0K
-TGluazogaHR0cHM6Ly9naXRodWIuY29tL0tERS9ibHVlei1xdC9ibG9iL21hc3Rlci9zcmMvYmF0
-dGVyeS5jcHAjTDMwDQpUaGVyZWZvcmUsIGl0IHdvdWxkIGJlIGJldHRlciB0byBmaWx0ZXIgdGhl
-IHZhbHVlcyBvbiB0aGUgYmx1ZXogc2lkZQ0KYW5kIHRoZW4gcGFzcyB0aGVtIG9uIHRvIHRoaXJk
-LXBhcnR5IGFwcGxpY2F0aW9ucy4gVGhpcyB3YXksIGFwcGxpY2F0aW9ucw0Kd2lsbCBub3QgaGF2
-ZSB0byBpbXBsZW1lbnQgdGhlIHNhbWUgbG9naWMgb3ZlciBhbmQgb3ZlciBhZ2Fpbi4NCg0KVGhl
-IHVzZSBvZiB0aGUgYXZlcmFnZSBiYXR0ZXJ5IHZhbHVlIGlzIGp1c3RpZmllZCBieSB0aGUgZm9s
-bG93aW5nDQpleGFtcGxlcyBmcm9tIHRoZSBMaW51eCBrZXJuZWw6DQpMaW5rOiBodHRwczovL2Vs
-aXhpci5ib290bGluLmNvbS9saW51eC92Ni4xOC1yYzMvc291cmNlL2RyaXZlcnMvcG93ZXIvc3Vw
-cGx5L2FkYy1iYXR0ZXJ5LWhlbHBlci5jI0wxMzINCkxpbms6IGh0dHBzOi8vZWxpeGlyLmJvb3Rs
-aW4uY29tL2xpbnV4L3Y2LjE3LjQvc291cmNlL2RyaXZlcnMvcG93ZXIvc3VwcGx5L2N3MjAxNV9i
-YXR0ZXJ5LmMjTDMwNg0K
+The battery charge level may fluctuate due to uncalibrated
+sensors. Commit smooths out such fluctuations.
+
+The algorithm for determining uncalibrated sensors consists of
+finding the number of changes in charge direction (i.e., "spikes").
+If the number of spikes is zero, the device is charging or discharging.
+If there is one spike, it may mean that the device has started charging
+or has been disconnected from charging. If there are two or more spikes,
+this is a clear indication of an uncalibrated sensor.
+
+Check that the battery charge is fluctuating. If the battery charge
+is fluctuating, use the average charge value, otherwise use the current
+value.
+
+Fixes: https://github.com/bluez/bluez/issues/1612
+---
+V3 -> V4: Functionality has been moved to separate files, unit tests
+have been added in the next patch, simple averaging of values is
+used instead of exponential averaging, and last_charges now stores
+values instead of pointers. 
+
+V2 -> V3: A queue is used instead of an array for the last charges,
+a bug with the spikes variable increment has been fixed, and the
+fluctuation check is called each time a new battery charge appears.
+
+V1 -> V2: Smoothing is only applied to uncalibrated sensors, the
+last 8 values are saved instead of 4, and the average value is used
+for smoothing instead of the minimum value.
+
+ Makefile.am          |  3 +-
+ src/battery.c        | 10 ++++-
+ src/shared/battery.c | 96 ++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/battery.h | 21 ++++++++++
+ 4 files changed, 128 insertions(+), 2 deletions(-)
+ create mode 100644 src/shared/battery.c
+ create mode 100644 src/shared/battery.h
+
+diff --git a/Makefile.am b/Makefile.am
+index 94f625db4..4bf859685 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -244,7 +244,8 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+ 			src/shared/ccp.h src/shared/ccp.c \
+ 			src/shared/lc3.h src/shared/tty.h \
+ 			src/shared/bap-defs.h \
+-			src/shared/asha.h src/shared/asha.c
++			src/shared/asha.h src/shared/asha.c \
++			src/shared/battery.h src/shared/battery.c
+ 
+ if READLINE
+ shared_sources += src/shared/shell.c src/shared/shell.h
+diff --git a/src/battery.c b/src/battery.c
+index 4c1ea79d9..796dbc4ac 100644
+--- a/src/battery.c
++++ b/src/battery.c
+@@ -19,6 +19,7 @@
+ 
+ #include "gdbus/gdbus.h"
+ #include "bluetooth/bluetooth.h"
++#include "src/shared/battery.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/util.h"
+ #include "battery.h"
+@@ -39,6 +40,7 @@ struct btd_battery {
+ 	uint8_t percentage; /* valid between 0 to 100 inclusively */
+ 	char *source; /* Descriptive source of the battery info */
+ 	char *provider_path; /* The provider root path, if any */
++	struct bt_battery *filter;
+ };
+ 
+ struct btd_battery_provider_manager {
+@@ -96,6 +98,7 @@ static struct btd_battery *battery_new(const char *path, const char *source,
+ 		battery->source = g_strdup(source);
+ 	if (provider_path)
+ 		battery->provider_path = g_strdup(provider_path);
++	battery->filter = bt_battery_new();
+ 
+ 	return battery;
+ }
+@@ -108,6 +111,11 @@ static void battery_free(struct btd_battery *battery)
+ 	if (battery->source)
+ 		g_free(battery->source);
+ 
++	if (battery->filter) {
++		bt_battery_free(battery->filter);
++		free(battery->filter);
++	}
++
+ 	free(battery);
+ }
+ 
+@@ -234,7 +242,7 @@ bool btd_battery_update(struct btd_battery *battery, uint8_t percentage)
+ 	if (battery->percentage == percentage)
+ 		return true;
+ 
+-	battery->percentage = percentage;
++	battery->percentage = bt_battery_filter(battery->filter, percentage);
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(), battery->path,
+ 				     BATTERY_INTERFACE, "Percentage");
+ 
+diff --git a/src/shared/battery.c b/src/shared/battery.c
+new file mode 100644
+index 000000000..5704bbb6c
+--- /dev/null
++++ b/src/shared/battery.c
+@@ -0,0 +1,96 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2025  Open Mobile Platform LLC <community@omp.ru>
++ *
++ *
++ */
++
++#include <stdint.h>
++#include <stdlib.h>
++
++#include "src/shared/battery.h"
++#include "src/shared/queue.h"
++#include "src/shared/util.h"
++
++struct bt_battery {
++	struct queue *last_charges; /* last charges received */
++	uint8_t avg_charge; /* average battery charge */
++	bool is_fluctuating; /* true, if the battery sensor fluctuates */
++};
++
++struct bt_battery *bt_battery_new(void)
++{
++	struct bt_battery *battery;
++
++	battery = new0(struct bt_battery, 1);
++	battery->last_charges = queue_new();
++	battery->avg_charge = 0;
++	battery->is_fluctuating = false;
++
++	return battery;
++}
++
++void bt_battery_free(struct bt_battery *battery)
++{
++	if (battery->last_charges)
++		queue_destroy(battery->last_charges, NULL);
++}
++
++static void bt_battery_check_fluctuations(struct bt_battery *battery)
++{
++	const struct queue_entry *entry;
++	uint8_t spikes = 0;
++	int8_t step;
++	int8_t direction = 0;
++	int8_t prev_direction;
++	uintptr_t prev_charge;
++	uintptr_t next_charge;
++	uint16_t sum_charge = 0;
++
++	for (entry = queue_get_entries(battery->last_charges); entry->next;
++	     entry = entry->next) {
++		prev_direction = direction;
++		prev_charge = PTR_TO_UINT(entry->data);
++		next_charge = PTR_TO_UINT(entry->next->data);
++		step = next_charge - prev_charge;
++		sum_charge += prev_charge;
++
++		/*
++		 * The battery charge fluctuates too much,
++		 * which may indicate a battery problem, so
++		 * the actual value should be displayed.
++		 */
++		if (abs(step) >= MAX_CHARGE_STEP) {
++			battery->is_fluctuating = false;
++			return;
++		}
++
++		if (step > 0)
++			direction = 1;
++		else if (step < 0)
++			direction = -1;
++
++		if (direction != prev_direction && prev_direction)
++			spikes++;
++	}
++
++	sum_charge += next_charge;
++	battery->avg_charge = sum_charge / LAST_CHARGES_SIZE;
++
++	battery->is_fluctuating = (spikes > 1) ? true : false;
++}
++
++uint8_t bt_battery_filter(struct bt_battery *battery, uint8_t percentage)
++{
++	queue_push_tail(battery->last_charges, UINT_TO_PTR(percentage));
++
++	if (queue_length(battery->last_charges) == LAST_CHARGES_SIZE) {
++		bt_battery_check_fluctuations(battery);
++		queue_pop_head(battery->last_charges);
++	}
++
++	return (battery->is_fluctuating) ? battery->avg_charge : percentage;
++}
+diff --git a/src/shared/battery.h b/src/shared/battery.h
+new file mode 100644
+index 000000000..41a7ed2b0
+--- /dev/null
++++ b/src/shared/battery.h
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2025  Open Mobile Platform LLC <community@omp.ru>
++ *
++ *
++ */
++
++#include <stdint.h>
++
++#define LAST_CHARGES_SIZE 8
++#define MAX_CHARGE_STEP 5
++
++struct bt_battery;
++
++struct bt_battery *bt_battery_new(void);
++void bt_battery_free(struct bt_battery *battery);
++
++uint8_t bt_battery_filter(struct bt_battery *battery, uint8_t percentage);
+-- 
+2.43.0
+
