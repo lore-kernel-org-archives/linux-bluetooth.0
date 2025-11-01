@@ -1,231 +1,129 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F228C2F7442
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Nov 2025 12:05:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761998742; cv=none; b=SLP5umiDys0mf4MTItoqsz33srUxc7Bter/JvW7sV9pM1jlK10eh1XH4h5lpuyW/GVCVlLJXX3keuEVCC89BiT+tfFhA01fJBcHW/GVeM257Xsdjb22f9GvKZ/uK36/4ftw2OKWp4YBAsRPM+2zQemsYyJVOYrQNL+/bYlyVuIU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761998742; c=relaxed/simple;
-	bh=rxvX4NyCzMDZDfqWBrEvLoJjGQpjDtwiIwqekMhOhfM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=AD4hrLSdvCr/6nMXbyq3bG56yH463daqk4tPebCO+KxBiGxPHj13pcsTDW+vV/NmC3hYTykOgGwxoWaIJBvFPk0u3t5XA4dkzUsehFh/gOtwzgs/dckYO3DqLEEHtG/3YksmrHWujaU+2o6yalIFfY+kGO7LR/RWNaTHJ756L2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cB7vvQd3; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325082C3262;
+	Sat,  1 Nov 2025 12:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761998989; cv=pass; b=g4oHC0wsywU+OrTMEZKuqlWnv7BL+VigjC2VNGKphtUEseiCmbqhA7XYJeU8VGETsbJgY06o+9/G1wl22crr6/qlMmnwUE5lmPRP1rK669ylixgrlnZ+o7UOAhOEQ3xgo6YIx/HwsSGJnsN2B8ad3vbuXRFkXg/lhPM805DRbA4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761998989; c=relaxed/simple;
+	bh=NcAlMqDdMRz/v2VxGUodZn5cxH+8ecfgWR8Uz40bwmA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kLH8IPgeJSTI/Ze43ShA2kVi/CaGwYujz96YRM33VnkA/L9pKTfkeVCbhPi6mmrxfAdUOdCuaLLjXiETHSOq/w6Y0dEy6q581AyqVDkVWW8TFWUC8GndWwkEus/hmudVjFzYRVA/6MpB5SFI7j4w1LtLx46nldOCnGwvEZicuk0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=J5OLF2yE; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=f4Utndre; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cB7vvQd3"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4eb75e8e47eso37149951cf.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Nov 2025 05:05:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761998740; x=1762603540; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rxvX4NyCzMDZDfqWBrEvLoJjGQpjDtwiIwqekMhOhfM=;
-        b=cB7vvQd3BziWoO8Yf+tineEFDwotRpep9vUQOBWANJMjRksoLghatTGrADuCsUx/Hg
-         c7ijpDk2iXY69kVtNgSU+Rb/mgmh5Tav6IQIod7dopM9vV/dOlzZ13JaAsbEULyHpLX5
-         2OjQwIfBab8H7auCMrZ/+cDGrIDDs2dqYY2kdSoo4UBkPPViU/FKGzT9WlNuRV59XbZq
-         Ds+OAxUstEDSPPEK5/JhU6EmHJXhtywL6oo0GT/NqwM7Oy+RrB09VZA1+nCRd0jiRSyU
-         sBP1tiMfvS1c+Iqv56ZGVQ5Y3fmm/NTfHOvRe3szmA9M+gnB+fxOXVoGvsdKSOpgaZMz
-         0GRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761998740; x=1762603540;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rxvX4NyCzMDZDfqWBrEvLoJjGQpjDtwiIwqekMhOhfM=;
-        b=ETG9Dmyp5rL9BBg+P5hHpv9a/nXuHTKbFeMaEZIygGuOsmN2IKLzG5kclytBZ5oni8
-         2F8ub2YZ9JhKX9bSqOPjq5eWf8EwY7Ut1YLQeBsnvG1rV0ILGTFKJK5oC2Pk38abfaji
-         FRwSjm84WTqISTngHrFjdeeSh/a6XzCC+z5dG1+tHyyQgU3ERFkqrP23cP2KXjiPps/m
-         paB2uwSZxmcvZcZi0qAMnTZa+9iVOgaZtKnWSwXdib7loAM1YYsn/9poNLq1LXxZpw8n
-         iDeoAyfY8Z/kOj3pXHSu1FZ8LVowOF4r5S8Vj+rLXBbL48raAz+2vhRlqmLWyDLl5Cos
-         adnA==
-X-Gm-Message-State: AOJu0YzlNaol34m64wwOgtkfmHJXS36GYYkQm3th+OZ6aTYfCstnHsvS
-	StPubtdCUJwk6s+pXq2VoNEszUmkVqRT5V6wa4FsDb1QO/Yjod89y+73kciQjg==
-X-Gm-Gg: ASbGncvsqxzZ9PO+XdH00i2sjw63A8T8EhVZbkLMaJcNJ3tVlkGx9wiSdOUBrPHgTi0
-	6YbiPoL/LQfdCwtITAvBYNyPjbYq7IZFr4PdS8DNyHveffxrXaM4W3lnXomyHgiEFc8r//MlFNc
-	6UzDxOkPWnRMwJeK9gDbEXl3tmuQBh0swQ5hnOP2LPbnT4zOT1uSa0fqCf6IrAwK2vgxEJ9Ici5
-	ikKT+oRHjxsZTd03YK1E9s7S6VQ5Mi5OZw+oYTHDMaFxdqVcRDA4khXBhsu3QeZe3uSW628qGID
-	H3ne9fSQi8/ipIEILI3Na49g5Q/nvYnBOxLjKrxujyzgiQHA1y7e5p1E3wgOgZ4OeVbgaMpTwJd
-	dAEHi9Hcx/lXvx3X5sr3ARIyr3RL445p6HodchZ3RhX+skeTaVjAQJwN1M9RQzbo9C069OTVAUX
-	LgA+kyUt9ZKH8vrT4d
-X-Google-Smtp-Source: AGHT+IFpILJZp9TfbCMI0TAdwYtFt/cCQzbdprX5D1+AO5L+wROocTXt5veigwN59btI87quXQc8Hw==
-X-Received: by 2002:ac8:59c9:0:b0:4e8:8274:5efa with SMTP id d75a77b69052e-4ed217b684bmr132042561cf.8.1761998739340;
-        Sat, 01 Nov 2025 05:05:39 -0700 (PDT)
-Received: from [172.17.0.2] ([172.174.165.1])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8ac0387b575sm288713985a.48.2025.11.01.05.05.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Nov 2025 05:05:38 -0700 (PDT)
-Message-ID: <6905f792.050a0220.321d50.782b@mx.google.com>
-Date: Sat, 01 Nov 2025 05:05:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2011155744727139838=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="J5OLF2yE";
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="f4Utndre"
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4czGqf1wlGz49Psw;
+	Sat,  1 Nov 2025 14:09:34 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1761998974;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NBBNCKo9ePNephA/xZaTvsunYp5GceXJ6NgFpJmSExk=;
+	b=J5OLF2yEEds46CbdBcXb6SkVSakBzPZM/lLE9Eatnvo/K4gtzhvhZQpYb19cmz1jGjhUhC
+	AnBgF7Q3gsUHGNNNgBKr97xGhl+iTR6uwIvG8bI/FrmbhffUlhyEbt2slRowjLF7peC38S
+	KWHorWNvnh7xNDAbmfXahPZSeCwNra63iS7WeD8bsH3rFUqhj1SWGSjW+Bnd/rcJfDRlNr
+	UxFrpuMTdOXvROa8tC4vEwdSMzLgJ1c8AHjn88Xt7jlJAcFcoVj95V33KxoQokAUIWuHyi
+	n2Jo3mMvLEGAKzkT9UgHQm5zLNTj6SjFV399P9t4ObTXwtCq5FBBdF4ZGXRTog==
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4czGqQ5cWlzyYG;
+	Sat,  1 Nov 2025 14:09:22 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1761998964;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NBBNCKo9ePNephA/xZaTvsunYp5GceXJ6NgFpJmSExk=;
+	b=f4UtndreOsIs5Yzbt9LFWmxTpy4tAeC95qj8V8ELDG5fnNa9meH2X/4MoaNDqnq/pWPC5P
+	q8j2KgH5JcuGkWXgHOmva3SV4bYMdFeKKbCuqZu1gqLCgkZ7Q0UI6NE8X/Z9pTQxt6O1KR
+	0W6mxdaTNNk8In0SGtmXiCg+2aTMb+8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1761998964;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NBBNCKo9ePNephA/xZaTvsunYp5GceXJ6NgFpJmSExk=;
+	b=e44ZNYu14WIDy9xBY9f22GrXFHxR2NGvgmhu4/p70hxSuXQGodk2LRii0zyV2dOHsT3irl
+	NNpN22GdeU8p3wU5Y5hv6QzBA6RzCVCbWumq00Ji1IE9at115Dyu02rkaPD0EP+nGHZmB1
+	8UL94AYuZaRas3kRlTZS4ly36PaVYZs=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1761998964; a=rsa-sha256; cv=none;
+	b=a+wj+nlHi2/Lv8dDNI76VHPQiTcBJ/zKdN/eiWlniNNG3GrXLwKGcMUGblGJ9raYIqeDfu
+	ayawQ9+953mVtgjenkZc2Bjt8bujcywM0ihRLMK/ZbYaWk9lKWLO80V3exaXo2s7IgfNvB
+	ld2cvqVZHAN93N5eEHc1YZ5rLUthuow=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	jukka.rissanen@linux.intel.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/4] Bluetooth: 6lowpan: reset link-local header on ipv6 recv path
+Date: Sat,  1 Nov 2025 14:09:11 +0200
+Message-ID: <639c5cb6ceb49ffd63952dc69d0d48b022aaec3b.1761998763.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ,v4,1/2] shared/battery: improve the display of the charge level
-In-Reply-To: <20251101115201.97961-1-r.smirnov@omp.ru>
-References: <20251101115201.97961-1-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2011155744727139838==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Bluetooth 6lowpan.c netdev has header_ops, so it must set link-local
+header for RX skb, otherwise things crash, eg. with AF_PACKET SOCK_RAW
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTAxODQ4NgoKLS0t
-VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
-ICAgUEVORElORyAgIDAuMjAgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
-RU5ESU5HICAgMC4yOCBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
-ICAgICAyMC4wOSBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAg
-ICAxOC40NSBzZWNvbmRzCk1ha2VDaGVjayAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAz
-OS4zOSBzZWNvbmRzCk1ha2VEaXN0Y2hlY2sgICAgICAgICAgICAgICAgIFBBU1MgICAgICAxODUu
-NDQgc2Vjb25kcwpDaGVja1ZhbGdyaW5kICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTQuOTMg
-c2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMjAuNjggc2Vj
-b25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBGQUlMICAgICAgMTIuODMgc2Vjb25k
-cwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBQRU5ESU5HICAgMC4yNyBzZWNvbmRzClNj
-YW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAzMy40MCBzZWNvbmRzCgpEZXRh
-aWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gUEVO
-RElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgoKIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQRU5ESU5HCkRlc2M6IFJ1biBnaXRs
-aW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1h
-a2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnNyYy9zaGFyZWQvYmF0dGVyeS5j
-OiBJbiBmdW5jdGlvbiDigJhidF9iYXR0ZXJ5X2ZpbHRlcuKAmToKc3JjL3NoYXJlZC9iYXR0ZXJ5
-LmM6ODA6MTM6IGVycm9yOiDigJhuZXh0X2NoYXJnZeKAmSBtYXkgYmUgdXNlZCB1bmluaXRpYWxp
-emVkIGluIHRoaXMgZnVuY3Rpb24gWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFsaXplZF0KICAgODAg
-fCAgc3VtX2NoYXJnZSArPSBuZXh0X2NoYXJnZTsKICAgICAgfCAgICAgICAgICAgICBefgpzcmMv
-c2hhcmVkL2JhdHRlcnkuYzo1MDoxMjogbm90ZTog4oCYbmV4dF9jaGFyZ2XigJkgd2FzIGRlY2xh
-cmVkIGhlcmUKICAgNTAgfCAgdWludHB0cl90IG5leHRfY2hhcmdlOwogICAgICB8ICAgICAgICAg
-ICAgXn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMK
-bWFrZVsxXTogKioqIFtNYWtlZmlsZTo3NjM3OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9v
-cF9sYS1iYXR0ZXJ5LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlz
-aGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDA4NzogYWxsXSBFcnJvciAyCiMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hlY2sgLSBGQUlMCkRlc2M6IFJ1
-biBCbHVleiBNYWtlIENoZWNrCk91dHB1dDoKCnNyYy9zaGFyZWQvYmF0dGVyeS5jOiBJbiBmdW5j
-dGlvbiDigJhidF9iYXR0ZXJ5X2ZpbHRlcuKAmToKc3JjL3NoYXJlZC9iYXR0ZXJ5LmM6ODA6MTM6
-IGVycm9yOiDigJhuZXh0X2NoYXJnZeKAmSBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRo
-aXMgZnVuY3Rpb24gWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFsaXplZF0KICAgODAgfCAgc3VtX2No
-YXJnZSArPSBuZXh0X2NoYXJnZTsKICAgICAgfCAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jh
-dHRlcnkuYzo1MDoxMjogbm90ZTog4oCYbmV4dF9jaGFyZ2XigJkgd2FzIGRlY2xhcmVkIGhlcmUK
-ICAgNTAgfCAgdWludHB0cl90IG5leHRfY2hhcmdlOwogICAgICB8ICAgICAgICAgICAgXn5+fn5+
-fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTog
-KioqIFtNYWtlZmlsZTo3Mzg1OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9nbGliX2xhLWJhdHRlcnku
-bG9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZToxMDU2OTogY2hlY2tdIEVycm9yIDIKIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlMCkRl
-c2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdpdGggVmFsZ3JpbmQKT3V0cHV0OgoKc3JjL3NoYXJl
-ZC9iYXR0ZXJ5LmM6IEluIGZ1bmN0aW9uIOKAmGJ0X2JhdHRlcnlfZmlsdGVy4oCZOgpzcmMvc2hh
-cmVkL2JhdHRlcnkuYzo4MDoxMzogZXJyb3I6IOKAmG5leHRfY2hhcmdl4oCZIG1heSBiZSB1c2Vk
-IHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbiBbLVdlcnJvcj1tYXliZS11bmluaXRpYWxp
-emVkXQogICA4MCB8ICBzdW1fY2hhcmdlICs9IG5leHRfY2hhcmdlOwogICAgICB8ICAgICAgICAg
-ICAgIF5+CnNyYy9zaGFyZWQvYmF0dGVyeS5jOjUwOjEyOiBub3RlOiDigJhuZXh0X2NoYXJnZeKA
-mSB3YXMgZGVjbGFyZWQgaGVyZQogICA1MCB8ICB1aW50cHRyX3QgbmV4dF9jaGFyZ2U7CiAgICAg
-IHwgICAgICAgICAgICBefn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVk
-IGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc2Mzc6IHNyYy9zaGFyZWQvbGlic2hh
-cmVkX21haW5sb29wX2xhLWJhdHRlcnkubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcg
-Zm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZToxMDU2OTogY2hlY2td
-IEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrU21hdGNo
-IC0gRkFJTApEZXNjOiBSdW4gc21hdGNoIHRvb2wgd2l0aCBzb3VyY2UKT3V0cHV0OgoKc3JjL3No
-YXJlZC9jcnlwdG8uYzoyNzE6MjE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1
-c2VkLgpzcmMvc2hhcmVkL2NyeXB0by5jOjI3MjoyMzogd2FybmluZzogVmFyaWFibGUgbGVuZ3Ro
-IGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1oZWxwZXJzLmM6NzY4OjMxOiB3YXJuaW5n
-OiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMu
-Yzo4MzA6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hh
-cmVkL2dhdHQtaGVscGVycy5jOjEzMjM6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJh
-eSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjEzNTQ6MjM6IHdhcm5pbmc6IFZh
-cmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtc2VydmVyLmM6Mjc4
-OjI1OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9n
-YXR0LXNlcnZlci5jOjYxODoyNTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVz
-ZWQuCnNyYy9zaGFyZWQvZ2F0dC1zZXJ2ZXIuYzo3MTY6MjU6IHdhcm5pbmc6IFZhcmlhYmxlIGxl
-bmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2JhcC5jOjMxNzoyNTogd2FybmluZzogYXJy
-YXkgb2YgZmxleGlibGUgc3RydWN0dXJlcwpzcmMvc2hhcmVkL2JhcC5jOiBub3RlOiBpbiBpbmNs
-dWRlZCBmaWxlOgouL3NyYy9zaGFyZWQvYXNjcy5oOjg4OjI1OiB3YXJuaW5nOiBhcnJheSBvZiBm
-bGV4aWJsZSBzdHJ1Y3R1cmVzCnNyYy9zaGFyZWQvYmF0dGVyeS5jOiBJbiBmdW5jdGlvbiDigJhi
-dF9iYXR0ZXJ5X2ZpbHRlcuKAmToKc3JjL3NoYXJlZC9iYXR0ZXJ5LmM6ODA6MTM6IGVycm9yOiDi
-gJhuZXh0X2NoYXJnZeKAmSBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rp
-b24gWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFsaXplZF0KICAgODAgfCAgc3VtX2NoYXJnZSArPSBu
-ZXh0X2NoYXJnZTsKICAgICAgfCAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2JhdHRlcnkuYzo1
-MDoxMjogbm90ZTog4oCYbmV4dF9jaGFyZ2XigJkgd2FzIGRlY2xhcmVkIGhlcmUKICAgNTAgfCAg
-dWludHB0cl90IG5leHRfY2hhcmdlOwogICAgICB8ICAgICAgICAgICAgXn5+fn5+fn5+fn4KY2Mx
-OiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtl
-ZmlsZTo3NjM3OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1iYXR0ZXJ5LmxvXSBF
-cnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6
-ICoqKiBbTWFrZWZpbGU6NDA4NzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIwpUZXN0OiBibHVlem1ha2VleHRlbGwgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWV6IHdp
-dGggRXh0ZXJuYWwgRUxMCk91dHB1dDoKCnNyYy9zaGFyZWQvYmF0dGVyeS5jOiBJbiBmdW5jdGlv
-biDigJhidF9iYXR0ZXJ5X2ZpbHRlcuKAmToKc3JjL3NoYXJlZC9iYXR0ZXJ5LmM6ODA6MTM6IGVy
-cm9yOiDigJhuZXh0X2NoYXJnZeKAmSBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMg
-ZnVuY3Rpb24gWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFsaXplZF0KICAgODAgfCAgc3VtX2NoYXJn
-ZSArPSBuZXh0X2NoYXJnZTsKICAgICAgfCAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2JhdHRl
-cnkuYzo1MDoxMjogbm90ZTog4oCYbmV4dF9jaGFyZ2XigJkgd2FzIGRlY2xhcmVkIGhlcmUKICAg
-NTAgfCAgdWludHB0cl90IG5leHRfY2hhcmdlOwogICAgICB8ICAgICAgICAgICAgXn5+fn5+fn5+
-fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioq
-IFtNYWtlZmlsZTo3NjM3OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1iYXR0ZXJ5
-LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4u
-Cm1ha2U6ICoqKiBbTWFrZWZpbGU6NDA4NzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIwpUZXN0OiBJbmNyZW1lbnRhbEJ1aWxkIC0gUEVORElORwpEZXNjOiBJbmNy
-ZW1lbnRhbCBidWlsZCB3aXRoIHRoZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgoKIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFNjYW5CdWlsZCAtIEZBSUwKRGVzYzog
-UnVuIFNjYW4gQnVpbGQKT3V0cHV0OgoKc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjQ1MToyMTog
-d2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGdhdHRfZGJf
-dW5yZWdpc3RlcihvcC0+Y2xpZW50LT5kYiwgb3AtPmRiX2lkKTsKICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6Njk2OjI6IHdhcm5p
-bmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICBkaXNjb3Zlcnlfb3Bf
-Y29tcGxldGUob3AsIGZhbHNlLCBhdHRfZWNvZGUpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjk5Njoy
-OiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgZGlzY292
-ZXJ5X29wX2NvbXBsZXRlKG9wLCBzdWNjZXNzLCBhdHRfZWNvZGUpOwogICAgICAgIF5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xp
-ZW50LmM6MTEwMjoyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAg
-ICAgICAgZGlzY292ZXJ5X29wX2NvbXBsZXRlKG9wLCBzdWNjZXNzLCBhdHRfZWNvZGUpOwogICAg
-ICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hh
-cmVkL2dhdHQtY2xpZW50LmM6MTI5NjoyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0
-IGlzIGZyZWVkCiAgICAgICAgZGlzY292ZXJ5X29wX2NvbXBsZXRlKG9wLCBzdWNjZXNzLCBhdHRf
-ZWNvZGUpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MTM2MToyOiB3YXJuaW5nOiBVc2Ugb2YgbWVt
-b3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgZGlzY292ZXJ5X29wX2NvbXBsZXRlKG9wLCBz
-dWNjZXNzLCBhdHRfZWNvZGUpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MTYzNjo2OiB3YXJuaW5n
-OiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgaWYgKHJlYWRfZGJfaGFz
-aChvcCkpIHsKICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xp
-ZW50LmM6MTY0MToyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAg
-ICAgICAgZGlzY292ZXJfYWxsKG9wKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFy
-ZWQvZ2F0dC1jbGllbnQuYzoyMTQ3OjY6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQg
-aXMgZnJlZWQKICAgICAgICBpZiAocmVhZF9kYl9oYXNoKG9wKSkgewogICAgICAgICAgICBefn5+
-fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzoyMTU1Ojg6IHdhcm5pbmc6IFVz
-ZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkaXNjb3Zlcnlfb3BfcmVmKG9wKSwKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+
-fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MzE4MDoyOiB3YXJuaW5nOiBV
-c2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgY29tcGxldGVfd3JpdGVfbG9u
-Z19vcChyZXEsIHN1Y2Nlc3MsIDAsIGZhbHNlKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzozMjAy
-OjI6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICByZXF1
-ZXN0X3VucmVmKHJlcSk7CiAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+CjEyIHdhcm5pbmdzIGdl
-bmVyYXRlZC4Kc3JjL3NoYXJlZC9iYXR0ZXJ5LmM6IEluIGZ1bmN0aW9uIOKAmGJ0X2JhdHRlcnlf
-ZmlsdGVy4oCZOgpzcmMvc2hhcmVkL2JhdHRlcnkuYzo4MDoxMzogZXJyb3I6IOKAmG5leHRfY2hh
-cmdl4oCZIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbiBbLVdlcnJv
-cj1tYXliZS11bmluaXRpYWxpemVkXQogICA4MCB8ICBzdW1fY2hhcmdlICs9IG5leHRfY2hhcmdl
-OwogICAgICB8ICAgICAgICAgICAgIF5+CnNyYy9zaGFyZWQvYmF0dGVyeS5jOjUwOjEyOiBub3Rl
-OiDigJhuZXh0X2NoYXJnZeKAmSB3YXMgZGVjbGFyZWQgaGVyZQogICA1MCB8ICB1aW50cHRyX3Qg
-bmV4dF9jaGFyZ2U7CiAgICAgIHwgICAgICAgICAgICBefn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJu
-aW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc2Mzc6
-IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWJhdHRlcnkubG9dIEVycm9yIDEKbWFr
-ZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4Kc3JjL3NoYXJlZC9iYXAu
-YzoxNTM0Ojg6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAg
-ICBiYXAgPSBidF9iYXBfcmVmX3NhZmUoYmFwKTsKICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+
-fn5+fn5+fgpzcmMvc2hhcmVkL2JhcC5jOjIzMjI6MjA6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkg
-YWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICByZXR1cm4gcXVldWVfZmluZChzdHJlYW0tPmJhcC0+
-c3RyZWFtcywgTlVMTCwgc3RyZWFtKTsKICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+
-fn5+fn5+fn5+fn5+fgoyIHdhcm5pbmdzIGdlbmVyYXRlZC4KbWFrZTogKioqIFtNYWtlZmlsZTo0
-MDg3OiBhbGxdIEVycm9yIDIKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+Add missing skb_reset_mac_header() for uncompressed ipv6 RX path.
 
---===============2011155744727139838==--
+For the compressed one, it is done in lowpan_header_decompress().
+
+Log: (BlueZ 6lowpan-tester Client Recv Raw - Success)
+------
+kernel BUG at net/core/skbuff.c:212!
+Call Trace:
+<IRQ>
+...
+packet_rcv (net/packet/af_packet.c:2152)
+...
+<TASK>
+__local_bh_enable_ip (kernel/softirq.c:407)
+netif_rx (net/core/dev.c:5648)
+chan_recv_cb (net/bluetooth/6lowpan.c:294 net/bluetooth/6lowpan.c:359)
+------
+
+Fixes: 18722c247023 ("Bluetooth: Enable 6LoWPAN support for BT LE devices")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
+ net/bluetooth/6lowpan.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index f0c862091bff..f1d29fa4b411 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -289,6 +289,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		local_skb->pkt_type = PACKET_HOST;
+ 		local_skb->dev = dev;
+ 
++		skb_reset_mac_header(local_skb);
+ 		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
+ 
+ 		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
+-- 
+2.51.1
+
