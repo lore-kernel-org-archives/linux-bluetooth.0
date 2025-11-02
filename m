@@ -1,269 +1,159 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17722D9482;
-	Sun,  2 Nov 2025 16:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762100592; cv=pass; b=MR+indJbdRkmYcJE8HkX7hcrMrvk2cRS0y8qm+495jpm4Acqd24Z4Xbd8ccWDqNq21SJz9Wj31bjOxeUHIwJDal1FzqghjgtODL+qSuWFAK3ToEIuQ0fPigvesjL+/21f0oqIJ0/U8WiKILozOm08v7OdNRq9u+VC1B37vpO5wg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762100592; c=relaxed/simple;
-	bh=vqHSxlN8vW0IkYc9EJdmBchIKyWnN2BFQ2urrmra6ZI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z9zZ0WkeOPoBi5WUJHKOuzmpslQRNLGiPxiCFRrLF/ngo8vy95sTSmAFgArWO2EL79Tau0GiY8d3rgWfCLYJVfMbp/wK4T5u5qovuNVgxQX6RUCWwO+nZ+A340S+zGGPfd96dc6xAreS2XWcIe8tRbiuJ+gdEtfazSw7RYfqNr8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=ooPYsFBj; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC0E1C84CB
+	for <linux-bluetooth@vger.kernel.org>; Sun,  2 Nov 2025 17:04:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762103061; cv=none; b=a5w1iD9HJLMJNkzsLndAvqhjxw2nTkovlvF+FKmVZiMiaNzZ5VrCQrEkQwpIgihhBV2Kjaxxxwgyba11kClm4s7aOGGkFGTaGrKvxPnR3j/UPa4BdwU5HxFnZwex/ysa2d30Umr57d6QKLHA44mcot7p7Q2LG7VozQzF7CgrHVk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762103061; c=relaxed/simple;
+	bh=wvRlsBuHx7mRuU/cgRB50BRlsshjySzyZqudZUenMwo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=TF1FKXSHqWliy+LWuiob0zZTyfJ6TChBkDFpaaAEVM5FC7JaH4XmcLoCzzyUruO1+7HHenCjUd8/RAQTGt7W0V1R9UfpIepovwl3TJ39T12+iYZuw7Juoe9NS6nHlnpuA/G65I1ysIgqa+UO6FEUKGuB2cHUbLNw1xwpkZhN19M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cGCfDr4/; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="ooPYsFBj"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4d00Pg1dVkz1064;
-	Sun,  2 Nov 2025 18:23:03 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1762100583;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bp0L8CrmTikzBpE/RQPCqJwcoGrZ9MB/Tpu/IkmyOiI=;
-	b=ooPYsFBjXYBKBPevx7ySOJKLVRHr+0Ey3veZomA3VdYQZQlsghNrIbokARz4mc/xmGDSbL
-	Zh0BP7ikFNRRItzKQNvsmemk4i/IBJnNuWccr5UTKQ5XSF4btlo2pP48tsxa8sIhqkR/Zb
-	wJyvWx+scCBpB6JMkyEn2yeZPV72QYY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1762100583;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bp0L8CrmTikzBpE/RQPCqJwcoGrZ9MB/Tpu/IkmyOiI=;
-	b=aBBZSbSqKcotsgm7DPczOniUwJuQ89rsqxgY6yMHxSm42WHlnTq1VrGkbasU+UTfSEpO7R
-	AP5fU033idhVw+c7Fi3JCj3mFFPy2meGHRl5+f6BgC+QhukOD5rNKAaa5JoyWGdym2MxvS
-	s6Ac8DAvzx+DJU+Dji97IlzE9RlVaq0=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1762100583; a=rsa-sha256; cv=none;
-	b=wbc4d0UsTBtEJaa5gTLsqvJXVQc4tVy7WF8F14IKfBhp+eoPw7Dp9Gt+vqCm47o29Q7B4w
-	CtqL/5eegG8ZOveCdwbdHiSqoLUI1oTFgN7ftsAQ9gepLZqFJv62UbmbK/CONe+FGQA40o
-	KE+O/QvUSRzV9LBq37mkLFlQGlc3e7I=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 8/8] Bluetooth: hci_sync: hold references in hci_sync callbacks
-Date: Sun,  2 Nov 2025 18:19:40 +0200
-Message-ID: <e18591f264c50e15917cb8b9e5f9798d9880979d.1762100290.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <cover.1762100290.git.pav@iki.fi>
-References: <cover.1762100290.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cGCfDr4/"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2956d816c10so9345845ad.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Nov 2025 09:04:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762103059; x=1762707859; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=W3SMoJRsvZ50OUnoHZm7u+qOISM2MdZG8WPQpZHL6G0=;
+        b=cGCfDr4/3IyXmIApNi5yphTLWa5NECvnjaQffN5KFu9uAbhyjhwokBxXgYz1687iUv
+         wcB6IubLFKxDRZNfOQ1gCFbVdIszlVjnPzvvQTGLJrXet9dRWQfKbpR5j5jCs0IbvBv6
+         MYr/tkqe97Pc0svHvPdMvhijrDL4Ts+mcImSOEX4yCRDYDUXTmp0yBo9gWbF8S1y1ncV
+         OxglGrxy/rVpE7JizmAaWef+qODLMDpBI9s+7xtWkY3DTbIU97FOMy+VlSFUjsR7O6wv
+         mie+FT7oUiS0lp6eo0TeEcPW0LmXQDqbPt78cueDNywFulFXuABA68BrMof908qIBeJc
+         ALAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762103059; x=1762707859;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W3SMoJRsvZ50OUnoHZm7u+qOISM2MdZG8WPQpZHL6G0=;
+        b=uA1ZPabc/FVAtR8XFe6PLg/mCEtgtx1FZvsBaZVJ4EftFofS6ioDTrrv+i6ucYzBD/
+         XMA3kuC4qIeBk2TkXgYbr7RiqBiCRJZ7Rn+SFy13C30AZJO8aS/G9NU+ygUrim4FXB01
+         BEbovllKOshE2tsNOK+YJRD92m529yw0gjkxIa7lq3RB55JNLlhcSTs0KzkI4j9/S6Pd
+         7TZ6R7x0pGsrroE+h11nyOeFX3ahE6SNBJhhZgNA19ry+QMbr0gyvtlyg+y/Qmt1Hab9
+         l5JBlxUik/Lu8fKRdRu9TyIwrnuOzcXEBv8YiPvgxKmZgC01EhCAUUtoTelEfiyz5JN1
+         130g==
+X-Gm-Message-State: AOJu0Yy0jAeLjFPKr/pVGdLfv+bPnSE2uImWnDXG2bh1PqjuDoCKEJo/
+	baRSWM/xwK0FbvXVgJGE6MVidUGUg9yLwviRzOEBYCNX0vTNOg3bfiiYDftofg==
+X-Gm-Gg: ASbGnctPGHqR45sAnjgqbZMJXdAxs8xvXCPLGlI2fUnKWUD9TW+mxfdUn9uAODxFEbx
+	GRZsBWwco3kkK/tEAZBsQmvQNuJBVG4R8cd12WwtC0E/ZFf8YU3yzP2gw/+jraoQzg6NznuAfa2
+	TG/Mmare1a8vaw2R4TloYUeVzQ3xL5LEjncbh4AsGppC6DV+oOyVbTa2tqoCCvwY7T9+eFuP8VE
+	8Nq+5GfqvGKqFt/r47Sz0fMt2kppVzTz3VtpHBYAsGZHWuWPkEps7UQ4HeO2s6A1QaNGSal/HaF
+	zwfQPECQ58N0IROKNuV+vMlTh1ACZU2bl+PEmE/jhIU1lZuPR6lQ5p3JFdiF9or8vbImgvnFmYN
+	7rI8AXFF/mFZkvSEl5AiQC9QYdMy3smpNPRFO0oWyEiB90IFVDT8J9Zd0FTiuUJzcXu/AHzkN1B
+	alat/BQ7wL
+X-Google-Smtp-Source: AGHT+IGUgnayG0ibPgRsEfLQSHsc16IgQzrMiQTaO6o4I+8sY6AMvqL1aa8S+L59iSsCgjKrW9jbPg==
+X-Received: by 2002:a17:903:234f:b0:28e:9a74:7b58 with SMTP id d9443c01a7336-2951a497483mr114519135ad.31.1762103059225;
+        Sun, 02 Nov 2025 09:04:19 -0800 (PST)
+Received: from [172.17.0.2] ([172.184.173.240])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-295512dedabsm63837655ad.5.2025.11.02.09.04.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Nov 2025 09:04:18 -0800 (PST)
+Message-ID: <69078f12.170a0220.313d30.11b7@mx.google.com>
+Date: Sun, 02 Nov 2025 09:04:18 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3812005602036163803=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: avoid concurrent deletion of hci_conn
+In-Reply-To: <2486739e3daff8e4fbc0e7fc95fb2e86f866cbc2.1762100290.git.pav@iki.fi>
+References: <2486739e3daff8e4fbc0e7fc95fb2e86f866cbc2.1762100290.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_conn_valid() should not be used on potentially freed hci_conn
-pointers, as relying on kmalloc not reusing addresses is bad practice.
+--===============3812005602036163803==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Hold a hci_conn reference for queued jobs so the pointers are not freed
-too early.
+This is automated email and please do not reply to this email!
 
-This also avoids potential UAF if the conn would be freed while the jobs
-are running.
+Dear submitter,
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1018632
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.45 seconds
+GitLint                       PENDING   0.30 seconds
+SubjectPrefix                 PASS      0.44 seconds
+BuildKernel                   PASS      26.15 seconds
+CheckAllWarning               PASS      28.32 seconds
+CheckSparse                   WARNING   32.21 seconds
+BuildKernel32                 PASS      25.26 seconds
+TestRunnerSetup               PASS      511.05 seconds
+TestRunner_l2cap-tester       PASS      24.32 seconds
+TestRunner_iso-tester         PASS      95.20 seconds
+TestRunner_bnep-tester        PASS      6.46 seconds
+TestRunner_mgmt-tester        FAIL      124.39 seconds
+TestRunner_rfcomm-tester      PASS      9.34 seconds
+TestRunner_sco-tester         PASS      14.57 seconds
+TestRunner_ioctl-tester       PASS      10.13 seconds
+TestRunner_mesh-tester        FAIL      10.41 seconds
+TestRunner_smp-tester         PASS      8.54 seconds
+TestRunner_userchan-tester    PASS      6.66 seconds
+IncrementalBuild              PENDING   0.71 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.105 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in run_timer_softirq+0x76b/0x7d0
+WARNING: CPU: 0 PID: 68 at kernel/workqueue.c:2257 __queue_work+0x97d/0xbe0
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Failed       0.130 seconds
+Mesh - Send cancel - 2                               Timed out    2.672 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    v2:
-    - fix also hci_past_sync()
 
- net/bluetooth/hci_sync.c | 66 +++++++++++++++++++++++++++++++---------
- 1 file changed, 51 insertions(+), 15 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index dc95a1ebe65e..d4420d5882d6 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6962,12 +6962,23 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
- 					conn->conn_timeout, NULL);
- }
- 
-+static void hci_acl_create_conn_sync_complete(struct hci_dev *hdev, void *data,
-+					      int err)
-+{
-+	struct hci_conn *conn = data;
-+
-+	hci_conn_put(conn);
-+}
-+
- int hci_connect_acl_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
- 	int err;
- 
--	err = hci_cmd_sync_queue_once(hdev, hci_acl_create_conn_sync, conn,
--				      NULL);
-+	err = hci_cmd_sync_queue_once(hdev, hci_acl_create_conn_sync,
-+				      hci_conn_get(conn),
-+				      hci_acl_create_conn_sync_complete);
-+	if (err)
-+		hci_conn_put(conn);
- 	return (err == -EEXIST) ? 0 : err;
- }
- 
-@@ -6978,36 +6989,41 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
- 	bt_dev_dbg(hdev, "err %d", err);
- 
- 	if (err == -ECANCELED)
--		return;
-+		goto done;
- 
- 	hci_dev_lock(hdev);
- 
- 	if (!hci_conn_valid(hdev, conn))
--		goto done;
-+		goto unlock;
- 
- 	if (!err) {
- 		hci_connect_le_scan_cleanup(conn, 0x00);
--		goto done;
-+		goto unlock;
- 	}
- 
- 	/* Check if connection is still pending */
- 	if (conn != hci_lookup_le_connect(hdev))
--		goto done;
-+		goto unlock;
- 
- 	/* Flush to make sure we send create conn cancel command if needed */
- 	flush_delayed_work(&conn->le_conn_timeout);
- 	hci_conn_failed(conn, bt_status(err));
- 
--done:
-+unlock:
- 	hci_dev_unlock(hdev);
-+done:
-+	hci_conn_put(conn);
- }
- 
- int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
- 	int err;
- 
--	err = hci_cmd_sync_queue_once(hdev, hci_le_create_conn_sync, conn,
-+	err = hci_cmd_sync_queue_once(hdev, hci_le_create_conn_sync,
-+				      hci_conn_get(conn),
- 				      create_le_conn_complete);
-+	if (err)
-+		hci_conn_put(conn);
- 	return (err == -EEXIST) ? 0 : err;
- }
- 
-@@ -7055,7 +7071,7 @@ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
- 	bt_dev_dbg(hdev, "err %d", err);
- 
- 	if (err == -ECANCELED)
--		return;
-+		goto done;
- 
- 	hci_dev_lock(hdev);
- 
-@@ -7079,6 +7095,8 @@ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
- 
- unlock:
- 	hci_dev_unlock(hdev);
-+done:
-+	hci_conn_put(conn);
- }
- 
- static int hci_le_past_params_sync(struct hci_dev *hdev, struct hci_conn *conn,
-@@ -7217,8 +7235,11 @@ int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
- 	int err;
- 
--	err = hci_cmd_sync_queue_once(hdev, hci_le_pa_create_sync, conn,
-+	err = hci_cmd_sync_queue_once(hdev, hci_le_pa_create_sync,
-+				      hci_conn_get(conn),
- 				      create_pa_complete);
-+	if (err)
-+		hci_conn_put(conn);
- 	return (err == -EEXIST) ? 0 : err;
- }
- 
-@@ -7229,10 +7250,17 @@ static void create_big_complete(struct hci_dev *hdev, void *data, int err)
- 	bt_dev_dbg(hdev, "err %d", err);
- 
- 	if (err == -ECANCELED)
--		return;
-+		goto done;
-+
-+	hci_dev_lock(hdev);
- 
- 	if (hci_conn_valid(hdev, conn))
- 		clear_bit(HCI_CONN_CREATE_BIG_SYNC, &conn->flags);
-+
-+	hci_dev_unlock(hdev);
-+
-+done:
-+	hci_conn_put(conn);
- }
- 
- static int hci_le_big_create_sync(struct hci_dev *hdev, void *data)
-@@ -7283,8 +7311,11 @@ int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
- 	int err;
- 
--	err = hci_cmd_sync_queue_once(hdev, hci_le_big_create_sync, conn,
-+	err = hci_cmd_sync_queue_once(hdev, hci_le_big_create_sync,
-+				      hci_conn_get(conn),
- 				      create_big_complete);
-+	if (err)
-+		hci_conn_put(conn);
- 	return (err == -EEXIST) ? 0 : err;
- }
- 
-@@ -7299,6 +7330,8 @@ static void past_complete(struct hci_dev *hdev, void *data, int err)
- 
- 	bt_dev_dbg(hdev, "err %d", err);
- 
-+	hci_conn_put(past->conn);
-+	hci_conn_put(past->le);
- 	kfree(past);
- }
- 
-@@ -7363,8 +7396,8 @@ int hci_past_sync(struct hci_conn *conn, struct hci_conn *le)
- 	if (!data)
- 		return -ENOMEM;
- 
--	data->conn = conn;
--	data->le = le;
-+	data->conn = hci_conn_get(conn);
-+	data->le = hci_conn_get(le);
- 
- 	if (conn->role == HCI_ROLE_MASTER)
- 		err = hci_cmd_sync_queue_once(conn->hdev,
-@@ -7374,8 +7407,11 @@ int hci_past_sync(struct hci_conn *conn, struct hci_conn *le)
- 		err = hci_cmd_sync_queue_once(conn->hdev, hci_le_past_sync,
- 					      data, past_complete);
- 
--	if (err)
-+	if (err) {
-+		hci_conn_put(data->conn);
-+		hci_conn_put(data->le);
- 		kfree(data);
-+	}
- 
- 	return (err == -EEXIST) ? 0 : err;
- }
--- 
-2.51.1
-
+--===============3812005602036163803==--
