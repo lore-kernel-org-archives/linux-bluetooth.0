@@ -1,152 +1,93 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F4D2C859
-	for <linux-bluetooth@vger.kernel.org>; Sun,  2 Nov 2025 19:03:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762110212; cv=none; b=IaAj8DJVxroQIhUyjuntAVjqsYHFzVQG9dL6vgY+1pTNd2ZOkRL3oXBlSpXnbEGKmuqKB7bDxx2VJlLeGld7+WGpmeKd+RR0ye96qLKOBpviBcx6ztSQeZTMkkFF4KQkd0uVkDj0LMrOLoo3N11eqlduJqyJnhbRmMuZ1hwGV50=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762110212; c=relaxed/simple;
-	bh=+Ls8RzqBRRBa0b22Ct4E+FoUEteAwJMhoijPWR5jXps=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ix2r4IRetbUe8HtDfoWqXhqXX8KRD23OSJEfAoUTTYtqZbWXRJSxZK4pLfIVL4D0cuC9EImMZSJs0c/skR23BWOK1AHgreZvlg+pipUte8LtkNRqZZJ/OpNof4WVPRXmcTq4tVlOYI9Jc24zbptS5oOXOx6rZNcqoy2zMF9/GWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j/xKTOk4; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B38D1E98E3;
+	Sun,  2 Nov 2025 19:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762110645; cv=pass; b=RaEgZbki8mar6uZtUa11DRciMrfyGq3dXdvCaA1ghEzXsnChpcxj3qtt4iiDAJpO8OLn4zpnku6XwkzavSu8un1OKE7529ZPiHIqCgGQDi2VDy22WelWcXlmUsfiLhHNqjCkw/G85LG1HpBRn4G8fTqKqCWwOkxjR6GUxq+qUYo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762110645; c=relaxed/simple;
+	bh=85YAsu0JXmPoJve1uWT8OdsdgthE9YF5aeTRmOu1n84=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hKw/Jk3GP81rWm1bJ1md59LNxxmm0OhVQaNKA0shWe+Isgx+C9MSNr46qi50t8S2xVosd01gOApQGVrU8p7nor3dfoxWEpFcJwIO3BaSePX3pGrq4q29KfWRFHRWpdLkYEKL8YM69hOjVXsf7hw/nX4CZEojhdWnCl/S2xKwEJ8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=GOJ4qg5B; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j/xKTOk4"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8ad29388523so115602085a.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Nov 2025 11:03:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762110209; x=1762715009; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3bp3PeXFARQVrbA+um2aXbzzgiott01MYkX+4ICXhHs=;
-        b=j/xKTOk46UziXy1rt0Z0KYqKv0RZoh2HA36d8kKPRxxiqErQs9DWXs84nRbkEanSTg
-         ezNeSQYbbLKD/2wVOPkLPFzKbJ6GLfeiUy08ct2bJaT3xqJ76AGWNK16BROZsN2nMAcy
-         6glKOWh2qYoR8nIrf1NwDcrHrvmpx8iNDsFuMwbmWUGkLN6BMCFPtwpSG2hXvNFyO32Y
-         uRekBtJfwBEoro4kNOqAiSswJtHikOb5MsbgkF8QOMkGcqE299dVYyEZoh3BvJxdEi5J
-         U64wQl+atFvZaRrX3Q6bVYn6zccGduNXA7jbvseN1UzdJ7DkH0cc4q1e86y8RRGVJbyB
-         Wh8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762110209; x=1762715009;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3bp3PeXFARQVrbA+um2aXbzzgiott01MYkX+4ICXhHs=;
-        b=UCbiLJilwoEvYf/9wikYFoebBiLCrA/WkL5qUVnWLSSSS/IhfrQq61EVpHZDM66t6l
-         scNI4aWmLuQAg7aiHU83Hy3Jnjh3IQUazz6PPbV3aKl/xcGH75eMgycMc0nECs+IN1yM
-         uzaQ/KaYlvBlbuRTGkoGYAPKUYV4kxwDYuKldaP1B+7Ko9ULJnL7rSpKedr7Mbe+yJOm
-         I8C5beEA7QXgSEYo4sTGWmWGxcym/n4K1/S89aVfQfjYo8FR0D1mmWIArd1lCq44At7v
-         cSDZmv558DWuLPu7clA5uKicQgDSeRQTgJiqWHPTnWZ2Ba/3G5uIAPftgFIztV61fX08
-         jZCg==
-X-Gm-Message-State: AOJu0YyxUEyrPevxJwPIF+5UABhakI/89fu7lglHqwZRQpcDURbfRQZy
-	ShEFg4aYNfIWyaCphKOSzXbjuZQy0tzESS1TRLGW9nVB0CgHsy+jYO/LaspNacWA
-X-Gm-Gg: ASbGncuA4VunTOMwewju0F83SbHExHoIlShpXN01lxpkycdHBZTfKOjsLS2nV3CJpzt
-	GqG3ihf0IHEOJhdPBwfDOvcl086vMva8mmupMhcgjtf+lEW5AGs2qZr36rV2z/5oS4XNu0fFcwI
-	V6hRyqoCMKsNzMlGINZgvB97BqTg732j01NnP20PFSIbv35Lx7VN2+AIbYQBZnst7QoD4643QeJ
-	3yfYAuCnriZ1g9f8JOUwR9Inzj+pswiUFUpNcRpiU25D2q8uZNepbKnzpDa/J00wJ1M9DwosT+a
-	FmgOj6ex1PQU0CfblWvVSajo22ka3iDrS24JUBLTmoxSjQfPozXZyiYuVN3KE/Djd6avkfI3kKB
-	1p+f+ZCW0vB55T3h/idKx4qakl97O1LXbGw4Ma91w4MrzyoEs+bh023Ixgogdt7S6hkJ/tY4qUf
-	Qi2SqM
-X-Google-Smtp-Source: AGHT+IGgvG6RklMyciWt2+YtKTHHGYFYdGzLEs7YdlY/Zyglde9G3bgjKrH1LGUxz+M6f3lDMedhhQ==
-X-Received: by 2002:a05:620a:1a0b:b0:891:d993:1bdb with SMTP id af79cd13be357-8ab9bb6e274mr1183583185a.86.1762110209353;
-        Sun, 02 Nov 2025 11:03:29 -0800 (PST)
-Received: from [172.17.0.2] ([20.161.60.20])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ed35354982sm43557991cf.34.2025.11.02.11.03.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Nov 2025 11:03:28 -0800 (PST)
-Message-ID: <6907ab00.050a0220.280034.9ef9@mx.google.com>
-Date: Sun, 02 Nov 2025 11:03:28 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4131201846033079824=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="GOJ4qg5B"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4d04735mh8zyTf;
+	Sun,  2 Nov 2025 21:10:39 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1762110640;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TyDz8UTU1XS+dg3StBHEDETctWzgVmHJp0QgzB1R4XU=;
+	b=GOJ4qg5BPXFl9NvfONQWRPdfYq9NPlVya0MXnyd60bqgLmzzm/WRS++9zp0onYtmdR7nXl
+	wkdHp3djBLysesrvof7NfOSW3rCn6rOUjIVWszfgFMReWxmL7+V+2z3G5LWyXAx0nRYbzg
+	V7mZ3kvlsjRPgI/FV/dzYpB9yEa3TpA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1762110640;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TyDz8UTU1XS+dg3StBHEDETctWzgVmHJp0QgzB1R4XU=;
+	b=mfgsIAjb8Y713rwLtDERPSQG7MjSC5bSS6D/henf9LT2xvTrqSnJnToA0xoyMpLdavOUfC
+	f/xYNi2YlzCkRY4Zbuqyn2UEZbHYJSYiOWhTVs8ot+eFAe60USJMhfBfO988dFE0jH+lsb
+	TMwPiTXNqJRX/Nu7LPnHfphJdXBFrpc=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1762110640; a=rsa-sha256; cv=none;
+	b=U6PXPD9ly/NC3XaXhOxIr+BO5yQAKEJImjaKaQ+rEyvZ22s9nnbIdhJyK/DaqP8eTOKnt9
+	gHtcd1wsuPo88ff/K+sJt3eyf7YRExwMJk+oNnnO5Qd6cc8gH6acmVPO/78726b6xwXs+g
+	fnh8lFlBOs5yh78uXhZt4i4TSiMH1y0=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	perex@perex.cz,
+	tiwai@suse.com,
+	linux-sound@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ALSA: usb-audio: add min_mute quirk for SteelSeries Arctis
+Date: Sun,  2 Nov 2025 21:10:15 +0200
+Message-ID: <a83f2694b1f8c37e4667a3cf057ffdc408b0f70d.1762108507.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: Bluetooth: MGMT: cancel mesh send timer when hdev removed
-In-Reply-To: <75b74d712d9eff4d79f05476973c004c226c08bc.1762107269.git.pav@iki.fi>
-References: <75b74d712d9eff4d79f05476973c004c226c08bc.1762107269.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4131201846033079824==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ID 1038:1294 SteelSeries ApS Arctis Pro Wireless
+is reported to have muted min playback volume. Apply quirk for that.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1018649
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.24 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      25.18 seconds
-CheckAllWarning               PASS      27.33 seconds
-CheckSparse                   PASS      30.74 seconds
-BuildKernel32                 PASS      24.50 seconds
-TestRunnerSetup               PASS      493.07 seconds
-TestRunner_l2cap-tester       PASS      23.43 seconds
-TestRunner_iso-tester         PASS      69.88 seconds
-TestRunner_bnep-tester        PASS      6.07 seconds
-TestRunner_mgmt-tester        FAIL      109.59 seconds
-TestRunner_rfcomm-tester      PASS      9.04 seconds
-TestRunner_sco-tester         PASS      14.06 seconds
-TestRunner_ioctl-tester       PASS      10.13 seconds
-TestRunner_mesh-tester        FAIL      11.52 seconds
-TestRunner_smp-tester         PASS      8.38 seconds
-TestRunner_userchan-tester    PASS      6.75 seconds
-IncrementalBuild              PENDING   1.01 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.100 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.134 seconds
-Mesh - Send cancel - 2                               Timed out    1.998 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Link: https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/4229#note_3174448
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
-Regards,
-Linux Bluetooth
+ sound/usb/quirks.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/sound/usb/quirks.c b/sound/usb/quirks.c
+index 71638e6dfb20..e5b857129caf 100644
+--- a/sound/usb/quirks.c
++++ b/sound/usb/quirks.c
+@@ -2267,6 +2267,8 @@ static const struct usb_audio_quirk_flags_table quirk_flags_table[] = {
+ 		   QUIRK_FLAG_FIXED_RATE),
+ 	DEVICE_FLG(0x0fd9, 0x0008, /* Hauppauge HVR-950Q */
+ 		   QUIRK_FLAG_SHARE_MEDIA_DEVICE | QUIRK_FLAG_ALIGN_TRANSFER),
++	DEVICE_FLG(0x1038, 0x1294, /* SteelSeries Arctis Pro Wireless */
++		   QUIRK_FLAG_MIXER_PLAYBACK_MIN_MUTE),
+ 	DEVICE_FLG(0x1101, 0x0003, /* Audioengine D1 */
+ 		   QUIRK_FLAG_GET_SAMPLE_RATE),
+ 	DEVICE_FLG(0x12d1, 0x3a07, /* Huawei Technologies Co., Ltd. */
+-- 
+2.51.1
 
---===============4131201846033079824==--
