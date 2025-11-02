@@ -1,55 +1,55 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE37A15530C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE46C22FAFD;
 	Sun,  2 Nov 2025 16:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762100588; cv=pass; b=bov15vB5urmAG1eZOo8biWecJ015/MBYIhNuhqPVT09ftGE+tU8hzX+vRAotjmiQUP3se/TYpikbIOl0ttna9oJNxdjk89gp1fNf7zpQTzjnnqXRsqA8t8AU6DPuNcn3I7fTRqLH43rRqt0RHHI5j7yB1S9ChxKGu00fr3lYRXU=
+	t=1762100588; cv=pass; b=GYXX963ZC4puZtJl4On5Cc1pfbbJoxCNq2JebLPY3+EYXzOWOiJfvRxsz/wM3kIFyTWHBA5bSBt+hxwyhJz5DqW5o18wXDTYvvIa8UeuspdAkX/viUWk6au80AkXY06Uql+GQz6t7Eb4xB/lPRcMVyjNI1Tuw4TBHYgf6AwWp1M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762100588; c=relaxed/simple;
-	bh=oKLjK/NSBdKcNwwSIYxIn5RHUqqNednNrnl22/bEtE0=;
+	bh=9P2BfdWr0ULqbleM1ZYC3iKyp/JalPh7fDzObFhwjiU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WOLdaqH+YlrjLqQ44iLkf6xRJSehom6+DeG1kwJC1sAR/iDC9YTXwdMZkx7VwkQYui4u8dJJqUjITwarMTNVIv39KfuVCOWeXNT81pCJolQkokYBtaaf62cgTTiC4l4v5PoKFixn5WhW9CEYIzRwZLAk2wRtdvXMGv4gXFb2+N0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=h3Kecrkk; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=g/k3QcP32EU/b5NYCE5Rkrh3PYNpw851zt9vvfwg1EG5/prvEMJAbsV4/tY0ihJIa28zRVruCp3A9VAw/dqm+KcQUMn7EixMogqQPAwB8MZeHsQgssNeu7Z6EZRRRBDlNOCvA949X8KsF+5365baZ2yoXq3u4eEXTmhG7LBNfUE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=yJCz2zKb; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="h3Kecrkk"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="yJCz2zKb"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4d00PY1cK8z1035;
-	Sun,  2 Nov 2025 18:22:57 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4d00PX0TWPz102R;
+	Sun,  2 Nov 2025 18:22:55 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1762100578;
+	t=1762100576;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9U/BbAjh/xn6PO3Jg0qRnrKxB7kTBCZUsPfq6R8y6zg=;
-	b=h3KecrkkrkYJNilgncwKlqpFrnPBPYW7etgSm2ilKPg/N/G/RfWaeRMrK2i4kQ/I4Mfbi9
-	5y2+AOsySKb0n6uiuQGtIfm7IS5aQXCFAMJUap1lE4Jy1kxDE7JjUCojp1NnIaYe8n02LO
-	2vPHFB8bukmDZf13yFMw+zpxzfaBdgE=
+	bh=FXhhbeiBtqg1CFuh+OtSZuOuHQVw/IOKMOafPmVriC4=;
+	b=yJCz2zKbg6SzBpz7fxhEiZeTowd6b0X3UrxV9cOum9ZBXOVGYuREAO/isGSwK5SsraVR4I
+	dAuoROBP8SQE64gLc4Ui/KRRI4wmK6t2INm/fwZY+do4P2pgu/K34/wZ82q3x8tb8+Yw+n
+	i2hzDA2uR388hq+5xlm2yWEmVUkZTo8=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1762100578;
+	s=meesny; t=1762100576;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9U/BbAjh/xn6PO3Jg0qRnrKxB7kTBCZUsPfq6R8y6zg=;
-	b=ODVtqh5dlPWkrTxnI9yr44mUlkIPUyS8o6eoN5w93U0l4vdUrQGpXogNwx1pQ2Uz1XM+mX
-	R1y8F03PB4NL9r45TIZEo018nlzSzF+WbW8B4oNUes8yu+F6vD0nl+Q221sU26PBVL/Kp2
-	xFRMZIEI2Rk82cimdLC6hcgY6eHSHN4=
+	bh=FXhhbeiBtqg1CFuh+OtSZuOuHQVw/IOKMOafPmVriC4=;
+	b=hdFcW7whbEow/4kiWn4sa1bMyjyz/V0ZD/P2jZd7ITtdBFLd0RfYrogZ10jcNPa9GAA0h3
+	dryXmHxQTTHbCMafDwJYreqF7epHVTTTpYlEttRCEfwddKlIKZ+N8C0bxvmB4eqSNrar7k
+	E52YB6B17CtjFK+NC1lyYVtp9rs0G7k=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1762100578; a=rsa-sha256; cv=none;
-	b=xsQDXlcF1OK532y0mfpHrBhr82MRqfeaWAzem4fCLEI0OPLzo9+d2YpWwSHQGDRhOJrI5t
-	yBbjUphtAkQucNXHGi7LcJpMexRWo/oxG8TSRV9LgY8kmpnS4jlQkBeFgWdrztKvhhuhgc
-	BQvpLuXaAbngnymC+xV+XrApPqwRIj0=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1762100576; a=rsa-sha256; cv=none;
+	b=xMi5b177SK/nVf+oPZtWPnNj1xZkFLfp8BRszsiFvSvwX6E5T57zuYC27Vdh+MHGJ7qkF6
+	zsYY2aD40JpLRqw6mFw7IX8wUxmVKerPPWUwQKw+oCFr5MVxQgn4Bh/tRaZ15C1bwNTard
+	TokORly0KnVFsDwB6vmnRnt+7VZH64k=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>,
@@ -57,9 +57,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/8] Bluetooth: hci_conn: take hdev lock in set_cig_params_sync
-Date: Sun,  2 Nov 2025 18:19:34 +0200
-Message-ID: <e3b024f672732a8b244022f7c9ac23826a130d2a.1762100290.git.pav@iki.fi>
+Subject: [PATCH v2 1/8] Bluetooth: hci_event: extend hdev lock in hci_le_remote_conn_param_req_evt
+Date: Sun,  2 Nov 2025 18:19:33 +0200
+Message-ID: <2486739e3daff8e4fbc0e7fc95fb2e86f866cbc2.1762100290.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1762100290.git.pav@iki.fi>
 References: <cover.1762100290.git.pav@iki.fi>
@@ -71,10 +71,13 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Take hdev lock to prevent hci_conn from being deleted or modified
-concurrently.
+Cover conn lookup and field access with hdev lock in
+hci_le_remote_conn_param_req_evt.
 
-Fixes: a091289218202 ("Bluetooth: hci_conn: Fix hci_le_set_cig_params")
+This avoids any concurrent deletion of the conn before we are done
+dereferencing it.
+
+Fixes: 95118dd4edfec ("Bluetooth: hci_event: Use of a function table to handle LE subevents")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
 
@@ -82,37 +85,75 @@ Notes:
     v2:
     - no change
 
- net/bluetooth/hci_conn.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_event.c | 33 ++++++++++++++++++++-------------
+ 1 file changed, 20 insertions(+), 13 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index d6162a95048e..d140e5740f92 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1825,9 +1825,13 @@ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
- 	u8 aux_num_cis = 0;
- 	u8 cis_id;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ba0a7b41611f..54f757017f3f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6675,25 +6675,31 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev, void *data,
+ 	latency = le16_to_cpu(ev->latency);
+ 	timeout = le16_to_cpu(ev->timeout);
  
 +	hci_dev_lock(hdev);
 +
- 	conn = hci_conn_hash_lookup_cig(hdev, cig_id);
--	if (!conn)
-+	if (!conn) {
-+		hci_dev_unlock(hdev);
- 		return 0;
+ 	hcon = hci_conn_hash_lookup_handle(hdev, handle);
+-	if (!hcon || hcon->state != BT_CONNECTED)
+-		return send_conn_param_neg_reply(hdev, handle,
+-						 HCI_ERROR_UNKNOWN_CONN_ID);
++	if (!hcon || hcon->state != BT_CONNECTED) {
++		send_conn_param_neg_reply(hdev, handle,
++					  HCI_ERROR_UNKNOWN_CONN_ID);
++		goto unlock;
 +	}
  
- 	qos = &conn->iso_qos;
- 	pdu->cig_id = cig_id;
-@@ -1866,6 +1870,8 @@ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
+-	if (max > hcon->le_conn_max_interval)
+-		return send_conn_param_neg_reply(hdev, handle,
+-						 HCI_ERROR_INVALID_LL_PARAMS);
++	if (max > hcon->le_conn_max_interval) {
++		send_conn_param_neg_reply(hdev, handle,
++					  HCI_ERROR_INVALID_LL_PARAMS);
++		goto unlock;
++	}
+ 
+-	if (hci_check_conn_params(min, max, latency, timeout))
+-		return send_conn_param_neg_reply(hdev, handle,
+-						 HCI_ERROR_INVALID_LL_PARAMS);
++	if (hci_check_conn_params(min, max, latency, timeout)) {
++		send_conn_param_neg_reply(hdev, handle,
++					  HCI_ERROR_INVALID_LL_PARAMS);
++		goto unlock;
++	}
+ 
+ 	if (hcon->role == HCI_ROLE_MASTER) {
+ 		struct hci_conn_params *params;
+ 		u8 store_hint;
+ 
+-		hci_dev_lock(hdev);
+-
+ 		params = hci_conn_params_lookup(hdev, &hcon->dst,
+ 						hcon->dst_type);
+ 		if (params) {
+@@ -6706,8 +6712,6 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev, void *data,
+ 			store_hint = 0x00;
+ 		}
+ 
+-		hci_dev_unlock(hdev);
+-
+ 		mgmt_new_conn_param(hdev, &hcon->dst, hcon->dst_type,
+ 				    store_hint, min, max, latency, timeout);
  	}
- 	pdu->num_cis = aux_num_cis;
+@@ -6721,6 +6725,9 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev, void *data,
+ 	cp.max_ce_len = 0;
  
-+	hci_dev_unlock(hdev);
+ 	hci_send_cmd(hdev, HCI_OP_LE_CONN_PARAM_REQ_REPLY, sizeof(cp), &cp);
 +
- 	if (!pdu->num_cis)
- 		return 0;
++unlock:
++	hci_dev_unlock(hdev);
+ }
  
+ static void hci_le_direct_adv_report_evt(struct hci_dev *hdev, void *data,
 -- 
 2.51.1
 
