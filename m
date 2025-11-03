@@ -1,35 +1,64 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D84D320A34;
-	Mon,  3 Nov 2025 17:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762189233; cv=none; b=cF6NIPgJET8PFalh7X7FCKB2MfBaZqT7HvY9E31gncfdKOLTjEcePa0eF4KBf+jDeg4CJPXk+7eTn8Cbg72uD/l20tbfYVs1LSpdfjnukAXNWvFo44/KDurFw3nJ0ai+EtrWpjcBhn3/SCIHzcvlxgeQOpHlu+4VS4lMaHwt104=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762189233; c=relaxed/simple;
-	bh=0zXDVuJijPp6w4w94FBd2TR0wNVoB96mFqT35Z2X7Do=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DOwRpFHSGd5HziwjdVkNwHMpBxJgUjps241DqhAT30QRcy2JICM+TFQ6eOTqlCFvnQxVSjwTOm9jYuLS5PV+IoNxbcQi2gjkBQnk2bQscLkJNuhfL3tM4xTLZAZ55xndmqmfns1tMPN8OmeTsBPCNMhlhtMY/w5pyp0q9zxHFCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k5EascSt; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5033191BE;
+	Mon,  3 Nov 2025 18:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762194609; cv=pass; b=YMt+h3/rXlU4ecmWvZIohdIubMDMxbDIEWza43mPOlrvk7oM0PNGERIQ3ETfNBGXwYX8L+hDEeVGWlCs4fz9o9GbH76B8Ft29LMbAe7QIzRKzWR3YzRJjbe9Udj9V9A8Doa6fbZYaaiHz7taTcXhrsi3K3q8tckyzHJcbRN5ncw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762194609; c=relaxed/simple;
+	bh=zv0gKD/j2UCGGjns0g8GmhckBkJTGfzoNfR0PPE3+0M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nk0Z0XxOLM7oSBagHmDEEkvXNHs48n7f/KSpuL+1mGP9UNKYbq7PfI2rubQQFSAF4HO7XsKr6FaZblg5OnzrPzafRqS8vMe1R0/FBbw6s05t68N/pMa+sERQ4AljBnhT/B5Ry+WLsPBlfKNQxFp/5QCJ0dkss/bCIazpCUS+W4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=hTpfaXXU; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5EascSt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8475C113D0;
-	Mon,  3 Nov 2025 17:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762189232;
-	bh=0zXDVuJijPp6w4w94FBd2TR0wNVoB96mFqT35Z2X7Do=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=k5EascStc+FTw/jdwEAOQKQdWBc0ndT70p2XoVgvIRWgPTcUB18oDKtXNfhY4mFih
-	 KyZKVC6AArGwJoo8pkTWX4GzMR7WeE5lG5BWbCOSVPkwOxq9Ev/65Zs0xF+YwtZDT2
-	 oRHOjt1Ze1uIwvr77wB9TrCCNtMaf2bW0hc9eIoZ5s97wL7Q83X1IzSYhtZo7u6u2t
-	 89CfchbnkSnAS22VX3ajyZX/sJgvaQ1VZW0mPQYPlXcep/eIe6/OpXSIQdckLzrsHZ
-	 URcGdosN6BoY40GP4r2lzK4aqfMi0M49PIg5fewCTmbgFJd9KxM2xggP+GEQrf0LRu
-	 Z9Yhpc2RLEXDw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AF3173809A85;
-	Mon,  3 Nov 2025 17:00:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="hTpfaXXU"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4d0g9b3b1QzyW3;
+	Mon,  3 Nov 2025 20:29:55 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1762194596;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gOeRgg8+DiILvbZr6t4qjobZPBFwYKrN2a8qo0BZFMI=;
+	b=hTpfaXXUaxrxQn2BC5tn+iX598cyQ0wJUjO16ada8qKLf/C3yVJH61BlmUzkWZEHW5LQHC
+	mC3h4vv/C4tfCMgxGbIbqvr9A8r/yRzbHTXXp76HXRm0PxCXeFcosjl10ipQruCNquUdll
+	fq+b65NZPuvmZDxvtyc4O1t7Fg1ompg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1762194596;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gOeRgg8+DiILvbZr6t4qjobZPBFwYKrN2a8qo0BZFMI=;
+	b=x+M0tkstS2vWo0ci0rx/mF+chqRqD6KzpsP64udSITlwt98cxaQ4fzHpLf6XaHnsYYTMiL
+	i8XqIhjmVzsC5gItIz2BQH9l8qC3yvRN9wYyPiIIfl/kZ1rkP01itDfWZHXu1QQ0NROk8G
+	/rDEeYuBC+CXsrclfluZ3/yk1KzLChk=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1762194596; a=rsa-sha256; cv=none;
+	b=HCrmmgtX+1UfToW57SgP2UoIXqUmnTWUp5Z5PltNKa4a2srX9uinhw5D7JdH+crKad2lTA
+	hXhKurLS3mdKPwqYDR18N3wbsobszrvQXEf6daTEOP/E9m3YLwzokNQ3S9pBJ7lTTo+rpf
+	TNgHoZxEKAxdPnfyp0tKUx+QMX8FEzk=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH v2 1/5] Bluetooth: 6lowpan: reset link-local header on ipv6 recv path
+Date: Mon,  3 Nov 2025 20:29:46 +0200
+Message-ID: <467024bf1ba60184bff304d23de33abb0ed2384f.1762194056.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,43 +66,52 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: MGMT: cancel mesh send timer when hdev removed
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176218920751.2128161.3685266924525568180.git-patchwork-notify@kernel.org>
-Date: Mon, 03 Nov 2025 17:00:07 +0000
-References: 
- <75b74d712d9eff4d79f05476973c004c226c08bc.1762107269.git.pav@iki.fi>
-In-Reply-To: 
- <75b74d712d9eff4d79f05476973c004c226c08bc.1762107269.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- johan.hedberg@gmail.com, luiz.dentz@gmail.com, brian.gix@intel.com,
- linux-kernel@vger.kernel.org
 
-Hello:
+Bluetooth 6lowpan.c netdev has header_ops, so it must set link-local
+header for RX skb, otherwise things crash, eg. with AF_PACKET SOCK_RAW
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Add missing skb_reset_mac_header() for uncompressed ipv6 RX path.
 
-On Sun,  2 Nov 2025 20:16:12 +0200 you wrote:
-> mesh_send_done timer is not canceled when hdev is removed, which causes
-> crash if the timer triggers after hdev is gone.
-> 
-> Cancel the timer when MGMT removes the hdev, like other MGMT timers.
-> 
-> Should fix the BUG: sporadically seen by BlueZ test bot
-> (in "Mesh - Send cancel - 1" test).
-> 
-> [...]
+For the compressed one, it is done in lowpan_header_decompress().
 
-Here is the summary with links:
-  - Bluetooth: MGMT: cancel mesh send timer when hdev removed
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2747d9296177
+Log: (BlueZ 6lowpan-tester Client Recv Raw - Success)
+------
+kernel BUG at net/core/skbuff.c:212!
+Call Trace:
+<IRQ>
+...
+packet_rcv (net/packet/af_packet.c:2152)
+...
+<TASK>
+__local_bh_enable_ip (kernel/softirq.c:407)
+netif_rx (net/core/dev.c:5648)
+chan_recv_cb (net/bluetooth/6lowpan.c:294 net/bluetooth/6lowpan.c:359)
+------
 
-You are awesome, thank you!
+Fixes: 18722c247023 ("Bluetooth: Enable 6LoWPAN support for BT LE devices")
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
+
+Notes:
+    v2:
+    - no changes
+
+ net/bluetooth/6lowpan.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index f0c862091bff..f1d29fa4b411 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -289,6 +289,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		local_skb->pkt_type = PACKET_HOST;
+ 		local_skb->dev = dev;
+ 
++		skb_reset_mac_header(local_skb);
+ 		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
+ 
+ 		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.51.1
 
