@@ -1,187 +1,208 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B452A381C4
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 18:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A352C11E9
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 22:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762281608; cv=none; b=sjnhbPjxKCT2yywNGMP3n08ObR7oMUJC6uZTlF8aOUopqtcH0+WLxCX90J1/O3ofYScjisXQPqRyGKdAw4sgbYRoGdc5F92aHt2kKCBAFTziEpivgUYyPRf/JaS9UstWDWZYlqnYiu147IAqihh7fe6W10zRzLIX6q4A/Kj8riA=
+	t=1762295283; cv=none; b=CoMzZbKr5Dw7CbScIvGShrKc2iOg64CANVY2vcdpyF6sUeGAOatefWU0H+j6rw/ojIbvTCJAg8JIedwfjtAkC+nZh5oSYr50VCc8F5cKAHtpgpwj48qdv19XvttGrQdJhgwG+2A+f9KkiRyX2/LsPPEEYoRMGj97LJLQcIWDLsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762281608; c=relaxed/simple;
-	bh=QGiYbNC6yMdsFyC/01kl7c02qYpJBJHq/kejlIP1u5s=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=Ye7RZLe1jZcsMzhT/lRaqy6LU0LiVMkqxX404ILMlOpAPnopzdQpCgyTj+xcgCb5duHpsJ9Ligl9BcLsY69I7v9DoMfehzzK8dPGM5td4Qp5niONOf5PeZSr7K6sF4DaZxaf9FI3KLDlgBBBNRbVWIFD5N0s7WfeCajeU3x30Y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AGO/PFVt; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1762295283; c=relaxed/simple;
+	bh=s7USCwnJrrK6mlhok1ks2/kCBfERtEmutYzSsYkw+y0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=HYhdirSTm63RklkMQwKGq7EVHtzC1hMu9OTjkjjY8Si7mPi5ulM1+uGpge/pTOTjos/sjPK0cSg2/vl6W1yl/Vce2Z8uc5Zj3TJzPnwWqFLcIH802MO7zRIi4IdX1L7itJcz/5ngolhI4DMdwnZ2IA6GVAT4j/wvx1ptR5eLYf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TnvW/BTZ; arc=none smtp.client-ip=209.85.217.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AGO/PFVt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762281607; x=1793817607;
-  h=date:from:to:cc:subject:message-id;
-  bh=QGiYbNC6yMdsFyC/01kl7c02qYpJBJHq/kejlIP1u5s=;
-  b=AGO/PFVtMFdiotrwWvZrvjcH5jabng3KFw42w+sr8B4kI61PRKTQONHW
-   VTeiltD9kUE0M6LlYuQa3dhhhVt2hJn3msFOYEQ2m18NpDC6vy9XiSc7r
-   ToUqaoOG6p72JZwyLKJRlegtcCRpNL0KaYLJ0IHivNKSaSyG/YmwYCLzK
-   Bzm0h0UPV8+FnGCfIOfi0MyaXyKhsfEaFk0+8iNSKbvH6o5zux8TGcfDe
-   iwCP4HAKmMvq/jrtKNhUM4tfpjgz8jBvt+p2zK4BZcrsfBqHFzIyiBgoT
-   YP6hh2tokaSgM2O9eKvJv0IxVXA4l9L+0EIFJSlCbJVdC8+VLy2NkkrCI
-   w==;
-X-CSE-ConnectionGUID: EhEnNisITF2h49tfE8PXVQ==
-X-CSE-MsgGUID: sboJs5c0SUSRH3ntZc+XKA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11603"; a="63396136"
-X-IronPort-AV: E=Sophos;i="6.19,279,1754982000"; 
-   d="scan'208";a="63396136"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 10:40:05 -0800
-X-CSE-ConnectionGUID: JgZ0uL6NTVudA24KZMuY/Q==
-X-CSE-MsgGUID: w65o1ZJ4SyeiwRD4facahQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,279,1754982000"; 
-   d="scan'208";a="186474950"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 04 Nov 2025 10:40:04 -0800
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vGLwn-000Rjo-1q;
-	Tue, 04 Nov 2025 18:40:01 +0000
-Date: Wed, 05 Nov 2025 02:39:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 2747d929617743ecba08eeeb310283b4be681383
-Message-ID: <202511050228.PpgMgcwk-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TnvW/BTZ"
+Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-5dbcc814b80so1799800137.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Nov 2025 14:28:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762295280; x=1762900080; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pn3xzbHXUNYQkS7ILXK0JudVYBFsVEKhPwK7vvBNB3c=;
+        b=TnvW/BTZ/5zqOmCZX0lMiwXl75swX1myNJ9P2TuWUeodlV/IKwbXojTlKCHsczCnAi
+         pvX1RbXUlE31U78+PEJMfmUhDOEhyoVHz8jNYrNHtnLUqPCJP63SUoTyo78Aw8y+MB2D
+         U90aE/MundtrFUMKVrD+A5UgRZThfJ7kB3HsGczmcC8ut3beCT7vcc26Bf8fm9mkD7t3
+         ih6EeY175rjYpHThmzkQAVKT0i8ovzqFj3ERuUL9q3XrQKgF94Xk0xn6kEUHEEvsEhos
+         6h3R5RKpRUznGLAS+woYzutDJcAfuqlHWyzzSAQXXCBtuoqRKgV+k4hwkgZNNnUm22v3
+         MRmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762295280; x=1762900080;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pn3xzbHXUNYQkS7ILXK0JudVYBFsVEKhPwK7vvBNB3c=;
+        b=SRn8QV7mgIrIT6gaUxVB+rTqRsAMXX3SE4KgQB1A2/rs/zRnzEbgi+yReiy04EUO9g
+         MiKl029lYgavCvHbQ0bkaAuFdNEWJiMEg75K1K9V3KEOVALQ+HIzvEXQpYJ9vAiaVXUe
+         25X5uj7su/Sv0ZBGihMIqUopL4Jf1sYWoUPDOpDNB2IDtrVkLmfO1Iq87+7pQdu5MWJk
+         SS4V+UDOUhAvcdjaOrpWWK7TE5dnU162XAT5L9APIrzSofQIv71SN/APYLRfjQbkMyYp
+         KXE7GPkUzHi+/YAqbr9rud9kzTYP96Ty+Jc9JbM3l9qqARfX9AF+G6xEZ2aiE2XftTH6
+         dNLQ==
+X-Gm-Message-State: AOJu0YzOlN5HCcvKfLqy4hfEgw0J5waIRPcaeA0ley8uCcAkjReQ2A0G
+	/QjzCaMg600WI0hXX2x/P8igYAIt6ejcJ6h5B33cpDu0wf+sOqApEgxQX/WqvFhdq3o=
+X-Gm-Gg: ASbGncvB4R9ZXfRSmhbAHiXxUmW5Jq3uEKvBQ/6JVQ/jpkgr6/9YVpyMoWJoAJ+x/Vg
+	jKuM79Qr/hYXFr0fyUdYbXE6K41o99OJzweX4HCJI7uGZz0+SyxSDrEbtOq26JCsSrgVX6PDX2K
+	2JVOdFWUriumUJbJw2uRLjWOkSGk78iSLLGSiJsWsK+V/DMcW4ZTa04lSAS7zoNas6UC0ilphwb
+	yOT+O+RqSZvM4/2DWaZkVdRo2fIjatbuR12YCsqqVzi8XZwUj6TkDbNkv1fo5unlENNM8LQm6hl
+	BwezDN26gt4rR1mUXnIVTDRtUEf5APVVpvSjc7YDbP/PvYRSb3IJmudF0sNubt5eA2EvI4Woddt
+	47P2KKp10M3Eus08JzCl3kJauPu57BT8s/OQ1CL6I3tKW5f47MqtI/gAsUrnUi1JRRLT8oIE8qJ
+	zOIpxlSiPuG99C0w==
+X-Google-Smtp-Source: AGHT+IEZdG2TmgxV2iwNJKKQwWRBvoOWbAst976TlN8LxdUu6fOvOaNiJtDx6rntdJr/t729Xkuogg==
+X-Received: by 2002:a05:6102:6c9:b0:5d5:f6ae:38dc with SMTP id ada2fe7eead31-5dd8926a346mr398968137.39.1762295279812;
+        Tue, 04 Nov 2025 14:27:59 -0800 (PST)
+Received: from lvondent-mobl5 ([50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-93542b31d18sm1477013241.11.2025.11.04.14.27.58
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Nov 2025 14:27:58 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_conn: Fix not cleaning up PA_LINK connections
+Date: Tue,  4 Nov 2025 17:27:49 -0500
+Message-ID: <20251104222749.198958-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 2747d929617743ecba08eeeb310283b4be681383  Bluetooth: MGMT: cancel mesh send timer when hdev removed
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-elapsed time: 1479m
+Contrary to what was stated on d36349ea73d8 ("Bluetooth: hci_conn:
+Fix running bis_cleanup for hci_conn->type PA_LINK") the PA_LINK does
+in fact needs to run bis_cleanup in order to terminate the PA Sync,
+since that is bond to the listening socket which is the entity that
+controls the lifetime of PA Sync, so if it is closed/released the PA
+Sync shall be terminated, terminating the PA Sync shall not result in
+the BIG Sync being terminated since once the later is established it
+doesn't depend on the former anymore.
 
-configs tested: 110
-configs skipped: 2
+If the use user wants to reconnect/rebind a number of BIS(s) it shall
+keep the socket open until it no longer needs the PA Sync, which means
+it retains full control of the lifetime of both PA and BIG Syncs.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Fixes: d36349ea73d8 ("Bluetooth: hci_conn: Fix running bis_cleanup for hci_conn->type PA_LINK")
+Fixes: a7bcffc673de ("Bluetooth: Add PA_LINK to distinguish BIG sync and PA sync connections")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_conn.c  | 30 +++++++++++++++++-------------
+ net/bluetooth/hci_event.c |  7 +------
+ net/bluetooth/hci_sync.c  |  2 +-
+ 3 files changed, 19 insertions(+), 20 deletions(-)
 
-tested configs:
-alpha                             allnoconfig    gcc-15.1.0
-alpha                            allyesconfig    gcc-15.1.0
-arc                               allnoconfig    gcc-15.1.0
-arc                   randconfig-001-20251104    gcc-12.5.0
-arc                   randconfig-002-20251104    gcc-9.5.0
-arm                               allnoconfig    clang-22
-arm                        mvebu_v7_defconfig    clang-22
-arm                             pxa_defconfig    gcc-15.1.0
-arm                   randconfig-001-20251104    gcc-14.3.0
-arm                   randconfig-002-20251104    gcc-10.5.0
-arm                   randconfig-003-20251104    clang-22
-arm                   randconfig-004-20251104    gcc-8.5.0
-arm64                             allnoconfig    gcc-15.1.0
-arm64                 randconfig-001-20251104    gcc-13.4.0
-arm64                 randconfig-002-20251104    clang-22
-arm64                 randconfig-003-20251104    gcc-13.4.0
-arm64                 randconfig-004-20251104    clang-22
-csky                              allnoconfig    gcc-15.1.0
-csky                  randconfig-001-20251104    gcc-10.5.0
-csky                  randconfig-002-20251104    gcc-15.1.0
-hexagon                          allmodconfig    clang-17
-hexagon                           allnoconfig    clang-22
-hexagon                          allyesconfig    clang-22
-hexagon               randconfig-001-20251104    clang-22
-hexagon               randconfig-002-20251104    clang-16
-i386                              allnoconfig    gcc-14
-i386        buildonly-randconfig-001-20251104    gcc-14
-i386        buildonly-randconfig-002-20251104    clang-20
-i386        buildonly-randconfig-003-20251104    gcc-12
-i386        buildonly-randconfig-004-20251104    gcc-14
-i386        buildonly-randconfig-005-20251104    gcc-12
-i386        buildonly-randconfig-006-20251104    gcc-14
-i386                  randconfig-011-20251104    gcc-13
-i386                  randconfig-012-20251104    clang-20
-i386                  randconfig-013-20251104    gcc-14
-i386                  randconfig-014-20251104    clang-20
-i386                  randconfig-015-20251104    gcc-14
-i386                  randconfig-016-20251104    clang-20
-i386                  randconfig-017-20251104    clang-20
-loongarch                        allmodconfig    clang-19
-loongarch                         allnoconfig    clang-22
-loongarch             randconfig-001-20251104    gcc-15.1.0
-loongarch             randconfig-002-20251104    clang-22
-m68k                             allmodconfig    gcc-15.1.0
-m68k                              allnoconfig    gcc-15.1.0
-m68k                             allyesconfig    gcc-15.1.0
-m68k                            mac_defconfig    gcc-15.1.0
-m68k                        mvme16x_defconfig    gcc-15.1.0
-microblaze                        allnoconfig    gcc-15.1.0
-mips                              allnoconfig    gcc-15.1.0
-nios2                             allnoconfig    gcc-11.5.0
-nios2                 randconfig-001-20251104    gcc-8.5.0
-nios2                 randconfig-002-20251104    gcc-11.5.0
-openrisc                          allnoconfig    gcc-15.1.0
-openrisc                 simple_smp_defconfig    gcc-15.1.0
-parisc                            allnoconfig    gcc-15.1.0
-parisc                randconfig-001-20251104    gcc-8.5.0
-parisc                randconfig-002-20251104    gcc-15.1.0
-powerpc                           allnoconfig    gcc-15.1.0
-powerpc                   lite5200b_defconfig    clang-22
-powerpc                      ppc44x_defconfig    clang-22
-powerpc               randconfig-001-20251104    gcc-15.1.0
-powerpc               randconfig-002-20251104    clang-22
-powerpc64             randconfig-001-20251104    clang-22
-riscv                             allnoconfig    gcc-15.1.0
-riscv                            allyesconfig    clang-16
-riscv                 randconfig-001-20251104    gcc-8.5.0
-riscv                 randconfig-002-20251104    gcc-8.5.0
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-22
-s390                             allyesconfig    gcc-15.1.0
-s390                  randconfig-001-20251104    clang-22
-s390                  randconfig-002-20251104    clang-22
-sh                               allmodconfig    gcc-15.1.0
-sh                                allnoconfig    gcc-15.1.0
-sh                               allyesconfig    gcc-15.1.0
-sh                                  defconfig    gcc-15.1.0
-sh                    randconfig-001-20251104    gcc-13.4.0
-sh                    randconfig-002-20251104    gcc-11.5.0
-sh                           se7343_defconfig    gcc-15.1.0
-sparc                            allmodconfig    gcc-15.1.0
-sparc                             allnoconfig    gcc-15.1.0
-sparc                 randconfig-001-20251104    gcc-13.4.0
-sparc                 randconfig-002-20251104    gcc-12.5.0
-sparc64                             defconfig    clang-20
-sparc64               randconfig-001-20251104    gcc-8.5.0
-sparc64               randconfig-002-20251104    clang-22
-um                                allnoconfig    clang-22
-um                                  defconfig    clang-22
-um                             i386_defconfig    gcc-14
-um                    randconfig-001-20251104    clang-22
-um                    randconfig-002-20251104    clang-22
-um                           x86_64_defconfig    clang-22
-x86_64                            allnoconfig    clang-20
-x86_64      buildonly-randconfig-001-20251104    clang-20
-x86_64      buildonly-randconfig-002-20251104    gcc-12
-x86_64      buildonly-randconfig-003-20251104    gcc-14
-x86_64      buildonly-randconfig-004-20251104    gcc-14
-x86_64      buildonly-randconfig-005-20251104    gcc-12
-x86_64      buildonly-randconfig-006-20251104    clang-20
-x86_64                              defconfig    gcc-14
-x86_64                randconfig-011-20251104    gcc-14
-x86_64                randconfig-012-20251104    gcc-14
-x86_64                randconfig-013-20251104    clang-20
-x86_64                randconfig-014-20251104    clang-20
-x86_64                randconfig-015-20251104    gcc-14
-x86_64                randconfig-016-20251104    clang-20
-xtensa                            allnoconfig    gcc-15.1.0
-xtensa                randconfig-001-20251104    gcc-13.4.0
-xtensa                randconfig-002-20251104    gcc-11.5.0
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 0b86aaddfb02..bd8c6b294eff 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -769,18 +769,19 @@ static void find_bis(struct hci_conn *conn, void *data)
+ 	d->count++;
+ }
+ 
+-static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, struct hci_conn *conn)
++static int hci_le_big_terminate(struct hci_dev *hdev, struct hci_conn *conn)
+ {
+ 	struct iso_list_data *d;
+ 	int ret;
+ 
+-	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, conn->sync_handle);
++	bt_dev_dbg(hdev, "hcon %p big 0x%2.2x sync_handle 0x%4.4x", conn,
++		   conn->iso_qos.bcast.big, conn->sync_handle);
+ 
+ 	d = kzalloc(sizeof(*d), GFP_KERNEL);
+ 	if (!d)
+ 		return -ENOMEM;
+ 
+-	d->big = big;
++	d->big = conn->iso_qos.bcast.big;
+ 	d->sync_handle = conn->sync_handle;
+ 
+ 	if (test_and_clear_bit(HCI_CONN_PA_SYNC, &conn->flags)) {
+@@ -801,6 +802,9 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, struct hci_conn *c
+ 			d->big_sync_term = true;
+ 	}
+ 
++	if (!d->pa_sync_term && !d->big_sync_term)
++		return 0;
++
+ 	ret = hci_cmd_sync_queue(hdev, big_terminate_sync, d,
+ 				 terminate_big_destroy);
+ 	if (ret)
+@@ -852,8 +856,7 @@ static void bis_cleanup(struct hci_conn *conn)
+ 
+ 		hci_le_terminate_big(hdev, conn);
+ 	} else {
+-		hci_le_big_terminate(hdev, conn->iso_qos.bcast.big,
+-				     conn);
++		hci_le_big_terminate(hdev, conn);
+ 	}
+ }
+ 
+@@ -1006,19 +1009,20 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type,
+ 		conn->mtu = hdev->le_mtu ? hdev->le_mtu : hdev->acl_mtu;
+ 		break;
+ 	case CIS_LINK:
+-	case BIS_LINK:
+-	case PA_LINK:
+ 		/* conn->src should reflect the local identity address */
+ 		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
+ 
+-		/* set proper cleanup function */
+-		if (!bacmp(dst, BDADDR_ANY))
+-			conn->cleanup = bis_cleanup;
+-		else if (conn->role == HCI_ROLE_MASTER)
++		if (conn->role == HCI_ROLE_MASTER)
+ 			conn->cleanup = cis_cleanup;
+ 
+-		conn->mtu = hdev->iso_mtu ? hdev->iso_mtu :
+-			    hdev->le_mtu ? hdev->le_mtu : hdev->acl_mtu;
++		conn->mtu = hdev->iso_mtu;
++		break;
++	case PA_LINK:
++	case BIS_LINK:
++		/* conn->src should reflect the local identity address */
++		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
++		conn->cleanup = bis_cleanup;
++		conn->mtu = hdev->iso_mtu;
+ 		break;
+ 	case SCO_LINK:
+ 		if (lmp_esco_capable(hdev))
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6edeebe46d94..51c23264ee2f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7056,14 +7056,9 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 				continue;
+ 		}
+ 
+-		if (ev->status != 0x42) {
++		if (ev->status != 0x42)
+ 			/* Mark PA sync as established */
+ 			set_bit(HCI_CONN_PA_SYNC, &bis->flags);
+-			/* Reset cleanup callback of PA Sync so it doesn't
+-			 * terminate the sync when deleting the connection.
+-			 */
+-			conn->cleanup = NULL;
+-		}
+ 
+ 		bis->sync_handle = conn->sync_handle;
+ 		bis->iso_qos.bcast.big = ev->handle;
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 1cbdd2ce03f2..a36d2414a3ca 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -7006,7 +7006,7 @@ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (!hci_conn_valid(hdev, conn))
++	if (hci_conn_valid(hdev, conn))
+ 		clear_bit(HCI_CONN_CREATE_PA_SYNC, &conn->flags);
+ 
+ 	if (!err)
+-- 
+2.51.0
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
