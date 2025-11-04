@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E67929D270
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E76A2BCF41
 	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 09:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762248503; cv=none; b=JegfbyBHsHbzYVtGsMPd+bz5UG1HUjtsTVVDWbZbt9HRTmXF0Zbb+r2RhETWj0P81NYcCwM3C7z49GmOHcFIcDb3WroFtb47tuFkV3GokEnQdNgzMWSkccvOorRKXpeGA5S/DJsnQTQI+Y1Huk+ko1lrASpuJ9TtZ9yfS1qbAVc=
+	t=1762248504; cv=none; b=kmTazmZFGmxTBR5wKquruJo0hK5cPev9v2wFKz8Qy+YHjUQFYWApm0PX4PgHOSZ48g2yvrCCqvBcjb7EdPA4j8BXKOf8TGTYJeHWihOrcpqCrtOXMbD79N9BxHLlrkVfvVmIlzMcs1Z4PriTRqVnyyYAVcVnwhDcg6QoIDM+tho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762248503; c=relaxed/simple;
-	bh=gJB5Xap/HRBGF4IiPYxOD6++7lnBTr1aJwen7JlsOOE=;
+	s=arc-20240116; t=1762248504; c=relaxed/simple;
+	bh=7UfYqu9WBBUxUDphr6biE12F/To0cfKACGyurH4kdVg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sgyg442/KnN23e31b4fVQh54/zMuWDJhkH7DIprQQnlVA/UV3GrPFAzsj1n3Mulcp0EtkOopdNOOWM6a3RVIKzubnlhqvTaBQwt7KtHIX2hvy9GMQy1FMcsT6ECEAhCR8Yr2j2ya51Ge5vdCNIn2n3HQ66C7uAQLJ/i5hjZ8FsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=AXGQ9FT4; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=HV5TUWb38yKkGE6U284A6C+pb5txI1IJSN1BqU73S7B/VBtSh1QH0Q/ocYlrXv+QGEw830bXu5v8tomOLV9Z/5Lx+YMh8ieT2XZw9P1xEwi2wEuJ1+vN03hsuZDZB8XuMnJ39sE4LSjEpj/4wtG4VOmQ0Orm7LfmVI/bQ3PbPfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=NUwyAmXF; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="AXGQ9FT4"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="NUwyAmXF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1762248494;
-	bh=gJB5Xap/HRBGF4IiPYxOD6++7lnBTr1aJwen7JlsOOE=;
+	bh=7UfYqu9WBBUxUDphr6biE12F/To0cfKACGyurH4kdVg=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=AXGQ9FT47zIB3be4Ao8HigBW4THFuzOYTsgQVK2GdTZMALiDqYdyM7Am4ZnqCT9Xj
-	 jAREnDZb1Zxgj7J8gHPlhjESbz3CoMOS09oUU69ZRO0oaKEM+tqsWjntF076gKEyXs
-	 oNghj/p8vPayfKoR2wARGsUlzPc6wvd/QiXBqXXa3LtmuToe8YdMXyAlHdEO1RaP31
-	 fYjQbybm/2tXMgBrf52uDyTyKGifO8aIKUy+LtKdrQYENpP7rkkCF0iL96jqNfpK1q
-	 cohPrbOedWeVG8KW8DZBvWArW9MP7YQMi9RfZ5T6HT7/Cr158tZDpbsegrw7PHzQTo
-	 7zz/PsBrpfGXg==
+	b=NUwyAmXFJe41Xh7LqKh4A1C6NZ+9n+DKuIH1ZaMu0QMKla7PoQkaVw0fWajDhoxxD
+	 S1d1XaqDhB7JkQhjxheXVXccjEIxbEPiNOdwiuSureEiN7s66RJBa19B+W2TnxggSg
+	 VCJ5aJtK8OSDGHNzNkPFzcKg4SyTSDhrZ5YU+O39Elms4W07vyhthqouawsMGhP7H0
+	 BIGwUPzTFINHvZDeVtU4LYOd7YhTKqFUqhhfbSQI9YUgnm5ZJBsEi5+ZccXRL7KkwZ
+	 p1exOEdBSwXgWF4Ukxso/f16yau/QvCYwkji+uNBPOOtPBp5t80jFrdxIiGu4+Sygg
+	 ast19RgCftOrA==
 Received: from fdanis-ThinkPad-X1.. (2a02-8428-AF44-1001-2EF7-962e-01c6-D201.rev.sfr.net [IPv6:2a02:8428:af44:1001:2ef7:962e:1c6:d201])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 08C3117E1398
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5360B17E13BC
 	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 10:28:14 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] shared/hfp: Add NREC disable command
-Date: Tue,  4 Nov 2025 10:28:07 +0100
-Message-ID: <20251104092808.128726-2-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ 3/3] unit/test-hfp: Add ECNR off test
+Date: Tue,  4 Nov 2025 10:28:08 +0100
+Message-ID: <20251104092808.128726-3-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251104092808.128726-1-frederic.danis@collabora.com>
 References: <20251104092808.128726-1-frederic.danis@collabora.com>
@@ -50,97 +50,61 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
+This add the following test:
+- /HFP/HF/ENO/BV-01-C
+  Verify that the HF can disable the EC/NR function of the AG.
 ---
- src/shared/hfp.c | 42 +++++++++++++++++++++++++++++++++++++++---
- unit/test-hfp.c  |  1 +
- 2 files changed, 40 insertions(+), 3 deletions(-)
+ unit/test-hfp.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 2342c24df..c2028ac2b 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -30,7 +30,11 @@
- 	hfp_debug(_hfp->debug_callback, _hfp->debug_data, "%s:%s() " fmt, \
- 						__FILE__, __func__, ## arg)
- 
--#define HFP_HF_FEATURES	(HFP_HF_FEAT_CLIP | HFP_HF_FEAT_ESCO_S4_T2)
-+#define HFP_HF_FEATURES	( \
-+	HFP_HF_FEAT_ECNR | \
-+	HFP_HF_FEAT_CLIP | \
-+	HFP_HF_FEAT_ESCO_S4_T2 \
-+)
- 
- struct hfp_gw {
- 	int ref_count;
-@@ -1996,7 +2000,7 @@ static void clip_cb(struct hfp_context *context, void *user_data)
- 							hfp->callbacks_data);
- }
- 
--static void cmee_resp(enum hfp_result result, enum hfp_error cme_err,
-+static void nrec_resp(enum hfp_result result, enum hfp_error cme_err,
- 	void *user_data)
- {
- 	struct hfp_hf *hfp = user_data;
-@@ -2004,7 +2008,7 @@ static void cmee_resp(enum hfp_result result, enum hfp_error cme_err,
- 	DBG(hfp, "");
- 
- 	if (result != HFP_RESULT_OK) {
--		DBG(hfp, "hf: CMEE error: %d", result);
-+		DBG(hfp, "hf: NREC error: %d", result);
- 		goto failed;
- 	}
- 
-@@ -2020,6 +2024,38 @@ failed:
- 						hfp->callbacks_data);
- }
- 
-+static void cmee_resp(enum hfp_result result, enum hfp_error cme_err,
-+	void *user_data)
-+{
-+	struct hfp_hf *hfp = user_data;
-+
-+	DBG(hfp, "");
-+
-+	if (result != HFP_RESULT_OK) {
-+		DBG(hfp, "hf: CMEE error: %d", result);
-+		goto failed;
-+	}
-+
-+	if (!(hfp->features & HFP_AG_FEAT_ECNR)) {
-+		/* Jump to next setup state */
-+		nrec_resp(HFP_RESULT_OK, cme_err, user_data);
-+		return;
-+	}
-+
-+	if (!hfp_hf_send_command(hfp, nrec_resp, hfp, "AT+NREC=0")) {
-+		DBG(hfp, "hf: Could not send AT+NREC=0");
-+		result = HFP_RESULT_ERROR;
-+		goto failed;
-+	}
-+
-+	return;
-+
-+failed:
-+	if (hfp->callbacks->session_ready)
-+		hfp->callbacks->session_ready(result, cme_err,
-+						hfp->callbacks_data);
-+}
-+
- static void clip_resp(enum hfp_result result, enum hfp_error cme_err,
- 	void *user_data)
- {
 diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-index fc9fb1865..94553d62c 100644
+index 94553d62c..c3f9ac4d0 100644
 --- a/unit/test-hfp.c
 +++ b/unit/test-hfp.c
-@@ -763,6 +763,7 @@ static void test_hf_robustness(gconstpointer data)
- 		'0', ',', '\"', 'T', 'E', 'S', 'T', '\"', '\r', '\n'), \
- 	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
- 	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-+	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
- 	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n')
+@@ -787,6 +787,9 @@ static void hf_session_ready_cb(enum hfp_result res, enum hfp_error cme_err,
+ 	g_assert_cmpint(res, ==, HFP_RESULT_OK);
+ 	context->session.completed = true;
  
- static void hf_cmd_complete(enum hfp_result res, enum hfp_error cme_err,
++	if (tester_use_debug())
++		tester_debug("HF session ready");
++
+ 	if (g_str_equal(test_name, "/HFP/HF/OCL/BV-01-C")) {
+ 		bool ret;
+ 
+@@ -998,7 +1001,8 @@ static void hf_call_line_id_updated(uint id, const char *number,
+ 	str = hfp_hf_call_get_number(context->hfp_hf, id);
+ 	g_assert_cmpstr(number, ==, str);
+ 
+-	if (g_str_equal(test_name, "/HFP/HF/ICA/BV-01-C") ||
++	if (g_str_equal(test_name, "/HFP/HF/ENO/BV-01-C") ||
++		g_str_equal(test_name, "/HFP/HF/ICA/BV-01-C") ||
+ 		g_str_equal(test_name, "/HFP/HF/ICA/BV-02-C") ||
+ 		g_str_equal(test_name, "/HFP/HF/ICA/BV-03-C") ||
+ 		g_str_equal(test_name, "/HFP/HF/ICA/BV-04-C") ||
+@@ -1368,6 +1372,23 @@ int main(int argc, char *argv[])
+ 				',', '1', '2', '9', ',', ',', '\r', '\n'),
+ 			data_end());
+ 
++	/* Disable EC/NR on the AG - HF */
++	define_hf_test("/HFP/HF/ENO/BV-01-C", test_hf_session,
++			NULL, test_hf_session_done,
++			FULL_SLC_SESSION('1', '0', '0', '0'),
++			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
++				'3', ',', '1', '\r', '\n'),
++			frg_pdu('\r', '\n', 'R', 'I', 'N', 'G', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'L', 'I', 'P', ':',
++				'\"', '1', '2', '3', '4', '5', '6', '7', '\"',
++				',', '1', '2', '9', ',', ',', '\r', '\n'),
++			raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
++				'2', ',', '1', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
++				'3', ',', '0', '\r', '\n'),
++			data_end());
++
+ 	/* Incoming call, in-band ring - HF */
+ 	define_hf_test("/HFP/HF/ICA/BV-01-C", test_hf_session,
+ 			NULL, test_hf_session_done,
 -- 
 2.43.0
 
