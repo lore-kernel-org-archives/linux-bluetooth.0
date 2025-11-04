@@ -1,126 +1,116 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0322E2773C6
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 11:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58BE2E62DC;
+	Tue,  4 Nov 2025 11:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762254388; cv=none; b=fj9ntYcPJ4Iq9QLQ505iRpsoTv/gCKGGjuGykROg5MwkwXbvPmaM0T4L7jnif4AWhtYKcz51QLYD02skE3bcLH1Fk3KXOE25fw1MQZu7cYkxNFbhLoG58UbdYySelZXoSzrQCAchNF3iRsRS5t8uhOevsCG8bRD5lRx1pQWDkxg=
+	t=1762255547; cv=none; b=Anjr2mIgStmyP2a1p6g51EcJd/iSqbEYXsr4JM/XLQsZOn7QZrjHWzU/msbh+DH1t0Q7nkQwDfOEuC+5orgYEwG9Zb4rmK+uxvqNOyoMIMw/u+kr2jWHKuwyjUvpq1qAUVePYvg7X2k95mZw1DhJZPRQJIhEqc7REk7FaZ16p7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762254388; c=relaxed/simple;
-	bh=UcWiyHsJB2Kz5U+kpvC5q7i9YCuZeiYmXezgsAICK5I=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g93QUUfzlt3o7PcltvFbjkri3JZh/yXw3GViJcWfSpmHsmNyHvtQZeF2rhjAomuGaoHx1Gpqzv4cSYjDcs+OGg4zeCyEaCnqHynr7jwHI0EPMKDng7YFUVt7U1jUTi682nS3KB3HSCjrxR4nxezOrTKU2wwL/bKEX2RFFq+ChbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dkNm3JJf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/yoHw74H; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dkNm3JJf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/yoHw74H; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1762255547; c=relaxed/simple;
+	bh=o7OcLfxnqWKM6nf/xV6GCKnnI7gRSA9ZAJzw9qA9RPQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nhHerE+5NWcfj3kTu7vM2maUY3abHZxWZwEOVg+O0JnpHc8gGJqVcG/lAIHk8lvbBWSfih7P87A+5RvEy56thZg1W4O6xvQcORW5+CrNf80Sipw4RtBiStNUf4WnF+HvA+ZWeoN0j2ASPhBh75n+JbsdlIauMv96gxIaEzduGt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=B+bal31w; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dkNm3JJf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/yoHw74H";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dkNm3JJf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/yoHw74H"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 2484A211A2;
-	Tue,  4 Nov 2025 11:06:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1762254385; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T+1w8v93M1maIude84/kjRuohQ/pOk2oTDPQmPP4h1U=;
-	b=dkNm3JJfq+Kee5/rpJNwXLRmwDmfR+2NEn4VhAnuIiyT2P8FHk6ojPY/t2TxX7eM/LhfVJ
-	fkDrGaN+41eQMNijJMnGl3kNMj6Rn64pduC81lTgk/ZauTjedZWnHmBT1mDng3lp7gDjUr
-	lKCw6g6B0PzND6CiPDV64akftQnqfKs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1762254385;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T+1w8v93M1maIude84/kjRuohQ/pOk2oTDPQmPP4h1U=;
-	b=/yoHw74HeESJTKOlvdXHAUAqs7qhUZqRFrDNTvUrY+FLRKNokXgHY/FXD5/Wl21j3dOn+V
-	4AOa/ytJPQpPOwBg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1762254385; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T+1w8v93M1maIude84/kjRuohQ/pOk2oTDPQmPP4h1U=;
-	b=dkNm3JJfq+Kee5/rpJNwXLRmwDmfR+2NEn4VhAnuIiyT2P8FHk6ojPY/t2TxX7eM/LhfVJ
-	fkDrGaN+41eQMNijJMnGl3kNMj6Rn64pduC81lTgk/ZauTjedZWnHmBT1mDng3lp7gDjUr
-	lKCw6g6B0PzND6CiPDV64akftQnqfKs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1762254385;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T+1w8v93M1maIude84/kjRuohQ/pOk2oTDPQmPP4h1U=;
-	b=/yoHw74HeESJTKOlvdXHAUAqs7qhUZqRFrDNTvUrY+FLRKNokXgHY/FXD5/Wl21j3dOn+V
-	4AOa/ytJPQpPOwBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E540C139A9;
-	Tue,  4 Nov 2025 11:06:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id j0yPNjDeCWlefQAAD6G6ig
-	(envelope-from <tiwai@suse.de>); Tue, 04 Nov 2025 11:06:24 +0000
-Date: Tue, 04 Nov 2025 12:06:24 +0100
-Message-ID: <87wm46giq7.wl-tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org,
-	perex@perex.cz,
-	tiwai@suse.com,
-	linux-sound@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ALSA: usb-audio: add min_mute quirk for SteelSeries Arctis
-In-Reply-To: <a83f2694b1f8c37e4667a3cf057ffdc408b0f70d.1762108507.git.pav@iki.fi>
-References: <a83f2694b1f8c37e4667a3cf057ffdc408b0f70d.1762108507.git.pav@iki.fi>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="B+bal31w"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A48g6Wj1583601;
+	Tue, 4 Nov 2025 11:25:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=9Tmbpmw0leFsTLjRv4pX4d3hLIlitQH8RGV
+	A2axkfmw=; b=B+bal31w7FsWuNCbadU35An/zxhsA8tP36P96hmtMWvI+WOzhqD
+	IQ9YmqvmDJbNRGa7ja7M3vdFm5iNGxwOUwVmVnGCy7Yu3yVHHWzr+6EO5WB+Axzk
+	H6vElWFgfjpB6WFb1WdsaRX9EZHv8xMxaMhBVjuXRSm0l2Y9+y+Nua8z6G+Jmbae
+	FW/o4WKt5EgBfr+4cMlUpNHVzkMXHvixt/ZTU0WkkpodEcA52VFarLg5iv3a/mj8
+	6BuMbjONgkjEL/sVSxpsIBb/OJgadom0/fjQQmLs3KvuiF//eQlcLraavguu6gok
+	bTVY5PAzNtjQIr9U1ZgP2ODULXXcb4QNYJw==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a79jjs8jk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Nov 2025 11:25:42 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A4BPd92025224;
+	Tue, 4 Nov 2025 11:25:39 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4a5b9mrepj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Nov 2025 11:25:39 +0000
+Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A4BPdEL025218;
+	Tue, 4 Nov 2025 11:25:39 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 5A4BPdp1025217
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Nov 2025 11:25:39 +0000
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
+	id 10269231FA; Tue,  4 Nov 2025 19:25:38 +0800 (CST)
+From: Shuai Zhang <quic_shuaz@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        quic_chejiang@quicinc.com, quic_jiaymao@quicinc.com,
+        quic_chezhou@quicinc.com, Shuai Zhang <quic_shuaz@quicinc.com>
+Subject: [PATCH v3 0/1] Bluetooth: btusb: add default nvm file
+Date: Tue,  4 Nov 2025 19:24:40 +0800
+Message-Id: <20251104112441.2667316-1-quic_shuaz@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-Spamd-Result: default: False [-3.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_FIVE(0.00)[6]
-X-Spam-Flag: NO
-X-Spam-Score: -3.30
-X-Spam-Level: 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: t8N4P9DFSmLZbLylEMIm1yt_w1SV6N4m
+X-Proofpoint-ORIG-GUID: t8N4P9DFSmLZbLylEMIm1yt_w1SV6N4m
+X-Authority-Analysis: v=2.4 cv=TuPrRTXh c=1 sm=1 tr=0 ts=6909e2b6 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
+ a=NJOSBjy7WMVMZ8b8f7cA:9 a=TjNXssC_j7lpFel5tvFf:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA0MDA5NCBTYWx0ZWRfX6bFmFXgIIIpp
+ Isx8kaoh8gFjHNP5O2CMf08y2/Oe8mKT41pavxVfnk4axNNxrPiGOxCr2/+kJucC/syFEDNW97W
+ OLWT1v4Gqc81REjrrG0h2Rfs1SWSxYRFYualew2r7pxWYynicj29woPSCPTA+QQMK073txp2pPd
+ 1RgRQQjBvK6ACEkp1ct5Dt9n2Lso7LZ4abnrYl2H6rT1xcqfuXxoMnLZb5UoG199jWNMozd/Ff5
+ FG5QJvV2BX+vOIto2DdiIGq3R1YXIlqLf4gJNI37Htm65g1VhNM28NfmUUdnzc2muMYL0br18b/
+ 4Xy4DIe/UfKpKAhkQGgn93vH2K7UtZz9epw6T3CHe4rwIXplY0Ph1Bbd6fnWtoCDYekoLPO0SO+
+ +a9XBicfbq7KQRpMJcvUEWorH7eAcw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-03_06,2025-11-03_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 adultscore=0 priorityscore=1501 phishscore=0 spamscore=0
+ clxscore=1015 malwarescore=0 impostorscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2511040094
 
-On Sun, 02 Nov 2025 20:10:15 +0100,
-Pauli Virtanen wrote:
-> 
-> ID 1038:1294 SteelSeries ApS Arctis Pro Wireless
-> is reported to have muted min playback volume. Apply quirk for that.
-> 
-> Link: https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/4229#note_3174448
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+this patch adds support for default NVM file
 
-Thanks, applied now.
+Changes v3:
+- Remove rery, modify btusb_setup_qca_load_nvm, and add board_id to enable the use of the default NVM file.
+- Link to v2
+  https://lore.kernel.org/all/20251029022955.827475-2-quic_shuaz@quicinc.com/
 
+Changes v2:
+- Add log for failed default nvm file request.
+- Added Cc: stable@vger.kernel.org to comply with stable kernel rules.
+- Link to v1:
+  https://lore.kernel.org/all/20251028120550.2225434-1-quic_shuaz@quicinc.com/
 
-Takashi
+Shuai Zhang (1):
+  Bluetooth: btusb: add default nvm file
+
+ drivers/bluetooth/btusb.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
+
+-- 
+2.34.1
+
