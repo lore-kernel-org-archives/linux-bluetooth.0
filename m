@@ -1,370 +1,132 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90AC127FD51
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 15:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEADA32340D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 16:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762271922; cv=none; b=p6VHxCf6HY/b8ZR72cjhrZcHyNBwR/4RBPNvxoy/SiEj7XVy1Ef8OAjVYfU5+H4A9T5ODa8EcUMHxX/006a6CUDSlRPRgQtvqae3EGZDLsXO95Vo6ZsqxGpiQdwAx057jxx/FeTpHNDdm3J4qP1kdTFqyJEBYc0cQkrNAbX1VHI=
+	t=1762272705; cv=none; b=QtvGlWDu67u6PSbVhkueogGWKlR/6uwKL25CvfK4yKWjuMev/Yzll2ywlUFgO4BLsu65Ydj+h5ys37TZ0WktDjj7K7xLpt3BUQkDM+ihhT4IHLN//SOr1c0h2ZjMCqQ/I4UMdSerMkqcRZJkj6rlf/pQPKEDliPtJB6Zjrne//8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762271922; c=relaxed/simple;
-	bh=OZWWLSdMeMGrZYp80Ez5P5kY+pYTGagJ1jTh7Rv586A=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=S8t+OReWdC7BltMQa6dX8+O9KerOqUofAczL0ARJPu/91AI0q95Er0Wk9s0GjTvXn5IpeTl4ZZvQuAYWRLMLBsvpgueduPSPq9upZYSCBPtQaB3YUviYKnO0KJY1Y3F1Z2w1ZS9M1s1GcZNj33dPPu1zcjEi53vAcdCSP8Obkec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 6228058458C
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 15:54:21 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AD1E24427A;
-	Tue,  4 Nov 2025 15:54:12 +0000 (UTC)
-Message-ID: <21bc36405f4f6222935536d5b49fee943a1f57c1.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v3] battery: improve the display of the charge
- level
-From: Bastien Nocera <hadess@hadess.net>
-To: Roman Smirnov <r.smirnov@omp.ru>, "luiz.dentz@gmail.com"
-	 <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 04 Nov 2025 16:54:12 +0100
-In-Reply-To: <b1148450635a6796fde4a8d3ae4955c3472bbcbe.camel@omp.ru>
-References: <20251028144320.104871-1-r.smirnov@omp.ru>
-		 <399171165c10f8edc9b39d16e06ec3d59a2beeb7.camel@hadess.net>
-		 <CABBYNZKmU3k6H4AsY-2TUVdFGQ0-rSD4=WRmi2KCKMyjz=vy4g@mail.gmail.com>
-	 <b1148450635a6796fde4a8d3ae4955c3472bbcbe.camel@omp.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=arc-20240116; t=1762272705; c=relaxed/simple;
+	bh=3hf9WzC3Yfq1c6FwfDYSgcmW7fsz+XrzRZKTBNgcSAs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=nNcxW0DlhB5OLUBgHvcwSB7Cn2AhRUhYGa2XErvrMEbmN08L6XfKIcDhXdOx7uvXbe4npayN5xghIUE6+VlgXdBZugE6ePkr3HbSoIth7zg27FjSBHd1rBSmGJL6UVd451TbxNnqGyWIeS66s+4ZVn1aMg+LZTkMf/UAAgEJwwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lJa5a1rZ; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lJa5a1rZ"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-28e7cd6dbc0so72991775ad.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Nov 2025 08:11:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762272701; x=1762877501; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+tUYNbfrI3sciT+yJtFNS9UZRx7JSB2Kth6mZZb+0BQ=;
+        b=lJa5a1rZ+uhKr6PleXl+fnjGy2ICcKOZHT6s19id/I8gGIMAM1kr6m7sxCJBtia1cT
+         QvOOn5yPHDYvoqOGubtogOWaFhhsjSRMJQs6NfovFvy0bcuRIpylH8Yu01n/0WRYkZ6L
+         08b05JIxIwleYKxPgRk9XPdYa7YSvEyWEByg4w0FfHuwHD4NQEkgLlaS8PlwoAMJhx48
+         GzWKZ2l6cgY/4rTSF71GbZYeiax2jtd12pudHBG2HbB7SHoVJHG6H69vmwFdRkRto8oc
+         kgrWQIVqefa4U+4nqQXDf2uhdgJ6uvFKZ+CBaGnADYkfd3sTypZvJG0hmAou08NXidpi
+         XsNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762272701; x=1762877501;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+tUYNbfrI3sciT+yJtFNS9UZRx7JSB2Kth6mZZb+0BQ=;
+        b=D7KJ0OLhVIR+N56oWl9C320JhJt9Q8KuWvJD9ljomd7lgHI6wGVuzR1c5kSFMNM5qG
+         5ya2XASRIKA+p3qWpjPB2/qxyD8FTv3UOnRxxNIat8rh08e2O2Z0PGy0/YnQxRkSLLTR
+         +kzuH/FQTJRQ1q23N1oZFBsusaWGoYc8Nj4zNn2EW3UjwBBJWK9DtSiYfnVTNjkoG2S/
+         yMOwuDvEzVFpYHI+lvpTfkVznSeFkgJsffv2S+pMz8AL+ItJSdj2A1pOFva6mql/g1Bv
+         +KFwR+QZeH5gL5jyc6xtwXSt/7WMehS9yd0ehJSZqZitgqsP1CYomY2aKUKC8IfrKNc/
+         Upkw==
+X-Gm-Message-State: AOJu0YxU2T4LWY4fEsNfYxmgQfKJkL09qIqv8BPN4TN1+z+o2E9+IJoK
+	je0zMYbGn6z6xRxBTLxx9lPTK35yfEJ2CpTcj5lB6mQiJuPjxj1p8Q+/S1MQUg==
+X-Gm-Gg: ASbGncvPG3P8VdRIgc+gLkocZwDV9jUxvRcqInAliRWtQaOkrBOnhhjeBS3dm+xS/bE
+	YASpFXId7vlrQ0tO600yN7ay33bKBZPeQLyuT8DCilaWN9rMLf3zag59MaXjsbu6jeHdTrikGBD
+	IIXnNoyJjFoQzUsmYeG96oOU34Nwdtd1JS5NuwA7xflmxuBGth0tiRYEVF5B6ZTlSa4WaV/XDyf
+	c++VUMpNiUujT2hceAkTfToTQI/5J82DOYFKYptDTfHIz0kadIbUs/3ao9RrT/zK6s+RB6xd1rt
+	aM8PwnBnpQFEdJ4CRp51FAzUGIk9dCR5EQHp7PR4Nh639CA7jFABcJKezl689r/JDTg/3/DjAY4
+	51TMa2pp55gn1bKUGkToBJnpa30IvRevEYd6HQq48WbtvWi4tumHMukNFxZtEdM3lneUMZ4t6oy
+	GbdF7jWRyGsaUz8A==
+X-Google-Smtp-Source: AGHT+IFkLdhN/evNWSQPS8gGok0BgSKIUncNbjyosykIoFRyUeikFAzjYwk7qW4vFDWzPR2feFxZDw==
+X-Received: by 2002:a17:902:f544:b0:295:24c3:8b49 with SMTP id d9443c01a7336-2962adb2398mr2136385ad.46.1762272701288;
+        Tue, 04 Nov 2025 08:11:41 -0800 (PST)
+Received: from [172.17.0.2] ([20.169.72.1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601a3a941sm31115145ad.57.2025.11.04.08.11.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Nov 2025 08:11:40 -0800 (PST)
+Message-ID: <690a25bc.170a0220.244c88.e102@mx.google.com>
+Date: Tue, 04 Nov 2025 08:11:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7780431284633391568=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukedugeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepvdfhkefhffehueeihfduleeuhfejgfekheevveegheeftdfhhedvhedtfeeiffefnecuffhomhgrihhnpehgihhthhhusgdrtghomhdpghhtkhdrohhrghdpfhhrvggvuggvshhkthhophdrohhrghdpsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopeefpdhrtghpthhtoheprhdrshhmihhrnhhovhesohhmphdrrhhup
- dhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: hadess@hadess.net
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/3] monitor: Decode Bluetooth 6.0 version
+In-Reply-To: <20251104142506.12356-1-luiz.dentz@gmail.com>
+References: <20251104142506.12356-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Sat, 2025-11-01 at 11:43 +0000, Roman Smirnov wrote:
-> On Tue, 2025-10-28 at 11:47 -0400, Luiz Augusto von Dentz wrote:
-> > Hi Bastien,
-> >=20
-> > On Tue, Oct 28, 2025 at 11:01=E2=80=AFAM Bastien Nocera <hadess@hadess.=
-net>
-> > wrote:
-> > >=20
-> > > Hey,
-> > >=20
-> > > Going to make a few comments inline. Those would be in addition
-> > > to
-> > > Luiz' comments, and not meant to replace them.
-> > >=20
-> > > On Tue, 2025-10-28 at 17:43 +0300, Roman Smirnov wrote:
-> > > > The battery charge level may fluctuate due to uncalibrated
-> > > > sensors. Commit smooths out such fluctuations.
-> > > >=20
-> > > > The algorithm for determining uncalibrated sensors consists of
-> > > > finding the number of changes in charge direction (i.e.,
-> > > > "spikes").
-> > > > If the number of spikes is zero, the device is charging or
-> > > > discharging.
-> > > > If there is one spike, it may mean that the device has started
-> > > > charging
-> > > > or has been disconnected from charging. If there are two or
-> > > > more
-> > > > spikes,
-> > > > this is a clear indication of an uncalibrated sensor.
-> > > >=20
-> > > > Check that the battery charge is fluctuating. If the battery
-> > > > charge
-> > > > is fluctuating, use the average charge value, otherwise use the
-> > > > current
-> > > > value.
-> > > >=20
-> > > > Fixes: https://github.com/bluez/bluez/issues/1612
-> > > > ---
-> > > > V2 -> V3: A queue is used instead of an array for the last
-> > > > charges,
-> > > > a bug with the spikes variable increment has been fixed, and
-> > > > the
-> > > > fluctuation check is called each time a new battery charge
-> > > > appears.
-> > > >=20
-> > > > V1 -> V2: Smoothing is only applied to uncalibrated sensors,
-> > > > the
-> > > > last 8 values are saved instead of 4, and the average value is
-> > > > used
-> > > > for smoothing instead of the minimum value.
-> > > >=20
-> > > > =C2=A0src/battery.c | 70
-> > > > +++++++++++++++++++++++++++++++++++++++++++++++++++
-> > > > =C2=A01 file changed, 70 insertions(+)
-> > > >=20
-> > > > diff --git a/src/battery.c b/src/battery.c
-> > > > index 59e4fc570..33079975c 100644
-> > > > --- a/src/battery.c
-> > > > +++ b/src/battery.c
-> > > > @@ -33,10 +33,15 @@
-> > > > =C2=A0#define BATTERY_PROVIDER_MANAGER_INTERFACE
-> > > > "org.bluez.BatteryProviderManager1"
-> > > >=20
-> > > > =C2=A0#define BATTERY_MAX_PERCENTAGE 100
-> > > > +#define LAST_CHARGES_SIZE 8
-> > > > +#define MAX_CHARGE_STEP 5
-> > > >=20
-> > > > =C2=A0struct btd_battery {
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char *path; /* D-Bus object path */
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t percentage; /* valid between=
- 0 to 100 inclusively
-> > > > */
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 struct queue *last_charges; /* last charg=
-es received */
-> > >=20
-> > > Instead of open-coding a queue, I think that a GArray would be
-> > > better:
-> > > https://docs.gtk.org/glib/struct.Array.html
-> >=20
-> > We don't recommend using glib specific structures on new code, we
-> > don't want new dependencies even if it is already supported on the
-> > required version.
-> >=20
-> > > - limit ->len to LAST_CHARGES_SIZE
-> > > - ability to add items from either side, truncate the queue or
-> > > remove
-> > > an arbitrary item
-> > >=20
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 float avg_charge; /* average battery char=
-ge */
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 bool is_fluctuating; /* true, if the batt=
-ery sensor
-> > > > fluctuates */
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char *source; /* Descriptive source =
-of the battery info
-> > > > */
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char *provider_path; /* The provider=
- root path, if any */
-> > > > =C2=A0};
-> > > > @@ -92,6 +97,10 @@ static struct btd_battery *battery_new(const
-> > > > char
-> > > > *path, const char *source,
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 battery =3D new0(struct btd_battery,=
- 1);
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 battery->path =3D g_strdup(path);
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 battery->percentage =3D UINT8_MAX;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 battery->last_charges =3D queue_new();
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 battery->avg_charge =3D 0;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 battery->is_fluctuating =3D false;
-> > > > +
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (source)
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 battery->source =3D g_strdup(source);
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (provider_path)
-> > > > @@ -105,6 +114,9 @@ static void battery_free(struct btd_battery
-> > > > *battery)
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (battery->path)
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 g_free(battery->path);
-> > > >=20
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 if (battery->last_charges)
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 queue_destroy(battery->last_charges, NULL);
-> > > > +
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (battery->source)
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 g_free(battery->source);
-> > > >=20
-> > > > @@ -217,8 +229,49 @@ bool btd_battery_unregister(struct
-> > > > btd_battery
-> > > > *battery)
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return true;
-> > > > =C2=A0}
-> > > >=20
-> > > > +static void check_fluctuations(struct btd_battery *battery)
-> > >=20
-> > > Instead of having this function, and quite complicated handling
-> > > of that
-> > > same queue of battery levels in btd_battery_update(), it would be
-> > > great
-> > > if the code was contained all within a function (or two) and used
-> > > non-
-> > > BlueZ specific data types.
-> > >=20
-> > > So that the code could be split off into its own battery helper,
-> > > and
-> > > could have a unit test showing a few different cases.
-> >=20
-> > I guess you are suggesting something to go into src/shared (e.g.
-> > battery.c:bt_battery) so it can be unit tested, while I think this
-> > would be nice to have Id leave this to Roman to decide since it may
-> > require some work to put it together and then generate test cases
-> > that
-> > cover fluctuation and other things we might want to check with the
-> > code.
-> >=20
-> > > > +{
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 const struct queue_entry *entry;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t spikes =3D 0;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 int8_t step;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 int8_t direction =3D 0;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 int8_t prev_direction;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t *prev_charge;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t *next_charge;
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 for (entry =3D queue_get_entries(battery-=
->last_charges);
-> > > > entry->next;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 entry =3D e=
-ntry->next) {
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 prev_direction =3D direction;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 prev_charge =3D entry->data;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 next_charge =3D entry->next->data;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 step =3D *next_charge - *prev_charge;
-> >=20
-> > It might be a good idea to store the values as pointers (using
-> > UINT_TO_PTR/PTR_TO_UINT), that way we avoid this kind of construct
-> > above where you have to use pointers and risk having NULL pointers
-> > bugs for example.
-> >=20
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 /*
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 * The battery charge fluctuates too much,
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 * which may indicate a battery problem, so
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 * the actual value should be displayed.
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 */
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 if (abs(step) >=3D MAX_CHARGE_STEP) {
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 battery->is_fluctuat=
-ing =3D false;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 }
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 if (step > 0)
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 direction =3D 1;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 else if (step < 0)
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 direction =3D -1;
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 if (direction !=3D prev_direction &&
-> > > > prev_direction)
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 spikes++;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 }
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 battery->is_fluctuating =3D (spikes > 1) =
-? true : false;
-> > > > +}
-> > > > +
-> > > > =C2=A0bool btd_battery_update(struct btd_battery *battery, uint8_t
-> > > > percentage)
-> > > > =C2=A0{
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t *p_percentage;
-> > > > +
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DBG("path =3D %s", battery->path);
-> > > >=20
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!queue_find(batteries, NULL, bat=
-tery)) {
-> > > > @@ -231,6 +284,23 @@ bool btd_battery_update(struct btd_battery
-> > > > *battery, uint8_t percentage)
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 return false;
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> > > >=20
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 if (!battery->avg_charge)
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 battery->avg_charge =3D percentage;
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 /* exponential smoothing */
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0 battery->avg_charge =3D battery->avg_char=
-ge * 0.7 +
-> > > > percentage
-> > > > * 0.3;
-> > >=20
-> > > Magic numbers should be #define's constants.
-> > >=20
-> > > As Luiz mentioned, it would be great if there was some prior art
-> > > referenced, perhaps the reference implementation in another
-> > > application.
-> > >=20
-> > > Or an explanation as to why this could needs to live here instead
-> > > of,
-> > > say, upower, which deals with heuristics, dodgy hardware, etc.
-> >=20
-> > This is a good question, what is the algorithm upower used for
-> > handling the battery level?
-> >=20
-> I checked how upower works, and it does not handle such cases. For
-> example, here the charge percentage is taken directly from sysfs:
-> Link:
-> https://gitlab.freedesktop.org/upower/upower/-/blob/master/src/linux/up-d=
-evice-supply-battery.c?ref_type=3Dheads#L514
->=20
-> If the battery does not send the charge percentage to sysfs, upower
-> calculates it based on the energy.cur variable, which is also read
-> from sysfs:
-> Link:
-> https://gitlab.freedesktop.org/upower/upower/-/blob/master/src/up-device-=
-battery.c?ref_type=3Dheads#L316
-> Link:
-> https://gitlab.freedesktop.org/upower/upower/-/blob/master/src/linux/up-d=
-evice-supply-battery.c?ref_type=3Dheads#L493
->=20
-> The only place where the accumulated statistics are used is here:
-> Link:
-> https://gitlab.freedesktop.org/upower/upower/-/blob/master/src/up-device-=
-battery.c?ref_type=3Dheads#L99
-> However, I didn't find anything interesting here either.
+--===============7780431284633391568==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I don't think I said that upower already did that, just that it was
-probably a better place to implement it.
+This is automated email and please do not reply to this email!
 
-> In my opinion, charge level averaging should be implemented in bluez,
-> as there are applications that access bluez directly:
-> Link: https://github.com/KDE/bluez-qt/blob/master/src/battery.cpp#L30
-> Therefore, it would be better to filter the values on the bluez side
-> and then pass them on to third-party applications. This way,
-> applications
-> will not have to implement the same logic over and over again.
+Dear submitter,
 
-Having spent quite a lot of time working on the battery support in
-bluez, the corresponding code in upower and GNOME Bluetooth as the
-front-end, I can tell you that you shouldn't be getting your battery
-levels directly from bluez because:
-- it requires bluez to actually know that battery level (so only
-supported for some audio profiles and Bluetooth LE BAS, leaving out a
-lot of HID Classic devices)
-- sometimes the Bluetooth levels are out-of-date because the device has
-a separate connection through, for example, USB duplicates.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1019482
 
-On desktop Linux, upower is the one source of truth.
+---Test result---
 
-Anyway, I don't mind which way this goes, but IMO it needs to be rigged
-for automated testing.
+Test Summary:
+CheckPatch                    PENDING   0.36 seconds
+GitLint                       PENDING   0.39 seconds
+BuildEll                      PASS      17.81 seconds
+BluezMake                     PASS      3985.14 seconds
+MakeCheck                     PASS      19.65 seconds
+MakeDistcheck                 PASS      172.50 seconds
+CheckValgrind                 PASS      231.76 seconds
+CheckSmatch                   WARNING   270.30 seconds
+bluezmakeextell               PASS      121.60 seconds
+IncrementalBuild              PENDING   0.34 seconds
+ScanBuild                     PASS      838.63 seconds
 
-Cheers
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-> The use of the average battery value is justified by the following
-> examples from the Linux kernel:
-> Link:
-> https://elixir.bootlin.com/linux/v6.18-rc3/source/drivers/power/supply/ad=
-c-battery-helper.c#L132
-> Link:
-> https://elixir.bootlin.com/linux/v6.17.4/source/drivers/power/supply/cw20=
-15_battery.c#L306
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1931:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3866:52: warning: array of flexible structuresemulator/btdev.c:459:29: warning: Variable length array is used.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7780431284633391568==--
