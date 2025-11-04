@@ -1,158 +1,118 @@
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495C732E6AE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 14:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD42A1865FA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 14:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762266322; cv=none; b=FgLiWTndzJ3W+ZHj26Ertp7MFMrJdzZfLJXVQ7Uo+lQtwposYOP8+KlQSlt78C8uxZiJt7C1vNYdgtBf3dhLjrPQq/Y3UosPdVHbJa9HRRZm0tgk3GIO1AVmIhmq9AhyGFw5WNMRD/vjgOGyrh+0nEJMdFto07ofEgjpMy0eutU=
+	t=1762267013; cv=none; b=bUM3HCHvUrTwzpn+gZN5gEjy9pZuvUhBO/qDi+m11ccLGr6D0u18LKJKvl6TOWadAdRx9ZVm2SoTfXyZRNXbH43Mjsh8as5cCQUvC6eCApOJ6z7sVpH9nFA8la4dyRiKpIATQADEwM57pgyaIFdzW8wO/kpxolcfOonwOOVjB7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762266322; c=relaxed/simple;
-	bh=g8prTLxYhqOqWOgrCXedj1AC9wpROuEzpckhxvtuwUg=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FBgopeFMPAvegLbpXK2v3kANVrziKAVPa/9bdo5+vqwodqEMg930uN9jw9eredaGuPY1ESe3MrgorFgWE8+aAXhX63ui198u7e06s2I236JU2rIkVtPWUQBiiUMY50qBnQ86VOmPlRuRjGR9ujxKHcnmBWx+dfIbxaOPSUccPuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JD3Jsb4K; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762267013; c=relaxed/simple;
+	bh=7fp1Si6aNBB9ZjQHr626oc4d6kQ7LfIVgYrda33B/II=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=kKRgHocXyiPelXmAv0rBTbfCd5gKDF/eN/XmO5GFcK6n6wCalYmt3vIfWtJtAaezl8FE/9I+LBQb1Db3YsENttWp+bP6+s7/PfHLXvpN3tUm6SRJM7Ay8ONS3tUQ+WD5Kkk9UqL/btUaTSGIGTkM5DBUlcWwMcibaDIHSsX343Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=GWacGazW; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JD3Jsb4K"
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5596e2a99faso279581e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Nov 2025 06:25:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762266319; x=1762871119; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U9lXi9rXjCUXyhFkyA83hbXVChAHMDQwSPl7FKVw4HM=;
-        b=JD3Jsb4K6KueGFppeQ8LGMV3am7da5RTE/wRoKAjz/RnU792QF67vvJdXCWtmBVjXH
-         rRNYqzzMIhXgcn6TK0B4aRijlj0nR6D/55O+pFEP7bGLfG5ciE6SEIuhMlL9kl3YODna
-         3MVJ+Ses3JuLDYQ8wh+/9VtROwWIpSaau5XUrdM+Q+NFX+XSBrzKPQCnp4JPjjihqXOD
-         I0omIxMsvniVzmjHvvPxK6sFclYUyBmT4zwHstkZVAiwLxnlMd8pOebKRy5sMEF8W6Sf
-         TILgoDbgGmLdaeLEae3z0Vk/dbKCs1n/dOI2+mcbhuvoHkA9UVhf9O3fBlqwkGS+LfWE
-         VVWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762266319; x=1762871119;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U9lXi9rXjCUXyhFkyA83hbXVChAHMDQwSPl7FKVw4HM=;
-        b=YOr4Bgos6cqWTUSKhdR9BplmxNGpw4cstTxkZtQX3kS200Z9CzTPFXeGn+/vpyaeUd
-         JDt98b6wCmWfhj4NeMnAuXUUy+QCl6RIxQZ1AFicAOVQWFhqkipTKrW8Rm2ojNexxRPc
-         83OVGNJZorU53wSZ/ktLVdfuadVrvMxaUAdqz180b98FfaeKOSCjEmDpa3KvQFWQBzMH
-         p/B3WTXYUj/B20EVmC7T4kh1PghJYq88G1EPaRZL4vgFwjkx4nQUCL/2VqFQK90xuFkI
-         Jd86TJ2bRnG126iqii/6iuiJoEmSB9qp8BETfq4cbr1RF3sC7OJrO6bNjDMuHfGcUEI/
-         J4uQ==
-X-Gm-Message-State: AOJu0YwkyML4TraXmZ1x7G63EMIgqCzyauSqculM0OKAKKTYXP3tFN/e
-	RETA5+BL8qpPoUhTm6FOU/vblAT4F4glOIjiIgja6yvyaCQElPpfTGIXVLVTNu4ycX0=
-X-Gm-Gg: ASbGncv6IEnrv/o8RcL1C2E3hhAbtDfJ/N5dAtz7HfmVC2DlScuE/sHj8FlXSdvNwBD
-	8IK0hDAYAj8obUHOWRAvlupAX4qA5pB+okbA0fm6i9MGxfCeqRZHsBQOIq82jPhWKwjGx6cHhft
-	wZF6K09IOh9miehRdgRiC/1UdW0sU1ah7kgcT+vh9caYdq/lm1SMLNXWtXpw7H0oj5t2+qe8wnd
-	Q0hKWwE+YXmmKN94ixH8IvL9qHtAze4YjeBafBA2tElF5SUMHs3p6dqH4v0Q5GyABpksOok2mtr
-	7P0q5Tx0A+NRn0k2yz5RrD4bFfjKY/whCe0hIhbZMLfGSsO5X+lo6/cHFBaMPXpc7b6xUZxttIl
-	WmDQQKNAzIoZmwbNxGDydSHbZBVF/UD4vke4hrDQsv73KQEklPR10SB4bpfmaz/ign4DmeeNwZ2
-	a7yvA=
-X-Google-Smtp-Source: AGHT+IFEKg3mPK+b0OVEjZQii5CwrT5HfvBajVy0aKsSR8h/SWXqUszDmRMgYZ89N7wRTIf45amU/g==
-X-Received: by 2002:a05:6102:c8c:b0:5db:d60a:6b24 with SMTP id ada2fe7eead31-5dbd60a7ce4mr2128726137.22.1762266318819;
-        Tue, 04 Nov 2025 06:25:18 -0800 (PST)
-Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5dbf31267easm1074306137.8.2025.11.04.06.25.16
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Nov 2025 06:25:16 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GWacGazW"
+Received: from github.com (hubbernetes-node-e690191.va3-iad.github.net [10.48.173.49])
+	by smtp.github.com (Postfix) with ESMTPA id CB3D23C1275
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Nov 2025 06:36:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1762267010;
+	bh=7Ksy5m+yI3g0M2U+FiTViXi3nGpiscL4goAPjn7bIvE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=GWacGazWKm+M5QmXb6hYL0ne9O0f4EGw1ha3dSfHm7g6z0e+Zt42TUrtw5x1sbip6
+	 gBBnrqX2SEOBmPg2Cr5ggpwUEDZ41LmYC5HPPiP9xHgD76RvSq6rT8rrPvTN0kkod6
+	 wtRofdTdbijbQUSh57INcZtqrdzmiWfSFbS56de4=
+Date: Tue, 04 Nov 2025 06:36:50 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/3] mgmt-tester: Add tests for 5.2 and 6.0 Bluetooth version
-Date: Tue,  4 Nov 2025 09:25:06 -0500
-Message-ID: <20251104142506.12356-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251104142506.12356-1-luiz.dentz@gmail.com>
-References: <20251104142506.12356-1-luiz.dentz@gmail.com>
+Message-ID: <bluez/bluez/push/refs/heads/1019482/000000-53ff16@github.com>
+Subject: [bluez/bluez] 707fb3: monitor: Decode Bluetooth 6.0 version
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1019482
+  Home:   https://github.com/bluez/bluez
+  Commit: 707fb3d15ab2e9339e1132fdd01150923da535cf
+      https://github.com/bluez/bluez/commit/707fb3d15ab2e9339e1132fdd0115=
+0923da535cf
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-04 (Tue, 04 Nov 2025)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Decode Bluetooth 6.0 version
+
+This decodes 0x0e as Bluetooth 6.0.
+
+
+  Commit: 43f76a1aa526f74e5e5b58faf59817575d9dbe42
+      https://github.com/bluez/bluez/commit/43f76a1aa526f74e5e5b58faf5981=
+7575d9dbe42
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-04 (Tue, 04 Nov 2025)
+
+  Changed paths:
+    M emulator/btdev.c
+    M emulator/btdev.h
+    M emulator/hciemu.c
+    M emulator/hciemu.h
+    M emulator/main.c
+
+  Log Message:
+  -----------
+  emulator: Add support for LL Extended Feature Set
+
+This adds support for emulating LL Extended Feature Set introduced in 6.0=
+
+that adds the following:
+
+Commands:
+
+ - HCI_LE_Read_All_Local_Supported_=C2=ADFeatures(0x2087)(Feature:47,1)
+ - HCI_LE_Read_All_Remote_Features(0x2088)(Feature:47,2)
+
+Events:
+
+ - HCI_LE_Read_All_Remote_Features_Complete(0x2b)(Mask bit:42)
+
+
+  Commit: 53ff16cb2aac116c0cfecaafc6bc1ee8ee72eb4d
+      https://github.com/bluez/bluez/commit/53ff16cb2aac116c0cfecaafc6bc1=
+ee8ee72eb4d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-04 (Tue, 04 Nov 2025)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Add tests for 5.2 and 6.0 Bluetooth version
 
 This adds the following tests that attempt to initialize controllers
 with version 5.2 and 6.0:
 
  - Set Low Energy on 5.2 - Success 4
  - Set Low Energy on 6.0 - Success 5
----
- tools/mgmt-tester.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 242909117987..663879a8fcd7 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -576,6 +576,20 @@ static void test_condition_complete(struct test_data *data)
- #define test_bredrle50(name, data, setup, func) \
- 	test_bredrle50_full(name, data, setup, func, 2)
- 
-+#define test_bredrle52_full(name, data, setup, func, timeout) \
-+	test_full(name, data, setup, func, timeout, HCIEMU_TYPE_BREDRLE52, \
-+					0x0b, 0x0001beff, 0x00000080)
-+
-+#define test_bredrle52(name, data, setup, func) \
-+	test_bredrle52_full(name, data, setup, func, 2)
-+
-+#define test_bredrle60_full(name, data, setup, func, timeout) \
-+	test_full(name, data, setup, func, timeout, HCIEMU_TYPE_BREDRLE60, \
-+					0x0e, 0x0001beff, 0x00000080)
-+
-+#define test_bredrle60(name, data, setup, func) \
-+	test_bredrle60_full(name, data, setup, func, 2)
-+
- #define test_hs_full(name, data, setup, func, timeout) \
- 	test_full(name, data, setup, func, timeout, HCIEMU_TYPE_BREDRLE, \
- 					0x09, 0x0001bfff, 0x00000080)
-@@ -1696,6 +1710,7 @@ static const char set_le_invalid_param[] = { 0x02 };
- static const char set_le_garbage_param[] = { 0x01, 0x00 };
- static const char set_le_settings_param_1[] = { 0x80, 0x02, 0x00, 0x00 };
- static const char set_le_settings_param_2[] = { 0x81, 0x02, 0x00, 0x00 };
-+static const char set_le_settings_param_4[] = { 0x81, 0x02, 0xfc, 0x01 };
- static const char set_le_on_write_le_host_param[] = { 0x01, 0x00 };
- 
- static const struct generic_data set_le_on_success_test_1 = {
-@@ -1736,6 +1751,20 @@ static const struct generic_data set_le_on_success_test_3 = {
- 	.expect_hci_len = sizeof(set_le_on_write_le_host_param),
- };
- 
-+static const struct generic_data set_le_on_success_test_4 = {
-+	.setup_settings = settings_le,
-+	.send_opcode = MGMT_OP_SET_POWERED,
-+	.send_param = set_powered_on_param,
-+	.send_len = sizeof(set_powered_on_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = set_le_settings_param_4,
-+	.expect_len = sizeof(set_le_settings_param_4),
-+	.expect_settings_set = MGMT_SETTING_LE,
-+	.expect_hci_command = BT_HCI_CMD_WRITE_LE_HOST_SUPPORTED,
-+	.expect_hci_param = set_le_on_write_le_host_param,
-+	.expect_hci_len = sizeof(set_le_on_write_le_host_param),
-+};
-+
- static const struct generic_data set_le_on_invalid_param_test_1 = {
- 	.send_opcode = MGMT_OP_SET_LE,
- 	.expect_status = MGMT_STATUS_INVALID_PARAMS,
-@@ -13231,6 +13260,12 @@ int main(int argc, char *argv[])
- 	test_bredrle("Set Low Energy on - Success 3",
- 				&set_le_on_success_test_3,
- 				NULL, test_command_generic);
-+	test_bredrle52("Set Low Energy on 5.2 - Success 4",
-+				&set_le_on_success_test_4,
-+				NULL, test_command_generic);
-+	test_bredrle60("Set Low Energy on 6.0 - Success 5",
-+				&set_le_on_success_test_4,
-+				NULL, test_command_generic);
- 	test_bredrle("Set Low Energy on - Invalid parameters 1",
- 				&set_le_on_invalid_param_test_1,
- 				NULL, test_command_generic);
--- 
-2.51.0
 
+Compare: https://github.com/bluez/bluez/compare/707fb3d15ab2%5E...53ff16c=
+b2aac
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
