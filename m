@@ -1,183 +1,152 @@
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7335D305E38;
-	Wed,  5 Nov 2025 09:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353742FE584
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 09:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762334379; cv=none; b=IJhw4vfdp0Xff9j9NLYuUvx9YdVeC7+3sUfuWnWm6W0SIk9MAKcTTYj1kTgcQ+W4khgw2SBCW8oIY16LB/i4hK82SihZeQ4qwYLiYJaszON22Cy8TPHWWSZEdPiuCubcygAqYjlP1VXWGQI0rEdP2LcDeqZX7kvRfkbxXmuM6zg=
+	t=1762335511; cv=none; b=DZseBR4AIosAC0vD6lojD6GLMLloGGXzaBgo7TapsxP5vCc13TPi4N5ODSrReG4eoWdy9bscg8iadNOLUoarEtqiNmiiJClSwE1SkNSYI20+zUl8FwQ7xKL2CKbjcEvnidfOs/SCbI+f9X+e32HvyMWQsLFxDlXS+FRh2Ahs4j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762334379; c=relaxed/simple;
-	bh=Rwt6oyO6h+JdNm5uij9AavKIIufkGHxD2BupZ5YTW1k=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=G9CCly9lVut7FleSI9qfOlbNZhPeX4aGs36E7pHb3hbFkPqE4a0647+84QeFhVX7QKCHn+qAhsl4IF/nDX8oVI9urvxcgBRjm47Bv3IqApGHdD6gNFz4h/xsel8yHJCGwgNW35jpLvI0BK8oR831WZrm9P97jq+zjv9QH46IOgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=ajuCtSIi; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+	s=arc-20240116; t=1762335511; c=relaxed/simple;
+	bh=iopb/2HE6rxnbJhUiygi9wiPs+tTGT3uUrtacSGas8M=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=D3zXOsb2ktVNgHCUWRb+xzLWyRWpppI1EacfK9dtE4vEJZbEaAlK1shMvcgl8DU+aigD5gdH6I/grPZ+/zYDtNleV3IRz1x/kqRu9H0Tg/pTfqgfapuLwTX/6AszmQANCro+rwmGLrTKUzsCsmGP/VJYflZdcnPGP9v6p9Qw2qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRDEKLBe; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="ajuCtSIi"
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 5A59J4Ma8876863, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1762334344; bh=Rwt6oyO6h+JdNm5uij9AavKIIufkGHxD2BupZ5YTW1k=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=ajuCtSIi6TCRgdFNjvVLLdmbz+RhqdOZoDorMhCSGvBCYGQw8MG4KBI5Tsw3k1EY7
-	 wFYE34Kb3+VgVyKQr7cpp9EkyMi9BZD6nyQnukWFmnQcU44aSgJHWxYTBkl29zk381
-	 v3uhW0FX6GrxyNogzsifkbSaZFir7kWaOYFZijmmXpOwb4g68rwH5AUNSRScyEeqTX
-	 OYT2neSgsc+Xn9XcpNhjNamnjhi+gxb+4AMrtqVw/KH/7JHyYFUcmUSYFHWUD95bmS
-	 ZLwFfB1PE38EV9hXlPQYOixcJxXH1KBGHtSRrI22XNjJ4z1s9g5keucJj3YEW5b0uz
-	 rrz8uX1fPmASw==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 5A59J4Ma8876863
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Nov 2025 17:19:04 +0800
-Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.27; Wed, 5 Nov 2025 17:19:04 +0800
-Received: from RTKEXHMBS03.realtek.com.tw (10.21.1.53) by
- RTKEXHMBS05.realtek.com.tw (10.21.1.55) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.27; Wed, 5 Nov 2025 17:19:04 +0800
-Received: from RTKEXHMBS03.realtek.com.tw ([::1]) by
- RTKEXHMBS03.realtek.com.tw ([fe80::2514:51f7:92e3:7d6a%9]) with mapi id
- 15.02.1544.027; Wed, 5 Nov 2025 17:19:04 +0800
-From: Max Chou <max.chou@realtek.com>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        Hilda Wu <hildawu@realtek.com>,
-        "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
-        "niall_ni@realsil.com.cn"
-	<niall_ni@realsil.com.cn>,
-        KidmanLee <kidman@realtek.com>
-Subject: RE: [PATCH] Bluetooth: btrtl: Avoid loading the config file on security chips
-Thread-Topic: [PATCH] Bluetooth: btrtl: Avoid loading the config file on
- security chips
-Thread-Index: AQHcTh6hyxvx5bb1LUuor8htNN7fW7TjMYMAgACLy9A=
-Date: Wed, 5 Nov 2025 09:19:04 +0000
-Message-ID: <acb85eada47f40d4ab6bfd4ae42f5861@realtek.com>
-References: <20251105063736.456618-1-max.chou@realtek.com>
- <08601ca9-e038-45a7-bd98-4ab24013a84f@molgen.mpg.de>
-In-Reply-To: <08601ca9-e038-45a7-bd98-4ab24013a84f@molgen.mpg.de>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRDEKLBe"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8b21fc25ae1so100428785a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Nov 2025 01:38:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762335509; x=1762940309; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=F3JF66Dwbv6Le0KOGeNOb3p2YGxaJucy1HI7+4jr1/k=;
+        b=GRDEKLBeB4xf3KpR4RF1l/pEikDSypPGBaGcOCWITIp1dHgJIyoxf9QCA7yNtob5Wi
+         y8e64YB7rnxr34LhxJDr68wlY9smWNX8Ah6qgBgysPXz9k25jRbIxFunTe5hc+RAFhqB
+         CZCzbKyxYmhpmFAyHVTuTcmbeGNO6+qlp6Snc1xRBFhU/x0dxiG+54jtCIh8RPez5NaV
+         P6c5qh46BZG7Sz709wWvdYzzQTmXZpzOi4PJGlSTl54PokwDMOYo+TlXrEFLwdZ/c5y6
+         wFDq4AXDCXV+8rm95q1+b6ilLLELnYEvyN6bigl8qIjtbGgrF2IymE5lGPtZrTaojcdc
+         Rvmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762335509; x=1762940309;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F3JF66Dwbv6Le0KOGeNOb3p2YGxaJucy1HI7+4jr1/k=;
+        b=BlbxAuc/N0Ww3J86RS2UWFU4GM8mpgXXHBA5s81wLnBPiseDOxwCMDKAaWaRPbHn3z
+         /a2gXeLdGxFZ1Zr35mvdJ1RGnUlP2Yq8dakVYEjmu9VbS4NK54GgnaUKEOU6IFKhUSLx
+         u3j4nnM3hkt8KUWiIMAAemlbLgUYCBya1qEb4EGIJ6HuQW0LA5M5YoPydT6zkKhvA/c8
+         R/kJYH8k7ateOSpWovgy5H/eHVN9dTPr6x/lhArhUTpCxDgZQsj50SpcS7C+SNcLH3+v
+         B3bGw5yV66hCcKwTosdgoR3g5ESQB+LtPlCv3flk+oLUzXcr+xue8BRXIXb2tR/aHyZG
+         Ulvg==
+X-Gm-Message-State: AOJu0YzEsETpCs7+lG+uYQ7+BbkVyJU836Vf1yaS7D4jyCv7E91R53hu
+	fnlo0oGRCNO4vIR/9uEtMqV2LerLpVPMOx3/GoZkE+iDl2eiJDZ+TasD81vdUg==
+X-Gm-Gg: ASbGncsyStqyL/C7QcIruuCbiXUeVMDV6fhtXw6t8rX/R5T2CkJpNIzHrGfph2WPUBW
+	v5jP6+KpJiETFhJ1rFJ3fWKLU6O0BGVB53zBVQJawkXyke/S09TdZYOIPpPyIK61NegE5oJcsWP
+	UUWzIMzINHm/D+pF0y3GKaCfp7DbASlkh8D3+D1t0UvRI5v0c+0Tg4lKm06A9jvwyxRd1Xl+ngf
+	TCGUwjZTA8avwKVu773G4bqlIUFYvWi64b9qpIUqiwSyoYaevEgtj18SEcocKYIE5cC9gcShmPV
+	9t5WC5uGIRxA/jz8eDTzDnGOER8HviJ7sQxFZPkeiGA5UEB2KN+DaK86CgHn9CA4oNLeFZMXQtk
+	dsuyISLplhtE/dm4IJqaippCOK3Hl5OU9daV6Jb8O/mSvqIR8vfTeAbQPb/eDcg/NIkqJHVsGGU
+	rBhNI/Yw==
+X-Google-Smtp-Source: AGHT+IGWMU0ipKL8GLjDSvfpA3j/sm3h1rYjQTh8RNl5YRd/y+82H0J7SNEvGCaCGqcf7sOt4wDgfw==
+X-Received: by 2002:a05:620a:4709:b0:8a9:b469:efc1 with SMTP id af79cd13be357-8b22083d951mr321616085a.24.1762335508580;
+        Wed, 05 Nov 2025 01:38:28 -0800 (PST)
+Received: from [172.17.0.2] ([48.214.53.179])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b0f548714fsm365787785a.23.2025.11.05.01.38.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 01:38:28 -0800 (PST)
+Message-ID: <690b1b14.050a0220.26ae85.a6bb@mx.google.com>
+Date: Wed, 05 Nov 2025 01:38:28 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0218071663665065791=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
+Subject: RE: Bluetooth: iso: Fix UAF on iso_sock_disconn
+In-Reply-To: <20251105-kernel_panic-v1-1-88637054c6b9@amlogic.com>
+References: <20251105-kernel_panic-v1-1-88637054c6b9@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-SGkhIFBhdWwsDQoNClRoYW5rcyBmb3IgeW91ciByZXNwb25zZS4NClBsZWFzZSBjaGVjayBteSBj
-b21tZW50cyBpbmxpbmUuDQoNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9t
-OiBQYXVsIE1lbnplbCBbbWFpbHRvOnBtZW56ZWxAbW9sZ2VuLm1wZy5kZV0NCj4gU2VudDogV2Vk
-bmVzZGF5LCBOb3ZlbWJlciA1LCAyMDI1IDM6NTggUE0NCj4gVG86IE1heCBDaG91IDxtYXguY2hv
-dUByZWFsdGVrLmNvbT4NCj4gQ2M6IE1hcmNlbCBIb2x0bWFubiA8bWFyY2VsQGhvbHRtYW5uLm9y
-Zz47IEx1aXogQXVndXN0byB2b24gRGVudHoNCj4gPGx1aXouZGVudHpAZ21haWwuY29tPjsgbGlu
-dXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgbGludXgtDQo+IGtlcm5lbEB2Z2VyLmtlcm5l
-bC5vcmc7IEhpbGRhIFd1IDxoaWxkYXd1QHJlYWx0ZWsuY29tPjsNCj4gYWxleF9sdUByZWFsc2ls
-LmNvbS5jbjsgbmlhbGxfbmlAcmVhbHNpbC5jb20uY247IEtpZG1hbkxlZQ0KPiA8a2lkbWFuQHJl
-YWx0ZWsuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIXSBCbHVldG9vdGg6IGJ0cnRsOiBBdm9p
-ZCBsb2FkaW5nIHRoZSBjb25maWcgZmlsZSBvbiBzZWN1cml0eQ0KPiBjaGlwcw0KPiANCj4gDQo+
-IEV4dGVybmFsIG1haWwgOiBUaGlzIGVtYWlsIG9yaWdpbmF0ZWQgZnJvbSBvdXRzaWRlIHRoZSBv
-cmdhbml6YXRpb24uIERvIG5vdCByZXBseSwNCj4gY2xpY2sgbGlua3MsIG9yIG9wZW4gYXR0YWNo
-bWVudHMgdW5sZXNzIHlvdSByZWNvZ25pemUgdGhlIHNlbmRlciBhbmQga25vdyB0aGUNCj4gY29u
-dGVudCBpcyBzYWZlLg0KPiANCj4gDQo+IA0KPiBEZWFyIE1heCwNCj4gDQo+IA0KPiBUaGFuayB5
-b3UgZm9yIHlvdXIgcGF0Y2guDQo+IA0KPiBBbSAwNS4xMS4yNSB1bSAwNzozNyBzY2hyaWViIE1h
-eCBDaG91Og0KPiA+IEZvciBjaGlwcyB3aXRoIHNlY3VyaXR5IGVuYWJsZWQsIGl0J3Mgb25seSBw
-b3NzaWJsZSB0byBsb2FkIGZpcm13YXJlDQo+ID4gd2l0aCBhIHZhbGlkIHNpZ25hdHVyZSBwYXR0
-ZXJuLg0KPiANCj4gSG93IGNhbiBzZWN1cml0eSBiZSBlbmFibGVkPw0KPiANCj4gV2hhdCBpcyBj
-dXJyZW50bHkgbG9nZ2VkPyBBbiBlcnJvcj8NCg0KDQpUaGUgc2VjdXJpdHkgY2hpcHMgd2lsbCBi
-ZSBzaGlwcGVkIHRvIHNwZWNpZmljIGJyYW5kIGN1c3RvbWVycyBhbmQgYXJlIG1hbmFnZWQgYnkg
-YW4gZUZ1c2UsIHdoaWNoIGlzIHByb2dyYW1tZWQgZHVyaW5nIG1hbnVmYWN0dXJpbmcuDQpDdXJy
-ZW50bHksIGxvYWRpbmcgdGhlIGNvbmZpZyBmaWxlIGNhdXNlcyBpbml0aWFsaXphdGlvbiB0byBm
-YWlsIG9uIHNlY3VyaXR5IGNoaXBzLg0KVGhlIHNlY3VyaXR5IGNoaXBzIGNhbiBvbmx5IGxvYWQg
-ZmlybXdhcmUgZmlsZXMgdGhhdCBjb250YWluIGEgdmFsaWQgc2lnbmF0dXJlLg0KDQoNCj4gDQo+
-IFBsZWFzZSBnbyBpbnRvIHRoZSBjaGFuZ2VzLiBXaGF0IGlzIHRoZSB2ZW5kb3IgY29tbWFuZCAw
-eEFEIG92ZXIgMHgwRD8NCj4gDQpBY3R1YWxseSwgdGhlIGN1cnJlbnQgdmFsdWUgaXMgaW5jb3Jy
-ZWN0LiBUaGUgY29ycmVjdCB2YWx1ZSBmb3IgdGhlIHBhcmFtZXRlcnMgb2YgdGhlIHZlbmRvciBj
-b21tYW5kIGlzIDB4QUQuDQoNCj4gPiAtIEV4YW1wbGUgbG9nIGZvciBhIHNlY3VyaXR5IGNoaXAu
-DQo+ID4NCj4gPiBCbHVldG9vdGg6IGhjaTA6IFJUTDogZXhhbWluaW5nIGhjaV92ZXI9MGMgaGNp
-X3Jldj0wMDBhDQo+ID4gICAgbG1wX3Zlcj0wYyBsbXBfc3VidmVyPTg5MjINCj4gPiBCbHVldG9v
-dGg6IGhjaTA6IFJUTDogcm9tX3ZlcnNpb24gc3RhdHVzPTAgdmVyc2lvbj0xDQo+ID4gQmx1ZXRv
-b3RoOiBoY2kwOiBSVEw6IGxvYWRpbmcgcnRsX2J0L3J0bDg5MjJhdV9mdy5iaW4NCj4gPiBCbHVl
-dG9vdGg6IGhjaTA6IFJUTDogY2ZnX3N6IDAsIHRvdGFsIHN6IDcxMzAxDQo+ID4gQmx1ZXRvb3Ro
-OiBoY2kwOiBSVEw6IGZ3IHZlcnNpb24gMHg0MWMwYzkwNQ0KPiA+DQo+ID4gLSBFeGFtcGxlIGxv
-ZyBmb3IgYSBub3JtYWwgY2hpcC4NCj4gPg0KPiA+IEJsdWV0b290aDogaGNpMDogUlRMOiBleGFt
-aW5pbmcgaGNpX3Zlcj0wYyBoY2lfcmV2PTAwMGENCj4gPiAgICBsbXBfdmVyPTBjIGxtcF9zdWJ2
-ZXI9ODkyMg0KPiA+IEJsdWV0b290aDogaGNpMDogUlRMOiByb21fdmVyc2lvbiBzdGF0dXM9MCB2
-ZXJzaW9uPTENCj4gPiBCbHVldG9vdGg6IGhjaTA6IFJUTDogbG9hZGluZyBydGxfYnQvcnRsODky
-MmF1X2Z3LmJpbg0KPiA+IEJsdWV0b290aDogaGNpMDogUlRMOiBsb2FkaW5nIHJ0bF9idC9ydGw4
-OTIyYXVfY29uZmlnLmJpbg0KPiA+IEJsdWV0b290aDogaGNpMDogUlRMOiBjZmdfc3ogNiwgdG90
-YWwgc3ogNzEzMDcNCj4gPiBCbHVldG9vdGg6IGhjaTA6IFJUTDogZncgdmVyc2lvbiAweDQxYzBj
-OTA1DQo+ID4NCj4gPiBUZXN0ZWQtYnk6IEhpbGRhIFd1IDxoaWxkYXd1QHJlYWx0ZWsuY29tPg0K
-PiA+IFNpZ25lZC1vZmYtYnk6IE5pYWwgTmkgPG5pYWxsX25pQHJlYWxzaWwuY29tLmNuPg0KPiA+
-IFNpZ25lZC1vZmYtYnk6IE1heCBDaG91IDxtYXguY2hvdUByZWFsdGVrLmNvbT4NCj4gPiAtLS0N
-Cj4gPiAgIGRyaXZlcnMvYmx1ZXRvb3RoL2J0cnRsLmMgfCAyNCArKysrKysrKysrKysrLS0tLS0t
-LS0tLS0NCj4gPiAgIDEgZmlsZSBjaGFuZ2VkLCAxMyBpbnNlcnRpb25zKCspLCAxMSBkZWxldGlv
-bnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHJ0bC5jIGIv
-ZHJpdmVycy9ibHVldG9vdGgvYnRydGwuYw0KPiA+IGluZGV4IDgyOTA5MzJiOGY3Yi4uZjZmY2Nj
-NmZkZjIyIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0cnRsLmMNCj4gPiAr
-KysgYi9kcml2ZXJzL2JsdWV0b290aC9idHJ0bC5jDQo+ID4gQEAgLTUwLDcgKzUwLDcgQEANCj4g
-Pg0KPiA+ICAgI2RlZmluZSAgICAgUlRMX0NISVBfU1VCVkVSICgmKHN0cnVjdCBydGxfdmVuZG9y
-X2NtZCkge3sweDEwLCAweDM4LCAweDA0LA0KPiAweDI4LCAweDgwfX0pDQo+ID4gICAjZGVmaW5l
-ICAgICBSVExfQ0hJUF9SRVYgICAgKCYoc3RydWN0IHJ0bF92ZW5kb3JfY21kKSB7ezB4MTAsIDB4
-M0EsIDB4MDQsDQo+IDB4MjgsIDB4ODB9fSkNCj4gPiAtI2RlZmluZSAgICAgIFJUTF9TRUNfUFJP
-SiAgICAoJihzdHJ1Y3QgcnRsX3ZlbmRvcl9jbWQpIHt7MHgxMCwgMHhBNCwgMHgwRCwNCj4gMHgw
-MCwgMHhiMH19KQ0KPiA+ICsjZGVmaW5lICAgICAgUlRMX1NFQ19QUk9KICAgICgmKHN0cnVjdCBy
-dGxfdmVuZG9yX2NtZCkge3sweDEwLCAweEE0LCAweEFELA0KPiAweDAwLCAweGIwfX0pDQo+ID4N
-Cj4gPiAgICNkZWZpbmUgUlRMX1BBVENIX1NOSVBQRVRTICAgICAgICAgIDB4MDENCj4gPiAgICNk
-ZWZpbmUgUlRMX1BBVENIX0RVTU1ZX0hFQURFUiAgICAgICAgICAgICAgMHgwMg0KPiA+IEBAIC01
-NDQsNyArNTQ0LDYgQEAgc3RhdGljIGludCBydGxidF9wYXJzZV9maXJtd2FyZV92MihzdHJ1Y3Qg
-aGNpX2Rldg0KPiAqaGRldiwNCj4gPiAgIHsNCj4gPiAgICAgICBzdHJ1Y3QgcnRsX2VwYXRjaF9o
-ZWFkZXJfdjIgKmhkcjsNCj4gPiAgICAgICBpbnQgcmM7DQo+ID4gLSAgICAgdTggcmVnX3ZhbFsy
-XTsNCj4gPiAgICAgICB1OCBrZXlfaWQ7DQo+ID4gICAgICAgdTMyIG51bV9zZWN0aW9uczsNCj4g
-PiAgICAgICBzdHJ1Y3QgcnRsX3NlY3Rpb24gKnNlY3Rpb247DQo+ID4gQEAgLTU1OSwxNCArNTU4
-LDcgQEAgc3RhdGljIGludCBydGxidF9wYXJzZV9maXJtd2FyZV92MihzdHJ1Y3QgaGNpX2Rldg0K
-PiAqaGRldiwNCj4gPiAgICAgICAgICAgICAgIC5sZW4gID0gYnRydGxfZGV2LT5md19sZW4gLSA3
-LCAvKiBDdXQgdGhlIHRhaWwgKi8NCj4gPiAgICAgICB9Ow0KPiA+DQo+ID4gLSAgICAgcmMgPSBi
-dHJ0bF92ZW5kb3JfcmVhZF9yZWcxNihoZGV2LCBSVExfU0VDX1BST0osIHJlZ192YWwpOw0KPiA+
-IC0gICAgIGlmIChyYyA8IDApDQo+ID4gLSAgICAgICAgICAgICByZXR1cm4gLUVJTzsNCj4gPiAt
-ICAgICBrZXlfaWQgPSByZWdfdmFsWzBdOw0KPiA+IC0NCj4gPiAtICAgICBydGxfZGV2X2RiZyho
-ZGV2LCAiJXM6IGtleSBpZCAldSIsIF9fZnVuY19fLCBrZXlfaWQpOw0KPiA+IC0NCj4gPiAtICAg
-ICBidHJ0bF9kZXYtPmtleV9pZCA9IGtleV9pZDsNCj4gPiArICAgICBrZXlfaWQgPSBidHJ0bF9k
-ZXYtPmtleV9pZDsNCj4gPg0KPiA+ICAgICAgIGhkciA9IHJ0bF9pb3ZfcHVsbF9kYXRhKCZpb3Ys
-IHNpemVvZigqaGRyKSk7DQo+ID4gICAgICAgaWYgKCFoZHIpDQo+ID4gQEAgLTEwODEsNiArMTA3
-Myw4IEBAIHN0cnVjdCBidHJ0bF9kZXZpY2VfaW5mbyAqYnRydGxfaW5pdGlhbGl6ZShzdHJ1Y3QN
-Cj4gaGNpX2RldiAqaGRldiwNCj4gPiAgICAgICB1MTYgaGNpX3JldiwgbG1wX3N1YnZlcjsNCj4g
-PiAgICAgICB1OCBoY2lfdmVyLCBsbXBfdmVyLCBjaGlwX3R5cGUgPSAwOw0KPiA+ICAgICAgIGlu
-dCByZXQ7DQo+ID4gKyAgICAgaW50IHJjOw0KPiA+ICsgICAgIHU4IGtleV9pZDsNCj4gPiAgICAg
-ICB1OCByZWdfdmFsWzJdOw0KPiA+DQo+ID4gICAgICAgYnRydGxfZGV2ID0ga3phbGxvYyhzaXpl
-b2YoKmJ0cnRsX2RldiksIEdGUF9LRVJORUwpOyBAQCAtMTE5MSw2DQo+ID4gKzExODUsMTQgQEAg
-c3RydWN0IGJ0cnRsX2RldmljZV9pbmZvICpidHJ0bF9pbml0aWFsaXplKHN0cnVjdCBoY2lfZGV2
-ICpoZGV2LA0KPiA+ICAgICAgICAgICAgICAgZ290byBlcnJfZnJlZTsNCj4gPiAgICAgICB9DQo+
-ID4NCj4gPiArICAgICByYyA9IGJ0cnRsX3ZlbmRvcl9yZWFkX3JlZzE2KGhkZXYsIFJUTF9TRUNf
-UFJPSiwgcmVnX3ZhbCk7DQo+ID4gKyAgICAgaWYgKHJjIDwgMCkNCj4gPiArICAgICAgICAgICAg
-IGdvdG8gZXJyX2ZyZWU7DQo+ID4gKw0KPiA+ICsgICAgIGtleV9pZCA9IHJlZ192YWxbMF07DQo+
-ID4gKyAgICAgYnRydGxfZGV2LT5rZXlfaWQgPSBrZXlfaWQ7DQo+ID4gKyAgICAgcnRsX2Rldl9k
-YmcoaGRldiwgIiVzOiBrZXkgaWQgJXUiLCBfX2Z1bmNfXywga2V5X2lkKTsNCj4gPiArDQo+ID4g
-ICAgICAgYnRydGxfZGV2LT5md19sZW4gPSAtRUlPOw0KPiA+ICAgICAgIGlmIChsbXBfc3VidmVy
-ID09IFJUTF9ST01fTE1QXzg4NTJBICYmIGhjaV9yZXYgPT0gMHgwMDBjKSB7DQo+ID4gICAgICAg
-ICAgICAgICBzbnByaW50Zihmd19uYW1lLCBzaXplb2YoZndfbmFtZSksICIlc192Mi5iaW4iLCBA
-QA0KPiA+IC0xMjEzLDcgKzEyMTUsNyBAQCBzdHJ1Y3QgYnRydGxfZGV2aWNlX2luZm8gKmJ0cnRs
-X2luaXRpYWxpemUoc3RydWN0IGhjaV9kZXYNCj4gKmhkZXYsDQo+ID4gICAgICAgICAgICAgICBn
-b3RvIGVycl9mcmVlOw0KPiA+ICAgICAgIH0NCj4gPg0KPiA+IC0gICAgIGlmIChidHJ0bF9kZXYt
-PmljX2luZm8tPmNmZ19uYW1lKSB7DQo+ID4gKyAgICAgaWYgKGJ0cnRsX2Rldi0+aWNfaW5mby0+
-Y2ZnX25hbWUgJiYgIWJ0cnRsX2Rldi0+a2V5X2lkKSB7DQo+IA0KPiBTbyBvbiBub24tc2VjdXJp
-dHkgZW5hYmxlZCBjaGlwcywga2V5X2lkIGlzIDA/IEl04oCZZCBiZSBncmVhdCBpZiB0aGF0IGNv
-dWxkIGJlIG1hZGUNCj4gY2xlYXIgaW4gdGhlIGNvbW1pdCBtZXNzYWdlLg0KDQoNCkFzIHlvdSB1
-bmRlcnN0b29kLCBrZXlfaWQgaXMgMCBmb3Igbm9ybWFsIGNoaXBzLg0KSSB3aWxsIGFkZCB0aGlz
-IGluZm9ybWF0aW9uIHRvIHRoZSBjb21taXQgbG9nIGluIHRoZSB2MiBwYXRjaC4NCg0KDQo+IA0K
-PiA+ICAgICAgICAgICAgICAgaWYgKHBvc3RmaXgpIHsNCj4gPiAgICAgICAgICAgICAgICAgICAg
-ICAgc25wcmludGYoY2ZnX25hbWUsIHNpemVvZihjZmdfbmFtZSksICIlcy0lcy5iaW4iLA0KPiA+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBidHJ0bF9kZXYtPmljX2luZm8tPmNmZ19u
-YW1lLCBwb3N0Zml4KTsNCj4gDQo+IA0KPiBLaW5kIHJlZ2FyZHMsDQo+IA0KPiBQYXVsDQoNCg0K
-QlJzLA0KTWF4DQo=
+--===============0218071663665065791==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1019783
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.29 seconds
+GitLint                       PENDING   0.25 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      25.47 seconds
+CheckAllWarning               PASS      27.35 seconds
+CheckSparse                   PASS      30.92 seconds
+BuildKernel32                 PASS      24.80 seconds
+TestRunnerSetup               PASS      496.53 seconds
+TestRunner_l2cap-tester       PASS      23.75 seconds
+TestRunner_iso-tester         PASS      78.33 seconds
+TestRunner_bnep-tester        PASS      6.13 seconds
+TestRunner_mgmt-tester        FAIL      120.19 seconds
+TestRunner_rfcomm-tester      PASS      9.03 seconds
+TestRunner_sco-tester         PASS      14.23 seconds
+TestRunner_ioctl-tester       PASS      9.81 seconds
+TestRunner_mesh-tester        FAIL      11.50 seconds
+TestRunner_smp-tester         PASS      8.34 seconds
+TestRunner_userchan-tester    PASS      6.43 seconds
+IncrementalBuild              PENDING   1.05 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.100 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.135 seconds
+Mesh - Send cancel - 2                               Timed out    1.998 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0218071663665065791==--
