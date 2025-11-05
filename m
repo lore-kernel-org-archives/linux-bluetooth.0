@@ -1,85 +1,144 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7962280CD5
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 19:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFB83191AC
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 19:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762370796; cv=none; b=ZiSJI0vw7LVa8SDiDpZit3ssgPCQf2wrTwU+Ew6MDkap47F1C6L8jSLFaZnRcOwmz0Uhya+tuH3/aSB9WjFw/71A3XAUW12wwYNzL9pNkzCIr995tqPvxQBqervu6yR8o61B0ZqvhGhsyTgQ1f7/oyBtujESQv21xsaX0jzmIdU=
+	t=1762371076; cv=none; b=gW2OC7JOs/9vgXCIHj+w2uhI32uJNWLD8xoYqvHnGp8jvkJm1E5z8UHV5FtqlPLMmdzgy9Wz34noeYzaluwl2BqvdMzOxiZY2WiGkl+LDzoWnqNzD1nF2+BHK2U3BXbWO6V1LSKQuTTZUfM+abhPskTNLFsAEShTU6bRLaQPhzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762370796; c=relaxed/simple;
-	bh=UNZcMpuO6y4OJjn0NtIVuErY1p4zM2D4jXthLsi6Mpc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=etA/7o2BSs0lPYWlqSq7wuXb9+4ERkTJtVNlgMZGqvV8tFKueY4Lg0n7qFvVvCaWF26CCUX6UUlynK/yaqblVkHrfga+aXhWgfqjY0H+EALYCY7MAt0Jo1LJMNuX51gJUFumCWpiw7hNm6OyFO0dTD90S3G6NZ2gi0VGpIRi6wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M/oKO4TE; arc=none smtp.client-ip=209.85.214.172
+	s=arc-20240116; t=1762371076; c=relaxed/simple;
+	bh=6TJSt3xv2/A7v5854hVI5HwkywLc6Tyjd2khpuHUBnk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bl7PMpsH0YXprrs3A62VZU38XCAPn1tMxe0UUBpYrGS6WiITXO/jZaxcOvyliB++sNL+XKLexovBt8VrOc1pRAkSMrKEOPlA6BnTDOBcrn6JjaMOcgmVHQFiJTrfVy1t1kIrt0UUY/69eIuVHhbSZGkdVzXDdTvGIBiiJ+fdc/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OWMAvfsS; arc=none smtp.client-ip=209.85.219.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M/oKO4TE"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-295548467c7so2225995ad.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Nov 2025 11:26:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWMAvfsS"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-880439c5704so1997086d6.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Nov 2025 11:31:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762370793; x=1762975593; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language:subject
-         :references:cc:to:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eBGVBhk9WiBBQIyOs7VH474iefDJjtxM86Nb1wbwzEQ=;
-        b=M/oKO4TEOceSmtEHilWCfNEnHYUL72a35otsYwZ0y+JNmn5ojJjz1Ftx9/sCOHVW20
-         PQunOCa81Gjb7i6mB3j5Z8WQkJJbYFGKjItZJz3lJvFhOQq3vNc6Ew8sesA6xnTkyTTc
-         x8tFDKnYBCh/7Px7FwvBXZ8Qpc/mu36XMGD8WcqUPdpmyaOXAgV+Cs5hkXkTK0MQt+2d
-         zFQL5Fi7abKWq5dxvfEkZLoT8+NjUB35DuNjFzV7C0LE3JJk9ySZ5Xw3RFSmuCTknqNy
-         lfcbK9yZnYPO1Nhg/IAt869aPF3TCB4j85OQpb3sXmtdFowoAgU9DK4DMQw2jLFdh0I+
-         B1Jg==
+        d=gmail.com; s=20230601; t=1762371074; x=1762975874; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EtdMFqP5e+uOi79bVwRdCIbG6WeQQ2xS83d6a0IHvlE=;
+        b=OWMAvfsShUNwMf+KcAn3lhaabEpNjYJU+7+TmUGeDTA66VvENRzAAnAEwj138jzGyy
+         iJbIMW/WK1QZS8RDlrnDUjYNlIfZG3/bYEwnx5T6TFaYBQxHImmge7BOw26XO2kb4JOH
+         typUU4K2d43o5EsEYttEhTSBb/zTh9w3JPAS9cUMnIIogZYElltcxuqNbk399Y7r1jnp
+         DzPqksgDIi5HrK3YZbUub2arwk5rKaU36E9ntO1Z5tK0e47BR4CPqyL37KHlzvSKQYTg
+         1NpMEuUrkP+bnVgPqp/vybgqb+K0dD35FLKdQXyYwHSz68LfXbjldqSK6973B8fpeydf
+         58Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762370793; x=1762975593;
-        h=content-transfer-encoding:in-reply-to:from:content-language:subject
-         :references:cc:to:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eBGVBhk9WiBBQIyOs7VH474iefDJjtxM86Nb1wbwzEQ=;
-        b=uW8HsnmDDFFRd1Yvx2H/GBO9zUCrCuGZT3AXCEFfQHZiZNWctaH1GmZXYIpKadVAVJ
-         4bCbfy6LAdFzgQHC2hAOdNaXXjBKcFo7ZYYpam390n9YBZqmK1KmpFr/kAb9lv/WWQjl
-         5G5+q5yj+MNOFMdB+P/tLzZpF97B6CtuhOLEygfB6U45Q7OFD90tx8gd2mwQcInQ3JQi
-         Q6VAZe+0LYIYWrXWyBXH+xeU7b+HiGVxA7iqGIBsY7bLPaxsYK8QUk4KfXL/dv6fL0BG
-         kDIjLssLVUOAEO8f2geBMCo5o0ynoRfImfbUhNQXOXwuEqkZ4I0eHMxXEMowcL/OL9JF
-         7e3Q==
-X-Gm-Message-State: AOJu0YxJzX7Sju/1CDYlsAZhW0snC92eGrNQZ89O13Kl3CZFmwIiJ8rA
-	+g9PCVPZyZdcinSIWfG+Ua9JyXXosCUlG8/k53o3M1iEQFdsXhy3QIsL
-X-Gm-Gg: ASbGnctrStRQJlChjOE3H5v9i3fy+84KoRpcYw2agIJFpUgmns484EvcTntCIkALCuw
-	rZQiEpoNg0ERSjzkqRPjmqgJo1ifs1Ivbv8fj9vcNq21t2FivqT7bI4ja6Kes4tC9G7SX0p6R5b
-	nfZrJRkYJMvg+sQKdKqDDcazqAVENwZxV/ygZoL2TwaFB5Gvz0eKkUyDk3Fbpvzjso3VD2I5EEK
-	4LNSj1IOdmfIxP4aCFYg1I8p1AcuL+E84hpDsPKrq1LKMO05dmS9ByUhrs9SJC6xe3vf9ujx/11
-	TxCrnSK+ATlq9icE5BNUXlCMdKrLiokmj1MoGe4PENnAJXKsyk4pY6IcpGUrW+eXqNd8LYiGmHH
-	IASvHO+RM6kY24wJ2KQhtaLJtRE5gM7ccQ5yWOEVnvvwkS50wOLaLosHuZsPgL+9gb262rBq677
-	094eedPw==
-X-Google-Smtp-Source: AGHT+IHdphld0nTUW0FL4kZnPuqWZOJ2nTOf3UbOG8vdAxizKHLsONTbcVoz1FMjfjVAQMg5mnXZhQ==
-X-Received: by 2002:a17:902:f68f:b0:294:7048:643 with SMTP id d9443c01a7336-2962ad1efa5mr64435405ad.15.1762370792924;
-        Wed, 05 Nov 2025 11:26:32 -0800 (PST)
-Received: from [192.168.1.13] ([110.226.177.99])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba8ffd3f6easm102870a12.21.2025.11.05.11.26.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Nov 2025 11:26:32 -0800 (PST)
-Message-ID: <8a4ec353-fe9d-4c7e-a56e-796280dc7f47@gmail.com>
-Date: Thu, 6 Nov 2025 00:56:28 +0530
+        d=1e100.net; s=20230601; t=1762371074; x=1762975874;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EtdMFqP5e+uOi79bVwRdCIbG6WeQQ2xS83d6a0IHvlE=;
+        b=kVHdc7NcUE8m8fG0nT3cdyG7LQnE5P/UHLc+uSpGL1GrXDVBf/uLzDjBMrak3X9Oak
+         gq9BB98u/hXu3EYOjRgDw7B+dh6Wq7aB7boIpoaKek0Gkho6LmZ62rQZskdLYp/1zXY/
+         eh6N1uHRBtIyZhWlcrELa/sYI9MstXPYQ8kf3yilH7Sbr+fys1gw02c1L4SWeC7ZXVZh
+         Lf5pB3m7Qrho/a9Un79lZtqPJLgVEzg5wmgGc8KwY4dZp5eMz+vPHCloKI/sBd8nPWRq
+         pRQglzxOJMRN80q/CmIIDudnjTDfi2CUlaSjPLuTaQBWzGtstTkuwMeYRqkYl4MKmFLa
+         y2mw==
+X-Gm-Message-State: AOJu0YzM7AwtmYjsx1F9qYegltFMrgBrEontNg71kPYj72GDeKnB7HFx
+	OHi3EP980qySEr6sMe3VotSThmxSYjNHY5nLTFKeIjo0JC360KMxC+Xh
+X-Gm-Gg: ASbGncs2VdvX64FriSN+yVZrR8l8s1EWGIwPMAAKDo3nssTBAq2P8BADhqtG7ZQKwED
+	WwrW1gNOihwYJQVxpLoJNpsZ7054JYArKmU0MC3ciE4PuL7BXqhztYCBJeseHOq2nNbJvHih9Wy
+	EbJK/z0Zf7ZiFf+uLEpIkLVaOhXfg5mJe2fcGxadrNccbt7FgjCAzloCgprzbQoYlC5klLY4f3L
+	GaT8yYpifUDoTtuH79CVw19D5jp6/e9hp1TUcQMeiZwI2G8infmgC8e/U8EZJMBnyULYsffTjvw
+	AOt1YznWkKWVqrLELiLUUz6pyfvdXyvgWZTGiLJeRhvqGmdF6r+QUM6rj5pz+le4CDyI28J0rF6
+	9qInZzgxA/ffDmX+T98mlwvcz7z26mIbk6Fp+Os3qmW6N5fxL6p2Mf0u2gnwytpYg1Ko1XMvKC5
+	F8aLjYRB2j9SdKDjaHNqry52sQg6TTquE=
+X-Google-Smtp-Source: AGHT+IGTQtwZl6sL+8gi5DnCDG03CnMRgliitzD0zn5JCJuTQDzTT1J9RmyVcxbUgojmqhn5RXv1cg==
+X-Received: by 2002:ad4:5ae7:0:b0:880:4f55:4af0 with SMTP id 6a1803df08f44-880710be2d5mr47019406d6.20.1762371073669;
+        Wed, 05 Nov 2025 11:31:13 -0800 (PST)
+Received: from rpthibeault-XPS-13-9305.. ([23.233.177.113])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-880828c4faasm3348326d6.12.2025.11.05.11.31.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 11:31:13 -0800 (PST)
+From: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev,
+	syzbot+2fc81b50a4f8263a159b@syzkaller.appspotmail.com,
+	skhan@linuxfoundation.org,
+	Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+Subject: [PATCH] Bluetooth: btusb: reorder cleanup in btusb_disconnect to avoid UAF
+Date: Wed,  5 Nov 2025 14:28:41 -0500
+Message-ID: <20251105192839.895418-3-rpthibeault@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: syzbot+14b6d57fb728e27ce23c@syzkaller.appspotmail.com
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+14b6d57fb728e27ce23c@syzkaller.appspotmail.com
-References: <5ff5d1d0-192d-4aaa-8ef4-e1bfe2fdf6bb@ee.vjti.ac.in>
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix use-after-free in
- l2cap_unregister_user
-Content-Language: en-US
-From: shaurya <ssranevjti@gmail.com>
-In-Reply-To: <5ff5d1d0-192d-4aaa-8ef4-e1bfe2fdf6bb@ee.vjti.ac.in>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-#syz test: 
-git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-https://lore.kernel.org/all/20251105142251.101852-1-ssranevjti@gmail.com/T/
+There is a KASAN: slab-use-after-free read in btusb_disconnect().
+Calling "usb_driver_release_interface(&btusb_driver, data->intf)" will
+free the btusb data associated with the interface. The same data is
+then used later in the function, hence the UAF.
+
+Fix by moving the accesses to btusb data to before the data is free'd.
+
+Reported-by: syzbot+2fc81b50a4f8263a159b@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=2fc81b50a4f8263a159b
+Tested-by: syzbot+2fc81b50a4f8263a159b@syzkaller.appspotmail.com
+Fixes: fd913ef7ce619 ("Bluetooth: btusb: Add out-of-band wakeup support")
+Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+---
+Syzbot opens a usb device with out of order interface descriptors:
+Interface 3 (ISOC) in position 0, Interface 2 (DIAG) in position 1,
+Interface 1 (INTF) in position 2.
+So, ISOC is the first interface to get disconnected by usb_disconnect()
+-> usb_disable_device() -> ... -> btusb_disconnect().
+
+I don't think this is a problem on hardware, where the bInterfaceNumber 
+matches the position in the dev->actconfig->interface list; and in 
+btusb_disconnect() it would only ever go into the first if 
+statement: "if (intf == data->intf)" and not into any of the others.
+
+ drivers/bluetooth/btusb.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 9ab661d2d1e6..1f8d4af184de 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4269,6 +4269,11 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 
+ 	hci_unregister_dev(hdev);
+ 
++	if (data->oob_wake_irq)
++		device_init_wakeup(&data->udev->dev, false);
++	if (data->reset_gpio)
++		gpiod_put(data->reset_gpio);
++
+ 	if (intf == data->intf) {
+ 		if (data->isoc)
+ 			usb_driver_release_interface(&btusb_driver, data->isoc);
+@@ -4279,17 +4284,11 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 			usb_driver_release_interface(&btusb_driver, data->diag);
+ 		usb_driver_release_interface(&btusb_driver, data->intf);
+ 	} else if (intf == data->diag) {
+-		usb_driver_release_interface(&btusb_driver, data->intf);
+ 		if (data->isoc)
+ 			usb_driver_release_interface(&btusb_driver, data->isoc);
++		usb_driver_release_interface(&btusb_driver, data->intf);
+ 	}
+ 
+-	if (data->oob_wake_irq)
+-		device_init_wakeup(&data->udev->dev, false);
+-
+-	if (data->reset_gpio)
+-		gpiod_put(data->reset_gpio);
+-
+ 	hci_free_dev(hdev);
+ }
+ 
+-- 
+2.43.0
 
