@@ -1,142 +1,86 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0DB315D5E
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 14:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C527A3321BD
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 14:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762352605; cv=none; b=qz3A/x9GrSn4nl4u9pdnAt9OqxIH2Xt7qxC4SDsS8lKf+uXSCSTsrRpsyuifaluMFmd6BkSBetT+cZU+JxAhJqGn+PyM8hUbjlhHdB7CLDUnzCLin4yiAKBVd/JkAf4LtA3H9JehLV5qlUUvLOtzF3rZC8WSKsETopVknEpmWkA=
+	t=1762353618; cv=none; b=tsUPkwFXCiuWG5kslvaxgdeNMX852MKu8wwWFAOcKNLCQ7VsmG9P3FwHwfoyawh5xzJGSzQiimZ1E+wobIkg4wabn6c7f+cCSnA7rOcYIvYbO2xsdoWyudpAJ2nxHdvVYIfdY8/voWboWu0fFKnnYznAnM29D+5AqWS/N0/Pqgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762352605; c=relaxed/simple;
-	bh=qpmJTC6YKospDeO0jUXU1ZaIBfIL9Uhz+7Oos97PVAs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DJhNZzOLPfT5SDWxEuGD3LBBv87RqVBdpmNiiY/Fre2OmwSPtB1ntqXBYa+lFdXEY6NFJcU+IFbB0G7ZZcr8Wm2+RVkyUUkLsVZ8Ehy0fkrVGLQNDudnsLr0XdswC4L44eNevV9sy0dzb+zmyyBfx0UL5AsnH1Ar6q0XSXDvOEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in; spf=none smtp.mailfrom=ee.vjti.ac.in; dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b=S3QptWGN; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ee.vjti.ac.in
+	s=arc-20240116; t=1762353618; c=relaxed/simple;
+	bh=Y/lXGHe+gqUlpxT/2a3TjBagE2nj98BAgLlMkCD7yn0=;
+	h=From:Message-ID:Date:MIME-Version:To:Cc:References:Subject:
+	 In-Reply-To:Content-Type; b=XP9zPXQCW4UDazk/bOIgein+VOMi6nVNn1mBqjR6yZDLTmcO5/EHiLJ8cK+1hjY07jRSi8l139siFkcdCaimRCdn0KFhRJm/MY5OFm8AL8Yazc6afrnWSGLPloZqekLCw/09ug4pcdOBqDYGm5aSTDpn0SXfWYKf7grh9QzAat0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WYqnVyTZ; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b="S3QptWGN"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7aea19fd91cso693893b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Nov 2025 06:23:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYqnVyTZ"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-34077439166so6009888a91.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Nov 2025 06:40:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vjti.ac.in; s=google; t=1762352603; x=1762957403; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y71Q4Or9q+0cg0Yv4fMcIkVRqD+KfzfM2pip1To6eSQ=;
-        b=S3QptWGNkkbtbB8GH8QNRrsS5wlxAmTrbj4czLeLVzNyCcaP1ztqpAnxttfA4Ssmtp
-         cZ8p/3mKXaLv7nH0JELmqmAPSS0BLUVsKZ2w5Ywzf6Vt4c/HnH3mepfvM7yVFqMvHjnH
-         ForR0ukVyTtqhn8XMPFMfiu/bfuGTo1xeH/X8=
+        d=gmail.com; s=20230601; t=1762353616; x=1762958416; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:subject
+         :references:cc:to:user-agent:mime-version:date:message-id:from:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PIHawX58BbfIVMXiDfSeiVcNH6WdARDGxAqamzICfAY=;
+        b=WYqnVyTZciwYDUG/6x0LrKqz6+sx1H0hwTLPhVTQ9QEQImumRcQdV/b/XgbTBRynSI
+         hqKjmd0gVnz3FSUbAe/steBMdcB5FZS3SOPP4WuRpsxSPmnVUUcnnI6by7CUDKbymgHi
+         /P/aiqr3saG1hd6J8c7Oys3sFB6L483B7m+QZG5LSn26/VnOwS1OO4LwQQChRbHOQPgN
+         hd5gy2UBSXBRBrwtl3fh4huwBeygAw2M0w6KstYNuTQjl46qw/Q+q79JP8i07xiAqWr7
+         4DSmWTOFv8IKRZ2In261wB4R5oZH6mcfbSc+LV6HabtXWcCKIR/Er17yM8M/H76qeNPH
+         fBUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762352603; x=1762957403;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y71Q4Or9q+0cg0Yv4fMcIkVRqD+KfzfM2pip1To6eSQ=;
-        b=TKONSPzufyZYBXuA9872sLQ4Oq1glYUjEuw4bZO6lxypyYtr+FJ2AeoyOyAjIJ12vf
-         YFo09sApg0oE070sRAbdEdjYpORgPQ9SrtXzXVQIVRfnL4jCKmW3+tDP4+Xiy6ZLluQL
-         iuj7cBkBvavMvofOwB0I68zy840INWIu0XI9gKkk9U2AA2T1qLncBMv4lA40AVOEBmqV
-         KwYs0EvZC+wof2cntrr97MklK9FhjgXf/vZXLPqrStFFSlf8LrGKpgSVrVml3rGiaP4W
-         e+iFn5khmGXsAbxU5tnmU9M6OCGiAm4LK5xhqBGcq9Nd5v9D9XHrkLqG3/oBhSbSDKzk
-         BNhg==
-X-Forwarded-Encrypted: i=1; AJvYcCXwqRnQlSufw9Cf8FQVJiaT6MrQhABX/5PjA1tPWHB9Khc5l7R2kafSGknEr8IPmqwTyRR5rA/tKDEia2whLmU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyol4qAA/V8yRL1kA78r5SXnxkqoS4nKmPbrp0M7zwhTZuxg47d
-	bz9RtnKswe8EwSyXzEhBgeueFzqCxn8g8Hftfqh62P2O6+rP5biNjVwY64BsU+bJQLUaU2fpzGx
-	qn7iZLVc=
-X-Gm-Gg: ASbGncuaQSPozQhngV1OspR0pFQ8gknx0BFhLYRANybYcT30V7WnPDn5ajDMekee0LY
-	WltTMUiIM+QZHpCzzrCniTB/P5KECUwup/NCMzsnFLMVHpOTbuglYpcAgWfK3oGHE6Dyw4j8BQ3
-	70V4nDma0JvubzxKtacMm7QxPa+NY//agsW1Mo0dCmijWBiCjpHypgtB6AD7tro0wU6I2Pj0I4g
-	mgVj2LCnQzFit/qMuJBv5kgNpcyrlQzQQzTAK29spfjdTqpQlAqRX/J696AJ6eDpCvaDqj0gKxP
-	UDFzppQwzRNPGA2VOwJ2acH3N5c3N5LjJjovLfxmk3HfvLbyeGquw9vVGx070IBs+CQg8Dj4yON
-	avHQi4cC/hfHBa50wZ7O5KSqSx1jroSQOHe4Tz2Byjk4WmHXx7QYfcDvxQDgejLw8YadNJWxTVn
-	BIHiKS9PZp1IW+59EELJO5bGhmgsbmMQa+PDuPAamTnB2Ugg==
-X-Google-Smtp-Source: AGHT+IFQQjNZZXg3azKMLg0M8p5F0zJHNipEU0X4Cm3Gg9oyoPK3H+JFlHZpPjn/covtWTqzUQ8ZLg==
-X-Received: by 2002:a05:6a20:a123:b0:34a:f44:1ce0 with SMTP id adf61e73a8af0-34f843107admr4405601637.23.1762352602792;
-        Wed, 05 Nov 2025 06:23:22 -0800 (PST)
-Received: from ranegod-HP-ENVY-x360-Convertible-13-bd0xxx.. ([110.226.177.99])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7acd3247ef3sm6485299b3a.11.2025.11.05.06.23.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 06:23:22 -0800 (PST)
-From: ssrane_b23@ee.vjti.ac.in
-X-Google-Original-From: ssranevjti@gmail.com
-To: marcel@holtmann.org
-Cc: johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+14b6d57fb728e27ce23c@syzkaller.appspotmail.com,
-	linux-kernel-mentees@lists.linux.dev,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	khalid@kernel.org,
-	Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
-Subject: [PATCH] Bluetooth: L2CAP: Fix use-after-free in l2cap_unregister_user
-Date: Wed,  5 Nov 2025 19:52:51 +0530
-Message-Id: <20251105142251.101852-1-ssranevjti@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1762353616; x=1762958416;
+        h=content-transfer-encoding:in-reply-to:content-language:subject
+         :references:cc:to:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PIHawX58BbfIVMXiDfSeiVcNH6WdARDGxAqamzICfAY=;
+        b=nQexYHeaE++3rxyGLZhy7pvf2OAdNoq8lyLOJ1g7CYWBmy3XLwwB0HpXKYJTn1jpMO
+         iPT1o09dOyBJ06YAWp+WaKDArR05MVpqem9Ojkr34YEd8LjMarDZlY8P+2gztDUr5boM
+         TcZQ+hy39UUzfh2Rki+KaG69dv8DP4HF28LD/+I2ZDyM6NsY3DMCteYWfK7lZiwScYgq
+         qO7wjlnSLzz+qa1SSQ2lIrGqYDxNxz/3OISp0XR+qU76NpqM6j5MVtiQPbmxbGY5EBS+
+         bEDWtLBJo40+0AXmVci3Cl7f7+Sy/8KAtiSM79vBT0G0M5qwbDL911fOpdmz0vdse1z+
+         +xxw==
+X-Gm-Message-State: AOJu0YxTJJc9YveJ/CeVIQIlvXTjwMT118gBDzaByLklYjgY+vOnH+2v
+	LJNZ/rjMeQJy0wWgTYIfNVOSrxP+zbyA04wrT+ScB6nBBA3PWljDlHhCyIYihw==
+X-Gm-Gg: ASbGncvkjN5E/4kZHpKXXQC0jjzQjUo9UAZ6YyjHhUB/bXVtWnm9ufP1T+bgVOFaQyE
+	SpjKrZNiHMVj7F0ZVnq9D+J87SM5UB4K1IoJfUFRjU4a8YQTek4xwsE24lcHKnrrx97OO86Y7y1
+	ed16/wRydXh1JWsu3iNJF6IbBJO8F2Aj7+p4AAu//p/0V07FJhjKou3DBVOQxelnLDpdbft6lwA
+	FEl6l5qOxRJx1dOiIoa1NDMXpKQU1HTQ5RfUG7teuVSKKXjzoakS1AKa4Ugpy+fwum04F+D0ugh
+	+ikkszKX5Nf7UDfNejIe4jEEKOJTFXJPGeiiU7tz010DzEsMj7Whb5bvk8tBHtDwtbpMWhQz4Pu
+	J0w37BBjugSSeHBk1ttlClBJfr05Zoj72Jf2tHcEkVJ/m0xYcSoAe63LMuacNo55klR0uwjPWBR
+	ypzLViyeQ2LY0=
+X-Google-Smtp-Source: AGHT+IFiVvhf3hLDjIqWbHqpdiOoG6ANOIt+yMe1ih3sPzpT24zI2pgxC199608O4JP4BZYtMwrW4g==
+X-Received: by 2002:a17:90b:4c49:b0:340:c261:f9db with SMTP id 98e67ed59e1d1-341a6c43e0bmr3903319a91.10.1762353615512;
+        Wed, 05 Nov 2025 06:40:15 -0800 (PST)
+Received: from [192.168.1.13] ([110.226.177.99])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341a69b626csm3187039a91.19.2025.11.05.06.40.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Nov 2025 06:40:15 -0800 (PST)
+From: shaurya <ssranevjti@gmail.com>
+X-Google-Original-From: shaurya <ssrane_b23@ee.vjti.ac.in>
+Message-ID: <5ff5d1d0-192d-4aaa-8ef4-e1bfe2fdf6bb@ee.vjti.ac.in>
+Date: Wed, 5 Nov 2025 20:10:10 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ luiz.dentz@gmail.com, marcel@holtmann.org,
+ syzbot+14b6d57fb728e27ce23c@syzkaller.appspotmail.com
+References: <20251105142251.101852-1-ssranevjti@gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: Fix use-after-free in
+ l2cap_unregister_user
+Content-Language: en-US
+In-Reply-To: <20251105142251.101852-1-ssranevjti@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
-
-Syzbot reported a use-after-free in l2cap_unregister_user(), caused by
-missing reference counting on the associated hci_dev. If the device is
-unregistered while L2CAP users are still active, l2cap_unregister_user()
-may access a freed hci_dev when taking its lock.
-
-Fix this by taking a device reference in l2cap_register_user() using
-hci_dev_hold(), and releasing it in l2cap_unregister_user() via
-hci_dev_put(). This ensures the hci_dev remains valid for the lifetime
-of registered L2CAP users.
-
-Reported-by: syzbot+14b6d57fb728e27ce23c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
-Fixes: c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to handle Command Complete")
-Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
----
- net/bluetooth/l2cap_core.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 805c752ac0a9..6a880f8ab6c2 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1688,6 +1688,11 @@ int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user)
- 	struct hci_dev *hdev = conn->hcon->hdev;
- 	int ret;
- 
-+	/* Hold a reference to hdev to prevent it from being freed while
-+	 * we have registered users.
-+	 */
-+	hci_dev_hold(hdev);
-+
- 	/* We need to check whether l2cap_conn is registered. If it is not, we
- 	 * must not register the l2cap_user. l2cap_conn_del() is unregisters
- 	 * l2cap_conn objects, but doesn't provide its own locking. Instead, it
-@@ -1717,6 +1722,10 @@ int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user)
- 
- out_unlock:
- 	hci_dev_unlock(hdev);
-+
-+	if (ret)
-+		hci_dev_put(hdev);
-+
- 	return ret;
- }
- EXPORT_SYMBOL(l2cap_register_user);
-@@ -1735,6 +1744,9 @@ void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *user)
- 
- out_unlock:
- 	hci_dev_unlock(hdev);
-+
-+	/* Release the reference we took in l2cap_register_user */
-+	hci_dev_put(hdev);
- }
- EXPORT_SYMBOL(l2cap_unregister_user);
- 
--- 
-2.34.1
+#syz test: 
+git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
 
