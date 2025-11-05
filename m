@@ -1,29 +1,32 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2121D1C6FE8
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 10:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B254D305957
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 10:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762339712; cv=none; b=GBGDJfqPXZX5z6eYWiY1TLIOp+iTEDqByM9tk42o0ohuH7yE7MHPtcQM+cN3aDKOJXRjkmrcwi3n6JhqAONOSeQajHUzUN4NSzerJGWTRoUKzPF6YKG6SxLuBUiGd6iDSwNHFLPXtWF8w2VVHuJCxZUfLkssJR6hI1f5CVI0y2M=
+	t=1762339719; cv=none; b=nm6f9iqHPyiwZ0bJUllNsYI/r90Hp+D3LVcb3uZLGhFDunl0g41h+0ZRCY8Wuvzls0IA4zA2D5b6WChM49Jj9v2+qQxN/N2UFNKXMZjg5RaqnOOrP4iMfnkqcJxEwpLqE95Hy9l3m0NSs5XM9FoWavk1cQMDQ5vnYdWjaFIOvUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762339712; c=relaxed/simple;
-	bh=OsehNLkBh+cgr+FzndP3YyiMMiwptsAMBFRYrOAU7VQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GR+4oZ8i3vpRGPhrLiv3miKmIxJwJ/yHrfKBAWY7VOIeCQdamCgx4+HfjgvaxQ4espqKVYlfFZmAUjjjaL6uqDhUilRlwrPbcDDvkIXAwQJYramuMxM3G93SKJQn4R5XJ0gVNjMH3buk+af4W9fdhpufT6hqUGaF7aoQvZ79dic=
+	s=arc-20240116; t=1762339719; c=relaxed/simple;
+	bh=/5p+VxjBjvfxHhShs2GeJEWvOxoHhhGqnvMO7q/3xIc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EdXAZZ4zUfMbx83/lXtoWBfLrBQQ6cCz7yN82TKwgfvvGLO/lo7wvhjB/CJEjEiCviRf4nN4nU6dDYD0y325s4wqtBI8y0SR0ietQJQ7vy9QxnQgMygRTxPGAyqTDVtL4qS9uQ2vNcSmyBvZG+gYlW67XWkk2lT40LlgsYUO5mQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from localhost.localdomain (188.225.51.113) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 5 Nov
- 2025 13:48:08 +0300
+ 2025 13:48:23 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v5 1/2] shared/battery: improve the display of the charge level
-Date: Wed, 5 Nov 2025 13:47:42 +0300
-Message-ID: <20251105104746.46652-1-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v5 2/2] unit: Add basic unit tests for battery charge handling
+Date: Wed, 5 Nov 2025 13:47:43 +0300
+Message-ID: <20251105104746.46652-2-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251105104746.46652-1-r.smirnov@omp.ru>
+References: <20251105104746.46652-1-r.smirnov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -48,13 +51,12 @@ X-KSE-AntiSpam-Info: LuaCore: 74 0.3.74
 X-KSE-AntiSpam-Info: {rep_avail}
 X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
 X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {Tracking_repetitive_subdir_in_url}
 X-KSE-AntiSpam-Info: {relay has no DNS name}
 X-KSE-AntiSpam-Info: {SMTP from is not routable}
 X-KSE-AntiSpam-Info: {Found in DNSBL: 188.225.51.113 in (user)
  b.barracudacentral.org}
 X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;github.com:7.1.1
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
 X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
 X-KSE-AntiSpam-Info: FromAlignment: s
 X-KSE-AntiSpam-Info: ApMailHostAddress: 188.225.51.113
@@ -74,114 +76,64 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-The battery charge level may fluctuate due to uncalibrated
-sensors. Commit smooths out such fluctuations.
-
-The algorithm for determining uncalibrated sensors consists of
-finding the number of changes in charge direction (i.e., "spikes").
-If the number of spikes is zero, the device is charging or discharging.
-If there is one spike, it may mean that the device has started charging
-or has been disconnected from charging. If there are two or more spikes,
-this is a clear indication of an uncalibrated sensor.
-
-Check that the battery charge is fluctuating. If the battery charge
-is fluctuating, use the average charge value, otherwise use the current
-value.
-
-Fixes: https://github.com/bluez/bluez/issues/1612
 ---
-V4 -> V5: Initialize the next_charge variable to pass the tests.
+ .gitignore            |   1 +
+ Makefile.am           |   6 ++
+ doc/test-coverage.txt |   3 +-
+ unit/test-battery.c   | 223 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 232 insertions(+), 1 deletion(-)
+ create mode 100644 unit/test-battery.c
 
-V3 -> V4: Functionality has been moved to separate files, unit tests
-have been added in the next patch, simple averaging of values is
-used instead of exponential averaging, and last_charges now stores
-values instead of pointers. 
-
-V2 -> V3: A queue is used instead of an array for the last charges,
-a bug with the spikes variable increment has been fixed, and the
-fluctuation check is called each time a new battery charge appears.
-
-V1 -> V2: Smoothing is only applied to uncalibrated sensors, the
-last 8 values are saved instead of 4, and the average value is used
-for smoothing instead of the minimum value.
-
- Makefile.am          |  3 +-
- src/battery.c        | 10 ++++-
- src/shared/battery.c | 96 ++++++++++++++++++++++++++++++++++++++++++++
- src/shared/battery.h | 21 ++++++++++
- 4 files changed, 128 insertions(+), 2 deletions(-)
- create mode 100644 src/shared/battery.c
- create mode 100644 src/shared/battery.h
-
+diff --git a/.gitignore b/.gitignore
+index d23a06af4..784fc77db 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -117,6 +117,7 @@ unit/test-ecc
+ unit/test-hog
+ unit/test-bap
+ unit/test-bass
++unit/test-battery
+ tools/mgmt-tester
+ tools/smp-tester
+ tools/gap-tester
 diff --git a/Makefile.am b/Makefile.am
-index 94f625db4..4bf859685 100644
+index 4bf859685..deb59fad3 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -244,7 +244,8 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/ccp.h src/shared/ccp.c \
- 			src/shared/lc3.h src/shared/tty.h \
- 			src/shared/bap-defs.h \
--			src/shared/asha.h src/shared/asha.c
-+			src/shared/asha.h src/shared/asha.c \
-+			src/shared/battery.h src/shared/battery.c
+@@ -701,6 +701,12 @@ unit_test_vcp_SOURCES = unit/test-vcp.c $(btio_sources)
+ unit_test_vcp_LDADD = src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la $(GLIB_LIBS)
  
- if READLINE
- shared_sources += src/shared/shell.c src/shared/shell.h
-diff --git a/src/battery.c b/src/battery.c
-index 4c1ea79d9..796dbc4ac 100644
---- a/src/battery.c
-+++ b/src/battery.c
-@@ -19,6 +19,7 @@
- 
- #include "gdbus/gdbus.h"
- #include "bluetooth/bluetooth.h"
-+#include "src/shared/battery.h"
- #include "src/shared/queue.h"
- #include "src/shared/util.h"
- #include "battery.h"
-@@ -39,6 +40,7 @@ struct btd_battery {
- 	uint8_t percentage; /* valid between 0 to 100 inclusively */
- 	char *source; /* Descriptive source of the battery info */
- 	char *provider_path; /* The provider root path, if any */
-+	struct bt_battery *filter;
- };
- 
- struct btd_battery_provider_manager {
-@@ -96,6 +98,7 @@ static struct btd_battery *battery_new(const char *path, const char *source,
- 		battery->source = g_strdup(source);
- 	if (provider_path)
- 		battery->provider_path = g_strdup(provider_path);
-+	battery->filter = bt_battery_new();
- 
- 	return battery;
- }
-@@ -108,6 +111,11 @@ static void battery_free(struct btd_battery *battery)
- 	if (battery->source)
- 		g_free(battery->source);
- 
-+	if (battery->filter) {
-+		bt_battery_free(battery->filter);
-+		free(battery->filter);
-+	}
++unit_tests += unit/test-battery
 +
- 	free(battery);
- }
++unit_test_battery_SOURCES = unit/test-battery.c
++unit_test_battery_LDADD = src/libshared-glib.la \
++				lib/libbluetooth-internal.la $(GLIB_LIBS)
++
+ if MIDI
+ unit_tests += unit/test-midi
+ unit_test_midi_CPPFLAGS = $(AM_CPPFLAGS) $(ALSA_CFLAGS) -DMIDI_TEST
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index 741492a3e..b92a2ae59 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -30,8 +30,9 @@ test-gobex-transfer	  36	OBEX transfer handling
+ test-gdbus-client	  13	D-Bus client handling
+ test-gatt		 180	GATT qualification test cases
+ test-hog		   6	HID Over GATT qualification test cases
++test-battery		  10	Battery charge test cases
+ 			-----
+-			 761
++			 771
  
-@@ -234,7 +242,7 @@ bool btd_battery_update(struct btd_battery *battery, uint8_t percentage)
- 	if (battery->percentage == percentage)
- 		return true;
  
--	battery->percentage = percentage;
-+	battery->percentage = bt_battery_filter(battery->filter, percentage);
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(), battery->path,
- 				     BATTERY_INTERFACE, "Percentage");
- 
-diff --git a/src/shared/battery.c b/src/shared/battery.c
+ Automated end-to-end testing
+diff --git a/unit/test-battery.c b/unit/test-battery.c
 new file mode 100644
-index 000000000..e91067719
+index 000000000..2b8d79877
 --- /dev/null
-+++ b/src/shared/battery.c
-@@ -0,0 +1,96 @@
++++ b/unit/test-battery.c
+@@ -0,0 +1,223 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + *
@@ -192,119 +144,219 @@ index 000000000..e91067719
 + *
 + */
 +
-+#include <stdint.h>
-+#include <stdlib.h>
++#include <glib.h>
 +
 +#include "src/shared/battery.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/util.h"
++#include "src/shared/tester.h"
 +
-+struct bt_battery {
-+	struct queue *last_charges; /* last charges received */
-+	uint8_t avg_charge; /* average battery charge */
-+	bool is_fluctuating; /* true, if the battery sensor fluctuates */
-+};
++#define DATA_SIZE 10
 +
-+struct bt_battery *bt_battery_new(void)
++static uint8_t calculate_average(const uint8_t *charges)
 +{
-+	struct bt_battery *battery;
++	uint16_t average = 0;
 +
-+	battery = new0(struct bt_battery, 1);
-+	battery->last_charges = queue_new();
-+	battery->avg_charge = 0;
-+	battery->is_fluctuating = false;
++	for (int i = DATA_SIZE - LAST_CHARGES_SIZE; i < DATA_SIZE; i++)
++		average += charges[i];
 +
-+	return battery;
++	return average / LAST_CHARGES_SIZE;
 +}
 +
-+void bt_battery_free(struct bt_battery *battery)
++static uint8_t process_data(struct bt_battery *battery, uint8_t *charges)
 +{
-+	if (battery->last_charges)
-+		queue_destroy(battery->last_charges, NULL);
++	uint8_t battery_avg;
++
++	for (int i = 0; i < DATA_SIZE; i++)
++		battery_avg = bt_battery_filter(battery, charges[i]);
++
++	return battery_avg;
 +}
 +
-+static void bt_battery_check_fluctuations(struct bt_battery *battery)
++static void test_discharging(const void *data)
 +{
-+	const struct queue_entry *entry;
-+	uint8_t spikes = 0;
-+	int8_t step;
-+	int8_t direction = 0;
-+	int8_t prev_direction;
-+	uintptr_t prev_charge;
-+	uintptr_t next_charge = 0;
-+	uint16_t sum_charge = 0;
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 84, 83, 83, 81, 80, 80, 80, 79, 79, 78 };
++	uint8_t processed_charge;
 +
-+	for (entry = queue_get_entries(battery->last_charges); entry->next;
-+	     entry = entry->next) {
-+		prev_direction = direction;
-+		prev_charge = PTR_TO_UINT(entry->data);
-+		next_charge = PTR_TO_UINT(entry->next->data);
-+		step = next_charge - prev_charge;
-+		sum_charge += prev_charge;
-+
-+		/*
-+		 * The battery charge fluctuates too much,
-+		 * which may indicate a battery problem, so
-+		 * the actual value should be displayed.
-+		 */
-+		if (abs(step) >= MAX_CHARGE_STEP) {
-+			battery->is_fluctuating = false;
-+			return;
-+		}
-+
-+		if (step > 0)
-+			direction = 1;
-+		else if (step < 0)
-+			direction = -1;
-+
-+		if (direction != prev_direction && prev_direction)
-+			spikes++;
++	for (int i = 0; i < DATA_SIZE; i++) {
++		processed_charge = bt_battery_filter(battery, charges[i]);
++		g_assert(processed_charge == charges[i]);
 +	}
 +
-+	sum_charge += next_charge;
-+	battery->avg_charge = sum_charge / LAST_CHARGES_SIZE;
-+
-+	battery->is_fluctuating = (spikes > 1) ? true : false;
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
 +}
 +
-+uint8_t bt_battery_filter(struct bt_battery *battery, uint8_t percentage)
++static void test_charging(const void *data)
 +{
-+	queue_push_tail(battery->last_charges, UINT_TO_PTR(percentage));
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 48, 48, 48, 49, 49, 50, 51, 51, 51, 53 };
++	uint8_t processed_charge;
 +
-+	if (queue_length(battery->last_charges) == LAST_CHARGES_SIZE) {
-+		bt_battery_check_fluctuations(battery);
-+		queue_pop_head(battery->last_charges);
++	for (int i = 0; i < DATA_SIZE; i++) {
++		processed_charge = bt_battery_filter(battery, charges[i]);
++		g_assert(processed_charge == charges[i]);
 +	}
 +
-+	return (battery->is_fluctuating) ? battery->avg_charge : percentage;
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
 +}
-diff --git a/src/shared/battery.h b/src/shared/battery.h
-new file mode 100644
-index 000000000..41a7ed2b0
---- /dev/null
-+++ b/src/shared/battery.h
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2025  Open Mobile Platform LLC <community@omp.ru>
-+ *
-+ *
-+ */
 +
-+#include <stdint.h>
++static void test_discharge_started(const void *data)
++{
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 48, 48, 49, 50, 51, 51, 49, 48, 47, 45 };
++	uint8_t processed_charge;
 +
-+#define LAST_CHARGES_SIZE 8
-+#define MAX_CHARGE_STEP 5
++	for (int i = 0; i < DATA_SIZE; i++) {
++		processed_charge = bt_battery_filter(battery, charges[i]);
++		g_assert(processed_charge == charges[i]);
++	}
 +
-+struct bt_battery;
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
++}
 +
-+struct bt_battery *bt_battery_new(void);
-+void bt_battery_free(struct bt_battery *battery);
++static void test_charge_started(const void *data)
++{
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 57, 57, 56, 56, 55, 54, 55, 57, 57, 58 };
++	uint8_t processed_charge;
 +
-+uint8_t bt_battery_filter(struct bt_battery *battery, uint8_t percentage);
++	for (int i = 0; i < DATA_SIZE; i++) {
++		processed_charge = bt_battery_filter(battery, charges[i]);
++		g_assert(processed_charge == charges[i]);
++	}
++
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
++}
++
++static void test_fluctuations(const void *data)
++{
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 74, 73, 75, 72, 74, 72, 73, 71, 75, 73 };
++	uint8_t processed_charge, average;
++
++	average = calculate_average(charges);
++	processed_charge = process_data(battery, charges);
++
++	g_assert(processed_charge == average);
++
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
++}
++
++static void test_fluctuations_with_anomaly(const void *data)
++{
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 33, 33, 34, 32, 94, 33, 31, 33, 34, 32 };
++	uint8_t processed_charge;
++
++	for (int i = 0; i < DATA_SIZE; i++) {
++		processed_charge = bt_battery_filter(battery, charges[i]);
++		g_assert(processed_charge == charges[i]);
++	}
++
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
++}
++
++static void test_fluctuations_with_old_anomaly(const void *data)
++{
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 94, 22, 22, 21, 21, 20, 21, 20, 21, 20 };
++	uint8_t processed_charge, average;
++
++	average = calculate_average(charges);
++	processed_charge = process_data(battery, charges);
++
++	g_assert(processed_charge == average);
++
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
++}
++
++static void test_bad_battery(const void *data)
++{
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 28, 38, 92, 34, 85, 34, 45, 41, 29, 40 };
++	uint8_t processed_charge;
++
++	for (int i = 0; i < DATA_SIZE; i++) {
++		processed_charge = bt_battery_filter(battery, charges[i]);
++		g_assert(processed_charge == charges[i]);
++	}
++
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
++}
++
++static void test_device_report_5_percent(const void *data)
++{
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 55, 55, 50, 50, 50, 55, 55, 55, 60, 60 };
++	uint8_t processed_charge;
++
++	for (int i = 0; i < DATA_SIZE; i++) {
++		processed_charge = bt_battery_filter(battery, charges[i]);
++		g_assert(processed_charge == charges[i]);
++	}
++
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
++}
++
++static void test_device_report_10_percent(const void *data)
++{
++	struct bt_battery *battery = bt_battery_new();
++	uint8_t charges[DATA_SIZE] = { 30, 30, 30, 40, 40, 50, 50, 50, 50, 60 };
++	uint8_t processed_charge;
++
++	for (int i = 0; i < DATA_SIZE; i++) {
++		processed_charge = bt_battery_filter(battery, charges[i]);
++		g_assert(processed_charge == charges[i]);
++	}
++
++	bt_battery_free(battery);
++	free(battery);
++	tester_test_passed();
++}
++
++int main(int argc, char *argv[])
++{
++	tester_init(&argc, &argv);
++
++	tester_add("/battery/test_discharging", NULL, NULL,
++			test_discharging, NULL);
++	tester_add("/battery/test_charging", NULL, NULL,
++			test_charging, NULL);
++	tester_add("/battery/test_discharge_started", NULL, NULL,
++			test_discharge_started, NULL);
++	tester_add("/battery/test_charge_started", NULL, NULL,
++			test_charge_started, NULL);
++	tester_add("/battery/test_fluctuations", NULL, NULL,
++			test_fluctuations, NULL);
++	tester_add("/battery/test_fluctuations_with_anomaly", NULL, NULL,
++			test_fluctuations_with_anomaly, NULL);
++	tester_add("/battery/test_fluctuations_with_old_anomaly", NULL, NULL,
++			test_fluctuations_with_old_anomaly, NULL);
++	tester_add("/battery/test_bad_battery", NULL, NULL, test_bad_battery, NULL);
++	tester_add("/battery/test_device_report_5_percent", NULL, NULL,
++			test_device_report_5_percent, NULL);
++	tester_add("/battery/test_device_report_10_percent", NULL, NULL,
++			test_device_report_10_percent, NULL);
++
++	return tester_run();
++}
 -- 
 2.43.0
 
