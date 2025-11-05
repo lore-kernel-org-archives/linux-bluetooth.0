@@ -1,362 +1,98 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B254D305957
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 10:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2B030DD24
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 10:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762339719; cv=none; b=nm6f9iqHPyiwZ0bJUllNsYI/r90Hp+D3LVcb3uZLGhFDunl0g41h+0ZRCY8Wuvzls0IA4zA2D5b6WChM49Jj9v2+qQxN/N2UFNKXMZjg5RaqnOOrP4iMfnkqcJxEwpLqE95Hy9l3m0NSs5XM9FoWavk1cQMDQ5vnYdWjaFIOvUs=
+	t=1762339953; cv=none; b=UNZSQml2LZ6huk8a7dfF7xHBSwq5D8432izcGCYB//WGMckQKW7gotBplEx6uFofXJRmB0Auh4tflD0KCK9emAo/Gj7HQ9dgIu0y029JTjRX3VB/5NVYk3zFurLVSxhqGIKcYZ+8s9OWirRmF1yDUxkL1MSwDJfYTzZMDQqh1FU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762339719; c=relaxed/simple;
-	bh=/5p+VxjBjvfxHhShs2GeJEWvOxoHhhGqnvMO7q/3xIc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EdXAZZ4zUfMbx83/lXtoWBfLrBQQ6cCz7yN82TKwgfvvGLO/lo7wvhjB/CJEjEiCviRf4nN4nU6dDYD0y325s4wqtBI8y0SR0ietQJQ7vy9QxnQgMygRTxPGAyqTDVtL4qS9uQ2vNcSmyBvZG+gYlW67XWkk2lT40LlgsYUO5mQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (188.225.51.113) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 5 Nov
- 2025 13:48:23 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v5 2/2] unit: Add basic unit tests for battery charge handling
-Date: Wed, 5 Nov 2025 13:47:43 +0300
-Message-ID: <20251105104746.46652-2-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251105104746.46652-1-r.smirnov@omp.ru>
-References: <20251105104746.46652-1-r.smirnov@omp.ru>
+	s=arc-20240116; t=1762339953; c=relaxed/simple;
+	bh=CsVzIxXnm/CkpdhGs+zCRMZ+Uv3+nGOuTqKxdhDJrBc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iBTY70ZZu7anCcOaIIpAJzeDeXO5lpWB/6RSEql66e/20wjWZUiovG2OdmSs6MJ4oK8zYOXLnafR+aAZ3g1xcvZp00wGX8ZuGbkXrKRUyQ/IOwH1Xi+J13+gG6809+Wq7s3S2iwVQAve7YA6XoyWqlqLMX4MQv0kyLSOOLk+B0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OGCLrcKk; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OGCLrcKk"
+Received: from github.com (hubbernetes-node-9a7dd51.va3-iad.github.net [10.48.204.69])
+	by smtp.github.com (Postfix) with ESMTPA id D02CD4E082B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 02:52:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1762339950;
+	bh=ZGKOYH9jy7J1CojP+rOhWmh0BoOh6re/K03wkcOm0GM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=OGCLrcKkcljG8W1aIbb+dSD6xVEFRRPojxGS60KgFtud9uxxyZBV68qpgk9dEkngg
+	 7xsuwXdICf+5iGFncy2r4K7hzVN2KO3zi4Gg8l9pA0HqZWoAImWSiviRd/z6VwWK5Q
+	 Z1JTJ26p0HU04ptfPQwolKJdXNOF4HTyvf9wx3TA=
+Date: Wed, 05 Nov 2025 02:52:30 -0800
+From: RSmirnov512 <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1019829/000000-18e86b@github.com>
+Subject: [bluez/bluez] 0d052a: shared/battery: improve the display of the
+ charge ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/05/2025 10:35:56
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 197784 [Nov 05 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 74 0.3.74
- 076026cf5b16801374fbd5d19166f5aeefca6115
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 188.225.51.113 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 188.225.51.113
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/05/2025 10:37:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/5/2025 9:03:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
----
- .gitignore            |   1 +
- Makefile.am           |   6 ++
- doc/test-coverage.txt |   3 +-
- unit/test-battery.c   | 223 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 232 insertions(+), 1 deletion(-)
- create mode 100644 unit/test-battery.c
+  Branch: refs/heads/1019829
+  Home:   https://github.com/bluez/bluez
+  Commit: 0d052a4623c6986a0f3f34c7a5af4fc5d0b5c2a4
+      https://github.com/bluez/bluez/commit/0d052a4623c6986a0f3f34c7a5af4fc5d0b5c2a4
+  Author: Roman Smirnov <r.smirnov@omp.ru>
+  Date:   2025-11-05 (Wed, 05 Nov 2025)
 
-diff --git a/.gitignore b/.gitignore
-index d23a06af4..784fc77db 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -117,6 +117,7 @@ unit/test-ecc
- unit/test-hog
- unit/test-bap
- unit/test-bass
-+unit/test-battery
- tools/mgmt-tester
- tools/smp-tester
- tools/gap-tester
-diff --git a/Makefile.am b/Makefile.am
-index 4bf859685..deb59fad3 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -701,6 +701,12 @@ unit_test_vcp_SOURCES = unit/test-vcp.c $(btio_sources)
- unit_test_vcp_LDADD = src/libshared-glib.la \
- 				lib/libbluetooth-internal.la $(GLIB_LIBS)
- 
-+unit_tests += unit/test-battery
-+
-+unit_test_battery_SOURCES = unit/test-battery.c
-+unit_test_battery_LDADD = src/libshared-glib.la \
-+				lib/libbluetooth-internal.la $(GLIB_LIBS)
-+
- if MIDI
- unit_tests += unit/test-midi
- unit_test_midi_CPPFLAGS = $(AM_CPPFLAGS) $(ALSA_CFLAGS) -DMIDI_TEST
-diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
-index 741492a3e..b92a2ae59 100644
---- a/doc/test-coverage.txt
-+++ b/doc/test-coverage.txt
-@@ -30,8 +30,9 @@ test-gobex-transfer	  36	OBEX transfer handling
- test-gdbus-client	  13	D-Bus client handling
- test-gatt		 180	GATT qualification test cases
- test-hog		   6	HID Over GATT qualification test cases
-+test-battery		  10	Battery charge test cases
- 			-----
--			 761
-+			 771
- 
- 
- Automated end-to-end testing
-diff --git a/unit/test-battery.c b/unit/test-battery.c
-new file mode 100644
-index 000000000..2b8d79877
---- /dev/null
-+++ b/unit/test-battery.c
-@@ -0,0 +1,223 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2025  Open Mobile Platform LLC <community@omp.ru>
-+ *
-+ *
-+ */
-+
-+#include <glib.h>
-+
-+#include "src/shared/battery.h"
-+#include "src/shared/tester.h"
-+
-+#define DATA_SIZE 10
-+
-+static uint8_t calculate_average(const uint8_t *charges)
-+{
-+	uint16_t average = 0;
-+
-+	for (int i = DATA_SIZE - LAST_CHARGES_SIZE; i < DATA_SIZE; i++)
-+		average += charges[i];
-+
-+	return average / LAST_CHARGES_SIZE;
-+}
-+
-+static uint8_t process_data(struct bt_battery *battery, uint8_t *charges)
-+{
-+	uint8_t battery_avg;
-+
-+	for (int i = 0; i < DATA_SIZE; i++)
-+		battery_avg = bt_battery_filter(battery, charges[i]);
-+
-+	return battery_avg;
-+}
-+
-+static void test_discharging(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 84, 83, 83, 81, 80, 80, 80, 79, 79, 78 };
-+	uint8_t processed_charge;
-+
-+	for (int i = 0; i < DATA_SIZE; i++) {
-+		processed_charge = bt_battery_filter(battery, charges[i]);
-+		g_assert(processed_charge == charges[i]);
-+	}
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+static void test_charging(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 48, 48, 48, 49, 49, 50, 51, 51, 51, 53 };
-+	uint8_t processed_charge;
-+
-+	for (int i = 0; i < DATA_SIZE; i++) {
-+		processed_charge = bt_battery_filter(battery, charges[i]);
-+		g_assert(processed_charge == charges[i]);
-+	}
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+static void test_discharge_started(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 48, 48, 49, 50, 51, 51, 49, 48, 47, 45 };
-+	uint8_t processed_charge;
-+
-+	for (int i = 0; i < DATA_SIZE; i++) {
-+		processed_charge = bt_battery_filter(battery, charges[i]);
-+		g_assert(processed_charge == charges[i]);
-+	}
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+static void test_charge_started(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 57, 57, 56, 56, 55, 54, 55, 57, 57, 58 };
-+	uint8_t processed_charge;
-+
-+	for (int i = 0; i < DATA_SIZE; i++) {
-+		processed_charge = bt_battery_filter(battery, charges[i]);
-+		g_assert(processed_charge == charges[i]);
-+	}
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+static void test_fluctuations(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 74, 73, 75, 72, 74, 72, 73, 71, 75, 73 };
-+	uint8_t processed_charge, average;
-+
-+	average = calculate_average(charges);
-+	processed_charge = process_data(battery, charges);
-+
-+	g_assert(processed_charge == average);
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+static void test_fluctuations_with_anomaly(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 33, 33, 34, 32, 94, 33, 31, 33, 34, 32 };
-+	uint8_t processed_charge;
-+
-+	for (int i = 0; i < DATA_SIZE; i++) {
-+		processed_charge = bt_battery_filter(battery, charges[i]);
-+		g_assert(processed_charge == charges[i]);
-+	}
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+static void test_fluctuations_with_old_anomaly(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 94, 22, 22, 21, 21, 20, 21, 20, 21, 20 };
-+	uint8_t processed_charge, average;
-+
-+	average = calculate_average(charges);
-+	processed_charge = process_data(battery, charges);
-+
-+	g_assert(processed_charge == average);
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+static void test_bad_battery(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 28, 38, 92, 34, 85, 34, 45, 41, 29, 40 };
-+	uint8_t processed_charge;
-+
-+	for (int i = 0; i < DATA_SIZE; i++) {
-+		processed_charge = bt_battery_filter(battery, charges[i]);
-+		g_assert(processed_charge == charges[i]);
-+	}
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+static void test_device_report_5_percent(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 55, 55, 50, 50, 50, 55, 55, 55, 60, 60 };
-+	uint8_t processed_charge;
-+
-+	for (int i = 0; i < DATA_SIZE; i++) {
-+		processed_charge = bt_battery_filter(battery, charges[i]);
-+		g_assert(processed_charge == charges[i]);
-+	}
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+static void test_device_report_10_percent(const void *data)
-+{
-+	struct bt_battery *battery = bt_battery_new();
-+	uint8_t charges[DATA_SIZE] = { 30, 30, 30, 40, 40, 50, 50, 50, 50, 60 };
-+	uint8_t processed_charge;
-+
-+	for (int i = 0; i < DATA_SIZE; i++) {
-+		processed_charge = bt_battery_filter(battery, charges[i]);
-+		g_assert(processed_charge == charges[i]);
-+	}
-+
-+	bt_battery_free(battery);
-+	free(battery);
-+	tester_test_passed();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	tester_init(&argc, &argv);
-+
-+	tester_add("/battery/test_discharging", NULL, NULL,
-+			test_discharging, NULL);
-+	tester_add("/battery/test_charging", NULL, NULL,
-+			test_charging, NULL);
-+	tester_add("/battery/test_discharge_started", NULL, NULL,
-+			test_discharge_started, NULL);
-+	tester_add("/battery/test_charge_started", NULL, NULL,
-+			test_charge_started, NULL);
-+	tester_add("/battery/test_fluctuations", NULL, NULL,
-+			test_fluctuations, NULL);
-+	tester_add("/battery/test_fluctuations_with_anomaly", NULL, NULL,
-+			test_fluctuations_with_anomaly, NULL);
-+	tester_add("/battery/test_fluctuations_with_old_anomaly", NULL, NULL,
-+			test_fluctuations_with_old_anomaly, NULL);
-+	tester_add("/battery/test_bad_battery", NULL, NULL, test_bad_battery, NULL);
-+	tester_add("/battery/test_device_report_5_percent", NULL, NULL,
-+			test_device_report_5_percent, NULL);
-+	tester_add("/battery/test_device_report_10_percent", NULL, NULL,
-+			test_device_report_10_percent, NULL);
-+
-+	return tester_run();
-+}
--- 
-2.43.0
+  Changed paths:
+    M Makefile.am
+    M src/battery.c
+    A src/shared/battery.c
+    A src/shared/battery.h
 
+  Log Message:
+  -----------
+  shared/battery: improve the display of the charge level
+
+The battery charge level may fluctuate due to uncalibrated
+sensors. Commit smooths out such fluctuations.
+
+The algorithm for determining uncalibrated sensors consists of
+finding the number of changes in charge direction (i.e., "spikes").
+If the number of spikes is zero, the device is charging or discharging.
+If there is one spike, it may mean that the device has started charging
+or has been disconnected from charging. If there are two or more spikes,
+this is a clear indication of an uncalibrated sensor.
+
+Check that the battery charge is fluctuating. If the battery charge
+is fluctuating, use the average charge value, otherwise use the current
+value.
+
+Fixes: https://github.com/bluez/bluez/issues/1612
+
+
+  Commit: 18e86b1931bd1d60132567a23eb8885fb1e9ca6b
+      https://github.com/bluez/bluez/commit/18e86b1931bd1d60132567a23eb8885fb1e9ca6b
+  Author: Roman Smirnov <r.smirnov@omp.ru>
+  Date:   2025-11-05 (Wed, 05 Nov 2025)
+
+  Changed paths:
+    M .gitignore
+    M Makefile.am
+    M doc/test-coverage.txt
+    A unit/test-battery.c
+
+  Log Message:
+  -----------
+  unit: Add basic unit tests for battery charge handling
+
+
+Compare: https://github.com/bluez/bluez/compare/0d052a4623c6%5E...18e86b1931bd
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
