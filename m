@@ -1,152 +1,111 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353742FE584
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 09:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F4D2D978B;
+	Wed,  5 Nov 2025 09:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762335511; cv=none; b=DZseBR4AIosAC0vD6lojD6GLMLloGGXzaBgo7TapsxP5vCc13TPi4N5ODSrReG4eoWdy9bscg8iadNOLUoarEtqiNmiiJClSwE1SkNSYI20+zUl8FwQ7xKL2CKbjcEvnidfOs/SCbI+f9X+e32HvyMWQsLFxDlXS+FRh2Ahs4j0=
+	t=1762335927; cv=none; b=d/afXaiW58Zd8L5ZqYioNsXNFebrfMaubR9t36GXYKGZ6e3Gaf1Q3g4pJ7/w/2C53rIrFH0LSZRugXrhzOoseNL1arWk/EnKpeqPPMDkfp9HHSKvK8h9UBTg4SK5MYZcnH7cUPU3T3Nf6K4lqU9HTeJAzaVAiWK6uWmJmegpc5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762335511; c=relaxed/simple;
-	bh=iopb/2HE6rxnbJhUiygi9wiPs+tTGT3uUrtacSGas8M=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=D3zXOsb2ktVNgHCUWRb+xzLWyRWpppI1EacfK9dtE4vEJZbEaAlK1shMvcgl8DU+aigD5gdH6I/grPZ+/zYDtNleV3IRz1x/kqRu9H0Tg/pTfqgfapuLwTX/6AszmQANCro+rwmGLrTKUzsCsmGP/VJYflZdcnPGP9v6p9Qw2qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRDEKLBe; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRDEKLBe"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8b21fc25ae1so100428785a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Nov 2025 01:38:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762335509; x=1762940309; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=F3JF66Dwbv6Le0KOGeNOb3p2YGxaJucy1HI7+4jr1/k=;
-        b=GRDEKLBeB4xf3KpR4RF1l/pEikDSypPGBaGcOCWITIp1dHgJIyoxf9QCA7yNtob5Wi
-         y8e64YB7rnxr34LhxJDr68wlY9smWNX8Ah6qgBgysPXz9k25jRbIxFunTe5hc+RAFhqB
-         CZCzbKyxYmhpmFAyHVTuTcmbeGNO6+qlp6Snc1xRBFhU/x0dxiG+54jtCIh8RPez5NaV
-         P6c5qh46BZG7Sz709wWvdYzzQTmXZpzOi4PJGlSTl54PokwDMOYo+TlXrEFLwdZ/c5y6
-         wFDq4AXDCXV+8rm95q1+b6ilLLELnYEvyN6bigl8qIjtbGgrF2IymE5lGPtZrTaojcdc
-         Rvmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762335509; x=1762940309;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F3JF66Dwbv6Le0KOGeNOb3p2YGxaJucy1HI7+4jr1/k=;
-        b=BlbxAuc/N0Ww3J86RS2UWFU4GM8mpgXXHBA5s81wLnBPiseDOxwCMDKAaWaRPbHn3z
-         /a2gXeLdGxFZ1Zr35mvdJ1RGnUlP2Yq8dakVYEjmu9VbS4NK54GgnaUKEOU6IFKhUSLx
-         u3j4nnM3hkt8KUWiIMAAemlbLgUYCBya1qEb4EGIJ6HuQW0LA5M5YoPydT6zkKhvA/c8
-         R/kJYH8k7ateOSpWovgy5H/eHVN9dTPr6x/lhArhUTpCxDgZQsj50SpcS7C+SNcLH3+v
-         B3bGw5yV66hCcKwTosdgoR3g5ESQB+LtPlCv3flk+oLUzXcr+xue8BRXIXb2tR/aHyZG
-         Ulvg==
-X-Gm-Message-State: AOJu0YzEsETpCs7+lG+uYQ7+BbkVyJU836Vf1yaS7D4jyCv7E91R53hu
-	fnlo0oGRCNO4vIR/9uEtMqV2LerLpVPMOx3/GoZkE+iDl2eiJDZ+TasD81vdUg==
-X-Gm-Gg: ASbGncsyStqyL/C7QcIruuCbiXUeVMDV6fhtXw6t8rX/R5T2CkJpNIzHrGfph2WPUBW
-	v5jP6+KpJiETFhJ1rFJ3fWKLU6O0BGVB53zBVQJawkXyke/S09TdZYOIPpPyIK61NegE5oJcsWP
-	UUWzIMzINHm/D+pF0y3GKaCfp7DbASlkh8D3+D1t0UvRI5v0c+0Tg4lKm06A9jvwyxRd1Xl+ngf
-	TCGUwjZTA8avwKVu773G4bqlIUFYvWi64b9qpIUqiwSyoYaevEgtj18SEcocKYIE5cC9gcShmPV
-	9t5WC5uGIRxA/jz8eDTzDnGOER8HviJ7sQxFZPkeiGA5UEB2KN+DaK86CgHn9CA4oNLeFZMXQtk
-	dsuyISLplhtE/dm4IJqaippCOK3Hl5OU9daV6Jb8O/mSvqIR8vfTeAbQPb/eDcg/NIkqJHVsGGU
-	rBhNI/Yw==
-X-Google-Smtp-Source: AGHT+IGWMU0ipKL8GLjDSvfpA3j/sm3h1rYjQTh8RNl5YRd/y+82H0J7SNEvGCaCGqcf7sOt4wDgfw==
-X-Received: by 2002:a05:620a:4709:b0:8a9:b469:efc1 with SMTP id af79cd13be357-8b22083d951mr321616085a.24.1762335508580;
-        Wed, 05 Nov 2025 01:38:28 -0800 (PST)
-Received: from [172.17.0.2] ([48.214.53.179])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b0f548714fsm365787785a.23.2025.11.05.01.38.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 01:38:28 -0800 (PST)
-Message-ID: <690b1b14.050a0220.26ae85.a6bb@mx.google.com>
-Date: Wed, 05 Nov 2025 01:38:28 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0218071663665065791=="
+	s=arc-20240116; t=1762335927; c=relaxed/simple;
+	bh=V4qdxwMlx41RWjBcGzibBH9WEiFnvpaxZeJ5nGAVDWM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r6aKR/3AgmhLh/5cTWmTlA8vtkQ2iokw6G5vZrgyKCAeppyK2ViS78LyLZla7cmG31loeCYXvAR02X2TcpM0NrOfa6VofZvbuOGkF6feeNehXdnp6yMdAXstfhHu/0DPsjTlCmOadYPa+2SggEOR2D50Yu4XDxaZdQ/+ALo8AUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af0d3.dynamic.kabel-deutschland.de [95.90.240.211])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id C571D61CC3FE3;
+	Wed, 05 Nov 2025 10:45:09 +0100 (CET)
+Message-ID: <c6f8f015-267f-49e8-b427-b4524c134bfb@molgen.mpg.de>
+Date: Wed, 5 Nov 2025 10:45:08 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
-Subject: RE: Bluetooth: iso: Fix UAF on iso_sock_disconn
-In-Reply-To: <20251105-kernel_panic-v1-1-88637054c6b9@amlogic.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: iso: Fix UAF on iso_sock_disconn
+To: Yang Li <yang.li@amlogic.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20251105-kernel_panic-v1-1-88637054c6b9@amlogic.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0218071663665065791==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251105-kernel_panic-v1-1-88637054c6b9@amlogic.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1019783
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.25 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      25.47 seconds
-CheckAllWarning               PASS      27.35 seconds
-CheckSparse                   PASS      30.92 seconds
-BuildKernel32                 PASS      24.80 seconds
-TestRunnerSetup               PASS      496.53 seconds
-TestRunner_l2cap-tester       PASS      23.75 seconds
-TestRunner_iso-tester         PASS      78.33 seconds
-TestRunner_bnep-tester        PASS      6.13 seconds
-TestRunner_mgmt-tester        FAIL      120.19 seconds
-TestRunner_rfcomm-tester      PASS      9.03 seconds
-TestRunner_sco-tester         PASS      14.23 seconds
-TestRunner_ioctl-tester       PASS      9.81 seconds
-TestRunner_mesh-tester        FAIL      11.50 seconds
-TestRunner_smp-tester         PASS      8.34 seconds
-TestRunner_userchan-tester    PASS      6.43 seconds
-IncrementalBuild              PENDING   1.05 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.100 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.135 seconds
-Mesh - Send cancel - 2                               Timed out    1.998 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Dear Yang,
 
 
+Thank you for your patch.
 
----
-Regards,
-Linux Bluetooth
+Am 05.11.25 um 10:02 schrieb Yang Li via B4 Relay:
+> From: Yang Li <yang.li@amlogic.com>
+> 
+> kernel panic: Unable to handle kernel read from unreadable
+> memory at virtual address 00000000000003d8
+
+No line break needed in pasted logs.
+
+> 
+> Call trace:
+>   iso_sock_disconn+0x110/0x1c8
+>   __iso_sock_close+0x50/0x164
+>   iso_sock_release+0x48/0xf0
+>   __sock_release+0x40/0xb4
+>   sock_close+0x18/0x28
+>   __fput+0xd8/0x28c
+>   __fput_sync+0x50/0x5c
+>   __arm64_sys_close+0x38/0x7c
+>   invoke_syscall+0x48/0x118
+>   el0_svc_common.constprop.0+0x40/0xe0
+>   do_el0_svc_compat+0x1c/0x34
+>   el0_svc_compat+0x30/0x88
+>   el0t_32_sync_handler+0x90/0x140
+>   el0t_32_sync+0x198/0x19c
+
+Please add a paragraph about this problem, and how `iso_pi(sk)->conn` 
+can be NULL.
+
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+>   net/bluetooth/iso.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index 74ec7d125c88..89c7700ceb81 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -838,14 +838,14 @@ static void __iso_sock_close(struct sock *sk)
+>   	case BT_CONNECT:
+>   	case BT_CONNECTED:
+>   	case BT_CONFIG:
+> -		if (iso_pi(sk)->conn->hcon)
+> +		if (iso_pi(sk)->conn && iso_pi(sk)->conn->hcon)
+>   			iso_sock_disconn(sk);
+>   		else
+>   			iso_chan_del(sk, ECONNRESET);
+>   		break;
+>   
+>   	case BT_CONNECT2:
+> -		if (iso_pi(sk)->conn->hcon &&
+> +		if (iso_pi(sk)->conn && iso_pi(sk)->conn->hcon &&
+>   		    (test_bit(HCI_CONN_PA_SYNC, &iso_pi(sk)->conn->hcon->flags) ||
+>   		    test_bit(HCI_CONN_PA_SYNC_FAILED, &iso_pi(sk)->conn->hcon->flags)))
+>   			iso_sock_disconn(sk);
+
+This diff looks fine.
 
 
---===============0218071663665065791==--
+Kind regards,
+
+Paul
