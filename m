@@ -1,167 +1,152 @@
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E451B2C0F97;
-	Wed,  5 Nov 2025 06:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC542BE02B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Nov 2025 06:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762324650; cv=none; b=ZGDniQUjn2aqOqw/AaG0TKPkWCiwfUb1gFgr19q+WYhbaysVwY29iww07Pr6RFa65LjmofBszTcLfWSyGHaOXRMEdjrO5nj+9CPl6WGpSz31vAUuh5dbKczOlZzL87qTaXPVgSOZxJEn5M9N7uHN7HhFPE5bscgUu+ZehFIDCu0=
+	t=1762325021; cv=none; b=ON4EPucvPSRUQ268rikln+qadCRp/BhLLpoFOIfkcV1ppO+ycNWjwCgJtA8iBvI8jLnIiTYUcPpE8vKFzayetLrBdKAruVwRIQTCAUrtDPCeJAAw5QD4hZhh79Wj1a6X5+Gh9zDblJREE3Ovj8KrzD8wHaUNmQ2r39DU2WuEiBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762324650; c=relaxed/simple;
-	bh=8NxT66zCphvkQCfdIza22bbxIBzsHc7TisrsL7R5jjk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p5le+QCP+tyEBx0cHVLw5YBVsirQhruZKU1LeCZ1QrP74/0zrNjSHLh+0+9WZI5eARzR0fWg/DW+qYKcCgefQdOr6tR6BWMMdvUwMisRtamt/CH60i2xuN2pIdb4r+HJjEcn6EDKhALeBNlD8/Nv/Kt8R7q8I7rSWV+fNRWqt5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=FgS0ckKl; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+	s=arc-20240116; t=1762325021; c=relaxed/simple;
+	bh=o0LiLtSkA4nV1R5vrzXHCkJ+TjAombkCZvKoK7NgLJM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=DUM+rVDCj4KmAn65dioh7Q1qboZAgfDKe+I2QvvzPy0sXvxfhPrr0oVHuYGRO/pQMMDo63xzrDi193wY+znytz7utOTxIyI6cpAvsRbTNMpHQqllj3Ll3fTpLqdoMojtVFAWIQ1sVxVgKrdV7adEqWQX+ENJl4q0SLGU0Zfw0qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=atG3EHYH; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="FgS0ckKl"
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 5A56bH5E1630904, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1762324637; bh=4ldqUFijuY4M4Ww4pUDqzKWGCyEgYoYPd767VqSYHa8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=FgS0ckKlTfOpMGULkk2vSnYbrR1iEZiKGr5Asa/Hns2e26JB8yxHDBDrZvlDQHeDJ
-	 964eP0OUlgNar8XLjZINhuImNOJhtAUZ/HVSce1ZVsmZejGiC4K89RVIaeizV3wAg4
-	 cYFuSVjpISlz7ytDke2x+clU2ehRlrjiWX14wvUZEJ7BXy/Q8fRSLKbYCzupahtMIp
-	 QCcAoXqRd+TsT+2PxoDjSqPXEFsy0TmFuMxrAomZSAq8lz9AMxhJKzpobuLn8XXlm0
-	 1IjQPhgCO+2eTe1YImBBKrXiEfSoPmIuMPz+OQ+t6FPtlwhMA3iWmN9WRcUBqFs0Ff
-	 gXDIjmOXT1NaQ==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 5A56bH5E1630904
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Nov 2025 14:37:17 +0800
-Received: from RTKEXHMBS01.realtek.com.tw (172.21.6.40) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.27; Wed, 5 Nov 2025 14:37:17 +0800
-Received: from RTKEXHMBS04.realtek.com.tw (10.21.1.54) by
- RTKEXHMBS01.realtek.com.tw (172.21.6.40) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.27; Wed, 5 Nov 2025 14:37:16 +0800
-Received: from rtkbt-D520MT-K.realtek.com.tw (172.24.54.67) by
- RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server id
- 15.2.1544.27 via Frontend Transport; Wed, 5 Nov 2025 14:37:16 +0800
-From: Max Chou <max.chou@realtek.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Hilda Wu <hildawu@realtek.com>, alex_lu <alex_lu@realsil.com.cn>,
-        <niall_ni@realsil.com.cn>, KidmanLee <kidman@realtek.com>,
-        Max Chou
-	<max.chou@realtek.com>
-Subject: [PATCH] Bluetooth: btrtl: Avoid loading the config file on security chips
-Date: Wed, 5 Nov 2025 14:37:36 +0800
-Message-ID: <20251105063736.456618-1-max.chou@realtek.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="atG3EHYH"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b9a5b5b47bfso2164266a12.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Nov 2025 22:43:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762325018; x=1762929818; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MyuS0FLxiwborZdnx6UnAeCzdSQgbhWqSkw6xTDBLIg=;
+        b=atG3EHYHdSxXmoyK4X/CeARQ9gmYNQfc92svgm5p63m19P+MNZw1xTRz8Slb2KBz8V
+         bM2l4Cz0VEB5DZN4FFqduYoWlYhv5GQBlbvYGLnJJId/hkJLkz1WTWvCVXDndcHeCWIF
+         nNrVjxlqW5PFTCZbsMz07+Oh9v0Nk1JG1CiV0UHIFK5Zgr95tEjsb5LeYj8qLJHovCIc
+         ys97xA7by3+lcz/qfZrOH3yluCEguyYVL5jl5YF+g95sZLF6aUzF9ONxnCFE1JsNwCjT
+         IH/YPOVZg3z9Q937sIQg2+k67vgJ7GObj0KdMewViHjzmzCYpDFg4W9m5ein+JfTtAHe
+         JcGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762325018; x=1762929818;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MyuS0FLxiwborZdnx6UnAeCzdSQgbhWqSkw6xTDBLIg=;
+        b=YmSQ2uoSJTm9Ynkg4Sq1JLVNvaAh/E4Ptle5YyIkuV1C62yVQqqlL2uPdeGKOFqPe7
+         xxBaZEHazyGwVprclV/I55m5DNiLVA2Zhi7SdTFnOJ2fIXmUnvEwp31K4mAw7wRxVgCV
+         up/Vf677OgXf70dnPNG+Ys9mo2tdH2WbGC/B4DMhKgiVZWM0XyuDLclpZTBLPRmGNrnq
+         LgzR1NZr3ATJU5+UiKCpxIsOoWcJVfBL3hEvri8nw7tMQDKtJYufxEDnRT7TksK1JDAf
+         RvDq1+uSctG7hRzzU+VdohSe0ceYv+FCLwcEngdj9bbZu4owAAqoF/qTFL3wVvOg4I/E
+         W4qA==
+X-Gm-Message-State: AOJu0Yw1bPcaX0Ay9usuNOGcc6CNlgCCm4vHiONhxUv/KsE6j1N+iyFb
+	90nFaZ39PA1KKG0maDeJqfW5mh57aSLFWAOUaCpxWQvrhz35d7mZEpj1JQIoPw==
+X-Gm-Gg: ASbGnct/ZaWw0SR4JPa8F2mzXLGeF2CC28SJUMJdhUHr89y4nq1uulM9giurIOYe9lb
+	tbl4MMomlh/wN16lTiLJh/JE6aTE6simH1QKIdQmjGh4cjTdkv2i/+PdL0yM4GO2kxDHzSPGc2S
+	za74yEv4RwNtamH1hJn/AFd2wk1tdnKi5PbG58drRCD8L2oXaJSLxrjXY3xDdVXyPoYP9k66GuZ
+	6rswW/1GZOygTFcs7C1XOCw+jzyviaNal/b2tHOUPwtKKyw5ShWrrB4i8Owsbu3yqiSbPxCYPzJ
+	p7uAfPQElsYa8arIX2KrAHf5+Chi/p3zNAArzUrAzAVIgIK+0VWCSSFrIZHtStGdyWQm8EMJoBt
+	phmNl+NAIogJD1KQc/q0Stu2G/kO0gaDZxeAL78PSnFsYHRIc/cnPmOl3/FoVUAg+dctSutsB3U
+	RqQjRC7Ig=
+X-Google-Smtp-Source: AGHT+IGnxrXexbHGbQb54PZV4sPVJ+27g7BD96Z81P08dKe9yVuf+BSvc3CSNmRyPabh/A7+3iWB3Q==
+X-Received: by 2002:a05:6a20:6a0f:b0:2d9:c2:5ce4 with SMTP id adf61e73a8af0-34f840138bcmr2816276637.7.1762325018246;
+        Tue, 04 Nov 2025 22:43:38 -0800 (PST)
+Received: from [172.17.0.2] ([172.182.212.57])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba1f2a7c7cfsm4460303a12.11.2025.11.04.22.43.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Nov 2025 22:43:37 -0800 (PST)
+Message-ID: <690af219.630a0220.5e3d1.38b0@mx.google.com>
+Date: Tue, 04 Nov 2025 22:43:37 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3814702423496335649=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, max.chou@realtek.com
+Subject: RE: Bluetooth: btusb: Add new VID/PID for RTL8852BE-VT
+In-Reply-To: <20251105055041.456142-2-max.chou@realtek.com>
+References: <20251105055041.456142-2-max.chou@realtek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-For chips with security enabled, it's only possible to load firmware
-with a valid signature pattern.
+--===============3814702423496335649==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-- Example log for a security chip.
+This is automated email and please do not reply to this email!
 
-Bluetooth: hci0: RTL: examining hci_ver=0c hci_rev=000a
-  lmp_ver=0c lmp_subver=8922
-Bluetooth: hci0: RTL: rom_version status=0 version=1
-Bluetooth: hci0: RTL: loading rtl_bt/rtl8922au_fw.bin
-Bluetooth: hci0: RTL: cfg_sz 0, total sz 71301
-Bluetooth: hci0: RTL: fw version 0x41c0c905
+Dear submitter,
 
-- Example log for a normal chip.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1019714
 
-Bluetooth: hci0: RTL: examining hci_ver=0c hci_rev=000a
-  lmp_ver=0c lmp_subver=8922
-Bluetooth: hci0: RTL: rom_version status=0 version=1
-Bluetooth: hci0: RTL: loading rtl_bt/rtl8922au_fw.bin
-Bluetooth: hci0: RTL: loading rtl_bt/rtl8922au_config.bin
-Bluetooth: hci0: RTL: cfg_sz 6, total sz 71307
-Bluetooth: hci0: RTL: fw version 0x41c0c905
+---Test result---
 
-Tested-by: Hilda Wu <hildawu@realtek.com>
-Signed-off-by: Nial Ni <niall_ni@realsil.com.cn>
-Signed-off-by: Max Chou <max.chou@realtek.com>
+Test Summary:
+CheckPatch                    PENDING   0.39 seconds
+GitLint                       PENDING   0.30 seconds
+SubjectPrefix                 PASS      0.21 seconds
+BuildKernel                   PASS      25.73 seconds
+CheckAllWarning               PASS      27.77 seconds
+CheckSparse                   PASS      31.36 seconds
+BuildKernel32                 PASS      24.98 seconds
+TestRunnerSetup               PASS      499.29 seconds
+TestRunner_l2cap-tester       PASS      24.08 seconds
+TestRunner_iso-tester         PASS      76.42 seconds
+TestRunner_bnep-tester        PASS      6.09 seconds
+TestRunner_mgmt-tester        FAIL      108.87 seconds
+TestRunner_rfcomm-tester      PASS      9.16 seconds
+TestRunner_sco-tester         PASS      14.26 seconds
+TestRunner_ioctl-tester       PASS      9.89 seconds
+TestRunner_mesh-tester        FAIL      11.46 seconds
+TestRunner_smp-tester         PASS      8.39 seconds
+TestRunner_userchan-tester    PASS      6.54 seconds
+IncrementalBuild              PENDING   0.47 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.099 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.066 seconds
+Mesh - Send cancel - 2                               Timed out    1.995 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btrtl.c | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 8290932b8f7b..f6fccc6fdf22 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -50,7 +50,7 @@
- 
- #define	RTL_CHIP_SUBVER (&(struct rtl_vendor_cmd) {{0x10, 0x38, 0x04, 0x28, 0x80}})
- #define	RTL_CHIP_REV    (&(struct rtl_vendor_cmd) {{0x10, 0x3A, 0x04, 0x28, 0x80}})
--#define	RTL_SEC_PROJ    (&(struct rtl_vendor_cmd) {{0x10, 0xA4, 0x0D, 0x00, 0xb0}})
-+#define	RTL_SEC_PROJ    (&(struct rtl_vendor_cmd) {{0x10, 0xA4, 0xAD, 0x00, 0xb0}})
- 
- #define RTL_PATCH_SNIPPETS		0x01
- #define RTL_PATCH_DUMMY_HEADER		0x02
-@@ -544,7 +544,6 @@ static int rtlbt_parse_firmware_v2(struct hci_dev *hdev,
- {
- 	struct rtl_epatch_header_v2 *hdr;
- 	int rc;
--	u8 reg_val[2];
- 	u8 key_id;
- 	u32 num_sections;
- 	struct rtl_section *section;
-@@ -559,14 +558,7 @@ static int rtlbt_parse_firmware_v2(struct hci_dev *hdev,
- 		.len  = btrtl_dev->fw_len - 7, /* Cut the tail */
- 	};
- 
--	rc = btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ, reg_val);
--	if (rc < 0)
--		return -EIO;
--	key_id = reg_val[0];
--
--	rtl_dev_dbg(hdev, "%s: key id %u", __func__, key_id);
--
--	btrtl_dev->key_id = key_id;
-+	key_id = btrtl_dev->key_id;
- 
- 	hdr = rtl_iov_pull_data(&iov, sizeof(*hdr));
- 	if (!hdr)
-@@ -1081,6 +1073,8 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 	u16 hci_rev, lmp_subver;
- 	u8 hci_ver, lmp_ver, chip_type = 0;
- 	int ret;
-+	int rc;
-+	u8 key_id;
- 	u8 reg_val[2];
- 
- 	btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
-@@ -1191,6 +1185,14 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 		goto err_free;
- 	}
- 
-+	rc = btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ, reg_val);
-+	if (rc < 0)
-+		goto err_free;
-+
-+	key_id = reg_val[0];
-+	btrtl_dev->key_id = key_id;
-+	rtl_dev_dbg(hdev, "%s: key id %u", __func__, key_id);
-+
- 	btrtl_dev->fw_len = -EIO;
- 	if (lmp_subver == RTL_ROM_LMP_8852A && hci_rev == 0x000c) {
- 		snprintf(fw_name, sizeof(fw_name), "%s_v2.bin",
-@@ -1213,7 +1215,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 		goto err_free;
- 	}
- 
--	if (btrtl_dev->ic_info->cfg_name) {
-+	if (btrtl_dev->ic_info->cfg_name && !btrtl_dev->key_id) {
- 		if (postfix) {
- 			snprintf(cfg_name, sizeof(cfg_name), "%s-%s.bin",
- 				 btrtl_dev->ic_info->cfg_name, postfix);
--- 
-2.43.0
 
+--===============3814702423496335649==--
