@@ -1,154 +1,124 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24412AE99
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 03:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0C826ACB
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 03:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762398950; cv=none; b=J06KunzdEhl7dpPjdSxGkW1oddiHxCkKd5fq8X+fpSQ+19TiwBpOm0tsofeiQoMIsRkOiSlKAOtP2oy3suDSz0oEXvYkTnnhNgiPwz2qOWiTcL6ROVUe5JEr60GAFYI/U4L0639+fveO7+kgm+Vctvz/hbPu4HQj1qE6n6Fmqq8=
+	t=1762399558; cv=none; b=lqVb/QaQom1jn96xL0zdHFfGpbiaAc7AvPumaClRSOxQpIHdVw5iP5+iDnYX8aP/R/hWrpVucHamascFQbbANMq7to9sBfaeP4EFx2xnHxFVMfoFHiPcoCIdWMVb/d1GSOJkIDgitRWbXM3ZCQyY/kigroTX7SYafvWx/MFKZMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762398950; c=relaxed/simple;
-	bh=HLlUY0dxbFGzywokmJ0hjaBsmFeD4USLk88qz56/m1c=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=PaMT9Pvh7vs1fRqMJ4u8kZht5YXdqm9FCdqeKXj+1jq6nH4UubM8mq0ECghN+67NCyTCEE0RfCcUilzP1uip+U1VXsv87GdYOQMapd+qNCYZQFIzAqZ0MWyhVD08pXvuLBPhtN9RlXFhxlyvPZPTYJW5X4G01cyEKf8K7RNhxRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ktYruc5C; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762399558; c=relaxed/simple;
+	bh=TVPL5Y8wTO7zDSVKPKd2ZKD08gTy26YTPkgy4WgfZfk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gs0f//OQt39JsTL3PUUGzQxkWZkoiSNrPQEJGRQ3/dkBRw9Tfh8FKjXB+Z9Klya/AhJkH6zd5J9BtxeOq4DVsuZyqwLp1cVlSYztqLjyphTO3IB9jGbjKVVpQuMWxcKu0HzQTBm0Em+O+AFBj6rdVlr6lhTTxps5gRd2V2fM9CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nfh8Zvc8; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ktYruc5C"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3418ad69672so394602a91.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Nov 2025 19:15:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762398948; x=1763003748; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SZW5fUMeus20RZbNaiLkipYszHZBskSCr1l1Ghj/JAk=;
-        b=ktYruc5Cn3RKYfU9hRUXDIFXgOgCx93eo7ZKeCnpd94fGfSjvTeQd0mENPQdCHkA8U
-         rN9ojtb53kRFtm/keN04fMCtTSKwLO8xatO4ASV9aliiTutd08qd7KqE1nRBTyQm7mh2
-         iV9WQpTAiddrmhvnFUPi0ym99qaU6QI5ikF3hxji+zY9g6FPYHqiAGmUHLx+/NnzW/uk
-         KMdLQbNHSxw0T6Y4IsN2hPMXYOxqGVw2Gk9gZ56SJ5A9fPJASMGn1QceetfAyBRsSVY4
-         PQqgqIARUIIgy3HOyKkL90uk/uIXvGFkRQsMyolDQN7udWs1Iys9R1eMSFkYW/YDfjGE
-         z24g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762398948; x=1763003748;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SZW5fUMeus20RZbNaiLkipYszHZBskSCr1l1Ghj/JAk=;
-        b=NgxEW0gOFIuQwOpD7+kiUmGvogeQNVHmu9AcdpRjqq3lmBwpyO4QvdcRwAcFO0Jefc
-         YbxNPnXQ0qVg28OhXOuuygE3GtzSVdtPZ3kf5wQcMhtKseBzDurksYblkcQpPRPZfaG5
-         zQzVM1zEtiz0Qe46lEuLfzY558AnQtO7mdyUPBg/bHIYbfSLVzgpXdfBIOLfYdLTGeoc
-         jjp98R1DwyJcnJTffVSpz3seP8VmSduEdDX/8Xz2tYcT70JQCPVqdARbPPWsMen57Oz8
-         0Ca27e//K+wfXmO+J/mQtV2NR4jvrU5mJ2tqGaxElxHC6M/iz8quFkJGUvkpx/6+Gxhq
-         0vqA==
-X-Gm-Message-State: AOJu0YyrbNtJV7D51/IGMqAW19otTte5brF64yZveUsZRt8z5GoUJuEG
-	+mKkvMB9pr5tk9Iaw8V+t+rvvZdqDog9LjXcOzwTp0hCkeRMwtJYWxMh9aPZT77B
-X-Gm-Gg: ASbGncuE+nMCNSXVt3gjPZC7UNx7jAZtaYPxPVGumiEn7YdzxCl7eoFYRMo4qfeVo7H
-	ubTDwdMzV93JRnr4MWjEyilHJs9pQADlBrKe5AIepG1r7s+k27le9Ne8UaCj5loyYk7gCCHSpCy
-	LgFux/vB8pX6E0jsGUbobyCL5YqJXca0J5WQtkm51NAvW7dEke/oX6KveUsNlPg6xptANVrMMd5
-	as+IwCQokbPpWPJV9WdAIYEy5KZBaSIJTyJ709BXBb4frQrGma4eT1Ucg/JrfrwROREIXyj4+R1
-	i39bUleo+wT/FWQnjfOZVSFml9uS21Uu46YhST20uyMevSXRNEloJtK2SuTDAvWbAYUzd5yHS+V
-	HB2Dn121Vc9nwLRSWFK20bWqSq0Y1D7iM2KG4WSWRcWWKPMuiFWgy3U2ez61odxKQt5HiSnLyPo
-	H74D0mTu0qUONM6EJM
-X-Google-Smtp-Source: AGHT+IH0edbVo4Zapp2cnCGVPmSc8b3rLjzV1DKkBdmsUUwcM/hI/XAZfwSRTKZC3fw7IK1QCCYCbg==
-X-Received: by 2002:a17:90a:e7cd:b0:340:25f0:a9b with SMTP id 98e67ed59e1d1-341a6f0b7d4mr6832046a91.33.1762398947840;
-        Wed, 05 Nov 2025 19:15:47 -0800 (PST)
-Received: from [172.17.0.2] ([20.163.32.225])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341d1242469sm262805a91.12.2025.11.05.19.15.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 19:15:47 -0800 (PST)
-Message-ID: <690c12e3.170a0220.295776.0e41@mx.google.com>
-Date: Wed, 05 Nov 2025 19:15:47 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3119992699003415930=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nfh8Zvc8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762399556; x=1793935556;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TVPL5Y8wTO7zDSVKPKd2ZKD08gTy26YTPkgy4WgfZfk=;
+  b=nfh8Zvc8N5+svQ2lZ61j4m4HXtYkDohwWc0cM28QHDsp+/7mrXzqnOuC
+   5imIjVOlS5KrlnPcpKb8fUXDtv03B9NSo2VaKlPc9gzZHweLFFXoQJh6D
+   5YmqQhyS0PJJUO+Ddnmq4C5R7YQbXJPnr+0LxEXifjttfXQiHydBP+Slc
+   2GK2rO8uS3kOsYUbDvTiYAGVsQ7xjAwpW/5DUStd0MZyrwyrJ/5V+7NqQ
+   0c0kJNAQerABbZX9+kVlyn8ilO4eFPKGkHdoA4S5FZyv8ofPP3Fq/wvEC
+   30AlnLIVCPlmhgBXiDTDpznzUP0x7/QGyunYJaE/mijTE5ePGjQZ20eqY
+   g==;
+X-CSE-ConnectionGUID: Kb0TD03jTz6Jeuzg7FwUPg==
+X-CSE-MsgGUID: bLoebm/4S4KTvS0Eg3HxRA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11604"; a="68388307"
+X-IronPort-AV: E=Sophos;i="6.19,283,1754982000"; 
+   d="scan'208";a="68388307"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 19:25:56 -0800
+X-CSE-ConnectionGUID: D/9mhqmSRAqy7SZ2++hTjQ==
+X-CSE-MsgGUID: BYQg6bwbTWaIai9smGwbvg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,283,1754982000"; 
+   d="scan'208";a="192812795"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by orviesa005.jf.intel.com with ESMTP; 05 Nov 2025 19:25:54 -0800
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vGqd9-000TRQ-2J;
+	Thu, 06 Nov 2025 03:25:49 +0000
+Date: Thu, 6 Nov 2025 11:24:44 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH v1 2/2] Bluetooth: btusb: Add support for Bulk
+ Serialization Mode
+Message-ID: <202511061054.iucfnuVO-lkp@intel.com>
+References: <20251105170445.518320-2-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
-Subject: RE: [v2] Bluetooth: iso: Fix UAF on iso_sock_disconn
-In-Reply-To: <20251106-kernel_panic-v2-1-f4ee57845eec@amlogic.com>
-References: <20251106-kernel_panic-v2-1-f4ee57845eec@amlogic.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251105170445.518320-2-luiz.dentz@gmail.com>
 
---===============3119992699003415930==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+kernel test robot noticed the following build errors:
 
-Dear submitter,
+[auto build test ERROR on bluetooth-next/master]
+[also build test ERROR on bluetooth/master linus/master v6.18-rc4 next-20251105]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1020214
+url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-btusb-Add-support-for-Bulk-Serialization-Mode/20251106-024830
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20251105170445.518320-2-luiz.dentz%40gmail.com
+patch subject: [PATCH v1 2/2] Bluetooth: btusb: Add support for Bulk Serialization Mode
+config: nios2-randconfig-002-20251106 (https://download.01.org/0day-ci/archive/20251106/202511061054.iucfnuVO-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251106/202511061054.iucfnuVO-lkp@intel.com/reproduce)
 
----Test result---
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511061054.iucfnuVO-lkp@intel.com/
 
-Test Summary:
-CheckPatch                    PENDING   0.47 seconds
-GitLint                       PENDING   0.30 seconds
-SubjectPrefix                 PASS      2.72 seconds
-BuildKernel                   PASS      22.82 seconds
-CheckAllWarning               PASS      25.13 seconds
-CheckSparse                   PASS      27.98 seconds
-BuildKernel32                 PASS      22.69 seconds
-TestRunnerSetup               PASS      452.35 seconds
-TestRunner_l2cap-tester       PASS      23.18 seconds
-TestRunner_iso-tester         PASS      61.75 seconds
-TestRunner_bnep-tester        PASS      5.97 seconds
-TestRunner_mgmt-tester        FAIL      117.46 seconds
-TestRunner_rfcomm-tester      PASS      9.18 seconds
-TestRunner_sco-tester         PASS      14.02 seconds
-TestRunner_ioctl-tester       PASS      9.63 seconds
-TestRunner_mesh-tester        FAIL      11.45 seconds
-TestRunner_smp-tester         PASS      8.30 seconds
-TestRunner_userchan-tester    PASS      6.34 seconds
-IncrementalBuild              PENDING   1.11 seconds
+All error/warnings (new ones prefixed by >>):
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.098 seconds
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.164 seconds
-LL Privacy - Start Discovery 1 (Disable RL)          Failed       0.164 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.177 seconds
-Mesh - Send cancel - 2                               Timed out    1.993 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+   drivers/bluetooth/btusb.c: In function 'btusb_recv_h4':
+>> drivers/bluetooth/btusb.c:1286:17: error: implicit declaration of function 'h4_recv_skb'; did you mean 'sk_eat_skb'? [-Werror=implicit-function-declaration]
+     data->rx_skb = h4_recv_skb(data->hdev, NULL, NULL, data->rx_skb, buffer,
+                    ^~~~~~~~~~~
+                    sk_eat_skb
+>> drivers/bluetooth/btusb.c:1286:15: warning: assignment to 'struct sk_buff *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+     data->rx_skb = h4_recv_skb(data->hdev, NULL, NULL, data->rx_skb, buffer,
+                  ^
+   cc1: some warnings being treated as errors
 
 
+vim +1286 drivers/bluetooth/btusb.c
 
----
-Regards,
-Linux Bluetooth
+  1280	
+  1281	static int btusb_recv_h4(struct btusb_data *data, void *buffer, int count)
+  1282	{
+  1283		unsigned long flags;
+  1284	
+  1285		spin_lock_irqsave(&data->rxlock, flags);
+> 1286		data->rx_skb = h4_recv_skb(data->hdev, NULL, NULL, data->rx_skb, buffer,
+  1287					   count, btusb_recv_pkts,
+  1288					   ARRAY_SIZE(btusb_recv_pkts));
+  1289		spin_unlock_irqrestore(&data->rxlock, flags);
+  1290	
+  1291		return 0;
+  1292	}
+  1293	
 
-
---===============3119992699003415930==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
