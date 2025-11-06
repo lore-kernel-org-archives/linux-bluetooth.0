@@ -1,35 +1,35 @@
 Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1A830AACE
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 23:17:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC212E9EBE
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 23:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762471062; cv=none; b=S/zQ/IcqDxRHnW8dDkS87pFzNSBDMnUQppkhVKg2X4k2EIQ/lv7Z3/mxoz2OfTKZbJ1nOQAA4RV8MFZTUzMhaAh9vzQrnxAIs9FYAan9ZbMww018FwUXIfTTa+kCIW8jCufERppQzF7sTnLyjFK0McybNudO0wgvO22Vz7MnWbI=
+	t=1762471065; cv=none; b=EOnQQi0dFZGX/e30PxaFFyW2K1nD2XFV7wThuu3caqkNh79NblC/Zu+0976dEH+o6zlGdIUekCtGLGMvluLjjgRtide4C4FpDU3rZ+QD7lPNXQYazOwh15Am5W0XLH+mIVwN9eyo8ssrEQCWQMnH8hdD7zvwEmllDKLd1oNULPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762471062; c=relaxed/simple;
-	bh=MsMBRH2Cyng8YFPqCMNtL355pQDdrQCNQFy6xJXV5IU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=QvOq8fnDmUK6Q4D8rWj9hT60qzXOLUgNQA1IE40ltwZwG857oVuFfjTsIEEricmF40E1GeU2zJcRqF4qe89LfhDXc/+bHSWnaNk4Zg5o/Aa9cIrkAZRNZFOXoQ5lZsrhzfWoA7z27PQD3iNSbi9c5M+HFJT3viDwooPMUSYVVEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=MzXVJIvX; arc=none smtp.client-ip=192.30.252.206
+	s=arc-20240116; t=1762471065; c=relaxed/simple;
+	bh=UgEQc5eat/rXAREU0MMihrl5fje9CfqOwXtaEfHMM0c=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=atLrZNIG9LB6m5M6iYzl+n7fVIBv2oUPbmkR8jkTf9gCzTM/SJcucOuGpMO+BC0XzFHM1hjS5f9Zko+JpfElplMezailVGfCDOXEHnDq0U0hVoHnia0AQpuPS4OxtplgptiOiBjeFhRH1hPvUfiuLpOgQSc5sG9Yd3wgB2V2HZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CKB2Xwwa; arc=none smtp.client-ip=192.30.252.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="MzXVJIvX"
-Received: from github.com (hubbernetes-node-1b3c1fc.ac4-iad.github.net [10.52.153.31])
-	by smtp.github.com (Postfix) with ESMTPA id 5A3DD2124C
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 15:17:40 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CKB2Xwwa"
+Received: from github.com (hubbernetes-node-af79c01.ac4-iad.github.net [10.52.154.57])
+	by smtp.github.com (Postfix) with ESMTPA id F1A8421270
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 15:17:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1762471060;
-	bh=t0h8xW46q86YWgtScrQufQHlv2sqi/rBOTFqszYwh80=;
+	s=pf2023; t=1762471063;
+	bh=SL/mC6mYMAlGssaaZwP0Dpnx0Ll3NIzLwlAQ0wsaY68=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=MzXVJIvXcnWM+9yQrgiCESVOzdElfEBPwx9ijqJDsD8mxXMgN/WK3Wv+A57QhGbIB
-	 2VYpfSkVDR45ayjruT1317jtK2APGFTEYTmIVt6Nqw0sRpDzduKtBNPilJhzf7GPeX
-	 RJLHl2eltAuZL+WOoguW1bevsJY5SV0pWbJ01OJU=
-Date: Thu, 06 Nov 2025 15:17:40 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
+	b=CKB2Xwwam30h6Aufo5W4JAF5ORBQOEbummdVYvPtU5gdi33AzN4cy84BUyjR07M+e
+	 2dVw5mTe8lsr/quRsT2uHSfbrsRLYNvfuA/MlnNTeFF1ZbADRH0ZLATYaS9t5TKMcq
+	 +BHpGlsCkvUS52dIA5+jA4cbo7+K8AzT6jv4EWvA=
+Date: Thu, 06 Nov 2025 15:17:42 -0800
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1020667/000000-e01392@github.com>
-Subject: [bluez/bluez] e01392: emulator: Generate PA Sync Lost
+Message-ID: <bluez/bluez/push/refs/heads/1020034/1812a6-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,23 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1020667
+  Branch: refs/heads/1020034
   Home:   https://github.com/bluez/bluez
-  Commit: e013922fa0ead39be766e9c28cb04bf525450b2b
-      https://github.com/bluez/bluez/commit/e013922fa0ead39be766e9c28cb04bf525450b2b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-11-06 (Thu, 06 Nov 2025)
-
-  Changed paths:
-    M emulator/btdev.c
-
-  Log Message:
-  -----------
-  emulator: Generate PA Sync Lost
-
-This attempts to generate a PA Sync Lost whenever a PA is disabled and
-there is a remote synced to it.
-
-
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
