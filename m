@@ -1,153 +1,102 @@
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876D433EB13
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 14:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AB13502B1
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 16:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762439846; cv=none; b=n4BSzjKw7O8Wd9iUaLqN01EjjTG4V72MIvlVoHDyoKxybgmuvms9B/8OBnDcB2a1DJqq0WC4XhxzhU+7ix+CfxWPdwPYlEVT1vho/CkyVxnTGr8ueRmDhOQbTxITpCA+9mr5uyTs5z13YK9XNajChUnrFhcT9Fjw3FAnyuS66k8=
+	t=1762446390; cv=none; b=YCaRLgemRKjDPt94vzva9it96uA/patAyoSw2Ou8pCh4ZOrRUPvE3aif1rLUFoRNkMIAH0eMhfQuTkg1Mu+NeT9CLxsMfCpufN7jRXNMNg2Tx0hHOf8Scghg76HTTQnU2xVH06AbPUD6nD/RcwS5Qz/wBCNpf8haMv/2UbALjzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762439846; c=relaxed/simple;
-	bh=94o2ck2jPxS5mx8uxZoe1FAQlkHibnuQDGtfj28iywM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=t6txZ7F8JiybahgDhFFyuETDQ9wD9EdjefaiuSKa/FXcyV8CeWBiO9+nXC4zgFvZoOj5htdESHwnYiSAJdWboiKYBOhtTeIBMTI/zE02Qw5+COi7Wf37dlvPnhYj8vJA2dhdT717rBwNDK+00OC29H3vM1ymxqSI+XCqYl0U7KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GdIBKUz7; arc=none smtp.client-ip=209.85.166.175
+	s=arc-20240116; t=1762446390; c=relaxed/simple;
+	bh=03iL+MrJCZIb22dUm5GFGPSBSc4oObKGQ1674twGAoA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WmGbgVSjH0Vho9o2Nsod7wR4dmic42Kp/awVu56v6WUY9m++9z4IHZ8MiY7uPdP7Dja+L087qEKPIYaR5Bx7cM0aPdsRtePNUPHWuKFdyYZKybRwYCHEAAW+NCnQwnyZs6j5etDo11/5flW4zpwzBlU1PI+Z+G/wlExQeoSalEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CWKkWHcO; arc=none smtp.client-ip=209.85.217.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GdIBKUz7"
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-43346da8817so6312335ab.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Nov 2025 06:37:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWKkWHcO"
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-5db1e29edbcso439465137.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Nov 2025 08:26:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762439843; x=1763044643; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6yI1aFSgnofhuXUd4wTBC5Zo6RMRE/NvXQYCAQDTL7E=;
-        b=GdIBKUz7ipMHARNv6R8WdmlDym8c9QZKT/wti45yJXXgQbLLdHImltYcHVUeIMdyNk
-         d8b6UhViJbqFyZemGWWqw7yjsjonfLq7FFC9qqHh2e/V/yjGI5DQkIUHpdL71un9XkC1
-         69WtSCbuX8LjJKE+Bp7+5UEaShnYproIxnQkw86XJ+Ey16ubGulwGKaRYUIHk4wM2frd
-         /uPar8pnHGsfB0eCbPLCNY2nmyRlFuJHNodtuLI2RctZ1L/Dw7FpOlLkA/rel4i5wJMu
-         73TRB+yvdM28URGZQW3tlaVYYxeCoZJfcPVxSqkVX7jTWG7oK+vyy7GMmh7kMEgijQr7
-         MQ5Q==
+        d=gmail.com; s=20230601; t=1762446386; x=1763051186; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YLm1rQ2FtRBpKOFPnpSkr7MK3VwWtNthgSOvuX+ttKE=;
+        b=CWKkWHcO7Tkm28hpDUE2veSGcuFyhulsVUg5S6k2qBbDNClfyLuQDRFxSigrACZ374
+         7hKeXGCLnmtBZjMVrTouiv5APZspeCbAeE8dhiMrpLjuxv1KbBDMzQUjPxH5lZCZV63R
+         D+BDFt44z/eZcinOXJ43o00/FkmFvQHzHsXy2555Uq/mRxLlqy1NCaXscmeOwp0ZvNFh
+         +paTxgcT6hZ/ctNPE7jvWucpStmleeyzCGSo33T7k4X5MNOkxMoHGXQyZXXVJyJRTWY2
+         qOLjeq1tUNszlHnZ83S1iN50Xmm20JConzIBeXc/gyDmQpfDDI5TOgue2qtFF0CTl+Vo
+         oEvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762439843; x=1763044643;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6yI1aFSgnofhuXUd4wTBC5Zo6RMRE/NvXQYCAQDTL7E=;
-        b=eDD5Y9juvrOJpsuQ/jcyGCZbe5mPzrdJZlAx2N/tgn9HPq4k6BnNT+gL73OE1mI8HM
-         VcNRCYP93InTkmpBgfVbe3E/h09VVezVOuj+WC4YFkZoT1MvEfhWr7xac2VqdQv0h8sr
-         lhbYxi1yaxdEKoSbu8n4k0O1axIhBHlDt2306d3ExQ3gM5hoGRv1xJw6M0skGAVYeC6Y
-         o8GwJiMKLiNdd9XyyUwUACYkPsT/YxgnGLU/KrATiEeEMUsG9QxEXTvr3fD7Hk3B/JGG
-         D0mpc+HSuz1S9MDeeeg1hNmhPkseCn5915Y+vu3iPOClTF8aYTt0nspgfGB9yVNjsX4w
-         WsKQ==
-X-Gm-Message-State: AOJu0YyRuTDcvcuxqfsQ7CF5DLSpLIH9VLcv7meHHsFcfJw6e78evMkW
-	/AXvcp+4qTiC1OgCXsZWl2INIMKhyKohG8DN7rN5Xpmu00E/s90N5GSbUVICYQ==
-X-Gm-Gg: ASbGncuK+tTYdWxleQlbgYxlLa9VRrOK742TI6CDTSDsiplFQjvFJeYQ1mUhLFj/jv8
-	nB7VaIJ23fSo0Cr1fZy52fzgMuEkhOp3sPiY766pG/KxBd3/uK8ObL2S5s/ro9OB6bx9ABmiJIr
-	p5jmY1P9A37yACNF/Ik9tRbCgjetzcETEdkP47GKy+Z8B//lZXH7vHtwVBWyHt4qH1bBYpkuzH3
-	7If3fqCX8DP7BgP1V9Z9hxSKgTMDtPXHhi6hW7i0idHMqYwJ2ajU5gKY90ilauEV7YWTvRJz6tD
-	p3VtKdsZhsBJUne4p9RrVNY3F41EgFRIpIkU2U5O2koWRT/VkBM53jHZAwOnPDdn4pMzddEcX42
-	4OXV7nKs3sMA4cwOG9q4GcXtZqs4Rv3WjmKWahHNt3WqB/U/ghMa9Y9D/YJ6lmn9175wkac2tCq
-	SlXtyQjDU=
-X-Google-Smtp-Source: AGHT+IFUVKsXrf+l+N15NcNk7BNcDio2dS7VLX/Y0jse7DQMZsmyh3oqF/Rs2G7QehBNUtbWe/64PQ==
-X-Received: by 2002:a05:6e02:194d:b0:433:2499:92f8 with SMTP id e9e14a558f8ab-4334ee41608mr50685655ab.5.1762439843312;
-        Thu, 06 Nov 2025 06:37:23 -0800 (PST)
-Received: from [172.17.0.2] ([172.212.165.64])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7467d5a37sm921864173.7.2025.11.06.06.37.22
+        d=1e100.net; s=20230601; t=1762446386; x=1763051186;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YLm1rQ2FtRBpKOFPnpSkr7MK3VwWtNthgSOvuX+ttKE=;
+        b=aBfFsZmnHDbAjaFfJG2rU0htHcxpRBw6ShBQC1yhsDZ0T9az/EhVNbj11Mocx9VRhC
+         OP+oWe2JeHkjhhnf0SgfxZf4zfR2+XuEK1PlnXWGEsUTjMy5ef1R81DH+iHlIusq/LlO
+         tqDxrACi/2iLCmhvgqd1jVh5ctl9FTZ3eo6BWRx6CxF1jx8DU110nyMOlcPVhFewpaCZ
+         tFRosCvDcCPo6ZSYlXZyZef/2UCpQ+D/fJOUJ9zrbgNa7Nc2WTKWe5OwI1guB2B49G32
+         L/wwPZQNqb+m0aU86ZxM5Ow8sEOY4rrYqweInUZ3c1egQ3b87YwpL/Z/0JnlJvKCAh2K
+         uUjg==
+X-Gm-Message-State: AOJu0YzARTXG0m3t8FKsAeHbi7LBZ3yU725vXoM+0o++EujRQ9ZHFSpW
+	jX6O+TNLVnbNXaU1TYa7gz8ObqcmnP3ezIw+fCDm/YJXqXRGSzLLy/dBRMsb7u9s
+X-Gm-Gg: ASbGncs/Qwpg7RlqLueRn7uMajC+WkbcG7yZrBVxoGxgaACS3xVDMH2jopIeoilLcMs
+	oENbssxdYp35Ekcqifi/2LE2uBZQrVJBb49UYAGHWo3X6EReeyxo61bCydWTNrRy3z9zNSFR6W9
+	IO5NC10qUndBbIfAmKrOri7WMhfChWC6YQjI5BAFbPu0IAVE4xuRS8ByW3eVy9eFaKf4cTUWLan
+	7pYBnAlFPQro5gBgSabJPDYa+EIZ0Qne/KUo1hD6Pb59QHDKggjl0W7cS7wW5rlzAVejVeC8HkJ
+	3POby596J9H4e18j5ri2I4DeK4xXdBCvJjXSp/E91roIr0fhxnpJfK3Q7l3rcWiQSNpszUMpalu
+	vTjUXhYn/K2FcoqGnXE1v1xQd8/8nenXHEkTZi3mVJdFYqkt/nWvThJ4WbeSMZDU12b5pcWmC+j
+	3i23PSg+EhCokuJg==
+X-Google-Smtp-Source: AGHT+IEumv05uuI87aPuagLcpKftj3CO0vH5OoYMyKgrAPK5lyvUOQWJO1E9R4IGwX5ZFK4zYjWnjQ==
+X-Received: by 2002:a05:6102:ccb:b0:5d6:676:2af with SMTP id ada2fe7eead31-5ddb2129f57mr11673137.12.1762446385922;
+        Thu, 06 Nov 2025 08:26:25 -0800 (PST)
+Received: from lvondent-mobl5 ([50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5dda200bbb3sm1204944137.11.2025.11.06.08.26.24
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 06:37:22 -0800 (PST)
-Message-ID: <690cb2a2.020a0220.61a09.17b6@mx.google.com>
-Date: Thu, 06 Nov 2025 06:37:22 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1117262266248677474=="
+        Thu, 06 Nov 2025 08:26:24 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] github/stale: Fix not removing stale tag when an issue is updated
+Date: Thu,  6 Nov 2025 11:26:15 -0500
+Message-ID: <20251106162615.745878-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_shuaz@quicinc.com
-Subject: RE: Fix SSR unable to wake up bug
-In-Reply-To: <20251106140103.1406081-2-quic_shuaz@quicinc.com>
-References: <20251106140103.1406081-2-quic_shuaz@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============1117262266248677474==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+In order for stale action to automatically remove stale label from
+issues it requires the following permissions:
 
-Dear submitter,
+issues: write and pull-requests: write
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1020461
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.43 seconds
-GitLint                       PENDING   0.30 seconds
-SubjectPrefix                 PASS      0.16 seconds
-BuildKernel                   PASS      25.84 seconds
-CheckAllWarning               PASS      28.28 seconds
-CheckSparse                   PASS      32.04 seconds
-BuildKernel32                 PASS      25.24 seconds
-TestRunnerSetup               PASS      516.12 seconds
-TestRunner_l2cap-tester       PASS      23.91 seconds
-TestRunner_iso-tester         PASS      63.77 seconds
-TestRunner_bnep-tester        PASS      5.99 seconds
-TestRunner_mgmt-tester        FAIL      116.24 seconds
-TestRunner_rfcomm-tester      PASS      9.17 seconds
-TestRunner_sco-tester         PASS      14.33 seconds
-TestRunner_ioctl-tester       PASS      9.78 seconds
-TestRunner_mesh-tester        FAIL      11.86 seconds
-TestRunner_smp-tester         PASS      8.38 seconds
-TestRunner_userchan-tester    PASS      6.48 seconds
-IncrementalBuild              PENDING   0.79 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.096 seconds
-LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.161 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.031 seconds
-Mesh - Send cancel - 2                               Timed out    1.997 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+https://github.com/actions/stale?tab=readme-ov-file#remove-stale-when-updated
 ---
-Regards,
-Linux Bluetooth
+ .github/workflows/stale.yml | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/.github/workflows/stale.yml b/.github/workflows/stale.yml
+index c6d6134d9d00..bf2c20226cc2 100644
+--- a/.github/workflows/stale.yml
++++ b/.github/workflows/stale.yml
+@@ -6,6 +6,9 @@ on:
+ jobs:
+   stale:
+     runs-on: ubuntu-latest
++    permissions:
++      issues: write
++      pull-requests: write
+     steps:
+       - uses: actions/stale@v9
+         with:
+-- 
+2.51.0
 
---===============1117262266248677474==--
