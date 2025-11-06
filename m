@@ -1,121 +1,64 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8129334F475
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 17:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762451087; cv=pass; b=I5fqpa8654tOBUkq5aUUAMv/SFIEnWssvQqmHmVz0jAL/8MRlyx3AzpM6F9fCptDesvfMvyKX7grtsE4eKGvuHwmNlh5rCOhvdbL9rd1D7fymu1Ey9HiXKQXNbhidivWMImBGlxMnZEo/16T8KqWUGgj77DVr+fd0yJwNcKhuEM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762451087; c=relaxed/simple;
-	bh=GD39ISEbjQ/iq+LwfmmcmI76tgKXpau5+cRsfrVKF28=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gMB+Tw5rJuZ4mgagfKVtNj/vrqQ6HvUtQ0m9rM03vdDhLSDwzabp3oADAOwNP2XJsIaxOwOG0sGG/QJWzcfd4SWUSD6Hfa2QtWKdET9n4t6/agN1sUg2UpDXaLdQk4ajVSXM/GiZBl3idOeg/FcHP9/zpdSnjO/PfRvD3AHrfdU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=rRzKv+65; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5E22BDC3E
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 17:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762451507; cv=none; b=sd9q7NbujQl9ZOE8a8GA0XewgI4gwdxjN2jerIwoMpwbclxwmewM7Bl2GWV+4leefYzPmd7YOCi1HmsXKvgAuPGjAJJfhnLv1xLz3QlOyxPz7uv1UB+8N9oR7sBoh5vHwk2Ky6SkNgvwCcyWhcnM8sotaZ9Bfm9EAYfqKzQOR24=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762451507; c=relaxed/simple;
+	bh=Np70fRGAm0etZfZzFb+ahn6keBw4Ae0WUXleg086U74=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=bfKEXQlPecPfHvE1nbf+sCojlfsx5kcRIsg8XhI4hq38TShJhUaC8tCj4SiZfKOpSzQUAlpzdkRWCk3Hm5lm+N+PhMlSK7xO3C/wCMPJlOX5GnPZkeONNPuzVRkuJWFAsfn+bla35JkUgxCQ7Ygjc72m0qdMifOPZbGDuHn8LkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=V7piTJmE; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="rRzKv+65"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4d2V1t5rCHzyW5;
-	Thu,  6 Nov 2025 19:44:34 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1762451075;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=svi6BKFYKmkilnr3SAa26aHRFmp0jYCchciXiM4pr0E=;
-	b=rRzKv+65t8CB07dub1xT2m3fZcnwsOj46sLyQ2aIxiM2ZsQoKHeEzhcqqUkPA2/BNzDhJj
-	dM2261kclikIaAYnDKbOn3oTaDiXMqJWzKJGn5Udg7a7SzUR4U0463sZ28VNcXlgrbmDcx
-	eIIMWQh9SS/k71WUYeK/02fjm3HpRp0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1762451075;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=svi6BKFYKmkilnr3SAa26aHRFmp0jYCchciXiM4pr0E=;
-	b=NW+f5VVzthtqq04EhrYqRmlAhFKHhsXjIw6mZuFynrV+oNhIFjSiJYJc9cbQTC4BQN8k57
-	s0Kogxyv4mCm+wHkTryHYJPEOOnG6fVBBD2IUYFRVhv/ZDxyYEyZ/r1du74p8z4NfW61fI
-	H9zmGBHSL1L27uA+uIPeYq9z1lnz1sY=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1762451075; a=rsa-sha256; cv=none;
-	b=ZV799Kp5nLg3MgpOQdwAPfs34AhbKBW2eMp9i8G4Ubp31s8iprIdShbvQvvvopbazd9NH2
-	TIpnTTPlQv8gZLdyiA2x2SWME0JE+d4uMbDoD0+dBy/pMtjLbqmt7B/zNHdx+mBkKrzP6c
-	pVS1ypSP7mRnem165nk3cHzUooqNOi4=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="V7piTJmE"
+Received: from github.com (hubbernetes-node-a8b9263.ash1-iad.github.net [10.56.203.107])
+	by smtp.github.com (Postfix) with ESMTPA id EBB1C1412EB
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Nov 2025 09:51:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1762451505;
+	bh=oP3k+gNELifs7Gcpxd/vSyUx/L0PGIxtB0rNDXMDras=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=V7piTJmECkO7dfp1LDii7XqrmIU4yHaoQrKKJTZ+K9NNOdvwH1LUkC8BAHScD6aT/
+	 FNQn972Cg2Lfn0ya0VfTzYpfooqdS0g+COrY/T/6c+RoF4X5ByKe3zZHXqBVrwrg4t
+	 EAyjoavTLrzNDiyuEwdGJLMGfCcN2e8lpm/SF8+U=
+Date: Thu, 06 Nov 2025 09:51:44 -0800
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] github/issue_template: Add basic issue template
-Date: Thu,  6 Nov 2025 19:44:28 +0200
-Message-ID: <4ae9101b9ad8a521af68b0eede9ed33e752de65a.1762450967.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
+Message-ID: <bluez/bluez/push/refs/heads/1020579/000000-873523@github.com>
+Subject: [bluez/bluez] 873523: github/issue_template: Add basic issue template
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1020579
+  Home:   https://github.com/bluez/bluez
+  Commit: 8735234805d2297c7e19559c5b1d23b7f8540b9c
+      https://github.com/bluez/bluez/commit/8735234805d2297c7e19559c5b1d23b7f8540b9c
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-06 (Thu, 06 Nov 2025)
+
+  Changed paths:
+    A .github/ISSUE_TEMPLATE/issue.md
+
+  Log Message:
+  -----------
+  github/issue_template: Add basic issue template
 
 Add issue template that instructs to use btmon and indicate software
 versions.
----
- .github/ISSUE_TEMPLATE/issue.md | 41 +++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
- create mode 100644 .github/ISSUE_TEMPLATE/issue.md
 
-diff --git a/.github/ISSUE_TEMPLATE/issue.md b/.github/ISSUE_TEMPLATE/issue.md
-new file mode 100644
-index 000000000..ba384e120
---- /dev/null
-+++ b/.github/ISSUE_TEMPLATE/issue.md
-@@ -0,0 +1,41 @@
-+---
-+name: New issue
-+about: 'Report a bug or other problem'
-+title: ''
-+labels: ''
-+assignees: ''
-+
-+---
-+
-+### Description
-+
-+<!-- A clear and concise description of what the bug is -->
-+
-+<!-- A clear and concise description of what you expected to happen -->
-+
-+<!-- Include any other relevant details -->
-+
-+### To reproduce
-+<!-- Steps to reproduce the issue, if possible -->
-+1.
-+2.
-+3.
-+4.
-+
-+### Logs
-+- btmon log: <!-- Bluetooth traffic dump: (usually needed)
-+                  0. Power off connected device
-+                  1. Run: btmon -w btmon.log
-+                  2. Connect device, reproduce the issue
-+                  3. Ctrl-C btmon
-+                  4. Attach btmon.log to the issue -->
-+- bluetoothd log: <!-- Run: journalctl -u bluetooth --boot 0 > bluetoothd.log; if relevant for issue -->
-+
-+<!-- Any other logs etc. relevant for the issue -->
-+
-+### Versions
-+- BlueZ version:  <!-- Run: bluetoothctl --version -->
-+- Kernel version:  <!-- Run: uname -r -->
-+- Problematic device: <!-- Device model etc information, if relevant -->
-+
-+<!-- Any other relevant information on platform / hardware here -->
--- 
-2.51.1
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
