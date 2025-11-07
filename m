@@ -1,106 +1,136 @@
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A8B18E1F
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 20:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50272F7441
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 20:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762546730; cv=none; b=taLtf3csuuxKEgKvjGPE+DFOeC+wiG7bsc2dHgTaOrQsBkBKcTzwwY81er7yCl8R/o/Tj4C9raRSh3oi9RWCBZ0pkxMj+/mdCoaPA0cMmIAXk2yUQSdWI42BhjwtglhQ7RqaG3w9W5/SqFepDatDB6NoCA8ufsWIB+LAE9m85B0=
+	t=1762547479; cv=none; b=jRpAywe2CgtusuFfhrcpGZBIg0CHRq18CMG+1OOrhzD/cXINm1p9ZmaKXDGwr4rZ/4H1dbsoWE+9vOxU/r1GsDwq3lnyyBmBKttSnnLJZ1Zdj5PLAGyusGqiL/pP0hFlJG8uZkEQiIke73LQUStXQAa8WxwkjY+sMWhnDpOrinI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762546730; c=relaxed/simple;
-	bh=O0F/FNrZmNnpMe5IFdxZbNg6K5fAuO3e19jqCuOByVA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HL0jwU9KHi0Dpo9fJX+l3mo4S422xsFhqbcytXyp1KnvwilZ8qw0ZA853csC89GERRWXbBwNSYWKalg1DpI1KkesCEwXAokuCVsw5wwiFqjl8glr2KtQcGLOYGRMa0uUIgT6XFEeJ+bZDZq7ha4r0iNQDVo5xcLoByatVoDY1os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jhbjdgUs; arc=none smtp.client-ip=209.85.221.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762547479; c=relaxed/simple;
+	bh=3/Yc7UaHe7wsho5eDCSelTMzudrZzRI/Icui5trJxzY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=EL5Z7rIYMItRuLrC7X+QzkrJBpxBYnjRXpSp32oqczBgtpel+vi6ik4rGefxjvgXs0rH/fkQDVkTNPR0albSLywDHmxNV/EW7zF7b3DYtWS3j5KoyHYxdaAcxUh26UnKnzIiMFa65Tkh5ADUXZeULPIlSUeD9tP9vpDGkg4DXDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Lwnm9JZt; arc=none smtp.client-ip=192.30.252.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jhbjdgUs"
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5598942c187so645464e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Nov 2025 12:18:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762546727; x=1763151527; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6W7PZac9Mfe1GzHxJm4zeI9is9sMdlnZRZRkdeiq860=;
-        b=jhbjdgUsGpTlHYdwn+StMzaXDyi8FpNK8ImYGsMZ4apILTv38YuoncXNhWfM6i4ew9
-         oayEz5WssqQbKkWQpzItgHZu/xGjJ4kyW+6ASnqrd6ng+pMnOVYXexFDRpFfEvaaX+pp
-         4rDb6Goa/w7VeMHVyrCM95+wlFQa1hwi5NWxXndqiwTQGdeX9N2t/DqOJdamumh172zG
-         YhYhleZ3nSt/zzpXbheFOJg/znJ8tgeqzEhr5gXeqt8fZhPM1XWk+QjungNuFpUGgupQ
-         Ix8pXGABaoyf7QmYCb7wdkf6pwRqpxMd2yO/RLqRnG+wSwdelHGRl3GDf3UKZCmthxNL
-         +O+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762546727; x=1763151527;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6W7PZac9Mfe1GzHxJm4zeI9is9sMdlnZRZRkdeiq860=;
-        b=fYRJWpK6/RzsZVZT0lgihx+qrWgenR2yvPbiV8IAwGVBYNngd4wnTxEWOIcucLh2nZ
-         Y50VffSKloF5V4NTgCSMT8/NHr19vwC5tRkkY0aNAqTzMKK/z22ik/JxOvVMZOePwsgj
-         csgWqaIpxXMqDek96WW9FsWz8VHqKuuZTCncc4Pgh9NXcsReu5Gbs7XGqnS6uUseqks2
-         FK7IfeWjdhr77DW6/uUYW+VZyxKpPFIVnJvSFfcfyDQqopGeM9suRA3ebyjo7hd4FhgA
-         9b6xaTVvXOlkwf8hPvht2GbYum2kHW3GtoZwAHnyxXsd1qU+r13iFb6bR7MqOmD/ww2l
-         Zoug==
-X-Gm-Message-State: AOJu0YxENnEmPrAPKqKznBESoU9ULigfrjN74D5i586BtuK7zIT+bb2V
-	rhHjVgh53oj6lNhQ9SM3QP0QRZ43l8nUd0YzreQqbhc4Z90mMDpXa6AtwaqXFQ==
-X-Gm-Gg: ASbGnctKC70FckekhpWPXYhEu+Wu/8sS4xMJs+IaRiz8yVGZFRakAGbDbC4Jj3JkTob
-	ZTqc9fVB64z48EcdGSSRwgLvqE7+mdnUsLwVuYOaITeK0G0xKNnyyKR66BE+hGu33sDlv7NbBkB
-	UgdhEVl8STp4UUqZJGxJ5wY0tVZea160FDw8/T1e8C96kXL+EhAi3QgRIilYFHwgscmx95C4TNH
-	Kz6CcGiT/gl8lXHf7/1GMxwwJYnRvQWz0EgV88buzj1zpdAUPjey7s7NYzbaqBrLtxab3a3h1MO
-	7SZxIYeGy3W1dok22DkmG1hd2TYrtYxktZtsVEYzcawlcNS3wlqLJku++NguuhHVxtUVBHDVZ7T
-	Uh/YDSjwfCarF2uu9adEf59CUUwPFW1/CLbNE6NbR4inpf/HF/3yYZwJBSrPCy7OYUj/fKY7BW/
-	3m/HPPGB93XCXPdg==
-X-Google-Smtp-Source: AGHT+IGMb9EzPKpGPE1LXQtmEw0IwoKO9hmWhJoSUm5eWIX+KsUPEeBJ/NDMXNpo5bSJfjjU3ItUlg==
-X-Received: by 2002:a05:6122:8498:b0:54a:a2a3:b16b with SMTP id 71dfb90a1353d-559aaf804b1mr871475e0c.3.1762546726837;
-        Fri, 07 Nov 2025 12:18:46 -0800 (PST)
-Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5599582860asm3562921e0c.16.2025.11.07.12.18.45
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 12:18:46 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Lwnm9JZt"
+Received: from github.com (hubbernetes-node-4151e64.ash1-iad.github.net [10.56.206.77])
+	by smtp.github.com (Postfix) with ESMTPA id E2A3060063B
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 12:31:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1762547476;
+	bh=k++Lo1JBmiWb5WzFyoJFSCn7G8oNYUihZdSOwfWw+BI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Lwnm9JZtcbvjIhHblENXm1BjmFUfrAp4eYA0lrm0znUBFcN0gn8sgegbtuMKwNbhk
+	 LDXA/bzLt0dTyzPCI0VB4fVo5BxYdne9uBnV/KxyqRofe+8xiLilJoHevStOZT5Hii
+	 fROtAAAdns3Kufhnzj1BUIvijqj+wBPr1+fkBo3M=
+Date: Fri, 07 Nov 2025 12:31:16 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 5/5] btio: Fix endless loop if accept return -EBADFD
-Date: Fri,  7 Nov 2025 15:18:27 -0500
-Message-ID: <20251107201827.1235953-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251107201827.1235953-1-luiz.dentz@gmail.com>
-References: <20251107201827.1235953-1-luiz.dentz@gmail.com>
+Message-ID: <bluez/bluez/push/refs/heads/1021075/000000-1b3bd7@github.com>
+Subject: [bluez/bluez] 27eb90: emulator: Generate PA Sync Lost
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1021075
+  Home:   https://github.com/bluez/bluez
+  Commit: 27eb90249173369fe000749a1d7e1a4ab81b7f2f
+      https://github.com/bluez/bluez/commit/27eb90249173369fe000749a1d7e1a4ab81b7f2f
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-07 (Fri, 07 Nov 2025)
+
+  Changed paths:
+    M emulator/btdev.c
+
+  Log Message:
+  -----------
+  emulator: Generate PA Sync Lost
+
+This attempts to generate a PA Sync Lost whenever a PA is disabled and
+there is a remote synced to it.
+
+
+  Commit: 1874de0a078158798e78debc09ba373bd83a9d91
+      https://github.com/bluez/bluez/commit/1874de0a078158798e78debc09ba373bd83a9d91
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-07 (Fri, 07 Nov 2025)
+
+  Changed paths:
+    M emulator/bthost.c
+    M emulator/bthost.h
+
+  Log Message:
+  -----------
+  bthost: Add support for terminating a BIG
+
+This adds support for sending BT_HCI_CMD_LE_TERM_BIG via
+bthost_terminate_big.
+
+
+  Commit: a4c24d8af5c4c7b7307c8fb2ba3ffe74486f0aac
+      https://github.com/bluez/bluez/commit/a4c24d8af5c4c7b7307c8fb2ba3ffe74486f0aac
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-07 (Fri, 07 Nov 2025)
+
+  Changed paths:
+    M tools/iso-tester.c
+
+  Log Message:
+  -----------
+  iso-tester: Add tests for checking proper handling of Sync Lost
+
+This introduces the following tests to check if BIG/PA Sync Lost are
+handled properly:
+
+ISO Broadcaster Receiver Sync Lost - Success
+ISO Broadcaster PAST Receiver Sync Lost - Success
+
+
+  Commit: 9f1669ae9412b4443ea138cd82d33ed88310d328
+      https://github.com/bluez/bluez/commit/9f1669ae9412b4443ea138cd82d33ed88310d328
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-07 (Fri, 07 Nov 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+    M profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  bass: Fix not cleaning up delegator properly
+
+When BIG sync is lost, or the assistant modify removing all streams,
+delegator should be freed to so the assistant can start over and share
+another stream.
+
+
+  Commit: 1b3bd732173925a05528676873a8c5d1c6eb04f5
+      https://github.com/bluez/bluez/commit/1b3bd732173925a05528676873a8c5d1c6eb04f5
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-07 (Fri, 07 Nov 2025)
+
+  Changed paths:
+    M btio/btio.c
+
+  Log Message:
+  -----------
+  btio: Fix endless loop if accept return -EBADFD
 
 In certain cases, e.g. ISO Broadcast Listen, the listening socket may
 get into an invalid state (CONNECTED) if the PA Sync is terminated
 causing an endless loop of accept syscall.
----
- btio/btio.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index 1a34927b2353..cfaa9392de12 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -253,8 +253,11 @@ static gboolean server_cb(GIOChannel *io, GIOCondition cond,
- 	srv_sock = g_io_channel_unix_get_fd(io);
- 
- 	cli_sock = accept(srv_sock, NULL, NULL);
--	if (cli_sock < 0)
-+	if (cli_sock < 0) {
-+		if (errno == EBADFD)
-+			return FALSE;
- 		return TRUE;
-+	}
- 
- 	cli_io = g_io_channel_unix_new(cli_sock);
- 
--- 
-2.51.1
 
+Compare: https://github.com/bluez/bluez/compare/27eb90249173%5E...1b3bd7321739
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
