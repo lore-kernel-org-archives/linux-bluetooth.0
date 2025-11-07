@@ -1,46 +1,62 @@
-Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [176.109.96.46])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8162299A94
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 12:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.109.96.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675AD288C3D;
+	Fri,  7 Nov 2025 12:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762518494; cv=none; b=kk6q025YAr6wsCANj72976zm/EwhaALLNFVdbVzKpGCqy4vQrBhJDBvGeRNYtxOYzus2JisXw7+yxV7ApsKvh3a18RKSjw2Yj3WACS78tlDWk9AuhqatiDPuei8Oo5ZBWEEL8FLt0vyzr7iXgYONAIxqW6OF6jKIv65x2oQQltQ=
+	t=1762520057; cv=none; b=kSVh58iGkEzaNNwSOL9Kg4oGBCAp+BBKcUd6fi0gEzT0SwDlUpR2MXzSZJHjip67bWf8L8RudwrpHVCmRbk7JUFcdSRbZzN3I03BA0+sQDH1yLZBa3079/NSaVppMmNyirM5cgDi3qVYFJPBZHa47R8o1w2AznJkQZs4YxB1VUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762518494; c=relaxed/simple;
-	bh=hxHKV/SqHgzbPEIWVb9UPDqMzQvyrKoka0N+sHC/m/I=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OlV/bqyq5j8zPheG7LMw8g9SPguIbJ7ngxdtre/EOK5IJl6FedXV3ZzdcQhn7bo53axLpzW7RxXG5H4mg5uL4l3ig0rjaZF63HRyCTWoBoAkGTtYT0mrxbIWzycAW3MqfriBnSfArVBsOqnHgpP7Jc57g3UAWOVnXdjd/j1sH0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=JdCk86sF; arc=none smtp.client-ip=176.109.96.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1762520057; c=relaxed/simple;
+	bh=k9EEVswMFqJRut4kEtTYv6JgOZb2c0VDD1VhmxGG4sw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NtZ1glNgoD1exZQ+yHxrKkI3b5xaV/Xx6YheasRpRWay3giaElPXyoK13ROT8UYjsW+7V6Bvh+1SPyzpM1JqSKKm+oxQbQxzaZltSnWfG4JSIbgp3F7Fvy7TBJGQ9i9hbiRpLfj+gwlm9NJOAvYK7AzNBaEGVxA/SeYBrrd6Cfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=GBVsjpWT; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="JdCk86sF"
-Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx4.sberdevices.ru (Postfix) with ESMTP id A6C9240059
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 15:28:06 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru A6C9240059
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=post; t=1762518486;
-	bh=4Di2YYASedd4ORpnRJ+tS2cIV040+0GjsXjHcz36dxg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=JdCk86sFthZli7lJozYpU6blkPbzytjS6YH+9cI8z03s7CKMql4mJPpIjNHsa4BQi
-	 gEk0xbTLpRlX6Gl2KlPYrR3/NiWGp0LqytufqJw/akqE8PEH2X2DQgiAiJzX4AJ6iD
-	 4ha+iyAHSoUuarhDU+ix/JB78d/LiF0qVLc3CLK6Oz/9auS8lziCPYJdirhpdHRbh9
-	 3+AJihnUnsUFsUrt3ciiXG6Ht9ypx+Pj+RnJhtc6hfcfgtmk8cv+ev5lTxJ3JWMxfg
-	 7oPVeXb5tETLeooyIMpHinNdpVZCyIQgs5PkAMUKtsQunWuUTWcXRZXkUOxmH3Y09Q
-	 pHSM81/ebev4Q==
-Received: from smtp.sberdevices.ru (p-exch-cas-s-m1.sberdevices.ru [172.16.210.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "sberdevices.ru", Issuer "R13" (verified OK))
-	by mx4.sberdevices.ru (Postfix) with ESMTPS
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 15:28:06 +0300 (MSK)
-From: Pavel Bozhko <pvbozhko@salutedevices.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Pavel Bozhko <pvbozhko@salutedevices.com>
-Subject: [PATCH BlueZ] The GATT.Client option is in the wrong section.
-Date: Fri, 7 Nov 2025 15:27:34 +0300
-Message-ID: <20251107122734.228-1-pvbozhko@salutedevices.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GBVsjpWT"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A7CVKV5584077;
+	Fri, 7 Nov 2025 12:54:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=z5p/PsAfcCWJ8LmVCSFKaFCCjmN+3ZdiDc1
+	RIjcMzEg=; b=GBVsjpWTh4Qcd53QS//ljZwGtyTZNhgAE6pgBmDZa63d3rIBiXd
+	VSkTCKorQ1ZuPWZjcrRFd4Mt757n1zciNTeGZqstwYEfsIE3t3Du2MOSGgyPbcxI
+	wZtdSQSGWZTCJ6cXUGDXqik+oh3ajodMoxcdvrvOp5YC+nToU+c45xC+mMKRaJTX
+	DMuA6cCX6dUvlQHtmmL4C3x5c9P77KwsaGWyFNrz5TMPT6vO0Tfzi9PhqdLR1+ks
+	r9yoATmmAtDq4TfKANp8TFjUzJFQPPiiLRYf5hEUxKqoVCk3Sm+OuubHgw3lL264
+	kYJORgxp+ghn5spZwqv5Akd+0KGhZm+bRjQ==
+Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a8yktk3ks-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Nov 2025 12:54:12 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A7CsAZx015077;
+	Fri, 7 Nov 2025 12:54:10 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4a5b9n7hj0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Nov 2025 12:54:10 +0000
+Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A7Cs9DH015068;
+	Fri, 7 Nov 2025 12:54:09 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 5A7Cs9rL015064
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Nov 2025 12:54:09 +0000
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
+	id 9E93E22CA9; Fri,  7 Nov 2025 20:54:07 +0800 (CST)
+From: Shuai Zhang <quic_shuaz@quicinc.com>
+To: dmitry.baryshkov@oss.qualcomm.com, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        quic_chejiang@quicinc.com, Shuai Zhang <quic_shuaz@quicinc.com>
+Subject: [PATCH v2 0/1] Bluetooth: btusb: add new custom firmwares
+Date: Fri,  7 Nov 2025 20:54:04 +0800
+Message-Id: <20251107125405.1632663-1-quic_shuaz@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -48,61 +64,50 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-exch-cas-a-m2.sberdevices.ru (172.24.201.210) To
- p-exch-cas-s-m1.sberdevices.ru (172.16.210.2)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: pvbozhko@salutedevices.com
-X-KSMG-AntiSpam-Info: LuaCore: 75 0.3.75 aab2175a55dcbd410b25b8694e49bbee3c09cdde, {Tracking_uf_ne_domains}, {Tracking_black_eng_exceptions}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 197878 [Nov 07 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/11/07 09:54:00 #27891999
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-KATA-Status: Not Scanned
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 5
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=bOgb4f+Z c=1 sm=1 tr=0 ts=690debf4 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
+ a=kD27Cg0GW0L-Zw9_jswA:9 a=TjNXssC_j7lpFel5tvFf:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: AP_Jpci6ruY239yw0sq2f2ZW-PHuuHfn
+X-Proofpoint-GUID: AP_Jpci6ruY239yw0sq2f2ZW-PHuuHfn
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDEwNSBTYWx0ZWRfX4C6V52howYkW
+ vEHpgARcw6d55Uvjpgf1ZzAFlk/iIaf+faRH5irejgmU9sw1tjy8U/DQx4mRVZGXcWeqSNDfKYq
+ 7p7Jmt4lfWoQsroBcMN/+YVaQD6Aav0JOdUnSplmDNSkvRnvQIClvVkytPFGAw3JaZXhel1OC/Z
+ la484ccRl5+8FSgmRxm3gClMhVsr6ctH0LuHVUvf7w0hv1ChDF/d+jhRyWDWHc6xDrGgcmtbxmJ
+ hHzBVEJ7jk6kRSgS5pxReo+GA0/kHJLKek9ZipV8/7Nb9c5SijqpPJ9LEyq2DvrA3nNhVIpgZ3o
+ DGA4rF+E8340//2+AGNShG9TXGp0UVOs8k3ZwAR0WgTfamhr+ziLUvoalLrWFdo37rQ6qBTAIa0
+ tGnrTl8jwxARWR2zEoi+9LrGSookOw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-07_03,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015
+ impostorscore=0 malwarescore=0 phishscore=0 adultscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511070105
 
-GATT.Client is currently in the CSIS section, but should
-be in the GATT section. The bug is that
-setting the Client option to false has no effect.
----
- src/main.conf | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+add new custom firmwares
 
-diff --git a/src/main.conf b/src/main.conf
-index 4c53376dc..fa94cf97d 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -262,6 +262,11 @@
- # Default: always
- #Cache = always
- 
-+# This enables the GATT client functionally, so it can be disabled in system
-+# which can only operate as a peripheral.
-+# Defaults to 'true'.
-+#Client = true
-+
- # Minimum required Encryption Key Size for accessing secured characteristics.
- # Possible values: 0 and 7-16. 0 means don't care.
- # Defaults to 0
-@@ -308,11 +313,6 @@
- # Defaults to 0
- #Rank = 0
- 
--# This enables the GATT client functionally, so it can be disabled in system
--# which can only operate as a peripheral.
--# Defaults to 'true'.
--#Client = true
--
- [AVDTP]
- # AVDTP L2CAP Signalling Channel Mode.
- # Possible values:
+Please refer to the link for information about the qcs2066 folder.
+
+a3f9f6dd047a ("Bluetooth: btusb: QCA: Support downloading custom-made firmwares")
+
+Changes for v2
+- Add a more detailed description of the patch.
+- remove CC stable
+- V1 link
+  https://lore.kernel.org/all/20251107021345.2759890-1-quic_shuaz@quicinc.com/
+
+Shuai Zhang (1):
+  Bluetooth: btusb: add new custom firmwares
+
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
 -- 
-2.43.0
+2.34.1
 
