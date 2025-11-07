@@ -1,152 +1,105 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [176.109.96.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58244214A8B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 06:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEEC82D7390
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 09:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.109.96.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762495335; cv=none; b=BTAv8yQnwTwtIUtf8+ucDWKQIHoyHELnS+z87JAFx+AbizOOnpk38ZdikxZqvkfgWONX+fpuayv4gLOx2He60eNiqSOLPSF4QpEg4HnYTdMTWTDpaA8DSNa7R3Jyrf496nyHvypEMTz5brfXepxFKCDz7blo2CMZASC3tI9KWYA=
+	t=1762506418; cv=none; b=nqjdf2NNNLfSg2QjZFWn7kIdyQCCtTdSjAslACme7waHYwn2q9XVUnSKp5Ft1D+l7aC2SJziauOXUxgoTR/Vi3KpykOcGay8wbFfoXd3oR9AmEs+l6q8HyzrTW2sHwm5/EMBITIN4IVjacyhb7xMEbwixOAPDBqldkpGxcGXpCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762495335; c=relaxed/simple;
-	bh=ZEv27SiSPY57E2/8jSqFF5ZjfrrjE2sFaGvwk83uU3s=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=jdsUoVKbHWqQVnTMTiODVOblWBXRZwmNf1T9Pb8pqJ/9Q1u6H2FTs44azVd9ljp4VAzY7mGf1o/HumGpxeWODj6Zko5GDrWshwYPLMFSB0XPwgLY5rrDqddygnse2ww9imR+YRnyOg0zzpjh8XVzoh65uKUt5yCjfHi4JiNvkF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RkoJ//oi; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762506418; c=relaxed/simple;
+	bh=Q0OdNFVPmN72aYzegfSjyp8p6grD1IQPj1wGach7ROo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ovXQKqMc0FVX7AVrx46imDEvod7obksmfv7tFvW4TBICzBJCzI1Nvk4hFxgdMumGLsyz674MiRL0y2RR7I1XG/pffb2RBjdRuU8kR2YIgE7oIK+BYFKlc8EbYrMv1m/wfAC6Ffesed+fcTGHjVsqczRPdCHzP7evoncdsYrO3Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=YjYDffEe; arc=none smtp.client-ip=176.109.96.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RkoJ//oi"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4e8a25d96ecso5735871cf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Nov 2025 22:02:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762495333; x=1763100133; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LRGV1QZGUwefs5PbXJVhsueSJp/zDf5lSyiSBFeyCi0=;
-        b=RkoJ//oiuDyeX9Wb2nA5r8BlHfK6N5ctcKvh57jgFlvMeagUuJr0zFZ98bjPghgs0w
-         Ih4NURT+rkeFceHgkCksDflWSymuWb5xQh7Xm5xbv0gUL6fuIc8re2SZbhsirA+6S2zS
-         9AueBEItquTOhJGfQatuAB3uaU4Ci+yo0G0TiAD4FueaR80N03WhUiB8FQ34Fka4TOde
-         xuwURNyafDhjo+gXqah18Uz2CtrgkpgkY/TfTxqjJ7vwNFzbwyB9AGSSiDXXlcMTqz/Z
-         NaI8SSCUVs6OcRuoea+s+c0jHKmO/2VkD3PUsSvjHvAtZI71iMD9571xt4/X/5M8e7yN
-         pD0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762495333; x=1763100133;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LRGV1QZGUwefs5PbXJVhsueSJp/zDf5lSyiSBFeyCi0=;
-        b=TGO9jAV8/DXgmixI49fLgsMJg7nV1/Lyob4MBOuRh2y6do2GkKihRe1Lffcad1sWaM
-         pJJM0hWWoX+9RnoEedzt37Tj57xLXs5BKcshrLpPwplhMinDWKPMBliuiMkfzPvrx8cd
-         c+4cLvHx2+k3O4ijZxHlXQDgqbgx2EaqYql+3R9b/ymsM9z+Ev6gC7NcVGIspH+KXPcy
-         SXVK5eIvnSlMgS4F5SyTqJfIApOI+KeXYkEjMsY650fLs21BtyPPK4CgoHmSuMR6jDMm
-         VxEMjz0JF/YBZBY3nh1uP2S29YkoACjD+oDDOUKykAm6Q9ZSDEwHs2yL6GCCteHKRnTB
-         ymeQ==
-X-Gm-Message-State: AOJu0YwGwGMObvLMu8dlFcf/13ZH1sKPpvUZoVQWmg6Yj1pZob+duW14
-	QUeD3E/ZYlIMb/sy7lZsW5+iMhulpEt6prvZOSSdhuAQ0d5MkhVUmDlMZr4w1w==
-X-Gm-Gg: ASbGncuL0CdkE6pjI2DJk3VlzwH7fmY5V9YXhdQYKacAy2kLuz4C+SvdGfeg49MT/G+
-	1tJGqNxqYr+0Ng6TNk0vBrvIztexCzZheMqZgeMxvrlgazKxdEIuGKiv52HOYS8PufC0uj/HC9u
-	8hyvLLhzCt370jKmImAiW37I4mnGXyAGJNEWNAhDIeanVhq5NXK+MavO7+Vh8hnH2ndwEObkFxD
-	dOdt3km6Cmayv0AepsLnN4CNFvDkB14C7rBh3jY8i0kmzhWruVgRF9a/eTVA7oVu/1Pe9BEFfwE
-	7vYIi2oKiI6aW1M6aMUFnGrOVFakoaE2eVatVVW8oS5GvVn/Uxh4zuHK2KYSbBLOauYu8UAc0Ft
-	vFRgebHUd+VY1qau5IsGPJ7CeSBJIf3Qb2t942KtyoRHvyxoP8/rjzlTAczKUWHk+p+jPMnEkp8
-	oT+UAmxQ==
-X-Google-Smtp-Source: AGHT+IHFOhfCLEHYo80nhAgIX6gi9pC1Nh6knW9BGFE2/HvsUexFmCBQy+Ni1a62cKRmnV01hJd6uA==
-X-Received: by 2002:ac8:7d96:0:b0:4ed:2164:5018 with SMTP id d75a77b69052e-4ed94aa1c52mr20629761cf.80.1762495332966;
-        Thu, 06 Nov 2025 22:02:12 -0800 (PST)
-Received: from [172.17.0.2] ([4.227.173.116])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ed94a4123csm10351301cf.4.2025.11.06.22.02.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 22:02:12 -0800 (PST)
-Message-ID: <690d8b64.c80a0220.3987a5.2150@mx.google.com>
-Date: Thu, 06 Nov 2025 22:02:12 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8205915906103377564=="
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="YjYDffEe"
+Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx4.sberdevices.ru (Postfix) with ESMTP id 7735240060
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 12:00:56 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru 7735240060
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=post; t=1762506056;
+	bh=xFuIWZiOLb9YNMz5W7utXn4fSKvvK1+F/+oPORpkH1c=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=YjYDffEeGF7d2FROFfzq0hRHHjrnSGlYwHIyhwTeLbwbJKt4PHYkdGXtFs+AxGHkC
+	 K3727f4EwOL/G29x9ief9lxBamMLL/5xZ8PU+uKvaws5PbNX4LAAZ/OJlXyr2yvRpw
+	 J5BpeUK6iJM6sPEW6+DPMAWnbGKDCt9nm27MTOZtMcHiZta8oadZg0UJGiHw8pfpNT
+	 3ri8sZsqc3CPKDWmfUYKz0lcOCWzCCdBE2ibtqtbtoL1PsPMzPzLoJ+6fF18DSy7Tp
+	 0hHvyHDQXEPR8uAR3BF3koWoBTaF6NpuhXufR67Um2o8FfqZznjo2xDOibDxkUZHV0
+	 7xGyWo/VlLfEw==
+Received: from smtp.sberdevices.ru (p-exch-cas-s-m1.sberdevices.ru [172.16.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "sberdevices.ru", Issuer "R13" (verified OK))
+	by mx4.sberdevices.ru (Postfix) with ESMTPS
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 12:00:56 +0300 (MSK)
+From: Pavel Bozhko <pvbozhko@salutedevices.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Pavel Bozhko <pvbozhko@salutedevices.com>
+Subject: [PATCH BlueZ] avrcp: fix AVRCP_STATUS_INVALID_PARAM
+Date: Fri, 7 Nov 2025 12:00:16 +0300
+Message-ID: <20251107090016.89520-1-pvbozhko@salutedevices.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com
-Subject: RE: [v2] Bluetooth: btintel_pcie: Introduce HCI Driver protocol
-In-Reply-To: <20251107054011.219938-1-chethan.tumkur.narayan@intel.com>
-References: <20251107054011.219938-1-chethan.tumkur.narayan@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-exch-cas-a-m2.sberdevices.ru (172.24.201.210) To
+ p-exch-cas-s-m1.sberdevices.ru (172.16.210.2)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: pvbozhko@salutedevices.com
+X-KSMG-AntiSpam-Info: LuaCore: 75 0.3.75 aab2175a55dcbd410b25b8694e49bbee3c09cdde, {Tracking_uf_ne_domains}, {Tracking_black_eng_exceptions}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 197867 [Nov 07 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/11/07 07:41:00 #27891535
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-KATA-Status: Not Scanned
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 5
 
---===============8205915906103377564==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The first AVRCP_EVENT_VOLUME_CHANGED event triggers
+an AVRCP_STATUS_INVALID_PARAM response.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1020747
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.31 seconds
-GitLint                       PENDING   0.25 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      24.73 seconds
-CheckAllWarning               PASS      27.29 seconds
-CheckSparse                   PASS      30.82 seconds
-BuildKernel32                 PASS      24.74 seconds
-TestRunnerSetup               PASS      494.09 seconds
-TestRunner_l2cap-tester       PASS      23.50 seconds
-TestRunner_iso-tester         PASS      70.41 seconds
-TestRunner_bnep-tester        PASS      6.12 seconds
-TestRunner_mgmt-tester        FAIL      115.98 seconds
-TestRunner_rfcomm-tester      PASS      9.23 seconds
-TestRunner_sco-tester         PASS      16.37 seconds
-TestRunner_ioctl-tester       PASS      9.91 seconds
-TestRunner_mesh-tester        FAIL      11.45 seconds
-TestRunner_smp-tester         PASS      8.36 seconds
-TestRunner_userchan-tester    PASS      6.47 seconds
-IncrementalBuild              PENDING   0.60 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 487 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.093 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.062 seconds
-Mesh - Send cancel - 2                               Timed out    1.998 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+When pairing, the org.bluez.MediaTransport1 instance
+may not have time to be created, but the org.bluez.Device1
+instance has already been created.
+avrcp_handle_register_notification receives an
+AVRCP_EVENT_VOLUME_CHANGED event and
+media_transport_get_device_volume will return a Volume
+of -1 from the org.bluez.Device1 object, resulting in
+an AVRCP_STATUS_INVALID_PARAM being sent to the audio source.
+After receiving the first AVRCP_STATUS_INVALID_PARAM,
+the Audio-Source will consider volume changes
+from the Audio-Sink unsupported.
+Relevant for all iPhone models as Audio Source.
 ---
-Regards,
-Linux Bluetooth
+ src/device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/src/device.c b/src/device.c
+index 91b6cc0c6..352323167 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4818,7 +4818,7 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
+ 		return NULL;
+ 
+ 	device->tx_power = 127;
+-	device->volume = -1;
++	device->volume = 0;
+ 	device->wake_id = -1U;
+ 
+ 	device->db = gatt_db_new();
+-- 
+2.43.0
 
---===============8205915906103377564==--
