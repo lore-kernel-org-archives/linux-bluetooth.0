@@ -1,153 +1,152 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF5C226165;
-	Fri,  7 Nov 2025 03:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC481991D2
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 04:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762486776; cv=none; b=XiQC6WirTfflu0J5Xjh3qxXOCyKpQvD4+cwJlOx3C1B1aujcnQwcu8Q5/TKXP/tnZlOOMILqmJEckN4iY3/e6kg9SatfK3jhP840yrvobDagsE70YW5TuC9G4oEvXGBsfEUFEpTMEMA5auv+tkOy5swCK+YAcxb4zbp50MbblTQ=
+	t=1762488134; cv=none; b=HGtnE/il+8Dr55WZqMS7qX7aLWXHLtDeYgciKbn89/SwkHhPAXPrnr/v4ZaxshYhQttzt7KtKHwM2G+ETZQ3gtunmzULWa1VzDweK+KhEkcZwnVVs/mNKUg65jLEM1adjDU8I0dUF53ROWxQqDK0oZelBcIBz20Rf/W8abA4H40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762486776; c=relaxed/simple;
-	bh=pW8CPbG5NzFUuHOLRpITRiR3Ksw9Yy71m5ZNvZG6vXI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OjgRSLcMpypWuqnAAjdJ1zbRvD9DzFUHB17p5k2aYrHzgm5+Z/4C1p4na+NaQ96H0DN84NtZdxa0VCMAdtHLbupGCvkaqC4n4WoSMZ4zUiYIfiyIv2dqAsnmQkq+6lNGP+R+PjgDakDYrRRijfMN5bTrLv8mh9jYM3BmB2c3eTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=DLdCbUNq; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1762488134; c=relaxed/simple;
+	bh=USsRXUEEIanvvBEO7MoTfkIpzCzWfZwKEe7iGdX/TfQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=LfW/jJnlaqJP31s6KiOdQRFIAKdWaXdESwRZ77dTq52Ls2Io2t7NN70ie26MgJfQsNMIuw5g1XPiQl4fkPnqvLL98blvSIHRYSPzWvK+Wop+Y0tC4Q4uVGYYreaacNotUdsqZdt8uHtmcypaio33wMvXx0YZvBtgodIGzU57Nhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U9Bc/1zD; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DLdCbUNq"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A6JfGs4629578;
-	Fri, 7 Nov 2025 03:39:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=rMmRLjhdiIR
-	peHRDuVPCwK9RaNnFhcASjqVMv5nFqBg=; b=DLdCbUNqXwotqxYdw8NqyL9Dxsh
-	yK5AWxh2LMQmCd5rBt2nlpvipJRV9eBRrCGDlTH+1fqBlEEBK7/ihimRFyCPTwRV
-	4mJldZ3sNUUj+N9/LUyZGwQZuHtYKTXCL9T12jPURm7ffXacAjd8rqRUEDa4Lsaz
-	BTj4bsSyVFvvRHZp8YwZRuFdsKEwxeKNHc3dJTVHaZ2tV4Na1ILcTgGu2vj+PLgi
-	PJ31ELPjBUI6X+VgnMSG/Mb26zrN9+W+hi6zgKrX4l96IF2S5GWx+H++AjGzHRtA
-	sIsV7zueLjlh5UfrxaqLiYy/pNAT73YW3RqzFTwUYcXWVaULRxPl6Mau6TA==
-Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a922314uu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 03:39:30 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A73dR1O014120;
-	Fri, 7 Nov 2025 03:39:28 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4a5b9nc06j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 03:39:28 +0000
-Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A73apbt011614;
-	Fri, 7 Nov 2025 03:39:27 GMT
-Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 5A73dR5m014105
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 03:39:27 +0000
-Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
-	id 65D4D2327A; Fri,  7 Nov 2025 11:39:26 +0800 (CST)
-From: Shuai Zhang <quic_shuaz@quicinc.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        quic_chejiang@quicinc.com, quic_jiaymao@quicinc.com,
-        quic_chezhou@quicinc.com, Shuai Zhang <quic_shuaz@quicinc.com>
-Subject: [PATCH v3 1/2] Bluetooth: qca: Fix delayed hw_error handling due to missing wakeup during SSR
-Date: Fri,  7 Nov 2025 11:39:23 +0800
-Message-Id: <20251107033924.3707495-2-quic_shuaz@quicinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251107033924.3707495-1-quic_shuaz@quicinc.com>
-References: <20251107033924.3707495-1-quic_shuaz@quicinc.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U9Bc/1zD"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-339d7c4039aso323693a91.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Nov 2025 20:02:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762488132; x=1763092932; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nLuSfaljxOq43LE3I+ypj4CsTjB8e3arjLxZYAHPATM=;
+        b=U9Bc/1zDZ/tAgiAIQ/Stq3DzdWfvLv05COkSVEXfQO4ueqsjs171Zr3DToGZ3JpwJX
+         7ZVSAdL21VSE1QJtMS5B5aiUoXKlT5aj0bm0/J9y2SQGFIj1uBcsFEmgBotXlSm5YDEM
+         irfrFI1QXC9shW0dZvO9MkEWPSjoTx5rCB+bTW4doCfSuHUe4yNbbKRP7v+xt6hByVfm
+         FCAJ9Jts4dO1+t1pX8iPEZvNLg6nNIreZYAcKd0utY/wHQ6eFdcPEXNB8wo9aEeke8O7
+         m4U9e+rB0BKUjp+GWL2Da5IETMKfbP9Ymjy4UkLj8Mx8W4kWNmU4Rtj22uXfE5lFY3dx
+         fJwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762488132; x=1763092932;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nLuSfaljxOq43LE3I+ypj4CsTjB8e3arjLxZYAHPATM=;
+        b=SblC0hkXVH6ru23MNJ8cgc+Am5bsTIBYhGBE6qVL3znPXQSZltOBG3GqkFC2oYpZnc
+         KvCIQlshJ1Fn0Te/zx7Q+I8MwJQIaVcdFIuTneMxVNpnxnNcs4F/MI1Sj9vwr8RuYBBU
+         NPjG78YPMLbdUYJFP4tsDbHnxgjHIXHo4SHc2uRmpl/p4WpYm4OS/1wf2SfBE0JHJkxz
+         Hk/K19KbuwpvJYeRyzvAlFeJQftd/Au+vpL4r/6obpQI5fhYRTsXB5oAxj35kQ/JaapQ
+         VxLkLLqBgd0cZpjkb3gDzbNEkdPUGVM/KqGggasTkrb5ZrAND5W4nddZ+3xQQgU82a/b
+         PZ7A==
+X-Gm-Message-State: AOJu0YxAlP9rSLiJZA50Ys9prcSH24vRalt8F5VlhKP8MBAAMz8oPISW
+	YYN3tU5x9wsO1RYUI6kDD5NxNOxmo+seoXnqT6Rm1h5Ol0qEKkbtQ1knil5h8A==
+X-Gm-Gg: ASbGncuqYJYKFRWBM7gYr4xoDH825wEAFNMYkIyRpIzg8tJXktxQBj/TbI1x1gyzMvy
+	kkbV4YlCiEjfnUw2ySoXovofmzxEmBnpkQJnp+YyLGZcaeRKj6M9PxOkFb5uT/pCSLOc8iVUjUX
+	DbAg/GH8txMA6kHSgzZ2HpJwslzCH5+tPIi3UR1trk6rAb86YR2FUGZQARI3l84Atq7lwn3ypC7
+	9d98YdI/SA8jaxTsGL+kL6AOxxUUnT0xrPHtN3dkoxGlx/Ig9rjBpUEU8sfjrZGMxSbLWU1X3qF
+	8KGQSeY1RKufN2iu0MrurvYafXmr1iU3R6PRgT+0Ga5sB/dGSLJu3esLQPiMLiBDsst95ZMrWSR
+	BEajFRLBwMOGD5CcFs3xzoDR4xlxNX0LLJSeouBsTj/+BPEzirS+OlS9UGcYrtremVmTXctdpef
+	CIhMZ7Ig==
+X-Google-Smtp-Source: AGHT+IEYdJg7BZmVOVVl2cmh03fCBqdande/tFIl9EesJUM2Eyxv7Jor2jmVkbrWQdZWMW85DxIraw==
+X-Received: by 2002:a17:903:2411:b0:296:2b7a:90cd with SMTP id d9443c01a7336-297c043ba3dmr22975265ad.32.1762488131517;
+        Thu, 06 Nov 2025 20:02:11 -0800 (PST)
+Received: from [172.17.0.2] ([128.24.163.32])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29650c5e3c5sm44943415ad.43.2025.11.06.20.02.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Nov 2025 20:02:11 -0800 (PST)
+Message-ID: <690d6f43.170a0220.2a797e.42fe@mx.google.com>
+Date: Thu, 06 Nov 2025 20:02:11 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4100289990857043915=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDAyNiBTYWx0ZWRfX0KcojV/VT2+P
- +tLoABWMv+C77fp+lkKIEEP42kaMEZTEIkcafUP2b4YrN2lAJDK67BJGlGM/kmbPP2/ac4/4uXc
- 0nbshHXwt22kzbvg3zCPm0K3dZUy6BjDQGG2uWi+6MZIRXqITn6uPuA+rLkNPZKKmjy8nMfdkQ/
- 2K8gYClvEPqfwY0fpFsQzYnG+Jn2VeoC9mURk85/y4Sp2RSb7kHfHiYfXBINBlisZHHEZGZSHVC
- YuAjKYkSd3wslKEmaPCG8v4N6lO/dd5uLV/Qao+bRVEmeiJRJH/0TPsVV+G9HVmtl+S4oS+xiXF
- P0pi5lJP/W5Qyx9QcjmHdeP8U7iwRHKAaAHPnkhNSCh7lwGpz1PIW3lUwRKwvfBlbSMbPi+kh11
- sY3qHxyOxZClE1RZInTr5e4rgFHbVA==
-X-Authority-Analysis: v=2.4 cv=Csmys34D c=1 sm=1 tr=0 ts=690d69f3 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=COk6AnOGAAAA:8
- a=eIGlGOcC9ytwnVZZLkwA:9 a=TjNXssC_j7lpFel5tvFf:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: PEqset9ezb0WcrLylz9MvdqWxuZeoe9H
-X-Proofpoint-ORIG-GUID: PEqset9ezb0WcrLylz9MvdqWxuZeoe9H
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-06_05,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 malwarescore=0 bulkscore=0 clxscore=1015 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511070026
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_shuaz@quicinc.com
+Subject: RE: Fix SSR unable to wake up bug
+In-Reply-To: <20251107033924.3707495-2-quic_shuaz@quicinc.com>
+References: <20251107033924.3707495-2-quic_shuaz@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When Bluetooth controller encounters a coredump, it triggers
-the Subsystem Restart (SSR) mechanism. The controller first
-reports the coredump data, and once the data upload is complete,
-it sends a hw_error event. The host relies on this event to
-proceed with subsequent recovery actions.
+--===============4100289990857043915==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If the host has not finished processing the coredump data
-when the hw_error event is received,
-it sets a timer to wait until either the data processing is complete
-or the timeout expires before handling the event.
+This is automated email and please do not reply to this email!
 
-The current implementation lacks a wakeup trigger. As a result,
-even if the coredump data has already been processed, the host
-continues to wait until the timer expires, causing unnecessary
-delays in handling the hw_error event.
+Dear submitter,
 
-To fix this issue, adds a `wake_up_bit()` call after the host finishes
-processing the coredump data. This ensures that the waiting thread is
-promptly notified and can proceed to handle the hw_error event without
-waiting for the timeout.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1020728
 
-Test case:
-- Trigger controller coredump using the command: `hcitool cmd 0x3f 0c 26`.
-- Use `btmon` to capture HCI logs.
-- Observe the time interval between receiving the hw_error event
-and the execution of the power-off sequence in the HCI log.
+---Test result---
 
-Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+Test Summary:
+CheckPatch                    PENDING   0.43 seconds
+GitLint                       PENDING   0.35 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      23.16 seconds
+CheckAllWarning               PASS      25.66 seconds
+CheckSparse                   PASS      28.63 seconds
+BuildKernel32                 PASS      23.13 seconds
+TestRunnerSetup               PASS      467.12 seconds
+TestRunner_l2cap-tester       PASS      23.50 seconds
+TestRunner_iso-tester         PASS      73.83 seconds
+TestRunner_bnep-tester        PASS      6.05 seconds
+TestRunner_mgmt-tester        FAIL      109.65 seconds
+TestRunner_rfcomm-tester      PASS      9.18 seconds
+TestRunner_sco-tester         PASS      14.11 seconds
+TestRunner_ioctl-tester       PASS      9.78 seconds
+TestRunner_mesh-tester        FAIL      11.58 seconds
+TestRunner_smp-tester         PASS      8.34 seconds
+TestRunner_userchan-tester    PASS      6.47 seconds
+IncrementalBuild              PENDING   0.95 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 487 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.098 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.058 seconds
+Mesh - Send cancel - 2                               Timed out    1.995 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/hci_qca.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 888176b0f..fa6be1992 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1103,7 +1103,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 				qca->qca_memdump = NULL;
- 				qca->memdump_state = QCA_MEMDUMP_COLLECTED;
- 				cancel_delayed_work(&qca->ctrl_memdump_timeout);
--				clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-+				clear_and_wake_up_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
- 				clear_bit(QCA_IBS_DISABLED, &qca->flags);
- 				mutex_unlock(&qca->hci_memdump_lock);
- 				return;
-@@ -1181,7 +1181,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 			kfree(qca->qca_memdump);
- 			qca->qca_memdump = NULL;
- 			qca->memdump_state = QCA_MEMDUMP_COLLECTED;
--			clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-+			clear_and_wake_up_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
- 		}
- 
- 		mutex_unlock(&qca->hci_memdump_lock);
--- 
-2.34.1
 
+--===============4100289990857043915==--
