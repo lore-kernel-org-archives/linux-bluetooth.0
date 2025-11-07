@@ -1,68 +1,72 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066F118E1F
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 20:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04BB18E1F
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Nov 2025 20:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762546721; cv=none; b=QJetSS3Jpm+C09xdE+ai/ARixOiMRGd34sxxY0GTjql/My0NVtUudpkTLDO3zjwN1uZwFsZ4a9jUxTEtjx3qLV2Ga8xSJBwb5njh2oCmDFaQ7m/fO35oTHjfTZ3p92d4ryG3oyju59iQvEIQXCXonaFcEpPJcbcyp9SBDYfc75Q=
+	t=1762546724; cv=none; b=Bsi6ghBftKbPIYiH6fPEV2GlrJ2v1HYnGkprbMoQ2GFLzTDlHxYXD64bFuAR6/hYRGPtXzF/EC3r2/YP/MzXgO6i0Pq9q3etAKrchFn7yS58XjWJ5yeWoL3uN0OD/vXkOE+6VlKDwCYeUodpBFZC+hTtJTy9FJ/ZAw7H8m7zbW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762546721; c=relaxed/simple;
-	bh=H9Nk1lvZc1BpxzyOBvEsiwj3XTJK1RV4pY7IfWNPF3w=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=cco2UDE/KzZ39sc8SLMPsp8jVNwEugbHTgFSUHgLNCw2d8TdodrL0ov1uWbkC5QXDZl+iirs2rin02JiQJGo2O4CUnuNl/e1LjJG0Ch2DSxVxQ/Xx2xtT7SxEV77UNoXEBe/dDeggIs16ZjRVjtwiytsOIJD+Wwj2v8SwEtJJG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZoJAB1ph; arc=none smtp.client-ip=209.85.221.174
+	s=arc-20240116; t=1762546724; c=relaxed/simple;
+	bh=A9111DUggdPLyFnwCY/jwNUHpJUOEU64ikoeOQaXuoA=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ef4sAOACrJqnjrbj8RWoBlyWzmdZAD+UIUJjlTW6JQxj555fYTlHgqFnYs+r881Efuxd+DvAdS/PKqk/evnTsjsJ78YNf9xsSE3WAjdrlsjDxgPzK3n/6XjVOF14oVMFdz2VBUPHFyVjpxfbMvxctWG7TV5msm6VWmSAxh+t1Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gScnbG4l; arc=none smtp.client-ip=209.85.221.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZoJAB1ph"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-557a56aa93fso315648e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Nov 2025 12:18:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gScnbG4l"
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5598b58d816so772822e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Nov 2025 12:18:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762546718; x=1763151518; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vIT87krLzz+Yjm/qoNRoHJr7KDUYNnow0uticwpqvxc=;
-        b=ZoJAB1phUOgWH8ZiMYrcixCmr3OQz+S5rqxvzso0Q3vZQdtsZWQYGEHsHkjPmAr6BB
-         qsXpIPfu639FWSEWgjybbczxxaZToA3etrttrhyQ4K5CMru7xYOCu787a/NJKbxyzXIT
-         DEroSbX1BZ/LTSaJk1LeaywXU0/7igmB+m0aCnG61DzPmUIWbGaRGqq8InsipYvgY/8S
-         6LwPkdHh5h8xiYNHWVHz+grVqn27iPq7XVvjfNA/RHrXc08IVuPKo1SajpdvpLe+QTej
-         n8ZeZu54XHWECRvfoi3AgBv1knFskdPQLBcw1l/KS7tm4/PDzRHcpdKaIhzRQiGr5Rlo
-         TAng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762546718; x=1763151518;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1762546721; x=1763151521; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vIT87krLzz+Yjm/qoNRoHJr7KDUYNnow0uticwpqvxc=;
-        b=RYnrsDjSmcp6HM0uzF0zZNmiqpbBCg48lZ8Mdv4VEZlQBQpsh8jQHOz+Cjbk1UQMTq
-         5Nl9Q4rTzn0GU6gOFjq1/ZF6iG7lR62NuTMIoWBhyGYgEZt3CTBZXuv02YA6z7rQWrT4
-         90ZdSu3EfCcCFC1f9ZTlwJKVNbPtEKNF9eZlluZr+cEoN8KHRtsM3tv3LidHw5xCm2l3
-         F/qFdjOPZR7aNACsdkP1F5fBlUMjONTgGn8L/2347qufosqMUPrwJElFidLh9nDPqGx0
-         3YMUJZG/v47TDDZIKlZ29t7B9u9JOMtJ7G9HKqbi+0VFcdWCoD/cMsmLJvYSD7DfRZce
-         X7WA==
-X-Gm-Message-State: AOJu0Yw3KoZyW5C8spCghmRwPk4zprBvPOwwpkln0zosYLi2iep/Tq/9
-	1EJ1CU2v7smnL5lHnyg952jm5R5oCG/PThMg2Pl6CjcuuPqgPBPhoRCXZ+It3g==
-X-Gm-Gg: ASbGncvTQaJ/QGvtG0vocjA4u//pFLjdF8/AM0mTiNxfv6OJEfPNBoAqu+aYNi5m26l
-	1hwDqCMo0p40wpzdIWZejx5fhJIJ+zoCRETepMumZSYZYy+hOnmk57Vdz7y60wNKOEWx4J53ivU
-	N7gU7s7YTzWBsIsmzcOuku9ymkwyvBiVk41KFmxjquyy9EjKIR2gfK5fx1Kcbc9jKb+8nLRTe9K
-	yl/7qe/I8d6xAimF4T8QxTj/8t1g4HUv2VB6Aj4RIUsUMPyxrIQoVvhGVvwNWighKeI7+v+RgRp
-	xl3EV8JDIVMvRkX02SiYY8J9nch/ME6voplsYgzw4KHXc/yx0vUcOky9SRokMjR7gzzKB/gyPlZ
-	KsEusWpyoju4jkWewSvfWL4Zy5H007HWakA1G1z5MPIzgXcnyNgTcV1zDiO6DP4eOi17FhIzWbF
-	8xYMkOMGRKWGftug==
-X-Google-Smtp-Source: AGHT+IF8BKA2dYDOBdzFr4dTye2y1PaAfIv8u27nuToogmURGh0bn6xyoy3Xsz6dAsYqkDdUdPay6A==
-X-Received: by 2002:a05:6122:4687:b0:559:6e78:a43a with SMTP id 71dfb90a1353d-559b328ca8fmr387783e0c.9.1762546717642;
-        Fri, 07 Nov 2025 12:18:37 -0800 (PST)
+        bh=71EU8+mMCRCBas/J1N81DTG0AzQF0ZNZ6dYYexH7Wy0=;
+        b=gScnbG4lhj4oU+RHtHifIMvKbeEZgjHGj7l5DhPS6WZRhXMvffeF4nvN6yQciv8FEP
+         HS8g5Pey6kjA6Ym77g5yzA+0YaJ3Y68CxVhkOiisJ/06RqYzOgfoZaPa8CT5+zS+z1yi
+         Zjq8cHDwinEvjwWBLk4F5ZfRAEny+aIovh8dbw9dWzOawGUE3OJiLJTbfIA1fv4G9X6e
+         TgRqYar56TrNtidkKTvGz7veFLSD5Dm8anYauOu2Iyt6HpKGBO4MO1smzW0pzPxRaSOq
+         vmW4YDGC7xZt6XixTFFZN7ndwlpNfsEXbuMp53yjRFp+vEBL+bPogmjKCJtnEBrNg4MM
+         fThw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762546721; x=1763151521;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=71EU8+mMCRCBas/J1N81DTG0AzQF0ZNZ6dYYexH7Wy0=;
+        b=rpFCzaIA8/A18hOYAdKR2BH2m+4lLq6S7jHQyb60nF67hNN4FSUcRW8x9cKGuLY4oW
+         SocNWHnYRpD/Yk0ymY+R0KQ7vZ11dEyXT22pZYcvouVex46QoSt23g32EVVxzUB/p6xy
+         dFF6ka5B12vhkbrSjfHceCFCUwlnVx120cKdKdp2pkyTha3MIEGDucyJ1HP8ULP9IJ+5
+         wJ0sGmnErTkG1qn6bRbnuzR8d+wwnOpkC34gQM9HgBLYhtvTDMAKvnuF8fmndTpFf0mE
+         xV2Se6qfSksJ7lcuiLzlUli0fLMOhC1D7ED+MmXGynFXj/EO6v/34m0DkUfwRCWfePdV
+         vuAQ==
+X-Gm-Message-State: AOJu0YydIRZaamrdgi0iGbS3jvHnmGmw3LtRssz1zQht3wDr95E3+UDf
+	OmUrARLQDFROw7tF9inhCG2gsyFhTJx739vL5stjvV+iX1z+JjzrwkWZidyiRg==
+X-Gm-Gg: ASbGncsnxkQ1SuMEC1aOxLe9KSWWHCx94umFCRHwayuQ80nT6cNvDhYGrZP8uJu0m+P
+	T/K15/7Tlmqhi/86/X2zT62NlI1fOXb8x+ZgfKXg8Wtavr718oG2NO3EO+TVtcZ67iz79EtOv5z
+	s3WbRKSa931f4tKEa45mcbarOIC087WF11MK+AmbTxwoqi1Jc6qjpfnvlVJL9IoSckyDNKTIB+c
+	WolgifW7dHTGgxgtKm3V7ceHi0YAmH9VEfzdfOKVlsoi1LLneGiPXV1VswGdiIJF0auj4d4H4EX
+	tfFfJgeZkWprPfG7DT8lQz3ZKHEwmx4zNxRXGq3AVF6YO2PeZj9pPFnP0nOEu8URO9nS1aIwp2k
+	/N6p/nUqGmGgSKC83hmif4pM1jUfzlPQMcOxMr/2FsQV87kysi+KkspICGFetF5qkR3llwn9Brf
+	rzzqM=
+X-Google-Smtp-Source: AGHT+IGoFR6DVK4mv7tKBlDR0/dk3Hxvk4q9kSKDAuUyGxw5iDI4t8zo4V/rB3rWd2T/O60lAvxLGw==
+X-Received: by 2002:a05:6122:4687:b0:559:6092:936c with SMTP id 71dfb90a1353d-559b32c51a6mr405946e0c.12.1762546720714;
+        Fri, 07 Nov 2025 12:18:40 -0800 (PST)
 Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5599582860asm3562921e0c.16.2025.11.07.12.18.35
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5599582860asm3562921e0c.16.2025.11.07.12.18.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 12:18:36 -0800 (PST)
+        Fri, 07 Nov 2025 12:18:38 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 1/5] emulator: Generate PA Sync Lost
-Date: Fri,  7 Nov 2025 15:18:23 -0500
-Message-ID: <20251107201827.1235953-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 2/5] bthost: Add support for terminating a BIG
+Date: Fri,  7 Nov 2025 15:18:24 -0500
+Message-ID: <20251107201827.1235953-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.51.1
+In-Reply-To: <20251107201827.1235953-1-luiz.dentz@gmail.com>
+References: <20251107201827.1235953-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,83 +77,47 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This attempts to generate a PA Sync Lost whenever a PA is disabled and
-there is a remote synced to it.
+This adds support for sending BT_HCI_CMD_LE_TERM_BIG via
+bthost_terminate_big.
 ---
- emulator/btdev.c | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+ emulator/bthost.c | 11 +++++++++++
+ emulator/bthost.h |  1 +
+ 2 files changed, 12 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 839b4941ca05..5632a822240a 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -116,10 +116,12 @@ struct le_ext_adv {
- 
- struct le_per_adv {
- 	struct btdev *dev;
-+	struct btdev *remote;
- 	uint8_t addr_type;
- 	uint8_t addr[6];
- 	uint8_t sid;
- 	uint16_t sync_handle;
-+	struct queue *syncs;
- };
- 
- struct le_big {
-@@ -5514,6 +5516,7 @@ static void le_pa_sync_estabilished(struct btdev *dev, struct btdev *remote,
- 		sync_handle++;
- 
- 	per_adv->sync_handle = sync_handle;
-+	per_adv->remote = remote;
- 
- 	ev.handle = cpu_to_le16(per_adv->sync_handle);
- 	ev.sid = per_adv->sid;
-@@ -5527,6 +5530,24 @@ static void le_pa_sync_estabilished(struct btdev *dev, struct btdev *remote,
- 	send_pa(dev, remote, 0, per_adv->sync_handle);
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index faabbaa36a4a..9f9538d0dc2c 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -3780,6 +3780,17 @@ void bthost_create_big(struct bthost *bthost, uint8_t num_bis,
+ 	send_command(bthost, BT_HCI_CMD_LE_CREATE_BIG, &cp, sizeof(cp));
  }
  
-+static void le_pa_sync_lost(struct le_per_adv *pa)
++void bthost_terminate_big(struct bthost *bthost, uint8_t reason)
 +{
-+	struct bt_hci_evt_le_per_sync_lost ev;
++	struct bt_hci_cmd_le_term_big cp;
 +
-+	memset(&ev, 0, sizeof(ev));
-+	ev.handle = cpu_to_le16(pa->sync_handle);
-+	le_meta_event(pa->dev, BT_HCI_EVT_LE_PA_SYNC_LOST, &ev, sizeof(ev));
-+	free(pa);
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = 0x01;
++	cp.reason = reason;
++
++	send_command(bthost, BT_HCI_CMD_LE_TERM_BIG, &cp, sizeof(cp));
 +}
 +
-+static bool match_remote(const void *data, const void *match_data)
-+{
-+	const struct le_per_adv *pa = data;
-+	const struct btdev *remote = match_data;
-+
-+	return pa->remote == remote;
-+}
-+
- static int cmd_set_pa_enable(struct btdev *dev, const void *data, uint8_t len)
+ bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr)
  {
- 	const struct bt_hci_cmd_le_set_pa_enable *cmd = data;
-@@ -5549,11 +5570,19 @@ static int cmd_set_pa_enable(struct btdev *dev, const void *data, uint8_t len)
- 		if (!remote || remote == dev)
- 			continue;
+ 	const struct queue_entry *entry;
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 4061c0be5349..ce6bd820fefe 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -128,6 +128,7 @@ void bthost_set_pa_enable(struct bthost *bthost, uint8_t enable);
+ void bthost_past_set_info(struct bthost *bthost, uint16_t handle);
+ void bthost_create_big(struct bthost *bthost, uint8_t num_bis, uint8_t enc,
+ 				const uint8_t *bcode);
++void bthost_terminate_big(struct bthost *bthost, uint8_t reason);
+ bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr);
  
--		if (remote->le_scan_enable &&
-+		if (dev->le_scan_enable &&
- 			queue_find(remote->le_per_adv, match_sync_handle,
- 			UINT_TO_PTR(INV_HANDLE)))
- 			le_pa_sync_estabilished(remote, dev,
- 							BT_HCI_ERR_SUCCESS);
-+		else if (!dev->le_pa_enable) {
-+			struct le_per_adv *pa;
-+
-+			pa = queue_remove_if(remote->le_per_adv, match_remote,
-+						dev);
-+			if (pa)
-+				le_pa_sync_lost(pa);
-+		}
- 	}
- 
- 	return 0;
+ void bthost_set_cig_params(struct bthost *bthost, uint8_t cig_id,
 -- 
 2.51.1
 
