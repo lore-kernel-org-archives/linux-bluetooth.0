@@ -1,178 +1,125 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BF120330
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Nov 2025 01:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A11C22157B;
+	Sun,  9 Nov 2025 09:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762652845; cv=none; b=IyQjEFRPVONpbXRLgnsa1OI9qm8XueeiACp4tbdaQkbtBzF31jr9j3nV3I9a6NJXKMmgCcQr9B5QTva2bOu5WqvWT+hVEYSBYHibmF9nYovbx+ACcIdSuEXTamtX8gr+mVLr4yM/HZA4eP8gDlSn1iv3cIf4IKfIFWybKfaEu9o=
+	t=1762680313; cv=none; b=o1Fk37ARk2T7tlUXrJtuDYUjRxY2/Viwj66cCGYdnwm2zaQYMdpOy5REdzfue0bqx2upNnKkDr5qbeUS9g/m/yBIPC7os5IHehPb0BRzROhoxXkyaXIhCdJ30tXWCE9BQFPeRUaXh2RsTCCy7hI4BwD0RENW8N3w2Z/zVbpsYIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762652845; c=relaxed/simple;
-	bh=nJUBalX4wukZ4q+Z3ZF1IZ5YFT8fAOBLA8Ag46q+Mew=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=t1addVI0WJelykP8q32wSmkPINrvBRhzd+sg/9hQPJMiHQZl5e1Lu8V8ASwDVUEI6TuEk4MOXdEFj77A+c92Cz+QbJZok2iatZT5jbGceida0LHz96fwTPRahGNFA1p2spc+WYn+IljvwOQbzRRx5fa7Oi9HCR/fyV4vW/jhaeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kX52kBBU; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1762680313; c=relaxed/simple;
+	bh=3rBTFftEx9yZP0caOfMTuZ/B607GriXUCwwanemc1Ow=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=E5Jm2U+xbXlpEXWbC8DJ5AO9ntnsOrMsr7C2eB7VV4XmotGgNtK0JpA2q03Dkw21hh3SenLJqi9jDhaf8PvoYJE6c31RUXeCYx8xTaxabQ0Y5GEgtZjYVdaX2kT0DabWl+bGBhHmEJz4xcyY91tDjtfk7sBB1Yde4EwW2f8bnTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=XgxWCiQb; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kX52kBBU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762652844; x=1794188844;
-  h=date:from:to:cc:subject:message-id;
-  bh=nJUBalX4wukZ4q+Z3ZF1IZ5YFT8fAOBLA8Ag46q+Mew=;
-  b=kX52kBBUD68VQFvvJLMkQ8SVAHYw7LOMxkZjZd2kr9suNwWhOXEqoyWg
-   lAoi6/uKSeVeNEW0yZ5sI6saN25DnA7aIE0jfwDM+zxHLne5zpq+Ftkd/
-   UxafjyChYo9j+Waqc5HVJ2TfU74Kzf24AYpYtNSG8M6O+iuCekCBaM156
-   75X2E5eihQHvR10Q/0+rn81MBCMxbE9Rj0LxH1tTMotSQl4RPHZI4K/gi
-   VHGokA33chCidFgUtJtNh2VGbdbS1cdFJLzwHmMSm7EZT3XzUt8zLH5jh
-   VmahT7aomkUdHcA/74SRr79eOAr7tq8HoDih1N2MYCqU+sVK1S1B9mMla
-   w==;
-X-CSE-ConnectionGUID: R3wTRskYSO6m38q14WzZ1Q==
-X-CSE-MsgGUID: Zuq7bCj1RYe8uYDvuPghAg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11607"; a="87383257"
-X-IronPort-AV: E=Sophos;i="6.19,290,1754982000"; 
-   d="scan'208";a="87383257"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2025 17:47:22 -0800
-X-CSE-ConnectionGUID: j/IW/VHPR9KDu0mAuW+8BA==
-X-CSE-MsgGUID: swQKcrbDQt25TAGH6zBVtg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,290,1754982000"; 
-   d="scan'208";a="188623101"
-Received: from lkp-server01.sh.intel.com (HELO 6ef82f2de774) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 08 Nov 2025 17:47:20 -0800
-Received: from kbuild by 6ef82f2de774 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vHuWU-0001fP-1e;
-	Sun, 09 Nov 2025 01:47:18 +0000
-Date: Sun, 09 Nov 2025 09:46:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 59e5396a25793eb6cb32763163e975c242ef3eef
-Message-ID: <202511090927.kAOzG6SL-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="XgxWCiQb"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A96cRUW4091830;
+	Sun, 9 Nov 2025 09:25:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=+sqidDvvAIg
+	6DJnB2CrMhAwtro3M0D/wEBD0FhheAWo=; b=XgxWCiQbt+qcps5LwssEBKdHzvt
+	QeFJgx/dwemuAqTpVFU1Jd8Ku5Ektf7jhT9rKhqTLzg8/GiNxyE9okj60o9pI/Aq
+	+K6ey7SnO41iV4MUykdSssPqpPhnXmIc/hkFyyKYtGlYyFtLQloDfx63WFWYBL9v
+	jeQYHXmQ+1/fxjtIQrastnGjBrFWU9GM/MsVjAGY8mJR10mQ2bAKSSs2PeXwH6IW
+	tKeB7B/Y+B93If/LADPMp06/FbKYCMCELUSCgeHxaMHB8OBlIgSfOtgZ2PXnNPov
+	oYHFiHXrBHcSkgQvCTzTdzBrYSQJyQQjanDFlwlziizKCKronLPkp2bA1qQ==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a9xu2swaf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 09 Nov 2025 09:25:08 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A99P549016200;
+	Sun, 9 Nov 2025 09:25:05 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4a9xxkrxr2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 09 Nov 2025 09:25:05 +0000
+Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A99P5sh016195;
+	Sun, 9 Nov 2025 09:25:05 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 5A99P5mR016193
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 09 Nov 2025 09:25:05 +0000
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
+	id 468B422923; Sun,  9 Nov 2025 17:25:04 +0800 (CST)
+From: Shuai Zhang <quic_shuaz@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, quic_chejiang@quicinc.com,
+        quic_jiaymao@quicinc.com, quic_chezhou@quicinc.com,
+        Shuai Zhang <quic_shuaz@quicinc.com>
+Subject: [PATCH v3 1/1] Bluetooth: btusb: add new custom firmwares
+Date: Sun,  9 Nov 2025 17:24:37 +0800
+Message-Id: <20251109092437.252022-2-quic_shuaz@quicinc.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251109092437.252022-1-quic_shuaz@quicinc.com>
+References: <20251109092437.252022-1-quic_shuaz@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=dMWrWeZb c=1 sm=1 tr=0 ts=69105df4 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=COk6AnOGAAAA:8
+ a=HSaFlmFXjmI1jj9ufZ4A:9 a=TjNXssC_j7lpFel5tvFf:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: ik1dugxauojNBxQRGNDiM62cDAizOWCR
+X-Proofpoint-ORIG-GUID: ik1dugxauojNBxQRGNDiM62cDAizOWCR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA5MDA4MiBTYWx0ZWRfX859g1G/ILzTS
+ ofGIwKiiDek6+0Hb4T/x5/+2U2p1NeqXxesSXHIuLykOQHCw+0RAXrIrSrxO3d253Hy/+IaAjhd
+ MUO7jqmUCeDjjIjtqhlfC+GJBupBI7YG8HquzU61bW8CviTGwJI8PNG3NK4YrrzmrbwhiG8Jt1D
+ aWLB8zetZInpnOF6LfZHS8QEnVNvvHjrdIOXG7tMWy2WgOmrShvYnP67WcpJ3npj2KAB1SmPwFn
+ JEJDYY2bgRUuXA4gPO0ut9ZRIF9XGsdAasyu8AU1NfqPpeMejQqHqepAqnUVJc3Qmb25mO7q/Vj
+ pMeXGMQgdg8hcvcaX4bPPHwhANDBXqxsBWgh3xf14HGDsLSoRmXLZe7c8mMgolBE/Y6UrsuIrU5
+ JA/MBFctFxSxlnjbgsq6rewwJ0q47Q==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-09_04,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015 impostorscore=0 malwarescore=0 adultscore=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 phishscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511090082
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 59e5396a25793eb6cb32763163e975c242ef3eef  Bluetooth: hci_event: Fix not handling PA Sync Lost event
+The new platform uses the QCA2066 chip along with a new board ID, which
+requires a dedicated firmware file to ensure proper initialization.
+Without this entry, the driver cannot locate and load the correct
+firmware, resulting in Bluetooth bring-up failure.
 
-elapsed time: 1847m
+This patch adds a new entry to the firmware table for QCA2066 so that
+the driver can correctly identify the board ID and load the appropriate
+firmware from 'qca/QCA2066/' in the linux-firmware repository.
 
-configs tested: 101
-configs skipped: 2
+Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index dcbff7641..7175e9b2d 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3273,6 +3273,7 @@ static const struct qca_device_info qca_devices_table[] = {
+ 
+ static const struct qca_custom_firmware qca_custom_btfws[] = {
+ 	{ 0x00130201, 0x030A, "QCA2066" },
++	{ 0x00130201, 0x030B, "QCA2066" },
+ 	{ },
+ };
+ 
+-- 
+2.34.1
 
-tested configs:
-alpha                             allnoconfig    gcc-15.1.0
-arc                               allnoconfig    gcc-15.1.0
-arc                        nsimosci_defconfig    gcc-15.1.0
-arc                   randconfig-001-20251108    gcc-12.5.0
-arc                   randconfig-002-20251108    gcc-8.5.0
-arc                           tb10x_defconfig    gcc-15.1.0
-arm                               allnoconfig    clang-22
-arm                            qcom_defconfig    clang-22
-arm                   randconfig-001-20251108    gcc-14.3.0
-arm                   randconfig-002-20251108    gcc-15.1.0
-arm                   randconfig-003-20251108    clang-22
-arm                   randconfig-004-20251108    gcc-10.5.0
-arm64                             allnoconfig    gcc-15.1.0
-arm64                 randconfig-001-20251109    gcc-15.1.0
-arm64                 randconfig-002-20251109    gcc-12.5.0
-arm64                 randconfig-003-20251109    clang-19
-arm64                 randconfig-004-20251109    gcc-8.5.0
-csky                              allnoconfig    gcc-15.1.0
-csky                  randconfig-001-20251109    gcc-14.3.0
-csky                  randconfig-002-20251109    gcc-11.5.0
-hexagon                           allnoconfig    clang-22
-hexagon               randconfig-001-20251108    clang-22
-hexagon               randconfig-002-20251108    clang-22
-i386                             alldefconfig    gcc-14
-i386                              allnoconfig    gcc-14
-i386        buildonly-randconfig-001-20251109    gcc-14
-i386        buildonly-randconfig-002-20251109    gcc-13
-i386        buildonly-randconfig-003-20251109    clang-20
-i386        buildonly-randconfig-004-20251109    clang-20
-i386        buildonly-randconfig-005-20251109    clang-20
-i386        buildonly-randconfig-006-20251109    clang-20
-i386                  randconfig-002-20251109    gcc-14
-i386                  randconfig-003-20251109    clang-20
-i386                  randconfig-004-20251109    clang-20
-i386                  randconfig-005-20251109    gcc-14
-i386                  randconfig-006-20251109    clang-20
-loongarch                         allnoconfig    clang-22
-loongarch                           defconfig    clang-19
-loongarch             randconfig-001-20251108    gcc-12.5.0
-loongarch             randconfig-002-20251108    gcc-12.5.0
-m68k                              allnoconfig    gcc-15.1.0
-m68k                                defconfig    gcc-15.1.0
-m68k                        m5272c3_defconfig    gcc-15.1.0
-m68k                        m5307c3_defconfig    gcc-15.1.0
-microblaze                        allnoconfig    gcc-15.1.0
-microblaze                          defconfig    gcc-15.1.0
-mips                              allnoconfig    gcc-15.1.0
-nios2                             allnoconfig    gcc-11.5.0
-nios2                               defconfig    gcc-11.5.0
-nios2                 randconfig-001-20251108    gcc-8.5.0
-nios2                 randconfig-002-20251108    gcc-9.5.0
-openrisc                          allnoconfig    gcc-15.1.0
-openrisc                            defconfig    gcc-15.1.0
-parisc                            allnoconfig    gcc-15.1.0
-parisc                              defconfig    gcc-15.1.0
-parisc                randconfig-001-20251108    gcc-8.5.0
-parisc                randconfig-002-20251108    gcc-8.5.0
-parisc64                            defconfig    gcc-15.1.0
-powerpc                           allnoconfig    gcc-15.1.0
-powerpc               randconfig-001-20251108    gcc-8.5.0
-powerpc               randconfig-002-20251108    gcc-9.5.0
-powerpc64             randconfig-001-20251108    gcc-8.5.0
-powerpc64             randconfig-002-20251108    gcc-8.5.0
-riscv                             allnoconfig    gcc-15.1.0
-riscv                               defconfig    clang-22
-riscv                 randconfig-001-20251108    clang-19
-riscv                 randconfig-002-20251108    gcc-12.5.0
-s390                              allnoconfig    clang-22
-s390                                defconfig    clang-22
-s390                  randconfig-001-20251108    clang-22
-s390                  randconfig-002-20251108    gcc-8.5.0
-sh                                allnoconfig    gcc-15.1.0
-sh                                  defconfig    gcc-15.1.0
-sh                    randconfig-001-20251108    gcc-15.1.0
-sh                    randconfig-002-20251108    gcc-13.4.0
-sh                          sdk7780_defconfig    gcc-15.1.0
-sh                           se7722_defconfig    gcc-15.1.0
-sparc                             allnoconfig    gcc-15.1.0
-sparc                               defconfig    gcc-15.1.0
-sparc                 randconfig-001-20251108    gcc-14.3.0
-sparc                 randconfig-002-20251108    gcc-8.5.0
-sparc64                             defconfig    clang-20
-sparc64               randconfig-001-20251108    clang-20
-sparc64               randconfig-002-20251108    clang-20
-um                                allnoconfig    clang-22
-um                                  defconfig    clang-22
-um                             i386_defconfig    gcc-14
-um                    randconfig-001-20251108    gcc-14
-um                    randconfig-002-20251108    clang-22
-um                           x86_64_defconfig    clang-22
-x86_64                            allnoconfig    clang-20
-x86_64                              defconfig    gcc-14
-x86_64                randconfig-011-20251109    gcc-14
-x86_64                randconfig-012-20251109    clang-20
-x86_64                randconfig-013-20251109    gcc-14
-x86_64                randconfig-014-20251109    clang-20
-x86_64                randconfig-015-20251109    clang-20
-x86_64                randconfig-016-20251109    clang-20
-xtensa                            allnoconfig    gcc-15.1.0
-xtensa                randconfig-001-20251108    gcc-8.5.0
-xtensa                randconfig-002-20251108    gcc-14.3.0
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
