@@ -1,125 +1,82 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9678818C26
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 18:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78B72DC76A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 20:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762799824; cv=none; b=Alt55Iz6U9UhAnCrkFIvRTC4lfPDrIpKIvDTpQTEk3I+G7odxRVl+y/Cr/Qb98Yk4nu6+abFZaVRfq6zaN1gTUZsMajea27TCcfaqSsNCGHjXXhJNeUeQD9HV0ZI+5k9zNfra+xrdxDZFlxeNbuA0EqP6EYoP402WjFc0e6FFZY=
+	t=1762806037; cv=none; b=jrArlnLlWKkNPIbAejUUeeJ6+bLGEoF4T1F2LXlK00NSOq7Vq/qU1LAFYSF6Qph2EHm7q5Et69AoCS7YDlhYI9HruwQLwDWyAMW+WzpUrCAoZp+rj/fKKtxPMVFY+xjjG0Rxt1TSpjKFguasmi5CVurd4J83HuQ+oG7glQdSVhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762799824; c=relaxed/simple;
-	bh=59YHbw/s+mzUNpMpwR2PCQVE5sGvzqUdGaI8+ZlObsU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aFJjEbumICUHiIl/ol0Pl8RoJlsXWCrNAYW3UIbC5FZ96IixA02JcCy4GjQIaLJHJ++TVe/kVIA8KHmXIXH99Jv6B6/rK8Sec8cV+zzMMFVuceDmXohbW86IhrBa96hMAtEeMbPf3+A1UlBVgArUtjPW/uXhwVZIvow1YK+phX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HxGby3+q; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762806037; c=relaxed/simple;
+	bh=ibjgQr36ZryTETJzVnOwQdCjazJd4MVcC7CvWlRRFD4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=C42Q0N3g18ISRtIGUo3Or6IaKdQKrFURE0RuXcqmaRT9iJkKj22P9Hlpou8VEmI6PGHWgfB7QS9p1+ZzsGBUolxdIJ95Cv0HkIIwr+fZBEwEKfNe9R84SMS/9dlWLMZO7LSqlAtIEeblAPBoJ5tvjhyOVACNf1WTcuBaVIkJ6Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ipWr1ZlW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HxGby3+q"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-36bf096b092so26998891fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 10:37:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762799821; x=1763404621; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZW7WOAyHEjvksnGLdqJtCgvuiFqQcZ2gCBobXnaWxY=;
-        b=HxGby3+qx12nbxGnNtAxfgfDd4qhKWN5SEW6U6uUgbDKHqjcJRubpv/yFmr05ukc9U
-         FJEqtkuI2qV0NAECuH4tbgGbAWZVOeCtGBjhfwMEzVyh0INRbBLASFfp9QfMxBa70jfG
-         Duu8TqWlxfFhej6qGVxaTOYc9QLm87E0Us/sDm2qtBa1lvjr6OLIisxomhW6BhthN/4t
-         eTF2BETiQea2Ffhc+X7YAwBo1OU6h6QRVmc5U5RHYoCl8e3ehTw1TikvJjw2cB09oq0F
-         P/y6JQSh6stPE3EyC65Zd53/m+9qc8N9dXh0Srh7W3Sq5QGj6rxii0OGu4dKLYod0caj
-         Y4Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762799821; x=1763404621;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IZW7WOAyHEjvksnGLdqJtCgvuiFqQcZ2gCBobXnaWxY=;
-        b=QmsAUmx+/JlEyufP5grc/56DETNo/tPXXNUMwIiVtYBW3IpRCNadSheJvBQpaHH0Ko
-         LzlRO+HnSCF6V4/wj5axpwecEFO5hO7pHlAMvqE0fD5RR/Oxt5rbLt+CMjQhO95gfUz9
-         +xxYDdyOwaQoHT9TpzxYrI/xNEiQQJdYOiXjDvIgRbTDiHs2rha/sFp/NH0qmLyM298t
-         8+NaBmhw37HGBjH9FeZXu+AWRaIcnmhLDx3cBRzAiZVAlX77mA8UJPIB1CiuunT2qD3D
-         CpXbmnr1IlmaGhEtz2vbtsQApOdW0CkxsKaIAQ3oAyHWZ7OliVoS/nMR9vwVNDftaHwO
-         jzEA==
-X-Gm-Message-State: AOJu0YxnZDWuTnRfoD04THQnw4CX1FOVUTVimITB634N4mRQM4YM50z5
-	WZsUkO5AiozxOhW/YUQqsl/8ZCFTmCqJ2/15OtwBEYInQ8F+j70eaburSC+Gf1QvHAJn/V2Uxot
-	w3gEzqFQJLjSYsLfvCszz0i5TnHV7iiFjXMadvj0=
-X-Gm-Gg: ASbGncuTnQUzMUbWuDlpuI8CQii4utXU+LNLPZo/YMF48M+p3amXDWE6VzfgFFFj+hF
-	Rcced5LtVOKjVrf8pqzhWKT97die7rj8gbrrQ2+XjgEVo1+64/wWmEvJQPHjjw0it5R95y5LFrL
-	WMVS/T4R8/iHIvbeYqVdNHYBs1I7UxBJ1viq4vI/9QG9P0NcautQ5hPuWWEjaLXAQy7vc+fHsrJ
-	7LBh1ER1yk77eaSAvi/KoHGZwF8Ve/8pCwqMWkP114xYGc33HufmzYdcViOGyqA+U3/LA==
-X-Google-Smtp-Source: AGHT+IG1XYqTa+mSvCMFJbWlY1pfmQOifeoY7ey0T4pDlhdd5tl+1NytnEDQgYWBzunhiENn+dQsKIxlT6Oiw2PwtlA=
-X-Received: by 2002:a2e:9a8d:0:b0:37a:2d7c:3ce3 with SMTP id
- 38308e7fff4ca-37a7b1d7ad7mr19971581fa.14.1762799820435; Mon, 10 Nov 2025
- 10:37:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ipWr1ZlW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40DF7C19423;
+	Mon, 10 Nov 2025 20:20:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762806037;
+	bh=ibjgQr36ZryTETJzVnOwQdCjazJd4MVcC7CvWlRRFD4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ipWr1ZlWe2hK/b3LCvCTbzSDd/Q5hUXhhipOrlO9XSfK1H8/a5AJq9fG85f/N1fGj
+	 kfWJCSxhfqSPYrggZGSgFGpcdCWFIPX4h+t68nPnymoZyFGl8jvKDTAAzdplSAFHmL
+	 /Wlo1Di0UMUn/n9Quy5EmJaxNGopZ3ZKLbNj/mO33RTMOiD7/UkyI1tGUDjVi2ejTV
+	 CMbkv0gVbMs6H6MTcqtmYlHFj5HA734uIEjiDIk2mPrlGW+jTGnECGxslbvLx9XV6V
+	 JWyQ49042BNiThfca64SbnTOob7utVJQBD0Zc+K0oIP2AMgsrsKpMYDEDzq8/8JPm0
+	 Owwa5KcSwod1w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB11B380CEF8;
+	Mon, 10 Nov 2025 20:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251107090016.89520-1-pvbozhko@salutedevices.com>
-In-Reply-To: <20251107090016.89520-1-pvbozhko@salutedevices.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 10 Nov 2025 13:36:46 -0500
-X-Gm-Features: AWmQ_bn-th1DLEpzj6ubM448Bf1JhZ5CJ2kAfAnUnVFbKjwT_XZFVTXJN1v3Up8
-Message-ID: <CABBYNZLbMzyrhgS2tmguH6xhPrZE4mgx0Qt1gN+fm1TyBPRxdw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] avrcp: fix AVRCP_STATUS_INVALID_PARAM
-To: Pavel Bozhko <pvbozhko@salutedevices.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/2] shared/hfp: Add Enhanced Call Status support
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176280600775.2762084.9118739314924188427.git-patchwork-notify@kernel.org>
+Date: Mon, 10 Nov 2025 20:20:07 +0000
+References: <20251110073804.49651-1-frederic.danis@collabora.com>
+In-Reply-To: <20251110073804.49651-1-frederic.danis@collabora.com>
+To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Pavel,
+Hello:
 
-On Fri, Nov 7, 2025 at 4:07=E2=80=AFAM Pavel Bozhko <pvbozhko@salutedevices=
-.com> wrote:
->
-> The first AVRCP_EVENT_VOLUME_CHANGED event triggers
-> an AVRCP_STATUS_INVALID_PARAM response.
->
-> When pairing, the org.bluez.MediaTransport1 instance
-> may not have time to be created, but the org.bluez.Device1
-> instance has already been created.
-> avrcp_handle_register_notification receives an
-> AVRCP_EVENT_VOLUME_CHANGED event and
-> media_transport_get_device_volume will return a Volume
-> of -1 from the org.bluez.Device1 object, resulting in
-> an AVRCP_STATUS_INVALID_PARAM being sent to the audio source.
-> After receiving the first AVRCP_STATUS_INVALID_PARAM,
-> the Audio-Source will consider volume changes
-> from the Audio-Sink unsupported.
-> Relevant for all iPhone models as Audio Source.
-> ---
->  src/device.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index 91b6cc0c6..352323167 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -4818,7 +4818,7 @@ static struct btd_device *device_new(struct btd_ada=
-pter *adapter,
->                 return NULL;
->
->         device->tx_power =3D 127;
-> -       device->volume =3D -1;
-> +       device->volume =3D 0;
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-But this will indicate volume is always supported, and worse set to 0,
-what we should probably do is initialize it to 0, so we might need a
-better way to detect that volume is supported and then perhaps set it
-to 0 until the transport is setup.
+On Mon, 10 Nov 2025 08:38:03 +0100 you wrote:
+> In case remote device supports the Enhanced Call Status the calls are
+> created, updated or removed based on results of AT+CLCC commands.
+> This implies to send an AT+CLCC command on reception of +CIEV events
+> for <call>, <callsetup> or <callheld> indicators instead of managing
+> calls directly.
+> 
+> This updates the tests using FULL_SLC_SESSION:
+> - /HFP/HF/ENO/BV-01-C
+> - /HFP/HF/ICA/BV-01-C
+> - /HFP/HF/ICA/BV-02-C
+> - /HFP/HF/ICA/BV-03-C
+> - /HFP/HF/ICA/BV-04-C-full
+> 
+> [...]
 
->         device->wake_id =3D -1U;
->
->         device->db =3D gatt_db_new();
-> --
-> 2.43.0
->
->
+Here is the summary with links:
+  - [BlueZ,1/2] shared/hfp: Add Enhanced Call Status support
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d33b9b7c9e7e
+  - [BlueZ,2/2] unit/test-hfp: Add Enhanced Call Status tests
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=173e9963df4b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
