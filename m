@@ -1,65 +1,72 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6988B2F5A0D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 21:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6A528000B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 21:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762808933; cv=none; b=mrq5BBDQUlj0WpPXCKmAya9jFkinjIc5XfYQ4iTWw9zOvHxCYssGpP5ude3MFfWbf7xVFSK7uI/DyLl3EBOnV570KFzE8tuuOQlgacuRnKwMDiopfPU/Ya0HFi8PIF2t6z+3vVlF+EucdXvZs6YgKkkkNraljijt4TJijjSAyDc=
+	t=1762809035; cv=none; b=Je1WnUtY6WOzrbCMv0fa4438xSlzFm99xDhtdmat9ckPovWgCq9NevTDG7Rpffn+hD1sBeqK+G9Epqlj2mrJUDIRA5DJE0XnicvdSnpt+d7q+OZ+FPfamRhmemNaEgWaDFQm7kFyXnK+3EM2dQS0MUxzBAIY3l/rnfiZnbxf8vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762808933; c=relaxed/simple;
-	bh=m1OMvisNKnprWaHTiNnr9qMNCd0ORYF8ud7uZg3pV3Q=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Uq258vmHOe+wXTCYfd/HLSyB84cmSvx2HVXfIMrbPIORcWUbJ/vxL9vQbuJ9SLSUgBnZLcADIhC/bSFkPXnCoV6PBMI4PNfaeAJm64BPfpSm9UhpVZ1SIFE0IgERPlGwp3C1dQ+41pYpq7XqmcDflFMepwaIuXBUUs/PsTGSrMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=PBasXBhY; arc=none smtp.client-ip=192.30.252.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1762809035; c=relaxed/simple;
+	bh=LyVsvVNyb4wGoJJoC1GHbSbus6TtBeCyXkA11NvHLjc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NLbRS/Qb0POAQSlpJ0nc00+GT9FdbFGFsYS06OD3xhpzej9g+dHWOuahralH1t7NYR1MvK3OkczQhgzXTpmuJ1UkzyY0jVP/P8YyQFDjK+w8yH/Z3cZtqx7EZqbgiaWxWpaZ2DX60u0Pmlj4XrZN6U3nszlspSMS2YGJu8fEY3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUZ7d2G4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="PBasXBhY"
-Received: from github.com (hubbernetes-node-95c5780.va3-iad.github.net [10.48.168.39])
-	by smtp.github.com (Postfix) with ESMTPA id 5875CE1034
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 13:08:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1762808930;
-	bh=yc+6rpw4qLdRctULfv+UvYR2Gl2IxSFSOKQZ/6uLyCs=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=PBasXBhYEwvcDFRLPmLcUEdKi+omO4H7IlSmqYLAZqsbDcqBDIaJuCe0NidbkbsuV
-	 PGaM50kZAQAfwTRA0o/0NcXA0WrOHNhdncmmIYR+VwEwlHOOejf2Q/qjJXzXSGwMfr
-	 U8tKbthS0iF8dVNuyLl2PW6S62mRi9hpLgkgTvlA=
-Date: Mon, 10 Nov 2025 13:08:50 -0800
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/a7b0f2-5e41d1@github.com>
-Subject: [bluez/bluez] 5e41d1: The GATT.Client option is in the wrong section.
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUZ7d2G4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B645C113D0;
+	Mon, 10 Nov 2025 21:10:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762809035;
+	bh=LyVsvVNyb4wGoJJoC1GHbSbus6TtBeCyXkA11NvHLjc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oUZ7d2G4pxQ+cnqLljJi1JqBSM6RlnbNNyEBGCHNwsHB2iQm07cxPegZEeVDzcnlj
+	 c+9JDLBZU+JYWQO/mYKBld0sIYdSOmiqSgqNQ3r51wnqIM9TKTBBRr7iXHRtDXjVgw
+	 AGAwlAnNtEpqcTrBau+kK5LfoGWAsuvR3tQtSJhsUkI9Avzbp/2/KjoZlrwYk4sWoX
+	 gItVr4KeJF362eYu1DJVC7jE60vjgjDNE/8N8GfqC+Vj87X3tEXFpovrcbh6pplgx3
+	 Ax+CDeBeowgGQR/BtmCvJk91R9Nv6zPvthXucU9L1Raet5xMKLK57xqk/zNLpsJUyC
+	 Stjt4+KctLTeg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBC47380CFD5;
+	Mon, 10 Nov 2025 21:10:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] The GATT.Client option is in the wrong section.
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176280900578.2775094.16100231208863886192.git-patchwork-notify@kernel.org>
+Date: Mon, 10 Nov 2025 21:10:05 +0000
+References: <20251107122734.228-1-pvbozhko@salutedevices.com>
+In-Reply-To: <20251107122734.228-1-pvbozhko@salutedevices.com>
+To: Pavel Bozhko <pvbozhko@salutedevices.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 5e41d1e1d361e7288964e4c2c5ed90736025662f
-      https://github.com/bluez/bluez/commit/5e41d1e1d361e7288964e4c2c5ed90736025662f
-  Author: Pavel Bozhko <pvbozhko@salutedevices.com>
-  Date:   2025-11-10 (Mon, 10 Nov 2025)
+Hello:
 
-  Changed paths:
-    M src/main.conf
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  The GATT.Client option is in the wrong section.
+On Fri, 7 Nov 2025 15:27:34 +0300 you wrote:
+> GATT.Client is currently in the CSIS section, but should
+> be in the GATT section. The bug is that
+> setting the Client option to false has no effect.
+> ---
+>  src/main.conf | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-GATT.Client is currently in the CSIS section, but should
-be in the GATT section. The bug is that
-setting the Client option to false has no effect.
+Here is the summary with links:
+  - [BlueZ] The GATT.Client option is in the wrong section.
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5e41d1e1d361
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
