@@ -1,140 +1,127 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F370379CD;
-	Mon, 10 Nov 2025 08:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196771DDC28
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 09:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762761700; cv=none; b=bey3A7uiJe4d+5c++6PPZ0BXXvDA9jU9MJ3/hEg5XGZrs95SMK+SawfOYqFj1jU+kdUDXXK9YG6OSPje1RhRWEAL1chzNSdKkvQTb+aePVLh7Rp1ciSFBz3gT35aYNXLyiy83wjGdrNfupz88VKkhK30McQOJdIfAhwxCXPM4Fs=
+	t=1762765341; cv=none; b=X8B9vqrnyHVs8VrIwbbBj6GtddEA9Bt67gY5xSMNEXPnfMlWLwlXc+IAZZyLMNKoBgqtus8cWrdwbw+P+2GT3cweMnLBZ/8k0tn6bVPMlVBwmaX/98MwCbsZH966bzAS4PzIkv4NPw58CnEutfce4Y71EpE1t/bhSRbU+nJ5MVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762761700; c=relaxed/simple;
-	bh=JwjdNc5Od1/yX9H/LlUz8bXR7/nAIi8de1f95CaCqDk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DxA8oYp4Y7dwL58rMxvKLYIfyMuvILFC3On15MU91LNNmZA0VHPExmq1ebet87VFFrNBBjggZFQ+4XeY/oaNLdSNRwMfIVCSjIX0FnjUYtMqpi/pCJc1Cmz29rw1vEtSUlAA1Q5Au4MYyMtwKTTRAXbB3H2PTO2dhh17jSLAy8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.215] (p57bd98ba.dip0.t-ipconnect.de [87.189.152.186])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E5EF8600D068A;
-	Mon, 10 Nov 2025 09:01:24 +0100 (CET)
-Message-ID: <5dc5f0f7-3dfa-403a-821d-b4fdb800d1e8@molgen.mpg.de>
-Date: Mon, 10 Nov 2025 09:01:23 +0100
+	s=arc-20240116; t=1762765341; c=relaxed/simple;
+	bh=et6MF5YD/fe2TpiOCbixUs1QFYSFR+IMz/Z1V4PLPGw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=WRY9nw1Zqo8cDb4UCX+WC8rfdx25YoO41uXIA6VYvDvkao4OnykDhnUMEp5pqj/wGh3Lmo4bWPAafRb0UIRtg4ykF8vX0UTkZU/p4y3g8svmg8DrPue0DB5Ytx/xBBPITFy2d2NS2/cTx6hojdttantp42NEsC4NfdrdhSFWopA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePTUtIf1; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePTUtIf1"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-8909f01bd00so283695685a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 01:02:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762765339; x=1763370139; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=w9VepaQAHKMaBtflYWJnZmBW5Q1lMQvnugPmhHP9meY=;
+        b=ePTUtIf17jmfcWIMgr9qBm3dbpMv3a2t6/Kum5SzPtdE+HxRN67LUHM3nT9D/rLRJt
+         fWnsYIx7AASrspnHdwMPoMHOir6EQRCvh98K9TaxYla0FjXnuMfuC8YdNSNmmRuzr7/s
+         LBy4b0n+iyWrN9zAhxTxJHRJW7Kf7aAlHP4pabv42Xoxw2/bc7uVJfLMyJIzFV35owfM
+         dYrAhmPJzkfTllBYcFxXihuyi10kRBLnefyNzlewrXkRqtAil5jwSoC7wwRkmJ+8TWI1
+         PIutNmDMnmkoh+zNV0zD/2WbtDpu2nHunTo1zZpeLZJx4fLHpAfwuFwReqA1+J3tND6A
+         9yog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762765339; x=1763370139;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w9VepaQAHKMaBtflYWJnZmBW5Q1lMQvnugPmhHP9meY=;
+        b=tu46CZBmnQZolv/KGSgTgCd4Ek/zJ1Hum/5P/G56iZjHAF3CGOR8X0/qBuzlhROpLA
+         jRckLJ629aZ6pTT9a7KIeenxMyuJNTNFslswo2FVl6gkmvNkx5RhlBfxOalDqJRVeVPc
+         sOrr4Glco4X/Hxz0JlJR+QvrlNN4os+LZXQ3b9bNlRFkG57W5pPZQg9d+gAAu3KDsVKI
+         KDeGAEE1dpRGmcy+TqDVAhlPt18vYzQEVATtrkRzX7u9OztUw0UC/rU2oj9Df3Mg/uzb
+         eNeMRg8X81arda6ZYAUckmkLv5rB3Ji3TQqI+HyZ3DK9cC0/kgzFDXRhJkeXOV1dXPY/
+         MnZw==
+X-Gm-Message-State: AOJu0Yyyrk0afBGAo+HDoeicmXNcrh31oT0EKujKbxjs5ePXEX1EVomm
+	A3rrmVX63W7D2CnfeuhMyw/Q30gLby+ufBZ98M6kktbNUxMEWLX7SvDCqfeoNQ==
+X-Gm-Gg: ASbGncu68/rsgxt7XlbtB+8uP36Am3EPlJvv4c46nc3Cgj0bdrNx/Z+84PkCpGSjQMq
+	bAg0Gw4CXGoexYLdoJC1pvOiKBg6PM8UHsM1pAQTXiMsa2yUYmpszjFo4gHnv1Ng41LM16uuY3+
+	LX71a+hGwAVripCQ8TQ7JZyVfj1F50TONISSf5hzBONbncURFSVPNxmQGJ2GZqzLd04XHP0VSLn
+	xJFYek+r/TfB/IOcTeBtw58y4ZVAMGapx07t0GVBfiwniYNXRQKSsy6f3/zjb1tyIkbX9Pt/pZi
+	XTowGniMB4qN2/N1oK1v4WOjEvaCETpxGd6InmsFGtWjFP40WCTpLvROcf+hR1rDUdcMyKsg0sn
+	RwZnICkPVq9OTCVeu8/MM468bVro/j+Kg4b3Gt8GtmRp6/1JKZ+GUu8yoGEEvuhHrXv2XXmLTu0
+	EI+9mYrecpkDqxXjvm
+X-Google-Smtp-Source: AGHT+IFZvQtWOCUczrJtsgYK2n9YwGeKSjhIgTgvLApQJAV++/tgfhTSy9g46WKy0xhAyEivang3fg==
+X-Received: by 2002:a05:620a:a81a:b0:8b2:598d:6e66 with SMTP id af79cd13be357-8b2598d6ff5mr668143785a.22.1762765338599;
+        Mon, 10 Nov 2025 01:02:18 -0800 (PST)
+Received: from [172.17.0.2] ([20.109.38.178])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b23582b0c9sm975606985a.55.2025.11.10.01.02.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Nov 2025 01:02:18 -0800 (PST)
+Message-ID: <6911aa1a.050a0220.27a1a5.62b9@mx.google.com>
+Date: Mon, 10 Nov 2025 01:02:18 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4214521583651537478=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/1] Bluetooth: btusb: add default nvm file
-To: Shuai Zhang <quic_shuaz@quicinc.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, quic_chejiang@quicinc.com,
- quic_jiaymao@quicinc.com, quic_chezhou@quicinc.com
-References: <20251110034134.1016537-1-quic_shuaz@quicinc.com>
- <20251110034134.1016537-2-quic_shuaz@quicinc.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251110034134.1016537-2-quic_shuaz@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,1/2] shared/hfp: Add Enhanced Call Status support
+In-Reply-To: <20251110073804.49651-1-frederic.danis@collabora.com>
+References: <20251110073804.49651-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============4214521583651537478==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Dear Shuai,
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1021420
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.26 seconds
+GitLint                       PENDING   0.26 seconds
+BuildEll                      PASS      20.19 seconds
+BluezMake                     PASS      2691.38 seconds
+MakeCheck                     PASS      20.25 seconds
+MakeDistcheck                 PASS      187.06 seconds
+CheckValgrind                 PASS      238.82 seconds
+CheckSmatch                   PASS      312.11 seconds
+bluezmakeextell               PASS      130.20 seconds
+IncrementalBuild              PENDING   0.26 seconds
+ScanBuild                     PASS      932.78 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Thank you for the patch.
 
-Am 10.11.25 um 04:41 schrieb Shuai Zhang:
-> If no NVM file matches the board_id, load the default NVM file.
-
-Maybe also add the comment, that the NVM file is always compatible(?) 
-and just might not give the best performance.
-
-Also, please add a comment about passing board_id now. (Is that 
-necessary or just an optimization?)
-
-> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
-> ---
->   drivers/bluetooth/btusb.c | 26 +++++++++++++++++---------
->   1 file changed, 17 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index dcbff7641..020dbb0ab 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3482,15 +3482,14 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
->   }
->   
->   static void btusb_generate_qca_nvm_name(char *fwname, size_t max_size,
-> -					const struct qca_version *ver)
-> +					const struct qca_version *ver,
-> +					u16 board_id)
->   {
->   	u32 rom_version = le32_to_cpu(ver->rom_version);
->   	const char *variant, *fw_subdir;
->   	int len;
-> -	u16 board_id;
->   
->   	fw_subdir = qca_get_fw_subdirectory(ver);
-> -	board_id = qca_extract_board_id(ver);
->   
->   	switch (le32_to_cpu(ver->ram_version)) {
->   	case WCN6855_2_0_RAM_VERSION_GF:
-> @@ -3517,14 +3516,14 @@ static void btusb_generate_qca_nvm_name(char *fwname, size_t max_size,
->   
->   static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
->   				    struct qca_version *ver,
-> -				    const struct qca_device_info *info)
-> +				    const struct qca_device_info *info,
-> +				    u16 board_id)
->   {
->   	const struct firmware *fw;
->   	char fwname[80];
->   	int err;
->   
-> -	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
-> -
-> +	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, board_id);
->   	err = request_firmware(&fw, fwname, &hdev->dev);
->   	if (err) {
->   		bt_dev_err(hdev, "failed to request NVM file: %s (%d)",
-> @@ -3606,10 +3605,19 @@ static int btusb_setup_qca(struct hci_dev *hdev)
->   	btdata->qca_dump.controller_id = le32_to_cpu(ver.rom_version);
->   
->   	if (!(status & QCA_SYSCFG_UPDATED)) {
-> -		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
-> -		if (err < 0)
-> -			return err;
-> +		u16 board_id = qca_extract_board_id(&ver);
->   
-> +		err = btusb_setup_qca_load_nvm(hdev, &ver, info, board_id);
-> +		if (err < 0) {
-> +			//if the board id is not 0, try to load the defalut nvm file
-
-Did `checkpatch.pl` not complain about the missing space, and 
-misspelling of *default*?
-
-> +			if (err == -ENOENT && board_id != 0) {
-> +				err = btusb_setup_qca_load_nvm(hdev, &ver, info, 0);
-> +				if (err < 0)
-> +					return err;
-> +			} else {
-> +				return err;
-> +			}
-> +		}
->   		/* WCN6855 2.1 and later will reset to apply firmware downloaded here, so
->   		 * wait ~100ms for reset Done then go ahead, otherwise, it maybe
->   		 * cause potential enable failure.
-
-Please try to catch the style errors before submitting patches.
+---
+Regards,
+Linux Bluetooth
 
 
-Kind regards,
-
-Paul
+--===============4214521583651537478==--
