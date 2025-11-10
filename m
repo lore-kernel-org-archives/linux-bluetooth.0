@@ -1,104 +1,140 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D91A2D5A14
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 07:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F370379CD;
+	Mon, 10 Nov 2025 08:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762760777; cv=none; b=VGnZARWxaRpQZzQZjheRWtbqDGkaq24O+8AIrgLi462+kHWkylbS9KhPIN9inClZncycs3BSWfp9y+sjdfiuuOezMRk3NZbmeII0fgohbwqJLphV43zzZYO+0vLxIhxk9q+9mohNgjcUHA/8LsZ3sf2pL3Wbvc2gxTFT4RF5W9s=
+	t=1762761700; cv=none; b=bey3A7uiJe4d+5c++6PPZ0BXXvDA9jU9MJ3/hEg5XGZrs95SMK+SawfOYqFj1jU+kdUDXXK9YG6OSPje1RhRWEAL1chzNSdKkvQTb+aePVLh7Rp1ciSFBz3gT35aYNXLyiy83wjGdrNfupz88VKkhK30McQOJdIfAhwxCXPM4Fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762760777; c=relaxed/simple;
-	bh=BevIoaSFafu8woc9N1nERqNY9EH/GOo7l/htilqWjfs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Uzvg2oawDnsZ2X7ZQ+5pDrQyFtryYUPqtu42cbKszjUQhQi9ePPAAZLJiwHserv3Seybqgystax9l+K2vZpxy3fGVCL8S/IDk5YNXUvMOsmQH5FW3CT6bzwuU8OHRi8cJk0aefipVoPTgznhjdl7ipskETpgEls/gZpgCH7K+pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=MWytZlL/; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="MWytZlL/"
-Received: from github.com (hubbernetes-node-eb39a88.ash1-iad.github.net [10.56.209.91])
-	by smtp.github.com (Postfix) with ESMTPA id 6DAF3920AA8
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Nov 2025 23:46:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1762760774;
-	bh=9XMvnkrJoUvcplm+vthPnX8n1jo3dV2PFnc+U+aM0q0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=MWytZlL/rHx14RMEETtqtpb9uoKXW5cR9OBRw8oz496lmkrVoMg4mQJCTLomNxT/J
-	 DGQyCxzKkuay0IpklATCmiRA3DuTzWlFUNenNLj32ZUrc+iJq425KOVcykvWZ4MXlf
-	 ByiHSZZVbXeB+3v5PTho5D2VKB5bSXnN/h/uOtUk=
-Date: Sun, 09 Nov 2025 23:46:14 -0800
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1021420/000000-930322@github.com>
-Subject: [bluez/bluez] 74b068: shared/hfp: Add Enhanced Call Status support
+	s=arc-20240116; t=1762761700; c=relaxed/simple;
+	bh=JwjdNc5Od1/yX9H/LlUz8bXR7/nAIi8de1f95CaCqDk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DxA8oYp4Y7dwL58rMxvKLYIfyMuvILFC3On15MU91LNNmZA0VHPExmq1ebet87VFFrNBBjggZFQ+4XeY/oaNLdSNRwMfIVCSjIX0FnjUYtMqpi/pCJc1Cmz29rw1vEtSUlAA1Q5Au4MYyMtwKTTRAXbB3H2PTO2dhh17jSLAy8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.215] (p57bd98ba.dip0.t-ipconnect.de [87.189.152.186])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E5EF8600D068A;
+	Mon, 10 Nov 2025 09:01:24 +0100 (CET)
+Message-ID: <5dc5f0f7-3dfa-403a-821d-b4fdb800d1e8@molgen.mpg.de>
+Date: Mon, 10 Nov 2025 09:01:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/1] Bluetooth: btusb: add default nvm file
+To: Shuai Zhang <quic_shuaz@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, quic_chejiang@quicinc.com,
+ quic_jiaymao@quicinc.com, quic_chezhou@quicinc.com
+References: <20251110034134.1016537-1-quic_shuaz@quicinc.com>
+ <20251110034134.1016537-2-quic_shuaz@quicinc.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251110034134.1016537-2-quic_shuaz@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-  Branch: refs/heads/1021420
-  Home:   https://github.com/bluez/bluez
-  Commit: 74b0687c958c2f59991c84c429c40ba9e1f330a2
-      https://github.com/bluez/bluez/commit/74b0687c958c2f59991c84c429c40=
-ba9e1f330a2
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-11-10 (Mon, 10 Nov 2025)
-
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  shared/hfp: Add Enhanced Call Status support
-
-In case remote device supports the Enhanced Call Status the calls are
-created, updated or removed based on results of AT+CLCC commands.
-This implies to send an AT+CLCC command on reception of +CIEV events
-for <call>, <callsetup> or <callheld> indicators instead of managing
-calls directly.
-
-This updates the tests using FULL_SLC_SESSION:
-- /HFP/HF/ENO/BV-01-C
-- /HFP/HF/ICA/BV-01-C
-- /HFP/HF/ICA/BV-02-C
-- /HFP/HF/ICA/BV-03-C
-- /HFP/HF/ICA/BV-04-C-full
+Dear Shuai,
 
 
-  Commit: 9303221ff05070965671a0f1df56dd5a5a7df3cb
-      https://github.com/bluez/bluez/commit/9303221ff05070965671a0f1df56d=
-d5a5a7df3cb
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-11-10 (Mon, 10 Nov 2025)
+Thank you for the patch.
 
-  Changed paths:
-    M unit/test-hfp.c
+Am 10.11.25 um 04:41 schrieb Shuai Zhang:
+> If no NVM file matches the board_id, load the default NVM file.
 
-  Log Message:
-  -----------
-  unit/test-hfp: Add Enhanced Call Status tests
+Maybe also add the comment, that the NVM file is always compatible(?) 
+and just might not give the best performance.
 
-This add the following test:
-- /HFP/HF/ECS/BV-01-C
-  Verify that the HF can request the status of current calls in the AG.
-- /HFP/HF/ECS/BV-02-C
-  Verify that the AG can send the correct call status when an SLC is
-  initialized.
-- /HFP/HF/ICA/BV-07-C-full
-  Verify that HF can connect to an AG that is receiving an in-coming
-  call.
+Also, please add a comment about passing board_id now. (Is that 
+necessary or just an optimization?)
+
+> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+> ---
+>   drivers/bluetooth/btusb.c | 26 +++++++++++++++++---------
+>   1 file changed, 17 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index dcbff7641..020dbb0ab 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -3482,15 +3482,14 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+>   }
+>   
+>   static void btusb_generate_qca_nvm_name(char *fwname, size_t max_size,
+> -					const struct qca_version *ver)
+> +					const struct qca_version *ver,
+> +					u16 board_id)
+>   {
+>   	u32 rom_version = le32_to_cpu(ver->rom_version);
+>   	const char *variant, *fw_subdir;
+>   	int len;
+> -	u16 board_id;
+>   
+>   	fw_subdir = qca_get_fw_subdirectory(ver);
+> -	board_id = qca_extract_board_id(ver);
+>   
+>   	switch (le32_to_cpu(ver->ram_version)) {
+>   	case WCN6855_2_0_RAM_VERSION_GF:
+> @@ -3517,14 +3516,14 @@ static void btusb_generate_qca_nvm_name(char *fwname, size_t max_size,
+>   
+>   static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+>   				    struct qca_version *ver,
+> -				    const struct qca_device_info *info)
+> +				    const struct qca_device_info *info,
+> +				    u16 board_id)
+>   {
+>   	const struct firmware *fw;
+>   	char fwname[80];
+>   	int err;
+>   
+> -	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
+> -
+> +	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, board_id);
+>   	err = request_firmware(&fw, fwname, &hdev->dev);
+>   	if (err) {
+>   		bt_dev_err(hdev, "failed to request NVM file: %s (%d)",
+> @@ -3606,10 +3605,19 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+>   	btdata->qca_dump.controller_id = le32_to_cpu(ver.rom_version);
+>   
+>   	if (!(status & QCA_SYSCFG_UPDATED)) {
+> -		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
+> -		if (err < 0)
+> -			return err;
+> +		u16 board_id = qca_extract_board_id(&ver);
+>   
+> +		err = btusb_setup_qca_load_nvm(hdev, &ver, info, board_id);
+> +		if (err < 0) {
+> +			//if the board id is not 0, try to load the defalut nvm file
+
+Did `checkpatch.pl` not complain about the missing space, and 
+misspelling of *default*?
+
+> +			if (err == -ENOENT && board_id != 0) {
+> +				err = btusb_setup_qca_load_nvm(hdev, &ver, info, 0);
+> +				if (err < 0)
+> +					return err;
+> +			} else {
+> +				return err;
+> +			}
+> +		}
+>   		/* WCN6855 2.1 and later will reset to apply firmware downloaded here, so
+>   		 * wait ~100ms for reset Done then go ahead, otherwise, it maybe
+>   		 * cause potential enable failure.
+
+Please try to catch the style errors before submitting patches.
 
 
-Compare: https://github.com/bluez/bluez/compare/74b0687c958c%5E...9303221=
-ff050
+Kind regards,
 
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+Paul
