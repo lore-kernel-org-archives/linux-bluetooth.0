@@ -1,48 +1,130 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4A92FD7B8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 21:28:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F30B332ED0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 21:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762810084; cv=none; b=SwNFnMGmtiAijHAHiEguyJpS+jNZgTc3x3IuY6wuqR6WoYVjtOrbG7iJemQ/AR9FCAVAEL0/+XmBdBZdiWzAbv1dIdKWPSBL7XnIUUvgJGVdc/MZvRDGWioGauuPzOQkpRJfOeBRa8XvKwe9E/xla+RRIvQy3YxVZj23YMIHaLg=
+	t=1762811111; cv=none; b=VOiS/8BsZO1B19EcBhR3zDX35m0mjmRcnY0POlcgYQyaPHY6psNQSceDDNagfHlbZuGxvdtfNbGbXb8rKj0gIAOEPa+q3OuWjJG0AuwRQKiA65WBZ3ImLvmv6zielcso853rhTVSieW/3md5QESgDxEjGmT9o/NmosYkg2W7JnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762810084; c=relaxed/simple;
-	bh=FPGAkUSKbK8rOyxYQBUlOWp9qvf/PdGVgZ001QyeoY4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=NKDWeL9MLro2Yepl6mpFvVMOgYkwXXj/4BBAzcFmmh70kUA4JM029nEYzDeGJ3fzqAgi8iTkP+pmPJQZKPBqMiVIRgQZcPuRe2/rI8sRBFxc7IHodsLqL9cqIXT8svaznafue3RegWq1PhBTVHl74DYby9jto1FjHUis2E/ozlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XCGLucjb; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1762811111; c=relaxed/simple;
+	bh=XbIkgjSjazI+gKAY7TFSSqe/qph2e7iSMcsTUjYLzUk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DtYOedaW/oS+kwpFBRF+mwCH2L7un/wetbrrQcJp8FZKxCI1q0iR3sQmhSmkbJZrxT/ekIdNP60LNo/iOfaF7901/Ohi+Fywi84Kuas1CKIPXBdBRg5CQTcDYTSZtF/wUrjPmm6oJnutA8ULlFNuGyUk/W34hJdgXHT6wGw2+qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZS8wj3G3; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XCGLucjb"
-Received: from github.com (hubbernetes-node-3752b24.ash1-iad.github.net [10.56.206.13])
-	by smtp.github.com (Postfix) with ESMTPA id F2E50920292
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 13:28:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1762810082;
-	bh=rDckmKbf7XkDI1g1muCHy1mMq0LB+tX5qvWwGsBf0Tg=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=XCGLucjbgFho3eXhFcH+3GEgEpsKdFovzGyDQk/kbp8DvkGiLsXBkHca61krfpZdM
-	 lCgMRSnbYTI00D8VcLxTv03gMt0cMkuZx/unU9mOaO/NONgoPIfZdfRVKCeTMSBF2b
-	 uIC6o2eroOZyfeS7GUHJBCS7vd++49Hck9pvdDBc=
-Date: Mon, 10 Nov 2025 13:28:01 -0800
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1020865/102f4b-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZS8wj3G3"
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-557bf688086so837328e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 13:45:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762811108; x=1763415908; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rT6k87tt95jXg2dv2HIIHHJQjMIVbfktrJtwWuz69Tg=;
+        b=ZS8wj3G3svVxvwCl4ILgYAc9AU3+I/zqQnHwkaH9VMK9ODuaq8nm8iiEDjPVDipZUy
+         0ramq3J5MwtQKcOVD1PhSh92uP58jCWJsdMJkpzzhLh5VtbUMGkd9rCBUPuaLw7zpGfn
+         vjpWDJHmuBp64TlB1C8MHjeHXn6fWOroOZxS9ORyoi9GtY6vXwwEhs+gIaoBx/yUxL6j
+         wM85eYWLuEoz2TzJeP0y+KWwSwEr+7U0BJgwCqpdItqDMDHwH1Iz91oNFzL3jmUPGTlR
+         Z7F0YvM/la/MixkMzBj9gXHXz1lAi/f2r4k5gQ1RPZVwuZK+dIgS9VXgwR5t1BCuyWj7
+         j6LA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762811108; x=1763415908;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rT6k87tt95jXg2dv2HIIHHJQjMIVbfktrJtwWuz69Tg=;
+        b=Q0M2+7XnKsDIcxv5ChJ73yW4ZU3XVK31OdrnMgR7AU7lHDJV7Q3JYllHT/seq4NpQA
+         Sg5EfKPhXEr9GAF2ysjVPSTV8Fowt7/pWGuD/rjjJ3xGlw3EbpWBqlp24tEKw2/ajbOZ
+         X0CuiiXN6sqLIbXSESyKN7Gba/gBSb0WSopQcxVSHt9q1YiHgjYYOyFZHIr8QL4Buy+/
+         TmJLTJ1La21J9khF2BSn+oLSWcBt0ruQ7b6ExiJ+kCmdn6GET2hzeGXPqxN4UvV5UE1X
+         9FsK/gGr1HWK8EzvctrfBYiNftQBWYnOtBYR2pVC8LMK5T/YCBA3/Try23GdpYYM1qFw
+         yWTg==
+X-Gm-Message-State: AOJu0Yy7DSPRZhshHgdEONpK6zdb3FTPa8GKqvctoknCzMbYMXRWI2HP
+	Z+NF6Q9N8ESlIs4+gi5V6N/YKPyGBMfEki2/e7uPBuPwcEtWlBeK58Tl
+X-Gm-Gg: ASbGncv4y5TShBLnJkPSijlMNOgg3ZZkGNo8fLfzKriFv+R3n7wtZkPUgiN8VAq6D5i
+	4dxqzMsJ+M7w80c1ZN79TAYpOVJa1knp+eHreb7FPyTJKcAhqxNZ9GcDqqliVSFZNQDQartnte6
+	be2vzNTh7bgLWOryAgDMMP63CrHDcsGvxGFOgLBjoXmuudV2eCTEBICUogyM+c49PSmLAKsNWcA
+	Tah4dPns3sgdD25CO1nSJ4A8/9Suut0Hd3dWJ0Y9ZlvQEny/RPBu5oj9Ls3GRp6AoJk486y+7Uz
+	cXS4SMKqOjzKSOlgSgfCHeOWqad43baqVQHTpaiMkVQIe8yTCdhFLsyfJjPgCsZhj2GJAuE6wIq
+	DDOUPdXdDhoJvnh7YoQbExkDnhtprvqRsRNcxHGGx1N2PY8RzaYBfEh7FNzLi15NX2IjruK2uWR
+	LHl5s=
+X-Google-Smtp-Source: AGHT+IGLukCHhejyOv+2B5P9xj/a4FMTd/9AYlXGWL72VlTt8uYGk0kfpVvV5fqMlzkyNxoRowg1ZA==
+X-Received: by 2002:a05:6122:660a:b0:54a:89b1:2fbb with SMTP id 71dfb90a1353d-559b328cac7mr3667200e0c.11.1762811108161;
+        Mon, 10 Nov 2025 13:45:08 -0800 (PST)
+Received: from lvondent-mobl5 ([50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-559958320aasm7947217e0c.20.2025.11.10.13.45.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Nov 2025 13:45:06 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-11-10
+Date: Mon, 10 Nov 2025 16:44:53 -0500
+Message-ID: <20251110214453.1843138-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1020865
-  Home:   https://github.com/bluez/bluez
+The following changes since commit 96a9178a29a6b84bb632ebeb4e84cf61191c73d5:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+  net: phy: micrel: lan8814 fix reset of the QSGMII interface (2025-11-07 19:00:38 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-11-10
+
+for you to fetch changes up to 6ea7b3104fc22ecd720de91b2b3e9ddeb5953c31:
+
+  Bluetooth: btrtl: Avoid loading the config file on security chips (2025-11-10 16:09:50 -0500)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - hci_conn: Fix not cleaning up PA_LINK connections
+ - hci_event: Fix not handling PA Sync Lost event
+ - MGMT: cancel mesh send timer when hdev removed
+ - 6lowpan: reset link-local header on ipv6 recv path
+ - 6lowpan: fix BDADDR_LE vs ADDR_LE_DEV address type confusion
+ - L2CAP: export l2cap_chan_hold for modules
+ - 6lowpan: Don't hold spin lock over sleeping functions
+ - 6lowpan: add missing l2cap_chan_lock()
+ - btusb: reorder cleanup in btusb_disconnect to avoid UAF
+ - btrtl: Avoid loading the config file on security chips
+
+----------------------------------------------------------------
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_conn: Fix not cleaning up PA_LINK connections
+      Bluetooth: hci_event: Fix not handling PA Sync Lost event
+
+Max Chou (1):
+      Bluetooth: btrtl: Avoid loading the config file on security chips
+
+Pauli Virtanen (6):
+      Bluetooth: MGMT: cancel mesh send timer when hdev removed
+      Bluetooth: 6lowpan: reset link-local header on ipv6 recv path
+      Bluetooth: 6lowpan: fix BDADDR_LE vs ADDR_LE_DEV address type confusion
+      Bluetooth: L2CAP: export l2cap_chan_hold for modules
+      Bluetooth: 6lowpan: Don't hold spin lock over sleeping functions
+      Bluetooth: 6lowpan: add missing l2cap_chan_lock()
+
+Raphael Pinsonneault-Thibeault (1):
+      Bluetooth: btusb: reorder cleanup in btusb_disconnect to avoid UAF
+
+ drivers/bluetooth/btrtl.c   |  24 +++++-----
+ drivers/bluetooth/btusb.c   |  13 +++---
+ include/net/bluetooth/hci.h |   5 +++
+ net/bluetooth/6lowpan.c     | 105 ++++++++++++++++++++++++++++++++------------
+ net/bluetooth/hci_conn.c    |  33 ++++++++------
+ net/bluetooth/hci_event.c   |  56 ++++++++++++++---------
+ net/bluetooth/hci_sync.c    |   2 +-
+ net/bluetooth/l2cap_core.c  |   1 +
+ net/bluetooth/mgmt.c        |   1 +
+ 9 files changed, 158 insertions(+), 82 deletions(-)
