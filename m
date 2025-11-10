@@ -1,157 +1,169 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C6B2D6607
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 06:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011CC2D73A9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 07:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762757095; cv=none; b=lNtvPKPY41bUBvRGCCmG77Cq6Dvup1FKwr3mzT4F3QFMm6ILYQW2PwV0omthCY61U+PktCPpHWqqubVUxIT2GXqt4zg7XM/8gck9/x7ewzowkCEDQVa1CZ1jVfbUOSkhZk5wXy03SFT8++8jYDoffNcVVuS13htQA27SIBxpXKc=
+	t=1762760299; cv=none; b=Lfpew5l4fX+huC8j4dA+IAKAhUEX0r7xTr7dDwSDeAAwDbk6xpa82pa3QXui5X/9ngLAmAmmZm6yWRpdWooOfOBbAkQm1dSfo4jGtm6NR0q/hkeIAhzy3hilb5qyf0a0Kql4v6+3kjLnvEOlc21jkgX0977QwnFxn7ZIKZ55xfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762757095; c=relaxed/simple;
-	bh=V4ch60GaCNsySGAH8nvtQs6NiXJ+wgxSToo3maKee0I=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=VJ0U0wNBzLZbtwy9L+muBGTizQEs7UnPR439z+rTy7AHKVCPfIfHfVSFBScOvGaRqIgX5FBovvY8b2jZLmnqcNeeFgj+oHqrmmzhVLnXS45R7H/6kguLilm5d+cmIzbhcNqKBeidJsf/KEiSZtGlZDbEuRbuOu2tTCFsiyqSwuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D5nA6k+T; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762760299; c=relaxed/simple;
+	bh=WoOtfu7a1ssBTzT+qzGFpj+0l4UXlYq+r/7TB/K474k=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PygkZ8EB5KW7kmJ4bBBLg/3od5Tf00YsJAF0C6+O0LUeYcQDUlJpyUV5ZoXfJSwpLqOmyPA0qhcxjXfGUFjtFuZtItfIKSBNte/aGGnJtQ8veLrMTf6ppWpL/8nadJXyflSN+wddhmE/3U+N6ZpWPkjP3AQAbIn25iu5nkQ/NLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ovLLGZud; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D5nA6k+T"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-9486354dcb2so106355439f.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Nov 2025 22:44:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762757092; x=1763361892; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=KG1G6OJ7FjFvYpOJqXHXrL21eekiQ6VLcpZp1hX3oLs=;
-        b=D5nA6k+TgvVyQbucC4iTir2h0/VXJRHdO3s5ltwZGj207VSHTlUyTJiCw8USQz5r83
-         AgvtYr+wGnRbV7FGVvKmFcpoU+Vj26rwr6ECtEwPWwZg8Bh5XucI0NEs4ApwAniBnqSc
-         BE/RX7bq6wtoYkOU7zXU/0S1dBGeTK45NxijHi2N7wDLlLUcDjokG2dQFSALPnGXswFJ
-         hsXsjePUCKnGgqeqII2Cg42jUjrc2GSg4tH1qRq8K8h7frekLuZ1a2dE9p0b6S2abBXP
-         QmcPQAbz5f5I/FF7BNu1jjBBxatPIXAdv9O2vmrpKBksNgywATjLTof3G5OnfF4+TxiL
-         OwcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762757092; x=1763361892;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KG1G6OJ7FjFvYpOJqXHXrL21eekiQ6VLcpZp1hX3oLs=;
-        b=LR1J9BfFNOsp0tgPWN3RQJwtOOCBGMMn/K/MJern20uirUvhlk3GqbKexx6z01D37G
-         dK7hkROy/ZKvxrRdryhdCDSNtlcnnCHJ18AUBgyCqxss6kwVoj+4QEFgWQc5IQ/v0Iic
-         h+SFhI1aBuVpyn6NehOoH/G5n/67vcSG/oiCn4Q0mnl9h8KjuuXr9jdAwEs2i7B2pSbp
-         2JX4jrvzGIJCk12/aoGg+XCDTTrhqy2yOINWTMq+P5xDVoidnk3VvWRHvX8ePggRepm7
-         pkeWmdpe6HxqnnZRxvYeTwtR3ozsxjZaHIonrhHUrH/aGqEnfgkr8NZ46FQ8eWm9r+FJ
-         HqNw==
-X-Gm-Message-State: AOJu0YyAGdKt6WQRzEViqr2XwJzkqbGkgGHsOcXyHT3BWlIVqBsieMDy
-	EObL9Py5aI9JuqCkSG9GU2RlXXBScilUXIg2yPmSkEhfIDA/5A0bYvjZgwsqEw==
-X-Gm-Gg: ASbGncs+0yozgiyUzzjhH2O5ikDFjhzUv9NcfilB6YT0JXWshAN4vo2N8GVRR6MskHS
-	XdLBg++hAHtqfGqPpimyHyCOHukQ/8aGEAigmmKtQux/2yTfqkKdi7y4BTPgSvhSIGXLEZ7vn9t
-	tgbeNElhitJXEj2y2k6u0Kd4gD65w1ScW/G9w5C+AEgzvtjBGBsGe3wuJJmwVbqc5oUMh9j0ryk
-	jl2+kHEMcMUQZnHC6yH0FVlYO45+YfgCPLfN92k5Ofo98iwTkjeLKjLugUAyTSi3d3XgKJAkqgl
-	01+Nl9SG0dIDkISgsnn6uRkl/Na2yV5BT1cuQsn9wRYmPZhCKp698+uouq/KE0XbfZRe2oP0EUn
-	QZBqh7x7l0Ib5YA84UZIgzt3l8IY1A3c/2DcfFHbqQrVpj+6C1C5ncKPwwm2jvlpl1UFHOw5yiM
-	cPGZgkcT4=
-X-Google-Smtp-Source: AGHT+IHyVTFP4GqBeflW5hzFWzP+jonyjOxofOjSytaE0gBw9i1ypUcau+fspkgblOHXIPg07u2Uew==
-X-Received: by 2002:a05:6e02:180d:b0:433:306e:2c83 with SMTP id e9e14a558f8ab-43367e6744dmr82122965ab.28.1762757092583;
-        Sun, 09 Nov 2025 22:44:52 -0800 (PST)
-Received: from [172.17.0.2] ([135.232.201.42])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-433754f1e7dsm21087325ab.11.2025.11.09.22.44.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Nov 2025 22:44:52 -0800 (PST)
-Message-ID: <691189e4.920a0220.125fe8.29fb@mx.google.com>
-Date: Sun, 09 Nov 2025 22:44:52 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3145060970549948571=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ovLLGZud"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1762760295;
+	bh=WoOtfu7a1ssBTzT+qzGFpj+0l4UXlYq+r/7TB/K474k=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=ovLLGZudce5ZMfzum29wONPnhYLHVz6+Q6aueHsYbWEelbU8J597C6s67R1VbZPzO
+	 UXQQ07oFKlvGHAjKOQyHL+GOUDFLJPah5pPU6biEs5OGgawlOfcXljRqzBbSrmzWsm
+	 oDQ/jSiDWB+P5gPZb01UcqflJ3jR/1Z87mENumRd/OQZCHylbpdPJDHN1zJBstXn7O
+	 WgqnzGECrnOd6d5JFyVyByJJWwHsGALjXlb3t3Rg1yL01phCgZzSycs65dHGIdiZQK
+	 KegWgMRCg64PTyrFJHF1gUCId9P/QFcHFRHcJJlY7uLrMjggEU2sJLfEDdDLP0GMnG
+	 CogwrxjanQgAA==
+Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-573E-e254-BC4f-0fC8.rev.sfr.net [IPv6:2a02:8428:af44:1001:573e:e254:bc4f:fc8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 234D017E090D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Nov 2025 08:38:15 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] unit/test-hfp: Add Enhanced Call Status tests
+Date: Mon, 10 Nov 2025 08:38:04 +0100
+Message-ID: <20251110073804.49651-2-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251110073804.49651-1-frederic.danis@collabora.com>
+References: <20251110073804.49651-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, wei.deng@oss.qualcomm.com
-Subject: RE: arm64: dts: qcom: lemans-evk: Enable Bluetooth support
-In-Reply-To: <20251110055709.319587-1-wei.deng@oss.qualcomm.com>
-References: <20251110055709.319587-1-wei.deng@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============3145060970549948571==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1021398
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.35 seconds
-GitLint                       PENDING   0.22 seconds
-SubjectPrefix                 FAIL      0.32 seconds
-BuildKernel                   PASS      25.28 seconds
-CheckAllWarning               PASS      28.49 seconds
-CheckSparse                   PASS      30.76 seconds
-BuildKernel32                 PASS      24.57 seconds
-TestRunnerSetup               PASS      493.78 seconds
-TestRunner_l2cap-tester       PASS      23.77 seconds
-TestRunner_iso-tester         PASS      65.94 seconds
-TestRunner_bnep-tester        PASS      6.87 seconds
-TestRunner_mgmt-tester        FAIL      116.88 seconds
-TestRunner_rfcomm-tester      PASS      9.15 seconds
-TestRunner_sco-tester         PASS      14.29 seconds
-TestRunner_ioctl-tester       PASS      9.79 seconds
-TestRunner_mesh-tester        FAIL      11.44 seconds
-TestRunner_smp-tester         PASS      8.49 seconds
-TestRunner_userchan-tester    PASS      6.50 seconds
-IncrementalBuild              PENDING   0.67 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 487 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.105 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.964 seconds
-Mesh - Send cancel - 2                               Timed out    1.997 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+This add the following test:
+- /HFP/HF/ECS/BV-01-C
+  Verify that the HF can request the status of current calls in the AG.
+- /HFP/HF/ECS/BV-02-C
+  Verify that the AG can send the correct call status when an SLC is
+  initialized.
+- /HFP/HF/ICA/BV-07-C-full
+  Verify that HF can connect to an AG that is receiving an in-coming
+  call.
 ---
-Regards,
-Linux Bluetooth
+ unit/test-hfp.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 68 insertions(+), 1 deletion(-)
 
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index b25b67379..67a88a1cc 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -948,7 +948,8 @@ static void hf_call_added(uint id, enum hfp_call_status status,
+ 	} else if (g_str_equal(test_name, "/HFP/HF/ICA/BV-01-C") ||
+ 		g_str_equal(test_name, "/HFP/HF/ICA/BV-02-C") ||
+ 		g_str_equal(test_name, "/HFP/HF/ICA/BV-03-C") ||
+-		g_str_equal(test_name, "/HFP/HF/ICA/BV-04-C-full")) {
++		g_str_equal(test_name, "/HFP/HF/ICA/BV-04-C-full") ||
++		g_str_equal(test_name, "/HFP/HF/ICA/BV-07-C-full")) {
+ 		bool ret;
+ 
+ 		g_assert_cmpint(id, ==, 1);
+@@ -1055,6 +1056,7 @@ static void hf_call_status_updated(uint id, enum hfp_call_status status,
+ 		g_str_equal(test_name, "/HFP/HF/ICA/BV-04-C-full") ||
+ 		g_str_equal(test_name, "/HFP/HF/ICA/BV-06-C") ||
+ 		g_str_equal(test_name, "/HFP/HF/ICA/BV-07-C") ||
++		g_str_equal(test_name, "/HFP/HF/ICA/BV-07-C-full") ||
+ 		g_str_equal(test_name, "/HFP/HF/TCA/BV-02-C")) {
+ 		const char *number;
+ 
+@@ -1377,6 +1379,38 @@ int main(int argc, char *argv[])
+ 				',', '1', '2', '9', ',', ',', '\r', '\n'),
+ 			data_end());
+ 
++	/* Query list of current calls - HF */
++	define_hf_test("/HFP/HF/ECS/BV-01-C", test_hf_session,
++			NULL, test_hf_session_done,
++			FULL_SLC_SESSION('1', '0', '0', '0'),
++			frg_pdu('\r', '\n', '+', 'C', 'L', 'C', 'C', ':', '1',
++				',', '1', ',', '0', ',', '0', ',', '0', ',',
++				'\"', '7', '6', '5', '4', '3', '2', '1', '\"',
++				',', '1', '2', '9', ',', '\"', 'A', 'n', 'A',
++				'c', 't', 'i', 'v', 'e', 'c', 'a', 'l', 'l',
++				'\"', '\r', '\n'),
++			raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
++				'2', ',', '0', '\r', '\n'),
++			raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'),
++			data_end());
++
++	/* Receiving call status on SLC initialization - HF */
++	define_hf_test("/HFP/HF/ECS/BV-02-C", test_hf_session,
++			NULL, test_hf_session_done,
++			FULL_SLC_SESSION('1', '1', '0', '0'),
++			frg_pdu('\r', '\n', '+', 'C', 'L', 'C', 'C', ':', '1',
++				',', '1', ',', '0', ',', '0', ',', '0', ',',
++				'\"', '7', '6', '5', '4', '3', '2', '1', '\"',
++				',', '1', '2', '9', ',', '\"', 'A', 'n', 'A',
++				'c', 't', 'i', 'v', 'e', 'c', 'a', 'l', 'l',
++				'\"', '\r', '\n'),
++			raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
++				'2', ',', '0', '\r', '\n'),
++			raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'),
++			data_end());
++
+ 	/* Disable EC/NR on the AG - HF */
+ 	define_hf_test("/HFP/HF/ENO/BV-01-C", test_hf_session,
+ 			NULL, test_hf_session_done,
+@@ -1622,6 +1656,39 @@ int main(int argc, char *argv[])
+ 				'2', ',', '0', '\r', '\n'),
+ 			data_end());
+ 
++	define_hf_test("/HFP/HF/ICA/BV-07-C-full", test_hf_session,
++			NULL, test_hf_session_done,
++			FULL_SLC_SESSION('1', '0', '1', '0'),
++			frg_pdu('\r', '\n', '+', 'C', 'L', 'C', 'C', ':', '1',
++				',', '1', ',', '4', ',', '0', ',', '0', ',',
++				'\"', '1', '2', '3', '4', '5', '6', '7', '\"',
++				',', '1', '2', '9', ',', '\"', 'A', 'i', 'n',
++				'c', 'o', 'm', 'i', 'n', 'g', 'c', 'a', 'l',
++				'l', '\"', '\r', '\n'),
++			raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'),
++			frg_pdu('\r', '\n', 'R', 'I', 'N', 'G', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'L', 'I', 'P', ':',
++				'\"', '1', '2', '3', '4', '5', '6', '7', '\"',
++				',', '1', '2', '9', ',', ',', ',', '\"', 'A',
++				'i', 'n', 'c', 'o', 'm', 'i', 'n', 'g', 'c',
++				'a', 'l', 'l', '\"', '\r', '\n'),
++			raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
++				'2', ',', '1', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
++				'3', ',', '0', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'L', 'C', 'C', ':', '1',
++				',', '1', ',', '0', ',', '0', ',', '0', ',',
++				'\"', '1', '2', '3', '4', '5', '6', '7', '\"',
++				',', '1', '2', '9', ',', '\"', 'A', 'i', 'n',
++				'c', 'o', 'm', 'i', 'n', 'g', 'c', 'a', 'l',
++				'l', '\"', '\r', '\n'),
++			raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'),
++			frg_pdu('\r', '\n', '+', 'C', 'I', 'E', 'V', ':', ' ',
++				'2', ',', '0', '\r', '\n'),
++			raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'),
++			data_end());
++
+ 	/* Initiate rejection of incoming call - HF */
+ 	define_hf_test("/HFP/HF/ICR/BV-01-C", test_hf_session,
+ 			NULL, test_hf_session_done,
+-- 
+2.43.0
 
---===============3145060970549948571==--
