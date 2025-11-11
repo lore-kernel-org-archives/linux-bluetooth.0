@@ -1,94 +1,130 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BECE3328F8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Nov 2025 14:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D64236B06A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Nov 2025 14:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762870288; cv=none; b=iw0u1KeyXz//6Xu6D07gaBQoFxeWT91fdp8RPonDCvOSysyLMCs+aOtnE2JD0OIu0YQ438vWFi+6U2WFDD5kpepY1JQKEIKlH7kCiZCbt7I1/N7NgvXIe4e165KFCPn6fpiQgUl9dRI4EUnIBIQBtk8JUVkdZhs36ZoIoby+SO8=
+	t=1762870452; cv=none; b=fcpQPzJdB0GDr6D+Mj7rnHsjuJW5Lz2bZgc/erqOY29e49DI9LxGIq32sX4BbpSjKfv3KFW2u7eI6Es1kd6oF29W8g3/9MrBVnrgJUt8wYHZs+RzgcLS/uxm2U7SPtykSId3URdeYUx6QRkd9sQ61OYgidAcSh35Kc4t8YAkSKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762870288; c=relaxed/simple;
-	bh=PZumaDDW5gxsL+FXIEHsxZJTuzIAEKFvYmh9j9CICKQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MHpdt9JQzPLIb4gb8X/fOvS+i8EH3st+cjV4zIa6Y7SViNMPl9a9IhTtudZkXKHENkehcwGmUWCICJati3RogZFZDZKuYlGk/1yzTXILXXDq2jFd2iCyrKQi5aFkNqHPmrf/YOjStDt9hVtu8RK3HGQt7acFONjGlUhD06jvGXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HN/NGMP2; arc=none smtp.client-ip=209.85.208.170
+	s=arc-20240116; t=1762870452; c=relaxed/simple;
+	bh=Y1DIK9oNHsdhGOzVTvNXsawBgEt4/ucPYN+TUbY1n6s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KSYtAnxhtyprNYuaIix1lrGo0iZEKJ9Ja3JK8wavgAZ3UdLWQfalUoesD1bwGa1ckXHTLc1x6Zwtr5p5AzoJv3ka3azFbzaBSPhvyHjW65ACXUAEojsxzmeFp1zpAtpSkjdz6yxWnoIOVpxYBoo5xnTA4UffQXNxs/3GjwZ5WMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hDLOkkJF; arc=none smtp.client-ip=209.85.222.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HN/NGMP2"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-37a2dced861so8547741fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Nov 2025 06:11:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hDLOkkJF"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-93729793469so1821332241.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Nov 2025 06:14:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762870285; x=1763475085; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vuCdQmKCHj4HkzfzDWSUNZHCHWQgXtus3sPe8OAt8NM=;
-        b=HN/NGMP2wUwX6kPs4s/2BAJ1g4wmbo8YsICAEcZZjbh76hQnUSGH1EeZxELyG/kfti
-         HJoCE6TANeJp9JjjrKYtOpKONzNuWh7Nd1dIhf96TQ/YpPw0CL+9MccX+lgVmpetJzlM
-         +cTlNWF8EmBSSTWStxYJWkvwRpcywHn7CsJaCF9eSW7K9QUIDc37i+JplrhLi2/Mkq1Z
-         4yZf//Zn1DtmHgpEQCob9ggTT6wenhWKZZLovm2euOOB3WHBE8E07UhwGAIzTiRwbjzr
-         SKoTNuOtGep2MlmAStUTJtWE9Cp5lB+qr4hjM83r2b8MA5C3x6TtXlM49TANExzqfnOE
-         6piQ==
+        d=gmail.com; s=20230601; t=1762870447; x=1763475247; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0mX5Bv9bZcRLgPEw2WkBKxv2dX3a+A+38dOkxX5EtiM=;
+        b=hDLOkkJF24oNM+P+x4aGn+8lZ9J+XAiEfGpaNoobhkikeLyNMKAzXvkClzxpk/JMVl
+         yr2Vh+bm8pFTW55o2MYncamMS0sQ9w7AcmSQJVp912Gb837YB55MW6+0biUwgDR/93AH
+         q2NWEYQ099gxuXh8uOMagjwqxyRyHQh+RWivjW8faTFabR3z5uPS8pXDHhoq+tp9R+8P
+         OGS89EAUpU3WdrdzIVR9izlZj1EaHFLseqnYjXVycCmWqg4Rc2nccPj6Jl89Z0jKlLsh
+         nUaHDCI3YravOKXFpE6dyEq4uzRRYuJvfA70TuPUTwaRQDCpdudz9gJNsRyxXDucRcqs
+         LViQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762870285; x=1763475085;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vuCdQmKCHj4HkzfzDWSUNZHCHWQgXtus3sPe8OAt8NM=;
-        b=KJWngSnjLl3SMIbIr5fBXP3ZAp4ARDfslgsbTdTQgRmsIRoMsx4n8j5IML8lBXAtnO
-         RaV7kdIUAbwEo0bNAPrruY+8MLqIyhfuiF5H+LNEuNaXaj3piksy065aePEnaHKye9MA
-         ywJAfmNGs5jSt9RyGiYiuyT2dXnuNQjduKT3I0e3bhus3txX5bU87Qefz1W7FtRoFErH
-         RwDBwGauvjMqYSQ1ABe8zGvNbgCK/e8+Iyk1h5USHeCri6dCrqH9fyA1gfXGOuHd86aR
-         81WSKFeaUZZT5Ss9mY7Y7c/Qn7f/cxRW2O86jwftNQFQm0IvVjQXCCLSHHgGOvmI0kxw
-         klew==
-X-Forwarded-Encrypted: i=1; AJvYcCXg88Pi08hBUSB1Zq/sgGaqC9POjr+VaHgWrmxuW/6XPfhXK2oAsgAsdjj4nOHeJL6YGic8mxspgYPmqPtJse0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9X2zeJiB3Gw8vzM7WyRsnJYuqVN/yd7D1Yzpuqt/g6yVfF1vK
-	S4qGfk9FcyhyA2MjJjEXUD6uf5xNWxnjYfZrsgwJrL4l4bRZ01+XHua59cyMdX45QqnThItEYQv
-	P3JLvXungupu9gI8Nc1LBz5fq2zrktcc=
-X-Gm-Gg: ASbGncuZ/R2Sez5U+1ph61Ie9CaDTWoCy2cZm+h0VdALTOXpso1WbrR86MTNpiMhNp3
-	trVUi6t7GY6U4t93D8tCoLq4+B/USXCXdaP4HQGXKTj/WBuzHrWseZeVra+HlUegYfhMlPUtrZf
-	/iKj5bwG+OA5LptiIDvdPOon2qtvYZZQeSqxWSsbZyukEYp4v8CW9uPz0fkrjJTvwMsLlHq5ujv
-	plO8Kdkm2R0FwWYn/NIrTANjytD9ddbsbkgmLz9CZuZdwZei2O0HgFIqmBrNo85VZy32g==
-X-Google-Smtp-Source: AGHT+IFT7oIDrae/qE3wgtv4v+UXDVGgrtZ7bDYTyHuRVBbQvz7KKO/qlls4dqRA+LV25quIR0njnCKrmwU5mn4MedM=
-X-Received: by 2002:a05:651c:4411:10b0:378:cd2b:5040 with SMTP id
- 38308e7fff4ca-37a95398ea4mr7277191fa.21.1762870284951; Tue, 11 Nov 2025
- 06:11:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762870447; x=1763475247;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0mX5Bv9bZcRLgPEw2WkBKxv2dX3a+A+38dOkxX5EtiM=;
+        b=unGwuoTY7RBwP7caN8ILaNOSt8kp3BTOf5Q39U0PPu5EReCI0AstLUPJJl4dUc1bR7
+         RFHJR1ObXTjUHXrZAc3NDRm1x7UWTn1VOq77FgHdaSpEQjIsAvlgaqB5t0BgGPrBKQXU
+         MWjpiXHwA8zVmZLD8LSu5VvRK3E8VXulX4ScgSVEV6aQPtQDntecXGCBCLdFuroGKSjY
+         LZj6eXO1haUh9MsFuWvNrtfhgxrZSjj3hErbIq3X7c4kHGkJftUfZs8ebjrjwDW7gkE7
+         fw6yLeOdzs9TeA4Kqp+excNs/f8Y5eT+taOoH0HfqStW8Go1EjwFR2kgC3hmDJ75D/co
+         cMvA==
+X-Gm-Message-State: AOJu0Yz2FKHbtrqQ4C1UtDwwSpwNlJY3f1dEUIMq56ea1tuSo8zNscI7
+	zk+rODbdmKVejld4slZ5pSCqps5OoMdfb1iOCrXJjFysnUh3suSfz/dM
+X-Gm-Gg: ASbGnctemtcCGaemYuhOVIqaRO6LhavNO1HBP4o/hgz3kbIDFdjJEDd1H3Oz8If/TmI
+	X+jbz4F359FVsF+1KZAMSKaWm/q2UesZ6w1cIeVGjuBLXO+pwUs8pGy/uwzcYpKB3ouCnkpHT+v
+	yaJqqjpeXoCK9j0hs0s1X2Rxqaq+pSf8/iYgR+G9STl68Rz1eqB189fnx21PjaLsesBw4rI6ZDL
+	alLqFWGt0Cy7QQdQ1s/Dc6hc9ohqO/1EnqY59hox67jN4nMTSo3zxcU5eihAgHA3YR2pveCnsPs
+	adw9+OG1TRPmzZvvOaBUMjw0ScgRMZ8KsXtZSX9wc7cP3Eovf2hiltNvykuTigU5jYxPtEeV55q
+	fme7zKSCzzqm7W35hYd8iAnGHB/h3SVe32oFP8pAFdX/sRV0buc2MVvTm6XIWbzPZ7Sdf6uN9FY
+	Si4Fo=
+X-Google-Smtp-Source: AGHT+IHkF/foArhnzTKr6PgOpEQVO2LXTiYrrZBRM8n/hA3PfGQND5C6T9Ksm6FQat1FH0UGGoCOnA==
+X-Received: by 2002:a05:6102:c90:b0:5dd:b317:aa19 with SMTP id ada2fe7eead31-5ddc46ae5d5mr4227154137.13.1762870447462;
+        Tue, 11 Nov 2025 06:14:07 -0800 (PST)
+Received: from lvondent-mobl5 ([50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-93720dcf560sm4668670241.2.2025.11.11.06.14.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Nov 2025 06:14:06 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-11-11
+Date: Tue, 11 Nov 2025 09:13:57 -0500
+Message-ID: <20251111141357.1983153-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251110214453.1843138-1-luiz.dentz@gmail.com> <20251110164321.75f7edec@kernel.org>
-In-Reply-To: <20251110164321.75f7edec@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 11 Nov 2025 09:11:12 -0500
-X-Gm-Features: AWmQ_blTsx75uwbTjJKBZrdd7Jc-eEQec5pYYmSJLUJCXPvrmQX7faCowPR9WLM
-Message-ID: <CABBYNZLvrYcYV4cN+v=sSxpJWZy7Fs7Y8BMwOo4vqOxuJuaF1w@mail.gmail.com>
-Subject: Re: [GIT PULL] bluetooth 2025-11-10
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Jakub,
+The following changes since commit 96a9178a29a6b84bb632ebeb4e84cf61191c73d5:
 
-On Mon, Nov 10, 2025 at 7:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 10 Nov 2025 16:44:53 -0500 Luiz Augusto von Dentz wrote:
-> >       Bluetooth: hci_event: Fix not handling PA Sync Lost event
->
-> nit: sparse says:
->
-> net/bluetooth/hci_event.c:5850:22: warning: cast to restricted __le16
->
-> (I haven't looked if the cast is correct but if so it needs a __force)
+  net: phy: micrel: lan8814 fix reset of the QSGMII interface (2025-11-07 19:00:38 -0800)
 
-Ouch, not sure how I missed it, it should be using __le HCI is little
-endian, will fix it and send another PR shortly.
+are available in the Git repository at:
 
---=20
-Luiz Augusto von Dentz
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-11-11
+
+for you to fetch changes up to cd8dbd9ef600435439bb0e70af0a1d9e2193aecb:
+
+  Bluetooth: btrtl: Avoid loading the config file on security chips (2025-11-11 09:06:57 -0500)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - hci_conn: Fix not cleaning up PA_LINK connections
+ - hci_event: Fix not handling PA Sync Lost event
+ - MGMT: cancel mesh send timer when hdev removed
+ - 6lowpan: reset link-local header on ipv6 recv path
+ - 6lowpan: fix BDADDR_LE vs ADDR_LE_DEV address type confusion
+ - L2CAP: export l2cap_chan_hold for modules
+ - 6lowpan: Don't hold spin lock over sleeping functions
+ - 6lowpan: add missing l2cap_chan_lock()
+ - btusb: reorder cleanup in btusb_disconnect to avoid UAF
+ - btrtl: Avoid loading the config file on security chips
+
+----------------------------------------------------------------
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_conn: Fix not cleaning up PA_LINK connections
+      Bluetooth: hci_event: Fix not handling PA Sync Lost event
+
+Max Chou (1):
+      Bluetooth: btrtl: Avoid loading the config file on security chips
+
+Pauli Virtanen (6):
+      Bluetooth: MGMT: cancel mesh send timer when hdev removed
+      Bluetooth: 6lowpan: reset link-local header on ipv6 recv path
+      Bluetooth: 6lowpan: fix BDADDR_LE vs ADDR_LE_DEV address type confusion
+      Bluetooth: L2CAP: export l2cap_chan_hold for modules
+      Bluetooth: 6lowpan: Don't hold spin lock over sleeping functions
+      Bluetooth: 6lowpan: add missing l2cap_chan_lock()
+
+Raphael Pinsonneault-Thibeault (1):
+      Bluetooth: btusb: reorder cleanup in btusb_disconnect to avoid UAF
+
+ drivers/bluetooth/btrtl.c   |  24 +++++-----
+ drivers/bluetooth/btusb.c   |  13 +++---
+ include/net/bluetooth/hci.h |   5 +++
+ net/bluetooth/6lowpan.c     | 105 ++++++++++++++++++++++++++++++++------------
+ net/bluetooth/hci_conn.c    |  33 ++++++++------
+ net/bluetooth/hci_event.c   |  56 ++++++++++++++---------
+ net/bluetooth/hci_sync.c    |   2 +-
+ net/bluetooth/l2cap_core.c  |   1 +
+ net/bluetooth/mgmt.c        |   1 +
+ 9 files changed, 158 insertions(+), 82 deletions(-)
