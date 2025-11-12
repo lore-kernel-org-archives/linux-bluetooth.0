@@ -1,174 +1,445 @@
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C427514A60F;
-	Wed, 12 Nov 2025 07:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DC62C21E7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 08:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762934026; cv=none; b=ABUtFcocDNvQNbOhSyhNGgSSFUHO0XoeujkvoMdrYOIu0/19fIlMVgtY7TqNGd1YSLO1O747CCJLt5R8TpwjoikmoAOeGwvhYnJakCj8TE1BDvsVor1bPXSN0sR7Hywddc2GrHw/qy/50NtlflyFC4TcnXCJNIkRhSjQwLKFhAI=
+	t=1762936328; cv=none; b=Fi0IiiUptivEwjOAbhnPu0hhgW3EUnPPGB30bHPyChZb4reOPlnffJSucWYaisWoiWSMc9xZAqOF4hfc92T892V8B+QffaEB/0gJTZVWA15pOH/SB6DHQrKz2Mq47DQ2DHP8kE+fp8qDiKPfIqxxwh3CeyJ6knRQ2DBk7N+ZupY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762934026; c=relaxed/simple;
-	bh=vIJ7ZYlP4a69M5JNBubznZ3tH7ZxShqibc6WbGxAfPw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mRek0IAOurEzD9KiyLG4avX0IkcJMGp16+K1QZa+LAY64qdJHiVuWqFaNqPqxBgjD1Ff3pLDpxTh/PbXWFGTXchSo+tm9CX06unuhE31c3mblE3AJ4sS7VwaYS+dfrPH7otAweWi8/rFtKyaHMYNJEla+uyiTQ//LG5NPISbCMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=rtgELYZy; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1762936328; c=relaxed/simple;
+	bh=dL8sBy7nef3Hx1kYCkLRy2jU7/46edcGiO/KzzjsoVA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E5vPy94KCtXM2BPQFwqcNJ+OK8qM83kbTmk4OB2AFBUh2sqVwZRhfhRrJeOHy3J87IOEGHxhqRO7GA5xVjzZifFkr8Sa5PtsuItTRfazG6rQyLOvBNJEOPy0dfJIxCDvWNszMc+QCch6zofc24w8jPK73+yaNUm9W7gDMAZW/PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=M42TIJL9; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="rtgELYZy"
-X-UUID: b29b6832bf9c11f08ac0a938fc7cd336-20251112
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=1G2iuVLIFfMskcE7UQQZSx1WXMQskLuTMIhO0Ja1jxc=;
-	b=rtgELYZyIN3To4bGUZdsKYjHvWdSHUpkGTc5NSJnOQtwE/YFUp98YP4KyXF58zEXjdVZBZe+luTkySzi9qzv22+/ow3Jah6jquUZ07netUsf5S/EutRE8SDANRLnuVK8aPNHV6ufW0t6HZa7uG3ggsfs27FURXqAxEdiwvvnjIA=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:15e8d64f-5e09-49c7-8d88-f68f0f592c7f,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:76a0ce57-17e4-43d2-bf73-55337eed999a,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
-	0,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OS
-	A:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: b29b6832bf9c11f08ac0a938fc7cd336-20251112
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 543103747; Wed, 12 Nov 2025 15:53:38 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Wed, 12 Nov 2025 15:53:36 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1748.26 via Frontend Transport; Wed, 12 Nov 2025 15:53:36 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Hao Qin <hao.qin@mediatek.com>, Will
- Lee <will-cy.Lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>, Steve Lee
-	<steve.lee@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v1] Bluetooth: btusb: mediatek: Fix kernel crash when releasing mtk iso interface
-Date: Wed, 12 Nov 2025 15:53:34 +0800
-Message-ID: <20251112075334.1162328-1-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="M42TIJL9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1762936317;
+	bh=dL8sBy7nef3Hx1kYCkLRy2jU7/46edcGiO/KzzjsoVA=;
+	h=From:To:Subject:Date:From;
+	b=M42TIJL9wIBo48NFnjt+VUdrHWztgogrBHUNB524rgRDUZyjbIecqPShF6ja0TsRr
+	 OWQlzQ+Y6HU9GlqChMlmm/cnOq+6p9wuWZLLhGJrxKpI5vsJCsEyvW8q0GfVzHEudS
+	 0wTHCJ7m4bNIGpwhCZLuAlTxxQBFR6NEUIBTgE2g02VQrRqPVY9KeKIAmZ92XPGKEK
+	 9K/0FlpmiYlS1ynDk1JGYer+eMvuZ6FFtLFIVz1SNlmWcAvhNdX0zpteRaWp1vBzj+
+	 p0HGxm1LP4vVIgsOWupfyd35MLn7DPWyumlTN2uFdT7JnvLLBeQCEgt4v16WcWcL0f
+	 kIVFXgBWRMgmQ==
+Received: from fdanis-ThinkPad-X1.. (2a02-8428-Af44-1001-094F-3df2-fbF5-546C.rev.sfr.net [IPv6:2a02:8428:af44:1001:94f:3df2:fbf5:546c])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id C470C17E1318
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 09:31:57 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] shared/hfp: Add simple 3way calls support
+Date: Wed, 12 Nov 2025 09:31:49 +0100
+Message-ID: <20251112083150.54641-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-When performing reset tests and encountering abnormal card drop issues
-that lead to a kernel crash, it is necessary to perform a null check
-before releasing resources to avoid attempting to release a null pointer.
-
-<4>[   29.158070] Hardware name: Google Quigon sku196612/196613 board (DT)
-<4>[   29.158076] Workqueue: hci0 hci_cmd_sync_work [bluetooth]
-<4>[   29.158154] pstate: 20400009 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-<4>[   29.158162] pc : klist_remove+0x90/0x158
-<4>[   29.158174] lr : klist_remove+0x88/0x158
-<4>[   29.158180] sp : ffffffc0846b3c00
-<4>[   29.158185] pmr_save: 000000e0
-<4>[   29.158188] x29: ffffffc0846b3c30 x28: ffffff80cd31f880 x27: ffffff80c1bdc058
-<4>[   29.158199] x26: dead000000000100 x25: ffffffdbdc624ea3 x24: ffffff80c1bdc4c0
-<4>[   29.158209] x23: ffffffdbdc62a3e6 x22: ffffff80c6c07000 x21: ffffffdbdc829290
-<4>[   29.158219] x20: 0000000000000000 x19: ffffff80cd3e0648 x18: 000000031ec97781
-<4>[   29.158229] x17: ffffff80c1bdc4a8 x16: ffffffdc10576548 x15: ffffff80c1180428
-<4>[   29.158238] x14: 0000000000000000 x13: 000000000000e380 x12: 0000000000000018
-<4>[   29.158248] x11: ffffff80c2a7fd10 x10: 0000000000000000 x9 : 0000000100000000
-<4>[   29.158257] x8 : 0000000000000000 x7 : 7f7f7f7f7f7f7f7f x6 : 2d7223ff6364626d
-<4>[   29.158266] x5 : 0000008000000000 x4 : 0000000000000020 x3 : 2e7325006465636e
-<4>[   29.158275] x2 : ffffffdc11afeff8 x1 : 0000000000000000 x0 : ffffffdc11be4d0c
-<4>[   29.158285] Call trace:
-<4>[   29.158290]  klist_remove+0x90/0x158
-<4>[   29.158298]  device_release_driver_internal+0x20c/0x268
-<4>[   29.158308]  device_release_driver+0x1c/0x30
-<4>[   29.158316]  usb_driver_release_interface+0x70/0x88
-<4>[   29.158325]  btusb_mtk_release_iso_intf+0x68/0xd8 [btusb (HASH:e8b6 5)]
-<4>[   29.158347]  btusb_mtk_reset+0x5c/0x480 [btusb (HASH:e8b6 5)]
-<4>[   29.158361]  hci_cmd_sync_work+0x10c/0x188 [bluetooth (HASH:a4fa 6)]
-<4>[   29.158430]  process_scheduled_works+0x258/0x4e8
-<4>[   29.158441]  worker_thread+0x300/0x428
-<4>[   29.158448]  kthread+0x108/0x1d0
-<4>[   29.158455]  ret_from_fork+0x10/0x20
-<0>[   29.158467] Code: 91343000 940139d1 f9400268 927ff914 (f9401297)
-<4>[   29.158474] ---[ end trace 0000000000000000 ]---
-<0>[   29.167129] Kernel panic - not syncing: Oops: Fatal exception
-<2>[   29.167144] SMP: stopping secondary CPUs
-<4>[   29.167158] ------------[ cut here ]------------
-
-Fixes: ceac1cb0259d ("Bluetooth: btusb: mediatek: add ISO data transmission functions")
-
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+This adds support for the AT+CHLD=0 (Releases all held calls or set
+User Determined User Busy for a waiting call), =1 (Releases all active
+calls and accept the other call, held or waiting) and =2 (Places all
+active calls on hold and accept the other call, held or waiting)
+commands and the +CCWA (Call waiting notification) event.
 ---
- drivers/bluetooth/btusb.c | 34 +++++++++++++++++++++++++++-------
- 1 file changed, 27 insertions(+), 7 deletions(-)
+ src/shared/hfp.c | 218 ++++++++++++++++++++++++++++++++++++++++++++++-
+ src/shared/hfp.h |  15 ++++
+ unit/test-hfp.c  |   5 ++
+ 3 files changed, 234 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e0e30f00a678..fcc62e2fb641 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2741,9 +2741,16 @@ static int btusb_recv_event_realtek(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index b5e84bf2b..e4f5161b6 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -32,6 +32,7 @@
  
- static void btusb_mtk_claim_iso_intf(struct btusb_data *data)
+ #define HFP_HF_FEATURES	( \
+ 	HFP_HF_FEAT_ECNR | \
++	HFP_HF_FEAT_3WAY | \
+ 	HFP_HF_FEAT_CLIP | \
+ 	HFP_HF_FEAT_ENHANCED_CALL_STATUS | \
+ 	HFP_HF_FEAT_ESCO_S4_T2 \
+@@ -105,6 +106,7 @@ struct hfp_hf {
+ 	uint8_t signal;
+ 	bool roaming;
+ 	uint8_t battchg;
++	uint8_t chlds;
+ 
+ 	bool session;
+ 	bool clcc_in_progress;
+@@ -396,6 +398,12 @@ bool hfp_context_close_container(struct hfp_context *context)
+ 	return true;
+ }
+ 
++bool hfp_context_is_container_close(struct hfp_context *context)
++{
++	return context->data[context->offset] == ')';
++}
++
++
+ bool hfp_context_get_string(struct hfp_context *context, char *buf,
+ 								uint8_t len)
  {
--	struct btmtk_data *btmtk_data = hci_get_priv(data->hdev);
-+	struct btmtk_data *btmtk_data;
- 	int err;
+@@ -1852,6 +1860,20 @@ static bool call_active_match(const void *data, const void *match_data)
+ 	return (call->status == CALL_STATUS_ACTIVE);
+ }
  
-+	if (!data->hdev)
-+		return;
++static bool call_waiting_match(const void *data, const void *match_data)
++{
++	const struct hf_call *call = data;
 +
-+	btmtk_data = hci_get_priv(data->hdev);
-+	if (!btmtk_data)
-+		return;
++	return (call->status == CALL_STATUS_WAITING);
++}
 +
- 	/*
- 	 * The function usb_driver_claim_interface() is documented to need
- 	 * locks held if it's not called from a probe routine. The code here
-@@ -2765,17 +2772,30 @@ static void btusb_mtk_claim_iso_intf(struct btusb_data *data)
- 
- static void btusb_mtk_release_iso_intf(struct hci_dev *hdev)
++static bool call_held_match(const void *data, const void *match_data)
++{
++	const struct hf_call *call = data;
++
++	return (call->status == CALL_STATUS_HELD);
++}
++
+ static void bsir_cb(struct hfp_context *context, void *user_data)
  {
--	struct btmtk_data *btmtk_data = hci_get_priv(hdev);
-+	struct btmtk_data *btmtk_data;
+ 	struct hfp_hf *hfp = user_data;
+@@ -1866,6 +1888,43 @@ static void bsir_cb(struct hfp_context *context, void *user_data)
+ 		hfp->callbacks->update_inband_ring(!!val, hfp->callbacks_data);
+ }
+ 
++static void ccwa_cb(struct hfp_context *context, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++	char number[255];
++	unsigned int type;
++	struct hf_call *call;
++	uint id;
 +
-+	if (!hdev)
++	DBG(hfp, "");
++
++	if (hfp->features & HFP_AG_FEAT_ENHANCED_CALL_STATUS) {
++		send_clcc(hfp);
++		return;
++	}
++
++	if (!hfp_context_get_string(context, number, sizeof(number))) {
++		DBG(hfp, "hf: Could not get string");
++		return;
++	}
++
++	if (!hfp_context_get_number(context, &type))
 +		return;
 +
-+	btmtk_data = hci_get_priv(hdev);
-+	if (!btmtk_data)
++	call = queue_find(hfp->calls, call_waiting_match, NULL);
++	if (call) {
++		DBG(hfp, "hf: waiting call already in progress");
 +		return;
- 
- 	if (test_bit(BTMTK_ISOPKT_OVER_INTR, &btmtk_data->flags)) {
- 		usb_kill_anchored_urbs(&btmtk_data->isopkt_anchor);
- 		clear_bit(BTMTK_ISOPKT_RUNNING, &btmtk_data->flags);
- 
--		dev_kfree_skb_irq(btmtk_data->isopkt_skb);
--		btmtk_data->isopkt_skb = NULL;
--		usb_set_intfdata(btmtk_data->isopkt_intf, NULL);
--		usb_driver_release_interface(&btusb_driver,
--					     btmtk_data->isopkt_intf);
-+		if (btmtk_data->isopkt_skb) {
-+			dev_kfree_skb_irq(btmtk_data->isopkt_skb);
-+			btmtk_data->isopkt_skb = NULL;
-+		}
++	}
 +
-+		if (btmtk_data->isopkt_intf) {
-+			usb_set_intfdata(btmtk_data->isopkt_intf, NULL);
-+			usb_driver_release_interface(&btusb_driver,
-+						     btmtk_data->isopkt_intf);
-+			btmtk_data->isopkt_intf = NULL;
-+		}
++	id = next_call_index(hfp);
++	if (id == 0) {
++		DBG(hfp, "hf: No new call index available");
++		return;
++	}
++	call_new(hfp, id, CALL_STATUS_WAITING, number, type, false);
++}
++
+ static void ciev_callsetup_cb(uint8_t val, void *user_data)
+ {
+ 	struct hfp_hf *hfp = user_data;
+@@ -2240,7 +2299,7 @@ failed:
+ 						hfp->callbacks_data);
+ }
+ 
+-static void clip_resp(enum hfp_result result, enum hfp_error cme_err,
++static void ccwa_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	void *user_data)
+ {
+ 	struct hfp_hf *hfp = user_data;
+@@ -2248,7 +2307,7 @@ static void clip_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	DBG(hfp, "");
+ 
+ 	if (result != HFP_RESULT_OK) {
+-		DBG(hfp, "hf: CLIP error: %d", result);
++		DBG(hfp, "hf: CCWA error: %d", result);
+ 		goto failed;
  	}
  
- 	clear_bit(BTMTK_ISOPKT_OVER_INTR, &btmtk_data->flags);
+@@ -2272,6 +2331,39 @@ failed:
+ 						hfp->callbacks_data);
+ }
+ 
++static void clip_resp(enum hfp_result result, enum hfp_error cme_err,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "");
++
++	if (result != HFP_RESULT_OK) {
++		DBG(hfp, "hf: CLIP error: %d", result);
++		goto failed;
++	}
++
++	if (!(hfp->features & HFP_AG_FEAT_3WAY)) {
++		/* Jump to next setup state */
++		ccwa_resp(HFP_RESULT_OK, cme_err, user_data);
++		return;
++	}
++
++	if (!hfp_hf_send_command(hfp, ccwa_resp, hfp,
++		"AT+CCWA=1")) {
++		DBG(hfp, "hf: Could not send AT+CCWA=1");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	return;
++
++failed:
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(result, cme_err,
++						hfp->callbacks_data);
++}
++
+ static void cops_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	void *user_data)
+ {
+@@ -2328,15 +2420,56 @@ failed:
+ 						hfp->callbacks_data);
+ }
+ 
+-static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
++static void slc_chld_cb(struct hfp_context *context, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	if (!hfp_context_open_container(context)) {
++		DBG(hfp, "hf: Could not open container for CHLD");
++		return;
++	}
++
++	while (hfp_context_has_next(context) &&
++		!hfp_context_is_container_close(context)) {
++		char val[3];
++
++		if (!hfp_context_get_unquoted_string(context, val,
++							sizeof(val))) {
++			DBG(hfp, "hf: Could not get string");
++			goto failed;
++		}
++
++		if (strcmp(val, "0") == 0)
++			hfp->chlds |= HFP_CHLD_0;
++		else if (strcmp(val, "1") == 0)
++			hfp->chlds |= HFP_CHLD_1;
++		else if (strcmp(val, "2") == 0)
++			hfp->chlds |= HFP_CHLD_2;
++		else
++			DBG(hfp, "CHLD not supported: %s", val);
++	}
++
++	if (!hfp_context_close_container(context)) {
++		DBG(hfp, "hf: Could not close container");
++		goto failed;
++	}
++
++	return;
++failed:
++	DBG(hfp, "hf: Error on CHLD response");
++}
++
++static void slc_chld_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	void *user_data)
+ {
+ 	struct hfp_hf *hfp = user_data;
+ 
+ 	DBG(hfp, "");
+ 
++	hfp_hf_unregister(hfp, "+CHLD");
++
+ 	if (result != HFP_RESULT_OK) {
+-		DBG(hfp, "hf: CMER error: %d", result);
++		DBG(hfp, "hf: CHLD=? error: %d", result);
+ 		goto failed;
+ 	}
+ 
+@@ -2351,6 +2484,8 @@ static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
+ 	/* Register unsolicited results handlers */
+ 	if (hfp->features & HFP_AG_FEAT_IN_BAND_RING_TONE)
+ 		hfp_hf_register(hfp, bsir_cb, "+BSIR", hfp, NULL);
++	if (hfp->features & HFP_AG_FEAT_3WAY)
++		hfp_hf_register(hfp, ccwa_cb, "+CCWA", hfp, NULL);
+ 	hfp_hf_register(hfp, ciev_cb, "+CIEV", hfp, NULL);
+ 	hfp_hf_register(hfp, clcc_cb, "+CLCC", hfp, NULL);
+ 	hfp_hf_register(hfp, clip_cb, "+CLIP", hfp, NULL);
+@@ -2364,6 +2499,44 @@ failed:
+ 						hfp->callbacks_data);
+ }
+ 
++static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "");
++
++	if (result != HFP_RESULT_OK) {
++		DBG(hfp, "hf: CMER error: %d", result);
++		goto failed;
++	}
++
++	if (!(hfp->features & HFP_AG_FEAT_3WAY)) {
++		/* Jump to next setup state */
++		slc_chld_resp(HFP_RESULT_OK, cme_err, user_data);
++		return;
++	}
++
++	if (!hfp_hf_register(hfp, slc_chld_cb, "+CHLD", hfp, NULL)) {
++		DBG(hfp, "hf: Could not register +CHLD");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	if (!hfp_hf_send_command(hfp, slc_chld_resp, hfp, "AT+CHLD=?")) {
++		DBG(hfp, "hf: Could not send AT+CHLD=?");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	return;
++
++failed:
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(result, cme_err,
++						hfp->callbacks_data);
++}
++
+ static void slc_cind_status_cb(struct hfp_context *context,
+ 	void *user_data)
+ {
+@@ -2745,6 +2918,38 @@ bool hfp_hf_dial(struct hfp_hf *hfp, const char *number,
+ 	return hfp_hf_send_command(hfp, resp_cb, user_data, "ATD%s;", number);
+ }
+ 
++bool hfp_hf_release_and_accept(struct hfp_hf *hfp,
++				hfp_response_func_t resp_cb,
++				void *user_data)
++{
++	if (!hfp)
++		return false;
++
++	DBG(hfp, "");
++
++	if (!(hfp->chlds & HFP_CHLD_1) ||
++		(!queue_find(hfp->calls, call_waiting_match, NULL) &&
++		!queue_find(hfp->calls, call_held_match, NULL)))
++		return false;
++
++	return hfp_hf_send_command(hfp, resp_cb, user_data, "AT+CHLD=1");
++}
++
++bool hfp_hf_swap_calls(struct hfp_hf *hfp,
++				hfp_response_func_t resp_cb,
++				void *user_data)
++{
++	if (!hfp)
++		return false;
++
++	DBG(hfp, "");
++
++	if (!(hfp->chlds & HFP_CHLD_2))
++		return false;
++
++	return hfp_hf_send_command(hfp, resp_cb, user_data, "AT+CHLD=2");
++}
++
+ bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
+ 				hfp_response_func_t resp_cb,
+ 				void *user_data)
+@@ -2791,6 +2996,11 @@ bool hfp_hf_call_hangup(struct hfp_hf *hfp, uint id,
+ 	if (call_setup_match(call, NULL) || call_active_match(call, NULL)) {
+ 		return hfp_hf_send_command(hfp, resp_cb, user_data,
+ 								"AT+CHUP");
++	} else if ((call_waiting_match(call, NULL) ||
++		call_held_match(call, NULL)) &&
++		(hfp->chlds & HFP_CHLD_0)) {
++		return hfp_hf_send_command(hfp, resp_cb, user_data,
++								"AT+CHLD=0");
+ 	}
+ 
+ 	return false;
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index 6e3d4c213..045e1f7ab 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -38,6 +38,14 @@
+ #define HFP_AG_FEAT_ENHANCED_VOICE_RECOGNITION_STATUS	0x00001000
+ #define HFP_AG_FEAT_VOICE_RECOGNITION_TEXT		0x00002000
+ 
++#define HFP_CHLD_0	1 << 0
++#define HFP_CHLD_1	1 << 1
++#define HFP_CHLD_2	1 << 2
++#define HFP_CHLD_3	1 << 3
++#define HFP_CHLD_4	1 << 4
++#define HFP_CHLD_1x	1 << 5
++#define HFP_CHLD_2x	1 << 6
++
+ enum hfp_result {
+ 	HFP_RESULT_OK		= 0,
+ 	HFP_RESULT_CONNECT	= 1,
+@@ -177,6 +185,7 @@ bool hfp_context_get_number_default(struct hfp_context *context,
+ 						unsigned int default_val);
+ bool hfp_context_open_container(struct hfp_context *context);
+ bool hfp_context_close_container(struct hfp_context *context);
++bool hfp_context_is_container_close(struct hfp_context *context);
+ bool hfp_context_get_string(struct hfp_context *context, char *buf,
+ 								uint8_t len);
+ bool hfp_context_get_unquoted_string(struct hfp_context *context,
+@@ -242,6 +251,12 @@ const char *hfp_hf_call_get_number(struct hfp_hf *hfp, uint id);
+ bool hfp_hf_dial(struct hfp_hf *hfp, const char *number,
+ 				hfp_response_func_t resp_cb,
+ 				void *user_data);
++bool hfp_hf_release_and_accept(struct hfp_hf *hfp,
++				hfp_response_func_t resp_cb,
++				void *user_data);
++bool hfp_hf_swap_calls(struct hfp_hf *hfp,
++				hfp_response_func_t resp_cb,
++				void *user_data);
+ bool hfp_hf_call_answer(struct hfp_hf *hfp, uint id,
+ 				hfp_response_func_t resp_cb,
+ 				void *user_data);
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index 67a88a1cc..5252ed316 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -758,12 +758,17 @@ static void test_hf_robustness(gconstpointer data)
+ 		',', '5', '\r', '\n'), \
+ 	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+ 	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
++	raw_pdu('\r', '\n', '+', 'C', 'H', 'L', 'D', ':', '(', '0', \
++		',', '1', ',', '1', 'x', ',', '2', ',', '2', 'x', \
++		',', '3', ',', '4', ')', '\r', '\n'), \
++	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+ 	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+ 	raw_pdu('\r', '\n', '+', 'C', 'O', 'P', 'S', ':', ' ', '0', ',', \
+ 		'0', ',', '\"', 'T', 'E', 'S', 'T', '\"', '\r', '\n'), \
+ 	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+ 	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+ 	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
++	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
+ 	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n')
+ 
+ static void hf_cmd_complete(enum hfp_result res, enum hfp_error cme_err,
 -- 
-2.45.2
+2.43.0
 
