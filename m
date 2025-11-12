@@ -1,322 +1,237 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C74F27B359
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 20:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C432DA74C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 21:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762978144; cv=none; b=qS1wItFHr6OjGYWKvuuh4b40xTeqQRgOQN8PB3+KkusBKgp0YwlYDs8YgaVq0U/eewtREAybkphDPayzcoK8FKJJe31Bi84MVhlzCildzibQRkjHM0zCFg7unCF3Nq1fGcMSoGs83xhr3V79lSqyWWHOZLLsL2U6d4cc9f8KFPQ=
+	t=1762981663; cv=none; b=fA/QgVcNH49zxUcbX9SoC6aSDkZawYrqlE0nyPqYoIRV9EQ+YofPsKiYGVHWpugZLZ5oNIWCgKeHMuRXJubatUw4kqWJYRQUwxF/7ykuCFiw6Y8RTL7CgdeWKXL2v2sURK7tKibsLj0T7WwkGc9MIvXLYJXOaYIaYkxlrcbyZNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762978144; c=relaxed/simple;
-	bh=pSfKi7QofeeoxWFt8fE1EwS0eMKYDkQjsuOeDlY4hz0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FrIH0e8lGCmg5jM3zOW3oo/458JLjJLl62VXaK50HfAL6Oy1PtXiK6Y8Lmez+lWW3qQrDf/fTRWWWak9KnoWP/hqcal00IvwteQlaTYqkpmMSHQf9HJa8ZMaZjCBdPgradNQg/SwRO31IyV5AEouiv3wFFfIKrX9wEJVEZ5g4j4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=cV7ndr+i; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=VXud9P+v; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1762981663; c=relaxed/simple;
+	bh=u8q2TZF20ibeYFuY8h4yCLkgQDj7Xrhx2gKQ62/nSkk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Dppwb/zwk80tr58MbWKqJQGeBRpYkyQxLHuh1DBMKWIUXAotSo+AMNiQT9/h6+QeulMuQeI+JpwDzcMZKlaGmmpo90nAqgtSiuhzTFxhhoy2f2pG5ss4cRFcMN1zV2/f9Oy3X9CO6pk4TzeF/GFH7bWJvWI/v+xOgsMhsl+YE8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aULWBmZ3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="cV7ndr+i";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="VXud9P+v"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ACGYC3U1757402
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 20:09:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=oU1WjTceS7iEoYjqJu8Zbfc7
-	OQIDw2FU/7LRg8xG76s=; b=cV7ndr+icjg3VVH2aCSd81MsxEv0yfiNC+8vpfgO
-	mvw8wdCt8mv3e5e6hervyN/igo5bv/dqpg3+1p0g8v9OkvcZsB6Buwbrxl/6G5s2
-	4s6b6nlMTooBQdWDqPBBRpYN4OcY4tskLBiHKKSCNS8HNJHS6wGjpEI+iQA3DDSr
-	o4hOr3A16UH40y3yDwVJwY5dXxAkEpB6qAXtldovfyCJ/q4XYgAA05wtIisKi9Am
-	OaYHAku795OwAn8nH1E16CVpY5E3ee81XYwQNlP6XmDI+sQ8Hn9ccveF7VHvK3Zt
-	PYf/0EDdNNPrOlECgdJ33rTOlMnAoly/qfD2cdCZ+mzEEg==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4acwve8meg-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 20:09:01 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8b2217a9c60so23805185a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 12:09:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1762978140; x=1763582940; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oU1WjTceS7iEoYjqJu8Zbfc7OQIDw2FU/7LRg8xG76s=;
-        b=VXud9P+veE9XHHD78ZGEMZQCjnLHntn0126KMpEWMRfRfh/M/vWMOOsCMEN8mTY73C
-         I76qvEKS+PETy85PZE3OR5w6w01XpY9WGxdxnP1M0RU802YGvpBGLgc+0jHb2l5lc4gU
-         CjbFjDrLrF/hLc+/sSH677wTNDccbdArjlNsPCJAPcFgfY4Vz4T9Vg4a9l5Du4xUtK2g
-         GtfCrXuePCQxfdZ4l6z/+rANatxc8Q/2qdDZKGi3fycBrZhxkiBmtfm2iAljbnLF7FrV
-         HRp1xbiq4sBCIa9xiGaoJ4Lx1loGXc+9ssMxWBezW9CyVjhj1nTdSwhlF7UxRHhjgndD
-         juAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762978140; x=1763582940;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oU1WjTceS7iEoYjqJu8Zbfc7OQIDw2FU/7LRg8xG76s=;
-        b=IWguaQAmW5Nf9ZlOeP1Zdavg9Klmr2Mz44OSB9LY4AeWUkOzoE2XdhU4p3xp3cxT/w
-         8CB0KLJS3Bnih9L1RfUO/BWVOlXlEyxk1hLpF5NtnNa2fI2n7jW0BNXENKKk0w5pzram
-         5C0TjiAtik5r322oual4TdtCVCPHzjPQKywsssrMCm6CY/5bAhEskxbmrO9vEYwlbHPj
-         ES2q99dEvSMI+o7sXBGRTL5Hphcz60bxeG4YRhLHFvG4oLOibTYhCXKI4ZESxe+DKh/c
-         dB1AaBc3Ban6XtxYToHYXaPkCiHnCQuGwGMPcSxuWRlzrhbkKNrx0aauxm7/o3EYOZOL
-         54mw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGXrRiiEulixgUA+/l+qE9lsG4FSIOj6a5ULI4QKy7zB3FyI6nE5qvn/e2xy6rN/nS/t7o87dOHkqFIyNLm+8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzdq4o6vRDKot9MUJWaeZIiabxG+kK5YMSCXLZqnSMLhtlFVhoL
-	8/TgAyQULuaaG4T26cWlFo7WAttlGNuOq+6W87YF+mv004sS5vTB1usjC63NJTVXKSIiar3HR64
-	dIxAjoSvoG89sfMagfl5g11C7+tLUBZfHycWXAlPEehWns5k7opIWgMbsqwKLtYsPQVuAFoI=
-X-Gm-Gg: ASbGncuS7bQZUwHcX6WREhSzkP22HUaXITLoeWum6afgaxH3tRwMPtyqWcOC2SV9jIf
-	PYDD0/E3jCxvG+0WvCYHAHHYi7MzeEZmFY271Kt8VkY7xHyWP6QKPO6P/JPUTSWyIXGOPoykgmz
-	+m42YffcAlofoSZKV0YqtYnZS05IraZSh2RotQSxBoLWFyz9bOHdVrxXn4pUY5eg2P4e/7osfRT
-	jl7maeFlIc38uO5qQhM0QVMsSvpZ2jukN8tTm82NapENBib8uaYwJ6WEyHVzyxle6GX64VkXUVS
-	dQONz19WpknUu6espf54dhhhclkVkFMkCMQ+0LHW7GIL8yAB8nIar2kWmBMaQGad21as/LV4eM+
-	+/RaOlwsvk/dGnYzEFfS1AWKN64OZTBW7QXwcT0F8UafMolhWgGqO7avmHJiKeamF1RE8J4KCup
-	iwBpIUuuJIrBMO
-X-Received: by 2002:ac8:7f8e:0:b0:4eb:a2f0:356d with SMTP id d75a77b69052e-4eddbde1df0mr57234691cf.84.1762978140337;
-        Wed, 12 Nov 2025 12:09:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEY6kyZf9KAmfvVo/gfYCdU4m5A6XRB2OqUqHhgGCiTF3Gq4+27j12k14c35oXTx6DcTf1+mQ==
-X-Received: by 2002:ac8:7f8e:0:b0:4eb:a2f0:356d with SMTP id d75a77b69052e-4eddbde1df0mr57234011cf.84.1762978139807;
-        Wed, 12 Nov 2025 12:08:59 -0800 (PST)
-Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5944a0b75bbsm6061720e87.61.2025.11.12.12.08.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 12:08:59 -0800 (PST)
-Date: Wed, 12 Nov 2025 22:08:57 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: manivannan.sadhasivam@oss.qualcomm.com
-Cc: Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas.schier@linux.dev>,
-        Hans de Goede <hansg@kernel.org>,
-        Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-        Mark Pearson <mpearson-lenovo@squebb.ca>,
-        "Derek J. Clark" <derekjohn.clark@gmail.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
-        Stephan Gerhold <stephan.gerhold@linaro.org>
-Subject: Re: [PATCH 7/9] dt-bindings: connector: Add PCIe M.2 Mechanical Key
- E connector
-Message-ID: <t45yq2cqj2t7lv4ifnvv556ewznjtzhdvvmofzgb5kcsarydqe@hxtonnejw6t7>
-References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
- <20251112-pci-m2-e-v1-7-97413d6bf824@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aULWBmZ3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1DC2C113D0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 21:07:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762981662;
+	bh=u8q2TZF20ibeYFuY8h4yCLkgQDj7Xrhx2gKQ62/nSkk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=aULWBmZ3rD1NOHg1GcQ4Dq2EBVHRlCDrSxReNcyrhsRiK1A2FuL00TwRxPiGuN4Db
+	 OKIrCUVIDLpK8jqGmMEAEZvERB8tg6pMwBoAiH4CsPX0gnoN+1qcTm+mxekJWDG+9G
+	 XgM8haSqwQasnU2/WgQCSpjtRUpEg+ytNyBljhB8bPSMB3jcrBn4aNlywo2AAlqTOl
+	 MWMANIebhQ1TxnenHMk2MDfOXtC8a2P8AZjlXo5da3Ts9/Kx00vg7gtFqYVpRUFxvA
+	 HcOZNzSR+8nmU8KV1v59K2b+h6WZxg8f9EB4/qrujfwGgn6fQlSZy7FZz2Futss1Rf
+	 Xne5czQMN2nQg==
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-640b4a52950so154543a12.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 13:07:42 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVwF8AGjO2HOO9dvZlNjBHz+3RihGUUuzTfxFLuSRWAiNoEhicw3kJUjSmG2omoZu1y3Pi39zXiD30g+8OslMI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRoLyV7X7wzFA+QuUXp5PjiLgq2hx2vc/pNsvh5XKk6DNZJ/lZ
+	88UCuXlSiiEnW1cSFnt7YbDYn8fKKbFbt9dFYwZ25Q8CoSV+2SodJD8ilU1qYfcVE/EEWU246pJ
+	mX42HG5+sFV0CVO0Owr9mw4WSg/d9Gw==
+X-Google-Smtp-Source: AGHT+IEIy21Sb3B7FBrgAI8SVidk1uSmlkEpW+/mXMU6zQinRFFusx79rk2YkYD+SPkgL7pLFxsxRVnlBhzaVvKVnfk=
+X-Received: by 2002:a05:6402:2106:b0:641:27d8:ec72 with SMTP id
+ 4fb4d7f45d1cf-6431a39656dmr3803888a12.4.1762981660959; Wed, 12 Nov 2025
+ 13:07:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251112-pci-m2-e-v1-7-97413d6bf824@oss.qualcomm.com>
-X-Proofpoint-GUID: 4MfaG3MkhgK8EjsoxzbXb1KftWH6hGhN
-X-Authority-Analysis: v=2.4 cv=F7Rat6hN c=1 sm=1 tr=0 ts=6914e95d cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=gEfo2CItAAAA:8 a=EUspDBNiAAAA:8 a=VwQbUJbxAAAA:8 a=9n3VPyBaaxcwdMvd-aYA:9
- a=CjuIK1q_8ugA:10 a=PEH46H7Ffwr30OY-TuGO:22 a=sptkURWiP4Gy88Gu7hUp:22
-X-Proofpoint-ORIG-GUID: 4MfaG3MkhgK8EjsoxzbXb1KftWH6hGhN
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEyMDE2MiBTYWx0ZWRfX8ek6B2UlWRqF
- P3SIt2dQiR5J8xk7n1vSzfhFWrjQXVG2fR9/hQ9h5DWqGCmxBznwOvnv4S8Xd6Xs1YJH1xUkt9X
- zaPrwGBq1wLv81dzdYRJbSMiirJzflBiwZlLNMV8HLsnfFOk/0b+JJrdHMZvvwgCKdiDG4Vj9My
- rRzgD+oEZKanPajV8ALeBA+yOJDQmzbqKbxllnoiqqPrRPAugXwoYsT/JOJqaAtseS/HPA18Tvj
- FPH+LYRAoenmh9hPSFlTL+BHK5WhIfy6GvvY9KLGk+esO3Znn91lsSi+MGHxVaPtzR40WFMnWns
- EZ3mD473qdowt8ibz0A1+kIjeJyLi4WjHnpdO+Hs0kGiPGNPW/6E6G9YejoppaF4icNLbugGHwz
- FpvKLVZt8bnQ+QatRWcCSb+O3JbWpw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-12_06,2025-11-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 suspectscore=0 phishscore=0 malwarescore=0 bulkscore=0
- clxscore=1015 adultscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511120162
+References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
+In-Reply-To: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 12 Nov 2025 15:07:29 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+rOGUETwhPuzSsC6bhq1Q10k=pCRnZrnoDbCxVYV91YA@mail.gmail.com>
+X-Gm-Features: AWmQ_bkhxcdj-NsfzZ0QRxOltuG2xQHMKmcPZ2R7l6HHsGWU07rxfsx54qGm66Y
+Message-ID: <CAL_Jsq+rOGUETwhPuzSsC6bhq1Q10k=pCRnZrnoDbCxVYV91YA@mail.gmail.com>
+Subject: Re: [PATCH 0/9] Add support for handling PCIe M.2 Key E connectors in devicetree
+To: manivannan.sadhasivam@oss.qualcomm.com
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+	linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 12, 2025 at 08:15:19PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
-> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> 
-> Add the devicetree binding for PCIe M.2 Mechanical Key E connector defined
-> in the PCI Express M.2 Specification, r4.0, sec 5.1.2. This connector
-> provides interfaces like PCIe or SDIO to attach the WiFi devices to the
-> host machine, USB or UART+PCM interfaces to attach the Bluetooth (BT)
-> devices along with additional interfaces like I2C for NFC solution. At any
-> point of time, the connector can only support either PCIe or SDIO as the
-> WiFi interface and USB or UART as the BT interface.
-> 
-> The connector provides a primary power supply of 3.3v, along with an
-> optional 1.8v VIO supply for the Adapter I/O buffer circuitry operating at
-> 1.8v sideband signaling.
-> 
-> The connector also supplies optional signals in the form of GPIOs for fine
-> grained power management.
-> 
-> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+On Wed, Nov 12, 2025 at 8:45=E2=80=AFAM Manivannan Sadhasivam via B4 Relay
+<devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> wrote:
+>
+> Hi,
+>
+> This series is the continuation of the series [1] that added the initial =
+support
+> for the PCIe M.2 connectors. This series extends it by adding support for=
+ Key E
+> connectors. These connectors are used to connect the Wireless Connectivit=
+y
+> devices such as WiFi, BT, NFC and GNSS devices to the host machine over
+> interfaces such as PCIe/SDIO, USB/UART and NFC. This series adds support =
+for
+> connectors that expose PCIe interface for WiFi and UART interface for BT.=
+ Other
+> interfaces are left for future improvements.
+>
+> Serdev device support for BT
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+>
+> Adding support for the PCIe interface was mostly straightforward and a lo=
+t
+> similar to the previous Key M connector. But adding UART interface has pr=
+oved to
+> be tricky. This is mostly because of the fact UART is a non-discoverable =
+bus,
+> unlike PCIe which is discoverable. So this series relied on the PCI notif=
+ier to
+> create the serdev device for UART/BT. This means the PCIe interface will =
+be
+> brought up first and after the PCIe device enumeration, the serdev device=
+ will
+> be created by the pwrseq driver. This logic is necessary since the connec=
+tor
+> driver and DT node don't describe the device, but just the connector. So =
+to make
+> the connector interface Plug and Play, the connector driver uses the PCIe=
+ device
+> ID to identify the card and creates the serdev device. This logic could b=
+e
+> extended in the future to support more M.2 cards. Even if the M.2 card us=
+es SDIO
+> interface for connecting WLAN, a SDIO notifier could be added to create t=
+he
+> serdev device.
+>
+> Open questions
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> Though this series adds the relevant functionality for handling the M.2 K=
+ey M
+> connectors, there are still a few open questions exists on the design.
+>
+> 1. I've used the M.2 card model name as the serdev device name. This is f=
+ound
+> out by comparing the PCIe VID:PID in the notifier. Is this approach accep=
+table?
+> I did not use the PID as the serdev name since it will vary if the SDIO
+> interface is used in the future.
+>
+> 2. PCIe client drivers of some M.2 WLAN cards like the Qcom QCA6390, rely=
+ on
+> the PCIe device DT node to extract properties such as
+> 'qcom,calibration-variant', 'firmware-name', etc... For those drivers, sh=
+ould we
+> add the PCIe DT node in the Root Port in conjunction with the Port node a=
+s
+> below?
+>
+> pcie@0 {
+>         wifi@0 {
+>                 compatible =3D "pci17cb,1103";
+>                 ...
+>                 qcom,calibration-variant =3D "LE_X13S";
+>         };
+>
+>         port {
+>                 pcie4_port0_ep: endpoint {
+>                         remote-endpoint =3D <&m2_e_pcie_ep>;
+>                 };
+>         };
+> };
+>
+> This will also require marking the PMU supplies optional in the relevant =
+ath
+> bindings for M.2 cards.
+>
+> 3. Some M.2 cards require specific power up sequence like delays between
+> regulator/GPIO and such. For instance, the WCN7850 card supported in this=
+ series
+> requires 50ms delay between powering up an interface and driving it. I've=
+ just
+> hardcoded the delay in the driver, but it is a pure hack. Since the pwrse=
+q
+> driver doesn't know anything about the device it is dealing with before p=
+owering
+> it ON, how should it handle the device specific power requirements? Shoul=
+d we
+> hardcode the device specific property in the connector node? But then, it=
+ will
+> no longer become a generic M.2 connector and sort of defeats the purpose =
+of the
+> connector binding.
+>
+> I hope to address these questions with the help of the relevant subsystem
+> maintainers and the community. Until then, this series is *not* mergeable=
+ as a
+> whole.
+>
+> Testing
+> =3D=3D=3D=3D=3D=3D=3D
+>
+> This series, together with the devicetree changes [2] was tested on the
+> Qualcomm X1e based Lenovo Thinkpad T14s Laptop which has the WCN7850 WLAN=
+/BT M.2
+> card connected over PCIe and UART.
+>
+> [1] https://lore.kernel.org/linux-pci/20251108-pci-m2-v2-0-e8bc4d7bf42d@o=
+ss.qualcomm.com
+> [2] https://github.com/Mani-Sadhasivam/linux/commit/d39b81b3ff1ecfb0d423b=
+4da0771925d41648b5a
+>
+> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.=
+com>
 > ---
->  .../bindings/connector/pcie-m2-e-connector.yaml    | 154 +++++++++++++++++++++
+> Manivannan Sadhasivam (9):
+>       serdev: Convert to_serdev_device() and to_serdev_controller() helpe=
+rs to macros
+>       serdev: Add serdev device based driver match support
+>       serdev: Allow passing the serdev device name to serdev_device_add()
+>       serdev: Add an API to find the serdev controller associated with th=
+e devicetree node
+>       serdev: Add modalias support for serdev client devices
+>       serdev: Skip registering serdev devices from DT is external connect=
+or is used
+>       dt-bindings: connector: Add PCIe M.2 Mechanical Key E connector
+>       Bluetooth: hci_qca: Add support for WCN7850 PCIe M.2 card
+>       power: sequencing: pcie-m2: Add support for PCIe M.2 Key E connecto=
+rs
+>
+>  .../bindings/connector/pcie-m2-e-connector.yaml    | 154 +++++++++++++++
 >  MAINTAINERS                                        |   1 +
->  2 files changed, 155 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..91cb56b1a75b7e3de3b9fe9a7537089f96875746
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
-> @@ -0,0 +1,154 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/connector/pcie-m2-e-connector.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: PCIe M.2 Mechanical Key E Connector
-> +
-> +maintainers:
-> +  - Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> +
-> +description:
-> +  A PCIe M.2 E connector node represents a physical PCIe M.2 Mechanical Key E
-> +  connector. Mechanical Key E connectors are used to connect Wireless
-> +  Connectivity devices including combinations of Wi-Fi, BT, NFC to the host
-> +  machine over interfaces like PCIe/SDIO, USB/UART+PCM, and I2C.
-> +
-> +properties:
-> +  compatible:
-> +    const: pcie-m2-e-connector
-> +
-> +  vpcie3v3-supply:
-> +    description: A phandle to the regulator for 3.3v supply.
-> +
-> +  vpcie1v8-supply:
-> +    description: A phandle to the regulator for VIO 1.8v supply.
-> +
-> +  ports:
-> +    $ref: /schemas/graph.yaml#/properties/ports
-> +    description: OF graph bindings modeling the interfaces exposed on the
-> +      connector. Since a single connector can have multiple interfaces, every
-> +      interface has an assigned OF graph port number as described below.
-> +
-> +    properties:
-> +      port@0:
-> +        $ref: /schemas/graph.yaml#/properties/port
-> +        description: PCIe/SDIO interface
+>  drivers/bluetooth/hci_qca.c                        |  20 ++
+>  drivers/platform/x86/dell/dell-uart-backlight.c    |   2 +-
+>  .../x86/lenovo/yoga-tab2-pro-1380-fastcharger.c    |   2 +-
+>  drivers/platform/x86/x86-android-tablets/core.c    |   2 +-
+>  drivers/power/sequencing/Kconfig                   |   1 +
+>  drivers/power/sequencing/pwrseq-pcie-m2.c          | 218 +++++++++++++++=
++++++-
+>  drivers/tty/serdev/core.c                          |  77 +++++++-
+>  include/linux/mod_devicetable.h                    |   8 +
+>  include/linux/serdev.h                             |  25 ++-
+>  scripts/mod/devicetable-offsets.c                  |   3 +
+>  scripts/mod/file2alias.c                           |   8 +
+>  13 files changed, 494 insertions(+), 27 deletions(-)
+> ---
+> base-commit: db81ec30672bb228cd7cd809edeeae661d621f2d
 
-The same comment as for the M-key bindings: please describe endpoints.
+git show db81ec30672bb228cd7cd80
+fatal: ambiguous argument 'db81ec30672bb228cd7cd80': unknown revision
+or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
 
-> +  led1-gpios:
-> +    description: GPIO controlled connection to LED_1# signal. This signal is
-> +      used by the M.2 card to indicate the card status via the system mounted
-> +      LED. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.2 for more
-> +      details.
+This series doesn't apply.
 
-How are we supposed to handle these LEDs? I have been assuming that
-these pins should go striaght to the LED driver.
-
-> +    maxItems: 1
-> +
-> +  led2-gpios:
-> +    description: GPIO controlled connection to LED_2# signal. This signal is
-> +      used by the M.2 card to indicate the card status via the system mounted
-> +      LED. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.2 for more
-> +      details.
-> +    maxItems: 1
-> +
-> +  viocfg-gpios:
-> +    description: GPIO controlled connection to IO voltage configuration
-> +      (VIO_CFG) signal. This signal is used by the M.2 card to indicate to the
-> +      host system that the card supports an independent IO voltage domain for
-> +      the sideband signals. Refer, PCI Express M.2 Specification r4.0, sec
-> +      3.1.15.1 for more details.
-> +    maxItems: 1
-
-This more looks like viocfg-supply. Looking at this one and several
-other pins, it's more like a GPIO controller, providing those pins for
-the system, rather than a GPIO consumer.
-
-> +
-> +  uim_power_src-gpios:
-> +    description: GPIO controlled connection to UIM_POWER_SRC signal. This signal
-> +      is used when the NFC solution is implemented and receives the power output
-> +      from WWAN_UIM_PWR signal of the another WWAN M.2 card. Refer, PCI Express
-> +      M.2 Specification r4.0, sec 3.1.11.1 for more details.
-> +    maxItems: 1
-> +
-> +  uim_power_snk-gpios:
-> +    description: GPIO controlled connection to UIM_POWER_SNK signal. This signal
-> +      is used when the NFC solution is implemented and supplies power to the
-> +      Universal Integrated Circuit Card (UICC). Refer, PCI Express M.2
-> +      Specification r4.0, sec 3.1.11.2 for more details.
-> +    maxItems: 1
-> +
-> +  uim_swp-gpios:
-> +    description: GPIO controlled connection to UIM_SWP signal. This signal is
-> +      used when the NFC solution is implemented and implements the Single Wire
-> +      Protocol (SWP) interface to the UICC. Refer, PCI Express M.2 Specification
-> +      r4.0, sec 3.1.11.3 for more details.
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
-> +  - vpcie3v3-supply
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  # PCI M.2 Key E connector for WLAN/BT with PCIe/UART interfaces
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +
-> +    connector {
-> +        compatible = "pcie-m2-e-connector";
-> +        vpcie3v3-supply = <&vreg_wcn_3p3>;
-> +        vpcie1v8-supply = <&vreg_l15b_1p8>;
-> +        w_disable1-gpios = <&tlmm 117 GPIO_ACTIVE_LOW>;
-> +        w_disable2-gpios = <&tlmm 116 GPIO_ACTIVE_LOW>;
-> +
-> +        ports {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +
-> +            port@0 {
-> +                reg = <0>;
-> +
-> +                endpoint {
-> +                    remote-endpoint = <&pcie4_port0_ep>;
-> +                };
-> +            };
-> +
-> +            port@3 {
-> +                reg = <3>;
-> +
-> +                endpoint {
-> +                    remote-endpoint = <&uart14_ep>;
-> +                };
-> +            };
-> +        };
-> +    };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 9b3f689d1f50c62afa3772a0c6802f99a98ac2de..f707f29d0a37f344d8dd061b7e49dbb807933c9f 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -20478,6 +20478,7 @@ PCIE M.2 POWER SEQUENCING
->  M:	Manivannan Sadhasivam <mani@kernel.org>
->  L:	linux-pci@vger.kernel.org
->  S:	Maintained
-> +F:	Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
->  F:	Documentation/devicetree/bindings/connector/pcie-m2-m-connector.yaml
->  F:	drivers/power/sequencing/pwrseq-pcie-m2.c
->  
-> 
-> -- 
-> 2.48.1
-> 
-> 
-
--- 
-With best wishes
-Dmitry
+Rob
