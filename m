@@ -1,35 +1,35 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7A22FC873
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 08:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16BC23BD1B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 08:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762937120; cv=none; b=Zh4CN3seQFGCk/CLm+lN6YarRREYCLuJhbuqqYqd5iM9GLua2juWDV3akKVkWUf6z3pm1eV3rqHoV5PfhxMGPkN0ebv5HSevZt2UJzngXPSk6vQiAyS++6bZ5COcF98wqMgG+UhAuBj/tRdmXY4J7YC0zDxxCajewKff+Zy6PEU=
+	t=1762937922; cv=none; b=UGPlLmSzVZqSpxFWN9HlmL4NYidnh1KNJvZHsJ4Oqx4nq4JyuatzSLxyS5c64hC4G9Tce7LDuH+t7HORx+a01lgd6IfhKxxLEfgd+m2GMWiuOiiftEoIrPXXc1OGsuWBOCC7dzoWMXX/+lBX5KSUuHMrjrNmGi/hZsLO/IEfJMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762937120; c=relaxed/simple;
-	bh=JNYRPaP1YmGUiUQptWhcK6PfoiUPzWu0Uwkvwf1sGsM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=fw0rVu/Ec/xlp5JZ3dX5iBE1+T7+SItL8RM5pT/E2Bs0+TVRwOC0PQDpYJ6Vitczyi0E0BVRP1kZm96jAMMXL+xqMxX3J6urpkGvPBG5AlR6frDEP5JkGTu5kqOweMJBiqteSRt1I6wDmEhrvFWRtYanxU1Yf5CUeJApq62tdLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=bNAfioDL; arc=none smtp.client-ip=192.30.252.201
+	s=arc-20240116; t=1762937922; c=relaxed/simple;
+	bh=LHbOyh6lm+V6xsDxSaH/53Rq9Nos9r5AlPbCMs8nTf4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hTI3NRFpuKdB5Is9D9rhydUiKoQ+JgWWPAWvUh+00KXLTcCgbRuT7heGkB/JkLcKPVHtWUmq9AanmA0AQgbyPsNfrIRD+zMkfQbJLGG7+gjCEsc4m1R8E/VjA9/84JZlY4Ykrg0AUqwA6VTMkTEpJh2IGiJzHbsIAwjoJxTSXI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DQpPTRaP; arc=none smtp.client-ip=192.30.252.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="bNAfioDL"
-Received: from github.com (hubbernetes-node-402c158.va3-iad.github.net [10.48.12.54])
-	by smtp.github.com (Postfix) with ESMTPA id 71A53E0BB2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 00:45:18 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DQpPTRaP"
+Received: from github.com (hubbernetes-node-3e15589.ash1-iad.github.net [10.56.196.55])
+	by smtp.github.com (Postfix) with ESMTPA id 0C4FC920959
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 00:58:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1762937118;
-	bh=6P/Q/cmsUkUxg7LXxSKOeTlc97JqIwWAbCdsb1hMrEE=;
+	s=pf2023; t=1762937920;
+	bh=M7wTsVOj2OHFTX0Rz2aeChj4ZW/uqhpK1PgZ3b3/dHk=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=bNAfioDLnuoQq9I0L/eyyYlBN0JcT199oWjiYn9otFMzDNRghKFbx77lL+noyEnsi
-	 TJyFmXAFfzhUWbbNgjFkoPDjQuyXTjhgIIYdjasZuGBLHiFAxcU0fWnjD+pdln6Lna
-	 u0ZvGtpl/ZYajIfnIPufySlEq6bZ2VzXjaI3ws6A=
-Date: Wed, 12 Nov 2025 00:45:18 -0800
-From: fdanis-oss <noreply@github.com>
+	b=DQpPTRaPA3pUtjHfxvw+kSTG1trTeB1kGzzofPLqTVCFc9AxPcE9+kG3h5YDW0b9j
+	 Uec/gBohOBekIIZYotfcq6z9utxN81xrclaBaPow+4RmjkpE2cJjCgNC4ve+PKWQUS
+	 dZK3MfVX24yxKvgLhZTv8SdzTfFnPnqwA8E89QXs=
+Date: Wed, 12 Nov 2025 00:58:40 -0800
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1022376/000000-500893@github.com>
-Subject: [bluez/bluez] 4128b8: shared/hfp: Add simple 3way calls support
+Message-ID: <bluez/bluez/push/refs/heads/1010619/aaf853-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -38,64 +38,11 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1022376
+  Branch: refs/heads/1010619
   Home:   https://github.com/bluez/bluez
-  Commit: 4128b8743c4bdb85af0fbaf7aa8e1b478ae3f4df
-      https://github.com/bluez/bluez/commit/4128b8743c4bdb85af0fbaf7aa8e1=
-b478ae3f4df
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-11-12 (Wed, 12 Nov 2025)
 
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  shared/hfp: Add simple 3way calls support
-
-This adds support for the AT+CHLD=3D0 (Releases all held calls or set
-User Determined User Busy for a waiting call), =3D1 (Releases all active
-calls and accept the other call, held or waiting) and =3D2 (Places all
-active calls on hold and accept the other call, held or waiting)
-commands and the +CCWA (Call waiting notification) event.
-
-
-  Commit: 50089370c8cc0cebb9f9ca6ebca80e872369e745
-      https://github.com/bluez/bluez/commit/50089370c8cc0cebb9f9ca6ebca80=
-e872369e745
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-11-12 (Wed, 12 Nov 2025)
-
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add tests for simple 3way support
-
-This add the following tests:
-- /HFP/HF/TWC/BV-01-C
-  Verify that the AG indicates to the HF the presence of an incoming
-  call waiting and that the HF sends the User Determined User Busy
-  (UDUB) indication to the AG (AT+CHLD=3D0).
-- /HFP/HF/TWC/BV-02-C
-  Verify that the AG indicates to the HF the presence of an incoming
-  call waiting, and the HF can end an active call and accept the other
-  (held or waiting) call (AT+CHLD=3D1).
-- /HFP/HF/TWC/BV-03-C
-  Verify that the AG indicates to the HF the presence of an incoming
-  call waiting, and the HF can place an active call on hold and accept
-  a call waiting (AT+CHLD=3D2).
-
-
-Compare: https://github.com/bluez/bluez/compare/4128b8743c4b%5E...5008937=
-0c8cc
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
