@@ -1,59 +1,64 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824F42609CC
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 18:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1275635CBC9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 18:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762973571; cv=pass; b=TT7OdRnyVrVi61kYiueMg20mp6eJurXMl0Rxtr1uQQClxj7+92Hy8oCyjZcmVU3F5fJY/4UczqOvh6JulvJ8yVGg3/s8nA8ScglxraXJxXW7ndLUZym23wk8RMjwP7u+Pn+nbmwxaPtwEDM1kVuDPLWvUMXCopLwI56y79Lmto0=
+	t=1762973573; cv=pass; b=OhmwGcdVTxaG0srWH1h+CR2piMlLyOSxzwdVF7tgUvKX9BCKm2Qa4+BDwQcVryh/WlhDoPKjuecaerBOA/wuc6zyVePhAyCRWDGNBkSPxbtj7jrN8WYudxR3vgEeiklOn0elzDXEfH89x9jUESmp8n8sgPCBT6sSgmYPl7oU4dc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762973571; c=relaxed/simple;
-	bh=GICSarlKb/+qtMfEQ8DDglLC40N2KezsAFgnEYEciUk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pqvOxozAE7cnEGdjF58QcM8L1PL44VM/qL1y3evsjIYF89JmY1vUXzSbHyqqdeOWOLYhrCKsz3XIE+6B/nwZ2/t0jkU4joxlbPoWRKhEu0atND+Oc9+N9hdr+kUr12VlDeoDlalklfwPu+Yo+wCZv5Ohqdtku292loPMqu7VqWg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Tn9JJx+b; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1762973573; c=relaxed/simple;
+	bh=6qDzjMV8FqAnppVkg4dKSEjLKlOPZARdyyi19vjy5GQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=S2roTneOmBNxZGpm7afYVmculleIDs4pD6e2/OLwBdCHBi4UDKSjfPlCv33bf4SJPyFmN7ovGS4V5XvxnZn+PuTVSKg0VbsWffTyG1SAl/QaEayYKHlo6HSI78tjp7ASIa7uKbr7pP3J1twHS3YklArDKdPME6k+EBhQrjDMN1Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=qmVt/Bnm; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Tn9JJx+b"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="qmVt/Bnm"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4d6CFh6ZFbz1022;
-	Wed, 12 Nov 2025 20:52:40 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4d6CFj4j7Tz103Q;
+	Wed, 12 Nov 2025 20:52:41 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1762973561;
+	t=1762973562;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=NAtc61oJJx+IIx4LZuDHOEmWowAPcoefXhkg00mLx1E=;
-	b=Tn9JJx+bAANxnkiBM/Pr4n6x1gVv2kdtG4XLFrFr4xkZ01lCKMYVUHexnbKqLXELjU3/Kc
-	mIJhw5X2Cr828kukqlkSZe3MjqgTfYT0HdVGdV/N7XXqtqxJM6dcTU1msCkzcg1O0rGbKF
-	cFw0xuLu4aaV1lakZ9iIvh6ZF89Imxk=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1762973561;
-	b=iW0SgIfaZk7SXxCPohbBp2mTfMWj68+cY3IHoTgUD9IfvG6LlSilEqp6GM78xrnq/cBKUj
-	aye7v81R79vq1teLwJW8RdAwElVewapO1wofiKCZswHEiSpSCn1zY3hHew9tlpujQABHgE
-	c40l8+ivBViqmjzE6QWsjvJYi1GkEuc=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cMy9+cEUJqQybauxigOGM9Xmw+umN38ziGKRcm4heKs=;
+	b=qmVt/BnmVojD59TzS9EhswtJngYJ7NjEI/5BSmK7oXEkeNHiKUTlNrYe82TPYlQj05NBb0
+	1S6H8vD109I4lJc9oHHxY9drNavXZzrPkdMgoFPNHSV9nkrfP4FQY8HRq1iMU0gZpuvXWJ
+	IXoz1mBPxqfRKLuHDKjY3iVwdEkBJpg=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1762973562;
+	b=OUqnhi2FR2B3EBjeC+Kksfgb4bSmwe5zwoxpvAZHzYKZAzzc1JkUd3eeoH7R9/lG3pJueE
+	Z4Ogg38fJ1yBaAtp6wNMf+M0baPXXHd6F/3fOsiQDrFiV2yp1oNe2fsG3oERtAu4+BIV1E
+	V8FfB8tMpYAAOF/i/jiOs3QyTKfGNdw=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1762973561;
+	s=meesny; t=1762973562;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=NAtc61oJJx+IIx4LZuDHOEmWowAPcoefXhkg00mLx1E=;
-	b=T0CJyvi6cfjLnuPHo+aL8i8leFZFzZKjeVKaBHm6HjVaU8r+gzsby0KFuR1QpMSg94V4q4
-	lZGW6e4J+b7ofy6yoKpRzW3pB6S8E+ZwcrUw05nZ6uHbbrA58re00zq3MC6uk4kNofrwfH
-	2qHzqiI4G1u81vFdfumIadAumYAzugA=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cMy9+cEUJqQybauxigOGM9Xmw+umN38ziGKRcm4heKs=;
+	b=hzpYfofmihQl5xZptt2KHti16xFZ8/q9tWgIY5g2N8s/vY8jhib5ye/ped5q87Tb85rHf3
+	Mvxb1dVLKDcMHAu5x/tIXnGomIEC50D3LbAcLVfN9UvYadwX0FUJ25yUIuea5ZCkr+CAM+
+	/fIDKEmvmTFR2pNVapXsBaz1S7oNeQo=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 1/4] shared/bap: fix channel allocation logic in bt_bap_select()
-Date: Wed, 12 Nov 2025 20:52:35 +0200
-Message-ID: <5d291ba409a0736f7074a7e42988570d29ac58bb.1762973380.git.pav@iki.fi>
+Subject: [PATCH BlueZ 2/4] test-bap: adjust macros for customizing remote audio locations
+Date: Wed, 12 Nov 2025 20:52:36 +0200
+Message-ID: <e0c9ea208e5bebefe168bcdc4bd3ae7ddfe15d07.1762973380.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
+In-Reply-To: <5d291ba409a0736f7074a7e42988570d29ac58bb.1762973380.git.pav@iki.fi>
+References: <5d291ba409a0736f7074a7e42988570d29ac58bb.1762973380.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,327 +67,228 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-bt_bap_select() does not correctly determine the need for multi-stream
-configurations 6,7,8,9,11(i), as its result depends on whether Audio
-Locations is read before or after the PACs, doesn't work with general
-location bits, etc.
-
-Fix the procedure to be simpler: create streams for all locations, up to
-a specific number of channels.  By default, limit to max 2 channels per
-direction for compatibility (BAP doesn't have explicit AC with larger
-channel counts.) Also simplify the code.
-
-Ignore lpac Locations when selecting: the value mostly makes sense for
-Unicast Server role, but Client and Server cannot use the same value as
-only a few bits can be set. As Client, we should be able to configure
-any Location bits.  The sound server can simply ignore our suggested
-channel allocation if really needed, or use SetConfiguration() API to
-build custom configurations.
+Add arguments to customize audio locations, in the macros defining data
+for remote PACS.
 ---
- profiles/audio/bap.c |   2 +-
- src/shared/bap.c     | 193 +++++++++++++++++++------------------------
- src/shared/bap.h     |   4 +-
- 3 files changed, 89 insertions(+), 110 deletions(-)
+ unit/test-bap.c | 123 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 88 insertions(+), 35 deletions(-)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 85bba9543..9fb879345 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -1919,7 +1919,7 @@ static bool pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 		queue_push_tail(select->eps, ep);
- 	}
+diff --git a/unit/test-bap.c b/unit/test-bap.c
+index c15afe52d..b1d1a42f1 100644
+--- a/unit/test-bap.c
++++ b/unit/test-bap.c
+@@ -35,7 +35,6 @@
+ #include "src/shared/lc3.h"
  
--	bt_bap_select(lpac, rpac, &select->remaining, select_cb, ep);
-+	bt_bap_select(lpac, rpac, 0, &select->remaining, select_cb, ep);
+ struct test_config {
+-	struct bt_bap_pac_qos pqos;
+ 	struct iovec cc;
+ 	struct iovec base;
+ 	struct bt_bap_qos qos;
+@@ -933,16 +932,26 @@ static void test_teardown(const void *user_data)
+  *       Front Left (0x00000001)
+  *       Front Right (0x00000002)
+  */
+-#define DISC_SNK_PAC(_caps...) \
++
++#define IOV_CONTENT(data...) data
++
++#define DISC_SNK_PAC(_caps) \
+ 	IOV_DATA(0x0a, 0x03, 0x00), \
+-	IOV_DATA(0x0b, 0x01, _caps), \
++	IOV_DATA(0x0b, 0x01, _caps)
++
++#define DISC_SNK_LOC(locations) \
+ 	IOV_DATA(0x0a, 0x06, 0x00), \
+-	IOV_DATA(0x0b, 0x03, 0x00, 0x00, 0x00)
++	IOV_DATA(0x0b, locations & 0xff, (locations >> 8)  & 0xff, \
++		(locations >> 16) & 0xff, (locations >> 24) & 0xff)
++
++#define LC3_PAC_CAPS(ch_counts) \
++	0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
++	0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, ch_counts, 0x05, 0x04, \
++	0x1a, 0x00, 0xf0, 0x00, 0x00
  
- 	return true;
- }
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index a18f393f7..00474b2e0 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -204,11 +204,6 @@ struct bt_bap {
- 	void *user_data;
+ #define DISC_SNK_LC3 \
+-	DISC_SNK_PAC(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_SNK_PAC(LC3_PAC_CAPS(0x03)), \
++	DISC_SNK_LOC(0x00000003)
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x0009 Type: Source PAC (0x2bcb)
+@@ -981,17 +990,28 @@ static void test_teardown(const void *user_data)
+  *       Front Left (0x00000001)
+  *       Front Right (0x00000002)
+  */
+-#define DISC_SRC_PAC(_caps...) \
+-	DISC_SNK_PAC(_caps), \
++#define DISC_SRC_PAC(_caps) \
+ 	IOV_DATA(0x0a, 0x09, 0x00), \
+-	IOV_DATA(0x0b, 0x01, _caps), \
++	IOV_DATA(0x0b, 0x01, _caps)
++
++#define DISC_SRC_LOC(locations) \
+ 	IOV_DATA(0x0a, 0x0c, 0x00), \
+-	IOV_DATA(0x0b, 0x03, 0x00, 0x00, 0x00)
++	IOV_DATA(0x0b, locations & 0xff, (locations >> 8) & 0xff, \
++		(locations >> 16) & 0xff, (locations >> 24) & 0xff)
++
++#define DISC_PACS(snk_locations, src_locations, snk_caps, src_caps) \
++	DISC_SNK_PAC(IOV_CONTENT(snk_caps)), \
++	DISC_SNK_LOC(snk_locations), \
++	DISC_SRC_PAC(IOV_CONTENT(src_caps)),	\
++	DISC_SRC_LOC(src_locations)
++
++#define DISC_PACS_NO_LOCATION(snk_caps, src_caps) \
++	DISC_SNK_PAC(IOV_CONTENT(snk_caps)), \
++	DISC_SRC_PAC(IOV_CONTENT(src_caps))
+ 
+ #define DISC_SRC_LC3 \
+-	DISC_SRC_PAC(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_PACS(0x00000003, 0x00000003, \
++			LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x000f Type: Available Audio Contexts (0x2bcd)
+@@ -999,15 +1019,21 @@ static void test_teardown(const void *user_data)
+  *   Value: ff0fff0f
+  *   Handle: 0x000f Type: Available Audio Contexts (0x2bcd)
+  */
+-#define DISC_CTX(_caps...) \
+-	DISC_SRC_PAC(_caps), \
++#define DISC_CTX(snk_locations, src_locations, snk_caps, src_caps) \
++	DISC_PACS(snk_locations, src_locations, \
++			IOV_CONTENT(snk_caps), IOV_CONTENT(src_caps)), \
++	IOV_DATA(0x0a, 0x0f, 0x00), \
++	IOV_DATA(0x0b, 0xff, 0x0f, 0xff, 0x0f)
++
++#define DISC_CTX_NO_LOCATION(snk_caps, src_caps) \
++	DISC_PACS_NO_LOCATION(IOV_CONTENT(snk_caps), \
++				IOV_CONTENT(src_caps)), \
+ 	IOV_DATA(0x0a, 0x0f, 0x00), \
+ 	IOV_DATA(0x0b, 0xff, 0x0f, 0xff, 0x0f)
+ 
+ #define DISC_CTX_LC3 \
+-	DISC_CTX(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_CTX(0x00000003, 0x00000003, \
++		LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x0012 Type: Supported Audio Contexts (0x2bce)
+@@ -1015,15 +1041,20 @@ static void test_teardown(const void *user_data)
+  *   Value: ff0fff0f
+  *   Handle: 0x0012 Type: Supported Audio Contexts (0x2bce)
+  */
+-#define DISC_SUP_CTX(_caps...) \
+-	DISC_CTX(_caps), \
++#define DISC_SUP_CTX(snk_locations, src_locations, snk_caps, src_caps) \
++	DISC_CTX(snk_locations, src_locations, \
++			IOV_CONTENT(snk_caps), IOV_CONTENT(src_caps)), \
++	IOV_DATA(0x0a, 0x12, 0x00), \
++	IOV_DATA(0x0b, 0xff, 0x0f, 0xff, 0x0f)
++
++#define DISC_SUP_CTX_NO_LOCATION(snk_caps, src_caps) \
++	DISC_CTX_NO_LOCATION(IOV_CONTENT(snk_caps), IOV_CONTENT(src_caps)), \
+ 	IOV_DATA(0x0a, 0x12, 0x00), \
+ 	IOV_DATA(0x0b, 0xff, 0x0f, 0xff, 0x0f)
+ 
+ #define DISC_SUP_CTX_LC3 \
+-	DISC_SUP_CTX(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_SUP_CTX(0x00000003, 0x00000003, \
++			LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x0016 Type: Sink ASE (0x2bc4)
+@@ -1046,8 +1077,9 @@ static void test_teardown(const void *user_data)
+  *       Notification (0x01)
+  * ATT: Write Response (0x13) len 0
+  */
+-#define DISC_SNK_ASE(_caps...) \
+-	DISC_SUP_CTX(_caps), \
++#define DISC_SNK_ASE(snk_locations, src_locations, snk_caps, src_caps)	\
++	DISC_SUP_CTX(snk_locations, src_locations, \
++			IOV_CONTENT(snk_caps), IOV_CONTENT(src_caps)), \
+ 	IOV_DATA(0x0a, 0x16, 0x00), \
+ 	IOV_DATA(0x0b, 0x01, 0x00), \
+ 	IOV_DATA(0x12, 0x17, 0x00, 0x01, 0x00), \
+@@ -1057,10 +1089,15 @@ static void test_teardown(const void *user_data)
+ 	IOV_DATA(0x12, 0x1a, 0x00, 0x01, 0x00), \
+ 	IOV_DATA(0x13)
+ 
++#define DISC_SNK_ASE_NO_LOCATION(snk_caps, src_caps) \
++	DISC_SUP_CTX_NO_LOCATION(IOV_CONTENT(snk_caps), \
++				IOV_CONTENT(src_caps)), \
++	IOV_DATA(0x0a, 0x16, 0x00), \
++	IOV_DATA(0x0b, 0x01, 0x00)
++
+ #define DISC_SNK_ASE_LC3 \
+-	DISC_SNK_ASE(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_SNK_ASE(0x00000003, 0x00000003, \
++			LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x001c Type: Source ASE (0x2bc5)
+@@ -1088,8 +1125,9 @@ static void test_teardown(const void *user_data)
+  *       Notification (0x01)
+  * ATT: Write Response (0x13) len 0
+  */
+-#define DISC_SRC_ASE(_cfg...) \
+-	DISC_SNK_ASE(_cfg), \
++#define DISC_SRC_ASE(snk_locations, src_locations, snk_pacs, src_pacs) \
++	DISC_SNK_ASE(snk_locations, src_locations, \
++			IOV_CONTENT(snk_pacs), IOV_CONTENT(src_pacs)), \
+ 	IOV_DATA(0x0a, 0x1c, 0x00), \
+ 	IOV_DATA(0x0b, 0x03, 0x00), \
+ 	IOV_DATA(0x12, 0x1d, 0x00, 0x01, 0x00), \
+@@ -1101,10 +1139,17 @@ static void test_teardown(const void *user_data)
+ 	IOV_DATA(0x12, 0x23, 0x00, 0x01, 0x00), \
+ 	IOV_DATA(0x13)
+ 
++#define DISC_SRC_ASE_NO_LOCATION(snk_pacs, src_pacs) \
++	DISC_SNK_ASE_NO_LOCATION(IOV_CONTENT(snk_pacs), \
++				IOV_CONTENT(src_pacs)), \
++	IOV_DATA(0x0a, 0x1c, 0x00), \
++	IOV_DATA(0x0b, 0x03, 0x00), \
++	IOV_DATA(0x12, 0x23, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x13)
++
+ #define DISC_SRC_ASE_LC3 \
+-	DISC_SRC_ASE(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_SRC_ASE(0x00000003, 0x00000003, \
++			LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ #define DISC_ASE_LC3 \
+ 	DISC_SNK_ASE_LC3, \
+@@ -1867,8 +1912,16 @@ static struct test_config cfg_snk_vs = {
+ 	.vs = true,
  };
  
--struct bt_bap_chan {
--	uint8_t count;
--	uint32_t location;
--};
--
- struct bt_bap_pac {
- 	struct bt_bap_db *bdb;
- 	char *name;
-@@ -3848,50 +3843,6 @@ static void *ltv_merge(struct iovec *data, struct iovec *cont)
- 	return util_iov_append(data, cont->iov_base, cont->iov_len);
- }
- 
--static void bap_pac_chan_add(struct bt_bap_pac *pac, uint8_t count,
--				uint32_t location)
--{
--	struct bt_bap_chan *chan;
--
--	if (!pac->channels)
--		pac->channels = queue_new();
--
--	chan = new0(struct bt_bap_chan, 1);
--	chan->count = count;
--	chan->location = location;
--
--	queue_push_tail(pac->channels, chan);
--}
--
--static void bap_pac_foreach_channel(size_t i, uint8_t l, uint8_t t, uint8_t *v,
--					void *user_data)
--{
--	struct bt_bap_pac *pac = user_data;
--
--	if (!v)
--		return;
--
--	bap_pac_chan_add(pac, *v, bt_bap_pac_get_locations(pac));
--}
--
--static void bap_pac_update_channels(struct bt_bap_pac *pac, struct iovec *data)
--{
--	uint8_t type = 0x03;
--
--	if (!data)
--		return;
--
--	util_ltv_foreach(data->iov_base, data->iov_len, &type,
--				bap_pac_foreach_channel, pac);
--
--	/* If record didn't set a channel count but set a location use that as
--	 * channel count.
--	 */
--	if (queue_isempty(pac->channels) && pac->qos.location)
--		bap_pac_chan_add(pac, pac->qos.location, pac->qos.location);
--
--}
--
- static void bap_pac_merge(struct bt_bap_pac *pac, struct iovec *data,
- 					struct iovec *metadata)
- {
-@@ -3901,9 +3852,6 @@ static void bap_pac_merge(struct bt_bap_pac *pac, struct iovec *data,
- 	else
- 		pac->data = util_iov_dup(data, 1);
- 
--	/* Update channels */
--	bap_pac_update_channels(pac, data);
--
- 	/* Merge metadata into existing record */
- 	if (pac->metadata)
- 		ltv_merge(pac->metadata, metadata);
-@@ -4845,6 +4793,8 @@ static void read_source_pac_loc(bool success, uint8_t att_ecode,
- 
- 	pacs->source_loc_value = get_le32(value);
- 
-+	DBG(bap, "PACS Source Locations: 0x%08x", pacs->source_loc_value);
++#define VS_PAC_CAPS(ch_count) \
++	0xff, 0x01, 0x00, 0x01, 0x00, 0x03, 0x02, 0x03, ch_count, \
++	0x00
 +
- 	/* Resume reading sinks if supported but for some reason is empty */
- 	if (pacs->source && queue_isempty(bap->rdb->sources)) {
- 		uint16_t value_handle;
-@@ -4878,6 +4828,8 @@ static void read_sink_pac_loc(bool success, uint8_t att_ecode,
- 
- 	pacs->sink_loc_value = get_le32(value);
- 
-+	DBG(bap, "PACS Sink Locations: 0x%08x", pacs->sink_loc_value);
++#define VS_PAC_CAPS_NO_COUNT				\
++	0xff, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00
 +
- 	/* Resume reading sinks if supported but for some reason is empty */
- 	if (pacs->sink && queue_isempty(bap->rdb->sinks)) {
- 		uint16_t value_handle;
-@@ -4911,6 +4863,9 @@ static void read_pac_context(bool success, uint8_t att_ecode,
+ #define DISC_SRC_ASE_VS \
+-	DISC_SRC_ASE(0xff, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00)
++	DISC_SRC_ASE(0x00000003, 0x00000003, \
++			VS_PAC_CAPS_NO_COUNT, VS_PAC_CAPS_NO_COUNT)
  
- 	pacs->sink_context_value = le16_to_cpu(ctx->snk);
- 	pacs->source_context_value = le16_to_cpu(ctx->src);
-+
-+	DBG(bap, "PACS Sink Context: 0x%04x", pacs->sink_context_value);
-+	DBG(bap, "PACS Source Context: 0x%04x", pacs->source_context_value);
- }
- 
- static void read_pac_supported_context(bool success, uint8_t att_ecode,
-@@ -4934,6 +4889,11 @@ static void read_pac_supported_context(bool success, uint8_t att_ecode,
- 
- 	pacs->supported_sink_context_value = le16_to_cpu(ctx->snk);
- 	pacs->supported_source_context_value = le16_to_cpu(ctx->src);
-+
-+	DBG(bap, "PACS Supported Sink Context: 0x%04x",
-+					pacs->supported_sink_context_value);
-+	DBG(bap, "PACS Supported Source Context: 0x%04x",
-+					pacs->supported_source_context_value);
- }
- 
- static void foreach_pacs_char(struct gatt_db_attribute *attr, void *user_data)
-@@ -6113,12 +6073,39 @@ static bool match_pac(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	return false;
- }
- 
--int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			int *count, bt_bap_pac_select_t func,
--			void *user_data)
-+static void bap_pac_ltv_ch_counts(size_t i, uint8_t l, uint8_t t, uint8_t *v,
-+								void *user_data)
- {
--	const struct queue_entry *lchan, *rchan;
--	int selected = 0;
-+	uint8_t *mask = user_data;
-+
-+	if (v)
-+		*mask |= *v;
-+}
-+
-+static uint8_t bap_pac_ch_counts(struct bt_bap_pac *pac)
-+{
-+	uint8_t type = 0x03;
-+	uint8_t mask = 0;
-+
-+	if (!pac->data)
-+		return 0;
-+
-+	util_ltv_foreach(pac->data->iov_base, pac->data->iov_len, &type,
-+						bap_pac_ltv_ch_counts, &mask);
-+
-+	if (!mask)
-+		mask = 0x01;  /* default (BAP v1.0.1 Sec 4.3.1) */
-+
-+	return mask;
-+}
-+
-+int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+			unsigned int max_channels, int *count,
-+			bt_bap_pac_select_t func, void *user_data)
-+{
-+	uint32_t locations;
-+	uint8_t ch_counts;
-+	unsigned int num_ase;
- 
- 	if (!lpac || !rpac || !func)
- 		return -EINVAL;
-@@ -6126,66 +6113,58 @@ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	if (!lpac->ops || !lpac->ops->select)
- 		return -EOPNOTSUPP;
- 
--	for (lchan = queue_get_entries(lpac->channels); lchan;
--					lchan = lchan->next) {
--		struct bt_bap_chan *lc = lchan->data;
--		struct bt_bap_chan map = *lc;
--		int i;
-+	if (!max_channels)
-+		max_channels = 2;  /* By default: don't go beyond BAP AC */
- 
--		for (i = 0, rchan = queue_get_entries(rpac->channels); rchan;
--					rchan = rchan->next, i++) {
--			struct bt_bap_chan *rc = rchan->data;
-+	ch_counts = bap_pac_ch_counts(lpac) & bap_pac_ch_counts(rpac);
-+	locations = bt_bap_pac_get_locations(rpac);
- 
--			/* Try matching the channel count */
--			if (!(map.count & rc->count))
--				break;
-+	if (rpac->type == BT_BAP_SINK)
-+		num_ase = queue_length(rpac->bdb->sinks);
-+	else
-+		num_ase = queue_length(rpac->bdb->sources);
- 
--			/* Check if location was set otherwise attempt to
--			 * assign one based on the number of channels it
--			 * supports.
--			 */
--			if (!rc->location) {
--				rc->location = bt_bap_pac_get_locations(rpac);
--				/* If channel count is 1 use a single
--				 * location
--				 */
--				if (rc->count == 0x01)
--					rc->location &= BIT(i);
--			}
-+	/* Fallback to unspecified/mono allocation if nothing is matching */
-+	if (!locations || !ch_counts) {
-+		lpac->ops->select(lpac, rpac, 0, &rpac->qos, func, user_data,
-+							lpac->user_data);
-+		if (count)
-+			(*count)++;
-+		return 0;
-+	}
- 
--			/* Try matching the channel location */
--			if (!(map.location & rc->location))
-+	/* Allocate all locations to streams */
-+	while (num_ase) {
-+		uint32_t allocation = 0, alloc = 0;
-+		unsigned int i, n;
-+
-+		/* Put max number of channels per stream */
-+		for (i = 0, n = 0; i < 32 && n < 8; ++i) {
-+			uint32_t loc = (1LL << i);
-+
-+			if (!(locations & loc))
- 				continue;
- 
--			lpac->ops->select(lpac, rpac, map.location &
--						rc->location, &rpac->qos,
--						func, user_data,
--						lpac->user_data);
--			selected++;
-+			alloc |= loc;
-+			if ((BIT(n) & ch_counts) && n < max_channels)
-+				allocation = alloc;
- 
--			/* Check if there are any channels left to select */
--			map.count &= ~(map.count & rc->count);
--			/* Check if there are any locations left to select */
--			map.location &= ~(map.location & rc->location);
--
--			if (!map.count || !map.location)
--				break;
--
--			/* Check if device require AC*(i) settings */
--			if (rc->count == 0x01)
--				map.count = map.count >> 1;
-+			++n;
- 		}
--	}
- 
--	/* Fallback to no channel allocation since none could be matched. */
--	if (!selected) {
--		lpac->ops->select(lpac, rpac, 0, &rpac->qos, func, user_data,
--					lpac->user_data);
--		selected++;
--	}
-+		if (!allocation)
-+			break;
- 
--	if (count)
--		*count += selected;
-+		/* Configure stream */
-+		lpac->ops->select(lpac, rpac, allocation, &rpac->qos,
-+					func, user_data, lpac->user_data);
-+		if (count)
-+			(*count)++;
-+
-+		locations &= ~allocation;
-+		max_channels -= __builtin_popcount(allocation);
-+		num_ase--;
-+	}
- 
- 	return 0;
- }
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index efeed604d..7f2c491fc 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -173,8 +173,8 @@ void *bt_bap_pac_get_user_data(struct bt_bap_pac *pac);
- 
- /* Stream related functions */
- int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			int *count, bt_bap_pac_select_t func,
--			void *user_data);
-+			unsigned int max_channels, int *count,
-+			bt_bap_pac_select_t func, void *user_data);
- 
- void bt_bap_cancel_select(struct bt_bap_pac *lpac, bt_bap_pac_select_t func,
- 			void *user_data);
+ #define SCC_SNK_VS \
+ 	DISC_SRC_ASE_VS,  \
 -- 
 2.51.1
 
