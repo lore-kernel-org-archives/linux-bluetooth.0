@@ -1,179 +1,132 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCF334A77D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 19:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F45DD2FB
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 19:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762974055; cv=none; b=MOj5xQuu3YlwKSMRF3WdevKg84VqTwWQ3L4FE4M9qNI7lipKxcl+jC+QBNvdycLH7WQrxYJrMQ0TArxCItxR1wUzuUN+1no3dhe6Ybpt9edq6I5aISqFXG7pAGRGNvbX3mGFBlQG+Tf86LAZZ0Uhkff8tE88YdM6BYwCkXh4eZI=
+	t=1762976780; cv=none; b=sSAkGqDE0r/jPBZC1hIBIiDyG3Mb5bzibRLTqhdSroAKo8TCqwQTuSL9KHI9YCekKcFQ/eFAmScUDPLXXX82tWd2NWJ7osjW6LQEss1kc1MsClYSwIyGfJXJ3Vb+EAeT6/h4S2tjFg9T0ghCA6DpOTQs88UmudMW9cgBuwASb1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762974055; c=relaxed/simple;
-	bh=YBcP0cYBx0Vg8YUBaQqyPI2WtYD7Egwwz6ubsLTybqM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RxM4jEfVuTkskyQHlkf7qy2D4+O0xLwYojaAxy8QpxrFlNVqTKzrSAUAsOmNHY9+WYAkPhrDPyslHpxp9veY6tKauYK+RwfoVKXvpzJeX8m5fNhi5YITd8D9VjGvcD2alwu3zamsE1q9DbuzNGQqFxbHScmY8wO7cg/wDoDQdKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RUdQ29yw; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1762976780; c=relaxed/simple;
+	bh=9rHR2UDhz5kYlA8mPXRbmKArZAu0tsBjVyhPFqTtZ/4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Z83i55tAZIO3e8KXWyh7yUsGfQ/XfbiuVfEiul6z+Y7YAwf7Qes1qbZN3l+k3QiibTd9NcPl4OQqvPDGTP9PU+fL3FtOjJ5sVTdburtgFBcttLc675TYz4VUHJwYZc0FWoWwwzIbzVG2JJMrF/0Z9DYO951sq5/s8CaJDZADYBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b9EWTl/z; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RUdQ29yw"
-Received: from github.com (hubbernetes-node-5499e75.ac4-iad.github.net [10.52.143.34])
-	by smtp.github.com (Postfix) with ESMTPA id 488A82142A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 11:00:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1762974053;
-	bh=SQ2t5KjhY1v3qmXM3KDa6Bq+sRN+iweOc/GnKZnctkQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=RUdQ29ywGLufzAlTq13KFb12LewS53EqCtGUmTPQ59va1z2ZXDOMSpKACl5CP7kra
-	 WXd3ylg1L0XyaOCV/g1G3R38qgxANVy/bZdhoAjMqdLyayaJrUDdC0rpmjXwJFER2L
-	 o460Qg4OGmK0zaxN8iHp6m+x1/ejSCndMyah0k9I=
-Date: Wed, 12 Nov 2025 11:00:53 -0800
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1022641/000000-a4d2b1@github.com>
-Subject: [bluez/bluez] df0eb5: shared/bap: fix channel allocation logic in
- bt_bap...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b9EWTl/z"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-4335726d0f2so354445ab.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 11:46:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762976777; x=1763581577; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sP0q5fwGQ5rIK3FfjDb8wge1/fP9XjEk/NH4nhn41Z8=;
+        b=b9EWTl/zWVpG9j8ZobbQ7HPqBuVZCqHBDVj93i/LfvG0H7FuY2iGthCrkapOQreMK7
+         QiuQzTtOq0blz/roGLTBH8Ai0jH6KTXPbYg9O6kO7aDekv0HjtrAC7OSkUShUmEZuagS
+         QgEOmLE5Z/K4pTY1utRIfOPDXldJu2ujakOY38TRdj94eOJSDYna5ln21dQzlkTKMDrt
+         O2GXy0ubWu6GwSvv2NFjltA4jT1Yrn0h4XotXlOB4XOZwo185rIk2x9Vy4Fol3lswTzP
+         f6du46pkIcGHSV59iHwoIgWXQdWkB15OfAcQzbdP6SOUMZqlXP15YG5CE9GskeBRJO0k
+         XmZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762976777; x=1763581577;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sP0q5fwGQ5rIK3FfjDb8wge1/fP9XjEk/NH4nhn41Z8=;
+        b=eV90mOgopL2eTMhg5yTL4iXZDzOT52yxOBSOGDB9qFcdBzBGFVDB7sj3tJth5FphqO
+         fb66FwWynTVzT6da1mA5+Xo//fN4GhRMLtLBH/RSPwgo89Oe2EK4OzJg3Qlc56LvrtPD
+         LTbI6cY6yQxXoYPMN53jiDmAf6j+c4h8zJk4ipYcB9/CrGY5BvsmsJ/YFpVm/n3NeO+8
+         BnRiBZkbEmWmhcLGXQv2PHS1ADVT7Mg7HVDUUNStMPfOylbkH6+HYsaP/+aWPupxSdG0
+         KGD7fsv8xjAY0Hfoz6FLpvYZNKzZ1gnEXT7ftGg4iSNhyovtMSf0TxPdD18W9Hq6NcSi
+         NsZw==
+X-Gm-Message-State: AOJu0Yxn4zV+ot8tqOa6H+Z6o641kGchiSBuubwEEN5/HgtqjLBa4zTO
+	U72r7QdMSHoyAqzoEEe4HHAvPP5UI/NRue5KSfDUhSq2qb4jyV3fzcYDCCZf0w==
+X-Gm-Gg: ASbGnct6zke6TxCYBIFZXNgP5OkSNQK2fAufRw6ObapJzTLHZ1hwxTcyUdKLG/UYygx
+	aO1kCX6lJcjn16xz492KobkZkCjeYmzELKBsQXHFn9wjr4mp5zudsuxDytg6/mWmXLX+/yKPg9M
+	O3wQU7MVDrDhgR+kkgGJvG9KtDB2PArVHor9zVlhx6tEB9HBCPl532StrBxu148x/e+tJMJMxq2
+	XIljTX2lA042PVXkcXKxj3Git5bp+sOWtAPDZXY6pGo4RnKqLLrKdgvZ99u33OJR18EqfyvcSek
+	jvMihatRUdZn7Cesz5IYUlaChewbmJ6EyssDwOf3WQ9hmdh4oE3uwLy7LC4ooJ8tJHoZ5EQ+7Pr
+	dkWY0xI5SJ8BtMV5NO1ZFAaXH36GDihlxwWu10G18zLydMZEOIVDcW01r3snasJiTWBDn2CCPd5
+	wB0JILIqMqG1q53voARA==
+X-Google-Smtp-Source: AGHT+IGP/jD8j9T5bVc3y5h5a03SObs5umBqcjVVjud+gIAEXvwpRMT3qkxLA/rs9zDKYn3fg7CDYg==
+X-Received: by 2002:a05:6e02:339d:b0:433:7896:3e51 with SMTP id e9e14a558f8ab-43473d17c00mr57754655ab.2.1762976776844;
+        Wed, 12 Nov 2025 11:46:16 -0800 (PST)
+Received: from [172.17.0.2] ([135.232.232.21])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-434767dc5c7sm8647275ab.33.2025.11.12.11.46.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 11:46:16 -0800 (PST)
+Message-ID: <6914e408.920a0220.14e5a0.1a51@mx.google.com>
+Date: Wed, 12 Nov 2025 11:46:16 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============9122203105699690162=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,1/4] shared/bap: fix channel allocation logic in bt_bap_select()
+In-Reply-To: <5d291ba409a0736f7074a7e42988570d29ac58bb.1762973380.git.pav@iki.fi>
+References: <5d291ba409a0736f7074a7e42988570d29ac58bb.1762973380.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============9122203105699690162==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1022641
-  Home:   https://github.com/bluez/bluez
-  Commit: df0eb54800fd6a95e67841c20a747c495574b559
-      https://github.com/bluez/bluez/commit/df0eb54800fd6a95e67841c20a747c495574b559
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-11-12 (Wed, 12 Nov 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M profiles/audio/bap.c
-    M src/shared/bap.c
-    M src/shared/bap.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  shared/bap: fix channel allocation logic in bt_bap_select()
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1022641
 
-bt_bap_select() does not correctly determine the need for multi-stream
-configurations 6,7,8,9,11(i), as its result depends on whether Audio
-Locations is read before or after the PACs, doesn't work with general
-location bits, etc.
+---Test result---
 
-Fix the procedure to be simpler: create streams for all locations, up to
-a specific number of channels.  By default, limit to max 2 channels per
-direction for compatibility (BAP doesn't have explicit AC with larger
-channel counts.) Also simplify the code.
+Test Summary:
+CheckPatch                    PENDING   0.31 seconds
+GitLint                       PENDING   0.36 seconds
+BuildEll                      PASS      20.39 seconds
+BluezMake                     PASS      627.35 seconds
+MakeCheck                     PASS      19.94 seconds
+MakeDistcheck                 PASS      236.21 seconds
+CheckValgrind                 PASS      292.19 seconds
+CheckSmatch                   WARNING   338.54 seconds
+bluezmakeextell               PASS      178.85 seconds
+IncrementalBuild              PENDING   0.26 seconds
+ScanBuild                     PASS      974.80 seconds
 
-Ignore lpac Locations when selecting: the value mostly makes sense for
-Unicast Server role, but Client and Server cannot use the same value as
-only a few bits can be set. As Client, we should be able to configure
-any Location bits.  The sound server can simply ignore our suggested
-channel allocation if really needed, or use SetConfiguration() API to
-build custom configurations.
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Commit: ddc182953cbe131268e7caea6dcdace3376f333c
-      https://github.com/bluez/bluez/commit/ddc182953cbe131268e7caea6dcdace3376f333c
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-11-12 (Wed, 12 Nov 2025)
-
-  Changed paths:
-    M unit/test-bap.c
-
-  Log Message:
-  -----------
-  test-bap: adjust macros for customizing remote audio locations
-
-Add arguments to customize audio locations, in the macros defining data
-for remote PACS.
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/bap.c:312:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:312:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:312:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: d59c90ad2bff1a9b2311abe3ff7a637870ab1413
-      https://github.com/bluez/bluez/commit/d59c90ad2bff1a9b2311abe3ff7a637870ab1413
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-11-12 (Wed, 12 Nov 2025)
 
-  Changed paths:
-    M unit/test-bap.c
-
-  Log Message:
-  -----------
-  test-bap: add tests for bt_bap_select()
-
-Add basic tests for bt_bap_select(), for configurations in BAP.TS. 4.10.
-
-UCL Select LC3 AC 1 (0a)
-UCL Select LC3 AC 1 (0b)
-UCL Select LC3 AC 1 (0c)
-UCL Select LC3 AC 1 (0d)
-UCL Select LC3 AC 1 (1)
-UCL Select LC3 AC 1 (1a)
-UCL Select LC3 AC 1 (1b)
-UCL Select LC3 AC 1 (1c)
-UCL Select LC3 AC 4 (2)
-UCL Select LC3 AC 4 (2a)
-UCL Select LC3 AC 4 (2b)
-UCL Select LC3 AC 4 (2c)
-UCL Select LC3 AC 2 (0a)
-UCL Select LC3 AC 2 (0b)
-UCL Select LC3 AC 2 (0c)
-UCL Select LC3 AC 2 (0d)
-UCL Select LC3 AC 2 (1)
-UCL Select LC3 AC 2 (1a)
-UCL Select LC3 AC 2 (1b)
-UCL Select LC3 AC 2 (1c)
-UCL Select LC3 AC 10 (2)
-UCL Select LC3 AC 10 (2a)
-UCL Select LC3 AC 10 (2b)
-UCL Select LC3 AC 10 (2c)
-UCL Select LC3 AC 3
-UCL Select LC3 AC 5
-UCL Select LC3 AC 7i
-UCL Select VS AC 7i
-UCL Select LC3 AC 6i
-UCL Select LC3 AC 6ii L
-UCL Select LC3 AC 6ii R
-UCL Select LC3 AC 9i
-UCL Select LC3 AC 9ii L
-UCL Select LC3 AC 9ii R
-UCL Select LC3 AC 8i
-UCL Select LC3 AC 8ii L
-UCL Select LC3 AC 8ii R
-UCL Select LC3 AC 11i
-UCL Select LC3 AC 11ii L
-UCL Select LC3 AC 11ii R
-UCL Select LC3 Many 2
-UCL Select LC3 Many 8
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: a4d2b16130095cde0022ad04b15ced5b324a19fc
-      https://github.com/bluez/bluez/commit/a4d2b16130095cde0022ad04b15ced5b324a19fc
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-11-12 (Wed, 12 Nov 2025)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: don't configure endpoints of all codecs at once
-
-When device is connected we currently try create all streams for all
-endpoints. If there are multiple (= vendor codecs), this likely causes
-creating multiple streams for same location, which is not allowed.
-
-Change it to create streams only for the first endpoint, for each
-direction.
-
-Sound server can later request switching to another endpoint if
-necessary.
-
-
-Compare: https://github.com/bluez/bluez/compare/df0eb54800fd%5E...a4d2b1613009
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============9122203105699690162==--
