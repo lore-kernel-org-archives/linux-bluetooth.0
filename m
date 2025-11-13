@@ -1,154 +1,1156 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425BD2D5C67
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 17:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763056061; cv=none; b=brT0R9mDDyj+jARM1Rl6kqgspI6+mR6uDEO8+CHwCAp2h0HjzyFQpfgKfEroXEjMUHinMcUgB8Q5p4eVyHPJ8gYbeVU1jaDQRGu6xRWzxwIlCJUSPosEaSt8dkQxGS6uIG7R7fqGAOGQAyIJJdZBVfoQMHsf+BXwMG8LK+ZT/Po=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763056061; c=relaxed/simple;
-	bh=FcuHoa9EKv6W36dHde28kohe6c75B3aDeQKTmo1Rq0E=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=K8c7Y+WMgDoeA+t/Y+eNRZziAiFgI+HjxV+oUVzr114ON1iCTk5+iXYuuCmWpy+WD4KeRf9D7y2knbkphRlZIe8m4F8QyjFpwZEJNuiwv55UJ0bRus54V2RrWWFslpjWgJlWgAYiBX3wMqZvlHCAgsVa4wWOMjz8MmCLqxjF5aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BwmIh9Mm; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFB72FBDE2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 17:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763056300; cv=pass; b=b+ZJjqq6soeJ0XKS5/UFAhsKKUgdPMgFCx5hwH9Y3aJQEU0uHSeIUjUV/QAObVZa7DALgC2Wzm9HB9uBkHfScUZgJkKRDm/kBMFHgPcfRfPK/z+Azqndvn981506gD7eYbvMQNG/uJQnEF65gkiB2WOQRu57ghDYMG6hI29RwDU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763056300; c=relaxed/simple;
+	bh=KfiLJVEBIZ/5RE1XVL/OqabwIwabEnmswgRoExNeSDE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=vChsF+BPY9CRTZcfjJRWOD3iitCiu/Z9pMdB6YMe4wZLFStUHpgCTpePGaaCsyGWMKSPx06n/jHZjcktzBWkP+aBZt38l+7NblkkfmEwV/mxCqm8GUH/SXqs9xVdAq2fiIOnkoU+jwtNwPYVURqBf+eZPh3k44hHArtrhbveXWg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=N/fz6b96; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BwmIh9Mm"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8823cde292eso12017616d6.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 09:47:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763056059; x=1763660859; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LfXtq7ResJPVcUk6kkSsWmBKGXqdP5cwXpuRdR217Zw=;
-        b=BwmIh9MmY2c3DZz7yzhcHxL5xIwD2qM6lJuBiIIBqV56/sV/4c8O0t6MFQH2aW4f2c
-         kSqXjx6wmzAiAoiwHPUKZ+fj1bOQhIr9RCh0z7t6xAktYKhQtKH4VVeXSqaxlI12qeYu
-         eRs2OZPCFEGbiw2hiH0bB+TOay57+Rm2HILQngJUiqG+yNJhwDUCFo0p2Vh+7pmPU5Dm
-         V/Z9H0R2k2DyZStXHXY0MtXAOiPltKZoMjB0Xfk1pB169G381vZ3dWhaINV78WGyfgJv
-         ub+5MVdWuUKvjNfQ25XT8xupXEGXf+S9JQtWP+34Cf08ajWh3oeAz0hc0xO1mVKPIK2U
-         L88Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763056059; x=1763660859;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LfXtq7ResJPVcUk6kkSsWmBKGXqdP5cwXpuRdR217Zw=;
-        b=oXpsrYwuBUIH77AKbOCFms8X5HLQAECi1geb4eF37vT+M+jUnrQnVwED+DfmZqJsGj
-         3kN+6BT7znfEnbOnYIu+v/e7r9p2388rEw01iAs98GWXATNMKTJyYN6Rm8ZoYrLmZ7EL
-         8hZRQ45DZE/scZiyCMrBvfjUNl0OfaC7zifYVkFQEAFksYKcGoO/8tC6B1uAzkpZ7dxE
-         57xmqTf0rVqAYyU3ZBSPEWMjszxIn8PJRUfjUblEdBfIssBuT+9hnfDTt6YWVNcU5ITO
-         n7g50PFq49nxmj71CcFSllyHVdFQFQxTnVBuB523vXKNC/qL3Oyjn8IkHsVbCusgF+0m
-         MIvA==
-X-Gm-Message-State: AOJu0YyWcC8hm0fIlEXsztWeofZ8zZBz5c49mV+Se1TaGccODVzdjnCL
-	znEQxZIYpcaS9xdzFOpyhg4gApa7o6d/eGVj7hfJRFn46VAMW96Vk0Hx5zi0mQ==
-X-Gm-Gg: ASbGncsMYZg5q8tJ9tNkx6tdwXvTwIyNSavxwCClBtnsASFJ8VLMcA6ii8qO7FgBg/B
-	QuS/vlTEX9qH2jz1EyQns+N4sU5Z8sATi8/Aa2jnphz2Btt0BF+uOUXiBWzNphJ7d0mRJWU/XYJ
-	GkU7PmlXFmG2FrQ7rwS7/JMn1rCDComUxi5O53Z6YsQX8rvfJjE7OBVFLz+GxkOVbAHu8i2w8z9
-	jWWqvghitjHjM2px1MyrtGIxYG1A2fSfC+4au4g0HVd9nPtgSHp9jFgpZ9rOEqSGNEhipihQfVP
-	DECuedCdHaVhPfmcCvueD/6NQQf27LWHbRhkWN1q5pYZwiMuZZ3145KE45MdTXdnUDSA3hn2XVc
-	3vHo0F1C0eRiMDbbTVaInu4ON70GYEK+hlGeA0uGdwmpu25wfd8NiT2D5Jz89KvQQgPNAc+jflB
-	b0N7rNTVgC1vLdTJRw
-X-Google-Smtp-Source: AGHT+IEfMtcBcmWVgT1n+kbdowTwEo9Ye7bV3kckWnxmg9zB2C6nskC+rlWdtgBAXuQofysulOz6ow==
-X-Received: by 2002:ad4:4ee2:0:b0:882:3156:6180 with SMTP id 6a1803df08f44-88271955d40mr119575956d6.22.1763056058778;
-        Thu, 13 Nov 2025 09:47:38 -0800 (PST)
-Received: from [172.17.0.2] ([4.246.135.160])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8828631454csm16396016d6.18.2025.11.13.09.47.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 09:47:38 -0800 (PST)
-Message-ID: <691619ba.050a0220.32f3e5.4f1e@mx.google.com>
-Date: Thu, 13 Nov 2025 09:47:38 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8919015383555450159=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="N/fz6b96"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4d6nrd2pWZz49PvN;
+	Thu, 13 Nov 2025 19:51:29 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1763056289;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8SNY5lW4PVHl570PeBZ92tzcVNNOOIrhrUUiImXQEtY=;
+	b=N/fz6b962EbJcWiDFbP8fkInFB42CJX/4MaEhdtjlQ7aI8d6LGwvEAU1nRFsDHY1u+Gf6N
+	8fqNVHv375XGYZDBA3yEAIHipcoNUaZotn6Tr7j2xslA2qI6U+r0BH9B93l0O+hpU+fMBO
+	2iSiZHCLDqNrw8UIn/yFEqHn5ijfh8yENgMMXpmF7s07srpE55hhjBeSR53E/Qja78F1Y3
+	dvynMDbrpz98F+NhZOiB5UH8qpxay7aixc70Ul+2+xuwKnvhcl4ItwKMiXqHIwD80WtjNX
+	3SuK5g9CGcjrQ669p3QZ6jNyuEtBRk6Kcw82/d0w6SFAlgbEHcV5F/XdtXOhKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1763056289;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8SNY5lW4PVHl570PeBZ92tzcVNNOOIrhrUUiImXQEtY=;
+	b=CAEdrvtS905ff8eY2FU+02DnbPavolVsX8bhJQHrdEh3Ixh/EAW0Sk9qHLjjU1IBYGBGNB
+	tVBnYVmvi4gJolZuV+8kE09GQdgHmG/2sKfnNAON8RZrr/lvP7osiNpWVzh+Gnks6sJq1M
+	yWlObNiks9S6Soo7c/xLRVQVSgdGkPW6Ahi+kpZdp1tornbcRAZJxCPbnCOM/ZHKlDfxxS
+	HCU8HxlJHWjBsTifgMOPmtMPeH+pxIlrxglXP6crmWGTCE53v41f2QGBB2bANY+fB9TBGf
+	zsXinQery2rzFV9gUXsiyRaQMzYpVEA6nL7JzZqENG+GgcUif7qmDy71BXd8mQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1763056289;
+	b=vMHuUvWqFcxKncKlzApPJxGY6JRYKoX/QvviPEW0nZ59ZogUdDHMLsMq/iWHaIXf5J5Pl7
+	8kifj2O5b8HR2psFuL7aaZ5yt3hFyybH+LpxDSyHgl1Xm9f93KsCBwKomCbyR6/P9ZoFHJ
+	Q+oThoQOC0VSZcZqHqLx7Y36iH9qCvFZ/Qg9QTfSKG9c4ruCexVCyUWgmLKfZJ74+Mx947
+	jhUgiNv5nxDp9lowQsNaxm7tvdqwSgkYO/8n13eZru03+2xI1YJcHEE7HkqlwHQfezTI7L
+	YknX1yKTbcPMS52KB9N/GCKQMHaLm/+VxjxEe3tw/BpjZBXDKIPO7QV8Z7GZ3Q==
+Message-ID: <07e2b93b19cd3750466d43289bc25b0d3fb7ca95.camel@iki.fi>
+Subject: Re: [PATCH BlueZ v2 3/4] test-bap: add tests for bt_bap_select()
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 13 Nov 2025 19:51:28 +0200
+In-Reply-To: <CABBYNZ+CuoWiwqxSbDYGzjkWRrXQwtGBJXSkpLNnibevC7_ydg@mail.gmail.com>
+References: 
+	<69ef74b5d531804f4f793f42032da508d1497d1b.1763052876.git.pav@iki.fi>
+	 <55f2fbe7c18f8c6b04bf8b4af161ceee3ac825c4.1763052876.git.pav@iki.fi>
+	 <CABBYNZ+CuoWiwqxSbDYGzjkWRrXQwtGBJXSkpLNnibevC7_ydg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,v2,1/4] shared/bap: fix channel allocation logic in bt_bap_select()
-In-Reply-To: <69ef74b5d531804f4f793f42032da508d1497d1b.1763052876.git.pav@iki.fi>
-References: <69ef74b5d531804f4f793f42032da508d1497d1b.1763052876.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============8919015383555450159==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+to, 2025-11-13 kello 12:40 -0500, Luiz Augusto von Dentz kirjoitti:
+[clip]
+> Hi Pauli,
+>=20
+> On Thu, Nov 13, 2025 at 12:20=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrot=
+e:
+> >=20
+> > Add basic tests for bt_bap_select(), for configurations in BAP.TS. 4.10=
+.
+> >=20
+> > UCL Select LC3 AC 1 (0a)
+> > UCL Select LC3 AC 1 (0b)
+> > UCL Select LC3 AC 1 (0c)
+> > UCL Select LC3 AC 1 (0d)
+> > UCL Select LC3 AC 1 (1)
+> > UCL Select LC3 AC 1 (1a)
+> > UCL Select LC3 AC 1 (1b)
+> > UCL Select LC3 AC 1 (1c)
+> > UCL Select LC3 AC 4 (2)
+> > UCL Select LC3 AC 4 (2a)
+> > UCL Select LC3 AC 4 (2b)
+> > UCL Select LC3 AC 4 (2c)
+> > UCL Select LC3 AC 2 (0a)
+> > UCL Select LC3 AC 2 (0b)
+> > UCL Select LC3 AC 2 (0c)
+> > UCL Select LC3 AC 2 (0d)
+> > UCL Select LC3 AC 2 (1)
+> > UCL Select LC3 AC 2 (1a)
+> > UCL Select LC3 AC 2 (1b)
+> > UCL Select LC3 AC 2 (1c)
+> > UCL Select LC3 AC 10 (2)
+> > UCL Select LC3 AC 10 (2a)
+> > UCL Select LC3 AC 10 (2b)
+> > UCL Select LC3 AC 10 (2c)
+> > UCL Select LC3 AC 3
+> > UCL Select LC3 AC 5
+> > UCL Select LC3 AC 7i
+> > UCL Select VS AC 7i
+> > UCL Select LC3 AC 6i
+> > UCL Select LC3 AC 6ii L
+> > UCL Select LC3 AC 6ii R
+> > UCL Select LC3 AC 9i
+> > UCL Select LC3 AC 9ii L
+> > UCL Select LC3 AC 9ii R
+> > UCL Select LC3 AC 8i
+> > UCL Select LC3 AC 8ii L
+> > UCL Select LC3 AC 8ii R
+> > UCL Select LC3 AC 11i
+> > UCL Select LC3 AC 11ii L
+> > UCL Select LC3 AC 11ii R
+> > UCL Select LC3 Many 2
+> > UCL Select LC3 Many 8
+>=20
+> These are not the names used by the test specification though, so I
+> wonder what is the thought process here? We probably want something
+> like:
+>=20
+> Test Case ID | ASE Type| Audio Channels/ Locations per ASE | CIS Establis=
+hment
+> BAP/UCL/STR/BV-535-C [UCL, AC 2,Generic] | Source ASE | 1 | Enable
+> ...
+>=20
+> So it reflects exactly what the test specs expect for each test case
+> ID, if you still think there are combinations not covered by these
+> then we can perhaps custom test case ID to cover those, but I'd only
+> consider that once we are done with the tests above.
 
-Dear submitter,
+These tests, aside from the "Many 2/8" ones, are supposed to map
+directly to the BAP.TS test cases.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1023092
+They just do not perform the full BAP.TS test case which cover from
+Idle to CIS Establishment, but only the bt_bap_select() part.
 
----Test result---
+I can change the names of these tests to be along the lines of
 
-Test Summary:
-CheckPatch                    PENDING   0.28 seconds
-GitLint                       PENDING   0.36 seconds
-BuildEll                      PASS      20.20 seconds
-BluezMake                     PASS      623.12 seconds
-MakeCheck                     PASS      20.71 seconds
-MakeDistcheck                 PASS      232.37 seconds
-CheckValgrind                 PASS      287.39 seconds
-CheckSmatch                   WARNING   334.96 seconds
-bluezmakeextell               PASS      173.51 seconds
-IncrementalBuild              PENDING   0.30 seconds
-ScanBuild                     WARNING   974.58 seconds
+"Select BAP/UCL/STR/BV-535-C [UCL, AC 2, Generic]"
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+if that seems better.
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+Having the full tests would be good, but I'd prefer to just add the
+configuration select tests first, and come back at adding the rest
+later when I find time.
 
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:312:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:312:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:312:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-profiles/health/hdp.c:644:3: warning: Use of memory after it is freed
-                hdp_tmp_dc_data_unref(dc_data);
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/health/hdp.c:800:19: warning: Use of memory after it is freed
-                path = g_strdup(chan->path);
-                                ^~~~~~~~~~
-profiles/health/hdp.c:1779:6: warning: Use of memory after it is freed
-                                        hdp_tmp_dc_data_ref(hdp_conn),
-                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/health/hdp.c:1836:30: warning: Use of memory after it is freed
-        reply = g_dbus_create_error(data->msg, ERROR_INTERFACE ".HealthError",
-                                    ^~~~~~~~~
-4 warnings generated.
-profiles/health/hdp_util.c:1052:2: warning: Use of memory after it is freed
-        conn_data->func(conn_data->data, gerr);
-        ^~~~~~~~~~~~~~~
-1 warning generated.
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8919015383555450159==--
+> > ---
+> >=20
+> > Notes:
+> >     v2:
+> >     - fix checking stream counts
+> >     - fix VS test
+> >     - fail tests with tester_test_failed() instead of g_assert()
+> >=20
+> >  unit/test-bap.c | 753 +++++++++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 748 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/unit/test-bap.c b/unit/test-bap.c
+> > index b1d1a42f1..6af6c3871 100644
+> > --- a/unit/test-bap.c
+> > +++ b/unit/test-bap.c
+> > @@ -44,6 +44,12 @@ struct test_config {
+> >         uint8_t state;
+> >         bt_bap_state_func_t state_func;
+> >         uint8_t streams;
+> > +       uint32_t snk_locations[4];
+> > +       uint32_t src_locations[4];
+> > +       struct bt_bap_pac_qos *pac_qos;
+> > +       struct iovec *pac_caps;
+> > +       const struct iovec *setup_data;
+> > +       size_t setup_data_len;
+> >  };
+> >=20
+> >  struct test_data {
+> > @@ -105,6 +111,10 @@ static struct bt_bap_pac_qos lc3_qos =3D {
+> >                 data.caps =3D &lc3_caps;                          \
+> >                 data.qos =3D &lc3_qos;                            \
+> >                 data.cfg =3D _cfg;                                \
+> > +               if (data.cfg && data.cfg->pac_caps)             \
+> > +                       data.caps =3D data.cfg->pac_caps;         \
+> > +               if (data.cfg && data.cfg->pac_qos)              \
+> > +                       data.qos =3D data.cfg->pac_qos;           \
+> >                 data.iovcnt =3D ARRAY_SIZE(iov_data(args));       \
+> >                 data.iov =3D util_iov_dup(iov, ARRAY_SIZE(iov_data(args=
+))); \
+> >                 data.streams =3D queue_new(); \
+> > @@ -325,6 +335,185 @@ static const struct iovec setup_data[] =3D {
+> >         IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a),
+> >  };
+> >=20
+> > +static const struct iovec setup_data_no_location[] =3D {
+> > +       /* ATT: Exchange MTU Response (0x03) len 2
+> > +        *   Server RX MTU: 64
+> > +        */
+> > +       IOV_DATA(0x02, 0x40, 0x00),
+> > +       /* ATT: Exchange MTU Request (0x02) len 2
+> > +        *    Client RX MTU: 64
+> > +        */
+> > +       IOV_DATA(0x03, 0x40, 0x00),
+> > +       /* ATT: Read By Type Request (0x08) len 6
+> > +        *   Handle range: 0x0001-0xffff
+> > +        *   Attribute type: Server Supported Features (0x2b3a)
+> > +        */
+> > +       IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x3a, 0x2b),
+> > +       /* ATT: Error Response (0x01) len 4
+> > +        *   Read By Type Request (0x08)
+> > +        *   Handle: 0x0001
+> > +        *   Error: Attribute Not Found (0x0a)
+> > +        */
+> > +       IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a),
+> > +       /*
+> > +        * ATT: Read By Group Type Request (0x10) len 6
+> > +        *   Handle range: 0x0001-0xffff
+> > +        *   Attribute group type: Primary Service (0x2800)
+> > +        */
+> > +       IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+> > +       /*
+> > +        * ATT: Read By Group Type Response (0x11) len 37
+> > +        *   Attribute data length: 6
+> > +        *   Attribute group list: 2 entries
+> > +        *   Handle range: 0x0001-0x0013
+> > +        *   UUID: Published Audio Capabilities (0x1850)
+> > +        *   Handle range: 0x0014-0x0023
+> > +        *   UUID: Audio Stream Control (0x184e)
+> > +        */
+> > +       IOV_DATA(0x11, 0x06,
+> > +               0x01, 0x00, 0x13, 0x00, 0x50, 0x18,
+> > +               0x14, 0x00, 0x23, 0x00, 0x4e, 0x18),
+> > +       /* ATT: Read By Group Type Request (0x10) len 6
+> > +        *   Handle range: 0x0024-0xffff
+> > +        *   Attribute group type: Primary Service (0x2800)
+> > +        */
+> > +       IOV_DATA(0x10, 0x24, 0x00, 0xff, 0xff, 0x00, 0x28),
+> > +       /* ATT: Error Response (0x01) len 4
+> > +        *   Read By Group Type Request (0x10)
+> > +        *   Handle: 0x0024
+> > +        *   Error: Attribute Not Found (0x0a)
+> > +        */
+> > +       IOV_DATA(0x01, 0x10, 0x24, 0x00, 0x0a),
+> > +       /* ATT: Read By Group Type Request (0x10) len 6
+> > +        *   Handle range: 0x0001-0xffff
+> > +        *   Attribute group type: Secondary Service (0x2801)
+> > +        */
+> > +       IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),
+> > +       /* ATT: Error Response (0x01) len 4
+> > +        *   Read By Group Type Request (0x10)
+> > +        *   Handle: 0x0001
+> > +        *   Error: Attribute Not Found (0x0a)
+> > +        */
+> > +       IOV_DATA(0x01, 0x10, 0x01, 0x00, 0x0a),
+> > +       /* ATT: Read By Type Request (0x08) len 6
+> > +        *   Handle range: 0x0001-0x0023
+> > +        *   Attribute group type: Include (0x2802)
+> > +        */
+> > +       IOV_DATA(0x08, 0x01, 0x00, 0x23, 0x00, 0x02, 0x28),
+> > +       /* ATT: Error Response (0x01) len 4
+> > +        *   Read By Group Type Request (0x10)
+> > +        *   Handle: 0x0001
+> > +        *   Error: Attribute Not Found (0x0a)
+> > +        */
+> > +       IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a),
+> > +       /* ATT: Read By Type Request (0x08) len 6
+> > +        *   Handle range: 0x0001-0x0023
+> > +        *   Attribute type: Characteristic (0x2803)
+> > +        */
+> > +       IOV_DATA(0x08, 0x01, 0x00, 0x23, 0x00, 0x03, 0x28),
+> > +       /* ATT: Read By Type Response (0x09) len 57
+> > +        * Attribute data length: 7
+> > +        * Attribute data list: 8 entries
+> > +        *   Handle: 0x0002
+> > +        *   Value: 120300c92b
+> > +        *   Properties: 0x12
+> > +        *     Read (0x02)
+> > +        *     Notify (0x10)
+> > +        *   Value Handle: 0x0003
+> > +        *   Value UUID: Sink PAC (0x2bc9)
+> > +        *   Handle: 0x0008
+> > +        *   Value: 120900cb2b
+> > +        *   Properties: 0x12
+> > +        *     Read (0x02)
+> > +        *     Notify (0x10)
+> > +        *   Value Handle: 0x0009
+> > +        *   Value UUID: Source PAC (0x2bcb)
+> > +        *  Handle: 0x000e
+> > +        *  Value: 120f00cd2b
+> > +        *  Properties: 0x12
+> > +        *    Read (0x02)
+> > +        *    Notify (0x10)
+> > +        *  Value Handle: 0x000f
+> > +        *  Value UUID: Available Audio Contexts (0x2bcd)
+> > +        *  Handle: 0x0011
+> > +        *  Value: 121200ce2b
+> > +        *  Properties: 0x12
+> > +        *    Read (0x02)
+> > +        *    Notify (0x10)
+> > +        *  Value Handle: 0x0012
+> > +        *  Value UUID: Supported Audio Contexts (0x2bce)
+> > +        *  Handle: 0x0015
+> > +        *  Value: 121600c42b
+> > +        *  Properties: 0x12
+> > +        *    Read (0x02)
+> > +        *    Notify (0x10)
+> > +        *  Value Handle: 0x0016
+> > +        *  Value UUID: Sink ASE (0x2bc4)
+> > +        *   Handle: 0x001b
+> > +        *   Value: 121c00c52b
+> > +        *   Properties: 0x12
+> > +        *     Read (0x02)
+> > +        *     Notify (0x10)
+> > +        *   Value Handle: 0x001c
+> > +        *   Value UUID: Source ASE (0x2bc5)
+> > +        *   Handle: 0x0021
+> > +        *   Value: 182200c62b
+> > +        *   Properties: 0x18
+> > +        *     Write (0x08)
+> > +        *     Notify (0x10)
+> > +        *   Value Handle: 0x0022
+> > +        *   Value UUID: ASE Control Point (0x2bc6)
+> > +        */
+> > +       IOV_DATA(0x09, 0x07,
+> > +               /* keep same IDs as above, leaving holes */
+> > +               0x02, 0x00, 0x12, 0x03, 0x00, 0xc9, 0x2b,
+> > +               0x08, 0x00, 0x12, 0x09, 0x00, 0xcb, 0x2b,
+> > +               0x0e, 0x00, 0x12, 0x0f, 0x00, 0xcd, 0x2b,
+> > +               0x11, 0x00, 0x12, 0x12, 0x00, 0xce, 0x2b,
+> > +               0x15, 0x00, 0x12, 0x16, 0x00, 0xc4, 0x2b,
+> > +               0x1b, 0x00, 0x12, 0x1c, 0x00, 0xc5, 0x2b,
+> > +               0x21, 0x00, 0x18, 0x22, 0x00, 0xc6, 0x2b),
+> > +       /* ATT: Read By Type Request (0x08) len 6
+> > +        *   Handle range: 0x0022-0x0023
+> > +        *   Attribute type: Characteristic (0x2803)
+> > +        */
+> > +       IOV_DATA(0x08, 0x22, 0x00, 0x23, 0x00, 0x03, 0x28),
+> > +       /* ATT: Error Response (0x01) len 4
+> > +        *   Read By Type Request (0x08)
+> > +        *   Handle: 0x0022
+> > +        *   Error: Attribute Not Found (0x0a)
+> > +        */
+> > +       IOV_DATA(0x01, 0x08, 0x22, 0x00, 0x0a),
+> > +       /* ATT: Find Information Request (0x04) */
+> > +       IOV_DATA(0x04, 0x04, 0x00, 0x07, 0x00),
+> > +       /* ATT: Error Response */
+> > +       IOV_DATA(0x01, 0x04, 0x04, 0x00, 0x0a),
+> > +       /* ATT: Find Information Request (0x04) */
+> > +       IOV_DATA(0x04, 0x0a, 0x00, 0x0d, 0x00),
+> > +       /* ATT: Error Response */
+> > +       IOV_DATA(0x01, 0x04, 0x0a, 0x00, 0x0a),
+> > +       /* ATT: Find Information Request (0x04) */
+> > +       IOV_DATA(0x04, 0x17, 0x00, 0x1a, 0x00),
+> > +       /* ATT: Error Response */
+> > +       IOV_DATA(0x01, 0x04, 0x17, 0x00, 0x0a),
+> > +       /* ATT: Find Information Request (0x04) */
+> > +       IOV_DATA(0x04, 0x1d, 0x00, 0x20, 0x00),
+> > +       /* ATT: Error Response */
+> > +       IOV_DATA(0x01, 0x04, 0x1d, 0x00, 0x0a),
+> > +       /* ACL Data TX: Handle 42 flags 0x00 dlen 11
+> > +        *   ATT: Read By Type Request (0x08) len 6
+> > +        *   Handle range: 0x0001-0xffff
+> > +        *   Attribute type: Database Hash (0x2b2a)
+> > +        */
+> > +       IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x2a, 0x2b),
+> > +       /* ATT: Error Response (0x01) len 4
+> > +        *   Read By Type Request (0x08)
+> > +        *   Handle: 0x0001
+> > +        *   Error: Attribute Not Found (0x0a)
+> > +        */
+> > +       IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a),
+> > +};
+> > +
+> >  static void print_debug(const char *str, void *user_data)
+> >  {
+> >         const char *prefix =3D user_data;
+> > @@ -340,7 +529,11 @@ static void test_setup(const void *user_data)
+> >         struct gatt_db *db;
+> >         struct io *io;
+> >=20
+> > -       io =3D tester_setup_io(setup_data, ARRAY_SIZE(setup_data));
+> > +       if (!data->cfg || !data->cfg->setup_data)
+> > +               io =3D tester_setup_io(setup_data, ARRAY_SIZE(setup_dat=
+a));
+> > +       else
+> > +               io =3D tester_setup_io(data->cfg->setup_data,
+> > +                                               data->cfg->setup_data_l=
+en);
+> >         g_assert(io);
+> >=20
+> >         att =3D bt_att_new(io_get_fd(io), false);
+> > @@ -454,11 +647,13 @@ static void test_setup_pacs(struct test_data *dat=
+a)
+> >                                                         "test-bap-snk",
+> >                                                         BT_BAP_SINK, 0x=
+0ff,
+> >                                                         0x0001, 0x0001,
+> > -                                                       NULL, data->cap=
+s, NULL);
+> > +                                                       data->qos, data=
+->caps,
+> > +                                                       NULL);
+> >                 else
+> >                         data->snk =3D bt_bap_add_pac(data->db, "test-ba=
+p-snk",
+> >                                                         BT_BAP_SINK, LC=
+3_ID,
+> > -                                                       NULL, data->cap=
+s, NULL);
+> > +                                                       data->qos, data=
+->caps,
+> > +                                                       NULL);
+> >                 g_assert(data->snk);
+> >         }
+> >=20
+> > @@ -468,11 +663,13 @@ static void test_setup_pacs(struct test_data *dat=
+a)
+> >                                                         "test-bap-src",
+> >                                                         BT_BAP_SOURCE, =
+0x0ff,
+> >                                                         0x0001, 0x0001,
+> > -                                                       NULL, data->cap=
+s, NULL);
+> > +                                                       data->qos, data=
+->caps,
+> > +                                                       NULL);
+> >                 else
+> >                         data->src =3D bt_bap_add_pac(data->db, "test-ba=
+p-src",
+> >                                                         BT_BAP_SOURCE, =
+LC3_ID,
+> > -                                                       NULL, data->cap=
+s, NULL);
+> > +                                                       data->qos, data=
+->caps,
+> > +                                                       NULL);
+> >                 g_assert(data->src);
+> >         }
+> >  }
+> > @@ -8686,6 +8883,551 @@ static void test_bsrc_str(void)
+> >         test_bsrc_str_2b();
+> >  }
+> >=20
+> > +/*
+> > + * Configuration selection: check example cases for BAP AC.
+> > + */
+> > +
+> > +#define LC3_PAC_CAPS_NO_COUNT \
+> > +       0x06, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x03, 0x01, \
+> > +       0xff, 0x00, 0x02, 0x02, 0x03, 0x05, 0x04, \
+> > +       0x1a, 0x00, 0xf0, 0x00, 0x00
+> > +
+> > +#define UNKNOWN_PAC_CAPS \
+> > +       0xff, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00
+> > +
+> > +/* BAP.TS 4.10.1 configurations */
+> > +#define DISC_SELECT_SNK(loc, caps) \
+> > +       DISC_SRC_ASE(loc, 0, IOV_CONTENT(caps), UNKNOWN_PAC_CAPS)
+> > +
+> > +#define DISC_SELECT_SNK_NO_LOC(caps) \
+> > +       DISC_SRC_ASE_NO_LOCATION(IOV_CONTENT(caps), UNKNOWN_PAC_CAPS)
+> > +
+> > +#define DISC_SELECT_SRC(loc, caps) \
+> > +       DISC_SRC_ASE(0, loc, UNKNOWN_PAC_CAPS, IOV_CONTENT(caps))
+> > +
+> > +#define DISC_SELECT_SRC_NO_LOC(caps) \
+> > +       DISC_SRC_ASE_NO_LOCATION(UNKNOWN_PAC_CAPS, IOV_CONTENT(caps))
+> > +
+> > +#define DISC_SELECT_LC3_AC1_0a DISC_SELECT_SNK(0, LC3_PAC_CAPS(0x01))
+> > +#define DISC_SELECT_LC3_AC1_0b DISC_SELECT_SNK(0, LC3_PAC_CAPS_NO_COUN=
+T)
+> > +#define DISC_SELECT_LC3_AC1_0c DISC_SELECT_SNK_NO_LOC(LC3_PAC_CAPS(0x0=
+1))
+> > +#define DISC_SELECT_LC3_AC1_0d DISC_SELECT_SNK_NO_LOC(LC3_PAC_CAPS_NO_=
+COUNT)
+> > +
+> > +#define DISC_SELECT_LC3_AC1_1  DISC_SELECT_SNK(0x2, LC3_PAC_CAPS(0x01)=
+)
+> > +#define DISC_SELECT_LC3_AC1_1a DISC_SELECT_SNK(0x2, LC3_PAC_CAPS(0x03)=
+)
+> > +#define DISC_SELECT_LC3_AC1_1b DISC_SELECT_SNK(0x22, LC3_PAC_CAPS(0x01=
+))
+> > +#define DISC_SELECT_LC3_AC1_1c DISC_SELECT_SNK(0x22, LC3_PAC_CAPS(0x03=
+))
+> > +
+> > +#define DISC_SELECT_LC3_AC4_2  DISC_SELECT_SNK(0x44, LC3_PAC_CAPS(0x02=
+))
+> > +#define DISC_SELECT_LC3_AC4_2a DISC_SELECT_SNK(0x44, LC3_PAC_CAPS(0x03=
+))
+> > +#define DISC_SELECT_LC3_AC4_2b DISC_SELECT_SNK(0x444, LC3_PAC_CAPS(0x0=
+2))
+> > +#define DISC_SELECT_LC3_AC4_2c DISC_SELECT_SNK(0x444, LC3_PAC_CAPS(0x0=
+3))
+> > +
+> > +#define DISC_SELECT_LC3_AC2_0a DISC_SELECT_SRC(0, LC3_PAC_CAPS(0x01))
+> > +#define DISC_SELECT_LC3_AC2_0b DISC_SELECT_SRC(0, LC3_PAC_CAPS_NO_COUN=
+T)
+> > +#define DISC_SELECT_LC3_AC2_0c DISC_SELECT_SRC_NO_LOC(LC3_PAC_CAPS(0x0=
+1))
+> > +#define DISC_SELECT_LC3_AC2_0d DISC_SELECT_SRC_NO_LOC(LC3_PAC_CAPS_NO_=
+COUNT)
+> > +
+> > +#define DISC_SELECT_LC3_AC2_1  DISC_SELECT_SRC(0x2, LC3_PAC_CAPS(0x01)=
+)
+> > +#define DISC_SELECT_LC3_AC2_1a DISC_SELECT_SRC(0x2, LC3_PAC_CAPS(0x03)=
+)
+> > +#define DISC_SELECT_LC3_AC2_1b DISC_SELECT_SRC(0x22, LC3_PAC_CAPS(0x01=
+))
+> > +#define DISC_SELECT_LC3_AC2_1c DISC_SELECT_SRC(0x22, LC3_PAC_CAPS(0x03=
+))
+> > +
+> > +#define DISC_SELECT_LC3_AC10_2 DISC_SELECT_SRC(0x44, LC3_PAC_CAPS(0x02=
+))
+> > +#define DISC_SELECT_LC3_AC10_2a        DISC_SELECT_SRC(0x44, LC3_PAC_C=
+APS(0x03))
+> > +#define DISC_SELECT_LC3_AC10_2b        DISC_SELECT_SRC(0x444, LC3_PAC_=
+CAPS(0x02))
+> > +#define DISC_SELECT_LC3_AC10_2c        DISC_SELECT_SRC(0x444, LC3_PAC_=
+CAPS(0x03))
+> > +
+> > +/* BAP.TS 4.10.2 configurations */
+> > +#define DISC_SELECT_VS_AC1_1   DISC_SELECT_SNK(0x2, VS_PAC_CAPS_NO_COU=
+NT)
+> > +#define DISC_SELECT_VS_AC1_2   DISC_SELECT_SNK(0x44, VS_PAC_CAPS(0x01)=
+)
+> > +#define DISC_SELECT_VS_AC2_1   DISC_SELECT_SRC(0x2, VS_PAC_CAPS_NO_COU=
+NT)
+> > +#define DISC_SELECT_VS_AC2_2   DISC_SELECT_SRC(0x44, VS_PAC_CAPS(0x01)=
+)
+> > +
+> > +/* BAP.TS 4.10.3 configurations
+> > + * Assumed Channels/Locations applies only to Sink ASE, as it's suppos=
+ed
+> > + * to test AC 3, 5, 7(i)
+> > + */
+> > +#define DISC_SELECT_LC3_AC3    DISC_SRC_ASE(0x1, 0x1, LC3_PAC_CAPS(0x0=
+1), \
+> > +                                                       LC3_PAC_CAPS(0x=
+01))
+> > +#define DISC_SELECT_LC3_AC5    DISC_SRC_ASE(0x22, 0x2, LC3_PAC_CAPS(0x=
+02), \
+> > +                                                       LC3_PAC_CAPS(0x=
+01))
+> > +#define DISC_SELECT_LC3_AC7i   DISC_SRC_ASE(0x4, 0x4, LC3_PAC_CAPS(0x0=
+1), \
+> > +                                                       LC3_PAC_CAPS(0x=
+01))
+> > +
+> > +/* BAP.TS 4.10.4 configurations */
+> > +#define DISC_SELECT_VS_AC3     DISC_SRC_ASE(0x1, 0x1, VS_PAC_CAPS(0x01=
+), \
+> > +                                                       VS_PAC_CAPS(0x0=
+1))
+> > +#define DISC_SELECT_VS_AC5     DISC_SRC_ASE(0x22, 0x2, VS_PAC_CAPS(0x0=
+2), \
+> > +                                                       VS_PAC_CAPS(0x0=
+1))
+> > +#define DISC_SELECT_VS_AC7i    DISC_SRC_ASE(0x4, 0x4, VS_PAC_CAPS(0x01=
+), \
+> > +                                                       VS_PAC_CAPS(0x0=
+1))
+> > +
+> > +/* BAP.TS 4.10.5 configurations */
+> > +#define DISC_SELECT_LC3_AC7ii_L        DISC_SELECT_SNK(0x01, LC3_PAC_C=
+APS(0x01))
+> > +#define DISC_SELECT_LC3_AC7ii_R        DISC_SELECT_SRC(0x10, LC3_PAC_C=
+APS(0x01))
+> > +
+> > +/* BAP.TS 4.10.6 configurations */
+> > +#define DISC_SELECT_LC3_AC6i   DISC_SELECT_SNK(0x11, LC3_PAC_CAPS(0x01=
+))
+> > +#define DISC_SELECT_VS_AC6i    DISC_SELECT_SNK(0x11, VS_PAC_CAPS(0x01)=
+)
+> > +
+> > +/* BAP.TS 4.10.7 configurations */
+> > +#define DISC_SELECT_LC3_AC6ii_L        DISC_SELECT_SNK(0x01, LC3_PAC_C=
+APS(0x01))
+> > +#define DISC_SELECT_LC3_AC6ii_R        DISC_SELECT_SNK(0x10, LC3_PAC_C=
+APS(0x01))
+> > +#define DISC_SELECT_VS_AC6ii_L DISC_SELECT_SNK(0x01, VS_PAC_CAPS(0x01)=
+)
+> > +#define DISC_SELECT_VS_AC6ii_R DISC_SELECT_SNK(0x10, VS_PAC_CAPS(0x01)=
+)
+> > +
+> > +/* BAP.TS 4.10.8 configurations */
+> > +#define DISC_SELECT_LC3_AC9i   DISC_SELECT_SRC(0x11, LC3_PAC_CAPS(0x01=
+))
+> > +#define DISC_SELECT_VS_AC9i    DISC_SELECT_SRC(0x11, VS_PAC_CAPS(0x01)=
+)
+> > +
+> > +/* BAP.TS 4.10.9 configurations */
+> > +#define DISC_SELECT_LC3_AC9ii_L DISC_SELECT_SRC(0x01, LC3_PAC_CAPS(0x0=
+1))
+> > +#define DISC_SELECT_LC3_AC9ii_R        DISC_SELECT_SRC(0x10, LC3_PAC_C=
+APS(0x01))
+> > +
+> > +/* BAP.TS 4.10.10 configurations */
+> > +#define DISC_SELECT_LC3_AC8i   DISC_SRC_ASE(0x11, 0x02, \
+> > +                                       LC3_PAC_CAPS(0x01), LC3_PAC_CAP=
+S(0x01))
+> > +
+> > +/* BAP.TS 4.10.11 configurations */
+> > +#define DISC_SELECT_LC3_AC8ii_L        DISC_SELECT_SNK(0x1, LC3_PAC_CA=
+PS(0x01))
+> > +#define DISC_SELECT_LC3_AC8ii_R        DISC_SRC_ASE(0x10, 0x2, \
+> > +                                       LC3_PAC_CAPS(0x01), LC3_PAC_CAP=
+S(0x01))
+> > +
+> > +/* BAP.TS 4.10.12 configurations */
+> > +#define DISC_SELECT_LC3_AC11i  DISC_SRC_ASE(0x11, 0x22, \
+> > +                                       LC3_PAC_CAPS(0x01), LC3_PAC_CAP=
+S(0x01))
+> > +
+> > +/* BAP.TS 4.10.13 configurations */
+> > +#define DISC_SELECT_LC3_AC11ii_L DISC_SRC_ASE(0x01, 0x02, \
+> > +                                       LC3_PAC_CAPS(0x01), LC3_PAC_CAP=
+S(0x01))
+> > +#define DISC_SELECT_LC3_AC11ii_R DISC_SRC_ASE(0x10, 0x20, \
+> > +                                       LC3_PAC_CAPS(0x01), LC3_PAC_CAP=
+S(0x01))
+> > +#define DISC_SELECT_VS_AC11i_L DISC_SRC_ASE(0x01, 0x02, \
+> > +                                       VS_PAC_CAPS(0x01), VS_PAC_CAPS(=
+0x01))
+> > +#define DISC_SELECT_VS_AC11i_R DISC_SRC_ASE(0x10, 0x20, \
+> > +                                       VS_PAC_CAPS(0x01), VS_PAC_CAPS(=
+0x01))
+> > +
+> > +/* Expected bt_bap_select() results */
+> > +
+> > +static struct test_config cfg_select_ac1_0ab =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0, -1 },
+> > +       .src_locations =3D { -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac1_0cd =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0, -1 },
+> > +       .src_locations =3D { -1 },
+> > +       .setup_data =3D setup_data_no_location,
+> > +       .setup_data_len =3D ARRAY_SIZE(setup_data_no_location),
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac1_1 =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .streams =3D 1,  /* force 1 channel; caps support also AC 4 & 6=
+(i) */
+> > +       .snk_locations =3D { 0x2, -1 },
+> > +       .src_locations =3D { -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac4_2 =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x44, -1 },
+> > +       .src_locations =3D { -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac2_0ab =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { -1 },
+> > +       .src_locations =3D { 0, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac2_0cd =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { -1 },
+> > +       .src_locations =3D { 0, -1 },
+> > +       .setup_data =3D setup_data_no_location,
+> > +       .setup_data_len =3D ARRAY_SIZE(setup_data_no_location),
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac2_1 =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .streams =3D 1,
+> > +       .snk_locations =3D { -1 },
+> > +       .src_locations =3D { 0x2, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac10_2 =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { -1 },
+> > +       .src_locations =3D { 0x44, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac3 =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x1, -1 },
+> > +       .src_locations =3D { 0x1, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac5 =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x22, -1 },
+> > +       .src_locations =3D { 0x2, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac7i =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x4, -1 },
+> > +       .src_locations =3D { 0x4, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_vs_ac7i =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x4, -1 },
+> > +       .src_locations =3D { 0x4, -1 },
+> > +       .vs =3D true,
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac6i =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x1, 0x10, -1 },
+> > +       .src_locations =3D { -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac6ii_L =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x1, -1 },
+> > +       .src_locations =3D { -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac6ii_R =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x10, -1 },
+> > +       .src_locations =3D { -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac9i =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { -1 },
+> > +       .src_locations =3D { 0x1, 0x10, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac9ii_L =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { -1 },
+> > +       .src_locations =3D { 0x1, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac9ii_R =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { -1 },
+> > +       .src_locations =3D { 0x10, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac8i =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x1, 0x10, -1 },
+> > +       .src_locations =3D { 0x2, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac8ii_L =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x1, -1 },
+> > +       .src_locations =3D { -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac8ii_R =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x10, -1 },
+> > +       .src_locations =3D { 0x2, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac11i =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x1, 0x10, -1 },
+> > +       .src_locations =3D { 0x2, 0x20, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac11ii_L =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x1, -1 },
+> > +       .src_locations =3D { 0x2, -1 },
+> > +};
+> > +
+> > +static struct test_config cfg_select_ac11ii_R =3D {
+> > +       .snk =3D true,
+> > +       .src =3D true,
+> > +       .snk_locations =3D { 0x10, -1 },
+> > +       .src_locations =3D { 0x20, -1 },
+> > +};
+> > +
+> > +/* Additional bt_bap_select() tests */
+> > +
+> > +#define DISC_SELECT_MANY \
+> > +       DISC_SRC_ASE(0x000000ff, 0, LC3_PAC_CAPS(0xf), UNKNOWN_PAC_CAPS=
+)
+> > +
+> > +static struct iovec caps_select_snk_many =3D
+> > +       LC3_CAPABILITIES(LC3_FREQ_ANY, LC3_DURATION_ANY, 0x0a, 26, 240)=
+;
+> > +
+> > +static struct test_config cfg_select_many_2 =3D {
+> > +       .snk =3D true,
+> > +       .snk_locations =3D { 0x00000003, -1 },
+> > +       .src_locations =3D { -1 },
+> > +       .pac_caps =3D &caps_select_snk_many,
+> > +};
+> > +
+> > +static struct test_config cfg_select_many_8 =3D {
+> > +       .snk =3D true,
+> > +       .streams =3D 8,
+> > +       .snk_locations =3D { 0x0000000f, 0x000000f0, -1 },
+> > +       .src_locations =3D { -1 },
+> > +       .pac_caps =3D &caps_select_snk_many,
+> > +};
+> > +
+> > +struct test_select_data {
+> > +       struct test_data *data;
+> > +       unsigned int num_src;
+> > +       unsigned int num_snk;
+> > +       uint32_t src_locations[4];
+> > +       uint32_t snk_locations[4];
+> > +};
+> > +
+> > +static bool test_select_pac(struct bt_bap_pac *lpac, struct bt_bap_pac=
+ *rpac,
+> > +                                                               void *u=
+ser_data)
+> > +{
+> > +       struct test_select_data *sdata =3D user_data;
+> > +       struct test_config *cfg =3D sdata->data->cfg;
+> > +       int err, count =3D 0;
+> > +
+> > +       err =3D bt_bap_select(sdata->data->bap, lpac, rpac, cfg->stream=
+s, &count,
+> > +                                                       (void *)0x1, sd=
+ata);
+> > +       if (err)
+> > +               tester_test_failed();
+> > +
+> > +       return false;
+> > +}
+> > +
+> > +static void bap_select_ready(struct bt_bap *bap, void *user_data)
+> > +{
+> > +       struct test_select_data sdata =3D {
+> > +               .data =3D (void *)user_data,
+> > +       };
+> > +       struct test_config *cfg =3D sdata.data->cfg;
+> > +       unsigned int i;
+> > +
+> > +       bt_bap_foreach_pac(bap, BT_BAP_SINK, test_select_pac, &sdata);
+> > +       bt_bap_foreach_pac(bap, BT_BAP_SOURCE, test_select_pac, &sdata)=
+;
+> > +
+> > +       for (i =3D 0; i < sdata.num_snk; ++i)
+> > +               if (sdata.snk_locations[i] !=3D cfg->snk_locations[i])
+> > +                       goto fail;
+> > +       if (i < ARRAY_SIZE(cfg->snk_locations) &&
+> > +                       cfg->snk_locations[i] !=3D (uint32_t)-1)
+> > +               goto fail;
+> > +
+> > +       for (i =3D 0; i < sdata.num_src; ++i)
+> > +               if (sdata.src_locations[i] !=3D cfg->src_locations[i])
+> > +                       goto fail;
+> > +       if (i < ARRAY_SIZE(cfg->src_locations) &&
+> > +                       cfg->src_locations[i] !=3D (uint32_t)-1)
+> > +               goto fail;
+> > +
+> > +       tester_test_passed();
+> > +       return;
+> > +
+> > +fail:
+> > +       tester_test_failed();
+> > +}
+> > +
+> > +static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac=
+,
+> > +                       uint32_t location, struct bt_bap_pac_qos *qos,
+> > +                       bt_bap_pac_select_t cb, void *cb_data, void *us=
+er_data)
+> > +{
+> > +       struct test_select_data *sdata =3D cb_data;
+> > +
+> > +       if (bt_bap_pac_get_type(rpac) =3D=3D BT_BAP_SINK) {
+> > +               if (sdata->num_snk >=3D ARRAY_SIZE(sdata->snk_locations=
+))
+> > +                       goto fail;
+> > +               tester_debug("select SNK 0x%08x", location);
+> > +               sdata->snk_locations[sdata->num_snk++] =3D location;
+> > +       } else {
+> > +               if (sdata->num_src >=3D ARRAY_SIZE(sdata->src_locations=
+))
+> > +                       goto fail;
+> > +               tester_debug("select SRC 0x%08x", location);
+> > +               sdata->src_locations[sdata->num_src++] =3D location;
+> > +       }
+> > +
+> > +       return 0;
+> > +
+> > +fail:
+> > +       tester_test_failed();
+> > +       return 0;
+> > +}
+> > +
+> > +static struct bt_bap_pac_ops test_select_pac_ops =3D {
+> > +       .select =3D pac_select,
+> > +};
+> > +
+> > +static void test_select(const void *user_data)
+> > +{
+> > +       struct test_data *data =3D (void *)user_data;
+> > +       struct io *io;
+> > +
+> > +       io =3D tester_setup_io(data->iov, data->iovcnt);
+> > +       g_assert(io);
+> > +
+> > +       tester_io_set_complete_func(NULL);
+> > +
+> > +       data->db =3D gatt_db_new();
+> > +       g_assert(data->db);
+> > +
+> > +       test_setup_pacs(data);
+> > +
+> > +       if (data->snk)
+> > +               bt_bap_pac_set_ops(data->snk, &test_select_pac_ops, NUL=
+L);
+> > +       if (data->src)
+> > +               bt_bap_pac_set_ops(data->src, &test_select_pac_ops, NUL=
+L);
+> > +
+> > +       data->bap =3D bt_bap_new(data->db, bt_gatt_client_get_db(data->=
+client));
+> > +       g_assert(data->bap);
+> > +
+> > +       bt_bap_set_debug(data->bap, print_debug, "bt_bap:", NULL);
+> > +
+> > +       bt_bap_ready_register(data->bap, bap_select_ready, data, NULL);
+> > +
+> > +       bt_bap_attach(data->bap, data->client);
+> > +}
+> > +
+> > +static void test_ucl_select(void)
+> > +{
+> > +       define_test("UCL Select LC3 AC 1 (0a)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac1_0ab, DISC_SELECT_LC3_AC=
+1_0a);
+> > +       define_test("UCL Select LC3 AC 1 (0b)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac1_0ab, DISC_SELECT_LC3_AC=
+1_0b);
+> > +       define_test("UCL Select LC3 AC 1 (0c)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac1_0cd, DISC_SELECT_LC3_AC=
+1_0c);
+> > +       define_test("UCL Select LC3 AC 1 (0d)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac1_0cd, DISC_SELECT_LC3_AC=
+1_0d);
+> > +
+> > +       define_test("UCL Select LC3 AC 1 (1)", test_setup, test_select,
+> > +                               &cfg_select_ac1_1, DISC_SELECT_LC3_AC1_=
+1);
+> > +       define_test("UCL Select LC3 AC 1 (1a)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac1_1, DISC_SELECT_LC3_AC1_=
+1a);
+> > +       define_test("UCL Select LC3 AC 1 (1b)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac1_1, DISC_SELECT_LC3_AC1_=
+1b);
+> > +       define_test("UCL Select LC3 AC 1 (1c)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac1_1, DISC_SELECT_LC3_AC1_=
+1c);
+> > +
+> > +       define_test("UCL Select LC3 AC 4 (2)", test_setup, test_select,
+> > +                               &cfg_select_ac4_2, DISC_SELECT_LC3_AC4_=
+2);
+> > +       define_test("UCL Select LC3 AC 4 (2a)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac4_2, DISC_SELECT_LC3_AC4_=
+2a);
+> > +       define_test("UCL Select LC3 AC 4 (2b)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac4_2, DISC_SELECT_LC3_AC4_=
+2b);
+> > +       define_test("UCL Select LC3 AC 4 (2c)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac4_2, DISC_SELECT_LC3_AC4_=
+2c);
+> > +
+> > +       define_test("UCL Select LC3 AC 2 (0a)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac2_0ab, DISC_SELECT_LC3_AC=
+2_0a);
+> > +       define_test("UCL Select LC3 AC 2 (0b)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac2_0ab, DISC_SELECT_LC3_AC=
+2_0b);
+> > +       define_test("UCL Select LC3 AC 2 (0c)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac2_0cd, DISC_SELECT_LC3_AC=
+2_0c);
+> > +       define_test("UCL Select LC3 AC 2 (0d)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac2_0cd, DISC_SELECT_LC3_AC=
+2_0d);
+> > +
+> > +       define_test("UCL Select LC3 AC 2 (1)", test_setup, test_select,
+> > +                               &cfg_select_ac2_1, DISC_SELECT_LC3_AC2_=
+1);
+> > +       define_test("UCL Select LC3 AC 2 (1a)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac2_1, DISC_SELECT_LC3_AC2_=
+1a);
+> > +       define_test("UCL Select LC3 AC 2 (1b)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac2_1, DISC_SELECT_LC3_AC2_=
+1b);
+> > +       define_test("UCL Select LC3 AC 2 (1c)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac2_1, DISC_SELECT_LC3_AC2_=
+1c);
+> > +
+> > +       define_test("UCL Select LC3 AC 10 (2)", test_setup, test_select=
+,
+> > +                               &cfg_select_ac10_2, DISC_SELECT_LC3_AC1=
+0_2);
+> > +       define_test("UCL Select LC3 AC 10 (2a)", test_setup, test_selec=
+t,
+> > +                               &cfg_select_ac10_2, DISC_SELECT_LC3_AC1=
+0_2a);
+> > +       define_test("UCL Select LC3 AC 10 (2b)", test_setup, test_selec=
+t,
+> > +                               &cfg_select_ac10_2, DISC_SELECT_LC3_AC1=
+0_2b);
+> > +       define_test("UCL Select LC3 AC 10 (2c)", test_setup, test_selec=
+t,
+> > +                               &cfg_select_ac10_2, DISC_SELECT_LC3_AC1=
+0_2c);
+> > +
+> > +       define_test("UCL Select LC3 AC 3", test_setup, test_select,
+> > +                               &cfg_select_ac3, DISC_SELECT_LC3_AC3);
+> > +       define_test("UCL Select LC3 AC 5", test_setup, test_select,
+> > +                               &cfg_select_ac5, DISC_SELECT_LC3_AC5);
+> > +       define_test("UCL Select LC3 AC 7i", test_setup, test_select,
+> > +                               &cfg_select_ac7i, DISC_SELECT_LC3_AC7i)=
+;
+> > +
+> > +       define_test("UCL Select VS AC 7i", test_setup, test_select,
+> > +                               &cfg_select_vs_ac7i, DISC_SELECT_VS_AC7=
+i);
+> > +
+> > +       define_test("UCL Select LC3 AC 6i", test_setup, test_select,
+> > +                               &cfg_select_ac6i, DISC_SELECT_LC3_AC6i)=
+;
+> > +
+> > +       define_test("UCL Select LC3 AC 6ii L", test_setup, test_select,
+> > +                               &cfg_select_ac6ii_L, DISC_SELECT_LC3_AC=
+6ii_L);
+> > +       define_test("UCL Select LC3 AC 6ii R", test_setup, test_select,
+> > +                               &cfg_select_ac6ii_R, DISC_SELECT_LC3_AC=
+6ii_R);
+> > +
+> > +       define_test("UCL Select LC3 AC 9i", test_setup, test_select,
+> > +                               &cfg_select_ac9i, DISC_SELECT_LC3_AC9i)=
+;
+> > +
+> > +       define_test("UCL Select LC3 AC 9ii L", test_setup, test_select,
+> > +                               &cfg_select_ac9ii_L, DISC_SELECT_LC3_AC=
+9ii_L);
+> > +       define_test("UCL Select LC3 AC 9ii R", test_setup, test_select,
+> > +                               &cfg_select_ac9ii_R, DISC_SELECT_LC3_AC=
+9ii_R);
+> > +
+> > +       define_test("UCL Select LC3 AC 8i", test_setup, test_select,
+> > +                               &cfg_select_ac8i, DISC_SELECT_LC3_AC8i)=
+;
+> > +
+> > +       define_test("UCL Select LC3 AC 8ii L", test_setup, test_select,
+> > +                               &cfg_select_ac8ii_L, DISC_SELECT_LC3_AC=
+8ii_L);
+> > +       define_test("UCL Select LC3 AC 8ii R", test_setup, test_select,
+> > +                               &cfg_select_ac8ii_R, DISC_SELECT_LC3_AC=
+8ii_R);
+> > +
+> > +       define_test("UCL Select LC3 AC 11i", test_setup, test_select,
+> > +                               &cfg_select_ac11i, DISC_SELECT_LC3_AC11=
+i);
+> > +
+> > +       define_test("UCL Select LC3 AC 11ii L", test_setup, test_select=
+,
+> > +                               &cfg_select_ac11ii_L, DISC_SELECT_LC3_A=
+C11ii_L);
+> > +
+> > +       define_test("UCL Select LC3 AC 11ii R", test_setup, test_select=
+,
+> > +                               &cfg_select_ac11ii_R, DISC_SELECT_LC3_A=
+C11ii_R);
+> > +
+> > +       define_test("UCL Select LC3 Many 2", test_setup, test_select,
+> > +                               &cfg_select_many_2, DISC_SELECT_MANY);
+> > +
+> > +       define_test("UCL Select LC3 Many 8", test_setup, test_select,
+> > +                               &cfg_select_many_8, DISC_SELECT_MANY);
+> > +}
+> > +
+> >  int main(int argc, char *argv[])
+> >  {
+> >         tester_init(&argc, &argv);
+> > @@ -8696,6 +9438,7 @@ int main(int argc, char *argv[])
+> >         test_bsnk_scc();
+> >         test_bsnk_str();
+> >         test_bsrc_str();
+> > +       test_ucl_select();
+> >=20
+> >         return tester_run();
+> >  }
+> > --
+> > 2.51.1
+> >=20
+> >=20
+>=20
+>=20
+> --
+> Luiz Augusto von Dentz
