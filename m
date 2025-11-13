@@ -1,127 +1,213 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204D7302CBF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 04:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1264E1EDA3C;
+	Thu, 13 Nov 2025 05:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763009489; cv=none; b=ePKR+xUu0NfnjMFkVtZxxw//612Tn3tgubPFDgSWX5IMyg5DtFZ3+iAXZhp5YmUxESy6jW64LQunhU9gsTVR7yxQpIQr6M0JQF/o43liDR4syvZViLJuCJMyZqef1Aet+PVU8Y4A4zmT0CRtvaS+icPzewvVOZJwemABJbMNHX8=
+	t=1763010067; cv=none; b=KTc+m4Y9AP82Kh5mTKqgwP6m/HAyofyLNVzUWC08OEo0KwmItJ3MNRcO3739xNWVCjUjVatuu33epFAb6mmTKj0GGrOGoDYhbj35u4nxbQUavieA1tNLdOqbm64FvYEylv8LFTc4LYZvISl5R9hQNVVzRjQFCJxQb7XvRnkOhns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763009489; c=relaxed/simple;
-	bh=VEIzwKmgDIs5iN+33DeUaEkvIMwyGFNHkGrRan03wBU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=QA2lZ93OQhVczMecAtHO+gRSIpg1Zakgp7wCE+4tByrpqtJ/QWQ0ghWbQn4lao7wdiLvkkQAGZToLFG+ztm0onv6S+8FhHbmvEpUch6vJonjL2CJgBAO7W0NsNS/S/WYSRMc8icWCRt+yLGkX5TGnYyMvXhqumyF6//kKKREzpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X2SqBWxL; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763010067; c=relaxed/simple;
+	bh=elbIHIxtHN/iHCWls82TyqD3OxlbCSrevgrw2dpxzBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gUpJ/VV1jDuaAydRqKxl407oRvgHnW72cnm7ePtLugmR6iQM9VDIrlH8LoPWGswymRxfi7bmu2CzvpE+aLQDUQwwkbmlCXjGdGrxzW0iMwB/OtazgPBR+1vFq2iMTKVBlfza3d/tvH/Vqt0ZY3cAtzodWcNVdB/HlYsPgO29izI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DKgetDj7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X2SqBWxL"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-94863b3620cso40959339f.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Nov 2025 20:51:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763009487; x=1763614287; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ie0CMWXQerA+rKZpnpTTZI2qC29rTyIERI8OJ9xuhSY=;
-        b=X2SqBWxL6tlY/wxUls/QJ2g9UYE1NUxrt4KtW2FtnZpejS7/ZwYmB7hldpgK1syvt5
-         wBVTriZFD9NMr7xclH+P0RK8aSdcdBjgrjRnEXPfOOf8Tfd1DtcKo+f6zSvzsM8xZHbt
-         9O79JWykHaprly7d+D1w5TYpM115tBDhOLGQzOO5i2gO7XD7HQJorPfo5GNTylYAaTYi
-         7NnHNgWQfwkUA4bdSR2tynqTlrQKPtejZ5E+3mabu2ZbD6GglNllRyxSKS4bIYbw3s7Y
-         hwYQXn/f5Vqjsb8YDvppJdtwLawjCTpc+6kSIck50SZHkGWV5P26U2RTQn7YkpJW2S8/
-         hFuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763009487; x=1763614287;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ie0CMWXQerA+rKZpnpTTZI2qC29rTyIERI8OJ9xuhSY=;
-        b=uVM8Agzoa+aAYt2Y3FMfsdso+mrDcUKe51PTDvD9EL/4G5L8D8lVB0xY3w042eJSQa
-         NXghgh8dwXY4wYejEyB0iu+kVft8X/x5fWQWfBnLW3AebxsfM5Z9rW04/qcDvpyay9nF
-         65BOGGtwClTJoBL1ci5uqM6ORuuENH7Rn9XZCjCTynk+VETjVCfG4QBEyZ4C9lpRkpyU
-         /02zoVTauUuO2OVSUh8DiEeSWGsY0+YEl8D1EdbunEkYFgZlvpDZwuWbifPZGK0lS4lA
-         cts5OkKnPNKnzlfCCOxL2JhVuTNlC47EAnMIQunY6eLN0QFjG9uYFu9hoAv0IvC6bEmh
-         X6Yg==
-X-Gm-Message-State: AOJu0YzQLWe1HbntPIL3P/8NZMZShuMrPERQP792tc+xyvCDP0lBghP+
-	AtTkmQOsniiVru4Cw74K7xu0XdtMwYI0sTss33elpMW/7T5mfIsrOQbgDgobtA==
-X-Gm-Gg: ASbGncsxBV8ffv97e8Fp3pxY0ZFPJYkzgscn3TuJ6e+UZBPRhwiDc9z1VZiLXrCQ9a7
-	b24k4T4WDiUsorToq9N1dIlfBRgHVn6i6Cpwx2QC4jIwOXjL6LHrKfdqVeIPTjrYX4kMqNQkBAy
-	ukiqqwePntFQUpiFk+lEjIFr6ZXK7/GpIpgS/xWgCZO3/+2f0X2+ELQjeLT4IStXALsF/iXP8Us
-	bGsurAz0YiuKy4lEggy0YKwj3dFKSzd/iE42pbqLF7BQgIJw5Ezl2skap4/xnrMxm4tWsWsunCN
-	SLIVrSY5rLR0xHKQuwjtjn8tiyCmZgcUk2m9swLMui7q+TJJuplNK0wEHTGwYmyfAADLxdTOuYV
-	gya0Te49imfFVWkVlBhoB1PLoAp71MJMLByfqphGjjUTkoTZikMkNArCueSoSQTRYQErVyLmsLf
-	JIw4w8Qg==
-X-Google-Smtp-Source: AGHT+IH6YtzqJhOBBjE9SLHVcOL6rOaWcuFA/cxq+VyixByTRiALs6N/wjSpjsc7nQTy/3zyoNfYeg==
-X-Received: by 2002:a05:6e02:3e89:b0:433:3406:1335 with SMTP id e9e14a558f8ab-43473cf762fmr75000545ab.3.1763009486786;
-        Wed, 12 Nov 2025 20:51:26 -0800 (PST)
-Received: from [172.17.0.2] ([64.236.145.64])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7bd3301efsm343453173.52.2025.11.12.20.51.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 20:51:26 -0800 (PST)
-Message-ID: <691563ce.050a0220.2c5bbe.08e3@mx.google.com>
-Date: Wed, 12 Nov 2025 20:51:26 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7772972222547371647=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DKgetDj7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FA76C19424;
+	Thu, 13 Nov 2025 05:00:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763010066;
+	bh=elbIHIxtHN/iHCWls82TyqD3OxlbCSrevgrw2dpxzBI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DKgetDj7dRR9Tfdf7Vr3zTxqI/ZLzKWaMpV2ow4x0puNQVtVelNfSdUZ2RKjLTROg
+	 e1ci46SxX8QhyVvhq42cupyaLkqn5pSKQoZRm+zuYjmTGQS9oQOyxVGMOTWXVnqrqn
+	 kjF7uVCwbDXPS6dQ6ApjXrMoVlW3PmSAH2QB7+QzqoumRp0gcINGgIIRsvXyfyRRGR
+	 BtkronFgRDPcwh0yq/Rs8VWiEK/+rFeER34DXNzZWI6Zu8vXPXH9wjXc2SOeGJG89p
+	 xQ9MWkqJ0cmkhd7IeyQOOEAHVlMrI6o8oy3DiXMdXyw5HVS4BzlVEFeIHR2Pnqxg24
+	 RGy9fx6Mj6eSA==
+Date: Thu, 13 Nov 2025 10:30:42 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
+	Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, Mark Pearson <mpearson-lenovo@squebb.ca>, 
+	"Derek J. Clark" <derekjohn.clark@gmail.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: [PATCH 7/9] dt-bindings: connector: Add PCIe M.2 Mechanical Key
+ E connector
+Message-ID: <qiwgnela4b6gbwuuq7xaqjong47c2ix6caagjl6ryqukzqkswn@6l7rvkf4dfyx>
+References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
+ <20251112-pci-m2-e-v1-7-97413d6bf824@oss.qualcomm.com>
+ <aRS/3OTerCBGlmBm@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ye.he@amlogic.com
-Subject: RE: [bluez,v2] bearer: Implement Connect/Disconnect methods
-In-Reply-To: <20251113-bearer-impl-v2-1-c3e825cc6758@amlogic.com>
-References: <20251113-bearer-impl-v2-1-c3e825cc6758@amlogic.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aRS/3OTerCBGlmBm@lizhi-Precision-Tower-5810>
 
---===============7772972222547371647==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, Nov 12, 2025 at 12:11:56PM -0500, Frank Li wrote:
+> On Wed, Nov 12, 2025 at 08:15:19PM +0530, Manivannan Sadhasivam wrote:
+> > Add the devicetree binding for PCIe M.2 Mechanical Key E connector defined
+> > in the PCI Express M.2 Specification, r4.0, sec 5.1.2. This connector
+> > provides interfaces like PCIe or SDIO to attach the WiFi devices to the
+> > host machine, USB or UART+PCM interfaces to attach the Bluetooth (BT)
+> > devices along with additional interfaces like I2C for NFC solution. At any
+> > point of time, the connector can only support either PCIe or SDIO as the
+> > WiFi interface and USB or UART as the BT interface.
+> >
+> > The connector provides a primary power supply of 3.3v, along with an
+> > optional 1.8v VIO supply for the Adapter I/O buffer circuitry operating at
+> > 1.8v sideband signaling.
+> >
+> > The connector also supplies optional signals in the form of GPIOs for fine
+> > grained power management.
+> >
+> > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > ---
+> >  .../bindings/connector/pcie-m2-e-connector.yaml    | 154 +++++++++++++++++++++
+> >  MAINTAINERS                                        |   1 +
+> >  2 files changed, 155 insertions(+)
+> >
+> > diff --git a/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+> > new file mode 100644
+> > index 0000000000000000000000000000000000000000..91cb56b1a75b7e3de3b9fe9a7537089f96875746
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+> > @@ -0,0 +1,154 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/connector/pcie-m2-e-connector.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: PCIe M.2 Mechanical Key E Connector
+> > +
+> > +maintainers:
+> > +  - Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > +
+> > +description:
+> > +  A PCIe M.2 E connector node represents a physical PCIe M.2 Mechanical Key E
+> > +  connector. Mechanical Key E connectors are used to connect Wireless
+> > +  Connectivity devices including combinations of Wi-Fi, BT, NFC to the host
+> > +  machine over interfaces like PCIe/SDIO, USB/UART+PCM, and I2C.
+> > +
+> > +properties:
+> > +  compatible:
+> > +    const: pcie-m2-e-connector
+> > +
+> > +  vpcie3v3-supply:
+> > +    description: A phandle to the regulator for 3.3v supply.
+> > +
+> > +  vpcie1v8-supply:
+> > +    description: A phandle to the regulator for VIO 1.8v supply.
+> > +
+> > +  ports:
+> > +    $ref: /schemas/graph.yaml#/properties/ports
+> > +    description: OF graph bindings modeling the interfaces exposed on the
+> > +      connector. Since a single connector can have multiple interfaces, every
+> > +      interface has an assigned OF graph port number as described below.
+> > +
+> > +    properties:
+> > +      port@0:
+> > +        $ref: /schemas/graph.yaml#/properties/port
+> > +        description: PCIe/SDIO interface
+> 
+> 
+> PCIe and SDIO is difference signal at key E. why combine to one port? The
+> similar case is USB2.0/UART
+> 
 
-This is automated email and please do not reply to this email!
+They will be defined as separate endpoints in the next version.
 
-Dear submitter,
+> > +
+> > +      port@1:
+> > +        $ref: /schemas/graph.yaml#/properties/port
+> > +        description: USB 2.0/UART interface
+> > +
+> > +      port@2:
+> > +        $ref: /schemas/graph.yaml#/properties/port
+> > +        description: PCM/I2S interface
+> > +
+> > +      port@3:
+> > +        $ref: /schemas/graph.yaml#/properties/port
+> > +        description: I2C interface
+> > +
+> > +    oneOf:
+> > +      - required:
+> > +          - port@0
+> > +
+> > +  clocks:
+> > +    description: 32.768 KHz Suspend Clock (SUSCLK) input from the host system to
+> > +      the M.2 card. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.1 for
+> > +      more details.
+> > +    maxItems: 1
+> 
+> Do we need add pciref clock here?
+> 
+> > +
+> > +  w_disable1-gpios:
+> 
+> use "-"
+> 
+> w-disable1-gpios
+> 
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1022762
+I just went with the spec that defines the signal as W_DISABLE.
 
----Test result---
+> > +    description: GPIO controlled connection to W_DISABLE1# signal. This signal
+> > +      is used by the system to disable WiFi radio in the M.2 card. Refer, PCI
+> > +      Express M.2 Specification r4.0, sec 3.1.12.3 for more details.
+> > +    maxItems: 1
+> > +
+> > +  w_disable2-gpios:
+> > +    description: GPIO controlled connection to W_DISABLE2# signal. This signal
+> > +      is used by the system to disable BT radio in the M.2 card. Refer, PCI
+> > +      Express M.2 Specification r4.0, sec 3.1.12.3 for more details.
+> > +    maxItems: 1
+> > +
+> > +  led1-gpios:
+> > +    description: GPIO controlled connection to LED_1# signal. This signal is
+> > +      used by the M.2 card to indicate the card status via the system mounted
+> > +      LED. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.2 for more
+> > +      details.
+> > +    maxItems: 1
+> > +
+> > +  led2-gpios:
+> > +    description: GPIO controlled connection to LED_2# signal. This signal is
+> > +      used by the M.2 card to indicate the card status via the system mounted
+> > +      LED. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.2 for more
+> > +      details.
+> > +    maxItems: 1
+> > +
+> > +  viocfg-gpios:
+> > +    description: GPIO controlled connection to IO voltage configuration
+> > +      (VIO_CFG) signal. This signal is used by the M.2 card to indicate to the
+> > +      host system that the card supports an independent IO voltage domain for
+> > +      the sideband signals. Refer, PCI Express M.2 Specification r4.0, sec
+> > +      3.1.15.1 for more details.
+> > +    maxItems: 1
+> > +
+> > +  uim_power_src-gpios:
+> 
+> property use -
+> 
 
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.27 seconds
-BuildEll                      PASS      19.97 seconds
-BluezMake                     PASS      2733.87 seconds
-MakeCheck                     PASS      19.87 seconds
-MakeDistcheck                 PASS      189.06 seconds
-CheckValgrind                 PASS      242.92 seconds
-CheckSmatch                   PASS      321.13 seconds
-bluezmakeextell               PASS      133.13 seconds
-IncrementalBuild              PENDING   0.26 seconds
-ScanBuild                     PASS      947.12 seconds
+Again, this is as per the spec. If DT maintainers object to it, I'll change it.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+- Mani
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7772972222547371647==--
+-- 
+மணிவண்ணன் சதாசிவம்
