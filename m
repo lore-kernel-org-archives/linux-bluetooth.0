@@ -1,421 +1,211 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C5C34CFCE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 12:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763035222; cv=pass; b=gOEl+TlhXlbzfTeYnFS+5XReiGaNScxKl4GCimjptLi74al85BhZIgJQ5TPXDc4Hlzri79yKZXn7WYznegC2FLMJB1+l1YtUfjctoqo4+OkCIKeT3NCVuhIZ2LRsgLtBi9n1nRpeI1JReVPpMbqAwrdHmhNQ4ZeySl8Ckdbphc4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763035222; c=relaxed/simple;
-	bh=CwLeLjUNhxZ7ybZXW91cmzuQqzZ3H+ktYD+dp86P0aM=;
-	h=Date:From:To:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=ZRSh6A0cRsIyKpODdj6AnT2uqfUllh/c54tx1BNP7Xd/W6SOpvLG6OU1s06124padA/b14sdLBSiOGbaJeVRPll4TffwlyopebYF5Py5sb7hxfOdaX/qVerjBMIiE+LuJx+3hPshxs+FAZKQRmupYJxqYbYR3N4aX9iP+n60uzA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=L+BfE0kJ; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62EF34DB45
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 12:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763037495; cv=none; b=ALI06+CNgFJkT/e1t+VWd3ftJC4Y7c50tkCsPlX5WMQzOl+FBp1g+a1JIHIb8A/sDVC5qAgUesZYTERmoYggu1DfFoaNRmrhMVD0kECWeseTrXw8W+mtUpfuEjbPFb7/WZBSSG+sY81IdflG/foyzS9npZ063PMSZ7hyceD+dxs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763037495; c=relaxed/simple;
+	bh=9elVzQ7mj77HKCWZYVJOcXXu5o8wH0/C9oI2JgD/UFo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I3vt9ew9mq8erCF7nGVts7PLi11r6TF0Scr69sT05RwlDt/KvXh5Q0u2SqcKyJPb6ShXu3J+27t2lVeYTHeTRhVHAv4VxSkLo6m/l6w6tn6wqwqOdTEgpOY58yAUw3Iymq3Jfnyx5/HMOQMN0JiHN8xH3f1W2DYwrlLAJWYcJTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ES56M6pI; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=BWq5IwsI; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="L+BfE0kJ"
-Received: from ehlo.thunderbird.net (unknown [193.138.7.153])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4d6f3H488cz49PvN
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 14:00:11 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1763035211;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=59grb7uWN7bwSvvSgKcwX0K6syAsSjEyf1Se1iqVBzE=;
-	b=L+BfE0kJvJXz1et0RKnNjIwRXSp8KbCFK97gO1oEijb3JJ3Junb4jCxqlJdlGL0RbfV2H3
-	Zd4a5feXP50ugt8dD+9nzaBha0thXX1WgBFvKY039CRqtM3oeFJiOR+Jzq81T6NNJZPVmH
-	76LA1VVMdIufc0hHrqjgo5s0b8r2jyuVnDiJ2/hq/PGvYDrq++CmCgtj3Eh6mjPxHf/16j
-	7jTxgloGzaVC1vKRhmpIdxOzpTFvDQ56CDztbKIiA5gDnQOnLWuErzLHxg5h0K5ywGscNP
-	vHU7sumDzZ2w7QHcBlPBf+qjrsCArrE0Ecg2kA0P0cmIZbWpLCDkS+QVuHIRGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1763035211;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=59grb7uWN7bwSvvSgKcwX0K6syAsSjEyf1Se1iqVBzE=;
-	b=eZnQ5tVy9ZqLnXXIycGDIzMfojarttAoF0VAz5zxFgnaENtO2ItqkA9oJLyCXGmExsad/J
-	dmK/fKjhTzoG93bWUFbaIEpcNYVjVKSE4AeL0AXwq6Xm3Q4LWYeL4ZuCZHHU7bM0Q4gFCn
-	a6b/qMlLzHB0tV5tI60i9p92VVCcRmLb7Z2i4caGgZ7wy5qVdjGXw7QcENrUk3sn+Mjc5j
-	6WlhDht+CBi18Z3mfGAwIslTYts5kjEDzh48n0FU4ajD1IIKR9KibVC8shrJXJuF3n67C1
-	Z6qCcgrpzNtdEn7AAc6y5CmvQ7QT2ae+dih759AapAEOBKqgVGsD24tB1YgEEQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1763035211;
-	b=szby3wfQndvrGkoVbHHuWPF0wrABEB/Ze05SUhnhLLzH2O0xhpdeGPR1wXIccArGTQ0Tx5
-	q5sVKqqnKIZ0JsQfxaXwn3tSSlaqe5ulbyRT7eaG0GwBvYCL+Z3PvCV3rN/ANrNrl9RhGb
-	wGO5g6z4v0D/4M430psRdC3y5j5GEnEvmFI86DZkVMj+G3CaPtA9eIt1dMyZNHQuaQDd0g
-	2dd/9fLosvsYjk8McMFih7ubYc2+GRGjwzDbGvf9EIyTSBWC6sVRL12wBFAcr/Zhwrt+eV
-	aidraTBfB/Y11HeBqghk/FSZ71xCjjWgS6XqE2kP10noXONml8GjX+aLGMP5Hw==
-Date: Thu, 13 Nov 2025 12:00:08 +0000
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_BlueZ_1/4=5D_shared/bap=3A_fix_ch?=
- =?US-ASCII?Q?annel_allocation_logic_in_bt=5Fbap=5Fselect=28=29?=
-In-Reply-To: <5d291ba409a0736f7074a7e42988570d29ac58bb.1762973380.git.pav@iki.fi>
-References: <5d291ba409a0736f7074a7e42988570d29ac58bb.1762973380.git.pav@iki.fi>
-Message-ID: <04DCBC8D-A185-4094-9131-F4EECE18E936@iki.fi>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ES56M6pI";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="BWq5IwsI"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AD9Z2aZ3120573
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 12:38:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	8q73xJKrrwuofdSMpRsZlhIm0BkjbrHEOxLRKfjxylk=; b=ES56M6pIRZfroTGw
+	5C3QBjap7rARk/2HKLQQaT2LMjM/5G9thrQy8MUfGqtwRE0DQ/ai2LlLYkl/sKAA
+	pvXdxjG6orAJntwfcRT7HjQSFKgybU8AxEcziNtXfZtwv5FdS2lmbVHng2DjSeaZ
+	Q+PxXLbbmewPEkGJOAwBdu+oxRv0ucBFMOxK7Vxtx/B5k1PGQiwdEDnpYmmsDh15
+	roSmjaGVHM1+GjiotwWdZ8NJZTXTVO1T/jSL87texxLL7pYFtcbVumPtZtatI+fc
+	OoT1x7mOzjUHPgEqdHx2h1Nvm4xH4eNO8eXEAtccOn39mmoUZmWdI0LdqemXYuob
+	ukPj0g==
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ad5pusueb-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 12:38:12 +0000 (GMT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-295ac7012acso3692545ad.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 04:38:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1763037492; x=1763642292; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8q73xJKrrwuofdSMpRsZlhIm0BkjbrHEOxLRKfjxylk=;
+        b=BWq5IwsIZ6uqxBRxynlu6HEPkVJFlrs0VFW6yskvQhw3np8gAJQtJzWzOOpQ8lL4JM
+         CQdUo1/f1iL6IIDhsCvKOuhLNp7L+AdhJaea2w0MiKeWs2/OMASxjBmMTnNiT7o/GLAh
+         WfOrUdIitAaXfnfkSytAHj7J2WCIdggQnYDafxwu+E05tFN3hnuPCp0hjoqwFm6xMDto
+         Y0cNt4eFPoPPuNf6LrGHhgQ6R/vtQH3zYppSOiIWZUacqbW6iTA4bIFVWiu8Z0dyIEMF
+         K+1CDY9IPZy7YLj4CFZwnoJn+xk0biPf1OaQaAXvXQ0YT+raFziGVh+ntrDdrHJkbvfP
+         qSCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763037492; x=1763642292;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8q73xJKrrwuofdSMpRsZlhIm0BkjbrHEOxLRKfjxylk=;
+        b=iiX1WgdwxR/9HpcaGRvjW0oezHO0lZQITBxHCC5C4ZXoRb7QKytZC0MJ0Z+8T8ezzx
+         wWuYqmQNsiY/zkhW5u/n8LXEC3jhDzg0l92f/cy5T/ZZB47tNeTPiXqT5AqVct9T904V
+         Ia7UCcGh+yk3ZF1OmDFt0igFtHxSRpwJ0bDWdWLJTxF6nj3UJlLsNu9dQsK80stwD2gJ
+         UmsWCaPYUoBjJZPp9vyQZsfc+CM4JQHhdCOnHftBx+WrEfoYAj8CVBfvFEphZZ7HYry6
+         QfVau1IvMblzKrAKC2Ps6uIRtVrkzM1CmrISdySI1bzQtdvZF0A24x6v5Lij/au8woO1
+         /F3w==
+X-Forwarded-Encrypted: i=1; AJvYcCVh/izMhwmxZAXLl1O74i9OTZ39MmNdZeuEFbDFYiXkbxEOSl5RL8A2kWhtYZuPG16kTBd0PNvdiX43Y+dACl0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9h+SVcXTMVmrQmtrxpFek7HacvOIXh9upTB0dkYy5zBYrz4VN
+	AX33u/zOC8UwbRfUr+QtsPe2UDUfMVVzAIuiqSks7eTjEGJsrCZXsq3xTE/u9nxJkl27mHfR9/P
+	ahI2NtJpbA91et59p4UU9XWp8JG6grmWvndVF5m+n2n76auRncV3EE1o1d8BFOVt84ZuZbXw=
+X-Gm-Gg: ASbGncuW2ycgbios4PQj6u9CuEp8uYbax5BYiNcmUIhq0JPxW27iLtWTgnL2oVdt5B+
+	IDW/XOt6kDRPenJ5uoR+/vode3RIWAiK1aIhCCwU7o8+Ot3R7x4ldIaOh9MfAcvVZisLvmcvH7/
+	aNBP7KxFVArkbT7wzWIuGixRQB6VG8VaxSBfGhBbiMYwME7ZA+CvSgOrQBzSwRajl2eT89QUJ6f
+	XV//nxmbdEwFONTiaqvQUBR3sgH71jcQj9WuaLSq42FmawUv9903nGX6XFVTNUiXAJKeSoZxoct
+	+trE8kjWWfOEv/AhUNJZjBN3UcvsNJZA7gQk5lLRMNafFR/KkADVaonuaFMvIH5E7Ac1ttXhBOV
+	XkzMwtlNyREbeujHowUPN5w==
+X-Received: by 2002:a17:902:da90:b0:295:2cab:dbc2 with SMTP id d9443c01a7336-2984edd4be8mr48491925ad.6.1763037492097;
+        Thu, 13 Nov 2025 04:38:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGmiRvv1bAO43hwnywK6aLTI273kvGCPDpDB6tE28lZlIwLwScGnHFybsark2D2NJEdA5iRFQ==
+X-Received: by 2002:a17:902:da90:b0:295:2cab:dbc2 with SMTP id d9443c01a7336-2984edd4be8mr48491645ad.6.1763037491596;
+        Thu, 13 Nov 2025 04:38:11 -0800 (PST)
+Received: from [10.253.73.240] ([114.94.8.21])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c245f21sm24521815ad.35.2025.11.13.04.38.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Nov 2025 04:38:11 -0800 (PST)
+Message-ID: <5a8d75a3-b20e-4de4-b15d-a56af503324d@oss.qualcomm.com>
+Date: Thu, 13 Nov 2025 20:38:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] arm64: dts: qcom: lemans-evk: Enable Bluetooth support
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        stable@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
+        quic_jiaymao@quicinc.com, quic_chezhou@quicinc.com,
+        quic_shuaz@quicinc.com
+References: <20251110055709.319587-1-wei.deng@oss.qualcomm.com>
+ <28ffece5-29b7-4d6f-a6cf-5fdf3b8259ef@oss.qualcomm.com>
+ <ee04e03a-ffd0-43c0-ba77-c7ee20aaac43@oss.qualcomm.com>
+ <2bde5922-6519-4b6d-9edf-94fd0e7dbc9d@oss.qualcomm.com>
+Content-Language: en-US
+From: Wei Deng <wei.deng@oss.qualcomm.com>
+In-Reply-To: <2bde5922-6519-4b6d-9edf-94fd0e7dbc9d@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=E6/AZKdl c=1 sm=1 tr=0 ts=6915d134 cx=c_pps
+ a=JL+w9abYAAE89/QcEU+0QA==:117 a=Uz3yg00KUFJ2y2WijEJ4bw==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8
+ a=1x_t3JyoWHe2diQJI2EA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=324X-CrmTo6CU4MGRt3R:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEzMDA5NSBTYWx0ZWRfX7bsJ5+SVb5Ug
+ EdVdAFk2jUNUithwzvmVBruLZxTQ+YhqXkc1QJlS1teZ5Va9+B0D1VdgHaDNdfag1YZTiEER8gG
+ m1Rr+jXMjzIDT71JtEQCvX0dEfU9p+prmr1ml+eKS/L9yRR9yLO0h0hkhHnrmeQhEDJe8ZEtu10
+ n/K1EAooK4RkUG0xS9mtDLThjj590VDw1o2H1RseC06cthiydtZ2uWcZC7r+tFdUPr7phTvUqmU
+ o3y0kES+oWYM8d17GbIl3ui6hL3qw/w848VrNMhleYGAZNsyzNz0Amev0OHE2jxk2ciK5XnAdlN
+ PxuglJHrYr/My/+ylRjIZcPceaaoLdRYb8mT9S0lNbGDMnD151iwb8t6Z8CfTKMdIDi9zvD5OdN
+ 2VngwIKGELEOSWp+dyNVBAaWlX30oQ==
+X-Proofpoint-GUID: quoGC4Px8UlUNoVw9ZRdlSpS4t-wWLVm
+X-Proofpoint-ORIG-GUID: quoGC4Px8UlUNoVw9ZRdlSpS4t-wWLVm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-13_02,2025-11-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 lowpriorityscore=0 adultscore=0 malwarescore=0 spamscore=0
+ clxscore=1015 phishscore=0 bulkscore=0 impostorscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511130095
 
+Hi Konrad，
+Thanks for your comments.
 
+On 11/12/2025 5:49 PM, Konrad Dybcio wrote:
+> On 11/11/25 1:24 PM, Wei Deng wrote:
+>> Hi Konrad,
+>>
+>> Thanks for your comments.
+>>
+>> On 11/10/2025 7:49 PM, Konrad Dybcio wrote:
+>>> On 11/10/25 6:57 AM, Wei Deng wrote:
+>>>> There's a WCN6855 WiFi/Bluetooth module on an M.2 card. To make
+>>>> Bluetooth work, we need to define the necessary device tree nodes,
+>>>> including UART configuration and power supplies.
+>>>>
+>>>> Since there is no standard M.2 binding in the device tree at present,
+>>>> the PMU is described using dedicated PMU nodes to represent the
+>>>> internal regulators required by the module.
+>>>>
+>>>> The 3.3V supply for the module is assumed to come directly from the
+>>>> main board supply, which is 12V. To model this in the device tree, we
+>>>> add a fixed 12V regulator node as the DC-IN source and connect it to
+>>>> the 3.3V regulator node.
+>>>>
+>>>> Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
+>>>> ---
+>>>
+>>> [...]
+>>>
+>>>>  &apps_rsc {
+>>>> @@ -627,6 +708,22 @@ &qupv3_id_2 {
+>>>>  	status = "okay";
+>>>>  };
+>>>>  
+>>>> +&qup_uart17_cts {
+>>>> +	bias-disable;
+>>>> +};
+>>>> +
+>>>> +&qup_uart17_rts {
+>>>> +	bias-pull-down;
+>>>> +};
+>>>> +
+>>>> +&qup_uart17_tx {
+>>>> +	bias-pull-up;
+>>>> +};
+>>>> +
+>>>> +&qup_uart17_rx {
+>>>> +	bias-pull-down;
+>>>> +};
+>>>
+>>> This is notably different than all other platforms' bluetooth pin
+>>> settings - for example pulling down RX sounds odd, since UART signal
+>>> is supposed to be high at idle
+>>>
+>>> see hamoa.dtsi : qup_uart14_default as an example
+>>>
+>>
+>> I followed the qup_uart17 settings from lemans-ride-common.dtsi. Since these configurations are not required for Bluetooth functionality. I will remove this configuration in the next patch.
+> 
+> This feels like you're essentially saying you don't know/care why you
+> did this before and don't know why you're changing it again. This
+> doesn't give me a lot of confidence. Are you testing your changes on
+> real hw, running an upstream kernel with some distro userland?
+> 
 
-12=2E marraskuuta 2025 18=2E52=2E35 UTC Pauli Virtanen <pav@iki=2Efi> kirj=
-oitti:
->bt_bap_select() does not correctly determine the need for multi-stream
->configurations 6,7,8,9,11(i), as its result depends on whether Audio
->Locations is read before or after the PACs, doesn't work with general
->location bits, etc=2E
->
->Fix the procedure to be simpler: create streams for all locations, up to
->a specific number of channels=2E  By default, limit to max 2 channels per
->direction for compatibility (BAP doesn't have explicit AC with larger
->channel counts=2E) Also simplify the code=2E
->
->Ignore lpac Locations when selecting: the value mostly makes sense for
->Unicast Server role, but Client and Server cannot use the same value as
->only a few bits can be set=2E As Client, we should be able to configure
->any Location bits=2E  The sound server can simply ignore our suggested
->channel allocation if really needed, or use SetConfiguration() API to
->build custom configurations=2E
->---
-> profiles/audio/bap=2Ec |   2 +-
-> src/shared/bap=2Ec     | 193 +++++++++++++++++++------------------------
-> src/shared/bap=2Eh     |   4 +-
-> 3 files changed, 89 insertions(+), 110 deletions(-)
->
->diff --git a/profiles/audio/bap=2Ec b/profiles/audio/bap=2Ec
->index 85bba9543=2E=2E9fb879345 100644
->--- a/profiles/audio/bap=2Ec
->+++ b/profiles/audio/bap=2Ec
->@@ -1919,7 +1919,7 @@ static bool pac_select(struct bt_bap_pac *lpac, str=
-uct bt_bap_pac *rpac,
-> 		queue_push_tail(select->eps, ep);
-> 	}
->=20
->-	bt_bap_select(lpac, rpac, &select->remaining, select_cb, ep);
->+	bt_bap_select(lpac, rpac, 0, &select->remaining, select_cb, ep);
->=20
-> 	return true;
-> }
->diff --git a/src/shared/bap=2Ec b/src/shared/bap=2Ec
->index a18f393f7=2E=2E00474b2e0 100644
->--- a/src/shared/bap=2Ec
->+++ b/src/shared/bap=2Ec
->@@ -204,11 +204,6 @@ struct bt_bap {
-> 	void *user_data;
-> };
->=20
->-struct bt_bap_chan {
->-	uint8_t count;
->-	uint32_t location;
->-};
->-
-> struct bt_bap_pac {
-> 	struct bt_bap_db *bdb;
-> 	char *name;
->@@ -3848,50 +3843,6 @@ static void *ltv_merge(struct iovec *data, struct =
-iovec *cont)
-> 	return util_iov_append(data, cont->iov_base, cont->iov_len);
-> }
->=20
->-static void bap_pac_chan_add(struct bt_bap_pac *pac, uint8_t count,
->-				uint32_t location)
->-{
->-	struct bt_bap_chan *chan;
->-
->-	if (!pac->channels)
->-		pac->channels =3D queue_new();
->-
->-	chan =3D new0(struct bt_bap_chan, 1);
->-	chan->count =3D count;
->-	chan->location =3D location;
->-
->-	queue_push_tail(pac->channels, chan);
->-}
->-
->-static void bap_pac_foreach_channel(size_t i, uint8_t l, uint8_t t, uint=
-8_t *v,
->-					void *user_data)
->-{
->-	struct bt_bap_pac *pac =3D user_data;
->-
->-	if (!v)
->-		return;
->-
->-	bap_pac_chan_add(pac, *v, bt_bap_pac_get_locations(pac));
->-}
->-
->-static void bap_pac_update_channels(struct bt_bap_pac *pac, struct iovec=
- *data)
->-{
->-	uint8_t type =3D 0x03;
->-
->-	if (!data)
->-		return;
->-
->-	util_ltv_foreach(data->iov_base, data->iov_len, &type,
->-				bap_pac_foreach_channel, pac);
->-
->-	/* If record didn't set a channel count but set a location use that as
->-	 * channel count=2E
->-	 */
->-	if (queue_isempty(pac->channels) && pac->qos=2Elocation)
->-		bap_pac_chan_add(pac, pac->qos=2Elocation, pac->qos=2Elocation);
->-
->-}
->-
-> static void bap_pac_merge(struct bt_bap_pac *pac, struct iovec *data,
-> 					struct iovec *metadata)
-> {
->@@ -3901,9 +3852,6 @@ static void bap_pac_merge(struct bt_bap_pac *pac, s=
-truct iovec *data,
-> 	else
-> 		pac->data =3D util_iov_dup(data, 1);
->=20
->-	/* Update channels */
->-	bap_pac_update_channels(pac, data);
->-
-> 	/* Merge metadata into existing record */
-> 	if (pac->metadata)
-> 		ltv_merge(pac->metadata, metadata);
->@@ -4845,6 +4793,8 @@ static void read_source_pac_loc(bool success, uint8=
-_t att_ecode,
->=20
-> 	pacs->source_loc_value =3D get_le32(value);
->=20
->+	DBG(bap, "PACS Source Locations: 0x%08x", pacs->source_loc_value);
->+
-> 	/* Resume reading sinks if supported but for some reason is empty */
-> 	if (pacs->source && queue_isempty(bap->rdb->sources)) {
-> 		uint16_t value_handle;
->@@ -4878,6 +4828,8 @@ static void read_sink_pac_loc(bool success, uint8_t=
- att_ecode,
->=20
-> 	pacs->sink_loc_value =3D get_le32(value);
->=20
->+	DBG(bap, "PACS Sink Locations: 0x%08x", pacs->sink_loc_value);
->+
-> 	/* Resume reading sinks if supported but for some reason is empty */
-> 	if (pacs->sink && queue_isempty(bap->rdb->sinks)) {
-> 		uint16_t value_handle;
->@@ -4911,6 +4863,9 @@ static void read_pac_context(bool success, uint8_t =
-att_ecode,
->=20
-> 	pacs->sink_context_value =3D le16_to_cpu(ctx->snk);
-> 	pacs->source_context_value =3D le16_to_cpu(ctx->src);
->+
->+	DBG(bap, "PACS Sink Context: 0x%04x", pacs->sink_context_value);
->+	DBG(bap, "PACS Source Context: 0x%04x", pacs->source_context_value);
-> }
->=20
-> static void read_pac_supported_context(bool success, uint8_t att_ecode,
->@@ -4934,6 +4889,11 @@ static void read_pac_supported_context(bool succes=
-s, uint8_t att_ecode,
->=20
-> 	pacs->supported_sink_context_value =3D le16_to_cpu(ctx->snk);
-> 	pacs->supported_source_context_value =3D le16_to_cpu(ctx->src);
->+
->+	DBG(bap, "PACS Supported Sink Context: 0x%04x",
->+					pacs->supported_sink_context_value);
->+	DBG(bap, "PACS Supported Source Context: 0x%04x",
->+					pacs->supported_source_context_value);
-> }
->=20
-> static void foreach_pacs_char(struct gatt_db_attribute *attr, void *user=
-_data)
->@@ -6113,12 +6073,39 @@ static bool match_pac(struct bt_bap_pac *lpac, st=
-ruct bt_bap_pac *rpac,
-> 	return false;
-> }
->=20
->-int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
->-			int *count, bt_bap_pac_select_t func,
->-			void *user_data)
->+static void bap_pac_ltv_ch_counts(size_t i, uint8_t l, uint8_t t, uint8_=
-t *v,
->+								void *user_data)
-> {
->-	const struct queue_entry *lchan, *rchan;
->-	int selected =3D 0;
->+	uint8_t *mask =3D user_data;
->+
->+	if (v)
->+		*mask |=3D *v;
->+}
->+
->+static uint8_t bap_pac_ch_counts(struct bt_bap_pac *pac)
->+{
->+	uint8_t type =3D 0x03;
->+	uint8_t mask =3D 0;
->+
->+	if (!pac->data)
->+		return 0;
->+
->+	util_ltv_foreach(pac->data->iov_base, pac->data->iov_len, &type,
->+						bap_pac_ltv_ch_counts, &mask);
->+
->+	if (!mask)
->+		mask =3D 0x01;  /* default (BAP v1=2E0=2E1 Sec 4=2E3=2E1) */
->+
->+	return mask;
->+}
->+
->+int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
->+			unsigned int max_channels, int *count,
->+			bt_bap_pac_select_t func, void *user_data)
->+{
->+	uint32_t locations;
->+	uint8_t ch_counts;
->+	unsigned int num_ase;
->=20
-> 	if (!lpac || !rpac || !func)
-> 		return -EINVAL;
->@@ -6126,66 +6113,58 @@ int bt_bap_select(struct bt_bap_pac *lpac, struct=
- bt_bap_pac *rpac,
-> 	if (!lpac->ops || !lpac->ops->select)
-> 		return -EOPNOTSUPP;
->=20
->-	for (lchan =3D queue_get_entries(lpac->channels); lchan;
->-					lchan =3D lchan->next) {
->-		struct bt_bap_chan *lc =3D lchan->data;
->-		struct bt_bap_chan map =3D *lc;
->-		int i;
->+	if (!max_channels)
->+		max_channels =3D 2;  /* By default: don't go beyond BAP AC */
->=20
->-		for (i =3D 0, rchan =3D queue_get_entries(rpac->channels); rchan;
->-					rchan =3D rchan->next, i++) {
->-			struct bt_bap_chan *rc =3D rchan->data;
->+	ch_counts =3D bap_pac_ch_counts(lpac) & bap_pac_ch_counts(rpac);
->+	locations =3D bt_bap_pac_get_locations(rpac);
->=20
->-			/* Try matching the channel count */
->-			if (!(map=2Ecount & rc->count))
->-				break;
->+	if (rpac->type =3D=3D BT_BAP_SINK)
->+		num_ase =3D queue_length(rpac->bdb->sinks);
->+	else
->+		num_ase =3D queue_length(rpac->bdb->sources);
+We add qup_uart17 config followed the changes referenced in the below 
+link and validated them on the hardware platform. Bluetooth functionality
+works fine before and after the removal.
+https://lore.kernel.org/all/20250509090443.4107378-1-quic_vdadhani@quicinc.com/
 
-This is wrong, ASEs are in remote_eps=2E
+> Konrad
 
--> v2
+-- 
+Best Regards,
+Wei Deng
 
->=20
->-			/* Check if location was set otherwise attempt to
->-			 * assign one based on the number of channels it
->-			 * supports=2E
->-			 */
->-			if (!rc->location) {
->-				rc->location =3D bt_bap_pac_get_locations(rpac);
->-				/* If channel count is 1 use a single
->-				 * location
->-				 */
->-				if (rc->count =3D=3D 0x01)
->-					rc->location &=3D BIT(i);
->-			}
->+	/* Fallback to unspecified/mono allocation if nothing is matching */
->+	if (!locations || !ch_counts) {
->+		lpac->ops->select(lpac, rpac, 0, &rpac->qos, func, user_data,
->+							lpac->user_data);
->+		if (count)
->+			(*count)++;
->+		return 0;
->+	}
->=20
->-			/* Try matching the channel location */
->-			if (!(map=2Elocation & rc->location))
->+	/* Allocate all locations to streams */
->+	while (num_ase) {
->+		uint32_t allocation =3D 0, alloc =3D 0;
->+		unsigned int i, n;
->+
->+		/* Put max number of channels per stream */
->+		for (i =3D 0, n =3D 0; i < 32 && n < 8; ++i) {
->+			uint32_t loc =3D (1LL << i);
->+
->+			if (!(locations & loc))
-> 				continue;
->=20
->-			lpac->ops->select(lpac, rpac, map=2Elocation &
->-						rc->location, &rpac->qos,
->-						func, user_data,
->-						lpac->user_data);
->-			selected++;
->+			alloc |=3D loc;
->+			if ((BIT(n) & ch_counts) && n < max_channels)
->+				allocation =3D alloc;
->=20
->-			/* Check if there are any channels left to select */
->-			map=2Ecount &=3D ~(map=2Ecount & rc->count);
->-			/* Check if there are any locations left to select */
->-			map=2Elocation &=3D ~(map=2Elocation & rc->location);
->-
->-			if (!map=2Ecount || !map=2Elocation)
->-				break;
->-
->-			/* Check if device require AC*(i) settings */
->-			if (rc->count =3D=3D 0x01)
->-				map=2Ecount =3D map=2Ecount >> 1;
->+			++n;
-> 		}
->-	}
->=20
->-	/* Fallback to no channel allocation since none could be matched=2E */
->-	if (!selected) {
->-		lpac->ops->select(lpac, rpac, 0, &rpac->qos, func, user_data,
->-					lpac->user_data);
->-		selected++;
->-	}
->+		if (!allocation)
->+			break;
->=20
->-	if (count)
->-		*count +=3D selected;
->+		/* Configure stream */
->+		lpac->ops->select(lpac, rpac, allocation, &rpac->qos,
->+					func, user_data, lpac->user_data);
->+		if (count)
->+			(*count)++;
->+
->+		locations &=3D ~allocation;
->+		max_channels -=3D __builtin_popcount(allocation);
->+		num_ase--;
->+	}
->=20
-> 	return 0;
-> }
->diff --git a/src/shared/bap=2Eh b/src/shared/bap=2Eh
->index efeed604d=2E=2E7f2c491fc 100644
->--- a/src/shared/bap=2Eh
->+++ b/src/shared/bap=2Eh
->@@ -173,8 +173,8 @@ void *bt_bap_pac_get_user_data(struct bt_bap_pac *pac=
-);
->=20
-> /* Stream related functions */
-> int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
->-			int *count, bt_bap_pac_select_t func,
->-			void *user_data);
->+			unsigned int max_channels, int *count,
->+			bt_bap_pac_select_t func, void *user_data);
->=20
-> void bt_bap_cancel_select(struct bt_bap_pac *lpac, bt_bap_pac_select_t f=
-unc,
-> 			void *user_data);
