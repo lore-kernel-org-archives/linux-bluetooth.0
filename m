@@ -1,102 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0400E219A89;
-	Thu, 13 Nov 2025 05:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E6526FA6E;
+	Thu, 13 Nov 2025 06:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763010960; cv=none; b=KHsschAlHNVnS6sDRbUyuwTIFCWxyZKCInQi3cnWAlkFhRN7s+9nrevrmBtWlvzrDJZF/VAs3EMVZO93JhGLHNvG1ixugVoUwyggUT9raN6T5i4H4H2b2BFUXA/aRx4sxLw/1Ld2/uwIf35rgs1pBmo8VfZP17jvLDWjhh33gRM=
+	t=1763014260; cv=none; b=jGvHrf4mCOpcnvHkc15y4UGgh2yNvxiw2OY8rrhCHyBele2qn6hJolpiWRnHAoehm6asTmz2bJ4Rzn0qDVGhOTSC+k6THZr34Xx3u2ArpkN1dz5xgLeirSvzv9ZR+GP9+zMQQJBu2mlw9yAXV4TxRj4QHpUBwM4Qd0gBm3GfM28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763010960; c=relaxed/simple;
-	bh=kYF+v51HiH8f+oyjLD8Cw6AcWEWsC5LFA5+wU5FAo20=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YkXxB17mRAiUVtGu+2hyCgxl4JbBORy+G6HhB0GxdSKHPW7UtvKST8tGrtCaXVlaWJd7whw4lUctp49SjQvafY6yF5K1ZriTntS71bCELkkH7akddFVmvqnxaRK27s0mk2IIucM482pAq2bMJyK7YnLHWgVjjyIuguGfTgf9DlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iVuiyaYu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763014260; c=relaxed/simple;
+	bh=qwxMZIZROPDSPUh1Pw+6DrDW5f7e8Nyi9qHsTlt2vic=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=f05hvjaSZ270Ttf7MOHu/HKjAYIv3A1dZAJ02uvhueL4dDBe4x6OqDuG8aURxJxRtVe31j/ytNImK6pR7ZSCY3QZ3Hk5hl2gA9cHpbSqIiWSMYztl8FR1TmOUYGh2nhImg4OSrJ4awEhLjsdpS4hYNSheXR6MFX9Ad1jWTaceMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=nVxJNsxt; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iVuiyaYu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01E95C19422;
-	Thu, 13 Nov 2025 05:15:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763010959;
-	bh=kYF+v51HiH8f+oyjLD8Cw6AcWEWsC5LFA5+wU5FAo20=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iVuiyaYucSNIVgvOzygjjmNpCJS2H3qyavnx2/sxZyLzQNuRHoJfMdE/OkjRuCDb4
-	 nCOg1PyrQ+PVf9pL6W7aGVVQcSXk7WkNBJmT4FAfJDda5LY2PmCQYi3Ugt5LqSdmD7
-	 /+3Jtl5cLtmvFA/0R0P5+9/ODBh26PWd27j1OOa2mR+9tfjM+5L1y4oennPlbqcAhD
-	 xht3cTQQ2YvguLhoIVJEHLA7MqL2UVmaivbvsadrid7nX59htdpThCWWaPWyvRdI6e
-	 rZO/VbDWV9E0Xw/fFRmamCh0ojFU29uvsXovnGgyg5ws+Z8nZ/osM2174EEcN99tsS
-	 56tWpHi+YVTFQ==
-Date: Thu, 13 Nov 2025 10:45:35 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: manivannan.sadhasivam@oss.qualcomm.com, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Subject: Re: [PATCH 1/9] serdev: Convert to_serdev_device() and
- to_serdev_controller() helpers to macros
-Message-ID: <vajsqzw2z5jljmlys6gk3eltj3b2fr4xymyv252idk57lk3wm3@gfff56nn25is>
-References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
- <20251112-pci-m2-e-v1-1-97413d6bf824@oss.qualcomm.com>
- <CAL_Jsq+dZOUCosma1QJ-aqtjWs4NDLRkAdB3Aaro=8_Ep7Y0Rg@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="nVxJNsxt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Bo
+	UTeBHcroRJmewLYRuoJb60IWyDYcyDdxrdqYUh0RA=; b=nVxJNsxt6zjDegxgxv
+	y6u1vgZuKQaqMaBjBRXb2qM7GTEHUsBIfZnhQRqLtCmdGIbXlwm77G4iJQyAE+e/
+	RAfLIpnwCvKcf08mY4Eg5yN4k71+jIsQSe1KZDaoE7lOd6B5zlFuVgyY4ISDq6Ic
+	o7DEuresYzSUd/tNi0GemaXAY=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wCXdtVWdhVp8ayOCw--.129S2;
+	Thu, 13 Nov 2025 14:10:31 +0800 (CST)
+From: Gongwei Li <13875017792@163.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Gongwei Li <ligongwei@kylinos.cn>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH v2 1/2] Bluetooth: Remove unused hcon->remote_id
+Date: Thu, 13 Nov 2025 14:10:28 +0800
+Message-Id: <20251113061028.114218-1-13875017792@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20251112094843.173238-1-13875017792@163.com>
+References: <20251112094843.173238-1-13875017792@163.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_Jsq+dZOUCosma1QJ-aqtjWs4NDLRkAdB3Aaro=8_Ep7Y0Rg@mail.gmail.com>
+X-CM-TRANSID:_____wCXdtVWdhVp8ayOCw--.129S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7JF1fWF4rXr1UJFykAFyDGFg_yoW3XFXEyw
+	1IvrWfur4UXrW7Ar12qFWjvw4Fqwn3GFn29Fs3XrWYq34DursxtryxXr1qqr1fW3srZr17
+	AayDXFWDXw1FyjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUnxnY7UUUUU==
+X-CM-SenderInfo: rprtmlyvqrllizs6il2tof0z/1tbiXQoFumkVcEGTEAAAsm
 
-On Wed, Nov 12, 2025 at 03:13:54PM -0600, Rob Herring wrote:
-> On Wed, Nov 12, 2025 at 8:45 AM Manivannan Sadhasivam via B4 Relay
-> <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> wrote:
-> >
-> > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> >
-> > If these helpers receive the 'const struct device' pointer, then the const
-> > qualifier will get dropped, leading to below warning:
-> >
-> > warning: passing argument 1 of ‘to_serdev_device_driver’ discards 'const'
-> > qualifier from pointer target type [-Wdiscarded-qualifiers]
-> >
-> > This is not an issue as of now, but with the future commits adding serdev
-> > device based driver matching, this warning will get triggered. Hence,
-> > convert these helpers to macros so that the qualifier get preserved.
-> >
-> > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> > ---
-> >  include/linux/serdev.h | 10 ++--------
-> >  1 file changed, 2 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/include/linux/serdev.h b/include/linux/serdev.h
-> > index 34562eb99931d808e885ce5022b8aa4577566885..ab185cac556380dfa3cdf94b7af6ee168b677587 100644
-> > --- a/include/linux/serdev.h
-> > +++ b/include/linux/serdev.h
-> > @@ -49,10 +49,7 @@ struct serdev_device {
-> >         struct mutex write_lock;
-> >  };
-> >
-> > -static inline struct serdev_device *to_serdev_device(struct device *d)
-> > -{
-> > -       return container_of(d, struct serdev_device, dev);
-> 
-> See container_of_const()
-> 
+From: Gongwei Li <ligongwei@kylinos.cn>
 
-Ah, didn't know about it. Will use it in v2.
+hcon->remote_id last use was removed in 2024 by
+commit e7b02296fb40 ("Bluetooth: Remove BT_HS").
 
-- Mani
+Remove it.
 
+Fixes: e7b02296fb40 ("Bluetooth: Remove BT_HS")
+Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+---
+v1->v2: Add Fixes tags
+ include/net/bluetooth/hci_core.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 18396e369..9efdefed3 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -750,7 +750,6 @@ struct hci_conn {
+ 
+ 	__u8		remote_cap;
+ 	__u8		remote_auth;
+-	__u8		remote_id;
+ 
+ 	unsigned int	sent;
+ 
 -- 
-மணிவண்ணன் சதாசிவம்
+2.25.1
+
