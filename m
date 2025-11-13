@@ -1,77 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D03E35B156
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 16:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A14E2F6903
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 16:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763050247; cv=none; b=j44bZZM0RbAW4dit5IqnmsvV0FwQjZtpIPPUV8b78e8IIeSvFVIvhXzmzJ+mg1NyMU2XB7jVoSttm5LhL7gggUInh3DTlNfdfbgas8w9Ois1bmvEzbqbjwowsRQdRjxmjsoSm4p9V9NvvOb5HZg/j9RE5vBO8n47cikS5/1HUic=
+	t=1763050645; cv=none; b=Wk0NQIGzCqPcHjo8ipy7qYP3ISSE9yXVQhbwQPKmposf2idkx/qGNk4NsklQz61XEqsDUq421jIjNA+Sdlg7QgV0k6nvajxt8FpG/eSzqQVct6FnFZSGEMdqbNrzd1TqOShux/8wGJzgbEI+Av1O1gXmCP7DYbj0WkVRlajtD+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763050247; c=relaxed/simple;
-	bh=WR9HldCywjVTTfLslfnk+ZuFTaWnUV3zFmd7IDVQGOE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Tl0THZyZwLs/59td0hhHaPhfGHn9kR4Ba/oa/nDoRxnA/5fqiT/OwNYsXF8Xe42Rr4q9kOHgUXrrYGKiHbWQwdJ/iFxR+AUM1Iixjz8RcvTSds5CajmtzowQfYZ507AzMja3uN62UUYT0i3rSwcvugpEOf/xmHwr4pmfFo1W0KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rXtFC24j; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763050645; c=relaxed/simple;
+	bh=+A/49oIbXvnwhWAxNbYy0sGQlkezEvc8QISoutkCgkQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HmCfZpsPy1H8rUvZHWRXPW5+2IqpmkiDVsz5Hvg+TKcaciRbkq7ONIixf5hXo/+QW36XKI+fBWJt4CJWrOIimccAMHvQPGyWDd6Y67EFVX0Lhyvny6hUFcQOouweGDQndHuA7+c7TBz/tLVN84/5tPOtQe/nKM6PyWmncQldkVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CR2qbF6Y; arc=none smtp.client-ip=192.30.252.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXtFC24j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21570C4CEF1;
-	Thu, 13 Nov 2025 16:10:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763050246;
-	bh=WR9HldCywjVTTfLslfnk+ZuFTaWnUV3zFmd7IDVQGOE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rXtFC24j9r5e9zCRLPxjczIUAYBriPB6oVIJcjYNqknL24LzXEpH7VCYNhqO2x+tB
-	 T6ZxRYL4o92kZGIANARobMbwfxTqYZUouinYOxIRB1KNOMlfqDHv58bDyrSXAnsxZU
-	 /62sR5vdUn3NiyCjQt/rGJ0cPRDOuVd6KkpZqZItmuJ/T1UbSQM6TkXnOKC55mz40g
-	 VOkrqM79Xt5Oxe0eHoPW49GZYGUpu6oi2rGNjZWOebSfHOcrJ075UZmM+1yKnJ1NHZ
-	 tXjUVT2ekVrYnAVDiFR9R5/7sx2wbTiBBhafclvqwP3Vm0XmtYTWxd9ZQ9kimA3Z6E
-	 CXEv+5X3nrbnQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71391380DBD2;
-	Thu, 13 Nov 2025 16:10:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CR2qbF6Y"
+Received: from github.com (hubbernetes-node-91ceb1b.ash1-iad.github.net [10.56.226.74])
+	by smtp.github.com (Postfix) with ESMTPA id 208226013A6
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 08:17:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1763050643;
+	bh=4jPhxNC9v4G7jpdHqCLHzuQKp9gs7Fdvah2Tv244Ts0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=CR2qbF6YbUGERs6goDMSZdWgvYKu5hGYlLN3JrMn9Xihpp1pvwA2PW1cccTRA6TGb
+	 mWjW54VdReNc5zXzpSKWEPv03A3VMSekWBcLk6nuLg3Oczxk6dRIAe9YLl1gBM9blz
+	 qY0xQsJRSGin30X+Jzr4AAEayQP/VCkGdlQsi62Q=
+Date: Thu, 13 Nov 2025 08:17:23 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1023061/000000-a834d1@github.com>
+Subject: [bluez/bluez] 9f8161: monitor: Add page information to
+ print_features_su...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: hci_core: Fix triggering cmd_timer for
- HCI_OP_NOP
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176305021524.908070.8065577142674388282.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Nov 2025 16:10:15 +0000
-References: <20251113151224.2598720-1-luiz.dentz@gmail.com>
-In-Reply-To: <20251113151224.2598720-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1023061
+  Home:   https://github.com/bluez/bluez
+  Commit: 9f8161fa39d34a34c35603ab7a91b804ab362a19
+      https://github.com/bluez/bluez/commit/9f8161fa39d34a34c35603ab7a91b804ab362a19
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-13 (Thu, 13 Nov 2025)
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M monitor/packet.c
 
-On Thu, 13 Nov 2025 10:12:24 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> HCI_OP_NOP means no command was actually sent so there is no point in
-> triggering cmd_timer which may cause a hdev->reset in the process since
-> it is assumed that the controller is stuck processing a command.
-> 
-> Fixes: e2d471b7806b ("Bluetooth: ISO: Fix not using SID from adv report")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> [...]
+  Log Message:
+  -----------
+  monitor: Add page information to print_features_subpage
 
-Here is the summary with links:
-  - [v1] Bluetooth: hci_core: Fix triggering cmd_timer for HCI_OP_NOP
-    https://git.kernel.org/bluetooth/bluetooth-next/c/486a25d25a4b
+This makes print_features_subpage print the page they belong:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> HCI Event: Command Complete (0x0e) plen 253
+      LE Read All Local Features (0x08|0x0087) ncmd 1
+        Status: Success (0x00)
+        Page: 10
+        Features[0/0][8]: 403900f301000080
+          LL Privacy
+          LE 2M PHY
+          LE Coded PHY
+          LE Extended Advertising
+          LE Periodic Advertising
+          Periodic Advertising Sync Transfer - Sender
+          Periodic Advertising Sync Transfer - Recipient
+          Connected Isochronous Stream - Central
+          Connected Isochronous Stream - Peripheral
+          Isochronous Broadcaster
+          Synchronized Receiver
+          Connected Isochronous Stream (Host Support)
+          LL Extended Feature Set
+        Features[1/0][8]: 0000000000000000
+        Features[1/1][8]: 0000000000000000
+        Features[1/2][8]: 0000000000000000
+        Features[2/0][8]: 0000000000000000
+        Features[2/1][8]: 0000000000000000
+        Features[2/2][8]: 0000000000000000
+        Features[3/0][8]: 0000000000000000
+        Features[3/1][8]: 0000000000000000
+        Features[3/2][8]: 0000000000000000
+        Features[4/0][8]: 0000000000000000
+        Features[4/1][8]: 0000000000000000
+        Features[4/2][8]: 0000000000000000
+        Features[5/0][8]: 0000000000000000
+        Features[5/1][8]: 0000000000000000
+        Features[5/2][8]: 0000000000000000
+        Features[6/0][8]: 0000000000000000
+        Features[6/1][8]: 0000000000000000
+        Features[6/2][8]: 0000000000000000
+        Features[7/0][8]: 0000000000000000
+        Features[7/1][8]: 0000000000000000
+        Features[7/2][8]: 0000000000000000
+        Features[8/0][8]: 0000000000000000
+        Features[8/1][8]: 0000000000000000
+        Features[8/2][8]: 0000000000000000
+        Features[9/0][8]: 0000000000000000
+        Features[9/1][8]: 0000000000000000
+        Features[9/2][8]: 0000000000000000
+        Features[10/0][8]: 0000000000000000
+        Features[10/1][8]: 0000000000000000
+        Features[10/2][8]: 0000000000000000
 
 
+  Commit: a834d12c243732f75c8eb88453ebc3affdc5563f
+      https://github.com/bluez/bluez/commit/a834d12c243732f75c8eb88453ebc3affdc5563f
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-11-13 (Thu, 13 Nov 2025)
+
+  Changed paths:
+    M emulator/btdev.c
+
+  Log Message:
+  -----------
+  btdev: Fix set_bredrle_commands
+
+This fixes set_bredrle_commands which was overriding the list of
+commands previously set, so instead of setting the extra command
+after the command list of the specific version this is now merged
+together with each version that requires the extra commands.
+
+
+Compare: https://github.com/bluez/bluez/compare/9f8161fa39d3%5E...a834d12c2437
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
