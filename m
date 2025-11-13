@@ -1,155 +1,99 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A952C29CEB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 20:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9EC3254A9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 23:05:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763064940; cv=none; b=MASM9cMQQ506D/o5hO9eyXGTeueBfA+nKyqvEf/r1yKO4doT+oEBju66W3MdhF0h1b9f24cMCEDV+r5Q2mmP1TH6yH1BB/ZNMHIkZoz+uHoAXrfnC6H8fBLzSYFEqARn38mzwevskG10ocfWU0m416z7WttFvkvUSRtFsJlL3UI=
+	t=1763075102; cv=none; b=r2iMNDJOp//GehzIlbmbwegsZlMehdod0bdEYLrmI4tFTH61KebuFquL9gTalHEI+ln0JevuKQc7/bVKMfYCPojyu2IjkZt24ZIuqeWXm83d/wvZ4bdUBhRINqczB9YtlFzfSGO8/8KhVUzbcOcCGSbNwPOPlXoFbTqhQnHc2aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763064940; c=relaxed/simple;
-	bh=2/Ubuvv4CRNzD5FkKlWviFf1YkbHNjdYEKg/lElsMpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s91bigd9m9UO63R67XZ/4jVDlARFDvEMS7nvnx8micNGeMjznrOpGxUWV/zzP0a9rMI5ujWGMAwwFvO0Exnvdjvlr1yYfNG/KRY14f30ffVoRvVZYYUSvpnUEsQvRqEiTOZiNSMhncTb1x8bEp0yWoGXhnidDQViNZdOijk+SPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=fMRbqKwi; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=UbsSNHnF; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1763075102; c=relaxed/simple;
+	bh=ONqpF6LSYPVL5eprFbfAoXpT+knQmqiHLlje6+G01hg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=X5nJ+hIR4UnKpGMCaUMME6PFKXkid51nL+E5FfEt1Jot7q81DW/WDqoQG7UWvHpyMxH+Yee3F0N3KAxj73r73pPdDmoAjaNMoKEHT9zUR9Jl8m8xUgAWXi2wM3xdMp1S7BYdtCo9tqW2ltLrULctL/jL9sZ2K4HNA6TFO9zDmFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DG7Y1g7K; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="fMRbqKwi";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="UbsSNHnF"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ADESdSv3801307
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 20:15:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ILd9PUMGN2TDvVwIqXslZCpGKIvmjdh159cGGGmejh0=; b=fMRbqKwiuIH8ZEd7
-	Gfs36gODraaybkk6C79RshPCRHamKWp6cqxOyCpTYWZHzbTz9OKt1d3aK6PCHePS
-	EdUVcLzpVtvPxkw5R3VChZBh3b1vRNHZtGri1vcyw55kbvI32CrQZM0YDI4DsYu/
-	SWnpw+xNg3/PPYHLgcgo6Nnk7s5RrbMqJPVoPk1MTO2wyF1Y9Wyfo63KDU9tY3Et
-	yudxGYV3AqnQY88orvexm4+vgU9T9wGFBhyZ4qvMLVtN7u2tfAxXrNBtwEdPha6j
-	L2+Z9hdZh0Io014C8qwVeDYXxqKU807JIAHaIgFZOsVklRyokbI1LBwRquLBNfrc
-	rBDeRw==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4adaamah7w-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 20:15:37 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8b2640347c5so390228185a.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 12:15:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DG7Y1g7K"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8909f01bd00so123659885a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Nov 2025 15:05:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1763064937; x=1763669737; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ILd9PUMGN2TDvVwIqXslZCpGKIvmjdh159cGGGmejh0=;
-        b=UbsSNHnFcklBSr2Wv4Gylg6xAeUbf+tj47SsYzkCsV0bA3UZeLyKLgmSZJcutJgOPp
-         na2xPHr+r68Yity7jO/U/gWp/y2r5BMq9G+11TuEZ+x+JbZBgN27nBVQxrVmGENQWCUU
-         2FYtQdODYBlJi6rzGQxA/1SZpFi0Vg0IpDcMhAyv7KPwUs9F/xBsblr3DvWDKRTHfNRV
-         KmivUE5DFMnDrBfHDNzaHhUd58u0A5fVRfpegLCcnQX6xGMgSrk/hKbp6v8FLxkHmGxd
-         mKigWRfMS/QMbxTCSFUXsZxvkYn95Z6pQ172RRQan79yROVsRPB91NIcHIKLjLoSfnE2
-         virQ==
+        d=gmail.com; s=20230601; t=1763075099; x=1763679899; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6yZb7urwOCrrCshhu5/orntY9nPwWMZ38T4XJmYKxig=;
+        b=DG7Y1g7KdlO5kvGkOmsxW9thekB4F6mqzkkKvqneBw54KPUVmXUJo9AXgG6OnQnaWX
+         p0iO7XrirYyAIUdyRFjMNa+c3W5X+lImPRzbU2A73I+Kh0qzyGEccEdWTxg95dwuZIqc
+         oPDANaF7QurNmfoX9uTR8VGEk2p0tTgMxeSjDFyNh/GnM8S1KPvY1vzyu8c2dw1kZFlX
+         SA6HA6eZJEmFnK8msTEZYX/N7TZk9vTThq+4LuSQUS86cVaczv3jt9tH6UAw6aPCnZ90
+         s+pLrYwnnBAGL9tK3Etjedl38Ucok7bkKkzFjkFzvmEkL7mHP3oiiBP0IwLDwOgLY0+8
+         w1gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763064937; x=1763669737;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ILd9PUMGN2TDvVwIqXslZCpGKIvmjdh159cGGGmejh0=;
-        b=hTpUIX4Y5+1wcZMqofNd1gf8NWpJBnKkNNpOAUmM/0VCJLuOwN7lHz214/JbeBaIyc
-         AUoO2ra59tSyfsIua3pJYJcbIkIqf4q1wYyXX9VMM+aAl/BSBA1nHR3wx4dzhk6MzLGC
-         vUqFHPPpw/FVIjIntWw5COEJq7RP9K3rTeqqXO3cG3iM0OaWeeICE5bcz56O9vfXfej/
-         8tehkHoTkLiM4HAGAXwhu7o9jn88sjcVCLrAcaV9jxdOTYwdK6dZ8qPj3rvjyrLAo1tJ
-         Lw1g837Jz0I0JBHeF3ta3yyfTiYIkQghClq6G4bgCtU/KspZ/25o55+2Mxm4PaNouAVM
-         /A3A==
-X-Forwarded-Encrypted: i=1; AJvYcCXgX2sy/j14uQxbbd6F7OJpLB3WYzzwcvBAL+EhPX6zpdd+8cJEGZWWWzTyFiV90MbxNem+4OkGf2lMCJJwgOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjeVVoHvZEhvSnRaYTQuJPvbBcUv3rFUk0DgM0GP6aBlzAAXce
-	aQKFwJiVib1OCv6F8LulCW9Ykr1w3PKg9Z0s7/MLtaJ1EPdV6+zWG20wAtIn1nGEryvQh4C8kI8
-	J8NijHj3buV/rbYWxxOkT5SuVQ0zYCbdJ3+kQz1D3/ZrfrywJAWYHp9SRxlMxZJW/7gfR/XU=
-X-Gm-Gg: ASbGncu4xYfL+sOavEx2TJVPc+d36l0E7kJjFhZQtIxFbYQG8mDVAeaQ51OdazaRY1g
-	3r87MZaGwa0SK/Jw9v98yEXoDz37Z3Np9q4iZW2pcUMgJjnXwze+plFpu0hYrjKaMOs6hrWVyR0
-	OZLhrr/TSoPnCg3gjNyZOgP0QkkzKjbG3wR0mvkPuF/+71Fx/N4ycNWERqTAQS59hqw78HaZ9i2
-	yaOae0vKC1lnn3j24BEdZtX6oCecLmSSDadqQpyKAaZXFV6gmvPpXmJN8mw3psQJ5KqWw7WFX1r
-	wtCRfJP/cjA6cVuxqhkzLmsQJqomB0N7duU5cdUPYhQjFw424OX3FHNrsxWMqzfZ+l/Ncfe7uL4
-	IEc5wsPgGx9Z7uknVtBeW8rUAfnUQnKQCvPbSyo3xPH6xMlKNafxiP3E+ju48sLkmMypdGc16D2
-	0TItqDOBS+6fJk
-X-Received: by 2002:a05:620a:4110:b0:82f:10ac:450b with SMTP id af79cd13be357-8b2c31c7699mr92100685a.65.1763064936485;
-        Thu, 13 Nov 2025 12:15:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGnqy2FoCmPRnlyXOKKZi4eMTrZOtfMsOc1+d2vmlJDOz7xyFgnjO1/YYJpqsIHOPAX691hHQ==
-X-Received: by 2002:a05:620a:4110:b0:82f:10ac:450b with SMTP id af79cd13be357-8b2c31c7699mr92093485a.65.1763064935832;
-        Thu, 13 Nov 2025 12:15:35 -0800 (PST)
-Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-37b9ce080e4sm6015221fa.2.2025.11.13.12.15.34
+        d=1e100.net; s=20230601; t=1763075099; x=1763679899;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6yZb7urwOCrrCshhu5/orntY9nPwWMZ38T4XJmYKxig=;
+        b=lzb1XVN5tpPnWHMNX/CTQkEAysDPjGiiP5ci+xxd1+gXsFQihEiqDiT5sTnyOIFHj2
+         lkqS3iXCHoJ7wSuNOLZJO7re6oDOM/t0tJtAgumQfAkuHFjvKp6Sb7NKLP0GyG0NIRdN
+         NuNxjnnbtzubVktKGlzF7sljryRJBIFNqlRNRYpVX+2Xo1syWA8zNBg37iCu5d+DjyXk
+         LQ8/cTQCvpoNI3ZFGt1l/BPIlIJ6kVSrHsDevwjNaWNBX0AT57vUxoas/quCGZSkZbj5
+         WI93pbPAfDBhT740tftUdJXbP3Kc8XPIkhbfZFlEwQb7qxJDfShR/JpE2Nr1dI5v8nMl
+         tzOQ==
+X-Gm-Message-State: AOJu0YyfAqNE/rKZcImpUomLubiBEQFeQkORxsVohQRxecC24RYpLj9H
+	OxWByXk2pqx2W4BYQwBk6pTYzu7wcWOwWEQajt4d0bLXB/8+xsRYwdk37gkD6w==
+X-Gm-Gg: ASbGnctv4NKcv+bld1NZ1leTBmnIclDDxNCTXxkSGremW1z8ChDiHMjZCQK1jUaTF/t
+	LSjhcNWEXTcUTaQjiP7nyzX03XDU+RKzOtXUcFPQyDLDUBx1Z3IJDAFYV+Jz5qPwuQ7boBh+FC6
+	3dfmKnyniCwYrbd2fy3ICCsdtj50oSMgfjLJMSy7elUwuKjUpxy4ZUcwA0odmED0gHQmRVkCkUj
+	lTKmSfe/gZj2Qc5Lw5YNyGC/Wp+bSfyjvVs015dBi6gGqHhGQlX3vOPIR+asmx3TlFsWxTsb0rC
+	6AsL/lHKnY3aNCJFe7fQchzIIZh+314+oQMc9m5k8GhJR7SQi2nNWfMiOAWKt/4ejI8GwsdhuRZ
+	op05iKGB5AcNxBdTD7Fc7F77G3aDmrx20taaTkW8V4eBkq9tMy/rkcs1lKiNnVoMXogFInA+XXR
+	8jBj9F6MssiLCdaiSwpK4OPIwVbL6gMIYh
+X-Google-Smtp-Source: AGHT+IHTvKfJTVQOLqloRn32xrSEohlNw8IuOzkApgfhR36j8zVImmhQH5zBFq9GzE6nHLx3Hl7KNA==
+X-Received: by 2002:a05:620a:4692:b0:8b2:a3a9:f757 with SMTP id af79cd13be357-8b2c3145ebdmr149825085a.15.1763075099339;
+        Thu, 13 Nov 2025 15:04:59 -0800 (PST)
+Received: from daniel-desktop3.localnet ([204.48.79.110])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b2aee9eeeasm221336385a.9.2025.11.13.15.04.58
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 12:15:34 -0800 (PST)
-Date: Thu, 13 Nov 2025 22:15:32 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Wei Deng <wei.deng@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_jiaymao@quicinc.com, quic_chezhou@quicinc.com,
-        quic_shuaz@quicinc.com
-Subject: Re: [PATCH] arm64: dts: qcom: monaco-evk: Enable Bluetooth support
-Message-ID: <feaaqnezljrvqyxd5hvkmcjgezl2cqnjw6gmmu43a3h6chs3vc@cx56pcgckwoz>
-References: <20251113130519.2647081-1-wei.deng@oss.qualcomm.com>
+        Thu, 13 Nov 2025 15:04:58 -0800 (PST)
+From: Daniel Tang <danielzgtg.opensource@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] mpris-proxy: Only be started by pipewire.service
+Date: Thu, 13 Nov 2025 18:04:57 -0500
+Message-ID: <2488030.6sBWrkQq0l@daniel-desktop3>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251113130519.2647081-1-wei.deng@oss.qualcomm.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEzMDE1OCBTYWx0ZWRfX1i/LUkQ7tCad
- sIicQELAIXnD8IYdsN+0H/z5B00AawOyS68CUZk38NrG2QF8N40pbpwIiUzTvLJJFs3hitGduRT
- v8n+C48/ju3ys6Sp4Ojp3YiMtJT6WI09rnTqvJkVaP0aki+TAGInozuiuMvxyK2EflAB+8KfZW9
- tJboXoYJS2I8yGCr2Hj8Xsdo/jm4zU3kPYHLpgjs9ANKyLicbLKJsf8yUMbwyzT4ikjLW9zzcb+
- kow0YiseI9cwyR5elmcPR/507yzw3X9VjJ4ilr5bsCcCVGucwMDXyR4WQgyCWxaqtaRagj9Rlb/
- VdT5BLdGJJK7b2phEqmYIMD8uLJwbql5oKhKP8zw37E3ksfyZEBZEYLU3aFjFIjwGBUjvfkwLjY
- u/ZDo7iZd8NDys8SV8ALPa8YNqjf/A==
-X-Authority-Analysis: v=2.4 cv=d4f4CBjE c=1 sm=1 tr=0 ts=69163c69 cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=EUspDBNiAAAA:8 a=vuKYHiuAbYjNwaP7v-kA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=zgiPjhLxNE0A:10 a=PEH46H7Ffwr30OY-TuGO:22
-X-Proofpoint-ORIG-GUID: bsO46DEkc_Zbqz-PsClggkYB-9qWh0yo
-X-Proofpoint-GUID: bsO46DEkc_Zbqz-PsClggkYB-9qWh0yo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-13_05,2025-11-13_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
- phishscore=0 suspectscore=0 spamscore=0 adultscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511130158
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
 
-On Thu, Nov 13, 2025 at 06:35:19PM +0530, Wei Deng wrote:
-> There's a WCN6855 WiFi/Bluetooth module on an M.2 card. To make
-> Bluetooth work, we need to define the necessary device tree nodes,
-> including UART configuration and power supplies.
-> 
-> Since there is no standard M.2 binding in the device tree at present,
-> the PMU is described using dedicated PMU nodes to represent the
-> internal regulators required by the module.
-> 
-> The module provides a 3.3V supply, which originates from the
-> main board’s 12V rail. To represent this power hierarchy in the device
-> tree, add a fixed 12V regulator node as the DC-IN source and link it
-> to the 3.3V regulator node.
-> 
-> Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
-> ---
->  arch/arm64/boot/dts/qcom/monaco-evk.dts | 99 +++++++++++++++++++++++++
->  1 file changed, 99 insertions(+)
-> 
+After `systemctl --user mask pipewire`, all related services including
+this should stop starting on login. A non-console-interactive user
+without the default sound server is unlikely to have any MPRIS clients
+running, and disabling the service reduces memory usage and attack
+surface. PulseAudio is obsolete, jack2 users have professional
+solutions, and non-PipeWire users can ignore the `systemctl enable`
+warning or use a drop-in.
+---
+ tools/mpris-proxy.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-
-
+diff --git a/tools/mpris-proxy.service.in b/tools/mpris-proxy.service.in
+index 6ae56c672..02a244b6e 100644
+--- a/tools/mpris-proxy.service.in
++++ b/tools/mpris-proxy.service.in
+@@ -11,4 +11,4 @@ Type=simple
+ ExecStart=@PKGBINDIR@/mpris-proxy
+ 
+ [Install]
+-WantedBy=default.target
++WantedBy=pipewire.service
 -- 
-With best wishes
-Dmitry
+2.51.0
+
+
+
