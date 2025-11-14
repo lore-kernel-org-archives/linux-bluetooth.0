@@ -1,131 +1,79 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B9D3271E2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 16:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D296330D24
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 17:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763137106; cv=none; b=oz3CpwUTWIBipTVldTFJYszcxofmw+TKaa+tFWxJpqB4JXpbvr//IvfZ4gGcMDtolyYeuFASgAP0XhWIjkHD4kfrwnMst1zFTBPYB3GqfgC9bNH8X+9G3jQHE3PNDwkcyW48vkBRNf9Y+PQPDpz1YU9/QHQ9a/PMXuBWR47q/bY=
+	t=1763140356; cv=none; b=kiuwR0KW6l5PJXuW5kPDl/FiAZ3YUvlCF0aMR738edBfq+tQSw9564a3All5Rheh5wVGjbo/tGqmaFKD/DQKQ1aaG4wN8VprJRsyB7mVDFSSzq/3g0wzOJBSXE5iITuAWmN9WsWLX7IEW0G7yClE9UU5Vc5VZAn/EBdf4+qZSH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763137106; c=relaxed/simple;
-	bh=QEjF1WF/vRwN70ClSuEqTx6+UbIiyHQ3zt9JLkF/88w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MQnDwhZPVl7sWuUkFMO73vwUFKDtM8Kl0vMRtg8nTxUV6oWynPJDB3jxXMKReXunlQyySxDgAHIblghl3rX+/mvv5ZCXvnPlychR6a1nFG3z7cbICx52ZESkxOROPoXU2vByXY9SCeFaZfnUCFAmOZ2umWDNjZTox98jbJEXJP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ac3WA5Xu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763140356; c=relaxed/simple;
+	bh=DFjdthS1WfCd8tQe3dOi06QV7VlZIU330MRYRHHgCnY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dQwgBij7r9MKH+V+Ijkg9hGbekexyhQ5rtkeudSu3fSfbUPs8fCqvTkwdMRVt9zh9hJJXa4FxlLBnS4nU10SuqPPz1O6L1OGvAW4NA3Dl6CHPT5GkqZuqQn4oByJNLT2wr+51MdzhFf2iy33qFq05kz/f8+iVlb6LAbIUlbGxJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p6QfkSoq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ac3WA5Xu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57AA7C2BCB2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 16:18:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p6QfkSoq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3A30C4CEF1;
+	Fri, 14 Nov 2025 17:12:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763137106;
-	bh=QEjF1WF/vRwN70ClSuEqTx6+UbIiyHQ3zt9JLkF/88w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Ac3WA5XuaQaAWGL8uFBSD+0TpGKP675lNRhFD+YZcUdIJSOqNhyLGcxJ/ap84XylO
-	 oG75GiSnC+95uA8uApQgdSauzQhKnGOI0gMWIvM6PDGZDKA//5gJb+1iPm8KeMU8Pe
-	 hxJOOL5PNqFhaZBjKdxNbdm+Vog4fvukWS+9k9xG8jvjd7jyLw4wjAdrgUZcwFzdDI
-	 37yFAIYt9lzbliOLiBImWMtjcwKMziKeR0uCaFWRgPeWYbPal66DGuFZF+WcfG8iyI
-	 jqxtzdRG93PtvBAd7R1TUcMeyiOQp8TmCxWViJzbgbSqMyVwvQ2OquFFCmYJ2z7qp+
-	 53kOMVYCt74mQ==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b736cd741c1so140659666b.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 08:18:26 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUBn1pxGFjGBKQrz77+sZvENrmxj00DY73Fv8NPf8wBuTQfCyJYxf9Nt5m2PSdCPYaBjQyGpE/VGnjVzyo3/u0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZKHh/VlF12jfpkXYYom7R9P/B9nBEEP1PMeTAXOj96CbQMyFs
-	o2UvNAS/4lyjJaas+l77lkSD7sVNvgYv2/5ShNje0A4RD0LdGywXV21jgPqlj7a3saHDUdhossa
-	Ctf7VLyigQvVjwb6rGeDVez9tnHeKFg==
-X-Google-Smtp-Source: AGHT+IEvLOFyqCU+gTpIpUldy/VCAnVeRKgX2Fjb/dnX2vDFUQSF+Pi1VBgJh5ukSnrIkAAXLmy9kEIRZ3yzcpYSJ/s=
-X-Received: by 2002:a17:907:a089:b0:b73:5f5e:574d with SMTP id
- a640c23a62f3a-b736796a33bmr324954266b.59.1763137104773; Fri, 14 Nov 2025
- 08:18:24 -0800 (PST)
+	s=k20201202; t=1763140355;
+	bh=DFjdthS1WfCd8tQe3dOi06QV7VlZIU330MRYRHHgCnY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=p6QfkSoqJ4WTABV+xhp64n26urx0YO5NGssu/7wpGlleGN5giFfbWBcaPmYaZkVeF
+	 os+e8QIsLwAypbMo5iCGa9+FnqHPvmpPgbJaDKJIwgXDdf2lTqG7ZbxevVMUWTCk8R
+	 3+CX1SzCHNUH0jNnOArX3WRRSL2RQXG7epe40j2dG3Y6aTootVCUVo0RQotCu7o+e8
+	 epyfTev98tGjNLjOBiaIEUtSaKPnwlp0qt5qVWBgh+maNSWNeJ4CU7Rg1okEv5fgNa
+	 efawB8niuqQwZb2TkpGQCn+VtdQdxGDsO2ExRhKwggMZ/MmD89F4T23RUSUdimzNED
+	 x5glT+u6SzQpQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710063A7859C;
+	Fri, 14 Nov 2025 17:12:05 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113130519.2647081-1-wei.deng@oss.qualcomm.com> <176313578860.3262114.17056319042303889483.robh@kernel.org>
-In-Reply-To: <176313578860.3262114.17056319042303889483.robh@kernel.org>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 14 Nov 2025 10:18:13 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqJX3doLFv-Nc6o+L1W_o8VjtvGp9dqdpsotuyG17zU7Lw@mail.gmail.com>
-X-Gm-Features: AWmQ_bkWy46OX7PgV9ZUzhlCrs70KVuhH4A3WuQtX93vwPtAy017ORp1pZrC_NY
-Message-ID: <CAL_JsqJX3doLFv-Nc6o+L1W_o8VjtvGp9dqdpsotuyG17zU7Lw@mail.gmail.com>
-Subject: Re: [PATCH] arm64: dts: qcom: monaco-evk: Enable Bluetooth support
-To: Wei Deng <wei.deng@oss.qualcomm.com>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	linux-arm-msm@vger.kernel.org, quic_jiaymao@quicinc.com, 
-	Konrad Dybcio <konradybcio@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, cheng.jiang@oss.qualcomm.com, 
-	devicetree@vger.kernel.org, Bjorn Andersson <andersson@kernel.org>, quic_shuaz@quicinc.com, 
-	quic_chezhou@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 BlueZ 0/3] build: Fix distcheck while installing
+ org.bluez.obex.service with --disable-system
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176314032400.1740925.4460596458732332307.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Nov 2025 17:12:04 +0000
+References: <20251111155644.11675-1-parona@protonmail.com>
+In-Reply-To: <20251111155644.11675-1-parona@protonmail.com>
+To: Alfred Wingate <parona@protonmail.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 
-On Fri, Nov 14, 2025 at 10:06=E2=80=AFAM Rob Herring (Arm) <robh@kernel.org=
-> wrote:
->
->
-> On Thu, 13 Nov 2025 18:35:19 +0530, Wei Deng wrote:
-> > There's a WCN6855 WiFi/Bluetooth module on an M.2 card. To make
-> > Bluetooth work, we need to define the necessary device tree nodes,
-> > including UART configuration and power supplies.
-> >
-> > Since there is no standard M.2 binding in the device tree at present,
-> > the PMU is described using dedicated PMU nodes to represent the
-> > internal regulators required by the module.
-> >
-> > The module provides a 3.3V supply, which originates from the
-> > main board=E2=80=99s 12V rail. To represent this power hierarchy in the=
- device
-> > tree, add a fixed 12V regulator node as the DC-IN source and link it
-> > to the 3.3V regulator node.
-> >
-> > Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
-> > ---
-> >  arch/arm64/boot/dts/qcom/monaco-evk.dts | 99 +++++++++++++++++++++++++
-> >  1 file changed, 99 insertions(+)
-> >
->
->
-> My bot found new DTB warnings on the .dts files added or changed in this
-> series.
->
-> Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-> are fixed by another series. Ultimately, it is up to the platform
-> maintainer whether these warnings are acceptable or not. No need to reply
-> unless the platform maintainer has comments.
->
-> If you already ran DT checks and didn't see these error(s), then
-> make sure dt-schema is up to date:
->
->   pip3 install dtschema --upgrade
->
->
-> This patch series was applied (using b4) to base:
->  Base: attempting to guess base-commit...
->  Base: tags/next-20251112 (exact match)
->  Base: tags/next-20251112 (use --merge-base to override)
->
-> If this is not the correct base, please add 'base-commit' tag
-> (or use b4 which does this automatically)
->
-> New warnings running 'make CHECK_DTBS=3Dy for arch/arm64/boot/dts/qcom/' =
-for 20251113130519.2647081-1-wei.deng@oss.qualcomm.com:
->
-> arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): =
-'vddpcielp3-supply', 'vddpcielp9-supply' do not match any of the regexes: '=
-^pinctrl-[0-9]+$'
->         from schema $id: http://devicetree.org/schemas/regulator/qcom,qca=
-6390-pmu.yaml
-> arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): =
-'vddpcie1p3-supply' is a required property
->         from schema $id: http://devicetree.org/schemas/regulator/qcom,qca=
-6390-pmu.yaml
-> arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): =
-'vddpcie1p9-supply' is a required property
->         from schema $id: http://devicetree.org/schemas/regulator/qcom,qca=
-6390-pmu.yaml
+Hello:
 
-This is the 3rd report of your typos. Is there some reason you are
-ignoring the reports?
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Rob
+On Tue, 11 Nov 2025 15:57:32 +0000 you wrote:
+> From: Alfred Wingate <parona@protonmail.com>
+> 
+> Pkg-config variables give absolute paths with system prefixes, causing problems
+> for distcheck which wants to install everything in its own prefix. To cope with
+> this lets give distcheck its own configure arguments with its own prefix variable
+> already included.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,BlueZ,1/3] build: use AM_DISTCHECK_CONFIGURE_FLAGS
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=708bf7d11056
+  - [v2,BlueZ,2/3] build: Fix distcheck by hardcoding non absolute paths
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=057da54566f6
+  - [v2,BlueZ,3/3] build: obexd: Revert "Fix make distcheck"
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ebd6f9fefa26
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
