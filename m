@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C82337B8A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 17:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E2A33710D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 17:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763140358; cv=none; b=OhSjzZm1+CFeY8vLvPbuZSWACAxQgZ6/4xrvP+E5uJArIfUnm/0WAnypbwSGd1rmAWY62WF08XMr+rd3ARdhh2J9YDjD9MmPrINbtz7Gd/IHPtUP3qy+NkzvFWLa9EGq8kQKeU2DRzywLhloG7nDRhAAKKvw1pDjk/xhmCwzFR8=
+	t=1763140359; cv=none; b=gCEQ5uta71Kb0n7jUtJRZIzDbgK93cjpyTLc4aFpm1XWIi5EFFLFNySku69/8GLm93HGI19TNADarN32ShoqLB3kEuwRkoovZ+zNFXtBJ6xQ4MP2ABD6XCVZ4vA2c0lWUGroiI3qcz1d9V6VII2DQbzJnNBqazSXeknH0c4mGkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763140358; c=relaxed/simple;
-	bh=03Sl3GTwQBW34XpiB9q9v9fY+vRMAa+Ky6IAAnRmVts=;
+	s=arc-20240116; t=1763140359; c=relaxed/simple;
+	bh=IxsPGJ7ryoOYmiFMYgI2G73mEwGCczaTL1XY8vKGW70=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dpsVznVRtDNxtobWmp8RmcFyp0DUtRUhLY6fZGNYY81s4L6fpagff9sSjJYtUn1xeFibhHyPHRlgptJwyax5xEaF9a9TA3B8SVa3zVNbStQz4xKqCyo6R1mRlKnnKNAPtJKdFl+lFmoYfSzs/+oosf8+Q9+yJrQWiMlYziFwIyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CfRXkokj; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=PvhLbz4VMqRdvTHp6F8/NNOt36DCfJODFvfsngTuHma4wsQvPgquhE9wfgX6VmR/OIjX/+ztw+KflS7YDZxvW2mIGtAOMjNVBYVJ/jBIoeJEvTeAFWXWVxO5wEbXEg5p6Mc9Y2PpxvQSVj2OLkYEvYUMHJk2efQ6YImGLsRcQQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=olIkSBjT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CfRXkokj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A2B3C113D0;
-	Fri, 14 Nov 2025 17:12:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="olIkSBjT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65BC4C4CEF5;
+	Fri, 14 Nov 2025 17:12:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763140358;
-	bh=03Sl3GTwQBW34XpiB9q9v9fY+vRMAa+Ky6IAAnRmVts=;
+	s=k20201202; t=1763140359;
+	bh=IxsPGJ7ryoOYmiFMYgI2G73mEwGCczaTL1XY8vKGW70=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CfRXkokjyT+9tT7v1MJN/owC1Tuet/IHVsUPnn7ul/5AwI0JAHJC9Ahj07LKM5lvL
-	 ItQri0f+Bf0lw3MvuaG7/QM9uEpV30q4ldvjg1LuQVriZ/nKmAFRD5vMJLEJxlHP3D
-	 p5xpEkZ//74yHkF6O6zUGN5MjpyCeJWkc9SFj+l1fAj6M1jHcNImCBNSFAwM6hmHMy
-	 3oqemNpK2wg01dVMDjmymMkWi+Js++KpegbpU92Y9n8zugw1RRb9PH/UnX1+RMH3Hw
-	 0f0Wwh4ia6ezhRgrh8iZym+9VC/N7txhHfRONAdJCNYu5IzPxn/ooM2zklb82g6QsD
-	 sUJt5j6ZmXuCA==
+	b=olIkSBjTOSxyBb3wfVMk7vx/gPsS3iSwvsFNJhGNxl6D5CgXCV32fZCOpIeIwgoMh
+	 1MBQqWq6BIStlhBbIFhFDmcnNZEWldurc41Mm4o6dcUlDBWaEzDdsvw78od+2Kj1ft
+	 j/8Um34VY/z/XxjXhBIfBTX3vdxkb3Zck88fB3o+XREyrsRS1Gj0Mv5Q5lwHAhSoeL
+	 6oZuCv3ogQXlQR+U/0NeLTr1VEYxHDhdtD2+n2JelQw5ldPj/w/hM118d6Ap1HTJ10
+	 RG/mpqp4cbpzRTRNv5Ae6olzYzvR70l0XqdIO3qTO26AvIw+h2jB8n13kMOV9o1vty
+	 4YPJGaMtyA3eQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0EE243A7859C;
-	Fri, 14 Nov 2025 17:12:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CBC3A7859C;
+	Fri, 14 Nov 2025 17:12:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,15 +37,17 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/2] monitor: Add page information to
- print_features_subpage
+Subject: Re: [PATCH BlueZ 0/3] build: Fix distcheck while installing
+ org.bluez.obex.service with --disable-systemd
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <176314032674.1740925.17555659694388224656.git-patchwork-notify@kernel.org>
-Date: Fri, 14 Nov 2025 17:12:06 +0000
-References: <20251113155818.2628720-1-luiz.dentz@gmail.com>
-In-Reply-To: <20251113155818.2628720-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+ <176314032808.1740925.14596822117835195069.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Nov 2025 17:12:08 +0000
+References: 
+ <-w4Tz-HGOFe81IvBNIZkrOtGaZ6VR30rkdG0gO1KgjhxcPPSli_0wT7tBXmJ1aUbSXQrBj7g0sEEfolp4FhC5d2WJwwICWVE0oNlVa1sp_w=@protonmail.com>
+In-Reply-To: 
+ <-w4Tz-HGOFe81IvBNIZkrOtGaZ6VR30rkdG0gO1KgjhxcPPSli_0wT7tBXmJ1aUbSXQrBj7g0sEEfolp4FhC5d2WJwwICWVE0oNlVa1sp_w=@protonmail.com>
+To: Alfred Wingate <parona@protonmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
@@ -53,67 +55,23 @@ Hello:
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 13 Nov 2025 10:58:17 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thu, 23 Oct 2025 05:05:09 +0000 you wrote:
+> Pkg-config variables give absolute paths with system prefixes, causing problems
+> for distcheck which wants to install everything in its own prefix. To cope with
+> this lets give distcheck its own configure arguments with its own prefix variable
+> already included.
 > 
-> This makes print_features_subpage print the page they belong:
-> 
-> > HCI Event: Command Complete (0x0e) plen 253
->       LE Read All Local Features (0x08|0x0087) ncmd 1
->         Status: Success (0x00)
->         Page: 10
->         Features[0/0][8]: 403900f301000080
->           LL Privacy
->           LE 2M PHY
->           LE Coded PHY
->           LE Extended Advertising
->           LE Periodic Advertising
->           Periodic Advertising Sync Transfer - Sender
->           Periodic Advertising Sync Transfer - Recipient
->           Connected Isochronous Stream - Central
->           Connected Isochronous Stream - Peripheral
->           Isochronous Broadcaster
->           Synchronized Receiver
->           Connected Isochronous Stream (Host Support)
->           LL Extended Feature Set
->         Features[1/0][8]: 0000000000000000
->         Features[1/1][8]: 0000000000000000
->         Features[1/2][8]: 0000000000000000
->         Features[2/0][8]: 0000000000000000
->         Features[2/1][8]: 0000000000000000
->         Features[2/2][8]: 0000000000000000
->         Features[3/0][8]: 0000000000000000
->         Features[3/1][8]: 0000000000000000
->         Features[3/2][8]: 0000000000000000
->         Features[4/0][8]: 0000000000000000
->         Features[4/1][8]: 0000000000000000
->         Features[4/2][8]: 0000000000000000
->         Features[5/0][8]: 0000000000000000
->         Features[5/1][8]: 0000000000000000
->         Features[5/2][8]: 0000000000000000
->         Features[6/0][8]: 0000000000000000
->         Features[6/1][8]: 0000000000000000
->         Features[6/2][8]: 0000000000000000
->         Features[7/0][8]: 0000000000000000
->         Features[7/1][8]: 0000000000000000
->         Features[7/2][8]: 0000000000000000
->         Features[8/0][8]: 0000000000000000
->         Features[8/1][8]: 0000000000000000
->         Features[8/2][8]: 0000000000000000
->         Features[9/0][8]: 0000000000000000
->         Features[9/1][8]: 0000000000000000
->         Features[9/2][8]: 0000000000000000
->         Features[10/0][8]: 0000000000000000
->         Features[10/1][8]: 0000000000000000
->         Features[10/2][8]: 0000000000000000
+> https://www.gnu.org/software/automake/manual/html_node/DISTCHECK_005fCONFIGURE_005fFLAGS.html
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v1,1/2] monitor: Add page information to print_features_subpage
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f67b72b4cc39
-  - [BlueZ,v1,2/2] btdev: Fix set_bredrle_commands
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4bf47f880d06
+  - [BlueZ,1/3] build: Support setting the cups_serverbin directory
+    (no matching commit)
+  - [BlueZ,2/3] build: Fix distcheck by hardcoding non absolute paths
+    (no matching commit)
+  - [BlueZ,3/3] build: obexd: Revert "Fix make distcheck"
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ebd6f9fefa26
 
 You are awesome, thank you!
 -- 
