@@ -1,118 +1,109 @@
-Received: from nx35.node01.secure-mailgate.com (nx35.node01.secure-mailgate.com [89.22.108.35])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09221279DC0;
-	Fri, 14 Nov 2025 08:03:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.22.108.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1083C21C9E1;
+	Fri, 14 Nov 2025 08:18:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763107441; cv=none; b=Zqd5sdbmNyQdTUscAIOOYoamNljI0LwgGbSbqm9A8DRDGxzLblS9wOpWE6xjqFu5Um56wYbAyKAgIYjODy8r5BPTLmG7UpgigTpxgN0BVq9k1HMMNSN8MMGKz8avne5syY6odVOBxbF5XEAuEbTmeDRbwnfk+bsUIFg2Ed1WJ3A=
+	t=1763108283; cv=none; b=XYNLeYjsDEcIkhiuEy8QY/mwH693bKut1qrs0+ykMXQY/QnTXNL4SyEY9s2gDKPLkpguhWn1wpuW8y3AP1URlcH5DGuCd7FeMJbK1RPwltCua2e/qN3P6AmQ5fo7Xbt9PQivXC95NQBg5NiadFjrqeI5K/lUX6mPuxZ5a5OZFCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763107441; c=relaxed/simple;
-	bh=/nvdXeCztr5x7wU02Syex4AbjYAAvVqMMlzKgulCUSY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=E25w7rP4L82DkXba1ylU/cUekwhWMX6xuDYeQ9iQeprESFAd7ukBgMwyqxoWyR58HK6MSEZcVawwHZw/tGHXFWeYoqF9v2js6TYCqjrRd5Y7M7xMfxbJUMe/FK/qUajEOgLQ0b9IOswuWy6FnwxZQchYhj0a9YecQEQnuUV6/nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=neukum.org; spf=pass smtp.mailfrom=neukum.org; dkim=pass (1024-bit key) header.d=neukum.org header.i=@neukum.org header.b=emu3T+mH; arc=none smtp.client-ip=89.22.108.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=neukum.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=neukum.org
+	s=arc-20240116; t=1763108283; c=relaxed/simple;
+	bh=qDEtVWuKa3nNq0TdHsWA5DtCc8KzkRxwXXfPKtQ9XDM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=irMmz5NdVVOJ7s2IRB5Maq8YM+zg6/BQsUNMzvW1xWT7C7FRHE6BOP+pa336zUISo7Tm7YtRBCMUgChZrT42mTCXQU6TdSYsqeg6LuzKZbdcrFOUTx3mCDx4LfsJr4KEPrAvJYcFFdAhViA9LJXAXCzBpQ2sF9nJDE3m3YFj2PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=MI02RcxT; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=neukum.org header.i=@neukum.org header.b="emu3T+mH"
-Received: from web268.dogado.net ([31.47.255.48])
-	by node01.secure-mailgate.com with esmtps  (TLS1.2) tls TLS_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <oliver@neukum.org>)
-	id 1vJomZ-00CmoB-S1; Fri, 14 Nov 2025 09:03:51 +0100
-X-SecureMailgate-Identity: neukum_org;web268.dogado.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=neukum.org;
-	s=cloudpit; t=1763107426;
-	bh=js5De72dNejc963vL2O1fflV3+QBWHSFP9enSUqAojE=;
-	h=Date:To:Cc:From:Subject:From;
-	b=emu3T+mHkAbxsHb8771NFxWKK791qe59KfEEWoE642RKhbt96UMTDXUV5VxYJw375
-	 sZOQcLPBbHNhPyl1PX/Dsk7wT2nA3F0H1JjCD+tVIE9+0R44dEWnWEVYKwb1FTuJeu
-	 C0db2M+1xKlBnAjIj1GeVSGuugmBLnsBpT+tE60Y=
-Received: from mailproxy6.dogado.net (mailproxy6.dogado.net [31.47.255.222])
-	(Authenticated sender: neukum_org)
-	by web268.dogado.net (Postfix) with ESMTPSA id 0ECEC28171E;
-	Fri, 14 Nov 2025 09:03:46 +0100 (CET)
-X-SecureMailgate-Identity: neukum_org;web268.dogado.net
-Message-ID: <aee37797-a280-47ea-91ac-487ddc124ac7@neukum.org>
-Date: Fri, 14 Nov 2025 09:03:45 +0100
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="MI02RcxT"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ADMb0kF1428363;
+	Fri, 14 Nov 2025 08:17:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=QzbJkE3oSLkXlG8DWAR5dymyilF+zia6V5+
+	I2vEt0As=; b=MI02RcxTdPhBdlknLciq30zGJOszl4HNGwmGlLxeEXKuK+gAL9b
+	+KNlNAXKWrvc5M5SWui5Q5DTefXFDESAuj+9FzPdY4DwbeTJKAH/iVN4zLG1DoNl
+	slC5Ag7RNnctocehE6XcO8rVrijcGHN1xDVef4mAQdCR6OG1NXM2nZV4o95qnfCH
+	nhNsSa/xVsopsqWoZkpYL2eT0iKk56GwOgesTKDHbSN4uz8NXrBl3HLQp9SZK/qp
+	oKgjjePJnTbk+WPeZKKVvdyWHOkqKjvQFBWTIXca799nBDD0bP3WGG8PjgjxBK0D
+	zPgQtGkhBnzSUtJECJeIbPJHXvSPYg45RIA==
+Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4adr9g1bs9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Nov 2025 08:17:56 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AE8HsUv016497;
+	Fri, 14 Nov 2025 08:17:54 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4a9xxn5rja-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Nov 2025 08:17:54 +0000
+Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AE8Hsje016356;
+	Fri, 14 Nov 2025 08:17:54 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 5AE8Hrnw016353
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Nov 2025 08:17:54 +0000
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
+	id D6B1A22B22; Fri, 14 Nov 2025 16:17:52 +0800 (CST)
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
+        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
+        shuai.zhang@oss.qualcomm.com, stable@vger.kernel.org
+Subject: [PATCH v2 0/1] Bluetooth: btqca: Add WCN6855 firmware priority selection feature
+Date: Fri, 14 Nov 2025 16:17:50 +0800
+Message-Id: <20251114081751.3940541-1-shuai.zhang@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
- Sachin Kamat <sachin.kamat@linaro.org>,
- Alan Stern <stern@rowland.harvard.edu>, USB list <linux-usb@vger.kernel.org>
-From: Oliver Neukum <oliver@neukum.org>
-Subject: issue with devm_ methods in disconnect and freeing memory in btusb
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SecureMailgate-Domain: web268.dogado.net
-X-SecureMailgate-Username: 31.47.255.48
-Authentication-Results: secure-mailgate.com; auth=pass smtp.auth=31.47.255.48@web268.dogado.net
-X-SecureMailgate-Outgoing-Class: ham
-X-SecureMailgate-Outgoing-Evidence: Combined (0.25)
-X-Recommended-Action: accept
-X-Filter-ID: 9kzQTOBWQUFZTohSKvQbgI7ZDo5ubYELi59AwcWUnuXjNdqzJDxDWLO/UpkdjCiXtcAWE8cl15hb
- OiPsRgpQYCu2SmbhJN1U9FKs8X3+Nt2xp4kjpLhmBfm/1jJBevzt8RFB30Ars0yTQ/BrMn+JnVYm
- 9cpWrOMZ7tQFwCmJ4YNwGYjbvhzWX8Co+5c+eruaCtmoQhY2xrBb8C+tWUvqrqBKsSdhvd/J5sX5
- daZjkYvhIO3OPuApEENzBIwyefYO48PjF2L3GVxHSajlUCf0ZlwxsU2jMuBNCauY+qeVRqcM2HNV
- 91gBZQ/1Pbs8eo64MUJTS2Jsxpkx+IHIsDarm2U3gyy0nlbakKK22WPBaizjKzb+JrnOTbl8FYp7
- CIWjverajYy2yB71RZy29b9HL7yliuqXZvH3i216cQum166kf/ld9xdbddNOGSuUXWv94PtbjLq6
- i876g4nLFuIm206wm4jyRZgLX3JeO1DimxffguuWRCT69XJD0VIf1Sv/utspepH656ibybPLqHoc
- HvpVQ/LHxirsNla37u2pHVFz3YiTLViM/bE4mY1qNrjcLCp1LDNBgpe9gGVcAseQ2CVZSXmdZ20d
- kJlKTM6tEuf8vTtpnDhFVFAXN/ieSgx2ezpFj0BqG/t3fGWq+iiriGm2Olw7NFWD50jbuEX0mdKm
- jhaG/t7hemlhJ+woX3OFSK+6iFsnJVr4u5Itb4fUJJQp+axrkf/Hwt0r5Ay1T6TlgTl6fJxyntEf
- hZCKje4ZOPJmqKySiclosAYjq5HhmyPxWFVH+H26km3T4pig7/wWquhQPjfO5uXT7j9W7u8qTfD6
- cxsdFKDXY5IAQfIM9f4GlAB0wMVfGTDZkKNlJZ7r2RGFJqPDOmAQctmh3zCCQYCC8/tQPot8U0pa
- WNjxsqHbbYrnOB/f8gHK828cLRfg7f7w8jy1FzdiCx53QuIcgpyfZlw7Bq0We+9rBz5aplVUjpsk
- cK4Q8fRu49B7wJHz9p/e5RuxqdsdqZOMXNAdnRq2H0n9jhG+7muBS1X+VskYoN/g2a11WysdYadd
- IKZKTPmNuL7Typo2qFGjUhbtexo0PPTHzQ/IcgTHsStfGbawPRuRtimbueg1dle5Gb6mB1YkM4cW
- R2XQFa6Gjq7FOcH0BPQeQFSwUcz39j/B+9lut0mbmApkjKY46fp6K4xHLjrNjqR2xLJfNZLtGdAq
- lVubB2rCMF6RoS5UV9u3bLZbcIJ0GR+Pe2PV4kBmHm8qxX2+VcRHEBh0q9VNLRGJDNhzVfdYAWUP
- 9T27PHqOuBMcaL/3sdQ+aU4L1Br+MEtb1ej7FoCtQ+x7KqtJIKKlUnGMDHzvLQLaIP9xF4j6wA==
-X-Report-Abuse-To: spam@node04.secure-mailgate.com
-X-Complaints-To: abuse@node01.secure-mailgate.com
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=L+AQguT8 c=1 sm=1 tr=0 ts=6916e5b5 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
+ a=042h51yfOyDqjzMtcBEA:9 a=TjNXssC_j7lpFel5tvFf:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE0MDA2NCBTYWx0ZWRfX5QPR+2xmsbH+
+ RTOEenc2E64SMb5nw7X4CWcYVF59jguksETLinpV/XQFmrQG/ir7x8vFqQC4xVXaskjl/Y8JHrS
+ mqJx/oKUMvlYAkfpI5hKtopNaCWf0jJq8gb590Ks5cvQAb2o9Ae4+o18mhkmh3uMB9hld4DqfQu
+ ZHrgDktBmZp1yJlY3LKLxrMT83Ih82eCLUkuDyhHtRWlM3m2FyGpQIOGToa/iiaT4oHEXOIxV5s
+ 3TvSQin2oc0IilhAJzd08SJ7yqj9Zhp8Trmblr/Brk3exe4B+gflA1mc8+zRtcmsyVY5tb7NbVg
+ Ib69yzhO5JzTiSClWPx+tHtn4tu/jG4s0AxsN/9ZKP1ohm1aGEVVfqC/CBZmDKIT/qg0H2JEcE8
+ SUeBALCyvY3E2e7a6JwHykYQMIPQFA==
+X-Proofpoint-ORIG-GUID: AQ51e088eEfbNqeg60lillmFnL4wgcg6
+X-Proofpoint-GUID: AQ51e088eEfbNqeg60lillmFnL4wgcg6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-14_01,2025-11-13_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 impostorscore=0 priorityscore=1501 adultscore=0
+ clxscore=1011 bulkscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511140064
 
-Hi,
+Fixed WCN6855 firmware to use the correct FW file and added a fallback mechanism.
 
-looking at the change to btusb_disconnect() in 23d22f2f7176
-and the discussion leading to it I have doubts. Let me quote the change log:
+Changes v2:
+- Add Fixes tag.
+- Add comments in the commit and code to explain the reason for the changes.
+- Link to v1
+  https://lore.kernel.org/all/20251112074638.1592864-1-quic_shuaz@quicinc.com/
+Shuai Zhang (1):
+  Bluetooth: btqca: Add WCN6855 firmware priority selection feature
 
--- quote --
+ drivers/bluetooth/btqca.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-Syzbot opens a usb device with out of order interface descriptors:
-Interface 3 (ISOC) in position 0, Interface 2 (DIAG) in position 1,
-Interface 1 (INTF) in position 2.
-So, ISOC is the first interface to get disconnected by usb_disconnect()
--> usb_disable_device() -> ... -> btusb_disconnect().
-
-I don't think this is a problem on hardware, where the bInterfaceNumber
-matches the position in the dev->actconfig->interface list; and in
-btusb_disconnect() it would only ever go into the first if
-statement: "if (intf == data->intf)" and not into any of the others.
-
--- quote --
-
-Now, we cannot do this. The order disconnect() is called is arbitrary
-
-1. The order syzbot used is valid according to spec, albeit unusual
-2. disconnect() can be triggered from user space via sysfs
-
-We must always be ready to handle any arbitrary order.
-The code in the second branch of the if statement used to be perfectly correct.
-The actual breaking commit was 98921dbd00c4e by introducing devm_kzalloc()
-for memory allocation. That ties the lifetime of memory to the binding
-of a driver to an interface. In hindsight in a driver that binds
-to multiple interfaces, this is problematic. Hence I would propose
-to just revert 98921dbd00c4e. It seems to me that we have discovered
-a design limitation in the devm_ methods. What do you think?
-
-	Regards
-		Oliver
+-- 
+2.34.1
 
