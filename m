@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D296330D24
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 17:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9C33370EC
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 17:12:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763140356; cv=none; b=kiuwR0KW6l5PJXuW5kPDl/FiAZ3YUvlCF0aMR738edBfq+tQSw9564a3All5Rheh5wVGjbo/tGqmaFKD/DQKQ1aaG4wN8VprJRsyB7mVDFSSzq/3g0wzOJBSXE5iITuAWmN9WsWLX7IEW0G7yClE9UU5Vc5VZAn/EBdf4+qZSH8=
+	t=1763140357; cv=none; b=gazE1cQNTkqDFA8/o7H3zKGtkSSWgMxy72/vzbeLG6tnD8JSHvlCzty9pq6Q6VwAhqLJrXAd7/hPGAmFvNgvvM5qv5bdBp/hV5VD1NbvQArCtQxcZI0qm7izWh/tUfD9fY7VktrfLcSvjtcGTAmb6NbBDuf078UBDBjnuIuX5f0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763140356; c=relaxed/simple;
-	bh=DFjdthS1WfCd8tQe3dOi06QV7VlZIU330MRYRHHgCnY=;
+	s=arc-20240116; t=1763140357; c=relaxed/simple;
+	bh=tazmg3sBGwa/6eyduPrd+dqTyvGgw8eato0YI6lwTCE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dQwgBij7r9MKH+V+Ijkg9hGbekexyhQ5rtkeudSu3fSfbUPs8fCqvTkwdMRVt9zh9hJJXa4FxlLBnS4nU10SuqPPz1O6L1OGvAW4NA3Dl6CHPT5GkqZuqQn4oByJNLT2wr+51MdzhFf2iy33qFq05kz/f8+iVlb6LAbIUlbGxJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p6QfkSoq; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=bvpvSGSxTpgwDz63Fj9HtRY8fu1u+TnsWA9eq2RFio4uCbbGRaMmv7VhmC20ztihEaDT4LT23Qlx9xMmVSmPefXU3I/hwDOd0HAlnb8KjsyYEzovLQhCabrJWyQUKu0hbqDpMnTLeK9j8BJXrbX5pfPVfmxLQZpIv3a4NdabR8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rRavRkoE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p6QfkSoq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3A30C4CEF1;
-	Fri, 14 Nov 2025 17:12:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rRavRkoE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6B0BC4CEF1;
+	Fri, 14 Nov 2025 17:12:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763140355;
-	bh=DFjdthS1WfCd8tQe3dOi06QV7VlZIU330MRYRHHgCnY=;
+	s=k20201202; t=1763140356;
+	bh=tazmg3sBGwa/6eyduPrd+dqTyvGgw8eato0YI6lwTCE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p6QfkSoqJ4WTABV+xhp64n26urx0YO5NGssu/7wpGlleGN5giFfbWBcaPmYaZkVeF
-	 os+e8QIsLwAypbMo5iCGa9+FnqHPvmpPgbJaDKJIwgXDdf2lTqG7ZbxevVMUWTCk8R
-	 3+CX1SzCHNUH0jNnOArX3WRRSL2RQXG7epe40j2dG3Y6aTootVCUVo0RQotCu7o+e8
-	 epyfTev98tGjNLjOBiaIEUtSaKPnwlp0qt5qVWBgh+maNSWNeJ4CU7Rg1okEv5fgNa
-	 efawB8niuqQwZb2TkpGQCn+VtdQdxGDsO2ExRhKwggMZ/MmD89F4T23RUSUdimzNED
-	 x5glT+u6SzQpQ==
+	b=rRavRkoEl9OrMGkfa5Z5/jYN6FTi5HAAAyQUouBIEobDSy0ra7g9//f+mt+kwZlyc
+	 TFvIJq+2OCa4fTi6gKTP/dEAXLI0HT0XndRecQLhSwIgV5xkVDwrgLDMLxmfv5JnC5
+	 Aao8BZmtC04vx774oi0DiI2EiuEjupY8gr3EYd5xInf2RTI+jCcB4enPlN5Iq8hCSv
+	 2BEu/3glB3KiCU0H/iYR+uz8/L4w/fzZSgXapKWPkdMyjgzjK3Xd+Xv1HlmOqU/Nlz
+	 LRyixea+A03/Ney3lWAAf552O0B5W2TZvKO7IgVeEKEJ14ScpibKh5klA/ystae6Hc
+	 tP551x7NHdd+w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710063A7859C;
-	Fri, 14 Nov 2025 17:12:05 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE8553A7859C;
+	Fri, 14 Nov 2025 17:12:06 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,39 +37,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 BlueZ 0/3] build: Fix distcheck while installing
- org.bluez.obex.service with --disable-system
+Subject: Re: [PATCH BlueZ 1/2] shared/hfp: Add simple 3way calls support
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <176314032400.1740925.4460596458732332307.git-patchwork-notify@kernel.org>
-Date: Fri, 14 Nov 2025 17:12:04 +0000
-References: <20251111155644.11675-1-parona@protonmail.com>
-In-Reply-To: <20251111155644.11675-1-parona@protonmail.com>
-To: Alfred Wingate <parona@protonmail.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+ <176314032549.1740925.17204930037815149447.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Nov 2025 17:12:05 +0000
+References: <20251112083150.54641-1-frederic.danis@collabora.com>
+In-Reply-To: <20251112083150.54641-1-frederic.danis@collabora.com>
+To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 11 Nov 2025 15:57:32 +0000 you wrote:
-> From: Alfred Wingate <parona@protonmail.com>
-> 
-> Pkg-config variables give absolute paths with system prefixes, causing problems
-> for distcheck which wants to install everything in its own prefix. To cope with
-> this lets give distcheck its own configure arguments with its own prefix variable
-> already included.
-> 
-> [...]
+On Wed, 12 Nov 2025 09:31:49 +0100 you wrote:
+> This adds support for the AT+CHLD=0 (Releases all held calls or set
+> User Determined User Busy for a waiting call), =1 (Releases all active
+> calls and accept the other call, held or waiting) and =2 (Places all
+> active calls on hold and accept the other call, held or waiting)
+> commands and the +CCWA (Call waiting notification) event.
+> ---
+>  src/shared/hfp.c | 218 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  src/shared/hfp.h |  15 ++++
+>  unit/test-hfp.c  |   5 ++
+>  3 files changed, 234 insertions(+), 4 deletions(-)
 
 Here is the summary with links:
-  - [v2,BlueZ,1/3] build: use AM_DISTCHECK_CONFIGURE_FLAGS
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=708bf7d11056
-  - [v2,BlueZ,2/3] build: Fix distcheck by hardcoding non absolute paths
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=057da54566f6
-  - [v2,BlueZ,3/3] build: obexd: Revert "Fix make distcheck"
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ebd6f9fefa26
+  - [BlueZ,1/2] shared/hfp: Add simple 3way calls support
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e9b4bf2917a3
+  - [BlueZ,2/2] unit/test-hfp: Add tests for simple 3way support
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=300ec5a46f69
 
 You are awesome, thank you!
 -- 
