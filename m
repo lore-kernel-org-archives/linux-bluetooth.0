@@ -1,127 +1,108 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8114D25CC79
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 13:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52720325732;
+	Fri, 14 Nov 2025 15:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763127962; cv=none; b=gRlByXwwth4XZi8mQekjtMCeoNyM1XysWrChzoxHsK6NGQT9fHk3Up53OLIfaUSBvviNWFPrjvPmwg3dX12O0ZoPaolhceFilFdNmCrxpr6vyG2wRJyQgOfGL7Ol3X2JyBuSeerD+eyRkab76uNA+BK27SrtIAtxp7BRZ6yJVhM=
+	t=1763135902; cv=none; b=cVRP/BO8SC9WhvixXw1EUYBMMDpqiP1yDt8oWwJSF81hwhFdCF5KTXbgG82u9MAjVbhVAipKX3yIhz5niPrVrAUgBYyUPBlCSOya5W5rSENC93iR7fqip00MtNRmMjHl7YWEzC4WM0nWB5yqiEZIOO0eHL2YFhxOkVTZteSUiVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763127962; c=relaxed/simple;
-	bh=tNnvR9e+3EL15N5t/wVziXRvuc66NRBbFVjTW71zRBM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=i8gW1KrI+oB9xgohxpEZdxV0ocwBwdgcrVUoQMSWebbrxQ/xw1x/VbIois51SwUbDDVpTeFC+8357zca5AU6T5f07aLOfm2iULnP7Z9+hwAqEP6Ztdb16Vj+qMqYTN3TcGnI47ZMeYJVx3/QUkOSUEzETuqsGzV9T7bU/P/p8+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HXioRPuf; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763135902; c=relaxed/simple;
+	bh=UrSTM5kmhxKUTGYm83kb1wdz9qhRcg8d9G1xvyGuRqA=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=SxA05DeUCQ7LYrTpCnfoBE51Pxae8YaZ7L9i5BRiZB4VrftYuEASe14TqgwGyhte6NS+RNkJKbA8fjIoRL+JRTh+0y7/UeNghSfezr9AfSSSGdWbcAWFrLnHWIyIVADAwC+twzfVvW5eXIPRXPKvpR20Rpf7Fv46fd2vKtSFBqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iwPSRCeL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HXioRPuf"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ed66b5abf7so33495811cf.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 05:46:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763127959; x=1763732759; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RAz+q2UVgKWzju16RjSIbiRNVqoocwERCOEYZitkmkU=;
-        b=HXioRPuf4S51g2vaMBJrB/A0uh+K2akqnzNpXagmgWDiue7mfs933WZGH3+iXB3yiQ
-         0IskTNR98k2rb9NuiEmRVhImzVLNyaR4YFXjmnYvhumTU3t3WdWk0UaTieFKpqkqM8ok
-         3hbnKAhtzIJYmeGq8ATohpAUs7NkniBF+qtlKFTxf0Z8+gmYiC2RD6rJRRw86tKUA7nd
-         G2bmvD80ri1v0C/u1TLCqhzKM8DVZcN4lbYou6TZMp9R2JEucuUm9crZFn8CFWAsF97J
-         rHGgcVCbWdZibhZ6UjYU6hoEKoZ1U7RZ7U/wj7IWyji6iTKKGeXeyr/wuFMubtSVt8xm
-         TUaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763127959; x=1763732759;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RAz+q2UVgKWzju16RjSIbiRNVqoocwERCOEYZitkmkU=;
-        b=TSHPjPxguWbj7ywIgRNW87r07jWj3un02wS9ruOP2gtnHOnn2FUmSlXSXLLv6pcemE
-         Xxr1wFh6speBqVTGDMdK6THHCZnSc/1HPvBayE3hRx0tZwZphUzikEoPtBy7y6kG4CcU
-         POQq5hmPGJRtgLWaIz4Qk7IAea8F2yNWgDKM0fhQcfimiV5QMSEohgNzVPpT/ZT/f8Cz
-         OLYKZW4KQES623/1R9UpikGP5fwiGF1vY1ds4KPD12KwaeHc/zrood8Ai8G6kYaEliaV
-         Wdn7Qba1qaxAOZC29LGGBRQXcjjGZbUffyJzczkoBNzv9qqMzSWoXuNRgJN6eT1BuZrd
-         0QxQ==
-X-Gm-Message-State: AOJu0Yz5mak0CF0Znut9vc+jU7GTbEqfoCvyzg0Psy9Qhq7Dilym+Cpg
-	sfRtcaoFtTrqGymzHgFzbT4V+6yHAJePy2woK8LVv3trbSnCt+Wlm6XlPInvew==
-X-Gm-Gg: ASbGncuniQ2qXisR6Vj0a6T3Mei904/kxxx8duee9zX51yk975dRBDn9ds+gCptRun9
-	i4Ksec3ZevRUu7AvxIv0UgJ/Xs1HWAqU+QdMxAdg9ciBe3CthT7OufWl/uaCOqkuzNoT+kPZxQh
-	qDG+sLGPlWnTXkwuuL1RrD0qWVi1/B123pcPCCuAqG+5H8lF4f6T407AoidhDIyXCIZhJuzlf/d
-	1IUZyMbj2S85y5KhP9YW5cjyxucmLlyasKFdcvEA+Hhfp3sgYt6LRKO0OjknqJg/0+CziFlIQDj
-	Ob7N6hF3PsQu8Nb/sZQsbKvzEc3mNzP1BWUWeCUCfTE5xfXwMG8XvKD/FocT1csCp318wDxQXQG
-	D86aDkBythxcU2l9CecKpLA6anVqY/V8h1gVzvKdiGfBs3e2J5XNB8w0BukCxhU+wsop++KKdoo
-	hfN+7q
-X-Google-Smtp-Source: AGHT+IHzdVakh1PK015/wAO4tkovGbvWEi1hMu7GTus4j0w6ilcb7ODISirPk0b/VHdN1Kf3MuYYew==
-X-Received: by 2002:a05:622a:f:b0:4ed:ac88:3142 with SMTP id d75a77b69052e-4edf1f4e9e9mr49317881cf.0.1763127959066;
-        Fri, 14 Nov 2025 05:45:59 -0800 (PST)
-Received: from [172.17.0.2] ([48.214.55.48])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ede86b3adesm28503741cf.1.2025.11.14.05.45.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 05:45:58 -0800 (PST)
-Message-ID: <69173296.c80a0220.30f9e2.7a79@mx.google.com>
-Date: Fri, 14 Nov 2025 05:45:58 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7128119754372190595=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iwPSRCeL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C562C4CEF8;
+	Fri, 14 Nov 2025 15:58:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763135901;
+	bh=UrSTM5kmhxKUTGYm83kb1wdz9qhRcg8d9G1xvyGuRqA=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=iwPSRCeL7z8DATQdBskcL7zGCuTm+gcWRYxoKhfk3RRy4EK/dBTKNhcc71B/Jkp8D
+	 z1AOlm1Zbqz3z1f0Kj4moytfVZmitSMMFAeQ3KP+ykKMWxXL2KAk0Fc/pvy4fY6iu+
+	 O4W+rIAHli90Qr3B0812O5UArvAvHEbUytggw/8PKGEYX0saQJq2zbMcSL1dwqvPk0
+	 N36MWMvi0bD7yET+x80GxnucCES+4PYHWecQykPiDF3x8jtTZXWTH1kLpf9Rbs2dkP
+	 aXoeXFch5LMPIN12iwLCNgEgrump+TiKTt7VgDjHoAVDlBy3XFqmvIdEklU/LGSh/s
+	 pj85xG9LrKWxQ==
+Date: Fri, 14 Nov 2025 09:58:20 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ,v7,1/2] shared/battery: improve the display of the charge level
-In-Reply-To: <20251114121140.102190-1-r.smirnov@omp.ru>
-References: <20251114121140.102190-1-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7128119754372190595==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1023520
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.34 seconds
-GitLint                       PENDING   0.28 seconds
-BuildEll                      PASS      20.13 seconds
-BluezMake                     PASS      2633.84 seconds
-MakeCheck                     PASS      20.23 seconds
-MakeDistcheck                 PASS      185.97 seconds
-CheckValgrind                 PASS      238.31 seconds
-CheckSmatch                   PASS      311.05 seconds
-bluezmakeextell               PASS      128.73 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      912.27 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, linux-arm-msm@vger.kernel.org, 
+ quic_jiaymao@quicinc.com, Konrad Dybcio <konradybcio@kernel.org>, 
+ linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ cheng.jiang@oss.qualcomm.com, devicetree@vger.kernel.org, 
+ Bjorn Andersson <andersson@kernel.org>, quic_shuaz@quicinc.com, 
+ quic_chezhou@quicinc.com
+To: Wei Deng <wei.deng@oss.qualcomm.com>
+In-Reply-To: <20251113130519.2647081-1-wei.deng@oss.qualcomm.com>
+References: <20251113130519.2647081-1-wei.deng@oss.qualcomm.com>
+Message-Id: <176313578860.3262114.17056319042303889483.robh@kernel.org>
+Subject: Re: [PATCH] arm64: dts: qcom: monaco-evk: Enable Bluetooth support
 
 
+On Thu, 13 Nov 2025 18:35:19 +0530, Wei Deng wrote:
+> There's a WCN6855 WiFi/Bluetooth module on an M.2 card. To make
+> Bluetooth work, we need to define the necessary device tree nodes,
+> including UART configuration and power supplies.
+> 
+> Since there is no standard M.2 binding in the device tree at present,
+> the PMU is described using dedicated PMU nodes to represent the
+> internal regulators required by the module.
+> 
+> The module provides a 3.3V supply, which originates from the
+> main board’s 12V rail. To represent this power hierarchy in the device
+> tree, add a fixed 12V regulator node as the DC-IN source and link it
+> to the 3.3V regulator node.
+> 
+> Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
+> ---
+>  arch/arm64/boot/dts/qcom/monaco-evk.dts | 99 +++++++++++++++++++++++++
+>  1 file changed, 99 insertions(+)
+> 
 
----
-Regards,
-Linux Bluetooth
+
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
+
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
+
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
+
+  pip3 install dtschema --upgrade
 
 
---===============7128119754372190595==--
+This patch series was applied (using b4) to base:
+ Base: attempting to guess base-commit...
+ Base: tags/next-20251112 (exact match)
+ Base: tags/next-20251112 (use --merge-base to override)
+
+If this is not the correct base, please add 'base-commit' tag
+(or use b4 which does this automatically)
+
+New warnings running 'make CHECK_DTBS=y for arch/arm64/boot/dts/qcom/' for 20251113130519.2647081-1-wei.deng@oss.qualcomm.com:
+
+arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpcielp3-supply', 'vddpcielp9-supply' do not match any of the regexes: '^pinctrl-[0-9]+$'
+	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml
+arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpcie1p3-supply' is a required property
+	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml
+arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpcie1p9-supply' is a required property
+	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml
+
+
+
+
+
