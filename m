@@ -1,108 +1,131 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52720325732;
-	Fri, 14 Nov 2025 15:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B9D3271E2
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 16:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763135902; cv=none; b=cVRP/BO8SC9WhvixXw1EUYBMMDpqiP1yDt8oWwJSF81hwhFdCF5KTXbgG82u9MAjVbhVAipKX3yIhz5niPrVrAUgBYyUPBlCSOya5W5rSENC93iR7fqip00MtNRmMjHl7YWEzC4WM0nWB5yqiEZIOO0eHL2YFhxOkVTZteSUiVQ=
+	t=1763137106; cv=none; b=oz3CpwUTWIBipTVldTFJYszcxofmw+TKaa+tFWxJpqB4JXpbvr//IvfZ4gGcMDtolyYeuFASgAP0XhWIjkHD4kfrwnMst1zFTBPYB3GqfgC9bNH8X+9G3jQHE3PNDwkcyW48vkBRNf9Y+PQPDpz1YU9/QHQ9a/PMXuBWR47q/bY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763135902; c=relaxed/simple;
-	bh=UrSTM5kmhxKUTGYm83kb1wdz9qhRcg8d9G1xvyGuRqA=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=SxA05DeUCQ7LYrTpCnfoBE51Pxae8YaZ7L9i5BRiZB4VrftYuEASe14TqgwGyhte6NS+RNkJKbA8fjIoRL+JRTh+0y7/UeNghSfezr9AfSSSGdWbcAWFrLnHWIyIVADAwC+twzfVvW5eXIPRXPKvpR20Rpf7Fv46fd2vKtSFBqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iwPSRCeL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763137106; c=relaxed/simple;
+	bh=QEjF1WF/vRwN70ClSuEqTx6+UbIiyHQ3zt9JLkF/88w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MQnDwhZPVl7sWuUkFMO73vwUFKDtM8Kl0vMRtg8nTxUV6oWynPJDB3jxXMKReXunlQyySxDgAHIblghl3rX+/mvv5ZCXvnPlychR6a1nFG3z7cbICx52ZESkxOROPoXU2vByXY9SCeFaZfnUCFAmOZ2umWDNjZTox98jbJEXJP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ac3WA5Xu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iwPSRCeL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C562C4CEF8;
-	Fri, 14 Nov 2025 15:58:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ac3WA5Xu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57AA7C2BCB2
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 16:18:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763135901;
-	bh=UrSTM5kmhxKUTGYm83kb1wdz9qhRcg8d9G1xvyGuRqA=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=iwPSRCeL7z8DATQdBskcL7zGCuTm+gcWRYxoKhfk3RRy4EK/dBTKNhcc71B/Jkp8D
-	 z1AOlm1Zbqz3z1f0Kj4moytfVZmitSMMFAeQ3KP+ykKMWxXL2KAk0Fc/pvy4fY6iu+
-	 O4W+rIAHli90Qr3B0812O5UArvAvHEbUytggw/8PKGEYX0saQJq2zbMcSL1dwqvPk0
-	 N36MWMvi0bD7yET+x80GxnucCES+4PYHWecQykPiDF3x8jtTZXWTH1kLpf9Rbs2dkP
-	 aXoeXFch5LMPIN12iwLCNgEgrump+TiKTt7VgDjHoAVDlBy3XFqmvIdEklU/LGSh/s
-	 pj85xG9LrKWxQ==
-Date: Fri, 14 Nov 2025 09:58:20 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=k20201202; t=1763137106;
+	bh=QEjF1WF/vRwN70ClSuEqTx6+UbIiyHQ3zt9JLkF/88w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Ac3WA5XuaQaAWGL8uFBSD+0TpGKP675lNRhFD+YZcUdIJSOqNhyLGcxJ/ap84XylO
+	 oG75GiSnC+95uA8uApQgdSauzQhKnGOI0gMWIvM6PDGZDKA//5gJb+1iPm8KeMU8Pe
+	 hxJOOL5PNqFhaZBjKdxNbdm+Vog4fvukWS+9k9xG8jvjd7jyLw4wjAdrgUZcwFzdDI
+	 37yFAIYt9lzbliOLiBImWMtjcwKMziKeR0uCaFWRgPeWYbPal66DGuFZF+WcfG8iyI
+	 jqxtzdRG93PtvBAd7R1TUcMeyiOQp8TmCxWViJzbgbSqMyVwvQ2OquFFCmYJ2z7qp+
+	 53kOMVYCt74mQ==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b736cd741c1so140659666b.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Nov 2025 08:18:26 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUBn1pxGFjGBKQrz77+sZvENrmxj00DY73Fv8NPf8wBuTQfCyJYxf9Nt5m2PSdCPYaBjQyGpE/VGnjVzyo3/u0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZKHh/VlF12jfpkXYYom7R9P/B9nBEEP1PMeTAXOj96CbQMyFs
+	o2UvNAS/4lyjJaas+l77lkSD7sVNvgYv2/5ShNje0A4RD0LdGywXV21jgPqlj7a3saHDUdhossa
+	Ctf7VLyigQvVjwb6rGeDVez9tnHeKFg==
+X-Google-Smtp-Source: AGHT+IEvLOFyqCU+gTpIpUldy/VCAnVeRKgX2Fjb/dnX2vDFUQSF+Pi1VBgJh5ukSnrIkAAXLmy9kEIRZ3yzcpYSJ/s=
+X-Received: by 2002:a17:907:a089:b0:b73:5f5e:574d with SMTP id
+ a640c23a62f3a-b736796a33bmr324954266b.59.1763137104773; Fri, 14 Nov 2025
+ 08:18:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, linux-arm-msm@vger.kernel.org, 
- quic_jiaymao@quicinc.com, Konrad Dybcio <konradybcio@kernel.org>, 
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- cheng.jiang@oss.qualcomm.com, devicetree@vger.kernel.org, 
- Bjorn Andersson <andersson@kernel.org>, quic_shuaz@quicinc.com, 
- quic_chezhou@quicinc.com
-To: Wei Deng <wei.deng@oss.qualcomm.com>
-In-Reply-To: <20251113130519.2647081-1-wei.deng@oss.qualcomm.com>
-References: <20251113130519.2647081-1-wei.deng@oss.qualcomm.com>
-Message-Id: <176313578860.3262114.17056319042303889483.robh@kernel.org>
+References: <20251113130519.2647081-1-wei.deng@oss.qualcomm.com> <176313578860.3262114.17056319042303889483.robh@kernel.org>
+In-Reply-To: <176313578860.3262114.17056319042303889483.robh@kernel.org>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 14 Nov 2025 10:18:13 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJX3doLFv-Nc6o+L1W_o8VjtvGp9dqdpsotuyG17zU7Lw@mail.gmail.com>
+X-Gm-Features: AWmQ_bkWy46OX7PgV9ZUzhlCrs70KVuhH4A3WuQtX93vwPtAy017ORp1pZrC_NY
+Message-ID: <CAL_JsqJX3doLFv-Nc6o+L1W_o8VjtvGp9dqdpsotuyG17zU7Lw@mail.gmail.com>
 Subject: Re: [PATCH] arm64: dts: qcom: monaco-evk: Enable Bluetooth support
+To: Wei Deng <wei.deng@oss.qualcomm.com>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	linux-arm-msm@vger.kernel.org, quic_jiaymao@quicinc.com, 
+	Konrad Dybcio <konradybcio@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, cheng.jiang@oss.qualcomm.com, 
+	devicetree@vger.kernel.org, Bjorn Andersson <andersson@kernel.org>, quic_shuaz@quicinc.com, 
+	quic_chezhou@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Nov 14, 2025 at 10:06=E2=80=AFAM Rob Herring (Arm) <robh@kernel.org=
+> wrote:
+>
+>
+> On Thu, 13 Nov 2025 18:35:19 +0530, Wei Deng wrote:
+> > There's a WCN6855 WiFi/Bluetooth module on an M.2 card. To make
+> > Bluetooth work, we need to define the necessary device tree nodes,
+> > including UART configuration and power supplies.
+> >
+> > Since there is no standard M.2 binding in the device tree at present,
+> > the PMU is described using dedicated PMU nodes to represent the
+> > internal regulators required by the module.
+> >
+> > The module provides a 3.3V supply, which originates from the
+> > main board=E2=80=99s 12V rail. To represent this power hierarchy in the=
+ device
+> > tree, add a fixed 12V regulator node as the DC-IN source and link it
+> > to the 3.3V regulator node.
+> >
+> > Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
+> > ---
+> >  arch/arm64/boot/dts/qcom/monaco-evk.dts | 99 +++++++++++++++++++++++++
+> >  1 file changed, 99 insertions(+)
+> >
+>
+>
+> My bot found new DTB warnings on the .dts files added or changed in this
+> series.
+>
+> Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+> are fixed by another series. Ultimately, it is up to the platform
+> maintainer whether these warnings are acceptable or not. No need to reply
+> unless the platform maintainer has comments.
+>
+> If you already ran DT checks and didn't see these error(s), then
+> make sure dt-schema is up to date:
+>
+>   pip3 install dtschema --upgrade
+>
+>
+> This patch series was applied (using b4) to base:
+>  Base: attempting to guess base-commit...
+>  Base: tags/next-20251112 (exact match)
+>  Base: tags/next-20251112 (use --merge-base to override)
+>
+> If this is not the correct base, please add 'base-commit' tag
+> (or use b4 which does this automatically)
+>
+> New warnings running 'make CHECK_DTBS=3Dy for arch/arm64/boot/dts/qcom/' =
+for 20251113130519.2647081-1-wei.deng@oss.qualcomm.com:
+>
+> arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): =
+'vddpcielp3-supply', 'vddpcielp9-supply' do not match any of the regexes: '=
+^pinctrl-[0-9]+$'
+>         from schema $id: http://devicetree.org/schemas/regulator/qcom,qca=
+6390-pmu.yaml
+> arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): =
+'vddpcie1p3-supply' is a required property
+>         from schema $id: http://devicetree.org/schemas/regulator/qcom,qca=
+6390-pmu.yaml
+> arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): =
+'vddpcie1p9-supply' is a required property
+>         from schema $id: http://devicetree.org/schemas/regulator/qcom,qca=
+6390-pmu.yaml
 
-On Thu, 13 Nov 2025 18:35:19 +0530, Wei Deng wrote:
-> There's a WCN6855 WiFi/Bluetooth module on an M.2 card. To make
-> Bluetooth work, we need to define the necessary device tree nodes,
-> including UART configuration and power supplies.
-> 
-> Since there is no standard M.2 binding in the device tree at present,
-> the PMU is described using dedicated PMU nodes to represent the
-> internal regulators required by the module.
-> 
-> The module provides a 3.3V supply, which originates from the
-> main board’s 12V rail. To represent this power hierarchy in the device
-> tree, add a fixed 12V regulator node as the DC-IN source and link it
-> to the 3.3V regulator node.
-> 
-> Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
-> ---
->  arch/arm64/boot/dts/qcom/monaco-evk.dts | 99 +++++++++++++++++++++++++
->  1 file changed, 99 insertions(+)
-> 
+This is the 3rd report of your typos. Is there some reason you are
+ignoring the reports?
 
-
-My bot found new DTB warnings on the .dts files added or changed in this
-series.
-
-Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-are fixed by another series. Ultimately, it is up to the platform
-maintainer whether these warnings are acceptable or not. No need to reply
-unless the platform maintainer has comments.
-
-If you already ran DT checks and didn't see these error(s), then
-make sure dt-schema is up to date:
-
-  pip3 install dtschema --upgrade
-
-
-This patch series was applied (using b4) to base:
- Base: attempting to guess base-commit...
- Base: tags/next-20251112 (exact match)
- Base: tags/next-20251112 (use --merge-base to override)
-
-If this is not the correct base, please add 'base-commit' tag
-(or use b4 which does this automatically)
-
-New warnings running 'make CHECK_DTBS=y for arch/arm64/boot/dts/qcom/' for 20251113130519.2647081-1-wei.deng@oss.qualcomm.com:
-
-arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpcielp3-supply', 'vddpcielp9-supply' do not match any of the regexes: '^pinctrl-[0-9]+$'
-	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml
-arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpcie1p3-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml
-arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpcie1p9-supply' is a required property
-	from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml
-
-
-
-
-
+Rob
