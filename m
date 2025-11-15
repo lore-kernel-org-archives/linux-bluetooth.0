@@ -1,75 +1,100 @@
-Received: from mail-m19731104.qiye.163.com (mail-m19731104.qiye.163.com [220.197.31.104])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18073770B
-	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 11:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.104
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763206776; cv=none; b=r0BCMgm3PE4lf44uypLTtnL4gB7VaewvRAk9XEOjMBxVvGLPsULFzsViIMHoQMF1Hf1LsJNcHl1Vg7rbfqyGrcfrKBEinc4XSUiw9H9tAg9ySNWNVHkVV8QfGFYq+fb0RgwlQ9a6evRv4t7baaZChwEZDm5ABkcHdZanXPc5Us8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763206776; c=relaxed/simple;
-	bh=8WLFKICKYdHkMh3kq9Yuto4u15r/D+yomNKWtNJJSjk=;
-	h=Content-Type:Message-ID:To:Cc:Subject:MIME-Version:From:Date; b=sCfoqUnQUvtNO275o0dnlilOcX31A3Qb8e/CdcKOP+ZViZOkKqfuLlWRVX3UvvvSQD0e88jCcjR7+KbkM9tEMt4+ZRHzzvjjiuQnUp9DfoF42RvfqhjL7rKij1lBBybOIaot3QCalbuhGxp7xYRsBzVE/7rBQD9r4tvgZMwYh8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stu.pku.edu.cn; spf=pass smtp.mailfrom=stu.pku.edu.cn; dkim=pass (1024-bit key) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.b=HOsOXu7M; arc=none smtp.client-ip=220.197.31.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stu.pku.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A84296BD3
+	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 11:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763207838; cv=pass; b=QbWsSxtU3Fz+BuFj7zNcWo9cQkBcvO5sFKeTgRgH+79TAc/o2gTQZI/uBOnYlN6Fc3xsuPyNCO/K1WGGmTssOE9pEmyLMUbG7M50bUtX2m1vD8UYEoLoWTgJrblf+OnQyna7tGshi4lQ1muXCQ9kblHa5ZNA7znPBV3P6v2UG4g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763207838; c=relaxed/simple;
+	bh=iJPjMhg8w2f1kQj+XRW4xowXfTzz9Z9Tf/utzYfnYFg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=A3mHvy6oztTObw7JEJlj7wsvIT8byeDALGoNT5mzMzRDQ/WRdudPcVdnjkyJXVVu0HaALjZLxpQE5anSLGJJVYD5/dd31BSTK4cNc/j7p+z/k+Y2kVRoN6sgVwELKxOb1j+4C8Yz2aRZ/bxDhx3hT7zu0WlctjB/bG0OoDDVnmo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=N+qcdfns; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.b="HOsOXu7M"
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Message-ID: <AKkAKwAGJh0rblXOmD98sapq.1.1763206454879.Hmail.2200013188@stu.pku.edu.cn>
-To: linux-kernel <linux-kernel@vger.kernel.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	"luiz.dentz" <luiz.dentz@gmail.com>, 
-	"johan.hedberg" <johan.hedberg@gmail.com>, 
-	marcel <marcel@holtmann.org>
-Subject: =?UTF-8?B?W0JVR10gQmx1ZXRvb3RoOiBzbGFiLXVzZS1hZnRlci1mcmVlIGluIGhjaV9jb3JlLmM6aGNpX3NlbmRfYWNsKCk=?=
-X-Priority: 3
-X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com Sirius_WEB_MAC_1.55.1
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="N+qcdfns"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4d7sts0MgPz104y;
+	Sat, 15 Nov 2025 13:57:09 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1763207829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jm55ed0L9EGr4w3SIbWJoMMBeWLdGT5cM7eaUCI52Io=;
+	b=N+qcdfnso92p3jx8ru87Q3K7uCvoqQXY3P+DsGFpXpnM1IyGtcifg7C1Nw5INlqLnQpmGu
+	xphK6Ji2j1w9XzsRoQ2Z5i+teFmo/a+owJCJRBPcmIOKBf8K0txjL0wPBzWVdsdk8R1kEu
+	CCmwV4NuM4kGU3cw0OQlxYwVWXz5GA0=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1763207829;
+	b=qgYZRUw8gdKINE68CAxyCq5PS0EnJVOSuSfb36KfhnDlynfr+fvBDdThJFJGqMimXmCEmi
+	c+Pj3fGEXrkvKuJkP0DpAkmdevd0WZhfJpkb2Q8YHm0P5qu9MifLgrE6I9/C7SxC7udzTc
+	AIYs3CFmqg361Wys3I4jNQoEbuutQRU=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1763207829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jm55ed0L9EGr4w3SIbWJoMMBeWLdGT5cM7eaUCI52Io=;
+	b=PDP80tBbKUh3mHxDqR1BYddK9d11YMIGoQC+MJYRRNbuEr8LOPKtr8gxNkP5dwVMdyBnjG
+	dy3g9237G/NcxzstZ58l1/crNFxm64+WTUDgyTLEeEpj1Zd94+8wgrhGYCTcLA4crBO1UY
+	/cKvtOEEfoyxYq998OMEKZAuNWP+bS4=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v3 4/6] shared/tester: better debug output on io memcmp failure
+Date: Sat, 15 Nov 2025 13:57:04 +0200
+Message-ID: <c4558b04f5a06eacb5cab40e0c3abc1c233df0e2.1763207813.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
+In-Reply-To: <69ef74b5d531804f4f793f42032da508d1497d1b.1763207813.git.pav@iki.fi>
+References: <69ef74b5d531804f4f793f42032da508d1497d1b.1763207813.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: from 2200013188@stu.pku.edu.cn( [210.73.43.101] ) by ajax-webmail ( [127.0.0.1] ) ; Sat, 15 Nov 2025 19:34:14 +0800 (GMT+08:00)
-From: =?UTF-8?B?5p2O5aSp5a6H?= <2200013188@stu.pku.edu.cn>
-Date: Sat, 15 Nov 2025 19:34:14 +0800 (GMT+08:00)
-X-HM-Tid: 0a9a872b115f09b6kunm54fc44fd342b9
-X-HM-MType: 1
-X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMYTqrvk2VXm1s3jojcL7ki9S5UDbyOJxmDzs8e
-	YzTqMdKwpWKMh6NnGmqzdrLX2gtXxvA4tYj9170HXwr/mSP2qUXmLprL2xLM1FRLzF5trXeOJ6tv
-	MNnUzo6i8oKdKatszNtOWYpY9Lci5b/33vu0s=
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkaGEwdVkhKQhgeT0tKTUxLQlYVFAkWGhdVEwETFh
-	oSFyQUDg9ZV1kYEgtZQVlJSktVTEhVT0hVSktKWVdZFhoPEhUdFFlBWU9LSFVKS0hKTk5IVUpLS1
-	VKQktLWQY+
-DKIM-Signature: a=rsa-sha256;
-	b=HOsOXu7MX3jEgRkXig7VDrUuapXQaCIT4i6iKweW6wx2fkDJdSG1JbxBI3YIc9Jz16/s9qnPioFMGHsvXhEPYB34Ok0Y8laBKEIE8djoUKe6Ra/9R0cVe+mPoHEg/moSDnsbUKKa0Z+ZwJ07UidE0+1BFZ0uWYZf+496mrKZ7sk=; c=relaxed/relaxed; s=default; d=stu.pku.edu.cn; v=1;
-	bh=8WLFKICKYdHkMh3kq9Yuto4u15r/D+yomNKWtNJJSjk=;
-	h=date:mime-version:subject:message-id:from;
+Content-Transfer-Encoding: 8bit
 
-SGVsbG8sCgpBIHVzZS1hZnRlci1mcmVlIGJ1ZyB3YXMgdHJpZ2dlcmVkIGluIHRoZSBCbHVldG9v
-dGggc3Vic3lzdGVtIHdoZW4gaGFuZGxpbmcgTDJDQVAgY29ubmVjdGlvbiBzZXR1cCBzZXF1ZW5j
-ZXMuClRoZSBrZXJuZWwgcmVwb3J0cyBhIHNsYWItdXNlLWFmdGVyLWZyZWUgaW4gaGNpX3NlbmRf
-YWNsKCkgaXNzdWUgY2F1c2VkIGJ5IGwyY2FwX2luZm9fdGltZW91dCgpIGFjY2Vzc2luZyBhIGZy
-ZWVkIGhjaV9jaGFuIG9iamVjdC4KClRoaXMgYnVnIHdhcyBmb3VuZCB2aWEgYSBmdXp6aW5nIGZy
-YW1ld29yayBvbiBMaW51eCB2Ni42KHg4Nl82NCwgUUVNVSkuIFRlc3QgZW52aXJvbm1lbnQsIGNv
-bmZpZ3VyYXRpb24sIGFuZCByZWxldmFudCBtYXRlcmlhbHMgYXJlIHByb3ZpZGVkIGJlbG93OgoK
-CUtlcm5lbCBzb3VyY2U6IGh0dHBzOi8vd3d3Lmtlcm5lbC5vcmcvcHViL2xpbnV4L2tlcm5lbC92
-Ni54L2xpbnV4LTYuNi50YXIuZ3oKCUNvbmZpZyBmaWxlOiBodHRwczovL2dpdGh1Yi5jb20vajFh
-a2FpL0tDb25maWdGdXp6X2J1Zy9yYXcvcmVmcy9oZWFkcy9tYWluL3g4Ni82Ni1jb25maWcKCUtl
-cm5lbCBsb2c6IGh0dHBzOi8vZ2l0aHViLmNvbS9qMWFrYWkvS0NvbmZpZ0Z1enpfYnVnL3Jhdy9y
-ZWZzL2hlYWRzL21haW4veDg2L2NyYXNoZXMtcGFydDEvMDA5NF9hYTViNDM2Yjc4Y2U0MzJlYjlm
-YTIzYmYxNDEwNTg4OWMwODI1OTkwL3g4Nl82Ml82Nl9zeXprYWxsZXJfMDkwMV82LjZfeWluL3Jl
-cG9ydDAKClRoZSByZXBvcnRzIGluZGljYXRlIHRoYXQgaGNpX2NoYW4gd2FzIGFsbG9jYXRlZCBp
-biBoY2lfY2hhbl9jcmVhdGUoKSBhbmQgbGF0ZXIgZnJlZWQgaW4gaGNpX2NoYW5fY2xlYW51cCgp
-LCB3aGlsZSBhIHBlbmRpbmcgTDJDQVAgd29yayBxdWV1ZSBjYWxsYmFjayAobDJjYXBfaW5mb190
-aW1lb3V0KSBjb250aW51ZWQgdG8gYWNjZXNzIHRoaXMgb2JqZWN0IGFuZCBpbnZva2VkIGhjaV9z
-ZW5kX2FjbCgpLCByZXN1bHRpbmcgaW4gYSB1c2UtYWZ0ZXItZnJlZSByZWFkLiAKQWZ0ZXIgY2hl
-Y2tpbmcgcmVsZXZhbnQgY29kZSBvbiBtYWlubGluZSwgaXQgc2VlbXMgdGhvdWdoIHRoZXJlIGFy
-ZSBzb21lIGFkZGl0aW9uYWwgY2hlY2tzLCBub25lIG9mIHRoZW0gaW52b2x2ZSBjaGVja2luZyB3
-aGV0aGVyIGhjaV9jaGFuIGlzIGVtcHR5LgoKSeKAmW0gY3VycmVudGx5IG9ubHkgcmVwb3J0aW5n
-IHRoZSBpc3N1ZSB0byB0aGUgY29tbXVuaXR5OyB0aGUgZXhhY3QgZml4IHdpbGwgbGlrZWx5IG5l
-ZWQgY29uZmlybWF0aW9uIGFuZCByZXZpZXcgZnJvbSB0aGUgQmx1ZXRvb3RoIG1haW50YWluZXJz
-Lg0KDQo=
+---
+
+Notes:
+    v3:
+    - new patch
+
+ src/shared/tester.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index d1e872b8f..1f59322bc 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -983,10 +983,11 @@ static bool test_io_recv(struct io *io, void *user_data)
+ 	if (test->iovcnt && !iov->iov_base)
+ 		iov = test_get_iov(test);
+ 
+-	g_assert_cmpint(len, ==, iov->iov_len);
++	if (memcmp(buf, iov->iov_base, len) || (size_t)len != iov->iov_len)
++		tester_monitor('!', 0x0004, 0x0000, iov->iov_base,
++							iov->iov_len);
+ 
+-	if (memcmp(buf, iov->iov_base, len))
+-		tester_monitor('!', 0x0004, 0x0000, iov->iov_base, len);
++	g_assert_cmpint(len, ==, iov->iov_len);
+ 
+ 	g_assert(memcmp(buf, iov->iov_base, len) == 0);
+ 
+-- 
+2.51.1
+
