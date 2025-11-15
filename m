@@ -1,27 +1,27 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729A128CF42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A0E28D83D
 	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 11:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763207839; cv=pass; b=rPF9KWEl0YZleho8+qZ7XfkcfUhrNaHqGKZ4dVjUzgS5/krPpHO5cIZ5R8qI7oUSK/v0DFYOPW9MyzwLJCbZNBv/X4e7Wo7Hhj8FjtbDCl1IdvoYvtZicYP56aDk0qGgEQ2mb9gmdVzyFui7FhVF4ZcZoJarmZxI0EC43UGIDLk=
+	t=1763207839; cv=pass; b=RRVKJDOPErrLP4n0Hjnk0fK+KN9ZVZ1ENih0zAUlagDAjc0lFJcSQPzE/qcMqwvkaT8gH2RWRzkg6xJV5zz4cDwuzvG/SW8HVSYzKZO+4H10rC4HHXkLd2DG5yPNwb2MeT4RrLVOHLF1EncIJiXQQmJN4ujrtY1phNjNWUie5Zs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763207839; c=relaxed/simple;
-	bh=40aRMez+yLqeLoQvPecUb1Vh5Kfzwi5GXhBw07Prveg=;
+	bh=TSPFolx/9OuvWXxheObWN44rxZBT5Katp6O4z1v2Jc4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UEa40vse2aMoSHiMf3q6JrdAcoobkDH9fcTG68Xwv84Dhf/CydeOYOsB38OMHi1+3v1S37/qkoFT+RBPuM4y6Mg4Hbp7WoplprewPqnD/3FRZBDNXQFrPPQqW4GfY1qQuyzMLCPedHvzRUpH4HZer2ZDDI87Ewqgsen+pBIlq78=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=r79Y6vYd; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=BxKjYbzz9xxh5ShB/PPBgAvDZCW04dXP4gtM+qewXQS9tpuK0OlDUQ87V+YcNnXiDR4/gjEusU3XrC7bl7FWGf1cMTaTMg8DQnoozgsYIbC3mBVJYS4/YzuyaAhl3e+0+Te87rKjp2Q/I1iBwBfO5XUf/S5w8cJWQB6S9guTqWc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=oAO7uWBg; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="r79Y6vYd"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="oAO7uWBg"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4d7str5yf3z104b;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4d7str4KtvzyY5;
 	Sat, 15 Nov 2025 13:57:08 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	t=1763207828;
@@ -29,14 +29,14 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Gw4w7wls86fNqidW/axG1faSPX3wMn4Iyr3o4XeDzC4=;
-	b=r79Y6vYdYPdiuw00oPScWVTQbgm4e5zkMi4mEtaMDoP9PcLHOSj1APB7Y6xDbAq+5W8L4Y
-	g2nsoFBfL84wRcr1vCHBjmFjl433EFiuRTrgIQqNRT/gfJzbStXirbmvgTwbT9rXP1LZGU
-	X36rrNhrrouQ4cKqlcueYQDZHhSQbLE=
+	bh=A7ouba+EM22aF+sGhQmr3eU+HuKBpTimDg611JuejYc=;
+	b=oAO7uWBgAcOfZf7ON8jvh4HpMtF2k4UEfoR4O41eQs5zSorPvnTLs8ztVkxeEbJi4qQQSS
+	rXfzzOvzL4/9EATsuYAO14U+xS4JObm5E0cvyAYGrLxzWwv8BlXeJLnU1tkTGDdCj/tN9P
+	+fuwtQeiZsSCvSeiY5tn/qInv4qdhFk=
 ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1763207828;
-	b=jOZx4zDIohCpc80Z2y0icxlYM7OX8ewjsI5SQinxjUwIr+S3PIsDrO99nd3POUjeOlA9gZ
-	5nHcARQDHpCOQmpYB1t0uyHq7WEkUfjZV7N1TQMSD/I7e5b20bvmzHSPMllYOYiTajKwxz
-	9qv9R+17LwgL/5Xtrb2ac6VfTEVl1Cg=
+	b=MLgm5H+9STHryr9qq2T/vEUXlvpwZ9GyE0uVxD9FHJXYrleTNhovi0+6/wb6Nuda0ApMAo
+	IvObRI93AILZxIyAkHOXfootzqDG6W5tUPvTuTL8sw7nOQrcIOOSi00+iPxY0XOxkbvMko
+	efALxVdnocpXmq+KHJh2GXVvcgNWTEs=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -46,16 +46,16 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Gw4w7wls86fNqidW/axG1faSPX3wMn4Iyr3o4XeDzC4=;
-	b=MEuRVXNp3bHpAKFyxsj4xmidBQOsPxASFUi4vY/2o1riaRSTLgTCs5OkslmYjwKr2M2TWU
-	hrH2R4k52oV7SFKNb0adlTAnAyvi0HRQZMxs8NZOvu9N6/0ANzk1a1RHw8E46LhAvN7sg3
-	JbOQtYBgp4W/tu52GvED+isze8ZG+FM=
+	bh=A7ouba+EM22aF+sGhQmr3eU+HuKBpTimDg611JuejYc=;
+	b=yu65a3kJibbF5853IsyZrXA3JdpJMLw7W1QbDexDEvmJTBbi3FfrE5kxbDcxidyeaFvPP5
+	H1c0SSfdF0uxPeENJc0HEYlx2fXsXqTE0qO04Z+Ib1aybUFXAkJmidepw8Jq3/6EigqkLH
+	u9Uhp1lLf7zJoK6uTYAU6C9kdNd2kT4=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 3/6] bap: don't configure endpoints of all codecs at once
-Date: Sat, 15 Nov 2025 13:57:03 +0200
-Message-ID: <da2831adb83ccd12e22e7756694fe347d3942691.1763207813.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 2/6] shared/bap: fix packet length comparison to ATT MTU in bap_queue_req()
+Date: Sat, 15 Nov 2025 13:57:02 +0200
+Message-ID: <8566b3528865d389dd8dbebf84dc164782fd774d.1763207813.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <69ef74b5d531804f4f793f42032da508d1497d1b.1763207813.git.pav@iki.fi>
 References: <69ef74b5d531804f4f793f42032da508d1497d1b.1763207813.git.pav@iki.fi>
@@ -67,40 +67,30 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When device is connected we currently try create all streams for all
-endpoints. If there are multiple (= vendor codecs), this likely causes
-creating multiple streams for same location, which is not allowed.
-
-Change it to create streams only for the first endpoint, for each
-direction.
-
-Sound server can later request switching to another endpoint if
-necessary.
+bap_queue_req() forgot to account for ATT command headers when comparing
+to MTU, and fail to send if packet too big. Fix the MTU comparison.
 ---
 
 Notes:
     v3:
-    - no change
+    - new patch, bug discovered in test
 
- profiles/audio/bap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ src/shared/bap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index ec3502b06..b07d65e68 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -1922,7 +1922,10 @@ static bool pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	bt_bap_select(data->bap, lpac, rpac, 0, &select->remaining,
- 								select_cb, ep);
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index b779f6716..27321a3d1 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -1730,7 +1730,7 @@ static bool bap_queue_req(struct bt_bap *bap, struct bt_bap_req *req)
+ 	struct queue *queue;
+ 	struct bt_att *att = bt_bap_get_att(bap);
+ 	uint16_t mtu = bt_att_get_mtu(att);
+-	uint16_t len = 2 + bap_req_len(req);
++	uint16_t len = 3 + 2 + bap_req_len(req);
  
--	return true;
-+	/* For initial configuration consider only one endpoint (for each
-+	 * direction).
-+	 */
-+	return select->reconfigure;
- }
- 
- static int bap_select_all(struct bap_data *data, bool reconfigure,
+ 	if (len > mtu) {
+ 		DBG(bap, "Unable to queue request: req len %u > %u mtu", len,
 -- 
 2.51.1
 
