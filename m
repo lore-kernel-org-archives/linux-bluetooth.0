@@ -1,230 +1,157 @@
-Received: from MEUPR01CU001.outbound.protection.outlook.com (mail-australiasoutheastazolkn19010003.outbound.protection.outlook.com [52.103.73.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8EB239E9D;
-	Sat, 15 Nov 2025 13:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.73.3
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763213291; cv=fail; b=bKIvg55XF4GKNjuGhI64ddGAlYEqGqhQPJBgoIcP6djPuNc4F6JzwUh60RUHojV31v1LfLHXGxEbr3fLkNFSBOQWtzKSBoz7J5IHxgGZSeBAikLnMNjWGoV5rwCVz9+TL+zV0+0xdSk/+6TRYF4ycoKLMLtjm4rnGGYvywiajI8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763213291; c=relaxed/simple;
-	bh=rk/pH1gZXF62FATxV9j4wigTu1noY6oIGUZW9y7OVSs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CUpy1UYUTmKd1pjC2qrD6nczVRpUWeWm61dG3ICdBoN0I7VBXJQSl8gptrylQSlBGcm4vstkZ/NVHCuuArNNDxfSFNkNyvv4HRRLQjN2gwVTFmDgGi9XNg2htxPEaK1hwLDOW2VT7xG7kNIRjv26CyrnVT8E7FWSRHeTC6ZBeM8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=Qwu/fXvG; arc=fail smtp.client-ip=52.103.73.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7200F2D739D
+	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 13:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763214509; cv=none; b=XnkdGgjt0zKaO/rrQAEvQiMD6TnzknS/qdo1zCZJtQPUF/XDdngSxHkZiFrAJsdPy+r1tlmeR1s0v7HH3tXqqZ/N9Qbb6CmSpwsnV4D0MiIQA8bvWFOGaQrc97ntQjUmsMBdL6E2gi+lbmNL6bpwq9hVNDKVG+S9s9bq41OLQII=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763214509; c=relaxed/simple;
+	bh=aVLth3eP3A1uBoPSqPEB102yotJ+PRG6785vS8DMt5A=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=KjA3L6JNIYGtKlpDqG0G4Y7PSBmgK3VEVlbQ9yxBgp2vOaM04mNZ3uKLsy10nOtCLtwsasDdHE4NjUnxBksmolMLHFelAgojwYMiEoKsgLMy15C6bQlFdK1qtp7bvMLjpbGQ4osd4wAkpnuImNSZAuC/9NFp4BrOtCSOrV1DrFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S4ROlIdH; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="Qwu/fXvG"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oLuVTD+nKSHHFk+9kmwOFvf+0G5TNtgUcu2CpGk04LQzGbrie7ajDe8jlCeth1Ng8MYPEz2UDZ+kCzI98XBRADO8Qhzio8usWkg9xjdejy3PnAVV8J9h9jnufnPogjGdKRJ2ezrG021vjhOpM/ZEhoZe3AHnhFxd3IXHTJkjx/LOtgTNJfGKqSYW3wf5R4v4nGL1GU78yhyNWwa88NVWrAAb0SLBvvxDbq43dznmZ3/cPlHIVzkx7pXkGAPsgOnNrfFtISWbmFOo67EjHQw6aDJ7/YnxQ94zDxQzS4P0DVGLNoPkfVfHivjt4VFWJAJGb2qkrcg50GZu9YiyCXxvhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tbSsgWjar5KhMn9qXB/jnsrEWpwI5yFlKt2Gw8vC5jI=;
- b=UhaByb+YjZG6ttzQvTy690v0KCBxA11Nq3sxnWAAEixkoxm+TF/PoVbYD3GrD7rZviyB8z1HKVrv0MlBfTqOoeNj7xYhYO9AVkkXGys+gDsSTWB2dSBk4qAW5AchWeOCdd7CasIQHWWHtRzObjKhcMfvOVuwhkyzxDANhkvCb9Gpfw/QbUBdpIeg01a/ELCopI7gYLHMzTHQ+yRtg7IrCyKATbgj/udkA/pKUIpmqciZgoZ1LKHNI8bMU2XbG14qYidQB9l7Yz4T1EckRrGd+uURJZ/gvCBDvYI1HcZF6ngEM6d/KvHEwiP0tB1vENQ2EFBW8eKe37jDd/LFFDoe8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tbSsgWjar5KhMn9qXB/jnsrEWpwI5yFlKt2Gw8vC5jI=;
- b=Qwu/fXvGyZWjxM+AWU0WE1NkgXGnl9DJtAUce/Q5YrWZf2w8K4HZD9cOyiAaQzjZ/G6sTm0Ciy9O/uD3OGjJ1r7G5UvX5atoDpvJsi2ko5ivyZF6l1aqrjham5l6dbWPwy+s1NDrlKit9k39fb2SyNeZ/Mj598N2Or9HIiqjwM7TsA4bkxas8pngE5jRCp84Q6UIzL03ZaJYC/sI4e+By7Rl3CCV9eBioCg8TQ7Vx5mWC0uPqxM0CDuxIS1LlwY39tXdkvfcnA9neSmAiTtUe+ncK7auihhZqSY3I91iqmtTEY3Mm21KG6NN3Ex+wRuSUETID1vazvGFhpYSWpwPTg==
-Received: from SY0P300MB0769.AUSP300.PROD.OUTLOOK.COM (2603:10c6:10:27f::18)
- by SY3PPF4A3113B3A.AUSP300.PROD.OUTLOOK.COM (2603:10c6:18::492) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.19; Sat, 15 Nov
- 2025 13:28:04 +0000
-Received: from SY0P300MB0769.AUSP300.PROD.OUTLOOK.COM
- ([fe80::141a:53ec:2e47:a156]) by SY0P300MB0769.AUSP300.PROD.OUTLOOK.COM
- ([fe80::141a:53ec:2e47:a156%4]) with mapi id 15.20.9320.018; Sat, 15 Nov 2025
- 13:28:04 +0000
-Message-ID:
- <SY0P300MB0769CA2A15FBD6EAB0F7F7FCC6CBA@SY0P300MB0769.AUSP300.PROD.OUTLOOK.COM>
-Date: Sat, 15 Nov 2025 21:27:31 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: Add one more ID 0x13d3:0x3612 for
- Realtek 8852CE
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20250927-ble-13d3-3612-v1-1-c62bbb0bc77c@outlook.com>
- <7926abe4-f824-4ff3-808e-e31b7869a7d6@molgen.mpg.de>
-Content-Language: en-US
-From: Levi Zim <rsworktech@outlook.com>
-In-Reply-To: <7926abe4-f824-4ff3-808e-e31b7869a7d6@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2P153CA0007.APCP153.PROD.OUTLOOK.COM (2603:1096:4:140::8)
- To SY0P300MB0769.AUSP300.PROD.OUTLOOK.COM (2603:10c6:10:27f::18)
-X-Microsoft-Original-Message-ID:
- <5f9bad62-3726-49b2-bf01-b4d03fcc664f@outlook.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S4ROlIdH"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8b2aa1ae006so383666785a.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 05:48:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763214506; x=1763819306; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qrzN6prH3BxO0vQgzx017YIfeShc3jIbzVc42m8uWBA=;
+        b=S4ROlIdHA6ax6EaFEFjShobC8o41GnAVkfRtKnn/eJam1V0Mhuoak/hH7dQx/ADmKs
+         VwOWt4EMtSroVRjekS9qwbOHV21ywt4Jr+Yi7fHtAAsLLcACwPbaEFmP8ZAFfjhbyIVv
+         2egdvoMDJDyxc8tW++JJYmmJncjTp69R7jzCCPdZKU7CN4V5IGtEYYQiCaGJLLgdicZ0
+         VWcGmb7yQiF/ufAM2/QJ5c5PqSFFZ+uKAfZr9WgmsH74lAklLrD1fla2iu2w9Uu6y29M
+         TP0JELXW5R2+BoW++obiK9LSfFg8OpEKuOkWb5isNa8Oe/qOg9T2vAhfPu4pROpeyqdo
+         +Gcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763214506; x=1763819306;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qrzN6prH3BxO0vQgzx017YIfeShc3jIbzVc42m8uWBA=;
+        b=wyI2nDNvFj6ZxyZyoDYIkPnAoM9KuceGhOFZMzNkJfdBfOKmMqGh+JLuHdT7CqlAt/
+         aMoXQ3HP7ysPDBRZZueETcmn81Vrw2CizIwa0QyFF6pG3apZegDmcYdotVYxu5bMDZJm
+         9EvLEC7HSreSOczXZvZaNQ5u0ZrRsP8Fq6dLsHpDevasF6PYSxD4Pg+VUicp7pBSyKg7
+         xF3uLcwGxeO0WoUrsB5gmaH5khjnVTKGoYztBRQDZqlkiM8GaJyPaIN5PPAjuwj5HmdD
+         wjv0hBx+0JOqZJ6aIFfa0zlX/jU4fi7xYtTiMdXiTHVJ2H8VvTaKp/vAEy19JWhvIN/b
+         DAWQ==
+X-Gm-Message-State: AOJu0YwodMcel5zjuSOeqSKkoGuzZyxgUMYQ7goL8AMjR1ASQ6AUz/+i
+	EjSj51hjv6kkUsCgKLE0i1HgAwVuk2HWEkalusVXQaplrTP/DMYwiyxxrKkTLQ==
+X-Gm-Gg: ASbGncukzGtlimBNFLxJfzRs+o5QfKz/HrYvdNsKfzJ1SZJqf1kQ8Q+OILfAsrPcWeh
+	l7v3bN1ykFA0fBFC1VkfIrtQPDGdMe2cN/fN8uzQ9Ccl8gUYzs46l4crRPH+N/B249JjUpOoLPj
+	FxPpe7etMM1bfv5jQHoQW0bdfbRSiFuDFtfsB4+6Gi4qYg9o+Sd1MoDMLIzmmMY8jkGIfHXZawH
+	rQEe6rHnLnKBrTH7JlKk/Nmubbc+w/NZu0g/FRjgsDDXUaI0SMmICDRGEz5XlkYogBTFAVyJjkz
+	Hbz7I7hxcbWnoL+FOWPeNpXF9ART2/rEb/5xvJfEgpE7y39GFc1FUJ9/niDr2LrYNPuRRif7JpV
+	wQsMlYebj85pqtBc04ZpAiZzNPCTO0RE2ku2Nw/8sUfAQeUh1pNRpiOE9PPr99A/irxqs6sI8pL
+	0qqHztBZzJq+nDQV5WWvFlcxvrWfdsakLpHWlMdQ==
+X-Google-Smtp-Source: AGHT+IHuyry9uBqQ/d08vMLatL5CkvxyyUkdaRO7VIv6qUJSDkRkBJpVLZoxt2KqeTpKdLOnxBNMkA==
+X-Received: by 2002:ac8:5d05:0:b0:4ec:f4be:6b12 with SMTP id d75a77b69052e-4edf21330aemr95377781cf.72.1763214506029;
+        Sat, 15 Nov 2025 05:48:26 -0800 (PST)
+Received: from [172.17.0.2] ([172.174.165.2])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee02763778sm16103731cf.32.2025.11.15.05.48.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Nov 2025 05:48:25 -0800 (PST)
+Message-ID: <691884a9.c80a0220.8c14e.31c5@mx.google.com>
+Date: Sat, 15 Nov 2025 05:48:25 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1479792994866875224=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SY0P300MB0769:EE_|SY3PPF4A3113B3A:EE_
-X-MS-Office365-Filtering-Correlation-Id: f2494ac7-e6b3-42ec-d7d9-08de244ace5f
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|19110799012|8060799015|23021999003|15080799012|51005399006|461199028|5072599009|6090799003|40105399003|3412199025|440099028;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZTI0WGk2ak5HZDVaMXJIY2dRSlV0OWNHWU1sNnZ2S2hqTVBZY0w2TEpXRlJy?=
- =?utf-8?B?KzhZS1VSR0RYQmE1U3FvM1NOZ2ljbDJoRGVnTmJmaGRwSDFXRjNsWXcyaWtF?=
- =?utf-8?B?V0ZudFNXQWRQNnQvT29yYW05aXBIUmM2bDdOeHQ2R2Y4VHBXU2dPTDluUjI2?=
- =?utf-8?B?b1dtYWlLazUwL1R3YzVMenRBb0kxdFczWjdYVjNIcUVDUU9QMktyRlZZanU4?=
- =?utf-8?B?eE1HeVF5NXdDSVdrLys5MmhMTE4zemdzQkZFQXU3ZnNYZWwxSG9NWXIwODhQ?=
- =?utf-8?B?d0FKNWVKdWI5WUQ0WVdmeTdyMk15cGVJYXNlZjcwTkJaczlDbE5EQUtwTTE2?=
- =?utf-8?B?ZDZoUUhDaXU4YXF6UnhuVW9aUFUxR21qa3NlUVpzWmVXUERNWE9oOVJXbW5v?=
- =?utf-8?B?QjZYV0FuZDdCNWk1elprd080N1g1QlkxaW45bHlVNlJkeGhFY01haHNXWEFK?=
- =?utf-8?B?OHdjY1NsNGI2bXZNc0t6U1czU2FIODRXN2xLQ1IwTms2b21OUlJ4OUNhVXFp?=
- =?utf-8?B?NHJEMmcyditZSDdKV0tETTh4V01paEplTm1EWXM5OGNPcGN2Q0JMSE9ZWklV?=
- =?utf-8?B?Yk5zWVVOVWpERk5LcHFqbWdNTFAyNnA3S2JXcVplN2xMYXdBV0NXVEdjV1cr?=
- =?utf-8?B?blB6UjJTZS9WSjRHM205eFlqNUY3ZlNxYVNZL1l3d2w0U2FKb1U0dlpQNWpU?=
- =?utf-8?B?T3NqQXROMDBTU01CVEJHUXFZbk14OWdSS1Z3Rk9nbVhrTTV5UmNqYUhuSWl5?=
- =?utf-8?B?bWovdnF0cG9zM3VuMHN1WDk3TUZLdTQxRURHTk9SUmE0RXBleW5kU2M2bDEw?=
- =?utf-8?B?ZXBpdlNPeitBcVFZUkhhRnB0S0NidjRMS2Q3UG9PZCtKODIwenFtOGFxTzN1?=
- =?utf-8?B?dWNOQWgzTVRBV0VKNW1QUzZDSXNDaytZWmcvazhlSFZnR3RwZks3bTJweTAr?=
- =?utf-8?B?dTJXbHFnZHhwKzV0N1MyS29FYi83MGp6V2toWmZIdFpoZE5EeEMwRGVra3hp?=
- =?utf-8?B?dWliY0gyRElhY29UeGoySzBBVGJRcFB3TUFiVEJycmtsaUdzN2k4aEQ2T2Vy?=
- =?utf-8?B?d0xOeEVxYWJFdE53L2dLb3hNWEthekRYdHlpMnY4NUNsVjMxcWw3MXJ0dmhR?=
- =?utf-8?B?VTZtYjB2eThQYnkwdzRRMjlIN2xwUHU4RXQwQUtUQUZQTnhrZ2dpd3c3MFFy?=
- =?utf-8?B?cGovaThSYjBCZzJSU0hWM1g3QWRYUU1rUnNKOXp4QSt0VGdKUCtvSEV3a041?=
- =?utf-8?B?WGZEUnFrOFpsOEpvUnFpemZhcndVcCtVa0MwbTA1clhwb1ZmY3pTWkt3bHla?=
- =?utf-8?B?K1pqSzQzYUgvaERhSlFkZmZtOEZOQTVDQk42N2JDZHF6aGZKNklYVEhYdXh2?=
- =?utf-8?B?L2NiZ2NnMGFxUzRGR3pDQVpUOXdHTExEK2xIZmJoRGdhbHFPSEJBNUFiaUFh?=
- =?utf-8?B?aFJIMmFpcUFTblBvYTkzd21MMUQxNkxYNWRNMDh3eldOa2VXd3R6RVV0TnpQ?=
- =?utf-8?B?a1d6U0Z5ZTQ4RTRQNzBLV282a1M0Y1ZsVDFxVzFQMWM5NWQ1d0hjYzJLbmxF?=
- =?utf-8?B?NVZrYkpKWWZCem1zdVo4VFI0d0p4ME4vZG5aTnAwZWd3T0RyOWFWRmgxalV3?=
- =?utf-8?B?cnRERVVzNlcwLzBBTFBaQmtyOVByakE9PQ==?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cjJyVUZSQTBVNU9mT092REU3MXNFY2IycnpIc3dvWk55N2tqZFVnUDJ4bFNI?=
- =?utf-8?B?Yy8rdGl1eEIwVVBIRkh4TjFrZHA4dUlIUGtWN09zdVI1RkxUcmtGVmQwWDBh?=
- =?utf-8?B?aXI5dyt1cHlMMGlZSjBocitMVjZvS2JxK3ZNalQzRkt4QU12aVp5UnJEMUpX?=
- =?utf-8?B?TGxmQzgzZ3RCUHB6U3IrT0pMa3gyZDZjQlkvOFN1b3ArbHdGYzRTaG8xRlhu?=
- =?utf-8?B?YmNiMFl1YWp5TmZZWkN4ZlJocGYybDJMSTNMdEdsM3VpKzhsREFzSFQ1SGh1?=
- =?utf-8?B?dmd3dld5QXBSbWdBZzh2TUNTSWpHT0ZLUjRacWxCOWVLR1lKK1NtdUx6eFU3?=
- =?utf-8?B?L0FveDI5aXNmbDFYdnh6aXovUHF3Yzc1WjI0QzBndG5TczBYdWdGS3FlL2VE?=
- =?utf-8?B?YmdYVlJFRGhGVXdoRTAvbmNvNjdFL1Y3a3dIdVhoQVlQYWtjTjFZZ2hTakFv?=
- =?utf-8?B?NGNPenA4QU53MkhVS0VNU095RGc4Yk1MSy9idmk0N0JGUWtmWmRTWGJzdk1t?=
- =?utf-8?B?OUhLNVFUT0hrc3B3U2Vqc3JuV1ozMnNTL0dMRllvWXFaMjBJOSsxZU9pRFhR?=
- =?utf-8?B?ZXM1TXZ5TDhJcHNjdU5xUmwzckYrTjJPdVVsNVY0M1JQUlM2UTJvVTkxVnhD?=
- =?utf-8?B?bC92a1B1YkR1aVJTQkZ3cVY1NEwxd3I0WWlndEYyUFIrY25TQy9tUHNyUVJI?=
- =?utf-8?B?ancxTzdGQmJNSmRYeGthbTdpaDRjL1dCaGErbXU0b0EyOW40czBldmZudHVt?=
- =?utf-8?B?cDkrUVROamF4TkxScDY1bjJqamZmbVJQUFZFM3BraVordEFIOUhlZ2ZSaXYw?=
- =?utf-8?B?L1hHbzY0ODgzTlVRRWozZWhZSVVma01VNG1VaHczOVZRUlg0dEZNdkxMQ01j?=
- =?utf-8?B?ZTVKb0R0MWs1TzE3Ty9LQzgyZEZCYkFQdXdlME9aMGJjZ2haSm5pOU43ZkFD?=
- =?utf-8?B?eWVic1UxaVorU1MzanhVa3FYUE9zMUdBTTYwYy9GMUlJK2o2QjNyTU9LZHZF?=
- =?utf-8?B?R0NCcFpmaWgxK0tuZVI5WE1BbXBXQ1FOREw5WjZXenluM3NhMVNmOTR0MHdt?=
- =?utf-8?B?SHhjZGZvWXFwb0JORnRYUVdoSEdUNEd0REdHMHJZcm5ZUEdod2xRTndyaGlo?=
- =?utf-8?B?ei9nNVRYcnBaNi9Ja2tMWTVwaDBDVi94NkV3NTJBdkdOa0NSQ21PZ0R1UU1U?=
- =?utf-8?B?ZXhXZkUxYk9LbWJJREtNZHN1SUx4RWJ6NXlzMDAxTkU0bXNZWjFWbVJnZnFX?=
- =?utf-8?B?dFBLWWNmbkNIVGxpQkpJZVc0Q3NVcWU1cUpBek4wd1YwSTBKSFV2N080N1Mx?=
- =?utf-8?B?U3ZRc0lYMGtObmdJcjRoNVlOaUFoY2RpNVQ3dlgyL3d3bE1NMHJtZ1pxZHcz?=
- =?utf-8?B?eGt0bVlGalYyYVJLOUZGcmxiWEV1bHd2cVJTR1VXWmVQaFo1cDcxTXg3ZDR5?=
- =?utf-8?B?bm9Oc1BhUzdaeFVqU2d1RWc3L1VpUWxyMHBlcmVKRENndU1MYTg0bS9mOFZY?=
- =?utf-8?B?blczNTY5V09sOTZqK2ZDQy9Yb3QzWmRUeGtVOTdaTXNxZzNpZ3h0TEZjV2Vm?=
- =?utf-8?B?RGhzQ21TMHA3bjY5WHdYWkNEV3JWVkR3RHVHUUNyaHhzWVFNOEpUa211RVo4?=
- =?utf-8?B?Yy9qT0NNMHJPMW1ER2VNMzNDTnhSTjdOZE5hVjRFTUZLMytMMWl1Yy9URDFn?=
- =?utf-8?Q?9GwBlIqbFES0XmaRk8gk?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f2494ac7-e6b3-42ec-d7d9-08de244ace5f
-X-MS-Exchange-CrossTenant-AuthSource: SY0P300MB0769.AUSP300.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2025 13:28:04.6674
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY3PPF4A3113B3A
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: hci_core: fix accessing consumed skb
+In-Reply-To: <8d6e3b719f6dc3922d653795869ed7bcbcf086f7.1763212292.git.pav@iki.fi>
+References: <8d6e3b719f6dc3922d653795869ed7bcbcf086f7.1763212292.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Paul,
+--===============1479792994866875224==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On 9/27/25 10:25 PM, Paul Menzel wrote:
-> Dear Levi,
->
->
-> Thank you for your patch. For the summary/title “one more” is not 
-> necessary.
->
->
-> Am 27.09.25 um 04:29 schrieb Levi Zim via B4 Relay:
->> From: Levi Zim <rsworktech@outlook.com>
->>
->> Devices with ID 13d3:3612 are found in ASUS TUF Gaming A16 (2025)
->> and ASUS TX Gaming FA608FM.
->>
->> The corresponding device info from /sys/kernel/debug/usb/devices is
->>
->> T:  Bus=03 Lev=02 Prnt=03 Port=02 Cnt=02 Dev#=  6 Spd=12   MxCh= 0
->> D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->> P:  Vendor=13d3 ProdID=3612 Rev= 0.00
->> S:  Manufacturer=Realtek
->> S:  Product=Bluetooth Radio
->> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
->> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
->> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
->>
->> Signed-off-by: Levi Zim <rsworktech@outlook.com>
->> ---
->>   drivers/bluetooth/btusb.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index 
->> 8085fabadde8ff01171783b59226589757bbbbbc..d1e62b3158166a33153a6dfaade03fd3fb7d8231 
->> 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -552,6 +552,8 @@ static const struct usb_device_id quirks_table[] = {
->>                                BTUSB_WIDEBAND_SPEECH },
->>       { USB_DEVICE(0x13d3, 0x3592), .driver_info = BTUSB_REALTEK |
->>                                BTUSB_WIDEBAND_SPEECH },
->> +    { USB_DEVICE(0x13d3, 0x3612), .driver_info = BTUSB_REALTEK |
->> +                             BTUSB_WIDEBAND_SPEECH },
->>       { USB_DEVICE(0x0489, 0xe122), .driver_info = BTUSB_REALTEK |
->>                                BTUSB_WIDEBAND_SPEECH },
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
->
-It's been a while since your review.
+This is automated email and please do not reply to this email!
 
-Do I need more R-B/Acked-By from another maintainer or is there any 
-other thing blocking this patch?
->
-> Kind regards,
->
-> Paul 
+Dear submitter,
 
-Kind regards,
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1023840
 
-Levi
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      25.17 seconds
+CheckAllWarning               PASS      27.47 seconds
+CheckSparse                   WARNING   30.92 seconds
+BuildKernel32                 PASS      24.95 seconds
+TestRunnerSetup               PASS      494.46 seconds
+TestRunner_l2cap-tester       PASS      23.82 seconds
+TestRunner_iso-tester         PASS      81.03 seconds
+TestRunner_bnep-tester        PASS      6.07 seconds
+TestRunner_mgmt-tester        FAIL      118.50 seconds
+TestRunner_rfcomm-tester      PASS      9.15 seconds
+TestRunner_sco-tester         PASS      14.21 seconds
+TestRunner_ioctl-tester       PASS      9.82 seconds
+TestRunner_mesh-tester        FAIL      11.46 seconds
+TestRunner_smp-tester         PASS      8.34 seconds
+TestRunner_userchan-tester    PASS      6.44 seconds
+IncrementalBuild              PENDING   0.79 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_core.c:85:9: warning: context imbalance in '__hci_dev_get' - different lock contexts for basic blocknet/bluetooth/hci_core.c: note: in included file (through include/linux/notifier.h, include/linux/memory_hotplug.h, include/linux/mmzone.h, include/linux/gfp.h, include/linux/xarray.h, include/linux/radix-tree.h, ...):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 487 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.098 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.010 seconds
+Mesh - Send cancel - 2                               Timed out    1.998 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1479792994866875224==--
