@@ -1,107 +1,171 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3681E49F
-	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 13:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763212335; cv=pass; b=iWkSml4Hi9WaS0hzJIjC3dUK8NF1BJNmNNhxvkBWSpGRvMqzCUteV7WTWFNa1vqtIgzj4ms7gag/VPae8TvqgRrBkjgz4WSzULX2IX483zoPMa4aRAw/ZLOgtK7hnF9FUSxLk0j2G9K+E/KN/5DB5AJPuLaM1m71TWAIWC7WcnA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763212335; c=relaxed/simple;
-	bh=de7X1OHKpPDlMIXkbklzQAt1TXMVkHt7NRwLmTqIWgU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N7WjvP/ifQ8lxdLeSjzUvRMNPNMcuSc/vsf/ySNQnQPKdOtipe8CRBJ4IpEHmyyK0+vfChfgJpMyqWdd1ePui/w6Jiw/yIt61Leb4GuYRb7nA42Or8vTrKaSt9PcqpwULqmtACiTVKKQI6wJ0dFHg+mKvQbcyCdIqrr6r+P3Lk0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=ksGMGC7X; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14901DC1AB
+	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 13:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763212636; cv=none; b=jBEYD1/KEg2N52LnlCo87zq0ZoAiQXOccyn2N/K+iwwwOPtHFMGVnxUQ3VGGiOuFtT1wuMUJc16dBgO19rQDv4nnn7koEgNQ11F1vu3/t1iwxNA/oziqFLXr2qr88g/W8Gah/UUYNh1R8yd4UaiNNSX/YJl1dT7/JyFLU5xFjTc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763212636; c=relaxed/simple;
+	bh=cmw/QMmzJRbSZMVP5AXm50UG3ykT4hQKJXAYpM7nqq4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=m69lYxl/qh59bEMCbQjM+SwISid6UHLCcNWeYBJelkH87t2PSPFEftoAYCPnPFz9l26WxEOVbb18wKhVPhBt6LLIZw8F/SSEADLVanTbagL9Jfd01gB7sVxa/d0upSPIMvfnVA3f2y0CnKFCgjQ+l/+Q6Z7Ysg6wysuOKUN8P0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=YcUhNbwG; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="ksGMGC7X"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4d7vYR0g98zySs;
-	Sat, 15 Nov 2025 15:12:10 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1763212331;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=HQZp+Upp09W1TSPrLJkB1f6EsPdJSQv1P1/UwJ4U72k=;
-	b=ksGMGC7XufJsz6gVnIXa9q9G5KvBP9ArpzP0NfXvOjOOi2OI1WKXPBRUBF5C/6JpT/Uw8k
-	jnw4kVfUYfJpz7LhtcRpaHRX1hineXiDC5HmcEdwinkABG9//N7EKlJjVDzyvGm/e3pwKa
-	zmvqqprB7aNMwEA65rI551oggCQINDk=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1763212331;
-	b=JeOPqaelktKAS5RSkgh5Xc+7YfjTVMszurJTar4tQjUmj0FvU5beBkrIT/x07LvxbbDtn5
-	/fAmWq4xBabcApukB9QuzQoSrPnZdSZxCCwyKwnDg69/GkK6e8J/xJrst4m9ecOwACqX5Y
-	xlIAiaNmH5x3HqkPPbI/CHkQURaskTQ=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1763212331;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=HQZp+Upp09W1TSPrLJkB1f6EsPdJSQv1P1/UwJ4U72k=;
-	b=Dcb1KbORnqwtWNaeuCsz2oWs6CmSmIEzdAF1GKB61SmMd5N3Eb4wgZozxAxIM+6d8OIGdL
-	Onjm1B+2S5utHWqxgXIpKejnzVbtecnP7jlfHmVGY54hXRRxqIpBnFp34kB6Ypb28rgzt2
-	CVNYxx0Hrfnne7TJ2su2LvDAAFxbAbU=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="YcUhNbwG"
+Received: from github.com (hubbernetes-node-b7767ca.ash1-iad.github.net [10.56.211.62])
+	by smtp.github.com (Postfix) with ESMTPA id 0AD4814036E
+	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 05:17:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1763212634;
+	bh=dSBPTQNXflvbR31gWTKHHGg/2xV/Ln+B1PtanJNRCaI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=YcUhNbwGSsEBtH74OMFDJhkl0eHd2wgD8PASjebIy0Uufb811oJ9Cmw88gl3K1EVc
+	 j0f6FwRz/Xccc+kPkbsLsov5HZ2/lzeMNv7SC2bBlgE4DPWDIYrIPNvm13or19GDF0
+	 lOG0sUnzPXJj2uDNiXEwtJdSnLR8X7O2JyEbk9iU=
+Date: Sat, 15 Nov 2025 05:17:14 -0800
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	syzbot+25e9c406cbd26c66c417@syzkaller.appspotmail.com
-Subject: [PATCH] Bluetooth: hci_core: fix accessing consumed skb
-Date: Sat, 15 Nov 2025 15:11:35 +0200
-Message-ID: <8d6e3b719f6dc3922d653795869ed7bcbcf086f7.1763212292.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
+Message-ID: <bluez/bluez/push/refs/heads/1023839/000000-64a912@github.com>
+Subject: [bluez/bluez] 3d9089: shared/bap: fix channel allocation logic in
+ bt_bap...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Access to skb after giving it to the driver causes a crash in
-hci_cmd_work().
+  Branch: refs/heads/1023839
+  Home:   https://github.com/bluez/bluez
+  Commit: 3d9089c41dc9b8c5cbc88f7fdd9408a6f68540f1
+      https://github.com/bluez/bluez/commit/3d9089c41dc9b8c5cbc88f7fdd9408a6f68540f1
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-15 (Sat, 15 Nov 2025)
 
-Do all checks before giving skb to the driver.
+  Changed paths:
+    M profiles/audio/bap.c
+    M src/shared/bap.c
+    M src/shared/bap.h
 
-Fixes: 486a25d25a4b3 ("Bluetooth: hci_core: Fix triggering cmd_timer for HCI_OP_NOP")
-Reported-by: syzbot+25e9c406cbd26c66c417@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=25e9c406cbd26c66c417
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
----
- net/bluetooth/hci_core.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+  Log Message:
+  -----------
+  shared/bap: fix channel allocation logic in bt_bap_select()
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9f686e5903a1..36612b4c098c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4162,16 +4162,20 @@ static void hci_cmd_work(struct work_struct *work)
- 
- 	/* Send queued commands */
- 	if (atomic_read(&hdev->cmd_cnt)) {
-+		bool is_nop;
-+
- 		skb = skb_dequeue(&hdev->cmd_q);
- 		if (!skb)
- 			return;
- 
-+		is_nop = (hci_skb_opcode(skb) == HCI_OP_NOP);
-+
- 		hci_send_cmd_sync(hdev, skb);
- 
- 		/* Don't trigger cmd_timer in case of HCI_OP_NOP since there is
- 		 * no command pending.
- 		 */
--		if (hci_skb_opcode(skb) == HCI_OP_NOP)
-+		if (is_nop)
- 			return;
- 
- 		rcu_read_lock();
--- 
-2.51.1
+bt_bap_select() does not correctly determine the need for multi-stream
+configurations 6,7,8,9,11(i), as its result depends on whether Audio
+Locations is read before or after the PACs, doesn't work with general
+location bits, etc.
 
+Fix the procedure to be simpler: create streams for all locations, up to
+a specific number of channels.  By default, limit to max 2 channels per
+direction for compatibility (BAP doesn't have explicit AC with larger
+channel counts.) Also simplify the code.
+
+Ignore lpac Locations when selecting: the value mostly makes sense for
+Unicast Server role, but Client and Server cannot use the same value as
+only a few bits can be set. As Client, we should be able to configure
+any Location bits.  The sound server can simply ignore our suggested
+channel allocation if really needed, or use SetConfiguration() API to
+build custom configurations.
+
+
+  Commit: 6fed34c03367c0b190f77b2ede8abe3adc172a2e
+      https://github.com/bluez/bluez/commit/6fed34c03367c0b190f77b2ede8abe3adc172a2e
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-15 (Sat, 15 Nov 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: fix packet length comparison to ATT MTU in bap_queue_req()
+
+bap_queue_req() forgot to account for ATT command headers when comparing
+to MTU, and fail to send if packet too big. Fix the MTU comparison.
+
+
+  Commit: 3adf59de03e2df36ef51e3554389b67bd38388c0
+      https://github.com/bluez/bluez/commit/3adf59de03e2df36ef51e3554389b67bd38388c0
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-15 (Sat, 15 Nov 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: don't configure endpoints of all codecs at once
+
+When device is connected we currently try create all streams for all
+endpoints. If there are multiple (= vendor codecs), this likely causes
+creating multiple streams for same location, which is not allowed.
+
+Change it to create streams only for the first endpoint, for each
+direction.
+
+Sound server can later request switching to another endpoint if
+necessary.
+
+
+  Commit: 968570ca3ac400f933d3ac719a80dc678da15922
+      https://github.com/bluez/bluez/commit/968570ca3ac400f933d3ac719a80dc678da15922
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-15 (Sat, 15 Nov 2025)
+
+  Changed paths:
+    M src/shared/tester.c
+
+  Log Message:
+  -----------
+  shared/tester: better debug output on io memcmp failure
+
+
+  Commit: 4b1a20579d3c91d2e05cca1e4ecd6e0b4c040b70
+      https://github.com/bluez/bluez/commit/4b1a20579d3c91d2e05cca1e4ecd6e0b4c040b70
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-15 (Sat, 15 Nov 2025)
+
+  Changed paths:
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  test-bap: make PDU macros parametrizable
+
+Adjust PDU-forming macros, so that they can be used for connecting
+multiple streams to parametrizable locations.
+
+
+  Commit: 64a912da7f475c8594123c0d65c05f4b7beb3d6a
+      https://github.com/bluez/bluez/commit/64a912da7f475c8594123c0d65c05f4b7beb3d6a
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-15 (Sat, 15 Nov 2025)
+
+  Changed paths:
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  test-bap: add audio configuration selection and streaming tests
+
+Add tests from BAP.TS 4.10.
+
+The tests testing (ii) configurations only test configuration selection
+with L/R separately. Can be filled in later to use two simultaneous BAP.
+
+The difference between CIS Establishment at QoS vs. Enable is not
+properly simulated, so only one variant is added.
+
+
+Compare: https://github.com/bluez/bluez/compare/3d9089c41dc9%5E...64a912da7f47
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
