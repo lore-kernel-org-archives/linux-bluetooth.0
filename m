@@ -1,59 +1,64 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9B218CC13
-	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 11:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7290827AC5C
+	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Nov 2025 11:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763207838; cv=pass; b=ltnCaqo5yLg0GYmY5/zrf8ZgHva65I7fchVYfa1X7wEi2EVvUVU4zJYac5D0/7SRqrzKLWT3XE38NBk+iJNCNireJleEJ1Cwwz60lTrS28iA6Syg7a5oYX1AZYKhJVfg7iutIB/x1UXd/8Xs825QR/cgF83sz2cHvz7YIIhNsgE=
+	t=1763207839; cv=pass; b=jxlRyzT4mg81q3VZs+TUx2vQ/3mO7lmfKz5rWKTOC2+Y3CG3OfVxhILQuh10xzDJGw04YHZ/c6WQ9aaY9B7MCe+LMGQuHuLqEJREnCAaiC8S+io/xTiipDRWdSZEHnI1z/jpldX/V5y0mTrrrWSygRp1mb362rPju4Xvxvp/4Y8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763207838; c=relaxed/simple;
-	bh=L529V/54ADMWnuk1NSROuPT/IiRE+8RxPjCSluuqGAk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NYynYeHy+TxOoupnBmjyv6RsvaAuTS0gKLZntoYYxj/tf9c+QnkD9oUBGjIcNaz49Yu2AHHwus7DMX0gn8rD89jFFeWtN0fkaaQXQHLxfm2ldJuDEtIQh+oB5DRz70Luabea6PhIGOE1Hg52Acz4SlwYtCX7EEWaAUanb+Q8VJ8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=EDuyqwv2; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1763207839; c=relaxed/simple;
+	bh=tPNkYYh+8WX/AWzTYz1Nkc4x2cj23aYY00fgUQIEIPU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SuJkH3MEUPl3AkBLXz6OwMoWYhUa6l5polqDmJIDWUip+na8+w+cCrQqDhINWqh5SaCOHMZUhWkHyXccUhHdEqUd5HnMRJyOJIJLivsDXlP/xrQKP7PNfCO+qaUnjZYl/CXY9viWvRgdMQi+f6SJEgGzIb8lG6OQ1Ir6bYWLH7A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=y11EELEQ; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="EDuyqwv2"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="y11EELEQ"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4d7str1gdszyRd;
-	Sat, 15 Nov 2025 13:57:08 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4d7sts2ZFyz105k;
+	Sat, 15 Nov 2025 13:57:09 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1763207828;
+	t=1763207829;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qtlD8DJ0qBDtet3wlGIBT0hCBk6FQGmb/t2DnHKELiM=;
-	b=EDuyqwv2aQTNWK3/vaEi7FntO/DVjGTgpk+y3e6Ux4hEO/X4XHNWus0HY/0BEdK5+lQIq8
-	xS9ANJTbYmM6assHtFEJkY4DcLMJAdsNfp5JuY/9W/GkRExqo4JvpmWrUyMn+372aRBrpb
-	HnMxp+TkyxTe3jOz7OAZv6Zccj0jkh4=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1763207828;
-	b=HOyE+HzXtFfyrLYvfPk1RWIswsScDluZJjAGULwFlwEwclxz9p/AUGvRDI97jLzeaxqaFc
-	sAwoUHoNliKr0mmGIA7/2FbMTqwVl81Tlqas4BqiModg9EwkBNUPGkQswB2+0kv0/BS2B+
-	TrCKHSXGUyWHghxyk0MiwmjruuVyLJQ=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b5gGed9EHVM8kvlEcKlHXGaAY60KPYpjA4ZUz013u1I=;
+	b=y11EELEQ9ZATz1OPrDdDRPrh1yr0ha8d2nQ+97m30/0rEuAsndZDF+44AFArGOKK9pxPei
+	95NVbKFlPDoXJNt+4Zr79I4x1ISp8Gm6TST4j1W18QebZsVg36nJwB1Zc9UzXJX7GnfJO7
+	JLSRuoCjH+APm003/0CXBjOn6EbOhEE=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1763207829;
+	b=wONvDmrJlc7bIXXac2rfN3wdYcyjw7pAkI8t/9wrAJq9hI0KTUB2jQ8c4nmng+63lKYg3t
+	ZBaNurbjXxlgdPzMOkm9QV/iBe3xYI4cK19mVTagOFZYLzAYeXZuAhwzwfeh9MNrq/4hhY
+	1u8GJ4St7I1O/JL5Ywxrsxkr/JlBKRA=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1763207828;
+	s=meesny; t=1763207829;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qtlD8DJ0qBDtet3wlGIBT0hCBk6FQGmb/t2DnHKELiM=;
-	b=pymAiqz3lLuJ8D/M64nBH35FV9rXUCJBZ+mrHjKEtdLxzMfg/07FHIXTLDkY8P0r16FRE0
-	CLjD4tY4xrjDpn7lPwAlYBdZDat6XOjRqwnJ7UwEnlMBlpPQvarkcLoJwpjV/+yrdvOH63
-	nVpd8DRw/eY+ADu6Fnoi9VSR4D6B5uI=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b5gGed9EHVM8kvlEcKlHXGaAY60KPYpjA4ZUz013u1I=;
+	b=CqEMU6YsATvIoiLUIwGkmXQzVAAKQOEMG2TPyBI276qy2rj3mbWFySQaciT2I5BEbeJPIz
+	m/CpMPDOGOVGXMaoPNIxu2ugpdVCaJuXyv8cEmCEJ3TshBcqtE4rSwxRl9Hf/0ALYUu/V0
+	OWsPp3pW0H4MBTeVoKG5QkYLeUNWV2M=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 1/6] shared/bap: fix channel allocation logic in bt_bap_select()
-Date: Sat, 15 Nov 2025 13:57:01 +0200
-Message-ID: <69ef74b5d531804f4f793f42032da508d1497d1b.1763207813.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 5/6] test-bap: make PDU macros parametrizable
+Date: Sat, 15 Nov 2025 13:57:05 +0200
+Message-ID: <dd3e09775b77897214d89d74965288965b7cca2f.1763207813.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
+In-Reply-To: <69ef74b5d531804f4f793f42032da508d1497d1b.1763207813.git.pav@iki.fi>
+References: <69ef74b5d531804f4f793f42032da508d1497d1b.1763207813.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,348 +67,559 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-bt_bap_select() does not correctly determine the need for multi-stream
-configurations 6,7,8,9,11(i), as its result depends on whether Audio
-Locations is read before or after the PACs, doesn't work with general
-location bits, etc.
-
-Fix the procedure to be simpler: create streams for all locations, up to
-a specific number of channels.  By default, limit to max 2 channels per
-direction for compatibility (BAP doesn't have explicit AC with larger
-channel counts.) Also simplify the code.
-
-Ignore lpac Locations when selecting: the value mostly makes sense for
-Unicast Server role, but Client and Server cannot use the same value as
-only a few bits can be set. As Client, we should be able to configure
-any Location bits.  The sound server can simply ignore our suggested
-channel allocation if really needed, or use SetConfiguration() API to
-build custom configurations.
+Adjust PDU-forming macros, so that they can be used for connecting
+multiple streams to parametrizable locations.
 ---
 
 Notes:
     v3:
-    - no change
+    - make parametrization more complete
 
- profiles/audio/bap.c |   3 +-
- src/shared/bap.c     | 205 +++++++++++++++++++++----------------------
- src/shared/bap.h     |   7 +-
- 3 files changed, 104 insertions(+), 111 deletions(-)
+ unit/test-bap.c | 357 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 258 insertions(+), 99 deletions(-)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 85bba9543..ec3502b06 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -1919,7 +1919,8 @@ static bool pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 		queue_push_tail(select->eps, ep);
- 	}
- 
--	bt_bap_select(lpac, rpac, &select->remaining, select_cb, ep);
-+	bt_bap_select(data->bap, lpac, rpac, 0, &select->remaining,
-+								select_cb, ep);
- 
- 	return true;
+diff --git a/unit/test-bap.c b/unit/test-bap.c
+index c15afe52d..1a35aaf4a 100644
+--- a/unit/test-bap.c
++++ b/unit/test-bap.c
+@@ -122,6 +122,22 @@ static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
  }
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index a18f393f7..b779f6716 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -204,11 +204,6 @@ struct bt_bap {
- 	void *user_data;
+ 
+ /* GATT Discover All procedure */
++
++#define SNK_PAC_HND	0x03, 0x00
++#define SRC_PAC_HND	0x09, 0x00
++#define SNK_LOC_HND	0x06, 0x00
++#define SRC_LOC_HND	0x0c, 0x00
++#define CTX_HND		0x0f, 0x00
++#define SUP_CTX_HND	0x12, 0x00
++#define SNK_HND(i)	(0x16 + 3*(i)), 0x00
++#define SRC_HND(i)	(0x1c + 3*(i)), 0x00
++#define SNK_CCC_HND(i)	(0x17 + 3*(i)), 0x00
++#define SRC_CCC_HND(i)	(0x1d + 3*(i)), 0x00
++#define SNK_ID(i)	(0x1 + (i))
++#define SRC_ID(i)	(0x3 + (i))
++#define CP_HND		0x22, 0x00
++#define CP_CCC_HND	0x23, 0x00
++
+ static const struct iovec setup_data[] = {
+ 	/* ATT: Exchange MTU Response (0x03) len 2
+ 	 *   Server RX MTU: 64
+@@ -933,16 +949,26 @@ static void test_teardown(const void *user_data)
+  *       Front Left (0x00000001)
+  *       Front Right (0x00000002)
+  */
+-#define DISC_SNK_PAC(_caps...) \
+-	IOV_DATA(0x0a, 0x03, 0x00), \
+-	IOV_DATA(0x0b, 0x01, _caps), \
+-	IOV_DATA(0x0a, 0x06, 0x00), \
+-	IOV_DATA(0x0b, 0x03, 0x00, 0x00, 0x00)
++
++#define IOV_CONTENT(data...) data
++
++#define DISC_SNK_PAC(_caps) \
++	IOV_DATA(0x0a, SNK_PAC_HND), \
++	IOV_DATA(0x0b, 0x01, _caps)
++
++#define DISC_SNK_LOC(locations) \
++	IOV_DATA(0x0a, SNK_LOC_HND), \
++	IOV_DATA(0x0b, locations & 0xff, (locations >> 8)  & 0xff, \
++		(locations >> 16) & 0xff, (locations >> 24) & 0xff)
++
++#define LC3_PAC_CAPS(ch_counts) \
++	0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
++	0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, ch_counts, 0x05, 0x04, \
++	0x1a, 0x00, 0xf0, 0x00, 0x00
+ 
+ #define DISC_SNK_LC3 \
+-	DISC_SNK_PAC(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_SNK_PAC(LC3_PAC_CAPS(0x03)), \
++	DISC_SNK_LOC(0x00000003)
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x0009 Type: Source PAC (0x2bcb)
+@@ -981,17 +1007,28 @@ static void test_teardown(const void *user_data)
+  *       Front Left (0x00000001)
+  *       Front Right (0x00000002)
+  */
+-#define DISC_SRC_PAC(_caps...) \
+-	DISC_SNK_PAC(_caps), \
+-	IOV_DATA(0x0a, 0x09, 0x00), \
+-	IOV_DATA(0x0b, 0x01, _caps), \
+-	IOV_DATA(0x0a, 0x0c, 0x00), \
+-	IOV_DATA(0x0b, 0x03, 0x00, 0x00, 0x00)
++#define DISC_SRC_PAC(_caps) \
++	IOV_DATA(0x0a, SRC_PAC_HND), \
++	IOV_DATA(0x0b, 0x01, _caps)
++
++#define DISC_SRC_LOC(locations) \
++	IOV_DATA(0x0a, SRC_LOC_HND), \
++	IOV_DATA(0x0b, locations & 0xff, (locations >> 8) & 0xff, \
++		(locations >> 16) & 0xff, (locations >> 24) & 0xff)
++
++#define DISC_PACS(snk_locations, src_locations, snk_caps, src_caps) \
++	DISC_SNK_PAC(IOV_CONTENT(snk_caps)), \
++	DISC_SNK_LOC(snk_locations), \
++	DISC_SRC_PAC(IOV_CONTENT(src_caps)),	\
++	DISC_SRC_LOC(src_locations)
++
++#define DISC_PACS_NO_LOCATION(snk_caps, src_caps) \
++	DISC_SNK_PAC(IOV_CONTENT(snk_caps)), \
++	DISC_SRC_PAC(IOV_CONTENT(src_caps))
+ 
+ #define DISC_SRC_LC3 \
+-	DISC_SRC_PAC(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_PACS(0x00000003, 0x00000003, \
++			LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x000f Type: Available Audio Contexts (0x2bcd)
+@@ -999,15 +1036,21 @@ static void test_teardown(const void *user_data)
+  *   Value: ff0fff0f
+  *   Handle: 0x000f Type: Available Audio Contexts (0x2bcd)
+  */
+-#define DISC_CTX(_caps...) \
+-	DISC_SRC_PAC(_caps), \
+-	IOV_DATA(0x0a, 0x0f, 0x00), \
++#define DISC_CTX(snk_locations, src_locations, snk_caps, src_caps) \
++	DISC_PACS(snk_locations, src_locations, \
++			IOV_CONTENT(snk_caps), IOV_CONTENT(src_caps)), \
++	IOV_DATA(0x0a, CTX_HND), \
++	IOV_DATA(0x0b, 0xff, 0x0f, 0xff, 0x0f)
++
++#define DISC_CTX_NO_LOCATION(snk_caps, src_caps) \
++	DISC_PACS_NO_LOCATION(IOV_CONTENT(snk_caps), \
++				IOV_CONTENT(src_caps)), \
++	IOV_DATA(0x0a, CTX_HND), \
+ 	IOV_DATA(0x0b, 0xff, 0x0f, 0xff, 0x0f)
+ 
+ #define DISC_CTX_LC3 \
+-	DISC_CTX(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_CTX(0x00000003, 0x00000003, \
++		LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x0012 Type: Supported Audio Contexts (0x2bce)
+@@ -1015,15 +1058,20 @@ static void test_teardown(const void *user_data)
+  *   Value: ff0fff0f
+  *   Handle: 0x0012 Type: Supported Audio Contexts (0x2bce)
+  */
+-#define DISC_SUP_CTX(_caps...) \
+-	DISC_CTX(_caps), \
+-	IOV_DATA(0x0a, 0x12, 0x00), \
++#define DISC_SUP_CTX(snk_locations, src_locations, snk_caps, src_caps) \
++	DISC_CTX(snk_locations, src_locations, \
++			IOV_CONTENT(snk_caps), IOV_CONTENT(src_caps)), \
++	IOV_DATA(0x0a, SUP_CTX_HND), \
++	IOV_DATA(0x0b, 0xff, 0x0f, 0xff, 0x0f)
++
++#define DISC_SUP_CTX_NO_LOCATION(snk_caps, src_caps) \
++	DISC_CTX_NO_LOCATION(IOV_CONTENT(snk_caps), IOV_CONTENT(src_caps)), \
++	IOV_DATA(0x0a, SUP_CTX_HND), \
+ 	IOV_DATA(0x0b, 0xff, 0x0f, 0xff, 0x0f)
+ 
+ #define DISC_SUP_CTX_LC3 \
+-	DISC_SUP_CTX(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_SUP_CTX(0x00000003, 0x00000003, \
++			LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x0016 Type: Sink ASE (0x2bc4)
+@@ -1046,21 +1094,29 @@ static void test_teardown(const void *user_data)
+  *       Notification (0x01)
+  * ATT: Write Response (0x13) len 0
+  */
+-#define DISC_SNK_ASE(_caps...) \
+-	DISC_SUP_CTX(_caps), \
+-	IOV_DATA(0x0a, 0x16, 0x00), \
++#define DISC_SNK_ASE(snk_locations, src_locations, snk_caps, src_caps)	\
++	DISC_SUP_CTX(snk_locations, src_locations, \
++			IOV_CONTENT(snk_caps), IOV_CONTENT(src_caps)), \
++	IOV_DATA(0x0a, SNK_HND(0)), \
+ 	IOV_DATA(0x0b, 0x01, 0x00), \
+-	IOV_DATA(0x12, 0x17, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x12, SNK_CCC_HND(0), 0x01, 0x00), \
+ 	IOV_DATA(0x13), \
+-	IOV_DATA(0x0a, 0x19, 0x00), \
++	IOV_DATA(0x0a, SNK_HND(1)), \
+ 	IOV_DATA(0x0b, 0x02, 0x00), \
+-	IOV_DATA(0x12, 0x1a, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x12, SNK_CCC_HND(1), 0x01, 0x00), \
++	IOV_DATA(0x13)
++
++#define DISC_SNK_ASE_NO_LOCATION(snk_caps, src_caps) \
++	DISC_SUP_CTX_NO_LOCATION(IOV_CONTENT(snk_caps), \
++				IOV_CONTENT(src_caps)), \
++	IOV_DATA(0x0a, SNK_HND(0)), \
++	IOV_DATA(0x0b, 0x01, 0x00), \
++	IOV_DATA(0x12, SNK_CCC_HND(0), 0x01, 0x00), \
+ 	IOV_DATA(0x13)
+ 
+ #define DISC_SNK_ASE_LC3 \
+-	DISC_SNK_ASE(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_SNK_ASE(0x00000003, 0x00000003, \
++			LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ /* ATT: Read Request (0x0a) len 2
+  *   Handle: 0x001c Type: Source ASE (0x2bc5)
+@@ -1088,23 +1144,33 @@ static void test_teardown(const void *user_data)
+  *       Notification (0x01)
+  * ATT: Write Response (0x13) len 0
+  */
+-#define DISC_SRC_ASE(_cfg...) \
+-	DISC_SNK_ASE(_cfg), \
+-	IOV_DATA(0x0a, 0x1c, 0x00), \
++#define DISC_SRC_ASE(snk_locations, src_locations, snk_pacs, src_pacs) \
++	DISC_SNK_ASE(snk_locations, src_locations, \
++			IOV_CONTENT(snk_pacs), IOV_CONTENT(src_pacs)), \
++	IOV_DATA(0x0a, SRC_HND(0)), \
+ 	IOV_DATA(0x0b, 0x03, 0x00), \
+-	IOV_DATA(0x12, 0x1d, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x12, SRC_CCC_HND(0), 0x01, 0x00), \
+ 	IOV_DATA(0x13), \
+-	IOV_DATA(0x0a, 0x1f, 0x00), \
++	IOV_DATA(0x0a, SRC_HND(1)), \
+ 	IOV_DATA(0x0b, 0x04, 0x00), \
+-	IOV_DATA(0x12, 0x20, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x12, SRC_CCC_HND(1), 0x01, 0x00), \
+ 	IOV_DATA(0x13), \
+-	IOV_DATA(0x12, 0x23, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x12, CP_CCC_HND, 0x01, 0x00), \
++	IOV_DATA(0x13)
++
++#define DISC_SRC_ASE_NO_LOCATION(snk_pacs, src_pacs) \
++	DISC_SNK_ASE_NO_LOCATION(IOV_CONTENT(snk_pacs), \
++				IOV_CONTENT(src_pacs)), \
++	IOV_DATA(0x0a, SRC_HND(0)), \
++	IOV_DATA(0x0b, 0x03, 0x00), \
++	IOV_DATA(0x12, SRC_CCC_HND(0), 0x01, 0x00), \
++	IOV_DATA(0x13), \
++	IOV_DATA(0x12, CP_CCC_HND, 0x01, 0x00), \
+ 	IOV_DATA(0x13)
+ 
+ #define DISC_SRC_ASE_LC3 \
+-	DISC_SRC_ASE(0x06, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x01, \
+-		0xff, 0x00, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 0x05, 0x04, \
+-		0x1a, 0x00, 0xf0, 0x00, 0x00)
++	DISC_SRC_ASE(0x00000003, 0x00000003, \
++			LC3_PAC_CAPS(0x03), LC3_PAC_CAPS(0x03))
+ 
+ #define DISC_ASE_LC3 \
+ 	DISC_SNK_ASE_LC3, \
+@@ -1251,17 +1317,33 @@ static void test_disc(void)
+  *   Handle: 0x0016
+  *     Data: 01010002010a00204e00409c00204e00409c00_cfg
+  */
+-#define SCC_SNK(_cfg...) \
+-	IOV_DATA(0x52, 0x22, 0x00, 0x01, 0x01, 0x01, 0x02, 0x02, _cfg), \
+-	IOV_DATA(0x1b, 0x22, 0x00, 0x01, 0x01, 0x01, 0x00, 0x00), \
++
++#define SCC_PDU(count) \
++	0x52, CP_HND, 0x01, (count)
++
++#define SCC_PDU_ASE(id, _cfg...) \
++	id, 0x02, 0x02, _cfg
++
++#define SCC_ASE(id, _cfg...) \
++	IOV_DATA(SCC_PDU(1), SCC_PDU_ASE(id, _cfg)), \
++	IOV_DATA(0x1b, CP_HND, 0x01, 0x01, id, 0x00, 0x00)
++
++#define SCC_SNK_NOTIFY(i, _cfg...) \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x01, 0x00, 0x02, 0x01, 0x0a, 0x00, \
++	IOV_DATA(0x1b, SNK_HND(i), SNK_ID(i), 0x01, \
++			0x00, 0x02, 0x01, 0x0a, 0x00, \
+ 			0x20, 0x4e, 0x00, 0x40, 0x9c, 0x00, 0x20, 0x4e, 0x00, \
+ 			0x40, 0x9c, 0x00, _cfg)
+ 
++#define SCC_SNK(_cfg...) \
++	SCC_ASE(SNK_ID(0), _cfg), SCC_SNK_NOTIFY(0, _cfg)
++
++#define LC3_CODEC_ID_DATA \
++	0x06, 0x00, 0x00, 0x00, 0x00
++
+ #define SCC_SNK_LC3(_cc...) \
+ 	DISC_SRC_ASE_LC3, \
+-	SCC_SNK(0x06, 0x00, 0x00, 0x00, 0x00, _cc)
++	SCC_SNK(LC3_CODEC_ID_DATA, _cc)
+ 
+ #define QOS_BALANCED_2M \
+ 	{ \
+@@ -1442,14 +1524,18 @@ static struct test_config cfg_snk_48_6 = {
+  *   Handle: 0x001c
+  *     Data: 03010002010a00204e00409c00204e00409c00_cfg
+  */
+-#define SCC_SRC(_cfg...) \
+-	IOV_DATA(0x52, 0x22, 0x00, 0x01, 0x01, 0x03, 0x02, 0x02, _cfg), \
+-	IOV_DATA(0x1b, 0x22, 0x00, 0x01, 0x01, 0x03, 0x00, 0x00), \
++
++#define SCC_SRC_NOTIFY(i, _cfg...) \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x01, 0x00, 0x02, 0x01, 0x0a, 0x00, \
++	IOV_DATA(0x1b, SRC_HND(i), SRC_ID(i), 0x01, \
++			0x00, 0x02, 0x01, 0x0a, 0x00, \
+ 			0x20, 0x4e, 0x00, 0x40, 0x9c, 0x00, 0x20, 0x4e, 0x00, \
+ 			0x40, 0x9c, 0x00, _cfg)
+ 
++#define SCC_SRC(_cfg...) \
++	SCC_ASE(SRC_ID(0), _cfg), \
++	SCC_SRC_NOTIFY(0, _cfg)
++
+ #define SCC_SRC_LC3(_cc...) \
+ 	DISC_SRC_ASE_LC3, \
+ 	SCC_SRC(0x06, 0x00, 0x00, 0x00, 0x00, _cc)
+@@ -1867,12 +1953,23 @@ static struct test_config cfg_snk_vs = {
+ 	.vs = true,
  };
  
--struct bt_bap_chan {
--	uint8_t count;
--	uint32_t location;
--};
--
- struct bt_bap_pac {
- 	struct bt_bap_db *bdb;
- 	char *name;
-@@ -3848,50 +3843,6 @@ static void *ltv_merge(struct iovec *data, struct iovec *cont)
- 	return util_iov_append(data, cont->iov_base, cont->iov_len);
- }
- 
--static void bap_pac_chan_add(struct bt_bap_pac *pac, uint8_t count,
--				uint32_t location)
--{
--	struct bt_bap_chan *chan;
--
--	if (!pac->channels)
--		pac->channels = queue_new();
--
--	chan = new0(struct bt_bap_chan, 1);
--	chan->count = count;
--	chan->location = location;
--
--	queue_push_tail(pac->channels, chan);
--}
--
--static void bap_pac_foreach_channel(size_t i, uint8_t l, uint8_t t, uint8_t *v,
--					void *user_data)
--{
--	struct bt_bap_pac *pac = user_data;
--
--	if (!v)
--		return;
--
--	bap_pac_chan_add(pac, *v, bt_bap_pac_get_locations(pac));
--}
--
--static void bap_pac_update_channels(struct bt_bap_pac *pac, struct iovec *data)
--{
--	uint8_t type = 0x03;
--
--	if (!data)
--		return;
--
--	util_ltv_foreach(data->iov_base, data->iov_len, &type,
--				bap_pac_foreach_channel, pac);
--
--	/* If record didn't set a channel count but set a location use that as
--	 * channel count.
--	 */
--	if (queue_isempty(pac->channels) && pac->qos.location)
--		bap_pac_chan_add(pac, pac->qos.location, pac->qos.location);
--
--}
--
- static void bap_pac_merge(struct bt_bap_pac *pac, struct iovec *data,
- 					struct iovec *metadata)
- {
-@@ -3901,9 +3852,6 @@ static void bap_pac_merge(struct bt_bap_pac *pac, struct iovec *data,
- 	else
- 		pac->data = util_iov_dup(data, 1);
- 
--	/* Update channels */
--	bap_pac_update_channels(pac, data);
--
- 	/* Merge metadata into existing record */
- 	if (pac->metadata)
- 		ltv_merge(pac->metadata, metadata);
-@@ -4845,6 +4793,8 @@ static void read_source_pac_loc(bool success, uint8_t att_ecode,
- 
- 	pacs->source_loc_value = get_le32(value);
- 
-+	DBG(bap, "PACS Source Locations: 0x%08x", pacs->source_loc_value);
++#define VS_PAC_CAPS(ch_count) \
++	0xff, 0x01, 0x00, 0x01, 0x00, 0x03, 0x02, 0x03, ch_count, \
++	0x00
 +
- 	/* Resume reading sinks if supported but for some reason is empty */
- 	if (pacs->source && queue_isempty(bap->rdb->sources)) {
- 		uint16_t value_handle;
-@@ -4878,6 +4828,8 @@ static void read_sink_pac_loc(bool success, uint8_t att_ecode,
- 
- 	pacs->sink_loc_value = get_le32(value);
- 
-+	DBG(bap, "PACS Sink Locations: 0x%08x", pacs->sink_loc_value);
++#define VS_PAC_CAPS_NO_COUNT				\
++	0xff, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00
 +
- 	/* Resume reading sinks if supported but for some reason is empty */
- 	if (pacs->sink && queue_isempty(bap->rdb->sinks)) {
- 		uint16_t value_handle;
-@@ -4911,6 +4863,9 @@ static void read_pac_context(bool success, uint8_t att_ecode,
- 
- 	pacs->sink_context_value = le16_to_cpu(ctx->snk);
- 	pacs->source_context_value = le16_to_cpu(ctx->src);
+ #define DISC_SRC_ASE_VS \
+-	DISC_SRC_ASE(0xff, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00)
++	DISC_SRC_ASE(0x00000003, 0x00000003, \
++			VS_PAC_CAPS_NO_COUNT, VS_PAC_CAPS_NO_COUNT)
 +
-+	DBG(bap, "PACS Sink Context: 0x%04x", pacs->sink_context_value);
-+	DBG(bap, "PACS Source Context: 0x%04x", pacs->source_context_value);
- }
++#define VS_CODEC_ID_DATA \
++	0xff, 0x01, 0x00, 0x01, 0x00
  
- static void read_pac_supported_context(bool success, uint8_t att_ecode,
-@@ -4934,6 +4889,11 @@ static void read_pac_supported_context(bool success, uint8_t att_ecode,
+ #define SCC_SNK_VS \
+ 	DISC_SRC_ASE_VS,  \
+-	SCC_SNK(0xff, 0x01, 0x00, 0x01, 0x00, 0x00)
++	SCC_SNK(VS_CODEC_ID_DATA, 0x00)
  
- 	pacs->supported_sink_context_value = le16_to_cpu(ctx->snk);
- 	pacs->supported_source_context_value = le16_to_cpu(ctx->src);
+ static struct test_config cfg_src_vs = {
+ 	.cc = IOV_NULL,
+@@ -2066,11 +2163,24 @@ static struct test_config cfg_snk_48_6_1 = {
+  *   Handle: 0x0016
+  *     Data: 01010102010a00204e00409c00204e00409c00_qos
+  */
+-#define QOS_SNK(_qos...) \
+-	IOV_DATA(0x52, 0x22, 0x00, 0x02, 0x01, 0x01, 0x00, 0x00, _qos), \
+-	IOV_DATA(0x1b, 0x22, 0x00, 0x02, 0x01, 0x01, 0x00, 0x00), \
 +
-+	DBG(bap, "PACS Supported Sink Context: 0x%04x",
-+					pacs->supported_sink_context_value);
-+	DBG(bap, "PACS Supported Source Context: 0x%04x",
-+					pacs->supported_source_context_value);
- }
- 
- static void foreach_pacs_char(struct gatt_db_attribute *attr, void *user_data)
-@@ -6113,12 +6073,55 @@ static bool match_pac(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	return false;
- }
- 
--int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			int *count, bt_bap_pac_select_t func,
--			void *user_data)
-+static void bap_pac_ltv_ch_counts(size_t i, uint8_t l, uint8_t t, uint8_t *v,
-+								void *user_data)
- {
--	const struct queue_entry *lchan, *rchan;
--	int selected = 0;
-+	uint8_t *mask = user_data;
++#define QOS_PDU(count) \
++	0x52, CP_HND, 0x02, (count)
 +
-+	if (v)
-+		*mask |= *v;
-+}
++#define QOS_PDU_ASE(id, cis, _qos...) \
++	id, 0x00, cis, _qos
 +
-+static uint8_t bap_pac_ch_counts(struct bt_bap_pac *pac)
-+{
-+	uint8_t type = 0x03;
-+	uint8_t mask = 0;
++#define QOS_ASE(id, cis, _qos...) \
++	IOV_DATA(QOS_PDU(1), QOS_PDU_ASE(id, cis, _qos)), \
++	IOV_DATA(0x1b, CP_HND, 0x02, 0x01, id, 0x00, 0x00)
 +
-+	if (!pac->data)
-+		return 0;
++#define QOS_SNK_NOTIFY(i, cis, _qos...) \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x02, 0x00, 0x00, _qos)
++	IOV_DATA(0x1b, SNK_HND(i), SNK_ID(i), 0x02, 0x00, cis, _qos)
 +
-+	util_ltv_foreach(pac->data->iov_base, pac->data->iov_len, &type,
-+						bap_pac_ltv_ch_counts, &mask);
++#define QOS_SNK(_qos...) \
++	QOS_ASE(SNK_ID(0), 0, _qos), \
++	QOS_SNK_NOTIFY(0, 0, _qos)
+ 
+ #define SCC_SNK_8_1_1 \
+ 	SCC_SNK_8_1, \
+@@ -2274,16 +2384,22 @@ static struct test_config cfg_src_48_6_1 = {
+  *   Handle: 0x001c
+  *     Data: 03010102010a00204e00409c00204e00409c00_qos
+  */
+-#define QOS_SRC(_qos...) \
+-	IOV_DATA(0x52, 0x22, 0x00, 0x02, 0x01, 0x03, 0x00, 0x00, _qos), \
+-	IOV_DATA(0x1b, 0x22, 0x00, 0x02, 0x01, 0x03, 0x00, 0x00), \
 +
-+	if (!mask)
-+		mask = 0x01;  /* default (BAP v1.0.1 Sec 4.3.1) */
++#define QOS_SRC_NOTIFY(i, cis, _qos...) \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x02, 0x00, 0x00, _qos)
++	IOV_DATA(0x1b, SRC_HND(i), SRC_ID(i), 0x02, 0x00, cis, _qos)
 +
-+	return mask;
-+}
++#define QOS_SRC(_qos...) \
++	QOS_ASE(SRC_ID(0), 0, _qos), \
++	QOS_SRC_NOTIFY(0, 0, _qos)
 +
-+static unsigned int bap_count_eps(struct queue *eps, uint8_t dir)
-+{
-+	const struct queue_entry *entry;
-+	unsigned int count = 0;
++#define QOS_SRC_8_1_1_DATA \
++	0x4c, 0x1d, 0x00, 0x00, 0x02, 0x1a, 0x00, 0x02, 0x08, 0x00, \
++	0x40, 0x9c, 0x00
+ 
+ #define SCC_SRC_8_1_1 \
+ 	SCC_SRC_8_1, \
+-	QOS_SRC(0x4c, 0x1d, 0x00, 0x00, 0x02, 0x1a, 0x00, 0x02, 0x08, 0x00, \
+-		0x40, 0x9c, 0x00)
++	QOS_SRC(QOS_SRC_8_1_1_DATA)
+ 
+ #define SCC_SRC_8_2_1 \
+ 	SCC_SRC_8_2, \
+@@ -3252,14 +3368,31 @@ static struct test_config cfg_snk_enable = {
+  *   Handle: 0x0016
+  *     Data: 0101010300403020100
+  */
 +
-+	for (entry = queue_get_entries(eps); entry; entry = entry->next) {
-+		struct bt_bap_endpoint *ep = entry->data;
++#define ENABLE_PDU(count) \
++	0x52, CP_HND, 0x03, (count)
 +
-+		if (ep->dir == dir)
-+			count++;
-+	}
++#define ENABLE_PDU_ASE(id) \
++	id, 0x04, 0x03, 0x02, 0x01, 00
 +
-+	return count;
-+}
++#define ENABLE_ASE(id) \
++	IOV_DATA(ENABLE_PDU(1), ENABLE_PDU_ASE(id)), \
++	IOV_DATA(0x1b, CP_HND, 0x03, 0x01, id, 0x00, 0x00)
 +
-+int bt_bap_select(struct bt_bap *bap,
-+			struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+			unsigned int max_channels, int *count,
-+			bt_bap_pac_select_t func, void *user_data)
-+{
-+	uint32_t locations;
-+	uint8_t ch_counts;
-+	unsigned int num_ase;
- 
- 	if (!lpac || !rpac || !func)
- 		return -EINVAL;
-@@ -6126,66 +6129,54 @@ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	if (!lpac->ops || !lpac->ops->select)
- 		return -EOPNOTSUPP;
- 
--	for (lchan = queue_get_entries(lpac->channels); lchan;
--					lchan = lchan->next) {
--		struct bt_bap_chan *lc = lchan->data;
--		struct bt_bap_chan map = *lc;
--		int i;
-+	if (!max_channels)
-+		max_channels = 2;  /* By default: don't go beyond BAP AC */
- 
--		for (i = 0, rchan = queue_get_entries(rpac->channels); rchan;
--					rchan = rchan->next, i++) {
--			struct bt_bap_chan *rc = rchan->data;
-+	ch_counts = bap_pac_ch_counts(lpac) & bap_pac_ch_counts(rpac);
-+	locations = bt_bap_pac_get_locations(rpac);
-+	num_ase = bap_count_eps(bap->remote_eps, rpac->type);
- 
--			/* Try matching the channel count */
--			if (!(map.count & rc->count))
--				break;
-+	/* Fallback to unspecified/mono allocation if nothing is matching */
-+	if (!locations || !ch_counts) {
-+		lpac->ops->select(lpac, rpac, 0, &rpac->qos, func, user_data,
-+							lpac->user_data);
-+		if (count)
-+			(*count)++;
-+		return 0;
-+	}
- 
--			/* Check if location was set otherwise attempt to
--			 * assign one based on the number of channels it
--			 * supports.
--			 */
--			if (!rc->location) {
--				rc->location = bt_bap_pac_get_locations(rpac);
--				/* If channel count is 1 use a single
--				 * location
--				 */
--				if (rc->count == 0x01)
--					rc->location &= BIT(i);
--			}
-+	/* Allocate all locations to streams */
-+	while (num_ase) {
-+		uint32_t allocation = 0, alloc = 0;
-+		unsigned int i, n;
- 
--			/* Try matching the channel location */
--			if (!(map.location & rc->location))
-+		/* Put max number of channels per stream */
-+		for (i = 0, n = 0; i < 32 && n < 8; ++i) {
-+			uint32_t loc = (1LL << i);
++#define SNK_ENABLE_NOTIFY(i, cis) \
++	IOV_NULL, \
++	IOV_DATA(0x1b, SNK_HND(i), SNK_ID(i), 0x03, \
++			0x00, cis, 0x04, 0x03, 0x02, 0x01, 0x00)
 +
-+			if (!(locations & loc))
- 				continue;
- 
--			lpac->ops->select(lpac, rpac, map.location &
--						rc->location, &rpac->qos,
--						func, user_data,
--						lpac->user_data);
--			selected++;
-+			alloc |= loc;
-+			if ((BIT(n) & ch_counts) && n < max_channels)
-+				allocation = alloc;
- 
--			/* Check if there are any channels left to select */
--			map.count &= ~(map.count & rc->count);
--			/* Check if there are any locations left to select */
--			map.location &= ~(map.location & rc->location);
--
--			if (!map.count || !map.location)
--				break;
--
--			/* Check if device require AC*(i) settings */
--			if (rc->count == 0x01)
--				map.count = map.count >> 1;
-+			++n;
- 		}
--	}
- 
--	/* Fallback to no channel allocation since none could be matched. */
--	if (!selected) {
--		lpac->ops->select(lpac, rpac, 0, &rpac->qos, func, user_data,
--					lpac->user_data);
--		selected++;
--	}
-+		if (!allocation)
-+			break;
- 
--	if (count)
--		*count += selected;
-+		/* Configure stream */
-+		lpac->ops->select(lpac, rpac, allocation, &rpac->qos,
-+					func, user_data, lpac->user_data);
-+		if (count)
-+			(*count)++;
++#define SNK_START_NOTIFY(i, cis) \
++	IOV_NULL, \
++	IOV_DATA(0x1b, SNK_HND(i), SNK_ID(i), 0x04,		\
++			0x00, cis, 0x04, 0x03, 0x02, 0x01, 0x00)
 +
-+		locations &= ~allocation;
-+		max_channels -= __builtin_popcount(allocation);
-+		num_ase--;
-+	}
+ #define SCC_SNK_ENABLE \
+ 	SCC_SNK_16_2_1, \
+-	IOV_DATA(0x52, 0x22, 0x00, 0x03, 0x01, 0x01, 0x04, 0x03, 0x02, 0x01, \
+-			00), \
+-	IOV_DATA(0x1b, 0x22, 0x00, 0x03, 0x01, 0x01, 0x00, 0x00), \
+-	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x03, 0x00, 0x00, 0x04, 0x03, 0x02, \
+-			0x01, 0x00)
++	ENABLE_ASE(SNK_ID(0)), \
++	SNK_ENABLE_NOTIFY(0, 0)
  
- 	return 0;
- }
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index efeed604d..80e91f10a 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -172,9 +172,10 @@ void bt_bap_pac_set_user_data(struct bt_bap_pac *pac, void *user_data);
- void *bt_bap_pac_get_user_data(struct bt_bap_pac *pac);
+ static struct test_config cfg_src_enable = {
+ 	.cc = LC3_CONFIG_16_2,
+@@ -3278,17 +3411,19 @@ static struct test_config cfg_src_enable = {
+  *   Handle: 0x001c
+  *     Data: 030300000403020100
+  */
+-#define SRC_ENABLE \
+-	IOV_DATA(0x52, 0x22, 0x00, 0x03, 0x01, 0x03, 0x04, 0x03, 0x02, 0x01, \
+-			00), \
+-	IOV_DATA(0x1b, 0x22, 0x00, 0x03, 0x01, 0x03, 0x00, 0x00), \
++#define SRC_ENABLE_NOTIFY(i, cis) \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x03, 0x00, 0x00, 0x04, 0x03, 0x02, \
+-			0x01, 0x00)
++	IOV_DATA(0x1b, SRC_HND(i), SRC_ID(i), 0x03, \
++			0x00, cis, 0x04, 0x03, 0x02, 0x01, 0x00)
++
++#define SRC_ENABLE \
++	ENABLE_ASE(SRC_ID(0)), \
++	SRC_ENABLE_NOTIFY(0, 0)
  
- /* Stream related functions */
--int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			int *count, bt_bap_pac_select_t func,
--			void *user_data);
-+int bt_bap_select(struct bt_bap *bap,
-+			struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+			unsigned int max_channels, int *count,
-+			bt_bap_pac_select_t func, void *user_data);
+ #define SCC_SRC_ENABLE \
+ 	SCC_SRC_16_2_1, \
+-	SRC_ENABLE
++	ENABLE_ASE(SRC_ID(0)), \
++	SRC_ENABLE_NOTIFY(0, 0)
  
- void bt_bap_cancel_select(struct bt_bap_pac *lpac, bt_bap_pac_select_t func,
- 			void *user_data);
+ /* Test Purpose:
+  * Verify that a Unicast Client IUT can initiate an Enable operation for an ASE
+@@ -3353,17 +3488,28 @@ static struct test_config cfg_snk_disable = {
+  *   Handle: 0x0016
+  *     Data: 01010102010a00204e00409c00204e00409c00_qos
+  */
+-#define ASE_SNK_DISABLE \
+-	IOV_DATA(0x52, 0x22, 0x00, 0x05, 0x01, 0x01), \
+-	IOV_DATA(0x1b, 0x22, 0x00, 0x05, 0x01, 0x01, 0x00, 0x00), \
++
++#define DISABLE_PDU(count) \
++	0x52, CP_HND, 0x05, (count)
++
++#define DISABLE_ASE(id) \
++	IOV_DATA(DISABLE_PDU(1), id), \
++	IOV_DATA(0x1b, CP_HND, 0x05, 0x01, id, 0x00, 0x00)
++
++#define SNK_DISABLE_NOTIFY(i, cis) \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x02, 0x00, 0x00, 0x10, 0x27, 0x00, \
++	IOV_DATA(0x1b, SNK_HND(i), SNK_ID(i), 0x02, \
++			0x00, cis, 0x10, 0x27, 0x00, \
+ 			0x00, 0x02, 0x28, 0x00, 0x02, 0x0a, 0x00, 0x40, 0x9c, \
+ 			0x00)
+ 
++#define SNK_DISABLE \
++	DISABLE_ASE(SNK_ID(0)), \
++	SNK_DISABLE_NOTIFY(0, 0)
++
+ #define SCC_SNK_DISABLE \
+ 	SCC_SNK_ENABLE, \
+-	ASE_SNK_DISABLE
++	SNK_DISABLE
+ 
+ static struct test_config cfg_src_disable = {
+ 	.cc = LC3_CONFIG_16_2,
+@@ -3382,15 +3528,19 @@ static struct test_config cfg_src_disable = {
+  *   Handle: 0x001c
+  *     Data: 030300000403020100
+  */
+-#define ASE_SRC_DISABLE \
+-	IOV_DATA(0x52, 0x22, 0x00, 0x05, 0x01, 0x03), \
+-	IOV_DATA(0x1b, 0x22, 0x00, 0x05, 0x01, 0x03, 0x00, 0x00), \
++
++#define SRC_DISABLE_NOTIFY(i, cis) \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x05, 0x00, 0x00, 0x04, 0x03, 0x02, \
+-		 0x01, 0x00)
++	IOV_DATA(0x1b, SRC_HND(i), SRC_ID(i), 0x05, \
++			0x00, cis, 0x04, 0x03, 0x02, 0x01, 0x00)
++
++#define SRC_DISABLE \
++	DISABLE_ASE(SRC_ID(0)), \
++	SRC_DISABLE_NOTIFY(0, 0)
++
+ #define SCC_SRC_DISABLE \
+ 	SCC_SRC_ENABLE, \
+-	ASE_SRC_DISABLE
++	SRC_DISABLE
+ 
+ static void state_start_disable(struct bt_bap_stream *stream,
+ 					uint8_t old_state, uint8_t new_state,
+@@ -3426,17 +3576,26 @@ static struct test_config cfg_src_disable_streaming = {
+  *   Handle: 0x0016
+  *     Data: 0101010400403020100
+  */
+-#define SRC_START \
+-	IOV_DATA(0x52, 0x22, 0x00, 0x04, 0x01, 0x03), \
+-	IOV_DATA(0x1b, 0x22, 0x00, 0x04, 0x01, 0x03, 0x00, 0x00), \
++#define START_PDU(count) \
++	0x52, CP_HND, 0x04, (count)
++
++#define START_ASE(id) \
++	IOV_DATA(START_PDU(1), id), \
++	IOV_DATA(0x1b, CP_HND, 0x04, 0x01, id, 0x00, 0x00)
++
++#define SRC_START_NOTIFY(i, cis) \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x04, 0x00, 0x00, 0x04, 0x03, 0x02, \
+-			0x01, 0x00)
++	IOV_DATA(0x1b, SRC_HND(i), SRC_ID(i), 0x04, \
++			0x00, cis, 0x04, 0x03, 0x02, 0x01, 0x00)
++
++#define SRC_START \
++	START_ASE(SRC_ID(0)), \
++	SRC_START_NOTIFY(0, 0)
+ 
+ #define SCC_SRC_DISABLE_STREAMING \
+ 	SCC_SRC_ENABLE, \
+ 	SRC_START, \
+-	ASE_SRC_DISABLE
++	SRC_DISABLE
+ 
+ /* Test Purpose:
+  * Verify that a Unicast Client IUT can initiate a Disable operation for an ASE
 -- 
 2.51.1
 
