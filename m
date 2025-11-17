@@ -1,131 +1,153 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8927326D51;
-	Mon, 17 Nov 2025 09:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0423426E143
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 10:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763372537; cv=none; b=RBiX2OmaPp0w1y/WiSOhgzLtqGq3G3hTPv4In0iZZ58+xz1OuRcIB/AT4kBYtY5hvqIAoGCV4U+Tpiqprdwk3TolOOor8odqpjtHuReGtHCb6DjNZRhfc2zSFuhF45hSxCet0phq15wB1qKyDPyl7G2VI5Wi4gZw7x1y4CuMVI8=
+	t=1763373945; cv=none; b=D4Q8QuO0Yt7FWizr22HLWfNNR11SyuvhfXh3ieje88w6SYllfsqmvs9HHmzQ797puGXIwsPWnjooRc4hyONz35zuegIADI2fecfDESUpCdN46uNREzE5WpxISyEv5uNKqarGd+Skh6hEMhmPAKZ+hFPr364zlsb41eyOFD3mxdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763372537; c=relaxed/simple;
-	bh=+lDX5repbVwAgSSpxEPe8Ggrw67h+ua6KeXvVwqhAvA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KH1tx5K7KVoguyWAnL0sledbZrLkGaON1XiRI1pRzn/1xgVvt79DPS/vJ2AtkDn1VROJzc+qRh7eqPWyrndU6KVX9wzMtRMb9fpbpmBNQQ7243fRJ31OnPHnAoxT7XpZBrVwZIn8OCIxA6hkAP7morLQLNavbHT/76+mFoZp86A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=z9YWdbBP; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1763373945; c=relaxed/simple;
+	bh=3tGCnaCFZSQuSJH0ousT8W1EYk1Evqg6h4b5X6rOHtI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=tG2hSvioMNmTPNmMvztHiFqQ4FJbQ7vG4wmuATwhQHz7PQvfXQm63nEphw5O+wliiQZyj0inf7My/L6yv+5GJJWuBDl6igBjxtULEORsKHPIxHKFx1vi+NcF8SY7/zJCnNuQTy8DnajCBjPOhs7JYOrfDJ5FVemcDzYIZPo5BVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YqIzZBJm; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="z9YWdbBP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=5FRGOs0emlTmc51RdE5KM9BmjBcn2zfRmynLjSXyid8=; t=1763372535;
-	x=1763804535; b=z9YWdbBPsUG40dPREbc9ZGK05KxKpl3FiicJ/d3rtuvj9HY4II4FtovqWZ1FV
-	VSHJ2FYYfLCqkJmlzEZlorPL3DpN3c6/SPZchvS2zVM3Ajgi+IyISeQYPZ7yfuxBw7vpReW/CtekP
-	lRx/lrjrqG03d7JDqF87fCRzlD/fNJIe0L6lwXk2MKGN9m+egD4DJSLsHLWg4gucyjJV1YvemeMUN
-	FAwZKhWfnbYmcXAEAgHj1/1yp+Iao7DSwovW4bCmRj3ThMzeM8eEgWe9KMVKXm2AVPvPWTc6nAG+R
-	3bCD4eVo3RMyOUt/HyZm7D/h+vLIouG00SJ5wmMnFyugfV/r6A==;
-Received: from [2a02:8108:8984:1d00:a0cf:1912:4be:477f]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
-	id 1vKvkM-005HvH-0f;
-	Mon, 17 Nov 2025 10:42:06 +0100
-Message-ID: <1b59d3c2-1ed0-40df-a3ba-cca2316e866b@leemhuis.info>
-Date: Mon, 17 Nov 2025 10:42:05 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YqIzZBJm"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7acd9a03ba9so3803277b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 02:05:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763373943; x=1763978743; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FvAATWYZClN+yLmzd5nq3oXrBeTp1mniTdss6d0RCKE=;
+        b=YqIzZBJmDLtCOjl+c2FfV87bGg2c9sGhcG0MX4SgxHPaAORnvqyqT27uwSQuePiFqz
+         ytu9sM0feovUhfNWiwDFo6/9SmBAbskyE4am//9fowhTQDgTJarzFR8Wi0UDqzXI0ueu
+         0k3Rq6W/rba5kzXdHJgMQZED4CiY7lfe+c/C2nHhqiBh7cxSk2H+gvWHoR6LNZgyIlST
+         gZCJ12FgUNFjAL5zNG023MOUipXqzxNg002AtBjHlfvpUs4HwBLO/DQyR0Z31CNTXhTo
+         nP8Py6iE5iOLS2qlIDKynjB7JjlaSATdhsJQEOGt7hyFZRNtr0PI4Srp/vTHmBe4x3l0
+         Q89g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763373943; x=1763978743;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FvAATWYZClN+yLmzd5nq3oXrBeTp1mniTdss6d0RCKE=;
+        b=hZH8ojgj2H/APWJIrlng1jkwj/1cC97rDdzyVwts+X5FUioQt8GAkLyZyIJI6hXnzJ
+         u7hPlpCuMcfgb40jWKFT2oansL7EuDpmRIb+ZShDSnOOM2aRExo8jlSrnVfw0VVlbitw
+         8/NAZmbgluQYG+KtgK3O30UJCMu0Rnda+YiaGoV9M4ro0MMDOyM+kLNpLH34T0OgFVbN
+         NSsSlTFcmfmOiJ2T1+Pp3GseO6jce7IsIm5rUEx0+woNljYfTvU68gQZYUPlOixIZnIj
+         i8gcLMj+0vVRECIFmECsArNxMijGbZvV2yknz/D8my+tPwjAzRbUU7dTP6KT/NIjhvMl
+         mYHg==
+X-Gm-Message-State: AOJu0YzXiGNl6+DX8lTvjOP0ElqPaUXktyQGwZq8u5EikuRJYQrm64jh
+	y5jJdWvU1dlGJyMg7DAC5dbACyA+y/ix53pK4Y3EBU8XqU4BNFKZIB6RNmxUOEgy
+X-Gm-Gg: ASbGncuCMVGLK3ld4U63gher1r7jz3SrkYOsNmNwnVOM/iEoEUitYxws9SoIpcpqjz8
+	x77JDDj6dkv7kHrREGwNYLCv1iBvndViT8xM2ZNkzieNv2CT07gpiEZjwa8N6+hHIdyKjaBstuM
+	tbHTYNnrjtktXUKiXTyMYlTgOBg1kU9w2M4jXtBzkNMmoqrx9OMoCSiEiIKnI1SbNRLZ0p4EZIo
+	z1p7mHoOrKJrSe/UWYCWjdt57CXGANOpoynLeCRKSXVJmf7PFRbz905JGtBjUQUpwl/focQ///M
+	V4xA78clgqC8e5sDIepet4TTTtFleArzDgWr3HdatcnoCn+jqTYoLFOMrl4AOi3N1ECSUyPm6IA
+	3NObpLUudfOZa+e8vvVQ+KABf6q6me/5xSIGb5yZLuE5d8+NRuHzI5dRv3/WZ32wI3TJXbTU4Tz
+	9TkZPpuMpw3g9og3JYse3+urqjOVSY
+X-Google-Smtp-Source: AGHT+IFUoujdQSFjhu2/Xr7gnE8pEMAlfE6QJgkmKUAS1y/4wfJa85R3iDGjm+SqFZbawwJsiEpGtg==
+X-Received: by 2002:a05:7022:388e:b0:119:e56b:9596 with SMTP id a92af1059eb24-11b411fc012mr5297701c88.27.1763373942929;
+        Mon, 17 Nov 2025 02:05:42 -0800 (PST)
+Received: from [172.17.0.2] ([57.151.136.161])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11b060885f9sm40941883c88.4.2025.11.17.02.05.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 02:05:42 -0800 (PST)
+Message-ID: <691af376.050a0220.1d699c.3e59@mx.google.com>
+Date: Mon, 17 Nov 2025 02:05:42 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5858554980557840701=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] Bluetooth adapter provided by `btusb` not recognized
- since v6.13.2
-To: incogcyberpunk@proton.me, "stable@vger.kernel.org"
- <stable@vger.kernel.org>
-Cc: "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
- "marcel@holtmann.org" <marcel@holtmann.org>,
- "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
- "sean.wang@mediatek.com" <sean.wang@mediatek.com>
-References: <jOB6zqCC3xjlPPJXwPYPb4MxHJOhxVgp380ayP7lYq-aT2iA5D8YCdMeCvq5Cp_ICZmqjpfgX8o9siQdlPu9DY4qgnL_zCjgqP23fXc-P4U=@proton.me>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: <jOB6zqCC3xjlPPJXwPYPb4MxHJOhxVgp380ayP7lYq-aT2iA5D8YCdMeCvq5Cp_ICZmqjpfgX8o9siQdlPu9DY4qgnL_zCjgqP23fXc-P4U=@proton.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1763372535;dec64b74;
-X-HE-SMSGID: 1vKvkM-005HvH-0f
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: Bluetooth: L2CAP: Accept incomplete SDU
+In-Reply-To: <20251117092408.336966-1-frederic.danis@collabora.com>
+References: <20251117092408.336966-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On 11/17/25 02:30, incogcyberpunk@proton.me wrote:
-> 
-> #regzbot introduced: v6.13.1..v6.13.2
-> 
-> Distro: Arch Linux 
-> Kernel: since v6.13.2
+--===============5858554980557840701==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Lo! Thx for the report. It's unlikely that any developer will look into
-this report[1] as 6.13.y is ancient by kernel development standards and
-EOL for quite a while.
+This is automated email and please do not reply to this email!
 
-Please check if the latest stable version is still affected; if it is,
-ideally try latest mainline (6.18-rc6), too. If that is as well, it
-would be great if you could bisect between 6.13.1 and 6.13.2.
+Dear submitter,
 
-Ciao, Thorsten
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1024166
 
-[1] see also:
-https://linux-regtracking.leemhuis.info/post/frequent-reasons-why-linux-kernel-bug-reports-are-ignored/
+---Test result---
 
-> The bluetooth adapter would be recognized and the bluetooth worked
-> flawlessly till v6.13.1 , but since the v6.13.2 , the bluetooth adapter
-> doesn't get recognized by the bluetooth service and therefore the
-> bluetooth functionality doesn't work . 
-> 
-> I suspect the bluetooth's driver failing to load at the kernel-level. 
-> 
->   * The output of |bluetoothctl|​ :
-> 
-> $: bluetoothctl
-> Agent registered
-> [bluetoothctl]> list
-> [bluetoothctl]> devices
-> No default controller available
-> [bluetoothctl]>
-> 
->   * The output of |systemctl status bluetooth.service|​ :
-> 
-> ● bluetooth.service - Bluetooth service
->      Loaded: loaded (/usr/lib/systemd/system/bluetooth.service; enabled;
-> preset: disabled)
->      Active: active (running) since Sat 2025-11-15 22:57:00 +0545; 1 day
-> 8h ago
->  Invocation: bddf190655fd4a4290d41cde594f2efa
->        Docs: man:bluetoothd(8)
->    Main PID: 617 (bluetoothd)
->      Status: "Running"
->       Tasks: 1 (limit: 18701)
->      Memory: 2.8M (peak: 3.8M)
->         CPU: 38ms
->      CGroup: /system.slice/bluetooth.service
->              └─617 /usr/lib/bluetooth/bluetoothd
-> 
-> Nov 15 22:57:00 Incog systemd[1]: Starting Bluetooth service...
-> Nov 15 22:57:00 Incog bluetoothd[617]: Bluetooth daemon 5.84
-> Nov 15 22:57:00 Incog systemd[1]: Started Bluetooth service.
-> Nov 15 22:57:00 Incog bluetoothd[617]: Starting SDP server
-> Nov 15 22:57:00 Incog bluetoothd[617]: Bluetooth management interface
-> 1.23 initialized
-> 
->   * The output of |lspci|​ is attached below . 
-> 
->   * The logs for |journalctl -b|​ for both v6.13.1 and v6.13.2 are
->     attached below. 
-> 
-> 
-> Regards,
-> IncogCyberpunk
-> 
+Test Summary:
+CheckPatch                    PENDING   0.40 seconds
+GitLint                       PENDING   0.33 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      24.80 seconds
+CheckAllWarning               PASS      27.20 seconds
+CheckSparse                   PASS      30.97 seconds
+BuildKernel32                 PASS      25.10 seconds
+TestRunnerSetup               PASS      502.50 seconds
+TestRunner_l2cap-tester       PASS      24.12 seconds
+TestRunner_iso-tester         PASS      91.19 seconds
+TestRunner_bnep-tester        PASS      6.07 seconds
+TestRunner_mgmt-tester        FAIL      113.26 seconds
+TestRunner_rfcomm-tester      PASS      9.21 seconds
+TestRunner_sco-tester         PASS      14.29 seconds
+TestRunner_ioctl-tester       PASS      9.84 seconds
+TestRunner_mesh-tester        FAIL      11.50 seconds
+TestRunner_smp-tester         PASS      8.27 seconds
+TestRunner_userchan-tester    PASS      6.31 seconds
+IncrementalBuild              PENDING   0.77 seconds
 
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 486 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.094 seconds
+LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.179 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.050 seconds
+Mesh - Send cancel - 2                               Timed out    1.998 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5858554980557840701==--
