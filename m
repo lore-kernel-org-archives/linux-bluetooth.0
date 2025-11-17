@@ -1,172 +1,153 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965261E3DE5;
-	Mon, 17 Nov 2025 02:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B29B2853EF
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 03:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763345820; cv=none; b=RrlZS0c9Ee/Pk1XM7jH9/KptbkApzVyw0OtDm/V0LcqX1zDoo28jj/9yGBTnsR4ANYVK8kjdO3P7WFvAuAuyH1WjIQjjfMfYnE/xLvtHh90hwp/lCcNkqqei5nO6amhWH5d4YDF6mqTRfaLSqSZ4xcG/9+KAnyq+VrjavedOtME=
+	t=1763349538; cv=none; b=rKFkhhzCz+ry0ZHpSaD5Ma/L+A5ZxalKX+hV+y1ehaiUBI9AO6vdgW5wuxzN/J4RoXQyYbUhldk0VwpxG7IS0ZVUYqWDBcV0UAAiDvHEgvWBJ1s+l084jp7ksA5lQERQN26yh3IzhEKyKGnIHXqNeREbKfkJg7eXukoL9LwYAik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763345820; c=relaxed/simple;
-	bh=Rx900UmhktNpwXcg60MQFit86edv3x5igmZ3sZFFEg0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RQXeKVqsdrf9QLQ8nafUCqBIlGTbsSCN8I4SmYzd86uB8qL+DLUzztzzOXGBlk3+RieeH9nfpkCK/5YrvLsPhI/pD7wyUanggVR0xZwUL60xfPUZ6gErtLFEB9QTmMtCz7mkRkWa4xaiwHchu7j7xDyHsFg5NvKW3nUYE+C1Q9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Hd82atw0; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1763349538; c=relaxed/simple;
+	bh=rfFeo4p6GSmQRWljCMFsLQUeKNyDlNWWEuKq8hF2h00=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Izrn5qp0tq6/Rn0o9SRSZhpjYVMsYTJ0V9hh2iyEHz9SO+xylJS3jyBtKIJ4jweV3dG3ZYx43kg84KiB0ZyTIcASPi4sw8x5VyoVFGGXJoSq6vdGZNQEHQ4R4c0Ekg+S+4VTRDoztQidpjEbjN94UW02iSBgjZP4VRZEgJ3kLuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m49U56M2; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Hd82atw0"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AGKQNEx1882721;
-	Mon, 17 Nov 2025 02:16:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=3oJmDOKHYr+
-	dxjccUVFiWGkGsLVRzUKp7PTRUBXg3CU=; b=Hd82atw0hdWHwzpDWt+J8MexvvV
-	9Rl1nBMImZAH13JRr1pHrWUZxFwDMQ777lvJlBRLuIVL9SMbSTfJLzQOQ/m1YiZ7
-	rbzY6cDgBf31w2BNdD8UHoZ5BAN0L6TIh0iYucxHemLmoy+HLMDxHYJ8HT56dQB/
-	QWghFNjGpURKVDnzWb+f5yY/oTnwaIBucqZtOdqTkWZtHkn5J7OPbtY1odyCydOX
-	SvHtIxki5IORTp0nOvibBpIGj+RP3LTXbD1HogHvSn1IkvD2lAI9Eecb0uPhAD7v
-	2neI+EzJOvABGjMmA4cSNsP0olOfv1wAlNURKb39V7TnLxfzTd/k2UG0H4w==
-Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4aejgcb1qc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Nov 2025 02:16:54 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AH2GpgX016816;
-	Mon, 17 Nov 2025 02:16:51 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4aejkm5jk8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Nov 2025 02:16:51 +0000
-Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AH2Gpc3016805;
-	Mon, 17 Nov 2025 02:16:51 GMT
-Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 5AH2Gonn016795
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Nov 2025 02:16:51 +0000
-Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
-	id EB34B216B6; Mon, 17 Nov 2025 10:16:49 +0800 (CST)
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        shuai.zhang@oss.qualcomm.com
-Subject: [PATCH v3 1/1] Bluetooth: btqca: Add WCN6855 firmware priority selection feature
-Date: Mon, 17 Nov 2025 10:16:45 +0800
-Message-Id: <20251117021645.712753-2-shuai.zhang@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251117021645.712753-1-shuai.zhang@oss.qualcomm.com>
-References: <20251117021645.712753-1-shuai.zhang@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m49U56M2"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8b21fc25ae1so398145485a.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Nov 2025 19:18:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763349536; x=1763954336; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VgHcryMU4+co4UsLmRrpjs6X74MtBrWPq8vt+QmPibk=;
+        b=m49U56M2xNaFVnF4YkuHmU687gGt1s5b9WL6iPTdsEnY2ppgU2tXTnFoshT8VQ32ZB
+         TjHUSJqe/UTLv7jeWobZNXcq/SZU5d/Pq+148sxz6Ga4aG9WPY0zJuyhSd5w6bXQ1iTz
+         L+8gaTdUASsLnnlpLbm+3WgZb4OAAgq/cjjc7tKewoftB6BrhQXJOCinmuKr28AEErd6
+         Cop4FbGLeytZGOue0QK6hP6QhlTvp8EKnp8JqmVxfjvm5ppTy141pF9rOOV2JekGINLH
+         FcB+2uTCjwjHABZRCXfToEdS62U9u48g9grl3YC+Q8CpuN/blWCgdRl/rI1IyWoAJ7+P
+         lb9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763349536; x=1763954336;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VgHcryMU4+co4UsLmRrpjs6X74MtBrWPq8vt+QmPibk=;
+        b=mrComD4mCJXnLd2wfPDacYTWsMcwqQk9nvXv45QGtA2HN5CUcjJJsHBCxccJpZ/Lf5
+         C3DoYRGvYSkv3wgi4hiJeUNP1w512CzcdT4OH5bE1yvd0rRZ+KpVnSZju2xpgpyiisVM
+         nqVeEgwhWsi2FnIWtrVFq4L+3alehpyiFEDEir1RxPNkvE9EVTBhjHJHq+U0xLgGxkDK
+         FFCpfq9ud6NX9GSmHyTMFmgW/3P0lSks0fNy1zjaDsJWKAcLSyrT6vpz4oUgbAIXU76n
+         oU4F9B8JrqWJWFCmxzK8W/Zl0Mh6f5k29LIgKi22tmZelXx4Kndch5+d1z7wUzplBTQs
+         tpjQ==
+X-Gm-Message-State: AOJu0YxjSvw8Z7QwPnTGdFByGhcQTqL/Nk2P2EaBQ9No/dYfb3DKbTk7
+	tUV3NfcRCvxsjCxOSp52lnaYCUjwVNoAwNbmFI+7y8oNlpRIAQXVk6fOhRAVdTZO
+X-Gm-Gg: ASbGnctbyjgvuecGohh6dGzJZo0ZLoHmD+9HyAmcwb+RP6XgIBdNHhRvjpCoHel3bLR
+	QG3UG0tOIIKyxaUo8tMv27azRPiARTL3b9MKYuLqeSD8OPbp3O0bQ56j3va+xHdq0C8WuD+VQ2t
+	kHW6sM6bSzvoLTVwS7nGh9Np9+uHf0RNf4+PwVDCS7h4mRmjZCfXVGG8+kmll8V2bsvoAY7HqwS
+	vX2VHIOQB6b5GUaKIG107BtoaheA/BCsOyj7A/EjFB45n4qkjic52XjXQ6COAoThcFbM+fXQObP
+	0F9t5nGX/ppUg+JthK+Sfhexkj78aOUP1puycLFqnH3eIKOKEzkP2GYM+YoT9iCckZHTSF2bRp3
+	puOZdFvSCVbSCFYJpLhug+qWaoqkgnykAIB3z/1+gEkq/9QeSJja5Kon/HVPnbhPSXRXhUB+ot8
+	kMCqSaAKlDbbvPKuODcFzr3WkmL50=
+X-Google-Smtp-Source: AGHT+IE5aU1lyrjjE3+G2Au7Ngg5xv8NB9qy4FfB3tEpnS3UaqFGXWt7PgdtkVwqIBRbDPxZqb7vQA==
+X-Received: by 2002:a05:620a:4726:b0:891:a91e:98c8 with SMTP id af79cd13be357-8b2c3162600mr1305021185a.23.1763349535681;
+        Sun, 16 Nov 2025 19:18:55 -0800 (PST)
+Received: from [172.17.0.2] ([20.161.45.113])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b2e7f63adfsm265524385a.11.2025.11.16.19.18.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Nov 2025 19:18:55 -0800 (PST)
+Message-ID: <691a941f.050a0220.2faa81.4420@mx.google.com>
+Date: Sun, 16 Nov 2025 19:18:55 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5642018504117929663=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: zxzzd--2aN5fuVZAdEujioD-ZJ1ghDox
-X-Proofpoint-GUID: zxzzd--2aN5fuVZAdEujioD-ZJ1ghDox
-X-Authority-Analysis: v=2.4 cv=PJECOPqC c=1 sm=1 tr=0 ts=691a8596 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8
- a=mafMjTZoDSqqSwhiDToA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE3MDAxNyBTYWx0ZWRfXzo1jMvpI9/J6
- Ug+5qnIlwtvk4M60ndR/9GcMkfXezBS7JU/EtwdJ19oNq9IfzP0fTcFXUV5A4QW0Co1WLgVHkr/
- mGF0wsPrbhQQag4tjJdO/erW+asXW6kkcExMo5WE7C1SlSCpD/YEzZETjJ42XxCCnlFmDEj28pP
- S24xoPl8rA2Lh9RGancl0lQChYvafufzGDDTxEBdkDKtrTwSzJM1GdwFmfI3rALb4n/QvvmUQjU
- 1UhZn54RYJk3QqO83a2VL/alNOaSGEx/S/GgTcI4Day8BMKVxz6/x/aKVEytC24sEqKZz6KlgCZ
- zTWus+MzXiK7c7Lri4iE0sGzbcfiU9evclrnQSC8NOtQNcedq6UUk8xNn7Cwp8ec0xl5DCN3i7A
- VmKeXdgPNYBHl0cveEdQIFBowo09KA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-17_01,2025-11-13_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 lowpriorityscore=0 clxscore=1015 spamscore=0 phishscore=0
- bulkscore=0 impostorscore=0 suspectscore=0 priorityscore=1501 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511170017
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com
+Subject: RE: Bluetooth: btqca: Add WCN6855 firmware priority selection feature
+In-Reply-To: <20251117021645.712753-2-shuai.zhang@oss.qualcomm.com>
+References: <20251117021645.712753-2-shuai.zhang@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Historically, WCN685x and QCA2066 shared the same firmware files.
-Now, changes are planned for the firmware that will make it incompatible
-with QCA2066, so a new firmware name is required for WCN685x.
+--===============5642018504117929663==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Test Steps:
- - Boot device
- - Check the BTFW loading status via dmesg
+This is automated email and please do not reply to this email!
 
-Sanity pass and Test Log:
-QCA Downloading qca/wcnhpbftfw21.tlv
-Direct firmware load for qca/wcnhpbftfw21.tlv failed with error -2
-QCA Downloading qca/hpbftfw21.tlv
+Dear submitter,
 
-Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1024068
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.34 seconds
+GitLint                       PENDING   0.26 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      26.38 seconds
+CheckAllWarning               PASS      29.85 seconds
+CheckSparse                   PASS      33.12 seconds
+BuildKernel32                 PASS      26.27 seconds
+TestRunnerSetup               PASS      519.32 seconds
+TestRunner_l2cap-tester       PASS      25.00 seconds
+TestRunner_iso-tester         PASS      74.58 seconds
+TestRunner_bnep-tester        PASS      6.51 seconds
+TestRunner_mgmt-tester        FAIL      127.02 seconds
+TestRunner_rfcomm-tester      PASS      9.65 seconds
+TestRunner_sco-tester         PASS      14.92 seconds
+TestRunner_ioctl-tester       PASS      10.31 seconds
+TestRunner_mesh-tester        FAIL      11.75 seconds
+TestRunner_smp-tester         PASS      8.81 seconds
+TestRunner_userchan-tester    PASS      6.75 seconds
+IncrementalBuild              PENDING   0.57 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 486 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.104 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.191 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.964 seconds
+Mesh - Send cancel - 2                               Timed out    2.000 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btqca.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 7c958d606..8e0004ef7 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -847,8 +847,12 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 				 "qca/msbtfw%02x.mbn", rom_ver);
- 			break;
- 		case QCA_WCN6855:
-+			/* Due to historical reasons, WCN685x chip has been using firmware
-+			 * without the "wcn" prefix. The mapping between the chip and its
-+			 * corresponding firmware has now been corrected.
-+			 */
- 			snprintf(config.fwname, sizeof(config.fwname),
--				 "qca/hpbtfw%02x.tlv", rom_ver);
-+				 "qca/wcnhpbtfw%02x.tlv", rom_ver);
- 			break;
- 		case QCA_WCN7850:
- 			snprintf(config.fwname, sizeof(config.fwname),
-@@ -861,6 +865,13 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	}
- 
- 	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
-+
-+	if (!rampatch_name && err < 0 && soc_type == QCA_WCN6855) {
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/hpbtfw%02x.tlv", rom_ver);
-+		err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
-+	}
-+
- 	if (err < 0) {
- 		bt_dev_err(hdev, "QCA Failed to download patch (%d)", err);
- 		return err;
-@@ -923,7 +934,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		case QCA_WCN6855:
- 			qca_read_fw_board_id(hdev, &boardid);
- 			qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
--						  "hpnv", soc_type, ver, rom_ver, boardid);
-+						  "wcnhpnv", soc_type, ver, rom_ver, boardid);
- 			break;
- 		case QCA_WCN7850:
- 			qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
-@@ -936,6 +947,13 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	}
- 
- 	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
-+
-+	if (!firmware_name && err < 0 && soc_type == QCA_WCN6855) {
-+		qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
-+					  "hpnv", soc_type, ver, rom_ver, boardid);
-+		err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
-+	}
-+
- 	if (err < 0) {
- 		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
- 		return err;
--- 
-2.34.1
 
+--===============5642018504117929663==--
