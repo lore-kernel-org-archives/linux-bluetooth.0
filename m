@@ -1,161 +1,146 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128173191A7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 20:49:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763412581; cv=pass; b=q9i9FY4Ed28dtZxektyp024DxzXwEJyAaKeavC/m+i+xHY5nIdbe89EW2Sn7uUiwAPI6BAaqhIJLp7xismq8A5O2GwIX08mHlW2zigqxaWnj01z9J5xxrnMTUYJV3/DX/YSZ6KhTdTQywXk74gPY1ApaoZq9joKB2UDUchE5rGc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763412581; c=relaxed/simple;
-	bh=Sw7/W4mRlcO1AhotMP22gehYKrxKx8XGo3ayri0irh0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=pVJHn/VGb+sO8qe39FFQncZomvhMseOlMbCxB35jagQyS/8t5+LympANy0ucsPql+Vm1sVYgHH+PqKp6uSqT0EiuAL1pTLqlgo0wJg9mt3GDFBGhjw83W58JgQuLJXBdoa19pau04KemBvfvVBgS5RNZZPYYRcP9GzgIrC9LYKU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=SWDUr97C; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="SWDUr97C"
-Received: from ehlo.thunderbird.net (unknown [193.138.7.194])
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3C73218B2
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 21:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763415723; cv=none; b=F1mIqi/m94baWBPRa1MxUfW58FbGWJLKyIl6y2f7QEe8+CELQRyePM4UbasD/YtsS81StiC+iTFkOMBoImmhkm/ffDz0E2qUTG/ZkprQvxDHaK7+FejoMmc+l2i28wDx84O75lMU61LM8S+VPf7VeBq5Q/FlRPRSbcWnO/sdOWQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763415723; c=relaxed/simple;
+	bh=77quI2KiW2vlkmtOwWW5uOnRrN7yl8sXsq4vab0nP3E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=YHV0GROGUs01EQwcaP60aiqj1u0HpSoe4aIVDUkpcOyiVwRK0EIHpxozlPReM7FXY/XrQ8E3xdtpXTJbmSyqry+DFZoZo6EzKBfh/LFC+11RcgoF/sjPuTaseL/38jDiBdw9D8bn7LfvZ6wmTKB8Fk8QYn9vJYRyFhRg4tYanMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.216] (p5dc5575e.dip0.t-ipconnect.de [93.197.87.94])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4d9Kc84B23zyQR;
-	Mon, 17 Nov 2025 22:49:28 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1763412569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i9bvhxLtsWTCoE1rns0LVHik5fZivNfp7HujCPaa4v4=;
-	b=SWDUr97CmLdbcm6J2NNGyrDaMsShH7K0an/Lp3pi3vTzJnKQ90N3/B12vYGC3V37Bty2/z
-	wjKshLNv784lURS96NknNEwizq05s1ezzYD+KGf0wAyiH/xUX5T2fMHw3VQSwrZp7NSxuG
-	ML6bizpIXrpCa7ibKadnhxwLR9SXQ6g=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1763412569;
-	b=Lj/W5qB4VEsr46qcyWlaVVP99UtPO/2L6ru4yRJXUc1MjfukQL7ZTIdhyvXoP/ZIj+Ukvb
-	leJgpLOlvRsbvszoq7d2tyXYupXbGShvz/mFY1x8g2FP6uhFdaRDtpaFc+4fOmDJ2hXPjl
-	IQaqiH9J3UikfIc41NT9HgIqX7NHxM0=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1763412569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i9bvhxLtsWTCoE1rns0LVHik5fZivNfp7HujCPaa4v4=;
-	b=ul2+fzF6DtpRa2znvPpEJBCN5NBbOGCOWySbZ7CGfVGq1oAMAcqPuVBz0E+NpR/T6B4pv6
-	PRiHVVP3njlfD8ose0bEkg08UKMO5dA8SG/sMh1zIJhjfM/X9G1ps9Bq4BFlHNhZAdpgfV
-	BPcfYVAeTmNvL5yfBddQFq87fwM9AAE=
-Date: Mon, 17 Nov 2025 20:49:27 +0000
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- syzbot+25e9c406cbd26c66c417@syzkaller.appspotmail.com
-CC: linux-bluetooth@vger.kernel.org,
- Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v1=5D_fixup!_Bluetooth=3A_hci=5Fcore?=
- =?US-ASCII?Q?=3A_Fix_triggering_cmd=5Ftimer_for_HCI=5FOP=5FNOP?=
-In-Reply-To: <20251117201255.3969812-1-luiz.dentz@gmail.com>
-References: <20251117201255.3969812-1-luiz.dentz@gmail.com>
-Message-ID: <1A6F9809-8B5B-4703-92A2-4DB1007143A6@iki.fi>
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E616061CC3FE4;
+	Mon, 17 Nov 2025 22:41:54 +0100 (CET)
+Message-ID: <02779265-0d40-436c-99fd-2e247a09aae1@molgen.mpg.de>
+Date: Mon, 17 Nov 2025 22:41:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: SMP: Fix not generating mackey and ltk when
+ repairing
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20251117190232.3918619-1-luiz.dentz@gmail.com>
+Content-Language: en-US
+Cc: linux-bluetooth@vger.kernel.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251117190232.3918619-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
+Dear Luiz,
 
-17=2E marraskuuta 2025 20=2E12=2E55 UTC Luiz Augusto von Dentz <luiz=2Eden=
-tz@gmail=2Ecom> kirjoitti:
->From: Luiz Augusto von Dentz <luiz=2Evon=2Edentz@intel=2Ecom>
->
->Fixes: 486a25d25a4b3 ("Bluetooth: hci_core: Fix triggering cmd_timer for =
-HCI_OP_NOP")
->Reported-by: syzbot+25e9c406cbd26c66c417@syzkaller=2Eappspotmail=2Ecom
->Closes: https://syzkaller=2Eappspot=2Ecom/bug?extid=3D25e9c406cbd26c66c41=
-7
->Signed-off-by: Pauli Virtanen <pav@iki=2Efi>
->Signed-off-by: Luiz Augusto von Dentz <luiz=2Evon=2Edentz@intel=2Ecom>
->---
-> net/bluetooth/hci_core=2Ec | 19 ++++++++++---------
-> 1 file changed, 10 insertions(+), 9 deletions(-)
->
->diff --git a/net/bluetooth/hci_core=2Ec b/net/bluetooth/hci_core=2Ec
->index 9f686e5903a1=2E=2Edc318aa79c59 100644
->--- a/net/bluetooth/hci_core=2Ec
->+++ b/net/bluetooth/hci_core=2Ec
->@@ -4121,7 +4121,7 @@ static void hci_rx_work(struct work_struct *work)
-> 	}
-> }
->=20
->-static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
->+static int hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> 	int err;
->=20
->@@ -4133,16 +4133,18 @@ static void hci_send_cmd_sync(struct hci_dev *hde=
-v, struct sk_buff *skb)
-> 	if (!hdev->sent_cmd) {
-> 		skb_queue_head(&hdev->cmd_q, skb);
-> 		queue_work(hdev->workqueue, &hdev->cmd_work);
->-		return;
->+		return -EINVAL;
-> 	}
->=20
-> 	if (hci_skb_opcode(skb) !=3D HCI_OP_NOP) {
-> 		err =3D hci_send_frame(hdev, skb);
-> 		if (err < 0) {
-> 			hci_cmd_sync_cancel_sync(hdev, -err);
->-			return;
->+			return err;
-> 		}
-> 		atomic_dec(&hdev->cmd_cnt);
->+	} else {
->+		err =3D -ENODATA;
 
-Change itself is probably OK, but I don't understand based on a quick look=
- what consumes the skb on error / nop (also in the previous code)
+Thank you for your patch.
 
-> 	}
->=20
-> 	if (hdev->req_status =3D=3D HCI_REQ_PEND &&
->@@ -4150,12 +4152,15 @@ static void hci_send_cmd_sync(struct hci_dev *hde=
-v, struct sk_buff *skb)
-> 		kfree_skb(hdev->req_skb);
-> 		hdev->req_skb =3D skb_clone(hdev->sent_cmd, GFP_KERNEL);
-> 	}
->+
->+	return err;
-> }
->=20
-> static void hci_cmd_work(struct work_struct *work)
-> {
-> 	struct hci_dev *hdev =3D container_of(work, struct hci_dev, cmd_work);
-> 	struct sk_buff *skb;
->+	int err;
->=20
-> 	BT_DBG("%s cmd_cnt %d cmd queued %d", hdev->name,
-> 	       atomic_read(&hdev->cmd_cnt), skb_queue_len(&hdev->cmd_q));
->@@ -4166,12 +4171,8 @@ static void hci_cmd_work(struct work_struct *work)
-> 		if (!skb)
-> 			return;
->=20
->-		hci_send_cmd_sync(hdev, skb);
->-
->-		/* Don't trigger cmd_timer in case of HCI_OP_NOP since there is
->-		 * no command pending=2E
->-		 */
->-		if (hci_skb_opcode(skb) =3D=3D HCI_OP_NOP)
->+		err =3D hci_send_cmd_sync(hdev, skb);
->+		if (err)
-> 			return;
->=20
-> 		rcu_read_lock();
+Am 17.11.25 um 20:02 schrieb Luiz Augusto von Dentz:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> The change eed467b517e8 ("Bluetooth: fix passkey uninitialized when used")
+> introduced a goto that bypasses the creation of temporary mackey and ltk
+> which are later used by the likes of DHKey Check step.
+> 
+> Later ffee202a78c2 ("Bluetooth: Always request for user confirmation for
+> Just Works (LE SC)") which means confirm_hint is always set in case
+> JUST_WORKS so the branch checking for an existing LTK becomes pointless
+> as confirm_hint will always be set, so this just merge both cases of
+> malicius or legimate devices to be confirmed before continuing with the
+
+malicious
+legitimate
+
+> pairing procedure.
+> 
+> Link: github.com/bluez/bluez/issues/1622
+
+Add https://
+
+> Fixes: eed467b517e8 ("Bluetooth: fix passkey uninitialized when used")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>   net/bluetooth/smp.c | 30 ++++++++----------------------
+>   1 file changed, 8 insertions(+), 22 deletions(-)
+> 
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index 45512b2ba951..08461ca06cde 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -2136,7 +2136,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+>   	struct smp_chan *smp = chan->data;
+>   	struct hci_conn *hcon = conn->hcon;
+>   	u8 *pkax, *pkbx, *na, *nb, confirm_hint;
+> -	u32 passkey;
+> +	u32 passkey = 0;
+>   	int err;
+>   
+>   	bt_dev_dbg(hcon->hdev, "conn %p", conn);
+> @@ -2188,24 +2188,6 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+>   		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
+>   			     smp->prnd);
+>   		SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
+> -
+> -		/* Only Just-Works pairing requires extra checks */
+> -		if (smp->method != JUST_WORKS)
+> -			goto mackey_and_ltk;
+> -
+> -		/* If there already exists long term key in local host, leave
+> -		 * the decision to user space since the remote device could
+> -		 * be legitimate or malicious.
+> -		 */
+> -		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
+> -				 hcon->role)) {
+> -			/* Set passkey to 0. The value can be any number since
+> -			 * it'll be ignored anyway.
+> -			 */
+> -			passkey = 0;
+> -			confirm_hint = 1;
+> -			goto confirm;
+> -		}
+>   	}
+>   
+>   mackey_and_ltk:
+> @@ -2226,11 +2208,15 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+>   	if (err)
+>   		return SMP_UNSPECIFIED;
+>   
+> -	confirm_hint = 0;
+> -
+> -confirm:
+> +	/* Always require user confirmation for Just-Works pairing to prevent
+> +	 * impersonation attacks, or in case of a legitimate device that is
+> +	 * repairing use the confimation to as and indication to proceed with
+
+confirmation
+
+> +	 * the creation of new keys.
+> +	 */
+>   	if (smp->method == JUST_WORKS)
+>   		confirm_hint = 1;
+> +	else
+> +		confirm_hint = 0;
+
+Use ternary operator?
+
+>   
+>   	err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst, hcon->type,
+>   					hcon->dst_type, passkey, confirm_hint);
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
