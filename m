@@ -1,156 +1,131 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FED31AF07
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 09:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8927326D51;
+	Mon, 17 Nov 2025 09:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763371457; cv=none; b=nu+x8kXfVH+4C3o5qV64VD1nplqDiTpW4aW24PYAJejQy0yP8lH1wgeRs6Y+CEvtPYJ6NlKRh1rJQuouO2/Um29jDZuO4RpCK7/b9SoZ2PtcR+HKDnASwsu2r524LMA87JWSuvb/fxrYt0AsbsKhJ7CPIO2aNFbDRyDFEBTY/aw=
+	t=1763372537; cv=none; b=RBiX2OmaPp0w1y/WiSOhgzLtqGq3G3hTPv4In0iZZ58+xz1OuRcIB/AT4kBYtY5hvqIAoGCV4U+Tpiqprdwk3TolOOor8odqpjtHuReGtHCb6DjNZRhfc2zSFuhF45hSxCet0phq15wB1qKyDPyl7G2VI5Wi4gZw7x1y4CuMVI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763371457; c=relaxed/simple;
-	bh=8NTclg9fONqzkzKXdx3TcZYe1MgWFjDDdfzZDmBzaJ8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Type; b=MVMSN5WAvpnqhDZ6mzZYsnqtM2qTTnDvBK2f4g2H6bJkcHX4srJXFEpFfCJ8koDmjh3r66zgOCBniCdV8O0vsOvydR2jArGW1d4MkBiOcfnNgwtN6QQOeOo6iiQvGFted8zyLsPQIafPjTgr8IfIfew99EPW9QRKyc+tiCVKwsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=N+YA1eqO; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1763372537; c=relaxed/simple;
+	bh=+lDX5repbVwAgSSpxEPe8Ggrw67h+ua6KeXvVwqhAvA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KH1tx5K7KVoguyWAnL0sledbZrLkGaON1XiRI1pRzn/1xgVvt79DPS/vJ2AtkDn1VROJzc+qRh7eqPWyrndU6KVX9wzMtRMb9fpbpmBNQQ7243fRJ31OnPHnAoxT7XpZBrVwZIn8OCIxA6hkAP7morLQLNavbHT/76+mFoZp86A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=z9YWdbBP; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="N+YA1eqO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1763371453;
-	bh=8NTclg9fONqzkzKXdx3TcZYe1MgWFjDDdfzZDmBzaJ8=;
-	h=From:To:Subject:Date:From;
-	b=N+YA1eqO9gOZDD4RmraDBKmW74MiIN3/pcsjws1lTzIXhjtgLTxdKoXUyXHfxRpFo
-	 lbJhH9Hbnvz0iiRerHarCLVolgTivGjMQtUKrBoHsbZ7NQImoR5yJEfsL1G8GjNwi6
-	 Z9E5qipxBlRY45U26L34Zss9bedBpZLyFFtEqW6ajfKNTqvg1gL3UDuTCqQpfydu3E
-	 X9iG7x0/CZvWdj1Mo7xGoUkB/Y/4rVOuAMqq24LMXrXoxOAgfqgQcU0+x0CIa8AxNf
-	 ZQOG+eaPMwLZfYMAYwIN/DlVOtthzoC1EOzgq9aaXJKhGBzvyb06dEcrnBs1Yj/zuO
-	 AARC/XfTRlcUg==
-Received: from fdanis-ThinkPad-X1.. (2A02-8428-af44-1001-5eba-E77F-2BaC-aa7B.rev.sfr.net [IPv6:2a02:8428:af44:1001:5eba:e77f:2bac:aa7b])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 74AB217E11FF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 10:24:13 +0100 (CET)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Accept incomplete SDU
-Date: Mon, 17 Nov 2025 10:24:08 +0100
-Message-ID: <20251117092408.336966-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="z9YWdbBP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
+	References; bh=5FRGOs0emlTmc51RdE5KM9BmjBcn2zfRmynLjSXyid8=; t=1763372535;
+	x=1763804535; b=z9YWdbBPsUG40dPREbc9ZGK05KxKpl3FiicJ/d3rtuvj9HY4II4FtovqWZ1FV
+	VSHJ2FYYfLCqkJmlzEZlorPL3DpN3c6/SPZchvS2zVM3Ajgi+IyISeQYPZ7yfuxBw7vpReW/CtekP
+	lRx/lrjrqG03d7JDqF87fCRzlD/fNJIe0L6lwXk2MKGN9m+egD4DJSLsHLWg4gucyjJV1YvemeMUN
+	FAwZKhWfnbYmcXAEAgHj1/1yp+Iao7DSwovW4bCmRj3ThMzeM8eEgWe9KMVKXm2AVPvPWTc6nAG+R
+	3bCD4eVo3RMyOUt/HyZm7D/h+vLIouG00SJ5wmMnFyugfV/r6A==;
+Received: from [2a02:8108:8984:1d00:a0cf:1912:4be:477f]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
+	id 1vKvkM-005HvH-0f;
+	Mon, 17 Nov 2025 10:42:06 +0100
+Message-ID: <1b59d3c2-1ed0-40df-a3ba-cca2316e866b@leemhuis.info>
+Date: Mon, 17 Nov 2025 10:42:05 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] Bluetooth adapter provided by `btusb` not recognized
+ since v6.13.2
+To: incogcyberpunk@proton.me, "stable@vger.kernel.org"
+ <stable@vger.kernel.org>
+Cc: "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+ "marcel@holtmann.org" <marcel@holtmann.org>,
+ "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+ "sean.wang@mediatek.com" <sean.wang@mediatek.com>
+References: <jOB6zqCC3xjlPPJXwPYPb4MxHJOhxVgp380ayP7lYq-aT2iA5D8YCdMeCvq5Cp_ICZmqjpfgX8o9siQdlPu9DY4qgnL_zCjgqP23fXc-P4U=@proton.me>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <jOB6zqCC3xjlPPJXwPYPb4MxHJOhxVgp380ayP7lYq-aT2iA5D8YCdMeCvq5Cp_ICZmqjpfgX8o9siQdlPu9DY4qgnL_zCjgqP23fXc-P4U=@proton.me>
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1763372535;dec64b74;
+X-HE-SMSGID: 1vKvkM-005HvH-0f
 
-During OBEX Abort command, iOS may return an incomplete SDU packet
-which ends with the reply to the Abort command.
-During OBEX Abort command, iOS may return the L2CAP_SAR_END packet
-before the normal end of the SAR packets:
+On 11/17/25 02:30, incogcyberpunk@proton.me wrote:
+> 
+> #regzbot introduced: v6.13.1..v6.13.2
+> 
+> Distro: Arch Linux 
+> Kernel: since v6.13.2
 
-  < ACL Data TX: Handle 21 [2/8] flags 0x00 dlen 11  #194 [hci0] 14.923741
-      Channel: 3080 len 7 ctrl 0x060a [PSM 4101 mode Enhanced
-               Retransmission (0x03)] {chan 0}
-      I-frame: Unsegmented TxSeq 5 ReqSeq 6
-        0a 06 ff 00 03 47 84                             .....G.
-...
-  > ACL Data RX: Handle 21 flags 0x01 dlen 458       #382 [hci0] 19.701854
-      Channel: 65 len 1006 ctrl 0x460e [PSM 4101 mode Enhanced
-               Retransmission (0x03)] {chan 0}
-      I-frame: Start (len 32767) TxSeq 7 ReqSeq 6
-        0e 46 ff 7f 90 7f ff 48 7f fc 43 48 41 52 53 45  .F.....H..CHARSE
-        ...
-> ACL Data RX: Handle 21 flags 0x02 dlen 552         #383 [hci0] 19.701854
-> ACL Data RX: Handle 21 flags 0x01 dlen 458         #384 [hci0] 19.755918
-      Channel: 65 len 1006 ctrl 0xc610 [PSM 4101 mode Enhanced
-               Retransmission (0x03)] {chan 0}
-      I-frame: Continuation TxSeq 8 ReqSeq 6
-        10 c6 6e 6f 73 61 69 72 65 73 64 65 73 69 67 6e  ..nosairesdesign
-        ...
-> ACL Data RX: Handle 21 flags 0x02 dlen 552         #385 [hci0] 19.775016
-> ACL Data RX: Handle 21 flags 0x01 dlen 458         #386 [hci0] 19.775024
-      Channel: 65 len 1006 ctrl 0xc612 [PSM 4101 mode Enhanced
-               Retransmission (0x03)] {chan 0}
-      I-frame: Continuation TxSeq 9 ReqSeq 6
-        12 c6 69 63 6f 20 43 69 74 79 20 54 65 63 68 20  ..ico City Tech
-        ...
-> ACL Data RX: Handle 21 flags 0x02 dlen 552         #387 [hci0] 19.775024
-> ACL Data RX: Handle 21 flags 0x01 dlen 458         #388 [hci0] 19.821542
-      Channel: 65 len 1006 ctrl 0xc614 [PSM 4101 mode Enhanced
-               Retransmission (0x03)] {chan 0}
-      I-frame: Continuation TxSeq 10 ReqSeq 6
-        14 c6 6c 74 69 6e 67 20 50 61 72 74 6e 65 72 0d  ..lting Partner.
-        ...
-> ACL Data RX: Handle 21 flags 0x02 dlen 552         #389 [hci0] 19.821610
-> ACL Data RX: Handle 21 flags 0x01 dlen 458         #390 [hci0] 19.821610
-      Channel: 65 len 1006 ctrl 0xc616 [PSM 4101 mode Enhanced
-               Retransmission (0x03)] {chan 0}
-      I-frame: Continuation TxSeq 11 ReqSeq 6
-        16 c6 6c 74 69 6e 67 2e 63 6f 6d 0d 0a 55 49 44  ..lting.com..UID
-        ...
-> ACL Data RX: Handle 21 flags 0x02 dlen 11          #391 [hci0] 19.821610
-      Channel: 65 len 7 ctrl 0x8618 [PSM 4101 mode Enhanced
-               Retransmission (0x03)] {chan 0}
-      I-frame: End TxSeq 12 ReqSeq 6
-        18 86 a0 00 03 3e 5d                             .....>]
-< ACL Data TX: Handle 21 [1/8] flags 0x00 dlen 12    #392 [hci0] 19.822491
-      L2CAP: Disconnection Request (0x06) ident 10 len 4
-        Destination CID: 3080
-        Source CID: 65
+Lo! Thx for the report. It's unlikely that any developer will look into
+this report[1] as 6.13.y is ancient by kernel development standards and
+EOL for quite a while.
 
-In this case the re-assembled packet should be 32767 bytes as defined
-in Start packet (#382), i.e. 33 segmented packets, but the End packet
-is sent as the 6th packet.
+Please check if the latest stable version is still affected; if it is,
+ideally try latest mainline (6.18-rc6), too. If that is as well, it
+would be great if you could bisect between 6.13.1 and 6.13.2.
 
-The l2cap_reassemble_sdu() function returns error -EINVAL if reassembled
-packet size != expected size, triggering the L2CAP disconnection, which
-disconnects the OBEX session, preventing further OBEX actions.
+Ciao, Thorsten
 
-Log this, discard previous segmented packet data and only send data
-from SAR End packet to upstream.
+[1] see also:
+https://linux-regtracking.leemhuis.info/post/frequent-reasons-why-linux-kernel-bug-reports-are-ignored/
 
-Closes: https://github.com/bluez/bluetooth-next/issues/17
-Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
----
- net/bluetooth/l2cap_core.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 35c57657bcf4..5fe1d058455e 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5703,13 +5703,20 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb,
- 		if (!chan->sdu)
- 			break;
- 
--		append_skb_frag(chan->sdu, skb,
--				&chan->sdu_last_frag);
-+		if (chan->sdu->len + skb->len != chan->sdu_len) {
-+			BT_DBG("Incomplete SDU, expected: %u received: %u", chan->sdu_len,
-+			       chan->sdu->len + skb->len);
-+			/* Discard previous data and keep only L2CAP_SAR_END data */
-+			kfree_skb(chan->sdu);
-+			chan->sdu = skb;
-+			chan->sdu_last_frag = skb;
-+			chan->sdu_len = skb->len;
-+		} else {
-+			append_skb_frag(chan->sdu, skb,
-+					&chan->sdu_last_frag);
-+		}
- 		skb = NULL;
- 
--		if (chan->sdu->len != chan->sdu_len)
--			break;
--
- 		err = chan->ops->recv(chan, chan->sdu);
- 
- 		if (!err) {
--- 
-2.43.0
+> The bluetooth adapter would be recognized and the bluetooth worked
+> flawlessly till v6.13.1 , but since the v6.13.2 , the bluetooth adapter
+> doesn't get recognized by the bluetooth service and therefore the
+> bluetooth functionality doesn't work . 
+> 
+> I suspect the bluetooth's driver failing to load at the kernel-level. 
+> 
+>   * The output of |bluetoothctl|​ :
+> 
+> $: bluetoothctl
+> Agent registered
+> [bluetoothctl]> list
+> [bluetoothctl]> devices
+> No default controller available
+> [bluetoothctl]>
+> 
+>   * The output of |systemctl status bluetooth.service|​ :
+> 
+> ● bluetooth.service - Bluetooth service
+>      Loaded: loaded (/usr/lib/systemd/system/bluetooth.service; enabled;
+> preset: disabled)
+>      Active: active (running) since Sat 2025-11-15 22:57:00 +0545; 1 day
+> 8h ago
+>  Invocation: bddf190655fd4a4290d41cde594f2efa
+>        Docs: man:bluetoothd(8)
+>    Main PID: 617 (bluetoothd)
+>      Status: "Running"
+>       Tasks: 1 (limit: 18701)
+>      Memory: 2.8M (peak: 3.8M)
+>         CPU: 38ms
+>      CGroup: /system.slice/bluetooth.service
+>              └─617 /usr/lib/bluetooth/bluetoothd
+> 
+> Nov 15 22:57:00 Incog systemd[1]: Starting Bluetooth service...
+> Nov 15 22:57:00 Incog bluetoothd[617]: Bluetooth daemon 5.84
+> Nov 15 22:57:00 Incog systemd[1]: Started Bluetooth service.
+> Nov 15 22:57:00 Incog bluetoothd[617]: Starting SDP server
+> Nov 15 22:57:00 Incog bluetoothd[617]: Bluetooth management interface
+> 1.23 initialized
+> 
+>   * The output of |lspci|​ is attached below . 
+> 
+>   * The logs for |journalctl -b|​ for both v6.13.1 and v6.13.2 are
+>     attached below. 
+> 
+> 
+> Regards,
+> IncogCyberpunk
+> 
 
