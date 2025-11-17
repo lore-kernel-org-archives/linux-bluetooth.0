@@ -1,349 +1,156 @@
-Received: from PNZPR01CU001.outbound.protection.outlook.com (mail-centralindiaazolkn19011028.outbound.protection.outlook.com [52.103.68.28])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993F4315761
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 07:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.68.28
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763362813; cv=fail; b=BhACqgGQNm8KTCWTvMk8S9EHGpeKsDAnHVZIgKVz5PhwdVJ19RBsbypO3eP2nrzWbMV8u1ghUAKDgG+PNBER0ataO6JAQlAOd6cKzKeGuSa8I9uP7pn/oBOCgMyG7GsymvrCmSIqwadWMa4G4uGpuQkmFlCHao8rIZzOGCzUTnQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763362813; c=relaxed/simple;
-	bh=UuCgZiIZW+/Zv5ZsmdsNHAkFBNMljg/5HML1OA0QFXU=;
-	h=Message-ID:Date:To:From:Subject:Content-Type:MIME-Version; b=hMGX4cGNOsS47cAHUujDiTRhYdyRr4roiTq0XVGblLVjDKsy14KoCrDPVazhXuQlMDhwfcz+rN4cdtPmOe8sHel34wnrsyxvUCc7AdUT8nC96+9x8iLqceIIICa1su/AicE6v0E8+3BkBXvCjf6Av3repv5JpfEJsGdJlf2D37Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.com; spf=pass smtp.mailfrom=live.com; dkim=pass (2048-bit key) header.d=live.com header.i=@live.com header.b=kn09RTZV; arc=fail smtp.client-ip=52.103.68.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=live.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3967F23C4F4
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 08:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763368783; cv=none; b=pAD9GsSYL9j9YiHSMTb2Pv9OU1fuOrnoOjow9Y8elxP6Qe/Or+HyQhsB748pxb9dZSG+RioOgdQ2WJQJE1bZnTK3Jr4sp5Op+/9kf9O5mIBQvk3LbQYcwpYph4XcVoaq+zXrcYKd7JUgeR4eiVfUuOPNaA0okA5kq/6HlXjBiq4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763368783; c=relaxed/simple;
+	bh=8NTclg9fONqzkzKXdx3TcZYe1MgWFjDDdfzZDmBzaJ8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Type; b=td1+ewcmwKR3gY8W/vPdKvzA9+YyqxzIqirDthJC0o/GRMecXudbnE7FAR4Ck4Jr04A0bV7TEZmYWWtMnzogepjZYEqXQK2bsL6vhWKlxRD1V2JnyYaPdUXIhMamNACXnrlQoKlObdqYEOHxJNpzt41S/zarqEuV7Lc9OGgsoNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=jlBbnP8H; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=live.com header.i=@live.com header.b="kn09RTZV"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cuoqMm/NV/BfVwfCqacKqdXV2si0rXRLfCwSXrMvxkc0HbxcIRT+ORIwWH5gEZuEnZWwNxEYNTCicv2Op7u7OSpem46bkHrms0CEJ5AxCEFh6E71PHAzys7y9qBQu2OYfH56N4y0MPEyMFwN9dfD0odywqS8GApWkWbpkbuEI6QvlZPb3lcnhSg7kx3R/yJqUaHRXsMRb05pfR0EsOcD1U2Cfba527wKhdSH/4I70E2fBmbRrcFhuUHan7OrUN0CfG7qx1dyokzbByRL1m9v5l2pGpDp7CxNs8zAUzxX5IXZ+vP91WksqeUXGBwhubZl7uK6vHN6K8ILec12rtLgYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wVkVKpfu8+Sw23xnlVLhgOzCq2Hrv3XYTiP/QF3kpgY=;
- b=nrf2xedybRizXNqcb50XrJDXdPSyCL+HK/kfsCgUleHreBfrA+wzUm/xnJWOvXPM6KSumkcTmbD4OeyvoDAPIShTprlPpQS/6fyN1rt3cfXsDHx3XWnybrZRttvNVh+O4c58k9P22JhXtW65Nlm1psgIsbFtHXEFbIQrCwxo+ahX6JdxEyZcljgX9vK9+41zMpPeXjk9V5F/r/o7cZ2T/ZB3zE+HN2wtLCPBznTldGDIY0bXxu8Hz/Xmdx1o7Z3bu5UQ3DsINgSsJo92saADXv4GHHKQMpWE2ic36Wb9fIAqIBfp7xVba450dyQi6PWQzUpWqNp7DVibcJOxq755Nw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=live.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wVkVKpfu8+Sw23xnlVLhgOzCq2Hrv3XYTiP/QF3kpgY=;
- b=kn09RTZVCNZjjJjn5aD/7LgXPhwXCkXM3DBmlcZgabTjYbkGGsZkbYw3AUCriNcoN0K/t+Go5N+IJO7f4KiVe69U6bjbi2s2Uk+rHbtrIWYJ94geapiUnxlMsr5DPjVasXIHxnXKdGcmvqlBNmFz0cD+mhNcSdAOqv+AirTfVMSLLAI9aoSI0QoHcMejFhuLM0WARrIy+jsqCquTtwna5wDfrIKTRxqbdsmy6lmQQnIROai9li1Tj3vdc9zNLq6m9p2QWbCmP1YqxmP7FAcq6Lo3xu6I6Jo6D7glBpq9RtmOKW3kXDpIOlnM+EwD7ojEONCL1/vRy7PICiqiJn4xEQ==
-Received: from MAUPR01MB11546.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:19c::18) by PNZPR01MB4446.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:1d::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.21; Mon, 17 Nov
- 2025 07:00:06 +0000
-Received: from MAUPR01MB11546.INDPRD01.PROD.OUTLOOK.COM
- ([fe80::418:72df:21ec:64ff]) by MAUPR01MB11546.INDPRD01.PROD.OUTLOOK.COM
- ([fe80::418:72df:21ec:64ff%6]) with mapi id 15.20.9320.021; Mon, 17 Nov 2025
- 07:00:06 +0000
-Message-ID:
- <MAUPR01MB115469354A4850FA87E8CD663B8C9A@MAUPR01MB11546.INDPRD01.PROD.OUTLOOK.COM>
-Date: Mon, 17 Nov 2025 12:29:46 +0530
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org
-From: Aditya Garg <gargaditya08@live.com>
-Subject: [BUG] Bluetooth doesn't pair to devices properly on MacBook Pro
- 16inch 2019
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN4P287CA0126.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:2b2::9) To MAUPR01MB11546.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:19c::18)
-X-Microsoft-Original-Message-ID:
- <8601a2a8-9152-4a94-95ab-6d9888a6cce4@live.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="jlBbnP8H"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1763368773;
+	bh=8NTclg9fONqzkzKXdx3TcZYe1MgWFjDDdfzZDmBzaJ8=;
+	h=From:To:Subject:Date:From;
+	b=jlBbnP8HU8SCkkHYyNJL99/4uu4cx9s1Y20edgVJxpQou27NGVh89EDS2Ff7agB4v
+	 U/H5J+TDjVNx8wTv2cXrcJvGJaf3ICqmmnqWovZJXqDpWDZtv7m0By+kqGf5V4jMxZ
+	 5w/G++q4H4a1DwvZYE98uVzEQwUvEHhhREntVUlQg8XutA9z1HunH91PRmGU/nPhsE
+	 byspDvQcXW17Mb4MIlw60tqRVDse3pCeXmysXH5JrGNtuQLnXqa41v5TuiIjjW+X5s
+	 soy184v27xe/g+5FEW3dBAGpK912rdTrsPjF8MwwS+mGIc3sx5VDtsBxEh8xeJtHkd
+	 fc+wCxAgVOh7A==
+Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-5eba-E77F-2baC-Aa7B.rev.sfr.net [IPv6:2a02:8428:af44:1001:5eba:e77f:2bac:aa7b])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 215FF17E110D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Nov 2025 09:39:33 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ] L2CAP: Accept incomplete SDU
+Date: Mon, 17 Nov 2025 09:39:26 +0100
+Message-ID: <20251117083926.332188-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MAUPR01MB11546:EE_|PNZPR01MB4446:EE_
-X-MS-Office365-Filtering-Correlation-Id: eb3e2bc6-20d9-4cf6-5be2-08de25a6eec7
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|5072599009|461199028|41001999006|6090799003|8060799015|19110799012|8022599003|23021999003|12121999013|15080799012|440099028|3412199025|10035399007|12091999003;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ekNIU3JVVjdaNjZBcytCaFcwNU9jTHZBNnRkdmQyL0FPU3Zja1NETm9MMi9i?=
- =?utf-8?B?ZU9mME1QTmVubitEV1VQZ1BUWG1LR0xLaW5ISUVrZ1puZnV4NHpMT0RnVno4?=
- =?utf-8?B?T1hVVGZldjNhc3JScExxMmhuU0t5MmVsMTYvbkh5NXBWSHB1N3RxQkZHMzk2?=
- =?utf-8?B?RW94R1VFdUdhT0FhL0xBVGt6emMxbkJrc0lEN25Ndk5mYXI2eTFXSDRzanFv?=
- =?utf-8?B?SlBKOE1WTy9OVmNkcS9MRHNJWDJ5d2s5akNhbi8wZ1htb25oWURkcXBmeEN6?=
- =?utf-8?B?NzFCdmlXS0syZklOVlM4dVZCRndIRTkzYzRtY0s1QWVGQzE1NGY2KzF4MTVM?=
- =?utf-8?B?S0lHa043ZDhxMHFYcHVra3Y1MVhwY1BCZEg5V1FkMWJ6aVVxWVRrdDBQTE8y?=
- =?utf-8?B?R3REQlNxTHRnUUx4cmxDRnhEQ2JBR0dPbEc2MEVSSnZIbGZHbEUveU92cXVO?=
- =?utf-8?B?aGpYcGI4TW9jTWwzdHVzSVJLQlBkckh3Y1dPOXIvb1BoOER2RE9MRnQwQnlt?=
- =?utf-8?B?bmhlbW0vSVIwaExPSHZKSkRtU2h6NVJ2U1hiRko2cDVCZ1pZazlqeXlwU1NF?=
- =?utf-8?B?T0lOa2pEQktnZFRtR2RjbXZCTG1id1A2NjhVaG9KV3BWRWJPcWd3VFp6dDlu?=
- =?utf-8?B?ZVEwVWxZTCsrTUpqWGRVWVBwaXNtYnh5OW1wc0ZYYnRuRm95ZXZqS3RsYkVV?=
- =?utf-8?B?cm9ndFp2ZkYyQWRiL0J5UmRPOEk4U0NNelJOR2lhYlJLSkp1Qmh6dnB0UkMr?=
- =?utf-8?B?L3hFQWN2WFVJSWExblgweHJBMk9YT1RySTBxajM4NmFqVktJL2ZIbVJsMnNO?=
- =?utf-8?B?QngwN0NwdEwxK0QvTFZJWlpxZGttQ1AwVGoxMGNrZWtOWUVuRTVhSm1rSVBq?=
- =?utf-8?B?bUVGb3dEcFY0a3NJeUJ0eEtPSnluZW1XdGthRGJHOEUrUkxFWUdFWUVaWStw?=
- =?utf-8?B?ZmlucERhNFA4d2MyRjNldmZOdldUQ2ZNOFAwVDdTVk8xRmIrZ01EdE9SamFB?=
- =?utf-8?B?K2RtZDJ1UHdoNzVRRHQxcklLdkU1anQ1ZUNrVWNFVnpiN2trcmp3RWFvY3Ew?=
- =?utf-8?B?bC82ZXUxZG0zU2JvNW55RVZzVGNyWks2WVdLUFVYbGRFV3dUQmhHN0c3ZS9J?=
- =?utf-8?B?NHFhVUVjcDhwbEUwMms2blIxZFREWWh2NHdZbnhEZlJQSzAwemQyekNkVXU4?=
- =?utf-8?B?cUZwblNibWx0VVpzV3Uyczd4SmZiZndyTFZ5UlBaUU5GQzRRNjY4Y1RWNERQ?=
- =?utf-8?B?ZzgwOUZHOGtOZXJ5dDRGVk40Qlg0dklZcE1vcWE4ZmdKcWl0ZWM1b0VyUGRr?=
- =?utf-8?B?ZnlRT0oyemw1UFMvZDFOZVlYVU9oSVM0N3RtNUxQemQ5SjFFNlJ3c0VzeklD?=
- =?utf-8?B?Mk9oU09kOC9EN3JYUXdwekRPbWJRcFg5dHZJdk8rd2ZmMWxZU0RuZHVRayto?=
- =?utf-8?B?UG4yMUsxd3lmUjV5TnlJOStwWlF0S2ZLbzZlL2ZWaGRydW5VRjU5eEgyVlE5?=
- =?utf-8?B?d1M3ZGtjUCt1QzJrTGdwR290RFN5bEpXUzYyeWNzQTg4UlJyc05ZWjhia09E?=
- =?utf-8?B?MGdXL3NvYVlhK1VIa1E1TXc2Y29tMVBuL0MwUTBFVGxBWjlCVktaUE5nSW4x?=
- =?utf-8?B?UXlVbitiWitMV05OYjJlQXJrdG9UbHE0bHoyT0F6eFhjUXJ1YnlTL3JCNERz?=
- =?utf-8?B?cU5paFZmU2JqQ2dNQ2ZpbTlqWnJSTlI4TG5SM0xZL2VHb0xWbDRCYTMwR3d0?=
- =?utf-8?Q?1YIHIRlE5Lyt/IvHdE=3D?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WW9uSnRVRGVTcjBkclZaT2IwckJZMnpPTVZ0aXlTdG9ZRGJtdG5DNGhJUG1i?=
- =?utf-8?B?NHQ2MXhUZlJ2Nmp6YVRBNlpFK2dZYkE1ZFJKOTJsaUZRcG5jWUJFeWVsZGtW?=
- =?utf-8?B?RDRhUnRlNDdYSytzUG52dy9EeE1mR3dOMTk0R0RqZXpUWW8vbUVPL0VGazQr?=
- =?utf-8?B?NTQ3Yi9tUmxHeHdLYlZyMldiQTcrMVRiU3V4aXVXTkNFcGU4VXlYN0FiN3Nl?=
- =?utf-8?B?ZWxzQS90N2dBYUYzZ24vZGR6MURQdDllSHdLeEhML0psWnlVL3BVOFFKYUor?=
- =?utf-8?B?dzZxL0xSVUdNbEgyWWt1OVZDbGJlSVpjTytkZ1pyWkhuNUd2NGYzaFdKQVVk?=
- =?utf-8?B?VGI2VThyRy83eWFEQlBSV09OWGpxeUMzZlJ3T3BoTS8vU09LT2owL1BjUElS?=
- =?utf-8?B?VEpOdXBUY0wzT2EvVkk1cUtqMWk1c2RDNndZVk9RY0pIWmtYdm9tOVdMOW5L?=
- =?utf-8?B?REdDWDVMV2xCRkZjNXY3Nzd4RnFiWjlUUGx2TE5yTGt6ektxNU9pbG5xakFC?=
- =?utf-8?B?MUFkWTBPZnRUZ2dTcnk4bVZCdDlzclBGaWxOWUt5SlJwZTFRVUZhOHdQWGhw?=
- =?utf-8?B?UHptUUUzL3FMenkwN1Z1aTJUWUh4ZFVERlJlRy9oNXBEOGc2aklGYWg1VG9Q?=
- =?utf-8?B?c3lvNjdJOGovaUhRZXdBLytRNlNXc1dXa1hPemorVERNY0JuU2RFNkxWa3Qr?=
- =?utf-8?B?TXZROSt5WngzVmZRQkZBS1BSN0tsQWdwa2tXU3djVWRicFB0RFFMZjhHWWp2?=
- =?utf-8?B?NXNnVlZpY2xLNFdNUjVRQnpuQ01ybHA3ZlBCSmZReVlKOFBjRisrQ3g1L0Va?=
- =?utf-8?B?MzZTMURqUGRFeno0RlErd25rNkE4bm9mQlJxMnNHUUh3eGVRbFA3S1Rqa0xk?=
- =?utf-8?B?bjdrelUvTzNBMkdmQWFINHk2b1JMMkMrSm5IRXBKTEZNVlBOdTN5NDBZclRw?=
- =?utf-8?B?NjJITWovWnEwL3Rtc2xoYTA2Zld3Umd6WVZSZWRNanVrODdwVW41bnlxaVFS?=
- =?utf-8?B?SzFTakREZUc0djlURVY2VWdqQUFrV2xLdTZSd1U4eDdYbnFoc2RBZERSYUZ1?=
- =?utf-8?B?emw4QnpGakwvcUFPUzk0cHh0clNDZ3ZnSHUzS3pjbWEyYWp5UzQvVHNwaSty?=
- =?utf-8?B?N29BY0kwVHhyUEk3Z2xoV1NyajIzcmZJVU1UcFBMVkdnazhlYjlybndkQlFH?=
- =?utf-8?B?b3NoUC9LZ29nQm5sWDBDTjBzWlhlNSs2S01NM2ZoNkhNYlZYbURlbVp6Wkxm?=
- =?utf-8?B?Q1AyNHp2OXVycGw3VnB5WjZxUnNobUgxSHpEZGIrS3V3eGh4UEl1dU84eWQr?=
- =?utf-8?B?ekNKNUJDeE5XaDl5b1JweFlzSnpGTnFqUzE5cWhENmJCSFpTNngybEw0T2NE?=
- =?utf-8?B?d1VlZXlmZXA2UHNFVmUySGhQU0VqV0FPY21CMm9tV3RUTEFuVFVUQjFVY284?=
- =?utf-8?B?alJaOUhkM2hwb1RQcVVhMUs2UW9ZTStJcm5HMjUwMGJOcTdkRElEYU1LYWRF?=
- =?utf-8?B?WWt5QnF1eVEyYVRqVjFEZWh6T005bUJ2T04ya0xCdkxiSHZMM01XY0Vxd0FB?=
- =?utf-8?B?UXMydFBoQnpFbjVjc1FobUUzWEJ0TnVTcFJrTExBV0pSdjdUQSs1cXUxRTRo?=
- =?utf-8?B?WGVpU3kyWmdsWjN3aVZzTGpmTTNzM2N5NmpxTVNTeDYvell0TUp3ZXNJNWYw?=
- =?utf-8?Q?T2+VqWqvG+Txrq4P+iO0?=
-X-OriginatorOrg: sct-15-20-9052-0-msonline-outlook-6aa33.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb3e2bc6-20d9-4cf6-5be2-08de25a6eec7
-X-MS-Exchange-CrossTenant-AuthSource: MAUPR01MB11546.INDPRD01.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2025 07:00:06.5759
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PNZPR01MB4446
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hi
+During OBEX Abort command, iOS may return an incomplete SDU packet
+which ends with the reply to the Abort command.
+During OBEX Abort command, iOS may return the L2CAP_SAR_END packet
+before the normal end of the SAR packets:
 
-I am currently using a MacBook Pro 16inch 2019 and the Bluetooth there is quite flaky.
+  < ACL Data TX: Handle 21 [2/8] flags 0x00 dlen 11  #194 [hci0] 14.923741
+      Channel: 3080 len 7 ctrl 0x060a [PSM 4101 mode Enhanced
+               Retransmission (0x03)] {chan 0}
+      I-frame: Unsegmented TxSeq 5 ReqSeq 6
+        0a 06 ff 00 03 47 84                             .....G.
+...
+  > ACL Data RX: Handle 21 flags 0x01 dlen 458       #382 [hci0] 19.701854
+      Channel: 65 len 1006 ctrl 0x460e [PSM 4101 mode Enhanced
+               Retransmission (0x03)] {chan 0}
+      I-frame: Start (len 32767) TxSeq 7 ReqSeq 6
+        0e 46 ff 7f 90 7f ff 48 7f fc 43 48 41 52 53 45  .F.....H..CHARSE
+        ...
+> ACL Data RX: Handle 21 flags 0x02 dlen 552         #383 [hci0] 19.701854
+> ACL Data RX: Handle 21 flags 0x01 dlen 458         #384 [hci0] 19.755918
+      Channel: 65 len 1006 ctrl 0xc610 [PSM 4101 mode Enhanced
+               Retransmission (0x03)] {chan 0}
+      I-frame: Continuation TxSeq 8 ReqSeq 6
+        10 c6 6e 6f 73 61 69 72 65 73 64 65 73 69 67 6e  ..nosairesdesign
+        ...
+> ACL Data RX: Handle 21 flags 0x02 dlen 552         #385 [hci0] 19.775016
+> ACL Data RX: Handle 21 flags 0x01 dlen 458         #386 [hci0] 19.775024
+      Channel: 65 len 1006 ctrl 0xc612 [PSM 4101 mode Enhanced
+               Retransmission (0x03)] {chan 0}
+      I-frame: Continuation TxSeq 9 ReqSeq 6
+        12 c6 69 63 6f 20 43 69 74 79 20 54 65 63 68 20  ..ico City Tech
+        ...
+> ACL Data RX: Handle 21 flags 0x02 dlen 552         #387 [hci0] 19.775024
+> ACL Data RX: Handle 21 flags 0x01 dlen 458         #388 [hci0] 19.821542
+      Channel: 65 len 1006 ctrl 0xc614 [PSM 4101 mode Enhanced
+               Retransmission (0x03)] {chan 0}
+      I-frame: Continuation TxSeq 10 ReqSeq 6
+        14 c6 6c 74 69 6e 67 20 50 61 72 74 6e 65 72 0d  ..lting Partner.
+        ...
+> ACL Data RX: Handle 21 flags 0x02 dlen 552         #389 [hci0] 19.821610
+> ACL Data RX: Handle 21 flags 0x01 dlen 458         #390 [hci0] 19.821610
+      Channel: 65 len 1006 ctrl 0xc616 [PSM 4101 mode Enhanced
+               Retransmission (0x03)] {chan 0}
+      I-frame: Continuation TxSeq 11 ReqSeq 6
+        16 c6 6c 74 69 6e 67 2e 63 6f 6d 0d 0a 55 49 44  ..lting.com..UID
+        ...
+> ACL Data RX: Handle 21 flags 0x02 dlen 11          #391 [hci0] 19.821610
+      Channel: 65 len 7 ctrl 0x8618 [PSM 4101 mode Enhanced
+               Retransmission (0x03)] {chan 0}
+      I-frame: End TxSeq 12 ReqSeq 6
+        18 86 a0 00 03 3e 5d                             .....>]
+< ACL Data TX: Handle 21 [1/8] flags 0x00 dlen 12    #392 [hci0] 19.822491
+      L2CAP: Disconnection Request (0x06) ident 10 len 4
+        Destination CID: 3080
+        Source CID: 65
 
-It discovers the devices well, but doesn't connect to them seamlessly.
+In this case the re-assembled packet should be 32767 bytes as defined
+in Start packet (#382), i.e. 33 segmented packets, but the End packet
+is sent as the 6th packet.
 
-I managed to dig it up a bit, and found these logs in journalctl:
+The l2cap_reassemble_sdu() function returns error -EINVAL if reassembled
+packet size != expected size, triggering the L2CAP disconnection, which
+disconnects the OBEX session, preventing further OBEX actions.
 
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART driver ver 2.3
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol H4 registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol BCSP registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol LL registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol ATH3K registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol Three-wire (H5) registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol Intel registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol Broadcom registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol QCA registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol AG6XX registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol Marvell registered
-Nov 17 11:53:57 MacBook kernel: Bluetooth: HCI UART protocol AML registered
-Nov 17 11:53:57 MacBook kernel: hci_uart_bcm serial0-0: Unexpected ACPI gpio_int_idx: -1
-Nov 17 11:53:57 MacBook kernel: hci_uart_bcm serial0-0: Unexpected number of ACPI GPIOs: 0
-Nov 17 11:53:57 MacBook kernel: hci_uart_bcm serial0-0: No reset resource, using default baud rate
-Nov 17 11:53:57 MacBook kernel: Bluetooth: hci0: BCM: failed to write update baudrate (-16)
-Nov 17 11:53:57 MacBook kernel: Bluetooth: hci0: Failed to set baudrate
-Nov 17 11:53:57 MacBook kernel: Bluetooth: hci0: BCM: chip id 150
-Nov 17 11:53:57 MacBook kernel: Bluetooth: hci0: BCM: features 0x07
-Nov 17 11:53:57 MacBook kernel: Bluetooth: hci0: BCM4364B3 Trinidad Olympic GEN (MFG)
-Nov 17 11:53:57 MacBook kernel: Bluetooth: hci0: BCM (001.016.091) build 0115
+Log this, discard previous segmented packet data and only send data
+from SAR End packet to upstream.
 
-I also was able to find some useful stuff from dsdt acpi tables:
+Closes: https://github.com/bluez/bluetooth-next/issues/17
+Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+---
+ net/bluetooth/l2cap_core.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-            Scope (URT0)
-            {
-                Device (BLTH)
-                {
-                    Name (_HID, EisaId ("BCM2E7C"))  // _HID: Hardware ID
-                    Name (_CID, "apple-uart-blth")  // _CID: Compatible ID
-                    Name (_UID, One)  // _UID: Unique ID
-                    Name (_ADR, Zero)  // _ADR: Address
-                    Method (_STA, 0, NotSerialized)  // _STA: Status
-                    {
-                        Return (0x0F)
-                    }
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 35c57657bcf4..5fe1d058455e 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5703,13 +5703,20 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb,
+ 		if (!chan->sdu)
+ 			break;
+ 
+-		append_skb_frag(chan->sdu, skb,
+-				&chan->sdu_last_frag);
++		if (chan->sdu->len + skb->len != chan->sdu_len) {
++			BT_DBG("Incomplete SDU, expected: %u received: %u", chan->sdu_len,
++			       chan->sdu->len + skb->len);
++			/* Discard previous data and keep only L2CAP_SAR_END data */
++			kfree_skb(chan->sdu);
++			chan->sdu = skb;
++			chan->sdu_last_frag = skb;
++			chan->sdu_len = skb->len;
++		} else {
++			append_skb_frag(chan->sdu, skb,
++					&chan->sdu_last_frag);
++		}
+ 		skb = NULL;
+ 
+-		if (chan->sdu->len != chan->sdu_len)
+-			break;
+-
+ 		err = chan->ops->recv(chan, chan->sdu);
+ 
+ 		if (!err) {
+-- 
+2.43.0
 
-                    Method (_PRW, 0, NotSerialized)  // _PRW: Power Resources for Wake
-                    {
-                        If (OSDW ())
-                        {
-                            Return (Package (0x02)
-                            {
-                                0x6F, 
-                                0x04
-                            })
-                        }
-                        Else
-                        {
-                            Return (Package (0x02)
-                            {
-                                0x6F, 
-                                0x03
-                            })
-                        }
-                    }
-
-                    Method (_CRS, 0, Serialized)  // _CRS: Current Resource Settings
-                    {
-                        Name (UBUF, ResourceTemplate ()
-                        {
-                            UartSerialBusV2 (0x0001C200, DataBitsEight, StopBitsOne,
-                                0xC0, LittleEndian, ParityTypeNone, FlowControlHardware,
-                                0x0020, 0x0020, "\\_SB.PCI0.URT0",
-                                0x00, ResourceProducer, , Exclusive,
-                                )
-                        })
-                        Name (ABUF, Buffer (0x02)
-                        {
-                             0x79, 0x00                                       // y.
-                        })
-                        If (!OSDW ())
-                        {
-                            Return (UBUF) /* \_SB_.PCI0.URT0.BLTH._CRS.UBUF */
-                        }
-
-                        Return (ABUF) /* \_SB_.PCI0.URT0.BLTH._CRS.ABUF */
-                    }
-
-                    Method (_DSM, 4, NotSerialized)  // _DSM: Device-Specific Method
-                    {
-                        If ((Arg0 == ToUUID ("a0b5b7c6-1318-441c-b0c9-fe695eaf949b") /* Unknown UUID */))
-                        {
-                            Local0 = Package (0x08)
-                                {
-                                    "baud", 
-                                    Buffer (0x08)
-                                    {
-                                         0xC0, 0xC6, 0x2D, 0x00, 0x00, 0x00, 0x00, 0x00   // ..-.....
-                                    }, 
-
-                                    "parity", 
-                                    Buffer (0x08)
-                                    {
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00   // ........
-                                    }, 
-
-                                    "dataBits", 
-                                    Buffer (0x08)
-                                    {
-                                         0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00   // ........
-                                    }, 
-
-                                    "stopBits", 
-                                    Buffer (0x08)
-                                    {
-                                         0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00   // ........
-                                    }
-                                }
-                            DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
-                            Return (Local0)
-                        }
-
-                        Return (Zero)
-                    }
-
-                    Method (BTPU, 0, Serialized)
-                    {
-                        ^^^LPCB.EC.BTPC = One
-                        Sleep (0x0A)
-                    }
-
-                    Method (BTPD, 0, Serialized)
-                    {
-                        ^^^LPCB.EC.BTPC = Zero
-                        Sleep (0x0A)
-                    }
-
-                    Method (BTRS, 0, Serialized)
-                    {
-                        BTPD ()
-                        BTPU ()
-                    }
-
-                    Method (BTLP, 1, Serialized)
-                    {
-                        If ((Arg0 == Zero))
-                        {
-                            ^^^LPCB.EC.BTDW = One
-                        }
-
-                        If ((Arg0 == One))
-                        {
-                            ^^^LPCB.EC.BTDW = Zero
-                        }
-                    }
-
-                    Method (BTRB, 1, Serialized)
-                    {
-                        If ((Arg0 == Zero))
-                        {
-                            SGOV (0x0309000A, One)
-                            SGDO (0x0309000A)
-                        }
-
-                        If ((Arg0 == One))
-                        {
-                            SGOV (0x0309000A, Zero)
-                            SGDO (0x0309000A)
-                        }
-                    }
-
-                    Method (_PSW, 1, NotSerialized)  // _PSW: Power State Wake
-                    {
-                        If ((^^^LPCB.EC.SWBT == One))
-                        {
-                            If (^^^LPCB.EC.ECOK)
-                            {
-                                If (OSDW ())
-                                {
-                                    If (Arg0)
-                                    {
-                                        ^^^LPCB.EC.EWBT = One
-                                    }
-                                    Else
-                                    {
-                                        ^^^LPCB.EC.EWBT = Zero
-                                        ^^^LPCB.EC.LWBT = Zero
-                                    }
-                                }
-                            }
-                        }
-                        Else
-                        {
-                        }
-                    }
-                }
-
-You can find the complete logs here:
-
-1. journalctl: https://pastebin.com/y0hzUUhj
-
-2. dsdt acpi table: https://pastebin.com/FuByaMm8
-
-Any help in fixing this bug will be highly appreciated!
-
-Thanks
-Aditya
