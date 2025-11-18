@@ -1,176 +1,586 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B34313523;
-	Tue, 18 Nov 2025 09:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FE031960D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Nov 2025 09:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763458161; cv=none; b=Ws2Ae3gwsgJy54Yk7mlm4lR6ZpXAxHIHuciFM3TF0RfC4xbgO2Uvf2Nq9iXO4Tp+q9JrXoB8/UnQTYvww4LOJW+fx1DauB3WMTZAd0aCUfFSxBZyQE/O2H5xSD7diRIz0NBVIiaiUUPHWQZOWELN+wTXSUOEuv693w/FeQN3RRY=
+	t=1763458164; cv=none; b=MNly4KF0Uo8XJMlOYU2f2bzBRiF5cVbPdiYsqrUQVUjrFbtiWZDWsJMQC/n8i9fYjEFASp99mN6VgyvJlENf6XBCCTMGTemQIax+akxbxngSJVi7fCWC9LaYsdV5tbDx91ghJKiDF5bXif27VnbESawT4A3WLafV3Ay0EvmECak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763458161; c=relaxed/simple;
-	bh=XtXjD5/us05FBBs2aNvNSAmALfBDhakcT0etFgo4DWg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Bqt+ZKFhzZH4IbmZ2yYyPVWdLP7LT3MiRcnyjg3f5q6hwZ+zFmi6AJcJY5qX4FCI2pV8OCGIJaONjKDEThCbWm1C4g0s0TXRiBys1l+266mp3+j9JDa7ujq/Lw8Pai10CoTVyTrkO8E0shpEUJ1g0cWY2aK+MwCyKJuQ37lz/dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lloDqHDE; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1763458164; c=relaxed/simple;
+	bh=4UsWtUst1VbEQNGYRIjiv94+TK1kqETdWNeV0+4eek8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=li1lAbFALplGzoxia2PqGkixoQS9tvnLFiZykk0UtFz6QbZ+ZE5Ay0h76VPfntHOy78Wt3DMlE/r8awvTYlWLr7zVRtp4WPzwlft7r8drT7MqpUqXTG096gwiiMwbR1Asyd3qaZbXz1J8g2Fs2AKuSbVuCAFWaB2euPDJf+OexE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iXDhL9XL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lloDqHDE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=po
-	5utToS7tZbEM3s51Es5F5AGq5I+najj73o2GX8Ib8=; b=lloDqHDEE8iWilaZwQ
-	qdJhaVyRG1z9GgiVz1O1DDcYN2kb4W9yJgW+n5ZByQbylNMrQBHRwP+PU+CmSist
-	KRFJUjJWn3rbW1eX2FSh6YW+D0z8rZHeHvDa+K/YRk5xn9P/UrGG2MQP3I0s4PyZ
-	YDwKwWIyiu+4xWC2LhvqWX7ck=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wD3H+JNPBxpth0NBA--.1772S3;
-	Tue, 18 Nov 2025 17:28:48 +0800 (CST)
-From: Gongwei Li <13875017792@163.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Gongwei Li <ligongwei@kylinos.cn>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH v3 2/2] Bluetooth: Process Read Remote Version evt
-Date: Tue, 18 Nov 2025 17:28:44 +0800
-Message-Id: <20251118092844.210978-2-13875017792@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251118092844.210978-1-13875017792@163.com>
-References: <20251118092844.210978-1-13875017792@163.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iXDhL9XL"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4447EC2BC86;
+	Tue, 18 Nov 2025 09:29:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763458164;
+	bh=4UsWtUst1VbEQNGYRIjiv94+TK1kqETdWNeV0+4eek8=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=iXDhL9XLU7JTupJ3JU85WOuT4OSn1oHBwOP6m70rM+fG/0l8iS8F9u2quLc5BHAac
+	 ljghyzd/vlVvGjBsXIQuRz25sDm0dDMp+0ZnOhEW+VbFptsk562nVTPccCcUZ4J1Fd
+	 egno1II+0kRrsj0bRL0kY/39+7MKFmhgCCsT/++q3dvuk+wJ+u4lFuAHVi/nXAdxl1
+	 FpG0T7KLD2ke2frn0hnSvzHn1qeInTqAsTVuN3RW20UnL+h+BPxWh1viy90wZg6/62
+	 kd4q6o8osHWcW2hCikkTYH8PFfoyX3leL9d0Pb6xFwanVy0Fq18NtvwOkgFz6t2jNY
+	 EbL+jyGNKxICA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0EE3CED24B;
+	Tue, 18 Nov 2025 09:29:23 +0000 (UTC)
+From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
+Date: Tue, 18 Nov 2025 17:29:19 +0800
+Subject: [PATCH bluez v3] bearer: Implement Connect/Disconnect methods
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3H+JNPBxpth0NBA--.1772S3
-X-Coremail-Antispam: 1Uf129KBjvJXoWxGF4UGr4rCw1DCr17tw4rAFb_yoWrCrWxpF
-	Z8u3WfArW8Jr4fXFyxAa18ZFn5Jrn7WFW7KrZ2v34rJws0vrWkJr4kCryjyFy5CrWqqFyx
-	ZF1jqr1fuFyUtr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jAcTPUUUUU=
-X-CM-SenderInfo: rprtmlyvqrllizs6il2tof0z/1tbiXAEKumkcONVibQABs7
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251118-bearer-impl-v3-1-dadcd8b0c75d@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAG48HGkC/22NQQ6CMBBFr2JmbY3TUkBX3sO4KHWASYCSVhuVc
+ HebrtQ4u/9/3psFAnmmAMfNAp4iB3ZTCmq7AdubqSPB15RB7qXGdKIh48kLHudB6LYidSixKoy
+ BRMyeWn5k2xma4U4vuKS653Bz/pl/RMzjX11EgaItUNcai0JifTLj4Dq2O+vGbIryk1bftEy0V
+ VRLbW1Z6R96Xdc3GuAe1e0AAAA=
+X-Change-ID: 20251111-bearer-impl-5f7e396174aa
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Ye He <ye.he@amlogic.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1763458162; l=16180;
+ i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
+ bh=kPOSJMzoT/D72xb3RUqQUHhf306R6PkzLcKyJsTUv6k=;
+ b=FEz0KVsfvs1ZSN1LB6vszeB8MjgqXyvREC70S1bFus7kJ4qlHegB0WS5l2SiU5YBEVF40/x9e
+ mx4rsFwSpBBDJvYsAn4SL1FA3pUaE+DT+LW/FZoxqbLeCL+evbrHFfk
+X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
+ pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
+X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
+ auth_id=348
+X-Original-From: Ye He <ye.he@amlogic.com>
+Reply-To: ye.he@amlogic.com
 
-From: Gongwei Li <ligongwei@kylinos.cn>
+From: Ye He <ye.he@amlogic.com>
 
-Add processing for HCI Process Read Remote Version event.
-Used to query the lmp version of remote devices.
+This patch provides implementations for the Connect and Disconnect
+methods of the org.bluez.Bearer.LE1 and org.bluez.Bearer.BREDR1
+interfaces.
 
-Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Ye He <ye.he@amlogic.com>
 ---
-v1->v2: Add bt_dev_dbg to print remote_ver
-v2->v3: Read ver in get_conn_info_Sync() instead of during the connection process
- include/net/bluetooth/hci_core.h |  1 +
- include/net/bluetooth/hci_sync.h |  2 ++
- net/bluetooth/hci_event.c        | 25 +++++++++++++++++++++++++
- net/bluetooth/hci_sync.c         | 11 +++++++++++
- net/bluetooth/mgmt.c             |  2 ++
- 5 files changed, 41 insertions(+)
+Changes in v3:
+- Move the modification logic from the device to bearer, and add
+- some helper functions to the device.
+- Link to v2: https://patch.msgid.link/20251113-bearer-impl-v2-1-c3e825cc6758@amlogic.com
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9efdefed3..424349b74 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -750,6 +750,7 @@ struct hci_conn {
+Changes in v2:
+- Fix build error & warning.
+- Link to v1: https://patch.msgid.link/20251111-bearer-impl-v1-1-f41585144218@amlogic.com
+---
+ src/bearer.c | 160 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ src/device.c | 130 ++++++++++++++++++++++++++++++++++++++++--------
+ src/device.h |  17 +++++++
+ 3 files changed, 285 insertions(+), 22 deletions(-)
+
+diff --git a/src/bearer.c b/src/bearer.c
+index 9723b59e2e7b39b2974e258363aa0ace95862651..46e272b16096740ce28bcc80d0e2426df8538a2e 100644
+--- a/src/bearer.c
++++ b/src/bearer.c
+@@ -25,23 +25,38 @@
  
- 	__u8		remote_cap;
- 	__u8		remote_auth;
-+	__u8		remote_ver;
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/mgmt.h"
++#include "bluetooth/uuid.h"
  
- 	unsigned int	sent;
+ #include "gdbus/gdbus.h"
+ #include "src/shared/util.h"
++#include "src/shared/queue.h"
++#include "src/shared/timeout.h"
  
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 3133f40fa..52078c58a 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -189,3 +189,5 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
- int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn);
- int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn);
- int hci_past_sync(struct hci_conn *conn, struct hci_conn *le);
+ #include "log.h"
+ #include "error.h"
+ #include "adapter.h"
+ #include "device.h"
++#include "profile.h"
++#include "service.h"
+ #include "dbus-common.h"
+ #include "bearer.h"
+ 
++#define DISCONNECT_TIMER	2
 +
-+int hci_get_remote_ver_sync(struct hci_dev *hdev, __le16 handle);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7c4ca14f1..12ed1fd36 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3738,6 +3738,28 @@ static void hci_remote_features_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
+ struct btd_bearer {
+ 	struct btd_device *device;
+ 	uint8_t type;
+ 	const char *path;
++	unsigned int disconn_timer;
++	struct queue *disconnects; /* disconnects message */
++	DBusMessage *connect; /* connect message */
+ };
+ 
++static void bearer_free_dbus_message(void *data)
++{
++    dbus_message_unref((DBusMessage *)data);
++}
++
+ static void bearer_free(void *data)
+ {
+ 	struct btd_bearer *bearer = data;
+@@ -49,17 +64,126 @@ static void bearer_free(void *data)
+ 	free(bearer);
  }
  
-+static void hci_remote_version_evt(struct hci_dev *hdev, void *data,
-+				   struct sk_buff *skb)
++static void bearer_disconnect_service(struct btd_service *service, void *user_data)
 +{
-+	struct hci_ev_remote_version *ev = (void *)skb->data;
-+	struct hci_conn *conn;
++	uint8_t bdaddr_type = *(uint8_t *)user_data;
++	struct btd_profile *profile;
++	bt_uuid_t uuid;
 +
-+	bt_dev_dbg(hdev, "");
++	profile = btd_service_get_profile(service);
++	if (!profile || !profile->remote_uuid)
++		return;
 +
-+	hci_dev_lock(hdev);
++	if (bt_string_to_uuid(&uuid, profile->remote_uuid) != 0)
++		return;
 +
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (!conn)
-+		goto unlock;
++	if (bdaddr_type == BDADDR_BREDR) {
++		if (uuid.value.u16 < 0x1100 || uuid.value.u16 > 0x11FF)
++			return;
++	} else {
++		if (uuid.value.u16 < 0x1800 || uuid.value.u16 > 0x18FF)
++			return;
++	}
 +
-+	conn->remote_ver = ev->lmp_ver;
++	DBG("Disconnecting profile %s (UUID 0x%04x) for bearer addr type %u",
++	profile->name ?: "(unknown)", uuid.value.u16, bdaddr_type);
 +
-+	bt_dev_dbg(hdev, "remote_ver 0x%2x2", conn->remote_ver);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
++	btd_service_disconnect(service);
 +}
 +
- static inline void handle_cmd_cnt_and_timer(struct hci_dev *hdev, u8 ncmd)
- {
- 	cancel_delayed_work(&hdev->cmd_timer);
-@@ -7523,6 +7545,9 @@ static const struct hci_ev {
- 	/* [0x0b = HCI_EV_REMOTE_FEATURES] */
- 	HCI_EV(HCI_EV_REMOTE_FEATURES, hci_remote_features_evt,
- 	       sizeof(struct hci_ev_remote_features)),
-+	/* [0x0c = HCI_EV_REMOTE_VERSION] */
-+	HCI_EV(HCI_EV_REMOTE_VERSION, hci_remote_version_evt,
-+	       sizeof(struct hci_ev_remote_version)),
- 	/* [0x0e = HCI_EV_CMD_COMPLETE] */
- 	HCI_EV_REQ_VL(HCI_EV_CMD_COMPLETE, hci_cmd_complete_evt,
- 		      sizeof(struct hci_ev_cmd_complete), HCI_MAX_EVENT_SIZE),
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a36d2414a..1bca97564 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -419,6 +419,17 @@ static void le_scan_disable(struct work_struct *work)
- static int hci_le_set_scan_enable_sync(struct hci_dev *hdev, u8 val,
- 				       u8 filter_dup);
- 
-+int hci_get_remote_ver_sync(struct hci_dev *hdev, __le16 handle)
++static bool bearer_disconnect_link(gpointer user_data)
 +{
-+	struct hci_cp_read_remote_version cp;
++	struct btd_bearer *bearer = user_data;
++	struct btd_device *device = bearer->device;
 +
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = handle;
++	bearer->disconn_timer = 0;
 +
-+	return __hci_cmd_sync_status(hdev, HCI_OP_READ_REMOTE_VERSION,
-+				     sizeof(cp), &cp, HCI_NCMD_TIMEOUT);
++	if (btd_device_bdaddr_type_connected(device, bearer->type))
++		btd_adapter_disconnect_device(device_get_adapter(device),
++						device_get_address(device),
++						bearer->type);
++	return FALSE;
 +}
 +
- static int reenable_adv_sync(struct hci_dev *hdev, void *data)
+ static DBusMessage *bearer_connect(DBusConnection *conn, DBusMessage *msg,
+ 							void *user_data)
  {
- 	bt_dev_dbg(hdev, "");
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c11cdef42..36f713d9e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7402,6 +7402,8 @@ static int get_conn_info_sync(struct hci_dev *hdev, void *data)
- 	/* Refresh RSSI each time */
- 	err = hci_read_rssi_sync(hdev, handle);
- 
-+	err = hci_get_remote_ver_sync(hdev, handle);
+-	/* TODO */
++	struct btd_bearer *bearer = user_data;
++	struct btd_device *device = bearer->device;
++	int err;
 +
- 	/* For LE links TX power does not change thus we don't need to
- 	 * query for it once value is known.
- 	 */
++	if (btd_device_bdaddr_type_connected(device, bearer->type)) {
++		if (msg)
++			return btd_error_already_connected(msg);
++		return NULL;
++	}
++
++	if (device_is_bonding(device, NULL)) {
++		if (msg)
++			return btd_error_in_progress(msg);
++		return NULL;
++	}
++
++	if (device_is_connecting(device) ||
++		bearer->connect) {
++		if (msg)
++			return btd_error_in_progress(msg);
++		return NULL;
++	}
++
++	if (msg)
++		bearer->connect = dbus_message_ref(msg);
++
++	if (bearer->type == BDADDR_BREDR)
++		return device_connect_profiles(device, BDADDR_BREDR,
++								msg, NULL);
++	else {
++		btd_device_set_temporary(device, false);
++		err = device_connect_le(device);
++		if (err < 0)
++			return btd_error_failed(msg, strerror(-err));
++	}
++
+ 	return NULL;
+ }
+ 
+ static DBusMessage *bearer_disconnect(DBusConnection *conn, DBusMessage *msg,
+ 							void *user_data)
+ {
+-	/* TODO */
++	struct btd_bearer *bearer = user_data;
++	struct btd_device *device = bearer->device;
++
++	if (!btd_device_bdaddr_type_connected(device, bearer->type)) {
++		if (msg)
++			return btd_error_not_connected(msg);
++		return NULL;
++	}
++
++	if (device_is_disconnecting(device)) {
++		if (msg)
++			return btd_error_in_progress(msg);
++		return NULL;
++	}
++
++	if (msg)
++		queue_push_tail(bearer->disconnects, dbus_message_ref(msg));
++
++	device_cancel_bonding(device, MGMT_STATUS_DISCONNECTED);
++
++	device_cancel_browse(device, bearer->type);
++
++	btd_device_foreach_service(device, bearer_disconnect_service,
++							&bearer->type);
++
++	device_remove_pending_services(device, bearer->type);
++
++	if (bearer->disconn_timer)
++		return NULL;
++
++	bearer->disconn_timer = timeout_add_seconds(DISCONNECT_TIMER,
++							bearer_disconnect_link,
++							bearer, NULL);
++
+ 	return NULL;
+ }
+ 
+@@ -151,6 +275,7 @@ struct btd_bearer *btd_bearer_new(struct btd_device *device, uint8_t type)
+ 	bearer->device = device;
+ 	bearer->type = type;
+ 	bearer->path = device_get_path(device);
++	bearer->disconnects = queue_new();
+ 
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					bearer->path, bearer_interface(type),
+@@ -174,6 +299,16 @@ void btd_bearer_destroy(struct btd_bearer *bearer)
+ 		return;
+ 	}
+ 
++	if (bearer->disconnects) {
++		queue_destroy(bearer->disconnects, bearer_free_dbus_message);
++		bearer->disconnects = NULL;
++	}
++
++	if (bearer->connect) {
++		dbus_message_unref(bearer->connect);
++		bearer->connect = NULL;
++	}
++
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(), bearer->path,
+ 					bearer_interface(bearer->type));
+ }
+@@ -203,6 +338,13 @@ void btd_bearer_connected(struct btd_bearer *bearer)
+ 	if (!bearer || !bearer->path)
+ 		return;
+ 
++	if (bearer->connect) {
++		g_dbus_send_reply(btd_get_dbus_connection(), bearer->connect,
++						DBUS_TYPE_INVALID);
++		dbus_message_unref(bearer->connect);
++		bearer->connect = NULL;
++	}
++
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(), bearer->path,
+ 					bearer_interface(bearer->type),
+ 					"Connected");
+@@ -212,10 +354,24 @@ void btd_bearer_disconnected(struct btd_bearer *bearer, uint8_t reason)
+ {
+ 	const char *name;
+ 	const char *message;
++	DBusMessage *msg;
++	const struct queue_entry *entry;
+ 
+ 	if (!bearer || !bearer->path)
+ 		return;
+ 
++	if (!btd_device_is_connected(bearer->device))
++		device_disconnect_watches_callback(bearer->device);
++
++	while (!queue_isempty(bearer->disconnects)) {
++		entry = queue_get_entries(bearer->disconnects);
++		msg = entry->data;
++		g_dbus_send_reply(btd_get_dbus_connection(), msg,
++						DBUS_TYPE_INVALID);
++		queue_remove(bearer->disconnects, msg);
++		dbus_message_unref(msg);
++	}
++
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(), bearer->path,
+ 					bearer_interface(bearer->type),
+ 					"Connected");
+diff --git a/src/device.c b/src/device.c
+index 91b6cc0c65eaae8058cd445c0942ffee57289f0d..918f1e51acd3a9cd6b776cc080c198885511fb20 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2022,6 +2022,28 @@ static void dev_disconn_service(gpointer a, gpointer b)
+ 	btd_service_disconnect(a);
+ }
+ 
++void device_disconnect_watches_callback(struct btd_device *device)
++{
++	if (!device || !device->watches)
++		return;
++
++	while (device->watches) {
++		struct btd_disconnect_data *data = device->watches->data;
++
++		if (data->watch)
++			/* temporary is set if device is going to be removed */
++			data->watch(device, device->temporary,
++							data->user_data);
++
++		/* Check if the watch has been removed by callback function */
++		if (!g_slist_find(device->watches, data))
++			continue;
++
++		device->watches = g_slist_remove(device->watches, data);
++		g_free(data);
++	}
++}
++
+ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+ {
+ 	if (device->bonding)
+@@ -2063,21 +2085,7 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+ 	g_slist_free(device->pending);
+ 	device->pending = NULL;
+ 
+-	while (device->watches) {
+-		struct btd_disconnect_data *data = device->watches->data;
+-
+-		if (data->watch)
+-			/* temporary is set if device is going to be removed */
+-			data->watch(device, device->temporary,
+-							data->user_data);
+-
+-		/* Check if the watch has been removed by callback function */
+-		if (!g_slist_find(device->watches, data))
+-			continue;
+-
+-		device->watches = g_slist_remove(device->watches, data);
+-		g_free(data);
+-	}
++	device_disconnect_watches_callback(device);
+ 
+ 	if (!btd_device_is_connected(device)) {
+ 		if (msg)
+@@ -2095,6 +2103,11 @@ bool device_is_disconnecting(struct btd_device *device)
+ 	return device->disconn_timer > 0;
+ }
+ 
++bool device_is_connecting(struct btd_device *device)
++{
++	return device->connect != NULL;
++}
++
+ static void add_set(void *data, void *user_data)
+ {
+ 	struct sirk_info *sirk = data;
+@@ -2712,8 +2725,8 @@ int btd_device_connect_services(struct btd_device *dev, GSList *services)
+ 	return connect_next(dev);
+ }
+ 
+-static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type,
+-					DBusMessage *msg, const char *uuid)
++DBusMessage *device_connect_profiles(struct btd_device *dev,
++		uint8_t bdaddr_type, DBusMessage *msg, const char *uuid)
+ {
+ 	struct bearer_state *state = get_state(dev, bdaddr_type);
+ 	int err;
+@@ -2826,7 +2839,7 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
+ 		return NULL;
+ 	}
+ 
+-	return connect_profiles(dev, bdaddr_type, msg, NULL);
++	return device_connect_profiles(dev, bdaddr_type, msg, NULL);
+ }
+ 
+ static DBusMessage *connect_profile(DBusConnection *conn, DBusMessage *msg,
+@@ -2848,7 +2861,7 @@ static DBusMessage *connect_profile(DBusConnection *conn, DBusMessage *msg,
+ 		return btd_error_invalid_args_str(msg,
+ 					ERR_BREDR_CONN_INVALID_ARGUMENTS);
+ 
+-	reply = connect_profiles(dev, BDADDR_BREDR, msg, uuid);
++	reply = device_connect_profiles(dev, BDADDR_BREDR, msg, uuid);
+ 	free(uuid);
+ 
+ 	return reply;
+@@ -3421,7 +3434,7 @@ static DBusMessage *new_authentication_return(DBusMessage *msg, uint8_t status)
+ 	}
+ }
+ 
+-static void device_cancel_bonding(struct btd_device *device, uint8_t status)
++void device_cancel_bonding(struct btd_device *device, uint8_t status)
+ {
+ 	struct bonding_req *bonding = device->bonding;
+ 	DBusMessage *reply;
+@@ -6629,6 +6642,38 @@ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg)
+ 	return err;
+ }
+ 
++static gboolean device_is_browsing(struct btd_device *device, uint8_t bdaddr_type)
++{
++	if (!device->browse)
++		return FALSE;
++
++	if (bdaddr_type == BDADDR_BREDR && device->browse->type == BROWSE_SDP)
++		return TRUE;
++
++	if (bdaddr_type != BDADDR_BREDR && device->browse->type == BROWSE_GATT)
++		return TRUE;
++
++	return FALSE;
++}
++
++void device_cancel_browse(struct btd_device *device, uint8_t bdaddr_type)
++{
++	struct btd_adapter *adapter = device->adapter;
++
++	DBG("");
++
++	if (!device_is_browsing(device, bdaddr_type))
++		return;
++
++	if (bdaddr_type == BDADDR_BREDR)
++		bt_cancel_discovery(btd_adapter_get_address(adapter),
++							&device->bdaddr);
++	else
++		attio_cleanup(device);
++
++	browse_request_free(device->browse);
++}
++
+ int device_discover_services(struct btd_device *device)
+ {
+ 	int err;
+@@ -8088,3 +8133,48 @@ void btd_device_foreach_service_data(struct btd_device *dev, bt_ad_func_t func,
+ {
+ 	bt_ad_foreach_service_data(dev->ad, func, data);
+ }
++
++
++void btd_device_foreach_service(struct btd_device *dev,
++				btd_device_service_func_t func,
++				void *user_data)
++{
++	GSList *l;
++
++	for (l = dev->services; l; l = l->next)
++		func(l->data, user_data);
++}
++
++void device_remove_pending_services(struct btd_device *dev,
++					uint8_t bdaddr_type)
++{
++	GSList *l = dev->pending;
++	GSList *next;
++	struct btd_service *service;
++	struct btd_profile *profile;
++	bt_uuid_t uuid;
++	bool match = false;
++
++	while (l) {
++		next = l->next;
++		service = l->data;
++
++		profile = btd_service_get_profile(service);
++		if (profile && profile->remote_uuid &&
++			bt_string_to_uuid(&uuid, profile->remote_uuid) == 0) {
++
++			if (bdaddr_type == BDADDR_BREDR)
++				match = uuid.value.u16 >= 0x1100 ||
++					uuid.value.u16 <= 0x11FF;
++			else
++				match = uuid.value.u16 >= 0x1800 ||
++					uuid.value.u16 <= 0x18FF;
++
++			if (match)
++				dev->pending = g_slist_remove(dev->pending,
++								service);
++		}
++
++		l = next;
++	}
++}
+\ No newline at end of file
+diff --git a/src/device.h b/src/device.h
+index 6ed8affa0d4a9274d30cac9b48e8a6826edefd64..fee1ad50dc9c7ae248acd819dae07762c783ac35 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -120,6 +120,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ gboolean device_is_bonding(struct btd_device *device, const char *sender);
+ void device_bonding_attempt_failed(struct btd_device *device, uint8_t status);
+ void device_bonding_failed(struct btd_device *device, uint8_t status);
++void device_cancel_bonding(struct btd_device *device, uint8_t status);
+ struct btd_adapter_pin_cb_iter *device_bonding_iter(struct btd_device *device);
+ int device_bonding_attempt_retry(struct btd_device *device);
+ long device_bonding_last_duration(struct btd_device *device);
+@@ -134,6 +135,9 @@ int device_notify_pincode(struct btd_device *device, gboolean secure,
+ 							const char *pincode);
+ void device_cancel_authentication(struct btd_device *device, gboolean aborted);
+ gboolean device_is_authenticating(struct btd_device *device);
++
++void device_cancel_browse(struct btd_device *device, uint8_t bdaddr_type);
++
+ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type,
+ 							uint32_t flags);
+ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type,
+@@ -141,6 +145,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type,
+ 							uint8_t reason);
+ void device_request_disconnect(struct btd_device *device, DBusMessage *msg);
+ bool device_is_disconnecting(struct btd_device *device);
++bool device_is_connecting(struct btd_device *device);
+ void device_set_ltk(struct btd_device *device, const uint8_t val[16],
+ 				bool central, uint8_t enc_size);
+ bool btd_device_get_ltk(struct btd_device *device, uint8_t val[16],
+@@ -170,6 +175,7 @@ guint device_add_disconnect_watch(struct btd_device *device,
+ 				disconnect_watch watch, void *user_data,
+ 				GDestroyNotify destroy);
+ void device_remove_disconnect_watch(struct btd_device *device, guint id);
++void device_disconnect_watches_callback(struct btd_device *device);
+ int device_get_appearance(struct btd_device *device, uint16_t *value);
+ void device_set_appearance(struct btd_device *device, uint16_t value);
+ 
+@@ -184,6 +190,9 @@ void btd_device_set_pnpid(struct btd_device *device, uint16_t source,
+ 
+ int device_connect_le(struct btd_device *dev);
+ 
++DBusMessage *device_connect_profiles(struct btd_device *dev,
++		uint8_t bdaddr_type, DBusMessage *msg, const char *uuid);
++
+ typedef void (*device_svc_cb_t) (struct btd_device *dev, int err,
+ 							void *user_data);
+ 
+@@ -225,3 +234,11 @@ void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
+ void btd_device_foreach_service_data(struct btd_device *dev,
+ 					bt_device_ad_func_t func,
+ 					void *data);
++
++typedef void (*btd_device_service_func_t)(struct btd_service *service,
++					void *user_data);
++void btd_device_foreach_service(struct btd_device *dev,
++				btd_device_service_func_t func,
++				void *user_data);
++void device_remove_pending_services(struct btd_device *dev,
++					uint8_t bdaddr_type);
+\ No newline at end of file
+
+---
+base-commit: 5e41d1e1d361e7288964e4c2c5ed90736025662f
+change-id: 20251111-bearer-impl-5f7e396174aa
+
+Best regards,
 -- 
-2.25.1
+Ye He <ye.he@amlogic.com>
+
 
