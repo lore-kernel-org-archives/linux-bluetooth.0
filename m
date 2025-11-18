@@ -1,175 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A16E2FD1AD;
-	Tue, 18 Nov 2025 07:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3823429ACD1;
+	Tue, 18 Nov 2025 09:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763450391; cv=none; b=YHEW7sa6bxt42iOmV1N68l2hmeYWmkRTC43ytQZUyN9c1ti2U3oIoh0IMw0MwDtGH9y1H2XMO17q2DI+9yWL6SSpg8ituzHBBt5hExFQIE2hFD8LkkXK5n3O9SKr96yiLTCN+drLaIddF2qAp9JcbRauZBxk/uhnChQx9Jj2V4Y=
+	t=1763458156; cv=none; b=R0TNfVL/v5Yl0gnShsLuT7xWGESRxa85Bhu7lLBM3wl0dBccMaxyOQ2Ihtqv1yrMXgD/U1Y2hHhV5zfYaQo9vChol04V6RRxc5o6QGezRD5SkCwZiaXHVVwGbfRFJPvMJJq+7Tqk+lrXhRK7AOyq3bQhpBYm1j/BaMkCJ+MRxKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763450391; c=relaxed/simple;
-	bh=ED27CMwNHU5TWXJaOSp3hBelRHeBOw08OxVZ+KML8VM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o8TT8kKIsp+brX42b2YyXK+zmLE7AMNUnXe6IQ+ong5jdMI+vpDsEGcHEXPaf5rLzwT/rWtU97zWyxel9IO3CtKsg4wlIRkQMKNEqNNGFbzhVUgsocNhsqP6tmbFvd+UnCNaOv4mwpwOdE3grpqWC1mqSOCx6kvwPVsEdEP//oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TO/mWiOt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763458156; c=relaxed/simple;
+	bh=VMyziYopC51vLit+yiZ1JbgUGXdaz28/EKqO+fXIUIo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P7cfb8EjRZMSAuS2/4fy+45dwgHa1t3IuXOH876EXBkfhlua5pV9Nn2rX65U2pmzUvg4WWbQbpcBo6APV2vOdeaGI85atumqSe47aGsmMGvRUhw5P8cp+BCGIYRNI0ECI4ghXZ7nb/Kw9iKVnuCzH+4D8VOI3et3BCFLYbWRhiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=OU/NVRXp; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TO/mWiOt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFD96C4CEF1;
-	Tue, 18 Nov 2025 07:19:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763450390;
-	bh=ED27CMwNHU5TWXJaOSp3hBelRHeBOw08OxVZ+KML8VM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TO/mWiOthigSwC4OfjnyKN/r1MCvZLZSrSJHlkapjDQmXyz3bp32UQP3DG/J2Dxs9
-	 z13ffMeafD15i1LmhYP9x+zpcaCkI8B9oBSdbG/MSdSg0a2UDY9ZO+pJwwLDdNi2Ck
-	 mYTriBJXqniEjI5ifZlCx627ZRGbAyXsIh/IY8B6ShwowoG7yj3cW4TbjMOK2dO1iY
-	 HEHwNyUcd8SUVMseSiEX4rtZ7wlSty8AbrUoVnZUGdHChC/7mDj/Oeyz2+r2ydBEoR
-	 XcsGYEm/CUNhkhkxHZloZmjeTdnOK9cSmQZwl3TqmC2M7VALCV/bZGq6z663JTCFg7
-	 cL7ZJUtevPjpQ==
-Message-ID: <0428a5a5-fd4e-4309-9b28-f94664177692@kernel.org>
-Date: Tue, 18 Nov 2025 08:19:45 +0100
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="OU/NVRXp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=I1
+	Br/UxaHiZ9gkbv6/uwDcyf0l1F+Ad5ILOMdUfz/sg=; b=OU/NVRXpMDQMQtolQ4
+	07TzCQjLuanHRjGcWGftEN0Yhu1l1XPB2Z1jhpHwRqrNXQIxWNVQ90cGryFZ9dXr
+	iwRCQZX38zCCXr64AKzDgh6umy6fkqdd1pgeJiYt+X/u6LAMCmU/q2PbaiSKvQiF
+	/WhZkSm5nwwJ5uXtmOWvZMyVs=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wD3H+JNPBxpth0NBA--.1772S2;
+	Tue, 18 Nov 2025 17:28:46 +0800 (CST)
+From: Gongwei Li <13875017792@163.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Gongwei Li <ligongwei@kylinos.cn>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH v3 1/2] Bluetooth: Remove unused hcon->remote_id
+Date: Tue, 18 Nov 2025 17:28:43 +0800
+Message-Id: <20251118092844.210978-1-13875017792@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] arm64: dts: qcom: monaco-evk: Enable Bluetooth support
-To: Wei Deng <wei.deng@oss.qualcomm.com>, Rob Herring <robh@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, linux-arm-msm@vger.kernel.org,
- quic_jiaymao@quicinc.com, Konrad Dybcio <konradybcio@kernel.org>,
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- cheng.jiang@oss.qualcomm.com, devicetree@vger.kernel.org,
- Bjorn Andersson <andersson@kernel.org>, quic_shuaz@quicinc.com,
- quic_chezhou@quicinc.com
-References: <20251113130519.2647081-1-wei.deng@oss.qualcomm.com>
- <176313578860.3262114.17056319042303889483.robh@kernel.org>
- <CAL_JsqJX3doLFv-Nc6o+L1W_o8VjtvGp9dqdpsotuyG17zU7Lw@mail.gmail.com>
- <ca6b02d8-07cc-4bc9-ac99-e75d8e3548fe@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <ca6b02d8-07cc-4bc9-ac99-e75d8e3548fe@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3H+JNPBxpth0NBA--.1772S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7JF1fWF4rXr1UJFykAFyDGFg_yoW3AwcEvw
+	1IvrWfur4UJry7Ar12qFWjyw4Fqwn3GFn2kFs3XrWYqa4DursxtryxZr1qqr1fW3srZr17
+	AayDXFWDXw1FyjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUnIApUUUUUU==
+X-CM-SenderInfo: rprtmlyvqrllizs6il2tof0z/1tbiXAEKumkcONVibQAAs6
 
-On 18/11/2025 08:07, Wei Deng wrote:
-> Hi Rob,
-> 
-> Thanks for your comments.
-> 
-> On 11/15/2025 12:18 AM, Rob Herring wrote:
->> On Fri, Nov 14, 2025 at 10:06 AM Rob Herring (Arm) <robh@kernel.org> wrote:
->>>
->>>
->>> On Thu, 13 Nov 2025 18:35:19 +0530, Wei Deng wrote:
->>>> There's a WCN6855 WiFi/Bluetooth module on an M.2 card. To make
->>>> Bluetooth work, we need to define the necessary device tree nodes,
->>>> including UART configuration and power supplies.
->>>>
->>>> Since there is no standard M.2 binding in the device tree at present,
->>>> the PMU is described using dedicated PMU nodes to represent the
->>>> internal regulators required by the module.
->>>>
->>>> The module provides a 3.3V supply, which originates from the
->>>> main board’s 12V rail. To represent this power hierarchy in the device
->>>> tree, add a fixed 12V regulator node as the DC-IN source and link it
->>>> to the 3.3V regulator node.
->>>>
->>>> Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
->>>> ---
->>>>  arch/arm64/boot/dts/qcom/monaco-evk.dts | 99 +++++++++++++++++++++++++
->>>>  1 file changed, 99 insertions(+)
->>>>
->>>
->>>
->>> My bot found new DTB warnings on the .dts files added or changed in this
->>> series.
->>>
->>> Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
->>> are fixed by another series. Ultimately, it is up to the platform
->>> maintainer whether these warnings are acceptable or not. No need to reply
->>> unless the platform maintainer has comments.
->>>
->>> If you already ran DT checks and didn't see these error(s), then
->>> make sure dt-schema is up to date:
->>>
->>>   pip3 install dtschema --upgrade
->>>
->>>
->>> This patch series was applied (using b4) to base:
->>>  Base: attempting to guess base-commit...
->>>  Base: tags/next-20251112 (exact match)
->>>  Base: tags/next-20251112 (use --merge-base to override)
->>>
->>> If this is not the correct base, please add 'base-commit' tag
->>> (or use b4 which does this automatically)
->>>
->>> New warnings running 'make CHECK_DTBS=y for arch/arm64/boot/dts/qcom/' for 20251113130519.2647081-1-wei.deng@oss.qualcomm.com:
->>>
->>> arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpcielp3-supply', 'vddpcielp9-supply' do not match any of the regexes: '^pinctrl-[0-9]+$'
->>>         from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml
->>> arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpcie1p3-supply' is a required property
->>>         from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml
->>> arch/arm64/boot/dts/qcom/monaco-evk.dtb: wcn6855-pmu (qcom,wcn6855-pmu): 'vddpcie1p9-supply' is a required property
->>>         from schema $id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml
->>
->> This is the 3rd report of your typos. Is there some reason you are
->> ignoring the reports?
->>
-> 
-> Sorry for the delayed response. These warnings are worth addressing 
-> and will be resolved in the next patch.
->
+From: Gongwei Li <ligongwei@kylinos.cn>
 
+hcon->remote_id last use was removed in 2024 by
+commit e7b02296fb40 ("Bluetooth: Remove BT_HS").
 
-Three of your patchsets have bugs easily pointed out by tools, so please
-answer - are you ignoring the reports? Are you doing any tests before
-sending?
+Remove it.
 
-Best regards,
-Krzysztof
+Fixes: e7b02296fb40 ("Bluetooth: Remove BT_HS")
+Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+---
+v1->v2: Add Fixes tags
+v2->v3: No modifications
+ include/net/bluetooth/hci_core.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 18396e369..9efdefed3 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -750,7 +750,6 @@ struct hci_conn {
+ 
+ 	__u8		remote_cap;
+ 	__u8		remote_auth;
+-	__u8		remote_id;
+ 
+ 	unsigned int	sent;
+ 
+-- 
+2.25.1
+
