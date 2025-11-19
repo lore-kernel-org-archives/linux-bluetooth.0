@@ -1,130 +1,222 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B2A371DD7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Nov 2025 19:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7180BCA52;
+	Wed, 19 Nov 2025 23:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763580731; cv=none; b=U80eTvTzq0Su6kfS0omZZqMZvXWWLHjXHmfdwfLze/loEbef5+BkVmXpW3KgPjxoJGDJ+OUDdoKNXui4ErXgM150rv5Af0tbaFWtuhfBnkTqL+RpPRJBZgJX452rdg6VH7m8l50g7mD5Q7b34HTu8NmlraRwwpc5e8MKZOJUJns=
+	t=1763596748; cv=none; b=LmlP9EIQrdRoxWWAL9wbIVAZepC3lAhR9ScBQ8fOBHL4l4EUV1fvQzP9+s7Ydse6V2nH1i+s37PIx4CtuMmOGiQMd7bBQB2WOjonA0sncBWVMghoKq6Yb8puNpEqx0/TOTbHgot9PGHlWlumim1sltQYZGLZi3z1op6oahkCsPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763580731; c=relaxed/simple;
-	bh=qQBswjc+KeKVbQcXqPf2gLD57YBurjtXsjy/Iv/n7t0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=EER0JXAC5TUYhKTIbBXje0TocZnjfEkroGEKpnvO9JY3TS0dIz6tFn+fehexwsqhiY1SAkOPpfiQN3XwHY2aAaEjsp2NCrtuzUn01SwZsEz6xXyUm2KKzkBg8m5h+iOpC/hLdDxsDwMA0XD0dSQFv56l66WnBtH660k6N/BaEe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-43376637642so1770945ab.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Nov 2025 11:32:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763580722; x=1764185522;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H2Le9Fd/fRw3/uMcOxtAMp9dhGa8mALsRSnwHNbxbHg=;
-        b=vofnykIhg/FKQxx6OfiSSR+naIsMmlch9t31QfGGwgNlIPVz11/ZcCq+wdnmGU8UA4
-         7fqW3kpZFEJsKc8f9QCUUERR4OKG6MMKv8AVgC3Zzbq0l3Ir6ixKtPjDhOonV7WHgDyR
-         uL6NloDrqGuM5JraOn7SXRBAo2ZJWWrQTXGfoUsLXD6CfXeI2CO0buixJO8pk1E9vry2
-         KiF/WDuQamLVIOCScheO8igcq9NiY56sCtkRHhIqXqPxihm9xlTgno9XDFZIsEKDBlP+
-         sz47iBcx4sRG9tRnvN/NrrkXj3cUslBgLzS1KMgLDIt2qoh+eCX4ESEw9mYSYis0v46I
-         ITFg==
-X-Gm-Message-State: AOJu0YyqvaN5tIp3Uv67HsGX8CVkjyXRIlNq4cMJZEjlz5DO9sNgRhdy
-	ANu25TQdfjxbxymIzUr8Crr0mmcQzo4oGy4IudjbxRihyaWWm9xQFUW6Xs0L8poKH0e1DFGBuWP
-	O5a9OM9/q61LiL64nAr21ghlWBD/OmyD8q8n9e0ArbAqYbw5JrbtMkalssXg=
-X-Google-Smtp-Source: AGHT+IGrQScWWo45LylkuRv5HGDyobczXYWErcXPx1E+v8CRWPcU17DFoElCjn+IhRNe9LH1A9rrr9GFRDwbOs6KC5iTCNajOJ3p
+	s=arc-20240116; t=1763596748; c=relaxed/simple;
+	bh=aMfWom2YqMjywxvhE2wFwmB5PmpGzL00uN54+jIPqgU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W5CIMmwHn9o7zrwkXZrOXZJ5mxGzKn0L7IDAfzSqrOnSB5w6FG7RNOMJPP6kFsGdc648izAUcaf3ggFhseOYENWCEWbLYnNN/FsDxqIJM1Jc3O8EsgOY9iXtiEvGAqG8hSqUIAeSlWnZIqUzff3VMSQdCcW0ipQ/nX0uhh3Vnog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V4iKVDWi; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4iKVDWi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29638C4CEF5;
+	Wed, 19 Nov 2025 23:59:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763596747;
+	bh=aMfWom2YqMjywxvhE2wFwmB5PmpGzL00uN54+jIPqgU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V4iKVDWikOrKp8hiVqz7Okp9Q1q3wFuIqlNEPISzAxRKkGlABp3eSp+Q323D3HozF
+	 WQovlJ6kDkd1iVz/X6E3BuADT96viHLBJ7t0DQqIMu0W2U4TzTk/Py116HXU2jWkNa
+	 qdzNhgGXEtQ4zt9knAMOkL7xksapBqYXZmJERU27xjOqcHNjcHg5YUTlmcsrX6G3XC
+	 tceGSYW6Roc2HnSvfiJUQJere5z2Bk3CrTyV2sV9MvwNGqupZN9jMnrpfcC2hL8URJ
+	 mVU1CXqlhnfTXBnt83idwbEra5CVbSFhTWeLRTWsvxW7s1GEz1PusdHV6R537Gv57b
+	 4zMtgEWnlvIaQ==
+Date: Wed, 19 Nov 2025 17:59:05 -0600
+From: Rob Herring <robh@kernel.org>
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Frank Li <Frank.li@nxp.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Mark Pearson <mpearson-lenovo@squebb.ca>,
+	"Derek J. Clark" <derekjohn.clark@gmail.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
+	Stephan Gerhold <stephan.gerhold@linaro.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: [PATCH 7/9] dt-bindings: connector: Add PCIe M.2 Mechanical Key
+ E connector
+Message-ID: <20251119235905.GA3575788-robh@kernel.org>
+References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
+ <20251112-pci-m2-e-v1-7-97413d6bf824@oss.qualcomm.com>
+ <aRS/3OTerCBGlmBm@lizhi-Precision-Tower-5810>
+ <qiwgnela4b6gbwuuq7xaqjong47c2ix6caagjl6ryqukzqkswn@6l7rvkf4dfyx>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a0f:b0:431:d864:366a with SMTP id
- e9e14a558f8ab-435a9011733mr8980315ab.2.1763580722699; Wed, 19 Nov 2025
- 11:32:02 -0800 (PST)
-Date: Wed, 19 Nov 2025 11:32:02 -0800
-In-Reply-To: <6d2a1c9f-d4db-496d-9230-e41e5166eb86@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <691e1b32.a70a0220.2ea503.001f.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] [usb?] memory leak in __hci_cmd_sync_sk
-From: syzbot <syzbot+f098d64cc684b8dbaf65@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ssranevjti@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <qiwgnela4b6gbwuuq7xaqjong47c2ix6caagjl6ryqukzqkswn@6l7rvkf4dfyx>
 
-Hello,
+On Thu, Nov 13, 2025 at 10:30:42AM +0530, Manivannan Sadhasivam wrote:
+> On Wed, Nov 12, 2025 at 12:11:56PM -0500, Frank Li wrote:
+> > On Wed, Nov 12, 2025 at 08:15:19PM +0530, Manivannan Sadhasivam wrote:
+> > > Add the devicetree binding for PCIe M.2 Mechanical Key E connector defined
+> > > in the PCI Express M.2 Specification, r4.0, sec 5.1.2. This connector
+> > > provides interfaces like PCIe or SDIO to attach the WiFi devices to the
+> > > host machine, USB or UART+PCM interfaces to attach the Bluetooth (BT)
+> > > devices along with additional interfaces like I2C for NFC solution. At any
+> > > point of time, the connector can only support either PCIe or SDIO as the
+> > > WiFi interface and USB or UART as the BT interface.
+> > >
+> > > The connector provides a primary power supply of 3.3v, along with an
+> > > optional 1.8v VIO supply for the Adapter I/O buffer circuitry operating at
+> > > 1.8v sideband signaling.
+> > >
+> > > The connector also supplies optional signals in the form of GPIOs for fine
+> > > grained power management.
+> > >
+> > > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > > ---
+> > >  .../bindings/connector/pcie-m2-e-connector.yaml    | 154 +++++++++++++++++++++
+> > >  MAINTAINERS                                        |   1 +
+> > >  2 files changed, 155 insertions(+)
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+> > > new file mode 100644
+> > > index 0000000000000000000000000000000000000000..91cb56b1a75b7e3de3b9fe9a7537089f96875746
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+> > > @@ -0,0 +1,154 @@
+> > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/connector/pcie-m2-e-connector.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: PCIe M.2 Mechanical Key E Connector
+> > > +
+> > > +maintainers:
+> > > +  - Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > > +
+> > > +description:
+> > > +  A PCIe M.2 E connector node represents a physical PCIe M.2 Mechanical Key E
+> > > +  connector. Mechanical Key E connectors are used to connect Wireless
+> > > +  Connectivity devices including combinations of Wi-Fi, BT, NFC to the host
+> > > +  machine over interfaces like PCIe/SDIO, USB/UART+PCM, and I2C.
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    const: pcie-m2-e-connector
+> > > +
+> > > +  vpcie3v3-supply:
+> > > +    description: A phandle to the regulator for 3.3v supply.
+> > > +
+> > > +  vpcie1v8-supply:
+> > > +    description: A phandle to the regulator for VIO 1.8v supply.
+> > > +
+> > > +  ports:
+> > > +    $ref: /schemas/graph.yaml#/properties/ports
+> > > +    description: OF graph bindings modeling the interfaces exposed on the
+> > > +      connector. Since a single connector can have multiple interfaces, every
+> > > +      interface has an assigned OF graph port number as described below.
+> > > +
+> > > +    properties:
+> > > +      port@0:
+> > > +        $ref: /schemas/graph.yaml#/properties/port
+> > > +        description: PCIe/SDIO interface
+> > 
+> > 
+> > PCIe and SDIO is difference signal at key E. why combine to one port? The
+> > similar case is USB2.0/UART
+> > 
+> 
+> They will be defined as separate endpoints in the next version.
+> 
+> > > +
+> > > +      port@1:
+> > > +        $ref: /schemas/graph.yaml#/properties/port
+> > > +        description: USB 2.0/UART interface
+> > > +
+> > > +      port@2:
+> > > +        $ref: /schemas/graph.yaml#/properties/port
+> > > +        description: PCM/I2S interface
+> > > +
+> > > +      port@3:
+> > > +        $ref: /schemas/graph.yaml#/properties/port
+> > > +        description: I2C interface
+> > > +
+> > > +    oneOf:
+> > > +      - required:
+> > > +          - port@0
+> > > +
+> > > +  clocks:
+> > > +    description: 32.768 KHz Suspend Clock (SUSCLK) input from the host system to
+> > > +      the M.2 card. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.1 for
+> > > +      more details.
+> > > +    maxItems: 1
+> > 
+> > Do we need add pciref clock here?
+> > 
+> > > +
+> > > +  w_disable1-gpios:
+> > 
+> > use "-"
+> > 
+> > w-disable1-gpios
+> > 
+> 
+> I just went with the spec that defines the signal as W_DISABLE.
+> 
+> > > +    description: GPIO controlled connection to W_DISABLE1# signal. This signal
+> > > +      is used by the system to disable WiFi radio in the M.2 card. Refer, PCI
+> > > +      Express M.2 Specification r4.0, sec 3.1.12.3 for more details.
+> > > +    maxItems: 1
+> > > +
+> > > +  w_disable2-gpios:
+> > > +    description: GPIO controlled connection to W_DISABLE2# signal. This signal
+> > > +      is used by the system to disable BT radio in the M.2 card. Refer, PCI
+> > > +      Express M.2 Specification r4.0, sec 3.1.12.3 for more details.
+> > > +    maxItems: 1
+> > > +
+> > > +  led1-gpios:
+> > > +    description: GPIO controlled connection to LED_1# signal. This signal is
+> > > +      used by the M.2 card to indicate the card status via the system mounted
+> > > +      LED. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.2 for more
+> > > +      details.
+> > > +    maxItems: 1
+> > > +
+> > > +  led2-gpios:
+> > > +    description: GPIO controlled connection to LED_2# signal. This signal is
+> > > +      used by the M.2 card to indicate the card status via the system mounted
+> > > +      LED. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.2 for more
+> > > +      details.
+> > > +    maxItems: 1
+> > > +
+> > > +  viocfg-gpios:
+> > > +    description: GPIO controlled connection to IO voltage configuration
+> > > +      (VIO_CFG) signal. This signal is used by the M.2 card to indicate to the
+> > > +      host system that the card supports an independent IO voltage domain for
+> > > +      the sideband signals. Refer, PCI Express M.2 Specification r4.0, sec
+> > > +      3.1.15.1 for more details.
+> > > +    maxItems: 1
+> > > +
+> > > +  uim_power_src-gpios:
+> > 
+> > property use -
+> > 
+> 
+> Again, this is as per the spec. If DT maintainers object to it, I'll change it.
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-memory leak in __hci_cmd_sync_sk
+Use '-'.
 
-2025/11/19 19:30:48 executed programs: 47
-2025/11/19 19:30:56 executed programs: 49
-2025/11/19 19:31:03 executed programs: 51
-2025/11/19 19:31:11 executed programs: 53
-BUG: memory leak
-unreferenced object 0xffff888111aec700 (size 240):
-  comm "kworker/u9:1", pid 5135, jiffies 4294955520
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc d1edf5a3):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4983 [inline]
-    slab_alloc_node mm/slub.c:5288 [inline]
-    kmem_cache_alloc_node_noprof+0x36f/0x5e0 mm/slub.c:5340
-    __alloc_skb+0x203/0x240 net/core/skbuff.c:660
-    alloc_skb include/linux/skbuff.h:1383 [inline]
-    bt_skb_alloc include/net/bluetooth/bluetooth.h:510 [inline]
-    hci_cmd_sync_alloc+0x30/0x140 net/bluetooth/hci_sync.c:58
-    hci_cmd_sync_add net/bluetooth/hci_sync.c:99 [inline]
-    __hci_cmd_sync_sk+0x84/0x290 net/bluetooth/hci_sync.c:168
-    __hci_cmd_sync_ev+0x3e/0x50 net/bluetooth/hci_sync.c:255
-    send_hci_cmd_sync+0x5e/0xf0 net/bluetooth/mgmt.c:2615
-    hci_cmd_sync_work+0xd5/0x160 net/bluetooth/hci_sync.c:337
-    process_one_work+0x26b/0x620 kernel/workqueue.c:3263
-    process_scheduled_works kernel/workqueue.c:3346 [inline]
-    worker_thread+0x2c4/0x4f0 kernel/workqueue.c:3427
-    kthread+0x15b/0x310 kernel/kthread.c:463
-    ret_from_fork+0x210/0x240 arch/x86/kernel/process.c:158
-    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-BUG: memory leak
-unreferenced object 0xffff88810a34a680 (size 704):
-  comm "kworker/u9:1", pid 5135, jiffies 4294955520
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 4e765d9f):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4983 [inline]
-    slab_alloc_node mm/slub.c:5288 [inline]
-    kmem_cache_alloc_node_noprof+0x36f/0x5e0 mm/slub.c:5340
-    kmalloc_reserve+0xe6/0x180 net/core/skbuff.c:579
-    __alloc_skb+0xd4/0x240 net/core/skbuff.c:670
-    alloc_skb include/linux/skbuff.h:1383 [inline]
-    bt_skb_alloc include/net/bluetooth/bluetooth.h:510 [inline]
-    hci_cmd_sync_alloc+0x30/0x140 net/bluetooth/hci_sync.c:58
-    hci_cmd_sync_add net/bluetooth/hci_sync.c:99 [inline]
-    __hci_cmd_sync_sk+0x84/0x290 net/bluetooth/hci_sync.c:168
-    __hci_cmd_sync_ev+0x3e/0x50 net/bluetooth/hci_sync.c:255
-    send_hci_cmd_sync+0x5e/0xf0 net/bluetooth/mgmt.c:2615
-    hci_cmd_sync_work+0xd5/0x160 net/bluetooth/hci_sync.c:337
-    process_one_work+0x26b/0x620 kernel/workqueue.c:3263
-    process_scheduled_works kernel/workqueue.c:3346 [inline]
-    worker_thread+0x2c4/0x4f0 kernel/workqueue.c:3427
-    kthread+0x15b/0x310 kernel/kthread.c:463
-    ret_from_fork+0x210/0x240 arch/x86/kernel/process.c:158
-    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
-
-
-Tested on:
-
-commit:         23cb64fb Merge tag 'soc-fixes-6.18-3' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13e81a12580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f30cc590c4f6da44
-dashboard link: https://syzkaller.appspot.com/bug?extid=f098d64cc684b8dbaf65
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=10d6f332580000
-
+Rob
