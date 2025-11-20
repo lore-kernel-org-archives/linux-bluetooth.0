@@ -1,43 +1,46 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA0730E859
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E760C340D92
 	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 13:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763646867; cv=none; b=cimIqlGjSUYeBClUMgkLPZTN5Ifc/ik6m1ZjktmLhwT06ZcEKz7LqowzFdhSi6zZMrP+p/GH1G/d6aNJ5IVrlU5MOSXRgs1sGA81PS6LHK2LMhbMPdl6aYBneX4WgPRt6N/iCB7WdPXLBYeySgoFgEn1GpeNIMijTyFyO1b7/x4=
+	t=1763646868; cv=none; b=W8ROvQhjmfPnBD/3VaY6b1qk26rWb11vE7YwFTonU98hOIwbmSstl+7mEeFXkq7BRDLoKV8NvOQ/eK1sOhDjqIlhfeey3pkMMtJa4vd8LdOm9wNwl+P8Fv1iBzyuGEhFWVOO/u2hzTOQbPY1gAVtO7GY0wfDgZk0whwHfO6KHE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763646867; c=relaxed/simple;
-	bh=OOLwT2DX6DCwo6JrsjYgmZGgCd7DQ08V141Slr4fx84=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nav5S8aemJNHP9DoGTiJ59PXFCwP3rFhrLbn9DdCoBkrZbdTXEItNAWT88JBbBOmgx+c6G6LWfMX1/cB6GnwBYTqJP7RJwYJtmzroYeNxVLxyHhoqEk22z99/xhcKjN5zEdbTtl5h7bfU/FfCJu/g4TR8q2Bu6bkdiqWPhaaQGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=We52Gec0; arc=none smtp.client-ip=148.251.105.195
+	s=arc-20240116; t=1763646868; c=relaxed/simple;
+	bh=Q4H0Tk/55VfPsONuGFHcUnJXZwS9+bOzJGrSZGSfqqc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LyvS1clAyiJZ42k6NvViJDMM31JVVmSDOVJ8PQZMIUDF309FOPo/ct8POfog43djFQaaVoIn342CAQnmDHCq13mnZabyk+oHBmLQalDo2zdwp+gEOul4ZUVDgIUvn6l/ES6KfEdl/Kpj3RRl52LoGQ8FFoh2L3jnFNVKp2965wE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=AW0knNBP; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="We52Gec0"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="AW0knNBP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1763646863;
-	bh=OOLwT2DX6DCwo6JrsjYgmZGgCd7DQ08V141Slr4fx84=;
-	h=From:To:Subject:Date:From;
-	b=We52Gec0/SzIuhmWdH5z6nzJlpSo3IprRQ5tw56i68zPIPgyAIqYACAwUp+s+XQlC
-	 KdfXnEEpVBQI99QSm6acjn3xX8oUSOqKS5UNOyesih+3yDRZjblQ8sq7+NtpAztcj/
-	 wY+qO+FcfAnxb1k066xq+Kqjr+v7sAXFeviMcksqrKsWSSgitCqY2MGFKlZ6xq7+mZ
-	 jNitbgxQkZ8HVwpgd7OSBKByPZKmi29qsGeDW+m92MG5NKddmHXWRHBa7fqgDr9D4I
-	 Tp+jaYtIVLtBBBq7VddydpAZ40oLdJDpd1dZqFSLEmn7VQFrwEgibq8uUNeCy5srGp
-	 4Ob1omYJKn4FA==
+	s=mail; t=1763646864;
+	bh=Q4H0Tk/55VfPsONuGFHcUnJXZwS9+bOzJGrSZGSfqqc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=AW0knNBPWy3oNUzAGXp3wm5FatXkxfjzJ5nWqGj/covX4SuYZS5JngHwZwP5xvK6Q
+	 UaIlKi/IS5lhdFuACqbz+flDJgmtG0xVmTNT0f+41uMrHueq3FugB0a0b/gHgijxCH
+	 nRR0tVDOje/f0fwVpxwyHJQ66upUwegetIqFE4opiafJJ/1EHhEYQZvk1PBBKlNyLG
+	 jvm5YPor8ELh4jNxKPs4kmH5mQ7Cq9RD8U+LwEsFANnADUKhteh0a0fsfTwowrnecf
+	 puCv2QrygWVbHm/bnv6kB1CTk6YsR5zbc5CFyoOl9F4XFlWjzCIqqFt1av13tTxqXA
+	 84NYSLfeh9vjg==
 Received: from fdanis-ThinkPad-X1.. (2A02-8428-aF44-1001-ec76-9D0e-ad8c-585A.rev.sfr.net [IPv6:2a02:8428:af44:1001:ec76:9d0e:ad8c:585a])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 6701F17E0222
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 14:54:23 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1044917E130A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 14:54:24 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/5] doc: Add new telephony related profiles interfaces
-Date: Thu, 20 Nov 2025 14:54:12 +0100
-Message-ID: <20251120135417.820220-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ 3/5] audio/hfp-hf: Add skeleton for HFP profile
+Date: Thu, 20 Nov 2025 14:54:14 +0100
+Message-ID: <20251120135417.820220-3-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251120135417.820220-1-frederic.danis@collabora.com>
+References: <20251120135417.820220-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -47,422 +50,270 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-These are interfaces are meant to be generic to the telephony related
-"headset" profiles like HSP HS, HFP HF, and CCP.
 ---
- Makefile.am                 |   4 +
- doc/org.bluez.Call.rst      | 140 ++++++++++++++++++++++
- doc/org.bluez.Telephony.rst | 225 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 369 insertions(+)
- create mode 100644 doc/org.bluez.Call.rst
- create mode 100644 doc/org.bluez.Telephony.rst
+ Makefile.plugins        |   5 +
+ configure.ac            |   7 ++
+ profiles/audio/hfp-hf.c | 220 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 232 insertions(+)
+ create mode 100644 profiles/audio/hfp-hf.c
 
-diff --git a/Makefile.am b/Makefile.am
-index 9f06d60e6..6167f6373 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -389,6 +389,7 @@ man_MANS += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
- 		doc/org.bluez.obex.Message.5 \
- 		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5 \
- 		doc/org.bluez.obex.Image.5
-+man_MANS += doc/org.bluez.Telephony.5 doc/org.bluez.Call.5
+diff --git a/Makefile.plugins b/Makefile.plugins
+index bae4363d0..66e8033e4 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -150,3 +150,8 @@ if ASHA
+ builtin_modules += asha
+ builtin_sources += profiles/audio/asha.h profiles/audio/asha.c
  endif
- manual_pages += src/bluetoothd.8
- manual_pages += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7 \
-@@ -425,6 +426,7 @@ manual_pages += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
- 		doc/org.bluez.obex.Message.5 \
- 		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5 \
- 		doc/org.bluez.obex.Image.5
-+manual_pages += doc/org.bluez.Telephony.5 doc/org.bluez.Call.5
- 
- EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
- 			src/main.conf profiles/network/network.conf \
-@@ -509,6 +511,8 @@ EXTRA_DIST += doc/org.bluez.obex.Client.rst doc/org.bluez.obex.Session.rst \
- 		doc/org.bluez.obex.AgentManager.rst doc/org.bluez.obex.Agent.rst \
- 		doc/org.bluez.obex.Image.rst
- 
-+EXTRA_DIST += doc/org.bluez.Telephony.rst doc/org.bluez.Call.rst
 +
- EXTRA_DIST += doc/pics-opp.txt doc/pixit-opp.txt \
- 		doc/pts-opp.txt
++if HFP
++builtin_modules += hfp
++builtin_sources += profiles/audio/telephony.c profiles/audio/hfp-hf.c
++endif
+diff --git a/configure.ac b/configure.ac
+index ebb01c4ae..0e5cdcb42 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -234,6 +234,13 @@ if test "${enable_asha}" != "no"; then
+ 	AC_DEFINE(HAVE_ASHA, 1, [Define to 1 if you have ASHA support.])
+ fi
  
-diff --git a/doc/org.bluez.Call.rst b/doc/org.bluez.Call.rst
++AC_ARG_ENABLE(hfp, AS_HELP_STRING([--disable-hfp],
++		[disable HFP support]), [enable_hfp=${enableval}])
++AM_CONDITIONAL(HFP, test "${enable_hfp}" != "no")
++if test "${enable_hfp}" != "no"; then
++	AC_DEFINE(HAVE_HFP, 1, [Define to 1 if you have HFP support.])
++fi
++
+ AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-tools],
+ 		[disable Bluetooth tools]), [enable_tools=${enableval}])
+ AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
+diff --git a/profiles/audio/hfp-hf.c b/profiles/audio/hfp-hf.c
 new file mode 100644
-index 000000000..8825e0f17
+index 000000000..5375168cf
 --- /dev/null
-+++ b/doc/org.bluez.Call.rst
-@@ -0,0 +1,140 @@
-+===============
-+org.bluez.Call1
-+===============
-+
-+--------------------------------------------
-+BlueZ D-Bus Telephony Call API documentation
-+--------------------------------------------
-+
-+:Version: BlueZ
-+:Date: May 2025
-+:Manual section: 5
-+:Manual group: Linux System Administration
-+
-+Interface
-+=========
-+
-+:Service:	org.bluez
-+:Interface:	org.bluez.Call1 [experimental]
-+:Object path:	[variable prefix]/{hci0,hci1,...}/dev_{BDADDR}/telephony#/call#
-+
-+Methods
-+-------
-+
-+void Answer()
-+`````````````
-+
-+Answers an incoming call. Only valid if the state of the call is "incoming".
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+void Hangup()
-+`````````````
-+
-+Hangs up the call.
-+
-+For an incoming call, the call is hung up using ATH or equivalent. For a
-+waiting call, the remote party is notified by using the User Determined User
-+Busy (UDUB) condition. This is generally implemented using CHLD=0.
-+
-+Please note that the GSM specification does not allow the release of a held
-+call when a waiting call exists. This is because 27.007 allows CHLD=1X to
-+operate only on active calls. Hence a held call cannot be hung up without
-+affecting the state of the incoming call (e.g. using other CHLD alternatives).
-+Most manufacturers provide vendor extensions that do allow the state of the
-+held call to be modified using CHLD=1X or equivalent. It should be noted that
-+Bluetooth HFP specifies the classic 27.007 behavior and does not allow CHLD=1X
-+to modify the state of held calls.
-+
-+Based on the discussion above, it should also be noted that releasing a
-+particular party of a held multiparty call might not be possible on some
-+implementations. It is recommended for the applications to structure their UI
-+accordingly.
-+
-+NOTE: Releasing active calls does not produce side-effects. That is the state
-+of held or waiting calls is not affected. As an exception, in the case where a
-+single active call and a waiting call are present, releasing the active call
-+will result in the waiting call transitioning to the 'incoming' state.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+Properties
-+----------
-+
-+string LineIdentification [readonly]
-+````````````````````````````````````
-+
-+Contains the Line Identification information returned by the network, if
-+present. For incoming calls this is effectively the CLIP. For outgoing calls
-+this attribute will hold the dialed number, or the COLP if received by the
-+audio gateway.
-+
-+Please note that COLP may be different from the dialed number. A special
-+"withheld" value means the remote party refused to provide caller ID and the
-+"override category" option was not provisioned for the current subscriber.
-+
-+string IncomingLine [readonly, optional]
-+````````````````````````````````````````
-+
-+Contains the Called Line Identification information returned by the network.
-+This is only available for incoming calls and indicates the local subscriber
-+number which was dialed by the remote party. This is useful for subscribers
-+which have a multiple line service with their network provider and would like
-+to know what line the call is coming in on.
-+
-+string Name [readonly]
-+``````````````````````
-+
-+Contains the Name Identification information returned by the network, if
-+present.
-+
-+boolean Multiparty [readonly]
-+`````````````````````````````
-+
-+Contains the indication if the call is part of a multiparty call or not.
-+
-+Notifications if a call becomes part or leaves a multiparty call are sent.
-+
-+string State [readonly]
-+```````````````````````
-+
-+Contains the state of the current call.
-+
-+Possible values:
-+
-+:"active":
-+
-+	The call is active
-+
-+:"held":
-+
-+	The call is on hold
-+
-+:"dialing":
-+
-+	The call is being dialed
-+
-+:"alerting":
-+
-+	The remote party is being alerted
-+
-+:"incoming":
-+
-+	Incoming call in progress
-+
-+:"waiting":
-+
-+	Call is waiting
-+
-+:"response_and_hold":
-+
-+	Incoming call has been set on hold
-+
-+:"disconnected":
-+
-+	No further use of this object is allowed, it will be
-+	destroyed shortly
-diff --git a/doc/org.bluez.Telephony.rst b/doc/org.bluez.Telephony.rst
-new file mode 100644
-index 000000000..a722e2a38
---- /dev/null
-+++ b/doc/org.bluez.Telephony.rst
-@@ -0,0 +1,225 @@
-+====================
-+org.bluez.Telephony1
-+====================
-+
-+-----------------------------------------------------
-+BlueZ D-Bus Telephony Audio Gateway API documentation
-+-----------------------------------------------------
-+
-+:Version: BlueZ
-+:Date: May 2025
-+:Manual section: 5
-+:Manual group: Linux System Administration
-+
-+Interface
-+=========
-+
-+:Service:	org.bluez
-+:Interface:	org.bluez.Telephony1 [experimental]
-+:Object path:	[variable prefix]/{hci0,hci1,...}/dev_{BDADDR}/telephony#
-+
-+Methods
-+-------
-+
-+object Dial(string uri)
-+``````````````````````````
-+
-+The uri is comprised of the URI scheme followed by the Caller ID (this could
-+be a telephone number or username), separated by a colon.
-+
-+Examples of common URI schemes can be found in Internet Assigned Numbers
-+Authority (IANA) URI Schemes:
-+https://iana.org/assignments/uri-schemes/uri-schemes.xhtml
-+
-+This initiates a new outgoing call. Returns the object path to the newly
-+created call.
-+
-+For HFP the URI is "tel:" followed by the telephone number.
-+
-+The telephone number must be a string containing the following characters:
-+`[0-9+*#,ABCD]{1,80}` The character set can contain numbers, `+`, `*`, `#`,
-+`,` and the letters `A` to `D`. Besides this sanity checking no further number
-+validation is performed. It is assumed that the gateway and/or the network
-+will perform further validation.
-+
-+If telephone number is an empty string, it will try to call last dialed number.
-+
-+NOTE: If an active call (single or multiparty) exists, then it is
-+automatically put on hold if the dial procedure is successful.
-+
-+Possible Errors:
-+
-+:org.bluez.Error.InvalidState:
-+:org.bluez.Error.InvalidArguments:
-+:org.bluez.Error.NotSupported:
-+:org.bluez.Error.Failed:
-+
-+void SwapCalls()
-+````````````````
-+
-+Swaps Active and Held calls. The effect of this is that all calls (0 or more
-+including calls in a multi-party conversation) that were Active are now Held,
-+and all calls (0 or more) that were Held are now Active.
-+
-+GSM specification does not allow calls to be swapped in the case where Held,
-+Active and Waiting calls exist. Some modems implement this anyway, thus it is
-+manufacturer specific whether this method will succeed in the case of Held,
-+Active and Waiting calls.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+void ReleaseAndAnswer()
-+```````````````````````
-+
-+Releases currently active call (0 or more) and answers the currently waiting
-+call. Please note that if the current call is a multiparty call, then all
-+parties in the multi-party call will be released.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+void ReleaseAndSwap()
-+`````````````````````
-+
-+Releases currently active call (0 or more) and activates any currently held
-+calls. Please note that if the current call is a multiparty call, then all
-+parties in the multi-party call will be released.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+void HoldAndAnswer()
-+````````````````````
-+
-+Puts the current call (including multi-party calls) on hold and answers the
-+currently waiting call. Calling this function when a user already has a both
-+Active and Held calls is invalid, since in GSM a user can have only a single
-+Held call at a time.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+void HangupAll()
-+````````````````
-+
-+Releases all calls except waiting calls. This includes multiparty calls.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+void HangupActive()
-+```````````````````
-+
-+Releases active calls. This includes multiparty active calls.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+void HangupHeld()
-+`````````````````
-+
-+Releases held calls except waiting calls. This includes multiparty held calls.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+array{object} CreateMultiparty()
-+````````````````````````````````
-+
-+Joins active and held calls together into a multi-party call. If one of the
-+calls is already a multi-party call, then the other call is added to the
-+multiparty conversation. Returns the new list of calls participating in the
-+multiparty call.
-+
-+There can only be one subscriber controlled multi-party call according to the
-+GSM specification.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.Failed
-+
-+void SendTones(string tones)
-+````````````````````````````
-+
-+Sends the DTMF tones to the network. The tones have a fixed duration.
-+Tones can be one of: '0' - '9', '*', '#', 'A', 'B', 'C', 'D'. The last four
-+are typically not used in normal circumstances.
-+
-+Possible Errors:
-+:org.bluez.Error.InvalidState
-+:org.bluez.Error.InvalidArgs
-+:org.bluez.Error.Failed
-+
-+Properties
-+----------
-+
-+string UUID [readonly]
-+``````````````````````
-+
-+UUID of the profile which the Telephony Audio Gateway is for.
-+
-+array{string} SupportedURISchemes [readonly]
-+````````````````````````````````````````````
-+
-+Contains the list of supported URI schemes.
-+
-+string State [readonly]
-+```````````````````````
-+
-+Contains the state of the current connection.
-+
-+Possible values:
-+
-+:"connecting":
-+
-+	RFComm connection in progress
-+
-+:"slc_connecting":
-+
-+	Service Level Connection in progress
-+
-+:"connected":
-+
-+	RFComm and Service Level Connection are connected
-+
-+:"disconnecting":
-+
-+	No further use of this object is allowed, it will be destroyed shortly
-+
-+boolean Service [readonly]
-+``````````````````````````
-+
-+Network service availability.
-+
-+byte Signal [readonly]
-+``````````````````````
-+
-+Network level signal from 0 to 5.
-+
-+boolean Roaming [readonly]
-+``````````````````````````
-+
-+Network roaming usage.
-+
-+byte BattChg [readonly]
-+```````````````````````
-+
-+Battery level from 0 to 5.
-+
-+string OperatorName [readonly, optional]
-+````````````````````````````````````````
-+
-+Operator name
-+
-+boolean InbandRingtone [readonly]
-+`````````````````````````````````
-+
-+In-band Ringtone availability.
++++ b/profiles/audio/hfp-hf.c
+@@ -0,0 +1,220 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *  Copyright © 2025 Collabora Ltd.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++
++#include <stdlib.h>
++#include <stdio.h>
++#include <errno.h>
++#include <limits.h>
++
++#include <stdint.h>
++
++#include <glib.h>
++
++#include "bluetooth/bluetooth.h"
++#include "bluetooth/sdp.h"
++#include "bluetooth/sdp_lib.h"
++#include "bluetooth/uuid.h"
++
++#include "gdbus/gdbus.h"
++
++#include "btio/btio.h"
++#include "src/adapter.h"
++#include "src/btd.h"
++#include "src/dbus-common.h"
++#include "src/device.h"
++#include "src/log.h"
++#include "src/plugin.h"
++#include "src/profile.h"
++#include "src/service.h"
++
++#include "telephony.h"
++
++#define URI	"tel"
++#define URI_PREFIX	URI ":"
++
++struct hfp_device {
++	struct telephony	*telephony;
++	uint16_t		version;
++	GIOChannel		*io;
++};
++
++static void device_destroy(struct hfp_device *dev)
++{
++	DBG("%s", telephony_get_path(dev->telephony));
++
++	if (dev->io) {
++		g_io_channel_unref(dev->io);
++		dev->io = NULL;
++	}
++
++	telephony_unregister_interface(dev->telephony);
++}
++
++static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
++{
++	struct hfp_device *dev = user_data;
++	struct btd_service *service = telephony_get_service(dev->telephony);
++
++	DBG("");
++
++	if (err) {
++		error("%s", err->message);
++		goto failed;
++	}
++
++	g_io_channel_set_close_on_unref(chan, FALSE);
++
++	btd_service_connecting_complete(service, 0);
++
++	return;
++
++failed:
++	g_io_channel_shutdown(chan, TRUE, NULL);
++	device_destroy(dev);
++}
++
++struct telephony_callbacks hfp_callbacks = {
++};
++
++static int hfp_connect(struct btd_service *service)
++{
++	struct hfp_device *dev;
++	struct btd_profile *p;
++	const sdp_record_t *rec;
++	sdp_list_t *list, *protos;
++	sdp_profile_desc_t *desc;
++	int channel;
++	bdaddr_t src, dst;
++	GError *err = NULL;
++
++	DBG("");
++
++	dev = btd_service_get_user_data(service);
++
++	p = btd_service_get_profile(service);
++	rec = btd_device_get_record(telephony_get_device(dev->telephony),
++					p->remote_uuid);
++	if (!rec)
++		return -EIO;
++
++	if (sdp_get_profile_descs(rec, &list) == 0) {
++		desc = list->data;
++		dev->version = desc->version;
++	}
++	sdp_list_free(list, free);
++
++	if (sdp_get_access_protos(rec, &protos) < 0) {
++		error("unable to get access protocols from record");
++		return -EIO;
++	}
++
++	channel = sdp_get_proto_port(protos, RFCOMM_UUID);
++	sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
++	sdp_list_free(protos, NULL);
++	if (channel <= 0) {
++		error("unable to get RFCOMM channel from record");
++		return -EIO;
++	}
++
++	src = telephony_get_src(dev->telephony);
++	dst = telephony_get_dst(dev->telephony);
++	dev->io = bt_io_connect(connect_cb, dev,
++		NULL, &err,
++		BT_IO_OPT_SOURCE_BDADDR, &src,
++		BT_IO_OPT_DEST_BDADDR, &dst,
++		BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++		BT_IO_OPT_CHANNEL, channel,
++		BT_IO_OPT_INVALID);
++	if (dev->io == NULL) {
++		error("unable to start connection");
++		return -EIO;
++	}
++
++	return telephony_register_interface(dev->telephony);
++}
++
++static int hfp_disconnect(struct btd_service *service)
++{
++	DBG("");
++
++	btd_service_disconnecting_complete(service, 0);
++
++	return 0;
++}
++
++static int hfp_probe(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	const char *path = device_get_path(device);
++	struct hfp_device *dev;
++
++	DBG("%s", path);
++
++	dev = g_new0(struct hfp_device, 1);
++	if (!dev)
++		return -EINVAL;
++
++	dev->telephony = telephony_new(service, dev, &hfp_callbacks);
++	btd_service_set_user_data(service, dev);
++	telephony_add_uri_scheme(dev->telephony, URI);
++
++	return 0;
++}
++
++static void hfp_remove(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	const char *path = device_get_path(device);
++	struct hfp_device *dev;
++
++	DBG("%s", path);
++
++	dev = btd_service_get_user_data(service);
++
++	telephony_free(dev->telephony);
++	g_free(dev);
++}
++
++static struct btd_profile hfp_hf_profile = {
++	.name		= "hfp",
++	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++
++	.remote_uuid	= HFP_AG_UUID,
++	.device_probe	= hfp_probe,
++	.device_remove	= hfp_remove,
++
++	.auto_connect	= true,
++	.connect	= hfp_connect,
++	.disconnect	= hfp_disconnect,
++
++	.experimental	= true,
++};
++
++static int hfp_init(void)
++{
++	btd_profile_register(&hfp_hf_profile);
++
++	return 0;
++}
++
++static void hfp_exit(void)
++{
++	btd_profile_unregister(&hfp_hf_profile);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(hfp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++		hfp_init, hfp_exit)
 -- 
 2.43.0
 
