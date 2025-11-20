@@ -1,152 +1,123 @@
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1489D36E9B5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 17:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E4E33C1A8;
+	Thu, 20 Nov 2025 17:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763658325; cv=none; b=ulGXMQeHueOk2sivqe6lYiS+L5M1L54YO+i4/mrZnwtEOWM904dBSYiil6W8xqBu7tCqQjQsInwmT/gEWiK4milfUw6u3JDOw/kzeHorA1I8hfrhJC03Pqc/5yIq1WAsVDruj9h7Par7vvF+47tyAQFiS8QnBbPQUTpnGKMK8NE=
+	t=1763658351; cv=none; b=guM4ZD3DaUYI3cHLmUQ4sZkuDjZ1YXODlpxYkFBir3xxV2CBpVHhsb/tH+gKmtaNMpOEEpgd8Zz20Lrr5cvGDrJ5s7xL/2LvMm/QHYd264lnpBXFTId7LEtPe1xAG4OR4E7ppJRZ0KqphlcUHchDdvu87FXfwjYZ5MHyQYkY0/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763658325; c=relaxed/simple;
-	bh=MzMYZuRf7e3I/lN8rut0kGmp7FJthYo9q52MMR93Wms=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Xo0xElrGv8zBVw6HuN28SPgti1o5bApKn2TJRAcs8TEudlSusz07uMt4y+O43MmH/+yL3zggoo+zTaXSk6hQJd2DB1MCXW33lZ4uOzkLf2xD9u+vLgnaTs6Jd37uSaNCXSs1aE0Q3q4YUWVVD+Kt9a3FLS8z0XXYd92YDElulaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JLOtB1hQ; arc=none smtp.client-ip=209.85.222.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JLOtB1hQ"
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-93c6628c266so69977241.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 09:05:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763658320; x=1764263120; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PPhZrv6lnrdsREdP3aEGP30G4E/QjtIOfFu2pFZ+Zsw=;
-        b=JLOtB1hQY4u5+T6QYPF6rTkipq4w7q/2LTTMfv3F+DPZfFQcXrHogP9lezsriCdejC
-         IO4JReR/oKiukJqNOJXcBN7ztxAiAwsm6/YplbaGb3CBW1yIV9JfnK0KyGCCvqJp2mXj
-         mRvhCEUH9VUUiZFqYn4bejm2zBCNWAHlTrTbG7iDcWb9sKtFYN/A24ngItXLh71Mkd9g
-         ogE7ZkvLridb14OcqcGZ2JWZExCEwBxVDo771OheRMp5UZv+M3IdXRlAjEQMhaAZB3e8
-         gZOE4fc2Cl0d+dki+mOoEYex4Va212QNakTO1Ji+TaT5iQegqLHx4iBY20R8eTinM6C3
-         jF4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763658320; x=1764263120;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PPhZrv6lnrdsREdP3aEGP30G4E/QjtIOfFu2pFZ+Zsw=;
-        b=O4ejrgqzO1/TkJdepo4egXWUNUJlEir1HEeohDhoVFdlvA8WIZBCSTot+IXQHpEDEe
-         92z7NaJw/ha5uUzGxmJ4QuEOj2DplNKJNhF4CzCP5CMnTRFJEHlEi1CDxbB/+s9LE76n
-         1t71uHSgjLGjkeScsdch6pSGC/n7LlC6jFhyCNdxddN1NxxS5X3Xm/zpQGuv1CNWI8mK
-         eAC4GWtFyoP2grCIoVcYvLaAHRTvCNrA3ceqiFLmsRvEsRShuAxSwuZ61RMMRwHZ1VD4
-         zPaDJA2wpMRcFbSokL+0VA/36yynBNEVUXlrtk9uVc9OdeLs4BOYO2rsOhf4cDWo8EBy
-         d76Q==
-X-Gm-Message-State: AOJu0Yzl7n8KFg0Xbcb3iVwELTCit1IZgSruYg+BzHlxfkvqjDLmUFBQ
-	U+fvMMSs9xSxJad2/lN6wMaXtZQNTSOpD/l6S+N2lebk0Q6ldp6fGOkTmP3DBw==
-X-Gm-Gg: ASbGnctqlu+Zrc3EEkiVHIqOxrO0PLLeL/eM7Ji/xo8Oru4VTXD4TPHUW9rlyY5mQr4
-	sBDHh0WfOWOGn9AFCNxCNbAuJEH3wTGgLhzL98qk+v6jX84pT47ElsrLytT7VqRXCpCeu2TPHwU
-	uU7r7fO5YYjmgfZvoso6S1Ws4DI1AKp6VQa7LIBE9ivtwfNQNuBpwzKEoWqsSvmYKHBDWv1eXc+
-	3nL0QIeTWO+qTUI7xnauKnY15aFFS0cVqh6M3v62juCs73hVXOTSn33eQRNrbK6ktMaTpmSaWbm
-	Ccw6IYP0kpzUGoQWXcOXWuIi2avNPNCz4pxuYd8NBPjYZd/qFUih2QYOfJiCXojCS/VeknOJZuV
-	q1j4OURSEQ4MxycmvwZizFrawn/PQQbHNTs+EqWomn9Y6X/8Sb/Gz+Uvq0POjtUQtr4X1+HgWoh
-	7P923A63uwucbjghibZ3/5NczQ
-X-Google-Smtp-Source: AGHT+IF9ArAAoJxbzjbi8zOg6VA8+IHSWZf3zD5LHTb0rYV/lq5WXsKbM0543jwun//IfImoe40MSQ==
-X-Received: by 2002:a05:6122:311b:b0:556:745f:6a06 with SMTP id 71dfb90a1353d-55b8b78fb12mr63137e0c.10.1763658318286;
-        Thu, 20 Nov 2025 09:05:18 -0800 (PST)
-Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-55b7f7763dfsm1193093e0c.13.2025.11.20.09.05.14
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 09:05:16 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: SMP: Fix not generating mackey and ltk when repairing
-Date: Thu, 20 Nov 2025 12:05:08 -0500
-Message-ID: <20251120170508.30581-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.1
+	s=arc-20240116; t=1763658351; c=relaxed/simple;
+	bh=zOzBlVRGWjXj/eLJL63dPaCE0EqtsPjRY+ol2qCqdbk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CaXckNd1gg+xAQixNHJFIW9e4pII/RDx4t2R3r9+DdabBx+ZIngcCTR9EdbmdnTrWKU6wEjJtfCtRuiSheisJbiQiWzG+R5F8LQNv64XbGkyEZMwc9qMW3PA5cnJdkSmkTNVMxjTN4QEQvIBUNdNdDVXsU69DAaLn7f7qhhWLwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CF5FF61CC3FE1;
+	Thu, 20 Nov 2025 18:04:36 +0100 (CET)
+Message-ID: <be1cbae6-f868-4939-a1c1-fd66e2c6b23e@molgen.mpg.de>
+Date: Thu, 20 Nov 2025 18:04:32 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] Bluetooth: btusb: mediatek: Avoid
+ btusb_mtk_claim_iso_intf() NULL deref
+To: Douglas Anderson <dianders@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Thorsten Leemhuis <regressions@leemhuis.info>, regressions@lists.linux.dev,
+ incogcyberpunk@proton.me, johan.hedberg@gmail.com, sean.wang@mediatek.com,
+ stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mediatek@lists.infradead.org
+References: <20251120081227.v3.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251120081227.v3.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear Douglas,
 
-The change eed467b517e8 ("Bluetooth: fix passkey uninitialized when used")
-introduced a goto that bypasses the creation of temporary mackey and ltk
-which are later used by the likes of DHKey Check step.
 
-Later ffee202a78c2 ("Bluetooth: Always request for user confirmation for
-Just Works (LE SC)") which means confirm_hint is always set in case
-JUST_WORKS so the branch checking for an existing LTK becomes pointless
-as confirm_hint will always be set, so this just merge both cases of
-malicious or legitimate devices to be confirmed before continuing with the
-pairing procedure.
+Thank you for your patch.
 
-Link: https://github.com/bluez/bluez/issues/1622
-Fixes: eed467b517e8 ("Bluetooth: fix passkey uninitialized when used")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/smp.c | 31 +++++++------------------------
- 1 file changed, 7 insertions(+), 24 deletions(-)
+Am 20.11.25 um 17:12 schrieb Douglas Anderson:
+> In btusb_mtk_setup(), we set `btmtk_data->isopkt_intf` to:
+>    usb_ifnum_to_if(data->udev, MTK_ISO_IFNUM)
+> 
+> That function can return NULL in some cases. Even when it returns
+> NULL, though, we still go on to call btusb_mtk_claim_iso_intf().
+> 
+> As of commit e9087e828827 ("Bluetooth: btusb: mediatek: Add locks for
+> usb_driver_claim_interface()"), calling btusb_mtk_claim_iso_intf()
+> when `btmtk_data->isopkt_intf` is NULL will cause a crash because
+> we'll end up passing a bad pointer to device_lock(). Prior to that
+> commit we'd pass the NULL pointer directly to
+> usb_driver_claim_interface() which would detect it and return an
+> error, which was handled.
+> 
+> Resolve the crash in btusb_mtk_claim_iso_intf() by adding a NULL check
+> at the start of the function. This makes the code handle a NULL
+> `btmtk_data->isopkt_intf` the same way it did before the problematic
+> commit (just with a slight change to the error message printed).
+> 
+> Reported-by: IncogCyberpunk <incogcyberpunk@proton.me>
+> Closes: http://lore.kernel.org/r/a380d061-479e-4713-bddd-1d6571ca7e86@leemhuis.info
+> Fixes: e9087e828827 ("Bluetooth: btusb: mediatek: Add locks for usb_driver_claim_interface()")
+> Cc: stable@vger.kernel.org
+> Tested-by: IncogCyberpunk <incogcyberpunk@proton.me>
+> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+> ---
+> 
+> Changes in v3:
+> - Added Cc to stable.
+> - Added IncogCyberpunk Tested-by tag.
+> - v2: https://patch.msgid.link/20251119092641.v2.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid
+> 
+> Changes in v2:
+> - Rebase atop commit 529ac8e706c3 ("Bluetooth: ... mtk iso interface")
+> - v1: https://patch.msgid.link/20251119085354.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid
+> 
+>   drivers/bluetooth/btusb.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index fcc62e2fb641..683ac02e964b 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2751,6 +2751,11 @@ static void btusb_mtk_claim_iso_intf(struct btusb_data *data)
+>   	if (!btmtk_data)
+>   		return;
+>   
+> +	if (!btmtk_data->isopkt_intf) {
+> +		bt_dev_err(data->hdev, "Can't claim NULL iso interface");
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 45512b2ba951..b9196cefe68a 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -2136,7 +2136,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 	struct smp_chan *smp = chan->data;
- 	struct hci_conn *hcon = conn->hcon;
- 	u8 *pkax, *pkbx, *na, *nb, confirm_hint;
--	u32 passkey;
-+	u32 passkey = 0;
- 	int err;
- 
- 	bt_dev_dbg(hcon->hdev, "conn %p", conn);
-@@ -2188,24 +2188,6 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
- 			     smp->prnd);
- 		SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
--
--		/* Only Just-Works pairing requires extra checks */
--		if (smp->method != JUST_WORKS)
--			goto mackey_and_ltk;
--
--		/* If there already exists long term key in local host, leave
--		 * the decision to user space since the remote device could
--		 * be legitimate or malicious.
--		 */
--		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
--				 hcon->role)) {
--			/* Set passkey to 0. The value can be any number since
--			 * it'll be ignored anyway.
--			 */
--			passkey = 0;
--			confirm_hint = 1;
--			goto confirm;
--		}
- 	}
- 
- mackey_and_ltk:
-@@ -2226,11 +2208,12 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (err)
- 		return SMP_UNSPECIFIED;
- 
--	confirm_hint = 0;
--
--confirm:
--	if (smp->method == JUST_WORKS)
--		confirm_hint = 1;
-+	/* Always require user confirmation for Just-Works pairing to prevent
-+	 * impersonation attacks, or in case of a legitimate device that is
-+	 * repairing use the confirmation to as acknowledgment to proceed with
-+	 * the creation of new keys.
-+	 */
-+	confirm_hint = smp->method == JUST_WORKS ? 1 : 0;
- 
- 	err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst, hcon->type,
- 					hcon->dst_type, passkey, confirm_hint);
--- 
-2.51.1
+As an error is printed now, what should be done about? Do drivers need 
+fixing? Is it broken hardware?
 
+> +		return;
+> +	}
+> +
+>   	/*
+>   	 * The function usb_driver_claim_interface() is documented to need
+>   	 * locks held if it's not called from a probe routine. The code here
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
