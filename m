@@ -1,157 +1,89 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD7F36C598
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 17:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6A41DA62E;
+	Thu, 20 Nov 2025 18:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763658815; cv=none; b=TXOsJIg6IZnZgE7m0lRV6TpGEmrz5FSSQwpufo6GEhhETTK6cdP/rsCFVa06zEO48k+WZEMYnTTTqnih6+nWOLltNJyGiv7qY0jNYz8OLaTXrp237BPWmSvhXLiN9o6edUcJQmr9PdxcDzN9zUktpH+yGDWZlRjLOQINQfOkbIc=
+	t=1763664642; cv=none; b=mYWtEB0gyHOH3ADKjfniiNspMgSXF9R14Icr3gRyD/bemLvD5z3SlMJGBWNX+zlEKNaKoqKU/akDHnmeH0pbKhDPoku9yYcQVoYZM5Dnncn9lMfi18JrcgozjaAvQBYhEs4aaw9UbmUPLMDCbMiGE2VJEITiXCMxpnFaJMCduA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763658815; c=relaxed/simple;
-	bh=dA+X3frohUmiN42sQXCsXtWK/UJo0Tcfbir9/CzOXlA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fZuxON42BLF4ihu9IV09iyWVQKWLODyddCNMYF/+KuFzggi+VNBnE9K8u2H88f4ZJKJsAbGFdeFEbvcLel7klHxDNDlyyIsqcg0H+p43c5TiNVlUbMBPjQreYmemx66eTFcv9I+Dygzn6VLkz/F0eW6Tdzos+Ed6Zx+YtjiJXXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=B0IPZ+bE; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1763664642; c=relaxed/simple;
+	bh=YWC2QaLQIZnbvvKPn+rk+SMxZpvA1t+FyR0kuqU02KA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LJQC4WpwSBPOe3gnaeg79/AhGnbKMRRN/Z8nrHzhc8gx9XMn+fGRd0GoI4eUgs8KB5oj8Ck4jolxkwVFfs24f4VgQ4Z94IpAg65712DcH0YDRHuVplr8JGptpfHNxnV8Z+x3wmEPW/VQNQjFeiRyGq1KzBErd8dOSiNQHVuja2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLpIh82A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="B0IPZ+bE"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b7291af7190so172266466b.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 09:13:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1763658801; x=1764263601; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=71+jWtBg7d1iYRAZRUfunCs8pFBPFzAnVW06bSqsOgk=;
-        b=B0IPZ+bEOJBe9qbZc8/hzmMYp7upSLg7MTHv6CKgsB78eF/SzR7TLR9cw16aRnLSoz
-         qUKeI3wBxuE7nQFAOuw8Fr6rffu14Ok2DmYeTNzIIYeTZ/aG/KVFWjlEYFGIL6LTaBRW
-         bXnPliLh/rHYdSlv82A0T4Jr2pC49T2QphR3E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763658801; x=1764263601;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=71+jWtBg7d1iYRAZRUfunCs8pFBPFzAnVW06bSqsOgk=;
-        b=j1X2vcdnVBWXTSDmQ5k6IVZ2tL1bVlbUq0BiJMgP9BLGdkoe2onhATsSKXXXLfFD3V
-         ET1EXs1LD0M7TwFOzgeYSc1FYs3Lo+tkI8HeUfAvWfUOoMiytfLw+PADgWI4jPBvLGXq
-         jxy2VvHwSzAiO5PTTrjXblhsjPwqcge6WrFKw+zbi1QHox+EPjmCjWxpW5IrB3H29yzI
-         m4TgDuuAv0SqlB1WXaFfzJC2/8xOHb4+u7SxRcgctrHFNXSlHcHedtgRi2RU2iaClbaf
-         iAcdfBjMYQXhuqAcLwwFouYeNPru8BvHahCstuMRla7UHFTJvRDkPT/JDqINaYgQupSs
-         qThQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxU4sVvceoyBgGFg7ODVc3urStdrTmWDUzlzNhBBuW27Znr2jiOVL+4E4fjEfZiIt1s+v3XOZvTM/GRpWB4Ho=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTvVi8/WvPe3UDcMCPj0mVZOdJUEENxVPqefhr+b88KpfKWuup
-	Vtbful5SW5WMViCzu9YiajMYsVh+s2Jixt9LskU1FHuqeYqP+K4M5Gg/gMIE0UD24JKANlg9VRn
-	1mx2IZccc
-X-Gm-Gg: ASbGnctZ+Bzc4pC8411rZjWQJ+hJdreDDjJ6tBlgTQGirSwLDlhpzyfuAjpDHo8sBRt
-	JOBkiPINfmdmB2nXIbLbhc9185tjo1/VVtEOpMOtMTHLOWcjsnuu9WyyLA7Eypz3gYzg9xNLQdx
-	6qUPWUDEC1c19m8BdQT8styFPk/9q0Bv+YCie1DI/oC597+gR5q8JfsMs7kqR+9zGahy/H+ZFr6
-	R3PZhgjh2eZxSFM1DN0GFUjtChi7/aQRgBgoLVgT7RiOVvZ1x724YhvienGWEye9rzo5cjVHIOF
-	7MVN7jnjXwNodPkt8R+17042OYacfFb3kYv/xe8Ivsd54MWAkDy97TMdL9rQuYOJljmsZWfK/uk
-	Nl8qXOFtq3UZjccpTUMo9KH1aooCliB26u/eDENs23nDnKdmo99J8Aw2Xfh1mY4/Q40nWCbSDYc
-	v0K72qdJ3oLpc8hXrTxSLEKgMTEeeCQ1eFCdcWOhh9Y8PQheu9TA==
-X-Google-Smtp-Source: AGHT+IFFpOu8p2zO5IKKz4X8+mGr5dLQfKaVj/a3SixblLiOHnfHIVg3ahrbumStFeDsI3+Vaeh45Q==
-X-Received: by 2002:a17:906:7314:b0:b43:b7ec:b8a1 with SMTP id a640c23a62f3a-b76587b2aa2mr307710766b.24.1763658800921;
-        Thu, 20 Nov 2025 09:13:20 -0800 (PST)
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com. [209.85.218.49])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b76550512d2sm247983866b.67.2025.11.20.09.13.19
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 09:13:19 -0800 (PST)
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b73161849e1so299559266b.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 09:13:19 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV+d2TH51LZ6IcLFHMSOE58GP+MPVSX5N9gBlhXXTE9O5GYKKJaqPE02SZqfeiTKkG0xNYkFn2Tw1UNYH8c3lo=@vger.kernel.org
-X-Received: by 2002:a17:907:84a:b0:b72:5e29:5084 with SMTP id
- a640c23a62f3a-b765869343emr280912466b.4.1763658799257; Thu, 20 Nov 2025
- 09:13:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLpIh82A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF406C116C6;
+	Thu, 20 Nov 2025 18:50:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763664641;
+	bh=YWC2QaLQIZnbvvKPn+rk+SMxZpvA1t+FyR0kuqU02KA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lLpIh82ApTKkcPa5DAFGjUR3FHxD+gzl/2/tjY9sFKwRGaXOhouiGSEOwvENQ6ddO
+	 BC6shW7HOkL81jFMqBcTkEfUEmi36F0Lwmd1kYc8hpvbPI49PtqhIkZkVTRjtL40jR
+	 VsR8eYHqfWeWZb6B5Lzhq+BtrM+gY6Z7nn+1tt2RjsKm0p6KDOK5U6mVH1wfz8J6qv
+	 69Lva35wffUJrAcoQJEkFRdKyDnJnepkJlYhYjsK4lX33lFHbK/EY3gr3KNals1s6J
+	 2f2GK06S56j108BVMotqoybEYjmoXradFsnthBCeiBWjEN0oj7uwfY7wXMT6D8IJ6V
+	 kiT3dQrEiPi3A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F663A40FE6;
+	Thu, 20 Nov 2025 18:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251120081227.v3.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid>
- <be1cbae6-f868-4939-a1c1-fd66e2c6b23e@molgen.mpg.de>
-In-Reply-To: <be1cbae6-f868-4939-a1c1-fd66e2c6b23e@molgen.mpg.de>
-From: Doug Anderson <dianders@chromium.org>
-Date: Thu, 20 Nov 2025 09:13:07 -0800
-X-Gmail-Original-Message-ID: <CAD=FV=W1D7ksbS-q1c6cHQSxx3=Z5yfC8duiBGh8S01NhLPLUg@mail.gmail.com>
-X-Gm-Features: AWmQ_bk3aT3ZuUmLknvARxMmblGOEsNctHWpwZyyDwMRW7H291WIp2zvCdFNcjo
-Message-ID: <CAD=FV=W1D7ksbS-q1c6cHQSxx3=Z5yfC8duiBGh8S01NhLPLUg@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: btusb: mediatek: Avoid btusb_mtk_claim_iso_intf()
- NULL deref
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Thorsten Leemhuis <regressions@leemhuis.info>, regressions@lists.linux.dev, 
-	incogcyberpunk@proton.me, johan.hedberg@gmail.com, sean.wang@mediatek.com, 
-	stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] Bluetooth: btusb: mediatek: Avoid
+ btusb_mtk_claim_iso_intf() NULL deref
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176366460701.1748676.511972373877694762.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Nov 2025 18:50:07 +0000
+References: 
+ <20251120081227.v3.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid>
+In-Reply-To: 
+ <20251120081227.v3.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid>
+To: Doug Anderson <dianders@chromium.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, regressions@leemhuis.info,
+ regressions@lists.linux.dev, incogcyberpunk@proton.me,
+ johan.hedberg@gmail.com, sean.wang@mediatek.com, stable@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
 
-Hi,
+Hello:
 
-On Thu, Nov 20, 2025 at 9:04=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de>=
- wrote:
->
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index fcc62e2fb641..683ac02e964b 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -2751,6 +2751,11 @@ static void btusb_mtk_claim_iso_intf(struct btus=
-b_data *data)
-> >       if (!btmtk_data)
-> >               return;
-> >
-> > +     if (!btmtk_data->isopkt_intf) {
-> > +             bt_dev_err(data->hdev, "Can't claim NULL iso interface");
->
-> As an error is printed now,
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-An error was also printed before commit e9087e828827 ("Bluetooth:
-btusb: mediatek: Add locks for usb_driver_claim_interface()") too, it
-was just a different error message. Previously the NULL would have
-been noticed by usb_driver_claim_interface(), which would have
-returned -ENODEV. That error would have been noticed and the message
-printed would have been:
+On Thu, 20 Nov 2025 08:12:28 -0800 you wrote:
+> In btusb_mtk_setup(), we set `btmtk_data->isopkt_intf` to:
+>   usb_ifnum_to_if(data->udev, MTK_ISO_IFNUM)
+> 
+> That function can return NULL in some cases. Even when it returns
+> NULL, though, we still go on to call btusb_mtk_claim_iso_intf().
+> 
+> As of commit e9087e828827 ("Bluetooth: btusb: mediatek: Add locks for
+> usb_driver_claim_interface()"), calling btusb_mtk_claim_iso_intf()
+> when `btmtk_data->isopkt_intf` is NULL will cause a crash because
+> we'll end up passing a bad pointer to device_lock(). Prior to that
+> commit we'd pass the NULL pointer directly to
+> usb_driver_claim_interface() which would detect it and return an
+> error, which was handled.
+> 
+> [...]
 
-Failed to claim iso interface: -19
+Here is the summary with links:
+  - [v3] Bluetooth: btusb: mediatek: Avoid btusb_mtk_claim_iso_intf() NULL deref
+    https://git.kernel.org/bluetooth/bluetooth-next/c/dd6dda907d09
 
-So that error is merely changed into:
-
-Can't claim NULL iso interface
-
-> what should be done about? Do drivers need
-> fixing? Is it broken hardware?
-
-Personally, I have no idea. I was mostly trying to get the regression
-fixed and, after looking at the code, I was convinced that this would
-get us back to working at least as well as we did before commit
-e9087e828827 ("Bluetooth: btusb: mediatek: Add locks for
-usb_driver_claim_interface()"), plus we'd still have the device_lock()
-in place to avoid the problems I noticed earlier. It sounds as if,
-even with the error printed, things were working well enough for
-IncogCyberpunk.
-
-If someone wants to analyze how / why `btmtk_data->isopkt_intf` would
-be NULL in this case and if we should do something better to handle
-it, I'd certainly support it!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-> > +             return;
-> > +     }
-> > +
-> >       /*
-> >        * The function usb_driver_claim_interface() is documented to nee=
-d
-> >        * locks held if it's not called from a probe routine. The code h=
-ere
->
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-Thanks!
-
--Doug
