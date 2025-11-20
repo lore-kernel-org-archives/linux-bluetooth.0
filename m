@@ -1,123 +1,157 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E4E33C1A8;
-	Thu, 20 Nov 2025 17:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD7F36C598
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 17:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763658351; cv=none; b=guM4ZD3DaUYI3cHLmUQ4sZkuDjZ1YXODlpxYkFBir3xxV2CBpVHhsb/tH+gKmtaNMpOEEpgd8Zz20Lrr5cvGDrJ5s7xL/2LvMm/QHYd264lnpBXFTId7LEtPe1xAG4OR4E7ppJRZ0KqphlcUHchDdvu87FXfwjYZ5MHyQYkY0/U=
+	t=1763658815; cv=none; b=TXOsJIg6IZnZgE7m0lRV6TpGEmrz5FSSQwpufo6GEhhETTK6cdP/rsCFVa06zEO48k+WZEMYnTTTqnih6+nWOLltNJyGiv7qY0jNYz8OLaTXrp237BPWmSvhXLiN9o6edUcJQmr9PdxcDzN9zUktpH+yGDWZlRjLOQINQfOkbIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763658351; c=relaxed/simple;
-	bh=zOzBlVRGWjXj/eLJL63dPaCE0EqtsPjRY+ol2qCqdbk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CaXckNd1gg+xAQixNHJFIW9e4pII/RDx4t2R3r9+DdabBx+ZIngcCTR9EdbmdnTrWKU6wEjJtfCtRuiSheisJbiQiWzG+R5F8LQNv64XbGkyEZMwc9qMW3PA5cnJdkSmkTNVMxjTN4QEQvIBUNdNdDVXsU69DAaLn7f7qhhWLwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CF5FF61CC3FE1;
-	Thu, 20 Nov 2025 18:04:36 +0100 (CET)
-Message-ID: <be1cbae6-f868-4939-a1c1-fd66e2c6b23e@molgen.mpg.de>
-Date: Thu, 20 Nov 2025 18:04:32 +0100
+	s=arc-20240116; t=1763658815; c=relaxed/simple;
+	bh=dA+X3frohUmiN42sQXCsXtWK/UJo0Tcfbir9/CzOXlA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fZuxON42BLF4ihu9IV09iyWVQKWLODyddCNMYF/+KuFzggi+VNBnE9K8u2H88f4ZJKJsAbGFdeFEbvcLel7klHxDNDlyyIsqcg0H+p43c5TiNVlUbMBPjQreYmemx66eTFcv9I+Dygzn6VLkz/F0eW6Tdzos+Ed6Zx+YtjiJXXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=B0IPZ+bE; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="B0IPZ+bE"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b7291af7190so172266466b.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 09:13:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1763658801; x=1764263601; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=71+jWtBg7d1iYRAZRUfunCs8pFBPFzAnVW06bSqsOgk=;
+        b=B0IPZ+bEOJBe9qbZc8/hzmMYp7upSLg7MTHv6CKgsB78eF/SzR7TLR9cw16aRnLSoz
+         qUKeI3wBxuE7nQFAOuw8Fr6rffu14Ok2DmYeTNzIIYeTZ/aG/KVFWjlEYFGIL6LTaBRW
+         bXnPliLh/rHYdSlv82A0T4Jr2pC49T2QphR3E=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763658801; x=1764263601;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=71+jWtBg7d1iYRAZRUfunCs8pFBPFzAnVW06bSqsOgk=;
+        b=j1X2vcdnVBWXTSDmQ5k6IVZ2tL1bVlbUq0BiJMgP9BLGdkoe2onhATsSKXXXLfFD3V
+         ET1EXs1LD0M7TwFOzgeYSc1FYs3Lo+tkI8HeUfAvWfUOoMiytfLw+PADgWI4jPBvLGXq
+         jxy2VvHwSzAiO5PTTrjXblhsjPwqcge6WrFKw+zbi1QHox+EPjmCjWxpW5IrB3H29yzI
+         m4TgDuuAv0SqlB1WXaFfzJC2/8xOHb4+u7SxRcgctrHFNXSlHcHedtgRi2RU2iaClbaf
+         iAcdfBjMYQXhuqAcLwwFouYeNPru8BvHahCstuMRla7UHFTJvRDkPT/JDqINaYgQupSs
+         qThQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWxU4sVvceoyBgGFg7ODVc3urStdrTmWDUzlzNhBBuW27Znr2jiOVL+4E4fjEfZiIt1s+v3XOZvTM/GRpWB4Ho=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTvVi8/WvPe3UDcMCPj0mVZOdJUEENxVPqefhr+b88KpfKWuup
+	Vtbful5SW5WMViCzu9YiajMYsVh+s2Jixt9LskU1FHuqeYqP+K4M5Gg/gMIE0UD24JKANlg9VRn
+	1mx2IZccc
+X-Gm-Gg: ASbGnctZ+Bzc4pC8411rZjWQJ+hJdreDDjJ6tBlgTQGirSwLDlhpzyfuAjpDHo8sBRt
+	JOBkiPINfmdmB2nXIbLbhc9185tjo1/VVtEOpMOtMTHLOWcjsnuu9WyyLA7Eypz3gYzg9xNLQdx
+	6qUPWUDEC1c19m8BdQT8styFPk/9q0Bv+YCie1DI/oC597+gR5q8JfsMs7kqR+9zGahy/H+ZFr6
+	R3PZhgjh2eZxSFM1DN0GFUjtChi7/aQRgBgoLVgT7RiOVvZ1x724YhvienGWEye9rzo5cjVHIOF
+	7MVN7jnjXwNodPkt8R+17042OYacfFb3kYv/xe8Ivsd54MWAkDy97TMdL9rQuYOJljmsZWfK/uk
+	Nl8qXOFtq3UZjccpTUMo9KH1aooCliB26u/eDENs23nDnKdmo99J8Aw2Xfh1mY4/Q40nWCbSDYc
+	v0K72qdJ3oLpc8hXrTxSLEKgMTEeeCQ1eFCdcWOhh9Y8PQheu9TA==
+X-Google-Smtp-Source: AGHT+IFFpOu8p2zO5IKKz4X8+mGr5dLQfKaVj/a3SixblLiOHnfHIVg3ahrbumStFeDsI3+Vaeh45Q==
+X-Received: by 2002:a17:906:7314:b0:b43:b7ec:b8a1 with SMTP id a640c23a62f3a-b76587b2aa2mr307710766b.24.1763658800921;
+        Thu, 20 Nov 2025 09:13:20 -0800 (PST)
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com. [209.85.218.49])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b76550512d2sm247983866b.67.2025.11.20.09.13.19
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Nov 2025 09:13:19 -0800 (PST)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b73161849e1so299559266b.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 09:13:19 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV+d2TH51LZ6IcLFHMSOE58GP+MPVSX5N9gBlhXXTE9O5GYKKJaqPE02SZqfeiTKkG0xNYkFn2Tw1UNYH8c3lo=@vger.kernel.org
+X-Received: by 2002:a17:907:84a:b0:b72:5e29:5084 with SMTP id
+ a640c23a62f3a-b765869343emr280912466b.4.1763658799257; Thu, 20 Nov 2025
+ 09:13:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Bluetooth: btusb: mediatek: Avoid
- btusb_mtk_claim_iso_intf() NULL deref
-To: Douglas Anderson <dianders@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Thorsten Leemhuis <regressions@leemhuis.info>, regressions@lists.linux.dev,
- incogcyberpunk@proton.me, johan.hedberg@gmail.com, sean.wang@mediatek.com,
- stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org
 References: <20251120081227.v3.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251120081227.v3.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <be1cbae6-f868-4939-a1c1-fd66e2c6b23e@molgen.mpg.de>
+In-Reply-To: <be1cbae6-f868-4939-a1c1-fd66e2c6b23e@molgen.mpg.de>
+From: Doug Anderson <dianders@chromium.org>
+Date: Thu, 20 Nov 2025 09:13:07 -0800
+X-Gmail-Original-Message-ID: <CAD=FV=W1D7ksbS-q1c6cHQSxx3=Z5yfC8duiBGh8S01NhLPLUg@mail.gmail.com>
+X-Gm-Features: AWmQ_bk3aT3ZuUmLknvARxMmblGOEsNctHWpwZyyDwMRW7H291WIp2zvCdFNcjo
+Message-ID: <CAD=FV=W1D7ksbS-q1c6cHQSxx3=Z5yfC8duiBGh8S01NhLPLUg@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: btusb: mediatek: Avoid btusb_mtk_claim_iso_intf()
+ NULL deref
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Thorsten Leemhuis <regressions@leemhuis.info>, regressions@lists.linux.dev, 
+	incogcyberpunk@proton.me, johan.hedberg@gmail.com, sean.wang@mediatek.com, 
+	stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Douglas,
+Hi,
 
+On Thu, Nov 20, 2025 at 9:04=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de>=
+ wrote:
+>
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index fcc62e2fb641..683ac02e964b 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -2751,6 +2751,11 @@ static void btusb_mtk_claim_iso_intf(struct btus=
+b_data *data)
+> >       if (!btmtk_data)
+> >               return;
+> >
+> > +     if (!btmtk_data->isopkt_intf) {
+> > +             bt_dev_err(data->hdev, "Can't claim NULL iso interface");
+>
+> As an error is printed now,
 
-Thank you for your patch.
+An error was also printed before commit e9087e828827 ("Bluetooth:
+btusb: mediatek: Add locks for usb_driver_claim_interface()") too, it
+was just a different error message. Previously the NULL would have
+been noticed by usb_driver_claim_interface(), which would have
+returned -ENODEV. That error would have been noticed and the message
+printed would have been:
 
-Am 20.11.25 um 17:12 schrieb Douglas Anderson:
-> In btusb_mtk_setup(), we set `btmtk_data->isopkt_intf` to:
->    usb_ifnum_to_if(data->udev, MTK_ISO_IFNUM)
-> 
-> That function can return NULL in some cases. Even when it returns
-> NULL, though, we still go on to call btusb_mtk_claim_iso_intf().
-> 
-> As of commit e9087e828827 ("Bluetooth: btusb: mediatek: Add locks for
-> usb_driver_claim_interface()"), calling btusb_mtk_claim_iso_intf()
-> when `btmtk_data->isopkt_intf` is NULL will cause a crash because
-> we'll end up passing a bad pointer to device_lock(). Prior to that
-> commit we'd pass the NULL pointer directly to
-> usb_driver_claim_interface() which would detect it and return an
-> error, which was handled.
-> 
-> Resolve the crash in btusb_mtk_claim_iso_intf() by adding a NULL check
-> at the start of the function. This makes the code handle a NULL
-> `btmtk_data->isopkt_intf` the same way it did before the problematic
-> commit (just with a slight change to the error message printed).
-> 
-> Reported-by: IncogCyberpunk <incogcyberpunk@proton.me>
-> Closes: http://lore.kernel.org/r/a380d061-479e-4713-bddd-1d6571ca7e86@leemhuis.info
-> Fixes: e9087e828827 ("Bluetooth: btusb: mediatek: Add locks for usb_driver_claim_interface()")
-> Cc: stable@vger.kernel.org
-> Tested-by: IncogCyberpunk <incogcyberpunk@proton.me>
-> Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> ---
-> 
-> Changes in v3:
-> - Added Cc to stable.
-> - Added IncogCyberpunk Tested-by tag.
-> - v2: https://patch.msgid.link/20251119092641.v2.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid
-> 
-> Changes in v2:
-> - Rebase atop commit 529ac8e706c3 ("Bluetooth: ... mtk iso interface")
-> - v1: https://patch.msgid.link/20251119085354.1.I1ae7aebc967e52c7c4be7aa65fbd81736649568a@changeid
-> 
->   drivers/bluetooth/btusb.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index fcc62e2fb641..683ac02e964b 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2751,6 +2751,11 @@ static void btusb_mtk_claim_iso_intf(struct btusb_data *data)
->   	if (!btmtk_data)
->   		return;
->   
-> +	if (!btmtk_data->isopkt_intf) {
-> +		bt_dev_err(data->hdev, "Can't claim NULL iso interface");
+Failed to claim iso interface: -19
 
-As an error is printed now, what should be done about? Do drivers need 
-fixing? Is it broken hardware?
+So that error is merely changed into:
 
-> +		return;
-> +	}
-> +
->   	/*
->   	 * The function usb_driver_claim_interface() is documented to need
->   	 * locks held if it's not called from a probe routine. The code here
+Can't claim NULL iso interface
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> what should be done about? Do drivers need
+> fixing? Is it broken hardware?
+
+Personally, I have no idea. I was mostly trying to get the regression
+fixed and, after looking at the code, I was convinced that this would
+get us back to working at least as well as we did before commit
+e9087e828827 ("Bluetooth: btusb: mediatek: Add locks for
+usb_driver_claim_interface()"), plus we'd still have the device_lock()
+in place to avoid the problems I noticed earlier. It sounds as if,
+even with the error printed, things were working well enough for
+IncogCyberpunk.
+
+If someone wants to analyze how / why `btmtk_data->isopkt_intf` would
+be NULL in this case and if we should do something better to handle
+it, I'd certainly support it!
 
 
-Kind regards,
+> > +             return;
+> > +     }
+> > +
+> >       /*
+> >        * The function usb_driver_claim_interface() is documented to nee=
+d
+> >        * locks held if it's not called from a probe routine. The code h=
+ere
+>
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Paul
+Thanks!
+
+-Doug
