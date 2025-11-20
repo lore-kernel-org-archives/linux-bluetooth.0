@@ -1,140 +1,152 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBB427F736
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 14:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB61E248891;
+	Thu, 20 Nov 2025 14:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763649756; cv=none; b=LIuaH8I1PAT8C2vWqR4brWJ9umXEcV7XiQLtlZDIhFMgrzKEU86U8c6JFlXv1s0P0I79r0W6mcbdIpamkYIfu77S1oGLYuz79eV4YGq8bUEW/AIyV0Z9skCpwQs9v3m5FdIYY9GY6jij/d28tX71LZSMLovKQKXUTtj+GJL+fOw=
+	t=1763650047; cv=none; b=PPyeMurXF4YArki1fFUeOx1aXM+fnShqBNy1qlVn2w1emrl14tgKzutnvmx+wz9uL7if+EwD1uGXTIi/yXw3mCism5yfAhw16zrroI10zfjwOt1gFlW3S4Uw9YS43si4sJ9qNO7BMYvdPBnTd3eNZ2UCqeMQDB/kiq9l6r/AIQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763649756; c=relaxed/simple;
-	bh=qVWVQehVzivEgQW4TTik0WBPqMi64cjIoVcj0BY03J4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=nVrGqZQHwaxiW/QPGA6QzknXdsMZt4lqJEiUnDGqnBcpQR+ExHNtcw8CD9wijg6RnGSpkTNREvujXfKTY7KVVFQREZxRw+EdfGnC4T8K8/QxgsO+IWCVgnIPH4D1nobPyCohcyziAaDgk6pEUmKyiNO2N3bQs60CPfnzuQ55w40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kq5ByOS5; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763650047; c=relaxed/simple;
+	bh=CL0AfZyGaf6o7tt8Zv6vmaXCHm+tuYBXPxYBDQdYbAg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bqJqhxKUfHvYp2M+JoLQwllNYBrFfOwLyqKenCxlIbcvZsWL4ZlUNMqDwnxWzC2crDumP2gdeibHFK7nNdn0gtTV+QkXrC0aCoaRIrdtg/MpXlzix3KBsOeO+uhFXkPDcdlz9xiOJXOcw6EqGjFHemJnba1CM4GpaMl0NdNLPIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TkSpRnrp; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kq5ByOS5"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4edb6e678ddso10943131cf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 06:42:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763649753; x=1764254553; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+IDXkrCKunuHRc+tVxh4CGOAcvWSpXCJvomdCmbHOKI=;
-        b=Kq5ByOS5j2x5ooqsqVxX10cmvz2DSlUld6QUdxIOMfBU27hPQKk0mQpp8QxNx1P9Ec
-         cccUUXmiEfykbHQ9NUCJPEeBhBqIHSQjHw8mWtM6dXH4beETc5o/IbUeAdqpFQDWtW+y
-         ur4RwdyYx8Ja2Nn+wWoRUgdo2B85ZQqxccCPkZuWSBRgF/CD0cVs1X9tDYtlB1iozkN4
-         ufWiNibr2FPai9LZWC/yPdJIezK2DfOUfB+0d3WEWRCMYxc/BRwFIHYvNv7Cvre+XAve
-         OLOXibM2Vx2kAv1IzLTv88yRSX14Sc/h7OY3shlpYbzy8mRzJZL2wy441IaUXKWbQVvs
-         YwGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763649753; x=1764254553;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+IDXkrCKunuHRc+tVxh4CGOAcvWSpXCJvomdCmbHOKI=;
-        b=XMblBIDGtob7y0DuNxorB2YSWXLI4Xkmj54UdBevU5K5kLzP2i6pAYT/A5G1Sp8IlA
-         b9Uexy1RsHgQAYnMOe12UVKOEzrmoQRvS/egyXzjIAvgfwqVCHr+Nkyb26c5hgiQrYFM
-         e/BO3Hq47/Apnh1TmQ6T1fFJXyeeveafoJJJIQhBEsXk+/gGo5kTz51UylCw6Z8adhmL
-         oDulNB7OCTkO9zaMs9JO9x5IdZWhiZQv5IJvnhkuiLclZeeszcOsaTNwmg+Ki5NOHunZ
-         DlMOWJcq/A+oEpAppCFg0rvP9yWihL3U4rsZ1AECTNT1Y3Drxlu2svbPp5m7r79WbhsH
-         Ycxg==
-X-Gm-Message-State: AOJu0Yyam4r73aHsPTOWkmouI2PkyvhnTr8rsl8XVbSnQ1GcOnWdiOZh
-	3dqrDZDyjKm9LLfdpBnkE4+oTE4k9Lwe1j8eDmSv9ppruNKgqNK+oOdmqlksHg==
-X-Gm-Gg: ASbGncue0uKWYAICXaF5jZNabUgVHgB4HDhOpFdy2uXzefYx9UAsu+pesXjxViKaqCG
-	gesab2f9XtEHl59DXohQ7iEurczBvDvIsT5nUkuBOCyKdKxGQ28fkPLJ84ksTcEKprKz9u3qjbM
-	kQBigA/QJp08/7JkpqHYyOAXn0qfg+Vx4xtvGe9q/fbpOliQY0B7uX/COEwveDt3v5EiVlKB2NM
-	jGbfgpwSeMnf6Q9p/6mJo5baECQczDhuC6nAfpCOlqr6WPgY+JA52iTeXU80W1hZzLwSd63CSRE
-	bej9fqW4Nky23jM9wFLgaWEFowfabEAfgj7vPWgBCewFIUF1hERIY9ZUVxrAKUwdhsmc00bdWZ8
-	vAv+gzmsmjkmvEdjtxKY3ZaJTt6os8nODkTaKuWMH8vqtN/ijM7V/SGcRdeIu9Li4xU2czwk6jA
-	qqAKPfCLVVy5lbgONI
-X-Google-Smtp-Source: AGHT+IE9ngJte0dvRm3G7RI3nhiJ/7jb5mKBKbm4LMm6eqtvltTarv2fTc1bBN8/jtqBuYyMRYh0Rw==
-X-Received: by 2002:ac8:5d4c:0:b0:4ee:1907:13ed with SMTP id d75a77b69052e-4ee49705856mr35419011cf.51.1763649753098;
-        Thu, 20 Nov 2025 06:42:33 -0800 (PST)
-Received: from [172.17.0.2] ([52.150.29.102])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee48d3bcc4sm16254331cf.6.2025.11.20.06.42.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 06:42:32 -0800 (PST)
-Message-ID: <691f28d8.050a0220.64d68.484b@mx.google.com>
-Date: Thu, 20 Nov 2025 06:42:32 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7845341082615234354=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TkSpRnrp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763650045; x=1795186045;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CL0AfZyGaf6o7tt8Zv6vmaXCHm+tuYBXPxYBDQdYbAg=;
+  b=TkSpRnrpsvOKJVubuqADVOMXO9qWNwx4QaJD3GaorH+3n29wQc9xz41y
+   2WYMl/n2K8DtNUO2foeFoLeuEWwArBPKCiJSNk+ryCq7AoWw/1W6NWhWH
+   27zFMb3v1L/BuYumeHkDsITuqgqzpC7/UtE6aZOm7PceNqPqOdV6TZSCB
+   6WBgenPLxjeYCapg/ktmTppp7hKlgHJb9r71hieXcwFeoMG658PWaTSe5
+   qefe6tUcXsehfUu0vTxpCeE+nBpt12htqAeFgGSPpyR8FF3E9m0eEYME0
+   1TgXjpE0GMXdNfOxBHeJ1TZ/K2fF5h8yuakaMEWqtIB/TlBM6r/4Qq5tP
+   g==;
+X-CSE-ConnectionGUID: a/gQ8aE0TLu0szKEPh0e9A==
+X-CSE-MsgGUID: M1e+gXrUQoq3xr1OiCKW4w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="65652168"
+X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
+   d="scan'208";a="65652168"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 06:47:25 -0800
+X-CSE-ConnectionGUID: WNeM5766TQ+VjRSmYA4AFg==
+X-CSE-MsgGUID: O5pTTRiETqSDJL02LqydeA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
+   d="scan'208";a="190668943"
+Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 20 Nov 2025 06:47:23 -0800
+Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vM5wO-00048x-18;
+	Thu, 20 Nov 2025 14:47:20 +0000
+Date: Thu, 20 Nov 2025 22:46:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, amitkumar.karwar@nxp.com,
+	sherry.sun@nxp.com, dmitrii.lebed@nxp.com,
+	neeraj.sanjaykale@nxp.com
+Subject: Re: [PATCH v1 07/11] Bluetooth: btnxpuart: Add device authentication
+Message-ID: <202511202234.PN8Zn4v7-lkp@intel.com>
+References: <20251118142025.1982263-8-neeraj.sanjaykale@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ,1/5] doc: Add new telephony related profiles interfaces
-In-Reply-To: <20251120135417.820220-1-frederic.danis@collabora.com>
-References: <20251120135417.820220-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251118142025.1982263-8-neeraj.sanjaykale@nxp.com>
 
---===============7845341082615234354==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Neeraj,
 
-This is automated email and please do not reply to this email!
+kernel test robot noticed the following build warnings:
 
-Dear submitter,
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master linus/master v6.18-rc6]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1025836
+url:    https://github.com/intel-lab-lkp/linux/commits/Neeraj-Sanjay-Kale/Bluetooth-btnxpuart-Add-firmware-metadata-parsing-for-secure-interface/20251118-223605
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20251118142025.1982263-8-neeraj.sanjaykale%40nxp.com
+patch subject: [PATCH v1 07/11] Bluetooth: btnxpuart: Add device authentication
+config: i386-randconfig-061-20251120 (https://download.01.org/0day-ci/archive/20251120/202511202234.PN8Zn4v7-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251120/202511202234.PN8Zn4v7-lkp@intel.com/reproduce)
 
----Test result---
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511202234.PN8Zn4v7-lkp@intel.com/
 
-Test Summary:
-CheckPatch                    PENDING   0.27 seconds
-GitLint                       PENDING   0.30 seconds
-BuildEll                      PASS      20.43 seconds
-BluezMake                     PASS      634.20 seconds
-MakeCheck                     PASS      21.36 seconds
-MakeDistcheck                 FAIL      43.78 seconds
-CheckValgrind                 PASS      301.06 seconds
-CheckSmatch                   PASS      344.97 seconds
-bluezmakeextell               PASS      180.63 seconds
-IncrementalBuild              PENDING   0.32 seconds
-ScanBuild                     PASS      980.55 seconds
+sparse warnings: (new ones prefixed by >>)
+   drivers/bluetooth/btnxpuart.c:1433:55: sparse: sparse: restricted __le32 degrades to integer
+   drivers/bluetooth/btnxpuart.c:1441:27: sparse: sparse: restricted __le32 degrades to integer
+   drivers/bluetooth/btnxpuart.c:1446:47: sparse: sparse: restricted __le32 degrades to integer
+   drivers/bluetooth/btnxpuart.c:1447:32: sparse: sparse: restricted __le32 degrades to integer
+   drivers/bluetooth/btnxpuart.c:1450:26: sparse: sparse: restricted __le32 degrades to integer
+   drivers/bluetooth/btnxpuart.c:1529:17: sparse: sparse: restricted __le32 degrades to integer
+>> drivers/bluetooth/btnxpuart.c:1758:64: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected unsigned short [usertype] chipid @@     got restricted __le16 const [usertype] chip_id @@
+   drivers/bluetooth/btnxpuart.c:1758:64: sparse:     expected unsigned short [usertype] chipid
+   drivers/bluetooth/btnxpuart.c:1758:64: sparse:     got restricted __le16 const [usertype] chip_id
+>> drivers/bluetooth/btnxpuart.c:1759:58: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected unsigned char [usertype] loader_ver @@     got restricted __le16 const [usertype] device_flags @@
+   drivers/bluetooth/btnxpuart.c:1759:58: sparse:     expected unsigned char [usertype] loader_ver
+   drivers/bluetooth/btnxpuart.c:1759:58: sparse:     got restricted __le16 const [usertype] device_flags
+>> drivers/bluetooth/btnxpuart.c:2114:25: sparse: sparse: incorrect type in initializer (different base types) @@     expected restricted __le16 [usertype] len @@     got unsigned short [usertype] @@
+   drivers/bluetooth/btnxpuart.c:2114:25: sparse:     expected restricted __le16 [usertype] len
+   drivers/bluetooth/btnxpuart.c:2114:25: sparse:     got unsigned short [usertype]
+   drivers/bluetooth/btnxpuart.c:2186:25: sparse: sparse: incorrect type in initializer (different base types) @@     expected restricted __le16 [usertype] len @@     got unsigned short [usertype] @@
+   drivers/bluetooth/btnxpuart.c:2186:25: sparse:     expected restricted __le16 [usertype] len
+   drivers/bluetooth/btnxpuart.c:2186:25: sparse:     got unsigned short [usertype]
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+vim +1758 drivers/bluetooth/btnxpuart.c
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+  1746	
+  1747	/* Secure Interface */
+  1748	static int nxp_get_pub_key(struct hci_dev *hdev,
+  1749			      const struct nxp_tls_device_info *device_info,
+  1750			      u8 ecdsa_pub_key[NXP_FW_ECDSA_PUBKEY_SIZE])
+  1751	{
+  1752		struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
+  1753		const char *fw_name;
+  1754	
+  1755		if (ecdsa_pub_key[0] == 0x04)
+  1756			return 0;
+  1757	
+> 1758		fw_name = nxp_get_fw_name_from_chipid(hdev, device_info->chip_id,
+> 1759						      device_info->device_flags);
+  1760		if (nxp_request_firmware(hdev, fw_name, NULL))
+  1761			return -ENOENT;
+  1762	
+  1763		nxp_process_fw_meta_data(hdev, nxpdev->fw);
+  1764		release_firmware(nxpdev->fw);
+  1765		memset(nxpdev->fw_name, 0, sizeof(nxpdev->fw_name));
+  1766	
+  1767		if (memcmp(nxpdev->crypto.fw_uuid, device_info->uuid, 16) ||
+  1768		    nxpdev->crypto.ecdsa_public[0] != 0x04) {
+  1769			bt_dev_err(hdev,
+  1770				   "UUID check failed while trying to read ECDSA public key from FW.");
+  1771			return -EBADF;
+  1772		}
+  1773	
+  1774		memcpy(ecdsa_pub_key, nxpdev->crypto.ecdsa_public, 65);
+  1775	
+  1776		return 0;
+  1777	}
+  1778	
 
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-../../profiles/audio/telephony.c:45:10: fatal error: telephony.h: No such file or directory
-   45 | #include "telephony.h"
-      |          ^~~~~~~~~~~~~
-compilation terminated.
-make[2]: *** [Makefile:9044: profiles/audio/bluetoothd-telephony.o] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [Makefile:4111: all] Error 2
-make: *** [Makefile:10553: distcheck] Error 1
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7845341082615234354==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
