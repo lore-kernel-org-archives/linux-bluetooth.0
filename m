@@ -1,59 +1,58 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289C43644CB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 16:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D84B376BC3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 16:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763655763; cv=none; b=cz95DdvIiGL1G4Mn9crbR+mLiIfZ9tG5Y+kGjBdbKnO8uJwn5ewTxaBDyh+WPLaJHS8hDMAUFc3VfAv2Yai4wuXn+edvd26UVGnmM2nvbU8oporUGBliQ4pEDXFDtNhDXpbt38uv9WvR9Sbu2d1edmuKQKcgvtR6VaZvKFXYtS0=
+	t=1763655867; cv=none; b=fuNB/RCIf5SgUYN0qC84bSEqnPps5ddPIcywfQ8Yb63IDA4Q0Tk5WgUZzLD788ogyyQlO4E8hS0PbHDOmHbUgWNuEYQdvuPDcfP4S8QALAbkYhZ0YPN9gzWliPMBsvb8PyDIjsskw7nZ/deKretDRnQDSQRJ3UNGbRkZJOGotfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763655763; c=relaxed/simple;
-	bh=hJVHNyb4jKQqKze6prYEqLheuTVZFupukMqkO8FbHMo=;
+	s=arc-20240116; t=1763655867; c=relaxed/simple;
+	bh=fPm7LqMqVE1iPfs79bOrQINOU+t0aFYIS7EK+rinako=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W/iEnecC49bz+Qq60JMFTVrf3rFQryG+E8CNA1CfRVEIjpp54555vM0qZ+C4/VUXiS8jPMdRSu3hV4HaOLIDcNAaVDQhkm7cSQiHYdC5/1nz2PLbILLmA2eHNEqyBH3iJQ9uDu7jgHLarnMeLUc43E+xC7TisNspWpusUxEyJ/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NaZbc4QQ; arc=none smtp.client-ip=209.85.208.181
+	 To:Cc:Content-Type; b=eBYLX5qI9imMNbvpsqG55ofcqa8NzAiF6SjhixlbMhO3fYh8BxRuhK3XnaboAeNf3leKXjNIagI5UcbP1Fc7PqRdR6/wNzo0WbGfAi65Il1+FtID9tyor3vKa25fdCXq4fG7OpWaJzEE+b1ZhT0digfSyzFwgpJCNDu/c23TKHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aYR6NoI9; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NaZbc4QQ"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-37a33f49018so8158761fa.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 08:22:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aYR6NoI9"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-37a2dced861so19735581fa.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 08:24:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763655759; x=1764260559; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763655863; x=1764260663; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uARKTPJZCBrPKSN4WFpL5C3vu7iEHuaz7Vb/n8TdRlg=;
-        b=NaZbc4QQTnRnFRI1XjmqgtI8/joyery9cqs8UilrH5qZb19uZESjspdSUILLVVjRLq
-         YRskiVIfJ0HbdakZATdZBtpDqOIFudMPqjQHDLBNAWq/rEOgZ+8YjHpuP3R2zu2PKt0m
-         xB+l0KtThB0jDL62O+bTtNm4s7ZN0t306HdOc5AkloA68g3SqkmjU2OiKnBilrkurLoR
-         xjVrRXOP97hAHkP8pfWYchpG8yJT8p5JCPI0vmUWyOk/EpDtP7nikfLMKARyM3IG4dSS
-         CMiIPPRJBGd2WY7cUdujTZBpVpVwGPSR0kzOBK8nObjfHyRpSRhuHkhyI86+0dZeJnN5
-         42ug==
+        bh=jpUnTJmDwcqfVUddDX9pzCjQLjUM8HPrSc0e2CIUg04=;
+        b=aYR6NoI9F3sSxKGN87s1zG8KN74Tw23ND6LpkUQU1zfmRUsROUhinCbe8uO/ufTWLy
+         0UzwYaI1xGtr/dWY8iz6OzG4jKNCvZwXfd98H/+r82txvJvjMTEY1NV2/1TvGv9NEven
+         piQKq9KjaNgMYBVxREWAdY8B9YgSh+FaHQiaUeVz+890NhVA4R7myf9nYZCGn154AVif
+         APZImQMbWWOVNIjYh7jGQD2sVc3LMeos7a61OX6b0kcyv2erCEkF22pXUtKuRSRtpeih
+         +2lQEGRvP2gjsdRjYbTDNTGNW8qQvBnhTaGV9VllNeSYTXz3WI5PKOAMgGD3gHcDZrlq
+         0jpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763655759; x=1764260559;
+        d=1e100.net; s=20230601; t=1763655863; x=1764260663;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=uARKTPJZCBrPKSN4WFpL5C3vu7iEHuaz7Vb/n8TdRlg=;
-        b=LnfudyEH8Vt0AF07U82TvNOe3sgaqhV8uLBHfd+bcN0m2HYzwP755JbmjE8ipuuAEp
-         tMsXLH9vZWkvu8yKrhVQaU+UYOnWbGnOpszq95rEb662KlUUfPfOvnVUU1+RMU7BkwPu
-         WG5BMdjxZdc8gX357edyb/8nqgBl8f1s481MkUrHAs6/iUFsQAGZzn8d/tquTNgM2TuM
-         0gbDV1a1Xg3ZyWacY92cyK/LpnUD5NInq0MFQC0CM/Vpsga0jDaIhBjrhil6FBWsU+LP
-         CjGrW81CSWgix9R4vjpG5jH/WZilx71H8vua+Ait9z5/e5K4K4wn0grsH72iWN1cBJbm
-         SmNA==
-X-Gm-Message-State: AOJu0Yzqvwtc5OAMw2vNE/n/yWX73gBiivQcg3i6lWQuNrshG8QToILB
-	6zgIkU4F7uK2/OZyafKezSM31KTBiKGzNCg6koS1PVQyiGm4ezPyu72i2R0q7nqW9dsDgbCMdxo
-	I+DHN0w+o6dEngm3y6RZAlV1fEiTWBe1UyA==
-X-Gm-Gg: ASbGncvOuqxllw/hHFXsF9B4rRMg32BQvAvKXHYEyx94Ww6XX9q0Qgz//Snl6HYXdcE
-	6pN1ttDuwbGkLh3NbiewOaesTfRSLnzYSqcukE5SaPUSNgWU+pqmYU0+7i9AhJfS8FggTWhBUBs
-	cdCKONVEoxEV+3pV2MgMeCzdFvCjUJi+pbJf4Z5zuaI5nZV9izZTyKXILB0Y9aLrbYrONcgxc13
-	8cTOlPASyvqfKq1e9ciQtkBRGVsJc1JFvlvqTpwhUi+xR3raZSc81joznynpj3F92xhYsgcJ3UR
-	heGX
-X-Google-Smtp-Source: AGHT+IF9FmRh4H0jg+VR4dQo1cnP/gTStdQwRGXa2QtDH7+BzKRUtLcdVN1YFnxymhPOk1ZP0EScYhRECuBkrbtwGjw=
-X-Received: by 2002:a2e:8a95:0:b0:379:348:80da with SMTP id
- 38308e7fff4ca-37cc6739731mr11371941fa.8.1763655758455; Thu, 20 Nov 2025
- 08:22:38 -0800 (PST)
+        bh=jpUnTJmDwcqfVUddDX9pzCjQLjUM8HPrSc0e2CIUg04=;
+        b=YnOENva5JIpC9Dfu6y454KRTxDnrB/vTy4wc+hJLafSkwBwuUZbFqCl8t8v9CS2VCF
+         lm7pf2Tb8t5Hu733lUq9bWAB8M+wxhEENqbTdlhTUjcsJZIHZzT5fHsqzVrNlOcRkfoZ
+         ksOPdW7JLFb/GK4XiBBJ259s8f+3z4iHRYRY2zcEWJRbnvyhFCIdQgU9mexgBqBTAHjP
+         Kt/aPHWjUTFiomxBB5qjYO6g9eZnfmk+5ldo2rE7hoJLxwKF5ejeXOE04xYRkfJWpZhY
+         Og1OmXOXFw3SpO7RQpBS69Hy92wsB3o/F6hxCFowm3/F0yYM/sEkLU8kaEtgz88XTPiJ
+         VypQ==
+X-Gm-Message-State: AOJu0YzfDTPMLfk7Z/ZY6Zft5TSzsrTJcetUljCjcez98heb9whkB+mg
+	LNbqSMAe9VPqc10QUIb3Zw4oE3RrFyM1lq/2X7nOgViT6I7CzvkNkoyIFCKK2yELFilg2utKDjJ
+	4U6YqPaojNjTf/VshOCRKtsIVfTiws9DwLQ==
+X-Gm-Gg: ASbGncsZmR+bb+l2mAWtseXpeTd58lpo4yfC9szLqht+ATV8k5yUy66r1RDzLnjIPQn
+	42i9LathKpo+lBKshng+Yf80qGV3Wh7wmS31vWIkWlWVweMCZFWF7FjZCol87z333o7JHk2tNA1
+	R6yxSVlVvlb+I2mdpsMRzKIB68qMpfu0eKqJ9dojYTUsgWwZH6Qkl+JpBDil4wQY9fUTw2Pn5Bj
+	7opN71mSyoiGYklCS63ThpRpNUeMRStZIE+Rvc03GJ5RPmmJTlpnuM8fphj0avosYrCPA==
+X-Google-Smtp-Source: AGHT+IHYDlxby1vGZGstnOvD4iXFor8G15xaN52YYuAMzb+TTTt29vsIZP6uVbMBm2RIfWxUmmE58T+kQCKwAebpUn8=
+X-Received: by 2002:a05:651c:b1e:b0:37b:a4f1:e4d1 with SMTP id
+ 38308e7fff4ca-37cc82c0799mr8337011fa.9.1763655862909; Thu, 20 Nov 2025
+ 08:24:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -64,9 +63,9 @@ References: <20251118-bearer-impl-v3-1-dadcd8b0c75d@amlogic.com>
  <CABBYNZKZ-Y2PqH620t0Tyr9sygoKikeyjdKTVOjV+7LDNxPRgQ@mail.gmail.com> <09087c54-4d27-460e-a6cb-ac74833068b6@amlogic.com>
 In-Reply-To: <09087c54-4d27-460e-a6cb-ac74833068b6@amlogic.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 20 Nov 2025 11:22:26 -0500
-X-Gm-Features: AWmQ_bno4ELVykOMjuTfvzjaBkJOlxBRGqL4nBTOR8Ggvz00LlVfEFkdvCw5Klk
-Message-ID: <CABBYNZLNDUUBj6pT_vgo8cdTb5B9ZDGOdf-+yFL2-h_Y2WANRA@mail.gmail.com>
+Date: Thu, 20 Nov 2025 11:24:10 -0500
+X-Gm-Features: AWmQ_bmiTF9h4vssx4BTGo5DOCX5Nenwo6X8S6RbfsipP63I_xANQb1RL8XaNno
+Message-ID: <CABBYNZJnBwXkwYQstvb2xecA=BPOubP=4ikHJkdDcipbJ3dbGg@mail.gmail.com>
 Subject: Re: [PATCH bluez v3] bearer: Implement Connect/Disconnect methods
 To: Ye He <ye.he@amlogic.com>
 Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
@@ -158,11 +157,7 @@ d
 > unexpected state transitions=E2=80=94for example, duplicated browse attem=
 pts
 > or redundant link-level connection requests.
-
-I think that was done because there is the likes of ConnectProfile,
-which is not the case here, anyway I'd probably add a comment that
-this is done in order to keep API semantics from Device.Connect.
-
+>
 > Disconnect() is different: queuing only affects how replies are
 > delivered, not the device=E2=80=99s actual behavior.
 >
@@ -211,15 +206,7 @@ this is done in order to keep API semantics from Device.Connect.
 .
 > I=E2=80=99m open to better guidance on how to classify services/profiles
 > per bearer.
-
-If we really need to distinct the services per bearer Id add a bearer
-field to btd_profile, because as you say above there are profiles that
-can exist in both BR/EDR and LE, anyway if you look at util.c where
-there is the table of UUIDs it seems that the service UUID can extend
-from 0x1800 to 0x2800, but there could also be vendor ones which are
-on 0xfxxx range, meaning there could be multiple ranges we would need
-to check so I don't think this would be reliable in the end.
-
+>
 > +
 > +       DBG("Disconnecting profile %s (UUID 0x%04x) for bearer addr type =
 %u",
@@ -321,7 +308,11 @@ onnect()
 > operation is in progress. This call has the higher priority because
 > it tears down both LE and BR/EDR bearers. Any bearer-level disconnect
 > requests should therefore be dropped once this state is active.
->
+
+Forgot about this one, this is fine but you might want to add the
+above as a comment to why checking device_is_diconnecting is
+necessary.
+
 > +       device_cancel_bonding(device, MGMT_STATUS_DISCONNECTED);
 > +
 > +       device_cancel_browse(device, bearer->type);
