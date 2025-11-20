@@ -1,102 +1,737 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEEC3644BB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 16:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289C43644CB
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 16:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763655750; cv=none; b=rAtfsghRW/wQQQOw/EkIXFONqYnTzBcq/pLnWENF6aAa5yjMVyQOQQJSJPpXUVisQhhwkCAYR7DpKZbfZYfr2LnAIlj4ZGTbgPTdQpcqOAFHmEwIwIQacjLUp3yqdJmQByLR/a3J4nEIN/LaK0CaWnqxM6MROlNGd4IHY26fJmw=
+	t=1763655763; cv=none; b=cz95DdvIiGL1G4Mn9crbR+mLiIfZ9tG5Y+kGjBdbKnO8uJwn5ewTxaBDyh+WPLaJHS8hDMAUFc3VfAv2Yai4wuXn+edvd26UVGnmM2nvbU8oporUGBliQ4pEDXFDtNhDXpbt38uv9WvR9Sbu2d1edmuKQKcgvtR6VaZvKFXYtS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763655750; c=relaxed/simple;
-	bh=bi/Po0AgpnEbGaYHxKxOmZ9YXa7BiIdYeqc0S3my3Xo=;
+	s=arc-20240116; t=1763655763; c=relaxed/simple;
+	bh=hJVHNyb4jKQqKze6prYEqLheuTVZFupukMqkO8FbHMo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M20pQxpvHkhkuqWvfRXs5TIfkXuBb3PlnyYn7CWrh8l5HEBrJmIvH+MerYobPlLCMQzv2PQ5Iy5Iubh+gwuJQEw2P6z3sywpd6rXj6FnWpISp20WIM+7LnR/C7ILKtTSAZSEkYmn+Y/XtH3PEw7MimMlRoEK9gcxvyMVTY6CtJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OJqg5gsj; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=W/iEnecC49bz+Qq60JMFTVrf3rFQryG+E8CNA1CfRVEIjpp54555vM0qZ+C4/VUXiS8jPMdRSu3hV4HaOLIDcNAaVDQhkm7cSQiHYdC5/1nz2PLbILLmA2eHNEqyBH3iJQ9uDu7jgHLarnMeLUc43E+xC7TisNspWpusUxEyJ/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NaZbc4QQ; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OJqg5gsj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79166C116C6
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 16:22:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763655750;
-	bh=bi/Po0AgpnEbGaYHxKxOmZ9YXa7BiIdYeqc0S3my3Xo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=OJqg5gsj68ksFZN0GbvCUrDOmfrmRxVknpZNcMdToGVZVvl4EawqQiK/RQ7e58ifU
-	 vwvTkArvsYgKhaFbPDYTNrAswmZJS94eTfPRPPhrE1hIJ7kn6kr7CgGow1eRsLVwh+
-	 Ubqao6grr+Ox/P33v8nvayEXUjcRzbzY/otv9qQWV46zE7hCP268zEkixGSjcQLuT1
-	 OM/SURl1hDHKSZYhO5shJ+N0LjpXKnP9vMougYMgUBNotoEzcNREMrmw3cuW13QsDJ
-	 nodPtUgFwQD7zQ1PbtHPPWCL9CX+kRLzBEnh0p3TRHH7doP1PaMme5cuOgaUtzKZJQ
-	 QD3VK61BRe7rg==
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6408f9cb1dcso1600508a12.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 08:22:30 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWvrP2bdqxFDM3R3hezGgfIRRc4WYSwIKliwnM9Utnsl7mfjEPrp6HtiaRvTR8JmUF7Cf3LGo3zkteS9o4T7HM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQO84cLKSKLLfz5dY9eqUkYiOHltyWv0JMXXiQ6grcdGgknznL
-	B+1iE/g3rNMvrmgEgKch9mMebHvuWt4SlKBhaMkH6n5zYieLr+Ctsa8lTHl3mjsYb9ZDRUOjZfd
-	IjrK0SVZi2oRjyv/Mfq57sYM2gc/OcA==
-X-Google-Smtp-Source: AGHT+IEWkCgWatcHpdXr/OIRJiRj/QCEmSn/C4yEQfCtXou2e73E372BAB9bX3hhR6qzcGe6jCZ9JRVO/S+7C6PFF8E=
-X-Received: by 2002:a17:907:db16:b0:b72:d001:7653 with SMTP id
- a640c23a62f3a-b7654de0b58mr374078966b.19.1763655748985; Thu, 20 Nov 2025
- 08:22:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NaZbc4QQ"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-37a33f49018so8158761fa.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Nov 2025 08:22:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763655759; x=1764260559; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uARKTPJZCBrPKSN4WFpL5C3vu7iEHuaz7Vb/n8TdRlg=;
+        b=NaZbc4QQTnRnFRI1XjmqgtI8/joyery9cqs8UilrH5qZb19uZESjspdSUILLVVjRLq
+         YRskiVIfJ0HbdakZATdZBtpDqOIFudMPqjQHDLBNAWq/rEOgZ+8YjHpuP3R2zu2PKt0m
+         xB+l0KtThB0jDL62O+bTtNm4s7ZN0t306HdOc5AkloA68g3SqkmjU2OiKnBilrkurLoR
+         xjVrRXOP97hAHkP8pfWYchpG8yJT8p5JCPI0vmUWyOk/EpDtP7nikfLMKARyM3IG4dSS
+         CMiIPPRJBGd2WY7cUdujTZBpVpVwGPSR0kzOBK8nObjfHyRpSRhuHkhyI86+0dZeJnN5
+         42ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763655759; x=1764260559;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uARKTPJZCBrPKSN4WFpL5C3vu7iEHuaz7Vb/n8TdRlg=;
+        b=LnfudyEH8Vt0AF07U82TvNOe3sgaqhV8uLBHfd+bcN0m2HYzwP755JbmjE8ipuuAEp
+         tMsXLH9vZWkvu8yKrhVQaU+UYOnWbGnOpszq95rEb662KlUUfPfOvnVUU1+RMU7BkwPu
+         WG5BMdjxZdc8gX357edyb/8nqgBl8f1s481MkUrHAs6/iUFsQAGZzn8d/tquTNgM2TuM
+         0gbDV1a1Xg3ZyWacY92cyK/LpnUD5NInq0MFQC0CM/Vpsga0jDaIhBjrhil6FBWsU+LP
+         CjGrW81CSWgix9R4vjpG5jH/WZilx71H8vua+Ait9z5/e5K4K4wn0grsH72iWN1cBJbm
+         SmNA==
+X-Gm-Message-State: AOJu0Yzqvwtc5OAMw2vNE/n/yWX73gBiivQcg3i6lWQuNrshG8QToILB
+	6zgIkU4F7uK2/OZyafKezSM31KTBiKGzNCg6koS1PVQyiGm4ezPyu72i2R0q7nqW9dsDgbCMdxo
+	I+DHN0w+o6dEngm3y6RZAlV1fEiTWBe1UyA==
+X-Gm-Gg: ASbGncvOuqxllw/hHFXsF9B4rRMg32BQvAvKXHYEyx94Ww6XX9q0Qgz//Snl6HYXdcE
+	6pN1ttDuwbGkLh3NbiewOaesTfRSLnzYSqcukE5SaPUSNgWU+pqmYU0+7i9AhJfS8FggTWhBUBs
+	cdCKONVEoxEV+3pV2MgMeCzdFvCjUJi+pbJf4Z5zuaI5nZV9izZTyKXILB0Y9aLrbYrONcgxc13
+	8cTOlPASyvqfKq1e9ciQtkBRGVsJc1JFvlvqTpwhUi+xR3raZSc81joznynpj3F92xhYsgcJ3UR
+	heGX
+X-Google-Smtp-Source: AGHT+IF9FmRh4H0jg+VR4dQo1cnP/gTStdQwRGXa2QtDH7+BzKRUtLcdVN1YFnxymhPOk1ZP0EScYhRECuBkrbtwGjw=
+X-Received: by 2002:a2e:8a95:0:b0:379:348:80da with SMTP id
+ 38308e7fff4ca-37cc6739731mr11371941fa.8.1763655758455; Thu, 20 Nov 2025
+ 08:22:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
- <20251112-pci-m2-e-v1-6-97413d6bf824@oss.qualcomm.com> <CAL_JsqKBcXH0EWguto3EFY2cJ5p=8VUZczMHz1u5fNFocv-AmA@mail.gmail.com>
- <cjtnoqjr3v5o64caa6unllb2e2csyvybr6vnzwuqqrl453bgz7@drqmfkfbn5xg>
-In-Reply-To: <cjtnoqjr3v5o64caa6unllb2e2csyvybr6vnzwuqqrl453bgz7@drqmfkfbn5xg>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 20 Nov 2025 10:22:16 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqLoD5GiiGgWTEa6-g8VwyuPTko-ewe5CKPBWMgHDnKaHg@mail.gmail.com>
-X-Gm-Features: AWmQ_blvWXZ3OwaL5ikiIPwr7cVeDcTz_uslr7dP8flZZyL49YRBC5MiFZDf9vA
-Message-ID: <CAL_JsqLoD5GiiGgWTEa6-g8VwyuPTko-ewe5CKPBWMgHDnKaHg@mail.gmail.com>
-Subject: Re: [PATCH 6/9] serdev: Skip registering serdev devices from DT is
- external connector is used
-To: Manivannan Sadhasivam <mani@kernel.org>
-Cc: manivannan.sadhasivam@oss.qualcomm.com, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+References: <20251118-bearer-impl-v3-1-dadcd8b0c75d@amlogic.com>
+ <CABBYNZKZ-Y2PqH620t0Tyr9sygoKikeyjdKTVOjV+7LDNxPRgQ@mail.gmail.com> <09087c54-4d27-460e-a6cb-ac74833068b6@amlogic.com>
+In-Reply-To: <09087c54-4d27-460e-a6cb-ac74833068b6@amlogic.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 20 Nov 2025 11:22:26 -0500
+X-Gm-Features: AWmQ_bno4ELVykOMjuTfvzjaBkJOlxBRGqL4nBTOR8Ggvz00LlVfEFkdvCw5Klk
+Message-ID: <CABBYNZLNDUUBj6pT_vgo8cdTb5B9ZDGOdf-+yFL2-h_Y2WANRA@mail.gmail.com>
+Subject: Re: [PATCH bluez v3] bearer: Implement Connect/Disconnect methods
+To: Ye He <ye.he@amlogic.com>
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 19, 2025 at 7:33=E2=80=AFAM Manivannan Sadhasivam <mani@kernel.=
-org> wrote:
->
-> On Tue, Nov 18, 2025 at 07:03:51AM -0600, Rob Herring wrote:
-> > On Wed, Nov 12, 2025 at 8:45=E2=80=AFAM Manivannan Sadhasivam via B4 Re=
-lay
-> > <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> wrote:
-> > >
-> > > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> > >
-> > > If an external connector like M.2 is connected to the serdev controll=
-er
-> > > in DT, then the serdev devices will be created dynamically by the con=
-nector
-> > > driver. So skip registering devices from DT node as there will be no
-> > > statically defined devices.
-> >
-> > You could still have statically defined devices. You are just choosing
-> > to probe them later from the connector driver.
-> >
->
-> The point of coming up with the M.2 binding is to avoid hardcoding the de=
-vices
-> in DT. So static devices are ruled out IMO.
+Hi,
 
-Until you have any one of the reasons we have PCIe devices described
-even when in a standard slot. Take your pick. An ethernet adapter that
-omits an EEPROM for the MAC address.
+On Tue, Nov 18, 2025 at 9:40=E2=80=AFPM Ye He <ye.he@amlogic.com> wrote:
+>
+> Hi Luiz,
+>
+> Hi,
+>
+> On Tue, Nov 18, 2025 at 4:32=E2=80=AFAM Ye He via B4 Relay
+> <devnull+ye.he.amlogic.com@kernel.org> wrote:
+>
+> From: Ye He <ye.he@amlogic.com>
+>
+> This patch provides implementations for the Connect and Disconnect
+> methods of the org.bluez.Bearer.LE1 and org.bluez.Bearer.BREDR1
+> interfaces.
+>
+> Ok, we will need some coverage in bluetoothctl in order to exercise this =
+API.
+>
+> OK, I will add the shell commands of bearer into bluetoothctl.
+>
+> Signed-off-by: Ye He <ye.he@amlogic.com>
+> ---
+> Changes in v3:
+> - Move the modification logic from the device to bearer, and add
+> - some helper functions to the device.
+> - Link to v2: https://patch.msgid.link/20251113-bearer-impl-v2-1-c3e825cc=
+6758@amlogic.com
+>
+> Changes in v2:
+> - Fix build error & warning.
+> - Link to v1: https://patch.msgid.link/20251111-bearer-impl-v1-1-f4158514=
+4218@amlogic.com
+> ---
+>  src/bearer.c | 160 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  src/device.c | 130 ++++++++++++++++++++++++++++++++++++++++--------
+>  src/device.h |  17 +++++++
+>  3 files changed, 285 insertions(+), 22 deletions(-)
+>
+> diff --git a/src/bearer.c b/src/bearer.c
+> index 9723b59e2e7b39b2974e258363aa0ace95862651..46e272b16096740ce28bcc80d=
+0e2426df8538a2e 100644
+> --- a/src/bearer.c
+> +++ b/src/bearer.c
+> @@ -25,23 +25,38 @@
+>
+>  #include "bluetooth/bluetooth.h"
+>  #include "bluetooth/mgmt.h"
+> +#include "bluetooth/uuid.h"
+>
+>  #include "gdbus/gdbus.h"
+>  #include "src/shared/util.h"
+> +#include "src/shared/queue.h"
+> +#include "src/shared/timeout.h"
+>
+>  #include "log.h"
+>  #include "error.h"
+>  #include "adapter.h"
+>  #include "device.h"
+> +#include "profile.h"
+> +#include "service.h"
+>  #include "dbus-common.h"
+>  #include "bearer.h"
+>
+> +#define DISCONNECT_TIMER       2
+> +
+>  struct btd_bearer {
+>         struct btd_device *device;
+>         uint8_t type;
+>         const char *path;
+> +       unsigned int disconn_timer;
+> +       struct queue *disconnects; /* disconnects message */
+> +       DBusMessage *connect; /* connect message */
+>
+> This doesn't sound quite right, why don't we queue connect messages?
+>
+> Just like Connect() in org.bluez.Device1, the connect operation is define=
+d
+> to allow only a single in-flight request. Queuing additional Connect
+> calls would change the existing API semantics and could lead to
+> unexpected state transitions=E2=80=94for example, duplicated browse attem=
+pts
+> or redundant link-level connection requests.
 
-Rob
+I think that was done because there is the likes of ConnectProfile,
+which is not the case here, anyway I'd probably add a comment that
+this is done in order to keep API semantics from Device.Connect.
+
+> Disconnect() is different: queuing only affects how replies are
+> delivered, not the device=E2=80=99s actual behavior.
+>
+>  };
+>
+> +static void bearer_free_dbus_message(void *data)
+> +{
+> +    dbus_message_unref((DBusMessage *)data);
+> +}
+> +
+>  static void bearer_free(void *data)
+>  {
+>         struct btd_bearer *bearer =3D data;
+> @@ -49,17 +64,126 @@ static void bearer_free(void *data)
+>         free(bearer);
+>  }
+>
+> +static void bearer_disconnect_service(struct btd_service *service, void =
+*user_data)
+> +{
+> +       uint8_t bdaddr_type =3D *(uint8_t *)user_data;
+> +       struct btd_profile *profile;
+> +       bt_uuid_t uuid;
+> +
+> +       profile =3D btd_service_get_profile(service);
+> +       if (!profile || !profile->remote_uuid)
+> +               return;
+> +
+> +       if (bt_string_to_uuid(&uuid, profile->remote_uuid) !=3D 0)
+> +               return;
+> +
+> +       if (bdaddr_type =3D=3D BDADDR_BREDR) {
+> +               if (uuid.value.u16 < 0x1100 || uuid.value.u16 > 0x11FF)
+> +                       return;
+> +       } else {
+> +               if (uuid.value.u16 < 0x1800 || uuid.value.u16 > 0x18FF)
+> +                       return;
+> +       }
+>
+> What are these ranges above?
+>
+> The UUID ranges are the SIG-assigned blocks for BR/EDR profiles
+> (0x1100=E2=80=930x11FF) and GATT services (0x1800=E2=80=930x18FF).
+> I originally used them to guess which bearer a service belongs to, but
+> this seems unreliable =E2=80=94 some profiles exist on both BR/EDR and LE=
+.
+> I=E2=80=99m open to better guidance on how to classify services/profiles
+> per bearer.
+
+If we really need to distinct the services per bearer Id add a bearer
+field to btd_profile, because as you say above there are profiles that
+can exist in both BR/EDR and LE, anyway if you look at util.c where
+there is the table of UUIDs it seems that the service UUID can extend
+from 0x1800 to 0x2800, but there could also be vendor ones which are
+on 0xfxxx range, meaning there could be multiple ranges we would need
+to check so I don't think this would be reliable in the end.
+
+> +
+> +       DBG("Disconnecting profile %s (UUID 0x%04x) for bearer addr type =
+%u",
+> +       profile->name ?: "(unknown)", uuid.value.u16, bdaddr_type);
+> +
+> +       btd_service_disconnect(service);
+> +}
+> +
+> +static bool bearer_disconnect_link(gpointer user_data)
+> +{
+> +       struct btd_bearer *bearer =3D user_data;
+> +       struct btd_device *device =3D bearer->device;
+> +
+> +       bearer->disconn_timer =3D 0;
+> +
+> +       if (btd_device_bdaddr_type_connected(device, bearer->type))
+> +               btd_adapter_disconnect_device(device_get_adapter(device),
+> +                                               device_get_address(device=
+),
+> +                                               bearer->type);
+> +       return FALSE;
+> +}
+> +
+>  static DBusMessage *bearer_connect(DBusConnection *conn, DBusMessage *ms=
+g,
+>                                                         void *user_data)
+>  {
+> -       /* TODO */
+> +       struct btd_bearer *bearer =3D user_data;
+> +       struct btd_device *device =3D bearer->device;
+> +       int err;
+> +
+> +       if (btd_device_bdaddr_type_connected(device, bearer->type)) {
+> +               if (msg)
+> +                       return btd_error_already_connected(msg);
+> +               return NULL;
+> +       }
+> +
+> +       if (device_is_bonding(device, NULL)) {
+> +               if (msg)
+> +                       return btd_error_in_progress(msg);
+> +               return NULL;
+> +       }
+> +
+> +       if (device_is_connecting(device) ||
+> +               bearer->connect) {
+> +               if (msg)
+> +                       return btd_error_in_progress(msg);
+> +               return NULL;
+> +       }
+> +
+> +       if (msg)
+> +               bearer->connect =3D dbus_message_ref(msg);
+> +
+> +       if (bearer->type =3D=3D BDADDR_BREDR)
+> +               return device_connect_profiles(device, BDADDR_BREDR,
+> +                                                               msg, NULL=
+);
+> +       else {
+> +               btd_device_set_temporary(device, false);
+> +               err =3D device_connect_le(device);
+> +               if (err < 0)
+> +                       return btd_error_failed(msg, strerror(-err));
+> +       }
+> +
+>         return NULL;
+>  }
+>
+>  static DBusMessage *bearer_disconnect(DBusConnection *conn, DBusMessage =
+*msg,
+>                                                         void *user_data)
+>  {
+> -       /* TODO */
+> +       struct btd_bearer *bearer =3D user_data;
+> +       struct btd_device *device =3D bearer->device;
+> +
+> +       if (!btd_device_bdaddr_type_connected(device, bearer->type)) {
+> +               if (msg)
+> +                       return btd_error_not_connected(msg);
+> +               return NULL;
+> +       }
+> +
+> +       if (device_is_disconnecting(device)) {
+> +               if (msg)
+> +                       return btd_error_in_progress(msg);
+> +               return NULL;
+> +       }
+> +
+> +       if (msg)
+> +               queue_push_tail(bearer->disconnects, dbus_message_ref(msg=
+));
+>
+> This also makes no sense, if you are going to queue the disconnect
+> message why are you sending in progress error if it is already
+> disconnecting?
+>
+> device_is_disconnecting(device) indicates that the org.bluez.Device1.Disc=
+onnect()
+> operation is in progress. This call has the higher priority because
+> it tears down both LE and BR/EDR bearers. Any bearer-level disconnect
+> requests should therefore be dropped once this state is active.
+>
+> +       device_cancel_bonding(device, MGMT_STATUS_DISCONNECTED);
+> +
+> +       device_cancel_browse(device, bearer->type);
+> +
+> +       btd_device_foreach_service(device, bearer_disconnect_service,
+> +                                                       &bearer->type);
+> +
+> +       device_remove_pending_services(device, bearer->type);
+> +
+> +       if (bearer->disconn_timer)
+> +               return NULL;
+> +
+> +       bearer->disconn_timer =3D timeout_add_seconds(DISCONNECT_TIMER,
+> +                                                       bearer_disconnect=
+_link,
+> +                                                       bearer, NULL);
+> +
+>         return NULL;
+>  }
+>
+> @@ -151,6 +275,7 @@ struct btd_bearer *btd_bearer_new(struct btd_device *=
+device, uint8_t type)
+>         bearer->device =3D device;
+>         bearer->type =3D type;
+>         bearer->path =3D device_get_path(device);
+> +       bearer->disconnects =3D queue_new();
+>
+>         if (!g_dbus_register_interface(btd_get_dbus_connection(),
+>                                         bearer->path, bearer_interface(ty=
+pe),
+> @@ -174,6 +299,16 @@ void btd_bearer_destroy(struct btd_bearer *bearer)
+>                 return;
+>         }
+>
+> +       if (bearer->disconnects) {
+> +               queue_destroy(bearer->disconnects, bearer_free_dbus_messa=
+ge);
+> +               bearer->disconnects =3D NULL;
+> +       }
+> +
+> +       if (bearer->connect) {
+> +               dbus_message_unref(bearer->connect);
+> +               bearer->connect =3D NULL;
+> +       }
+> +
+>         g_dbus_unregister_interface(btd_get_dbus_connection(), bearer->pa=
+th,
+>                                         bearer_interface(bearer->type));
+>  }
+> @@ -203,6 +338,13 @@ void btd_bearer_connected(struct btd_bearer *bearer)
+>         if (!bearer || !bearer->path)
+>                 return;
+>
+> +       if (bearer->connect) {
+> +               g_dbus_send_reply(btd_get_dbus_connection(), bearer->conn=
+ect,
+> +                                               DBUS_TYPE_INVALID);
+> +               dbus_message_unref(bearer->connect);
+> +               bearer->connect =3D NULL;
+> +       }
+> +
+>         g_dbus_emit_property_changed(btd_get_dbus_connection(), bearer->p=
+ath,
+>                                         bearer_interface(bearer->type),
+>                                         "Connected");
+> @@ -212,10 +354,24 @@ void btd_bearer_disconnected(struct btd_bearer *bea=
+rer, uint8_t reason)
+>  {
+>         const char *name;
+>         const char *message;
+> +       DBusMessage *msg;
+> +       const struct queue_entry *entry;
+>
+>         if (!bearer || !bearer->path)
+>                 return;
+>
+> +       if (!btd_device_is_connected(bearer->device))
+> +               device_disconnect_watches_callback(bearer->device);
+> +
+> +       while (!queue_isempty(bearer->disconnects)) {
+> +               entry =3D queue_get_entries(bearer->disconnects);
+> +               msg =3D entry->data;
+> +               g_dbus_send_reply(btd_get_dbus_connection(), msg,
+> +                                               DBUS_TYPE_INVALID);
+> +               queue_remove(bearer->disconnects, msg);
+> +               dbus_message_unref(msg);
+> +       }
+> +
+>         g_dbus_emit_property_changed(btd_get_dbus_connection(), bearer->p=
+ath,
+>                                         bearer_interface(bearer->type),
+>                                         "Connected");
+> diff --git a/src/device.c b/src/device.c
+> index 91b6cc0c65eaae8058cd445c0942ffee57289f0d..918f1e51acd3a9cd6b776cc08=
+0c198885511fb20 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -2022,6 +2022,28 @@ static void dev_disconn_service(gpointer a, gpoint=
+er b)
+>         btd_service_disconnect(a);
+>  }
+>
+> +void device_disconnect_watches_callback(struct btd_device *device)
+> +{
+> +       if (!device || !device->watches)
+> +               return;
+> +
+> +       while (device->watches) {
+> +               struct btd_disconnect_data *data =3D device->watches->dat=
+a;
+> +
+> +               if (data->watch)
+> +                       /* temporary is set if device is going to be remo=
+ved */
+> +                       data->watch(device, device->temporary,
+> +                                                       data->user_data);
+> +
+> +               /* Check if the watch has been removed by callback functi=
+on */
+> +               if (!g_slist_find(device->watches, data))
+> +                       continue;
+> +
+> +               device->watches =3D g_slist_remove(device->watches, data)=
+;
+> +               g_free(data);
+> +       }
+> +}
+> +
+>  void device_request_disconnect(struct btd_device *device, DBusMessage *m=
+sg)
+>  {
+>         if (device->bonding)
+> @@ -2063,21 +2085,7 @@ void device_request_disconnect(struct btd_device *=
+device, DBusMessage *msg)
+>         g_slist_free(device->pending);
+>         device->pending =3D NULL;
+>
+> -       while (device->watches) {
+> -               struct btd_disconnect_data *data =3D device->watches->dat=
+a;
+> -
+> -               if (data->watch)
+> -                       /* temporary is set if device is going to be remo=
+ved */
+> -                       data->watch(device, device->temporary,
+> -                                                       data->user_data);
+> -
+> -               /* Check if the watch has been removed by callback functi=
+on */
+> -               if (!g_slist_find(device->watches, data))
+> -                       continue;
+> -
+> -               device->watches =3D g_slist_remove(device->watches, data)=
+;
+> -               g_free(data);
+> -       }
+> +       device_disconnect_watches_callback(device);
+>
+>         if (!btd_device_is_connected(device)) {
+>                 if (msg)
+> @@ -2095,6 +2103,11 @@ bool device_is_disconnecting(struct btd_device *de=
+vice)
+>         return device->disconn_timer > 0;
+>  }
+>
+> +bool device_is_connecting(struct btd_device *device)
+> +{
+> +       return device->connect !=3D NULL;
+> +}
+> +
+>  static void add_set(void *data, void *user_data)
+>  {
+>         struct sirk_info *sirk =3D data;
+> @@ -2712,8 +2725,8 @@ int btd_device_connect_services(struct btd_device *=
+dev, GSList *services)
+>         return connect_next(dev);
+>  }
+>
+> -static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bda=
+ddr_type,
+> -                                       DBusMessage *msg, const char *uui=
+d)
+> +DBusMessage *device_connect_profiles(struct btd_device *dev,
+> +               uint8_t bdaddr_type, DBusMessage *msg, const char *uuid)
+>  {
+>         struct bearer_state *state =3D get_state(dev, bdaddr_type);
+>         int err;
+> @@ -2826,7 +2839,7 @@ static DBusMessage *dev_connect(DBusConnection *con=
+n, DBusMessage *msg,
+>                 return NULL;
+>         }
+>
+> -       return connect_profiles(dev, bdaddr_type, msg, NULL);
+> +       return device_connect_profiles(dev, bdaddr_type, msg, NULL);
+>  }
+>
+>  static DBusMessage *connect_profile(DBusConnection *conn, DBusMessage *m=
+sg,
+> @@ -2848,7 +2861,7 @@ static DBusMessage *connect_profile(DBusConnection =
+*conn, DBusMessage *msg,
+>                 return btd_error_invalid_args_str(msg,
+>                                         ERR_BREDR_CONN_INVALID_ARGUMENTS)=
+;
+>
+> -       reply =3D connect_profiles(dev, BDADDR_BREDR, msg, uuid);
+> +       reply =3D device_connect_profiles(dev, BDADDR_BREDR, msg, uuid);
+>         free(uuid);
+>
+>         return reply;
+> @@ -3421,7 +3434,7 @@ static DBusMessage *new_authentication_return(DBusM=
+essage *msg, uint8_t status)
+>         }
+>  }
+>
+> -static void device_cancel_bonding(struct btd_device *device, uint8_t sta=
+tus)
+> +void device_cancel_bonding(struct btd_device *device, uint8_t status)
+>  {
+>         struct bonding_req *bonding =3D device->bonding;
+>         DBusMessage *reply;
+> @@ -6629,6 +6642,38 @@ static int device_browse_sdp(struct btd_device *de=
+vice, DBusMessage *msg)
+>         return err;
+>  }
+>
+> +static gboolean device_is_browsing(struct btd_device *device, uint8_t bd=
+addr_type)
+> +{
+> +       if (!device->browse)
+> +               return FALSE;
+> +
+> +       if (bdaddr_type =3D=3D BDADDR_BREDR && device->browse->type =3D=
+=3D BROWSE_SDP)
+> +               return TRUE;
+> +
+> +       if (bdaddr_type !=3D BDADDR_BREDR && device->browse->type =3D=3D =
+BROWSE_GATT)
+> +               return TRUE;
+> +
+> +       return FALSE;
+> +}
+> +
+> +void device_cancel_browse(struct btd_device *device, uint8_t bdaddr_type=
+)
+> +{
+> +       struct btd_adapter *adapter =3D device->adapter;
+> +
+> +       DBG("");
+> +
+> +       if (!device_is_browsing(device, bdaddr_type))
+> +               return;
+> +
+> +       if (bdaddr_type =3D=3D BDADDR_BREDR)
+> +               bt_cancel_discovery(btd_adapter_get_address(adapter),
+> +                                                       &device->bdaddr);
+> +       else
+> +               attio_cleanup(device);
+> +
+> +       browse_request_free(device->browse);
+> +}
+> +
+>  int device_discover_services(struct btd_device *device)
+>  {
+>         int err;
+> @@ -8088,3 +8133,48 @@ void btd_device_foreach_service_data(struct btd_de=
+vice *dev, bt_ad_func_t func,
+>  {
+>         bt_ad_foreach_service_data(dev->ad, func, data);
+>  }
+> +
+> +
+> +void btd_device_foreach_service(struct btd_device *dev,
+> +                               btd_device_service_func_t func,
+> +                               void *user_data)
+> +{
+> +       GSList *l;
+> +
+> +       for (l =3D dev->services; l; l =3D l->next)
+> +               func(l->data, user_data);
+> +}
+> +
+> +void device_remove_pending_services(struct btd_device *dev,
+> +                                       uint8_t bdaddr_type)
+> +{
+> +       GSList *l =3D dev->pending;
+> +       GSList *next;
+> +       struct btd_service *service;
+> +       struct btd_profile *profile;
+> +       bt_uuid_t uuid;
+> +       bool match =3D false;
+> +
+> +       while (l) {
+> +               next =3D l->next;
+> +               service =3D l->data;
+> +
+> +               profile =3D btd_service_get_profile(service);
+> +               if (profile && profile->remote_uuid &&
+> +                       bt_string_to_uuid(&uuid, profile->remote_uuid) =
+=3D=3D 0) {
+> +
+> +                       if (bdaddr_type =3D=3D BDADDR_BREDR)
+> +                               match =3D uuid.value.u16 >=3D 0x1100 ||
+> +                                       uuid.value.u16 <=3D 0x11FF;
+> +                       else
+> +                               match =3D uuid.value.u16 >=3D 0x1800 ||
+> +                                       uuid.value.u16 <=3D 0x18FF;
+> +
+> +                       if (match)
+> +                               dev->pending =3D g_slist_remove(dev->pend=
+ing,
+> +                                                               service);
+> +               }
+> +
+> +               l =3D next;
+> +       }
+> +}
+> \ No newline at end of file
+> diff --git a/src/device.h b/src/device.h
+> index 6ed8affa0d4a9274d30cac9b48e8a6826edefd64..fee1ad50dc9c7ae248acd819d=
+ae07762c783ac35 100644
+> --- a/src/device.h
+> +++ b/src/device.h
+> @@ -120,6 +120,7 @@ void device_bonding_complete(struct btd_device *devic=
+e, uint8_t bdaddr_type,
+>  gboolean device_is_bonding(struct btd_device *device, const char *sender=
+);
+>  void device_bonding_attempt_failed(struct btd_device *device, uint8_t st=
+atus);
+>  void device_bonding_failed(struct btd_device *device, uint8_t status);
+> +void device_cancel_bonding(struct btd_device *device, uint8_t status);
+>  struct btd_adapter_pin_cb_iter *device_bonding_iter(struct btd_device *d=
+evice);
+>  int device_bonding_attempt_retry(struct btd_device *device);
+>  long device_bonding_last_duration(struct btd_device *device);
+> @@ -134,6 +135,9 @@ int device_notify_pincode(struct btd_device *device, =
+gboolean secure,
+>                                                         const char *pinco=
+de);
+>  void device_cancel_authentication(struct btd_device *device, gboolean ab=
+orted);
+>  gboolean device_is_authenticating(struct btd_device *device);
+> +
+> +void device_cancel_browse(struct btd_device *device, uint8_t bdaddr_type=
+);
+> +
+>  void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type,
+>                                                         uint32_t flags);
+>  void device_remove_connection(struct btd_device *device, uint8_t bdaddr_=
+type,
+> @@ -141,6 +145,7 @@ void device_remove_connection(struct btd_device *devi=
+ce, uint8_t bdaddr_type,
+>                                                         uint8_t reason);
+>  void device_request_disconnect(struct btd_device *device, DBusMessage *m=
+sg);
+>  bool device_is_disconnecting(struct btd_device *device);
+> +bool device_is_connecting(struct btd_device *device);
+>  void device_set_ltk(struct btd_device *device, const uint8_t val[16],
+>                                 bool central, uint8_t enc_size);
+>  bool btd_device_get_ltk(struct btd_device *device, uint8_t val[16],
+> @@ -170,6 +175,7 @@ guint device_add_disconnect_watch(struct btd_device *=
+device,
+>                                 disconnect_watch watch, void *user_data,
+>                                 GDestroyNotify destroy);
+>  void device_remove_disconnect_watch(struct btd_device *device, guint id)=
+;
+> +void device_disconnect_watches_callback(struct btd_device *device);
+>  int device_get_appearance(struct btd_device *device, uint16_t *value);
+>  void device_set_appearance(struct btd_device *device, uint16_t value);
+>
+> @@ -184,6 +190,9 @@ void btd_device_set_pnpid(struct btd_device *device, =
+uint16_t source,
+>
+>  int device_connect_le(struct btd_device *dev);
+>
+> +DBusMessage *device_connect_profiles(struct btd_device *dev,
+> +               uint8_t bdaddr_type, DBusMessage *msg, const char *uuid);
+> +
+>  typedef void (*device_svc_cb_t) (struct btd_device *dev, int err,
+>                                                         void *user_data);
+>
+> @@ -225,3 +234,11 @@ void btd_device_set_conn_param(struct btd_device *de=
+vice, uint16_t min_interval,
+>  void btd_device_foreach_service_data(struct btd_device *dev,
+>                                         bt_device_ad_func_t func,
+>                                         void *data);
+> +
+> +typedef void (*btd_device_service_func_t)(struct btd_service *service,
+> +                                       void *user_data);
+> +void btd_device_foreach_service(struct btd_device *dev,
+> +                               btd_device_service_func_t func,
+> +                               void *user_data);
+> +void device_remove_pending_services(struct btd_device *dev,
+> +                                       uint8_t bdaddr_type);
+> \ No newline at end of file
+>
+> ---
+> base-commit: 5e41d1e1d361e7288964e4c2c5ed90736025662f
+> change-id: 20251111-bearer-impl-5f7e396174aa
+>
+> Best regards,
+> --
+> Ye He <ye.he@amlogic.com>
+>
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+
+
+--=20
+Luiz Augusto von Dentz
