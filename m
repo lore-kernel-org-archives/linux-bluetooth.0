@@ -1,67 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CE533A031;
-	Thu, 20 Nov 2025 16:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDE12874F5;
+	Thu, 20 Nov 2025 16:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763657005; cv=none; b=E7B8VmxRL+1MEFWDiZv0xuOlznE/GRfF2I/D/K8V0z3Ljq2dTZ60PhxYo6elGbnGJXHuF86JmPpYG+Q/IsC/sW0NAHec9kXCdJh6D8xUaFkB6CuakTSpUW90kbbNsOuBv7n0uZRnpiHWWSZIFzz3okoyaXV/BlcmnH0gcnKsRQI=
+	t=1763657688; cv=none; b=nQkNr8b/SeBmWR9nNJs/4q+MLjh8bLlMWsdYtP1MOOZzVEYWrG5v/rTIUxJ8WmfkT5/u65cPVb003gG6GmpBlvKsZjLBROEjgrXWqRaVLY9MJEzGPRycbqSyh0gSMofFAzZJXKL2BCixFN6+TT/EvONsz24XnqyG12y48XMLMLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763657005; c=relaxed/simple;
-	bh=dUIhrJg6evgAmwLYcdnUYtg1zhKvMCqiLE1HJR0Bnr0=;
+	s=arc-20240116; t=1763657688; c=relaxed/simple;
+	bh=7RlJgO0bn3IQUwfaWF5A5gBBgoG4DUcrllB7yObH7KY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kWTedJJZR0z/pcmgAqeRmaCExYE6gABy16cC+mFfXdKoV8T+dFg9zg0RQRWy52x7nXC+qMQ+Vcu2wp7i9xttkwV2wyNjeMd5cmiEE1ElrHbaNLm/gC1K5O6w3h9PwIVZcShrYqVxQyE6glqqrlAIAPlpJTeXTl/mGS/Ac70B7XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=v/mbh+tv; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=UjN7Hqoe+pMesYYl59SHEntNwfZYOVitWNTMLuvlKYzaWUgyMe/ktib/t1TNEKXLG4CWBh1H5dBZ8MSwXzT6jJvtfd7YlH1w+UKoAZJfenNfWuZJUfHy2zNd0zWa8LrmMZrbwGZXgYjmEbvlIayEHHaY0dQBOygiVmfFnaa6N2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oK/ZXygo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="v/mbh+tv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E7B0C4CEF1;
-	Thu, 20 Nov 2025 16:43:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1763657004;
-	bh=dUIhrJg6evgAmwLYcdnUYtg1zhKvMCqiLE1HJR0Bnr0=;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oK/ZXygo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51418C4CEF1;
+	Thu, 20 Nov 2025 16:54:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763657687;
+	bh=7RlJgO0bn3IQUwfaWF5A5gBBgoG4DUcrllB7yObH7KY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=v/mbh+tvB1KHelE1be9Z1/VEYxRSHACo9IxEASdHb3KE0sdGip0SRtZ/nrsQ3s43a
-	 wzRPKSiS9wI05OiqkCN6i+qGXrTmC0DnuybsHOBiO0f5YQF+x83ctOIY1MtZpjSSmm
-	 44yfUg8qlDLRdQhoDq8AT89dUiG9RFPbyBQd5qpY=
-Date: Thu, 20 Nov 2025 17:43:21 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: incogcyberpunk@proton.me
-Cc: Doug Anderson <dianders@chromium.org>,
-	Thorsten Leemhuis <regressions@leemhuis.info>,
-	"regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-	"marcel@holtmann.org" <marcel@holtmann.org>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-	"sean.wang@mediatek.com" <sean.wang@mediatek.com>,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [REGRESSION] Bluetooth adapter provided by `btusb` not
- recognized since v6.13.2
-Message-ID: <2025112001-omen-idealness-19d4@gregkh>
-References: <jOB6zqCC3xjlPPJXwPYPb4MxHJOhxVgp380ayP7lYq-aT2iA5D8YCdMeCvq5Cp_ICZmqjpfgX8o9siQdlPu9DY4qgnL_zCjgqP23fXc-P4U=@proton.me>
- <T4YKnjuw-ZdA4uQjGVxQh-vqahAK_69kn20zfC_8R45iOxbdjo_tlIDwP5rTUyjn3NVUHYhG09VO2ryFtfLtgptBBhfXggFNAD2CVAwPcjU=@proton.me>
- <CAD=FV=WDx-WcosBWf2yd3sLx5pEyjOgbs_Y5RBF=+b=0q3dBww@mail.gmail.com>
- <5rFwJreAVujrYXDGZZxW32PHa6HZ29PEP4R5-dqS9dbU3FI__qe3zIUx31TIHO_LjuURCSwaGucSFBPeXAjf00XzAxTzXbmf1AaY6neyQ3Q=@proton.me>
- <CAD=FV=UCnt3nUktRyzUDp1agDFp3ZJo=t+xBbLCD6W7Jd0aF7Q@mail.gmail.com>
- <5vLxmZlxKXfznaWPi2ndxyj90dJN1FML_fINz027uaJP2rZK_nQu_41m7WA7Gnc1yy_XLw8KMWF18Y_keW-qKjHy0BBOQl0A92QiY7Kg004=@proton.me>
- <CAD=FV=WRYYYB+G4-7y7uVR8QCEEMp2iRfmtsAa29UfyNCVD=4Q@mail.gmail.com>
- <YrzH4CVQLf1BjCQDuWEnQ5oxWGrsTge_CHmEViJEDklOFwbMEylpl2KnmeiG1EgCm62OKNFG1JRu_b2bOVUbZZOZQwcSNHbUO1gR1GiN1rI=@proton.me>
- <CAD=FV=XUFEMAuLiFUR7pvPsWJP=_A=6=UGrFX9mobTV1M0gN=w@mail.gmail.com>
- <dA269ZfA6vvmePZBF3DBULVIDsK_zAWujzWKpPy44BQ0QGB6t6pG5JVTt8lwsArauLABj3oMiZVMEzM8GzjJKgx1iqQNwkICiGq9cNtaZak=@proton.me>
+	b=oK/ZXygo0+HJVRL1dGc2x1xDyykr2qJuxy9hlNMyPRPzGG+8NMayKfzWmw+R6Bks7
+	 zyojuibYxSUmBoBY9wjhfb43NO9giDXA7vx8gBMfjr/8LQIaYvRMvZ6ACsHiMbgzjq
+	 NJDFuGV9RKFcdQSEb1JDDEnFUjd6YM3rGWae0hwPLnbeyaa9wGYyYQLhF03Umc4WFb
+	 PW2ADyTK72HpLutxMVJhk+HkKz5au0EeujP3qdGrmz/HHsPtUrYEgxIe5LPgjDlp6q
+	 S1ZWqQPLybPUdcut5h8hQjJWD3waRP3UuCTKe4LWXvgHNEg+YNEh8YNZwLZ8v4xnk7
+	 S8RktxhAFysUw==
+Date: Thu, 20 Nov 2025 22:24:24 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: manivannan.sadhasivam@oss.qualcomm.com, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Hans de Goede <hansg@kernel.org>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
+	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: [PATCH 6/9] serdev: Skip registering serdev devices from DT is
+ external connector is used
+Message-ID: <blqs5xugab5kumljzrt26dvyhnun2pmpeu4y727xoz3vrponrt@bbxqnl55zhky>
+References: <20251112-pci-m2-e-v1-0-97413d6bf824@oss.qualcomm.com>
+ <20251112-pci-m2-e-v1-6-97413d6bf824@oss.qualcomm.com>
+ <CAL_JsqKBcXH0EWguto3EFY2cJ5p=8VUZczMHz1u5fNFocv-AmA@mail.gmail.com>
+ <cjtnoqjr3v5o64caa6unllb2e2csyvybr6vnzwuqqrl453bgz7@drqmfkfbn5xg>
+ <CAL_JsqLoD5GiiGgWTEa6-g8VwyuPTko-ewe5CKPBWMgHDnKaHg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <dA269ZfA6vvmePZBF3DBULVIDsK_zAWujzWKpPy44BQ0QGB6t6pG5JVTt8lwsArauLABj3oMiZVMEzM8GzjJKgx1iqQNwkICiGq9cNtaZak=@proton.me>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL_JsqLoD5GiiGgWTEa6-g8VwyuPTko-ewe5CKPBWMgHDnKaHg@mail.gmail.com>
 
-On Thu, Nov 20, 2025 at 04:35:27PM +0000, incogcyberpunk@proton.me wrote:
-> So, now does this patch for the regression gets merged upstream for the next mainline and stable releases ? 
+On Thu, Nov 20, 2025 at 10:22:16AM -0600, Rob Herring wrote:
+> On Wed, Nov 19, 2025 at 7:33 AM Manivannan Sadhasivam <mani@kernel.org> wrote:
+> >
+> > On Tue, Nov 18, 2025 at 07:03:51AM -0600, Rob Herring wrote:
+> > > On Wed, Nov 12, 2025 at 8:45 AM Manivannan Sadhasivam via B4 Relay
+> > > <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> wrote:
+> > > >
+> > > > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > > >
+> > > > If an external connector like M.2 is connected to the serdev controller
+> > > > in DT, then the serdev devices will be created dynamically by the connector
+> > > > driver. So skip registering devices from DT node as there will be no
+> > > > statically defined devices.
+> > >
+> > > You could still have statically defined devices. You are just choosing
+> > > to probe them later from the connector driver.
+> > >
+> >
+> > The point of coming up with the M.2 binding is to avoid hardcoding the devices
+> > in DT. So static devices are ruled out IMO.
+> 
+> Until you have any one of the reasons we have PCIe devices described
+> even when in a standard slot. Take your pick. An ethernet adapter that
+> omits an EEPROM for the MAC address.
+> 
 
-Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+Hmm, I didn't envision the need to have static and dynamic devices at the same
+time. So you are suggesting to first look for the static devices and then look
+for graph port at the end?
 
-for how this happens.
+- Mani
+
+-- 
+மணிவண்ணன் சதாசிவம்
