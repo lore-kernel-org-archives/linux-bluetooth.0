@@ -1,75 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6102E34EEE2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Nov 2025 14:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BDC3346A9
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Nov 2025 14:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763735445; cv=none; b=sCM8qd59ZK/NdC8tmoKjG13NCyorBLKYA1qv0wEc8fkaEM6+6QqGqK8XjjCa4lJ+fEQSDdtSHj05oQr+4xaSQmWvm5vn1AnurJ3NeipM7rRiAPtbx0iPaEZPGHzIXejwgzNX/KfBTNo6JyZPZMbTQF25GEPSneAEJsHsDwxL4YQ=
+	t=1763736239; cv=none; b=Cnw3IKDaNeW2CCKcyF5f0br11Seu9ttG67IKFwWcY7mFIQJX9pzHosoA8OuKMC+yl21M3Y5IDadBt0HZpLSqGBCacUXVmMsJ07YXj6e9qf8uQZVL7SJpOA2Q2FzNgVYdNaeDF5mO5Afc5m8T0XqAiUY/L6zdJleS6Z0iNLVnDoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763735445; c=relaxed/simple;
-	bh=SdV+j3JiV/oNkmBrjgcunRXXcyMRM/t6OdLB6W1V2i4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WsgmmP06Ge014t1ciHzUeZydP0ee7Bnl/YnizED386TC1g8BxLTYd8OLKkEb0dV0dFxeq1/BxTeDDs2jTCcIu6MXsLAQd8LZH+YRhP8G1hpbwLpUA/7pVmSV7hA0Sc0nxBqi5DXX39idWPhoEHl7osL+T28ONfawkeKzfUV7fvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VvOekOqz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763736239; c=relaxed/simple;
+	bh=vm729RKaRLjLXG2NQrqwQNX22gthM3+IVU0sOoOpG8c=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=KPkPJh8ETXl1ae4yy5Kaam8oEpFvY8lwkdJK0a7VL7RigNXQCszrCuAxITtYXM7WGdOdkqoJ2UV0OmkVZ9KHxVdsoekXGuThI2tyChq2PDKDdV8xgF9EWC+oI9e1LTKOm+RXTVJvgQAWYXlNhsmyCI/582+/Ha7+TWeXYOw6M70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lbH95zH8; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VvOekOqz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F39F7C4CEF1;
-	Fri, 21 Nov 2025 14:30:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763735445;
-	bh=SdV+j3JiV/oNkmBrjgcunRXXcyMRM/t6OdLB6W1V2i4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VvOekOqzNYPuXhJ2IrLega7bDRNVbz1IGBpG82gss0+061oiC/74RexLD6kYE05uK
-	 j71B7Sei5bPLYa9+CrCnIY7owoxVPlXP9/2ELBN0kiiqvLjwutfvnPVo5xOpw/jIyB
-	 LTJx4+A5xpj+JVdUaLyCxSNejZIVvMnqhrhbNQMdQfm/lYNJH0pPvZJFpuzzcA0LtJ
-	 lVQFWOS3ELn+rVMnU0kLPy75ReTyWhWFIcukP3mA0Djxgk/mIMkaaPOdU4wTn8hnML
-	 V2miO+V7ymd8w8sWTn+LOmx1F6DaUG8BFACy5cTpsJXyHsjjkfPxhLrBkftiiHtV0+
-	 N9+E40XzdhbuQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFE43A55FBE;
-	Fri, 21 Nov 2025 14:30:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lbH95zH8"
+Received: from github.com (hubbernetes-node-6f921cd.va3-iad.github.net [10.48.221.57])
+	by smtp.github.com (Postfix) with ESMTPA id 11C5FE0C5C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Nov 2025 06:43:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1763736236;
+	bh=z21sWYq43r0/eMRanqPtBzpDdrc1rsb2vcOKfe3NpzE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=lbH95zH8puN7YGR9nQfpUoMoHSn3hxEknhXEFNIvdCR2RlbUFagMGw1X9MpXsFkYD
+	 ZhVpTEUMxkQZ1lWg1lKuPyIgbZuslZkfLACigaBBlmhciod70mthXpF2Sc1sGLMzjC
+	 D90zT7Us9DDdlPRaYH3xCrNL06w7wz9iRPIMUOog=
+Date: Fri, 21 Nov 2025 06:43:56 -0800
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/8a41ac-ae5473@github.com>
+Subject: [bluez/bluez] ae5473: client: Fix issue of bearer info not printing
+ corr...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bluez] client: Fix issue of bearer info not printing
- correctly
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176373540977.2451256.7122543895977949126.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Nov 2025 14:30:09 +0000
-References: <20251121-bearer-info-v1-1-f38dc0cbbbd0@amlogic.com>
-In-Reply-To: <20251121-bearer-info-v1-1-f38dc0cbbbd0@amlogic.com>
-To: Ye He <ye.he@amlogic.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: ae54731047cd8b124e1b35e7fb8e8ed73b340532
+      https://github.com/bluez/bluez/commit/ae54731047cd8b124e1b35e7fb8e8ed73b340532
+  Author: Ye He <ye.he@amlogic.com>
+  Date:   2025-11-21 (Fri, 21 Nov 2025)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M client/main.c
 
-On Fri, 21 Nov 2025 17:16:25 +0800 you wrote:
-> From: Ye He <ye.he@amlogic.com>
-> 
-> The device proxy was incorrectly used when printing
-> bearer properties.
-> 
-> Signed-off-by: Ye He <ye.he@amlogic.com>
-> 
-> [...]
+  Log Message:
+  -----------
+  client: Fix issue of bearer info not printing correctly
 
-Here is the summary with links:
-  - [bluez] client: Fix issue of bearer info not printing correctly
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ae54731047cd
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The device proxy was incorrectly used when printing
+bearer properties.
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
