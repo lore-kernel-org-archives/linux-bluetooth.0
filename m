@@ -1,611 +1,226 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C99F2D8774
-	for <linux-bluetooth@vger.kernel.org>; Sun, 23 Nov 2025 16:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763914656; cv=pass; b=HSVZBpkc6WNVhaaow0n6ddBQAv1lWlk+TnEafzw9krBJTWFD2aozNkshqN7SCtsoT569oNU4027ATIkY2ve86f8sbjjxFSKBrWEn4Zdd/gpHUiaVpOAfVhaC+GH7Q1WeM2X+KVglRNatdQDP9tc1CdP5x0uPLtaf2AcIJH2Enlk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763914656; c=relaxed/simple;
-	bh=a7cWn/7Nz6PU6upX9DWBf3wowcfY231SDAWUQ7Zq7Xw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f/3RwgJnltw+7XAuFGk4/D3Mr0ytWbPhBW3Wt1vt18Rn7mJKJUIBpoiMh+aPIUkwqlZ1E52hqCXmtTV/j0Sq3oewHXDqYPQYMsHAS4hA4tLD8fByueuvBBigIJWPEqLmg+IOYhRnDFVb6clg5no0sOJ9ogvKBzdPJWKmOHPPWSw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=L30x5DP7; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF5722579E
+	for <linux-bluetooth@vger.kernel.org>; Sun, 23 Nov 2025 16:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763915924; cv=none; b=rNASYAMKxS6t0NzOFOP3sX3ufTqaVuyqgToqgSm7AZtqq9qOXg69Rzx2K3kIOmskVMc/FMg68L94Xx88LPC/qMpFTVqCrfMxBt1wrq5ZA59N2kVTW8pg/5Uc7V8BmPzbwnTS9jx4PiVy3QJTIPdBa/aZQj2mCXnaniQSO2x3y9U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763915924; c=relaxed/simple;
+	bh=PqATHG24rYFtdd8mdkaSgl4+Jqs0J+/X/nx2sriFmXo=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GV1NGRq5/Zvyx+PvQzE13IG7kRroAYMPNJbPFCmoYQI1wFsuasrQ/alfMvkCmlANosw172jFPJrwjQF5NEwjbqIoY80ZChwVoqwwfbWI01T+LD8Kl4evq3TLnqcbk4t28l78YjUYB0pdrL+B1VxzTPzR662rxV1AzLL0Zo5SYOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=AKNWMeVB; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="L30x5DP7"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dDvHV5tGjz10D5;
-	Sun, 23 Nov 2025 18:17:26 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1763914647;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vrjrI/d0Vrdr5IUT/PdB3SAqRt9CfaK75gxnjCa1oF8=;
-	b=L30x5DP72DYtiTCPY7dTUr0Z4BOPrBAzRPuC/N2h2rI+GDhvEQkmIuzsA//Ht0CWBnA7ye
-	d0BKTu5BsIB+oDCEuAIiqSwAKd7/3+etsppPBLoiHSwhUn2x4IWnO6I52UOrKo372cs5hc
-	+Boo7TMLG8YDMOB9+lYMRCnSC+6Ucgk=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1763914647;
-	b=l/OlL2KAHguXIBKkbsElnLIpidpixaI7aU+ldE4c3KQzE4IE037qDK72fpEfFaVGhS0KjF
-	7NS9GcPavzjQOSncg+t2OM12h1hjMb6NsMXzTVM+0LHQMuUPpUabjTIeSghxxa/QcI9Xmz
-	PGJGHYftHBWZJXnJZmBbr9nPi4yKo/w=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1763914647;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vrjrI/d0Vrdr5IUT/PdB3SAqRt9CfaK75gxnjCa1oF8=;
-	b=Zru5evxYGTZUqlO2OtErgDkRPcUwQSqlKrIQohjWytufVYv/SnGCjDQDbep7x5HTZ6kP4S
-	X/ygzK+plJKNEOKZM3b8luHWIOOCu4yfiLKBqo+pxCR2TEI6MCX+DpJl7deiMox5PtoVr/
-	cU5izJsV1FY5ls8/tozsLy0+EnQC4LI=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="AKNWMeVB"
+Received: from github.com (hubbernetes-node-58caf4e.ash1-iad.github.net [10.56.168.37])
+	by smtp.github.com (Postfix) with ESMTPA id 810FB14022C
+	for <linux-bluetooth@vger.kernel.org>; Sun, 23 Nov 2025 08:38:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1763915920;
+	bh=KVSrSswUF8mMFiRhCglXYdxm0/tY2/tsffD24dwZkr8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=AKNWMeVBS8TRwLnS33u2H4Ikt3gp7mJv7uhzbHht0MYO2CNYfO6/QTWKompBHu1vB
+	 lQaWD+oiUEYSeCg3Ptf28dGt8gjvJBXF4pcGt8tmP00/Ew/3aLb+CnitdUGKsDEK3J
+	 gQ/JQFO260WvCkDnSRisAduJQeHsghT+Idtgw9hI=
+Date: Sun, 23 Nov 2025 08:38:40 -0800
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 06/10] test-gmap: add test for GMAP Service
-Date: Sun, 23 Nov 2025 18:17:11 +0200
-Message-ID: <8f84563df9653b5afcf052694a99e881e0cc4e81.1763914558.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <cover.1763914558.git.pav@iki.fi>
-References: <cover.1763914558.git.pav@iki.fi>
+Message-ID: <bluez/bluez/push/refs/heads/1026711/000000-f5872e@github.com>
+Subject: [bluez/bluez] 80e60b: shared/tmap: add TMAP Service
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1026711
+  Home:   https://github.com/bluez/bluez
+  Commit: 80e60b4f55c27a4fa56176ea669c24ca68bb825a
+      https://github.com/bluez/bluez/commit/80e60b4f55c27a4fa56176ea669c24ca68bb825a
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M Makefile.am
+    M lib/bluetooth/uuid.h
+    A src/shared/tmap.c
+    A src/shared/tmap.h
+
+  Log Message:
+  -----------
+  shared/tmap: add TMAP Service
+
+TMAP Service is just a simple service with a Role bitmask.
+
+The value can be used to figure out which TMAP roles the remote device
+claims it supports (matters for available mandatory features).  Also can
+advertise the same for remote clients.
+
+
+  Commit: ea90fd37dfc6a4649e5585d2c678492d5ecaa2be
+      https://github.com/bluez/bluez/commit/ea90fd37dfc6a4649e5585d2c678492d5ecaa2be
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M .gitignore
+    M Makefile.am
+    A unit/test-tmap.c
+
+  Log Message:
+  -----------
+  test-tmap: add test for TMAP Service
+
+Add tests on TMAP service for reading the role attribute.
+
+
+  Commit: 99953b4fc0a922993c686558d8137786cd41bfad
+      https://github.com/bluez/bluez/commit/99953b4fc0a922993c686558d8137786cd41bfad
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M Makefile.plugins
+    M configure.ac
+    A profiles/audio/tmap.c
+
+  Log Message:
+  -----------
+  tmap: add TMAP profile
+
+Read TMAP Role from remote devices and enable advertising the value for
+local services.
+
+
+  Commit: 575d6e7d4de2fc416f98e8da3942888844b6aa4d
+      https://github.com/bluez/bluez/commit/575d6e7d4de2fc416f98e8da3942888844b6aa4d
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: have unicast client wait for VCS & TMAS
+
+Have unicast client to wait for VCS and TMAS before creating endpoints
+and transports, so that their information is available at that point.
+
+
+  Commit: e0db0211999d9cca745c4f84034529429c2a9f0b
+      https://github.com/bluez/bluez/commit/e0db0211999d9cca745c4f84034529429c2a9f0b
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M Makefile.am
+    M lib/bluetooth/uuid.h
+    A src/shared/gmap.c
+    A src/shared/gmap.h
+
+  Log Message:
+  -----------
+  shared/gmap: add GMAP Service
+
+GMAP Service is just a simple service with bitmasks.
+
+The values can be used to figure out which GMAP roles and features the
+remote device claims it supports (matters for available mandatory
+features).  Also can advertise the same for remote clients.
+
+
+  Commit: e68d2fb43c391f16b4a3d3ba5b6e577396cdd389
+      https://github.com/bluez/bluez/commit/e68d2fb43c391f16b4a3d3ba5b6e577396cdd389
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M .gitignore
+    M Makefile.am
+    A unit/test-gmap.c
+
+  Log Message:
+  -----------
+  test-gmap: add test for GMAP Service
 
 Add tests on GMAP service for reading the attributes.
----
- .gitignore       |   1 +
- Makefile.am      |   6 +
- unit/test-gmap.c | 496 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 503 insertions(+)
- create mode 100644 unit/test-gmap.c
 
-diff --git a/.gitignore b/.gitignore
-index 48bf72a4a..ba29d9d5e 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -119,6 +119,7 @@ unit/test-bap
- unit/test-bass
- unit/test-battery
- unit/test-tmap
-+unit/test-gmap
- tools/mgmt-tester
- tools/smp-tester
- tools/gap-tester
-diff --git a/Makefile.am b/Makefile.am
-index 14dccafaf..7221e4cba 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -709,6 +709,12 @@ unit_test_tmap_SOURCES = unit/test-tmap.c $(btio_sources)
- unit_test_tmap_LDADD = src/libshared-glib.la \
- 				lib/libbluetooth-internal.la $(GLIB_LIBS)
- 
-+unit_tests += unit/test-gmap
-+
-+unit_test_gmap_SOURCES = unit/test-gmap.c $(btio_sources)
-+unit_test_gmap_LDADD = src/libshared-glib.la \
-+				lib/libbluetooth-internal.la $(GLIB_LIBS)
-+
- unit_tests += unit/test-battery
- 
- unit_test_battery_SOURCES = unit/test-battery.c
-diff --git a/unit/test-gmap.c b/unit/test-gmap.c
-new file mode 100644
-index 000000000..6102ce65d
---- /dev/null
-+++ b/unit/test-gmap.c
-@@ -0,0 +1,496 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2025  Pauli Virtanen. All rights reserved.
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+#include <unistd.h>
-+#include <string.h>
-+#include <sys/socket.h>
-+#include <fcntl.h>
-+
-+#include <glib.h>
-+
-+#include "bluetooth/bluetooth.h"
-+#include "bluetooth/uuid.h"
-+#include "src/shared/util.h"
-+#include "src/shared/tester.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/shared/gatt-server.h"
-+#include "src/shared/io.h"
-+#include "src/shared/gmap.h"
-+
-+struct test_config {
-+	uint8_t role;
-+	uint32_t features;
-+	const struct iovec *setup_data;
-+	const size_t setup_data_len;
-+};
-+
-+struct test_data {
-+	struct gatt_db *db;
-+	struct bt_gatt_server *server;
-+	struct bt_gatt_client *client;
-+	struct bt_gmap *gmap;
-+	size_t iovcnt;
-+	struct iovec *iov;
-+	const struct test_config *cfg;
-+};
-+
-+#define iov_data(args...) ((const struct iovec[]) { args })
-+
-+#define define_test(name, setup, function, _cfg, args...)	\
-+	do {							\
-+		const struct iovec iov[] = { args };		\
-+		static struct test_data data;			\
-+		data.iovcnt = ARRAY_SIZE(iov_data(args));	\
-+		data.iov = util_iov_dup(iov, ARRAY_SIZE(iov_data(args))); \
-+		data.cfg = _cfg;				\
-+		tester_add(name, &data, setup, function,	\
-+				test_teardown);			\
-+	} while (0)
-+
-+static void print_debug(const char *str, void *user_data)
-+{
-+	const char *prefix = user_data;
-+
-+	if (tester_use_debug())
-+		tester_debug("%s%s", prefix, str);
-+}
-+
-+static void test_teardown(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+
-+	bt_gatt_client_unref(data->client);
-+
-+	bt_gatt_server_unref(data->server);
-+	util_iov_free(data->iov, data->iovcnt);
-+
-+	gatt_db_unref(data->db);
-+
-+	bt_gmap_unref(data->gmap);
-+	tester_teardown_complete();
-+}
-+
-+/* ATT: Exchange MTU Response (0x03) len 2
-+ *   Server RX MTU: 64
-+ * ATT: Exchange MTU Request (0x02) len 2
-+ *    Client RX MTU: 64
-+ * ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute type: Server Supported Features (0x2b3a)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Type Request (0x08)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_MTU_FEAT \
-+	IOV_DATA(0x02, 0x40, 0x00), \
-+	IOV_DATA(0x03, 0x40, 0x00), \
-+	IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x3a, 0x2b), \
-+	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
-+
-+/* ATT: Read By Group Type Request (0x10) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute group type: Primary Service (0x2800)
-+ * ATT: Read By Group Type Response (0x11) len 37
-+ *   Attribute data length: 6
-+ *   Attribute group list: 1 entries
-+ *   Handle range: 0x0001-0x000f
-+ *   UUID: Gaming Audio Service (0x1858)
-+ * ATT: Read By Group Type Request (0x10) len 6
-+ *   Handle range: 0x0006-0xffff
-+ *   Attribute group type: Primary Service (0x2800)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Group Type Request (0x10)
-+ *   Handle: 0x0004
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_PRIMARY_SERVICE \
-+	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28), \
-+	IOV_DATA(0x11, 0x06, \
-+		0x01, 0x00, 0x0f, 0x00, 0x58, 0x18), \
-+	IOV_DATA(0x10, 0x10, 0x00, 0xff, 0xff, 0x00, 0x28), \
-+	IOV_DATA(0x01, 0x10, 0x10, 0x00, 0x0a)
-+
-+
-+/* ATT: Read By Group Type Request (0x10) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute group type: Secondary Service (0x2801)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Group Type Request (0x10)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_SECONDARY_SERVICE \
-+	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28), \
-+	IOV_DATA(0x01, 0x10, 0x01, 0x00, 0x0a)
-+
-+/* ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0x0005
-+ *   Attribute group type: Include (0x2802)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Group Type Request (0x10)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_INCLUDE \
-+	IOV_DATA(0x08, 0x01, 0x00, 0x0f, 0x00, 0x02, 0x28), \
-+	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
-+
-+/* ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0x0003
-+ *   Attribute type: Characteristic (0x2803)
-+ * ATT: Read By Type Response (0x09) len 57
-+ *   Attribute data length: 7
-+ *   Attribute data list: 8 entries
-+ *     Handle: 0x0002
-+ *     Value: 020300512b
-+ *     Properties: 0x02
-+ *       Read (0x02)
-+ *     Value Handle: 0x0003
-+ *     Value UUID: GMAP Role (0x2c00)
-+ * ATT: Read By Type Response (0x09) len 57
-+ *   Attribute data length: 7
-+ *   Attribute data list: 8 entries
-+ *     Handle: 0x0004
-+ *     Value: 020300512b
-+ *     Properties: 0x02
-+ *       Read (0x02)
-+ *     Value Handle: 0x0005
-+ *     Value UUID: GMAP Features ({uuid})
-+ * ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0003-0x0004
-+ *   Attribute type: Characteristic (0x2803)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Type Request (0x08)
-+ *   Handle: 0x0022
-+ *   Error: Attribute Not Found (0x0a)
-+ * ATT: Find Information Request (0x04)
-+ * ATT: Error Response
-+ */
-+#define IOV_CONTENT(data...)	data
-+
-+#define GMAS_FIND_CHRC(uuid) \
-+	IOV_DATA(0x08, 0x01, 0x00, 0x0f, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x09, 0x07, \
-+		0x02, 0x00, 0x02, 0x03, 0x00, 0x00, 0x2c, \
-+		0x04, 0x00, 0x02, 0x05, 0x00, uuid), \
-+	IOV_DATA(0x08, 0x05, 0x00, 0x0f, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x01, 0x08, 0x05, 0x00, 0x0a), \
-+	IOV_DATA(0x04, 0x06, 0x00, 0x0f, 0x00), \
-+	IOV_DATA(0x01, 0x04, 0x06, 0x00, 0x0a)
-+
-+#define UGG_UUID	0x01, 0x2c
-+#define UGT_UUID	0x02, 0x2c
-+#define BGS_UUID	0x03, 0x2c
-+#define BGR_UUID	0x04, 0x2c
-+
-+#define ROLE_HND	0x03, 0x00
-+#define FEAT_HND	0x05, 0x00
-+
-+/* ACL Data TX: Handle 42 flags 0x00 dlen 11
-+ *   ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute type: Database Hash (0x2b2a)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Type Request (0x08)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_DATABASE_HASH \
-+	IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x2a, 0x2b), \
-+	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
-+
-+
-+#define GMAS_SETUP(uuid) \
-+	GMAS_MTU_FEAT, \
-+	GMAS_PRIMARY_SERVICE, \
-+	GMAS_SECONDARY_SERVICE, \
-+	GMAS_INCLUDE, \
-+	GMAS_FIND_CHRC(IOV_CONTENT(uuid)), \
-+	GMAS_DATABASE_HASH
-+
-+/* GATT Discover All procedure */
-+static const struct iovec setup_data_ugg[] = { GMAS_SETUP(UGG_UUID) };
-+static const struct iovec setup_data_ugt[] = { GMAS_SETUP(UGT_UUID) };
-+static const struct iovec setup_data_bgs[] = { GMAS_SETUP(BGS_UUID) };
-+static const struct iovec setup_data_bgr[] = { GMAS_SETUP(BGR_UUID) };
-+
-+static void setup_complete_cb(const void *user_data)
-+{
-+	tester_setup_complete();
-+}
-+
-+static void test_setup_server(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+	const struct test_config *cfg = data->cfg;
-+	struct bt_att *att;
-+	struct gatt_db *db;
-+	struct io *io;
-+
-+	io = tester_setup_io(cfg->setup_data, cfg->setup_data_len);
-+	g_assert(io);
-+
-+	tester_io_set_complete_func(setup_complete_cb);
-+
-+	db = gatt_db_new();
-+	g_assert(db);
-+
-+	data->gmap = bt_gmap_add_db(db);
-+	bt_gmap_set_debug(data->gmap, print_debug, "gmap:", NULL);
-+
-+	bt_gmap_set_role(data->gmap, data->cfg->role);
-+	bt_gmap_set_features(data->gmap, data->cfg->features);
-+
-+	att = bt_att_new(io_get_fd(io), false);
-+	g_assert(att);
-+	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
-+
-+	data->server = bt_gatt_server_new(db, att, 64, 0);
-+	g_assert(data->server);
-+	bt_gatt_server_set_debug(data->server, print_debug, "bt_gatt_server:",
-+						NULL);
-+
-+	tester_io_send();
-+
-+	bt_att_unref(att);
-+	gatt_db_unref(db);
-+}
-+
-+static void test_complete_cb(const void *user_data)
-+{
-+	tester_test_passed();
-+}
-+
-+static void test_server(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+	struct io *io;
-+
-+	io = tester_setup_io(data->iov, data->iovcnt);
-+	g_assert(io);
-+
-+	tester_io_set_complete_func(test_complete_cb);
-+
-+	tester_io_send();
-+}
-+
-+static void setup_ready_cb(bool success, uint8_t att_ecode, void *user_data)
-+{
-+	if (!success)
-+		tester_setup_failed();
-+	else
-+		tester_setup_complete();
-+}
-+
-+static void test_setup(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+	const struct test_config *cfg = data->cfg;
-+	struct bt_att *att;
-+	struct gatt_db *db;
-+	struct io *io;
-+
-+	io = tester_setup_io(cfg->setup_data, cfg->setup_data_len);
-+	g_assert(io);
-+
-+	att = bt_att_new(io_get_fd(io), false);
-+	g_assert(att);
-+
-+	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
-+
-+	db = gatt_db_new();
-+	g_assert(db);
-+
-+	data->client = bt_gatt_client_new(db, att, 64, 0);
-+	g_assert(data->client);
-+
-+	bt_gatt_client_set_debug(data->client, print_debug, "bt_gatt_client:",
-+						NULL);
-+
-+	bt_gatt_client_ready_register(data->client, setup_ready_cb, data,
-+						NULL);
-+
-+	bt_att_unref(att);
-+	gatt_db_unref(db);
-+}
-+
-+static void client_ready_cb(struct bt_gmap *gmap, void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+
-+	if (bt_gmap_get_role(gmap) != data->cfg->role) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	if (bt_gmap_get_features(gmap) != data->cfg->features) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	tester_test_passed();
-+}
-+
-+static void test_client(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+	struct io *io;
-+
-+	io = tester_setup_io(data->iov, data->iovcnt);
-+	g_assert(io);
-+
-+	tester_io_set_complete_func(NULL);
-+
-+	data->gmap = bt_gmap_attach(data->client, client_ready_cb, data);
-+	g_assert(data->gmap);
-+
-+	bt_gmap_set_debug(data->gmap, print_debug, "gmap:", NULL);
-+}
-+
-+/* ATT: Read Request (0x0a) len 2
-+ *   Handle: 0x0003 Type: GMAP Role (0x2c00)
-+ * ATT: Read Response (0x0b) len 24
-+ *   Value: _value
-+ *   Handle: 0x0003 Type: GMAP Role (0x2c00)
-+ */
-+
-+#define READ_CHRC(hnd, value...) \
-+	IOV_DATA(0x0a, hnd), \
-+	IOV_DATA(0x0b, value)
-+
-+#define READ_ROLE(value...)	READ_CHRC(IOV_CONTENT(ROLE_HND), value)
-+#define READ_FEAT(value...)	READ_CHRC(IOV_CONTENT(FEAT_HND), value)
-+
-+#define CGGIT_CHA(role, value)	READ_ROLE(role), READ_FEAT(value)
-+
-+#define CGGIT_ROLE	CGGIT_CHA(0x01, 0x00)
-+#define CGGIT_ROLE_RFU	CGGIT_CHA(0xf1, 0x00)
-+
-+const struct test_config cfg_read_role = {
-+	.role = BT_GMAP_ROLE_UGG,
-+	.setup_data = setup_data_ugg,
-+	.setup_data_len = ARRAY_SIZE(setup_data_ugg),
-+};
-+
-+#define CGGIT_UGG	CGGIT_CHA(0x01, 0x01)
-+#define CGGIT_UGG_RFU	CGGIT_CHA(0x01, 0xf1)
-+
-+const struct test_config cfg_read_ugg = {
-+	.role = BT_GMAP_ROLE_UGG,
-+	.features = BT_GMAP_UGG_MULTIPLEX,
-+	.setup_data = setup_data_ugg,
-+	.setup_data_len = ARRAY_SIZE(setup_data_ugg),
-+};
-+
-+#define CGGIT_UGT	CGGIT_CHA(0x02, 0x01)
-+#define CGGIT_UGT_RFU	CGGIT_CHA(0x02, 0x81)
-+
-+const struct test_config cfg_read_ugt = {
-+	.role = BT_GMAP_ROLE_UGT,
-+	.features = BT_GMAP_UGT_SOURCE,
-+	.setup_data = setup_data_ugt,
-+	.setup_data_len = ARRAY_SIZE(setup_data_ugt),
-+};
-+
-+#define CGGIT_BGS	CGGIT_CHA(0x04, 0x01)
-+#define CGGIT_BGS_RFU	CGGIT_CHA(0x04, 0x81)
-+
-+const struct test_config cfg_read_bgs = {
-+	.role = BT_GMAP_ROLE_BGS,
-+	.features = BT_GMAP_BGS_96KBPS,
-+	.setup_data = setup_data_bgs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_bgs),
-+};
-+
-+#define CGGIT_BGR	CGGIT_CHA(0x08, 0x01)
-+#define CGGIT_BGR_RFU	CGGIT_CHA(0x08, 0x81)
-+
-+const struct test_config cfg_read_bgr = {
-+	.role = BT_GMAP_ROLE_BGR,
-+	.features = BT_GMAP_BGR_MULTISINK,
-+	.setup_data = setup_data_bgr,
-+	.setup_data_len = ARRAY_SIZE(setup_data_bgr),
-+};
-+
-+static void test_gmap_cl(void)
-+{
-+	/* Sec. 4.5.1 TMA Client */
-+	define_test("GMAP/CL/CGGIT/CHA/BV-01-C [GMAP Role Read Characteristic, "
-+						"Client]",
-+		test_setup, test_client, &cfg_read_role, CGGIT_ROLE);
-+	define_test("GMAP/CL/CGGIT/CHA/BV-03-C [UGG Features Read "
-+						"Characteristic, Client]",
-+		test_setup, test_client, &cfg_read_ugg, CGGIT_UGG);
-+	define_test("GMAP/CL/CGGIT/CHA/BV-02-C [UGT Features Read "
-+						"Characteristic, Client]",
-+		test_setup, test_client, &cfg_read_ugt, CGGIT_UGT);
-+	define_test("GMAP/CL/CGGIT/CHA/BV-04-C [BGS Features Read "
-+						"Characteristic, Client]",
-+		test_setup, test_client, &cfg_read_bgs, CGGIT_BGS);
-+	define_test("GMAP/CL/CGGIT/CHA/BV-05-C [BGR Features Read "
-+						"Characteristic, Client]",
-+		test_setup, test_client, &cfg_read_bgr, CGGIT_BGR);
-+
-+	define_test("GMAP/CL/GMAS/BI-01-C [Client Ignores RFU Bits in GMAP "
-+						"Role Characteristic]",
-+		test_setup, test_client, &cfg_read_role, CGGIT_ROLE_RFU);
-+	define_test("GMAP/CL/GMAS/BI-03-C [Client Ignores RFU Bits in UGG "
-+						"Features Characteristic]",
-+		test_setup, test_client, &cfg_read_ugg, CGGIT_UGG_RFU);
-+	define_test("GMAP/CL/GMAS/BI-02-C [Client Ignores RFU Bit in UGT "
-+						"Features Characteristic]",
-+		test_setup, test_client, &cfg_read_ugt, CGGIT_UGT_RFU);
-+	define_test("GMAP/CL/GMAS/BI-04-C [Client Ignores RFU Bits in BGS "
-+						"Features Characteristic]",
-+		test_setup, test_client, &cfg_read_bgs, CGGIT_BGS_RFU);
-+	define_test("GMAP/CL/GMAS/BI-05-C [Client Ignores RFU Bits in BGR "
-+						"Features Characteristic]",
-+		test_setup, test_client, &cfg_read_bgr, CGGIT_BGR_RFU);
-+}
-+
-+/* Step 1. in CGGIT/CHA skipped, should be unnecessary */
-+#define SGGIT_CHA_ROLE	READ_ROLE(0x01)
-+#define SGGIT_CHA_FEAT	READ_FEAT(0x01)
-+
-+static void test_gmap_sr(void)
-+{
-+	/* Sec. 4.6.2 GMA Server */
-+	define_test("GMAP/SR/SGGIT/CHA/BV-01-C [Characteristic GGIT - GMAP "
-+						"Role]",
-+		test_setup_server, test_server, &cfg_read_role, SGGIT_CHA_ROLE);
-+	define_test("GMAP/SR/SGGIT/CHA/BV-03-C [Characteristic GGIT - UGG "
-+						"Features]",
-+		test_setup_server, test_server, &cfg_read_ugg, SGGIT_CHA_FEAT);
-+	define_test("GMAP/SR/SGGIT/CHA/BV-02-C [Characteristic GGIT - UGT "
-+						"Features]",
-+		test_setup_server, test_server, &cfg_read_ugt, SGGIT_CHA_FEAT);
-+	define_test("GMAP/SR/SGGIT/CHA/BV-04-C [Characteristic GGIT - BGS "
-+						"Features]",
-+		test_setup_server, test_server, &cfg_read_bgs, SGGIT_CHA_FEAT);
-+	define_test("GMAP/SR/SGGIT/CHA/BV-05-C [Characteristic GGIT - BGR "
-+						"Features]",
-+		test_setup_server, test_server, &cfg_read_bgr, SGGIT_CHA_FEAT);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	tester_init(&argc, &argv);
-+	test_gmap_cl();
-+	test_gmap_sr();
-+
-+	return tester_run();
-+}
--- 
-2.51.1
 
+  Commit: d992424281c71092cabcaac86eee677f51ec33c3
+      https://github.com/bluez/bluez/commit/d992424281c71092cabcaac86eee677f51ec33c3
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M Makefile.plugins
+    M configure.ac
+    A profiles/audio/gmap.c
+
+  Log Message:
+  -----------
+  gmap: Add GMAP profile
+
+Read GMAP properties from remote devices and enable advertising the
+values for local services.
+
+
+  Commit: c30fc6a06bf57004dd94e840dbfcf7f96c84b5a1
+      https://github.com/bluez/bluez/commit/c30fc6a06bf57004dd94e840dbfcf7f96c84b5a1
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: unicast client wait for GMAP service
+
+Wait until GMAP properties (if any) are read before configuring
+endpoints and transports as BAP Client.
+
+
+  Commit: f86a08101d6e9dd597b4d280db64ef141555b7d3
+      https://github.com/bluez/bluez/commit/f86a08101d6e9dd597b4d280db64ef141555b7d3
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M doc/org.bluez.MediaEndpoint.rst
+
+  Log Message:
+  -----------
+  doc: org.bluez.MediaEndpoint: add SupportedFeatures
+
+Add SupportedFeatures field for indicating TMAP & GMAP roles and
+features.
+
+
+  Commit: f5872e81f4df93d8a55627e5fe6b04ce88f86df2
+      https://github.com/bluez/bluez/commit/f5872e81f4df93d8a55627e5fe6b04ce88f86df2
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-23 (Sun, 23 Nov 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: add SupportedFeatures for MediaEndpoints
+
+Indicate TMAP & GMAP capabilities in SupportedFeatures.
+
+
+Compare: https://github.com/bluez/bluez/compare/80e60b4f55c2%5E...f5872e81f4df
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
