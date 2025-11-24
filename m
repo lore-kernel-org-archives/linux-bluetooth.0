@@ -1,132 +1,416 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E0736D4F0
-	for <linux-bluetooth@vger.kernel.org>; Sun, 23 Nov 2025 21:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEFD239E9A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Nov 2025 02:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763931662; cv=none; b=IKLgDhbPtu+TjroBpAb5NNMdzic1pcLkQVN9ssaVUJMC8tHtGRdGlibspdOCAv1ENdmrPQ3AE+5Mc2NfKDXTl6ozeysQeWoaf9CIFhbUf+uPqXj8YtFX7OrPpNuaNuBalIwpUgivQrYMAxTK2ACxVN55dEw8DlCMgxBJpfN6m4E=
+	t=1763952920; cv=none; b=Y7JQy+9NSLeU1SZOQmodMyQzsLzLTbLROYQRq1wJNTOPRuwojkAsqXWRFYxTVlVQtoXoSwBFOyc/Lz94DhelPxlRoYg8kM+Y6LvvI/8YMwaGUPGxXcPRRKfsDbqaxPziA0Z/vFfsd/ueLRyQujwpt44aLjrif/1eU04WbENk3os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763931662; c=relaxed/simple;
-	bh=oXqT7chW4gwJOXjqphGpx+rcK+tX+1zMqqwPxnai7Z4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=hyjHrQymYJ3jZ5+S2/Xd0pHvErdXaOGlK1IiFE1UVOioxrmb6iWK/ztONUIF6qdcWIG3lBMEfE7Q0dAkw5K8+e7bd3XS7OBMnaO1Asj3kwtAEgQKnqrx6PWgGXV/1l1vU9IGly0W2j5SZR0v1ed1XKT+QIEzU2CaI2oMMTWziTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h9J/I8G7; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763952920; c=relaxed/simple;
+	bh=16ETnOMrwTlbSMN/GmWr2fghN7ZjFYG1dMmpLeNkvNA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=AIkymfnU2q3ubG/BMuCrrVYrqPonJU1RXRovhxmemLP/zTW/KniWBUa04NNl3Uqcss6BOn0iOSGJPwZbJTMC6Hm1e05EceTOvSKPtsPQUf4WzMlVgfvrgW2gll6cY2aFTjYKsLZJVTxqHMgwothu6pSLhOKzyXkkgJe+/gZoEf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vE/mfeD9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h9J/I8G7"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8b28f983333so371089285a.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Nov 2025 13:00:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763931658; x=1764536458; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hUpwYZb8FwI4PMzSx92sdewjHs3fu8C4Z9oNA4pPARk=;
-        b=h9J/I8G7qlvkiPh2mDRMEYHiFrCrGpfsUYsQBXH1LaJWOAagWxivgNdo5UqEYjANxY
-         MA3hkzSHV8vwYBZ2wS/0IpMqxX7IKQ6KAwJU4AHRfGsniDVdyUNhNAT6mimRmMLLYKPG
-         XPxj30/mrU5CVMGqwOXGmz7ggGo00SaYtcqfxe69MNE4Ud6DFYWQA8tJXwhVSfaX2mZ4
-         j9QkRfbHjaccUaW+5uEXNKISk3yi7pD+kvNY9GZTxY91dIR/JYL+Xcyj0+ThAjf2I+I0
-         0UPWK+XCdSPZKLB2Qhfv7WeL22lmcs/K0rU2PjMoYoQv/i0jngezhUOeXzrahBVSX+No
-         QPHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763931658; x=1764536458;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hUpwYZb8FwI4PMzSx92sdewjHs3fu8C4Z9oNA4pPARk=;
-        b=on0n8VTqmFtKV7MbrUEd1M8m1vTXUZ7gl9pZs0KMP6lTOgInRmQuO5uM8zI/rBmu2V
-         ALwnfwLZgOx967PkHx9jplZ/MnW3/0WObuy6DXL5P7ca4BU9gwJ9vyvaxgnH8Vq5qWaH
-         K93Pvmwoxq9kpuo0xaWJwXKGGtqGLgqO5B6EAq6QUD6AjIXgdlp0/i+3Kb/kbtrBDZIj
-         nl8A4XDzQeRhljIPCL02Twq6XCGtnPP+fwHMB9G+EV3ND0ialCJlyHGkEq/Lta4l7s0l
-         5L1PyS/k6S2eqlYQIODUeWLailtafvSHuTyj+spvufQfzlMf1FXb4sM/W2B7x4h25nj0
-         MHyg==
-X-Gm-Message-State: AOJu0YzLmNsnQAAWYfcLrc+a+iU5v3GtGy1yUEsrdcKvyvcm0TPeJhWU
-	X898AKSiO6fScIKIu/MTaGnElIgytMrYKPgE6k/VPGkp+pA8FQsM3It0MAPw2Q==
-X-Gm-Gg: ASbGncuNubHqTZfYg6sGqEX3Y8Ki8+x9M9tyN4zQU+nXAYr7behvxG/hjygnwDLoKDD
-	dowAisJjxZqOK8NpmM5a5bO/aX6F4Bzr+y9jpWJSrdnhxcdsxkNkjpq5ZU/gGWqhuwn/6RKtCBH
-	zcZ+lVFLji8pY3kwI65nOoU4mfXd8AE73lK7z8J20dm1Muuh14xNhsYZlZHsztmmsVFlYm+dGxY
-	vPn6681zIK0rdAMb4EhnaFeNyhDittShiBkm2pOFnHvf3QitVlbCx/pHszRzU6M/AmJIq3bWrjh
-	4wSJJurFDYgFcqnZZ99GFU3roMHBkqxgmDpcCALt+kU8xN3sOMio3u/AtIQKCYbfaJEgHRS+7Rk
-	Tt0Ogzme7VZWi8SMP8j69JXA5TKtOkRU4d+mn+Y15v8iH45dVNK5ggTfUF6hl8GI6MIJVpNf+G2
-	JNQhnPbv6P/uQXONqB1oiwN4+JQBWN5w==
-X-Google-Smtp-Source: AGHT+IEfWjyMi/nDvL4Ix+62iWmSHBhlyc0jx1uA9qhauU3mGidmpXAdohR4VrK4RVTu4uh9dzBIgg==
-X-Received: by 2002:a05:622a:143:b0:4ec:fa43:4d58 with SMTP id d75a77b69052e-4ee589103c1mr116859821cf.50.1763931658412;
-        Sun, 23 Nov 2025 13:00:58 -0800 (PST)
-Received: from [172.17.0.2] ([135.119.238.200])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee48e65f59sm73674631cf.27.2025.11.23.13.00.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Nov 2025 13:00:57 -0800 (PST)
-Message-ID: <69237609.c80a0220.724ab.3202@mx.google.com>
-Date: Sun, 23 Nov 2025 13:00:57 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6913584910821623726=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vE/mfeD9"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 32371C113D0;
+	Mon, 24 Nov 2025 02:55:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763952920;
+	bh=16ETnOMrwTlbSMN/GmWr2fghN7ZjFYG1dMmpLeNkvNA=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=vE/mfeD9F7CDc3aSCjcREOnFUyn0vsDwRqEjlRVmPQCIxSnckkn4pCg9y3bTD+p97
+	 9/NYTyNajwqt1Ln0kC6RsFSl+aqak7wqy1THKIzPZJphdIX13HvYr3aRDOM1+PE15B
+	 DTrXaJOouBF3ZkeeH6J4vLZtfLyc2QRCo+iZwTK/0YlfrySJThhgQT5Ss8kfU5gWTT
+	 nagynLBaX2jRVsilxQr8fLukiov3zdE6R/7qE0SQCTT2kbwvdcwyLve5uw0G+h0fPd
+	 CNMl7SnMaeTgbIcPfQLrXzAXIwsBjPU/L+RdWIbxZsAzI1H7gbkSUI3Uz+cXevn0XB
+	 jF9mDWIv8jfgA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2071BCFD316;
+	Mon, 24 Nov 2025 02:55:20 +0000 (UTC)
+From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
+Date: Mon, 24 Nov 2025 10:55:18 +0800
+Subject: [PATCH bluez] profiles: Add bearer field to btd_profile
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] sco-tester: add timeout / close during connection tests
-In-Reply-To: <d4a840b0d5c6bde1c6e5a5da6e2479bb2aaad7d3.1763928580.git.pav@iki.fi>
-References: <d4a840b0d5c6bde1c6e5a5da6e2479bb2aaad7d3.1763928580.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============6913584910821623726==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20251124-profile-bearer-type-v1-1-50b377b65048@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIABXJI2kC/x3MQQqDMBBG4avIrB0wQbH2KuIiqX/aAdEwUWkV7
+ 97g8lu8d1KCChI9i5MUuyRZ5gxTFvT6uPkNljGbbGUbY2zNUZcgE9jDKZTXXwQbhwdC16JDRbm
+ MiiDf+9qTnzYcNFzXH/uz9zpsAAAA
+X-Change-ID: 20251124-profile-bearer-type-1ae8ef97e9e0
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Ye He <ye.he@amlogic.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1763952918; l=13832;
+ i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
+ bh=UiNDJDmUHsffzefxnX+hE+voiuhZDJyqyuhJqMWvM18=;
+ b=qTwCGY5zAw5YnuVT3LXvO+rwbik4Wx+BJoowbwo6qEoSj/xnzYnVuPmpW2hMplV+OBs1EOiGT
+ agV6GkvYTbVC658M33XojR9/2R7+Zh4VAleHcUKVqUCLZeF/rk+RELA
+X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
+ pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
+X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
+ auth_id=348
+X-Original-From: Ye He <ye.he@amlogic.com>
+Reply-To: ye.he@amlogic.com
 
-This is automated email and please do not reply to this email!
+From: Ye He <ye.he@amlogic.com>
 
-Dear submitter,
+Add bearer filed into btd_profile to indicates which bearer
+type this profile belongs to. Thus we can distinct the services
+per bearer.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1026741
+Signed-off-by: Ye He <ye.he@amlogic.com>
+---
+ profiles/audio/a2dp.c            |  5 +++--
+ profiles/audio/asha.c            |  1 +
+ profiles/audio/avrcp.c           |  2 ++
+ profiles/audio/bap.c             |  2 ++
+ profiles/audio/bass.c            |  1 +
+ profiles/audio/ccp.c             |  1 +
+ profiles/audio/csip.c            |  2 ++
+ profiles/audio/mcp.c             |  1 +
+ profiles/audio/micp.c            |  1 +
+ profiles/audio/vcp.c             |  1 +
+ profiles/battery/battery.c       |  1 +
+ profiles/deviceinfo/deviceinfo.c |  1 +
+ profiles/gap/gas.c               |  1 +
+ profiles/health/hdp_manager.c    |  2 ++
+ profiles/input/hog.c             |  1 +
+ profiles/input/manager.c         |  1 +
+ profiles/midi/midi.c             |  1 +
+ profiles/network/manager.c       |  3 +++
+ profiles/scanparam/scan.c        |  1 +
+ src/profile.h                    | 10 ++++++++++
+ 20 files changed, 37 insertions(+), 2 deletions(-)
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.29 seconds
-BuildEll                      PASS      20.25 seconds
-BluezMake                     PASS      632.41 seconds
-MakeCheck                     PASS      21.81 seconds
-MakeDistcheck                 PASS      238.19 seconds
-CheckValgrind                 PASS      295.20 seconds
-CheckSmatch                   WARNING   342.21 seconds
-bluezmakeextell               PASS      180.04 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      964.89 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-tools/sco-tester.c: note: in included file:./lib/bluetooth/bluetooth.h:232:15: warning: array of flexible structures./lib/bluetooth/bluetooth.h:237:31: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index d8f24eaebc745a6d91a8207f6595f0b90d982c39..7a37003a2b25a9e931b8efdfc974368f5ab2bac8 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -3757,8 +3757,9 @@ static void media_server_remove(struct btd_adapter *adapter)
+ static struct btd_profile a2dp_source_profile = {
+ 	.name		= "a2dp-source",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
+-
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 	.remote_uuid	= A2DP_SOURCE_UUID,
++
+ 	.device_probe	= a2dp_source_probe,
+ 	.device_remove	= a2dp_source_remove,
+ 
+@@ -3773,7 +3774,7 @@ static struct btd_profile a2dp_source_profile = {
+ static struct btd_profile a2dp_sink_profile = {
+ 	.name		= "a2dp-sink",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
+-
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 	.remote_uuid	= A2DP_SINK_UUID,
+ 	.device_probe	= a2dp_sink_probe,
+ 	.device_remove	= a2dp_sink_remove,
+diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
+index e870ea06f03ac1c20e5b29fb158c815aa2ce756c..8e625fdca32ff0b40efd43e394b34559627bde8c 100644
+--- a/profiles/audio/asha.c
++++ b/profiles/audio/asha.c
+@@ -499,6 +499,7 @@ static int asha_source_disconnect(struct btd_service *service)
+ static struct btd_profile asha_source_profile = {
+ 	.name		= "asha-source",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= ASHA_PROFILE_UUID,
+ 	.experimental	= true,
+ 
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 21bc80bbd095da49788a87357fd67c8e96ab779d..e6f7e1bfde9879ab6bf028e16384d474332fe805 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -4868,6 +4868,7 @@ done:
+ 
+ static struct btd_profile avrcp_target_profile = {
+ 	.name		= "audio-avrcp-target",
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 
+ 	.remote_uuid	= AVRCP_TARGET_UUID,
+ 	.device_probe	= avrcp_target_probe,
+@@ -4951,6 +4952,7 @@ done:
+ 
+ static struct btd_profile avrcp_controller_profile = {
+ 	.name		= "avrcp-controller",
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 
+ 	.remote_uuid	= AVRCP_REMOTE_UUID,
+ 	.device_probe	= avrcp_controller_probe,
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index b07d65e68bab2e60ec675ff9dac781f29194acb2..3f71e3522635d9dee11a32a08d1d18059711f737 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -3869,6 +3869,7 @@ static void bap_adapter_remove(struct btd_profile *p,
+ static struct btd_profile bap_profile = {
+ 	.name		= "bap",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= PACS_UUID_STR,
+ 	.device_probe	= bap_probe,
+ 	.device_remove	= bap_remove,
+@@ -3883,6 +3884,7 @@ static struct btd_profile bap_profile = {
+ static struct btd_profile bap_bcast_profile = {
+ 	.name		= "bcaa",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= BCAAS_UUID_STR,
+ 	.device_probe	= bap_bcast_probe,
+ 	.device_remove	= bap_bcast_remove,
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index 9ace372376f9452050724360c2c28e7cdcf1391b..8886a27d99b63b37e2937d8d70f71dfeda3d9ef2 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -2172,6 +2172,7 @@ static void bass_server_remove(struct btd_profile *p,
+ static struct btd_profile bass_service = {
+ 	.name		= "bass",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= BASS_UUID_STR,
+ 	.device_probe	= bass_probe,
+ 	.device_remove	= bass_remove,
+diff --git a/profiles/audio/ccp.c b/profiles/audio/ccp.c
+index 8aa537b044e13b6d6a773645b420161bedca13ef..fb85045bb8ba1ec47a33856af1129d0ef78bf500 100644
+--- a/profiles/audio/ccp.c
++++ b/profiles/audio/ccp.c
+@@ -208,6 +208,7 @@ ccp_server_remove(struct btd_profile *p,
+ static struct btd_profile ccp_profile = {
+ 	.name		= "ccp",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= GTBS_UUID_STR,
+ 	.device_probe	= ccp_probe,
+ 	.device_remove	= ccp_remove,
+diff --git a/profiles/audio/csip.c b/profiles/audio/csip.c
+index b8f29ddf852231d89760d6fe7ca2cfd684236570..d766c3da951899d990aa59132b820737604b1b7c 100644
+--- a/profiles/audio/csip.c
++++ b/profiles/audio/csip.c
+@@ -303,6 +303,7 @@ static void csip_remove(struct btd_service *service)
+ static struct btd_profile csip_profile = {
+ 	.name		= "csip",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= CSIS_UUID_STR,
+ 
+ 	.device_probe	= csip_probe,
+@@ -442,6 +443,7 @@ static void csis_server_remove(struct btd_profile *p,
+ static struct btd_profile csis_profile = {
+ 	.name		= "csis",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.local_uuid	= CSIS_UUID_STR,
+ 
+ 	.adapter_probe	= csis_server_probe,
+diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
+index 6651b0897e6f631906b1467f5a479737541da286..8d4eed64399195533ac13fd075d7196a35cf2113 100644
+--- a/profiles/audio/mcp.c
++++ b/profiles/audio/mcp.c
+@@ -383,6 +383,7 @@ static void media_control_server_remove(struct btd_profile *p,
+ static struct btd_profile mcp_profile = {
+ 	.name			= "mcp",
+ 	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= GMCS_UUID_STR,
+ 	.device_probe	= mcp_probe,
+ 	.device_remove	= mcp_remove,
+diff --git a/profiles/audio/micp.c b/profiles/audio/micp.c
+index f1fb133897320677225a1c8bee06b4a1214f14fa..475f32daf75c06dc28ca72420a80e30802e5a3e9 100644
+--- a/profiles/audio/micp.c
++++ b/profiles/audio/micp.c
+@@ -300,6 +300,7 @@ static void micp_server_remove(struct btd_profile *p,
+ static struct btd_profile micp_profile = {
+ 	.name		= "micp",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= MICS_UUID_STR,
+ 
+ 	.device_probe	= micp_probe,
+diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
+index 8949c71858e53448ee01c5c4261082f3912a759c..471ad59250386941c377e2f81e911467d7023cce 100644
+--- a/profiles/audio/vcp.c
++++ b/profiles/audio/vcp.c
+@@ -328,6 +328,7 @@ static void vcp_server_remove(struct btd_profile *p,
+ static struct btd_profile vcp_profile = {
+ 	.name		= "vcp",
+ 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= VCS_UUID_STR,
+ 
+ 	.device_probe	= vcp_probe,
+diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
+index 050234a0fa03813dc9e1b8302689fc68ec254184..2fe1f4aca2cf7b21e52bec989711741d6d7e25b5 100644
+--- a/profiles/battery/battery.c
++++ b/profiles/battery/battery.c
+@@ -327,6 +327,7 @@ static int batt_disconnect(struct btd_service *service)
+ 
+ static struct btd_profile batt_profile = {
+ 	.name		= "batt-profile",
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= BATTERY_UUID,
+ 	.device_probe	= batt_probe,
+ 	.device_remove	= batt_remove,
+diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
+index f5adb101e312108be8dae20c75cc74e1ff7eaabf..e77bb50b457a28f08f3e9d2ecf8d81d80da86106 100644
+--- a/profiles/deviceinfo/deviceinfo.c
++++ b/profiles/deviceinfo/deviceinfo.c
+@@ -137,6 +137,7 @@ static int deviceinfo_disconnect(struct btd_service *service)
+ 
+ static struct btd_profile deviceinfo_profile = {
+ 	.name		= "deviceinfo",
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= DEVICE_INFORMATION_UUID,
+ 	.device_probe	= deviceinfo_probe,
+ 	.device_remove	= deviceinfo_remove,
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index dd45554d43ebc267d40a8fe4a8fab48f602bf6bc..0f41c9e6c2a5c7d980509ae66d8d7d7c2678fd21 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -366,6 +366,7 @@ static int gap_disconnect(struct btd_service *service)
+ 
+ static struct btd_profile gap_profile = {
+ 	.name		= "gap-profile",
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= GAP_UUID,
+ 	.device_probe	= gap_probe,
+ 	.device_remove	= gap_remove,
+diff --git a/profiles/health/hdp_manager.c b/profiles/health/hdp_manager.c
+index d1e627a3382a01bdd5002bcc0da01da35e872da1..72b69428036df77e2cdb224f186fb13191f955ed 100644
+--- a/profiles/health/hdp_manager.c
++++ b/profiles/health/hdp_manager.c
+@@ -57,6 +57,7 @@ static void hdp_driver_remove(struct btd_service *service)
+ 
+ static struct btd_profile hdp_source_profile = {
+ 	.name		= "hdp-source",
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 	.remote_uuid	= HDP_SOURCE_UUID,
+ 
+ 	.device_probe	= hdp_driver_probe,
+@@ -68,6 +69,7 @@ static struct btd_profile hdp_source_profile = {
+ 
+ static struct btd_profile hdp_sink_profile = {
+ 	.name		= "hdp-sink",
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 	.remote_uuid	= HDP_SINK_UUID,
+ 
+ 	.device_probe	= hdp_driver_probe,
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index 1f5b82b774353244067e460f49aaccd09e26dcc8..f50a0f217f7f732f82645e289419e51ee6412917 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -215,6 +215,7 @@ static int hog_disconnect(struct btd_service *service)
+ 
+ static struct btd_profile hog_profile = {
+ 	.name		= "input-hog",
++	.bearer		= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid	= HOG_UUID,
+ 	.device_probe	= hog_probe,
+ 	.device_remove	= hog_remove,
+diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+index b0e415f6706c54e7c96199d3bb5e483d0927153f..0fcd6728c2fca83f03f7333f50102658553403e7 100644
+--- a/profiles/input/manager.c
++++ b/profiles/input/manager.c
+@@ -45,6 +45,7 @@ static void hid_server_remove(struct btd_profile *p,
+ 
+ static struct btd_profile input_profile = {
+ 	.name		= "input-hid",
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 	.local_uuid	= HID_UUID,
+ 	.remote_uuid	= HID_UUID,
+ 
+diff --git a/profiles/midi/midi.c b/profiles/midi/midi.c
+index 90e00a5f58361f1da57a71f393e581da5128310c..ea4719b95b23aa97850de362da9012728427f08e 100644
+--- a/profiles/midi/midi.c
++++ b/profiles/midi/midi.c
+@@ -458,6 +458,7 @@ static int midi_disconnect(struct btd_service *service)
+ 
+ static struct btd_profile midi_profile = {
+ 	.name = "MIDI GATT Driver",
++	.bearer	= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid = MIDI_UUID,
+ 	.priority = BTD_PROFILE_PRIORITY_HIGH,
+ 	.auto_connect = true,
+diff --git a/profiles/network/manager.c b/profiles/network/manager.c
+index 51f382529df27600d1a4fd806cb656d7f1a682af..693547d45fbc5b2f227fed832b4efb8fb87c2d59 100644
+--- a/profiles/network/manager.c
++++ b/profiles/network/manager.c
+@@ -120,6 +120,7 @@ static void nap_server_remove(struct btd_profile *p,
+ 
+ static struct btd_profile panu_profile = {
+ 	.name		= "network-panu",
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 	.local_uuid	= NAP_UUID,
+ 	.remote_uuid	= PANU_UUID,
+ 	.device_probe	= connection_register,
+@@ -132,6 +133,7 @@ static struct btd_profile panu_profile = {
+ 
+ static struct btd_profile gn_profile = {
+ 	.name		= "network-gn",
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 	.local_uuid	= PANU_UUID,
+ 	.remote_uuid	= GN_UUID,
+ 	.device_probe	= connection_register,
+@@ -144,6 +146,7 @@ static struct btd_profile gn_profile = {
+ 
+ static struct btd_profile nap_profile = {
+ 	.name		= "network-nap",
++	.bearer		= BTD_PROFILE_BEARER_BREDR,
+ 	.local_uuid	= PANU_UUID,
+ 	.remote_uuid	= NAP_UUID,
+ 	.device_probe	= connection_register,
+diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+index 1c531773740c847e970ac45b7fbda2c0c9501ded..a66f80eabf3ef63e35cfd5e8da30e4aa18420b94 100644
+--- a/profiles/scanparam/scan.c
++++ b/profiles/scanparam/scan.c
+@@ -259,6 +259,7 @@ static int scan_param_probe(struct btd_service *service)
+ 
+ static struct btd_profile scan_profile = {
+ 	.name = "Scan Parameters Client Driver",
++	.bearer	= BTD_PROFILE_BEARER_LE,
+ 	.remote_uuid = SCAN_PARAMETERS_UUID,
+ 	.device_probe = scan_param_probe,
+ 	.device_remove = scan_param_remove,
+diff --git a/src/profile.h b/src/profile.h
+index 424ce55ad65748ead13b1a38d67fbad6beb2b828..1281d8d9a0daa5de6578a5ae6df8fc211269d409 100644
+--- a/src/profile.h
++++ b/src/profile.h
+@@ -12,12 +12,22 @@
+ #define BTD_PROFILE_PRIORITY_MEDIUM	1
+ #define BTD_PROFILE_PRIORITY_HIGH	2
+ 
++#define BTD_PROFILE_BEARER_ANY		0
++#define BTD_PROFILE_BEARER_LE		1
++#define BTD_PROFILE_BEARER_BREDR	2
++
+ struct btd_service;
+ 
+ struct btd_profile {
+ 	const char *name;
+ 	int priority;
+ 
++	/* Indicates which bearer type this profile belongs to. Some profiles
++	 * may exist in both BR/EDR and LE, in which case they should be
++	 * registered with BTD_PROFILE_BEARER_ANY.
++	 */
++	int bearer;
++
+ 	const char *local_uuid;
+ 	const char *remote_uuid;
+ 
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: f6f6abf8d5ccf3c4bc42cf578c4ef7ab6c2ec9d9
+change-id: 20251124-profile-bearer-type-1ae8ef97e9e0
+
+Best regards,
+-- 
+Ye He <ye.he@amlogic.com>
 
 
---===============6913584910821623726==--
