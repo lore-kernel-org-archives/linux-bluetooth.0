@@ -1,249 +1,118 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7067A31619D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Nov 2025 16:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764003528; cv=pass; b=qNjuZM3BHTM+MXLC4nFjWMKwZISDt9dOeDvh2soFO7PangZscp+W8pGlIahbljNFAKBueXzOZyFmM9Iyr70tRXeUf7b33xFe4fc/TVe1ib5v2QnfVE1XmvophWAoJBWjQxmfNp0/qjM98xu1YQyBfSrET0/9QoAWjp61DCpsRQM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764003528; c=relaxed/simple;
-	bh=N/6Egd5p9q9R0+9S+OnaZAAitFGJz28ISpmWOEXHxec=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=E7uW6eVXKgzLBnLeWcD/EEldNvq1RA/yRhwxtFoIf4TS37hN6NV8DOZS+qOYUGGeVuVjapRWskl77YiKay5Ookb432gnfqk6mt8kN6HjJ8I5GFvgqk+pWwmmaIb9zMWhIu9Duen/OQ5lX0QUs6h3gWEzM4T/Cmre7Dsj+6ahw3E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=okx1f5Ix; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEBE2D3A96
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Nov 2025 18:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764010458; cv=none; b=ONaLK0rR4CO942ZeaXm9zW6rRaxHjHxRbehrk8KEHhCkRL6mVYHJ8HLoEVL7kvmO8Ic7sIsSy1Z6oX0CSdp9MTcMbpnMhPyo2ivgmmdnQ4qO0U03HnX06RYqtWFZY8P9U2VKSRH/HqsiJrTAUspKtFFtNG430FvQ5WVRCdzuOqI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764010458; c=relaxed/simple;
+	bh=TEK7y+I345Za9ATxX+knyA/Uh489WPY9Dd1JCZP1I5g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VzP7O8AODyRf6feRRhZ4aUSa02Mo0uZ13mO1Y1lFkYKCYlJBfHMoCVUF2TgnK4btY1cNRLdsTgLbEXrnXinzQWB7PNXNuOKjDPJaT6hFtmN4nHVssmDbWp7ugdYJ73OTHuEmcvKveDngvhiqUNbLAzVYbWPXwymxSo2ny/+YR6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AmpYBxDa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="okx1f5Ix"
-Received: from ehlo.thunderbird.net (unknown [193.138.7.214])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dFX8h1JYKzyS9;
-	Mon, 24 Nov 2025 18:58:44 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1764003524;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MnRgdJ0XVbWKSvI6ef9b4cgnzrwoZe7yV7fNQecyKJM=;
-	b=okx1f5IxUDpJ+I8rJkZ0wBHo96OBon3yRwejMXG+BqyZQEWX80i0VkJJYLAF2M2+SsSWFC
-	GuiUVr7O6KQvIK87RV2DJq1qykGWLpHiq3sNXmemSK0hDCVfoDYCS/QBaPhoTEnVfIKxQc
-	Uk2aBTlvzDAFZFNgW96VOLgtJyh7WWw=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764003524;
-	b=dCzAyGpv1ZnvNRrjaJVmMUUWRyF+JxJsBD3MlWZN3d3lb84CG+3gMhYCHfX2UpQYALZ+ds
-	t62u92bWbhE0pdKj/+R5JNfMf0OURviQKkbDK70wp8A+xjF46xY6p+kFCz1A2wYUpsrHEw
-	i1B0tXCCcyxZL+UDBGkQOtgTpYvLDPM=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1764003524;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MnRgdJ0XVbWKSvI6ef9b4cgnzrwoZe7yV7fNQecyKJM=;
-	b=XxAm3memyyizkcmVlCRI51TP/iTlOrYWmiS6Rk6Hgq3AxgqE/j7Uo2CP7gV2xd9jk9fF9L
-	YtxR7EJ0RtFQoV1vJg18RFDsfekanbIu2zXd9pZpyjVkjKV4OILCKxM+5AzCDLLwxg3i6A
-	ezoAaR1HMCe0wyEtu5CFj7mJcm4uTp4=
-Date: Mon, 24 Nov 2025 16:58:44 +0000
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 04/10] bap: have unicast client wait for VCS & TMAS
-In-Reply-To: <CABBYNZJdLZwX0t+0h3R71bvfqapj8zrc=_t=ZnVJ6SyuTj=_pA@mail.gmail.com>
-References: <cover.1763914558.git.pav@iki.fi> <3761b0c09f02442470d64de9225d3308df2d509f.1763914558.git.pav@iki.fi> <CABBYNZJdLZwX0t+0h3R71bvfqapj8zrc=_t=ZnVJ6SyuTj=_pA@mail.gmail.com>
-Message-ID: <CE94A896-F5D2-4446-8692-3BE4B5881709@iki.fi>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AmpYBxDa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CABBAC2BC9E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Nov 2025 18:54:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764010457;
+	bh=TEK7y+I345Za9ATxX+knyA/Uh489WPY9Dd1JCZP1I5g=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=AmpYBxDaPN5ZX9P0uxZqWlwOpLxvn2PrmdmQy+Ucj2PSpzD1kjzVJQNspQ3O+zzAE
+	 SoyfcVuxENoe6qN/jwgovr+Map/yE1k+ds7flRVlx2SmXzlUGVnFRek18ncwAZHd7S
+	 CmZZxqAIg/l3VjDKxFy7NVIj3yVu8kSd1iexr44ZzLxCtAc/tf/uV7g0Evv7eqHjnm
+	 1YCo41nZXFteqNZB42Xy6mkJWgTsrY3vio3yZSuwLAF9h+4WTNJsjuMD9VktUXg+iG
+	 xqY1spckPyd0iU/VIM2tMeSOPeqRpUk3qI2vXgOXeQZFFERXoX3JYZp2Be25cXhs5B
+	 9ERA2nzw21Whg==
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-640b0639dabso8037106a12.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Nov 2025 10:54:17 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWxCOMS2Ufv9zBmTLyoGMGeRmRuCSYeexefSWqHudC0tDwFcIQUAT6EsS3UNw77qugIKZrcvFCQCS2MgosLC7Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywmu1IWl6lb/BOX8n/f5g6o5PqjKKf9SB42Jo422YTkyfTJOe/S
+	uuOd3sOtAWK7ejxemnqnI7dhzrBoxgTM/1EGX8Sa3bvuopcwvDjf4DdFm9xlomzO9+djU2cuPO6
+	J2EF5XGlCKCwPQZ2D7VMf3WzUKzvFQw==
+X-Google-Smtp-Source: AGHT+IFReAtDFuSFDhp918Ohx2vHaiN5KlMAX/uodATZY6O/YB75rQVqkELqtwQbH271c/8FxbJ2Dkum3f0Uu3OWMzM=
+X-Received: by 2002:a05:6402:5252:b0:643:4e9c:d166 with SMTP id
+ 4fb4d7f45d1cf-6455443ed4cmr10891528a12.8.1764010456224; Mon, 24 Nov 2025
+ 10:54:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
+ <20250911151001.108744-4-ariel.dalessandro@collabora.com> <20250912140619.GA1293647-robh@kernel.org>
+ <fb20e4fe-df0a-4089-a7cf-e82bfe1f8e00@collabora.com>
+In-Reply-To: <fb20e4fe-df0a-4089-a7cf-e82bfe1f8e00@collabora.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 24 Nov 2025 12:54:04 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+eeiw9oaqQPWt2=rZSX98Pak_oB=tfQFvEehwLZ=S52g@mail.gmail.com>
+X-Gm-Features: AWmQ_blUF-g1qhHGkKsa6U6HY_V7mtf4Q-WkpVuhZVm09t2HSWt6-IOrweXVTPs
+Message-ID: <CAL_Jsq+eeiw9oaqQPWt2=rZSX98Pak_oB=tfQFvEehwLZ=S52g@mail.gmail.com>
+Subject: Re: [PATCH v2 03/12] dt-bindings: net: Convert Marvell 8897/8997
+ bindings to DT schema
+To: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch, 
+	andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com, 
+	broonie@kernel.org, chunkuang.hu@kernel.org, conor+dt@kernel.org, 
+	davem@davemloft.net, dmitry.torokhov@gmail.com, edumazet@google.com, 
+	flora.fu@mediatek.com, heiko@sntech.de, houlong.wei@mediatek.com, 
+	jeesw@melfas.com, kernel@collabora.com, krzk+dt@kernel.org, kuba@kernel.org, 
+	lgirdwood@gmail.com, linus.walleij@linaro.org, 
+	louisalexis.eyraud@collabora.com, luiz.dentz@gmail.com, 
+	maarten.lankhorst@linux.intel.com, marcel@holtmann.org, 
+	matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com, 
+	mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com, 
+	sean.wang@kernel.org, simona@ffwll.ch, support.opensource@diasemi.com, 
+	tiffany.lin@mediatek.com, tzimmermann@suse.de, yunfei.dong@mediatek.com, 
+	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, linux-rockchip@lists.infradead.org, 
+	linux-sound@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-24=2E marraskuuta 2025 16=2E25=2E49 UTC Luiz Augusto von Dentz <luiz=2Eden=
-tz@gmail=2Ecom> kirjoitti:
->Hi Pauli,
+On Wed, Oct 1, 2025 at 12:28=E2=80=AFPM Ariel D'Alessandro
+<ariel.dalessandro@collabora.com> wrote:
 >
->On Sun, Nov 23, 2025 at 11:17=E2=80=AFAM Pauli Virtanen <pav@iki=2Efi> wr=
-ote:
->>
->> Have unicast client to wait for VCS and TMAS before creating endpoints
->> and transports, so that their information is available at that point=2E
->> ---
->>  profiles/audio/bap=2Ec | 69 ++++++++++++++++++++++++++++++++++++++++++=
+> Rob,
+>
+> On 9/12/25 11:06 AM, Rob Herring wrote:
+> > On Thu, Sep 11, 2025 at 12:09:52PM -0300, Ariel D'Alessandro wrote:
+> >> Convert the existing text-based DT bindings for Marvell 8897/8997
+> >> (sd8897/sd8997) bluetooth devices controller to a DT schema.
+> >>
+> >> While here:
+> >>
+> >> * bindings for "usb1286,204e" (USB interface) are dropped from the DT
+> >>    schema definition as these are currently documented in file [0].
+> >> * DT binding users are updated to use bluetooth generic name
+> >>    recommendation.
+> >>
+> >> [0] Documentation/devicetree/bindings/net/btusb.txt
+> >>
+> >> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> >> ---
+> >>   .../net/bluetooth/marvell,sd8897-bt.yaml      | 79 +++++++++++++++++=
++
+> >>   .../devicetree/bindings/net/btusb.txt         |  2 +-
+> >>   .../bindings/net/marvell-bt-8xxx.txt          | 83 -----------------=
 --
->>  1 file changed, 66 insertions(+), 3 deletions(-)
->>
->> diff --git a/profiles/audio/bap=2Ec b/profiles/audio/bap=2Ec
->> index b07d65e68=2E=2E73c5cfc74 100644
->> --- a/profiles/audio/bap=2Ec
->> +++ b/profiles/audio/bap=2Ec
->> @@ -127,6 +127,7 @@ struct bap_data {
->>         struct btd_device *device;
->>         struct btd_adapter *adapter;
->>         struct btd_service *service;
->> +       struct queue *wait_services;
->>         struct bt_bap *bap;
->>         unsigned int ready_id;
->>         unsigned int state_id;
->> @@ -139,6 +140,7 @@ struct bap_data {
->>         GIOChannel *listen_io;
->>         unsigned int io_id;
->>         unsigned int cig_update_id;
->> +       unsigned int service_state_id;
->>  };
->>
->>  static struct queue *sessions;
->> @@ -186,11 +188,15 @@ static void bap_data_free(struct bap_data *data)
->>         queue_destroy(data->bcast, ep_unregister);
->>         queue_destroy(data->server_streams, NULL);
->>         queue_destroy(data->bcast_snks, setup_free);
->> +       queue_destroy(data->wait_services, NULL);
->>         bt_bap_ready_unregister(data->bap, data->ready_id);
->>         bt_bap_state_unregister(data->bap, data->state_id);
->>         bt_bap_pac_unregister(data->bap, data->pac_id);
->>         bt_bap_unref(data->bap);
->>
->> +       if (data->service_state_id)
->> +               btd_service_remove_state_cb(data->service_state_id);
->> +
->>         if (data->cig_update_id)
->>                 g_source_remove(data->cig_update_id);
->>
->> @@ -2015,13 +2021,16 @@ static bool pac_found_bcast(struct bt_bap_pac *=
-lpac, struct bt_bap_pac *rpac,
->>         return true;
->>  }
->>
->> -static void bap_ready(struct bt_bap *bap, void *user_data)
->> +static void bap_service_ready(struct bap_data *data)
->>  {
->> -       struct btd_service *service =3D user_data;
->> -       struct bap_data *data =3D btd_service_get_user_data(service);
->> +       struct bt_bap *bap =3D data->bap;
->> +       struct btd_service *service =3D data->service;
->>
->>         DBG("bap %p", bap);
->>
->> +       if (!queue_isempty(data->wait_services))
->> +               return;
->> +
->>         /* Register all ep before selecting, so that sound server
->>          * knows all=2E
->>          */
->> @@ -2031,6 +2040,15 @@ static void bap_ready(struct bt_bap *bap, void *=
-user_data)
->>         bap_select_all(data, false, NULL, NULL);
->>  }
->>
->> +static void bap_ready(struct bt_bap *bap, void *user_data)
->> +{
->> +       struct btd_service *service =3D user_data;
->> +       struct bap_data *data =3D btd_service_get_user_data(service);
->> +
->> +       queue_remove(data->wait_services, NULL);
->> +       bap_service_ready(data);
->> +}
->> +
->>  static bool match_setup_stream(const void *data, const void *user_data=
-)
->>  {
->>         const struct bap_setup *setup =3D data;
->> @@ -3740,6 +3758,44 @@ static int bap_probe(struct btd_service *service=
-)
->>         return 0;
->>  }
->>
->> +static void wait_service_cb(struct btd_service *service,
->> +                                               btd_service_state_t old=
-_state,
->> +                                               btd_service_state_t new=
-_state,
->> +                                               void *user_data)
->> +{
->> +       struct bap_data *data =3D user_data;
->> +
->> +       if (new_state =3D=3D BTD_SERVICE_STATE_CONNECTING)
->> +               return;
->> +       if (!queue_remove(data->wait_services, service))
->> +               return;
->> +
->> +       DBG("%s", btd_service_get_profile(service)->name);
->> +       bap_service_ready(data);
->> +}
->> +
->> +static void wait_service_add(struct bap_data *data, uint16_t remote_uu=
-id)
->> +{
->> +       struct btd_service *service;
->> +       bt_uuid_t uuid;
->> +       char uuid_str[64];
->> +
->> +       bt_uuid16_create(&uuid, remote_uuid);
->> +       bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
->> +
->> +       service =3D btd_device_get_service(data->device, uuid_str);
->> +       if (!service)
->> +               return;
->> +       if (btd_service_get_state(service) !=3D BTD_SERVICE_STATE_CONNE=
-CTING)
->> +               return;
->> +
->> +       queue_push_tail(data->wait_services, service);
->> +
->> +       if (!data->service_state_id)
->> +               data->service_state_id =3D btd_service_add_state_cb(
->> +                                               wait_service_cb, data);
->> +}
->> +
->>  static int bap_accept(struct btd_service *service)
->>  {
->>         struct btd_device *device =3D btd_service_get_device(service);
->> @@ -3760,6 +3816,13 @@ static int bap_accept(struct btd_service *servic=
-e)
->>                 return -EINVAL;
->>         }
->>
->> +       queue_destroy(data->wait_services, NULL);
->> +       data->wait_services =3D queue_new();
->> +
->> +       queue_push_tail(data->wait_services, NULL);
+> >
+> >>   .../dts/rockchip/rk3288-veyron-fievel.dts     |  2 +-
+> >>   .../boot/dts/rockchip/rk3288-veyron-jaq.dts   |  2 +-
+> >>   arch/arm64/boot/dts/mediatek/mt8173-elm.dtsi  |  2 +-
+> >
+> > .dts files should be separate patches. Please send the bindings patches
+> > separately per subsystem so subsystem maintainers can apply them. All
+> > the Mediatek dts changes can be 1 series.
 >
->Why are you pushing NULL above?
+> Ack, will fix in v3.
 
-It's for waiting for bap_ready
+Are you going to send v3 still?
 
->
->> +       wait_service_add(data, TMAS_UUID);
->> +       wait_service_add(data, VCS_UUID);
->
->I wonder if we couldn't add this sort of logic directly in service=2Ec
->so in case other plugins need to do some dependency handling like
->above we don't need to code it  internally in the plugin itself
->creating duplicate handling=2E
-
-Could be changed to be generic yes=2E We also might want to also do confli=
-cts, eg BAP and AVRPC/AVDTP at the same time sometimes happens in practice =
-and devices usually don't like that=2E
-
-
->
->>         btd_service_connecting_complete(service, 0);
->>
->>         return 0;
->> --
->> 2=2E51=2E1
->>
->>
->
->
+Rob
