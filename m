@@ -1,127 +1,216 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com [209.85.221.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95ABC32E75B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Nov 2025 18:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3922325728
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Nov 2025 19:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764095537; cv=none; b=tBlI4xvZ+cOVG3Ycrrns3nS5sdLasenntC873yoLKqHdTH72rxIBzWKmwopnh0bTnJCMpm6PpkJNRab7n4RMaqsg1ZTWYkCtIgXQ/z0wvCls6wrQKrwrtZbj4qyxj6wLP+IJLrx2Wx0AUc0huPtiYJ6e3vTZcycWfVjD+UrOB7Y=
+	t=1764100648; cv=none; b=Bu2FZqrYx1Oj/4zMmL8tVArREC/cgHZJq+HCu9O3R1ABkpg6W+xzC+18FuXuGNa25lD8sAHmQmbjkcji7RUqOu7W/7OxsauO4zOMryMPIYXFBnEWIR3VLreBs7Og/cuQBjnJzogdzmHyRdMXVH87e4W/druNBTdOS7t2qCT1ILo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764095537; c=relaxed/simple;
-	bh=7IhXQpY+HblDn2OeVHq7IvnLN78J3k/fG65zNSBIFVI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=odyl1Dy3N/xJOVABN8X1Nxghxlw68Hqwv+OYFZ8EYEX9i7hs8cettYFfnOpiMUjnASclIuB+CxCM6bH9FXDiXVXVnjziLd7Z9kNdla+nkcm4H9DTnaDUF3pcb4BRBbBYl9oRTE7ASlSIUGR6v/iSmQR5+JhEoAyxbSoWsK/STKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KCAd+yEl; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764100648; c=relaxed/simple;
+	bh=iokwoTFVPBOTaPfOIU5c7pX/GalN7fc0nJfgCYlBKvM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DXx1luZal7AUaKkn3aud8f0moWBj8plf87nVHqkfCeTeCbPuryvcbE5V5wgS2KsMwTrJeMksw1xUJ0ZsNe62z22HY63qTaYfI0DSlHboZTOFe/vRkhJRTRZhZs/3gRFCMbQM/uybV8A5A8D2DFFok37ezEkf8MmCXw+c+IzvGXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=E3+WFYd7; arc=none smtp.client-ip=209.85.221.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KCAd+yEl"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ed7a7ddc27so48320901cf.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Nov 2025 10:32:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E3+WFYd7"
+Received: by mail-wr1-f66.google.com with SMTP id ffacd0b85a97d-42b3669ca3dso2372642f8f.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Nov 2025 11:57:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764095529; x=1764700329; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=56keGR2mykwjqqU56vSsuLpvPFw3ljFeME0zqBTFP4k=;
-        b=KCAd+yElGvhGEuHbOJk08rGwRcfKXB0LizoQO9QAWfFCODXx6dxwn0ogDTk4ZGTm77
-         OhGB5E/7lQp6gtdOLwcRkOQ8G37qfEqA4Yd97Bi9wVz0Y6b8mrCo2BI2Fc+h7yISbbi7
-         jbp4ssOsah9Qup/BmaAu87MDe+1LAJsnX1CEutFqFl0DLEcDJh0NNb9LT7UTrthuLAtg
-         AgHtyds41g5okMHwIEU1DdVMoKNDFO4rWoWt/K3M077FZldvTKeLzE8JLCd0G3ZhydGt
-         HjbHnYSeyc4iKY7YBkgb65Gk/JR3Tnh+G70XLTaCyqoZC0w+HNwtuF8qXe1cUwdpNEXk
-         /60w==
+        d=linaro.org; s=google; t=1764100643; x=1764705443; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E1UnNoOWnCZ6jNATqSLrvL0gVBX8cPau2AT5/t6kV9Y=;
+        b=E3+WFYd7f5+MIm16F523Jp2L/0FdmLr2llL7NvcjJTaVC7gDZ4jAJ3ZT92cjbATxxy
+         K1neAO0iFSJp8rd6CMc46LL0vFY2ZxYuff7IhW47BekmuS9OlG6eozp9ZPoQWIpHT89C
+         NFXd3qkiLizg7f/a3lWPgX8VVnaHVdcUt3zGL+uCUE6EbbzGXUYHSpasPSbAXqfSPobO
+         e3LLS+2RS+Ol8n/1DBwdv47Vl9IdOsxUE+KJBIv0pUYV78VVC55KiqzuPCPQcRc/6xDg
+         F0O6d/mQ47TNSJurO7m1fpqIYpSPMarRaECaISWbkqPu5iLzwy0CSkkxPMjANFl2VqeJ
+         lzpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764095529; x=1764700329;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=56keGR2mykwjqqU56vSsuLpvPFw3ljFeME0zqBTFP4k=;
-        b=u+JjshYI4Cek2tIkx6lB/hFa0Y8HK3iB7jJHtAWqqHpJYRnuPcw+uTiqiHMgX6Yrd/
-         1xBBU8K12OZLkIg1LQUgCiNMZojgoaRU1QOPCRcZI+saRrM88zfM5nicp0yL/NDfX4E1
-         IQqPtA0tRMBG+G+IprJsZ7t9EEDBcAstKqMpnSY5JJf1PLWSvQFCPmF9QfJeshqta+/e
-         xoJFpCv/4NNCwhHVx2J4DQhiXpzyhi45vmnScyKTfdP73qbnAXl9QcjlbRDQgDancVRZ
-         OX0j98dUh1+BWTTx+rv3aQv+SH1jtTH4kjE21rvRdzOZwE6KEy1MvxlRIlZMpMp5wzJl
-         53+w==
-X-Gm-Message-State: AOJu0YyrZu0007cJzPqHZ7nuZJ3ZwTfmga/2Xsv8TMARa29SExkK5+Em
-	Ij32KqWpuUFXNdxUc8BfItCpnbru00rHUQcbfXhCD9kzbRbAt7KiBwpLp/bAVw==
-X-Gm-Gg: ASbGncuVXF7YT8ui4ON2ToV0rF1t372JMeL0itshIirdsRB6ZjRgHjRKs7mxQUYk6FP
-	knhuYUOkQ0nyzzm7HMeLbyyuDuPxTAnDD285hGUk2KxNs0JuULFZ10hu0uaBmHm+EQY2jK5CoUh
-	Pla0FbIcVKlJsn999hk4hg/GxcVq2TZuhPAknOKiXPLebyo1sKRMyiFNiVB5c582CKXPXENDOIP
-	Vtp7eRwXSppxIZRFyisXpAeXEaGPUG33b8jEeHER/vhVbDa4r0Xxx81G14Q/jFpZBap3Sv6+ySy
-	raRLddZHJlUQELrmG7yx+pZME/NA6jctLjrNjObm4a2qUPtgYSVgN3XKyiyREDWEadTeJOYIsmR
-	tSgfbn9untJ+PmKyyD6Svb7O4RH1CCDpHLYcrXsP3S8FSopFUHzLYRpwd9/r+KZhLXxETtCdppQ
-	ZXZcW2
-X-Google-Smtp-Source: AGHT+IHuE77M3qvybkkFCdia48E3IuzIQWb7oQ51Zmy0zPSIEETl4+S6aUw8PvZ/PPINm0AU4rD+cw==
-X-Received: by 2002:a05:622a:1a01:b0:4ee:1ec9:f947 with SMTP id d75a77b69052e-4efbd91578emr55345291cf.3.1764095529456;
-        Tue, 25 Nov 2025 10:32:09 -0800 (PST)
-Received: from [172.17.0.2] ([135.119.132.148])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee48e67fa9sm111982811cf.23.2025.11.25.10.32.08
+        d=1e100.net; s=20230601; t=1764100643; x=1764705443;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E1UnNoOWnCZ6jNATqSLrvL0gVBX8cPau2AT5/t6kV9Y=;
+        b=pi/VhX67/TftTssqFLx8AD9slfmMRvzMA48jWTkGq6Fbn/yWvy0+cJ8cGury/4oVZu
+         I0rRw+nEEPvPSK13ai2ttHQnCgoZICKEahti8hkds3jB527V7aW/dkCJ9VAi5/55stqP
+         tO7VE4sQ89LdDSWIdCdh/SN8lsXfO5RSUc3hvNm8TmlMfZjkgnEraSuNV0boSDU2Xo1B
+         kjrTrgFNuvZ6SInoyHZaX5nLk8vhgwGslMtmTngidP9NyBWZ6wl9qYXPKMXcbZLb6g4m
+         T1wKZiIRDDiWvbAnJXnBfQPT7zJa8VmdrbI9/TWEdVJE7IWARAYBwYEce8TiDvOo1CGh
+         TAkg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBK3bFcNX2o5UvhN3afTuc/pMLhZT3CxV/3Q29E8BaailqYsAgeK/YM6tJEBnxVAEgEg0kZ7yoTRdCqtSo1CA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/C7UcYmzeZUQENZxedzEW7ndHbqgWdwS/RRAyh7/S2vrX3xru
+	rRbLwPdimMMOye9LhPq3DJwJI7Pn2ViEl1xRPD581jICHGyVEUwz6YnfRutJpbp2jVk=
+X-Gm-Gg: ASbGncsHtR73bBuX7MjWeD6bUf+n2l0V9EFvJpPBRAm/kyOP6NJ1f3+omoE5q2lEW9Q
+	yKAJH6Dm7vYjY/E8jgD9O1wISVfSnzcitLUsMsqxX31twHeJpHE6D6LOiWgWKQ2VoiRtpZxxuhc
+	Y9VeycPM5ox6zvH1nu1fjZex2CAbwDUG8nutHkf1yHQzqT1FJ8n7LNj5OMEazusSbqV2iqUKCNZ
+	s3SrPHqbrZlW5mJpV6bBBMydCn9AL/526FcWbuA1XUt7G6e7kONhJVjpvbHshNNdO4v2qUls/WV
+	1Ykgm4YBz0sHhkaLWqtkkShcVuJWUTQ8xpesLAXsbYCpyuYDhqnFUPX+4UoqExGvnjLOvKh02JH
+	cECm3ijc7GXqkhPhbeolcrFWD//lfSB+EbIeq0eJAdqNNsPjcohY76cXYe4G/Q9avO5gBwl/hk/
+	TCxQhKWYcw62a6AtfpZorR7ls=
+X-Google-Smtp-Source: AGHT+IEAbkYexDq6opE/RHcWGXGaG9IQZqQuowS+lidqh7NE88eFU6gVV4oNIEt+OqoiQG7s1o7+ow==
+X-Received: by 2002:a05:6000:2881:b0:42b:3dfb:645c with SMTP id ffacd0b85a97d-42cc1ac9debmr18306375f8f.12.1764100643122;
+        Tue, 25 Nov 2025 11:57:23 -0800 (PST)
+Received: from linaro.org ([2a02:2454:ff23:4430:a656:9e9b:eea0:17e9])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fb9190sm36157180f8f.33.2025.11.25.11.57.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 10:32:09 -0800 (PST)
-Message-ID: <6925f629.c80a0220.2ad282.e820@mx.google.com>
-Date: Tue, 25 Nov 2025 10:32:09 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2654329183289188932=="
+        Tue, 25 Nov 2025 11:57:22 -0800 (PST)
+Date: Tue, 25 Nov 2025 20:57:18 +0100
+From: Stephan Gerhold <stephan.gerhold@linaro.org>
+To: manivannan.sadhasivam@oss.qualcomm.com
+Cc: Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Mark Pearson <mpearson-lenovo@squebb.ca>,
+	"Derek J. Clark" <derekjohn.clark@gmail.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: [PATCH v2 00/10] Add support for handling PCIe M.2 Key E
+ connectors in devicetree
+Message-ID: <aSYKHjpJkXWUVIyo@linaro.org>
+References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] transport: fix VCP volume updating and sink volumes
-In-Reply-To: <68b8ba8dd63306081aa7630e3b1f8a186e558b6c.1764090857.git.pav@iki.fi>
-References: <68b8ba8dd63306081aa7630e3b1f8a186e558b6c.1764090857.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
 
---===============2654329183289188932==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Nov 25, 2025 at 08:15:04PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
+> This series is the continuation of the series [1] that added the initial support
+> for the PCIe M.2 connectors. This series extends it by adding support for Key E
+> connectors. These connectors are used to connect the Wireless Connectivity
+> devices such as WiFi, BT, NFC and GNSS devices to the host machine over
+> interfaces such as PCIe/SDIO, USB/UART and NFC. This series adds support for
+> connectors that expose PCIe interface for WiFi and UART interface for BT. Other
+> interfaces are left for future improvements.
+> 
+> Serdev device support for BT
+> ============================
+> 
+> Adding support for the PCIe interface was mostly straightforward and a lot
+> similar to the previous Key M connector. But adding UART interface has proved to
+> be tricky. This is mostly because of the fact UART is a non-discoverable bus,
+> unlike PCIe which is discoverable. So this series relied on the PCI notifier to
+> create the serdev device for UART/BT. This means the PCIe interface will be
+> brought up first and after the PCIe device enumeration, the serdev device will
+> be created by the pwrseq driver. This logic is necessary since the connector
+> driver and DT node don't describe the device, but just the connector. So to make
+> the connector interface Plug and Play, the connector driver uses the PCIe device
+> ID to identify the card and creates the serdev device. This logic could be
+> extended in the future to support more M.2 cards. Even if the M.2 card uses SDIO
+> interface for connecting WLAN, a SDIO notifier could be added to create the
+> serdev device.
+> 
+> Open questions
+> ==============
+> 
+> Though this series adds the relevant functionality for handling the M.2 Key M
+> connectors, there are still a few open questions exists on the design. 
+> 
+> 1. I've used the M.2 card model name as the serdev device name. This is found
+> out by comparing the PCIe VID:PID in the notifier. Is this approach acceptable?
+> I did not use the PID as the serdev name since it will vary if the SDIO
+> interface is used in the future.
+> 
+> 2. PCIe client drivers of some M.2 WLAN cards like the Qcom QCA6390, rely on
+> the PCIe device DT node to extract properties such as
+> 'qcom,calibration-variant', 'firmware-name', etc... For those drivers, should we
+> add the PCIe DT node in the Root Port in conjunction with the Port node as
+> below?
+> 
+> pcie@0 {
+> 	wifi@0 {
+> 		compatible = "pci17cb,1103";
+> 		...
+> 		qcom,calibration-variant = "LE_X13S";
+> 	};
+> 
+> 	port {
+> 		pcie4_port0_ep: endpoint {
+> 			remote-endpoint = <&m2_e_pcie_ep>;
+> 		};
+> 	};
+> };
+> 
+> This will also require marking the PMU supplies optional in the relevant ath
+> bindings for M.2 cards.
+> 
+> 3. Some M.2 cards require specific power up sequence like delays between
+> regulator/GPIO and such. For instance, the WCN7850 card supported in this series
+> requires 50ms delay between powering up an interface and driving it. I've just
+> hardcoded the delay in the driver, but it is a pure hack. Since the pwrseq
+> driver doesn't know anything about the device it is dealing with before powering
+> it ON, how should it handle the device specific power requirements? Should we
+> hardcode the device specific property in the connector node? But then, it will
+> no longer become a generic M.2 connector and sort of defeats the purpose of the
+> connector binding.
+> 
+> I hope to address these questions with the help of the relevant subsystem
+> maintainers and the community. 
+> 
+> Testing
+> =======
+> 
+> This series, together with the devicetree changes [2] was tested on the
+> Qualcomm X1e based Lenovo Thinkpad T14s Laptop which has the WCN7850 WLAN/BT M.2
+> card connected over PCIe and UART.
+> 
+> [2] https://github.com/Mani-Sadhasivam/linux/commit/acbee74a5c90fc8839bb7b6f326c677ee1c0d89c
 
-This is automated email and please do not reply to this email!
+Thanks for working on describing the M.2 connectors properly in the
+device tree!
 
-Dear submitter,
+I haven't had time to look into this in detail yet, but a quick look at
+the dt-bindings and examples looks good to me! Thanks for keeping the
+bindings as generic as possible.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1027465
+I have a small nitpick for the specific example you have here: The
+Lenovo ThinkPad T14s does not actually have a "M.2 Mechanical Key E
+connector". If you look at a picture of the mainboard [1], the WLAN/BT
+module is "soldered-down" (look on the right, on the right side next to
+the large copper bracket). In the M.2 specification, "soldered-down"
+modules do not have a "key", they have a specific pinout that is
+followed (see section 5.4). The power sequencing etc and the set of pins
+is quite similar/the same though.
 
----Test result---
+My notes (from a few months ago) suggest the T14s probably uses a
+non-standard M.2 Type 1620 LGA pinout. I don't remember the exact chain
+of thought behind that, but you can find similarly looking modules with
+this type, e.g. https://www.sparklan.com/product/wnsq-290be/. There is a
+1620 *BGA* pinout in the M.2 specification, but a 1620 *LGA* pinout does
+not exist there. Interestingly, in the block diagram of the module in
+the link above this type is called *Q*M.2 1620 LGA 168 pin, as if this
+is some Qualcomm-specific form factor.
 
-Test Summary:
-CheckPatch                    PENDING   0.46 seconds
-GitLint                       PENDING   0.25 seconds
-BuildEll                      PASS      19.97 seconds
-BluezMake                     PASS      643.87 seconds
-MakeCheck                     PASS      21.82 seconds
-MakeDistcheck                 PASS      236.25 seconds
-CheckValgrind                 PASS      293.75 seconds
-CheckSmatch                   PASS      341.22 seconds
-bluezmakeextell               PASS      178.24 seconds
-IncrementalBuild              PENDING   0.31 seconds
-ScanBuild                     PASS      953.47 seconds
+A real mechanical key E connector can be found e.g. in the X1E CRD, X1E
+Devkit, or I think some of the X1E-based HP laptops (would need to check
+which one exactly).
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+I'm not sure if it's really appropriate modeling the "soldered-down"
+variant as "Mechanical Key E connector" in the DT. We might need
+a separate compatible for this. Do you have any thoughts about that?
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+Thanks,
+Stephan
 
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2654329183289188932==--
+[1]: https://www.notebookcheck.com/fileadmin/_processed_/d/c/csm_DSC_0003_aadae1ddd2.jpg
