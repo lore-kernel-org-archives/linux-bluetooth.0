@@ -1,280 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AD32BE64F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Nov 2025 07:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD9513AA2D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Nov 2025 07:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764054096; cv=none; b=hOtDw87x6XZCJeMeNNNU37rkh33l9qc8yjFfEIj4dc4R3oa8jp4aqsvFGX9560qxuPTXJ6pD7X/zz/hwGWMeCcSQ9e2hpB7C8oSpvOCuhZoQVG7dmQQ31y5NUaDckoHhtgXW7s5BN4vzzBa3EFbw97Eztkx3Soaw+EWvxzg0LmE=
+	t=1764055154; cv=none; b=EfBzWYoSswl6LQqYVbdDObghIBwjdbJpad5fyO/cyzYzcg20ES/dg+NiuvUu0MmS47DnfTs5iz8vlrCGj2fGj7OKVtX5hv/5wEy34vpXq40dk9gygqmBsqPqH0QDozsGxVfMZCH/ILd8jJNWgb5J23dNBgevXk8RJXAG56e08vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764054096; c=relaxed/simple;
-	bh=m+PlCMYja4vqFf8iGyLrk6DiUUmwM1JBYgFsefAwm1s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TEYDU58DZ0IuZiYG6n8S316ABbQcvpOeBEY8h2wZ/ydeJHpW902GlD5d9C+c1c3EMgpK7YCfwX1Qkdh1Z95pJgfsHz9l1Ce+xRXtnFq+TMQhU6W7SlnyrDqcRl859uH+lFcJjtyIiq3QblGIeNgSdWUhaakPs5/ocTaHmc8M4NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WGv0srG7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764055154; c=relaxed/simple;
+	bh=Xx9WR607aCMDhcxEdQJhAozjn6EDGcsVVXriKq6WceA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=b616VWErGR/gRqp5y2SMHRpOVDiScBBnZNWTk111q89S3upDO156pjjTlLeswqwLDyzUSumBIVCfmJvX0HuPV2acK/gL0zLqo46c/e0+WcdUvLxehCkz9KLwAYTrzv/W2u8HrTl158KV5F046glWPcBhv4KppP1iv0KdNmCzi8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=E27yLV5I; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WGv0srG7"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1F0ABC19422;
-	Tue, 25 Nov 2025 07:01:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764054096;
-	bh=m+PlCMYja4vqFf8iGyLrk6DiUUmwM1JBYgFsefAwm1s=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=WGv0srG7axIQ0n7ypgZqftjC0T4nKs8QiHmwJJnh2hWxW0DU15GvvUkJveR0Wc6+U
-	 LJmjQnpS8jwv/L6KVOwE2dPaZhPo1YvhghZPfzD/nQNZUxT+OyhUNCLXAMl7QR/5WT
-	 w9tK2bJsESud+XjjORC92ZPpW9ciPwqSGrUC6dOz9yoQPsD2O8mO9SRbjrA5xivwQt
-	 Chx2Km5hcf77XTL3xNRARZEqpjNxOFsibSg3EY1lkTDMVQbBNr8rj8KToiFLxC2WcQ
-	 0Zt/iGy20sgusbOpstngTszUrnM/tnuqPXKpRYAMdLUedD3ucXiIORoCIyd28q8c8s
-	 1uijkqij+ZcYA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18716CFD364;
-	Tue, 25 Nov 2025 07:01:36 +0000 (UTC)
-From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
-Date: Tue, 25 Nov 2025 15:01:16 +0800
-Subject: [PATCH bluez v5 3/3] client: Add shell cmd for bearer
- connect/disconnect
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="E27yLV5I"
+Received: from github.com (hubbernetes-node-a8406d9.ac4-iad.github.net [10.52.210.59])
+	by smtp.github.com (Postfix) with ESMTPA id 7357220954
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Nov 2025 23:19:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1764055152;
+	bh=6VTOK4GocIM76Ae4t3q4A6bFspcOPSgqGuBBR9KHQMI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=E27yLV5IZ92o7s+GQGNjxo7dYoORPxfvM9gLzzxHucZ9YcxrqD8E9wCovoN6j38Tr
+	 0SoNuibb0XJFMAFgE98wPZfTP0uqxCvRwKkpbJ+chqhxrOUtyOqbg/IQ3K99PbF3Gm
+	 6XtepIUT/IWGsKvJU+ogah2tGaY9G4y3UeRYs4GQ=
+Date: Mon, 24 Nov 2025 23:19:12 -0800
+From: "github-actions[bot]" <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1027210/000000-71160c@github.com>
+Subject: [bluez/bluez] 29dcff: profiles: Add bearer field to btd_profile
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251125-bearer-impl-v5-3-ce1ce5ad19d9@amlogic.com>
-References: <20251125-bearer-impl-v5-0-ce1ce5ad19d9@amlogic.com>
-In-Reply-To: <20251125-bearer-impl-v5-0-ce1ce5ad19d9@amlogic.com>
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Ye He <ye.he@amlogic.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764054092; l=6942;
- i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
- bh=KpEi9/04/MX2wi3Rs4MiaEEYpqg4yvHQbi0Cs5dMeSs=;
- b=vdLeCLjQW13m1rwVNR8K4DdE5ufpwxZVVZN2NsViauwXj5Erqab+5sbWfTgjA+vZZZ/DdKjUG
- yNAUH9cd9wYCEV3rRrw65L2D+ddi7OsdQC/qgWNwcDS5Mk6yuhoel+h
-X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
- pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
-X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
- auth_id=348
-X-Original-From: Ye He <ye.he@amlogic.com>
-Reply-To: ye.he@amlogic.com
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Ye He <ye.he@amlogic.com>
+  Branch: refs/heads/1027210
+  Home:   https://github.com/bluez/bluez
+  Commit: 29dcfff9551bd248fb6b59c7a2c2e810b5763924
+      https://github.com/bluez/bluez/commit/29dcfff9551bd248fb6b59c7a2c2e810b5763924
+  Author: Ye He <ye.he@amlogic.com>
+  Date:   2025-11-25 (Tue, 25 Nov 2025)
+
+  Changed paths:
+    M profiles/audio/a2dp.c
+    M profiles/audio/asha.c
+    M profiles/audio/avrcp.c
+    M profiles/audio/bap.c
+    M profiles/audio/bass.c
+    M profiles/audio/ccp.c
+    M profiles/audio/csip.c
+    M profiles/audio/mcp.c
+    M profiles/audio/micp.c
+    M profiles/audio/vcp.c
+    M profiles/battery/battery.c
+    M profiles/deviceinfo/deviceinfo.c
+    M profiles/gap/gas.c
+    M profiles/health/hdp_manager.c
+    M profiles/input/hog.c
+    M profiles/input/manager.c
+    M profiles/midi/midi.c
+    M profiles/network/manager.c
+    M profiles/scanparam/scan.c
+    M src/profile.h
+
+  Log Message:
+  -----------
+  profiles: Add bearer field to btd_profile
+
+Add bearer filed into btd_profile to indicates which bearer
+type this profile belongs to. Thus we can distinct the services
+per bearer.
+
+Signed-off-by: Ye He <ye.he@amlogic.com>
+
+
+  Commit: c3e8a526367a4f3d06b94d224d5d0a0de11ba1b2
+      https://github.com/bluez/bluez/commit/c3e8a526367a4f3d06b94d224d5d0a0de11ba1b2
+  Author: Ye He <ye.he@amlogic.com>
+  Date:   2025-11-25 (Tue, 25 Nov 2025)
+
+  Changed paths:
+    M src/bearer.c
+    M src/device.c
+    M src/device.h
+
+  Log Message:
+  -----------
+  bearer: Implement Connect/Disconnect methods
+
+This patch provides implementations for the Connect and Disconnect
+methods of the org.bluez.Bearer.LE1 and org.bluez.Bearer.BREDR1
+interfaces.
+
+Signed-off-by: Ye He <ye.he@amlogic.com>
+
+
+  Commit: 71160c46b41e31b3b4e1c1a0f6d4e539fd8b83e2
+      https://github.com/bluez/bluez/commit/71160c46b41e31b3b4e1c1a0f6d4e539fd8b83e2
+  Author: Ye He <ye.he@amlogic.com>
+  Date:   2025-11-25 (Tue, 25 Nov 2025)
+
+  Changed paths:
+    M client/bluetoothctl.rst
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Add shell cmd for bearer connect/disconnect
 
 This patch adds shell command for bearer connect/disconnect.
 
 Signed-off-by: Ye He <ye.he@amlogic.com>
----
- client/bluetoothctl.rst |  34 ++++++++++++
- client/main.c           | 141 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 175 insertions(+)
-
-diff --git a/client/bluetoothctl.rst b/client/bluetoothctl.rst
-index 0187e877d60b28eb1e735181b3203e60da821e6f..e10933eb90e9d1ab830ebba6d210d940b2d91d35 100644
---- a/client/bluetoothctl.rst
-+++ b/client/bluetoothctl.rst
-@@ -296,6 +296,40 @@ needed.
- 
- :Usage: **> disconnect <dev> [uuid]**
- 
-+connect-bearer
-+--------------
-+
-+Connect device with specified bearer.
-+
-+This command initiates a bearer-level connection to a remote device.
-+
-+By default this command connects the specified bearer (LE or BREDR)
-+and all profiles that are associated with that bearer and marked as
-+auto-connectable. Only the profiles bound to the selected bearer
-+will be considered, profiles on the other bearer are not affected.
-+
-+For LE connections an active scan report is required before the connection
-+can be established. If no advertising report is received before the timeout,
-+a le-connection-abort-by-local error will be issued.
-+
-+:Usage: > connect-bearer <dev> <le/bredr>
-+:Example: > connect-bearer 1C:48:F9:9D:81:5C le
-+:Example: > connect-bearer 1C:48:F9:9D:81:5C bredr
-+
-+disconnect-bearer
-+-----------------
-+
-+Disconnect device with specified bearer.
-+
-+By default this command disconnects all profiles associated with the specified
-+bearer (LE or BREDR) and then terminates that bearer's link. Only profiles
-+bound to the selected bearer are affected, profiles on the other bearer remain
-+connected.
-+
-+:Usage: > disconnect-bearer <dev> <le/bredr>
-+:Example: > disconnect-bearer 1C:48:F9:9D:81:5C le
-+:Example: > disconnect-bearer 1C:48:F9:9D:81:5C bredr
-+
- info
- ----
- 
-diff --git a/client/main.c b/client/main.c
-index 0a928efaa9bb0d2a806895ff8f8c0c7c0d2493bd..5a0862a1bc1eb5104c78aeba9722375ef526e756 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2303,6 +2303,141 @@ static void cmd_disconn(int argc, char *argv[])
- 						proxy_address(proxy));
- }
- 
-+static void bearer_connect_reply(DBusMessage *message, void *user_data)
-+{
-+	DBusError error;
-+
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		bt_shell_printf("Failed to connect: %s %s\n", error.name,
-+				error.message);
-+		dbus_error_free(&error);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Connection successful\n");
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
-+static void bearer_disconn_reply(DBusMessage *message, void *user_data)
-+{
-+	DBusError error;
-+
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		bt_shell_printf("Failed to disconnect: %s %s\n", error.name,
-+				error.message);
-+		dbus_error_free(&error);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Disconnection successful\n");
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
-+static void cmd_connect_bearer(int argc, char *argv[])
-+{
-+	const char *type;
-+	GDBusProxy *device;
-+	GDBusProxy *bearer;
-+
-+	if (argc < 3) {
-+		bt_shell_printf("Usage: connect-bearer <dev> <le/bredr>\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	device = find_device(argc, argv);
-+	if (!device) {
-+		bt_shell_printf("Device %s not available\n", argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	type = argv[2];
-+
-+	if (strcmp(type, "le") != 0 && strcmp(type, "bredr") != 0) {
-+		bt_shell_printf("Invalid bearer type: %s, "
-+			"Usage: connect-bearer <dev> <le/bredr>\n", type);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	if (!strcmp(type, "bredr"))
-+		bearer = find_proxies_by_iface(default_ctrl->bearers,
-+					g_dbus_proxy_get_path(device),
-+					"org.bluez.Bearer.BREDR1");
-+	else if (!strcmp(type, "le"))
-+		bearer = find_proxies_by_iface(default_ctrl->bearers,
-+					g_dbus_proxy_get_path(device),
-+					"org.bluez.Bearer.LE1");
-+
-+	if (!bearer) {
-+		bt_shell_printf("No bearer(%s) on device %s\n", type, argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	if (g_dbus_proxy_method_call(bearer, "Connect", NULL,
-+				bearer_connect_reply, NULL, NULL) == FALSE) {
-+		bt_shell_printf("Failed to call bearer Connect\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Attempting to connect bearer(%s) to %s\n",
-+			type, argv[1]);
-+}
-+
-+static void cmd_disconnect_bearer(int argc, char *argv[])
-+{
-+	const char *type;
-+	GDBusProxy *device;
-+	GDBusProxy *bearer;
-+
-+	if (argc < 3) {
-+		bt_shell_printf("Usage: disconnect-bearer <dev> <le/bredr>\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	device = find_device(argc, argv);
-+	if (!device) {
-+		bt_shell_printf("Device %s not available\n", argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	type = argv[2];
-+
-+	if (strcmp(type, "le") != 0 && strcmp(type, "bredr") != 0) {
-+		bt_shell_printf("Invalid bearer type: %s, "
-+			"Usage: disconnect-bearer <dev> <le/bredr>\n", type);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	if (!strcmp(type, "bredr"))
-+		bearer = find_proxies_by_iface(default_ctrl->bearers,
-+					g_dbus_proxy_get_path(device),
-+					"org.bluez.Bearer.BREDR1");
-+	else if (!strcmp(type, "le"))
-+		bearer = find_proxies_by_iface(default_ctrl->bearers,
-+					g_dbus_proxy_get_path(device),
-+					"org.bluez.Bearer.LE1");
-+
-+	if (!bearer) {
-+		bt_shell_printf("No bearer(%s) on device %s\n", type, argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	if (g_dbus_proxy_method_call(bearer, "Disconnect",NULL,
-+				bearer_disconn_reply, NULL, NULL) == FALSE) {
-+		bt_shell_printf("Failed to call bearer Disconnect\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("Attempting to disconnect bearer(%s) from %s\n",
-+			type,
-+			argv[1]);
-+}
-+
- static void cmd_wake(int argc, char *argv[])
- {
- 	GDBusProxy *proxy;
-@@ -3528,6 +3663,12 @@ static const struct bt_shell_menu main_menu = {
- 	{ "disconnect",   "[dev] [uuid]", cmd_disconn,
- 				"Disconnect a device or optionally disconnect "
- 				"a single profile only", dev_generator },
-+	{ "connect-bearer", "<dev> <le/bredr>", cmd_connect_bearer,
-+				"Connect a specific bearer on a device",
-+							dev_generator },
-+	{ "disconnect-bearer", "<dev> <le/bredr>", cmd_disconnect_bearer,
-+				"Disconnect a specific bearer on a device",
-+							dev_generator },
- 	{ "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake support",
- 							dev_generator },
- 	{ "bearer",       "<dev> [last-seen/bredr/le]", cmd_bearer,
-
--- 
-2.42.0
 
 
+Compare: https://github.com/bluez/bluez/compare/29dcfff9551b%5E...71160c46b41e
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
