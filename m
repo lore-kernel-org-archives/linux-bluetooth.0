@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7031274B58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7DE274B58
 	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Nov 2025 05:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764134471; cv=none; b=gvqOVcStW7xhYtdNAltyUUOSfDg5U4GtIqRo5R2Vve0p79kE74kuMApfCP4UcYan+FN+v9KvsoOgZGbiNvcc5uOSkl+F5jTUvtirpcPPtTMANgLgvV+wZfTqfnRcA5uv9eWodRFEdCOyfU3b2LyQfYiikKf5qfBb1aeZ3RvETLI=
+	t=1764134472; cv=none; b=HjIlK+hLFa9mnUXRBL7sRc6adsaPvOZqv7PTxN4qvEc9Byj3ZTC5a6ilNbdvfEQiasjJtEqVVOKDBbtDrPA5D7WPT4rD1AK6/JcTXO/Rr8vPfmBxcKtIDYFKqw6VKil2cyGglB24mY3Bk2o4CDe4kE05/bLPazQsfj7fKGKMJkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764134471; c=relaxed/simple;
-	bh=p3DXHWFDB8tR2W/FG6wKMNdj7lJgL8ku8wqQFqIy5fo=;
+	s=arc-20240116; t=1764134472; c=relaxed/simple;
+	bh=2CWo+lTbxodIfGiIUu4CWrdzEaREVVr4DecyeTCwacE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=oj84j5Pcfls8R653JZAjmopNox884y7urwK+wyliMZTBPweEW2GmkD9EHbEVGgePQ+BdqiLmidhlCjDYmft2EWF+3/heqwkegm3DMcUv8BR/saIZR0slzzwQZcMQz5YBm3/bG/j+55iQgH9V0XyZuctPk3z79aNvO2P35nz79V4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pf27cZfi; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=em/SajhLv3ZKK5a1mqIKLJ8bp1no6jcD8RtYrscQNJFjwLK0pWgvTCFfDO1fzzEgMeVVszQT/0l3nX2e/gcRGCpwcketmFBSggWXKINmT/SMsjBn466X3xMgPA8f/PiwFZbF68CiGvob4O0TqPoSlc1UUxdZnpqBPDt9BfAdzzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BUIlp8gA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pf27cZfi"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 49D2EC16AAE;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BUIlp8gA"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 687D5C19421;
 	Wed, 26 Nov 2025 05:21:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1764134471;
-	bh=p3DXHWFDB8tR2W/FG6wKMNdj7lJgL8ku8wqQFqIy5fo=;
+	bh=2CWo+lTbxodIfGiIUu4CWrdzEaREVVr4DecyeTCwacE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=pf27cZfiHSiKz6R5xOEnTG0eJun2afPct5UFHa5Qqyp5w4aXsBpFp61xAza/PhnU4
-	 +e5HqCxsW+z30spCD7qk65fFcVT6tVWUjW0Yd8oGSwj1wfpzU657k2SOpyi4vlH24l
-	 ifbnQm5VOtNCsQgN1qLUQcO6KiocXC6W2PKP6CHQef69tybBzbwiYX2xFG4gWtErfY
-	 dChLNt2VThU9gSgD5T4AFCqzZh5iIAL/CntckM0XdeTddAKp1e4R8JslDcv7y8+3zs
-	 NmODnStH8uwXMSw6bF+pqizgI4SG5PYvqyVq4+5FCiJvScUSs2891a7xqiotKFmvhW
-	 AiL9pHhjUHx4Q==
+	b=BUIlp8gAB/YUon6GGkVAbZuI1mVsmenCRltnl0vTcN3K8bHt950By9Z6AZ7+JaIgx
+	 IY/GIU6SDWNmnMn1KZNWmIyZPF/5C6RLtXIQTJKe5tCsSKd/5VABSKm55VegE7+tkd
+	 3WryvZblmv7BN/A9UDfAXeX48rMG3w3hMXcl0KSlI7amXo5vjuYuowmFucew3CPE4e
+	 iLOn10b6mz1Yao3kEHthlBBzR2MeOxpi02OXZfjXb2ma5dqwyc/aq/AQDrE7/ZUxva
+	 CCxGQkKVK9/mIvOhDS87MjN6HW9jUh0T9jkG7oAw2mQ2wTLAYUD2EQy7LjLudoGAXd
+	 Q65iMChpWOllQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3778DD1037F;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F17BD1037F;
 	Wed, 26 Nov 2025 05:21:11 +0000 (UTC)
 From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
-Date: Wed, 26 Nov 2025 13:21:08 +0800
-Subject: [PATCH bluez v6 1/3] profiles: Add bearer field to btd_profile
+Date: Wed, 26 Nov 2025 13:21:10 +0800
+Subject: [PATCH bluez v6 3/3] client: Add shell cmd for bearer
+ connect/disconnect
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,17 +41,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251126-bearer-impl-v6-1-e93fd41f10b6@amlogic.com>
+Message-Id: <20251126-bearer-impl-v6-3-e93fd41f10b6@amlogic.com>
 References: <20251126-bearer-impl-v6-0-e93fd41f10b6@amlogic.com>
 In-Reply-To: <20251126-bearer-impl-v6-0-e93fd41f10b6@amlogic.com>
 To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 Cc: Ye He <ye.he@amlogic.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764134468; l=13682;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1764134469; l=6957;
  i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
- bh=iJknXYj5/qJnw3R4q7z1tmxHYi/nmqwl9k1IYJRo4HA=;
- b=+ywIYdjpczkCAL4HR3TSwpEX9wmgtcfdlfIilNp5Zulc8xwAQgiTmU4u6PzJNUM4iUjAfACGD
- FbVPy5tLmLhD5nnAKmZ8QuaKkp3oSFIfhZblw8e0cDtZNjtki8EOmei
+ bh=DwrnAHYQjxM4r7k4bwyDZCOjC09TbqFsR3iztyP5vIw=;
+ b=1lNb6UcgDga+4/fJG+azi5/e1HBsQUV369PGVd40cVmEqtT6h3ik8BCguo77797rgssU5chr8
+ Nwi3+SCQOPVBHm6YIiBwa1Loh0fRFaQZQU7zOhuY+rmt61qeT9ngVos
 X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
  pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
 X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
@@ -60,349 +61,218 @@ Reply-To: ye.he@amlogic.com
 
 From: Ye He <ye.he@amlogic.com>
 
-Add bearer filed into btd_profile to indicates which bearer
-type this profile belongs to. Thus we can distinct the services
-per bearer.
+This patch adds shell command for bearer connect/disconnect.
 
 Signed-off-by: Ye He <ye.he@amlogic.com>
 ---
- profiles/audio/a2dp.c            |  5 +++--
- profiles/audio/asha.c            |  1 +
- profiles/audio/avrcp.c           |  2 ++
- profiles/audio/bap.c             |  2 ++
- profiles/audio/bass.c            |  1 +
- profiles/audio/ccp.c             |  1 +
- profiles/audio/csip.c            |  2 ++
- profiles/audio/mcp.c             |  1 +
- profiles/audio/micp.c            |  1 +
- profiles/audio/vcp.c             |  1 +
- profiles/battery/battery.c       |  1 +
- profiles/deviceinfo/deviceinfo.c |  1 +
- profiles/gap/gas.c               |  1 +
- profiles/health/hdp_manager.c    |  2 ++
- profiles/input/hog.c             |  1 +
- profiles/input/manager.c         |  1 +
- profiles/midi/midi.c             |  1 +
- profiles/network/manager.c       |  3 +++
- profiles/scanparam/scan.c        |  1 +
- src/profile.h                    | 10 ++++++++++
- 20 files changed, 37 insertions(+), 2 deletions(-)
+ client/bluetoothctl.rst |  34 ++++++++++++
+ client/main.c           | 141 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 175 insertions(+)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index d8f24eaebc745a6d91a8207f6595f0b90d982c39..7a37003a2b25a9e931b8efdfc974368f5ab2bac8 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -3757,8 +3757,9 @@ static void media_server_remove(struct btd_adapter *adapter)
- static struct btd_profile a2dp_source_profile = {
- 	.name		= "a2dp-source",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
--
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 	.remote_uuid	= A2DP_SOURCE_UUID,
+diff --git a/client/bluetoothctl.rst b/client/bluetoothctl.rst
+index 0187e877d60b28eb1e735181b3203e60da821e6f..e10933eb90e9d1ab830ebba6d210d940b2d91d35 100644
+--- a/client/bluetoothctl.rst
++++ b/client/bluetoothctl.rst
+@@ -296,6 +296,40 @@ needed.
+ 
+ :Usage: **> disconnect <dev> [uuid]**
+ 
++connect-bearer
++--------------
 +
- 	.device_probe	= a2dp_source_probe,
- 	.device_remove	= a2dp_source_remove,
- 
-@@ -3773,7 +3774,7 @@ static struct btd_profile a2dp_source_profile = {
- static struct btd_profile a2dp_sink_profile = {
- 	.name		= "a2dp-sink",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
--
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 	.remote_uuid	= A2DP_SINK_UUID,
- 	.device_probe	= a2dp_sink_probe,
- 	.device_remove	= a2dp_sink_remove,
-diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
-index e870ea06f03ac1c20e5b29fb158c815aa2ce756c..8e625fdca32ff0b40efd43e394b34559627bde8c 100644
---- a/profiles/audio/asha.c
-+++ b/profiles/audio/asha.c
-@@ -499,6 +499,7 @@ static int asha_source_disconnect(struct btd_service *service)
- static struct btd_profile asha_source_profile = {
- 	.name		= "asha-source",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= ASHA_PROFILE_UUID,
- 	.experimental	= true,
- 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 21bc80bbd095da49788a87357fd67c8e96ab779d..e6f7e1bfde9879ab6bf028e16384d474332fe805 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -4868,6 +4868,7 @@ done:
- 
- static struct btd_profile avrcp_target_profile = {
- 	.name		= "audio-avrcp-target",
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 
- 	.remote_uuid	= AVRCP_TARGET_UUID,
- 	.device_probe	= avrcp_target_probe,
-@@ -4951,6 +4952,7 @@ done:
- 
- static struct btd_profile avrcp_controller_profile = {
- 	.name		= "avrcp-controller",
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 
- 	.remote_uuid	= AVRCP_REMOTE_UUID,
- 	.device_probe	= avrcp_controller_probe,
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 85bba9543974e5bf2a1ff6380c36e518ebc095ac..a03a120ddaaed7e261d40ac06a8f9502c52772bc 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -3865,6 +3865,7 @@ static void bap_adapter_remove(struct btd_profile *p,
- static struct btd_profile bap_profile = {
- 	.name		= "bap",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= PACS_UUID_STR,
- 	.device_probe	= bap_probe,
- 	.device_remove	= bap_remove,
-@@ -3879,6 +3880,7 @@ static struct btd_profile bap_profile = {
- static struct btd_profile bap_bcast_profile = {
- 	.name		= "bcaa",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= BCAAS_UUID_STR,
- 	.device_probe	= bap_bcast_probe,
- 	.device_remove	= bap_bcast_remove,
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index 9ace372376f9452050724360c2c28e7cdcf1391b..8886a27d99b63b37e2937d8d70f71dfeda3d9ef2 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -2172,6 +2172,7 @@ static void bass_server_remove(struct btd_profile *p,
- static struct btd_profile bass_service = {
- 	.name		= "bass",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= BASS_UUID_STR,
- 	.device_probe	= bass_probe,
- 	.device_remove	= bass_remove,
-diff --git a/profiles/audio/ccp.c b/profiles/audio/ccp.c
-index 8aa537b044e13b6d6a773645b420161bedca13ef..fb85045bb8ba1ec47a33856af1129d0ef78bf500 100644
---- a/profiles/audio/ccp.c
-+++ b/profiles/audio/ccp.c
-@@ -208,6 +208,7 @@ ccp_server_remove(struct btd_profile *p,
- static struct btd_profile ccp_profile = {
- 	.name		= "ccp",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= GTBS_UUID_STR,
- 	.device_probe	= ccp_probe,
- 	.device_remove	= ccp_remove,
-diff --git a/profiles/audio/csip.c b/profiles/audio/csip.c
-index b8f29ddf852231d89760d6fe7ca2cfd684236570..d766c3da951899d990aa59132b820737604b1b7c 100644
---- a/profiles/audio/csip.c
-+++ b/profiles/audio/csip.c
-@@ -303,6 +303,7 @@ static void csip_remove(struct btd_service *service)
- static struct btd_profile csip_profile = {
- 	.name		= "csip",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= CSIS_UUID_STR,
- 
- 	.device_probe	= csip_probe,
-@@ -442,6 +443,7 @@ static void csis_server_remove(struct btd_profile *p,
- static struct btd_profile csis_profile = {
- 	.name		= "csis",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.local_uuid	= CSIS_UUID_STR,
- 
- 	.adapter_probe	= csis_server_probe,
-diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
-index 6651b0897e6f631906b1467f5a479737541da286..8d4eed64399195533ac13fd075d7196a35cf2113 100644
---- a/profiles/audio/mcp.c
-+++ b/profiles/audio/mcp.c
-@@ -383,6 +383,7 @@ static void media_control_server_remove(struct btd_profile *p,
- static struct btd_profile mcp_profile = {
- 	.name			= "mcp",
- 	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= GMCS_UUID_STR,
- 	.device_probe	= mcp_probe,
- 	.device_remove	= mcp_remove,
-diff --git a/profiles/audio/micp.c b/profiles/audio/micp.c
-index f1fb133897320677225a1c8bee06b4a1214f14fa..475f32daf75c06dc28ca72420a80e30802e5a3e9 100644
---- a/profiles/audio/micp.c
-+++ b/profiles/audio/micp.c
-@@ -300,6 +300,7 @@ static void micp_server_remove(struct btd_profile *p,
- static struct btd_profile micp_profile = {
- 	.name		= "micp",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= MICS_UUID_STR,
- 
- 	.device_probe	= micp_probe,
-diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
-index 8949c71858e53448ee01c5c4261082f3912a759c..471ad59250386941c377e2f81e911467d7023cce 100644
---- a/profiles/audio/vcp.c
-+++ b/profiles/audio/vcp.c
-@@ -328,6 +328,7 @@ static void vcp_server_remove(struct btd_profile *p,
- static struct btd_profile vcp_profile = {
- 	.name		= "vcp",
- 	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= VCS_UUID_STR,
- 
- 	.device_probe	= vcp_probe,
-diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-index 050234a0fa03813dc9e1b8302689fc68ec254184..2fe1f4aca2cf7b21e52bec989711741d6d7e25b5 100644
---- a/profiles/battery/battery.c
-+++ b/profiles/battery/battery.c
-@@ -327,6 +327,7 @@ static int batt_disconnect(struct btd_service *service)
- 
- static struct btd_profile batt_profile = {
- 	.name		= "batt-profile",
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= BATTERY_UUID,
- 	.device_probe	= batt_probe,
- 	.device_remove	= batt_remove,
-diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
-index f5adb101e312108be8dae20c75cc74e1ff7eaabf..e77bb50b457a28f08f3e9d2ecf8d81d80da86106 100644
---- a/profiles/deviceinfo/deviceinfo.c
-+++ b/profiles/deviceinfo/deviceinfo.c
-@@ -137,6 +137,7 @@ static int deviceinfo_disconnect(struct btd_service *service)
- 
- static struct btd_profile deviceinfo_profile = {
- 	.name		= "deviceinfo",
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= DEVICE_INFORMATION_UUID,
- 	.device_probe	= deviceinfo_probe,
- 	.device_remove	= deviceinfo_remove,
-diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
-index dd45554d43ebc267d40a8fe4a8fab48f602bf6bc..0f41c9e6c2a5c7d980509ae66d8d7d7c2678fd21 100644
---- a/profiles/gap/gas.c
-+++ b/profiles/gap/gas.c
-@@ -366,6 +366,7 @@ static int gap_disconnect(struct btd_service *service)
- 
- static struct btd_profile gap_profile = {
- 	.name		= "gap-profile",
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= GAP_UUID,
- 	.device_probe	= gap_probe,
- 	.device_remove	= gap_remove,
-diff --git a/profiles/health/hdp_manager.c b/profiles/health/hdp_manager.c
-index d1e627a3382a01bdd5002bcc0da01da35e872da1..72b69428036df77e2cdb224f186fb13191f955ed 100644
---- a/profiles/health/hdp_manager.c
-+++ b/profiles/health/hdp_manager.c
-@@ -57,6 +57,7 @@ static void hdp_driver_remove(struct btd_service *service)
- 
- static struct btd_profile hdp_source_profile = {
- 	.name		= "hdp-source",
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 	.remote_uuid	= HDP_SOURCE_UUID,
- 
- 	.device_probe	= hdp_driver_probe,
-@@ -68,6 +69,7 @@ static struct btd_profile hdp_source_profile = {
- 
- static struct btd_profile hdp_sink_profile = {
- 	.name		= "hdp-sink",
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 	.remote_uuid	= HDP_SINK_UUID,
- 
- 	.device_probe	= hdp_driver_probe,
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 1f5b82b774353244067e460f49aaccd09e26dcc8..f50a0f217f7f732f82645e289419e51ee6412917 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -215,6 +215,7 @@ static int hog_disconnect(struct btd_service *service)
- 
- static struct btd_profile hog_profile = {
- 	.name		= "input-hog",
-+	.bearer		= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid	= HOG_UUID,
- 	.device_probe	= hog_probe,
- 	.device_remove	= hog_remove,
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index b0e415f6706c54e7c96199d3bb5e483d0927153f..0fcd6728c2fca83f03f7333f50102658553403e7 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -45,6 +45,7 @@ static void hid_server_remove(struct btd_profile *p,
- 
- static struct btd_profile input_profile = {
- 	.name		= "input-hid",
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 	.local_uuid	= HID_UUID,
- 	.remote_uuid	= HID_UUID,
- 
-diff --git a/profiles/midi/midi.c b/profiles/midi/midi.c
-index 90e00a5f58361f1da57a71f393e581da5128310c..ea4719b95b23aa97850de362da9012728427f08e 100644
---- a/profiles/midi/midi.c
-+++ b/profiles/midi/midi.c
-@@ -458,6 +458,7 @@ static int midi_disconnect(struct btd_service *service)
- 
- static struct btd_profile midi_profile = {
- 	.name = "MIDI GATT Driver",
-+	.bearer	= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid = MIDI_UUID,
- 	.priority = BTD_PROFILE_PRIORITY_HIGH,
- 	.auto_connect = true,
-diff --git a/profiles/network/manager.c b/profiles/network/manager.c
-index 51f382529df27600d1a4fd806cb656d7f1a682af..693547d45fbc5b2f227fed832b4efb8fb87c2d59 100644
---- a/profiles/network/manager.c
-+++ b/profiles/network/manager.c
-@@ -120,6 +120,7 @@ static void nap_server_remove(struct btd_profile *p,
- 
- static struct btd_profile panu_profile = {
- 	.name		= "network-panu",
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 	.local_uuid	= NAP_UUID,
- 	.remote_uuid	= PANU_UUID,
- 	.device_probe	= connection_register,
-@@ -132,6 +133,7 @@ static struct btd_profile panu_profile = {
- 
- static struct btd_profile gn_profile = {
- 	.name		= "network-gn",
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= GN_UUID,
- 	.device_probe	= connection_register,
-@@ -144,6 +146,7 @@ static struct btd_profile gn_profile = {
- 
- static struct btd_profile nap_profile = {
- 	.name		= "network-nap",
-+	.bearer		= BTD_PROFILE_BEARER_BREDR,
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= NAP_UUID,
- 	.device_probe	= connection_register,
-diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
-index 1c531773740c847e970ac45b7fbda2c0c9501ded..a66f80eabf3ef63e35cfd5e8da30e4aa18420b94 100644
---- a/profiles/scanparam/scan.c
-+++ b/profiles/scanparam/scan.c
-@@ -259,6 +259,7 @@ static int scan_param_probe(struct btd_service *service)
- 
- static struct btd_profile scan_profile = {
- 	.name = "Scan Parameters Client Driver",
-+	.bearer	= BTD_PROFILE_BEARER_LE,
- 	.remote_uuid = SCAN_PARAMETERS_UUID,
- 	.device_probe = scan_param_probe,
- 	.device_remove = scan_param_remove,
-diff --git a/src/profile.h b/src/profile.h
-index 424ce55ad65748ead13b1a38d67fbad6beb2b828..1281d8d9a0daa5de6578a5ae6df8fc211269d409 100644
---- a/src/profile.h
-+++ b/src/profile.h
-@@ -12,12 +12,22 @@
- #define BTD_PROFILE_PRIORITY_MEDIUM	1
- #define BTD_PROFILE_PRIORITY_HIGH	2
- 
-+#define BTD_PROFILE_BEARER_ANY		0
-+#define BTD_PROFILE_BEARER_LE		1
-+#define BTD_PROFILE_BEARER_BREDR	2
++Connect device with specified bearer.
 +
- struct btd_service;
- 
- struct btd_profile {
- 	const char *name;
- 	int priority;
- 
-+	/* Indicates which bearer type this profile belongs to. Some profiles
-+	 * may exist in both BR/EDR and LE, in which case they should be
-+	 * registered with BTD_PROFILE_BEARER_ANY.
-+	 */
-+	int bearer;
++This command initiates a bearer-level connection to a remote device.
 +
- 	const char *local_uuid;
- 	const char *remote_uuid;
++By default this command connects the specified bearer (LE or BREDR)
++and all profiles that are associated with that bearer and marked as
++auto-connectable. Only the profiles bound to the selected bearer
++will be considered, profiles on the other bearer are not affected.
++
++For LE connections an active scan report is required before the connection
++can be established. If no advertising report is received before the timeout,
++a le-connection-abort-by-local error will be issued.
++
++:Usage: > connect-bearer <dev> <le/bredr>
++:Example: > connect-bearer 1C:48:F9:9D:81:5C le
++:Example: > connect-bearer 1C:48:F9:9D:81:5C bredr
++
++disconnect-bearer
++-----------------
++
++Disconnect device with specified bearer.
++
++By default this command disconnects all profiles associated with the specified
++bearer (LE or BREDR) and then terminates that bearer's link. Only profiles
++bound to the selected bearer are affected, profiles on the other bearer remain
++connected.
++
++:Usage: > disconnect-bearer <dev> <le/bredr>
++:Example: > disconnect-bearer 1C:48:F9:9D:81:5C le
++:Example: > disconnect-bearer 1C:48:F9:9D:81:5C bredr
++
+ info
+ ----
  
+diff --git a/client/main.c b/client/main.c
+index 0a928efaa9bb0d2a806895ff8f8c0c7c0d2493bd..ea551498f5d09879f87b8c77d7de2f0668b53fa6 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2303,6 +2303,141 @@ static void cmd_disconn(int argc, char *argv[])
+ 						proxy_address(proxy));
+ }
+ 
++static void bearer_connect_reply(DBusMessage *message, void *user_data)
++{
++	DBusError error;
++
++	dbus_error_init(&error);
++
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		bt_shell_printf("Failed to connect: %s %s\n", error.name,
++				error.message);
++		dbus_error_free(&error);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_shell_printf("Connection successful\n");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void bearer_disconn_reply(DBusMessage *message, void *user_data)
++{
++	DBusError error;
++
++	dbus_error_init(&error);
++
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		bt_shell_printf("Failed to disconnect: %s %s\n", error.name,
++				error.message);
++		dbus_error_free(&error);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_shell_printf("Disconnection successful\n");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void cmd_connect_bearer(int argc, char *argv[])
++{
++	const char *type;
++	GDBusProxy *device;
++	GDBusProxy *bearer = NULL;
++
++	if (argc < 3) {
++		bt_shell_printf("Usage: connect-bearer <dev> <le/bredr>\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	device = find_device(argc, argv);
++	if (!device) {
++		bt_shell_printf("Device %s not available\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	type = argv[2];
++
++	if (strcmp(type, "le") != 0 && strcmp(type, "bredr") != 0) {
++		bt_shell_printf("Invalid bearer type: %s, "
++			"Usage: connect-bearer <dev> <le/bredr>\n", type);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!strcmp(type, "bredr"))
++		bearer = find_proxies_by_iface(default_ctrl->bearers,
++					g_dbus_proxy_get_path(device),
++					"org.bluez.Bearer.BREDR1");
++	else if (!strcmp(type, "le"))
++		bearer = find_proxies_by_iface(default_ctrl->bearers,
++					g_dbus_proxy_get_path(device),
++					"org.bluez.Bearer.LE1");
++
++	if (!bearer) {
++		bt_shell_printf("No bearer(%s) on device %s\n", type, argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (g_dbus_proxy_method_call(bearer, "Connect", NULL,
++				bearer_connect_reply, NULL, NULL) == FALSE) {
++		bt_shell_printf("Failed to call bearer Connect\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_shell_printf("Attempting to connect bearer(%s) to %s\n",
++			type, argv[1]);
++}
++
++static void cmd_disconnect_bearer(int argc, char *argv[])
++{
++	const char *type;
++	GDBusProxy *device;
++	GDBusProxy *bearer = NULL;
++
++	if (argc < 3) {
++		bt_shell_printf("Usage: disconnect-bearer <dev> <le/bredr>\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	device = find_device(argc, argv);
++	if (!device) {
++		bt_shell_printf("Device %s not available\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	type = argv[2];
++
++	if (strcmp(type, "le") != 0 && strcmp(type, "bredr") != 0) {
++		bt_shell_printf("Invalid bearer type: %s, "
++			"Usage: disconnect-bearer <dev> <le/bredr>\n", type);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!strcmp(type, "bredr"))
++		bearer = find_proxies_by_iface(default_ctrl->bearers,
++					g_dbus_proxy_get_path(device),
++					"org.bluez.Bearer.BREDR1");
++	else if (!strcmp(type, "le"))
++		bearer = find_proxies_by_iface(default_ctrl->bearers,
++					g_dbus_proxy_get_path(device),
++					"org.bluez.Bearer.LE1");
++
++	if (!bearer) {
++		bt_shell_printf("No bearer(%s) on device %s\n", type, argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (g_dbus_proxy_method_call(bearer, "Disconnect", NULL,
++				bearer_disconn_reply, NULL, NULL) == FALSE) {
++		bt_shell_printf("Failed to call bearer Disconnect\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_shell_printf("Attempting to disconnect bearer(%s) from %s\n",
++			type,
++			argv[1]);
++}
++
+ static void cmd_wake(int argc, char *argv[])
+ {
+ 	GDBusProxy *proxy;
+@@ -3528,6 +3663,12 @@ static const struct bt_shell_menu main_menu = {
+ 	{ "disconnect",   "[dev] [uuid]", cmd_disconn,
+ 				"Disconnect a device or optionally disconnect "
+ 				"a single profile only", dev_generator },
++	{ "connect-bearer", "<dev> <le/bredr>", cmd_connect_bearer,
++				"Connect a specific bearer on a device",
++							dev_generator },
++	{ "disconnect-bearer", "<dev> <le/bredr>", cmd_disconnect_bearer,
++				"Disconnect a specific bearer on a device",
++							dev_generator },
+ 	{ "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake support",
+ 							dev_generator },
+ 	{ "bearer",       "<dev> [last-seen/bredr/le]", cmd_bearer,
 
 -- 
 2.42.0
