@@ -1,326 +1,179 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3237303A09
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Nov 2025 14:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C3D33B97E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Nov 2025 15:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764167750; cv=none; b=WIq1+yajaRx16tnj81iZd0TR9ynbGjjltsyRKWrQ7wVeUJbMETiW7B4Tb5vfFhy/Qq5/8dUdyz0V/J5CCIlvGCF/IXRbOwJwJ57S1+q6GgTLi4wTyE/N02u6BAtaJPpiST0nWf5h0Hilx1pCEvqVxdQNNM6rO/GzhqVgAG9TWEc=
+	t=1764172140; cv=none; b=l1uG2NvTytvx1PFXQ8P8neGeqCg9LL6OmmiHn/HTBW8bx0WgCPv4wWdzM5M+nTtm9Y94aiN3PCFqDUcj1xqtmVC0lF++d8xq3RIc/zr68ie9iLLWZa+i8+uHZf2o60GoNPt640bhs7B+qLMgF1RDeSr/6UDm9br06c5n4jm+gTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764167750; c=relaxed/simple;
-	bh=TcmZ+wAAS5tQPJBEU4QTypkW3RYLdTotD0Od7/PF/+w=;
+	s=arc-20240116; t=1764172140; c=relaxed/simple;
+	bh=6YASY02fQ23f1RDqygF5S199ObV7kVOcbwcCGJNj4Gg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aghY6ZbDBlQlQmW4aeGuY0NyswJwhLEFmjuY/d9jdBSeJQ41ZfviVp3kNP03cCdfHCikYTWbJBkzLQiBOaLw4wHL68HDMizTxv3C1HoGCjD9DLeGDrCyATfB2ZjE01/nAWbE1vCidJtBIUH+m8dis08y374Czpv5HM7rU3JIHo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GOikbPG1; arc=none smtp.client-ip=209.85.208.171
+	 To:Cc:Content-Type; b=j/NDAT4hOsZWhjiUiOFqsk45rDmzGtjtQQ5PrpB2PcYiqyYgbtjYoDtY9B+HsMUVGT8zTcYKov9CMBOBGrYXBL+etC7zfHFEVw0EzAr8MXjvph5U2DDZcK3f+cWwul2Zxyj7S0Xz43Uh5LNLZyLVHFYnn3aBX0CtWTPZUmW4eUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YhmSRNS5; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GOikbPG1"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-37ba5af5951so30342191fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Nov 2025 06:35:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YhmSRNS5"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-37d056f5703so22880771fa.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Nov 2025 07:48:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764167747; x=1764772547; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764172137; x=1764776937; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3VRS2l7H8ouVUtHWgzfDZd/58q1aZUMQoCsBc03FOIs=;
-        b=GOikbPG1zI40Gic1uuBTM++wlcjqS4TOUNgttQISzwCarVlxTyZc8DFi545uqWP1fm
-         O0+ebTMpG4OjeFHFAS5q6QrL8b7wg1AH6QyA7t7yGl1lRnC/yjB1gf0IX0OX6YBZu5Mb
-         bISKAzPZpfgVNzcZ4Fg7TqX5f1sfkvaYjVe0paCej7zEczquX4gUzcWHHHkVAszRPJpr
-         k+vKVH14DplFHRAz/j8pKcqmwQC/gVESL+sQV4LrxSb/15LfR6TIfNm431CxqJkLz/Sy
-         /DKZk3zUQNVLgswm9gUGgEgG8f+KpxEUPYFFI8Cq5wZAnn0TuCpMrC8UkrH3FHC21TQy
-         IjSg==
+        bh=HoRwtJhb9wcPZrMi0TT2OcMTg162LjhvYh/7nz96y18=;
+        b=YhmSRNS5FzGwu9X0WUpylj3pHq9BByBLeZetmI/BM8khel0Of/yfG8aDnTdrCFjyV4
+         uuo0LzygUbRRsyOQYrdUetCtt30rP6NFfGc7tzsBSXxP+ZprashwiDXsi/DxuOU3V4Xh
+         4gUmnUalXDGU9HkZZanwkJ/CT0RpuUog2x/Zv84I1iTMzRdV8a1k9d3nfRcgQ/2eC2TM
+         g3Hh+lbQouXFSg6JoDojPTIoehI57Yaii0XCXYUTCQ/T+5Y9AUpy8BoTjX09BW5MnMpN
+         KuyQY35EER05OIC26RLv+G6jNLf4LoS5T6IlBPucpsP5Oi7PIRJ3V7DXNwpLjKiz2vxP
+         bMLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764167747; x=1764772547;
+        d=1e100.net; s=20230601; t=1764172137; x=1764776937;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=3VRS2l7H8ouVUtHWgzfDZd/58q1aZUMQoCsBc03FOIs=;
-        b=LOwXyEZWuP6Ivho2MNMDlwXjzP/EuPVuhZYTAAgJaAAlBav4qxJYp9IO+3mhnwUsHw
-         17DiSL5pbF6tqgqzj37DMRxeL0dBW72WIBOlL55mBk5syvTx3mH6b+bM9lE6ygmHwM/F
-         QxhsXkKEO5YeNpKoujYykoxYXkxKzQb1LrBEowCWKBjDfFMgVUpi+ijgyJl1PrJhsAUL
-         E8iNEZgDBtTVdUnDxUBDi3Gqu5eHAcAWAAxudzVuooOnrymSw0gg1y7OYSrjbm6MBA42
-         NUmXc0DOZOe+RzfXp2pXP2F56jO59ALIQpBXlSP70mPoIy3il0VJyJzs0fPdLkuv4iVm
-         3VLw==
-X-Gm-Message-State: AOJu0YwBImIPw4ryFlMgBEgkwxCc46rQh3Ad8gi/6vuzPVBpk7Aw6MMl
-	vDgYTR11oAXo63Dj3Bh58WtHFqrvmtdUS5DpQAFIhdXCf2QZlhcFN1cCeIFy7ws5rRz3KKT/epS
-	fbWrr2dJcgNmVDOkKrmcZvofu76i18GZbIDuH
-X-Gm-Gg: ASbGnctwZOH/8su0Am6aWf290slmWU+egXd/dhi92ypRVqW6zTB/inOrg0gc2dmAj5Z
-	rmc+xvVwVz5L07SBgQdm83qAaDBu289GTDZynIqCyqRthDUJQrZMRdZWMHmxq1Imv+yh2rzYcOF
-	1x0Pfl2wqJ4mpIrZ8seqsR+sElCSnfZjCUHydReq/nqovpz3uy8BAh3JCMVOTTahbFqyLnUQao0
-	M9RtJthInUpewskcpOqHb/xoSTGUiIT2obHWlByorjxmVs6xVBRcveY5iG/IaFi9Yu8eQ==
-X-Google-Smtp-Source: AGHT+IFsof0B4JCXWUkjJ7onCps2y/VCyThij8PR80z1G5EAQmSaKKgx34yM4vH22QL94q1vf+Y0ZzPqTeuuHhYHMpk=
-X-Received: by 2002:a2e:9d4f:0:b0:37b:b952:5e2 with SMTP id
- 38308e7fff4ca-37cd919c5aamr40383431fa.16.1764167746530; Wed, 26 Nov 2025
- 06:35:46 -0800 (PST)
+        bh=HoRwtJhb9wcPZrMi0TT2OcMTg162LjhvYh/7nz96y18=;
+        b=BLWtTXSNryOGzgxtVzjvY2X7SyMUNqb4rpzJg/iF+kdlO6kSjYEA97fKpVv++FM5ln
+         SmCPt6vDncK07KO6d55LQg9TcM4IwBSaN2RYPv15ZwBCmo06G5f5z5alEcVt9vXHe918
+         QKsG3UeaKj5XornrwmkWEMHdNHxFdXLc8JcmIfWrIyNAzSm8NZ2k1pcq+XlFdXGiqk8W
+         jolf4qVsvr+4wI7E5OvZSSlRD0X9AVDpsd0n2987H82dZpDCetZ4pE6Th7iaXvg3KlrW
+         Yg/NZwQ7pCxD1xAm+DXeeA45bs7qi2gm734cMHxSje1e3X6OqTn0AARufEgyC3euPyZY
+         PIQw==
+X-Gm-Message-State: AOJu0YzLqyuuCpt0wP7IVbnlsiXnIbaIiGJHHXorgQmr/DdBczFzDf9P
+	lhgFgobjH2et1KXwep3ru+h04DkhhNyZWHjnDd38NUUunZr6zKXogxJA2COLhfw3rxVqNhi0+zP
+	qt4fut+m6XQrPszMtXys1XNDkdQoUFzRfgWB6
+X-Gm-Gg: ASbGncsMu7sV/cqX5d1hfRq0EFvT+VF75thzOLHiXPMJNAzZ8US/LE7/C9g4xlOQ2jF
+	ozR2bH9HtlkYrp4JOBMkcoA1pVw3O1appdKxldzZASGWTpOYnQXu53OQz6lfqU8LnYi3K8FPsov
+	pEN3c5jpPWaLkJWsYE/11RZXP+IgylITyDMZVYJALfldNPN3z+yzSxGqCwDDTulyRpwxPT8QdDa
+	uyGinzknoD3jrwu2MJrHJc6feZoSw/zNxlzxLM4WGfkKqVRt13+bp4UDBZmwgmwfK/Rlg==
+X-Google-Smtp-Source: AGHT+IF4DdppOdxGdhhsclhdCwqvZjSNXeKTwy6U7+naspffXEtbIRlXROFOhDVQj4PsyMTZtJUIIkt/Nzbwc8Wnk+8=
+X-Received: by 2002:a05:651c:f14:b0:372:9bf0:aec9 with SMTP id
+ 38308e7fff4ca-37cd9186ce7mr58248171fa.8.1764172136298; Wed, 26 Nov 2025
+ 07:48:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126-bearer-impl-v6-0-e93fd41f10b6@amlogic.com> <20251126-bearer-impl-v6-3-e93fd41f10b6@amlogic.com>
-In-Reply-To: <20251126-bearer-impl-v6-3-e93fd41f10b6@amlogic.com>
+References: <68b8ba8dd63306081aa7630e3b1f8a186e558b6c.1764090857.git.pav@iki.fi>
+In-Reply-To: <68b8ba8dd63306081aa7630e3b1f8a186e558b6c.1764090857.git.pav@iki.fi>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 26 Nov 2025 09:35:34 -0500
-X-Gm-Features: AWmQ_blBhb_wBtHQz5J18wO7qAVc0QjEkh-0H1NSwOcYZdePLR5riVZcvVsvLyg
-Message-ID: <CABBYNZK2TpPjdraCC+WuY5u-yvAiyCJZAf-FrjtoLO7Qntp8uQ@mail.gmail.com>
-Subject: Re: [PATCH bluez v6 3/3] client: Add shell cmd for bearer connect/disconnect
-To: ye.he@amlogic.com
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Wed, 26 Nov 2025 10:48:42 -0500
+X-Gm-Features: AWmQ_blUfxp7bXVNvhFX0slWvnEpj6ySKgSxdOtiatkztu-eTHdiXu_Q6rbCkpU
+Message-ID: <CABBYNZ+7CCN2r6GjUEi1jh7Sn00OnVkY4+sho=2eUosgtMdTTw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] transport: fix VCP volume updating and sink volumes
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Pauli,
 
-On Wed, Nov 26, 2025 at 12:21=E2=80=AFAM Ye He via B4 Relay
-<devnull+ye.he.amlogic.com@kernel.org> wrote:
+On Tue, Nov 25, 2025 at 12:16=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
 >
-> From: Ye He <ye.he@amlogic.com>
+> Signaling VCP volume value update was broken in
+> media_transport_update_device_volume() due to inverted strcasecmp(), it
+> also has to be done for all transports since they show the volume.
 >
-> This patch adds shell command for bearer connect/disconnect.
->
-> Signed-off-by: Ye He <ye.he@amlogic.com>
+> VCP output volume was incorrectly shown on input transports.  Don't
+> expose Volume for BAP input transports, since AICS is only partly
+> implemented.
 > ---
->  client/bluetoothctl.rst |  34 ++++++++++++
->  client/main.c           | 141 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  2 files changed, 175 insertions(+)
+>  profiles/audio/transport.c | 36 +++++++++++++++++++++++++++---------
+>  1 file changed, 27 insertions(+), 9 deletions(-)
 >
-> diff --git a/client/bluetoothctl.rst b/client/bluetoothctl.rst
-> index 0187e877d60b28eb1e735181b3203e60da821e6f..e10933eb90e9d1ab830ebba6d=
-210d940b2d91d35 100644
-> --- a/client/bluetoothctl.rst
-> +++ b/client/bluetoothctl.rst
-> @@ -296,6 +296,40 @@ needed.
->
->  :Usage: **> disconnect <dev> [uuid]**
->
-> +connect-bearer
-> +--------------
+> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+> index fc23cf33d..d466ec9b6 100644
+> --- a/profiles/audio/transport.c
+> +++ b/profiles/audio/transport.c
+> @@ -2308,16 +2308,32 @@ static void bap_connecting(struct bt_bap_stream *=
+stream, bool state, int fd,
+>  static int transport_bap_get_volume(struct media_transport *transport)
+>  {
+>  #ifdef HAVE_VCP
+> -       return bt_audio_vcp_get_volume(transport->device);
+> -#else
+> -       return -ENODEV;
+> +       const char *uuid =3D media_endpoint_get_uuid(transport->endpoint)=
+;
 > +
-> +Connect device with specified bearer.
+> +       /* TODO: PAC_SINK_UUID needs AICS */
+> +       /* TODO: VOCS */
 > +
-> +This command initiates a bearer-level connection to a remote device.
+> +       if (strcasecmp(uuid, PAC_SOURCE_UUID) =3D=3D 0 ||
+> +                               strcasecmp(uuid, BAA_SERVICE_UUID) =3D=3D=
+ 0)
+> +               return bt_audio_vcp_get_volume(transport->device);
+>  #endif /* HAVE_VCP */
 > +
-> +By default this command connects the specified bearer (LE or BREDR)
-> +and all profiles that are associated with that bearer and marked as
-> +auto-connectable. Only the profiles bound to the selected bearer
-> +will be considered, profiles on the other bearer are not affected.
-> +
-> +For LE connections an active scan report is required before the connecti=
-on
-> +can be established. If no advertising report is received before the time=
-out,
-> +a le-connection-abort-by-local error will be issued.
-> +
-> +:Usage: > connect-bearer <dev> <le/bredr>
-> +:Example: > connect-bearer 1C:48:F9:9D:81:5C le
-> +:Example: > connect-bearer 1C:48:F9:9D:81:5C bredr
-> +
-> +disconnect-bearer
-> +-----------------
-> +
-> +Disconnect device with specified bearer.
-> +
-> +By default this command disconnects all profiles associated with the spe=
-cified
-> +bearer (LE or BREDR) and then terminates that bearer's link. Only profil=
-es
-> +bound to the selected bearer are affected, profiles on the other bearer =
-remain
-> +connected.
-> +
-> +:Usage: > disconnect-bearer <dev> <le/bredr>
-> +:Example: > disconnect-bearer 1C:48:F9:9D:81:5C le
-> +:Example: > disconnect-bearer 1C:48:F9:9D:81:5C bredr
-
-
-I think it would be better if we do something like
-le.connect/bredr.connect instead of having to pass the bearer as
-parameter, this should also help with tab completion since in that
-case we can make it list just the devices that support the given
-bearer.
-
->  info
->  ----
->
-> diff --git a/client/main.c b/client/main.c
-> index 0a928efaa9bb0d2a806895ff8f8c0c7c0d2493bd..ea551498f5d09879f87b8c77d=
-7de2f0668b53fa6 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -2303,6 +2303,141 @@ static void cmd_disconn(int argc, char *argv[])
->                                                 proxy_address(proxy));
+> +       return -ENODEV;
 >  }
 >
-> +static void bearer_connect_reply(DBusMessage *message, void *user_data)
-> +{
-> +       DBusError error;
-> +
-> +       dbus_error_init(&error);
-> +
-> +       if (dbus_set_error_from_message(&error, message) =3D=3D TRUE) {
-> +               bt_shell_printf("Failed to connect: %s %s\n", error.name,
-> +                               error.message);
-> +               dbus_error_free(&error);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       bt_shell_printf("Connection successful\n");
-> +
-> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static void bearer_disconn_reply(DBusMessage *message, void *user_data)
-> +{
-> +       DBusError error;
-> +
-> +       dbus_error_init(&error);
-> +
-> +       if (dbus_set_error_from_message(&error, message) =3D=3D TRUE) {
-> +               bt_shell_printf("Failed to disconnect: %s %s\n", error.na=
-me,
-> +                               error.message);
-> +               dbus_error_free(&error);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       bt_shell_printf("Disconnection successful\n");
-> +
-> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static void cmd_connect_bearer(int argc, char *argv[])
-> +{
-> +       const char *type;
-> +       GDBusProxy *device;
-> +       GDBusProxy *bearer =3D NULL;
-> +
-> +       if (argc < 3) {
-> +               bt_shell_printf("Usage: connect-bearer <dev> <le/bredr>\n=
-");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       device =3D find_device(argc, argv);
-> +       if (!device) {
-> +               bt_shell_printf("Device %s not available\n", argv[1]);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       type =3D argv[2];
-> +
-> +       if (strcmp(type, "le") !=3D 0 && strcmp(type, "bredr") !=3D 0) {
-> +               bt_shell_printf("Invalid bearer type: %s, "
-> +                       "Usage: connect-bearer <dev> <le/bredr>\n", type)=
-;
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       if (!strcmp(type, "bredr"))
-> +               bearer =3D find_proxies_by_iface(default_ctrl->bearers,
-> +                                       g_dbus_proxy_get_path(device),
-> +                                       "org.bluez.Bearer.BREDR1");
-> +       else if (!strcmp(type, "le"))
-> +               bearer =3D find_proxies_by_iface(default_ctrl->bearers,
-> +                                       g_dbus_proxy_get_path(device),
-> +                                       "org.bluez.Bearer.LE1");
-> +
-> +       if (!bearer) {
-> +               bt_shell_printf("No bearer(%s) on device %s\n", type, arg=
-v[1]);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       if (g_dbus_proxy_method_call(bearer, "Connect", NULL,
-> +                               bearer_connect_reply, NULL, NULL) =3D=3D =
-FALSE) {
-> +               bt_shell_printf("Failed to call bearer Connect\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       bt_shell_printf("Attempting to connect bearer(%s) to %s\n",
-> +                       type, argv[1]);
-> +}
-> +
-> +static void cmd_disconnect_bearer(int argc, char *argv[])
-> +{
-> +       const char *type;
-> +       GDBusProxy *device;
-> +       GDBusProxy *bearer =3D NULL;
-> +
-> +       if (argc < 3) {
-> +               bt_shell_printf("Usage: disconnect-bearer <dev> <le/bredr=
->\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       device =3D find_device(argc, argv);
-> +       if (!device) {
-> +               bt_shell_printf("Device %s not available\n", argv[1]);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       type =3D argv[2];
-> +
-> +       if (strcmp(type, "le") !=3D 0 && strcmp(type, "bredr") !=3D 0) {
-> +               bt_shell_printf("Invalid bearer type: %s, "
-> +                       "Usage: disconnect-bearer <dev> <le/bredr>\n", ty=
-pe);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       if (!strcmp(type, "bredr"))
-> +               bearer =3D find_proxies_by_iface(default_ctrl->bearers,
-> +                                       g_dbus_proxy_get_path(device),
-> +                                       "org.bluez.Bearer.BREDR1");
-> +       else if (!strcmp(type, "le"))
-> +               bearer =3D find_proxies_by_iface(default_ctrl->bearers,
-> +                                       g_dbus_proxy_get_path(device),
-> +                                       "org.bluez.Bearer.LE1");
-> +
-> +       if (!bearer) {
-> +               bt_shell_printf("No bearer(%s) on device %s\n", type, arg=
-v[1]);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       if (g_dbus_proxy_method_call(bearer, "Disconnect", NULL,
-> +                               bearer_disconn_reply, NULL, NULL) =3D=3D =
-FALSE) {
-> +               bt_shell_printf("Failed to call bearer Disconnect\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       bt_shell_printf("Attempting to disconnect bearer(%s) from %s\n",
-> +                       type,
-> +                       argv[1]);
-> +}
-> +
->  static void cmd_wake(int argc, char *argv[])
+>  static int transport_bap_set_volume(struct media_transport *transport,
+>                                                                 int volum=
+e)
 >  {
->         GDBusProxy *proxy;
-> @@ -3528,6 +3663,12 @@ static const struct bt_shell_menu main_menu =3D {
->         { "disconnect",   "[dev] [uuid]", cmd_disconn,
->                                 "Disconnect a device or optionally discon=
-nect "
->                                 "a single profile only", dev_generator },
-> +       { "connect-bearer", "<dev> <le/bredr>", cmd_connect_bearer,
-> +                               "Connect a specific bearer on a device",
-> +                                                       dev_generator },
-> +       { "disconnect-bearer", "<dev> <le/bredr>", cmd_disconnect_bearer,
-> +                               "Disconnect a specific bearer on a device=
-",
-> +                                                       dev_generator },
->         { "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake su=
-pport",
->                                                         dev_generator },
->         { "bearer",       "<dev> [last-seen/bredr/le]", cmd_bearer,
+>  #ifdef HAVE_VCP
+> +       const char *uuid =3D media_endpoint_get_uuid(transport->endpoint)=
+;
+> +
+> +       /* TODO: PAC_SINK_UUID needs AICS */
+> +       /* TODO: VOCS */
+> +
+> +       if (strcasecmp(uuid, PAC_SOURCE_UUID) &&
+> +                               strcasecmp(uuid, BAA_SERVICE_UUID))
+> +               return -ENODEV;
+> +
+>         if (volume < 0 || volume > 255)
+>                 return -EINVAL;
+>
+> @@ -2802,7 +2818,6 @@ void media_transport_update_device_volume(struct bt=
+d_device *dev,
+>         if (dev =3D=3D NULL || volume < 0)
+>                 return;
+>
+> -#ifdef HAVE_A2DP
+>         /* Attempt to locate the transport to set its volume */
+>         for (l =3D transports; l; l =3D l->next) {
+>                 struct media_transport *transport =3D l->data;
+> @@ -2811,16 +2826,19 @@ void media_transport_update_device_volume(struct =
+btd_device *dev,
+>                         continue;
+>
+>                 /* Volume is A2DP and BAP only */
+> -               if (media_endpoint_get_sep(transport->endpoint) ||
+> -                               strcasecmp(uuid, PAC_SINK_UUID) ||
+> -                               strcasecmp(uuid, PAC_SOURCE_UUID) ||
+> -                               strcasecmp(uuid, BAA_SERVICE_UUID)) {
+> +#ifdef HAVE_A2DP
+> +               if (media_endpoint_get_sep(transport->endpoint)) {
+>                         media_transport_update_volume(transport, volume);
+>                         break;
+>                 }
+> -       }
+>  #endif
+>
+> +               /* This is sink volume */
+> +               if (strcasecmp(uuid, PAC_SOURCE_UUID) =3D=3D 0 ||
+> +                               strcasecmp(uuid, BAA_SERVICE_UUID) =3D=3D=
+ 0)
+> +                       media_transport_update_volume(transport, volume);
+> +       }
+
+Current code sounds quite messy with respect to callbacks, we should
+really only add the callback if the feature is supported per UUID,
+perhaps we have to rethink how media.c interfaces with profiles to
+avoid having to do #ifdef everywhere.
+
+>         btd_device_set_volume(dev, volume);
+>  }
 >
 > --
-> 2.42.0
->
+> 2.51.1
 >
 >
 
