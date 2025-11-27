@@ -1,77 +1,77 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30B627E060
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Nov 2025 13:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2450327E060
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Nov 2025 13:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764251302; cv=none; b=cjw715IafiRC5/GsEj24d8uW/4TSDSXzfFX+qjJEBgCw7cp6dIBexgn1qUEZHPuOUYXSKej1iX6AKyuSgBJhGyl1R8L9F3QUakisTApVWqklXSR8K9ux5KB6wm3ZqL/vss7Bw3XqP2FOTMjswHDN7V4QN2xh9+ymbtk1GSxs1rA=
+	t=1764251364; cv=none; b=Lpq7gK0O6Pe1gcSMR0YFUxEjZp4i69dp0ZTi0i0PWyBO8XIiIc94hLHMI5lh+hbnEWqhMpM6qZc5orQefMLgwMGH7jjpiblmrfSWG6S/IVVpRvSBg7LCnKjjvJLa/puV4ovxwhKiwI3o6ZVXYk2xVzdA/LXKojt1/YOOApilZF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764251302; c=relaxed/simple;
-	bh=uaVm51pAfA+7BtceViMdoGw/achxdyKv4cZ8WrD61Jg=;
+	s=arc-20240116; t=1764251364; c=relaxed/simple;
+	bh=djx46A/t4g9tFTNKTkwprP+1rBHg+hljQCYzR5C8ROA=;
 	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B4a6j6Ii8H0Rz1I6ldOJ3mAtrPE0cJ33fURVb/tCjl5VkIyLvCgrw5wLua3BO0NMRNSne4kPDcicSPnTsCpGJ9VZKMe6N4aLfSLuW+xuI7LjspoCdpKLLRRV04qZzN+l3Le2swhhBw1P0rWvq4z1tnndn0/KLbhrL0Affjw/duQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=i02WFtvh; arc=none smtp.client-ip=209.85.167.54
+	 To:Cc:Content-Type; b=ZrVUNaTNHGv8CJDu8nLNp6PH7AH6EQmnIUHZ6q2v0aplE6NlWD4vwrTOpO1mqOBLOgfzKI1DHqOOEPQdviPyDGJtWYPRI3ZWG5lo5bIlSWtS/Btg6w9TjDTa6yYxrO76G02bXb7nnnTsxLSmBjWLTxMRxDewjj2y/Llu9SM+7Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=uLj1JFNa; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="i02WFtvh"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-595819064cdso1222371e87.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Nov 2025 05:48:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="uLj1JFNa"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-594285c6509so1073305e87.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Nov 2025 05:49:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1764251298; x=1764856098; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1764251360; x=1764856160; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=G07GekTGY4SC2iSrWnFuwKzI1N7AFmcaYb52fmGR7rY=;
-        b=i02WFtvhCeLzn92sa9e6xhLxGCy5Sim19nT058tNigw8epvH/gu95hf6cLoCMwaNKY
-         IqDKAGXh9dHQ/dGJmuBfIuL3x/3mQmdidgbmfcIKIjLBeAG7tUFDR0YBRsGW0Q1IIWCk
-         8BuLjnJel7z1JJH+LbF6Le/w1hwgX1kygRLXlZuPD8EGkDB3tvxTix82fUhYx1k6zGAF
-         WYPTVg29Fu6D0wGZWAe3AaCoPL1SrCyRd+L5F+8XRBLDTLLH+h0GNs9EAqP9xQuJU9hr
-         2RtSX9K2ugisuqMpl+ZtNhMiLL6v8ebRDa+i7wN7d6DHi3DpAxXVwwbzJUy6U9og1UQx
-         LF5w==
+        bh=djx46A/t4g9tFTNKTkwprP+1rBHg+hljQCYzR5C8ROA=;
+        b=uLj1JFNaKbDfbxo09KGuxHCMyfKejpCJ1WTapAbhCouqWGf7nWZMdnozs59WqDSOOe
+         pKh+xItKdnpSkz+ie4zbDtWnGqjhIUj5iJcN4GZc3r9OWWFjUDbtmIDFnDxS7kQs52N5
+         o7zRwL9XMpj0ovWUukkXhdxO+Oom/eQ0xP1Bqhns1G3+RLZvbuTMbuE9wi0OoxAuFS/a
+         PPG6CyfX81DIu4rzuUmZ0n2d7PklxBj89vNtazQQpqPzyAkP9MVXbw8pmaXbiQRlQAok
+         Je2FL5kvoXJ0r70ZgvakShfVpiV4HBUa4RGJc9S0isAgm4GJ9jVZ2ODpt7XqWEIKhhNw
+         jhPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764251298; x=1764856098;
+        d=1e100.net; s=20230601; t=1764251360; x=1764856160;
         h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
          :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=G07GekTGY4SC2iSrWnFuwKzI1N7AFmcaYb52fmGR7rY=;
-        b=jiDZeOYMbxhB3eaU+CqrA5GlCKm4IfnOrrHMwIEXMjV31qKptIkUjw+ifJw3LA8pcR
-         7+zFOkAZKCwviDv4gyqymUrT0QJV7Q5IjCxsE/7Sp/rDzkuGi0FRSvkOQZxU45gtDwtZ
-         z3fQz/nzrjY9/PTOUPot3kHzeu3nDVXJ2GHmAD/GsOl29XIYm5AeYC5nRO5a5mSPJXuv
-         TGTlS8R58ug8p5YB0D44ea4knzStubtkd7GsjoLjzAAapbUsHjpNtHGGd3WUIhmU10Yc
-         LAFD9YM79ThIpQvodV9dLRA/TgOcyuvNd0d4eFrUfSKwzoTVtTNysNLIVu/aYdQ9Wuv+
-         7TgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUWqscbSCOg4NUwEWmc0lmllmOJIrCgG0icdYbEiWkYYzFGZowgCRgyl5ya41kXkbnWvzvd1+HR2gCLWq8E6WE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydpcAGZWiInaDeNxmmzbR+1TNAyxTIUAqIQz52924r82lroWTO
-	EKMrkBpb4yNqRr6sQfBx/BNXRhQhlxtOJqjDlMfypBO0R+u42jev07Pmr8MGGTvQCmTHqN0SeYy
-	67OOIuogrwC6q/EHqmkjStEAAhEFeTLjWdEydiu31aw==
-X-Gm-Gg: ASbGnctvUlLX8CQ0bTjiztitRjVyAMmRxNa8WQQrikqQ0fY1euMHnWhSBUJMN+CaViD
-	l+nY3+Yzon+IdDwjB+wLLOJ4BHAgykXdia4iMNwAZbqIhUbmd7XIjF02d9+zD3bl1xJRDB4nOXb
-	MFlhD70VtaMcSaqlsrIsDIpIwd3wMgMbtDNMbogvME4wQ0pS1yTTDmTdJkbzpE9JRCWvjBw6AdM
-	cPJtOnqkTgFVJF1z+0qORiBwvwNZ2rf+7oELiTTBoJAEBCoGnR3KBwdp5KfwaDfTiV7jS3DKTZX
-	ScYR5/+IKRVjKYI4yAfilRdqTrw=
-X-Google-Smtp-Source: AGHT+IGvFI8L5fGXcjZ+qNvP8EZkHInkEP3SOQcYofhj+ZFeXXcaPdCECdiTD+YtbO/uvB+N8tYFM9k+NWHSnM4EQ3k=
-X-Received: by 2002:a05:6512:6d3:b0:594:37bc:f40c with SMTP id
- 2adb3069b0e04-596a3749dfcmr8511591e87.10.1764251297792; Thu, 27 Nov 2025
- 05:48:17 -0800 (PST)
+        bh=djx46A/t4g9tFTNKTkwprP+1rBHg+hljQCYzR5C8ROA=;
+        b=ZMryPbhjnelhFeSdJ7CoL35RBZXLdAaq1VN73NGSUASSNNeoOGx6VjsvVxuC+G43yn
+         wGiweCiyIJeMn9erSQ7lB4qZAHXfcs13UKqpjMG6ATl8ZcJj6Z6nZf5tSCEp2NzumE+k
+         v/NLB4IkfCIBJ+TovEw/rfGY0KG9HE5FmI4RwepeIiC/8BlGr+a0VE+b7Xo1RxSPVGtp
+         bg0Z9uS76aZvmaUUI+xHEVF8p9USSXMbhtjC/T55MhW4m8e85w5hdvrmh2fMumFSUljy
+         G6gH+I72FSJI95GmrZBkXjdXLsEDusFL67sBSH77kYB7XAy6JRFiKMdWg2oFJi5jZh/J
+         gfrg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkD+Pzunw6+C9fo40eLnCrdeTzk/Dg1zWEg3Dr5jpGpX4+OBLIqu1L5C5eDsedv3j78twZvHNJjZlfHA7vFag=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGiVBDnbUzq2EgBQOgOKJlHmyrirLZsUUTGCrdjubAalv3BIjM
+	T8mmWoRWyERnuNPUH4h27sM8NqrhfBWN5Rk6D+MUqf+FcpIbt1YaOsgUSHiX/NbMFpbuZQcID5Y
+	ivwV+ukGiN6I/PTPPq1lwQdZ1GpErr9AafMiLcZ9fAg==
+X-Gm-Gg: ASbGncsA30dhv5jer3o6wjJaUot4shiL6EY36c2VYTJ5TGHzf56QQR624WUn9K6pAvz
+	k58bK8aV09ygf3heRo77yFu6AkrniNJYfyPQz7FoNFk2ScFrR/JcJspXwyjmOGeJgBtaGSHU2fO
+	34OxeFkuSQImoW9tJanWmLqxMrSxy7z/z620HdjyRse8mxNIdcDdcfjgJVvg5E6E6WF5vWDhZYr
+	5ptprWjzhrIlpavfPUPrj1Hup27xatswTBOKs9zB3Yr2ljL9hcMJkU8fbUA/FyZii3nwMMd7G81
+	/dIaFvZ6u51BlaoOVx/6xLBDrJM=
+X-Google-Smtp-Source: AGHT+IH+CDUfKujPpotwtmLcmyLVWHWVuqtFgSXM/kqLIDQE6VNVNZAmDKJw5gKN9s8jiNvQgCQtNi8buZoDHFa0ulg=
+X-Received: by 2002:a05:6512:800c:20b0:596:a540:c95f with SMTP id
+ 2adb3069b0e04-596a540cb59mr5729287e87.19.1764251360301; Thu, 27 Nov 2025
+ 05:49:20 -0800 (PST)
 Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 27 Nov 2025 05:48:16 -0800
+ HTTPREST; Thu, 27 Nov 2025 05:49:19 -0800
 Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 27 Nov 2025 05:48:16 -0800
+ HTTPREST; Thu, 27 Nov 2025 05:49:19 -0800
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-In-Reply-To: <20251125-pci-m2-e-v2-7-32826de07cc5@oss.qualcomm.com>
+In-Reply-To: <20251125-pci-m2-e-v2-9-32826de07cc5@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com> <20251125-pci-m2-e-v2-7-32826de07cc5@oss.qualcomm.com>
-Date: Thu, 27 Nov 2025 05:48:16 -0800
-X-Gm-Features: AWmQ_bk0-XCJTQ6PapzzNjyRg3LPIzKuWTKtDYqS86NfBbxq1eZ_R5ABgi6vUTk
-Message-ID: <CAMRc=Mck-Vx6SSDSp4+jFWeobQ3fzf9P=zJa_bQoEe6T6R_VHQ@mail.gmail.com>
-Subject: Re: [PATCH v2 07/10] serdev: Do not return -ENODEV from
- of_serdev_register_devices() if external connector is used
+References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com> <20251125-pci-m2-e-v2-9-32826de07cc5@oss.qualcomm.com>
+Date: Thu, 27 Nov 2025 05:49:19 -0800
+X-Gm-Features: AWmQ_bmLrPADj6DoaQnC1ZJGmDNpk5NRcjPDulR-pWqLbapX0f-JV3TGd0Beet4
+Message-ID: <CAMRc=McQO4OKra4S+goHsrq75HJbO1U=pfOg_8RrGFxNwy_-pw@mail.gmail.com>
+Subject: Re: [PATCH v2 09/10] Bluetooth: hci_qca: Add support for WCN7850 PCIe
+ M.2 card
 To: manivannan.sadhasivam@oss.qualcomm.com
 Cc: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, 
 	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -89,52 +89,17 @@ Cc: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualco
 	Bartosz Golaszewski <brgl@bgdev.pl>
 Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 25 Nov 2025 15:45:11 +0100, Manivannan Sadhasivam via B4 Relay
+On Tue, 25 Nov 2025 15:45:13 +0100, Manivannan Sadhasivam via B4 Relay
 <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
 > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 >
-> If an external connector like M.2 is connected to the serdev controller
-> in DT, then the serdev devices may be created dynamically by the connector
-> driver. So do not return -ENODEV from of_serdev_register_devices() if the
-> static nodes are not found and the graph node is used.
+> The WCN7850 PCIe M.2 card connected to the UART controller exposes the
+> 'WCN7850' serdev device and is controlled using the pwrseq framework.
+>
+> Hence, add support for it in the driver. It reuses the existing
+> 'qca_soc_data_wcn7850' driver data.
 >
 > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 > ---
->  drivers/tty/serdev/core.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> index 8c2a40a537d9..fba7b98026bb 100644
-> --- a/drivers/tty/serdev/core.c
-> +++ b/drivers/tty/serdev/core.c
-> @@ -12,6 +12,7 @@
->  #include <linux/kernel.h>
->  #include <linux/module.h>
->  #include <linux/of.h>
-> +#include <linux/of_graph.h>
->  #include <linux/of_device.h>
->  #include <linux/pm_domain.h>
->  #include <linux/pm_runtime.h>
-> @@ -581,7 +582,13 @@ static int of_serdev_register_devices(struct serdev_controller *ctrl)
->  		} else
->  			found = true;
->  	}
-> -	if (!found)
-> +
-> +	/*
-> +	 * When the serdev controller is connected to an external connector like
-> +	 * M.2 in DT, then the serdev devices may be created dynamically by the
-> +	 * connector driver.
-> +	 */
-> +	if (!found && !of_graph_is_present(ctrl->dev.of_node))
->  		return -ENODEV;
->
->  	return 0;
->
-> --
-> 2.48.1
->
->
->
 
 Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
