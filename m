@@ -1,73 +1,96 @@
-Received: from mail-m49232.qiye.163.com (mail-m49232.qiye.163.com [45.254.49.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6FC31C58A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Nov 2025 12:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C187232D7D6
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Nov 2025 12:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764246085; cv=none; b=AR96ciKlVtGvOUikMRJu8V4YCkzuXriXp+B2mMlbh7m10HHG2oIXtwoEef/uqNFsEGB3AplmMbIOn6IqniYa+mSB1DD9ffNqaNK2eQaHd5UH5R1Rma/hpHxJRMqwg7s5aNyA7H2uBiuq3zMcOROzrHEB70nVjwHuPGtqPAl7nbY=
+	t=1764247349; cv=none; b=ivSd7JzQ1ExJ7vkiyQsuyO/g8G7Wpbf9ditUpDaBEfVopf8Bu+E8/RlHgb1x19xqApEbB7B2YB8miiqhJBJxzCUktu4gbbbpl6cbeMjYOaqxe1LoSfcofpuqPFFXuNKMQBcBVj1hTENuN1ZE5lIBKl6Zzwkcyc+bXSMtyN3j5po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764246085; c=relaxed/simple;
-	bh=YM4qbCb+nzuHFDxXeMY6zpAkpSDuqy7O2GrYT5gDLhI=;
-	h=Content-Type:Message-ID:To:Cc:Subject:MIME-Version:From:Date; b=QXPGDLyTpTTp1my56OB3n6CRkJ8lpi1cTVNCO/5sOuwRMsZfCdCwNP63+cVXChmR2rsDDd1MPmFQxIatNave6UGBWpwvtQqD3HC9qNYjMOADPLXcW7p0w1FwUy8RbDlVClLB3+RyjvAXVGC/CeVJr+ng3Uoi6vNM7Fhfnr11RXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stu.pku.edu.cn; spf=pass smtp.mailfrom=stu.pku.edu.cn; dkim=pass (1024-bit key) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.b=BHqBan23; arc=none smtp.client-ip=45.254.49.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stu.pku.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.b="BHqBan23"
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Message-ID: <AJMA6ACZJsDbFlQIckIfV4oY.1.1764245763996.Hmail.2200013188@stu.pku.edu.cn>
-To: linux-kernel <linux-kernel@vger.kernel.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	"luiz.dentz" <luiz.dentz@gmail.com>, 
-	"johan.hedberg" <johan.hedberg@gmail.com>, 
-	marcel <marcel@holtmann.org>, 
-	xujiakai2025 <xujiakai2025@iscas.ac.cn>
-Subject: =?UTF-8?B?W0JVR10gQmx1ZXRvb3RoOiBzbGFiLXVzZS1hZnRlci1mcmVlIGluIGwyY2FwX2NvcmUuYw==?=
-X-Priority: 3
-X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com Sirius_WEB_MAC_1.56.0
+	s=arc-20240116; t=1764247349; c=relaxed/simple;
+	bh=kXFV9UoHshjCNKHfOQ/QK2SapSSyuognZrMVhyfHRAg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=L2MdLrIrfcwGiqcz9lTalCcegBRzNvwF5zzCbBxz9j+tneg3TQwJKl7Jp5NgkbehjpetbEqVNOr1+TbfNkqzyXbkigEnPSWz+fbOuXDNM15eO+9QRKD4uu6EjNy/LmzGjsc+VguB1+8QE7dDh1bUKIkNBW8kBXqrow/YVc8zoEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-433312ee468so6975585ab.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Nov 2025 04:42:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764247346; x=1764852146;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GXLCdfVWYDfhLqMpf2ZZ2A81MGaJh2cyN1erqr+EJjE=;
+        b=VQOlrACwT678LgyyeH3KBA7ij1QuQX8YcA6Lw88+gJe1Dujez0SJAo+RwEg4ADn0Dv
+         2h3HTv91Kk+txdV87ll/4BVwVvEo82w6x9aR4T+th+XqoFBa+2p+AQK7hDVLlIEQ/KTF
+         V76CNfFGB5qr76bmeRbA02ABmCfwJfYIPcvJuP4xmJcX2VCOifzNJEU5ZELYnYvNuOIX
+         qzU0THtlh457SM5ad7YaB+cu8uP84XSqjTde/sfWOViP92tZf9nVFE27AXRMZZLTLj6f
+         37IaRrmvMibT8xDdqEJeBDJzENjbaX7rAq6zC8+8BJDy5XXL7Fm8Y+8arDgdoNcvohXQ
+         Sl/Q==
+X-Gm-Message-State: AOJu0Ywb3eEHQabmiTA3iBEZsjQvyZNouM9x1mCdCLmLvOv8I6ysfMjc
+	aySi0TlZ1DOdb7n58m7edXv7+LhejoCJoT/A1yBBQ6Cqg56IMSrQrL0QU/B2I5mowuVsfD2gjpT
+	nQ2FyMPPMb7ohKXXNfhNDRmxIAUymqMSehHMPywGTy5hFzU2ChSVNQa1JvWg=
+X-Google-Smtp-Source: AGHT+IHnlI+NFC35D6qerayODBGTnfIUqT+tDTkqascrE1lyN7rtNxtfMKhnvHqF5Y53r+84bTV42qIrOquXIzDzvfUjuAfgOewU
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: from 2200013188@stu.pku.edu.cn( [210.73.43.101] ) by ajax-webmail ( [127.0.0.1] ) ; Thu, 27 Nov 2025 20:16:03 +0800 (GMT+08:00)
-From: =?UTF-8?B?5p2O5aSp5a6H?= <2200013188@stu.pku.edu.cn>
-Date: Thu, 27 Nov 2025 20:16:03 +0800 (GMT+08:00)
-X-HM-Tid: 0a9ac536b16309b6kunm5f6835a110f
-X-HM-MType: 1
-X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMYTqrvk2VXm1s3jojcL7ki9S5UDbyOJxmDzs8e
-	YzTqMdKwpWKMh6NnGmqzdrLX2gtSVGYmoxDwl8xVhLAO7Z5gtjQivdReiURg4yGSB77thk2wd5xy
-	HMnSA69e9o+YW9thfqk6f6AmALqWSS+60CC1c=
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZTkkZVh0aT01DGEpJSUgYSFYVFAkWGhdVEwETFh
-	oSFyQUDg9ZV1kYEgtZQVlJSktVTEhVT0hVSktKWVdZFhoPEhUdFFlBWU9LSFVKS0hLT0NIVUpLS1
-	VKQlkG
-DKIM-Signature: a=rsa-sha256;
-	b=BHqBan23CNN6LJe3Qy/7TkfNXRngy/aJQgP6ZRNtgjVRCHuB8SBD/Ms5R1bnkxldiBtIpKuCxUlSBEsQx0W83wQo5pHp6KZq6tnNMHJHBgEhKkQbZzs3s8Eh4KnTf2Ur3NYa+eYQF1sG9l/lIUcUJwMwERMCE51gdLPkWIvc+5Q=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
-	bh=YM4qbCb+nzuHFDxXeMY6zpAkpSDuqy7O2GrYT5gDLhI=;
-	h=date:mime-version:subject:message-id:from;
+X-Received: by 2002:a92:db4c:0:b0:433:2cf4:5ffb with SMTP id
+ e9e14a558f8ab-435aa880479mr171704775ab.6.1764247345875; Thu, 27 Nov 2025
+ 04:42:25 -0800 (PST)
+Date: Thu, 27 Nov 2025 04:42:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69284731.a70a0220.d98e3.0102.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Nov 2025)
+From: syzbot <syzbot+list01ecc151fef18ec81f0a@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-RGVhciBtYWludGFpbmVycywKCkkgYW0gd3JpdGluZyB0byByZXBvcnQgYSBzbGFiLXVzZS1hZnRl
-ci1mcmVlIGJ1ZyB0aGF0IEkgZm91bmQgdXNpbmcgYSBmdXp6aW5nIGZyYW1ld29yayBvbiBMaW51
-eCA2LjE4LXJjNywgdGhlIG1haW5saW5lIGtlcm5lbC4KClRoZSBidWcgaXMgdHJpZ2dlcmVkIHdo
-ZW4gbDJjYXBfY2hhbl90aW1lb3V0KCkgaXMgY2FsbGVkLiBTcGVjaWZpY2FsbHksIGF0IGxpbmUg
-NDE3LCB0aGUgYWRkcmVzcyBvZiBjb25uLSZndDtsb2NrIGlzIHBhc3NlZCBhcyBhIHBhcmFtZXRl
-ciwgYW5kIGxhdGVyIGluIGtlcm5lbC9sb2NraW5nL211dGV4LmM6MTgzLCBpdCBpcyBkZXRlY3Rl
-ZCBhcyBhIGZyZWVkIHBvaW50ZXIgd2hlbiBhY2Nlc3NpbmcgaXRzIHdhaXRfbGlzdCBmaWVsZC4g
-VGhlIGxvY2sgZmllbGQgYXBwZWFycyB0byBiZSBmcmVlZCBpbiBsMmNhcF9jb25uX2ZyZWUsIHdo
-aWNoIGlzIGxpbmtlZCB0byBhIHJlZmNvdW50IG1vZHVsZSBpbiBsMmNhcF9jb25uX3B1dC4gQmFz
-ZWQgb24gdGhpcywgSSBzdXNwZWN0IHRoYXQgdGhlIGlzc3VlIG1heSBzdGVtIGZyb20gYW4gaW5j
-b3JyZWN0IGNhbGN1bGF0aW9uIG9mIHRoZSByZWZlcmVuY2UgY291bnQgZm9yIHRoZSBjb25uIHN0
-cnVjdCwgd2hpY2ggY291bGQgbGVhZCB0byBhbiBlYXJseSByZWxlYXNlIG9mIHJlc291cmNlcy4K
-CkR1ZSB0byBteSBsaW1pdGVkIGtub3dsZWRnZSBvZiB0aGUga2VybmVsIGFuZCB0aGUgbGFjayBv
-ZiBmdXJ0aGVyIGluZm9ybWF0aW9uLCBJIGFtIHVuc3VyZSBpZiBhZGRpdGlvbmFsIGFuYWx5c2lz
-IGlzIG5lZWRlZC4gSG93ZXZlciwgSSBob3BlIHRoaXMgcmVwb3J0IGlzIGhlbHBmdWwgaW4gaWRl
-bnRpZnlpbmcgYW5kIGFkZHJlc3NpbmcgdGhlIGlzc3VlLgoKVGhhbmsgeW91IGZvciB5b3VyIGF0
-dGVudGlvbiB0byB0aGlzIG1hdHRlci4KClJlbGV2YW50IG1hdGVyaWFsczoKCUtlcm5lbCBsb2c6
-IGh0dHBzOi8vZ2l0aHViLmNvbS9XeG0tMjMzL0tDb25maWdGdXp6X2NyYXNoZXMvcmF3L3JlZnMv
-aGVhZHMvbWFpbi9mYmZmNDJiNDZiZTA2OTJlOGJkNzU1YjU5MTRmYzlhZDA4MDEzNTkwL3JlcG9y
-dDAKCVVuZm9ydHVuYXRlbHksIEkgZG9uJ3QgaGF2ZSByZXBybyBjb2RlIGF0IHRoaXMgdGltZSA6
-KAoKQmVzdCByZWdhcmRzDQoNCg==
+Hello bluetooth maintainers/developers,
+
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
+
+During the period, 3 new issues were detected and 0 were fixed.
+In total, 39 issues are still open and 92 have already been fixed.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  45175   Yes   KASAN: slab-use-after-free Read in l2cap_unregister_user
+                   https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
+<2>  27015   No    KASAN: slab-use-after-free Read in hci_cmd_work (2)
+                   https://syzkaller.appspot.com/bug?extid=4d6b203d625d2f57d4ca
+<3>  7673    Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<4>  3791    Yes   general protection fault in lock_sock_nested
+                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+<5>  2456    Yes   general protection fault in h5_recv
+                   https://syzkaller.appspot.com/bug?extid=b5691bb559396b262064
+<6>  1282    Yes   WARNING in hci_conn_timeout (2)
+                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
+<7>  391     Yes   possible deadlock in l2cap_conn_del
+                   https://syzkaller.appspot.com/bug?extid=b71bb48c13bf3fed3692
+<8>  390     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
+                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
+<9>  329     No    WARNING in l2cap_chan_del
+                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
+<10> 113     Yes   WARNING in hci_recv_frame
+                   https://syzkaller.appspot.com/bug?extid=3e07a461b836821ff70e
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
