@@ -1,64 +1,64 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB9D32ED50
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 16:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA2A2BE053
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 16:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764345981; cv=none; b=Ww6TC7G9myyDLjFAegmWWAb2KrcjatfuTX5tunVT7rAdhzLVM8EuZkkqehdtJrhMntMNWefL2cIzlTa2pns9JE7t2zSH7iq4MVx3/ASQRjCxCPngCIejRCp1zpx398GnnfZNBJ5iJH/T8l20VjbAh6NtxvcukG+sXWAnklMDm4s=
+	t=1764345987; cv=none; b=Z//yvdf7kPPkASAHuCU9ezzrKcqC7aQef9KAh3nAliR0b+I1LZbKiFKeUwNZuyBHHDAmkphF5t3gp9UIZ3SGd8PrkqQO5eUDWl7/ryRArjjbdpE+Wi5UrGROboDYYCw8eUcNxlMnqPsKYK+E9siqXYnobVpOQ71srFGCUjklOPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764345981; c=relaxed/simple;
-	bh=p4TRIPhh7eCXg4oL8eEB5Ly0L/lmhP7XDzG06yVs7As=;
+	s=arc-20240116; t=1764345987; c=relaxed/simple;
+	bh=xUOfVR4rsP4k4iSxfTxt28P2aCRP7f27RFLz88rROqo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ot1XWpArZt/WVUPYYS3An6M1lCRLfyxSJiWqyriGcLJSpwMCwmzOqs0/g5hTbSpogWzEXQc+GPDCa4KiT389tc8pQ6mGGaA3tj2uVdjBe07MQu8NcGeONVPju3ORwA2w7Ff1gCtRHQTp2UVbB4X/FIOK84nCZ/IAjrLESw9flEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=frEHY2mJ; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version; b=jbFsMI79zx+w7/GQsgg+/TvHMU9zynszAIYw9BvJkWUP0ShdSc09GVKNDFrEUtKlB8qnLrUqic+Ecn3BTryw5/fA0LO/YjKSlqH1pBrx3EKuF67JU8r87k5smfHljqcumeF9cU/M6N7bLxlvsYpYrqHHnRIWm+Wu7LmNnBuJ7eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GONYey7a; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="frEHY2mJ"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7ade456b6abso1681682b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 08:06:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GONYey7a"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7b9a98b751eso1562789b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 08:06:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764345980; x=1764950780; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764345985; x=1764950785; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pWjvp+vOFGL8T/NXTev+NZf62jPu9HyIJqL4GkC+d9Y=;
-        b=frEHY2mJ7l5Rncm3cA/ZaOD3JYo++2nO6VWFcYAaLZxferXeZuUWGub4VehRO3fS/X
-         KzzK2Jn1cVofOekGtlHP1DuNbasOSfNRKYbacrIaRmpgqLOOeYTt4PcbYQYrjicnw6fQ
-         VAOBYFzPnk5839WRKjsDS2tAsnk3WiKZWv4B8v66YHKGjY8xljGP5cbFTEtI80kMn2pb
-         5Cs23tHv+JaycJk9XeZAOMIJY+MBeHel8aLZZWfMFAQ7MtiWtOJXlYcZy0Fi5MkogeAM
-         zS38vMZ18ux0zWNWQouAKEaEG/WLTv6TW7/nejB2h++AQCh795zvCnmNqAonm+doVAbR
-         RGPQ==
+        bh=5aRj16inyvCNx7XEzEMiTg0hEspzqpDmbN1/ltb1rWU=;
+        b=GONYey7aKY1Qli2QU187NYWEtijrZYSSrGDyDZuvBWIXX3wPFvjFAq+dNrVsgy6Y1+
+         JIrpusGVJZfLpWhf34s+nNQ913aNP76l0V65Zf+45ZFze9OtXanXOSHSv3Hcx5FvzGeB
+         b9dL2tuXLzlBQXJAsbgRQ+1UMrHJKKj4AHLcTsRIAm+lsauWgWxAWaioTbHgjOwxmEVf
+         bKRn/mkrQ1aPGyxDxyeoelB3cOSoTwiqITvyw62mqxLRdxoa2bex/T4iKogfQzm4elyV
+         IwX+0h4nPo8mUep/HKJaRVuVJYXewWPdphBZUQRBievnctv5tdOW8oROQJHEcrXLXyaY
+         lnPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764345980; x=1764950780;
+        d=1e100.net; s=20230601; t=1764345985; x=1764950785;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=pWjvp+vOFGL8T/NXTev+NZf62jPu9HyIJqL4GkC+d9Y=;
-        b=ECRIHvXvvDpMFa4kohk88kzu6gm6Gc2Efx2ZWus4xGQLLfqshwjnMImRRVj9dbiuiT
-         C1fa6RfOVQCEETyNWpdJ6XRUUw99Q5Wa4oqNal6d4pvF57MthUZq/o5pRhfO/HkhqzWz
-         m3YG9alAMbpzvtetjbmHPqQZpxtW2C+B4+2wdPxt7wJ4CoTJ4OQfVLKpjL3zD4cvpe5L
-         TVPm/FRGa6L5hSc3FveO/Q0etkaJNuphrF5dWKF9QRohiG2rfeZZPAdBWxLoG8XXkFZy
-         wP0U30MIvsDraJyK7rD+0hkqND80H05vR+41mzV2zFkbvoMLf1ACJTtuKXfAi8KpCRpC
-         uYoA==
-X-Forwarded-Encrypted: i=1; AJvYcCWc34Apx3DU569ziRp+qGUGboDweRvgqSGk38Y/zRV8WLfDHdSflyS9t/842RNCunLQeHlmgOpYihXQe6yZuYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9ekAo2WudZZAy277YcmmTPElewwux1YYh6f9pXgL2bUVliBAQ
-	OPc1oV0mAeQevI4UApotu0Xy6bCDb94gcVZ9SwoVnLZtGEw2KIW0sr5p
-X-Gm-Gg: ASbGncsgR0Hlbo2Lw4KTDWEoHJpKVvn4PIWkClO4Adzp3awGbR/yuloZT7AfjtTI1il
-	PhrVu6vqKAPD6karh+ukqJDSwFq5GXTG3Aqe8APhZnLNdo28OjH1Tqx6TI/gFIvUkRg3UwFIvuo
-	NTC6WwSx8o8udqj71IY8jaNvlls5324tBzsxXig/dI2PQN4LztrhdRO9BhlDaw+JHuTELe38wbQ
-	By2OqQRGiKZZgH9/a4UCLTG0Tlzt8ELurJbZzmX5UduFQSlYqIt17ml1iD7oq/fgBQHMEnOtng1
-	adeHnarkdZx0nYxdmr/9qNZGv73d+NU7nJk85t6rhetqTEiAJQznFaEfQoShgF6+K4g1ZHecq/Q
-	MfPjt4AUvWcoadl1SNHwacdNqgRiU7fl2P2XbvhF9bjGlJazEIyv4RHHOu+lA27V1suVb1D8XMe
-	3mh/KYcE1aTm2zjLZn3jAXcNOL3GkeUdUfoqL+tg==
-X-Google-Smtp-Source: AGHT+IFapLhQU9fdniLElMhOTBueBGSZ5wz5zku4Mw2lynCB6SmbEsu5fwwc8sIpEraRjt+Qk/oxxw==
-X-Received: by 2002:a05:6a00:181d:b0:7a2:8111:780a with SMTP id d2e1a72fcca58-7c58c2b1851mr32051480b3a.2.1764345979249;
-        Fri, 28 Nov 2025 08:06:19 -0800 (PST)
+        bh=5aRj16inyvCNx7XEzEMiTg0hEspzqpDmbN1/ltb1rWU=;
+        b=RIQovkJkdo41pAaZ+fQtQmsHI6uHx/mkau+4L3hHTaLx5F6m1W/V2EuN2KIY5J/4Xg
+         +tvdOvtA64/80MmDlG8DKpipK04f1RBT7jtuZR22b6L6Mr1o4y1mCmKiVfXGgKYUji9e
+         myPwFFxVala2tZLhXaEnXpm12xS13Mm/ZXqGwhK3T4YEF2TbcfzAozbDpXig6RpnDm66
+         zv5R+lfUuPPH2GGvq5oPdfCxPkDS50RFGPVGgHAu+PEJU2KFeF1DevFnVNurz44d2Vc5
+         H4ALBwzQNAF3C4V+He7b+foA706+E5TcNgw32i8a27kK69AZDef6K3M1MuYvVyDC4wZR
+         m5TA==
+X-Forwarded-Encrypted: i=1; AJvYcCXmsBWVI5ByhnSBXfwzMHNXz7o0L8pJ/dFfjjE9DFZJU/7relzioi9n1QFTHGAzLIecRYn+pG856MOZIpPzHeI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUUaX6FPCcEVoTW0pE6C4iSVtPnoBQLncBsflX0W5zE9MvNZ1a
+	d+Y/fsmlNjpNDjFesvEn9PFz3q2jKrguvfgchrrbUwi3ZyrLLWJukh5grnG20vSzG6NpMA==
+X-Gm-Gg: ASbGnctfs+FdV620b306zoHNzm1jIILF549GgJZ60o1zoOUUdnMOSrpMoDQlj77ASG1
+	xIv9ezJYV1ReDDi9uCXECDrc9/ENbZVCExJ0I0Jv5gbH4iNllpjr2hmbstEzrOTbxofuNVGBaDZ
+	Q7fG1m/+nx8ZIoxZWMNIpZ/9xFps/vON+KvyM2qy2oRvbfAW6lOBbUhqqSbVrbHVFMLQpPKqZhT
+	CZxkmNzdkAezTZE8z8lk4rU3sNRUCR29FdJW0ebcT2FdjF3pvD2rIvh1UF8XGQrvDfvedlnR925
+	cui0wCwFcdf3pdLr/+GWEtKPKu9NB/VPe2jJoWYgowCYQ4dcrVL6uQUm+BWbzetPNQiaZj6+x7Z
+	dDgCz+tWoKD2H8vZOF+nA20qAnSlaTr3tc0mkRbmuj69H01YKzoxQANvCMsdnAo+prWlJb9cyUj
+	2udcxl5o7scqqHoYVsLbxh/mFP7Fg30hSNugOKDQ==
+X-Google-Smtp-Source: AGHT+IEztlvGKlUoqD0g25lCC8MUysNRG6xtAj50T9YwNqBxGNZ27/ROzosGghSBWQujOhn5Z/L7rQ==
+X-Received: by 2002:a05:6a00:987:b0:7b8:7c1a:7f60 with SMTP id d2e1a72fcca58-7ca8977c27emr17931768b3a.12.1764345984715;
+        Fri, 28 Nov 2025 08:06:24 -0800 (PST)
 Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15f26f11fsm5408499b3a.50.2025.11.28.08.06.14
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15f26f11fsm5408499b3a.50.2025.11.28.08.06.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 08:06:18 -0800 (PST)
+        Fri, 28 Nov 2025 08:06:23 -0800 (PST)
 From: Jeongjun Park <aha310510@gmail.com>
 To: stable@vger.kernel.org
 Cc: gregkh@linuxfoundation.org,
@@ -80,9 +80,9 @@ Cc: gregkh@linuxfoundation.org,
 	aha310510@gmail.com,
 	linux-staging@lists.linux.dev,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH 5.15.y 06/14] timers: Replace BUG_ON()s
-Date: Sat, 29 Nov 2025 01:05:31 +0900
-Message-Id: <20251128160539.358938-7-aha310510@gmail.com>
+Subject: [PATCH 5.15.y 07/14] timers: Rename del_timer() to timer_delete()
+Date: Sat, 29 Nov 2025 01:05:32 +0900
+Message-Id: <20251128160539.358938-8-aha310510@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251128160539.358938-1-aha310510@gmail.com>
 References: <20251128160539.358938-1-aha310510@gmail.com>
@@ -96,70 +96,95 @@ Content-Transfer-Encoding: 8bit
 
 From: Thomas Gleixner <tglx@linutronix.de>
 
-[ Upstream commit 82ed6f7ef58f9634fe4462dd721902c580f01569 ]
+[ Upstream commit bb663f0f3c396c6d05f6c5eeeea96ced20ff112e ]
 
-The timer code still has a few BUG_ON()s left which are crashing the kernel
-in situations where it still can recover or simply refuse to take an
-action.
+The timer related functions do not have a strict timer_ prefixed namespace
+which is really annoying.
 
-Remove the one in the hotplug callback which checks for the CPU being
-offline. If that happens then the whole hotplug machinery will explode in
-colourful ways.
-
-Replace the rest with WARN_ON_ONCE() and conditional returns where
-appropriate.
+Rename del_timer() to timer_delete() and provide del_timer()
+as a wrapper. Document that del_timer() is not for new code.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Tested-by: Guenter Roeck <linux@roeck-us.net>
+Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Link: https://lore.kernel.org/r/20221123201624.769128888@linutronix.de
+Link: https://lore.kernel.org/r/20221123201625.015535022@linutronix.de
 Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 ---
- kernel/time/timer.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ include/linux/timer.h | 15 ++++++++++++++-
+ kernel/time/timer.c   |  6 +++---
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
+diff --git a/include/linux/timer.h b/include/linux/timer.h
+index 551fa467726f..e338e173ce8b 100644
+--- a/include/linux/timer.h
++++ b/include/linux/timer.h
+@@ -169,7 +169,6 @@ static inline int timer_pending(const struct timer_list * timer)
+ }
+ 
+ extern void add_timer_on(struct timer_list *timer, int cpu);
+-extern int del_timer(struct timer_list * timer);
+ extern int mod_timer(struct timer_list *timer, unsigned long expires);
+ extern int mod_timer_pending(struct timer_list *timer, unsigned long expires);
+ extern int timer_reduce(struct timer_list *timer, unsigned long expires);
+@@ -184,6 +183,7 @@ extern void add_timer(struct timer_list *timer);
+ 
+ extern int try_to_del_timer_sync(struct timer_list *timer);
+ extern int timer_delete_sync(struct timer_list *timer);
++extern int timer_delete(struct timer_list *timer);
+ 
+ /**
+  * del_timer_sync - Delete a pending timer and wait for a running callback
+@@ -198,6 +198,19 @@ static inline int del_timer_sync(struct timer_list *timer)
+ 	return timer_delete_sync(timer);
+ }
+ 
++/**
++ * del_timer - Delete a pending timer
++ * @timer:	The timer to be deleted
++ *
++ * See timer_delete() for detailed explanation.
++ *
++ * Do not use in new code. Use timer_delete() instead.
++ */
++static inline int del_timer(struct timer_list *timer)
++{
++	return timer_delete(timer);
++}
++
+ extern void init_timers(void);
+ struct hrtimer;
+ extern enum hrtimer_restart it_real_fn(struct hrtimer *);
 diff --git a/kernel/time/timer.c b/kernel/time/timer.c
-index e09852be4e63..7094b916c854 100644
+index 60e538b566e3..2b5e8c26b697 100644
 --- a/kernel/time/timer.c
 +++ b/kernel/time/timer.c
-@@ -1208,7 +1208,8 @@ EXPORT_SYMBOL(timer_reduce);
+@@ -1257,7 +1257,7 @@ void add_timer_on(struct timer_list *timer, int cpu)
+ EXPORT_SYMBOL_GPL(add_timer_on);
+ 
+ /**
+- * del_timer - Deactivate a timer.
++ * timer_delete - Deactivate a timer
+  * @timer:	The timer to be deactivated
+  *
+  * The function only deactivates a pending timer, but contrary to
+@@ -1270,7 +1270,7 @@ EXPORT_SYMBOL_GPL(add_timer_on);
+  * * %0 - The timer was not pending
+  * * %1 - The timer was pending and deactivated
   */
- void add_timer(struct timer_list *timer)
+-int del_timer(struct timer_list *timer)
++int timer_delete(struct timer_list *timer)
  {
--	BUG_ON(timer_pending(timer));
-+	if (WARN_ON_ONCE(timer_pending(timer)))
-+		return;
- 	__mod_timer(timer, timer->expires, MOD_TIMER_NOTPENDING);
- }
- EXPORT_SYMBOL(add_timer);
-@@ -1227,7 +1228,8 @@ void add_timer_on(struct timer_list *timer, int cpu)
- 	struct timer_base *new_base, *base;
+ 	struct timer_base *base;
  	unsigned long flags;
+@@ -1286,7 +1286,7 @@ int del_timer(struct timer_list *timer)
  
--	BUG_ON(timer_pending(timer) || !timer->function);
-+	if (WARN_ON_ONCE(timer_pending(timer) || !timer->function))
-+		return;
+ 	return ret;
+ }
+-EXPORT_SYMBOL(del_timer);
++EXPORT_SYMBOL(timer_delete);
  
- 	new_base = get_timer_cpu_base(timer->flags, cpu);
- 
-@@ -2047,8 +2049,6 @@ int timers_dead_cpu(unsigned int cpu)
- 	struct timer_base *new_base;
- 	int b, i;
- 
--	BUG_ON(cpu_online(cpu));
--
- 	for (b = 0; b < NR_BASES; b++) {
- 		old_base = per_cpu_ptr(&timer_bases[b], cpu);
- 		new_base = get_cpu_ptr(&timer_bases[b]);
-@@ -2065,7 +2065,8 @@ int timers_dead_cpu(unsigned int cpu)
- 		 */
- 		forward_timer_base(new_base);
- 
--		BUG_ON(old_base->running_timer);
-+		WARN_ON_ONCE(old_base->running_timer);
-+		old_base->running_timer = NULL;
- 
- 		for (i = 0; i < WHEEL_SIZE; i++)
- 			migrate_timer_list(new_base, old_base->vectors + i);
---
+ /**
+  * try_to_del_timer_sync - Try to deactivate a timer
+-- 
