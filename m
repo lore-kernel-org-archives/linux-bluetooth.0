@@ -1,102 +1,129 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2A821FF4C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 15:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32668280318
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 16:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764343051; cv=none; b=Oi+/naNqBEuszQorNu5BBdiUZkzjA39EKvfNktCwXZXV022b/i0N5jlbnvVrJQZkLLVPAZs55Q0oK+YPZI/PhVDXOWJ0He9YfiGophqD6dBjuhU414AtkrCCz17aJDIJig4PA/UREApS8FRoVUdl+qB2ukd3YLht8UiqUGwsKZ4=
+	t=1764345950; cv=none; b=tPvmmbo3eAjdY+lZOTKdJZczCm+/bHdDVPHTNUa8nEeOUNtFrXfJjKR2wn6SIrniCEFGfnY904M3iY030K6USSTs8re9O3WrZ2ziTcaZB6ZmJfBvO85KBnNBfMFvFsuHmB8LDEIvWzY/iBGSu680ELpIKPHCLhn7mjlsycF+uIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764343051; c=relaxed/simple;
-	bh=Nh/eDAor8sCVcidh6vsBDI2qfAMw5bA5fpoCXzyd1Yo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=U/rLReWibseNyg7XjQWaPAUUH3BcAA8DaeqOXdt+w1m+BL4ADkMjAnA2uGdNCzmLmN9CwPy4zO3h7I+FEh1Af6EfQ3Tg8GQMi41Q3t7icXvF8xeqE/Cu9utK1XQW/5ckAaMKqHC+Z7Jiqah8rc5vDBnxJBA3CbGcxUW4IcOspx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lv9UZG6n; arc=none smtp.client-ip=209.85.210.171
+	s=arc-20240116; t=1764345950; c=relaxed/simple;
+	bh=7R/V3fLA5ZUpQU7ZkDgrTUeowxcERJCp6oWcWnZd8YQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZLni3EvcP2dqu6zSOMpuqt17mOlXQYur1ojaHE42pJ/Ms/bNtwvnfw93M41OYQhKn6cPqWh7i+jd1PA5ZWhZ3gFsPzGCch6qlQTiUt5S99jYdHjtYr3OtpaF1Wu3qk/X6yhszQ82//NhgY9E0YtS8euycnKY+5Uqr9ft0PB03tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdIvhtzO; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lv9UZG6n"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7b89c1ce9easo2381338b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 07:17:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdIvhtzO"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-297e982506fso27087305ad.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 08:05:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764343049; x=1764947849; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nh/eDAor8sCVcidh6vsBDI2qfAMw5bA5fpoCXzyd1Yo=;
-        b=lv9UZG6nuOK/kep9NiAQMfoqZfshSjT82f4qmOHPgsas7NmWCeYY0G5XSjv5e8+CSP
-         C9FyPPXLQhDX5A5mlLlblndV9aY1Hvd1mMaHhYrAXQdRUaozwfjvcUzHWyP+ZsODE6W1
-         WOAcW5iFUQUuKlftohQbQNbzjnn2oqgUw05XjZ6CfIroZo6bdz0W9AtMEwMTpSmiCI35
-         xkU8hZV7lm8XzNEucB843eCVhsdCdhnyasev4Yr1uvKJ3KquEsTM4xTPY/r5tAz1D2Ly
-         FZRTeHu4P6t9NQ9vg4pglZovdNlPKqNwL+cFKhVUW2fAnMBKXMlzli8W4sMGfcC8Ntht
-         IuFA==
+        d=gmail.com; s=20230601; t=1764345947; x=1764950747; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jr0436cSAe7dIJCuJ52U9qMmv3xepyLVevZMH0j277U=;
+        b=HdIvhtzOBvQ5EY6cqn4AipFgpqL552YJbs3JhicLIGEAFAC7S3KIJyUuUUOV+7E6k2
+         T42z3ruF9j09Ve0d6/G15lGLACv7LbwDADBSIvG7X9+BQFVCitZ9ZAgesw9AZx0FNWws
+         k1g+K6wt4Gynv3QWnesk5RImQY7oMI+l6z06S/GIJkpp+9VeTQqnPbvIcDUWfZJ5Mm3M
+         2nbAg2ZUnuqcOPRFok42nrhJNbyimDgGcXepdfVidSboxfb+kegEDTqe38fYVQlFGvvZ
+         1wGOlxHZvbJULLFg29t8Kw9Cp3JguVNAEr/FYJb41EG27G4nkNDsOpvqAbSVAf2kPyGV
+         R5Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764343049; x=1764947849;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1764345947; x=1764950747;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Nh/eDAor8sCVcidh6vsBDI2qfAMw5bA5fpoCXzyd1Yo=;
-        b=somub7gMwVgfjRWdSbBXCSx5KH+n/ptcBUjZ1YTU/qiZUQVtYFZMvV4hHZRpSVdV5W
-         oLEoTUg+Kcod8XsQ2fVt7k/AYIjET6YcLBVsmPXnhFO9YPaJXstI0dufe0SAukdwEkPF
-         Owamc9J7s7OCt5RqbnqV0fx51f0CMAGL41G5295tftXb2zpKDWw+qaagVHL5mBPbwKvJ
-         eIMyydpFLRwUUGAKnduBFJ/GtjGppyHowvfPBg1NVk4/OrfennuVy4YIr/5h1S3LivPO
-         p9nhoIdSEo7hS6HsEDwJU6ovxCryvAXkrJ+qzExqm0JcOcl+jyULUV4rWEoEENwFjOhk
-         sDXg==
-X-Gm-Message-State: AOJu0Yx9zL3tx1B1SPDJLJtH1HnZFWXLACxN+HTF18nUM4JxffZzgGqO
-	QVVQ+OQxMiNsh8MwvGLEjonZA8SjkNKgRNRgou6Un5vwYygWp2Dy5ldn2dU3fg==
-X-Gm-Gg: ASbGncvA5sISTfm76522UnOLvjXfZfi2kK/EPaKV+Ql3XJTEb9goSTkqeUll87rJe7h
-	KlCmeP1Kydy02XXZ2J6TKlTd95CAFLGEp+B9P5ke3db/JN0d3XhGrDoXZyYc6JbCQFYFyv/Z1wx
-	iY69rNKKCJSWJwC/02MquULwheuDVYGWUTnv+7D4mKwVYNAVGGDDiE6XXJq2LS8z82oKLwmVOKd
-	JxBQLYqyur8OxVYe34vPwkBm50bF/CVCjoAzr1r7YvcX99JIk+l1XsXs8TF/NJ+7GEOn3qKMkxn
-	hC01wqWOGJBd697TqTE1s3+joudPjGIUTCpQqo5nUHhnnVEv3z0mr+KGBKsP1yLuUyr6ZhfZzC1
-	mAMPdGiAQdJY3gsNqvjNt2l5aE4OU6qAH/HSV9+LjJZUqd84oooP21rORLKnzBQ3aKYtktP6bv0
-	qDwvBReDeAw+BamdGgV3q9l8Y+E6Rl
-X-Google-Smtp-Source: AGHT+IHzUl2i1bXC0JkVxoLgFuYmBxyFnr2NSYUaYxEyzk2wGArljGaHCuIEOQkppTf3ahUUNANDuQ==
-X-Received: by 2002:a05:7022:629f:b0:11b:9386:a3bf with SMTP id a92af1059eb24-11c9d87286fmr23665602c88.42.1764343049179;
-        Fri, 28 Nov 2025 07:17:29 -0800 (PST)
-Received: from [172.17.0.2] ([52.159.229.150])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11dcaee7076sm19375024c88.4.2025.11.28.07.17.28
+        bh=jr0436cSAe7dIJCuJ52U9qMmv3xepyLVevZMH0j277U=;
+        b=ggGJoXpuh9qVUCSWcyUzhmw9210dC1HJtAg+v9eTdYO3PPShACa8sI5mJ8M/ShZs9g
+         wKTIDdwdun3nLxs/5FVg9ELU6P/ydxikzKvb+q5FBsK9sZc3imF96Z5Sn0+Zo/VOaWrV
+         x9JOKvZ/02VbgGqyGrvRyo4rS3Ni41/1Sj5VPX1IqPeXh78f6i4vsrUdDFrtJNpmpIGR
+         xUCPyE0P21+IM0wGZ9nDZoTcTqfSqXMUq6pGKEgqkRAmnYjXPDxL8UHJTgE9e7K7A5gP
+         LF1fLZTVvNoKvt3E7YOjJFo/QY4qacVUfi4J+tge/KnaKX5iHeZUPeADM7+PGHn4iF18
+         MnIw==
+X-Forwarded-Encrypted: i=1; AJvYcCX5T2Fi9j+2bSkjMly3xYSIlQD0igXG+U1uGwGZapS7+udVvbaW5aZ577/XUsJa/SyBY07CfNRmwVPrHpG+n7Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1CkCLk0yDHGVdChxRwvk+fLVFVwcfr4TCelC45Ono4wTMhMH/
+	mbL8kB2V3nfjOQS5HEsSX/Kd5EKjWdkoClZhsrDu4CxQAqEqMMiE6jac
+X-Gm-Gg: ASbGncs7NhUGZtfzVscMrXbaAysA0qxQCj7XN6W2fr+779ysHVkKHWlcowhaba7UG8F
+	951SSAUHdMh7Sop7j7yd/13OLwpf5tTd4C9yiMrBR2sxR6Bz8f73Dm6L8uc9r5mDID0uxOmv3zD
+	qfWvg9W61sEdmf+wB6NWZ8nSDcLPwFxAHDwcyYSoZWUDN1bzdgUif/quwFjn2rgOpTmEkY8D/Ft
+	x1uwgxC3P9Aec+QKorOIDmIHzNrTf/vMMeDpAGX6C69XVx7rIQrlJBkZm6ULzY0UqGWhUoAapFi
+	rQ9Yq+cS40bdULtdi/t14FMuSaBJurtvIh4jsHF9V4Agqb+dH/vAeZ9L+lRri67MXKXabEfVAyG
+	QB3rkO9qABjqV7mBzkNJEzddQj6vTVAxTZyGrQ+R0oYHInUb2awGlQvS6alDTMa65URrumBzsFt
+	nSwZLsqw0cdu5HBf5TLIo/bQse0WFN8yXzbtSY9w==
+X-Google-Smtp-Source: AGHT+IEbRdUXnl5aQOE+Qq55lmPGygxKdzplNnm4FsxdZSNypxAVuwWstG2sn4JYjVv8VNlcsFkFkQ==
+X-Received: by 2002:a17:903:11c3:b0:297:e3f5:4a20 with SMTP id d9443c01a7336-29b6bee38ecmr348858315ad.26.1764345946851;
+        Fri, 28 Nov 2025 08:05:46 -0800 (PST)
+Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15f26f11fsm5408499b3a.50.2025.11.28.08.05.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 07:17:28 -0800 (PST)
-Message-ID: <6929bd08.050a0220.b7f77.295a@mx.google.com>
-Date: Fri, 28 Nov 2025 07:17:28 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5420155276424048799=="
+        Fri, 28 Nov 2025 08:05:45 -0800 (PST)
+From: Jeongjun Park <aha310510@gmail.com>
+To: stable@vger.kernel.org
+Cc: gregkh@linuxfoundation.org,
+	tglx@linutronix.de,
+	Julia.Lawall@inria.fr,
+	akpm@linux-foundation.org,
+	anna-maria@linutronix.de,
+	arnd@arndb.de,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@roeck-us.net,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	maz@kernel.org,
+	peterz@infradead.org,
+	rostedt@goodmis.org,
+	sboyd@kernel.org,
+	viresh.kumar@linaro.org,
+	aha310510@gmail.com,
+	linux-staging@lists.linux.dev
+Subject: [PATCH 5.15.y 00/14] timers: Provide timer_shutdown[_sync]()
+Date: Sat, 29 Nov 2025 01:05:25 +0900
+Message-Id: <20251128160539.358938-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sivartiwe@gmail.com
-Subject: RE: [5.10/5.15] Bluetooth: Add more enc key size check
-In-Reply-To: <20251128144535.55357-1-sivartiwe@gmail.com>
-References: <20251128144535.55357-1-sivartiwe@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5420155276424048799==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The "timers: Provide timer_shutdown[_sync]()" patch series implemented a
+useful feature that addresses various bugs caused by attempts to rearm
+shutdown timers.
 
-This is an automated email and please do not reply to this email.
+https://lore.kernel.org/all/20221123201306.823305113@linutronix.de/
 
-Dear Submitter,
+However, this patch series was not fully backported to versions prior to
+6.2, requiring separate patches for older kernels if these bugs were
+encountered.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+The biggest problem with this is that even if these bugs were discovered
+and patched in the upstream kernel, if the maintainer or author didn't
+create a separate backport patch for versions prior to 6.2, the bugs would
+remain untouched in older kernels.
 
------ Output -----
-
-error: patch failed: net/bluetooth/hci_event.c:3043
-error: net/bluetooth/hci_event.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
+Therefore, to reduce the hassle of having to write a separate patch, we
+should backport the remaining unbackported commits from the
+"timers: Provide timer_shutdown[_sync]()" patch series to versions prior
+to 6.2.
 
 ---
-Regards,
-Linux Bluetooth
-
-
---===============5420155276424048799==--
+ Documentation/RCU/Design/Requirements/Requirements.rst      |   2 +-
+ Documentation/core-api/local_ops.rst                        |   2 +-
+ Documentation/kernel-hacking/locking.rst                    |  17 +++++++-----
+ Documentation/timers/hrtimers.rst                           |   2 +-
+ Documentation/translations/it_IT/kernel-hacking/locking.rst |  14 +++++-----
+ Documentation/translations/zh_CN/core-api/local_ops.rst     |   2 +-
+ arch/arm/mach-spear/time.c                                  |   8 +++---
+ drivers/bluetooth/hci_qca.c                                 |  10 +++++--
+ drivers/char/tpm/tpm-dev-common.c                           |   4 +--
+ drivers/clocksource/arm_arch_timer.c                        |  12 ++++-----
+ drivers/clocksource/timer-sp804.c                           |   6 ++---
+ drivers/staging/wlan-ng/hfa384x_usb.c                       |   4 +--
+ drivers/staging/wlan-ng/prism2usb.c                         |   6 ++---
+ include/linux/timer.h                                       |  17 ++++++++++--
+ kernel/time/timer.c                                         | 315 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------------
+ net/sunrpc/xprt.c                                           |   2 +-
+ 16 files changed, 322 insertions(+), 101 deletions(-)
