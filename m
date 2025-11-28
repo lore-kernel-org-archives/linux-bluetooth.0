@@ -1,132 +1,165 @@
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013017.outbound.protection.outlook.com [52.101.72.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A979A2773DE;
-	Thu, 27 Nov 2025 18:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3C124E4C3
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 01:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764267462; cv=pass; b=mQrkinFpyYsJ05Fk51I9hKp1Ml/+WS74Q/077Rg+39i+KvNZW5rjPLPSX11EOm/MI6FiVTky0S+q8mzQEUmg52u2tocgRYOJv7MjL+fDYq3CBN15FmGbutPgHOqysxdrDF64QyN15pHRAuslk6AOzp+vt2m8kIC0AwyajSLtSC4=
+	t=1764295114; cv=fail; b=Y0uwAFbIYrrEAzF3dUxnotG+8O+1CD8LzD+pk/8CevaTt3Uoz+hIZ9dk21tc+zG8zs+AvPL6MViuXpYwaQxreUNeGJ+9vS31e14T8opsZSNPZR//ZZ842AUwmg6tQmxqN9daj2Q/hT/LKYRiUjzOzEJWzvPcb5RJLgFTATMcmiE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764267462; c=relaxed/simple;
-	bh=Am9z6NB1hWcUKAtK2Wd4vEeA4UQDmYpPUuhYvTNI8BM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QqhvkhWz17105av0MafZHeOXNp8bBso5CfWJbj+x9agrq/3QNgQ28EklmDcAbW1OQkA6QcGbs4DKbTdLLtugV0BEshl2pMAdfNwncEAJYMbzMz9eyovTxbqhCC+mJJ6pa+Ee2mui5xbQR3j51tef3kKNTo9aq62bUd3/+YH0v3w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=MrrmR/Eb; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1764295114; c=relaxed/simple;
+	bh=nUE919yC7+ZWGFZ/AoJ0G6H7INzM2EEBxKVmzH7oYyo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Tuouwt/qDpwItJvzS4YIr0kWYbeB8mSNmlz6vEikFSkNnzbQJ3Grfe5HOSz11lST2H/sqqdzq/4G3YW86n6Fn3Rm13VqLq+lmc8rLYi+roAOPwW9PuLE0bYOfH1erXFyLFGoETLdn28pgHiayK/8sKhLarA7Br6zRNdktgOv38U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=GAOJxILg; arc=fail smtp.client-ip=52.101.72.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="MrrmR/Eb"
-ARC-Seal: i=1; a=rsa-sha256; t=1764267379; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=VHNPgFqZa0o6809/T+8jHJoMCBYjd2yZiYvEH43ecdDw0RDEoZBASvS8GXIRjf443u9HWsC87weywb65C5DIBcudiiLSfw66tyl4FaLNKaejlEIJIohOY954WwUx+6cfKsQdPDjAUxOAHUCJW2JVa5BuwC53SzyModibprg79Xg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1764267379; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=GA9FTV2ejX5xguOwyiDUL1hpvKOTwyB0xhI2crLeIWM=; 
-	b=VzgCDjp9rcRegJe18G1VoZpp248pQnSYb2nnPRvNYWxHUdyyrlHItaUgv2yGSNf+L6cT0ioGjEOUEpK+K0iTAkjcNQ9RhPc7ICm06mhWm7aOWDC7aTqGKcy/QGw9e2DvPfDfeB5pm0C9OwDjdwtPltUGw2ChGO1r7cznhhdiZRQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
-	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1764267379;
-	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=GA9FTV2ejX5xguOwyiDUL1hpvKOTwyB0xhI2crLeIWM=;
-	b=MrrmR/EbOR0f5Gb5Xbhy3YhzRySSoWvRdfWRmCgcQVrMezcKplDmR9LS92M5F8YU
-	44hmR7lvwMtOD/5nw3ELxQb8PadU5cfnfMx7ngMJ02a3mou1wD1bDW4FltRjo9ZXijV
-	BVrAa/6yr4xsF2CvbF/50U6ILU5JghWfinyStD5c=
-Received: by mx.zohomail.com with SMTPS id 1764267377521567.410213066609;
-	Thu, 27 Nov 2025 10:16:17 -0800 (PST)
-Message-ID: <2dd059f5-96d4-44a1-84be-b14dce28cf06@collabora.com>
-Date: Thu, 27 Nov 2025 15:15:47 -0300
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="GAOJxILg"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PcXCEQe1Btnu+GcYMbnJjCGco7gAdM4TsgWPjy7HK6+97DXD89TNcygJZGA8nD8uCwpidrZxGgtUNgnGYUYWWgjK8+imQ2YDvZ9H+E15zFsTkWcPnOfYvQWZozUjDx0O/yuBL6x08+41+zn+8URLIbvxq+YWh19X/mWPa2jkT2vmIBzl8VhcoKEc0tJnFFAkQXzwSh1ThiZ8G8rTqDtgOXMVgOWQQVv4UlgzOyTiirF6haRg0pL3IeoO3FEL11WBkdheWSAvZWjXy5Ww1238wbMmnG7/1ObNRFhpPeg7sDuW4oY4EdbIhSXol9GkjYcYQGaLbHxm6LCHysJ2cCJ1+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4xF60Pxuu5Vpjfa8FpOh/Tt3sbwxa1xiM8yWY4q7RrA=;
+ b=x3XqwhmvQguSZo7q1qFQBaiwP1T/e2jcPpdKoCTRAaIURPEdxbPudoVc8TH1I4njqD9M3/g9FAfBX4K2uNT55UGKSjbOhSSpz3InteRK/bnWbbuzXAK35WqS0eZfnLa4qjzZYqATM76SsaZ4Xa4PQM2536QMTBAX0D4EbgqehXthsGSa5EfXXzEa7Bc8SGEb7W5NBBkfCCjl5iFxlLuWng4NeDYuUr6ooESLF82+sgEK0BSUmF53yDwc6ZnPyH2BXpL8iVqvOrxUkSpWng+cuioof7AdJO6cEdT3EDN7kMfVGLRtPSXtZWbtWSHpSOEWBJbEk7kJdHGA8N9U3hwjOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 195.60.68.100) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=axis.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=axis.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4xF60Pxuu5Vpjfa8FpOh/Tt3sbwxa1xiM8yWY4q7RrA=;
+ b=GAOJxILgSSBqA3MDequmcUADuRGOqYPktfcK0bJCGcYoZKXgISdKfI47DWTb77SN7fbabmzb6AkNgHyr5717sEtkDh2bG/cgNWrvQdqFSaMGRl4820GBNIR8zmcAYbgJRPEnMobZb+4xBJel6iCAfAFYJyeN7XRE6HQdfFkV3N8=
+Received: from PAZP264CA0182.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:236::15)
+ by DU0PR02MB9244.eurprd02.prod.outlook.com (2603:10a6:10:474::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.14; Fri, 28 Nov
+ 2025 01:58:28 +0000
+Received: from AM4PEPF00025F96.EURPRD83.prod.outlook.com
+ (2603:10a6:102:236:cafe::5f) by PAZP264CA0182.outlook.office365.com
+ (2603:10a6:102:236::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.13 via Frontend Transport; Fri,
+ 28 Nov 2025 01:58:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
+ smtp.mailfrom=axis.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=axis.com;
+Received-SPF: Pass (protection.outlook.com: domain of axis.com designates
+ 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
+ client-ip=195.60.68.100; helo=mail.axis.com; pr=C
+Received: from mail.axis.com (195.60.68.100) by
+ AM4PEPF00025F96.mail.protection.outlook.com (10.167.16.5) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9388.0 via Frontend Transport; Fri, 28 Nov 2025 01:58:28 +0000
+Received: from se-mail01w.axis.com (10.20.40.7) by se-mail10w.axis.com
+ (10.20.40.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.39; Fri, 28 Nov
+ 2025 02:58:28 +0100
+Received: from se-mail02w.axis.com (10.20.40.8) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.61; Fri, 28 Nov
+ 2025 02:58:28 +0100
+Received: from se-intmail01x.se.axis.com (10.4.0.28) by se-mail02w.axis.com
+ (10.20.40.8) with Microsoft SMTP Server id 15.1.2507.61 via Frontend
+ Transport; Fri, 28 Nov 2025 02:58:28 +0100
+Received: from lnxchenhuiz2.sh.cn.axis.com (lnxchenhuiz2.sh.cn.axis.com [192.168.77.59])
+	by se-intmail01x.se.axis.com (Postfix) with ESMTP id EDCD77E5;
+	Fri, 28 Nov 2025 02:58:26 +0100 (CET)
+From: Hermes Zhang <Hermes.Zhang@axis.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Hermes Zhang <chenhuiz@axis.com>
+Subject: [PATCH] main: Fix wrong option name in LE options array
+Date: Fri, 28 Nov 2025 09:58:18 +0800
+Message-ID: <20251128015818.1838246-1-Hermes.Zhang@axis.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/12] dt-bindings: net: Convert Marvell 8897/8997
- bindings to DT schema
-To: Rob Herring <robh@kernel.org>
-Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
- andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com,
- broonie@kernel.org, chunkuang.hu@kernel.org, conor+dt@kernel.org,
- davem@davemloft.net, dmitry.torokhov@gmail.com, edumazet@google.com,
- flora.fu@mediatek.com, heiko@sntech.de, houlong.wei@mediatek.com,
- jeesw@melfas.com, kernel@collabora.com, krzk+dt@kernel.org, kuba@kernel.org,
- lgirdwood@gmail.com, linus.walleij@linaro.org,
- louisalexis.eyraud@collabora.com, luiz.dentz@gmail.com,
- maarten.lankhorst@linux.intel.com, marcel@holtmann.org,
- matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com,
- mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com,
- sean.wang@kernel.org, simona@ffwll.ch, support.opensource@diasemi.com,
- tiffany.lin@mediatek.com, tzimmermann@suse.de, yunfei.dong@mediatek.com,
- devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-input@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-sound@vger.kernel.org, netdev@vger.kernel.org
-References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
- <20250911151001.108744-4-ariel.dalessandro@collabora.com>
- <20250912140619.GA1293647-robh@kernel.org>
- <fb20e4fe-df0a-4089-a7cf-e82bfe1f8e00@collabora.com>
- <CAL_Jsq+eeiw9oaqQPWt2=rZSX98Pak_oB=tfQFvEehwLZ=S52g@mail.gmail.com>
-Content-Language: en-US
-From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-In-Reply-To: <CAL_Jsq+eeiw9oaqQPWt2=rZSX98Pak_oB=tfQFvEehwLZ=S52g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM4PEPF00025F96:EE_|DU0PR02MB9244:EE_
+X-MS-Office365-Filtering-Correlation-Id: 696dd701-8759-43b2-a749-08de2e219ff0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?hrGHhavc1Twyj1p6RInz9u9LoW4Pu6GaaHCV7EOE9BPNkvpXxwzRuZSc8ODn?=
+ =?us-ascii?Q?oHnJWyWywDdMQ94z8lX2tPyS2Laa6l2E0MEotR+yyEiYixACkJph4z9HQqe9?=
+ =?us-ascii?Q?Ye5NPcdrqz3C/zpqRhabebR8rODX/WDL0+FOv5GmEV/CE//07lgPvpG9KidI?=
+ =?us-ascii?Q?7I6IqCYt5HY64qRWZEHt/liwsbz5vCjbDa7ivSXO04a9Q65Nh0d7gdacnIuM?=
+ =?us-ascii?Q?uAjFANr1O9j1aOaAz2XrCXhG5FfEdICbiJKujqgFqznlEVZN4naOm6VKYx66?=
+ =?us-ascii?Q?yJn8AxVdM8SklR5nYoS+Ta/V9MiRyjsOD3ahujbIXdqI+JBUn7qlue0jR/oN?=
+ =?us-ascii?Q?OROoZtxfvKRHYGFRoCHN7kTqwg5RowHPNQHgnbo0Hrjj3JhemmmTlXZWUSMV?=
+ =?us-ascii?Q?MQPSGP6Yy0G/0/zqHMex3yzUPPJYM1RtUeG7SmHze7i8iHfCLp2vw1bt3Nxs?=
+ =?us-ascii?Q?MSSA+PaqS8tkyp/7QCr17MNkhxB9UXLrQKIT2JkU+YX8/NujlHcghipwD+JJ?=
+ =?us-ascii?Q?KR1znGkz4rGMM/JdqIzIilvc3AplkB3ccdKEEyOm+DEendU8eHz0vpHP+iZS?=
+ =?us-ascii?Q?hP4QUj7p3LOL9DI0fAOC+OEsvLpr8D4W/B4umaKztAt2dhG563hs6eRtMrzC?=
+ =?us-ascii?Q?zQA/hoqxKix4ap4eV/BLQSvC2qGKFbh222XWasNRA+w1UB+biUt/J+zPOq1f?=
+ =?us-ascii?Q?Xu/gHwhWKZa2OvmuSyZynpGiNiuQMaCMTtbD0ehJWbWTY81/qMonJB3kmM0K?=
+ =?us-ascii?Q?x36oMzuXA6jQcQuiq+Z6QnvoYCa6ATYtd5OFPVnKVfZjCXesgA2XAvr9+/+4?=
+ =?us-ascii?Q?p52ep3yAHyfEoYdHFyWzpNUMfA0TzJJNsq3UVXkbD1BLOPDRaawUc4qjhtTw?=
+ =?us-ascii?Q?E5ibA+yyqJ7runL15c21WHGI6OowHNHRBSftn2NPx6XY+WsOkHHd26YNCTAr?=
+ =?us-ascii?Q?0bH3/a/DdqjrBruHZAnpF1EMbpUkLti0BLLY7a5TnTLQg0gj0RzB6FF4kCgN?=
+ =?us-ascii?Q?8iNwEL2F5XE6PjH1oJ81bn2sdZ87gA0IauXorWk0P5hK3l+xxXBTJUoZ+n/N?=
+ =?us-ascii?Q?GmRXvpf6Yr1MF8cA0/Vbv50ENhtVtb4yO/ImvcdhlDCPUfbsnweTmB6tqdW8?=
+ =?us-ascii?Q?Qqbi28Gnt+h0SadVpGXic8+OVbvYCdvsOqxYMd6T4k5Ea/0IpiqTQqJ8g5ZJ?=
+ =?us-ascii?Q?1qclwZOOxAKgnuboY4G+U92sm5VUPyaNsXLrXY0Q3dPROBRixc8Y9fTdfF//?=
+ =?us-ascii?Q?TdTTg7IGdZ2dvrbIZMn+1QHXqwzNRF+AcUBHbrSLvbmmD9zH9HlwU+o9bTWP?=
+ =?us-ascii?Q?QPh0Eug3u4NmqkpOfLNh0eulKorlK/uAi0aVhbcGMeMOdmJ7rKtovq+1EeqE?=
+ =?us-ascii?Q?ZKSgyYCehcrdfPcPiMcEjSajAzMeIZH7K0M35DDzmLRa3s4Vr55mqdkCaR0s?=
+ =?us-ascii?Q?KqAeTnCOk9kmQvAOWeB1rHvmeYEUnsozU/mLbPKS2Zn0JqyRQEGvTjKm1b2u?=
+ =?us-ascii?Q?fnjqpBCZWjso5JMr8UrjU/Tl2p3xWYwgqNovEad2ueIarivmpQkeHN8NKZLS?=
+ =?us-ascii?Q?Rp4iCPVTX3G1slVmtzU=3D?=
+X-Forefront-Antispam-Report:
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2025 01:58:28.4916
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 696dd701-8759-43b2-a749-08de2e219ff0
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM4PEPF00025F96.EURPRD83.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR02MB9244
 
-Hi Rob,
+From: Hermes Zhang <chenhuiz@axis.com>
 
-On 11/24/25 3:54 PM, Rob Herring wrote:
-> On Wed, Oct 1, 2025 at 12:28 PM Ariel D'Alessandro
-> <ariel.dalessandro@collabora.com> wrote:
->>
->> Rob,
->>
->> On 9/12/25 11:06 AM, Rob Herring wrote:
->>> On Thu, Sep 11, 2025 at 12:09:52PM -0300, Ariel D'Alessandro wrote:
->>>> Convert the existing text-based DT bindings for Marvell 8897/8997
->>>> (sd8897/sd8997) bluetooth devices controller to a DT schema.
->>>>
->>>> While here:
->>>>
->>>> * bindings for "usb1286,204e" (USB interface) are dropped from the DT
->>>>     schema definition as these are currently documented in file [0].
->>>> * DT binding users are updated to use bluetooth generic name
->>>>     recommendation.
->>>>
->>>> [0] Documentation/devicetree/bindings/net/btusb.txt
->>>>
->>>> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
->>>> ---
->>>>    .../net/bluetooth/marvell,sd8897-bt.yaml      | 79 ++++++++++++++++++
->>>>    .../devicetree/bindings/net/btusb.txt         |  2 +-
->>>>    .../bindings/net/marvell-bt-8xxx.txt          | 83 -------------------
->>>
->>>>    .../dts/rockchip/rk3288-veyron-fievel.dts     |  2 +-
->>>>    .../boot/dts/rockchip/rk3288-veyron-jaq.dts   |  2 +-
->>>>    arch/arm64/boot/dts/mediatek/mt8173-elm.dtsi  |  2 +-
->>>
->>> .dts files should be separate patches. Please send the bindings patches
->>> separately per subsystem so subsystem maintainers can apply them. All
->>> the Mediatek dts changes can be 1 series.
->>
->> Ack, will fix in v3.
-> 
-> Are you going to send v3 still?
+Correct the name of "AdvMonitoring" to "AdvMonitor" for consistency
+with Bluetooth Low Energy (LE) terminology in the le_options array.
 
-Yes, will be sending out v3 asap, with the remaining changes.
-Sorry for the delay.
+- ScanIntervalAdvMonitoring -> ScanIntervalAdvMonitor
+- ScanWindowAdvMonitoring -> ScanWindowAdvMonitor
 
+This will remove the confuse warning message:
+
+bluetoothd[973]: ... /main.c:check_options() Unknown key ScanIntervalAdvMonitor for group LE in /etc/bluetooth/main.conf
+bluetoothd[973]: ... /main.c:check_options() Unknown key ScanWindowAdvMonitor for group LE in /etc/bluetooth/main.conf
+---
+ src/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index 1c7390e63..558bf2888 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -120,8 +120,8 @@ static const char *le_options[] = {
+ 	"ScanWindowSuspend",
+ 	"ScanIntervalDiscovery",
+ 	"ScanWindowDiscovery",
+-	"ScanIntervalAdvMonitoring",
+-	"ScanWindowAdvMonitoring",
++	"ScanIntervalAdvMonitor",
++	"ScanWindowAdvMonitor",
+ 	"ScanIntervalConnect",
+ 	"ScanWindowConnect",
+ 	"MinConnectionInterval",
 -- 
-Ariel D'Alessandro
-Software Engineer
-
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, UK 
-Registered in England & Wales, no. 5513718
+2.49.0
 
