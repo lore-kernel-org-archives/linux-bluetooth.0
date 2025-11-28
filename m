@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F8E27AC28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470982D46D6
 	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 20:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764360170; cv=pass; b=bU4XnYRxFcxyZ2td9VuwNw/I0Hk/6DY/7pI7cNpwM4j/yru5SqUezKG2o4j++yYsnTCNKuIu8peiSkAsi0rwObLXWuo+czes6RLRv0ZfxhJmKdFK+Y86S3bdvDxv5ah5KkljB+HK7JBSncZGoKgHhAGPM/lEr9A9oYV30QpZi6w=
+	t=1764360171; cv=pass; b=fvE+o0kZMnylDFx3uByG09kB/1gMnmIb2Haeh71OimjgX2CdU3GSVvEYssxVokPbuenH3smv4tjKFlGIu/xaz6topM15gmUAVBAcVH8s2gcKUoH/nTNvpZVP2aDsB85YtZievKxoX6Eurper6Zn/tGdfh8nPWidrIsrgLRpK+g0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764360170; c=relaxed/simple;
-	bh=0OIYcceCj2/WjqpzQ8YhEO+vZHRRAJYHzFcBXS8PByQ=;
+	s=arc-20240116; t=1764360171; c=relaxed/simple;
+	bh=T0pkdk8wpp4f1G5n6xt7SwqnuQ8TL7AFGriLFYuWRJI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dNRWA7DPDKVwYJjS10v1jE7a3P2DCUvOmOzv8JAJHYvzxat/ERaX/stEt5F1Jzq8XzzuzgjDrxJuBA4c72jYhAZSagv7kWAKxag+RNhT7AEGRKxg5p9Slx3lwUKjd4amTZYn4sSqhexQLuP8cyscAEmq4bnkwsS41o6slYIyRtk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=B1fj8P7P; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=seA7DTkLnP23A/OYcrp9CWgDrYmfPIAQUrTZe3Efa65kRBBIbBehfKoEbgTay0cS8TT2ulr7KSwxCG0jctaJ17AAuVjch4g4Yvu6EickKxXw37kHQiyokOaWDrbltBhpHfD/u7I8pMR/rOdAxEKd9xxkYLazBbQEyO9sVeTmqVo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=cQn298Zr; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="B1fj8P7P"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="cQn298Zr"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dJ4335r5Wz104J;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dJ4333FCLzyVG;
 	Fri, 28 Nov 2025 22:02:39 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1764360160;
+	t=1764360159;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=K4rGcfHlm1311eezOR6PTowfQAkdvJDBov9I7LdForQ=;
-	b=B1fj8P7PHgDO4igvvJAz4xtyYzG+f7QCWH3CMNWzAX2png8KhqzfQ/muUjpprO6+9bk7K4
-	gWQ+RNP4PDf7AcreAQ7DjzipesHkerlIhOFmeQ3R6ns1qWtL7III8T52+9nXw5DIBTW3ST
-	a7Lpp7V1tK5kaE+HTAs7ev+gPNC4EKM=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764360160;
-	b=g6ezPZ1k71hSLetDiWp/HnCe2p3wB5yBcYhvk08sB7j5B4ut6/SVtUkVbbtjMGyBIF+ta9
-	HCTNY9pHjPxNPm8dWBhoGGhdlpulWHp8N0WuhW/IdG1xbn519HxBliys5qIZ6gcsC5GJPk
-	e4A6ssD64tE47pjvt4KFPa7486DmL/Q=
+	bh=2VwR037PNkKrWAI6KcwZbY2IF8mkiqQQ63JBA2Mlc3k=;
+	b=cQn298Zr7ZJ4C6KjuzGafTocsTx4uxRbWxg5RX0XdDSWcr454yv5i6coKUgh/ytHDJZ3WG
+	pnqRLdLnrzj262g5EEB57wzQ9LTjcbw7r9BtQ0GST1zt3Jg3HJLrIgt6tCvi95GxkND4vU
+	SJCBXw4YUhFOq8GhIZc+QSbJMVX5d7g=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764360159;
+	b=JLmh4iVnh7/1TjixdzFcAyGQp73cSC6WwwaZ/9VPIZg9Ko4aFeENT/l6IIiC7tdogKcNqA
+	ZpVe8UhtyHb+X6klEvAgo7nUpj8TUeZ/Ka0QqADeNv5DwrPPT/l5qNyxIGVqdcD+4l2blJ
+	cnuUxIqb+Dy5BLhyg/PnaxhcZUqKKRo=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1764360160;
+	s=meesny; t=1764360159;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=K4rGcfHlm1311eezOR6PTowfQAkdvJDBov9I7LdForQ=;
-	b=vbyVZGJHnwMCFiug17LThxzQc6w4VJmwIldSnaw/rgGYgLoI0ar3DX9obt0kPYXfFlU+aP
-	FFwXkYebtuhvtVp0Wc5ji2i6xCEeTe2ojWgpeneZAD1YO6SjhaojxfhvqKaDJypuKQIS5I
-	DQcBQH/JHD4PghTs6gofMHkeLIwlwn4=
+	bh=2VwR037PNkKrWAI6KcwZbY2IF8mkiqQQ63JBA2Mlc3k=;
+	b=VUdP33d5S2Vb5E0Y/XmxAMlIKOZYqUdcOHu0JKcJESFTneQCrsnOHzADEwzX4XKPH46ffq
+	xy1Ah1SCGxcGIHhbqgwpc0Rsy0hoEphDsWktliIBWb7BPnIPip3xnFmxM4O+JC6+IYUEZ9
+	2tjv5+lA1DnaHfSE72t88Qy6UOROUXk=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 2/9] test-gmap: add test for GMAP Service
-Date: Fri, 28 Nov 2025 22:02:21 +0200
-Message-ID: <ef2291e551549453b47abb39fe9394496daf5adc.1764360140.git.pav@iki.fi>
+Subject: [PATCH BlueZ v2 1/9] shared/gmap: add GMAP Service
+Date: Fri, 28 Nov 2025 22:02:20 +0200
+Message-ID: <e96fe0ead1afec4ce017a2416132b58548f1850b.1764360140.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1764360140.git.pav@iki.fi>
 References: <cover.1764360140.git.pav@iki.fi>
@@ -67,550 +67,539 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add tests on GMAP service for reading the attributes.
+GMAP Service is just a simple service with bitmasks.
+
+The values can be used to figure out which GMAP roles and features the
+remote device claims it supports (matters for available mandatory
+features).  Also can advertise the same for remote clients.
 ---
 
 Notes:
     v2:
-    - no change
+    - remove one unnecessary #include
 
- .gitignore       |   1 +
- Makefile.am      |   6 +
- unit/test-gmap.c | 496 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 503 insertions(+)
- create mode 100644 unit/test-gmap.c
+ Makefile.am          |   1 +
+ lib/bluetooth/uuid.h |   8 +
+ src/shared/gmap.c    | 401 +++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gmap.h    |  70 ++++++++
+ 4 files changed, 480 insertions(+)
+ create mode 100644 src/shared/gmap.c
+ create mode 100644 src/shared/gmap.h
 
-diff --git a/.gitignore b/.gitignore
-index 48bf72a4a..ba29d9d5e 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -119,6 +119,7 @@ unit/test-bap
- unit/test-bass
- unit/test-battery
- unit/test-tmap
-+unit/test-gmap
- tools/mgmt-tester
- tools/smp-tester
- tools/gap-tester
 diff --git a/Makefile.am b/Makefile.am
-index 14dccafaf..7221e4cba 100644
+index 11e632c02..14dccafaf 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -709,6 +709,12 @@ unit_test_tmap_SOURCES = unit/test-tmap.c $(btio_sources)
- unit_test_tmap_LDADD = src/libshared-glib.la \
- 				lib/libbluetooth-internal.la $(GLIB_LIBS)
+@@ -243,6 +243,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+ 			src/shared/bass.h src/shared/bass.c \
+ 			src/shared/ccp.h src/shared/ccp.c \
+ 			src/shared/tmap.c src/shared/tmap.h \
++			src/shared/gmap.c src/shared/gmap.h \
+ 			src/shared/lc3.h src/shared/tty.h \
+ 			src/shared/bap-defs.h \
+ 			src/shared/asha.h src/shared/asha.c \
+diff --git a/lib/bluetooth/uuid.h b/lib/bluetooth/uuid.h
+index 771f7675d..82e948a23 100644
+--- a/lib/bluetooth/uuid.h
++++ b/lib/bluetooth/uuid.h
+@@ -216,6 +216,14 @@ extern "C" {
+ #define TMAS_UUID				0x1855
+ #define TMAP_ROLE_CHRC_UUID			0x2b51
  
-+unit_tests += unit/test-gmap
++/* Gaming Audio Service */
++#define GMAS_UUID				0x1858
++#define GMAP_ROLE_CHRC_UUID			0x2c00
++#define GMAP_UGG_CHRC_UUID			0x2c01
++#define GMAP_UGT_CHRC_UUID			0x2c02
++#define GMAP_BGS_CHRC_UUID			0x2c03
++#define GMAP_BGR_CHRC_UUID			0x2c04
 +
-+unit_test_gmap_SOURCES = unit/test-gmap.c $(btio_sources)
-+unit_test_gmap_LDADD = src/libshared-glib.la \
-+				lib/libbluetooth-internal.la $(GLIB_LIBS)
-+
- unit_tests += unit/test-battery
- 
- unit_test_battery_SOURCES = unit/test-battery.c
-diff --git a/unit/test-gmap.c b/unit/test-gmap.c
+ /* Coordinated Set Identification Profile(CSIP) */
+ #define CSIS_UUID					0x1846
+ #define CS_SIRK						0x2B84
+diff --git a/src/shared/gmap.c b/src/shared/gmap.c
 new file mode 100644
-index 000000000..6102ce65d
+index 000000000..f571f3270
 --- /dev/null
-+++ b/unit/test-gmap.c
-@@ -0,0 +1,496 @@
++++ b/src/shared/gmap.c
+@@ -0,0 +1,401 @@
 +// SPDX-License-Identifier: LGPL-2.1-or-later
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2025  Pauli Virtanen. All rights reserved.
++ *  Copyright (C) 2025	Pauli Virtanen. All rights reserved.
++ *
 + */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
 +#define _GNU_SOURCE
-+#include <unistd.h>
++#include <inttypes.h>
 +#include <string.h>
-+#include <sys/socket.h>
-+#include <fcntl.h>
-+
-+#include <glib.h>
++#include <stdlib.h>
++#include <stdbool.h>
++#include <unistd.h>
++#include <errno.h>
 +
 +#include "bluetooth/bluetooth.h"
 +#include "bluetooth/uuid.h"
-+#include "src/shared/util.h"
-+#include "src/shared/tester.h"
++
 +#include "src/shared/queue.h"
++#include "src/shared/util.h"
++#include "src/shared/timeout.h"
 +#include "src/shared/att.h"
 +#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
 +#include "src/shared/gatt-server.h"
-+#include "src/shared/io.h"
++#include "src/shared/gatt-client.h"
 +#include "src/shared/gmap.h"
 +
-+struct test_config {
-+	uint8_t role;
-+	uint32_t features;
-+	const struct iovec *setup_data;
-+	const size_t setup_data_len;
-+};
++#define DBG(_gmap, fmt, arg...) \
++	gmap_debug(_gmap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
 +
-+struct test_data {
-+	struct gatt_db *db;
-+	struct bt_gatt_server *server;
-+	struct bt_gatt_client *client;
++struct bt_gmas_attr {
 +	struct bt_gmap *gmap;
-+	size_t iovcnt;
-+	struct iovec *iov;
-+	const struct test_config *cfg;
++	const char *name;
++	struct gatt_db_attribute *attr;
++	uint8_t value;
 +};
 +
-+#define iov_data(args...) ((const struct iovec[]) { args })
-+
-+#define define_test(name, setup, function, _cfg, args...)	\
-+	do {							\
-+		const struct iovec iov[] = { args };		\
-+		static struct test_data data;			\
-+		data.iovcnt = ARRAY_SIZE(iov_data(args));	\
-+		data.iov = util_iov_dup(iov, ARRAY_SIZE(iov_data(args))); \
-+		data.cfg = _cfg;				\
-+		tester_add(name, &data, setup, function,	\
-+				test_teardown);			\
-+	} while (0)
-+
-+static void print_debug(const char *str, void *user_data)
-+{
-+	const char *prefix = user_data;
-+
-+	if (tester_use_debug())
-+		tester_debug("%s%s", prefix, str);
-+}
-+
-+static void test_teardown(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+
-+	bt_gatt_client_unref(data->client);
-+
-+	bt_gatt_server_unref(data->server);
-+	util_iov_free(data->iov, data->iovcnt);
-+
-+	gatt_db_unref(data->db);
-+
-+	bt_gmap_unref(data->gmap);
-+	tester_teardown_complete();
-+}
-+
-+/* ATT: Exchange MTU Response (0x03) len 2
-+ *   Server RX MTU: 64
-+ * ATT: Exchange MTU Request (0x02) len 2
-+ *    Client RX MTU: 64
-+ * ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute type: Server Supported Features (0x2b3a)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Type Request (0x08)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_MTU_FEAT \
-+	IOV_DATA(0x02, 0x40, 0x00), \
-+	IOV_DATA(0x03, 0x40, 0x00), \
-+	IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x3a, 0x2b), \
-+	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
-+
-+/* ATT: Read By Group Type Request (0x10) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute group type: Primary Service (0x2800)
-+ * ATT: Read By Group Type Response (0x11) len 37
-+ *   Attribute data length: 6
-+ *   Attribute group list: 1 entries
-+ *   Handle range: 0x0001-0x000f
-+ *   UUID: Gaming Audio Service (0x1858)
-+ * ATT: Read By Group Type Request (0x10) len 6
-+ *   Handle range: 0x0006-0xffff
-+ *   Attribute group type: Primary Service (0x2800)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Group Type Request (0x10)
-+ *   Handle: 0x0004
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_PRIMARY_SERVICE \
-+	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28), \
-+	IOV_DATA(0x11, 0x06, \
-+		0x01, 0x00, 0x0f, 0x00, 0x58, 0x18), \
-+	IOV_DATA(0x10, 0x10, 0x00, 0xff, 0xff, 0x00, 0x28), \
-+	IOV_DATA(0x01, 0x10, 0x10, 0x00, 0x0a)
-+
-+
-+/* ATT: Read By Group Type Request (0x10) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute group type: Secondary Service (0x2801)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Group Type Request (0x10)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_SECONDARY_SERVICE \
-+	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28), \
-+	IOV_DATA(0x01, 0x10, 0x01, 0x00, 0x0a)
-+
-+/* ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0x0005
-+ *   Attribute group type: Include (0x2802)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Group Type Request (0x10)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_INCLUDE \
-+	IOV_DATA(0x08, 0x01, 0x00, 0x0f, 0x00, 0x02, 0x28), \
-+	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
-+
-+/* ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0x0003
-+ *   Attribute type: Characteristic (0x2803)
-+ * ATT: Read By Type Response (0x09) len 57
-+ *   Attribute data length: 7
-+ *   Attribute data list: 8 entries
-+ *     Handle: 0x0002
-+ *     Value: 020300512b
-+ *     Properties: 0x02
-+ *       Read (0x02)
-+ *     Value Handle: 0x0003
-+ *     Value UUID: GMAP Role (0x2c00)
-+ * ATT: Read By Type Response (0x09) len 57
-+ *   Attribute data length: 7
-+ *   Attribute data list: 8 entries
-+ *     Handle: 0x0004
-+ *     Value: 020300512b
-+ *     Properties: 0x02
-+ *       Read (0x02)
-+ *     Value Handle: 0x0005
-+ *     Value UUID: GMAP Features ({uuid})
-+ * ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0003-0x0004
-+ *   Attribute type: Characteristic (0x2803)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Type Request (0x08)
-+ *   Handle: 0x0022
-+ *   Error: Attribute Not Found (0x0a)
-+ * ATT: Find Information Request (0x04)
-+ * ATT: Error Response
-+ */
-+#define IOV_CONTENT(data...)	data
-+
-+#define GMAS_FIND_CHRC(uuid) \
-+	IOV_DATA(0x08, 0x01, 0x00, 0x0f, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x09, 0x07, \
-+		0x02, 0x00, 0x02, 0x03, 0x00, 0x00, 0x2c, \
-+		0x04, 0x00, 0x02, 0x05, 0x00, uuid), \
-+	IOV_DATA(0x08, 0x05, 0x00, 0x0f, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x01, 0x08, 0x05, 0x00, 0x0a), \
-+	IOV_DATA(0x04, 0x06, 0x00, 0x0f, 0x00), \
-+	IOV_DATA(0x01, 0x04, 0x06, 0x00, 0x0a)
-+
-+#define UGG_UUID	0x01, 0x2c
-+#define UGT_UUID	0x02, 0x2c
-+#define BGS_UUID	0x03, 0x2c
-+#define BGR_UUID	0x04, 0x2c
-+
-+#define ROLE_HND	0x03, 0x00
-+#define FEAT_HND	0x05, 0x00
-+
-+/* ACL Data TX: Handle 42 flags 0x00 dlen 11
-+ *   ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute type: Database Hash (0x2b2a)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Type Request (0x08)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define GMAS_DATABASE_HASH \
-+	IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x2a, 0x2b), \
-+	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
-+
-+
-+#define GMAS_SETUP(uuid) \
-+	GMAS_MTU_FEAT, \
-+	GMAS_PRIMARY_SERVICE, \
-+	GMAS_SECONDARY_SERVICE, \
-+	GMAS_INCLUDE, \
-+	GMAS_FIND_CHRC(IOV_CONTENT(uuid)), \
-+	GMAS_DATABASE_HASH
-+
-+/* GATT Discover All procedure */
-+static const struct iovec setup_data_ugg[] = { GMAS_SETUP(UGG_UUID) };
-+static const struct iovec setup_data_ugt[] = { GMAS_SETUP(UGT_UUID) };
-+static const struct iovec setup_data_bgs[] = { GMAS_SETUP(BGS_UUID) };
-+static const struct iovec setup_data_bgr[] = { GMAS_SETUP(BGR_UUID) };
-+
-+static void setup_complete_cb(const void *user_data)
-+{
-+	tester_setup_complete();
-+}
-+
-+static void test_setup_server(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+	const struct test_config *cfg = data->cfg;
-+	struct bt_att *att;
++struct bt_gmas_db {
 +	struct gatt_db *db;
-+	struct io *io;
++	struct gatt_db_attribute *service;
++	struct bt_gmas_attr role;
++	struct bt_gmas_attr ugg;
++	struct bt_gmas_attr ugt;
++	struct bt_gmas_attr bgs;
++	struct bt_gmas_attr bgr;
++};
 +
-+	io = tester_setup_io(cfg->setup_data, cfg->setup_data_len);
-+	g_assert(io);
++struct bt_gmap {
++	int ref_count;
++	struct bt_gatt_client *client;
++	struct bt_gmas_db db;
 +
-+	tester_io_set_complete_func(setup_complete_cb);
++	int idle_id;
++	bt_gmap_ready_func_t ready_func;
++	void *ready_data;
 +
-+	db = gatt_db_new();
-+	g_assert(db);
++	bt_gmap_debug_func_t debug_func;
++	bt_gmap_destroy_func_t debug_destroy;
++	void *debug_data;
++};
 +
-+	data->gmap = bt_gmap_add_db(db);
-+	bt_gmap_set_debug(data->gmap, print_debug, "gmap:", NULL);
++static struct queue *instances;
 +
-+	bt_gmap_set_role(data->gmap, data->cfg->role);
-+	bt_gmap_set_features(data->gmap, data->cfg->features);
++static void gmap_free(void *data)
++{
++	struct bt_gmap *gmap = data;
 +
-+	att = bt_att_new(io_get_fd(io), false);
-+	g_assert(att);
-+	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
++	if (gmap->client) {
++		bt_gatt_client_idle_unregister(gmap->client, gmap->idle_id);
++		bt_gatt_client_unref(gmap->client);
++	} else {
++		gatt_db_remove_service(gmap->db.db, gmap->db.service);
++		gatt_db_unref(gmap->db.db);
++	}
 +
-+	data->server = bt_gatt_server_new(db, att, 64, 0);
-+	g_assert(data->server);
-+	bt_gatt_server_set_debug(data->server, print_debug, "bt_gatt_server:",
-+						NULL);
++	queue_remove(instances, gmap);
++	if (queue_isempty(instances)) {
++		queue_destroy(instances, NULL);
++		instances = NULL;
++	}
 +
-+	tester_io_send();
-+
-+	bt_att_unref(att);
-+	gatt_db_unref(db);
++	free(gmap);
 +}
 +
-+static void test_complete_cb(const void *user_data)
++struct bt_gmap *bt_gmap_ref(struct bt_gmap *gmap)
 +{
-+	tester_test_passed();
++	if (!gmap)
++		return NULL;
++
++	__sync_fetch_and_add(&gmap->ref_count, 1);
++
++	return gmap;
 +}
 +
-+static void test_server(const void *user_data)
++void bt_gmap_unref(struct bt_gmap *gmap)
 +{
-+	struct test_data *data = (void *)user_data;
-+	struct io *io;
++	if (!gmap)
++		return;
 +
-+	io = tester_setup_io(data->iov, data->iovcnt);
-+	g_assert(io);
++	if (__sync_sub_and_fetch(&gmap->ref_count, 1))
++		return;
 +
-+	tester_io_set_complete_func(test_complete_cb);
-+
-+	tester_io_send();
++	gmap_free(gmap);
 +}
 +
-+static void setup_ready_cb(bool success, uint8_t att_ecode, void *user_data)
++static void gmap_debug(struct bt_gmap *gmap, const char *format, ...)
 +{
-+	if (!success)
-+		tester_setup_failed();
-+	else
-+		tester_setup_complete();
++	va_list ap;
++
++	if (!gmap || !format || !gmap->debug_func)
++		return;
++
++	va_start(ap, format);
++	util_debug_va(gmap->debug_func, gmap->debug_data, format, ap);
++	va_end(ap);
 +}
 +
-+static void test_setup(const void *user_data)
++bool bt_gmap_set_debug(struct bt_gmap *gmap, bt_gmap_debug_func_t cb,
++		void *user_data, bt_gmap_destroy_func_t destroy)
 +{
-+	struct test_data *data = (void *)user_data;
-+	const struct test_config *cfg = data->cfg;
-+	struct bt_att *att;
-+	struct gatt_db *db;
-+	struct io *io;
++	if (!gmap)
++		return false;
 +
-+	io = tester_setup_io(cfg->setup_data, cfg->setup_data_len);
-+	g_assert(io);
++	if (gmap->debug_destroy)
++		gmap->debug_destroy(gmap->debug_data);
 +
-+	att = bt_att_new(io_get_fd(io), false);
-+	g_assert(att);
++	gmap->debug_func = cb;
++	gmap->debug_destroy = destroy;
++	gmap->debug_data = user_data;
 +
-+	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
-+
-+	db = gatt_db_new();
-+	g_assert(db);
-+
-+	data->client = bt_gatt_client_new(db, att, 64, 0);
-+	g_assert(data->client);
-+
-+	bt_gatt_client_set_debug(data->client, print_debug, "bt_gatt_client:",
-+						NULL);
-+
-+	bt_gatt_client_ready_register(data->client, setup_ready_cb, data,
-+						NULL);
-+
-+	bt_att_unref(att);
-+	gatt_db_unref(db);
++	return true;
 +}
 +
-+static void client_ready_cb(struct bt_gmap *gmap, void *user_data)
++uint8_t bt_gmap_get_role(struct bt_gmap *gmap)
 +{
-+	struct test_data *data = (void *)user_data;
++	if (!gmap)
++		return 0;
 +
-+	if (bt_gmap_get_role(gmap) != data->cfg->role) {
-+		tester_test_failed();
++	return gmap->db.role.value & BT_GMAP_ROLE_MASK;
++}
++
++uint32_t bt_gmap_get_features(struct bt_gmap *gmap)
++{
++	if (!gmap)
++		return 0;
++
++	return (((uint32_t)gmap->db.ugg.value << BT_GMAP_UGG_FEATURE_SHIFT) |
++		((uint32_t)gmap->db.ugt.value << BT_GMAP_UGT_FEATURE_SHIFT) |
++		((uint32_t)gmap->db.bgs.value << BT_GMAP_BGS_FEATURE_SHIFT) |
++		((uint32_t)gmap->db.bgr.value << BT_GMAP_BGR_FEATURE_SHIFT)) &
++		BT_GMAP_FEATURE_MASK;
++}
++
++/*
++ * GMA Client
++ */
++
++static void gmap_attr_read(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct bt_gmas_attr *attr = user_data;
++	struct bt_gmap *gmap = attr->gmap;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint8_t v;
++
++	if (!success) {
++		DBG(gmap, "Unable to read %s: error 0x%02x",
++							attr->name, att_ecode);
 +		return;
 +	}
 +
-+	if (bt_gmap_get_features(gmap) != data->cfg->features) {
-+		tester_test_failed();
++	if (!util_iov_pull_u8(&iov, &v)) {
++		DBG(gmap, "Invalid %s", attr->name);
 +		return;
 +	}
 +
-+	tester_test_passed();
++	DBG(gmap, "%s Value 0x%x", attr->name, v);
++	attr->value = v;
 +}
 +
-+static void test_client(const void *user_data)
++static void foreach_gmap_char(struct gatt_db_attribute *attr, void *user_data)
 +{
-+	struct test_data *data = (void *)user_data;
-+	struct io *io;
++	struct bt_gmap *gmap = user_data;
++	uint16_t value_handle;
++	bt_uuid_t uuid, uuid_attr;
++	struct {
++		const uint32_t uuid;
++		struct bt_gmas_attr *attr;
++		const char *name;
++	} attrs[] = {
++		{ GMAP_ROLE_CHRC_UUID, &gmap->db.role, "Role" },
++		{ GMAP_UGG_CHRC_UUID, &gmap->db.ugg, "UGG Features" },
++		{ GMAP_UGT_CHRC_UUID, &gmap->db.ugt, "UGT Features" },
++		{ GMAP_BGS_CHRC_UUID, &gmap->db.bgs, "BGS Features" },
++		{ GMAP_BGR_CHRC_UUID, &gmap->db.bgr, "BGR Features" },
++	};
++	unsigned int i;
 +
-+	io = tester_setup_io(data->iov, data->iovcnt);
-+	g_assert(io);
++	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
++						NULL, NULL, &uuid))
++		return;
 +
-+	tester_io_set_complete_func(NULL);
++	for (i = 0; i < ARRAY_SIZE(attrs); ++i) {
++		bt_uuid16_create(&uuid_attr, attrs[i].uuid);
++		if (bt_uuid_cmp(&uuid, &uuid_attr))
++			continue;
 +
-+	data->gmap = bt_gmap_attach(data->client, client_ready_cb, data);
-+	g_assert(data->gmap);
++		attrs[i].attr->gmap = gmap;
++		attrs[i].attr->name = attrs[i].name;
 +
-+	bt_gmap_set_debug(data->gmap, print_debug, "gmap:", NULL);
++		DBG(gmap, "GMAS %s Char found: handle 0x%04x",
++			attrs[i].name, value_handle);
++		bt_gatt_client_read_value(gmap->client, value_handle,
++					gmap_attr_read, attrs[i].attr,
++					NULL);
++		return;
++	}
 +}
 +
-+/* ATT: Read Request (0x0a) len 2
-+ *   Handle: 0x0003 Type: GMAP Role (0x2c00)
-+ * ATT: Read Response (0x0b) len 24
-+ *   Value: _value
-+ *   Handle: 0x0003 Type: GMAP Role (0x2c00)
++static void foreach_gmap_service(struct gatt_db_attribute *attr,
++						void *user_data)
++{
++	struct bt_gmap *gmap = user_data;
++
++	gatt_db_service_set_claimed(attr, true);
++	gatt_db_service_foreach_char(attr, foreach_gmap_char, gmap);
++}
++
++static void gmap_idle(void *data)
++{
++	struct bt_gmap *gmap = data;
++
++	gmap->idle_id = 0;
++
++	if (!instances)
++		instances = queue_new();
++	queue_push_tail(instances, gmap);
++
++	if (gmap->ready_func)
++		gmap->ready_func(gmap, gmap->ready_data);
++}
++
++struct bt_gmap *bt_gmap_attach(struct bt_gatt_client *client,
++				bt_gmap_ready_func_t ready, void *user_data)
++{
++	struct bt_gmap *gmap;
++	bt_uuid_t uuid;
++
++	if (!client)
++		return NULL;
++
++	client = bt_gatt_client_clone(client);
++	if (!client)
++		return NULL;
++
++	gmap = new0(struct bt_gmap, 1);
++	gmap->client = client;
++	gmap->ready_func = ready;
++	gmap->ready_data = user_data;
++	gmap->db.db = bt_gatt_client_get_db(gmap->client);
++
++	bt_uuid16_create(&uuid, GMAS_UUID);
++	gatt_db_foreach_service(gmap->db.db, &uuid, foreach_gmap_service, gmap);
++
++	gmap->idle_id = bt_gatt_client_idle_register(gmap->client, gmap_idle,
++								gmap, NULL);
++
++	return bt_gmap_ref(gmap);
++}
++
++/*
++ * GMAS Service
 + */
 +
-+#define READ_CHRC(hnd, value...) \
-+	IOV_DATA(0x0a, hnd), \
-+	IOV_DATA(0x0b, value)
-+
-+#define READ_ROLE(value...)	READ_CHRC(IOV_CONTENT(ROLE_HND), value)
-+#define READ_FEAT(value...)	READ_CHRC(IOV_CONTENT(FEAT_HND), value)
-+
-+#define CGGIT_CHA(role, value)	READ_ROLE(role), READ_FEAT(value)
-+
-+#define CGGIT_ROLE	CGGIT_CHA(0x01, 0x00)
-+#define CGGIT_ROLE_RFU	CGGIT_CHA(0xf1, 0x00)
-+
-+const struct test_config cfg_read_role = {
-+	.role = BT_GMAP_ROLE_UGG,
-+	.setup_data = setup_data_ugg,
-+	.setup_data_len = ARRAY_SIZE(setup_data_ugg),
-+};
-+
-+#define CGGIT_UGG	CGGIT_CHA(0x01, 0x01)
-+#define CGGIT_UGG_RFU	CGGIT_CHA(0x01, 0xf1)
-+
-+const struct test_config cfg_read_ugg = {
-+	.role = BT_GMAP_ROLE_UGG,
-+	.features = BT_GMAP_UGG_MULTIPLEX,
-+	.setup_data = setup_data_ugg,
-+	.setup_data_len = ARRAY_SIZE(setup_data_ugg),
-+};
-+
-+#define CGGIT_UGT	CGGIT_CHA(0x02, 0x01)
-+#define CGGIT_UGT_RFU	CGGIT_CHA(0x02, 0x81)
-+
-+const struct test_config cfg_read_ugt = {
-+	.role = BT_GMAP_ROLE_UGT,
-+	.features = BT_GMAP_UGT_SOURCE,
-+	.setup_data = setup_data_ugt,
-+	.setup_data_len = ARRAY_SIZE(setup_data_ugt),
-+};
-+
-+#define CGGIT_BGS	CGGIT_CHA(0x04, 0x01)
-+#define CGGIT_BGS_RFU	CGGIT_CHA(0x04, 0x81)
-+
-+const struct test_config cfg_read_bgs = {
-+	.role = BT_GMAP_ROLE_BGS,
-+	.features = BT_GMAP_BGS_96KBPS,
-+	.setup_data = setup_data_bgs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_bgs),
-+};
-+
-+#define CGGIT_BGR	CGGIT_CHA(0x08, 0x01)
-+#define CGGIT_BGR_RFU	CGGIT_CHA(0x08, 0x81)
-+
-+const struct test_config cfg_read_bgr = {
-+	.role = BT_GMAP_ROLE_BGR,
-+	.features = BT_GMAP_BGR_MULTISINK,
-+	.setup_data = setup_data_bgr,
-+	.setup_data_len = ARRAY_SIZE(setup_data_bgr),
-+};
-+
-+static void test_gmap_cl(void)
++static void gmas_attr_read(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
 +{
-+	/* Sec. 4.5.1 TMA Client */
-+	define_test("GMAP/CL/CGGIT/CHA/BV-01-C [GMAP Role Read Characteristic, "
-+						"Client]",
-+		test_setup, test_client, &cfg_read_role, CGGIT_ROLE);
-+	define_test("GMAP/CL/CGGIT/CHA/BV-03-C [UGG Features Read "
-+						"Characteristic, Client]",
-+		test_setup, test_client, &cfg_read_ugg, CGGIT_UGG);
-+	define_test("GMAP/CL/CGGIT/CHA/BV-02-C [UGT Features Read "
-+						"Characteristic, Client]",
-+		test_setup, test_client, &cfg_read_ugt, CGGIT_UGT);
-+	define_test("GMAP/CL/CGGIT/CHA/BV-04-C [BGS Features Read "
-+						"Characteristic, Client]",
-+		test_setup, test_client, &cfg_read_bgs, CGGIT_BGS);
-+	define_test("GMAP/CL/CGGIT/CHA/BV-05-C [BGR Features Read "
-+						"Characteristic, Client]",
-+		test_setup, test_client, &cfg_read_bgr, CGGIT_BGR);
++	struct bt_gmas_attr *attr = user_data;
++	struct iovec iov = {
++		.iov_base = &attr->value,
++		.iov_len = sizeof(attr->value)
++	};
 +
-+	define_test("GMAP/CL/GMAS/BI-01-C [Client Ignores RFU Bits in GMAP "
-+						"Role Characteristic]",
-+		test_setup, test_client, &cfg_read_role, CGGIT_ROLE_RFU);
-+	define_test("GMAP/CL/GMAS/BI-03-C [Client Ignores RFU Bits in UGG "
-+						"Features Characteristic]",
-+		test_setup, test_client, &cfg_read_ugg, CGGIT_UGG_RFU);
-+	define_test("GMAP/CL/GMAS/BI-02-C [Client Ignores RFU Bit in UGT "
-+						"Features Characteristic]",
-+		test_setup, test_client, &cfg_read_ugt, CGGIT_UGT_RFU);
-+	define_test("GMAP/CL/GMAS/BI-04-C [Client Ignores RFU Bits in BGS "
-+						"Features Characteristic]",
-+		test_setup, test_client, &cfg_read_bgs, CGGIT_BGS_RFU);
-+	define_test("GMAP/CL/GMAS/BI-05-C [Client Ignores RFU Bits in BGR "
-+						"Features Characteristic]",
-+		test_setup, test_client, &cfg_read_bgr, CGGIT_BGR_RFU);
++	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
++							iov.iov_len);
 +}
 +
-+/* Step 1. in CGGIT/CHA skipped, should be unnecessary */
-+#define SGGIT_CHA_ROLE	READ_ROLE(0x01)
-+#define SGGIT_CHA_FEAT	READ_FEAT(0x01)
-+
-+static void test_gmap_sr(void)
++static bool match_db(const void *data, const void *match_data)
 +{
-+	/* Sec. 4.6.2 GMA Server */
-+	define_test("GMAP/SR/SGGIT/CHA/BV-01-C [Characteristic GGIT - GMAP "
-+						"Role]",
-+		test_setup_server, test_server, &cfg_read_role, SGGIT_CHA_ROLE);
-+	define_test("GMAP/SR/SGGIT/CHA/BV-03-C [Characteristic GGIT - UGG "
-+						"Features]",
-+		test_setup_server, test_server, &cfg_read_ugg, SGGIT_CHA_FEAT);
-+	define_test("GMAP/SR/SGGIT/CHA/BV-02-C [Characteristic GGIT - UGT "
-+						"Features]",
-+		test_setup_server, test_server, &cfg_read_ugt, SGGIT_CHA_FEAT);
-+	define_test("GMAP/SR/SGGIT/CHA/BV-04-C [Characteristic GGIT - BGS "
-+						"Features]",
-+		test_setup_server, test_server, &cfg_read_bgs, SGGIT_CHA_FEAT);
-+	define_test("GMAP/SR/SGGIT/CHA/BV-05-C [Characteristic GGIT - BGR "
-+						"Features]",
-+		test_setup_server, test_server, &cfg_read_bgr, SGGIT_CHA_FEAT);
++	const struct bt_gmap *gmap = data;
++
++	return gmap->db.db == match_data;
 +}
 +
-+int main(int argc, char *argv[])
++struct bt_gmap *bt_gmap_find(struct gatt_db *db)
 +{
-+	tester_init(&argc, &argv);
-+	test_gmap_cl();
-+	test_gmap_sr();
-+
-+	return tester_run();
++	return db ? queue_find(instances, match_db, db) : NULL;
 +}
++
++static void gmap_update_chrc(struct bt_gmap *gmap)
++{
++	struct {
++		const uint32_t uuid;
++		uint8_t role;
++		struct bt_gmas_attr *attr;
++		const char *name;
++	} attrs[] = {
++		{ GMAP_ROLE_CHRC_UUID, 0, &gmap->db.role, "Role" },
++		{ GMAP_UGG_CHRC_UUID, BT_GMAP_ROLE_UGG, &gmap->db.ugg,
++							"UGG Features" },
++		{ GMAP_UGT_CHRC_UUID, BT_GMAP_ROLE_UGT, &gmap->db.ugt,
++							"UGT Features" },
++		{ GMAP_BGS_CHRC_UUID, BT_GMAP_ROLE_BGS, &gmap->db.bgs,
++							"BGS Features" },
++		{ GMAP_BGR_CHRC_UUID, BT_GMAP_ROLE_BGR, &gmap->db.bgr,
++							"BGR Features" },
++	};
++	unsigned int i;
++	bt_uuid_t uuid;
++
++	for (i = 0; i < ARRAY_SIZE(attrs); ++i) {
++		if (attrs[i].attr->attr)
++			continue;
++
++		attrs[i].attr->gmap = gmap;
++		attrs[i].attr->name = attrs[i].name;
++
++		if (attrs[i].role && !(gmap->db.role.value & attrs[i].role))
++			continue;
++
++		bt_uuid16_create(&uuid, attrs[i].uuid);
++		attrs[i].attr->attr = gatt_db_service_add_characteristic(
++					gmap->db.service,
++					&uuid,
++					BT_ATT_PERM_READ,
++					BT_GATT_CHRC_PROP_READ,
++					gmas_attr_read, NULL,
++					attrs[i].attr);
++		gatt_db_attribute_set_fixed_length(attrs[i].attr->attr, 1);
++	}
++}
++
++struct bt_gmap *bt_gmap_add_db(struct gatt_db *db)
++{
++	struct bt_gmap *gmap;
++	bt_uuid_t uuid;
++
++	if (!db || queue_find(instances, match_db, db))
++		return NULL;
++
++	gmap = new0(struct bt_gmap, 1);
++	gmap->db.db = gatt_db_ref(db);
++
++	bt_uuid16_create(&uuid, GMAS_UUID);
++	gmap->db.service = gatt_db_add_service(db, &uuid, true, 5*3);
++
++	if (!instances)
++		instances = queue_new();
++	queue_push_tail(instances, gmap);
++
++	return bt_gmap_ref(gmap);
++}
++
++void bt_gmap_set_role(struct bt_gmap *gmap, uint8_t role)
++{
++	if (gmap->client)
++		return;
++
++	gmap->db.role.value = role & BT_GMAP_ROLE_MASK;
++
++	gmap_update_chrc(gmap);
++
++	/* Expose values only when first set */
++	gatt_db_service_set_active(gmap->db.service, true);
++}
++
++
++void bt_gmap_set_features(struct bt_gmap *gmap, uint32_t features)
++{
++	if (gmap->client)
++		return;
++
++	gmap->db.ugg.value = (features & BT_GMAP_UGG_FEATURE_MASK)
++						>> BT_GMAP_UGG_FEATURE_SHIFT;
++	gmap->db.ugt.value = (features & BT_GMAP_UGT_FEATURE_MASK)
++						>> BT_GMAP_UGT_FEATURE_SHIFT;
++	gmap->db.bgs.value = (features & BT_GMAP_BGS_FEATURE_MASK)
++						>> BT_GMAP_BGS_FEATURE_SHIFT;
++	gmap->db.bgr.value = (features & BT_GMAP_BGR_FEATURE_MASK)
++						>> BT_GMAP_BGR_FEATURE_SHIFT;
++
++	gmap_update_chrc(gmap);
++
++	/* Expose values only when first set */
++	gatt_db_service_set_active(gmap->db.service, true);
++}
+diff --git a/src/shared/gmap.h b/src/shared/gmap.h
+new file mode 100644
+index 000000000..ef7d96e0a
+--- /dev/null
++++ b/src/shared/gmap.h
+@@ -0,0 +1,70 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2025  Pauli Virtanen. All rights reserved.
++ *
++ */
++
++#include <stdbool.h>
++#include <inttypes.h>
++
++#define BT_GMAP_ROLE_UGG		BIT(0)
++#define BT_GMAP_ROLE_UGT		BIT(1)
++#define BT_GMAP_ROLE_BGS		BIT(2)
++#define BT_GMAP_ROLE_BGR		BIT(3)
++#define BT_GMAP_ROLE_MASK		(BIT(4) - 1)
++
++#define BT_GMAP_UGG_MULTIPLEX		(BIT(0) << 0)
++#define BT_GMAP_UGG_96KBPS		(BIT(1) << 0)
++#define BT_GMAP_UGG_MULTISINK		(BIT(2) << 0)
++#define BT_GMAP_UGG_FEATURE_MASK	((BIT(3) - 1) << 0)
++#define BT_GMAP_UGG_FEATURE_SHIFT	0
++
++#define BT_GMAP_UGT_SOURCE		(BIT(0) << 8)
++#define BT_GMAP_UGT_80KBPS_SOURCE	(BIT(1) << 8)
++#define BT_GMAP_UGT_SINK		(BIT(2) << 8)
++#define BT_GMAP_UGT_64KBPS_SINK		(BIT(3) << 8)
++#define BT_GMAP_UGT_MULTIPLEX		(BIT(4) << 8)
++#define BT_GMAP_UGT_MULTISINK		(BIT(5) << 8)
++#define BT_GMAP_UGT_MULTISOURCE		(BIT(6) << 8)
++#define BT_GMAP_UGT_FEATURE_MASK	((BIT(7) - 1) << 8)
++#define BT_GMAP_UGT_FEATURE_SHIFT	8
++
++#define BT_GMAP_BGS_96KBPS		(BIT(0) << 16)
++#define BT_GMAP_BGS_FEATURE_MASK	((BIT(1) - 1) << 16)
++#define BT_GMAP_BGS_FEATURE_SHIFT	16
++
++#define BT_GMAP_BGR_MULTISINK		(BIT(0) << 24)
++#define BT_GMAP_BGR_MULTIPLEX		(BIT(1) << 24)
++#define BT_GMAP_BGR_FEATURE_MASK	((BIT(2) - 1) << 24)
++#define BT_GMAP_BGR_FEATURE_SHIFT	24
++
++#define BT_GMAP_FEATURE_MASK		(BT_GMAP_UGG_FEATURE_MASK | \
++					BT_GMAP_UGT_FEATURE_MASK | \
++					BT_GMAP_BGS_FEATURE_MASK | \
++					BT_GMAP_BGR_FEATURE_MASK)
++
++struct bt_gmap;
++
++typedef void (*bt_gmap_ready_func_t)(struct bt_gmap *gmap, void *user_data);
++typedef void (*bt_gmap_destroy_func_t)(void *user_data);
++typedef void (*bt_gmap_debug_func_t)(const char *str, void *user_data);
++
++struct bt_gmap *bt_gmap_ref(struct bt_gmap *gmap);
++void bt_gmap_unref(struct bt_gmap *gmap);
++
++struct bt_gmap *bt_gmap_attach(struct bt_gatt_client *client,
++				bt_gmap_ready_func_t ready, void *user_data);
++struct bt_gmap *bt_gmap_find(struct gatt_db *db);
++struct bt_gmap *bt_gmap_add_db(struct gatt_db *db);
++
++uint8_t bt_gmap_get_role(struct bt_gmap *gmap);
++uint32_t bt_gmap_get_features(struct bt_gmap *gmap);
++
++void bt_gmap_set_role(struct bt_gmap *gmas, uint8_t role);
++void bt_gmap_set_features(struct bt_gmap *gmas, uint32_t features);
++
++bool bt_gmap_set_debug(struct bt_gmap *gmap, bt_gmap_debug_func_t cb,
++			void *user_data, bt_gmap_destroy_func_t destroy);
 -- 
 2.51.1
 
