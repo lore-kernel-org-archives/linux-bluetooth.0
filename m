@@ -1,215 +1,236 @@
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011002.outbound.protection.outlook.com [52.101.65.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724F82FF14C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 09:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764320548; cv=none; b=KqWewDxhuybMRQw4yj5S25JhoVVoE6Tt93E4F6X7YCqcPqCJFPa1X31mvBmzWb8Igq6qJ2QL2dN7UdFlzYFgj6tJhvplVgcUQjqs9UQTDi56yLPnzeYtOKGRe2u8IuB+73/SthscbaVPmQ3/ByIWpef0hvcKf9Awab1fIIQC/KQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764320548; c=relaxed/simple;
-	bh=bFDdKSns5d3WkFMlQ1ny4/3w/r6PvGTkr33j5EFKuIM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YZBahMQjGqM7ZIK7y/CLBKFSYpBXliobQwSY9X2b2HLqqRMT/rEsDbxfnpHlwBMNiba1pvlLL+fEHY6J5gSxdlUE9E7aH9fTBbtXp/OwpleWRdTgYoMVn9TmrnH2PqEvxyuLd9jZsETWq3n9Y6PWj6xyVDA6GdHktowtRIvoEcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-433770ba913so10179305ab.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 01:02:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764320545; x=1764925345;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FYEGiucc3jDXdKRoaLp8Ulhwj2Z6I1Jr5vS3nTkXZ8w=;
-        b=hXj9a2hL7vmvoYfvCAG8c6PFNMQ3Qm/+eXP4sJyDum9P+IKtZJso2FmJdC6WIJ81tw
-         jRlb0hvnmBVPegYwbCe/vrh+K7UAtKerjcXA1vOUZsVsexZJgiwBFOllLS5LryYB1dTB
-         N4WBroo6X81J4PWM4CgJRadmXJ8dyuiXyFEFGWpgfGUDzWmwcZMApgeVM0VQ6pALKvIb
-         BLQyifuhCUwkBm28AeMrisSfDchHW6ArNjXLp8X++7GZGSQ3JGQNkyrnuMNqN6yCARfs
-         T2uTy40DIyNXd13LjYQ/ISVDFLOD093nlCP7ICuHgCj4RLclY0tedybJemAxsSQxVOfr
-         V1GQ==
-X-Gm-Message-State: AOJu0YyWi0D3aqU+ruYIG2Jm94vQonQULoa4CQjyD87AZDkcmfX3YSfi
-	6wl3YbO4agqhsJL9E6Z8hDt8SNNMe6ISGL1ne0/tk0VfqFpvRY06zHyjvd7PKl+PvUYVnFTITY0
-	04fGQabI9mY/XBH6KthReHTu7RhKzVib2P/eRt1CZRo6cBAhADWv4sTZwgxGLPA==
-X-Google-Smtp-Source: AGHT+IGgsEIj9zlZPvhC21Ddej9gE2P9agZoggSFa6AAB2s1p81DG79t+2jWTXCS8PMOtXzRAdxFDwUv4SL185TDErutiVvUvPW4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB89E2FDC5C;
+	Fri, 28 Nov 2025 09:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.2
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764321333; cv=fail; b=gOgtScGqLISn4TQ7DXkeJYXmvdZYFomu2Xhfw+FRkl2FSQyx/8Ven8JMHm4GGlLbj4m/cKxhvdBJhCwZOW0AkAqU5JYNObDG/pIhhP4ra2CNFuqhZZ16Wx6zNRmr7FtGXVSB2BG9g5bK6Ljlhepu/x8GD5uslRclmhbLrzO9Jes=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764321333; c=relaxed/simple;
+	bh=v/+IANBCitrH0JPPZW8ZJyA+ti5aycwt0Po200aux2c=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=sPcS5LAYHj3BYanpShZqVhhb59sMlDu2LWBOuAK9cH8m4+L6qWOtoVvWmIHHlHofl3HMdxPzb6ZbhtkG2eCarSNb+fHX1lSM9eDmPO0nnBKc5yRfVbjJEjueJibk8ZTmIcPP2Z8+pk0ixDOugRbpbSkc4GM2BzRu0H/Of3DD6Xs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=B84SWLuV; arc=fail smtp.client-ip=52.101.65.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="B84SWLuV"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nHSq9VyyP49RUfvwPsVv3Ln/7aq/WLlZf/V7kD1xqX+w3az9EvyrguQuEv+Gpb0oCpf3i95P8lAbupRKsiKyLaMDw1B536B8GprwwXDbrNRctRuRIpsAs2sYGFzpP8tv/xEEu0s3eczKrN3mEZh28VUhjEJ9IJ1B17FpD9cnETuKCuKR0bs/eTWUDseBE4ID9VyuJXJ3RYlHBfKRR1TEStKXM5ngHxMER0bfVXakYNK3gjsRPIZrLP7a4XQ3Zi5mn9//iCd5nIUSgKk1+jXANa2IC6lGR5NMKpxxJ4YJT/IxWPJAFzQKBFb13ipRlUkYBSE64xmB6wHx8zSPAwXs+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Zx+314doJI2eQrzvv4TMxXzH0PBnI/4dj0K+ZciJRWw=;
+ b=gRUBQoseP6FZxWUBiFO9UmGIGdeD4+PZdXUsT8s8JAjhaQiQIlIQe3rVC24twl/pQ++21jGVeWo9/ZVMUxKFyD1wM11WdGYkAs6swY0gJTQV6CPqOiYpy94CuwL1APM/5kWh9FGIFHKv6n4UVd2mjdkjUr7Syt7ZRDEETh8gyznuY6lQsE13Xxvhwl2UuprQCEZ4qcASXI1DWU2SP1+SiQYBo+9IMm4JfJuIWhvsdpi0/yIWqnWyqwmS0F3e69V/s5vIpIU4+Zg7FB/gnUk1G3I0QjCBkaGrhR5RtpoA8KnqADsRukSJro5DZrAS+8S7vaSLesxG+DmIi8IQTY5Z3Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zx+314doJI2eQrzvv4TMxXzH0PBnI/4dj0K+ZciJRWw=;
+ b=B84SWLuVDZUST3caZ7WczsteyB6zcKOle2PlF+263S0JD/2h5CgZg71cvL8Sagrx01V59eZdEWX9ZrHavbCQLprgxWBDy85S+39FCZDYYHRgOnNO8kXJzSO2cQ9awhd67UCEblG/QzwupplR5NDHKYXTutqojCWBKwNw7jUgpLZT/VTAri1zx2rcVBvKVQzeIko9R9CX2NPpoPupy/h26MWU22zJN9F2h/50JfLCPsvVqxUxqwtvNfHJH0w6yCMBHVDI58JHXWrOp6Cbf0QCVFaw0NCUaK8MD3X6U9r0WaWjVli4N41W3iMN0JhskoDWRSO+9/JBDi6gLx+a4VY2XQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB9PR04MB9676.eurprd04.prod.outlook.com (2603:10a6:10:308::13)
+ by AS5PR04MB9998.eurprd04.prod.outlook.com (2603:10a6:20b:67e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.16; Fri, 28 Nov
+ 2025 09:15:27 +0000
+Received: from DB9PR04MB9676.eurprd04.prod.outlook.com
+ ([fe80::97c:438a:2968:465d]) by DB9PR04MB9676.eurprd04.prod.outlook.com
+ ([fe80::97c:438a:2968:465d%4]) with mapi id 15.20.9366.009; Fri, 28 Nov 2025
+ 09:15:26 +0000
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	amitkumar.karwar@nxp.com,
+	sherry.sun@nxp.com,
+	dmitrii.lebed@nxp.com,
+	neeraj.sanjaykale@nxp.com
+Subject: [PATCH v2 00/11] Bluetooth: btnxpuart: Add secure interface support for NXP chipsets
+Date: Fri, 28 Nov 2025 14:44:32 +0530
+Message-ID: <20251128091443.2797316-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR01CA0007.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:191::11) To DB9PR04MB9676.eurprd04.prod.outlook.com
+ (2603:10a6:10:308::13)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3f09:b0:433:7826:2b69 with SMTP id
- e9e14a558f8ab-435b8e4fcb7mr239951145ab.11.1764320545535; Fri, 28 Nov 2025
- 01:02:25 -0800 (PST)
-Date: Fri, 28 Nov 2025 01:02:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69296521.a70a0220.d98e3.0134.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in skb_pull
-From: syzbot <syzbot+2d7ca98b34b871173f28@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB9PR04MB9676:EE_|AS5PR04MB9998:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a0575d3-aa4e-4562-5389-08de2e5eaad7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|52116014|1800799024|19092799006|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?HsVrSzBFVYgJkzLQvg0H8oNyQsheGo8URXrskvB3tvxVPT5kiEtwuNBI+bCF?=
+ =?us-ascii?Q?aMJ4DY2VrT5NwEkRPWEywbycZsbqcuJWVfUcmp4zJk+VFptQgrd7NYu9dvzz?=
+ =?us-ascii?Q?8tovL0ozK7I0WICylvAF3eWFP2W/EczovtJZJpWa/uhhP4nQ9fjGcQJxFmhO?=
+ =?us-ascii?Q?7ZuPyeaHV+8+2G4k7/rVxquzqiW/ppL1ipscJ/Ez7lw/3tH+l1FHP3YFmF0k?=
+ =?us-ascii?Q?ajWG0cdczkVKRvgrsHvH3yRCKMACDUHEJWbK/m3YSz/v9OnAmPEX6ivZkSc/?=
+ =?us-ascii?Q?/DambO5XwtAyLivABNnXbzLte5ERxYFW0Z5m5xl1kmLqGGchOG675EeORKQU?=
+ =?us-ascii?Q?7MOdK7YU5nFPDceoh1070XnjWnyR21wDrpsEPMS/yEgditKxSS/l8TOG68AJ?=
+ =?us-ascii?Q?QLntcZCfL9gkOBDh4pzKVOI4JeNuwT/1EJ7dPby/fKo8/hcIi3XhCwFtv4ge?=
+ =?us-ascii?Q?dxYfcWSlp2+tmXhbDY9FEUa1GpFdCBxynU1KykhBfb2O/IxCh/5webMkXepx?=
+ =?us-ascii?Q?sO6C8dr7DeUflHzHnMMYvYGaKehNCVjDK2eaaQJGsTr4W/CS0nFbS5eZzUI1?=
+ =?us-ascii?Q?XEQBjSj1OyMOtY7s15EG1qlZQ4RrQ3FmSLOwQ0aYhE0GzZPwFph5RfhtfrWT?=
+ =?us-ascii?Q?MO5eMm4Lm4uBnMxitUaqgJZYoKz80dP6YKGyHmdpGgYmiQD/iFqS6Akg+E6i?=
+ =?us-ascii?Q?SkxLKBmOga9jYWJLB+Z17pM9x9IMItHjkZbF1rujmIQXwO/vycaYINUcjkuq?=
+ =?us-ascii?Q?sOwZJSgEw/nwTUblFWAG4fhX1mjBIyKE7o1/u/aigIb7Te7w+aZwI8Zv52MG?=
+ =?us-ascii?Q?H2QAoaHETtprY2FR3zqxERH9oWClNpOkmlhZ+sVrIqO0I6AyxDSfL2gUElE7?=
+ =?us-ascii?Q?saqjLEGY/ebu0dVhwg5jqD5diCtdbOCqkQzy/HQZyw6KkTHb85WV9niMXNrx?=
+ =?us-ascii?Q?fhBoG4BpOqBRUY/654nf6QVO4YXmS6CRhldaL+ljdtEbFPNyFboaRVJ3rvUl?=
+ =?us-ascii?Q?vAf52u4599zP5X7C/10byXSpz+wraH4e66Wan/MTgCPQ/3NRfwosTBFknw2R?=
+ =?us-ascii?Q?Ut4o40s1vjygbrBXEw/QOzEIVOR0agK8h0Hao9PeU08Su7TiG8zkmjN1OgVW?=
+ =?us-ascii?Q?4Xz6V3krxLYBfXT36lZjHiO8L1jJusKQt2qro9sR6p/5+3hOT1L15K6akb+F?=
+ =?us-ascii?Q?BOf5FpQ9vG5eFHbnvEMVjNMFkdHqudGBWPiycCVsLU0XaI7/UFogC+eo4gbV?=
+ =?us-ascii?Q?nIoXGczwWX8hT2hbIvJDB+8Ve6P/k6TDBT10dzs7N+PmuwR9bmGxRfYqcywi?=
+ =?us-ascii?Q?bQTzBcKu2JIeAYEYTpGXgLObbVhRX+Sivij7vI56pZRxF87NV7A5sIXG8Hox?=
+ =?us-ascii?Q?WESAmjP8Oc3zhF+S51D7GaOyijI0xhjEKmBbhUpPET5wDOyY3nqaX6PykT5K?=
+ =?us-ascii?Q?CMFNX87SGPfmOF+MjS8Dal6LrUT3Q8yatbELKQIUmDCScJ4RaOztWoN6Duc1?=
+ =?us-ascii?Q?OVJzf99e/nooXyPll+htP+T480iZJSXQ6pIx?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB9676.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(52116014)(1800799024)(19092799006)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?jP5W9xwhQREZ5T3PXHDS0Cou9ENeH4pgvthvZ9CHIZMMFDigUTMT1zYbqmcV?=
+ =?us-ascii?Q?sAMRpgJYLyspq9n0CvtHSrwB2gJIsyNZnzKKAxskHy2Y4stob8yXScud2aA3?=
+ =?us-ascii?Q?b70BqIxHmiCxnuD/VK9GB9lBPr7YBdyCOgGLuvhseFiJNxJZx+LF2gGGwEN7?=
+ =?us-ascii?Q?85qs9sJmWOlfmpZu7wgYzYte1OivKbJaga8Fwt2EoalT2nJR6dfFVZgdCF6w?=
+ =?us-ascii?Q?Chg2m1NPbi4yEbub3W6AveglFpJsvoieWNjNjZLqb3rT2ZGDgkTmuZ/qIZx5?=
+ =?us-ascii?Q?+x+lvA1b16NgdP/N+KOrn0RzurZ7DV+Ki+Y2lUeS0MvxnYZUZrN5xvX6/tMP?=
+ =?us-ascii?Q?5/ORmc8R5aOycPOciaSsgu11W4RX9r7/V18OJBRC6zuAVvTjwJofB9l8rUhW?=
+ =?us-ascii?Q?WPTh/Ywj93TsHeGUlDaeDdoJJA1hwUB9du75vH6nAJNe+TajjaizqO+Ipffa?=
+ =?us-ascii?Q?hp7hQj98PPHXwYMoNW5lTyUjKEozoLKfpcdphGQJ7SKBQeDHzQ85EKd4ALA5?=
+ =?us-ascii?Q?XCf1jQrLCIxv4Wyz2Evil/w7yk+vD6z7CrDGxEAuAMm8qqzZYwz1FvYxDjQ0?=
+ =?us-ascii?Q?bQo1mxhrYaiY0ZLJ6ouCrDBCLgI+l353LCfDC/Nh9lAluF5ZjwcShs8hi6oq?=
+ =?us-ascii?Q?nNjf59gJM/u0FbLgXm5uSXRcF2NPEC34myoffng0wCI0JmoSPOO9Ji4HcH1w?=
+ =?us-ascii?Q?EcmrxdIPadfwFpjf/nWH4I8YB6dHTN1JIt13D+RqZMygCLF2ppSNySDvDQMV?=
+ =?us-ascii?Q?ywc93h0vNZ74M4bunF7Z8irVSKJIMA/Eg6+5EzzsfQRtmyBGodI4azY319ub?=
+ =?us-ascii?Q?E87YzpU8DdXl8Uxnpf41sUMzxDYZ6fnyp+wZcKGY9fjJq2Pposdjbbmstl3P?=
+ =?us-ascii?Q?bS1QHyveL3T6p3KzX5Z+LVkC/iaho2MJF3xrQ3yMpFP2tDefPjP2Xc8Q2Q3I?=
+ =?us-ascii?Q?FNc57rlLfKLxeG7HTJMkNcng0euSvSZYrqucmk9jtFu4AxNxJu2AHYolZRhl?=
+ =?us-ascii?Q?3Q3wSRihNTrm+ieeC5I82GfvVP8MYn6zgdv7O6iSDpw172Au9btMWh+VwAat?=
+ =?us-ascii?Q?Ad2ckbSooC/NXd+ttNBzgHiS6BV1122nKJdymV+C+hXHWy4aDqNsSjHnXXou?=
+ =?us-ascii?Q?X+MEHbWvUD4hMpoCgT3SpkGfPtWXQSUc41tNkNqDDZqHJf4if7Z93G+FmTZr?=
+ =?us-ascii?Q?lsSBFs4O1Qo1AKxPbZ8OJ3uUypxFeAiR5b3y8AZm7j3MXG0SLC+dKUSr1qek?=
+ =?us-ascii?Q?0+6BW3KEMOTcgaV9DazDNNsB+Iw15Zv7vmG9ZybwC/L6+zkB6+hWbZLEu4+N?=
+ =?us-ascii?Q?BeZ+PcPFIL0Snkr2JrU4+ed3XIPzeuE2MxJ0iIm9aFyKPsQnQ98Ij7NmuJQE?=
+ =?us-ascii?Q?X7lvN07Pp1+cC739jldSqnn8ML7pr2p4070KyvXL31wArYNvOLM4jm5DgiuM?=
+ =?us-ascii?Q?dReh03fagSCaneR25yky0aUsf5oxpgkcaR+NZr7Y6Dmf/Tnyo78nhhOui0mR?=
+ =?us-ascii?Q?cqacagi6TdeEoJbgWSHK1nAzhDZbodZEG5eri5/ofMFVZI4SP8LgnhvPlq1C?=
+ =?us-ascii?Q?WNwPd49mJynUMcCxVQcS9WcpU5V1cAzgZu9Zs15vYRUvUgGp9vHPikkk5PKN?=
+ =?us-ascii?Q?Tw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a0575d3-aa4e-4562-5389-08de2e5eaad7
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB9676.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2025 09:15:26.5334
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OhY/pO7yGc3GL6FlRnC8Hii/DJ5QMeyZ5NGrHAW6NpjbabNFb7f8YASsYI5WlJ5sREyT1hCV7eBTYhgo09vF2GI6mgqcRKXpG68Khu+TZ/o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB9998
 
-Hello,
+This patch series adds secure interface support for NXP Bluetooth chipsets 
+to protect against UART-based attacks on Bluetooth security keys.
 
-syzbot found the following issue on:
+Problem Statement:
+==================
+Bluetooth UART drivers are vulnerable to physical attacks where adversaries
+can monitor UART TX/RX lines to extract sensitive cryptographic material.
+As demonstrated in research [1], attackers can capture H4 packets 
+containing Link Keys, LTKs, and other pairing data transmitted in plaintext
+over UART.
 
-HEAD commit:    d13f3ac64efb Merge tag 'mips-fixes_6.18_1' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=171bd8b4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=14b6a9313e132a6b
-dashboard link: https://syzkaller.appspot.com/bug?extid=2d7ca98b34b871173f28
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+Once an attacker obtains these keys from UART traffic, they can:
+- Decrypt all Bluetooth communication for paired devices
+- Impersonate trusted devices
+- Perform man-in-the-middle attacks
 
-Unfortunately, I don't have any reproducer for this issue yet.
+This vulnerability affects any Bluetooth implementation using UART
+transport, making physical access to UART lines equivalent to compromising
+all paired device security.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7bcabeb5eac8/disk-d13f3ac6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f32f75375954/vmlinux-d13f3ac6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/889beba59370/bzImage-d13f3ac6.xz
+Solution:
+=========
+Implement a TLS 1.3-inspired secure interface that:
+- Authenticates the chipset using ECDSA signature verification
+- Establishes shared encryption keys via ECDH key exchange
+- Encrypts sensitive HCI commands (Link Key Reply, LTK Reply, etc.) using
+  AES-GCM
+- Decrypts encrypted vendor events from the chipset
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2d7ca98b34b871173f28@syzkaller.appspotmail.com
+This ensures that even with full UART access, attackers cannot extract
+usable cryptographic keys from the communication channel.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in skb_pull_inline include/linux/skbuff.h:2839 [inline]
-BUG: KASAN: slab-use-after-free in skb_pull+0x133/0x1d0 net/core/skbuff.c:2619
-Read of size 4 at addr ffff8880687ace30 by task kworker/0:1/16647
+Implementation Overview:
+========================
+The solution is implemented in 11 incremental patches:
 
-CPU: 0 UID: 0 PID: 16647 Comm: kworker/0:1 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Workqueue: events hci_uart_write_work
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- skb_pull_inline include/linux/skbuff.h:2839 [inline]
- skb_pull+0x133/0x1d0 net/core/skbuff.c:2619
- hci_uart_write_work+0x329/0x550 drivers/bluetooth/hci_ldisc.c:168
- process_one_work kernel/workqueue.c:3263 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+1-2:   Add firmware metadata parsing and version detection
+3-4:   Establish secure interface framework and crypto setup
+5-7:   Implement TLS handshake (Host Hello, Device Hello, authentication)
+8:     Derive application traffic keys for encryption/decryption
+9-10:  Add command encryption and event decryption support
+11:    Add required crypto algorithm dependencies
 
-Allocated by task 16739:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- unpoison_slab_object mm/kasan/common.c:342 [inline]
- __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:368
- kasan_slab_alloc include/linux/kasan.h:252 [inline]
- slab_post_alloc_hook mm/slub.c:4978 [inline]
- slab_alloc_node mm/slub.c:5288 [inline]
- kmem_cache_alloc_node_noprof+0x433/0x710 mm/slub.c:5340
- __alloc_skb+0x112/0x2d0 net/core/skbuff.c:660
- alloc_skb include/linux/skbuff.h:1383 [inline]
- bt_skb_alloc include/net/bluetooth/bluetooth.h:510 [inline]
- hci_cmd_sync_alloc+0x3d/0x380 net/bluetooth/hci_sync.c:58
- hci_cmd_sync_add net/bluetooth/hci_sync.c:99 [inline]
- __hci_cmd_sync_sk+0x1a7/0xbc0 net/bluetooth/hci_sync.c:168
- __hci_cmd_sync_status_sk net/bluetooth/hci_sync.c:263 [inline]
- __hci_cmd_sync_status net/bluetooth/hci_sync.c:287 [inline]
- hci_read_local_features_sync net/bluetooth/hci_sync.c:3708 [inline]
- hci_init_stage_sync net/bluetooth/hci_sync.c:3623 [inline]
- hci_init1_sync net/bluetooth/hci_sync.c:3755 [inline]
- hci_init_sync net/bluetooth/hci_sync.c:4867 [inline]
- hci_dev_init_sync net/bluetooth/hci_sync.c:5059 [inline]
- hci_dev_open_sync+0x14be/0x2b60 net/bluetooth/hci_sync.c:5137
- hci_dev_do_open net/bluetooth/hci_core.c:430 [inline]
- hci_power_on+0x1b4/0x680 net/bluetooth/hci_core.c:959
- process_one_work kernel/workqueue.c:3263 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+The implementation automatically detects secure interface capability via
+firmware version strings and enables encryption only when needed. Legacy
+chipsets continue to work without modification.
 
-The buggy address belongs to the object at ffff8880687acdc0
- which belongs to the cache skbuff_head_cache of size 240
-The buggy address is located 112 bytes inside of
- freed 240-byte region [ffff8880687acdc0, ffff8880687aceb0)
+Security Properties:
+===================
+- Chipset authentication prevents rogue device substitution
+- Forward secrecy through ephemeral ECDH key exchange
+- Authenticated encryption (AES-GCM) prevents tampering
+- Per-session keys limit exposure from key compromise
 
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x687ac
-memcg:ffff88806bd25281
-flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000000 ffff88801d2fb8c0 dead000000000100 dead000000000122
-raw: 0000000000000000 00000000000c000c 00000000f5000000 ffff88806bd25281
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 6067, tgid 6067 (kworker/u8:10), ts 1088046828849, free_ts 1087965340429
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x234/0x290 mm/page_alloc.c:1845
- prep_new_page mm/page_alloc.c:1853 [inline]
- get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3879
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5178
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
- alloc_slab_page mm/slub.c:3059 [inline]
- allocate_slab+0x96/0x350 mm/slub.c:3232
- new_slab mm/slub.c:3286 [inline]
- ___slab_alloc+0xf56/0x1990 mm/slub.c:4655
- __slab_alloc+0x65/0x100 mm/slub.c:4778
- __slab_alloc_node mm/slub.c:4854 [inline]
- slab_alloc_node mm/slub.c:5276 [inline]
- kmem_cache_alloc_node_noprof+0x4c5/0x710 mm/slub.c:5340
- __alloc_skb+0x112/0x2d0 net/core/skbuff.c:660
- alloc_skb include/linux/skbuff.h:1383 [inline]
- nsim_dev_trap_skb_build drivers/net/netdevsim/dev.c:763 [inline]
- nsim_dev_trap_report drivers/net/netdevsim/dev.c:820 [inline]
- nsim_dev_trap_report_work+0x29a/0xb80 drivers/net/netdevsim/dev.c:866
- process_one_work kernel/workqueue.c:3263 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-page last free pid 5194 tgid 5194 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1394 [inline]
- __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2901
- __tlb_remove_table_free mm/mmu_gather.c:227 [inline]
- tlb_remove_table_rcu+0x85/0x100 mm/mmu_gather.c:290
- rcu_do_batch kernel/rcu/tree.c:2605 [inline]
- rcu_core+0xcab/0x1770 kernel/rcu/tree.c:2861
- handle_softirqs+0x286/0x870 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:723
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
- common_interrupt+0xbb/0xe0 arch/x86/kernel/irq.c:318
- asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:688
+Testing:
+========
+Tested on AW693 chipsets with secure firmware. Verified that:
+- Authentication handshake completes successfully
+- Sensitive commands are encrypted before transmission
+- Encrypted events are properly decrypted
+- UART monitoring shows only encrypted payloads for sensitive operations
+- Legacy chipsets remain unaffected
 
-Memory state around the buggy address:
- ffff8880687acd00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
- ffff8880687acd80: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
->ffff8880687ace00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                     ^
- ffff8880687ace80: fb fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc
- ffff8880687acf00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+[1] "BLAP: Bluetooth Low Energy Attacks on Pairing" - DSN 2022
+    https://netsec.ethz.ch/publications/papers/dsn22_blap.pdf
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Neeraj Sanjay Kale (11):
+  Bluetooth: btnxpuart: Add firmware metadata parsing for secure
+    interface
+  Bluetooth: btnxpuart: Print FW version and enable chip specific
+    features
+  Bluetooth: btnxpuart: Add secure interface TLS authentication support
+  Bluetooth: btnxpuart: Implement TLS authentication crypto framework
+  Bluetooth: btnxpuart: Add TLS host hello handshake implementation
+  Bluetooth: btnxpuart: Add TLS device hello processing
+  Bluetooth: btnxpuart: Add device authentication
+  Bluetooth: btnxpuart: Derive traffic keys from TLS 1.3 handshake
+  Bluetooth: btnxpuart: Add command encryption for sensitive HCI
+    commands
+  Bluetooth: btnxpuart: Add encrypted event handling
+  Bluetooth: btnxpuart: Select crypto algorithms for secure interface
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+ drivers/bluetooth/Kconfig     |    7 +
+ drivers/bluetooth/btnxpuart.c | 1442 ++++++++++++++++++++++++++++++++-
+ 2 files changed, 1440 insertions(+), 9 deletions(-)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+-- 
+2.43.0
 
-If you want to undo deduplication, reply with:
-#syz undup
