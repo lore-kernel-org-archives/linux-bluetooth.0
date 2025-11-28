@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2C32BE622
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 20:02:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00CB2D9EE7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 20:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764360174; cv=pass; b=G7s0I6MYjkgc5UiPorkPCp9yhvCPV2rfpw5nCKDj/kCHrTewhVZO9tixLhLNl2AMygCb3yaEgt0oKRZgmdus8FO/Jddv3jCqsC8ejWrTrYdNLUiAdnHFDYOsx0ZYtVwDSmFDxYMuAu3Ac5dphDH0OBlHsCwZGkKhIPkAsulRR2s=
+	t=1764360174; cv=pass; b=oDWzFRscnOM2VVAVomS7jV27GC2dMzt9WprYll+AKrCRJ1NxkILLWrpl3oA30E/J4rRlQrxkTwWehCAVjd83Z8ga2V7w4G3MpBmQss5wtTJatqJ3BrV4ivNBHdCNw0PWpjc1FQiy1H9jdip5H2NpQoRSmGqsXdRnGyub7MA2Ibk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764360174; c=relaxed/simple;
-	bh=iUr0Jdf2RU82jcN63CfWE/PZbM7IVTdxZOc6MUKZkYs=;
+	bh=hy9dgkEqpm5Trb/jQQ32dPxR86XXZ6p9UJagUZPKmqU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MbfToHws0Z0LJ6wU4Tp3b465SY21vELgdpc4gVTSjlnPuZtTBMSiiIbQnpKcipI6nFtNX5ZkspHoT9mOpIwWvPlhi6b+rLbe3TSZJagcBumS7alSwRqcLtJkPDEnINpSaywa894ddr+3M48EhOp8Ux7K9g+iAtchoznzXqFgFW0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=f7K7xm7E; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=L97zUG5LyeicthueFLgiUM5cGsYyoLSu2uxdOFbPpcerz3iHkKEGVs3iHANH+hC2OK96kOdBdiy+uV4Bq+giyKc2MvKKPWnb7yB/TdbwZIuneJ+l4oSoS12Ffm1Rtga6/QX2GY3NJK7oB5gF4MiUPtBTIGIyc+3GLA8J9rnuwtI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=gQhcteBG; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="f7K7xm7E"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="gQhcteBG"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dJ4356lCBz10Kc;
-	Fri, 28 Nov 2025 22:02:41 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dJ4345rBSz109Q;
+	Fri, 28 Nov 2025 22:02:40 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1764360162;
+	t=1764360160;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xWTA02LCtg1U/jhkAqSE1NenFJJny1Pv5JBIi6rno78=;
-	b=f7K7xm7EvvMPbJStrwefjKUXgQITl6KOaOiAdS8mTILivZZ39GUXywWTgoxJJaW/nr/MSd
-	DrZP4NuT9QxWT08T1rzDcSzUpS438xnkJEinsr3j7YAalC18emulHnMIKZigdUdhXDOOqW
-	GW4BY3w6DezJkl/9/1lyFCGGuDJPeoY=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764360162;
-	b=CkgP5AVACoDMocMideTh7JUAkRcElz2PX4m+9dEUPOE70D8Wy+1ny4qu2Kr/ZPdHB8nKiZ
-	ueYg+wzvJJsi9jD3Rfg63MZTVfnomGnPpAxKXU3wH5MHs5mr7YAylykaet6LgxPdv5N0WA
-	+53wdEbnuTLDmb3YMkmzYMM2ZA7gh6s=
+	bh=k6WW/LbWZ9Der3Aa+r+VY9mKZkKEMkw3mhkwvpJkZFQ=;
+	b=gQhcteBGIqLOlteFC2piuy8Ws7u83w5Rv+FsTCzGvB2ThIZunE5tc+W4G4R0wNagHx8IVJ
+	j7OxiyV5ff+rzf9DOUI5dhF/b5brmJLoxmA55PzR2hyGlY5FbCiBeGQEsS9ELcF1XrWJnG
+	M9fr7Tpx+DzpnYXd3DhTrHo+MNwyqrA=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764360160;
+	b=iB6QU604N1qVw0iDllwQ+sr2gz4QMWej8dK/o3DVvUId44Y/1PB55bmGtcPinY+j/BoGY2
+	lBbSRkpDszPsAfmjDU901XLI3jzJRQmug3WbJjtCq7bvT8efzoB9dNpORNWBdXvYSCFmkT
+	d5UriZlCaEpnaFPLlvJfdFIqkHApRLg=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1764360162;
+	s=meesny; t=1764360160;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xWTA02LCtg1U/jhkAqSE1NenFJJny1Pv5JBIi6rno78=;
-	b=MhjQEHCi9OPIFMxiVmy1z+dHv96oBNYVmXahbFDtTVvuBRNrYlf7e0kn4e/OXLI2lmFIKd
-	xnYLMlX6vWWafqm8tJ4l8JEL4X05JD3U0HxKSrQ5zf4LgZwHFbX7OihYszlFJBtkvXlpox
-	Uiut8mNFeWNfetqfUucVjNMXiNWwZxs=
+	bh=k6WW/LbWZ9Der3Aa+r+VY9mKZkKEMkw3mhkwvpJkZFQ=;
+	b=ODcJzx/+7PALQix8N584OnQnosCFEXSGX/ePGMsTwxESQ5Eo1mPZt9pUp/nAbxk2t/r5+k
+	4S/iIlwHry8+G01yeaS0sXmjY+NEX0WskupNQhQS+9wGg9+B7gQFqSH658q2Wx9OEp0Av3
+	QGe1O48q8BElUSX3WOw44ufWh93ml68=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 9/9] bap: have unicast client wait for VCS & TMAS & GMAP
-Date: Fri, 28 Nov 2025 22:02:28 +0200
-Message-ID: <c833be2c695b126089c8c9242a7aa5d69e267cdc.1764360141.git.pav@iki.fi>
+Subject: [PATCH BlueZ v2 5/9] bap: add SupportedFeatures for MediaEndpoints
+Date: Fri, 28 Nov 2025 22:02:24 +0200
+Message-ID: <da848f8cc1c85683386cdf475743ff448c5ce00d.1764360140.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1764360140.git.pav@iki.fi>
 References: <cover.1764360140.git.pav@iki.fi>
@@ -67,103 +67,170 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Have unicast client to wait for VCS, TMAS, and GMAP before creating
-endpoints and transports, so that their information is available at that
-point.
+Indicate TMAP & GMAP capabilities in SupportedFeatures.
 ---
 
 Notes:
     v2:
-    - use the generic mechanism to do this
+    - make it a dict uuid -> features
 
- profiles/audio/bap.c | 41 ++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 38 insertions(+), 3 deletions(-)
+ profiles/audio/bap.c | 122 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 122 insertions(+)
 
 diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 0dcc57eb5..8e6a7c57f 100644
+index b07d65e68..0dcc57eb5 100644
 --- a/profiles/audio/bap.c
 +++ b/profiles/audio/bap.c
-@@ -145,6 +145,8 @@ struct bap_data {
- 	GIOChannel *listen_io;
- 	unsigned int io_id;
- 	unsigned int cig_update_id;
-+	bool services_ready;
-+	bool bap_ready;
- };
+@@ -46,6 +46,8 @@
+ #include "src/shared/gatt-client.h"
+ #include "src/shared/gatt-server.h"
+ #include "src/shared/bap.h"
++#include "src/shared/tmap.h"
++#include "src/shared/gmap.h"
  
- static struct queue *sessions;
-@@ -2137,10 +2139,10 @@ static bool pac_found_bcast(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	return true;
+ #include "btio/btio.h"
+ #include "src/plugin.h"
+@@ -65,6 +67,10 @@
+ #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
+ #define MEDIA_INTERFACE "org.bluez.Media1"
+ 
++#define VCS_UUID_STR "00001844-0000-1000-8000-00805f9b34fb"
++#define TMAS_UUID_STR "00001855-0000-1000-8000-00805f9b34fb"
++#define GMAS_UUID_STR "00001858-0000-1000-8000-00805f9b34fb"
++
+ struct bap_setup;
+ 
+ typedef void (*bap_setup_ready_func_t)(struct bap_setup *setup, int code,
+@@ -438,6 +444,120 @@ static gboolean get_qos(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
--static void bap_ready(struct bt_bap *bap, void *user_data)
-+static void bap_ucast_start(struct bap_data *data)
- {
--	struct btd_service *service = user_data;
--	struct bap_data *data = btd_service_get_user_data(service);
-+	struct btd_service *service = data->service;
-+	struct bt_bap *bap = data->bap;
- 
- 	DBG("bap %p", bap);
- 
-@@ -3723,6 +3725,29 @@ static void pa_and_big_sync(struct bap_setup *setup)
- 	}
- }
- 
-+static void bap_ready(struct bt_bap *bap, void *user_data)
++static bool probe_tmap_role(struct bap_ep *ep, uint32_t data)
 +{
-+	struct btd_service *service = user_data;
-+	struct bap_data *data = btd_service_get_user_data(service);
++	struct gatt_db *db = bt_bap_get_db(ep->data->bap, true);
 +
-+	DBG("bap %p", bap);
-+
-+	data->bap_ready = true;
-+	if (data->services_ready)
-+		bap_ucast_start(data);
++	return bt_tmap_get_role(bt_tmap_find(db)) & data;
 +}
 +
-+static void bap_services_ready(struct btd_service *service)
++static bool probe_gmap_role(struct bap_ep *ep, uint32_t data)
 +{
-+	struct bap_data *data = btd_service_get_user_data(service);
++	struct gatt_db *db = bt_bap_get_db(ep->data->bap, true);
 +
-+	DBG("%p", data);
-+
-+	data->services_ready = true;
-+	if (data->bap_ready)
-+		bap_ucast_start(data);
++	return bt_gmap_get_role(bt_gmap_find(db)) & data;
 +}
 +
- static int bap_bcast_probe(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
-@@ -3877,6 +3902,9 @@ static int bap_accept(struct btd_service *service)
- 		return -EINVAL;
- 	}
- 
-+	data->bap_ready = false;
-+	data->services_ready = false;
++static bool probe_gmap_feature(struct bap_ep *ep, uint32_t data)
++{
++	struct gatt_db *db = bt_bap_get_db(ep->data->bap, true);
 +
- 	if (!bt_bap_attach(data->bap, client)) {
- 		error("BAP unable to attach");
- 		return -EINVAL;
-@@ -3996,10 +4024,17 @@ static struct btd_profile bap_profile = {
- 	.device_remove	= bap_remove,
- 	.accept		= bap_accept,
- 	.disconnect	= bap_disconnect,
-+	.ready		= bap_services_ready,
- 	.adapter_probe	= bap_adapter_probe,
- 	.adapter_remove	= bap_adapter_remove,
- 	.auto_connect	= true,
- 	.experimental	= true,
-+	.after_uuids = (const char *[]) {
-+		VCS_UUID_STR,
-+		TMAS_UUID_STR,
-+		GMAS_UUID_STR,
-+		NULL
-+	},
++	return bt_gmap_get_features(bt_gmap_find(db)) & data;
++}
++
++struct feature {
++	const char *name;
++	bool (*probe)(struct bap_ep *ep, uint32_t data);
++	uint32_t data;
++};
++
++static const struct feature tmap_features[] = {
++	{ "cg", probe_tmap_role, BT_TMAP_ROLE_CG },
++	{ "ct", probe_tmap_role, BT_TMAP_ROLE_CT },
++	{ "ums", probe_tmap_role, BT_TMAP_ROLE_UMS },
++	{ "umr", probe_tmap_role, BT_TMAP_ROLE_UMR },
++	{ "bms", probe_tmap_role, BT_TMAP_ROLE_BMS },
++	{ "bmr", probe_tmap_role, BT_TMAP_ROLE_BMR },
++};
++
++static const struct feature gmap_features[] = {
++	{ "ugg", probe_gmap_role, BT_GMAP_ROLE_UGG },
++	{ "ugt", probe_gmap_role, BT_GMAP_ROLE_UGT },
++	{ "bgs", probe_gmap_role, BT_GMAP_ROLE_BGS },
++	{ "bgr", probe_gmap_role, BT_GMAP_ROLE_BGR },
++	{ "ugg-multiplex", probe_gmap_feature, BT_GMAP_UGG_MULTIPLEX },
++	{ "ugg-96kbps-source", probe_gmap_feature, BT_GMAP_UGG_96KBPS },
++	{ "ugg-multisink", probe_gmap_feature, BT_GMAP_UGG_MULTISINK },
++	{ "ugt-source", probe_gmap_feature, BT_GMAP_UGT_SOURCE },
++	{ "ugt-80kbps-source", probe_gmap_feature,
++						BT_GMAP_UGT_80KBPS_SOURCE },
++	{ "ugt-sink", probe_gmap_feature, BT_GMAP_UGT_SINK },
++	{ "ugt-64kbps-sink", probe_gmap_feature, BT_GMAP_UGT_64KBPS_SINK },
++	{ "ugt-multiplex", probe_gmap_feature, BT_GMAP_UGT_MULTIPLEX },
++	{ "ugt-multisink", probe_gmap_feature, BT_GMAP_UGT_MULTISINK },
++	{ "ugt-multisource", probe_gmap_feature, BT_GMAP_UGT_MULTISOURCE },
++	{ "bgs-96kbps", probe_gmap_feature, BT_GMAP_BGS_96KBPS },
++	{ "bgr-multisink", probe_gmap_feature, BT_GMAP_BGR_MULTISINK },
++	{ "bgr-multiplex", probe_gmap_feature, BT_GMAP_BGR_MULTIPLEX },
++};
++
++static const struct {
++	const char *uuid;
++	const struct feature *items;
++	size_t count;
++} features[] = {
++	{ TMAS_UUID_STR, tmap_features, ARRAY_SIZE(tmap_features) },
++	{ GMAS_UUID_STR, gmap_features, ARRAY_SIZE(gmap_features) },
++};
++
++static gboolean supported_features(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct bap_ep *ep = data;
++	DBusMessageIter dict, entry, variant, list;
++	size_t i, j;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
++
++	for (i = 0; i < ARRAY_SIZE(features); ++i) {
++		for (j = 0; j < features[i].count; ++j) {
++			const struct feature *feature = &features[i].items[j];
++
++			if (feature->probe(ep, feature->data))
++				break;
++		}
++		if (j == features[i].count)
++			continue;
++
++		dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
++								NULL, &entry);
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++							&features[i].uuid);
++		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++								"as", &variant);
++		dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
++								"s", &list);
++
++		for (j = 0; j < features[i].count; ++j) {
++			const struct feature *feature = &features[i].items[j];
++
++			if (!feature->probe(ep, feature->data))
++				continue;
++
++			dbus_message_iter_append_basic(&list, DBUS_TYPE_STRING,
++								&feature->name);
++		}
++
++		dbus_message_iter_close_container(&variant, &list);
++		dbus_message_iter_close_container(&entry, &variant);
++		dbus_message_iter_close_container(&dict, &entry);
++	}
++
++	dbus_message_iter_close_container(iter, &dict);
++
++	return TRUE;
++}
++
+ static const GDBusPropertyTable ep_properties[] = {
+ 	{ "UUID", "s", get_uuid, NULL, NULL,
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+@@ -457,6 +577,8 @@ static const GDBusPropertyTable ep_properties[] = {
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{ "QoS", "a{sv}", get_qos, NULL, qos_exists,
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "SupportedFeatures", "a{sv}", supported_features, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{ }
  };
  
- static struct btd_profile bap_bcast_profile = {
 -- 
 2.51.1
 
