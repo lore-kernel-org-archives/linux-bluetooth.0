@@ -1,64 +1,64 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803BB32C948
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 16:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB9D32ED50
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 16:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764345977; cv=none; b=iWUyIdUaQ/LvKAM3Gert3lIVFDLXeq13qGheAGk05TFWGNmLN6JUtIGsbmCzGi73Sgbvpb7NXX7ne/K+zEO8OcuK7/Ws9lyJJiQFnqdjKiXaXR0mpQmGIrSrpDfP95y9TEBt0h/PPABPmkYdvaVDMqJxKqNMESenerM75c/J0yg=
+	t=1764345981; cv=none; b=Ww6TC7G9myyDLjFAegmWWAb2KrcjatfuTX5tunVT7rAdhzLVM8EuZkkqehdtJrhMntMNWefL2cIzlTa2pns9JE7t2zSH7iq4MVx3/ASQRjCxCPngCIejRCp1zpx398GnnfZNBJ5iJH/T8l20VjbAh6NtxvcukG+sXWAnklMDm4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764345977; c=relaxed/simple;
-	bh=HhT6z2DVcZ8yTv/m6DHxcDKqHPAmK3H4JJhD4dhIVH0=;
+	s=arc-20240116; t=1764345981; c=relaxed/simple;
+	bh=p4TRIPhh7eCXg4oL8eEB5Ly0L/lmhP7XDzG06yVs7As=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dASrakCUWTIRUlMC3mHmZJjY1jpKkge0Tj+M5gR/kUObfy+QmihdX3wheTj9maKoakFRAUubzCgpa7QEdW1dbUrybkJ9ONN3SGtPf1lC5oZObjRgM+zg5XHE1qecdfTlFECCApYbyBlTLpCikcaE/+fS12ka9jG7SWH3u5+U2W4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QDAJp0YI; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=ot1XWpArZt/WVUPYYS3An6M1lCRLfyxSJiWqyriGcLJSpwMCwmzOqs0/g5hTbSpogWzEXQc+GPDCa4KiT389tc8pQ6mGGaA3tj2uVdjBe07MQu8NcGeONVPju3ORwA2w7Ff1gCtRHQTp2UVbB4X/FIOK84nCZ/IAjrLESw9flEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=frEHY2mJ; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDAJp0YI"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7b80fed1505so2458014b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 08:06:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="frEHY2mJ"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7ade456b6abso1681682b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Nov 2025 08:06:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764345975; x=1764950775; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764345980; x=1764950780; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2Ivwth3bvYn00MIlpqUjU3pfVj9NAWsfF7rOKTWPDVU=;
-        b=QDAJp0YInzlKue+cv1quVOhF5wjp2MQKtZ25y/ab5AoqQoFav8QSfIRN3qgbtLzhZC
-         mDrqmxkT33Ui8Fd0wqq6Mh+qngVGG0Qdbk5ZWOSRBAmbI0qrPE2zXwCJXrODPhk20lxf
-         9mFDcy8dWatGATCSftKHWFTdBc3Mw95YAgws3p6r76TpR21oAGcq1pTOsirQvv27DaRo
-         TRf3RD+VYD4eKo6vMTDXF7Ysj7H+N2bJjVCst4f9gwpm1lDLCB6XJLb7uM6LHjR99zh/
-         inyGu3LBpma3g/U3T4DWJ3V7xBcjqXpO3KZ4+N+zqYvHFMB/ZD7dY2QKLNm9y+Ug2Omy
-         mjuQ==
+        bh=pWjvp+vOFGL8T/NXTev+NZf62jPu9HyIJqL4GkC+d9Y=;
+        b=frEHY2mJ7l5Rncm3cA/ZaOD3JYo++2nO6VWFcYAaLZxferXeZuUWGub4VehRO3fS/X
+         KzzK2Jn1cVofOekGtlHP1DuNbasOSfNRKYbacrIaRmpgqLOOeYTt4PcbYQYrjicnw6fQ
+         VAOBYFzPnk5839WRKjsDS2tAsnk3WiKZWv4B8v66YHKGjY8xljGP5cbFTEtI80kMn2pb
+         5Cs23tHv+JaycJk9XeZAOMIJY+MBeHel8aLZZWfMFAQ7MtiWtOJXlYcZy0Fi5MkogeAM
+         zS38vMZ18ux0zWNWQouAKEaEG/WLTv6TW7/nejB2h++AQCh795zvCnmNqAonm+doVAbR
+         RGPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764345975; x=1764950775;
+        d=1e100.net; s=20230601; t=1764345980; x=1764950780;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=2Ivwth3bvYn00MIlpqUjU3pfVj9NAWsfF7rOKTWPDVU=;
-        b=xSzP/uA1y1zeZpnqBwslmQpLRU8AhLwwBKNZKbFo9L5ngac4zvqjHhjEFsiZzgZK5E
-         vvYQHWVQF4LhUJYjp1h9OSW4RYB7Q/ZMYQIFV68h7Lwen8ce1CDWiMBJe6IefwdPIqGA
-         5esl4ShjU6CIJpu/rBVKiZYhHrgWHuS+W0M7hXsWWfgy+Z/uFKBBkEoa6MAm7c1aiHGc
-         0qSDO9n4njYUHJ/+RHpr+58RN3QqN5DzVAgxCW0aqXnZa1eV+nk8Rd44/9cNzzPQakXe
-         mRvgfgazsYHq4mfbyO+X5TsiSBvzP6116v1BKPP08MWW2Q1RxEqm5f5lqi2lsp0nHbuT
-         xaHg==
-X-Forwarded-Encrypted: i=1; AJvYcCVA6mcEvub91L5+lvWWnvFqr8Rd0vE9MKan03r90elzGpPLUXUuy65G/UlvAkNB6TZB/46b6UCV4ijhE61baUQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJL1tgTWYSIGNGglOBH1XLR922ykgiUkpVnPspA54DfMxv1LSQ
-	vIG3zppRA9ZJX/M6ZqD8J7kZR0V7L664n2bXtAJ1DYV2Xl6hHUsge5xr
-X-Gm-Gg: ASbGncskg/vUyhjI66SjC0uhn5ZmK2nav3ZJRX1uDpNSA9mrrGU+1ufjK57jt/mdso1
-	MWbMc4jsOqJUZWz3k1EBg1raOStfLgaXeyFOshpaumVhepnkSs7Ykt698fd3ULlB9Y5x3pxtz4L
-	biOM9BxEmoxBTNdiGQQ3+RaJs5fNNPevhhqwV6Dc16f6vB5PpR6bGUulx3ha6pwewzAZjNGUEXH
-	7tkA4bJpo5QmFBUDlkYfvTgGT20Gu8UyqN6l+DkcRuWZn+GONOlDBG6G+jzg8ytuVLmJY8Ms25F
-	eKwyUhbtdFmRrUIvuua14UIQx0W0J/5ovCsybgotsgNbPwN+xDvTGi9+rDODAw7pKB/YK9Ty0IE
-	HlpnOXjso4X18RXMu1UnSFNSdQsxAUOFOLX57MSadLUal9TeLJvzmVMXt8kAPeC/dqGWYpP2Slo
-	Q0MaPPck19fM/eX55gyrX2iVRdd2IRyltAm4xBxQ==
-X-Google-Smtp-Source: AGHT+IFt9S/vPqjUM0mz+GQlgswc6/I0j11kLNLh5CdF1ZTntqzS++PULCgN0F0Q/MhhEDQPVXOPYQ==
-X-Received: by 2002:a05:6a00:3e29:b0:783:c2c4:9aa5 with SMTP id d2e1a72fcca58-7c58effc088mr29961873b3a.32.1764345974342;
-        Fri, 28 Nov 2025 08:06:14 -0800 (PST)
+        bh=pWjvp+vOFGL8T/NXTev+NZf62jPu9HyIJqL4GkC+d9Y=;
+        b=ECRIHvXvvDpMFa4kohk88kzu6gm6Gc2Efx2ZWus4xGQLLfqshwjnMImRRVj9dbiuiT
+         C1fa6RfOVQCEETyNWpdJ6XRUUw99Q5Wa4oqNal6d4pvF57MthUZq/o5pRhfO/HkhqzWz
+         m3YG9alAMbpzvtetjbmHPqQZpxtW2C+B4+2wdPxt7wJ4CoTJ4OQfVLKpjL3zD4cvpe5L
+         TVPm/FRGa6L5hSc3FveO/Q0etkaJNuphrF5dWKF9QRohiG2rfeZZPAdBWxLoG8XXkFZy
+         wP0U30MIvsDraJyK7rD+0hkqND80H05vR+41mzV2zFkbvoMLf1ACJTtuKXfAi8KpCRpC
+         uYoA==
+X-Forwarded-Encrypted: i=1; AJvYcCWc34Apx3DU569ziRp+qGUGboDweRvgqSGk38Y/zRV8WLfDHdSflyS9t/842RNCunLQeHlmgOpYihXQe6yZuYY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9ekAo2WudZZAy277YcmmTPElewwux1YYh6f9pXgL2bUVliBAQ
+	OPc1oV0mAeQevI4UApotu0Xy6bCDb94gcVZ9SwoVnLZtGEw2KIW0sr5p
+X-Gm-Gg: ASbGncsgR0Hlbo2Lw4KTDWEoHJpKVvn4PIWkClO4Adzp3awGbR/yuloZT7AfjtTI1il
+	PhrVu6vqKAPD6karh+ukqJDSwFq5GXTG3Aqe8APhZnLNdo28OjH1Tqx6TI/gFIvUkRg3UwFIvuo
+	NTC6WwSx8o8udqj71IY8jaNvlls5324tBzsxXig/dI2PQN4LztrhdRO9BhlDaw+JHuTELe38wbQ
+	By2OqQRGiKZZgH9/a4UCLTG0Tlzt8ELurJbZzmX5UduFQSlYqIt17ml1iD7oq/fgBQHMEnOtng1
+	adeHnarkdZx0nYxdmr/9qNZGv73d+NU7nJk85t6rhetqTEiAJQznFaEfQoShgF6+K4g1ZHecq/Q
+	MfPjt4AUvWcoadl1SNHwacdNqgRiU7fl2P2XbvhF9bjGlJazEIyv4RHHOu+lA27V1suVb1D8XMe
+	3mh/KYcE1aTm2zjLZn3jAXcNOL3GkeUdUfoqL+tg==
+X-Google-Smtp-Source: AGHT+IFapLhQU9fdniLElMhOTBueBGSZ5wz5zku4Mw2lynCB6SmbEsu5fwwc8sIpEraRjt+Qk/oxxw==
+X-Received: by 2002:a05:6a00:181d:b0:7a2:8111:780a with SMTP id d2e1a72fcca58-7c58c2b1851mr32051480b3a.2.1764345979249;
+        Fri, 28 Nov 2025 08:06:19 -0800 (PST)
 Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15f26f11fsm5408499b3a.50.2025.11.28.08.06.09
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15f26f11fsm5408499b3a.50.2025.11.28.08.06.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 08:06:13 -0800 (PST)
+        Fri, 28 Nov 2025 08:06:18 -0800 (PST)
 From: Jeongjun Park <aha310510@gmail.com>
 To: stable@vger.kernel.org
 Cc: gregkh@linuxfoundation.org,
@@ -80,9 +80,9 @@ Cc: gregkh@linuxfoundation.org,
 	aha310510@gmail.com,
 	linux-staging@lists.linux.dev,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH 5.15.y 05/14] timers: Get rid of del_singleshot_timer_sync()
-Date: Sat, 29 Nov 2025 01:05:30 +0900
-Message-Id: <20251128160539.358938-6-aha310510@gmail.com>
+Subject: [PATCH 5.15.y 06/14] timers: Replace BUG_ON()s
+Date: Sat, 29 Nov 2025 01:05:31 +0900
+Message-Id: <20251128160539.358938-7-aha310510@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251128160539.358938-1-aha310510@gmail.com>
 References: <20251128160539.358938-1-aha310510@gmail.com>
@@ -96,124 +96,70 @@ Content-Transfer-Encoding: 8bit
 
 From: Thomas Gleixner <tglx@linutronix.de>
 
-[ Upstream commit 9a5a305686971f4be10c6d7251c8348d74b3e014 ]
+[ Upstream commit 82ed6f7ef58f9634fe4462dd721902c580f01569 ]
 
-del_singleshot_timer_sync() used to be an optimization for deleting timers
-which are not rearmed from the timer callback function.
+The timer code still has a few BUG_ON()s left which are crashing the kernel
+in situations where it still can recover or simply refuse to take an
+action.
 
-This optimization turned out to be broken and got mapped to
-del_timer_sync() about 17 years ago.
+Remove the one in the hotplug callback which checks for the CPU being
+offline. If that happens then the whole hotplug machinery will explode in
+colourful ways.
 
-Get rid of the undocumented indirection and use del_timer_sync() directly.
-
-No functional change.
+Replace the rest with WARN_ON_ONCE() and conditional returns where
+appropriate.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Tested-by: Guenter Roeck <linux@roeck-us.net>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Link: https://lore.kernel.org/r/20221123201624.706987932@linutronix.de
+Link: https://lore.kernel.org/r/20221123201624.769128888@linutronix.de
 Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 ---
- drivers/char/tpm/tpm-dev-common.c     | 4 ++--
- drivers/staging/wlan-ng/hfa384x_usb.c | 4 ++--
- drivers/staging/wlan-ng/prism2usb.c   | 6 +++---
- include/linux/timer.h                 | 2 --
- kernel/time/timer.c                   | 2 +-
- net/sunrpc/xprt.c                     | 2 +-
- 6 files changed, 9 insertions(+), 11 deletions(-)
+ kernel/time/timer.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/char/tpm/tpm-dev-common.c b/drivers/char/tpm/tpm-dev-common.c
-index 56e56a09cc90..c3fbbf4d3db7 100644
---- a/drivers/char/tpm/tpm-dev-common.c
-+++ b/drivers/char/tpm/tpm-dev-common.c
-@@ -157,7 +157,7 @@ ssize_t tpm_common_read(struct file *file, char __user *buf,
- out:
- 	if (!priv->response_length) {
- 		*off = 0;
--		del_singleshot_timer_sync(&priv->user_read_timer);
-+		del_timer_sync(&priv->user_read_timer);
- 		flush_work(&priv->timeout_work);
- 	}
- 	mutex_unlock(&priv->buffer_mutex);
-@@ -264,7 +264,7 @@ __poll_t tpm_common_poll(struct file *file, poll_table *wait)
- void tpm_common_release(struct file *file, struct file_priv *priv)
- {
- 	flush_work(&priv->async_work);
--	del_singleshot_timer_sync(&priv->user_read_timer);
-+	del_timer_sync(&priv->user_read_timer);
- 	flush_work(&priv->timeout_work);
- 	file->private_data = NULL;
- 	priv->response_length = 0;
-diff --git a/drivers/staging/wlan-ng/hfa384x_usb.c b/drivers/staging/wlan-ng/hfa384x_usb.c
-index 0d869b5e309c..8687e0bf3315 100644
---- a/drivers/staging/wlan-ng/hfa384x_usb.c
-+++ b/drivers/staging/wlan-ng/hfa384x_usb.c
-@@ -1116,8 +1116,8 @@ static int hfa384x_usbctlx_complete_sync(struct hfa384x *hw,
- 		if (ctlx == get_active_ctlx(hw)) {
- 			spin_unlock_irqrestore(&hw->ctlxq.lock, flags);
- 
--			del_singleshot_timer_sync(&hw->reqtimer);
--			del_singleshot_timer_sync(&hw->resptimer);
-+			del_timer_sync(&hw->reqtimer);
-+			del_timer_sync(&hw->resptimer);
- 			hw->req_timer_done = 1;
- 			hw->resp_timer_done = 1;
- 			usb_kill_urb(&hw->ctlx_urb);
-diff --git a/drivers/staging/wlan-ng/prism2usb.c b/drivers/staging/wlan-ng/prism2usb.c
-index 4b08dc1da4f9..83fcb937a58e 100644
---- a/drivers/staging/wlan-ng/prism2usb.c
-+++ b/drivers/staging/wlan-ng/prism2usb.c
-@@ -171,9 +171,9 @@ static void prism2sta_disconnect_usb(struct usb_interface *interface)
- 		 */
- 		prism2sta_ifstate(wlandev, P80211ENUM_ifstate_disable);
- 
--		del_singleshot_timer_sync(&hw->throttle);
--		del_singleshot_timer_sync(&hw->reqtimer);
--		del_singleshot_timer_sync(&hw->resptimer);
-+		del_timer_sync(&hw->throttle);
-+		del_timer_sync(&hw->reqtimer);
-+		del_timer_sync(&hw->resptimer);
- 
- 		/* Unlink all the URBs. This "removes the wheels"
- 		 * from the entire CTLX handling mechanism.
-diff --git a/include/linux/timer.h b/include/linux/timer.h
-index e78521bce565..3c166b4f704d 100644
---- a/include/linux/timer.h
-+++ b/include/linux/timer.h
-@@ -198,8 +198,6 @@ static inline int del_timer_sync(struct timer_list *timer)
- 	return timer_delete_sync(timer);
- }
- 
--#define del_singleshot_timer_sync(t) del_timer_sync(t)
--
- extern void init_timers(void);
- struct hrtimer;
- extern enum hrtimer_restart it_real_fn(struct hrtimer *);
 diff --git a/kernel/time/timer.c b/kernel/time/timer.c
-index d4ce3ebe2c8c..6cd908cfbad4 100644
+index e09852be4e63..7094b916c854 100644
 --- a/kernel/time/timer.c
 +++ b/kernel/time/timer.c
-@@ -1912,7 +1912,7 @@ signed long __sched schedule_timeout(signed long timeout)
- 	timer_setup_on_stack(&timer.timer, process_timeout, 0);
- 	__mod_timer(&timer.timer, expire, MOD_TIMER_NOTPENDING);
- 	schedule();
--	del_singleshot_timer_sync(&timer.timer);
-+	del_timer_sync(&timer.timer);
- 
- 	/* Remove the timer from the object tracker */
- 	destroy_timer_on_stack(&timer.timer);
-diff --git a/net/sunrpc/xprt.c b/net/sunrpc/xprt.c
-index 2db834318d14..2bccb5a90934 100644
---- a/net/sunrpc/xprt.c
-+++ b/net/sunrpc/xprt.c
-@@ -1160,7 +1160,7 @@ xprt_request_enqueue_receive(struct rpc_task *task)
- 	spin_unlock(&xprt->queue_lock);
- 
- 	/* Turn off autodisconnect */
--	del_singleshot_timer_sync(&xprt->timer);
-+	del_timer_sync(&xprt->timer);
+@@ -1208,7 +1208,8 @@ EXPORT_SYMBOL(timer_reduce);
+  */
+ void add_timer(struct timer_list *timer)
+ {
+-	BUG_ON(timer_pending(timer));
++	if (WARN_ON_ONCE(timer_pending(timer)))
++		return;
+ 	__mod_timer(timer, timer->expires, MOD_TIMER_NOTPENDING);
  }
+ EXPORT_SYMBOL(add_timer);
+@@ -1227,7 +1228,8 @@ void add_timer_on(struct timer_list *timer, int cpu)
+ 	struct timer_base *new_base, *base;
+ 	unsigned long flags;
  
- /**
+-	BUG_ON(timer_pending(timer) || !timer->function);
++	if (WARN_ON_ONCE(timer_pending(timer) || !timer->function))
++		return;
+ 
+ 	new_base = get_timer_cpu_base(timer->flags, cpu);
+ 
+@@ -2047,8 +2049,6 @@ int timers_dead_cpu(unsigned int cpu)
+ 	struct timer_base *new_base;
+ 	int b, i;
+ 
+-	BUG_ON(cpu_online(cpu));
+-
+ 	for (b = 0; b < NR_BASES; b++) {
+ 		old_base = per_cpu_ptr(&timer_bases[b], cpu);
+ 		new_base = get_cpu_ptr(&timer_bases[b]);
+@@ -2065,7 +2065,8 @@ int timers_dead_cpu(unsigned int cpu)
+ 		 */
+ 		forward_timer_base(new_base);
+ 
+-		BUG_ON(old_base->running_timer);
++		WARN_ON_ONCE(old_base->running_timer);
++		old_base->running_timer = NULL;
+ 
+ 		for (i = 0; i < WHEEL_SIZE; i++)
+ 			migrate_timer_list(new_base, old_base->vectors + i);
 --
