@@ -1,242 +1,123 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131431DDA18
-	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Nov 2025 16:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764434470; cv=pass; b=qLOSKk/hYC0/emgYQB3vFCtTCXi6uL4/+HSzhQ9o+LlliWvRqKDI6X5iI8o7MDkeiS7KZ1FW9stUD/WJW5lWu93JRbJovwbT4RqGKWNJd2aaLTlajtGIAJxrwYK5Jg96uWlxFxqCnxX7ID3SCiBL7qPDcAxZ9A4K5ti2NHqE4gc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764434470; c=relaxed/simple;
-	bh=uJpgN/g4j+TpseN2MCi9ffeVEHxxNaJ706/rkXWBgjc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l1xqa1Sbud9jkPKKZj1hGxFQ430iWoJxy5OgSyXR8xKeJ6q+a3NIRtKCBqlcmEP7oel/0mYMCkuRtkuRJOdI82sPoKosFyvlRTB/yDj2hvtJpyUuLdIVz0sh42jmtl4WrTrKM9lZBFyyRKM6zQqOwU/RL7KKu1Oiku9gD6l8I5I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=TlUzwS1o; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BF81AA7BF
+	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Nov 2025 16:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764435073; cv=none; b=Q5U3GXLegI3lQjIE96+jINCILH7PToVqq178ABl6WzO9FS9BgE7eio+mgdOFjTGEjYb96CRPPPBXmfhbnPQeB89Q8CiQGmjHJqv7Qy614M4u1TKxZmKcvf51SGBjIVB7csJoGLgRDo6BioVIqHATeW7tRjvRrgD2ztczseiFAtc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764435073; c=relaxed/simple;
+	bh=4ZFuPP0dSHxAUPC42sa7t2uBltHBwmsLrAA8agN17Wo=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=XQKzc87tham9jU43pOZUuYz2S3XMrnjQa0I32Rd01z55ylb3S6iP+cvUU4EJXNPVXOuc455txtjUG2mS+NEdq2Vtq2jrNAd30u55zcbfWDponJMUZn3APEbji2M/Z/31Sx8ZQGy1IrkUu15ck/uqdtPPfn0uyHV0QXNPS7X18so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kRUC+dyw; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="TlUzwS1o"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dJbX00ZvHzyS8;
-	Sat, 29 Nov 2025 18:41:04 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1764434464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ah88DNQLPDrWIA+9birTfnQp89YVTQgsBNKkAXzZ0uA=;
-	b=TlUzwS1oSZSBqDAvT0zQp5jwV+IN6RaoAb/VeJF6WO76/wL3a0dY53RObV9WbJEquYuVWv
-	mxttwPfeKZhPJOOvnc+zl7BPDiEHddL7AJTth0CWETM1PfXPQ5CpL5PIK5ZUT5lFvG5oPJ
-	FFg9m8sOOppIYI052nROicVaAYl8XVs=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764434464;
-	b=cv2caOBwaGJ55+73BsTnyYeuIr/TRbgfRYt0k3K1AiYHefJlu1wBiTzO/WkHNJy+PDhhKe
-	o0EjQ+JptxDpLC+1W/F9vwFQ9Vy6RiuWjL/tDqXZ6Nv8+mVrgfRZPsZPh887ivO1chBo2y
-	DySEFgUorzNtpvrTv+iFDC5LxutX4gI=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1764434464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ah88DNQLPDrWIA+9birTfnQp89YVTQgsBNKkAXzZ0uA=;
-	b=GVWyz3/t46JYW4vF1iMwZPG0p/MR4eFgeBD9dOzE3/S8EpLC2uIPSjR6LWLABgUqMiegj1
-	z8ZQHVcZD5xspTYAlTtrszUrPVuZH24GmqfMrHRBFsYw5HRAIv7Rkm4ha2d1qFm7kwzq0z
-	Xpc1QJZfT+1xLf22ugOfLut9BBRQLEk=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kRUC+dyw"
+Received: from github.com (hubbernetes-node-530f5b9.ac4-iad.github.net [10.52.206.108])
+	by smtp.github.com (Postfix) with ESMTPA id 1B709202F0
+	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Nov 2025 08:51:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1764435071;
+	bh=iAhEtm6iDEPREZh7c3Yzo2Zk1EekBvRWezfsraWId+w=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=kRUC+dywolEVnZanLhW/MXrdBDQ5/Skbv+770+tLycwTn1FMHV35qsjnJVBH6Fs27
+	 dWOHPq2T3aM7waYDqO9sNNZ+NcI+kKV7bxneWWWJxFoigmgR0YYnQQxPEBrBGT4Clw
+	 iGs6Ntqb93ZsYsPaiK0dtt2e8ab7Bk2JhhWQNACs=
+Date: Sat, 29 Nov 2025 08:51:11 -0800
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 1/4] sco-tester: add timeout / close during connection tests
-Date: Sat, 29 Nov 2025 18:40:59 +0200
-Message-ID: <ab1a4fceca2948a2844dbac64fbca08ee7514f3e.1764434454.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
+Message-ID: <bluez/bluez/push/refs/heads/1028907/000000-76c2fa@github.com>
+Subject: [bluez/bluez] dba0f9: sco-tester: add timeout / close during
+ connection ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1028907
+  Home:   https://github.com/bluez/bluez
+  Commit: dba0f97b9f65d3dcd1878cf507cde768c4b2c43d
+      https://github.com/bluez/bluez/commit/dba0f97b9f65d3dcd1878cf507cde768c4b2c43d
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-29 (Sat, 29 Nov 2025)
+
+  Changed paths:
+    M tools/sco-tester.c
+
+  Log Message:
+  -----------
+  sco-tester: add timeout / close during connection tests
 
 Add tests for connect timeout behavior and kernel corner cases:
 
 eSCO CVSD - Timeout
 eSCO CVSD - Close
----
 
-Notes:
-    Resend.
 
- tools/sco-tester.c | 77 +++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 70 insertions(+), 7 deletions(-)
+  Commit: 61281d56bb5d308de0bde799b8307d88bc7d50da
+      https://github.com/bluez/bluez/commit/61281d56bb5d308de0bde799b8307d88bc7d50da
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-29 (Sat, 29 Nov 2025)
 
-diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-index d2ab51b35..660f36e07 100644
---- a/tools/sco-tester.c
-+++ b/tools/sco-tester.c
-@@ -56,9 +56,15 @@ struct sco_client_data {
- 	const uint8_t *send_data;
- 	uint16_t data_len;
- 
-+	/* Connect timeout */
-+	unsigned int connect_timeout_us;
-+
- 	/* Shutdown socket after connect */
- 	bool shutdown;
- 
-+	/* Close socket after connect */
-+	bool close_after_connect;
-+
- 	/* Enable SO_TIMESTAMPING with these flags */
- 	uint32_t so_timestamping;
- 
-@@ -247,7 +253,7 @@ static void test_data_free(void *test_data)
- }
- 
- #define test_sco_full(name, data, setup, func, _disable_esco, _enable_codecs, \
--							_disable_sco_flowctl) \
-+					_disable_sco_flowctl, _timeout) \
- 	do { \
- 		struct test_data *user; \
- 		user = malloc(sizeof(struct test_data)); \
-@@ -264,28 +270,39 @@ static void test_data_free(void *test_data)
- 		user->disable_sco_flowctl = _disable_sco_flowctl; \
- 		tester_add_full(name, data, \
- 				test_pre_setup, setup, func, NULL, \
--				test_post_teardown, 2, user, test_data_free); \
-+				test_post_teardown, _timeout, user, \
-+				test_data_free); \
- 	} while (0)
- 
- #define test_sco(name, data, setup, func) \
--	test_sco_full(name, data, setup, func, false, false, false)
-+	test_sco_full(name, data, setup, func, false, false, false, 2)
- 
- #define test_sco_no_flowctl(name, data, setup, func) \
--	test_sco_full(name, data, setup, func, false, false, true)
-+	test_sco_full(name, data, setup, func, false, false, true, 2)
- 
- #define test_sco_11(name, data, setup, func) \
--	test_sco_full(name, data, setup, func, true, false, false)
-+	test_sco_full(name, data, setup, func, true, false, false, 2)
- 
- #define test_sco_11_no_flowctl(name, data, setup, func) \
--	test_sco_full(name, data, setup, func, true, false, true)
-+	test_sco_full(name, data, setup, func, true, false, true, 2)
- 
- #define test_offload_sco(name, data, setup, func) \
--	test_sco_full(name, data, setup, func, false, true, false)
-+	test_sco_full(name, data, setup, func, false, true, false, 2)
- 
- static const struct sco_client_data connect_success = {
- 	.expect_err = 0
- };
- 
-+static const struct sco_client_data connect_timeout = {
-+	.expect_err = ETIMEDOUT,
-+	.connect_timeout_us = 1,
-+};
-+
-+/* Check timeout handling if closed before connect finishes */
-+static const struct sco_client_data connect_close = {
-+	.close_after_connect = true,
-+};
-+
- static const struct sco_client_data disconnect_success = {
- 	.expect_err = 0,
- 	.shutdown = true,
-@@ -684,6 +701,7 @@ end:
- 
- static int create_sco_sock(struct test_data *data)
- {
-+	const struct sco_client_data *scodata = data->test_data;
- 	const uint8_t *central_bdaddr;
- 	struct sockaddr_sco addr;
- 	int sk, err;
-@@ -697,6 +715,19 @@ static int create_sco_sock(struct test_data *data)
- 		return err;
- 	}
- 
-+	if (scodata->connect_timeout_us) {
-+		struct timeval timeout = {
-+			.tv_sec = scodata->connect_timeout_us / 1000000,
-+			.tv_usec = scodata->connect_timeout_us % 1000000
-+		};
-+
-+		if (setsockopt(sk, SOL_SOCKET, SO_SNDTIMEO,
-+					(void *)&timeout, sizeof(timeout))) {
-+			tester_warn("failed to set timeout: %m");
-+			return -EINVAL;
-+		}
-+	}
-+
- 	central_bdaddr = hciemu_get_central_bdaddr(data->hciemu);
- 	if (!central_bdaddr) {
- 		tester_warn("No central bdaddr");
-@@ -923,6 +954,7 @@ static gboolean sco_connect_cb(GIOChannel *io, GIOCondition cond,
- static void test_connect(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-+	const struct sco_client_data *scodata = data->test_data;
- 	GIOChannel *io;
- 	int sk;
- 
-@@ -938,6 +970,12 @@ static void test_connect(const void *test_data)
- 		return;
- 	}
- 
-+	if (scodata->close_after_connect) {
-+		close(sk);
-+		tester_test_passed();
-+		return;
-+	}
-+
- 	data->sk = sk;
- 
- 	io = g_io_channel_unix_new(sk);
-@@ -1036,6 +1074,25 @@ end:
- 	close(sk);
- }
- 
-+static bool hook_delay_evt(const void *msg, uint16_t len, void *user_data)
-+{
-+	tester_print("Delaying emulator response...");
-+	g_usleep(500000);
-+	tester_print("Delaying emulator response... Done.");
-+	return true;
-+}
-+
-+static void test_connect_delayed(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_EVT,
-+					BT_HCI_EVT_SYNC_CONN_COMPLETE,
-+					hook_delay_evt, NULL);
-+
-+	test_connect(test_data);
-+}
-+
- static bool hook_setup_sync_evt(const void *buf, uint16_t len, void *user_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -1201,6 +1258,12 @@ int main(int argc, char *argv[])
- 	test_sco("eSCO CVSD - Success", &connect_success, setup_powered,
- 							test_connect);
- 
-+	test_sco_full("eSCO CVSD - Timeout", &connect_timeout, setup_powered,
-+				test_connect_delayed, false, false, false, 8);
-+
-+	test_sco("eSCO CVSD - Close", &connect_close, setup_powered,
-+						test_connect_delayed);
-+
- 	test_sco("eSCO mSBC - Success", &connect_success, setup_powered,
- 							test_connect_transp);
- 
--- 
-2.51.1
+  Changed paths:
+    M emulator/btdev.c
 
+  Log Message:
+  -----------
+  btdev: implement Sync Conn Accept/Reject flow
+
+Send HCI Connection Request properly for Setup Synchronous Connection,
+instead of proceeding to Connection Complete immediately.
+
+See Core v6.1 Vol 2 Part F Sec 5
+
+
+  Commit: 75cd750ecb653d79eb086b750821c4372be67c06
+      https://github.com/bluez/bluez/commit/75cd750ecb653d79eb086b750821c4372be67c06
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-29 (Sat, 29 Nov 2025)
+
+  Changed paths:
+    M emulator/bthost.c
+    M emulator/bthost.h
+
+  Log Message:
+  -----------
+  bthost: add bthost_setup_sco() and accept incoming eSCO
+
+Add support for bthost initiating SCO connections and accepting eSCO
+ones with BT_HCI_CMD_ACCEPT_SYNC_CONN_REQUEST.
+
+
+  Commit: 76c2fad61c095b8c9e420b28aaae92a78a6708b3
+      https://github.com/bluez/bluez/commit/76c2fad61c095b8c9e420b28aaae92a78a6708b3
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-11-29 (Sat, 29 Nov 2025)
+
+  Changed paths:
+    M tools/sco-tester.c
+
+  Log Message:
+  -----------
+  sco-tester: add socket listen tests
+
+Add basic SCO server tests:
+
+SCO CVSD Listen - Success
+SCO CVSD Listen Defer - Success
+SCO CVSD Listen Recv - Success
+SCO CVSD Listen Send - Success
+
+
+Compare: https://github.com/bluez/bluez/compare/dba0f97b9f65%5E...76c2fad61c09
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
