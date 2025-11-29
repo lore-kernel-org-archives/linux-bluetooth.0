@@ -1,139 +1,183 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C30E2475CF;
-	Sat, 29 Nov 2025 14:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764426674; cv=none; b=Sxo1hPp3WSd5PqN2GqITi1mZoFmIeGeo/36jarfEx8lnSxPMgawifVPSIz06jZ/DF7BV1RhbdK1rU0HRklUySiXM+6Q+3dm7o4xbODItXmaY36zkXJt6zGyibeOUbEhOUOP7tcy3Ln0klK5Swd4/FnL2Zo7cfcMPeEZG7gkFQ6c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764426674; c=relaxed/simple;
-	bh=OOXM+8VJNr1jofMq1aDwIoY/tJO1ZvIsD3b19brw7lc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FCdDzs/duUsn4BXITUAsA78yUYV+ycWDFrOKQqPRv09WDwaYOG8NQ5VyRJWb7smtVbyLITP7KxwocUlAhoNl4N5VHqA9AR8qi9carSdI/ASsPPzqDzDXaSf/eUJ+F+MgnUkLypMKFzWgcPPnlfupXu38/SqX9mNx6/XDnkA91Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PWj4NUCZ; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBE222759C
+	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Nov 2025 16:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764434469; cv=pass; b=JeExrWaC8yEvPWrldvUCxI6lPI84NcllV5296f//TBLYtpteqxYsco9ieJvz2w7JisYcyyfB/7EYcZZ8fVO1uVDa/7Pg9FazC62DQixZXiKe0IggxcMGhrqKp55wpz0myEq5XdTXzEknGeq7KCrCK0ok3zjkD7eZe471lpYfgZw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764434469; c=relaxed/simple;
+	bh=73tEKxuhVp4SYZZPoil2tsvj6n94pcpkZApzsJ26wd4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FEtLOSL1d7r8MzpEG9vT2jNr+hdL6pER+DtRllTldkbJByL4M9lWPwZx9tYPSFnfk9c58fQ9k65/KF+SZv9OZf2KzTT62o3bSUHlOp9RE7Whn35QwRxIdvkAXbOGXBVKcqTZbz8hw1tYeMuzJE8uj6D3TPMFX+33pXmmLJxyO3w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=nFbwwl7L; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PWj4NUCZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E083AC4CEF7;
-	Sat, 29 Nov 2025 14:31:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764426671;
-	bh=OOXM+8VJNr1jofMq1aDwIoY/tJO1ZvIsD3b19brw7lc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PWj4NUCZXJCf0cQOQb/LwGSzkgtSkTq3JT0SBX/1zyzCien82/KxUzpcFPaPNswO1
-	 LPsmXmQGJaV/nsBwXaRc+feT5qhOHUyfve6rwdiYNZTuZDq4ve43Lr9B6KzaOEx1BT
-	 3zmN40bldzF85pdUb/lerOgzou1GFRyUUPNCnRVlHr1SUTob626mzl5IcZJvMWTvAt
-	 OANnR3Mpymo9zIAywoq14c/rXgiM7+MbSLIw+wWZzQrHmOWro44T3QcT70eaQ626DY
-	 MvjC4jKdWWhEH5sfrKC/+iEzAFN9Gm2uGILsrHvsHzIGHMqlgMtiMcR6i1cpV+wLao
-	 gm220dgQpILkw==
-Message-ID: <9efa0a3c-ffef-488a-97f3-45b9649d35fd@kernel.org>
-Date: Sat, 29 Nov 2025 15:31:03 +0100
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="nFbwwl7L"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dJbX146HmzybB;
+	Sat, 29 Nov 2025 18:41:05 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1764434465;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F3OJuMMef1m6fBs7HkrxWlr5JMm8VZBpddi0degFzT8=;
+	b=nFbwwl7LKDpBkyqjuF6fIjkzvhfoGlXHN+lUEVFq27EcWkGSpobjnyGbCYeJ953rG721IG
+	XLarysp1lydSTvcJh2WTQT/OhWI7X49ME+nMF/OXBFP9ajPwknG6VddG14bxNzERw2M482
+	dYmd0JKolBw3Q+ACb9X6U3Lg0wht/54=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764434465;
+	b=niEKcn3rT0R/H1ortlzpvxA/ZY5ci4J7uKKNe9lQ66j+b1lG6/dd14ktpTjEorOHBSstTJ
+	6HYmaAQV9W5h1u93+DxL7we4LfHjj5LB9iTsC39YHUYv3z+kHHhu8mrRWceuBmoD3GanQZ
+	VnWddVO/sMIP/BV311saJMRK2Fk2JWM=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1764434465;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F3OJuMMef1m6fBs7HkrxWlr5JMm8VZBpddi0degFzT8=;
+	b=DP2Ir8ANJkyociymrnsCdyEJxPxsMCRxHVzPvQYSqasKaD3kHl0DRCUBXCYaoycHb3aiRm
+	/40yrXqlncQYP6ZhXDq8xo4q9RhI00LfuF0q7TGkeINDwg2YcWptNLugvY/W4veUcKM+Sk
+	4kFKb6wOAMtbkeuAcQRAFX2SLUwub64=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 3/4] bthost: add bthost_setup_sco() and accept incoming eSCO
+Date: Sat, 29 Nov 2025 18:41:01 +0200
+Message-ID: <f1ac0d4f8cd5c1c86a7bbb07a6635c003297bf34.1764434454.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
+In-Reply-To: <ab1a4fceca2948a2844dbac64fbca08ee7514f3e.1764434454.git.pav@iki.fi>
+References: <ab1a4fceca2948a2844dbac64fbca08ee7514f3e.1764434454.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/10] power: sequencing: pcie-m2: Add support for PCIe
- M.2 Key E connectors
-To: manivannan.sadhasivam@oss.qualcomm.com, Rob Herring <robh@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Mark Pearson <mpearson-lenovo@squebb.ca>,
- "Derek J. Clark" <derekjohn.clark@gmail.com>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org,
- linux-pci@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
- <20251125-pci-m2-e-v2-10-32826de07cc5@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
- QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
- +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
- ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
- 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
- hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
- tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
- 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
- naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
- hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
- whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
- qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
- RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
- Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
- H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
- dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
- AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
- jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
- zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
- XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20251125-pci-m2-e-v2-10-32826de07cc5@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 25/11/2025 15:45, Manivannan Sadhasivam via B4 Relay wrote:
->  static const struct pwrseq_pcie_m2_pdata pwrseq_pcie_m2_m_of_data = {
->  	.targets = pwrseq_pcie_m2_m_targets,
->  };
-> @@ -92,6 +174,96 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
->  	return PWRSEQ_NO_MATCH;
->  }
->  
-> +static int pwrseq_m2_pcie_notify(struct notifier_block *nb, unsigned long action,
-> +			      void *data)
-> +{
-> +	struct pwrseq_pcie_m2_ctx *ctx = container_of(nb, struct pwrseq_pcie_m2_ctx, nb);
-> +	struct pci_dev *pdev = to_pci_dev(data);
-> +	struct device_node *pci_remote __free(device_node) = NULL;
+Add support for bthost initiating SCO connections and accepting eSCO
+ones with BT_HCI_CMD_ACCEPT_SYNC_CONN_REQUEST.
+---
+ emulator/bthost.c | 63 ++++++++++++++++++++++++++++++++++++++++++++---
+ emulator/bthost.h |  3 +++
+ 2 files changed, 63 insertions(+), 3 deletions(-)
 
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 9f9538d0d..935b4ba60 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -20,6 +20,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <endian.h>
++#include <errno.h>
+ #include <stdbool.h>
+ 
+ #include "bluetooth/bluetooth.h"
+@@ -1317,11 +1318,29 @@ static void evt_conn_request(struct bthost *bthost, const void *data,
+ 	if (len < sizeof(*ev))
+ 		return;
+ 
+-	memset(&cmd, 0, sizeof(cmd));
+-	memcpy(cmd.bdaddr, ev->bdaddr, sizeof(ev->bdaddr));
++	if (ev->link_type == 0x01 || ev->link_type == 0x00) {
++		memset(&cmd, 0, sizeof(cmd));
++		memcpy(cmd.bdaddr, ev->bdaddr, sizeof(ev->bdaddr));
+ 
+-	send_command(bthost, BT_HCI_CMD_ACCEPT_CONN_REQUEST, &cmd,
++		send_command(bthost, BT_HCI_CMD_ACCEPT_CONN_REQUEST, &cmd,
+ 								sizeof(cmd));
++	} else if (ev->link_type == 0x02) {
++		struct bt_hci_cmd_accept_sync_conn_request cmd;
++
++		memset(&cmd, 0, sizeof(cmd));
++		memcpy(cmd.bdaddr, ev->bdaddr, sizeof(ev->bdaddr));
++
++		/* TODO: emulate these properly? */
++		cmd.tx_bandwidth = cpu_to_le32(0x00001f40);
++		cmd.rx_bandwidth = cpu_to_le32(0x00001f40);
++		cmd.max_latency = cpu_to_le16(0xffff);
++		cmd.voice_setting = 0x00;
++		cmd.retrans_effort = 0x02;
++		cmd.pkt_type = 0xff;
++
++		send_command(bthost, BT_HCI_CMD_ACCEPT_SYNC_CONN_REQUEST, &cmd,
++								sizeof(cmd));
++	}
+ }
+ 
+ static void init_conn(struct bthost *bthost, uint16_t handle,
+@@ -3538,6 +3557,44 @@ void bthost_hci_disconnect(struct bthost *bthost, uint16_t handle,
+ 	send_command(bthost, BT_HCI_CMD_DISCONNECT, &disc, sizeof(disc));
+ }
+ 
++int bthost_setup_sco(struct bthost *bthost, uint16_t acl_handle,
++							uint16_t setting)
++{
++	static const struct bt_hci_cmd_setup_sync_conn settings[] = {
++		{
++			.tx_bandwidth = cpu_to_le32(0x00001f40),
++			.rx_bandwidth = cpu_to_le32(0x00001f40),
++			.max_latency = cpu_to_le16(0x000a),
++			.retrans_effort = 0x01,
++			.voice_setting = cpu_to_le16(BT_VOICE_CVSD_16BIT),
++		},
++		{
++			.tx_bandwidth = cpu_to_le32(0x00001f40),
++			.rx_bandwidth = cpu_to_le32(0x00001f40),
++			.max_latency = cpu_to_le16(0x000d),
++			.retrans_effort = 0x02,
++			.voice_setting = cpu_to_le16(BT_VOICE_TRANSPARENT),
++		}
++	};
++	struct bt_hci_cmd_setup_sync_conn cmd;
++	unsigned int i;
++
++	memset(&cmd, 0, sizeof(cmd));
++
++	for (i = 0; i < ARRAY_SIZE(settings); ++i) {
++		if (settings[i].voice_setting == cpu_to_le16(setting)) {
++			memcpy(&cmd, &settings[i], sizeof(cmd));
++			break;
++		}
++	}
++	if (!cmd.voice_setting)
++		return -EINVAL;
++
++	cmd.handle = cpu_to_le16(acl_handle);
++	send_command(bthost, BT_HCI_CMD_SETUP_SYNC_CONN, &cmd, sizeof(cmd));
++	return 0;
++}
++
+ void bthost_write_scan_enable(struct bthost *bthost, uint8_t scan)
+ {
+ 	send_command(bthost, BT_HCI_CMD_WRITE_SCAN_ENABLE, &scan, 1);
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index ce6bd820f..c88ea0329 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -69,6 +69,9 @@ void bthost_hci_ext_connect(struct bthost *bthost, const uint8_t *bdaddr,
+ void bthost_hci_disconnect(struct bthost *bthost, uint16_t handle,
+ 								uint8_t reason);
+ 
++int bthost_setup_sco(struct bthost *bthost, uint16_t acl_handle,
++							uint16_t setting);
++
+ typedef void (*bthost_cid_hook_func_t)(const void *data, uint16_t len,
+ 							void *user_data);
+ 
+-- 
+2.51.1
 
-This is an undesired syntax explicitly documented as one to avoid. You
-need here proper assignment, not NULL. Please don't use cleanup.h if you
-do not intend to follow it because it does not make the code simpler.
-
-> +	struct device_node *serdev_remote __free(device_node) = NULL;
-
-This is even worse. Instead of making it local scope, you have automatic
-cleanup for entire function with completely redundant constructor.
-
-Please, use cleanup.h only if you really want to follow its spirit.
-Otherwise it does not make the code easier.
-
-
-Best regards,
-Krzysztof
