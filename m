@@ -1,212 +1,670 @@
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F1662773EE
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Dec 2025 21:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BA9279DC3
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Dec 2025 22:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764625110; cv=none; b=pYVbQhDmZrWvK4fuZICE85a8HENpdQxOQlKiCGxqWImRmt0FTUAHJibi1hGq3z2mzzxizGrxWG6iuWSRCm9Dt0kYX95jR72k5y7zEJWEStovlHCJjto0w9mcap6YxH4uaGg0YjAc86sP3MG4QUTxzdBi9PwSYCg/+AkYF0kZNJw=
+	t=1764628178; cv=none; b=EIET3Bu1O67Xsa8+4GcSu0v9eyjaxgUzjWdBbL96bl5D0z0VG3wZ+lBsBVMRYWGycd4pwhFydV6EV4f48INXeLZ111viU39v3AJGsLbYlKpdK+ahOgZuSSLFGvvPGbP7JlCxFUs2MeulbywaxxM5R4pjlCZKfedKwBTlDEj4blA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764625110; c=relaxed/simple;
-	bh=Yoj9iQNYK9By8VoGAnCGRF6u7NuVQ1MJ/Naz4y+RCzQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uR3IR7yfDd2DOzHenog0uSVSjTsyhglVGt82fv5ewg833kjXOo4kLW43hEoB8DDmN+XsBURyMYfala3f2X3tyVN8jJUeooIz6u+ziyIM5+N88mrsCAXJMYHEI6W/CMrmWgKT1WaY9QAI1fOicL8g/kFtNUfN/V7yJmq5al/Sj8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mIj7GzaS; arc=none smtp.client-ip=209.85.222.44
+	s=arc-20240116; t=1764628178; c=relaxed/simple;
+	bh=BMCPfXsczalKD5lcsJVfoJeSDrUhQTUswbasNh46mSk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jNaUpUiM99ZEk6qU0dDr/Evf4elZCjIcnndACPRtcuxf2BFq88UDM92T5pIH5ea6O2szFSH8rK/sOVEr67Btr7pvUrxPlafdlWxvNw7CqHiOUI2ZRSBAyXfXuLXTftfGYz8MM9Lu0+ds9vMW4/z/B05Fbkukyn29RBX5OgVSDco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QrEpXvHm; arc=none smtp.client-ip=209.85.208.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mIj7GzaS"
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-93516cbe2bbso1299226241.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Dec 2025 13:38:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QrEpXvHm"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-37b935df7bfso44902161fa.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Dec 2025 14:29:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764625107; x=1765229907; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GYRW13K52vCUTDPjkklfII+V6bz+Q4NWZsu9T0M4G84=;
-        b=mIj7GzaSivVhs+bok+ob+9OVbTfjFWPIKZtPpUxDkUqFRehdBLP+0/gH3OL72xnN6P
-         rqNq1krLtaPpy+nJf9l5ShlpI8UcflxyQ87EoB6t+a0EAWeyeNWPnVBMiEAodWZRdXAs
-         FwpJBg7iestj3fQkEeqnHWUnHwWzkSuoQkSpTMJIJTYJR535HQKR/tC4nqzjQtoCgAIF
-         NmGc/ECDAxuht8zOzrlCRdkgM7+SdKKGpe8U+xgK3TRhJk48GrP+PTvwxeTSoONa3vJk
-         COKBdes+w8Ics6gmjrc96u7vu/P4TDTPbl4InvIDlzHXad0fjIkgc9nF/WC89DvmDxEK
-         qjDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764625107; x=1765229907;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1764628174; x=1765232974; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GYRW13K52vCUTDPjkklfII+V6bz+Q4NWZsu9T0M4G84=;
-        b=sUltLJbJppAD9u7V3FwI56UwcLeZl8QvnmeTxT/SOZhe9D4lH1ESsyW04ZQn4K9yo/
-         pRY6k7+Ej06zcfJkUdlmZYG8dm3gBrbWp57EMfQJPGuikUKjvo+iajQ3Na7EiKm0NBye
-         mg4opVCq5+SdWXbZRaHPBLVlWh+X5QRahDHwzopFZuwXaRmLsa+zWbaD10Gfxd7XueHz
-         AKxBKTpnc3GUsWhuMhhf9oSfm0ehYX8IOu2irBpGDkhJ6bk8DdOQ1KvYnUDW7eS4sPfu
-         eGd9JcGxCeQaLuMlpOgs3fkXKFLPrX8Oi29800XwA/6OeNQiWb2zsieWhAl5zRvGDSVo
-         5BRg==
-X-Gm-Message-State: AOJu0Yzs0TUcKdaJih8fS4O0xz4dZHvyM2tlHwNsDrUA0FMBK/PJPkAZ
-	DGxfZ9nuv7kH+vjw4K9j81+8J6VyrBuz/cD8qSh3b4Lp7MwFAkQ5fVQYmVeJqA==
-X-Gm-Gg: ASbGnctui5e17MUSZSmFeIA4d4gWApM7mkucxy9JMrICQW2aHg1F9XsF52VhXdmTnqJ
-	EGl2NXKuVQ/VZB23iY1G1F6pLKH/rPvh8tLych1OcxZGZuI27SwPaPmyXtkL/SC+zitgvwkyFsk
-	BMeeQrRWzVb6jdl5DN03VyUfllzeKyogIWcPq9w1FOqCM/j2I8ITuLi/UPsHVbXhbcuv0+B63J6
-	SIsdBcvxU+I4ceFGj2JB2rGZHRWo67nG63YAC706dtz4C024/g/hZvEjf8Gci0nflJc+Wx7g3Rj
-	bxOPQyeI8Y/N+uds4F9A5g9Ly2GbK/01aKpRIYknT7Lxw1paT2ox7X3pwDDufByIG4g3MbJMGaP
-	pn1oZGDnaHzS/36hMSmnENBaspMGWugLGJTsHFm+hUE+PwSBX+HFnxi+dN+OlFtmRuoAL9BWgw8
-	aw6RQRevjO5plBiw==
-X-Google-Smtp-Source: AGHT+IH77jNXCQLillzdPq1DorFBiz7kPL4ksUtxlksWWuxFwMXf7hCuvrSgb0u2vfi1FGVZwWHiQQ==
-X-Received: by 2002:a05:6102:c8c:b0:5df:b31d:d5c2 with SMTP id ada2fe7eead31-5e1de2fe1e9mr16513506137.28.1764625107190;
-        Mon, 01 Dec 2025 13:38:27 -0800 (PST)
-Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-93cd768450csm5781875241.14.2025.12.01.13.38.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 13:38:26 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth-next 2025-12-01
-Date: Mon,  1 Dec 2025 16:38:18 -0500
-Message-ID: <20251201213818.97249-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.1
+        bh=tRRVPZrPQcOHpo4i+meDE5/iDJWcZH/sDBtsB92sHqU=;
+        b=QrEpXvHmcOQxIw680BxsoJLVtV8UAuOSplAk3vQpOAmQJFdg/YE2ARU5rwzHj1viIM
+         /XMC3G48zOYg9UFQ/FEio3RprxmUGn+GmqIo89HV2UAKNEmXb1c4ypvc53WEjVmmAyld
+         kAuehoMcf98STi06SCPxsJyPHl3k+jib58cYers17O+5/nfph52B0lFTAQR6mDWdwRB4
+         VYHpGQJd8EN1ieyjg4KqzKkjgj8E4nUi/l+9EghheW0T64Op7Uv/T6E/iM5cIa0bTReC
+         rj/zFCVCBgQwcj7cb5Pxj/oRNcsttKjlF3XwfEXs8nzvPS7S7UQyvo0fFaJIzVov0GOT
+         lqEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764628174; x=1765232974;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=tRRVPZrPQcOHpo4i+meDE5/iDJWcZH/sDBtsB92sHqU=;
+        b=b+hFIYeya7wo/PLNFTCcMR1FlDxJ38nNU4ieE8mAFweDLo1SDuMvgMNN94tqgwb+gt
+         5ItMtpq0Tl45WAtd2ZAhHTIm+vN0tj3jeiHZrjUEvvKJZeNKO7/MSYBNFAhES52MzBu7
+         2zYk+xU+lVnXzeoOIYWvTMLtStKUb6iPJ5wzu3+C9sXMsF+KSh2Tb1IjRHn6IZOCMkSV
+         KJ1qgcBlVMLDd5hKvqg+to0iM7vnBPs37xiIwUiqkTlIQNHSM1mO5DjbiLoH4v/QIUKS
+         5zsGUkmQw9JKBMcrX5gm3YDnT4c12VYyUzZz6ccBCM7je/8xX/af/0/uLHeS6u1Odk79
+         mnOQ==
+X-Gm-Message-State: AOJu0YyyEBXEliT8jX1ofDvkNPXVCH64t5MCEQlpmqbonZCgjU3B3Nm5
+	5QbDPV8HXBCTEgbog6ZGMii36aldM36qtp3TrN1C7CjjHJMVFl1UgbTUfv0TIstMo4v2VogGEMm
+	68ykmYK0GRG7FK5GrPxLioC8G/ptZ+TqcZOoj
+X-Gm-Gg: ASbGnctI+jRRbCVngwC2W3nr2H3DZNKrhsDZgkm7Pj33FNrMAtdkjEXLU19gbnR5LYh
+	Z+yAWA27FL1J6awbAxJED1cfDrIUHCnshEmy8JYSGXOqfPpve6BYH2NYn/i4OuZ1dO7SMI7OGNk
+	GOOTWePcSMGuSFTfcgtrhdH04/0j9unp7if6PdZscLaNoKlFYm2FgDo4+rCYsVm6VyQb04P2ZCP
+	fowN/bRNCAObOs8WKW6EgFHFIHTbdoHES/1gIi2E0GvnRGjbEk0+ycR/D//OMNzUxYWGw==
+X-Google-Smtp-Source: AGHT+IG1YUPM1WCWuStrSMvg4JUpbvDz/ocbpOQzmO6L9ziXCpMUluh3eTkRCpsk0UBl4xO6xlovONBG/a4egSOiToM=
+X-Received: by 2002:a2e:91c4:0:b0:37a:3963:cec5 with SMTP id
+ 38308e7fff4ca-37cd92b2e33mr76423751fa.43.1764628174198; Mon, 01 Dec 2025
+ 14:29:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251201-bearer-impl-v8-0-f944b6f9f201@amlogic.com> <20251201-bearer-impl-v8-3-f944b6f9f201@amlogic.com>
+In-Reply-To: <20251201-bearer-impl-v8-3-f944b6f9f201@amlogic.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 1 Dec 2025 17:29:22 -0500
+X-Gm-Features: AWmQ_bnW_AeggosJZASm-BkqcYs6DuumMb8EPwaAEfswBLkFME3JwkZlPBoB1wM
+Message-ID: <CABBYNZLNvKPHmJAtybnXHP29kMgeJ6v2fF7OT+5e6QBCUdvLqg@mail.gmail.com>
+Subject: Re: [PATCH bluez v8 3/3] client: Add shell cmd for bearer connect/disconnect
+To: ye.he@amlogic.com
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following changes since commit cbca440dc329b39f18a1121e385aed830bbdfb12:
+Hi,
 
-  Merge branch 'net-freescale-migrate-to-get_rx_ring_count-ethtool-callback' (2025-12-01 11:54:50 -0800)
+On Mon, Dec 1, 2025 at 3:29=E2=80=AFAM Ye He via B4 Relay
+<devnull+ye.he.amlogic.com@kernel.org> wrote:
+>
+> From: Ye He <ye.he@amlogic.com>
+>
+> This patch adds shell command for bearer connect/disconnect.
+>
+> Signed-off-by: Ye He <ye.he@amlogic.com>
+> ---
+>  client/bluetoothctl-bredr.rst |  70 +++++++++
+>  client/bluetoothctl-le.rst    |  71 +++++++++
+>  client/bluetoothctl.rst       |  10 ++
+>  client/main.c                 | 324 ++++++++++++++++++++++++++++++++++++=
+++++++
+>  4 files changed, 475 insertions(+)
+>
+> diff --git a/client/bluetoothctl-bredr.rst b/client/bluetoothctl-bredr.rs=
+t
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..3ec702a59ff35261f6eb71cf7=
+7b3267229bbad8b
+> --- /dev/null
+> +++ b/client/bluetoothctl-bredr.rst
+> @@ -0,0 +1,70 @@
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +bluetoothctl-bredr
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +-------------
+> +BREDR Submenu
+> +-------------
+> +
+> +:Version: BlueZ
+> +:Copyright: Free use of this software is granted under the terms of the =
+GNU
+> +            Lesser General Public Licenses (LGPL).
+> +:Date: December 2025
+> +:Manual section: 1
+> +:Manual group: Linux System Administration
+> +
+> +SYNOPSIS
+> +=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +**bluetoothctl** [--options] [bredr.commands]
+> +
+> +BREDR Commands
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +list
+> +----
+> +
+> +List available bredr devices.
+> +
+> +:Usage: **> list**
+> +
+> +show
+> +----
+> +
+> +Show bredr bearer information on a device.
+> +
+> +:Usage: **> show [dev]**
+> +
+> +connect
+> +-------
+> +
+> +Connect device over bredr.
+> +
+> +This command initiates a bredr connection to a remote device.
+> +
+> +By default, it establishes the bredr connection and then connects all pr=
+ofiles
+> +that marked as auto-connectable.
+> +
+> +:Usage: > connect <dev>
+> +:Example: > connect 1C:48:F9:9D:81:5C
+> +
+> +disconnect
+> +----------
+> +
+> +Disconnect device over bredr.
+> +
+> +By default this command disconnects all profiles associated with the bre=
+dr
+> +connection, and then terminates the bredr link.
+> +
+> +:Usage: > disconnect <dev>
+> +:Example: > disconnect 1C:48:F9:9D:81:5C
+> +
+> +RESOURCES
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +http://www.bluez.org
+> +
+> +REPORTING BUGS
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +linux-bluetooth@vger.kernel.org
+> diff --git a/client/bluetoothctl-le.rst b/client/bluetoothctl-le.rst
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..808d5786ee805a61228a5195c=
+c731a5f46de9201
+> --- /dev/null
+> +++ b/client/bluetoothctl-le.rst
+> @@ -0,0 +1,71 @@
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +bluetoothctl-le
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +----------
+> +LE Submenu
+> +----------
+> +
+> +:Version: BlueZ
+> +:Copyright: Free use of this software is granted under the terms of the =
+GNU
+> +            Lesser General Public Licenses (LGPL).
+> +:Date: December 2025
+> +:Manual section: 1
+> +:Manual group: Linux System Administration
+> +
+> +SYNOPSIS
+> +=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +**bluetoothctl** [--options] [le.commands]
+> +
+> +LE Commands
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +list
+> +----
+> +
+> +List available le devices.
+> +
+> +:Usage: **> list**
+> +
+> +show
+> +----
+> +
+> +Show le bearer information on a device.
+> +
+> +:Usage: **> show [dev]**
+> +
+> +connect
+> +-------
+> +
+> +Connect device over le.
+> +
+> +This command initiates a le connection to a remote device.
+> +
+> +An active scan report is required before the connection can be
+> +established. If no advertising report is received before the timeout,
+> +a le-connection-abort-by-local error will be issued.
+> +
+> +:Usage: > connect <dev>
+> +:Example: > connect 1C:48:F9:9D:81:5C
+> +
+> +disconnect
+> +----------
+> +
+> +Disconnect device over le.
+> +
+> +By default this command disconnects all profiles/services associated wit=
+h the le
+> +connection, and then terminates the le link.
+> +
+> +:Usage: > disconnect <dev>
+> +:Example: > disconnect 1C:48:F9:9D:81:5C
+> +
+> +RESOURCES
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +http://www.bluez.org
+> +
+> +REPORTING BUGS
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +linux-bluetooth@vger.kernel.org
+> diff --git a/client/bluetoothctl.rst b/client/bluetoothctl.rst
+> index 0187e877d60b28eb1e735181b3203e60da821e6f..f8d6c345797722aeb1550d903=
+a268c7d756545f9 100644
+> --- a/client/bluetoothctl.rst
+> +++ b/client/bluetoothctl.rst
+> @@ -371,6 +371,16 @@ Assistant Submenu
+>
+>  See **bluetoothctl-assistant(1)**
+>
+> +LE Submenu
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +See **bluetoothctl-le(1)**
+> +
+> +BREDR Submenu
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +See **bluetoothctl-bredr(1)**
+> +
+>  AUTOMATION
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>  Two common ways to automate the tool are to use Here Docs or the program=
+ expect.
+> diff --git a/client/main.c b/client/main.c
+> index 0a928efaa9bb0d2a806895ff8f8c0c7c0d2493bd..464243ea3b7247f4ae2be4796=
+43c44380af82917 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -2789,6 +2789,47 @@ static char *dev_set_generator(const char *text, i=
+nt state)
+>         return set_generator(text, state);
+>  }
+>
+> +static char *bearer_dev_generator(const char *text, int state,
+> +                                       const char *iface)
+> +{
+> +       char *addr;
+> +       GDBusProxy *device;
+> +       GDBusProxy *bearer;
+> +
+> +       if (!iface)
+> +               return NULL;
+> +
+> +       addr =3D dev_generator(text, state);
+> +       if (!addr)
+> +               return NULL;
+> +
+> +       device =3D find_proxy_by_address(default_ctrl->devices, addr);
+> +       if (!device)
+> +               goto failed;
+> +
+> +       bearer =3D find_proxies_by_iface(default_ctrl->bearers,
+> +                                       g_dbus_proxy_get_path(device),
+> +                                       iface);
+> +       if (!bearer)
+> +               goto failed;
+> +
+> +       return addr;
+> +
+> +failed:
+> +       g_free(addr);
+> +       return NULL;
+> +}
+> +
+> +static char *le_dev_generator(const char *text, int state)
+> +{
+> +       return bearer_dev_generator(text, state, "org.bluez.Bearer.LE1");
+> +}
+> +
+> +static char *bredr_dev_generator(const char *text, int state)
+> +{
+> +       return bearer_dev_generator(text, state, "org.bluez.Bearer.BREDR1=
+");
+> +}
+> +
+>  static char *attribute_generator(const char *text, int state)
+>  {
+>         return gatt_attribute_generator(text, state);
+> @@ -3296,6 +3337,253 @@ static void cmd_adv_monitor_get_supported_info(in=
+t argc, char *argv[])
+>         adv_monitor_get_supported_info();
+>  }
+>
+> +static void print_le_properties(GDBusProxy *proxy)
+> +{
+> +       GDBusProxy *device;
+> +
+> +       device =3D find_proxies_by_path(default_ctrl->devices,
+> +                                       g_dbus_proxy_get_path(proxy));
+> +
+> +       if (!device)
+> +               return;
+> +
+> +       bt_shell_printf("Device %s\n", proxy_address(device));
+> +
+> +       /* New properties may add to org.bluez.Bearer.LE1. */
+> +       print_property(proxy, "Paired");
+> +       print_property(proxy, "Bonded");
+> +       print_property(proxy, "Connected");
+> +}
+> +
+> +static void print_le_bearers(void *data, void *user_data)
+> +{
+> +       GDBusProxy *proxy =3D data;
+> +
+> +       if (!strcmp(g_dbus_proxy_get_interface(proxy),
+> +                                     "org.bluez.Bearer.LE1"))
+> +               print_le_properties(data);
+> +}
+> +
+> +static void print_bredr_properties(GDBusProxy *proxy)
+> +{
+> +       GDBusProxy *device;
+> +
+> +       device =3D find_proxies_by_path(default_ctrl->devices,
+> +                                       g_dbus_proxy_get_path(proxy));
+> +
+> +       if (!device)
+> +               return;
+> +
+> +       bt_shell_printf("Device %s\n", proxy_address(device));
+> +
+> +       /* New properties may add to org.bluez.Bearer.BREDR1. */
+> +       print_property(proxy, "Paired");
+> +       print_property(proxy, "Bonded");
+> +       print_property(proxy, "Connected");
+> +}
+> +
+> +static void print_bredr_bearers(void *data, void *user_data)
+> +{
+> +       GDBusProxy *proxy =3D data;
+> +
+> +       if (!strcmp(g_dbus_proxy_get_interface(proxy),
+> +                                     "org.bluez.Bearer.BREDR1"))
+> +               print_bredr_properties(data);
+> +}
+> +
+> +static void cmd_list_le(int argc, char *argv[])
+> +{
+> +       GList *l;
+> +       GDBusProxy *device;
+> +
+> +       for (l =3D default_ctrl->devices; l; l =3D g_list_next(l)) {
+> +               device =3D l->data;
+> +               if (find_proxies_by_iface(default_ctrl->bearers,
+> +                                     g_dbus_proxy_get_path(device),
+> +                                     "org.bluez.Bearer.LE1"))
+> +                       print_device(device, NULL);
+> +       }
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_list_bredr(int argc, char *argv[])
+> +{
+> +       GList *l;
+> +       GDBusProxy *device;
+> +
+> +       for (l =3D default_ctrl->devices; l; l =3D g_list_next(l)) {
+> +               device =3D l->data;
+> +               if (find_proxies_by_iface(default_ctrl->bearers,
+> +                                     g_dbus_proxy_get_path(device),
+> +                                     "org.bluez.Bearer.BREDR1"))
+> +                       print_device(device, NULL);
+> +       }
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_show_le(int argc, char *argv[])
+> +{
+> +       GDBusProxy *device;
+> +       GDBusProxy *bearer;
+> +
+> +       /* Show all le bearers if no argument is given */
+> +       if (argc !=3D 2) {
+> +               g_list_foreach(default_ctrl->bearers, print_le_bearers, N=
+ULL);
+> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +       }
+> +
+> +       device =3D find_proxy_by_address(default_ctrl->devices, argv[1]);
+> +       if (!device) {
+> +               bt_shell_printf("Device %s not found\n", argv[1]);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       bearer =3D find_proxies_by_iface(default_ctrl->bearers,
+> +                                     g_dbus_proxy_get_path(device),
+> +                                     "org.bluez.Bearer.LE1");
+> +       if (!bearer) {
+> +               bt_shell_printf("LE bearer not found on %s\n", argv[1]);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       print_le_properties(bearer);
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_show_bredr(int argc, char *argv[])
+> +{
+> +       GDBusProxy *device;
+> +       GDBusProxy *bearer;
+> +
+> +       /* Show all bredr bearers if no argument is given */
+> +       if (argc !=3D 2) {
+> +               g_list_foreach(default_ctrl->bearers, print_bredr_bearers=
+,
+> +                                                                       N=
+ULL);
+> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +       }
+> +
+> +       device =3D find_proxy_by_address(default_ctrl->devices, argv[1]);
+> +       if (!device) {
+> +               bt_shell_printf("Device %s not found\n", argv[1]);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       bearer =3D find_proxies_by_iface(default_ctrl->bearers,
+> +                                     g_dbus_proxy_get_path(device),
+> +                                     "org.bluez.Bearer.BREDR1");
+> +       if (!bearer) {
+> +               bt_shell_printf("BREDR bearer not found on %s\n", argv[1]=
+);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       print_bredr_properties(bearer);
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void bearer_connect_reply(DBusMessage *message, void *user_data)
+> +{
+> +       DBusError error;
+> +
+> +       dbus_error_init(&error);
+> +
+> +       if (dbus_set_error_from_message(&error, message) =3D=3D TRUE) {
+> +               bt_shell_printf("Failed to connect: %s %s\n", error.name,
+> +                               error.message);
+> +               dbus_error_free(&error);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       bt_shell_printf("Connection successful\n");
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void bearer_disconn_reply(DBusMessage *message, void *user_data)
+> +{
+> +       DBusError error;
+> +
+> +       dbus_error_init(&error);
+> +
+> +       if (dbus_set_error_from_message(&error, message) =3D=3D TRUE) {
+> +               bt_shell_printf("Failed to disconnect: %s %s\n", error.na=
+me,
+> +                               error.message);
+> +               dbus_error_free(&error);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       bt_shell_printf("Disconnection successful\n");
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_bearer_method_handler(int argc, char *argv[],
+> +                                       const char *iface,
+> +                                       const char *method)
+> +{
+> +       GDBusProxy *device;
+> +       GDBusProxy *bearer;
+> +
+> +       if (!check_default_ctrl())
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       device =3D find_proxy_by_address(default_ctrl->devices, argv[1]);
+> +       if (!device) {
+> +               bt_shell_printf("Device %s not available\n", argv[1]);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       bearer =3D find_proxies_by_iface(default_ctrl->bearers,
+> +                                       g_dbus_proxy_get_path(device),
+> +                                       iface);
+> +       if (!bearer) {
+> +               bt_shell_printf("%s is not available on %s\n",
+> +                               iface, argv[1]);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       if (!g_dbus_proxy_method_call(bearer, method, NULL,
+> +                                     strcmp(method, "Connect") =3D=3D 0 =
+?
+> +                                       bearer_connect_reply :
+> +                                       bearer_disconn_reply,
+> +                                     NULL, NULL)) {
+> +               bt_shell_printf("Failed to call %s\n", method);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       bt_shell_printf("Attempting to %s %s with %s\n",
+> +                                       method,
+> +                                       argv[1],
+> +                                       iface);
+> +}
+> +
+> +static void cmd_connect_le(int argc, char *argv[])
+> +{
+> +       cmd_bearer_method_handler(argc, argv, "org.bluez.Bearer.LE1",
+> +                                                               "Connect"=
+);
+> +}
+> +
+> +static void cmd_disconnect_le(int argc, char *argv[])
+> +{
+> +       cmd_bearer_method_handler(argc, argv, "org.bluez.Bearer.LE1",
+> +                                                               "Disconne=
+ct");
+> +}
+> +
+> +static void cmd_connect_bredr(int argc, char *argv[])
+> +{
+> +       cmd_bearer_method_handler(argc, argv, "org.bluez.Bearer.BREDR1",
+> +                                                               "Connect"=
+);
+> +}
+> +
+> +static void cmd_disconnect_bredr(int argc, char *argv[])
+> +{
+> +       cmd_bearer_method_handler(argc, argv, "org.bluez.Bearer.BREDR1",
+> +                                                               "Disconne=
+ct");
+> +}
+> +
+>  static const struct bt_shell_menu advertise_menu =3D {
+>         .name =3D "advertise",
+>         .desc =3D "Advertise Options Submenu",
+> @@ -3469,6 +3757,40 @@ static const struct bt_shell_menu gatt_menu =3D {
+>         { } },
+>  };
+>
+> +static const struct bt_shell_menu le_menu =3D {
+> +       .name =3D "le",
+> +       .desc =3D "LE Bearer Submenu",
+> +       .entries =3D {
+> +       { "list", NULL, cmd_list_le, "List available le devices" },
+> +       { "show", "[dev]", cmd_show_le,
+> +                                       "LE bearer information",
+> +                                       le_dev_generator },
+> +       { "connect", "<dev>", cmd_connect_le,
+> +                                       "Connect le on a device",
+> +                                       le_dev_generator },
+> +       { "disconnect", "<dev>", cmd_disconnect_le,
+> +                                       "Disconnect le on a device",
+> +                                       le_dev_generator },
+> +       {} },
+> +};
+> +
+> +static const struct bt_shell_menu bredr_menu =3D {
+> +       .name =3D "bredr",
+> +       .desc =3D "BREDR Bearer Submenu",
+> +       .entries =3D {
+> +       { "list", NULL, cmd_list_bredr, "List available bredr devices" },
+> +       { "show", "[dev]", cmd_show_bredr,
+> +                                       "BREDR bearer information",
+> +                                       bredr_dev_generator },
+> +       { "connect", "<dev>", cmd_connect_bredr,
+> +                                       "Connect bredr on a device",
+> +                                       bredr_dev_generator },
+> +       { "disconnect", "<dev>", cmd_disconnect_bredr,
+> +                                       "Disconnect bredr on a device",
+> +                                       bredr_dev_generator },
+> +       {} },
+> +};
+> +
+>  static const struct bt_shell_menu main_menu =3D {
+>         .name =3D "main",
+>         .entries =3D {
+> @@ -3593,6 +3915,8 @@ int main(int argc, char *argv[])
+>         bt_shell_add_submenu(&advertise_monitor_menu);
+>         bt_shell_add_submenu(&scan_menu);
+>         bt_shell_add_submenu(&gatt_menu);
+> +       bt_shell_add_submenu(&le_menu);
+> +       bt_shell_add_submenu(&bredr_menu);
+>         admin_add_submenu();
+>         player_add_submenu();
+>         mgmt_add_submenu();
+>
+> --
+> 2.42.0
 
-are available in the Git repository at:
+Just tried something simple:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-12-01
+[bluetoothctl]> le.connect 88:92:CC:54:B8:FD
+Attempting to Connect 88:92:CC:54:B8:FD with org.bluez.Bearer.LE1
+[bluetoothctl]> le.connect 88:92:CC:54:B8:FD
+Attempting to Connect 88:92:CC:54:B8:FD with org.bluez.Bearer.LE1
+Failed to connect: org.bluez.Error.InProgress In Progress
+Failed to connect: org.freedesktop.DBus.Error.NoReply Did not receive
+a reply. Possible causes include: the remote application did not send
+a reply, the message bus security policy blocked the reply, the reply
+timeout expired, or the network connection was broken.
 
-for you to fetch changes up to 525459da4bd62a81142fea3f3d52188ceb4d8907:
+Looks like it doesn't handle things like connection timeout, etc, so
+bearer.connect is never cleanup, nor any reply is generated.
 
-  Bluetooth: btusb: Add new VID/PID 13d3/3533 for RTL8821CE (2025-12-01 16:21:16 -0500)
+>
+>
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
 
-core:
-
- - HCI: Add initial support for PAST
- - hci_core: Introduce HCI_CONN_FLAG_PAST
- - ISO: Add support to bind to trigger PAST
- - HCI: Always use the identity address when initializing a connection
- - ISO: Attempt to resolve broadcast address
- - MGMT: Allow use of Set Device Flags without Add Device
- - ISO: Fix not updating BIS sender source address
- - HCI: Add support for LL Extended Feature Set
-
- driver:
-
- - btusb: Add new VID/PID 2b89/6275 for RTL8761BUV
- - btusb: MT7920: Add VID/PID 0489/e135
- - btusb: MT7922: Add VID/PID 0489/e170
- - btusb: Add new VID/PID 13d3/3533 for RTL8821CE
- - btusb: Add new VID/PID 0x0489/0xE12F for RTL8852BE-VT
- - btusb: Add new VID/PID 0x13d3/0x3618 for RTL8852BE-VT
- - btusb: Add new VID/PID 0x13d3/0x3619 for RTL8852BE-VT
- - btusb: Reclassify Qualcomm WCN6855 debug packets
- - btintel_pcie: Introduce HCI Driver protocol
- - btintel_pcie: Support for S4 (Hibernate)
- - btintel_pcie: Suspend/Resume: Controller doorbell interrupt handling
- - dt-bindings: net: Convert Marvell 8897/8997 bindings to DT schema
- - btbcm: Use kmalloc_array() to prevent overflow
- - btrtl: Add the support for RTL8761CUV
- - hci_h5: avoid sending two SYNC messages
- - hci_h5: implement CRC data integrity
-
-MAINTAINERS:
-
- - Add Bartosz Golaszewski as Qualcomm hci_qca maintainer
-
-----------------------------------------------------------------
-Ariel D'Alessandro (1):
-      dt-bindings: net: Convert Marvell 8897/8997 bindings to DT schema
-
-Ayaan Mirza Baig (1):
-      drivers/bluetooth: btbcm: Use kmalloc_array() to prevent overflow
-
-Chethan T N (1):
-      Bluetooth: btintel_pcie: Introduce HCI Driver protocol
-
-Chingbin Li (1):
-      Bluetooth: btusb: Add new VID/PID 2b89/6275 for RTL8761BUV
-
-Chris Lu (2):
-      Bluetooth: btusb: MT7920: Add VID/PID 0489/e135
-      Bluetooth: btusb: MT7922: Add VID/PID 0489/e170
-
-Gongwei Li (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3533 for RTL8821CE
-
-Javier Nieto (2):
-      Bluetooth: hci_h5: avoid sending two SYNC messages
-      Bluetooth: hci_h5: implement CRC data integrity
-
-Krzysztof Kozlowski (1):
-      Bluetooth: MAINTAINERS: Add Bartosz Golaszewski as Qualcomm hci_qca maintainer
-
-Luiz Augusto von Dentz (8):
-      Bluetooth: HCI: Add initial support for PAST
-      Bluetooth: hci_core: Introduce HCI_CONN_FLAG_PAST
-      Bluetooth: ISO: Add support to bind to trigger PAST
-      Bluetooth: HCI: Always use the identity address when initializing a connection
-      Bluetooth: ISO: Attempt to resolve broadcast address
-      Bluetooth: MGMT: Allow use of Set Device Flags without Add Device
-      Bluetooth: ISO: Fix not updating BIS sender source address
-      Bluetooth: HCI: Add support for LL Extended Feature Set
-
-Max Chou (4):
-      Bluetooth: btrtl: Add the support for RTL8761CUV
-      Bluetooth: btusb: Add new VID/PID 0x0489/0xE12F for RTL8852BE-VT
-      Bluetooth: btusb: Add new VID/PID 0x13d3/0x3618 for RTL8852BE-VT
-      Bluetooth: btusb: Add new VID/PID 0x13d3/0x3619 for RTL8852BE-VT
-
-Pascal Giard (1):
-      Bluetooth: btusb: Reclassify Qualcomm WCN6855 debug packets
-
-Ravindra (2):
-      Bluetooth: btintel_pcie: Support for S4 (Hibernate)
-      Bluetooth: btintel_pcie: Suspend/Resume: Controller doorbell interrupt handling
-
-Sakari Ailus (1):
-      Bluetooth: Remove redundant pm_runtime_mark_last_busy() calls
-
-Shuai Zhang (1):
-      Bluetooth: btusb: add new custom firmwares
-
-Yang Li (1):
-      Bluetooth: iso: fix socket matching ambiguity between BIS and CIS
-
-Zhangchao Zhang (1):
-      Bluetooth: mediatek: add gpio pin to reset bt
-
- .../bindings/net/bluetooth/marvell,sd8897-bt.yaml  |  79 +++++++
- Documentation/devicetree/bindings/net/btusb.txt    |   2 +-
- .../devicetree/bindings/net/marvell-bt-8xxx.txt    |  83 -------
- MAINTAINERS                                        |   1 +
- drivers/bluetooth/Kconfig                          |   1 +
- drivers/bluetooth/btbcm.c                          |   4 +-
- drivers/bluetooth/btintel_pcie.c                   | 175 ++++++++++++--
- drivers/bluetooth/btintel_pcie.h                   |   4 +
- drivers/bluetooth/btmtksdio.c                      |   1 -
- drivers/bluetooth/btrtl.c                          |  16 +-
- drivers/bluetooth/btusb.c                          |  47 ++++
- drivers/bluetooth/hci_bcm.c                        |   6 +-
- drivers/bluetooth/hci_h5.c                         |  53 ++++-
- drivers/bluetooth/hci_intel.c                      |   3 -
- include/net/bluetooth/hci.h                        |  77 +++++++
- include/net/bluetooth/hci_core.h                   |  23 +-
- include/net/bluetooth/hci_sync.h                   |   3 +
- include/net/bluetooth/mgmt.h                       |   2 +
- net/bluetooth/hci_conn.c                           |  55 +++--
- net/bluetooth/hci_event.c                          | 222 ++++++++++++++----
- net/bluetooth/hci_sync.c                           | 254 ++++++++++++++++++++-
- net/bluetooth/iso.c                                | 207 ++++++++++++++---
- net/bluetooth/mgmt.c                               | 160 +++++++------
- 23 files changed, 1172 insertions(+), 306 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/marvell,sd8897-bt.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+--=20
+Luiz Augusto von Dentz
