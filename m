@@ -1,186 +1,127 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A058D21883E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Dec 2025 20:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0172E62D0
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Dec 2025 21:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764708810; cv=none; b=GPcP0XPo8aUwLh6MhvM5pz385MH3KaCLekg7Kf0YKENWIrb9wAU51TNDofPE7WHmXQvroqcPBsfaaog8SnOfZnK1tdPy7IwoJHhDn7p9D4r2j3Uhv/8aGhKx3Kk7KCb24c/nWrQlm85AtDV9A3OA7R4o8ued5tF1hvmRAasHsP4=
+	t=1764710001; cv=none; b=WM1SlFuxD+g65zSeCoyJXbieX2x+mgBEXDz3qmYE6ZSJA6IUXp2ZCyqZgfNHf067S5LYOv+zHkkXMWf0znhWOsvrImKhHctzKVG74X/40c5BwumpW7Aoo1VDX0pODJ1ZisAf1VsM/jjcCqfurnVLgJVOw8qsNisDjMAICXPfVVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764708810; c=relaxed/simple;
-	bh=jb5LtTbdxTLmIH+c8OSEPEcn+uZZi/IN68vbxtQcOSU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=MmvEMtHjriD/2YqxBy8iv1AqVOigEAvfVM97Nx2kW87nd6O3Y/DKbtNhEeD9j1QY7aSiaILTfMo5+1SGcH/wVF/FTsqEgkoA/S33CtVDOF4ePZg52qFW93RK4T01G7XzHXfnUKMNxYOkD72WCBMLrUFB4wn8L1nnwYnHzNsd/NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Z8lDzUir; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1764710001; c=relaxed/simple;
+	bh=2PucVuPy9pa+viEBaPNG7Ryc2mU0mIq7cNSrNTYmoLI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jK9Eo35Si50oEeufcsa8R8yHrR66r4UHNcW9r+2bwuyed3atvTtkhQEQvM6AGezHXChIm/KOfx6pe4nAPs2/0DpB6T4fuGdiKm6oCVZNkVhtuEDHSKk9D+l5orD0+XZp84/4h+/yVtogNLRJWnet5rDhTJ0uydlwL/x6TKyf0lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GPOkHIcM; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Z8lDzUir"
-Received: from github.com (hubbernetes-node-56813b9.ash1-iad.github.net [10.56.225.86])
-	by smtp.github.com (Postfix) with ESMTPA id B93A2600757
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Dec 2025 12:53:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1764708807;
-	bh=5uehAK6tSgRrb9xn8DARx+Z5BtbsQAwhuh6DCU7LCOE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Z8lDzUirYq2qEllTtv7IXQfxOFm7WBTnv7XIjdMtat+1J1oWyOzWxrMPLOXaCeoi8
-	 FsK/7dXzC+cuwsFWPEbE2gVaY8FfjrPHPbbujG5Y1Pr7vS/yjbodarJG2vpGU2CF0k
-	 ueHOjWr0y9zOgXm53s84RwH3W/LnYRaOO69sDHSI=
-Date: Tue, 02 Dec 2025 12:53:27 -0800
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1029869/000000-d21535@github.com>
-Subject: [bluez/bluez] 617e7f: profile: add after_services for ordering
- profile s...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GPOkHIcM"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-880576ebe38so63225396d6.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Dec 2025 13:13:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764709999; x=1765314799; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9dxvt22k5xerdRD+KIB2csstnrYWbVmkfd3QOk6FP8c=;
+        b=GPOkHIcMDDKUvA0GyduSKBGfTgEvivYEUnsiAm/C/m3D+HT0gavPS7rw6ajzqiiHyS
+         eHyd3X8WBmZQNcZlJCg/GPESjz0rqCLMszXKUpcRJMaq21fUp5JoU0RUAx0vBaE1aVXZ
+         MwkKngUaVYdZp7Zs9wx/S418HRDTbpQ17pZYI3u+xeJBGF9ZZC5sm3biwmXLwTKsVTjN
+         SYAJNOkX+d9VCkP2TVMsbHyaRk5zujPfaTR1aYcVx84kSSW0lxxm4lmnZtdTjm0czcEw
+         JTOzkw+ovwY+uoaPpih6oXKXrf70Iw0UXizr2r/Faj1/bM6zMgbbZMlIyEMnBI3M9ZSp
+         LIGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764709999; x=1765314799;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9dxvt22k5xerdRD+KIB2csstnrYWbVmkfd3QOk6FP8c=;
+        b=wlM/T8KIUORhUUvuvEcCBw50xCFmuKJA17URBPIIUh1pgCEpyaTrfO6P+YrQ+wH8dh
+         xZe1IlKhizPS9ysT5ApTVtqG/tu9pCa67KJJkwuA94K2+/8PjJP7eRb3gzilXyhbXp71
+         5yblti8KFtH9UCyOYPTJUCoAhxd4LloFioDIn6PPuiRZ74uTG/++Myme/cLV6kuwU/uV
+         +8nYNMVxCdh4ky+SX8fusjD8oZ++tsltC9YVtPxCiAT3P8wnvBI76EX6nF7xjqPZozwP
+         N3MYmBHsWtR2+s1bnqcQfIS5QgxMERTcWO6cUhDjjgDe8usJHKYa0JsKTA7/RlNopVGR
+         ttdQ==
+X-Gm-Message-State: AOJu0YyKtCMg2fLqINJQM6wqWFbZMVdvzeZExSCUw9in/EjlAAs02EDp
+	2a2MJ7pFIAZKTmuLcHrz5zrytH+6fH2YKsuy1slOzu0Pma6LJfVOlJHLekEL5zKi
+X-Gm-Gg: ASbGncteRFLg1RN39AOC+seCM8jyH0NtRxtOBHLzrKw+wOesfHHKIENjeZKN+O2qPRS
+	wkB9BXhx2JBARyDsVrS+xEgpmNikz7dJHTGdvNclOcxHAlGF0GoHTaXNC0ZRHCv8eaB+rF6M93y
+	C7iYJ+1WAeLfexBAzbJHsqNIpnZwgfGcO9H8+FrKhhc5cYmblBgoxEiuUCw59RxZM6b8+VxM7Z7
+	YxAC2fbdhA03jWzRxqt4q8M0q4IMHE66UqbL8k+i5IvEXty6OiTUB4Z/bsImiWOAZWUt5Nvvyjh
+	TlPRs5DIAbS5El0Xa8jom1vhUhjr+V5BUfb2HWS14UiDdwifS8Su33Jld2bIba4/sJEcOrHu05A
+	SXWVxIXt6z+vWZa5T9OsMB7fYWhu+PXMlY1EMzI+lTzqnFk9vLdd1WSsnD6GsgMSY1upn0Blh3+
+	XhEUErWuUGLIM/Ft6/
+X-Google-Smtp-Source: AGHT+IH5zalhkmlRtlRExlfEL1L+KSLltcGK//QM7uW2BbPIa/efeSxYzD4l5roZZFKXDvsad3t2Zg==
+X-Received: by 2002:a05:6214:e45:b0:880:4dd2:1d15 with SMTP id 6a1803df08f44-8863af6de5cmr457309026d6.44.1764709998904;
+        Tue, 02 Dec 2025 13:13:18 -0800 (PST)
+Received: from [172.17.0.2] ([20.161.44.227])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-886524b0560sm113269556d6.7.2025.12.02.13.13.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 13:13:18 -0800 (PST)
+Message-ID: <692f566e.0c0a0220.18c376.4bcd@mx.google.com>
+Date: Tue, 02 Dec 2025 13:13:18 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7354098236498911538=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] client: Fix transport.acquire auto not working as initiator
+In-Reply-To: <20251202201810.2022976-1-luiz.dentz@gmail.com>
+References: <20251202201810.2022976-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============7354098236498911538==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1029869
-  Home:   https://github.com/bluez/bluez
-  Commit: 617e7f7db6be5cbdeae4a69e18761b770f33edeb
-      https://github.com/bluez/bluez/commit/617e7f7db6be5cbdeae4a69e18761b770f33edeb
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-02 (Tue, 02 Dec 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M src/profile.c
-    M src/profile.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  profile: add after_services for ordering profile startup
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1029860
 
-Add btd_profile::after_servicess to specify the profile connect/accept
-order for autoconnect.  This is a "soft" dependency so it doesn't fail
-if the other services fail to start nor try to start them if they
-otherwise wouldn't.
+---Test result---
 
-Add btd_profile_sort_list() for sorting a list according to profile
-ordering, taking account priority and after_services.
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.27 seconds
+BuildEll                      PASS      20.20 seconds
+BluezMake                     PASS      628.50 seconds
+MakeCheck                     PASS      22.09 seconds
+MakeDistcheck                 PASS      241.04 seconds
+CheckValgrind                 PASS      296.43 seconds
+CheckSmatch                   PASS      343.85 seconds
+bluezmakeextell               PASS      181.55 seconds
+IncrementalBuild              PENDING   0.33 seconds
+ScanBuild                     PASS      978.80 seconds
 
-Add btd_profile_find_remote_uuid() lookup utility, needed when using
-btd_profile_sort_list() with uuid lists.
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Commit: dc2d782c008937a05f55f19992581fef27104b7b
-      https://github.com/bluez/bluez/commit/dc2d782c008937a05f55f19992581fef27104b7b
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-02 (Tue, 02 Dec 2025)
-
-  Changed paths:
-    M .gitignore
-    M Makefile.am
-    A unit/btd.c
-    A unit/test-profile.c
-
-  Log Message:
-  -----------
-  test-profile: add tests for profile sorting
-
-Add tests to check btd_profile_sort_list() works correctly.
-
-The test uses queue instead of GSList in case device.c is converted to
-use queue later.
-
-Makefile.am: separate out bluetoothd_internal_sources (excludes plugins
-& main.c) and add stub for symbols in main.c.  The profile.c pulls in
-large parts of these so it's simpler to depend on them all for the test.
-This doesn't cause any recompilation.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: ac5f5a333c27285228552637ca1883e839e27056
-      https://github.com/bluez/bluez/commit/ac5f5a333c27285228552637ca1883e839e27056
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-02 (Tue, 02 Dec 2025)
 
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: use after_services in service autoconnect and sort also GATT
-
-Use btd_profile_sort_list() for selecting the order in which services
-are connected: first by priority, then by after_services.
-
-Probe and accept also GATT services in profile order. Previously this
-was done in the order they were in GATT db.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 868ef3b95480cc7d45324a26e166a8d00f603cfb
-      https://github.com/bluez/bluez/commit/868ef3b95480cc7d45324a26e166a8d00f603cfb
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-02 (Tue, 02 Dec 2025)
-
-  Changed paths:
-    M src/service.c
-
-  Log Message:
-  -----------
-  service: implement btd_profile::after_services callback
-
-Handle btd_profile::after_services callback when after_services
-dependencies have finished connecting.
-
-
-  Commit: 0e55ecd81ed52bbd4ea8d8af2b5dc66226381237
-      https://github.com/bluez/bluez/commit/0e55ecd81ed52bbd4ea8d8af2b5dc66226381237
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-02 (Tue, 02 Dec 2025)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: have unicast client wait for VCS & TMAS & GMAP
-
-Have unicast client to wait for VCS, TMAS, and GMAP before creating
-endpoints and transports, so that their information is available at that
-point.
-
-
-  Commit: 693b73340e4a4c88b97ca2260bb65e4e64a7cdc2
-      https://github.com/bluez/bluez/commit/693b73340e4a4c88b97ca2260bb65e4e64a7cdc2
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-02 (Tue, 02 Dec 2025)
-
-  Changed paths:
-    M src/shared/vcp.c
-    M src/shared/vcp.h
-
-  Log Message:
-  -----------
-  shared/vcp: add ready callback to bt_vcp_attach()
-
-Add callback that is called when VCP client has finished attaching, so
-that caller can know when it can be used.
-
-
-  Commit: d215356302ee80defe30cbe8b712a1d635e2b665
-      https://github.com/bluez/bluez/commit/d215356302ee80defe30cbe8b712a1d635e2b665
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-02 (Tue, 02 Dec 2025)
-
-  Changed paths:
-    M profiles/audio/vcp.c
-
-  Log Message:
-  -----------
-  vcp: wait until client ready before marking profile connected
-
-Mark vcp profile connected only when VCP client is ready, so that
-dependent profiles do not try to use it when it is not yet initialized.
-
-
-Compare: https://github.com/bluez/bluez/compare/617e7f7db6be%5E...d215356302ee
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============7354098236498911538==--
