@@ -1,27 +1,27 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B891A2F744F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3042F745C
 	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Dec 2025 20:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764708491; cv=pass; b=tyP/A//nWhn6tK5+v9qubGJMDftMvW4dd/acuhWa4BzIIZ72wXOSm0vwgyZDZV1fQVFvpMqTvH5ez0KIJqvUYYvjPQUyeaP0MeuMyJIP+ZJ8frb5tuwPHZ5QPVRWUABv2R6S0JZsrjhHK7lFlqNoZQxx9tGZn+0Oeag1fFjRMQA=
+	t=1764708492; cv=pass; b=GrCkH1ckkVo9ZSxuZVyKUCKAqp6PKelW+PMwzDHL9EnSAz3CS6s7hApk36sxxtLpYk7FP60KNd/B9NFWbAYttI662kZqVrXmg6YgcLQIq/lsyS855BwK5jL+cK87SQ04iSRRFoOWUGq2l70zVUgiAgxTpQtc0VaMlRXN3lBXljY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764708491; c=relaxed/simple;
-	bh=BCeD8ePDtuI3Bt8pG8J2vyprYPBlHPFZJaEz/7rVzeM=;
+	s=arc-20240116; t=1764708492; c=relaxed/simple;
+	bh=xFMR9Gk8RLaEFI6qmNfrUPAfPfF4n8mZT3/LI7RF3wg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vGK/lE55rpYyGggXuyfkDaLX8GR2OiSn/QpUBKAT44XuFZFRAXJV7y5RCib5uARi8E+Ph2YXAPlhecdByJjb8v2EYk0/8dKVjG4tL4NJx56Zfj9+rHXX/bJU6INHMVi5RQLafe0wRrWoxQo71RkhK7RCYI8k++lhlxa3gLVGTkc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=jjZ1IATD; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=J+/OONpp4k6Y/274ImsjiPR9a7wlTq1D4Og8hzVBmXYMq76saNPcOYI2AY83OCEbNz1VIOvsVAUpi0Lm4Xt5FCSIo49c6y4CGShJ0zWQelmP68zXly3QP3+cvxwyZHrn35miZw9OCAnGJNmnqBIj3ft6EbklUHsK7vYBg021Boo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=rlmUPYdr; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="jjZ1IATD"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="rlmUPYdr"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dLXsR6PlYz10M6;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dLXsR4fdqz10M3;
 	Tue,  2 Dec 2025 22:47:55 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	t=1764708475;
@@ -29,14 +29,14 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Yj2npiU1/k95aPJZ/6YCDbrZrDQwx0KVSVzGSgkE+T8=;
-	b=jjZ1IATDe99fwi/FLo1pheLq+khEKvC/KBjtspz9tUE+OI28sZSbaXQDuNLziR3PnA8Kd7
-	+hmoF+x/LIsAQ+ODmZ0V1fL2Y20/wQ0YojWeDCOg0yflWMunWqr+ywy6ZVgM2id42z6XC5
-	kKU/tQ0kIejBK4Kffvl7oK6dh143JFs=
+	bh=5zs6AMls0y6pjwnp6M1vJqoMhk7yZI2/AREY3VYzcP8=;
+	b=rlmUPYdrMt+gky2ObDYmSuFrp1x9Q/UUQpOlc0yOalV6vHEuQpuhazZxChdOFBs6olaChR
+	X+InY9RGnhsjQ3nUuUsjr+AJEPUKWNnBca0Di4vk9Bp+y375tH0d9B2UISK42gDk9kF6wR
+	g1rjLeBjfKXSw8Vk5CLTzzBazKZLzEM=
 ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764708475;
-	b=XArYexAvB+xnKO9BBv0Gi/8FmBi2SAzWmOCwDSt8bfLS02ttQ82s2DYNZfncuuS8gBnzuv
-	WxIUGlJM6K8RW05BnHpngzmlyPKDus3LVQRUc41sW5AIqmJ0Tlx+KDFXzRbh4d4Jf6vpzl
-	gGXfXua7S7XmkRHotz0CDcgDK5yR/+0=
+	b=ShM6rsqri87aiB/9X2RpjpbCcrtbsh2PICNZZS1FaBmvfo4XeCkXW2RxqX0Psu2UX31DCv
+	Wtk1TpmxYPfK4+ervOPXv3l4mbmnbprD6rRpiWsTP/Eo2MAxW6c2pp5H2TeQLL7zefk6QT
+	uJzaUvh53EMlJtoJCdwweW2++PJFWLE=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -46,16 +46,16 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Yj2npiU1/k95aPJZ/6YCDbrZrDQwx0KVSVzGSgkE+T8=;
-	b=hnY1CUpPM2QaUD5mlHil8WQSO85X2xSWHGDb/NnSCXtBe3A3+QjpBBZaIi2mIO9BAeIFGi
-	tNYaMlsJjn1+CXhYQ0XCWkPCijeO0X4t8cmtFWViYg3zuDzQTWhLMK7N/xhbJXj7hZo/jL
-	XwrDTQ5xtzChWwt7nKcRBdqYRNZJIp4=
+	bh=5zs6AMls0y6pjwnp6M1vJqoMhk7yZI2/AREY3VYzcP8=;
+	b=OAUZ8BjeeVMCdI8qhkwyltbp2inqERPxzHdi3RNBFdgOcgKjQvi3GqDUs/Hwc/o8q/YkEb
+	woUhFFvBpyhD0VQPTEe1M5UQMRGG8N1wS+kYH3bztg9Yv8UpnRUeCNyJlUmKOw0JoMKPGU
+	rIIJwVgrLwOX4sY7oyZv5VN2i6LIhOM=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 6/7] shared/vcp: add ready callback to bt_vcp_attach()
-Date: Tue,  2 Dec 2025 22:47:51 +0200
-Message-ID: <2df6144985b594eb07f379a6b9f831c07205f36d.1764708372.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 5/7] bap: have unicast client wait for VCS & TMAS & GMAP
+Date: Tue,  2 Dec 2025 22:47:50 +0200
+Message-ID: <ea99aac0d8fddbc9dc7130cfb89d139e48850c66.1764708372.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1764708372.git.pav@iki.fi>
 References: <cover.1764708372.git.pav@iki.fi>
@@ -67,92 +67,96 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add callback that is called when VCP client has finished attaching, so
-that caller can know when it can be used.
+Have unicast client to wait for VCS, TMAS, and GMAP before creating
+endpoints and transports, so that their information is available at that
+point.
 ---
 
 Notes:
     v3:
-    - new commit
+    - ready + after_uuids -> after_services
+    v2:
+    - use the generic mechanism to do this
 
- src/shared/vcp.c | 29 ++++++++++++++++++++++++++++-
- src/shared/vcp.h |  3 ++-
- 2 files changed, 30 insertions(+), 2 deletions(-)
+ profiles/audio/bap.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index b766faef6..c7f74956e 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -203,6 +203,10 @@ struct bt_vcp {
- 	unsigned int aics_ip_status_id;
- 	unsigned int aics_ip_descr_id;
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 0dcc57eb5..295e4552d 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -145,6 +145,8 @@ struct bap_data {
+ 	GIOChannel *listen_io;
+ 	unsigned int io_id;
+ 	unsigned int cig_update_id;
++	bool services_ready;
++	bool bap_ready;
+ };
  
-+	unsigned int idle_id;
-+	bt_vcp_func_t ready_func;
-+	void *ready_data;
-+
- 	struct queue *notify;
- 	struct queue *pending;
- 
-@@ -427,6 +431,11 @@ void bt_vcp_detach(struct bt_vcp *vcp)
- 	if (!queue_remove(sessions, vcp))
- 		return;
- 
-+	if (vcp->idle_id) {
-+		bt_gatt_client_idle_unregister(vcp->client, vcp->idle_id);
-+		vcp->idle_id = 0;
-+	}
-+
- 	if (vcp->client) {
- 		bt_gatt_client_unref(vcp->client);
- 		vcp->client = NULL;
-@@ -2976,7 +2985,18 @@ static void foreach_aics_service(struct gatt_db_attribute *attr,
- 	gatt_db_service_foreach_char(attr, foreach_aics_char, vcp);
- }
- 
--bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client)
-+static void vcp_idle(void *data)
-+{
-+	struct bt_vcp *vcp = data;
-+
-+	vcp->idle_id = 0;
-+
-+	if (vcp->ready_func)
-+		vcp->ready_func(vcp, vcp->ready_data);
-+}
-+
-+bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client,
-+				bt_vcp_func_t ready, void *ready_user_data)
- {
- 	bt_uuid_t uuid;
- 
-@@ -3004,5 +3024,12 @@ bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client)
- 	bt_uuid16_create(&uuid, AUDIO_INPUT_CS_UUID);
- 	gatt_db_foreach_service(vcp->rdb->db, &uuid, foreach_aics_service, vcp);
- 
-+	vcp->ready_func = ready;
-+	vcp->ready_data = ready_user_data;
-+
-+	if (!vcp->idle_id)
-+		vcp->idle_id = bt_gatt_client_idle_register(vcp->client,
-+							vcp_idle, vcp, NULL);
-+
+ static struct queue *sessions;
+@@ -2137,10 +2139,10 @@ static bool pac_found_bcast(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
  	return true;
  }
-diff --git a/src/shared/vcp.h b/src/shared/vcp.h
-index 705b6f301..89efaa09c 100644
---- a/src/shared/vcp.h
-+++ b/src/shared/vcp.h
-@@ -43,7 +43,8 @@ void bt_vcp_unref(struct bt_vcp *vcp);
  
- void bt_vcp_add_db(struct gatt_db *db);
+-static void bap_ready(struct bt_bap *bap, void *user_data)
++static void bap_ucast_start(struct bap_data *data)
+ {
+-	struct btd_service *service = user_data;
+-	struct bap_data *data = btd_service_get_user_data(service);
++	struct btd_service *service = data->service;
++	struct bt_bap *bap = data->bap;
  
--bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client);
-+bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client,
-+				bt_vcp_func_t ready, void *ready_user_data);
- void bt_vcp_detach(struct bt_vcp *vcp);
+ 	DBG("bap %p", bap);
  
- uint8_t bt_vcp_get_volume(struct bt_vcp *vcp);
+@@ -3723,6 +3725,29 @@ static void pa_and_big_sync(struct bap_setup *setup)
+ 	}
+ }
+ 
++static void bap_ready(struct bt_bap *bap, void *user_data)
++{
++	struct btd_service *service = user_data;
++	struct bap_data *data = btd_service_get_user_data(service);
++
++	DBG("bap %p", bap);
++
++	data->bap_ready = true;
++	if (data->services_ready)
++		bap_ucast_start(data);
++}
++
++static void bap_services_ready(struct btd_service *service)
++{
++	struct bap_data *data = btd_service_get_user_data(service);
++
++	DBG("%p", data);
++
++	data->services_ready = true;
++	if (data->bap_ready)
++		bap_ucast_start(data);
++}
++
+ static int bap_bcast_probe(struct btd_service *service)
+ {
+ 	struct btd_device *device = btd_service_get_device(service);
+@@ -3877,6 +3902,9 @@ static int bap_accept(struct btd_service *service)
+ 		return -EINVAL;
+ 	}
+ 
++	data->bap_ready = false;
++	data->services_ready = false;
++
+ 	if (!bt_bap_attach(data->bap, client)) {
+ 		error("BAP unable to attach");
+ 		return -EINVAL;
+@@ -4000,6 +4028,8 @@ static struct btd_profile bap_profile = {
+ 	.adapter_remove	= bap_adapter_remove,
+ 	.auto_connect	= true,
+ 	.experimental	= true,
++	.after_services	= BTD_PROFILE_UUID_CB(bap_services_ready,
++				VCS_UUID_STR, TMAS_UUID_STR, GMAS_UUID_STR),
+ };
+ 
+ static struct btd_profile bap_bcast_profile = {
 -- 
 2.51.1
 
