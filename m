@@ -1,64 +1,77 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3042F745C
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Dec 2025 20:48:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C56C2F7446
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Dec 2025 20:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764708492; cv=pass; b=GrCkH1ckkVo9ZSxuZVyKUCKAqp6PKelW+PMwzDHL9EnSAz3CS6s7hApk36sxxtLpYk7FP60KNd/B9NFWbAYttI662kZqVrXmg6YgcLQIq/lsyS855BwK5jL+cK87SQ04iSRRFoOWUGq2l70zVUgiAgxTpQtc0VaMlRXN3lBXljY=
+	t=1764708497; cv=pass; b=PSXgU2XdgJSolqEUrIBuDSw2zc8JqqKznEWoyWWaNlv1tdthpmJlBD8nVrRBQuwANvecPp5b/JWgiGbaZR8CGLSTCgZ1MyvmfuNAHK9u8A0DtTiDt869oB//BTk4syjRHF3MtrjYZw+4ws8K3DxvpWye+ZNhvxUOMDE9+QJGoak=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764708492; c=relaxed/simple;
-	bh=xFMR9Gk8RLaEFI6qmNfrUPAfPfF4n8mZT3/LI7RF3wg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J+/OONpp4k6Y/274ImsjiPR9a7wlTq1D4Og8hzVBmXYMq76saNPcOYI2AY83OCEbNz1VIOvsVAUpi0Lm4Xt5FCSIo49c6y4CGShJ0zWQelmP68zXly3QP3+cvxwyZHrn35miZw9OCAnGJNmnqBIj3ft6EbklUHsK7vYBg021Boo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=rlmUPYdr; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1764708497; c=relaxed/simple;
+	bh=R49BFfWwS0xcJ8dj4iVDAaWNzXNluVBMfSp4NCQQQ/I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FABaFQJvx8S3jYZ6mTlz7Uc0gPVWTdxHDJIg2ltJvzVNtlxHbYGSj5gQ0DabP06w+hDBhjWePFlRm7dkVNSsp5DuXiljYSnIvHbM+yvHmFu8FThmZzOWnCgAqfOTieas39EFIufKTtjLt5uHtqEi1IdZN4WS2CQUDScfLTpaheE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=lvD10C5l; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Juyjcjqi; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="rlmUPYdr"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="lvD10C5l";
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Juyjcjqi"
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4dLXsZ1FY4z49PwQ
+	for <linux-bluetooth@vger.kernel.org>; Tue, 02 Dec 2025 22:48:02 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1764708482;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vfojInN8c9GJ9kMi6pGUatebpzZiW+nY/HNNHWrJMnA=;
+	b=lvD10C5lb23ZfS/xYrtvZNVYDUdBamcErGh6RsCc438QYuPPnL1x0XgltHJQCUfQO5EOAJ
+	S9qp3rV+4Ij4+vmman0CXxbUAcfI2YTy9L1UHlibCFeaz/fi0eEu3ujBLLs3algUs4gLfK
+	5Do48Z0fymolnMNQfzVEI/WXvyt4+Crzi5yZoByQAI/cPB/Xkrvm1Ad4F0X3uJoVswaX20
+	gxJ7ophUJUw/whdrCacIxGkD7QVmwvPaqAOkZ4uwoUEtv7pI/CEEkkxP2gF5m5N2ShFRKh
+	J12qkI8SpGCazrDv731qtbAebOxWSFC5u1ricGrKgBOZ0x4hbPwZWcnLt96SRA==
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dLXsR4fdqz10M3;
-	Tue,  2 Dec 2025 22:47:55 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dLXsQ0Lp9zyQn;
+	Tue,  2 Dec 2025 22:47:53 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1764708475;
+	t=1764708474;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5zs6AMls0y6pjwnp6M1vJqoMhk7yZI2/AREY3VYzcP8=;
-	b=rlmUPYdrMt+gky2ObDYmSuFrp1x9Q/UUQpOlc0yOalV6vHEuQpuhazZxChdOFBs6olaChR
-	X+InY9RGnhsjQ3nUuUsjr+AJEPUKWNnBca0Di4vk9Bp+y375tH0d9B2UISK42gDk9kF6wR
-	g1rjLeBjfKXSw8Vk5CLTzzBazKZLzEM=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764708475;
-	b=ShM6rsqri87aiB/9X2RpjpbCcrtbsh2PICNZZS1FaBmvfo4XeCkXW2RxqX0Psu2UX31DCv
-	Wtk1TpmxYPfK4+ervOPXv3l4mbmnbprD6rRpiWsTP/Eo2MAxW6c2pp5H2TeQLL7zefk6QT
-	uJzaUvh53EMlJtoJCdwweW2++PJFWLE=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vfojInN8c9GJ9kMi6pGUatebpzZiW+nY/HNNHWrJMnA=;
+	b=JuyjcjqipBRtA7/d85JjVtxN+jW+Gr6X6B8g2IHy+M8vURmSZ4RMxEjvPkSBqIAxTVClMv
+	vUjLqOEf16vQrSG5wvUfgdTWcjFLUFPJI7cXlkul7h6N9HCeKyN9tmMU9JL8u0WShO8UfJ
+	XDH6YM3YPIl6FQOAtC2dk0bOVwjIZh4=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764708474;
+	b=PFzhq/2KQ0LkSHPpH3fA/rooU+yZSvEVFaJiUx71nevcxLVEUkYuPBLSNBAFvWhGXGdP1i
+	9o7XE6lN0hISwWaxAKDAU63SAZn0wUdj95j8nmauTHlbchvJyw+snzG2s7+wxzeMOhhjMz
+	xol9weuW528Drs41MkT36yvknWP6gKU=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1764708475;
+	s=meesny; t=1764708474;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5zs6AMls0y6pjwnp6M1vJqoMhk7yZI2/AREY3VYzcP8=;
-	b=OAUZ8BjeeVMCdI8qhkwyltbp2inqERPxzHdi3RNBFdgOcgKjQvi3GqDUs/Hwc/o8q/YkEb
-	woUhFFvBpyhD0VQPTEe1M5UQMRGG8N1wS+kYH3bztg9Yv8UpnRUeCNyJlUmKOw0JoMKPGU
-	rIIJwVgrLwOX4sY7oyZv5VN2i6LIhOM=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vfojInN8c9GJ9kMi6pGUatebpzZiW+nY/HNNHWrJMnA=;
+	b=J+YIKbdACKD1X82NO8s0m2joVu0sr99d5P/u9GGaobMG11vi6Pi2NiVA/Je4sOwUf2QVmg
+	zobY7xsmmYLO4Q20IZ8xytlNy2LvDXY5PNlBFzKGgvicKJXKtl1RkDNlxysoEF9rLyyE0H
+	Z7F6ouhTMcfOsn/yJUzwzZrLAtPxEPs=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 5/7] bap: have unicast client wait for VCS & TMAS & GMAP
-Date: Tue,  2 Dec 2025 22:47:50 +0200
-Message-ID: <ea99aac0d8fddbc9dc7130cfb89d139e48850c66.1764708372.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 0/7] Add TMAP & GMAP information services
+Date: Tue,  2 Dec 2025 22:47:45 +0200
+Message-ID: <cover.1764708372.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
-In-Reply-To: <cover.1764708372.git.pav@iki.fi>
-References: <cover.1764708372.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -67,96 +80,68 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Have unicast client to wait for VCS, TMAS, and GMAP before creating
-endpoints and transports, so that their information is available at that
-point.
+Add support for TMAP and GMAP services. They contain only device
+audio capability bitmasks.
+
+v3:
+- rename after_uuids -> after_services + make it a struct
+- add tests for btd_profile_sort_list()
+- leave it as the GSList version for now, tests use queue
+- add commits to mark VCP connected only after its attach has finished
+
+v2:
+- Rework the service wait to be general mechanism that also determines
+  the service autoconnect order.
+
+  This is now slightly more involved, but this sort of "soft" ordering
+  dependency must know which services the autoconnect mechanism is going
+  to start.
+
+  Sorting autoconnect services is one of the ways to do it, probably
+  makes sense also otherwise, and we could insert service conflict
+  handling at the same place.
+
+- Make org.bluez.MediaEndpoint::SupportedFeatures per-uuid dict
+
 ---
 
-Notes:
-    v3:
-    - ready + after_uuids -> after_services
-    v2:
-    - use the generic mechanism to do this
+Expose the values from remote devices in
+org.bluez.MediaEndpoint->SupportedFeatures
 
- profiles/audio/bap.c | 36 +++++++++++++++++++++++++++++++++---
- 1 file changed, 33 insertions(+), 3 deletions(-)
+This maybe could also be org.bluez.Device->SupportedFeatures instead,
+but MediaEndpoint looks OK too.
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 0dcc57eb5..295e4552d 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -145,6 +145,8 @@ struct bap_data {
- 	GIOChannel *listen_io;
- 	unsigned int io_id;
- 	unsigned int cig_update_id;
-+	bool services_ready;
-+	bool bap_ready;
- };
- 
- static struct queue *sessions;
-@@ -2137,10 +2139,10 @@ static bool pac_found_bcast(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	return true;
- }
- 
--static void bap_ready(struct bt_bap *bap, void *user_data)
-+static void bap_ucast_start(struct bap_data *data)
- {
--	struct btd_service *service = user_data;
--	struct bap_data *data = btd_service_get_user_data(service);
-+	struct btd_service *service = data->service;
-+	struct bt_bap *bap = data->bap;
- 
- 	DBG("bap %p", bap);
- 
-@@ -3723,6 +3725,29 @@ static void pa_and_big_sync(struct bap_setup *setup)
- 	}
- }
- 
-+static void bap_ready(struct bt_bap *bap, void *user_data)
-+{
-+	struct btd_service *service = user_data;
-+	struct bap_data *data = btd_service_get_user_data(service);
-+
-+	DBG("bap %p", bap);
-+
-+	data->bap_ready = true;
-+	if (data->services_ready)
-+		bap_ucast_start(data);
-+}
-+
-+static void bap_services_ready(struct btd_service *service)
-+{
-+	struct bap_data *data = btd_service_get_user_data(service);
-+
-+	DBG("%p", data);
-+
-+	data->services_ready = true;
-+	if (data->bap_ready)
-+		bap_ucast_start(data);
-+}
-+
- static int bap_bcast_probe(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
-@@ -3877,6 +3902,9 @@ static int bap_accept(struct btd_service *service)
- 		return -EINVAL;
- 	}
- 
-+	data->bap_ready = false;
-+	data->services_ready = false;
-+
- 	if (!bt_bap_attach(data->bap, client)) {
- 		error("BAP unable to attach");
- 		return -EINVAL;
-@@ -4000,6 +4028,8 @@ static struct btd_profile bap_profile = {
- 	.adapter_remove	= bap_adapter_remove,
- 	.auto_connect	= true,
- 	.experimental	= true,
-+	.after_services	= BTD_PROFILE_UUID_CB(bap_services_ready,
-+				VCS_UUID_STR, TMAS_UUID_STR, GMAS_UUID_STR),
- };
- 
- static struct btd_profile bap_bcast_profile = {
+Sound server can use theses to determine which mandatory capabilities
+devices have.
+
+TODO (maybe later): add way to configure advertised local service
+values, e.g.  via config file.
+
+Pauli Virtanen (7):
+  profile: add after_services for ordering profile startup
+  test-profile: add tests for profile sorting
+  device: use after_services in service autoconnect and sort also GATT
+  service: implement btd_profile::after_services callback
+  bap: have unicast client wait for VCS & TMAS & GMAP
+  shared/vcp: add ready callback to bt_vcp_attach()
+  vcp: wait until client ready before marking profile connected
+
+ .gitignore           |   1 +
+ Makefile.am          |  22 ++-
+ profiles/audio/bap.c |  36 ++++-
+ profiles/audio/vcp.c |  11 +-
+ src/device.c         |  74 ++++++++--
+ src/profile.c        |  90 +++++++++++
+ src/profile.h        |  26 ++++
+ src/service.c        | 106 +++++++++++++
+ src/shared/vcp.c     |  29 +++-
+ src/shared/vcp.h     |   3 +-
+ unit/btd.c           |  41 ++++++
+ unit/test-profile.c  | 344 +++++++++++++++++++++++++++++++++++++++++++
+ 12 files changed, 758 insertions(+), 25 deletions(-)
+ create mode 100644 unit/btd.c
+ create mode 100644 unit/test-profile.c
+
 -- 
 2.51.1
 
