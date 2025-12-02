@@ -1,80 +1,80 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6A22F83A2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7FF2F7445
 	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Dec 2025 20:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764708497; cv=pass; b=hs7IxyBVbzW26Q6fHgZ0F/YdNEDDdPznqCSWNDOyWdUfDLdAYYWlT/of+ZYPwaiKGuRsV4bMot2cO6qDkvLw1AsW3ISpJbl0dQFG+KG8WMocLNjPhJ/RgCbr2PO9FwGJJ9uHZvE5wLfRym+K+O8Px+ZwfjNzV7u2lTLCOMnxpwE=
+	t=1764708498; cv=pass; b=LhH13WZ36MfXGtEUJ0T/OYDO1WlAAdIO0OVLrqCBzXtUBYkZCGeGyzoTbO/SCIW47GAaD78hZU26Ird7e4JELXEe9rWqcfEm22qYyP3IOiBLkxOVAmqFjaQdLmuPmsUsqGXgJpEH3dz+s05tEcQKRJlNsK4XOQAbFRW2/xn1Edg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764708497; c=relaxed/simple;
-	bh=+ECREZ+zhMnxB5ry4fL01z8l6NJUddtatGkf6CvdDqw=;
+	s=arc-20240116; t=1764708498; c=relaxed/simple;
+	bh=4qgbBIBOct5BMbNNXoqfGp8iPXscbumiGeoTKfj8Qq4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n8rQ+beh/mVroAuf664ePQuEzyyIESDEuDhzGcWQWRJwi/epdc0+w0ysvdbMQLYL1XBueDzPcL2eHiaRIsbZnpYXWqWxhweTfVj9WoUoeiFJqbgQ+OIBPOMk08T7fNrEUHViaq5ttlyacjG9YpNd7DF+N4WcsqiADuliLmZZzEY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=uFarlFCp; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=nrVPaeXk; arc=pass smtp.client-ip=185.185.170.37
+	 MIME-Version; b=TugohLnAoRpZPd7mtFtSaATqIPXbJ7Tvq7SzdtbZZZBdogeY0qglf/fj/5gwrR6M1LH8zVursdjRusmbXZ5izs98FaZpxfkJtpgn2cjbDWX6paXofQuqA6ahZ8fqk1HwZes8DACNngQS82TicIELCFFPJB3GyfaAUzzYpOIL5go=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=RUHc3f/w; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=e/ZMgFDM; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="uFarlFCp";
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="nrVPaeXk"
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="RUHc3f/w";
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="e/ZMgFDM"
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4dLXsZ6B37z49Q4P
-	for <linux-bluetooth@vger.kernel.org>; Tue, 02 Dec 2025 22:48:02 +0200 (EET)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4dLXsb19pdz49Q7m
+	for <linux-bluetooth@vger.kernel.org>; Tue, 02 Dec 2025 22:48:03 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1764708482;
+	t=1764708483;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RJF3YvnIsvij4PKNCMoZFuQJKYoWoHXwhYfkbDgC7tU=;
-	b=uFarlFCpI/CnmftresG8iTu3eAe8YtJz0RQ7tkH5EXccxXtS7ffag9ORzf7PqIO8IBkmeJ
-	DX02DVUAldL/mWEUPNYPIKBfVyiZRLPWTSA5a8qFvZTM6LM26dI97igckNSY8XJ/Dw1bcJ
-	vXKoh5RDA9bi5wksA3QSJx2lM05xNzqlOSYFM2NKeAuJL6cgBS4c0VRpp/pJIq+n2m0yfz
-	1AsDHI3o23F/oEVGb8f+c/2CTfeYSZ1IGxoR51yKGaB8y3NraSBRN0JmZsub5FI9Jege3W
-	j7gB9n9vzBaCouwrNG7It7NqWpi5ae3cXHXddvq8AwLyigixEhVKJ6o+ZsTFcw==
+	bh=72KdhHgQMAe4BWL8C5WJhGKRj7o8PisUYelbuNuCj3g=;
+	b=RUHc3f/wj5Mp4BGkO458kQ86Hek2Ly0sbk3zSsBqBJLW7xUwIzMehyAfneRHJfUse64QQd
+	VLHnMTG4hHdXIgK+SSczusM0aTUFFae9i+cA1P8KToprOS2nmHu9tQo+eBB9lCsZhQLA0O
+	DHPrE/e2flnRaglVABQBoMGY8vgDEKtTEwZFPUT1oQ9bFVS+KIH4Tr73wrHnrw9J+6007E
+	CRJOBFe3vvEycTFF2Rf2hCaznb4VCPq1PXOXufJwn0QPtxUa9h11qLmnj0K35TjHxhTWAI
+	9MT0qz4d7+CtCzyS4orFl2Gknd4h6hoFwKIMHAPcwTcEGvkR8O0mysEZ6TDbRg==
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dLXsR1WBCz10LB;
-	Tue,  2 Dec 2025 22:47:55 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dLXsQ5HP9z107f;
+	Tue,  2 Dec 2025 22:47:54 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1764708475;
+	t=1764708474;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RJF3YvnIsvij4PKNCMoZFuQJKYoWoHXwhYfkbDgC7tU=;
-	b=nrVPaeXkbsxtz93hrvlt+TvGd8LZs60nciSUyNlrvMdFXf429R8FSywiRzA2NWOIMIOc5j
-	eenYlUNlh+yoAPYC6BBPeq+pFYMBI6xbAgJnF+ZSVd2S//Ee2S5mm0YdYALaXaZHmnM/7K
-	hUSibc0b9/S6r0VB3ymDywubtsmFu0o=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764708475;
-	b=myQnakMHG6U4rdu4tZUnsQvjsDHEZUeExPM9p/FmQ0D0slnzeGKe8SgoADiw/1x+CyiocH
-	zfUXN9Ca/4usHDEEhLRKwtrYM4kKfbZOzFy5ZJ5m8dLIambNX+gXeD42jdbNJJzWc0zT3L
-	ehGTpVfN1/69+ZveWMzyqG++ITOtixw=
+	bh=72KdhHgQMAe4BWL8C5WJhGKRj7o8PisUYelbuNuCj3g=;
+	b=e/ZMgFDMlGqdui/CqN5+PhSNzOCfHj8LsdHHZD/AV6H/13lJvGR8yJFGcO4m4f3Zek3ync
+	y+fiiic9OiSpyvYStxGbaVaBreJpL9GazlhVxwvW8+03xTFYwgbIfSrfW7I5Rmux6CaEeF
+	o9KPvYR2OhBaF176zbxzFAhGfvhB//U=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1764708474;
+	b=DiRHhFb/KWf6erLF2kIFyHnB1ZsHJdHBztCp5EUZVY+8RcLmv/Q9FyOt5oKb8U2Q3Ps9TS
+	CAq+xT5i5d85iocyhgo4vZE8xrJbXheXh+OH9YlQUCsDn6rKZNLg8qW+zNrqcAbQb3zh7d
+	6t9q3eE/YYhh2/+cm2Suo3NyYAI7Nsw=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1764708475;
+	s=meesny; t=1764708474;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RJF3YvnIsvij4PKNCMoZFuQJKYoWoHXwhYfkbDgC7tU=;
-	b=KtsyF7jHc04gtUesgiDrjtX3rIsyDlbslqtnuNQl9qFbtyUA5CltBK8MDEIIGtaCVDrUFF
-	YLdhmEZYKsU7nxA7TSMQp9xtler1RIzfBXDP247iQ4FFofi+CxoZcLRJIAllwew4NR289E
-	WQ6o19PgoYg9OfXuAr/avFtImh7VG0E=
+	bh=72KdhHgQMAe4BWL8C5WJhGKRj7o8PisUYelbuNuCj3g=;
+	b=FU/7K/J7+EqZ0sVq2uueDO0JYTFX+u7220JcbdD3XrDCcf8L3FmVKrOiHH8p+4lc05EqPw
+	oQCo1d34EILQ4Ft/tiuLOGu6HHrz2xgS80J1k8sCfUW/vtw9qYbWNtux5A+FXocUe5fYJd
+	nDkMJ03h2jDISpd/fKVa5489CGhmfKA=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 3/7] device: use after_services in service autoconnect and sort also GATT
-Date: Tue,  2 Dec 2025 22:47:48 +0200
-Message-ID: <efb6103c34abdc72d6039e1c30760dc47f4d919a.1764708372.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 2/7] test-profile: add tests for profile sorting
+Date: Tue,  2 Dec 2025 22:47:47 +0200
+Message-ID: <b93c49b85f27bc15e393b0f9bb46b7fb88c5632e.1764708372.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1764708372.git.pav@iki.fi>
 References: <cover.1764708372.git.pav@iki.fi>
@@ -86,149 +86,495 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use btd_profile_sort_list() for selecting the order in which services
-are connected: first by priority, then by after_services.
+Add tests to check btd_profile_sort_list() works correctly.
 
-Probe and accept also GATT services in profile order. Previously this
-was done in the order they were in GATT db.
+The test uses queue instead of GSList in case device.c is converted to
+use queue later.
+
+Makefile.am: separate out bluetoothd_internal_sources (excludes plugins
+& main.c) and add stub for symbols in main.c.  The profile.c pulls in
+large parts of these so it's simpler to depend on them all for the test.
+This doesn't cause any recompilation.
 ---
 
 Notes:
     v3:
-    - no change
-    - GSList *pending -> struct queue *pending refactoring left for later...
+    - new commit
 
- src/device.c | 74 +++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 62 insertions(+), 12 deletions(-)
+ .gitignore          |   1 +
+ Makefile.am         |  22 ++-
+ unit/btd.c          |  41 ++++++
+ unit/test-profile.c | 344 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 403 insertions(+), 5 deletions(-)
+ create mode 100644 unit/btd.c
+ create mode 100644 unit/test-profile.c
 
-diff --git a/src/device.c b/src/device.c
-index eb184633a..3ecbfd67c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2523,14 +2523,6 @@ static struct btd_service *find_connectable_service(struct btd_device *dev,
- 	return NULL;
- }
+diff --git a/.gitignore b/.gitignore
+index ba29d9d5e..80427e1dd 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -120,6 +120,7 @@ unit/test-bass
+ unit/test-battery
+ unit/test-tmap
+ unit/test-gmap
++unit/test-profile
+ tools/mgmt-tester
+ tools/smp-tester
+ tools/gap-tester
+diff --git a/Makefile.am b/Makefile.am
+index 7221e4cba..e152ae648 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -304,9 +304,9 @@ include Makefile.plugins
  
--static int service_prio_cmp(gconstpointer a, gconstpointer b)
--{
--	struct btd_profile *p1 = btd_service_get_profile(a);
--	struct btd_profile *p2 = btd_service_get_profile(b);
--
--	return p2->priority - p1->priority;
--}
--
- bool btd_device_all_services_allowed(struct btd_device *dev)
- {
- 	GSList *l;
-@@ -2581,6 +2573,12 @@ void btd_device_update_allowed_services(struct btd_device *dev)
- 	}
- }
+ pkglibexec_PROGRAMS += src/bluetoothd
  
-+static const struct btd_profile *get_service_profile(void *data,
-+								void *user_data)
+-src_bluetoothd_SOURCES = $(builtin_sources) \
++bluetoothd_internal_sources = \
+ 			$(attrib_sources) $(btio_sources) \
+-			src/main.c src/log.h src/log.c \
++			src/log.h src/log.c \
+ 			src/backtrace.h src/backtrace.c \
+ 			src/rfkill.c src/btd.h src/sdpd.h \
+ 			src/sdpd-server.c src/sdpd-request.c \
+@@ -316,7 +316,6 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
+ 			src/sdp-client.h src/sdp-client.c \
+ 			src/textfile.h src/textfile.c \
+ 			src/uuid-helper.h src/uuid-helper.c \
+-			src/plugin.h src/plugin.c \
+ 			src/storage.h src/storage.c \
+ 			src/advertising.h src/advertising.c \
+ 			src/agent.h src/agent.c \
+@@ -333,10 +332,17 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
+ 			src/settings.h src/settings.c \
+ 			src/set.h src/set.c \
+ 			src/bearer.h src/bearer.c
+-src_bluetoothd_LDADD = lib/libbluetooth-internal.la \
++
++bluetoothd_internal_ldadd = lib/libbluetooth-internal.la \
+ 			gdbus/libgdbus-internal.la \
+ 			src/libshared-glib.la \
+-			$(BACKTRACE_LIBS) $(GLIB_LIBS) $(DBUS_LIBS) -ldl -lrt \
++			$(BACKTRACE_LIBS) $(GLIB_LIBS) $(DBUS_LIBS) -ldl -lrt
++
++src_bluetoothd_SOURCES = $(builtin_sources) \
++			$(bluetoothd_internal_sources) \
++			src/plugin.h src/plugin.c \
++			src/main.c
++src_bluetoothd_LDADD = $(bluetoothd_internal_ldadd) \
+ 			$(builtin_ldadd)
+ 
+ if EXTERNAL_PLUGINS
+@@ -576,6 +582,12 @@ unit_tests += unit/test-uhid
+ unit_test_uhid_SOURCES = unit/test-uhid.c
+ unit_test_uhid_LDADD = src/libshared-glib.la $(GLIB_LIBS)
+ 
++unit_tests += unit/test-profile
++
++unit_test_profile_SOURCES = unit/test-profile.c \
++			unit/btd.c $(bluetoothd_internal_sources)
++unit_test_profile_LDADD = $(bluetoothd_internal_ldadd)
++
+ unit_tests += unit/test-sdp
+ 
+ unit_test_sdp_SOURCES = unit/test-sdp.c \
+diff --git a/unit/btd.c b/unit/btd.c
+new file mode 100644
+index 000000000..06b2a1220
+--- /dev/null
++++ b/unit/btd.c
+@@ -0,0 +1,41 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2000-2001  Qualcomm Incorporated
++ *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
++ *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ */
++
++/* Stub replacement for daemon main.c for tests */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <stdbool.h>
++#include <stdint.h>
++
++#include <glib.h>
++
++#include "../src/btd.h"
++
++struct btd_opts btd_opts;
++
++GKeyFile *btd_get_main_conf(void)
 +{
-+	return btd_service_get_profile(data);
++	return NULL;
 +}
 +
- static GSList *create_pending_list(struct btd_device *dev, const char *uuid)
- {
- 	struct btd_service *service;
-@@ -2619,10 +2617,13 @@ static GSList *create_pending_list(struct btd_device *dev, const char *uuid)
- 						BTD_SERVICE_STATE_DISCONNECTED)
- 			continue;
- 
--		dev->pending = g_slist_insert_sorted(dev->pending, service,
--							service_prio_cmp);
-+		dev->pending = g_slist_append(dev->pending, service);
- 	}
- 
-+	/* Connect in priority order */
-+	dev->pending = btd_profile_sort_list(dev->pending, get_service_profile,
-+									NULL);
-+
- 	return dev->pending;
- }
- 
-@@ -4630,9 +4631,42 @@ done:
- 	service_accept(service, btd_device_is_initiator(device));
- }
- 
-+
-+static const struct btd_profile *get_gatt_profile(void *data, void *user_data)
++bool btd_kernel_experimental_enabled(const char *uuid)
 +{
-+	struct gatt_db_attribute *attr = data;
-+	struct btd_profile *profile;
-+	bt_uuid_t uuid;
-+	struct btd_profile *dummy_profile = user_data;
-+	char *uuid_str = (char *)dummy_profile->remote_uuid;
-+
-+	gatt_db_attribute_get_service_uuid(attr, &uuid);
-+	bt_uuid_to_string(&uuid, uuid_str, MAX_LEN_UUID_STR);
-+
-+	profile = btd_profile_find_remote_uuid(uuid_str);
-+	if (!profile)
-+		profile = dummy_profile;
-+
-+	return profile;
++	return false;
 +}
 +
-+static void get_gatt_attrs(struct gatt_db_attribute *attr,
++void btd_exit(void)
++{
++}
+diff --git a/unit/test-profile.c b/unit/test-profile.c
+new file mode 100644
+index 000000000..31c96596e
+--- /dev/null
++++ b/unit/test-profile.c
+@@ -0,0 +1,344 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <unistd.h>
++#include <string.h>
++#include <limits.h>
++#include <stdint.h>
++#include <sys/socket.h>
++#include <fcntl.h>
++
++#include <glib.h>
++
++#include "bluetooth/bluetooth.h"
++#include "bluetooth/uuid.h"
++
++#include "src/shared/util.h"
++#include "src/shared/queue.h"
++#include "src/shared/tester.h"
++
++#include "src/adapter.h"
++#include "src/profile.h"
++
++#define FAIL_TEST() \
++	do { tester_warn("%s:%d: failed in %s", __FILE__, __LINE__, __func__); \
++		tester_test_failed(); } while (0)
++
++struct test_config {
++	const struct btd_profile *profiles;
++	unsigned int profiles_count;
++	unsigned int shuffle_count;
++	const char *cycle_break;
++};
++
++struct test_data {
++	const struct test_config *cfg;
++};
++
++#define define_test(name, _cfg, setup, function)		\
++	do {							\
++		static struct test_data data;			\
++		data.cfg = _cfg;				\
++		tester_add(name, &data, setup, function,	\
++						test_teardown);	\
++	} while (0)
++
++static void test_teardown(const void *user_data)
++{
++	tester_teardown_complete();
++}
++
++#define SORT_PROFILE(expect_pos_, ...) \
++	{ .name = UINT_TO_PTR(expect_pos_), __VA_ARGS__ }
++#define AFTER(...) \
++	.after_services = BTD_PROFILE_UUID_CB(NULL, __VA_ARGS__)
++
++const struct test_config sort_priority = {
++	.profiles = (const struct btd_profile []) {
++		SORT_PROFILE(3, .priority = 1),
++		SORT_PROFILE(4, .priority = 1),
++		SORT_PROFILE(1, .priority = 2),
++		SORT_PROFILE(5, .priority = 0),
++		SORT_PROFILE(2, .priority = 2),
++		SORT_PROFILE(6, .priority = 0),
++	},
++	.profiles_count = 6,
++};
++
++const struct test_config sort_after_service = {
++	.profiles = (const struct btd_profile []) {
++		SORT_PROFILE(4, .priority = 1, AFTER("B", "C")),
++		SORT_PROFILE(3, .priority = 1, .remote_uuid = "C"),
++		SORT_PROFILE(2, .priority = 2, AFTER("B")),
++		SORT_PROFILE(1, .priority = 2, .remote_uuid = "B"),
++		SORT_PROFILE(6, .priority = 0),
++		SORT_PROFILE(5, .priority = 1, AFTER("invalid")),
++	},
++	.profiles_count = 6,
++};
++
++const struct test_config sort_cycle = {
++	.profiles = (const struct btd_profile []) {
++		SORT_PROFILE(2, .remote_uuid = "B", AFTER("F")),
++		SORT_PROFILE(4, .remote_uuid = "D", AFTER("A", "C")),
++		SORT_PROFILE(5, .remote_uuid = "E", AFTER("D")),
++		SORT_PROFILE(3, .remote_uuid = "C", AFTER("B")),
++		SORT_PROFILE(6, .remote_uuid = "F", AFTER("E")),
++		SORT_PROFILE(1, .remote_uuid = "A"),
++	},
++	.profiles_count = 6,
++	.cycle_break = "F",
++};
++
++const struct test_config sort_fuzz = {
++	.profiles_count = 50,
++	.shuffle_count = 100,
++};
++
++static const struct btd_profile *sort_get(void *item, void *user_data)
++{
++	return item;
++}
++
++static bool check_sort(struct queue *list, unsigned int count,
++							const char *cycle_break)
++{
++	int priority = INT_MAX;
++	GHashTable *uuids, *items;
++	const struct queue_entry *entry;
++	unsigned int n;
++
++	uuids = g_hash_table_new(g_str_hash, g_str_equal);
++	items = g_hash_table_new(NULL, NULL);
++
++	if (queue_length(list) != count) {
++		FAIL_TEST();
++		return false;
++	}
++
++	for (entry = queue_get_entries(list), n = 0; entry;
++						entry = entry->next, ++n) {
++		const struct btd_profile *profile = entry->data;
++
++		g_hash_table_add(uuids, (void *)profile->remote_uuid);
++	}
++
++	if (cycle_break)
++		g_hash_table_remove(uuids, (void *)cycle_break);
++
++	for (entry = queue_get_entries(list), n = 0; entry;
++						entry = entry->next, ++n) {
++		const struct btd_profile *profile = entry->data;
++		unsigned int i;
++
++		/* No duplicates */
++		if (g_hash_table_contains(items, profile)) {
++			FAIL_TEST();
++			return false;
++		}
++		g_hash_table_add(items, (void *)profile);
++
++		/* Decreasing priority */
++		if (profile->priority > priority) {
++			FAIL_TEST();
++			return false;
++		} else if (profile->priority < priority) {
++			priority = profile->priority;
++		}
++
++		/* Ordered by after_services */
++		g_hash_table_remove(uuids, (void *)profile->remote_uuid);
++
++		for (i = 0; i < profile->after_services.count; ++i) {
++			if (g_hash_table_contains(uuids,
++					profile->after_services.uuids[i])) {
++				FAIL_TEST();
++				return false;
++			}
++		}
++
++		/* Manual sort check */
++		if (profile->name && profile->name != UINT_TO_PTR(n + 1)) {
++			FAIL_TEST();
++			return false;
++		}
++	}
++
++	g_hash_table_destroy(uuids);
++	g_hash_table_destroy(items);
++
++	return true;
++}
++
++static struct queue *make_profile_list(const struct btd_profile *profiles,
++							unsigned int count)
++{
++	struct queue *list = queue_new();
++	unsigned int i;
++
++	for (i = 0; i < count; ++i) {
++		struct btd_profile *profile;
++
++		profile = util_memdup(&profiles[i], sizeof(*profile));
++		if (profile->remote_uuid)
++			profile->remote_uuid = g_strdup(profile->remote_uuid);
++		else
++			profile->remote_uuid = g_strdup_printf("%d", i);
++
++		queue_push_tail(list, profile);
++	}
++
++	return list;
++}
++
++static void free_profile_list(struct queue *list)
++{
++	const struct queue_entry *entry;
++
++	for (entry = queue_get_entries(list); entry; entry = entry->next) {
++		const struct btd_profile *profile = entry->data;
++
++		g_free((void *)profile->remote_uuid);
++		free((void *)profile);
++	}
++
++	queue_destroy(list, NULL);
++}
++
++static void *queue_peek_nth(struct queue *list, unsigned int i)
++{
++	const struct queue_entry *entry;
++	unsigned int n = 0;
++
++	for (entry = queue_get_entries(list); entry; entry = entry->next, n++) {
++		if (n == i)
++			return entry->data;
++	}
++
++	return NULL;
++}
++
++static void shuffle_list(struct queue *list)
++{
++	struct queue *shuffled = queue_new();
++
++	while (!queue_isempty(list)) {
++		int i = g_random_int_range(0, queue_length(list));
++		void *data = queue_peek_nth(list, i);
++
++		queue_remove(list, data);
++		queue_push_tail(shuffled, data);
++	}
++
++	/* Put back to original list */
++	while (!queue_isempty(shuffled))
++		queue_push_tail(list, queue_pop_head(shuffled));
++	queue_destroy(shuffled, NULL);
++}
++
++static void btd_profile_sort(struct queue *queue, btd_profile_list_get get,
 +							void *user_data)
 +{
-+	GSList **list = user_data;
++	const struct queue_entry *entry;
++	GSList *list = NULL, *item;
 +
-+	*list = g_slist_append(*list, attr);
++	for (entry = queue_get_entries(queue); entry; entry = entry->next)
++		list = g_slist_append(list, entry->data);
++
++	list = btd_profile_sort_list(list, get, user_data);
++
++	queue_remove_all(queue, NULL, NULL, NULL);
++
++	for (item = list; item; item = item->next)
++		queue_push_tail(queue, item->data);
++
++	g_slist_free(list);
 +}
 +
- static void device_add_gatt_services(struct btd_device *device)
- {
- 	char addr[18];
-+	GSList *attrs = NULL;
-+	GSList *entry;
-+	char uuid_str[MAX_LEN_UUID_STR];
-+	struct btd_profile dummy_profile = {
-+		.remote_uuid = uuid_str,
-+	};
- 
- 	ba2str(&device->bdaddr, addr);
- 
-@@ -4641,18 +4675,34 @@ static void device_add_gatt_services(struct btd_device *device)
- 		return;
- 	}
- 
--	gatt_db_foreach_service(device->db, NULL, add_gatt_service, device);
-+	/* Probe and accept in profile priority order */
-+	gatt_db_foreach_service(device->db, NULL, get_gatt_attrs, &attrs);
++static void test_sort(const void *user_data)
++{
++	struct test_data *data = (void *)user_data;
++	const struct test_config *cfg = data->cfg;
++	struct queue *list;
 +
-+	attrs = btd_profile_sort_list(attrs, get_gatt_profile,
-+							&dummy_profile);
++	list = make_profile_list(cfg->profiles, cfg->profiles_count);
 +
-+	for (entry = attrs; entry; entry = g_slist_next(entry))
-+		add_gatt_service(entry->data, device);
++	btd_profile_sort(list, sort_get, NULL);
++	check_sort(list, cfg->profiles_count, cfg->cycle_break);
 +
-+	g_slist_free(attrs);
- }
- 
- static void device_accept_gatt_profiles(struct btd_device *device)
- {
- 	GSList *l;
- 	bool initiator = btd_device_is_initiator(device);
-+	GSList *services;
- 
- 	DBG("initiator %s", initiator ? "true" : "false");
- 
--	for (l = device->services; l != NULL; l = g_slist_next(l))
-+	/* Accept in profile priority order */
-+	services = g_slist_copy(device->services);
-+	services = btd_profile_sort_list(services, get_service_profile, NULL);
++	free_profile_list(list);
++	tester_test_passed();
++}
 +
-+	for (l = services; l != NULL; l = g_slist_next(l))
- 		service_accept(l->data, initiator);
++static void test_sort_fuzz(const void *user_data)
++{
++	struct test_data *data = (void *)user_data;
++	const struct test_config *cfg = data->cfg;
++	unsigned int i, j;
 +
-+	g_slist_free(services);
- }
- 
- static void device_remove_gatt_service(struct btd_device *device,
++	for (i = 0; i < cfg->shuffle_count; ++i) {
++		struct queue *list;
++		struct btd_profile profiles[64] = { 0 };
++		char *uuids[64];
++
++		g_random_set_seed(i);
++
++		for (j = 0; j < ARRAY_SIZE(uuids); ++j)
++			uuids[j] = g_strdup_printf("%d", j);
++
++		for (j = 0; j < cfg->profiles_count; ++j) {
++			int count;
++
++			profiles[j].priority = 3 - 3 * j / cfg->profiles_count;
++
++			if (g_random_int_range(0, 3) == 0 || j == 0)
++				continue;
++
++			count = g_random_int_range(1, j + 1);
++			if (count > 5)
++				count = 5;
++			profiles[j].after_services.count = count;
++			profiles[j].after_services.uuids = (const char **)uuids
++				+ g_random_int_range(0, j + 1 - count);
++		}
++
++		list = make_profile_list(profiles, cfg->profiles_count);
++		shuffle_list(list);
++
++		btd_profile_sort(list, sort_get, NULL);
++		if (!check_sort(list, cfg->profiles_count, NULL))
++			return;
++
++		free_profile_list(list);
++
++		for (j = 0; j < ARRAY_SIZE(uuids); ++j)
++			g_free(uuids[j]);
++	}
++
++	tester_test_passed();
++}
++
++int main(int argc, char *argv[])
++{
++	tester_init(&argc, &argv);
++
++	define_test("Sort Priority - Success", &sort_priority, NULL, test_sort);
++	define_test("Sort After Service - Success", &sort_after_service, NULL,
++								test_sort);
++	define_test("Sort Cycle - Success", &sort_cycle, NULL, test_sort);
++	define_test("Sort Fuzz - Success", &sort_fuzz, NULL, test_sort_fuzz);
++
++	return tester_run();
++}
 -- 
 2.51.1
 
