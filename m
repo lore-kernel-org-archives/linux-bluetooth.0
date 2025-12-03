@@ -1,231 +1,176 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F1728489A
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Dec 2025 22:16:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733B923908B;
+	Wed,  3 Dec 2025 03:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764713816; cv=none; b=L3mk66Mze8d/PZOP/1AZB6hIw38RGVuOKT9pK6KJqiWrN4QbNeiygQP0Ep5XqfbXCn11XPec/IGqHJiQuMdlzHQxE+xWctdDv3BV6FUEpTd4nVp1Izeey7tNA2SxZJq6AEQQY6o0AYK9T+/uWuzfTTXLpwsXNaPUBPrCxH5qJ2g=
+	t=1764733048; cv=none; b=pPZR0ujvOuwjUMBvEjGlHWZTZIW7nPQcqPb7M6Hb5ItadTLbbFsxXdA/k/TVDFG7Rinz5RmWwk25FJNI6c7+Wr9Kg8hBWTEolhum27IiPFlpGpwTCJCsDiUfjVd84HygCz5iUY5iqESZHRdxGIGZwqOzHFZm/KoVZa5aZphnW5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764713816; c=relaxed/simple;
-	bh=ab5mZuMkE9O+A3A1KuMq4ZV7A/CtEWJVUGtHh3yFQk8=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=W2ZaLfWpmnj9fi2UQceYRYNAZiqqiTcPcY3q02z1sqDAKRbBOC1pSIRdSTPsZQ6Eb60lYOjkY9VJb6CApWNpu4cYv+ufSdSTbOLJiiFt+CZ7LwGL0IIIVNoZSbMBP5jHNfDo713auwzapQHorYbFSMPhVn6E/YHlgFG27FgYzUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EmYfxuDE; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1764733048; c=relaxed/simple;
+	bh=8LYbJtgnEAhoQDdSY/IcYhsNjJ0/KYN8OcHCXlwqTks=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=kKoSxI96/V8scbLCMP9nTOQEeK/F1lgFzneLUjJOEDGI68JO/osNgzTNH2jBqD7dzbvJIRDdhsbZfQQK4QXQ3a7qzL9kBXA2cBBQhpf8Yx29bhQ3LFRroJYB2wy4mFP2z/X5pJAAhKr5dGYThplz5rUq+JZfEdtxva6FEYxP/cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=CmbS9j26; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EmYfxuDE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764713815; x=1796249815;
-  h=date:from:to:cc:subject:message-id;
-  bh=ab5mZuMkE9O+A3A1KuMq4ZV7A/CtEWJVUGtHh3yFQk8=;
-  b=EmYfxuDEuNeoF+fok3pmEOQnuknFf9xa9WbVGovDL7jP5EuhFpRdlav+
-   S/jQbZOGCRz+ymLATrSA+3Hy9OAcIH5GeaVvOD56cIGHoaFor3OweQTtK
-   bEumpNEbzZGdLSdmRPQwtTOne+i1ffRgsMm50i/auUmhPdkSiu30o1UIt
-   24rj/qgD/j7z3fGLi559V/GemZ0D2E9i07FflPiW4P7qUB/TaXyG0QmEc
-   ykLJ4cuWwLOATFxAyBtkyXcYnT5IJglId9tUsO/+suxvgYg/aQxL7w9PM
-   aiXj91IzaHnCE4FuUlB7oebHuyGQRV9DqhesL/AHOx94DbBnYbix8zgZQ
-   g==;
-X-CSE-ConnectionGUID: qjTfOgwnTD60vNgvBC8iLw==
-X-CSE-MsgGUID: gWZBmAVVSg+jKLByIqoG7Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="84096641"
-X-IronPort-AV: E=Sophos;i="6.20,244,1758610800"; 
-   d="scan'208";a="84096641"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 14:16:55 -0800
-X-CSE-ConnectionGUID: Xy2bAAXfR1mhgCdoBxUVxA==
-X-CSE-MsgGUID: NjP3qaIkTnyZnq0nmmpp2A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,244,1758610800"; 
-   d="scan'208";a="194491195"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 02 Dec 2025 14:16:54 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vQYfz-00000000AFN-0I6m;
-	Tue, 02 Dec 2025 22:16:51 +0000
-Date: Wed, 03 Dec 2025 06:16:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 525459da4bd62a81142fea3f3d52188ceb4d8907
-Message-ID: <202512030622.ztKowyYl-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="CmbS9j26"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B2ISl1L4130365;
+	Wed, 3 Dec 2025 03:37:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=1kf5kH9SgOT
+	+bLrCJflerNmHyJAP8uxLoRhy3DGFocE=; b=CmbS9j26ZNm3mybGodXNjmiByml
+	PQeoTTdOCmEpxjmGSPS0bTmlWCfk/9DNvwQ7tdMz0Q23XQapPg27szL6lAVlw/8w
+	KoaGKx+DpVptIM+0p3gxUDuRHEtyREqPsyUgnEhniF2odmsiZWav54t1dK4XB9qJ
+	HNwB0qwmfkTPwdgPOhxVx38xHr9vynPAltZv7nhKH3SlhZ9opNvA/r3ekX988Qlt
+	q64q/HW5IGe+535pbOdqLbS3BiD7DqL1EnIOjy7TR8u3etPe8rNkfnrejYn0JPg9
+	3A6OVmbJYg9MQShRYE50Pxk6TuNFKXjDRzJQDqxY1kXjeLDwhJzCX3JtYWA==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4at5e79avg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Dec 2025 03:37:22 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 5B33bJHb015805;
+	Wed, 3 Dec 2025 03:37:19 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4aqswm45wu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Dec 2025 03:37:19 +0000
+Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5B33bJci015798;
+	Wed, 3 Dec 2025 03:37:19 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 5B33bJhm015793
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Dec 2025 03:37:19 +0000
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
+	id 58B93233F4; Wed,  3 Dec 2025 11:37:18 +0800 (CST)
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
+        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
+        shuai.zhang@oss.qualcomm.com,
+        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: [PATCH v13 1/1] Bluetooth: hci_qca: Fix SSR (SubSystem Restart) fail when BT_EN is pulled up by hw
+Date: Wed,  3 Dec 2025 11:37:12 +0800
+Message-Id: <20251203033712.446632-2-shuai.zhang@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251203033712.446632-1-shuai.zhang@oss.qualcomm.com>
+References: <20251203033712.446632-1-shuai.zhang@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAzMDAyNiBTYWx0ZWRfXwOelUHl5LgK2
+ WVRkd0ZM8UfzuYJ7jK4/WJpjU7H2wifRoOJ6bHo9eUZ0JCNdP/cATpoLni6xZZCsFqkyJrM53t2
+ Bt/AQJ38YxQzS2lH/AwFXQ1hCvht4ryE049l7ZeC9cHWaFrI2j0HfzCPFebw/Eg/UahwLDpZS02
+ y8+x5pgdplejhJT3SCsoRyzZRhatzaLwM1hXqvtoFjk0RAu0fxBsANBKQ4O2rCLS9nlrbijuoTE
+ Ixi6aSj40pGu8zJVbmmP67WzWzvWg/vCdVUmF72BIUj/EEq0B1ITOsaA8NLCeSx3Y2nL6+fYsIF
+ yyqj9x/+M1jiC8LbVfpnt7HlTvJiyVf6mn/LrcX0T7t3QAaXBcZLodpHLlpD+WCxLxt+2m9iwA+
+ H9dcHFtaUT0a3BeIrrsrl6VbVm3Csg==
+X-Authority-Analysis: v=2.4 cv=KcrfcAYD c=1 sm=1 tr=0 ts=692fb072 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8
+ a=i1iVT939vnhokII3DuMA:9
+X-Proofpoint-GUID: Wjh8k2xOd6L4vfpobgMIZE3FHaGzYc9S
+X-Proofpoint-ORIG-GUID: Wjh8k2xOd6L4vfpobgMIZE3FHaGzYc9S
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-01_01,2025-11-27_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 spamscore=0 adultscore=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1015 bulkscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512030026
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 525459da4bd62a81142fea3f3d52188ceb4d8907  Bluetooth: btusb: Add new VID/PID 13d3/3533 for RTL8821CE
+On QCS9075 and QCA8275 platforms, the BT_EN pin is always pulled up by hw
+and cannot be controlled by the host. As a result, in case of a firmware
+crash, the host cannot trigger a cold reset. Instead, the BT controller
+performs a warm restart on its own, without reloading the firmware.
 
-elapsed time: 1450m
+This leads to the controller remaining in IBS_WAKE state, while the host
+expects it to be in sleep mode. The mismatch causes HCI reset commands
+to time out. Additionally, the driver does not clear internal flags
+QCA_SSR_TRIGGERED and QCA_IBS_DISABLED, which blocks the reset sequence.
+If the SSR duration exceeds 2 seconds, the host may enter TX sleep mode
+due to tx_idle_timeout, further preventing recovery. Also, memcoredump_flag
+is not cleared, so only the first SSR generates a coredump.
 
-configs tested: 154
-configs skipped: 2
+Tell the driver that the BT controller has undergone a proper restart sequence:
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+- Clear QCA_SSR_TRIGGERED and QCA_IBS_DISABLED flags after SSR.
+- Add a 50ms delay to allow the controller to complete its warm reset.
+- Reset tx_idle_timer to prevent the host from entering TX sleep mode.
+- Clear memcoredump_flag to allow multiple coredump captures.
 
-tested configs:
-alpha                             allnoconfig    gcc-15.1.0
-alpha                               defconfig    gcc-15.1.0
-arc                              allmodconfig    gcc-15.1.0
-arc                               allnoconfig    gcc-15.1.0
-arc                              allyesconfig    gcc-15.1.0
-arc                                 defconfig    gcc-15.1.0
-arc                 nsimosci_hs_smp_defconfig    gcc-15.1.0
-arc                   randconfig-001-20251202    gcc-8.5.0
-arc                   randconfig-002-20251202    gcc-12.5.0
-arm                               allnoconfig    clang-22
-arm                                 defconfig    clang-22
-arm                         lpc18xx_defconfig    clang-22
-arm                   randconfig-001-20251202    clang-17
-arm                   randconfig-002-20251202    clang-22
-arm                   randconfig-003-20251202    clang-22
-arm                   randconfig-004-20251202    gcc-14.3.0
-arm64                             allnoconfig    gcc-15.1.0
-arm64                               defconfig    gcc-15.1.0
-arm64                 randconfig-001-20251202    clang-22
-arm64                 randconfig-002-20251202    clang-22
-arm64                 randconfig-003-20251202    clang-16
-arm64                 randconfig-004-20251202    clang-22
-csky                             allmodconfig    gcc-15.1.0
-csky                              allnoconfig    gcc-15.1.0
-csky                                defconfig    gcc-15.1.0
-csky                  randconfig-001-20251202    gcc-13.4.0
-csky                  randconfig-002-20251202    gcc-15.1.0
-hexagon                           allnoconfig    clang-22
-hexagon                             defconfig    clang-22
-hexagon               randconfig-001-20251202    clang-22
-hexagon               randconfig-002-20251202    clang-22
-i386                             allmodconfig    gcc-14
-i386                              allnoconfig    gcc-14
-i386                             allyesconfig    gcc-14
-i386        buildonly-randconfig-001-20251202    clang-20
-i386        buildonly-randconfig-002-20251202    gcc-14
-i386        buildonly-randconfig-003-20251202    clang-20
-i386        buildonly-randconfig-004-20251202    clang-20
-i386        buildonly-randconfig-005-20251202    clang-20
-i386        buildonly-randconfig-006-20251202    gcc-14
-i386                                defconfig    clang-20
-i386                  randconfig-001-20251202    clang-20
-i386                  randconfig-002-20251202    gcc-14
-i386                  randconfig-003-20251202    gcc-14
-i386                  randconfig-004-20251202    clang-20
-i386                  randconfig-005-20251202    gcc-14
-i386                  randconfig-006-20251202    clang-20
-i386                  randconfig-007-20251202    clang-20
-i386                  randconfig-011-20251202    clang-20
-i386                  randconfig-012-20251202    clang-20
-i386                  randconfig-013-20251202    gcc-14
-i386                  randconfig-014-20251202    gcc-14
-i386                  randconfig-015-20251202    gcc-14
-i386                  randconfig-016-20251202    clang-20
-i386                  randconfig-017-20251202    clang-20
-loongarch                        allmodconfig    clang-19
-loongarch                         allnoconfig    clang-22
-loongarch                           defconfig    clang-19
-loongarch             randconfig-001-20251202    gcc-15.1.0
-loongarch             randconfig-002-20251202    clang-22
-m68k                             allmodconfig    gcc-15.1.0
-m68k                              allnoconfig    gcc-15.1.0
-m68k                             allyesconfig    gcc-15.1.0
-m68k                                defconfig    gcc-15.1.0
-microblaze                        allnoconfig    gcc-15.1.0
-microblaze                       allyesconfig    gcc-15.1.0
-microblaze                          defconfig    gcc-15.1.0
-mips                             allmodconfig    gcc-15.1.0
-mips                              allnoconfig    gcc-15.1.0
-mips                             allyesconfig    gcc-15.1.0
-nios2                             allnoconfig    gcc-11.5.0
-nios2                               defconfig    gcc-11.5.0
-nios2                 randconfig-001-20251202    gcc-8.5.0
-nios2                 randconfig-002-20251202    gcc-8.5.0
-openrisc                          allnoconfig    gcc-15.1.0
-openrisc                            defconfig    gcc-15.1.0
-openrisc                    or1ksim_defconfig    gcc-15.1.0
-parisc                           allmodconfig    gcc-15.1.0
-parisc                            allnoconfig    gcc-15.1.0
-parisc                           allyesconfig    gcc-15.1.0
-parisc                              defconfig    gcc-15.1.0
-parisc                generic-32bit_defconfig    gcc-15.1.0
-parisc                randconfig-001-20251202    gcc-9.5.0
-parisc                randconfig-002-20251202    gcc-15.1.0
-parisc64                            defconfig    gcc-15.1.0
-powerpc                          allmodconfig    gcc-15.1.0
-powerpc                           allnoconfig    gcc-15.1.0
-powerpc                   motionpro_defconfig    clang-22
-powerpc                 mpc8315_rdb_defconfig    clang-22
-powerpc               randconfig-001-20251202    clang-22
-powerpc               randconfig-002-20251202    gcc-10.5.0
-powerpc64             randconfig-001-20251202    clang-22
-powerpc64             randconfig-002-20251202    clang-22
-riscv                             allnoconfig    gcc-15.1.0
-riscv                               defconfig    clang-22
-riscv                 randconfig-001-20251202    gcc-9.5.0
-riscv                 randconfig-002-20251202    clang-22
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-22
-s390                             allyesconfig    gcc-15.1.0
-s390                                defconfig    clang-22
-s390                  randconfig-001-20251202    clang-17
-s390                  randconfig-002-20251202    gcc-13.4.0
-sh                               allmodconfig    gcc-15.1.0
-sh                                allnoconfig    gcc-15.1.0
-sh                               allyesconfig    gcc-15.1.0
-sh                                  defconfig    gcc-15.1.0
-sh                    randconfig-001-20251202    gcc-15.1.0
-sh                    randconfig-002-20251202    gcc-12.5.0
-sparc                             allnoconfig    gcc-15.1.0
-sparc                               defconfig    gcc-15.1.0
-sparc                 randconfig-001-20251202    gcc-8.5.0
-sparc                 randconfig-002-20251202    gcc-8.5.0
-sparc64                             defconfig    clang-20
-sparc64               randconfig-001-20251202    gcc-8.5.0
-sparc64               randconfig-002-20251202    gcc-10.5.0
-um                                allnoconfig    clang-22
-um                                  defconfig    clang-22
-um                             i386_defconfig    gcc-14
-um                    randconfig-001-20251202    clang-17
-um                    randconfig-002-20251202    gcc-14
-um                           x86_64_defconfig    clang-22
-x86_64                           allmodconfig    clang-20
-x86_64                            allnoconfig    clang-20
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20251202    gcc-14
-x86_64      buildonly-randconfig-002-20251202    gcc-14
-x86_64      buildonly-randconfig-003-20251202    clang-20
-x86_64      buildonly-randconfig-004-20251202    gcc-13
-x86_64      buildonly-randconfig-005-20251202    gcc-14
-x86_64      buildonly-randconfig-006-20251202    gcc-13
-x86_64                              defconfig    gcc-14
-x86_64                randconfig-001-20251202    clang-20
-x86_64                randconfig-002-20251202    clang-20
-x86_64                randconfig-003-20251202    gcc-14
-x86_64                randconfig-004-20251202    gcc-14
-x86_64                randconfig-005-20251202    gcc-14
-x86_64                randconfig-006-20251202    clang-20
-x86_64                randconfig-011-20251202    clang-20
-x86_64                randconfig-012-20251202    gcc-13
-x86_64                randconfig-013-20251202    gcc-14
-x86_64                randconfig-014-20251202    clang-20
-x86_64                randconfig-015-20251202    clang-20
-x86_64                randconfig-016-20251202    clang-20
-x86_64                randconfig-071-20251202    clang-20
-x86_64                randconfig-072-20251202    clang-20
-x86_64                randconfig-073-20251202    clang-20
-x86_64                randconfig-074-20251202    clang-20
-x86_64                randconfig-075-20251202    clang-20
-x86_64                randconfig-076-20251202    clang-20
-x86_64                          rhel-9.4-rust    clang-20
-xtensa                            allnoconfig    gcc-15.1.0
-xtensa                randconfig-001-20251202    gcc-11.5.0
-xtensa                randconfig-002-20251202    gcc-11.5.0
+Apply these steps only when HCI_QUIRK_NON_PERSISTENT_SETUP is not set,
+which indicates that BT_EN is defined in DTS and cannot be toggled.
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Refer to the comment in include/net/bluetooth/hci.h for details on
+HCI_QUIRK_NON_PERSISTENT_SETUP.
+
+Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+---
+ drivers/bluetooth/hci_qca.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 4cff4d9be..2d6560482 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1653,6 +1653,39 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+ 		skb_queue_purge(&qca->rx_memdump_q);
+ 	}
+ 
++	/*
++	 * If the BT chip's bt_en pin is connected to a 3.3V power supply via
++	 * hardware and always stays high, driver cannot control the bt_en pin.
++	 * As a result, during SSR (SubSystem Restart), QCA_SSR_TRIGGERED and
++	 * QCA_IBS_DISABLED flags cannot be cleared, which leads to a reset
++	 * command timeout.
++	 * Add an msleep delay to ensure controller completes the SSR process.
++	 *
++	 * Host will not download the firmware after SSR, controller to remain
++	 * in the IBS_WAKE state, and the host needs to synchronize with it
++	 *
++	 * Since the bluetooth chip has been reset, clear the memdump state.
++	 */
++	if (!hci_test_quirk(hu->hdev, HCI_QUIRK_NON_PERSISTENT_SETUP)) {
++		/*
++		 * When the SSR (SubSystem Restart) duration exceeds 2 seconds,
++		 * it triggers host tx_idle_delay, which sets host TX state
++		 * to sleep. Reset tx_idle_timer after SSR to prevent
++		 * host enter TX IBS_Sleep mode.
++		 */
++		mod_timer(&qca->tx_idle_timer, jiffies +
++				  msecs_to_jiffies(qca->tx_idle_delay));
++
++		/* Controller reset completion time is 50ms */
++		msleep(50);
++
++		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
++		clear_bit(QCA_IBS_DISABLED, &qca->flags);
++
++		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
++		qca->memdump_state = QCA_MEMDUMP_IDLE;
++	}
++
+ 	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
+ }
+ 
+-- 
+2.34.1
+
