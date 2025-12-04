@@ -1,68 +1,72 @@
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D35303A1E
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Dec 2025 18:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B092FC038
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Dec 2025 18:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764873091; cv=none; b=dSol65cjrUpv9ecc2I7QFYWJ8kJMni8eBxg20GJ1h4OBs2/b1rHRFM566sOM5LObBT/cy/DIuPEbn7Dumizt4LtdRTgc8Zf0r18kUg80dLrwmkBwhL/E/4a0m4cG7j70e0PflAndaW5iDJvGIF1FdObeGStM9q1KINkcDXRoFd8=
+	t=1764873093; cv=none; b=hqHv7eZvNv2p8OBFzobozu7aSBd7blmCM/UeTio6DBK1ZOEyEe6Oz7hcW7DIgO0cM2gKgdFFN3A3IC/328MghiwxDS0WeElz2OMrwGFgWSXpu/cl3f01swEK6ucYm9R9f5Pv9ew2uUNtufG9JyPW7r9wdb6zU02O1a9ofYglHhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764873091; c=relaxed/simple;
-	bh=4KPS+SZZgCoSZfJD6mLF8JKu4hAMmi74vm5a8whuhPY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=YT/2n6tbnpYtcAeD3Vbx84+z298vALGg3P5ilK1URIf4agzXZO7zTpJdDomhq9fHMpp3J7b8uHehvQUAmMb37xL/EjRBGDqUPuycZ0ZXh7719XmpFRByqf/fcmLgrm2dp2RgZDbZjpMbYBzCv39pdaxMd+s95+SLKYNU4nq3zGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YtPqmUi2; arc=none smtp.client-ip=209.85.217.43
+	s=arc-20240116; t=1764873093; c=relaxed/simple;
+	bh=Wqqwmh03qxNpQXaczwXS5tpuv5kqeDDZoY2p1EdqsTI=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=l4DRXDn4w9jFFosTYdwZlBzJVTetnafB2c5+TvHQKlGzhmceFZLyD5oGBlavD5YTahaNcB+SI+L/B3ALpTKKTrszo8+1nduplrIYx1v3nZkg8YKKxubZese/aDX0qhRqpzaClL+yyRl21VfOcLROxY7Z2w75XZ1tWrC41Ttxkn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ukx3aVe6; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YtPqmUi2"
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-5e1fde1f014so442177137.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Dec 2025 10:31:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ukx3aVe6"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-55b2a09ff61so394565e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Dec 2025 10:31:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764873086; x=1765477886; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HiVdosadHPruLwP7lVNJdadU5vME/dj4suQ0pRHX6V0=;
-        b=YtPqmUi2EI5kWpbIou+tIfexB+id1ncR2Kjk6WTY62pOKybLXX9gMNpE9EZ2HD0/zK
-         kBl5TY0LI5Hoo98ajoTYkXWzJlCgmJiXk74fjzfxI1er2Bo88bRiBBVY3DQswu4XDzqk
-         oG5r0rISjxb8dsMuaz/rsn5Xaj0R7uaNXfz2UnL8R+el7s113ZzPryKxKVtm7A/wf/cQ
-         o6DJMuLZfpwwOCutzltPmZkI+stddjdoq5mxpIVH40cVrSsy0mSlCM9eFsg8gpmaL2Cx
-         a0sp6KTXMWdEez9cDsn/Y1xTLDulXTIdXl8gk+V3nbysgjStUIlWQosfQsQwQj771F03
-         DOng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764873086; x=1765477886;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1764873090; x=1765477890; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HiVdosadHPruLwP7lVNJdadU5vME/dj4suQ0pRHX6V0=;
-        b=eJTiYFRHuZtACf/DQfCSDA5tR1+F9r7ultglsNOOsMDJepB5ZfnkLdTfYp62o3pMwM
-         oUPPCYBigYvu1SY0n41hz7XWlfZ1ILjewyyQY3YPDlhLuqjDv1UqIKGr94ythHjQZ1XT
-         vaBesWKhc0L8zjn/YJ9LI11A5StLLltPz7qhuGLUERmAfdh//KxA4h5+60iB7CdbpGMB
-         znW5ZprzaOGN7OwQqOBzyCm6B0WqLVyGr2uJCnCybXNEIKrwu0qhdSI1NezX2kHk0Bxz
-         YRjRGPZnQKrTsPkGzRWUpvXi31ZUvja7dQkY642kgIrwpuhC3b37ZY4VQ7fK1GSbJ5W9
-         e6oA==
-X-Gm-Message-State: AOJu0YxVjbWMiitgmL6R9OiUKfohbVbKToJtqqSaEaaitjtVXbDNx5n0
-	B238ZVS6mkiJN2AOaU4O9g3N8jySP5+b0T5njHDrnSzYm2t3ZKHHImq4YSoVKA==
-X-Gm-Gg: ASbGncsChP1qmui7tAlyGXhemmukmlRDNQkbzcq7K03XhSUnaIdL8Kz7Vua8CoU/R7f
-	d1IDlHuOuS9JRBIH0wnXtVqCufp+mH50VIKrCppcO5LpqYYBiwOF3IWGMb9ciceeuLuoH9Nzn3X
-	h614VqqbfLSOsaz55R3nZpEmbbAiOX5sOTmCIp9i/XF2NYfhszb2Zp5fMIN0zm/Fc2fMnvJMvEF
-	jN87RdXXOqrgIKqhe4DTd7UsiNWY8CQVfrEtbGuWFdJaEI3cPmJ5S24Y1U845Rn6PgHTsXiH7cr
-	qIS92X6Jgk1b+TasYhO7qSGj2535hnTIURDF7Appwt9pRw1jKuDgv1QQOqAtB9ZYYs3joMBXdHe
-	eu0B6va3yHGUYXcnKxUmq1X3+N64BZO3LKDr/iAPHbAi4fxefcwyGoBixofRFajk4RoKnvP1X0r
-	sY98hjaepdmR6OmA==
-X-Google-Smtp-Source: AGHT+IE344dvWt8ftgtXWiypzNx3vNS/gU9uKsgoMoBXGg/ip7afVs35n6wo8sr6PcEYoaFd2yeQBg==
-X-Received: by 2002:a67:e704:0:b0:5de:6dc:22be with SMTP id ada2fe7eead31-5e48e38dde5mr2627230137.36.1764873085672;
-        Thu, 04 Dec 2025 10:31:25 -0800 (PST)
+        bh=0Ylm1zupFMklBHwtioCi90QvPxnT31gNX9Qln//rxNM=;
+        b=Ukx3aVe6Ffv1Pgn53QsLIP6u+Y2ApNSV/G4sLy3pkL2MTm507cUB/StjOnszdWUrTd
+         qEHcwXfxs7lyS4js2cAQ9PdWaNB2+9ETCxKXTafWu+Y43xUrhrwa2B0LZAbePv7hifDw
+         RjS3OU3TassDJ1eRHvQo19MB+KiPtbl0JGG/nopwTZF9h0llt1aJ9zJFPSCdIEj3Z1ZT
+         CQMuuorB/2L6uY6sWni5GawCN3O26VnBXwRRr0/8DY1zbpAjHqNXFLXk68sD38CxvQoF
+         VTthgCqr8Jw+WmcP58V1bswEWqbbP0wCfKxfSYAks46uJDZZ3MnetRzfijDTwWPq1G8T
+         FlNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764873090; x=1765477890;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0Ylm1zupFMklBHwtioCi90QvPxnT31gNX9Qln//rxNM=;
+        b=QlsfZwPgsWORdOAUdJ1oWMNsuVVZ+P3jpgNF8Tw0gR/M/kzsSvDi9zHdEvl2ORpxiZ
+         5D66e43H2U5ZYlPigt7ZFi582AAPhtwif2uTz+rjruoofOo6CSTNg4fVLsLZWMvrlGOF
+         h392uYl15QJ/7FY6MChIv9ZiiVWmilAWlwjZZuRZmBoxD01zqZRS5nxlIGBB3hBLSV58
+         4043ZiFJxWCda7SrFf7o5wWzoO5YaEeqT3axK2509o2HBmwRjfkaJ/H6LJtiylWj5yyp
+         GZAzpENkfR5mspZ9ZqEwZqu9V50gKSHce+3W9RE+KsTQQOQ8o3t87s+skgb7qxMChj/R
+         /hMA==
+X-Gm-Message-State: AOJu0YwJ4bigMCP1Ra7b/UnAocAOjJrKI0dxnLR7nPCW18DSX72JCQCh
+	yZc7Pmpl+juJ5OTRh1HgOMfrAJWUR6Gwv3kkytDZTJP/Sb9oHqoyahj+/7S/vw==
+X-Gm-Gg: ASbGncvWrv2HizWWX5OhdEK9cxM+j//vV9ZQZsLAoSrpZJD6OS9wZgokVKO0PylYb55
+	ll8qV/ZHpgRUuw/mowz6trAfbx4DOKJI8lQt8JabpCr3zl4ZkzP81z7RAiAZ4KnBTVfBTh43XmK
+	aFLwgR38JXbHS+yM5O5Xjf7AtWUQ0aZDucJLegLHpCLDleVpj1glOP/Ehsf+xICwRNvIvkA2yfF
+	+i4iRqnPDLhF0kD/cu8qEm1ZtxCnVbzOb4ACZP0E1z0PhK0GQoiciU9X/RRbyDGA7TaYP2GPmeE
+	gD4fmtBhIrgYIezIG+tCmS1GlMNT1FajJnRjjnqSynlUEm77NwxFhQo3dDCZsTHwzWMcW8Z4kD5
+	F9XpK6b9vjxBkZZDjEs+E5Ti2lxc9bcZFYmdMRUZl/CRc15f630gqvsyJsn2/Yh11KbpCNUVwfD
+	c2ehtGwCM/GNw2Jg==
+X-Google-Smtp-Source: AGHT+IEdu1dgfcrgJH0KcYK6Ql1z1cnvFanOyTpUHM6Pv8drPoikJd8p0VBqKWa2h0R+GJ9Fq1S49g==
+X-Received: by 2002:a05:6102:d8c:b0:5db:3b75:a2aa with SMTP id ada2fe7eead31-5e48e24e9e0mr2766813137.18.1764873088670;
+        Thu, 04 Dec 2025 10:31:28 -0800 (PST)
 Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5e510808c63sm1009520137.7.2025.12.04.10.31.23
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5e510808c63sm1009520137.7.2025.12.04.10.31.25
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Dec 2025 10:31:24 -0800 (PST)
+        Thu, 04 Dec 2025 10:31:27 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] bass: Fix attaching to unicast session
-Date: Thu,  4 Dec 2025 13:31:14 -0500
-Message-ID: <20251204183115.2533504-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/2] shared/bap: Fix parsing of BT_ASCS_METADATA for multiple ASE IDs
+Date: Thu,  4 Dec 2025 13:31:15 -0500
+Message-ID: <20251204183115.2533504-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20251204183115.2533504-1-luiz.dentz@gmail.com>
+References: <20251204183115.2533504-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,27 +77,94 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This attempst to check if bt_bap session is attached to an ATT channel
-then it shall be considered an unicast session not a broadcast session.
----
- profiles/audio/bass.c | 4 ++++
- 1 file changed, 4 insertions(+)
+bt_ascs_metadata is variable length so when there are multiple ASE IDs
+each item needs to be parsed according to its length otherwise it would
+cause issues such as bellow where the ASE IDs is incorrectly parse:
 
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index 8886a27d99b6..20c37323bb0e 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -1298,6 +1298,10 @@ static void bap_bc_attached(struct bt_bap *bap, void *user_data)
- 	struct btd_adapter *adapter;
- 	struct bass_data *data;
+> ACL Data RX: Handle 2048 flags 0x02 dlen 25
+      ATT: Write Command (0x52) len 20
+        Handle: 0x009b Type: ASE Control Point (0x2bc6)
+          Data[18]: 070201060302040001050206030204000105
+            Opcode: Update Metadata (0x07)
+            Number of ASE(s): 2
+            ASE: #0
+            ASE ID: 0x01
+            Metadata: #0: len 0x03 type 0x02
+              Context: 0x0004
+                Media (0x0004)
+            Metadata: #1: len 0x01 type 0x05
+            ASE: #1
+            ASE ID: 0x02
+            Metadata: #0: len 0x03 type 0x02
+              Context: 0x0004
+                Media (0x0004)
+            Metadata: #1: len 0x01 type 0x05
+
+= first LTV in the metadata is incorrectly used as ASE ID (0x03)
+src/shared/bap.c:ep_metadata() ep 0x55b1f428d490 id 0x03 dir 0x02
+src/shared/bap.c:ep_metadata() Invalid state config
+
+< ACL Data TX: Handle 2048 [1/6] flags 0x00 dlen 15
+      ATT: Handle Value Notification (0x1b) len 10
+        Handle: 0x009b Type: ASE Control Point (0x2bc6)
+          Data[8]: 0702010000030400
+            Opcode: Update Metadata (0x07)
+            Number of ASE(s): 2
+            ASE: #0
+            ASE ID: 0x01
+            ASE Response Code: Success (0x00)
+            ASE Response Reason: None (0x00)
+            ASE: #1
+            ASE ID: 0x03
+            ASE Response Code: Invalid ASE State (0x04)
+            ASE Response Reason: None (0x00)
+---
+ src/shared/bap.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 27321a3d1e3d..b5840d18a820 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -3508,10 +3508,12 @@ static uint8_t ascs_stop(struct bt_ascs *ascs, struct bt_bap *bap,
+ 	return ep_stop(ep, rsp);
+ }
  
-+	/* Only handle broadcast session */
-+	if (bt_bap_get_att(bap))
-+		return;
+-static uint8_t ep_metadata(struct bt_bap_endpoint *ep, struct iovec *meta,
+-						struct iovec *rsp)
++static uint8_t ep_metadata(struct bt_bap_endpoint *ep,
++				struct bt_ascs_metadata *req,
++				struct iovec *iov, struct iovec *rsp)
+ {
+ 	struct bt_bap_stream *stream = ep->stream;
++	struct iovec meta;
+ 
+ 	DBG(stream->bap, "ep %p id 0x%02x dir 0x%02x", ep, ep->id, ep->dir);
+ 
+@@ -3530,7 +3532,13 @@ static uint8_t ep_metadata(struct bt_bap_endpoint *ep, struct iovec *meta,
+ 		return 0;
+ 	}
+ 
+-	return stream_metadata(ep->stream, meta, rsp);
++	if (iov->iov_len < req->len)
++		return BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
 +
- 	DBG("%p", bap);
++	meta.iov_base = util_iov_pull_mem(iov, req->len);
++	meta.iov_len = req->len;
++
++	return stream_metadata(ep->stream, &meta, rsp);
+ }
  
- 	db = btd_gatt_database_get(bt_bap_get_db(bap, false));
+ static uint8_t ascs_metadata(struct bt_ascs *ascs, struct bt_bap *bap,
+@@ -3557,7 +3565,7 @@ static uint8_t ascs_metadata(struct bt_ascs *ascs, struct bt_bap *bap,
+ 		return 0;
+ 	}
+ 
+-	return ep_metadata(ep, iov, rsp);
++	return ep_metadata(ep, req, iov, rsp);
+ }
+ 
+ static uint8_t ascs_release(struct bt_ascs *ascs, struct bt_bap *bap,
 -- 
 2.52.0
 
