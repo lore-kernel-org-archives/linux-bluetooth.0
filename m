@@ -1,128 +1,140 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6552566F7
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Dec 2025 21:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF5D30E0FA
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Dec 2025 08:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764799020; cv=none; b=kM60VapgwxzwS0pwxczTQXObWasrKDEWn+zzPLgdxF8XRkJzGwaGACQ8pEHv+6eERludpr+kZYan1Y3pNY8SquS++RpJxN2JbPpNtWVx0blW+ut9OGdpDwhlcyMbMjd1WWn7HXaC5wL0uyQJ9gfwQrKi56yxbLG6YHmQZ0KlsS4=
+	t=1764837461; cv=none; b=ONbn2J9HOIEoFBN2d9n78Mv/FDYXEfaiD7UALrhh6VgxGJb0wIhxUeTm1jp41npGijXCPxdMINN13CW2kGWojG47Twv7N+qq8uVN/YtiIKcVAZ13DrGGkhojfcrhMgJXoK89e2c87x12CXxguIcnDtY6exB2vcxBZex3CTheZ/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764799020; c=relaxed/simple;
-	bh=6gEA0pJKVhBkDBYlpt0GRUh0HGVim6UTDPeTrbtrn4k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i+Jv/3XTkiS1jDF9d4c/tmjvO+4ZWLreV+U1ansbp9kgQ5rg6yNKfgeUSDB5olt4ujPyEECAn1nwsQj2fUBJS3VaNjeaqXrM6KSEUn0wzzxc+MgH0AES5NtbJFC82aFatxv5LGka0KbHUdqqlYptp2h9zmEXojbgs7XkmghJ5Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jA611M+o; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764837461; c=relaxed/simple;
+	bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=ObkTvFBIKSi9fY7YJpM+Cf7mXxiNkngaRTDpSCC9Ffxzpd8E5xm9r5HLBfSOvcKsiMEn/+oREsroYc7Gx15/1Ac/qyRq4Dv4f9mu7eojsocz6a5S9GgbqSJBqfnhJo2JV8aDXowChDr2noiwfrjFWaHwLjORY3uobbiXqIDDHbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZpQFNzAe; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nRGqH40E; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jA611M+o"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-37b97e59520so1790321fa.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Dec 2025 13:56:58 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZpQFNzAe";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nRGqH40E"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764837459;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
+	b=ZpQFNzAeVEUSBeymrYARs3asayHbvEII9+G4r1uEZnc5FW5fYhOlaaaD2RvhNLax/Ehy5N
+	SvtePppkfmYVgR6tlFfKd5RY+oXhriCS1xsXBqU3Mkk/QI8AHj+CkdBc0+XS+HBg2P8Z3s
+	Zhrpe81G2pg6o4BjZekHMXC/0jkzWtI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-388-hYBpjbLVPgOw3q5C6AXoiw-1; Thu, 04 Dec 2025 03:37:37 -0500
+X-MC-Unique: hYBpjbLVPgOw3q5C6AXoiw-1
+X-Mimecast-MFC-AGG-ID: hYBpjbLVPgOw3q5C6AXoiw_1764837456
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477939321e6so4206365e9.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Dec 2025 00:37:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764799017; x=1765403817; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1764837456; x=1765442256; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Saws8Y94qpSylG9D9HDPB01VzD98ZNCI0FRXIYw3WZM=;
-        b=jA611M+oQkl5YN5+jiJuwLamSpCH2ADQkpUro1BrjTwYBNnoaIhRXie2hxqljdamfl
-         KUQnEGKkhB4WAlKSlF6Akfg3+FyoVdYf/QLMFIZ4Iwbc29OP63KayPjTCWacq2/ZnlgY
-         /qvD6mo9Q8J97Tt4X9ouvWJWm96BqlT1/hbjwITQt2f8lpJtHTMTwqR6CjYaR+XSeHtM
-         zKI08JVHT6u/pDeORcJLF9kaO1GVMVbREmBWGzeDspVMPqVLe633Rc3VUNPVZxb6Q5s8
-         m0t/my+JcbYD0wBpCN6yA4IYnepeaRIo86rDrKRzBm5XrJwEXvNI1yl0KKNWeQ//Jlmm
-         defw==
+        bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
+        b=nRGqH40Eb8jPlEqLKyctp5JX+jgbcBrCLcW5eNJGsrb0WLK+aRsYrSLip/KCyGA1DS
+         CQHnbDmDWR7WOGZ65oRG8yBcflYV47Ft2yDKRE+7gWvB+EzVOXFpqNbp3aHUAY8yBdL1
+         K51BgV3HT+L7Uy6HI/Mhnu0pmcMM3v3plD23xvSCYxS5kh3GTnIr2eNCMuVG+g04dzIR
+         WWxiNixQqVzinaKaU2DJ86Fo/1F1aDVHoq3iL/OffZ6yEFy4k5jav41dDxacMk1H2Rqv
+         3O1tiOYx0pvCTK9+uM04dwmHuQ7utOKkydby6N6FiBg5nOaskqvTRTAej+vWUMlrgkcn
+         WhEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764799017; x=1765403817;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Saws8Y94qpSylG9D9HDPB01VzD98ZNCI0FRXIYw3WZM=;
-        b=qJW+L9HFbCLwhK/mWLj5HxoBl5TuDiWL8lIm4y6Sy7rIbqjFtOD1S81v3nr4Auu7g/
-         M2v0/dSdFiHZpp0lkK/wNR8/DVrN/3gyDYYXg/DZnVP156jZqNhL21qXWRX9V2CVji0l
-         Qr/7D9r60J8jIwhDxyxASwghcRccVRJ7hjpedHPMaCZJZSidwTRSCptWK7lUi/5GWXK9
-         b3Op9rslFNM2aNWb5esBFj2SRtKW7lIU1flc7qXCdUff6FHirScnbWJ78FPSF0aHOyGk
-         z2cJqzSAlmwJTxrxYSI+nOyHWiySB6WpokJ2wpEuG3Wusx9RPUkSgW51/M48JugS/rx0
-         U/zw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLOiJpYdEvZaCqg3fvnHh/V9N3ybNWyj/G/n61s/zZB3HmFOvuAZkUjbBbNizVt+zkJY2qnefsyAIDraeglYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyehnc0rKPXwbtuhfFK2uILXUdjZgpTAW2ZeCsZE+ouJM6/Ydr6
-	EXy64xqbaMhNhj1E2kKJFLFKL3cRBorXhrCbcIWxkNxUTO57Tiv1hZrvD33+EFOJVuistU49+g4
-	qRCxdcB8Xt1Mcvo7r+2UDpdLgbhCClZo=
-X-Gm-Gg: ASbGncsjpSXWbECaTDkyj6Zr0Wn/mK/6U/XOElPxNdxjv6kkOoOWMT5GRhZF56ypAXA
-	cK98n3GevZVy6MK2jtRVMAPpFwgqTSx718BQEU73l7RlJ5+t9dyxPHKi8dJM+NGE0QSupss++x1
-	s46+zngn5mbyzDfPxZKrboB+pj+DuU1vaOBta0wrI1f9fbNYv/476vuWEcxxOAUYf3nmqp/3BQ+
-	GXeDR/39yiL8BGb4Sw2H+3pTcU=
-X-Google-Smtp-Source: AGHT+IFLdPoRYfYTvlEWLMdLLo36lk8cs7+WfkUclMO9AFimPEGln5SEMuEPo4tgnF4yZnE3aqITcD1unt0PYThN+0k=
-X-Received: by 2002:a05:651c:324a:b0:37b:9ff7:2a1a with SMTP id
- 38308e7fff4ca-37e6372e443mr15102691fa.7.1764799016683; Wed, 03 Dec 2025
- 13:56:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764837456; x=1765442256;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
+        b=ityHGp9WOhBWK6AB0ZUliAobwV9tX7jUamuz4qePBgrO6BIwyeZTtnLetiTXUePNVb
+         /nw6QCIw6RX0U6ecUbKP3tQuUrIe6gZnMXg9e7t3dZSwqvRl/F1WzBtNBHZdbQbweU8f
+         e8Myz6clSpdi30O7+BfGnXQ+PHUFdNw81L3OOBFS+jre0ZyZOwdc7We2n7KuQVIShMU1
+         pkHVI8gtuLPK312XZAntSwjH3xqE05VVYJWTudGRZN4P9cMb+rZCQ6I+KjqKwWSdwF7U
+         uNGUDN3ZnPRBtfusCMQirANUgMTJlC4ONfATsdHM/ut61p3byqs0Idbrezow2enmqHZ6
+         E3QA==
+X-Forwarded-Encrypted: i=1; AJvYcCUL5GHpOUDCmqmX36u6WHxLiCsVBUPeuK/nSeUfBBNjvlQDtgMVPNu918snOcf2Gs5J9oFVLOTJA6H8EbpDpyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzbq5sqMd2m5pFC8yh2FZZaeP1G7oz2IwSi/929UWt8nFcnq0EG
+	xdBp+s6Qi9oa86oRSyZA99/ZMPo2KCVyu01nSih41FhfFVlrmKita+TMyGcXriyzTSznCN/sw8m
+	Y4sY5520zIUdh7W05Q6s7gFHFs7N6ZE/0tW0bQIzH2uiX2XGJFhtEtccs8+xw8TN8dhj/nw==
+X-Gm-Gg: ASbGncvIma4p1Qm/9hsBewE3aqmRIkCFMg7fSOVrHrAL9hq/oWij+HLueVHbaEfC1U6
+	sgoy7hL/DOTdDAKXLCWLylObI/S5ubkkqu3OL7i35q3UdZySE5L5F7QgCCEloXqQB6mH2LUPX/2
+	dx28IvTyfVQ9IBGU8iOWOgyCxSHQo6Jf9fDBTliI7UKPeYku2LfBMH6StxZJ06LrnJSJD0cXgrM
+	zEkocRRWLvuMnTQE5dQv3Ys14RNVYpERQ/X48XSymvGaAywEpQshJK15Vdv1Ox/0fjkJVcX80UF
+	ufj/KFvX0cauIoRrTNbn5Tv7wdESwj78ZzMwhDA3+0o0j/A1GpSe2l0UzN/1+yOujWbwUqmkZ/A
+	Q2L4a2XUbUc08
+X-Received: by 2002:a05:600c:3b1f:b0:477:fcb:226b with SMTP id 5b1f17b1804b1-4792f24413emr20683775e9.2.1764837456377;
+        Thu, 04 Dec 2025 00:37:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFOFiaycmUpSi4NFw0Dx9Owuk3m9GKbQxWbEzhOFEEvLDFewzTh2sfwX63tPD9WFtnBq5V4Cw==
+X-Received: by 2002:a05:600c:3b1f:b0:477:fcb:226b with SMTP id 5b1f17b1804b1-4792f24413emr20683335e9.2.1764837455818;
+        Thu, 04 Dec 2025 00:37:35 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7d352a52sm1925339f8f.38.2025.12.04.00.37.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Dec 2025 00:37:35 -0800 (PST)
+Message-ID: <3a2cf402-cba2-49d1-a87e-a4d3f35107d0@redhat.com>
+Date: Thu, 4 Dec 2025 09:37:32 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1764708372.git.pav@iki.fi> <176479740655.84322.12625187572932573679.git-patchwork-notify@kernel.org>
-In-Reply-To: <176479740655.84322.12625187572932573679.git-patchwork-notify@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 3 Dec 2025 16:56:44 -0500
-X-Gm-Features: AWmQ_bn4NsBQeiDGlJRM0kXpfdnVjGAw_ZFbAPbo6rWxoS82N2Yu82bzXYgn2A8
-Message-ID: <CABBYNZLuyQ9MT4u_bC+HsZg7kQoVx2Rpb-JJh2zNqV7J-W0Q1Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 0/7] Add TMAP & GMAP information services
-To: patchwork-bot+bluetooth@kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Paolo Abeni <pabeni@redhat.com>
+Subject: [ANN] poll on EoY break
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org,
+ "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+ Oliver Hartkopp <socketcan@hartkopp.net>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ Dust Li <dust.li@linux.alibaba.com>, Sidraya Jayagond
+ <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, Matthieu Baerts
+ <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>,
+ MPTCP Linux <mptcp@lists.linux.dev>,
+ "open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)"
+ <bpf@vger.kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, wireguard@lists.zx2c4.com,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Aaron Conole <aconole@redhat.com>,
+ Eelco Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
+ dev@openvswitch.org, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, devel@lists.linux-ipsec.org,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Pauli,
+Hi all,
 
-On Wed, Dec 3, 2025 at 4:33=E2=80=AFPM <patchwork-bot+bluetooth@kernel.org>=
- wrote:
->
-> Hello:
->
-> This series was applied to bluetooth/bluez.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
->
-> On Tue,  2 Dec 2025 22:47:45 +0200 you wrote:
-> > Add support for TMAP and GMAP services. They contain only device
-> > audio capability bitmasks.
-> >
-> > v3:
-> > - rename after_uuids -> after_services + make it a struct
-> > - add tests for btd_profile_sort_list()
-> > - leave it as the GSList version for now, tests use queue
-> > - add commits to mark VCP connected only after its attach has finished
-> >
-> > [...]
->
-> Here is the summary with links:
->   - [BlueZ,v3,1/7] profile: add after_services for ordering profile start=
-up
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D5806271a69d6
->   - [BlueZ,v3,2/7] test-profile: add tests for profile sorting
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D37f1d5de78d4
->   - [BlueZ,v3,3/7] device: use after_services in service autoconnect and =
-sort also GATT
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dcdcd845f87ee
->   - [BlueZ,v3,4/7] service: implement btd_profile::after_services callbac=
-k
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D7f8ac0c1fbcd
->   - [BlueZ,v3,5/7] bap: have unicast client wait for VCS & TMAS & GMAP
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Db78808cfb3b8
->   - [BlueZ,v3,6/7] shared/vcp: add ready callback to bt_vcp_attach()
->     (no matching commit)
->   - [BlueZ,v3,7/7] vcp: wait until client ready before marking profile co=
-nnected
->     (no matching commit)
->
-> You are awesome, thank you!
-> --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
+Due to some unfortunate calendar, conference and personal schedule
+circumstances we (the netdev maintainers) are strongly considering an
+end-of-year break similar to 2024'one, but for a longer period:
+effectively re-opening net-next after Jan 2.
 
-In case you are wondering, I just had to fix the building of 6/7 since
-you changed bt_vcp_attach but only changed it on 7/7, anyway brilliant
-work, you really took it to another level with fuzzy testing on
-test-profile.
+Since this comes out-of-the blue and with a very strict timing, please
+express your opinion using the poll below:
 
---=20
-Luiz Augusto von Dentz
+http://poll-maker.com/poll5664619x19774f43-166
+
+The poll will be open for the next 24H.
+
+Thanks,
+
+Paolo
+
