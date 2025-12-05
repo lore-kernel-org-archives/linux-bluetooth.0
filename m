@@ -1,143 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3EB331210;
-	Fri,  5 Dec 2025 12:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A6457C9F
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Dec 2025 14:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764938902; cv=none; b=WYyFcTQrlaWLDBqBWbuIAainzDGd+31zGZI8sG7g6yfrmEp4AoiYFkIH1thEghTYc81mKStQJyJLpz7OX01mUruUQWVM/rQyWlMZvUCB3i6LCM0FEFOB+aCANCgLBPhGnBr3PLQJQgDLKoNDnsv363EooyKeACgrcHTU3K0VAyY=
+	t=1764946210; cv=none; b=sHqrP13z4xEr1IX5hGuNeRAqK/sWcZMAqPbxFt2P3II2gulZc3nMzwR6i/TFpv7u7rDICbeqFItowV+iWTQ4/3tjVP7y1KPVFXtxLU+pG3FWp7N8/pvJV8ugXhAu0GARkeorI6ryDa360DvHo0qY/DqFgxen7OZWlDyRyoyiOxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764938902; c=relaxed/simple;
-	bh=Ai0XL/rEqdg4fKzx1hPzCDfZgmgmHN7GcRLB+pKSxyc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=mcHXhZpJbuukIPPLbgfsqdW9X8x2wO/4Gy5BMdtrAINnAO1Ma4x1nMfbkgvUqiYrGxoYWWcb5sjCBfXfZ8F5kl0u/aRkjX60LUdiUBMKUqWeuUkce6Wl6+gGaraPHx2zejDrZEdFAEhv6huM/pIIrm0bz4TvfrxSDjVq3Wn4zn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JS5waypy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764946210; c=relaxed/simple;
+	bh=//rj/OyIA0UUd2FYLVuKrcTlsUhzm7owDnqF56W9QBc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gt21IsI1le3G81qHFEHragLV6JveNQ05R/bPqOCiulfpUYqBQwnIigHM+DOJH9hA7a6Dtqt5YrjQyDRbhmLpB0V9UWqshz+cQDnUdvVqbG+fX1FTBRaF1V3rXEWlNKwumBLQ7mDmeECX7f08WNUQBJSzI6j4B0AXmZ5NxUmN9UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g7tFlPBQ; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JS5waypy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A692C4CEF1;
-	Fri,  5 Dec 2025 12:48:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764938898;
-	bh=Ai0XL/rEqdg4fKzx1hPzCDfZgmgmHN7GcRLB+pKSxyc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=JS5waypy9prkYwOZQf/O3E7RqqEyPgExfLlXyX1vf4F6EIYhFaH2lK2ktrR+/b118
-	 aJfQLCtvZl4Ul8MjEpXNC+Dn+n/o2PqqKvxUHCHPPLIJW1dV1gWBE/3EeX+WfIBLcZ
-	 t3JJwjbSbMOlGYV+T3T8jP/6WtgLj72JaSrgUIKoxbpdAr0WaKH3+2LU6c08wckSd/
-	 f/f9eFLftvXE1jRCmRrvJMvW0yB9hwVZO93sp+LwsbtqH8FoAVXHRqWhamv6KPFiwc
-	 0axRjfXP9txEMrniiuq1b0Xde/HDM7ILWQ6GHTI6aqDi3gpx0RqoItdco0BskSuFPA
-	 QBcfOacuhyR4A==
-From: Konrad Dybcio <konradybcio@kernel.org>
-Date: Fri, 05 Dec 2025 13:47:29 +0100
-Subject: [PATCH 10/10] arm64: dts: qcom: lemans-ride-common: Fix up WCN
- power grid
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7tFlPBQ"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5599b119b4aso628798e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Dec 2025 06:50:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764946202; x=1765551002; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0WRz7pbBmzuIsuM3fJWT3rTLbaC63BHUBijA8opd+Fw=;
+        b=g7tFlPBQW2qtJgzzivo0x+fifaGgN9UaaIp1BfkIWG7Ctz737C5VKHj5we0KNYDXsF
+         vNuFX7K+3vy/KV1pP0ilJqDHG+yNAHoRQCTL92FaEJpyVPz7/uyKfBE3JfjnU5Nuk4Xx
+         8kd/lI0lI/4ffeFnqPzxKa2Z+CbDwnVzF8ZnOrO+pRlS5xQm8RK8SCqLyiEaDHzJCFWt
+         4NzscfbcD2eRk7rbmJpiCTXHy8Ta0PzNDdvQJ7pqzu8UM4vhHRdMYMjRnE0V+l+F09EW
+         ROKnU86zhU6DI3HXnxMk0K6/nNrN5CJPKP2tRXx/xjT5uAISJaKodxzbplEQ/J+Bcq3y
+         YgUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764946202; x=1765551002;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0WRz7pbBmzuIsuM3fJWT3rTLbaC63BHUBijA8opd+Fw=;
+        b=ZT4TUXmytMzg3U2V4uq8tObzfMqKqKFX3/rFLsx6/EGWyaxVEzp/Yl2N0jNZZxdWrg
+         WcP6mwqL9/CgqzxA/C3sUN9tnSXBRuQDWn6TN7jueZHWwLYrrw9sJ8h6ToHiUujkYr0E
+         atJn0bmW/OaioZ7mc0sIDjJspurU5W0t7jcC4ZT1THxh54PO1r9a7MVCEnbnOO0zA0Oy
+         l1qRUjorrVZdYV+W7RrQGAap65LniWnk/T60uFNxsPdttEd9FapAX7zAlqdWhxmTPEoh
+         OVFaZ16SZjcxSLP1iovxW85ZYWLjtYr1if/KfelDCzz8KNzBgWcqF2wPTaLI58Y2aXQM
+         BbAQ==
+X-Gm-Message-State: AOJu0Yw/agKGRcyz4Zu/NpyF/ZwBfm7IPnV+u6LAO6KRxKIlX/WUKDTj
+	wnILYY3gUv7ovAfgR3qk18kyWuzaWQw9gB2qjIumnG6Cvz3oIpUqHhjSlyUPAg==
+X-Gm-Gg: ASbGncuSOWdZmAeNBLbp8Kc1C95cZEH6jfLlLLCfwnHWznSw0PO0Y+p4APiitY2HMAv
+	DkaQNPBuMpuBFuDPRqeE8dulPzbWqk1iSnKGmI/69DhOTUg/DzkrNHJmPyvpikhxDG3DlZnsrAD
+	1Omw8dxBKUSA5ckTAJWWtFfWSUgTCw1AszNNfWm52LeonmZglZgcACfAXsdwAPNtWoroZ8eeDL6
+	kOyv8lFjseSO+rwn9EnBa3ngPsXMIwG+ou5m6738ZLan8gnwgIReCEBPoCedmLuO2DYjcZWT7jj
+	AaVy8L1lR9j1Dy/GE1TySMGQdtnjF69WsMk41hzpTo8S+pXq8clmpsT7zy5VgRUKVpCKCJ6C71d
+	GbKqOubQqTQp//IirSRw+AnQOSxlUGEDjU0pRURkEdUkRhteI5g2L8UGnqn7L5pkqw26sWwH+FU
+	kZdU3Ia54DGLydlg==
+X-Google-Smtp-Source: AGHT+IGEeG9sHeaK5J6quHy9J5kkPhJGqmQC+97DIfy3iZXXDwe+KI38XijFLizT3ee1mBgux1RwUw==
+X-Received: by 2002:a05:6122:2189:b0:55b:9bee:ff61 with SMTP id 71dfb90a1353d-55e5bf964a0mr3706549e0c.16.1764946202015;
+        Fri, 05 Dec 2025 06:50:02 -0800 (PST)
+Received: from lvondent-mobl5 ([50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-55e6c5908d9sm2243380e0c.9.2025.12.05.06.49.58
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Dec 2025 06:50:00 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] bass: Fix attempting to create multiple assistant for the same stream
+Date: Fri,  5 Dec 2025 09:49:52 -0500
+Message-ID: <20251205144952.8373-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251205-topic-wcn6855_pmu_dtbdings-v1-10-165611f687c8@oss.qualcomm.com>
-References: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
-In-Reply-To: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
-To: Jeff Johnson <jeff.johnson@oss.qualcomm.com>, 
- Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
- Rocky Liao <quic_rjliao@quicinc.com>, 
- Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764938851; l=2322;
- i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
- bh=3dp5C5HMXp/1Z+9Y4SVZNMQFZXiUBgxXrgev7YSQma0=;
- b=kpS9agG2WNK3VYAqHsavDbymkBGzvMGZGB37LEthnF+VOKmBZucGJUDnf3gYAxernEd6790G5
- 7X5Nbl5Q/anBlDdWAh4VA64Kz3erE2PtO08O9AL85n2cK7LuiY4GaVH
-X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
- pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
+Content-Transfer-Encoding: 8bit
 
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Make the dt checker happy by filling out the required properties in
-line with the schematics.
-
-Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+bt_bap_stream may change from streaming -> streaming when updating its
+metadata in which case bis_src_handler would be called multiple times
+for the same stream causing it to fail at g_dbus_register_interface, to
+fix this adds a check if the state is already streaming then it must
+have been handle already so it safe to skip calling bt_bap_parse_base.
 ---
- arch/arm64/boot/dts/qcom/lemans-ride-common.dtsi | 32 ++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ profiles/audio/bass.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/qcom/lemans-ride-common.dtsi b/arch/arm64/boot/dts/qcom/lemans-ride-common.dtsi
-index c69aa2f41ce2..069d58e6b6c5 100644
---- a/arch/arm64/boot/dts/qcom/lemans-ride-common.dtsi
-+++ b/arch/arm64/boot/dts/qcom/lemans-ride-common.dtsi
-@@ -79,6 +79,18 @@ vreg_3p0: vreg-3p0-regulator {
- 		vin-supply = <&vreg_12p0>;
- 	};
- 
-+	vreg_3p3: vreg-3p3-regulator {
-+		compatible = "regulator-fixed";
-+		regulator-name = "VREG_3P3";
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index 20c37323bb0e..031f527be9f5 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -1274,6 +1274,10 @@ static void bap_state_src_changed(struct bt_bap_stream *stream,
+ 		data->stream = NULL;
+ 		break;
+ 	case BT_BAP_STREAM_STATE_STREAMING:
++		/* If already streaming don't attempt to parse it again */
++		if (old_state == new_state)
++			break;
 +
-+		regulator-always-on;
-+		regulator-boot-on;
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+
-+		vin-supply = <&vreg_12p0>;
-+	};
-+
- 	vreg_conn_1p8: vreg_conn_1p8 {
- 		compatible = "regulator-fixed";
- 		regulator-name = "vreg_conn_1p8";
-@@ -95,6 +107,22 @@ vreg_conn_pa: vreg_conn_pa {
- 		gpio = <&pmm8654au_1_gpios 6 GPIO_ACTIVE_HIGH>;
- 	};
- 
-+	/*
-+	 * TODO: These two regulators are actually part of the removable M.2
-+	 * card and not the mainboard. Need to describe this differently.
-+	 * Functionally it works correctly, because all we need to do is to
-+	 * turn on the actual 3.3V supply above.
-+	 */
-+	vreg_wcn_0p95: vreg-wcn-0p95-regulator {
-+		compatible = "regulator-fixed";
-+
-+		regulator-name = "VREG_WCN_0P95";
-+		regulator-min-microvolt = <950000>;
-+		regulator-max-microvolt = <950000>;
-+
-+		vin-supply = <&vreg_3p3>;
-+	};
-+
- 	wcn6855-pmu {
- 		compatible = "qcom,wcn6855-pmu";
- 
-@@ -104,6 +132,8 @@ wcn6855-pmu {
- 		vddio-supply = <&vreg_conn_pa>;
- 		vddaon-supply = <&vreg_l2c>;
- 		vddpmu-supply = <&vreg_conn_1p8>;
-+		vddpmumx-supply = <&vreg_wcn_0p95>;
-+		vddpmucx-supply = <&vreg_wcn_0p95>;
- 		vddrfa0p95-supply = <&vreg_l2c>;
- 		vddrfa1p3-supply = <&vreg_l6e>;
- 		vddrfa1p9-supply = <&vreg_s5a>;
-@@ -974,6 +1004,8 @@ bluetooth {
- 		vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
- 		vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
- 		vddrfa1p7-supply = <&vreg_pmu_rfa_1p7>;
-+		vddwlcx-supply = <&vreg_pmu_wlcx_0p8>;
-+		vddwlmx-supply = <&vreg_pmu_wlmx_0p85>;
- 	};
- };
- 
-
+ 		base = bt_bap_stream_get_base(stream);
+ 		if (!base) {
+ 			error("Unable to read BASE of stream %p", stream);
 -- 
 2.52.0
 
