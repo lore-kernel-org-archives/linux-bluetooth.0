@@ -1,127 +1,111 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5690722127A
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 03:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9C41FF7C7
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 05:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764992361; cv=none; b=r/jvkOijQvtx2J8LwFAaYpyZJM06w5QJtFhEVRjR78/t/urnwbcWv/Erm7EKLbPsrofJl13cCadpGWqhNMFxA5l1LV+5xodxgPtgzolG4fjsnVbqyBQq2lARndUfvQNq685nyzBjbGywOOjf7dFSSRH7LMYOsM8hPXPvnOy8T2I=
+	t=1764998965; cv=none; b=OW+BlhawEWw66PtE/BZb+uHQiee77DWFuGMghWeyjKBT7pf6BmCnJpWM6ehJD3ltWGdlXR57ORjxoVoCcDm7ZEKTO5R32tBdIdnt7uyKA+9I/TCkGnPzGKdv3jWFunXdHVxYHDazMRIXCgEU3JDcPJVG16EbKoH+ny0I7bi6u2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764992361; c=relaxed/simple;
-	bh=9iBfutDgo2tlvQBngaDZT5+sJzt4AVkGKjDZUyAfFlc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=g6H6hKm7WSSEUxllBXroGyl0s7ZlgX/awaQjOXesdq838MSi1WfKRpJAyHhx7H/9yFVlNKBfcDDOAX0ZxiH8I4MxHVZhmp+Okh/nLUYW0R88jloj6j3c9gaPlHZDWbYVyPmkwtjMn5HR2lb+secb6bUAoG3Lx3NQ+dXLXF3d+XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YVZre2Qo; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YVZre2Qo"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4f02dd964feso7751371cf.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Dec 2025 19:39:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764992358; x=1765597158; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=oT5YrQ533tmfytEy5Qf7LnHDupB01ZVdi+Mu9cfJ02E=;
-        b=YVZre2QoLfmfP7I+4Fnh/yKqfCPkyA2wqKedNjI9AgI4U3DlwYWi3SElFItZAe9sVV
-         2HsVXd2pJ0gEg8NjYgK9f3exsE/O4i9YyDrCvgp+fxBdHzqg0w1faOw008/iziDw5Ltj
-         2NgmaBWNQhTDFh+YQOanZzTnEFe2s2O891hY2SATjfV3IFOobcdb6CzvAe/SvRfI5TkG
-         2qfy1xK3A1496VGUr4RuTCul45WOab2zaQW+FGzYPaMVcUtj+HUiJ0ZrjI+/YHAA9Irp
-         kTdU5OZ04qybfZKDUGOaaXnnJ/sm5BiGkhZIf8wY0IbhH3sPjq5eECM9/yDx+QjYV/3g
-         Rtyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764992358; x=1765597158;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oT5YrQ533tmfytEy5Qf7LnHDupB01ZVdi+Mu9cfJ02E=;
-        b=MlkTkoTndrFCz/A0oNNoTVKag3xgtczfP0YLfEMSaucU4XRT4HQMz1FSYR8MZTfYqz
-         SDByVuo/zkmCBxXnO5ilT2kk2R+7PhnLAR0RZwl4XVK2kk6KsYQMJf2omcRqq4eaD5zE
-         yCJWHwaDQpcRwzJRaewIiaXZtZTdAZ/ge8J5XOOuXbU7UAw+sGYojIyeWBwsHA5do9iL
-         BbCwZA4PsJR8MELMTBBaV+FDOsn9vaDdPWmG7S1RE2mHnH5gRZEvsZv3KMslZU0dRn0l
-         vhKd6XdLlgmbCPbRsB+rKDwsl9PpHORfd+t8O4A5vpESE4VD5rIGc8OplIZOEO3taBSb
-         IDDA==
-X-Gm-Message-State: AOJu0Yyy3YqDK+sf23Zxm7xq/y5FPolZ9c+9ISjrALG8dDG73ycuUMH3
-	q8VXCOPNEMeeqOQpMBIqvpaQIz/nunMvpNkWJ08ByMh84a35hDnn6ywtzca+cQ==
-X-Gm-Gg: ASbGncsE38OnFsJktJqR5jP3z/ysKrhZMgr1JLfbT3huDmqDy4zXZYXQGESNFjv6CgH
-	dZjPXCoERKAl7GpbJ4kI5GUv4Q3WdPTp0VP0/A0n8FVAVvGFBcHQma3v4RoWyJYyIJsZqRWHPaw
-	6+/aym9Jz2EIPREH6pTcrqnj1erzPbzVGc5DTjAO8T4WpaUn9WSdCGRPo+ZrAjxlxo+OsUHRxO8
-	kL75MhLJW9wP9Ahr1cmJRon0AhiRVQTqoK3TT3uG3o/NX9z0lVPEi5drZK1lgeMljOya/9uxpfb
-	43HEIVRNczokX683uO0LxK7IpOkm6IIyCd6ZTaZUpz0xeDcjrfdetvkSBz69ij9+2tPsA2m26Hf
-	eC4U/EWzEe9sjxk/hF36YvgJrpadfXx4SyOW9hvNRZYFQPn3GNpWpI1TxJi+Uf/CZmTQBM32Ew4
-	T6BKaR209gW06r9nV4
-X-Google-Smtp-Source: AGHT+IFosulRub0YEyZiaGOcR0/whscnejMiLBXWqWxTrs2y6j4vwNDVJFAFMwQX3km28uaco7rjyg==
-X-Received: by 2002:ac8:5fd6:0:b0:4ee:bff:7fcb with SMTP id d75a77b69052e-4f03fd5259emr19895881cf.1.1764992357807;
-        Fri, 05 Dec 2025 19:39:17 -0800 (PST)
-Received: from [172.17.0.2] ([64.236.134.32])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8883b5e9dfcsm12827706d6.40.2025.12.05.19.39.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Dec 2025 19:39:17 -0800 (PST)
-Message-ID: <6933a565.0c0a0220.28a8e4.485f@mx.google.com>
-Date: Fri, 05 Dec 2025 19:39:17 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2927386397450772713=="
+	s=arc-20240116; t=1764998965; c=relaxed/simple;
+	bh=kvaVICPJgckVprAkO1PTzdwxzYwo/eA1iHNuVj+VMmQ=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gH0wd24KxoP0T9X0y1NW/i+43qu4LxMxVgdDL4QmiR2YJUATP6b5BZAQAoGGhhaHBWiEOWVe8qO8ZUN9mQ6n2xIafZG1SJbp68ZCmUcNzpCM1TM+zafW7Vj86+dhdoFEw69PWJ9mkd75UaGkTF+lCWpQJhF/2QEikXMZbqxGh1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 7F1E158BEFF
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Dec 2025 15:14:05 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 78B694322F;
+	Fri,  5 Dec 2025 15:13:58 +0000 (UTC)
+Message-ID: <4efd49cd5fa6897706742d8907b56aaff3b475b3.camel@hadess.net>
+Subject: Re: [PATCH BlueZ] main: fix bool vs. gboolean type in
+ g_option_context_parse()
+From: Bastien Nocera <hadess@hadess.net>
+To: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
+Date: Fri, 05 Dec 2025 16:13:57 +0100
+In-Reply-To: <36c55de961b5b5ceda83c019ec511f8fa7cd44b6.1764880521.git.pav@iki.fi>
+References: 
+	<36c55de961b5b5ceda83c019ec511f8fa7cd44b6.1764880521.git.pav@iki.fi>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, andrew.smirnov@gmail.com
-Subject: RE: [BlueZ] input/device: Fix off by one report descriptor size error
-In-Reply-To: <20251206015257.651144-1-andrew.smirnov@gmail.com>
-References: <20251206015257.651144-1-andrew.smirnov@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdekjeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfffjghftgfgfgggsehtqhertddtreejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeeuveeivdetkeekgfefffeftefhjeeikeetffdvteejheefieeltedtvdeuleduleenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvpdhrtghpthhtohepphgrvhesihhkihdrfhhipdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: hadess@hadess.net
 
---===============2927386397450772713==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, 2025-12-04 at 22:38 +0200, Pauli Virtanen wrote:
+> btd_opts.experimental and testing are bool, not gboolean, which may
+> cause memory to be clobbered and crash.
 
-This is automated email and please do not reply to this email!
+Can you please explain why it crashes in the commit message?
 
-Dear submitter,
+IIRC, it's because a gboolean is a typedef for an int, and bool/_Bool
+for a single bit.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1031026
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.24 seconds
-BuildEll                      PASS      20.11 seconds
-BluezMake                     PASS      651.12 seconds
-MakeCheck                     PASS      21.74 seconds
-MakeDistcheck                 PASS      245.97 seconds
-CheckValgrind                 PASS      305.54 seconds
-CheckSmatch                   PASS      355.98 seconds
-bluezmakeextell               PASS      185.95 seconds
-IncrementalBuild              PENDING   0.32 seconds
-ScanBuild                     PASS      1055.11 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2927386397450772713==--
+>=20
+> Fix with separate variable for cmdline option.
+>=20
+> Log:
+> ERROR: AddressSanitizer: BUS on unknown address
+> =C2=A0=C2=A0=C2=A0 #0 0x0000005b9914 in queue_find ../src/shared/queue.c:=
+230
+> =C2=A0=C2=A0=C2=A0 #1 0x00000057c0ff in btd_kernel_experimental_enabled
+> ../src/main.c:721
+> =C2=A0=C2=A0=C2=A0 #2 0x0000004ff52f in read_exp_features_complete
+> ../src/adapter.c:10230
+> =C2=A0=C2=A0=C2=A0 #3 0x0000005be40b in request_complete ../src/shared/mg=
+mt.c:306
+> ---
+> =C2=A0src/main.c | 9 +++++++--
+> =C2=A01 file changed, 7 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/src/main.c b/src/main.c
+> index 558bf2888..61e5ef983 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -1330,6 +1330,8 @@ static char *option_noplugin =3D NULL;
+> =C2=A0static char *option_configfile =3D NULL;
+> =C2=A0static gboolean option_compat =3D FALSE;
+> =C2=A0static gboolean option_detach =3D TRUE;
+> +static gboolean option_experimental =3D FALSE;
+> +static gboolean option_testing =3D FALSE;
+> =C2=A0static gboolean option_version =3D FALSE;
+> =C2=A0
+> =C2=A0static void free_options(void)
+> @@ -1420,9 +1422,9 @@ static GOptionEntry options[] =3D {
+> =C2=A0			"Specify an explicit path to the config
+> file", "FILE"},
+> =C2=A0	{ "compat", 'C', 0, G_OPTION_ARG_NONE, &option_compat,
+> =C2=A0				"Provide deprecated command line
+> interfaces" },
+> -	{ "experimental", 'E', 0, G_OPTION_ARG_NONE,
+> &btd_opts.experimental,
+> +	{ "experimental", 'E', 0, G_OPTION_ARG_NONE,
+> &option_experimental,
+> =C2=A0				"Enable experimental D-Bus
+> interfaces" },
+> -	{ "testing", 'T', 0, G_OPTION_ARG_NONE, &btd_opts.testing,
+> +	{ "testing", 'T', 0, G_OPTION_ARG_NONE, &option_testing,
+> =C2=A0				"Enable testing D-Bus interfaces" },
+> =C2=A0	{ "kernel", 'K', G_OPTION_FLAG_OPTIONAL_ARG,
+> G_OPTION_ARG_CALLBACK,
+> =C2=A0				parse_kernel_experimental,
+> @@ -1464,6 +1466,9 @@ int main(int argc, char *argv[])
+> =C2=A0		exit(0);
+> =C2=A0	}
+> =C2=A0
+> +	btd_opts.experimental =3D option_experimental;
+> +	btd_opts.testing =3D option_testing;
+> +
+> =C2=A0	umask(0077);
+> =C2=A0
+> =C2=A0	btd_backtrace_init();
