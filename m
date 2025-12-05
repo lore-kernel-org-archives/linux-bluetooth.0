@@ -1,102 +1,88 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from o1.sgmail.github.com (o1.sgmail.github.com [192.254.114.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A6457C9F
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Dec 2025 14:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639EB28FFF6
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Dec 2025 14:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.254.114.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764946210; cv=none; b=sHqrP13z4xEr1IX5hGuNeRAqK/sWcZMAqPbxFt2P3II2gulZc3nMzwR6i/TFpv7u7rDICbeqFItowV+iWTQ4/3tjVP7y1KPVFXtxLU+pG3FWp7N8/pvJV8ugXhAu0GARkeorI6ryDa360DvHo0qY/DqFgxen7OZWlDyRyoyiOxI=
+	t=1764946410; cv=none; b=f+cCxRU2DIlAATZX7qnrmzG9atpnugUB9ODAsIOdwF59mVgaDg5xSXE3mQoDncZ/BkCENtWumdnKfXyHhhtv7YYKUdlaZSoJBeIrYrIbXeWx1lmsjfo14cIHZQJDIqBb0BFgYJDzqQOfAyuXDeYvHk5qkJLxjumX4V7M48iWvSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764946210; c=relaxed/simple;
-	bh=//rj/OyIA0UUd2FYLVuKrcTlsUhzm7owDnqF56W9QBc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gt21IsI1le3G81qHFEHragLV6JveNQ05R/bPqOCiulfpUYqBQwnIigHM+DOJH9hA7a6Dtqt5YrjQyDRbhmLpB0V9UWqshz+cQDnUdvVqbG+fX1FTBRaF1V3rXEWlNKwumBLQ7mDmeECX7f08WNUQBJSzI6j4B0AXmZ5NxUmN9UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g7tFlPBQ; arc=none smtp.client-ip=209.85.221.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764946410; c=relaxed/simple;
+	bh=ygA/oYaJOXjaETMhtr7YKlHIZcVvRfJoCBQbx4+ii6s=;
+	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=WqLBxycuo6tR0fbH6VbcvQAoEqys+Xx9TDOXq6DZ0NF4ZoPn5jV+bmzKCRSEA8SX9as2xkn85yw5e4uGzypmkand4bj9v+mtbtqBkdhrtf7AaQI7Krm/c2HzzNuqJxrqDMwKxQ5CtLgKyPy0tyHoBV+E+xkWAfZFcJGy7mHW+SE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=xaWfFAMH; arc=none smtp.client-ip=192.254.114.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7tFlPBQ"
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5599b119b4aso628798e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Dec 2025 06:50:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764946202; x=1765551002; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0WRz7pbBmzuIsuM3fJWT3rTLbaC63BHUBijA8opd+Fw=;
-        b=g7tFlPBQW2qtJgzzivo0x+fifaGgN9UaaIp1BfkIWG7Ctz737C5VKHj5we0KNYDXsF
-         vNuFX7K+3vy/KV1pP0ilJqDHG+yNAHoRQCTL92FaEJpyVPz7/uyKfBE3JfjnU5Nuk4Xx
-         8kd/lI0lI/4ffeFnqPzxKa2Z+CbDwnVzF8ZnOrO+pRlS5xQm8RK8SCqLyiEaDHzJCFWt
-         4NzscfbcD2eRk7rbmJpiCTXHy8Ta0PzNDdvQJ7pqzu8UM4vhHRdMYMjRnE0V+l+F09EW
-         ROKnU86zhU6DI3HXnxMk0K6/nNrN5CJPKP2tRXx/xjT5uAISJaKodxzbplEQ/J+Bcq3y
-         YgUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764946202; x=1765551002;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0WRz7pbBmzuIsuM3fJWT3rTLbaC63BHUBijA8opd+Fw=;
-        b=ZT4TUXmytMzg3U2V4uq8tObzfMqKqKFX3/rFLsx6/EGWyaxVEzp/Yl2N0jNZZxdWrg
-         WcP6mwqL9/CgqzxA/C3sUN9tnSXBRuQDWn6TN7jueZHWwLYrrw9sJ8h6ToHiUujkYr0E
-         atJn0bmW/OaioZ7mc0sIDjJspurU5W0t7jcC4ZT1THxh54PO1r9a7MVCEnbnOO0zA0Oy
-         l1qRUjorrVZdYV+W7RrQGAap65LniWnk/T60uFNxsPdttEd9FapAX7zAlqdWhxmTPEoh
-         OVFaZ16SZjcxSLP1iovxW85ZYWLjtYr1if/KfelDCzz8KNzBgWcqF2wPTaLI58Y2aXQM
-         BbAQ==
-X-Gm-Message-State: AOJu0Yw/agKGRcyz4Zu/NpyF/ZwBfm7IPnV+u6LAO6KRxKIlX/WUKDTj
-	wnILYY3gUv7ovAfgR3qk18kyWuzaWQw9gB2qjIumnG6Cvz3oIpUqHhjSlyUPAg==
-X-Gm-Gg: ASbGncuSOWdZmAeNBLbp8Kc1C95cZEH6jfLlLLCfwnHWznSw0PO0Y+p4APiitY2HMAv
-	DkaQNPBuMpuBFuDPRqeE8dulPzbWqk1iSnKGmI/69DhOTUg/DzkrNHJmPyvpikhxDG3DlZnsrAD
-	1Omw8dxBKUSA5ckTAJWWtFfWSUgTCw1AszNNfWm52LeonmZglZgcACfAXsdwAPNtWoroZ8eeDL6
-	kOyv8lFjseSO+rwn9EnBa3ngPsXMIwG+ou5m6738ZLan8gnwgIReCEBPoCedmLuO2DYjcZWT7jj
-	AaVy8L1lR9j1Dy/GE1TySMGQdtnjF69WsMk41hzpTo8S+pXq8clmpsT7zy5VgRUKVpCKCJ6C71d
-	GbKqOubQqTQp//IirSRw+AnQOSxlUGEDjU0pRURkEdUkRhteI5g2L8UGnqn7L5pkqw26sWwH+FU
-	kZdU3Ia54DGLydlg==
-X-Google-Smtp-Source: AGHT+IGEeG9sHeaK5J6quHy9J5kkPhJGqmQC+97DIfy3iZXXDwe+KI38XijFLizT3ee1mBgux1RwUw==
-X-Received: by 2002:a05:6122:2189:b0:55b:9bee:ff61 with SMTP id 71dfb90a1353d-55e5bf964a0mr3706549e0c.16.1764946202015;
-        Fri, 05 Dec 2025 06:50:02 -0800 (PST)
-Received: from lvondent-mobl5 ([50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-55e6c5908d9sm2243380e0c.9.2025.12.05.06.49.58
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Dec 2025 06:50:00 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] bass: Fix attempting to create multiple assistant for the same stream
-Date: Fri,  5 Dec 2025 09:49:52 -0500
-Message-ID: <20251205144952.8373-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="xaWfFAMH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	h=date:from:subject:mime-version:content-type:content-transfer-encoding:
+	list-unsubscribe:to:cc:content-type:date:from:subject:to;
+	s=smtpapi; bh=PtdexdvOE0f5NsScYhhvmARSSMaHGDkHO7YI+7Ur3M8=;
+	b=xaWfFAMH5fT1MER05gH84VCE7b9wOAbGCwfPy397J3NM3XhbX0VK1IA5PVPSw66FcIwN
+	ZkaNbq9IQZLaTxu0pzig5QTgTf0Zdo9eSMthhyT2MxJwsXo9m70IaxeAhS5msYmCbzq9wL
+	DvDZbAqmyStsOAtwNuRSNmXUQljA2dmf4=
+Received: by recvd-5ffc458897-brhxf with SMTP id recvd-5ffc458897-brhxf-1-6932F1E4-5D
+	2025-12-05 14:53:24.728591587 +0000 UTC m=+2666996.100737919
+Received: from out-21.smtp.github.com (unknown)
+	by geopod-ismtpd-58 (SG)
+	with ESMTP id nHf1HS97Q2avmeADZ1UxBA
+	for <linux-bluetooth@vger.kernel.org>;
+	Fri, 05 Dec 2025 14:53:24.712 +0000 (UTC)
+Received: from github.com (hubbernetes-node-a71872c.ac4-iad.github.net [10.52.211.112])
+	by smtp.github.com (Postfix) with ESMTPA id D2102401207
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Dec 2025 06:53:17 -0800 (PST)
+Date: Fri, 05 Dec 2025 14:53:24 +0000 (UTC)
+From: Pauli Virtanen <noreply@github.com>
+Message-ID: <bluez/bluez/push/refs/heads/master/d383c8-c42a49@github.com>
+Subject: [bluez/bluez] c42a49: main: fix bool vs. gboolean type in
+ g_option_conte...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+X-SG-EID: 
+ =?us-ascii?Q?u001=2Ezu6eUoWwK70GvXWP+kE2GIYMQflaq6Ix3rraxcwcvSqstVpfwwfs1H7iT?=
+ =?us-ascii?Q?j=2Fu7Mau0w5pPZd2OpCSrPHF+2C5b=2FFyvmurMMnZ?=
+ =?us-ascii?Q?=2FoOZn=2FsG36z0RYylOcx=2Fl68PCFZ4yDku0wejVgN?=
+ =?us-ascii?Q?eqLnn4otdZw=2FDrWebq5UZMSGhoIc14KnxkAcr+T?=
+ =?us-ascii?Q?6yfuGqSWqBFTfq3h7ZHdkDDXGfjwiPaY38RoAxP?=
+ =?us-ascii?Q?7wL1BlPsItLEj0ACn8RcaY1qsEdvjLBkWI49emV?= =?us-ascii?Q?XfSC?=
+To: linux-bluetooth@vger.kernel.org
+X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c42a49a243e48182b8d5050949cf26e9a961afe6
+      https://github.com/bluez/bluez/commit/c42a49a243e48182b8d5050949cf26e9a961afe6
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-05 (Fri, 05 Dec 2025)
 
-bt_bap_stream may change from streaming -> streaming when updating its
-metadata in which case bis_src_handler would be called multiple times
-for the same stream causing it to fail at g_dbus_register_interface, to
-fix this adds a check if the state is already streaming then it must
-have been handle already so it safe to skip calling bt_bap_parse_base.
----
- profiles/audio/bass.c | 4 ++++
- 1 file changed, 4 insertions(+)
+  Changed paths:
+    M src/main.c
 
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index 20c37323bb0e..031f527be9f5 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -1274,6 +1274,10 @@ static void bap_state_src_changed(struct bt_bap_stream *stream,
- 		data->stream = NULL;
- 		break;
- 	case BT_BAP_STREAM_STATE_STREAMING:
-+		/* If already streaming don't attempt to parse it again */
-+		if (old_state == new_state)
-+			break;
-+
- 		base = bt_bap_stream_get_base(stream);
- 		if (!base) {
- 			error("Unable to read BASE of stream %p", stream);
--- 
-2.52.0
+  Log Message:
+  -----------
+  main: fix bool vs. gboolean type in g_option_context_parse()
 
+btd_opts.experimental and testing are bool, not gboolean, which may
+cause memory to be clobbered and crash.
+
+Fix with separate variable for cmdline option.
+
+Log:
+ERROR: AddressSanitizer: BUS on unknown address
+    #0 0x0000005b9914 in queue_find ../src/shared/queue.c:230
+    #1 0x00000057c0ff in btd_kernel_experimental_enabled ../src/main.c:721
+    #2 0x0000004ff52f in read_exp_features_complete ../src/adapter.c:10230
+    #3 0x0000005be40b in request_complete ../src/shared/mgmt.c:306
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
