@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C2133121E;
-	Fri,  5 Dec 2025 12:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CFD313294;
+	Fri,  5 Dec 2025 12:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764938876; cv=none; b=qFXeyTEbSC7NCyZDzpARZvKEwsYOXQvs2nqKf+rBOzrNiIJM3mEgCTrJCsRyTPKHZ+CHnJJ5GzYybTCRhYcdDyYoDaRz+MQmyjNYFFYey4xn9wGRlx/eduBaqqYx5gDCnhG9ndpk/Os07pf+hY0rP/7/cYU6tqsmer8a5bwVpf4=
+	t=1764938880; cv=none; b=WR0YuM1tf4x7wJ2QLQ40oV4Gztq+3ZshzsAEMU65i/frr7qTHBFRsmc78TeqOAtompYpUEZ53A5eT6TtHf25eVwlFo0EYlFixaq/lNFDWR7/XoY6KX+lyjvBRzwuRtKeKyUAIPJ7Uk2I1zee1zldo8WQFZyvN7Je+5UQfcgJcd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764938876; c=relaxed/simple;
-	bh=IX50Uol5VXmJmVEGDMqzvXL6HN4e9W0XS5zbQlbRYwM=;
+	s=arc-20240116; t=1764938880; c=relaxed/simple;
+	bh=g5nsJt8V3Rhk8lC7cU0UF7gcIKnw0CCckqxLprED9NM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bQBvLJ+ICX2ZIMEHxMcbHh2kBuEsCTg5dWnD6W4h2/wUFct8IPylEZbyMwskEc21jL/kfqmHyvjfQHVNrSPqVswbCK46xdKl1qQvzQbHEHVf+USd7etPAL6SLunYHjx8pDWroeBX4vyYZrEF+hu8ljvOxc7+WZ0jyit06rnnRkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWU0Xuit; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=pYmHYeBICwpiZy/3iTcGZ2FBPWQCW9b4PLdbm1mQHJ7T0tyOq75PK1shZiFa/fm3TDs97oMxWK34q5igz8mG9rW9UnI2u4G08zcGm89QZSOL4qRou3Msf5OTEYpXi4QcCt/m4XoUdrpWx9AmBbQu1LkZVdM6eT9MPch2ZN0JrRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EaJeuGZa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWU0Xuit"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7261BC4CEF1;
-	Fri,  5 Dec 2025 12:47:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EaJeuGZa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECEC1C113D0;
+	Fri,  5 Dec 2025 12:47:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764938873;
-	bh=IX50Uol5VXmJmVEGDMqzvXL6HN4e9W0XS5zbQlbRYwM=;
+	s=k20201202; t=1764938877;
+	bh=g5nsJt8V3Rhk8lC7cU0UF7gcIKnw0CCckqxLprED9NM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=IWU0XuitZ+Ta1uQiI9+/FHCZiVvxeXxr43O7iTAwnpa1kY8T4fnsheVt0q5taVbAQ
-	 /YLev0jNHCGHRDf//GuSclAL0aCNPGl27JuivD7xPku2VQnrz5siRlRIw/CGP/Lszx
-	 V/Jdm1ybF0+6+SyAE43WNVKHB/B2SsOoKcgpnHXxkLQmz4F/paMAlftR7ppiH3+tEZ
-	 TRmtX2huIMMK5f7jhjx4sZ9r9fNzG1xIfyEiJ3ZldncfctTLwZhNuj6rlh/DTqMnrz
-	 2v908jlx7v6wTQ34egySu3zJfAFEpaWFleOGoqx6NqXywrPVzbSjOWuC35cHkO9YtQ
-	 l3B8FaBlnhMaA==
+	b=EaJeuGZaIUEejETX7dTcrX9MLxI87XvYYegQFdudwlSnMBbC+ONYK0l0L6BgytUmH
+	 CzMUTxyJdGZcsnIqa9C/ng8n2TEonzJ7FxHNSzVKDGPaG6rrPKIF+eouyppMmEt5iI
+	 sJCWl51m3/u4ebFfs1k49GAGEpZqgYoZMNLD5z3/sDKDopfTSIP2w5L4JaXAw1/1Di
+	 7pVFkbHY2QSJ/ngCh/DiKaAkl9ngYmCwuXEAGWZ0KI/JKK1gGkuQnvqyNs9q9MlV0m
+	 8KokFbrqCzT9xP48nmCeYaxLnnhppj60DVicI2JtDc9NnI09FoECps0XmkDCDuVviv
+	 19zY7T+YIvS3w==
 From: Konrad Dybcio <konradybcio@kernel.org>
-Date: Fri, 05 Dec 2025 13:47:23 +0100
-Subject: [PATCH 04/10] arm64: dts: qcom: sc8280xp-gaokun3: Fix BT RFA
- supply name
+Date: Fri, 05 Dec 2025 13:47:24 +0100
+Subject: [PATCH 05/10] arm64: dts: qcom: sc8280xp-x13s: Fix BT RFA supply
+ name
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251205-topic-wcn6855_pmu_dtbdings-v1-4-165611f687c8@oss.qualcomm.com>
+Message-Id: <20251205-topic-wcn6855_pmu_dtbdings-v1-5-165611f687c8@oss.qualcomm.com>
 References: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
 In-Reply-To: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
 To: Jeff Johnson <jeff.johnson@oss.qualcomm.com>, 
@@ -55,11 +55,11 @@ Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764938851; l=820;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1764938851; l=850;
  i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
- bh=f1L2IQcYsyragIm1+0txFbShzUX0NQpT5HnFIeRLvoA=;
- b=wZCe1CQXIR5dH1wPKpaEwyJl5rD2cF9OhE9Uiux5DipJLfhlJjowzEe5fBFbTUNdGHC4timKz
- Ywoo4Me7nZLDXmHXAGzNyB6GFmCHqwlhcDoYG0COI+KsdWYpV/RS/o8
+ bh=GlPR5/O3251wq0EgqGmaDqHI1jFthnyndmjFGVnrR2M=;
+ b=P7FqYRh8BDfP4YNuDmowDLYQFipIXPvEF4S11KHxGjz+pjpSM7oRZa0o6EvXIEGUzsX1DOaze
+ 7l1w11HgNkUBj/j6D12KRRsfr7We67qCajzmMXt45YuzACaJV/e1ZnQ
 X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
  pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 
@@ -69,14 +69,14 @@ Fix up the supply name to align with bindings.
 
 Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 ---
- arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts | 2 +-
+ arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts b/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts
-index 9819454abe13..f3c00be67081 100644
---- a/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts
-+++ b/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts
-@@ -1122,7 +1122,7 @@ bluetooth {
+diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+index d84ca010ab9d..abd9c5a67b9f 100644
+--- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
++++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+@@ -1331,7 +1331,7 @@ bluetooth {
  		vddbtcmx-supply = <&vreg_pmu_btcmx_0p8>;
  		vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
  		vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
