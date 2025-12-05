@@ -1,127 +1,153 @@
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4AF33ADA2
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Dec 2025 16:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764950675; cv=none; b=UvzBmwxcaJw98alxWsM8jN9SpulqU1fjgGQ+dF2acjQbC8LTFa18xVKICaM84ruPW5PkQfQ8sxESKosG6CGIZRsnYyUvqhw+y5nq53uMKRmVjlUtRULUnXlDu4d4y1A/fMG6Jzc834esP4ZEX8ZGgkNCezyUoJE+5d6hFNNvi48=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764950675; c=relaxed/simple;
-	bh=6vz68bDdPB6LoZvHxwipKYx6Cj18+S4eWckb7I/VE3M=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tGMnpPsNMvgCKH66iaY1mI39W8DT9leQgt2ckQ2JeD6jKMdWxX7Iz0UjQeviYIH1868AGaq4H7pL9TfYKihYAlu8q96X49txienwh1IQzmNa1g4bB+cpNkuOGJFECOi8cxkR2jKZ984MCIJz8wFNT0pJOF7Oorqk79gjwOjxiek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R6QUBxzF; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F69830DEA6
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Dec 2025 16:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764952273; cv=pass; b=uwQShf/qheV12mvAyZ6APeVm2oQuiP+NREfUnfDuFrFg0vUzHsdBvpgI3YMvvh2h+Q5LnX3oVpa2Bq/UDsFj9gjR/at71Ond2osPy4bY8JCaCvtqQcO5x/ALPP0ZAk9E3+UYbPMdfCEnJTLPkywMrke+C39i9/2JWlYwzxcUzcE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764952273; c=relaxed/simple;
+	bh=ZkWI5NrKcexZrH44VOccuqzoQkJogJc0UFuxlT14oDw=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ncxzFWWm5IbcB3Oaue7W4eRx4gR1TmgvEATVK5s4t2ACh/btVY3U1CdtN6+f+6oSM5BaLVbPsSIkrxcBiI/+qsb4tyHau56b6YW4i1H6iNpTFtdPjKgw2G6uKwDcTgrpklNfBww4U7FRgSrghIe01205E9vKCrvS4sN4CaJlBSE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=f90Y/bf1; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R6QUBxzF"
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-657a6028fbbso1096247eaf.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Dec 2025 08:04:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764950660; x=1765555460; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7LP31PJH8CbvYwtl5fNVcb1jhz45anlBmVzx03mHxdM=;
-        b=R6QUBxzF39ZAetNL2GZobbKHdwmawANiVSiQttP7mQn73SxMN6JiiO8uUjMOiZmUo0
-         bnX2DO5mx4hJ3n3vGvMG59Yb5khL4nfsAyCbBz04gCnBkXRYPruSj0J/k1/lLbXYv6g7
-         Jsu84KJfTMAKaJojdrirw4074ssTj6OtG1y1yyoBWxDJNXekKTmnxY1ftBtbhB6VMUqy
-         PjcYI9EQ0OZEEok/B/16lkqBx06NZ6rNdavyA/N+vUFXBNh8mbcZmmqErOp1Du88xaRk
-         eh5RIjJsder7R/O8JvQv5M4Bq+FSwZdfIinS0tLgDZtU/hna3QTU+rnIDX8LnLfAw8Wz
-         EkiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764950660; x=1765555460;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7LP31PJH8CbvYwtl5fNVcb1jhz45anlBmVzx03mHxdM=;
-        b=LyQOI0aBGYTzfjMXnwG6RIj3M6IXk6Bc3NCv/7nDW+LBa55IzbI+jHO8Id6Z7FHBny
-         BQxK/ib64vaFJuQVM/QzOFkouLVNHK+P4ZCE1LcXjL3zoUbHIBIqxRfP/F7YaoFgwTCP
-         5zd/u8YPDSWvHNCuLRxA35Nzb5eL2KtCcfPVo9TFhVSaaJMzMQY5BvAGPfGhWM+KYsI2
-         M1A6opF9b5J0K4s0LuVVSABs1jr5NThNiqIkAr34Vmatn8X7s8OQhKwDmQm8NYU9ZCVI
-         zNknzTRtTsHBIgkt8gw7elcM8US7x+bosMpMv7C7BYpRWq3dUMxcNCw8cy7zkkRJou/D
-         zOyQ==
-X-Gm-Message-State: AOJu0YyLE3hiTAtHbeiJlDLIVYR9tYFD9XdeuDrBA+7pZg1mu0NBnJnZ
-	ymO09pydJ8TVvlT4/av33pXjauuNNABD8OrT59Sv2OBgObp8n03w57EV1Bd9ww==
-X-Gm-Gg: ASbGncsCZ42PU3AEdjDmsvOpJry6UdEIMnp4fFgijVGyMVB6Xf80T+ys/9YLhhx76Rf
-	/R5c44o79KCsHtcpV5k19blYeanwAO7/P2kVC7R67uFvaDpUdya1jz+opOYoBi1/IiQA9sM4eNZ
-	urUm3/Gs0A/fKzYIO5DPLb1Kzl4lPesvVy2HyuoFeDDYH2DAFY7HPqp37Gunh70SgaQFZhyMd6G
-	c6VCixWOKkcxtXax0Niay6QqZls62p+iX/AXlJ2UT1h7HqzNAkM6ul4IncbSw6ibxkKz90znxP1
-	MZNBfcwM4jORBu14IlJzBS9hBzR1eSt5rnBqSec6ozB3mdraqyVsS83bkc7HXmVpxVKoffVkKAh
-	kJ97bOpn+oi7CnLxjnbThkAwVc4f2rwppYDREhLn1z1h+4bgde5Id+jOhiNirz5Mtw70LfjEqQu
-	qKxf0DO87HoWzj8qeZfa4VIfJ2
-X-Google-Smtp-Source: AGHT+IHXX2wEG49V/T94zrZNjfnI8EBm+87Mg3v1Uhpcn8ZyIRWUQlqHU5f9QlSwxj2K1Rxa0shjew==
-X-Received: by 2002:a05:6820:4c01:b0:657:5e6f:b9d7 with SMTP id 006d021491bc7-65998a34b2fmr307370eaf.6.1764950660230;
-        Fri, 05 Dec 2025 08:04:20 -0800 (PST)
-Received: from [172.17.0.2] ([52.165.59.6])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6597ef0ca05sm2342018eaf.11.2025.12.05.08.04.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Dec 2025 08:04:19 -0800 (PST)
-Message-ID: <69330283.050a0220.352f8e.6eb0@mx.google.com>
-Date: Fri, 05 Dec 2025 08:04:19 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0013544337720868363=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="f90Y/bf1"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4dNH1T596Lz49QB2;
+	Fri, 05 Dec 2025 18:30:53 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1764952254;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bKBEZF0KXF8+/wl3jM6dv3dJPbHWz1TxyHpa2TA/WoA=;
+	b=f90Y/bf1mJp+Y7I8xktO+waMI6DxEqgUIGQX8BIfsnoDdCiJM0mWxMLi7B4IoEtJIbUl30
+	99mefEU1juZI0xsjYcXniTsiQ/FaQqt6Mubo93nno4g7itfESyh5ZdF7kIh4u04k4F9Y/S
+	5XEwVGsfQWcXoduYTSxTLkP1MUeGy2laxvDhkspSZw6/GP7RlRGpCDxcG4JGX+34nEkz3S
+	RjEZPaYVO4Xt55XCD02O3wRTomMvi3SLSyi5uCX2tSuUwr8jBjbKF4Np4Gq2KSqvAAV2vX
+	yuxf+FFgRDMPMhW6L/zYiKAbbGilPmo+vU0qIJcRxbg7FvyS5pqIzkFILFRLXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1764952254;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bKBEZF0KXF8+/wl3jM6dv3dJPbHWz1TxyHpa2TA/WoA=;
+	b=WfMSDYuU+94ZzW/yGITgiuGZyE7WjZ4YseatD3NZwlHg3N6qoH43i/uBtSzt9k4N3ivJgw
+	iA6SB5Xto5JP7lgxl7CmCYSzDnLXA9FjchY0vjx4AGZOdKnCzkwH4o5MV9Pu+aqVatfShS
+	jqP90+v1YoyQ4SrUBmWu8x9HlhDu48hxtiha1USvDiISrp9K5hLjM0jjSi7NNOP1tYOrTY
+	Q6ga8WmEZkSG+s1Dj6i+r6aAVrGtyUXJE0RyDLj5G4/CS6cncHyvQrf427jAYUslMIuEFo
+	dj146ub+1dc3za0BKil/cZXmjpAby2QJYQ90oNu5FqYVXkOORBsHHKehIkgXNg==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1764952254;
+	b=bg7ad45TAH1Zs25dlkU9br9L4pYblXG2KEURd9dbU4KSRttFMKzfTN4c9enLaMAB5chzcy
+	orvDkm05H6HaMrxZFMdr/TP/oqh5xOKOlEMkAdK/cf/3FEDbbgZAQzIgVLaziHzj2cTTFD
+	h4HJmQqUZmgNT9wtp1VCQuErCpAoS+W9GM8osOJVCLFsbrnIpPaCEaHsVbwJfr9uWFsxAr
+	gYSbEn8VO5UdLjP0+9Fpdg2S2BahFYjmCeEIv5aZ6h6XPXtBXiVBXCjlsUkBu4T6By9mSP
+	G4EshUZAIVcaR7vay9eNTSNMTVFdeKD1giRjgnu9ogzFMpw/kfJsY8NVRGB/SQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <26b2371d176809498b19758a36ec8f05a3ecadd8.camel@iki.fi>
+Subject: Re: [PATCH BlueZ] main: fix bool vs. gboolean type in
+ g_option_context_parse()
+From: Pauli Virtanen <pav@iki.fi>
+To: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+Date: Fri, 05 Dec 2025 18:30:51 +0200
+In-Reply-To: <4efd49cd5fa6897706742d8907b56aaff3b475b3.camel@hadess.net>
+References: 
+	<36c55de961b5b5ceda83c019ec511f8fa7cd44b6.1764880521.git.pav@iki.fi>
+	 <4efd49cd5fa6897706742d8907b56aaff3b475b3.camel@hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] bass: Fix attempting to create multiple assistant for the same stream
-In-Reply-To: <20251205144952.8373-1-luiz.dentz@gmail.com>
-References: <20251205144952.8373-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============0013544337720868363==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+pe, 2025-12-05 kello 16:13 +0100, Bastien Nocera kirjoitti:
+> On Thu, 2025-12-04 at 22:38 +0200, Pauli Virtanen wrote:
+> > btd_opts.experimental and testing are bool, not gboolean, which may
+> > cause memory to be clobbered and crash.
+>=20
+> Can you please explain why it crashes in the commit message?
+>=20
+> IIRC, it's because a gboolean is a typedef for an int, and bool/_Bool
+> for a single bit.
 
-This is automated email and please do not reply to this email!
+bool is 1 byte, gboolean 4, and writing to btd_opts.experimental
+clobbers btd_kernel list head.
 
-Dear submitter,
+>=20
+> >=20
+> > Fix with separate variable for cmdline option.
+> >=20
+> > Log:
+> > ERROR: AddressSanitizer: BUS on unknown address
+> > =C2=A0=C2=A0=C2=A0 #0 0x0000005b9914 in queue_find ../src/shared/queue.=
+c:230
+> > =C2=A0=C2=A0=C2=A0 #1 0x00000057c0ff in btd_kernel_experimental_enabled
+> > ../src/main.c:721
+> > =C2=A0=C2=A0=C2=A0 #2 0x0000004ff52f in read_exp_features_complete
+> > ../src/adapter.c:10230
+> > =C2=A0=C2=A0=C2=A0 #3 0x0000005be40b in request_complete ../src/shared/=
+mgmt.c:306
+> > ---
+> > =C2=A0src/main.c | 9 +++++++--
+> > =C2=A01 file changed, 7 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/src/main.c b/src/main.c
+> > index 558bf2888..61e5ef983 100644
+> > --- a/src/main.c
+> > +++ b/src/main.c
+> > @@ -1330,6 +1330,8 @@ static char *option_noplugin =3D NULL;
+> > =C2=A0static char *option_configfile =3D NULL;
+> > =C2=A0static gboolean option_compat =3D FALSE;
+> > =C2=A0static gboolean option_detach =3D TRUE;
+> > +static gboolean option_experimental =3D FALSE;
+> > +static gboolean option_testing =3D FALSE;
+> > =C2=A0static gboolean option_version =3D FALSE;
+> > =C2=A0
+> > =C2=A0static void free_options(void)
+> > @@ -1420,9 +1422,9 @@ static GOptionEntry options[] =3D {
+> > =C2=A0			"Specify an explicit path to the config
+> > file", "FILE"},
+> > =C2=A0	{ "compat", 'C', 0, G_OPTION_ARG_NONE, &option_compat,
+> > =C2=A0				"Provide deprecated command line
+> > interfaces" },
+> > -	{ "experimental", 'E', 0, G_OPTION_ARG_NONE,
+> > &btd_opts.experimental,
+> > +	{ "experimental", 'E', 0, G_OPTION_ARG_NONE,
+> > &option_experimental,
+> > =C2=A0				"Enable experimental D-Bus
+> > interfaces" },
+> > -	{ "testing", 'T', 0, G_OPTION_ARG_NONE, &btd_opts.testing,
+> > +	{ "testing", 'T', 0, G_OPTION_ARG_NONE, &option_testing,
+> > =C2=A0				"Enable testing D-Bus interfaces" },
+> > =C2=A0	{ "kernel", 'K', G_OPTION_FLAG_OPTIONAL_ARG,
+> > G_OPTION_ARG_CALLBACK,
+> > =C2=A0				parse_kernel_experimental,
+> > @@ -1464,6 +1466,9 @@ int main(int argc, char *argv[])
+> > =C2=A0		exit(0);
+> > =C2=A0	}
+> > =C2=A0
+> > +	btd_opts.experimental =3D option_experimental;
+> > +	btd_opts.testing =3D option_testing;
+> > +
+> > =C2=A0	umask(0077);
+> > =C2=A0
+> > =C2=A0	btd_backtrace_init();
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1030870
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.28 seconds
-GitLint                       PENDING   0.38 seconds
-BuildEll                      PASS      19.91 seconds
-BluezMake                     PASS      638.04 seconds
-MakeCheck                     PASS      21.49 seconds
-MakeDistcheck                 PASS      240.46 seconds
-CheckValgrind                 PASS      300.94 seconds
-CheckSmatch                   PASS      351.75 seconds
-bluezmakeextell               PASS      182.01 seconds
-IncrementalBuild              PENDING   0.41 seconds
-ScanBuild                     PASS      1012.04 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0013544337720868363==--
+--=20
+Pauli Virtanen
