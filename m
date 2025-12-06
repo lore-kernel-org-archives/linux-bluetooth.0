@@ -1,138 +1,80 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9DC1F30A9
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 14:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765030321; cv=pass; b=qtmDiz7TC/gxw9+q/goSrNrYgsRE1a3WbUZhff0UAJ3tvI2vgLuBVfdmfx95OEozgz4QhlEv+fgCeORP00zOhh89P+Su82blwAzJQOcCHez9+b0vgOd+qkt+2egNBkAK0Tuj7fQPqP1fM2VQSU2FC8m1Tt/SvLwhPqL6+XT0ypo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765030321; c=relaxed/simple;
-	bh=wuGi/Um9cMdWUiW4hsDVmYPa+8WvvduhUnLCkJxXlv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nhu8r153g0EuGqlSULDOXEZT6tfY1M4Rz6zyvJkCJZhru6erPYNTH0WXLgzZaEqx51DpsPczVfqFuFjj0t0GtegfxPPmcozLI+/W7EdRmoR8IDjvbAMvV16N6Hs3rs00l+35D+8dlAaxPNBpz1fk4cV42HlqWzjLPrl9Bmvwz6s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Z1xw8AIp; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467592FF156
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 14:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765030622; cv=none; b=kdAWDkX1Z4TNr3d2U0nSiSUOGE2zaOhaola7vdQUqWEbMVEyovU9h+OZxJANInx261+qNbwY/+L4ocHQ/DaXaINxtBEtXdKuhxLyEC4Kn2zwIemdhxeI44gBiiLcXeOZYktGZ8QQIfDs5I0KB1pZ/BhC6yHodh6DFtQ2MeilZTI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765030622; c=relaxed/simple;
+	bh=Y25q/VGgHu/sEQvBlv4aN3t+lRVKJwt60ubQw+HLSGc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=VQlIgVnsC92fe4oqGiUExo2hTFYFkLmvbNrkWSViBnO8n77hzcA2zXeFpdtliDLuj/07JnEbp/jAH/ziBuRWOc6IeeeQOfoa+Egw3JiRMq0tPjutu1TRJ0xK+pXEXc0/NDQadwsv8+1yds+QxvpkMcUq4OQhsLfZemuI45CH0TY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZJUiVO13; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Z1xw8AIp"
-Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a01d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dNqth2G5bzyW9;
-	Sat,  6 Dec 2025 16:11:56 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1765030317;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=yS8qg3LvxCYmYNRyrC7oQXcE7uwHvA+5HwzWW/6xgOg=;
-	b=Z1xw8AIpSLAViGx8lhphjBzf1rsp7/XzJbo8kGO/YI1a4f4HTaoVPXPgUgms7SCny4zW0k
-	FFqd4pIXhi61LiEMF2UdVh/4iVePPtg2sLQ8TqnW0mC/pjlqfHLU/CzKfxWtaC2mdCfoUn
-	LAo5MJT6l8pSa12v5nyZXGlxmP+L3cs=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765030317;
-	b=b6Z6Cfb9VMMRkzxjpHep5NXMe03ZkCSnUlSAKvaSEEREbmgpp3aUhQaJsAa1Ms40hTL3bp
-	bPKIEbCoMGWhL8IWfGFShl+6BYhfm7fdIO4GkMEzLcwJSjQhvAaPYOSJ82V6E+3V4zlvjl
-	yUfc8NREvx1kSrDFXAAvme5zS7g4kEU=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1765030317;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=yS8qg3LvxCYmYNRyrC7oQXcE7uwHvA+5HwzWW/6xgOg=;
-	b=JMdw4TRlZTduIABVA68OpwjrRk7U5SFK9GfJ7UDWDRMbmuwr1L5I91pJsCwlqJy8TfF0vC
-	vN39ELpmlsdrVdyms+Ldurd4J+r0OqVyerw2Fez8CD3mL0/D1d9X2OAsENjcWevoC/JGr4
-	p0l8ZSpMMZCAC2GKP7RlajIhNysYaNo=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZJUiVO13"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C50E7C4CEF5
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 14:17:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765030621;
+	bh=Y25q/VGgHu/sEQvBlv4aN3t+lRVKJwt60ubQw+HLSGc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=ZJUiVO13EeMCJe8+IkqAU+SQ02/5RcyOBC8s8NfElPc5wzRnfPbzXNTaUkEdwgdi5
+	 6zXSxYXYq9ILOg8BLs9golV6VGy43p+2T0BMBIuwLSDeNWf3XfJymLpiF13rJkUXaA
+	 /sDghR2IVHjalVfSPNKy7MZsUaPquLSVZsgG4qUENxtMWttjDranRttr3HVBj9idvA
+	 V+4Jf25x2M8LO9/CWyepv/9uODN5Y2aGiINmnLzwe5F+RtYziQMHgnKsu5qUksOSGq
+	 OOUj2PCJfBppjWhEM2C0l2n/E/kXRg09YF1NyYSMIzPPWYkSSarrlHBgbJvc7ugwNO
+	 xHq0l/EyVaD8Q==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id B8EDFC3279F; Sat,  6 Dec 2025 14:17:01 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] monitor: show ISO timestamps and fix their handling
-Date: Sat,  6 Dec 2025 16:11:52 +0200
-Message-ID: <d86bbd8809c75dea5107ddd0f63f300d3e9c6423.1765030276.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
+Subject: [Bug 220815] btusb: Add Realtek RTL8852CE device ID (13d3:3612)
+Date: Sat, 06 Dec 2025 14:17:01 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: jeremy53561@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-220815-62941-ZRTtoenXIH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220815-62941@https.bugzilla.kernel.org/>
+References: <bug-220815-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Fix ISO packet size checks, taking timestamp presence into account.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220815
 
-Also display timestamp value if present.
----
- monitor/packet.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+jeremy (jeremy53561@gmail.com) changed:
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 2ae4f8fff..4f90c412d 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -14205,8 +14205,9 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	const struct bt_hci_iso_data_start *start;
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint8_t flags = acl_flags(handle);
--	char handle_str[36], extra_str[33];
-+	char handle_str[36], extra_str[50], ts_str[16] = { 0 };
- 	struct index_buf_pool *pool = &index_list[index].iso;
-+	size_t ts_size = 0;
- 
- 	if (index >= MAX_INDEX) {
- 		print_field("Invalid index (%d).", index);
-@@ -14223,11 +14224,15 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 
- 	/* Detect if timestamp field is preset */
- 	if (iso_flags_ts(flags)) {
--		if (size < sizeof(uint32_t))
-+		ts_size = sizeof(uint32_t);
-+
-+		if (size < ts_size)
- 			goto malformed;
- 
--		data += sizeof(uint32_t);
--		size -= sizeof(uint32_t);
-+		snprintf(ts_str, sizeof(ts_str), " ts %u", get_le32(data));
-+
-+		data += ts_size;
-+		size -= ts_size;
- 	}
- 
- 	start = data;
-@@ -14239,8 +14244,8 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 		sprintf(handle_str, "Handle %u SN %u", acl_handle(handle),
- 			start->sn);
- 
--	sprintf(extra_str, "flags 0x%2.2x dlen %u slen %u", flags, hdr->dlen,
--		start->slen);
-+	sprintf(extra_str, "flags 0x%2.2x dlen %u slen %u%s", flags, hdr->dlen,
-+							start->slen, ts_str);
- 
- 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_ISODATA,
- 				in ? "ISO Data RX" : "ISO Data TX",
-@@ -14250,9 +14255,16 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 		packet_enqueue_tx(tv, acl_handle(handle),
- 					index_list[index].frame, hdr->dlen);
- 
--	if (size != hdr->dlen) {
-+	if (size + ts_size != hdr->dlen) {
- 		print_text(COLOR_ERROR, "invalid packet size (%d != %d)",
--							size, hdr->dlen);
-+						size + (int)ts_size, hdr->dlen);
-+		packet_hexdump(data, size);
-+		return;
-+	}
-+
-+	if (size != start->slen + 4) {
-+		print_text(COLOR_ERROR, "invalid packet slen (%d+4 != %d)",
-+							start->slen, size);
- 		packet_hexdump(data, size);
- 		return;
- 	}
--- 
-2.51.1
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jeremy53561@gmail.com
 
+--- Comment #3 from jeremy (jeremy53561@gmail.com) ---
+They need results for
+sudo cat /sys/kernel/debug/usb/devices| awk '/3612/' RS=3D
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
