@@ -1,42 +1,42 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D30C222585
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA722298987
 	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 11:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765018905; cv=pass; b=cFoNQRRzJZnvH6S/c41v3GGojX1F1drEjpx3ZlMx9pMwCfQjOUZi7caZThZjSrJr3anTB3P56RL1Q1MXX+42ckVJBhPJpQMx8JNCO/eeQFiuUXKLh5/3Rrv2WyzO+sDUkgfsL0Rg7Rc6bdAVI4pflXNXaPkqBqiikHnlantzQdo=
+	t=1765018906; cv=pass; b=TANP3qDh0yPReZCicrTO2YxSpn+UVUGi5a3yErwXxd+eb9IG18QEPzPiR6bk1MUxWxpUcSQM3316/RTF+28fAU79EF09NBhIyxUcCiAbA0EIQptPLZL5m72g13f1aq8+98CzStmmGDzeSF6EmZqhe7G6sY+JDBmeVH63Zl8FzAU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765018905; c=relaxed/simple;
-	bh=Yx9EhTObkF/kB+Nrl/srdut3SFPDyg9pfGgHiwCwII8=;
+	s=arc-20240116; t=1765018906; c=relaxed/simple;
+	bh=/Bnxe6wasam0JDTjtHgyhzvBFhVqQyL1P+p1g5Fp+0k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fKlq4hRvgqiUvOtgNezvjY/5rxM6zlk5Z/zsNfarjy0ADktmnc8UUwcNyyJA2g1pvUaeKEyVZ5hUNA/HjDvGpTiBa1QBiA2sejo4Flt/44qiXbeyYdmcMreqRC+7NRn4tVztl+uTVkfjAWKumsDnfwd0PcJSnR/jRvZFGJOVh8c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Vu6YO7rE; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=ss8AuxZY7oQ40G87rqxIli6XxMgKkQOku/dLAGTV6pg6yH7QCeBEM+sn/6BKNjfgCtNWGDA96zLY5toktfhY1oPJfxfP6NaWKBSky8zWnjaggfu7e/3Vb/QpLBJ+oc8ESiw5dOLWmdc3I/u34Q5FfqLB2Rm52qlsit6NkqmbHbg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=ZE0i8p/R; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Vu6YO7rE"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="ZE0i8p/R"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a01d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dNlg32Yllz104J;
-	Sat,  6 Dec 2025 13:01:35 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dNlg42hJ1z103S;
+	Sat,  6 Dec 2025 13:01:36 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	t=1765018896;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5MAQkqL+1ESGcuyoLxsxsYQdIWEkd9fBe2+WZXg6fso=;
-	b=Vu6YO7rEvAF213K/vklknM04u15Gbd1rrHS2WiBiN6tQDeQJ7n0bUXVAvkofRrM8wisZ07
-	THzAh454cN7Mfa+TcHJ6g6e8yAWa6s2H6st6j5baunTXiEDzbJTFfY8ZSxMy8vukgQp5FK
-	yyWW91N5ElIqq8pgzV+weU80tjy1GyA=
+	bh=X8D0xB7m6SFQ/pbTfgId8FzX2U/VR7Db9LqpJcdjcT0=;
+	b=ZE0i8p/R6LAn4wLf0hYrWgmrYPuNPsrr+ZMZfWS/uzEDDwnFDvGkFaXtEu/Ig/zFDN2Bx7
+	CDhOR10mqcboaye2vaW0JFdAZIpCsNcQ8z/ryfhd5nstLHSG7Fde/ebhKF49QSQcRFiIdO
+	IsvPpUT25JN7zATH6fO+sb0mif7ky4Q=
 ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765018896;
-	b=jGTx3OMCTNtaEaDAZznQ/ldlB54U36xEarQmJOAz7TyaS9Se0+bbkXvuUcW99QIe/oe0ko
-	qtnW+4bRl7CrXOmLFI/Bb+0tvqfGLyu4+EQ5hJk7PezeAR/ouPR+1t7PArbtyVkzeed+/l
-	9eQZc4GGuyd/MgRaNvvrpBv+cW3tTrI=
+	b=NfnvKBhlfoCIHSKCWo9FP4F+6GPxzZV5HgvxuarGa8S6QdygHR9CZo3t5Db7DGGn8xH7kQ
+	49u6BXxo2NKUE0hAxjRZUKet22ctXls3O+dA5LJ7yXFFdYCHqG+b9Y5GLgTPtaVr3RHBw+
+	+dpELpbhNR7Ekwx0duIP1tn0Z2y1Djk=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -46,16 +46,16 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5MAQkqL+1ESGcuyoLxsxsYQdIWEkd9fBe2+WZXg6fso=;
-	b=U9IJNl3ZTLvNqMUVTT6B1ioRbaqcRTiu42oPBR906294xitqPw0cR5hAZin9ZCkNOVtf6X
-	M3Sh4IZSTpZUHj8ZeFepZk2Rp/J+3F1ac1scxuOgAy5LicJY0/q9u0pUPrSOBtXYp2EeWm
-	ktLBsjd0jJ+OxNVFgt70q/6DA9Q9+Ek=
+	bh=X8D0xB7m6SFQ/pbTfgId8FzX2U/VR7Db9LqpJcdjcT0=;
+	b=S2P0rcIC4OwKmGznlsxh7Qj4rkIIjkE5yj0uhsiYlRZsjp3jj4e4QP75lYFIB/oU73OQVc
+	BNGU3XHw4iYTiBWq76hQ/4RQ4WizMK7nle3JOCbXdCI8R6izE7aq88t4t/4fBmeKvd7ozi
+	c+iXuavg11oxkorDTGxFXwuOPbzbq0g=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 03/11] shared/tmap, gmap: add macros for feature names and listing
-Date: Sat,  6 Dec 2025 13:01:19 +0200
-Message-ID: <d127c7cdf011d7af03a7c1c10723491b83c4f2f8.1765018766.git.pav@iki.fi>
+Subject: [PATCH BlueZ 04/11] bap: use tmap/gmap macros for listing features
+Date: Sat,  6 Dec 2025 13:01:20 +0200
+Message-ID: <067155c7930a868f884aa4e9585809a6466364d1.1765018766.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1765018766.git.pav@iki.fi>
 References: <cover.1765018766.git.pav@iki.fi>
@@ -67,103 +67,58 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Better use constants for feature names to avoid typos.
-
-Add macros for generating lists containing all features / roles.
+Use listing macros to generate the feature lists.
 ---
- src/shared/gmap.h | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- src/shared/tmap.h | 15 +++++++++++++++
- 2 files changed, 59 insertions(+), 1 deletion(-)
+ profiles/audio/bap.c | 32 ++++++++------------------------
+ 1 file changed, 8 insertions(+), 24 deletions(-)
 
-diff --git a/src/shared/gmap.h b/src/shared/gmap.h
-index ef7d96e0a..d633bfe69 100644
---- a/src/shared/gmap.h
-+++ b/src/shared/gmap.h
-@@ -17,7 +17,7 @@
- #define BT_GMAP_ROLE_MASK		(BIT(4) - 1)
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 9cd649c7b..cda10a643 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -469,34 +469,18 @@ struct feature {
+ 	uint32_t data;
+ };
  
- #define BT_GMAP_UGG_MULTIPLEX		(BIT(0) << 0)
--#define BT_GMAP_UGG_96KBPS		(BIT(1) << 0)
-+#define BT_GMAP_UGG_96KBPS_SOURCE	(BIT(1) << 0)
- #define BT_GMAP_UGG_MULTISINK		(BIT(2) << 0)
- #define BT_GMAP_UGG_FEATURE_MASK	((BIT(3) - 1) << 0)
- #define BT_GMAP_UGG_FEATURE_SHIFT	0
-@@ -46,6 +46,49 @@
- 					BT_GMAP_BGS_FEATURE_MASK | \
- 					BT_GMAP_BGR_FEATURE_MASK)
++#define TMAP_ROLE(key)		{ key ## _STR, probe_tmap_role, key },
++
+ static const struct feature tmap_features[] = {
+-	{ "cg", probe_tmap_role, BT_TMAP_ROLE_CG },
+-	{ "ct", probe_tmap_role, BT_TMAP_ROLE_CT },
+-	{ "ums", probe_tmap_role, BT_TMAP_ROLE_UMS },
+-	{ "umr", probe_tmap_role, BT_TMAP_ROLE_UMR },
+-	{ "bms", probe_tmap_role, BT_TMAP_ROLE_BMS },
+-	{ "bmr", probe_tmap_role, BT_TMAP_ROLE_BMR },
++	BT_TMAP_ROLE_LIST(TMAP_ROLE)
+ };
  
-+#define BT_GMAP_ROLE_UGG_STR		"ugg"
-+#define BT_GMAP_ROLE_UGT_STR		"ugt"
-+#define BT_GMAP_ROLE_BGS_STR		"bgs"
-+#define BT_GMAP_ROLE_BGR_STR		"bgr"
++#define GMAP_ROLE(key)		{ key ## _STR, probe_gmap_role, key },
++#define GMAP_FEATURE(key)	{ key ## _STR, probe_gmap_feature, key },
 +
-+#define BT_GMAP_UGG_MULTIPLEX_STR	"ugg-multiplex"
-+#define BT_GMAP_UGG_96KBPS_SOURCE_STR	"ugg-96kbps-source"
-+#define BT_GMAP_UGG_MULTISINK_STR	"ugg-multisink"
-+
-+#define BT_GMAP_UGT_SOURCE_STR		"ugt-source"
-+#define BT_GMAP_UGT_80KBPS_SOURCE_STR	"ugt-80kbps-source"
-+#define BT_GMAP_UGT_SINK_STR		"ugt-sink"
-+#define BT_GMAP_UGT_64KBPS_SINK_STR	"ugt-64kbps-sink"
-+#define BT_GMAP_UGT_MULTIPLEX_STR	"ugt-multiplex"
-+#define BT_GMAP_UGT_MULTISINK_STR	"ugt-multisink"
-+#define BT_GMAP_UGT_MULTISOURCE_STR	"ugt-multisource"
-+
-+#define BT_GMAP_BGS_96KBPS_STR		"bgs-96kbps"
-+
-+#define BT_GMAP_BGR_MULTISINK_STR	"bgr-multisink"
-+#define BT_GMAP_BGR_MULTIPLEX_STR	"bgr-multiplex"
-+
-+#define BT_GMAP_ROLE_LIST(role) \
-+	role(BT_GMAP_ROLE_UGG) \
-+	role(BT_GMAP_ROLE_UGT) \
-+	role(BT_GMAP_ROLE_BGS) \
-+	role(BT_GMAP_ROLE_BGR)
-+
-+#define BT_GMAP_FEATURE_LIST(feature) \
-+	feature(BT_GMAP_UGG_MULTIPLEX) \
-+	feature(BT_GMAP_UGG_96KBPS_SOURCE) \
-+	feature(BT_GMAP_UGG_MULTISINK) \
-+	feature(BT_GMAP_UGT_SOURCE) \
-+	feature(BT_GMAP_UGT_80KBPS_SOURCE) \
-+	feature(BT_GMAP_UGT_SINK) \
-+	feature(BT_GMAP_UGT_64KBPS_SINK) \
-+	feature(BT_GMAP_UGT_MULTIPLEX) \
-+	feature(BT_GMAP_UGT_MULTISINK) \
-+	feature(BT_GMAP_UGT_MULTISOURCE) \
-+	feature(BT_GMAP_BGS_96KBPS) \
-+	feature(BT_GMAP_BGR_MULTISINK) \
-+	feature(BT_GMAP_BGR_MULTIPLEX)
-+
- struct bt_gmap;
+ static const struct feature gmap_features[] = {
+-	{ "ugg", probe_gmap_role, BT_GMAP_ROLE_UGG },
+-	{ "ugt", probe_gmap_role, BT_GMAP_ROLE_UGT },
+-	{ "bgs", probe_gmap_role, BT_GMAP_ROLE_BGS },
+-	{ "bgr", probe_gmap_role, BT_GMAP_ROLE_BGR },
+-	{ "ugg-multiplex", probe_gmap_feature, BT_GMAP_UGG_MULTIPLEX },
+-	{ "ugg-96kbps-source", probe_gmap_feature, BT_GMAP_UGG_96KBPS },
+-	{ "ugg-multisink", probe_gmap_feature, BT_GMAP_UGG_MULTISINK },
+-	{ "ugt-source", probe_gmap_feature, BT_GMAP_UGT_SOURCE },
+-	{ "ugt-80kbps-source", probe_gmap_feature,
+-						BT_GMAP_UGT_80KBPS_SOURCE },
+-	{ "ugt-sink", probe_gmap_feature, BT_GMAP_UGT_SINK },
+-	{ "ugt-64kbps-sink", probe_gmap_feature, BT_GMAP_UGT_64KBPS_SINK },
+-	{ "ugt-multiplex", probe_gmap_feature, BT_GMAP_UGT_MULTIPLEX },
+-	{ "ugt-multisink", probe_gmap_feature, BT_GMAP_UGT_MULTISINK },
+-	{ "ugt-multisource", probe_gmap_feature, BT_GMAP_UGT_MULTISOURCE },
+-	{ "bgs-96kbps", probe_gmap_feature, BT_GMAP_BGS_96KBPS },
+-	{ "bgr-multisink", probe_gmap_feature, BT_GMAP_BGR_MULTISINK },
+-	{ "bgr-multiplex", probe_gmap_feature, BT_GMAP_BGR_MULTIPLEX },
++	BT_GMAP_ROLE_LIST(GMAP_ROLE)
++	BT_GMAP_FEATURE_LIST(GMAP_FEATURE)
+ };
  
- typedef void (*bt_gmap_ready_func_t)(struct bt_gmap *gmap, void *user_data);
-diff --git a/src/shared/tmap.h b/src/shared/tmap.h
-index 9d872f0b6..9b37dc226 100644
---- a/src/shared/tmap.h
-+++ b/src/shared/tmap.h
-@@ -18,6 +18,21 @@
- #define BT_TMAP_ROLE_BMR		BIT(5)
- #define BT_TMAP_ROLE_MASK		(BIT(6) - 1)
- 
-+#define BT_TMAP_ROLE_CG_STR		"cg"
-+#define BT_TMAP_ROLE_CT_STR		"ct"
-+#define BT_TMAP_ROLE_UMS_STR		"ums"
-+#define BT_TMAP_ROLE_UMR_STR		"umr"
-+#define BT_TMAP_ROLE_BMS_STR		"bms"
-+#define BT_TMAP_ROLE_BMR_STR		"bmr"
-+
-+#define BT_TMAP_ROLE_LIST(role) \
-+	role(BT_TMAP_ROLE_CG) \
-+	role(BT_TMAP_ROLE_CT) \
-+	role(BT_TMAP_ROLE_UMS) \
-+	role(BT_TMAP_ROLE_UMR) \
-+	role(BT_TMAP_ROLE_BMS) \
-+	role(BT_TMAP_ROLE_BMR)
-+
- struct bt_tmap;
- 
- typedef void (*bt_tmap_ready_func_t)(struct bt_tmap *tmap, void *user_data);
+ static const struct {
 -- 
 2.51.1
 
