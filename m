@@ -1,97 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED89B3B8D43
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 10:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765017379; cv=none; b=OLLMKC2oivvfGuRAiEW97Oj50/UDNKSVmHo+zwDHh1FRokYIwjMG4ISAEH/BP2tNlPh4mq4JgOYsGTMlejgNHmkzpQFkbsyxtX1Oq2NFkDKSy/2hB4RMRtleW1GQHm+0+rp9i6x01c1ldfcUo9yxd1VNNNWtzhGo5JoDklbGYYQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765017379; c=relaxed/simple;
-	bh=gpVV63iDglnfpaEWSXD1aX6VXDo3O9ua7snWNryoF3E=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YrW2ag762ZHWsRMkbd4q3dj+Ub+Rh9/MQ+7/++GEqbNAjaF67GYDlsXsMHwic3yeePKapaDC4YuDkjw6jomdcznw7Q6KNVia0jf7BvLy1siEdBHb6crraE/b5G4b23Fe9wBYSlIJABG9cdTWlzrO5L1tdckfL+9vmMZLT+xqRSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EbFDulp3; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFEE2222585
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 11:01:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765018903; cv=pass; b=UBzDpoQd3ipWcHKD5HyoXoWos+Pi2+ltMqNnS88P4ZvUJ2InAHX52O9gbOrnQrEsQmfQDzIyoSpcCNMBkQRTGKk9ohYh2ncRvFDJFapniZQgw/PWjeRNYJKr2K3l3oAbmyLfe2PCgTIY/QA4QMk010bjSdavZ4JLjGEgQhy4XqU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765018903; c=relaxed/simple;
+	bh=2DasQTNGxYzQBpu0sQnGTBqGtRL67aUQ7yw6M8nNpsE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYnwbS2EJeJw7IvXK1imW6gfHMeAMRcEOFSGPO+bCDPcsmqWUlfBieHD0pRWdaMPJDIdnf5i5Ad8RpCsO+zG9fqH5Bt6tx95q8EDXGMDNNBh56vLyj2YHce8G8p6B4nSQWAPKhwohxaB1t4dR1vfKNfZQR1PppbGb11WQtI1ZGU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=uwOrt0vz; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EbFDulp3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 987D3C116D0
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 10:36:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765017378;
-	bh=gpVV63iDglnfpaEWSXD1aX6VXDo3O9ua7snWNryoF3E=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=EbFDulp33Na/XwDV8Rj+879IbM/RrrGGlifCyfnX1JMWpyYjydOGCz8miKqhE9Pfd
-	 R3CLkdrN+Sb9GSB7jNMq/hCCkcmPVuR7uB3L7noF6DCXamUVjKFeWzrScPGyUiFm80
-	 XifYXEuPppSsfLsBL4awLeaxM5YuS5YFUrQbbUtcGOaZ3x8XQQdNkbjc+X65Mpu87G
-	 NNdZNzswphu+3+CjmKBclsKbG9Oo8LnLeCCHxmcqI7wkfjxSi5pU7qSRtW35X3OkxQ
-	 RyFUgw3NH26/fxcXdzMMYIUgV7ikowqijQ9dq23eHk22fSr0WQUHy+4ZedXm91Zy3S
-	 6dUAtln6UMP3Q==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5943d20f352so3285683e87.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 06 Dec 2025 02:36:18 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWoIcP84cAkgv8Tl5tiCxnhySqdoZn3PAQi3/q5dJglT7r01DIDPRT1FytxJdPHZbhwXffhrishZBDt16Ppwh0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyONFfyv+OvIbTZskJw7dwCDVELuC7HQo9QnZ2VKSXeexR0eUvu
-	ykP3SbOXuV0Rh5u11XObin+q3Zmrae3Z39HtmHEZE8Bod+APTEhOmp0axVmsma5aNok9d1QIh9h
-	FgkW9yp6J9uBkzm7I97UjB3M9z/9D8Mm+xeJWfvDG3A==
-X-Google-Smtp-Source: AGHT+IF6DtV7OW+BejuKVtdzjK3twTb49WoGKkQvitpJR/41yEScXdRbSXUcqvOsFNEJ72Er9XF4YpUdDXF5/uploMQ=
-X-Received: by 2002:a05:6512:3044:b0:592:f5f9:f5a9 with SMTP id
- 2adb3069b0e04-598853c29f9mr536908e87.36.1765017377296; Sat, 06 Dec 2025
- 02:36:17 -0800 (PST)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Sat, 6 Dec 2025 02:36:15 -0800
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Sat, 6 Dec 2025 02:36:15 -0800
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="uwOrt0vz"
+Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a01d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dNlg002k8zySY;
+	Sat,  6 Dec 2025 13:01:31 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1765018892;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vTN9Dn9yGOjhxM6nU7j2G0l65VRQpeqXHSBW33SohQE=;
+	b=uwOrt0vz+J2a3xXDDZKUZOBnMDyKarlvpOLK7E+JCRQPoGlIh5XRWAlgMVx9/qV47cq/Jn
+	wEeZj3W9f1sIt+GFLEykGzhAFNlC4u51vTkEG3/SCT5IK40id/P1XzwqJRmrWImrGpY34E
+	tvaVkNPQtXjuwhIx2EOlgmxmG2q/mdw=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765018892;
+	b=EiBYT+395PhB8h2sMbplOqmDD/mlr9sC9SLvOtHITMez7XyxTrSKYQZmpduypLm42K6una
+	zb4xgyUT7ZKnIE1HXzhlWItLJ1OFL2EPPn51yq5gpQTP1EoK27nbm3qspiGCsUPcjXNBdK
+	Ku0EtikXWHl7H1EUyoNM9DLbSAC+300=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1765018892;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vTN9Dn9yGOjhxM6nU7j2G0l65VRQpeqXHSBW33SohQE=;
+	b=X67l04czK4jLzzBeOP/Y/WYHVk73b27CxY8RATNjtFWx2qHD08d6gj1ZhkmYpkN8pQ7G5d
+	87opP6VXB49x0E/6KL7uQ/wf/sTTNEEayOrwcfeeYqZz3lFPMFkWD96KgccUbx/aBqrhEM
+	ud+8WUU7P5X9yIhUCaASwtsmtXpTnlY=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 00/11] Add local TMAS & GMAS servers
+Date: Sat,  6 Dec 2025 13:01:16 +0200
+Message-ID: <cover.1765018766.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
-Date: Sat, 6 Dec 2025 02:36:15 -0800
-X-Gmail-Original-Message-ID: <CAMRc=Mcx1E3w7roY55HhKZg6pqV+NRkp87KYa5=BUEVJHOXVLw@mail.gmail.com>
-X-Gm-Features: AQt7F2oWdedln7_1XCoDS6sUsiV3R704Mi2gnvY4_t_P0x5kXui4g-3uZj4PJtM
-Message-ID: <CAMRc=Mcx1E3w7roY55HhKZg6pqV+NRkp87KYa5=BUEVJHOXVLw@mail.gmail.com>
-Subject: Re: [PATCH 00/10] Fix up WCN6855 RFA power supply name
-To: Konrad Dybcio <konradybcio@kernel.org>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
-	Jeff Johnson <jeff.johnson@oss.qualcomm.com>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Bjorn Andersson <andersson@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, 5 Dec 2025 13:47:19 +0100, Konrad Dybcio <konradybcio@kernel.org> said:
-> Commit 5f4f954bba12 ("dt-bindings: bluetooth: bring the HW description
-> closer to reality for wcn6855") renamed the supply representing the
-> VDD17_PMU_RFA leg to mention "1p8" instead.
->
-> While the supply's voltage is normally 1.8 V, the bindings should
-> reflect the actual naming of the pin. Moreover, almost all DTs define
-> the output as 1p7, so that ends up looking a little odd..
->
-> Ultimately, this is a "fake" regulator that is consumed for the sake
-> of DT sanity and this series is meant to bring uniformity and squash
-> checker errors.
->
-> The last patch fixes up a less-trivial warning.
-> sc8280xp-microsoft-arcata is left out because I don't know whether the
-> mounting of the chip is on-board or as an M.2-y card (although I would
-> guesstimate the prior).
->
-> Depends on the long-ready-for-the-merge series by Krzysztof (per-chip
-> bindings split of qualcomm-bluetooth.yaml), mentioned below
->
-> Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> ---
+Parse TMAS and GMAS features to expose from
+MediaEndpoint::SupportedFeatures
 
-I want to belive there was a reason for it but I no longer remember. :( Is it
-possible the schematics for the lenovo X13s laptop had it described as 1p7?
+Improve handling of changing TMAP & GMAP features: set the service
+inactive when there is no Role set.  For GMAP, we must also remove the
+feature chrc if a role is unset.
 
-Well, anyway:
+Also do some minor cleanup.
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Pipewire side:
+https://gitlab.freedesktop.org/pvir/pipewire/-/commits/tmap-features
+
+Pauli Virtanen (11):
+  lib: move VCS, TMAS, GMAS uuid strings to uuid.h
+  shared/tester: check size before trying debug print
+  shared/tmap, gmap: add macros for feature names and listing
+  bap: use tmap/gmap macros for listing features
+  shared/tmap: deactivate service if setting Role to 0
+  shared/gmap: deactivate service or remove feature chrc if role removed
+  test-tmap: test removing and adding role
+  test-gmap: test removing, adding, and changing role
+  media: parse SupportedFeatures from registered MediaEndpoints
+  tmap: remove service on device remove
+  gmap: remove service on device remove
+
+ lib/bluetooth/uuid.h   |   3 +
+ profiles/audio/bap.c   |  36 +++-------
+ profiles/audio/gmap.c  |   2 +
+ profiles/audio/media.c | 160 +++++++++++++++++++++++++++++++++++++++--
+ profiles/audio/tmap.c  |   2 +
+ profiles/audio/vcp.c   |   1 -
+ src/shared/gmap.c      |  57 +++++++++++----
+ src/shared/gmap.h      |  45 +++++++++++-
+ src/shared/tester.c    |   2 +-
+ src/shared/tmap.c      |  14 ++--
+ src/shared/tmap.h      |  15 ++++
+ unit/test-gmap.c       |  89 ++++++++++++++++-------
+ unit/test-tmap.c       |  15 ++++
+ 13 files changed, 363 insertions(+), 78 deletions(-)
+
+-- 
+2.51.1
+
