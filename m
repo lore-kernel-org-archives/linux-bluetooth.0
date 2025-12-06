@@ -1,111 +1,97 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9C41FF7C7
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 05:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED89B3B8D43
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 10:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764998965; cv=none; b=OW+BlhawEWw66PtE/BZb+uHQiee77DWFuGMghWeyjKBT7pf6BmCnJpWM6ehJD3ltWGdlXR57ORjxoVoCcDm7ZEKTO5R32tBdIdnt7uyKA+9I/TCkGnPzGKdv3jWFunXdHVxYHDazMRIXCgEU3JDcPJVG16EbKoH+ny0I7bi6u2c=
+	t=1765017379; cv=none; b=OLLMKC2oivvfGuRAiEW97Oj50/UDNKSVmHo+zwDHh1FRokYIwjMG4ISAEH/BP2tNlPh4mq4JgOYsGTMlejgNHmkzpQFkbsyxtX1Oq2NFkDKSy/2hB4RMRtleW1GQHm+0+rp9i6x01c1ldfcUo9yxd1VNNNWtzhGo5JoDklbGYYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764998965; c=relaxed/simple;
-	bh=kvaVICPJgckVprAkO1PTzdwxzYwo/eA1iHNuVj+VMmQ=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gH0wd24KxoP0T9X0y1NW/i+43qu4LxMxVgdDL4QmiR2YJUATP6b5BZAQAoGGhhaHBWiEOWVe8qO8ZUN9mQ6n2xIafZG1SJbp68ZCmUcNzpCM1TM+zafW7Vj86+dhdoFEw69PWJ9mkd75UaGkTF+lCWpQJhF/2QEikXMZbqxGh1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 7F1E158BEFF
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Dec 2025 15:14:05 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 78B694322F;
-	Fri,  5 Dec 2025 15:13:58 +0000 (UTC)
-Message-ID: <4efd49cd5fa6897706742d8907b56aaff3b475b3.camel@hadess.net>
-Subject: Re: [PATCH BlueZ] main: fix bool vs. gboolean type in
- g_option_context_parse()
-From: Bastien Nocera <hadess@hadess.net>
-To: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
-Date: Fri, 05 Dec 2025 16:13:57 +0100
-In-Reply-To: <36c55de961b5b5ceda83c019ec511f8fa7cd44b6.1764880521.git.pav@iki.fi>
-References: 
-	<36c55de961b5b5ceda83c019ec511f8fa7cd44b6.1764880521.git.pav@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
+	s=arc-20240116; t=1765017379; c=relaxed/simple;
+	bh=gpVV63iDglnfpaEWSXD1aX6VXDo3O9ua7snWNryoF3E=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YrW2ag762ZHWsRMkbd4q3dj+Ub+Rh9/MQ+7/++GEqbNAjaF67GYDlsXsMHwic3yeePKapaDC4YuDkjw6jomdcznw7Q6KNVia0jf7BvLy1siEdBHb6crraE/b5G4b23Fe9wBYSlIJABG9cdTWlzrO5L1tdckfL+9vmMZLT+xqRSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EbFDulp3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EbFDulp3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 987D3C116D0
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 10:36:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765017378;
+	bh=gpVV63iDglnfpaEWSXD1aX6VXDo3O9ua7snWNryoF3E=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
+	b=EbFDulp33Na/XwDV8Rj+879IbM/RrrGGlifCyfnX1JMWpyYjydOGCz8miKqhE9Pfd
+	 R3CLkdrN+Sb9GSB7jNMq/hCCkcmPVuR7uB3L7noF6DCXamUVjKFeWzrScPGyUiFm80
+	 XifYXEuPppSsfLsBL4awLeaxM5YuS5YFUrQbbUtcGOaZ3x8XQQdNkbjc+X65Mpu87G
+	 NNdZNzswphu+3+CjmKBclsKbG9Oo8LnLeCCHxmcqI7wkfjxSi5pU7qSRtW35X3OkxQ
+	 RyFUgw3NH26/fxcXdzMMYIUgV7ikowqijQ9dq23eHk22fSr0WQUHy+4ZedXm91Zy3S
+	 6dUAtln6UMP3Q==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5943d20f352so3285683e87.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 06 Dec 2025 02:36:18 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWoIcP84cAkgv8Tl5tiCxnhySqdoZn3PAQi3/q5dJglT7r01DIDPRT1FytxJdPHZbhwXffhrishZBDt16Ppwh0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyONFfyv+OvIbTZskJw7dwCDVELuC7HQo9QnZ2VKSXeexR0eUvu
+	ykP3SbOXuV0Rh5u11XObin+q3Zmrae3Z39HtmHEZE8Bod+APTEhOmp0axVmsma5aNok9d1QIh9h
+	FgkW9yp6J9uBkzm7I97UjB3M9z/9D8Mm+xeJWfvDG3A==
+X-Google-Smtp-Source: AGHT+IF6DtV7OW+BejuKVtdzjK3twTb49WoGKkQvitpJR/41yEScXdRbSXUcqvOsFNEJ72Er9XF4YpUdDXF5/uploMQ=
+X-Received: by 2002:a05:6512:3044:b0:592:f5f9:f5a9 with SMTP id
+ 2adb3069b0e04-598853c29f9mr536908e87.36.1765017377296; Sat, 06 Dec 2025
+ 02:36:17 -0800 (PST)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Sat, 6 Dec 2025 02:36:15 -0800
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Sat, 6 Dec 2025 02:36:15 -0800
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdekjeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfffjghftgfgfgggsehtqhertddtreejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeeuveeivdetkeekgfefffeftefhjeeikeetffdvteejheefieeltedtvdeuleduleenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvpdhrtghpthhtohepphgrvhesihhkihdrfhhipdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: hadess@hadess.net
+References: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
+Date: Sat, 6 Dec 2025 02:36:15 -0800
+X-Gmail-Original-Message-ID: <CAMRc=Mcx1E3w7roY55HhKZg6pqV+NRkp87KYa5=BUEVJHOXVLw@mail.gmail.com>
+X-Gm-Features: AQt7F2oWdedln7_1XCoDS6sUsiV3R704Mi2gnvY4_t_P0x5kXui4g-3uZj4PJtM
+Message-ID: <CAMRc=Mcx1E3w7roY55HhKZg6pqV+NRkp87KYa5=BUEVJHOXVLw@mail.gmail.com>
+Subject: Re: [PATCH 00/10] Fix up WCN6855 RFA power supply name
+To: Konrad Dybcio <konradybcio@kernel.org>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+	Jeff Johnson <jeff.johnson@oss.qualcomm.com>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	Bjorn Andersson <andersson@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 2025-12-04 at 22:38 +0200, Pauli Virtanen wrote:
-> btd_opts.experimental and testing are bool, not gboolean, which may
-> cause memory to be clobbered and crash.
-
-Can you please explain why it crashes in the commit message?
-
-IIRC, it's because a gboolean is a typedef for an int, and bool/_Bool
-for a single bit.
-
->=20
-> Fix with separate variable for cmdline option.
->=20
-> Log:
-> ERROR: AddressSanitizer: BUS on unknown address
-> =C2=A0=C2=A0=C2=A0 #0 0x0000005b9914 in queue_find ../src/shared/queue.c:=
-230
-> =C2=A0=C2=A0=C2=A0 #1 0x00000057c0ff in btd_kernel_experimental_enabled
-> ../src/main.c:721
-> =C2=A0=C2=A0=C2=A0 #2 0x0000004ff52f in read_exp_features_complete
-> ../src/adapter.c:10230
-> =C2=A0=C2=A0=C2=A0 #3 0x0000005be40b in request_complete ../src/shared/mg=
-mt.c:306
+On Fri, 5 Dec 2025 13:47:19 +0100, Konrad Dybcio <konradybcio@kernel.org> said:
+> Commit 5f4f954bba12 ("dt-bindings: bluetooth: bring the HW description
+> closer to reality for wcn6855") renamed the supply representing the
+> VDD17_PMU_RFA leg to mention "1p8" instead.
+>
+> While the supply's voltage is normally 1.8 V, the bindings should
+> reflect the actual naming of the pin. Moreover, almost all DTs define
+> the output as 1p7, so that ends up looking a little odd..
+>
+> Ultimately, this is a "fake" regulator that is consumed for the sake
+> of DT sanity and this series is meant to bring uniformity and squash
+> checker errors.
+>
+> The last patch fixes up a less-trivial warning.
+> sc8280xp-microsoft-arcata is left out because I don't know whether the
+> mounting of the chip is on-board or as an M.2-y card (although I would
+> guesstimate the prior).
+>
+> Depends on the long-ready-for-the-merge series by Krzysztof (per-chip
+> bindings split of qualcomm-bluetooth.yaml), mentioned below
+>
+> Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 > ---
-> =C2=A0src/main.c | 9 +++++++--
-> =C2=A01 file changed, 7 insertions(+), 2 deletions(-)
->=20
-> diff --git a/src/main.c b/src/main.c
-> index 558bf2888..61e5ef983 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -1330,6 +1330,8 @@ static char *option_noplugin =3D NULL;
-> =C2=A0static char *option_configfile =3D NULL;
-> =C2=A0static gboolean option_compat =3D FALSE;
-> =C2=A0static gboolean option_detach =3D TRUE;
-> +static gboolean option_experimental =3D FALSE;
-> +static gboolean option_testing =3D FALSE;
-> =C2=A0static gboolean option_version =3D FALSE;
-> =C2=A0
-> =C2=A0static void free_options(void)
-> @@ -1420,9 +1422,9 @@ static GOptionEntry options[] =3D {
-> =C2=A0			"Specify an explicit path to the config
-> file", "FILE"},
-> =C2=A0	{ "compat", 'C', 0, G_OPTION_ARG_NONE, &option_compat,
-> =C2=A0				"Provide deprecated command line
-> interfaces" },
-> -	{ "experimental", 'E', 0, G_OPTION_ARG_NONE,
-> &btd_opts.experimental,
-> +	{ "experimental", 'E', 0, G_OPTION_ARG_NONE,
-> &option_experimental,
-> =C2=A0				"Enable experimental D-Bus
-> interfaces" },
-> -	{ "testing", 'T', 0, G_OPTION_ARG_NONE, &btd_opts.testing,
-> +	{ "testing", 'T', 0, G_OPTION_ARG_NONE, &option_testing,
-> =C2=A0				"Enable testing D-Bus interfaces" },
-> =C2=A0	{ "kernel", 'K', G_OPTION_FLAG_OPTIONAL_ARG,
-> G_OPTION_ARG_CALLBACK,
-> =C2=A0				parse_kernel_experimental,
-> @@ -1464,6 +1466,9 @@ int main(int argc, char *argv[])
-> =C2=A0		exit(0);
-> =C2=A0	}
-> =C2=A0
-> +	btd_opts.experimental =3D option_experimental;
-> +	btd_opts.testing =3D option_testing;
-> +
-> =C2=A0	umask(0077);
-> =C2=A0
-> =C2=A0	btd_backtrace_init();
+
+I want to belive there was a reason for it but I no longer remember. :( Is it
+possible the schematics for the lenovo X13s laptop had it described as 1p7?
+
+Well, anyway:
+
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
