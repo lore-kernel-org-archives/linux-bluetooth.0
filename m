@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408DC26CE0A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A828121CFF6
 	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 11:01:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765018906; cv=pass; b=ZPihp7+hke8jrg6LDGIBKPKmbdDyIT2fRc7PC6nclrKVUqcoYW6b7JBXUA4811Uu1y8jtGlSOpDDQeMTKfGim4mSx+N9R4rdRU1kEpZeRxl4VkPsqLQlJ8smdb2gmFDTGhkqlkhq7/+l91YsSbW/gkDJFC32wHbL8aNzcPliToo=
+	t=1765018907; cv=pass; b=th4h6VX29O199M4IhnqpiqvY8QCVOvHBnOoRzebuj0iLEATbpR4UYNWQMYXpOiq8vOVwVRc5z/JVeQTgcAgEvS7XOmTawgYgvlzuTbCh17JStMCxF8RM0szO1sXQc8K2oQ6exCEXPZQUEIL43bZda7bftTOVOIXE24iHelwtERI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765018906; c=relaxed/simple;
-	bh=8kDDpXsFQXLd+IvWOE+oRimFHrPdGMtMcD4R64rwcLs=;
+	s=arc-20240116; t=1765018907; c=relaxed/simple;
+	bh=158BYJaRp30mXow9jSVcmhqgZ8exkCXN2umYo59yuR4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=er0OWbmpztuJXJsDtSG+edxJnFwjm+31yZt4yjVVlRj2ahFd/g9YD4eEmrw9gN5M2wljINcdn+0Q7MpE4odlucK4uQmvGniKNgtBs+DBVwA9WDBCmcYdrJqei576YYiG0ERCeEK3WzS6Uff+gABwj7qhXNCcY1z5ZChf5O9ueNw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=gV7SrLe2; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=iPa6nhbOG89HP1wSpYqrceM/QZkjeL4GTtc9T9TbFF4BtSONFgCs3+p6osw0uajNzta2pVcOtWrCm6M/cnKa+E2lYC3DfcaJBNLL3y+8ruizjr/uH9fM/VquZD382OjnWjrkUU4u2AfPZ+csEbQNc4GHK2kZm1Ne0bsVnBUKO+Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=C53gDNxm; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="gV7SrLe2"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="C53gDNxm"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a01d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dNlg634Bgz105L;
-	Sat,  6 Dec 2025 13:01:38 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dNlg73BVMz106Q;
+	Sat,  6 Dec 2025 13:01:39 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1765018899;
+	t=1765018900;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=I2iZJ0fCvUjJ/TXjcWp9VxHkjcLe1goda/Po4srIpr0=;
-	b=gV7SrLe2JljXLs0NslreTwkPSLTaOn11we+fPG0H684Udj81MkTPhHRMr9xMLNyYwwgfCX
-	42Hq4GUU+ZddoknzdZhMMQfG5vmghMxDh3OZQh1cXYhGJKe7qL6WMerlbEBRbX0HSSDiy7
-	9pMCd69NKC+3PIp/AjKF/dVEFxKosx4=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765018899;
-	b=tdmctBiAQ+j4tq9Tzd1s512C1TluqPINgwb7Zq2Gog2ZFNaR1CyLpmJd944/9aPEtDmPVi
-	7ystbcCleJAkrCOhcCoyKHcbvwhP6o/86N/G2xpkp5nVlc69q61/bZADzDvwQsJaLetD0g
-	reVLmLxUNGH5GdM8OwN2bRyqIjaam9c=
+	bh=DJSmRtTtVb/X7dFNZM6fJ5GWY7hzrThjkizECjyERQs=;
+	b=C53gDNxmMDySHqWoygA7DW3kIZ5FSbv9AN5TKmWaAdxvW+IymkEsWkKRkc9ADlUcoDUiLl
+	ioP4/+oxA8zs8gpwj2pq+yFsinkhr7SMpX/6T27nklM+7FhI9HMQBIDJHpEDcmvaVgEsG/
+	mgUxC9+mMbBH1bj9+7Tztm1ZXR19moQ=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765018900;
+	b=xAwC94OAFn8yDw+BfHu90l+MtEVM7ymFxzOIWyD1nxikRywp+IkGmHSl0X7riHdfPhXKm5
+	YFW8h05XgTE0OUfN3gXIc40JLPbo53CFBdUZ5uvEj2HV58t6/+2tF+OKtLRXleQpLdiTz+
+	NLCZ757Xi5povo61cPculzqgwB3VyLI=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1765018899;
+	s=meesny; t=1765018900;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=I2iZJ0fCvUjJ/TXjcWp9VxHkjcLe1goda/Po4srIpr0=;
-	b=RYxiu0DPIbOaIFzCrGb6DsYkwDKnE9ik9Vl+JF/d+j2Vop4HiEII61ey6CtKPBEcNePNHx
-	WlZtoitFNERhplNT/M+OPz7BBYd2HEJ/QgiL33fwuu/YCbh8JViEQaxxCQnL1+9FY1hN7d
-	/PfgPrvFUmh9Wn8+TCC4i3KwzAstVwg=
+	bh=DJSmRtTtVb/X7dFNZM6fJ5GWY7hzrThjkizECjyERQs=;
+	b=Qc34ff+1pFdZkD9oQnzjt5sjN4vlkaTDU9826u+cY3T2wjRE+5c3H0qbwHTxIo5XYKYxBD
+	jj1cOLftV1BiZhxm2/Ka1V+Toh7Q0376eu45PYRGJV8jB+KJbYDw1gbT4mMRCtzbFJ2hNw
+	7cw/xM5ku57DH2B71HzOde4qSBfxb38=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 06/11] shared/gmap: deactivate service or remove feature chrc if role removed
-Date: Sat,  6 Dec 2025 13:01:22 +0200
-Message-ID: <85a61bd53ede5c07cd07d616506218e9cb5099e3.1765018766.git.pav@iki.fi>
+Subject: [PATCH BlueZ 07/11] test-tmap: test removing and adding role
+Date: Sat,  6 Dec 2025 13:01:23 +0200
+Message-ID: <a75f5438bc41af7388cfa458922fcd2814cdd53e.1765018766.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1765018766.git.pav@iki.fi>
 References: <cover.1765018766.git.pav@iki.fi>
@@ -67,118 +67,57 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When role is removed, the associated feature chrc must be removed too as
-it's then Excluded in spec.  If all roles are removed, deactivate the
-service instead to avoid consuming ATT handles.
-
-Reserve exactly the right number of handles for the service.
-
-Also add null checks to the feature set routines for convenience.
 ---
- src/shared/gmap.c | 57 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 43 insertions(+), 14 deletions(-)
+ unit/test-tmap.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/src/shared/gmap.c b/src/shared/gmap.c
-index f571f3270..291135db3 100644
---- a/src/shared/gmap.c
-+++ b/src/shared/gmap.c
-@@ -345,10 +345,27 @@ static void gmap_update_chrc(struct bt_gmap *gmap)
- 	}
- }
+diff --git a/unit/test-tmap.c b/unit/test-tmap.c
+index 481453112..937dac6ee 100644
+--- a/unit/test-tmap.c
++++ b/unit/test-tmap.c
+@@ -32,6 +32,7 @@
  
-+static void gmap_init_service(struct bt_gmas_db *db)
-+{
-+	bt_uuid_t uuid;
-+
-+	if (db->service) {
-+		gatt_db_remove_service(db->db, db->service);
-+		db->service = NULL;
-+		db->role.attr = NULL;
-+		db->ugg.attr = NULL;
-+		db->ugt.attr = NULL;
-+		db->bgs.attr = NULL;
-+		db->bgr.attr = NULL;
+ struct test_config {
+ 	uint16_t role;
++	uint16_t old_role;
+ };
+ 
+ struct test_data {
+@@ -221,6 +222,11 @@ static void test_setup_server(const void *user_data)
+ 	data->tmap = bt_tmap_add_db(db);
+ 	bt_tmap_set_debug(data->tmap, print_debug, "tmap:", NULL);
+ 
++	if (data->cfg->old_role) {
++		bt_tmap_set_role(data->tmap, data->cfg->old_role);
++		bt_tmap_set_role(data->tmap, 0);
 +	}
 +
-+	bt_uuid16_create(&uuid, GMAS_UUID);
-+	db->service = gatt_db_add_service(db->db, &uuid, true, 5*2 + 1);
-+}
+ 	bt_tmap_set_role(data->tmap, data->cfg->role);
+ 
+ 	att = bt_att_new(io_get_fd(io), false);
+@@ -344,6 +350,11 @@ const struct test_config cfg_read_role = {
+ 	.role = BT_TMAP_ROLE_UMS | BT_TMAP_ROLE_BMR,
+ };
+ 
++const struct test_config cfg_read_role_re_add = {
++	.role = BT_TMAP_ROLE_UMS | BT_TMAP_ROLE_BMR,
++	.old_role = BT_TMAP_ROLE_CT,
++};
 +
- struct bt_gmap *bt_gmap_add_db(struct gatt_db *db)
+ static void test_tmap_cl(void)
  {
- 	struct bt_gmap *gmap;
--	bt_uuid_t uuid;
- 
- 	if (!db || queue_find(instances, match_db, db))
- 		return NULL;
-@@ -356,8 +373,7 @@ struct bt_gmap *bt_gmap_add_db(struct gatt_db *db)
- 	gmap = new0(struct bt_gmap, 1);
- 	gmap->db.db = gatt_db_ref(db);
- 
--	bt_uuid16_create(&uuid, GMAS_UUID);
--	gmap->db.service = gatt_db_add_service(db, &uuid, true, 5*3);
-+	gmap_init_service(&gmap->db);
- 
- 	if (!instances)
- 		instances = queue_new();
-@@ -368,23 +384,41 @@ struct bt_gmap *bt_gmap_add_db(struct gatt_db *db)
- 
- void bt_gmap_set_role(struct bt_gmap *gmap, uint8_t role)
- {
--	if (gmap->client)
-+	if (!gmap || gmap->client)
- 		return;
- 
--	gmap->db.role.value = role & BT_GMAP_ROLE_MASK;
-+	role &= BT_GMAP_ROLE_MASK;
-+	if (role == gmap->db.role.value)
-+		return;
+ 	/* Sec. 4.5.1 TMA Client */
+@@ -366,6 +377,10 @@ static void test_tmap_sr(void)
+ 								"TMAP Role]",
+ 		test_setup_server, test_server, &cfg_read_role,
+ 		SGGIT_CHA);
 +
-+	DBG(gmap, "set role 0x%02x", role);
-+
-+	gmap->db.role.value = role;
-+
-+	/* Removing role must remove feature chrc too; reset svc if needed */
-+	if (role && ((!(role & BT_GMAP_ROLE_UGG) && gmap->db.ugg.attr) ||
-+			(!(role & BT_GMAP_ROLE_UGT) && gmap->db.ugt.attr) ||
-+			(!(role & BT_GMAP_ROLE_BGS) && gmap->db.bgs.attr) ||
-+			(!(role & BT_GMAP_ROLE_BGR) && gmap->db.bgr.attr)))
-+		gmap_init_service(&gmap->db);
- 
- 	gmap_update_chrc(gmap);
- 
--	/* Expose values only when first set */
--	gatt_db_service_set_active(gmap->db.service, true);
-+	/* Expose values only when first set and active */
-+	gatt_db_service_set_active(gmap->db.service, role != 0);
++	define_test("TMAP/SR/SGGIT/CHA/BLUEZ-01-C [Re-add Role]",
++		test_setup_server, test_server, &cfg_read_role_re_add,
++		SGGIT_CHA);
  }
  
--
- void bt_gmap_set_features(struct bt_gmap *gmap, uint32_t features)
- {
--	if (gmap->client)
-+	if (!gmap || gmap->client)
- 		return;
- 
-+	features &= BT_GMAP_FEATURE_MASK;
-+	if (features == bt_gmap_get_features(gmap))
-+		return;
-+
-+	DBG(gmap, "set features 0x%08x", features);
-+
- 	gmap->db.ugg.value = (features & BT_GMAP_UGG_FEATURE_MASK)
- 						>> BT_GMAP_UGG_FEATURE_SHIFT;
- 	gmap->db.ugt.value = (features & BT_GMAP_UGT_FEATURE_MASK)
-@@ -393,9 +427,4 @@ void bt_gmap_set_features(struct bt_gmap *gmap, uint32_t features)
- 						>> BT_GMAP_BGS_FEATURE_SHIFT;
- 	gmap->db.bgr.value = (features & BT_GMAP_BGR_FEATURE_MASK)
- 						>> BT_GMAP_BGR_FEATURE_SHIFT;
--
--	gmap_update_chrc(gmap);
--
--	/* Expose values only when first set */
--	gatt_db_service_set_active(gmap->db.service, true);
- }
+ int main(int argc, char *argv[])
 -- 
 2.51.1
 
