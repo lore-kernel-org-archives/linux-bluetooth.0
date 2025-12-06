@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA82425CC7A
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 11:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D30C222585
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Dec 2025 11:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765018904; cv=pass; b=feUfOYH0Defxx0JyTedW+HBas4w4Oym3Lk7ku+WkWMvWnjAqiQdLjLIZmqF2rp7J9D++NCTlT8AYBxaTOBOizGcl6nb2WatLP8dEjGTM4v/m9e89k7/Qo3yJ+4F/gUvpa3SRqjaYKpDk765s84eblA+tnzIJdnIttWoLfYknRMc=
+	t=1765018905; cv=pass; b=cFoNQRRzJZnvH6S/c41v3GGojX1F1drEjpx3ZlMx9pMwCfQjOUZi7caZThZjSrJr3anTB3P56RL1Q1MXX+42ckVJBhPJpQMx8JNCO/eeQFiuUXKLh5/3Rrv2WyzO+sDUkgfsL0Rg7Rc6bdAVI4pflXNXaPkqBqiikHnlantzQdo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765018904; c=relaxed/simple;
-	bh=owHAc1A7rj1hHdc+AIh8uez4wxOfu/va/ksUHS2s350=;
+	s=arc-20240116; t=1765018905; c=relaxed/simple;
+	bh=Yx9EhTObkF/kB+Nrl/srdut3SFPDyg9pfGgHiwCwII8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oIMCdGyb3g7i/lBDTyfmVW8kkWExmT1VjZIrpQ8j5Q3L2LYKSmkUzhUZLd/vNrEbP8AGYb88kX+AHIXmEfyNvenc/q6L6ArlTEkLl8Jnv0zJ9nQ36XnVCWcki928kcodgoJ1OfTsNptPCFhmF8NSTuvZZMf8CG3u1kggIZkFDhQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=NYojmin2; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=fKlq4hRvgqiUvOtgNezvjY/5rxM6zlk5Z/zsNfarjy0ADktmnc8UUwcNyyJA2g1pvUaeKEyVZ5hUNA/HjDvGpTiBa1QBiA2sejo4Flt/44qiXbeyYdmcMreqRC+7NRn4tVztl+uTVkfjAWKumsDnfwd0PcJSnR/jRvZFGJOVh8c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Vu6YO7rE; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="NYojmin2"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Vu6YO7rE"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a01d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dNlg22BzFzyW9;
-	Sat,  6 Dec 2025 13:01:34 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dNlg32Yllz104J;
+	Sat,  6 Dec 2025 13:01:35 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1765018894;
+	t=1765018896;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qLK1CjEbucuW2MMkH974FnWramo+ozs/4y9F5HknZkY=;
-	b=NYojmin2MHUySVUUPkgbHBBSySOFcelJcOAgfT89OQlHLDSVmWeh9zgbgB9raLKanNTx/N
-	9Y8o0z0iDEKSWRaYYAX40mx/9quUkJ25VFGtoz0hSAONNy6UyEgvmnxKgCDxmuh84Tn+BQ
-	BKFq8lXzPfpIEvp7GTDDd0lbazOJAtE=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765018894;
-	b=RIok2SwKS8hI46ccNuoWsSvlaYksui1yl0e8loAynwuEFiWGCFRRuDHBk1oMnqPmIz+Uxx
-	iLUe9B4mNqArS4IZz2v6bWT2AF2dqP3KwLf0Ko+z/29iF5GeDglZKTalvVo3G10vWXPXQ8
-	JWa6EiMZb4DoUoAx/ckg0By+XIEsYLE=
+	bh=5MAQkqL+1ESGcuyoLxsxsYQdIWEkd9fBe2+WZXg6fso=;
+	b=Vu6YO7rEvAF213K/vklknM04u15Gbd1rrHS2WiBiN6tQDeQJ7n0bUXVAvkofRrM8wisZ07
+	THzAh454cN7Mfa+TcHJ6g6e8yAWa6s2H6st6j5baunTXiEDzbJTFfY8ZSxMy8vukgQp5FK
+	yyWW91N5ElIqq8pgzV+weU80tjy1GyA=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765018896;
+	b=jGTx3OMCTNtaEaDAZznQ/ldlB54U36xEarQmJOAz7TyaS9Se0+bbkXvuUcW99QIe/oe0ko
+	qtnW+4bRl7CrXOmLFI/Bb+0tvqfGLyu4+EQ5hJk7PezeAR/ouPR+1t7PArbtyVkzeed+/l
+	9eQZc4GGuyd/MgRaNvvrpBv+cW3tTrI=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1765018894;
+	s=meesny; t=1765018896;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qLK1CjEbucuW2MMkH974FnWramo+ozs/4y9F5HknZkY=;
-	b=ed+sRQc9yxYQ2uvCpQgwTsB0iwgPLLe9ZUNxHkjuqwacmnKMMrWRsv0HWyCAJIYlit8ddL
-	Y5jjC5TqH93WohSnJbVnxhJvJmjkr9UaQYQJa47p12Wv67AehafQYf+vUaXZC6jsBNorAa
-	BYFc5xh5vG3f4G7uD8fSxwRxr9GTUy4=
+	bh=5MAQkqL+1ESGcuyoLxsxsYQdIWEkd9fBe2+WZXg6fso=;
+	b=U9IJNl3ZTLvNqMUVTT6B1ioRbaqcRTiu42oPBR906294xitqPw0cR5hAZin9ZCkNOVtf6X
+	M3Sh4IZSTpZUHj8ZeFepZk2Rp/J+3F1ac1scxuOgAy5LicJY0/q9u0pUPrSOBtXYp2EeWm
+	ktLBsjd0jJ+OxNVFgt70q/6DA9Q9+Ek=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 02/11] shared/tester: check size before trying debug print
-Date: Sat,  6 Dec 2025 13:01:18 +0200
-Message-ID: <475a3be7c4dab70d162d58b27f21d02218e81bfd.1765018766.git.pav@iki.fi>
+Subject: [PATCH BlueZ 03/11] shared/tmap, gmap: add macros for feature names and listing
+Date: Sat,  6 Dec 2025 13:01:19 +0200
+Message-ID: <d127c7cdf011d7af03a7c1c10723491b83c4f2f8.1765018766.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1765018766.git.pav@iki.fi>
 References: <cover.1765018766.git.pav@iki.fi>
@@ -67,23 +67,103 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- src/shared/tester.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Better use constants for feature names to avoid typos.
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 1f59322bc..7a0145b46 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -983,7 +983,7 @@ static bool test_io_recv(struct io *io, void *user_data)
- 	if (test->iovcnt && !iov->iov_base)
- 		iov = test_get_iov(test);
+Add macros for generating lists containing all features / roles.
+---
+ src/shared/gmap.h | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ src/shared/tmap.h | 15 +++++++++++++++
+ 2 files changed, 59 insertions(+), 1 deletion(-)
+
+diff --git a/src/shared/gmap.h b/src/shared/gmap.h
+index ef7d96e0a..d633bfe69 100644
+--- a/src/shared/gmap.h
++++ b/src/shared/gmap.h
+@@ -17,7 +17,7 @@
+ #define BT_GMAP_ROLE_MASK		(BIT(4) - 1)
  
--	if (memcmp(buf, iov->iov_base, len) || (size_t)len != iov->iov_len)
-+	if ((size_t)len != iov->iov_len || memcmp(buf, iov->iov_base, len))
- 		tester_monitor('!', 0x0004, 0x0000, iov->iov_base,
- 							iov->iov_len);
+ #define BT_GMAP_UGG_MULTIPLEX		(BIT(0) << 0)
+-#define BT_GMAP_UGG_96KBPS		(BIT(1) << 0)
++#define BT_GMAP_UGG_96KBPS_SOURCE	(BIT(1) << 0)
+ #define BT_GMAP_UGG_MULTISINK		(BIT(2) << 0)
+ #define BT_GMAP_UGG_FEATURE_MASK	((BIT(3) - 1) << 0)
+ #define BT_GMAP_UGG_FEATURE_SHIFT	0
+@@ -46,6 +46,49 @@
+ 					BT_GMAP_BGS_FEATURE_MASK | \
+ 					BT_GMAP_BGR_FEATURE_MASK)
  
++#define BT_GMAP_ROLE_UGG_STR		"ugg"
++#define BT_GMAP_ROLE_UGT_STR		"ugt"
++#define BT_GMAP_ROLE_BGS_STR		"bgs"
++#define BT_GMAP_ROLE_BGR_STR		"bgr"
++
++#define BT_GMAP_UGG_MULTIPLEX_STR	"ugg-multiplex"
++#define BT_GMAP_UGG_96KBPS_SOURCE_STR	"ugg-96kbps-source"
++#define BT_GMAP_UGG_MULTISINK_STR	"ugg-multisink"
++
++#define BT_GMAP_UGT_SOURCE_STR		"ugt-source"
++#define BT_GMAP_UGT_80KBPS_SOURCE_STR	"ugt-80kbps-source"
++#define BT_GMAP_UGT_SINK_STR		"ugt-sink"
++#define BT_GMAP_UGT_64KBPS_SINK_STR	"ugt-64kbps-sink"
++#define BT_GMAP_UGT_MULTIPLEX_STR	"ugt-multiplex"
++#define BT_GMAP_UGT_MULTISINK_STR	"ugt-multisink"
++#define BT_GMAP_UGT_MULTISOURCE_STR	"ugt-multisource"
++
++#define BT_GMAP_BGS_96KBPS_STR		"bgs-96kbps"
++
++#define BT_GMAP_BGR_MULTISINK_STR	"bgr-multisink"
++#define BT_GMAP_BGR_MULTIPLEX_STR	"bgr-multiplex"
++
++#define BT_GMAP_ROLE_LIST(role) \
++	role(BT_GMAP_ROLE_UGG) \
++	role(BT_GMAP_ROLE_UGT) \
++	role(BT_GMAP_ROLE_BGS) \
++	role(BT_GMAP_ROLE_BGR)
++
++#define BT_GMAP_FEATURE_LIST(feature) \
++	feature(BT_GMAP_UGG_MULTIPLEX) \
++	feature(BT_GMAP_UGG_96KBPS_SOURCE) \
++	feature(BT_GMAP_UGG_MULTISINK) \
++	feature(BT_GMAP_UGT_SOURCE) \
++	feature(BT_GMAP_UGT_80KBPS_SOURCE) \
++	feature(BT_GMAP_UGT_SINK) \
++	feature(BT_GMAP_UGT_64KBPS_SINK) \
++	feature(BT_GMAP_UGT_MULTIPLEX) \
++	feature(BT_GMAP_UGT_MULTISINK) \
++	feature(BT_GMAP_UGT_MULTISOURCE) \
++	feature(BT_GMAP_BGS_96KBPS) \
++	feature(BT_GMAP_BGR_MULTISINK) \
++	feature(BT_GMAP_BGR_MULTIPLEX)
++
+ struct bt_gmap;
+ 
+ typedef void (*bt_gmap_ready_func_t)(struct bt_gmap *gmap, void *user_data);
+diff --git a/src/shared/tmap.h b/src/shared/tmap.h
+index 9d872f0b6..9b37dc226 100644
+--- a/src/shared/tmap.h
++++ b/src/shared/tmap.h
+@@ -18,6 +18,21 @@
+ #define BT_TMAP_ROLE_BMR		BIT(5)
+ #define BT_TMAP_ROLE_MASK		(BIT(6) - 1)
+ 
++#define BT_TMAP_ROLE_CG_STR		"cg"
++#define BT_TMAP_ROLE_CT_STR		"ct"
++#define BT_TMAP_ROLE_UMS_STR		"ums"
++#define BT_TMAP_ROLE_UMR_STR		"umr"
++#define BT_TMAP_ROLE_BMS_STR		"bms"
++#define BT_TMAP_ROLE_BMR_STR		"bmr"
++
++#define BT_TMAP_ROLE_LIST(role) \
++	role(BT_TMAP_ROLE_CG) \
++	role(BT_TMAP_ROLE_CT) \
++	role(BT_TMAP_ROLE_UMS) \
++	role(BT_TMAP_ROLE_UMR) \
++	role(BT_TMAP_ROLE_BMS) \
++	role(BT_TMAP_ROLE_BMR)
++
+ struct bt_tmap;
+ 
+ typedef void (*bt_tmap_ready_func_t)(struct bt_tmap *tmap, void *user_data);
 -- 
 2.51.1
 
