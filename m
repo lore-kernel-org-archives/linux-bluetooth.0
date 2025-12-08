@@ -1,216 +1,172 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D3A2248AF
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Dec 2025 15:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288B423536B
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Dec 2025 15:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765208149; cv=none; b=Uz4Tqy9mFQIysY0l7ldbPdImueyzT3A1Fk4gLgJMbJ9i6gCO3AJse/7jgFIDTCkFOR1XLyESWcAq09xN1hROpD93v4lSdFCrTX5ZIkMk69Xc4npQN7wuh/DmE/cSNiQ4Y3lsHEjp9JBIzC9Pd7WcYfghJ5X/4q4yJ3e8kGGbgzc=
+	t=1765208495; cv=none; b=dE75KubrPfB6VWAMoC5n4K+nK/wjnya8RyxYYn8r2UOxqzWG6CGJJKAuX704MKfY/ymjlCxCm+PnZ4flVOFrFANXww3Q3eOakciG/iPGvc8Ywhv6bM9BV/uj0RBOFwy9wNxIqoJg6wpc4YHy5WMm+H4ig31f45fGtzw1bfAhjN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765208149; c=relaxed/simple;
-	bh=XKlOssSOiluaAkTuqzPNbnNo5wswOaCh/aOSg/InTMA=;
+	s=arc-20240116; t=1765208495; c=relaxed/simple;
+	bh=9jHgmnqnlWV2JYqFCDR57PXSAtsWgG84sOx7voZbGGg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VUkGvYSwiLS0ktPXBEmIgD0QVlpO2y5yuCgyTK+ffGCExvmPemIYp6vClWqDw/d5Bw6h+i7fK2ZZtwsOf2TFp4DQ2h0WkT0K/XKWPtW0dbRWrcFOH+kY8sQY3MZt7dAX/1nwCBAyebP5rOhXejYBX7LIAu/It6XQGOUWIUSBAU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ANbzyLTF; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=KmowCRSGV9BvP+A9eS9JzPcUp9ANJDfiH1MQnKUGKKi/l+TCzT1XGM5WFTJ/7LBY1QiDEbH5SEWAPzz5MkLcZVDkPoIvCAd9qLq9I95uwTDC2W2VGsVdOn8duSvNxCN0idC9y8WqIXvVjuEFdQ8DgZhfElrY09ZJuCq8IZFRs2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kRp0sZuK; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANbzyLTF"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-37d96f97206so36888471fa.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Dec 2025 07:35:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kRp0sZuK"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-37a2dced861so46439801fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Dec 2025 07:41:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765208145; x=1765812945; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1765208491; x=1765813291; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LnMesBWs9K96ISefwjInMCFFlmWgdyGh6umQLKK1XLg=;
-        b=ANbzyLTFDBICyc6ypIWHeVi0W19Wg7ggxT2VPUq7rIEk6F36Kzj7JMsRemx1kBJwI3
-         f9SUEoYYA2EtSM4yILNy6C6hAWgB9i1OFjxWg0FvyvIh6JJkDyyCxG3gKyvsXuAVwOEY
-         bl6uR5MtLni77EK/VqJUvXMLl50pwyjX0U8I+lm1Aohvhe5J6sintb2G6nAG4n/37DN3
-         iDTSkqiKJWq0SlKdNwq2DdZchvkoBNtJyJPWmpABHeyp/NQUNtlF4jnapbbly7a/iIgY
-         Dlm7pBUBD35UHG8ON5QCg/9L52S3xYoa23/h3rdtdVfZrUtKwqzgTf6yloAiz6uoHy7b
-         wuqA==
+        bh=TdIxYHx8lXZJdczXuJZyC+LSIFRXQ29Bol9iUPCXQzs=;
+        b=kRp0sZuKSv6Xdb5jIiwJs5xWHLMN2PKOCSxDWbNCwmgPq/oQ9NDCfNLCXj5PKKtuUF
+         WItzbPPuL9nTDKkaLDKW0IHKxZJR0q7XVMWx2el2lQG8JAMMkbwc/qfBucP04dkErH9Y
+         t5eaTBAYRhg0E5tIOi/dwV6iUK5Dj3tk7Nqtjc7TJ/BxwFmwkJf5tFQdIwCXOUGBRvis
+         8+4RBnmjJBvuWzSW4rvex0pLt8Gu6KhUZzs/3xwl2tjVNBD6HiBRe2+R6yp/CC+FaLO1
+         7jdx79Kfa9N5ovTMdUr8zA8bboQ/fcw+iO6TE08LdYlETajtbEZqzAwtAp/kqqapIzxo
+         MmbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765208145; x=1765812945;
+        d=1e100.net; s=20230601; t=1765208491; x=1765813291;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=LnMesBWs9K96ISefwjInMCFFlmWgdyGh6umQLKK1XLg=;
-        b=mbOAb0Gm7S5d/rp4ycBOc65FGsV4yK83jXkh/rxJCOfM+sHCZXnDRofpxjPVnQqxmW
-         suCbgHT1C6tLWR1VbzEfuyJInnIX5qlLmRAjm00TkfCSHgkOW6C53kfarbWjqbhfiT/w
-         svfhQmUCZwtjD5xg9CcfcDqdCPvqN1ZVEmvGrFZ+S8tXB+cVXYRdBnqcNe3ukqxqRHFi
-         wtTS0CYgvIKfKgH244FCl13iO2PSr5e6CBm/YNI4z1Te/3mgEWZgEP0R9EkhM0tTuTsF
-         EEzLsG6uQpMGYfdaGAvOvO1oqu2YiqaVuM/ZoYiecc9fr6U6wbwoQDT/Tv58kjm+iD/Q
-         ji+g==
-X-Gm-Message-State: AOJu0YzmuoWs5k7pRYsPZtnVoCI3f0vhlBD5hkwqisYScRSNqz5EObZc
-	6Y7U1w8EN/Tlfci8qYwHy1OxKbRelxihEpWgPE78HTcsOn34wCRePPbEMsfkblGdZOko+BPRTqk
-	3p31YT9NsLuVaC830dos7Zv+5zgFVzIM=
-X-Gm-Gg: ASbGnctf8wNnc82Thv28JmrEsoJqwaKhvnDSV7j2rxc5sKWcufuhaO3LQrYMS2M9lv8
-	YQQ8lILgJ/nr1zDYj2+dY8I87XurymvG8HZODbvedaJWvUNWeCUGmZJ8GZsKoLI7YjgkKJ6NbKi
-	pLGFVKKqlKdQvrUv3FVjDjy7WHTGaXc0QMWGhljuos+iWKDU8aoNgQfKmgv00TyaKYoFdHY5uxH
-	1E78skrmWU5gKOZp8RkcLRIxPTY9SjgfzAiCsDKA09OXmnXPClgfux5+1JQy3HUS7S6bQ==
-X-Google-Smtp-Source: AGHT+IH/up8DOQxkVmAYNK0+IAyqLiY2+XktesBDw4Olo/TvoTZlmB/mY0+aSLFX+k09y1vVE/q1qgkeaNb1trrpUWI=
-X-Received: by 2002:a05:651c:3058:b0:37f:933b:aa07 with SMTP id
- 38308e7fff4ca-37f933bacbemr12257031fa.33.1765208144560; Mon, 08 Dec 2025
- 07:35:44 -0800 (PST)
+        bh=TdIxYHx8lXZJdczXuJZyC+LSIFRXQ29Bol9iUPCXQzs=;
+        b=Foa9KQ0lEPRIFywj9uDyioIPnSmXnaG3NIXNWWRvK72UyRn4gKSN8McPaXmxemJHnF
+         gjsnGl8c6Ij9t6qkSx8LS7/9zgoBtaffNCknsdH75B2PIAw8pw4mu4Xb9vvsKuJ40zIY
+         +BCxyZIsLPK+/B7jFCX8QMSfsgfNJflHMdHXcyDIqN/yFj/hQh8utPNuWt1vQ550puRH
+         Zm7xlXE2MJ+SniUs4Zrhsn4DZmpUJCk/DMG/i2k98M/ihsMsXsuRzYNBBBuyz46DaKhx
+         t7Z7+AEmUWXW8EVqKTZ/sHs3aP5l0qcz6ZPg6XxEkoSzdj45GN7aoWxZhu0oI7YlIvVc
+         Zrrw==
+X-Gm-Message-State: AOJu0YzThsUfsDkwNsRCorqOoeoWIHkVhkjnw3L8FBWkV8bvSPmzVZzr
+	QMqURufnn2WXh96+BJtus8N9eM60vLawkAnWTHyazWI9T/5+e1ic0WePrNeOxmhdtRDGnZt2P3g
+	KtUq5QTOuh93IoFvzoIgy/QlPgNGqF/aHihul
+X-Gm-Gg: ASbGncuU+uKMfs6yWhihqZmAY1GiMHmv4OQHi29x5SYmyyRpcz53Pqr4Dq3mv7RkIve
+	HbfyYiu7G+Jo6sLthOPhMQm4bwpl0K4bBq8vYN21C8HpD8ypuKYxtxQDeKqQInGTpUuaiTF7q6b
+	jyXx65JsELPfpYcGtsdW6Ucria5gBgJgU21Vce93fTi6vcMzU5dKyvwxL5Bt4PWRoA6v3GZGUPB
+	419qj5kSf1jliO0LxZ8NYk8yKArIAGp/qBH+PhqmDtZ6cy2mLM0I4Em52h6o3bukMBeew==
+X-Google-Smtp-Source: AGHT+IHlnswypvpiQUHQDw7FSwD25P4ZofMC81E+Nu552DWP/mpIUQpmS4DMEJxsdSgi3NuQK5ULuvkp8yJfPRqJa5Y=
+X-Received: by 2002:a05:651c:2222:b0:378:d020:b6b3 with SMTP id
+ 38308e7fff4ca-37e6cc0615amr41529181fa.7.1765208490281; Mon, 08 Dec 2025
+ 07:41:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251208101915.247459-1-mengshi.wu@oss.qualcomm.com>
-In-Reply-To: <20251208101915.247459-1-mengshi.wu@oss.qualcomm.com>
+References: <20251208095508.3481977-1-zzzccc427@gmail.com> <6936ab2d.0c0a0220.11bcee.8d68@mx.google.com>
+In-Reply-To: <6936ab2d.0c0a0220.11bcee.8d68@mx.google.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 Dec 2025 10:35:31 -0500
-X-Gm-Features: AQt7F2p0cahbqsKycX8T-ypu38qwCPo14vWwNsj_jmmMQgTd8AlsnNQHdvJY66I
-Message-ID: <CABBYNZJ=S3LHcwyXAc=gxf0RptcOC+6TPaWvoEmJquar54b3dQ@mail.gmail.com>
-Subject: Re: [PATCH v1] gatt-client:Implement error handling for
- DB_OUT_OF_SYNC in GATT caching.
-To: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com, 
-	cheng.jiang@oss.qualcomm.com, chezhou@qti.qualcomm.com, 
-	wei.deng@oss.qualcomm.com
+Date: Mon, 8 Dec 2025 10:41:17 -0500
+X-Gm-Features: AQt7F2qvDH0fuVQtrnYOqxndM9l609zL_NDo2JsKg19NSDN9MwDV7nfNckOaY5g
+Message-ID: <CABBYNZ+2PxLJvbW+HuoGMcjFBh+=riMRKBXisRrZMvQRMfC+xA@mail.gmail.com>
+Subject: Re: [RESEND] Bluetooth: sco: Serialize state check in
+ sco_sock_connect to fix UAF
+To: linux-bluetooth@vger.kernel.org
+Cc: zzzccc427@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Mon, Dec 8, 2025 at 5:19=E2=80=AFAM Mengshi Wu <mengshi.wu@oss.qualcomm.=
-com> wrote:
+On Mon, Dec 8, 2025 at 5:40=E2=80=AFAM <bluez.test.bot@gmail.com> wrote:
 >
-> Add automatic DB re-discovery on receiving BT_ATT_ERROR_DB_OUT_OF_SYNC
-> error code from ATT operations. This ensures the local GATT database
-> stays synchronized with the remote device by triggering a full service
-> discovery (handles 0x0001-0xffff) when the database becomes out of sync.
+> This is automated email and please do not reply to this email!
 >
-> The process_db_out_of_sync() function is now called in all ATT error
-> response handlers (read_multiple, read_long, write, execute_write,
-> prepare_write, and prep_write callbacks) to handle this error condition
-> consistently.
+> Dear submitter,
 >
-> Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D103=
+1328
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PENDING   0.32 seconds
+> GitLint                       PENDING   0.24 seconds
+> SubjectPrefix                 PASS      0.11 seconds
+> BuildKernel                   PASS      25.46 seconds
+> CheckAllWarning               PASS      28.37 seconds
+> CheckSparse                   WARNING   31.94 seconds
+> BuildKernel32                 PASS      25.61 seconds
+> TestRunnerSetup               PASS      558.74 seconds
+> TestRunner_l2cap-tester       PASS      24.64 seconds
+> TestRunner_iso-tester         PASS      88.68 seconds
+> TestRunner_bnep-tester        PASS      6.29 seconds
+> TestRunner_mgmt-tester        FAIL      125.65 seconds
+> TestRunner_rfcomm-tester      PASS      9.38 seconds
+> TestRunner_sco-tester         FAIL      14.61 seconds
+> TestRunner_ioctl-tester       PASS      10.26 seconds
+> TestRunner_mesh-tester        FAIL      11.58 seconds
+> TestRunner_smp-tester         PASS      8.61 seconds
+> TestRunner_userchan-tester    PASS      6.69 seconds
+> IncrementalBuild              PENDING   0.70 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - PENDING
+> Desc: Run checkpatch.pl script
+> Output:
+>
+> ##############################
+> Test: GitLint - PENDING
+> Desc: Run gitlint
+> Output:
+>
+> ##############################
+> Test: CheckSparse - WARNING
+> Desc: Run sparse tool with linux kernel
+> Output:
+> net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_c=
+ore.h:153:35: warning: array of flexible structures
+> ##############################
+> Test: TestRunner_mgmt-tester - FAIL
+> Desc: Run mgmt-tester with test-runner
+> Output:
+> Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+>
+> Failed Test Cases
+> Read Exp Feature - Success                           Failed       0.111 s=
+econds
+> ##############################
+> Test: TestRunner_sco-tester - FAIL
+> Desc: Run sco-tester with test-runner
+> Output:
+> WARNING: possible circular locking dependency detected
+> BUG: sleeping function called from invalid context at net/core/sock.c:378=
+2
+
+The above seems new to me, might need to check with the likes of
+sco-tester if you didn't already.
+
+> Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+> ##############################
+> Test: TestRunner_mesh-tester - FAIL
+> Desc: Run mesh-tester with test-runner
+> Output:
+> Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+>
+> Failed Test Cases
+> Mesh - Send cancel - 1                               Timed out    1.792 s=
+econds
+> Mesh - Send cancel - 2                               Timed out    1.997 s=
+econds
+> ##############################
+> Test: IncrementalBuild - PENDING
+> Desc: Incremental build with the patches in the series
+> Output:
+>
+>
+>
 > ---
->  src/shared/gatt-client.c | 35 +++++++++++++++++++++++++++++++++--
->  1 file changed, 33 insertions(+), 2 deletions(-)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index f6d5dc4b7..087d4e228 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -1965,6 +1965,29 @@ fail:
->                 "Failed to initiate service discovery after Service Chang=
-ed");
->  }
->
-> +static void process_db_out_of_sync(struct bt_gatt_client *client,
-> +                                  uint8_t att_ecode)
-> +{
-> +       struct service_changed_op *op;
-> +
-> +       if (att_ecode !=3D BT_ATT_ERROR_DB_OUT_OF_SYNC)
-> +               return;
-> +
-> +       DBG(client, "Database Out of Sync - triggering full re-discovery"=
-);
-> +
-> +       if (!client->in_svc_chngd) {
-> +               process_service_changed(client, 0x0001, 0xffff);
-> +               return;
-> +       }
-> +
-> +       op =3D new0(struct service_changed_op, 1);
-> +
-> +       op->start_handle =3D 0x0001;
-> +       op->end_handle =3D 0xffff;
-> +
-> +       queue_push_tail(client->svc_chngd_queue, op);
-> +}
-
-Id just change process_error to call into db_out_sync, that said this
-is not recovering at all, it just rediscovering but the original
-request will be lost, I wonder if we should implement some backoff
-logic wait to see if the server do a service changed, read the hash
-(in case we are not doing it already), and then redo the operation.
-Also we do need to make sure we don't end up in a loop rediscovery.
-
->  static void service_changed_cb(uint16_t value_handle, const uint8_t *val=
-ue,
->                                         uint16_t length, void *user_data)
->  {
-> @@ -2709,10 +2732,12 @@ static void read_multiple_cb(uint8_t opcode, cons=
-t void *pdu, uint16_t length,
->                         (!pdu && length)) {
->                 success =3D false;
->
-> -               if (opcode =3D=3D BT_ATT_OP_ERROR_RSP)
-> +               if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
->                         att_ecode =3D process_error(pdu, length);
-> -               else
-> +                       process_db_out_of_sync(req->client, att_ecode);
-> +               } else {
->                         att_ecode =3D 0;
-> +               }
->
->                 pdu =3D NULL;
->                 length =3D 0;
-> @@ -2864,6 +2889,7 @@ static void read_long_cb(uint8_t opcode, const void=
- *pdu,
->         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
->                 success =3D false;
->                 att_ecode =3D process_error(pdu, length);
-> +               process_db_out_of_sync(req->client, att_ecode);
->                 goto done;
->         }
->
-> @@ -3050,6 +3076,7 @@ static void write_cb(uint8_t opcode, const void *pd=
-u, uint16_t length,
->         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
->                 success =3D false;
->                 att_ecode =3D process_error(pdu, length);
-> +               process_db_out_of_sync(req->client, att_ecode);
->                 goto done;
->         }
->
-> @@ -3213,6 +3240,7 @@ static void execute_write_cb(uint8_t opcode, const =
-void *pdu, uint16_t length,
->         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
->                 success =3D false;
->                 att_ecode =3D process_error(pdu, length);
-> +               process_db_out_of_sync(req->client, att_ecode);
->         } else if (opcode !=3D BT_ATT_OP_EXEC_WRITE_RSP || pdu || length)
->                 success =3D false;
->
-> @@ -3278,6 +3306,7 @@ static void prepare_write_cb(uint8_t opcode, const =
-void *pdu, uint16_t length,
->         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
->                 success =3D false;
->                 att_ecode =3D process_error(pdu, length);
-> +               process_db_out_of_sync(req->client, att_ecode);
->                 goto done;
->         }
->
-> @@ -3447,6 +3476,7 @@ static void prep_write_cb(uint8_t opcode, const voi=
-d *pdu, uint16_t length,
->                 success =3D false;
->                 reliable_error =3D false;
->                 att_ecode =3D process_error(pdu, length);
-> +               process_db_out_of_sync(req->client, att_ecode);
->                 goto done;
->         }
->
-> @@ -3597,6 +3627,7 @@ static void exec_write_cb(uint8_t opcode, const voi=
-d *pdu, uint16_t length,
->         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
->                 success =3D false;
->                 att_ecode =3D process_error(pdu, length);
-> +               process_db_out_of_sync(req->client, att_ecode);
->                 goto done;
->         }
->
-> --
-> 2.34.1
->
+> Regards,
+> Linux Bluetooth
 >
 
 
