@@ -1,16 +1,16 @@
 Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D2D3B8D7C;
-	Mon,  8 Dec 2025 13:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6253148D0
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Dec 2025 13:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765200293; cv=none; b=MkRqbJsIVoIErPyaRdbEgCoh4EOBEMyjOxWvQfeIVA5g8J7BQACKrntdZiywDaxYURXuIqkdNni+ixIjiYUOwEnzWqnO0+EhEzk6edS+fP5gIcyjXg2dDbP4z0l+rgTZgsnpWzsvMFmAmo1rxg58nIwloDnrhgsopniw3xFDLvc=
+	t=1765200749; cv=none; b=D9bpUjpAbmyQMsQ8le8f8VyUiZIEW1TufJNOrGZCF5OQdEaJ7DuSAA0fpO6x5QspKWT/S16NZYMCnGCDR2NJ7rgbU29lkmi59EpwIJLZHqvIty5Y7PrHXTJ/RjeugEa61Sv27i/odoySGms3Q5GNKxUFYPZ9A8RJkJ2tuz2aSlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765200293; c=relaxed/simple;
-	bh=R5PuPMGoKEWezcbDkRUOspKp6PzmYWlKgyJBLxEepIE=;
+	s=arc-20240116; t=1765200749; c=relaxed/simple;
+	bh=cX9uhFg0WLkP+zWZmB0FtKadciTYc65cNRJRGeuX5cM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nqcDBfecbHPZGuA6ZmSR1bZ+gzqyntLKtDGWs0eMD/X6VtjX4+uufzAIEk1//llXdhoBSgkVeCDoA2BcGqsw2RhKF4QUP3OUmJh6VWPr16pYy9shACvAm4vYEjfoFZOiCipySH2WxerEBb5537RPSqCHQg0Ef14AGfWEsxEdtiQ=
+	 In-Reply-To:Content-Type; b=k4UCl3iVFK/bwmtzzS+Vn23x6z3Ku5k+p71n4U8gvTkNja9F5MdYYhcPZebvJQGq4CbujtI4FslodBqmZlyXMAgoRNFztrXt+HHgFkkucz3R5TOziMdpvgaLs+Rmr9vDWhA32tt1EgWeS91aB58Si5K6xJ+QxkuzafBHvt3JDc8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
@@ -19,10 +19,10 @@ Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 500A86028F356;
-	Mon, 08 Dec 2025 14:24:38 +0100 (CET)
-Message-ID: <fc2e5c27-b1ea-4034-bbf4-1b494ed765c1@molgen.mpg.de>
-Date: Mon, 8 Dec 2025 14:24:36 +0100
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 38FCF617C4F8B;
+	Mon, 08 Dec 2025 14:32:20 +0100 (CET)
+Message-ID: <069caee5-1169-4ae3-a501-d873cb4ed0bb@molgen.mpg.de>
+Date: Mon, 8 Dec 2025 14:32:19 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,195 +30,64 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 1/2] Bluetooth: hci_conn: Add tracepoints for debugging
+Subject: Re: [RFC 2/2] Bluetooth: hci_conn: fix WARNING in hci_conn_timeout
 To: Wang Yaxin <wang.yaxin@zte.com.cn>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
  linux-bluetooth@vger.kernel.org, xu.xin16@zte.com.cn,
  yang.yang29@zte.com.cn, qiu.yutan@zte.com.cn, chen.junlin@zte.com.cn,
- jiang.kun2@zte.com.cn, linux-trace-kernel@vger.kernel.org
-References: <20251208203245047U3UW5v2aGUumhmvjLl96E@zte.com.cn>
+ jiang.kun2@zte.com.cn
+References: <20251208203404000bLAos3jnZFMsLDRmqZb_S@zte.com.cn>
 Content-Language: en-US
 From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251208203245047U3UW5v2aGUumhmvjLl96E@zte.com.cn>
+In-Reply-To: <20251208203404000bLAos3jnZFMsLDRmqZb_S@zte.com.cn>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-[Cc: +linux-trace-kernel@vger.kernel.org]
-
-Dear Yutan,
+Dear Yaxin, dear Yutan,
 
 
 Thank you for your patch.
 
-Am 08.12.25 um 13:32 schrieb wang.yaxin@zte.com.cn:
+Am 08.12.25 um 13:34 schrieb wang.yaxin@zte.com.cn:
 > From: Qiu Yutan <qiu.yutan@zte.com.cn>
 > 
-> Add tracepoints for tracking hci_conn_hold, hci_conn_drop, and hci_conn_del
-> to facilitate debugging and viewing call stacks.
+> The warning is triggered when conn->refcnt is decremented to a negative value.
 
-I’d add a blank line between paragraphs.
+Please past the warning (no line wrapping for pastes required).
 
-> The existing Bluetooth debugging method, BT_DBG, cannot trace call stacks.
+> Since atomic_dec_if_positive(&conn->refcnt) only decrements the value by 1
+> when conn->refcnt is positive, the resulting value will be greater than or equal to zero,
+> preventing this warning from reoccurring.
 
-It’d be great if you added an example output, how to use hte new trace 
-points.
+Please re-flow for 75 characters per line.
 
 > Signed-off-by: Qiu Yutan <qiu.yutan@zte.com.cn>
 > Signed-off-by: Wang Yaxin <wang.yaxin@zte.com.cn>
 > Signed-off-by: xu xin <xu.xin16@zte.com.cn>
 
-Please start each name with a capital letter.
+Please start the names with a capital letter.
 
 > Signed-off-by: Chen Junlin <chen.junlin@zte.com.cn>
 > ---
->   include/net/bluetooth/hci_core.h |  3 ++
->   include/trace/events/bluetooth.h | 80 ++++++++++++++++++++++++++++++++
->   net/bluetooth/hci_conn.c         |  4 ++
->   3 files changed, 87 insertions(+)
->   create mode 100644 include/trace/events/bluetooth.h
+>   include/net/bluetooth/hci_core.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 2b261e74e2c4..5e01e6c501c1 100644
+> index 5e01e6c501c1..2b306115add4 100644
 > --- a/include/net/bluetooth/hci_core.h
 > +++ b/include/net/bluetooth/hci_core.h
-> @@ -29,6 +29,7 @@
->   #include <linux/idr.h>
->   #include <linux/leds.h>
->   #include <linux/rculist.h>
-> +#include <trace/events/bluetooth.h>
-> 
->   #include <net/bluetooth/hci.h>
->   #include <net/bluetooth/hci_drv.h>
-> @@ -1620,6 +1621,7 @@ static inline void hci_conn_put(struct hci_conn *conn)
-> 
->   static inline struct hci_conn *hci_conn_hold(struct hci_conn *conn)
->   {
-> +	trace_hci_conn_hold(conn);
+> @@ -1635,7 +1635,7 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+>   	trace_hci_conn_drop(conn);
 >   	BT_DBG("hcon %p orig refcnt %d", conn, atomic_read(&conn->refcnt));
 > 
->   	atomic_inc(&conn->refcnt);
-> @@ -1630,6 +1632,7 @@ static inline struct hci_conn *hci_conn_hold(struct hci_conn *conn)
+> -	if (atomic_dec_and_test(&conn->refcnt)) {
+> +	if (atomic_dec_if_positive(&conn->refcnt) == 0) {
+>   		unsigned long timeo;
 > 
->   static inline void hci_conn_drop(struct hci_conn *conn)
->   {
-> +	trace_hci_conn_drop(conn);
->   	BT_DBG("hcon %p orig refcnt %d", conn, atomic_read(&conn->refcnt));
-> 
->   	if (atomic_dec_and_test(&conn->refcnt)) {
-> diff --git a/include/trace/events/bluetooth.h b/include/trace/events/bluetooth.h
-> new file mode 100644
-> index 000000000000..dd6446263e83
-> --- /dev/null
-> +++ b/include/trace/events/bluetooth.h
-> @@ -0,0 +1,80 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#undef TRACE_SYSTEM
-> +#define TRACE_SYSTEM bluetooth
-> +
-> +#if !defined(_TRACE_BLUETOOTH_H) || defined(TRACE_HEADER_MULTI_READ)
-> +#define _TRACE_BLUETOOTH_H
-> +
-> +#include <linux/tracepoint.h>
-> +#include <net/bluetooth/hci_core.h>
-> +
-> +TRACE_EVENT(hci_conn_hold,
-> +
-> +	TP_PROTO(void *conn_ptr),
-> +
-> +	TP_ARGS(conn_ptr),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(void *, conn_addr)
-> +		__field(int, refcnt)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		struct hci_conn *conn = (struct hci_conn *)conn_ptr;
-> +
-> +		__entry->conn_addr = conn;
-> +		__entry->refcnt = atomic_read(&conn->refcnt);
-> +	),
-> +
-> +	TP_printk("conn_addr=%p, orig refcnt=%d",
-> +			__entry->conn_addr, __entry->refcnt)
-> +)
-> +
-> +TRACE_EVENT(hci_conn_drop,
-> +
-> +	TP_PROTO(void *conn_ptr),
-> +
-> +	TP_ARGS(conn_ptr),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(void *, conn_addr)
-> +		__field(int, refcnt)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		struct hci_conn *conn = (struct hci_conn *)conn_ptr;
-> +
-> +		__entry->conn_addr = conn;
-> +		__entry->refcnt = atomic_read(&conn->refcnt);
-> +	),
-> +
-> +	TP_printk("conn_addr=%p, orig refcnt=%d",
-> +			__entry->conn_addr, __entry->refcnt)
-> +)
-> +
-> +TRACE_EVENT(hci_conn_del,
-> +
-> +	TP_PROTO(void *conn_ptr),
-> +
-> +	TP_ARGS(conn_ptr),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(void *, conn_addr)
-> +		 __field(int, refcnt)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		struct hci_conn *conn = (struct hci_conn *)conn_ptr;
-> +
-> +		__entry->conn_addr = conn;
-> +		__entry->refcnt = atomic_read(&conn->refcnt);
-> +	),
-> +
-> +	TP_printk("conn_addr=%p, orig refcnt=%d",
-> +			__entry->conn_addr, __entry->refcnt)
-> +)
+>   		switch (conn->type) {
 
-All definitions look the same besides the name. Any idea, how the 
-duplication can be avoided?
-
-> +
-> +#endif /* _TRACE_BLUETOOTH_H */
-> +
-> +/* This part must be outside protection */
-> +#include <trace/define_trace.h>
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 99efeed6a766..74a02cf7ba14 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -35,6 +35,9 @@
->   #include <net/bluetooth/iso.h>
->   #include <net/bluetooth/mgmt.h>
-> 
-> +#define CREATE_TRACE_POINTS
-> +#include <trace/events/bluetooth.h>
-> +
->   #include "smp.h"
->   #include "eir.h"
-> 
-> @@ -1129,6 +1132,7 @@ static void hci_conn_unlink(struct hci_conn *conn)
-> 
->   void hci_conn_del(struct hci_conn *conn)
->   {
-> +	trace_hci_conn_del(conn);
->   	struct hci_dev *hdev = conn->hdev;
-> 
->   	BT_DBG("%s hcon %p handle %d", hdev->name, conn, conn->handle);
-
-Thank you for working on that. I’t great to see.
+This patch looks unrelated from the trace point patch. Could you send it 
+in separately? Also, why did you mark it as RFC?
 
 
 Kind regards,
