@@ -1,74 +1,211 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B931B2EF665
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Dec 2025 10:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4461B2E9757
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Dec 2025 11:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765190594; cv=none; b=L7/dm2qVGIGu/Kh+GFFfGKBAn7kC0HZQBN27IL/XO3y3gBp42E/q21t2T9NjI+Qfbh/2o4CmWplUeTfuLbH0m1u+LEHyL+wlBqDJZqPA5hT8DySOZwjZP2tKw6YO9qON2vdF8dBgScTT9LQlp3sUh+xf0fA6qjTU9e75FNUJYos=
+	t=1765195082; cv=none; b=c/wrcpSfMc3dhZ729BuhR4Yfxd0ku2QbZSu9ZJhE9pE8jR3iOCoNoBez4p5wrw3W/F8WqPVf7Rzm+GW35BpiUs3OBgAyiKvdFEXDa4p61i09Y6PzUfCTL+liUoh3g7SpwAZYJNkNoNTuCeMMKqrNPk6IqtUnve/MiWD37if9/4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765190594; c=relaxed/simple;
-	bh=gzC1xg0W5zPi74fqJhw7sO48YBVeZ1ePhptHp9YxF0I=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=PUxGzZ5iQmZ3SZvQbKrhnlmwFaANfHawP9jX+UNDpAdrQno2qqbhjKooIxSHw3/YHHiq+eA5WbgISaAA1Mje6/u7C/bAMMkc5pKK+Cr/DKBCWLkQduniKSH+4MuLNjzFGvbkyV8KClYIVPYE1PYSHKXJ+WQ8XKadWCaCr6OznSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kAhUM46z; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kAhUM46z"
-Received: from github.com (hubbernetes-node-004ce96.ac4-iad.github.net [10.52.182.41])
-	by smtp.github.com (Postfix) with ESMTPA id A1CAD6401F1
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Dec 2025 02:43:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1765190591;
-	bh=K0tsIbFy7IPN5bF1C1ouFktg5VYbAUpZ1ymOsbDKGCU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=kAhUM46z5xCgV4212XmnRc4bA9fSH5KntTLUxD/p9HgMtmN0W6NYpltidTZ62gmTH
-	 ftsNFUs3q2Ijsn7nH8tOD9T62tq6+x8lxmth2dNa8JWwHO9imQ6WtOAMLj1wL0Mklu
-	 JP3IChXbbVOdKGBzUGuRBBLxDitZ2K1VhU+ClP4E=
-Date: Mon, 08 Dec 2025 02:43:11 -0800
-From: "github-actions[bot]" <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1031333/000000-c8dc51@github.com>
-Subject: [bluez/bluez] c8dc51: gatt-client:Implement error handling for
- DB_OUT_OF...
+	s=arc-20240116; t=1765195082; c=relaxed/simple;
+	bh=uzP+zpNr2LEU0vi48i/A1xmLSiRRnOFlf4os9GRhlT8=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=bk61yeCZ33a1NrNqvoRH1L5FWErvZ5oT17QuDPFwpSdLW/ozbVfeZxSl17+nDySES8WlBsg1nkaMa9NRGDE1/HLsz82yTS/owNxODik1sMwnDACC6e4kqGOWntSxuUD8DBd/cXexMRe6wlbs6KAGTGvmHKN8RnV5QpF1KVxGhJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 33C5D431FF;
+	Mon,  8 Dec 2025 11:57:52 +0000 (UTC)
+Message-ID: <eb393fee5cfc383397918349d1f714c7023bd3ca.camel@hadess.net>
+Subject: Re: [PATCH BlueZ] build: Allow systemd unit build without libsystemd
+From: Bastien Nocera <hadess@hadess.net>
+To: Achill Gilgenast <achill@achill.org>, linux-bluetooth@vger.kernel.org
+Date: Mon, 08 Dec 2025 12:57:51 +0100
+In-Reply-To: <20251208012421.838601-1-achill@achill.org>
+References: <20251208012421.838601-1-achill@achill.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieeiudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkffuhffvffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnheptdehffevfeffvedtheethfejveeljeehheeljefhkeevffehieefhfeuudduieevnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheprggthhhilhhlsegrtghhihhllhdrohhrghdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhor
+ hhg
+X-GND-Sasl: hadess@hadess.net
 
-  Branch: refs/heads/1031333
-  Home:   https://github.com/bluez/bluez
-  Commit: c8dc5108f66464da7423b7d99f4766f6d5ef9231
-      https://github.com/bluez/bluez/commit/c8dc5108f66464da7423b7d99f4766f6d5ef9231
-  Author: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-  Date:   2025-12-08 (Mon, 08 Dec 2025)
+On Mon, 2025-12-08 at 02:24 +0100, Achill Gilgenast wrote:
+> Decouples libsystemd and systemd units from the same option and
+> allows
+> installation of services without systemd.pc by manually specifying
+> the
+> directories.
+>=20
+> This is useful in Alpine Linux where we don't ship systemd, but allow
+> systemd services to be subpackaged for downstream distributions like
+> postmarketOS.
 
-  Changed paths:
-    M src/shared/gatt-client.c
+For what it's worth, this was already implemented in the meson port:
+https://github.com/hadess/bluez/commit/b8d12fa7eb9a5b7071eb130344a0816c46c8=
+7db8
 
-  Log Message:
-  -----------
-  gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching.
-
-Add automatic DB re-discovery on receiving BT_ATT_ERROR_DB_OUT_OF_SYNC
-error code from ATT operations. This ensures the local GATT database
-stays synchronized with the remote device by triggering a full service
-discovery (handles 0x0001-0xffff) when the database becomes out of sync.
-
-The process_db_out_of_sync() function is now called in all ATT error
-response handlers (read_multiple, read_long, write, execute_write,
-prepare_write, and prep_write callbacks) to handle this error condition
-consistently.
-
-Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+> ---
+> I'm by far no expert in autotools or bluez and how specific
+> components
+> are best categorized, so please let me know your feedback.
+> ---
+> =C2=A0Makefile.am=C2=A0=C2=A0=C2=A0 |=C2=A0 6 +++++-
+> =C2=A0Makefile.mesh=C2=A0 |=C2=A0 4 +++-
+> =C2=A0Makefile.obexd |=C2=A0 2 +-
+> =C2=A0Makefile.tools |=C2=A0 4 ++--
+> =C2=A0configure.ac=C2=A0=C2=A0 | 21 +++++++++++++++------
+> =C2=A05 files changed, 26 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/Makefile.am b/Makefile.am
+> index e152ae64853c..d3cdb2890d32 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -49,13 +49,17 @@ conf_DATA +=3D profiles/network/network.conf
+> =C2=A0state_DATA =3D
+> =C2=A0endif
+> =C2=A0
+> -if SYSTEMD
+> +if SYSTEMD_SYSTEMUNITS
+> =C2=A0systemdsystemunitdir =3D $(SYSTEMD_SYSTEMUNITDIR)
+> =C2=A0systemdsystemunit_DATA =3D src/bluetooth.service
+> +endif
+> =C2=A0
+> +if SYSTEMD_USERUNITS
+> =C2=A0systemduserunitdir =3D $(SYSTEMD_USERUNITDIR)
+> =C2=A0systemduserunit_DATA =3D
+> +endif
+> =C2=A0
+> +if SYSTEMD_UNITS
+> =C2=A0dbussystembusdir =3D $(DBUS_SYSTEMBUSDIR)
+> =C2=A0dbussystembus_DATA =3D src/org.bluez.service
+> =C2=A0endif
+> diff --git a/Makefile.mesh b/Makefile.mesh
+> index e4c9fa6a32e6..e9998a9cdd75 100644
+> --- a/Makefile.mesh
+> +++ b/Makefile.mesh
+> @@ -6,8 +6,10 @@ dbus_DATA +=3D mesh/bluetooth-mesh.conf
+> =C2=A0conf_DATA +=3D mesh/mesh-main.conf
+> =C2=A0endif
+> =C2=A0
+> -if SYSTEMD
+> +if SYSTEMD_SYSTEMUNITS
+> =C2=A0systemdsystemunit_DATA +=3D mesh/bluetooth-mesh.service
+> +endif
+> +if SYSTEMD_UNITS
+> =C2=A0dbussystembus_DATA +=3D mesh/org.bluez.mesh.service
+> =C2=A0endif
+> =C2=A0
+> diff --git a/Makefile.obexd b/Makefile.obexd
+> index 7ad74e1286b6..25aa8feb73d1 100644
+> --- a/Makefile.obexd
+> +++ b/Makefile.obexd
+> @@ -1,7 +1,7 @@
+> =C2=A0# SPDX-License-Identifier: GPL-2.0
+> =C2=A0if OBEX
+> =C2=A0
+> -if SYSTEMD
+> +if SYSTEMD_USERUNITS
+> =C2=A0systemduserunit_DATA +=3D obexd/src/obex.service
+> =C2=A0
+> =C2=A0obexd-add-service-symlink:
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 561b03d0b95b..72dffe7cd005 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -74,7 +74,7 @@ pkglibexec_PROGRAMS +=3D tools/btmon-logger
+> =C2=A0tools_btmon_logger_SOURCES =3D tools/btmon-logger.c
+> =C2=A0tools_btmon_logger_LDADD =3D src/libshared-mainloop.la
+> =C2=A0
+> -if SYSTEMD
+> +if SYSTEMD_SYSTEMUNITS
+> =C2=A0systemdsystemunit_DATA +=3D tools/bluetooth-logger.service
+> =C2=A0endif
+> =C2=A0endif
+> @@ -340,7 +340,7 @@ tools_hex2hcd_SOURCES =3D tools/hex2hcd.c
+> tools/missing.h
+> =C2=A0
+> =C2=A0tools_mpris_proxy_SOURCES =3D tools/mpris-proxy.c
+> =C2=A0tools_mpris_proxy_LDADD =3D gdbus/libgdbus-internal.la $(GLIB_LIBS)
+> $(DBUS_LIBS)
+> -if SYSTEMD
+> +if SYSTEMD_USERUNITS
+> =C2=A0systemduserunit_DATA +=3D tools/mpris-proxy.service
+> =C2=A0endif
+> =C2=A0
+> diff --git a/configure.ac b/configure.ac
+> index 16b81aca37e6..2d9352b59557 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -352,29 +352,38 @@ AC_ARG_WITH([systemdsystemunitdir],
+> =C2=A0			AS_HELP_STRING([--with-
+> systemdsystemunitdir=3DDIR],
+> =C2=A0			[path to systemd system unit directory]),
+> =C2=A0					[path_systemunitdir=3D${withva
+> l}])
+> -if (test "${enable_systemd}" !=3D "no" && test -z
+> "${path_systemunitdir}"); then
+> +if (test "${enable_systemd}" !=3D "no" -o -z "${path_systemunitdir}");
+> then
+> =C2=A0	AC_MSG_CHECKING([systemd system unit dir])
+> -	path_systemunitdir=3D"`$PKG_CONFIG --
+> variable=3Dsystemdsystemunitdir systemd`"
+> =C2=A0	if (test -z "${path_systemunitdir}"); then
+> -		AC_MSG_ERROR([systemd system unit directory is
+> required])
+> +		path_systemunitdir=3D"`$PKG_CONFIG --
+> variable=3Dsystemdsystemunitdir systemd`"
+> +		if (test -z "${path_systemunitdir}"); then
+> +			AC_MSG_ERROR([systemd system unit directory
+> is required])
+> +		fi
+> =C2=A0	fi
+> =C2=A0	AC_MSG_RESULT([${path_systemunitdir}])
+> =C2=A0fi
+> =C2=A0AC_SUBST(SYSTEMD_SYSTEMUNITDIR, [${path_systemunitdir}])
+> +AM_CONDITIONAL(SYSTEMD_SYSTEMUNITS, test "${path_systemunitdir}" !=3D
+> "")
+> =C2=A0
+> =C2=A0AC_ARG_WITH([systemduserunitdir],
+> =C2=A0			AS_HELP_STRING([--with-
+> systemduserunitdir=3DDIR],
+> =C2=A0			[path to systemd user unit directory]),
+> =C2=A0					[path_userunitdir=3D${withval}
+> ])
+> -if (test "${enable_systemd}" !=3D "no" && test -z
+> "${path_userunitdir}"); then
+> +if (test "${enable_systemd}" !=3D "no" -o -z "${path_userunitdir}");
+> then
+> =C2=A0	AC_MSG_CHECKING([systemd user unit dir])
+> -	path_userunitdir=3D"`$PKG_CONFIG --variable=3Dsystemduserunitdir
+> systemd`"
+> =C2=A0	if (test -z "${path_userunitdir}"); then
+> -		AC_MSG_ERROR([systemd user unit directory is
+> required])
+> +		path_userunitdir=3D"`$PKG_CONFIG --
+> variable=3Dsystemduserunitdir systemd`"
+> +		if (test -z "${path_userunitdir}"); then
+> +			AC_MSG_ERROR([systemd user unit directory is
+> required])
+> +		fi
+> =C2=A0	fi
+> =C2=A0	AC_MSG_RESULT([${path_userunitdir}])
+> =C2=A0fi
+> =C2=A0AC_SUBST(SYSTEMD_USERUNITDIR, [${path_userunitdir}])
+> +AM_CONDITIONAL(SYSTEMD_USERUNITS, test "${path_userunitdir}" !=3D "")
+> +
+> +AM_CONDITIONAL(SYSTEMD_UNITS, (test "${path_systemunitdir}" !=3D "" ||
+> test "${path_userunitdir}" !=3D ""))
+> +
+> =C2=A0
+> =C2=A0AC_ARG_ENABLE(datafiles, AS_HELP_STRING([--disable-datafiles],
+> =C2=A0			[do not install configuration and data
+> files]),
