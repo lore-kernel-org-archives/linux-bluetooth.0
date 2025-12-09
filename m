@@ -1,132 +1,185 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C4E8F4A;
-	Tue,  9 Dec 2025 06:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8506DF76
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 07:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765260289; cv=none; b=bHOeuBGdcjT30vjp28QBbvRuu3BGJyrNKRgdE/VFmcyz2fs5+kLI1RYnBzpv2o05Pu04Hg07EkpLtPpyzMyhz6+Onmkb2mZzl/7IbY2EN6ICt+0aFYGwGRPFQykJNtbPFF17v3MY1RXWGQnk17RvW66OSlIJcoz1Rf5xd7jDfhU=
+	t=1765264651; cv=none; b=bsuxsXLKCn32GqYQKlIZIGL3dHU0STCNpsvT/RIeL8mUaKRXKrF0K6ul31h3PprJEnFETVgG26tUl6pieG7JIm95rDwON9DYFTQ9oiazDZXD/2oHkH1rneBwblIioDEj/9si8uHrs28AvfbtSarX3NLd3MozJRJkJ5UAI/9LnnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765260289; c=relaxed/simple;
-	bh=ea44/ga/xuLV8J5uLfVbwWdxM/jIGHFQEBqcJ/vGb6I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q+BE0r0AGMWnTD3QGpwg9klJL1Hj7mR7Kn/9DdpewH774YD1v5ULR+pdvgsF1HbzIXLfCilWzj+WTfmdkII4x1Bb0IWlsMj4mkF9QSVH7I4Wt+rUpk0Ly7yJtpqO86XmHEC69iXFqd7zHxF4LQzgXJAYxXGZeTZkYFZJ0FalDK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c3rlP9M2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765264651; c=relaxed/simple;
+	bh=n6G313WPiJejO+ZpvTBGsvbRiJHvypVyUn0r7HF48jg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=LPm/3+IkeXeeYsibqUAuav2f60nvA80t1eiocvAOLQjdwcExw//JUvCpixx3Ugy/Yzh6qZafOw2ZtXiibP/BmOkxPsFgUnDup3KvWwKWdnSKjuphyyZ1d9jS0zotpB1tLlsxzJYVarRqdDFF5HriGdsp6Hh6S5Tq4gzJEJ6MO1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RJanU7Kw; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c3rlP9M2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B51DC4CEF5;
-	Tue,  9 Dec 2025 06:04:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765260289;
-	bh=ea44/ga/xuLV8J5uLfVbwWdxM/jIGHFQEBqcJ/vGb6I=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=c3rlP9M2yRdnAnr7EeAKQpXPILv+GmroRMgli2f7aGLFrKqKN7DaGPkKhzdyV33Nt
-	 fSicNucXSRHyai9M/uWkUOOTnvB33t5bzrCbRcbXPQF/cR+UVuI8NcKiPxPRQANrl5
-	 qc58F5tAMdSBlOMsjYLH0mibpfTmu1EnEy3bUmM88jiCNsFv9xD3yp8Ma1VVSgB7s6
-	 mZ8FEoEH73EGJQH9Ybcsps/QqvsHrK9QfbS565Ym/EQr2dtEXYrIsZpNbaTpSlYllG
-	 7LWD4l9x1O2i7k757xb+k4UwF+Oo6xERulyXW41pZRloxsK0qMDRPnlxwinFExthHk
-	 X1s82VcCqd1Nw==
-Message-ID: <d40f32d9-b8fb-42c5-ad4e-5b04a7eaec38@kernel.org>
-Date: Tue, 9 Dec 2025 07:04:44 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RJanU7Kw"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7b80fed1505so5552059b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Dec 2025 23:17:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765264649; x=1765869449; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PjJGCdCeBeoefMULktLbEhsWf3L0qKXXM/mrlsCWH18=;
+        b=RJanU7KwATxWiKrRFRonLLbR1vtroEoY/a+6YPv+ADeH/4RAzd2VnLyCqspHhfjrGs
+         Fs5yDK8LEgvoQig30swj2GW7/LehRab99bBnwc01FVtVE7PrU1YPQjBBKmYKQxJkxVNU
+         6Ch4KQW7WDE36XK0GfOeqxrl47Iq2K/x0Cpnk9lsMUvZP6fuKJp0vGdR+UViHJbuomP+
+         G1d3XczpGuZji93vhjWxohT65koUtgmOvbbE2oYwRXuwOv6+n6Icw+VfQlleQ9OAc/zw
+         qsgcTo9mQRH2GtcusNcBqUhVZ9tNmSgISnwmh0hLOa7ggoPrvC8kfuPlpFeJT+PQLyvu
+         YFgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765264649; x=1765869449;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PjJGCdCeBeoefMULktLbEhsWf3L0qKXXM/mrlsCWH18=;
+        b=KjMzZPcAGm60OayI6c8L7jBt2cOU5Lcgd/05jK4Pc2STR4SJCYUxjZqM7OJwquvrT0
+         hC4nO+Wg9uU4fE6igHkMYxBDDFVaNBstXbXIsZvPDqMO/7RbcflrqtwJvQCzDY0K4UqY
+         50mG8UonHV4UwIhDUFM5LXsu96oMqKuC1jZT25NanxPHL0mrXUgZC/5oacaJnRm0aaXn
+         oV3YYhiWFZstVJbGSBdh2b4OgUs85IHhUQq4z/9Z5LAvWNOkxuGirzSdnUZoBKXpkdzR
+         EYmq8EnQavbzXp7mRLE7bq/mQmtsFxTh6Hw6VLtph9JFpcEgbySJazDC4zQ2REfeAX8j
+         Rbbw==
+X-Forwarded-Encrypted: i=1; AJvYcCVw6LyyFWP5O2f6geq39pKIh8Y4PtBrpKAiFobTJfyTjC9SVDyvX5gT8gymNimH/ni47W1kJ5ZaurikBriNNkM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrF/M8boPolMVHNLqH+bnNulf7WmCE5q2vKa+UrDHPdbcxDLJB
+	HcTPBrf8goQ7TTkYiMyGR0lz9nUOYdKTwypf/TLGbu2VHRsUL4sAsBqnQeTYtmBBkMo=
+X-Gm-Gg: ASbGncsq9KD2XsMdIxNkmFoB2uSXbDGpElwVbfjY2wyPw7hyO7ExOoLB7Kd/C5UmTbJ
+	LrwMlo8J4DVzCNQ+rTbXstsIrGRgKNmSNm4zLwilAdp8WD1T4jBz/+FojRKGQ72D0VaScnb6ZJp
+	1fia3ebdLCVRIyE4BiV6L35wRMnMJEpqw/dMNd58uSuj7gCDV1yU9Lbi+s7Ypu2L0QsIztetz09
+	lyYSG7KHfnB3IO9mtH1S73gBAjXCUkaVfZIYj5M89xUHmKt4ZKCBKJe+Ie3fax8ueSG3wcV9nOx
+	4X/pdsp1y/U4yOS+f6sgVYsL5hpF6MetJxWA8C2G2gdlEMQXL27UQqCXdU1x7SIs2+v4FCj5gAo
+	AuVt2qpJRo2IJJWhJKlzF47tMgY+3Lv5D9XQx2IwywQwns0L3BoOYfO7VHAmh6EcagLvhAtDJk/
+	pkwxjnelPloXHCjkd4UVV+ACNK7Ao=
+X-Google-Smtp-Source: AGHT+IHhpnodgm0X3Kb5hZSr10+4m7fcJqMPZJ3NYoPgYBczSRs6Bbm0JQF7xsfK35+Ujwut0MgMdA==
+X-Received: by 2002:a05:6a20:1611:b0:34f:c83b:b3ea with SMTP id adf61e73a8af0-36617e6c5f7mr10014926637.18.1765264648685;
+        Mon, 08 Dec 2025 23:17:28 -0800 (PST)
+Received: from lavm-prs74opxn5.. ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34a4a1fab4bsm766871a91.1.2025.12.08.23.17.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Dec 2025 23:17:28 -0800 (PST)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: luiz.dentz@gmail.com,
+	marcel@holtmann.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	pav@iki.fi,
+	baijiaju1990@gmail.com,
+	r33s3n6@gmail.com,
+	gality369@gmail.com,
+	zhenghaoran154@gmail.com,
+	Cen Zhang <zzzccc427@gmail.com>
+Subject: [PATCH] Bluetooth: btintel: serialize hw error recovery with req_lock
+Date: Tue,  9 Dec 2025 15:12:48 +0800
+Message-Id: <20251209071248.3575845-1-zzzccc427@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/10] dt-bindings: net: bluetooth: qualcomm: Fix WCN6855
- regulator names
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>, Bjorn Andersson
- <andersson@kernel.org>, Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
- <20251205-topic-wcn6855_pmu_dtbdings-v1-1-165611f687c8@oss.qualcomm.com>
- <20251208-soft-beaver-of-justice-ae6fc4@quoll>
- <10077527-0295-4d82-b60f-e566ef5ac076@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
- QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
- +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
- ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
- 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
- hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
- tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
- 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
- naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
- hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
- whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
- qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
- RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
- Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
- H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
- dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
- AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
- jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
- zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
- XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <10077527-0295-4d82-b60f-e566ef5ac076@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 08/12/2025 13:30, Konrad Dybcio wrote:
-> On 12/8/25 7:59 AM, Krzysztof Kozlowski wrote:
->> On Fri, Dec 05, 2025 at 01:47:20PM +0100, Konrad Dybcio wrote:
->>> From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
->>>
->>> Commit 5f4f954bba12 ("dt-bindings: bluetooth: bring the HW description
->>> closer to reality for wcn6855") changed the vddrfa1p7-supply to 1p8
->>> for whatever reason.
->>>
->>> The schematics footprint for this chip definitely says 7 on the input
->>> leg and the driver still expects 1p7. Bring it back.
->>>
->>> Fixes: 5f4f954bba12 ("dt-bindings: bluetooth: bring the HW description closer to reality for wcn6855")
->>> Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
->>> ---
->>
->> This will conflict with my series which (for whatever reason) are
->> waiting for 1.5 months now:
->> https://lore.kernel.org/all/20251029-dt-bindings-qcom-bluetooth-v2-9-dd8709501ea1@linaro.org/
->> (I wonder how many maintainers need to review them...)
->> ... but I can rebase, no big deal.
-> 
-> As explicitly mentioned, this is rebased atop that!
+btintel_hw_error() issues two __hci_cmd_sync() calls to reset the
+controller and fetch the Intel exception report. Unlike the shutdown
+path, this helper ran without hci_req_sync_lock(), so it could race
+against hci_dev_do_close() and both sides would manipulate
+hdev->req_status/req_rsp concurrently.When the close path freed the
+shared response buffer first, the still running hw_error path hit a
+slab-use-after-free inside kfree_skb() (skb_unref → atomic_read) and
+KASAN reported the crash in the trace.
 
-Cool! I missed that, thanks.
+Acquire hci_req_sync_lock() around the hw_error recovery sequence and
+make sure all error/cleanup paths release it. This serializes the Intel
+handler with every other synchronous command issuer and prevents the
+req_* bookkeeping from being double-touched.
 
-Best regards,
-Krzysztof
+Below is the data race report and the kasan report:
+
+BUG: data-race in __hci_cmd_sync_sk / btintel_shutdown_combined
+
+read of hdev->req_rsp at net/bluetooth/hci_sync.c:199 by task kworker/u17:1/83
+write/free of same SKB at drivers/bluetooth/btintel.c:3660 by task ioctl/22580
+
+Call Trace (reader):
+  __hci_cmd_sync_sk+0x12f2/0x1c30 net/bluetooth/hci_sync.c:200
+  __hci_cmd_sync+0x55/0x80 net/bluetooth/hci_sync.c:223
+  btintel_hw_error+0x114/0x670 drivers/bluetooth/btintel.c:254
+  hci_error_reset+0x348/0xa30 net/bluetooth/hci_core.c:1030
+  ...
+
+Call Trace (writer):
+  btintel_shutdown_combined+0xd0/0x360 drivers/bluetooth/btintel.c:3648
+  hci_dev_close_sync+0x9ae/0x2c10 net/bluetooth/hci_sync.c:5246
+  hci_dev_do_close+0x232/0x460 net/bluetooth/hci_core.c:526
+  ...
+
+BUG: KASAN: slab-use-after-free in sk_skb_reason_drop+0x43/0x380 net/core/skbuff.c:1202
+Read of size 4 at addr ffff888144a738dc by task kworker/u17:1/83
+
+Call Trace:
+  __hci_cmd_sync_sk+0x12f2/0x1c30 net/bluetooth/hci_sync.c:200
+  __hci_cmd_sync+0x55/0x80 net/bluetooth/hci_sync.c:223
+  btintel_hw_error+0x186/0x670 drivers/bluetooth/btintel.c:260
+  ...
+
+Allocated by task 84:
+  skb_clone+0x212/0x3a0 net/core/skbuff.c:2049
+  hci_event_packet+0x66c/0x2da0 net/bluetooth/hci_event.c:7614
+  ...
+
+Freed by task 22580:
+  btintel_shutdown_combined+0xd0/0x360 drivers/bluetooth/btintel.c:3648
+  hci_dev_close_sync+0x9ae/0x2c10 net/bluetooth/hci_sync.c:5246
+  hci_dev_do_close+0x232/0x460 net/bluetooth/hci_core.c:526
+  ...
+
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+---
+ drivers/bluetooth/btintel.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 9d29ab811..baa3ee510 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -251,10 +251,12 @@ void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ 
+ 	bt_dev_err(hdev, "Hardware error 0x%2.2x", code);
+ 
++	hci_req_sync_lock(hdev);
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		bt_dev_err(hdev, "Reset after hardware error failed (%ld)",
+ 			   PTR_ERR(skb));
++		hci_req_sync_unlock(hdev);
+ 		return;
+ 	}
+ 	kfree_skb(skb);
+@@ -263,18 +265,22 @@ void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ 	if (IS_ERR(skb)) {
+ 		bt_dev_err(hdev, "Retrieving Intel exception info failed (%ld)",
+ 			   PTR_ERR(skb));
++		hci_req_sync_unlock(hdev);
+ 		return;
+ 	}
+ 
+ 	if (skb->len != 13) {
+ 		bt_dev_err(hdev, "Exception info size mismatch");
+ 		kfree_skb(skb);
++		hci_req_sync_unlock(hdev);
+ 		return;
+ 	}
+ 
+ 	bt_dev_err(hdev, "Exception info %s", (char *)(skb->data + 1));
+ 
+ 	kfree_skb(skb);
++
++	hci_req_sync_unlock(hdev);
+ }
+ EXPORT_SYMBOL_GPL(btintel_hw_error);
+ 
+-- 
+2.34.1
+
