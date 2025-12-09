@@ -1,104 +1,127 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28258313272
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 21:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765314949; cv=pass; b=u5GwQWCJmW3qpndcAvXrRuhn0C8gdWGq6sqC633b9qf2g7ShBxOYmlTuLhrclZn8suMW3TyXsVa7hWs0PCOOjcxCvW2tgkosviaipFO8H3DzIYgq+NHAymLQBRF8x3rW3XZbBeRU/F0lPIkcaZ3edcNCF7eaxDxW9XxNFr5cQG4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765314949; c=relaxed/simple;
-	bh=aeog+6PLXNmGbhLNu7i7EGWyHvCrjz0EodWyA0y1TUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TyWeVmDJu0UN2bVKTfmHd8QvYtKW73lFg1WwHKr2aKUFiLK+q56T2EYf94as2BcH5J6LIXDvei+gqTy8FHttbl/Ve+M3pw+eWJMKncl3+DVPLvPIUe5RoAyp9eVbEh0c2n1bJkLy2NXLjchD9HwpP2HfneNY0hSoqzH89aIrAVQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=GA9kmueL; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08B931691A
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 21:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765315272; cv=none; b=t5oZ5aq/Jgp2ZseVz05YbVf8Rsv0/qZ+GnEa8TNnujStj73xsyjJRxOGrCXT0mM9RznD5dSramVsopE1KwdWXOcWpTo/59/OIO1es+adIA8AXmK7SMedScIS6lMnF4HMgY/qSJ0yPbUrVwSoFAyokY0wPXzc7r8Ly2Uik5y6XYU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765315272; c=relaxed/simple;
+	bh=3nMnSn+ApHzwxdNY2zNnaiZXNslMPvNbFJxmMjj0GWg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=D2aQLO/DkRck2k55vgPTTlnIEhnikJxY/Y02co8azvfVBKMhgZDmcMjcznnxa5NcRUk/wgpLnfsNusqftGEyolDBHOzIh9UbtT5R967DjW/81qaI7sCBRB7w2pKL4Q/YdsBdfiQg3QByPQZxZ8J57r8C/u5CZAbAe7iDmgZnVNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hdqJPu23; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="GA9kmueL"
-Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a03d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dQs8J1DQwzyTs;
-	Tue,  9 Dec 2025 23:15:44 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1765314944;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+LnqALAKocDHdaUaCb8sMgnvU6pb7SZqtIOeHda+FgY=;
-	b=GA9kmueL9j0M4SPE0J2AU5wWtx58fPMh7/1CZLyRkjm2C7cvwkCu1TW3SmvofxDgqJwqQz
-	CMsDsHI4XoQtyh3B9CpvUeqxM+yWDBHy6P5CH3jyL5tN+Gpsb9nr3AaHvRfHuYO2uzNNDJ
-	X/JPpxQxKWf2bnAsbFC8q1CKwd6cg5M=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765314944;
-	b=G04IppXSrnQPfF39KWXYM2AUoq8hO6x9We+f6BWqI5Pg17qGl93zqaRHkYb8LGyae+Exqn
-	93AGPkFpdIV51t4fVrDp5AM7bZ5lGTx2De2FCKksCZfU20FmsANMa+Zfnm5DmJjqk6XX7p
-	H6LGhhbYiqrU0kdcHbskN1R+kbppido=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1765314944;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+LnqALAKocDHdaUaCb8sMgnvU6pb7SZqtIOeHda+FgY=;
-	b=B/VVkkKvvp3h3N/1sE0lhA63+MabjUNtSgaOxqbR9xsrzI5pjkge6eLs/379ISfKDXX5cj
-	J//JRZ0r7Z9sU3LTvc1kuScT+cy+srSIOd7qyOa5n+Dei7yVWT3fRk5gwtIwC8KpQUjPjE
-	PptyoBgqvrA2KwF7DxJVLyIlsoOQFM8=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 6/6] shared/gatt-client: fix notify_data leak in notify_data_write_ccc
-Date: Tue,  9 Dec 2025 23:15:23 +0200
-Message-ID: <4e23d70301077f50d37e71502c4a27f9ae8f31fd.1765314903.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <cover.1765314903.git.pav@iki.fi>
-References: <cover.1765314903.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hdqJPu23"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8b2ed01b95dso529761485a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Dec 2025 13:21:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765315268; x=1765920068; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fnrev+jYDN9XQT2aPSCXbIcAmPytXDixND09kS6hbEM=;
+        b=hdqJPu23pNQLBKBCqiBLUJkjqDrBIJK5CesLZdprgAqs6PnIJ1EyxoSmTbkMwvPuJQ
+         llSQmbBtzYQfua/hcGJlD/QI7WMqXfXbEalmf9x3Lwv5f2O9vE/WVqN4HNdB0ZXfEQEI
+         ODyG9wZ/+1jWmXxCL1Js/hIVBgC2SDNlp+/KMYOwCDDcWw30P4OmCldI6t4qTmPBZHg5
+         E3dph4EoiIrtT8kdsbGyQt9iNn4+DyxXCFhDl325LYvsu0TiBjlK+UAI0jtYRm3aXXrW
+         UFT8G3AHnR3rXxG6dQ9WVRavRhdOYU1vZLDhM9Drr4q1l/8IrPJDUTZVNQATdChgPYfx
+         AX7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765315268; x=1765920068;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fnrev+jYDN9XQT2aPSCXbIcAmPytXDixND09kS6hbEM=;
+        b=I/Evw2fa1zIuOVTb82uYBDogTiuRQrGYfvInaANpfO/HT9u/bjCHZZ3p7Ht814cTHP
+         bBNFd7v7qPQQYmXIg8n/tMt5s1Mu1kRQVbVDMYbYGRfFqHVG6Zpi/FCqRToXF77laLkL
+         w5SOv4Dap67b10w8CB3gKapwQIwmclLU52owDfLNBbg22a5GrlIgi47v+KIaTBALQhxv
+         Taj8iCddF2x2yZ6iYmdUmjw94tkULZqmurNG0bp555zLD/Y14t0peslhF03dY5nXW/53
+         Gdh4hwE1rJ80+WI4RsPdfgVU7oCTrt5BkNq8q78c6jnB/HrnM+ASK6/R4UFeGmILqLp6
+         +0XQ==
+X-Gm-Message-State: AOJu0Ywn5XqwoMm2izDPPCH3dFTEiOl3ebDjglMvjHbur0Hj2hHDAffl
+	cI2Lyz07aw/IBHEtyBFnnkGyL3MFOSHQIsjwLzmpA+vtHmLTQ41bDd+dK8Bjxg==
+X-Gm-Gg: ASbGncs+7vqZ8kgrUxra+b06/UxTzYDB5Wphrn9l4NeuyNKN7uzmcwQnnxgbuBIWVWg
+	CRwr/gz4M5pL6RGKHc0kuXJViu2+O2PYGuSiHXQ8EqycCh6DD8zpg2/s+dknwTCtm2M2CU0EVgU
+	QE77Hj2UNXUEJCjFWhfNJyBouDfBoSeuU4q78nxnFYFtmpNXSvaFLxAhPHDwPUKH+KBCMHwXlOv
+	B5UFZpcoCKalKxbNkkATD8EB22vESPbzGKTC2i/O/vuQJAFHaMPE+wLfSCcPPTMpgjg9tUB+vCL
+	BhYK7exn/y2/V0D9uBCB+BiabKiNbUAUJUKs6H8qNaQ9kecBDWSmJJcXIgMEojtkLdlsgeo5U7q
+	EP9OPr0dtyUQEpDWuEStBujmKV9trQa8DoVEycs1NnOKvTkhb8U0u8978YHP5zxEJ7nJuM6+p3z
+	EDKzSGBi6w8TxRp48=
+X-Google-Smtp-Source: AGHT+IG51Ego+2zfKq3sZIGUJUVojzJtQJwVN/d5ktShVUQM59kEArc0G7UGPS+sfbxS02w7vYJC9g==
+X-Received: by 2002:a05:620a:2548:b0:8b2:d6eb:8203 with SMTP id af79cd13be357-8ba3a666ddcmr71555585a.69.1765315267867;
+        Tue, 09 Dec 2025 13:21:07 -0800 (PST)
+Received: from [172.17.0.2] ([20.161.60.96])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b6252b4328sm1363019185a.14.2025.12.09.13.21.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Dec 2025 13:21:07 -0800 (PST)
+Message-ID: <693892c3.050a0220.49578.7f0c@mx.google.com>
+Date: Tue, 09 Dec 2025 13:21:07 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0232008835996001074=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ] unit: reduce macro expansion volume
+In-Reply-To: <8da87c1000bbbb062d302b74518351a8ba65075f.1765310255.git.pav@iki.fi>
+References: <8da87c1000bbbb062d302b74518351a8ba65075f.1765310255.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Calling bt_gatt_client_unregister_notify() when ATT has disconnected
-leaks the reference to notify_data: in notify_data_write_ccc() the
-bt_gatt_client_write_value() fails, the destroy is never called, and
-notify_data_ref() is leaked.
+--===============0232008835996001074==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fix by balancing unref notify_data on write failure.
+This is automated email and please do not reply to this email!
 
-Log (unit/test-mcp):
-Direct leak of 5760 byte(s) in 90 object(s) allocated from:
-    #0 0x7fd7e2ce6f2b in malloc
-    #1 0x0000004227e5 in util_malloc src/shared/util.c:46
-    #2 0x00000044a81c in register_notify src/shared/gatt-client.c:1782
-    #3 0x000000458367 in bt_gatt_client_register_notify src/shared/gatt-client.c:3685
-    #4 0x00000049f9f5 in foreach_mcs_char src/shared/mcp.c:1834
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1031813
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.26 seconds
+BuildEll                      PASS      19.94 seconds
+BluezMake                     PASS      635.97 seconds
+MakeCheck                     PASS      22.07 seconds
+MakeDistcheck                 PASS      237.44 seconds
+CheckValgrind                 PASS      297.68 seconds
+CheckSmatch                   PASS      345.96 seconds
+bluezmakeextell               PASS      181.79 seconds
+IncrementalBuild              PENDING   0.25 seconds
+ScanBuild                     PASS      1021.97 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- src/shared/gatt-client.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index f6d5dc4b7..f8ebab3fa 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1691,6 +1691,9 @@ static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
- 						callback,
- 						notify_data_ref(notify_data),
- 						notify_data_unref);
-+	if (!att_id)
-+		notify_data_unref(notify_data);
-+
- 	notify_data->chrc->ccc_write_id = notify_data->att_id = att_id;
- 
- 	return !!att_id;
--- 
-2.51.1
 
+--===============0232008835996001074==--
