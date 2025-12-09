@@ -1,228 +1,183 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EFD2C21DB;
-	Tue,  9 Dec 2025 00:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343CC1FF5E3
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 03:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765239483; cv=none; b=U2PI+GuPOvn0esx5e2ppFgRu8SSQyRK0SGxhTZ+sTBYn/Zeq8FhPNbokQn1UlpFa8aKTQgDgp7j4N6elNgU1bmaOeLkWUChXeMHFcpvsdke1BvnN4prasa0MFGYg65h0tDIhgIkABHfPDCVedoVl5DPqjqSPP6CHb/hA7Purbqg=
+	t=1765249470; cv=none; b=NYgBXtbHdQmVFkl7KWKmpn8MPEz5zjY5wzZZHqT7fSG1gH1k9iQzDXBBpxMKVUUAz4HbObTdflg21uAzp3A5Br90XqxF7XulLI4IdNy++dk1JNSOnV1EXGpptCGVBaKnuHKnVsfh1onhwQfJH9QmWn1GSlm1qfoJpPSIgVbL+KE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765239483; c=relaxed/simple;
-	bh=uR8napX9KZeuBCSbLJOTeRpPBJvBLislxq4J0wu0pW4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MTDnfrtcoz10hlGJA5+LDc6zayY3JptHDNzZTZi2oCFqoyKNiO7weCazxeNqin4R9k6A3AdbzpNhPsMPldkmr3I09VZWwI49c0eQ0lTtSuAmezJpvDLLJNWv7PZ3Wxftl+HMRSD52+uVBaks+/EgXl/qWSLHFvRSnwLEuJCZgMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FpTjKh0/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765249470; c=relaxed/simple;
+	bh=zuBrqI+k3375lYwxSM0TM6yyCytWdN8NMXde9m2lkOI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=l+qFTA6hTL7WpsezJbTLA1tqGDVvXSjsW23l+G/RjOhja77wozW/vn5wWGfnsUS4uvIPye1JenWl+HjrMjaIY0azd555Q90Em+Sw2cjAPmjYSMieIH8qp6S1QF1HdyGZXOKYJaVjpO8THREdwOHig0BpHnpuMXeydp9CreKgaos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/2V/7tH; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FpTjKh0/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90629C113D0;
-	Tue,  9 Dec 2025 00:18:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765239482;
-	bh=uR8napX9KZeuBCSbLJOTeRpPBJvBLislxq4J0wu0pW4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FpTjKh0/B9B54puuEzd+AjW4ErzJ/ag7fcEaMf9LS4WbM3AxqjaCIf+pd204EnaeY
-	 wLxHzadhDHgc/Ga1R1gNeVvXmBZwV4icGeg1wjJuV2kjvaq8AJQxc+syL1BOVKyJua
-	 c/KgEUl/Az9nJ00HRHA4IAB6mRImVDdFbltQsVx1b3OKJJKwHZLMp0RjjbX1lSk9CM
-	 UD7ktfxEyjmzRbMyqAGF9hfjh8P3f6434C4U+DOpgfVU44IwiUXFHn2py52g1ejdHB
-	 lHc0iDYY9D7z/X6OLiyonzDlMuudR1i4ayaOQlqUIYDwzGs36Dd+FeclGMD8FCK7y2
-	 v4YonkqPCHtNg==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Chingbin Li <liqb365@163.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.6] Bluetooth: btusb: Add new VID/PID 2b89/6275 for RTL8761BUV
-Date: Mon,  8 Dec 2025 19:15:28 -0500
-Message-ID: <20251209001610.611575-36-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251209001610.611575-1-sashal@kernel.org>
-References: <20251209001610.611575-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/2V/7tH"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7b8e49d8b35so6344480b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Dec 2025 19:04:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765249468; x=1765854268; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jwe69yxioHlY4ZbFKre52tYc0WMZ/6kY9gk8OVirfXo=;
+        b=U/2V/7tHhAquhiWwteoAIrV6wHfwIOlHi6AlQn08aiBWjiSZt7CkElH6aPczW/Kc66
+         SapJ7BL9AemEPk8InXos5Dx+QiQ2lg+Zw8+wuhlLDo80Q7bLPQOWZnRtbnLrOeHqFKjk
+         BhyNByZ6ZjmHvVYuRw0gRthiCwm0Y63Hm/y3kRsJUDN+DKrSOOSBpx+HFuTG2CVnrDy/
+         dXM4tP6lCxRawh3Lq7UpgHCEvOBvFTwLddD71alugN9ypgLoxNB5bKmTGx6U5Qf2FByU
+         o6wVOHj8GGBkIvcYDM7JzAT5HHgAyABRUrIeegUkyuCb9zom8jhSOPzNigqd+gurkL0D
+         ZleA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765249468; x=1765854268;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jwe69yxioHlY4ZbFKre52tYc0WMZ/6kY9gk8OVirfXo=;
+        b=EXAPU4gSAwMV//wwTT9bBJ5W3x1TXp8b5ynDkj0QqQSdMrtIQBgFsaR8wCPmFJUG2N
+         Y4gLjWhv1IeyBym9hI5vzONPMvRbiyAVsZ3PS3//y/P7SN42VddXMZQsNZLLhuFPaPf5
+         ZZty9+68WqYuPgeDQJkdpnXOZmuZQyGy6Tse97cUo2uTCbBLbtBI85hHj4rUsojWXQkS
+         LxE2uXZRwrK9r5pNYXgxFLO859gltaDK1ZKlfziDI5aQ36Jl/u/5gJYoK9mRQcH1NFbX
+         aBc4mB0TBVfiyh93qjKXrjrlXwYZgcovqntivnJ0gZKue2p/2OXhgkFXNE/DkHEZaS6M
+         ZV6A==
+X-Forwarded-Encrypted: i=1; AJvYcCW/AjwalRyS9geXNUKGC7G4kmTwb5hIXwXXegU+Kzga4Km3ZsXNCdkV/BnLtxBg71P+tQH7TiUlTT8ho4me8Nk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOK/Fc0msBoDKjwXSt8V1SMCBIYU6+Df4fiUFJXPL35aYHaXnx
+	d+VoM3yeXnaIJTWtOnYU3Wue3XCRx5TSBpr/EfgesZoqGigUkV53laRB
+X-Gm-Gg: ASbGnctvvJvZLCkQrbwZXy0zIsrhl6nkUhJx1Rswc/uavWU6k//thi1Tg/79wg4YCxA
+	vSxiH32s2hswgeOrtYd2IFZtlDLnETuf1OgU5IJTnnraSK6OSARgTzZPG/xIixDYa7ycwSeNfMc
+	P0/nEHV3QLxyIlAcnw8hdtaAPzMMZvGq3gsD7CfT6qshaROHmNAM8XUBd484ejCNZZt2jmcPcHx
+	7lcaXp/A60IPSWh3Byb1oWimBbjbaMt2DKdRUoEhuPI+szh12SX09YqFzQOnhGUgdPv0JNnaWio
+	Vzuct2JF6jkA5TIjdmfhoFpXwqYXdaJapouxRTbRNEvvV3Cil/adYy/77IwH0on3OTPnj+c5Idd
+	1VFFa7ynMGI1e2zYpB9SejMqpxim/f76D7tAs8Zl2Wnkb0tA2kqaxwBsUzmOI411JYBHXvPnMz2
+	Ieq17sMDzYqgG8Rnjt
+X-Google-Smtp-Source: AGHT+IF0AYr51+oXX9VH+qtdgIAirX3IdK6su9cVXslzsV/sUvHzb9PNFfFOPDZ9KSIm3lZkEYNiEw==
+X-Received: by 2002:a05:6a00:228e:b0:7ab:21ca:a3be with SMTP id d2e1a72fcca58-7e8c04fd601mr9300446b3a.12.1765249468360;
+        Mon, 08 Dec 2025 19:04:28 -0800 (PST)
+Received: from lavm-prs74opxn5.. ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7e2af843307sm14415879b3a.61.2025.12.08.19.04.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Dec 2025 19:04:28 -0800 (PST)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: luiz.dentz@gmail.com,
+	johan.hedberg@gmail.com,
+	marcel@holtmann.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	pav@iki.fi,
+	baijiaju1990@gmail.com,
+	r33s3n6@gmail.com,
+	gality369@gmail.com,
+	zhenghaoran154@gmail.com,
+	Cen Zhang <zzzccc427@gmail.com>
+Subject: [RFC PATCH v2] Bluetooth: sco: Serialize state check in sco_sock_connect to fix UAF
+Date: Tue,  9 Dec 2025 10:59:45 +0800
+Message-Id: <20251209025945.3555605-1-zzzccc427@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.18
 Content-Transfer-Encoding: 8bit
 
-From: Chingbin Li <liqb365@163.com>
+Concurrent sco_sock_connect() calls could race on the same socket since the
+state checks (BT_OPEN/BT_BOUND) were done without holding the socket lock.
+This allowed two parallel connects to proceed and end up binding two
+separate sco_conn objects to the same sk. Later, when sk->conn had been
+updated to point to the second conn, closing the socket could free the
+second conn and the socket, while the first conn's connect confirm path
+still referenced the stale sk/conn, triggering a KASAN use-after-free.
 
-[ Upstream commit 8dbbb5423c0802ec21266765de80fd491868fab1 ]
+Fix by taking lock_sock(sk) before checking sk->sk_state and sk->sk_type,
+performing the destination address assignment under the lock, and releasing
+it before invoking sco_connect() (which will acquire the lock as needed).
+This serializes concurrent connect attempts for the same sk and prevents the
+interleaving that caused the double-attachment and subsequent UAF.
 
-Add VID 2b89 & PID 6275 for Realtek RTL8761BUV USB Bluetooth chip.
+Thread 1:               Thread 2:               Thread3:
+check sk_state          check sk_state
+sco_sock_connect(sk)    sco_sock_connect(sk)    sco_connect_cfm(sk->conn)
+conn1->sk = sk
+                        conn2->sk = sk
+sk->conn = conn1
+                        sk->conn = conn2
+                        sco_sock_release
+                        free conn2 and sk
+                                                sco_connect_cfm
+                                                sco_conn_del
+                                                sco_conn_free
+                                                UAF on sk
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
+The representative KASAN report excerpt:
 
-T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  6 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=2b89 ProdID=6275 Rev= 2.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00E04C239987
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-
-Signed-off-by: Chingbin Li <liqb365@163.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-## Commit Analysis: Bluetooth: btusb: Add new VID/PID 2b89/6275 for
-RTL8761BUV
-
-### 1. COMMIT MESSAGE ANALYSIS
-
-- **Subject:** Adding a USB VID (0x2b89) / PID (0x6275) for a Realtek
-  RTL8761BUV Bluetooth chip
-- **No "Fixes:" tag** - This is not fixing a code bug
-- **No "Cc: stable@vger.kernel.org"** - Not explicitly tagged for stable
-- **Evidence of real hardware:** The commit includes detailed USB device
-  information from `/sys/kernel/debug/usb/devices`, showing the
-  contributor has physical access to the device
-
-### 2. CODE CHANGE ANALYSIS
-
-The change is minimal - just 2 lines added to
-`drivers/bluetooth/btusb.c`:
-
-```c
-{ USB_DEVICE(0x2b89, 0x6275), .driver_info = BTUSB_REALTEK |
-                                             BTUSB_WIDEBAND_SPEECH },
-```
-
-This entry:
-- Is added to the `quirks_table[]` array in the "Additional Realtek
-  8761BUV Bluetooth devices" section
-- Uses the exact same pattern and flags as other RTL8761BUV entries
-- The same vendor ID (0x2b89) already exists with a different product ID
-  (0x8761)
-
-### 3. CLASSIFICATION
-
-This is a **NEW DEVICE ID** addition - one of the explicitly allowed
-exceptions for stable trees:
-- Adds a USB ID to an existing, mature driver (btusb)
-- The btusb driver already fully supports RTL8761BUV chips
-- Only the device ID is new, not any driver functionality
-
-### 4. SCOPE AND RISK ASSESSMENT
-
-| Factor | Assessment |
-|--------|------------|
-| Lines changed | 2 |
-| Files touched | 1 |
-| Complexity | Trivial - mechanical ID table addition |
-| Risk of regression | Essentially zero |
-| Pattern precedent | Exact same pattern used by dozens of other entries
-|
-
-The risk is **extremely low** because:
-- The new entry cannot affect any existing devices
-- It only matches the specific VID/PID combination
-- All the handling code (BTUSB_REALTEK, BTUSB_WIDEBAND_SPEECH) is
-  already tested with similar hardware
-
-### 5. USER IMPACT
-
-- **Affected users:** Anyone with a Bluetooth USB adapter using VID
-  0x2b89 and PID 0x6275
-- **Without the patch:** The device is not recognized, Bluetooth does
-  not work at all
-- **With the patch:** Full Bluetooth functionality via the mature btusb
-  driver
-
-This is a complete enablement fix for affected hardware.
-
-### 6. STABILITY INDICATORS
-
-- Signed-off-by from the Bluetooth subsystem maintainer (Luiz Augusto
-  von Dentz)
-- Follows established patterns exactly
-- USB device info in commit shows real-world testing on actual hardware
-
-### 7. DEPENDENCY CHECK
-
-- **No dependencies** on other commits
-- The required flags (BTUSB_REALTEK, BTUSB_WIDEBAND_SPEECH) have existed
-  for years
-- Will apply cleanly to all stable trees with btusb support
+  BUG: KASAN: slab-use-after-free in sco_conn_free net/bluetooth/sco.c:94
+  ...
+  Write of size 8 at addr ffff88810d2be350 by task kworker/u25:1/88
+  ...
+  Call Trace:
+  sco_conn_free net/bluetooth/sco.c:94 [inline]
+  kref_put include/linux/kref.h:65 [inline]
+  sco_conn_put+0x49d/0xfc0 net/bluetooth/sco.c:115
+  sco_conn_del+0x46d/0x8d0 net/bluetooth/sco.c:280
+  sco_connect_cfm+0x83d/0x1ee0 net/bluetooth/sco.c:1468
+  hci_connect_cfm include/net/bluetooth/hci_core.h:2082 [inline]
+  ...
+  Allocated by task 294:
+  ...
+  sco_sock_create+0x22d/0xc00 net/bluetooth/sco.c:616
+  ...
+  Freed by task 295:
+  __sk_destruct+0x4b0/0x630 net/core/sock.c:2373
+  sock_put include/net/sock.h:1962 [inline]
+  sco_sock_kill+0x64d/0x9b0 net/bluetooth/sco.c:526
+  sco_sock_release+0x770/0xa50 net/bluetooth/sco.c:1359
+  ...
 
 ---
+v2: Try to resolve the issue of incorrect lock usage.
+---
 
-## Summary
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+---
+ net/bluetooth/sco.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-This commit is a textbook example of a stable-appropriate device ID
-addition:
-
-**Pros:**
-- Trivial 2-line change adding a USB VID/PID
-- Zero risk of regression - only affects the specific new device
-- Enables real hardware for users who otherwise have no Bluetooth
-- Follows exact pattern used by many other stable-backported device ID
-  additions
-- Already merged by subsystem maintainer
-
-**Cons:**
-- No explicit stable tag (but not required for device ID additions)
-- No Fixes: tag (appropriate - this isn't fixing broken code)
-
-**Risk vs Benefit:** Near-zero risk with clear benefit for hardware
-owners.
-
-Per the stable kernel rules, device ID additions to existing drivers are
-explicitly appropriate for backporting. They are small, obviously
-correct, fix a real user problem (hardware not working), and cannot
-introduce regressions.
-
-**YES**
-
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9b199da1c0d67..cc03c8c38b16f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -785,6 +785,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x2b89, 0x8761), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x2b89, 0x6275), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 87ba90336..cf590219e 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -298,7 +298,7 @@ static int sco_chan_add(struct sco_conn *conn, struct sock *sk,
+ 	int err = 0;
  
- 	/* Additional Realtek 8821AE Bluetooth devices */
- 	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
+ 	sco_conn_lock(conn);
+-	if (conn->sk)
++	if (conn->sk || sco_pi(sk)->conn)
+ 		err = -EBUSY;
+ 	else
+ 		__sco_chan_add(conn, sk, parent);
+@@ -356,6 +356,7 @@ static int sco_connect(struct sock *sk)
+ 	err = sco_chan_add(conn, sk, NULL);
+ 	if (err) {
+ 		release_sock(sk);
++		hci_conn_drop(hcon);
+ 		goto unlock;
+ 	}
+ 
+@@ -651,8 +652,12 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr_unsized *addr,
+ 	    addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
+ 
+-	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND)
++	lock_sock(sk);
++	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) {
++		release_sock(sk);
+ 		return -EBADFD;
++	}
++	release_sock(sk);
+ 
+ 	if (sk->sk_type != SOCK_SEQPACKET)
+ 		err = -EINVAL;
 -- 
-2.51.0
+2.34.1
 
