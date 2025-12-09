@@ -1,216 +1,160 @@
-Received: from mail-oa1-f79.google.com (mail-oa1-f79.google.com [209.85.160.79])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA9E1F12F8
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 14:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905CE27A442
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 14:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765290506; cv=none; b=k+7U6iwQPiT+qGYVgz4reB39ph12fqo5t6u9rOIhKmbryq7gz/e4/pDgJkFW1uldUFlWPYeNQt9VqHFi9kkUuXLdrNK49IYM6Qg3K4EDJR0/rXRO7lU1oppi7yC3TiXRa0UCgU3uOaR/3OYQa/uw07vnx2x7iP5QBeXl2NOJG+k=
+	t=1765291244; cv=none; b=JKXQ/+9wf9MrWX77GEpyLz9t+0hRhKw9S4wAh8mkujh8vZEDzBBN5hmpuXmjOwQOMt6rek0829wZnV+fny6dZ4U+PqmDQhdS1k6BZ1JSBZU71NdKEOhb9npriwfAZvFIVQOv4EtXsB3x69oSiCIR9BLiG/IvrnLjVfANjooJQQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765290506; c=relaxed/simple;
-	bh=tF3x4xAXyXHdl+BhowAO/iO9liTtenk76VatcWGRhgM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Y1rMw2F5RBUSkZFE16TdDcEWDjHkn/1j5saHzkRy0d/GYkyjVDT6hGrWtuJ+jhNT7UTi0FAfmULSs/I/Ct6IIcTCA1l6CeXuPubkiUWjM7CckFx+rp6ciohEP8NE430U8s/zFa0vOf4fUXJaoRVBCDg9vbw1itKgPPgue78ncIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f79.google.com with SMTP id 586e51a60fabf-3ec31d72794so12216836fac.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Dec 2025 06:28:24 -0800 (PST)
+	s=arc-20240116; t=1765291244; c=relaxed/simple;
+	bh=lmzluPEWTzMCFZ1lAa3jWY69oGm3nCtMSYE6q9qlU8U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=cUfCwJnFoTLUxwf0JsZ4a7Pu2tdPhmvbo/mWNazkVegn58UhRhwWF6unKOiTlNQw2XFveMqxBb4b0BSzDFNQyfjiYu6yod8F1Vv2MQ5PB3zvgvPqm/Q59Esgzd2YbtFKYf4JFweCz8Af6TOp5DCdnF8mBukG6VM+EU99+HlGSpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QSz2jn5k; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QSz2jn5k"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8824ce98111so82822516d6.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Dec 2025 06:40:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765291241; x=1765896041; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1wNNLndkSw93gCKDVHlzevz9i188Z5mCYDX23st3HJ8=;
+        b=QSz2jn5kYVbyvE5ejpvujohxx154ObN5PCSL84UEI4WF/zm1QXXHBemlAAX+qOwp+s
+         1HcTcxru3sAa1JG1Q1k6RL9VhJdaTt6+tXLCpva4bBRsxwYQhNFv8yd7R3XNgG1ZzdKH
+         RzIwPsCe7obQnoaHd3QHJcJRhIY/9Gmjc+fg4JapEGEMYebBp6gWkQjaVEvvB/IYE6z1
+         p23R9HozSOuREYm3tDDd5v79VI6GgAjY26r5taKzhhXBFMHvglm1wHzUDAUoQslKETbd
+         sGmGl2RmZTyX5RPF6LWVHTWK3CJt3VqsEJ8oFRBG/0s1HDtxZLflm9vh53T4/9OBSn7S
+         O2JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765290503; x=1765895303;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=J0NTnosFMSh+SEq7ngC2o7cW/jV3+R33W89520u9yeA=;
-        b=bI6CWC52gzwpsV7zNPhIQInfz3GGG1QLN0NyMXu5P7URct7eZJEjap88rpiSHlERQC
-         N+NVdR8CtHCv258N6g55AW1Ztics0eP/q69Sit0pFh1tDQgHDfDB0rNGBGNgGGznXWug
-         19n5XVwsR0pQdD8wrxrghu55RWPyw2p8yJcM2HBntrQsANJEhmWgWceZXS2KA7cuUIIl
-         8lqkfeuoT6lh8nSLF2W3R7Z/PotpezMFyLtelZe1nRCD0HWts9dlJd3J90KKRfW6sChU
-         KGH3aRvbYKOPZMTRS3KoI6/1510FFaf2BpM4p8IxTHPbZl+tqpk45Jjm1aky5WE9gRzL
-         R4Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCVUvT+2koHz8g3Wjj1CVm1KRIoQROsJxt0wh0aN38y6FgUkonca6pGOStI+wcdHt8GwHlPSVgc1dGSb0bU29T4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi9VHs9MBvQjDY20ydT1s2ZXyv7aPk4+P93lHZa17k+7h5wm6/
-	rgRkRQOao6fCUhTtmLUcw8NSczsDPdQsi8Do7gsiAmkByGUcZ8lAPisM7qtxnBumJoEZYxZ9OIF
-	B4oioBMk39OPo2h2l4o+hDe/H61iPLAcuMzJYuP3xbxumi26FrlpsBm/h1co=
-X-Google-Smtp-Source: AGHT+IFsMcY8TrEVYELtpsDVknVu0JMqZUrNmOL68Ka8+iIm5wP2y+0iND7QsJL/qcXBcoJIn1dkzRwbmz3HHw8lvjZ1bYh9Wpf1
+        d=1e100.net; s=20230601; t=1765291241; x=1765896041;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1wNNLndkSw93gCKDVHlzevz9i188Z5mCYDX23st3HJ8=;
+        b=MYgJoTzRtBQ8LcZGdnGqJcMoEZeumONroPIvL+f8RA3YEfXl3zVtF8rDQBftQCcqux
+         U1tThz1uvWi8phoNbf/gnzfHgYjIey9FvSB3wKjSoSyHW8mC8sRtg5mBYuri4BvDJx11
+         1IpanKsZFDn1EFQSwP6CFa3TIQJMHkWSncZ61up0hJIUcpPJB4YfE3ahr2NRddT90LRz
+         JVe8To7yUMitXmEhp8yh0tEdhjC2hVPnAYJRNTf0sAfNUZcICFsJ5NYfHUl3MCMSn/u4
+         ekeorFHPmkIYcE8Kkwguxaglynu1Zz//EBy6z32TI4GYX6VUNPujxO7Yxsv1khz6Jl83
+         SAxQ==
+X-Gm-Message-State: AOJu0YyyoPIjux4qorZEBHfhk2RSpATym1PqqxTv9KqIHj817D2yTIgW
+	RSw3tqDgEtvUZh19f4bAYTGabd0WIOJc0qdD3mjIucV78efjVkG01NcNIlT/Nw==
+X-Gm-Gg: AY/fxX7lXKhdETK0KnOakGXiHxoFQJfJ4q8z3X7ksFsY9+FY48wQJhnBbdvkdE82Y0y
+	iIEt+DCu2yKEpjtCaIAbq8gvErfdJ9lnR9GU6U/YkVcteXQA6yGb+tXXpBrFT96N7k6RGo0MvxR
+	zKsvS9c6tr1sZ+d9ua3KDCWsE7CZX281tFCyi793NUB/X7g8UEbUG8uqkZGYwi/iZEdTYzO7NIP
+	9NsyQc4YyBcOs41D9hXtiBAW1yH+wkcgJ59L/Kv0uySGeEvFZ0SKzYPPlA0IPNImqn0DTRtq88K
+	oxxZl0HLymzaEi4IXgQbVUEYoDHmMisYD0vnDJlpl8CjVwlHduB+1Bkp+ZB/S3zM8kw/selQo0k
+	89/CcsWSbAGU6JhFX+osy3boUGZziSvDpcpJhixA8qSP7CnccmG1BY8h/6NBFdKOJ47ZgGQ4MoH
+	A7ZnPiD+ErQLim6aw=
+X-Google-Smtp-Source: AGHT+IGAdkaoGCvpBwMS2MIOTYi2cmsa+/Lk+jm16Y/MQ7/LEl8SdoY/mWX64ewZ6FsKYo5UwidaJA==
+X-Received: by 2002:a05:6214:c4f:b0:880:4790:e61b with SMTP id 6a1803df08f44-8883db618f9mr191879566d6.26.1765291241066;
+        Tue, 09 Dec 2025 06:40:41 -0800 (PST)
+Received: from [172.17.0.2] ([20.109.39.57])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b627a88115sm1308166185a.41.2025.12.09.06.40.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Dec 2025 06:40:40 -0800 (PST)
+Message-ID: <693834e8.370a0220.668a3.4fb4@mx.google.com>
+Date: Tue, 09 Dec 2025 06:40:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6681518953776817187=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:c20d:0:b0:659:9a49:8e27 with SMTP id
- 006d021491bc7-65b2353b59fmr532154eaf.25.1765290503432; Tue, 09 Dec 2025
- 06:28:23 -0800 (PST)
-Date: Tue, 09 Dec 2025 06:28:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69383207.050a0220.1ff09b.0008.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: null-ptr-deref Write in
- l2cap_sock_suspend_cb (3)
-From: syzbot <syzbot+b47462dd9d3cf7eb9729@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com
+Subject: RE: [v1] Bluetooth: hci_sync: Fix not clearing cmd_sync_work_list on power off
+In-Reply-To: <20251209140347.2816326-1-shuai.zhang@oss.qualcomm.com>
+References: <20251209140347.2816326-1-shuai.zhang@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello,
+--===============6681518953776817187==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-syzbot found the following issue on:
+This is automated email and please do not reply to this email!
 
-HEAD commit:    05c93f3395ed Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=1149701a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3b5338ad1e59a06c
-dashboard link: https://syzkaller.appspot.com/bug?extid=b47462dd9d3cf7eb9729
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-userspace arch: arm64
+Dear submitter,
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1031732
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6b5c913e373c/disk-05c93f33.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/15e75f1266ef/vmlinux-05c93f33.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/dd930129c578/Image-05c93f33.gz.xz
+---Test result---
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b47462dd9d3cf7eb9729@syzkaller.appspotmail.com
+Test Summary:
+CheckPatch                    PENDING   0.36 seconds
+GitLint                       PENDING   1.04 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      25.36 seconds
+CheckAllWarning               PASS      28.41 seconds
+CheckSparse                   PASS      31.51 seconds
+BuildKernel32                 PASS      25.07 seconds
+TestRunnerSetup               PASS      551.16 seconds
+TestRunner_l2cap-tester       PASS      23.72 seconds
+TestRunner_iso-tester         PASS      87.69 seconds
+TestRunner_bnep-tester        PASS      6.22 seconds
+TestRunner_mgmt-tester        FAIL      130.79 seconds
+TestRunner_rfcomm-tester      PASS      9.40 seconds
+TestRunner_sco-tester         FAIL      14.54 seconds
+TestRunner_ioctl-tester       PASS      10.19 seconds
+TestRunner_mesh-tester        FAIL      11.50 seconds
+TestRunner_smp-tester         PASS      8.66 seconds
+TestRunner_userchan-tester    PASS      9.26 seconds
+IncrementalBuild              PENDING   0.90 seconds
 
-kobject: kobject_add_internal failed for hci1:201 with -EEXIST, don't try to register things with the same name in the same directory.
-Bluetooth: hci1: failed to register connection device
-==================================================================
-BUG: KASAN: null-ptr-deref in instrument_atomic_write include/linux/instrumented.h:82 [inline]
-BUG: KASAN: null-ptr-deref in set_bit include/asm-generic/bitops/instrumented-atomic.h:28 [inline]
-BUG: KASAN: null-ptr-deref in l2cap_sock_suspend_cb+0x50/0xb4 net/bluetooth/l2cap_sock.c:1748
-Write of size 8 at addr 0000000000000588 by task kworker/u9:1/6144
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-CPU: 1 UID: 0 PID: 6144 Comm: kworker/u9:1 Not tainted syzkaller #0 PREEMPT 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/03/2025
-Workqueue: hci1 hci_rx_work
-Call trace:
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:499 (C)
- __dump_stack+0x30/0x40 lib/dump_stack.c:94
- dump_stack_lvl+0xd8/0x12c lib/dump_stack.c:120
- print_report+0x58/0x84 mm/kasan/report.c:485
- kasan_report+0xb0/0x110 mm/kasan/report.c:595
- check_region_inline mm/kasan/generic.c:-1 [inline]
- kasan_check_range+0x264/0x2a4 mm/kasan/generic.c:200
- __kasan_check_write+0x20/0x30 mm/kasan/shadow.c:37
- instrument_atomic_write include/linux/instrumented.h:82 [inline]
- set_bit include/asm-generic/bitops/instrumented-atomic.h:28 [inline]
- l2cap_sock_suspend_cb+0x50/0xb4 net/bluetooth/l2cap_sock.c:1748
- l2cap_chan_ready net/bluetooth/l2cap_core.c:1258 [inline]
- l2cap_le_start+0x900/0x10c0 net/bluetooth/l2cap_core.c:1376
- l2cap_conn_ready net/bluetooth/l2cap_core.c:1629 [inline]
- l2cap_connect_cfm+0x558/0xd40 net/bluetooth/l2cap_core.c:7305
- hci_connect_cfm+0x98/0x134 include/net/bluetooth/hci_core.h:2107
- le_conn_complete_evt+0xcc0/0x1184 net/bluetooth/hci_event.c:5799
- hci_le_conn_complete_evt+0x114/0x3f8 net/bluetooth/hci_event.c:5825
- hci_le_meta_evt+0x2cc/0x4b0 net/bluetooth/hci_event.c:7278
- hci_event_func net/bluetooth/hci_event.c:7586 [inline]
- hci_event_packet+0x6bc/0xf04 net/bluetooth/hci_event.c:7643
- hci_rx_work+0x320/0xb18 net/bluetooth/hci_core.c:4099
- process_one_work+0x7e8/0x155c kernel/workqueue.c:3263
- process_scheduled_works kernel/workqueue.c:3346 [inline]
- worker_thread+0x958/0xed8 kernel/workqueue.c:3427
- kthread+0x5fc/0x75c kernel/kthread.c:463
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:844
-==================================================================
-Unable to handle kernel NULL pointer dereference at virtual address 0000000000000588
-Mem abort info:
-  ESR = 0x0000000096000006
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x06: level 2 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
-  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-user pgtable: 4k pages, 48-bit VAs, pgdp=0000000139adc000
-[0000000000000588] pgd=08000001310ec403, p4d=08000001310ec403, pud=0800000122921403, pmd=0000000000000000
-Internal error: Oops: 0000000096000006 [#1]  SMP
-Modules linked in:
-CPU: 1 UID: 0 PID: 6144 Comm: kworker/u9:1 Tainted: G    B               syzkaller #0 PREEMPT 
-Tainted: [B]=BAD_PAGE
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/03/2025
-Workqueue: hci1 hci_rx_work
-pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-pc : __lse_atomic64_or arch/arm64/include/asm/atomic_lse.h:132 [inline]
-pc : arch_atomic64_or arch/arm64/include/asm/atomic.h:65 [inline]
-pc : raw_atomic64_or include/linux/atomic/atomic-arch-fallback.h:3798 [inline]
-pc : raw_atomic_long_or include/linux/atomic/atomic-long.h:1069 [inline]
-pc : arch_set_bit include/asm-generic/bitops/atomic.h:18 [inline]
-pc : set_bit include/asm-generic/bitops/instrumented-atomic.h:29 [inline]
-pc : l2cap_sock_suspend_cb+0x5c/0xb4 net/bluetooth/l2cap_sock.c:1748
-lr : __lse_atomic64_or arch/arm64/include/asm/atomic_lse.h:132 [inline]
-lr : arch_atomic64_or arch/arm64/include/asm/atomic.h:65 [inline]
-lr : raw_atomic64_or include/linux/atomic/atomic-arch-fallback.h:3798 [inline]
-lr : raw_atomic_long_or include/linux/atomic/atomic-long.h:1069 [inline]
-lr : arch_set_bit include/asm-generic/bitops/atomic.h:18 [inline]
-lr : set_bit include/asm-generic/bitops/instrumented-atomic.h:29 [inline]
-lr : l2cap_sock_suspend_cb+0x58/0xb4 net/bluetooth/l2cap_sock.c:1748
-sp : ffff8000a27973b0
-x29: ffff8000a27973b0 x28: ffff8000a2797420 x27: 1fffe00019c58004
-x26: 1fffe00019c58002 x25: 1fffe00019c58000 x24: ffff7000144f2e84
-x23: 0000000000000002 x22: dfff800000000000 x21: dfff800000000000
-x20: 0000000000000588 x19: 0000000000000000 x18: 00000000ffffffff
-x17: 3d3d3d3d3d3d3d3d x16: ffff800082defcc0 x15: 0000000000000001
-x14: 1ffff000125d3514 x13: 0000000000000000 x12: 0000000000000000
-x11: 0000000000100000 x10: 0000000000012831 x9 : ffff8000b19a7000
-x8 : 0000000000000002 x7 : 0000000000000001 x6 : ffff800080565b88
-x5 : 0000000000000000 x4 : 0000000000000000 x3 : ffff8000803c104c
-x2 : 0000000000000001 x1 : 0000000000000000 x0 : 0000000000000000
-Call trace:
- __lse_atomic64_or arch/arm64/include/asm/atomic_lse.h:-1 [inline] (P)
- arch_atomic64_or arch/arm64/include/asm/atomic.h:65 [inline] (P)
- raw_atomic64_or include/linux/atomic/atomic-arch-fallback.h:3798 [inline] (P)
- raw_atomic_long_or include/linux/atomic/atomic-long.h:1069 [inline] (P)
- arch_set_bit include/asm-generic/bitops/atomic.h:18 [inline] (P)
- set_bit include/asm-generic/bitops/instrumented-atomic.h:29 [inline] (P)
- l2cap_sock_suspend_cb+0x5c/0xb4 net/bluetooth/l2cap_sock.c:1748 (P)
- l2cap_chan_ready net/bluetooth/l2cap_core.c:1258 [inline]
- l2cap_le_start+0x900/0x10c0 net/bluetooth/l2cap_core.c:1376
- l2cap_conn_ready net/bluetooth/l2cap_core.c:1629 [inline]
- l2cap_connect_cfm+0x558/0xd40 net/bluetooth/l2cap_core.c:7305
- hci_connect_cfm+0x98/0x134 include/net/bluetooth/hci_core.h:2107
- le_conn_complete_evt+0xcc0/0x1184 net/bluetooth/hci_event.c:5799
- hci_le_conn_complete_evt+0x114/0x3f8 net/bluetooth/hci_event.c:5825
- hci_le_meta_evt+0x2cc/0x4b0 net/bluetooth/hci_event.c:7278
- hci_event_func net/bluetooth/hci_event.c:7586 [inline]
- hci_event_packet+0x6bc/0xf04 net/bluetooth/hci_event.c:7643
- hci_rx_work+0x320/0xb18 net/bluetooth/hci_core.c:4099
- process_one_work+0x7e8/0x155c kernel/workqueue.c:3263
- process_scheduled_works kernel/workqueue.c:3346 [inline]
- worker_thread+0x958/0xed8 kernel/workqueue.c:3427
- kthread+0x5fc/0x75c kernel/kthread.c:463
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:844
-Code: 97840524 d503201f 97840483 52800048 (f828329f) 
----[ end trace 0000000000000000 ]---
-----------------
-Code disassembly (best guess):
-   0:	97840524 	bl	0xfffffffffe101490
-   4:	d503201f 	nop
-   8:	97840483 	bl	0xfffffffffe101214
-   c:	52800048 	mov	w8, #0x2                   	// #2
-* 10:	f828329f 	stset	x8, [x20] <-- trapping instruction
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 488 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.113 seconds
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.171 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.961 seconds
+Mesh - Send cancel - 2                               Timed out    1.999 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Regards,
+Linux Bluetooth
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--===============6681518953776817187==--
