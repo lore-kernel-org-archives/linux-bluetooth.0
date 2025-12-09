@@ -1,300 +1,229 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAA226056D;
-	Mon,  8 Dec 2025 20:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1838F1FF5E3;
+	Tue,  9 Dec 2025 00:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765225687; cv=none; b=d+dHHiLrBMiGRgTnrypxhlhPVa6MF5dqQS7v7Tqy64DGWNY9z7VPdXcDp3FuDlhyrSlrATlGhe4vEuembI0oyWEBwPdEtHE8wsXhlUQJkwE9SgGtXUdYv+LfCbH1qXO9fNVABAxmts7eNW7hGmnb4wT3K40NzR0JRPNAY0y5jpc=
+	t=1765239411; cv=none; b=UgvowpAQ4LveU7y1/Wz6VIIWHrEncCNsm555KQzgPNOSFB+pFMHcveuSDgjp04GBe1YGwOcfzSjqT/gVG/+ahkVRyLh1Ijihh5ArT2BqBhQUrv7KyANTtMr/eDIgr4r/9CxStCY1JPFHplG8FGDA6E+mSG5y1MdKbbwZPZeJmbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765225687; c=relaxed/simple;
-	bh=YIXliSchTOGG+1D3mmfdvl+VICDaZKaTzDSnNx+OpKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CW2gyI8ypjI0lkE+Eidni43MS5rea9Oe7HXS7yYIHmQEb6kp4T2tZnJEFnLVC1VwKkWPdY74ONVfZp4AFdwF8p16utjn5LhEzig3ccNVMxbW3q1RJH9X+NLrK3zndL9CBsp0yC/E4/OnqujQQBckOl2nFC5e0mqLxKpoq9RbIOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cKSQiL3F; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765239411; c=relaxed/simple;
+	bh=xv6Cu0U7vsA5sFTybvJeaOcOWgd+Wt5iJGmQdax558c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=iZK73ARb7swWx3iik12QFNz/J3YFsmvVZ0l7buq5/EBTxSv45Za+sC0C6cm5gt85zwJGFHEG9egZWKEC1xHxLsziQOsRhC7BDZi92Yyqr6nOJQ+c2M+/sy1klacF98/atToEKrrF+vZfLQc6uCHzh7I2J6O7Lexaohfwwi6iE3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fdk2JZAv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cKSQiL3F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96B46C4CEF1;
-	Mon,  8 Dec 2025 20:28:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fdk2JZAv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B41FC113D0;
+	Tue,  9 Dec 2025 00:16:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765225686;
-	bh=YIXliSchTOGG+1D3mmfdvl+VICDaZKaTzDSnNx+OpKw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cKSQiL3F7jbs9gE3oqTSJIXkLb7tk+tk91qixKYoK8qtGJAUSs5aJ9ePUjh2Qyia8
-	 nHuumMDiLGW1aiPxpaKX3WZKl+PSFWJ2IZJf5qmM9A3ntp+DnWf4EWqg8Mt20FNsiV
-	 o/BElrDBTbH82vMlXrixaqJYwwWoybic9v8tQbVhKn8pHPN5/PLJU3eAYfXUA78Zi4
-	 +tyZs8g1KoMMLqcFIe1M/jPs4Gp2QwLh9hKNINqnMoqyHy+KrNjxUG/R7NNuh/CfU2
-	 gqOTAR3nA/ZFH8fqhudoLG513fmgCYvOOeMyYP8VijHvl6qcbVorCvBQWiAJErnTbN
-	 mrFyypLkTFIww==
-Date: Mon, 8 Dec 2025 14:28:03 -0600
-From: Rob Herring <robh@kernel.org>
-To: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mark Pearson <mpearson-lenovo@squebb.ca>,
-	"Derek J. Clark" <derekjohn.clark@gmail.com>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
-	Stephan Gerhold <stephan.gerhold@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Subject: Re: [PATCH v2 08/10] dt-bindings: connector: Add PCIe M.2 Mechanical
- Key E connector
-Message-ID: <20251208202803.GA2541017-robh@kernel.org>
-References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
- <20251125-pci-m2-e-v2-8-32826de07cc5@oss.qualcomm.com>
+	s=k20201202; t=1765239411;
+	bh=xv6Cu0U7vsA5sFTybvJeaOcOWgd+Wt5iJGmQdax558c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Fdk2JZAvE2iInBrosnWQW6peCGj8NAczTSIo2mlU19iCT5jfhre3WI7YZcFCHutbe
+	 RUEoxs6Pbj9Ep0uMBJcaCQZjr9tjucNiBBg8kX7Gote6tqB4+HSoDevOtsZcNIbwkT
+	 3WWyunXcSVaEuCNOizRz1I/U7Rv6YuKJl5MvVWuDO7IOpog68UJhOahIoErYO20kGg
+	 AX/yC/apLy3HikCQ4myc265WhIwRY1HZ6Q0li9JhXeoD6o2cOvYOB5ma69dsKarL/e
+	 YJfo4VOOH0fnYHD0jF6gncmJIHAx5XjIPzqy8THV76r3gzVm2e0oYYqx3qpDoGoIcz
+	 uVn0ADLBKT5qw==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Gongwei Li <ligongwei@kylinos.cn>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.18-5.10] Bluetooth: btusb: Add new VID/PID 13d3/3533 for RTL8821CE
+Date: Mon,  8 Dec 2025 19:15:01 -0500
+Message-ID: <20251209001610.611575-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251209001610.611575-1-sashal@kernel.org>
+References: <20251209001610.611575-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251125-pci-m2-e-v2-8-32826de07cc5@oss.qualcomm.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.18
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 25, 2025 at 08:15:12PM +0530, Manivannan Sadhasivam wrote:
-> Add the devicetree binding for PCIe M.2 Mechanical Key E connector defined
-> in the PCI Express M.2 Specification, r4.0, sec 5.1.2. This connector
-> provides interfaces like PCIe or SDIO to attach the WiFi devices to the
-> host machine, USB or UART+PCM interfaces to attach the Bluetooth (BT)
-> devices along with additional interfaces like I2C for NFC solution. At any
-> point of time, the connector can only support either PCIe or SDIO as the
-> WiFi interface and USB or UART as the BT interface.
+From: Gongwei Li <ligongwei@kylinos.cn>
 
-AFAICT, there's no muxing of interfaces. Maybe that's a defacto 
-limitation on x86 systems? There's no reason to encode that into the 
-binding if the pins aren't mux'ed on the connector.
+[ Upstream commit 525459da4bd62a81142fea3f3d52188ceb4d8907 ]
 
-> 
-> The connector provides a primary power supply of 3.3v, along with an
-> optional 1.8v VIO supply for the Adapter I/O buffer circuitry operating at
-> 1.8v sideband signaling.
-> 
-> The connector also supplies optional signals in the form of GPIOs for fine
-> grained power management.
-> 
-> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> ---
->  .../bindings/connector/pcie-m2-e-connector.yaml    | 178 +++++++++++++++++++++
->  MAINTAINERS                                        |   1 +
->  2 files changed, 179 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
-> new file mode 100644
-> index 000000000000..fe2c9a943a21
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
-> @@ -0,0 +1,178 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/connector/pcie-m2-e-connector.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: PCIe M.2 Mechanical Key E Connector
-> +
-> +maintainers:
-> +  - Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> +
-> +description:
-> +  A PCIe M.2 E connector node represents a physical PCIe M.2 Mechanical Key E
-> +  connector. Mechanical Key E connectors are used to connect Wireless
-> +  Connectivity devices including combinations of Wi-Fi, BT, NFC to the host
-> +  machine over interfaces like PCIe/SDIO, USB/UART+PCM, and I2C.
-> +
-> +properties:
-> +  compatible:
-> +    const: pcie-m2-e-connector
-> +
-> +  vpcie3v3-supply:
-> +    description: A phandle to the regulator for 3.3v supply.
-> +
-> +  vpcie1v8-supply:
-> +    description: A phandle to the regulator for VIO 1.8v supply.
-> +
-> +  ports:
-> +    $ref: /schemas/graph.yaml#/properties/ports
-> +    description: OF graph bindings modeling the interfaces exposed on the
-> +      connector. Since a single connector can have multiple interfaces, every
-> +      interface has an assigned OF graph port number as described below.
-> +
-> +    properties:
-> +      port@0:
-> +        $ref: /schemas/graph.yaml#/properties/port
-> +        description: Connector interfaces for Wi-Fi
-> +
-> +        properties:
-> +          endpoint@0:
-> +            $ref: /schemas/graph.yaml#/properties/endpoint
-> +            description: PCIe interface
-> +
-> +          endpoint@1:
-> +            $ref: /schemas/graph.yaml#/properties/endpoint
-> +            description: SDIO interface
-> +
-> +        anyOf:
-> +          - required:
-> +              - endpoint@0
-> +          - required:
-> +              - endpoint@1
-> +
-> +      port@1:
-> +        $ref: /schemas/graph.yaml#/properties/port
-> +        description: Connector interfaces for BT
-> +
-> +        properties:
-> +          endpoint@0:
-> +            $ref: /schemas/graph.yaml#/properties/endpoint
-> +            description: USB 2.0 interface
-> +
-> +          endpoint@1:
-> +            $ref: /schemas/graph.yaml#/properties/endpoint
-> +            description: UART interface
-> +
-> +        anyOf:
-> +          - required:
-> +              - endpoint@0
-> +          - required:
-> +              - endpoint@1
-> +
-> +      port@2:
-> +        $ref: /schemas/graph.yaml#/properties/port
-> +        description: PCM/I2S interface
+Add VID 13d3 & PID 3533 for Realtek RTL8821CE USB Bluetooth chip.
 
-Does this work with any existing DAI bindings? Or conflict with the 
-audio graph card binding?
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-> +
-> +      port@3:
-> +        $ref: /schemas/graph.yaml#/properties/port
-> +        description: I2C interface
+T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3533 Rev= 1.10
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Like the other one, use i2c-parent.
+Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
-> +
-> +    oneOf:
-> +      - required:
-> +          - port@0
-> +
-> +  clocks:
-> +    description: 32.768 KHz Suspend Clock (SUSCLK) input from the host system to
-> +      the M.2 card. Refer, PCI Express M.2 Specification r4.0, sec 3.1.12.1 for
-> +      more details.
-> +    maxItems: 1
-> +
-> +  w-disable1-gpios:
-> +    description: GPIO controlled connection to W_DISABLE1# signal. This signal
-> +      is used by the system to disable WiFi radio in the M.2 card. Refer, PCI
-> +      Express M.2 Specification r4.0, sec 3.1.12.3 for more details.
-> +    maxItems: 1
-> +
-> +  w-disable2-gpios:
-> +    description: GPIO controlled connection to W_DISABLE2# signal. This signal
-> +      is used by the system to disable BT radio in the M.2 card. Refer, PCI
-> +      Express M.2 Specification r4.0, sec 3.1.12.3 for more details.
-> +    maxItems: 1
-> +
-> +  viocfg-gpios:
-> +    description: GPIO controlled connection to IO voltage configuration
-> +      (VIO_CFG) signal. This signal is used by the M.2 card to indicate to the
-> +      host system that the card supports an independent IO voltage domain for
-> +      the sideband signals. Refer, PCI Express M.2 Specification r4.0, sec
-> +      3.1.15.1 for more details.
-> +    maxItems: 1
-> +
-> +  uim-power-src-gpios:
-> +    description: GPIO controlled connection to UIM_POWER_SRC signal. This signal
-> +      is used when the NFC solution is implemented and receives the power output
-> +      from WWAN_UIM_PWR signal of the another WWAN M.2 card. Refer, PCI Express
-> +      M.2 Specification r4.0, sec 3.1.11.1 for more details.
-> +    maxItems: 1
-> +
-> +  uim-power-snk-gpios:
-> +    description: GPIO controlled connection to UIM_POWER_SNK signal. This signal
-> +      is used when the NFC solution is implemented and supplies power to the
-> +      Universal Integrated Circuit Card (UICC). Refer, PCI Express M.2
-> +      Specification r4.0, sec 3.1.11.2 for more details.
-> +    maxItems: 1
-> +
-> +  uim-swp-gpios:
-> +    description: GPIO controlled connection to UIM_SWP signal. This signal is
-> +      used when the NFC solution is implemented and implements the Single Wire
-> +      Protocol (SWP) interface to the UICC. Refer, PCI Express M.2 Specification
-> +      r4.0, sec 3.1.11.3 for more details.
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
-> +  - vpcie3v3-supply
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  # PCI M.2 Key E connector for Wi-Fi/BT with PCIe/UART interfaces
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +
-> +    connector {
-> +        compatible = "pcie-m2-e-connector";
-> +        vpcie3v3-supply = <&vreg_wcn_3p3>;
-> +        vpcie1v8-supply = <&vreg_l15b_1p8>;
-> +        w-disable1-gpios = <&tlmm 117 GPIO_ACTIVE_LOW>;
-> +        w-disable2-gpios = <&tlmm 116 GPIO_ACTIVE_LOW>;
-> +
-> +        ports {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +
-> +            port@0 {
-> +                #address-cells = <1>;
-> +                #size-cells = <0>;
-> +
-> +                reg = <0>;
-> +
-> +                endpoint@0 {
-> +                    reg = <0>;
-> +                    remote-endpoint = <&pcie4_port0_ep>;
-> +                };
-> +            };
-> +
-> +            port@1 {
-> +                #address-cells = <1>;
-> +                #size-cells = <0>;
-> +
-> +                reg = <1>;
-> +
-> +                endpoint@1 {
-> +                    reg = <1>;
-> +                    remote-endpoint = <&uart14_ep>;
-> +                };
-> +            };
-> +        };
-> +    };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 9b3f689d1f50..f707f29d0a37 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -20478,6 +20478,7 @@ PCIE M.2 POWER SEQUENCING
->  M:	Manivannan Sadhasivam <mani@kernel.org>
->  L:	linux-pci@vger.kernel.org
->  S:	Maintained
-> +F:	Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
->  F:	Documentation/devicetree/bindings/connector/pcie-m2-m-connector.yaml
->  F:	drivers/power/sequencing/pwrseq-pcie-m2.c
->  
-> 
-> -- 
-> 2.48.1
-> 
+LLM Generated explanations, may be completely bogus:
+
+## Commit Analysis: Bluetooth: btusb: Add new VID/PID 13d3/3533 for
+RTL8821CE
+
+### 1. COMMIT MESSAGE ANALYSIS
+
+**Subject:** Adding a new USB Vendor ID (0x13d3) and Product ID (0x3533)
+for a Realtek RTL8821CE Bluetooth chip.
+
+**Tags present:**
+- No "Fixes:" tag
+- No "Cc: stable@vger.kernel.org" tag
+- Signed-off-by from contributor and Bluetooth maintainer (Luiz Augusto
+  von Dentz)
+
+**Key content:** The commit includes detailed USB device information
+showing this is a real, tested device from the
+`/sys/kernel/debug/usb/devices` output.
+
+### 2. CODE CHANGE ANALYSIS
+
+The diff shows a simple 2-line addition:
+
+```c
+/* Realtek 8821CE Bluetooth devices */
+{ USB_DEVICE(0x13d3, 0x3529), .driver_info = BTUSB_REALTEK |
+                                             BTUSB_WIDEBAND_SPEECH },
++{ USB_DEVICE(0x13d3, 0x3533), .driver_info = BTUSB_REALTEK |
++                                            BTUSB_WIDEBAND_SPEECH },
+```
+
+- Adds USB device entry with VID 0x13d3, PID 0x3533
+- Uses **identical** flags as the existing RTL8821CE entry (0x13d3,
+  0x3529)
+- Placed directly under the "Realtek 8821CE Bluetooth devices" comment
+- Follows established table pattern exactly
+
+### 3. CLASSIFICATION
+
+This is a **NEW DEVICE ID** addition - one of the explicit exceptions
+for stable backports:
+
+> "Adding PCI IDs, USB IDs, ACPI IDs, etc. to existing drivers. These
+are trivial one-line additions that enable hardware support."
+
+The btusb driver already fully supports RTL8821CE devices; this just
+adds a new variant's USB ID to the match table.
+
+### 4. SCOPE AND RISK ASSESSMENT
+
+| Metric | Assessment |
+|--------|------------|
+| Lines changed | 2 lines added |
+| Files touched | 1 file (drivers/bluetooth/btusb.c) |
+| Complexity | Trivial - table entry only |
+| Risk | **Extremely low** - purely additive |
+
+**Risk analysis:**
+- Cannot break existing functionality (new table entry only)
+- Uses same driver_info flags as sibling device
+- Only affects users with this specific USB hardware
+- If somehow wrong, worst case is Bluetooth doesn't work for this device
+  (no worse than before)
+
+### 5. USER IMPACT
+
+- **Affected users:** Those with laptops/devices containing this
+  Bluetooth chip variant
+- **Current behavior:** Bluetooth device not recognized by btusb driver
+- **Fixed behavior:** Bluetooth works normally
+- **Severity:** Hardware enablement - critical for affected users
+- **Evidence of real use:** Detailed USB device tree dump proves this is
+  real, tested hardware
+
+### 6. STABILITY INDICATORS
+
+- Proper maintainer sign-off (Luiz Augusto von Dentz, Intel Bluetooth
+  maintainer)
+- Matches exact pattern of existing entries
+- Same flags as the sibling 8821CE entry (0x13d3/0x3529)
+
+### 7. DEPENDENCY CHECK
+
+- **Dependencies:** None - completely standalone table entry
+- **Prerequisite code:** RTL8821CE support (BTUSB_REALTEK,
+  BTUSB_WIDEBAND_SPEECH) already exists in stable trees
+- **Applies cleanly:** The quirks_table structure has been stable for a
+  long time
+
+## Summary
+
+This commit is a textbook example of the "NEW DEVICE ID" exception for
+stable backports:
+
+**Reasons to backport:**
+1. Trivial 2-line USB ID table addition
+2. Zero risk of regression to existing functionality
+3. Enables Bluetooth for users with this specific hardware variant
+4. Follows established, well-tested patterns exactly
+5. No dependencies on other commits
+6. Driver already fully supports this chip family
+
+**Minor consideration:**
+- No explicit "Cc: stable" tag, but device ID additions are routinely
+  backported without it
+
+The fix is small, surgical, and follows an explicit exception in stable
+kernel rules for device ID additions.
+
+**YES**
+
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 9a923918bf741..b92bfd131567e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -504,6 +504,8 @@ static const struct usb_device_id quirks_table[] = {
+ 	/* Realtek 8821CE Bluetooth devices */
+ 	{ USB_DEVICE(0x13d3, 0x3529), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3533), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Realtek 8822CE Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0xb00c), .driver_info = BTUSB_REALTEK |
+-- 
+2.51.0
+
