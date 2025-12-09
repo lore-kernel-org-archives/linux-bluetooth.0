@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687B8274FF5;
-	Tue,  9 Dec 2025 00:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EFD2C21DB;
+	Tue,  9 Dec 2025 00:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765239454; cv=none; b=dWhWZex6H5or4nFNmkf1E/RWjSiLNz2lrB57sM32s/UmkwP1BXpNgEzkrhOPmFrglDQbFkVe2PhWScsOJ8HHepmaSLO/GNSk3pNirB2tKeSuK4B6WvEC526lG7fXc/cGvVz9pABX+3dLzClMw1fSMFUko4/Go/LAcNd7IWrkpSs=
+	t=1765239483; cv=none; b=U2PI+GuPOvn0esx5e2ppFgRu8SSQyRK0SGxhTZ+sTBYn/Zeq8FhPNbokQn1UlpFa8aKTQgDgp7j4N6elNgU1bmaOeLkWUChXeMHFcpvsdke1BvnN4prasa0MFGYg65h0tDIhgIkABHfPDCVedoVl5DPqjqSPP6CHb/hA7Purbqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765239454; c=relaxed/simple;
-	bh=tNId2viZ0EA1M0gDDU3hMYtdyi9yanQqyDZcD/xdLKI=;
+	s=arc-20240116; t=1765239483; c=relaxed/simple;
+	bh=uR8napX9KZeuBCSbLJOTeRpPBJvBLislxq4J0wu0pW4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lN1NK1QrgCsj3XZABQuPszSdsyU1FzAR8v5pt/L9yAhtGWQzKdBbLTxDo0BYGeozq4cUCXanIA6PrYGeRUjZz5a7ytzEoV2mj8qArKhmqs5fgGQ1g/069mnFSRel6FzyrjBXhO4trT8MsFLGeZcG+336acHfg/WZY30ve6AH0Yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iew6E5A8; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=MTDnfrtcoz10hlGJA5+LDc6zayY3JptHDNzZTZi2oCFqoyKNiO7weCazxeNqin4R9k6A3AdbzpNhPsMPldkmr3I09VZWwI49c0eQ0lTtSuAmezJpvDLLJNWv7PZ3Wxftl+HMRSD52+uVBaks+/EgXl/qWSLHFvRSnwLEuJCZgMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FpTjKh0/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iew6E5A8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F00C4CEF1;
-	Tue,  9 Dec 2025 00:17:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FpTjKh0/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90629C113D0;
+	Tue,  9 Dec 2025 00:18:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765239454;
-	bh=tNId2viZ0EA1M0gDDU3hMYtdyi9yanQqyDZcD/xdLKI=;
+	s=k20201202; t=1765239482;
+	bh=uR8napX9KZeuBCSbLJOTeRpPBJvBLislxq4J0wu0pW4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iew6E5A8f8aanCn6QwS5bGtCvnDxKpZKmvEHVlC8gLng7n+9KFu0ydvPVdSgEE5wx
-	 PX+cIAoprJmTXwcmuQALut4lSEExNS2K8s228C85d8k9lPf+q/ihiHa0z/qMHrTIZw
-	 ZOxGvmb6jcuUO9s/J1vwq5l0lojbpLqw75rvLDIK1FcxeNV/Qsh4Lly0llkSg0WpYd
-	 qpn+ENiQOr/c87Vug4Zq5u53i9516alx8qtBAuyPr7WEXiqpatSFtg/I9brqhZT6fR
-	 mql8xliM+KvefMTjv2JjZLCKnp3HICfKZn1BpzKhWoxwSk6kchNQtZrcsIc6I8Fph9
-	 VGxU9NHVaR2/Q==
+	b=FpTjKh0/B9B54puuEzd+AjW4ErzJ/ag7fcEaMf9LS4WbM3AxqjaCIf+pd204EnaeY
+	 wLxHzadhDHgc/Ga1R1gNeVvXmBZwV4icGeg1wjJuV2kjvaq8AJQxc+syL1BOVKyJua
+	 c/KgEUl/Az9nJ00HRHA4IAB6mRImVDdFbltQsVx1b3OKJJKwHZLMp0RjjbX1lSk9CM
+	 UD7ktfxEyjmzRbMyqAGF9hfjh8P3f6434C4U+DOpgfVU44IwiUXFHn2py52g1ejdHB
+	 lHc0iDYY9D7z/X6OLiyonzDlMuudR1i4ayaOQlqUIYDwzGs36Dd+FeclGMD8FCK7y2
+	 v4YonkqPCHtNg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Shuai Zhang <quic_shuaz@quicinc.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+Cc: Chingbin Li <liqb365@163.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.17] Bluetooth: btusb: add new custom firmwares
-Date: Mon,  8 Dec 2025 19:15:18 -0500
-Message-ID: <20251209001610.611575-26-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.6] Bluetooth: btusb: Add new VID/PID 2b89/6275 for RTL8761BUV
+Date: Mon,  8 Dec 2025 19:15:28 -0500
+Message-ID: <20251209001610.611575-36-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251209001610.611575-1-sashal@kernel.org>
 References: <20251209001610.611575-1-sashal@kernel.org>
@@ -51,83 +50,179 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.18
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Shuai Zhang <quic_shuaz@quicinc.com>
+From: Chingbin Li <liqb365@163.com>
 
-[ Upstream commit a8b38d19857d42a1f2e90c9d9b0f74de2500acd7 ]
+[ Upstream commit 8dbbb5423c0802ec21266765de80fd491868fab1 ]
 
-The new platform uses the QCA2066 chip along with a new board ID, which
-requires a dedicated firmware file to ensure proper initialization.
-Without this entry, the driver cannot locate and load the correct
-firmware, resulting in Bluetooth bring-up failure.
+Add VID 2b89 & PID 6275 for Realtek RTL8761BUV USB Bluetooth chip.
 
-This patch adds a new entry to the firmware table for QCA2066 so that
-the driver can correctly identify the board ID and load the appropriate
-firmware from 'qca/QCA2066/' in the linux-firmware repository.
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
-Acked-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  6 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=2b89 ProdID=6275 Rev= 2.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00E04C239987
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+Signed-off-by: Chingbin Li <liqb365@163.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-### Backport Considerations
+## Commit Analysis: Bluetooth: btusb: Add new VID/PID 2b89/6275 for
+RTL8761BUV
 
-The prerequisite QCA2066 support was introduced in v6.17 (commit
-a3f9f6dd047af). This means:
-- Only 6.17.y stable tree would benefit from this backport
-- Earlier LTS trees (6.12.y, 6.6.y, 6.1.y, 5.15.y) don't have the
-  required infrastructure
+### 1. COMMIT MESSAGE ANALYSIS
+
+- **Subject:** Adding a USB VID (0x2b89) / PID (0x6275) for a Realtek
+  RTL8761BUV Bluetooth chip
+- **No "Fixes:" tag** - This is not fixing a code bug
+- **No "Cc: stable@vger.kernel.org"** - Not explicitly tagged for stable
+- **Evidence of real hardware:** The commit includes detailed USB device
+  information from `/sys/kernel/debug/usb/devices`, showing the
+  contributor has physical access to the device
+
+### 2. CODE CHANGE ANALYSIS
+
+The change is minimal - just 2 lines added to
+`drivers/bluetooth/btusb.c`:
+
+```c
+{ USB_DEVICE(0x2b89, 0x6275), .driver_info = BTUSB_REALTEK |
+                                             BTUSB_WIDEBAND_SPEECH },
+```
+
+This entry:
+- Is added to the `quirks_table[]` array in the "Additional Realtek
+  8761BUV Bluetooth devices" section
+- Uses the exact same pattern and flags as other RTL8761BUV entries
+- The same vendor ID (0x2b89) already exists with a different product ID
+  (0x8761)
+
+### 3. CLASSIFICATION
+
+This is a **NEW DEVICE ID** addition - one of the explicitly allowed
+exceptions for stable trees:
+- Adds a USB ID to an existing, mature driver (btusb)
+- The btusb driver already fully supports RTL8761BUV chips
+- Only the device ID is new, not any driver functionality
+
+### 4. SCOPE AND RISK ASSESSMENT
+
+| Factor | Assessment |
+|--------|------------|
+| Lines changed | 2 |
+| Files touched | 1 |
+| Complexity | Trivial - mechanical ID table addition |
+| Risk of regression | Essentially zero |
+| Pattern precedent | Exact same pattern used by dozens of other entries
+|
+
+The risk is **extremely low** because:
+- The new entry cannot affect any existing devices
+- It only matches the specific VID/PID combination
+- All the handling code (BTUSB_REALTEK, BTUSB_WIDEBAND_SPEECH) is
+  already tested with similar hardware
+
+### 5. USER IMPACT
+
+- **Affected users:** Anyone with a Bluetooth USB adapter using VID
+  0x2b89 and PID 0x6275
+- **Without the patch:** The device is not recognized, Bluetooth does
+  not work at all
+- **With the patch:** Full Bluetooth functionality via the mature btusb
+  driver
+
+This is a complete enablement fix for affected hardware.
+
+### 6. STABILITY INDICATORS
+
+- Signed-off-by from the Bluetooth subsystem maintainer (Luiz Augusto
+  von Dentz)
+- Follows established patterns exactly
+- USB device info in commit shows real-world testing on actual hardware
+
+### 7. DEPENDENCY CHECK
+
+- **No dependencies** on other commits
+- The required flags (BTUSB_REALTEK, BTUSB_WIDEBAND_SPEECH) have existed
+  for years
+- Will apply cleanly to all stable trees with btusb support
+
+---
 
 ## Summary
 
-| Criterion | Assessment |
-|-----------|------------|
-| Bug fix? | ✅ Fixes Bluetooth bring-up failure |
-| Obviously correct? | ✅ Single table entry matching existing pattern |
-| Small and contained? | ✅ 1 line, 1 file |
-| Tested? | ✅ Acked by Qualcomm developer, signed by maintainer |
-| Risk? | ✅ Extremely low - isolated hardware variant |
-| User impact? | ✅ Complete Bluetooth loss without fix |
-| Exception category? | ✅ NEW DEVICE IDs (board_id addition) |
+This commit is a textbook example of a stable-appropriate device ID
+addition:
 
-**Conclusion:**
+**Pros:**
+- Trivial 2-line change adding a USB VID/PID
+- Zero risk of regression - only affects the specific new device
+- Enables real hardware for users who otherwise have no Bluetooth
+- Follows exact pattern used by many other stable-backported device ID
+  additions
+- Already merged by subsystem maintainer
 
-This is a textbook example of the "NEW DEVICE IDs" stable exception. It
-adds a single board_id entry to an existing firmware lookup table to
-enable Bluetooth on a new hardware variant. The change:
-- Fixes a real user problem (non-working Bluetooth)
-- Is trivially small and obviously correct
-- Has essentially zero regression risk
-- Only affects new hardware that wouldn't work otherwise
+**Cons:**
+- No explicit stable tag (but not required for device ID additions)
+- No Fixes: tag (appropriate - this isn't fixing broken code)
 
-While it lacks explicit stable tags, this type of hardware enablement is
-routinely accepted for stable backporting because it matches the pattern
-of USB/PCI ID additions. The only limitation is that backporting only
-applies to 6.17.y since the QCA2066 infrastructure doesn't exist in
-earlier kernels.
+**Risk vs Benefit:** Near-zero risk with clear benefit for hardware
+owners.
+
+Per the stable kernel rules, device ID additions to existing drivers are
+explicitly appropriate for backporting. They are small, obviously
+correct, fix a real user problem (hardware not working), and cannot
+introduce regressions.
 
 **YES**
 
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a5b73e0d271f3..9a923918bf741 100644
+index 9b199da1c0d67..cc03c8c38b16f 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -3269,6 +3269,7 @@ static const struct qca_device_info qca_devices_table[] = {
+@@ -785,6 +785,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x2b89, 0x8761), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x2b89, 0x6275), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
  
- static const struct qca_custom_firmware qca_custom_btfws[] = {
- 	{ 0x00130201, 0x030A, "QCA2066" },
-+	{ 0x00130201, 0x030B, "QCA2066" },
- 	{ },
- };
- 
+ 	/* Additional Realtek 8821AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
 -- 
 2.51.0
 
