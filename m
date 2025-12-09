@@ -1,121 +1,116 @@
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64112FDC21
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 11:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25C930F815;
+	Tue,  9 Dec 2025 12:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765281593; cv=none; b=G1QpUfWq5tqtkaL0yFAYMOSbXHDjSoYBBpSgYnOUCveKruhxOtHdj9wIfCBEoDZeu/w0sYpn5mwMD7KYKxgmyBYORFDM0etZ6CNvfCF53Q9pZOUq9AQrUauZ6d0jNF3h+u4o1m6by6xEDYjRqI1+9XsrSdK0owYtfqD1R+Pd8iE=
+	t=1765281979; cv=none; b=kAxTdNUpIX7nSiEYa5/JinFktwvoVV8MoG4NzLrVyCY/V4JU2pG/JbdFSkX5WfeEI5HY0lhLCByorw3odYKN7It1GCoAlSLZSfYHcIQ4dMVC1orZsdZuxwJ+N7I3alJXQEsY5VW1NavWzGvuQd4LSLa9TtV5fQtHRrus70jI3kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765281593; c=relaxed/simple;
-	bh=032D9VvLUgl8YpxTVBVp2NhLvEAxxRjHA7Are7Xu6QU=;
-	h=Date:Message-ID:In-Reply-To:References:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=PPWuqKXWthQXnIBVJY3AqM8v5SqlGaob30V3jWRekpV6IVP2H/BevdQHtZH6C+G2Wd4HPJcQw4dGgUqoE+ss0rrKFzhO39HVVrn3PoQoxeciH4T4KTHS/tfdSnOoYXHZottgGqbrM4UhQ8p7hpcJv6TQtWwHTDoLl+zbDqJvXvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4dQcpp1jXTz5BNRd;
-	Tue, 09 Dec 2025 19:59:46 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.99.176])
-	by mse-fl1.zte.com.cn with SMTP id 5B9BxV88080630;
-	Tue, 9 Dec 2025 19:59:31 +0800 (+08)
-	(envelope-from wang.yaxin@zte.com.cn)
-Received: from mapi (xaxapp01[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Tue, 9 Dec 2025 19:59:34 +0800 (CST)
-Date: Tue, 9 Dec 2025 19:59:34 +0800 (CST)
-X-Zmail-TransId: 2af969380f26023-c4694
-X-Mailer: Zmail v1.0
-Message-ID: <20251209195934117dOZMagBKlAEelaDzehffA@zte.com.cn>
-In-Reply-To: <069caee5-1169-4ae3-a501-d873cb4ed0bb@molgen.mpg.de>
-References: 20251208203404000bLAos3jnZFMsLDRmqZb_S@zte.com.cn,069caee5-1169-4ae3-a501-d873cb4ed0bb@molgen.mpg.de
+	s=arc-20240116; t=1765281979; c=relaxed/simple;
+	bh=V8ZbFNitZxZ0q6LoUIU6sh5wINJxFzeJhsg5BYpoR1w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dW4QyaB6zms0v8BOQg6dr6RZ0irBDmOP0DQSWC9jDzCIrw3txbZ1YzELDBJijXtV6UkllREn0aCByMcFWaXhWgmNrMu+fCnpVNx3ypKSlZRDdhAaLreW/o5aKoaA6+hwLiM7+bXvS9EtmfvW9BOJ0NDcoCCboxXfhs/qxK/3VLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=DGAdVkpe; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="DGAdVkpe"
+X-UUID: 6f05039cd4f711f0b33aeb1e7f16c2b6-20251209
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=biSx7WZ/dzqIzHa74Ww6F9siP+61NLhUlnmYjDzhZbE=;
+	b=DGAdVkpeTpPLxliFZwMmRsNKZF0YRw3Y6g52gkDVEZtxMhpKVMRcnceuZGvuE8N/mfhGSQ9jm6ovZ+qGAYnAPeCrhVI0bb709GhZWHMsSe9ayqqwbWSUbu28oL1tQRIYmcylJHdqw3jWJgBrUdQ9JVaGuIgIQ11VBCrVHcUhTN4=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:335daf81-1d4c-4606-ab40-4f18d303d5d0,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:a9d874c,CLOUDID:0547ffa9-6421-45b1-b8b8-e73e3dc9a90f,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
+	0,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OS
+	A:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 6f05039cd4f711f0b33aeb1e7f16c2b6-20251209
+Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw02.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 69700997; Tue, 09 Dec 2025 20:06:03 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 9 Dec 2025 20:06:02 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1748.26 via Frontend Transport; Tue, 9 Dec 2025 20:06:02 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
+	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v1] Bluetooth: btmtk: Trigger reset on firmware download failure
+Date: Tue, 9 Dec 2025 20:05:59 +0800
+Message-ID: <20251209120559.2991698-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <wang.yaxin@zte.com.cn>
-To: <pmenzel@molgen.mpg.de>
-Cc: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <xu.xin16@zte.com.cn>,
-        <yang.yang29@zte.com.cn>, <qiu.yutan@zte.com.cn>,
-        <chen.junlin@zte.com.cn>, <jiang.kun2@zte.com.cn>
-Subject: =?UTF-8?B?UmU6IFtSRkMgMi8yXSBCbHVldG9vdGg6IGhjaV9jb25uOiBmaXggV0FSTklORyBpbiBoY2lfY29ubl90aW1lb3V0?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 5B9BxV88080630
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: wang.yaxin@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.132 unknown Tue, 09 Dec 2025 19:59:46 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 69380F32.000/4dQcpp1jXTz5BNRd
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Thank you for your feedback.
+Initiate reset flow if MT79xx series BT failed to download firmware when
+doing setup.
+If driver is not able to get event after reset in the first section of
+btmtk_usb_setup, the protocol is deemed unuable and driver will return to
+prevent from repeatedly executing resets.
 
->> From: Qiu Yutan <qiu.yutan@zte.com.cn>
->> 
->> The warning is triggered when conn->refcnt is decremented to a negative value.
->
->Please past the warning (no line wrapping for pastes required).
->
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+---
+ drivers/bluetooth/btmtk.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-The monthly penetration testing results for this issue from Google are available 
-at the following link:
-https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index a8c520dc09e1..8b1443b9e9cf 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -1333,7 +1333,7 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 						btmtk_usb_hci_wmt_sync);
+ 		if (err < 0) {
+ 			bt_dev_err(hdev, "Failed to set up firmware (%d)", err);
+-			return err;
++			goto reset_fw;
+ 		}
+ 
+ 		/* It's Device EndPoint Reset Option Register */
+@@ -1353,7 +1353,7 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 		err = btmtk_usb_hci_wmt_sync(hdev, &wmt_params);
+ 		if (err < 0) {
+ 			bt_dev_err(hdev, "Failed to send wmt func ctrl (%d)", err);
+-			return err;
++			goto reset_fw;
+ 		}
+ 
+ 		hci_set_msft_opcode(hdev, 0xFD30);
+@@ -1444,6 +1444,13 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 	}
+ 	kfree_skb(skb);
+ 
++reset_fw:
++	if (btmtk_data->reset_sync) {
++		bt_dev_err(hdev, "Mediatek do firmware reset");
++		btmtk_reset_sync(hdev);
++		return err;
++	}
++
+ done:
+ 	rettime = ktime_get();
+ 	delta = ktime_sub(rettime, calltime);
+-- 
+2.45.2
 
->> Since atomic_dec_if_positive(&conn->refcnt) only decrements the value by 1
->> when conn->refcnt is positive, the resulting value will be greater than or equal to zero,
->> preventing this warning from reoccurring.
->
->Please re-flow for 75 characters per line.
->
-
-I'll submit a patch v2 to fix these formatting issues.
-
->> Signed-off-by: Qiu Yutan <qiu.yutan@zte.com.cn>
->> Signed-off-by: Wang Yaxin <wang.yaxin@zte.com.cn>
->> Signed-off-by: xu xin <xu.xin16@zte.com.cn>
->
->Please start the names with a capital letter.
->
->> Signed-off-by: Chen Junlin <chen.junlin@zte.com.cn>
->> ---
->>   include/net/bluetooth/hci_core.h | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index 5e01e6c501c1..2b306115add4 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -1635,7 +1635,7 @@ static inline void hci_conn_drop(struct hci_conn *conn)
->>       trace_hci_conn_drop(conn);
->>       BT_DBG("hcon %p orig refcnt %d", conn, atomic_read(&conn->refcnt));
->> 
->> -    if (atomic_dec_and_test(&conn->refcnt)) {
->> +    if (atomic_dec_if_positive(&conn->refcnt) == 0) {
->>           unsigned long timeo;
->> 
->>           switch (conn->type) {
->
->This patch looks unrelated from the trace point patch. Could you send it 
->in separately? Also, why did you mark it as RFC?
-
-The trace point patch aims to better reproduce and resolve the 
-"WARNING in hci_conn_timeout" issue. 
-
-Actually, the purpose of this patch series is primarily to address the WARNING in 
-hci_conn_timeout issue, while also initiating a discussion on the asymmetric i
-ncrement/decrement operations of conn->refcnt exposed therein.
-
-Please refer to the cover-letter description for details.
-
-Sincerely,
-
-Qiu Yutan
