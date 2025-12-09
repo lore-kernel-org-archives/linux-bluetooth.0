@@ -1,48 +1,109 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66EA2641E3
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 15:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765295418; cv=none; b=DSK6RH8TNRZbNHKqZDv5A4iR5E5RhFuymGh2noIk0bpMvWKMGrWJM6IVWTCzlgCfJouiabz+q/Rk8d7jeb3coxtuCDMGjMosWBsB67qG0g9JG7HV0J2Bdf5AdiZFhUMSrxodJ+pu9rhYELkFPAbWRaEXfI0a9aGxXqEiP9cqPkU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765295418; c=relaxed/simple;
-	bh=uP1A5xglp3RDUMNv5GCFBhJFqEzmQeb0sqU3xBvufA0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=TpcndM4pHumhUd19794MRh0LLVLznKFMGIwETaJfO+XY71NpOBvCtu+l0c51lwhv9FM3RV7h+2l2zGxBFFU6yDEZRqZvlYNkuxpRItcZBGZZLa46uyCryyn0IGeC5mzkwO5B2mmQllnP/AANWtK/nLJ/HYnyxhkQaUM1QQfqmuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kgJD/Mav; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115C419CD06
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 16:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765297858; cv=pass; b=hDxBh53rpB3JV4x+DXS0yS8Nhbqh3xWRUhIDp84m3yH50gINfjbqYG3eRCc+yFx9FY2F1xG3KR5hoF+u1aw2hGtETskgYfpq9B1onqKpjWeFtW4Gg/21tASjCbMgRUHFhOR4Wy79ckjmk11P88TrExHoGeFYc4NJKwnKX9/eP2o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765297858; c=relaxed/simple;
+	bh=JFvDr3Ew6b6bUtja/p6jTxDDClA90f++F3NPsn+N2Io=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SaOQefviGidKK4qb70GA4YTU0vovl5g/Ku1vD2DbjK10H4tXUhPHbnqOu3oX3QPgBhtrM5ruFMfg91YBR9ufvcd5CNh4Sd0IKwZ+diSqOm0ulLbFlD13aHLc7DOV3V/sJZkneDfikKquF6T9TUbfeh0ik3PZey1XZhS7e4rkaxE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=HW3a1L1n; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kgJD/Mav"
-Received: from github.com (hubbernetes-node-6763abf.va3-iad.github.net [10.48.219.82])
-	by smtp.github.com (Postfix) with ESMTPA id DE96A4E02A8
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Dec 2025 07:50:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1765295415;
-	bh=JM0UeZBl8DJBOTPIyfXk7Z9heLfkYOR6GH3oI/J2/4I=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=kgJD/MavcCpQ0EEYLHubod1fsuznw0aV277vZVk7k+BJlLBs4SEq2goHcUXd+J4XK
-	 ltZ3Q7SkdV2druecRtdfHqST9yk5Hql8b/AEMs5Yo2Q/5ANmHaFYpEXTrCpf2Mmhqo
-	 Bn6o7CzKmlaAHed+XuQcjmmzfrFcIzdf0HRRBufk=
-Date: Tue, 09 Dec 2025 07:50:15 -0800
-From: BluezTestBot <noreply@github.com>
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="HW3a1L1n"
+Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a03d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dQkqb4l2CzyRd;
+	Tue,  9 Dec 2025 18:30:51 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1765297852;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=anb1S9Vd5g6ujNgDCgRuwHk22HiJGfbuoBBDijDlBBU=;
+	b=HW3a1L1nCRobKb4QMu1wgtXwZlu+9WQCd6Hm3fs+b5Iah0jRoe2H1HJ9WJBKSCRDFlbJyG
+	DGqRUzEXRGAMapHeX9rNSj0jj0fI6k+aUbheg7HoDB6+HvSvno5uNPFrA1mT2c1Wk4NcfD
+	BtvuFGIO0LdyGcw7El0ZPOkl0ZC5zN0=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765297852;
+	b=wbTWof9tAHrt2pQRpC/ZigmgQ9kqpfIuRSzakkWWiO5bGf0c5Lnryidx2kERQbv8o0ZOxg
+	V/A+ObuYZEgSQKUgEUIY6pCz7A/1CYAVE9wUYRs/zZAY4PEKppZZw7BCRrhG9r3fUt4/t6
+	cBaT1ghEDAcNP2jea4jG8ZWvVstjl08=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1765297852;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=anb1S9Vd5g6ujNgDCgRuwHk22HiJGfbuoBBDijDlBBU=;
+	b=AB9m+W1NuYmGIxA+NJweiOMOSxOcMKxcWjstKGBfGBgtAASODol7rvO7E3dFYXY1FYAm0S
+	8AE8VOqJeWLd9zZ8urLGKqAKTSGPwRcgH/mIwDETMa+xGJ+zt0sYjaSkfjxA+615GMcLtf
+	iQrQLAh49RugGmnXdiOUT0el/qQ4qPE=
+From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1031084/d569e5-000000@github.com>
-Subject: [bluez/bluez]
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [RFC PATCH v2 1/2] Bluetooth: fix locking in hci_conn_request_evt() with HCI_PROTO_DEFER
+Date: Tue,  9 Dec 2025 18:30:34 +0200
+Message-ID: <118c61c95ad4deab0e08d3a3c8b92910bc271281.1765297112.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1031084
-  Home:   https://github.com/bluez/bluez
+When protocol sets HCI_PROTO_DEFER, hci_conn_request_evt() calls
+hci_connect_cfm(conn) without hdev->lock.  Only SCO and ISO set
+HCI_PROTO_DEFER (for listening socket with defer setup).
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Nothing guarantees conn remains alive after unlock.  In all other code
+paths (also listening socket without defer setup), hci_connect_cfm(conn)
+is called with hdev->lock held.
+
+Fix by holding the lock.
+
+Fixes: 70c464256310 ("Bluetooth: Refactor connection request handling")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
+
+Notes:
+    These two patches are pending some further testing in practice, but
+    lockdep is now happy about how this works.
+
+ net/bluetooth/hci_event.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a9868f17ef40..a3bd7dcee1bb 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3306,8 +3306,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
+ 
+ 	memcpy(conn->dev_class, ev->dev_class, 3);
+ 
+-	hci_dev_unlock(hdev);
+-
+ 	if (ev->link_type == ACL_LINK ||
+ 	    (!(flags & HCI_PROTO_DEFER) && !lmp_esco_capable(hdev))) {
+ 		struct hci_cp_accept_conn_req cp;
+@@ -3341,7 +3339,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
+ 		hci_connect_cfm(conn, 0);
+ 	}
+ 
+-	return;
+ unlock:
+ 	hci_dev_unlock(hdev);
+ }
+-- 
+2.51.1
+
