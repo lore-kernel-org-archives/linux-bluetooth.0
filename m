@@ -1,161 +1,150 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0731DE8A4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 21:08:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808C02D73B8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 21:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765400912; cv=none; b=axBTf1oHMZuq/09FdeEJN1uj9UAyFzZMo7Uc50XDRpVo8M54Z4mFZJrgN/7cLR1COlaT/RQIWoN/n32w8eqAhaVBDPVKGBe32SHezQbH2jKcJFhkmMb+5bqsGajtnIunVVoR6HdCjP7HAOqNy7l164SsB2Xt4vfy9np7PvykK7A=
+	t=1765400959; cv=none; b=RRS59jfmWllRmCMy7ssqCKuALeJNeVLa8ZTKzuYPS246aMr4TmF69VrDgRnW+YRrse1Z7HhD8OgadWbeyLljiJc6POLfd/UQvuLG+yrRPdppRqMTq8pfT6mEOrLgCkk44H/7FztHWf/PxzJW+low5W1/nc4fUPB5qXT0i0ZReWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765400912; c=relaxed/simple;
-	bh=O4lIsPsS2Mh9lYEXbW5Xp3heDdxnf4UlJeap4iiWxzY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=K6qJUslC2CVXGYCLIpt7Yy/seI4FTL3NPv2ckGjcmjjRACzZ2D9X3HlaORXedHHFedWNBDs3WBEw/xeeFsdTt+DHG6nK/u2dpbNLeUb/IpRtzwiro1kiLt9eBzw3+ZbCyMRD3H8Q/T4IimR+UBRWIZc59o8AynS4M85u+j7KLII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HXxVJaa7; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1765400959; c=relaxed/simple;
+	bh=+JwZdOS4OO4M4sPyj7QLRNlKidsDHfjjGOTQ6H2spos=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o7UpKf8caa5W2SBb1t7EOGZrZILJeHFB2bPtCZZVPdtbW99Z+zu/p7MPdKuoswTsDXOrifR8Oso1lO7cuNjjhNZnoEAloBO71naIzD+gX86E2r6bMaXDooShuCmdr2kpOohBOnSEltbeyHEW4ec/KWeZWAGgKgVjFLM1+KDjlK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xf3fKTJX; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HXxVJaa7"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-297f35be2ffso4053695ad.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 13:08:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xf3fKTJX"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-37d96f97206so1673901fa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 13:09:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765400910; x=1766005710; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pxQVrdbmi9mZgmKJB8FA1EWSVlZ6YZRLuQ9F9sSCl38=;
-        b=HXxVJaa7omAW8mOnvBBKRQLpcpoaQCheJOHtCLxSX5zERu5tyyNE1OfGx44zPmpFhz
-         zPU2aDzI3xvBU1dlVpgTSh8LchbJxCuXJvmkU8Hg3p/AUN85qPriG5jU1mxSGjZlQa31
-         /6mZI3Yy7TiehtgSRAtlGXOJOld4qfjerFg+czbLUiEl8WyXO1FrAX87VSb7Ztg82Wjf
-         BhtZqEy/XgE+Q+6OorlnZfYsc6Bo/2i2wfeeMbYG4pg4yTFOwFuvSzImk5otR/ReEkcT
-         RJ5s9nuepEt0NPe+QeMU2aVV5YJ42FRgWFAf+6hH30bQ+BSsbR4pEryef03/o3DULYGw
-         jsPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765400910; x=1766005710;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1765400956; x=1766005756; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pxQVrdbmi9mZgmKJB8FA1EWSVlZ6YZRLuQ9F9sSCl38=;
-        b=av0tkvRWsTc0R3BsH1fIg4X/iDZ4zxS1C3ZZpT+65KRe8dK0UIy29PJuCvheM1TbzA
-         lNCbGJZ2kv11dIC1JeP/B+RZApjGfQEgu6F0+bgc9ayR5OloldK7jdYaa8h7oK//jRsm
-         75B1NYTz5ETa2EZaK+x9fe23LYhdATQBFliGk8XmgdWWFbu8kl3yxLCznnPxZBJOKa6R
-         RbObBG6F+TmuZClRfZHNqm/dQ9WiVRtyKUJh7+rH9AcabL6Wz20e5nOviBUDELKZWkUJ
-         XVO6dWGdDcJ4SVv3fGrBySci9C39x+F52zsbt5zISq3ya/zb87o4VMC1n/2rNAGyMXC/
-         2jgw==
-X-Gm-Message-State: AOJu0Ywx+kVTlYJF1d/5C6YSe92tG772cFq1ggl7SPrFcrcs7o8YeMF+
-	3mad+3rNykT8UT2v2rz7/02apJUlsDZyzqIwgij9COKkbmakGLi6RNcJn7MDEA==
-X-Gm-Gg: ASbGncvXIL0fNtaR71tPS4BwIsqW+/kyby1emr6h/sSDD0W3vclzjgkNgBgRWtTgV89
-	Ab3T0P/v5brQwguBNPye8teyIPecSH3vv4vjyULNzegPwlmlMN6IK6cqyf9xA05Fgt32aRYqRtm
-	RXevHQPuwUjlezJmk0U4Snc0NgsXN22b1f5W4AYz3EcohxLWwph3X9C1P+//lgv8Zweda4MD1EM
-	LJdaansqSSL4muLiKtF1f91WXa8SC5to3eVFsyGeRDYlGppWgS6l/AmQ4zcwJzf47x3a5MwoAdy
-	VNEfHJ8HYbUIzIEPRbizNBmXv01QKp7WJcCm45cmbMWqswoF8Xw5JImhydBCMYRxklLRgj3I0UE
-	oq1JExXmbkDi+bHGmlVee5x+epWp+MXS/o53jPqm1TH1oD9IR+XI9iwMreEKNtgDvTSIA2mVrPH
-	VzDFSV4f3Kyb4nJt5bKig=
-X-Google-Smtp-Source: AGHT+IHFPKg3BnOzd7+rbpu2aHHHXy+IEgBi0jvCGC2ORHAYgwX8vFGeu4OLSSEDQRv2STaz4UXlWw==
-X-Received: by 2002:a05:7022:4429:b0:11f:2c9e:87f8 with SMTP id a92af1059eb24-11f2c9e8887mr1516139c88.34.1765400910013;
-        Wed, 10 Dec 2025 13:08:30 -0800 (PST)
-Received: from [172.17.0.2] ([172.184.211.163])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11f2e30497fsm1553512c88.15.2025.12.10.13.08.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 13:08:29 -0800 (PST)
-Message-ID: <6939e14d.050a0220.2dd6a8.cee4@mx.google.com>
-Date: Wed, 10 Dec 2025 13:08:29 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5049255519195162885=="
+        bh=ET/9QO44rDBP9OpaiN9wAo/Ddh/RnDMf08D3p9at9V0=;
+        b=Xf3fKTJXtAaXPQQzcRM183sxAuJN+JGDC+2zNudR3exGwhar6bvzq2Hy6MG9xCd2tw
+         G9kSdSiA/MTm6Aoo80f0Y1xe1pjVgcfNJjzVzVifApcDrnpXvpy22do1INLjxVJ7VVlL
+         3VbLzxAzeiBJDo/aJFUsiLuRHSvb8q55539taIZAmZNswoWSzHTKxlZ5ugcjbDOSnTqT
+         FVcqRX5VFO6YgXrP/2Ta7FnG+uiiPoTdjNb80IKFtsVArqq+CGoHnpMZsrSdLbA4FH4H
+         VPOKyd7zthBPaqQSMfx9rBQDVzUL8wYpjmRDK+uch7pGbDSDEYr/3JqBwiQI1wIt1FbR
+         0pLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765400956; x=1766005756;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ET/9QO44rDBP9OpaiN9wAo/Ddh/RnDMf08D3p9at9V0=;
+        b=dL03VrsVs5PGrGPdeDA5+9zhn+60HRILgeyIuJZK1/uTIodP2+rNChdM1R9A8r5UCe
+         /Y48gCm76DO8jd+aFFvE1sryU6USG3zArfngrAfVLWvYzjU9rLKLG9ZW4Vg0vCK1uK5I
+         its/cSXeTdzlY9PifAuSCo4ZlqO728Lw0zA9M7A5xogP6CNgGtc7nDwq3iX3rm/gML7M
+         1EY8OxJhHTLgXRYuQ8x3xKxjAd4E16NrBXebESxWhAaYNYDFi4XX6EEGqFtaTM7tKbCN
+         yRyJTrskgMCTVzbWZYNtfh/yG7i9x4PHJLd7lgQ25kq/jKW2aAlW2cc16ajcAID1IYzu
+         efGw==
+X-Forwarded-Encrypted: i=1; AJvYcCXBrV0SQx3xGQ5EMpaqCOQnJlHz4nxsLeCVq8Leiu847OWT+5G+ey0I39WdoyKX9iWT/R0+qp8T08cBGBYRNDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk3tlrN7VUb1gNF0k3EBqInYvXKWen/3GriPx5bDraH1l4/Zt1
+	FDZl59XCls67GGWXcOmobRyGTo1IfPYzpDfXxVAPWBA7zUmVJ6OLFdw4kUF59LC9++iFPB4+/gu
+	+dEhpW4QR6MVqOd4tH++ovurWj/mezb4=
+X-Gm-Gg: AY/fxX6UdWetH/fkza535WL4TpC+zYJTqlhB1cWW3U0CIe/ecLp8TDczarOnEAuUssI
+	KLo69cSmnTXRVzaCUaPlU000cMpT/nrpkRaEsmsb67s1hX2xzPbkgGxV9LKwP7vhUhYPBznWrLo
+	woqIMRWT8m7YQ5cGA5WcIiDq9VsBfFNCn2rNNmpL4YI7wUdMdwX4R7aQdfeTPQ/tz/S/nKzacqf
+	wDejkQVUc5baivwrgcRCnwcYuyt3PA6uX8ZWOk4n7Fyt2GN3A4Zsuon2SFUtmt39qSIbg==
+X-Google-Smtp-Source: AGHT+IHdCox96E67zeHTDjL/WO2yGbC6snv7WJvcW8t/0qFT9DOrWg8r9WPmdGrMqw4kUG3QDe03qZMxxZ+Jt9yBp50=
+X-Received: by 2002:a05:651c:1505:b0:37b:b8c0:b5d4 with SMTP id
+ 38308e7fff4ca-37fb208c3bfmr10569841fa.23.1765400955319; Wed, 10 Dec 2025
+ 13:09:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, elantsew.andrew@gmail.com
-Subject: RE: Bluetooth: btusb: Add support for MediaTek7920 0489:e158
-In-Reply-To: <20251210202225.135637-1-elantsew.andrew@gmail.com>
-References: <20251210202225.135637-1-elantsew.andrew@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20251209120559.2991698-1-chris.lu@mediatek.com>
+In-Reply-To: <20251209120559.2991698-1-chris.lu@mediatek.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 10 Dec 2025 16:09:03 -0500
+X-Gm-Features: AQt7F2pUKepbtCaHCSB5Wq10ueXFl0KdG1dLSST2gFITkH7g0XHmlMzylb_0RLQ
+Message-ID: <CABBYNZ+o_ewu7fwDLSW0c4BEosG-CqugK+7JgY3TBf2PcPrm8A@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: btmtk: Trigger reset on firmware download failure
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>, 
+	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, 
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============5049255519195162885==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Chris,
 
-This is automated email and please do not reply to this email!
+On Tue, Dec 9, 2025 at 7:06=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wro=
+te:
+>
+> Initiate reset flow if MT79xx series BT failed to download firmware when
+> doing setup.
+> If driver is not able to get event after reset in the first section of
+> btmtk_usb_setup, the protocol is deemed unuable and driver will return to
+> prevent from repeatedly executing resets.
+>
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> ---
+>  drivers/bluetooth/btmtk.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> index a8c520dc09e1..8b1443b9e9cf 100644
+> --- a/drivers/bluetooth/btmtk.c
+> +++ b/drivers/bluetooth/btmtk.c
+> @@ -1333,7 +1333,7 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+>                                                 btmtk_usb_hci_wmt_sync);
+>                 if (err < 0) {
+>                         bt_dev_err(hdev, "Failed to set up firmware (%d)"=
+, err);
+> -                       return err;
+> +                       goto reset_fw;
+>                 }
+>
+>                 /* It's Device EndPoint Reset Option Register */
+> @@ -1353,7 +1353,7 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+>                 err =3D btmtk_usb_hci_wmt_sync(hdev, &wmt_params);
+>                 if (err < 0) {
+>                         bt_dev_err(hdev, "Failed to send wmt func ctrl (%=
+d)", err);
+> -                       return err;
+> +                       goto reset_fw;
+>                 }
+>
+>                 hci_set_msft_opcode(hdev, 0xFD30);
+> @@ -1444,6 +1444,13 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+>         }
+>         kfree_skb(skb);
+>
+> +reset_fw:
+> +       if (btmtk_data->reset_sync) {
+> +               bt_dev_err(hdev, "Mediatek do firmware reset");
 
-Dear submitter,
+This message is a bit cryptic to me, why do we need to print that you
+will be doing a reset?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1032097
+> +               btmtk_reset_sync(hdev);
 
----Test result---
+This seems to be doing a hard reset, which I assume you are doing as
+an attempt to recover by retrying to setup, but if it fails we may go
+into a loop condition trying to setup so we better limit the number of
+attempts.
 
-Test Summary:
-CheckPatch                    PENDING   0.47 seconds
-GitLint                       PENDING   0.38 seconds
-SubjectPrefix                 PASS      0.05 seconds
-BuildKernel                   PASS      25.70 seconds
-CheckAllWarning               PASS      27.89 seconds
-CheckSparse                   PASS      31.47 seconds
-BuildKernel32                 PASS      25.15 seconds
-TestRunnerSetup               PASS      550.75 seconds
-TestRunner_l2cap-tester       PASS      23.93 seconds
-TestRunner_iso-tester         PASS      71.62 seconds
-TestRunner_bnep-tester        PASS      6.20 seconds
-TestRunner_mgmt-tester        FAIL      126.72 seconds
-TestRunner_rfcomm-tester      PASS      9.21 seconds
-TestRunner_sco-tester         FAIL      14.55 seconds
-TestRunner_ioctl-tester       PASS      10.10 seconds
-TestRunner_mesh-tester        FAIL      11.51 seconds
-TestRunner_smp-tester         PASS      8.44 seconds
-TestRunner_userchan-tester    PASS      6.54 seconds
-IncrementalBuild              PENDING   0.88 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 487 (98.6%), Failed: 3, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.104 seconds
-LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.173 seconds
-LL Privacy - Add Device 3 (AL is full)               Failed       0.202 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.858 seconds
-Mesh - Send cancel - 2                               Timed out    1.997 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
+> +               return err;
+> +       }
+> +
+>  done:
+>         rettime =3D ktime_get();
+>         delta =3D ktime_sub(rettime, calltime);
+> --
+> 2.45.2
+>
 
 
---===============5049255519195162885==--
+--=20
+Luiz Augusto von Dentz
