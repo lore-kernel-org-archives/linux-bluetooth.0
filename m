@@ -1,81 +1,69 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5162FAC0A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 23:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04D91E5205
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 23:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765408889; cv=none; b=g383EN+MWHX/AQeNILzoltHo5mpqQ0ao4WO2U5Ln4KgwT8ghn0eG/vgmSIpNU0UGVWoytAZwvnO1417dmcOFr/a/AJfQCZiKTGpkNjIkw2Mep+Xfneuek2MZl8kYmAni9XEmtyyWv/e7UIqpxQH49sUe82qfK9OI7u9Pr7KJpeI=
+	t=1765409898; cv=none; b=AuQ7GkqH1XVhjNvw354EnSDvunL+4LWpAk7mD1LhgpwcXOkUwsQ+qXMj+P4DBE1uUKGelCkDBFeQESv8AGmwU/wMfC3QCVMjvF15PGJ9eL2KZOP0PY8XzzPdjfeLOnUjbCzv2KvwIK6mHm3BHkc9qfqkxN98daDV84yRQumuKHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765408889; c=relaxed/simple;
-	bh=7U6Hf0CN4Pzn/d+Dmrxb012ZiCGtKjQudcOEFKhWfgo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C/zUL6LAl/5p643P1wopaCYSEUmIqfNJC21xpM+shi1eUdP5+lT0Mc+ER1+q+zrROIq7dX2Y0pAawsPoONz412dbkVfih0JIs/lDbR5NVxJvBVBkdanM4xOHeZWZ6bMT2ySDxLnb8z/NOhc5bKw6eMeEhrv+VksPajPCiFcu9I4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YmWHvfJ7; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1765409898; c=relaxed/simple;
+	bh=gaDMfQa+hKFDCRDrFJeuGokLWDNko3wq7G4EDakylDI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=od50+edxbweZuE+ywQy0JAwnY2HtoC3Imj4G6hNv+HEyf5ALNNdb8XFGfUmrtlcGiSUcE7xzOAI5W2M+Cn4Wa43ZSqh8eStg0zIfQp8YkRPrFiRrTlJmH1MO9F89exMnwn5ZL4Chlbdql0QuyuUsBvRxMMsjqtJFjHtFhyaZhvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ug7rbwko; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YmWHvfJ7"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-477b1cc8fb4so1947425e9.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 15:21:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ug7rbwko"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3436d6bdce8so427466a91.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 15:38:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765408885; x=1766013685; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L08jHXpXjen58cg14Adrr2f98WJp67FFgA9qD2YXBHU=;
-        b=YmWHvfJ78XWy0tgjXo1NcrTeVrmvUk9zr6aph0VUPcXF2BIf9rg0vDy111OToOolSy
-         c1x3A2AISxATOAI39GFIM2FYc/D92E/DYK/t1CriigOhymbppGsEY0Wim6BMebrf7xxl
-         TncGrjqHM6Sb9H483rnAh6Hv5bDVT5q73lUhd1w3t41Gu3xMqn7YtqNugMyv64luKruo
-         AxCzoU2jS+sGGtdNWx23nCh+Fya5vKsQgFJjppQq7N/ufwSz2Na0O++cWpmnza9NTdpN
-         AUfQGlIRILlPBiZTy/305Lavw1ZQdcfzhN65CfFZ1Qy+Yc4U5jqUL1mRR4OoWBwXzjD6
-         GT0g==
+        d=gmail.com; s=20230601; t=1765409896; x=1766014696; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pSqoVz0K/QZnou9ls05KRAopur/ThNtu2Vyd3fkzg6M=;
+        b=Ug7rbwkoSidLNs2LzEJO9F7hU9O1jdTRNEfLrb0dkdnbw07fRZ/9U+/ioG+aokXpeG
+         7sTcuP+W1fB/JPAnCSu5zpCRf258ozabZwH0E5fUXzHW49qRcTdSihe4cycToX6EI43N
+         Oo2h2xj6XOCpHdGbJgDEONAirCbvT47SRKLCNpd6Ca6YTopBnsbwuZzqfUhBgdAWKySi
+         PQKYuMsTtiFGat0SPqlZuTUqwUNlSBBNzPNpdQcqZi5kC38BblMk6yja/38TJsD8ievX
+         ULk+CjayfyPCjvOORFjKTlcHTKnHV0EhNAWzYPScOEptHLBA5sTI/bs7nMWUbMOcryln
+         bFDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765408885; x=1766013685;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=L08jHXpXjen58cg14Adrr2f98WJp67FFgA9qD2YXBHU=;
-        b=fW2WOTmvZcHyvAYAXotIyF/57IuOoJLkHUCjhrvsFpU1FToxPWJRdOpCwpsGMO6V5a
-         jQnoclqI2UdAPXT2jJ8I0kDsDzNyCFCbMxcH5adXSBPUCzmTISkYy1h90kYJc2obvJV9
-         e+51hV20PWgfKJZF3JAP05s419+aqspaUZfB9mmmZFn3UGvoI/gaCDWNBVyjUQR4dcvZ
-         1ASnQiYVkvcZO65f2O329cw9Sevh4fa8jZ5068k32+zSFclA4Xtlx0cGy9+a0EDA/OuJ
-         fo6F/Ar+2+RaViSLSrnGB5uve9ziXcjaRbrPl4OgbX55zOKFQLFEAgw7GBD7etLk9J58
-         EjyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV1Afr9FrmlGNbO7iyiQ9ysve9I9pcnJvcM8NxtRCjDfEmZ0iBkwqsyW1JIn7Kia8zuRDe90LLSc4SGjarxkzg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+Z3R4OGYpT3iFb3j8HzBSfaopVkVBy12b2lg1wH38McFjTOBo
-	S2lYD07Cp5nwNSYm8mwYh3T/RPI2agWwl+ndZqF9PO6Z9IESr9M8Ze0XWyJYmQ==
-X-Gm-Gg: ASbGncu8GgMlK2TMlRWvDE/nedk7HXv/+Bws4V8k7bECUutvcBuFKy4LFz+o6nfwsyf
-	0v4Oqc8WXtbjt+k8u8mOVZQJ1LN0eLxY1h7XPxvBOGU1KSH1W/BI/Zbn2AXFTEUSdlwGnEpSEWe
-	+liuxUPTfudQi/oxrBH5LCNLCQccOYma1ZtRiD/kBDGPIX76pUzpvy21P/HQ4CgtLxB0n71PXYP
-	bMU4TpihFW/nY2k2TkOywUX6BWYb5q4oFQMyFEzpAOjpjx/8nnFIUoElLUy6lXp1NxdYwIjBqbA
-	JVztRKjm4Ic0MHtBlAL6iSYXaIInZdqknN/QnohGrhZBb6GyKt+l2Ig2i5OZXKRFAxHZwuQP0Lv
-	2kfjGNTibOE5zRFL51F0EIZzFkePDKgqHyLT0C7KWWsExGW/qkyGamZ0KljrDs+pFzIjCcj9+s6
-	bGP39EAHCfk6nuz6vP2qQYcTrNy8uCGb/YLw==
-X-Google-Smtp-Source: AGHT+IGHScSlL9cu47vMGSsn/jos8nO6lMKdreWx01YeiMB6yIIL90yCPe3N5A1FoFFavDktLuDS7g==
-X-Received: by 2002:a05:600c:1c93:b0:471:d2f:7987 with SMTP id 5b1f17b1804b1-47a837b9a4cmr42271815e9.26.1765408885028;
-        Wed, 10 Dec 2025 15:21:25 -0800 (PST)
-Received: from dev-linux.homserver.local ([51.154.248.28])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a89f742a4sm654425e9.10.2025.12.10.15.21.24
+        d=1e100.net; s=20230601; t=1765409896; x=1766014696;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pSqoVz0K/QZnou9ls05KRAopur/ThNtu2Vyd3fkzg6M=;
+        b=B8xe3zHOQncAXd0oSDy71h6mHu/drBN8RwCZmoZA7/QjwBfpYSildvb/hp9Hnsa7nF
+         TwRKPEPOoWOfbfxl7HfgKXg1KXq0RyUv9tiQUxo6+jqRPFfxNTrmoAocV/1wfx0E7OIV
+         payl3W8WGEaXnWzUTB7b8utjIk261PAkZ2oLWym4uVXRRjcOsfIlVyrT53OKaOBuoWX8
+         rG3T/Q6xLW9/2RYXbTm703AyMhE+Ap/OBcycN3v7eeEyUuHefMd/+PyTVPFlYcE4j3n0
+         f/ra4cX9nY+OtXPuMsmIyta/Lt+fWahGWABltWM/8gqEzaaBngW0nHr/Fbr4DxKXZJ8H
+         1iJw==
+X-Gm-Message-State: AOJu0YwOiPd9+tjLZwcxjS6zxnNFgbPN28wPHKix3AQIoGKs6assZCTG
+	zVyHmBYmq9sM1buw/gEYrZCKVC89thpSr3OMxpbC9jqeDG9VU+pkx7oWFgLVmy9su6E=
+X-Gm-Gg: AY/fxX4Re1Oavhhwz6Tc+w+sJ0rpWDz41vfFiUUroWiS86bdYHTy1B2WHOPscOGRolK
+	8N0N1lKg/+UoNzqp1BR0UoRs70i/lAifZZZjxVYOODQyuppHVt0Uxg9VUgdk3uLFLIfIwyUIHgV
+	kbHPUi+gWCRJd84fRV4fiH9NqqHX0kuWaQkGaSDDemf4GfMiIp5Nx/Ga+769rLPdYNXrmpDqXMJ
+	8QDxw4CGmsAw7jqJOlFsoM1s69Z/13lcD4IPpDXJ6aIJiVzPoxJ6LTsWMHrQToUGq71SU6uAlHi
+	8L2TlzNcnPqBp+qZhrnHyEEth/2VvYEur/vECLm3RTT1f8/IxiF4JWHLyMKUF+CYcEiAUVPt3L2
+	H4VvvPzTm8EVbw8DD6uOY7W/vRRrpfdR3+JuvyxmHJAptZcK6JZoDmjh48QxSbxTRlDGvVtr9WV
+	9jTpu7/JKcdk6YNk9MmYFxoLJTWqK2
+X-Google-Smtp-Source: AGHT+IHGKtagm9wjmK8AOMGyoagtwsO3egeNSxgXgz6F+mG/PbOZVY2gNHyu2xOsY/5BdTFRxkpPGg==
+X-Received: by 2002:a17:90a:c883:b0:340:ca7d:936a with SMTP id 98e67ed59e1d1-34a72900fe9mr4227737a91.18.1765409895645;
+        Wed, 10 Dec 2025 15:38:15 -0800 (PST)
+Received: from localhost.localdomain ([73.221.165.73])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34a926af6efsm10049a91.5.2025.12.10.15.38.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 15:21:24 -0800 (PST)
-From: Vaibhav Gupta <vaibhavgupta40@gmail.com>
-To: Sven Peter <sven@kernel.org>,
-	Janne Grunau <j@jannau.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Neal Gompa <neal@gompa.dev>
-Cc: Vaibhav Gupta <vaibhavgupta40@gmail.com>,
-	asahi@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_bcm4377: Use generic power management
-Date: Wed, 10 Dec 2025 23:21:09 +0000
-Message-ID: <20251210232115.547729-1-vaibhavgupta40@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251210211728.544677-1-vaibhavgupta40@gmail.com>
-References: <20251210211728.544677-1-vaibhavgupta40@gmail.com>
+        Wed, 10 Dec 2025 15:38:14 -0800 (PST)
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: [PATCH BlueZ v4] monitor: Add unknown options decoding for Configure Response
+Date: Wed, 10 Dec 2025 15:37:54 -0800
+Message-ID: <20251210233755.2252548-1-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -84,68 +72,128 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Switch to the generic PCI power management framework and remove legacy
-callbacks like .suspend() and .resume(). With the generic framework, the
-standard PCI related work like:
-        - pci_save/restore_state()
-        - pci_enable/disable_device()
-        - pci_set_power_state()
-is handled by the PCI core and this driver should implement only
-hci_bcm4377 specific operations in its respective callback functions.
+Unknown options respose for Configure Respose packet has a different
+layout that of unaccepted options, so it needs special code to handle
+it.
 
-Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
----
-v2: v1 has a typo in its subject. This patch is not part of a series. So
-there should be no '[.... 1/2]'.
----
- drivers/bluetooth/hci_bcm4377.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Before:
 
-diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
-index 45e6d84224ee..925d0a635945 100644
---- a/drivers/bluetooth/hci_bcm4377.c
-+++ b/drivers/bluetooth/hci_bcm4377.c
-@@ -2416,8 +2416,9 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 					hdev);
- }
- 
--static int bcm4377_suspend(struct pci_dev *pdev, pm_message_t state)
-+static int bcm4377_suspend(struct device *dev)
- {
-+	struct pci_dev *pdev = to_pci_dev(dev);
- 	struct bcm4377_data *bcm4377 = pci_get_drvdata(pdev);
- 	int ret;
- 
-@@ -2431,8 +2432,9 @@ static int bcm4377_suspend(struct pci_dev *pdev, pm_message_t state)
- 	return 0;
- }
- 
--static int bcm4377_resume(struct pci_dev *pdev)
-+static int bcm4377_resume(struct device *dev)
- {
-+	struct pci_dev *pdev = to_pci_dev(dev);
- 	struct bcm4377_data *bcm4377 = pci_get_drvdata(pdev);
- 
- 	iowrite32(BCM4377_BAR0_SLEEP_CONTROL_UNQUIESCE,
-@@ -2441,6 +2443,8 @@ static int bcm4377_resume(struct pci_dev *pdev)
- 	return hci_resume_dev(bcm4377->hdev);
- }
- 
-+static DEFINE_SIMPLE_DEV_PM_OPS(bcm4377_ops, bcm4377_suspend, bcm4377_resume);
-+
- static const struct dmi_system_id bcm4377_dmi_board_table[] = {
- 	{
- 		.matches = {
-@@ -2541,8 +2545,7 @@ static struct pci_driver bcm4377_pci_driver = {
- 	.name = "hci_bcm4377",
- 	.id_table = bcm4377_devid_table,
- 	.probe = bcm4377_probe,
--	.suspend = bcm4377_suspend,
--	.resume = bcm4377_resume,
-+	.driver.pm = &bcm4377_ops,
+> ACL Data RX: Handle 12 flags 0x02 dlen 15
+      L2CAP: Configure Response (0x05) ident 2 len 7
+        Source CID: 64
+        Flags: 0x0000
+        Result: Failure - unknown options (0x0003)
+        04
+
+After:
+
+> ACL Data RX: Handle 12 flags 0x02 dlen 15
+      L2CAP: Configure Response (0x05) ident 3 len 7
+        Source CID: 65
+        Flags: 0x0000
+        Result: Failure - unknown options (0x0003)
+        Option: Retransmission and Flow Control (0x04)
+---
+
+Changes since [v3]:
+
+    - Fixed various checkpatch warnings
+
+Changes since [v2]:
+
+    - Patch rebased on latest master
+
+Changes since [v1]:
+
+    - Code converted to use l2cap_frame_get_u8() and l2cap_frame_pull()
+
+[v3] https://lore.kernel.org/linux-bluetooth/20251205233253.550032-1-andrew.smirnov@gmail.com
+[v2] https://lore.kernel.org/linux-bluetooth/20190906190717.1325-1-andrew.smirnov@gmail.com
+[v1] https://lore.kernel.org/linux-bluetooth/20190522013216.22493-1-andrew.smirnov@gmail.com/
+
+ monitor/l2cap.c | 51 +++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 41 insertions(+), 10 deletions(-)
+
+diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+index 6380fec7a..be041a8e1 100644
+--- a/monitor/l2cap.c
++++ b/monitor/l2cap.c
+@@ -733,6 +733,41 @@ static const struct {
+         { }
  };
- module_pci_driver(bcm4377_pci_driver);
- 
--- 
-2.51.0
 
++static void lookup_option_by_type(uint8_t type, const char **str,
++				  uint8_t *expect_len)
++{
++	int i;
++
++	for (i = 0; options_table[i].str; i++) {
++		if (options_table[i].type == type) {
++			*str = options_table[i].str;
++			if (expect_len)
++				*expect_len = options_table[i].len;
++			return;
++		}
++	}
++
++	*str = "Unknown";
++	if (expect_len)
++		*expect_len = 0;
++}
++
++static void print_unknown_options(const struct l2cap_frame *source,
++				  uint8_t offset)
++{
++	struct l2cap_frame frame;
++	uint8_t type;
++
++	l2cap_frame_pull(&frame, source, offset);
++
++	while (l2cap_frame_get_u8(&frame, &type)) {
++		const char *str;
++
++		lookup_option_by_type(type, &str, NULL);
++		print_field("Option: %s (0x%2.2x)", str, type);
++	}
++}
++
+ static void print_config_options(const struct l2cap_frame *frame,
+ 				uint8_t offset, uint16_t cid, bool response)
+ {
+@@ -741,20 +776,13 @@ static void print_config_options(const struct l2cap_frame *frame,
+ 	uint16_t consumed = 0;
+
+ 	while (consumed < size - 2) {
+-		const char *str = "Unknown";
++		const char *str;
+ 		uint8_t type = data[consumed] & 0x7f;
+ 		uint8_t hint = data[consumed] & 0x80;
+ 		uint8_t len = data[consumed + 1];
+ 		uint8_t expect_len = 0;
+-		int i;
+
+-		for (i = 0; options_table[i].str; i++) {
+-			if (options_table[i].type == type) {
+-				str = options_table[i].str;
+-				expect_len = options_table[i].len;
+-				break;
+-			}
+-		}
++		lookup_option_by_type(type, &str, &expect_len);
+
+ 		print_field("Option: %s (0x%2.2x) [%s]", str, type,
+ 						hint ? "hint" : "mandatory");
+@@ -1132,7 +1160,10 @@ static void sig_config_rsp(const struct l2cap_frame *frame)
+ 	print_cid("Source", pdu->scid);
+ 	print_config_flags(pdu->flags);
+ 	print_config_result(pdu->result);
+-	print_config_options(frame, 6, le16_to_cpu(pdu->scid), true);
++	if (pdu->result == 0x0003)
++		print_unknown_options(frame, 6);
++	else
++		print_config_options(frame, 6, le16_to_cpu(pdu->scid), true);
+ }
+
+ static void sig_disconn_req(const struct l2cap_frame *frame)
+--
+2.43.0
