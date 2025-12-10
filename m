@@ -1,319 +1,120 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CB81E5718
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 14:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765377731; cv=none; b=YP/bN0LC2kJ5SwoA9Y6TdMXwF2M3vRdkcPyrQCUb1A+dkfm+3P+NwJ+tOYTS+vlh/mZsP1+PafCc0PcInUefqc4CRhNL0RYk9yW9hF/SnzlVM5KmArR28hS+f1w3Yv++CJYpWuFvFn8b4pCb/kuxWBNT/bjWm7CWr5bbHAE0xVU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765377731; c=relaxed/simple;
-	bh=PBBISkA+qLlv7WSI7xEfMW5nHMg3ufUizxm8boAu+nE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NeLwrNLrV1x2RM8lBSN8tJODygzDw2L9zf7SYFtN21nGbR//3iVu+LY4d7AZ1T8dVk6Jy4hxKV3fZHgLXT0d5UBPr46izPWFBVURwiLCgJ77gs0ve7RgwS1FHbd/L5XWsaP007KctxOARiZAp5c3S0Qi+2kkmBMIluqDAVna2uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nDXKB7JQ; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B4C72FFF95
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 15:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765381461; cv=pass; b=rnoGi/xaBua1pLH09dX0+IdWUYUOOJQ8nnyg/wm5nq5E7u2C17NE1FbZt+2OVz2hN+YdpTYcsbDa3/D/DN3dnvHuXSoPrMvPIp+6SSgxnR3ZRBwz8T3YGNTZzy0KSyX5MygFbcdGaTwaP7e0N3Zr/df19OoWkM3WSVjx5Hzx938=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765381461; c=relaxed/simple;
+	bh=r/hxrmM9JOVdjZ7DHhTaxITI3laPV2MpcYkRG+Hmvg4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pIv4teYfYJVry9NoOqyYUMcAjaSr4GXzbwUkoocWdfIIMnIepCcVeD5xwRakMPjNnexT6CN0rD9qGXhm0L4FjI22PyfFEdEyvF1cRo5a+RczGhtOil6l2+q2llglv0LmAj3gPa8FQRPZFM5OwZddSmmRLepC3MBO40qX4F+d174=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=FmKR2VL7; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nDXKB7JQ"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-37e578d04b5so61323341fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 06:42:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765377727; x=1765982527; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7QYb54U1fhzPowjaezENyMdTxXRPVId7KyqKSxIrwtU=;
-        b=nDXKB7JQcynR+/cdd9DOKrbDmoh7wwsJNm323Q8JEw9ONmXTLHXBW/SdlMEzLg77uU
-         yKoaBie8SvBmUNDW9j3nf/yRCssqIfaMdVkPUYtl/vYDhb8YR9FqLKFlkZB0bZJfenxq
-         6RdgVYlZF/Phg8CwV5iVmgeo0NlxRRbbx8MOsMiZc/Mw4rlMJxzXMwFBku1NN7uryrs0
-         xX+xP1+nEJCNTBp4ORgDUMvlGitwlO/iHOowy2whxoqbVswCbjLse+FBe37YcGSoI8Mc
-         DVR7DfMfgzuf0K3MlYXxgt3VdM9fCfJR1voBfmrNRDEbRUOQUpY1KFAEOJ83Lh2ZvdCh
-         4tkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765377727; x=1765982527;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7QYb54U1fhzPowjaezENyMdTxXRPVId7KyqKSxIrwtU=;
-        b=mQH1/f4Vzw/PaKHsVoaztW9FLkiyOtV6f9VApkYZof73ai6bmVG9NQFimviIGCIVj5
-         bwu8mNT9jGEF4Ojxmx8TiJEyovH29hlqPrxQlYDbfsn3MHuu713qkQNBqYnDWRzi+boq
-         wJI5gJbN5mV2g0UnR8jBvVegSfxBfAzE5ud+tNuiJRqDxz1/2iTI52i50gXzO4T8WhJE
-         zZfpR4RWvVelJKSNrW1wxjU3XW4RX+Bm6lpGFEBLy389/a4UeI2SQU1tpTMtA/yNPqoY
-         kwmEyiiPLBNC4whfEPzH07IqwQW3tSzQHHd9GmUgeY50NwAvYa7pflSDeS96auJbT/VK
-         jpVA==
-X-Gm-Message-State: AOJu0Yyrx4LByz+u9Ebv8RmYIr101hzKlJWp/htCkwOYwEZXNFcEiCHz
-	kFZM61fXIk+3MPOMYVBzituyiHy2YBEO2nYVByyZYilixGT9EBKadSpYxd5Qy9+0RD5pg5Hoyum
-	avGb2ghiCfsss4BTwAsCSWhgm8b6OFy4=
-X-Gm-Gg: AY/fxX7U0MNKII89Rghy5XY+ECPhSqNdY6KCY3Ae3dFr+5t/Xv8MaGkqLblQOCYconr
-	FOfcojyMtCvsRtLWibHDG0sVtNIBXiHpX0OzpwfCIypVdfBx/p0Aam2XoISPheDXUaIPyd4kcrj
-	IF8XC1DtbrZGzsxxKWppcLmP8P578M4o+K9t51vdz9spuUG9O7gtn2F9z/Tno+uI3CNyUXyVPKP
-	noD1p/GM6LvUlv/lyPq/xqAdq3mgYCHJrSbY8m/80RuUuoNXY9xE+XgDycE/y39FvLKu5a14dpD
-	znDW
-X-Google-Smtp-Source: AGHT+IGcgGaWP0vysLjwZnBc8Cm2EUxlCaZLSTu3OhBSAtpqVPZ2UkGKD/WMgddcGxwfie+wp0eI8LAOYZYsyuWjBEA=
-X-Received: by 2002:a2e:be9d:0:b0:37b:aaf7:eff3 with SMTP id
- 38308e7fff4ca-37fb20531damr7273391fa.28.1765377726695; Wed, 10 Dec 2025
- 06:42:06 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="FmKR2VL7"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dRKlM58qMzyQH;
+	Wed, 10 Dec 2025 17:44:15 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1765381456;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AIPIT/1wbwtO9LH4oZDyBZHX+ywHJxG3s0LqUSQqGUM=;
+	b=FmKR2VL7z3rf19zfHDeVGsEO0qiCDLId1SG57plrFg72WLow+0UD63dk+vLxJz9GziiPjx
+	VBktjYHjz3dxzPWAaSPlqDCLdMoDWJETFa1om6roB7ad7iDA7t7c3cFi9YebaH9u+7v8TX
+	QIJm68mqvsMqcsoVPVrrg0qzturfNDU=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765381456;
+	b=bbA/lVPFKt61/DrFiBxRjqauzT6IHbZl4eBW0S32KvLtHl8FzSQb26QIdCGNmsMggRPPmL
+	iuUFy8/UsqyVkfVSjZucHp2FAR02MisW+umpuPRuzC0+7LKAoVRG34uKEP8rizJ+yOG3sQ
+	5jCtT6yRec0hIl423pjPrcyHscKUpok=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1765381456;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AIPIT/1wbwtO9LH4oZDyBZHX+ywHJxG3s0LqUSQqGUM=;
+	b=U9Kdr3fymDVwLngHyVShv3nc3XKGVuvMz/OaJV31zdB6ITeZNRyened3EHB9bIXzhgcN7c
+	3ppNjGOCXvsgWEnAyJc9cZJmxEhzbbW1tZLMbW+NYHrhB9fTfDo1Bzm/sfuMiS4206unbn
+	46HQvt4GG5olD4sW2L+WdJtow8b5r7c=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2.. 0/7] mcp: support multiple MCP and implement local GMCS
+Date: Wed, 10 Dec 2025 17:44:05 +0200
+Message-ID: <cover.1765381438.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251208101915.247459-1-mengshi.wu@oss.qualcomm.com>
- <CABBYNZJ=S3LHcwyXAc=gxf0RptcOC+6TPaWvoEmJquar54b3dQ@mail.gmail.com> <ee21c657-5120-4dbd-8660-d2a522f8578b@oss.qualcomm.com>
-In-Reply-To: <ee21c657-5120-4dbd-8660-d2a522f8578b@oss.qualcomm.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 10 Dec 2025 09:41:54 -0500
-X-Gm-Features: AQt7F2r-0Fa8PtM40ab9Ug0_3MG0fWx2T05HBRkDQO0RzYjeyRuAXvHOAzTpozk
-Message-ID: <CABBYNZ+s3Oj5zM9uL-SPLQAmo3y+-06JLK4mn-YF-j-e196T8A@mail.gmail.com>
-Subject: Re: [PATCH v1] gatt-client:Implement error handling for
- DB_OUT_OF_SYNC in GATT caching.
-To: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com, 
-	cheng.jiang@oss.qualcomm.com, chezhou@qti.qualcomm.com, 
-	wei.deng@oss.qualcomm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
+v2:
+- fix compilation issues
+- remove unnecessary code in get_media_cp_op_supported
 
-On Wed, Dec 10, 2025 at 2:59=E2=80=AFAM Mengshi Wu <mengshi.wu@oss.qualcomm=
-.com> wrote:
->
-> Hi,
->
-> Thank you for your comments.
->
-> On 12/8/2025 11:35 PM, Luiz Augusto von Dentz wrote:
-> > Hi,
-> >
-> > On Mon, Dec 8, 2025 at 5:19=E2=80=AFAM Mengshi Wu <mengshi.wu@oss.qualc=
-omm.com> wrote:
-> >>
-> >> Add automatic DB re-discovery on receiving BT_ATT_ERROR_DB_OUT_OF_SYNC
-> >> error code from ATT operations. This ensures the local GATT database
-> >> stays synchronized with the remote device by triggering a full service
-> >> discovery (handles 0x0001-0xffff) when the database becomes out of syn=
-c.
-> >>
-> >> The process_db_out_of_sync() function is now called in all ATT error
-> >> response handlers (read_multiple, read_long, write, execute_write,
-> >> prepare_write, and prep_write callbacks) to handle this error conditio=
-n
-> >> consistently.
-> >>
-> >> Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-> >> ---
-> >>  src/shared/gatt-client.c | 35 +++++++++++++++++++++++++++++++++--
-> >>  1 file changed, 33 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> >> index f6d5dc4b7..087d4e228 100644
-> >> --- a/src/shared/gatt-client.c
-> >> +++ b/src/shared/gatt-client.c
-> >> @@ -1965,6 +1965,29 @@ fail:
-> >>                 "Failed to initiate service discovery after Service Ch=
-anged");
-> >>  }
-> >>
-> >> +static void process_db_out_of_sync(struct bt_gatt_client *client,
-> >> +                                  uint8_t att_ecode)
-> >> +{
-> >> +       struct service_changed_op *op;
-> >> +
-> >> +       if (att_ecode !=3D BT_ATT_ERROR_DB_OUT_OF_SYNC)
-> >> +               return;
-> >> +
-> >> +       DBG(client, "Database Out of Sync - triggering full re-discove=
-ry");
-> >> +
-> >> +       if (!client->in_svc_chngd) {
-> >> +               process_service_changed(client, 0x0001, 0xffff);
-> >> +               return;
-> >> +       }
-> >> +
-> >> +       op =3D new0(struct service_changed_op, 1);
-> >> +
-> >> +       op->start_handle =3D 0x0001;
-> >> +       op->end_handle =3D 0xffff;
-> >> +
-> >> +       queue_push_tail(client->svc_chngd_queue, op);
-> >> +}
-> >
-> > Id just change process_error to call into db_out_sync, that said this
-> > is not recovering at all, it just rediscovering but the original
-> > request will be lost, I wonder if we should implement some backoff
-> > logic wait to see if the server do a service changed, read the hash
-> > (in case we are not doing it already), and then redo the operation.
-> > Also we do need to make sure we don't end up in a loop rediscovery.
->
-> At the beginning, we considered implementing recovery for failed ATT
-> requests caused by a Database Out of Sync error. However, we identified
-> potential risks in retrying some ATT requests after the remote device=E2=
-=80=99s
-> services have changed. For example, the handle in the ATT_READ_REQ PDU,
-> which identifies the target attribute, may have changed on the remote
-> device. Even if the retry succeeds, it might operate on the wrong
-> attribute.
->
-> As usual, any ATT response error will be propagated to the application
-> layer, so the operation will not be lost but will fail. We did not modify
-> this behavior.
+***
 
-We do recovery for encryption/pairing errors.
+For Media Control Client, add support for multiple GMCS / MCS services
+on the server. Revise the API accordingly.
 
-> It may not be appropriate to implement recovery logic for failed ATT
-> requests at the BlueZ host layer. Therefore, we only do a rediscovery
-> as required by the Core Spec, Vol. 3, Part G, Section 2.5.2.1,
-> after receiving a Database Out of Sync error.
->
-> For the suggestion about back-off logic,
->
-> We are considering reading the remote database hash and comparing it
-> with the locally stored hash before initiating rediscovery. If reading
-> the remote database hash fails, we will assume that the remote GATT
-> database has changed and proceed with rediscovery immediately.
->
-> As shown below, the client checks the remote database hash after
-> receiving a Database Out of Sync error. If the remote services have
-> changed, the client initiates rediscovery.
->
-> btmon HCI Logs:
-> > ACL Data RX: Handle 2 flags 0x02 dlen 9
->       ATT: Error Response (0x01) len 4
->         Read Request (0x0a)
->         Handle: 0x000d
->         Error: Database Out of Sync (0x12)
-> bluetoothd[57993]: < ACL Data TX: Handle 2 flags 0x00 dlen 11
->       ATT: Read By Type Request (0x08) len 6
->         Handle range: 0x0001-0xffff
->         Attribute type: Database Hash (0x2b2a)
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->         Num handles: 1
->         Handle: 2
->         Count: 1
-> > ACL Data RX: Handle 2 flags 0x02 dlen 24
->       ATT: Read By Type Response (0x09) len 19
->         Attribute data length: 18
->         Attribute data list: 1 entry
->         Handle: 0x000f
->         Value: 10d6a00f95bb0eeec55a097ccf7dead8
-> bluetoothd[57993]: < ACL Data TX: Handle 2 flags 0x00 dlen 11
->       ATT: Read By Type Request (0x08) len 6
->         Handle range: 0x0010-0xffff
->         Attribute type: Database Hash (0x2b2a)
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->         Num handles: 1
->         Handle: 2
->         Count: 1
-> > ACL Data RX: Handle 2 flags 0x02 dlen 9
->       ATT: Error Response (0x01) len 4
->         Read By Type Request (0x08)
->         Handle: 0x0010
->         Error: Attribute Not Found (0x0a)
+For Media Control Server, make it a non-stub implementation (OTS still
+missing), and add an API the profile can use.
 
-I don't recall if we have this behavior earlier of using Read By Type
-request for hash in the beginning? We need to limit the results to one
-and not proceed to read it again since it is supposed to exist only
-once in the database. Anyway I don't see a problem if we do read the
-hash and that didn't change we should probably go ahead and resend the
-original request, in the meantime if we receive a service changed we
-can narrow down the range that needs to be rediscovered and not use
-0x0001-0xffff as bellow, and we can actually perform recovery also in
-case the service changed don't affect the original operation handle.
+Add tests.
 
-> bluetoothd[57993]: < ACL Data TX: Handle 2 flags 0x00 dlen 11
->       ATT: Read By Group Type Request (0x10) len 6
->         Handle range: 0x0001-0xffff
->         Attribute group type: Primary Service (0x2800)
->
-> >
-> >>  static void service_changed_cb(uint16_t value_handle, const uint8_t *=
-value,
-> >>                                         uint16_t length, void *user_da=
-ta)
-> >>  {
-> >> @@ -2709,10 +2732,12 @@ static void read_multiple_cb(uint8_t opcode, c=
-onst void *pdu, uint16_t length,
-> >>                         (!pdu && length)) {
-> >>                 success =3D false;
-> >>
-> >> -               if (opcode =3D=3D BT_ATT_OP_ERROR_RSP)
-> >> +               if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
-> >>                         att_ecode =3D process_error(pdu, length);
-> >> -               else
-> >> +                       process_db_out_of_sync(req->client, att_ecode)=
-;
-> >> +               } else {
-> >>                         att_ecode =3D 0;
-> >> +               }
-> >>
-> >>                 pdu =3D NULL;
-> >>                 length =3D 0;
-> >> @@ -2864,6 +2889,7 @@ static void read_long_cb(uint8_t opcode, const v=
-oid *pdu,
-> >>         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
-> >>                 success =3D false;
-> >>                 att_ecode =3D process_error(pdu, length);
-> >> +               process_db_out_of_sync(req->client, att_ecode);
-> >>                 goto done;
-> >>         }
-> >>
-> >> @@ -3050,6 +3076,7 @@ static void write_cb(uint8_t opcode, const void =
-*pdu, uint16_t length,
-> >>         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
-> >>                 success =3D false;
-> >>                 att_ecode =3D process_error(pdu, length);
-> >> +               process_db_out_of_sync(req->client, att_ecode);
-> >>                 goto done;
-> >>         }
-> >>
-> >> @@ -3213,6 +3240,7 @@ static void execute_write_cb(uint8_t opcode, con=
-st void *pdu, uint16_t length,
-> >>         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
-> >>                 success =3D false;
-> >>                 att_ecode =3D process_error(pdu, length);
-> >> +               process_db_out_of_sync(req->client, att_ecode);
-> >>         } else if (opcode !=3D BT_ATT_OP_EXEC_WRITE_RSP || pdu || leng=
-th)
-> >>                 success =3D false;
-> >>
-> >> @@ -3278,6 +3306,7 @@ static void prepare_write_cb(uint8_t opcode, con=
-st void *pdu, uint16_t length,
-> >>         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
-> >>                 success =3D false;
-> >>                 att_ecode =3D process_error(pdu, length);
-> >> +               process_db_out_of_sync(req->client, att_ecode);
-> >>                 goto done;
-> >>         }
-> >>
-> >> @@ -3447,6 +3476,7 @@ static void prep_write_cb(uint8_t opcode, const =
-void *pdu, uint16_t length,
-> >>                 success =3D false;
-> >>                 reliable_error =3D false;
-> >>                 att_ecode =3D process_error(pdu, length);
-> >> +               process_db_out_of_sync(req->client, att_ecode);
-> >>                 goto done;
-> >>         }
-> >>
-> >> @@ -3597,6 +3627,7 @@ static void exec_write_cb(uint8_t opcode, const =
-void *pdu, uint16_t length,
-> >>         if (opcode =3D=3D BT_ATT_OP_ERROR_RSP) {
-> >>                 success =3D false;
-> >>                 att_ecode =3D process_error(pdu, length);
-> >> +               process_db_out_of_sync(req->client, att_ecode);
-> >>                 goto done;
-> >>         }
-> >>
-> >> --
-> >> 2.34.1
-> >>
-> >>
-> >
-> >
->
+This changes the design of the previous MCP code, so it's mostly a
+rewrite.
 
+The shared/mcp: commit doesn't fix the API in profiles/audio, that's
+done in the later mcp: commit, as it's a rewrite of the API.
 
---=20
-Luiz Augusto von Dentz
+TODO (for later): OTP/OTS parts -- requires design for OTP/OTS
+implementation first
+
+TODO (for later): MPRIS integration to GMCS server -- this needs some
+redesign in media.c as it's hardcoded to AVRCP there.
+
+Pauli Virtanen (7):
+  shared/mcp: support multiple MCP, and add non-stub MCS server
+  test-mcp: add tests for MCP / MCS
+  mcp: adapt to new MCP API to support multiple remote MCS services
+  avctp: move uinput utilities to uinput-util.c
+  uinput-util: fix compiler complaint about strncpy usage
+  mcp: add local GMCS service that emits uinput media keys
+  shared/gatt-client: fix notify_data leak in notify_data_write_ccc
+
+ .gitignore                   |    1 +
+ Makefile.am                  |    6 +
+ Makefile.plugins             |    4 +-
+ lib/bluetooth/uuid.h         |   27 +-
+ profiles/audio/avctp.c       |  119 +-
+ profiles/audio/mcp.c         |  802 ++++++---
+ profiles/audio/uinput-util.c |  146 ++
+ profiles/audio/uinput-util.h |   23 +
+ src/shared/gatt-client.c     |    3 +
+ src/shared/mcp.c             | 3216 ++++++++++++++++++++--------------
+ src/shared/mcp.h             |  186 +-
+ src/shared/mcs.h             |   51 +-
+ unit/test-mcp.c              | 1807 +++++++++++++++++++
+ 13 files changed, 4650 insertions(+), 1741 deletions(-)
+ create mode 100644 profiles/audio/uinput-util.c
+ create mode 100644 profiles/audio/uinput-util.h
+ create mode 100644 unit/test-mcp.c
+
+-- 
+2.51.1
+
