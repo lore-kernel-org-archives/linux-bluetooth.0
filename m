@@ -1,159 +1,151 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317582D97A9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 22:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5162FAC0A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 23:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765404355; cv=none; b=lQj61AOEwKTMwEI3IjPvrxuvIef6XIqEVdGoa03ZaSXjjTRR+YRD7CUtCpg7urq8IEibKQ++O+8LlaW6B8OkVyHWfxEryK6ZraNQSvC8hqDeryxyjs2KeRVO/eC8iWA6VCd0W0o9FP6qIBvHt/Tj0Rys+499vS09K5ld5T51ujc=
+	t=1765408889; cv=none; b=g383EN+MWHX/AQeNILzoltHo5mpqQ0ao4WO2U5Ln4KgwT8ghn0eG/vgmSIpNU0UGVWoytAZwvnO1417dmcOFr/a/AJfQCZiKTGpkNjIkw2Mep+Xfneuek2MZl8kYmAni9XEmtyyWv/e7UIqpxQH49sUe82qfK9OI7u9Pr7KJpeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765404355; c=relaxed/simple;
-	bh=lYJf8OtId2OAidejmbCqVYMn5dyE/ZNStGky0nlyhuw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=spPkl523LTTpI4i/GwsX1FURbbBNb9RKQ71YcjbHZOU0oETguR4NgzWXuLdwHfYefAyhC3OSuUlx1OPbLYXFh7089US99BzcmRrCkQ7MUQpgwWLCLSe0qQe2iLUxB7XvWxxmwmusIc6Z+PfOZT6L7gCL0L5G2/VQVvHFeMZh7yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MUB5vUFg; arc=none smtp.client-ip=209.85.215.176
+	s=arc-20240116; t=1765408889; c=relaxed/simple;
+	bh=7U6Hf0CN4Pzn/d+Dmrxb012ZiCGtKjQudcOEFKhWfgo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=C/zUL6LAl/5p643P1wopaCYSEUmIqfNJC21xpM+shi1eUdP5+lT0Mc+ER1+q+zrROIq7dX2Y0pAawsPoONz412dbkVfih0JIs/lDbR5NVxJvBVBkdanM4xOHeZWZ6bMT2ySDxLnb8z/NOhc5bKw6eMeEhrv+VksPajPCiFcu9I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YmWHvfJ7; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUB5vUFg"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-bc4b952cc9dso245341a12.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 14:05:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YmWHvfJ7"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-477b1cc8fb4so1947425e9.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 15:21:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765404351; x=1766009151; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SPZn6+mIXeRsGknj0VsZo8hWL0E1GPc8EpEqb2i+Mic=;
-        b=MUB5vUFgssEtySJH2SC0PvIuZr37uS8zMxwQWfuD784gkZcBGC06wfyeb1JxGNkTVT
-         0hzix/RcPXuE3SRpxWSvb1UlfRhRIjxNfz1y2yze2fB4NIreaKX6LPQxwwRTynVdi0aQ
-         HrrVgXsHYEOK2eUuUDjNinmR3Pv2bgRiJqjzhM6PWN8P8v0ubs9rn5SwNLQBdQKDju60
-         PLhYNmH9P+ztbq2nW9V3v1L7UcS+Wayur4CJveIXyuJeHFyUpIKwSFXp0EzanRbh5Lez
-         vmqbFmAqiRIc2oZEDTCgjJ9FsCuukv1z8aTEqHoaDu92fuQCzN8ue1icpT1X7jylNkXe
-         jbNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765404351; x=1766009151;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1765408885; x=1766013685; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SPZn6+mIXeRsGknj0VsZo8hWL0E1GPc8EpEqb2i+Mic=;
-        b=MhpMHgjKVwvtv+2uZZ6t3alHyoApxZx7d2Stn+fum7zfjmhParRR9C3PFnlRWAJdeg
-         9TwD4rbUUbgfL/twHz9OqnvxsHrmx6BkCmE+ROUPsef3lxxbUWfblUS8aXYYcEXhpSuk
-         ivcBFIunaUVPw6AF6na+NYMiudNyBDdmzvbVgl4kOB9fYN10yk+xNOmfP8YWnrMHXQ+M
-         Qfq9Fni3agT+wzAGAStpoIO6feF4vYJDeAsM4r06VYa57jfix+l5j0EdybS9xjRpiraP
-         5atdNNcrHe2c/zEJRXk0OKh9YdkH9kq3JreJdBPgPRdP7OnaQBpUFUqlBJxLbxuLYWqs
-         EY3A==
-X-Gm-Message-State: AOJu0YwXMz+SRIspv0t6e0V9ihL9LJhGjyNRCq2f8uOWzYkfhGhIUNP4
-	j3dA0s+CTXFq6uD6otjDz3r0ANHV8DyYnamrsPboJmq/uOnkSqBHfS7M9Ci4EA==
-X-Gm-Gg: AY/fxX6p9F22zcDtIaTbuQVhfyIK8Psmw97zGO1sWmW24YNBdrzIlcGIAGrv9do9kWH
-	p/QoOwVUONbqL+uXIj638cM5LtxiMvApwLUu0D2ioCb7k4doV+rBMn53XU9DAF5wB2FLgKiGho7
-	wusB8tyPrs+rGiBCHaDdFy/nab82b2nMXPdRcP3Jr6O3QTFFdrykBCXip8uoUPYpSPpz6LWB4wx
-	xc745JV/+EwDJXsilIKBuGDdEVxdYY0G0E8qCq8t4ZPQ/T7CyFORt93Fgb6uqHuU8NBAJuaUdH6
-	2DS1aIiRxg6cTomSRPs6VVli1ZblQDm04FbfqyEBoqhB+iwLBsYA17YTmS+/bDowB5JBuWGY/o2
-	T1nqnKCuwM0f4+m+r8K5DRzpQp71fXSixY2UOk+EXSvPpX1zARRXmikrESBfOvGJu6npskV8kxd
-	JsDruH+n6NJO8OlDaPZjw/biBpvCgPqw==
-X-Google-Smtp-Source: AGHT+IGeLocZMiQ87PRXFMyb/lQH8LPpOo3ok0RAMjSChBP5/e9D1YVE3LlMOB26m0JtNiXNDgsUag==
-X-Received: by 2002:a05:7300:e12a:b0:2a4:4885:6cc0 with SMTP id 5a478bee46e88-2ac05473aeemr3501965eec.14.1765404351268;
-        Wed, 10 Dec 2025 14:05:51 -0800 (PST)
-Received: from [172.17.0.2] ([172.182.224.161])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11f2e2ff110sm2028504c88.10.2025.12.10.14.05.50
+        bh=L08jHXpXjen58cg14Adrr2f98WJp67FFgA9qD2YXBHU=;
+        b=YmWHvfJ78XWy0tgjXo1NcrTeVrmvUk9zr6aph0VUPcXF2BIf9rg0vDy111OToOolSy
+         c1x3A2AISxATOAI39GFIM2FYc/D92E/DYK/t1CriigOhymbppGsEY0Wim6BMebrf7xxl
+         TncGrjqHM6Sb9H483rnAh6Hv5bDVT5q73lUhd1w3t41Gu3xMqn7YtqNugMyv64luKruo
+         AxCzoU2jS+sGGtdNWx23nCh+Fya5vKsQgFJjppQq7N/ufwSz2Na0O++cWpmnza9NTdpN
+         AUfQGlIRILlPBiZTy/305Lavw1ZQdcfzhN65CfFZ1Qy+Yc4U5jqUL1mRR4OoWBwXzjD6
+         GT0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765408885; x=1766013685;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=L08jHXpXjen58cg14Adrr2f98WJp67FFgA9qD2YXBHU=;
+        b=fW2WOTmvZcHyvAYAXotIyF/57IuOoJLkHUCjhrvsFpU1FToxPWJRdOpCwpsGMO6V5a
+         jQnoclqI2UdAPXT2jJ8I0kDsDzNyCFCbMxcH5adXSBPUCzmTISkYy1h90kYJc2obvJV9
+         e+51hV20PWgfKJZF3JAP05s419+aqspaUZfB9mmmZFn3UGvoI/gaCDWNBVyjUQR4dcvZ
+         1ASnQiYVkvcZO65f2O329cw9Sevh4fa8jZ5068k32+zSFclA4Xtlx0cGy9+a0EDA/OuJ
+         fo6F/Ar+2+RaViSLSrnGB5uve9ziXcjaRbrPl4OgbX55zOKFQLFEAgw7GBD7etLk9J58
+         EjyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV1Afr9FrmlGNbO7iyiQ9ysve9I9pcnJvcM8NxtRCjDfEmZ0iBkwqsyW1JIn7Kia8zuRDe90LLSc4SGjarxkzg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+Z3R4OGYpT3iFb3j8HzBSfaopVkVBy12b2lg1wH38McFjTOBo
+	S2lYD07Cp5nwNSYm8mwYh3T/RPI2agWwl+ndZqF9PO6Z9IESr9M8Ze0XWyJYmQ==
+X-Gm-Gg: ASbGncu8GgMlK2TMlRWvDE/nedk7HXv/+Bws4V8k7bECUutvcBuFKy4LFz+o6nfwsyf
+	0v4Oqc8WXtbjt+k8u8mOVZQJ1LN0eLxY1h7XPxvBOGU1KSH1W/BI/Zbn2AXFTEUSdlwGnEpSEWe
+	+liuxUPTfudQi/oxrBH5LCNLCQccOYma1ZtRiD/kBDGPIX76pUzpvy21P/HQ4CgtLxB0n71PXYP
+	bMU4TpihFW/nY2k2TkOywUX6BWYb5q4oFQMyFEzpAOjpjx/8nnFIUoElLUy6lXp1NxdYwIjBqbA
+	JVztRKjm4Ic0MHtBlAL6iSYXaIInZdqknN/QnohGrhZBb6GyKt+l2Ig2i5OZXKRFAxHZwuQP0Lv
+	2kfjGNTibOE5zRFL51F0EIZzFkePDKgqHyLT0C7KWWsExGW/qkyGamZ0KljrDs+pFzIjCcj9+s6
+	bGP39EAHCfk6nuz6vP2qQYcTrNy8uCGb/YLw==
+X-Google-Smtp-Source: AGHT+IGHScSlL9cu47vMGSsn/jos8nO6lMKdreWx01YeiMB6yIIL90yCPe3N5A1FoFFavDktLuDS7g==
+X-Received: by 2002:a05:600c:1c93:b0:471:d2f:7987 with SMTP id 5b1f17b1804b1-47a837b9a4cmr42271815e9.26.1765408885028;
+        Wed, 10 Dec 2025 15:21:25 -0800 (PST)
+Received: from dev-linux.homserver.local ([51.154.248.28])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a89f742a4sm654425e9.10.2025.12.10.15.21.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 14:05:50 -0800 (PST)
-Message-ID: <6939eebe.050a0220.8a5cb.f2aa@mx.google.com>
-Date: Wed, 10 Dec 2025 14:05:50 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2163891601668988227=="
+        Wed, 10 Dec 2025 15:21:24 -0800 (PST)
+From: Vaibhav Gupta <vaibhavgupta40@gmail.com>
+To: Sven Peter <sven@kernel.org>,
+	Janne Grunau <j@jannau.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Neal Gompa <neal@gompa.dev>
+Cc: Vaibhav Gupta <vaibhavgupta40@gmail.com>,
+	asahi@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: hci_bcm4377: Use generic power management
+Date: Wed, 10 Dec 2025 23:21:09 +0000
+Message-ID: <20251210232115.547729-1-vaibhavgupta40@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251210211728.544677-1-vaibhavgupta40@gmail.com>
+References: <20251210211728.544677-1-vaibhavgupta40@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, vaibhavgupta40@gmail.com
-Subject: RE: [v1,1/2] Bluetooth: hci_bcm4377: Use generic power management
-In-Reply-To: <20251210211728.544677-1-vaibhavgupta40@gmail.com>
-References: <20251210211728.544677-1-vaibhavgupta40@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2163891601668988227==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Switch to the generic PCI power management framework and remove legacy
+callbacks like .suspend() and .resume(). With the generic framework, the
+standard PCI related work like:
+        - pci_save/restore_state()
+        - pci_enable/disable_device()
+        - pci_set_power_state()
+is handled by the PCI core and this driver should implement only
+hci_bcm4377 specific operations in its respective callback functions.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1032107
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.54 seconds
-GitLint                       PENDING   0.32 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      25.62 seconds
-CheckAllWarning               PASS      27.76 seconds
-CheckSparse                   PASS      31.05 seconds
-BuildKernel32                 PASS      24.76 seconds
-TestRunnerSetup               PASS      553.69 seconds
-TestRunner_l2cap-tester       PASS      24.62 seconds
-TestRunner_iso-tester         PASS      90.05 seconds
-TestRunner_bnep-tester        PASS      6.10 seconds
-TestRunner_mgmt-tester        FAIL      116.33 seconds
-TestRunner_rfcomm-tester      PASS      9.42 seconds
-TestRunner_sco-tester         FAIL      14.33 seconds
-TestRunner_ioctl-tester       PASS      10.11 seconds
-TestRunner_mesh-tester        FAIL      11.49 seconds
-TestRunner_smp-tester         PASS      8.46 seconds
-TestRunner_userchan-tester    PASS      6.55 seconds
-IncrementalBuild              PENDING   0.85 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.101 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.991 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+v2: v1 has a typo in its subject. This patch is not part of a series. So
+there should be no '[.... 1/2]'.
+---
+ drivers/bluetooth/hci_bcm4377.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
+index 45e6d84224ee..925d0a635945 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -2416,8 +2416,9 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 					hdev);
+ }
+ 
+-static int bcm4377_suspend(struct pci_dev *pdev, pm_message_t state)
++static int bcm4377_suspend(struct device *dev)
+ {
++	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct bcm4377_data *bcm4377 = pci_get_drvdata(pdev);
+ 	int ret;
+ 
+@@ -2431,8 +2432,9 @@ static int bcm4377_suspend(struct pci_dev *pdev, pm_message_t state)
+ 	return 0;
+ }
+ 
+-static int bcm4377_resume(struct pci_dev *pdev)
++static int bcm4377_resume(struct device *dev)
+ {
++	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct bcm4377_data *bcm4377 = pci_get_drvdata(pdev);
+ 
+ 	iowrite32(BCM4377_BAR0_SLEEP_CONTROL_UNQUIESCE,
+@@ -2441,6 +2443,8 @@ static int bcm4377_resume(struct pci_dev *pdev)
+ 	return hci_resume_dev(bcm4377->hdev);
+ }
+ 
++static DEFINE_SIMPLE_DEV_PM_OPS(bcm4377_ops, bcm4377_suspend, bcm4377_resume);
++
+ static const struct dmi_system_id bcm4377_dmi_board_table[] = {
+ 	{
+ 		.matches = {
+@@ -2541,8 +2545,7 @@ static struct pci_driver bcm4377_pci_driver = {
+ 	.name = "hci_bcm4377",
+ 	.id_table = bcm4377_devid_table,
+ 	.probe = bcm4377_probe,
+-	.suspend = bcm4377_suspend,
+-	.resume = bcm4377_resume,
++	.driver.pm = &bcm4377_ops,
+ };
+ module_pci_driver(bcm4377_pci_driver);
+ 
+-- 
+2.51.0
 
---===============2163891601668988227==--
