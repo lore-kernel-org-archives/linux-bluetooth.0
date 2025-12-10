@@ -1,71 +1,67 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF4F2FF642
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 20:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4717930171F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 20:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765398431; cv=none; b=I9shoGLbZYNrAtNJ/CJ4ik1UPCFk5NTyOIRXRqFd9ji+JsDbXcVBuc+PkIHC9cCa9754ymg5PYL0orLd9xpI/fBcIzRF80RadKbYPab9s1M3GyjzSjcVHQUYfK37E2GCvuJ5pFeBXifQhQoIiGPSQsGcpSBM39sWLSVmIPGXJmQ=
+	t=1765399805; cv=none; b=HvfKtPtzgp5xe0ct92++yfF41WC6HYFX6jbej63zr8/LysV2b50l5EjEz6cjwFNWRNkEhMEVPOKnqmom+ofQLGFVtZkdHGJfms+duAUKrwXTnBLLfRZZdEG8x/R/x5YPZWEArltiteUIeUDb9E1fBukocWGNLTVYomtDljx+7hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765398431; c=relaxed/simple;
-	bh=b/ZPIAYf7o5aeKdR0Wa7PCHaK7ibBY0gOPzRYgHd2dw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oY9uM8jBTmWYMO8nQZL0rG9oOs6BKOaEeoSoKFsG8ibDbsFefhEfEQXWAz/KhRnQfhMS9chVkakFzfVTnu0NCkW3I/BDR6Hqpz8TXM5HZB88B02oGnG4jnzcOuOAPdeR/eAEv0lYfVJYLqoMqcUfh0+N3vKDoUsKezXcKHoVEps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KeffT0l0; arc=none smtp.client-ip=209.85.219.44
+	s=arc-20240116; t=1765399805; c=relaxed/simple;
+	bh=1Orh4UVZhZsUyXCDodJWs9DqpDU21z3G6p7zm5lXgSY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UZz7CLgiq9PzMI2fboYIxYZSet2U4uO1N/+V1KvnyUbEnFoNzrST39IopYwlMA8z981mVlq15nfdgk9fdQKG3dzqb010AYzxBC7uWCwzXzqLFGb1kAwpH/JyyY9sWoIPd6WgZQBjcTrcQ8basBEU7b7OsGtF/tFJugWSvuKCwyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iR3XVz+j; arc=none smtp.client-ip=209.85.221.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KeffT0l0"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8885aae52b1so2466996d6.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 12:27:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iR3XVz+j"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-55e8c539b11so187664e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 12:50:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765398428; x=1766003228; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VJFqedgOD3b6T5OmpLiCgu4ibvGTC1lALXgForQmmoY=;
-        b=KeffT0l0QgwPRpR+xsbPmkVMv2hsD7wwx3fcGqaUeBNTaD0yTcL6QpN/RiPuwsentu
-         JXa54lIYx3kGrszdd4BoQPhwRbezUul91DEKj+Q00PQzndT+R0Oxaesh/JhfKlexoCGx
-         dl5JDz9AjS76+wBzGJAtSaRLggDSd360ccqZ9lhqqNIuMgNDrb7UMRgI0iC+g6ugdOkS
-         2kTFNjX5sWQNj9u4Fkx18lcWFkch/gpHxBexmyqHChC9ypDr5AkiEc16LqRtlK7+WstU
-         2JUO7ZrqHSAZ1SCeHZexIIpHI5hr1LsutkWS/9lAnWCWsib73jhTssZTUOO2wkJaS3qM
-         uzLA==
+        d=gmail.com; s=20230601; t=1765399801; x=1766004601; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=i1bZxqauGwvI6KbbyF0X6x2PkgsvZL9Dbo9wPOjZFGo=;
+        b=iR3XVz+jQjUkJgC1YGhshN4Ta6xVpYM+MzLXIwj3r2hurnIjUrBQI4//W+nLqeABHX
+         qSXvOulsaKkCFnkckkoyB7aB1z5CtDgDCK6FNmC4LdQWv2rHRimLjcLab5B5L0pKAnBq
+         8JyMvCczMo7ywRmv6tw8h3bPuOi84izH3lQONKIHw0h8f3WYab3eaOdSsRBR2pfLYrsd
+         GH5a4m2q+jlP9kw0bhBwTJybDGfzks9WiLtkMAa0gkM1tdmDkYA8rfOuQZnOV76xWyXz
+         wI6VbH4nZar8Df8og2cdJMbwM+OroZfjcKaBXNL7oYG1fqJ393T+qFsB/U2xNgrYdO6u
+         HWQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765398428; x=1766003228;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VJFqedgOD3b6T5OmpLiCgu4ibvGTC1lALXgForQmmoY=;
-        b=PgLfbzSDl3PD+KGL3v+04ULeQyKnU9wSgHfcMgY+6yN39tdEIdrijc39dPKXSvbOzt
-         +3YJp99ggjogtKIH1mSDvlJIUxBc7eoTJp0adcLozNhNGxSucCPxXF70x6CYjgSSMlal
-         tT32HSMotRX3jPqvh6435Ep3yaQFfhG0yRtfvXw05Jyr7N6ApjJK2ui7rtjjNjyVcDpW
-         S2eWFvca8xLe8BMGEKvBAKotYoO9DVTv0LKf7mQQDQ3S2uuuqCnIP0RdqGYDnxn4s33c
-         3Upe63qlmpRNdAXmb8X7iWK0MiY25Rtf7aqvoGnA0ZsgF8GZWKp+Nm9xJpgEzFqt5fea
-         FSMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWFiF+EGwrysFXAYn6Ar5PWG7o7+cn1nWrzhw41oTX89MzFpaF1RcigXw6Os3uz4qI/mn/sNQmK0c+RNADOnYo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcIKNobzyq0eBo47CIJ6zMaR5tmvYbgyiUlw6da8Rez5umoO8c
-	El8lDOfKQg+EZxk1AC7bGwC903CAy32SzZ7PNCXhPjVILg3pLHPm5/rT
-X-Gm-Gg: AY/fxX6do7IYfLdU1J4l6fu8t0ffZIhgN0hX2z7rjGUczZZFaJZ5C3riTk2alYwzJJW
-	C8oguln9OqSMVd0eXHgG4JIbsN5cJRKvB0CHz5ZU+gm5pkBzrW5yLBreEhG0k4+eMSwyFcVlrjO
-	dZEXubyccnkqdo6AXMT43xUJwrb7oW77lahBS6v2XquKArWBGlM61MEKq5d8wLOzMr8kCfb8uIi
-	SQiltxFLPVUKY/O6DWxItZmsUQfI/ogXqB/paB+dncqS6YOdjn2n4/gff335iwDey8r+mN/PhoN
-	SHepVvufK6B4N6iUDxcK5PCAyXw+6DyTbd5suWsLyr7DSl2eLQhax8mmVTyBGuHDulV2Lt1Mn/P
-	6JigcylDS4NgLgzxwLN9EMQ/HUkM/OlVxSicHh55mUyJmkpWfWGOygMXl19yAoWg3fnIIn5RPWw
-	xBJrqkKpLUbol2G4dYK2/xi+uhnQ==
-X-Google-Smtp-Source: AGHT+IGyYV5FcqzaMVDlmABo0DZ8sgEEj9IA0/Qgj+mKqZ5jOF90fZVePgOfbc3ld4wmMREILboRPg==
-X-Received: by 2002:a05:6214:1c49:b0:880:527f:9493 with SMTP id 6a1803df08f44-88863a3e8acmr59793536d6.12.1765398428574;
-        Wed, 10 Dec 2025 12:27:08 -0800 (PST)
-Received: from archlinux ([89.169.15.126])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8886ec55d55sm5217276d6.20.2025.12.10.12.27.06
+        d=1e100.net; s=20230601; t=1765399801; x=1766004601;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i1bZxqauGwvI6KbbyF0X6x2PkgsvZL9Dbo9wPOjZFGo=;
+        b=MrnAl5/wgCDukfeHUVvGhThdlY5Z5IFzINpDyc52I6nPIzyCC6j9NGfXemcvdLUG/i
+         B7aQrIDJHNIXu0q8n7k9adYDz7EOMyu73RGruRdnbdDorrTPekC65BtvKuRykNljIC2W
+         Gs9XKVZ2KI6JGsPVJNXnQlk6KkbXyMoR1RSiuZJlB3pZ9TNc6N9Zn9dBEo7cxU4tGX1O
+         FAX2uHDpUZLFUfQhbQU5pBfdq5oGU+6Q9j/NaI8LPgqPMULRiBfbYLJutXiSV61h3Puq
+         e6G9cYm+hRe/59qERQkIHF980k5Qcq7UGwcIuG2PCQnb4+zMrV3h9bBVFKFZXaXAC4FQ
+         4Htg==
+X-Gm-Message-State: AOJu0YwUhzF5V/MYb98bNF0vDrrvr26n7dycRX+bIlwkIR4rZujV4FYv
+	DYgwtRNWYOeBKdU1ECjzNIxlqVYITSW34RUk5H74srcQwgn83BCHu0c74FsR/npF
+X-Gm-Gg: AY/fxX7A2mCPCv79EjwnhC0TOrwsUpyxNADYm92HD1W93zmuGmdpnef5pLbP/sn+xm2
+	n7eIhLVS3HAmF+2rSxxgLrg3HrKIvY9hHdHxwguLUv8vzjGnxPIavXlhGXRaLRQ8gLssKf3ismS
+	oDgj05S/ca2VXS6CA5f9kjU6/RGdukPk4zDf4oAxjL7l2RoBGyGYaY8yOlowOjMFVhji4uZxF+a
+	Bb8kN80Fs2vJ6B8Vgo+Vic2YdmuST0m0qP+sBU9dWiNQGIPuV2GINEg7XitcZoJq0hxhd0j6PNW
+	IalxeY5UvAwSTd/xuOp8mmgW00LJqowEGR1dToLJ2m29MvRukpsNmI2ryFavzZ/OvFKi1d5qJ0a
+	jXu+9hF7GwER2cF0BqmSOLmPUsk9bqPoaAnH7mtgkOOHj0/NsZh84Rk9lUx8or/KhsuRl1YU7Re
+	/TWlTRRSbN1p/tqg==
+X-Google-Smtp-Source: AGHT+IEpURQN46j7eiV3xL8RqZx4P5f6tLID0qmZLS2lES/LephHcnVNTdHu7Ot/3kCLNnpYMaPiiQ==
+X-Received: by 2002:a05:6122:c85:b0:55b:6b20:a17a with SMTP id 71dfb90a1353d-55fcfb52d3amr1435953e0c.9.1765399801386;
+        Wed, 10 Dec 2025 12:50:01 -0800 (PST)
+Received: from lvondent-mobl5 ([50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-55fdc5efb62sm53435e0c.4.2025.12.10.12.49.58
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 12:27:08 -0800 (PST)
-From: Bluecross <elantsew.andrew@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bluecross <elantsew.andrew@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add support for MediaTek7920 0489:e158
-Date: Wed, 10 Dec 2025 23:22:25 +0300
-Message-ID: <20251210202225.135637-1-elantsew.andrew@gmail.com>
+        Wed, 10 Dec 2025 12:50:00 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] l2cap-test: Add tests for BT_PHY
+Date: Wed, 10 Dec 2025 15:49:52 -0500
+Message-ID: <20251210204952.153725-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -75,68 +71,253 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for MediaTek7920 0489:e158
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-/sys/kernel/debug/usb/devices reports for that device:
+This adds the following tests that uses BT_PHY to retrieve the ACL/LE
+connection supported PHYs:
 
-T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=03 Dev#=  5 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e158 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-
-Signed-off-by: Andrew Elatsev <elantsew.andrew@gmail.com>
+L2CAP BR/EDR Client - PHY
+L2CAP BR/EDR Server - PHY
+L2CAP LE Client - PHY
+L2CAP LE Server - PHY
+L2CAP Ext-Flowctl Client - PHY
+L2CAP Ext-Flowctl Server - PHY
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/l2cap-tester.c | 110 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 109 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8ed3883ab8ee..f1943c6625b9 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -637,6 +637,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3622), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0489, 0xe158), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index a9ab8b05166f..2706a4b33f7b 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -46,6 +46,7 @@ struct test_data {
+ 	uint16_t scid;
+ 	uint16_t dcid;
+ 	struct l2cap_options l2o;
++	uint32_t phys;
+ 	int sk;
+ 	int sk2;
+ 	bool host_disconnected;
+@@ -105,6 +106,9 @@ struct l2cap_data {
  
- 	/* Additional MediaTek MT7921 Bluetooth devices */
- 	{ USB_DEVICE(0x0489, 0xe0c8), .driver_info = BTUSB_MEDIATEK |
+ 	/* Socket type (0 means SOCK_SEQPACKET) */
+ 	int sock_type;
++
++	/* Expected supported PHYs */
++	uint32_t phys;
+ };
+ 
+ static void print_debug(const char *str, void *user_data)
+@@ -420,6 +424,14 @@ static const struct l2cap_data client_connect_shut_wr_success_test = {
+ 	.shut_sock_wr = true,
+ };
+ 
++static const struct l2cap_data client_connect_phy_test_1 = {
++	.client_psm = 0x1001,
++	.server_psm = 0x1001,
++	.phys = (BT_PHY_BR_1M_1SLOT |
++	BT_PHY_EDR_2M_1SLOT | BT_PHY_EDR_2M_3SLOT | BT_PHY_EDR_2M_5SLOT |
++	BT_PHY_EDR_3M_1SLOT | BT_PHY_EDR_3M_3SLOT | BT_PHY_EDR_3M_5SLOT),
++};
++
+ static const struct l2cap_data client_connect_nval_psm_test_1 = {
+ 	.client_psm = 0x1001,
+ 	.expect_err = ECONNREFUSED,
+@@ -556,6 +568,17 @@ static const struct l2cap_data l2cap_server_nval_cid_test2 = {
+ 	.expect_cmd_len = sizeof(l2cap_nval_cfg_rsp),
+ };
+ 
++static const struct l2cap_data l2cap_server_phy_test = {
++	.server_psm = 0x1001,
++	.send_cmd_code = BT_L2CAP_PDU_CONN_REQ,
++	.send_cmd = l2cap_connect_req,
++	.send_cmd_len = sizeof(l2cap_connect_req),
++	.expect_cmd_code = BT_L2CAP_PDU_CONN_RSP,
++	.phys = (BT_PHY_BR_1M_1SLOT |
++	BT_PHY_EDR_2M_1SLOT | BT_PHY_EDR_2M_3SLOT | BT_PHY_EDR_2M_5SLOT |
++	BT_PHY_EDR_3M_1SLOT | BT_PHY_EDR_3M_3SLOT | BT_PHY_EDR_3M_5SLOT),
++};
++
+ static const struct l2cap_data le_client_connect_success_test_1 = {
+ 	.client_psm = 0x0080,
+ 	.server_psm = 0x0080,
+@@ -675,6 +698,12 @@ static const struct l2cap_data le_client_connect_reject_test_2 = {
+ 	.addr_type = BDADDR_LE_PUBLIC,
+ };
+ 
++static const struct l2cap_data le_client_connect_phy_test_1 = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.phys = (BT_PHY_LE_1M_TX | BT_PHY_LE_1M_RX),
++};
++
+ static uint8_t nonexisting_bdaddr[] = {0x00, 0xAA, 0x01, 0x02, 0x03, 0x00};
+ static const struct l2cap_data le_client_close_socket_test_1 = {
+ 	.client_psm = 0x0080,
+@@ -752,6 +781,17 @@ static const struct l2cap_data le_server_nval_scid_test = {
+ 	.expect_cmd_len = sizeof(nval_le_connect_rsp),
+ };
+ 
++static const struct l2cap_data le_server_phy_test = {
++	.server_psm = 0x0080,
++	.send_cmd_code = BT_L2CAP_PDU_LE_CONN_REQ,
++	.send_cmd = le_connect_req,
++	.send_cmd_len = sizeof(le_connect_req),
++	.expect_cmd_code = BT_L2CAP_PDU_LE_CONN_RSP,
++	.expect_cmd = le_connect_rsp,
++	.expect_cmd_len = sizeof(le_connect_rsp),
++	.phys = (BT_PHY_LE_1M_TX | BT_PHY_LE_1M_RX),
++};
++
+ static const uint8_t ecred_connect_req[] = {	0x80, 0x00, /* PSM */
+ 						0x40, 0x00, /* MTU */
+ 						0x40, 0x00, /* MPS */
+@@ -810,6 +850,17 @@ static const struct l2cap_data ext_flowctl_server_nval_scid_test = {
+ 	.expect_cmd_len = sizeof(nval_ecred_connect_rsp),
+ };
+ 
++static const struct l2cap_data ext_flowctl_server_phy_test = {
++	.server_psm = 0x0080,
++	.send_cmd_code = BT_L2CAP_PDU_ECRED_CONN_REQ,
++	.send_cmd = ecred_connect_req,
++	.send_cmd_len = sizeof(ecred_connect_req),
++	.expect_cmd_code = BT_L2CAP_PDU_ECRED_CONN_RSP,
++	.expect_cmd = ecred_connect_rsp,
++	.expect_cmd_len = sizeof(ecred_connect_rsp),
++	.phys = (BT_PHY_LE_1M_TX | BT_PHY_LE_1M_RX),
++};
++
+ static const struct l2cap_data le_att_client_connect_success_test_1 = {
+ 	.cid = 0x0004,
+ 	.sec_level = BT_SECURITY_LOW,
+@@ -936,6 +987,13 @@ static const struct l2cap_data ext_flowctl_client_2_close_1 = {
+ 	.close_1 = true,
+ };
+ 
++static const struct l2cap_data ext_flowctl_client_connect_phy_test_1 = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.mode = BT_MODE_EXT_FLOWCTL,
++	.phys = (BT_PHY_LE_1M_TX | BT_PHY_LE_1M_RX),
++};
++
+ static void client_cmd_complete(uint16_t opcode, uint8_t status,
+ 					const void *param, uint8_t len,
+ 					void *user_data)
+@@ -1384,6 +1442,28 @@ static bool check_mtu(struct test_data *data, int sk)
+ 	return true;
+ }
+ 
++static bool check_phys(struct test_data *data,int sk)
++{
++	const struct l2cap_data *l2data = data->test_data;
++	socklen_t len;
++
++	len = sizeof(data->phys);
++	data->phys = 0;
++
++	if (getsockopt(sk, SOL_BLUETOOTH, BT_PHY, &data->phys, &len) < 0) {
++		tester_warn("getsockopt(BT_PHY): %s (%d)",
++				strerror(errno), errno);
++		return false;
++	}
++
++	if (l2data->phys && l2data->phys != data->phys) {
++		tester_warn("phys 0x%08x != 0x%08x", l2data->phys, data->phys);
++		return false;
++	}
++
++	return true;
++}
++
+ static gboolean recv_errqueue(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -1559,6 +1639,11 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
++	if (!check_phys(data, sk)) {
++		tester_test_failed();
++		return FALSE;
++	}
++
+ 	if (l2data->read_data) {
+ 		l2cap_read_data(data, io, data->dcid);
+ 		return FALSE;
+@@ -2279,6 +2364,11 @@ static gboolean l2cap_accept_cb(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
++	if (!check_phys(data, sk)) {
++		tester_test_failed();
++		return FALSE;
++	}
++
+ 	if (l2data->read_data) {
+ 		l2cap_read_data(data, io, data->dcid);
+ 		return FALSE;
+@@ -2628,6 +2718,10 @@ int main(int argc, char *argv[])
+ 					&client_connect_shut_wr_success_test,
+ 					setup_powered_client, test_connect);
+ 
++	test_l2cap_bredr("L2CAP BR/EDR Client - PHY",
++					&client_connect_phy_test_1,
++					setup_powered_client, test_connect);
++
+ 	test_l2cap_bredr("L2CAP BR/EDR Server - Success",
+ 					&l2cap_server_success_test,
+ 					setup_powered_server, test_server);
+@@ -2664,6 +2758,9 @@ int main(int argc, char *argv[])
+ 	test_l2cap_bredr("L2CAP BR/EDR Server - Invalid Config CID",
+ 				&l2cap_server_nval_cid_test2,
+ 				setup_powered_server, test_server);
++	test_l2cap_bredr("L2CAP BR/EDR Server - PHY",
++				&l2cap_server_phy_test,
++				setup_powered_server, test_server);
+ 
+ 	test_l2cap_bredr("L2CAP BR/EDR Ethtool Get Ts Info - Success", NULL,
+ 			setup_powered_server, test_l2cap_ethtool_get_ts_info);
+@@ -2710,6 +2807,9 @@ int main(int argc, char *argv[])
+ 	test_l2cap_bredr("L2CAP LE Client - Connection Reject",
+ 				&le_client_connect_reject_test_2,
+ 				setup_powered_client, test_connect_reject);
++	test_l2cap_le("L2CAP LE Client - PHY",
++				&le_client_connect_phy_test_1,
++				setup_powered_client, test_connect);
+ 
+ 	test_l2cap_le("L2CAP LE Client - Close socket 1",
+ 				&le_client_close_socket_test_1,
+@@ -2738,7 +2838,8 @@ int main(int argc, char *argv[])
+ 					setup_powered_server, test_server);
+ 	test_l2cap_le("L2CAP LE Server - Nval SCID", &le_server_nval_scid_test,
+ 					setup_powered_server, test_server);
+-
++	test_l2cap_le("L2CAP LE Server - PHY", &le_server_phy_test,
++					setup_powered_server, test_server);
+ 
+ 	test_l2cap_le("L2CAP Ext-Flowctl Client - Success",
+ 				&ext_flowctl_client_connect_success_test_1,
+@@ -2769,12 +2870,19 @@ int main(int argc, char *argv[])
+ 				setup_powered_client,
+ 				test_connect_2);
+ 
++	test_l2cap_le("L2CAP Ext-Flowctl Client - PHY",
++				&ext_flowctl_client_connect_phy_test_1,
++				setup_powered_client, test_connect);
++
+ 	test_l2cap_le("L2CAP Ext-Flowctl Server - Success",
+ 				&ext_flowctl_server_success_test,
+ 				setup_powered_server, test_server);
+ 	test_l2cap_le("L2CAP Ext-Flowctl Server - Nval SCID",
+ 				&ext_flowctl_server_nval_scid_test,
+ 				setup_powered_server, test_server);
++	test_l2cap_le("L2CAP Ext-Flowctl Server - PHY",
++				&ext_flowctl_server_phy_test,
++				setup_powered_server, test_server);
+ 
+ 	test_l2cap_le("L2CAP LE ATT Client - Success",
+ 				&le_att_client_connect_success_test_1,
 -- 
 2.52.0
 
