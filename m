@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2099D2C11C6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 16:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFABA2E9EC3
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 16:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765383210; cv=pass; b=sxcLsu3oDaU8iTp93OGAx++b8M3xa1oLK4hTT2XqIWOwvX/rgupzY8r65vu0I5rW4c5Qlc1Zm09WwBqoyQB5UXMaX9PCR3HGJbFxInc7aD5oYvW7UmAW7FIw0Tr/8qp7CGxS3jHtXcf82pc214R17avdpa5r7EyGq2tEgbkQzkk=
+	t=1765383211; cv=pass; b=LA4iZ5NyD8V55traHWKjcqRJvBTauJkZzsghj19B0bOMiECcsWhiXcmlpmXibsnej5DJIOr26F9f+TMjonr3FhW+3+Xs8oucJQxzWd5jFndGd3cUguHqna+hzxJYhtTDHI0aQH5KzqGAFoSWqcyXgySFhGrV+NtAMzF51T6vOBA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765383210; c=relaxed/simple;
-	bh=BuOxERr+4kB/99A0HgAxyEIfT8cBzec5w0+yt2MOgoo=;
+	s=arc-20240116; t=1765383211; c=relaxed/simple;
+	bh=4JtXGlfSP9DJ6vmbIbuKGNyQRZDfI+zmshF/XoAVUz4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qrV93Nr6CsX7jWoJ3VnCrLdsQrcb5KcBGGmNEHNeOAuaCEkCd/yksv1HtAk/0T2FPoMQc+h1RKMKpwjZnPoEmoYkvZk0+hpkhLi9GQjB6NwZ/B34k9qeObgSE/6/OE6V3bp9uGIGX8CIXzufnOhUAAujKNy+a4rNAstqu9jJcsc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=XhVdQsD3; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=OTYI89zSthtoAV7r5UwP7CEalaMTUa7O+XSt8vVPfVUrLAyWWX1WCwdOaoFBEYG4xP9UVWpqNv3O2FNYhc0JrCpnP1P5EUwCDBfKqlzmzdJ8d49D0PvwTGhLx+jTfecdqUh0GkCIGrRY5pEX+sPLovlE/jcMgunvsZxN+CIBOf4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=s7wgXkz4; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="XhVdQsD3"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="s7wgXkz4"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dRLNz1Cbfz108R;
-	Wed, 10 Dec 2025 18:13:23 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dRLP14Nn1z105k;
+	Wed, 10 Dec 2025 18:13:25 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1765383203;
+	t=1765383206;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uddHSGmRyQ15UtQQMTpeqG5fwH2tzMR/NzF6IZdoVZo=;
-	b=XhVdQsD3XIkdL3lzKWYS3f9LIUxqpTHkwd7JQ17IkTz1mT2SfGRjU5j622MEtoKYtQisR9
-	TGtQhRGafeO1grihlX6nApKPAwA+Rpp3mMLLPHApxrj5xSBp94Oq91IwJvLUtsPkxKkdwl
-	M8QOb/oBpRRykD83oUtdVXUG2yBPqDY=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765383203;
-	b=nyzpZ9zSzgOroV5NYxXcrS0+VwE44YmUNL69H/4EMLgt9V4SSVaYcrVDXbljWqF6dsZOkG
-	HmXsLVUYP5NBkt5A8zgoJkxHelCRbQK3n5vErzdbJ7kriN9gxWwp6FkKghv3W8qLhqi1jV
-	eMkjwPvVfyZSE677FSvSD9vD/Kszhpo=
+	bh=kya0Q6Qe2LcuX1uvuhmfu2D4MwPSUQMcs0Um4+KrFDc=;
+	b=s7wgXkz4qFR4jvYcjEaZiQQJHMilSOEtI4vOyMDjS3SXpykgNRcb6QfrT9QrYJmJsQnYud
+	SV4EDxWIuktqkw5DndSQ0GsAmqPHsibrAnCXOmxhr79eSMF0wUI0DYKZIkyRjm8KYSQqmv
+	+SyvBnBmOunfnS0mPX6uVqWOOP+f2Bo=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765383206;
+	b=xYsNuAN3H9FDExwFxqRT/q2RkpG/i3H3Irt9Mtai9HDsDe9UegKB3WYf2tz05gNmzcwGTA
+	Biza3NyNaRdp1c/abIa17Mn4/gVxsyMTm1dF4GBO4ZcAkDvJUzaPlRE4hJiVVPVlOluWa6
+	wgHbDXHuVnFw2S4zzN0AMxcetxua6yk=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1765383203;
+	s=meesny; t=1765383206;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uddHSGmRyQ15UtQQMTpeqG5fwH2tzMR/NzF6IZdoVZo=;
-	b=TaNz1NK6mCXwKWPdd7W45b5rNOBG3w4lIkB3l34KDgczYDCZknyeVFKW+QracSGR+fR5/3
-	VLaqEJtFcsyCqKgjhgX0FxgoQN8yfEXqZtzQ5eCXHJDWEZyMNsNR2XckUQzwTdTsOmrg9m
-	obHQC9Ajlpl6TjNVT12sMCz9CBUbg3E=
+	bh=kya0Q6Qe2LcuX1uvuhmfu2D4MwPSUQMcs0Um4+KrFDc=;
+	b=HbriZ6Vl89d+7JkPUnXGqnIj/F8UegFkduyA4kYzJH9Q5/jpophICQRzMV0iz9yZ+cSR2/
+	dmWVMD7tm9I3cyDHs410pe+pT3MZRzRmMCIIkV08EGg1BQTtPDd4CrW4Ht7G6j/L989F+k
+	RWUoedGRgyF5G7L658Hr+2swk0woqy4=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 4/7] avctp: move uinput utilities to uinput-util.c
-Date: Wed, 10 Dec 2025 18:13:12 +0200
-Message-ID: <0ca3e2b822e0111525e7b88edc2db54c35fcee0b.1765383173.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 6/7] mcp: add local GMCS service that emits uinput media keys
+Date: Wed, 10 Dec 2025 18:13:14 +0200
+Message-ID: <3b8c22f8d714738bfcecfec2422a92d4c87c32fb.1765383173.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1765383173.git.pav@iki.fi>
 References: <cover.1765383173.git.pav@iki.fi>
@@ -67,398 +67,223 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move basic uinput utilities to a separate file, so they can be reused
-for MCS.
----
- Makefile.plugins             |   4 +-
- profiles/audio/avctp.c       | 119 +++-------------------------
- profiles/audio/uinput-util.c | 146 +++++++++++++++++++++++++++++++++++
- profiles/audio/uinput-util.h |  23 ++++++
- 4 files changed, 181 insertions(+), 111 deletions(-)
- create mode 100644 profiles/audio/uinput-util.c
- create mode 100644 profiles/audio/uinput-util.h
+Implement simple GMCS service that is always inactive, and emits media
+key presses via uinput for Play/Pause/Stop/Next/Prev MCS commands.
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 3572ee845..54647e2ab 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -44,7 +44,9 @@ if AVRCP
- builtin_modules += avrcp
- builtin_sources += profiles/audio/control.h profiles/audio/control.c \
- 			profiles/audio/avctp.h profiles/audio/avctp.c \
--			profiles/audio/avrcp.h profiles/audio/avrcp.c
-+			profiles/audio/avrcp.h profiles/audio/avrcp.c \
-+			profiles/audio/uinput-util.h \
-+			profiles/audio/uinput-util.c
- endif
+In practice, this seems to be enough to support media control keys on
+headsets.  Some headsets (Creative Zen Hybrid Pro) also refuse to
+connect if there is no GMCS service.
+---
+
+Notes:
+    Tested production devices:
+    
+    - Creative Zen Hybrid Pro (doesn't even connect without GMCS)
+    - Samsung Galaxy Buds Pro2
+
+ profiles/audio/mcp.c | 163 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 163 insertions(+)
+
+diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
+index e64cbd01d..acc143d8c 100644
+--- a/profiles/audio/mcp.c
++++ b/profiles/audio/mcp.c
+@@ -23,6 +23,7 @@
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <math.h>
++#include <linux/uinput.h>
  
- if NETWORK
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 65eec6f6c..346a97dd1 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -44,6 +44,7 @@
+ #include <glib.h>
  
- #include "avctp.h"
- #include "avrcp.h"
+@@ -54,6 +55,7 @@
+ #include "src/error.h"
+ 
+ #include "player.h"
 +#include "uinput-util.h"
  
- /* AV/C Panel 1.23, page 76:
-  * command with the pressed value is valid for two seconds
-@@ -228,11 +229,7 @@ struct avctp_browsing_pdu_handler {
- 	GDestroyNotify destroy;
+ #define MCS_UUID_STR	"00001848-0000-1000-8000-00805f9b34fb"
+ #define GMCS_UUID_STR	"00001849-0000-1000-8000-00805f9b34fb"
+@@ -433,6 +435,145 @@ static const struct bt_mcp_callback mcp_cb = {
  };
  
--static const struct {
--	const char *name;
--	uint8_t avc;
--	uint16_t uinput;
--} key_map[] = {
-+static const struct uinput_key_map key_map[] = {
- 	{ "SELECT",		AVC_SELECT,		KEY_SELECT },
- 	{ "UP",			AVC_UP,			KEY_UP },
- 	{ "DOWN",		AVC_DOWN,		KEY_DOWN },
-@@ -301,25 +298,9 @@ static gboolean avctp_passthrough_rsp(struct avctp *session, uint8_t code,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data);
  
--static int send_event(int fd, uint16_t type, uint16_t code, int32_t value)
--{
--	struct input_event event;
--
--	memset(&event, 0, sizeof(event));
--	event.type	= type;
--	event.code	= code;
--	event.value	= value;
--
--	return write(fd, &event, sizeof(event));
--}
--
- static void send_key(int fd, uint16_t key, int pressed)
- {
--	if (fd < 0)
--		return;
--
--	send_event(fd, EV_KEY, key, pressed);
--	send_event(fd, EV_SYN, SYN_REPORT, 0);
-+	uinput_send_key(fd, key, pressed);
- }
- 
- static bool auto_release(gpointer user_data)
-@@ -401,12 +382,12 @@ static size_t handle_panel_passthrough(struct avctp *session,
- 	for (i = 0; key_map[i].name != NULL; i++) {
- 		uint8_t key_quirks;
- 
--		if ((operands[0] & 0x7F) != key_map[i].avc)
-+		if ((operands[0] & 0x7F) != key_map[i].code)
- 			continue;
- 
- 		DBG("AV/C: %s %s", key_map[i].name, status);
- 
--		key_quirks = session->key_quirks[key_map[i].avc];
-+		key_quirks = session->key_quirks[key_map[i].code];
- 
- 		if (key_quirks & QUIRK_NO_RELEASE) {
- 			if (!pressed) {
-@@ -1154,89 +1135,6 @@ failed:
- 	return FALSE;
- }
- 
--static int uinput_create(struct btd_device *device, const char *name,
--			 const char *suffix)
--{
--	struct uinput_user_dev dev;
--	int fd, err, i;
--	char src[18];
--
--	fd = open("/dev/uinput", O_RDWR);
--	if (fd < 0) {
--		fd = open("/dev/input/uinput", O_RDWR);
--		if (fd < 0) {
--			fd = open("/dev/misc/uinput", O_RDWR);
--			if (fd < 0) {
--				err = -errno;
--				error("Can't open input device: %s (%d)",
--							strerror(-err), -err);
--				return err;
--			}
--		}
--	}
--
--	memset(&dev, 0, sizeof(dev));
--
--	if (name) {
--		strncpy(dev.name, name, UINPUT_MAX_NAME_SIZE - 1);
--		dev.name[UINPUT_MAX_NAME_SIZE - 1] = '\0';
--	}
--
--	if (suffix) {
--		int len, slen;
--
--		len = strlen(dev.name);
--		slen = strlen(suffix);
--
--		/* If name + suffix don't fit, truncate the name, then add the
--		 * suffix.
--		 */
--		if (len + slen < UINPUT_MAX_NAME_SIZE - 1) {
--			strcpy(dev.name + len, suffix);
--		} else {
--			len = UINPUT_MAX_NAME_SIZE - slen - 1;
--			strncpy(dev.name + len, suffix, slen);
--			dev.name[UINPUT_MAX_NAME_SIZE - 1] = '\0';
--		}
--	}
--
--	dev.id.bustype = BUS_BLUETOOTH;
--	dev.id.vendor  = btd_device_get_vendor(device);
--	dev.id.product = btd_device_get_product(device);
--	dev.id.version = btd_device_get_version(device);
--
--	if (write(fd, &dev, sizeof(dev)) < 0) {
--		err = -errno;
--		error("Can't write device information: %s (%d)",
--						strerror(-err), -err);
--		close(fd);
--		return err;
--	}
--
--	ioctl(fd, UI_SET_EVBIT, EV_KEY);
--	ioctl(fd, UI_SET_EVBIT, EV_REL);
--	ioctl(fd, UI_SET_EVBIT, EV_REP);
--	ioctl(fd, UI_SET_EVBIT, EV_SYN);
--
--	ba2strlc(btd_adapter_get_address(device_get_adapter(device)), src);
--	ioctl(fd, UI_SET_PHYS, src);
--
--	for (i = 0; key_map[i].name != NULL; i++)
--		ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
--
--	if (ioctl(fd, UI_DEV_CREATE, NULL) < 0) {
--		err = -errno;
--		error("Can't create uinput device: %s (%d)",
--						strerror(-err), -err);
--		close(fd);
--		return err;
--	}
--
--	send_event(fd, EV_REP, REP_DELAY, 300);
--
--	return fd;
--}
--
- static void init_uinput(struct avctp *session)
- {
- 	char name[UINPUT_MAX_NAME_SIZE];
-@@ -1249,7 +1147,8 @@ static void init_uinput(struct avctp *session)
- 		session->key_quirks[AVC_PAUSE] |= QUIRK_NO_RELEASE;
- 	}
- 
--	session->uinput = uinput_create(session->device, name, " (AVRCP)");
-+	session->uinput = uinput_create(device_get_adapter(session->device),
-+				session->device, name, " (AVRCP)", key_map);
- 	if (session->uinput < 0)
- 		error("AVRCP: failed to init uinput for %s", name);
- 	else
-@@ -1793,7 +1692,7 @@ static const char *op2str(uint8_t op)
- 	int i;
- 
- 	for (i = 0; key_map[i].name != NULL; i++) {
--		if ((op & 0x7F) == key_map[i].avc)
-+		if ((op & 0x7F) == key_map[i].code)
- 			return key_map[i].name;
- 	}
- 
-@@ -2232,7 +2131,7 @@ bool avctp_supports_avc(uint8_t avc)
- 	int i;
- 
- 	for (i = 0; key_map[i].name != NULL; i++) {
--		if (key_map[i].avc == avc)
-+		if (key_map[i].code == avc)
- 			return true;
- 	}
- 	return false;
-diff --git a/profiles/audio/uinput-util.c b/profiles/audio/uinput-util.c
-new file mode 100644
-index 000000000..75f2a500c
---- /dev/null
-+++ b/profiles/audio/uinput-util.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2006-2010  Nokia Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  Texas Instruments, Inc.
-+ *
-+ *
++ * Local player
 + */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++struct gmcs;
 +
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include <sys/ioctl.h>
-+#include <errno.h>
-+#include <string.h>
-+#include <linux/uinput.h>
-+
-+#include <glib.h>
-+
-+#include "bluetooth/bluetooth.h"
-+#include "bluetooth/uuid.h"
-+
-+#include "src/adapter.h"
-+#include "src/device.h"
-+#include "src/log.h"
-+
-+#include "uinput-util.h"
-+
-+
-+static int send_event(int fd, uint16_t type, uint16_t code, int32_t value)
-+{
-+	struct input_event event;
-+
-+	memset(&event, 0, sizeof(event));
-+	event.type	= type;
-+	event.code	= code;
-+	event.value	= value;
-+
-+	return write(fd, &event, sizeof(event));
-+}
-+
-+void uinput_send_key(int fd, uint16_t key, int pressed)
-+{
-+	if (fd < 0)
-+		return;
-+
-+	send_event(fd, EV_KEY, key, pressed);
-+	send_event(fd, EV_SYN, SYN_REPORT, 0);
-+}
-+
-+int uinput_create(struct btd_adapter *adapter, struct btd_device *device,
-+					const char *name, const char *suffix,
-+					const struct uinput_key_map *key_map)
-+{
-+	struct uinput_user_dev dev;
-+	int fd, err, i;
-+	char src[18];
-+
-+	fd = open("/dev/uinput", O_RDWR);
-+	if (fd < 0) {
-+		fd = open("/dev/input/uinput", O_RDWR);
-+		if (fd < 0) {
-+			fd = open("/dev/misc/uinput", O_RDWR);
-+			if (fd < 0) {
-+				err = -errno;
-+				error("Can't open input device: %s (%d)",
-+							strerror(-err), -err);
-+				return err;
-+			}
-+		}
-+	}
-+
-+	memset(&dev, 0, sizeof(dev));
-+
-+	if (name) {
-+		strncpy(dev.name, name, UINPUT_MAX_NAME_SIZE - 1);
-+		dev.name[UINPUT_MAX_NAME_SIZE - 1] = '\0';
-+	}
-+
-+	if (suffix) {
-+		int len, slen;
-+
-+		len = strlen(dev.name);
-+		slen = strlen(suffix);
-+
-+		/* If name + suffix don't fit, truncate the name, then add the
-+		 * suffix.
-+		 */
-+		if (len + slen < UINPUT_MAX_NAME_SIZE - 1) {
-+			strcpy(dev.name + len, suffix);
-+		} else {
-+			len = UINPUT_MAX_NAME_SIZE - slen - 1;
-+			strncpy(dev.name + len, suffix, slen);
-+			dev.name[UINPUT_MAX_NAME_SIZE - 1] = '\0';
-+		}
-+	}
-+
-+	if (device) {
-+		dev.id.bustype = BUS_BLUETOOTH;
-+		dev.id.vendor  = btd_device_get_vendor(device);
-+		dev.id.product = btd_device_get_product(device);
-+		dev.id.version = btd_device_get_version(device);
-+	} else {
-+		dev.id.bustype = BUS_VIRTUAL;
-+		dev.id.vendor  = 0;
-+		dev.id.product = 0;
-+		dev.id.version = 0;
-+	}
-+
-+	if (write(fd, &dev, sizeof(dev)) < 0) {
-+		err = -errno;
-+		error("Can't write device information: %s (%d)",
-+						strerror(-err), -err);
-+		close(fd);
-+		return err;
-+	}
-+
-+	ioctl(fd, UI_SET_EVBIT, EV_KEY);
-+	ioctl(fd, UI_SET_EVBIT, EV_REL);
-+	ioctl(fd, UI_SET_EVBIT, EV_REP);
-+	ioctl(fd, UI_SET_EVBIT, EV_SYN);
-+
-+	ba2strlc(btd_adapter_get_address(adapter), src);
-+	ioctl(fd, UI_SET_PHYS, src);
-+
-+	for (i = 0; key_map[i].name != NULL; i++)
-+		ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
-+
-+	if (ioctl(fd, UI_DEV_CREATE, NULL) < 0) {
-+		err = -errno;
-+		error("Can't create uinput device: %s (%d)",
-+						strerror(-err), -err);
-+		close(fd);
-+		return err;
-+	}
-+
-+	send_event(fd, EV_REP, REP_DELAY, 300);
-+
-+	return fd;
-+}
-diff --git a/profiles/audio/uinput-util.h b/profiles/audio/uinput-util.h
-new file mode 100644
-index 000000000..75de8aedd
---- /dev/null
-+++ b/profiles/audio/uinput-util.h
-@@ -0,0 +1,23 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2006-2010  Nokia Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2011  Texas Instruments, Inc.
-+ *
-+ *
-+ */
-+
-+struct uinput_key_map {
-+	const char *name;
-+	unsigned int code;
-+	uint16_t uinput;
++struct local_player {
++	struct bt_mcs *mcs;
++	struct media_player *mp;
++	struct gmcs *gmcs;
 +};
 +
-+int uinput_create(struct btd_adapter *adapter, struct btd_device *device,
-+					const char *name, const char *suffix,
-+					const struct uinput_key_map *key_map);
++struct gmcs {
++	int uinput;
++	struct btd_adapter *adapter;
++	struct bt_mcs *mcs;
++	struct queue *players;
++};
 +
-+void uinput_send_key(int fd, uint16_t key, int pressed);
++static const struct uinput_key_map key_map[] = {
++	{ "Play",	BT_MCS_CMD_PLAY,		KEY_PLAYCD },
++	{ "Stop",	BT_MCS_CMD_STOP,		KEY_STOPCD },
++	{ "Pause",	BT_MCS_CMD_PAUSE,		KEY_PAUSECD },
++	{ "Next Track",	BT_MCS_CMD_NEXT_TRACK,		KEY_NEXTSONG },
++	{ "Prev Track",	BT_MCS_CMD_PREV_TRACK,		KEY_PREVIOUSSONG },
++	{ NULL }
++};
++
++static struct queue *servers;
++
++static bool gmcs_command(struct gmcs *gmcs, uint8_t cmd)
++{
++	unsigned int i;
++
++	/* Emulate media key press */
++	if (gmcs->uinput < 0)
++		return false;
++
++	for (i = 0; i < ARRAY_SIZE(key_map); ++i) {
++		if (key_map[i].code == cmd) {
++			DBG("GMCS press %s", key_map[i].name);
++			uinput_send_key(gmcs->uinput, key_map[i].uinput, 1);
++			uinput_send_key(gmcs->uinput, key_map[i].uinput, 0);
++			break;
++		}
++	}
++
++	/* We are always inactive, so command does not cause state changes and
++	 * does not succeed, even though we do generate the key presses.
++	 * This should be OK vs. MCP v1.0.1 p. 26
++	 */
++	return false;
++}
++
++static bool gmcs_play(void *data)
++{
++	return gmcs_command(data, BT_MCS_CMD_PLAY);
++}
++
++static bool gmcs_pause(void *data)
++{
++	return gmcs_command(data, BT_MCS_CMD_PAUSE);
++}
++
++static bool gmcs_stop(void *data)
++{
++	return gmcs_command(data, BT_MCS_CMD_STOP);
++}
++
++static bool gmcs_next_track(void *data)
++{
++	return gmcs_command(data, BT_MCS_CMD_NEXT_TRACK);
++}
++
++static bool gmcs_previous_track(void *data)
++{
++	return gmcs_command(data, BT_MCS_CMD_PREV_TRACK);
++}
++
++static void gmcs_media_player_name(void *data, struct iovec *buf, size_t size)
++{
++	struct gmcs *gmcs = data;
++	int len;
++
++	len = snprintf((void *)buf->iov_base, size, "%s",
++					btd_adapter_get_name(gmcs->adapter));
++	if (len < 0)
++		len = 0;
++	else if ((size_t)len > size)
++		len = size;
++	util_iov_push(buf, len);
++}
++
++static void gmcs_destroy(void *data)
++{
++	struct gmcs *gmcs = data;
++
++	DBG_IDX(0xffff, "destroy %p", data);
++
++	queue_remove(servers, gmcs);
++
++	if (gmcs->uinput >= 0)
++		close(gmcs->uinput);
++
++	free(gmcs);
++}
++
++static void gmcs_debug(void *data, const char *str)
++{
++	DBG_IDX(0xffff, "%s", str);
++}
++
++static const struct bt_mcs_callback gmcs_cb = {
++	.media_player_name = gmcs_media_player_name,
++	.play = gmcs_play,
++	.pause = gmcs_pause,
++	.stop = gmcs_stop,
++	.next_track = gmcs_next_track,
++	.previous_track = gmcs_previous_track,
++	.debug = gmcs_debug,
++	.destroy = gmcs_destroy,
++};
++
++static struct gmcs *gmcs_new(struct btd_adapter *adapter)
++{
++	struct gmcs *gmcs;
++	const char *name = btd_adapter_get_name(adapter);
++
++	gmcs = new0(struct gmcs, 1);
++	gmcs->adapter = adapter;
++	gmcs->uinput = uinput_create(adapter, NULL, name, " (MCS)", key_map);
++	if (gmcs->uinput < 0)
++		error("MCS: failed to init uinput for %s", name);
++
++	DBG_IDX(0xffff, "new %p", gmcs);
++
++	return gmcs;
++}
++
+ /*
+  * Profile
+  */
+@@ -510,11 +651,33 @@ static void mcp_remove(struct btd_service *service)
+ 
+ static int gmcs_probe(struct btd_profile *p, struct btd_adapter *adapter)
+ {
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++	struct gatt_db *db = btd_gatt_database_get_db(database);
++	struct gmcs *gmcs;
++
++	gmcs = gmcs_new(adapter);
++	if (!gmcs)
++		return -EINVAL;
++
++	gmcs->mcs = bt_mcs_register(db, true, &gmcs_cb, gmcs);
++	if (!gmcs->mcs) {
++		gmcs_destroy(gmcs);
++		return -EINVAL;
++	}
++
++	if (!servers)
++		servers = queue_new();
++	queue_push_tail(servers, gmcs);
++
+ 	return 0;
+ }
+ 
+ static void gmcs_remove(struct btd_profile *p, struct btd_adapter *adapter)
+ {
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++	struct gatt_db *db = btd_gatt_database_get_db(database);
++
++	bt_mcs_unregister_all(db);
+ }
+ 
+ static struct btd_profile mcp_gmcs_profile = {
 -- 
 2.51.1
 
