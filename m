@@ -1,71 +1,182 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C787E326920
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 15:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765381467; cv=pass; b=bZAFFIf9kqkRwB4OpJBUwmiJ0UGA+wZFa/xGPMMGvmo6pdb1XCqrFl5RkkyaoQHkcJgyE+p2d2QRngZTlFXRaG5pXLY/9Q1fFKo2bY/EQ5W3laC4IWEbQ+usqbkV9wn0NYfrcYlgl+Fy1ZL1URp0+1jEXsY4njIJcFZhziMslZE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765381467; c=relaxed/simple;
-	bh=aeog+6PLXNmGbhLNu7i7EGWyHvCrjz0EodWyA0y1TUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ldmmON/27hWBFfn2/hfF3/4zs4W29sVHGJu/Nf/qkJGed0/ide8be3Q3/05WBiVHGLXSpF4N82Qbxs8YcaOWH8Z0TAdDfllPMAQvXBdtQ7nIRzbcAk5Aifzn2f5xWgk1FhacFldsF/vFXH24c+wLZ0k/RdqHSapYATZunQhf67Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=hdHegA5o; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BDB4265CBE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 15:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765381833; cv=none; b=CmCKz7E7eby+ylNPUO6El0R569Qc+FmxI8alVjsRdt+JD/krRsuHwDcPnRJQ0BM8CIm/ULwA7Qnbjj+IaEPCiXodQDw66GB9EmOPSI9iolzzlO6zp+Ejmq//UaNmFF4cug0xx6yG/GUtEWUZ0tSuUvH/wTibRzJ4Id7mZS+dtUE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765381833; c=relaxed/simple;
+	bh=YLIhPlDnRJFm+kKft2me5r3ihgoa9zmwK9RdgoSrg5o=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SGGe49PzkOdzV7bNmYpujBv3T24Yh5ahHT+0+XqGOGt5Yhgj8csuZiA00+CtI37bIQt4fD00soxRpAkifgSvd198jRoEZpWnq+O4EaGT+9XYGU3c/eB1cbVnZl0kaaLCPTRnH9vgT2Hn7wGMhTN1R5napFH5HJiIsNzWfldEH8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=KR+wFQBL; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="hdHegA5o"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dRKlV5KKSz10JQ;
-	Wed, 10 Dec 2025 17:44:22 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1765381463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+LnqALAKocDHdaUaCb8sMgnvU6pb7SZqtIOeHda+FgY=;
-	b=hdHegA5oqndhbUjB62wTUkLQ/gnubMZEJHZb7t9VWzAikks6s6a+gp4zq8YDaafrPO6iaY
-	M7rjP+GLLm9AxwiBKABnnb7OlofUWXOsqZSuMcuLcGIzTbEtE0625IG0BIMz4V72N0k2vL
-	ke/CyUzyqeWugbp+NhdaAP0VqketMt4=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765381463;
-	b=XbjP++czACGuZAqInRZ2rNggpprbLDY5UQ7JRQp//L+oE934WqrdHvHzwfUy9qxLaNT2nl
-	XjHIrRgC/EikLIVjXWS2GVIzWBxMgHS4uxJcnbf7Cg+w2RC0VCty1SHhpHJ91QyEDuLf3s
-	UlBxq+XZ/iGi71o7IBQUTNQhSSUjvnc=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1765381463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+LnqALAKocDHdaUaCb8sMgnvU6pb7SZqtIOeHda+FgY=;
-	b=xjpiRwyeHC8v8J87ushtwolGMNBs9Mrs0cii/G/qYOD8BRs7zvvwTEHPBrvGwqIOJ8xEvG
-	+hABigza8qcWllQDK9bMQR4oR55EZdB/Zgu8oDe29C3A5HkrHs/zGA/NFKstW06vFT9BlB
-	SpQWXrElRhuRk6zX/GNsVT1os48tl5E=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="KR+wFQBL"
+Received: from github.com (hubbernetes-node-006a804.va3-iad.github.net [10.48.206.56])
+	by smtp.github.com (Postfix) with ESMTPA id A272E4E0413
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 07:50:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1765381830;
+	bh=Z3/WrSfi0kUFFRmusibKO0hbkdbCE9iUnQyG3N70yDA=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=KR+wFQBLlJeKYfd76gG8/KEyLG5s1j5PN2EZIHXNZn67n5rMWFgVYQFlZUNTICu+B
+	 HkvpiuIVobndbVGyO3Q790DB3qvp8IsuCzJy93sJyxK+H/mdJUvRZgqkWmsPbmca08
+	 0r9xlvY2qTu5jSoy6v/JjnOvBgvaej29tkzs8qcI=
+Date: Wed, 10 Dec 2025 07:50:30 -0800
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2.. 7/7] shared/gatt-client: fix notify_data leak in notify_data_write_ccc
-Date: Wed, 10 Dec 2025 17:44:12 +0200
-Message-ID: <14e2a607cf2b5930a8e2c66c94845972c1cb4477.1765381438.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <cover.1765381438.git.pav@iki.fi>
-References: <cover.1765381438.git.pav@iki.fi>
+Message-ID: <bluez/bluez/push/refs/heads/1032038/000000-d1aa17@github.com>
+Subject: [bluez/bluez] ccd89a: shared/mcp: support multiple MCP, and add
+ non-stub...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1032038
+  Home:   https://github.com/bluez/bluez
+  Commit: ccd89a3cf1a99f41657a93cfbd9f6ee49a12aa11
+      https://github.com/bluez/bluez/commit/ccd89a3cf1a99f41657a93cfbd9f6ee49a12aa11
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-10 (Wed, 10 Dec 2025)
+
+  Changed paths:
+    M lib/bluetooth/uuid.h
+    M src/shared/mcp.c
+    M src/shared/mcp.h
+    M src/shared/mcs.h
+
+  Log Message:
+  -----------
+  shared/mcp: support multiple MCP, and add non-stub MCS server
+
+For Media Control Client, add support for multiple GMCS / MCS services
+on the server. Revise the API accordingly.
+
+For Media Control Server, make it a complete implementation (OTS still
+missing), and add an API the profile can use.
+
+This is mostly a complete rewrite.
+
+
+  Commit: 608b3ab6488e99de18e535b395a098425b8b7050
+      https://github.com/bluez/bluez/commit/608b3ab6488e99de18e535b395a098425b8b7050
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-10 (Wed, 10 Dec 2025)
+
+  Changed paths:
+    M .gitignore
+    M Makefile.am
+    A unit/test-mcp.c
+
+  Log Message:
+  -----------
+  test-mcp: add tests for MCP / MCS
+
+Add tests for the Media Control Client / Server implementation.
+
+This contains basic GGIT and state transition tests.  Not all state
+transition tests are here, as they'd largely test the upper layer of the
+profile which is not tested now.
+
+
+  Commit: 13dce720dc4864f337b91fa1fdeb204695c58055
+      https://github.com/bluez/bluez/commit/13dce720dc4864f337b91fa1fdeb204695c58055
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-10 (Wed, 10 Dec 2025)
+
+  Changed paths:
+    M profiles/audio/mcp.c
+
+  Log Message:
+  -----------
+  mcp: adapt to new MCP API to support multiple remote MCS services
+
+Rewrite to use the new shared/mcp API, adding support for multiple MCS
+services on the remote side.
+
+
+  Commit: 3142def64ace65b4048f38707bc2c519d26f1fcc
+      https://github.com/bluez/bluez/commit/3142def64ace65b4048f38707bc2c519d26f1fcc
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-10 (Wed, 10 Dec 2025)
+
+  Changed paths:
+    M Makefile.plugins
+    M profiles/audio/avctp.c
+    A profiles/audio/uinput-util.c
+    A profiles/audio/uinput-util.h
+
+  Log Message:
+  -----------
+  avctp: move uinput utilities to uinput-util.c
+
+Move basic uinput utilities to a separate file, so they can be reused
+for MCS.
+
+
+  Commit: 56b242bc36bf8dc80aba38a6bb8f7f8fef678ca7
+      https://github.com/bluez/bluez/commit/56b242bc36bf8dc80aba38a6bb8f7f8fef678ca7
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-10 (Wed, 10 Dec 2025)
+
+  Changed paths:
+    M profiles/audio/uinput-util.c
+
+  Log Message:
+  -----------
+  uinput-util: fix compiler complaint about strncpy usage
+
+Fixes:
+
+profiles/audio/uinput-util.c: In function 'uinput_create':
+profiles/audio/uinput-util.c:97:25: error: '__builtin___strncpy_chk'
+    output truncated before terminating nul copying as many bytes
+    from a string as its length [-Werror=stringop-truncation]
+   97 |                         strncpy(dev.name + len, suffix, slen);
+
+
+  Commit: e62af835d801a062e0e376c21eefb8dd3ec72d1c
+      https://github.com/bluez/bluez/commit/e62af835d801a062e0e376c21eefb8dd3ec72d1c
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-10 (Wed, 10 Dec 2025)
+
+  Changed paths:
+    M profiles/audio/mcp.c
+
+  Log Message:
+  -----------
+  mcp: add local GMCS service that emits uinput media keys
+
+Implement simple GMCS service that is always inactive, and emits media
+key presses via uinput for Play/Pause/Stop/Next/Prev MCS commands.
+
+In practice, this seems to be enough to support media control keys on
+headsets.  Some headsets (Creative Zen Hybrid Pro) also refuse to
+connect if there is no GMCS service.
+
+
+  Commit: d1aa1777bfe14193aab7aa0e05e581d33bd545a4
+      https://github.com/bluez/bluez/commit/d1aa1777bfe14193aab7aa0e05e581d33bd545a4
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-10 (Wed, 10 Dec 2025)
+
+  Changed paths:
+    M src/shared/gatt-client.c
+
+  Log Message:
+  -----------
+  shared/gatt-client: fix notify_data leak in notify_data_write_ccc
 
 Calling bt_gatt_client_unregister_notify() when ATT has disconnected
 leaks the reference to notify_data: in notify_data_write_ccc() the
@@ -81,24 +192,8 @@ Direct leak of 5760 byte(s) in 90 object(s) allocated from:
     #2 0x00000044a81c in register_notify src/shared/gatt-client.c:1782
     #3 0x000000458367 in bt_gatt_client_register_notify src/shared/gatt-client.c:3685
     #4 0x00000049f9f5 in foreach_mcs_char src/shared/mcp.c:1834
----
- src/shared/gatt-client.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index f6d5dc4b7..f8ebab3fa 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1691,6 +1691,9 @@ static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
- 						callback,
- 						notify_data_ref(notify_data),
- 						notify_data_unref);
-+	if (!att_id)
-+		notify_data_unref(notify_data);
-+
- 	notify_data->chrc->ccc_write_id = notify_data->att_id = att_id;
- 
- 	return !!att_id;
--- 
-2.51.1
 
+Compare: https://github.com/bluez/bluez/compare/ccd89a3cf1a9%5E...d1aa1777bfe1
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
