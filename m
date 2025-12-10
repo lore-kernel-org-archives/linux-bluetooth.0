@@ -1,77 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADBA2C027E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 21:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8726C329E72
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 21:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765402991; cv=none; b=sc+tsRA/FDHOzsB2zQMlCEy9clf8mbcMUsmC+xwWhvCFb9gTcTekNSRr0+IfSDnT3Gg8/WUufEhrAxSXxyYpdE/ydWn5O3PzV0lNo7wlY9MKHoAuwfy79qIF+OTrlL3lDfE8J75K71NDJc2pg7U3bK8GffoOrrEfAWgxnvKhZ0w=
+	t=1765403215; cv=none; b=hPa/pXRShDtAvxmGccNYtsgCcV38H1/vGEMwPslE1BBC8TuDxeiGiMWrA+O/mw4HKVmu4ECxlT8WTjsBkYjFWgEatZG1cpda/0mcFpksDX2XjHbHiadcj2/p8w1Z+9XEKS/6Gh9TL20PD7ouEtIOJP4BUNRs7fosuqiNoPl8/fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765402991; c=relaxed/simple;
-	bh=5tE3Q/VYXSa/wf5KYZlLo5YXOMCSYksmp/rJt/qicHQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=J31D9VgwKw5Oaw9x8j6Fda04GP1j7YfavthedJ+CWYzY0zqPho19kA0BS6VjvRoJCunietF8t0/FAhpNjWhODoysyxWrb8hSFyN83wQQxP6WGeVpLHwVkFkTn3gqPqqfjf5v2Yvnt1Qwjzh89pn+wAD4K4GdjYaYNhiCy3LxIyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqBjLnPa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765403215; c=relaxed/simple;
+	bh=Tvv1w7TadOtU/tKbGIXZ9l/BvHFjUeV6F1wY1j7rr3o=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ntIfAFrm9kPaPTTJgmBdnq7rx4diiltF/EREXFRy9AQjAANaxmWWvJHcFnF0i3loC7Md+qWap5TSOv73UG6Hu2XsIa2j6mIfgdsZ7ad00s/QoozGsc5C7p9tutpBq4A0lPvzQ+/4pOtc5PMjPu3L/5RcjNSS3dEntTfoAvPyAzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fc3P8WJ8; arc=none smtp.client-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqBjLnPa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B389CC4CEF1;
-	Wed, 10 Dec 2025 21:43:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765402990;
-	bh=5tE3Q/VYXSa/wf5KYZlLo5YXOMCSYksmp/rJt/qicHQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oqBjLnPaOrMPlOQkn/u8SeAW/ifB8Emkae0hTPOc6yaHngUP9sWsKMDQbCiA4oPun
-	 R1PJ5QnDH2WejFoUpr/D2ghMQyQ9aYCKQ2Ea37NfhRZIS8giEf3cYJX4BtXrXaPGuj
-	 iRJmSz7eebKcH/+p8FvM86cuw9Tzzq4sQka6fZBe61Gog9Bf1rA/GOUIscZLS/ooc0
-	 Z6pLRKdadyL+KB8PbRNXMzMkFbnMLWxKXNx4pliyE/fy7R0YQa8EeCmcj7Mmmlikvu
-	 witWtlomjN7I3xyZGiiCQg3UL1x2pfCNcGWBab0U0Vn5SItF0ZhCN3LDUa1bkimxYn
-	 LjJRIbM66S3jA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B6D43809A23;
-	Wed, 10 Dec 2025 21:40:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fc3P8WJ8"
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-11beb0a7bd6so1701734c88.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Dec 2025 13:46:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765403211; x=1766008011; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=22V4ueSv/OHpboUVOras6CSpClzQV10pCyNCyhsPgFs=;
+        b=Fc3P8WJ80iQZnmaMdMKeK/kjfHpGmC2i9nC+OeGqERG0ttqAzJt8aEQ8OnSfLI5PiM
+         VVAvbPUa1MmvvoHHwDdp6mp5pUyVncDKg7emYGLdKVFZM1dCsVVaSveBsi5Mhut3/U6d
+         4ebXF4Wcxe1UCTKfDhEedzHS3OWWxuVCWnoFSHrSUGyhpf7u5crX4ZCyMncfRFidw/7N
+         85SAbjlZqi8pIDilq/04ifR+Ne5T5tv/g9JbtUwhW3odI993jI4ViQrh5NZt4I5iQrPH
+         2JY+pA0YvNQ2YGYn+XEXQ4iaSkPvfpg5eui3omTdjinY5IK+eAeZaNdanucZrAjxULY3
+         Jdow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765403211; x=1766008011;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=22V4ueSv/OHpboUVOras6CSpClzQV10pCyNCyhsPgFs=;
+        b=S4v0sOm0U5m2FyPS5T6RtWLJtxzgxdlfcIHOUSWO+vOE7+1BYSKlcbUcZeIC5qorX0
+         OHpTNzFnGPQRSrJoiLaxMCwN+jZDb4eANzUKfXjuT/r1WcSY5mu4NQKXUgjKqy7Qb6F5
+         jR6oq+RmHbfpOLtq4OjZzdFTfJfSxYAS2+5T0DLsTsQuZxn8U2JIFijdYYMWJo4JgEs5
+         2gRXkJpfhG9DO5CNQtxVCa5PkCWs48K3Lpw7aWJI9OCdMhyHoVZ57ilQ89Rzm0092RHZ
+         Cmrz7LdXWCaRYzO7Vp7OilgoWf2NUL43cVrXouUprQ9jeJ+xfuUGFyZQun14TfYxlDt0
+         esNA==
+X-Gm-Message-State: AOJu0Yydx8FfXGXH1xSf8aNDhhXRjXbdR42S4ogdMvhJKRT9aCHmgpcb
+	2RpAIMkvuKmJDBI2GOaH1y9lxydHzw9nnKCkmq+WzWpoL7kNrc1Yp1H8AA+GPg==
+X-Gm-Gg: ASbGncsOnLyQZTeDlUkVVLhxXjYqxlKvMvaDWKktKnsePAcHCUVdVgvj3YfBQ4Hfv+H
+	Qldf7NiHVuskp82W5WB05MlwLhmzB9/wN5sGCopJiPi54HYfdITj76xh10DW7wWGgJ3umvnzAkA
+	sJJ0QmS6kYvDOnyY/wWWlbTBuxDOfJV8+h1nsIIYZBkZfhf/UR4i+Pc0XTGZi8wSTDGmCNMwWh4
+	cFJ8IWGa8aH7GeCm+XIp4MI6dAPzqqVPbM1We4j+0Ovs9d3AAjj1JUkxokAl6lfJhgMSFrx0BUX
+	FZGgg7xEgCQ1bj5mw9c2spSbtPH7spZvxp1+kYSY5+y3BITFuqu5Pi5abuxeRCYJPmxNqvG1p5W
+	2tl3nnMpcqz5t7DzsUKbD8ULq74FMSRChzeCy7o9Pz3FzQ765VGpeFrAi+87sMpuLP8xlDbN7MY
+	q60bPMhTBLn22eCkUf
+X-Google-Smtp-Source: AGHT+IF1u4oNGzMuC74r7/VqHMI/RYnFfIxOLb1aRG5llEYuSLV1L0pvZmS72oERy9tNdu9oKntYHA==
+X-Received: by 2002:a05:7022:128c:b0:11c:883d:1ef0 with SMTP id a92af1059eb24-11f2e0dc654mr643846c88.15.1765403211095;
+        Wed, 10 Dec 2025 13:46:51 -0800 (PST)
+Received: from [172.17.0.2] ([172.208.154.2])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11f2e30497fsm1779777c88.15.2025.12.10.13.46.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Dec 2025 13:46:50 -0800 (PST)
+Message-ID: <6939ea4a.050a0220.2dd6a8.decc@mx.google.com>
+Date: Wed, 10 Dec 2025 13:46:50 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6286352049661081081=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] unit: reduce macro expansion volume
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176540280504.733730.10284047710695566137.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Dec 2025 21:40:05 +0000
-References: 
- <8da87c1000bbbb062d302b74518351a8ba65075f.1765310255.git.pav@iki.fi>
-In-Reply-To: 
- <8da87c1000bbbb062d302b74518351a8ba65075f.1765310255.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] l2cap-test: Add tests for BT_PHY
+In-Reply-To: <20251210204952.153725-1-luiz.dentz@gmail.com>
+References: <20251210204952.153725-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============6286352049661081081==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is automated email and please do not reply to this email!
 
-On Tue,  9 Dec 2025 22:26:11 +0200 you wrote:
-> define_test() in some of unit tests expands the long command sequences
-> three times.
-> 
-> Make it expand only once.
-> 
-> This reduces preprocessor output e.g. for test-bap.c from 23 Mb to 5 Mb,
-> for faster compilation.
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - [BlueZ] unit: reduce macro expansion volume
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fa6f1e942cee
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1032100
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.39 seconds
+GitLint                       PENDING   0.44 seconds
+BuildEll                      PASS      17.88 seconds
+BluezMake                     PASS      651.77 seconds
+MakeCheck                     PASS      21.95 seconds
+MakeDistcheck                 PASS      225.70 seconds
+CheckValgrind                 PASS      294.18 seconds
+CheckSmatch                   PASS      327.84 seconds
+bluezmakeextell               PASS      174.61 seconds
+IncrementalBuild              PENDING   0.41 seconds
+ScanBuild                     PASS      997.89 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6286352049661081081==--
