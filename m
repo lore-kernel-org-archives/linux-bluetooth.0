@@ -1,144 +1,245 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D422701CB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Dec 2025 21:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965E528A3EF
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Dec 2025 21:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765487856; cv=none; b=mPYhWEVTnUkvpXEw9K27kEVtbBmPQ0hb9Rw0dI2ba7CbNPuw4W33oyPCESHOWAG1jjPN1801znvZt5dwzbeLbxIqDaRsORBAISL/JV5Hbx2zeC7i1Lsld+bsKbTmZY1y5T3mkEgXrtSyvlDOOJOeKboIFr9fzyEmUr26lTlRi7k=
+	t=1765488012; cv=none; b=G2D1Cq2ZQnBVabhfOXGm2ibY4ZxiswM/YjEwC85SPY/XKgaS3kG5BMwFK2/B9KG2Aeu93JTvzZHBnsklddHmeHFLAkGfppru1NIa2uvGkyf6JJdddsl5Zlxlinkj3/DCVq+uYsIYb+LE1qf+jNqtqpUaFA0N8F9HBA/7WBW29Ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765487856; c=relaxed/simple;
-	bh=3ZKCLdQ5V7vfr02FS+baYgm6WctDn6xapRECbyG4LTY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jjPdcy4S3tq8WZT59NL9Pxryr5LvlX5d6pYDu6ZdzzqXPJS9xax6xCFxsY9v3pq/Ht3Wd5FYWP9rWSfi1RPAZRz/wh8QN8faNKU+VrlwZ6LQzZ+lIlhRbyY5CFaXIsX9+w+C+4b7NJkeGH7G8RZZ5T5Kurrj20X1R23AOXGvoEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=QGo6dBsI; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1765488012; c=relaxed/simple;
+	bh=GfE4xUl2jtTcG09KxNYM+oLZmDu8aINUbyoU7oMUCQc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=TWNmsgxt9ic2FwBxdC8+WeTg/p2KqwxSqoldVrh9qkjeBwimgvgolGj+2oyCGoMg1dBuVZysPwp/K5v9MSTFM4qA35quEaf6RFSprDdJ2DOQ0M7oSGkju5yE8Ze0S54tLFWb8QTJDKypjIlb9awy/RyyWkmexKKK349odtaPDhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NxT/rXGG; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="QGo6dBsI"
-Received: from github.com (hubbernetes-node-a757b4c.ac4-iad.github.net [10.52.220.43])
-	by smtp.github.com (Postfix) with ESMTPA id D160C204EB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Dec 2025 13:17:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1765487853;
-	bh=wYl5RNg0IXSuwrDP1o7bxvgHmxrrdPE+y8TVMoyEzq4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=QGo6dBsIT4rYoWr39KejV9XZR281ivGb8ezIK78hHBAqcfJ4cd7BBT67iuoWQd5Pp
-	 HeOCMSdx0rdmh8yLJWzRWFjdITVWSHPrcLcOjzuqyxvXqBwOYsBNcbPO2fg69B9jSC
-	 ep4cavtdazKSgkvI2WNQEpxuRKG/RFAnQhfj6nA4=
-Date: Thu, 11 Dec 2025 13:17:33 -0800
-From: "Manuel A. Fernandez Montecelo" <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1032437/000000-3ff490@github.com>
-Subject: [bluez/bluez] 3ff490: Support for config fragments (conf.d style
- dirs)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NxT/rXGG"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8845498be17so7074256d6.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Dec 2025 13:20:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765488009; x=1766092809; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GfE4xUl2jtTcG09KxNYM+oLZmDu8aINUbyoU7oMUCQc=;
+        b=NxT/rXGGKBgDY4yJDi9sTW6HQRtm8JPWAGiuoe3L8xAoU7st3dOiucT8GNOXG5SXeO
+         h+4wRff7T/BH81YzfwPMAFTBNntd/4MEs7dz3DMQmno86GfkfjgDJ7LLjYAskub1ZRLu
+         w+WEYMVh8YdTOyPZ0v1MvGo2XnPF6k3UP3hoEyA6isyrqJbmm4He0xL6RpGr6/vsa77w
+         0kS/s9/MNbnLAMhOenr235LAuDBMKzLOvvKVVrsNAXRDeaNUwYKb3qbfvtnYjLyZS+0Y
+         5iA4D9d77OXhkkWcPUGaB+2TJaqnb282SvYy9ceTfAkJs5J5DJHWfswNOMOr5BJb71eH
+         GAlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765488009; x=1766092809;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GfE4xUl2jtTcG09KxNYM+oLZmDu8aINUbyoU7oMUCQc=;
+        b=iWEoA3dlwOZ5oyql51LHKY1yu0BtWzRS5Rhq2iLLDIW5A28yZKdnSoqkVkGCT8hual
+         +Vf7fnvl883PXIIU+FPag6DmbXlrmile8cG96WMaWpxImsnRzh9XKkkoIGd9AjeMuxgU
+         qBSH477bUmu/BR/OA0dhknzlLttjo+uHtlL/IKhx20/nVwWLSLjE6CotfCSWKg1VnZvI
+         1OUizsBFUHP68A+4n+q4cvrnktofuPvwZ3FPs14c4t6tJ7DLz2dLsp60owMbIB3esJ/C
+         iNn0RtahiczFcLbP7M5cIAvUAZPZwe1JJY3KXYQWqS2rV1HbQ98FfzHNtLLcO1gD+/QY
+         GpYw==
+X-Gm-Message-State: AOJu0YyJSn8RSDECfnyGgdyMcW4qbNHAErkL8GJSvDqNRbloP8KCirB0
+	Q/a41Cc3YimOGUb4k3cTl9QUEgaxeJ8dLgex+7gRWKnZOF89DyEbweh3VMCIYA==
+X-Gm-Gg: AY/fxX7okNa9aGoN93v1a3KJpDWZpSl8SHZnTo2tlGt9f+NOHGTQdjrnjxINp4zx823
+	SGq4LREneRKQmC3xOwiIu1y+wR8xTu3QnUDg6gN9qNs/AJXC9pAlUgl9SivAsfGO1XrMITmIyVY
+	wBTg0JyPi35xgFx+aFtCRUYHIYPqOwFjeCZr4fZEq4P6jY6maH9XLDauEnYNJNXOQk7cr3ynbNu
+	lR+c1yk+mrn65mevJpvydRt8VA9RxcmpVaygarutQke/A2nx6aAXVsd/vBBmdEJWY3n6vctdIP5
+	6h4HnBX15E8S2AeM3sISBptyzGpdm93E8FP36PdMjnlXsaQQSyRDX18nFDuO5Z8mOUoqcrQMvVr
+	7QmpkKJBjy5pTtmFtAnQYN+ih/42SFS7Rerl18d5954JoG+YrRykwIZIJ72WJ1ffZ6XWR0oFYZh
+	Dwj7u9i/SkwTASYP4d
+X-Google-Smtp-Source: AGHT+IHkmXSADesVVQyXOvdQwdMSrK6xEtAYGKk0gSkYL7oV2OIXXQ7qM3teavZeA8nod5bwgb6e7g==
+X-Received: by 2002:ad4:5b8a:0:b0:880:4c2d:dc8c with SMTP id 6a1803df08f44-8887e01e6e5mr1466746d6.18.1765488009074;
+        Thu, 11 Dec 2025 13:20:09 -0800 (PST)
+Received: from [172.17.0.2] ([20.55.127.229])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8886ef1a0f7sm34265086d6.49.2025.12.11.13.20.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Dec 2025 13:20:08 -0800 (PST)
+Message-ID: <693b3588.050a0220.35fd92.b550@mx.google.com>
+Date: Thu, 11 Dec 2025 13:20:08 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0822859685511041149=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, mafm@igalia.com
+Subject: RE: Support for config fragments (conf.d style dirs)
+In-Reply-To: <20251211211356.3842264-2-mafm@igalia.com>
+References: <20251211211356.3842264-2-mafm@igalia.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1032437
-  Home:   https://github.com/bluez/bluez
-  Commit: 3ff4906bcf774600491427be70e5249b066a4eae
-      https://github.com/bluez/bluez/commit/3ff4906bcf774600491427be70e5249b066a4eae
-  Author: Manuel A. Fernandez Montecelo <mafm@igalia.com>
-  Date:   2025-12-11 (Thu, 11 Dec 2025)
+--===============0822859685511041149==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-  Changed paths:
-    M Makefile.am
-    M acinclude.m4
-    M profiles/input/hog.c
-    M profiles/input/manager.c
-    M profiles/network/manager.c
-    A src/conf_d.c
-    A src/conf_d.h
-    M src/main.c
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTAzMjQzNwoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgUEVORElORyAgIDAuMjUgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+RU5ESU5HICAgMC4zNCBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAyMC4zOCBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAg
+ICAxMS4yMyBzZWNvbmRzCk1ha2VDaGVjayAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAw
+LjI3IHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDQ0LjAw
+IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDEwLjI5IHNl
+Y29uZHMKQ2hlY2tTbWF0Y2ggICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDEyLjI3IHNlY29u
+ZHMKYmx1ZXptYWtlZXh0ZWxsICAgICAgICAgICAgICAgRkFJTCAgICAgIDEwLjc5IHNlY29uZHMK
+SW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEVORElORyAgIDAuMzIgc2Vjb25kcwpTY2Fu
+QnVpbGQgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTMuNzUgc2Vjb25kcwoKRGV0YWls
+cwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tQYXRjaCAtIFBFTkRJ
+TkcKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBHaXRMaW50IC0gUEVORElORwpEZXNjOiBSdW4gZ2l0bGlu
+dApPdXRwdXQ6CgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQmx1ZXpNYWtl
+IC0gRkFJTApEZXNjOiBCdWlsZCBCbHVlWgpPdXRwdXQ6CgpJbiBmaWxlIGluY2x1ZGVkIGZyb20g
+L3Vzci9pbmNsdWRlL2dsaWItMi4wL2dsaWIvZ3R5cGVzLmg6MzQsCiAgICAgICAgICAgICAgICAg
+ZnJvbSAvdXNyL2luY2x1ZGUvZ2xpYi0yLjAvZ2xpYi9nYWxsb2NhLmg6MzIsCiAgICAgICAgICAg
+ICAgICAgZnJvbSAvdXNyL2luY2x1ZGUvZ2xpYi0yLjAvZ2xpYi5oOjMwLAogICAgICAgICAgICAg
+ICAgIGZyb20gLi9zcmMvZWlyLmg6MTIsCiAgICAgICAgICAgICAgICAgZnJvbSBzcmMvc2hhcmVk
+L2FkLmM6MjQ6Ci91c3IvaW5jbHVkZS9nbGliLTIuMC9nbGliL2d2ZXJzaW9ubWFjcm9zLmg6MzEx
+OjI6IGVycm9yOiAjZXJyb3IgIkdMSUJfVkVSU0lPTl9NSU5fUkVRVUlSRUQgbXVzdCBiZSA8PSBH
+TElCX1ZFUlNJT05fQ1VSX1NUQUJMRSIKICAzMTEgfCAjZXJyb3IgIkdMSUJfVkVSU0lPTl9NSU5f
+UkVRVUlSRUQgbXVzdCBiZSA8PSBHTElCX1ZFUlNJT05fQ1VSX1NUQUJMRSIKICAgICAgfCAgXn5+
+fn4KL3Vzci9pbmNsdWRlL2dsaWItMi4wL2dsaWIvZ3ZlcnNpb25tYWNyb3MuaDozMTQ6MjogZXJy
+b3I6ICNlcnJvciAiR0xJQl9WRVJTSU9OX01BWF9BTExPV0VEIG11c3QgYmUgPj0gR0xJQl9WRVJT
+SU9OX01JTl9SRVFVSVJFRCIKICAzMTQgfCAjZXJyb3IgIkdMSUJfVkVSU0lPTl9NQVhfQUxMT1dF
+RCBtdXN0IGJlID49IEdMSUJfVkVSU0lPTl9NSU5fUkVRVUlSRUQiCiAgICAgIHwgIF5+fn5+Cm1h
+a2VbMV06ICoqKiBbTWFrZWZpbGU6Nzc3MDogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3Bf
+bGEtYWQubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
+cy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0MjAxOiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VDaGVjayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6
+IE1ha2UgQ2hlY2sKT3V0cHV0OgoKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC91c3IvaW5jbHVkZS9n
+bGliLTIuMC9nbGliL2d0eXBlcy5oOjM0LAogICAgICAgICAgICAgICAgIGZyb20gL3Vzci9pbmNs
+dWRlL2dsaWItMi4wL2dsaWIvZ2FsbG9jYS5oOjMyLAogICAgICAgICAgICAgICAgIGZyb20gL3Vz
+ci9pbmNsdWRlL2dsaWItMi4wL2dsaWIuaDozMCwKICAgICAgICAgICAgICAgICBmcm9tIGNsaWVu
+dC9tYWluLmM6MjM6Ci91c3IvaW5jbHVkZS9nbGliLTIuMC9nbGliL2d2ZXJzaW9ubWFjcm9zLmg6
+MzExOjI6IGVycm9yOiAjZXJyb3IgIkdMSUJfVkVSU0lPTl9NSU5fUkVRVUlSRUQgbXVzdCBiZSA8
+PSBHTElCX1ZFUlNJT05fQ1VSX1NUQUJMRSIKICAzMTEgfCAjZXJyb3IgIkdMSUJfVkVSU0lPTl9N
+SU5fUkVRVUlSRUQgbXVzdCBiZSA8PSBHTElCX1ZFUlNJT05fQ1VSX1NUQUJMRSIKICAgICAgfCAg
+Xn5+fn4KL3Vzci9pbmNsdWRlL2dsaWItMi4wL2dsaWIvZ3ZlcnNpb25tYWNyb3MuaDozMTQ6Mjog
+ZXJyb3I6ICNlcnJvciAiR0xJQl9WRVJTSU9OX01BWF9BTExPV0VEIG11c3QgYmUgPj0gR0xJQl9W
+RVJTSU9OX01JTl9SRVFVSVJFRCIKICAzMTQgfCAjZXJyb3IgIkdMSUJfVkVSU0lPTl9NQVhfQUxM
+T1dFRCBtdXN0IGJlID49IEdMSUJfVkVSU0lPTl9NSU5fUkVRVUlSRUQiCiAgICAgIHwgIF5+fn5+
+Cm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NzE0NDogY2xpZW50L21haW4ub10gRXJyb3IgMQptYWtl
+OiAqKiogW01ha2VmaWxlOjEwODk4OiBjaGVja10gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMKVGVzdDogTWFrZURpc3RjaGVjayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1h
+a2UgRGlzdGNoZWNrCk91dHB1dDoKCi4uLy4uL3NyYy9jb25mX2QuYzogSW4gZnVuY3Rpb24g4oCY
+Y29uZmRfZ2V0X3ZhbGlkX2ZpbGVzX3NvcnRlZOKAmToKLi4vLi4vc3JjL2NvbmZfZC5jOjI5OjM3
+OiBlcnJvcjog4oCYR19SRUdFWF9ERUZBVUxU4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0
+aGlzIGZ1bmN0aW9uKTsgZGlkIHlvdSBtZWFuIOKAmEdfUkVHRVhfRE9UQUxM4oCZPwogICAyOSB8
+ICByZWdleCA9IGdfcmVnZXhfbmV3KHJlZ2V4X3BhdHRlcm4sIEdfUkVHRVhfREVGQVVMVCwgR19S
+RUdFWF9NQVRDSF9ERUZBVUxULCAmZXJyb3IpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fgogICAgICB8ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIEdfUkVHRVhfRE9UQUxMCi4uLy4uL3NyYy9jb25mX2QuYzoyOToz
+Nzogbm90ZTogZWFjaCB1bmRlY2xhcmVkIGlkZW50aWZpZXIgaXMgcmVwb3J0ZWQgb25seSBvbmNl
+IGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4KLi4vLi4vc3JjL2NvbmZfZC5jOjI5OjU0
+OiBlcnJvcjog4oCYR19SRUdFWF9NQVRDSF9ERUZBVUxU4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVz
+ZSBpbiB0aGlzIGZ1bmN0aW9uKTsgZGlkIHlvdSBtZWFuIOKAmEdfUkVHRVhfTUFUQ0hfTk9URU9M
+4oCZPwogICAyOSB8ICByZWdleCA9IGdfcmVnZXhfbmV3KHJlZ2V4X3BhdHRlcm4sIEdfUkVHRVhf
+REVGQVVMVCwgR19SRUdFWF9NQVRDSF9ERUZBVUxULCAmZXJyb3IpOwogICAgICB8ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+
+fn5+fn5+fn5+CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBHX1JFR0VYX01BVENIX05PVEVPTAouLi8uLi9zcmMvY29uZl9kLmM6NjE6
+Mzogd2FybmluZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCYZ19wdHJfYXJy
+YXlfc29ydF92YWx1ZXPigJk7IGRpZCB5b3UgbWVhbiDigJhnX3B0cl9hcnJheV9zb3J04oCZPyBb
+LVdpbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgNjEgfCAgIGdfcHRyX2FycmF5X3Nv
+cnRfdmFsdWVzKHJldF9jb25mZF9maWxlcywgY29uZmRfY29tcGFyZV9maWxlbmFtZXMpOwogICAg
+ICB8ICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgfCAgIGdfcHRyX2FycmF5X3NvcnQK
+bWFrZVsyXTogKioqIFtNYWtlZmlsZTo5MzczOiBzcmMvYmx1ZXRvb3RoZC1jb25mX2Qub10gRXJy
+b3IgMQptYWtlWzJdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlWzFd
+OiAqKiogW01ha2VmaWxlOjQyMDE6IGFsbF0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjEw
+ODE5OiBkaXN0Y2hlY2tdIEVycm9yIDEKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRl
+c3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdpdGgg
+VmFsZ3JpbmQKT3V0cHV0OgoKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC91c3IvaW5jbHVkZS9nbGli
+LTIuMC9nbGliL2d0eXBlcy5oOjM0LAogICAgICAgICAgICAgICAgIGZyb20gL3Vzci9pbmNsdWRl
+L2dsaWItMi4wL2dsaWIvZ2FsbG9jYS5oOjMyLAogICAgICAgICAgICAgICAgIGZyb20gL3Vzci9p
+bmNsdWRlL2dsaWItMi4wL2dsaWIuaDozMCwKICAgICAgICAgICAgICAgICBmcm9tIC4vc3JjL2Vp
+ci5oOjEyLAogICAgICAgICAgICAgICAgIGZyb20gc3JjL3NoYXJlZC9hZC5jOjI0OgovdXNyL2lu
+Y2x1ZGUvZ2xpYi0yLjAvZ2xpYi9ndmVyc2lvbm1hY3Jvcy5oOjMxMToyOiBlcnJvcjogI2Vycm9y
+ICJHTElCX1ZFUlNJT05fTUlOX1JFUVVJUkVEIG11c3QgYmUgPD0gR0xJQl9WRVJTSU9OX0NVUl9T
+VEFCTEUiCiAgMzExIHwgI2Vycm9yICJHTElCX1ZFUlNJT05fTUlOX1JFUVVJUkVEIG11c3QgYmUg
+PD0gR0xJQl9WRVJTSU9OX0NVUl9TVEFCTEUiCiAgICAgIHwgIF5+fn5+Ci91c3IvaW5jbHVkZS9n
+bGliLTIuMC9nbGliL2d2ZXJzaW9ubWFjcm9zLmg6MzE0OjI6IGVycm9yOiAjZXJyb3IgIkdMSUJf
+VkVSU0lPTl9NQVhfQUxMT1dFRCBtdXN0IGJlID49IEdMSUJfVkVSU0lPTl9NSU5fUkVRVUlSRUQi
+CiAgMzE0IHwgI2Vycm9yICJHTElCX1ZFUlNJT05fTUFYX0FMTE9XRUQgbXVzdCBiZSA+PSBHTElC
+X1ZFUlNJT05fTUlOX1JFUVVJUkVEIgogICAgICB8ICBefn5+fgptYWtlWzFdOiAqKiogW01ha2Vm
+aWxlOjc3NzA6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWFkLmxvXSBFcnJvciAx
+Cm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBb
+TWFrZWZpbGU6MTA4OTg6IGNoZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIwpUZXN0OiBDaGVja1NtYXRjaCAtIEZBSUwKRGVzYzogUnVuIHNtYXRjaCB0b29sIHdpdGgg
+c291cmNlCk91dHB1dDoKCnNyYy9zaGFyZWQvY3J5cHRvLmM6MjcxOjIxOiB3YXJuaW5nOiBWYXJp
+YWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9jcnlwdG8uYzoyNzI6MjM6IHdh
+cm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2FkLmM6IG5v
+dGU6IGluIGluY2x1ZGVkIGZpbGUgKHRocm91Z2ggL3Vzci9pbmNsdWRlL2dsaWItMi4wL2dsaWIv
+Z3R5cGVzLmgsIC91c3IvaW5jbHVkZS9nbGliLTIuMC9nbGliL2dhbGxvY2EuaCwgL3Vzci9pbmNs
+dWRlL2dsaWItMi4wL2dsaWIuaCwgc3JjL2Vpci5oKToKL3Vzci9pbmNsdWRlL2dsaWItMi4wL2ds
+aWIvZ3ZlcnNpb25tYWNyb3MuaDozMTE6MjogZXJyb3I6ICJHTElCX1ZFUlNJT05fTUlOX1JFUVVJ
+UkVEIG11c3QgYmUgPD0gR0xJQl9WRVJTSU9OX0NVUl9TVEFCTEUiCi91c3IvaW5jbHVkZS9nbGli
+LTIuMC9nbGliL2d2ZXJzaW9ubWFjcm9zLmg6MzE0OjI6IGVycm9yOiAiR0xJQl9WRVJTSU9OX01B
+WF9BTExPV0VEIG11c3QgYmUgPj0gR0xJQl9WRVJTSU9OX01JTl9SRVFVSVJFRCIKc3JjL3NoYXJl
+ZC9nYXR0LWhlbHBlcnMuYzo3Njg6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBp
+cyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjgzMDozMTogd2FybmluZzogVmFyaWFi
+bGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdXNyL2luY2x1
+ZGUvZ2xpYi0yLjAvZ2xpYi9ndHlwZXMuaDozNCwKICAgICAgICAgICAgICAgICBmcm9tIC91c3Iv
+aW5jbHVkZS9nbGliLTIuMC9nbGliL2dhbGxvY2EuaDozMiwKICAgICAgICAgICAgICAgICBmcm9t
+IC91c3IvaW5jbHVkZS9nbGliLTIuMC9nbGliLmg6MzAsCiAgICAgICAgICAgICAgICAgZnJvbSAu
+L3NyYy9laXIuaDoxMiwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvYWQuYzoyNDoK
+L3Vzci9pbmNsdWRlL2dsaWItMi4wL2dsaWIvZ3ZlcnNpb25tYWNyb3MuaDozMTE6MjogZXJyb3I6
+ICNlcnJvciAiR0xJQl9WRVJTSU9OX01JTl9SRVFVSVJFRCBtdXN0IGJlIDw9IEdMSUJfVkVSU0lP
+Tl9DVVJfU1RBQkxFIgogIDMxMSB8ICNlcnJvciAiR0xJQl9WRVJTSU9OX01JTl9SRVFVSVJFRCBt
+dXN0IGJlIDw9IEdMSUJfVkVSU0lPTl9DVVJfU1RBQkxFIgogICAgICB8ICBefn5+fgovdXNyL2lu
+Y2x1ZGUvZ2xpYi0yLjAvZ2xpYi9ndmVyc2lvbm1hY3Jvcy5oOjMxNDoyOiBlcnJvcjogI2Vycm9y
+ICJHTElCX1ZFUlNJT05fTUFYX0FMTE9XRUQgbXVzdCBiZSA+PSBHTElCX1ZFUlNJT05fTUlOX1JF
+UVVJUkVEIgogIDMxNCB8ICNlcnJvciAiR0xJQl9WRVJTSU9OX01BWF9BTExPV0VEIG11c3QgYmUg
+Pj0gR0xJQl9WRVJTSU9OX01JTl9SRVFVSVJFRCIKICAgICAgfCAgXn5+fn4KbWFrZVsxXTogKioq
+IFtNYWtlZmlsZTo3NzcwOiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1hZC5sb10g
+RXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpzcmMv
+c2hhcmVkL2dhdHQtaGVscGVycy5jOjEzMjM6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBh
+cnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjEzNTQ6MjM6IHdhcm5pbmc6
+IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgptYWtlOiAqKiogW01ha2VmaWxlOjQyMDE6
+IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogYmx1ZXpt
+YWtlZXh0ZWxsIC0gRkFJTApEZXNjOiBCdWlsZCBCbHVleiB3aXRoIEV4dGVybmFsIEVMTApPdXRw
+dXQ6CgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Vzci9pbmNsdWRlL2dsaWItMi4wL2dsaWIvZ3R5
+cGVzLmg6MzQsCiAgICAgICAgICAgICAgICAgZnJvbSAvdXNyL2luY2x1ZGUvZ2xpYi0yLjAvZ2xp
+Yi9nYWxsb2NhLmg6MzIsCiAgICAgICAgICAgICAgICAgZnJvbSAvdXNyL2luY2x1ZGUvZ2xpYi0y
+LjAvZ2xpYi5oOjMwLAogICAgICAgICAgICAgICAgIGZyb20gLi9zcmMvZWlyLmg6MTIsCiAgICAg
+ICAgICAgICAgICAgZnJvbSBzcmMvc2hhcmVkL2FkLmM6MjQ6Ci91c3IvaW5jbHVkZS9nbGliLTIu
+MC9nbGliL2d2ZXJzaW9ubWFjcm9zLmg6MzExOjI6IGVycm9yOiAjZXJyb3IgIkdMSUJfVkVSU0lP
+Tl9NSU5fUkVRVUlSRUQgbXVzdCBiZSA8PSBHTElCX1ZFUlNJT05fQ1VSX1NUQUJMRSIKICAzMTEg
+fCAjZXJyb3IgIkdMSUJfVkVSU0lPTl9NSU5fUkVRVUlSRUQgbXVzdCBiZSA8PSBHTElCX1ZFUlNJ
+T05fQ1VSX1NUQUJMRSIKICAgICAgfCAgXn5+fn4KL3Vzci9pbmNsdWRlL2dsaWItMi4wL2dsaWIv
+Z3ZlcnNpb25tYWNyb3MuaDozMTQ6MjogZXJyb3I6ICNlcnJvciAiR0xJQl9WRVJTSU9OX01BWF9B
+TExPV0VEIG11c3QgYmUgPj0gR0xJQl9WRVJTSU9OX01JTl9SRVFVSVJFRCIKICAzMTQgfCAjZXJy
+b3IgIkdMSUJfVkVSU0lPTl9NQVhfQUxMT1dFRCBtdXN0IGJlID49IEdMSUJfVkVSU0lPTl9NSU5f
+UkVRVUlSRUQiCiAgICAgIHwgIF5+fn5+Cm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6Nzc3MDogc3Jj
+L3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtYWQubG9dIEVycm9yIDEKbWFrZVsxXTogKioq
+IFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0MjAx
+OiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEluY3Jl
+bWVudGFsQnVpbGQgLSBQRU5ESU5HCkRlc2M6IEluY3JlbWVudGFsIGJ1aWxkIHdpdGggdGhlIHBh
+dGNoZXMgaW4gdGhlIHNlcmllcwpPdXRwdXQ6CgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMKVGVzdDogU2NhbkJ1aWxkIC0gRkFJTApEZXNjOiBSdW4gU2NhbiBCdWlsZApPdXRwdXQ6CgpJ
+biBmaWxlIGluY2x1ZGVkIGZyb20gL3Vzci9pbmNsdWRlL2dsaWItMi4wL2dsaWIvZ3R5cGVzLmg6
+MzQsCiAgICAgICAgICAgICAgICAgZnJvbSAvdXNyL2luY2x1ZGUvZ2xpYi0yLjAvZ2xpYi9nYWxs
+b2NhLmg6MzIsCiAgICAgICAgICAgICAgICAgZnJvbSAvdXNyL2luY2x1ZGUvZ2xpYi0yLjAvZ2xp
+Yi5oOjMwLAogICAgICAgICAgICAgICAgIGZyb20gLi9zcmMvZWlyLmg6MTIsCiAgICAgICAgICAg
+ICAgICAgZnJvbSBzcmMvc2hhcmVkL2FkLmM6MjQ6Ci91c3IvaW5jbHVkZS9nbGliLTIuMC9nbGli
+L2d2ZXJzaW9ubWFjcm9zLmg6MzExOjI6IGVycm9yOiAjZXJyb3IgIkdMSUJfVkVSU0lPTl9NSU5f
+UkVRVUlSRUQgbXVzdCBiZSA8PSBHTElCX1ZFUlNJT05fQ1VSX1NUQUJMRSIKICAzMTEgfCAjZXJy
+b3IgIkdMSUJfVkVSU0lPTl9NSU5fUkVRVUlSRUQgbXVzdCBiZSA8PSBHTElCX1ZFUlNJT05fQ1VS
+X1NUQUJMRSIKICAgICAgfCAgXn5+fn4KL3Vzci9pbmNsdWRlL2dsaWItMi4wL2dsaWIvZ3ZlcnNp
+b25tYWNyb3MuaDozMTQ6MjogZXJyb3I6ICNlcnJvciAiR0xJQl9WRVJTSU9OX01BWF9BTExPV0VE
+IG11c3QgYmUgPj0gR0xJQl9WRVJTSU9OX01JTl9SRVFVSVJFRCIKICAzMTQgfCAjZXJyb3IgIkdM
+SUJfVkVSU0lPTl9NQVhfQUxMT1dFRCBtdXN0IGJlID49IEdMSUJfVkVSU0lPTl9NSU5fUkVRVUlS
+RUQiCiAgICAgIHwgIF5+fn5+Cm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6Nzc3MDogc3JjL3NoYXJl
+ZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtYWQubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRp
+bmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0MjAxOiBhbGxd
+IEVycm9yIDIKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-  Log Message:
-  -----------
-  Support for config fragments (conf.d style dirs)
-
-Support config fragments, to read config from conf.d directories.
-Those dirs will be main.conf.d for main.conf, analog for input.conf
-and network.conf.
-
-This is commonly supported by other tools, as an extension of the main
-config file(s).  It is useful and convenient in several situations,
-for example:
-
-- distributions can set different values from the defaults shipped
-  upstream, without having to modify the config file
-
-- different packages or config-management tools can change config just
-  by adding, removing or modifying files in that directory; instead of
-  editing the main config files
-
-The main or base config files will be processed first, and then files
-in the conf.d dirs, if existing.
-
-When reading these config files in conf.d dirs, they override values
-for keys in the base config files (or default config set in code).
-For example, for "main.conf" the directory to be processed will be
-"main.conf.d", in the same basedir as the config file
-(e.g. /etc/main.conf, /etc/main.conf.d/).  The same for input.conf and
-network.conf.
-
-Within the conf.d directory, the format of the filename should be
-'^([0-9][0-9])-([a-zA-Z0-9-_])*\.conf$', that is, starting with "00-"
-to "99-", ending in ".conf", and with a mix of alphanumeric characters
-with dashes and underscores in between.  For example:
-'01-override-general-secureconnections.conf'.
-
-Files named differently will not be considered, and accepting groups
-or keys not present in the base config depends on the code, currently
-set to "NOT accept new groups" but "YES to accept new keys".  This is
-because the base config files contain all the groups, but most keys
-are commented-out, with the values set in code.
-
-The candidate files within the given directory are sorted (with
-g_strcmp0(), so the ordering will be as with strcmp()).  The
-configuration in the files being processed later will override
-previous config, in particular the main/base config files, but also
-the one from previous files processed, if the Group and Key coincide.
-
-For example, consider 'main.conf' that contains the defaults:
-
-  [General]
-  DiscoverableTimeout=0
-  PairableTimeout=0
-
-and there is a file 'main.conf.d/70-default-timeouts-vendor.conf'
-containing settings for these keys:
-
-  [General]
-  DiscoverableTimeout=30
-  PairableTimeout=30
-
-and another 'main.conf.d/99-default-timeouts-local.conf'
-containing settings only for 'PairableTimeout':
-
-  [General]
-  PairableTimeout=15
-
-What happens is:
-1) First, the 'main.conf' is processed as usual;
-2) then 'main.conf.d/70-default-timeouts-vendor.conf' is processed,
-   overriding the two values from the main config file with the given
-   values;
-3) and finally 'main.conf.d/99-default-timeouts-local.conf' is
-   processed, overriding once again only 'PairableTimeout'.
-
-The final, effective values are:
-
-  DiscoverableTimeout=30
-  PairableTimeout=15
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============0822859685511041149==--
