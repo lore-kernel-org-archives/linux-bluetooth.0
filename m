@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB16026CE33
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 20:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51CA430BBB0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 20:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765570376; cv=pass; b=oPaE/sEHCIO3dLfe42Ijp0WjbX47aNt9i38be+OnFoTimaSt5ZGheoNZoxat2Q7Sk2mtSp+w0fE7471Nt8WohaYq1m/we0IXjoPjxTfqFLQPKLhrupd6RJ56t9F5sW5ys8ME0mZESqopAnPVRgGtIjB6uJXzZ3wATBvIscTlnzs=
+	t=1765570375; cv=pass; b=pKXOVvon+BFWIoFEUtSj6ywlfgoeLao2m1+CtCq5gHOLN6182zpgen51W2/8iqU0WMyCmpHRlA0g0aKP0ywekuwcRtbY9ZEsLaJ+cCHxBSzUr9TGCeS/pPFUcJeX+aw7U+4tAGKlx5L+NneriAxEg0VYgEBWYIjfjtcSFvNiL5U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765570376; c=relaxed/simple;
-	bh=z6OzFyLSYft2RFQD39fLKRpxvkmJinPYxPdeP46/A2Q=;
+	s=arc-20240116; t=1765570375; c=relaxed/simple;
+	bh=hpyvlDrIAFeSnREYZXhTBZwYF4wz1/YSN3FJB66Wohw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CmaKiMNzNrqD8IUgCedsMIROzaosyD3wnrSqluPnvfdgkxEGSgmiNtt8am0tqQE/IVNFrpbp+MosYUZ9O8zsG5hHI7CT2sKX2yRyVo0JUDFEyAxWZ5LxSzE2r45Y5XLz48FSosEIHFv8Sjm5OErlpTzFnZ6p9paCDOLZr5GfQfc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=csTarfz8; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=NNbCuBCVdXAn1YGNCdXyN6pQf2tA07vp9bGEpgbxVs8WGI5MNwtxXjs4wpVWeCyTx6gnjM1fIR4jjpuKdJ/ho0fuZvsom5iUdwcrJfON/0CrwFLc//3W7kgrrdjixchm57U4QT2uSuduZV6Ji37OYvPHMHcFJWA1SYYToVxIs80=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=MZDmzcFn; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="csTarfz8"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="MZDmzcFn"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a02d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dSgc63lLrz1064;
-	Fri, 12 Dec 2025 22:12:38 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dSgc40GZ2zyd0;
+	Fri, 12 Dec 2025 22:12:35 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1765570359;
+	t=1765570358;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZhVFreSTINuVi+XkrEDkAV7XZMsqW9DnJvcsfKp1K1Y=;
-	b=csTarfz8B/N3BV7sF5rPIhnydmcnkqqa7w/QGSwcyNySSRNkSA+av2byhF1qUyAYvzU0Md
-	FS+IM4SXT/n+cq+J8zz6TrAF0qB2PLWo+hkhJXJOrkW2afpzv3FmddUinZJclQ0gu5/Hce
-	QVjFu/f53imKZJPMILBFsah5m/k8mco=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765570359;
-	b=l78JDBwY3O0OezvU2JQ12ZaISHVk2jJ1N3xkBQ67uPp3CjGZmbxFIcnsmntzd9HeANODkG
-	HPAUS1JtJh0B8wcecypCutSLzoGio97b5JisTd1uXD8kdjmJVQFJLwFErt4l5j9NfA3Hu8
-	HmNJL3Tq88VkI1/26v1WjKE8BDoNNyg=
+	bh=sk/Gplpp4S2XjBEzkbnyQpQv5G0aKMuWgOMOEMNT3oc=;
+	b=MZDmzcFnUBxwVRe53yUardl+5f0lddsRpRJQjYIjOWT7vURNrbxio29/RtYrEruC1GgVqf
+	5ojciemNnJLFsSmEHy8ZzdStj3spmFXBDZeJdmdqoRm7D2e/x7ZSie8cD28KyTUm/RRIA1
+	mJY4nxmqVrd9wrRO60zbU8Ob0fOf71k=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765570358;
+	b=oR4X2oo9rZopv3ezsqy7it5B8tsBONGHFU83WHeFOzDTWR5VgX0N0OyjCP0YoUO21X6qil
+	4HEzR3q5X9rWdTrjzWPmP57EpmNY1MK9bFA10jcdQ9zdopYrwK1SspNHPP1KVkaGYif6/y
+	NdEUXx9QSXW5ZZWTymjuQgK/j1SNu5c=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1765570359;
+	s=meesny; t=1765570358;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZhVFreSTINuVi+XkrEDkAV7XZMsqW9DnJvcsfKp1K1Y=;
-	b=y7f3SXbkaSeJ8oNmpCr9gWk/YvPuCh/vsNby9bWaU2xlF6F4DH+NSG4Z08esXktruTyDgj
-	iVzdrtPlgBJxR/XgFQZIltbWRYANd3FAP/c0ZTtbiaXemA8F/O++Uz8JUJgJeFu8ZwVg8G
-	q4+S7ITV0de9Vby9woQim0NryGLpkEE=
+	bh=sk/Gplpp4S2XjBEzkbnyQpQv5G0aKMuWgOMOEMNT3oc=;
+	b=eggeB0eFyWx90e7aDHQHysS9UaEKI6uNrJw2uDuLoFplQ0Qg/BMUFAgBuDyxTbhqTnhJEx
+	EtX5DpdHlH7WjWCKQ1gTP8EJGmHlMDwxcWwdsCT5xFFrzyaKbQvJK4EnR6LSSxYLZOcAHR
+	nOd0XO1WOqEXrmXrNszqKufhcsWvRJA=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v6 2/9] test-mcp: add tests for MCP / MCS
-Date: Fri, 12 Dec 2025 22:12:24 +0200
-Message-ID: <9dd85056d030aa03fcc0e6311699e7860e651de3.1765570334.git.pav@iki.fi>
+Subject: [PATCH BlueZ v6 1/9] shared/mcp, mcp: support multiple MCP, and add non-stub MCS server
+Date: Fri, 12 Dec 2025 22:12:23 +0200
+Message-ID: <cedc9937c80f336a46ccb6329a909063bb82c50b.1765570334.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1765570334.git.pav@iki.fi>
 References: <cover.1765570334.git.pav@iki.fi>
@@ -67,1860 +67,4325 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add tests for the Media Control Client / Server implementation.
+For Media Control Client, add support for multiple GMCS / MCS services
+on the server. Revise the API accordingly.
 
-This contains basic GGIT and state transition tests.  Not all state
-transition tests are here, as they'd largely test the upper layer of the
-profile which is not tested now.
+For Media Control Server, make it a complete implementation (OTS still
+missing), and add an API the profile can use.
+
+This is mostly a complete rewrite.
+
+Adapt also profile/mcp.c to use the new API, adding support for multiple
+MCS services on the remote side.
 ---
- .gitignore      |    1 +
- Makefile.am     |    6 +
- unit/test-mcp.c | 1807 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 1814 insertions(+)
- create mode 100644 unit/test-mcp.c
+ lib/bluetooth/uuid.h |   27 +-
+ profiles/audio/mcp.c |  518 +++----
+ src/shared/mcp.c     | 3214 ++++++++++++++++++++++++------------------
+ src/shared/mcp.h     |  186 ++-
+ src/shared/mcs.h     |   51 +-
+ 5 files changed, 2362 insertions(+), 1634 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 80427e1dd..f8e4ad686 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -120,6 +120,7 @@ unit/test-bass
- unit/test-battery
- unit/test-tmap
- unit/test-gmap
-+unit/test-mcp
- unit/test-profile
- tools/mgmt-tester
- tools/smp-tester
-diff --git a/Makefile.am b/Makefile.am
-index 060a90cfc..795d0d403 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -731,6 +731,12 @@ unit_test_gmap_SOURCES = unit/test-gmap.c $(btio_sources)
- unit_test_gmap_LDADD = src/libshared-glib.la \
- 				lib/libbluetooth-internal.la $(GLIB_LIBS)
+diff --git a/lib/bluetooth/uuid.h b/lib/bluetooth/uuid.h
+index 805366c3d..74bd83742 100644
+--- a/lib/bluetooth/uuid.h
++++ b/lib/bluetooth/uuid.h
+@@ -198,20 +198,21 @@ extern "C" {
+ #define	AICS_AUDIO_INPUT_CP_CHRC_UUID		0X2B7B
+ #define	AICS_INPUT_DESCR_CHAR_UUID		0X2B7C
  
-+unit_tests += unit/test-mcp
-+
-+unit_test_mcp_SOURCES = unit/test-mcp.c $(btio_sources)
-+unit_test_mcp_LDADD = src/libshared-glib.la \
-+				lib/libbluetooth-internal.la $(GLIB_LIBS)
-+
- unit_tests += unit/test-battery
++#define MCS_UUID                                0x1848
+ #define GMCS_UUID                               0x1849
+-#define MEDIA_PLAYER_NAME_CHRC_UUID             0x2b93
+-#define MEDIA_TRACK_CHNGD_CHRC_UUID             0x2b96
+-#define MEDIA_TRACK_TITLE_CHRC_UUID             0x2b97
+-#define MEDIA_TRACK_DURATION_CHRC_UUID          0x2b98
+-#define MEDIA_TRACK_POSTION_CHRC_UUID           0x2b99
+-#define MEDIA_PLAYBACK_SPEED_CHRC_UUID          0x2b9a
+-#define MEDIA_SEEKING_SPEED_CHRC_UUID           0x2b9b
+-#define MEDIA_PLAYING_ORDER_CHRC_UUID           0x2ba1
+-#define MEDIA_PLAY_ORDER_SUPPRTD_CHRC_UUID      0x2ba2
+-#define MEDIA_STATE_CHRC_UUID                   0x2ba3
+-#define MEDIA_CP_CHRC_UUID                      0x2ba4
+-#define MEDIA_CP_OP_SUPPORTED_CHRC_UUID         0x2ba5
+-#define MEDIA_CONTENT_CONTROL_ID_CHRC_UUID      0x2bba
++#define MCS_MEDIA_PLAYER_NAME_CHRC_UUID         0x2b93
++#define MCS_TRACK_CHANGED_CHRC_UUID             0x2b96
++#define MCS_TRACK_TITLE_CHRC_UUID               0x2b97
++#define MCS_TRACK_DURATION_CHRC_UUID            0x2b98
++#define MCS_TRACK_POSITION_CHRC_UUID            0x2b99
++#define MCS_PLAYBACK_SPEED_CHRC_UUID            0x2b9a
++#define MCS_SEEKING_SPEED_CHRC_UUID             0x2b9b
++#define MCS_PLAYING_ORDER_CHRC_UUID             0x2ba1
++#define MCS_PLAYING_ORDER_SUPPORTED_CHRC_UUID   0x2ba2
++#define MCS_MEDIA_STATE_CHRC_UUID               0x2ba3
++#define MCS_MEDIA_CP_CHRC_UUID                  0x2ba4
++#define MCS_MEDIA_CP_OP_SUPPORTED_CHRC_UUID     0x2ba5
++#define MCS_CCID_CHRC_UUID                      0x2bba
  
- unit_test_battery_SOURCES = unit/test-battery.c
-diff --git a/unit/test-mcp.c b/unit/test-mcp.c
-new file mode 100644
-index 000000000..0100df1ab
---- /dev/null
-+++ b/unit/test-mcp.c
-@@ -0,0 +1,1807 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
+ /* Telephony and Media Audio Service */
+ #define TMAS_UUID_STR		"00001855-0000-1000-8000-00805f9b34fb"
+diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
+index 8d4eed643..a4cb9e9d8 100644
+--- a/profiles/audio/mcp.c
++++ b/profiles/audio/mcp.c
+@@ -51,50 +51,54 @@
+ #include "src/service.h"
+ #include "src/log.h"
+ #include "src/error.h"
++
+ #include "player.h"
+ 
+-#define GMCS_UUID_STR "00001849-0000-1000-8000-00805f9b34fb"
++#define MCS_UUID_STR	"00001848-0000-1000-8000-00805f9b34fb"
++#define GMCS_UUID_STR	"00001849-0000-1000-8000-00805f9b34fb"
+ 
+-struct mcp_data {
+-	struct btd_device *device;
+-	struct btd_service *service;
++
 +/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2022  Intel Corporation.
-+ *  Copyright 2024 NXP
-+ *  Copyright (C) 2025  Pauli Virtanen.
++ * Remote player
 + */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++struct remote_player {
+ 	struct bt_mcp *mcp;
+-	unsigned int state_id;
+-
++	uint8_t ccid;
+ 	struct media_player *mp;
++	uint8_t playing_order;
+ };
+ 
+-static void mcp_debug(const char *str, void *user_data)
+-{
+-	DBG_IDX(0xffff, "%s", str);
+-}
+-
+ static char *name2utf8(const uint8_t *name, uint16_t len)
+ {
+-	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
++	char *utf8_name;
+ 
+-	len = MIN(len, sizeof(utf8_name) - 1);
++	utf8_name = malloc(len + 1);
++	if (!utf8_name)
++		return NULL;
+ 
+-	memset(utf8_name, 0, sizeof(utf8_name));
+-	strncpy(utf8_name, (char *) name, len);
++	if (len)
++		memcpy(utf8_name, name, len);
 +
-+#define _GNU_SOURCE
-+#include <unistd.h>
-+#include <string.h>
-+#include <sys/socket.h>
-+#include <fcntl.h>
++	utf8_name[len] = 0;
+ 	strtoutf8(utf8_name, len);
+ 
+ 	/* Remove leading and trailing whitespace characters */
+ 	g_strstrip(utf8_name);
+ 
+-	return g_strdup(utf8_name);
++	return utf8_name;
+ }
+ 
+ static const char *mcp_status_val_to_string(uint8_t status)
+ {
+ 	switch (status) {
+-	case BT_MCS_STATUS_PLAYING:
++	case BT_MCS_STATE_PLAYING:
+ 		return "playing";
+-	case BT_MCS_STATUS_PAUSED:
++	case BT_MCS_STATE_PAUSED:
+ 		return "paused";
+-	case BT_MCS_STATUS_INACTIVE:
++	case BT_MCS_STATE_INACTIVE:
+ 		return "stopped";
+-	case BT_MCS_STATUS_SEEKING:
++	case BT_MCS_STATE_SEEKING:
+ 		/* TODO: find a way for fwd/rvs seeking, probably by storing
+ 		 * control point operation sent before
+ 		 */
+@@ -104,307 +108,339 @@ static const char *mcp_status_val_to_string(uint8_t status)
+ 	}
+ }
+ 
+-static struct mcp_data *mcp_data_new(struct btd_device *device)
+-{
+-	struct mcp_data *data;
+-
+-	data = new0(struct mcp_data, 1);
+-	data->device = device;
+-
+-	return data;
+-}
+-
+-static void cb_player_name(struct bt_mcp *mcp,  const uint8_t *value,
+-					uint16_t length)
++static void remote_media_player_name(void *data, const uint8_t *value,
++								uint16_t length)
+ {
++	struct remote_player *remote = data;
+ 	char *name;
+-	struct media_player *mp = bt_mcp_get_user_data(mcp);
+ 
+ 	name = name2utf8(value, length);
++	if (!name)
++		return;
 +
-+#include <glib.h>
+ 	DBG("Media Player Name %s", (const char *)name);
+ 
+-	media_player_set_name(mp, name);
++	media_player_set_name(remote->mp, name);
+ 
+-	g_free(name);
++	free(name);
+ }
+ 
+-static void cb_track_changed(struct bt_mcp *mcp)
++static void remote_track_changed(void *data)
+ {
++	struct remote_player *remote = data;
 +
-+#include "bluetooth/bluetooth.h"
-+#include "bluetooth/uuid.h"
-+#include "src/shared/util.h"
-+#include "src/shared/tester.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/shared/gatt-server.h"
-+#include "src/shared/io.h"
-+#include "src/shared/mcp.h"
-+#include "src/shared/mcs.h"
+ 	DBG("Track Changed");
+-	/* Since track changed has happened
+-	 * track title notification is expected
+-	 */
 +
-+struct test_config {
-+	bool gmcs;
-+	const struct bt_mcs_callback *mcs_cb;
-+	const struct bt_mcp_callback *mcp_cb;
-+	const struct bt_mcp_listener_callback *listener_cb;
-+	const struct iovec *setup_data;
-+	const size_t setup_data_len;
-+	uint8_t expect_cmd;
-+	uint8_t expect_cmd_result;
-+	uint8_t state;
-+};
++	media_player_metadata_changed(remote->mp);
+ }
+ 
+-static void cb_track_title(struct bt_mcp *mcp, const uint8_t *value,
+-					uint16_t length)
++static void remote_track_title(void *data, const uint8_t *value,
++								uint16_t length)
+ {
++	struct remote_player *remote = data;
+ 	char *name;
+ 	uint16_t len;
+-	struct media_player *mp = bt_mcp_get_user_data(mcp);
+ 
+ 	name = name2utf8(value, length);
++	if (!name)
++		return;
 +
-+struct test_data {
-+	struct gatt_db *db;
-+	struct bt_gatt_server *server;
-+	struct bt_gatt_client *client;
-+	struct queue *ccc_states;
-+	struct bt_mcp *mcp;
-+	struct bt_mcs *mcs;
-+	unsigned int id;
-+	unsigned int step;
-+	size_t iovcnt;
-+	struct iovec *iov;
-+	const struct test_config *cfg;
-+};
+ 	len = strlen(name);
+ 
+ 	DBG("Track Title %s", (const char *)name);
+ 
+-	media_player_set_metadata(mp, NULL, "Title", name, len);
+-	media_player_metadata_changed(mp);
++	media_player_set_metadata(remote->mp, NULL, "Title", name, len);
++	media_player_metadata_changed(remote->mp);
+ 
+-	g_free(name);
++	free(name);
+ }
+ 
+-static void cb_track_duration(struct bt_mcp *mcp, int32_t duration)
++static void remote_track_duration(void *data, int32_t duration_centisec)
+ {
+-	struct media_player *mp = bt_mcp_get_user_data(mcp);
+-	unsigned char buf[10];
++	struct remote_player *remote = data;
+ 
+-	/* MCP defines duration is int32 but api takes it as uint32 */
+-	snprintf((char *)buf, 10, "%d", duration);
+-	media_player_set_metadata(mp, NULL, "Duration", buf, sizeof(buf));
+-	media_player_metadata_changed(mp);
+-}
+-
+-static void cb_track_position(struct bt_mcp *mcp, int32_t duration)
+-{
+-	struct media_player *mp = bt_mcp_get_user_data(mcp);
+-
+-	/* MCP defines duration is int32 but api takes it as uint32 */
+-	media_player_set_position(mp, duration);
+-}
+-
+-static void cb_media_state(struct bt_mcp *mcp, uint8_t status)
+-{
+-	struct media_player *mp = bt_mcp_get_user_data(mcp);
+-
+-	media_player_set_status(mp, mcp_status_val_to_string(status));
+-}
+-
+-static const struct bt_mcp_event_callback cbs = {
+-	.player_name			= cb_player_name,
+-	.track_changed			= cb_track_changed,
+-	.track_title			= cb_track_title,
+-	.track_duration			= cb_track_duration,
+-	.track_position			= cb_track_position,
+-	.media_state			= cb_media_state,
+-};
+-
+-static int ct_play(struct media_player *mp, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	return bt_mcp_play(mcp);
+-}
+-
+-static int ct_pause(struct media_player *mp, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	return bt_mcp_pause(mcp);
+-}
+-
+-static int ct_stop(struct media_player *mp, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	return bt_mcp_stop(mcp);
+-}
+-
+-static int ct_next(struct media_player *mp, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	return bt_mcp_next_track(mcp);
+-}
+-
+-static int ct_previous(struct media_player *mp, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	return bt_mcp_previous_track(mcp);
+-}
+-
+-static const struct media_player_callback ct_cbs = {
+-	.play		= ct_play,
+-	.pause		= ct_pause,
+-	.stop		= ct_stop,
+-	.next		= ct_next,
+-	.previous	= ct_previous,
+-};
+-
+-static int mcp_probe(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct btd_adapter *adapter = device_get_adapter(device);
+-	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
+-	struct mcp_data *data = btd_service_get_user_data(service);
+-	char addr[18];
+-
+-	ba2str(device_get_address(device), addr);
+-	DBG("%s", addr);
+-
+-	/* Ignore, if we were probed for this device already */
+-	if (data) {
+-		error("Profile probed twice for the same device!");
+-		return -EINVAL;
+-	}
+-
+-	data = mcp_data_new(device);
+-	data->service = service;
+-
+-	data->mcp = bt_mcp_new(btd_gatt_database_get_db(database),
+-					btd_device_get_gatt_db(device));
+-
+-	bt_mcp_set_debug(data->mcp, mcp_debug, NULL, NULL);
+-	btd_service_set_user_data(service, data);
+-
+-	return 0;
+-}
+-
+-static void mcp_data_free(struct mcp_data *data)
+-{
+-	DBG("");
+-
+-	if (data->service) {
+-		btd_service_set_user_data(data->service, NULL);
+-		bt_mcp_set_user_data(data->mcp, NULL);
+-	}
+-
+-	if (data->mp) {
+-		media_player_destroy(data->mp);
+-		data->mp = NULL;
+-	}
+-
+-	bt_mcp_unref(data->mcp);
+-	free(data);
+-}
+-
+-static void mcp_data_remove(struct mcp_data *data)
+-{
+-	DBG("data %p", data);
+-
+-	mcp_data_free(data);
+-}
+-
+-static void mcp_remove(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct mcp_data *data;
+-	char addr[18];
+-
+-	ba2str(device_get_address(device), addr);
+-	DBG("%s", addr);
+-
+-	data = btd_service_get_user_data(service);
+-	if (!data) {
+-		error("MCP service not handled by profile");
++	if (duration_centisec == BT_MCS_POSITION_UNAVAILABLE) {
++		media_player_set_duration(remote->mp, 0);
+ 		return;
+ 	}
+ 
+-	mcp_data_remove(data);
++	if (duration_centisec < 0)
++		duration_centisec = 0;
 +
-+struct ccc_state {
-+	uint16_t handle;
-+	uint16_t value;
-+};
++	media_player_set_duration(remote->mp, duration_centisec * 10);
++}
 +
-+#define FAIL_TEST() \
-+	do { tester_warn("%s:%d: failed in %s", __FILE__, __LINE__, __func__); \
-+		tester_test_failed(); } while (0)
-+
-+#define iov_data(args...) ((const struct iovec[]) { args })
-+
-+#define define_test(name, setup, function, _cfg, args...)	\
-+	do {							\
-+		const struct iovec iov[] = { args };		\
-+		static struct test_data data;			\
-+		data.iovcnt = ARRAY_SIZE(iov);			\
-+		data.iov = data.iovcnt ?			\
-+			util_iov_dup(iov, data.iovcnt) : NULL;	\
-+		data.cfg = _cfg;				\
-+		tester_add(name, &data, setup, function,	\
-+				test_teardown);			\
-+	} while (0)
-+
-+static void print_debug(const char *str, void *user_data)
++static void remote_track_position(void *data, int32_t position_centisec)
 +{
-+	const char *prefix = user_data;
++	struct remote_player *remote = data;
 +
-+	if (tester_use_debug())
-+		tester_debug("%s%s", prefix, str);
++	if (position_centisec == BT_MCS_POSITION_UNAVAILABLE) {
++		media_player_set_position(remote->mp, 0);
++		return;
++	}
++
++	if (position_centisec < 0)
++		position_centisec = 0;
++
++	media_player_set_position(remote->mp, position_centisec * 10);
++}
++
++static void remote_media_state(void *data, uint8_t status)
++{
++	struct remote_player *remote = data;
++
++	media_player_set_status(remote->mp, mcp_status_val_to_string(status));
++}
++
++static void remote_destroy(void *data)
++{
++	struct remote_player *remote = data;
++
++	media_player_destroy(remote->mp);
++	free(data);
++}
++
++static const struct bt_mcp_listener_callback remote_cb = {
++	.media_player_name = remote_media_player_name,
++	.track_changed = remote_track_changed,
++	.track_title = remote_track_title,
++	.track_duration = remote_track_duration,
++	.track_position = remote_track_position,
++	.media_state = remote_media_state,
++	.destroy = remote_destroy,
++};
++
++static int remote_mp_play(struct media_player *mp, void *user_data)
++{
++	struct remote_player *remote = user_data;
++
++	return bt_mcp_play(remote->mcp, remote->ccid);
++}
++
++static int remote_mp_pause(struct media_player *mp, void *user_data)
++{
++	struct remote_player *remote = user_data;
++
++	return bt_mcp_pause(remote->mcp, remote->ccid);
++}
++
++static int remote_mp_stop(struct media_player *mp, void *user_data)
++{
++	struct remote_player *remote = user_data;
++
++	return bt_mcp_stop(remote->mcp, remote->ccid);
++}
++
++static int remote_mp_next(struct media_player *mp, void *user_data)
++{
++	struct remote_player *remote = user_data;
++
++	return bt_mcp_next_track(remote->mcp, remote->ccid);
++}
++
++static int remote_mp_previous(struct media_player *mp, void *user_data)
++{
++	struct remote_player *remote = user_data;
++
++	return bt_mcp_previous_track(remote->mcp, remote->ccid);
++}
++
++static const struct media_player_callback remote_mp_cb = {
++	.play		= remote_mp_play,
++	.pause		= remote_mp_pause,
++	.stop		= remote_mp_stop,
++	.next		= remote_mp_next,
++	.previous	= remote_mp_previous,
++};
++
++static void mcp_ccid(void *data, uint8_t ccid, bool gmcs)
++{
++	struct btd_service *service = data;
++	struct btd_device *device = btd_service_get_device(service);
++	struct bt_mcp *mcp = btd_service_get_user_data(service);
++	struct remote_player *remote;
++	struct media_player *mp;
++
++	mp = media_player_controller_create(device_get_path(device),
++					gmcs ? "mcp_gmcs" : "mcp_mcs", ccid);
++	if (!mp) {
++		DBG("Unable to create Media Player");
++		return;
++	}
++
++	remote = new0(struct remote_player, 1);
++	remote->mcp = mcp;
++	remote->ccid = ccid;
++	remote->mp = mp;
++
++	media_player_set_callbacks(remote->mp, &remote_mp_cb, remote);
++
++	if (!bt_mcp_add_listener(mcp, ccid, &remote_cb, remote)) {
++		DBG("Unable to register Media Player with MCP");
++		media_player_destroy(mp);
++		free(remote);
++		return;
++	}
 +}
 +
 +static void mcp_debug(void *data, const char *str)
 +{
-+	print_debug(str, "mcp: ");
++	DBG_IDX(0xffff, "%s", str);
 +}
 +
-+static void mcs_debug(void *data, const char *str)
++static void mcp_ready(void *data)
 +{
-+	print_debug(str, "mcs: ");
-+}
++	struct btd_service *service = data;
 +
-+static void test_teardown(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+
-+	bt_gatt_client_unref(data->client);
-+
-+	bt_gatt_server_unref(data->server);
-+	util_iov_free(data->iov, data->iovcnt);
-+
-+	gatt_db_unref(data->db);
-+
-+	bt_mcp_detach(data->mcp);
-+
-+	bt_mcs_unregister(data->mcs);
-+
-+	queue_destroy(data->ccc_states, free);
-+
-+	tester_teardown_complete();
-+}
-+
-+/* ATT: Exchange MTU Response (0x03) len 2
-+ *   Server RX MTU: 64
-+ * ATT: Exchange MTU Request (0x02) len 2
-+ *    Client RX MTU: 64
-+ * ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute type: Server Supported Features (0x2b3a)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Type Request (0x08)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define MCS_MTU_FEAT \
-+	IOV_DATA(0x02, 0x40, 0x00), \
-+	IOV_DATA(0x03, 0x40, 0x00), \
-+	IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x3a, 0x2b), \
-+	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
-+
-+/* ATT: Read By Group Type Request (0x10) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute group type: Primary Service (0x2800)
-+ * ATT: Read By Group Type Response (0x11) len 37
-+ *   Attribute data length: 6
-+ *   Attribute group list: 1 entries
-+ *   Handle range: 0x0001-0x0026
-+ *   UUID: (Generic) Media Control Service (0x1849 / 0x1848)
-+ * ATT: Read By Group Type Request (0x10) len 6
-+ *   Handle range: 0x0027-0xffff
-+ *   Attribute group type: Primary Service (0x2800)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Group Type Request (0x10)
-+ *   Handle: 0x0004
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define MCS_PRIMARY_SERVICE(base, uuid...) \
-+	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28), \
-+	IOV_DATA(0x11, 0x06, \
-+		base + 0x01, 0x00, base + 0x26, 0x00, uuid), \
-+	IOV_DATA(0x10, base + 0x27, 0x00, 0xff, 0xff, 0x00, 0x28), \
-+	IOV_DATA(0x01, 0x10, base + 0x27, 0x00, 0x0a)
-+
-+#define MCS_SERVICE	0x48, 0x18
-+#define GMCS_SERVICE	0x49, 0x18
-+
-+/* ATT: Read By Group Type Request (0x10) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute group type: Secondary Service (0x2801)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Group Type Request (0x10)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define NO_SECONDARY_SERVICE \
-+	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28), \
-+	IOV_DATA(0x01, 0x10, 0x01, 0x00, 0x0a)
-+
-+/* ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0x0026
-+ *   Attribute group type: Include (0x2802)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Group Type Request (0x10)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define NO_INCLUDE(base) \
-+	IOV_DATA(0x08, 0x01+base, 0x00, 0x26+base, 0x00, 0x02, 0x28), \
-+	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
-+
-+/* ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0x0003
-+ *   Attribute type: Characteristic (0x2803)
-+ * ATT: Read By Type Response (0x09) len 57
-+ *   ...
-+ * ATT: Read By Type Request (0x08) len 6
-+ *   ...
-+ *   Attribute type: Characteristic (0x2803)
-+ * ATT: Read By Type Response (0x09) len 57
-+ *   ...
-+ * ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0026-0x0026
-+ *   Attribute type: Characteristic (0x2803)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Type Request (0x08)
-+ *   Handle: 0x0026
-+ *   Error: Attribute Not Found (0x0a)
-+ * ATT: Find Information Request (0x04)
-+ * ATT: Error Response
-+ */
-+#define IOV_CONTENT(data...)	data
-+
-+#define HND(value)			((value) & 0xff), ((value) >> 8)
-+#define FIND_CHRC(vhnd, prop, uuid...)	HND(vhnd-1), prop, HND(vhnd), uuid
-+
-+#define NAME			0x03
-+#define NAME_CCC		0x04
-+#define TRACK_CHG		0x06
-+#define TRACK_CHG_CCC		0x07
-+#define TRACK_TITLE		0x09
-+#define TRACK_TITLE_CCC		0x0a
-+#define TRACK_DUR		0x0c
-+#define TRACK_DUR_CCC		0x0d
-+#define TRACK_POS		0x0f
-+#define TRACK_POS_CCC		0x10
-+#define PLAY_SPEED		0x12
-+#define PLAY_SPEED_CCC		0x13
-+#define SEEK_SPEED		0x15
-+#define SEEK_SPEED_CCC		0x16
-+#define PLAY_ORDER		0x18
-+#define PLAY_ORDER_CCC		0x19
-+#define PLAY_ORDER_SUPP		0x1b
-+#define STATE			0x1d
-+#define STATE_CCC		0x1e
-+#define CP			0x20
-+#define CP_CCC			0x21
-+#define CP_SUPP			0x23
-+#define CP_SUPP_CCC		0x24
-+#define CCID			0x26
-+
-+#define PROP_R			0x02
-+#define PROP_N			0x10
-+#define PROP_RN			0x12
-+#define PROP_RW			0x0e
-+#define PROP_WN			0x1c
-+#define PROP_RWN		0x1e
-+
-+#define GMCS_FIND_CHRC(base) \
-+	IOV_DATA(0x08, 0x01+base, 0x00, 0x26+base, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x09, 0x07, \
-+		FIND_CHRC(NAME+base, PROP_RN, 0x93, 0x2b), \
-+		FIND_CHRC(TRACK_CHG+base, PROP_N, 0x96, 0x2b), \
-+		FIND_CHRC(TRACK_TITLE+base, PROP_RN, 0x97, 0x2b), \
-+		FIND_CHRC(TRACK_DUR+base, PROP_RN, 0x98, 0x2b), \
-+		FIND_CHRC(TRACK_POS+base, PROP_RWN, 0x99, 0x2b), \
-+		FIND_CHRC(PLAY_SPEED+base, PROP_RWN, 0x9a, 0x2b), \
-+		FIND_CHRC(SEEK_SPEED+base, PROP_RN, 0x9b, 0x2b), \
-+		FIND_CHRC(PLAY_ORDER+base, PROP_RWN, 0xa1, 0x2b)), \
-+	IOV_DATA(0x08, PLAY_ORDER+base, 0x00, 0x26+base, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x09, 0x07, \
-+		FIND_CHRC(PLAY_ORDER_SUPP+base, PROP_R, 0xa2, 0x2b), \
-+		FIND_CHRC(STATE+base, PROP_RN, 0xa3, 0x2b), \
-+		FIND_CHRC(CP+base, PROP_WN, 0xa4, 0x2b), \
-+		FIND_CHRC(CP_SUPP+base, PROP_RN, 0xa5, 0x2b), \
-+		FIND_CHRC(CCID+base, PROP_R, 0xba, 0x2b)), \
-+	IOV_DATA(0x08, CCID+base, 0x00, CCID+base, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x01, 0x08, CCID+base, 0x00, 0x0a)
-+
-+/* As above but without optional Notify properties, and
-+ * ATT: Find Information Request (0x04)
-+ * ATT: Error Response (0x01) Attribute Not Found (0x0a)
-+ * for each missing CCC HND to keep handles the same.
-+ * Not valid for GMCS!
-+ */
-+#define MCS_FIND_CHRC(base) \
-+	IOV_DATA(0x08, 0x01+base, 0x00, 0x26+base, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x09, 0x07, \
-+		FIND_CHRC(NAME+base, PROP_R, 0x93, 0x2b), \
-+		FIND_CHRC(TRACK_CHG+base, PROP_N, 0x96, 0x2b), \
-+		FIND_CHRC(TRACK_TITLE+base, PROP_R, 0x97, 0x2b), \
-+		FIND_CHRC(TRACK_DUR+base, PROP_R, 0x98, 0x2b), \
-+		FIND_CHRC(TRACK_POS+base, PROP_RW, 0x99, 0x2b), \
-+		FIND_CHRC(PLAY_SPEED+base, PROP_RW, 0x9a, 0x2b), \
-+		FIND_CHRC(SEEK_SPEED+base, PROP_R, 0x9b, 0x2b), \
-+		FIND_CHRC(PLAY_ORDER+base, PROP_RW, 0xa1, 0x2b)), \
-+	IOV_DATA(0x08, PLAY_ORDER+base, 0x00, 0x26+base, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x09, 0x07, \
-+		FIND_CHRC(PLAY_ORDER_SUPP+base, PROP_R, 0xa2, 0x2b), \
-+		FIND_CHRC(STATE+base, PROP_RN, 0xa3, 0x2b), \
-+		FIND_CHRC(CP+base, PROP_WN, 0xa4, 0x2b), \
-+		FIND_CHRC(CP_SUPP+base, PROP_R, 0xa5, 0x2b), \
-+		FIND_CHRC(CCID+base, PROP_R, 0xba, 0x2b)), \
-+	IOV_DATA(0x08, CCID+base, 0x00, CCID+base, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x01, 0x08, CCID+base, 0x00, 0x0a), \
-+	IOV_DATA(0x04, HND(NAME_CCC), HND(NAME_CCC)), \
-+	IOV_DATA(0x01, 0x04, HND(NAME_CCC), 0x0a), \
-+	IOV_DATA(0x04, HND(TRACK_TITLE_CCC), HND(TRACK_TITLE_CCC)), \
-+	IOV_DATA(0x01, 0x04, HND(TRACK_TITLE_CCC), 0x0a), \
-+	IOV_DATA(0x04, HND(TRACK_DUR_CCC), HND(TRACK_DUR_CCC)), \
-+	IOV_DATA(0x01, 0x04, HND(TRACK_DUR_CCC), 0x0a), \
-+	IOV_DATA(0x04, HND(TRACK_POS_CCC), HND(TRACK_POS_CCC)), \
-+	IOV_DATA(0x01, 0x04, HND(TRACK_POS_CCC), 0x0a), \
-+	IOV_DATA(0x04, HND(PLAY_SPEED_CCC), HND(PLAY_SPEED_CCC)), \
-+	IOV_DATA(0x01, 0x04, HND(PLAY_SPEED_CCC), 0x0a), \
-+	IOV_DATA(0x04, HND(SEEK_SPEED_CCC), HND(SEEK_SPEED_CCC)), \
-+	IOV_DATA(0x01, 0x04, HND(SEEK_SPEED_CCC), 0x0a), \
-+	IOV_DATA(0x04, HND(PLAY_ORDER_CCC), HND(PLAY_ORDER_CCC)), \
-+	IOV_DATA(0x01, 0x04, HND(PLAY_ORDER_CCC), 0x0a), \
-+	IOV_DATA(0x04, HND(CP_SUPP_CCC), HND(CP_SUPP_CCC)), \
-+	IOV_DATA(0x01, 0x04, HND(CP_SUPP_CCC), 0x0a)
-+
-+/* ACL Data TX: Handle 42 flags 0x00 dlen 11
-+ *   ATT: Read By Type Request (0x08) len 6
-+ *   Handle range: 0x0001-0xffff
-+ *   Attribute type: Database Hash (0x2b2a)
-+ * ATT: Error Response (0x01) len 4
-+ *   Read By Type Request (0x08)
-+ *   Handle: 0x0001
-+ *   Error: Attribute Not Found (0x0a)
-+ */
-+#define NO_DATABASE_HASH \
-+	IOV_DATA(0x08, 0x01, 0x00, 0xff, 0xff, 0x2a, 0x2b), \
-+	IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
-+
-+/* GATT Discover All procedure */
-+#define GMCS_SETUP(base, uuid...) \
-+	MCS_MTU_FEAT, \
-+	MCS_PRIMARY_SERVICE(base, uuid), \
-+	NO_SECONDARY_SERVICE, \
-+	NO_INCLUDE(base), \
-+	GMCS_FIND_CHRC(base)
-+
-+#define MCS_SETUP(base, uuid...) \
-+	MCS_MTU_FEAT, \
-+	MCS_PRIMARY_SERVICE(base, uuid), \
-+	NO_SECONDARY_SERVICE, \
-+	NO_INCLUDE(base), \
-+	MCS_FIND_CHRC(base)
-+
-+static bool ccc_state_match(const void *a, const void *b)
-+{
-+	const struct ccc_state *ccc = a;
-+	uint16_t handle = PTR_TO_UINT(b);
-+
-+	return ccc->handle == handle;
-+}
-+
-+static struct ccc_state *find_ccc_state(struct test_data *data,
-+				uint16_t handle)
-+{
-+	return queue_find(data->ccc_states, ccc_state_match,
-+				UINT_TO_PTR(handle));
-+}
-+
-+static struct ccc_state *get_ccc_state(struct test_data *data,
-+					uint16_t handle)
-+{
-+	struct ccc_state *ccc;
-+
-+	ccc = find_ccc_state(data, handle);
-+	if (ccc)
-+		return ccc;
-+
-+	ccc = new0(struct ccc_state, 1);
-+	ccc->handle = handle;
-+	queue_push_tail(data->ccc_states, ccc);
-+
-+	return ccc;
-+}
-+
-+static void gatt_notify_cb(struct gatt_db_attribute *attrib,
-+					struct gatt_db_attribute *ccc,
-+					const uint8_t *value, size_t len,
-+					struct bt_att *att, void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint16_t handle = gatt_db_attribute_get_handle(attrib);
-+
-+	if (tester_use_debug())
-+		tester_debug("handle 0x%04x len %zd", handle, len);
-+
-+	if (!data->server) {
-+		if (tester_use_debug())
-+			tester_debug("data->server %p", data->server);
-+		return;
-+	}
-+
-+	if (!bt_gatt_server_send_notification(data->server,
-+			handle, value, len, false))
-+		tester_debug("%s: Failed to send notification", __func__);
-+}
-+
-+static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
-+					unsigned int id, uint16_t offset,
-+					uint8_t opcode, struct bt_att *att,
-+					void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	struct ccc_state *ccc;
-+	uint16_t handle;
-+	uint8_t ecode = 0;
-+	uint16_t value = 0;
-+
-+	handle = gatt_db_attribute_get_handle(attrib);
-+
-+	ccc = get_ccc_state(data, handle);
-+	if (!ccc) {
-+		ecode = BT_ATT_ERROR_UNLIKELY;
-+		goto done;
-+	}
-+
-+	value = cpu_to_le16(ccc->value);
-+
-+done:
-+	gatt_db_attribute_read_result(attrib, id, ecode, (void *)&value,
-+							sizeof(value));
-+}
-+
-+static void setup_complete_cb(const void *user_data)
-+{
-+	tester_setup_complete();
-+}
-+
-+static void test_setup_server(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+	const struct test_config *cfg = data->cfg;
-+	struct bt_att *att;
-+	struct gatt_db *db;
-+	struct io *io;
-+
-+	bt_mcs_test_util_reset_ccid();
-+
-+	io = tester_setup_io(cfg->setup_data, cfg->setup_data_len);
-+	g_assert(io);
-+
-+	tester_io_set_complete_func(setup_complete_cb);
-+
-+	db = gatt_db_new();
-+	g_assert(db);
-+
-+	gatt_db_ccc_register(db, gatt_ccc_read_cb, NULL, gatt_notify_cb, data);
-+
-+	data->ccc_states = queue_new();
-+
-+	data->mcs = bt_mcs_register(db, data->cfg->gmcs, data->cfg->mcs_cb,
-+									data);
-+
-+	att = bt_att_new(io_get_fd(io), false);
-+	g_assert(att);
-+	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
-+
-+	data->server = bt_gatt_server_new(db, att, 64, 0);
-+	g_assert(data->server);
-+	bt_gatt_server_set_debug(data->server, print_debug, "bt_gatt_server:",
-+						NULL);
-+
-+	tester_io_send();
-+
-+	bt_att_unref(att);
-+	gatt_db_unref(db);
-+}
-+
-+static void test_complete_cb(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+
-+	if (!data->step)
-+		tester_test_passed();
-+}
-+
-+static void test_server(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+	struct io *io;
-+
-+	io = tester_setup_io(data->iov, data->iovcnt);
-+	g_assert(io);
-+
-+	tester_io_set_complete_func(test_complete_cb);
-+
-+	tester_io_send();
-+}
-+
-+static void setup_ready_cb(bool success, uint8_t att_ecode, void *user_data)
-+{
-+	if (!success)
-+		tester_setup_failed();
-+	else
-+		tester_setup_complete();
-+}
-+
-+static void test_setup(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+	const struct test_config *cfg = data->cfg;
-+	struct bt_att *att;
-+	struct gatt_db *db;
-+	struct io *io;
-+
-+	io = tester_setup_io(cfg->setup_data, cfg->setup_data_len);
-+	g_assert(io);
-+
-+	att = bt_att_new(io_get_fd(io), false);
-+	g_assert(att);
-+
-+	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
-+
-+	db = gatt_db_new();
-+	g_assert(db);
-+
-+	data->client = bt_gatt_client_new(db, att, 64, 0);
-+	g_assert(data->client);
-+
-+	bt_gatt_client_set_debug(data->client, print_debug, "bt_gatt_client:",
-+						NULL);
-+
-+	bt_gatt_client_ready_register(data->client, setup_ready_cb, data,
-+						NULL);
-+
-+	bt_att_unref(att);
-+	gatt_db_unref(db);
-+}
-+
-+static void mcp_ccid(void *user_data, uint8_t ccid, bool gmcs)
-+{
-+	struct test_data *data = user_data;
-+
-+	bt_mcp_add_listener(data->mcp, ccid, data->cfg->listener_cb, data);
++	btd_service_connecting_complete(service, 0);
 +}
 +
 +static const struct bt_mcp_callback mcp_cb = {
 +	.ccid = mcp_ccid,
 +	.debug = mcp_debug,
++	.ready = mcp_ready,
 +};
 +
-+static void test_client_start_io_cb(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+	struct io *io;
-+	struct iovec *iov = data->iov;
-+	size_t iovcnt = data->iovcnt;
-+	bool io_send = iovcnt && !iov[0].iov_base;
 +
-+	if (io_send) {
-+		iovcnt--;
-+		iov++;
++/*
++ * Profile
++ */
++
++static struct btd_profile mcp_gmcs_profile;
++
++static int add_service(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
++	struct bt_mcp *mcp = btd_service_get_user_data(service);
++	bool gmcs;
++
++	if (mcp)
++		return -EALREADY;
++
++	gmcs = btd_service_get_profile(service) == &mcp_gmcs_profile;
++
++	mcp = bt_mcp_attach(client, gmcs, &mcp_cb, service);
++	if (!mcp) {
++		DBG("Unable to attach MCP");
++		return -EINVAL;
 +	}
 +
-+	io = tester_setup_io(iov, iovcnt);
-+	g_assert(io);
-+
-+	if (io_send)
-+		tester_io_send();
++	btd_service_set_user_data(service, mcp);
++	return 0;
 +}
 +
-+static void test_client(const void *user_data)
++static void remove_service(struct btd_service *service)
 +{
-+	struct test_data *data = (void *)user_data;
-+	const struct bt_mcp_callback *cb = data->cfg->mcp_cb;
++	struct bt_mcp *mcp = btd_service_get_user_data(service);
 +
-+	tester_io_set_complete_func(test_client_start_io_cb);
++	btd_service_set_user_data(service, NULL);
++	bt_mcp_detach(mcp);
+ }
+ 
+ static int mcp_accept(struct btd_service *service)
+ {
+ 	struct btd_device *device = btd_service_get_device(service);
+-	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
+-	struct mcp_data *data = btd_service_get_user_data(service);
+ 	char addr[18];
+ 
+ 	ba2str(device_get_address(device), addr);
+ 	DBG("%s", addr);
+ 
+-	bt_mcp_attach(data->mcp, client);
+-
+-	data->mp = media_player_controller_create(device_get_path(device),
+-							"mcp", 0);
+-	if (data->mp == NULL) {
+-		DBG("Unable to create Media Player");
+-		return -EINVAL;
+-	}
+-
+-	media_player_set_callbacks(data->mp, &ct_cbs, data->mcp);
+-
+-	bt_mcp_set_user_data(data->mcp, data->mp);
+-	bt_mcp_set_event_callbacks(data->mcp, &cbs, data->mp);
+-	btd_service_connecting_complete(service, 0);
+-
+-	return 0;
++	return add_service(service);
+ }
+ 
+ static int mcp_connect(struct btd_service *service)
+ {
+-	struct btd_device *device = btd_service_get_device(service);
+-	char addr[18];
+-
+-	ba2str(device_get_address(device), addr);
+-	DBG("%s", addr);
+-
+ 	return 0;
+ }
+ 
+ static int mcp_disconnect(struct btd_service *service)
+ {
+ 	struct btd_device *device = btd_service_get_device(service);
+-	struct mcp_data *data = btd_service_get_user_data(service);
+ 	char addr[18];
+ 
+ 	ba2str(device_get_address(device), addr);
+ 	DBG("%s", addr);
+ 
+-	if (data->mp) {
+-		media_player_destroy(data->mp);
+-		data->mp = NULL;
+-	}
+-
+-	bt_mcp_detach(data->mcp);
+-
++	remove_service(service);
+ 	btd_service_disconnecting_complete(service, 0);
+-
+ 	return 0;
+ }
+ 
+-static int media_control_server_probe(struct btd_profile *p,
+-						struct btd_adapter *adapter)
++static int mcp_probe(struct btd_service *service)
+ {
+-	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
+-
+-	bt_mcp_register(btd_gatt_database_get_db(database));
+-
+ 	return 0;
+ }
+ 
+-static void media_control_server_remove(struct btd_profile *p,
+-						struct btd_adapter *adapter)
++static void mcp_remove(struct btd_service *service)
+ {
+-
++	remove_service(service);
+ }
+ 
+-static struct btd_profile mcp_profile = {
+-	.name			= "mcp",
++static int gmcs_probe(struct btd_profile *p, struct btd_adapter *adapter)
++{
++	return 0;
++}
++
++static void gmcs_remove(struct btd_profile *p, struct btd_adapter *adapter)
++{
++}
++
++static struct btd_profile mcp_gmcs_profile = {
++	.name			= "mcp-gmcs",
+ 	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
+-	.bearer		= BTD_PROFILE_BEARER_LE,
+-	.remote_uuid	= GMCS_UUID_STR,
+-	.device_probe	= mcp_probe,
+-	.device_remove	= mcp_remove,
++	.bearer			= BTD_PROFILE_BEARER_LE,
++	.remote_uuid		= GMCS_UUID_STR,
++	.device_probe		= mcp_probe,
++	.device_remove		= mcp_remove,
+ 	.accept			= mcp_accept,
+ 	.connect		= mcp_connect,
+ 	.disconnect		= mcp_disconnect,
+ 
+-	.adapter_probe	= media_control_server_probe,
+-	.adapter_remove = media_control_server_remove,
++	.adapter_probe		= gmcs_probe,
++	.adapter_remove		= gmcs_remove,
+ 
+-	.experimental	= true,
++	.experimental = true,
++};
++
++static struct btd_profile mcp_mcs_profile = {
++	.name			= "mcp-mcs",
++	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
++	.bearer			= BTD_PROFILE_BEARER_LE,
++	.remote_uuid		= MCS_UUID_STR,
++	.device_probe		= mcp_probe,
++	.device_remove		= mcp_remove,
++	.accept			= mcp_accept,
++	.connect		= mcp_connect,
++	.disconnect		= mcp_disconnect,
++
++	.adapter_probe		= NULL,
++	.adapter_remove		= NULL,
++
++	.experimental = true,
+ };
+ 
+ static int mcp_init(void)
+ {
+-	return btd_profile_register(&mcp_profile);
++	int err;
++
++	err = btd_profile_register(&mcp_gmcs_profile);
++	if (err)
++		return err;
++
++	err = btd_profile_register(&mcp_mcs_profile);
++	if (err) {
++		btd_profile_unregister(&mcp_gmcs_profile);
++		return err;
++	}
++
++	return err;
+ }
+ 
+ static void mcp_exit(void)
+ {
+-	btd_profile_unregister(&mcp_profile);
++	btd_profile_unregister(&mcp_gmcs_profile);
++	btd_profile_unregister(&mcp_mcs_profile);
+ }
+ 
+ BLUETOOTH_PLUGIN_DEFINE(mcp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+diff --git a/src/shared/mcp.c b/src/shared/mcp.c
+index 3b03aff40..97970c495 100644
+--- a/src/shared/mcp.c
++++ b/src/shared/mcp.c
+@@ -3,7 +3,8 @@
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+- *  Copyright (C) 2022  Intel Corporation. All rights reserved.
++ *  Copyright (C) 2022	Intel Corporation. All rights reserved.
++ *  Copyright (C) 2025	Pauli Virtanen. All rights reserved.
+  *
+  */
+ 
+@@ -29,1463 +30,2004 @@
+ #include "src/shared/mcp.h"
+ #include "src/shared/mcs.h"
+ 
+-#define DBG(_mcp, fmt, arg...) \
+-	mcp_debug(_mcp, "%s:%s() " fmt, __FILE__, __func__, ## arg)
++#define DBG_MCP(mcp, fmt, ...) \
++	mcp_debug(mcp, "%s:%s() mcp %p | " fmt, __FILE__, __func__, mcp, \
++								##__VA_ARGS__)
++#define DBG_SVC(service, fmt, ...) \
++	mcp_debug(service->mcp, "%s:%s() svc %p | " fmt, __FILE__, __func__, \
++							service, ##__VA_ARGS__)
++#define DBG_MCS(mcs, fmt, ...) \
++	mcs_debug(mcs, "%s:%s() mcs %p | " fmt, __FILE__, __func__, mcs, \
++								##__VA_ARGS__)
+ 
+-struct bt_mcp_db {
+-	struct gatt_db *db;
+-	struct bt_mcs *mcs;
+-};
++#define MAX_ATTR	32
++#define MAX_PENDING	256
+ 
+-struct bt_mcp_pending {
+-	unsigned int id;
+-	struct bt_mcp *mcp;
+-	bt_gatt_client_read_callback_t func;
+-	void *user_data;
+-};
++struct bt_mcs_db {
++	bool gmcs;
++	int ccid_value;
++	uint32_t media_cp_op_supported_value;
++	uint16_t playing_order_supported_value;
+ 
+-struct event_callback {
+-	const struct bt_mcp_event_callback *cbs;
+-	void *user_data;
+-};
+-
+-struct bt_mcp_session_info {
+-	uint8_t content_control_id;
+-	uint32_t cp_op_supported;
+-};
+-
+-struct bt_mcp {
+-	int ref_count;
+-	struct bt_gatt_client *client;
+-	struct bt_mcp_db *ldb;
+-	struct bt_mcp_db *rdb;
+-	unsigned int mp_name_id;
+-	unsigned int track_changed_id;
+-	unsigned int track_title_id;
+-	unsigned int track_duration_id;
+-	unsigned int track_position_id;
+-	unsigned int media_state_id;
+-	unsigned int media_cp_id;
+-	unsigned int media_cp_op_supported_id;
+-
+-	struct bt_mcp_session_info session;
+-	struct event_callback *cb;
+-
+-	struct queue *pending;
+-
+-	bt_mcp_debug_func_t debug_func;
+-	bt_mcp_destroy_func_t debug_destroy;
+-	void *debug_data;
+-	void *user_data;
+-};
+-
+-struct bt_mcs {
+-	struct bt_mcp_db *mdb;
+ 	struct gatt_db_attribute *service;
+-	struct gatt_db_attribute *mp_name;
++	struct gatt_db_attribute *media_player_name;
++	struct gatt_db_attribute *media_player_name_ccc;
+ 	struct gatt_db_attribute *track_changed;
+ 	struct gatt_db_attribute *track_changed_ccc;
+ 	struct gatt_db_attribute *track_title;
++	struct gatt_db_attribute *track_title_ccc;
+ 	struct gatt_db_attribute *track_duration;
++	struct gatt_db_attribute *track_duration_ccc;
+ 	struct gatt_db_attribute *track_position;
++	struct gatt_db_attribute *track_position_ccc;
+ 	struct gatt_db_attribute *playback_speed;
++	struct gatt_db_attribute *playback_speed_ccc;
+ 	struct gatt_db_attribute *seeking_speed;
+-	struct gatt_db_attribute *play_order;
+-	struct gatt_db_attribute *play_order_supported;
++	struct gatt_db_attribute *seeking_speed_ccc;
++	struct gatt_db_attribute *playing_order;
++	struct gatt_db_attribute *playing_order_ccc;
++	struct gatt_db_attribute *playing_order_supported;
+ 	struct gatt_db_attribute *media_state;
+ 	struct gatt_db_attribute *media_state_ccc;
+ 	struct gatt_db_attribute *media_cp;
+ 	struct gatt_db_attribute *media_cp_ccc;
+-	struct gatt_db_attribute *media_cp_op_supportd;
+-	struct gatt_db_attribute *content_control_id;
+-	struct gatt_db_attribute *content_control_id_ccc;
++	struct gatt_db_attribute *media_cp_op_supported;
++	struct gatt_db_attribute *media_cp_op_supported_ccc;
++	struct gatt_db_attribute *ccid;
+ };
+ 
+-static struct queue *mcp_db;
++struct bt_mcs_client {
++	struct bt_att *att;
++
++	/* Per-client state.
++	 *
++	 * Concurrency is not specified in MCS v1.0.1, everything currently
++	 * implemented seems OK to be in global state.
++	 *
++	 * TODO: Search Results ID likely should go here
++	 */
++};
++
++struct bt_mcs {
++	struct gatt_db *db;
++	struct bt_mcs_db ldb;
++	struct queue *clients;
++
++	uint8_t media_state;
++
++	const struct bt_mcs_callback *cb;
++	void *user_data;
++};
++
++struct bt_mcp_listener {
++	const struct bt_mcp_listener_callback *cb;
++	void *user_data;
++};
++
++struct bt_mcp_service {
++	struct bt_mcp *mcp;
++	struct bt_mcs_db rdb;
++
++	bool ready;
++
++	unsigned int notify_id[MAX_ATTR];
++	unsigned int notify_id_count;
++
++	unsigned int pending_id;
++
++	struct queue *pending;
++	struct queue *listeners;
++};
++
++struct bt_mcp_pending {
++	struct bt_mcp_service *service;
++	unsigned int id;
++	uint8_t op;
++	struct {
++		unsigned int client_id;
++		struct gatt_db_attribute *attrib;
++		uint8_t result;
++	} write;
++};
++
++struct bt_mcp {
++	bool gmcs;
++	struct bt_gatt_client *client;
++	unsigned int idle_id;
++	unsigned int db_id;
++	bool ready;
++
++	struct queue *services;
++
++	const struct bt_mcp_callback *cb;
++	void *user_data;
++};
++
++#define MCS_COMMAND(name_, op_, arg_, end_state_) \
++	{ \
++		.name = name_, \
++		.op = BT_MCS_CMD_ ## op_, \
++		.support = BT_MCS_CMD_ ## op_ ## _SUPPORTED, \
++		.int32_arg = arg_, \
++		.end_state = end_state_, \
++	}
++
++#define ANY_STATE	-1
++
++static const struct mcs_command {
++	const char *name;
++	uint8_t op;
++	uint32_t support;
++	bool int32_arg;
++	int end_state;
++} mcs_command[] = {
++	MCS_COMMAND("Play", PLAY, false, BT_MCS_STATE_PLAYING),
++	MCS_COMMAND("Pause", PAUSE, false, BT_MCS_STATE_PAUSED),
++	MCS_COMMAND("Fast Rewind", FAST_REWIND, false, BT_MCS_STATE_SEEKING),
++	MCS_COMMAND("Fast Forward", FAST_FORWARD, false, BT_MCS_STATE_SEEKING),
++	MCS_COMMAND("Stop", STOP, false, BT_MCS_STATE_PAUSED),
++	MCS_COMMAND("Move Relative", MOVE_RELATIVE, true, ANY_STATE),
++	MCS_COMMAND("Prev Segment", PREV_SEGMENT, false, ANY_STATE),
++	MCS_COMMAND("Next Segment", NEXT_SEGMENT, false, ANY_STATE),
++	MCS_COMMAND("First Segment", FIRST_SEGMENT, false, ANY_STATE),
++	MCS_COMMAND("Last Segment", LAST_SEGMENT, false, ANY_STATE),
++	MCS_COMMAND("Goto Segment", GOTO_SEGMENT, true, ANY_STATE),
++	MCS_COMMAND("Prev Track", PREV_TRACK, false, ANY_STATE),
++	MCS_COMMAND("Next Track", NEXT_TRACK, false, ANY_STATE),
++	MCS_COMMAND("First Track", FIRST_TRACK, false, ANY_STATE),
++	MCS_COMMAND("Last Track", LAST_TRACK, false, ANY_STATE),
++	MCS_COMMAND("Goto Track", GOTO_TRACK, true, ANY_STATE),
++	MCS_COMMAND("Prev Group", PREV_GROUP, false, ANY_STATE),
++	MCS_COMMAND("Next Group", NEXT_GROUP, false, ANY_STATE),
++	MCS_COMMAND("First Group", FIRST_GROUP, false, ANY_STATE),
++	MCS_COMMAND("Last Group", LAST_GROUP, false, ANY_STATE),
++	MCS_COMMAND("Goto Group", GOTO_GROUP, true, ANY_STATE),
++};
++
++#define MCS_PLAYING_ORDER(name) \
++	{ BT_MCS_ORDER_ ## name, BT_MCS_ORDER_SUPPORTED_ ## name }
++
++static const struct {
++	uint8_t order;
++	uint16_t support;
++} mcs_playing_orders[] = {
++	MCS_PLAYING_ORDER(SINGLE_ONCE),
++	MCS_PLAYING_ORDER(SINGLE_REPEAT),
++	MCS_PLAYING_ORDER(IN_ORDER_ONCE),
++	MCS_PLAYING_ORDER(IN_ORDER_REPEAT),
++	MCS_PLAYING_ORDER(OLDEST_ONCE),
++	MCS_PLAYING_ORDER(OLDEST_REPEAT),
++	MCS_PLAYING_ORDER(NEWEST_ONCE),
++	MCS_PLAYING_ORDER(NEWEST_REPEAT),
++	MCS_PLAYING_ORDER(SHUFFLE_ONCE),
++	MCS_PLAYING_ORDER(SHUFFLE_REPEAT)
++};
++
++typedef bool (*mcs_command_func_t)(void *data);
++typedef bool (*mcs_command_func_int32_t)(void *data, int32_t offset);
++typedef void (*mcs_get_func_t)(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size);
++typedef bool (*mcs_set_func_t)(struct bt_mcs *mcs, void *data);
++
++static struct queue *servers;
++static uint8_t servers_ccid;
++
++
++/*
++ * MCS Server
++ */
++
++static void mcs_debug_func(const char *str, void *user_data)
++{
++	struct bt_mcs *mcs = user_data;
++
++	mcs->cb->debug(mcs->user_data, str);
++}
++
++static void mcs_debug(struct bt_mcs *mcs, const char *format, ...)
++{
++	va_list ap;
++
++	if (!mcs || !format || !mcs->cb->debug)
++		return;
++
++	va_start(ap, format);
++	util_debug_va(mcs_debug_func, mcs, format, ap);
++	va_end(ap);
++}
++
++static const struct mcs_command *mcs_get_command(uint8_t op)
++{
++	size_t i;
++
++	for (i = 0; i < ARRAY_SIZE(mcs_command); ++i)
++		if (mcs_command[i].op == op)
++			return &mcs_command[i];
++
++	return NULL;
++}
++
++static mcs_command_func_t mcs_get_handler(struct bt_mcs *mcs, uint8_t op)
++
++{
++	switch (op) {
++	case BT_MCS_CMD_PLAY: return mcs->cb->play;
++	case BT_MCS_CMD_PAUSE: return mcs->cb->pause;
++	case BT_MCS_CMD_FAST_REWIND: return mcs->cb->fast_rewind;
++	case BT_MCS_CMD_FAST_FORWARD: return mcs->cb->fast_forward;
++	case BT_MCS_CMD_STOP: return mcs->cb->stop;
++	case BT_MCS_CMD_PREV_SEGMENT: return mcs->cb->previous_segment;
++	case BT_MCS_CMD_NEXT_SEGMENT: return mcs->cb->next_segment;
++	case BT_MCS_CMD_FIRST_SEGMENT: return mcs->cb->first_segment;
++	case BT_MCS_CMD_LAST_SEGMENT: return mcs->cb->last_segment;
++	case BT_MCS_CMD_PREV_TRACK: return mcs->cb->previous_track;
++	case BT_MCS_CMD_NEXT_TRACK: return mcs->cb->next_track;
++	case BT_MCS_CMD_FIRST_TRACK: return mcs->cb->first_track;
++	case BT_MCS_CMD_LAST_TRACK: return mcs->cb->last_track;
++	case BT_MCS_CMD_PREV_GROUP: return mcs->cb->previous_group;
++	case BT_MCS_CMD_NEXT_GROUP: return mcs->cb->next_group;
++	case BT_MCS_CMD_FIRST_GROUP: return mcs->cb->first_group;
++	case BT_MCS_CMD_LAST_GROUP: return mcs->cb->last_group;
++	}
++	return NULL;
++}
++
++static mcs_command_func_int32_t mcs_get_handler_int32(struct bt_mcs *mcs,
++								uint8_t op)
++
++{
++	switch (op) {
++	case BT_MCS_CMD_MOVE_RELATIVE: return mcs->cb->move_relative;
++	case BT_MCS_CMD_GOTO_SEGMENT: return mcs->cb->goto_segment;
++	case BT_MCS_CMD_GOTO_TRACK: return mcs->cb->goto_track;
++	case BT_MCS_CMD_GOTO_GROUP: return mcs->cb->goto_group;
++	}
++	return NULL;
++}
++
++static uint32_t mcs_get_supported(struct bt_mcs *mcs)
++{
++	unsigned int i;
++	uint32_t value = 0;
++
++	for (i = 0; i < ARRAY_SIZE(mcs_command); ++i)
++		value |= mcs_command[i].support;
++
++	if (mcs->cb->media_cp_op_supported)
++		value = mcs->cb->media_cp_op_supported(mcs->user_data);
++
++	for (i = 0; i < ARRAY_SIZE(mcs_command); ++i) {
++		void *handler = mcs_get_handler(mcs, mcs_command[i].op);
++
++		if (!handler)
++			handler = mcs_get_handler_int32(mcs, mcs_command[i].op);
++		if (!handler)
++			value &= ~mcs_command[i].support;
++	}
++
++	mcs->ldb.media_cp_op_supported_value = value;
++	return value;
++}
++
++static void write_media_cp(struct gatt_db_attribute *attrib,
++				unsigned int id, uint16_t offset,
++				const uint8_t *data, size_t len,
++				uint8_t opcode, struct bt_att *att,
++				void *user_data)
++{
++	struct bt_mcs *mcs = user_data;
++	struct iovec iov = { .iov_base = (void *)data, .iov_len = len };
++	const struct mcs_command *cmd = NULL;
++	struct bt_mcs_cp_rsp rsp = {
++		.op = 0,
++		.result = BT_MCS_RESULT_COMMAND_CANNOT_COMPLETE
++	};
++	int ret = 0;
++	int32_t arg = 0;
++	uint8_t op;
++	bool ok = false;
++
++	if (offset) {
++		ret = BT_ATT_ERROR_INVALID_OFFSET;
++		goto respond;
++	}
++
++	if (!util_iov_pull_u8(&iov, &op)) {
++		ret = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
++		goto respond;
++	}
++
++	rsp.op = op;
++
++	cmd = mcs_get_command(op);
++	if (!cmd || !(cmd->support & mcs_get_supported(mcs))) {
++		rsp.result = BT_MCS_RESULT_OP_NOT_SUPPORTED;
++		goto respond;
++	}
++
++	DBG_MCS(mcs, "Command %s", cmd->name);
++
++	/* We may attempt to perform the operation also if inactive (MCS v1.0.1
++	 * p. 26), leave decision to upper layer.
++	 */
++
++	ok = cmd->int32_arg ?
++		mcs_get_handler_int32(mcs, op)(mcs->user_data, arg) :
++		mcs_get_handler(mcs, op)(mcs->user_data);
++	if (ok)
++		rsp.result = BT_MCS_RESULT_SUCCESS;
++	else if (mcs->media_state == BT_MCS_STATE_INACTIVE)
++		rsp.result = BT_MCS_RESULT_MEDIA_PLAYER_INACTIVE;
++	else
++		rsp.result = BT_MCS_RESULT_COMMAND_CANNOT_COMPLETE;
++
++respond:
++	DBG_MCS(mcs, "%s ret %u result %u", cmd ? cmd->name : "-",
++							ret, rsp.result);
++
++	gatt_db_attribute_write_result(attrib, id, ret);
++	if (!rsp.op)
++		return;
++
++	/* Make state transition immediately if command was successful and has
++	 * specified end state. Upper layer shall emit spontaneous transitions
++	 * to correct as needed.
++	 */
++	if (ok) {
++		bt_mcs_set_media_state(mcs, cmd->end_state);
++
++		switch (op) {
++		case BT_MCS_CMD_STOP:
++		case BT_MCS_CMD_PREV_TRACK:
++		case BT_MCS_CMD_NEXT_TRACK:
++		case BT_MCS_CMD_FIRST_TRACK:
++		case BT_MCS_CMD_LAST_TRACK:
++		case BT_MCS_CMD_GOTO_TRACK:
++		case BT_MCS_CMD_PREV_GROUP:
++		case BT_MCS_CMD_NEXT_GROUP:
++		case BT_MCS_CMD_FIRST_GROUP:
++		case BT_MCS_CMD_LAST_GROUP:
++		case BT_MCS_CMD_GOTO_GROUP:
++			if (mcs->cb->set_track_position)
++				mcs->cb->set_track_position(mcs->user_data, 0);
++			bt_mcs_changed(mcs, MCS_TRACK_POSITION_CHRC_UUID);
++			break;
++		}
++	}
++
++	gatt_db_attribute_notify(attrib, (uint8_t *)&rsp, sizeof(rsp), att);
++}
++
++void bt_mcs_set_media_state(struct bt_mcs *mcs, uint8_t state)
++{
++	switch (state) {
++	case BT_MCS_STATE_INACTIVE:
++	case BT_MCS_STATE_PLAYING:
++	case BT_MCS_STATE_PAUSED:
++	case BT_MCS_STATE_SEEKING:
++		break;
++	default:
++		return;
++	}
++
++	if (state == mcs->media_state)
++		return;
++
++	mcs->media_state = state;
++	bt_mcs_changed(mcs, MCS_MEDIA_STATE_CHRC_UUID);
++}
++
++uint8_t bt_mcs_get_media_state(struct bt_mcs *mcs)
++{
++	return mcs->media_state;
++}
++
++static void get_media_player_name(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	if (mcs->cb->media_player_name)
++		mcs->cb->media_player_name(mcs->user_data, buf, size);
++}
++
++static void get_track_changed(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++}
++
++static void get_track_title(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	if (mcs->cb->track_title)
++		mcs->cb->track_title(mcs->user_data, buf, size);
++}
++
++static void get_track_duration(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	int32_t value = BT_MCS_DURATION_UNAVAILABLE;
++
++	if (mcs->cb->track_duration)
++		value = mcs->cb->track_duration(mcs->user_data);
++
++	util_iov_push_le32(buf, (uint32_t)value);
++}
++
++static void get_track_position(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	int32_t value = BT_MCS_POSITION_UNAVAILABLE;
++
++	if (mcs->cb->track_position)
++		value = mcs->cb->track_position(mcs->user_data);
++
++	util_iov_push_le32(buf, (uint32_t)value);
++}
++
++static void get_playback_speed(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	int8_t value = 0x00;
++
++	if (mcs->cb->playback_speed)
++		value = mcs->cb->playback_speed(mcs->user_data);
++
++	util_iov_push_u8(buf, (uint8_t)value);
++}
++
++static void get_seeking_speed(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	int8_t value = 0x00;
++
++	if (mcs->cb->seeking_speed)
++		value = mcs->cb->seeking_speed(mcs->user_data);
++
++	util_iov_push_u8(buf, (uint8_t)value);
++}
++
++static void get_playing_order(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	uint8_t value = BT_MCS_ORDER_IN_ORDER_REPEAT;
++
++	if (mcs->cb->playing_order)
++		value = mcs->cb->playing_order(mcs->user_data);
++
++	util_iov_push_u8(buf, value);
++}
++
++static void get_playing_order_supported(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	uint16_t value = BT_MCS_ORDER_SUPPORTED_IN_ORDER_REPEAT;
++
++	if (mcs->cb->playing_order_supported)
++		value = mcs->cb->playing_order_supported(mcs->user_data);
++
++	util_iov_push_le16(buf, value);
++}
++
++static void get_media_state(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	util_iov_push_u8(buf, mcs->media_state);
++}
++
++static void get_media_cp_op_supported(struct bt_mcs *mcs, struct iovec *buf,
++								size_t size)
++{
++	util_iov_push_le32(buf, mcs_get_supported(mcs));
++}
++
++static void get_ccid(struct bt_mcs *mcs, struct iovec *buf, size_t size)
++{
++	util_iov_push_u8(buf, mcs->ldb.ccid_value);
++}
++
++static bool set_track_position(struct bt_mcs *mcs, void *data)
++{
++	int32_t value = (int32_t)get_le32(data);
++
++	DBG_MCS(mcs, "Set Track Position %d", value);
++
++	if (mcs->cb->set_track_position)
++		return mcs->cb->set_track_position(mcs->user_data, value);
++	return false;
++}
++
++static bool set_playback_speed(struct bt_mcs *mcs, void *data)
++{
++	int8_t value = (int8_t)get_u8(data);
++
++	DBG_MCS(mcs, "Set Playback Speed %d", value);
++
++	if (mcs->cb->set_playback_speed)
++		return mcs->cb->set_playback_speed(mcs->user_data, value);
++	return false;
++}
++
++static bool set_playing_order(struct bt_mcs *mcs, void *data)
++{
++	uint8_t value = get_u8(data);
++
++	DBG_MCS(mcs, "Set Playing Order %u", value);
++
++	if (mcs->cb->set_playing_order)
++		return mcs->cb->set_playing_order(mcs->user_data, value);
++	return false;
++}
++
++static void read_result(struct bt_mcs *mcs, struct gatt_db_attribute *attrib,
++			unsigned int id, uint16_t offset, mcs_get_func_t get)
++{
++	uint8_t buf[BT_ATT_MAX_VALUE_LEN];
++	struct iovec iov = { .iov_base = buf, .iov_len = 0 };
++
++	get(mcs, &iov, sizeof(buf));
++
++	if (offset > iov.iov_len) {
++		gatt_db_attribute_read_result(attrib, id,
++					BT_ATT_ERROR_INVALID_OFFSET, NULL, 0);
++		return;
++	}
++
++	gatt_db_attribute_read_result(attrib, id, 0, buf + offset,
++							iov.iov_len - offset);
++}
++
++#define READ_FUNC(name) \
++	static void read_ ## name(struct gatt_db_attribute *attrib, \
++				unsigned int id, uint16_t offset, \
++				uint8_t opcode, struct bt_att *att, \
++				void *user_data) \
++	{ \
++		DBG_MCS(user_data, ""); \
++		read_result(user_data, attrib, id, offset, get_ ##name); \
++	}
++
++READ_FUNC(media_player_name)
++READ_FUNC(track_title)
++READ_FUNC(track_duration)
++READ_FUNC(track_position)
++READ_FUNC(playback_speed)
++READ_FUNC(seeking_speed)
++READ_FUNC(playing_order)
++READ_FUNC(playing_order_supported)
++READ_FUNC(media_state)
++READ_FUNC(media_cp_op_supported)
++READ_FUNC(ccid)
++
++static void write_result(struct bt_mcs *mcs,
++				struct gatt_db_attribute *attrib,
++				unsigned int id, uint16_t offset,
++				const uint8_t *data, size_t len,
++				mcs_get_func_t get, mcs_set_func_t set)
++{
++	uint8_t buf[4];
++	struct iovec iov = { .iov_base = buf, .iov_len = 0 };
++	bt_uuid_t uuid;
++	uint8_t ret;
++
++	get(mcs, &iov, sizeof(buf));
++
++	if (len > iov.iov_len) {
++		gatt_db_attribute_write_result(attrib, id,
++				BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN);
++		return;
++	}
++
++	if (offset + len > iov.iov_len) {
++		gatt_db_attribute_write_result(attrib, id,
++				BT_ATT_ERROR_INVALID_OFFSET);
++		return;
++	}
++
++	memcpy(iov.iov_base + offset, data, len);
++
++	if (set(mcs, iov.iov_base))
++		ret = 0;
++	else
++		ret = BT_ATT_ERROR_VALUE_NOT_ALLOWED;
++
++	gatt_db_attribute_write_result(attrib, id, ret);
++
++	if (!gatt_db_attribute_get_char_data(attrib, NULL, NULL, NULL, NULL,
++									&uuid))
++		return;
++	if (!ret)
++		bt_mcs_changed(mcs, uuid.value.u16);
++}
++
++#define WRITE_FUNC(name) \
++	static void write_ ## name(struct gatt_db_attribute *attrib, \
++				unsigned int id, uint16_t offset, \
++				const uint8_t *data, size_t len, \
++				uint8_t opcode, struct bt_att *att, \
++				void *user_data) \
++	{ write_result(user_data, attrib, id, offset, data, len, \
++						get_ ## name, set_ ## name); }
++
++WRITE_FUNC(track_position)
++WRITE_FUNC(playback_speed)
++WRITE_FUNC(playing_order)
++
++void bt_mcs_changed(struct bt_mcs *mcs, uint16_t chrc_uuid)
++{
++	struct {
++		struct gatt_db_attribute *attr;
++		mcs_get_func_t get;
++	} attrs[] = {
++		{ mcs->ldb.media_player_name, get_media_player_name },
++		{ mcs->ldb.track_changed, get_track_changed },
++		{ mcs->ldb.track_title, get_track_title },
++		{ mcs->ldb.track_duration, get_track_duration },
++		{ mcs->ldb.track_position, get_track_position },
++		{ mcs->ldb.playback_speed, get_playback_speed },
++		{ mcs->ldb.seeking_speed, get_seeking_speed },
++		{ mcs->ldb.playing_order, get_playing_order },
++		{ mcs->ldb.media_state, get_media_state },
++		{ mcs->ldb.media_cp_op_supported, get_media_cp_op_supported },
++	};
++	uint8_t buf[BT_ATT_MAX_VALUE_LEN];
++	struct iovec iov = { .iov_base = buf, .iov_len = 0 };
++	unsigned int i;
++	bt_uuid_t uuid, uuid_attr;
++	uint8_t props;
++
++	bt_uuid16_create(&uuid, chrc_uuid);
++
++	for (i = 0; i < ARRAY_SIZE(attrs); ++i) {
++		if (!gatt_db_attribute_get_char_data(attrs[i].attr, NULL,
++						NULL, &props, NULL, &uuid_attr))
++			continue;
++		if (bt_uuid_cmp(&uuid_attr, &uuid))
++			continue;
++
++		DBG_MCS(mcs, "Notify %u", chrc_uuid);
++
++		attrs[i].get(mcs, &iov, sizeof(buf));
++
++		/* No client-specific state: notify everyone */
++		gatt_db_attribute_notify(attrs[i].attr, iov.iov_base,
++							iov.iov_len, NULL);
++		break;
++	}
++}
++
++static bool mcs_init_db(struct bt_mcs *mcs, bool is_gmcs)
++{
++	struct gatt_db *db = mcs->db;
++	struct bt_mcs_db *ldb = &mcs->ldb;
++	bt_uuid_t uuid;
++
++	bt_uuid16_create(&uuid, is_gmcs ? GMCS_UUID : MCS_UUID);
++	ldb->service = gatt_db_add_service(db, &uuid, true, 38);
++
++	/* Add also optional CCC */
++
++	bt_uuid16_create(&uuid, MCS_MEDIA_PLAYER_NAME_CHRC_UUID);
++	ldb->media_player_name = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ,
++		BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_NOTIFY,
++		read_media_player_name, NULL, mcs);
++
++	ldb->media_player_name_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_TRACK_CHANGED_CHRC_UUID);
++	ldb->track_changed = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_NONE, BT_GATT_CHRC_PROP_NOTIFY,
++		NULL, NULL, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->track_changed, 0);
++
++	ldb->track_changed_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_TRACK_TITLE_CHRC_UUID);
++	ldb->track_title = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ,
++		BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_NOTIFY,
++		read_track_title, NULL, mcs);
++
++	ldb->track_title_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_TRACK_DURATION_CHRC_UUID);
++	ldb->track_duration = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ,
++		BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_NOTIFY,
++		read_track_duration, NULL, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->track_duration,
++							sizeof(int32_t));
++
++	ldb->track_duration_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_TRACK_POSITION_CHRC_UUID);
++	ldb->track_position = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++		BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_NOTIFY |
++		BT_GATT_CHRC_PROP_WRITE | BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP,
++		read_track_position, write_track_position, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->track_position,
++							sizeof(int32_t));
++
++	ldb->track_position_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_PLAYBACK_SPEED_CHRC_UUID);
++	ldb->playback_speed = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++		BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_NOTIFY |
++		BT_GATT_CHRC_PROP_WRITE | BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP,
++		read_playback_speed, write_playback_speed, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->playback_speed, sizeof(int8_t));
++
++	ldb->playback_speed_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_SEEKING_SPEED_CHRC_UUID);
++	ldb->seeking_speed = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ,
++		BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_NOTIFY,
++		read_seeking_speed, NULL, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->seeking_speed, sizeof(int8_t));
++
++	ldb->seeking_speed_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_PLAYING_ORDER_CHRC_UUID);
++	ldb->playing_order = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++		BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_NOTIFY |
++		BT_GATT_CHRC_PROP_WRITE | BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP,
++		read_playing_order, write_playing_order, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->playing_order, sizeof(uint8_t));
++
++	ldb->playing_order_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_PLAYING_ORDER_SUPPORTED_CHRC_UUID);
++	ldb->playing_order_supported = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
++		read_playing_order_supported, NULL, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->playing_order_supported,
++							sizeof(uint16_t));
++
++	bt_uuid16_create(&uuid, MCS_MEDIA_STATE_CHRC_UUID);
++	ldb->media_state = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ,
++		BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_NOTIFY,
++		read_media_state, NULL, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->media_state, sizeof(uint8_t));
++
++	ldb->media_state_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_MEDIA_CP_CHRC_UUID);
++	ldb->media_cp = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_WRITE,
++		BT_GATT_CHRC_PROP_WRITE | BT_GATT_CHRC_PROP_NOTIFY |
++					BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP,
++		NULL, write_media_cp, mcs);
++
++	ldb->media_cp_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_MEDIA_CP_OP_SUPPORTED_CHRC_UUID);
++	ldb->media_cp_op_supported = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ,
++		BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_NOTIFY,
++		read_media_cp_op_supported, NULL, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->media_cp_op_supported,
++							sizeof(uint32_t));
++
++	ldb->media_cp_op_supported_ccc = gatt_db_service_add_ccc(
++		ldb->service, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
++
++	bt_uuid16_create(&uuid, MCS_CCID_CHRC_UUID);
++	ldb->ccid = gatt_db_service_add_characteristic(
++		ldb->service, &uuid,
++		BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
++		read_ccid, NULL, mcs);
++	gatt_db_attribute_set_fixed_length(ldb->ccid, sizeof(uint8_t));
++
++	return true;
++}
++
++uint8_t bt_mcs_get_ccid(struct bt_mcs *mcs)
++{
++	return mcs->ldb.ccid_value;
++}
++
++struct match_mcs_data {
++	struct gatt_db *db;
++	bool gmcs;
++	bool any;
++	int ccid;
++};
++
++static bool match_mcs(const void *data, const void *user_data)
++{
++	const struct bt_mcs *mcs = data;
++	const struct match_mcs_data *match = user_data;
++
++	if (match->db != mcs->db)
++		return false;
++	if (match->gmcs)
++		return mcs->ldb.gmcs;
++	if (match->any)
++		return true;
++	return match->ccid == mcs->ldb.ccid_value;
++}
++
++static int mcs_alloc_ccid(struct gatt_db *db)
++{
++	unsigned int ccid;
++
++	if (!db)
++		return 0;
++
++	for (ccid = servers_ccid; ccid < servers_ccid + 0x100u; ccid++) {
++		struct match_mcs_data match = { .db = db, .ccid = ccid & 0xff };
++
++		if (!queue_find(servers, match_mcs, &match)) {
++			servers_ccid = ccid + 1;
++			return match.ccid;
++		}
++	}
++
++	return -ENOENT;
++}
++
++void bt_mcs_test_util_reset_ccid(void)
++{
++	servers_ccid = 0;
++}
++
++struct bt_mcs *bt_mcs_register(struct gatt_db *db, bool is_gmcs,
++			const struct bt_mcs_callback *cb, void *user_data)
++{
++	struct bt_mcs *mcs;
++	int ccid;
++
++	if (!db || !cb)
++		return NULL;
++
++	if (is_gmcs) {
++		struct match_mcs_data match = { .db = db, .gmcs = true };
++
++		/* Only one GMCS possible */
++		if (queue_find(servers, match_mcs, &match))
++			return NULL;
++	}
++
++	ccid = mcs_alloc_ccid(db);
++	if (ccid < 0)
++		return NULL;
++
++	mcs = new0(struct bt_mcs, 1);
++	mcs->db = db;
++	mcs->ldb.ccid_value = ccid;
++	mcs->cb = cb;
++	mcs->user_data = user_data;
++
++	mcs->media_state = BT_MCS_STATE_INACTIVE;
++
++	if (!mcs_init_db(mcs, is_gmcs)) {
++		free(mcs);
++		return NULL;
++	}
++
++	gatt_db_ref(mcs->db);
++
++	if (!servers)
++		servers = queue_new();
++	queue_push_tail(servers, mcs);
++
++	gatt_db_service_set_active(mcs->ldb.service, true);
++	return mcs;
++}
++
++void bt_mcs_unregister(struct bt_mcs *mcs)
++{
++	if (!mcs)
++		return;
++
++	if (mcs->cb->destroy)
++		mcs->cb->destroy(mcs->user_data);
++
++	queue_remove(servers, mcs);
++
++	gatt_db_remove_service(mcs->db, mcs->ldb.service);
++	gatt_db_unref(mcs->db);
++
++	if (queue_isempty(servers)) {
++		queue_destroy(servers, NULL);
++		servers = NULL;
++	}
++
++	free(mcs);
++}
++
++void bt_mcs_unregister_all(struct gatt_db *db)
++{
++	struct bt_mcs *mcs;
++
++	do {
++		struct match_mcs_data match = { .db = db, .any = true };
++
++		mcs = queue_find(servers, match_mcs, &match);
++		bt_mcs_unregister(mcs);
++	} while (mcs);
++}
++
++/*
++ * MCP Client
++ */
++
++static void mcp_service_reread(struct bt_mcp_service *service,
++					struct gatt_db_attribute *attrib);
++
++static void mcp_debug_func(const char *str, void *user_data)
++{
++	struct bt_mcp *mcp = user_data;
++
++	mcp->cb->debug(mcp->user_data, str);
++}
+ 
+ static void mcp_debug(struct bt_mcp *mcp, const char *format, ...)
+ {
+ 	va_list ap;
+ 
+-	if (!mcp || !format || !mcp->debug_func)
++	if (!mcp || !format || !mcp->cb->debug)
+ 		return;
+ 
+ 	va_start(ap, format);
+-	util_debug_va(mcp->debug_func, mcp->debug_data, format, ap);
++	util_debug_va(mcp_debug_func, mcp, format, ap);
+ 	va_end(ap);
+ }
+ 
+-static bool mcp_db_match(const void *data, const void *match_data)
++static bool match_ccid(const void *data, const void *user_data)
+ {
+-	const struct bt_mcp_db *mdb = data;
+-	const struct gatt_db *db = match_data;
++	const struct bt_mcp_service *service = data;
+ 
+-	return (mdb->db == db);
++	return service->rdb.ccid_value == (int)PTR_TO_UINT(user_data);
+ }
+ 
+-static void mcp_db_free(void *data)
+-{
+-	struct bt_mcp_db *bdb = data;
+-
+-	if (!bdb)
+-		return;
+-
+-	gatt_db_unref(bdb->db);
+-
+-	free(bdb->mcs);
+-	free(bdb);
+-}
+-
+-static void mcp_free(void *data)
+-{
+-	struct bt_mcp *mcp = data;
+-
+-	DBG(mcp, "");
+-
+-	bt_mcp_detach(mcp);
+-
+-	mcp_db_free(mcp->rdb);
+-
+-	queue_destroy(mcp->pending, NULL);
+-
+-	free(mcp);
+-}
+-
+-struct bt_mcp *bt_mcp_ref(struct bt_mcp *mcp)
++static struct bt_mcp_service *mcp_service(struct bt_mcp *mcp, uint8_t ccid)
+ {
+ 	if (!mcp)
+ 		return NULL;
+ 
+-	__sync_fetch_and_add(&mcp->ref_count, 1);
+-
+-	return mcp;
++	return queue_find(mcp->services, match_ccid, UINT_TO_PTR(ccid));
+ }
+ 
+-void bt_mcp_unref(struct bt_mcp *mcp)
++static bool match_pending(const void *data, const void *user_data)
+ {
+-	if (!mcp)
+-		return;
++	const struct bt_mcp_pending *pending = data;
+ 
+-	if (__sync_sub_and_fetch(&mcp->ref_count, 1))
+-		return;
+-
+-	mcp_free(mcp);
++	return pending->id == PTR_TO_UINT(user_data);
+ }
+ 
+-bool bt_mcp_set_user_data(struct bt_mcp *mcp, void *user_data)
+-{
+-	if (!mcp)
+-		return false;
+-
+-	mcp->user_data = user_data;
+-
+-	return true;
+-}
+-
+-void *bt_mcp_get_user_data(struct bt_mcp *mcp)
+-{
+-	if (!mcp)
+-		return NULL;
+-
+-	return mcp->user_data;
+-}
+-
+-bool bt_mcp_set_debug(struct bt_mcp *mcp, bt_mcp_debug_func_t func,
+-			void *user_data, bt_mcp_destroy_func_t destroy)
+-{
+-	if (!mcp)
+-		return false;
+-
+-	if (mcp->debug_destroy)
+-		mcp->debug_destroy(mcp->debug_data);
+-
+-	mcp->debug_func = func;
+-	mcp->debug_destroy = destroy;
+-	mcp->debug_data = user_data;
+-
+-	return true;
+-}
+-
+-static void mcs_mp_name_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	char mp_name[] = "";
+-	struct iovec iov;
+-
+-	iov.iov_base = mp_name;
+-	iov.iov_len = sizeof(mp_name);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_track_title_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	char track_title[] = "";
+-	struct iovec iov;
+-
+-	iov.iov_base = track_title;
+-	iov.iov_len = 0;
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_track_duration_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	int32_t track_duration = 0xFFFFFFFF;
+-	struct iovec iov;
+-
+-	iov.iov_base = &track_duration;
+-	iov.iov_len = sizeof(track_duration);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_track_position_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	int32_t track_position = 0xFFFFFFFF;
+-	struct iovec iov;
+-
+-	iov.iov_base = &track_position;
+-	iov.iov_len = sizeof(track_position);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_track_position_write(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				const uint8_t *value, size_t len,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	gatt_db_attribute_write_result(attrib, id,
+-			BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
+-}
+-
+-static void mcs_playback_speed_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	int8_t playback_speed = 0x00;
+-	struct iovec iov;
+-
+-	iov.iov_base = &playback_speed;
+-	iov.iov_len = sizeof(playback_speed);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_playback_speed_write(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				const uint8_t *value, size_t len,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	gatt_db_attribute_write_result(attrib, id,
+-				BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
+-}
+-
+-static void mcs_seeking_speed_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	int8_t seeking_speed = 0x00;
+-	struct iovec iov;
+-
+-	iov.iov_base = &seeking_speed;
+-	iov.iov_len = sizeof(seeking_speed);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_playing_order_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	uint8_t playing_order = 0x01;
+-	struct iovec iov;
+-
+-	iov.iov_base = &playing_order;
+-	iov.iov_len = sizeof(playing_order);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_playing_order_write(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				const uint8_t *value, size_t len,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	gatt_db_attribute_write_result(attrib, id,
+-				BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
+-}
+-
+-static void mcs_playing_order_supported_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	uint16_t playing_order_supported = 0x01;
+-	struct iovec iov;
+-
+-	iov.iov_base = &playing_order_supported;
+-	iov.iov_len = sizeof(playing_order_supported);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_media_state_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	uint8_t media_state = 0x00;
+-	struct iovec iov;
+-
+-	iov.iov_base = &media_state;
+-	iov.iov_len = sizeof(media_state);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_media_cp_write(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				const uint8_t *value, size_t len,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	gatt_db_attribute_write_result(attrib, id,
+-				BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
+-}
+-
+-static void mcs_media_cp_op_supported_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	uint32_t cp_op_supported = 0x00000000;
+-	struct iovec iov;
+-
+-	iov.iov_base = &cp_op_supported;
+-	iov.iov_len = sizeof(cp_op_supported);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static void mcs_media_content_control_id_read(struct gatt_db_attribute *attrib,
+-				unsigned int id, uint16_t offset,
+-				uint8_t opcode, struct bt_att *att,
+-				void *user_data)
+-{
+-	uint8_t content_control_id = 0x00;
+-	struct iovec iov;
+-
+-	iov.iov_base = &content_control_id;
+-	iov.iov_len = sizeof(content_control_id);
+-
+-	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+-							iov.iov_len);
+-}
+-
+-static struct bt_mcs *mcs_new(struct gatt_db *db)
+-{
+-	struct bt_mcs *mcs;
+-	bt_uuid_t uuid;
+-
+-	if (!db)
+-		return NULL;
+-
+-	mcs = new0(struct bt_mcs, 1);
+-
+-	/* Populate DB with MCS attributes */
+-	bt_uuid16_create(&uuid, GMCS_UUID);
+-	mcs->service = gatt_db_add_service(db, &uuid, true, 31);
+-
+-	bt_uuid16_create(&uuid, MEDIA_PLAYER_NAME_CHRC_UUID);
+-	mcs->mp_name = gatt_db_service_add_characteristic(mcs->service, &uuid,
+-					BT_ATT_PERM_READ,
+-					BT_GATT_CHRC_PROP_READ,
+-					mcs_mp_name_read, NULL,
+-					mcs);
+-
+-	bt_uuid16_create(&uuid, MEDIA_TRACK_CHNGD_CHRC_UUID);
+-	mcs->track_changed = gatt_db_service_add_characteristic(mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_NONE,
+-					BT_GATT_CHRC_PROP_NOTIFY,
+-					NULL, NULL,
+-					mcs);
+-
+-	mcs->track_changed_ccc = gatt_db_service_add_ccc(mcs->service,
+-					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
+-
+-	bt_uuid16_create(&uuid, MEDIA_TRACK_TITLE_CHRC_UUID);
+-	mcs->track_title = gatt_db_service_add_characteristic(mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ,
+-					BT_GATT_CHRC_PROP_READ,
+-					mcs_track_title_read, NULL,
+-					mcs);
+-
+-	bt_uuid16_create(&uuid, MEDIA_TRACK_DURATION_CHRC_UUID);
+-	mcs->track_duration = gatt_db_service_add_characteristic(mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ,
+-					BT_GATT_CHRC_PROP_READ,
+-					mcs_track_duration_read, NULL,
+-					mcs);
+-
+-	bt_uuid16_create(&uuid, MEDIA_TRACK_POSTION_CHRC_UUID);
+-	mcs->track_position = gatt_db_service_add_characteristic(mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
+-					BT_GATT_CHRC_PROP_READ |
+-					BT_GATT_CHRC_PROP_WRITE |
+-					BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP,
+-					mcs_track_position_read,
+-					mcs_track_position_write,
+-					mcs);
+-
+-	bt_uuid16_create(&uuid, MEDIA_PLAYBACK_SPEED_CHRC_UUID);
+-	mcs->playback_speed = gatt_db_service_add_characteristic(mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
+-					BT_GATT_CHRC_PROP_READ |
+-					BT_GATT_CHRC_PROP_WRITE |
+-					BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP,
+-					mcs_playback_speed_read,
+-					mcs_playback_speed_write,
+-					mcs);
+-
+-	bt_uuid16_create(&uuid, MEDIA_SEEKING_SPEED_CHRC_UUID);
+-	mcs->seeking_speed = gatt_db_service_add_characteristic(mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ,
+-					BT_GATT_CHRC_PROP_READ,
+-					mcs_seeking_speed_read, NULL,
+-					mcs);
+-
+-	bt_uuid16_create(&uuid, MEDIA_PLAYING_ORDER_CHRC_UUID);
+-	mcs->play_order = gatt_db_service_add_characteristic(mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
+-					BT_GATT_CHRC_PROP_READ |
+-					BT_GATT_CHRC_PROP_WRITE |
+-					BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP,
+-					mcs_playing_order_read,
+-					mcs_playing_order_write,
+-					mcs);
+-
+-	bt_uuid16_create(&uuid, MEDIA_PLAY_ORDER_SUPPRTD_CHRC_UUID);
+-	mcs->play_order_supported = gatt_db_service_add_characteristic(
+-					mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ,
+-					BT_GATT_CHRC_PROP_READ,
+-					mcs_playing_order_supported_read, NULL,
+-					mcs);
+-
+-	bt_uuid16_create(&uuid, MEDIA_STATE_CHRC_UUID);
+-	mcs->media_state = gatt_db_service_add_characteristic(mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ,
+-					BT_GATT_CHRC_PROP_READ |
+-					BT_GATT_CHRC_PROP_NOTIFY,
+-					mcs_media_state_read, NULL,
+-					mcs);
+-
+-	mcs->media_state_ccc = gatt_db_service_add_ccc(mcs->service,
+-					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
+-
+-	bt_uuid16_create(&uuid, MEDIA_CP_CHRC_UUID);
+-	mcs->media_cp = gatt_db_service_add_characteristic(mcs->service, &uuid,
+-					BT_ATT_PERM_WRITE,
+-					BT_GATT_CHRC_PROP_WRITE |
+-					BT_GATT_CHRC_PROP_NOTIFY |
+-					BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP,
+-					NULL, mcs_media_cp_write,
+-					mcs);
+-
+-	mcs->media_cp_ccc = gatt_db_service_add_ccc(mcs->service,
+-					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
+-
+-	bt_uuid16_create(&uuid, MEDIA_CP_OP_SUPPORTED_CHRC_UUID);
+-	mcs->media_cp_op_supportd = gatt_db_service_add_characteristic(
+-					mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ,
+-					BT_GATT_CHRC_PROP_READ,
+-					mcs_media_cp_op_supported_read, NULL,
+-					mcs);
+-
+-	bt_uuid16_create(&uuid, MEDIA_CONTENT_CONTROL_ID_CHRC_UUID);
+-	mcs->content_control_id = gatt_db_service_add_characteristic(
+-					mcs->service,
+-					&uuid,
+-					BT_ATT_PERM_READ,
+-					BT_GATT_CHRC_PROP_READ |
+-					BT_GATT_CHRC_PROP_NOTIFY,
+-					mcs_media_content_control_id_read,
+-					NULL,
+-					mcs);
+-
+-	mcs->content_control_id_ccc = gatt_db_service_add_ccc(mcs->service,
+-					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
+-
+-	gatt_db_service_set_active(mcs->service, false);
+-
+-	return mcs;
+-}
+-
+-static struct bt_mcs *mcp_get_mcs(struct bt_mcp *mcp)
+-{
+-	if (!mcp)
+-		return NULL;
+-
+-	if (mcp->rdb->mcs)
+-		return mcp->rdb->mcs;
+-
+-	mcp->rdb->mcs = new0(struct bt_mcs, 1);
+-	mcp->rdb->mcs->mdb = mcp->rdb;
+-
+-	return mcp->rdb->mcs;
+-}
+-
+-static unsigned int mcp_send(struct bt_mcp *mcp, uint8_t operation)
+-{
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-	int ret;
+-	uint16_t handle;
+-
+-	DBG(mcp, "mcs %p", mcs);
+-
+-	if (!mcp->client)
+-		return -1;
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->media_cp, NULL, &handle,
+-					NULL, NULL, NULL))
+-		return -1;
+-
+-	ret = bt_gatt_client_write_without_response(mcp->client, handle, false,
+-					&operation, sizeof(uint8_t));
+-	if (!ret)
+-		return -1;
+-
+-	return 0;
+-}
+-
+-unsigned int bt_mcp_play(struct bt_mcp *mcp)
+-{
+-	if (!mcp)
+-		return 0;
+-
+-	if (!(mcp->session.cp_op_supported & BT_MCS_CMD_PLAY_SUPPORTED))
+-		return -ENOTSUP;
+-
+-	DBG(mcp, "mcp %p", mcp);
+-
+-	return mcp_send(mcp, BT_MCS_CMD_PLAY);
+-}
+-
+-unsigned int bt_mcp_pause(struct bt_mcp *mcp)
+-{
+-	if (!mcp)
+-		return 0;
+-
+-	if (!(mcp->session.cp_op_supported & BT_MCS_CMD_PAUSE_SUPPORTED))
+-		return -ENOTSUP;
+-
+-	DBG(mcp, "mcp %p", mcp);
+-
+-	return mcp_send(mcp, BT_MCS_CMD_PAUSE);
+-}
+-
+-unsigned int bt_mcp_stop(struct bt_mcp *mcp)
+-{
+-	if (!mcp)
+-		return 0;
+-
+-	if (!(mcp->session.cp_op_supported & BT_MCS_CMD_STOP_SUPPORTED))
+-		return -ENOTSUP;
+-
+-	DBG(mcp, "mcp %p", mcp);
+-
+-	return mcp_send(mcp, BT_MCS_CMD_STOP);
+-}
+-
+-unsigned int bt_mcp_next_track(struct bt_mcp *mcp)
+-{
+-	if (!mcp)
+-		return 0;
+-
+-	if (!(mcp->session.cp_op_supported & BT_MCS_CMD_NEXT_TRACK_SUPPORTED))
+-		return -ENOTSUP;
+-
+-	DBG(mcp, "mcp %p", mcp);
+-
+-	return mcp_send(mcp, BT_MCS_CMD_NEXT_TRACK);
+-}
+-
+-unsigned int bt_mcp_previous_track(struct bt_mcp *mcp)
+-{
+-	if (!mcp)
+-		return 0;
+-
+-	if (!(mcp->session.cp_op_supported & BT_MCS_CMD_PREV_TRACK_SUPPORTED))
+-		return -ENOTSUP;
+-
+-	DBG(mcp, "mcp %p", mcp);
+-
+-	return mcp_send(mcp, BT_MCS_CMD_PREV_TRACK);
+-}
+-
+-static void mcp_mp_set_player_name(struct bt_mcp *mcp, const uint8_t *value,
+-					uint16_t length)
+-{
+-	struct event_callback *cb;
+-
+-	if (!mcp)
+-		return;
+-
+-	cb = mcp->cb;
+-
+-	if (cb && cb->cbs && cb->cbs->player_name)
+-		cb->cbs->player_name(mcp, value, length);
+-}
+-
+-static void mcp_mp_set_track_title(struct bt_mcp *mcp, const uint8_t *value,
+-					uint16_t length)
+-{
+-	struct event_callback *cb;
+-
+-	if (!mcp)
+-		return;
+-
+-	cb = mcp->cb;
+-
+-	if (cb && cb->cbs && cb->cbs->track_title)
+-		cb->cbs->track_title(mcp, value, length);
+-}
+-
+-static void mcp_mp_set_title_duration(struct bt_mcp *mcp, int32_t duration)
+-{
+-	struct event_callback *cb;
+-
+-	if (!mcp)
+-		return;
+-
+-	cb = mcp->cb;
+-
+-	DBG(mcp, "Track Duration 0x%08x", duration);
+-
+-	if (cb && cb->cbs && cb->cbs->track_duration)
+-		cb->cbs->track_duration(mcp, duration);
+-}
+-
+-static void mcp_mp_set_title_position(struct bt_mcp *mcp, int32_t position)
+-{
+-	struct event_callback *cb;
+-
+-	if (!mcp)
+-		return;
+-
+-	cb = mcp->cb;
+-
+-	DBG(mcp, "Track Position 0x%08x", position);
+-
+-	if (cb && cb->cbs && cb->cbs->track_position)
+-		cb->cbs->track_position(mcp, position);
+-}
+-
+-static void mcp_mp_set_media_state(struct bt_mcp *mcp, uint8_t state)
+-{
+-	struct event_callback *cb;
+-
+-	if (!mcp)
+-		return;
+-
+-	cb = mcp->cb;
+-
+-	DBG(mcp, "Media State 0x%02x", state);
+-
+-	if (cb && cb->cbs && cb->cbs->media_state)
+-		cb->cbs->media_state(mcp, state);
+-}
+-
+-static void read_media_player_name(bool success, uint8_t att_ecode,
+-				const uint8_t *value, uint16_t length,
+-				void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (!success) {
+-		DBG(mcp, "Unable to read media player name: error 0x%02x",
+-				att_ecode);
+-		return;
+-	}
+-
+-	if (!length)
+-		return;
+-
+-	mcp_mp_set_player_name(mcp, value, length);
+-}
+-
+-static void read_track_title(bool success, uint8_t att_ecode,
+-				const uint8_t *value, uint16_t length,
+-				void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (!success) {
+-		DBG(mcp, "Unable to read track title: error 0x%02x",
+-					att_ecode);
+-		return;
+-	}
+-
+-	if (!length)
+-		return;
+-
+-	mcp_mp_set_track_title(mcp, value, length);
+-}
+-
+-static void read_track_duration(bool success, uint8_t att_ecode,
+-				const uint8_t *value, uint16_t length,
+-				void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-	int32_t duration;
+-
+-	if (!success) {
+-		DBG(mcp, "Unable to read track duration: error 0x%02x",
+-					att_ecode);
+-		return;
+-	}
+-
+-	if (length != sizeof(duration))
+-		DBG(mcp, "Wrong length received Length : %u", length);
+-
+-	memcpy(&duration, value, length);
+-	mcp_mp_set_title_duration(mcp, duration);
+-}
+-
+-static void read_track_position(bool success, uint8_t att_ecode,
+-				const uint8_t *value, uint16_t length,
+-				void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-	int32_t position;
+-
+-	if (!success) {
+-		DBG(mcp, "Unable to read track position: error 0x%02x",
+-					att_ecode);
+-		return;
+-	}
+-
+-	if (length != sizeof(position))
+-		DBG(mcp, "Wrong length received Length : %u", length);
+-
+-	memcpy(&position, value, length);
+-	mcp_mp_set_title_position(mcp, position);
+-}
+-
+-static void read_media_state(bool success, uint8_t att_ecode,
+-				const uint8_t *value, uint16_t length,
+-				void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (!success) {
+-		DBG(mcp, "Unable to read media state: error 0x%02x",
+-					att_ecode);
+-		return;
+-	}
+-
+-	if (length != sizeof(uint8_t))
+-		DBG(mcp, "Wrong length received Length : %u", length);
+-
+-	mcp_mp_set_media_state(mcp, *value);
+-}
+-
+-static void read_media_cp_op_supported(bool success, uint8_t att_ecode,
+-				const uint8_t *value, uint16_t length,
+-				void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (!success) {
+-		DBG(mcp, "Unable to read media CP OP supported: error 0x%02x",
+-					att_ecode);
+-		return;
+-	}
+-
+-	if (length != sizeof(uint32_t))
+-		DBG(mcp, "Wrong length received Length : %u", length);
+-
+-	memcpy(&mcp->session.cp_op_supported, value, sizeof(uint32_t));
+-	DBG(mcp, "Media Control Point Opcodes Supported 0x%08x",
+-			mcp->session.cp_op_supported);
+-}
+-
+-static void read_content_control_id(bool success, uint8_t att_ecode,
+-				const uint8_t *value, uint16_t length,
+-				void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (!success) {
+-		DBG(mcp, "Unable to read content control id: error 0x%02x",
+-					att_ecode);
+-		return;
+-	}
+-
+-	if (length != sizeof(uint8_t))
+-		DBG(mcp, "Wrong length received Length : %u", length);
+-
+-	DBG(mcp, "Content Control ID 0x%02x", *value);
+-}
+-
+-static void mcp_pending_destroy(void *data)
+-{
+-	struct bt_mcp_pending *pending = data;
+-	struct bt_mcp *mcp = pending->mcp;
+-
+-	queue_remove_if(mcp->pending, NULL, pending);
+-}
+-
+-static void mcp_pending_complete(bool success, uint8_t att_ecode,
+-				const uint8_t *value, uint16_t length,
+-				void *user_data)
+-{
+-	struct bt_mcp_pending *pending = user_data;
+-
+-	if (pending->func)
+-		pending->func(success, att_ecode, value, length,
+-						pending->user_data);
+-}
+-
+-static void mcp_read_value(struct bt_mcp *mcp, uint16_t value_handle,
+-				bt_gatt_client_read_callback_t func,
+-				void *user_data)
++static struct bt_mcp_pending *mcp_pending_new(struct bt_mcp_service *service)
+ {
+ 	struct bt_mcp_pending *pending;
+ 
+-	pending = new0(struct bt_mcp_pending, 1);
+-	pending->mcp = mcp;
+-	pending->func = func;
+-	pending->user_data = user_data;
++	if (queue_length(service->pending) > MAX_PENDING)
++		return NULL;
+ 
+-	pending->id = bt_gatt_client_read_value(mcp->client, value_handle,
+-						mcp_pending_complete, pending,
+-						mcp_pending_destroy);
+-	if (!pending->id) {
+-		DBG(mcp, "Unable to send Read request");
++	while (!service->pending_id || queue_find(service->pending,
++			match_pending, UINT_TO_PTR(service->pending_id)))
++		service->pending_id++;
++
++	pending = new0(struct bt_mcp_pending, 1);
++	pending->service = service;
++	pending->id = service->pending_id++;
++	return pending;
++}
++
++static unsigned int mcp_send(struct bt_mcp_service *service, uint8_t *buf,
++								uint16_t length)
++{
++	struct bt_mcp *mcp = service->mcp;
++	uint16_t handle;
++	struct bt_mcp_pending *pending;
++	int ret;
++	uint8_t op = buf[0];
++
++	if (!gatt_db_attribute_get_char_data(service->rdb.media_cp, NULL,
++						&handle, NULL, NULL, NULL))
++		return 0;
++
++	pending = mcp_pending_new(service);
++	if (!pending)
++		return 0;
++
++	ret = bt_gatt_client_write_without_response(mcp->client,
++						handle, false, buf, length);
++	if (!ret) {
+ 		free(pending);
++		return 0;
++	}
++
++	pending->op = op;
++	queue_push_tail(service->pending, pending);
++
++	DBG_SVC(service, "%u", pending->id);
++	return pending->id;
++}
++
++static void mcp_pending_write_cb(bool success, uint8_t att_ecode,
++								void *user_data)
++{
++	struct bt_mcp_pending *pending = user_data;
++	uint8_t props;
++
++	if (!success) {
++		pending->write.result = BT_MCS_RESULT_COMMAND_CANNOT_COMPLETE;
+ 		return;
+ 	}
+ 
+-	queue_push_tail(mcp->pending, pending);
++	pending->write.result = BT_MCS_RESULT_SUCCESS;
++
++	if (!gatt_db_attribute_get_char_data(pending->write.attrib, NULL,
++						NULL, &props, NULL, NULL))
++		return;
++	if (props & BT_GATT_CHRC_PROP_NOTIFY)
++		return;
++
++	/* If the attribute doesn't have notify, reread to get the new value */
++	mcp_service_reread(pending->service, pending->write.attrib);
+ }
+ 
+-static void mcp_mp_name_register(uint16_t att_ecode, void *user_data)
++static void mcp_pending_write_done(void *user_data)
+ {
++	struct bt_mcp_pending *pending = user_data;
++	struct bt_mcp_service *service = pending->service;
++	struct bt_mcp *mcp = service->mcp;
++
++	DBG_SVC(service, "write %u", pending->id);
++
++	queue_remove(service->pending, pending);
++
++	if (mcp->cb->complete)
++		mcp->cb->complete(mcp->user_data, pending->id,
++							pending->write.result);
++	free(pending);
++}
++
++static unsigned int mcp_write_chrc(struct bt_mcp_service *service,
++		struct gatt_db_attribute *attrib, void *data, uint16_t length)
++{
++	struct bt_mcp *mcp;
++	struct bt_mcp_pending *pending;
++	uint16_t handle;
++
++	if (!service)
++		return 0;
++
++	mcp = service->mcp;
++
++	if (!gatt_db_attribute_get_char_data(attrib, NULL, &handle, NULL, NULL,
++									NULL))
++		return 0;
++
++	pending = mcp_pending_new(service);
++	if (!pending)
++		return 0;
++
++	pending->write.attrib = attrib;
++	pending->write.client_id = bt_gatt_client_write_value(mcp->client,
++				handle, data, length, mcp_pending_write_cb,
++				pending, mcp_pending_write_done);
++	if (!pending->write.client_id) {
++		free(pending);
++		return 0;
++	}
++
++	queue_push_tail(service->pending, pending);
++	return pending->id;
++}
++
++static bool match_pending_write(const void *data, const void *user_data)
++{
++	const struct bt_mcp_pending *pending = data;
++
++	return !pending->op;
++}
++
++static void mcp_cancel_pending_writes(struct bt_mcp_service *service)
++{
++	struct bt_mcp_pending *pending;
++	struct bt_gatt_client *client = service->mcp->client;
++
++	do {
++		pending = queue_remove_if(service->pending, match_pending_write,
++									NULL);
++		if (pending) {
++			if (!bt_gatt_client_cancel(client,
++						pending->write.client_id))
++				free(pending);
++		}
++	} while (pending);
++}
++
++static unsigned int mcp_command(struct bt_mcp *mcp, uint8_t ccid, uint8_t op,
++								int32_t arg)
++{
++	const struct mcs_command *cmd = mcs_get_command(op);
++	struct bt_mcp_service *service = mcp_service(mcp, ccid);
++	uint8_t buf[5];
++	struct iovec iov = { .iov_base = buf, .iov_len = 0 };
++
++	if (!service || !cmd)
++		return 0;
++
++	if (!(service->rdb.media_cp_op_supported_value & cmd->support))
++		return 0;
++
++	DBG_SVC(service, "%s %d", cmd->name, arg);
++
++	util_iov_push_u8(&iov, op);
++	if (cmd->int32_arg)
++		util_iov_push_le32(&iov, arg);
++
++	return mcp_send(service, iov.iov_base, iov.iov_len);
++}
++
++unsigned int bt_mcp_play(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_PLAY, 0);
++}
++
++unsigned int bt_mcp_pause(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_PAUSE, 0);
++}
++
++unsigned int bt_mcp_fast_rewind(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_FAST_REWIND, 0);
++}
++
++unsigned int bt_mcp_fast_forward(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_FAST_FORWARD, 0);
++}
++
++unsigned int bt_mcp_stop(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_STOP, 0);
++}
++
++unsigned int bt_mcp_move_relative(struct bt_mcp *mcp, uint8_t ccid,
++								int32_t offset)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_MOVE_RELATIVE, offset);
++}
++
++unsigned int bt_mcp_previous_segment(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_PREV_SEGMENT, 0);
++}
++
++unsigned int bt_mcp_next_segment(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_NEXT_SEGMENT, 0);
++}
++
++unsigned int bt_mcp_first_segment(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_FIRST_SEGMENT, 0);
++}
++
++unsigned int bt_mcp_last_segment(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_LAST_SEGMENT, 0);
++}
++
++unsigned int bt_mcp_goto_segment(struct bt_mcp *mcp, uint8_t ccid, int32_t n)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_GOTO_SEGMENT, n);
++}
++
++unsigned int bt_mcp_previous_track(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_PREV_TRACK, 0);
++}
++
++unsigned int bt_mcp_next_track(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_NEXT_TRACK, 0);
++}
++
++unsigned int bt_mcp_first_track(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_FIRST_TRACK, 0);
++}
++
++unsigned int bt_mcp_last_track(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_LAST_TRACK, 0);
++}
++
++unsigned int bt_mcp_goto_track(struct bt_mcp *mcp, uint8_t ccid, int32_t n)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_GOTO_TRACK, n);
++}
++
++unsigned int bt_mcp_previous_group(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_PREV_GROUP, 0);
++}
++
++unsigned int bt_mcp_next_group(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_NEXT_GROUP, 0);
++}
++
++unsigned int bt_mcp_first_group(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_FIRST_GROUP, 0);
++}
++
++unsigned int bt_mcp_last_group(struct bt_mcp *mcp, uint8_t ccid)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_LAST_GROUP, 0);
++}
++
++unsigned int bt_mcp_goto_group(struct bt_mcp *mcp, uint8_t ccid, int32_t n)
++{
++	return mcp_command(mcp, ccid, BT_MCS_CMD_GOTO_GROUP, n);
++}
++
++unsigned int bt_mcp_set_track_position(struct bt_mcp *mcp, uint8_t ccid,
++							int32_t position)
++{
++	struct bt_mcp_service *service = mcp_service(mcp, ccid);
++
++	position = cpu_to_le32(position);
++	return mcp_write_chrc(service, service->rdb.track_position,
++						&position, sizeof(position));
++}
++
++unsigned int bt_mcp_set_playback_speed(struct bt_mcp *mcp, uint8_t ccid,
++								int8_t value)
++{
++	struct bt_mcp_service *service = mcp_service(mcp, ccid);
++
++	return mcp_write_chrc(service, service->rdb.playback_speed,
++							&value, sizeof(value));
++}
++
++unsigned int bt_mcp_set_playing_order(struct bt_mcp *mcp, uint8_t ccid,
++								uint8_t value)
++{
++	struct bt_mcp_service *service = mcp_service(mcp, ccid);
++	uint16_t support = 0;
++	unsigned int i;
++
++	if (!service)
++		return 0;
++
++	for (i = 0; i < ARRAY_SIZE(mcs_playing_orders); ++i) {
++		if (mcs_playing_orders[i].order == value) {
++			support = mcs_playing_orders[i].support;
++			break;
++		}
++	}
++	if (!(service->rdb.playing_order_supported_value & support))
++		return 0;
++
++	return mcp_write_chrc(service, service->rdb.playing_order,
++							&value, sizeof(value));
++}
++
++uint16_t bt_mcp_get_supported_playing_order(struct bt_mcp *mcp, uint8_t ccid)
++{
++	struct bt_mcp_service *service = mcp_service(mcp, ccid);
++
++	if (!service)
++		return 0;
++	return service->rdb.playing_order_supported_value;
++}
++
++uint32_t bt_mcp_get_supported_commands(struct bt_mcp *mcp, uint8_t ccid)
++{
++	struct bt_mcp_service *service = mcp_service(mcp, ccid);
++
++	if (!service)
++		return 0;
++	return service->rdb.media_cp_op_supported_value;
++}
++
++#define LISTENER_CB(service, method, ...) \
++	do { \
++		const struct queue_entry *entry = \
++				queue_get_entries((service)->listeners); \
++		for (; entry; entry = entry->next) { \
++			struct bt_mcp_listener *listener = entry->data; \
++			if (listener->cb->method) \
++				listener->cb->method(listener->user_data, \
++							## __VA_ARGS__); \
++		} \
++	} while (0)
++
++static void update_media_player_name(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++
++	DBG_SVC(service, "Media Player Name");
++
++	LISTENER_CB(service, media_player_name, value, length);
++}
++
++static void update_track_changed(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++
++	if (!success) {
++		DBG_SVC(service, "Unable to read Track Changed: "
++						"error 0x%02x", att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Track Changed");
++
++	LISTENER_CB(service, track_changed);
++}
++
++static void update_track_title(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++
++	if (!success) {
++		DBG_SVC(service, "Unable to read Track Title: error 0x%02x",
++								att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Track Title");
++
++	LISTENER_CB(service, track_title, value, length);
++}
++
++static void update_track_duration(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint32_t v;
++
++	if (!success || !util_iov_pull_le32(&iov, &v)) {
++		DBG_SVC(service, "Unable to read Track Duration: "
++						"error 0x%02x", att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Track Duration: %d", (int32_t)v);
++
++	LISTENER_CB(service, track_duration, (int32_t)v);
++}
++
++static void update_track_position(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint32_t v;
++
++	if (!success || !util_iov_pull_le32(&iov, &v)) {
++		DBG_SVC(service, "Unable to read Track Position: "
++						"error 0x%02x", att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Track Position: %d", (int32_t)v);
++
++	LISTENER_CB(service, track_position, (int32_t)v);
++}
++
++static void update_playback_speed(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint8_t v;
++
++	if (!success || !util_iov_pull_u8(&iov, &v)) {
++		DBG_SVC(service, "Unable to read Playback Speed: "
++						"error 0x%02x", att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Playback Speed: %d", (int8_t)v);
++
++	LISTENER_CB(service, playback_speed, (int8_t)v);
++}
++
++static void update_seeking_speed(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint8_t v;
++
++	if (!success || !util_iov_pull_u8(&iov, &v)) {
++		DBG_SVC(service, "Unable to read Seeking Speed: "
++						"error 0x%02x", att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Seeking Speed: %d", (int8_t)v);
++
++	LISTENER_CB(service, seeking_speed, (int8_t)v);
++}
++
++static void update_playing_order(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint8_t v;
++
++	if (!success || !util_iov_pull_u8(&iov, &v)) {
++		DBG_SVC(service, "Unable to read Playing Order: "
++						"error 0x%02x", att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Playing Order: %u", v);
++
++	LISTENER_CB(service, playing_order, v);
++}
++
++static void update_playing_order_supported(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint16_t v;
++
++	if (!success || !util_iov_pull_le16(&iov, &v)) {
++		DBG_SVC(service, "Unable to read "
++			"Playing Order Supported: error 0x%02x", att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Playing Order Supported: %u", v);
++
++	service->rdb.playing_order_supported_value = v;
++}
++
++static void update_media_state(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint8_t v;
++
++	if (!success || !util_iov_pull_u8(&iov, &v)) {
++		DBG_SVC(service, "Unable to read Media State: error 0x%02x",
++								att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Media State: %u", v);
++
++	LISTENER_CB(service, media_state, v);
++}
++
++static bool match_pending_op(const void *data, const void *user_data)
++{
++	const struct bt_mcp_pending *pending = data;
++
++	return pending->op && pending->op == PTR_TO_UINT(user_data);
++}
++
++static void update_media_cp(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct bt_mcp *mcp = service->mcp;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	struct bt_mcp_pending *pending;
++	uint8_t op, result;
++
++	if (!success || !util_iov_pull_u8(&iov, &op) ||
++					!util_iov_pull_u8(&iov, &result)) {
++		DBG_SVC(service, "Unable to read Media CP: error 0x%02x",
++								att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Media CP %u result %u", op, result);
++
++	pending = queue_remove_if(service->pending, match_pending_op,
++							UINT_TO_PTR(op));
++	if (!pending)
++		return;
++
++	if (mcp->cb->complete)
++		mcp->cb->complete(mcp->user_data, pending->id, result);
++
++	free(pending);
++}
++
++static void update_media_cp_op_supported(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint32_t v;
++
++	if (!success || !util_iov_pull_le32(&iov, &v)) {
++		DBG_SVC(service, "Unable to read "
++			"Media CP Op Supported: error 0x%02x", att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "Media CP Op Supported: %d", v);
++
++	service->rdb.media_cp_op_supported_value = v;
++}
++
++static void update_add_service(void *data, void *user_data)
++{
++	struct bt_mcp_service *service = data;
+ 	struct bt_mcp *mcp = user_data;
+ 
+-	if (att_ecode)
+-		DBG(mcp, "Media Player Name notification failed: 0x%04x",
+-					att_ecode);
++	if (service->rdb.ccid_value < 0)
++		return;
++
++	if (service->ready)
++		return;
++
++	service->ready = true;
++	if (mcp->cb->ccid)
++		mcp->cb->ccid(mcp->user_data, service->rdb.ccid_value,
++							service->rdb.gmcs);
+ }
+ 
+-static void mcp_mp_name_notify(uint16_t value_handle, const uint8_t *value,
++static void update_ccid(bool success, uint8_t att_ecode,
++				const uint8_t *value, uint16_t length,
++				void *user_data)
++{
++	struct bt_mcp_service *service = user_data;
++	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
++	uint8_t v;
++
++	if (!success || !util_iov_pull_u8(&iov, &v)) {
++		DBG_SVC(service, "Unable to read Media State: error 0x%02x",
++								att_ecode);
++		return;
++	}
++
++	DBG_SVC(service, "CCID: %u", v);
++
++	service->rdb.ccid_value = v;
++
++	update_add_service(service, service->mcp);
++}
++
++static void mcp_service_reread(struct bt_mcp_service *service,
++					struct gatt_db_attribute *attrib)
++{
++	const struct {
++		struct gatt_db_attribute *attr;
++		bt_gatt_client_read_callback_t cb;
++	} attrs[] = {
++		{ service->rdb.track_title, update_track_title },
++		{ service->rdb.track_duration, update_track_duration },
++		{ service->rdb.track_position, update_track_position },
++		{ service->rdb.playback_speed, update_playback_speed },
++		{ service->rdb.seeking_speed, update_seeking_speed },
++		{ service->rdb.playing_order, update_playing_order },
++		{ service->rdb.playing_order_supported,
++		  update_playing_order_supported },
++		{ service->rdb.media_state, update_media_state },
++		{ service->rdb.media_cp_op_supported,
++		  update_media_cp_op_supported },
++	};
++	struct bt_gatt_client *client = service->mcp->client;
++	uint16_t value_handle;
++	unsigned int i;
++
++	for (i = 0; i < ARRAY_SIZE(attrs); ++i) {
++		if (!attrs[i].attr)
++			continue;
++		if (attrib && attrs[i].attr != attrib)
++			continue;
++
++		if (!gatt_db_attribute_get_char_data(attrs[i].attr, NULL,
++					&value_handle, NULL, NULL, NULL))
++			return;
++
++		DBG_SVC(service, "re-read handle 0x%04x", value_handle);
++
++		bt_gatt_client_read_value(client, value_handle,
++						attrs[i].cb, service, NULL);
++	}
++}
++
++static void notify_media_player_name(struct bt_mcp_service *service)
++{
++	/* On player name change, re-read all attributes */
++	mcp_service_reread(service, NULL);
++}
++
++static void mcp_idle(void *data)
++{
++	struct bt_mcp *mcp = data;
++
++	DBG_MCP(mcp, "");
++
++	mcp->idle_id = 0;
++
++	if (!mcp->ready) {
++		mcp->ready = true;
++		if (mcp->cb->ready)
++			mcp->cb->ready(mcp->user_data);
++	}
++}
++
++struct chrc_notify_data {
++	const char *name;
++	struct bt_mcp_service *service;
++	bt_gatt_client_read_callback_t cb;
++	void (*notify_cb)(struct bt_mcp_service *service);
++};
++
++static void chrc_register(uint16_t att_ecode, void *user_data)
++{
++	struct chrc_notify_data *data = user_data;
++
++	if (att_ecode)
++		DBG_SVC(data->service, "%s notification failed: 0x%04x",
++							data->name, att_ecode);
++}
++
++static void chrc_notify(uint16_t value_handle, const uint8_t *value,
+ 					uint16_t length, void *user_data)
+ {
+-	struct bt_mcp *mcp = user_data;
++	struct chrc_notify_data *data = user_data;
++	struct bt_mcp_service *service = data->service;
++	struct bt_gatt_client *client = service->mcp->client;
++	uint16_t mtu = bt_gatt_client_get_mtu(client);
+ 
+-	if (!length)
++	DBG_SVC(service, "Notify %s", data->name);
++
++	if (length == mtu - 3) {
++		/* Probably truncated value */
++		DBG_SVC(service, "Read %s", data->name);
++
++		bt_gatt_client_read_value(client, value_handle,
++						data->cb, service, NULL);
+ 		return;
++	}
+ 
+-	mcp_mp_set_player_name(mcp, value, length);
+-}
++	data->cb(true, 0xff, value, length, data->service);
+ 
+-static void mcp_track_changed_register(uint16_t att_ecode, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (att_ecode)
+-		DBG(mcp, "Media Track Changed notification failed: 0x%04x",
+-					att_ecode);
+-}
+-
+-static void mcp_track_changed_notify(uint16_t value_handle,
+-			const uint8_t *value, uint16_t length, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-	struct event_callback *cb = mcp->cb;
+-
+-	DBG(mcp, "Track Changed");
+-
+-	if (cb && cb->cbs && cb->cbs->track_changed)
+-		cb->cbs->track_changed(mcp);
+-}
+-
+-static void mcp_track_title_register(uint16_t att_ecode, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (att_ecode)
+-		DBG(mcp, "Media Track Title notification failed: 0x%04x",
+-					att_ecode);
+-}
+-
+-static void mcp_track_title_notify(uint16_t value_handle,
+-			const uint8_t *value, uint16_t length, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	mcp_mp_set_track_title(mcp, value, length);
+-}
+-
+-static void mcp_track_duration_register(uint16_t att_ecode, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (att_ecode)
+-		DBG(mcp, "Media Track Duration notification failed: 0x%04x",
+-					att_ecode);
+-}
+-
+-static void mcp_track_duration_notify(uint16_t value_handle,
+-			const uint8_t *value, uint16_t length, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-	int32_t duration;
+-
+-	memcpy(&duration, value, sizeof(int32_t));
+-	mcp_mp_set_title_duration(mcp, duration);
+-}
+-
+-static void mcp_track_position_register(uint16_t att_ecode, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (att_ecode)
+-		DBG(mcp, "Media Track Position notification failed: 0x%04x",
+-					att_ecode);
+-}
+-
+-static void mcp_track_position_notify(uint16_t value_handle,
+-		const uint8_t *value, uint16_t length, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-	int32_t position;
+-
+-	memcpy(&position, value, sizeof(int32_t));
+-	mcp_mp_set_title_position(mcp, position);
+-}
+-
+-static void mcp_media_state_register(uint16_t att_ecode, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (att_ecode)
+-		DBG(mcp, "Media Media State notification failed: 0x%04x",
+-					att_ecode);
+-}
+-
+-static void mcp_media_state_notify(uint16_t value_handle,
+-			const uint8_t *value, uint16_t length, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	mcp_mp_set_media_state(mcp, *value);
+-}
+-
+-static void mcp_media_cp_register(uint16_t att_ecode, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (att_ecode)
+-		DBG(mcp, "Media Media CP notification failed: 0x%04x",
+-					att_ecode);
+-}
+-
+-static void mcp_media_cp_notify(uint16_t value_handle, const uint8_t *value,
+-					uint16_t length, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	DBG(mcp, "Media CP Notification");
+-}
+-
+-static void mcp_media_cp_op_supported_register(uint16_t att_ecode,
+-					void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	if (att_ecode)
+-		DBG(mcp, "Media Media CP OP Supported notify failed: 0x%04x",
+-					att_ecode);
+-}
+-
+-static void mcp_media_cp_op_supported_notify(uint16_t value_handle,
+-			const uint8_t *value, uint16_t length, void *user_data)
+-{
+-	struct bt_mcp *mcp = user_data;
+-
+-	memcpy(&mcp->session.cp_op_supported, value, sizeof(uint32_t));
+-	DBG(mcp, "Media CP Opcodes Supported Notification 0x%08x",
+-			mcp->session.cp_op_supported);
+-}
+-
+-static void bt_mcp_mp_name_attach(struct bt_mcp *mcp)
+-{
+-	uint16_t value_handle;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->mp_name, NULL, &value_handle,
+-						NULL, NULL, NULL))
+-		return;
+-
+-	DBG(mcp, "Media Player handle 0x%04x", value_handle);
+-
+-	mcp_read_value(mcp, value_handle, read_media_player_name, mcp);
+-
+-	mcp->mp_name_id = bt_gatt_client_register_notify(mcp->client,
+-				value_handle, mcp_mp_name_register,
+-				mcp_mp_name_notify, mcp, NULL);
+-}
+-
+-static void bt_mcp_track_changed_attach(struct bt_mcp *mcp)
+-{
+-	uint16_t value_handle;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->track_changed, NULL,
+-				&value_handle, NULL, NULL, NULL))
+-		return;
+-
+-	DBG(mcp, "Track Changed handle 0x%04x", value_handle);
+-
+-	mcp->track_changed_id = bt_gatt_client_register_notify(mcp->client,
+-				value_handle, mcp_track_changed_register,
+-				mcp_track_changed_notify, mcp, NULL);
+-}
+-
+-static void bt_mcp_track_title_attach(struct bt_mcp *mcp)
+-{
+-	uint16_t value_handle;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->track_title, NULL,
+-				&value_handle, NULL, NULL, NULL))
+-		return;
+-
+-	DBG(mcp, "Track Title handle 0x%04x", value_handle);
+-
+-	mcp_read_value(mcp, value_handle, read_track_title, mcp);
+-
+-	mcp->track_title_id = bt_gatt_client_register_notify(mcp->client,
+-				value_handle, mcp_track_title_register,
+-				mcp_track_title_notify, mcp, NULL);
+-}
+-
+-static void bt_mcp_track_duration_attach(struct bt_mcp *mcp)
+-{
+-	uint16_t value_handle;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->track_duration, NULL,
+-				&value_handle, NULL, NULL, NULL))
+-		return;
+-
+-	DBG(mcp, "Track Duration handle 0x%04x", value_handle);
+-
+-	mcp_read_value(mcp, value_handle, read_track_duration, mcp);
+-
+-	mcp->track_duration_id = bt_gatt_client_register_notify(mcp->client,
+-				value_handle, mcp_track_duration_register,
+-				mcp_track_duration_notify, mcp, NULL);
+-}
+-
+-static void bt_mcp_track_position_attach(struct bt_mcp *mcp)
+-{
+-	uint16_t value_handle;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->track_position, NULL,
+-				&value_handle, NULL, NULL, NULL))
+-		return;
+-
+-	DBG(mcp, "Track Position handle 0x%04x", value_handle);
+-
+-	mcp_read_value(mcp, value_handle, read_track_position, mcp);
+-
+-	mcp->track_position_id = bt_gatt_client_register_notify(mcp->client,
+-				value_handle, mcp_track_position_register,
+-				mcp_track_position_notify, mcp, NULL);
+-}
+-
+-static void bt_mcp_media_state_attach(struct bt_mcp *mcp)
+-{
+-	uint16_t value_handle;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->media_state, NULL,
+-				&value_handle, NULL, NULL, NULL))
+-		return;
+-
+-	DBG(mcp, "Media State handle 0x%04x", value_handle);
+-
+-	mcp_read_value(mcp, value_handle, read_media_state, mcp);
+-
+-	mcp->media_state_id = bt_gatt_client_register_notify(mcp->client,
+-					value_handle, mcp_media_state_register,
+-					mcp_media_state_notify, mcp, NULL);
+-}
+-
+-static void bt_mcp_media_cp_attach(struct bt_mcp *mcp)
+-{
+-	uint16_t value_handle;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->media_cp, NULL,
+-				&value_handle, NULL, NULL, NULL))
+-		return;
+-
+-	DBG(mcp, "Media Control Point handle 0x%04x", value_handle);
+-
+-	mcp->media_cp_id = bt_gatt_client_register_notify(mcp->client,
+-					value_handle, mcp_media_cp_register,
+-					mcp_media_cp_notify, mcp, NULL);
+-}
+-
+-static void bt_mcp_media_cp_op_supported_attach(struct bt_mcp *mcp)
+-{
+-	uint16_t value_handle;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->media_cp_op_supportd, NULL,
+-				&value_handle, NULL, NULL, NULL))
+-		return;
+-
+-	DBG(mcp, "Media Control Point Opcodes Supported handle 0x%04x",
+-			value_handle);
+-
+-	mcp_read_value(mcp, value_handle, read_media_cp_op_supported, mcp);
+-
+-	mcp->media_cp_op_supported_id = bt_gatt_client_register_notify(
+-		mcp->client, value_handle, mcp_media_cp_op_supported_register,
+-		mcp_media_cp_op_supported_notify, mcp, NULL);
+-}
+-
+-static void bt_mcp_content_control_id_supported_attach(struct bt_mcp *mcp)
+-{
+-	uint16_t value_handle;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
+-
+-	if (!gatt_db_attribute_get_char_data(mcs->content_control_id, NULL,
+-				&value_handle, NULL, NULL, NULL))
+-		return;
+-
+-	DBG(mcp, "Media Content Control id Supported handle 0x%04x",
+-				value_handle);
+-	mcp_read_value(mcp, value_handle, read_content_control_id, mcp);
++	if (data->notify_cb)
++		data->notify_cb(service);
+ }
+ 
+ static void foreach_mcs_char(struct gatt_db_attribute *attr, void *user_data)
+ {
+-	struct bt_mcp *mcp = user_data;
++	struct bt_mcp_service *service = user_data;
++	struct bt_mcp *mcp = service->mcp;
++	const struct {
++		uint16_t uuid;
++		const char *name;
++		struct gatt_db_attribute **dst;
++		bt_gatt_client_read_callback_t cb;
++		void (*notify_cb)(struct bt_mcp_service *service);
++		bool no_read;
++		bool no_notify;
++	} attrs[] = {
++		{ MCS_CCID_CHRC_UUID, "CCID", &service->rdb.ccid,
++		  update_ccid, .no_notify = true },
++		{ MCS_MEDIA_PLAYER_NAME_CHRC_UUID, "Media Player Name",
++		  &service->rdb.media_player_name, update_media_player_name,
++		  .notify_cb = notify_media_player_name },
++		{ MCS_TRACK_CHANGED_CHRC_UUID, "Track Changed",
++		  &service->rdb.track_changed, update_track_changed,
++		  .no_read = true },
++		{ MCS_TRACK_TITLE_CHRC_UUID, "Track Title",
++		  &service->rdb.track_title, update_track_title },
++		{ MCS_TRACK_DURATION_CHRC_UUID, "Track Duration",
++		  &service->rdb.track_duration, update_track_duration },
++		{ MCS_TRACK_POSITION_CHRC_UUID, "Track Position",
++		  &service->rdb.track_position, update_track_position },
++		{ MCS_PLAYBACK_SPEED_CHRC_UUID, "Playback Speed",
++		  &service->rdb.playback_speed, update_playback_speed },
++		{ MCS_SEEKING_SPEED_CHRC_UUID, "Seeking Speed",
++		  &service->rdb.seeking_speed, update_seeking_speed },
++		{ MCS_PLAYING_ORDER_CHRC_UUID, "Playing Order",
++		  &service->rdb.playing_order, update_playing_order },
++		{ MCS_PLAYING_ORDER_SUPPORTED_CHRC_UUID,
++		  "Playing Order Supported",
++		  &service->rdb.playing_order_supported,
++		  update_playing_order_supported, .no_notify = true },
++		{ MCS_MEDIA_STATE_CHRC_UUID, "Media State",
++		  &service->rdb.media_state, update_media_state },
++		{ MCS_MEDIA_CP_CHRC_UUID, "Media Control Point",
++		  &service->rdb.media_cp, update_media_cp },
++		{ MCS_MEDIA_CP_OP_SUPPORTED_CHRC_UUID, "Media CP Op Supported",
++		  &service->rdb.media_cp_op_supported,
++		  update_media_cp_op_supported },
++	};
++	struct bt_gatt_client *client = service->mcp->client;
++	bt_uuid_t uuid, uuid_attr;
+ 	uint16_t value_handle;
+-	bt_uuid_t uuid, uuid_mp_name, uuid_track_changed, uuid_track_title,
+-		uuid_track_duration, uuid_track_position, uuid_media_state,
+-		uuid_media_cp, uuid_media_cp_op_supported,
+-		uuid_content_control_id;
+-	struct bt_mcs *mcs;
++	uint8_t props;
++	unsigned int i;
+ 
+ 	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
+-						NULL, NULL, &uuid))
++						&props, NULL, &uuid_attr))
+ 		return;
+ 
+-	bt_uuid16_create(&uuid_mp_name, MEDIA_PLAYER_NAME_CHRC_UUID);
+-	bt_uuid16_create(&uuid_track_changed, MEDIA_TRACK_CHNGD_CHRC_UUID);
+-	bt_uuid16_create(&uuid_track_title, MEDIA_TRACK_TITLE_CHRC_UUID);
+-	bt_uuid16_create(&uuid_track_duration, MEDIA_TRACK_DURATION_CHRC_UUID);
+-	bt_uuid16_create(&uuid_track_position, MEDIA_TRACK_POSTION_CHRC_UUID);
+-	bt_uuid16_create(&uuid_media_state, MEDIA_STATE_CHRC_UUID);
+-	bt_uuid16_create(&uuid_media_cp, MEDIA_CP_CHRC_UUID);
+-	bt_uuid16_create(&uuid_media_cp_op_supported,
+-					MEDIA_CP_OP_SUPPORTED_CHRC_UUID);
+-	bt_uuid16_create(&uuid_content_control_id,
+-					MEDIA_CONTENT_CONTROL_ID_CHRC_UUID);
++	for (i = 0; i < ARRAY_SIZE(attrs); ++i) {
++		unsigned int id;
++		struct chrc_notify_data *data;
+ 
+-	if (!bt_uuid_cmp(&uuid, &uuid_mp_name)) {
+-		DBG(mcp, "Media Player Name found: handle 0x%04x",
+-					value_handle);
++		if (*attrs[i].dst)
++			continue;
+ 
+-		mcs = mcp_get_mcs(mcp);
+-		if (!mcs || mcs->mp_name)
+-			return;
++		bt_uuid16_create(&uuid, attrs[i].uuid);
++		if (bt_uuid_cmp(&uuid_attr, &uuid))
++			continue;
+ 
+-		mcs->mp_name = attr;
+-		bt_mcp_mp_name_attach(mcp);
++		DBG_SVC(service, "%s found: handle 0x%04x",
++						attrs[i].name, value_handle);
++		*attrs[i].dst = attr;
++
++		if ((props & BT_GATT_CHRC_PROP_READ) && !attrs[i].no_read)
++			bt_gatt_client_read_value(client, value_handle,
++						attrs[i].cb, service, NULL);
++
++		if (!(props & BT_GATT_CHRC_PROP_NOTIFY) || attrs[i].no_notify)
++			break;
++		if (service->notify_id_count >= ARRAY_SIZE(service->notify_id))
++			break;
++
++		data = new0(struct chrc_notify_data, 1);
++		data->name = attrs[i].name;
++		data->service = service;
++		data->cb = attrs[i].cb;
++
++		id = bt_gatt_client_register_notify(client, value_handle,
++						chrc_register, chrc_notify,
++						data, free);
++		if (id)
++			service->notify_id[service->notify_id_count++] = id;
++		else
++			free(data);
++
++		break;
+ 	}
+ 
+-	if (!bt_uuid_cmp(&uuid, &uuid_track_changed)) {
+-		DBG(mcp, "Track Changed found: handle 0x%04x", value_handle);
+-
+-		mcs = mcp_get_mcs(mcp);
+-		if (!mcs || mcs->track_changed)
+-			return;
+-
+-		mcs->track_changed = attr;
+-		bt_mcp_track_changed_attach(mcp);
+-	}
+-
+-	if (!bt_uuid_cmp(&uuid, &uuid_track_title)) {
+-		DBG(mcp, "Track Title found: handle 0x%04x", value_handle);
+-
+-		mcs = mcp_get_mcs(mcp);
+-		if (!mcs || mcs->track_title)
+-			return;
+-
+-		mcs->track_title = attr;
+-		bt_mcp_track_title_attach(mcp);
+-	}
+-
+-	if (!bt_uuid_cmp(&uuid, &uuid_track_duration)) {
+-		DBG(mcp, "Track Duration found: handle 0x%04x", value_handle);
+-
+-		mcs = mcp_get_mcs(mcp);
+-		if (!mcs || mcs->track_duration)
+-			return;
+-
+-		mcs->track_duration = attr;
+-		bt_mcp_track_duration_attach(mcp);
+-	}
+-
+-	if (!bt_uuid_cmp(&uuid, &uuid_track_position)) {
+-		DBG(mcp, "Track Position found: handle 0x%04x", value_handle);
+-
+-
+-		mcs = mcp_get_mcs(mcp);
+-		if (!mcs || mcs->track_position)
+-			return;
+-
+-		mcs->track_position = attr;
+-		bt_mcp_track_position_attach(mcp);
+-	}
+-
+-	if (!bt_uuid_cmp(&uuid, &uuid_media_state)) {
+-		DBG(mcp, "Media State found: handle 0x%04x", value_handle);
+-
+-		mcs = mcp_get_mcs(mcp);
+-		if (!mcs || mcs->media_state)
+-			return;
+-
+-		mcs->media_state = attr;
+-		bt_mcp_media_state_attach(mcp);
+-	}
+-
+-	if (!bt_uuid_cmp(&uuid, &uuid_media_cp)) {
+-		DBG(mcp, "Media Control Point found: handle 0x%04x",
+-					value_handle);
+-
+-		mcs = mcp_get_mcs(mcp);
+-		if (!mcs || mcs->media_cp)
+-			return;
+-
+-		mcs->media_cp = attr;
+-		bt_mcp_media_cp_attach(mcp);
+-	}
+-
+-	if (!bt_uuid_cmp(&uuid, &uuid_media_cp_op_supported)) {
+-		DBG(mcp, "Media CP Opcodes Supported found: handle 0x%04x",
+-					value_handle);
+-
+-		mcs = mcp_get_mcs(mcp);
+-		if (!mcs || mcs->media_cp_op_supportd)
+-			return;
+-
+-		mcs->media_cp_op_supportd = attr;
+-		bt_mcp_media_cp_op_supported_attach(mcp);
+-	}
+-
+-	if (!bt_uuid_cmp(&uuid, &uuid_content_control_id)) {
+-		DBG(mcp, "Content Control ID found: handle 0x%04x",
+-					value_handle);
+-
+-		mcs = mcp_get_mcs(mcp);
+-		if (!mcs || mcs->content_control_id)
+-			return;
+-
+-		mcs->content_control_id = attr;
+-		bt_mcp_content_control_id_supported_attach(mcp);
+-	}
++	if (!mcp->idle_id && i < ARRAY_SIZE(attrs))
++		mcp->idle_id = bt_gatt_client_idle_register(mcp->client,
++							mcp_idle, mcp, NULL);
+ }
+ 
+-void bt_mcp_set_event_callbacks(struct bt_mcp *mcp,
+-				const struct bt_mcp_event_callback *cbs,
+-				void *user_data)
++static void foreach_mcs_ccid(struct gatt_db_attribute *attr, void *user_data)
+ {
+-	struct event_callback *cb;
++	bt_uuid_t uuid, uuid_attr;
+ 
+-	if (!mcp)
++	if (!gatt_db_attribute_get_char_data(attr, NULL, NULL, NULL, NULL,
++								&uuid_attr))
+ 		return;
+ 
+-	if (mcp->cb)
+-		free(mcp->cb);
++	bt_uuid16_create(&uuid, MCS_CCID_CHRC_UUID);
++	if (bt_uuid_cmp(&uuid_attr, &uuid))
++		return;
+ 
+-	cb = new0(struct event_callback, 1);
+-	cb->cbs = cbs;
+-	cb->user_data = user_data;
+-
+-	mcp->cb = cb;
++	foreach_mcs_char(attr, user_data);
+ }
+ 
+-static void foreach_mcs_service(struct gatt_db_attribute *attr,
+-						void *user_data)
++static void listener_destroy(void *data)
++{
++	struct bt_mcp_listener *listener = data;
++
++	if (listener->cb->destroy)
++		listener->cb->destroy(listener->user_data);
++
++	free(listener);
++}
++
++static void mcp_service_destroy(void *data)
++{
++	struct bt_mcp_service *service = data;
++	struct bt_gatt_client *client = service->mcp->client;
++	unsigned int i;
++
++	mcp_cancel_pending_writes(service);
++
++	queue_destroy(service->listeners, listener_destroy);
++
++	for (i = 0; i < service->notify_id_count; ++i)
++		bt_gatt_client_unregister_notify(client, service->notify_id[i]);
++
++	queue_destroy(service->pending, free);
++	free(service);
++}
++
++static void foreach_mcs_service(struct gatt_db_attribute *attr, void *user_data)
+ {
+ 	struct bt_mcp *mcp = user_data;
+-	struct bt_mcs *mcs = mcp_get_mcs(mcp);
++	struct bt_mcp_service *service;
++	bt_uuid_t uuid, uuid_attr;
++	bool gmcs, mcs;
+ 
+-	DBG(mcp, "");
++	DBG_MCP(mcp, "");
+ 
+-	mcs->service = attr;
++	if (!gatt_db_attribute_get_service_uuid(attr, &uuid_attr))
++		return;
+ 
+-	gatt_db_service_foreach_char(attr, foreach_mcs_char, mcp);
++	bt_uuid16_create(&uuid, GMCS_UUID);
++	gmcs = !bt_uuid_cmp(&uuid_attr, &uuid);
++
++	if (gmcs != mcp->gmcs)
++		return;
++
++	bt_uuid16_create(&uuid, MCS_UUID);
++	mcs = !bt_uuid_cmp(&uuid_attr, &uuid);
++
++	if (!gmcs && !mcs)
++		return;
++
++	service = new0(struct bt_mcp_service, 1);
++	service->mcp = mcp;
++	service->rdb.gmcs = gmcs;
++	service->rdb.service = attr;
++	service->rdb.ccid_value = -1;
++	service->pending = queue_new();
++	service->listeners = queue_new();
++
++	/* Find CCID first */
++	gatt_db_service_foreach_char(attr, foreach_mcs_ccid, service);
++
++	gatt_db_service_foreach_char(attr, foreach_mcs_char, service);
++
++	queue_push_tail(mcp->services, service);
+ }
+ 
+-static struct bt_mcp_db *mcp_db_new(struct gatt_db *db)
++static bool match_service_attr(const void *data, const void *user_data)
+ {
+-	struct bt_mcp_db *mdb;
++	const struct bt_mcp_service *service = data;
+ 
+-	if (!db)
+-		return NULL;
+-
+-	mdb = new0(struct bt_mcp_db, 1);
+-	mdb->db = gatt_db_ref(db);
+-
+-	if (!mcp_db)
+-		mcp_db = queue_new();
+-
+-	queue_push_tail(mcp_db, mdb);
+-
+-	mdb->mcs = mcs_new(db);
+-	return mdb;
++	return service->rdb.service == user_data;
+ }
+ 
+-static struct bt_mcp_db *mcp_get_db(struct gatt_db *db)
++static void mcp_service_added(struct gatt_db_attribute *attr, void *user_data)
+ {
+-	struct bt_mcp_db *mdb;
++	struct bt_mcp *mcp = user_data;
+ 
+-	mdb = queue_find(mcp_db, mcp_db_match, db);
+-	if (mdb)
+-		return mdb;
+-
+-	return mcp_db_new(db);
++	foreach_mcs_service(attr, mcp);
+ }
+ 
+-struct bt_mcp *bt_mcp_new(struct gatt_db *ldb, struct gatt_db *rdb)
++static void mcp_service_removed(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct bt_mcp *mcp = user_data;
++
++	queue_remove_all(mcp->services, match_service_attr, attr,
++							mcp_service_destroy);
++}
++
++struct bt_mcp *bt_mcp_attach(struct bt_gatt_client *client, bool gmcs,
++			const struct bt_mcp_callback *cb, void *user_data)
+ {
+ 	struct bt_mcp *mcp;
+-	struct bt_mcp_db *mdb;
++	struct gatt_db *db;
++	bt_uuid_t uuid;
+ 
+-	if (!ldb)
++	if (!cb)
+ 		return NULL;
+ 
+-	mdb = mcp_get_db(ldb);
+-	if (!mdb)
++	client = bt_gatt_client_clone(client);
++	if (!client)
+ 		return NULL;
+ 
+ 	mcp = new0(struct bt_mcp, 1);
+-	mcp->ldb = mdb;
+-	mcp->pending = queue_new();
++	mcp->gmcs = gmcs;
++	mcp->client = client;
++	mcp->services = queue_new();
++	mcp->cb = cb;
++	mcp->user_data = user_data;
+ 
+-	if (!rdb)
+-		goto done;
++	DBG_MCP(mcp, "");
+ 
+-	mdb = new0(struct bt_mcp_db, 1);
+-	mdb->db = gatt_db_ref(rdb);
++	db = bt_gatt_client_get_db(client);
+ 
+-	mcp->rdb = mdb;
++	bt_uuid16_create(&uuid, GMCS_UUID);
++	gatt_db_foreach_service(db, &uuid, foreach_mcs_service, mcp);
+ 
+-done:
+-	bt_mcp_ref(mcp);
++	bt_uuid16_create(&uuid, MCS_UUID);
++	gatt_db_foreach_service(db, &uuid, foreach_mcs_service, mcp);
++
++	mcp->db_id = gatt_db_register(db, mcp_service_added,
++						mcp_service_removed, mcp, NULL);
++
++	if (!mcp->idle_id)
++		mcp_idle(mcp);
+ 
+ 	return mcp;
+ }
+ 
+-void bt_mcp_register(struct gatt_db *db)
+-{
+-	if (!db)
+-		return;
+-
+-	mcp_db_new(db);
+-}
+-
+-bool bt_mcp_attach(struct bt_mcp *mcp, struct bt_gatt_client *client)
+-{
+-	bt_uuid_t uuid;
+-
+-	if (!mcp)
+-		return false;
+-
+-	DBG(mcp, "mcp %p", mcp);
+-
+-	mcp->client = bt_gatt_client_clone(client);
+-	if (!mcp->client)
+-		return false;
+-
+-	if (mcp->rdb->mcs) {
+-		bt_mcp_mp_name_attach(mcp);
+-		bt_mcp_track_changed_attach(mcp);
+-		bt_mcp_track_title_attach(mcp);
+-		bt_mcp_track_duration_attach(mcp);
+-		bt_mcp_track_position_attach(mcp);
+-		bt_mcp_media_state_attach(mcp);
+-		bt_mcp_media_cp_attach(mcp);
+-		bt_mcp_media_cp_op_supported_attach(mcp);
+-		bt_mcp_content_control_id_supported_attach(mcp);
+-
+-		return true;
+-	}
+-
+-	bt_uuid16_create(&uuid, GMCS_UUID);
+-	gatt_db_foreach_service(mcp->rdb->db, &uuid, foreach_mcs_service, mcp);
+-
+-	return true;
+-}
+-
+ void bt_mcp_detach(struct bt_mcp *mcp)
+ {
++	struct gatt_db *db;
++
+ 	if (!mcp)
+ 		return;
+ 
+-	DBG(mcp, "%p", mcp);
++	DBG_MCP(mcp, "");
++
++	queue_destroy(mcp->services, mcp_service_destroy);
++
++	if (mcp->cb->destroy)
++		mcp->cb->destroy(mcp->user_data);
++
++	if (mcp->idle_id)
++		bt_gatt_client_idle_unregister(mcp->client, mcp->idle_id);
++
++	db = bt_gatt_client_get_db(mcp->client);
++	if (mcp->db_id)
++		gatt_db_unregister(db, mcp->db_id);
+ 
+ 	bt_gatt_client_unref(mcp->client);
+-	mcp->client = NULL;
++
++	free(mcp);
++}
++
++bool bt_mcp_add_listener(struct bt_mcp *mcp, uint8_t ccid,
++				const struct bt_mcp_listener_callback *cb,
++				void *user_data)
++{
++	struct bt_mcp_listener *listener;
++	struct bt_mcp_service *service;
 +
 +	if (!cb)
-+		cb = &mcp_cb;
-+	data->mcp = bt_mcp_attach(data->client, data->cfg->gmcs, cb, data);
-+	g_assert(data->mcp);
-+}
++		return false;
 +
-+/* ATT: Write Request (0x12)
-+ *   Handle: {ccc_hnd}
-+ *   Value: 0x0001 (Notification enabled)
-+ */
-+#define NOTIFY_ENABLE(ccc_hnd) \
-+	IOV_DATA(0x12, HND(ccc_hnd), 0x01, 0x00), \
-+	IOV_DATA(0x13)
++	service = queue_find(mcp->services, match_ccid, UINT_TO_PTR(ccid));
++	if (!service)
++		return false;
 +
-+/* ATT: Read Request (0x0a) len 2
-+ *   Handle: 0x0003 Type: GMAP Role (0x2c00)
-+ * ATT: Read Response (0x0b) len 24
-+ *   Value: _value
-+ *   Handle: 0x0003 Type: GMAP Role (0x2c00)
-+ */
++	listener = new0(struct bt_mcp_listener, 1);
++	listener->cb = cb;
++	listener->user_data = user_data;
 +
-+#define READ_CHRC(hnd, value...) \
-+	IOV_DATA(0x0a, HND(hnd)), \
-+	IOV_DATA(0x0b, value)
-+
-+/* ATT: Write Command (0x52) len 2
-+ */
-+
-+#define WRITE_NORESP_CHRC(hnd, value...) \
-+	IOV_DATA(0x52, HND(hnd), value), \
-+	IOV_NULL
-+
-+/* ATT: Write Request (0x12) len 2
-+ * ATT: Write Response (0x13) len 1
-+ */
-+
-+#define WRITE_CHRC(hnd, value...) \
-+	IOV_DATA(0x12, HND(hnd), value), \
-+	IOV_DATA(0x13)
-+
-+/* ATT: Write Request (0x12) len 2
-+ * ATT: Error Response (0x01) len 1
-+ */
-+
-+#define WRITE_ERR_CHRC(hnd, err, value...) \
-+	IOV_DATA(0x12, HND(hnd), value), \
-+	IOV_DATA(0x01, 0x12, HND(hnd), err)
-+
-+/* ATT: Handle Value Notification (0x1b) len 7
-+ *   Handle: {hnd}
-+ *     Data: {value}
-+ */
-+#define NOTIFY_CHRC(hnd, value...) \
-+	IOV_NULL, \
-+	IOV_DATA(0x1b, HND(hnd), value)
-+
-+#define SPLIT_INT32(value) \
-+	(value & 0xff), ((value >> 8) & 0xff), \
-+	((value >> 16) & 0xff), ((value >> 24) & 0xff)
-+
-+#define MCS_MINIMAL_INIT_ALL(ops) \
-+	READ_CHRC(CCID, 0x01), \
-+	READ_CHRC(NAME, 'B', 'l', 'u', 'e', 'Z'), \
-+	NOTIFY_ENABLE(TRACK_CHG_CCC), \
-+	READ_CHRC(TRACK_TITLE, 'T', 'i', 't', 'l', 'e'), \
-+	READ_CHRC(TRACK_DUR, 0xff, 0xff, 0xff, 0xff), \
-+	READ_CHRC(TRACK_POS, 0xff, 0xff, 0xff, 0xff), \
-+	READ_CHRC(PLAY_SPEED, 0x00), \
-+	READ_CHRC(SEEK_SPEED, 0x00), \
-+	READ_CHRC(PLAY_ORDER, 0x04 /* in order repeat */), \
-+	READ_CHRC(PLAY_ORDER_SUPP, 0x18, 0x00  /* in order + oldest */), \
-+	READ_CHRC(STATE, 0x00 /* inactive */), \
-+	NOTIFY_ENABLE(STATE_CCC), \
-+	NOTIFY_ENABLE(CP_CCC), \
-+	READ_CHRC(CP_SUPP, SPLIT_INT32(ops))
-+
-+#define GMCS_INIT_ALL(ops) \
-+	READ_CHRC(CCID, 0x01), \
-+	READ_CHRC(NAME, 'B', 'l', 'u', 'e', 'Z'), \
-+	NOTIFY_ENABLE(NAME_CCC), \
-+	NOTIFY_ENABLE(TRACK_CHG_CCC), \
-+	READ_CHRC(TRACK_TITLE, 'T', 'i', 't', 'l', 'e'), \
-+	NOTIFY_ENABLE(TRACK_TITLE_CCC), \
-+	READ_CHRC(TRACK_DUR, 0xff, 0xff, 0xff, 0xff), \
-+	NOTIFY_ENABLE(TRACK_DUR_CCC), \
-+	READ_CHRC(TRACK_POS, 0xff, 0xff, 0xff, 0xff), \
-+	NOTIFY_ENABLE(TRACK_POS_CCC), \
-+	READ_CHRC(PLAY_SPEED, 0x00), \
-+	NOTIFY_ENABLE(PLAY_SPEED_CCC), \
-+	READ_CHRC(SEEK_SPEED, 0x00), \
-+	NOTIFY_ENABLE(SEEK_SPEED_CCC), \
-+	READ_CHRC(PLAY_ORDER, 0x04 /* in order repeat */), \
-+	NOTIFY_ENABLE(PLAY_ORDER_CCC), \
-+	READ_CHRC(PLAY_ORDER_SUPP, 0x18, 0x00 /* in order + oldest */), \
-+	READ_CHRC(STATE, 0x00 /* inactive */), \
-+	NOTIFY_ENABLE(STATE_CCC), \
-+	NOTIFY_ENABLE(CP_CCC), \
-+	READ_CHRC(CP_SUPP, SPLIT_INT32(ops)), \
-+	NOTIFY_ENABLE(CP_SUPP_CCC)
-+
-+
++	queue_push_tail(service->listeners, listener);
++	return true;
+ }
+diff --git a/src/shared/mcp.h b/src/shared/mcp.h
+index ee57ed4bf..937afb6d3 100644
+--- a/src/shared/mcp.h
++++ b/src/shared/mcp.h
+@@ -10,54 +10,160 @@
+ #include <stdbool.h>
+ #include <inttypes.h>
+ 
+-#ifndef __packed
+-#define __packed __attribute__((packed))
+-#endif
+-
+ struct bt_mcp;
+-struct bt_mcp_db;
+-struct bt_mcp_session_info;
++struct bt_mcs;
+ 
+-typedef void (*bt_mcp_debug_func_t)(const char *str, void *user_data);
+-typedef void (*bt_mcp_destroy_func_t)(void *user_data);
 +/*
-+ * Client tests
++ * Media Control Client
 + */
+ 
+-struct bt_mcp_event_callback {
+-	void (*player_name)(struct bt_mcp *mcp,  const uint8_t *value,
+-					uint16_t length);
+-	void (*track_changed)(struct bt_mcp *mcp);
+-	void (*track_title)(struct bt_mcp *mcp, const uint8_t *value,
+-					uint16_t length);
+-	void (*track_duration)(struct bt_mcp *mcp, int32_t duration);
+-	void (*track_position)(struct bt_mcp *mcp, int32_t position);
+-	void (*playback_speed)(struct bt_mcp *mcp, int8_t speed);
+-	void (*seeking_speed)(struct bt_mcp *mcp, int8_t speed);
+-	void (*play_order)(struct bt_mcp *mcp, uint8_t order);
+-	void (*play_order_supported)(struct bt_mcp *mcp,
+-					uint16_t order_supported);
+-	void (*media_state)(struct bt_mcp *mcp, uint8_t state);
+-	void (*content_control_id)(struct bt_mcp *mcp, uint8_t cc_id);
++struct bt_mcp_callback {
++	/* New player seen */
++	void (*ccid)(void *data, uint8_t ccid, bool gmcs);
 +
-+#define CGGIT_MCS_ALL \
-+	MCS_MINIMAL_INIT_ALL(0x001fffff)
++	/* Client command complete */
++	void (*complete)(void *data, unsigned int id, uint8_t status);
 +
-+#define CGGIT_GMCS_ALL \
-+	GMCS_INIT_ALL(0x001fffff)
++	/* Attach complete */
++	void (*ready)(void *data);
 +
-+static const struct iovec setup_data_mcs[] = {
-+	MCS_SETUP(0, MCS_SERVICE),
-+	CGGIT_MCS_ALL
++	/* Debug message */
++	void (*debug)(void *data, const char *str);
++
++	/* mcp destroyed (no further callbacks) */
++	void (*destroy)(void *data);
+ };
+ 
+-void bt_mcp_set_event_callbacks(struct bt_mcp *mcp,
+-				const struct bt_mcp_event_callback *cbs,
++struct bt_mcp_listener_callback {
++	/* Value notification */
++	void (*media_player_name)(void *data, const uint8_t *value,
++							uint16_t length);
++	void (*track_changed)(void *data);
++	void (*track_title)(void *data, const uint8_t *value, uint16_t length);
++	void (*track_duration)(void *data, int32_t duration_centisecond);
++	void (*track_position)(void *data, int32_t position_centisecond);
++	void (*playback_speed)(void *data, int8_t log2_speed);
++	void (*seeking_speed)(void *data, int8_t log2_speed);
++	void (*playing_order)(void *data, uint8_t order);
++	void (*media_state)(void *data, uint8_t state);
++
++	/* TODO: OTS */
++
++	/* Listener destroyed (no further callbacks) */
++	void (*destroy)(void *data);
 +};
 +
-+static const struct iovec setup_data_gmcs[] = {
-+	GMCS_SETUP(0, GMCS_SERVICE),
-+	CGGIT_GMCS_ALL
-+};
-+
-+static void cggit_player_name(void *data, const uint8_t *value, uint16_t length)
-+{
-+	if (strncmp((void *)value, "BlueZ", length) == 0) {
-+		tester_test_passed();
-+		return;
-+	}
-+	FAIL_TEST();
-+}
-+
-+static void cggit_track_changed(void *data)
-+{
-+	tester_test_passed();
-+}
-+
-+static void cggit_track_title(void *data, const uint8_t *value, uint16_t length)
-+{
-+	if (strncmp((void *)value, "Title", length) == 0) {
-+		tester_test_passed();
-+		return;
-+	}
-+	FAIL_TEST();
-+}
-+
-+static void cggit_track_duration(void *data, int32_t value)
-+{
-+	if ((uint32_t)value == 0xffffffff)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+static void cggit_track_position(void *user_data, int32_t value)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_debug("position %d", value);
-+	if ((uint32_t)value == 0xffffffff && data->step == 0)
-+		; /* ok */
-+	else if (value == -777 && data->step == 1)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+static void cggit_play_speed(void *user_data, int8_t value)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_debug("play speed %d", value);
-+
-+	if (value == 0 && data->step == 0)
-+		; /* ok */
-+	else if (value == 0x07 && data->step == 1)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+static void cggit_seek_speed(void *data, int8_t value)
-+{
-+	if (value == 0)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+static void cggit_play_order(void *user_data, uint8_t value)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_debug("play order %u", value);
-+
-+	if (value == 0x04 && data->step == 0)
-+		; /* ok */
-+	else if (value == 0x05 && data->step == 1)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+static void cggit_media_state(void *data, uint8_t value)
-+{
-+	if (value == 0x00)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+static void cggit_complete(void *user_data, unsigned int id, uint8_t res)
-+{
-+	struct test_data *data = user_data;
-+
-+	if (!res || id != data->id) {
-+		FAIL_TEST();
-+		return;
-+	}
-+
-+	data->step--;
-+}
-+
-+#define CGGIT_CHA_BV_01_C
-+
-+const struct test_config cfg_cggit_cha_bv_01_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.media_player_name = cggit_player_name,
-+	},
-+	.mcp_cb = &mcp_cb,
-+	.setup_data = setup_data_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
-+	.gmcs = false,
-+};
-+
-+#define CGGIT_CHA_BV_23_C
-+
-+const struct test_config cfg_cggit_cha_bv_23_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.media_player_name = cggit_player_name,
-+	},
-+	.mcp_cb = &mcp_cb,
-+	.setup_data = setup_data_gmcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_gmcs),
-+	.gmcs = true,
-+};
-+
-+#define CGGIT_CHA_BV_04_C \
-+	NOTIFY_CHRC(TRACK_CHG), \
-+	IOV_NULL
-+
-+const struct test_config cfg_cggit_cha_bv_04_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.track_changed = cggit_track_changed,
-+	},
-+	.mcp_cb = &mcp_cb,
-+	.setup_data = setup_data_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
-+	.gmcs = false,
-+};
-+
-+#define CGGIT_CHA_BV_05_C
-+
-+const struct test_config cfg_cggit_cha_bv_05_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.track_title = cggit_track_title,
-+	},
-+	.mcp_cb = &mcp_cb,
-+	.setup_data = setup_data_gmcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_gmcs),
-+	.gmcs = true,
-+};
-+
-+#define CGGIT_CHA_BV_06_C
-+
-+const struct test_config cfg_cggit_cha_bv_06_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.track_duration = cggit_track_duration,
-+	},
-+	.mcp_cb = &mcp_cb,
-+	.setup_data = setup_data_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
-+	.gmcs = false,
-+};
-+
-+#define CGGIT_CHA_BV_07_C \
-+	WRITE_CHRC(TRACK_POS, 0xf7, 0xfc, 0xff, 0xff), \
-+	NOTIFY_CHRC(TRACK_POS, 0xf7, 0xfc, 0xff, 0xff)
-+
-+static void cggit_ready_cha_bv_07_c(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t ccid = 0x01;
-+
-+	data->step = 2;
-+	data->id = bt_mcp_set_track_position(data->mcp, ccid, -777);
-+}
-+
-+const struct test_config cfg_cggit_cha_bv_07_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.track_position = cggit_track_position,
-+	},
-+	.mcp_cb = &(struct bt_mcp_callback) {
-+		.ccid = mcp_ccid,
-+		.debug = mcp_debug,
-+		.ready = cggit_ready_cha_bv_07_c,
-+		.complete = cggit_complete,
-+	},
-+	.setup_data = setup_data_gmcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_gmcs),
-+	.gmcs = true,
-+};
-+
-+#define CGGIT_CHA_BV_08_C \
-+	WRITE_CHRC(PLAY_SPEED, 0x07), \
-+	NOTIFY_CHRC(PLAY_SPEED, 0x07)
-+
-+static void cggit_ready_cha_bv_08_c(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t ccid = 0x01;
-+
-+	data->step = 2;
-+	data->id = bt_mcp_set_playback_speed(data->mcp, ccid, 7);
-+}
-+
-+const struct test_config cfg_cggit_cha_bv_08_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.playback_speed = cggit_play_speed,
-+	},
-+	.mcp_cb = &(struct bt_mcp_callback) {
-+		.ccid = mcp_ccid,
-+		.debug = mcp_debug,
-+		.ready = cggit_ready_cha_bv_08_c,
-+		.complete = cggit_complete,
-+	},
-+	.setup_data = setup_data_gmcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_gmcs),
-+	.gmcs = true,
-+};
-+
-+#define CGGIT_CHA_BV_09_C
-+
-+const struct test_config cfg_cggit_cha_bv_09_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.seeking_speed = cggit_seek_speed,
-+	},
-+	.mcp_cb = &mcp_cb,
-+	.setup_data = setup_data_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
-+	.gmcs = false,
-+};
-+
-+#define CGGIT_CHA_BV_15_C \
-+	WRITE_CHRC(PLAY_ORDER, 0x05), \
-+	READ_CHRC(PLAY_ORDER, 0x05)	/* no notify, so bt_mcp reads */
-+
-+static void cggit_ready_cha_bv_15_c(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t ccid = 0x01;
-+
-+	/* check not supported order */
-+	if (bt_mcp_set_playing_order(data->mcp, ccid, 0x06)) {
-+		FAIL_TEST();
-+		return;
-+	}
-+
-+	data->step = 2;
-+	data->id = bt_mcp_set_playing_order(data->mcp, ccid, 0x05);
-+}
-+
-+const struct test_config cfg_cggit_cha_bv_15_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.playing_order = cggit_play_order,
-+	},
-+	.mcp_cb = &(struct bt_mcp_callback) {
-+		.ccid = mcp_ccid,
-+		.debug = mcp_debug,
-+		.ready = cggit_ready_cha_bv_15_c,
-+		.complete = cggit_complete,
-+	},
-+	.setup_data = setup_data_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
-+	.gmcs = false,
-+};
-+
-+#define CGGIT_CHA_BV_16_C
-+
-+static void cggit_ready_cha_bv_16_c(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t ccid = 0x01;
-+	uint8_t order = bt_mcp_get_supported_playing_order(data->mcp, ccid);
-+
-+	tester_debug("0x%x", order);
-+
-+	if (order == 0x18)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+const struct test_config cfg_cggit_cha_bv_16_c = {
-+	.mcp_cb = &(struct bt_mcp_callback) {
-+		.ready = cggit_ready_cha_bv_16_c,
-+		.ccid = mcp_ccid,
-+		.debug = mcp_debug,
-+	},
-+	.setup_data = setup_data_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
-+	.gmcs = false,
-+};
-+
-+#define CGGIT_CHA_BV_17_C
-+
-+const struct test_config cfg_cggit_cha_bv_17_c = {
-+	.listener_cb = &(struct bt_mcp_listener_callback) {
-+		.media_state = cggit_media_state,
-+	},
-+	.mcp_cb = &mcp_cb,
-+	.setup_data = setup_data_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
-+	.gmcs = false,
-+};
-+
-+#define CGGIT_CHA_BV_18_C \
-+	WRITE_NORESP_CHRC(CP, 0x01), \
-+	NOTIFY_CHRC(CP, 0x01, 0x01)
-+
-+static void cggit_complete_cha_bv_18_c(void *user_data, unsigned int id,
-+								uint8_t result)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_debug("complete %d expect %d result %u", id, data->id, result);
-+
-+	if (id == data->id && result == 0x01)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+static void cggit_ready_cha_bv_18_c(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t ccid = 0x01;
-+
-+	data->id = bt_mcp_play(data->mcp, ccid);
-+}
-+
-+const struct test_config cfg_cggit_cha_bv_18_c = {
-+	.mcp_cb = &(struct bt_mcp_callback) {
-+		.ready = cggit_ready_cha_bv_18_c,
-+		.complete = cggit_complete_cha_bv_18_c,
-+		.ccid = mcp_ccid,
-+		.debug = mcp_debug,
-+	},
-+	.setup_data = setup_data_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
-+	.gmcs = false,
-+};
-+
-+#define CGGIT_CHA_BV_19_C
-+
-+static void cggit_ready_cha_bv_19_c(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t ccid = 0x01;
-+	uint32_t support = bt_mcp_get_supported_commands(data->mcp, ccid);
-+
-+	if (support == 0x001fffff)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+const struct test_config cfg_cggit_cha_bv_19_c = {
-+	.mcp_cb = &(struct bt_mcp_callback) {
-+		.ready = cggit_ready_cha_bv_19_c,
-+		.ccid = mcp_ccid,
-+		.debug = mcp_debug,
-+	},
-+	.setup_data = setup_data_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
-+	.gmcs = false,
-+};
-+
-+#define MCCP_BASIC(op, result, data...) \
-+	WRITE_NORESP_CHRC(CP, op, data), \
-+	NOTIFY_CHRC(CP, op, result)
-+
-+static void mccp_basic_complete(void *user_data, unsigned int id,
-+								uint8_t result)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_debug("complete %d expect %d result %u", id, data->id, result);
-+
-+	if (id == data->id && result == 0x01)
-+		tester_test_passed();
-+	else
-+		FAIL_TEST();
-+}
-+
-+static void mccp_basic_ready(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t ccid = 0x01;
-+
-+	switch (data->cfg->expect_cmd) {
-+	case 0x01:
-+		data->id = bt_mcp_play(data->mcp, ccid);
-+		break;
-+	case 0x02:
-+		data->id = bt_mcp_pause(data->mcp, ccid);
-+		break;
-+	case 0x03:
-+		data->id = bt_mcp_fast_rewind(data->mcp, ccid);
-+		break;
-+	case 0x04:
-+		data->id = bt_mcp_fast_forward(data->mcp, ccid);
-+		break;
-+	case 0x05:
-+		data->id = bt_mcp_stop(data->mcp, ccid);
-+		break;
-+	case 0x10:
-+		data->id = bt_mcp_move_relative(data->mcp, ccid, 0x42);
-+		break;
-+	case 0x20:
-+		data->id = bt_mcp_previous_segment(data->mcp, ccid);
-+		break;
-+	case 0x21:
-+		data->id = bt_mcp_next_segment(data->mcp, ccid);
-+		break;
-+	case 0x22:
-+		data->id = bt_mcp_first_segment(data->mcp, ccid);
-+		break;
-+	case 0x23:
-+		data->id = bt_mcp_last_segment(data->mcp, ccid);
-+		break;
-+	case 0x24:
-+		data->id = bt_mcp_goto_segment(data->mcp, ccid,
-+							(int32_t)0xfffffff0u);
-+		break;
-+	case 0x30:
-+		data->id = bt_mcp_previous_track(data->mcp, ccid);
-+		break;
-+	case 0x31:
-+		data->id = bt_mcp_next_track(data->mcp, ccid);
-+		break;
-+	case 0x32:
-+		data->id = bt_mcp_first_track(data->mcp, ccid);
-+		break;
-+	case 0x33:
-+		data->id = bt_mcp_last_track(data->mcp, ccid);
-+		break;
-+	case 0x34:
-+		data->id = bt_mcp_goto_track(data->mcp, ccid,
-+							(int32_t)0xfffffff1u);
-+		break;
-+	case 0x40:
-+		data->id = bt_mcp_previous_group(data->mcp, ccid);
-+		break;
-+	case 0x41:
-+		data->id = bt_mcp_next_group(data->mcp, ccid);
-+		break;
-+	case 0x42:
-+		data->id = bt_mcp_first_group(data->mcp, ccid);
-+		break;
-+	case 0x43:
-+		data->id = bt_mcp_last_group(data->mcp, ccid);
-+		break;
-+	case 0x44:
-+		data->id = bt_mcp_goto_group(data->mcp, ccid,
-+							(int32_t)0xfffffff2u);
-+		break;
-+	}
-+}
-+
-+static const struct bt_mcp_callback mccp_basic_mcp_cb = {
-+	.ready = mccp_basic_ready,
-+	.complete = mccp_basic_complete,
-+	.debug = mcp_debug,
-+};
-+
-+#define MCCP_BASIC_CFG(name_, cmd) \
-+	const struct test_config name_ = { \
-+		.expect_cmd = cmd, \
-+		.expect_cmd_result = 0x01, \
-+		.mcp_cb = &mccp_basic_mcp_cb, \
-+		.setup_data = setup_data_mcs, \
-+		.setup_data_len = ARRAY_SIZE(setup_data_mcs), \
-+		.gmcs = false, \
-+	}
-+
-+#define MCCP_BV_01_C	MCCP_BASIC(0x01, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_01_c, 0x01);
-+
-+#define MCCP_BV_02_C	MCCP_BASIC(0x02, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_02_c, 0x02);
-+
-+#define MCCP_BV_03_C	MCCP_BASIC(0x03, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_03_c, 0x03);
-+
-+#define MCCP_BV_04_C	MCCP_BASIC(0x04, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_04_c, 0x04);
-+
-+#define MCCP_BV_05_C	MCCP_BASIC(0x05, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_05_c, 0x05);
-+
-+#define MCCP_BV_06_C	MCCP_BASIC(0x10, 0x01, 0x42, 0x00, 0x00, 0x00)
-+MCCP_BASIC_CFG(cfg_mccp_bv_06_c, 0x10);
-+
-+#define MCCP_BV_07_C	MCCP_BASIC(0x20, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_07_c, 0x20);
-+
-+#define MCCP_BV_08_C	MCCP_BASIC(0x21, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_08_c, 0x21);
-+
-+#define MCCP_BV_09_C	MCCP_BASIC(0x22, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_09_c, 0x22);
-+
-+#define MCCP_BV_10_C	MCCP_BASIC(0x23, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_10_c, 0x23);
-+
-+#define MCCP_BV_11_C	MCCP_BASIC(0x24, 0x01, 0xf0, 0xff, 0xff, 0xff)
-+MCCP_BASIC_CFG(cfg_mccp_bv_11_c, 0x24);
-+
-+#define MCCP_BV_12_C	MCCP_BASIC(0x30, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_12_c, 0x30);
-+
-+#define MCCP_BV_13_C	MCCP_BASIC(0x31, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_13_c, 0x31);
-+
-+#define MCCP_BV_14_C	MCCP_BASIC(0x32, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_14_c, 0x32);
-+
-+#define MCCP_BV_15_C	MCCP_BASIC(0x33, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_15_c, 0x33);
-+
-+#define MCCP_BV_16_C	MCCP_BASIC(0x34, 0x01, 0xf1, 0xff, 0xff, 0xff)
-+MCCP_BASIC_CFG(cfg_mccp_bv_16_c, 0x34);
-+
-+#define MCCP_BV_17_C	MCCP_BASIC(0x40, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_17_c, 0x40);
-+
-+#define MCCP_BV_18_C	MCCP_BASIC(0x41, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_18_c, 0x41);
-+
-+#define MCCP_BV_19_C	MCCP_BASIC(0x42, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_19_c, 0x42);
-+
-+#define MCCP_BV_20_C	MCCP_BASIC(0x43, 0x01)
-+MCCP_BASIC_CFG(cfg_mccp_bv_20_c, 0x43);
-+
-+#define MCCP_BV_21_C	MCCP_BASIC(0x44, 0x01, 0xf2, 0xff, 0xff, 0xff)
-+MCCP_BASIC_CFG(cfg_mccp_bv_21_c, 0x44);
-+
-+static void testgroup_cl_cggit(void)
-+{
-+	/* MCP.TS Sec. 4.3 Generic GATT Integration Tests */
-+	define_test("MCP/CL/CGGIT/CHA/BV-01-C [Characteristic GGIT - Media "
-+								"Player Name]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_01_c, CGGIT_CHA_BV_01_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-23-C [Characteristic GGIT - Media "
-+							"Player Name - GMCS]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_23_c, CGGIT_CHA_BV_23_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-04-C [Characteristic GGIT - Track "
-+								"Changed]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_04_c, CGGIT_CHA_BV_04_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-05-C [Characteristic GGIT - Track "
-+								"Title]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_05_c, CGGIT_CHA_BV_05_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-06-C [Characteristic GGIT - Track "
-+								"Duration]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_06_c, CGGIT_CHA_BV_06_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-07-C [Characteristic GGIT - Track "
-+								"Position]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_07_c, CGGIT_CHA_BV_07_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-08-C [Characteristic GGIT - Playback "
-+								"Speed]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_08_c, CGGIT_CHA_BV_08_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-09-C [Characteristic GGIT - Seeking "
-+								"Speed]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_09_c, CGGIT_CHA_BV_09_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-15-C [Characteristic GGIT - Playing "
-+								"Order]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_15_c, CGGIT_CHA_BV_15_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-16-C [Characteristic GGIT - Playing "
-+							"Order Supported]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_16_c, CGGIT_CHA_BV_16_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-17-C [Characteristic GGIT - Media "
-+								"State]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_17_c, CGGIT_CHA_BV_17_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-18-C [Characteristic GGIT - Media "
-+							"Control Point]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_18_c, CGGIT_CHA_BV_18_C);
-+	define_test("MCP/CL/CGGIT/CHA/BV-19-C [Characteristic GGIT - Media "
-+						"Control Opcodes Supported]",
-+		test_setup, test_client,
-+		&cfg_cggit_cha_bv_19_c, CGGIT_CHA_BV_19_C);
-+}
-+
-+static void testgroup_cl_mccp(void)
-+{
-+	/* MCP.TS Sec. 4.5 Service Procedure - Media Control Point */
-+	define_test("MCP/CL/MCCP/BV-01-C [Media Control Point - Play]",
-+		test_setup, test_client, &cfg_mccp_bv_01_c, MCCP_BV_01_C);
-+	define_test("MCP/CL/MCCP/BV-02-C [Media Control Point - Pause]",
-+		test_setup, test_client, &cfg_mccp_bv_02_c, MCCP_BV_02_C);
-+	define_test("MCP/CL/MCCP/BV-03-C [Media Control Point - Fast Rewind]",
-+		test_setup, test_client, &cfg_mccp_bv_03_c, MCCP_BV_03_C);
-+	define_test("MCP/CL/MCCP/BV-04-C [Media Control Point - Fast Forward]",
-+		test_setup, test_client, &cfg_mccp_bv_04_c, MCCP_BV_04_C);
-+	define_test("MCP/CL/MCCP/BV-05-C [Media Control Point - Stop]",
-+		test_setup, test_client, &cfg_mccp_bv_05_c, MCCP_BV_05_C);
-+	define_test("MCP/CL/MCCP/BV-06-C [Media Control Point - Move Relative]",
-+		test_setup, test_client, &cfg_mccp_bv_06_c, MCCP_BV_06_C);
-+	define_test("MCP/CL/MCCP/BV-07-C [Media Control Point - Previous "
-+								"Segment]",
-+		test_setup, test_client, &cfg_mccp_bv_07_c, MCCP_BV_07_C);
-+	define_test("MCP/CL/MCCP/BV-08-C [Media Control Point - Next Segment]",
-+		test_setup, test_client, &cfg_mccp_bv_08_c, MCCP_BV_08_C);
-+	define_test("MCP/CL/MCCP/BV-09-C [Media Control Point - First Segment]",
-+		test_setup, test_client, &cfg_mccp_bv_09_c, MCCP_BV_09_C);
-+	define_test("MCP/CL/MCCP/BV-10-C [Media Control Point - Last Segment]",
-+		test_setup, test_client, &cfg_mccp_bv_10_c, MCCP_BV_10_C);
-+	define_test("MCP/CL/MCCP/BV-11-C [Media Control Point - Goto Segment]",
-+		test_setup, test_client, &cfg_mccp_bv_11_c, MCCP_BV_11_C);
-+	define_test("MCP/CL/MCCP/BV-12-C [Media Control Point - Previous "
-+								"Track]",
-+		test_setup, test_client, &cfg_mccp_bv_12_c, MCCP_BV_12_C);
-+	define_test("MCP/CL/MCCP/BV-13-C [Media Control Point - Next Track]",
-+		test_setup, test_client, &cfg_mccp_bv_13_c, MCCP_BV_13_C);
-+	define_test("MCP/CL/MCCP/BV-14-C [Media Control Point - First Track]",
-+		test_setup, test_client, &cfg_mccp_bv_14_c, MCCP_BV_14_C);
-+	define_test("MCP/CL/MCCP/BV-15-C [Media Control Point - Last Track]",
-+		test_setup, test_client, &cfg_mccp_bv_15_c, MCCP_BV_15_C);
-+	define_test("MCP/CL/MCCP/BV-16-C [Media Control Point - Goto Track]",
-+		test_setup, test_client, &cfg_mccp_bv_16_c, MCCP_BV_16_C);
-+	define_test("MCP/CL/MCCP/BV-17-C [Media Control Point - Previous "
-+								"Group]",
-+		test_setup, test_client, &cfg_mccp_bv_17_c, MCCP_BV_17_C);
-+	define_test("MCP/CL/MCCP/BV-18-C [Media Control Point - Next Group]",
-+		test_setup, test_client, &cfg_mccp_bv_18_c, MCCP_BV_18_C);
-+	define_test("MCP/CL/MCCP/BV-19-C [Media Control Point - First Group]",
-+		test_setup, test_client, &cfg_mccp_bv_19_c, MCCP_BV_19_C);
-+	define_test("MCP/CL/MCCP/BV-20-C [Media Control Point - Last Group]",
-+		test_setup, test_client, &cfg_mccp_bv_20_c, MCCP_BV_20_C);
-+	define_test("MCP/CL/MCCP/BV-21-C [Media Control Point - Goto Group]",
-+		test_setup, test_client, &cfg_mccp_bv_21_c, MCCP_BV_21_C);
-+}
-+
++unsigned int bt_mcp_play(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_pause(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_fast_rewind(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_fast_forward(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_stop(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_move_relative(struct bt_mcp *mcp, uint8_t ccid,
++								int32_t offset);
++
++unsigned int bt_mcp_previous_segment(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_next_segment(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_first_segment(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_last_segment(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_goto_segment(struct bt_mcp *mcp, uint8_t ccid, int32_t n);
++
++unsigned int bt_mcp_previous_track(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_next_track(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_first_track(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_last_track(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_goto_track(struct bt_mcp *mcp, uint8_t ccid, int32_t n);
++
++unsigned int bt_mcp_previous_group(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_next_group(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_first_group(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_last_group(struct bt_mcp *mcp, uint8_t ccid);
++unsigned int bt_mcp_goto_group(struct bt_mcp *mcp, uint8_t ccid, int32_t n);
++
++unsigned int bt_mcp_set_track_position(struct bt_mcp *mcp, uint8_t ccid,
++							int32_t position);
++unsigned int bt_mcp_set_playback_speed(struct bt_mcp *mcp, uint8_t ccid,
++							int8_t speed);
++unsigned int bt_mcp_set_playing_order(struct bt_mcp *mcp, uint8_t ccid,
++							uint8_t order);
++
++uint16_t bt_mcp_get_supported_playing_order(struct bt_mcp *mcp, uint8_t ccid);
++uint32_t bt_mcp_get_supported_commands(struct bt_mcp *mcp, uint8_t ccid);
++
++bool bt_mcp_add_listener(struct bt_mcp *mcp, uint8_t ccid,
++				const struct bt_mcp_listener_callback *cb,
+ 				void *user_data);
+ 
+-bool bt_mcp_set_debug(struct bt_mcp *mcp, bt_mcp_debug_func_t cb,
+-			void *user_data, bt_mcp_destroy_func_t destroy);
+-
+-void bt_mcp_register(struct gatt_db *db);
+-bool bt_mcp_attach(struct bt_mcp *mcp, struct bt_gatt_client *client);
++struct bt_mcp *bt_mcp_attach(struct bt_gatt_client *client, bool gmcs,
++				const struct bt_mcp_callback *cb,
++				void *user_data);
+ void bt_mcp_detach(struct bt_mcp *mcp);
+ 
+-struct bt_mcp *bt_mcp_new(struct gatt_db *ldb, struct gatt_db *rdb);
+-struct bt_mcp *bt_mcp_ref(struct bt_mcp *mcp);
+-void bt_mcp_unref(struct bt_mcp *mcp);
 +/*
-+ * Server tests
++ * Media Control Server
 + */
+ 
+-bool bt_mcp_set_user_data(struct bt_mcp *mcp, void *user_data);
+-void *bt_mcp_get_user_data(struct bt_mcp *mcp);
++struct bt_mcs_callback {
++	/* Value requests */
++	void (*media_player_name)(void *data, struct iovec *buf, size_t size);
++	void (*track_title)(void *data, struct iovec *buf, size_t size);
++	int32_t (*track_duration)(void *data);
++	int32_t (*track_position)(void *data);
++	int8_t (*playback_speed)(void *data);
++	int8_t (*seeking_speed)(void *data);
++	uint8_t (*playing_order)(void *data);
++	uint16_t (*playing_order_supported)(void *data);
++	uint32_t (*media_cp_op_supported)(void *data);
+ 
+-unsigned int bt_mcp_play(struct bt_mcp *mcp);
+-unsigned int bt_mcp_pause(struct bt_mcp *mcp);
+-unsigned int bt_mcp_stop(struct bt_mcp *mcp);
+-unsigned int bt_mcp_next_track(struct bt_mcp *mcp);
+-unsigned int bt_mcp_previous_track(struct bt_mcp *mcp);
++	/* TODO: OTS */
 +
-+static const struct iovec setup_data_server_mcs[] = {
-+	GMCS_SETUP(0, MCS_SERVICE),
++	/* Set value notification */
++	bool (*set_track_position)(void *data, int32_t value);
++	bool (*set_playback_speed)(void *data, int8_t value);
++	bool (*set_playing_order)(void *data, uint8_t value);
++
++	/* Command notification */
++	bool (*play)(void *data);
++	bool (*pause)(void *data);
++	bool (*fast_rewind)(void *data);
++	bool (*fast_forward)(void *data);
++	bool (*stop)(void *data);
++	bool (*move_relative)(void *data, int32_t offset);
++
++	bool (*previous_segment)(void *data);
++	bool (*next_segment)(void *data);
++	bool (*first_segment)(void *data);
++	bool (*last_segment)(void *data);
++	bool (*goto_segment)(void *data, int32_t n);
++
++	bool (*previous_track)(void *data);
++	bool (*next_track)(void *data);
++	bool (*first_track)(void *data);
++	bool (*last_track)(void *data);
++	bool (*goto_track)(void *data, int32_t n);
++
++	bool (*previous_group)(void *data);
++	bool (*next_group)(void *data);
++	bool (*first_group)(void *data);
++	bool (*last_group)(void *data);
++	bool (*goto_group)(void *data, int32_t n);
++
++	/* Debug message */
++	void (*debug)(void *data, const char *str);
++
++	/* Player destroyed (no further callbacks) */
++	void (*destroy)(void *data);
 +};
 +
-+static const struct iovec setup_data_server_gmcs[] = {
-+	GMCS_SETUP(0, GMCS_SERVICE),
-+};
-+
-+static void sggit_player_name(void *data, struct iovec *buf, size_t size)
-+{
-+	util_iov_push_mem(buf, 5, "BlueZ");
-+}
-+
-+static void sggit_track_title(void *data, struct iovec *buf, size_t size)
-+{
-+	util_iov_push_mem(buf, 5, "Title");
-+}
-+
-+static int32_t sggit_track_duration(void *data)
-+{
-+	return 0x00004321;
-+}
-+
-+static int32_t sggit_track_position(void *data)
-+{
-+	return 0x00001234;
-+}
-+
-+static int8_t sggit_playback_speed(void *data)
-+{
-+	return 0x03;
-+}
-+
-+static int8_t sggit_seeking_speed(void *data)
-+{
-+	return 0x05;
-+}
-+
-+static uint8_t sggit_playing_order(void *data)
-+{
-+	return 0x04;
-+}
-+
-+static uint16_t sggit_playing_order_supported(void *data)
-+{
-+	return 0x18;
-+}
-+
-+static uint32_t sggit_media_cp_op_supported(void *data)
-+{
-+	return 0x11;
-+}
-+
-+static bool sggit_set_track_position(void *user_data, int32_t value)
-+{
-+	struct test_data *data = user_data;
-+
-+	if (value == 0x5678)
-+		data->step--;
-+	return false;
-+}
-+
-+static bool sggit_set_playback_speed(void *user_data, int8_t value)
-+{
-+	struct test_data *data = user_data;
-+
-+	if (value == 0x42)
-+		data->step--;
-+	return true;
-+}
-+
-+static bool sggit_set_playing_order(void *user_data, uint8_t value)
-+{
-+	struct test_data *data = user_data;
-+
-+	if (value == 0x05)
-+		data->step--;
-+	return false;
-+}
-+
-+static bool sggit_play(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	data->step--;
-+	return false;
-+}
-+
-+const struct bt_mcs_callback sggit_cha_mcs = {
-+	.media_player_name = sggit_player_name,
-+	.track_title = sggit_track_title,
-+	.track_duration = sggit_track_duration,
-+	.track_position = sggit_track_position,
-+	.playback_speed = sggit_playback_speed,
-+	.seeking_speed = sggit_seeking_speed,
-+	.playing_order = sggit_playing_order,
-+	.playing_order_supported = sggit_playing_order_supported,
-+	.media_cp_op_supported = sggit_media_cp_op_supported,
-+	.set_track_position = sggit_set_track_position,
-+	.set_playback_speed = sggit_set_playback_speed,
-+	.set_playing_order = sggit_set_playing_order,
-+	.play = sggit_play,
-+	.debug = mcs_debug,
-+};
-+
-+const struct test_config cfg_sggit_mcs = {
-+	.mcs_cb = &sggit_cha_mcs,
-+	.setup_data = setup_data_server_mcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_server_mcs),
-+	.gmcs = false,
-+};
-+
-+const struct test_config cfg_sggit_gmcs = {
-+	.mcs_cb = &sggit_cha_mcs,
-+	.setup_data = setup_data_server_gmcs,
-+	.setup_data_len = ARRAY_SIZE(setup_data_server_gmcs),
-+	.gmcs = true,
-+};
-+
-+#define SGGIT_CHA_BV_01_C \
-+	READ_CHRC(NAME, 'B', 'l', 'u', 'e', 'Z')
-+
-+#define SGGIT_CHA_BV_04_C \
-+	NOTIFY_CHRC(TRACK_CHG)
-+
-+static void test_sggit_cha_bv_04_c(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+
-+	test_server(data);
-+	bt_mcs_changed(data->mcs, MCS_TRACK_CHANGED_CHRC_UUID);
-+}
-+
-+#define SGGIT_CHA_BV_05_C \
-+	READ_CHRC(TRACK_TITLE, 'T', 'i', 't', 'l', 'e')
-+
-+#define SGGIT_CHA_BV_06_C \
-+	READ_CHRC(TRACK_DUR, 0x21, 0x43, 0x00, 0x00)
-+
-+#define SGGIT_CHA_BV_07_C \
-+	READ_CHRC(TRACK_POS, 0x34, 0x12, 0x00, 0x00), \
-+	WRITE_ERR_CHRC(TRACK_POS, 0x13, 0x78, 0x56, 0x00, 0x00)
-+
-+static void test_sggit_step(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+
-+	data->step++;
-+	test_server(data);
-+}
-+
-+#define SGGIT_CHA_BV_08_C \
-+	READ_CHRC(PLAY_SPEED, 0x03), \
-+	WRITE_CHRC(PLAY_SPEED, 0x42)
-+
-+#define SGGIT_CHA_BV_09_C \
-+	READ_CHRC(SEEK_SPEED, 0x05)
-+
-+#define SGGIT_CHA_BV_15_C \
-+	READ_CHRC(PLAY_ORDER, 0x04), \
-+	WRITE_ERR_CHRC(PLAY_ORDER, 0x13, 0x05)
-+
-+#define SGGIT_CHA_BV_16_C \
-+	READ_CHRC(PLAY_ORDER_SUPP, 0x18, 0x00)
-+
-+#define SGGIT_CHA_BV_17_C \
-+	READ_CHRC(STATE, 0x00)
-+
-+#define SGGIT_CHA_BV_18_C \
-+	WRITE_CHRC(CP, 0x01), \
-+	NOTIFY_CHRC(CP, 0x01, 0x03 /* inactive */), \
-+	WRITE_CHRC(CP, 0x10), \
-+	NOTIFY_CHRC(CP, 0x10, 0x02 /* not supp */)
-+
-+#define SGGIT_CHA_BV_19_C \
-+	READ_CHRC(CP_SUPP, 0x01, 0x00, 0x00, 0x00)
-+
-+#define SGGIT_CHA_BV_22_C \
-+	READ_CHRC(CCID, 0x00)
-+
-+static void testgroup_sr_sggit(void)
-+{
-+	/* MCS.TS Sec 4.3 Generic GATT Integrated Tests (MCS) */
-+	define_test("MCS/SR/SGGIT/CHA/BV-01-C [Characteristic GGIT - Media "
-+							"Player Name, MCS]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_01_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-04-C [Characteristic GGIT - Track "
-+								"Changed]",
-+		test_setup_server, test_sggit_cha_bv_04_c,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_04_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-05-C [Characteristic GGIT - Track "
-+								"Title]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_05_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-06-C [Characteristic GGIT - Track "
-+								"Duration]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_06_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-07-C [Characteristic GGIT - Track "
-+								"Position]",
-+		test_setup_server, test_sggit_step,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_07_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-08-C [Characteristic GGIT - Playback "
-+								"Speed]",
-+		test_setup_server, test_sggit_step,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_08_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-09-C [Characteristic GGIT - Seeking "
-+								"Speed]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_09_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-15-C [Characteristic GGIT - Playing "
-+								"Order]",
-+		test_setup_server, test_sggit_step,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_15_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-16-C [Characteristic GGIT - Playing "
-+							"Order Supported]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_16_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-17-C [Characteristic GGIT - Media "
-+								"State]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_17_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-18-C [Characteristic GGIT - Media "
-+							"Control Point]",
-+		test_setup_server, test_sggit_step,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_18_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-19-C [Characteristic GGIT - Media "
-+					"Control Point Opcodes Supported]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_19_C);
-+	define_test("MCS/SR/SGGIT/CHA/BV-22-C [Characteristic GGIT - Content "
-+								"Control ID]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_mcs, SGGIT_CHA_BV_22_C);
-+
-+	/* MCS.TS Sec 4.3 Generic GATT Integrated Tests (GMCS) */
-+	define_test("GMCS/SR/SGGIT/CHA/BV-01-C [Characteristic GGIT - Media "
-+							"Player Name, GMCS]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_01_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-04-C [Characteristic GGIT - Track "
-+								"Changed]",
-+		test_setup_server, test_sggit_cha_bv_04_c,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_04_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-05-C [Characteristic GGIT - Track "
-+								"Title]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_05_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-06-C [Characteristic GGIT - Track "
-+								"Duration]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_06_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-07-C [Characteristic GGIT - Track "
-+								"Position]",
-+		test_setup_server, test_sggit_step,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_07_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-08-C [Characteristic GGIT - Playback "
-+								"Speed]",
-+		test_setup_server, test_sggit_step,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_08_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-09-C [Characteristic GGIT - Seeking "
-+								"Speed]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_09_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-15-C [Characteristic GGIT - Playing "
-+								"Order]",
-+		test_setup_server, test_sggit_step,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_15_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-16-C [Characteristic GGIT - Playing "
-+							"Order Supported]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_16_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-17-C [Characteristic GGIT - Media "
-+								"State]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_17_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-18-C [Characteristic GGIT - Media "
-+							"Control Point]",
-+		test_setup_server, test_sggit_step,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_18_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-19-C [Characteristic GGIT - Media "
-+					"Control Point Opcodes Supported]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_19_C);
-+	define_test("GMCS/SR/SGGIT/CHA/BV-22-C [Characteristic GGIT - Content "
-+								"Control ID]",
-+		test_setup_server, test_server,
-+		&cfg_sggit_gmcs, SGGIT_CHA_BV_22_C);
-+}
-+
-+static uint32_t sr_mcp_media_cp_op_supported(void *data)
-+{
-+	return 0x001fffff;  /* everything supported */
-+}
-+
-+static bool sr_mcp_op_success(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_debug("Command OK");
-+	data->step--;
-+	return true;
-+}
-+
-+static bool sr_mcp_op_success_inactive(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_debug("Command OK");
-+	data->step--;
-+	return bt_mcs_get_media_state(data->mcs) != BT_MCS_STATE_INACTIVE;
-+}
-+
-+static int32_t sr_mcp_track_position(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	return 71 - data->id;
-+}
-+
-+static bool sr_mcp_set_track_position(void *user_data, int32_t value)
-+{
-+	struct test_data *data = user_data;
-+
-+	data->id = 71 - value;
-+	return true;
-+}
-+
-+const struct bt_mcs_callback sr_mcp_mcs = {
-+	.media_cp_op_supported = sr_mcp_media_cp_op_supported,
-+	.play = sr_mcp_op_success,
-+	.pause = sr_mcp_op_success,
-+	.fast_rewind = sr_mcp_op_success,
-+	.fast_forward = sr_mcp_op_success,
-+	.stop = sr_mcp_op_success_inactive,
-+	.track_position = sr_mcp_track_position,
-+	.set_track_position = sr_mcp_set_track_position,
-+	.debug = mcs_debug,
-+};
-+
-+#define MCS_SR_MCP_CFG(name, initial) \
-+	const struct test_config cfg_mcs_sr_mcp_ ## name = { \
-+		.mcs_cb = &sr_mcp_mcs, \
-+		.setup_data = setup_data_server_mcs, \
-+		.setup_data_len = ARRAY_SIZE(setup_data_server_mcs), \
-+		.gmcs = false, \
-+		.state = initial, \
-+	}
-+
-+#define SR_MCP_CMD(cmd, initial, end_state) \
-+	NOTIFY_CHRC(STATE, initial), \
-+	WRITE_CHRC(CP, cmd), \
-+	NOTIFY_CHRC(STATE, end_state), \
-+	NOTIFY_CHRC(CP, cmd, 0x01)
-+
-+#define SR_MCP_CMD_INACTIVE(cmd, end_state) \
-+	WRITE_CHRC(CP, cmd), \
-+	NOTIFY_CHRC(STATE, end_state), \
-+	NOTIFY_CHRC(CP, cmd, 0x01)
-+
-+MCS_SR_MCP_CFG(bv_01_c, BT_MCS_STATE_PAUSED);
-+#define MCS_SR_MCP_BV_01_C \
-+	SR_MCP_CMD(BT_MCS_CMD_PLAY, BT_MCS_STATE_PAUSED, BT_MCS_STATE_PLAYING)
-+
-+MCS_SR_MCP_CFG(bv_02_c, BT_MCS_STATE_SEEKING);
-+#define MCS_SR_MCP_BV_02_C \
-+	SR_MCP_CMD(BT_MCS_CMD_PLAY, BT_MCS_STATE_SEEKING, BT_MCS_STATE_PLAYING)
-+
-+MCS_SR_MCP_CFG(bv_70_c, BT_MCS_STATE_INACTIVE);
-+#define MCS_SR_MCP_BV_70_C \
-+	SR_MCP_CMD_INACTIVE(BT_MCS_CMD_PLAY, BT_MCS_STATE_PLAYING)
-+
-+MCS_SR_MCP_CFG(bv_03_c, BT_MCS_STATE_PLAYING);
-+#define MCS_SR_MCP_BV_03_C \
-+	SR_MCP_CMD(BT_MCS_CMD_PAUSE, BT_MCS_STATE_PLAYING, BT_MCS_STATE_PAUSED)
-+
-+MCS_SR_MCP_CFG(bv_04_c, BT_MCS_STATE_SEEKING);
-+#define MCS_SR_MCP_BV_04_C \
-+	SR_MCP_CMD(BT_MCS_CMD_PAUSE, BT_MCS_STATE_SEEKING, BT_MCS_STATE_PAUSED)
-+
-+MCS_SR_MCP_CFG(bv_71_c, BT_MCS_STATE_INACTIVE);
-+#define MCS_SR_MCP_BV_71_C \
-+	SR_MCP_CMD_INACTIVE(BT_MCS_CMD_PAUSE, BT_MCS_STATE_PAUSED)
-+
-+#define SR_MCP_STOP(initial) \
-+	NOTIFY_CHRC(STATE, initial), \
-+	WRITE_CHRC(CP, BT_MCS_CMD_STOP), \
-+	NOTIFY_CHRC(STATE, BT_MCS_STATE_PAUSED), \
-+	NOTIFY_CHRC(TRACK_POS, 0x00, 0x00, 0x00, 0x00), \
-+	NOTIFY_CHRC(CP, BT_MCS_CMD_STOP, 0x01)
-+
-+#define SR_MCP_STOP_PAUSED \
-+	NOTIFY_CHRC(STATE, BT_MCS_STATE_PAUSED), \
-+	WRITE_CHRC(CP, BT_MCS_CMD_STOP), \
-+	NOTIFY_CHRC(TRACK_POS, 0x00, 0x00, 0x00, 0x00), \
-+	NOTIFY_CHRC(CP, BT_MCS_CMD_STOP, 0x01)
-+
-+#define SR_MCP_STOP_INACTIVE \
-+	WRITE_CHRC(CP, BT_MCS_CMD_STOP), \
-+	NOTIFY_CHRC(CP, BT_MCS_CMD_STOP, 0x03 /* inactive */)
-+
-+MCS_SR_MCP_CFG(bv_09_c, BT_MCS_STATE_PLAYING);
-+#define MCS_SR_MCP_BV_09_C SR_MCP_STOP(BT_MCS_STATE_PLAYING)
-+
-+MCS_SR_MCP_CFG(bv_10_c, BT_MCS_STATE_PAUSED);
-+#define MCS_SR_MCP_BV_10_C SR_MCP_STOP_PAUSED
-+
-+MCS_SR_MCP_CFG(bv_11_c, BT_MCS_STATE_SEEKING);
-+#define MCS_SR_MCP_BV_11_C SR_MCP_STOP(BT_MCS_STATE_SEEKING)
-+
-+MCS_SR_MCP_CFG(bv_74_c, BT_MCS_STATE_INACTIVE);
-+#define MCS_SR_MCP_BV_74_C SR_MCP_STOP_INACTIVE
-+
-+static void test_sr_mcp(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+
-+	bt_mcs_set_media_state(data->mcs, data->cfg->state);
-+	data->step++;
-+	test_server(data);
-+}
-+
-+static void testgroup_sr_mcp(void)
-+{
-+	/* Only the MCS tests. No point in GMCS as only svc uuid changes */
-+
-+	/* MCS.TS Sec 4.4.1 Play and Pause */
-+	define_test("MCS/SR/MCP/BV-01-C [Play from Paused]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_01_c, MCS_SR_MCP_BV_01_C);
-+	define_test("MCS/SR/MCP/BV-02-C [Play from Seeking]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_02_c, MCS_SR_MCP_BV_02_C);
-+	define_test("MCS/SR/MCP/BV-70-C [Play from Inactive]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_70_c, MCS_SR_MCP_BV_70_C);
-+	define_test("MCS/SR/MCP/BV-03-C [Pause from Playing]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_03_c, MCS_SR_MCP_BV_03_C);
-+	define_test("MCS/SR/MCP/BV-04-C [Pause from Seeking]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_04_c, MCS_SR_MCP_BV_04_C);
-+	define_test("MCS/SR/MCP/BV-71-C [Pause from Inactive]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_71_c, MCS_SR_MCP_BV_71_C);
-+
-+	/* MCS.TS Sec 4.4.3 Stop */
-+	define_test("MCS/SR/MCP/BV-09-C [Stop from Playing]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_09_c, MCS_SR_MCP_BV_09_C);
-+	define_test("MCS/SR/MCP/BV-10-C [Stop from Paused]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_10_c, MCS_SR_MCP_BV_10_C);
-+	define_test("MCS/SR/MCP/BV-11-C [Stop from Seeking]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_11_c, MCS_SR_MCP_BV_11_C);
-+	define_test("MCS/SR/MCP/BV-74-C [Stop from Inactive]",
-+		test_setup_server, test_sr_mcp,
-+		&cfg_mcs_sr_mcp_bv_74_c, MCS_SR_MCP_BV_74_C);
-+
-+	/* TODO: other state transition tests. They largely test the profile
-+	 * upper layer, so do not add much here.
-+	 */
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	tester_init(&argc, &argv);
-+	testgroup_cl_cggit();
-+	testgroup_cl_mccp();
-+	testgroup_sr_sggit();
-+	testgroup_sr_mcp();
-+
-+	return tester_run();
-+}
++void bt_mcs_set_media_state(struct bt_mcs *mcs, uint8_t state);
++uint8_t bt_mcs_get_media_state(struct bt_mcs *mcs);
++
++void bt_mcs_changed(struct bt_mcs *mcs, uint16_t chrc_uuid);
++uint8_t bt_mcs_get_ccid(struct bt_mcs *mcs);
++
++struct bt_mcs *bt_mcs_register(struct gatt_db *db, bool is_gmcs,
++			const struct bt_mcs_callback *cb, void *user_data);
++void bt_mcs_unregister(struct bt_mcs *mcs);
++void bt_mcs_unregister_all(struct gatt_db *db);
++
++/* For tests: */
++void bt_mcs_test_util_reset_ccid(void);
+diff --git a/src/shared/mcs.h b/src/shared/mcs.h
+index 09b3bffe8..f6666ab58 100644
+--- a/src/shared/mcs.h
++++ b/src/shared/mcs.h
+@@ -7,11 +7,54 @@
+  *
+  */
+ 
++#ifndef __packed
++#define __packed __attribute__((packed))
++#endif
++
++struct bt_mcs_cp_rsp {
++	uint8_t	op;
++	uint8_t	result;
++} __packed;
++
++/* MCP Track Position */
++#define BT_MCS_POSITION_UNAVAILABLE	((int32_t)0xffffffffu)
++#define BT_MCS_DURATION_UNAVAILABLE	((int32_t)0xffffffffu)
++
+ /* MCP Media State */
+-#define BT_MCS_STATUS_INACTIVE	0x00
+-#define BT_MCS_STATUS_PLAYING	0x01
+-#define BT_MCS_STATUS_PAUSED	0x02
+-#define BT_MCS_STATUS_SEEKING	0x03
++#define BT_MCS_STATE_INACTIVE	0x00
++#define BT_MCS_STATE_PLAYING	0x01
++#define BT_MCS_STATE_PAUSED	0x02
++#define BT_MCS_STATE_SEEKING	0x03
++
++/* MCP Playing Order */
++#define BT_MCS_ORDER_SINGLE_ONCE	0x01
++#define BT_MCS_ORDER_SINGLE_REPEAT	0x02
++#define BT_MCS_ORDER_IN_ORDER_ONCE	0x03
++#define BT_MCS_ORDER_IN_ORDER_REPEAT	0x04
++#define BT_MCS_ORDER_OLDEST_ONCE	0x05
++#define BT_MCS_ORDER_OLDEST_REPEAT	0x06
++#define BT_MCS_ORDER_NEWEST_ONCE	0x07
++#define BT_MCS_ORDER_NEWEST_REPEAT	0x08
++#define BT_MCS_ORDER_SHUFFLE_ONCE	0x09
++#define BT_MCS_ORDER_SHUFFLE_REPEAT	0x0a
++
++/* MCP Playing Order Supported */
++#define BT_MCS_ORDER_SUPPORTED_SINGLE_ONCE	0x0001
++#define BT_MCS_ORDER_SUPPORTED_SINGLE_REPEAT	0x0002
++#define BT_MCS_ORDER_SUPPORTED_IN_ORDER_ONCE	0x0004
++#define BT_MCS_ORDER_SUPPORTED_IN_ORDER_REPEAT	0x0008
++#define BT_MCS_ORDER_SUPPORTED_OLDEST_ONCE	0x0010
++#define BT_MCS_ORDER_SUPPORTED_OLDEST_REPEAT	0x0020
++#define BT_MCS_ORDER_SUPPORTED_NEWEST_ONCE	0x0040
++#define BT_MCS_ORDER_SUPPORTED_NEWEST_REPEAT	0x0080
++#define BT_MCS_ORDER_SUPPORTED_SHUFFLE_ONCE	0x0100
++#define BT_MCS_ORDER_SUPPORTED_SHUFFLE_REPEAT	0x0200
++
++/* Control Point result codes */
++#define BT_MCS_RESULT_SUCCESS			0x01
++#define BT_MCS_RESULT_OP_NOT_SUPPORTED		0x02
++#define BT_MCS_RESULT_MEDIA_PLAYER_INACTIVE	0x03
++#define BT_MCS_RESULT_COMMAND_CANNOT_COMPLETE	0x04
+ 
+ /* MCP Control Point Opcodes */
+ #define BT_MCS_CMD_PLAY			    0x01
 -- 
 2.51.1
 
