@@ -1,73 +1,72 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27CF3B8D5D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 15:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE7F23DEB6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 16:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765555095; cv=none; b=EAXRLGL/kfHvp5jsRJJPNbR5CuNrJLhMregsFEYojeiyyGPyOKdJjmtiKJCyZ3SkbEoua37SGL0u2rSzCxdRNIl3THRIPW1xF8DM0xTiHK/+1Rf35VeymSLoF09wmM/8xUtuBTa/6lKH7E4gZ6SgZhTSp94SvQTk93gM1f578Zk=
+	t=1765555678; cv=none; b=POHjVAixImnt+UJqfa5BBj2WDG2dy9QgX9NgeNg/YtCrF7wQ7e0APHzdq8tIUPXLFy+O4ro95ZdCNcfplG0LX7ZwBOea9yIAo1HXrVNQicmHKoo9O1ov3sucD2TpTqXE61V2tLZrx+GzH5Flo5G74rx3zwo05agRozjlTszqkik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765555095; c=relaxed/simple;
-	bh=EreJvkVscMHTwfWE+ZLqdLtYQJROrFrUJNc1gNFPYM0=;
+	s=arc-20240116; t=1765555678; c=relaxed/simple;
+	bh=8tCsu7PXM3/EnOcvWJFtIzVKWL17kGHFHb4GXQll82Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tzsodmWXswXBuC6oegEuG2UE0RVOv0GSs334Yoif9FYE95u0z9mwWaTwwHkaSYUpCmD91zUTXMCd5+1H+23B10CbkYy+a3GMaSXT4U4MkH08GA45sT1B5Cg0HBsyo7x3aFViWgG1mdGqBuDgzn7CoubU/CxY4yjlkGhf54WLSfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BngAxDCl; arc=none smtp.client-ip=209.85.208.176
+	 To:Cc:Content-Type; b=UtuS9mWSpFJepXpafTYb38n7j3lyTpPIAgRldYvmqRKwO41IxEKYZ8I6Z0gNxyZPfmJTnEvg2c/7uH/NhdFU/YF50q1ncKhjtGfOuZCXfpqDGonCyqsOWn+YhiIZYLpti4Y5u5CmcyXoIHutPfsOnywYE+DYDxhxG0YKorSsJpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EVmeVSe+; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BngAxDCl"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-37e578d04b5so17000441fa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 07:58:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVmeVSe+"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-594285c6509so1603150e87.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 08:07:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765555091; x=1766159891; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1765555674; x=1766160474; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WhiWVdICclqTnD+AumfKAHONKTFjh4RoicZdEIHzfsk=;
-        b=BngAxDClZMX6vHgTsjA8el2Frq6fB08lfrZcLHQrs0fta1Ye1/bGv5tYXu1nHZpa9G
-         7EycCJ5oejrcrJI8QsBVtUrx/95ltzVmBAzZ/j4LCEdJ5VE9UcLWZ80R/BELxD1AzY5d
-         H5Qwhkb3PsDZ/K8ySCOts+SSZP1pTwZZv51DTiAgtAjKlTwi8sbixQyir0faxQRvyi5H
-         IXhirDm2wiolyYwn/BLesVRKWyCLpc3wrW+B+fpjcTFOrjXyj2h7lnZvTswSpqSbFSza
-         PQHYjyLTiraVg0Vxk/f7DHykYOS4cKSjsXAanbcFv4WcRMTmmyO14hDDmXw97vBQcYcZ
-         aEbw==
+        bh=tAx6m6RPCNmtj/ZVdeNH1e1eOPTm/ihc1UsMaHdlBTc=;
+        b=EVmeVSe+w2M4ZfgbzR7Ndlex4L0MYWaCeIEz/TPXvz9zSEFEep2iYC4wCuaBpmHsCN
+         BPqZHVzmdiv+RENGuPd74ecQAHwWoe3H/lMLfEcgOujHNPuulJ23vSZWPFTv9VCRnTg4
+         yd8C8A4XOw4jMo2evDQyGNKx4NQ326idlxVaV44hgKBPuHAE53NBzkCCO6N18uXXQqeP
+         klgpftt6IEo/H2WaITBuUKF484y3V0Mrd5d2BEdPNEuspQudNyPDnyzS2q4Eqsq5fMwH
+         pyvsFkJU+P2+6pUPAf1mItW1z13hrvVIOAO4fhvhzbOtOvgr8X2tm2cfkQnTDIjQhdZb
+         w3Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765555091; x=1766159891;
+        d=1e100.net; s=20230601; t=1765555674; x=1766160474;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=WhiWVdICclqTnD+AumfKAHONKTFjh4RoicZdEIHzfsk=;
-        b=KJc7r1Z04KJCMozrnADCNHK4W4kajVR3xJsqeMDqyik9gs7t9R++K9n+ixeWkvZGBi
-         Mp6x8vOSZZVt9g5OS20CkZG4LBm2orV+P9kyytSu5dsh6s2NLKKE/GuK3vYr3Ghf5CnT
-         5zKErhfYbkq1ilh83B+0iFZ9SpxQHmt9BQ/N14sirEbuFIxfSIylwanKLUvSTwcBNWka
-         EfQh/x6fefpjVRYoSnHpOZGQOAOUVm7t6m7m+02lpADLwUGMzE72j0fsT0WgIutH33gJ
-         OUWkYCSc2QMiJl03No7tX5ShMN2PBJzarg5Sl3/ZXHaEkIKE1hgyp3OjYBQU2jTLj0mK
-         zsDg==
-X-Gm-Message-State: AOJu0YxvAOxx9+4Oa9awvBCjsufTO7zvqnY8Aikht3OolwGO2hFY8r37
-	ivM1g0qpFAW/wB47gQhxEtrcZfkiU5u4X067o74NJYeeQSVJw/+uguPniamRRkVRiJgGbnWGRgN
-	8915YqDZFYiua9g6wz6bCTek0AfRPqL8=
-X-Gm-Gg: AY/fxX7SE8awdPFwOh5+z+QAh4H2x3WYJDfjlAhMtQcblDd4rXSeqa9dvSPyU2AeEBP
-	Ap2O2RWa3Rdn98J9napKtKyo3bMDGAtr8AL63czv3FlJfp8kRWNigCKQ3xzzwgrhOBAxNMNXEpE
-	hpiArKEE9XmNtmwi4DOgRn4jkJqQ4kpvEHpARUErq4uCFp+BE7WY5EBIAEKWqViUnlhT8aGobJS
-	Iy1vRPW9omwo28aTqveMt7PJ0MaBenaAnif2Jl16EyfS68sVIT4rdLQrGqiPpv+vE8p5w==
-X-Google-Smtp-Source: AGHT+IGHIjqz+IUzm7tYdxAVg2N7l/SbgHqBkpIt4IchqstM0wDmAM7JMHa9yETZ47x0GZ1nee4rd4EPRRoIG4R4GOE=
-X-Received: by 2002:a05:651c:19a6:b0:37f:b2d7:8a0e with SMTP id
- 38308e7fff4ca-37fd070b348mr7361251fa.5.1765555090455; Fri, 12 Dec 2025
- 07:58:10 -0800 (PST)
+        bh=tAx6m6RPCNmtj/ZVdeNH1e1eOPTm/ihc1UsMaHdlBTc=;
+        b=Ac/6YELrzwpw6DhhQEjkyKVvETdo1txU+K530gwc95B2fYpfWKsiYif3Cq9W/XxmXf
+         Nm5tLIjEq2EJneO6zdjMu+/8D+nmonT9v+1RLSw4o/+4Nedu+c0eJzh56AsDpcOSS7Pl
+         tdI3YnmNeLFQ9z8Gqg5CRYbxnvoKp3TOH0EgkZBiTzdsGm9Fh+zI7FrGN7JfZEWwgOw9
+         sUAz8jzsAHFfoVrCnB5GPFKtn88PKpKFlXiGIjeTd3xCvuIFl5qA70xtILQOBEvMhYYz
+         qY9WF7SdtN+0Zdi1BBG90IxIm7UbdjIUmyAOPO+MM2oeeqIR4lwF30va9QKhmVA+BZtM
+         GEIw==
+X-Gm-Message-State: AOJu0YwaVjO22g56shYRSAC7IZer4CNHelrwTdP4wo2wrhg/r+6t05CT
+	DVKTaiJ1GmFVpZTg91CY7BOosXoC9kmgbqnS1v5XvR2pmZqHw0qLbybp7/86Pd/mohZUfuAf/Mh
+	XsTcyHexSu8QYi4FK+zxXd40pJmvh1rI=
+X-Gm-Gg: AY/fxX4lgRBHLpO3JU0dMN22TOGEw9necUlz/9/ABspv9fHess8xaWMwyBjRGocMWGW
+	Xj8WVx7AOz+2Nv6G4WRFEDSp+7+yybnEToUHER8wTA7te0TWXKuvnLCr/IUgg5VuCGKnYrsGxtF
+	AZkAdl6Ku0BAFFtPFxNP18v6Z2442EL6z2Sz+vxOkBgLZ5SYMttvrgcYaLKPuTUs4u0LpgZOYYQ
+	0HO2Qzm0faAGx7HT1GDXsFMnGMys1xd78/Ys/+W5QaXVfdSpKsZPs21gedRYJJmgd/bng==
+X-Google-Smtp-Source: AGHT+IE6JwuV8S8rMsAFF+5yJjY0ZQXzawqgBpNgE+CUqbQvKLn9hqO/mbeROQbO3m8LKflJ6k1/asC69Nz0pdGriz0=
+X-Received: by 2002:a2e:a543:0:b0:37f:8bb4:6b with SMTP id 38308e7fff4ca-37fd08c5868mr9204221fa.38.1765555673396;
+ Fri, 12 Dec 2025 08:07:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1765484150.git.pav@iki.fi> <f343a41406876428005288982a73bc20ae5d10b7.1765484150.git.pav@iki.fi>
- <CABBYNZJq4A+SgGsk6HiGx-ydfGikpqW5O_W4o72efgGr9mYYUA@mail.gmail.com> <278086C1-29C0-4AC6-9044-114D128DFC5D@iki.fi>
-In-Reply-To: <278086C1-29C0-4AC6-9044-114D128DFC5D@iki.fi>
+References: <cover.1765484150.git.pav@iki.fi> <e8fd07e902ad1fbc00113ef57eb89b8970d29a84.1765484150.git.pav@iki.fi>
+ <CABBYNZLBEhEeHb7U77WreFguqZefPkPzebRMz0mR-ErJT79BLw@mail.gmail.com> <081f864de65d00f024fd2418cafd2309eef5dc67.camel@iki.fi>
+In-Reply-To: <081f864de65d00f024fd2418cafd2309eef5dc67.camel@iki.fi>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 12 Dec 2025 10:57:58 -0500
-X-Gm-Features: AQt7F2pzzApyH3FN9OHD6Fd16XnX4a88lYe9DLv63nK891gHFV7-utwM2eSBQK0
-Message-ID: <CABBYNZJpaTRJ3F8ZtMqj48YAqPo34AGEkR0nmjMPKEQH=2QS+A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v5 1/7] shared/mcp: support multiple MCP, and add
- non-stub MCS server
+Date: Fri, 12 Dec 2025 11:07:40 -0500
+X-Gm-Features: AQt7F2oDb7xS7f7VtHFOzoC6Do7nkKBw5B4Dw4Lt7GL9T3vF0McjsbpdqKxvDNw
+Message-ID: <CABBYNZJe58G1xg0-4eu7ZRiA8kTLL-6g2fm-81bAwVZj3P56rw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5 4/7] shared/uinput-util: extract uinput utility
+ function from AVCTP
 To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -75,342 +74,336 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Pauli,
 
-On Fri, Dec 12, 2025 at 10:50=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+On Thu, Dec 11, 2025 at 5:50=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
 >
->
->
-> 12. joulukuuta 2025 15.17.18 UTC Luiz Augusto von Dentz <luiz.dentz@gmail=
-.com> kirjoitti:
-> >Hi Pauli,
+> to, 2025-12-11 kello 17:05 -0500, Luiz Augusto von Dentz kirjoitti:
+> > Hi Pauli,
 > >
-> >On Thu, Dec 11, 2025 at 3:16=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrot=
-e:
-> >>
-> >> For Media Control Client, add support for multiple GMCS / MCS services
-> >> on the server. Revise the API accordingly.
-> >>
-> >> For Media Control Server, make it a complete implementation (OTS still
-> >> missing), and add an API the profile can use.
-> >>
-> >> This is mostly a complete rewrite.
-> >> ---
-> >>  lib/bluetooth/uuid.h |   27 +-
-> >>  src/shared/mcp.c     | 3216 ++++++++++++++++++++++++-----------------=
--
-> >>  src/shared/mcp.h     |  186 ++-
-> >>  src/shared/mcs.h     |   51 +-
-> >>  4 files changed, 2086 insertions(+), 1394 deletions(-)
-> >>
-> >> diff --git a/lib/bluetooth/uuid.h b/lib/bluetooth/uuid.h
-> >> index 805366c3d..74bd83742 100644
-> >> --- a/lib/bluetooth/uuid.h
-> >> +++ b/lib/bluetooth/uuid.h
-> >> @@ -198,20 +198,21 @@ extern "C" {
-> >>  #define        AICS_AUDIO_INPUT_CP_CHRC_UUID           0X2B7B
-> >>  #define        AICS_INPUT_DESCR_CHAR_UUID              0X2B7C
-> >>
-> >> +#define MCS_UUID
->
-> [clip]
->
-> >>  /* MCP Control Point Opcodes */
-> >>  #define BT_MCS_CMD_PLAY                            0x01
-> >> --
-> >> 2.51.1
+> > On Thu, Dec 11, 2025 at 3:16=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wro=
+te:
+> > >
+> > > Extract uinput utility function from AVCTP to src/shared so that it c=
+an
+> > > be reused for MCS.
+> > > ---
+> > >  Makefile.am              |   4 +-
+> > >  src/shared/uinput-util.c | 191 +++++++++++++++++++++++++++++++++++++=
+++
+> > >  src/shared/uinput-util.h |  31 +++++++
+> > >  3 files changed, 225 insertions(+), 1 deletion(-)
+> > >  create mode 100644 src/shared/uinput-util.c
+> > >  create mode 100644 src/shared/uinput-util.h
+> > >
+> > > diff --git a/Makefile.am b/Makefile.am
+> > > index ba0262d5f..4c7177886 100644
+> > > --- a/Makefile.am
+> > > +++ b/Makefile.am
+> > > @@ -247,7 +247,9 @@ shared_sources =3D src/shared/io.h src/shared/tim=
+eout.h \
+> > >                         src/shared/lc3.h src/shared/tty.h \
+> > >                         src/shared/bap-defs.h \
+> > >                         src/shared/asha.h src/shared/asha.c \
+> > > -                       src/shared/battery.h src/shared/battery.c
+> > > +                       src/shared/battery.h src/shared/battery.c \
+> > > +                       src/shared/uinput-util.h \
+> > > +                       src/shared/uinput-util.c
+> > >
+> > >  if READLINE
+> > >  shared_sources +=3D src/shared/shell.c src/shared/shell.h
+> > > diff --git a/src/shared/uinput-util.c b/src/shared/uinput-util.c
+> > > new file mode 100644
+> > > index 000000000..4e9644661
+> > > --- /dev/null
+> > > +++ b/src/shared/uinput-util.c
+> > > @@ -0,0 +1,191 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > > +/*
+> > > + *
+> > > + *  BlueZ - Bluetooth protocol stack for Linux
+> > > + *
+> > > + *  Copyright (C) 2006-2010  Nokia Corporation
+> > > + *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+> > > + *  Copyright (C) 2011  Texas Instruments, Inc.
+> > > + *
+> > > + *
+> > > + */
+> > > +
+> > > +#ifdef HAVE_CONFIG_H
+> > > +#include <config.h>
+> > > +#endif
+> > > +
+> > > +#include <unistd.h>
+> > > +#include <fcntl.h>
+> > > +#include <sys/ioctl.h>
+> > > +#include <errno.h>
+> > > +#include <string.h>
+> > > +#include <stdio.h>
+> > > +#include <stdarg.h>
+> > > +#include <linux/uinput.h>
+> > > +
+> > > +#include "bluetooth/bluetooth.h"
+> > > +
+> > > +#include "src/shared/util.h"
+> > > +#include "src/shared/uinput-util.h"
+> > > +
+> > > +
+> > > +#define DBG(uinput, fmt, arg...) \
+> > > +       uinput_debug(uinput->debug_func, uinput->debug_data, "%s:%s()=
+ " fmt, \
+> > > +                                               __FILE__, __func__, #=
+# arg)
+> > > +
+> > > +struct bt_uinput {
+> > > +       int fd;
+> > > +       bt_uinput_debug_func_t debug_func;
+> > > +       void *debug_data;
+> > > +};
+> > > +
+> > > +static void uinput_debug(bt_uinput_debug_func_t debug_func, void *de=
+bug_data,
+> > > +                                                       const char *f=
+ormat, ...)
+> > > +{
+> > > +       va_list ap;
+> > > +
+> > > +       if (!debug_func || !format)
+> > > +               return;
+> > > +
+> > > +       va_start(ap, format);
+> > > +       util_debug_va(debug_func, debug_data, format, ap);
+> > > +       va_end(ap);
+> > > +}
+> > > +
+> > > +static int send_event(int fd, uint16_t type, uint16_t code, int32_t =
+value)
+> > > +{
+> > > +       struct input_event event;
+> > > +
+> > > +       memset(&event, 0, sizeof(event));
+> > > +       event.type      =3D type;
+> > > +       event.code      =3D code;
+> > > +       event.value     =3D value;
+> > > +
+> > > +       return write(fd, &event, sizeof(event));
+> > > +}
+> > > +
+> > > +void bt_uinput_send_key(struct bt_uinput *uinput, uint16_t key, bool=
+ pressed)
+> > > +{
+> > > +       if (!uinput)
+> > > +               return;
+> > > +
+> > > +       DBG(uinput, "%d", key);
+> > > +
+> > > +       send_event(uinput->fd, EV_KEY, key, pressed ? 1 : 0);
+> > > +       send_event(uinput->fd, EV_SYN, SYN_REPORT, 0);
+> > > +}
+> > > +
+> > > +struct bt_uinput *bt_uinput_new(const char *name, const char *suffix=
+,
+> > > +                                       const bdaddr_t *addr,
+> > > +                                       const struct input_id *dev_id=
+,
+> > > +                                       const struct bt_uinput_key_ma=
+p *key_map,
+> > > +                                       bt_uinput_debug_func_t debug,
+> > > +                                       void *user_data)
+> > > +{
+> > > +       struct bt_uinput *uinput;
+> > > +       struct uinput_user_dev dev;
+> > > +       int fd, err, i;
+> > > +       char src[18];
+> > > +
+> > > +       uinput =3D new0(struct bt_uinput, 1);
+> > > +       uinput->debug_func =3D debug;
+> > > +       uinput->debug_data =3D user_data;
+> > > +
+> > > +       fd =3D open("/dev/uinput", O_RDWR);
+> > > +       if (fd < 0) {
+> > > +               fd =3D open("/dev/input/uinput", O_RDWR);
+> > > +               if (fd < 0) {
+> > > +                       fd =3D open("/dev/misc/uinput", O_RDWR);
+> > > +                       if (fd < 0) {
+> > > +                               err =3D errno;
+> > > +                               DBG(uinput, "Can't open input device:=
+ %s (%d)",
+> > > +                                                       strerror(err)=
+, err);
+> > > +                               free(uinput);
 > >
-> >There quite a few build errors when build each patch:
+> > It is probably worth reordering the uinput allocation so it is after
+> > the open, that way we don't need to free on bail out.
 >
-> Yes, this is known as noted in cover letter, the profile is updated in th=
-e later patch, as there are significant API changes.
+> This is on purpose for the DBG macro, so I'd not change it.
+
+Just to be able to print that uinput was not be able to be open? I
+suspect we want to decouple the opening of the uinput with the device
+creation, like it is done in bt_uhid.
+
 >
-> If it is a requirement that individual patches have to produce buildable =
-state, easiest fix would be to combine the shared/mcp: and  mcp: commits. A=
-nother would be to remove the earlier profile/mcp.c first.
-
-Yep, in fact the CI should actually check that but it seems it doesn't
-for some reason.
-
-> I suppose one could invent intermediate series of changes to arrive at th=
-e same code. Not sure much is gained, given the initial implementation was =
-not complete.
+> > > +                               errno =3D err;
+> > > +                               return NULL;
+> > > +                       }
+> > > +               }
+> > > +       }
+> > > +
+> > > +       memset(&dev, 0, sizeof(dev));
+> > > +
+> > > +       if (name)
+> > > +               snprintf(dev.name, UINPUT_MAX_NAME_SIZE, "%s", name);
+> > > +
+> > > +       if (suffix) {
+> > > +               int len, slen;
+> > > +
+> > > +               len =3D strlen(dev.name);
+> > > +               slen =3D strlen(suffix);
+> > > +
+> > > +               /* If name + suffix don't fit, truncate the name, the=
+n add the
+> > > +                * suffix.
+> > > +                */
+> > > +               if (slen >=3D UINPUT_MAX_NAME_SIZE)
+> > > +                       slen =3D UINPUT_MAX_NAME_SIZE - 1;
+> > > +               if (len > UINPUT_MAX_NAME_SIZE - slen - 1)
+> > > +                       len =3D UINPUT_MAX_NAME_SIZE - slen - 1;
+> > > +
+> > > +               snprintf(dev.name + len, UINPUT_MAX_NAME_SIZE - len,
+> > > +                                                               "%s",=
+ suffix);
+> > > +       }
+> > > +
+> > > +       if (dev_id) {
+> > > +               dev.id.bustype =3D dev_id->bustype;
+> > > +               dev.id.vendor =3D dev_id->vendor;
+> > > +               dev.id.product =3D dev_id->product;
+> > > +               dev.id.version =3D dev_id->version;
+> > > +       } else {
+> > > +               dev.id.bustype =3D BUS_VIRTUAL;
+> > > +       }
+> > > +
+> > > +       if (write(fd, &dev, sizeof(dev)) < 0) {
+> > > +               err =3D errno;
+> > > +               DBG(uinput, "Can't write device information: %s (%d)"=
+,
+> > > +                                                       strerror(err)=
+, err);
+> > > +               close(fd);
+> > > +               free(uinput);
+> > > +               errno =3D err;
+> > > +               return NULL;
+> > > +       }
+> > > +
+> > > +       ioctl(fd, UI_SET_EVBIT, EV_KEY);
+> > > +       ioctl(fd, UI_SET_EVBIT, EV_REL);
+> > > +       ioctl(fd, UI_SET_EVBIT, EV_REP);
+> > > +       ioctl(fd, UI_SET_EVBIT, EV_SYN);
+> > > +
+> > > +       ba2strlc(addr, src);
+> > > +       ioctl(fd, UI_SET_PHYS, src);
+> > > +
+> > > +       for (i =3D 0; key_map[i].name !=3D NULL; i++)
+> > > +               ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
+> > > +
+> > > +       if (ioctl(fd, UI_DEV_CREATE, NULL) < 0) {
+> > > +               err =3D errno;
+> > > +               DBG(uinput, "Can't create uinput device: %s (%d)",
+> > > +                                                       strerror(err)=
+, err);
+> > > +               close(fd);
+> > > +               free(uinput);
+> > > +               errno =3D err;
+> > > +               return NULL;
+> > > +       }
+> > > +
+> > > +       send_event(fd, EV_REP, REP_DELAY, 300);
+> > > +
+> > > +       DBG(uinput, "%p", uinput);
+> > > +
+> > > +       uinput->fd =3D fd;
+> > > +       return uinput;
+> > > +}
+> > > +
+> > > +void bt_uinput_destroy(struct bt_uinput *uinput)
+> > > +{
+> > > +       if (!uinput)
+> > > +               return;
+> > > +
+> > > +       DBG(uinput, "%p", uinput);
+> > > +
+> > > +       ioctl(uinput->fd, UI_DEV_DESTROY);
+> > > +       close(uinput->fd);
+> > > +       free(uinput);
+> > > +}
+> > > diff --git a/src/shared/uinput-util.h b/src/shared/uinput-util.h
+> > > new file mode 100644
+> > > index 000000000..fb8f7e6bd
+> > > --- /dev/null
+> > > +++ b/src/shared/uinput-util.h
+> > > @@ -0,0 +1,31 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-or-later
+> >
+> > In theory we should only place LGPL code into src/shared, now I see we
+> > are copying some code thus it should continue using the same license
+> > as the original code, but perhaps it is worth reworking the copied
+> > code since it is quite simple and I think it is worth it to not
+> > contaminate shared library with GPL.
 >
-> What do you prefer?
+> That, or decide it's small enough to not be copyrightable, given it's
+> anyway partly rewritten already.
 
-I guess squashing the changes would be better, that is how I normally
-address the building of each commit individually.
+Yeah, most of the existing code comes from code snips from uinput
+documentation anyway and since we are doing many changes to the code I
+think it is probably safe to relicense under LGPL.
 
+> > > +/*
+> > > + *
+> > > + *  BlueZ - Bluetooth protocol stack for Linux
+> > > + *
+> > > + *  Copyright (C) 2006-2010  Nokia Corporation
+> > > + *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+> > > + *  Copyright (C) 2011  Texas Instruments, Inc.
+> > > + *
+> > > + *
+> > > + */
+> > > +
+> > > +struct bt_uinput;
+> > > +
+> > > +struct bt_uinput_key_map {
+> > > +       const char *name;
+> > > +       unsigned int code;
+> > > +       uint16_t uinput;
+> > > +};
+> > > +
+> > > +typedef void (*bt_uinput_debug_func_t)(const char *str, void *user_d=
+ata);
+> > > +
+> > > +struct bt_uinput *bt_uinput_new(const char *name, const char *suffix=
+,
+> > > +                                       const bdaddr_t *addr,
+> > > +                                       const struct input_id *dev_id=
+,
+> > > +                                       const struct bt_uinput_key_ma=
+p *key_map,
+> > > +                                       bt_uinput_debug_func_t debug,
+> > > +                                       void *user_data);
 > >
-> >profiles/audio/mcp.c: In function =E2=80=98mcp_status_val_to_string=E2=
-=80=99:
-> >profiles/audio/mcp.c:91:14: error: =E2=80=98BT_MCS_STATUS_PLAYING=E2=80=
-=99 undeclared
-> >(first use in this function); did you mean =E2=80=98BT_MCS_STATE_PLAYING=
-=E2=80=99?
-> >   91 |         case BT_MCS_STATUS_PLAYING:
-> >      |              ^~~~~~~~~~~~~~~~~~~~~
-> >      |              BT_MCS_STATE_PLAYING
-> >profiles/audio/mcp.c:91:14: note: each undeclared identifier is
-> >reported only once for each function it appears in
-> >profiles/audio/mcp.c:93:14: error: =E2=80=98BT_MCS_STATUS_PAUSED=E2=80=
-=99 undeclared
-> >(first use in this function); did you mean =E2=80=98BT_MCS_STATE_PAUSED=
-=E2=80=99?
-> >   93 |         case BT_MCS_STATUS_PAUSED:
-> >      |              ^~~~~~~~~~~~~~~~~~~~
-> >      |              BT_MCS_STATE_PAUSED
-> >profiles/audio/mcp.c:95:14: error: =E2=80=98BT_MCS_STATUS_INACTIVE=E2=80=
-=99 undeclared
-> >(first use in this function); did you mean =E2=80=98BT_MCS_STATE_INACTIV=
-E=E2=80=99?
-> >   95 |         case BT_MCS_STATUS_INACTIVE:
-> >      |              ^~~~~~~~~~~~~~~~~~~~~~
-> >      |              BT_MCS_STATE_INACTIVE
-> >profiles/audio/mcp.c:97:14: error: =E2=80=98BT_MCS_STATUS_SEEKING=E2=80=
-=99 undeclared
-> >(first use in this function); did you mean =E2=80=98BT_MCS_STATE_SEEKING=
-=E2=80=99?
-> >   97 |         case BT_MCS_STATUS_SEEKING:
-> >      |              ^~~~~~~~~~~~~~~~~~~~~
-> >      |              BT_MCS_STATE_SEEKING
-> >profiles/audio/mcp.c: In function =E2=80=98cb_player_name=E2=80=99:
-> >profiles/audio/mcp.c:121:35: error: implicit declaration of function
-> >=E2=80=98bt_mcp_get_user_data=E2=80=99; did you mean =E2=80=98btd_servic=
-e_get_user_data=E2=80=99?
-> >[-Wimplicit-function-declaration]
-> >  121 |         struct media_player *mp =3D bt_mcp_get_user_data(mcp);
-> >      |                                   ^~~~~~~~~~~~~~~~~~~~
-> >      |                                   btd_service_get_user_data
-> >profiles/audio/mcp.c:121:35: error: initialization of =E2=80=98struct
-> >media_player *=E2=80=99 from =E2=80=98int=E2=80=99 makes pointer from in=
-teger without a cast
-> >[-Wint-conversion]
-> >profiles/audio/mcp.c: In function =E2=80=98cb_track_title=E2=80=99:
-> >profiles/audio/mcp.c:144:35: error: initialization of =E2=80=98struct
-> >media_player *=E2=80=99 from =E2=80=98int=E2=80=99 makes pointer from in=
-teger without a cast
-> >[-Wint-conversion]
-> >  144 |         struct media_player *mp =3D bt_mcp_get_user_data(mcp);
-> >      |                                   ^~~~~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c: In function =E2=80=98cb_track_duration=E2=80=99:
-> >profiles/audio/mcp.c:159:35: error: initialization of =E2=80=98struct
-> >media_player *=E2=80=99 from =E2=80=98int=E2=80=99 makes pointer from in=
-teger without a cast
-> >[-Wint-conversion]
-> >  159 |         struct media_player *mp =3D bt_mcp_get_user_data(mcp);
-> >      |                                   ^~~~~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c: In function =E2=80=98cb_track_position=E2=80=99:
-> >profiles/audio/mcp.c:170:35: error: initialization of =E2=80=98struct
-> >media_player *=E2=80=99 from =E2=80=98int=E2=80=99 makes pointer from in=
-teger without a cast
-> >[-Wint-conversion]
-> >  170 |         struct media_player *mp =3D bt_mcp_get_user_data(mcp);
-> >      |                                   ^~~~~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c: In function =E2=80=98cb_media_state=E2=80=99:
-> >profiles/audio/mcp.c:178:35: error: initialization of =E2=80=98struct
-> >media_player *=E2=80=99 from =E2=80=98int=E2=80=99 makes pointer from in=
-teger without a cast
-> >[-Wint-conversion]
-> >  178 |         struct media_player *mp =3D bt_mcp_get_user_data(mcp);
-> >      |                                   ^~~~~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c: At top level:
-> >profiles/audio/mcp.c:183:21: error: variable =E2=80=98cbs=E2=80=99 has i=
-nitializer but
-> >incomplete type
-> >  183 | static const struct bt_mcp_event_callback cbs =3D {
-> >      |                     ^~~~~~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c:184:10: error: =E2=80=98const struct
-> >bt_mcp_event_callback=E2=80=99 has no member named =E2=80=98player_name=
-=E2=80=99
-> >  184 |         .player_name                    =3D cb_player_name,
-> >      |          ^~~~~~~~~~~
-> >profiles/audio/mcp.c:184:43: error: excess elements in struct
-> >initializer [-Werror]
-> >  184 |         .player_name                    =3D cb_player_name,
-> >      |                                           ^~~~~~~~~~~~~~
-> >profiles/audio/mcp.c:184:43: note: (near initialization for =E2=80=98cbs=
-=E2=80=99)
-> >profiles/audio/mcp.c:185:10: error: =E2=80=98const struct
-> >bt_mcp_event_callback=E2=80=99 has no member named =E2=80=98track_change=
-d=E2=80=99
-> >  185 |         .track_changed                  =3D cb_track_changed,
-> >      |          ^~~~~~~~~~~~~
-> >profiles/audio/mcp.c:185:43: error: excess elements in struct
-> >initializer [-Werror]
-> >  185 |         .track_changed                  =3D cb_track_changed,
-> >      |                                           ^~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c:185:43: note: (near initialization for =E2=80=98cbs=
-=E2=80=99)
-> >profiles/audio/mcp.c:186:10: error: =E2=80=98const struct
-> >bt_mcp_event_callback=E2=80=99 has no member named =E2=80=98track_title=
-=E2=80=99
-> >  186 |         .track_title                    =3D cb_track_title,
-> >      |          ^~~~~~~~~~~
-> >profiles/audio/mcp.c:186:43: error: excess elements in struct
-> >initializer [-Werror]
-> >  186 |         .track_title                    =3D cb_track_title,
-> >      |                                           ^~~~~~~~~~~~~~
-> >profiles/audio/mcp.c:186:43: note: (near initialization for =E2=80=98cbs=
-=E2=80=99)
-> >profiles/audio/mcp.c:187:10: error: =E2=80=98const struct
-> >bt_mcp_event_callback=E2=80=99 has no member named =E2=80=98track_durati=
-on=E2=80=99
-> >  187 |         .track_duration                 =3D cb_track_duration,
-> >      |          ^~~~~~~~~~~~~~
-> >profiles/audio/mcp.c:187:43: error: excess elements in struct
-> >initializer [-Werror]
-> >  187 |         .track_duration                 =3D cb_track_duration,
-> >      |                                           ^~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c:187:43: note: (near initialization for =E2=80=98cbs=
-=E2=80=99)
-> >profiles/audio/mcp.c:188:10: error: =E2=80=98const struct
-> >bt_mcp_event_callback=E2=80=99 has no member named =E2=80=98track_positi=
-on=E2=80=99
-> >  188 |         .track_position                 =3D cb_track_position,
-> >      |          ^~~~~~~~~~~~~~
-> >profiles/audio/mcp.c:188:43: error: excess elements in struct
-> >initializer [-Werror]
-> >  188 |         .track_position                 =3D cb_track_position,
-> >      |                                           ^~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c:188:43: note: (near initialization for =E2=80=98cbs=
-=E2=80=99)
-> >profiles/audio/mcp.c:189:10: error: =E2=80=98const struct
-> >bt_mcp_event_callback=E2=80=99 has no member named =E2=80=98media_state=
-=E2=80=99
-> >  189 |         .media_state                    =3D cb_media_state,
-> >      |          ^~~~~~~~~~~
-> >profiles/audio/mcp.c:189:43: error: excess elements in struct
-> >initializer [-Werror]
-> >  189 |         .media_state                    =3D cb_media_state,
-> >      |                                           ^~~~~~~~~~~~~~
-> >profiles/audio/mcp.c:189:43: note: (near initialization for =E2=80=98cbs=
-=E2=80=99)
-> >profiles/audio/mcp.c: In function =E2=80=98ct_play=E2=80=99:
-> >profiles/audio/mcp.c:196:16: error: too few arguments to function
-> >=E2=80=98bt_mcp_play=E2=80=99; expected 2, have 1
-> >  196 |         return bt_mcp_play(mcp);
-> >      |                ^~~~~~~~~~~
-> >In file included from profiles/audio/mcp.c:42:
-> >./src/shared/mcp.h:56:14: note: declared here
-> >   56 | unsigned int bt_mcp_play(struct bt_mcp *mcp, uint8_t ccid);
-> >      |              ^~~~~~~~~~~
-> >profiles/audio/mcp.c: In function =E2=80=98ct_pause=E2=80=99:
-> >profiles/audio/mcp.c:203:16: error: too few arguments to function
-> >=E2=80=98bt_mcp_pause=E2=80=99; expected 2, have 1
-> >  203 |         return bt_mcp_pause(mcp);
-> >      |                ^~~~~~~~~~~~
-> >./src/shared/mcp.h:57:14: note: declared here
-> >   57 | unsigned int bt_mcp_pause(struct bt_mcp *mcp, uint8_t ccid);
-> >      |              ^~~~~~~~~~~~
-> >profiles/audio/mcp.c: In function =E2=80=98ct_stop=E2=80=99:
-> >profiles/audio/mcp.c:210:16: error: too few arguments to function
-> >=E2=80=98bt_mcp_stop=E2=80=99; expected 2, have 1
-> >  210 |         return bt_mcp_stop(mcp);
-> >      |                ^~~~~~~~~~~
-> >./src/shared/mcp.h:60:14: note: declared here
-> >   60 | unsigned int bt_mcp_stop(struct bt_mcp *mcp, uint8_t ccid);
-> >      |              ^~~~~~~~~~~
-> >profiles/audio/mcp.c: In function =E2=80=98ct_next=E2=80=99:
-> >profiles/audio/mcp.c:217:16: error: too few arguments to function
-> >=E2=80=98bt_mcp_next_track=E2=80=99; expected 2, have 1
-> >  217 |         return bt_mcp_next_track(mcp);
-> >      |                ^~~~~~~~~~~~~~~~~
-> >./src/shared/mcp.h:71:14: note: declared here
-> >   71 | unsigned int bt_mcp_next_track(struct bt_mcp *mcp, uint8_t ccid)=
-;
-> >      |              ^~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c: In function =E2=80=98ct_previous=E2=80=99:
-> >profiles/audio/mcp.c:224:16: error: too few arguments to function
-> >=E2=80=98bt_mcp_previous_track=E2=80=99; expected 2, have 1
-> >  224 |         return bt_mcp_previous_track(mcp);
-> >      |                ^~~~~~~~~~~~~~~~~~~~~
-> >./src/shared/mcp.h:70:14: note: declared here
-> >   70 | unsigned int bt_mcp_previous_track(struct bt_mcp *mcp, uint8_t c=
-cid);
-> >      |              ^~~~~~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c: In function =E2=80=98mcp_probe=E2=80=99:
-> >profiles/audio/mcp.c:255:21: error: implicit declaration of function
-> >=E2=80=98bt_mcp_new=E2=80=99; did you mean =E2=80=98bt_att_new=E2=80=99?
-> >[-Wimplicit-function-declaration]
-> >  255 |         data->mcp =3D bt_mcp_new(btd_gatt_database_get_db(databa=
-se),
-> >      |                     ^~~~~~~~~~
-> >      |                     bt_att_new
-> >profiles/audio/mcp.c:255:19: error: assignment to =E2=80=98struct bt_mcp=
- *=E2=80=99
-> >from =E2=80=98int=E2=80=99 makes pointer from integer without a cast
-> >[-Wint-conversion]
-> >  255 |         data->mcp =3D bt_mcp_new(btd_gatt_database_get_db(databa=
-se),
-> >      |                   ^
-> >profiles/audio/mcp.c:258:9: error: implicit declaration of function
-> >=E2=80=98bt_mcp_set_debug=E2=80=99; did you mean =E2=80=98bt_att_set_deb=
-ug=E2=80=99?
-> >[-Wimplicit-function-declaration]
-> >  258 |         bt_mcp_set_debug(data->mcp, mcp_debug, NULL, NULL);
-> >      |         ^~~~~~~~~~~~~~~~
-> >      |         bt_att_set_debug
-> >profiles/audio/mcp.c: In function =E2=80=98mcp_data_free=E2=80=99:
-> >profiles/audio/mcp.c:270:17: error: implicit declaration of function
-> >=E2=80=98bt_mcp_set_user_data=E2=80=99; did you mean =E2=80=98btd_servic=
-e_set_user_data=E2=80=99?
-> >[-Wimplicit-function-declaration]
-> >  270 |                 bt_mcp_set_user_data(data->mcp, NULL);
-> >      |                 ^~~~~~~~~~~~~~~~~~~~
-> >      |                 btd_service_set_user_data
-> >profiles/audio/mcp.c:278:9: error: implicit declaration of function
-> >=E2=80=98bt_mcp_unref=E2=80=99; did you mean =E2=80=98bt_att_unref=E2=80=
-=99?
-> >[-Wimplicit-function-declaration]
-> >  278 |         bt_mcp_unref(data->mcp);
-> >      |         ^~~~~~~~~~~~
-> >      |         bt_att_unref
-> >profiles/audio/mcp.c: In function =E2=80=98mcp_accept=E2=80=99:
-> >profiles/audio/mcp.c:317:27: error: passing argument 1 of
-> >=E2=80=98bt_mcp_attach=E2=80=99 from incompatible pointer type
-> >[-Wincompatible-pointer-types]
-> >  317 |         bt_mcp_attach(data->mcp, client);
-> >      |                       ~~~~^~~~~
-> >      |                           |
-> >      |                           struct bt_mcp *
-> >./src/shared/mcp.h:96:53: note: expected =E2=80=98struct bt_gatt_client =
-*=E2=80=99 but
-> >argument is of type =E2=80=98struct bt_mcp *=E2=80=99
-> >   96 | struct bt_mcp *bt_mcp_attach(struct bt_gatt_client *client, bool=
- gmcs,
-> >      |                              ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
-> >profiles/audio/mcp.c:317:9: error: too few arguments to function
-> >=E2=80=98bt_mcp_attach=E2=80=99; expected 4, have 2
-> >  317 |         bt_mcp_attach(data->mcp, client);
-> >      |         ^~~~~~~~~~~~~
-> >./src/shared/mcp.h:96:16: note: declared here
-> >   96 | struct bt_mcp *bt_mcp_attach(struct bt_gatt_client *client, bool=
- gmcs,
-> >      |                ^~~~~~~~~~~~~
-> >profiles/audio/mcp.c:329:9: error: implicit declaration of function
-> >=E2=80=98bt_mcp_set_event_callbacks=E2=80=99 [-Wimplicit-function-declar=
-ation]
-> >  329 |         bt_mcp_set_event_callbacks(data->mcp, &cbs, data->mp);
-> >      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-> >profiles/audio/mcp.c: In function =E2=80=98media_control_server_probe=E2=
-=80=99:
-> >profiles/audio/mcp.c:372:9: error: implicit declaration of function
-> >=E2=80=98bt_mcp_register=E2=80=99; did you mean =E2=80=98bt_mcs_register=
-=E2=80=99?
-> >[-Wimplicit-function-declaration]
-> >  372 |         bt_mcp_register(btd_gatt_database_get_db(database));
-> >      |         ^~~~~~~~~~~~~~~
-> >      |         bt_mcs_register
-> >profiles/audio/mcp.c: At top level:
-> >profiles/audio/mcp.c:183:43: error: storage size of =E2=80=98cbs=E2=80=
-=99 isn=E2=80=99t known
-> >  183 | static const struct bt_mcp_event_callback cbs =3D {
-> >      |                                           ^~~
-> >cc1: all warnings being treated as errors
+> > I'd leave the debug function to be initialized with its own function
+> > (e.g. bt_uinput_set_debug).
 > >
-> >It looks like it is only fixed in the follow up changes, which means
-> >it breaks the likes of bisect.
+> > > +void bt_uinput_destroy(struct bt_uinput *uinput);
+> > > +
+> > > +void bt_uinput_send_key(struct bt_uinput *uinput, uint16_t key, bool=
+ pressed);
+> > > --
+> > > 2.51.1
+> > >
+> > >
 > >
-
+>
+> --
+> Pauli Virtanen
+>
+>
 
 
 --=20
