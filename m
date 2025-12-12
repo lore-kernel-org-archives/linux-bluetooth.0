@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1014130DEAC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 20:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F3C30DEB5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 20:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765570374; cv=pass; b=mylKcD8XIEt3J3sciuMcszdDixsj8gElyRmtSQ96repOzh1r0oFdsD3B1H45Rozi6llulj9Vf6zW+zLuYaJGG09aZ+7k56IMQT/z9/nZBohCUU64jbG/l86R80cKXdYKLbKnhBIDbB3mA/1wZPLSBHHZoEu8k/IL4R432GMkOVc=
+	t=1765570375; cv=pass; b=QwELZI93MOe926jpUnVdA/QhSxXJtJ986vFLgYpsIGwGO+aUhnV6OLL6NLOakYzUYTJsX+VVgjyNNhrjIrDXxhkDY9/bwJqw2C1qrXBlxSEQ6WQHn6onl4euEC+tREnPeU1rzYhzKA0DJojSO20hMmfH50in1LjK7bdZ9/qrxU4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765570374; c=relaxed/simple;
-	bh=eutJ2ZAajbgulJW8xv3liPaW9voEZgRxV/kM1Xx84y8=;
+	s=arc-20240116; t=1765570375; c=relaxed/simple;
+	bh=wHIZL2wNjvbc9km5Oemtwxj6LgHJfGW4VkzKYpUnkeQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aO+d0xU5VSQaenSLXyYc9U3BxeyrNQl9FpKDFi9vm+kxJ1oz0lSRgeQt6UndMt7DZWMmGMh8mqIy+uQBWzQpNNkyIiouRer7Wx4utHSV4TlJGtZ9K3s1QPLC7Ef12dB0qvwj9MGGb/TK4nkSeZ8FKK1DjbrzOxSgxVHQN/ee7D0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=O3oPVQQf; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=liPq42En/gP17fctCxVLLcLhRyzGtRgxieO/6/c6rMaB9ivzSAV8DAjXwN4qTUklNIiW4L0BRMctuyRdhuYYpM8ENzmhvZOoBLfA08ICAXYaaZnr/Fn7Iqtnwotyjzuq2Hd6CDvxXQV9Zq3UI12YP97A4nC7cFKYhE4+UNLmsvo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=aLvSzVrm; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="O3oPVQQf"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="aLvSzVrm"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a02d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dSgcC5xGQz10Gt;
-	Fri, 12 Dec 2025 22:12:43 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dSgcB3HcLzyff;
+	Fri, 12 Dec 2025 22:12:42 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1765570364;
+	t=1765570362;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BnfZyKNtpagHUkw21Cp3OrKOd3hg0ygvCrq9DUdub/U=;
-	b=O3oPVQQfJPKglNYwyp81PJGIwIjG4WUHPTmKFwTPWVk+uqHzkI0QOoAypR7qf0SN7JEJD9
-	PeZX/G1Uf0XU+n4JFUgwxZUcaN8H+InPbr4rjHFZI15qDgd3YSWWMde1XSaTSeGf0QYuOR
-	dWnG/8zqzavaXHQsSfIZTPzpPu8Gm20=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765570364;
-	b=EzUbdV2OCSQDZgCwARihnpM1y6GY6MYJlAl0AMoG1GwXm+YN0kjn1KrvCTpCHM4ItpilSp
-	4ltFOhbWhER/W3Uc+VGd6dZl0W4ZdkfaNu7NnvlJOg9S52mS+sqYY2mYWXam0Xmp6N8Oz9
-	fdUoFmKmyOu2VcvDJgLryIpZ8uC01to=
+	bh=OgfkexMOTUXElleHTjT+yhxiJD/xfueelvB/J7HE3TM=;
+	b=aLvSzVrmopM3UzTCZMTpyVWuoyBXBcNpwo83q2ibqt8Aj5RbrCG7TFsSdEueVK+aGjQ3om
+	qAhQl5Ir26ZtSK5gk4mKtHCMM/I3ZWnK+9w8IcpVW+cx5BPvSYmGLuDEnLXXxBlieewd3s
+	86VDg48NL98WYZxnaGXH6YYc9seoAQw=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765570362;
+	b=j7sxMsjcLiEJ1WUeNGLdNr7401HDkBHrEkIBqI0G4TckHkne+RFlBvWnqW+gAfqPQAqjOV
+	yHxSJN4oInxNFg5p0QY2eks+DH2sLor+78QZLSGOYfsePrEiWAxv7cuwX+jI3yTTdBfKc+
+	v311ZXnkYy+37ck4mmkFO++GdpEG8wk=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1765570364;
+	s=meesny; t=1765570362;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BnfZyKNtpagHUkw21Cp3OrKOd3hg0ygvCrq9DUdub/U=;
-	b=YlbY++X3oYGXrAysVzgPLaryAve59uhWepQfhij1x5EuVHlB/A9yXGFu4OUQFSluhuxZ83
-	ia3BI8DjzmxW6du5sHzG9iXMbwUpwWeSlu9YJBNoTwjwvWhuLYe08g3kV8PLlbeGMH7GjD
-	q0H0zSPpGRt9jUibYZ6viEkYTk5zWM0=
+	bh=OgfkexMOTUXElleHTjT+yhxiJD/xfueelvB/J7HE3TM=;
+	b=Rph5ID0ILNE7dgvwzRzYPHXIzrqD4Ww8gK96hCm92JeZDfc4l0mttpIriMGxBfmbvyu2AT
+	mAxKLsEj2Ga5Oon1B38S0PxHRBYriHcMdwpA9VtI4GYQAQQRGPgD2k2CcpuAxNWZygletD
+	0e3VCVy6AW2db3PPPA9jt/t23sJo2uE=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v6 7/9] shared/mcp: on track changed, re-read values if notify not available
-Date: Fri, 12 Dec 2025 22:12:29 +0200
-Message-ID: <8e0ead8e18dd199b502d57764b414290e385f23a.1765570334.git.pav@iki.fi>
+Subject: [PATCH BlueZ v6 5/9] avctp: use uinput utilities from src/shared
+Date: Fri, 12 Dec 2025 22:12:27 +0200
+Message-ID: <3587b1923a280c64b0bba360475a78bca87fe4a6.1765570334.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1765570334.git.pav@iki.fi>
 References: <cover.1765570334.git.pav@iki.fi>
@@ -67,108 +67,306 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Notify is optional for some MCS attributes. To get new track titles etc.
-re-read values on track change, if remote does not have notify on them.
+Make use of the src/shared version of uinput_create() / send_key
 ---
- src/shared/mcp.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ profiles/audio/avctp.c | 166 ++++++++++-------------------------------
+ 1 file changed, 40 insertions(+), 126 deletions(-)
 
-diff --git a/src/shared/mcp.c b/src/shared/mcp.c
-index 97970c495..4916289e1 100644
---- a/src/shared/mcp.c
-+++ b/src/shared/mcp.c
-@@ -979,7 +979,8 @@ void bt_mcs_unregister_all(struct gatt_db *db)
-  */
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 65eec6f6c..f20e08c00 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -41,6 +41,7 @@
+ #include "src/error.h"
+ #include "src/shared/timeout.h"
+ #include "src/shared/util.h"
++#include "src/shared/uinput.h"
  
- static void mcp_service_reread(struct bt_mcp_service *service,
--					struct gatt_db_attribute *attrib);
-+					struct gatt_db_attribute *attrib,
-+					bool skip_notify);
+ #include "avctp.h"
+ #include "avrcp.h"
+@@ -191,7 +192,7 @@ struct avctp {
  
- static void mcp_debug_func(const char *str, void *user_data)
- {
-@@ -1074,7 +1075,6 @@ static void mcp_pending_write_cb(bool success, uint8_t att_ecode,
- 								void *user_data)
- {
- 	struct bt_mcp_pending *pending = user_data;
--	uint8_t props;
+ 	avctp_state_t state;
  
- 	if (!success) {
- 		pending->write.result = BT_MCS_RESULT_COMMAND_CANNOT_COMPLETE;
-@@ -1083,14 +1083,8 @@ static void mcp_pending_write_cb(bool success, uint8_t att_ecode,
+-	int uinput;
++	struct bt_uinput *uinput;
  
- 	pending->write.result = BT_MCS_RESULT_SUCCESS;
+ 	guint auth_id;
+ 	unsigned int passthrough_id;
+@@ -228,11 +229,7 @@ struct avctp_browsing_pdu_handler {
+ 	GDestroyNotify destroy;
+ };
  
--	if (!gatt_db_attribute_get_char_data(pending->write.attrib, NULL,
--						NULL, &props, NULL, NULL))
--		return;
--	if (props & BT_GATT_CHRC_PROP_NOTIFY)
+-static const struct {
+-	const char *name;
+-	uint8_t avc;
+-	uint16_t uinput;
+-} key_map[] = {
++static const struct bt_uinput_key_map key_map[] = {
+ 	{ "SELECT",		AVC_SELECT,		KEY_SELECT },
+ 	{ "UP",			AVC_UP,			KEY_UP },
+ 	{ "DOWN",		AVC_DOWN,		KEY_DOWN },
+@@ -301,27 +298,6 @@ static gboolean avctp_passthrough_rsp(struct avctp *session, uint8_t code,
+ 					uint8_t *operands, size_t operand_count,
+ 					void *user_data);
+ 
+-static int send_event(int fd, uint16_t type, uint16_t code, int32_t value)
+-{
+-	struct input_event event;
+-
+-	memset(&event, 0, sizeof(event));
+-	event.type	= type;
+-	event.code	= code;
+-	event.value	= value;
+-
+-	return write(fd, &event, sizeof(event));
+-}
+-
+-static void send_key(int fd, uint16_t key, int pressed)
+-{
+-	if (fd < 0)
 -		return;
 -
- 	/* If the attribute doesn't have notify, reread to get the new value */
--	mcp_service_reread(pending->service, pending->write.attrib);
-+	mcp_service_reread(pending->service, pending->write.attrib, true);
- }
- 
- static void mcp_pending_write_done(void *user_data)
-@@ -1389,6 +1383,8 @@ static void update_track_changed(bool success, uint8_t att_ecode,
- 		return;
- 	}
- 
-+	mcp_service_reread(service, NULL, true);
-+
- 	DBG_SVC(service, "Track Changed");
- 
- 	LISTENER_CB(service, track_changed);
-@@ -1626,7 +1622,7 @@ static void update_ccid(bool success, uint8_t att_ecode,
- 	uint8_t v;
- 
- 	if (!success || !util_iov_pull_u8(&iov, &v)) {
--		DBG_SVC(service, "Unable to read Media State: error 0x%02x",
-+		DBG_SVC(service, "Unable to read CCID: error 0x%02x",
- 								att_ecode);
- 		return;
- 	}
-@@ -1639,7 +1635,8 @@ static void update_ccid(bool success, uint8_t att_ecode,
- }
- 
- static void mcp_service_reread(struct bt_mcp_service *service,
--					struct gatt_db_attribute *attrib)
-+					struct gatt_db_attribute *attrib,
-+					bool skip_notify)
+-	send_event(fd, EV_KEY, key, pressed);
+-	send_event(fd, EV_SYN, SYN_REPORT, 0);
+-}
+-
+ static bool auto_release(gpointer user_data)
  {
- 	const struct {
- 		struct gatt_db_attribute *attr;
-@@ -1659,6 +1656,7 @@ static void mcp_service_reread(struct bt_mcp_service *service,
- 	};
- 	struct bt_gatt_client *client = service->mcp->client;
- 	uint16_t value_handle;
-+	uint8_t props;
- 	unsigned int i;
+ 	struct avctp *session = user_data;
+@@ -330,7 +306,7 @@ static bool auto_release(gpointer user_data)
  
- 	for (i = 0; i < ARRAY_SIZE(attrs); ++i) {
-@@ -1668,8 +1666,10 @@ static void mcp_service_reread(struct bt_mcp_service *service,
+ 	DBG("AV/C: key press timeout");
+ 
+-	send_key(session->uinput, session->key.op, 0);
++	bt_uinput_send_key(session->uinput, session->key.op, 0);
+ 
+ 	return FALSE;
+ }
+@@ -344,12 +320,12 @@ static void handle_press(struct avctp *session, uint16_t op)
+ 		if (session->key.op == op)
+ 			goto done;
+ 
+-		send_key(session->uinput, session->key.op, 0);
++		bt_uinput_send_key(session->uinput, session->key.op, 0);
+ 	}
+ 
+ 	session->key.op = op;
+ 
+-	send_key(session->uinput, op, 1);
++	bt_uinput_send_key(session->uinput, op, 1);
+ 
+ done:
+ 	session->key.timer = timeout_add_seconds(AVC_PRESS_TIMEOUT,
+@@ -364,7 +340,7 @@ static void handle_release(struct avctp *session, uint16_t op)
+ 		session->key.timer = 0;
+ 	}
+ 
+-	send_key(session->uinput, op, 0);
++	bt_uinput_send_key(session->uinput, op, 0);
+ }
+ 
+ static size_t handle_panel_passthrough(struct avctp *session,
+@@ -401,12 +377,12 @@ static size_t handle_panel_passthrough(struct avctp *session,
+ 	for (i = 0; key_map[i].name != NULL; i++) {
+ 		uint8_t key_quirks;
+ 
+-		if ((operands[0] & 0x7F) != key_map[i].avc)
++		if ((operands[0] & 0x7F) != key_map[i].code)
  			continue;
  
- 		if (!gatt_db_attribute_get_char_data(attrs[i].attr, NULL,
--					&value_handle, NULL, NULL, NULL))
--			return;
-+					&value_handle, &props, NULL, NULL))
-+			continue;
-+		if (skip_notify && (props & BT_GATT_CHRC_PROP_NOTIFY))
-+			continue;
+ 		DBG("AV/C: %s %s", key_map[i].name, status);
  
- 		DBG_SVC(service, "re-read handle 0x%04x", value_handle);
+-		key_quirks = session->key_quirks[key_map[i].avc];
++		key_quirks = session->key_quirks[key_map[i].code];
  
-@@ -1681,7 +1681,7 @@ static void mcp_service_reread(struct bt_mcp_service *service,
- static void notify_media_player_name(struct bt_mcp_service *service)
- {
- 	/* On player name change, re-read all attributes */
--	mcp_service_reread(service, NULL);
-+	mcp_service_reread(service, NULL, false);
+ 		if (key_quirks & QUIRK_NO_RELEASE) {
+ 			if (!pressed) {
+@@ -415,8 +391,10 @@ static size_t handle_panel_passthrough(struct avctp *session,
+ 			}
+ 
+ 			DBG("AV/C: treating key press as press + release");
+-			send_key(session->uinput, key_map[i].uinput, 1);
+-			send_key(session->uinput, key_map[i].uinput, 0);
++			bt_uinput_send_key(session->uinput, key_map[i].uinput,
++									1);
++			bt_uinput_send_key(session->uinput, key_map[i].uinput,
++									0);
+ 			break;
+ 		}
+ 
+@@ -570,15 +548,14 @@ static void avctp_disconnected(struct avctp *session)
+ 	if (session->key.timer > 0)
+ 		timeout_remove(session->key.timer);
+ 
+-	if (session->uinput >= 0) {
++	if (session->uinput) {
+ 		char address[18];
+ 
+ 		ba2str(device_get_address(session->device), address);
+ 		DBG("AVCTP: closing uinput for %s", address);
+ 
+-		ioctl(session->uinput, UI_DEV_DESTROY);
+-		close(session->uinput);
+-		session->uinput = -1;
++		bt_uinput_destroy(session->uinput);
++		session->uinput = NULL;
+ 	}
+ 
+ 	server = session->server;
+@@ -1154,92 +1131,17 @@ failed:
+ 	return FALSE;
  }
  
- static void mcp_idle(void *data)
+-static int uinput_create(struct btd_device *device, const char *name,
+-			 const char *suffix)
++static void uinput_debug(const char *str, void *data)
+ {
+-	struct uinput_user_dev dev;
+-	int fd, err, i;
+-	char src[18];
+-
+-	fd = open("/dev/uinput", O_RDWR);
+-	if (fd < 0) {
+-		fd = open("/dev/input/uinput", O_RDWR);
+-		if (fd < 0) {
+-			fd = open("/dev/misc/uinput", O_RDWR);
+-			if (fd < 0) {
+-				err = -errno;
+-				error("Can't open input device: %s (%d)",
+-							strerror(-err), -err);
+-				return err;
+-			}
+-		}
+-	}
+-
+-	memset(&dev, 0, sizeof(dev));
+-
+-	if (name) {
+-		strncpy(dev.name, name, UINPUT_MAX_NAME_SIZE - 1);
+-		dev.name[UINPUT_MAX_NAME_SIZE - 1] = '\0';
+-	}
+-
+-	if (suffix) {
+-		int len, slen;
+-
+-		len = strlen(dev.name);
+-		slen = strlen(suffix);
+-
+-		/* If name + suffix don't fit, truncate the name, then add the
+-		 * suffix.
+-		 */
+-		if (len + slen < UINPUT_MAX_NAME_SIZE - 1) {
+-			strcpy(dev.name + len, suffix);
+-		} else {
+-			len = UINPUT_MAX_NAME_SIZE - slen - 1;
+-			strncpy(dev.name + len, suffix, slen);
+-			dev.name[UINPUT_MAX_NAME_SIZE - 1] = '\0';
+-		}
+-	}
+-
+-	dev.id.bustype = BUS_BLUETOOTH;
+-	dev.id.vendor  = btd_device_get_vendor(device);
+-	dev.id.product = btd_device_get_product(device);
+-	dev.id.version = btd_device_get_version(device);
+-
+-	if (write(fd, &dev, sizeof(dev)) < 0) {
+-		err = -errno;
+-		error("Can't write device information: %s (%d)",
+-						strerror(-err), -err);
+-		close(fd);
+-		return err;
+-	}
+-
+-	ioctl(fd, UI_SET_EVBIT, EV_KEY);
+-	ioctl(fd, UI_SET_EVBIT, EV_REL);
+-	ioctl(fd, UI_SET_EVBIT, EV_REP);
+-	ioctl(fd, UI_SET_EVBIT, EV_SYN);
+-
+-	ba2strlc(btd_adapter_get_address(device_get_adapter(device)), src);
+-	ioctl(fd, UI_SET_PHYS, src);
+-
+-	for (i = 0; key_map[i].name != NULL; i++)
+-		ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
+-
+-	if (ioctl(fd, UI_DEV_CREATE, NULL) < 0) {
+-		err = -errno;
+-		error("Can't create uinput device: %s (%d)",
+-						strerror(-err), -err);
+-		close(fd);
+-		return err;
+-	}
+-
+-	send_event(fd, EV_REP, REP_DELAY, 300);
+-
+-	return fd;
++	DBG_IDX(0xffff, "%s", str);
+ }
+ 
+ static void init_uinput(struct avctp *session)
+ {
++	struct btd_adapter *adapter = device_get_adapter(session->device);
+ 	char name[UINPUT_MAX_NAME_SIZE];
++	struct input_id id;
++	int err;
+ 
+ 	device_get_name(session->device, name, sizeof(name));
+ 	if (g_str_equal(name, "Nokia CK-20W")) {
+@@ -1249,11 +1151,24 @@ static void init_uinput(struct avctp *session)
+ 		session->key_quirks[AVC_PAUSE] |= QUIRK_NO_RELEASE;
+ 	}
+ 
+-	session->uinput = uinput_create(session->device, name, " (AVRCP)");
+-	if (session->uinput < 0)
+-		error("AVRCP: failed to init uinput for %s", name);
+-	else
++	id.bustype = BUS_BLUETOOTH;
++	id.vendor  = btd_device_get_vendor(session->device);
++	id.product = btd_device_get_product(session->device);
++	id.version = btd_device_get_version(session->device);
++
++	session->uinput = bt_uinput_new(name, " (AVRCP)",
++				btd_adapter_get_address(adapter), &id);
++	bt_uinput_set_debug(session->uinput, uinput_debug, NULL);
++
++	err = bt_uinput_create(session->uinput, key_map);
++	if (err < 0) {
++		error("AVRCP: failed to create uinput for %s: %s", name,
++								strerror(-err));
++		bt_uinput_destroy(session->uinput);
++		session->uinput = NULL;
++	} else {
+ 		DBG("AVRCP: uinput initialized for %s", name);
++	}
+ }
+ 
+ static struct avctp_queue *avctp_queue_create(struct avctp_channel *chan)
+@@ -1492,7 +1407,6 @@ static struct avctp *avctp_get_internal(struct btd_device *device)
+ 	session->server = server;
+ 	session->device = btd_device_ref(device);
+ 	session->state = AVCTP_STATE_DISCONNECTED;
+-	session->uinput = -1;
+ 	session->key.op = AVC_INVALID;
+ 
+ 	server->sessions = g_slist_append(server->sessions, session);
+@@ -1793,7 +1707,7 @@ static const char *op2str(uint8_t op)
+ 	int i;
+ 
+ 	for (i = 0; key_map[i].name != NULL; i++) {
+-		if ((op & 0x7F) == key_map[i].avc)
++		if ((op & 0x7F) == key_map[i].code)
+ 			return key_map[i].name;
+ 	}
+ 
+@@ -2232,7 +2146,7 @@ bool avctp_supports_avc(uint8_t avc)
+ 	int i;
+ 
+ 	for (i = 0; key_map[i].name != NULL; i++) {
+-		if (key_map[i].avc == avc)
++		if (key_map[i].code == avc)
+ 			return true;
+ 	}
+ 	return false;
 -- 
 2.51.1
 
