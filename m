@@ -1,221 +1,78 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D51C2D73BB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 20:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BE3245019
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 20:23:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765570938; cv=none; b=Ite14s3qVutjsLUPnENtux0EBOphvHI5zAIVGVQjPK3qPKCUjADgBuMSc4002m+sjAT5JScUHYCXjRzjSPdkD063edeywuxWtpjnsjqGqogD70BdgRPR77mevNqwNbO6Uhzegxy3v3ylxQQokwsYqSfHDXfCemLt87jGinzSREk=
+	t=1765570989; cv=none; b=oJhgdaZBTR/q0Wg3mfBKz2FNNoJqOl8nG+90DFqSJrDF5yJS46JqwCd71IMmBn2z2QGLhw1Hx2K4ndYCVXpPUjphLIWG4D/H0k6qFnsrj66O2SwNIhVctCxgtbWvo1debgxBhHS4UR/TzVRhnLRewsoYMZPx3BnOuAk8B+OH1oM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765570938; c=relaxed/simple;
-	bh=jBdKyhhS2b1JW3kYiHUEWdceV6K/zOJu/zBHx9H0Mbw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=fT4RKqSDLLq9BYyfw+yVAaknZrTrnAwSfGrYQDXXxdip0tRZ1ht5SXKYRzjezOIhYrRp82oJBwOlIOdT7f/eeglbLyNohtMcyYnduuXeEQn2Ow9pgnnQYuKu9FKp+ntxbHZYAKY/u34vl4ufrQkWWRowrhk517Un53xMU2uP4Ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=l80Kq5n9; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1765570989; c=relaxed/simple;
+	bh=eVVnPliD2dAdhUVLnLr7hI+WueYX9GOnx26wqncsvMw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pATcxqJFgSAae0CmPfWRaTuSM+gThZIO+1GJbnWBPGuXsFScOcG2Yycai1LEJvgCD4vKwTakp93brFF1mJqrlqNKPSpJeA/F3mmqWVUfIUgzVGMORaazdnh0/a8/bb1gXgm6rb8PAKd13lCDs3c77RVE9HSHPGccRcEB1ueBub0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=PuCBYY4a; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="l80Kq5n9"
-Received: from github.com (hubbernetes-node-2b4eaac.ash1-iad.github.net [10.56.128.74])
-	by smtp.github.com (Postfix) with ESMTPA id 8958C9211A0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 12:22:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1765570936;
-	bh=7v+AJKDt3XLt0zZItjXInt6VDMBukQh8G7y5ZSGiIFQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=l80Kq5n9tFrqYaecPPuC05OieD4uDKS7/DetuaUKmjT2MUaSqwL21DR1OJXUOHzaJ
-	 7CV5qvH8LS2L02RVbtpHirhf5KLadoXAzoT64K4WoRdEGdNzG3GuvuKx2QIrYdrw2m
-	 3CWeWl/UHUCisSgRZxTX5sOImKMk6+B9RdAI2zLE=
-Date: Fri, 12 Dec 2025 12:22:16 -0800
-From: Pauli Virtanen <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="PuCBYY4a"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=owXFN5JRdobUX6IAqN59Ob8HlVxd2JCnYXmOG4guum0=; b=PuCBYY4ayk4arN1o1jc76WVkX3
+	D4XTLN9XCElYRsFyvvplAWPm7K/4VoQNQ89Z+InjfmKWOWBcUZ1bzeoc7updq+J1ILeiaJM7f5ipd
+	aCG3Zc5e4LqYFHhICZgPT/Ebn3McJvYFGbY0urro7tPPgqfK/+hdJBFh3HHnxFA4A/QcLu1c99/Zm
+	nu4fERefVRzHy7m+Rzg7r5u49SSNIU+9s2GAVPlKS2sK+U66KAIFnQWrlWvmza86GBxEvHtxaX7uj
+	Mn5VIPCIb9CW4XlMmartqQPmIvws//XxJAbiTFauN+MCR1ILAkxqu3uLU1VWo8bdr1izAkIng2ZLA
+	IvxorADA==;
+Received: from 241.red-83-35-220.dynamicip.rima-tde.net ([83.35.220.241] helo=breogan.igalia.local)
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1vU9fK-00C9aJ-1p; Fri, 12 Dec 2025 21:23:02 +0100
+From: "Manuel A. Fernandez Montecelo" <mafm@igalia.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1032730/000000-b00b63@github.com>
-Subject: [bluez/bluez] b45440: shared/mcp, mcp: support multiple MCP, and add
- non...
+Cc: "Manuel A. Fernandez Montecelo" <mafm@igalia.com>
+Subject: [PATCH BlueZ v2 0/1] Support for config fragments (conf.d style dirs)
+Date: Fri, 12 Dec 2025 21:22:39 +0100
+Message-ID: <20251212202240.4057163-1-mafm@igalia.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1032730
-  Home:   https://github.com/bluez/bluez
-  Commit: b45440cca48dffcd0cc0f33dbc4bc815edb85a1b
-      https://github.com/bluez/bluez/commit/b45440cca48dffcd0cc0f33dbc4bc815edb85a1b
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-12 (Fri, 12 Dec 2025)
+Support config fragments, to read config from conf.d directories.
 
-  Changed paths:
-    M lib/bluetooth/uuid.h
-    M profiles/audio/mcp.c
-    M src/shared/mcp.c
-    M src/shared/mcp.h
-    M src/shared/mcs.h
+This is commonly supported by other tools, as an extension of the main
+config file(s).  It is useful and convenient in several situations,
+for example:
 
-  Log Message:
-  -----------
-  shared/mcp, mcp: support multiple MCP, and add non-stub MCS server
+* distributions can set different values from the defaults shipped
+  upstream, without having to modify the config file
 
-For Media Control Client, add support for multiple GMCS / MCS services
-on the server. Revise the API accordingly.
+* different packages or config-management tools can change config just
+  by adding, removing or modifying files in that directory; instead of
+  editing the main config files
 
-For Media Control Server, make it a complete implementation (OTS still
-missing), and add an API the profile can use.
+Manuel A. Fernandez Montecelo (1):
+  Support for config fragments (conf.d style dirs)
 
-This is mostly a complete rewrite.
+ Makefile.am                |   1 +
+ profiles/input/hog.c       |   3 +
+ profiles/input/manager.c   |   3 +
+ profiles/network/manager.c |   3 +
+ src/conf_d.c               | 202 +++++++++++++++++++++++++++++++++++++
+ src/conf_d.h               |  76 ++++++++++++++
+ src/main.c                 |   3 +
+ 7 files changed, 291 insertions(+)
+ create mode 100644 src/conf_d.c
+ create mode 100644 src/conf_d.h
 
-Adapt also profile/mcp.c to use the new API, adding support for multiple
-MCS services on the remote side.
+-- 
+2.51.0
 
-
-  Commit: 2d71b6f901e5bf0df2b9a21058e5beea21a4a21f
-      https://github.com/bluez/bluez/commit/2d71b6f901e5bf0df2b9a21058e5beea21a4a21f
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-12 (Fri, 12 Dec 2025)
-
-  Changed paths:
-    M .gitignore
-    M Makefile.am
-    A unit/test-mcp.c
-
-  Log Message:
-  -----------
-  test-mcp: add tests for MCP / MCS
-
-Add tests for the Media Control Client / Server implementation.
-
-This contains basic GGIT and state transition tests.  Not all state
-transition tests are here, as they'd largely test the upper layer of the
-profile which is not tested now.
-
-
-  Commit: 8f5d3d9e2d011df33050920b75412118413d58d7
-      https://github.com/bluez/bluez/commit/8f5d3d9e2d011df33050920b75412118413d58d7
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-12 (Fri, 12 Dec 2025)
-
-  Changed paths:
-    M profiles/audio/mcp.c
-
-  Log Message:
-  -----------
-  mcp: add support for Repeat & Shuffle for remote player
-
-Add support for toggling remote player playing order settings.
-
-These do not fully map to current org.bluez.MediaPlayer Repeat/Shuffle,
-but try best effort mapping.
-
-
-  Commit: 795424a01efd552bce742fe046842c1326365a7b
-      https://github.com/bluez/bluez/commit/795424a01efd552bce742fe046842c1326365a7b
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-12 (Fri, 12 Dec 2025)
-
-  Changed paths:
-    M Makefile.am
-    A src/shared/uinput.c
-    A src/shared/uinput.h
-
-  Log Message:
-  -----------
-  shared/uinput: add uinput utility functions
-
-Add uinput utility function that can be used both for AVCTP and MCS.
-
-
-  Commit: 1a4067c650edef4385c04de80ff2ab3316b0521b
-      https://github.com/bluez/bluez/commit/1a4067c650edef4385c04de80ff2ab3316b0521b
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-12 (Fri, 12 Dec 2025)
-
-  Changed paths:
-    M profiles/audio/avctp.c
-
-  Log Message:
-  -----------
-  avctp: use uinput utilities from src/shared
-
-Make use of the src/shared version of uinput_create() / send_key
-
-
-  Commit: 1563041a4c66c7a368de4e149b54ae9717d7bafd
-      https://github.com/bluez/bluez/commit/1563041a4c66c7a368de4e149b54ae9717d7bafd
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-12 (Fri, 12 Dec 2025)
-
-  Changed paths:
-    M profiles/audio/mcp.c
-
-  Log Message:
-  -----------
-  mcp: add local GMCS service that emits uinput media keys
-
-Implement simple GMCS service that is always inactive, and emits media
-key presses via uinput for Play/Pause/Stop/Next/Prev MCS commands.
-
-In practice, this seems to be enough to support media control keys on
-headsets.  Some headsets (Creative Zen Hybrid Pro) also refuse to
-connect if there is no GMCS service.
-
-
-  Commit: a99047749c8e7cc1b642516e32c970bf7d1807e0
-      https://github.com/bluez/bluez/commit/a99047749c8e7cc1b642516e32c970bf7d1807e0
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-12 (Fri, 12 Dec 2025)
-
-  Changed paths:
-    M src/shared/mcp.c
-
-  Log Message:
-  -----------
-  shared/mcp: on track changed, re-read values if notify not available
-
-Notify is optional for some MCS attributes. To get new track titles etc.
-re-read values on track change, if remote does not have notify on them.
-
-
-  Commit: a2ff5f082013d6be3ef60c9e1736d76b740f1abd
-      https://github.com/bluez/bluez/commit/a2ff5f082013d6be3ef60c9e1736d76b740f1abd
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-12 (Fri, 12 Dec 2025)
-
-  Changed paths:
-    M unit/test-mcp.c
-
-  Log Message:
-  -----------
-  test-mcp: check attributes are reread on track change if no notify
-
-Add test we reread attributes on track change if remote does not have
-optional notify features.
-
-
-  Commit: b00b63b3f692db1d2ae4f9a1b1e1fa0414b9d4b3
-      https://github.com/bluez/bluez/commit/b00b63b3f692db1d2ae4f9a1b1e1fa0414b9d4b3
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-12-12 (Fri, 12 Dec 2025)
-
-  Changed paths:
-    M src/shared/mcp.c
-
-  Log Message:
-  -----------
-  shared/mcp: complete CCID read before considering other attributes
-
-Service is shown ready to upper level when CCID is read, after which we
-should notify upper level about current attribute values.
-
-Make sure the values reach upper level, by reading them only after the
-service is ready. Otherwise, the reads may complete in unspecified
-order and upper level misses some events.
-
-
-Compare: https://github.com/bluez/bluez/compare/b45440cca48d%5E...b00b63b3f692
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
