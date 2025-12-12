@@ -1,353 +1,137 @@
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20073B8D64
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Dec 2025 22:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2114324728E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 08:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765493416; cv=none; b=Sumha+ONmFG+KMBJUz5P+jLd3UofWfiRrMIz+HnmyMyzpC31SGDmok33sR0dFWI94WDauI05fGDV57dRNXI8v9u7ZbFpUMwKhjP1tPhfRtFYgXNGruye6mCQvc0wq4eTjdUUPDdqTsfOoHYdTxscdijZTJZxY5b09e9cH6fS7bo=
+	t=1765526971; cv=none; b=eYOT21WVHo9g/PINf/O2XBfKHPuAhvmIFLyqxgm9TniZigxjKLJLh6s2OAqt4zQQMqi8IoLw2/4CAyT8KMjUQNMIVOWc6SV2HZVzh2wXl+9y9dHlsHm+HAr2Q/GptoeXlMWAEd2cqrN5UBntbwTNpRAD+bqddaAkKQlMD2TeNS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765493416; c=relaxed/simple;
-	bh=kcU9SyvA6WXuTNIHNe2BjrRkK/jgcjvsjijTh7qaXaE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EH6Dzfq0KAWRqqnNFVOTq49rQGUQlib0//OT55TkTBBh+LaszR7VvJ0VhOgLSSLIqW71ltXAxtbZtyeuOsJLIBOqVMMb3/NR+ENcwqGS4ZiZreVGvli9iXrWNuHCtoOEUQ8cU5QgODhBMGgg6WnaLnm5nCaZyH/b+DlvRVNtg3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=fail smtp.mailfrom=iki.fi; arc=none smtp.client-ip=185.67.36.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=iki.fi
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id EE326240027
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Dec 2025 23:48:04 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4dS75t3Gybz9rwn;
-	Thu, 11 Dec 2025 23:48:02 +0100 (CET)
-Message-ID: <081f864de65d00f024fd2418cafd2309eef5dc67.camel@iki.fi>
-Subject: Re: [PATCH BlueZ v5 4/7] shared/uinput-util: extract uinput utility
- function from AVCTP
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 11 Dec 2025 22:48:04 +0000
-In-Reply-To: <CABBYNZLBEhEeHb7U77WreFguqZefPkPzebRMz0mR-ErJT79BLw@mail.gmail.com>
-References: <cover.1765484150.git.pav@iki.fi>
-	 <e8fd07e902ad1fbc00113ef57eb89b8970d29a84.1765484150.git.pav@iki.fi>
-	 <CABBYNZLBEhEeHb7U77WreFguqZefPkPzebRMz0mR-ErJT79BLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1765526971; c=relaxed/simple;
+	bh=K06CTF1+H8fsvJB8Sz7I3QqOSTfTlCxCmD4vCQHcp/Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Piwq8bMHE0l7pb9vKddzutuZidPV2+Qxtx8CbLt4fuLoqbqYTLYoYhlrFpoOXV8mFap0hmAmzTTLUi5XuASWlCpJPH+7mOu8AccjXADe2ffjEFLAc8nJIWjHGg9RnwbMKc10aKIPy/1MV05Ob4910fBiW2D/Vi5pgFl59MDrM5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=VQyN9t+s; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="VQyN9t+s"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-640aa1445c3so1557308a12.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 00:09:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765526967; x=1766131767; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z4ODxaS91WWg8dms1l29deWZrC7eVseakTTbVZP9TPM=;
+        b=VQyN9t+sLEL/hIuBW/KIOEI00UrAqUlJjnEqwC+FdON6JLO9z7/yUMsP/cwtSqfOcx
+         D7CdkARndnfuvifT8wNgW11N7IwwnAqmWK76Q4E6b9iHh3M2IG58U9pMWbkCF9wzs89u
+         LEbhI9HYa8BioFTqLVMf3lTio7rhTTeZPMsbq9cJMopoD9HyqdTEaSxCv9TR08ZHx5wZ
+         XJ/cvZqmrLgksernPaiaU1JoiqT8GmGzmq6iliUP772TD72w6G4WKrXV97682fTIqvn+
+         3ud+YZOH7fC4TyMqbm9XTuEwPnEMnKm8nsLAGUF/YoZWkh5MivVoMJ7gJdRJrj90CoCx
+         p1VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765526967; x=1766131767;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z4ODxaS91WWg8dms1l29deWZrC7eVseakTTbVZP9TPM=;
+        b=S81ngw3GPN5vK0SuWxm6Lmdn1o2OqZm4uWfysBpTqOd4UXFN2Jvapc1ZKe4+7n9YrR
+         h1tARTwr2dVfePDMe4NnhF6rOn/XPyoePM9hjY7R6iDoq6ki88HTYZJEAJCOGjd0A7z0
+         ZS86755H2of75v9REWHJV96PephVrSwne3EqITp2TtU7EcZqjARndwHvR9ePomhSPN7i
+         qGGqHKKqRKh3VJuEQjX6cdldrniDNAnYxZlpERJkgoO+Hfnub5hhmAHFZqvaDzEgBqUg
+         0mdhyqPtPLRt6z6822D4Z9OrpCiiYVZhkG/aju9jCA7z2lccBcjP/Ug/68ss5Ijjt3Mu
+         GVBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUggG7pJXAxmNS3tDgReiVJ1tQNtBD5I/cnAtWRG4Ty6I9U0le6NoP+a/AT/Kt5OOEoxa/BpkHri2fHPrks8RQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYHla+u9yVUqv9XE2SWFNCF9FMKVZrkotWXMyWGK9DVcnDEUXG
+	5AcbGCjoYvxvleO8jgLmoh03rsJJYVtcF5y0O0qj45W5HZ+mpVpyIFXbebWwqhlBME8=
+X-Gm-Gg: AY/fxX56oLVFmj33LCZKUpOhWS4WYo3ns0jf6ES7vrMXE4kZ7SBHcAOjQT42j1bBEmD
+	khCrf0Zmu7i6f2l1c/5lVTF6tFtQ/sLg1aPftowKlEsJoCSFb5GF3ThSDHGNQsId+Z1aONl+wS1
+	MBz9jNYsm8O3vcW/3qnHXP8k+u0UHcqB9ri5XamphDoEIHlhyrJgsLYnVRXiatGOE6alFHKvprb
+	ZmfCaOIDqvEjhpoEAIaffVklFiD091kEOBdeb0qx8oIi6AdUDrYNBNJgcYoSVLPQS2mzq8TSEN4
+	C5QWpmyRP7AqpgRFzyxs60uLUkW20Op8EoKJV1SGw/iCgm10Aih5zT7D/wXrjeuELz+IMkqWAz9
+	/NAypRMSuWrD09n3ydI/n9aS6kCCS0zSrK7skib1sYeIJPVwpaTH7zgjG57mYNXDTRjbEa2coBo
+	VZb8Iir8kjAZVleKLO9SgRUcmy35eO1bYvjlS6e+A7V7ukBoO89dSu7YjV7KVyDLvj++9QG+FTC
+	iw=
+X-Google-Smtp-Source: AGHT+IGjlZGO7rwXFONsbS/nqwyomTwF06cuS1NBQZnSkxQyjYYdO5U9mb9vjrawLsD5RVoidrAzyQ==
+X-Received: by 2002:a17:907:8011:b0:b7a:6c98:32ba with SMTP id a640c23a62f3a-b7d235c977amr57851566b.1.1765526967412;
+        Fri, 12 Dec 2025 00:09:27 -0800 (PST)
+Received: from localhost (p200300f65f0066082ad4229ee042f7ed.dip0.t-ipconnect.de. [2003:f6:5f00:6608:2ad4:229e:e042:f7ed])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b7cfa29bedbsm510984066b.9.2025.12.12.00.09.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Dec 2025 00:09:27 -0800 (PST)
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Yang Li <yang.li@amlogic.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Maximilian Luz <luzmaximilian@gmail.com>,
+	Hans de Goede <hansg@kernel.org>,
+	=?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: linux-serial@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org
+Subject: [PATCH v1 0/4] serdev: Stop using device_driver callbacks
+Date: Fri, 12 Dec 2025 09:09:05 +0100
+Message-ID: <cover.1765526117.git.u.kleine-koenig@baylibre.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2042; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=K06CTF1+H8fsvJB8Sz7I3QqOSTfTlCxCmD4vCQHcp/Y=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBpO82hS2J33V3DvLBVORXLLnffbAMzV3OfWdh2a VVjbXTGbp6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaTvNoQAKCRCPgPtYfRL+ To3JCACryjD6szyIbOAJaZIbJtZMnL1IOkIiXNzrMoIlqNyOhOwBe/3SwVg+zplh4KCp8HCJk+O y0YB98avclKkhAN8MqyBBiONeBwksmxil9PatLgexVwxQlb3BRfFCKaWkdecsThmRQoVC1dJ3FZ TiFdiZZFveRo4TT2RE2fj8mlgtdtwzponNXPqcznoA5L7QN5w2ZVUAGB3tRk585tZwFkZMYm56s B5YrvZ2zovmO2vhkdWeMc0rXKgJN2FjP4GVbYm8aWcSz3qFSY8cmzChofq/YnzdzSrPxuN+ttjD whNGQH+Nu7ZdRFUDa0F+PD93nRgzYZjNFt74aRphPSZAJzWw
+X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
 
-to, 2025-12-11 kello 17:05 -0500, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
->=20
-> On Thu, Dec 11, 2025 at 3:16=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote=
-:
-> >=20
-> > Extract uinput utility function from AVCTP to src/shared so that it can
-> > be reused for MCS.
-> > ---
-> >  Makefile.am              |   4 +-
-> >  src/shared/uinput-util.c | 191 +++++++++++++++++++++++++++++++++++++++
-> >  src/shared/uinput-util.h |  31 +++++++
-> >  3 files changed, 225 insertions(+), 1 deletion(-)
-> >  create mode 100644 src/shared/uinput-util.c
-> >  create mode 100644 src/shared/uinput-util.h
-> >=20
-> > diff --git a/Makefile.am b/Makefile.am
-> > index ba0262d5f..4c7177886 100644
-> > --- a/Makefile.am
-> > +++ b/Makefile.am
-> > @@ -247,7 +247,9 @@ shared_sources =3D src/shared/io.h src/shared/timeo=
-ut.h \
-> >                         src/shared/lc3.h src/shared/tty.h \
-> >                         src/shared/bap-defs.h \
-> >                         src/shared/asha.h src/shared/asha.c \
-> > -                       src/shared/battery.h src/shared/battery.c
-> > +                       src/shared/battery.h src/shared/battery.c \
-> > +                       src/shared/uinput-util.h \
-> > +                       src/shared/uinput-util.c
-> >=20
-> >  if READLINE
-> >  shared_sources +=3D src/shared/shell.c src/shared/shell.h
-> > diff --git a/src/shared/uinput-util.c b/src/shared/uinput-util.c
-> > new file mode 100644
-> > index 000000000..4e9644661
-> > --- /dev/null
-> > +++ b/src/shared/uinput-util.c
-> > @@ -0,0 +1,191 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + *
-> > + *  BlueZ - Bluetooth protocol stack for Linux
-> > + *
-> > + *  Copyright (C) 2006-2010  Nokia Corporation
-> > + *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-> > + *  Copyright (C) 2011  Texas Instruments, Inc.
-> > + *
-> > + *
-> > + */
-> > +
-> > +#ifdef HAVE_CONFIG_H
-> > +#include <config.h>
-> > +#endif
-> > +
-> > +#include <unistd.h>
-> > +#include <fcntl.h>
-> > +#include <sys/ioctl.h>
-> > +#include <errno.h>
-> > +#include <string.h>
-> > +#include <stdio.h>
-> > +#include <stdarg.h>
-> > +#include <linux/uinput.h>
-> > +
-> > +#include "bluetooth/bluetooth.h"
-> > +
-> > +#include "src/shared/util.h"
-> > +#include "src/shared/uinput-util.h"
-> > +
-> > +
-> > +#define DBG(uinput, fmt, arg...) \
-> > +       uinput_debug(uinput->debug_func, uinput->debug_data, "%s:%s() "=
- fmt, \
-> > +                                               __FILE__, __func__, ## =
-arg)
-> > +
-> > +struct bt_uinput {
-> > +       int fd;
-> > +       bt_uinput_debug_func_t debug_func;
-> > +       void *debug_data;
-> > +};
-> > +
-> > +static void uinput_debug(bt_uinput_debug_func_t debug_func, void *debu=
-g_data,
-> > +                                                       const char *for=
-mat, ...)
-> > +{
-> > +       va_list ap;
-> > +
-> > +       if (!debug_func || !format)
-> > +               return;
-> > +
-> > +       va_start(ap, format);
-> > +       util_debug_va(debug_func, debug_data, format, ap);
-> > +       va_end(ap);
-> > +}
-> > +
-> > +static int send_event(int fd, uint16_t type, uint16_t code, int32_t va=
-lue)
-> > +{
-> > +       struct input_event event;
-> > +
-> > +       memset(&event, 0, sizeof(event));
-> > +       event.type      =3D type;
-> > +       event.code      =3D code;
-> > +       event.value     =3D value;
-> > +
-> > +       return write(fd, &event, sizeof(event));
-> > +}
-> > +
-> > +void bt_uinput_send_key(struct bt_uinput *uinput, uint16_t key, bool p=
-ressed)
-> > +{
-> > +       if (!uinput)
-> > +               return;
-> > +
-> > +       DBG(uinput, "%d", key);
-> > +
-> > +       send_event(uinput->fd, EV_KEY, key, pressed ? 1 : 0);
-> > +       send_event(uinput->fd, EV_SYN, SYN_REPORT, 0);
-> > +}
-> > +
-> > +struct bt_uinput *bt_uinput_new(const char *name, const char *suffix,
-> > +                                       const bdaddr_t *addr,
-> > +                                       const struct input_id *dev_id,
-> > +                                       const struct bt_uinput_key_map =
-*key_map,
-> > +                                       bt_uinput_debug_func_t debug,
-> > +                                       void *user_data)
-> > +{
-> > +       struct bt_uinput *uinput;
-> > +       struct uinput_user_dev dev;
-> > +       int fd, err, i;
-> > +       char src[18];
-> > +
-> > +       uinput =3D new0(struct bt_uinput, 1);
-> > +       uinput->debug_func =3D debug;
-> > +       uinput->debug_data =3D user_data;
-> > +
-> > +       fd =3D open("/dev/uinput", O_RDWR);
-> > +       if (fd < 0) {
-> > +               fd =3D open("/dev/input/uinput", O_RDWR);
-> > +               if (fd < 0) {
-> > +                       fd =3D open("/dev/misc/uinput", O_RDWR);
-> > +                       if (fd < 0) {
-> > +                               err =3D errno;
-> > +                               DBG(uinput, "Can't open input device: %=
-s (%d)",
-> > +                                                       strerror(err), =
-err);
-> > +                               free(uinput);
->=20
-> It is probably worth reordering the uinput allocation so it is after
-> the open, that way we don't need to free on bail out.
+Hello,
 
-This is on purpose for the DBG macro, so I'd not change it.
+the serdev subsystem currently doesn't provide a shutdown callback, thus
+drivers that want being notified on shutdown have to implement the
+respective callback in struct device_driver. This (and more)
+functionality can be provided by a bus method as it already done for
+.probe() and .remove().
 
-> > +                               errno =3D err;
-> > +                               return NULL;
-> > +                       }
-> > +               }
-> > +       }
-> > +
-> > +       memset(&dev, 0, sizeof(dev));
-> > +
-> > +       if (name)
-> > +               snprintf(dev.name, UINPUT_MAX_NAME_SIZE, "%s", name);
-> > +
-> > +       if (suffix) {
-> > +               int len, slen;
-> > +
-> > +               len =3D strlen(dev.name);
-> > +               slen =3D strlen(suffix);
-> > +
-> > +               /* If name + suffix don't fit, truncate the name, then =
-add the
-> > +                * suffix.
-> > +                */
-> > +               if (slen >=3D UINPUT_MAX_NAME_SIZE)
-> > +                       slen =3D UINPUT_MAX_NAME_SIZE - 1;
-> > +               if (len > UINPUT_MAX_NAME_SIZE - slen - 1)
-> > +                       len =3D UINPUT_MAX_NAME_SIZE - slen - 1;
-> > +
-> > +               snprintf(dev.name + len, UINPUT_MAX_NAME_SIZE - len,
-> > +                                                               "%s", s=
-uffix);
-> > +       }
-> > +
-> > +       if (dev_id) {
-> > +               dev.id.bustype =3D dev_id->bustype;
-> > +               dev.id.vendor =3D dev_id->vendor;
-> > +               dev.id.product =3D dev_id->product;
-> > +               dev.id.version =3D dev_id->version;
-> > +       } else {
-> > +               dev.id.bustype =3D BUS_VIRTUAL;
-> > +       }
-> > +
-> > +       if (write(fd, &dev, sizeof(dev)) < 0) {
-> > +               err =3D errno;
-> > +               DBG(uinput, "Can't write device information: %s (%d)",
-> > +                                                       strerror(err), =
-err);
-> > +               close(fd);
-> > +               free(uinput);
-> > +               errno =3D err;
-> > +               return NULL;
-> > +       }
-> > +
-> > +       ioctl(fd, UI_SET_EVBIT, EV_KEY);
-> > +       ioctl(fd, UI_SET_EVBIT, EV_REL);
-> > +       ioctl(fd, UI_SET_EVBIT, EV_REP);
-> > +       ioctl(fd, UI_SET_EVBIT, EV_SYN);
-> > +
-> > +       ba2strlc(addr, src);
-> > +       ioctl(fd, UI_SET_PHYS, src);
-> > +
-> > +       for (i =3D 0; key_map[i].name !=3D NULL; i++)
-> > +               ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
-> > +
-> > +       if (ioctl(fd, UI_DEV_CREATE, NULL) < 0) {
-> > +               err =3D errno;
-> > +               DBG(uinput, "Can't create uinput device: %s (%d)",
-> > +                                                       strerror(err), =
-err);
-> > +               close(fd);
-> > +               free(uinput);
-> > +               errno =3D err;
-> > +               return NULL;
-> > +       }
-> > +
-> > +       send_event(fd, EV_REP, REP_DELAY, 300);
-> > +
-> > +       DBG(uinput, "%p", uinput);
-> > +
-> > +       uinput->fd =3D fd;
-> > +       return uinput;
-> > +}
-> > +
-> > +void bt_uinput_destroy(struct bt_uinput *uinput)
-> > +{
-> > +       if (!uinput)
-> > +               return;
-> > +
-> > +       DBG(uinput, "%p", uinput);
-> > +
-> > +       ioctl(uinput->fd, UI_DEV_DESTROY);
-> > +       close(uinput->fd);
-> > +       free(uinput);
-> > +}
-> > diff --git a/src/shared/uinput-util.h b/src/shared/uinput-util.h
-> > new file mode 100644
-> > index 000000000..fb8f7e6bd
-> > --- /dev/null
-> > +++ b/src/shared/uinput-util.h
-> > @@ -0,0 +1,31 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
->=20
-> In theory we should only place LGPL code into src/shared, now I see we
-> are copying some code thus it should continue using the same license
-> as the original code, but perhaps it is worth reworking the copied
-> code since it is quite simple and I think it is worth it to not
-> contaminate shared library with GPL.
+The eventual goal is to remove .shutdown() (and .probe() and .remove())
+from struct device_driver.
 
-That, or decide it's small enough to not be copyrightable, given it's
-anyway partly rewritten already.
+Note that the first patch introduces a warning when the three affected
+drivers are registered (in driver_register() because `drv->bus->shutdown
+&& drv->shutdown`). Patches #2 - #4 fix these warnings. So from a user
+perspective it would be good to get the whole series in during a single
+merge window---either by creating an immutable branch containing patch
+#1 that is merged into the respective subsystems before applying the
+following patches, or merging the complete series via a single tree.
 
-> > +/*
-> > + *
-> > + *  BlueZ - Bluetooth protocol stack for Linux
-> > + *
-> > + *  Copyright (C) 2006-2010  Nokia Corporation
-> > + *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-> > + *  Copyright (C) 2011  Texas Instruments, Inc.
-> > + *
-> > + *
-> > + */
-> > +
-> > +struct bt_uinput;
-> > +
-> > +struct bt_uinput_key_map {
-> > +       const char *name;
-> > +       unsigned int code;
-> > +       uint16_t uinput;
-> > +};
-> > +
-> > +typedef void (*bt_uinput_debug_func_t)(const char *str, void *user_dat=
-a);
-> > +
-> > +struct bt_uinput *bt_uinput_new(const char *name, const char *suffix,
-> > +                                       const bdaddr_t *addr,
-> > +                                       const struct input_id *dev_id,
-> > +                                       const struct bt_uinput_key_map =
-*key_map,
-> > +                                       bt_uinput_debug_func_t debug,
-> > +                                       void *user_data);
->=20
-> I'd leave the debug function to be initialized with its own function
-> (e.g. bt_uinput_set_debug).
->=20
-> > +void bt_uinput_destroy(struct bt_uinput *uinput);
-> > +
-> > +void bt_uinput_send_key(struct bt_uinput *uinput, uint16_t key, bool p=
-ressed);
-> > --
-> > 2.51.1
-> >=20
-> >=20
->=20
+At a later point in time the added check in
+__serdev_device_driver_register() and the function
+serdev_legacy_shutdown() can be dropped. I intend to cope for that in
+the merge window that removes the callbacks from struct device_driver
+because drivers that I might have missed to convert or that are rebased
+over that change break silently as long as struct
+device_driver::shutdown exists.
 
---=20
-Pauli Virtanen
+Best regards
+Uwe
+
+Uwe Kleine-König (4):
+  serdev: Provide a bustype shutdown function
+  Bluetooth: hci_aml: Migrate to serdev specific shutdown function
+  Bluetooth: hci_qca: Migrate to serdev specific shutdown function
+  platform/surface: Migrate to serdev specific shutdown function
+
+ drivers/bluetooth/hci_aml.c                | 16 ++++++++--------
+ drivers/bluetooth/hci_qca.c                |  5 ++---
+ drivers/platform/surface/aggregator/core.c |  6 +++---
+ drivers/tty/serdev/core.c                  | 21 +++++++++++++++++++++
+ include/linux/serdev.h                     |  1 +
+ 5 files changed, 35 insertions(+), 14 deletions(-)
+
+
+base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
+-- 
+2.47.3
 
