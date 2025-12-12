@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03FB2D9786
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 20:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777FF30DEAD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Dec 2025 20:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765570368; cv=pass; b=QQ72Q/6rcnpHTlHRBre+Hwj5rTJOkIXfp7I7T4/NQsfTtDlKTN81iqhC0ElxAuC8czbD/64pnBdcSzzmqMlpFjiayvwwwi9PiaJtxw60DMfxEmX86JyBK39dtfywDlDXGljGbJgABxBhGGA03UPfnPzcUriSzcWklM1Q+akoJ9E=
+	t=1765570374; cv=pass; b=kbbr+FXi+msRn1cpxSCsrJcW9yZZqOyJKSoTQ8ofVN5CM0YfdiWbyuHwsO+91W6BV0KsOjNSisIfIOwJ4Xrkp5B7XCKD23uTkmK8+mSy7WAXvY3/rcBkgE+RykN4h8/b464OQFii4gFDd5kkPhRrkRxay0HlF7ibnyPhZv8ZfR0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765570368; c=relaxed/simple;
-	bh=XxWVH2hQsTlByrXC1nUNJtvR5Y59pnlETwdNBuVEcXs=;
+	s=arc-20240116; t=1765570374; c=relaxed/simple;
+	bh=FoMsDD38TwJD1Gi1nPO/soiNpv9ywEAXq77+Pjun6xc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F/6VH3+fv3f9ThYBVsjvIqzqbrCV97CTaGfPDssaVfGrTb7aJcZ41swfMzTT/ZaXBmv8Ear8BLZXVXSqIUn3x83f7r1vB9fFxiaqdMyQ4p1m4QlskTTjuTu5cL9fEH3yM72xMgdc+KhoS/v/aMt1n54n45KKJpyaEfetNdG5UYU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=w9jpt13U; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=FTWQptzJBpge2rfcYPasVP2ECipxd3XXufOHxPfYYPvYs9PtZ7owxjgR3C+NVjlcccEb8N7ezp2waAaNhl/cNmsQYMOXg3KBC3bH02VXyAhdxrNaBZaJKz5tJWL5BwE38v840QcCq3fb5OwXgUt5Xhj2UOU5ZnRe59JCOiaVJss=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=b1PS++Wl; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="w9jpt13U"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="b1PS++Wl"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a02d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dSgc84pXDz107f;
-	Fri, 12 Dec 2025 22:12:40 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dSgcD46NXz1065;
+	Fri, 12 Dec 2025 22:12:44 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1765570361;
+	t=1765570364;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=v4oesjIVWt2H0Z57T9oQXDFXpJd6hYy6QZwIzp7TBy4=;
-	b=w9jpt13UGRDr4unomADkbbTBMmIJI8iDZaMAOOsPJIyvgV26pJsx7MzT6UFHCe5MAmSAmk
-	ukfRzfxMKJ7mkSaY5bmWGiSt7G49CdQtt4VsJI33SUbI6xMsdMl9tfi0e6ZVz9G3jueYui
-	cOXZR3XzfRnvOF9EvAsY9mg9mt/HrzM=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765570361;
-	b=xD86+T6CMeEOiXR+rLSmqyVkgOgLZZQVMuImqVDplsVQdvbJZatxhR80fdRPCJ6CQnvj2k
-	kAPtHTuHd9X+6nkAIokzjy0e6lBvXZpoXdJOH52f4BjwzLYlw1nRAEyTN+UMqKKgz2Ft7B
-	pU0bgJ0RIxJ0jKztvygzjS4dPXBZy0U=
+	bh=N/9vNOPO1IOvBdanSYt+dCH7fFi27EF6pvwj4k0Z8wU=;
+	b=b1PS++WlrIFiaxi0Z1KsIMoWJayBv5Ehdvqpawqz/eK0j0TRaPEJOez0Al+Bcsqxc1ktyU
+	NPrsvKZQKvreqGRXq/5kNpS3Kb6jE8TfSvWs2dTmyU1j/7IdZMfn6ge7ZvnD6CDs+tIw5V
+	sei1mMp5vDab8tmo6E9Tccoeu7fgX0o=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765570364;
+	b=BJ9/frJWn03LS6fgsUHPpAtuKXLe580QLSucXMwjv9K4vtnczgC9UkiDKnXwFtTYplbNWs
+	5+SU3K4BOIIOrfy228x/AGBLIyucWqKIgUBoWG8gta2Y2EJ6FcJ64VMgHD9j7b8GP7sCDH
+	Y3rVradT+kbLN8+kdQ3PoUsZ8uRj8O4=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1765570361;
+	s=meesny; t=1765570364;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=v4oesjIVWt2H0Z57T9oQXDFXpJd6hYy6QZwIzp7TBy4=;
-	b=FcK5t+9+Axv8VFYalDLzWa2DywbKAn+SR46sZfXJQCOy6sjgXCy0vF/M8WUNy/jCDKNvOC
-	DDThCYNPLWcdwrJuUCqeGtNtp3GESpc0TeQysDjMe2zTdCparf+erDPWgmV2PVOVMlFA4y
-	B6rx6mK9fOCeviQ39lXxP5fpujl5ZCI=
+	bh=N/9vNOPO1IOvBdanSYt+dCH7fFi27EF6pvwj4k0Z8wU=;
+	b=BefomvgTnADycauBCMIuLIoHbduvnWEjwB77V6B9b2PVvfeSb7wd+53Ypgb8sa/RKaZGeE
+	KrmWLib3iU25nVw5MIZe4eW1xYlNPctcZHJIUBgoxZJb6hQF13vflQXuQz3Ksm4jslVQS/
+	Rl7DwVG6lsBrNwRRsUPqzLRYLp6BFRo=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v6 4/9] shared/uinput: add uinput utility functions
-Date: Fri, 12 Dec 2025 22:12:26 +0200
-Message-ID: <bfdabc3f228c68b2855e335de32c3eb083916c63.1765570334.git.pav@iki.fi>
+Subject: [PATCH BlueZ v6 8/9] test-mcp: check attributes are reread on track change if no notify
+Date: Fri, 12 Dec 2025 22:12:30 +0200
+Message-ID: <cba69d3d6d820bdcb5b112cc0726459d838554b6.1765570334.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1765570334.git.pav@iki.fi>
 References: <cover.1765570334.git.pav@iki.fi>
@@ -67,277 +67,82 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add uinput utility function that can be used both for AVCTP and MCS.
+Add test we reread attributes on track change if remote does not have
+optional notify features.
 ---
- Makefile.am         |   3 +-
- src/shared/uinput.c | 204 ++++++++++++++++++++++++++++++++++++++++++++
- src/shared/uinput.h |  32 +++++++
- 3 files changed, 238 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/uinput.c
- create mode 100644 src/shared/uinput.h
+ unit/test-mcp.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-diff --git a/Makefile.am b/Makefile.am
-index 795d0d403..3adfa6cd5 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -247,7 +247,8 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/lc3.h src/shared/tty.h \
- 			src/shared/bap-defs.h \
- 			src/shared/asha.h src/shared/asha.c \
--			src/shared/battery.h src/shared/battery.c
-+			src/shared/battery.h src/shared/battery.c \
-+			src/shared/uinput.h src/shared/uinput.c
+diff --git a/unit/test-mcp.c b/unit/test-mcp.c
+index 0100df1ab..b05630185 100644
+--- a/unit/test-mcp.c
++++ b/unit/test-mcp.c
+@@ -1325,6 +1325,57 @@ static void testgroup_cl_mccp(void)
+ 		test_setup, test_client, &cfg_mccp_bv_21_c, MCCP_BV_21_C);
+ }
  
- if READLINE
- shared_sources += src/shared/shell.c src/shared/shell.h
-diff --git a/src/shared/uinput.c b/src/shared/uinput.c
-new file mode 100644
-index 000000000..4856f93cf
---- /dev/null
-+++ b/src/shared/uinput.c
-@@ -0,0 +1,204 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2025  Pauli Virtanen
-+ *
-+ */
++#define CL_BLUEZ_1_REREAD \
++	NOTIFY_CHRC(TRACK_CHG), \
++	READ_CHRC(TRACK_TITLE, 'N', 'e', 'w'), \
++	READ_CHRC(TRACK_DUR, 0xff, 0xff, 0xff, 0xff), \
++	READ_CHRC(TRACK_POS, 0xff, 0xff, 0xff, 0xff), \
++	READ_CHRC(PLAY_SPEED, 0x00), \
++	READ_CHRC(SEEK_SPEED, 0x00), \
++	READ_CHRC(PLAY_ORDER, 0x04), \
++	READ_CHRC(PLAY_ORDER_SUPP, 0x18, 0x00), \
++	READ_CHRC(CP_SUPP, SPLIT_INT32(0x01))
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include <sys/ioctl.h>
-+#include <errno.h>
-+#include <string.h>
-+#include <stdio.h>
-+#include <stdarg.h>
-+#include <linux/uinput.h>
-+
-+#include "bluetooth/bluetooth.h"
-+
-+#include "src/shared/util.h"
-+#include "src/shared/uinput.h"
-+
-+
-+#define DBG(uinput, fmt, arg...) \
-+	uinput_debug(uinput->debug_func, uinput->debug_data, "%s:%s() " fmt, \
-+						__FILE__, __func__, ## arg)
-+
-+struct bt_uinput {
-+	struct input_id dev_id;
-+	char name[UINPUT_MAX_NAME_SIZE];
-+	bdaddr_t addr;
-+	int fd;
-+
-+	bt_uinput_debug_func_t debug_func;
-+	void *debug_data;
-+};
-+
-+static void uinput_debug(bt_uinput_debug_func_t debug_func, void *debug_data,
-+							const char *format, ...)
++static void cl_reread_complete_cb(const void *user_data)
 +{
-+	va_list ap;
++	struct test_data *data = (void *)user_data;
 +
-+	if (!debug_func || !format)
-+		return;
-+
-+	va_start(ap, format);
-+	util_debug_va(debug_func, debug_data, format, ap);
-+	va_end(ap);
++	if (data->step == 2)
++		tester_test_passed();
 +}
 +
-+static void uinput_emit(struct bt_uinput *uinput, uint16_t type, uint16_t code,
-+								int32_t val)
++static void cl_reread_track_title(void *user_data, const uint8_t *value,
++								uint16_t length)
 +{
-+	struct input_event ie;
++	struct test_data *data = user_data;
 +
-+	memset(&ie, 0, sizeof(ie));
-+
-+	ie.type = type;
-+	ie.code = code;
-+	ie.value = val;
-+
-+	write(uinput->fd, &ie, sizeof(ie));
-+}
-+
-+void bt_uinput_send_key(struct bt_uinput *uinput, uint16_t key, bool pressed)
-+{
-+	if (!uinput)
-+		return;
-+
-+	DBG(uinput, "%d", key);
-+
-+	uinput_emit(uinput, EV_KEY, key, pressed ? 1 : 0);
-+	uinput_emit(uinput, EV_SYN, SYN_REPORT, 0);
-+}
-+
-+struct bt_uinput *bt_uinput_new(const char *name, const char *suffix,
-+				const bdaddr_t *addr,
-+				const struct input_id *dev_id)
-+{
-+	struct bt_uinput *uinput;
-+	const size_t name_max = sizeof(uinput->name);
-+
-+	uinput = new0(struct bt_uinput, 1);
-+	uinput->fd = -1;
-+
-+	if (name)
-+		snprintf(uinput->name, name_max, "%s", name);
-+
-+	if (suffix) {
-+		size_t name_len = strlen(uinput->name);
-+		size_t suffix_len = strlen(suffix);
-+		size_t pos = name_len;
-+
-+		if (suffix_len > name_max - 1)
-+			suffix_len = name_max - 1;
-+		if (pos + suffix_len > name_max - 1)
-+			pos = name_max - 1 - suffix_len;
-+
-+		snprintf(uinput->name + pos, name_max - pos, "%s", suffix);
-+	}
-+
-+	if (addr)
-+		bacpy(&uinput->addr, addr);
-+
-+	if (dev_id) {
-+		uinput->dev_id.bustype = dev_id->bustype;
-+		uinput->dev_id.product = dev_id->product;
-+		uinput->dev_id.vendor = dev_id->vendor;
-+		uinput->dev_id.version = dev_id->version;
++	if (strncmp((void *)value, "Title", length) == 0 && data->step == 0) {
++		data->step++;
++	} else if (strncmp((void *)value, "New", length) == 0 &&
++							data->step == 1) {
++		data->step++;
++		tester_io_set_complete_func(cl_reread_complete_cb);
 +	} else {
-+		uinput->dev_id.bustype = BUS_BLUETOOTH;
++		FAIL_TEST();
 +	}
-+
-+	return uinput;
 +}
 +
-+void bt_uinput_set_debug(struct bt_uinput *uinput,
-+					bt_uinput_debug_func_t debug_func,
-+					void *user_data)
-+{
-+	if (!uinput)
-+		return;
-+
-+	uinput->debug_func = debug_func;
-+	uinput->debug_data = user_data;
-+}
-+
-+int bt_uinput_create(struct bt_uinput *uinput,
-+					const struct bt_uinput_key_map *key_map)
-+{
-+	int fd = -1;
-+	struct uinput_user_dev dev;
-+	size_t i;
-+	int err;
-+	char addr[18];
-+
-+	if (!uinput || uinput->fd >= 0)
-+		return -EINVAL;
-+
-+	fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
-+	if (fd < 0)
-+		fd = open("/dev/input/uinput", O_WRONLY | O_NONBLOCK);
-+	if (fd < 0)
-+		fd = open("/dev/misc/uinput", O_WRONLY | O_NONBLOCK);
-+	if (fd < 0) {
-+		err = -errno;
-+		DBG(uinput, "Failed to open /dev/uinput: %s", strerror(-err));
-+		goto fail;
-+	}
-+
-+	ioctl(fd, UI_SET_EVBIT, EV_KEY);
-+	ioctl(fd, UI_SET_EVBIT, EV_SYN);
-+	for (i = 0; key_map[i].name; ++i)
-+		ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
-+
-+	ba2strlc(&uinput->addr, addr);
-+	ioctl(fd, UI_SET_PHYS, addr);
-+
-+	memset(&dev, 0, sizeof(dev));
-+	dev.id = uinput->dev_id;
-+	snprintf(dev.name, sizeof(dev.name), "%s", uinput->name);
-+
-+	if (write(fd, &dev, sizeof(dev)) < 0) {
-+		err = -errno;
-+		DBG(uinput, "Failed to write setup: %s", strerror(-err));
-+		goto fail;
-+	}
-+
-+	if (ioctl(fd, UI_DEV_CREATE) < 0) {
-+		err = -errno;
-+		DBG(uinput, "Failed to create device: %s", strerror(-err));
-+		goto fail;
-+	}
-+
-+	DBG(uinput, "%p", uinput);
-+
-+	uinput->fd = fd;
-+	return 0;
-+
-+fail:
-+	if (fd >= 0)
-+		close(fd);
-+	return err;
-+}
-+
-+void bt_uinput_destroy(struct bt_uinput *uinput)
-+{
-+	if (!uinput)
-+		return;
-+
-+	DBG(uinput, "%p", uinput);
-+
-+	if (uinput->fd >= 0) {
-+		ioctl(uinput->fd, UI_DEV_DESTROY);
-+		close(uinput->fd);
-+	}
-+
-+	free(uinput);
-+}
-diff --git a/src/shared/uinput.h b/src/shared/uinput.h
-new file mode 100644
-index 000000000..a15e4b3b4
---- /dev/null
-+++ b/src/shared/uinput.h
-@@ -0,0 +1,32 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2025  Pauli Virtanen
-+ */
-+
-+struct bt_uinput;
-+
-+struct bt_uinput_key_map {
-+	const char *name;
-+	unsigned int code;
-+	uint16_t uinput;
++const struct test_config cfg_cl_bluez_1_reread = {
++	.listener_cb = &(struct bt_mcp_listener_callback) {
++		.track_title = cl_reread_track_title,
++	},
++	.setup_data = setup_data_mcs,
++	.setup_data_len = ARRAY_SIZE(setup_data_mcs),
++	.gmcs = false,
 +};
 +
-+typedef void (*bt_uinput_debug_func_t)(const char *str, void *user_data);
++static void testgroup_cl_extra(void)
++{
++	define_test("MCP/CL/BLUEZ-1 [Reread On Track Change, No Notify]",
++		test_setup, test_client,
++		&cfg_cl_bluez_1_reread, CL_BLUEZ_1_REREAD);
++}
 +
-+struct bt_uinput *bt_uinput_new(const char *name, const char *suffix,
-+				const bdaddr_t *addr,
-+				const struct input_id *dev_id);
-+
-+void bt_uinput_set_debug(struct bt_uinput *uinput,
-+					bt_uinput_debug_func_t debug_func,
-+					void *user_data);
-+
-+int bt_uinput_create(struct bt_uinput *uinput,
-+				const struct bt_uinput_key_map *key_map);
-+
-+void bt_uinput_destroy(struct bt_uinput *uinput);
-+
-+void bt_uinput_send_key(struct bt_uinput *uinput, uint16_t key, bool pressed);
+ /*
+  * Server tests
+  */
+@@ -1800,6 +1851,7 @@ int main(int argc, char *argv[])
+ 	tester_init(&argc, &argv);
+ 	testgroup_cl_cggit();
+ 	testgroup_cl_mccp();
++	testgroup_cl_extra();
+ 	testgroup_sr_sggit();
+ 	testgroup_sr_mcp();
+ 
 -- 
 2.51.1
 
