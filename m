@@ -1,74 +1,63 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from xtrwsrct.outbound-mail.sendgrid.net (xtrwsrct.outbound-mail.sendgrid.net [167.89.101.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACBE341057
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 19:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8C0341076
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 19:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.89.101.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765828046; cv=none; b=ps84u+yCwRXyby6pPYS95Hzlc/xKmBIuG5mmTMqClU9fhB/vdr+f0wHNkOBl1aHxQ/70Y6etcRAPIqQ66qHOH3XQs2z26Ncv2qroGxci941PsYaAjAsZV3D+orhBuV2tIdxQy/UoecGZnxnvlky+AJHXzBK4TIX9xmhfs9eWMM0=
+	t=1765828228; cv=none; b=hJ93xAt5+KCYGP674P5ndO9YxiRQOg04rX3KsjQWp9OYxxnLpWtqeLKTgCL/umZfY565VoB/pPGwGauH2V0n41PDWxISWmVR7+q2Dh/gTS26t1OapXq1QXHfehG6wKJIJVNDLGMvoqV2og0UE2ypoV1IqeJGpJu9MH3zVjT91AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765828046; c=relaxed/simple;
-	bh=XdiAQ7FAU0ZAEPcMUOwGFxSqvX4UqOYFo1Aarg04OSM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QcEayFVjcDk6QOQV/HV/IOZ50dco9PlQp0jgK1uUm29Evl6H/aTH/ydjh4LxsNmM2tsO+ooZyYlbJrBHsiW4KKiyva+s3Zbm6KcrAioZs9gz0yHSs/P8HtcCjDbEE1VhjY7kkAwWLpAhqXr1YrCAN3XHlpiV8mPLgAYTBoIg0d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cm2wDc63; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765828228; c=relaxed/simple;
+	bh=Dkr/Xs3KxjNKI+4687jy3mQ52x7TgUGK0T4LpD7Q8a8=;
+	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=HTlqgrgqQ/xgHhEre7M6Xtl5I/6HOV+cfpl80Pqlyw25rzSrCw8TWPYgoVNCTk8AiRMu32A678DouRf/PnGg9zZvMqauMB6h3v1XH6l3dWFpGveBPqe7SRjdLL173Mo74jRh282+uGcebcvJz6Fsf34yv7QFWTlOGjtG2NsukOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NwR88Bq+; arc=none smtp.client-ip=167.89.101.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cm2wDc63"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04092C4CEF5;
-	Mon, 15 Dec 2025 19:47:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765828046;
-	bh=XdiAQ7FAU0ZAEPcMUOwGFxSqvX4UqOYFo1Aarg04OSM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Cm2wDc63RDZ5n6OHd+Y1ELXfvpoioBhZ39X409LixlH/jyGz78AZmwhmcfnj0tLK6
-	 CQHj+J6HPOWWskf+Owo3kcg6tegafuXMsyyXToPFjJ/rapfoDJE5nXhq2Kg/iMuyov
-	 /TefZ9tLw+Ddd0Ua71R9HnRYsa5BxgJC0/ItgTSvq+8I9ZKGgTWYkAPhHNjJ55ioFf
-	 bKtVwF6dfe9PlPrPmVozAE85CzwlXrelzjRaQ7sodaBO0THhmGZUzIHxSUR2sKwEXJ
-	 r735XtukpvqY8RPJzWW7SSD1cMOVPxrwjuA4EEDDd7gyPiY9XPkXgwZDND4CiI1khk
-	 H1ol29nJSqdyQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 789B4380AAE2;
-	Mon, 15 Dec 2025 19:44:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NwR88Bq+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	h=date:from:subject:mime-version:content-type:content-transfer-encoding:
+	list-unsubscribe:to:cc:content-type:date:from:subject:to;
+	s=smtpapi; bh=uIQhzGlB50ZjBXdwFi+8xkoN6bOfuS6koondZ08qb1Q=;
+	b=NwR88Bq+s0It4bkNuG8sHOumIiKpCe3pFfzo8Kodw1ciPGopNSiMeMwut1gM4KbHxTr5
+	tFJrQi2jTHlwlFAYqVXKj6I+VEGo7nJyADVmknMy9FVZ/z09n1szrdzyPIcEWehZDtNdQp
+	ZVmlk+5FFVFtpLgudBlFcVL3BLE05Nxb0=
+Received: by recvd-canary-7fc4469768-hzrng with SMTP id recvd-canary-7fc4469768-hzrng-1-69406681-70
+	2025-12-15 19:50:25.637276146 +0000 UTC m=+3617316.214482710
+Received: from out-24.smtp.github.com (unknown)
+	by geopod-ismtpd-9 (SG)
+	with ESMTP id dZn3zpDsT-ahnMCxPClbdw
+	for <linux-bluetooth@vger.kernel.org>;
+	Mon, 15 Dec 2025 19:50:25.614 +0000 (UTC)
+Received: from github.com (hubbernetes-node-0d93c7f.ac4-iad.github.net [10.52.202.74])
+	by smtp.github.com (Postfix) with ESMTPA id 32BB9640978
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 11:50:18 -0800 (PST)
+Date: Mon, 15 Dec 2025 19:50:25 +0000 (UTC)
+From: BluezTestBot <noreply@github.com>
+Message-ID: <bluez/bluez/push/refs/heads/1033273/cf6d79-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] client/player: Refcount registered endpoints
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176582785702.183851.11478923750064431583.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Dec 2025 19:44:17 +0000
-References: <20251215140203.638669-1-arkadiusz.bokowy@gmail.com>
-In-Reply-To: <20251215140203.638669-1-arkadiusz.bokowy@gmail.com>
-To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+X-SG-EID: 
+ =?us-ascii?Q?u001=2EyVDaIUJfOTIVaBYkJvNzXFDwUvSfXABmYIMG7o2yQ0XjHiQN8HeKlKfUQ?=
+ =?us-ascii?Q?+TD5y9uUDiSc3WCQ=2FbFOxbFL1vD479ITsVE1zKd?=
+ =?us-ascii?Q?bKdRtSV5uFxSpn3ytY0ve+p6Ls2=2FEh+iW6lV3gT?=
+ =?us-ascii?Q?+t+whlTBmVAoJlfxSEm0BSnXT13K7vmRnLHllOY?=
+ =?us-ascii?Q?2nA0VCgdweC8zMiV+q8gbBdYxWPcpBu2n6CiTqS?=
+ =?us-ascii?Q?nxzCHCsjvU8e1BES=2FcW54s69bxWXlRa=2F0Lx06Uy?=
+ =?us-ascii?Q?DgsKtBOjTQyf+QLWCNRPX28rrw=3D=3D?=
+To: linux-bluetooth@vger.kernel.org
+X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
 
-Hello:
+  Branch: refs/heads/1033273
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Mon, 15 Dec 2025 15:02:03 +0100 you wrote:
-> In case when more than one adapter is available on the host, the
-> endpoint is registered on all of these adapters. When unregistering
-> we need to keep track of registration count, otherwise we might free
-> the endpoint structure prematurely (on the first unregister reply)
-> which will cause SIGSEGV.
-> ---
->  client/player.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-
-Here is the summary with links:
-  - client/player: Refcount registered endpoints
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ba4978255c3c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
