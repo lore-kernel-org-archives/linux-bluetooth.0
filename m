@@ -1,57 +1,58 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611B02F12CA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 15:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4E92D73B2
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 15:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765813127; cv=none; b=gzyiLppjmlTxZF1PjTYpGMzDgCNJNSXQCpqHpGn2z1b5SNFkSonsZyO5SYcg4X9szVvl44u6zhDoXo1RyZrfgZ2C0SZ4CFVgozL1j2N6Yd8A5LNC02Ogr0jEwrPJyDwtaxnbn+c4YH4OboPWMRcg1KqQDjEocAigjNduhdVun5Q=
+	t=1765813598; cv=none; b=G/B1+5io7yjV5n3MBoTPc/eqZE8UEisEW83zFNHfMHN8RGZrPPx2KzIPT1mALXRht5y5t1OHUW+VlwMyLfFgeLfNPKy7q4/r3DuUmU7IEHzj57VDsQMePzV7PYy6+tu2eiywX6nghRl0ZbkaEAVUeyi3AsMOqnXugJvok/GD0LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765813127; c=relaxed/simple;
-	bh=3W1fzPdLausKSoXjPmbEQ+xmyfpqOD/tyAGgrFJY8Yo=;
+	s=arc-20240116; t=1765813598; c=relaxed/simple;
+	bh=xARBVQ8DdEC8F1ONmGPvA/lzUfaTn7/VMbcYrfzQpLo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g9e6A6X7YGFHY5M4YRtc9yU7zOKYdW8M6N3knqkkBba9HQxcBljXX96cZbJLEVNHe3Sa9phwi63lV/uqpcABEYVJSJOwGa89vcACvwwsBFSBdyM0bPLM72pWH15el1BAomvjpLIwIhPx3Gbn9vFzea6kA02992ZX2NrYJ1rrAgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MRHwqRI1; arc=none smtp.client-ip=74.125.224.48
+	 To:Cc:Content-Type; b=cMJwvcXQ+LQI6qPiQkl0EXfnLdAxhVPMbrA+v4lN9gU1JnwLotOq/xsYBcFBcIKFgslstk/RfZsuQ35kihbp3tF7ZgqB6GSz+KUkVc9nvskZbvYSxmBIt4eVatDmSO+h2MrlTAlI8MQ8C2btsRdyIhg+EJR+zOBLFbZaUPmDVyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbAP7xII; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MRHwqRI1"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-6446c1a7a1cso3158312d50.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 07:38:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbAP7xII"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-37a2dcc52aeso32031371fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 07:46:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765813125; x=1766417925; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3W1fzPdLausKSoXjPmbEQ+xmyfpqOD/tyAGgrFJY8Yo=;
-        b=MRHwqRI1mrkIMDpqEoNcweuZOxuiurk9WDacaTMxSlwmX8UT7ZEKfjPdSnJh+ugWio
-         vMBD2azEsUj0ipoyf/QrXp3yQ72ssO/8lgr/KlN+FXbbUKMurV5f6szVblzj2JxIAX5g
-         VSv/LKXJEA+2MHCVf2WvrQDUXyUVxS+7lVBgP8RjOGj40q0a5jA0Dc+qmS6/+c2BjcLb
-         vl8CQOqVsyM3lBV5GfioUJy7uzpVJuacsEMjZ5W3zD6wl2y9Fh6jOBWenxnhBpGDmHHQ
-         B/uLl3X+XjKIc7qr9RwLaKC2UaZfvDIgXp7H3vBPSTolOm40TjcNQKPWuq56Ek1OxR7c
-         Xm6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765813125; x=1766417925;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1765813594; x=1766418394; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3W1fzPdLausKSoXjPmbEQ+xmyfpqOD/tyAGgrFJY8Yo=;
-        b=WwV5WpPrkiYkz3/IyX5z6ot7UckdbM9gqpTosWFiTzgTAo357yvHfRtG+3WsO5wop/
-         4Rhrt2nBG6oLvTk5Ii2ux0nscKeNxN6H8zNqB7+mRlWn+XR9y+o0nMHsS7M0tOoH8eY1
-         yzZ5trXI8AzkeL3dVM5xl49SattKT9AZTZ+k3ua3Z0Fu2nfQRz/7NGzw5kqVilNiMM2+
-         b+WeUwco4/kRxH05tAuUsAjf9edTvFFbJ6M6Uyq3SYlYXwJBfO8PnPXYITXtZQiTxCd8
-         kaqfL2CXxmUR9hp2I3wsyGYRoU4USNnonVwzgqobKaXaNHODfqoAotyWz2qmLa9g1dam
-         fDLQ==
-X-Gm-Message-State: AOJu0Yz5mBncfLN7hPg6QenGSeE8ZUdaELjODT7VpfDjmg9laajtQorN
-	jGdjG5eAKzYBMXNnvd8L3RuBTYYppnqhxYud12dH0QMsk6SDW6Hnj+43rzrRP7XRpPv6iuno/eW
-	XpcklDmayLY9QaPRzwWTLLiqTFnNriTw=
-X-Gm-Gg: AY/fxX5D3KLfdzAvRFnktGfvshlxC/Ta9uA3olrBdOg7e0TzUvkSCDq0iVHlmQrF3ai
-	iH9/9IXeE0PdzZ8joBdkobVT4D4bttLw7DrApJH9lfPuDXpcUFAuA6PNiLxSOp6WdSg3TS6athN
-	RuJnph1CNobSKvNjlxXEs8ePDK3scTWBbZJZTdSFv+z/piZvtM4GjxIZS5ABUj74nkZxVTgAuzc
-	4FaJe1XqZr31iOnR/uBeU+qHxTsljkDCzOOBzbfM9dV7gzQ6b1noQVgQGJan6Xo1UZ84+o=
-X-Google-Smtp-Source: AGHT+IGSyHlLr/9bXq9vUJCfIY44eCkFJnjdCDxs331aGy9IWVRzBpL6092ECQnJKmwxJZQxeca/+DkTn5V7KviOJgo=
-X-Received: by 2002:a05:690e:1448:b0:645:52ea:83c5 with SMTP id
- 956f58d0204a3-64555661e71mr7540821d50.65.1765813125303; Mon, 15 Dec 2025
- 07:38:45 -0800 (PST)
+        bh=uMvvVGERd3mt1B4otJOteb3OqAwxA2BKhC4KiqGzfY8=;
+        b=MbAP7xIIuoOOzDgRL20GQM2cffYaTzidS4SEirLrIZyGjtKGisyvIGxDlliF4TCr9Q
+         QSmQPqHxPh8uhBT3lVqIeQydrUOwsCM7CucBEGvjQCa2Ca/Yt8paY04Q+MV5tDFeTxne
+         Obeekt7BYvoAFzMTnHfP/0n9NpEKSrp8lvtPp/cXn6cAoBrALRfGBW9/k+wrl/iEZHyG
+         vLoLgoi0k6IgJr0jhf2ltCGkD8516rfkR2Sn/3N8Bo8XvkmEaFOb1jimC86C8iyRKB3z
+         +4WV6+psgh/YwFVpPpE0FThiKZ2tfB7nFp7WwCVyH/mZ0YkFd+vsgZWKOdR2QtGsD+Fj
+         h4Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765813594; x=1766418394;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uMvvVGERd3mt1B4otJOteb3OqAwxA2BKhC4KiqGzfY8=;
+        b=TBNRW8VQ+5ozn3B+MajtHqENYIlv3jrlymx/GqsKzwmHECo5BVSJ204K+/Y5bsUhBp
+         zrc3kvZtobqcjAP3b7g1uLFvoXS5XLxiG4zVcuw/cUb9RdtlyLQAl6MNxIMNd369fil/
+         DtC8BglA/QjdAFXzNQFpsdIuKToFUCNFrAqZyGGR3byOXMMTa9XCu8t/4YEoFWy25ssq
+         2wsaigv9DiehbD0i0YZIdVjkdqlmPOv0wgiX40+hurHVe5GVVrP26z0hDlNNBHXZAsSO
+         PzKCyqGgTjVVQtr/SQVK9CnZoo1JI71zkXUCwhnwNulMKaeKtYYlKmc9MTsJ+urhyRHj
+         Nwug==
+X-Gm-Message-State: AOJu0YyX2JSGmLtSBsSk/Yi4AWMsCsNw9jXpTNSoP3iZNVJLBghlUhPh
+	VmrYq95rbyx3b6WylxCw63avJyHD1PDqYCxF+QPeUQr+ZkXAREYpRcSHluSAUP16QlxPjHJ0b2m
+	j/vIJdV0stBxuX0m+xTQnR2ziAOC80f8=
+X-Gm-Gg: AY/fxX4R99ReZem0bMPB2c4TBGJzcTdqY+AzkIXUqb9uNzpG0LbtgM/Xab6dVUKBJl2
+	8cEgKc5etAx3YBZOp+nvxbMN1ORQW4pHNs6YEY5FzYe11OYm7d3drCIQFWCgjbGV5wqFqqnSMdA
+	vVFaPyXGAqPxsgIzhOonVdPweRWLJPi5e35+QQyIPI7lrTzYSyMuNYNBlZOcu6RpCMLAkaK8ZXh
+	lW0aIatH6PIJgDey+R5qJlSPNJ5mnDsdlS6K0vR0NV+b73R93jkZY3BAAI5f9g8X4A7Rw==
+X-Google-Smtp-Source: AGHT+IHneG1rZ2MwhYZ0u2YxLT6UH/z5TKZYZ9/dEAf9S+15E8j9p/hAl/fdsirSTgMcNSUFElhetehKeQTXJGitb0I=
+X-Received: by 2002:a2e:9a12:0:b0:37a:95c9:4745 with SMTP id
+ 38308e7fff4ca-37fd08c7a93mr34442571fa.40.1765813593980; Mon, 15 Dec 2025
+ 07:46:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,19 +62,105 @@ MIME-Version: 1.0
 References: <20251215140203.638669-1-arkadiusz.bokowy@gmail.com>
  <CABBYNZ+bgaa4znWcjW_n_3n3_oKbPsptg0K80eZU8iQwR81kVA@mail.gmail.com> <CAGFh0265yqFi=Jm2VOSxG4pdy+FKxvnFr5F_+wesB1dwW1nDLA@mail.gmail.com>
 In-Reply-To: <CAGFh0265yqFi=Jm2VOSxG4pdy+FKxvnFr5F_+wesB1dwW1nDLA@mail.gmail.com>
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Date: Mon, 15 Dec 2025 16:38:34 +0100
-X-Gm-Features: AQt7F2pq99tfxZdCsyHW_3PpbsnDG7-7KZgmpj06C11VyPO8WfJ78XoLY_4r7-c
-Message-ID: <CAGFh027gy+KkyiQXTTyXateYwzVxdHwRwjp8Q+z+h+GZQKNZHA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 15 Dec 2025 10:46:21 -0500
+X-Gm-Features: AQt7F2otUwxJwQ7XIwVNIT8gfOXVfkQK1Qp3qbMcB9HO2iJLaNVon6VA-vAMrGQ
+Message-ID: <CABBYNZ+jcFPxigPq9yUbiRstaT2zyO68527z_0xDexLr3aJ6pQ@mail.gmail.com>
 Subject: Re: [PATCH] client/player: Refcount registered endpoints
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> org.bluez.Media is per adapter, so the likes of RegisterEndpoint
-> registers a new object per adapter.
+Hi Arkadiusz,
 
-Or maybe the /local/endpoint/ep0 should be per-adapter in this player
-code? I have not checked whether it works with many adapters, though.
-My use case is that I'm not able to deregister media endpoint in case
-I have more than one adapter attached to my host.
+On Mon, Dec 15, 2025 at 10:33=E2=80=AFAM Arkadiusz Bokowy
+<arkadiusz.bokowy@gmail.com> wrote:
+>
+> > Do you have a backtrace or something? We don't reference struct
+> > endpoint across different adapters afaik so this might be a different
+> > bug or something.
+>
+> > [bluetoothctl]> endpoint.register 0000110a-0000-1000-8000-00805f9b34fb =
+0x00 '0xFF 0xFF 0x02 0x40'
+> > [/local/endpoint/ep0] Enter Metadata (value/no): no
+> > [/local/endpoint/ep0] Auto Accept (yes/no): no
+> > [/local/endpoint/ep0] Max Transports (auto/value): auto
+> > [/local/endpoint/ep0] Locations: 0
+> > [/local/endpoint/ep0] Supported Context (value): 0
+> > [/local/endpoint/ep0] Context (value): 0
+> > [/local/endpoint/ep0] CIG (auto/value): auto
+> > [/local/endpoint/ep0] CIS (auto/value): auto
+> > Capabilities:
+> >   ff ff 02 40                                      ...@
+> > Capabilities:
+> >   ff ff 02 40                                      ...@
+> > Endpoint /local/endpoint/ep0 registered
+> > Endpoint /local/endpoint/ep0 registered
+> > [bluetoothctl]> endpoint.unregister /local/endpoint/ep0
+> > Endpoint /local/endpoint/ep0 unregistered
+> > [bluetoothctl]>
+> > Program received signal SIGSEGV, Segmentation fault.
+> > Download failed: Invalid argument.  Continuing without source file ./st=
+ring/../sysdeps/x86_64/multiarch/strlen-avx2.S.
+> > __strlen_avx2 () at ../sysdeps/x86_64/multiarch/strlen-avx2.S:76
+> > warning: 76     ../sysdeps/x86_64/multiarch/strlen-avx2.S: No such file=
+ or directory
+> > (gdb) bt
+> > #0  __strlen_avx2 () at ../sysdeps/x86_64/multiarch/strlen-avx2.S:76
+> > #1  0x00007ffff7a6f980 in __printf_buffer (buf=3Dbuf@entry=3D0x7fffffff=
+c7a0, format=3Dformat@entry=3D0x5555555afbd3 "Endpoint %s unregistered\n", =
+ap=3Dap@entry=3D0x7fffffffc8b0, mode_f
+> >     at ./stdio-common/vfprintf-process-arg.c:443
+> > #2  0x00007ffff7a70788 in __vfprintf_internal (s=3D0x7ffff7c355c0 <_IO_=
+2_1_stdout_>, format=3Dformat@entry=3D0x5555555afbd3 "Endpoint %s unregiste=
+red\n", ap=3Dap@entry=3D0x7fffffffc8
+> >     at ./stdio-common/vfprintf-internal.c:1543
+> > #3  0x00007ffff7b45489 in ___vfprintf_chk (fp=3D<optimized out>, flag=
+=3Dflag@entry=3D2, format=3Dformat@entry=3D0x5555555afbd3 "Endpoint %s unre=
+gistered\n", ap=3Dap@entry=3D0x7fffffffc8b
+> > #4  0x00005555555a90bf in vprintf (__fmt=3D0x5555555afbd3 "Endpoint %s =
+unregistered\n", __ap=3D0x7fffffffc8b0) at /usr/include/x86_64-linux-gnu/bi=
+ts/stdio2.h:156
+> > #5  bt_shell_printf (fmt=3Dfmt@entry=3D0x5555555afbd3 "Endpoint %s unre=
+gistered\n") at ../src/shared/shell.c:741
+> > #6  0x0000555555587739 in unregister_endpoint_reply (message=3D0x555556=
+2c2990, user_data=3D0x5555562b9c00) at ../client/player.c:3738
+> > #7  unregister_endpoint_reply (message=3D0x5555562c2990, user_data=3D0x=
+5555562b9c00) at ../client/player.c:3724
+> > #8  0x00005555555a1516 in method_call_reply (call=3D<optimized out>, us=
+er_data=3D0x5555562c2270) at ../gdbus/client.c:1075
+> > #9  0x00007ffff7e037c2 in ?? () from /lib/x86_64-linux-gnu/libdbus-1.so=
+.3
+> > #10 0x00007ffff7e07dfe in dbus_connection_dispatch () from /lib/x86_64-=
+linux-gnu/libdbus-1.so.3
+> > #11 0x000055555559c828 in message_dispatch (data=3D0x5555562a8890) at .=
+./gdbus/mainloop.c:59
+> > #12 0x00007ffff7e9fbfb in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.=
+so.0
+> > #13 0x00007ffff7ea1237 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.=
+so.0
+> > #14 0x00007ffff7ea15d7 in g_main_loop_run () from /lib/x86_64-linux-gnu=
+/libglib-2.0.so.0
+> > #15 0x00005555555ab7f9 in mainloop_run () at ../src/shared/mainloop-gli=
+b.c:65
+> > #16 0x00005555555abbfa in mainloop_run_with_signal (func=3Dfunc@entry=
+=3D0x5555555a8880 <signal_callback>, user_data=3Duser_data@entry=3D0x0) at =
+../src/shared/mainloop-notify.c:196
+> > #17 0x00005555555aa655 in bt_shell_run () at ../src/shared/shell.c:1476
+> > #18 0x000055555556f418 in main (argc=3D<optimized out>, argv=3D0x7fffff=
+ffcef8) at ../client/main.c:3960
+
+Oh, this is bluetoothctl bug, sorry I was looking into bluetoothd not
+bluetoothctl, endpoint_register does indeed make a reference to the
+same object.
+
+> The bug is caused by freeing the endpoint on the first reply from
+> deregistration. When the second one (or another if you have 3, 4, 5..
+> etc. adapters) arrieves you have access after free. Simple refcount
+> should fix that, but of course there might be other approaches.
+
+
+
+--=20
+Luiz Augusto von Dentz
