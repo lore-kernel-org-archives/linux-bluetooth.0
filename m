@@ -1,95 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF342337118
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 17:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728C9243387
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 17:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765819721; cv=none; b=ub7JlcOkvoBPhdXXOnBzez+UWyKYrKJvtZzbNYXsS0uCv4XJuhes4gF/PfWVDZ3i2mCUr+IE6ySXHe2v9bNF8/8ZcfteeHvO0NnbAFK8tHdAxRPa1qckATt3tNeVtG2dTNCOgGyehOjPDctlpiTtD+Y1N1zivphUA4LCsqJWbG4=
+	t=1765820046; cv=none; b=I7CnJR3j1eN/5+OafMKOG4ytJBF2ETx1lIYF6fO/QkArbbLMAJmIuOMLDFn6khsClYu8xm2V+3H5P9wyzgnECNDFq+LbCW8fndfInYXe6tnHy2q5lq6Vt6IyG8TKUMZ15rxnKWy/4AVcCQrYEo/g+Cn3NPPt+kXFHqoV6f4mqKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765819721; c=relaxed/simple;
-	bh=XSj9HZFphARs/ASk9xxKln0Vf/KjpO3uMTrDMlj5zLE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q9EraLjOUJbIRctaQ8B7T+ukKZWkMPQIWl4qINqrunrir3h5sVMgHy8SRHF4Po14ULIPFtB1ZCa0P4mmT45twEIHahCHWQA45qSs4tFNrqgu+2SlToossYGf7qlGQdoc8YdfA5HJ4k7SHn8IV0MzYR2aMU6HlRpB3LoOm+V/BjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IKxDWe0M; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765820046; c=relaxed/simple;
+	bh=GAJemcTNhFbjM/poY6TTHXAPMBGPBkZ3N704KaKchxE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=TKLdLhi+PzBn1TtBSpQsJooxytMBDBW2r+S9EfAg6+grgL9vbCMKGFcjzCOFwBob7ik00NAOpy3kc5na3TmLTew4KMhWdk1O0Hr7x9NnpiGJRkyawVf4JDXv6GIOzlu/iQH0dsrUBeIUYgJNNpuf/uw7HYGLo8d1FlwRILWWuJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cg6z9rka; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IKxDWe0M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3315C4CEF5;
-	Mon, 15 Dec 2025 17:28:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765819721;
-	bh=XSj9HZFphARs/ASk9xxKln0Vf/KjpO3uMTrDMlj5zLE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IKxDWe0Mfi/ZTxacUTA2uB0tLDpn3VV1W16IqMztQEKF1XtnBdOeAGkJ7P/cqkFeD
-	 EKBZVkXFMVAIMulvMDeNLTl6Ozn+w/JXOCrVm784vJuSrYk6BK/LKFudHCXzId6gE8
-	 6PY1PtURASdbjQ8oI4EG7ToljrGVwFVo1Yg5xz67thJMBRXxaVWXD0DOnkdlrQDgEp
-	 TNw8Jy2g0sau6rgXr9vDxom9X3YS58BSeyZdWnRdnRs2iks/0tihdIWd7q1sRRnXDf
-	 lty+QXvopvw7vlms97BUdNHAR8miVpCyShD7VPhc1XWNQNkn1BAAVzdrMZus+OsRIm
-	 I9HOzA9uimkKA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 788D8380AADC;
-	Mon, 15 Dec 2025 17:25:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cg6z9rka"
+Received: from github.com (hubbernetes-node-e5f60bf.ac4-iad.github.net [10.52.138.31])
+	by smtp.github.com (Postfix) with ESMTPA id 7E890400E1E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 09:34:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1765820044;
+	bh=ESRKgc2VDjBM5mn1m8SR+kRFb+GmQgT+iedcVkxOq+0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=cg6z9rka5GBd2akr4Ry2xRCghOkmtY12X5V4jqazCk0RzJz6pF60IF+1cuvPtPaDD
+	 C0eZI85FKh6MZAtPc2HcG7U2JdMaRHekY/BwYd23LfkQXXjO6jA4erc2h8FJa+PeDw
+	 /+ODfh6aT+KKwvBto/1T9V12i1KJ5QKW1NlaiUDw=
+Date: Mon, 15 Dec 2025 09:34:04 -0800
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1032751/a992b5-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v7 0/9] mcp: support multiple MCP and implement
- local
- GMCS
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176581953229.111127.13320931968033257977.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Dec 2025 17:25:32 +0000
-References: <cover.1765572338.git.pav@iki.fi>
-In-Reply-To: <cover.1765572338.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1032751
+  Home:   https://github.com/bluez/bluez
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Fri, 12 Dec 2025 22:45:45 +0200 you wrote:
-> v7:
-> - fix -Werror=unused-result
-> 
-> v6:
-> - use only rewritten bt_uinput to be able to change license
-> - make all patches buildable, combining commits
-> - in that, split out mcp: add support for Repeat & Shuffle
-> - fixup: re-read of values on track change if remote doesn't notify
-> - fixup: make sure other values are read only after CCID
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,v7,1/9] shared/mcp, mcp: support multiple MCP, and add non-stub MCS server
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9027edc4604e
-  - [BlueZ,v7,2/9] test-mcp: add tests for MCP / MCS
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=90d78210f222
-  - [BlueZ,v7,3/9] mcp: add support for Repeat & Shuffle for remote player
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0a4a07d9a1e8
-  - [BlueZ,v7,4/9] shared/uinput: add uinput utility functions
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=be02c3e92e16
-  - [BlueZ,v7,5/9] avctp: use uinput utilities from src/shared
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=174e812b8aea
-  - [BlueZ,v7,6/9] mcp: add local GMCS service that emits uinput media keys
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d3089866bd2e
-  - [BlueZ,v7,7/9] shared/mcp: on track changed, re-read values if notify not available
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6734c19cb4c6
-  - [BlueZ,v7,8/9] test-mcp: check attributes are reread on track change if no notify
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=809091c8b3ee
-  - [BlueZ,v7,9/9] shared/mcp: complete CCID read before considering other attributes
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2ec29cc98ad5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
