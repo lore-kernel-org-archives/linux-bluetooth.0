@@ -1,123 +1,81 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from o3.sgmail.github.com (o3.sgmail.github.com [192.254.112.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C281830F933
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 14:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDAB33A6F6
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 14:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.254.112.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765807338; cv=none; b=UxozKfCI8kkwQIWacwFMvbKnWqf+QJ8NnmPQR/g1jRKRe+5aDIlJauZ9K8jmFfaSWX9+1HNH1CuzCphXrMhDjrphCg1g4ReknMxpEY83L6+g/tjy3rGa4FZAofLXsq68zLiMnH97w6G9B0v7KZVBE6Z8/NU3yVIJ0w3bjpDQyag=
+	t=1765808046; cv=none; b=tN4KfUZO1kT1ojvGcdciHAgRu4KUimwRthy93S2WdF4mtJFx2Z27crYi7h4tZfsg48jwKKo/Jll3YYyIEGrEztQIEfnsI8o8RHP6g+Vr/sPWcXPb+PNvLvv34ejx3L7qWOnu+p0qdeg+2x+IkBnVPvGMwISVlKhjehMBd3lSgwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765807338; c=relaxed/simple;
-	bh=CZJFQ70QdeF/bBSt/+Kic5lE7MIkUQhfFPEe49SDPvA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vyd7poPKPq2G33VGR7vInP5Me1cYD8Xkhx6sbdbwDFrYKtNKu9Fm9Z/t8l6879lXn6aJRPxYpav3Qm0aWacx3nT1vjCytbwN6PwjHw6pIP1Ew7Dg3Jfa7pUOUuLgfeh0e6ptl87OhesXDxlVK6g7ObighPLI2+GfWzPdpEyCcEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RfUb/xvU; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1765808046; c=relaxed/simple;
+	bh=hLnsFrUXIecPdM+Ks2o7HKEe78khi2z0AQX5ZmnoG5k=;
+	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=k2EiamnYVUeYm6t+21zLGVWUQQN7w1vvUWSdsUhi4pVtZqhR/ye5bsrJuCZEA3Hqz0Q0DFvsWrlQT07LNhsclCwii60/azXcUf5HTrNEEgtUh4NAfF+vkbu3z6dpPJI+ja8MFh+hihd7HxP4F3WgmLUsXZ78waV6zXpb0NIddY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DcMZNy1T; arc=none smtp.client-ip=192.254.112.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RfUb/xvU"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b73a9592fb8so753187766b.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 06:02:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765807335; x=1766412135; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zbNRHrorTpP/+rQbRL0YbnQp+DJZYluazFEnrRrYArs=;
-        b=RfUb/xvUGj0ydAdCCPlK8sXnZaUySKix5IhoQddeC06N/50K0MckjBUc/oRb52NPvi
-         170mr4UKrnfafHyZ7bb0cD0m+esoHftMZb8RXZWNmJh0gsB2trCzpzLprEzRXnjfT/+l
-         QeZVzDGF7CJZfMwawfvT92EAD6rh9hW/K1S4XrUDAoc6YkjWQsKH3virWdfrD1UsrmuF
-         YimXl3GruiCuU3ljO4GCapfirEPyjdUWiobhESPl/bWbrUUU6nsyEQQAJk1y5Ktbu/nU
-         alDHtsx+3VFg5kwudd0itk0iqka0RQg/H2cX3mpily/KALtoJVrCjBkHKb9nLB4WWfCx
-         7iww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765807335; x=1766412135;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zbNRHrorTpP/+rQbRL0YbnQp+DJZYluazFEnrRrYArs=;
-        b=XtLDLZ7umYMBXE5dYe4/T/wR8xm0fI9oWM+MzKBciht4ScFbo3tas0d35fyXHFtWzC
-         LeDctV5aumSNdktJTV5N1lIbqKy2IeiPGIrvzAsYcuE0IUxMcy6mgSsms2Dr4LarV4+L
-         zMaPLjGaUV7dzUXvxMLRyJXnLrHd75Qe265VUdkPS3th2sN77owBEvkp5jiGUA9Mxh30
-         HwXVVef+lEZj1ywub6GNQYijocYrjLtmbUMA8F24k+MjK8aCFwBwG1j7sEF/R16Qd+MA
-         /YLIQFiH1NqM19LtOU0HU2UAMIvvnyquojhNOVX80wQj4lju+ytZpGhMsxog/Ivtcuxi
-         nzuA==
-X-Gm-Message-State: AOJu0YwbFQ1lxEjpkzg5nLpTqPIAqcP9FbEbBAivG2UYO+5z11sQ42oC
-	DU92LNe7okxwH3IZRwGzPCLgeldGDAuvKF51YM9zhqynZcTuP/KAfreXqow2CgIY
-X-Gm-Gg: AY/fxX5+nnM0v09VmEvEl7W3RDrdBiHPMXMjBuZAL+VvF6tA3FNp7zKEAt0eSI83KOZ
-	tpljtoQ9tXF7N4TcHBs+XyX5uiRi85gqVYvESnem8NfWIdDHFz6evhciUnjt4wwA8reot1vnxy5
-	9o0o3K1FqelsvUwSzvpfPsChaNHdV2L5cC04zi7ps/raZi/kV4c4HGO1WiIZ8Y51LFQasQ90gtm
-	Kn0oENu0PpZoXS66PqQ+BU59I/z/6goy26ALjo9B1I7UdPUzIKx1IxhYS8mEvIRjN7lqR8J2Lpw
-	Jnp7N6/YwoBeraZbfCudY2dPzQDljuWN+fNaLzEQWlhfblocVILNSXu06xkXMT+0/VXKuXkBqvo
-	w17PmCRJxsvh+nmZE8uLYzVLUCpGM9O3iB1ta5MlgtZ0mWR5epdEju7BMPy0ut74kKALxfbFYXd
-	wAdgTfmUjiqA5+zzwbs/d4lHS34j5wlnDxaDlvcz9EwayWPTVhrmcbHnPdHRMnUr0xfxN6UaZTi
-	/C4RIPXRA==
-X-Google-Smtp-Source: AGHT+IH4sfYXjc0mooENjByeCRlkIQfk0F1uLDB5qdU0zmnMx4qyxPNXB2/MbHaGwrdZxoMxc54Tmg==
-X-Received: by 2002:a17:907:ca09:b0:b7d:27dd:9a54 with SMTP id a640c23a62f3a-b7d27ddeeebmr853814666b.31.1765807334386;
-        Mon, 15 Dec 2025 06:02:14 -0800 (PST)
-Received: from localhost.localdomain (46.205.203.157.nat.ftth.dynamic.t-mobile.pl. [46.205.203.157])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-649821316e4sm14374148a12.31.2025.12.15.06.02.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 06:02:13 -0800 (PST)
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: [PATCH] client/player: Refcount registered endpoints
-Date: Mon, 15 Dec 2025 15:02:03 +0100
-Message-ID: <20251215140203.638669-1-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DcMZNy1T"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	h=date:from:subject:mime-version:content-type:content-transfer-encoding:
+	list-unsubscribe:to:cc:content-type:date:from:subject:to;
+	s=smtpapi; bh=bO7a+2gC/Dq4luZ7FTlvwDMxCFrMa4RMwgtwPKPqNVw=;
+	b=DcMZNy1TJs6YeI/AUeIrzyGytzcGhcI7RVwxa7Dv90fj1ql1fb0mj1ae5cZ9CVT7GnSz
+	gR+IcnCV0IarA03StVgR/fPOxyNWic+4FDH7bQKr6hX96Hg8vx29u1U1ixa7rlvEAB5/Mj
+	IvVbTp6Jsz/IRGOmEL+bptfB9+AGlkOfw=
+Received: by recvd-6476b67d56-qbq2q with SMTP id recvd-6476b67d56-qbq2q-1-694017AB-86
+	2025-12-15 14:14:03.780767432 +0000 UTC m=+2395535.102821883
+Received: from out-26.smtp.github.com (unknown)
+	by geopod-ismtpd-65 (SG)
+	with ESMTP id smeJSEUNTZeGl2n-9rrOMw
+	for <linux-bluetooth@vger.kernel.org>;
+	Mon, 15 Dec 2025 14:14:03.743 +0000 (UTC)
+Received: from github.com (hubbernetes-node-756baa6.ash1-iad.github.net [10.56.203.102])
+	by smtp.github.com (Postfix) with ESMTPA id E37516008A0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 06:13:56 -0800 (PST)
+Date: Mon, 15 Dec 2025 14:14:03 +0000 (UTC)
+From: Arkadiusz Bokowy <noreply@github.com>
+Message-ID: <bluez/bluez/push/refs/heads/1033273/000000-cf6d79@github.com>
+Subject: [bluez/bluez] cf6d79: client/player: Refcount registered endpoints
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+X-SG-EID: 
+ =?us-ascii?Q?u001=2ELO+ikaWOpEJip0eb74Fuh4r3BVdAQak9xTBNPV6J60QSHxMhjmDWKIjet?=
+ =?us-ascii?Q?Yk7hBnaT8ylbP+7jLMVNsrku1Mq=2FFVPTHCQqQaD?=
+ =?us-ascii?Q?wMBgGUSdNugkFI3AhM9pr9Ou2KX45y9KqiLPBUs?=
+ =?us-ascii?Q?YziVj8xYsVN0e=2FlxOvLUCVZd4ouKPr6GPpLWU54?=
+ =?us-ascii?Q?+g5p6444brKcJStEgBrZdWCqxRWLx+SV+eDlSuT?=
+ =?us-ascii?Q?INz4OjLbSfZdGCOzSeGmxZLRjDsyAz4LlCWRuqP?= =?us-ascii?Q?y17+?=
+To: linux-bluetooth@vger.kernel.org
+X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
+
+  Branch: refs/heads/1033273
+  Home:   https://github.com/bluez/bluez
+  Commit: cf6d7967eecaf622ddf26a13e19532029f7f4cf3
+      https://github.com/bluez/bluez/commit/cf6d7967eecaf622ddf26a13e19532029f7f4cf3
+  Author: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Refcount registered endpoints
 
 In case when more than one adapter is available on the host, the
 endpoint is registered on all of these adapters. When unregistering
 we need to keep track of registration count, otherwise we might free
 the endpoint structure prematurely (on the first unregister reply)
 which will cause SIGSEGV.
----
- client/player.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/client/player.c b/client/player.c
-index b6b02a000..cedb07d65 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -127,6 +127,7 @@ struct endpoint {
- 	struct codec_preset *codec_preset;
- 	bool broadcast;
- 	struct iovec *bcode;
-+	unsigned int refcount;
- };
- 
- static DBusConnection *dbus_conn;
-@@ -3323,6 +3324,7 @@ static void register_endpoint_reply(DBusMessage *message, void *user_data)
- 	}
- 
- 	bt_shell_printf("Endpoint %s registered\n", ep->path);
-+	ep->refcount++;
- 
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
-@@ -3737,9 +3739,13 @@ static void unregister_endpoint_reply(DBusMessage *message, void *user_data)
- 
- 	bt_shell_printf("Endpoint %s unregistered\n", ep->path);
- 
--	local_endpoints = g_list_remove(local_endpoints, ep);
--	g_dbus_unregister_interface(dbus_conn, ep->path,
--					BLUEZ_MEDIA_ENDPOINT_INTERFACE);
-+	ep->refcount--;
-+
-+	if (ep->refcount == 0) {
-+		local_endpoints = g_list_remove(local_endpoints, ep);
-+		g_dbus_unregister_interface(dbus_conn, ep->path,
-+					    BLUEZ_MEDIA_ENDPOINT_INTERFACE);
-+	}
- 
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
--- 
-2.51.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
