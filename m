@@ -1,439 +1,123 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9B442AB7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 12:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C281830F933
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 14:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765800370; cv=none; b=QNUjUv8Gq00aYPHTgyNNaBGXMYMAIebcLRP3RS6aEbBSFeHsE+P7pclEWQ5x/sNBWwi6XD0RDqxATfY/EgQy+lwoIB0NmZh1OI7XeEi3YT1CteTXcNzeZ2NRR+MVRsUZ5MsBLN3tRR3W681avr6QvixVDv0iS7dX2vTXyGzyYeU=
+	t=1765807338; cv=none; b=UxozKfCI8kkwQIWacwFMvbKnWqf+QJ8NnmPQR/g1jRKRe+5aDIlJauZ9K8jmFfaSWX9+1HNH1CuzCphXrMhDjrphCg1g4ReknMxpEY83L6+g/tjy3rGa4FZAofLXsq68zLiMnH97w6G9B0v7KZVBE6Z8/NU3yVIJ0w3bjpDQyag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765800370; c=relaxed/simple;
-	bh=uoe6JP5BXVzUm2xgInR/EiwLm02xGDewtc2sB26kz80=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=jk9x9MPsJ47ZTD6lC76/hglQV/kKiRNWa1PY8GpLdw3RnULK8UXJTvWLUyfOpltyhX0alP8QKK2FJ+sgbgvBxdAmIQaXZD416z1QRHG6vSuCBVNq53N2QmrgfoedCiWz4X2bz0OYWGXxelBfxT7GiVq3WCzwHM2l9j01HLfnCZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WJQPIBpF; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=AXgkO6cg; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1765807338; c=relaxed/simple;
+	bh=CZJFQ70QdeF/bBSt/+Kic5lE7MIkUQhfFPEe49SDPvA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vyd7poPKPq2G33VGR7vInP5Me1cYD8Xkhx6sbdbwDFrYKtNKu9Fm9Z/t8l6879lXn6aJRPxYpav3Qm0aWacx3nT1vjCytbwN6PwjHw6pIP1Ew7Dg3Jfa7pUOUuLgfeh0e6ptl87OhesXDxlVK6g7ObighPLI2+GfWzPdpEyCcEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RfUb/xvU; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="WJQPIBpF";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="AXgkO6cg"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BFANsQx594469
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 12:06:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	RRwTjGByRXdXPvThOFxqtP+RtzaHYw182oI92ump6Z4=; b=WJQPIBpF/V0uELop
-	O29KUm7ruKTL0kI41ABjy13aGEODdPP7/swDAeQ+njZC2NJMmzwBhGE0eUIQMUXc
-	RXTm83yHOH0sTmH1eEKbJCJY1XW4c01jsm0s3DZeMAoYrNIwh/0AQ/NoxrH+3bkM
-	PZIj5yKAUAhRZp8mAXX9rp+e0mn/PCClphJH8m9O42GQakkLfAZ6NYkoZuEiTF1R
-	/juPPinAnS5O29aWlYcuKIn9AkeDSrrkeM+g5Rpouya1ZDSW8vIbfR7VuDrQo3HL
-	rh6vgeFEyjLeVasbA64g3ebciRhIF1TP4cca6gQsMuEYslBTk8M6b/iMkZdCbAew
-	YeWkpw==
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4b11dsceck-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 12:06:04 +0000 (GMT)
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-29da1ea0b97so88724495ad.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 04:06:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RfUb/xvU"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b73a9592fb8so753187766b.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 06:02:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1765800364; x=1766405164; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RRwTjGByRXdXPvThOFxqtP+RtzaHYw182oI92ump6Z4=;
-        b=AXgkO6cgSTfnYveZHsy2v7usQxurgwztEGCWyqeJvrnPcI+jR9HghmkmzO9ZOBzt4D
-         vydhF1qp4MlTT+VtvqGUEyQxI3EUodhIQaymtnT1O6x+aMYLYcG0EElYkneTM9u6BL3C
-         1oQO+lOYclpy3Gp5HqcTjAg092gNf+0Z9t68Tu3F5rZv4KA8Q+s+FB4Fy6F/zqyNmzEY
-         8Z9/nzPw85+FF0YDnPpVTLBgxFrjGwWW3rMw/gOFcWQa/K6cMWED8Jof/Di5gYRvxQFU
-         tlvLyDRYJa6NKHqGNcup0Px6kFpsq4uw03Fqm3P95CFngMXAhvl4qTwvcoLxH75+iO+6
-         mLog==
+        d=gmail.com; s=20230601; t=1765807335; x=1766412135; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zbNRHrorTpP/+rQbRL0YbnQp+DJZYluazFEnrRrYArs=;
+        b=RfUb/xvUGj0ydAdCCPlK8sXnZaUySKix5IhoQddeC06N/50K0MckjBUc/oRb52NPvi
+         170mr4UKrnfafHyZ7bb0cD0m+esoHftMZb8RXZWNmJh0gsB2trCzpzLprEzRXnjfT/+l
+         QeZVzDGF7CJZfMwawfvT92EAD6rh9hW/K1S4XrUDAoc6YkjWQsKH3virWdfrD1UsrmuF
+         YimXl3GruiCuU3ljO4GCapfirEPyjdUWiobhESPl/bWbrUUU6nsyEQQAJk1y5Ktbu/nU
+         alDHtsx+3VFg5kwudd0itk0iqka0RQg/H2cX3mpily/KALtoJVrCjBkHKb9nLB4WWfCx
+         7iww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765800364; x=1766405164;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RRwTjGByRXdXPvThOFxqtP+RtzaHYw182oI92ump6Z4=;
-        b=oNBXqCXdfc7AU4OU7JqGDyaKuR1K9wagJh6aXcV03jV1jqqOj2+YZzmv3kJmeECflz
-         KrhbdanJIrVQGJGVQWbXzBo+rEN7uCqAFiotDjHUP6q7rz5raAgqsF8QG/9sP6qqHuho
-         EC0BxWjIbWh1MmcLgDB0FJjj6w0wjWiEoybwcfILz1DTNwK9YaOIADqX5YnUf16DFTPN
-         xzw4JLinvQEjkulxIuUxX9ZHRO3lkVigk6AGgRunutN0dKYD61ZDyaT9SHIUfeZm4E22
-         ua8Kzinppy2ps4CRflfassTu658LuaP1TChpKZeLy+x3TS8InF5BnLPkLNe0+Lglk6mU
-         Kv+A==
-X-Gm-Message-State: AOJu0YxtjBPDRBR+p4xJw9Ubrf44RvzQy3FygCPjVIxgQEP5ErDok+o4
-	B9tUzx9/wFnJBxFu/G0nzMnocA4zWaroY6nY3A+t3F7h0MgczU/buBo0o0St5vOG0BLWmGOYq+t
-	D3wfJOKbzmsMd+9K/gkap4arXsNkreOyEqiZZ7nbASn6QVRKjB5Frark7xWaDWTPX32ZOsy8=
-X-Gm-Gg: AY/fxX6W7Dn3dUZ6LzgbgwJVMzcaIZN2XjNju6zZLreCNgoUtvCY2Qm+8EJqIk1ZAiD
-	uJ4IrdJh+yLr7hOgxw/VaW1ny/cB5FrzWF8cuvo79eWVhSN0Sc09+h6d8EvxXOhPPn1SmeOabvk
-	HNfsfcHIA7Qi8qqCD3L3hJxkNdzispd08GVCj5xDC2D/mbS5R7vaTzcjGnvLQF71EW9GTux2DAV
-	VA5cwrCtTVzUapMUONVg+ZJm5lscOtVIv9pmWW2biIqO3SI/OBrZbioPj5ZO3sl4q0iqvSWGYc6
-	N5MBPHdY3vfFqwwR8R9i7RG2irRCo9xDaQ7sFmZkbJkiiUAH38Vx2W5EQMLSYNiTji0l6OfAozd
-	x0mih6UWkW8j/l3hQ+JKENC5gnfqsIijrdfu6
-X-Received: by 2002:a17:903:3508:b0:2a0:e5cd:80a1 with SMTP id d9443c01a7336-2a0e5cd8229mr35610365ad.41.1765800363758;
-        Mon, 15 Dec 2025 04:06:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFa0aSu27ULUxxOhFvkcnQ9foOIK4MNNbvDkwgM80SmuoexjWJsW6a+G+cBVmiHfGnLZKTBZA==
-X-Received: by 2002:a17:903:3508:b0:2a0:e5cd:80a1 with SMTP id d9443c01a7336-2a0e5cd8229mr35609795ad.41.1765800363067;
-        Mon, 15 Dec 2025 04:06:03 -0800 (PST)
-Received: from [10.231.216.203] ([114.94.8.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29eea016c55sm134072865ad.58.2025.12.15.04.06.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Dec 2025 04:06:02 -0800 (PST)
-Message-ID: <8b4f2797-9632-4df9-a794-452d4dad174a@oss.qualcomm.com>
-Date: Mon, 15 Dec 2025 20:05:40 +0800
+        d=1e100.net; s=20230601; t=1765807335; x=1766412135;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zbNRHrorTpP/+rQbRL0YbnQp+DJZYluazFEnrRrYArs=;
+        b=XtLDLZ7umYMBXE5dYe4/T/wR8xm0fI9oWM+MzKBciht4ScFbo3tas0d35fyXHFtWzC
+         LeDctV5aumSNdktJTV5N1lIbqKy2IeiPGIrvzAsYcuE0IUxMcy6mgSsms2Dr4LarV4+L
+         zMaPLjGaUV7dzUXvxMLRyJXnLrHd75Qe265VUdkPS3th2sN77owBEvkp5jiGUA9Mxh30
+         HwXVVef+lEZj1ywub6GNQYijocYrjLtmbUMA8F24k+MjK8aCFwBwG1j7sEF/R16Qd+MA
+         /YLIQFiH1NqM19LtOU0HU2UAMIvvnyquojhNOVX80wQj4lju+ytZpGhMsxog/Ivtcuxi
+         nzuA==
+X-Gm-Message-State: AOJu0YwbFQ1lxEjpkzg5nLpTqPIAqcP9FbEbBAivG2UYO+5z11sQ42oC
+	DU92LNe7okxwH3IZRwGzPCLgeldGDAuvKF51YM9zhqynZcTuP/KAfreXqow2CgIY
+X-Gm-Gg: AY/fxX5+nnM0v09VmEvEl7W3RDrdBiHPMXMjBuZAL+VvF6tA3FNp7zKEAt0eSI83KOZ
+	tpljtoQ9tXF7N4TcHBs+XyX5uiRi85gqVYvESnem8NfWIdDHFz6evhciUnjt4wwA8reot1vnxy5
+	9o0o3K1FqelsvUwSzvpfPsChaNHdV2L5cC04zi7ps/raZi/kV4c4HGO1WiIZ8Y51LFQasQ90gtm
+	Kn0oENu0PpZoXS66PqQ+BU59I/z/6goy26ALjo9B1I7UdPUzIKx1IxhYS8mEvIRjN7lqR8J2Lpw
+	Jnp7N6/YwoBeraZbfCudY2dPzQDljuWN+fNaLzEQWlhfblocVILNSXu06xkXMT+0/VXKuXkBqvo
+	w17PmCRJxsvh+nmZE8uLYzVLUCpGM9O3iB1ta5MlgtZ0mWR5epdEju7BMPy0ut74kKALxfbFYXd
+	wAdgTfmUjiqA5+zzwbs/d4lHS34j5wlnDxaDlvcz9EwayWPTVhrmcbHnPdHRMnUr0xfxN6UaZTi
+	/C4RIPXRA==
+X-Google-Smtp-Source: AGHT+IH4sfYXjc0mooENjByeCRlkIQfk0F1uLDB5qdU0zmnMx4qyxPNXB2/MbHaGwrdZxoMxc54Tmg==
+X-Received: by 2002:a17:907:ca09:b0:b7d:27dd:9a54 with SMTP id a640c23a62f3a-b7d27ddeeebmr853814666b.31.1765807334386;
+        Mon, 15 Dec 2025 06:02:14 -0800 (PST)
+Received: from localhost.localdomain (46.205.203.157.nat.ftth.dynamic.t-mobile.pl. [46.205.203.157])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-649821316e4sm14374148a12.31.2025.12.15.06.02.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Dec 2025 06:02:13 -0800 (PST)
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH] client/player: Refcount registered endpoints
+Date: Mon, 15 Dec 2025 15:02:03 +0100
+Message-ID: <20251215140203.638669-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-Subject: Re: [PATCH v1] gatt-client:Implement error handling for
- DB_OUT_OF_SYNC in GATT caching.
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com,
-        cheng.jiang@oss.qualcomm.com, chezhou@qti.qualcomm.com,
-        wei.deng@oss.qualcomm.com, yiboz@qti.qualcomm.com
-References: <20251208101915.247459-1-mengshi.wu@oss.qualcomm.com>
- <CABBYNZJ=S3LHcwyXAc=gxf0RptcOC+6TPaWvoEmJquar54b3dQ@mail.gmail.com>
- <ee21c657-5120-4dbd-8660-d2a522f8578b@oss.qualcomm.com>
- <CABBYNZ+s3Oj5zM9uL-SPLQAmo3y+-06JLK4mn-YF-j-e196T8A@mail.gmail.com>
- <29919357-f843-4c28-8b54-001955f4f09e@oss.qualcomm.com>
- <CABBYNZJZreb5oowVXJMVqsqsvgEGX9=yK7kFOJp8MhNrfBJGLw@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CABBYNZJZreb5oowVXJMVqsqsvgEGX9=yK7kFOJp8MhNrfBJGLw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: RJnuePdZiSjaxwgu0crJKgMmHHAxZfXe
-X-Proofpoint-ORIG-GUID: RJnuePdZiSjaxwgu0crJKgMmHHAxZfXe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE1MDEwNCBTYWx0ZWRfX4R1hpCPDBVYC
- sfcXzNj3c4f/KxLEod8Gj/dLbgc88P+i72/Mc3wPughpvjbQiEj+xghqEXV3vtobMPb9Ir77A/X
- Dyn08OWqVsLdulZ2LuMltlLwcKL3q7UujRxyEq6msqBO8cYjvwzCY7OoFcrnYEmMvArYFuxhToE
- YZ3fGMn7nIYNkJrTOjGZXneeSJVx7UviITLpFm/bRIXlE6jlLcOjXcZxtoXCkOlRBqBaQOb1cr1
- 1/SXEQGeVFqkB3WXLBDJ5lvVTjzTp2cyXA2AUO9F4XbyZRCOzNCsMKU/LIO1SOnW9kv7mxYrwAh
- PQRFksjnH37QLCKhmZl6zNf5BFOmTpfDqtCp2HyicDqEKxeVIdrWuBwdka4AB3ua1RtHxBOmIae
- ontGTiNhoHPgccQJj8DbP35GS4wRMQ==
-X-Authority-Analysis: v=2.4 cv=cfLfb3DM c=1 sm=1 tr=0 ts=693ff9ad cx=c_pps
- a=cmESyDAEBpBGqyK7t0alAg==:117 a=Uz3yg00KUFJ2y2WijEJ4bw==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=TJ7pBEMUdyOPNGVDxwsA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=1OuFwYUASf3TG4hYMiVC:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-15_02,2025-12-15_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0 impostorscore=0
- priorityscore=1501 suspectscore=0 phishscore=0 malwarescore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512150104
 
-Hi,
+In case when more than one adapter is available on the host, the
+endpoint is registered on all of these adapters. When unregistering
+we need to keep track of registration count, otherwise we might free
+the endpoint structure prematurely (on the first unregister reply)
+which will cause SIGSEGV.
+---
+ client/player.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-On 12/12/2025 1:36 AM, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Wed, Dec 10, 2025 at 11:32 PM Mengshi Wu <mengshi.wu@oss.qualcomm.com> wrote:
->>
->> Hi,
->>
->> On 12/10/2025 10:41 PM, Luiz Augusto von Dentz wrote:
->>> Hi,
->>>
->>> On Wed, Dec 10, 2025 at 2:59 AM Mengshi Wu <mengshi.wu@oss.qualcomm.com> wrote:
->>>>
->>>> Hi,
->>>>
->>>> Thank you for your comments.
->>>>
->>>> On 12/8/2025 11:35 PM, Luiz Augusto von Dentz wrote:
->>>>> Hi,
->>>>>
->>>>> On Mon, Dec 8, 2025 at 5:19 AM Mengshi Wu <mengshi.wu@oss.qualcomm.com> wrote:
->>>>>>
->>>>>> Add automatic DB re-discovery on receiving BT_ATT_ERROR_DB_OUT_OF_SYNC
->>>>>> error code from ATT operations. This ensures the local GATT database
->>>>>> stays synchronized with the remote device by triggering a full service
->>>>>> discovery (handles 0x0001-0xffff) when the database becomes out of sync.
->>>>>>
->>>>>> The process_db_out_of_sync() function is now called in all ATT error
->>>>>> response handlers (read_multiple, read_long, write, execute_write,
->>>>>> prepare_write, and prep_write callbacks) to handle this error condition
->>>>>> consistently.
->>>>>>
->>>>>> Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
->>>>>> ---
->>>>>>  src/shared/gatt-client.c | 35 +++++++++++++++++++++++++++++++++--
->>>>>>  1 file changed, 33 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->>>>>> index f6d5dc4b7..087d4e228 100644
->>>>>> --- a/src/shared/gatt-client.c
->>>>>> +++ b/src/shared/gatt-client.c
->>>>>> @@ -1965,6 +1965,29 @@ fail:
->>>>>>                 "Failed to initiate service discovery after Service Changed");
->>>>>>  }
->>>>>>
->>>>>> +static void process_db_out_of_sync(struct bt_gatt_client *client,
->>>>>> +                                  uint8_t att_ecode)
->>>>>> +{
->>>>>> +       struct service_changed_op *op;
->>>>>> +
->>>>>> +       if (att_ecode != BT_ATT_ERROR_DB_OUT_OF_SYNC)
->>>>>> +               return;
->>>>>> +
->>>>>> +       DBG(client, "Database Out of Sync - triggering full re-discovery");
->>>>>> +
->>>>>> +       if (!client->in_svc_chngd) {
->>>>>> +               process_service_changed(client, 0x0001, 0xffff);
->>>>>> +               return;
->>>>>> +       }
->>>>>> +
->>>>>> +       op = new0(struct service_changed_op, 1);
->>>>>> +
->>>>>> +       op->start_handle = 0x0001;
->>>>>> +       op->end_handle = 0xffff;
->>>>>> +
->>>>>> +       queue_push_tail(client->svc_chngd_queue, op);
->>>>>> +}
->>>>>
->>>>> Id just change process_error to call into db_out_sync, that said this
->>>>> is not recovering at all, it just rediscovering but the original
->>>>> request will be lost, I wonder if we should implement some backoff
->>>>> logic wait to see if the server do a service changed, read the hash
->>>>> (in case we are not doing it already), and then redo the operation.
->>>>> Also we do need to make sure we don't end up in a loop rediscovery.
->>>>
->>>> At the beginning, we considered implementing recovery for failed ATT
->>>> requests caused by a Database Out of Sync error. However, we identified
->>>> potential risks in retrying some ATT requests after the remote device’s
->>>> services have changed. For example, the handle in the ATT_READ_REQ PDU,
->>>> which identifies the target attribute, may have changed on the remote
->>>> device. Even if the retry succeeds, it might operate on the wrong
->>>> attribute.
->>>>
->>>> As usual, any ATT response error will be propagated to the application
->>>> layer, so the operation will not be lost but will fail. We did not modify
->>>> this behavior.
->>>
->>> We do recovery for encryption/pairing errors.
->>
->> Sorry for the confusion. I meant that the Database Out of Sync error is
->> directly propagated to the bluetoothctl console, whereas not all errors
->> are.
->>
->>>
->>>> It may not be appropriate to implement recovery logic for failed ATT
->>>> requests at the BlueZ host layer. Therefore, we only do a rediscovery
->>>> as required by the Core Spec, Vol. 3, Part G, Section 2.5.2.1,
->>>> after receiving a Database Out of Sync error.
->>>>
->>>> For the suggestion about back-off logic,
->>>>
->>>> We are considering reading the remote database hash and comparing it
->>>> with the locally stored hash before initiating rediscovery. If reading
->>>> the remote database hash fails, we will assume that the remote GATT
->>>> database has changed and proceed with rediscovery immediately.
->>>>
->>>> As shown below, the client checks the remote database hash after
->>>> receiving a Database Out of Sync error. If the remote services have
->>>> changed, the client initiates rediscovery.
->>>>
->>>> btmon HCI Logs:
->>>>> ACL Data RX: Handle 2 flags 0x02 dlen 9
->>>>       ATT: Error Response (0x01) len 4
->>>>         Read Request (0x0a)
->>>>         Handle: 0x000d
->>>>         Error: Database Out of Sync (0x12)
->>>> bluetoothd[57993]: < ACL Data TX: Handle 2 flags 0x00 dlen 11
->>>>       ATT: Read By Type Request (0x08) len 6
->>>>         Handle range: 0x0001-0xffff
->>>>         Attribute type: Database Hash (0x2b2a)
->>>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>>         Num handles: 1
->>>>         Handle: 2
->>>>         Count: 1
->>>>> ACL Data RX: Handle 2 flags 0x02 dlen 24
->>>>       ATT: Read By Type Response (0x09) len 19
->>>>         Attribute data length: 18
->>>>         Attribute data list: 1 entry
->>>>         Handle: 0x000f
->>>>         Value: 10d6a00f95bb0eeec55a097ccf7dead8
->>>> bluetoothd[57993]: < ACL Data TX: Handle 2 flags 0x00 dlen 11
->>>>       ATT: Read By Type Request (0x08) len 6
->>>>         Handle range: 0x0010-0xffff
->>>>         Attribute type: Database Hash (0x2b2a)
->>>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>>         Num handles: 1
->>>>         Handle: 2
->>>>         Count: 1
->>>>> ACL Data RX: Handle 2 flags 0x02 dlen 9
->>>>       ATT: Error Response (0x01) len 4
->>>>         Read By Type Request (0x08)
->>>>         Handle: 0x0010
->>>>         Error: Attribute Not Found (0x0a)
->>>
->>> I don't recall if we have this behavior earlier of using Read By Type
->>> request for hash in the beginning? We need to limit the results to one
->>> and not proceed to read it again since it is supposed to exist only
->>> once in the database. Anyway I don't see a problem if we do read the
->>> hash and that didn't change we should probably go ahead and resend the
->>
->> I checked this and found that the stored hash value in the database
->> would only be updated at the beginning of a connection, using Read By
->> Type request. The process of service changed indication will not update
->> the stored hash value.
->>
->> I read cache file after a service changed indication done, it shows:
->> ------------------
->> [Attributes]
->> .....
->> 000e=2803:000f:02:f74347d19eef647d97f0b2f7af502e33: \
->> 00002b2a-0000-1000-8000-00805f9b34fb
->> .....
->> ------------------
->>
->> Then I read database hash from remote device, it shows:
->> ------------------
->> [:/service0008/char000e]# read
->> Attempting to read
->> /org/bluez/hci0/dev_C8_A3_E8_DD_3D_cC/service0oo8/char000e
->> [:/service0008/char000e]# [CHG] Attribute
->> /org/bluez/hci0/dev_C8_A3_E8_DD_3D_CC/service0008/char00e Value:
->> [:/service0008/char000e]# 0f 15 81 0b e0 c9 55 66 7e 2f f8 73 37 16 88 bc
->> [:/service0008/char000e]# 0f 15 81 0b e0 c9 55 66 7e 2f f8 73 37 16 88 bc
->> ------------------
->>
->> The stored hash value is not updated. Based on this, it seems to be safe
->> to resend the original request if hash values are the same, since there
->> are no risks of critical section operations between handling Service
->> Changed Indication and handling Database Out of Sync error. We will add
->> resend logic for this condition.
->>
->>
->>> original request, in the meantime if we receive a service changed we
->>> can narrow down the range that needs to be rediscovered and not use
->>
->> Sure. Since we reuse the process_service_changed(), we are capable of
->> knowing that the Service Changed Indication comes simultaneously under
->> certain conditions. We will not append a full range rediscovery to the
->> client->svc_chngd_queue if client->in_svc_chngd is true.
->>
->>> 0x0001-0xffff as bellow, and we can actually perform recovery also in
->>> case the service changed don't affect the original operation handle.
->>
->> Unlike the Service Changed indication, the Database Out of Sync error
->> provides no information about the affected range. Consequently, we cannot
->> determine whether the original operation handle is impacted. By the way,
->> Service Changed characteristic is not readable, so we can not get effect
->> from it either.
-> 
-> Service Changed must always be generated in case the database changes,
-> otherwise it would be broken with legacy devices that don't use the db
-> hash, and since the later is the reason for the server to send out of
-> sync we can infer what is the affected range and either do the resend
-> before or after handing the rediscover on the Service Changed range,
-> either way it should be possible to recover from out of sync errors
-> automatically. If the remote misbehaves, or is just playing tricks
-> with out of sync error to force the stack to rediscover the whole db,
-> we should just wait a short grace time and if it doesn't send the
-> service changed on then we should initiate a full rediscover.
-
-We could consider queuing a pending task to wait for the Service 
-Changed indication. If the original attribute handle is outside the 
-affected range, we retry the request; otherwise, we propagate db out 
-of sync error.
-
-For cases where a Service Changed indication may never arrive, we could
-plan to wait until the remote hash value is read back. If the remote 
-device does intend to send a Service Changed indication, it will likely 
-follow immediately after the connection event that reports the db out 
-of sync error. We can also explore alternative approaches to determine 
-an appropriate waiting time.
-
-> 
->>>
->>>> bluetoothd[57993]: < ACL Data TX: Handle 2 flags 0x00 dlen 11
->>>>       ATT: Read By Group Type Request (0x10) len 6
->>>>         Handle range: 0x0001-0xffff
->>>>         Attribute group type: Primary Service (0x2800)
->>>>
->>>>>
->>>>>>  static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
->>>>>>                                         uint16_t length, void *user_data)
->>>>>>  {
->>>>>> @@ -2709,10 +2732,12 @@ static void read_multiple_cb(uint8_t opcode, const void *pdu, uint16_t length,
->>>>>>                         (!pdu && length)) {
->>>>>>                 success = false;
->>>>>>
->>>>>> -               if (opcode == BT_ATT_OP_ERROR_RSP)
->>>>>> +               if (opcode == BT_ATT_OP_ERROR_RSP) {
->>>>>>                         att_ecode = process_error(pdu, length);
->>>>>> -               else
->>>>>> +                       process_db_out_of_sync(req->client, att_ecode);
->>>>>> +               } else {
->>>>>>                         att_ecode = 0;
->>>>>> +               }
->>>>>>
->>>>>>                 pdu = NULL;
->>>>>>                 length = 0;
->>>>>> @@ -2864,6 +2889,7 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
->>>>>>         if (opcode == BT_ATT_OP_ERROR_RSP) {
->>>>>>                 success = false;
->>>>>>                 att_ecode = process_error(pdu, length);
->>>>>> +               process_db_out_of_sync(req->client, att_ecode);
->>>>>>                 goto done;
->>>>>>         }
->>>>>>
->>>>>> @@ -3050,6 +3076,7 @@ static void write_cb(uint8_t opcode, const void *pdu, uint16_t length,
->>>>>>         if (opcode == BT_ATT_OP_ERROR_RSP) {
->>>>>>                 success = false;
->>>>>>                 att_ecode = process_error(pdu, length);
->>>>>> +               process_db_out_of_sync(req->client, att_ecode);
->>>>>>                 goto done;
->>>>>>         }
->>>>>>
->>>>>> @@ -3213,6 +3240,7 @@ static void execute_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
->>>>>>         if (opcode == BT_ATT_OP_ERROR_RSP) {
->>>>>>                 success = false;
->>>>>>                 att_ecode = process_error(pdu, length);
->>>>>> +               process_db_out_of_sync(req->client, att_ecode);
->>>>>>         } else if (opcode != BT_ATT_OP_EXEC_WRITE_RSP || pdu || length)
->>>>>>                 success = false;
->>>>>>
->>>>>> @@ -3278,6 +3306,7 @@ static void prepare_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
->>>>>>         if (opcode == BT_ATT_OP_ERROR_RSP) {
->>>>>>                 success = false;
->>>>>>                 att_ecode = process_error(pdu, length);
->>>>>> +               process_db_out_of_sync(req->client, att_ecode);
->>>>>>                 goto done;
->>>>>>         }
->>>>>>
->>>>>> @@ -3447,6 +3476,7 @@ static void prep_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
->>>>>>                 success = false;
->>>>>>                 reliable_error = false;
->>>>>>                 att_ecode = process_error(pdu, length);
->>>>>> +               process_db_out_of_sync(req->client, att_ecode);
->>>>>>                 goto done;
->>>>>>         }
->>>>>>
->>>>>> @@ -3597,6 +3627,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
->>>>>>         if (opcode == BT_ATT_OP_ERROR_RSP) {
->>>>>>                 success = false;
->>>>>>                 att_ecode = process_error(pdu, length);
->>>>>> +               process_db_out_of_sync(req->client, att_ecode);
->>>>>>                 goto done;
->>>>>>         }
->>>>>>
->>>>>> --
->>>>>> 2.34.1
->>>>>>
->>>>>>
->>>>>
->>>>>
->>>>
->>>
->>>
->>
-> 
-> 
+diff --git a/client/player.c b/client/player.c
+index b6b02a000..cedb07d65 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -127,6 +127,7 @@ struct endpoint {
+ 	struct codec_preset *codec_preset;
+ 	bool broadcast;
+ 	struct iovec *bcode;
++	unsigned int refcount;
+ };
+ 
+ static DBusConnection *dbus_conn;
+@@ -3323,6 +3324,7 @@ static void register_endpoint_reply(DBusMessage *message, void *user_data)
+ 	}
+ 
+ 	bt_shell_printf("Endpoint %s registered\n", ep->path);
++	ep->refcount++;
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -3737,9 +3739,13 @@ static void unregister_endpoint_reply(DBusMessage *message, void *user_data)
+ 
+ 	bt_shell_printf("Endpoint %s unregistered\n", ep->path);
+ 
+-	local_endpoints = g_list_remove(local_endpoints, ep);
+-	g_dbus_unregister_interface(dbus_conn, ep->path,
+-					BLUEZ_MEDIA_ENDPOINT_INTERFACE);
++	ep->refcount--;
++
++	if (ep->refcount == 0) {
++		local_endpoints = g_list_remove(local_endpoints, ep);
++		g_dbus_unregister_interface(dbus_conn, ep->path,
++					    BLUEZ_MEDIA_ENDPOINT_INTERFACE);
++	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+-- 
+2.51.0
 
