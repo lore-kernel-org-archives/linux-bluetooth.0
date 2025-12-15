@@ -1,166 +1,235 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from o10.sgmail.github.com (o10.sgmail.github.com [167.89.101.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4E92D73B2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 15:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22E933892F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 16:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.89.101.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765813598; cv=none; b=G/B1+5io7yjV5n3MBoTPc/eqZE8UEisEW83zFNHfMHN8RGZrPPx2KzIPT1mALXRht5y5t1OHUW+VlwMyLfFgeLfNPKy7q4/r3DuUmU7IEHzj57VDsQMePzV7PYy6+tu2eiywX6nghRl0ZbkaEAVUeyi3AsMOqnXugJvok/GD0LY=
+	t=1765817385; cv=none; b=LsqqNAvmX0QBlyjJn3eTLtJDc1gYuJmg0NFzVXnHHT7pKg7gcXhaU2m5S7+v2a82eoa+uYIyJxpWLldSVDrSdch5Q767TL5/QdbomERsDbNkk81IG4Rx6eZ4AXPz9dKYvYKUlPPidMUmE+O3x+fmz5K0SLL+wgmkgqmvfoRyIig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765813598; c=relaxed/simple;
-	bh=xARBVQ8DdEC8F1ONmGPvA/lzUfaTn7/VMbcYrfzQpLo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cMJwvcXQ+LQI6qPiQkl0EXfnLdAxhVPMbrA+v4lN9gU1JnwLotOq/xsYBcFBcIKFgslstk/RfZsuQ35kihbp3tF7ZgqB6GSz+KUkVc9nvskZbvYSxmBIt4eVatDmSO+h2MrlTAlI8MQ8C2btsRdyIhg+EJR+zOBLFbZaUPmDVyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbAP7xII; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1765817385; c=relaxed/simple;
+	bh=VTsXvjDVgxhUlcPhE0XRrufuxfwv+Hrvw4glxpHiJto=;
+	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=GPwg1KOcoqFj3cSq3bjh9pdiaGcR2zRY9QjWRPbvU2z1wErGiVWsQPCBybWP4OH64hhQ3i1j2LyhlNWKsP32njbm1oPlZPcyI1A5ilx28FNxgbDPq+x+uAGp7U344ew8OEZ564y9t83yVYWz31iPVYTSCIGd/ioxcgGHPYCsAjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=beiEwfdr; arc=none smtp.client-ip=167.89.101.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbAP7xII"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-37a2dcc52aeso32031371fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 07:46:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765813594; x=1766418394; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uMvvVGERd3mt1B4otJOteb3OqAwxA2BKhC4KiqGzfY8=;
-        b=MbAP7xIIuoOOzDgRL20GQM2cffYaTzidS4SEirLrIZyGjtKGisyvIGxDlliF4TCr9Q
-         QSmQPqHxPh8uhBT3lVqIeQydrUOwsCM7CucBEGvjQCa2Ca/Yt8paY04Q+MV5tDFeTxne
-         Obeekt7BYvoAFzMTnHfP/0n9NpEKSrp8lvtPp/cXn6cAoBrALRfGBW9/k+wrl/iEZHyG
-         vLoLgoi0k6IgJr0jhf2ltCGkD8516rfkR2Sn/3N8Bo8XvkmEaFOb1jimC86C8iyRKB3z
-         +4WV6+psgh/YwFVpPpE0FThiKZ2tfB7nFp7WwCVyH/mZ0YkFd+vsgZWKOdR2QtGsD+Fj
-         h4Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765813594; x=1766418394;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uMvvVGERd3mt1B4otJOteb3OqAwxA2BKhC4KiqGzfY8=;
-        b=TBNRW8VQ+5ozn3B+MajtHqENYIlv3jrlymx/GqsKzwmHECo5BVSJ204K+/Y5bsUhBp
-         zrc3kvZtobqcjAP3b7g1uLFvoXS5XLxiG4zVcuw/cUb9RdtlyLQAl6MNxIMNd369fil/
-         DtC8BglA/QjdAFXzNQFpsdIuKToFUCNFrAqZyGGR3byOXMMTa9XCu8t/4YEoFWy25ssq
-         2wsaigv9DiehbD0i0YZIdVjkdqlmPOv0wgiX40+hurHVe5GVVrP26z0hDlNNBHXZAsSO
-         PzKCyqGgTjVVQtr/SQVK9CnZoo1JI71zkXUCwhnwNulMKaeKtYYlKmc9MTsJ+urhyRHj
-         Nwug==
-X-Gm-Message-State: AOJu0YyX2JSGmLtSBsSk/Yi4AWMsCsNw9jXpTNSoP3iZNVJLBghlUhPh
-	VmrYq95rbyx3b6WylxCw63avJyHD1PDqYCxF+QPeUQr+ZkXAREYpRcSHluSAUP16QlxPjHJ0b2m
-	j/vIJdV0stBxuX0m+xTQnR2ziAOC80f8=
-X-Gm-Gg: AY/fxX4R99ReZem0bMPB2c4TBGJzcTdqY+AzkIXUqb9uNzpG0LbtgM/Xab6dVUKBJl2
-	8cEgKc5etAx3YBZOp+nvxbMN1ORQW4pHNs6YEY5FzYe11OYm7d3drCIQFWCgjbGV5wqFqqnSMdA
-	vVFaPyXGAqPxsgIzhOonVdPweRWLJPi5e35+QQyIPI7lrTzYSyMuNYNBlZOcu6RpCMLAkaK8ZXh
-	lW0aIatH6PIJgDey+R5qJlSPNJ5mnDsdlS6K0vR0NV+b73R93jkZY3BAAI5f9g8X4A7Rw==
-X-Google-Smtp-Source: AGHT+IHneG1rZ2MwhYZ0u2YxLT6UH/z5TKZYZ9/dEAf9S+15E8j9p/hAl/fdsirSTgMcNSUFElhetehKeQTXJGitb0I=
-X-Received: by 2002:a2e:9a12:0:b0:37a:95c9:4745 with SMTP id
- 38308e7fff4ca-37fd08c7a93mr34442571fa.40.1765813593980; Mon, 15 Dec 2025
- 07:46:33 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="beiEwfdr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	h=date:from:subject:mime-version:content-type:content-transfer-encoding:
+	list-unsubscribe:to:cc:content-type:date:from:subject:to;
+	s=smtpapi; bh=FEZ2GtBkp9Hv/hwSD099sd8g8IhskIVO+zRpkx88sFU=;
+	b=beiEwfdr6r/rdiIMZ+nsaMwVxZa0fxTww5b2YhCWWERDkdOkfam2+PGk+HBmk7ban/rg
+	GBbVzmXy0n3XRxgSIeRnlHOFw5JqbVouXzNVl57DPSISxUcraneHJPWIL7r44M5ax6/v1F
+	5tDFPTQCCfJk3h0t2khvXk/ZI+cxZr+uU=
+Received: by recvd-78f8dbdb7-k7l46 with SMTP id recvd-78f8dbdb7-k7l46-1-69403C26-10A
+	2025-12-15 16:49:42.77669042 +0000 UTC m=+2395258.503991893
+Received: from out-21.smtp.github.com (unknown)
+	by geopod-ismtpd-8 (SG)
+	with ESMTP id umZk3LR_Sh2n0hCF95GZgQ
+	for <linux-bluetooth@vger.kernel.org>;
+	Mon, 15 Dec 2025 16:49:42.768 +0000 (UTC)
+Received: from github.com (hubbernetes-node-d5b3929.ac4-iad.github.net [10.52.133.35])
+	by smtp.github.com (Postfix) with ESMTPA id 79A824011DA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 08:49:36 -0800 (PST)
+Date: Mon, 15 Dec 2025 16:49:42 +0000 (UTC)
+From: Pauli Virtanen <noreply@github.com>
+Message-ID: <bluez/bluez/push/refs/heads/master/a2ef82-2ec29c@github.com>
+Subject: [bluez/bluez] 9027ed: shared/mcp, mcp: support multiple MCP, and add
+ non...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251215140203.638669-1-arkadiusz.bokowy@gmail.com>
- <CABBYNZ+bgaa4znWcjW_n_3n3_oKbPsptg0K80eZU8iQwR81kVA@mail.gmail.com> <CAGFh0265yqFi=Jm2VOSxG4pdy+FKxvnFr5F_+wesB1dwW1nDLA@mail.gmail.com>
-In-Reply-To: <CAGFh0265yqFi=Jm2VOSxG4pdy+FKxvnFr5F_+wesB1dwW1nDLA@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 15 Dec 2025 10:46:21 -0500
-X-Gm-Features: AQt7F2otUwxJwQ7XIwVNIT8gfOXVfkQK1Qp3qbMcB9HO2iJLaNVon6VA-vAMrGQ
-Message-ID: <CABBYNZ+jcFPxigPq9yUbiRstaT2zyO68527z_0xDexLr3aJ6pQ@mail.gmail.com>
-Subject: Re: [PATCH] client/player: Refcount registered endpoints
-To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+X-SG-EID: 
+ =?us-ascii?Q?u001=2Ezu6eUoWwK70GvXWP+kE2GIYMQflaq6Ix3rraxcwcvSqstVpfwwfs1H7iT?=
+ =?us-ascii?Q?j=2Fu7Mau0w5pPZd2OpCSrPHF+2C5b3td6fDaSkgc?=
+ =?us-ascii?Q?gtnx58HouwkKvE6=2Fev=2FDWeyHSJO6n2KuMn41oW=2F?=
+ =?us-ascii?Q?zZHxutLcOzakRspIvAU5KN02IwbSElM0oH3BCMb?=
+ =?us-ascii?Q?AuAMSwzVU1HXBhlMidl1=2FL2Y7UnfyFGS+LEHz=2FW?=
+ =?us-ascii?Q?io+Cwa5Eu00iYzxq=2FXh8FhbIgI7Olm9jdZt9hMq?= =?us-ascii?Q?LeDV?=
+To: linux-bluetooth@vger.kernel.org
+X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
 
-Hi Arkadiusz,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 9027edc4604ed6be3e1d8d741df1441577d1ae58
+      https://github.com/bluez/bluez/commit/9027edc4604ed6be3e1d8d741df1441577d1ae58
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
 
-On Mon, Dec 15, 2025 at 10:33=E2=80=AFAM Arkadiusz Bokowy
-<arkadiusz.bokowy@gmail.com> wrote:
->
-> > Do you have a backtrace or something? We don't reference struct
-> > endpoint across different adapters afaik so this might be a different
-> > bug or something.
->
-> > [bluetoothctl]> endpoint.register 0000110a-0000-1000-8000-00805f9b34fb =
-0x00 '0xFF 0xFF 0x02 0x40'
-> > [/local/endpoint/ep0] Enter Metadata (value/no): no
-> > [/local/endpoint/ep0] Auto Accept (yes/no): no
-> > [/local/endpoint/ep0] Max Transports (auto/value): auto
-> > [/local/endpoint/ep0] Locations: 0
-> > [/local/endpoint/ep0] Supported Context (value): 0
-> > [/local/endpoint/ep0] Context (value): 0
-> > [/local/endpoint/ep0] CIG (auto/value): auto
-> > [/local/endpoint/ep0] CIS (auto/value): auto
-> > Capabilities:
-> >   ff ff 02 40                                      ...@
-> > Capabilities:
-> >   ff ff 02 40                                      ...@
-> > Endpoint /local/endpoint/ep0 registered
-> > Endpoint /local/endpoint/ep0 registered
-> > [bluetoothctl]> endpoint.unregister /local/endpoint/ep0
-> > Endpoint /local/endpoint/ep0 unregistered
-> > [bluetoothctl]>
-> > Program received signal SIGSEGV, Segmentation fault.
-> > Download failed: Invalid argument.  Continuing without source file ./st=
-ring/../sysdeps/x86_64/multiarch/strlen-avx2.S.
-> > __strlen_avx2 () at ../sysdeps/x86_64/multiarch/strlen-avx2.S:76
-> > warning: 76     ../sysdeps/x86_64/multiarch/strlen-avx2.S: No such file=
- or directory
-> > (gdb) bt
-> > #0  __strlen_avx2 () at ../sysdeps/x86_64/multiarch/strlen-avx2.S:76
-> > #1  0x00007ffff7a6f980 in __printf_buffer (buf=3Dbuf@entry=3D0x7fffffff=
-c7a0, format=3Dformat@entry=3D0x5555555afbd3 "Endpoint %s unregistered\n", =
-ap=3Dap@entry=3D0x7fffffffc8b0, mode_f
-> >     at ./stdio-common/vfprintf-process-arg.c:443
-> > #2  0x00007ffff7a70788 in __vfprintf_internal (s=3D0x7ffff7c355c0 <_IO_=
-2_1_stdout_>, format=3Dformat@entry=3D0x5555555afbd3 "Endpoint %s unregiste=
-red\n", ap=3Dap@entry=3D0x7fffffffc8
-> >     at ./stdio-common/vfprintf-internal.c:1543
-> > #3  0x00007ffff7b45489 in ___vfprintf_chk (fp=3D<optimized out>, flag=
-=3Dflag@entry=3D2, format=3Dformat@entry=3D0x5555555afbd3 "Endpoint %s unre=
-gistered\n", ap=3Dap@entry=3D0x7fffffffc8b
-> > #4  0x00005555555a90bf in vprintf (__fmt=3D0x5555555afbd3 "Endpoint %s =
-unregistered\n", __ap=3D0x7fffffffc8b0) at /usr/include/x86_64-linux-gnu/bi=
-ts/stdio2.h:156
-> > #5  bt_shell_printf (fmt=3Dfmt@entry=3D0x5555555afbd3 "Endpoint %s unre=
-gistered\n") at ../src/shared/shell.c:741
-> > #6  0x0000555555587739 in unregister_endpoint_reply (message=3D0x555556=
-2c2990, user_data=3D0x5555562b9c00) at ../client/player.c:3738
-> > #7  unregister_endpoint_reply (message=3D0x5555562c2990, user_data=3D0x=
-5555562b9c00) at ../client/player.c:3724
-> > #8  0x00005555555a1516 in method_call_reply (call=3D<optimized out>, us=
-er_data=3D0x5555562c2270) at ../gdbus/client.c:1075
-> > #9  0x00007ffff7e037c2 in ?? () from /lib/x86_64-linux-gnu/libdbus-1.so=
-.3
-> > #10 0x00007ffff7e07dfe in dbus_connection_dispatch () from /lib/x86_64-=
-linux-gnu/libdbus-1.so.3
-> > #11 0x000055555559c828 in message_dispatch (data=3D0x5555562a8890) at .=
-./gdbus/mainloop.c:59
-> > #12 0x00007ffff7e9fbfb in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.=
-so.0
-> > #13 0x00007ffff7ea1237 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.=
-so.0
-> > #14 0x00007ffff7ea15d7 in g_main_loop_run () from /lib/x86_64-linux-gnu=
-/libglib-2.0.so.0
-> > #15 0x00005555555ab7f9 in mainloop_run () at ../src/shared/mainloop-gli=
-b.c:65
-> > #16 0x00005555555abbfa in mainloop_run_with_signal (func=3Dfunc@entry=
-=3D0x5555555a8880 <signal_callback>, user_data=3Duser_data@entry=3D0x0) at =
-../src/shared/mainloop-notify.c:196
-> > #17 0x00005555555aa655 in bt_shell_run () at ../src/shared/shell.c:1476
-> > #18 0x000055555556f418 in main (argc=3D<optimized out>, argv=3D0x7fffff=
-ffcef8) at ../client/main.c:3960
+  Changed paths:
+    M lib/bluetooth/uuid.h
+    M profiles/audio/mcp.c
+    M src/shared/mcp.c
+    M src/shared/mcp.h
+    M src/shared/mcs.h
 
-Oh, this is bluetoothctl bug, sorry I was looking into bluetoothd not
-bluetoothctl, endpoint_register does indeed make a reference to the
-same object.
+  Log Message:
+  -----------
+  shared/mcp, mcp: support multiple MCP, and add non-stub MCS server
 
-> The bug is caused by freeing the endpoint on the first reply from
-> deregistration. When the second one (or another if you have 3, 4, 5..
-> etc. adapters) arrieves you have access after free. Simple refcount
-> should fix that, but of course there might be other approaches.
+For Media Control Client, add support for multiple GMCS / MCS services
+on the server. Revise the API accordingly.
+
+For Media Control Server, make it a complete implementation (OTS still
+missing), and add an API the profile can use.
+
+This is mostly a complete rewrite.
+
+Adapt also profile/mcp.c to use the new API, adding support for multiple
+MCS services on the remote side.
 
 
+  Commit: 90d78210f222c0960ada7b39839d6ce5291680d8
+      https://github.com/bluez/bluez/commit/90d78210f222c0960ada7b39839d6ce5291680d8
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
 
---=20
-Luiz Augusto von Dentz
+  Changed paths:
+    M .gitignore
+    M Makefile.am
+    A unit/test-mcp.c
+
+  Log Message:
+  -----------
+  test-mcp: add tests for MCP / MCS
+
+Add tests for the Media Control Client / Server implementation.
+
+This contains basic GGIT and state transition tests.  Not all state
+transition tests are here, as they'd largely test the upper layer of the
+profile which is not tested now.
+
+
+  Commit: 0a4a07d9a1e871d05ad8706d84e0171af8f9ffd1
+      https://github.com/bluez/bluez/commit/0a4a07d9a1e871d05ad8706d84e0171af8f9ffd1
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
+
+  Changed paths:
+    M profiles/audio/mcp.c
+
+  Log Message:
+  -----------
+  mcp: add support for Repeat & Shuffle for remote player
+
+Add support for toggling remote player playing order settings.
+
+These do not fully map to current org.bluez.MediaPlayer Repeat/Shuffle,
+but try best effort mapping.
+
+
+  Commit: be02c3e92e1671e0eb88628384147be466790699
+      https://github.com/bluez/bluez/commit/be02c3e92e1671e0eb88628384147be466790699
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
+
+  Changed paths:
+    M Makefile.am
+    A src/shared/uinput.c
+    A src/shared/uinput.h
+
+  Log Message:
+  -----------
+  shared/uinput: add uinput utility functions
+
+Add uinput utility function that can be used both for AVCTP and MCS.
+
+
+  Commit: 174e812b8aea92b741b3ba6d7a1a795428a9dc42
+      https://github.com/bluez/bluez/commit/174e812b8aea92b741b3ba6d7a1a795428a9dc42
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
+
+  Changed paths:
+    M profiles/audio/avctp.c
+
+  Log Message:
+  -----------
+  avctp: use uinput utilities from src/shared
+
+Make use of the src/shared version of uinput_create() / send_key
+
+
+  Commit: d3089866bd2e1787bf69635e9625c083a785af4e
+      https://github.com/bluez/bluez/commit/d3089866bd2e1787bf69635e9625c083a785af4e
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
+
+  Changed paths:
+    M profiles/audio/mcp.c
+
+  Log Message:
+  -----------
+  mcp: add local GMCS service that emits uinput media keys
+
+Implement simple GMCS service that is always inactive, and emits media
+key presses via uinput for Play/Pause/Stop/Next/Prev MCS commands.
+
+In practice, this seems to be enough to support media control keys on
+headsets.  Some headsets (Creative Zen Hybrid Pro) also refuse to
+connect if there is no GMCS service.
+
+
+  Commit: 6734c19cb4c62e8ad47d9075a41f8e900de68c66
+      https://github.com/bluez/bluez/commit/6734c19cb4c62e8ad47d9075a41f8e900de68c66
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
+
+  Changed paths:
+    M src/shared/mcp.c
+
+  Log Message:
+  -----------
+  shared/mcp: on track changed, re-read values if notify not available
+
+Notify is optional for some MCS attributes. To get new track titles etc.
+re-read values on track change, if remote does not have notify on them.
+
+
+  Commit: 809091c8b3ee4596fd51d8d5256c15e8f3621577
+      https://github.com/bluez/bluez/commit/809091c8b3ee4596fd51d8d5256c15e8f3621577
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
+
+  Changed paths:
+    M unit/test-mcp.c
+
+  Log Message:
+  -----------
+  test-mcp: check attributes are reread on track change if no notify
+
+Add test we reread attributes on track change if remote does not have
+optional notify features.
+
+
+  Commit: 2ec29cc98ad5d32e9323e654ae5c1ec3bdac3994
+      https://github.com/bluez/bluez/commit/2ec29cc98ad5d32e9323e654ae5c1ec3bdac3994
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-12-15 (Mon, 15 Dec 2025)
+
+  Changed paths:
+    M src/shared/mcp.c
+
+  Log Message:
+  -----------
+  shared/mcp: complete CCID read before considering other attributes
+
+Service is shown ready to upper level when CCID is read, after which we
+should notify upper level about current attribute values.
+
+Make sure the values reach upper level, by reading them only after the
+service is ready. Otherwise, the reads may complete in unspecified
+order and upper level misses some events.
+
+
+Compare: https://github.com/bluez/bluez/compare/a2ef82f1aaa9...2ec29cc98ad5
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
