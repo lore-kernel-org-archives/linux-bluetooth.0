@@ -1,314 +1,127 @@
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B304D291C3F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 09:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C73D2874FB
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 09:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765791400; cv=none; b=ch+qqHyFCPgSAJc5AOMThLRRHvNowbKyCjYYbehki8QQESNxsazF303EsFtVrN4EiybYb0hYrGyGNQe812IyFyDHDh5hFBNUU7MZOkzFebSILL5D1DSATYzyZXswaKDhkGWzRJxo7gvXr9W8Kd8rEVoB3ea+264Z7nus+NrFuKg=
+	t=1765791797; cv=none; b=LQxOLFJ9Wo6ds3s9c6Q/cCtGgKN0jUPfej0JVx/0kyhhpLr8n7qktbC+yICYdoIQnK1BJsNX96yzPpDLrT88yiieLCTYCpwkS8dNJu0CrxJdGzxH5GVYKzYp2ffLVcE469BPlH6sBJ5Gh8XylYyPbAQOSHzQs8SzxDIMs1wIgpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765791400; c=relaxed/simple;
-	bh=5ydw3n7sORoyfTmD/4zCMTjivFFggk5KPJO0z4rtLyA=;
-	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=eR/zbfhQB/c/lGIbaTUKKwqy6yjk4tJn5DwEVg92rG3nh++RYtjMknmevHHqEoFPn3IETBEifJMByGm90Yzbxihrd8jA7d/rmgkU+OmoeTIyRV4AP063VXnzMfQhCtwU8EF5BgMROLJaZX5cDSIj/w763gZDBPLb4pMFx4bvLJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1E486431FC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 09:36:29 +0000 (UTC)
-Message-ID: <4817e2e497496a8638d289bfc32f9f19fd8fd033.camel@hadess.net>
-Subject: Another build failure with a2dp disabled
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 15 Dec 2025 10:36:29 +0100
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
+	s=arc-20240116; t=1765791797; c=relaxed/simple;
+	bh=Jvhq2Ja5UXpS59JotyqEupdP8+K+AzAqfSWw7wYm84U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=m3J5LR+P6jB9xB4gi1E34FAU174ia7p4s4bO9XhM+keEvI2K6UVWBckcfuJWzI3g+xuw/8k+UrQdaiDtQV08Kcli83QECQWCuhdw2Yt+FUro9+HeQU5gA3DyDC5l0S8bpm5ZiW2Zn0iUwT/4X3rG8KRAEpCnWjkomAv6UN0uInE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IV1B8TvR; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IV1B8TvR"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8b220ddc189so444153985a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Dec 2025 01:43:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765791795; x=1766396595; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=UrME0P+f+llu5aOZHjGgZj6QS/Z/RMmd4VdIVY3T9Ps=;
+        b=IV1B8TvRzCE1lPBhVrGjkJxnZvfaEYhv9mdMYOqIxtD2cUNHN9h0HwfK8TExnv9SVw
+         IyGM6HouR0Pj+1XS3Y03J6HDVRubJsoE9WeE2ZE+cf9np+Q2cmTU1ZyfgAy6Ms2EqWql
+         Pn27nxWmkOeCxh+bp03/hZU8rjgUg9uFFpAvGpgQyScuXFXooi3k5vrdS2roaCPbxT7k
+         Y+dSve2bjoLjY8ftGsC10VqW9dX+DykMaZdY0Mo2vsViGptHLxyxtHO3okZHjJs5iFic
+         /EK/MQPjGYumZ6voH04t7wVUnwyoFJML2kOwq3ukNzQ4uuNOyChLy6Jp0NCQYUN94RZH
+         lEVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765791795; x=1766396595;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UrME0P+f+llu5aOZHjGgZj6QS/Z/RMmd4VdIVY3T9Ps=;
+        b=iuBrr4ntuTrXhYJskMDulIF7fR6fO82UYdlI/MfQfMNhPzp1IxblDZZ3cdbyeTVr7k
+         0Zqv/ErxeRhCSVkFBJJ0hmsD3XcBNaTMqUUchCkFRAIGPQksGb5+1b3d4fizN7TyDFKq
+         MLOpuAo+MQ4Z5HvKFfJS8FE61NPqrupd5in/2c/0DD57LPsHmsK0HIjyKI6XOrKVwMOj
+         6CuKTW++vVgwLudZR86Gq3qBjxICcZf7xoQmkqE3zZIGpn8h8HQxj5RWQUYN+om//kru
+         Y9gouC6V9h2y5CJ5ZDHMPbg2D2vSd2VNW+PzZrz75CKCUy+c9DVB5DYGtEgET+kO1eDg
+         +QOw==
+X-Gm-Message-State: AOJu0Yz4cWn2+CoyRG/GQz4S4KtECbqGLr6NQR/tqz7xhUimGwvpC1MI
+	O+APMckiGpG9E04aAz35FIi72cBcnLUlMU+g6aEpv5PSvNXBEDQBnQLinKQuGQ==
+X-Gm-Gg: AY/fxX7l95OTTApBfOqv5+HcWkFxD5nnRWRk/+PsJXAqy0IAvddy7sje69vziPkqttB
+	05DOLBoEfd64ppo4OneWtB5Qj1zvQ0lqa2FnVYH7qbKrPbqijPMoOpd+3X+nRbIPXeL0Kq1N9GI
+	h5ymj6lDVn++Gn7iypvUAXyQ3b8EX1x3HyK7Rh64qyLmVHn8kG+Xqu7qeMr4KFKNR8dm7qFSN9T
+	MkOhSX2xgQN/ZIPThfx66I4xxkgJ/sUBBAeocnY3Kg/Jdf+lKUbjSLRinP8sw/LEVEcL0sLSyJc
+	ZtIlh5/7IIF+P+jWhZWXTTXc2DuFNBXtLsR6dTTm7RRtXuhL7m/nCfaR7abMsriSi+jCoxWZLkU
+	LQC2YlZsNVYP30qJBKyYkxwo+Yq+A4+N3g2JKMh0DZDqmo7i2PsSVeW+mx8Z2ZdRKj2qDfkWhhW
+	uwGvqUcfymj76WuZGqEgE=
+X-Google-Smtp-Source: AGHT+IEV81J0r4XIqcpbw7jdmN6HyMWkItgNJE+25dD7S0UwVvBVSQRE/aEelK72PigcewJE73b3Uw==
+X-Received: by 2002:a05:620a:29c5:b0:8b9:cf85:40a2 with SMTP id af79cd13be357-8bb3a2531bcmr1335297785a.54.1765791794732;
+        Mon, 15 Dec 2025 01:43:14 -0800 (PST)
+Received: from [172.17.0.2] ([172.177.209.212])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8bab5d4cd34sm1024053685a.47.2025.12.15.01.43.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Dec 2025 01:43:14 -0800 (PST)
+Message-ID: <693fd832.050a0220.2336a3.c3c7@mx.google.com>
+Date: Mon, 15 Dec 2025 01:43:14 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8079752980804263692=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefieegiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpefkuffhvffftgfgfgggsehtqhertddtreejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeffhfejjeffgfekkeeuvedvtedtieeggeelheduuefhudevgfelgffgvdefhffgvdenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupedugfegkeeigeefudfhvedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-State: clean
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kx960506@163.com
+Subject: RE: [BlueZ] client/palyer: Fix QoS 32_2_1 in lc3_ucast_presets
+In-Reply-To: <20251215081912.1245-1-kx960506@163.com>
+References: <20251215081912.1245-1-kx960506@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hey,
+--===============8079752980804263692==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-We probably need to add this selection of options to the CI. I found
-this using the meson build system, but it also applies to autotools.
+This is automated email and please do not reply to this email!
 
-Cheers
+Dear submitter,
 
-$ ./bootstrap-configure --disable-a2dp && make
-[...]
-profiles/audio/media.c: In function =E2=80=98media_player_destroy=E2=80=99:
-profiles/audio/media.c:2010:17: error: implicit declaration of function =E2=
-=80=98avrcp_unregister_player=E2=80=99 [-Wimplicit-function-declaration]
- 2010 |                 avrcp_unregister_player(player);
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c: At top level:
-profiles/audio/media.c:2282:15: error: variable =E2=80=98player_cb=E2=80=99=
- has initializer but incomplete type
- 2282 | static struct avrcp_player_cb player_cb =3D {
-      |               ^~~~~~~~~~~~~~~
-profiles/audio/media.c:2283:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98list_settings=E2=80=99
- 2283 |         .list_settings =3D media_player_list_settings,
-      |          ^~~~~~~~~~~~~
-profiles/audio/media.c:2283:26: error: excess elements in struct initialize=
-r [-Werror]
- 2283 |         .list_settings =3D media_player_list_settings,
-      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2283:26: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2284:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98get_setting=E2=80=99
- 2284 |         .get_setting =3D media_player_get_setting,
-      |          ^~~~~~~~~~~
-profiles/audio/media.c:2284:24: error: excess elements in struct initialize=
-r [-Werror]
- 2284 |         .get_setting =3D media_player_get_setting,
-      |                        ^~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2284:24: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2285:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98set_setting=E2=80=99
- 2285 |         .set_setting =3D media_player_set_setting,
-      |          ^~~~~~~~~~~
-profiles/audio/media.c:2285:24: error: excess elements in struct initialize=
-r [-Werror]
- 2285 |         .set_setting =3D media_player_set_setting,
-      |                        ^~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2285:24: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2286:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98list_metadata=E2=80=99
- 2286 |         .list_metadata =3D media_player_list_metadata,
-      |          ^~~~~~~~~~~~~
-profiles/audio/media.c:2286:26: error: excess elements in struct initialize=
-r [-Werror]
- 2286 |         .list_metadata =3D media_player_list_metadata,
-      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2286:26: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2287:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98get_uid=E2=80=99
- 2287 |         .get_uid =3D media_player_get_uid,
-      |          ^~~~~~~
-profiles/audio/media.c:2287:20: error: excess elements in struct initialize=
-r [-Werror]
- 2287 |         .get_uid =3D media_player_get_uid,
-      |                    ^~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2287:20: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2288:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98get_metadata=E2=80=99
- 2288 |         .get_metadata =3D media_player_get_metadata,
-      |          ^~~~~~~~~~~~
-profiles/audio/media.c:2288:25: error: excess elements in struct initialize=
-r [-Werror]
- 2288 |         .get_metadata =3D media_player_get_metadata,
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2288:25: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2289:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98get_position=E2=80=99
- 2289 |         .get_position =3D media_player_get_position,
-      |          ^~~~~~~~~~~~
-profiles/audio/media.c:2289:25: error: excess elements in struct initialize=
-r [-Werror]
- 2289 |         .get_position =3D media_player_get_position,
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2289:25: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2290:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98get_duration=E2=80=99
- 2290 |         .get_duration =3D media_player_get_duration,
-      |          ^~~~~~~~~~~~
-profiles/audio/media.c:2290:25: error: excess elements in struct initialize=
-r [-Werror]
- 2290 |         .get_duration =3D media_player_get_duration,
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2290:25: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2291:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98get_status=E2=80=99
- 2291 |         .get_status =3D media_player_get_status,
-      |          ^~~~~~~~~~
-profiles/audio/media.c:2291:23: error: excess elements in struct initialize=
-r [-Werror]
- 2291 |         .get_status =3D media_player_get_status,
-      |                       ^~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2291:23: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2292:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98get_name=E2=80=99
- 2292 |         .get_name =3D media_player_get_player_name,
-      |          ^~~~~~~~
-profiles/audio/media.c:2292:21: error: excess elements in struct initialize=
-r [-Werror]
- 2292 |         .get_name =3D media_player_get_player_name,
-      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2292:21: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2293:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98play=E2=80=99
- 2293 |         .play =3D media_player_play,
-      |          ^~~~
-profiles/audio/media.c:2293:17: error: excess elements in struct initialize=
-r [-Werror]
- 2293 |         .play =3D media_player_play,
-      |                 ^~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2293:17: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2294:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98stop=E2=80=99
- 2294 |         .stop =3D media_player_stop,
-      |          ^~~~
-profiles/audio/media.c:2294:17: error: excess elements in struct initialize=
-r [-Werror]
- 2294 |         .stop =3D media_player_stop,
-      |                 ^~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2294:17: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2295:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98pause=E2=80=99
- 2295 |         .pause =3D media_player_pause,
-      |          ^~~~~
-profiles/audio/media.c:2295:18: error: excess elements in struct initialize=
-r [-Werror]
- 2295 |         .pause =3D media_player_pause,
-      |                  ^~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2295:18: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2296:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98next=E2=80=99
- 2296 |         .next =3D media_player_next,
-      |          ^~~~
-profiles/audio/media.c:2296:17: error: excess elements in struct initialize=
-r [-Werror]
- 2296 |         .next =3D media_player_next,
-      |                 ^~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2296:17: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c:2297:10: error: =E2=80=98struct avrcp_player_cb=E2=
-=80=99 has no member named =E2=80=98previous=E2=80=99
- 2297 |         .previous =3D media_player_previous,
-      |          ^~~~~~~~
-profiles/audio/media.c:2297:21: error: excess elements in struct initialize=
-r [-Werror]
- 2297 |         .previous =3D media_player_previous,
-      |                     ^~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2297:21: note: (near initialization for =E2=80=98pla=
-yer_cb=E2=80=99)
-profiles/audio/media.c: In function =E2=80=98set_status=E2=80=99:
-profiles/audio/media.c:2327:9: error: implicit declaration of function =E2=
-=80=98avrcp_player_event=E2=80=99 [-Wimplicit-function-declaration]
- 2327 |         avrcp_player_event(mp->player, AVRCP_EVENT_STATUS_CHANGED, =
-mp->status);
-      |         ^~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2327:40: error: =E2=80=98AVRCP_EVENT_STATUS_CHANGED=
-=E2=80=99 undeclared (first use in this function)
- 2327 |         avrcp_player_event(mp->player, AVRCP_EVENT_STATUS_CHANGED, =
-mp->status);
-      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2327:40: note: each undeclared identifier is reporte=
-d only once for each function it appears in
-profiles/audio/media.c: In function =E2=80=98set_position=E2=80=99:
-profiles/audio/media.c:2356:41: error: =E2=80=98AVRCP_EVENT_TRACK_REACHED_S=
-TART=E2=80=99 undeclared (first use in this function)
- 2356 |                                         AVRCP_EVENT_TRACK_REACHED_S=
-TART, NULL);
-      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~
-profiles/audio/media.c:2365:48: error: =E2=80=98AVRCP_EVENT_TRACK_REACHED_E=
-ND=E2=80=99 undeclared (first use in this function)
- 2365 |                 avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_RE=
-ACHED_END,
-      |                                                ^~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~
-profiles/audio/media.c:2371:40: error: =E2=80=98AVRCP_EVENT_STATUS_CHANGED=
-=E2=80=99 undeclared (first use in this function)
- 2371 |         avrcp_player_event(mp->player, AVRCP_EVENT_STATUS_CHANGED, =
-status);
-      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c: In function =E2=80=98parse_player_metadata=E2=80=99=
-:
-profiles/audio/media.c:2545:40: error: =E2=80=98AVRCP_EVENT_TRACK_CHANGED=
-=E2=80=99 undeclared (first use in this function)
- 2545 |         avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_CHANGED, &=
-uid);
-      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2546:40: error: =E2=80=98AVRCP_EVENT_TRACK_REACHED_S=
-TART=E2=80=99 undeclared (first use in this function)
- 2546 |         avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_REACHED_ST=
-ART, NULL);
-      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~
-profiles/audio/media.c: In function =E2=80=98set_property=E2=80=99:
-profiles/audio/media.c:2564:40: error: =E2=80=98AVRCP_EVENT_SETTINGS_CHANGE=
-D=E2=80=99 undeclared (first use in this function)
- 2564 |         avrcp_player_event(mp->player, AVRCP_EVENT_SETTINGS_CHANGED=
-, key);
-      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c: In function =E2=80=98media_player_create=E2=80=99:
-profiles/audio/media.c:2787:22: error: implicit declaration of function =E2=
-=80=98avrcp_register_player=E2=80=99 [-Wimplicit-function-declaration]
- 2787 |         mp->player =3D avrcp_register_player(adapter->btd_adapter, =
-&player_cb,
-      |                      ^~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:2787:20: error: assignment to =E2=80=98struct avrcp_=
-player *=E2=80=99 from =E2=80=98int=E2=80=99 makes pointer from integer wit=
-hout a cast [-Wint-conversion]
- 2787 |         mp->player =3D avrcp_register_player(adapter->btd_adapter, =
-&player_cb,
-      |                    ^
-profiles/audio/media.c: At top level:
-profiles/audio/media.c:2282:31: error: storage size of =E2=80=98player_cb=
-=E2=80=99 isn=E2=80=99t known
- 2282 | static struct avrcp_player_cb player_cb =3D {
-      |                               ^~~~~~~~~
-profiles/audio/media.c:1488:13: error: =E2=80=98a2dp_endpoint_supported=E2=
-=80=99 defined but not used [-Werror=3Dunused-function]
- 1488 | static bool a2dp_endpoint_supported(struct btd_adapter *adapter)
-      |             ^~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:645:15: error: =E2=80=98get_capabilities=E2=80=99 de=
-fined but not used [-Werror=3Dunused-function]
-  645 | static size_t get_capabilities(struct a2dp_sep *sep, uint8_t **capa=
-bilities,
-      |               ^~~~~~~~~~~~~~~~
-profiles/audio/media.c:638:20: error: =E2=80=98get_path=E2=80=99 defined bu=
-t not used [-Werror=3Dunused-function]
-  638 | static const char *get_path(struct a2dp_sep *sep, void *user_data)
-      |                    ^~~~~~~~
-profiles/audio/media.c:631:20: error: =E2=80=98get_name=E2=80=99 defined bu=
-t not used [-Werror=3Dunused-function]
-  631 | static const char *get_name(struct a2dp_sep *sep, void *user_data)
-      |                    ^~~~~~~~
-profiles/audio/media.c:533:32: error: =E2=80=98find_device_transport=E2=80=
-=99 defined but not used [-Werror=3Dunused-function]
-  533 | static struct media_transport *find_device_transport(
-      |                                ^~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:496:17: error: =E2=80=98select_configuration=E2=80=
-=99 defined but not used [-Werror=3Dunused-function]
-  496 | static gboolean select_configuration(struct media_endpoint *endpoin=
-t,
-      |                 ^~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8595: profiles/audio/bluetoothd-media.o] Error 1
-make[1]: *** Waiting for unfinished jobs....
-profiles/audio/transport.c: In function =E2=80=98media_transport_get_device=
-_volume=E2=80=99:
-profiles/audio/transport.c:2769:17: error: unused variable =E2=80=98l=E2=80=
-=99 [-Werror=3Dunused-variable]
- 2769 |         GSList *l;
-      |                 ^
-profiles/audio/transport.c: In function =E2=80=98media_transport_update_dev=
-ice_volume=E2=80=99:
-profiles/audio/transport.c:2800:17: error: unused variable =E2=80=98l=E2=80=
-=99 [-Werror=3Dunused-variable]
- 2800 |         GSList *l;
-      |                 ^
-cc1: all warnings being treated as errors
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1033107
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.29 seconds
+BuildEll                      PASS      20.18 seconds
+BluezMake                     PASS      634.65 seconds
+MakeCheck                     PASS      22.38 seconds
+MakeDistcheck                 PASS      243.50 seconds
+CheckValgrind                 PASS      303.34 seconds
+CheckSmatch                   PASS      349.04 seconds
+bluezmakeextell               PASS      180.90 seconds
+IncrementalBuild              PENDING   0.32 seconds
+ScanBuild                     PASS      1018.02 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8079752980804263692==--
