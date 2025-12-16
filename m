@@ -1,27 +1,27 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D76322A28
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 22:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9E832ED30
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 22:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765925676; cv=pass; b=uxlgTB534EUrtuyz8rG1jwDi5qYb2KGHQlRWCWBk9OO2KnUlOFp7mE1l2A30BJIbw/vFaME9J4AgSqR2IRa8dHDh2Yyp2VqA7jbUgseS3UwK5FjVF+hxWDIr0UEPDVUlfeDgI0OTiqQsjRKgerKTql5Inf832vtUt5XDVjLfC2g=
+	t=1765925677; cv=pass; b=kLlYf71e0dXdgEq8TZ96FavpvPvaFaV5CntSzhC4cdxsn80TGIU2pd3qAAY1vVw9GxvwrtCWCPE3gFQrvQZJnuCwbR9oNQNO1mw2ClmrYufp/yZX+VyPFkIBK6ATv1M6bq0GrczGX8e3FPQB1HelSdgMrjXNaXey1ubZpP70WAU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765925676; c=relaxed/simple;
-	bh=HPmmijRB5kaE/46bn67wP/OHPRWOGxbdzIZzPGa1l70=;
+	s=arc-20240116; t=1765925677; c=relaxed/simple;
+	bh=KXl3Kybtp1Pk+l7K2GktmmSnaRoaG6P53RKKT5mLQxE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=an8nufOn5NIlDhiGpPxD2YtXR7cEQfu62mO3i5Q+caYyZbefX3ztfzivlvAM2S1plkKZuOLWRWbUt7kHY+D5IRWG7ELV9U/SZ93pCrl1P6EBb4cg+yIzRL+aRBs88Jwn0oxi+md+5r9lfDIRqiNvGvEJLhNaD6ZoLVIfwW9iXio=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=U7OQLJ8y; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=H7U5ukzVoZ538iEXCA8MVGBYn4jIgk146ilV9bpH09R1UOSs0ZHWX7jspG4aoHFHtsPUFqLlkxNZrVVN5xtUZaLBR9hNuOf/HKBzlE/RKmvFFUSU4sx9kAsiw0hY9HkaXNtvnMTBitbQIjQ0qZTkiG+zehlWNF4oqUBRiu4zxnA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Hf0DRqmm; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="U7OQLJ8y"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Hf0DRqmm"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dWC141yH5z108s;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dWC143gclz1098;
 	Wed, 17 Dec 2025 00:54:32 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	t=1765925672;
@@ -29,14 +29,14 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Csu/X46WMtAE79ULi6qs95UYLt+/ZYcsP9jjsIJ8EAE=;
-	b=U7OQLJ8y6SS0mMffisA8k87fzyELuVfgm/G/oH4Pydg+wfHFeb4cDnIuaurL8iF2DIYB7x
-	EbDR5zNBSBZtFlkOxVzwrMdtMlCEKIlxGRXkcQuhrz4Ro6siYwSDuQGliDhV4MoD8Zd958
-	wlkCdKFb1+amXomo7VKShbocYMTNeVo=
+	bh=wUTEkl5wtaiD3VlSWqOIusNDJCc2Uh4OTiwG4BseWiY=;
+	b=Hf0DRqmmVeVAlmQVaYLG6JYm63SvQ1UirccT1bVP9zQHb8TbCdDlHFNWRKHFuV0n98zJKt
+	TFFJu8CBUKIP2HzTXMEUYkRZnzaadgRFTESLfCOAeBHd3VqxD3vnuAlD21tLkrfQrNCmoG
+	8CU5NqGCMShvM2UaVR+Vhs8AlJ3o/0I=
 ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765925672;
-	b=qj/D+mQYQ4MwoqU8A2Il1BXhEWUOpua6elCeG5msOjXukkVZOkzb2kpGMSykj8aPl0Nsnh
-	H//8tjvP3srydKq4baV6NmH+KKo0MqPkaP9ridbm9VdNr6QEBEx9i5z673LJcJmcitJUyc
-	pa3XvtXUYZm/mIy+J43Se1NFg2bX8nY=
+	b=cCI6aEli50qOVsrYUzZBu763C5bIOdplMe2goRo7tRNJ6pUGxflu/Xr1BSnqUwcM9sPKmh
+	RzRHWHeO0XXEUaksRsQN3jMAgSwZHmf1raUQZBdZJC2GiNPnbdZVkym0Gg9v0ya1hyaKTW
+	HgZaHUSbPn8y2T38k66u+rZJkApxqZk=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -46,16 +46,16 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Csu/X46WMtAE79ULi6qs95UYLt+/ZYcsP9jjsIJ8EAE=;
-	b=mGaot/WjDjQBZDfRVhhCR4Hwy4FtvsMnl39YGYOcVhhPeto3LxpQeKo8dIWAHEs7npXfTV
-	JRAV3RwM2ZNorsbuZyrU/DALjigC4cVHlMi1rzp2tPNlaWUQ0aCw+Yb2ID+I8z4PD8TRIx
-	hv48uD+ybekUIov6zrSgzj/yeX8aCmk=
+	bh=wUTEkl5wtaiD3VlSWqOIusNDJCc2Uh4OTiwG4BseWiY=;
+	b=Ni/v/2TGcBYm+lfNj7/p+sQs5IDmNJCGJgjCuWjaOnKIgG1XxiRGWPcGETVFQxWGeTHIz9
+	w6o8R0J8LvkxJJ0lb7KQ7WQx6mwmOtHVU5EobhokfcY9ogcfZCgeIbbbrsWSvI8NGa5sIr
+	4xDMY+gqNEXBJTkY5pTT11sP5erxr5E=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 2/3] mcp: expose org.bluez.MediaPlayer information via GMCS
-Date: Wed, 17 Dec 2025 00:54:28 +0200
-Message-ID: <2e0fae23b58835c229465bcf7080e1a0ddb7829f.1765925485.git.pav@iki.fi>
+Subject: [PATCH BlueZ 3/3] tools/mpris-proxy: allow selecting which adapter to use
+Date: Wed, 17 Dec 2025 00:54:29 +0200
+Message-ID: <83084652378b7e6e7aa8ff271408fc91da1212d1.1765925485.git.pav@iki.fi>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1765925485.git.pav@iki.fi>
 References: <cover.1765925485.git.pav@iki.fi>
@@ -67,676 +67,46 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Select one of the local org.bluez.MediaPlayer instances as the "active"
-player, and expose its playback controls via GMCS.
+mpris-proxy by default uses the first adapter it sees over DBus.  Add
+option for selecting a specific one.
 ---
- profiles/audio/mcp.c | 506 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 441 insertions(+), 65 deletions(-)
+ tools/mpris-proxy.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
-index fc0587ce3..0c2e0de0b 100644
---- a/profiles/audio/mcp.c
-+++ b/profiles/audio/mcp.c
-@@ -56,6 +56,7 @@
- #include "src/error.h"
+diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
+index 2774bcc1a..c01c6af77 100644
+--- a/tools/mpris-proxy.c
++++ b/tools/mpris-proxy.c
+@@ -62,6 +62,7 @@ static GSList *obex_sessions;
  
- #include "player.h"
-+#include "media.h"
+ static gboolean option_version = FALSE;
+ static gboolean option_export = FALSE;
++static gchar *option_adapter;
  
- #define MCS_UUID_STR	"00001848-0000-1000-8000-00805f9b34fb"
- #define GMCS_UUID_STR	"00001849-0000-1000-8000-00805f9b34fb"
-@@ -203,30 +204,42 @@ static const struct {
- 	  .shuffle = true },
+ struct tracklist {
+ 	GDBusProxy *proxy;
+@@ -753,6 +754,8 @@ static GOptionEntry options[] = {
+ 				"Show version information and exit" },
+ 	{ "export", 'e', 0, G_OPTION_ARG_NONE, &option_export,
+ 				"Export remote players" },
++	{ "adapter", 'a', 0, G_OPTION_ARG_STRING, &option_adapter,
++				"DBus path of the adapter to use" },
+ 	{ NULL },
  };
  
--static void remote_playing_order(void *data, uint8_t order)
-+static bool get_playing_order(uint8_t order, const char **repeat,
-+							const char **shuffle)
- {
--	struct remote_player *remote = data;
--	const char *repeat = "off";
- 	unsigned int i;
--	bool shuffle;
+@@ -2349,8 +2352,11 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 	path = g_dbus_proxy_get_path(proxy);
  
--	remote->playing_order = order;
-+	*repeat = "off";
-+	*shuffle = "off";
+ 	if (!strcmp(interface, BLUEZ_ADAPTER_INTERFACE)) {
+-		if (adapter != NULL)
++		if ((option_adapter && strcmp(path, option_adapter)) ||
++							adapter != NULL) {
++			printf("Bluetooth Adapter %s ignored\n", path);
+ 			return;
++		}
  
- 	for (i = 0; i < ARRAY_SIZE(playing_orders); ++i) {
--		shuffle = playing_orders[i].shuffle;
-+		*shuffle = playing_orders[i].shuffle ? "alltracks" : "off";
- 		if (order == playing_orders[i].basic) {
- 			break;
- 		} else if (order == playing_orders[i].repeat) {
--			repeat = playing_orders[i].single ? "singletrack" :
-+			*repeat = playing_orders[i].single ? "singletrack" :
- 				"alltracks";
- 			break;
- 		}
- 	}
- 	if (i == ARRAY_SIZE(playing_orders))
-+		return false;
-+
-+	return true;
-+}
-+
-+static void remote_playing_order(void *data, uint8_t order)
-+{
-+	struct remote_player *remote = data;
-+	const char *repeat, *shuffle;
-+
-+	remote->playing_order = order;
-+
-+	if (!get_playing_order(order, &repeat, &shuffle))
- 		return;
- 
- 	media_player_set_setting(remote->mp, "Repeat", repeat);
--	media_player_set_setting(remote->mp, "Shuffle", shuffle ? "on" : "off");
-+	media_player_set_setting(remote->mp, "Shuffle", shuffle);
- }
- 
- static void remote_media_state(void *data, uint8_t status)
-@@ -297,7 +310,7 @@ static bool remote_mp_set_setting(struct media_player *mp, const char *key,
- 	unsigned int i;
- 
- 	if (strcmp(key, "Repeat") == 0) {
--		bool repeat = (strcmp(value, "alltracks") == 0);
-+		bool repeat = (strcasecmp(value, "alltracks") == 0);
- 		uint8_t order = remote->playing_order;
- 
- 		/* Some sensible mapping, 1-to-1 not possible */
-@@ -313,7 +326,7 @@ static bool remote_mp_set_setting(struct media_player *mp, const char *key,
- 			}
- 		}
- 
--		if (strcmp(value, "singletrack") == 0)
-+		if (strcasecmp(value, "singletrack") == 0)
- 			order = BT_MCS_ORDER_SINGLE_REPEAT;
- 
- 		DBG("Set Repeat %s -> 0x%02x", value, order);
-@@ -325,7 +338,7 @@ static bool remote_mp_set_setting(struct media_player *mp, const char *key,
- 	}
- 
- 	if (strcmp(key, "Shuffle") == 0) {
--		bool shuffle = (strcmp(value, "off") != 0);
-+		bool shuffle = (strcasecmp(value, "off") != 0);
- 		uint8_t order = remote->playing_order;
- 
- 		/* Some sensible mapping, 1-to-1 not possible */
-@@ -424,22 +437,33 @@ static const struct bt_mcp_callback mcp_cb = {
- 
- 
- /*
-- * Local player
-+ * Local player.
-+ *
-+ * TODO: maybe expose multiple MCS instances, as many as there are players. We'd
-+ * have to keep unused instances around in inactive state, so that we don't
-+ * consume ATT handles when players disappear/reappear.
-+ *
-+ * If an instance has no local player, for GMCS we forward key presses to
-+ * uinput. Other MCS instances should do nothing when inactive.
-  */
- 
--struct gmcs;
-+struct mcs_instance;
- 
--struct local_player {
--	struct bt_mcs *mcs;
--	struct media_player *mp;
--	struct gmcs *gmcs;
-+struct player_link {
-+	struct local_player *lp;
-+	unsigned int id;
-+	struct mcs_instance *instance;
- };
- 
--struct gmcs {
--	struct bt_uinput *uinput;
-+struct mcs_instance {
- 	struct btd_adapter *adapter;
- 	struct bt_mcs *mcs;
--	struct queue *players;
-+	struct queue *player_links;
-+	bool at_start;
-+
-+	/* GMCS-specific */
-+	struct bt_uinput *uinput;
-+	unsigned int player_watch_id;
- };
- 
- static const struct bt_uinput_key_map key_map[] = {
-@@ -453,96 +477,418 @@ static const struct bt_uinput_key_map key_map[] = {
- 
- static struct queue *servers;
- 
--static bool gmcs_command(struct gmcs *gmcs, uint8_t cmd)
-+static struct player_link *mcs_get_active(struct mcs_instance *mcs)
-+{
-+	return queue_peek_head(mcs->player_links);
-+}
-+
-+static bool player_link_is_active(struct player_link *p)
-+{
-+	return mcs_get_active(p->instance) == p;
-+}
-+
-+static void mcs_update_media_state(struct mcs_instance *mcs)
-+{
-+	struct player_link *p = mcs_get_active(mcs);
-+	const char *status = NULL;
-+	uint8_t state;
-+
-+	mcs->at_start = false;
-+
-+	if (p)
-+		status = local_player_get_status(p->lp);
-+
-+	if (!status) {
-+		state = BT_MCS_STATE_INACTIVE;
-+	} else if (!strcasecmp(status, "playing")) {
-+		state = BT_MCS_STATE_PLAYING;
-+	} else if (!strcasecmp(status, "stopped")) {
-+		mcs->at_start = true;
-+		state = BT_MCS_STATE_PAUSED;
-+	} else if (!strcasecmp(status, "paused")) {
-+		state = BT_MCS_STATE_PAUSED;
-+	} else if (!strcasecmp(status, "forward-seek") ||
-+					!strcasecmp(status, "backward-seek")) {
-+		state = BT_MCS_STATE_SEEKING;
-+	} else {
-+		state = BT_MCS_STATE_INACTIVE;
-+	}
-+
-+	bt_mcs_set_media_state(mcs->mcs, state);
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_POSITION_CHRC_UUID);
-+}
-+
-+static void mcs_player_changed(struct mcs_instance *mcs)
-+{
-+	struct player_link *p = mcs_get_active(mcs);
-+	const char *name = p ? local_player_get_player_name(p->lp) : NULL;
-+
-+	DBG("active: %p %s", p, name ? name : "");
-+
-+	bt_mcs_changed(mcs->mcs, MCS_MEDIA_PLAYER_NAME_CHRC_UUID);
-+	mcs_update_media_state(mcs);
-+
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_TITLE_CHRC_UUID);
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_DURATION_CHRC_UUID);
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_POSITION_CHRC_UUID);
-+	bt_mcs_changed(mcs->mcs, MCS_PLAYBACK_SPEED_CHRC_UUID);
-+	bt_mcs_changed(mcs->mcs, MCS_SEEKING_SPEED_CHRC_UUID);
-+	bt_mcs_changed(mcs->mcs, MCS_PLAYING_ORDER_CHRC_UUID);
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_CHANGED_CHRC_UUID);
-+}
-+
-+static bool player_link_make_active(struct player_link *p)
-+{
-+	struct mcs_instance *mcs = p->instance;
-+
-+	if (player_link_is_active(p))
-+		return false;
-+
-+	queue_remove(mcs->player_links, p);
-+	queue_push_head(mcs->player_links, p);
-+
-+	mcs_player_changed(mcs);
-+	return true;
-+}
-+
-+static void lp_status_changed(void *user_data)
-+{
-+	struct player_link *p = user_data;
-+	struct mcs_instance *mcs = p->instance;
-+	const char *status = local_player_get_status(p->lp);
-+
-+	/* Make the last player to start playing active */
-+	if (!strcasecmp(status, "playing")) {
-+		if (player_link_make_active(p))
-+			return;
-+	}
-+
-+	if (!player_link_is_active(p))
-+		return;
-+
-+	mcs_update_media_state(mcs);
-+}
-+
-+static void lp_track_position(uint32_t old_ms, uint32_t new_ms, void *user_data)
-+{
-+	struct player_link *p = user_data;
-+	struct mcs_instance *mcs = p->instance;
-+
-+	if (!player_link_is_active(p))
-+		return;
-+
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_POSITION_CHRC_UUID);
-+}
-+
-+static void lp_track_changed(void *user_data)
-+{
-+	struct player_link *p = user_data;
-+	struct mcs_instance *mcs = p->instance;
-+
-+	mcs->at_start = false;
-+
-+	if (!player_link_is_active(p))
-+		return;
-+
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_TITLE_CHRC_UUID);
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_POSITION_CHRC_UUID);
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_DURATION_CHRC_UUID);
-+	bt_mcs_changed(mcs->mcs, MCS_TRACK_CHANGED_CHRC_UUID);
-+}
-+
-+static void lp_settings_changed(const char *key, void *user_data)
-+{
-+	struct player_link *p = user_data;
-+	struct mcs_instance *mcs = p->instance;
-+
-+	if (!player_link_is_active(p))
-+		return;
-+	if (strcasecmp(key, "Shuffle") && strcasecmp(key, "Repeat"))
-+		return;
-+
-+	bt_mcs_changed(mcs->mcs, MCS_PLAYING_ORDER_CHRC_UUID);
-+}
-+
-+static void lp_player_removed(void *user_data)
-+{
-+	struct player_link *p = user_data;
-+	struct mcs_instance *mcs = p->instance;
-+	bool active = player_link_is_active(p);
-+
-+	DBG("%p", p);
-+
-+	queue_remove(mcs->player_links, p);
-+	free(p);
-+
-+	if (active)
-+		mcs_player_changed(mcs);
-+}
-+
-+const struct local_player_callback local_player_cb = {
-+	.status_changed = lp_status_changed,
-+	.track_position = lp_track_position,
-+	.track_changed = lp_track_changed,
-+	.settings_changed = lp_settings_changed,
-+	.player_removed = lp_player_removed,
-+};
-+
-+static bool mcs_command(struct mcs_instance *mcs, uint8_t cmd)
- {
- 	unsigned int i;
- 
- 	/* Emulate media key press */
--	if (!gmcs->uinput)
-+	if (!mcs->uinput)
- 		return false;
- 
- 	for (i = 0; i < ARRAY_SIZE(key_map); ++i) {
- 		if (key_map[i].code == cmd) {
--			DBG("GMCS press %s", key_map[i].name);
--			bt_uinput_send_key(gmcs->uinput, key_map[i].uinput, 1);
--			bt_uinput_send_key(gmcs->uinput, key_map[i].uinput, 0);
-+			DBG("MCS press %s", key_map[i].name);
-+			bt_uinput_send_key(mcs->uinput, key_map[i].uinput, 1);
-+			bt_uinput_send_key(mcs->uinput, key_map[i].uinput, 0);
- 			break;
- 		}
- 	}
- 
--	/* We are always inactive, so command does not cause state changes and
-+	/* We are inactive, so command does not cause state changes and
- 	 * does not succeed, even though we do generate the key presses.
- 	 * This should be OK vs. MCP v1.0.1 p. 26
- 	 */
- 	return false;
- }
- 
--static bool gmcs_play(void *data)
-+static bool mcs_play(void *data)
- {
--	return gmcs_command(data, BT_MCS_CMD_PLAY);
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+
-+	if (p && local_player_play(p->lp))
-+		return true;
-+	return mcs_command(mcs, BT_MCS_CMD_PLAY);
- }
- 
--static bool gmcs_pause(void *data)
-+static bool mcs_pause(void *data)
- {
--	return gmcs_command(data, BT_MCS_CMD_PAUSE);
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+
-+	if (p && local_player_pause(p->lp))
-+		return true;
-+	return mcs_command(mcs, BT_MCS_CMD_PAUSE);
- }
- 
--static bool gmcs_stop(void *data)
-+static bool mcs_stop(void *data)
- {
--	return gmcs_command(data, BT_MCS_CMD_STOP);
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+
-+	if (p && local_player_stop(p->lp)) {
-+		mcs->at_start = true;
-+		return true;
-+	}
-+	return mcs_command(mcs, BT_MCS_CMD_STOP);
- }
- 
--static bool gmcs_next_track(void *data)
-+static bool mcs_next_track(void *data)
- {
--	return gmcs_command(data, BT_MCS_CMD_NEXT_TRACK);
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+
-+	if (p && local_player_next(p->lp)) {
-+		mcs->at_start = true;
-+		return true;
-+	}
-+	return mcs_command(data, BT_MCS_CMD_NEXT_TRACK);
- }
- 
--static bool gmcs_previous_track(void *data)
-+static bool mcs_previous_track(void *data)
- {
--	return gmcs_command(data, BT_MCS_CMD_PREV_TRACK);
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+
-+	if (p && local_player_previous(p->lp)) {
-+		mcs->at_start = true;
-+		return true;
-+	}
-+	return mcs_command(data, BT_MCS_CMD_PREV_TRACK);
- }
- 
--static void gmcs_media_player_name(void *data, struct iovec *buf, size_t size)
-+static void mcs_media_player_name(void *data, struct iovec *buf, size_t size)
- {
--	struct gmcs *gmcs = data;
--	int len;
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+	const char *name = NULL;
- 
--	len = snprintf((void *)buf->iov_base, size, "%s",
--					btd_adapter_get_name(gmcs->adapter));
--	if (len < 0)
--		len = 0;
--	else if ((size_t)len > size)
--		len = size;
--	util_iov_push(buf, len);
-+	if (p)
-+		name = local_player_get_player_name(p->lp);
-+	if (!name)
-+		name = btd_adapter_get_name(mcs->adapter);
-+
-+	snprintf((void *)buf->iov_base, size, "%s", name);
-+	util_iov_push(buf, strlen(buf->iov_base));
- }
- 
--static void gmcs_destroy(void *data)
-+static void mcs_track_title(void *data, struct iovec *buf, size_t size)
- {
--	struct gmcs *gmcs = data;
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+	const char *name = NULL;
-+
-+	if (p)
-+		name = local_player_get_metadata(p->lp, "Title");
-+	if (!name)
-+		name = "";
-+
-+	snprintf((void *)buf->iov_base, size, "%s", name);
-+	util_iov_push(buf, strlen(buf->iov_base));
-+}
-+
-+static int32_t mcs_track_duration(void *data)
-+{
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+	const char *duration = NULL;
-+	long duration_ms;
-+
-+	if (p)
-+		duration = local_player_get_metadata(p->lp, "Duration");
-+	if (!duration)
-+		return BT_MCS_DURATION_UNAVAILABLE;
-+
-+	duration_ms = atol(duration);
-+	return duration_ms / 10;
-+}
-+
-+static int32_t mcs_track_position(void *data)
-+{
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+
-+	if (!p)
-+		return BT_MCS_POSITION_UNAVAILABLE;
-+
-+	if (mcs->at_start)
-+		return 0;
-+
-+	return local_player_get_position(p->lp) / 10;
-+}
-+
-+static uint8_t mcs_playing_order(void *data)
-+{
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+	bool shuffle, repeat, single;
-+	const char *shuffle_str, *repeat_str;
-+
-+	if (!p)
-+		return BT_MCS_ORDER_IN_ORDER_ONCE;
-+
-+	shuffle_str = local_player_get_setting(p->lp, "Shuffle");
-+	repeat_str = local_player_get_setting(p->lp, "Repeat");
-+
-+	shuffle = shuffle_str && strcasecmp(shuffle_str, "off");
-+	repeat = repeat_str && strcasecmp(repeat_str, "off");
-+	single = repeat_str && !strcasecmp(repeat_str, "singletrack");
-+	if (single)
-+		return BT_MCS_ORDER_SINGLE_REPEAT;
-+
-+	if (shuffle)
-+		return repeat ? BT_MCS_ORDER_SHUFFLE_REPEAT :
-+						BT_MCS_ORDER_SHUFFLE_ONCE;
-+	return repeat ? BT_MCS_ORDER_IN_ORDER_REPEAT :
-+						BT_MCS_ORDER_IN_ORDER_ONCE;
-+}
-+
-+static uint16_t mcs_playing_order_supported(void *data)
-+{
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+
-+	if (!p)
-+		return BT_MCS_ORDER_SUPPORTED_IN_ORDER_ONCE;
-+
-+	return BT_MCS_ORDER_SUPPORTED_SINGLE_REPEAT |
-+		BT_MCS_ORDER_SUPPORTED_IN_ORDER_ONCE |
-+		BT_MCS_ORDER_SUPPORTED_IN_ORDER_REPEAT |
-+		BT_MCS_ORDER_SUPPORTED_SHUFFLE_ONCE |
-+		BT_MCS_ORDER_SUPPORTED_SHUFFLE_REPEAT;
-+}
-+
-+static bool mcs_set_track_position(void *data, int32_t value)
-+{
-+	/* TODO: add support to setting position in org.bluez.MediaPlayer */
-+	return false;
-+}
-+
-+static bool mcs_set_playing_order(void *data, uint8_t value)
-+{
-+	struct mcs_instance *mcs = data;
-+	struct player_link *p = mcs_get_active(mcs);
-+	const char *repeat, *shuffle;
-+	bool ok = true;
-+
-+	if (!p)
-+		return false;
-+	if (!get_playing_order(value, &repeat, &shuffle))
-+		return false;
-+
-+	if (local_player_set_setting(p->lp, "Shuffle", shuffle) < 0)
-+		ok = false;
-+	if (local_player_set_setting(p->lp, "Repeat", repeat) < 0)
-+		ok = false;
-+
-+	bt_mcs_changed(mcs->mcs, MCS_PLAYING_ORDER_CHRC_UUID);
-+	return ok;
-+}
-+
-+static void player_link_destroy(void *data)
-+{
-+	struct player_link *p = data;
-+
-+	DBG("%p", p);
-+
-+	local_player_unregister_callbacks(p->lp, p->id);
-+	free(p);
-+}
-+
-+static void mcs_destroy(void *data)
-+{
-+	struct mcs_instance *mcs = data;
- 
- 	DBG("destroy %p", data);
- 
--	queue_remove(servers, gmcs);
-+	queue_remove(servers, mcs);
- 
--	bt_uinput_destroy(gmcs->uinput);
-+	bt_uinput_destroy(mcs->uinput);
- 
--	free(gmcs);
-+	queue_destroy(mcs->player_links, player_link_destroy);
-+
-+	if (mcs->player_watch_id)
-+		local_player_unregister_watch(mcs->player_watch_id);
-+
-+	free(mcs);
- }
- 
--static void gmcs_debug(void *data, const char *str)
-+static void mcs_debug(void *data, const char *str)
- {
- 	DBG_IDX(0xffff, "%s", str);
- }
- 
- static const struct bt_mcs_callback gmcs_cb = {
--	.media_player_name = gmcs_media_player_name,
--	.play = gmcs_play,
--	.pause = gmcs_pause,
--	.stop = gmcs_stop,
--	.next_track = gmcs_next_track,
--	.previous_track = gmcs_previous_track,
--	.debug = gmcs_debug,
--	.destroy = gmcs_destroy,
-+	.media_player_name = mcs_media_player_name,
-+	.track_title = mcs_track_title,
-+	.track_duration = mcs_track_duration,
-+	.track_position = mcs_track_position,
-+	.playing_order = mcs_playing_order,
-+	.playing_order_supported = mcs_playing_order_supported,
-+	.set_track_position = mcs_set_track_position,
-+	.set_playing_order = mcs_set_playing_order,
-+	.play = mcs_play,
-+	.pause = mcs_pause,
-+	.stop = mcs_stop,
-+	.next_track = mcs_next_track,
-+	.previous_track = mcs_previous_track,
-+	.debug = mcs_debug,
-+	.destroy = mcs_destroy,
- };
- 
- static void uinput_debug(const char *str, void *data)
-@@ -550,13 +896,39 @@ static void uinput_debug(const char *str, void *data)
- 	DBG_IDX(0xffff, "%s", str);
- }
- 
--static struct gmcs *gmcs_new(struct btd_adapter *adapter)
-+static void gmcs_player_added(struct local_player *lp, void *user_data)
- {
--	struct gmcs *gmcs;
-+	struct mcs_instance *gmcs = user_data;
-+	struct btd_adapter *adapter = local_player_get_adapter(lp);
-+	struct player_link *p;
-+
-+	if (adapter != gmcs->adapter)
-+		return;
-+
-+	p = new0(struct player_link, 1);
-+	p->lp = lp;
-+	p->id = local_player_register_callbacks(lp, &local_player_cb, p);
-+	p->instance = gmcs;
-+	if (!p->id) {
-+		free(p);
-+		return;
-+	}
-+
-+	DBG("%p", p);
-+
-+	queue_push_tail(gmcs->player_links, p);
-+
-+	if (queue_length(gmcs->player_links) == 1)
-+		mcs_player_changed(gmcs);
-+}
-+
-+static struct mcs_instance *gmcs_new(struct btd_adapter *adapter)
-+{
-+	struct mcs_instance *gmcs;
- 	const char *name = btd_adapter_get_name(adapter);
- 	int err;
- 
--	gmcs = new0(struct gmcs, 1);
-+	gmcs = new0(struct mcs_instance, 1);
- 	gmcs->adapter = adapter;
- 
- 	gmcs->uinput = bt_uinput_new(name, " (MCS)",
-@@ -571,6 +943,10 @@ static struct gmcs *gmcs_new(struct btd_adapter *adapter)
- 		gmcs->uinput = NULL;
- 	}
- 
-+	gmcs->player_links = queue_new();
-+	gmcs->player_watch_id = local_player_register_watch(gmcs_player_added,
-+									gmcs);
-+
- 	DBG("new %p", gmcs);
- 	return gmcs;
- }
-@@ -654,7 +1030,7 @@ static int gmcs_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
- 	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
- 	struct gatt_db *db = btd_gatt_database_get_db(database);
--	struct gmcs *gmcs;
-+	struct mcs_instance *gmcs;
- 
- 	DBG("Add GMCS server %s", adapter_get_path(adapter));
- 
-@@ -664,7 +1040,7 @@ static int gmcs_probe(struct btd_profile *p, struct btd_adapter *adapter)
- 
- 	gmcs->mcs = bt_mcs_register(db, true, &gmcs_cb, gmcs);
- 	if (!gmcs->mcs) {
--		gmcs_destroy(gmcs);
-+		mcs_destroy(gmcs);
- 		return -EINVAL;
- 	}
- 
+ 		printf("Bluetooth Adapter %s found\n", path);
+ 		adapter = proxy;
 -- 
 2.51.1
 
