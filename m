@@ -1,127 +1,94 @@
-Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6ADB1D9A54
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 20:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765917655; cv=none; b=gBac2+8+JjUIMRBVYDMifJGfojwvHYa95QA3bRMMoz88lviq0Fs7l5qAI5X3VhTl+GnuUCc0SDkjPsQmJUX1rPJa0RFokxcRFK5CvrvbVXd2WmfgtB0kGvyxRVU8D+sis62cOZ630jIgT8vnQDabQYXQaOXiAU6S3qTNDHjFtxY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765917655; c=relaxed/simple;
-	bh=/HC4PdImE0wWKVkUP/2ez3aODL13+KeL21GlSO3zdz8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=P3dx/4hbKwMxM+b4d6CYdA4dcLahRlpjBi5jMD4FY9uAUfJKdpbNehgS7Fxpc2fbElOCIIS5eJMQHVL351qcPsfJ1kQgbajjLmH9XhJCZoRdY4iVFvaiqVl6YqQbf62fPlsacLVI0B3Ff/Nx68IuJk+5IsORcx3DGDSyYviKEz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VMkaWfBq; arc=none smtp.client-ip=209.85.210.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18F72BEFF1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 22:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765925676; cv=pass; b=NwAWHyMRMG6eAnDJq6EqHPNcVPF5W6xtJBWOA8+LErsLoV/AsCWtv1plI/GIr4UZ1CNtW4UmqKJeluvzMFVMske6Lfib+A2d/f0czYCIZPwounvvJsSpfSt01JuW9tdRRven0CGsweh8NJmN7a9RuKZbmHGxsPrm6tQ7hkgAHL8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765925676; c=relaxed/simple;
+	bh=oHaAVXYs050rrC38AB/KGLm4nJ+adAJzrHke63ldEgI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e2feF7bJtZqv53AAIZur3/3v1aD5MDKf89T5rC2o5iDIpLrc+L+2JmQh6uP9xmhf5n/3jzSFOsapKSPokqPoE98sozSzDXK3h7qicDnb3OFKaIu+BHNBm+mSTypl0f5rcW+cHgjYvu5ebItAt7aUc8xNH7WUWJI4W4Lcm5kzpd4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=vDqqJstv; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VMkaWfBq"
-Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-7f1243792f2so3390420b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 12:40:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765917653; x=1766522453; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OfZi3yBsX6Bu351o3uubhK7MfECMkv1CSYMG9n7590o=;
-        b=VMkaWfBqHkEghL03lSKSmtCGGCabYNQ0a5CK4wVu96hS/wxwPvqh/aRf9lQsIa4meq
-         NhXXPBjwPwqk5QJLQ+O8cOaOjYnTE0105MHCKuNx0HDk2D96XieF0LWdephcAKLIRqTw
-         jEo5ty9Q7q7mOFxLZ4WM7FvL/qm4HaOXEZnG+TLsLLjrP9O+7Of59lXE5txo8NPp/dzL
-         6VWNMACYdYp3LWJhQRsvfpH3X7mEqGHBWRTjGb+8n/HyLL3i4bfjC2ucVF2+U+WqszS/
-         VKnrj7XGnpEv36oyUOEd6bfjQbKi5bcqL2ddTMYpVUNv+jtcOPBBaR94JO59rvqwVs8F
-         Ty3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765917653; x=1766522453;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OfZi3yBsX6Bu351o3uubhK7MfECMkv1CSYMG9n7590o=;
-        b=o4YE+eWi7M3RWLcT+j6eET5GrZQAlGq1UWzzbU0YMlM1i0PqNcPp+X4EZoua/e84Od
-         bLnessaPWOmsSM6IupL/RaVZdn0BQmjgQSmS49h0BtjwRPFzfCG/3z1Gbyr0dsdpyovZ
-         CyDeY7CXXEvHvHohunquUVEXrMtxSkVfgqSh9D6YE/x6aLaZm7HG8TAdPQE3XbxL3OuY
-         wmEbW9pJfGxdpetP2fkH4bmV39oXfPlcD3V5vjh/1O7rcnpWsv8LqSgnGWsL66oKY/fa
-         1JhUpoCh3Rd/9LJ9VuRqeVjIcBEdKqgdL5YricW2tMbCPOLYvMB0i40b3euf9of1/aTw
-         /+NQ==
-X-Gm-Message-State: AOJu0YwGLXtF93bT16gkroMLyXg6ws/Zy0A7ThDntcTOY3HtTOel12N9
-	+Uztpb0PHMC9/ROkjGQEmU6QdBAdvKy1NjdEt5rX//hcK4LLiZBGucWbKuxCTORM
-X-Gm-Gg: AY/fxX5U//u1KAkPn1WiHbtOIxcRhpO2S/Q6/64CeezNzCJZJks34r0Vyx72siwhdPi
-	3vvPYe+mLR/aAq0EyVlCyTdz2wclJMbQpCkdhNrZNYoZVaXQFid9fmfFYv7LAK0bu1hL9Q+MLke
-	O/e5mtDMs77KIprEgK/1Z4pxqSFeEidEfpkSwnBNBpGHoYyZtv74V5ql0GMxFsQ6eSB5SxW0OGr
-	0KGpPLh8QcqsV8VcBjGF+J41pE9XKZVWufAvABWVx6tPcWvROjyKlu6E29HNP6ysDF1EQINhtOF
-	aa4oVQB/D/5+BA1tMxAH8umW4porDVSpb5RZStNJBX2lrRzowYgFr462BN8QCJRlSougM/obapX
-	HymmU9SiQkcMd/LaWJBiq+TWZkD50rx0PGZsuh1joPKLVSeXk2TA87JSoN+LkPXk3WmlTt5gz6q
-	bxreAMJBK6D35UKxhh
-X-Google-Smtp-Source: AGHT+IEejESkBaH65c5ewdiER9GMTxRqNcS/El55TPBkAvlbPUkYGyxHfMdkLH5CElajdRqNtx6sQQ==
-X-Received: by 2002:a05:7022:7f14:b0:11b:9386:a386 with SMTP id a92af1059eb24-11f34c593f4mr9464635c88.41.1765917652771;
-        Tue, 16 Dec 2025 12:40:52 -0800 (PST)
-Received: from [172.17.0.2] ([104.209.5.147])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11f2e304766sm58149181c88.13.2025.12.16.12.40.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 12:40:52 -0800 (PST)
-Message-ID: <6941c3d4.050a0220.2f327e.6b30@mx.google.com>
-Date: Tue, 16 Dec 2025 12:40:52 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5590463699609324157=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="vDqqJstv"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dWC134ZY6zyVK;
+	Wed, 17 Dec 2025 00:54:31 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1765925671;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=duHC5uaHnzVvJG5nkVbaQJzgZqkEKsyH69keCSAQJDY=;
+	b=vDqqJstv7tJXxmQKk8+Fln8iZlM7tCZ2HBnVqgwN9iYlbDVPFDhMG20wNF4sMg0ZcAvK3J
+	tEE3Usl+o5Eq3qYxPZmlY5xGzyM46DN86sUSMVUhzWAfYngC75A5BiGfj3F9WKzrxaaLI3
+	PhLJsiMvwktDVzjD7ZiQRoDMFrT9ybU=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765925671;
+	b=UKqnDAZmWpX+96ZjQRcsOCOc3HzwwH4JnVVpjqAFZyE+AGDrOeZ21GuurGAU5pTeFwzFnC
+	oqGiX7Bwylx9wAnMw0kkG2iVcWr97Q1n9G5IGxO2ZnGn7usy8SPUV7TKrcRDyWqYINoj6a
+	QO8xsGL+2Xm3riFl2IZ6IeaO+Qt7Ugs=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1765925671;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=duHC5uaHnzVvJG5nkVbaQJzgZqkEKsyH69keCSAQJDY=;
+	b=cHjVjKavU+U2MIIiHmjINFsxc683DPYjMYpR6ouTD73PwUgA5L6uA2LfczJyruLsgoWfsW
+	B8S2pyEYhirHZWQAoioQujT1WwM0sxKES52exeBmgw2gtcg6cgLXv2khzVGkdGFY7Z54uJ
+	Ze19cvFh7HJ3V7QhkJpKOIzoae6DJYU=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 0/3] mcp: expose org.bluez.MediaPlayer information via GMCS
+Date: Wed, 17 Dec 2025 00:54:26 +0200
+Message-ID: <cover.1765925485.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,1/2] shared/mcp: emit MCS error if value changes during long read
-In-Reply-To: <977354414f40c09d5a0a14c839b860d22a8ba23e.1765914148.git.pav@iki.fi>
-References: <977354414f40c09d5a0a14c839b860d22a8ba23e.1765914148.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5590463699609324157==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Select one of the local org.bluez.MediaPlayer instances as the "active"
+player, and expose its playback controls via GMCS.
 
-This is automated email and please do not reply to this email!
+To do this, decouple media.c player API from AVRCP by adding a similar
+API for org.bluez.MediaPlayer --> remote as used for the remote -->
+org.bluez.MediaPlayer direction. Use it for both AVRCP and MCS.
 
-Dear submitter,
+In theory we could also expose each org.bluez.MediaPlayer in separate
+MCS instances. This is not implemented here; it would need to be done so
+that we don't consume ATT handles when players come and go.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1033906
+Pauli Virtanen (3):
+  media: decouple local org.bluez.MediaPlayer from AVRCP
+  mcp: expose org.bluez.MediaPlayer information via GMCS
+  tools/mpris-proxy: allow selecting which adapter to use
 
----Test result---
+ Makefile.plugins              |   3 +-
+ profiles/audio/avrcp-player.c | 291 +++++++++++++++++++
+ profiles/audio/avrcp.c        |   4 +
+ profiles/audio/avrcp.h        |   3 +
+ profiles/audio/mcp.c          | 506 +++++++++++++++++++++++++++++-----
+ profiles/audio/media.c        | 501 ++++++++++++++++++---------------
+ profiles/audio/media.h        |  45 +++
+ tools/mpris-proxy.c           |   8 +-
+ 8 files changed, 1074 insertions(+), 287 deletions(-)
+ create mode 100644 profiles/audio/avrcp-player.c
 
-Test Summary:
-CheckPatch                    PENDING   0.35 seconds
-GitLint                       PENDING   0.29 seconds
-BuildEll                      PASS      19.79 seconds
-BluezMake                     PASS      644.38 seconds
-MakeCheck                     PASS      22.21 seconds
-MakeDistcheck                 PASS      239.01 seconds
-CheckValgrind                 PASS      297.79 seconds
-CheckSmatch                   PASS      346.90 seconds
-bluezmakeextell               PASS      179.64 seconds
-IncrementalBuild              PENDING   0.37 seconds
-ScanBuild                     PASS      1006.66 seconds
+-- 
+2.51.1
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5590463699609324157==--
