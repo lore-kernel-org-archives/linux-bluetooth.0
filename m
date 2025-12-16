@@ -1,196 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f65.google.com (mail-qv1-f65.google.com [209.85.219.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A5E1C5D77
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 09:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C00E2D131D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 10:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765878939; cv=none; b=uIQeYWrXPu3OYVg0NHGHxbpaYQL45/qlP5hdZFpSX1k2tVYWzzmuHGvKS902+ITxPeFITqJsmkOA5bhlF1etTNE90TCrkZefGdwBGWiWOZl60a9CBD34olsXyQO7OiOOwrfMT5JMDM0ozXk4he19fE0UgfQpdg+irW+92I1EZco=
+	t=1765879753; cv=none; b=qGlaNVh9OuPXFOWs5UPAYhncdBF+shm31q/xg+JA7phAdfADFrX8uRMBpBrs9mHL0cSyTn+4uLWUtkcnldCKNlSppF1ZwHCnvrND3B/4dNVeC0DQcDQ9yQ9QtkHvJHPkBzktUbj66/3tN83ZKJQKxhicjA4VjpTi5X0WjDHLNBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765878939; c=relaxed/simple;
-	bh=2PfAvArHLFe8hklkl1H8RD8/GAGbcP2zhbRQAi7zXKo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=OgSZOheCMBnnm1d1BnLaF1vhQXzCQkXZ1P3TbBLCJwkNKOyp4r2GQGUZPv4YeQ2K+1AQvJqTs+IjFnTHsLjsTiNpwO4XfSTA69WHdlhpMIOG8GT5jAAoFUDIvTgSr3L56+x2GWLWEJiEh3w/gscAB8QVc1eXwpyAOmjlsug2p7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sa4UAYys; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765879753; c=relaxed/simple;
+	bh=ZwXNpu05gaat6S7m+IgN6sjf2U7rzctnLfl783/blnM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=mVAjf6tSThAWC8/3rtGW4gdV9w0Roojy4cR1qAOj3Ghe4Iq8CcQe0fvQPiRO2/2359q4ZHv+4R4AaVCGmgTJh5Adt8e66pLqdRV5ABQKiK8QgRJ+zgBdwywF2KXdFMe2jqH8ccCoxGdS/y0e8BAHcH3IqX8qZbgJGlSLMJ/toKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V9tkNo0g; arc=none smtp.client-ip=209.85.219.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sa4UAYys"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B4A58C4CEF1;
-	Tue, 16 Dec 2025 09:55:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765878938;
-	bh=2PfAvArHLFe8hklkl1H8RD8/GAGbcP2zhbRQAi7zXKo=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=Sa4UAYysz7HoNVeDrY8rqXikkj0qCE4PtPqP8QoKg2MPfFCaii7cWeV9Ao9judrQP
-	 eDUG9EV3/S3Z55PSwTxc/C68qOnLOFZvDpHcTaiZrI6dEF1cMhPDBYyDSu0UW7loYt
-	 U7o7uY3bKYIoBzln5/4jkOv2All5552XXJdz2g0hQX4eUbMsGrclKGvna/5jBX7k+o
-	 y4kMcUZNC6S0VCEkji/Iig5pmb+7/75Uyb9HD6rxClgULXbPqqrnKdypS9jkeoxtY9
-	 v+YHwSKjUXzQVMCmkTo7sVkMTqlm8FvuZ3aNPG5WZw1JprcCWbM0knFGBNQhjbu3xK
-	 lPdpikY3lzLCQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B78D5B16C;
-	Tue, 16 Dec 2025 09:55:38 +0000 (UTC)
-From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
-Date: Tue, 16 Dec 2025 17:55:36 +0800
-Subject: [PATCH bluez] bap: add PA sync monitor timeout
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V9tkNo0g"
+Received: by mail-qv1-f65.google.com with SMTP id 6a1803df08f44-8888a444300so31848666d6.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 02:09:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765879751; x=1766484551; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=gjvbv62IGrehrPekqlkGLd61TQ2OotJDzORErQpkx4Q=;
+        b=V9tkNo0g6lE8RD717ZrzwtllepLeGzyLVDpL5L+M3HxbZc/g6I40cGeTBRi5LKc6Y9
+         hbs5qbczrd3SB73X3Y/5eh83KzBuDfiptCESGDx4781ecyTYWD1aVnjMBA+xNBz8sMU+
+         SeTw5R2Th5i0QiA0fgQSazc5v8rN5jZhAZWdqOvnmVWAvvDD3/N+LUW8dUaNSA1z/gPL
+         aafiTu0jxKpQCgAxj0EyUmzVmsO3EpxeadSbUphnkC1Gbe66W5d0rdJOGFStMLfPAljB
+         NtBc9kwi2wIsqcCfktY45kcynYotopC/KFi+ydjWummpU6KvxtDU2H9T5U85+1aB3vdZ
+         gljg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765879751; x=1766484551;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gjvbv62IGrehrPekqlkGLd61TQ2OotJDzORErQpkx4Q=;
+        b=BDvRncoM8zdM/dqyyQepchKmfFlHB9GGs4WNnr/3s1QJ1ZstjlHyzpMbwO3HA/FDiq
+         BR3PEPiwIoynDJQg5fLmLZqv89+bhxaa8xds6jxw1WTy/GPR1u+Mal3Va+YiV3JN4S2P
+         +8JMIL/kQQVZHJPJCeQrYh33ltWbwRXqlvRXxTIfAvPePXUaiN/7d76Nm7DkRyypsIJS
+         w0/L+KQ0n5GejMNF/ZhEWMyHv7D5OkcGIqw1zQ4qjbIH7JnDtlpwpXnIwOYsp1JdKQ0X
+         Fl/4KpO+/s4h4w7+vqEQ5TPH7USfw/A0jIIJhz9hLt3ohb8KHPPnfLk8wsIkJDtnT9LG
+         SPrQ==
+X-Gm-Message-State: AOJu0YzjHTfd6/D20V5I1jWE/T/tRS8u8ugqWgNkhPL3Pu1u38GuHPsx
+	IU8U+MdVsP4GXkokBcHam7ZSQkQFKFK/0bCa+hGdVlAXkUuIhwwNFgxU8uQiLhlB
+X-Gm-Gg: AY/fxX4WdtMULbziStFVnHeq5tvyfGX7y3Ozdgma/5+Cz3yLmNUgGivj3mJ5a43QmXD
+	KEHgl6qLreCMR+EFAXcwKcAnCXRGR7nohOfWQWnczBvqtgNfNixVAGsLEIMEC1ekIdFwaUR5G3S
+	39FXxClJ4+06UQNsSdG1KuF4DDFmCoggKMQyWLgF2OppqXlaj8yELe2BP5AecGnGdpt/pXyWGKn
+	c9wN8DfwY0ktVBtZC9eBVoS/KWSLYRvMrH2qFouyOoRbL3PI2TKH8eKWmUZRcfYmNG0w6EIEm2A
+	Vgkz7Gw5BxBTkvLZ0ylU9sgew/xqizVM+eu3mscFsA/0aM/Fsi3Nq/UgY/yd08G4fInydc0QhTa
+	SCX0a/SkNZ8yR5cx3ElWARGGcO8145b0NuPl2Plm26ZS1SyFFvQ7hQxHjCZBcpJZrBWI4SJ4Eh6
+	/dyNurLVeq0iSDXx+RaQ==
+X-Google-Smtp-Source: AGHT+IG3/fI+8xDRzRIjV+/QP6bIDf/mfGYZw9h9ycYmScF0cDlkTP0aNetsJr1J+c2f8uIwMWTB7g==
+X-Received: by 2002:a05:622a:5c13:b0:4f1:cd55:d9af with SMTP id d75a77b69052e-4f1d05a92f9mr177589691cf.47.1765879750645;
+        Tue, 16 Dec 2025 02:09:10 -0800 (PST)
+Received: from [172.17.0.2] ([135.119.235.87])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f345c2e5f7sm11810031cf.20.2025.12.16.02.09.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 02:09:10 -0800 (PST)
+Message-ID: <69412fc6.050a0220.25ca59.2046@mx.google.com>
+Date: Tue, 16 Dec 2025 02:09:10 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============9176614046153309734=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ssorensen@roku.com
+Subject: RE: Bluetooth: Fixes for BR/EDR connection idle timeout configuration
+In-Reply-To: <20251216092011.111208-2-ssorensen@roku.com>
+References: <20251216092011.111208-2-ssorensen@roku.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============9176614046153309734==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251216-bap-pa-sync-v1-1-b1ada9e1a299@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAJcsQWkC/x3MSwqAMAwA0atI1gZsUAleRVxUjRqQWloUP3h3i
- 8u3mHkgSlCJ0GQPBDk06uYSTJ7BsFg3C+qYDFRQZcjU2FuP3mK83IBcsiEhZuIRUuGDTHr+txb
- 6dZcbuvf9ANE/uMlkAAAA
-X-Change-ID: 20251216-bap-pa-sync-84812e28828d
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Ye He <ye.he@amlogic.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1765878937; l=3588;
- i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
- bh=zdZd1Fkwtc7/GqcEgJ03kSMgb45XmyXlaY7hNJfm7mo=;
- b=Ik/72iMAZtnktvwx96ZNND/rXbVX+XyCvovW5qBZjsASuwWHjMXibO2YvXzFsrXOmQmnjxh2Y
- Q+e7tc/apr9Aw2kiDeqC0ZAuSVjUKxn2Psbn4E6ITn9W5cNhSULAFBx
-X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
- pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
-X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
- auth_id=348
-X-Original-From: Ye He <ye.he@amlogic.com>
-Reply-To: ye.he@amlogic.com
 
-From: Ye He <ye.he@amlogic.com>
+This is automated email and please do not reply to this email!
 
-When PA sync times out, the BAP broadcast probe may remain
-pending and fail to exit, even if LE scanning is triggered
-again.
+Dear submitter,
 
-This adds a monitor timeout to ensure the pending probe
-is properly aborted when PA sync does not complete, avoiding
-stuck states.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1033698
 
-err print from kernel:
-  hci0: command 0x0000 tx timeout
+---Test result---
 
-Signed-off-by: Ye He <ye.he@amlogic.com>
----
- profiles/audio/bap.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+Test Summary:
+CheckPatch                    PENDING   0.36 seconds
+GitLint                       PENDING   0.27 seconds
+SubjectPrefix                 PASS      0.33 seconds
+BuildKernel                   PASS      25.25 seconds
+CheckAllWarning               PASS      27.92 seconds
+CheckSparse                   WARNING   31.32 seconds
+BuildKernel32                 PASS      25.31 seconds
+TestRunnerSetup               PASS      551.71 seconds
+TestRunner_l2cap-tester       PASS      25.41 seconds
+TestRunner_iso-tester         PASS      80.01 seconds
+TestRunner_bnep-tester        PASS      6.24 seconds
+TestRunner_mgmt-tester        FAIL      115.42 seconds
+TestRunner_rfcomm-tester      PASS      9.40 seconds
+TestRunner_sco-tester         FAIL      14.50 seconds
+TestRunner_ioctl-tester       PASS      10.44 seconds
+TestRunner_mesh-tester        FAIL      11.56 seconds
+TestRunner_smp-tester         PASS      8.57 seconds
+TestRunner_userchan-tester    PASS      6.59 seconds
+IncrementalBuild              PENDING   0.79 seconds
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index cda10a643fdea8314c8717b81961546403bc2dc3..61aad856ff9156fc9048e7a215397abb4f473458 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -48,6 +48,7 @@
- #include "src/shared/bap.h"
- #include "src/shared/tmap.h"
- #include "src/shared/gmap.h"
-+#include "src/shared/timeout.h"
- 
- #include "btio/btio.h"
- #include "src/plugin.h"
-@@ -139,6 +140,7 @@ struct bap_data {
- 	struct queue *bcast_snks;
- 	struct queue *server_streams;
- 	GIOChannel *listen_io;
-+	unsigned int listen_timer;
- 	unsigned int io_id;
- 	unsigned int cig_update_id;
- 	bool services_ready;
-@@ -174,6 +176,9 @@ static void setup_free(void *data);
- 
- static void bap_data_free(struct bap_data *data)
- {
-+	if (data->listen_timer)
-+		timeout_remove(data->listen_timer);
-+
- 	if (data->listen_io) {
- 		g_io_channel_shutdown(data->listen_io, TRUE, NULL);
- 		g_io_channel_unref(data->listen_io);
-@@ -1559,6 +1564,11 @@ static gboolean big_info_report_cb(GIOChannel *io, GIOCondition cond,
- 
- 	DBG("BIG Info received");
- 
-+	if (data->listen_timer) {
-+		timeout_remove(data->listen_timer);
-+		data->listen_timer = 0;
-+	}
-+
- 	bt_io_get(io, &err,
- 			BT_IO_OPT_BASE, &base,
- 			BT_IO_OPT_QOS, &qos,
-@@ -3566,6 +3576,21 @@ static void bap_detached(struct bt_bap *bap, void *user_data)
- 	bap_data_remove(data);
- }
- 
-+static bool pa_sync_timeout_callback(gpointer user_data)
-+{
-+	struct bap_data *data = user_data;
-+
-+	error("PA sync timeout, remove broadcast source device %s",
-+				device_get_path(data->device));
-+
-+	data->listen_timer = 0;
-+
-+	/* remove device to force exit from pending bcast probe */
-+	btd_adapter_remove_device(data->adapter, data->device);
-+
-+	return FALSE;
-+}
-+
- static int pa_sync(struct bap_data *data)
- {
- 	GError *err = NULL;
-@@ -3595,8 +3620,14 @@ static int pa_sync(struct bap_data *data)
- 	if (!data->listen_io) {
- 		error("%s", err->message);
- 		g_error_free(err);
-+		return -1;
- 	}
- 
-+	data->listen_timer = timeout_add(
-+				/* unit: 10ms */
-+				bap_sink_pa_qos.bcast.sync_timeout * 10,
-+				pa_sync_timeout_callback,
-+				data, NULL);
- 	return 0;
- }
- 
-@@ -3647,6 +3678,11 @@ static void iso_do_big_sync(GIOChannel *io, void *user_data)
- 
- 	DBG("PA Sync done");
- 
-+	if (data->listen_timer) {
-+		timeout_remove(data->listen_timer);
-+		data->listen_timer = 0;
-+	}
-+
- 	g_io_channel_unref(data->listen_io);
- 	g_io_channel_shutdown(data->listen_io, TRUE, NULL);
- 	data->listen_io = io;
-@@ -3702,7 +3738,15 @@ static void pa_and_big_sync(struct bap_setup *setup)
- 	if (!bap_data->listen_io) {
- 		error("%s", err->message);
- 		g_error_free(err);
-+		return;
- 	}
-+
-+	bap_data->listen_timer = timeout_add(
-+				/* unit: 10ms */
-+				bap_sink_pa_qos.bcast.sync_timeout * 10,
-+				pa_sync_timeout_callback,
-+				bap_data, NULL);
-+
- }
- 
- static void bap_ready(struct bt_bap *bap, void *user_data)
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/mgmt_config.c:127:17: warning: incorrect type in initializer (different base types)net/bluetooth/mgmt_config.c:127:17:    expected restricted __le16 [usertype] typenet/bluetooth/mgmt_config.c:127:17:    got restricted __le32 [usertype]
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 488 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.103 seconds
+LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.153 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.850 seconds
+Mesh - Send cancel - 2                               Timed out    1.997 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
-base-commit: ba4978255c3cfb244a89782b30b115c2c9b58c81
-change-id: 20251216-bap-pa-sync-84812e28828d
-
-Best regards,
--- 
-Ye He <ye.he@amlogic.com>
+Regards,
+Linux Bluetooth
 
 
+--===============9176614046153309734==--
