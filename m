@@ -1,276 +1,177 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47C133554B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 18:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B2830EF67
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 19:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765910679; cv=none; b=GH/1d+CujVAOgrF7NCZ/V/F1XcAPOGy093hdAMdJk5Pt/ZQtYN8l5S9TIadJE4m/mZrjS1W73EqNsO9Z9QdBDQxpGAsVeq37NyZm9NEABZrL4bsxbPbkA+fM52l89OqDRCN7Ip+UO33phABCGDCxozhRntoIOJf5gcSXJX0Od7g=
+	t=1765912391; cv=none; b=YbpNLtBHZBAQQZTKa2SO1aXACZPfmBY/JGBygHFcyFp3K0sxVzaxbXFjA0kkuuaKSdWvbU+TJf+co4zRGLm5vKH5bdboWf11J77yY4/pxyGVPd70P7ge5oDuaOQsVSX1SxGHMSaATx+YRV0ddLvwuyqqhuQggLwcklBqH9dvB+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765910679; c=relaxed/simple;
-	bh=ykm8YSZUpiwDUACaIq25C6dbl6iuBDM7QEulPL1yjfY=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=qnEEtHRcVBpj8gtjdOtH7Pp3bv+zqwvVOHkHBcWFNhpt4BARsE8abzjCoEUmEwBTyN+Fha8SGrellrfH/e36dB3/u4mb0d3vmaQusDXTpsAEtVxw/Lkmmk7eBOD4JnZ1FzWNYzg0RxjxeIGWsI8ojFH6kzpkze0EWdrl2Sft83c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AxECxwZF; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1765912391; c=relaxed/simple;
+	bh=9aejOiev4cEQVwtjfzoreNUfB0kVR9KWVuIDK7nOAkA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j8pDt07IQiLyr8hmbHBrk+lapEz+tSEUowjWDuzOdF01IiysIbm93vFk7FmmmHm0iaAHMWpVqgpwHGYg9BxgWGKjwuIp5NrCnLlaCy/QT0Q/nC9kbDH63EkEXnijxG0pJ9wrcWOllMxtW6lvj9hb5BYzmS9zs25HLIxWqmkQnfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mr6O+BCM; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AxECxwZF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765910678; x=1797446678;
-  h=date:from:to:cc:subject:message-id;
-  bh=ykm8YSZUpiwDUACaIq25C6dbl6iuBDM7QEulPL1yjfY=;
-  b=AxECxwZFNQBHtx3GuzMkBZ/11W+U9LlXHxmmC352HQQfm/ms5nRsj3EH
-   G+Gd4OzUxN7DDs0Dj81LxpQ7UyMmwGigbH8Abmb+5tAoElETzj/FKSyOD
-   LUsTbLNHwm5FIZPD5kxpteHTAjOuJP/Zk15HMamY12EmKRgo+DEG/CQuF
-   YSN/Tyqf909TAyhmWdHf0KJ++qW0TvNG8NA1u/8nM5jzbqztvEibs47Ke
-   5zlMhFlY5kva1kJEW+LrDoMdlfiBYFD1VOpahffmu/aM+5FCd1Qh9/DBd
-   8BdGB/rSlPdMODkZ59VfFZN9u06oc0pyDx+Yfl3v1c3DyGpE853oiBq9R
-   w==;
-X-CSE-ConnectionGUID: 1jTpU1mGSTSc/2GeLfRFtw==
-X-CSE-MsgGUID: nrqH2o4FSZ2qbN+Fm+t/+A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11644"; a="71693311"
-X-IronPort-AV: E=Sophos;i="6.21,153,1763452800"; 
-   d="scan'208";a="71693311"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2025 10:44:32 -0800
-X-CSE-ConnectionGUID: Ni27xpfpRvG+QYBZbJZvPg==
-X-CSE-MsgGUID: Q8QBEIuuTrK+bw9+mWRShQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,153,1763452800"; 
-   d="scan'208";a="228780093"
-Received: from lkp-server02.sh.intel.com (HELO 034c7e8e53c3) ([10.239.97.151])
-  by orviesa002.jf.intel.com with ESMTP; 16 Dec 2025 10:44:29 -0800
-Received: from kbuild by 034c7e8e53c3 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vVa1y-000000003jq-32VR;
-	Tue, 16 Dec 2025 18:44:21 +0000
-Date: Wed, 17 Dec 2025 02:43:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 3a7cf69ce3cfce597357cb677a4f23e0d26481a3
-Message-ID: <202512170242.odxIE3e6-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mr6O+BCM"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-477b5e0323bso22856555e9.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 11:13:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765912387; x=1766517187; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=c7Zu6eAcymY6NeJU3CgMqAJH0fkDjsEct7SgqC2bGP0=;
+        b=mr6O+BCM9l7FPVHU//DvWCyjmmdONGIfSu5tETDZbGfLAKrK03X7zslPB0ql8VnI5J
+         dnmgAwj9ZHSiP/s0AmJ9BAsdsag7GMfvwmiEwqfie1ajPqMh826DnH8ftwM0g6t2SGOJ
+         idP7OQs2JZASkv8/PysnRzFnW2RHQSuTBHTgqqnpfRGX4Z/adtmQ/6EVKp6b70/glV8T
+         P4M/Z6R56kKTLk8LvNM/ASyX5Q/ksCBChnhi9cqjJYyz5wbTI2M0amM5M6dk/hBcjSHE
+         G5zRroSmrmcWqc/oAyKyuxW3a3Vp73VXddIAoS7/G3LQZ1AKcTkbpGL5orDTGkhpgTnk
+         uF0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765912387; x=1766517187;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c7Zu6eAcymY6NeJU3CgMqAJH0fkDjsEct7SgqC2bGP0=;
+        b=j4xeOOD6SJRothu18y9DYx7oKMH0WFAUbERMz9VFSD9cp6ToF1iuPobU9vx/wPorOD
+         VPAGzeCnKEQaAmhzsJUzQUaknp3fLFUTms3DDBA/0Es/963RXHOyLohk5goyS91aG28T
+         5aCVU7hVLR8k04M0SKqNJCI6UegmeZrNDrPunDvsK8YKKJq+ZjqcAUa3k2gw4gct2ysu
+         wRovqM8iQSWwwbrZGZTKklXxlu6T4l3yUyRHLESZJ2XsPmDiuxc71Yd/GRAI4e6EXHGt
+         hbXD1FYKxuO4y5CRU80hoQGPAlC1VL5aMioC8Xz3ifLurCbw1nZ7EUSoategWPQ91km9
+         Dkow==
+X-Gm-Message-State: AOJu0YxP3egXGS8gfFdb87XEr9rea6me9Dv30Yv1sGlxh7hO3ORlL6lL
+	63aWr7opPcJSnX/JeUkHG1MZEhvuKKQ3LW0FjApObvqt6W4/vlRQ2lgR2T9+
+X-Gm-Gg: AY/fxX74Gp6q/7YdKOrlMRCqdtFBNBhBrKflC5sEwAS5yt9xlKZZZSHPguelJF4Sh66
+	FKkrxtr4bZ3n5vnb6WterK8oV2I66D4tnHY7A4OsxLNxwEOnoMriNgMSR51Xv8wEyB250JT8XRa
+	iv5YzBUdM2Ur4+qukhaVUqiOY+mPQjnAxT7VFOk/uaGY9rntdCdX8ly6Zqdodk5ywTT0pjkdoDn
+	Q+3NOc0ymknMz7Zlf1CVekDtLgoh7oJIUnVuhGwgcX1toy5o2VlIvVXJotya1Al/v0gAbm2PFNS
+	/tEF2kVWpDzVYjSYzQmbSht8j9nMDHY6NQ5dsKd7mfFIDXi0TZqh6v4rSuYSY99UOuR81UAv6w/
+	/fLYhuZ14xPdJnb+zoBHv5R2QkwpvWk4T0sKUX3CleVW/vTzsuPQ9z/PiTu4AcLE3q/6E0Co3zI
+	FmJe7JUd/cZSJ6xm3i2VCE
+X-Google-Smtp-Source: AGHT+IEAqeMIDhK+f/ZJDeUorxR8/oEQnp2bw9uHrtBZm1kdrq7o6FrAZ251LEGgaY+X/yNUZHh75Q==
+X-Received: by 2002:adf:f7cf:0:b0:42f:b555:5274 with SMTP id ffacd0b85a97d-42fb55553f5mr13925210f8f.20.1765912387191;
+        Tue, 16 Dec 2025 11:13:07 -0800 (PST)
+Received: from slim.tail1db9c.ts.net ([31.223.101.104])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4310ade81absm652655f8f.21.2025.12.16.11.13.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 11:13:05 -0800 (PST)
+From: Cihangir Akturk <cakturk@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Cihangir Akturk <cakturk@gmail.com>,
+	syzbot+87badbb9094e008e0685@syzkaller.appspotmail.com
+Subject: [PATCH] Bluetooth: hci: fix refcounts in LE remote features command
+Date: Tue, 16 Dec 2025 22:12:55 +0300
+Message-ID: <20251216191255.882653-1-cakturk@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 3a7cf69ce3cfce597357cb677a4f23e0d26481a3  Bluetooth: btusb: revert use of devm_kzalloc in btusb
+KASAN reported a slab-use-after-free in le_read_features_complete()
+running from hci_cmd_sync_work.  le_read_features_complete() can run
+after hci_rx_work/hci_conn_del() has removed the link, so the destroy
+callback may touch a freed hci_conn and trigger a KASAN use-after-free.
+Duplicate submissions also need to drop the references to avoid leaking
+the hold and blocking teardown.
 
-elapsed time: 1460m
+Fix this by taking hci_conn_get() before queueing, passing the conn
+directly as work data, and balancing hci_conn_hold()/drop() and
+hci_conn_get()/put() in the completion and all error/-EEXIST paths so
+the connection stays referenced while the work runs and is released
+afterwards.
 
-configs tested: 199
-configs skipped: 0
+Reported-by: syzbot+87badbb9094e008e0685@syzkaller.appspotmail.com
+Signed-off-by: Cihangir Akturk <cakturk@gmail.com>
+---
+ net/bluetooth/hci_sync.c | 37 ++++++++++++++++++++++++++-----------
+ 1 file changed, 26 insertions(+), 11 deletions(-)
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+I am not entirely sure that removing the err == -ECANCELED early return
+is strictly correct. My assumption is that, with the changes in this
+patch, there does not appear to be another cancellation path that
+reliably balances hci_conn_drop() and hci_conn_put() for this command.
+Based on that assumption, keeping the early return could leave the
+references taken before queuing unbalanced on cancellation, so I opted
+to remove it to keep the lifetime handling consistent.
 
-tested configs:
-alpha                             allnoconfig    gcc-15.1.0
-alpha                            allyesconfig    gcc-15.1.0
-alpha                               defconfig    gcc-15.1.0
-arc                              allmodconfig    clang-16
-arc                              allmodconfig    gcc-15.1.0
-arc                               allnoconfig    gcc-15.1.0
-arc                              allyesconfig    clang-22
-arc                              allyesconfig    gcc-15.1.0
-arc                                 defconfig    gcc-15.1.0
-arc                   randconfig-001-20251216    gcc-8.5.0
-arc                   randconfig-002-20251216    gcc-8.5.0
-arm                               allnoconfig    clang-22
-arm                               allnoconfig    gcc-15.1.0
-arm                              allyesconfig    clang-16
-arm                              allyesconfig    gcc-15.1.0
-arm                                 defconfig    gcc-15.1.0
-arm                   milbeaut_m10v_defconfig    gcc-15.1.0
-arm                   randconfig-001-20251216    gcc-8.5.0
-arm                   randconfig-002-20251216    gcc-8.5.0
-arm                   randconfig-003-20251216    gcc-8.5.0
-arm                   randconfig-004-20251216    gcc-8.5.0
-arm64                            allmodconfig    clang-19
-arm64                            allmodconfig    clang-22
-arm64                             allnoconfig    gcc-15.1.0
-arm64                               defconfig    gcc-15.1.0
-arm64                 randconfig-001-20251216    gcc-10.5.0
-arm64                 randconfig-002-20251216    gcc-10.5.0
-arm64                 randconfig-003-20251216    gcc-10.5.0
-arm64                 randconfig-004-20251216    gcc-10.5.0
-csky                             allmodconfig    gcc-15.1.0
-csky                              allnoconfig    gcc-15.1.0
-csky                                defconfig    gcc-15.1.0
-csky                  randconfig-001-20251216    gcc-10.5.0
-csky                  randconfig-002-20251216    gcc-10.5.0
-hexagon                          allmodconfig    clang-17
-hexagon                          allmodconfig    gcc-15.1.0
-hexagon                           allnoconfig    clang-22
-hexagon                           allnoconfig    gcc-15.1.0
-hexagon                             defconfig    gcc-15.1.0
-hexagon               randconfig-001-20251216    gcc-8.5.0
-hexagon               randconfig-002-20251216    gcc-8.5.0
-i386                             allmodconfig    clang-20
-i386                             allmodconfig    gcc-14
-i386                              allnoconfig    gcc-14
-i386                              allnoconfig    gcc-15.1.0
-i386                             allyesconfig    clang-20
-i386                             allyesconfig    gcc-14
-i386        buildonly-randconfig-001-20251216    gcc-14
-i386        buildonly-randconfig-002-20251216    gcc-14
-i386        buildonly-randconfig-003-20251216    gcc-14
-i386        buildonly-randconfig-004-20251216    gcc-14
-i386        buildonly-randconfig-005-20251216    gcc-14
-i386        buildonly-randconfig-006-20251216    gcc-14
-i386                                defconfig    gcc-15.1.0
-i386                  randconfig-001-20251216    gcc-14
-i386                  randconfig-002-20251216    gcc-14
-i386                  randconfig-003-20251216    gcc-14
-i386                  randconfig-004-20251216    gcc-14
-i386                  randconfig-005-20251216    gcc-14
-i386                  randconfig-006-20251216    gcc-14
-i386                  randconfig-007-20251216    gcc-14
-i386                  randconfig-011-20251216    gcc-13
-i386                  randconfig-012-20251216    gcc-13
-i386                  randconfig-013-20251216    gcc-13
-i386                  randconfig-014-20251216    gcc-13
-i386                  randconfig-015-20251216    gcc-13
-i386                  randconfig-016-20251216    gcc-13
-i386                  randconfig-017-20251216    gcc-13
-loongarch                        allmodconfig    clang-19
-loongarch                        allmodconfig    clang-22
-loongarch                         allnoconfig    clang-22
-loongarch                         allnoconfig    gcc-15.1.0
-loongarch                           defconfig    clang-19
-loongarch             randconfig-001-20251216    gcc-8.5.0
-loongarch             randconfig-002-20251216    gcc-8.5.0
-m68k                             allmodconfig    gcc-15.1.0
-m68k                              allnoconfig    gcc-15.1.0
-m68k                             allyesconfig    clang-16
-m68k                             allyesconfig    gcc-15.1.0
-m68k                                defconfig    clang-19
-m68k                        m5272c3_defconfig    gcc-15.1.0
-microblaze                        allnoconfig    gcc-15.1.0
-microblaze                       allyesconfig    gcc-15.1.0
-microblaze                          defconfig    clang-19
-mips                             allmodconfig    gcc-15.1.0
-mips                              allnoconfig    gcc-15.1.0
-mips                             allyesconfig    gcc-15.1.0
-mips                           ip30_defconfig    gcc-15.1.0
-nios2                            allmodconfig    clang-22
-nios2                             allnoconfig    clang-22
-nios2                             allnoconfig    gcc-11.5.0
-nios2                               defconfig    clang-19
-nios2                 randconfig-001-20251216    gcc-8.5.0
-nios2                 randconfig-002-20251216    gcc-8.5.0
-openrisc                         allmodconfig    clang-22
-openrisc                          allnoconfig    clang-22
-openrisc                          allnoconfig    gcc-15.1.0
-openrisc                            defconfig    gcc-15.1.0
-parisc                           allmodconfig    gcc-15.1.0
-parisc                            allnoconfig    clang-22
-parisc                            allnoconfig    gcc-15.1.0
-parisc                           allyesconfig    clang-19
-parisc                           allyesconfig    gcc-15.1.0
-parisc                              defconfig    gcc-15.1.0
-parisc                randconfig-001-20251216    clang-22
-parisc                randconfig-002-20251216    clang-22
-parisc64                            defconfig    clang-19
-powerpc                          allmodconfig    gcc-15.1.0
-powerpc                           allnoconfig    clang-22
-powerpc                           allnoconfig    gcc-15.1.0
-powerpc                      bamboo_defconfig    gcc-15.1.0
-powerpc                      ep88xc_defconfig    gcc-15.1.0
-powerpc               randconfig-001-20251216    clang-22
-powerpc               randconfig-002-20251216    clang-22
-powerpc64             randconfig-001-20251216    clang-22
-powerpc64             randconfig-002-20251216    clang-22
-riscv                            allmodconfig    clang-22
-riscv                             allnoconfig    clang-22
-riscv                             allnoconfig    gcc-15.1.0
-riscv                            allyesconfig    clang-16
-riscv                               defconfig    gcc-15.1.0
-riscv                 randconfig-001-20251216    clang-17
-riscv                 randconfig-002-20251216    clang-17
-s390                             allmodconfig    clang-18
-s390                             allmodconfig    clang-19
-s390                              allnoconfig    clang-22
-s390                             allyesconfig    gcc-15.1.0
-s390                                defconfig    gcc-15.1.0
-s390                  randconfig-001-20251216    clang-17
-s390                  randconfig-002-20251216    clang-17
-sh                               allmodconfig    gcc-15.1.0
-sh                                allnoconfig    clang-22
-sh                                allnoconfig    gcc-15.1.0
-sh                               allyesconfig    clang-19
-sh                               allyesconfig    gcc-15.1.0
-sh                                  defconfig    gcc-14
-sh                    randconfig-001-20251216    clang-17
-sh                    randconfig-002-20251216    clang-17
-sh                           se7712_defconfig    gcc-15.1.0
-sparc                             allnoconfig    clang-22
-sparc                             allnoconfig    gcc-15.1.0
-sparc                               defconfig    gcc-15.1.0
-sparc                 randconfig-001-20251216    gcc-8.5.0
-sparc                 randconfig-002-20251216    gcc-8.5.0
-sparc64                          allmodconfig    clang-22
-sparc64                             defconfig    gcc-14
-sparc64               randconfig-001-20251216    gcc-8.5.0
-sparc64               randconfig-002-20251216    gcc-8.5.0
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-22
-um                               allyesconfig    gcc-14
-um                               allyesconfig    gcc-15.1.0
-um                                  defconfig    gcc-14
-um                             i386_defconfig    gcc-14
-um                    randconfig-001-20251216    gcc-8.5.0
-um                    randconfig-002-20251216    gcc-8.5.0
-um                           x86_64_defconfig    gcc-14
-x86_64                           allmodconfig    clang-20
-x86_64                            allnoconfig    clang-20
-x86_64                            allnoconfig    clang-22
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20251216    clang-20
-x86_64      buildonly-randconfig-002-20251216    clang-20
-x86_64      buildonly-randconfig-003-20251216    clang-20
-x86_64      buildonly-randconfig-004-20251216    clang-20
-x86_64      buildonly-randconfig-005-20251216    clang-20
-x86_64      buildonly-randconfig-006-20251216    clang-20
-x86_64                              defconfig    gcc-14
-x86_64                                  kexec    clang-20
-x86_64                randconfig-001-20251216    clang-20
-x86_64                randconfig-002-20251216    clang-20
-x86_64                randconfig-003-20251216    clang-20
-x86_64                randconfig-004-20251216    clang-20
-x86_64                randconfig-005-20251216    clang-20
-x86_64                randconfig-006-20251216    clang-20
-x86_64                randconfig-011-20251216    clang-20
-x86_64                randconfig-012-20251216    clang-20
-x86_64                randconfig-013-20251216    clang-20
-x86_64                randconfig-014-20251216    clang-20
-x86_64                randconfig-015-20251216    clang-20
-x86_64                randconfig-016-20251216    clang-20
-x86_64                randconfig-071-20251216    gcc-14
-x86_64                randconfig-072-20251216    gcc-14
-x86_64                randconfig-073-20251216    gcc-14
-x86_64                randconfig-074-20251216    gcc-14
-x86_64                randconfig-075-20251216    gcc-14
-x86_64                randconfig-076-20251216    gcc-14
-x86_64                               rhel-9.4    clang-20
-x86_64                           rhel-9.4-bpf    gcc-14
-x86_64                          rhel-9.4-func    clang-20
-x86_64                    rhel-9.4-kselftests    clang-20
-x86_64                         rhel-9.4-kunit    gcc-14
-x86_64                           rhel-9.4-ltp    gcc-14
-x86_64                          rhel-9.4-rust    clang-20
-xtensa                            allnoconfig    clang-22
-xtensa                            allnoconfig    gcc-15.1.0
-xtensa                           allyesconfig    clang-22
-xtensa                randconfig-001-20251216    gcc-8.5.0
-xtensa                randconfig-002-20251216    gcc-8.5.0
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index a9f5b1a68356..5a3d288e7015 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -776,14 +776,23 @@ _hci_cmd_sync_lookup_entry(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+  * - Lookup if an entry already exist and only if it doesn't creates a new entry
+  *   and queue it.
+  */
+-int hci_cmd_sync_queue_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++static int __hci_cmd_sync_queue_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 			    void *data, hci_cmd_sync_work_destroy_t destroy)
+ {
+ 	if (hci_cmd_sync_lookup_entry(hdev, func, data, destroy))
+-		return 0;
++		return -EEXIST;
+ 
+ 	return hci_cmd_sync_queue(hdev, func, data, destroy);
+ }
++
++int hci_cmd_sync_queue_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++			    void *data, hci_cmd_sync_work_destroy_t destroy)
++{
++	int ret;
++
++	ret = __hci_cmd_sync_queue_once(hdev, func, data, destroy);
++	return ret == -EEXIST ? 0 : ret;
++}
+ EXPORT_SYMBOL(hci_cmd_sync_queue_once);
+ 
+ /* Run HCI command:
+@@ -7338,10 +7347,8 @@ static void le_read_features_complete(struct hci_dev *hdev, void *data, int err)
+ 
+ 	bt_dev_dbg(hdev, "err %d", err);
+ 
+-	if (err == -ECANCELED)
+-		return;
+-
+ 	hci_conn_drop(conn);
++	hci_conn_put(conn);
+ }
+ 
+ static int hci_le_read_all_remote_features_sync(struct hci_dev *hdev,
+@@ -7408,12 +7415,20 @@ int hci_le_read_remote_features(struct hci_conn *conn)
+ 	 * role is possible. Otherwise just transition into the
+ 	 * connected state without requesting the remote features.
+ 	 */
+-	if (conn->out || (hdev->le_features[0] & HCI_LE_PERIPHERAL_FEATURES))
+-		err = hci_cmd_sync_queue_once(hdev,
+-					      hci_le_read_remote_features_sync,
+-					      hci_conn_hold(conn),
+-					      le_read_features_complete);
+-	else
++	if (conn->out || (hdev->le_features[0] & HCI_LE_PERIPHERAL_FEATURES)) {
++		hci_conn_get(conn);
++		hci_conn_hold(conn);
++		err = __hci_cmd_sync_queue_once(hdev,
++						hci_le_read_remote_features_sync,
++						conn,
++						le_read_features_complete);
++		if (err) {
++			hci_conn_drop(conn);
++			hci_conn_put(conn);
++			if (err == -EEXIST)
++				err = 0;
++		}
++	} else
+ 		err = -EOPNOTSUPP;
+ 
+ 	return err;
+-- 
+2.52.0
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
