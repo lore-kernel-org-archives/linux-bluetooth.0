@@ -1,159 +1,260 @@
-Received: from mail-qt1-f194.google.com (mail-qt1-f194.google.com [209.85.160.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4134A21C16E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 19:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.194
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765913953; cv=none; b=dtDX7GDny6I5EvvPyjyiRnuHx7oq732KFiU958F2AS635lR5GngJxDl7sSHmF34o1G6S9TpAO1WZgKBllhP9JeEXE0fBjZGfEefiYjgYFQjZlA2gPcZMnvX12ICiFs3gynb/g9J2PjeYaaj1Uk7DEm/eRrQHt0PjevqWI33pby4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765913953; c=relaxed/simple;
-	bh=pqxNfLfphae2ciJFlX415E6qgN6kUCbEfkfmQH6laMo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=TnBFZFo5OxDYM+z07MZXeb7MArFtE78eXgTWg6aHb4mpCUT6/5cU4kQLZAnZQzcOHNcfyLvbIEQB1yRqy7/3qUh+diEWE7rZae3Q8kGGykP95ykUM/afDzhLzwGuffmwSYEf9I+fq8W8xWyDSll/5f+6XOmPGxXCJ3BV6kmTw4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CGvadCRF; arc=none smtp.client-ip=209.85.160.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0349D2BDC0A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 19:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765914417; cv=pass; b=sF/kQ4qhGC/KilBA/wFHuOMqIK9EQhr7nMFPERc/ghOVL9PT9WUgswzNY2MSqioOhOzhK2nH1+HdEzbgyabnuWhP2iWpdNOQOemqXIdkDu+hBeNB788zpg8O4I4x2DLNd/n50N6jRq5RK9I3IZA+chnsp9Pvko6l+xB/HIeXZvs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765914417; c=relaxed/simple;
+	bh=MxQkzaKy84wNfB7/HrXUzitw0sl/KVrMMMFCBcw+L30=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h5c8ILGwLuP5AhsL30128rlvbh5OYe5G5/Vvq9Czg9G7LAxyUtQyFpED3pVK1aTizEe13isb9kSIlFtlhZV5z3nnnRgccSwibIZwXvDRMcbKu51zS4ZtyxfYz2aijJNDhPJR+7Oj6T102qJUfHk05co2ZsmMLD3BQ4T6J+hxz7I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=P2VBgG7f; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CGvadCRF"
-Received: by mail-qt1-f194.google.com with SMTP id d75a77b69052e-4f1b4bb40aaso29927571cf.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Dec 2025 11:39:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765913950; x=1766518750; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rWFVzwKzQEbfwAAoaeEkya7wddH5EfM6a6zerhq4Um4=;
-        b=CGvadCRFXWHrRABWjlLopA+2WRhOk5OaeM1jOhiV1Wpc/7O9kMRMwxMONAuJ1/4g2D
-         bA9dYpD2sfeO91r7m8OQfr0Mox3wBJFMcIwTcPbg0XuMTRi6Hm8/KQJjpT3Ba+eNWWkg
-         q42MewRBuBgwHhpduZFWwTZdPBO5VQZAY3X3wvfXgnn5gU0Qwsa2A4r0lq6eYSWTO+zr
-         q7xoGAXdHmKhTZRDVCvW+Wr0s8l9fiQjzbzXyM7zsI1kwjtXeqiAa637DXGvXb/YKf8D
-         ojmWYKKAXxZHSFoMyJK0pxcyP9TDRXzKt+KzFwl2tmOe6U5acUbBBkSxGej2cUeLDhr0
-         M0gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765913950; x=1766518750;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rWFVzwKzQEbfwAAoaeEkya7wddH5EfM6a6zerhq4Um4=;
-        b=BXn8/FliO1TZM9IivVrnZKlp7sk4jA2iS9AZ7oMF9fR3vJiVTYQP8/lAFbv6XGmLzf
-         c30RC3MbM6PrQMwYXJmUraeesbuarL0/DP3ELssmEBhkEQuMETRrHv31PPMPMRLPOm7X
-         cAj6i1QZq0Z3vKNpRg9agT4C6MtQprzfLq+Ow6OV9dfZTmqA0ao+enHmLTqu1Zqty8Qt
-         DbdSPBq7ReXhQQieYqxUM/KSgbgL9jXsqYKOoAcBxn4+Gc7SQIQvlSj6B69/An+Lm7bF
-         7jIQA1iNmWMXYN6rm9xvuUjEz9ndEXcCNLBaE3uOBEqYp08U0lBYLywPiH3fiFk8xnnX
-         4G1g==
-X-Gm-Message-State: AOJu0YybUPYwipdNjtwUHg6XTS19tZlZOWUnLo837ikPwSw64KmYxgk7
-	u5ipkgtC2Y2Gc3x6QFoTU19rdLJaWBZDiaij5RzWdw6wFMRMkHE4XPkQYDtg1uCB
-X-Gm-Gg: AY/fxX4YtdqY70aBnTqVGj39hARkCNq5ZJ9fNWc77cWjggJGz7hvekIoKEU8ULZVfML
-	Co+3xg5xnJdhQk/25/Y0fyWueHKOTO+4nMOru3uRxaqAGBJ1UIOZvPyXrj18pHOjBreYBlyv4pr
-	deuE2TbKk0qoHbcx1PiV8hFIFIYVc+amThS/KAoqpUyTy3872kc82trHHMZRxAZlao7fq9skbJX
-	WQMEAIPCTN8YiBAFgavRZMpXRpoGbS996HCyfjv2/M61QHM4CiFPYerjXat6T9D6DlPTR1GMSOB
-	glNxKbmKDfTULg0cvCUVtHlbyfQm/vLxO7ttm/BOJMbb2g43n9zEEEwdbg/r0pH3EDRXTOWOqbm
-	A+yj8UNEtC1vz7uaA2PAgUf+v8vxrn85hPjW1lZGrVZ5hCY74EMb6o795tVaL50SeBeXkYB7NIy
-	amz03ian/819YL4Hcxx54=
-X-Google-Smtp-Source: AGHT+IGFo3FqXlxSz0QC5OvdEXzJHFj/7QaYLnq+o1WZahmkeRXFVqmdNyNiFtkEuYwTZUyqTHh7lw==
-X-Received: by 2002:a05:622a:550f:b0:4f0:441:96be with SMTP id d75a77b69052e-4f1d05deeaemr204685181cf.51.1765913949648;
-        Tue, 16 Dec 2025 11:39:09 -0800 (PST)
-Received: from [172.17.0.2] ([172.208.126.101])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8899ea360cbsm84191876d6.37.2025.12.16.11.39.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 11:39:09 -0800 (PST)
-Message-ID: <6941b55d.050a0220.3c737b.4d6f@mx.google.com>
-Date: Tue, 16 Dec 2025 11:39:09 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7155037813580058084=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="P2VBgG7f"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dW6rP6ZcSzyQK;
+	Tue, 16 Dec 2025 21:46:45 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1765914406;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=R1sm9bctrnlchmh9pGFOi9QFKEX2SSGu303MZgvwnTU=;
+	b=P2VBgG7foK+JCPZJacMwsnOTFiWE09If+aj0nbmpUaL6XPbC+J7hqyvK82KSdDhrDbd2fP
+	m/nxYUmP4PIbnlyz53LAAQt2S5wq/embGEfRIINTwFl144kKUkSgPi0DOzbFjKrSOJ9rHR
+	XppYtu+c1I9kmMtjU8yWItie9Ugg/3Q=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1765914406;
+	b=AGUJCmqi4jL65qEJcFqR8OFCuuXeE549nHOdnuvYsqsI/1DsyIJCwG1IuWLBCybdh6k+sG
+	KCY8vdWN+Tl76ZCyMMayLguOG9XrHqsHxwpdgju5icFLF/T641z+ulN9WJa01RcQ3E3T0t
+	KVTR3UuQumeqSnjbwtvC0G4Cr2AIwZo=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1765914406;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=R1sm9bctrnlchmh9pGFOi9QFKEX2SSGu303MZgvwnTU=;
+	b=Je8cxUDnsyH8GPdgRggB8KqQ+EI3Tii7wv1bSOsTm3Z66ZeG+56BBrV2Srj5xTzdZu2OvP
+	12gZJFm89eTxInb0MwMis2aYoh7OduN8lm9DQcoMOVQFxrsil11f1MuNAbY1h02hk/+d1w
+	V0kDqRCbFYkAI46WZP7PD/E/ThVPQUI=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 1/2] shared/mcp: emit MCS error if value changes during long read
+Date: Tue, 16 Dec 2025 21:46:43 +0200
+Message-ID: <977354414f40c09d5a0a14c839b860d22a8ba23e.1765914148.git.pav@iki.fi>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, cakturk@gmail.com
-Subject: RE: Bluetooth: hci: fix refcounts in LE remote features command
-In-Reply-To: <20251216191255.882653-1-cakturk@gmail.com>
-References: <20251216191255.882653-1-cakturk@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7155037813580058084==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+MCS spec requires emitting Value Changed During Read Long if value
+changes between remote reading with zero offset and nonzero offset.
 
-This is automated email and please do not reply to this email!
+This is session-specific state, so add support for that.
 
-Dear submitter,
+As server, track value changes and emit that error properly.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1033902
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.36 seconds
-GitLint                       PENDING   0.36 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      26.09 seconds
-CheckAllWarning               PASS      28.88 seconds
-CheckSparse                   PASS      31.99 seconds
-BuildKernel32                 PASS      25.82 seconds
-TestRunnerSetup               PASS      566.38 seconds
-TestRunner_l2cap-tester       PASS      25.56 seconds
-TestRunner_iso-tester         PASS      86.13 seconds
-TestRunner_bnep-tester        PASS      6.20 seconds
-TestRunner_mgmt-tester        FAIL      116.07 seconds
-TestRunner_rfcomm-tester      PASS      9.38 seconds
-TestRunner_sco-tester         FAIL      14.36 seconds
-TestRunner_ioctl-tester       PASS      10.09 seconds
-TestRunner_mesh-tester        FAIL      11.42 seconds
-TestRunner_smp-tester         PASS      8.52 seconds
-TestRunner_userchan-tester    PASS      6.68 seconds
-IncrementalBuild              PENDING   0.64 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.106 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.974 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+As client, we don't need to reread if this error occurs, as there should
+be a notification or track changed that queues a new read.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/mcp.c | 109 +++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 97 insertions(+), 12 deletions(-)
 
+diff --git a/src/shared/mcp.c b/src/shared/mcp.c
+index 910089f18..9f8952af1 100644
+--- a/src/shared/mcp.c
++++ b/src/shared/mcp.c
+@@ -30,6 +30,8 @@
+ #include "src/shared/mcp.h"
+ #include "src/shared/mcs.h"
+ 
++#define BT_MCS_ERROR_VALUE_CHANGED_DURING_READ_LONG	0x80
++
+ #define DBG_MCP(mcp, fmt, ...) \
+ 	mcp_debug(mcp, "%s:%s() mcp %p | " fmt, __FILE__, __func__, mcp, \
+ 								##__VA_ARGS__)
+@@ -76,22 +78,19 @@ struct bt_mcs_db {
+ 	struct gatt_db_attribute *ccid;
+ };
+ 
+-struct bt_mcs_client {
++struct bt_mcs_session {
++	struct bt_mcs *mcs;
+ 	struct bt_att *att;
++	unsigned int disconn_id;
+ 
+-	/* Per-client state.
+-	 *
+-	 * Concurrency is not specified in MCS v1.0.1, everything currently
+-	 * implemented seems OK to be in global state.
+-	 *
+-	 * TODO: Search Results ID likely should go here
+-	 */
++	/* Per-client state */
++	struct queue *changed;
+ };
+ 
+ struct bt_mcs {
+ 	struct gatt_db *db;
+ 	struct bt_mcs_db ldb;
+-	struct queue *clients;
++	struct queue *sessions;
+ 
+ 	uint8_t media_state;
+ 
+@@ -557,11 +556,86 @@ static bool set_playing_order(struct bt_mcs *mcs, void *data)
+ 	return false;
+ }
+ 
++static bool match_session_att(const void *data, const void *match_data)
++{
++	const struct bt_mcs_session *session = data;
++
++	return session->att == match_data;
++}
++
++static void session_destroy(void *data)
++{
++	struct bt_mcs_session *session = data;
++
++	bt_att_unregister_disconnect(session->att, session->disconn_id);
++	queue_destroy(session->changed, NULL);
++	free(session);
++}
++
++static void session_disconnect(int err, void *user_data)
++{
++	struct bt_mcs_session *session = user_data;
++	struct bt_mcs *mcs = session->mcs;
++
++	queue_remove(mcs->sessions, session);
++	session_destroy(session);
++}
++
++static struct bt_mcs_session *get_session(struct bt_mcs *mcs,
++							struct bt_att *att)
++{
++	struct bt_mcs_session *session;
++
++	session = queue_find(mcs->sessions, match_session_att, att);
++	if (session)
++		return session;
++
++	session = new0(struct bt_mcs_session, 1);
++	session->disconn_id = bt_att_register_disconnect(att,
++					session_disconnect, session, NULL);
++	if (!session->disconn_id) {
++		free(session);
++		return NULL;
++	}
++
++	session->mcs = mcs;
++	session->att = att;
++	session->changed = queue_new();
++
++	queue_push_tail(mcs->sessions, session);
++	return session;
++}
++
++static void session_changed(void *data, void *user_data)
++{
++	struct bt_mcs_session *session = data;
++	struct gatt_db_attribute *attrib = user_data;
++
++	if (!queue_find(session->changed, NULL, attrib))
++		queue_push_tail(session->changed, attrib);
++}
++
+ static void read_result(struct bt_mcs *mcs, struct gatt_db_attribute *attrib,
+-			unsigned int id, uint16_t offset, mcs_get_func_t get)
++			unsigned int id, uint16_t offset, struct bt_att *att,
++			mcs_get_func_t get)
+ {
+ 	uint8_t buf[BT_ATT_MAX_VALUE_LEN];
+ 	struct iovec iov = { .iov_base = buf, .iov_len = 0 };
++	struct bt_mcs_session *session = get_session(mcs, att);
++
++	if (!session) {
++		gatt_db_attribute_read_result(attrib, id,
++						BT_ATT_ERROR_UNLIKELY, NULL, 0);
++		return;
++	}
++
++	if (!offset) {
++		queue_remove(session->changed, attrib);
++	} else if (queue_find(session->changed, NULL, attrib)) {
++		gatt_db_attribute_read_result(attrib, id,
++			BT_MCS_ERROR_VALUE_CHANGED_DURING_READ_LONG, NULL, 0);
++		return;
++	}
+ 
+ 	get(mcs, &iov, sizeof(buf));
+ 
+@@ -582,7 +656,7 @@ static void read_result(struct bt_mcs *mcs, struct gatt_db_attribute *attrib,
+ 				void *user_data) \
+ 	{ \
+ 		DBG_MCS(user_data, ""); \
+-		read_result(user_data, attrib, id, offset, get_ ##name); \
++		read_result(user_data, attrib, id, offset, att, get_ ##name); \
+ 	}
+ 
+ READ_FUNC(media_player_name)
+@@ -683,7 +757,9 @@ void bt_mcs_changed(struct bt_mcs *mcs, uint16_t chrc_uuid)
+ 		if (bt_uuid_cmp(&uuid_attr, &uuid))
+ 			continue;
+ 
+-		DBG_MCS(mcs, "Notify %u", chrc_uuid);
++		queue_foreach(mcs->sessions, session_changed, attrs[i].attr);
++
++		DBG_MCS(mcs, "Notify 0x%04x", chrc_uuid);
+ 
+ 		attrs[i].get(mcs, &iov, sizeof(buf));
+ 
+@@ -925,6 +1001,7 @@ struct bt_mcs *bt_mcs_register(struct gatt_db *db, bool is_gmcs,
+ 	mcs->user_data = user_data;
+ 
+ 	mcs->media_state = BT_MCS_STATE_INACTIVE;
++	mcs->sessions = queue_new();
+ 
+ 	if (!mcs_init_db(mcs, is_gmcs)) {
+ 		free(mcs);
+@@ -959,6 +1036,8 @@ void bt_mcs_unregister(struct bt_mcs *mcs)
+ 		servers = NULL;
+ 	}
+ 
++	queue_destroy(mcs->sessions, session_destroy);
++
+ 	free(mcs);
+ }
+ 
+@@ -1367,6 +1446,12 @@ static void update_media_player_name(bool success, uint8_t att_ecode,
+ {
+ 	struct bt_mcp_service *service = user_data;
+ 
++	if (!success) {
++		DBG_SVC(service, "Unable to read Media Player Name: "
++						"error 0x%02x", att_ecode);
++		return;
++	}
++
+ 	DBG_SVC(service, "Media Player Name");
+ 
+ 	LISTENER_CB(service, media_player_name, value, length);
+-- 
+2.51.1
 
---===============7155037813580058084==--
