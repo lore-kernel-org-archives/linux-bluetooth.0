@@ -1,88 +1,127 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f66.google.com (mail-oo1-f66.google.com [209.85.161.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C34E2F12B7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 19:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2A7155C82
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 20:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766000595; cv=none; b=FF7t6veZPG7yMfSxSFEKVTugzIpmD2dc2SkJXvHH21l0VVxtPpEUw7e3rrLD+ltB0aR+ofLm7RbanVfMJ7lENCiq+ct2/U9N6IZYqosSdGv+GJ7HtIPJyPPkYhy2LVhUqBpYSQvAH+XouXX7mzi+Z4QhbS5b39N9nkLLPTDBO5M=
+	t=1766003463; cv=none; b=AVFhNRMD9w8bceJRKNc6YDrbqxBwDiTSpyTfqvZ4PkEs/d/7z4ADh0zIweAeCcNnQhZYQNtsdjfflL42uuM26LRD6/O67rnkSW2IaKyvby7lgeM3rhfwkgVXOx+XoJClHwgvHUKceVSDVuN9b4ZaJ3H0h+HRRf8NOGq4w2xREZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766000595; c=relaxed/simple;
-	bh=GipMu+KqP2Vedzo0PmUZiTYTRt/c4Hv2kfxDPU9nNos=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=d9fP/XQKfxGWqKPDhHayQx5YJFmVCETeOeXMzMrjdZL8qVYu6wqrDh231tJqEw6J1gSJ8C/UfFAU/eS8JMa0JyyhJ8gNXhLF0UCmCnKd4WLkjy4Z7w4WrloZRsFiBFwtztCbaDXUJvnv3f+4f70Tw8Kpn0MHcgDRB1HR9PTwjxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=eYNrDXl5; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1766003463; c=relaxed/simple;
+	bh=aW458C0YXzzhTO9v20YCM2W2QZ7+P9shCaajbzCDU40=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=sWkkP/nJEilA9MSA/VkLydFaUZugZ6i9IOaiCpILt2L772HBmwA1HSQ6erDMi4i3KHCMMW4UkdrUM+GwkgYo3fNbZZnc7SAEpKfEDJC3wzhfEy6J7+Zqu7gyY9vWziLKf/bcTHoSU8HsjfGHI64UvFkbIGb0mkxSt9apTLt2Lyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hew+I054; arc=none smtp.client-ip=209.85.161.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="eYNrDXl5"
-Received: from github.com (hubbernetes-node-5f624db.ash1-iad.github.net [10.56.209.106])
-	by smtp.github.com (Postfix) with ESMTPA id 34913600A9D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 11:43:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1766000587;
-	bh=BgBk6pzHqM5RRAdnNMGVsSasTuQi02ving6Y9Hni7J4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=eYNrDXl5mflkhRV2mU8urror++3C3WYZh4ItN3Ot00H8162UEuRghqK0/w6/qVRYv
-	 1uKnRYX6wyDRHBAa7L7v0Z53RkGd27iJh2mej3u6ZLtF01slJPLrZ9vjbKbRFF4BxT
-	 xzkJErBqCtNFE/9plKCK17TU5XD8DRBXTK/WOvk4=
-Date: Wed, 17 Dec 2025 11:43:07 -0800
-From: ssorensenroku <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1034329/000000-4fd06b@github.com>
-Subject: [bluez/bluez] c0d55b: doc: Sync default system parameter list with
- kernel
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hew+I054"
+Received: by mail-oo1-f66.google.com with SMTP id 006d021491bc7-657044fea68so540958eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 12:31:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766003459; x=1766608259; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=276aglpefDhpLEPLZE7zRE4d5cO5Al9QUAMMKwvtcs0=;
+        b=Hew+I054auq8FRUjW1MsFmGNKmsya2ndBSRik1xyU60CFkYOkNDAGatPvztepdHF4l
+         22hqdZkIBJOdAj3BcNqM1kzCZC1bRJ/lif0zzt3UjufMx9q2pE+Z/0eL3CwTjlcr/kpB
+         mEdKArV8Ypf+jojmCPphWlw6dQlutTwV/KMF0ByUfPS7C7Q70ktrJSAklO/e1pCORwYC
+         rQCWWEjw5I2uICysgh7mpXSb9c4iz3cPVYPkPx1jMptvuFpjmHZPNwudYHp+SYLAuoHo
+         i+dh6fxU3IWiviK07LTsvRTuhj+K4e9S5ALXV7QiE7foAG0vCB6VJlfp7SbSRlzaj4m5
+         CbUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766003459; x=1766608259;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=276aglpefDhpLEPLZE7zRE4d5cO5Al9QUAMMKwvtcs0=;
+        b=WafvUYC68Vsxg0ZcuyP1Sow1Ef3KrWpD+INc6WgZAVRSNn9Kam2ZFQTFL54Tv/fjPE
+         3a+UXOUSyB0Efr+lvGtCyU9lE8f1evB+OahzA+ZVM2zxakhockd3Ye4psx40LRpjHBlJ
+         WLKvjJ+FQZpBMKaVuO2KBJPNNCWzCqsowbju0yD+Pcy+mRX6JVifZ2tEofthAQfE3hNb
+         E9NFy9LuG5TzDfOmcnEL+fPVZ8O7svz/2pmNHzgex+SqvZ3uF6kKxeouoBsJ+7vBw/Hn
+         Rh7mTj3a/HzM/LNgyyZhz5vyfiJZWj86rWH4EnZYIN4cOwPwfqphvPk4EW7X8DdBsWhC
+         bxCQ==
+X-Gm-Message-State: AOJu0YyNCYbPAXwhPS0maE2OVYgppQPVCG73YTH08Co0H5ZgEYLVdP0r
+	kPsJTZw+4i6eUpGFdED4FCiCtZzktNVUw3ia4PwZRKIDIMqNwYSKHtPeJgsbVlTL
+X-Gm-Gg: AY/fxX6FEUUIiLmmrQbraESAU4eXzdInBKlKSqIicbVUwlk2DNIDvsEHMMDFb8/th4a
+	oM7IuMFDGpWJW1qrerdZaAhz31Js5tzUZohaKdymwQ+8s+6yJlKCp70RTf8zUTxIMfh3w4hyzSk
+	CgSpR5Q8r1hYTzTM7kRJzxtNS+jpK9fJ3xu6ehiYUrMuHWF9FY1UiHsucET9rGgtCUZj2XU3bT5
+	iUFT0PCs182mIDJITH08J7Tn1bsXyOPV41qkpwEMD+YpJ5jElRUq8wK+27XHAUSzgfWXAsS28fQ
+	oKPDM4NPtWJustTJB1AwaSCFzU3IeSEvcGlLfZ2devyf++4vCzlxPFX2vS2YeyBYoKx5gSc0qP8
+	xIuAEi9VCWm03Bf3mzpqavtNkjZRPkJBlymD7by0tRpRaDe1olXZECWrSdSjumhnuDfKeUDH1Mi
+	oPI317t8TRl+fd6ddd
+X-Google-Smtp-Source: AGHT+IEpuilg6LHO//z0bEhnTnPEgFmWhnQ5ccs9S59mA14ujSN0Xkg/0k5T5JwyYdIfyOrhef4bJw==
+X-Received: by 2002:a05:6820:810:b0:65c:f70e:ddb2 with SMTP id 006d021491bc7-65cfe6e6c63mr318937eaf.14.1766003458939;
+        Wed, 17 Dec 2025 12:30:58 -0800 (PST)
+Received: from [172.17.0.2] ([132.196.19.21])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3fa17cfe8a4sm287817fac.3.2025.12.17.12.30.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 12:30:58 -0800 (PST)
+Message-ID: <69431302.050a0220.90c2e.68d6@mx.google.com>
+Date: Wed, 17 Dec 2025 12:30:58 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0202044990207661489=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ssorensen@roku.com
+Subject: RE: [BlueZ,1/4] doc: Sync default system parameter list with kernel
+In-Reply-To: <20251217160256.441737-2-ssorensen@roku.com>
+References: <20251217160256.441737-2-ssorensen@roku.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1034329
-  Home:   https://github.com/bluez/bluez
-  Commit: c0d55bfbe5740fc4f17f3830aa6f0dea0790b3f2
-      https://github.com/bluez/bluez/commit/c0d55bfbe5740fc4f17f3830aa6f0=
-dea0790b3f2
-  Author: Stefan S=C3=B8rensen <ssorensen@roku.com>
-  Date:   2025-12-17 (Wed, 17 Dec 2025)
+--===============0202044990207661489==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M doc/mgmt.rst
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  doc: Sync default system parameter list with kernel
+Dear submitter,
 
-Add the LE interleave scan default system parameters that were never
-added to the documentation.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1034329
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.31 seconds
+GitLint                       PENDING   0.41 seconds
+BuildEll                      PASS      20.39 seconds
+BluezMake                     PASS      647.22 seconds
+MakeCheck                     PASS      22.03 seconds
+MakeDistcheck                 PASS      246.23 seconds
+CheckValgrind                 PASS      305.40 seconds
+CheckSmatch                   PASS      354.38 seconds
+bluezmakeextell               PASS      183.85 seconds
+IncrementalBuild              PENDING   0.33 seconds
+ScanBuild                     PASS      1052.98 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: 4fd06b817fa4859a918e686cb7ca0760f9bf52da
-      https://github.com/bluez/bluez/commit/4fd06b817fa4859a918e686cb7ca0=
-760f9bf52da
-  Author: Stefan S=C3=B8rensen <ssorensen@roku.com>
-  Date:   2025-12-17 (Wed, 17 Dec 2025)
 
-  Changed paths:
-    M src/adapter.c
-    M src/shared/mgmt.c
-    M src/shared/mgmt.h
-
-  Log Message:
-  -----------
-  adapter: Do not send empty default system parameter list
-
-If we have no default system parameters to set, bail out without
-sending the empty list to the kernel just to get an error back.
+---
+Regards,
+Linux Bluetooth
 
 
-Compare: https://github.com/bluez/bluez/compare/c0d55bfbe574%5E...4fd06b8=
-17fa4
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+--===============0202044990207661489==--
