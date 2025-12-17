@@ -1,33 +1,28 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61CAE56A;
-	Wed, 17 Dec 2025 12:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E4F354AF9;
+	Wed, 17 Dec 2025 14:15:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765974592; cv=none; b=S2/JK4t0G88AJlyK/jRQ9tokz65oCFaK0434ODy/wPfZjRd7gW44y2Jqn/0G1aQ6I+bLtbDgT9jkTXCLEUYXZWJn6iKK/VH6UE2p/EuEHzpyTL0AbaQCGO1FCgqRubCpW8L557JsfBErukN9IRHardUOC9RSJZBPc3unki3Zp2A=
+	t=1765980906; cv=none; b=Yy86bbuHUPDzhWCmh0DcZbwze3wMb9OTZsUQvdDVIQ0G7Le4PkhZDmZcD4GLj3L7Y5mhG6PT/zQYRqLU24fQ7K1nHUzsiBhZJt6SxS6l1deu/4qKwhS1kSOriAlDdYDaNGaXVKFXczj4TWzyaXn5XQppl3Dz6IazZuqBPQoBIHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765974592; c=relaxed/simple;
-	bh=MGtDqPULgyGcKOuGtBjEwy7VXqIIkfv7q0+QuhBXCqM=;
+	s=arc-20240116; t=1765980906; c=relaxed/simple;
+	bh=MEQ2EbCrYHXrNgo/n0tyR4WzPAtMaQBZltY3EmDm+4A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=si74KCjSXCicq6DkGiz6BTrpZm4egmNjV9RtPMBHEJoNJjhJ0GCzwWpDw2718/Cu9ay5jSv2FVj/24pMI1vcDP0KhgGhCma1K93RU1DC6V5r7syY3AwjaQVTpT8kwqsSfvnZpmuYjEp6Wyl6ScMoDLAe3jS+5pk8wcpdYR1BJ2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NTwWLBsO; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NTwWLBsO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49900C4CEF5;
-	Wed, 17 Dec 2025 12:29:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765974590;
-	bh=MGtDqPULgyGcKOuGtBjEwy7VXqIIkfv7q0+QuhBXCqM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NTwWLBsOEpGPWcL5ozeMr/uAxuabAPtsJU0FBPmgqzF83Gq17j6EzWascPqdtWWGb
-	 B3j+zNZc/D2m+py6mCpf+yNNa0PnxOFnh07Lg1QpoDRV27jE4QxWZxK8aFarck8kCF
-	 pfVDxcp9pRZIkG63bR9H3dFit+8S+43Bz/YJ3IaaR2ZMISqkEU2hX6sqEOWIIBcKqK
-	 lKp10xM8SWZonqn4H6iAQytU8MMuCMuybhVT1NeY5NSJg/Hcrl2EgjWXsItzwgNFDo
-	 x8pYGHygH7EmBWONf5uIzLxrtf35Qat4+UpMO2tbLCuLksw23lMJgWGSJU4PFlTzm2
-	 +jp3aQnOVJ0yw==
-Message-ID: <4bea23cc-68bf-4a78-981d-9798cc1668e8@kernel.org>
-Date: Wed, 17 Dec 2025 13:29:45 +0100
+	 In-Reply-To:Content-Type; b=CGauQOM3JdCRrbOlAGwnymSkRGKM8uF6Hkg3IdaTMUgSmSNnTUDQHLI5s1qw06xW12PlYkSBWolocer5AiZiyT41pGg/QeSogpQpLgoCCGD5UC7FyFG8ZFc923WkxIM/YfEoNIMEMOqT1gv8iTUY5wUaZi+khaRr7oXyOfjsNxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af75b.dynamic.kabel-deutschland.de [95.90.247.91])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4795661CC3FDB;
+	Wed, 17 Dec 2025 15:14:42 +0100 (CET)
+Message-ID: <d180711b-7957-4252-b34b-81312705555b@molgen.mpg.de>
+Date: Wed, 17 Dec 2025 15:14:40 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,85 +32,61 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/2] DT: add bindings for QCC2072 Add DT compatible string
  "qcom,qcc2072-bt" to yaml file.
-To: Vivek Kumar Sahu <vivesahu@qti.qualcomm.com>,
- Marcel Holtmann <marcel@holtmann.org>,
+To: Vivek Kumar Sahu <vivesahu@qti.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
  <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
  Conor Dooley <conor+dt@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>,
  Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>
-Cc: quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
- linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org
+ Rocky Liao <quic_rjliao@quicinc.com>, quic_mohamull@quicinc.com,
+ quic_hbandi@quicinc.com, linux-bluetooth@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org
 References: <20251217112850.520572-1-vivesahu@qti.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
- QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
- +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
- ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
- 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
- hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
- tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
- 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
- naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
- hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
- whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
- qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
- RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
- Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
- H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
- dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
- AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
- jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
- zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
- XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
+From: Paul Menzel <pmenzel@molgen.mpg.de>
 In-Reply-To: <20251217112850.520572-1-vivesahu@qti.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 17/12/2025 12:28, Vivek Kumar Sahu wrote:
+Dear Vivek,
+
+
+Thank you for your patch. The formatting is off, and the summary/title 
+(subject) has two statements – look yourself in the archive [1]. Also 
+the prefix seems wrong.
+
+Am 17.12.25 um 12:28 schrieb Vivek Kumar Sahu:
 > Signed-off-by: Vivek Kumar Sahu <vivesahu@qti.qualcomm.com>
+
+Please elaborate by giving more context, why it is compatible, and I’d 
+like to see how you tested this.
+
 > ---
->  .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml    | 1 +
->  1 file changed, 1 insertion(+)
+>   .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml    | 1 +
+>   1 file changed, 1 insertion(+)
 > 
 > diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
 > index 6353a336f382..197248d6f7b8 100644
 > --- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
 > +++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
 > @@ -28,6 +28,7 @@ properties:
->        - qcom,wcn6750-bt
->        - qcom,wcn6855-bt
->        - qcom,wcn7850-bt
+>         - qcom,wcn6750-bt
+>         - qcom,wcn6855-bt
+>         - qcom,wcn7850-bt
 > +      - qcom,qcc2072-bt
 
-This patch fails multiple basic contribution guidelines. Read
-instruction how to contribute to upstream and how proper patchset should
-look like.
+Lacking more lines, I am not certain, but I maybe this should be sorted.
 
-Best regards,
-Krzysztof
+>   
+>     enable-gpios:
+>       maxItems: 1
+
+
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://lore.kernel.org/all/20251217112850.520572-1-vivesahu@qti.qualcomm.com/
