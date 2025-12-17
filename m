@@ -1,133 +1,537 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2DF1D5ADE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 11:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E3D33DECA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 11:25:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765970456; cv=none; b=pl3Bn+K262PlXkB9g2bg7GqtzAlG2AhHoK3by0TWWj6SIQwvNEAigobv649Buotn7Bz3hahJlYC8TPhlKblKcfVKyW8Sw+o/OOrUYf47EG+0iZEvKOTxb3QES1WdJBX2aaedVp7wdxr2R6c7wVXt4CjfZbfWPAdTpV3MXP1/Q1A=
+	t=1765970749; cv=none; b=U9kc0ezMaculPp+lrszLUN3RhHfNBTC4tLTwS4EZfdBNviW0oKKkI04pv+zvDynTR2TYjs83eGUMXPwFl8nVDaVv58INr9GwkpDqitaZ1ilkI4pnnRYCgYJDZjmMaPwXCHpIUXyxdCwKvQpe2qSEAPPyV7qt5gDYNhlClAsEAQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765970456; c=relaxed/simple;
-	bh=ip0toTFqPEpK+4s0Rx5RGWhl8GI5wCxXBuwM4DUFaEw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fBXvoEG8oCCFhC8QCjR1FfznYnq72f6e7vWBDlzcDA2so4jDpZEW85HK0v7NExFThfGX4Rye0fP/9NtQgB3HRjyQ/LbJHByNCcywmtYdZ+3qz9JCYBiMaGZES3WxyeIkUXyqMoD8ScIh9OyRFPXS1Mk2TxkhuYQeITwemByxg88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=nfxyqgJf; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1765970749; c=relaxed/simple;
+	bh=+5c5QdWwlcUVTjo7CBbRtTPVRnnXzd/7Oq94EWphCt4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g4kJoh7ic9UEs3seBshyWB8L1CAmE7IqhYHTO2upJ5Kcgvvhwrsx6jJ10uWGI/P/WVqYhWeO6b+RGjkSEDBe+pVBZye6B4q+HE85rvUYt1kY270lMbpvdMwlbLHvtuNIVFYQGPWK9uJSgLVqH8bROxCaUMdc0lfzwha8eCsNctU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=O3gYfUxs; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=LUK+/Vqh; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="nfxyqgJf"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b713c7096f9so937434366b.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 03:20:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="O3gYfUxs";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="LUK+/Vqh"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BHAGdNF1872560
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 11:25:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=+nAihVvEo0dup82KcICFgWSmU1dOmxNkvIX
+	eDxCHr+k=; b=O3gYfUxsazVzVg6vI+bOD756CaR61dWS6tq3iB/RyW6+D/3OZJs
+	xc6/j+MrGkCbqyxQc8z5RiQSGvVgN8/KRk5D85EfIzCthOsW8YxJyFcbHSrd9vz3
+	m8DpDZcFW3/7u7mlPQguGEndcf9XsX1a84vlS79Btg7CCfPzThwLxXCmggBtA+Yb
+	4aU1fcYXNCU8K8KasNfaDzjN++lst1DQbtH/aOcpL5dVGzzf9/UURmUUIWEnaeM0
+	yjfABTJi24BRPSTJ+mJda90h7a3J+QQMmeoCLGdyvpSixmSwcJzdqfgOTsaYl7yD
+	dRScTvuNN8006aVM36HKDp/Vycd/BeIrEMg==
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4b3jgq9ruj-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 11:25:45 +0000 (GMT)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2a0d59f0198so52607265ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Dec 2025 03:25:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765970452; x=1766575252; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1765970745; x=1766575545; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jTcwQN3kMfRwn0MOtZPrgw4H2EwbAELatd4tH4NVBgE=;
-        b=nfxyqgJfJ4pzzrgHtYHETqzjh66mPvQ/nhgpribaGYsWlFIinJPeaRlzuEvEj+t3Pb
-         bZ9yXIPLSjOjRht3ARz7koHBI62JPiDkrkuhkW4ru0vVIH3t2UhOdzArs642sx8+tciT
-         XzhdogkPyMPnC094YTl1mEqQDE3tZ3tVMoTebjaFNfAjIf2RTSpJOSFeb+EuyOB8Gs91
-         EzYjwF5rOBt8AQqqG0ss6/cbzIMHPaBowfCgsN7aPDeeFA9jrbgkKOlL5DbfPW/Euba+
-         HInuinghHuyyK/KKWQ0drXBN2dt2pc/b2RuO1p8rielXTKsOTeeVz0yqaxHo+QP6tDmq
-         9jXw==
+        bh=+nAihVvEo0dup82KcICFgWSmU1dOmxNkvIXeDxCHr+k=;
+        b=LUK+/VqhRFN/m88rlZjtTiJMGg9lV1/C7FmCokYjUyMdM3dKd0Qc7XJ6Y0vR2POoja
+         DQSWpqyJypUxPJ7SBmuREtpqFkzdH6+f+UcZWv2wmvdmsLsXSU+d7DDr2ckLrrkxAQgM
+         jhvYKOQkkdhsf1d3ly+FHDXnpDorOq9xtnXNw25SP2+t2U43XaEmPy/rI6Vua+W4LXiM
+         APEx25t/ZtjF0HP3mHYayfjQLkH4+f5yAIXyrxoe731BfKbOn1EYjvlqV95A1ILNlcRY
+         +wOylL+EIrLTIUUxPBamrKPYDIICUj2O6QKG0htsEgWnBqK1qwJjfe2uotN88QFUD9b9
+         1+Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765970452; x=1766575252;
+        d=1e100.net; s=20230601; t=1765970745; x=1766575545;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jTcwQN3kMfRwn0MOtZPrgw4H2EwbAELatd4tH4NVBgE=;
-        b=o4FDOb2G50+I4wYTzTbp3GkRXMs7aojsUcJOxVTTqmTEJ9H0H+MZkk9S/7jPgoKMva
-         fPdd38m6kgHfQOqUjXpi/QW5kS/VIJKAe7VHVCB0hUSdb4DifuKzB/RU8z1zy8+6T/hc
-         1AeqIcA41HCqshcsGHTNPgjEky0QIi1xAWtoNsJLlVHSVq7W1MSLYcSqpgutiOqtEiQg
-         6aN4mEd9r4mCojUTmVKoxAsaYkKc4b+vVqq8HG5tkYzWWOHpagA4fRvR268eZAa2tAt+
-         gLSaKF+CTQ6K4AE8EokMMo0vMEVDZwtrKjorm4WMzuWDzS8DpgoUq4Bf0htHIxa9nkxA
-         xWHQ==
-X-Gm-Message-State: AOJu0YxmQU34f66WrwVBt12P+RSm0PEG04S48I0TPhg/SIRKGBs3vrxY
-	WqYHxPNu8zs0qRvbtX5A2afhq74DIVx7fLKP095kQs2lqanN8YRcVuFhqLJiTPVriJw=
-X-Gm-Gg: AY/fxX4PFPRCBymiWpVqnVlyowV41V3P3bF2iT+9i7jnggZgS3kV4PClPzzOniFXPRk
-	eZM5V8kd8o5D1XT5PzlbQ8H7WNj7hb6f259tWkcnvKOR/wJbk0uyXA7uwAXOAIelQbiFkS+audW
-	unnIcUrAQRBujs8r8LCBDthvfSvPSMIgO74OZsStyo12DYMJk0NhVrcWYEWFi6+gli86yJx5w37
-	SBIMmVBqSSAgZbPZO+7+69KEMc9CKYHcr9aRQI6qwQ5Xr7clMTGWzUfYU19F9K07aIrVX9vszUN
-	FiFf1sWqcjLLXV2v6ss7baTsSPbNg+Dkc/BrVt0s1YUEtEegy2udQhAexuB0kklOvSYAporelng
-	SfEB7qDavVaCU2/IHdvTz4G05o10I7SKkZWf8hWCAnAh0UXqJjDxmAhtJ+sybPbPvJbXOGeNopB
-	fCq/7gRCgDa15zW8s1s/MJOzZd9ls=
-X-Google-Smtp-Source: AGHT+IEagpbs4HyNCpsx7OlTFhT0q9uoh62JevUfquHGVnwzeKSmc61VVn5TagHQj0mzzpbxTuoklg==
-X-Received: by 2002:a17:907:bb49:b0:b7f:eb45:f572 with SMTP id a640c23a62f3a-b7feb45f993mr603953966b.55.1765970452008;
-        Wed, 17 Dec 2025 03:20:52 -0800 (PST)
-Received: from localhost ([2a02:8071:b783:6940:1d24:d58d:2b65:c291])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b7ff725efd8sm417291266b.27.2025.12.17.03.20.51
+        bh=+nAihVvEo0dup82KcICFgWSmU1dOmxNkvIXeDxCHr+k=;
+        b=ODT+b9v5/UZfH+XbY1mBqlL5xxE7cCwy6cXvlUgiZWbKEOooPVYfE+Ug6YGY+aNSgc
+         bgOzZ5jdEVIco0pnZkDsj5Xc8JD4FW70Xn0279gM4UWiSWQ44v0AUfXN/npOxwC9UKq4
+         u63DUhZoit7GxIH2zA0a0v+H5daNxWLQMe22d/+I6+xaoZnTVJH9WuMBxRgXj9DpzN75
+         mE9peAgaAqI8/yOkjsA3b+NxrdYAID4DzRBHgcjY09WQvb6lRHSaQEmgHmOhsi2Ub24B
+         Q+/vowkQxgLLKwMqvyFFFsae9GNzpzkSrI0zXRxZ+7jlASvEEpg2ZIh7CsTzRu04J8B7
+         UW9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUMqrOSBaedJAZPJUFZT0cPeB7ABDKaMaH2cw3Gp/4HOBd+R3UJKi0hiOHWG94CbO11nF6NTNKgJDDHVOiCjIE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1b0gxFbccCebyIP8/IL5wqlh1QtFZCaTunzOoM4q/HrNmmQxY
+	c+wZs7f5uUYJwM+5qLCVB/ANeZpykksT6uIXQ3lgWtAy84rQ0Vd2+re/DqH4ZvEwt/IN+guiMKy
+	0SrpKUrrK18aCHzXPay4ZGH+wt7Dj0eT/XeQ21FAW/AC1a6Hf/MGynp6oWwjVqWmv1PXm34w=
+X-Gm-Gg: AY/fxX7QkXoR0V7pYoIUfLFxMu65ddw+PlYfel1iU92rlN4+eo950FgB69glbwQY9lb
+	jPjQ/UNDMJ30nWbe4DV6FAwpBLiKMsfLecAeGPxNNmCnkbRWa66cn+8E5ifSO4P2/dJqHVI9iwS
+	ee4tO2B5v5i0KxtOlsn3N1i1R5Fd6t449DGfBk4O7r7NCFm8Wk+Y1HktJEe6uQ/Bn13ChYyNDOo
+	8SFrpHOfvmq1ntDOpROgqsPdytdN3LhPFrNJZK4SU+YGMwrEGDsaT2+aBQpby61oWZp9evpAMp0
+	lUnYF7XamLlzViuFanHVCfVQU1iaV+kcr6vu6K+kh3VvXc0dHZl7ZyDcHwLNU24huma+HwmVatv
+	0Hc1pDWpRmdc6iBKF3UHFOSKGEaEyvaEPVnAg1gk=
+X-Received: by 2002:a17:903:3204:b0:29f:1bf:6424 with SMTP id d9443c01a7336-29f23b513c9mr168241855ad.18.1765970744481;
+        Wed, 17 Dec 2025 03:25:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGd+oPMn3IehR/bwCusj1EZhovu8fgRn66M/mxR+nhn0kQmyT+u2YAblNrUDvtgKs9VRLgKlA==
+X-Received: by 2002:a17:903:3204:b0:29f:1bf:6424 with SMTP id d9443c01a7336-29f23b513c9mr168241575ad.18.1765970743882;
+        Wed, 17 Dec 2025 03:25:43 -0800 (PST)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29eea03fa7bsm199097065ad.68.2025.12.17.03.25.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 03:20:51 -0800 (PST)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+        Wed, 17 Dec 2025 03:25:43 -0800 (PST)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH] Bluetooth: btmtksdio: Use pm_ptr instead of #ifdef CONFIG_PM
-Date: Wed, 17 Dec 2025 12:20:33 +0100
-Message-ID: <20251217112033.3309281-3-u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: anubhavg@qti.qualcomm.com, mohamull@qti.qualcomm.com,
+        hbandi@qti.qualcomm.com, Simon Horman <horms@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH v2] Bluetooth: hci_sync: Add LE Channel Sounding HCI Command/event structures
+Date: Wed, 17 Dec 2025 16:55:23 +0530
+Message-Id: <20251217112523.2671279-1-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1398; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=ip0toTFqPEpK+4s0Rx5RGWhl8GI5wCxXBuwM4DUFaEw=; b=kA0DAAoBj4D7WH0S/k4ByyZiAGlCkgGiATO5RL0sh3KYGWs49kKJWdWd4V/InvAHNjCL/KJfD okBMwQAAQoAHRYhBD+BrGk6eh5Zia3+04+A+1h9Ev5OBQJpQpIBAAoJEI+A+1h9Ev5O0cUH/Aoc wZfGf5D7k2Y3xp+Eq2OKaDjC4SdZdn1wPRyKoxuxJ6Tw777evLx2xaxOJa8gtNq3XXkl1d5ytJb wVedpUMeon8lBhvLxJIQnb5LneH9ERGhyVon+g65nMM/ncWgUyT+mQx9vl3gF/6wa1uz9rJUB8E iio65wqGEYu8Q7cWuo2o8sf62CaSimzLrnFiwIbD5k156AgQJIbnBB6+bahGKu1Cmebl6ZtC6CQ 1a3CoPsf+je0wTNPMlCc3Ze1MxMrEJ2spZdTy/SbYZQIG8OuMf/BsLcjij9wWnmYSQ8fcKxhOhU V130qUndlr9XefXvOApYyIOHzdPIUJjQkSphjic=
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=VLjQXtPX c=1 sm=1 tr=0 ts=69429339 cx=c_pps
+ a=IZJwPbhc+fLeJZngyXXI0A==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=EUspDBNiAAAA:8 a=9yJRpJph0W-_3QfB-SUA:9 a=uG9DUKGECoFWVXl0Dc02:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE3MDA5MCBTYWx0ZWRfX0uuEIsn0BUkx
+ PjZImLfpXprmpzZm11iRYX4rmk8MLI4zhfbrlnUf+i/lyjrIaktweIt8tPgzCnUaFWpSfuhumER
+ 2ivFIi27WKWz712DhEeVJGxxHD4sV4aaxbc/io0G/HEX2jcXIfPck8V7YOjZiIBxjjeqUhGWc+J
+ BcgZUzQQ8lXTwU0Vv0SGEvPYp1ayC59DIo1xocJVnXw5yl3tdaYTqaULAinCupoQGlw/JxcIZIa
+ qKpDxnnLmjcF2dF2jCphuO0XcDsbgwc4ZH8kY3hxvSeGzA7tCrGUJc+8Xr8Min+DNwIc+uoDjab
+ oxwZlpE8GoDo3SBz8DYH9cm7XHvZMvTH3fEFd/NFwZGI7MaTkZMJG+PFiIlL0LPB8RC8GjbOzDE
+ h/883y6xUsjzsPHmONqr06xqYIB1QA==
+X-Proofpoint-ORIG-GUID: K561kN5Oi3u2YLp66NLjrH68ywXxU-he
+X-Proofpoint-GUID: K561kN5Oi3u2YLp66NLjrH68ywXxU-he
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-17_01,2025-12-16_05,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 adultscore=0 suspectscore=0 bulkscore=0 malwarescore=0
+ priorityscore=1501 impostorscore=0 clxscore=1015 lowpriorityscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2512170090
 
-This increases build coverage and allows to drop an #ifdef.
+1. Implement LE Event Mask to include events required for
+   LE Channel Sounding
+2. Enable Channel Sounding feature bit in the
+   LE Host Supported Features command
+3. Define HCI command and event structures necessary for
+   LE Channel Sounding functionality
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+Signed-off-by: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 ---
-Hello,
+ include/net/bluetooth/hci.h      | 323 +++++++++++++++++++++++++++++++
+ include/net/bluetooth/hci_core.h |   6 +
+ net/bluetooth/hci_sync.c         |  15 ++
+ 3 files changed, 344 insertions(+)
 
-I found the patch opportunity while looking in this driver for a different
-reason.
-
-Best regards
-Uwe
-
- drivers/bluetooth/btmtksdio.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
-
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index fba3ab6d30a5..e986e5af51ae 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -1472,7 +1472,6 @@ static void btmtksdio_remove(struct sdio_func *func)
- 	hci_free_dev(hdev);
- }
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index a27cd3626b87..f860dc4545e8 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -654,6 +654,8 @@ enum {
+ #define HCI_LE_ISO_BROADCASTER		0x40
+ #define HCI_LE_ISO_SYNC_RECEIVER	0x80
+ #define HCI_LE_LL_EXT_FEATURE		0x80
++#define HCI_LE_CHANNEL_SOUNDING		0x40
++#define HCI_LE_CHANNEL_SOUNDING_HOST	0x80
  
--#ifdef CONFIG_PM
- static int btmtksdio_runtime_suspend(struct device *dev)
- {
- 	struct sdio_func *func = dev_to_sdio_func(dev);
-@@ -1542,18 +1541,13 @@ static const struct dev_pm_ops btmtksdio_pm_ops = {
- 	RUNTIME_PM_OPS(btmtksdio_runtime_suspend, btmtksdio_runtime_resume, NULL)
- };
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+@@ -2269,6 +2271,204 @@ struct hci_cp_le_read_all_remote_features {
+ 	__u8	 pages;
+ } __packed;
  
--#define BTMTKSDIO_PM_OPS (&btmtksdio_pm_ops)
--#else	/* CONFIG_PM */
--#define BTMTKSDIO_PM_OPS NULL
--#endif	/* CONFIG_PM */
--
- static struct sdio_driver btmtksdio_driver = {
- 	.name		= "btmtksdio",
- 	.probe		= btmtksdio_probe,
- 	.remove		= btmtksdio_remove,
- 	.id_table	= btmtksdio_table,
- 	.drv = {
--		.pm = BTMTKSDIO_PM_OPS,
-+		.pm = pm_ptr(&btmtksdio_pm_ops),
++/* Channel Sounding Commands */
++#define HCI_OP_LE_CS_RD_LOCAL_SUPP_CAP	0x2089
++struct hci_rp_le_cs_rd_local_supp_cap {
++	__u8	status;
++	__u8	num_config_supported;
++	__le16	max_consecutive_procedures_supported;
++	__u8	num_antennas_supported;
++	__u8	max_antenna_paths_supported;
++	__u8	roles_supported;
++	__u8	modes_supported;
++	__u8	rtt_capability;
++	__u8	rtt_aa_only_n;
++	__u8	rtt_sounding_n;
++	__u8	rtt_random_payload_n;
++	__le16	nadm_sounding_capability;
++	__le16	nadm_random_capability;
++	__u8	cs_sync_phys_supported;
++	__le16	subfeatures_supported;
++	__le16	t_ip1_times_supported;
++	__le16	t_ip2_times_supported;
++	__le16	t_fcs_times_supported;
++	__le16	t_pm_times_supported;
++	__u8	t_sw_time_supported;
++	__u8	tx_snr_capability;
++} __packed;
++
++#define HCI_OP_LE_CS_RD_RMT_SUPP_CAP		0x208A
++struct hci_cp_le_cs_rd_local_supp_cap {
++	__le16	handle;
++} __packed;
++
++#define HCI_OP_LE_CS_WR_CACHED_RMT_SUPP_CAP	0x208B
++struct hci_cp_le_cs_wr_cached_rmt_supp_cap {
++	__le16	handle;
++	__u8	num_config_supported;
++	__le16	max_consecutive_procedures_supported;
++	__u8	num_antennas_supported;
++	__u8	max_antenna_paths_supported;
++	__u8	roles_supported;
++	__u8	modes_supported;
++	__u8	rtt_capability;
++	__u8	rtt_aa_only_n;
++	__u8	rtt_sounding_n;
++	__u8	rtt_random_payload_n;
++	__le16	nadm_sounding_capability;
++	__le16	nadm_random_capability;
++	__u8	cs_sync_phys_supported;
++	__le16	subfeatures_supported;
++	__le16	t_ip1_times_supported;
++	__le16	t_ip2_times_supported;
++	__le16	t_fcs_times_supported;
++	__le16	t_pm_times_supported;
++	__u8	t_sw_time_supported;
++	__u8	tx_snr_capability;
++} __packed;
++
++struct hci_rp_le_cs_wr_cached_rmt_supp_cap {
++	__u8	status;
++	__le16	handle;
++} __packed;
++
++#define HCI_OP_LE_CS_SEC_ENABLE			0x208C
++struct hci_cp_le_cs_sec_enable {
++	__le16	handle;
++} __packed;
++
++#define HCI_OP_LE_CS_SET_DEFAULT_SETTINGS	0x208D
++struct hci_cp_le_cs_set_default_settings {
++	__le16	handle;
++	__u8	role_enable;
++	__u8	cs_sync_ant_sel;
++	__s8	max_tx_power;
++} __packed;
++
++struct hci_rp_le_cs_set_default_settings {
++	__u8	status;
++	__le16	handle;
++} __packed;
++
++#define HCI_OP_LE_CS_RD_RMT_FAE_TABLE		0x208E
++struct hci_cp_le_cs_rd_rmt_fae_table {
++	__le16	handle;
++} __packed;
++
++#define HCI_OP_LE_CS_WR_CACHED_RMT_FAE_TABLE	0x208F
++struct hci_cp_le_cs_wr_rmt_cached_fae_table {
++	__le16	handle;
++	__u8	remote_fae_table[72];
++} __packed;
++
++struct hci_rp_le_cs_wr_rmt_cached_fae_table {
++	__u8	status;
++	__le16	handle;
++} __packed;
++
++#define HCI_OP_LE_CS_CREATE_CONFIG		0x2090
++struct hci_cp_le_cs_create_config {
++	__le16	handle;
++	__u8	config_id;
++	__u8	create_context;
++	__u8	main_mode_type;
++	__u8	sub_mode_type;
++	__u8	min_main_mode_steps;
++	__u8	max_main_mode_steps;
++	__u8	main_mode_repetition;
++	__u8	mode_0_steps;
++	__u8	role;
++	__u8	rtt_type;
++	__u8	cs_sync_phy;
++	__u8	channel_map[10];
++	__u8	channel_map_repetition;
++	__u8	channel_selection_type;
++	__u8	ch3c_shape;
++	__u8	ch3c_jump;
++	__u8	reserved;
++} __packed;
++
++#define HCI_OP_LE_CS_REMOVE_CONFIG		0x2091
++struct hci_cp_le_cs_remove_config {
++	__le16	handle;
++	__u8	config_id;
++} __packed;
++
++#define HCI_OP_LE_CS_SET_CH_CLASSIFICATION	0x2092
++struct hci_cp_le_cs_set_ch_classification {
++	__u8	ch_classification[10];
++} __packed;
++
++struct hci_rp_le_cs_set_ch_classification {
++	__u8	status;
++} __packed;
++
++#define HCI_OP_LE_CS_SET_PROC_PARAM		0x2093
++struct hci_cp_le_cs_set_proc_param {
++	__le16	handle;
++	__u8	config_id;
++	__le16	max_procedure_len;
++	__le16	min_procedure_interval;
++	__le16	max_procedure_interval;
++	__le16	max_procedure_count;
++	__u8	min_subevent_len[3];
++	__u8	max_subevent_len[3];
++	__u8	tone_antenna_config_selection;
++	__u8	phy;
++	__u8	tx_power_delta;
++	__u8	preferred_peer_antenna;
++	__u8	snr_control_initiator;
++	__u8	snr_control_reflector;
++} __packed;
++
++struct hci_rp_le_cs_set_proc_param {
++	__u8	status;
++	__le16	handle;
++} __packed;
++
++#define HCI_OP_LE_CS_SET_PROC_ENABLE		0x2094
++struct hci_cp_le_cs_set_proc_enable {
++	__le16	handle;
++	__u8	config_id;
++	__u8	enable;
++} __packed;
++
++#define HCI_OP_LE_CS_TEST			0x2095
++struct hci_cp_le_cs_test {
++	__u8	main_mode_type;
++	__u8	sub_mode_type;
++	__u8	main_mode_repetition;
++	__u8	mode_0_steps;
++	__u8	role;
++	__u8	rtt_type;
++	__u8	cs_sync_phy;
++	__u8	cs_sync_antenna_selection;
++	__u8	subevent_len[3];
++	__le16	subevent_interval;
++	__u8	max_num_subevents;
++	__u8	transmit_power_level;
++	__u8	t_ip1_time;
++	__u8	t_ip2_time;
++	__u8	t_fcs_time;
++	__u8	t_pm_time;
++	__u8	t_sw_time;
++	__u8	tone_antenna_config_selection;
++	__u8	reserved;
++	__u8	snr_control_initiator;
++	__u8	snr_control_reflector;
++	__le16	drbg_nonce;
++	__u8	channel_map_repetition;
++	__le16	override_config;
++	__u8	override_parameters_length;
++	__u8	override_parameters_data[];
++} __packed;
++
++struct hci_rp_le_cs_test {
++	__u8	status;
++} __packed;
++
++#define HCI_OP_LE_CS_TEST_END			0x2096
++
+ /* ---- HCI Events ---- */
+ struct hci_ev_status {
+ 	__u8    status;
+@@ -2960,6 +3160,129 @@ struct hci_evt_le_read_all_remote_features_complete {
+ 	__u8    features[248];
+ } __packed;
+ 
++/* Channel Sounding Events */
++#define HCI_EVT_LE_CS_READ_RMT_SUPP_CAP_COMPLETE	0x2C
++struct hci_evt_le_cs_read_rmt_supp_cap_complete {
++	__u8	status;
++	__le16	handle;
++	__u8	num_configs_supp;
++	__le16	max_consec_proc_supp;
++	__u8	num_ant_supp;
++	__u8	max_ant_path_supp;
++	__u8	roles_supp;
++	__u8	modes_supp;
++	__u8	rtt_cap;
++	__u8	rtt_aa_only_n;
++	__u8	rtt_sounding_n;
++	__u8	rtt_rand_payload_n;
++	__le16	nadm_sounding_cap;
++	__le16	nadm_rand_cap;
++	__u8	cs_sync_phys_supp;
++	__le16	sub_feat_supp;
++	__le16	t_ip1_times_supp;
++	__le16	t_ip2_times_supp;
++	__le16	t_fcs_times_supp;
++	__le16	t_pm_times_supp;
++	__u8	t_sw_times_supp;
++	__u8	tx_snr_cap;
++} __packed;
++
++#define HCI_EVT_LE_CS_READ_RMT_FAE_TABLE_COMPLETE	0x2D
++struct hci_evt_le_cs_read_rmt_fae_table_complete {
++	__u8	status;
++	__le16	handle;
++	__u8	remote_fae_table[72];
++} __packed;
++
++#define HCI_EVT_LE_CS_SECURITY_ENABLE_COMPLETE		0x2E
++struct hci_evt_le_cs_security_enable_complete {
++	__u8	status;
++	__le16	handle;
++} __packed;
++
++#define HCI_EVT_LE_CS_CONFIG_COMPLETE			0x2F
++struct hci_evt_le_cs_config_complete {
++	__u8	status;
++	__le16	handle;
++	__u8	config_id;
++	__u8	action;
++	__u8	main_mode_type;
++	__u8	sub_mode_type;
++	__u8	min_main_mode_steps;
++	__u8	max_main_mode_steps;
++	__u8	main_mode_rep;
++	__u8	mode_0_steps;
++	__u8	role;
++	__u8	rtt_type;
++	__u8	cs_sync_phy;
++	__u8	channel_map[10];
++	__u8	channel_map_rep;
++	__u8	channel_sel_type;
++	__u8	ch3c_shape;
++	__u8	ch3c_jump;
++	__u8	reserved;
++	__u8	t_ip1_time;
++	__u8	t_ip2_time;
++	__u8	t_fcs_time;
++	__u8	t_pm_time;
++} __packed;
++
++#define HCI_EVT_LE_CS_PROCEDURE_ENABLE_COMPLETE		0x30
++struct hci_evt_le_cs_procedure_enable_complete {
++	__u8	status;
++	__le16	handle;
++	__u8	config_id;
++	__u8	state;
++	__u8	tone_ant_config_sel;
++	__s8	sel_tx_pwr;
++	__u8	sub_evt_len[3];
++	__u8	sub_evts_per_evt;
++	__le16	sub_evt_intrvl;
++	__le16	evt_intrvl;
++	__le16	proc_intrvl;
++	__le16	proc_counter;
++	__le16	max_proc_len;
++} __packed;
++
++#define HCI_EVT_LE_CS_SUBEVENT_RESULT			0x31
++struct hci_evt_le_cs_subevent_result {
++	__le16	handle;
++	__u8	config_id;
++	__le16	start_acl_conn_evt_counter;
++	__le16	proc_counter;
++	__le16	freq_comp;
++	__u8	ref_pwr_lvl;
++	__u8	proc_done_status;
++	__u8	subevt_done_status;
++	__u8	abort_reason;
++	__u8	num_ant_paths;
++	__u8	num_steps_reported;
++	__u8	step_mode[0]; /* depends on num_steps_reported */
++	__u8	step_channel[0]; /* depends on num_steps_reported */
++	__u8	step_data_length[0]; /* depends on num_steps_reported */
++	__u8	step_data[0]; /* depends on num_steps_reported */
++} __packed;
++
++#define HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE		0x32
++struct hci_evt_le_cs_subevent_result_continue {
++	__le16	handle;
++	__u8	config_id;
++	__u8	proc_done_status;
++	__u8	subevt_done_status;
++	__u8	abort_reason;
++	__u8	num_ant_paths;
++	__u8	num_steps_reported;
++	__u8	step_mode[0]; /* depends on num_steps_reported */
++	__u8	step_channel[0]; /* depends on num_steps_reported */
++	__u8	step_data_length[0]; /* depends on num_steps_reported */
++	__u8	step_data[0]; /* depends on num_steps_reported */
++} __packed;
++
++#define HCI_EVT_LE_CS_TEST_END_COMPLETE			0x33
++struct hci_evt_le_cs_test_end_complete {
++	__u8	status;
++} __packed;
++
+ #define HCI_EV_VENDOR			0xff
+ 
+ /* Internal events generated by Bluetooth stack */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4263e71a23ef..df7375fda425 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -2071,6 +2071,12 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define ll_ext_feature_capable(dev) \
+ 	((dev)->le_features[7] & HCI_LE_LL_EXT_FEATURE)
+ 
++/* Channel sounding support */
++#define le_cs_capable(dev) \
++	(((dev)->le_features[5] & HCI_LE_CHANNEL_SOUNDING))
++#define le_cs_host_capable(dev) \
++	(((dev)->le_features[5] & HCI_LE_CHANNEL_SOUNDING_HOST))
++
+ #define mws_transport_config_capable(dev) (((dev)->commands[30] & 0x08) && \
+ 	(!hci_test_quirk((dev), HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG)))
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index a9f5b1a68356..64e59d230d16 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4427,6 +4427,17 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
+ 		events[4] |= 0x02;	/* LE BIG Info Advertising Report */
  	}
- };
  
-
-base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
++	if (le_cs_capable(hdev)) {
++		/* Channel Sounding events */
++		events[5] |= 0x08;	/* LE CS Read Remote Supported Cap Complete event */
++		events[5] |= 0x10;	/* LE CS Read Remote FAE Table Complete event */
++		events[5] |= 0x20;	/* LE CS Security Enable Complete event */
++		events[5] |= 0x40;	/* LE CS Config Complete event */
++		events[5] |= 0x80;	/* LE CS Procedure Enable Complete event */
++		events[6] |= 0x01;	/* LE CS Subevent Result event */
++		events[6] |= 0x02;	/* LE CS Subevent Result Continue event */
++		events[6] |= 0x04;	/* LE CS Test End Complete event */
++	}
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EVENT_MASK,
+ 				     sizeof(events), events, HCI_CMD_TIMEOUT);
+ }
+@@ -4572,6 +4583,10 @@ static int hci_le_set_host_feature_sync(struct hci_dev *hdev)
+ 	cp.bit_number = 32;
+ 	cp.bit_value = iso_enabled(hdev) ? 0x01 : 0x00;
+ 
++	/* Channel Sounding (Host Support) */
++	cp.bit_number = 47;
++	cp.bit_value = le_cs_capable(hdev) ? 0x01 : 0x00;
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_HOST_FEATURE,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
 -- 
-2.47.3
-
