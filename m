@@ -1,62 +1,58 @@
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11021104.outbound.protection.outlook.com [52.101.52.104])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020137.outbound.protection.outlook.com [52.101.46.137])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48A4136349
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 07:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F68132D7D5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 12:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.137
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766043711; cv=fail; b=I0INNVuNRWqCyw4HCwdx83lKh9zHWwCZP/8whEaySz2ZZnQwrJqjGEiTjIPG3r5ZuEr4V8poVj7a/Zgm5XKwH+O5YezYzkLbwCjHccfQrW5FlERMKtjJb5Fog14r7hGPAXtjfmIexHyblHTBBSBlBx2DgGVyqHnlYZ93WjJBAIg=
+	t=1766059763; cv=fail; b=a4ZZIu5S1yjopw8e47ArNWcj8FoV0YT60C/6kKz3eUsWJky6Odtq13UIbdLzM8vQ8yxXhzPrHjiGQ1UMkFDeQPqURzs5NLO/QWLt7S23yjkZL86pgd1jzbpeRXucd5gdiNOC1S1JOLCeGoy7qo3+M4HexrJpSENS1XnH8I21ur0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766043711; c=relaxed/simple;
-	bh=kBzrlLedGInYepbpprr5+merKJTab1mWagxD19AuqV4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=AVeJBikie1cdPhMOQbw+a6z/mwwdbw1UG5A6DpMHz8TxZwJMK7BnJBJcao/9ABWfyC0blsNQgJqKcA3OKMEzXvsS0R3CJxFceiKeZxuUsrSGJ10o3nk8MXUwYcQOCsdF2UAOC+wMtba9EalL+IvmFOVTF24p/FAp0s2t+qFlxz8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=roku.com; spf=pass smtp.mailfrom=roku.com; dkim=pass (2048-bit key) header.d=roku.com header.i=@roku.com header.b=3aC1LD4H; arc=fail smtp.client-ip=52.101.52.104
+	s=arc-20240116; t=1766059763; c=relaxed/simple;
+	bh=dbOcnya+IpldqTSuuMo7O/9ZwTrEmxIOoDKy4SZbNTs=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Ch9hQY5GZGiXvc2cLnWYZNRg9ASMXeSjzvQx+egjWgPPNMMWYSnXwAhEOXt2cSYRqJPC/Me429rbqKLs9eg7Cg98IFrXIilXhhyLDCoO67zoJNJu+pm2VRVaL+9gMhWt3HJHxFVVOzJ/ht2njHRh4/Usdq1kHWMKT+YRY9NF1iM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=roku.com; spf=pass smtp.mailfrom=roku.com; dkim=pass (2048-bit key) header.d=roku.com header.i=@roku.com header.b=s/W/7gr7; arc=fail smtp.client-ip=52.101.46.137
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=roku.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=roku.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=roku.com header.i=@roku.com header.b="3aC1LD4H"
-Received: from PH7PR01MB8665.prod.exchangelabs.com (2603:10b6:510:30d::20) by
- CY1PR01MB9337.prod.exchangelabs.com (2603:10b6:930:107::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9434.6; Thu, 18 Dec 2025 03:06:39 +0000
+	dkim=pass (2048-bit key) header.d=roku.com header.i=@roku.com header.b="s/W/7gr7"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mHnuMwFscizUgu/V1j1SyNjbbYkMqDj3nyRl5zZWorP05wT0Pb5rDs2GOvYdIYZp6FLIdPtlG3fQK+nGDdbmqeQsqZ5rxKGdrG7NIqbBcw4vsl29tVrN2/5f/GWmPZVC6ueVHIdSZ5jVKMNWMV3dkIEyqemgQTMaxIBSKdCXGLErd+Bmekaib5QmoF5m2ozKKBkFRmW0Hke+TkTfK/4C+WvmMsJINKDl3G6v9slLAOmid5R+yd6SzkXyEVUrwgbuNPAshRsDJO2jirWEVKvqsLbvutLnanN9DwXWIZ2J/57yrV7aIgk0wAdXRWvGuG6E64401xKxMMtWeU1nMufHrw==
+ b=H9lgqsIJovR8ynkLjgS63wcstQpSKITYQ+7qkYtqXAuopdvyPvXiHi5ObK7PmzXmxLIOnz8WkJ/JfSFi0QIEUfcRZpYmETIkDUKBnycm69q0uXVH6ypggHAnwfv89dIVDylykMJ1DKVOI9ITpY/sFdHz6ytNkuoePx9AmwV9HFhi8qCxTG/v+GArKRI1FakMul8CHjssOvllyITveucoPk1cmZ3BxSlFzvrU+E+jimU70OOXvft8XBdoRW3L/jF05sTzn/F/LpKyqqLAUgWET2vxJVozVHoQc6Bt/YRNXSHYwC76MLV0DgdyNFkFYYal6en9w8T/A/pBF+YwEFEhoA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ky0wTESARTywaf9d53MhogVjZBzzk8tT7c/rVcmtqss=;
- b=H2nvpLDImtjECzI2nKh/vXgoqwlyFdVV92JV4o3RilQK2cfyz1bti5sm3w1KfcHPpcW9477b2nztHpv5t/wBtEagnOcwiYacpYP2/NKSvNh3gxvwVNW/Kus36d5oqV3+R9ZuoTqDRzpMeRmR6nCP2pH/grzBFOqY2h3jELZNvilkWdJOgyvkZoSod3baA9KnOOsNFOZ5wRJmhsg6sc0aZLL/r62/zw2LM2y5/7cmlLTxT0IOdYk8SOxGLCulvPcS0JhEA0gUlfoxzwutG00ULbdR6mcqR6XkvLqbBLHwi3GK3GiNVawleFW3znI9Uu6AouECymEpk7EFxBDSqYWxRA==
+ bh=tWa4zk79VNkU0s1RE0EVoAEm5RlHsL9NZ4k+iX66iT0=;
+ b=EzCUC7+KwlMpB2ZRdKFSIur0RtvmlRHrgxbQ2e4AaG6qEuZTC7NEeFJ+pM7CV9xv3ZTTK9jO5W7z9M+iUUDE3yem2FEXkiSm0Nwbw5WBXF82htMXAw3ZJUdco1rIWGt7M8AGWOWBoCwadvCU2EWDtpq9pgzCG3XvL5Tr50+O+DYFMe9ijuD1aX2x3mY/HygQu6TdEWnEmvfzO+BNfCm7zUjQgDoHnOd9QtqlBkDHHtttbocrgUqMsg3GZkl+IYkAGlaY337f99RTyCfyIhy3ZWBPVUXPCNLG0GN86qNV2a2DaEOSSprKS/1+CLJwXsKwqt0seWCIKqJHBMs2gnFXTg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=roku.com; dmarc=pass action=none header.from=roku.com;
  dkim=pass header.d=roku.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=roku.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ky0wTESARTywaf9d53MhogVjZBzzk8tT7c/rVcmtqss=;
- b=3aC1LD4HOoh0SCIFYFWDdZqvggaLCHD2C5Xft7y8I02eKUF7GgG+JWnr84m2qJ96mQ+3GzUdBmm9mD/6RmDrPZryWVDZoHsKYa+rMw3/fMCkAD+6VJNx3p1mWT2mteJwFqYV9KBGOxR5fEVz6WNYwKdl4I/DFTlXKhCQBIy8PHKqES12ufWghztVUptxtbGZtcVBc1UstwVPkWYaCWWd4KEyCM5zcDL3+PHInR08J+4gVLXAghfpoHJTh0altEAPRaNt+FRdPEc+aPq7q/2ji3OgrihtkEu85eyE5h+FAOBbZ2TjH6tCktvN/gdlmNeY5GX2Ze2nt2xbrSQ8o1NH0A==
+ bh=tWa4zk79VNkU0s1RE0EVoAEm5RlHsL9NZ4k+iX66iT0=;
+ b=s/W/7gr7BRJBU4zhffE3BqO948qgQIFVoP2hlBXIbUfEkiHT79xn9ODrdUHQgF496n1vQJrvWgo37jYdGmnCwkbRUZgzS4UU3DX/2F8k53Lz6mAMK1bG8iQJcqocmmYPcS3Mvea/sSpNitQOM57wpfn4ejJKvH5vx1zpCJEHr6XQvc/iHDejMWT4nZ4Yh+3e64UTDliBrkeLCzQncIg7m1s08KjkxX+F7UTYKIi/NLjUHqqkDSlJ/j98WnOD7ZgUwsQQC+JRr26tuNh1h/JoPfuS2PHeeWdjB/4W26ySDnIKaFi6qSoWZBCtkoQfu2iIsiMkJ9D5hWJq6zRPNgEQ8g==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=roku.com;
 Received: from SJ2PR01MB8282.prod.exchangelabs.com (2603:10b6:a03:540::13) by
- PH7PR01MB8665.prod.exchangelabs.com (2603:10b6:510:30d::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9434.6; Wed, 17 Dec 2025 16:03:41 +0000
+ DS0PR01MB7889.prod.exchangelabs.com (2603:10b6:8:143::20) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9434.6; Thu, 18 Dec 2025 12:09:19 +0000
 Received: from SJ2PR01MB8282.prod.exchangelabs.com
  ([fe80::1b0b:87da:f914:dd1f]) by SJ2PR01MB8282.prod.exchangelabs.com
- ([fe80::1b0b:87da:f914:dd1f%7]) with mapi id 15.20.9434.001; Wed, 17 Dec 2025
- 16:03:41 +0000
+ ([fe80::1b0b:87da:f914:dd1f%7]) with mapi id 15.20.9434.001; Thu, 18 Dec 2025
+ 12:09:19 +0000
 From: =?UTF-8?q?Stefan=20S=C3=B8rensen?= <ssorensen@roku.com>
-To: linux-bluetooth@vger.kernel.org
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Stefan=20S=C3=B8rensen?= <ssorensen@roku.com>
-Subject: [PATCH BlueZ 3/4] monitor: Decode MGMT read/set default system parameters
-Date: Wed, 17 Dec 2025 17:02:55 +0100
-Message-ID: <20251217160256.441737-4-ssorensen@roku.com>
+Subject: [PATCH] Bluetooth: mgmt: Fix TLV parameter code type conversion
+Date: Thu, 18 Dec 2025 13:08:26 +0100
+Message-ID: <20251218120826.533081-1-ssorensen@roku.com>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251217160256.441737-1-ssorensen@roku.com>
-References: <20251217160256.441737-1-ssorensen@roku.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BN0PR04CA0181.namprd04.prod.outlook.com
- (2603:10b6:408:e9::6) To SJ2PR01MB8282.prod.exchangelabs.com
+X-ClientProxiedBy: MN0P223CA0001.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:208:52b::19) To SJ2PR01MB8282.prod.exchangelabs.com
  (2603:10b6:a03:540::13)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -65,245 +61,119 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic:
-	SJ2PR01MB8282:EE_|PH7PR01MB8665:EE_|CY1PR01MB9337:EE_
-X-MS-Office365-Filtering-Correlation-Id: dd8adf5a-69fe-458a-3c6a-08de3d85d89b
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8282:EE_|DS0PR01MB7889:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1b50977-0c0a-49b4-e86c-08de3e2e459f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
- =?us-ascii?Q?QCzoEd7fa+u9OudFpR2I9uF9jk9QUIJm2R8dt2QzO+B4L8ybLZXL5mFuQmzA?=
- =?us-ascii?Q?GuFw5oQDla7qDWkoThMsrmV+QLvfMJTKREsx2EZE9bzOBrsphv8h4DcWLN8F?=
- =?us-ascii?Q?HpCyBsmCF2U455HN2+kdm11Ha7N3F1IkNA4ORyP0xjyMhtQh5o4U3lHddxUd?=
- =?us-ascii?Q?sW+YTVlUiVSqSKHquMWmcDcVOPt6seGL065SYVfUtTjMrHpfM3+ccrAJt4we?=
- =?us-ascii?Q?alb1IIuyAQJMFFeu+KGf+rqDMyJ9LbBdVeJ6yKHgyDFKELAVmhnrwgJKcBMR?=
- =?us-ascii?Q?Bajnr6qeSzv47h2aLvCib2HYSAOq1FOzoQ5FySQB04HSLWgPb6N+WvjVvet/?=
- =?us-ascii?Q?vsO/SOAF4GyAfkzFtGP9Tp11EbBht5Z76GuhysZKIV4j11Tm5qsEYRgu8TMa?=
- =?us-ascii?Q?KiMwSzNvPoaszLv6lpbhZ8KLFxQaTwUtVktxnVLKtlDqgIyv1FnyIW/ezSGV?=
- =?us-ascii?Q?bsaxx3xjNo2VdzCM+zoeVBV1Lx5WXpYaCYEBtoRM9bvxlyHbqwMM4/NuasiO?=
- =?us-ascii?Q?umEamZ0IP0BTBtR/j2lZfTLl67cyZz4XQN2+unn/hYgZeQ5uFNeM5PkzK8Oe?=
- =?us-ascii?Q?vy75Xj6tMywFQddcblRNUjwOhcGEAoIuZvqnV6K+duS6qlxh6wuUhHfoAf0T?=
- =?us-ascii?Q?Db3kjWWRyB2k2CMXml3zPCgw+igbAe3nCdsh/RZ/XsYVq9pqL39cOMG253/q?=
- =?us-ascii?Q?D1/LtFOOBXcp2XV5xD9SWkAhv3aFfwcAUjpZMPoibX7p4RTKL+WFH0JAU+Km?=
- =?us-ascii?Q?17nJpmWubRny14n5mg2n6LSm/PNSOD1uW7kl/RVtwOr0+58lA82BNkHOk7WA?=
- =?us-ascii?Q?jvA++eGrG8b8CVF3hzkMlfTC2KzHnapJMEFLQ9pe2AUyTmyTzMjE/jFQ66cN?=
- =?us-ascii?Q?mbbWmtnFXl4UKsRJxVXqPYVWEQReMXraZprarJSHJe9u1nIEKMMjkke3oiwk?=
- =?us-ascii?Q?N3gmOWOZPo8k8wfOVANL2nFjNkU2M7rsWHTAAWus0+gMxpv74iKbreBxHgH2?=
- =?us-ascii?Q?qPaQgKKOk4jYD1cBkUJyKU+6aYIajFlOW1urK6xphefK/KENA+8pQXIe4nJ8?=
- =?us-ascii?Q?ANi3PvI+g3ElzUPitNu2i134naCFdi9u834wj9RvUR8svEfrGDur9q8KBGht?=
- =?us-ascii?Q?tmqnFxa8TKHf9sBx2lq1rmEWf3LoLe5pmayO8EwMIxGnQgfzKG5uukDo3q5K?=
- =?us-ascii?Q?qyAMadhvdr/wc4mnZq/nLZAuln9vgJ21V5B+8U1K2psDPQ5NiwAmLwnVA186?=
- =?us-ascii?Q?n1V8AZFvCJJhwUIT5lj6eNuVV0DKbKYZCbDjPtdFBbqp6dCAIN1XYdWmX/Rg?=
- =?us-ascii?Q?0XHN2YjjXYUKTdFkwOKTlOypmU/jkm2xmeCU2deaOI9KCC6O/e0lEAurWT1A?=
- =?us-ascii?Q?OpIsBTlWtKljCqWuAgk4ErHGf/+xFMUoKmmZrXh5EFdKvZZzPg7wOpfxLKPo?=
- =?us-ascii?Q?OGJgzQokATTp2ue5MbVTF101fX4cr6Fk?=
+	=?utf-8?B?OEYvZGtTbDlrOGdMeUU0b1VvUHoyZ0lWSW9qM25FYUNwTVRDUmtVS2FzdHM3?=
+ =?utf-8?B?TmlWS1MwQ1p0K1BkZTNOc2tJakJpbytPNGVUZ2xUNHFaYVhSK2RhS3VDWXVz?=
+ =?utf-8?B?Z2Z3Qjk0dlV3TDBHSTcwOWp0bTVmQXdjYWNoZnQ5bEY3WGR6NnFHOUxEU1Ex?=
+ =?utf-8?B?SEttdEtSWjNiUTcrbis4Q3RxU1N4dzYvL2VjVlVZMXZCWkJ3U0VUTmRKc0M4?=
+ =?utf-8?B?aU9ORm1ldkRaenpyOWxUeGtHc0phZlVxeE1KNUVxRTRPcmNyalp5NXl6Z2Zk?=
+ =?utf-8?B?OG05RDRFNExUSitYSXpGTDdEc0dTSDJKT1NqZTUvSkRPYkRGOWVRZzhONTRO?=
+ =?utf-8?B?c2ZRWTVPRTBITGs2WEZlZHJsRmw3RXZidkM1ZXJRZE16ZEZPcnpoRGduWC8w?=
+ =?utf-8?B?WVk5elpnUVQvc0NhcW9EVlQ5UENtVzVCRG5FWE5kTktMMzJLMW9QNldQUW1J?=
+ =?utf-8?B?TlVvWnkrVEZFaG9Ha3dIZ0h0Q3pLMzZYTitBcTJsV1p0UFpDWUFHbW5DREQ0?=
+ =?utf-8?B?MUhXUTFRUnViNlR2R0l6K2RxVHUzQnNDV2thSU5JbklkZHRIaHo5V2FYSlM2?=
+ =?utf-8?B?eFJVdXh6eTZKNmdZWUdZU3FQdVhZeU5VSTQ4WTFmMEc3MFpSb0ptWGJwRXFM?=
+ =?utf-8?B?VTU5VHc3cFpxckdzK0gyaDYycHZib3d5N1ZVUVFRd2tSL0VRZWVYdzRIVUpY?=
+ =?utf-8?B?MFNFZjBzd3JncVRxbEtFSXY2TmJHelJHcWtQREI3dytTWVpoOHRQTG9ZNVBo?=
+ =?utf-8?B?QWdsaHFlTUF4Z01HcFVWQUxVVDRXR0RSMklQV0ZZZ1hlOEl0N0U3YUpRMHVS?=
+ =?utf-8?B?Nk0va2ljb1dDUUlRblVqVlBBWHJsbjRBTkwwMG9pU2VTV0ZIUk1xcUc0ODBG?=
+ =?utf-8?B?RzlvQ2NYUmlsNWZtZEZTZFFITUZPdHJTZHdXandEUDBUVG9aZFNjOW1kSmtx?=
+ =?utf-8?B?VjdlZEF4WmgvVDBJQjJ0MjQrOWM0a1lOSStyT1J5OXExZFdzYUx4WDYvSWt3?=
+ =?utf-8?B?clZxV3hyRUozQXNxdWN4NDlZNlRNNkNSMzhtYVlGMGhrS3RBY2RoT1liQVVD?=
+ =?utf-8?B?cHZhU3NhN0lmR00xck1MNjBaRzd6YytFYlIxQzUwTTU2S0w4VjRZSHI0ZkQv?=
+ =?utf-8?B?ZlZrQjdPTTV6MGNvZTFsSjFzUEZ4Zng2OVYwTm5XZE81NStJRnNKVWlXYkk3?=
+ =?utf-8?B?Tk44c0VmVmd2eUJNcUN1Z01GYmpIN2FJRlJMZDVCaGxleTJpWUw5ZHZYeGxZ?=
+ =?utf-8?B?VlJvRUxaQkRHYkk2QWNIeXVLWmdSTzhQRHVMdzNwd2NLYmZ0MGU1Vk5NMFlm?=
+ =?utf-8?B?SDJlNUYvbmlDdXZLbDZ1UitYbGNyV0p1dXo2bjJTOXFIb01KVGMwampJRHBY?=
+ =?utf-8?B?QlBCYXhVck5WQWlkVGZzN2JTN3BDUDh5TDdwZWt6aXRLT0FZaE9zRGtramly?=
+ =?utf-8?B?T3huVUpDWkI4dW92eEVoMjFZb1lYblQ0VTBJUnU1ZEl0djZJcEtUQXlPcUQ0?=
+ =?utf-8?B?RWlZK0ZNTTJ2NmpEUXhhOEp4MVVCR01KbVRzTUdFdk92eW5GUVF5TWNEeFNj?=
+ =?utf-8?B?elVyYUtaWHM1ZlZFekovcHhWTWcvbHVzMXNMMTNBSUtFK0QrZGVYSUtmRmtm?=
+ =?utf-8?B?N1FFT3VKR3hNR2tlNzZZSXRmTTF5R0hiWWt5a3ZjRmExZWVrZkFudjlvNmhV?=
+ =?utf-8?B?b1JqaEhLazlyMUpFU1RESHI1c0dPVCtpRjE5MFRLQXZDaE0wbVZEZ2F6Qld2?=
+ =?utf-8?B?KzRGY0w2d3RKM1F6VTdweTV2dllxRkg1dmV2NVV4NGV6NzhaY2wvMExhTzBp?=
+ =?utf-8?B?Rzlrd2xYUk14d3ZDWVpRMklNS2NtcmphTFdCZzNMUTVoUHRpQjg4SHNWVUt5?=
+ =?utf-8?B?QVhnM2NhV1BRTnVidDEvZ2xNb3lGK0JxRkZ0QkNYbE13aEd1N1VCZkcvUCtO?=
+ =?utf-8?Q?jYEwHVx04T928CkMZKV+WJRVo/S29aaE?=
 X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8282.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8282.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?4unJkC5K2afFMQkuXUGlNNZhEcdZ/WjlrbmhBir51eoRQ9fHS3W/V0RFnlIQ?=
- =?us-ascii?Q?vKvkfFL0SGY9t12kck61FjM6DfpS9cKJhqcErelzVq1yg9O6GCtcrsggLQ2P?=
- =?us-ascii?Q?QmLmE3gbaG1ffG/dlwbKMx+uA7daQQhBLKePuAKxJhlq/9ZBcmzaYN8h4ZLD?=
- =?us-ascii?Q?lOKJaoCJjd80cbg/RAvY50MQJOcH4xPQyAACFfaXWl08p3xIFr4hE9fouIDR?=
- =?us-ascii?Q?E5sRwhfDxLaw5P+UHI9IHGKrDzPNobMfpKJmwTrC6RopMg71WeM6BMUJ8PxN?=
- =?us-ascii?Q?vwyBLwtnHUdtX6qS6rP5WrvdjURXKYmbg0lySinhIxLdHDynVAobjbzpaQr8?=
- =?us-ascii?Q?isxYlW6LLBmtu6VN0PbQ30JfMd4A51tTxA/yINLLEBiN+FYA5S96fEELgSm6?=
- =?us-ascii?Q?byqPPqlZTMK8mkKeKdKcHMoQxXtQhGmAhL31AZaLz6wkDfuKDxwvK6Z4HQKK?=
- =?us-ascii?Q?t4J/rg3mMXq12RKE5EymljAn0aaQPvj9HscB5n6M4Rf5ktIaHlYHz1ViTxYr?=
- =?us-ascii?Q?QAcXIGpi59vaSOTlzmEUnvx19SW35WYdCxctR4ZI2FK90U+7BHluaDczYps8?=
- =?us-ascii?Q?DVh0vlBBU3x9G8SNmQi8LAcmD5sKWmP1x0wonnxjnoHNERzfpKzdW0uQ9Bb5?=
- =?us-ascii?Q?0dn7WOmVDDau1r4nW9jO6LPWvoe1iDh+EJ4a7e0SlLphR0DvPVrlaLl1WCJq?=
- =?us-ascii?Q?Crxo17YswD+EX79svvHY8NunC58Xr67CnTEbFhHZit+YLmSyItlHe1Xn/5EW?=
- =?us-ascii?Q?gN5qaoqzyQAS6tk3RLLjk4ZGTlkKV+aZspmZr9c2vt2wigmdVD+26L/6X/pH?=
- =?us-ascii?Q?P6+z4GjPcrDkAN+3ol+PUMoTWnEkPvTbjyyZhh6q9XuP9hzePiNtdsaGG0V5?=
- =?us-ascii?Q?9bpLQ2/BLkYILuN9+fq70wbcShaycDk37ACZMeW682twcH1OgRjM0sjX1iUh?=
- =?us-ascii?Q?0RRedZ26QAvikW0jS3IyG1dO8/74EbBig0oXPHmEV9PTTEYWTRQaZ/0rYZ1Z?=
- =?us-ascii?Q?qiqs72E1aXN7jjZs2UGY2SxvUOYirsPMeLzxnChPtEAvcxqHJLCeaqiDaNhR?=
- =?us-ascii?Q?isI7RCxmIg6j5+mN+jp3TGm9vVskWPCgNl7KLnz9uLOmifgmS9Jvo/X2J9Az?=
- =?us-ascii?Q?CMiPXwEjS6RAiZ0bNUuh0nrn4JfdsvPUEHVIINPkvSYOoHcXfBo/KZpwRoBz?=
- =?us-ascii?Q?cypE3UZbisYbF0Ax55OeDZghJO0CNu9DVAReqxKsmGo0GvossfV4J+9QGDSN?=
- =?us-ascii?Q?Ou4pzN241Hsay7ijU4VZfSV8wRIby3/BeNEkIJMNZqbfkyklx8OOv8aLb9Q4?=
- =?us-ascii?Q?yvIOxdiqFCIDu6fUcFvMoZ5UwWWbntDPsQGlksEQOfegvD8Q4iRPhhKoxVrV?=
- =?us-ascii?Q?mV8LeK3ZUwsrtoN0Nt7Q0HjgCARyqqMijhKyNPgIw2ekOokUpv4ssJ5xx54l?=
- =?us-ascii?Q?hm+Af2GMwQ+avvf7kycKFVYBM3HgQByjDSNVgrAenqxAaZVdNREpE70DGOV9?=
- =?us-ascii?Q?uw4SBr10bhnlqDpZTEs0eV/W+dm+E+Kb/Qw5P8my7sPHe+R6QE9hwX8kGeMC?=
- =?us-ascii?Q?VZ6mKTu+eHIy2miiGZ6Dl/uC8jEAB1LL4KoVMiF7?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd8adf5a-69fe-458a-3c6a-08de3d85d89b
+	=?utf-8?B?T0lZWEZxMCtsQmN4RWZtejQxUEZscUJkZldFZjFDUjVCeXpSSStoWmtVRXVB?=
+ =?utf-8?B?NjFST2traTMrMWN6L1dSUkVsM25WL0JkTEc3bE8zemZLa0xINVlvVGMwa2NM?=
+ =?utf-8?B?ZlpyeHpZdUk2WTArS1ErSDZPWGJCSlVGN3l4N0taRWxmSkJJVEE4WHFxa1FB?=
+ =?utf-8?B?YTdYTkhsVnBOTzJzdFovbFp4SmIyY0ZSd2h4ZUZzTDNtcklpUTZ2eU8vODF3?=
+ =?utf-8?B?T2RRV24wb2g5Mkljck5BMDFhV2NiYWU4NTJhekNnYVBHNk5GTnlGZm1zdTNH?=
+ =?utf-8?B?MVdSa2t2U0Jkd1EyVFVHZHZXRVhhSDJzT1BkSTRzM0JSaXpQMVpNUGhPdjB6?=
+ =?utf-8?B?bHpheElRTlR3QlNzQTUrejRWanZEWXBGNVg3QUlLdGc3VjBJQVVBZUtzTm82?=
+ =?utf-8?B?aDRSM3lta0EyM29RN0ZWK0tUTU85T2Y1QS9rc0ltZ3JPRUNWYVRnVFcwbnJt?=
+ =?utf-8?B?eWYwS29NLzVXMXFZQXhhb1gvQ0I1eEhxUkdUUzlZWDlGOHplRWo3cFcxc2JN?=
+ =?utf-8?B?Z0kvc1NVNGJKZUhlQ0hFSWVhQWF0N1o1eFkwbCtpYUlUd21JNjJjYUVXVUdP?=
+ =?utf-8?B?ZmJxS2k3RnJqYnhsdENhN04vYm9PR255Q0JqSXo0SlhVVEh5dklIaHFSVUJo?=
+ =?utf-8?B?aXMrS0g0WHRXVGE4ajdjKzZyclBLTUJWcnhUTnltS1BHRXEzYmVEd2JhRWZL?=
+ =?utf-8?B?ejNQdWZFNy9qSW9PdTNLYVZRSEtmYzRJVFJtdEFLcFRqK0hVa2ZJNmdHTExI?=
+ =?utf-8?B?MEhlVVBqdW8zUHJNeXdEWTQvWHk3b3NzSUlPbmZpQ2NzZ3FlMGprVXJlV1B1?=
+ =?utf-8?B?dmlSazFTOTF2bnRsbUtXeFQrVTBOR0w1WG5yejFnVCs4cUpZRFFJU2ZhQk1W?=
+ =?utf-8?B?eVRnQStaaG9XNXhNb1dwNzZ4TmNoMG5YcXZJQ1I1eG1vcFRRZFRPWGhzd3V6?=
+ =?utf-8?B?N2pHZWJtNkg3OEp0eSt2Zi9LcFcxYXBnZ3dKMk01Z1RqbTlqa1UzNzI4Vlcw?=
+ =?utf-8?B?clo1NVg4akpjYmQraUVuTFEyVE9xU2VOeVN2ek54UEo1dk0zL1NSZkQ4bVRp?=
+ =?utf-8?B?eWo1MytpS2VWdFMyQWg0cnpoRm0xbTRwK0RoRUZkUStGT1JTRVphUmEzTE9M?=
+ =?utf-8?B?Z2FqdDBxL3hWZEtpenBLR1JiU1AxL2hUbjRaZXNUSmhyZ0syc3JUYkZPUUNa?=
+ =?utf-8?B?NkIyUVNtR0VGcWRlQ2t1bFgrd3IvLzN1ME1KNVRrU3FZR1NnZFhJalBMWXhM?=
+ =?utf-8?B?em8yK3NwNXVNRnlkVU8yQmlIQ2lFaHBuZ2pvSDhZZy8rcVJmc29EaWFWTXVO?=
+ =?utf-8?B?NjA3TFIvTVR6TEkzbXF5TmRQZjVWeHRGeTA0ODREa01rY0hDVFdvajVvVGIr?=
+ =?utf-8?B?ajhZekdQVmJEMHF2SWg0S3MwQjAwazZHVXp5MnVid0Vzdm5zbTRPbkg2MFJz?=
+ =?utf-8?B?Z2V3a3d6bEJTWlhTUm4rZjNoK3RCYStSbGZPNlpTNFlicHU0VXdmekdsNWxw?=
+ =?utf-8?B?T2Vrc0ZadHJPOTBzeWR3YXgrMlZqOXV3V1pKVFBYU0JDakNRWE10VjkvQk14?=
+ =?utf-8?B?QkYwbmRKRlVXKzZTRHVtL25OVi9ySUdnWStaSUlCWlBrQTZNcjUvWW0xcTlL?=
+ =?utf-8?B?ZlgvcnpXWnZtdmhHc1Zac2I3RE9CcE5yYnFSTG9rMEFSRlVMc1RSUldwWlFM?=
+ =?utf-8?B?WWpLNlhGMHJBQ0dMbTdhSnF5SjZJd0oxdzQrRHhuSU9TeXVkZ3djZnJhTWEw?=
+ =?utf-8?B?M0FSdllFQmlqbk9GQ1pTaGpqQjFQOXd2YVhSMGZ1QjNiSGFmWlo1dDlKZnQ3?=
+ =?utf-8?B?UzlFbUJCekt3TkhXT1lUSDJLOFpWNnF1a0x1TEZvQjJQVzRNR28rdkY4VVdC?=
+ =?utf-8?B?a1lsbjBhRDh1MzFDTjJTTVdrRzVwY3dVS3VlMXc5L01yRVZ5SmtFZXBOOUlz?=
+ =?utf-8?B?SXdrKzhiZU1PaEFyVnNrTHpoSnFUd3pld04xTE1nM3VrWWc5UmZ1U3QxMnNG?=
+ =?utf-8?B?bVJQaDY5RmMwL2l5SnNNVkFpL0REOVlabFRrV2dZU0VqMUltcDY3S2t5UVpi?=
+ =?utf-8?B?N0FuNG8wanJFUzNFSWUralhnNWtadGtuQlN6Y3R6VW5JZloyaGszR1JvYmhO?=
+ =?utf-8?Q?KFaWrRiIEmvV4/YSteSXfvdRJ?=
+X-OriginatorOrg: roku.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1b50977-0c0a-49b4-e86c-08de3e2e459f
 X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8282.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Dec 2025 16:03:41.5436
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2025 12:09:19.5748
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 00fc7e42-ad65-4c4c-ab54-848ba124a5b7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: P5x8JbJreFtDEIevH51Y2w4qCdJVTZ33c+sKEnSybQiu46QD7IaZs22+u4R8MPD0qYQbrkCUgeO3vohKGt2YfQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR01MB8665
-X-OriginatorOrg: roku.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: kHcXpou17ppWpSLs7RK8SJNwubfYsJyUJcQtLlV3Up6OyjYOX1VviiYMzx9heU8nu7eSSh/ZQcq2Rt+zSrI2qA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR01MB7889
 
-Add decoding of the payload of the Read Default System Configuration
-and Set Default System Configuration MGMT commands and replies:
+Use the correct le16 conversion for the TLV type field when adding a
+TLV using a u32 data field.
 
-@ MGMT Command: Set Default System Configuration (0x004c) plen 15
-        BR/EDR Page Timeout: 200
-        BR/EDR Min Sniff Interval: 50
-        BR/EDR Max Sniff Interval: 200
+Fixes: afa20d8099ddf ("Bluetooth: mgmt: Add idle_timeout to configurable system parameters")
+Signed-off-by: Stefan Sørensen <ssorensen@roku.com>
 ---
- monitor/packet.c | 116 ++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 110 insertions(+), 6 deletions(-)
+ net/bluetooth/mgmt_config.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 254fe840d..bd316d842 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -32,11 +32,13 @@
- #include "bluetooth/uuid.h"
- #include "bluetooth/hci.h"
- #include "bluetooth/hci_lib.h"
-+#include "bluetooth/mgmt.h"
+diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+index 4ec6c008cb7e6..fdcc752c6f13f 100644
+--- a/net/bluetooth/mgmt_config.c
++++ b/net/bluetooth/mgmt_config.c
+@@ -37,7 +37,7 @@
  
- #include "src/shared/util.h"
- #include "src/shared/btsnoop.h"
- #include "src/shared/queue.h"
- #include "src/shared/bap-debug.h"
-+#include "src/shared/mgmt.h"
- #include "display.h"
- #include "bt.h"
- #include "ll.h"
-@@ -14683,10 +14685,6 @@ static const struct bitfield_data mgmt_adv_flags_table[] = {
- 	{  16, "Contain Scan Response Data"		},
- 	{ }
- };
--#define MGMT_ADV_PARAM_DURATION		(1 << 12)
--#define MGMT_ADV_PARAM_TIMEOUT		(1 << 13)
--#define MGMT_ADV_PARAM_INTERVALS	(1 << 14)
--#define MGMT_ADV_PARAM_TX_POWER		(1 << 15)
+ #define TLV_SET_U32(_param_code_, _param_name_) \
+ 	{ \
+-		{ cpu_to_le32(_param_code_), sizeof(__u32) }, \
++		{ cpu_to_le16(_param_code_), sizeof(__u32) }, \
+ 		cpu_to_le32(hdev->_param_name_) \
+ 	}
  
- static void mgmt_print_adv_flags(uint32_t flags)
- {
-@@ -15994,6 +15992,108 @@ static void mgmt_set_exp_feature_rsp(const void *data, uint16_t size)
- 	mgmt_print_exp_feature(data);
- }
- 
-+static const struct {
-+	uint16_t val;
-+	const char *str;
-+} default_system_config_table[] = {
-+	{0x0000, "BR/EDR Page Scan Type"                              },
-+	{0x0001, "BR/EDR Page Scan Interval"                          },
-+	{0x0002, "BR/EDR Page Scan Window"                            },
-+	{0x0003, "BR/EDR Inquiry Scan Type"                           },
-+	{0x0004, "BR/EDR Inquiry Scan Interval"                       },
-+	{0x0005, "BR/EDR Inquiry Scan Window"                         },
-+	{0x0006, "BR/EDR Link Supervision Timeout"                    },
-+	{0x0007, "BR/EDR Page Timeout"                                },
-+	{0x0008, "BR/EDR Min Sniff Interval"                          },
-+	{0x0009, "BR/EDR Max Sniff Interval"                          },
-+	{0x000a, "LE Advertisement Min Interval"                      },
-+	{0x000b, "LE Advertisement Max Interval"                      },
-+	{0x000c, "LE Multi Advertisement Rotation Interval"           },
-+	{0x000d, "LE Scanning Interval for auto connect"              },
-+	{0x000e, "LE Scanning Window for auto connect"                },
-+	{0x000f, "LE Scanning Interval for wake scenarios"            },
-+	{0x0010, "LE Scanning Window for wake scenarios"              },
-+	{0x0011, "LE Scanning Interval for discovery"                 },
-+	{0x0012, "LE Scanning Window for discovery"                   },
-+	{0x0013, "LE Scanning Interval for adv monitoring"            },
-+	{0x0014, "LE Scanning Window for adv monitoring"              },
-+	{0x0015, "LE Scanning Interval for connect"                   },
-+	{0x0016, "LE Scanning Window for connect"                     },
-+	{0x0017, "LE Min Connection Interval"                         },
-+	{0x0018, "LE Max Connection Interval"                         },
-+	{0x0019, "LE Connection Latency"                              },
-+	{0x001a, "LE Connection Supervision Timeout"                  },
-+	{0x001b, "LE Autoconnect Timeout"                             },
-+	{0x001d, "LE Allow List Scanning Duration for adv monitoring" },
-+	{0x001e, "LE No Filter Scanning Duration for adv monitoring"  },
-+	{0x001f, "LE Enable Interleave Scan for adv monitoring"       },
-+	{ }
-+};
-+
-+static const char *default_system_config(uint16_t val)
-+{
-+	int i;
-+
-+	for (i = 0; default_system_config_table[i].str; i++) {
-+		if (default_system_config_table[i].val == val)
-+			return default_system_config_table[i].str;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void mgmt_print_system_config_tlv(void *data, void *user_data)
-+{
-+	const struct mgmt_tlv *entry = data;
-+	uint16_t type = get_le16(&entry->type);
-+	const char *desc = default_system_config(type);
-+	uint32_t value;
-+	char buf[8];
-+
-+	if (!desc) {
-+		snprintf(buf, sizeof(buf), "0x%4.4x", entry->type);
-+		desc = buf;
-+	}
-+
-+	if (entry->length == 1 || entry->length == 2 || entry->length == 4) {
-+		if (entry->length == 1)
-+			value = get_u8(entry->value);
-+		else if (entry->length == 2)
-+			value = get_le16(entry->value);
-+		else if (entry->length == 4)
-+			value = get_le32(entry->value);
-+		print_field("%s: %u", desc, value);
-+	} else {
-+		print_hex_field(desc, entry->value, entry->length);
-+	}
-+}
-+
-+static void mgmt_read_default_system_config_rsp(const void *data, uint16_t size)
-+{
-+	struct mgmt_tlv_list *tlv_list;
-+
-+	tlv_list = mgmt_tlv_list_load_from_buf(data, size);
-+	if (!tlv_list) {
-+		print_text(COLOR_ERROR, "  Unable to parse response of read system configuration");
-+		return;
-+	}
-+	mgmt_tlv_list_foreach(tlv_list, mgmt_print_system_config_tlv, NULL);
-+	mgmt_tlv_list_free(tlv_list);
-+}
-+
-+static void mgmt_set_default_system_config_cmd(const void *data, uint16_t size)
-+{
-+	struct mgmt_tlv_list *tlv_list;
-+
-+	tlv_list = mgmt_tlv_list_load_from_buf(data, size);
-+	if (!tlv_list) {
-+		print_text(COLOR_ERROR, "  Unable to parse command of set system configuration");
-+		return;
-+	}
-+	mgmt_tlv_list_foreach(tlv_list, mgmt_print_system_config_tlv, NULL);
-+	mgmt_tlv_list_free(tlv_list);
-+}
-+
- static const struct bitfield_data mgmt_added_device_flags_table[] = {
- 	{ 0, "Remote Wakeup"		},
- 	{ 1, "Device Privacy Mode"	},
-@@ -16574,8 +16674,12 @@ static const struct mgmt_data mgmt_command_table[] = {
- 	{ 0x004a, "Set Experimental Feature",
- 				mgmt_set_exp_feature_cmd, 17, true,
- 				mgmt_set_exp_feature_rsp, 20, true },
--	{ 0x004b, "Read Default System Configuration" },
--	{ 0x004c, "Set Default System Configuration" },
-+	{ 0x004b, "Read Default System Configuration",
-+				mgmt_null_cmd, 0, true,
-+				mgmt_read_default_system_config_rsp, 4, false},
-+	{ 0x004c, "Set Default System Configuration",
-+				mgmt_set_default_system_config_cmd, 4, false,
-+				mgmt_null_rsp, 0, true},
- 	{ 0x004d, "Read Default Runtime Configuration" },
- 	{ 0x004e, "Set Default Runtime Configuration" },
- 	{ 0x004f, "Get Device Flags",
 -- 
 2.52.0
 
