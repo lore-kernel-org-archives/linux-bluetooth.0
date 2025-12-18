@@ -1,38 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52BD2741A6
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 21:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33853A1E64
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 21:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766094541; cv=none; b=HfmlrXUqu2SQlhStOyXJzkIE43+Sxn2jLy1PM99MabwjePYwyMb4+iUOXVOxrBaSLGwsmNpia0EwMioo7WxUNt05TvUQOVQia4s4/ZEw7+WBGsf/ojzUGKhKpyNP24G2VWks47R09oys6goaZjHYuw5OD3tQ7k8hA6LaTTjWkak=
+	t=1766094936; cv=none; b=VIx9tjqHQu6v/P06UuyKF7r2crFI03ZlEkwvKMwCOVRiHBgYmiq3ytSdvjgAkZebNuDfDUfRa5LSd/59QfkTX9Pb/JKoz0G92FydA0BqCKbkAngRRbpuW9C7o+kglaTKFP1IQWS8FTs4Yy4t0BG0AYN8GjsJPUiM8SzOqEPqIlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766094541; c=relaxed/simple;
-	bh=299cF6gIKZBxzVul6zqM9/1Izx0dwOBr8fuQgT7bhyw=;
+	s=arc-20240116; t=1766094936; c=relaxed/simple;
+	bh=cisfjgjwbzkQ7+vhA6v7wOPzJ1+S+CTLarnKrxFzkXY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=UOX6Y6ZecyAVSU7tXvIPqtSVuyKLCdhu4BTWAl+/7rrg93pG693kmOPWkjtYiCRidbQCYJJ3AORtB3ZSooN+XIfdQp8AmJbk92x6kBq3U8RHb1kwihfO0qEnrUCgMo7LZn5Ecw+ZuLa4olrK3YuLvM4vLyo43mifuxBJqJUwDCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ky/180df; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=cjM+TNXB5u1L7Fcj+L5JnC83R2X/UVbcIM4B/RYbkrRrksHchG4I1yQr6kzu34k0WRyL4Ncr48RwRGQX2P13baG6AkHyVB/w6JwSKFTiYNfqZAGpNgLbv7hVZfnKc/wIqu49BEL4raLZ2U+5j4hKtwDBHXeY2zj/zoBM0Ya3Fog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nyUfsbhb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ky/180df"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D3A0C19421
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 21:49:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nyUfsbhb"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 64B1FC19421
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 21:55:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766094541;
-	bh=299cF6gIKZBxzVul6zqM9/1Izx0dwOBr8fuQgT7bhyw=;
+	s=k20201202; t=1766094936;
+	bh=cisfjgjwbzkQ7+vhA6v7wOPzJ1+S+CTLarnKrxFzkXY=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Ky/180dfr02axQUfhBRRIvOIjXRSbJjehiJpj2CpWLC7jgyXGgqv5Bc1uN179kjO2
-	 gcok9ULKG/aMjQmmWIjE6QQDtgW3JhzHnQXXAEN7SaU5c81xhUww/SArqLEZCP7lZf
-	 dOtn6l/rJoc6rwlo+Ncgkxlo5jj0UY8D8YNjHLoAaNmwW0uxRw6lSsx54LvRE212Zj
-	 TnCkFjHZDtq6pEoDliOLYQireRQ2NO5+dGuBFzy80Cdd9poR7wnPSjMbJCFuLThhYy
-	 CKchu65Y4xjB56SgX1UJ6ReW4G6v2XXN8c9hgs29gP6MBhfvzUJM2y+se+tva1+Ld3
-	 FnANE1aVd0r6g==
+	b=nyUfsbhbxGFjZEllfKandTrnJlF3BdJbx2iK+tSCxx8vb6BeYs0edlAUFDl15PlpF
+	 ovDIxZZMM6ZicFmwC0BvqONqOklTG/hs8jJqp5ubi0AMzMYvcZRn/8cnPmv/z44ALr
+	 URfS3vms8fqCX4R5TrStsgwMocf8r9sGaivVmcPonxC2YLKrxstjKRwCGzCKpc0Pf7
+	 kLkDBvO77Lq1GkV0sO9CyqGlBEhWmoT6XS9nu8DYvkNNVleTHyzUapJ6dmlRnXsUZz
+	 NX3eoK0+bNvm4rf9+PgcfFTlE+G+JAXv6wrrO05HjcG8blrTlSO+UjHgLt1s/pZ2MI
+	 Au9E8znmVShhQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 55AAAC3279F; Thu, 18 Dec 2025 21:49:01 +0000 (UTC)
+	id 5CBACC4160E; Thu, 18 Dec 2025 21:55:36 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 86931] hid-generic 0005:099A:0500.0001: unknown main item tag
- 0x0
-Date: Thu, 18 Dec 2025 21:49:01 +0000
+Subject: [Bug 200007] HP Elite Presenter Mouse support
+Date: Thu, 18 Dec 2025 21:55:36 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -42,15 +41,15 @@ X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
 X-Bugzilla-Who: rdunlap@infradead.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-86931-62941-XQXSMEs9vl@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-86931-62941@https.bugzilla.kernel.org/>
-References: <bug-86931-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_status cc resolution
+Message-ID: <bug-200007-62941-OYzwsUKXAN@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-200007-62941@https.bugzilla.kernel.org/>
+References: <bug-200007-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -62,25 +61,18 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D86931
+https://bugzilla.kernel.org/show_bug.cgi?id=3D200007
 
 Randy Dunlap (rdunlap@infradead.org) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
                  CC|                            |rdunlap@infradead.org
+         Resolution|---                         |CODE_FIX
 
---- Comment #12 from Randy Dunlap (rdunlap@infradead.org) ---
-This message is now (as of June-2025) rate-limited, so there should not be =
-so
-much flooding of the log. AFAIK the underlying cause still has not been
-determined.
-
-Patch:
-commit 4051ead99888
-Author: Li Chen <chenl311@chinatelecom.cn>
-Date:   Fri Jun 20 20:02:31 2025 +0800
-    HID: rate-limit hid_warn to prevent log flooding
+--- Comment #6 from Randy Dunlap (rdunlap@infradead.org) ---
+Marking as closed/fixed unless/until someone has a problem.
 
 --=20
 You may reply to this email to add a comment.
