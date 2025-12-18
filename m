@@ -1,48 +1,89 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36AFC329364
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 20:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52BD2741A6
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 21:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766090812; cv=none; b=orOaEm9WnKgzwWJYX4gUZyohXWNrp7lRmw/pf0pLuYGi8oOfDuiZQkyGDVUzz5Ky6pQ2c3kNQjyLTuikcVvkx7PzT2tqXe0YK6FHd6katbSee4Nc7kpBeswJFP5HjR20SnLdMj72KOMPgiPxWeREbKWavQPK+qms7jPfhszHn50=
+	t=1766094541; cv=none; b=HfmlrXUqu2SQlhStOyXJzkIE43+Sxn2jLy1PM99MabwjePYwyMb4+iUOXVOxrBaSLGwsmNpia0EwMioo7WxUNt05TvUQOVQia4s4/ZEw7+WBGsf/ojzUGKhKpyNP24G2VWks47R09oys6goaZjHYuw5OD3tQ7k8hA6LaTTjWkak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766090812; c=relaxed/simple;
-	bh=XATDKuzDBl4ZPzVcYyiE6qHGQjCY/mT888jJhf+hUmA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HEFqBGj6PFTYWrdeVxQ0e3Z/u860X81KeIyMzPcSPbyydqZrPtDUEIsZLBVAQxY5spa9MKuwoMahlC95ldC2mQ4DOH3FzKmz9MXZvPyoLSusJyNJGjGwPbqt0Bz4BVHhMmkyyWFLPoYb+l3pFz7i/fTQnvCdC8vL50rSjZMlGP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jkoZI5Q+; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1766094541; c=relaxed/simple;
+	bh=299cF6gIKZBxzVul6zqM9/1Izx0dwOBr8fuQgT7bhyw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UOX6Y6ZecyAVSU7tXvIPqtSVuyKLCdhu4BTWAl+/7rrg93pG693kmOPWkjtYiCRidbQCYJJ3AORtB3ZSooN+XIfdQp8AmJbk92x6kBq3U8RHb1kwihfO0qEnrUCgMo7LZn5Ecw+ZuLa4olrK3YuLvM4vLyo43mifuxBJqJUwDCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ky/180df; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jkoZI5Q+"
-Received: from github.com (hubbernetes-node-bd1da1f.ash1-iad.github.net [10.56.212.85])
-	by smtp.github.com (Postfix) with ESMTPA id 4CFA6600B7E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 12:46:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1766090810;
-	bh=MnuqILHGrpThcpp3I2W0C6lN4wkjFa+iI2RgiUV485w=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=jkoZI5Q+OuIliuCO48vfLOWaUUxg5DMnqWXLvEtYFm/riONRJ7b3ORnoOYzrZaPLc
-	 fZQHF/BYdRxXt9eZe6H7QnLcsSMFzxuf6GZmmhuxusePWa7mWpKwlZMTCljuQVDMcr
-	 QLBjoDhRNhcFjvebdjZP1sszewR+7YIlAjTL9daI=
-Date: Thu, 18 Dec 2025 12:46:50 -0800
-From: BluezTestBot <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ky/180df"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D3A0C19421
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 21:49:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766094541;
+	bh=299cF6gIKZBxzVul6zqM9/1Izx0dwOBr8fuQgT7bhyw=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=Ky/180dfr02axQUfhBRRIvOIjXRSbJjehiJpj2CpWLC7jgyXGgqv5Bc1uN179kjO2
+	 gcok9ULKG/aMjQmmWIjE6QQDtgW3JhzHnQXXAEN7SaU5c81xhUww/SArqLEZCP7lZf
+	 dOtn6l/rJoc6rwlo+Ncgkxlo5jj0UY8D8YNjHLoAaNmwW0uxRw6lSsx54LvRE212Zj
+	 TnCkFjHZDtq6pEoDliOLYQireRQ2NO5+dGuBFzy80Cdd9poR7wnPSjMbJCFuLThhYy
+	 CKchu65Y4xjB56SgX1UJ6ReW4G6v2XXN8c9hgs29gP6MBhfvzUJM2y+se+tva1+Ld3
+	 FnANE1aVd0r6g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 55AAAC3279F; Thu, 18 Dec 2025 21:49:01 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1034336/0bb525-000000@github.com>
-Subject: [bluez/bluez]
+Subject: [Bug 86931] hid-generic 0005:099A:0500.0001: unknown main item tag
+ 0x0
+Date: Thu, 18 Dec 2025 21:49:01 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: rdunlap@infradead.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-86931-62941-XQXSMEs9vl@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-86931-62941@https.bugzilla.kernel.org/>
+References: <bug-86931-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
 
-  Branch: refs/heads/1034336
-  Home:   https://github.com/bluez/bluez
+https://bugzilla.kernel.org/show_bug.cgi?id=3D86931
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Randy Dunlap (rdunlap@infradead.org) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |rdunlap@infradead.org
+
+--- Comment #12 from Randy Dunlap (rdunlap@infradead.org) ---
+This message is now (as of June-2025) rate-limited, so there should not be =
+so
+much flooding of the log. AFAIK the underlying cause still has not been
+determined.
+
+Patch:
+commit 4051ead99888
+Author: Li Chen <chenl311@chinatelecom.cn>
+Date:   Fri Jun 20 20:02:31 2025 +0800
+    HID: rate-limit hid_warn to prevent log flooding
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
