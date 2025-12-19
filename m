@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33853A1E64
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 21:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA7919AD5C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Dec 2025 01:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766094936; cv=none; b=VIx9tjqHQu6v/P06UuyKF7r2crFI03ZlEkwvKMwCOVRiHBgYmiq3ytSdvjgAkZebNuDfDUfRa5LSd/59QfkTX9Pb/JKoz0G92FydA0BqCKbkAngRRbpuW9C7o+kglaTKFP1IQWS8FTs4Yy4t0BG0AYN8GjsJPUiM8SzOqEPqIlY=
+	t=1766107721; cv=none; b=KQ5QU9CACalpamSUdIQEhBGP/riq9ATYs5brchm1y7cm92ErxZU9nUx/7NTqDOJi0VoGDosdyiqcue9qjvF6IGV1/bn/U2WG0Ezu5qCRFujEE2ryYHJCwN7zOzUVj+JUPCw2ndRxuvWGHD0YEpNOXfoY2AO9U9AA20n9GE94C7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766094936; c=relaxed/simple;
-	bh=cisfjgjwbzkQ7+vhA6v7wOPzJ1+S+CTLarnKrxFzkXY=;
+	s=arc-20240116; t=1766107721; c=relaxed/simple;
+	bh=yZsC1vUOMIEhbZgDj4CQyyw5IRzuwXmR86FnZ/8eUXI=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cjM+TNXB5u1L7Fcj+L5JnC83R2X/UVbcIM4B/RYbkrRrksHchG4I1yQr6kzu34k0WRyL4Ncr48RwRGQX2P13baG6AkHyVB/w6JwSKFTiYNfqZAGpNgLbv7hVZfnKc/wIqu49BEL4raLZ2U+5j4hKtwDBHXeY2zj/zoBM0Ya3Fog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nyUfsbhb; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=IA8XoEPfX5tQTcUxjvRLiBbVpZKIg+Bw5xy1u58qzSQB3ELIkRTM9FX/eO/Zru9WzBRyzjaWMssHSJHFS9eD8FvOnYa0voTSpS5IlsXiEFMJxPZhfWMMlfFtRkjMJp2hcLGCFT1/fD7aYTwTjBJ1YybjVIgmsE8iTYJGzYsbS6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MZHGPwLS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nyUfsbhb"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 64B1FC19421
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Dec 2025 21:55:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MZHGPwLS"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 83A86C19421
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Dec 2025 01:28:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766094936;
-	bh=cisfjgjwbzkQ7+vhA6v7wOPzJ1+S+CTLarnKrxFzkXY=;
+	s=k20201202; t=1766107720;
+	bh=yZsC1vUOMIEhbZgDj4CQyyw5IRzuwXmR86FnZ/8eUXI=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=nyUfsbhbxGFjZEllfKandTrnJlF3BdJbx2iK+tSCxx8vb6BeYs0edlAUFDl15PlpF
-	 ovDIxZZMM6ZicFmwC0BvqONqOklTG/hs8jJqp5ubi0AMzMYvcZRn/8cnPmv/z44ALr
-	 URfS3vms8fqCX4R5TrStsgwMocf8r9sGaivVmcPonxC2YLKrxstjKRwCGzCKpc0Pf7
-	 kLkDBvO77Lq1GkV0sO9CyqGlBEhWmoT6XS9nu8DYvkNNVleTHyzUapJ6dmlRnXsUZz
-	 NX3eoK0+bNvm4rf9+PgcfFTlE+G+JAXv6wrrO05HjcG8blrTlSO+UjHgLt1s/pZ2MI
-	 Au9E8znmVShhQ==
+	b=MZHGPwLSh8tmmfIeELb6150NxzpJUWxjvqyrXrLtJM0SU1cwsUsdn43ozWY9ST58w
+	 XxO9KSWvXuU1RbiFnUIjDQg10Gq3bRXAIvgPr3XWom3DbEb/is7tzQcnqlf3dikmo6
+	 atUYyFPoKFCBPDDMrqAJry9/jhzdgO/viqj1Jyaum6/LcXNekZJ7SPr8dxNYBEE3oC
+	 nQfUHIXTOFXfi9VpsJrBTddF7lA8Oqs0v19Z/tgaVi4NWYH82GxRI/ZKgVrR2exUKg
+	 6pxsWjmlGd+vvnQ1ksdsTQyFtHWDjtuyzfDKygsDPMBKtSLE99sQ6XTybKR7hM6M6V
+	 oHhmNWxoXiKBg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5CBACC4160E; Thu, 18 Dec 2025 21:55:36 +0000 (UTC)
+	id 7A34DCAB780; Fri, 19 Dec 2025 01:28:40 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 200007] HP Elite Presenter Mouse support
-Date: Thu, 18 Dec 2025 21:55:36 +0000
+Subject: [Bug 86931] hid-generic 0005:099A:0500.0001: unknown main item tag
+ 0x0
+Date: Fri, 19 Dec 2025 01:28:40 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -40,16 +41,16 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: rdunlap@infradead.org
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Who: hurikhan77+bko@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status cc resolution
-Message-ID: <bug-200007-62941-OYzwsUKXAN@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-200007-62941@https.bugzilla.kernel.org/>
-References: <bug-200007-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-86931-62941-JQZHxFo3YA@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-86931-62941@https.bugzilla.kernel.org/>
+References: <bug-86931-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -61,18 +62,31 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D200007
+https://bugzilla.kernel.org/show_bug.cgi?id=3D86931
 
-Randy Dunlap (rdunlap@infradead.org) changed:
+--- Comment #13 from Kai Krakow (hurikhan77+bko@gmail.com) ---
+Randy,
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-                 CC|                            |rdunlap@infradead.org
-         Resolution|---                         |CODE_FIX
+the underlying issue is quite easy to understand:
 
---- Comment #6 from Randy Dunlap (rdunlap@infradead.org) ---
-Marking as closed/fixed unless/until someone has a problem.
+All Microsoft Xbox controllers are sending a NUL terminated HID descriptor
+block. If we strip it away for those devices, the message is gone. This is
+probably true for some other vendors (as reported here for Apple Magic Mous=
+e).
+
+We are doing it here around these lines to avoid the warning for Xbox
+controllers:
+https://github.com/atar-axis/xpadneo/commit/1e6b074506b85d03d2636beca528177=
+f482029b8
+
+So maybe the HID parser should just ignore a single trailing NUL byte and
+accept that some device vendors just do that.
+
+OTOH, it may be useful to warn about it, so device developers can properly =
+fix
+their HID descriptors. And for that case, rate limiting is the proper
+implementation to work around other side effects (like overwhelming an UART
+console).
 
 --=20
 You may reply to this email to add a comment.
