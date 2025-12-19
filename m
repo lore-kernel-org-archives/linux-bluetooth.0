@@ -1,151 +1,159 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B75F33C199
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Dec 2025 17:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766164259; cv=pass; b=iAe/gCA7wAzS9BmhXPexDffUrrLazkftXaZHVTp40iBIBq3509d4WVKFvlPniNNzsrYKF+8RsEsJtTI/Rw1aEi222NuZNHe+NlhY6snhQmnqKMrew2knMxeiLA2s0r18Xgp3rCCUsBufPATiKrRzzgZxvxfGkSaHGCsy98Gjm6A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766164259; c=relaxed/simple;
-	bh=7W+zzMQIPnbx1KY79KILe0Z8LoLdiE1iUk89Pu+57No=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IM+Xf+Ik0DYiVIQpBWmIPNH5Qg0PiLtcO9IXttXDkMTMdR+lbwV0Fn75z8WWe1QiT6XC2vuEzuwsGD9hEXJcFgNAdGE6A9uZRksaRUTNRcEQUVCyj08an2VQ92ubOAj7681z6vvOkQ9Nk2Bk5OR1ZX2jPoZmQFiwnTr4Z+34pyc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=D8cEXsUv; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8B7339879
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Dec 2025 17:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766164316; cv=none; b=PpT+HoAUfgbfcjOdQfoFoG9Swlh3imReBkaqrsK4xU8MpBuwjC/JXBTpnwPM7auMaaud+vMthRXZEFPTU1lyO9XQ3WJPtSi8R7CedMzuFcQL2eyvJnwFVuNCc8NrUzyY2ZpLS5yc2F2vn1A992q6Yq5qMOnf1ZJ2INVgOTqkxdY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766164316; c=relaxed/simple;
+	bh=7Az+Zi0F/YovGcqII8PKRsH0KmAS5VtBRnuLvewd9zo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=tUrDU6MqthryS+9DW2eoUbdYL18NdXm1Yh0HKDKROP3kPQb4y087o7ExbZkBfGRla+LKrLedgp624zoFlFMQHaKIyUbRG3EPz8kRqsg3+c/NPohr3hHDUG9QwF4t8/ksSgOwmLlCmZUhb/24hcuVbMFOuZBzp/rSSFvGulPKnmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lB/rED6H; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="D8cEXsUv"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4dXvF24RrVz105D;
-	Fri, 19 Dec 2025 19:10:46 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1766164247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=akKv7tnb1dWScoBcFQZDRXjZpKY7xbXjB1iZwXKhYnU=;
-	b=D8cEXsUvFzSROLDfBd3KsnDBBXAHTXsXgpUfJRKzW9ixg5O/AgUfdFO2L9hgQI9VGLnfEx
-	F31Zw8/eKZ9dpsy9cIQSl2nvoiWQz3B6yfkneGHfwoPNkWp5KoYfjUSyHyk8tAuC4403mZ
-	hN8q9NYDdXrahMZMwzNcpVjlJvDyw/s=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1766164247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=akKv7tnb1dWScoBcFQZDRXjZpKY7xbXjB1iZwXKhYnU=;
-	b=wUQcTjEu85RBFQ5MCuA8uUqmKHTjxCNodpS5tXuAoWh/lloMyTVhiPcjvW+jNNLRI8dgw4
-	Po4T7KLyh5CGeHAd4GEjQIJKx12H515EHMPoKiKFmt94MufgZXb+SnLOdcnMGF51OiaHWk
-	2nrJ3Gh14CPEtL7KITDp62ZhuFzfHf4=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1766164247;
-	b=rJvn/lOzz+Sqzzjq3mMwHYc2aqx3qaSILDt4ZGE2sy+t8FeWmicPFSD9uhEiE2j5aaifuH
-	YC8StMkpC9KPec5FNQPqAFTw4aODdxO717xLN036Z0rLU7J3A72cfsxSkhQrAlPOjfUodM
-	ZrOJf+HOSHCnl0Z/uKGZQWeL77WBIwA=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 3/3] tools/mpris-proxy: allow selecting which adapter to use
-Date: Fri, 19 Dec 2025 19:10:39 +0200
-Message-ID: <fc109d9cb3edfa76a05ed747017a42f2ce2ec5cf.1766164144.git.pav@iki.fi>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <cover.1766164144.git.pav@iki.fi>
-References: <cover.1766164144.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lB/rED6H"
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-29f2676bb21so24640175ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Dec 2025 09:11:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766164314; x=1766769114; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kgMQhqgNGMB10RSnRH0iwlZEQdzPNtH6mAo1d7cT16c=;
+        b=lB/rED6Hma+oxgd6Iw8MsjJeyccfKRW2KjKHzBrdHxSVBjxjB28NYZ/JSkaxLd8/d8
+         bc/jUIKYM3Yl4xq8FnUGmfc0NLEK3dfHujubhTUxsdHTURH/+w3Ej6jtyIm1dEnESKai
+         qzrRrQk2vz5wMXZOEc8yt1mnk5/XE5WTe5zqy/vsXboadBTWBNkMxxR0Xs12XZIYATDH
+         NEVIiPcwuMhXUg0GqflaTzxGwNjymmDmUn5DWJ19sLesR/hS/BPZbY5JCFET1et3aLTx
+         BgzQ6hjYzg7kdkVY7NUZvfcvNhPUEUKj36InHo8rBEgR3g9IhERh8Ia6ESWNN/lFVgwO
+         KQ0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766164314; x=1766769114;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kgMQhqgNGMB10RSnRH0iwlZEQdzPNtH6mAo1d7cT16c=;
+        b=W3ytyzsPaVfortfKiwK9bEu5qaAN2SipCcZCiOvdS4qFSU6CiuI+3sUypuF08O63I6
+         2TgIOjbiNagnaL9Z7J4EtWp1jlUdvg6IRj3hxXoPbxxEVl9sXMqoUP4l8OsD+/g4AwuF
+         5zs6Zp0ochdoIECKy8g0wE7FGai1SLV7LAWSsA/8LqyciGVfxhj9bwbrjtp9lcL0Djms
+         FNRdT6mDyR8dYXIljSuKAVQagOv000ssy5Hf+9LDSkxKXz8wtVzPZukipmZwornkPJ/o
+         1MntY9NseqjU6xb2ge2mPewD/6nJ/JfPhTqzkXsWD1Fd/6x3VRQri8dwNT2hoej+nA16
+         o5DA==
+X-Gm-Message-State: AOJu0Yx02B8vlxzAnbg11CTCVf20eBvkwqfuv9NYRCwit+ikWHm1M2oE
+	gPKMUvl7jrdMWRoQ2+jHRAwG0JNVispDs/q0Pum6rRjsOn0KyibesQBIAIEuDCJ6
+X-Gm-Gg: AY/fxX7t+u11sb2I5IlSBThVr+lC7T0+arv4NCYy8UerTKHXzsAo+055rEH+L/3aDPC
+	gk9lDj+y+jV4gnHmW6I1coeibWin3omhF2rAaw90SEvtvs5E1RJ1g56sXC+IhFH6TOkf/62BJfy
+	mOmaYHRtdo3AcJrPzROmAPPQ/Zh1DtNyulJL1Hu24zoWVS5bvgeafAbBIW2gH5UsD9gMVD4liut
+	9GAwr4h1JNutjItVO8+zpUd2KvAJ80jJhdX1o1GUG6oU8/WnEumTXoGZAJinTFusm78DS2YvdIr
+	0bQ5TfxIiNJJtLswZRzf8vhR+wgccx34noXyD9tkHx5xoiAvwwuXvVTBFB5xIAF3v1de9qdWh6A
+	8kAuggMIy2jLQduWkPTw/2A1jmE1hz/pCp+yJb2L4zSA3lsGYrBFzeIKW+h3R12ccKWmQ6J7pT1
+	mbl1YsjFuNClRqMFwMcqYEdQpLFP3s
+X-Google-Smtp-Source: AGHT+IEty+ZmChpDB8dbHbZn2sxKogEtUrDyWURvRshbkyLn1thzu2M1ASdlUm/SB8VuFH7TJMTUKA==
+X-Received: by 2002:a05:7022:6291:b0:119:e569:f61e with SMTP id a92af1059eb24-121722e12e7mr3689309c88.23.1766164313704;
+        Fri, 19 Dec 2025 09:11:53 -0800 (PST)
+Received: from [172.17.0.2] ([104.209.11.210])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121724cfa2csm8386663c88.3.2025.12.19.09.11.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Dec 2025 09:11:53 -0800 (PST)
+Message-ID: <69458759.050a0220.804d4.549c@mx.google.com>
+Date: Fri, 19 Dec 2025 09:11:53 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7711148144245084463=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1] fixup! Bluetooth: hci_sync: Add LE Channel Sounding HCI Command/event structures
+In-Reply-To: <20251219162820.320823-1-luiz.dentz@gmail.com>
+References: <20251219162820.320823-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-mpris-proxy by default uses the first adapter it sees over DBus.  Add
-option for selecting a specific one.
+--===============7711148144245084463==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1035126
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.56 seconds
+GitLint                       PENDING   0.33 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      25.38 seconds
+CheckAllWarning               PASS      28.06 seconds
+CheckSparse                   PASS      31.86 seconds
+BuildKernel32                 PASS      25.04 seconds
+TestRunnerSetup               PASS      555.28 seconds
+TestRunner_l2cap-tester       PASS      28.19 seconds
+TestRunner_iso-tester         PASS      73.38 seconds
+TestRunner_bnep-tester        PASS      6.35 seconds
+TestRunner_mgmt-tester        FAIL      116.62 seconds
+TestRunner_rfcomm-tester      PASS      9.54 seconds
+TestRunner_sco-tester         FAIL      14.83 seconds
+TestRunner_ioctl-tester       PASS      10.42 seconds
+TestRunner_mesh-tester        FAIL      12.68 seconds
+TestRunner_smp-tester         PASS      8.77 seconds
+TestRunner_userchan-tester    PASS      6.79 seconds
+IncrementalBuild              PENDING   0.92 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.105 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.764 seconds
+Mesh - Send cancel - 2                               Timed out    1.998 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    v2:
-    - use --index/-i option that takes integer
 
- tools/mpris-proxy.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
-
-diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
-index 2774bcc1a..1d7a421e9 100644
---- a/tools/mpris-proxy.c
-+++ b/tools/mpris-proxy.c
-@@ -62,6 +62,7 @@ static GSList *obex_sessions;
- 
- static gboolean option_version = FALSE;
- static gboolean option_export = FALSE;
-+static gint option_index = -1;
- 
- struct tracklist {
- 	GDBusProxy *proxy;
-@@ -748,11 +749,37 @@ static void usage(void)
- 	printf("Usage:\n");
- }
- 
-+static gboolean parse_option_index(const char *key, const char *value,
-+					gpointer user_data, GError **error)
-+{
-+	long i;
-+	char *end;
-+
-+	if (!value)
-+		goto fail;
-+	if (!strncmp(value, "hci", 3))
-+		value += 3;
-+
-+	i = strtol(value, &end, 10);
-+	if (end == value || *end != '\0' || i < 0)
-+		goto fail;
-+
-+	option_index = i;
-+	return TRUE;
-+
-+fail:
-+	g_set_error(error, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE,
-+						"Invalid value for --index/-i");
-+	return FALSE;
-+}
-+
- static GOptionEntry options[] = {
- 	{ "version", 'v', 0, G_OPTION_ARG_NONE, &option_version,
- 				"Show version information and exit" },
- 	{ "export", 'e', 0, G_OPTION_ARG_NONE, &option_export,
- 				"Export remote players" },
-+	{ "index", 'i', 0, G_OPTION_ARG_CALLBACK, parse_option_index,
-+				"Use the specified controller" },
- 	{ NULL },
- };
- 
-@@ -2349,8 +2376,16 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
- 	path = g_dbus_proxy_get_path(proxy);
- 
- 	if (!strcmp(interface, BLUEZ_ADAPTER_INTERFACE)) {
--		if (adapter != NULL)
-+		char buf[32] = { 0 };
-+
-+		if (option_index >= 0)
-+			snprintf(buf, sizeof(buf), BLUEZ_PATH "/hci%d",
-+								option_index);
-+
-+		if ((buf[0] && strcmp(path, buf)) || adapter != NULL) {
-+			printf("Bluetooth Adapter %s ignored\n", path);
- 			return;
-+		}
- 
- 		printf("Bluetooth Adapter %s found\n", path);
- 		adapter = proxy;
--- 
-2.51.1
-
+--===============7711148144245084463==--
