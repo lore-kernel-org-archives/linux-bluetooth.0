@@ -1,127 +1,74 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C82A270ED9;
-	Sat, 20 Dec 2025 15:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508381C69D
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Dec 2025 15:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766244802; cv=none; b=gTmzIy8+7ET+A4BiVP4HkjkWfJj0Wxmer+lUPtR5sZmbDGP8uzYsWVhucbB0C0ya1odshNoQzIFo82FNbnCsm+1KrR0B1jPsSTGFYVnhc6dtCR/CKqq+Y2XvX2EvbCE+0DJhN0ncOy+EjTkoY3HB1sZe0cg0DSeZvh3eCFhGr/s=
+	t=1766245346; cv=none; b=Dd955hWCnt/uqlRYxDTxmu2Yn7/7L3fl85HnbX4pZRbPEaEI0FyMbsIGdQ7YrhkdZPMkoq9Mu3+MUzPlsBxvNUHgdMY3i/eRe7WhOfv01MRxiln5OJMJDe8brCY4BerlWxT6Ixx8Ds5oXV8+MEvO4Ln3CoHknF9Gkq7UOrFdY7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766244802; c=relaxed/simple;
-	bh=psCh1TYkBto3F/c5tTwekWgwUEj/QzB04jmM1OIM3R4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nPlMg6L2QX5ITNh0juDAKe+L3NAbrLhxuXKa5d3UkM/a+a4dmAkoUtJw8Gdd5CHgwiG5IxLPNYuj3i1cxoAc90TFUyCG+FX/RJQRwjzl7hREG/vsDeSz644XgYtptOGgnNhVVFMVeT7Mr2dHB5eAVsQyjOYelPjshwK++/3Prhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KUGs4G0J; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1766245346; c=relaxed/simple;
+	bh=Ihu1iLIL1hVykRRR9hfk+MQOIpwAyh+vTUg1/kzrNUU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HANRYDCvvl+udkIR3xpQkCrPGq1V41LhcZ8EOwTdy+PKNMZ1YQjnMIneOB5gBZ5DyARG1+JgIB0C0PvNte2DP+PypJ2h0863EER8hYwuXrVyuCb2Amq1ZA0C0xPMC6TxmHiaCqd+9C+yph9NlWqNJWp5kzCFV5Jao7l6wctqI2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IyUuRShB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KUGs4G0J"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766244801; x=1797780801;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=psCh1TYkBto3F/c5tTwekWgwUEj/QzB04jmM1OIM3R4=;
-  b=KUGs4G0Jhs3Kb6Q2UT51tQc0+NBNiGiC57LKw3gvkQQVlVysvNHs4jCy
-   3HT7BU+m0YqbUw0YTZwj7cUnLjJmxjzRq3rC77pqH50PpIE8sOH+rG1g/
-   fMMz8H4Py10FtjAYPSvQ9ouG6mBceL74iYlV0grvRo/LY4VotPd1jfcGu
-   9zfB89v8egdRfZ7i2idF4wRX9VtvCqEOKWs9S1PoQS4taEpaE4OfFxGOu
-   xI6ZX/1XxtKdBS2HMESW7SHg3rzC/p6X9jbB9pERb3//rZSL0FbOgMBNs
-   0goPYA1Tijz+O5bGzfiCfDwxTbS79N50fGt+zdHflut4bF4aEey5vwm7t
-   w==;
-X-CSE-ConnectionGUID: NWXE8YOXQZK8pesBupmMdQ==
-X-CSE-MsgGUID: xflPaKTWQ0+lcMQHYBGTMA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11648"; a="67927110"
-X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
-   d="scan'208";a="67927110"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2025 07:33:20 -0800
-X-CSE-ConnectionGUID: nUmViF3vTfuwZeRj+B1kzA==
-X-CSE-MsgGUID: H6rRap5ORXi6DqlZSg4bvw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
-   d="scan'208";a="203569341"
-Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 20 Dec 2025 07:33:16 -0800
-Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vWyxG-000000004ks-1V0h;
-	Sat, 20 Dec 2025 15:33:14 +0000
-Date: Sat, 20 Dec 2025 23:33:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	anubhavg@qti.qualcomm.com, mohamull@qti.qualcomm.com,
-	hbandi@qti.qualcomm.com, Simon Horman <horms@kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Initial LE Channel Sounding
- support by defining required HCI command/event structures.
-Message-ID: <202512202215.swPhiL21-lkp@intel.com>
-References: <20251216113753.3969183-1-naga.akella@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IyUuRShB"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 23BE8C4CEF5
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Dec 2025 15:42:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766245346;
+	bh=Ihu1iLIL1hVykRRR9hfk+MQOIpwAyh+vTUg1/kzrNUU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=IyUuRShB6vUMABFIR+XTAkBviRRWU91/GHqbWmdHLB9R39I2hJoEZk4D3+Mru3zJc
+	 eH+qJEG0k6HJXtKk/xf+7nrAdJnTz8pKv8IZWLL9tmP9/E1wtyUkjM/a7O1/nx4tLf
+	 wRbC4tvx2TaJNI4rQTgKWWiN9yq0Jyfyn7+1DN+1gL5nTeAqU0TPKAbjcvNfEASMob
+	 +R+VRFyGL39eukdqmkZxnf4GXgp36xdsuAkol1i0mtBydZVpU+FHvCw/XWupcJihCH
+	 z4YWy998E4xbdP4E6r/JOM2GBNy5yFPFWy3SKmPOj6EGBijWMFFrgK47oXCEzLXVi8
+	 x6NtUTK7PfaIw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 1BE26C433E1; Sat, 20 Dec 2025 15:42:26 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 216936] First attempt to upload firmware for Intel Bluetooth
+ fails (a timing issue?)
+Date: Sat, 20 Dec 2025 15:42:25 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: cheako+kernel_org@mikemestnik.net
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216936-62941-YOsOrWz8AL@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216936-62941@https.bugzilla.kernel.org/>
+References: <bug-216936-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251216113753.3969183-1-naga.akella@oss.qualcomm.com>
 
-Hi Naga,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216936
 
-kernel test robot noticed the following build errors:
+--- Comment #30 from cheako+kernel_org@mikemestnik.net ---
+Moved: https://marc.info/?l=3Dlinux-bluetooth&m=3D176624588529966&w=3D2
 
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on net-next/main net/main linus/master v6.19-rc1]
-[cannot apply to bluetooth/master next-20251219]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+--=20
+You may reply to this email to add a comment.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Naga-Bhavani-Akella/Bluetooth-hci_sync-Initial-LE-Channel-Sounding-support-by-defining-required-HCI-command-event-structures/20251216-202908
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-patch link:    https://lore.kernel.org/r/20251216113753.3969183-1-naga.akella%40oss.qualcomm.com
-patch subject: [PATCH v1] Bluetooth: hci_sync: Initial LE Channel Sounding support by defining required HCI command/event structures.
-config: arm-am200epdkit_defconfig (https://download.01.org/0day-ci/archive/20251220/202512202215.swPhiL21-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251220/202512202215.swPhiL21-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512202215.swPhiL21-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/net/bluetooth/hci_core.h:35,
-                    from net/bluetooth/hci_core.c:39:
->> include/net/bluetooth/hci.h:2430:8: error: redefinition of 'struct hci_cp_le_cs_set_proc_param'
-    2430 | struct hci_cp_le_cs_set_proc_param {
-         |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/net/bluetooth/hci.h:2407:8: note: originally defined here
-    2407 | struct hci_cp_le_cs_set_proc_param {
-         |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +2430 include/net/bluetooth/hci.h
-
-  2428	
-  2429	#define HCI_OP_LE_CS_SET_PROC_ENABLE		0x2094
-> 2430	struct hci_cp_le_cs_set_proc_param {
-  2431		__le16  conn_hdl;
-  2432		__u8	config_id;
-  2433		__u8	enable;
-  2434	} __packed;
-  2435	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+You are receiving this mail because:
+You are the assignee for the bug.=
