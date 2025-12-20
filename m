@@ -1,128 +1,102 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6752765C5;
-	Sat, 20 Dec 2025 15:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A57586277
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Dec 2025 20:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766245464; cv=none; b=RQ/qKRcR4Bs1JBx4GfItl6Ozt3X3CCY2IZWe/bK4GPQOodMzB3A1M2+3hNNRn/7fQ9zUslKuWQS1ES2KecVs13F4imBRjl0EGv/YpcJfeQeHhZ3Mcovz15l/aPRwhqyRqVkRCho+T4rRlGu7oy6V6VlHNNwGgB/HhIxITSKpbF0=
+	t=1766263301; cv=none; b=Aj0c438/19x25nrbBEcdFhcqZ0C5/5kpfkw7Arg67y4hQdUoWSiOmTPsonpGfma91yIREkKuMvmsQuQamgE25yWQi4201n0bCbrxetq8T3FVA3rtXLwfnzfXl+8zs33MbTzsXwu0EM+DHZdNccZxvA9+neJflPjrXdSZ5wu/BSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766245464; c=relaxed/simple;
-	bh=sPTfzgRAB6RKo0v/+78CZE6GdRZEgXz+wQviLbdQR20=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GjDFCFt/P/r2OHP95nd7PBrbVrmv8MREk1Aiy1HE/OE/sixofSHP9Ka7c2SsUKwsDfqkHbmviPaB8r0q1JXKGSyVYzdLHcnhnvFBpRyl/4t2yRbPmZ6m9tTyFLqR4a/SkeU2n/p9w09SZzyYP3dTrxmxSaXwka7I8q17lJFL3BY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bwJLZTg7; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1766263301; c=relaxed/simple;
+	bh=DBgLTRInF2/cLukC/bjBYaVN77QdRKPAfDeER5b7zhc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OHCcU0o+N1YjQlhJ9y/CgP9wlr73LX3VBrZli2clqyt0XC0mAdW8NJplybCCi4ck6LPFApecWPsQcEOPnrHrja17fCFEJhGMrt86uGbtNMj48EfNq7VGY2eRB8ZhQtq9WwlY+5HOy0BBfhqRI9yidDr3DAFaypkSSlJPWJ7XFz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q/9r0SVy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bwJLZTg7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766245463; x=1797781463;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=sPTfzgRAB6RKo0v/+78CZE6GdRZEgXz+wQviLbdQR20=;
-  b=bwJLZTg7EswXssE31yeY1b0LUhnVUfzs8P3awvmB7CDRYgLnZnMcu4xT
-   O5+OwaJLhkhqcKQYNMbglFaSEZaxXMPDFI9UKnOdnTsyzKhVFY0W+ym9W
-   9uLC+iMq+woH/pwDFA+HDIqkIdnvxoR4M3NJuWlBV8sYYC9brSWFlQ6s1
-   4DIMyPHyxnKIEge6OTGU8JD1Xg7hC38dr2AZ3p24YG0o9o+HicHQS7AXJ
-   nY5b43KIraH8ogf3Hw5T0r0pnh+qnFXDIUCwqDR+YWJQ/f/2ZtGs9KNzJ
-   /ThpSfj+WrkiObyuQA1MdryY3C7zTT0lphjJC5MybvGzKPpX9EWF8wzMH
-   A==;
-X-CSE-ConnectionGUID: yvLqZvBUQoeY8iosGI1hvw==
-X-CSE-MsgGUID: AUVhemQmQ9mqfRgJA5vRjQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11648"; a="90838742"
-X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
-   d="scan'208";a="90838742"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2025 07:44:22 -0800
-X-CSE-ConnectionGUID: wENouVOqQGO/o8GLybGm3A==
-X-CSE-MsgGUID: wToCnkxuQL2Ch03L4CHG+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
-   d="scan'208";a="222597991"
-Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 20 Dec 2025 07:44:18 -0800
-Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vWz7v-000000004m3-2Tdb;
-	Sat, 20 Dec 2025 15:44:15 +0000
-Date: Sat, 20 Dec 2025 23:43:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	anubhavg@qti.qualcomm.com, mohamull@qti.qualcomm.com,
-	hbandi@qti.qualcomm.com, Simon Horman <horms@kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Initial LE Channel Sounding
- support by defining required HCI command/event structures.
-Message-ID: <202512202353.A3cnxg81-lkp@intel.com>
-References: <20251216113753.3969183-1-naga.akella@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q/9r0SVy"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DECF0C116C6
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Dec 2025 20:41:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766263300;
+	bh=DBgLTRInF2/cLukC/bjBYaVN77QdRKPAfDeER5b7zhc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=Q/9r0SVyZsyG+TTFSiFHX9VxOCemeOECx0/7NoAzki0CbjOqkUfGt90uy2zzwx+Pm
+	 a9Z6PIPM0o3Li4DksxJitU/R3AJ6XPwLAY99XH8sd8P5LQNQxr/s/qmcrveJaqYwry
+	 qeQi1I5yOT+VU0Zs2/FGWqt43tXPQXQKhNBGCVAWpO+Ml0khbh2DyV7rXcH6w1M1lY
+	 jlLWFdtQEw2DQrMSp1tovePRRLSmXLUEXJFtcWbicpP7qv6JIqUjOZL1BKo2UZVw8X
+	 UyK6+WjYw54aToujivAWBWeki2zjdsPt5UjrlQg3NbdLb2K6sLGxZKc2FIsgdhehkg
+	 yyvyGaiF3TCEg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id D303CC3279F; Sat, 20 Dec 2025 20:41:40 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 216936] First attempt to upload firmware for Intel Bluetooth
+ fails (a timing issue?)
+Date: Sat, 20 Dec 2025 20:41:40 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: mpearson-lenovo@squebb.ca
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216936-62941-6jdDhEfMC3@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216936-62941@https.bugzilla.kernel.org/>
+References: <bug-216936-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251216113753.3969183-1-naga.akella@oss.qualcomm.com>
 
-Hi Naga,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216936
 
-kernel test robot noticed the following build errors:
+Mark Pearson (mpearson-lenovo@squebb.ca) changed:
 
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on net-next/main net/main linus/master v6.19-rc1]
-[cannot apply to bluetooth/master next-20251219]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |mpearson-lenovo@squebb.ca
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Naga-Bhavani-Akella/Bluetooth-hci_sync-Initial-LE-Channel-Sounding-support-by-defining-required-HCI-command-event-structures/20251216-202908
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-patch link:    https://lore.kernel.org/r/20251216113753.3969183-1-naga.akella%40oss.qualcomm.com
-patch subject: [PATCH v1] Bluetooth: hci_sync: Initial LE Channel Sounding support by defining required HCI command/event structures.
-config: x86_64-randconfig-161-20251217 (https://download.01.org/0day-ci/archive/20251220/202512202353.A3cnxg81-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251220/202512202353.A3cnxg81-lkp@intel.com/reproduce)
+--- Comment #31 from Mark Pearson (mpearson-lenovo@squebb.ca) ---
+Bit of a long shot - but try removing the SBDC call in thinkpad_acpi
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512202353.A3cnxg81-lkp@intel.com/
+https://github.com/torvalds/linux/blob/fa084c35afa13ab07a860ef0936cd987f9aa=
+0460/drivers/platform/x86/lenovo/thinkpad_acpi.c#L4181
 
-All errors (new ones prefixed by >>):
+(afraid you'll need to edit code and build a kernel)
 
-   In file included from net/bluetooth/hci_core.c:39:
-   In file included from include/net/bluetooth/hci_core.h:35:
->> include/net/bluetooth/hci.h:2430:8: error: redefinition of 'hci_cp_le_cs_set_proc_param'
-    2430 | struct hci_cp_le_cs_set_proc_param {
-         |        ^
-   include/net/bluetooth/hci.h:2407:8: note: previous definition is here
-    2407 | struct hci_cp_le_cs_set_proc_param {
-         |        ^
-   1 error generated.
+We've seen a few issues on recent platforms with disabling Wifi, related to
+this call. It's not used on Windows, and it can put the Wifi in a disabled
+state that it doesn't recover from.
 
+I've been trying to track down what changed and why. We originally thought =
+it
+was Mediatek modems only, but have seen it on Intel too. On impacted platfo=
+rms
+we've been turning that SBDC call into a no-op as a fix in the BIOS (I don't
+want to break older platforms where this might be needed, so have avoided a
+kenrnel fix so far).
+I'm a bit worried the problem is more widespread than originally expected.
 
-vim +/hci_cp_le_cs_set_proc_param +2430 include/net/bluetooth/hci.h
+We see the issue when disabling Wifi from the systray on Gnome, but it's fi=
+ne
+when done from gnome-control-center. Very weird.
 
-  2428	
-  2429	#define HCI_OP_LE_CS_SET_PROC_ENABLE		0x2094
-> 2430	struct hci_cp_le_cs_set_proc_param {
-  2431		__le16  conn_hdl;
-  2432		__u8	config_id;
-  2433		__u8	enable;
-  2434	} __packed;
-  2435	
+--=20
+You may reply to this email to add a comment.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+You are receiving this mail because:
+You are the assignee for the bug.=
