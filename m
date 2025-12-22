@@ -1,109 +1,132 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f195.google.com (mail-qt1-f195.google.com [209.85.160.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75ACB1946BC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Dec 2025 19:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB79E25487C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Dec 2025 20:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766432664; cv=none; b=sjGTtW48v0ySg6gw+wwB2fI/Qzki1/iM2gonKTnIeaZIFoHILs+A0ev3QtXy3QMrMiR1599+vRK4N0n7oKpC24t9AACqbReJk+k5kJPEFhLNNRz5X3t4nOKZzLek0hw9X7VdDyyCA2tx+Yg0zWSJAATuL/WenmVm/mlJi+xxoxg=
+	t=1766435470; cv=none; b=i3926ApzbHB0fWxfc6NuIMJ06uXcg+EAO3Q9TciDzlfbeIF4jEmk6YDlbV0nfpr3hOipY8D2B5QBbhYok7Wmu7GVWNKq2rMf/TYMlJsxdig3Ms879XclTuvQMDZjqWzZ+14yOcElVYWR9bKINnNRGqs9Md3BtYvNNsnzKgIrJrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766432664; c=relaxed/simple;
-	bh=A3Xjge3hQ7DOn3F8cSnrpgaQeP6ufEUM8RsNrTpjWNI=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=AQFJHbFk490bHjgywKEplzK2dniKv6OZvTRG1Gjo0ABLc5u/smd8F9fr4iyrD4Tj8pLmTEUgYiq9FZ8M/+1rvC5tTrcabm+z6WcrwlLnC5qGz1T8FasMuuwcAJPwuwE1Rb/Ikb+6JeKW3GF+fvC3nPyO7r3yhczOnkJo1Uiq3Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=eq4raTRB; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1766435470; c=relaxed/simple;
+	bh=AJEK7Crkm86y4w0BUe83wsURgxyNSvFqOcqJK9bQPao=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=h1hfmzqRfYFwABhe43YRjCY9rK+9+TRp5Nv+1As0Mif93tAhbbul9AuEdR11kddik101H0Oed6ZXpC4JlPV7y/tOvS6EkZl1LNDba8NQRTm6S6twQoIkqNy/kCSojbJQxYwjLW4EiwWt8KEsgF+k5IKAy6vxj/EDjmSBWsIRC20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EP6xrT4j; arc=none smtp.client-ip=209.85.160.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="eq4raTRB"
-Received: from github.com (hubbernetes-node-22d2b4a.ash1-iad.github.net [10.56.150.32])
-	by smtp.github.com (Postfix) with ESMTPA id 9EE006008D6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Dec 2025 11:44:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1766432662;
-	bh=qOKO2x+iVHrodeNDDejUSycFlkY6iTCINfmdbPIPWAY=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=eq4raTRBkJo7G3YCrxoTHCuVLlI+KNX3aDGjNkTFcohc/GwOhKYzfrZi8JgLd/S6h
-	 Btlt+1FJTc1Kw3+0mMFiusm3CqpH/VV8V7mtL6iit+n6jFlNE6ItqjqG05gQd9Osj+
-	 /5FcThklP0C0/cyE7vpmipM2wbZKzmbp7J6HpadY=
-Date: Mon, 22 Dec 2025 11:44:22 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1035801/000000-b707db@github.com>
-Subject: [bluez/bluez] 2fb0aa: monitor: Fix parsing of
- BT_HCI_CMD_LE_SET_CIG_PARAMS
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EP6xrT4j"
+Received: by mail-qt1-f195.google.com with SMTP id d75a77b69052e-4f1ab2ea5c1so56974481cf.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Dec 2025 12:31:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766435467; x=1767040267; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=BlfSewOn74V4aflBkSgxoijJ0r1yK78mRNANNaFSlww=;
+        b=EP6xrT4jx1AX6v2clIn6lTzOhM3zjcfPcupcnZo0rjq3/Xyg+/9yXB1beyuz1fhxOk
+         HkQsGS/tis7Dm42gyeV2+SsPsGWcCSgqIWonDhzxz4EPHKl8MfeIZh3aRvQOCtjk9mt0
+         wsXXOOFvlFHeJEyajQA9ihj4sVchpIh80pWaIkxcNgwZ4ua5iapgXlMRVa3nUUdsyF3I
+         yE+h0mUSzbi3SAJMKpwVLpvJH+vcdg9j9kBBHmzPg1QcK1HOqNIgHuM7XEvpMhStTgzz
+         Vm6NNW4Z+8ukl6bRg5U1K2EOFVHfTXljlxJXD5VtSoi/CTfsGoSd/JztjdMVD2Er0LGH
+         XFdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766435467; x=1767040267;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BlfSewOn74V4aflBkSgxoijJ0r1yK78mRNANNaFSlww=;
+        b=w11OFgpiKmRDSU0089+t3Leu6mYRHM7X+OEKmVsmIIQwzsIGixlRdPgWsNE6vbDmF5
+         dojyivlee0+E68pmjKYPrh+ibsVvPU9f0asAOXLCah7lg4IiQhMNJ20P6yElmdwW5JqG
+         ceUiSbTj6XqfxzCmyUStFmLF5dJmlbqJT+LMb9W7/kdNHMxthxRb9WBiKqhZk6p77t7O
+         kx5GJCj1trRyhwgL2d/q71svKkCBCHe+jUgQWs0yquYvx4idZsomCZVTJUoPg4hqES+c
+         zUSkSr11SIUZlhZ7ehldL+Y/6dl1jzoHJKm/o6o6YV2CduweDjXQQTZExDTScJuu0akJ
+         1xxg==
+X-Gm-Message-State: AOJu0YyaybxmUI9nbfxQw548s214rhUxGBtx9nuUYaze4kcm9CE9LdR0
+	PWNkOOTYNGdf6vwlUJz+a3Yul15TmY/n5DlETMYe/d5oZgtk50lUo0eol1m9o0lj
+X-Gm-Gg: AY/fxX63zSdtzj/ZP+uNBqe1BVxFba1uCzC6FeBrLuuR/hfr5F6ikEmdjGGGvtE0KY5
+	FE5MGJbbgj5oIsuSjlELsX3SpsE26wc7BySlYiRr8h4WvMe2cF/ls1pYDLn03mbvQf7M2WtmMug
+	z16p3f34JnvJcZ0J1klqyYO3KFe8dkx5+JczLNvfjvLVCmtBCGP8tl+axKG4EZm8n6h6OoHbnES
+	SqO/XkQHLtgke1yATorinedLOY9vhfSPTcD+r0dnze0r/M9pkPHGDqA+SMHtNAXn8bLP0+ig1ED
+	fyuTrWBr0UOAoq1Vl6baPG7mwVaQoFmy2vPFumFHbCfOD8XpB3VA2FdCrz5m81GDN2VVjECojbr
+	NB2u8RWyTzl2WLlEw/SRzyn6IusVbxYxruFk38D+QnTviHi0LavsOb2vRV+7eqTm/vImAjMwaB5
+	l7gXt7yONqKLfkA6/Ycg==
+X-Google-Smtp-Source: AGHT+IFXnJFXJtJqN1KnGkjfgwJfFB3Z6zN+mgl++fMIkoP4tNToL99b2MBK9+8H9WkgkJfJUyk8Yw==
+X-Received: by 2002:a05:622a:108:b0:4ee:c1a:f11f with SMTP id d75a77b69052e-4f4abdd30demr178952271cf.84.1766435467201;
+        Mon, 22 Dec 2025 12:31:07 -0800 (PST)
+Received: from [172.17.0.2] ([172.172.87.242])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4d5b4c975sm15314181cf.1.2025.12.22.12.31.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Dec 2025 12:31:06 -0800 (PST)
+Message-ID: <6949aa8a.050a0220.1b3c64.3c91@mx.google.com>
+Date: Mon, 22 Dec 2025 12:31:06 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1058128725335284769=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/3] monitor: Fix parsing of BT_HCI_CMD_LE_SET_CIG_PARAMS
+In-Reply-To: <20251222193504.650019-1-luiz.dentz@gmail.com>
+References: <20251222193504.650019-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1058128725335284769==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1035801
-  Home:   https://github.com/bluez/bluez
-  Commit: 2fb0aa22d80c296d88da566edd71570a7788e426
-      https://github.com/bluez/bluez/commit/2fb0aa22d80c296d88da566edd71570a7788e426
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-12-22 (Mon, 22 Dec 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M emulator/btdev.c
-    M emulator/bthost.c
-    M monitor/bt.h
-    M monitor/ll.c
-    M monitor/packet.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  monitor: Fix parsing of BT_HCI_CMD_LE_SET_CIG_PARAMS
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1035801
 
-The fields of BT_HCI_CMD_LE_SET_CIG_PARAMS are bitfields rather than
-values, so this changes the fields to phy's' and fixes the parsing to
-print it as bitfield rather than value.
+---Test result---
 
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.31 seconds
+BuildEll                      PASS      19.97 seconds
+BluezMake                     PASS      627.66 seconds
+MakeCheck                     PASS      22.09 seconds
+MakeDistcheck                 PASS      239.58 seconds
+CheckValgrind                 PASS      299.14 seconds
+CheckSmatch                   WARNING   350.46 seconds
+bluezmakeextell               PASS      182.47 seconds
+IncrementalBuild              PENDING   0.30 seconds
+ScanBuild                     PASS      1031.97 seconds
 
-  Commit: a6679d0338cde5682e05f8fd5d225c0d327c2fea
-      https://github.com/bluez/bluez/commit/a6679d0338cde5682e05f8fd5d225c0d327c2fea
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-12-22 (Mon, 22 Dec 2025)
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Changed paths:
-    M emulator/btdev.c
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Log Message:
-  -----------
-  emulator: Fix using BT_HCI_CMD_LE_SET_CIG_PARAMS PHYs as values
-
-BT_HCI_CMD_LE_SET_CIG_PARAMS PHYs are bitfield so they need to be
-converted to values when emitting BT_HCI_EVT_LE_CIS_ESTABLISHED.
-
-
-  Commit: b707dba6249130050c716b6cccd46d1e57d34ca5
-      https://github.com/bluez/bluez/commit/b707dba6249130050c716b6cccd46d1e57d34ca5
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-12-22 (Mon, 22 Dec 2025)
-
-  Changed paths:
-    M emulator/btdev.c
-    M emulator/bthost.c
-    M monitor/bt.h
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Fix parsing of BT_HCI_BIT_LE_CREATE_BIG
-
-The PHY field of BT_HCI_BIT_LE_CREATE_BIG are bitfields rather than
-a value, so this changes the fields to phy's' and fixes the parsing to
-print it as bitfield rather than value and also make the emulator to
-use bits_to_phy to convert when emitting the likes of
-BT_HCI_EVT_LE_BIG_COMPLETE.
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/btdev.c:470:29: warning: Variable length array is used.emulator/bthost.c:700:28: warning: Variable length array is used.emulator/bthost.c:701:32: warning: Variable length array is used.emulator/bthost.c:918:28: warning: Variable length array is used.emulator/bthost.c:952:28: warning: Variable length array is used.emulator/bthost.c:953:32: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1933:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3866:52: warning: array of flexible structuresemulator/btdev.c:470:29: warning: Variable length array is used.emulator/btdev.c:470:29: warning: Variable length array is used.emulator/bthost.c:700:28: warning: Variable length array is used.emulator/bthost.c:701:32: warning: Variable length array is used.emulator/bthost.c:918:28: warning: Variable length array is used.emulator/bthost.c:952:28: warning: Variable length array is used.emulator/bthost.c:953:32: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1933:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3866:52: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Compare: https://github.com/bluez/bluez/compare/2fb0aa22d80c%5E...b707dba62491
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1058128725335284769==--
