@@ -1,127 +1,199 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA8D32ABF9;
-	Mon, 22 Dec 2025 13:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB88F283FDD;
+	Mon, 22 Dec 2025 14:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766411726; cv=none; b=DfU9dGA7N25KF80Dp7u5E9b9Ptaq9KLXQKPnFR32rxzssiscRMNGkQEpU2nXvOIeazeYs2WTS1j2zIq3uCzFrp66Rhv++Jzr8eGFm5dI79WgllHYajdm+mFrlJIM8dZSK4sggPsKJLuOPKKkFesJY7TH2BjGkIvZ7leRoeginh8=
+	t=1766412469; cv=none; b=UgWZy672jSJTf2+iF/ibEh/A1C54RUxOaSmwZ0cCuFlPYlZ6t552dY9MVFabfDnHa1kEa6r/fK8NGjZ2uibNJV7gWEbb1A09JB097H94uAP/xWPGftQCYMq6HNcO9/cFHYLgM4wbLXyVRGFUcBQDS/mgmxh9F/7JqTuu7XlLy0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766411726; c=relaxed/simple;
-	bh=iVUOQTvyAcWMUm5+vyDIUFL9gPJNw55kGB/8CyiS6Xw=;
+	s=arc-20240116; t=1766412469; c=relaxed/simple;
+	bh=UOGYbwV4khizIIRkAZEZ1DrHXk7kYjdhqrezBYqAA7o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q3bD6vTiQ2gFFOagpjIYlCbdN6hSEutTPGEp6iDNFvv1whKvvAyTWjgz3HFB49RBs6LfHY2EfG0qgoIwC0h2sc1XqXbhCJaMoSvMYEgIiIOHxYfJEmNxbvd+cb1ZP5emH5JKwvU4KMf56HAdy3ACMRcDuB1aQVL8vX3Dj6XWqII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A5f3sGZg; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=pqWgM38/sZuTalGNcJF51FIHp5lVdBb4QFz0QYZg5jv3YC8KTCWOwb/LUQvL9QQT508oGOIg1itgh2xQG4wQf7eGtiWjXUvExO/W/gi+blT+zlrvMShmN0PYDsfLd7lOd6YXxvbRmV+o/MUonqcGBWlSrWmC1v53CaH2Qwg/mHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NitRYNPv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A5f3sGZg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766411725; x=1797947725;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=iVUOQTvyAcWMUm5+vyDIUFL9gPJNw55kGB/8CyiS6Xw=;
-  b=A5f3sGZgg5MqcLHPt47TJllqRc84ZPr4kyBfGAsj/AxOiSwlBDCophrD
-   2FQX8k6BV7AiVQ6u1fK4Ostq5yHO+s6m6H+g5k9Q7UIfBSB11DCZXbuiv
-   pquOGA/xPOZdzcdzgicquoYNXjCU0WiohLI0IcwQnQ9BlRzsSSeGjPMBu
-   pFyS9lj8WadY+2mrBjqV8PEihr2/su92iTnqQCFDa6NbLwZFJfsY7JOLP
-   RsW7ElmEiqOlql+cyaeaRPbyTLx3P4a2E9JxIfeIQvLYQ7VVO6Nln3MZx
-   K5BEMjJjpT37N2T77EM44ZV7RNYwhBBE2f2DcxYHzag1kQQ+wBCTaVhA2
-   Q==;
-X-CSE-ConnectionGUID: uDE9yGd1TDedFfBec93Jrg==
-X-CSE-MsgGUID: If21tjQcROi5gg6Gqampeg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11650"; a="79626641"
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="79626641"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2025 05:55:24 -0800
-X-CSE-ConnectionGUID: X0Vl+MZxQImF2H9r2iO1ug==
-X-CSE-MsgGUID: NVxBXRpWSZCr2WjBm09GQw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="204584115"
-Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
-  by orviesa005.jf.intel.com with ESMTP; 22 Dec 2025 05:55:20 -0800
-Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vXgNZ-000000005V2-3P73;
-	Mon, 22 Dec 2025 13:55:17 +0000
-Date: Mon, 22 Dec 2025 14:54:18 +0100
-From: kernel test robot <lkp@intel.com>
-To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	anubhavg@qti.qualcomm.com, mohamull@qti.qualcomm.com,
-	hbandi@qti.qualcomm.com, Simon Horman <horms@kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Initial LE Channel Sounding
- support by defining required HCI command/event structures.
-Message-ID: <202512221453.cZfzdvAS-lkp@intel.com>
-References: <20251216113753.3969183-1-naga.akella@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NitRYNPv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48CD4C4CEF1;
+	Mon, 22 Dec 2025 14:07:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766412468;
+	bh=UOGYbwV4khizIIRkAZEZ1DrHXk7kYjdhqrezBYqAA7o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NitRYNPvIDex3swqylD4WNfRjVbR/bL6FXStoDH7LCIy4B+888HSCmpnVuf2RASRR
+	 tKURip7NkNgixeDYA9a8FcqmQdidzevjjx0dxRhsqJDNW+pM2RJxH4h8tZVnS9C0Na
+	 oioopBrRVbIXKkkJtRjcl7s1PzFFtYcBmPF37C5mVqF9WaXRB1U6D0clzDghYveDWm
+	 Se4x2fakW8N7B4oJMLcVj0aI2MOSwDSVE8G32Vte+JbL/pkjGM5/0JhqEq/lsptzqx
+	 Z9yeM4/+Nhul31zfAvGm41yePHjelZ4DCHesVf4L6zJc71PrEW8/M2rH6uCPrHj/Bg
+	 R8OGyQTYCfRzg==
+Date: Mon, 22 Dec 2025 19:37:36 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Stephan Gerhold <stephan.gerhold@linaro.org>
+Cc: manivannan.sadhasivam@oss.qualcomm.com, Rob Herring <robh@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Hans de Goede <hansg@kernel.org>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
+	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-pm@vger.kernel.org, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: [PATCH v2 00/10] Add support for handling PCIe M.2 Key E
+ connectors in devicetree
+Message-ID: <lrpxki6crdiezqam3nuw3pi45digirjpqxpvyjvwjugux6rjk5@3wpmtl77oj6f>
+References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
+ <aSYKHjpJkXWUVIyo@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251216113753.3969183-1-naga.akella@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aSYKHjpJkXWUVIyo@linaro.org>
 
-Hi Naga,
+On Tue, Nov 25, 2025 at 08:57:18PM +0100, Stephan Gerhold wrote:
+> On Tue, Nov 25, 2025 at 08:15:04PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
+> > This series is the continuation of the series [1] that added the initial support
+> > for the PCIe M.2 connectors. This series extends it by adding support for Key E
+> > connectors. These connectors are used to connect the Wireless Connectivity
+> > devices such as WiFi, BT, NFC and GNSS devices to the host machine over
+> > interfaces such as PCIe/SDIO, USB/UART and NFC. This series adds support for
+> > connectors that expose PCIe interface for WiFi and UART interface for BT. Other
+> > interfaces are left for future improvements.
+> > 
+> > Serdev device support for BT
+> > ============================
+> > 
+> > Adding support for the PCIe interface was mostly straightforward and a lot
+> > similar to the previous Key M connector. But adding UART interface has proved to
+> > be tricky. This is mostly because of the fact UART is a non-discoverable bus,
+> > unlike PCIe which is discoverable. So this series relied on the PCI notifier to
+> > create the serdev device for UART/BT. This means the PCIe interface will be
+> > brought up first and after the PCIe device enumeration, the serdev device will
+> > be created by the pwrseq driver. This logic is necessary since the connector
+> > driver and DT node don't describe the device, but just the connector. So to make
+> > the connector interface Plug and Play, the connector driver uses the PCIe device
+> > ID to identify the card and creates the serdev device. This logic could be
+> > extended in the future to support more M.2 cards. Even if the M.2 card uses SDIO
+> > interface for connecting WLAN, a SDIO notifier could be added to create the
+> > serdev device.
+> > 
+> > Open questions
+> > ==============
+> > 
+> > Though this series adds the relevant functionality for handling the M.2 Key M
+> > connectors, there are still a few open questions exists on the design. 
+> > 
+> > 1. I've used the M.2 card model name as the serdev device name. This is found
+> > out by comparing the PCIe VID:PID in the notifier. Is this approach acceptable?
+> > I did not use the PID as the serdev name since it will vary if the SDIO
+> > interface is used in the future.
+> > 
+> > 2. PCIe client drivers of some M.2 WLAN cards like the Qcom QCA6390, rely on
+> > the PCIe device DT node to extract properties such as
+> > 'qcom,calibration-variant', 'firmware-name', etc... For those drivers, should we
+> > add the PCIe DT node in the Root Port in conjunction with the Port node as
+> > below?
+> > 
+> > pcie@0 {
+> > 	wifi@0 {
+> > 		compatible = "pci17cb,1103";
+> > 		...
+> > 		qcom,calibration-variant = "LE_X13S";
+> > 	};
+> > 
+> > 	port {
+> > 		pcie4_port0_ep: endpoint {
+> > 			remote-endpoint = <&m2_e_pcie_ep>;
+> > 		};
+> > 	};
+> > };
+> > 
+> > This will also require marking the PMU supplies optional in the relevant ath
+> > bindings for M.2 cards.
+> > 
+> > 3. Some M.2 cards require specific power up sequence like delays between
+> > regulator/GPIO and such. For instance, the WCN7850 card supported in this series
+> > requires 50ms delay between powering up an interface and driving it. I've just
+> > hardcoded the delay in the driver, but it is a pure hack. Since the pwrseq
+> > driver doesn't know anything about the device it is dealing with before powering
+> > it ON, how should it handle the device specific power requirements? Should we
+> > hardcode the device specific property in the connector node? But then, it will
+> > no longer become a generic M.2 connector and sort of defeats the purpose of the
+> > connector binding.
+> > 
+> > I hope to address these questions with the help of the relevant subsystem
+> > maintainers and the community. 
+> > 
+> > Testing
+> > =======
+> > 
+> > This series, together with the devicetree changes [2] was tested on the
+> > Qualcomm X1e based Lenovo Thinkpad T14s Laptop which has the WCN7850 WLAN/BT M.2
+> > card connected over PCIe and UART.
+> > 
+> > [2] https://github.com/Mani-Sadhasivam/linux/commit/acbee74a5c90fc8839bb7b6f326c677ee1c0d89c
+> 
 
-kernel test robot noticed the following build errors:
+Sorry for the delay!
 
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on net-next/main net/main]
-[cannot apply to bluetooth/master linus/master v6.16-rc1 next-20251219]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> Thanks for working on describing the M.2 connectors properly in the
+> device tree!
+> 
+> I haven't had time to look into this in detail yet, but a quick look at
+> the dt-bindings and examples looks good to me! Thanks for keeping the
+> bindings as generic as possible.
+> 
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Naga-Bhavani-Akella/Bluetooth-hci_sync-Initial-LE-Channel-Sounding-support-by-defining-required-HCI-command-event-structures/20251216-202908
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-patch link:    https://lore.kernel.org/r/20251216113753.3969183-1-naga.akella%40oss.qualcomm.com
-patch subject: [PATCH v1] Bluetooth: hci_sync: Initial LE Channel Sounding support by defining required HCI command/event structures.
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20251222/202512221453.cZfzdvAS-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251222/202512221453.cZfzdvAS-lkp@intel.com/reproduce)
+Thanks for pushing me too ;)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512221453.cZfzdvAS-lkp@intel.com/
+> I have a small nitpick for the specific example you have here: The
+> Lenovo ThinkPad T14s does not actually have a "M.2 Mechanical Key E
+> connector". If you look at a picture of the mainboard [1], the WLAN/BT
+> module is "soldered-down" (look on the right, on the right side next to
+> the large copper bracket). In the M.2 specification, "soldered-down"
+> modules do not have a "key", they have a specific pinout that is
+> followed (see section 5.4). The power sequencing etc and the set of pins
+> is quite similar/the same though.
+> 
 
-All errors (new ones prefixed by >>):
+Oh, I was shared one schematics internally and told that it was the mirror of
+the T14s and it had the M.2 slot. So I just went with that. I didn't dare to
+open the cover of my corporate laptop ;)
 
-   In file included from include/net/bluetooth/hci_core.h:35,
-                    from net/bluetooth/hci_core.c:39:
->> include/net/bluetooth/hci.h:2430:8: error: redefinition of 'struct hci_cp_le_cs_set_proc_param'
-    2430 | struct hci_cp_le_cs_set_proc_param {
-         |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/net/bluetooth/hci.h:2407:8: note: originally defined here
-    2407 | struct hci_cp_le_cs_set_proc_param {
-         |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+But this is a good info, thanks!
 
+> My notes (from a few months ago) suggest the T14s probably uses a
+> non-standard M.2 Type 1620 LGA pinout. I don't remember the exact chain
+> of thought behind that, but you can find similarly looking modules with
+> this type, e.g. https://www.sparklan.com/product/wnsq-290be/. There is a
+> 1620 *BGA* pinout in the M.2 specification, but a 1620 *LGA* pinout does
+> not exist there. Interestingly, in the block diagram of the module in
+> the link above this type is called *Q*M.2 1620 LGA 168 pin, as if this
+> is some Qualcomm-specific form factor.
+> 
 
-vim +2430 include/net/bluetooth/hci.h
+But the spec uses 1620 BGA for defining the SSD pinout. So 1620 LGA indeed looks
+like a custom one.
 
-  2428	
-  2429	#define HCI_OP_LE_CS_SET_PROC_ENABLE		0x2094
-> 2430	struct hci_cp_le_cs_set_proc_param {
-  2431		__le16  conn_hdl;
-  2432		__u8	config_id;
-  2433		__u8	enable;
-  2434	} __packed;
-  2435	
+> A real mechanical key E connector can be found e.g. in the X1E CRD, X1E
+> Devkit, or I think some of the X1E-based HP laptops (would need to check
+> which one exactly).
+> 
+> I'm not sure if it's really appropriate modeling the "soldered-down"
+> variant as "Mechanical Key E connector" in the DT. We might need
+> a separate compatible for this. Do you have any thoughts about that?
+> 
+
+I think having a separate compatible that uses the same binding should be
+sufficient since the interfaces are almost the same.
+
+- Mani
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+மணிவண்ணன் சதாசிவம்
