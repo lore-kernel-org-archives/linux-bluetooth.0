@@ -1,62 +1,62 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620E1241139
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Dec 2025 14:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C161C28E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Dec 2025 14:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766499765; cv=pass; b=J8QYNC9cSVhJJU+gD8OZ2NlNQ9dtTbi0HrKBGvIybxaRpK2Yb8ZlBiEahjzKEJ+iDpJLBLNSdqKpFw2KBbLK35ei/7rEczeqki1G2fOuj3eRGdIFovSmJWJ1CerIBS/mumPLWcb7dexYyF/wKJSdhO2J8lo3g7sI0fJ0PLc3GjY=
+	t=1766500838; cv=pass; b=r9tsbh5+2FXahPJQyxc3rDudyz93Q3iw6Gik+b5nD+OY5FA9sGDBEC3tumA39BEJx97C4k1quWFvWKhTYJ4fy7/1VIFOrX42BaUPVyd2FruMYm5/sovljtXfGQA8ptL+A8qckWpkgZ+2hj+IuURbfm2miZs81+3PH2P3jhYwbUw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766499765; c=relaxed/simple;
-	bh=LssF7P+QQb/f9WJwlGRrIqvMeIKCgPARJkLKoOIegYY=;
+	s=arc-20240116; t=1766500838; c=relaxed/simple;
+	bh=RW09XMRUYAkb2HVX5BsTVuzN/hoMwQ7igtKVjkSsB9Y=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FChLyfP4aNJjwyw5Meq1OwGPfeSmi/CIeamPytULFxuKxicnpkssX+kuX0C9BJ3LKHY1nMjtNRw9+nLxLG8d9LJOmur6qYtOexExcWOYmY6e1gGEzwtCXdYoq3RRyO7JiUvcmkqNKjUWtrjBMEazAGsV5IWKVjuzNbOTAa8+G6U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=ZNGuiO+E; arc=pass smtp.client-ip=185.185.170.37
+	 Content-Type:MIME-Version; b=gyhywoD1UTHT3IqH41O1LHy9B361X0O/uhimE9ELifoBOb8+Ni9rbUxjfbSLYGT/0SkFYQ4pdaGVaBxAogZIGwqOeFrGGCbTvD97uWkQ22m5dM+DwM6sKEnFLYha5CYnyx6wuC2qrOKkqDyIhuqQtJe8QUK9Yml33/Z3LJkVX/0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=OecpkRUZ; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="ZNGuiO+E"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="OecpkRUZ"
 Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:1::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4dbHK80ZVlz49PyD;
-	Tue, 23 Dec 2025 16:22:35 +0200 (EET)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4dbHjn0RGjz49PyD;
+	Tue, 23 Dec 2025 16:40:29 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1766499756;
+	t=1766500829;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=gAhzw/UoYuvhwsCkRq3J9/LdMH4iUDxW2y7Oy8Vd4Eg=;
-	b=ZNGuiO+EPziJyttwcYSVYlosCG/kDTeAwQbS+6UT8AnCzGXPYlq3mjpw9Tq95xa06o+9y0
-	xoxKFbQnbMJUH3xpTm+dIuceINaDVDpQuCSJZT4DaJGI8P9RiOFJKG9aL6B+qm0YN7Kyd5
-	tn+sOS/WWHfKJrEof4rW/pONY+ngyuQ5iQ0f0DvQWzjcWVNrcqkdLc6lhXaWnugOOAYcCH
-	S4ptJqdZx8IvITT8SuGS51tyA0qrd6lPmBL7jSbcfMmd3CEtT+8HKI8lmOH7s1dl6CUjVH
-	13XvT6BVkeUUCoHiAgztJP0ISBh/aSiDiSweaweXNhFDp7XKSHn6CvYoZD+g1g==
+	bh=xS6fWLWNpnEPjqJngBpmhxkq5j1ADF4SDD5WlHnFrnY=;
+	b=OecpkRUZIQkRvPOICz/B4Vau/288MUeXMq6GbPlBLDwcva4np74z/APgQ/XGn6+XYUd/ht
+	zrydVMkplfnrzKCboev2m0lOUUfdakg1S3Aa076CWelkfmqpTAz4W6hr1ZXA1uMnCoHr+/
+	pKtd4FB3Jdu3sgzgFbsQkpxfcj06Vwgs79YVLSpKM6A9B8kzJGqpq22mTIyYfYyx8w4Tye
+	blWXsq7YQDU7YgXbXUbfRQzJQvyAYKfB6wG6VFLnUy322N4I9PvJxDdTaMRQIM2qoqOflh
+	82Xu1XZLdkwuBpXiHyl7qRq7X4PFavBICnpLfgz4/OR3SIpa1wrRtishXO978A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1766499756;
+	s=lahtoruutu; t=1766500829;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=gAhzw/UoYuvhwsCkRq3J9/LdMH4iUDxW2y7Oy8Vd4Eg=;
-	b=BHcy31pHLk6Or96KdosnGA/OnVQuygcUg8aPsEOB0vE6/NtzJpHuGJVWbfqzHf13VBKdy8
-	OCKr8zodlTIVU5qsX57UVE1cdrXowPaBjTrBrKkwmN21GjEXoE0eVA/BalYnAB4eNInOl4
-	eNpCOhdjNQLh7EJqCOSxAljSO9lZgruofxc0h8BvoR1mPoIf2gQ6/9ncuqx+Th8bsStWxe
-	uyrHGt+PpZ0tdpfoOhRbLDbzE++YFi9UtI6Ww9Hx3wXKBF5XH/TzgJ3Hd6jtLXKzvPLC+O
-	pmr1A5F86AkDIjwQqQ70ZaPBoA+4S0iIUx8JDvRLYNFFwII1E1f0fetKqWD1+A==
+	bh=xS6fWLWNpnEPjqJngBpmhxkq5j1ADF4SDD5WlHnFrnY=;
+	b=NtR0xJthryGIHIzk1Uwrfyar/zbdcS/WV4rlf0vd/kna7VRpJKmfOyMCw1js6W8VrTcYVE
+	U7BluQl+jYhr3xOHcJlGmNA+dLZjCCRRjs4h73lvkRxuI+q7LO8FskiIUOL9+uyb2UmpIM
+	hIeo8Kn/3GRy3DgcPsv5ZKu2rnwWCOt2OnhzueO7hYr4O0Q5tx9rg8LF01287xzE5GM4+a
+	eqqc/OcI5YD/Lhd7j8V2ShX7BfJBPWnFG37Ec1jpBFLOAmZSFoJT1cZwbWb7Mcty6SCGqB
+	FcUqoV73bP2oRYZP1NS8YIgl2sZ8Xx1ahkRjTwnvhXuLUi9wqBnEiNxyHRePLA==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1766499756;
-	b=LwFbJGQt2H+KNLbiPgiYLaBvZ1S0Y3Zf92vF0ZVRAhXgYSe+AquwU2jVEIi6kCX91p14T/
-	vkBvaW4s5OvCSiPBL/GgrcN4fikYjmSY/nksezA6bEJDLKxDaVrecwmLMKfYZXgSoUYGE0
-	g14v1wnTOkF89O7D3zd1azmw4djagUftiTsHV1/bG4ibFbGhr5/u8ncC+A8CAi7hatWmfU
-	bwM23AsqwL2Sp5OJodV+seWOlxgx7AEfUn+1MY3OKsbtxWKujTzQVHKsJ0ttnh/rSlZYYQ
-	0ckFWwdjOosUT0RNaEX/OSz0eTNObHx/YlUfETCDMPZeMnXjlqUC57TFQTr1Ow==
-Message-ID: <dacbbaa37ff78ef55ced6d7e9a58a6cc025b52fb.camel@iki.fi>
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1766500829;
+	b=GhG/ERq5H39Czz2reNWp7trTmHjskAVxm3XOFm9dqJpdD+VMGctWid4XoPFRQ7AMYdgsPv
+	0qIk9s1zxVY5STDqYsvqUAVigU1sCkNxNFAiFwQoA7S+wAzVAfbEZxw+pt2mvbRlbriUAN
+	uEtTDm48ovQKvIPLk66Tj/QC0JrAtrsgyzVDznpTrqxvTD2i9QS/KrkAZ0wZ4uu2FufRsb
+	l/3R+bI9bs7GmmJps5QMm/10jMILZIvKdH3X2PrGXiX6mBVlqG7u9FFvGwb72IWVOnJU5t
+	R3rvHjSgcU9f7exn15XZqNO4/WcKzt0edJHHpZEjfsU2TSJ1b2kSQ1RuxJvVEQ==
+Message-ID: <411953d7da5ddcc712887ae3703d6d3b49792581.camel@iki.fi>
 Subject: Re: [PATCH BlueZ v1 1/1] profiles/audio/bap.c: Fix
  heap-use-after-free in setup_free()
 From: Pauli Virtanen <pav@iki.fi>
@@ -64,10 +64,11 @@ To: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>,
 	linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, vinit.mehta@nxp.com, mahesh.talewad@nxp.com, 
 	devyani.godbole@nxp.com
-Date: Tue, 23 Dec 2025 16:22:35 +0200
-In-Reply-To: <20251223135134.706-2-sarveshwar.bajaj@nxp.com>
+Date: Tue, 23 Dec 2025 16:40:27 +0200
+In-Reply-To: <dacbbaa37ff78ef55ced6d7e9a58a6cc025b52fb.camel@iki.fi>
 References: <20251223135134.706-1-sarveshwar.bajaj@nxp.com>
-	 <20251223135134.706-2-sarveshwar.bajaj@nxp.com>
+		 <20251223135134.706-2-sarveshwar.bajaj@nxp.com>
+	 <dacbbaa37ff78ef55ced6d7e9a58a6cc025b52fb.camel@iki.fi>
 Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
  keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
  ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
@@ -111,91 +112,127 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-Hi,
-
-ti, 2025-12-23 kello 19:21 +0530, Sarveshwar Bajaj kirjoitti:
-> Fix crash when removing or disconnecting a device with active broadcast
-> streams. AddressSanitizer reports a heap-use-after-free in
-> bt_bap_stream_get_state() called from release_stream() during
-> setup_free().
+ti, 2025-12-23 kello 16:22 +0200, Pauli Virtanen kirjoitti:
+> Hi,
 >=20
-> Detach frees BIS streams during teardown, but setup_free() still
-> unlocks and releases setup->stream afterwards, leaving a stale pointer
-> and triggering UAF. This can happen with multiple BIS streams since
-> each setup holds its own invalid reference.
+> ti, 2025-12-23 kello 19:21 +0530, Sarveshwar Bajaj kirjoitti:
+> > Fix crash when removing or disconnecting a device with active broadcast
+> > streams. AddressSanitizer reports a heap-use-after-free in
+> > bt_bap_stream_get_state() called from release_stream() during
+> > setup_free().
+> >=20
+> > Detach frees BIS streams during teardown, but setup_free() still
+> > unlocks and releases setup->stream afterwards, leaving a stale pointer
+> > and triggering UAF. This can happen with multiple BIS streams since
+> > each setup holds its own invalid reference.
+> >=20
+> > Fix by skipping unlock/release in setup_free() and clearing
+> > setup->stream to prevent further access.
+> >=20
+> > Log:
+> > ERROR: AddressSanitizer: heap-use-after-free on address
+> > 0x7c43a43e3458 at pc 0x572415a8603d bp 0x7ffcdef9b870 sp 0x7ffcdef9b860
+> > READ of size 8 at 0x7c43a43e3458 thread T0
+> >     #0 0x572415a8603c in bt_bap_stream_get_state src/shared/bap.c:6386
+> >     #1 0x5724158f9d0a in release_stream profiles/audio/bap.c:951
+> >     #2 0x5724158fa10e in setup_free profiles/audio/bap.c:1121
+> >     #3 0x572415a293c1 in queue_remove_all src/shared/queue.c:341
+> >     #4 0x572415a29440 in queue_destroy src/shared/queue.c:60
+> >     #5 0x5724158f9464 in bap_data_free profiles/audio/bap.c:192
+> >     #6 0x5724158f9464 in bap_data_remove profiles/audio/bap.c:211
+> >     #7 0x5724159040e4 in bap_bcast_remove profiles/audio/bap.c:3821
+> >     #8 0x5724159a7eb9 in service_remove src/service.c:239
+> >     #9 0x5724159cfa49 in device_remove src/device.c:5489
+> >     #10 0x572415999889 in btd_adapter_remove_device src/adapter.c:1458
+> >     #11 0x5724159b99c7 in device_disappeared src/device.c:3854
+> >     #12 0x572415abcea5 in timeout_callback src/shared/timeout-glib.c:25
+> >     #13 0x7f63a58f9329 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x68329)
+> >     #14 0x7f63a58f7de1 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x66de1)
+> >     #15 0x7f63a59691f7 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0xd81f7)
+> >     #16 0x7f63a58f9156 in g_main_loop_run
+> >         (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x68156)
+> >     #17 0x572415abd18d in mainloop_run src/shared/mainloop-glib.c:65
+> >     #18 0x572415abd9c4 in mainloop_run_with_signal
+> >         src/shared/mainloop-notify.c:196
+> >     #19 0x5724159ea378 in main src/main.c:1550
+> >     #20 0x7f63a562a577 in __libc_start_call_main
+> >         ../sysdeps/nptl/libc_start_call_main.h:58
+> >     #21 0x7f63a562a63a in __libc_start_main_impl ../csu/libc-start.c:36=
+0
+> >     #22 0x57241587d464 in _start
+> >         (/home/workspace/bluez/src/bluetoothd+0x106464)
+> > 0x7c43a43e3458 is located 120 bytes inside of 160-byte region
+> > [0x7c43a43e33e0,0x7c43a43e3480)
+> > freed by thread T0 here:
+> >     #0 0x7f63a5b212ab in free
+> >         ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:51
+> >     #1 0x572415a710f4 in bap_stream_free src/shared/bap.c:1254
+> >     #2 0x572415a710f4 in bt_bap_stream_unref src/shared/bap.c:1337
+> > ---
+> >  profiles/audio/bap.c | 7 +------
+> >  1 file changed, 1 insertion(+), 6 deletions(-)
+> >=20
+> > diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+> > index cda10a643..f30262987 100644
+> > --- a/profiles/audio/bap.c
+> > +++ b/profiles/audio/bap.c
+> > @@ -1113,12 +1113,7 @@ static void setup_free(void *data)
+> >  	if (setup->destroy)
+> >  		setup->destroy(setup);
+> > =20
+> > -	bt_bap_stream_unlock(setup->stream);
+> > -
+> > -	if (!closing) {
+> > -		/* Release if not already done */
+> > -		release_stream(setup->stream);
+> > -	}
+> > +	setup->stream =3D NULL;
 >=20
-> Fix by skipping unlock/release in setup_free() and clearing
-> setup->stream to prevent further access.
+> This breaks various aspects of unicast, so it doesn't look correct.
 >=20
-> Log:
-> ERROR: AddressSanitizer: heap-use-after-free on address
-> 0x7c43a43e3458 at pc 0x572415a8603d bp 0x7ffcdef9b870 sp 0x7ffcdef9b860
-> READ of size 8 at 0x7c43a43e3458 thread T0
->     #0 0x572415a8603c in bt_bap_stream_get_state src/shared/bap.c:6386
->     #1 0x5724158f9d0a in release_stream profiles/audio/bap.c:951
->     #2 0x5724158fa10e in setup_free profiles/audio/bap.c:1121
->     #3 0x572415a293c1 in queue_remove_all src/shared/queue.c:341
->     #4 0x572415a29440 in queue_destroy src/shared/queue.c:60
->     #5 0x5724158f9464 in bap_data_free profiles/audio/bap.c:192
->     #6 0x5724158f9464 in bap_data_remove profiles/audio/bap.c:211
->     #7 0x5724159040e4 in bap_bcast_remove profiles/audio/bap.c:3821
->     #8 0x5724159a7eb9 in service_remove src/service.c:239
->     #9 0x5724159cfa49 in device_remove src/device.c:5489
->     #10 0x572415999889 in btd_adapter_remove_device src/adapter.c:1458
->     #11 0x5724159b99c7 in device_disappeared src/device.c:3854
->     #12 0x572415abcea5 in timeout_callback src/shared/timeout-glib.c:25
->     #13 0x7f63a58f9329 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x68329)
->     #14 0x7f63a58f7de1 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x66de1)
->     #15 0x7f63a59691f7 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0xd81f7)
->     #16 0x7f63a58f9156 in g_main_loop_run
->         (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x68156)
->     #17 0x572415abd18d in mainloop_run src/shared/mainloop-glib.c:65
->     #18 0x572415abd9c4 in mainloop_run_with_signal
->         src/shared/mainloop-notify.c:196
->     #19 0x5724159ea378 in main src/main.c:1550
->     #20 0x7f63a562a577 in __libc_start_call_main
->         ../sysdeps/nptl/libc_start_call_main.h:58
->     #21 0x7f63a562a63a in __libc_start_main_impl ../csu/libc-start.c:360
->     #22 0x57241587d464 in _start
->         (/home/workspace/bluez/src/bluetoothd+0x106464)
-> 0x7c43a43e3458 is located 120 bytes inside of 160-byte region
-> [0x7c43a43e33e0,0x7c43a43e3480)
-> freed by thread T0 here:
->     #0 0x7f63a5b212ab in free
->         ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:51
->     #1 0x572415a710f4 in bap_stream_free src/shared/bap.c:1254
->     #2 0x572415a710f4 in bt_bap_stream_unref src/shared/bap.c:1337
-> ---
->  profiles/audio/bap.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
+> Possibly, the problem is that state transition to IDLE is not correctly
+> emitted from src/shared/bap.c for BIS when it is detached.
 >=20
-> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-> index cda10a643..f30262987 100644
-> --- a/profiles/audio/bap.c
-> +++ b/profiles/audio/bap.c
-> @@ -1113,12 +1113,7 @@ static void setup_free(void *data)
->  	if (setup->destroy)
->  		setup->destroy(setup);
-> =20
-> -	bt_bap_stream_unlock(setup->stream);
-> -
-> -	if (!closing) {
-> -		/* Release if not already done */
-> -		release_stream(setup->stream);
-> -	}
-> +	setup->stream =3D NULL;
+> Or, setup->stream should be set to NULL at the point where it is
+> invalidated.
 
-This breaks various aspects of unicast, so it doesn't look correct.
+Looks setups are not removed from data->bcast_snk when they are freed,
+so probably something like the following fixes it:
 
-Possibly, the problem is that state transition to IDLE is not correctly
-emitted from src/shared/bap.c for BIS when it is detached.
-
-Or, setup->stream should be set to NULL at the point where it is
-invalidated.
-
-> =20
->  	if (setup->ep)
->  		bap_update_cigs(setup->ep->data);
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index cda10a643..b6eb91ab3 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -174,6 +174,8 @@ static void setup_free(void *data);
+=20
+ static void bap_data_free(struct bap_data *data)
+ {
++       struct queue *bcast_snks =3D data->bcast_snks;
++
+        if (data->listen_io) {
+                g_io_channel_shutdown(data->listen_io, TRUE, NULL);
+                g_io_channel_unref(data->listen_io);
+@@ -189,7 +191,9 @@ static void bap_data_free(struct bap_data *data)
+        queue_destroy(data->srcs, ep_unregister);
+        queue_destroy(data->bcast, ep_unregister);
+        queue_destroy(data->server_streams, NULL);
+-       queue_destroy(data->bcast_snks, setup_free);
++       data->bcast_snks =3D NULL;
++       queue_destroy(bcast_snks, setup_free);
++
+        bt_bap_ready_unregister(data->bap, data->ready_id);
+        bt_bap_state_unregister(data->bap, data->state_id);
+        bt_bap_pac_unregister(data->bap, data->pac_id);
+@@ -1104,6 +1108,9 @@ static void setup_free(void *data)
+        if (setup->ep)
+                queue_remove(setup->ep->setups, setup);
+=20
++       if (setup->data)
++               queue_remove(setup->data->bcast_snks, setup);
++
+        setup_io_close(setup, NULL);
+=20
+        util_iov_free(setup->caps, 1);
 
 --=20
 Pauli Virtanen
