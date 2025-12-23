@@ -1,126 +1,157 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from mailout04.t-online.de (mailout04.t-online.de [194.25.134.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAF127453
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Dec 2025 10:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766487356; cv=pass; b=uOfOoVTeeoppaK5JBIUmuJ0yEdemU4/QIOX7y5u8TLGI0BIKLVsZEBLBoRUM6dgumBAfsSJ6Ieeen9cbUmY0IpeN442vocBDmZ/yBBktDyZMnZ+Tq/UQTc+5lbkGDBUDgzr2qXAT0VFP6IFkS782pq7GrTd63mEzd10CQ5ycKl8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766487356; c=relaxed/simple;
-	bh=rdeNGdh7v0rV1LfuC3DiIatWjNbMQl40M1nB7rm/6+M=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A5E20C463
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Dec 2025 12:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.25.134.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766494019; cv=none; b=YhU95MAzpx9j4/sdy2bd8aBPlIsZZ9ZD2HBrBYKRieGQ7pNraRyvuq5OSDWyoa1Mws0vndF4JD3PlqoEquDHaH6IyZodjq+ydJYjfMogSgO4xPSbMtSKX9gP6+qUNa03MGR2Fg6lewFx254qSI0rLd3SR1p1GUJOzxiuxOnM/Fo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766494019; c=relaxed/simple;
+	bh=AIrPVRY3xLhwpK9dMOMAFFOKuI5ZyC5qjcG0OS3QEgM=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Uvrl52Mkf4uUGmrjeJZ3QuDM2+x1RcfrDp48bxN22ESDod5ffQpIk76iNoCKxsZHhP64xo1McxZqQB9AsjVBiUdXa4My11FvXE6VfhiJvHARRlA7752+nB0YXoIfz3Bw1kx9+cQJ6CVVhrOU+mBzVROsG2uE+A4PEZNqMwJTyh8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=SGfpKUUY; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="SGfpKUUY"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4dbBkS2lS6z49PsK;
-	Tue, 23 Dec 2025 12:55:44 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1766487344;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=R+fhDpl7GLgHFUZHucUBamGboOCE+6rGWq8C1mAW08k=;
-	b=SGfpKUUYyiAVaBvtNC3UxEuEXlk7mPeoEH5RRRueOR5OdnTkGT2aZP7arOJicRq3tdkY13
-	T46SQVtbqmSeTPcnHc3egil2Q6bzlaG330JcnHyvTA2nWplDq45rGVwQIQM+7tmL3ocjc/
-	0mucdVUvF9eVGBP/eyFjsMdvkDuiKRepujPCLfuf7FewvPG2TvXatcGzgsYQtubsL5+JPZ
-	rH7Fa8D0NeF1C7quIBf0STi2a6eGsArcM/gmJHkkm2BbTLrXzRX0YYhKJs3/YKTTHNU1PX
-	lfnaoWzTThm1/2NhE4PqtT13/rPJbaA8WN+ILhDU+5/RQGkKxDQ7b3ayHmU85A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1766487344;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=R+fhDpl7GLgHFUZHucUBamGboOCE+6rGWq8C1mAW08k=;
-	b=wIl/6voHXaOq2G+nxxuIrYWSU5hNXfEMadwW5vXzpJh6mhCdE3RZwI0HHwLoU5ApfP/QIX
-	ES0PMIgi+lCH/4t7Pme1sQQVP4ojmeq6vk6y7w+F8IssFg0hmz0L/Zctrm87pGjTxdbQK7
-	9eWJc/jbQOY3suW+0ffs0+hEuumSf9IQRaETB6VQ0bp+aaEJueNPktbgZdrZbn3xOpYo0f
-	Cw5ImKfUa1v/dxVG2t72Pr8JI4V0y8DpclmgcvBA0xpC9w5OrB3oDUQKZLXUMhOcGKf09L
-	Nxrlx+f7mAv6F5LyorvMfXhVUvrFpWBNYBor+KPUKbNoN2uPvyjjXnkC70ycQw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1766487344;
-	b=kyZYEmHGeP6PvATmuBTqOupKMJiGQnAum/LLNczViR7QzxIf11RpxQZWQu4C24VWRvz0/l
-	f03B35jR5QPJCQ9TfbRBDppaBQUfVPzOqBkj4exf4z7JVV5QkWDZ/rLH45wrZCJsxO9L6p
-	EOZ2MIjE+HzrUgHf50JiuPWePfXe55KdJXe3nirijtJC0zkqZeeM8ZJAxIlos2jmruyY6t
-	itsBkn9euQCuNkz8BpMQAeigeh+UT78yCc2MihQewqryYy6tWy3UUabpK6O6KGIGQJ6OWL
-	YhviulE8jytprAio5ve6X6PCzhvS+Qha7zKebWYW/YBtHPN4i6jBMpsApB4GMQ==
-Message-ID: <a0ee7d9d9451215a38cdf51c60691f3d4ab433ab.camel@iki.fi>
+	 Content-Type:MIME-Version; b=WMF9pxtDU3I7oApBn2lpLPtAspcgaP4Dlk3Fi5a2QkjfIykVb3Uqtgsv7E91BuB45hrHmN3PsvzSbfgI+WoWijKeOBKDKgMsCVif6zxVQHaOEwMV0xsxqFv+rgjqdUvZ4z4LvnKosqPPpuiXZXlLez3MtYuFiwlhrvS6kiJdc9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=t-online.de; spf=pass smtp.mailfrom=t-online.de; arc=none smtp.client-ip=194.25.134.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=t-online.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-online.de
+Received: from fwd78.aul.t-online.de (fwd78.aul.t-online.de [10.223.144.104])
+	by mailout04.t-online.de (Postfix) with SMTP id EF65AADE;
+	Tue, 23 Dec 2025 13:38:27 +0100 (CET)
+Received: from [192.168.101.2] ([220.97.177.23]) by fwd78.t-online.de
+	with (TLSv1.3:TLS_AES_256_GCM_SHA384 encrypted)
+	esmtp id 1vY1ej-0JDDrl0; Tue, 23 Dec 2025 13:38:26 +0100
+Message-ID: <31553bc66935b6287f0723984388a98b5f720e39.camel@t-online.de>
 Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for Quectel NCM865
-From: Pauli Virtanen <pav@iki.fi>
-To: Frank Tornack <f-tornack@t-online.de>
+From: Frank Tornack <f-tornack@t-online.de>
+Reply-To: f-tornack@t-online.de
+To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 23 Dec 2025 12:55:43 +0200
-In-Reply-To: <20251223094535.91725-1-f-tornack@t-online.de>
+Date: Tue, 23 Dec 2025 13:38:13 +0100
+In-Reply-To: <a0ee7d9d9451215a38cdf51c60691f3d4ab433ab.camel@iki.fi>
 References: <694a366a.e90a0220.1a6835.f67f@mx.google.com>
-	 <20251223094535.91725-1-f-tornack@t-online.de>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
- ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
- cYmEvIhQjHH3vv2HCOKxSZES/6NXkskByXtkPVP8prHPNl1FHIO0JVVL7/psmWFP/eeB66eAcwIgd
- aUeWsA9+/AwcjqJV2pa1kblWjfZZw4TxrBgCB72dC7FAYs94ebUmNg3dyv8PQq63EnC8TAUTyph+M
- cnQiCPz6chp7XHVQdeaxSfcCEsOJaHlS+CtdUHiGYxN4mewPm5JwM1C7PW6QBPIpx6XFvtvMfG+Ny
- +AZ/jZtXxHmrGEJ5sz5YfqucDV8bMcNgnbFzFWxvVklafpP80O/4VkEZ8Og09kvDBdB6MAhr71b3O
- n+dE0S83rEiJs4v64/CG8FQ8B9K2p9HE55Iu3AyovR6jKajAi/iMKR/x4KoSq9Jgj9ZI3g86voWxM
- 4735WC8h7vnhFSA8qKRhsbvlNlMplPjq0f9kVLg9cyNzRQBVrNcH6zGMhkMqbSvCTR5I1kY4SfU4f
- QqRF1Ai5f9Q9D8ExKb6fy7ct8aDUZ69Ms9N+XmqEL8C3+AAYod1XaXk9/hdTQ1Dhb51VPXAMWTICB
- dXi5z7be6KALQARAQABtCZQYXVsaSBWaXJ0YW5lbiA8cGF1bGkudmlydGFuZW5AaWtpLmZpPokCWg
- QTAQgARAIbAwUJEswDAAULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgBYhBGrOSfUCZNEJOswAnOS
- aCbhLOrBPBQJl/qsDAhkBAAoJEOSaCbhLOrBPB/oP/1j6A7hlzheRhqcj+6sk+OgZZ+5eX7mBomyr
- 76G+m/3RhPGlKbDxKTWtBZaIDKg2c0Q6yC1TegtxQ2EUD4kk7wKoHKj8dKbR29uS3OvURQR1guCo2
- /5kzQQVxQwhIoMdHJYF0aYNQgdA+ZJL09lDz+JC89xvup3spxbKYc9Iq6vxVLbVbjF9Uv/ncAC4Bs
- g1MQoMowhKsxwN5VlUdjqPZ6uGebZyC+gX6YWUHpPWcHQ1TxCD8TtqTbFU3Ltd3AYl7d8ygMNBEe3
- T7DV2GjBI06Xqdhydhz2G5bWPM0JSodNDE/m6MrmoKSEG0xTNkH2w3TWWD4o1snte9406az0YOwkk
- xDq9LxEVoeg6POceQG9UdcsKiiAJQXu/I0iUprkybRUkUj+3oTJQECcdfL1QtkuJBh+IParSF14/j
- Xojwnf7tE5rm7QvMWWSiSRewro1vaXjgGyhKNyJ+HCCgp5mw+ch7KaDHtg0fG48yJgKNpjkzGWfLQ
- BNXqtd8VYn1mCM3YM7qdtf9bsgjQqpvFiAh7jYGrhYr7geRjary1hTc8WwrxAxaxGvo4xZ1XYps3u
- ayy5dGHdiddk5KJ4iMTLSLH3Rucl19966COQeCwDvFMjkNZx5ExHshWCV5W7+xX/2nIkKUfwXRKfK
- dsVTL03FG0YvY/8A98EMbvlf4TnpyyaytBtQYXVsaSBWaXJ0YW5lbiA8cGF2QGlraS5maT6JAlcEE
- wEIAEEWIQRqzkn1AmTRCTrMAJzkmgm4SzqwTwUCZf6qYQIbAwUJEswDAAULCQgHAgIiAgYVCgkICw
- IEFgIDAQIeBwIXgAAKCRDkmgm4SzqwTxYZD/9hfC+CaihOESMcTKHoK9JLkO34YC0t8u3JAyetIz3
- Z9ek42FU8fpf58vbpKUIR6POdiANmKLjeBlT0D3mHW2ta90O1s711NlA1yaaoUw7s4RJb09W2Votb
- G02pDu2qhupD1GNpufArm3mOcYDJt0Rhh9DkTR2WQ9SzfnfzapjxmRQtMzkrH0GWX5OPv368IzfbJ
- S1fw79TXmRx/DqyHg+7/bvqeA3ZFCnuC/HQST72ncuQA9wFbrg3ZVOPAjqrjesEOFFL4RSaT0JasS
- XdcxCbAu9WNrHbtRZu2jo7n4UkQ7F133zKH4B0SD5IclLgK6Zc92gnHylGEPtOFpij/zCRdZw20VH
- xrPO4eI5Za4iRpnKhCbL85zHE0f8pDaBLD9L56UuTVdRvB6cKncL4T6JmTR6wbH+J+s4L3OLjsyx2
- LfEcVEh+xFsW87YQgVY7Mm1q+O94P2soUqjU3KslSxgbX5BghY2yDcDMNlfnZ3SdeRNbssgT28PAk
- 5q9AmX/5YyNbexOCyYKZ9TLcAJJ1QLrHGoZaAIaR72K/kmVxy0oqdtAkvCQw4j2DCQDR0lQXsH2bl
- WTSfNIdSZd4pMxXHFF5iQbh+uReDc8rISNOFMAZcIMd+9jRNCbyGcoFiLa52yNGOLo7Im+CIlmZEt
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
+		 <20251223094535.91725-1-f-tornack@t-online.de>
+	 <a0ee7d9d9451215a38cdf51c60691f3d4ab433ab.camel@iki.fi>
+Autocrypt: addr=f-tornack@t-online.de; prefer-encrypt=mutual;
+ keydata=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
+ KwYBBAHaRw8BAQdA9MoQWxT+PljXoionhEHpIAuLlhUME07Jht42EmJS9/K0f0ZyYW5rIEVja2hhc
+ mQgVG9ybmFjayAodGhpcyBrZXkgaXMgdXNlZCBhZnRlciAyMy4wNy4yMDIxLiBBbiBhdHRlbXB0IH
+ dhcyBtYWRlIHRvIGludmFsaWRhdGUgb3RoZXIga2V5cykgPGYtdG9ybmFja0B0LW9ubGluZS5kZT6
+ JAoYEExYIAi4CGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4ACGQFEFIAAAAAAEAArcHJvb2ZAYXJp
+ YWRuZS5pZGh0dHBzOi8vdHViZS50Y2huY3MuZGUvYS9ib2xsZXJ3YWdlbnBpY2FyZC9iFIAAAAAAE
+ gBHcHJvb2ZAbWV0YWNvZGUuYml6aHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20vZnJhbmtlbnN0ZWluOT
+ EvOGE2ZmEwNmMxM2ZiY2VlZjhhMjRmZDFiNmRlNzIyYmFFFIAAAAAAEgAqcHJvb2ZAbWV0YWNvZGU
+ uYml6aHR0cHM6Ly9tYXN0b2RvbnRlY2guZGUvQEJvbGxlcndhZ2VuUGljYXJkqhSAAAAAABIAj3By
+ b29mQG1ldGFjb2RlLmJpem1hdHJpeDp1L0Bib2xsZXJ3YWdlbnBpY2FyZDp0Y2huY3MuZGU/b3JnL
+ mtleW94aWRlLnI9IWRCZlFaeENvR1ZtU1R1amZpdjptYXRyaXgub3JnJm9yZy5rZXlveGlkZS5lPS
+ RjWGVqcnQ3dWJ1RUF5aTNsaFVDeWFEUUlBa0lnRktHMnF3TF8yTXl6MDY0UxSAAAAAABIAOHByb29
+ mQG1ldGFjb2RlLmJpemh0dHBzOi8vZ2l0LmdnYy1wcm9qZWN0LmRlL0JvbGxlcndhZ2VuUGljYXJk
+ L2dpdGVhX3Byb29mFiEEirOWSf3d6fB6q3EmVa3qmdMF6s0FAmiMmowFCQhajfQACgkQVa3qmdMF6
+ s2uHgD/dxJ2cY3dVn5DJCkCNdr0wxz0rL5MZtqXfRxGOlH6GZQBALoRq4LFNYIeiuJjVi6iNBjKQg
+ 0AbjOnM/UCVTAGjAYEtFBGcmFua2Vuc3RlaW45MSAoRGllcyBpc3QgbWVpbmUgU3BhbSBFLU1haWw
+ pIDxmcmFua2Vuc3RlaW45MS5pbmZvQGdvb2dsZW1haWwuY29tPojQBBMWCAB4AhsDBQsJCAcCBhUK
+ CQgLAgQWAgMBAh4BAheAORSAAAAAABIAHnByb29mQG1ldGFjb2RlLmJpemh0dHBzOi8vbGljaGVzc
+ y5vcmcvQC9NVExGcmFuaxYhBIqzlkn93enweqtxJlWt6pnTBerNBQJojJqSBQkIWo30AAoJEFWt6p
+ nTBerNeMsBAILdFx36go3uOgLVukgeD+bWu2q38wY29u4icMiCfadsAP9nngHM3BIiY4r0RWWrY8E
+ KFcNM+DfPF2j+BCmkpu/LD7RMRnJhbmtlbnN0ZWluOTEgPGZyYW5rZW5zdGVpbjkxLmluZm9AZ21h
+ aWwuY29tPiAoc2hvcnQgdmVyc2lvbiBvZiBHb29nbGVtYWlsKYiWBBMWCAA+AhsDBQsJCAcCBhUKC
+ QgLAgQWAgMBAh4BAheAFiEEirOWSf3d6fB6q3EmVa3qmdMF6s0FAmiMmpIFCQhajfQACgkQVa3qmd
+ MF6s3pOgD/ZEnhUZ7GUWlcuWReqZNI5YX6ZvfiBf/c/Z8Tb+M3kZQA/29ktoeEe78tMiFtBp9nhbK
+ sopm1fvM5aaGDn4nXSnMJ
+Organization: Privat
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-xCNM6MaFBi+IzOg+72uK"
+User-Agent: Evolution 3.58.2 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-TOI-EXPURGATEID: 150726::1766493506-137D31F2-0AAA2627/0/0 CLEAN NORMAL
+X-TOI-MSGID: 5a4f3800-599f-4c6d-bab8-c07efbde9f7f
+
+
+--=-xCNM6MaFBi+IzOg+72uK
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Pauli,
+
+Thank you very much for your quick and helpful feedback on my patch.
+
+Before sending a v3, I'd like to clarify a point. In the bluetooth-next
+tree I'm working with, an entry for the USB ID 2c7c:0130 already exists
+in the quirks_table.
+
+However, this entry alone does not seem to be sufficient for the device
+to be correctly initialized in my setup (tested with a DKMS module on
+Arch Linux). I found that adding an additional, identical entry to the
+btusb_table resolves the issue and allows the module to function as
+expected. My v2 patch therefore adds this entry to the btusb_table.
+
+Given this, I'd like to ask for your guidance on how to proceed. Should
+I submit a v3 patch that keeps the entry in the btusb_table and
+explains this necessity in the commit log? Or do you perhaps see a
+better approach to address this specific behavior?
+
+Thank you for your help.
+
+--=20
+Frank Tornack <f-tornack@t-online.de>
+Privat
+
+-------- Urspr=C3=BCngliche Nachricht --------
+Von: Pauli Virtanen <pav@iki.fi>
+An: Frank Tornack <f-tornack@t-online.de>
+Kopie: linux-bluetooth@vger.kernel.org
+Betreff: Re: [PATCH v2] Bluetooth: btusb: Add support for Quectel
+NCM865
+Datum: 23.12.2025 11:55:43
 
 Hi,
 
 ti, 2025-12-23 kello 10:45 +0100, Frank Tornack kirjoitti:
-> Add the USB ID 2c7c:0130 for the Quectel NCM865 module to the btusb_devic=
-e_table. This device is based on the Qualcomm WCN785x (FastConnect 7800) an=
-d requires the BTUSB_QCA_WCN6855 flag.
+> Add the USB ID 2c7c:0130 for the Quectel NCM865 module to the
+> btusb_device_table. This device is based on the Qualcomm WCN785x
+> (FastConnect 7800) and requires the BTUSB_QCA_WCN6855 flag.
 >=20
 > Signed-off-by: Frank Tornack <f-tornack@t-online.de>
 >=20
 > v2: Fixed merge conflict with current bluetooth-next HEAD.
 > ---
->  drivers/bluetooth/btusb.c | 3 +++
->  1 file changed, 3 insertions(+)
+> =C2=A0drivers/bluetooth/btusb.c | 3 +++
+> =C2=A01 file changed, 3 insertions(+)
 
 Changelog "v2:" should go below the "---" so it's not included in the
 commit message.
@@ -136,21 +167,35 @@ drew@gmail.com/
 > index 646de80c7..70feeb9a9 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
-> @@ -172,6 +172,9 @@ static const struct usb_device_id btusb_table[] =3D {
->  	{ USB_DEVICE(0x8087, 0x0a5a),
->  	  .driver_info =3D BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
-> =20
+> @@ -172,6 +172,9 @@ static const struct usb_device_id btusb_table[] =3D
+> {
+> =C2=A0	{ USB_DEVICE(0x8087, 0x0a5a),
+> =C2=A0	=C2=A0 .driver_info =3D BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
+> =C2=A0
 > +	/* Quectel NCM865 */
-> +	{ USB_DEVICE(0x2c7c, 0x0130), .driver_info =3D BTUSB_QCA_WCN6855 |
-> +						     BTUSB_WIDEBAND_SPEECH },
->  	{ }	/* Terminating entry */
+> +	{ USB_DEVICE(0x2c7c, 0x0130), .driver_info =3D
+> BTUSB_QCA_WCN6855 |
+> +						=C2=A0=C2=A0=C2=A0=C2=A0
+> BTUSB_WIDEBAND_SPEECH },
+> =C2=A0	{ }	/* Terminating entry */
 
 This should be added in the position in the list where the other
 BTUSB_QCA_WCN6855 entries are, trying to keep them sorted by vendor +
 device ID.
 
->  };
-> =20
+> =C2=A0};
+> =C2=A0
 
---=20
-Pauli Virtanen
+--=-xCNM6MaFBi+IzOg+72uK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSKs5ZJ/d3p8HqrcSZVreqZ0wXqzQUCaUqNNQAKCRBVreqZ0wXq
+zc6cAP9k/KIkh94L/qndgiirtTXajUhHL1Eb2VkVwlxQ7QfOMwD+InvZYwfcwXFP
+rcVd+jPwSXs5wbvZO8o05Wz9IphEaQM=
+=+G+v
+-----END PGP SIGNATURE-----
+
+--=-xCNM6MaFBi+IzOg+72uK--
