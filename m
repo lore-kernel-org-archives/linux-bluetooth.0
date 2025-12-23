@@ -1,150 +1,168 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012005.outbound.protection.outlook.com [52.101.66.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872DA32C958
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Dec 2025 13:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AE32749D2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Dec 2025 13:52:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.5
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766496482; cv=pass; b=NSGXDrXLuf1dENbMHwmov6WWFPLAycyl1TtRJfRXS/7tNFsGKYR3Au6wreJiTGo0vPNyITLAqBHaLuJPY4XO5fDVPMlz9IH3HE6F+OkX3Po9y6dVoeOixy4THLOur+mC0eapAawk4tzA/FcxxOyDm3X+Ya68riJGIc6YQ7/XcYE=
+	t=1766497930; cv=fail; b=pd109DR8WnJVLMU7zGFfEvUMdSNPFMRoQwW2KCRtE3cq26YVNAbsvA+vzDgUOXfsf9QV19rPRkWwWehvpIYzxqZWuoanE1u/wm6/hSFRUosWGBiAHkBJIi18BLZpxR6Tg/rmARy/xv2ibIzlwYDuMHcwm1Ocs5ECRSioEOeX6Ao=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766496482; c=relaxed/simple;
-	bh=mU+ub8VfcnqvUHGc5B4V0tDSvtJ21j0mdS1WrmFJyyQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XHZx0++F834mhreCii1Wa5FjzT459AK6JzQJe9OLGpqfCFYMGmZDVS9mA79Km8m1LdaNmthY6W2d5Y7Pb8a9UZHPoKDaH7pCgtrabkbmdASx2K1HaGoi7bH+C3UIJWO7Ko00ybYPoQE20lJQJkgu+xvR1X3cHoLgaUZMVgXFaxQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=sFc5UFAe; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1766497930; c=relaxed/simple;
+	bh=PjD/75/WAON8kWTTnS4Yj6pyzIAun57Ahd4cHlSBE/o=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=FKFwdT54oGpKCvkpIzZO6PrfG4w/5tYLCSxS8G6djyNfHkf18iC7JEIx+Z8zRHOUIZY4Wi44wuR706cSMhvdOBjtCdobqXnl5oPSDab9AH8jM/0CmhCnVWXBxhNUrDDgZdGqvjMQ5ymXfkOfNsLHn5zLg3njncElvH+3O9T2VuU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=SfcdtuCk; arc=fail smtp.client-ip=52.101.66.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="sFc5UFAe"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4dbG5z3fgWz49PyD;
-	Tue, 23 Dec 2025 15:27:51 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1766496471;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mU+ub8VfcnqvUHGc5B4V0tDSvtJ21j0mdS1WrmFJyyQ=;
-	b=sFc5UFAeBgJrlBd7PY/JdfTcwXBpuGzSPqYe+LPMeWZiMSFg4keheBLZIAOCTpTFxs4JUo
-	FZkvkN6VLQJS4p/GtiHZ4Hnmau6TSC/cx6HN9Yfl5dgbrCuwmydxmwtX4Cs4pByw88DtPl
-	SeciD6RdYXzJ9PQrxU5GjQyunRalCifn7OvnHKK9ZQVMeFUiNnHooIj+QkscPF6bag45JM
-	dhtHaKkaRkBSaf9dwC/9O6TtMaa2xcnJKEa/UM1yIzVkcFiCS2WsNHoU7R11zB8LWTHWi3
-	4gTLW0IevydDc7xfTD40JGQ2Lq7/aD5xHHJ7lAesCJCzL7p/x2RDPz+2pL8MYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1766496471;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mU+ub8VfcnqvUHGc5B4V0tDSvtJ21j0mdS1WrmFJyyQ=;
-	b=RCC2zDG/gx0zL4ftmFdG2kWFfGMxcMDuiRjc5yKQSmh8PQ5zPtT0vGflBaUk8aQMICMCUI
-	Yd84hPInBr6iMibdFfYoYvTxId+sx/sI9dANqjebcRQP7Na9V/dE6vXzumM/pMPI6kk1th
-	sY4e2vTdbmgdd4x+eUP32MjL/c1YFd7i+k1Nrr9VOAkkGEhU6xOCG9gDjIo5TJ2kce4feo
-	5VIsiny8lVbBytrvKfH6enfR9S+DDRhA/OpHoCxleivLI5VpAofe3TX4+5RKK1ekfyxcmM
-	sio79Y2h5YZZZ+iKK/zcafph6rRQGMiNWUcHHefeQxO6FrKIBo32wHXv9XeE+g==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1766496471;
-	b=RIgE5ufRFk+ajzr+axaioc5SbEpNB4E/0EYBSdUXIs5Hv13yTdtrmq+ELbm5OQ1KZhTA8A
-	RPn2sEV0GwJBaMoPgaEyp53Pl8XDXWjzS4sGdCvp81EqB+XuhexctMkJ7XSPzEcFNCxnS+
-	iSn4KD0dGyKJhvkpoyMTkjjSYNT1Jfj8E9bXJ75MtsaKOQKbK0iMjEnW9HG9HweUzF8rM8
-	YxN2sjxSY50gQ9UL/98zyYXLqs/LV2rA5R8zNx/DGZSBT6o07rT73CtzylSbj7kN6mvA46
-	ejC9Fj4enBYBamnQYx46x8ICiDTiMN3tMvzD+3sfnm2VldWAhL64EpM6yEzRFQ==
-Message-ID: <2051d4d464090c4a84d508e7648e9580f50c14a0.camel@iki.fi>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for Quectel NCM865
-From: Pauli Virtanen <pav@iki.fi>
-To: f-tornack@t-online.de
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 23 Dec 2025 15:27:49 +0200
-In-Reply-To: <31553bc66935b6287f0723984388a98b5f720e39.camel@t-online.de>
-References: <694a366a.e90a0220.1a6835.f67f@mx.google.com>
-			 <20251223094535.91725-1-f-tornack@t-online.de>
-		 <a0ee7d9d9451215a38cdf51c60691f3d4ab433ab.camel@iki.fi>
-	 <31553bc66935b6287f0723984388a98b5f720e39.camel@t-online.de>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="SfcdtuCk"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oELknI4iCNTG/H6AaZ2niHtaysL552OJkZ05p2kax4nUni9uPbA2Rmm1jfPY8RTXY+xozI01BfS3nLD223B4sWYO6KAtWVrPCvniEDnPOWgVR7v3w6CKRtes6lIWb7mcV3Pp5EgY2d/bsDrXoduwZ3b3isApuMnXPsoB7MfOwmo60uUFROAPvERbiho2O+QCphYkgdQDsIWWJ07jLM2d4QztXM8IAbMU8dSVwqZTGts3dZB+IkxJARD8xoKGodbixDHzJnXaCX0wjs8azKhkR6fbz/tetwitRRBCl3FYd8mbh8OsuY/oTNRvffz9C6e4YmdpWB2ub+92by3aIi2noA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tuDO/qT8iCwe+EjoR0KGzxP4Si1yF1CnpqM7eMEZRAo=;
+ b=jLVVbdQy/Eo4QM+WcNX02ArkN/sZMP3gqjiN36Lpzd+vcO4X05HfLZ/YPTfutMLyKIXQ/jVrKi4PZNV6WU6nYQ/kvfQsdNQPeDdAd27Rj0XGzxv5gE3cFY7+cGlchxYvsxSoXJYQuL2zUWTakl//pPsootMhQ6KCVQ+qMiWEyTRL0zVfldSbt7c9hhtZ1WNa2Qu+lL+h3kibcmRVuTe+evU88cWRWzb6FRaHMLNVKmnMpiEGRw4ZkyTIEkiYMWY0H1TVkFmKfu35pa0OW5vIaXuVzmZsB5F634k7IiopAhVfyTYdlZ2ZTHslyH+BwfuIw0EnUt5S+zKu1WTrsXVRGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tuDO/qT8iCwe+EjoR0KGzxP4Si1yF1CnpqM7eMEZRAo=;
+ b=SfcdtuCkc7Hom6kGEfkII5WCoLwNR8aApq5iU8U895s6/nyWdog4KV6KGkOQ0fOTw6l7nHLszThcbWPvDWYg4XafpYqZ6qQeM8s452ArLbpZykg6gVoW9MS4bmeLr4mS60I0JDHz28DZsqChKfX/Iz9tXjmRvRXtYEY6+j/IOJMQLssSCyqClvgEj4emnANqfdfd1XbNjX9+qOMWr3X8YTeg6DyoOfrJcbVqb+JQI3EmJMAFYnqk9+aYWCZlpTAJ1AsLfADoGGodbpTdhkOO9uCt78mcunUsRzHUqih0e+ITA6K3MuMaerZ2wWP0gjUEe3uJmaGcH2W6fprqB0nfVg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS1PR04MB9630.eurprd04.prod.outlook.com (2603:10a6:20b:475::16)
+ by PA2PR04MB10132.eurprd04.prod.outlook.com (2603:10a6:102:407::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.11; Tue, 23 Dec
+ 2025 13:52:03 +0000
+Received: from AS1PR04MB9630.eurprd04.prod.outlook.com
+ ([fe80::8e4e:9bae:9fbd:cb52]) by AS1PR04MB9630.eurprd04.prod.outlook.com
+ ([fe80::8e4e:9bae:9fbd:cb52%4]) with mapi id 15.20.9434.009; Tue, 23 Dec 2025
+ 13:52:02 +0000
+From: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	vinit.mehta@nxp.com,
+	sarveshwar.bajaj@nxp.com,
+	mahesh.talewad@nxp.com,
+	devyani.godbole@nxp.com
+Subject: [PATCH BlueZ v1 0/1] Fix heap-use-after-free in setup_free()
+Date: Tue, 23 Dec 2025 19:21:32 +0530
+Message-ID: <20251223135134.706-1-sarveshwar.bajaj@nxp.com>
+X-Mailer: git-send-email 2.49.0.windows.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR4P281CA0343.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:ea::12) To AS1PR04MB9630.eurprd04.prod.outlook.com
+ (2603:10a6:20b:475::16)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR04MB9630:EE_|PA2PR04MB10132:EE_
+X-MS-Office365-Filtering-Correlation-Id: 53342e4b-ef8c-4fa5-9147-08de422a733c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|52116014|19092799006|1800799024|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?nTCwqSUaGNzsepOzuQKE4a2RZfjL6MN3j4xDqT8W34ElDDfLwJDJR4J0SoUh?=
+ =?us-ascii?Q?bmfh1luEyGu3QUxFbjbb7d+suc+2uRWKj7A2MSSavPF6wu1te2NSgoycRi5B?=
+ =?us-ascii?Q?/5T4+TFn9s9me4JgE4L1TfqzKfIR/4K7+11jtnUP4yRcEiaxM7k9VmNhA8LO?=
+ =?us-ascii?Q?iBLOknhdmV8ac8wmGFtVyHTQvh0wLyyrnWo3Gi3JYoEed73VZOZWKbwMDeD5?=
+ =?us-ascii?Q?uGkQPO5KpIJAYLd7LAgk2t5KECfn9gnfKOtvwbehPQagm26XsQUiIDHXeCQT?=
+ =?us-ascii?Q?gy2Myvq1CBtSJ+uXMIGsH0ZVLay6FxTcV2zkHUH1i0+Z7YUkVx3gk5SCu3Z2?=
+ =?us-ascii?Q?76IYblRD0MuX4mdvpaX7obUeorDCUWTv8TP0O5/JsoBV395bbAFendDyTm3G?=
+ =?us-ascii?Q?48Au0j3J7kx12Axxrab68vbRjlcBTMrV7o4vHjempxd5qKvLLLKv6zZMnBQK?=
+ =?us-ascii?Q?FD4CT3pJp+ogTsSudQjhqFLehsuOsJklluR65MZrJbjAOT6ytCWYJUf/i6E4?=
+ =?us-ascii?Q?eqCHb/YwPvS6iLA0nqy7QFAozaJm1ikrTzxLyTcruDVSS/mdO7HTwpFFZ4b2?=
+ =?us-ascii?Q?2TP3ZPlM20Ok3CTpgMkuNfhfn/w64eXUoVDLpGyY0a3MGFbchNeQ1D6llVsA?=
+ =?us-ascii?Q?qF5s08s7uL24LQ16egVlpoErgfLtoMbs7KzwbrclTrTN4aKDcRvnNvuMO4ch?=
+ =?us-ascii?Q?eVQ9f+YyE2iDJOOldnltTduxYjpooEYf9AGhMCEqYTWMUJmXvB/toPO49ws6?=
+ =?us-ascii?Q?Bn2I+4G2Ox2xjY/En9/uruTcTOc2wMpInUtAepx/wUo1XbaZkdZ5155urLsD?=
+ =?us-ascii?Q?HqYSZDEE1hMnJYR3PKllWyJ9LTY2Pmh3RyX74se64wNLzvr9x64Xe6E8F61r?=
+ =?us-ascii?Q?N80qk6wf4SGdOaSCA751zwT2ghe9azCp0OZKNNbzAfxJVznpT7HwHzyJbV4K?=
+ =?us-ascii?Q?t56mTfp98cdABSdUO/7o2oZOPXmfF2Dj+BKiQFzpEbA6Yw+qL2yvCfsPDF+g?=
+ =?us-ascii?Q?rfp+19jtG/MBUuxDQeb33MPIlGkscurh4H1cibq/k35MsMhBMBDJaTH6YCPv?=
+ =?us-ascii?Q?MkTxaFgmJUmfmPq0LXtUYtOsJcfqH5kOhnjBZ5CNo5Da+mjt2WX+wIP/hCYY?=
+ =?us-ascii?Q?VguRMJsN7m0buemScZFiXDZxn/QU+m77jap0GstBB22T44oML2yUB25phoDf?=
+ =?us-ascii?Q?eGfRTVkXkyMMIz674fOgOvtARPdxx4hePaVR7wnJoZNDaQLQMdxiaWr53rh7?=
+ =?us-ascii?Q?Ge2xAh6HKtGokg19H0mMahzo63xwCWwR9lBaS89T5LPAd6ED/5qpbttSv1ZQ?=
+ =?us-ascii?Q?aPcKP3kOVk5wdp2IUiYj9BvSCAf8E1hAft9jwmGhhcD+puE4qT8m+AuBHFTI?=
+ =?us-ascii?Q?ziL4VPfEW+YZHkYS2mIYf5bvPbCBBPBQMv72QFPFdL9bof5HT/lFJFeO5cMa?=
+ =?us-ascii?Q?oXs7WQwXeR39ERzL4H+8eYS673HgGw3QoAxjIf0+CE7199qH6rll021rneA5?=
+ =?us-ascii?Q?G0SibPe+nYqQCFypY9LKy+PQg7K7veoJ1o7P?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR04MB9630.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(19092799006)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?qM6+oPUKYPaoEy4+mfUz8jbGtNTpSv5JDL1qceKnZwUpIDi7oFTc/hmpHLU3?=
+ =?us-ascii?Q?vj9LeV0CaR8jBOqtNlP5pj4UQAsKZ3NLqI0fes9fPSaGKYvhOyIcxmrmYlCB?=
+ =?us-ascii?Q?TUZpXywqMFKNNe2JEBHaE5+a4/tdnhWAtbIblFTR0qaBZfdMdTA09rImRo97?=
+ =?us-ascii?Q?hgTOMzq/sf/zLfRjP1WcnLtwkt3qIdXN/XtYlEAaJHaIGcQ1rWLy5UIF62Bk?=
+ =?us-ascii?Q?S5GPMcXKm6nYKWWMrteHTE31HbclL76RjEmRUBPxhYLppaIiwibBvcMG2DN8?=
+ =?us-ascii?Q?RXgKNwcKOZhB+kfHwvD587BEfJZnSTfjr2RnPYj9JdS8tOOKBe51bS2BnEan?=
+ =?us-ascii?Q?H1yDB/KDptkC3B7rxBD3cl69BMSlmjyiD3IBvrNS071C1sjT0d0HcgEiDNbz?=
+ =?us-ascii?Q?RAkdPE3E1zJpg3nedx3R/y3Od40fdkjkJpMFxL8OqmxbeZ78UFnvCZVPVdcf?=
+ =?us-ascii?Q?D65gf932VNtsCZk6+5BTJA736kxqFAqCVmHI/SZY/yZKhG1S8YekMkfai9Ol?=
+ =?us-ascii?Q?1/Z6fbJO1k2YGs3cCiYp2inYS59cWfR94BkLu233fxOR24E2niN8y6DpBSfG?=
+ =?us-ascii?Q?VqvQjFsua0NyZ0N9JhP21Ao/rEy31f9dDJdCda5IwR7vqZ5REAVS1fW8BVEw?=
+ =?us-ascii?Q?awodyCO/+TkQjMgPeNJXKL4G5xzy38v6X8fLImgEv50HctEyhCj8y+gZyn9x?=
+ =?us-ascii?Q?j41FN4z+yqG73/7d6fZ1OqzpjbgUwRAYeVpIT38pxaWh4DChnfNhhCg1NWq8?=
+ =?us-ascii?Q?NH+5xHoHjHh2txAf89aSjy7JMqDSN6iWS4IfSEeBNPzZvMNlIMZo7rkG2QgS?=
+ =?us-ascii?Q?PQvSOgod7brFHXw8FMoqvNS/UKYNIMYyo3hs/tUSzocBZaFqNSPwOQhVxMpb?=
+ =?us-ascii?Q?uPNYjmEiWqBeXHXTOPXO3m30X7GiZ7X6UIkHO86e6yP5UIKM9ohJ6UZoOvOE?=
+ =?us-ascii?Q?EBpBFtyo/fOPSXsgCDOPI6cSQxo15eqU7ioBS/TWz2AoDUIx4o2Yl8otD/r6?=
+ =?us-ascii?Q?1B/zW3vbWax4c6LrgPldY05tc6XIXinTPk/0rwydcTbz5x5XZ90O7ibzSXe8?=
+ =?us-ascii?Q?u4dOnfhnio0osqEb1zPWQQDSAw2cIXBs4CxamX89CZbBwmzWdZXP3dj/1lVk?=
+ =?us-ascii?Q?Cxq5fKB/Ipxg4A02nEcOIPNpKVMZBraJ12ViDkPXVMXwPCjkCPl7NiHq6vk5?=
+ =?us-ascii?Q?cv0EtcynA3BsSWqWflaSHq7elDrZvq12v4FsD98QF3mGVHwYISNbd/9tP0sg?=
+ =?us-ascii?Q?PUEcUO+CwWAIAp/RFT9cvLlSEZZCVfZx6QKiorBAQdmYNPrPehPpIVCPlITz?=
+ =?us-ascii?Q?y5AuuxtcF9JfmDRWAMfwv+wSRO5b1/houI/cGCqzD8Ym4eDpi8MfJB9WMS3z?=
+ =?us-ascii?Q?aKokeRmeXGwFoFJA06y21OTZLqui9hH29a63jiYA8Tuv5NsFu3uuqTbD6wPc?=
+ =?us-ascii?Q?HqWzO4Vg8Rdv+1IqcvBISxlkZKBbT1u5TYfi6sUNyEnoqkibI5u6bUxkCpK0?=
+ =?us-ascii?Q?ztSioY1K2ZnAOj7R7MccAChb1GF5X/rReKDjIiTc8JstMXNO75mtFoGCACpL?=
+ =?us-ascii?Q?fLu5Ya3MeLAon89aFpzYzswXpJw+sCvQFWsAuHcRgdDqau4bRTdMZ2OsJHs3?=
+ =?us-ascii?Q?+k/3IdKcloVRvTGAIAHgo7C0vLpHkkvMr6mvQDWvAwtRuYo/lLrKkBTajltb?=
+ =?us-ascii?Q?iMBEUhwGmsSLsroaa4SPCfKZ62i7mPICq8YiQmY9HilbigqH9FS4hKe7WQGk?=
+ =?us-ascii?Q?H/MUavjTellQi9Gj7xGqNq8nPYjXKkg=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53342e4b-ef8c-4fa5-9147-08de422a733c
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR04MB9630.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Dec 2025 13:52:02.6826
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6xLsnMrp/vsHicy30nH9PO8y5f/LVSjvfbstBhwFvCsUyRPpmjU7/rcbRp5lA1JKeTTCp3JNjDAGGoMhZPr8zceCht6s8bp0u2UyYccK4gg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA2PR04MB10132
 
-Hi,
+Hi Maintainers,
 
-ti, 2025-12-23 kello 13:38 +0100, Frank Tornack kirjoitti:
-> Hi Pauli,
->=20
-> Thank you very much for your quick and helpful feedback on my patch.
->=20
-> Before sending a v3, I'd like to clarify a point. In the bluetooth-next
-> tree I'm working with, an entry for the USB ID 2c7c:0130 already exists
-> in the quirks_table.
->=20
-> However, this entry alone does not seem to be sufficient for the device
-> to be correctly initialized in my setup (tested with a DKMS module on
-> Arch Linux). I found that adding an additional, identical entry to the
-> btusb_table resolves the issue and allows the module to function as
-> expected. My v2 patch therefore adds this entry to the btusb_table.
->=20
-> Given this, I'd like to ask for your guidance on how to proceed. Should
-> I submit a v3 patch that keeps the entry in the btusb_table and
-> explains this necessity in the commit log? Or do you perhaps see a
-> better approach to address this specific behavior?
+In the current implementation, each broadcast setup maintains a
+pointer to its associated BIS stream. During teardown, detach
+procedure frees BIS streams when removing or disconnecting a
+broadcast session. However, later in teardown sequence,setup_free() 
+assumes that stream is still valid and attempts to unlock and release 
+it, leading to a use-after-free.
 
-That's surprising, usb_match_id() returns the first match so second
-identical entry should do nothing.
+This issue is fixed by skipping unlock/release in setup_free() and
+clearing setup->stream to prevent further access to a freed object.
+This ensures proper cleanup without triggering UAF. The fix was
+tested under ASan with repeated disconnect/remove cycles involving
+multiple BIS streams.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/dri=
-vers/usb/core/driver.c#n815
+Sarveshwar Bajaj (1):
+  profiles/audio/bap.c: Fix heap-use-after-free in setup_free()
 
-I'd suggest to double check the patch actually does something, eg.
-change the added entry to `USB_DEVICE(0x1234, 0x5678)`.
+ profiles/audio/bap.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-If it does something it's necessary to understand why. Easiest would be
-to add some printk(KERN_WARNING "some message") debug prints to
-suitable places in the code to trace what goes wrong, or use some other
-debugging mechanism.
+-- 
+2.48.1
 
---=20
-Pauli Virtanen
