@@ -1,1008 +1,256 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013040.outbound.protection.outlook.com [52.101.72.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFD01DF736
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Dec 2025 15:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766591153; cv=none; b=FTfOkHeDGRXWIEUnHmszqp11tRreik1HLWC88KkUCSRUYxAkkKLvRzxwxFg/mwQksBuSH+5jArQR7Aq8BvkveugJq8pYKK8Mhjwn7Mj52R6VYKbuurK/S0dbRF9YPqjPYJD8akaDBMj+lJb3nZ/wJ2XE2KPrDHLK3C193GsFUkQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766591153; c=relaxed/simple;
-	bh=Xeq4dzkRJmwORy0mNbrpMXCiDIPDk/oB3TyGHlE0Zpo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iNqC2lCXeMMSWdLmoeG8GgrvZ85C0jMP4qtGrVzKRd69rPe9LpsdJR1hq9hzelw4RJVcC5dAyeDJ0xZf4pntU4iopJzmqx2tZOBPc7yNQQX9iWTE7x5rFqp/sPuJA/A+AJy0mvDZ14TbnbxSG5aNBFyHh5D2LXb4hZT7y9GrZs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jrF4No31; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D71333F364
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Dec 2025 18:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766599542; cv=fail; b=cJ0g42ejQs97dS4tmOE6/PkaqXch5fzXT9nggcqvpwKu6v4nFjjpPeQpChKPCqqmRTaCQdPpkJOi9N4sJ5ebK/K7DzX8HQbVjM1eijrKiQ2PhLFPg2+3nCeZ+PlySd4+DpRdilcVojJVCBKaXYLGSMdTDxL3Z629fBLod5PSeiY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766599542; c=relaxed/simple;
+	bh=4IxZ/9Jrj82AQ3quZ7ViP/Xjna5oChnCAh4o8nKu27w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ujftvonz7f1ceo45O+U5M7m5mP+ZKydswV9xKEG0VGphC0p2O/KkQ/YB3ZjBzzE2hGcsbsJGFtCokrucrTs2VOEiHB+W3xGic1ta9Sq9y/HJ6y9mfKnFpr7IG97i3ENGPG4GTWmiE2Dg5XrpJvvmU5DClBOwC7TTTys2YE1+YSM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=PPtH3fkP; arc=fail smtp.client-ip=52.101.72.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jrF4No31"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6864BC16AAE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Dec 2025 15:45:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766591152;
-	bh=Xeq4dzkRJmwORy0mNbrpMXCiDIPDk/oB3TyGHlE0Zpo=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=jrF4No31PCwbkW14+awzdvEAwsx/w5oVeRIy6pX5QapgqeU7Lit1k8EhNE4GisX8s
-	 o1GnQjFTrTn6ykTrGG1T8bNROYQrH00zk6rtNY3NASbdLGBld41xlWMf2ozrpD/Epl
-	 8Ce8bO6F6RDroWyx9JrLMS6g0t765UYj8S9NhYbGScotN5+mi/6TADvG+WqTZgpDJK
-	 JXBqsv0m35HrLmt/FqsWegPe5b/LBf7llTu9THR8OnrdgzWKNt6xQNKPSOzUIGEbkf
-	 etBg2dIZ/m60Ocmct2CIDFT7PoJRjMisBb/M2oOXgmVQf26R4H4hoUnmlf3zyDUcbo
-	 ewTxHPXA4O20g==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 59A3FC4160E; Wed, 24 Dec 2025 15:45:52 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219387] Bluetooth: hci0: Reading supported features failed
- (-16)
-Date: Wed, 24 Dec 2025 15:45:52 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: cheako+kernel_org@mikemestnik.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219387-62941-7dJF1rR7oO@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219387-62941@https.bugzilla.kernel.org/>
-References: <bug-219387-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="PPtH3fkP"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=v45VMZP7xblXKP8Q84VhOvguUgkJxkt26O7GCeRqze6Dp31ndf4PoeSl4OOMlGq1QJ+6vIeDfdo24JgpkHNa86DSivYB2R7v9B3+vTSuLMieQOjTJNsINU7S8WwqxpKtCqDeFjnOuHlCMegteYhXDOfZIfUzD6D4X9fJ+DZHPD/lT/ChqRVto8EIJRDHKrAFdSfmy/J4akCz6tF2fKqc/Wf48hXFKE5vpPcwaSMvh/oHcNGTBhhvd5AsNyAKkcrf50Ek8QZV1QE+Z7UPCpboGpYH3CkRmocvAQX1fSfKpM5mgAF9VMJSfhSjBUeDJBC3/akEx3izg+n9S1+03/Wl+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4IxZ/9Jrj82AQ3quZ7ViP/Xjna5oChnCAh4o8nKu27w=;
+ b=ZRnxwYjPIjJcd1RNfT4zhZwGSFgQBBRNVHcXSy2swChelwlNLYuL73c+I29cnr7eZTxr9/yMhwpeGcNBG6qcdB9w4OinxGfLrGXrFuujuqYfPgoOg+4u4J4K2pmeQHceo/r+1JBeI33hi8+kNAgMOovixOhRCoF1PD0iPxdb7AMhEC8QHR7KNjCJSQ/KmT8D0NdB4rvfIBhyoJ1PQXqrzs44GRhR63VSGCkriwepgwpXZCIGr0QhcYKEDg3GPDMbbk71NiU50SpmKN1a6rP0UKFbbjssvmfrCvvZ7lIHD95n9VBPzPKbCVX1bQns0L0GXWWQ7KFxP83fT4UBjAyW5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4IxZ/9Jrj82AQ3quZ7ViP/Xjna5oChnCAh4o8nKu27w=;
+ b=PPtH3fkPuRN7mGjXgqTnV1nGPw1od4eMdQ9Xud+oPe5NKEgLfQ0azHUV+hkWw94BqVlxrPrhArc0ugEpBL9Rho8yMzEve68LwPPlQhKhaJeyAuZGeAXr8nrpgHUfSUP+ptPsi3f/wNAWwN/82ahNKkHjEu121N51uFktZl7paqCF+zY0EdlhUv+pY1cwWSRlHmsNG78s24YbTHKHq3O5aDXJQCHEjfWqITHglczOhQiXDkgLOWldgQoYwNUGt27fbc0ApZW8xuDL8nDK+AscFudnZEJdaUO1zeP4sKWqCm/HgC3MOlzbts4p/IYrS9oEDH2dqADLRUy0gOgyubnUmQ==
+Received: from AS1PR04MB9630.eurprd04.prod.outlook.com (2603:10a6:20b:475::16)
+ by AS5PR04MB11466.eurprd04.prod.outlook.com (2603:10a6:20b:6c6::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.11; Wed, 24 Dec
+ 2025 18:05:37 +0000
+Received: from AS1PR04MB9630.eurprd04.prod.outlook.com
+ ([fe80::8e4e:9bae:9fbd:cb52]) by AS1PR04MB9630.eurprd04.prod.outlook.com
+ ([fe80::8e4e:9bae:9fbd:cb52%4]) with mapi id 15.20.9456.008; Wed, 24 Dec 2025
+ 18:05:37 +0000
+From: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Vinit
+ Mehta <vinit.mehta@nxp.com>, Mahesh Talewad <mahesh.talewad@nxp.com>, Devyani
+ Godbole <devyani.godbole@nxp.com>
+Subject: RE: [EXT] Re: [PATCH BlueZ v1 1/1] profiles/audio/bap.c: Fix
+ heap-use-after-free in setup_free()
+Thread-Topic: [EXT] Re: [PATCH BlueZ v1 1/1] profiles/audio/bap.c: Fix
+ heap-use-after-free in setup_free()
+Thread-Index: AQHcdBNU3nPgF4+yMEStSH9FHS3MxrUvTCCAgAHHmDA=
+Date: Wed, 24 Dec 2025 18:05:37 +0000
+Message-ID:
+ <AS1PR04MB9630CCF6B346BB2D652AD60A93B2A@AS1PR04MB9630.eurprd04.prod.outlook.com>
+References: <20251223135134.706-1-sarveshwar.bajaj@nxp.com>
+ <20251223135134.706-2-sarveshwar.bajaj@nxp.com>
+ <CABBYNZKGSo5Uza6JoBXyCqQyi82WS4tQTBKOzpQ=HdOKu0Oa-A@mail.gmail.com>
+In-Reply-To:
+ <CABBYNZKGSo5Uza6JoBXyCqQyi82WS4tQTBKOzpQ=HdOKu0Oa-A@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS1PR04MB9630:EE_|AS5PR04MB11466:EE_
+x-ms-office365-filtering-correlation-id: 074b0af8-aa64-4a53-4933-08de43170a95
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|376014|366016|19092799006|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?VUROSjJWc1FNeEJxRFVuNVZtVnNVTXZicFV6Wk92bFl3NVJIYTBrTjBLYWdR?=
+ =?utf-8?B?bjZ6dW9CVkVEd0Q0R1JOV0pRT2Z2NEJ5MmswZGlkMnhGZ0hHVzVudkdTVXp1?=
+ =?utf-8?B?dkRnZHg3SXBrWkVrd2Urai83bFp0WjkwQjhRUEtCM29WRlRZRzhEVXVwajZ3?=
+ =?utf-8?B?T3FWeW5LaXp4R1dhV0gwMzU2QlRpSVozVWNlaS9ieS9HTDdNTFd2dDZyczFu?=
+ =?utf-8?B?SEQ1N1V1NE1MS0pOcUc4RE95WFhpZDZMR3JZTkNadVlxQzIwbzAwY2lnRTF0?=
+ =?utf-8?B?emlZRzZLandyWndoS2hjVEh0MUNUMFlqdGIrRzBLcVRXVCtmTTJqZ1hIbGQv?=
+ =?utf-8?B?a2laaHFYY1Z2V1lXZXFsNDllN3A2M3dodDVYK1hCVW52emk2SUJpOXc4a1E0?=
+ =?utf-8?B?SXJmQTYyVnQ0alFaekZVSzRkWDJwWUFqMEtMTFdPN3BlOEg4QVZnTGU3S3ZE?=
+ =?utf-8?B?QWo0TWFrL1lOM1FyY2dZamJta0F4dElSTVhIbWxxWTdQTXhweG1FbWlBNlZK?=
+ =?utf-8?B?YlEzMU5iMFg5VUZrelNYblZzUERsMlY4eWJxZ3dRZDR3MVllL1Q0cUpMWDRE?=
+ =?utf-8?B?dXhwWWFPSkxIbXlMR0ZLQTYzQnYvTlBRdUd0cmtQZDRTWXlqM2ZxK0pYbEVY?=
+ =?utf-8?B?Z2NSR2JudUdRNzl2dmdQdDZTUDlEclRSTVA4UXowa3J6UEVxdlBoY2N4QW9x?=
+ =?utf-8?B?ZjZRMzJZYU5MV0RZbUprZFF5dkdFdTNnWVhMMFB5NU9iMWdaZTFNdmJhcDNI?=
+ =?utf-8?B?d3JBUVJzSXpFTkxvYWhsZ2hVTnpkb2g3b1NoRFA4Qkw0WnZsZzBUWGZ3dWU0?=
+ =?utf-8?B?Rm4wQmM5OU9VQTFNQVljNW1FSTNwYzFvNURheEc0cTkrZDZRM2pJNXo3RTdF?=
+ =?utf-8?B?TVEvM0FSeHpURlR6ME9EZEFlTE1lNHdTNVEvNk5EbU1mRlMrUDJaaWhsUGN4?=
+ =?utf-8?B?MW9oeUNSd1dkUis5KzZMVzc2K0EvUGdUSjJadGMyRHpLZGZBMnZNQWlTdnIx?=
+ =?utf-8?B?T2lMNVVSM084a0lITE00NnNyWHZJakhNRjlVeldWSWs3aWpITFNPR3diMzVV?=
+ =?utf-8?B?YXN3ZmltMTlEc1R1SnE1dm1DbDJYcHhTZGQrWCtQVzUyMVd0MS9rWXpXWG01?=
+ =?utf-8?B?MFdpOHJ1UjNqdjc3RVFHOEs2cGNEU0pVVHptN0VTVi9BUEYrZG5uS2oyWUlI?=
+ =?utf-8?B?Ym45MHNuekhzTDlOYU0wYzJRT3RHUk8xc3JoSXV3MUFjTDRqbGFmTEhtZTIz?=
+ =?utf-8?B?ODRjd3pTR0h1d1piWDExeUNYOEFwYUExcGxFRE1sZ1pMYWQrZDJ5eVBMc0p5?=
+ =?utf-8?B?MVlNNDdnYjNQeXhub0FBd3JDK21CNTB2VFBEQVdZSG5tdnZyUHNjcVlnUUdZ?=
+ =?utf-8?B?TktXUkJhekNhUkNqVVhNNVlURCtyNnAyc2tDRVJBK0dXNXMxRlp1eWcwcEp1?=
+ =?utf-8?B?b1FPR1BZb0hMWUN2M21aWXVLZVhhSnpqQ1F2RU9VQUtKNU5JVkt4aDlYaEhs?=
+ =?utf-8?B?Y1dYc2JWNnA1TXltM2VTdFdMOCtlQ1NEakZNallvSktxNnBYWFMya3BZVGVJ?=
+ =?utf-8?B?T3A2TGtUVW0zdTY0S0hKN0ZoZmZYdlNaVDFONk9zMWlEbTN3MnFuZG1UMk02?=
+ =?utf-8?B?bkpMNHRhUmRJV1NvQkVjS3Y2a1h6bFV4alJFTG5PTVBhN2QyTmQveXhrRlFQ?=
+ =?utf-8?B?NFU1eVprMHhaWk16MjlyNkRZOVJiNklIcXZKUnNVSmErNEluZVpQODB6TU9D?=
+ =?utf-8?B?dnQvRzdNVldxVmlYNFpzTWlmSit2SzcydVVPVkZHWVRqK0NiOWdobnNaVzVK?=
+ =?utf-8?B?UVNOcHQvMTc4a1NQUDZWYmtMTkx3NFBLakNzY3pxdHBnWWluUnZZcm1scU1I?=
+ =?utf-8?B?SGVyMlBUN3VwSE5VVVhhdW1FSUpObTZ3eTlCalp6U3U4Y0d3R0ZxMU5EekQr?=
+ =?utf-8?B?R0RvU1I0Ull5dm1zQ21ubG1KVE5iQXg1citLWTVwcWQ0Mnk4eEdDMDhCcXFo?=
+ =?utf-8?B?L0lJWXAzUEU3VXkzbThLUFRzcVduWlBvQndYQU1nb2l3Z09kV3FkQXpFY25w?=
+ =?utf-8?Q?kz/DWu?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR04MB9630.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(19092799006)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?emI2OXNRRTVDNW8wRFFaWjZ3bnd2TG9BMlZoMW5WZ0ZGSDVrTk5VTEh1WDU2?=
+ =?utf-8?B?SUR2djV6UmlTVEM3MGJJdCtmM1Z6SDBaWHlUTVh3WTdlWG5mMllWKzJJYnlR?=
+ =?utf-8?B?MnQxdURqelpGRzZ4OUlveEhKU0NveVFlZXNYMnNOZjV0SFpKNXp3WnNiMThQ?=
+ =?utf-8?B?bTNpVWo2YWM4aEt1aXRQaisrN0JwSDV6VlUyVUp1aUVYUkxMMVFyZlFnVzY3?=
+ =?utf-8?B?QVZGQ2Y4Q2hIVzRTa1lseUptRmxaSGx5a1lPU3dtUUFDN0dZaVpZTXBjL1FZ?=
+ =?utf-8?B?VE9LRWEwVlBVSnFoR2lUU29jSEUrMVBtYzlvY0xnZVJ1SE1QcVNJYUwzdVps?=
+ =?utf-8?B?dUZ4cm4vS3lSQmtBaURYeDNHOHkrUXgzVkNJdFp0bzY3aHRaOURlanNVY1lw?=
+ =?utf-8?B?eWNabHkxZzd0S3dNeVRiUDl1alVPMnd5Z3RsOGYvYzExbStZKzlHYXV4MERT?=
+ =?utf-8?B?VGV5UERGZEJxQUFXTGNFWi9GcHFGU2hVV1VyMXgzMUZsTU5jWWk5V1Noc09X?=
+ =?utf-8?B?aWQ3SUIrOTRyWHJiZWFiR1Z6MkhkZVNpNDQwOFNOV1dyMStrRDh0ZGZ1T1Qy?=
+ =?utf-8?B?WTZ6am4zSUVWK2t4WHpiVTdETWpHTUJnTjk2Y3NRbTk4dmtwZm1lM0tYRnJz?=
+ =?utf-8?B?VUg0TkZ5QzFJeVpFL212bWk1VCsxUUxqa1N5Y1pCWTUwWE9PQWdYRHBmVGp5?=
+ =?utf-8?B?WEVhT212Q1Z0djMxWlVKSTNHbExrdFdYMTZSTE8zdzlUaUlUa0xwK2tiOUtZ?=
+ =?utf-8?B?RmRyV1FITS9DYThuSnJlYnRHTlNEZkRYSlYxRG1ibUEzbGUxbkI2b1BCVWcr?=
+ =?utf-8?B?SGNUWVFpejFuTHBrVHBxWWdjSjhHUEJsTEg4dUdncVkwRWZaN29Na2JSckk4?=
+ =?utf-8?B?UXl4a0k0RDNOVWRHTGFuNFgvVU9yRXdTRmxORytzbENFdHY2Sno3bmFDWHRU?=
+ =?utf-8?B?K240L2V5K0o1aFN4cEh2U0YzOXZpQ3lMRG1nTkZKV2dOUGwyWXpnblBKNHlS?=
+ =?utf-8?B?RkdZYVY1ZmdaMVRwUXU2ZVROK0M4VTFLZ083RStRdlZ3T3VuMzV3ejVNYUNO?=
+ =?utf-8?B?T2QxaG1ENlRrQ3hLNzhsL0htSGtPQWJpZEdKc0FhZjdpaU5ia1A3VWFtVjBW?=
+ =?utf-8?B?ZU5XRGRHUzVkVmpSZmM2cVYwOFFqd0RPUE9nWkV3c2lyM3l5YWFLUUpDSWtB?=
+ =?utf-8?B?QXpuK05GSE03QlJiV1FHUmRhZ1NvcDZHSzNTU0Y3KzkzSGgvT0hWYnl4WTM2?=
+ =?utf-8?B?WGFGMW80Q3V3Tmlkc2RtMEkzalBveThLWFdUTk1aTmVySGlycnBFcWRYTFFB?=
+ =?utf-8?B?a2RLcGtJSG9uSzNuUUJWZ2t6aWNyM3JmOWhPWDM2MXB0eXJqNkhPeVlRTUsy?=
+ =?utf-8?B?LzhHVkhGK2Q5RXhBdk94Q29hdnlhRVc4MHd3UFUvSm5XbTZxaDM0c2tPazJl?=
+ =?utf-8?B?blZlaERtOW9veGFGYkdGaTRpc252a1Z5VGN4N2oxTXUxb2h6ZWJnZzQvWkpp?=
+ =?utf-8?B?TnBSUmdmRVQ5Z0NBRnBYcTZuRkRmUmg0bUozOHBWZ2dwNVE3VW80U1FSVlUw?=
+ =?utf-8?B?aHBhU2VqeXVBNGUvU0pSTUhVR3dJSDhCbzc2STNFWUY3WnhmVVJzYWt3cXJP?=
+ =?utf-8?B?bnRxT3ZBZ2tGRncybDJtK0VSdUhpSFFQeDRuSllEVmhOaXNaWmg2V1oxSGpJ?=
+ =?utf-8?B?cEE4S1YzUTFENS91ZVFWN1NzTGhiblpsKzN2elVSajhJQTF3YUlFM0hycDJj?=
+ =?utf-8?B?L2tPYTVQYXR6L2E4Z2FkMFBjRHhjL1V5ZE9jQ0hORlUraEdMSVc0USswc0xm?=
+ =?utf-8?B?ZG04d3d6dU5sYU9NYngvWkdDWm9MTWFvUVdkZ0dwM3dmSEZyby9uS2p2Y2NC?=
+ =?utf-8?B?dURBYzFLS040b2ZHMXU5MldxcnJkNGNaeEpqb1k0K3N5KzN4YzdtSFgrVFJC?=
+ =?utf-8?B?ZmUvd1JkZGx0MzQ3MC96dHQ2dDA5bjlrYk5TYTFUdTNBQkt1cU5vWXhibzFJ?=
+ =?utf-8?B?bUlMT3ZHTmpZcFIzb252eWVpS1RBVnNTMmVpT2NVOGNtVTY1L1E1WmJmLzdS?=
+ =?utf-8?B?bXIxd3FEd2t5Lzh2NFFLOUhTQ2FaamIycHJTM1g4LzkrUjE3RVIyaGdnK0pW?=
+ =?utf-8?B?d2YybWQ1eW1OQms0aUtBd1p1SjA2UFM3UXVEQVo3dHFOT3ZSRXpvMWhJTEV1?=
+ =?utf-8?B?MjVMN1Awc1dURXkyVjQ2dFEvU0duK3A5TW1LOGZ2Qks4dXFqTEZUdDhPSFlo?=
+ =?utf-8?B?WnF0NEdDcWRhbjVEK1RVQTlJMW9nT1hCT1E3MUlteTFXanBBZFVVZ3lIVXhp?=
+ =?utf-8?B?Zml6c0NqKzdIR0Rvb2d4R0g5MnhtajVIejdWd3Z1djRCSEV5L3VZQT09?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR04MB9630.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 074b0af8-aa64-4a53-4933-08de43170a95
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Dec 2025 18:05:37.3234
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fksD71QgzHAUkoqvNuwL567yXjd4sf+z9D+Ue+op5Px/nqE5V1PjdYaEnF7wkmO5SDJaWOWz8CXwC4orMoT98aJ4bagzQJYGZ5MEApdAJPQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB11466
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219387
-
-cheako+kernel_org@mikemestnik.net changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |cheako+kernel_org@mikemestn
-                   |                            |ik.net
-
---- Comment #14 from cheako+kernel_org@mikemestnik.net ---
-This could be a duplicate of #216936 ?
-
-Do you get sometime nothing, like there is no btusb, and sometime firmware
-loading failed, and sometimes this?
-
-Try adding `blacklist thinkpad_acpi` to `/etc/modprobe.d/` and update the
-initramfs.
-
-Also, you could to what I did and hexedit your wifi's PCI id into that btbug
-table.
-
-There is still much more to learn about 936, so try and add the debug flags
-that I used and see what you get.
-
-
-The key line to look for is `kernel: usb 3-1: USB disconnect, device number=
- 2`,
-your numbers may be different but generally during boot you should not have
-anything usb disconnecting.
-
-Here is the log I got:
-```text
-Dec 20 01:16:46 nysa systemd-journald[339]: Received client request to flush
-runtime journal.
-Dec 20 01:16:46 nysa kernel: mousedev: PS/2 mouse device common for all mice
-Dec 20 01:16:46 nysa kernel: Adding 33554428k swap on /dev/nvme0n1p2.=20
-Priority:-2 extents:1 across:33554428k SSDsc
-Dec 20 01:16:46 nysa kernel: acpi_cpufreq: overriding BIOS provided _PSD da=
-ta
-Dec 20 01:16:46 nysa kernel: ccp 0000:05:00.2: enabling device (0000 -> 000=
-2)
-Dec 20 01:16:46 nysa kernel: ccp 0000:05:00.2: ccp enabled
-Dec 20 01:16:46 nysa kernel: ccp 0000:05:00.2: psp: unable to access the
-device: you might be running a broken BIOS.
-Dec 20 01:16:46 nysa systemd-fsck[460]: fsck.fat 4.2 (2021-01-31)
-Dec 20 01:16:46 nysa systemd-fsck[460]: /dev/nvme0n1p3: 5 files, 660/130812
-clusters
-Dec 20 01:16:46 nysa kernel: mc: Linux media interface: v0.10
-Dec 20 01:16:46 nysa kernel: input: PC Speaker as
-/devices/platform/pcspkr/input/input11
-Dec 20 01:16:46 nysa kernel: RAPL PMU: API unit is 2^-32 Joules, 2 fixed
-counters, 163840 ms ovfl timer
-Dec 20 01:16:46 nysa kernel: RAPL PMU: hw unit of domain package 2^-16 Joul=
-es
-Dec 20 01:16:46 nysa kernel: RAPL PMU: hw unit of domain core 2^-16 Joules
-Dec 20 01:16:46 nysa kernel: ee1004 0-0050: 512 byte EE1004-compliant SPD
-EEPROM, read-only
-Dec 20 01:16:46 nysa kernel: Bluetooth: Core ver 2.22
-Dec 20 01:16:46 nysa kernel: NET: Registered PF_BLUETOOTH protocol family
-Dec 20 01:16:46 nysa kernel: Bluetooth: HCI device and connection manager
-initialized
-Dec 20 01:16:46 nysa kernel: Bluetooth: HCI socket layer initialized
-Dec 20 01:16:46 nysa kernel: Bluetooth: L2CAP socket layer initialized
-Dec 20 01:16:46 nysa kernel: Bluetooth: SCO socket layer initialized
-Dec 20 01:16:46 nysa kernel: videodev: Linux video capture interface: v2.00
-Dec 20 01:16:46 nysa kernel: cfg80211: Loading compiled-in X.509 certificat=
-es
-for regulatory database
-Dec 20 01:16:46 nysa kernel: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea=
-7'
-Dec 20 01:16:46 nysa kernel: Loaded X.509 cert 'wens:
-61c038651aabdcf94bd0ac7ff06c7248db18c600'
-Dec 20 01:16:46 nysa kernel: thinkpad_acpi: ThinkPad ACPI Extras v0.26
-Dec 20 01:16:46 nysa kernel: thinkpad_acpi: http://ibm-acpi.sf.net/
-Dec 20 01:16:46 nysa kernel: thinkpad_acpi: ThinkPad BIOS R0UET78W (1.58 ),=
- EC
-R0UHT78W
-Dec 20 01:16:46 nysa kernel: thinkpad_acpi: Lenovo ThinkPad E585, model
-20KV000YUS
-Dec 20 01:16:46 nysa kernel: cfg80211: loaded regulatory.db is malformed or
-signature is missing/invalid
-Dec 20 01:16:46 nysa kernel: thinkpad_acpi: radio switch found; radios are
-enabled
-Dec 20 01:16:46 nysa kernel: thinkpad_acpi: This ThinkPad has standard ACPI
-backlight brightness control, supported by the ACPI video driver
-Dec 20 01:16:46 nysa kernel: thinkpad_acpi: Disabling thinkpad-acpi brightn=
-ess
-events by default...
-Dec 20 01:16:46 nysa kernel: usbcore: registered new interface driver btusb
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa systemd[1]: Finished systemd-journal-flush.service - F=
-lush
-Journal to Persistent Storage.
-Dec 20 01:16:46 nysa systemd[1]: proc-sys-fs-binfmt_misc.automount: Got
-automount request for /proc/sys/fs/binfmt_misc, triggered by 474
-(systemd-binfmt)
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000def208cd status 0 count 4
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Bootloader revision 0.3 build=
- 0
-week 24 2017
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: iwlwifi 0000:04:00.0: enabling device (0000 ->
-0002)
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-000000007a2689cd status 0 count 3
-Dec 20 01:16:46 nysa systemd[1]: Starting systemd-tmpfiles-setup.service -
-Create System Files and Directories...
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Device revision is 1
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Secure boot is enabled
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: OTP lock is enabled
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: API lock is enabled
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Debug lock is disabled
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Minimum firmware build 1 week=
- 10
-2014
-Dec 20 01:16:46 nysa kernel: ACPI: \: failed to evaluate _DSM
-2c176672-0b22-294b-814f-75e4dd26b5fd rev:0 func:0 (0x1001)
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Found device firmware:
-intel/ibt-20-1-3.sfi
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Boot Address: 0x24800
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Firmware Version: 193-33.24
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: ACPI: \: failed to evaluate _DSM
-2c176672-0b22-294b-814f-75e4dd26b5fd rev:0 func:0 (0x1001)
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000e181074e status 0 count 132
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: iwlwifi 0000:04:00.0: Detected crf-id 0x3617,
-cnv-id 0x100530 wfpm id 0x80000000
-Dec 20 01:16:46 nysa kernel: iwlwifi 0000:04:00.0: PCI dev 2723/0084,
-rev=3D0x340, rfid=3D0x10a100
-Dec 20 01:16:46 nysa kernel: iwlwifi 0000:04:00.0: Detected Intel(R) Wi-Fi 6
-AX200 160MHz
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-0000000047350e5b status 0 count 256
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000df769fe6 status 0 count 8
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 256
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 8
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000109a812f status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000f473cfbe status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000f473cfbe status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000f473cfbe status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000f473cfbe status 0 count 252
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status 0 count 6
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: usb 3-1: USB disconnect, device number 2
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000d89c849e status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_bulk_complete:1520: hci0 urb
-00000000c3a9ce16 status -71 count 0
-Dec 20 01:16:46 nysa kernel: btusb:btusb_tx_complete:1862: hci0 urb
-00000000f473cfbe status -71 count 0
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Failed to send firmware data
-(-19)
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: sending frame failed (-19)
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: FW download error recovery fa=
-iled
-(-19)
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: sending frame failed (-19)
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Reading supported features fa=
-iled
-(-19)
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Error reading debug features
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: HCI LE Coded PHY feature bit =
-is
-set, but its usage is not supported.
-Dec 20 01:16:46 nysa kernel: btusb:btusb_send_frame_intel:2616: hci0
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: sending frame failed (-19)
-Dec 20 01:16:46 nysa kernel: Bluetooth: hci0: Failed to read MSFT supported
-features (-19)
-Dec 20 01:16:46 nysa kernel: iwlwifi 0000:04:00.0: loaded firmware version
-77.30b1cbd8.0 cc-a0-77.ucode op_mode iwlmvm
-Dec 20 01:16:46 nysa systemd[1]: Mounting proc-sys-fs-binfmt_misc.mount -
-Arbitrary Executable File Formats File System...
-Dec 20 01:16:46 nysa systemd-tmpfiles[537]: /usr/lib/tmpfiles.d/legacy.conf=
-:14:
-Duplicate line for path "/run/lock", ignoring.
-Dec 20 01:16:46 nysa kernel: uvcvideo 3-2:1.0: Found UVC 1.00 device Integr=
-ated
-Camera (5986:2113)
-Dec 20 01:16:46 nysa kernel: kvm_amd: TSC scaling supported
-Dec 20 01:16:46 nysa kernel: kvm_amd: Nested Virtualization enabled
-Dec 20 01:16:46 nysa kernel: kvm_amd: Nested Paging enabled
-Dec 20 01:16:46 nysa kernel: kvm_amd: LBR virtualization supported
-Dec 20 01:16:46 nysa kernel: kvm_amd: SEV disabled (ASIDs 0 - 15)
-Dec 20 01:16:46 nysa kernel: kvm_amd: SEV-ES disabled (ASIDs 1 - 4294967295)
-Dec 20 01:16:46 nysa kernel: kvm_amd: Virtual VMLOAD VMSAVE supported
-Dec 20 01:16:46 nysa kernel: kvm_amd: Virtual GIF supported
-Dec 20 01:16:46 nysa kernel: thinkpad_acpi: Standard ACPI backlight interfa=
-ce
-available, not loading native one
-Dec 20 01:16:46 nysa systemd[1]: Mounted proc-sys-fs-binfmt_misc.mount -
-Arbitrary Executable File Formats File System.
-Dec 20 01:16:46 nysa kernel: pps_core: LinuxPPS API ver. 1 registered
-Dec 20 01:16:46 nysa kernel: pps_core: Software ver. 5.3.6 - Copyright
-2005-2007 Rodolfo Giometti <giometti@linux.it>
-Dec 20 01:16:46 nysa kernel: snd_hda_intel 0000:05:00.1: enabling device (0=
-000
--> 0002)
-Dec 20 01:16:46 nysa kernel: PTP clock support registered
-Dec 20 01:16:46 nysa systemd[1]: Finished systemd-binfmt.service - Set Up
-Additional Binary Formats.
-Dec 20 01:16:46 nysa kernel: usbcore: registered new interface driver uvcvi=
-deo
-Dec 20 01:16:46 nysa kernel: snd_hda_intel 0000:05:00.1: Handle vga_switche=
-roo
-audio client
-Dec 20 01:16:46 nysa kernel: snd_hda_intel 0000:05:00.6: enabling device (0=
-000
--> 0002)
-Dec 20 01:16:46 nysa systemd[1]: Starting binfmt-support.service - Enable
-support for additional executable binary formats...
-Dec 20 01:16:46 nysa systemd[1]: Finished networking.service - Raise network
-interfaces.
-Dec 20 01:16:46 nysa systemd[1]: Finished systemd-tmpfiles-setup.service -
-Create System Files and Directories.
-Dec 20 01:16:46 nysa systemd[1]: ldconfig.service - Rebuild Dynamic Linker
-Cache was skipped because no trigger condition checks were met.
-Dec 20 01:16:46 nysa systemd[1]: systemd-firstboot.service - Initial Setup =
-was
-skipped because of an unmet condition check (ConditionFirstBoot=3Dyes).
-Dec 20 01:16:46 nysa systemd[1]: first-boot-complete.target - First Boot
-Complete was skipped because of an unmet condition check
-(ConditionFirstBoot=3Dyes).
-Dec 20 01:16:46 nysa systemd[1]: systemd-journal-catalog-update.service -
-Rebuild Journal Catalog was skipped because of an unmet condition check
-(ConditionNeedsUpdate=3D/var).
-Dec 20 01:16:46 nysa systemd[1]: systemd-machine-id-commit.service - Save
-Transient machine-id to Disk was skipped because of an unmet condition check
-(ConditionPathIsMountPoint=3D/etc/machine-id).
-Dec 20 01:16:46 nysa systemd[1]: systemd-update-done.service - Update is
-Completed was skipped because no trigger condition checks were met.
-Dec 20 01:16:46 nysa systemd[1]: Reached target sysinit.target - System
-Initialization.
-Dec 20 01:16:46 nysa systemd[1]: Started acpid.path - ACPI Events Check.
-Dec 20 01:16:46 nysa systemd[1]: Started anacron.timer - Trigger anacron ev=
-ery
-hour.
-Dec 20 01:16:46 nysa systemd[1]: Started apt-daily.timer - Daily apt downlo=
-ad
-activities.
-Dec 20 01:16:46 nysa systemd[1]: Started apt-daily-upgrade.timer - Daily apt
-upgrade and clean activities.
-Dec 20 01:16:46 nysa kernel: snd_hda_intel 0000:05:00.1: bound 0000:05:00.0
-(ops amdgpu_dm_audio_component_bind_ops [amdgpu])
-Dec 20 01:16:46 nysa systemd[1]: Started btrfs-balance.timer - Balance block
-groups on a btrfs filesystem.
-Dec 20 01:16:46 nysa kernel: snd_hda_codec_conexant hdaudioC2D0: CX20753/4:
-BIOS auto-probing.
-Dec 20 01:16:46 nysa systemd[1]: Started btrfs-scrub.timer - Scrub btrfs
-filesystem, verify block checksums.
-Dec 20 01:16:46 nysa kernel: snd_hda_codec_conexant hdaudioC2D0: CX20753/4:
-picked fixup  for PCI SSID 17aa:0000
-Dec 20 01:16:46 nysa systemd[1]: Started btrfs-trim.timer - Discard unused
-blocks on a mounted filesystem.
-Dec 20 01:16:46 nysa kernel: snd_hda_codec_conexant hdaudioC2D0: autoconfig=
- for
-CX20753/4: line_outs=3D1 (0x17/0x0/0x0/0x0/0x0) type:speaker
-Dec 20 01:16:46 nysa systemd[1]: Started certbot.timer - Run certbot twice
-daily.
-Dec 20 01:16:46 nysa kernel: snd_hda_codec_conexant hdaudioC2D0:=20=20=20
-speaker_outs=3D0 (0x0/0x0/0x0/0x0/0x0)
-Dec 20 01:16:46 nysa systemd[1]: Started dpkg-db-backup.timer - Daily dpkg
-database backup timer.
-Dec 20 01:16:46 nysa kernel: snd_hda_codec_conexant hdaudioC2D0:    hp_outs=
-=3D1
-(0x16/0x0/0x0/0x0/0x0)
-Dec 20 01:16:46 nysa systemd[1]: Started e2scrub_all.timer - Periodic ext4
-Online Metadata Check for All Filesystems.
-Dec 20 01:16:46 nysa kernel: snd_hda_codec_conexant hdaudioC2D0:    mono:
-mono_out=3D0x0
-Dec 20 01:16:46 nysa systemd[1]: Started exim4-base.timer - Daily exim4-base
-housekeeping.
-Dec 20 01:16:46 nysa kernel: snd_hda_codec_conexant hdaudioC2D0:    inputs:
-Dec 20 01:16:46 nysa systemd[1]: Started fwupd-refresh.timer - Refresh fwupd
-metadata regularly.
-Dec 20 01:16:46 nysa kernel: snd_hda_codec_conexant hdaudioC2D0:      Mic=
-=3D0x19
-Dec 20 01:16:46 nysa systemd[1]: Started logrotate.timer - Daily rotation of
-log files.
-Dec 20 01:16:46 nysa kernel: snd_hda_codec_conexant hdaudioC2D0:      Inter=
-nal
-Mic=3D0x1a
-Dec 20 01:16:46 nysa systemd[1]: Started man-db.timer - Daily man-db
-regeneration.
-Dec 20 01:16:46 nysa kernel: input: HD-Audio Generic HDMI/DP,pcm=3D3 as
-/devices/pci0000:00/0000:00:08.1/0000:05:00.1/sound/card0/input13
-Dec 20 01:16:46 nysa systemd[1]: Started plocate-updatedb.timer - Update the
-plocate database daily.
-Dec 20 01:16:46 nysa kernel: input: HD-Audio Generic HDMI/DP,pcm=3D7 as
-/devices/pci0000:00/0000:00:08.1/0000:05:00.1/sound/card0/input14
-Dec 20 01:16:46 nysa systemd[1]: Started snapper-boot.timer - Take snapper
-snapshot of root on boot.
-Dec 20 01:16:46 nysa kernel: input: HD-Audio Generic HDMI/DP,pcm=3D8 as
-/devices/pci0000:00/0000:00:08.1/0000:05:00.1/sound/card0/input15
-Dec 20 01:16:46 nysa systemd[1]: Started snapper-cleanup.timer - Daily Clea=
-nup
-of Snapper Snapshots.
-Dec 20 01:16:46 nysa kernel: amd_atl: AMD Address Translation Library
-initialized
-Dec 20 01:16:46 nysa systemd[1]: Started snapper-timeline.timer - Timeline =
-of
-Snapper Snapshots.
-Dec 20 01:16:46 nysa systemd[1]: Started systemd-tmpfiles-clean.timer - Dai=
-ly
-Cleanup of Temporary Directories.
-Dec 20 01:16:46 nysa systemd[1]: Reached target paths.target - Path Units.
-Dec 20 01:16:46 nysa systemd[1]: Reached target timers.target - Timer Units.
-Dec 20 01:16:46 nysa systemd[1]: Listening on acpid.socket - ACPID Listen
-Socket.
-Dec 20 01:16:46 nysa systemd[1]: Listening on avahi-daemon.socket - Avahi
-mDNS/DNS-SD Stack Activation Socket.
-Dec 20 01:16:46 nysa systemd[1]: Listening on dbus.socket - D-Bus System
-Message Bus Socket.
-Dec 20 01:16:46 nysa systemd[1]: Starting docker.socket - Docker Socket for=
- the
-API...
-Dec 20 01:16:46 nysa systemd[1]: Listening on netavark-dhcp-proxy.socket -
-Netavark DHCP proxy socket.
-Dec 20 01:16:46 nysa systemd[1]: Listening on sshd-unix-local.socket - Open=
-SSH
-Server Socket (systemd-ssh-generator, AF_UNIX Local).
-Dec 20 01:16:46 nysa systemd[1]: Listening on systemd-hostnamed.socket -
-Hostname Service Socket.
-Dec 20 01:16:46 nysa systemd[1]: Listening on systemd-logind-varlink.socket=
- -
-User Login Management Varlink Socket.
-Dec 20 01:16:46 nysa systemd[1]: Listening on systemd-machined.socket - Vir=
-tual
-Machine and Container Registration Service Socket.
-Dec 20 01:16:46 nysa systemd[1]: Listening on uuidd.socket - UUID daemon
-activation socket.
-Dec 20 01:16:46 nysa systemd[1]: systemd-pcrphase-sysinit.service - TPM PCR
-Barrier (Initialization) was skipped because of an unmet condition check
-(ConditionSecurity=3Dmeasured-uki).
-Dec 20 01:16:46 nysa systemd[1]: Listening on docker.socket - Docker Socket=
- for
-the API.
-Dec 20 01:16:46 nysa systemd[1]: Reached target sockets.target - Socket Uni=
-ts.
-Dec 20 01:16:46 nysa systemd[1]: Reached target basic.target - Basic System.
-Dec 20 01:16:46 nysa systemd[1]: System is tainted: unmerged-bin
-Dec 20 01:16:46 nysa systemd[1]: Starting accounts-daemon.service - Accounts
-Service...
-Dec 20 01:16:46 nysa kernel: input: HD-Audio Generic Mic as
-/devices/pci0000:00/0000:00:08.1/0000:05:00.6/sound/card2/input16
-Dec 20 01:16:46 nysa kernel: input: HD-Audio Generic Headphone as
-/devices/pci0000:00/0000:00:08.1/0000:05:00.6/sound/card2/input17
-Dec 20 01:16:46 nysa systemd[1]: Started anacron.service - Run anacron jobs.
-Dec 20 01:16:46 nysa systemd[1]: Starting avahi-daemon.service - Avahi
-mDNS/DNS-SD Stack...
-Dec 20 01:16:46 nysa systemd[1]: Starting chrony.service - chrony, an NTP
-client/server...
-Dec 20 01:16:46 nysa systemd[1]: Starting cosmic-greeter-daemon.service -
-COSMIC Greeter Daemon...
-Dec 20 01:16:46 nysa systemd[1]: Started cron.service - Regular background
-program processing daemon.
-Dec 20 01:16:46 nysa systemd[1]: Starting dbus.service - D-Bus System Messa=
-ge
-Bus...
-Dec 20 01:16:46 nysa anacron[611]: Anacron 2.3 started on 2025-12-20
-Dec 20 01:16:46 nysa systemd[1]: Starting e2scrub_reap.service - Remove Sta=
-le
-Online ext4 Metadata Check Snapshots...
-Dec 20 01:16:46 nysa anacron[611]: Normal exit (0 jobs run)
-Dec 20 01:16:46 nysa systemd[1]: getty-static.service - getty on tty2-tty6 =
-if
-dbus and logind are not available was skipped because of an unmet condition
-check (ConditionPathExists=3D!/usr/bin/dbus-daemon).
-Dec 20 01:16:46 nysa systemd[1]: Reached target getty.target - Login Prompt=
-s.
-Dec 20 01:16:46 nysa systemd[1]: Starting gnunet.service - A framework for
-secure peer-to-peer networking...
-Dec 20 01:16:46 nysa cron[621]: (CRON) INFO (pidfile fd =3D 3)
-Dec 20 01:16:46 nysa systemd[1]: Starting gpm.service - Console Mouse
-manager...
-Dec 20 01:16:46 nysa avahi-daemon[614]: Found user 'avahi' (UID 114) and gr=
-oup
-'avahi' (GID 118).
-Dec 20 01:16:46 nysa avahi-daemon[614]: Successfully dropped root privilege=
-s.
-Dec 20 01:16:46 nysa cron[621]: (CRON) INFO (Running @reboot jobs)
-Dec 20 01:16:46 nysa systemd[1]: Starting grub-common.service - Record
-successful boot for GRUB...
-Dec 20 01:16:46 nysa avahi-daemon[614]: avahi-daemon 0.8 starting up.
-Dec 20 01:16:46 nysa kernel: intel_rapl_common: Found RAPL domain package
-Dec 20 01:16:46 nysa kernel: intel_rapl_common: Found RAPL domain core
-Dec 20 01:16:46 nysa systemd[1]: Starting lm-sensors.service - Initialize
-hardware monitoring sensors...
-Dec 20 01:16:46 nysa systemd[1]: low-memory-monitor.service - Low Memory
-Monitor was skipped because of an unmet condition check
-(ConditionPathExists=3D/proc/pressure).
-Dec 20 01:16:46 nysa systemd[1]: Starting netavark-dhcp-proxy.service -
-Netavark DHCP proxy service...
-Dec 20 01:16:46 nysa systemd[1]: Starting networkd-dispatcher.service -
-Dispatcher daemon for systemd-networkd...
-Dec 20 01:16:46 nysa systemd[1]: Starting rsyslog.service - System Logging
-Service...
-Dec 20 01:16:46 nysa systemd[1]: Starting smartmontools.service - Self
-Monitoring and Reporting Technology (SMART) Daemon...
-Dec 20 01:16:46 nysa kernel: iwlwifi 0000:04:00.0: Detected RF HR B3,
-rfid=3D0x10a100
-Dec 20 01:16:46 nysa /usr/sbin/gpm[652]: *** info [daemon/startup.c(131)]:
-Dec 20 01:16:46 nysa /usr/sbin/gpm[652]: Started gpm successfully. Entered
-daemon mode.
-Dec 20 01:16:46 nysa systemd[1]: Starting snapper-boot.service - Take snapp=
-er
-snapshot of root on boot...
-Dec 20 01:16:46 nysa systemd[1]: Starting snapperd.service - DBus interface=
- for
-snapper...
-Dec 20 01:16:46 nysa systemd[1]: sshd-keygen.service - Generate sshd host k=
-eys
-on first boot was skipped because of an unmet condition check
-(ConditionFirstBoot=3Dyes).
-Dec 20 01:16:46 nysa systemd[1]: Starting switcheroo-control.service -
-Switcheroo Control Proxy service...
-Dec 20 01:16:46 nysa systemd[1]: Starting systemd-logind.service - User Log=
-in
-Management...
-Dec 20 01:16:46 nysa kernel: thinkpad_acpi: battery 1 registered (start 75,
-stop 80, behaviours: 0xb)
-Dec 20 01:16:46 nysa systemd[1]: systemd-pcrphase.service - TPM PCR Barrier
-(User) was skipped because of an unmet condition check
-(ConditionSecurity=3Dmeasured-uki).
-Dec 20 01:16:46 nysa kernel: ACPI: battery: new hook: ThinkPad Battery
-Extension
-Dec 20 01:16:46 nysa systemd[1]: Starting tor.service - Anonymizing overlay
-network for TCP (multi-instance-master)...
-Dec 20 01:16:46 nysa systemd[1]: Starting udisks2.service - Disk Manager...
-Dec 20 01:16:46 nysa systemd[1]: Started uptimed.service - uptime record
-daemon.
-Dec 20 01:16:46 nysa kernel: input: ThinkPad Extra Buttons as
-/devices/platform/thinkpad_acpi/input/input12
-Dec 20 01:16:46 nysa systemd[1]: Started
-beesd@b333a6e7-1449-4209-a685-8b85aca25dfa.service - Bees
-(b333a6e7-1449-4209-a685-8b85aca25dfa).
-Dec 20 01:16:46 nysa kernel: iwlwifi 0000:04:00.0: base HW address:
-e0:d4:e8:79:22:4b
-Dec 20 01:16:46 nysa systemd[1]: Started netavark-dhcp-proxy.service - Neta=
-vark
-DHCP proxy service.
-Dec 20 01:16:46 nysa systemd[1]: Finished binfmt-support.service - Enable
-support for additional executable binary formats.
-Dec 20 01:16:46 nysa systemd[1]: anacron.service: Deactivated successfully.
-Dec 20 01:16:46 nysa systemd[1]: Finished tor.service - Anonymizing overlay
-network for TCP (multi-instance-master).
-Dec 20 01:16:46 nysa gnunet-arm[689]: 2025-12-20T01:16:46.843921-0600 arm-6=
-89
-ERROR `open' failed on file `/var/log/gnunet/gnunet.log' at
-common_logging.c:418 with error: Permission denied
-Dec 20 01:16:46 nysa gnunet-arm[689]: 2025-12-20T01:16:46.843975-0600 arm-6=
-89
-ERROR Assertion failed at service.c:2068.
-Dec 20 01:16:46 nysa avahi-daemon[614]: Successfully called chroot().
-Dec 20 01:16:46 nysa avahi-daemon[614]: Successfully dropped remaining
-capabilities.
-Dec 20 01:16:46 nysa smartd[648]: smartd 7.5 2025-04-30 r5714
-[x86_64-linux-6.18.1-x64v3-xanmod1] (local build)
-Dec 20 01:16:46 nysa smartd[648]: Opened configuration file /etc/smartd.conf
-Dec 20 01:16:46 nysa smartd[648]: Drive: DEVICESCAN, implied '-a' Directive=
- on
-line 18 of file /etc/smartd.conf
-Dec 20 01:16:46 nysa avahi-daemon[614]: Loading service file
-/services/ssh.service.
-Dec 20 01:16:46 nysa chronyd[695]: chronyd version 4.6.1 starting (+CMDMON =
-+NTP
-+REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +ASYNCDNS +NTS +SECHASH +IPV6 -DE=
-BUG)
-Dec 20 01:16:46 nysa smartd[648]: Configuration file /etc/smartd.conf was
-parsed, found DEVICESCAN, scanning devices
-Dec 20 01:16:46 nysa chronyd[695]: Loaded 0 symmetric keys
-Dec 20 01:16:46 nysa smartd[648]: Device: /dev/nvme0, opened
-Dec 20 01:16:46 nysa chronyd[695]: Using leap second list
-/usr/share/zoneinfo/leap-seconds.list
-Dec 20 01:16:46 nysa smartd[648]: Device: /dev/nvme0, Samsung SSD 970 EVO P=
-lus
-1TB, S/N:S59ANJ0N516812Z, FW:2B2QEXM7, 1.00 TB
-Dec 20 01:16:46 nysa chronyd[695]: Frequency -7.059 +/- 5.761 ppm read from
-/var/lib/chrony/chrony.drift
-Dec 20 01:16:46 nysa kernel: nvme nvme0: using unchecked data buffer
-Dec 20 01:16:46 nysa chronyd[695]: Loaded seccomp filter (level 1)
-Dec 20 01:16:46 nysa smartd[648]: Device: /dev/nvme0, is SMART capable. Add=
-ing
-to "monitor" list.
-Dec 20 01:16:46 nysa smartd[648]: Device: /dev/nvme0, state read from
-/var/lib/smartmontools/smartd.Samsung_SSD_970_EVO_Plus_1TB-S59ANJ0N516812Z.=
-nvme.state
-Dec 20 01:16:46 nysa smartd[648]: Monitoring 0 ATA/SATA, 0 SCSI/SAS and 1 N=
-VMe
-devices
-Dec 20 01:16:46 nysa smartd[648]: Device: /dev/nvme0, NVMe error count
-increased from 1502 to 1505 (0 new, 1 ignored, 2 unknown)
-Dec 20 01:16:46 nysa smartd[648]: Device: /dev/nvme0, state written to
-/var/lib/smartmontools/smartd.Samsung_SSD_970_EVO_Plus_1TB-S59ANJ0N516812Z.=
-nvme.state
-Dec 20 01:16:46 nysa udisksd[676]: udisks daemon version 2.10.1 starting
-Dec 20 01:16:46 nysa (udev-worker)[388]: controlC2: Process '/usr/sbin/alsa=
-ctl
--E HOME=3D/run/alsa -E XDG_RUNTIME_DIR=3D/run/alsa/runtime restore 2' faile=
-d with
-exit code 99.
-Dec 20 01:16:46 nysa systemd[1]: Started dbus.service - D-Bus System Message
-Bus.
-Dec 20 01:16:46 nysa systemd[1]: Started smartmontools.service - Self
-Monitoring and Reporting Technology (SMART) Daemon.
-Dec 20 01:16:46 nysa systemd[1]: Started chrony.service - chrony, an NTP
-client/server.
-Dec 20 01:16:46 nysa systemd-logind[673]: New seat seat0.
-Dec 20 01:16:46 nysa (udev-worker)[416]: controlC0: Process '/usr/sbin/alsa=
-ctl
--E HOME=3D/run/alsa -E XDG_RUNTIME_DIR=3D/run/alsa/runtime restore 2' faile=
-d with
-exit code 99.
-Dec 20 01:16:46 nysa systemd-logind[673]: Watching system buttons on
-/dev/input/event3 (Power Button)
-Dec 20 01:16:46 nysa rsyslogd[647]: imuxsock: Acquired UNIX socket
-'/run/systemd/journal/syslog' (fd 3) from systemd.  [v8.2504.0]
-Dec 20 01:16:46 nysa rsyslogd[647]: [origin software=3D"rsyslogd"
-swVersion=3D"8.2504.0" x-pid=3D"647" x-info=3D"https://www.rsyslog.com"] st=
-art
-Dec 20 01:16:46 nysa systemd-logind[673]: Watching system buttons on
-/dev/input/event0 (Power Button)
-Dec 20 01:16:46 nysa avahi-daemon[614]: Joining mDNS multicast group on
-interface lo.IPv6 with address ::1.
-Dec 20 01:16:46 nysa avahi-daemon[614]: New relevant interface lo.IPv6 for
-mDNS.
-Dec 20 01:16:46 nysa systemd[1]: Started rsyslog.service - System Logging
-Service.
-Dec 20 01:16:46 nysa avahi-daemon[614]: Joining mDNS multicast group on
-interface lo.IPv4 with address 127.0.0.1.
-Dec 20 01:16:46 nysa avahi-daemon[614]: New relevant interface lo.IPv4 for
-mDNS.
-Dec 20 01:16:46 nysa avahi-daemon[614]: Network interface enumeration
-completed.
-Dec 20 01:16:46 nysa avahi-daemon[614]: Registering new address record for =
-::1
-on lo.*.
-Dec 20 01:16:46 nysa avahi-daemon[614]: Registering new address record for
-127.0.0.1 on lo.IPv4.
-Dec 20 01:16:46 nysa dbus-daemon[623]: [system] Activating via systemd: ser=
-vice
-name=3D'org.freedesktop.PolicyKit1' unit=3D'polkit.service' requested by ':=
-1.2'
-(uid=3D0 pid=3D676 comm=3D"/usr/libexec/udisks2/udisksd")
-Dec 20 01:16:46 nysa kernel: iwlwifi 0000:04:00.0 wlp4s0: renamed from wlan0
-Dec 20 01:16:46 nysa systemd[1]: Started cosmic-greeter-daemon.service - CO=
-SMIC
-Greeter Daemon.
-Dec 20 01:16:46 nysa systemd[1]: Started avahi-daemon.service - Avahi
-mDNS/DNS-SD Stack.
-Dec 20 01:16:46 nysa systemd[1]: Started switcheroo-control.service -
-Switcheroo Control Proxy service.
-Dec 20 01:16:46 nysa systemd-logind[673]: Watching system buttons on
-/dev/input/event1 (Lid Switch)
-Dec 20 01:16:46 nysa systemd-logind[673]: Watching system buttons on
-/dev/input/event2 (Sleep Button)
-Dec 20 01:16:46 nysa systemd[1]: Listening on systemd-rfkill.socket - Load/=
-Save
-RF Kill Switch Status /dev/rfkill Watch.
-Dec 20 01:16:46 nysa systemd-logind[673]: Watching system buttons on
-/dev/input/event4 (AT Translated Set 2 keyboard)
-Dec 20 01:16:46 nysa systemd[1]: Starting NetworkManager.service - Network
-Manager...
-Dec 20 01:16:46 nysa systemd[1]: alsa-state.service - Manage Sound Card Sta=
-te
-(restore and store) was skipped because of an unmet condition check
-(ConditionPathExists=3D/etc/alsa/state-daemon.conf).
-Dec 20 01:16:46 nysa systemd[1]: Starting alsa-restore.service - Save/Resto=
-re
-Sound Card State...
-Dec 20 01:16:46 nysa systemd[1]: Starting bluetooth.service - Bluetooth
-service...
-Dec 20 01:16:46 nysa systemd-logind[673]: Watching system buttons on
-/dev/input/event16 (ThinkPad Extra Buttons)
-Dec 20 01:16:46 nysa systemd[1]: Starting polkit.service - Authorization
-Manager...
-Dec 20 01:16:46 nysa alsactl[735]: alsa-lib
-parser.c:2796:(load_toplevel_config) Unable to find the top-level configura=
-tion
-file '/usr/share/alsa/ucm2/ucm.conf'.
-Dec 20 01:16:46 nysa alsactl[735]: alsa-lib main.c:1554:(snd_use_case_mgr_o=
-pen)
-error: failed to import hw:0 use case configuration -2
-Dec 20 01:16:46 nysa alsactl[735]: alsa-lib
-parser.c:2796:(load_toplevel_config) Unable to find the top-level configura=
-tion
-file '/usr/share/alsa/ucm2/ucm.conf'.
-Dec 20 01:16:46 nysa alsactl[735]: alsa-lib main.c:1554:(snd_use_case_mgr_o=
-pen)
-error: failed to import hw:0 use case configuration -2
-Dec 20 01:16:46 nysa alsactl[735]: Found hardware: "HDA-Intel" "ATI R6xx HD=
-MI"
-"HDA:1002aa01,00aa0100,00100700" "0x17aa" "0x506f"
-Dec 20 01:16:46 nysa alsactl[735]: Hardware is initialized using a generic
-method
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #1 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #2 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #3 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #4 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #5 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #6 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #7 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #8 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #9 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #10 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #11 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #12 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #13 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #14 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #15 (No such file or directory)
-Dec 20 01:16:46 nysa systemd[1]: Starting wpa_supplicant.service - WPA
-supplicant...
-Dec 20 01:16:46 nysa gnunet-arm[708]: 2025-12-20T01:16:46.957242-0600
-gnunet-arm-708 WARNING GNUnet not running, cannot stop the peer
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #16 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #17 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #18 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #19 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: alsa-lib
-parser.c:2796:(load_toplevel_config) Unable to find the top-level configura=
-tion
-file '/usr/share/alsa/ucm2/ucm.conf'.
-Dec 20 01:16:46 nysa alsactl[735]: alsa-lib main.c:1554:(snd_use_case_mgr_o=
-pen)
-error: failed to import hw:2 use case configuration -2
-Dec 20 01:16:46 nysa alsactl[735]: alsa-lib
-parser.c:2796:(load_toplevel_config) Unable to find the top-level configura=
-tion
-file '/usr/share/alsa/ucm2/ucm.conf'.
-Dec 20 01:16:46 nysa alsactl[735]: alsa-lib main.c:1554:(snd_use_case_mgr_o=
-pen)
-error: failed to import hw:2 use case configuration -2
-Dec 20 01:16:46 nysa alsactl[735]: Found hardware: "HDA-Intel" "Conexant
-CX20753/4" "HDA:14f15111,17aa5070,00100101" "0x17aa" "0x5070"
-Dec 20 01:16:46 nysa alsactl[735]: Hardware is initialized using a generic
-method
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #1 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #2 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #3 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #4 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #5 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #6 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #7 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #8 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #9 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #10 (No such file or directory)
-Dec 20 01:16:46 nysa systemd[1]: Started systemd-logind.service - User Login
-Management.
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #11 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #12 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #13 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #14 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #15 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #16 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #17 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #18 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #19 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #20 (No such file or directory)
-Dec 20 01:16:46 nysa alsactl[735]: /usr/sbin/alsactl: set_control:1346: fai=
-led
-to obtain info for control #21 (No such file or directory)
-Dec 20 01:16:46 nysa systemd[1]: gnunet.service: Deactivated successfully.
-Dec 20 01:16:46 nysa systemd[1]: Started gnunet.service - A framework for
-secure peer-to-peer networking.
-Dec 20 01:16:46 nysa systemd[1]: grub-common.service: Deactivated successfu=
-lly.
-Dec 20 01:16:46 nysa systemd[1]: Finished grub-common.service - Record
-successful boot for GRUB.
-Dec 20 01:16:46 nysa systemd[1]: Finished alsa-restore.service - Save/Resto=
-re
-Sound Card State.
-Dec 20 01:16:46 nysa systemd[1]: Reached target sound.target - Sound Card.
-Dec 20 01:16:46 nysa systemd[1]: Starting systemd-rfkill.service - Load/Sav=
-e RF
-Kill Switch Status...
-Dec 20 01:16:46 nysa dbus-daemon[623]: [system] Activating via systemd: ser=
-vice
-name=3D'org.opensuse.Snapper' unit=3D'snapperd.service' requested by ':1.6'=
- (uid=3D0
-pid=3D661 comm=3D"/usr/bin/snapper --config root create --cleanup-al")
-Dec 20 01:16:46 nysa systemd[1]: Started systemd-rfkill.service - Load/Save=
- RF
-Kill Switch Status.
-Dec 20 01:16:46 nysa systemd[1]: e2scrub_reap.service: Deactivated
-successfully.
-```
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+SGkgTHVpeiwNCg0KSSByYW4gdGVzdCB1c2luZyBCbHVleiBUb1QgbWFzdGVyIGJyYW5jaChjb21t
+aXQjMDU4MTNkZjVlKSB3aXRoIGtlcm5lbCB2ZXJzaW9uIDYuMTguMg0KSGFzIHRoaXMgaXNzdWUg
+YmVlbiByZXNvbHZlZCBpbiB0aGUgbGF0ZXN0IGtlcm5lbCBzZXJpZXMgKDYuMTkpPyBJZiBzbywg
+Y291bGQgeW91IHByb3ZpZGUgZGV0YWlscyBvbiB0aGUgbGlrZWx5IGZpeD8NCg0KLS0tLS1Pcmln
+aW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEx1aXogQXVndXN0byB2b24gRGVudHogPGx1aXouZGVu
+dHpAZ21haWwuY29tPiANClNlbnQ6IDIzIERlY2VtYmVyIDIwMjUgMjA6MTENClRvOiBTYXJ2ZXNo
+d2FyIEJhamFqIDxzYXJ2ZXNod2FyLmJhamFqQG54cC5jb20+DQpDYzogbGludXgtYmx1ZXRvb3Ro
+QHZnZXIua2VybmVsLm9yZzsgVmluaXQgTWVodGEgPHZpbml0Lm1laHRhQG54cC5jb20+OyBNYWhl
+c2ggVGFsZXdhZCA8bWFoZXNoLnRhbGV3YWRAbnhwLmNvbT47IERldnlhbmkgR29kYm9sZSA8ZGV2
+eWFuaS5nb2Rib2xlQG54cC5jb20+DQpTdWJqZWN0OiBbRVhUXSBSZTogW1BBVENIIEJsdWVaIHYx
+IDEvMV0gcHJvZmlsZXMvYXVkaW8vYmFwLmM6IEZpeCBoZWFwLXVzZS1hZnRlci1mcmVlIGluIHNl
+dHVwX2ZyZWUoKQ0KDQpDYXV0aW9uOiBUaGlzIGlzIGFuIGV4dGVybmFsIGVtYWlsLiBQbGVhc2Ug
+dGFrZSBjYXJlIHdoZW4gY2xpY2tpbmcgbGlua3Mgb3Igb3BlbmluZyBhdHRhY2htZW50cy4gV2hl
+biBpbiBkb3VidCwgcmVwb3J0IHRoZSBtZXNzYWdlIHVzaW5nIHRoZSAnUmVwb3J0IHRoaXMgZW1h
+aWwnIGJ1dHRvbg0KDQoNCkhpIFNhcnZlc2h3YXIsDQoNCk9uIFR1ZSwgRGVjIDIzLCAyMDI1IGF0
+IDg6NTLigK9BTSBTYXJ2ZXNod2FyIEJhamFqIDxzYXJ2ZXNod2FyLmJhamFqQG54cC5jb20+IHdy
+b3RlOg0KPg0KPiBGaXggY3Jhc2ggd2hlbiByZW1vdmluZyBvciBkaXNjb25uZWN0aW5nIGEgZGV2
+aWNlIHdpdGggYWN0aXZlIA0KPiBicm9hZGNhc3Qgc3RyZWFtcy4gQWRkcmVzc1Nhbml0aXplciBy
+ZXBvcnRzIGEgaGVhcC11c2UtYWZ0ZXItZnJlZSBpbg0KPiBidF9iYXBfc3RyZWFtX2dldF9zdGF0
+ZSgpIGNhbGxlZCBmcm9tIHJlbGVhc2Vfc3RyZWFtKCkgZHVyaW5nIA0KPiBzZXR1cF9mcmVlKCku
+DQo+DQo+IERldGFjaCBmcmVlcyBCSVMgc3RyZWFtcyBkdXJpbmcgdGVhcmRvd24sIGJ1dCBzZXR1
+cF9mcmVlKCkgc3RpbGwgDQo+IHVubG9ja3MgYW5kIHJlbGVhc2VzIHNldHVwLT5zdHJlYW0gYWZ0
+ZXJ3YXJkcywgbGVhdmluZyBhIHN0YWxlIHBvaW50ZXIgDQo+IGFuZCB0cmlnZ2VyaW5nIFVBRi4g
+VGhpcyBjYW4gaGFwcGVuIHdpdGggbXVsdGlwbGUgQklTIHN0cmVhbXMgc2luY2UgDQo+IGVhY2gg
+c2V0dXAgaG9sZHMgaXRzIG93biBpbnZhbGlkIHJlZmVyZW5jZS4NCj4NCj4gRml4IGJ5IHNraXBw
+aW5nIHVubG9jay9yZWxlYXNlIGluIHNldHVwX2ZyZWUoKSBhbmQgY2xlYXJpbmcNCj4gc2V0dXAt
+PnN0cmVhbSB0byBwcmV2ZW50IGZ1cnRoZXIgYWNjZXNzLg0KPg0KPiBMb2c6DQo+IEVSUk9SOiBB
+ZGRyZXNzU2FuaXRpemVyOiBoZWFwLXVzZS1hZnRlci1mcmVlIG9uIGFkZHJlc3MNCj4gMHg3YzQz
+YTQzZTM0NTggYXQgcGMgMHg1NzI0MTVhODYwM2QgYnAgMHg3ZmZjZGVmOWI4NzAgc3AgDQo+IDB4
+N2ZmY2RlZjliODYwIFJFQUQgb2Ygc2l6ZSA4IGF0IDB4N2M0M2E0M2UzNDU4IHRocmVhZCBUMA0K
+PiAgICAgIzAgMHg1NzI0MTVhODYwM2MgaW4gYnRfYmFwX3N0cmVhbV9nZXRfc3RhdGUgc3JjL3No
+YXJlZC9iYXAuYzo2Mzg2DQo+ICAgICAjMSAweDU3MjQxNThmOWQwYSBpbiByZWxlYXNlX3N0cmVh
+bSBwcm9maWxlcy9hdWRpby9iYXAuYzo5NTENCj4gICAgICMyIDB4NTcyNDE1OGZhMTBlIGluIHNl
+dHVwX2ZyZWUgcHJvZmlsZXMvYXVkaW8vYmFwLmM6MTEyMQ0KPiAgICAgIzMgMHg1NzI0MTVhMjkz
+YzEgaW4gcXVldWVfcmVtb3ZlX2FsbCBzcmMvc2hhcmVkL3F1ZXVlLmM6MzQxDQo+ICAgICAjNCAw
+eDU3MjQxNWEyOTQ0MCBpbiBxdWV1ZV9kZXN0cm95IHNyYy9zaGFyZWQvcXVldWUuYzo2MA0KPiAg
+ICAgIzUgMHg1NzI0MTU4Zjk0NjQgaW4gYmFwX2RhdGFfZnJlZSBwcm9maWxlcy9hdWRpby9iYXAu
+YzoxOTINCj4gICAgICM2IDB4NTcyNDE1OGY5NDY0IGluIGJhcF9kYXRhX3JlbW92ZSBwcm9maWxl
+cy9hdWRpby9iYXAuYzoyMTENCj4gICAgICM3IDB4NTcyNDE1OTA0MGU0IGluIGJhcF9iY2FzdF9y
+ZW1vdmUgcHJvZmlsZXMvYXVkaW8vYmFwLmM6MzgyMQ0KPiAgICAgIzggMHg1NzI0MTU5YTdlYjkg
+aW4gc2VydmljZV9yZW1vdmUgc3JjL3NlcnZpY2UuYzoyMzkNCj4gICAgICM5IDB4NTcyNDE1OWNm
+YTQ5IGluIGRldmljZV9yZW1vdmUgc3JjL2RldmljZS5jOjU0ODkNCj4gICAgICMxMCAweDU3MjQx
+NTk5OTg4OSBpbiBidGRfYWRhcHRlcl9yZW1vdmVfZGV2aWNlIHNyYy9hZGFwdGVyLmM6MTQ1OA0K
+PiAgICAgIzExIDB4NTcyNDE1OWI5OWM3IGluIGRldmljZV9kaXNhcHBlYXJlZCBzcmMvZGV2aWNl
+LmM6Mzg1NA0KDQpIbW0sIEkgdGhvdWdodCB3ZSBmaXggdGhlIGRldmljZSBiZWluZyB0ZW1wb3Jh
+cnkgd2l0aCBicm9hZGNhc3QsIGlmIHRoZXJlIGlzIGEgYnJvYWRjYXN0IHN0cmVhbSB0aGVuIHRo
+ZSBkZXZpY2Ugc2hhbGwgYmUgbWFya2VkIGFzIGNvbm5lY3RlZCBzbyBpdCB3b3VsZG4ndCB0cmln
+Z2VyIHRoZSBzZXF1ZW5jZSBhYm92ZS4gUGVyaGFwcyB5b3UgZW5jb3VudGVyIHRoaXMgd2l0aCBh
+biBvbGQgdmVyc2lvbj8gT3IgbWF5YmUgaXQgaXMgdGhlIGtlcm5lbCB0aGF0IGlzIG9sZC4NCg0K
+PiAgICAgIzEyIDB4NTcyNDE1YWJjZWE1IGluIHRpbWVvdXRfY2FsbGJhY2sgc3JjL3NoYXJlZC90
+aW1lb3V0LWdsaWIuYzoyNQ0KPiAgICAgIzEzIDB4N2Y2M2E1OGY5MzI5ICgvbGliL3g4Nl82NC1s
+aW51eC1nbnUvbGliZ2xpYi0yLjAuc28uMCsweDY4MzI5KQ0KPiAgICAgIzE0IDB4N2Y2M2E1OGY3
+ZGUxICgvbGliL3g4Nl82NC1saW51eC1nbnUvbGliZ2xpYi0yLjAuc28uMCsweDY2ZGUxKQ0KPiAg
+ICAgIzE1IDB4N2Y2M2E1OTY5MWY3ICgvbGliL3g4Nl82NC1saW51eC1nbnUvbGliZ2xpYi0yLjAu
+c28uMCsweGQ4MWY3KQ0KPiAgICAgIzE2IDB4N2Y2M2E1OGY5MTU2IGluIGdfbWFpbl9sb29wX3J1
+bg0KPiAgICAgICAgICgvbGliL3g4Nl82NC1saW51eC1nbnUvbGliZ2xpYi0yLjAuc28uMCsweDY4
+MTU2KQ0KPiAgICAgIzE3IDB4NTcyNDE1YWJkMThkIGluIG1haW5sb29wX3J1biBzcmMvc2hhcmVk
+L21haW5sb29wLWdsaWIuYzo2NQ0KPiAgICAgIzE4IDB4NTcyNDE1YWJkOWM0IGluIG1haW5sb29w
+X3J1bl93aXRoX3NpZ25hbA0KPiAgICAgICAgIHNyYy9zaGFyZWQvbWFpbmxvb3Atbm90aWZ5LmM6
+MTk2DQo+ICAgICAjMTkgMHg1NzI0MTU5ZWEzNzggaW4gbWFpbiBzcmMvbWFpbi5jOjE1NTANCj4g
+ICAgICMyMCAweDdmNjNhNTYyYTU3NyBpbiBfX2xpYmNfc3RhcnRfY2FsbF9tYWluDQo+ICAgICAg
+ICAgLi4vc3lzZGVwcy9ucHRsL2xpYmNfc3RhcnRfY2FsbF9tYWluLmg6NTgNCj4gICAgICMyMSAw
+eDdmNjNhNTYyYTYzYSBpbiBfX2xpYmNfc3RhcnRfbWFpbl9pbXBsIC4uL2NzdS9saWJjLXN0YXJ0
+LmM6MzYwDQo+ICAgICAjMjIgMHg1NzI0MTU4N2Q0NjQgaW4gX3N0YXJ0DQo+ICAgICAgICAgKC9o
+b21lL3dvcmtzcGFjZS9ibHVlei9zcmMvYmx1ZXRvb3RoZCsweDEwNjQ2NCkNCj4gMHg3YzQzYTQz
+ZTM0NTggaXMgbG9jYXRlZCAxMjAgYnl0ZXMgaW5zaWRlIG9mIDE2MC1ieXRlIHJlZ2lvbg0KPiBb
+MHg3YzQzYTQzZTMzZTAsMHg3YzQzYTQzZTM0ODApDQo+IGZyZWVkIGJ5IHRocmVhZCBUMCBoZXJl
+Og0KPiAgICAgIzAgMHg3ZjYzYTViMjEyYWIgaW4gZnJlZQ0KPiAgICAgICAgIC4uLy4uLy4uLy4u
+L3NyYy9saWJzYW5pdGl6ZXIvYXNhbi9hc2FuX21hbGxvY19saW51eC5jcHA6NTENCj4gICAgICMx
+IDB4NTcyNDE1YTcxMGY0IGluIGJhcF9zdHJlYW1fZnJlZSBzcmMvc2hhcmVkL2JhcC5jOjEyNTQN
+Cj4gICAgICMyIDB4NTcyNDE1YTcxMGY0IGluIGJ0X2JhcF9zdHJlYW1fdW5yZWYgc3JjL3NoYXJl
+ZC9iYXAuYzoxMzM3DQo+IC0tLQ0KPiAgcHJvZmlsZXMvYXVkaW8vYmFwLmMgfCA3ICstLS0tLS0N
+Cj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgNiBkZWxldGlvbnMoLSkNCj4NCj4g
+ZGlmZiAtLWdpdCBhL3Byb2ZpbGVzL2F1ZGlvL2JhcC5jIGIvcHJvZmlsZXMvYXVkaW8vYmFwLmMg
+aW5kZXggDQo+IGNkYTEwYTY0My4uZjMwMjYyOTg3IDEwMDY0NA0KPiAtLS0gYS9wcm9maWxlcy9h
+dWRpby9iYXAuYw0KPiArKysgYi9wcm9maWxlcy9hdWRpby9iYXAuYw0KPiBAQCAtMTExMywxMiAr
+MTExMyw3IEBAIHN0YXRpYyB2b2lkIHNldHVwX2ZyZWUodm9pZCAqZGF0YSkNCj4gICAgICAgICBp
+ZiAoc2V0dXAtPmRlc3Ryb3kpDQo+ICAgICAgICAgICAgICAgICBzZXR1cC0+ZGVzdHJveShzZXR1
+cCk7DQo+DQo+IC0gICAgICAgYnRfYmFwX3N0cmVhbV91bmxvY2soc2V0dXAtPnN0cmVhbSk7DQo+
+IC0NCj4gLSAgICAgICBpZiAoIWNsb3NpbmcpIHsNCj4gLSAgICAgICAgICAgICAgIC8qIFJlbGVh
+c2UgaWYgbm90IGFscmVhZHkgZG9uZSAqLw0KPiAtICAgICAgICAgICAgICAgcmVsZWFzZV9zdHJl
+YW0oc2V0dXAtPnN0cmVhbSk7DQo+IC0gICAgICAgfQ0KPiArICAgICAgIHNldHVwLT5zdHJlYW0g
+PSBOVUxMOw0KPg0KPiAgICAgICAgIGlmIChzZXR1cC0+ZXApDQo+ICAgICAgICAgICAgICAgICBi
+YXBfdXBkYXRlX2NpZ3Moc2V0dXAtPmVwLT5kYXRhKTsNCj4gLS0NCj4gMi40OC4xDQo+DQoNCg0K
+LS0NCkx1aXogQXVndXN0byB2b24gRGVudHoNCg==
