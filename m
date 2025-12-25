@@ -1,140 +1,110 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8259917A2E8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Dec 2025 10:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F283023EAAF
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Dec 2025 15:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766657575; cv=none; b=BqC70kcHICrPjAAljKJ2JM1c0863dfxPTGvPRxtRuYiP6guaZieXlmdIEyHV6MbFHn478BYrYgfA7WoEIleL2BYVeInRPCFsq8n1NPfWxU+mBO4pmGntgSCOyqduanFyk3F2GeLUbVYYInngH1S9CSgYlgaDHqLP6NrgMu7/lyk=
+	t=1766677427; cv=none; b=SYbPD8ZYYfr3cOpgIMD4nRlWBwV6V2TILnalwXY7NffNWlwQJ5UZTcJaasU8p+wHcykgksNBrvlzfJkdK08dQByXbPvMKzmF7DlEylEIirKqAHxJ3f0svoin0tKb0Vr/9sXbSoLvh0O+/ULQXJsRT8aaEZ9Lmw2/VkfMg8nPnos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766657575; c=relaxed/simple;
-	bh=q6TGceaWJjeYpfrlr/KxtLFmArYwINx+82CwKXi4upk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZS0k5SyHC7UH+fmd6/kQ6163fQfrcN/QfVxAIrLm1tYSqGTd61iz2Lj0fKYt5XnJKLPLNeQeNnc7fN1hy282+AQhgGK0PpvEuV6Vvcg0wEAlmCZ7H30JEYQgPIn3Ixk6HgwpaUhbIjh6WCJG6kc5u7h1LgRG4b372dCdgG+XDBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CAL07QMO; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1766677427; c=relaxed/simple;
+	bh=q9WXpG+dgos7OvEH3xK50c87rlSECPltlxXkNNcQtEY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HHj/fykc19n1uAKxhBbBWKvUfV9cdcUHbnfI7plfQDU/+gPLm7YWKp0OIG64LjrxmIaKok9h+opHTpc85C17c50xa5YoiOsEap6APbLVyPs1DHkS5jRROZSlIufATsg0eu3oYN6AgYujmHCX9hkFyIcfntL3D/I1dySPmfhRvDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IWImAfmm; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAL07QMO"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-64b560e425eso8323868a12.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Dec 2025 02:12:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766657572; x=1767262372; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nWjMubZISi0FTDGXhZSVtiNSbKzg5CT4V6iUAxgUYJU=;
-        b=CAL07QMOOrQxbZjpiFDrXaHbp1sYEh6jbd2YO84XUw5gaojNRcvLfvrfHXUOau1fdx
-         1/D0jtwFJhhV0qfLsf6wtERFDAmaA8g/jWYL0MYmR+PHoVVpmjB35RFM1wpW9sONvcsA
-         is0piMZu8L4zqZ3Hr03Fc4xbEfAvAgfN6Bl6ZwdxW2IR1R5IQoa1AjoiOjUfZ5dp5HYG
-         vBOIF9Z3lTHCckL81wZHLj/gBW5cpZzCUO1JfMT3GYwMun247wA08B9UbVxmFIjMQdBw
-         7kcwSwSKaE0Cr50OljdalTz2+ZVelmpXBZGj7B/vf880NhKgrmZztVyQTCD8obBP4hgc
-         Ucmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766657572; x=1767262372;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nWjMubZISi0FTDGXhZSVtiNSbKzg5CT4V6iUAxgUYJU=;
-        b=VxHdCOtzsglMbXIXlz62yZsm/k12duAYGGFO/TgVTV56ye8HhBCf8hIivB76juvRfT
-         rf5KxdLZiwUrfAXuwxEC0nsTTUzByvXO/5KiceFnLl9QQWBGaeVa82w0DspUw10UFSxw
-         BncKOcCYuZdlqZcNOvjpB+TWOSMe1783+a5h8L9dTA9SddEpkHacvInegnb4kWLVRmBI
-         vsuAc3X3hf4zFAX7xD6Jr0A2JScK45r7kk+ka0O4e/G0/AP63KD+zEC0vj0qhOEaoL0b
-         /tKQY+MHbCnz6HIUAvyf4DMFk5iMrUW7Xak0jn7F3Br7b2juRaWsRQHdBEefpj+Qk8+q
-         6CKA==
-X-Gm-Message-State: AOJu0YyD3XGun1EmMFCrb2jv3b4KiVvCy/1RrZv4BJqCgFo+qoTfjkUK
-	qLgkTBlE5JXysDWAxECRPyltuHHejdXf3f43T6CRXkqaMT6+qi4h7mNd
-X-Gm-Gg: AY/fxX4aizJA8pAP+TvLJQIM0m9XcxFKvzoFheHsaDTnegTCDa+wAjj/nAK/GvqeFlE
-	UgDjWB88CgLPZUV7xLjiEdWR5iBBTaX64An6dAS3RLq9htkaAL7vjpxu8jBRiosSw+CpNnWYi1E
-	AR8PDcmLNpnGDOikdRgjeDtzoL9zz/VkPgXWcIAKyhBXGTyCEGOGLpWbmRhQoFn5QjN+XGrHdN3
-	vY4rQj4CyJkJGG5n/JaNM1KJHRLqstwk0cg+bk2sk7yf677ojMHwLzfNb3pTOwJD1OHH9nUiEJE
-	9tDcAkdg7cWx7QVndXCAHoJnwV/iZCV5juoxjBQWneKviZP1rEqDMSylLPBawB1fMvf4YEz15uS
-	m+5t96QnO76/o4ybsP08fTQLT/rMyqHnsvGTUi8gaVYhfxyKvmdlLRwCi7kJ6+24y/mcKZd5ngU
-	tb04zuhE5XaWx0AQ==
-X-Google-Smtp-Source: AGHT+IFZI8cfw4SGRY8yu8Mc7PJ+owBERWrm9PETMeb8mbCXlfK1Cnq4ASL9Fz/YTqRdhnA/NgPbsw==
-X-Received: by 2002:a05:6402:3586:b0:64d:88c:c2ca with SMTP id 4fb4d7f45d1cf-64d088ccb1emr14717333a12.28.1766657571677;
-        Thu, 25 Dec 2025 02:12:51 -0800 (PST)
-Received: from prometheus ([85.11.110.37])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64b91599605sm19261043a12.23.2025.12.25.02.12.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Dec 2025 02:12:51 -0800 (PST)
-From: Szymon Wilczek <swilczek.lx@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+4d6b203d625d2f57d4ca@syzkaller.appspotmail.com,
-	Szymon Wilczek <swilczek.lx@gmail.com>
-Subject: [PATCH v3] Bluetooth: vhci: Fix slab-use-after-free by cloning skb
-Date: Thu, 25 Dec 2025 11:12:42 +0100
-Message-ID: <20251225101242.23142-1-swilczek.lx@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251224235407.46333-1-swilczek.lx@gmail.com>
-References: <20251224235407.46333-1-swilczek.lx@gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IWImAfmm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766677426; x=1798213426;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=q9WXpG+dgos7OvEH3xK50c87rlSECPltlxXkNNcQtEY=;
+  b=IWImAfmmiwtpyIV/RU8d8EgNLzR0dXMbfwZIzvD/Dpt+Ot6EgSBtbIoS
+   QiYYf+AhHpj+Ix6Xcasbs4qHmb/PjDSI5KAVcYEU37YcJA0W0gOVP7X3S
+   M/M4A5Wu8yFMiOmrCq9q+TKAwyZEHPuUqLNbdWrhkSbiyZLCZxv5o02vJ
+   tSb73eE5hzQ8Jq+fh/TKTItbEmh2Zqfm6+oFADS23/QeWSx9giwzFnGE1
+   powK74mz7DUpOlsqM7tsJyPiNrnxQvxGXRAA9+zaCPSGdAAA+3SbIk53N
+   P9r2oPAkfomF7TV0OQVVBidPDm85iFPx2mYr63+zQ05nqqVg1gPqhv1oY
+   A==;
+X-CSE-ConnectionGUID: +dNjlXmyTECvQscqwFgHIQ==
+X-CSE-MsgGUID: YLpyxNP4TzuA2ypOEC4t1g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11652"; a="79925521"
+X-IronPort-AV: E=Sophos;i="6.21,176,1763452800"; 
+   d="scan'208";a="79925521"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2025 07:43:45 -0800
+X-CSE-ConnectionGUID: nW5jaxgZRxmji24kW1ARpA==
+X-CSE-MsgGUID: P7/WSTQRSoCtTyefOn1AnA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,176,1763452800"; 
+   d="scan'208";a="204736661"
+Received: from lkp-server02.sh.intel.com (HELO dd3453e2b682) ([10.239.97.151])
+  by fmviesa005.fm.intel.com with ESMTP; 25 Dec 2025 07:43:44 -0800
+Received: from kbuild by dd3453e2b682 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vYnV7-000000004Cn-2zbH;
+	Thu, 25 Dec 2025 15:43:41 +0000
+Date: Thu, 25 Dec 2025 23:42:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mahesh Talewad <mahesh.talewad@nxp.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, devyani.godbole@nxp.com,
+	luiz.dentz@gmail.com, sarveshwar.bajaj@nxp.com,
+	mahesh.talewad@nxp.com, vinit.mehta@nxp.com
+Subject: Re: [PATCH BlueZ v2 1/1] Enhanced or Legacy Accept Synchronous
+ Connection Request command
+Message-ID: <202512252310.9FjpXrbM-lkp@intel.com>
+References: <20251224063150.2476968-2-mahesh.talewad@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251224063150.2476968-2-mahesh.talewad@nxp.com>
 
-Hillf Danton pointed out that the root cause of the UAF issue is the
-lack of isolation between hci_core and vhci driver consumers.
+Hi Mahesh,
 
-vhci_send_frame() modifies the skb (via skb_push) and queues the
-original skb to the readq for userspace consumption. This means the
-hci_core caller sees a modified skb (corrupted headers/data pointer)
-if it retains any reference. Furthermore, if vhci_read() frees the
-skb immediately, hci_core might hit a Use-After-Free.
+kernel test robot noticed the following build warnings:
 
-Other drivers (like btusb) create a new URB and context, isolating
-the skb lifetime.
+[auto build test WARNING on v6.18]
+[cannot apply to bluetooth-next/master bluetooth/master v6.19-rc2 v6.19-rc1 linus/master next-20251219]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Fix this by cloning the skb in vhci_send_frame() before queueing.
-The clone is modified and queued. The original skb is freed using
-dev_consume_skb_any() which is safe in atomic context, satisfying
-the HCI driver contract to consume the skb while ensuring the queued
-object is distinct from the one passed by hci_core.
+url:    https://github.com/intel-lab-lkp/linux/commits/Mahesh-Talewad/Enhanced-or-Legacy-Accept-Synchronous-Connection-Request-command/20251224-143311
+base:   v6.18
+patch link:    https://lore.kernel.org/r/20251224063150.2476968-2-mahesh.talewad%40nxp.com
+patch subject: [PATCH BlueZ v2 1/1] Enhanced or Legacy Accept Synchronous Connection Request command
+config: nios2-randconfig-r071-20251225 (https://download.01.org/0day-ci/archive/20251225/202512252310.9FjpXrbM-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 11.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251225/202512252310.9FjpXrbM-lkp@intel.com/reproduce)
 
-Reported-by: syzbot+4d6b203d625d2f57d4ca@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=4d6b203d625d2f57d4ca
-Signed-off-by: Szymon Wilczek <swilczek.lx@gmail.com>
----
-v3: Replaced kfree_skb() with dev_consume_skb_any() to fix sleeping
-    in atomic context warning reported by CI.
-v2: Moved fix to vhci driver, using skb_clone to isolate ownership.
----
- drivers/bluetooth/hci_vhci.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512252310.9FjpXrbM-lkp@intel.com/
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 2fef08254d78..7c72c635965c 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -74,13 +74,20 @@ static int vhci_flush(struct hci_dev *hdev)
- static int vhci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct vhci_data *data = hci_get_drvdata(hdev);
-+	struct sk_buff *nskb;
- 
--	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
-+	nskb = skb_clone(skb, GFP_ATOMIC);
-+	if (!nskb)
-+		return -ENOMEM;
-+
-+	memcpy(skb_push(nskb, 1), &hci_skb_pkt_type(skb), 1);
- 
--	skb_queue_tail(&data->readq, skb);
-+	skb_queue_tail(&data->readq, nskb);
- 
- 	if (atomic_read(&data->initialized))
- 		wake_up_interruptible(&data->read_wait);
-+
-+	dev_consume_skb_any(skb);
- 	return 0;
- }
- 
+All warnings (new ones prefixed by >>):
+
+   In file included from include/net/bluetooth/hci_core.h:37,
+                    from net/bluetooth/hci_core.c:39:
+>> include/net/bluetooth/hci_sync.h:198:33: warning: 'esco_params_msbc' defined but not used [-Wunused-const-variable=]
+     198 | static const struct esco_params esco_params_msbc[] = {
+         |                                 ^~~~~~~~~~~~~~~~
+
+
+vim +/esco_params_msbc +198 include/net/bluetooth/hci_sync.h
+
+   197	
+ > 198	static const struct esco_params esco_params_msbc[] = {
+
 -- 
-2.52.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
