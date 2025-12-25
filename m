@@ -1,115 +1,167 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-qk1-f194.google.com (mail-qk1-f194.google.com [209.85.222.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53984295DB8
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Dec 2025 23:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75553A1E90
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Dec 2025 01:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766620460; cv=none; b=i8q8b4U1HCNrMu2Ry59xuSd3wRbbM/W4pDcjuq+t5iROpenPQEBkYDBPyY660ZLSo2IVG0i1uotLsJsne4fscdZ8xkM4tYj4yE7gSa+VoBkn2INMSsbPSXyhTUmJBO0s69y6oRY7MrvP4E0RrmWXBloGfzr6hUiFxnco/KbXGKE=
+	t=1766626424; cv=none; b=CuSw7Nh/2Oqb4yshVrGtXPf2XCTqXijLrkT3UPT+V3e3LW9/Wq7WwnPO9ZofpY8M8aX3dQKNCq95oi92a9e5LsAQ9I9VNS8kVLa/7ETXhln8HWekueoRm+mWaCKQkOKt9nlmoU3oKe8pI7ufEGOyl7FpQpQZwYWnyBfcrp7NXoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766620460; c=relaxed/simple;
-	bh=w0v4tX4mseckg2+iLUxgfFSsK4vg8zMZvbRYnGc6RnQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OW6uyK1AwmSt94oa3w/jqUuBQuUDPA0t5Q4/ENtXueRkumbzZFYKWh1GZb5uT3nRDfW68xSXmnFD//Nw/trta1/NC4+Q9c0lTnj/ZkVUE1wlCiv/Jnp1spo/H4HKiNNonpcStqlsAft/MiFBISDfuvGLaFAEYAeqEdDWfa5Rkw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K4COhyb4; arc=none smtp.client-ip=209.85.208.52
+	s=arc-20240116; t=1766626424; c=relaxed/simple;
+	bh=q1tYSW9e67lz9UOOaVOdxIgLfU35WW4MdB/eu9Nvsp0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hOZzH75CUrJb3DXphSNP2SULA/0SU+qAMUpi/Re3az8eaB2uSM5AMzEsZ9vEDyapXa13H1RtMJg6h3ccYf8VTQ3oae1NXbKpUywVwYrmQf8Ucip7iN0uNUQGkGMYeuZTTQKZS0CzkQGelCQbUY8Y5+KhzAFRBC+PMEVldADrmPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WOsSuJEK; arc=none smtp.client-ip=209.85.222.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K4COhyb4"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-64b92abe63aso9463023a12.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Dec 2025 15:54:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOsSuJEK"
+Received: by mail-qk1-f194.google.com with SMTP id af79cd13be357-8b2d7c38352so730809285a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Dec 2025 17:33:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766620457; x=1767225257; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NA0rUVS0xrAio4YdZs9DHUZnF1aKMyxAVaNNj28rtl0=;
-        b=K4COhyb4ylBJQP3QlASyiGmJfupdUqNzre67dSW5RZFTowC+R0rVDefuAOfsKel6cq
-         z7XAFb18s5mkVP84+a3mtDHq/6UJ692TUuvFvDEnvmB9ZPFCb46BK27exmuZinaPT0iu
-         FWeITZ95OtPl2jSXoheZIRuJkQJnX9GQdc+mdHX9lV8IQjY37lZGPd+/2ISfVMIAqX5n
-         npGddlIBvm3bZYvz8LQV9bWPnvEbGSGaaQ3GugChYYBAZLvihN8+lrM5cTY8YtgxwQ1t
-         2kAmrEzmVR4CSwjCsL7zk0NnoNKkxy8bYsJh9dPUvkiR8uglRgkgszYNKyMAaVSzqsp0
-         fVnQ==
+        d=gmail.com; s=20230601; t=1766626421; x=1767231221; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=woqz6UDFRq+YJ4Bd9zFlFhhaqFBRpjlWGYEzfTflIUs=;
+        b=WOsSuJEK5sYehfE17S7FRKCeS461otjQrjEtfO30Kc6KPdMfqvB8EzcxEeNR1/p8Iu
+         n22Qio/DWEvh4EHN1bDGH7BzoW66R3TlK+oXwXh2wEsStk8hlu+mTNK14t1fql6XyhFJ
+         DhWcpqJaWyvZRI+Ng02EXbN69Ea3RQ/g5uLejj6SAnxPn8heDYf/4Mf66QvyawmMj+FE
+         12mInozItuYyRWD2LT/EbMqkgLzTFGFE8zWcku5pkdtBrLW+snYq9TOasgzMuCZ7On7q
+         jR0Ivq12K/4OdLykfVsDQX6FPpQxM2Vo6hsLpmw79XUIXxoE/XBUKLY1O1B5exnRm9Ha
+         rmHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766620457; x=1767225257;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1766626421; x=1767231221;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NA0rUVS0xrAio4YdZs9DHUZnF1aKMyxAVaNNj28rtl0=;
-        b=GuGSQVXJDVr82aX+wUzdlS1bIWVb7p1sF5x7saEwl3dI6B6eSogbRnZo+woqBR2NGC
-         PfjaZdYjCeWGRJhwZmQoeQ6MZPf3Ut2p4rp9XrXmiBplW1r8wKeT9/7yxCJyhHuA4dcj
-         o43TKU7oHbP3aN+5L5JraBBCzEMk6oLPw1suZiwvNAOpFycsYes4YVRptDy2uhHKx7WG
-         8AkNEi/EnhvOFn50YDq5Ue5A4s4jTL1uCQgx3fS+5ig0JcSgfjqMtPHN18lYC053rRir
-         cI+GHfA9vTKLJOZDKyDYklw6oRhdLrFNZ4g22yU0pZ3JdM40Cvr1Shq7QtNN0EhYqUKJ
-         Rp0w==
-X-Gm-Message-State: AOJu0YymX1q3CAs3ZHPYwOfKIGkKyg3ja9ZzPmLxny+CAEEkCj6e9YLe
-	jjvhnBYtfROtywQCW4u6pCjHTMYpUFETVpdPtdBfEgn32xvVD63nZoQl
-X-Gm-Gg: AY/fxX7CLY8WV/o9EVkZ7Cl06uqw0DmYLfjraFW4cuZZK+2ZANpvONX3fv1nijq0Msg
-	lFy9EUjCfHoe43ymO0sdZ/kJb8dMtWVIZoNz77oj6v6cpdyZiPCgeF/9U8QB4ChUl0nrmcWQupV
-	kdLnLE4DPwXgsAuY42RRT3y5TJWEFmhwME0GyvmAphwT0FaRRkoL8CrQXNc6t9KYGQuCngQuTn2
-	1AbWJEm8hAwy24wKfUfNaZJt+gfYTaF++3O61ve4Jvar82RpelCv8A6ozkFiUgPV70aucIQYkG5
-	Zp+4J2a7DcxfhjMG0AS/yvh5gQrhVqS7y0VvtmRnaNRTYL55uzOxh02HzZuvbkbgpLNCHjCsOyq
-	kQdP7KlC+VlIzdEAICPXAmePHz++sRjIw1rUpzxHCXTb6xy222U+qR2aJlAD7NsZWfn21XfkDqj
-	Bb1QUnOW11UVBSSqLfuGKSYYv3
-X-Google-Smtp-Source: AGHT+IH+E5/I8GdpN3VNJfPlbMktwWF++c8gFdwZl+Zj15raohvSlarp3yRp94DY8l+PQ6BIPy2Nnw==
-X-Received: by 2002:a17:907:868c:b0:b43:b7ec:b8a1 with SMTP id a640c23a62f3a-b8036f28da0mr2086792966b.24.1766620456525;
-        Wed, 24 Dec 2025 15:54:16 -0800 (PST)
-Received: from prometheus ([85.11.110.37])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037f0b7bcsm1972149266b.49.2025.12.24.15.54.15
+        bh=woqz6UDFRq+YJ4Bd9zFlFhhaqFBRpjlWGYEzfTflIUs=;
+        b=M1A/7ZZwYZHdyltS9ncVffKK29Co9WdrBgY8yZi9GHZieejD/QM510PDBVNXAN7HpY
+         f6rM8+F9w0dE4gvs9whmShJ/vWcV9KlI6XLA68P4/OnBNAK2Fv7Ku+uFKqJAvFtuuxUk
+         3YFcKdtsyFtrvYN9YzPq/Il0/PqT1udWICj8r+if6t6sgzibKp15hDEdpjpQNuc3znvU
+         0keprf2eOagZV/KIiI/WEJ7WudiUDDhFq6iQFFaGDDDIWUeJdHT7KZBFgyNKy6sdQyOm
+         n1XcqD0Rm+n5+JnBSxb/o/hvLTf0RMGREnCc8uengPX2fCJTk8HhZRno5tT7ST14JT/p
+         qZXQ==
+X-Gm-Message-State: AOJu0Yw2qUsrw58Z+CCi7gACvPkMUTOajQIey0rM7rRUg51O+7xnhH+h
+	jlGleFU8J/xr0OBqz54ENZU8WjJezPqtvGR0/w+v5F/rs+cEIJgQO/pGpyTWyFAA
+X-Gm-Gg: AY/fxX6ILDHaTE+Zdm7Az9YuevUR0dP9Ojxrt6HYdb/gyReGn1DZM+Zv2FXwu6xr9Kc
+	CCoGsM6liy6qXeOTh+SmJNWIjHrIfUOza+wAJaFUvn5FcGBWJXriY9eMaMDsgFKlFahHjPolKYq
+	je9UgCwH4b5b4XqNxnvk4l4+yP6xU/AgUkziIthwe4hT7WPv9Q13pkKCH/OxEKsrXKBcg84vTRj
+	5ifmL1GE+b8Jpl3ZNpy68p8YxbGx0CqWgyjAuS7nR0ntOfZJc/bH91npr3S83tB6x8UczH8zugM
+	XcY07Sue9VKIvYj/4VZf1kDp8USc4vNQQzcCftfVLU6w1QnV0oZsHqE5VqnQWem+vl4vGdUR42w
+	MmYs8g778GNZdQFVbmLNJ0UTHISpPKFFk6MZFMGwW7ADMLWveYLTO7kVXPSeMFNHAI6ZvnO3+yH
+	M2aUU1Y3vRqdAHvMabGkrUFttwEoqc
+X-Google-Smtp-Source: AGHT+IHkYsatvotjtFuZlX4/v1a02sXeZAECKRsczguk5Z9dLJSL3dzKzK9YN0VwIavofi7+4qRkJQ==
+X-Received: by 2002:a05:620a:1a94:b0:8b2:eefb:c8ab with SMTP id af79cd13be357-8bee6836c1emr3166343585a.19.1766626421506;
+        Wed, 24 Dec 2025 17:33:41 -0800 (PST)
+Received: from [172.17.0.2] ([145.132.100.65])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c096783662sm1471002185a.5.2025.12.24.17.33.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Dec 2025 15:54:16 -0800 (PST)
-From: Szymon Wilczek <swilczek.lx@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+4d6b203d625d2f57d4ca@syzkaller.appspotmail.com,
-	Szymon Wilczek <swilczek.lx@gmail.com>
-Subject: [PATCH] Bluetooth: hci_core: Fix slab-use-after-free in hci_cmd_work
-Date: Thu, 25 Dec 2025 00:54:07 +0100
-Message-ID: <20251224235407.46333-1-swilczek.lx@gmail.com>
-X-Mailer: git-send-email 2.52.0
+        Wed, 24 Dec 2025 17:33:41 -0800 (PST)
+Message-ID: <694c9475.050a0220.30d648.465a@mx.google.com>
+Date: Wed, 24 Dec 2025 17:33:41 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7714160666062667743=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, swilczek.lx@gmail.com
+Subject: RE: Bluetooth: hci_core: Fix slab-use-after-free in hci_cmd_work
+In-Reply-To: <20251224235407.46333-1-swilczek.lx@gmail.com>
+References: <20251224235407.46333-1-swilczek.lx@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-syzbot reported a slab-use-after-free in hci_cmd_work.
-The issue is that hci_send_cmd_sync() consumes the skb reference
-(either by passing it to the driver which frees it, or by calling
-kfree_skb() on error), but the skb might be accessed after the call
-in certain configurations or due to race conditions with the freeing
-process (e.g. vhci_read).
+--===============7714160666062667743==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Explicitly hold a reference to the skb using skb_get() before calling
-hci_send_cmd_sync() and release it with kfree_skb() afterwards. This
-ensures the skb object remains valid throughout the function call,
-regardless of how hci_send_cmd_sync() handles the original reference.
+This is automated email and please do not reply to this email!
 
-Reported-by: syzbot+4d6b203d625d2f57d4ca@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=4d6b203d625d2f57d4ca
-Signed-off-by: Szymon Wilczek <swilczek.lx@gmail.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1036498
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.35 seconds
+GitLint                       PENDING   0.26 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      25.01 seconds
+CheckAllWarning               PASS      27.27 seconds
+CheckSparse                   WARNING   30.42 seconds
+BuildKernel32                 PASS      24.45 seconds
+TestRunnerSetup               PASS      547.75 seconds
+TestRunner_l2cap-tester       PASS      27.98 seconds
+TestRunner_iso-tester         PASS      84.99 seconds
+TestRunner_bnep-tester        PASS      6.19 seconds
+TestRunner_mgmt-tester        FAIL      116.22 seconds
+TestRunner_rfcomm-tester      PASS      9.28 seconds
+TestRunner_sco-tester         FAIL      14.26 seconds
+TestRunner_ioctl-tester       PASS      10.12 seconds
+TestRunner_mesh-tester        FAIL      11.41 seconds
+TestRunner_smp-tester         PASS      8.39 seconds
+TestRunner_userchan-tester    PASS      6.48 seconds
+IncrementalBuild              PENDING   0.72 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_core.c:85:9: warning: context imbalance in '__hci_dev_get' - different lock contexts for basic blocknet/bluetooth/hci_core.c: note: in included file (through include/linux/notifier.h, include/linux/memory_hotplug.h, include/linux/mmzone.h, include/linux/gfp.h, include/linux/xarray.h, include/linux/radix-tree.h, ...):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 486 (98.4%), Failed: 4, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.106 seconds
+LL Privacy - Add Device 3 (AL is full)               Failed       0.196 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.193 seconds
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.184 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.052 seconds
+Mesh - Send cancel - 2                               Timed out    1.992 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- net/bluetooth/hci_core.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8ccec73dce45..af4ef31295c4 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4149,7 +4149,10 @@ static void hci_cmd_work(struct work_struct *work)
- 		if (!skb)
- 			return;
- 
-+		skb_get(skb);
- 		err = hci_send_cmd_sync(hdev, skb);
-+		kfree_skb(skb);
-+
- 		if (err)
- 			return;
- 
--- 
-2.52.0
 
+--===============7714160666062667743==--
