@@ -1,48 +1,76 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291012F49F8
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jan 2026 21:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F142DC769
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jan 2026 10:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767301954; cv=none; b=AiiYQSHrJxpQN+gGoJwnxMURk6G2/XyijTWGJv5O7b/lNew888GlQgtnAyaCVE32XQGG8D1+9aYHql+wp0NDM3PTGmZJ4LqGSvU+LfA0/i+m+u8ggk5K30dlAg6a5oD1ioITCb3szls6po9he2uYvsPWNTnnLvBmrMbMkRZ2gC8=
+	t=1767350018; cv=none; b=gFrB00MPoXKtWXfi6r8WM4wbA6EL3yNSbsTQqL5u6fabgnaZp0Bo4e2NgGgY56OlNVi0Giou/fDnb4pk2fE4kq53CdQbJ6J1NMgpgicCAoMY5UPz8vRimmoKap5SJzdwRR12gtBDzUhCdwqtQslVzmxbDS1DoS9K8EvTXuFH9wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767301954; c=relaxed/simple;
-	bh=ORGbi0Ipz21Z8RMb7GZOnYNb9Gu3+OqMkuD3VExrU+k=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=G804z+HYIfnDcgBSP0AAP5X/vjtLAsqTXJ+GbtEUdJZ6A5fZq4nUH3ftuTjWhjN78icIeooggjbPMT3HHKh6A21cMzOkTs9cIOYqCXN5nwTq6UJvpfcbedxegC+0y+YpFmJaX6+5HObwlKR64UVQYbnM68swzYGk0yntzf6qmtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CcDXM+sT; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1767350018; c=relaxed/simple;
+	bh=A0qONLkVZbPsPnKckIfQkcczqlnRmA9L8RYgFTezUw8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Prw9Gy2YG7WyL4mmyqEBCuZ4fmipTsm6xwXF/MhpxOK/w5yELN1UXqOjj8jHAY1m7R545eAI8TeQIS/Hte1yBDZYmJXqP9ev/tzcHK+Dx36USNY8gX2zIcV5O/wdOVi+BxD1BINh8SgR81AipZ7qxhue7C15G1x3Q9z63ODcRsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hL1NA0mP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CcDXM+sT"
-Received: from github.com (hubbernetes-node-3b28b36.ac4-iad.github.net [10.52.211.92])
-	by smtp.github.com (Postfix) with ESMTPA id 5AECC640428
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jan 2026 13:12:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1767301951;
-	bh=Q9I2q2ZQN6hX8640bwEc+G54SRon3uMV9fKDkAnIjRQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=CcDXM+sTmhReBVe3Yvhm11Hua4qtBhNJVvRta3SoFTqRyJn6ke7nHBfAx5lFb/LAt
-	 GisuSBsQq3enC4ysLN83PxeAd8B9SL44DSPN0qw/wOX++5Z5/hTW9nvtHRsmrYacim
-	 EHhw27DuQoWEqzbi7q0n0xeRFGsN5Imi8JRq43m0=
-Date: Thu, 01 Jan 2026 13:12:31 -0800
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1029869/d21535-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hL1NA0mP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7212FC2BC9E
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jan 2026 10:33:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767350017;
+	bh=A0qONLkVZbPsPnKckIfQkcczqlnRmA9L8RYgFTezUw8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=hL1NA0mPb5yOQ9xMUzwBPK5mLRdXyfnjnt8KEVGMu4Jg+WQyfgDy2jPKb8UeGiq44
+	 JYkyTKQsGCat2fAZP7gad2Abnp1LZXTyOk7tMxNh9SCe8VLGHZ0fTjGmh8Jpv3FNAy
+	 53/YFPER+P3tUvSKzP/B3qUgFv10UwlQFJlHQyUkEL/oc7uldl+wMGA2wSrNKSovp7
+	 FlYCK3lwf6ohbtmvVZSkH6dFA3ZcYnfPdHPFFx22YzQUiZkxolLYwAEzqygjOUJYqR
+	 jM7aGyVCn1ad0vxDNEOXEgWxgbxNOQBRY9FEQXofbukvXnGoD0X4GCXWyMtOd4I7b+
+	 bAxcmsX5SxWOw==
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5957db5bdedso13789747e87.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jan 2026 02:33:37 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUuVf4himi9pDbG4tPGl3YZk8H3+nZLDzqZuoL9e+ec1gTXMCc6be49OiyW0T3MbsQI1xuSw0kO/mtWoy5mW2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzGhu/RTNZpa3vIvHNAsl+EnUfjU/i6Aov8IFGPHXgD5fXNjjk
+	/V0OazbHjatmot+j0bV9Ou/1Ha43mVcdO03G6L6msWkRhudmbkUio/D9EBG1ULvd3t5G5HmiCCD
+	zoTmpbdahCLCtbN1mdXbWcW+5BR1IiJjF2sRI+oQIXA==
+X-Google-Smtp-Source: AGHT+IFz1P8JUDB3m78xG4JMv2W0HVtLRZ/WsXZNHNG01D4tm87qUYlJcn7VJnG4LRHgTHHzEjfbyGcJwlzlvzauRbA=
+X-Received: by 2002:a05:6512:3b0a:b0:595:8350:5824 with SMTP id
+ 2adb3069b0e04-59a17d18081mr13844896e87.7.1767350015887; Fri, 02 Jan 2026
+ 02:33:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20251231-wcn3990-pwrctl-v1-0-1ff4d6028ad5@oss.qualcomm.com> <20251231-wcn3990-pwrctl-v1-11-1ff4d6028ad5@oss.qualcomm.com>
+In-Reply-To: <20251231-wcn3990-pwrctl-v1-11-1ff4d6028ad5@oss.qualcomm.com>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Fri, 2 Jan 2026 11:33:24 +0100
+X-Gmail-Original-Message-ID: <CAMRc=Mese6Zyn45oZCzv3G6eg3w8Obvwq6TE4-MnXT8w7P6fgw@mail.gmail.com>
+X-Gm-Features: AQt7F2qL-yjjeTVapL27TBw0paXaPtMV-m6Ka4LrQJAKTqWS7TV8j8nK3HvZ8xw
+Message-ID: <CAMRc=Mese6Zyn45oZCzv3G6eg3w8Obvwq6TE4-MnXT8w7P6fgw@mail.gmail.com>
+Subject: Re: [PATCH 11/14] arm64: dts: qcom: qrb4210-rb2: describe WiFi/BT properly
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Jeff Johnson <jjohnson@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Matthias Kaehlcke <mka@chromium.org>, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+	linux-pm@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/1029869
-  Home:   https://github.com/bluez/bluez
+On Wed, Dec 31, 2025 at 12:36=E2=80=AFAM Dmitry Baryshkov
+<dmitry.baryshkov@oss.qualcomm.com> wrote:
+>
+> The onboard WiFi / BT device, WCN3988, has a simple on-chip PMU, which
+> further spreads generated voltage. Describe the PMU in the device tree.
+>
+> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+> ---
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
