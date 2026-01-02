@@ -1,196 +1,89 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD08B2E1F08
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jan 2026 11:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0BE30F55A;
+	Fri,  2 Jan 2026 12:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767352424; cv=none; b=iALC9SB36db7jizq/ymlyke1lZO1iZQKGwjgCodK6x0RbzuJLxI0a7U3a1OMxwORTYwQuBRUDA6aRtsOPRL/Z/ud7yiuR15NLB2T8o9JsXFtQ71Et+XMAe38QPuAplaFFb+aenIGglYb7k8lfyldZSd6dsAWE+71492xaQfbRFM=
+	t=1767356639; cv=none; b=A2IZ694Txy51fz5cSIIcFLysTwPEirCSxM6giZMSMlobSQJF8Wrd9NlNggNIuuQmiXqvtMPAAAIVkKnhlvi2Ma7+Pa9tmPBK7Bx3yp/JbeFuKwyusX7lvvem4e2TjarjQWFut/mDqWE5ufJI5qILPUVk3PnCQLB5VPWdqvITuxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767352424; c=relaxed/simple;
-	bh=nXFZwZZBKquh8LmMNfYlo2E6H3yvO66kM3Z2AGIucRg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ufzgbjylkA4bvRsFFgFA6uz6utgVSTHA6gQfYqirgyoa3tJ+/Y5ptgoU247/0dWJ9F/EY6j5luBLau+H9/Z7pfERhcGHRCGj4hPIXIs1jPKL8lwsz88/n17eQnhIi5ZN8iQyXz0xlFDTBEPq9+XG0lzxsWC8XxyI3iJgPA8D1X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=E+DJ2rP6; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1767356639; c=relaxed/simple;
+	bh=UFKKF1haRLgSTi4RG+IyCkOVonss33GrfgWTfx8VFj4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lz/ZE/rpQQnr2zZNyHK8lY3Dsr5EgYHttAHxPESinGs/MgGvKA4eXc6ytZC1e/4Fo/Ul3SpfA3Us+QLK5T4KPS7qfHH0+nyMju1NgULKK2R0kTbwib9e7FzYnMZ9RbeYVF6k57XX6q3gISK2qU6TZHkMRK2WryPlzhADOEWV2Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I4vzuANR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="E+DJ2rP6"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-59a10df8027so15497335e87.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jan 2026 03:13:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1767352420; x=1767957220; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FsSijJtpaI/oDSTtzaUkeXToSyfCr4FMo1aTrP8qZaU=;
-        b=E+DJ2rP6MxVUCdmBqZoI8P0tCI2IXXRTYgVdh+t0wtuN5qhCvwC8gsXod6vw7KkFDh
-         FX0G8uZKwAKwhcZpD9fB0YcUqH7AYcatZ0IVw7+OSkhch+6ID6Y0kLwrn/R+CRqgVOyD
-         tpN3Dc2+4KHitrxseeIxY9cratYQyTnVB13uoPBYdWVGsqBSkVZ3vCa6OkigVNmpp3fv
-         5m7yPUiqflkZGIPCNgqdLBbFxbNi5+APmnzvs+69Ca5UOHYui3zP27LzMpqQDjSXaz0l
-         +le3YqGnrtn5GgRi2URtYCVep5lwkpa3u3/8tI+TAFBALnLY32FvPFm/rDNuKieBMvCj
-         Ee4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767352420; x=1767957220;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FsSijJtpaI/oDSTtzaUkeXToSyfCr4FMo1aTrP8qZaU=;
-        b=OtUobYLwRsinQ2c5s7hgHPDXCRtzHducCgniuvJdX9arIBccUT/I4WPupF6GXX8XWy
-         Jg+nk+jK1Rj6gubhoSWR2EK9dNfO1tYgbJi+1MnG+MQPmxGG+upwob9+ghN7wvuLjAa4
-         OxhiXa6fX2MChQsYqN8NlSnx6sBx7iuudzv5C+k/RhWymdu8c4mWhckBwXpXG1Sv0czm
-         c+tAhJrOzKrai29Y6kMInUCJOaULQDQryd/RpiIqANAt+RF9yfP6SnK9XkiFmygAGkD+
-         1gpzXnkpasHpDIPMiVpxbhYSTjVh9SLHQXh7C9r13X1rxB7wNA/xZr1c2x0B6aEVhnyv
-         FtcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXCsFFyi3TImzN3B7go2oX8t7nsiizaa0g5l9forg1/2CQ+youcMLjBpK93tBW/bbVzbTyxWeji1g1dDWnjhwI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6/aBO8nTejBZhwX3EwvfaM8MQGvaKB9cm/JfHNNHk0vlZYjgC
-	erNDx83okIDVEcjz8gVuKJUYTAp0vqXMwqCRojak+XPaGUrqkWiLEd90Xrnee3GuYX3Mn85sITG
-	bV1GIBkw/1s4zOge5zsbFQeMy7H1p1TfHJTl00/oCMw==
-X-Gm-Gg: AY/fxX76xUeR7/HSu0AKQCy5FEXeNloSoii80QTisr3Rd2YhmNGaNM1a+QhrvlT0sJr
-	id079XBdH51yOJj2RzVeqjHoy5ztJZ7jMhjJZ5HlJJu1hs3Ef6MDSB2PTV/Rno8bbuNauPJyeeW
-	0FR3uf/uuzJgGTsQnnPLKTVN8Y3ALyhQstuNuwAMahQealX73XTNhzogZKv91V8khtKzHIKEjEc
-	epL+xQ8GSSIPp3+vPjYUwt8/nuMpORA5Upna5Vw9YoWv2MuOn3rKZXIHBg2LTr1m5tNLjoHMatj
-	RHlY5Prlj+NkMKlnhRj8EwOA97I=
-X-Google-Smtp-Source: AGHT+IFAdaCcjUwdY3Ew9NHcwLT11KRJipC8z25Ztoxl2WB+caL1mXRBHlm39ALYwigrxotmoGpHP+uwj2P6/o6YWRA=
-X-Received: by 2002:a05:6512:b8b:b0:598:8f92:c33f with SMTP id
- 2adb3069b0e04-59a17d77435mr14680425e87.51.1767352419706; Fri, 02 Jan 2026
- 03:13:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I4vzuANR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F1EDC116B1;
+	Fri,  2 Jan 2026 12:23:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767356638;
+	bh=UFKKF1haRLgSTi4RG+IyCkOVonss33GrfgWTfx8VFj4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I4vzuANRs/MKY/qs8qq0MJvtp8uzAfIK0t0Nq/f97q9oZtXOL267hkPvzCQDFRrF/
+	 bOefuMnqSyBXiPUT55snSNbPneHYuOoy6h+was+izicXzxDY2RyakDOjAnCIvZdPum
+	 iRqGw4CdAY9s4jBAGG7gzqCYUEVJ32IQRMkGJYDw577TipItqMKWIAF8s6asVKyTTf
+	 Ci8ORTHWb7KbQfEwsYtB/tDqXLQlMc3ptzpAg/84UQiMrvGEncOuOvO9/7FdlVAfur
+	 MFi8mYG4AlrCWUKNv5UMDiGEIvZnK1Dw3mg+uVcMfpl9zslr5NIShF7/4D8OwZqZZm
+	 06S+Fz2WgoARA==
+Date: Fri, 2 Jan 2026 13:23:56 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Jeff Johnson <jjohnson@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Matthias Kaehlcke <mka@chromium.org>, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-pm@vger.kernel.org
+Subject: Re: [PATCH 01/14] regulator: dt-bindings: qcom,qca6390-pmu: describe
+ PMUs on WCN39xx
+Message-ID: <20260102-exotic-spectacular-ladybug-0dc1c5@quoll>
+References: <20251231-wcn3990-pwrctl-v1-0-1ff4d6028ad5@oss.qualcomm.com>
+ <20251231-wcn3990-pwrctl-v1-1-1ff4d6028ad5@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251125-pci-m2-e-v2-0-32826de07cc5@oss.qualcomm.com>
- <20251125-pci-m2-e-v2-2-32826de07cc5@oss.qualcomm.com> <CAMRc=Mc-WebsQZ3jt2xirioNMticiWj9PJ3fsPTXGCeJ1iTLRg@mail.gmail.com>
- <fwzmob6ez7c6xbakcd4rq2icp7mdwgdvimss3zybb4ivdds3uo@mwguaz7rekjc>
-In-Reply-To: <fwzmob6ez7c6xbakcd4rq2icp7mdwgdvimss3zybb4ivdds3uo@mwguaz7rekjc>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 2 Jan 2026 12:13:27 +0100
-X-Gm-Features: AQt7F2rD4Vva2u72gj0duDgyvxJiVfI_tVGQktahu3E6VwiSEZFuXnq9LhXUXbk
-Message-ID: <CAMRc=MdNTHtzTJ3f3qVHH=qFbK86MzUP0vvx3ogZsXG+iqMUnw@mail.gmail.com>
-Subject: Re: [PATCH v2 02/10] serdev: Add serdev device based driver match support
-To: Manivannan Sadhasivam <mani@kernel.org>
-Cc: manivannan.sadhasivam@oss.qualcomm.com, 
-	Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, 
-	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Rob Herring <robh@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251231-wcn3990-pwrctl-v1-1-1ff4d6028ad5@oss.qualcomm.com>
 
-On Tue, Dec 30, 2025 at 8:56=E2=80=AFAM Manivannan Sadhasivam <mani@kernel.=
-org> wrote:
->
-> On Thu, Nov 27, 2025 at 06:32:04AM -0800, Bartosz Golaszewski wrote:
-> > On Tue, 25 Nov 2025 15:45:06 +0100, Manivannan Sadhasivam via B4 Relay
-> > <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
-> > > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> > >
-> > > Add support to match serdev devices with serdev drivers based on the =
-serdev
-> > > ID table defined in serdev_device_driver::id_table.
-> > >
-> > > The matching function, serdev_driver_match_device() uses the serdev d=
-evice
-> > > name to match against the entries in serdev_device_driver::id_table.
-> > >
-> > > If there is no serdev id_table for the driver, then serdev_device_mat=
-ch()
-> > > will fallback to ACPI and DT based matching.
-> > >
-> > > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualc=
-omm.com>
-> > > ---
-> > >  drivers/tty/serdev/core.c         | 23 ++++++++++++++++++++++-
-> > >  include/linux/mod_devicetable.h   |  7 +++++++
-> > >  include/linux/serdev.h            |  4 ++++
-> > >  scripts/mod/devicetable-offsets.c |  3 +++
-> > >  4 files changed, 36 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> > > index b33e708cb245..2b5582cd5063 100644
-> > > --- a/drivers/tty/serdev/core.c
-> > > +++ b/drivers/tty/serdev/core.c
-> > > @@ -85,12 +85,33 @@ static const struct device_type serdev_ctrl_type =
-=3D {
-> > >     .release        =3D serdev_ctrl_release,
-> > >  };
-> > >
-> > > +static int serdev_driver_match_device(struct device *dev, const stru=
-ct device_driver *drv)
-> > > +{
-> > > +   const struct serdev_device_driver *serdev_drv =3D to_serdev_devic=
-e_driver(drv);
-> > > +   struct serdev_device *serdev =3D to_serdev_device(dev);
-> > > +   const struct serdev_device_id *id;
-> > > +
-> > > +   if (!serdev_drv->id_table)
-> > > +           return 0;
-> > > +
-> > > +   for (id =3D serdev_drv->id_table; id->name[0]; id++) {
-> > > +           if (!strcmp(dev_name(dev), id->name)) {
-> > > +                   serdev->id =3D id;
-> > > +                   return 1;
-> > > +           }
-> > > +   }
-> > > +
-> > > +   return 0;
-> > > +}
-> > > +
-> >
-> > I don't know if Rob agrees with me but I would very much prefer to see
-> > software-node-based approach instead of an ID table matching.
-> >
-> > Could you in the pwrseq driver, create a software node for the serdev d=
-evice
-> > you allocate, set its "compatible" to "qcom,wcn7850-bt" and match again=
-st it
-> > here?
-> >
-> > This has several benefits: if you ever need to pass more properties to =
-the
-> > serdev devices, you already have a medium for that and you can also lea=
-ve
-> > serdev_device_add() alone. You're comparing the entire name here - what=
- if
-> > someone sets device's ID to some value and the name will be "WCN7850.2"=
-?
-> >
-> > You could also drop the serdev_id field from struct serdev_device. For =
-matching
-> > you could even reuse the of_device_id from the device driver.
-> >
->
-> I tried this approach and I really liked it since it gets rid of the yet-=
-another
-> id_table for serdev (which I didn't like it btw). But there is one concer=
-n
-> though. We need a generic 'device_get_match_data' implementation for swno=
-de.
-> While trying to implement it, I stumbled upon this patch [1] which does t=
-he same
-> for other usecase, but there was a disagreement on whether swnode should =
-be used
-> for driver matching or not. For my usecase, I find it very useful and
-> reasonable, but Dmitry Torokhov believes otherwise.
->
-> Maybe I'll include this patch in the next version, CC Dmitry and see wher=
-e it
-> goes.
+On Wed, Dec 31, 2025 at 01:35:51AM +0200, Dmitry Baryshkov wrote:
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - qcom,wcn3950-pmu
+> +              - qcom,wcn3988-pmu
+> +              - qcom,wcn3990-pmu
+> +              - qcom,wcn3991-pmu
+> +              - qcom,wcn3998-pmu
+> +    then:
+> +      properties:
+> +        wlan-enable-gpios: false
+> +        bt-enable-gpios: false
+> +      required:
+> +        - vddio-supply
+> +        - vddxo-supply
+> +        - vddrfa1p3-supply
+> +        - vddch0-supply
+> +        - vddch1-supply
 
-Thanks for bringing this to my attention. I think that historically
-software nodes were meant to always be "secondary" but now we have all
-kinds of auxiliary devices that use software nodes as their "primary"
-nodes so maybe we can re-discuss this.
+You need new binding file. 3/5 above are not shared with any other
+device.
 
-Bart
+> +
+>    - if:
+>        properties:
+>          compatible:
+> 
+> -- 
+> 2.47.3
+> 
