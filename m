@@ -1,127 +1,92 @@
-Received: from mail-ot1-f67.google.com (mail-ot1-f67.google.com [209.85.210.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244ABDF6C
-	for <linux-bluetooth@vger.kernel.org>; Sat,  3 Jan 2026 23:21:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.67
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767482463; cv=none; b=sKLb2ar2muEvNyIu3wGfCMrGmf/tojfM2gRUgRwAzZldnCHewlzo/YllkmUUrF7pLiq9BohQ/Uf9YvGNwC9tCfYvUUOYytTUb8kz2KI3Q/rifaHlQ5gMosencZ9hGxGZ3mToQxJOxd/Z/TJILJTpOJ2PUv8OeKQSG19p/jAzlzg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767482463; c=relaxed/simple;
-	bh=zAbEXHUVPpQJwKG38Z2+WVBAaT0cfrma2nRR5GYtP40=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=bnIXFbQyGaVl25vbwWQSIKFd1KAA2ldDhDBTJPXc/BFcOyNgqrJvbuTBY5ev2DvFpBGbrpdmhp8Tn85HgVo5KU4Z6aVHN/JNV7wIArljtxJQyU2xk4c/v3ZrpYrOwMaxJoe3+3PTY466HoEj5aPJqqpX6jXpnN9kKM2pCI29Kqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BPA435Rh; arc=none smtp.client-ip=209.85.210.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC25221710
+	for <linux-bluetooth@vger.kernel.org>; Sun,  4 Jan 2026 20:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767559880; cv=pass; b=RImqXLJxYtgKAmdzYkHblIdx5b4fpO0ooxmaLSpdZzXv87IShKJOtJRO4R8hIxPTmy+/zOxRTtQDaGc0uIKwizHjY4xH94JU3wixgBZTKNwfo9QU0ifbptbmHxZF6+AI3dZKGNqDCTeWKSYO6EJV6mTO9r4Hbzpq+OY2SoWPzfs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767559880; c=relaxed/simple;
+	bh=W9BQLHhts7Iroo0HrqY5TbjBzDm4OZGdgMcc2UACUbs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dQGUgdOiL8fa40A6YSQBaa66gPkmsxlqjut8Lx3I+z3k/QrdMeUS4kUsdSaUqPtBDf5//bN6dRHtTjjxwLPJMm6hQyxzy6Y5DnCAEj2iBbjoepGemAXUXIJwySNeIc7jhvJwlQE0MKCaoUW1PIz08vGzE8dspa+QY6kxmZ41qdU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=BLc/kQSH; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPA435Rh"
-Received: by mail-ot1-f67.google.com with SMTP id 46e09a7af769-7cdd651c884so659411a34.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 03 Jan 2026 15:21:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767482461; x=1768087261; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pRSpHiW7/cwHOUZfKtHYJ4USozyCyYCVbW4CdRFTwc0=;
-        b=BPA435Rh/F0KnauscfjdlYBUqGfEMQaxb4ncjbayZkTCYGA0bUo+H85pgbR2o+zZV+
-         UGxi6ulqa7n1N/YWBQJtSZhLUEh/+LTMH8HcdBL/HtUXILYhe6XZ1Q6W3PkRm5UXGq+d
-         KOd6335ej2/pqYv1GaIECgfimhPi1p0bo0zMPTCQ1AtgZXp/0NJof4ux2/dLfprigLAR
-         WSUWw57TJXQh4Br/a79w+dNyFjriCLMCvI2V5awaxizcP+pKOaxJJ4+LA0JKufPrJ8LI
-         7GDyrqWGOaWAGzWbJoOsp0kvBTrJtRsKl93DGNqb7P1QU3kWNA3aVHUV39uOhmOHm6o/
-         UDQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767482461; x=1768087261;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pRSpHiW7/cwHOUZfKtHYJ4USozyCyYCVbW4CdRFTwc0=;
-        b=Oqgs2Q6jwPcjrueRSy+reWMp5GXM2nq7wq8eBJtv5DZ4DDR9NTf1uLnSPwpk626YFn
-         AIOWHMrvp6vtNrlQmkeHkMnDBN6KubhalObWAqhCikNukvEX+PLDalflXM6/0C/gOXEO
-         oUijfFVMNgFBoTZNKKXiZBfyFD1EAtpJHLfIE49MgMMcEKqnNkWPyK+3ckP5zer9jvk+
-         25DSSOkzzuJuE6oWXdIQmbzRSjpgiotNgeCzFIB55d/rbyJMy3PMfgrUg85YAt97fhs5
-         ZE4PE0DZ5UfWFsH2omhbtoxugBiuJ7BcJ5Jxio6rfopqbhmIPRP/uL69s0A+yNbxEigf
-         Xk0Q==
-X-Gm-Message-State: AOJu0YyA4PH8i3sBj82zADYop90CaawCzjGt2v+vdBu3sl2aC72USMw9
-	QAmHNN0hVLrNnWijPcYNM79pr+XOVdL4oNswUXagg5QrjSk2qGRwcFW1d/clsHiW
-X-Gm-Gg: AY/fxX4z6UpbN99Z9Z8ivPhh7TT+OYmm74Uej4gculBgelP8y91lQrKrs9zSjWY8/K9
-	jarW3Dqfi0IoWr+Z+Im6J5yoiEzL6pwJq6qO5GMBmjQqI2lN/tKWnWOeOVdn2+i7RKdvNl4Ac49
-	fZW6rmj4UubAAiq07wkaccipJSAcAihbb364uf9wrvbZ+Ud5pgZI060tpXbNpt+APbtMHYIFumO
-	J9tqmzIWcXYdc7nBKILR9mtN9mTeKgcjTaAoCNO+15oKGhr8HSG2R/pXpzc5Ea2PYhi1jAwJimb
-	AG+i74f1SHAq7XkCIBtbdUj4M4MrJDeAkQMISADWacaKyHCnQnAlL6FXQW819WrQe42A60P5fLv
-	bJJOXt1CQ1mmhhXIJCuZ5uYs1NiZhesBx7zDDmGsAaEQqD6/GXJsQ3gfvhaugkdn9JZDq1+I/nj
-	JoUhZzb3NClAMxE8c=
-X-Google-Smtp-Source: AGHT+IGDGVgQJiovCHlBYboLQHOMHTjYnaSVUMBm4ymiHS7t20JkCcYrQlnM0Oy6N0CT0kXV4vlGrg==
-X-Received: by 2002:a05:6830:6ed1:b0:7c7:5f86:196b with SMTP id 46e09a7af769-7ce2bf07242mr1896774a34.3.1767482460720;
-        Sat, 03 Jan 2026 15:21:00 -0800 (PST)
-Received: from [172.17.0.2] ([52.176.37.65])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc667f9468sm30330678a34.28.2026.01.03.15.20.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Jan 2026 15:21:00 -0800 (PST)
-Message-ID: <6959a45c.9d0a0220.347a8.856e@mx.google.com>
-Date: Sat, 03 Jan 2026 15:21:00 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8155923745171324798=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="BLc/kQSH"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4dkqN26FLmzyQR;
+	Sun, 04 Jan 2026 22:51:14 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1767559875;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vAuKhIdgQTL6AhxqWhuFpZtilsbushTq0lYrt3lMgWo=;
+	b=BLc/kQSHojNhafaesKeQ7vpCBBLs54nh0TAKEHPZ7w4iT0XnhFVpQLVjfCiLr5jjJ3sIu1
+	OAeD2QzYEjKnwbU1NTNUbm6iTfarzGS993ZafopZm4S4W5vQeyBCIsRLDOLvNThPoChQ4n
+	sneOYyM1TOjww5m57F4hfUAcSOKLC4k=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1767559875;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vAuKhIdgQTL6AhxqWhuFpZtilsbushTq0lYrt3lMgWo=;
+	b=zMIGpzQcKXMYKMUIbBqdpFVXB4vDFjnWM8QyiD34iSq3LwnwszbVZAILaVNzChl3aC6r/t
+	LsXYA1ANxNfFpxQ1B6QL5bH15JeZ9DOq3yXTgNByZJRUIMyD7g/Vjjjv3DgfJ7D0ZWYsot
+	M23shyfV7Cc7+R47FxawMdl41iHZfFs=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1767559875;
+	b=ik3MJJHT8HaNm794wQ9iCBU6Htu6yuWPpiGhZ4Oe2BtO9Zyxr12F4K+ZgKu4j9lW6FUEXU
+	huLR33uWvbTLgaZWHpx/nTior9IPWdMrNwqDCanczYEV/0+XJ7Kyhv+HIqPr+PPPNL9Nzh
+	jzP1t00MCwLfDYsTS+OPuUs6v0ExfLM=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 0/3] transport: distinguish BAP mic and playback volumes
+Date: Sun,  4 Jan 2026 22:51:09 +0200
+Message-ID: <cover.1767559459.git.pav@iki.fi>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [RESEND,BlueZ,1/2] 6lowpan-tester: add test for header compression
-In-Reply-To: <d7f5c6978db76b58f9db1b6f93254d2f38c1e365.1767478380.git.pav@iki.fi>
-References: <d7f5c6978db76b58f9db1b6f93254d2f38c1e365.1767478380.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8155923745171324798==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Currently we are confusing VCP and MICP volumes.
 
-This is automated email and please do not reply to this email!
+We are also mixing up AVRCP and VCP volumes.
 
-Dear submitter,
+As microphone volumes are commonly 100% and sound server may set them,
+we end up with spurious 100% playback volumes.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1038129
+Fix this, and also do some cleanup of #ifdefs in the volume code.
 
----Test result---
+Pauli Virtanen (3):
+  shared/bap: add bt_bap_stream_is_server
+  transport: clean up volume set/get for A2DP and VCP
+  transport: distinguish BAP mic and playback volumes
 
-Test Summary:
-CheckPatch                    PENDING   0.31 seconds
-GitLint                       PENDING   0.25 seconds
-BuildEll                      PASS      20.03 seconds
-BluezMake                     PASS      632.55 seconds
-MakeCheck                     PASS      21.60 seconds
-MakeDistcheck                 PASS      241.92 seconds
-CheckValgrind                 PASS      302.95 seconds
-CheckSmatch                   PASS      351.89 seconds
-bluezmakeextell               PASS      182.02 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      1031.44 seconds
+ profiles/audio/avrcp.c     |  10 +--
+ profiles/audio/media.c     |   2 +-
+ profiles/audio/media.h     |  10 +++
+ profiles/audio/transport.c | 137 +++++++++++++++++++++----------------
+ profiles/audio/transport.h |  10 +--
+ profiles/audio/vcp.c       |  12 ++--
+ profiles/audio/vcp.h       |  21 +++++-
+ src/shared/bap.c           |   6 ++
+ src/shared/bap.h           |   2 +
+ 9 files changed, 133 insertions(+), 77 deletions(-)
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+-- 
+2.52.0
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8155923745171324798==--
