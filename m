@@ -1,109 +1,164 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com [209.85.215.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3382DBF4B
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 21:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4059810FD
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 21:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767647842; cv=none; b=a5wV7LNvLovrWu3l/oyGK+PHMnTkvRdC/HJdlymmwdp2WhLCUtL8/bXZ38QY+0+ZpK/2/xiLRUxnQgirtLFTjI/ODIVYuIFJXPAHKpYEQ8piU2CN4xKA8QY5GILq+lfTgmBvyG5N8fu+JyN0MpGMdULoO3NZtX9xyFxUu4eWNw8=
+	t=1767649102; cv=none; b=V9+9udsnG33ysS+xHDmY2qyF4WKqqNKpNGrw9MOhcYF6LkzZTnwNBiY4qtwV0zqGL/oeavXosVUhr7vO+NN+XiWO9FZEe3ZAl/eYYs6Bw0lSLHTa+HvkpKXXnvUpaIFfnuu5rfAIKWASRHlzr0vPWNIYhZKHNjn9kP3fpFV4I+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767647842; c=relaxed/simple;
-	bh=YeBW0NGqO7N1FZrjCNLElMJLQmHkaxWSnGGb+26xoow=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lIGIhHnmn3O3w488aXFXqM75LWpY8cIxeFhG1X/OBYFbEI0HsO9SyZjAGkGIAgFyIwS5BNAt3PXcwcMcVJuJ5Hw58aMssNesKq6lEU8TuCYVVQ+nUuquOysguv1V4HPNQrQ63Mip2347ADRKBF8HwXHJtyJcziibWUZ/HJabboM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kdhWjm8D; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1767649102; c=relaxed/simple;
+	bh=zHqN/OmLIZEjSCaYtPF3ZUkJavSSZezCnLWvIurZd60=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=O2Q/c7SwQlt51EX5p0q0s9Vd9xzbS6i8+ftNEvZLd7kITjEbUO1lQcJidnkXp63c+amLQ5ItASe+jDLJqzZKyYxhuMCxes9ZGXRm8pSh03p0ALfuNNZM5k+27HOYn7IetOtapclT8rQzqtiRaevOh57H9N6LxL3cwuP34ahu3m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b+ytSAF6; arc=none smtp.client-ip=209.85.215.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kdhWjm8D"
-Received: from github.com (hubbernetes-node-ed34f81.ac4-iad.github.net [10.52.81.28])
-	by smtp.github.com (Postfix) with ESMTPA id 06F0D401093
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 13:17:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1767647840;
-	bh=NwazwscSbEcRhYp72W8t8+BZZDk2gQyp9HNHkaB/448=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=kdhWjm8DxzufcdqTItnxbXbh5t0pKXlTPAP93NKtcDGFN/lPJuB4fEZGDwsVSH77d
-	 +zyVflfVAs76glp+Y5qbnns+AL5aqPugM/n25o742s7R5Stq15f2FKo4qHmMsKz3Ce
-	 6vB74wrXOGzsttWHgTNcI9pa0UZZBaQv/tntbEwI=
-Date: Mon, 05 Jan 2026 13:17:20 -0800
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1038698/000000-246e27@github.com>
-Subject: [bluez/bluez] dcf8b8: transport: clean up volume set/get for A2DP and
- VCP
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b+ytSAF6"
+Received: by mail-pg1-f193.google.com with SMTP id 41be03b00d2f7-c13771b2cf9so266268a12.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Jan 2026 13:38:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767649100; x=1768253900; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YhAG0DHLf+GEVCzwu8beYJW2gXCzH2/LSM6iUwdKP00=;
+        b=b+ytSAF6WfOaoHx56SxMtDGVqiJTbj6v9+1F5Jg/U5TAdszGTaFlqQ7rw+z1DyoMY1
+         EBmeuHBPBi0cI9hG4Dq2CfU0TvLrYDq6hE8F4E77fCGoANXwsNzVqXNJWEpXxX+Elg+g
+         7GkPJSzGYydrtRzi7fuWMtto5GpWLllMO1GwN/ftEN0mrwwLTuwj9rWZuBbMTUEyvS7l
+         1ci0Sq1DEtTXqrMwRtsHiF/WtCgpsi3IpjqILHoTxUOKcEJgVci81F9F+m1epyxlNTQt
+         RFB00CiRxk/oJF4mMWouZn8zuMpiZu4r3B6jF/kt9/sNm1PjzXybrvLR6tSlJ3br9cM1
+         uGMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767649100; x=1768253900;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YhAG0DHLf+GEVCzwu8beYJW2gXCzH2/LSM6iUwdKP00=;
+        b=dhAbBFpfZ1O0bbwvuWtVWb/DMEO/MXR5IeTRfln589q58QWq8o8PSVxxsIlU45bd20
+         iCzJCFt9WSWs2Mi+8HaMUj2IKPmuHMxn9GSU+wFn0eNH/XEMOBmfP+86mYTlzZQUiom2
+         +75iyP03+/AsHaTMSNm8F3FmnS/09oZUrcHOTtscUwWe6fQ55NlIHigxgJEj/cN8KeWm
+         uJMa7rxDKZZWj9qvQvidbZg6rmqDKvaGu/3c2D4gP0FfWRMb+mSVtGNGkkKBlHuPFLj9
+         9j6OtUGDNrYg7D6npvffqaGkqdzCNC81gd4UiJBuIcBdiCV3GwQ/3jrZnhlXEWqq3/ma
+         WO6g==
+X-Gm-Message-State: AOJu0YxlKUqug2QcAqvPAcis1Yk/x8X4RLvxPUJxNVBTNAm2dH8oC6HD
+	RmW6MlOpua+/XB7s3d899W8YqO2y3xd+VEJB9jCpA71+mJn9je7TiByiPHRbB3zl
+X-Gm-Gg: AY/fxX4/qS4eMYCKruyiAYt5DQsV5+5fqC0HY1+raKCVs//t+JcnblayMdZcct+m68c
+	RtXWinZXuLtKwX0C5ALiGbiOA7jpAw4Rfym9SPrZFGKHWUQRGUYA0h4b9jBc/SD6ay4iCw3yrwX
+	kge7rEwrsFtLviZAYHpOZV11RAS2PP/Y2cpa7oPaSFkJ6zV/lt0IuviT+vNCTVjXULK8zhQ3bti
+	5ZysjnVSn+65xoBOdfTIcysmzfl3YL82pVvYG/Mdr5YaJgxZaCAokm/sbGTDO9++YEeT/DRLYz9
+	Obt4AL02iKpeU0Exs52HfrCcE6atclPmu4Gil9Y1lj/5XLOQchQ7BHFyLSDa2fw479gDpLB4Mua
+	71fvWPYH/IMOf4X1yxu4qTjaNXv2EzkFNmPQN3nlUxE/5pTKqrFZR0mX4g21Sq6ieVOoQuuq4Wl
+	3vuGQH2rHY89G+Gjg=
+X-Google-Smtp-Source: AGHT+IEMp9K43K7VnAZGHxuRY3pbufiMWjbEF42s8H0n0b4JzIz6DkJBSFIGM+87Ix+HGjGYNiiH0Q==
+X-Received: by 2002:a05:7300:1696:b0:2ae:5e28:743a with SMTP id 5a478bee46e88-2b16f86c6ddmr464755eec.17.1767649100088;
+        Mon, 05 Jan 2026 13:38:20 -0800 (PST)
+Received: from [172.17.0.2] ([52.238.24.37])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b170673266sm562972eec.1.2026.01.05.13.38.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 13:38:19 -0800 (PST)
+Message-ID: <695c2f4b.050a0220.3cdca8.2855@mx.google.com>
+Date: Mon, 05 Jan 2026 13:38:19 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5470642941015260962=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: Fix using PHYs bitfields as PHY value
+In-Reply-To: <20260105211019.3098952-1-luiz.dentz@gmail.com>
+References: <20260105211019.3098952-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5470642941015260962==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1038698
-  Home:   https://github.com/bluez/bluez
-  Commit: dcf8b8eb4d9c28c8c40425503d2885e27f674073
-      https://github.com/bluez/bluez/commit/dcf8b8eb4d9c28c8c40425503d2885e27f674073
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-01-05 (Mon, 05 Jan 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M profiles/audio/avrcp.c
-    M profiles/audio/media.c
-    M profiles/audio/media.h
-    M profiles/audio/transport.c
-    M profiles/audio/transport.h
-    M profiles/audio/vcp.c
-    M profiles/audio/vcp.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  transport: clean up volume set/get for A2DP and VCP
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1038699
 
-Cleanup uuid comparisons in device transport volume set/get. These are
-unnecessary because the transport->ops already do the equivalent check.
+---Test result---
 
-Use separate functions for set/get AVRCP volume, to avoid mixing up
-AVRCP and VCP volumes.
+Test Summary:
+CheckPatch                    PENDING   0.44 seconds
+GitLint                       PENDING   0.34 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      24.87 seconds
+CheckAllWarning               PASS      27.62 seconds
+CheckSparse                   WARNING   31.10 seconds
+BuildKernel32                 PASS      24.68 seconds
+TestRunnerSetup               PASS      547.93 seconds
+TestRunner_l2cap-tester       PASS      27.60 seconds
+TestRunner_iso-tester         PASS      77.35 seconds
+TestRunner_bnep-tester        PASS      6.15 seconds
+TestRunner_mgmt-tester        FAIL      126.56 seconds
+TestRunner_rfcomm-tester      PASS      9.39 seconds
+TestRunner_sco-tester         FAIL      14.42 seconds
+TestRunner_ioctl-tester       PASS      10.05 seconds
+TestRunner_mesh-tester        FAIL      12.45 seconds
+TestRunner_smp-tester         PASS      8.46 seconds
+TestRunner_userchan-tester    PASS      6.93 seconds
+IncrementalBuild              PENDING   0.79 seconds
 
-For VCP send volume update notifications on all transports, since same
-volume is listed on all.
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-To avoid interspersing #ifdefs for A2DP/VCP in this code, define dummy
-functions in headers that behave accordingly.
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-Fix the bt_audio_vcp_get/set_volume to properly indicate when VCP is not
-present.
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.109 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.745 seconds
+Mesh - Send cancel - 2                               Timed out    1.996 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: 246e2747d7ccc05945269ae267299377f9227124
-      https://github.com/bluez/bluez/commit/246e2747d7ccc05945269ae267299377f9227124
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-01-05 (Mon, 05 Jan 2026)
 
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: distinguish BAP mic and playback volumes
-
-BAP Unicast has two kinds of relevant volumes: playback and microphone.
-Client Sink and Server Source generally correspond to microphone volume.
-Broadcast Source and Sink do not have microphone volume.  Microphone
-volumes shall use MICP, not VCP, but currently we confuse them.
-
-Fix by distinguishing the VCP / MICP cases. The shared/micp
-implementation is incomplete, so leave those volumes unimplemented also
-in transport.
-
-This fixes setting volume on microphone transport changing the playback
-volume.
+---
+Regards,
+Linux Bluetooth
 
 
-Compare: https://github.com/bluez/bluez/compare/dcf8b8eb4d9c%5E...246e2747d7cc
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============5470642941015260962==--
