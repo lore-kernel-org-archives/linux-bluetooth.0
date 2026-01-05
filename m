@@ -1,79 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D732C21F0
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 15:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927EC306B1B
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 15:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767626008; cv=none; b=hg3vZPDp8FYtoSUmFXfIdTlD+1B6ML6Oq1i3EVyV4BnV0u2UgEY3+86yHrWvfwil+B1o8sDHccwn4eYj2nG65uKKSWuHqi7FXkb8BkAa7zThKdk2C2uma2lqYvi4YBAQWl0qM/Vkw2FPfv3XspPdeERb+dG6l4CK9i4Kn86PPFQ=
+	t=1767626590; cv=none; b=JOhBte37cw5h+40gn69gOrMKhBBaYOn79rkIrHklcKYYdg9xhv+nTa2Q2F0Cdgx72cN226ScmH89Lb2MwU+9K8iXRUHkcLSzrfd1BTYvxgQpIu5PGBR1Ip1Fgkt7RJmKbk/TAcfaRGFHFUtfMlvKca38uOU5q1R8M0Thpq2CVm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767626008; c=relaxed/simple;
-	bh=X9gal8DWxTy1xrXo9YCAzfzRNVXS37y+HyIgw29MvYg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WVXc1Zh6ou/HXazmRy71s9uu793xiwmf80kvXm1iLnxnAtyhI7OF4A5ENAJYm3h8vSLdEoY6V83na6ZI3nwf6iDVTfK2Ba5e4dDrqOVVh1Z9N6bqY/j/A55etIg5ik5Yfa69PkCtUVyJTwT+pQ/QrqV8i/klOt1v9+I1rKcPnxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nIBEyuH5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767626590; c=relaxed/simple;
+	bh=PeUd4bGPFMDKNEp4BqRgI9U8vO26JEfp7lE1agatD8k=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=K5tqqWgeLd7Xhq7EO0t049R2e3pj8B6ilA6kdo2eICWvnZsdzf0p49PqMPpSig25bGJlx3ZqmIbZhXYmj13GbWzxSA5u5P/sBIwqM0GruwRyATVgz7sVlmoz6PcZ43Jnli46TdFLNHfLQHy+gh0+lpQy5CM8vnz8WKuszshSLYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Cs8B1+q6; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nIBEyuH5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 293E7C116D0;
-	Mon,  5 Jan 2026 15:13:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767626008;
-	bh=X9gal8DWxTy1xrXo9YCAzfzRNVXS37y+HyIgw29MvYg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nIBEyuH5OipeEXaqSX0caXRlvDNqXzOJcGFlt9fsoUMEKpqD7XvfCA/bUr523HZL1
-	 k7km2V1vrRkml68n3pdGPPV5lT7w8iS25LZ8jIRyzX9FDglRlQ00nK5fXhVv2e/XUO
-	 cYb5xosW+1D5u0w4dAlIzhzi7eFtN8CuCHduIoeSk6UUI+wjU1t+15Sn8/4RJdcYPa
-	 EK8BI95zmeMyrFk58n8m4RrqwFfw0Jz+H78+maYooAUaOPNTuBHeLt2DExeaPSnATf
-	 3nfeLAMa0Gi51RcAET2aVdaMk8Jc9UaWVPSrk8Zf6iuBnkvJ/eWwBZUr8swIBOY5fS
-	 AA1zQRxNcGufw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B67EB380AA7F;
-	Mon,  5 Jan 2026 15:10:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Cs8B1+q6"
+Received: from github.com (hubbernetes-node-1085f9c.ac4-iad.github.net [10.52.173.56])
+	by smtp.github.com (Postfix) with ESMTPA id 7F011213DD
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 07:23:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1767626586;
+	bh=cRkvWdTrza1rIVYPwFhcm2MsyTAVE19gI5zhoR38YbI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Cs8B1+q6rMd7W0Cv9/BnDt46aB1thuE2vmK//xyLBFTKj8MsbA/vEzfimLjYmtieH
+	 UGq6Q2ufVkpufS7ALlE8V67nK6L7YVeP0N8DDSteADVBDMJXvuLpp42sjzogS+YlaV
+	 EKO6hEhMj5i9FKt8ENwTktWKJKt5Eu0Zb+kFCJeg=
+Date: Mon, 05 Jan 2026 07:23:06 -0800
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/05813d-f30307@github.com>
+Subject: [bluez/bluez] 6358a2: 6lowpan-tester: add test for header compression
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [RESEND PATCH BlueZ 1/2] 6lowpan-tester: add test for header
- compression
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176762580655.1187428.2344752861125385664.git-patchwork-notify@kernel.org>
-Date: Mon, 05 Jan 2026 15:10:06 +0000
-References: 
- <d7f5c6978db76b58f9db1b6f93254d2f38c1e365.1767478380.git.pav@iki.fi>
-In-Reply-To: 
- <d7f5c6978db76b58f9db1b6f93254d2f38c1e365.1767478380.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 6358a2a11313e17846d481d59a55a76e2898d6ec
+      https://github.com/bluez/bluez/commit/6358a2a11313e17846d481d59a55a76e2898d6ec
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-01-05 (Mon, 05 Jan 2026)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M tools/6lowpan-tester.c
 
-On Sun,  4 Jan 2026 00:14:06 +0200 you wrote:
-> Add smoke test for IPV6 header compression. These test the compressed
-> ipv6 code path in net/bluetooth/6lowpan.c
-> 
-> Client Recv IPHC Dgram - Success
-> Client Recv IPHC Raw - Success
-> ---
->  tools/6lowpan-tester.c | 61 +++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 57 insertions(+), 4 deletions(-)
+  Log Message:
+  -----------
+  6lowpan-tester: add test for header compression
 
-Here is the summary with links:
-  - [RESEND,BlueZ,1/2] 6lowpan-tester: add test for header compression
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6358a2a11313
-  - [RESEND,BlueZ,2/2] 6lowpan-tester: re-enable previously crashing test
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f30307588ea5
+Add smoke test for IPV6 header compression. These test the compressed
+ipv6 code path in net/bluetooth/6lowpan.c
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Client Recv IPHC Dgram - Success
+Client Recv IPHC Raw - Success
 
 
+  Commit: f30307588ea5b7d2dd0cb1040a8452e8ed41c040
+      https://github.com/bluez/bluez/commit/f30307588ea5b7d2dd0cb1040a8452e8ed41c040
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-01-05 (Mon, 05 Jan 2026)
+
+  Changed paths:
+    M tools/6lowpan-tester.c
+
+  Log Message:
+  -----------
+  6lowpan-tester: re-enable previously crashing test
+
+Enable test that previously crashed kernel, fixed in v6.18
+
+Client Recv Raw - Success
+
+
+Compare: https://github.com/bluez/bluez/compare/05813df5e490...f30307588ea5
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
