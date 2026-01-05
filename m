@@ -1,160 +1,113 @@
-Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com [209.85.215.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75AB3273D66
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 06:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48C717A303
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 10:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767596071; cv=none; b=Yg5Wd4Gh3uR1gaFmzZ6tPUQ1P3GnYZ0TAbw1PW9+QCA5zNf5gQchDU5C6Gm6541QCCE77mTHdNiQMt8epGip9CHuRrjx3GswcUS6PQwiCjpjyoXBldr6eRIMIu1DaMDUlRch+ikO6KFD5eWMyuaUhRoVXDn3i7dbSVTh5y/fPTY=
+	t=1767609517; cv=none; b=TPXkO1MYdk4nDZRO7uSrFd57rlMTQWfFjO9llVAT3ciIF/qxlizOYxTFcM9UaI6bCniDlWF4oe9jOt7k89iFcDQUKpOHzQUm2F4RuU9J8BJE+67p+R+zALBd0V9v8QVq98IUgrfjo7cqkDgPtPQWLpH5r7onaQujGC50vU3sYbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767596071; c=relaxed/simple;
-	bh=tps7KzwrWA3lcvJh1aBdHW6eM4H6ZX+gWhaXL9n4ilw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ksl10hvxdsnIto1TW0zu0sodWESDzCLAEjNKv/EtPZTK+5I5SeNh43ZPWIbt0he4Z1aPwAEU3LGn3XiS5gCTS8HAGdKyw5fY2y1gr3wRm09WFC1cgSZHk/kXTBGhNdcfcgVDEthmu9sUh7RBoVR70DUaLppxGfPo9UUQcOMHpGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DsYhA91K; arc=none smtp.client-ip=209.85.215.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767609517; c=relaxed/simple;
+	bh=eICmaTYkcEXXxxfQrLH6IWRPFrqs3//uD71yxJGp+tg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AIZBWtRlGXEUfzbyKxaJvh25JRIUzVD7S2vO8sIQzLWInttWAfxcjafbWtcoFDL0SbOpxm3Z8mfXqFsTeZuelYWV7sZYDM2DUmr+4uSPqIqm17QlTakI/FZzEUvuUXfkhLnTT3ea4mCn5U+R3C4y0EVB1G73cwt6p8cm7AH5n80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=LxcePAr6; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DsYhA91K"
-Received: by mail-pg1-f196.google.com with SMTP id 41be03b00d2f7-bf5ac50827dso8842001a12.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 04 Jan 2026 22:54:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767596068; x=1768200868; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uuJIS624lB8mDh+dEgSLO2jTKO3ufHGYIxx9kOVm4sk=;
-        b=DsYhA91KkElfKRCTUPhb6pVxrhLwGviyfh7v6Cv+W1BIIhFR6sbKkGgaqOR3eVdKqn
-         vycVSbhOa5AJ5mtn8USoLuBo3PtkqVUjYvbr/BcwG1LjNfWwfrVhTDvuIfTK5Nnls/Qy
-         N/FKIvZtbrwfe9ZrZaOlAZz2O/Za9wK/558qmEpKNYKZKAUXPzlE09y2FFfJTX9gZlk0
-         pfVGRcX/3RfyoJlyyg+uZzSAllLU09pVWoVspbDyDJEJVotipjTSPur2bBh0asdiM46w
-         iMWkyaPEytMegnXRwoMORhq+pkQlQRHfSqQAtGo9pmgH5McaV7qmLpahagXUiJTfVOTx
-         oU6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767596068; x=1768200868;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uuJIS624lB8mDh+dEgSLO2jTKO3ufHGYIxx9kOVm4sk=;
-        b=aVsPU1QX2mX0whtVawdL7mLwb5GsY9oMbs8RFeUoM+3FhDQZftg2F9fyHwOAQIXG04
-         QunNtTUnAW8HOLIL6/yWaE2GO7CrJRdkFErAvHe+lzJnm2AVjudCuip4K+qskfgBn7tE
-         UKaIsOQ8V83r9gWr7d+vpNsZACmWd+/hCnOy2a1jMp3tzLZGmAqcK76WpzwEw7QfMEmz
-         FVH8BG2d2XIhmx01BETvIF+tnJojaGR58gKt2QKz/PJlx6oqXCKhscepOdegQlSSTXk2
-         T5g/JlAzmyHNPgHk6VTNK7j/5Jus+LMSmRaFnMYkSeBXvBYKCi4gRAxczYH/9GOIN2lW
-         jtRA==
-X-Gm-Message-State: AOJu0YxpuA+saM3mmG6JcKEwMmf6tK5HClH1nAqAHSbibC0u4PQzwdG2
-	6FDUyadSPWyCXszywPNRAeDfPM3eUibXXvWg+jcl5oV+QOpRt8A5wIMsEzHGxSPr
-X-Gm-Gg: AY/fxX6o6p+PPDzYYehIRRM8Ej8+j/3WnZkZl540nrvzxfY8XC6vHovFn0A6FgFQdXA
-	H9WYOxOaSFwaXidSzor1gs8K1vEscqeTM69ESINwiy4sRwwoCWdQWicnx6RYFOhhWr6Uq4AnqpN
-	Dt7/1gco1Xq+/iljvOH3F2NWe8E9t/AxbTNa3vKJW6gNDGaU0/umE67bHOQnDwkM6x3r2hmglBU
-	73b3sVuXunYGdYRh3H/tb30GsKivuq3vr3FtTkfZnCJBUqHLUCT3nTUPd4hqJ3KNBwxOHUptLdc
-	FI2vLncldE39xhiUjqqfcahUxPHmBVLCOUWbsz8brMxyethU7VbtyqAjb6TXCE8s1H/RomohyWt
-	/zNIFCNHs6ZmsSvl2FG9AygP4s9A8MrK8Ozshmd05WJLQ3jQbykUFNoAvdrgOmO+lW74hoOPQp3
-	itCK8dwNEH3NHn6Ejaig==
-X-Google-Smtp-Source: AGHT+IGZtTPJxyDigrnQrPJhKohcwbQ/hyN0NylyoY3dPbRUYNZKwA2doc67MgQMFeBqSNAuOO4k8w==
-X-Received: by 2002:a05:7300:de48:b0:2ab:c279:9dce with SMTP id 5a478bee46e88-2b05ebd0d75mr33321403eec.7.1767596068284;
-        Sun, 04 Jan 2026 22:54:28 -0800 (PST)
-Received: from [172.17.0.2] ([128.24.160.163])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b140c42e8bsm10897347eec.26.2026.01.04.22.54.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Jan 2026 22:54:27 -0800 (PST)
-Message-ID: <695b6023.050a0220.52245.869f@mx.google.com>
-Date: Sun, 04 Jan 2026 22:54:27 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2283533459281885582=="
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="LxcePAr6"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6055ZQMR4031674;
+	Mon, 5 Jan 2026 10:38:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=uKJsV7ajmZOeh5IiJeFT5Rqd7MIyvMMSCH8
+	r0Oq0Mis=; b=LxcePAr60NpTHu6u+2tNIDOoZoem1ZmnFVh6yfApxudfKc6/R0J
+	dCN7UuqvxN9vdO3XNUDqtxOVlgWb91Cf2Vjf2rYRMh7jOhOcchjaY9l4AFtdgf6m
+	KmNDdh5V1rxVd5cbIxwiUhv0tzey9MjwBTLz/fH81AO9WLwQZDazFb6MFs1MznCc
+	i2ysbPG1BTr0JIRd2ygtxslGHXDzOJi92BQ2MhLdcpmm/K7F64bo9Z99eCbeXPX9
+	NbD59M1UtLCWzYevU0qn0z/nufdBbCVc5pgKhn1wRoNGRC1YAZLFz/wRkb2Hh0E1
+	pad14Ug1H+eRMwmSf3gDAfP8+RQqacV7QfA==
+Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bg79ngw2e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Jan 2026 10:38:34 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 605AcVtV019287;
+	Mon, 5 Jan 2026 10:38:31 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4bev6kry99-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Jan 2026 10:38:31 +0000
+Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 605AcVVv019282;
+	Mon, 5 Jan 2026 10:38:31 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 605AcVNm019281
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Jan 2026 10:38:31 +0000
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4766378)
+	id 48ED8237A3; Mon,  5 Jan 2026 18:38:30 +0800 (CST)
+From: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+To: luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com,
+        cheng.jiang@oss.qualcomm.com, chezhou@qti.qualcomm.com,
+        wei.deng@oss.qualcomm.com, yiboz@qti.qualcomm.com,
+        Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+Subject: [PATCH v2 0/1] gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching.
+Date: Mon,  5 Jan 2026 18:38:27 +0800
+Message-Id: <20260105103828.105346-1-mengshi.wu@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com
-Subject: RE: Bluetooth: btqca: move WCN7850 WA and add WCN6855 firmware priority selection feature
-In-Reply-To: <20260105055646.3816296-2-shuai.zhang@oss.qualcomm.com>
-References: <20260105055646.3816296-2-shuai.zhang@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2283533459281885582==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1038335
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.42 seconds
-GitLint                       PENDING   0.36 seconds
-SubjectPrefix                 PASS      0.15 seconds
-BuildKernel                   PASS      26.20 seconds
-CheckAllWarning               PASS      28.28 seconds
-CheckSparse                   PASS      31.63 seconds
-BuildKernel32                 PASS      25.72 seconds
-TestRunnerSetup               PASS      565.47 seconds
-TestRunner_l2cap-tester       PASS      28.97 seconds
-TestRunner_iso-tester         PASS      112.97 seconds
-TestRunner_bnep-tester        PASS      6.42 seconds
-TestRunner_mgmt-tester        FAIL      134.85 seconds
-TestRunner_rfcomm-tester      PASS      9.88 seconds
-TestRunner_sco-tester         FAIL      15.27 seconds
-TestRunner_ioctl-tester       PASS      10.77 seconds
-TestRunner_mesh-tester        FAIL      12.80 seconds
-TestRunner_smp-tester         PASS      9.16 seconds
-TestRunner_userchan-tester    PASS      6.83 seconds
-IncrementalBuild              PENDING   0.99 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 488 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.116 seconds
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.196 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.684 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: r968mxliSM64bauCRz0BTR-g8nsxMZf4
+X-Proofpoint-ORIG-GUID: r968mxliSM64bauCRz0BTR-g8nsxMZf4
+X-Authority-Analysis: v=2.4 cv=Y8P1cxeN c=1 sm=1 tr=0 ts=695b94aa cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
+ a=jQMTAWt6YVLlqYqpKcEA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA1MDA5MyBTYWx0ZWRfXy+57zUKM7TRE
+ TqqeLvkUJ1ZgGtxnvKKHDMRPx+SeBEiorOHnn6NqAv9+TaEWoXIiSkSLGtj07X03UJo86+w/MDc
+ Db/tn/2/jp4HNOPVqtJFGOj98sZdkBUiJrI2YM8EI4ajXy8ZJr5VWLR4Ocz9bf+uu8hpgtsj65S
+ VAySRc39QJw/ZVJ3WzWOdlJJgOz6tC0bTqcbe2/uus9eNywfOtTYktU8EHhfHCI6sWAKiHKPExi
+ VQWod/w2J8nmOkJHA5/onGtQUp+1x8ErvvIic2P46ZGQ4TK1OWvXYiwMT7U7ujmxLjfYhJEZrmo
+ Y/QVL5wAGowMImrCbPwht8eR6uTlVMeyIe1+RPxVSWnmIrlny/fYGyqOKEV2e1clbl1d6MCe6Bs
+ JZ3VNi7/e9ftVaZp7SoVyHRIcfb/C5Olp5yAN4yjs/dgpzYoNXnDJYTxI/7n4GAzJvDbybO0cWC
+ uulXkuq+Dtc8/qdauLg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-05_01,2025-12-31_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 malwarescore=0 lowpriorityscore=0 phishscore=0
+ impostorscore=0 suspectscore=0 clxscore=1015 bulkscore=0 adultscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2512120000
+ definitions=main-2601050093
 
 
+Changes from v1:
+ - Implement automatic recovery when ATT_ECODE_DB_OUT_OF_SYNC error is
+   received from the remote device.
+ - Link to v1
+   https://lore.kernel.org/all/20251208101915.247459-1-mengshi.wu@oss.qualcomm.com/
 
----
-Regards,
-Linux Bluetooth
+Mengshi Wu (1):
+  gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT
+    caching.
 
+ src/shared/gatt-client.c  | 376 +++++++++++++++++++++++++++++++++++++-
+ src/shared/gatt-helpers.c |  16 ++
+ src/shared/gatt-helpers.h |   3 +
+ 3 files changed, 392 insertions(+), 3 deletions(-)
 
---===============2283533459281885582==--
+-- 
+2.34.1
+
