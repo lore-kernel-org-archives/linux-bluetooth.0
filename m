@@ -1,190 +1,338 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F713314DE
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 20:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767644443; cv=pass; b=CXw1pweoV5iw1uSOTufXlud+vwoW3PQzJmjZx+i1iT420s+tlQ+MnMAGyI+5phxsXi2cGxP7jTf2oNibhxvmJ7ulbknF7ugW1Bf+93ZcsM3cch0rvUQykbek7H+guaGT0yQxjaBLdg9Cq9H2oazNq8gzKTDjA+YUafTMJVyOsB8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767644443; c=relaxed/simple;
-	bh=95l8WSh0rJobw7b1v8cRHfWUu8Zpl2re0KYedQ4TJyk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tcQqvgl3goRNeK3wHEh26jwZnjREGa9IWs3A4gHDWTOgEthJIhppgKybnXo2QlMG7gjFKhwR3aU7KOSQNSX3zmvGyOEWEdKjEK6IADVwlQtC1nykP+2Ai6DFoeQIP+rtUK3f/OS/fNfOqu407YkagQ0v4cxhXQIlRxSH7iswg+0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=Bc4w9eZ/; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46072737EB
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 20:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767645879; cv=none; b=R9Smd+4b3o5oL8FhxfBe2dKWD2Qp1GS5kIPzJWjycXB+NWACL1cZuCk8ftPYijiXkdyoN1hbiwCCP9r7+TNh/N0Sskzpmd6RuRGmtV8IAvyP7PNRZRO4QRPMY4elCy4G4BbsRVEQ4uAKpvSN0b8FHegE7UR/JJOY/eWC2GPbq4Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767645879; c=relaxed/simple;
+	bh=PZiuIZaNeVLbsSobN0esnaPFTqwG7Bu6GAQxnR0V7to=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=oaNzcuYMTlFiQZvsOcbULuLYZoBxKeOCnpudwJGr5k6bLrEGmPEcOQABIkrFE0syvu5pB+mysyFXW+0DGBi5s99FOLebrnENJFU7kewhoBhKA3gl2gUm1X6vu4fRlztJb5qO2mKyE+zf8OaRsa9G4USFnJGhjFjvxyi/O7I/UXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q7KrTNjW; arc=none smtp.client-ip=209.85.221.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="Bc4w9eZ/"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:4::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4dlQfF1cYYz49PxB;
-	Mon, 05 Jan 2026 22:20:37 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1767644437;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEuxk8XgC335TU92Sj8gMqbY+TPDwI63Km2fFwdi5HY=;
-	b=Bc4w9eZ/ugAfu5vK7XNUhxzrLgv59zIKXVvVtK7oa17gBLbhBNyP7O9VJA9EWp1td1z45R
-	7neewTIsv9s/MPSyc1V0MfAJhSEBAFYVI6AiKOKxP2V6onKMy4amSVS3+L2aQSjDaThC4d
-	M3uEdTwzNYBQ8YkrMXt8auXuBW2+s24kIg1OAvqu/l740iXHbrOtMoZhPOtxVz2Bby+6mb
-	64jjMKNN0alyxODf87b5k0yRXAYJ9fMkQBD4cWnf6SN0D2pudpt/tCLpx565Au20XCZaFP
-	UlgimkBbKaNFQ9VDMwv8QJ7UMYz/keeh7P6Y/Fnl1FeSK7qHXA3bqUUC0Nqntg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1767644437;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEuxk8XgC335TU92Sj8gMqbY+TPDwI63Km2fFwdi5HY=;
-	b=IA7pi7mjqn3S87cUgjDKhaaSmDGuKb6pNeGAMBJMV25fKofiPFzMscsye30yE+L6fJ1lss
-	0Wp3o4jK02+OQ0MxqqQn/xAhzqzeR0p8DMdlUlGg1BjqsMyvLXffnybYKkGAb8G4anC/mz
-	Flc0bVfUTHDvcKobqGkRRgsGZkP6zUyQVCIQabMDVb+Qisq+QeFdDx3oVvxWOQEREND2bo
-	3dtQzBJkedsSPcue6FaGY5FMfBcwQmLn3LNWPGefkdgFakkxlo8W1WEWFjUZcep+huy5kT
-	+JYk1zY1lvg43QOZ+z14oCQnRGLVtinqz5AMTqIimBBRjNhcrgKPnKlkzi/tSQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1767644437;
-	b=D9Sz+yXdr1husTgodLMO7LZg4oBgsjTMI9UTWSJN3cxr2D3rrxWit24EXCeytEnfTI3sMM
-	X4SEDoq1GRQPI8LfhVe8V3e/mZ+U927hGBmj+S18JLq9na8AE5mDHG3xLCqkXkgat/pJNh
-	vFNe10kwodp8sfYMsrqk1xjNPWWaoO2QoIld5fRkxCmimusYjiZAViliqK2Cqgq5I3xtqm
-	+jJbv4teEskvl4+MrRD4XoysgMemEypbm0qR27PA3B0Yg4pKN7PIysWIThDIFKpyAbplc6
-	UCO9omulbswzGLa9yR8fVOcjoSeScX7k+zMoTu4AKglbbnuD5o4ZNvtG2tvWSg==
-Message-ID: <7126bb812e05c324970c04604b5377e84a0e54f2.camel@iki.fi>
-Subject: Re: [PATCH BlueZ 1/3] shared/bap: add bt_bap_stream_is_server
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 05 Jan 2026 22:20:35 +0200
-In-Reply-To: <CABBYNZ+t35ShsD2C+Hee8tOLpBgsq4L+keS6bozqPr5m+rn6ig@mail.gmail.com>
-References: <cover.1767559459.git.pav@iki.fi>
-	 <ce1ecf069f0856ff58471bbc39c6e38ad4acf0a9.1767559459.git.pav@iki.fi>
-	 <CABBYNZJ5gFe1N-NGU-ni7TybTraCh3yFDjwSEzYUzeC84_Kqyg@mail.gmail.com>
-	 <afee37a9062cab55f853b25ec1550eab005d6306.camel@iki.fi>
-	 <CABBYNZ+t35ShsD2C+Hee8tOLpBgsq4L+keS6bozqPr5m+rn6ig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q7KrTNjW"
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5597330a34fso216690e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Jan 2026 12:44:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767645876; x=1768250676; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RfrEjrHfpB4Wu1oMdwsyFbuqzphovEBKdvU8L1SQw4M=;
+        b=Q7KrTNjW2u+IEqeBVENo4Tg9E+1E6/N/8iQnwvHCMRd7IQcXAJ1lu/aMkTnKSqLeVB
+         8kKlPObF3GE/dWtT2+kT/dskAuLFeVUjssRGv5j27veMg0fMJaR7A0L1007idnJTM7zo
+         0X2uAmnMLNSTtlwRRPVxcHolBtMyj391zPsLX5VjAjyO1hwUOVgo+TDYpQmX9wzApGy7
+         7W34iV/O1MYWgNUkg1xsFWEVqlYHTqYO8Y+9yyxm1CwIplLd9CpeKRJy9gY+6WTrv1aT
+         Nq9OF+kum9JWQyivBuouPDDc3HfyDpGO1f0ep5BQq7AcgvcI9PlxJyUxgjYSWD9FcML5
+         9JVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767645876; x=1768250676;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RfrEjrHfpB4Wu1oMdwsyFbuqzphovEBKdvU8L1SQw4M=;
+        b=Swa/rp7je29GUvw3nN1CRYkMLX++6wSTzPhrS+k/d8yVVMMK0kBZgGYTHofuMcjTyY
+         7NyBj38n0q+mPUyUxVZcRgxj5+wbAhngzeMyXvSgZUsSWv3ONUAuFVSXlMCnQ8pDouf/
+         N7lAeWNb2xtfINLrRxc4vj4fB35xeKZxmWjixv7oQnpi2skxJpr9JmZczzHEOBzv0oFj
+         lNm6iJzZEFXuqIeNDd+VRNhmLj5HLi8S9MdwQ3VwOul9UeR8bHQcFxCjP83TUr7npjiC
+         3LEd/zRL1SDWVolGEQDWVT7oWQIXBmrz3DYFCPImIbHBRBzDbJGiHmuYHJ2RaX7ToRiX
+         5bLw==
+X-Gm-Message-State: AOJu0YwjJNnfiAwlzjt7KyyB9/hQjgxmEQ6r2UwAx3nw+EcxaKOgVicz
+	RlIlBUspT/OfJqyt3OxhQAhw74tk5Yn7ZaL9WIjasJKID7DN4qj2luAhGte4zUfP
+X-Gm-Gg: AY/fxX4iJ54EQ4c6LcHsSM6Mepg6Ov8kHDs2O4vyrHvuA4GRL9pajra/IX1qb4BQnaX
+	O1o15QLEeDklJ7JejR+6BQQZZySWI9EWCeEpScu2NmdyEeADQIkJx6c5uWHuQxeI8tIgtA/MNp+
+	nQ9tcCnYYGeRuzefSH5GOQR7/n7yo+o05+7/YTnRJ2ZfWoBvbu7OmfF6Aqro5DDIkah4jiYb7po
+	fCKpa+P/Qauctht+Q5Zvo3tWHVbKEw1h5mBgxORzfRxU11hAdv8FnE+FyTEG6z3uxzyXen6lHR9
+	W4QrT/s7glb9G/Te25hbeZ4p5VKPLuvefWNGSV4b0H/8Zm/QIIuj+iX2I4jdcKhMbGnBQ7aGmtz
+	W1XmvPI1jf6xMc5Dlf+ePm/mhA1MfWbuZkE9j6ZYYIOSrtjuvls/KfY7p0cs4lp/sfLWAUbWHDj
+	FMzhtb322wiCAqfahkLqqzC0QJNAgdTyyDwpYlw4EAkkGBARygexX+3EtdX2Zlj5wKz92lUu1OC
+	1MCIw==
+X-Google-Smtp-Source: AGHT+IFA8JbJ9njQur+DJg0dJ1yqRQNMEXX9yerjCseeXK4qe/EZ7USSxmCnHWtoLnTAQyb4HHELuA==
+X-Received: by 2002:a05:6122:919:b0:559:83be:69c5 with SMTP id 71dfb90a1353d-5633950fde7mr241661e0c.10.1767645876229;
+        Mon, 05 Jan 2026 12:44:36 -0800 (PST)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5633a414155sm94116e0c.15.2026.01.05.12.44.35
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 12:44:35 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: Fix using PHYs bitfields as PHY value
+Date: Mon,  5 Jan 2026 15:44:26 -0500
+Message-ID: <20260105204426.3034176-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-ma, 2026-01-05 kello 14:29 -0500, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
->=20
-> On Mon, Jan 5, 2026 at 2:09=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
-> >=20
-> > Hi,
-> >=20
-> > ma, 2026-01-05 kello 13:45 -0500, Luiz Augusto von Dentz kirjoitti:
-> > > Hi Pauli,
-> > >=20
-> > > On Sun, Jan 4, 2026 at 3:51=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wr=
-ote:
-> > > >=20
-> > > > Add function for determining whether a given stream is a BAP Server
-> > > > stream or not.
-> > > > ---
-> > > >  src/shared/bap.c | 6 ++++++
-> > > >  src/shared/bap.h | 2 ++
-> > > >  2 files changed, 8 insertions(+)
-> > > >=20
-> > > > diff --git a/src/shared/bap.c b/src/shared/bap.c
-> > > > index 6a35e4e1d..d0425318c 100644
-> > > > --- a/src/shared/bap.c
-> > > > +++ b/src/shared/bap.c
-> > > > @@ -4270,6 +4270,12 @@ uint8_t bt_bap_stream_get_type(struct bt_bap=
-_stream *stream)
-> > > >         return 0x00;
-> > > >  }
-> > > >=20
-> > > > +bool bt_bap_stream_is_server(struct bt_bap_stream *stream)
-> > > > +{
-> > >=20
-> > > It is probably a good idea to check if the stream is valid first
-> > > before attempting to check if the client field is valid.
-> >=20
-> > Yes
-> >=20
-> > > > +       /* Stream is a BAP Server stream (not Broadcast or BAP Clie=
-nt) */
-> > > > +       return !stream->client;
-> > >=20
-> > > Hmm, so the assumption here is that stream->client is set for
-> > > broadcast as well? Perhaps the terminology is misleading here, perhap=
-s
-> > > initiator would have been better, otherwise this may be confused with
-> > > BAP client/server role which only applies to unicast, anyway Im fine
-> > > rewording it later but I think it would be clearer to have something
-> > > like bt_bap_stream_is_initiator.
-> >=20
-> > Yes, client=3Dtrue is set for bcast in bap_bcast_stream_new().
-> >=20
-> > This is intented to returns whether the stream is BAP Unicast Server
-> > stream, hence the is_server() suffix, but maybe it's slightly strange
-> > API with broadcast.
-> >=20
-> > Maybe bt_bap_stream_is_initiator() is clearer here,
-> >=20
-> > Local is Initiator Sink (Unicast only) -> MICP
-> > Local is Initiator Source (Unicast or Broadcast) -> VCP
-> > Local is Acceptor Sink (Unicast or Broadcast) -> VCS
-> > Local is Acceptor Source (Unicast only) -> MICS
-> >=20
-> > where Initiator is assumed to also be Commander, with the definitions
-> > from CAP.
->=20
-> Yep, I guess that is clearer than reusing the client in the context of
-> stream, or perhaps MICP/VCP have role definitions for these?
+This renames the PHY fields in bt_iso_io_qos to PHYs (plural) since it
+represents a bitfield where multiple PHYs can be set and make the same
+change also to HCI_OP_LE_SET_CIG_PARAMS since both c_phy and p_phy
+fields are bitfields.
 
-MICP/VCP have role definitions but they appear equivalent to just
-Client/Server but in different words. AFAIK they don't associate them
-with BAP streams.
+This also fixes the assumption that hci_evt_le_cis_established PHYs
+fields are compatible with bt_iso_io_qos, they are not, the fields in
+hci_evt_le_cis_established represent just a single PHY value so they
+need to be converted to bitfield when set in bt_iso_io_qos.
 
-I'd maybe go with CAP terminology here.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/bluetooth.h |  8 +++----
+ include/net/bluetooth/hci.h       |  2 +-
+ net/bluetooth/hci_conn.c          | 35 ++++++++++++++++---------------
+ net/bluetooth/hci_event.c         |  8 +++----
+ net/bluetooth/hci_sync.c          |  6 +++---
+ net/bluetooth/iso.c               | 10 ++++-----
+ 6 files changed, 35 insertions(+), 34 deletions(-)
 
-> >=20
-> > > > +}
-> > > > +
-> > > >  static void notify_pac_removed(void *data, void *user_data)
-> > > >  {
-> > > >         struct bt_bap_pac_changed *changed =3D data;
-> > > > diff --git a/src/shared/bap.h b/src/shared/bap.h
-> > > > index 80e91f10a..983b9d9a6 100644
-> > > > --- a/src/shared/bap.h
-> > > > +++ b/src/shared/bap.h
-> > > > @@ -113,6 +113,8 @@ struct iovec *bt_bap_pac_get_metadata(struct bt=
-_bap_pac *pac);
-> > > >=20
-> > > >  uint8_t bt_bap_stream_get_type(struct bt_bap_stream *stream);
-> > > >=20
-> > > > +bool bt_bap_stream_is_server(struct bt_bap_stream *stream);
-> > > > +
-> > > >  struct bt_bap_stream *bt_bap_pac_get_stream(struct bt_bap_pac *pac=
-);
-> > > >=20
-> > > >  /* Session related function */
-> > > > --
-> > > > 2.52.0
-> > > >=20
-> > > >=20
-> > >=20
-> >=20
-> > --
-> > Pauli Virtanen
->=20
->=20
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 89a60919050b..69eed69f7f26 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -182,7 +182,7 @@ struct bt_iso_io_qos {
+ 	__u32 interval;
+ 	__u16 latency;
+ 	__u16 sdu;
+-	__u8  phy;
++	__u8  phys;
+ 	__u8  rtn;
+ };
+ 
+@@ -221,9 +221,9 @@ struct bt_iso_qos {
+ 	};
+ };
+ 
+-#define BT_ISO_PHY_1M		0x01
+-#define BT_ISO_PHY_2M		0x02
+-#define BT_ISO_PHY_CODED	0x04
++#define BT_ISO_PHY_1M		BIT(0)
++#define BT_ISO_PHY_2M		BIT(1)
++#define BT_ISO_PHY_CODED	BIT(2)
+ #define BT_ISO_PHY_ANY		(BT_ISO_PHY_1M | BT_ISO_PHY_2M | \
+ 				 BT_ISO_PHY_CODED)
+ 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index db76c2d1eeaa..32e75d8eabd3 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1891,7 +1891,7 @@ struct hci_cp_le_set_phy {
+ 	__u8    all_phys;
+ 	__u8    tx_phys;
+ 	__u8    rx_phys;
+-	__le16   phy_opts;
++	__le16  phy_opts;
+ } __packed;
+ 
+ #define HCI_OP_LE_SET_EXT_SCAN_PARAMS   0x2041
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 1a4b6badf2b3..713e536f7a3f 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1825,7 +1825,7 @@ static int hci_le_create_big(struct hci_conn *conn, struct bt_iso_qos *qos)
+ 	cp.bis.sdu = cpu_to_le16(qos->bcast.out.sdu);
+ 	cp.bis.latency =  cpu_to_le16(qos->bcast.out.latency);
+ 	cp.bis.rtn  = qos->bcast.out.rtn;
+-	cp.bis.phy  = qos->bcast.out.phy;
++	cp.bis.phy  = qos->bcast.out.phys;
+ 	cp.bis.packing = qos->bcast.packing;
+ 	cp.bis.framing = qos->bcast.framing;
+ 	cp.bis.encryption = qos->bcast.encryption;
+@@ -1875,10 +1875,10 @@ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
+ 		cis->cis_id = cis_id;
+ 		cis->c_sdu  = cpu_to_le16(conn->iso_qos.ucast.out.sdu);
+ 		cis->p_sdu  = cpu_to_le16(conn->iso_qos.ucast.in.sdu);
+-		cis->c_phy  = qos->ucast.out.phy ? qos->ucast.out.phy :
+-			      qos->ucast.in.phy;
+-		cis->p_phy  = qos->ucast.in.phy ? qos->ucast.in.phy :
+-			      qos->ucast.out.phy;
++		cis->c_phy  = qos->ucast.out.phys ? qos->ucast.out.phys :
++			      qos->ucast.in.phys;
++		cis->p_phy  = qos->ucast.in.phys ? qos->ucast.in.phys :
++			      qos->ucast.out.phys;
+ 		cis->c_rtn  = qos->ucast.out.rtn;
+ 		cis->p_rtn  = qos->ucast.in.rtn;
+ 	}
+@@ -1980,8 +1980,8 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 		return cis;
+ 
+ 	/* Update LINK PHYs according to QoS preference */
+-	cis->le_tx_phy = qos->ucast.out.phy;
+-	cis->le_rx_phy = qos->ucast.in.phy;
++	cis->le_tx_phy = qos->ucast.out.phys;
++	cis->le_rx_phy = qos->ucast.in.phys;
+ 
+ 	/* If output interval is not set use the input interval as it cannot be
+ 	 * 0x000000.
+@@ -2096,15 +2096,15 @@ int hci_le_create_cis_pending(struct hci_dev *hdev)
+ }
+ 
+ static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
+-			      struct bt_iso_io_qos *qos, __u8 phy)
++			      struct bt_iso_io_qos *qos, __u8 phys)
+ {
+ 	/* Only set MTU if PHY is enabled */
+-	if (!qos->sdu && qos->phy)
++	if (!qos->sdu && qos->phys)
+ 		qos->sdu = conn->mtu;
+ 
+ 	/* Use the same PHY as ACL if set to any */
+-	if (qos->phy == BT_ISO_PHY_ANY)
+-		qos->phy = phy;
++	if (qos->phys == BT_ISO_PHY_ANY)
++		qos->phys = phys;
+ 
+ 	/* Use LE ACL connection interval if not set */
+ 	if (!qos->interval)
+@@ -2124,7 +2124,7 @@ static int create_big_sync(struct hci_dev *hdev, void *data)
+ 	u32 flags = 0;
+ 	int err;
+ 
+-	if (qos->bcast.out.phy == 0x02)
++	if (qos->bcast.out.phys == BIT(1))
+ 		flags |= MGMT_ADV_FLAG_SEC_2M;
+ 
+ 	/* Align intervals */
+@@ -2233,8 +2233,7 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
+ 		return conn;
+ 
+ 	/* Update LINK PHYs according to QoS preference */
+-	conn->le_tx_phy = qos->bcast.out.phy;
+-	conn->le_tx_phy = qos->bcast.out.phy;
++	conn->le_tx_def_phys = qos->bcast.out.phys;
+ 
+ 	/* Add Basic Announcement into Peridic Adv Data if BASE is set */
+ 	if (base_len && base) {
+@@ -2243,7 +2242,7 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
+ 	}
+ 
+ 	hci_iso_qos_setup(hdev, conn, &qos->bcast.out,
+-			  conn->le_tx_phy ? conn->le_tx_phy :
++			  conn->le_tx_def_phys ? conn->le_tx_def_phys :
+ 			  hdev->le_tx_def_phys);
+ 
+ 	conn->iso_qos = *qos;
+@@ -2363,9 +2362,11 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 		return le;
+ 
+ 	hci_iso_qos_setup(hdev, le, &qos->ucast.out,
+-			  le->le_tx_phy ? le->le_tx_phy : hdev->le_tx_def_phys);
++			  le->le_tx_def_phys ? le->le_tx_def_phys :
++			  hdev->le_tx_def_phys);
+ 	hci_iso_qos_setup(hdev, le, &qos->ucast.in,
+-			  le->le_rx_phy ? le->le_rx_phy : hdev->le_rx_def_phys);
++			  le->le_rx_def_phys ? le->le_rx_def_phys :
++			  hdev->le_rx_def_phys);
+ 
+ 	cis = hci_bind_cis(hdev, dst, dst_type, qos, timeout);
+ 	if (IS_ERR(cis)) {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 467710a42d45..6d9a224dfce0 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6928,8 +6928,8 @@ static void hci_le_cis_established_evt(struct hci_dev *hdev, void *data,
+ 					  1000);
+ 		qos->ucast.in.sdu = ev->c_bn ? le16_to_cpu(ev->c_mtu) : 0;
+ 		qos->ucast.out.sdu = ev->p_bn ? le16_to_cpu(ev->p_mtu) : 0;
+-		qos->ucast.in.phy = ev->c_phy;
+-		qos->ucast.out.phy = ev->p_phy;
++		qos->ucast.in.phys = ev->c_phy;
++		qos->ucast.out.phys = ev->p_phy;
+ 		break;
+ 	case HCI_ROLE_MASTER:
+ 		qos->ucast.in.interval = p_sdu_interval;
+@@ -6943,8 +6943,8 @@ static void hci_le_cis_established_evt(struct hci_dev *hdev, void *data,
+ 					  1000);
+ 		qos->ucast.out.sdu = ev->c_bn ? le16_to_cpu(ev->c_mtu) : 0;
+ 		qos->ucast.in.sdu = ev->p_bn ? le16_to_cpu(ev->p_mtu) : 0;
+-		qos->ucast.out.phy = ev->c_phy;
+-		qos->ucast.in.phy = ev->p_phy;
++		qos->ucast.out.phys = ev->c_phy;
++		qos->ucast.in.phys = ev->p_phy;
+ 		break;
+ 	}
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index ab0b68faa61c..5179ecf3ff63 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2948,8 +2948,8 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
+ 			if (conn) {
+ 				struct bt_iso_qos *qos = &conn->iso_qos;
+ 
+-				if (qos->bcast.in.phy & BT_ISO_PHY_1M ||
+-				    qos->bcast.in.phy & BT_ISO_PHY_2M) {
++				if (qos->bcast.in.phys & BT_ISO_PHY_1M ||
++				    qos->bcast.in.phys & BT_ISO_PHY_2M) {
+ 					cp->scanning_phys |= LE_SCAN_PHY_1M;
+ 					hci_le_scan_phy_params(phy, type,
+ 							       interval,
+@@ -2958,7 +2958,7 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
+ 					phy++;
+ 				}
+ 
+-				if (qos->bcast.in.phy & BT_ISO_PHY_CODED) {
++				if (qos->bcast.in.phys & BT_ISO_PHY_CODED) {
+ 					cp->scanning_phys |= LE_SCAN_PHY_CODED;
+ 					hci_le_scan_phy_params(phy, type,
+ 							       interval * 3,
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index e36d24a9098b..1459ab161fd2 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -361,7 +361,7 @@ static int iso_connect_bis(struct sock *sk)
+ 	}
+ 
+ 	/* Fail if out PHYs are marked as disabled */
+-	if (!iso_pi(sk)->qos.bcast.out.phy) {
++	if (!iso_pi(sk)->qos.bcast.out.phys) {
+ 		err = -EINVAL;
+ 		goto unlock;
+ 	}
+@@ -458,7 +458,7 @@ static int iso_connect_cis(struct sock *sk)
+ 	}
+ 
+ 	/* Fail if either PHYs are marked as disabled */
+-	if (!iso_pi(sk)->qos.ucast.in.phy && !iso_pi(sk)->qos.ucast.out.phy) {
++	if (!iso_pi(sk)->qos.ucast.in.phys && !iso_pi(sk)->qos.ucast.out.phys) {
+ 		err = -EINVAL;
+ 		goto unlock;
+ 	}
+@@ -894,7 +894,7 @@ static struct proto iso_proto = {
+ 	.interval	= 10000u, \
+ 	.latency	= 10u, \
+ 	.sdu		= 40u, \
+-	.phy		= BT_ISO_PHY_2M, \
++	.phys		= BT_ISO_PHY_2M, \
+ 	.rtn		= 2u, \
+ }
+ 
+@@ -1661,7 +1661,7 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ static bool check_io_qos(struct bt_iso_io_qos *qos)
+ {
+ 	/* If no PHY is enable SDU must be 0 */
+-	if (!qos->phy && qos->sdu)
++	if (!qos->phys && qos->sdu)
+ 		return false;
+ 
+ 	if (qos->interval && (qos->interval < 0xff || qos->interval > 0xfffff))
+@@ -1670,7 +1670,7 @@ static bool check_io_qos(struct bt_iso_io_qos *qos)
+ 	if (qos->latency && (qos->latency < 0x05 || qos->latency > 0xfa0))
+ 		return false;
+ 
+-	if (qos->phy > BT_ISO_PHY_ANY)
++	if (qos->phys > BT_ISO_PHY_ANY)
+ 		return false;
+ 
+ 	return true;
+-- 
+2.52.0
 
---=20
-Pauli Virtanen
