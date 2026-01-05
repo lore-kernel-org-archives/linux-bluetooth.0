@@ -1,35 +1,35 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C4813FEE
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 19:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9782513FEE
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 19:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767642060; cv=none; b=DEdPU+Pd1K3uAXiM4a92oldUh3U/CSY4pOGdnAfhsjAXoxA+0sp3r48V4+gBbyEp3kS7md/ogAKrjNXBHyRPFPF5JcxxsepouSL42TC+vluV3y8WVELm+R8WKXDcrC5Q0Ka+uAdg/EUL1o75B5Dq/lTLCC6a1Owjo6CGPZiF3ZQ=
+	t=1767642103; cv=none; b=icicJMa4iw1HaRT8OeyCEfOgYZAYDyDQlPOK/p1sidP+f30OsiBp5QZCEvbO00J3h85AvOFtn3Aji2NTbYSxKxPwcvZ8EleuHKjB4kJ+qp8FLXnWIEDVyuxRDgejMuMKUcaMDggxA2p8GeRaje/DfxPQ1pq040w+GWC6lG7iXTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767642060; c=relaxed/simple;
-	bh=2WQogkOZytk5hQjPHl5YrKgKAY0z60xe+lQiiunDPZE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=gcS8fY3WVM7mkKdv26tbcLTvR9eYg3BbAVrH/JMwiUkILqjRlbiB10j7Yi1cKdVQyjbnLi3AvGJR/EGFNp6DDHenSbsIZX8bwNQouDp55zVPMqlzejypD5BgkynClOBaVvmHGrLVgIlxrTj5U9n08nHeTUoRqR4AuLGYBMzcmqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Zd4kMoQ9; arc=none smtp.client-ip=192.30.252.211
+	s=arc-20240116; t=1767642103; c=relaxed/simple;
+	bh=p9w3vciB+ywk3vi1VbAM2sE349DRKL7/EWtUwuR1xik=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=nixFrO4Z6/I5cquY8AtWtEWQ1/wOAw8vhXB8tMILft72zO6q3UdVnG5MS180E7IPKFiYwkE1Ir+/ZITZbEIvL0K415+rCSNcDz+nTyT51hh0oB0Hxmg1/ByyCsSJZDCsFOiF1cOo37c/RSHt42tQY8VKi9BjubuGqZJtAdW1fh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=EIbKxFZw; arc=none smtp.client-ip=192.30.252.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Zd4kMoQ9"
-Received: from github.com (hubbernetes-node-117a8f8.ash1-iad.github.net [10.56.209.94])
-	by smtp.github.com (Postfix) with ESMTPA id 6D49792078C
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 11:40:58 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="EIbKxFZw"
+Received: from github.com (hubbernetes-node-ce3e992.va3-iad.github.net [10.48.171.36])
+	by smtp.github.com (Postfix) with ESMTPA id A9E1C4E03F8
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Jan 2026 11:41:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1767642058;
-	bh=xhRxJ6ipo8WYHapJD+g0XUFR2s3d7Ap7D9mHN+ckpe8=;
+	s=pf2023; t=1767642101;
+	bh=AUZD1vU+AlvcbNHPT+TBz8MYJiVSffiwWEhSFhhX6KA=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Zd4kMoQ9O2jASqmpDHRc5fWkBxAvK2jGJQmbjx6lDmZvz+68qMFsFoeJPtLnh4YSw
-	 sWmKu4YaxBtJgRnQpZm3hw8Pl3tnbIVVcC5Zl0NtPAFFfC/3m2NSu0vnOXZGqxPn/y
-	 DoFrK6U512jeDFlP7dzhV8w7x8IAUlxk3lFdTwj0=
-Date: Mon, 05 Jan 2026 11:40:58 -0800
-From: Pauli Virtanen <noreply@github.com>
+	b=EIbKxFZwBn7XIM9NOF9YUMWJoZa5NIxwE3v7ImNwZnxHJAkjyPh8gWqcYWih3AfJ6
+	 +ZbU2Vo3KA2Q8baPnVx8zXRg3QvJRlOoKHFDU4ESsQaWTHKIcf/0I0fXY1cbpJGw0p
+	 Ev1tmgN/7VtyBXp51sUQ0vD3xtG7vDBwwcslISBQ=
+Date: Mon, 05 Jan 2026 11:41:41 -0800
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/f30307-c8fb53@github.com>
-Subject: [bluez/bluez] c8fb53: bap: remove setup from bcast_snks when freed
+Message-ID: <bluez/bluez/push/refs/heads/1037326/d031ad-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,26 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/1037326
   Home:   https://github.com/bluez/bluez
-  Commit: c8fb53f49cc691145c4b6447ab4eaf67ad3515b3
-      https://github.com/bluez/bluez/commit/c8fb53f49cc691145c4b6447ab4eaf67ad3515b3
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-01-05 (Mon, 05 Jan 2026)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: remove setup from bcast_snks when freed
-
-create_stream_for_bis() adds setups to data->bcast_snks, but they are
-not removed from there in setup_free() which may cause double free in
-bap_data_free().
-
-Fix by removing setups from data->bcast_snks when freed.
-
-
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
