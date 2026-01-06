@@ -1,111 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEAD329C5D
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Jan 2026 12:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A39327C0D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Jan 2026 12:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767703119; cv=none; b=j7GnYReGA7zS3yTtKFrWs1UKsw5KiQAqx5mIJ+eaQ2+2kqAh0aIptkOBl5BrwlFw+zoSQXBw6616+HTEgYATHJ6693vrmdemJa3q0rxImDTQVyv72tcWyrTPRzauHf3eJflIJp7GKgetP9MgJxn2sr+BIqK+Ftw3BIqUFEsBSSg=
+	t=1767703672; cv=none; b=ujWzcrIk7D22srGjuox3BhhW+kaz+XSc/dg6y4i9jUxI/SYg35a7tuXVdiuVGnbo17ggqTG9FdxgJZIAfaUdpbqaLooWdNzGC3ELwUnIYI7hDhOwYh9tyi10EyxIJf5/YI5qPyeodlbMKsUZq6JNIS3j4/4FimN9E4sKbOXBVVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767703119; c=relaxed/simple;
-	bh=/WJ3FXylxb75JjfkAYrSDskdl0Pr5JcXSOfrWa9vX2M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=spvmHpEGqtjUTvf3jB0YLURKw3qQopJRNqODVDYhFySfjnCW8ZBU1ddihuF7cuk9lSYguqrYZbye0Ow9zIbyiahFTCBp2/ZYW4gP0qA65SRMZpb7WoUJIK/31GkEoTs1WJqYgzmggBlNbGk1Cpojw7eGkIc4IgJo3JFa1PPkdN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eBijw961; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767703672; c=relaxed/simple;
+	bh=NQGC3hiDPKKTWfzYg1u7VRePemVOOQK0yPtv/upFZiI=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G04EoIgt6GDyvmb99Otdg78MZnL0WXJCsAcZ1teq4yNsVUXmgWoRfumVKOlk4AQbKpSvSgZWAbvQnva0EtDsIIzDPnI+5ad/CqdGueYmwycdWLdgQa2dTVN57J69ttX3G/QO2f/rFlbMdH82jQb/ESkV4uT6clVm4qEw76x995U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kXfrnHZ1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBijw961"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB304C19424
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Jan 2026 12:38:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kXfrnHZ1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48B6BC19425
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Jan 2026 12:47:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767703118;
-	bh=/WJ3FXylxb75JjfkAYrSDskdl0Pr5JcXSOfrWa9vX2M=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=eBijw961FdVqdQ5lzqU/ESM00AOiadOqx+ua0ZRGi8NdxZOi0LmsS4uMs8po6Cb0O
-	 5TMhTC1pqRmu5yMhNHRR+d9WYEpa5PYeh2yArJhCA70XzCJpBcWfx41mNkMu0g87H7
-	 xo89EoRPkf34wKF1WWhYht/GJw/1OcOhYW0wZp+ouQonriPSRbIJVqOczclQENQpIe
-	 N8Gjs/7c0iTXE66WYqZPBMwfi2/XNAtnLCMO3RPd6DP97ZzSdEoYSqQ4ZTSfsUnQ12
-	 xGnHMMTQLsb/EQJU/s/eAr+K2BKAJOufY6CAyLHUMxqYPkOXol0F+D/fjg/dimDcik
-	 qXCIufIZGv6/A==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-59b672f8e40so630520e87.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Jan 2026 04:38:38 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUAmm0YTeNpQi+4/9eiZuaBQXYiMoVbbWSmg8U/Nt2nZPhJGpOip1okw98znHgbDsR4/k3gkhF1Y5znGbsJJ+k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf1yBOdsDmLahWCojqavmUMhSPn+pKnUOPsyNSH4+hkgrJUoZh
-	vcBdse4lM8qr0Sv4x/laLe7/IrEYufLlhiy7Xa4ZiwcP/sVgM/mSfSA9ofyO1yr2BzbEyhH5M8H
-	ovgiW5YuTv2OvnJxuBBFQDVFU+burwApkmCae31C0tw==
-X-Google-Smtp-Source: AGHT+IH/5oi/Mm4ylt/aH4A15j/ljVlSgxeG2MAOav7Sf6QITgCC+i0rM7ktFn11IEgwttpux/NAggqCjE5gcEsv344=
-X-Received: by 2002:a05:6512:4010:b0:598:f2e1:f616 with SMTP id
- 2adb3069b0e04-59b652b8202mr751335e87.29.1767703117392; Tue, 06 Jan 2026
- 04:38:37 -0800 (PST)
+	s=k20201202; t=1767703672;
+	bh=NQGC3hiDPKKTWfzYg1u7VRePemVOOQK0yPtv/upFZiI=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
+	b=kXfrnHZ1RhCuhF4Yu67ji1qyJgyC88rFVGpH1nILoIwnOxZT9D0bLQi7WdN6rPIxr
+	 2Zbc7idacOWCrZz8nWANJnNnR66Xjjm11wqKOjgEmfbnX0TMJp5OqNJUuL6hlre6ND
+	 o3IB0bt1Gup+CkaHsHu+AAkYM2zI+iC3EArf6rhspAHdTIhuGEqNZDECUortPoMVvc
+	 qy0tgrx3vYhxM+JtNi6mXvzjGNJ3qBS5yahjtpQypWuI9N2BcgiAlHz1YHHfuKsoYF
+	 WDJr/gEeaVq6+OxOTmkFe8++98SWcqBNvsjZrjl5PUKcYyGh/i+KCHXH3AfZNDu/ky
+	 2wshmTxo9BoMQ==
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-595910c9178so753668e87.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Jan 2026 04:47:52 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUR7nELBhFoz6IQfw1TpIR0OJtmNbS1/PKs6TG0uX6633gJMmOSwMMjznYGntoBK7g1CXuKFGVxc6L+21+CB9A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7rk+tRUIFqPtT7lftPoR4H9Zwf2fLD1OkHX7wBuQJu2JS/NmT
+	EZhz69aS04L6MkFxElvgx9P6w+azjL3HJN/nCkbavzdWgaGG4m19wIz+y314rc9+w00Mw2+tLkl
+	2+HCmMqJTJwTtQRVX813pRsr9cJKKGVNMkucylhs7GA==
+X-Google-Smtp-Source: AGHT+IHsOGMS2kWnD7UXPpC7pq1fOQ4U2dZYY2aVj4WcmZGkiBh+z+fLu2SrOhDgKkUso98ZCQ3YB27/lj2jbEkRPpc=
+X-Received: by 2002:a05:6512:3c8b:b0:598:ef90:3e87 with SMTP id
+ 2adb3069b0e04-59b6529257emr966684e87.18.1767703670946; Tue, 06 Jan 2026
+ 04:47:50 -0800 (PST)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 6 Jan 2026 07:47:47 -0500
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 6 Jan 2026 07:47:47 -0500
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260106094310.784564-1-jinwang.li@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260106-wcn3990-pwrctl-v2-0-0386204328be@oss.qualcomm.com> <20260106-wcn3990-pwrctl-v2-3-0386204328be@oss.qualcomm.com>
-In-Reply-To: <20260106-wcn3990-pwrctl-v2-3-0386204328be@oss.qualcomm.com>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Tue, 6 Jan 2026 13:38:25 +0100
-X-Gmail-Original-Message-ID: <CAMRc=McxGOejmegC9KaNLpCbxSL_CWmPC2PwfQGxQ+vaHg+rOw@mail.gmail.com>
-X-Gm-Features: AQt7F2rrsJVu7GLT96AFg8gb0rDx8lEL223Ap08R9PVwfe0DiaVCdXK84QTL9yQ
-Message-ID: <CAMRc=McxGOejmegC9KaNLpCbxSL_CWmPC2PwfQGxQ+vaHg+rOw@mail.gmail.com>
-Subject: Re: [PATCH v2 03/14] Bluetooth: qca: fix ROM version reading on
- WCN3998 chips
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Matthias Kaehlcke <mka@chromium.org>, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
-	linux-pm@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>
+References: <20260106094310.784564-1-jinwang.li@oss.qualcomm.com>
+Date: Tue, 6 Jan 2026 07:47:47 -0500
+X-Gmail-Original-Message-ID: <CAMRc=MdYUq6q76ZbBA5EWh68BRLby9veWcYG0bgWGkMcSV9GJw@mail.gmail.com>
+X-Gm-Features: AQt7F2qmIoZjhJuRB9zmBna7dKx8knRdQqrxaDyXpjctjFf_Lgxa4niRZ3OzmEk
+Message-ID: <CAMRc=MdYUq6q76ZbBA5EWh68BRLby9veWcYG0bgWGkMcSV9GJw@mail.gmail.com>
+Subject: Re: [PATCH v4] Bluetooth: hci_qca: Cleanup on all setup failures
+To: Jinwang Li <jinwang.li@oss.qualcomm.com>
+Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com, 
+	quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com, 
+	shuai.zhang@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com, 
+	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 6, 2026 at 2:01=E2=80=AFAM Dmitry Baryshkov
-<dmitry.baryshkov@oss.qualcomm.com> wrote:
+On Tue, 6 Jan 2026 10:43:10 +0100, Jinwang Li
+<jinwang.li@oss.qualcomm.com> said:
+> The setup process previously combined error handling and retry gating
+> under one condition. As a result, the final failed attempt exited
+> without performing cleanup.
 >
-> WCN3998 uses a bit different format for rom version:
+> Update the failure path to always perform power and port cleanup on
+> setup failure, and reopen the port only when retrying.
 >
-> [    5.479978] Bluetooth: hci0: setting up wcn399x
-> [    5.633763] Bluetooth: hci0: QCA Product ID   :0x0000000a
-> [    5.645350] Bluetooth: hci0: QCA SOC Version  :0x40010224
-> [    5.650906] Bluetooth: hci0: QCA ROM Version  :0x00001001
-> [    5.665173] Bluetooth: hci0: QCA Patch Version:0x00006699
-> [    5.679356] Bluetooth: hci0: QCA controller version 0x02241001
-> [    5.691109] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
-> [    6.680102] Bluetooth: hci0: QCA Downloading qca/crnv21.bin
-> [    6.842948] Bluetooth: hci0: QCA setup on UART is completed
->
-> Fixes: 523760b7ff88 ("Bluetooth: hci_qca: Added support for WCN3998")
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+> Fixes: 9e80587aba4c ("Bluetooth: hci_qca: Enhance retry logic in qca_setup")
+> Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
 > ---
->  drivers/bluetooth/btqca.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 7c958d6065be..86a48d009d1b 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -804,6 +804,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baud=
-rate,
->          */
->         if (soc_type =3D=3D QCA_WCN3988)
->                 rom_ver =3D ((soc_ver & 0x00000f00) >> 0x05) | (soc_ver &=
- 0x0000000f);
-> +       else if (soc_type =3D=3D QCA_WCN3998)
-> +               rom_ver =3D ((soc_ver & 0x0000f000) >> 0x07) | (soc_ver &=
- 0x0000000f);
->         else
->                 rom_ver =3D ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver &=
- 0x0000000f);
->
->
-> --
-> 2.47.3
->
 
 Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
