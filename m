@@ -1,69 +1,73 @@
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+Received: from mail-ua1-f67.google.com (mail-ua1-f67.google.com [209.85.222.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6919027B50F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Jan 2026 20:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9CB1494A8
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Jan 2026 20:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767730166; cv=none; b=RJnrRc9ieGJaiQVK+NsjjQR/4IkLjthdaRYXWJHTsNN3j46Cl4pDniWsxqxPUjjVzbuMko28G/KY+GlV4nm0X+4NBxEzY0Jiq0WAc0z3YM/MiEcLH/wSNSAE+BHbBdaHlOrqjVNe9jyZMTcjKnP8IUG6Ym7Kb/12lLuN2zJw1Ok=
+	t=1767730167; cv=none; b=QBu0sMcX91/Q6AMVRx4UBcDhelwJ60ZBbLF7l/6/0lnW8nvrB4UHZJR3hh2izFOxT2yzcvIlP+oFbHU1JNmaIiyOV7q7qg8XsNy7NFvZ+42xLCo31DCx7xEwz3fWv2d1EtYPAl2h8aLM5fTbejaI1BRbO1dfgpOa6opnGPqNhVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767730166; c=relaxed/simple;
-	bh=ppPzgR440gFNPRD6EL56Cjou9sZrmZYs1rw70EIzf40=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=GeaLJwXgS6a4FWQwyuTCSQeaQt04plAUYGVROuZV1AlA1k6jrrKCuc+dxtZCj0xzqWi5c19zqVuWudZB6yqjBEgSXugs38S2yebyVsQtztVR0oskM/0+gyCKH6ZnNq/M4LRtff8hAJ09FgRR5uML/Riz5b0C2Jp2LM+Wad1/ZnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DLRK4uIL; arc=none smtp.client-ip=209.85.222.50
+	s=arc-20240116; t=1767730167; c=relaxed/simple;
+	bh=MG71iW1kLIEvNaPoI37SBj3+VJhf3UArgsxf0sSgC/0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eGEsDy4Xu8DIi+pOvcJWKtUjHPUfwZGQVQno7Zvcn2WzuCdxgIbzlKJa7K/95cpqUPsL863TduKRgYiyCgoudMOO4/AdUeXtxmnoFsBeCPC5OxneFJXB1xlewGz6uw6UfW3FFSvoDnH6O5h+7FJ6KSiQkQzny02ND36erHi22E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hbya416Y; arc=none smtp.client-ip=209.85.222.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLRK4uIL"
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-941275fece4so357842241.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Jan 2026 12:09:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hbya416Y"
+Received: by mail-ua1-f67.google.com with SMTP id a1e0cc1a2514c-9412512e9f3so409451241.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Jan 2026 12:09:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767730163; x=1768334963; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EEiLVpD5txKuULuEdVcnUcYTiXO8v1nkEdL8aY/+LgI=;
-        b=DLRK4uILXc0wCP0z9wShDJGXN8bMMliVEfoo78QEn3lAFva7wUPycKO8NfIacUIIdd
-         3mXq3yVo/0s8j5X9yfICpIMYZQzLmpO5eeNcI+hmGGk90EBo0OFnN8zUtUXEnRnr2MOz
-         Rh2SFvIUwfNGVMJVD1XFqogpI8XI8oqb9UgJGtmpohaGYTUkYU/O46LuFoOOqqYrE0tI
-         HWkW13GKTQwLDWtKO7klFldD72+XqURzfMBKyVagZ2yX8wDnZMQjF26RTuIEoZxHxJua
-         459l9eZ/AwMO799RwV13nJDMfgx0ljkSufxQmzTlGxhs/OVYcvTJnAxTGXzYwfhK7FWK
-         Lbmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767730163; x=1768334963;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1767730164; x=1768334964; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EEiLVpD5txKuULuEdVcnUcYTiXO8v1nkEdL8aY/+LgI=;
-        b=QzuvVim7p2hehQnOxu5B28/XofYDT727KCI/WouYHRk59VP6HG19Sl02UpeblIlgmN
-         GuYsHHQ91C8Jko473x7kdAtNJ2bjEy2oJXJRk5WoKZiXK7Olz6b2g06WZfq9pV2UYP73
-         BGN1K7B656Kp1d7Gabfd1MvGdtY5mBA1ETRB5CpjXwOqP/wSP8khsCZyOSWugfKtLBmO
-         iGZGPL03xCKkqpGt7uxlDLBrY77KJbnomChKvhHhw00bzNLErNIp2aSyseUDRSlevPZ7
-         CAFiZ6dH/G5jHYQjByTRPfzi0k+XMvjuz40cLkAn9v5JbpzbEhjGf/8sDsHA//14kjY8
-         8iXw==
-X-Gm-Message-State: AOJu0YytBrLEnbkq9jrep3hxjPNTppI+H1FP0loxG4f3Jx+9YyUTCSp/
-	UjFgXLY1ICpZ/4m8Qwp5s4clvK4n8pLqAlSoxU7yYtY0+nUxvIhNJ17tCLzYYSGd
-X-Gm-Gg: AY/fxX4KdSBXtWqCZ6N/Cg1wYfaiSTyavCJhq8EYChjVdAJBQDZi3YWuUy+Uw20t4dX
-	WMHSfsd15b+yktSCmqqdxla/WCeL4BdXwopVhybsI5lEaefk1g9JhQzIYQ3uPTCKXLYuuFSfjBB
-	WLaO2MCGTE0Bgz3N9ZHLujpsBvgW2o6w55mR+Jo55/k4jr1tA65Ay/9E+KmSOBY3ZdqIyEZ14pi
-	gHqYYMrdHbIA8Cp9oM18jUfmzbWCC+GHYBYOqYq0SSvgC96T13t8nEbocuJNsnK/i6KT3CABW1x
-	rDVGRkP21eJ+SwZgICBzOkkG3OOALuSRbBoNzY0CL+8nvCgcyz9IvtmkC1UjF9kWXpQahjh/v2S
-	wYw5QqRGu1lOPgX7nsv9JSeIX1iJZlfuskYIEnvAeZ90FjochjEpmEr2wxa0ICFrPFD7zmUAYrN
-	M0mYVN/tDf6yd1+DObb21k3KA2PoT6JgNYWkjPCNdLOEMqL4uimNe3//WELlmgpUEgIbSvGSWEd
-	hYHow==
-X-Google-Smtp-Source: AGHT+IG23eQ8fIEvKmH0aYm5EUU3YFydhMtpuQMDV33YCIdlNJ9ZnLzdyom1svDqnFOYrG/V+PEuDA==
-X-Received: by 2002:a05:6102:c0a:b0:5dd:b2ee:c6ff with SMTP id ada2fe7eead31-5ecb1e72e29mr23159137.8.1767730162825;
-        Tue, 06 Jan 2026 12:09:22 -0800 (PST)
+        bh=k2/rJIknnA9yZaxmnMRxWNRmDmTc7qzUZ/7OO17EYfc=;
+        b=Hbya416YIVtK/7zZb1zrddbnorADMhXkmsyO5UO3IVsTOptybuVhG2PXu2lhsy9Rh/
+         QbBg8teyv54ZBtBprobDdq5o+QCbTqQPCSSb1raaOD0S0xmQ4fduo2TTOUCPpNC1rhj8
+         YrkMPR+30iazmKoCwnQtBhiswUTHJxn/EHzFopTm0YOKIzKSAaFh2NkzzF2mhXrgmMt6
+         WLjn6XseGgx2gZw6P7Ny5341PykC+ZpGHtbcYpjTzD0Myu0/qfgh0BwzX3zvlHlFhL68
+         jsQtrLY94hq12J8HpozA8pBHGuE96g3sAwvGcNMQGXqT9/WvQgbIJdgteMJ1ziRzFaI3
+         FIVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767730164; x=1768334964;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=k2/rJIknnA9yZaxmnMRxWNRmDmTc7qzUZ/7OO17EYfc=;
+        b=LYgJtHjvnPCSuWba91GhSsT41+0j92hA0kgWFrjvLTfOTbO4skYVgM6FSCveHyNO0l
+         c9V0cMpgO4YvD0XMuHq140At7vbclud0Fmb0w4nYmi5NiMoUfnZfQs2GKLxtO7rLJqPo
+         vNv7tDKVyySML7iTjG5NSlAxpt0/GzYWFT6SDbK6z/h1AhuNdhN6hM1GFcXDTZKuEBGQ
+         9YDCmFHU6XmzawH5Dq5rXppHjbw6l4VW9IZLxOVfmiM5hPKXoMTg5F15klt0LBu5Ko+9
+         jGD7oWcG/9d+7OMqOiSqMVFWP1LaJHESk7rIKcMV/5wosZ6eAc/KkNDN7bZRgRMWTteV
+         gHZw==
+X-Gm-Message-State: AOJu0YzrQ8yZG/FnnLR7FbqhNOVr26mDV06bkBfa+3WVrjIuNzBQHMrL
+	C6M4jDzl4Bv2ewtWTA81Bx+e1NUbEAQE3In+BUuzptca37FWAeJkJgFeGdL2jFZ/aUs=
+X-Gm-Gg: AY/fxX4G08Wqze1k1qnWLLIpE5oNLDizFfQVC6eYUuPmZjgi3TzjQRB5PTczxjF+5dK
+	LGQ0byU9GfAzTgxCwDBEK3GCn75v3dCx3VcfsguHDa9u+SFJ8P4Q4HtLSf2co7e43AgnshaiHzo
+	EmU7WT5j006aZ6OByMqkdcsiqVPHIF3e2EaTznKBtlCPTMuWWT8dhnZ8+2cvrhdSJqv7LApeIQH
+	xmFaErxdsas20N4U1nbNoZBDUjCPAC+mZ7maHLqeplln3aDyqHwkOwI257Pr+UZTlwH8pvenf/U
+	E/HD+biykFSsDqCW+miDuPSYiPMWNLQUtPbgIq9Y8pcPBE7NfyqMpYLq3pydMPkrDpN+HEnMZwq
+	+q0W6TQWBtZbOEawcJ+n5XKY+Jr60WZ8kg2kCcFjx28nhIxJwSxmExTUK5/nwjeK39dlnPlKkQ7
+	BbBBx6IJ1JfRh1ztfWSq5s/sjuNrm+cATMH2aFmaRxwCWJ/19RRegk1OV0W+/GYrsAi+JodNFp0
+	RV5eA==
+X-Google-Smtp-Source: AGHT+IEg1eapZhrwlOKuvYlBYp9imgqo+v3LJ3Wp0f/8ik35LxB65J0ICss8AkTYQ+8+EEd82DbCUw==
+X-Received: by 2002:a05:6102:6c7:b0:5db:d411:20cd with SMTP id ada2fe7eead31-5ecb6946bcfmr14592137.28.1767730164222;
+        Tue, 06 Jan 2026 12:09:24 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-944121ef3fcsm938373241.0.2026.01.06.12.09.21
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-944121ef3fcsm938373241.0.2026.01.06.12.09.23
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 12:09:22 -0800 (PST)
+        Tue, 06 Jan 2026 12:09:23 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] lib: Rename bt_iso_io_qos phy field to phys
-Date: Tue,  6 Jan 2026 15:09:12 -0500
-Message-ID: <20260106200913.3419162-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/2] shared/bap: Fix PHY fields being treated as single value
+Date: Tue,  6 Jan 2026 15:09:13 -0500
+Message-ID: <20260106200913.3419162-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260106200913.3419162-1-luiz.dentz@gmail.com>
+References: <20260106200913.3419162-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,327 +78,387 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This renames the bt_iso_io_qos phy field to phys to emphasize it is
-actually a bitfield rather than a single value.
+BP PHY fields always refer to bitfields with the exception of target
+PHY field in bt_ascs_config.
 ---
- emulator/bthost.c         |  8 ++++----
- lib/bluetooth/bluetooth.h |  2 +-
- profiles/audio/bap.c      |  4 ++--
- profiles/audio/media.c    |  8 ++++----
- src/shared/bap.c          | 16 ++++++++--------
- src/shared/bap.h          |  2 +-
- tools/btiotest.c          |  2 +-
- tools/iso-tester.c        |  8 ++++----
- tools/isotest.c           | 24 ++++++++++++------------
- unit/test-bap.c           |  2 +-
- 10 files changed, 38 insertions(+), 38 deletions(-)
+ client/player.c            | 12 +++++-----
+ profiles/audio/bap.c       |  6 ++---
+ profiles/audio/media.c     |  2 +-
+ profiles/audio/transport.c |  6 ++---
+ src/shared/ascs.h          |  6 ++---
+ src/shared/bap-defs.h      |  8 +++----
+ src/shared/bap.c           | 49 +++++++++++++++++++++++++-------------
+ src/shared/lc3.h           |  4 ++--
+ unit/test-bap.c            |  4 ++--
+ 9 files changed, 57 insertions(+), 40 deletions(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index fe6ad4145673..d09ad1e76c50 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -3886,10 +3886,10 @@ void bthost_set_cig_params(struct bthost *bthost, uint8_t cig_id,
- 	cp->cis[0].cis_id = cis_id;
- 	cp->cis[0].c_sdu = qos->ucast.in.sdu;
- 	cp->cis[0].p_sdu = qos->ucast.out.sdu;
--	cp->cis[0].c_phys = qos->ucast.in.phy ? qos->ucast.in.phy :
--							qos->ucast.out.phy;
--	cp->cis[0].p_phys = qos->ucast.out.phy ? qos->ucast.out.phy :
--							qos->ucast.in.phy;
-+	cp->cis[0].c_phys = qos->ucast.in.phys ? qos->ucast.in.phys :
-+							qos->ucast.out.phys;
-+	cp->cis[0].p_phys = qos->ucast.out.phys ? qos->ucast.out.phys :
-+							qos->ucast.in.phys;
- 	cp->cis[0].c_rtn = qos->ucast.in.rtn;
- 	cp->cis[0].p_rtn = qos->ucast.out.rtn;
+diff --git a/client/player.c b/client/player.c
+index d7402d19d57b..1444e939d30b 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -1890,9 +1890,9 @@ static void append_io_qos(DBusMessageIter *iter, struct bt_bap_io_qos *qos)
+ 	g_dbus_dict_append_entry(iter, "Interval", DBUS_TYPE_UINT32,
+ 						&qos->interval);
  
-diff --git a/lib/bluetooth/bluetooth.h b/lib/bluetooth/bluetooth.h
-index 88a5d8b66134..f9f22c3f7523 100644
---- a/lib/bluetooth/bluetooth.h
-+++ b/lib/bluetooth/bluetooth.h
-@@ -173,7 +173,7 @@ struct bt_iso_io_qos {
- 	uint32_t interval;
- 	uint16_t latency;
- 	uint16_t sdu;
--	uint8_t  phy;
-+	uint8_t  phys;
- 	uint8_t  rtn;
- };
+-	bt_shell_printf("PHY 0x%02x\n", qos->phy);
++	bt_shell_printf("PHYs 0x%02x\n", qos->phys);
  
+-	g_dbus_dict_append_entry(iter, "PHY", DBUS_TYPE_BYTE, &qos->phy);
++	g_dbus_dict_append_entry(iter, "PHY", DBUS_TYPE_BYTE, &qos->phys);
+ 
+ 	bt_shell_printf("SDU %u\n", qos->sdu);
+ 
+@@ -2229,7 +2229,7 @@ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
+ 	else
+ 		qos = &preset->qos.ucast.io_qos;
+ 
+-	if (qos->phy) {
++	if (qos->phys) {
+ 		/* Set QoS parameters */
+ 		cfg->qos = preset->qos;
+ 		/* Adjust the SDU size based on the number of
+@@ -4162,9 +4162,9 @@ static void custom_phy(const char *input, void *user_data)
+ 		qos = &p->qos.ucast.io_qos;
+ 
+ 	if (!strcmp(input, "1M"))
+-		qos->phy = 0x01;
++		qos->phys = BIT(0);
+ 	else if (!strcmp(input, "2M"))
+-		qos->phy = 0x02;
++		qos->phys = BIT(1);
+ 	else {
+ 		char *endptr = NULL;
+ 		uint8_t phy = strtol(input, &endptr, 0);
+@@ -4177,7 +4177,7 @@ static void custom_phy(const char *input, void *user_data)
+ 		switch (phy) {
+ 		case 0x01:
+ 		case 0x02:
+-			qos->phy = phy;
++			qos->phys = phy;
+ 			break;
+ 		default:
+ 			bt_shell_printf("Invalid argument: %s\n", input);
 diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index b6eb91ab3fb6..f015f73e3c6d 100644
+index f015f73e3c6d..90a9786674ab 100644
 --- a/profiles/audio/bap.c
 +++ b/profiles/audio/bap.c
-@@ -428,7 +428,7 @@ static gboolean get_qos(const GDBusPropertyTable *property,
- 		return FALSE;
+@@ -594,7 +594,7 @@ static int parse_io_qos(const char *key, int var, DBusMessageIter *iter,
+ 		if (var != DBUS_TYPE_BYTE)
+ 			return -EINVAL;
  
- 	dict_append_entry(&dict, "Framing", DBUS_TYPE_BYTE, &qos->framing);
--	dict_append_entry(&dict, "PHY", DBUS_TYPE_BYTE, &qos->phy);
-+	dict_append_entry(&dict, "PHY", DBUS_TYPE_BYTE, &qos->phys);
- 	dict_append_entry(&dict, "Retransmissions", DBUS_TYPE_BYTE, &qos->rtn);
- 	dict_append_entry(&dict, "MaximumLatency", DBUS_TYPE_UINT16,
- 					&qos->latency);
+-		dbus_message_iter_get_basic(iter, &qos->phy);
++		dbus_message_iter_get_basic(iter, &qos->phys);
+ 	} else if (!strcasecmp(key, "SDU")) {
+ 		if (var != DBUS_TYPE_UINT16)
+ 			return -EINVAL;
+@@ -1145,7 +1145,7 @@ static bool match_io_qos(const struct bt_bap_io_qos *io_qos,
+ 	if (io_qos->sdu != match->sdu)
+ 		return false;
+ 
+-	if (io_qos->phy != match->phy)
++	if (io_qos->phys != match->phys)
+ 		return false;
+ 
+ 	if (io_qos->rtn != match->rtn)
 @@ -2242,7 +2242,7 @@ static void bap_iso_qos(struct bt_bap_qos *qos, struct bt_iso_io_qos *io)
  	io->interval = qos->ucast.io_qos.interval;
  	io->latency = qos->ucast.io_qos.latency;
  	io->sdu = qos->ucast.io_qos.sdu;
--	io->phy = qos->ucast.io_qos.phy;
-+	io->phys = qos->ucast.io_qos.phy;
+-	io->phys = qos->ucast.io_qos.phy;
++	io->phys = qos->ucast.io_qos.phys;
  	io->rtn = qos->ucast.io_qos.rtn;
  }
  
 diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index ad9eb7beb536..bf8be52ac960 100644
+index bf8be52ac960..f153e757c06d 100644
 --- a/profiles/audio/media.c
 +++ b/profiles/audio/media.c
-@@ -1049,7 +1049,7 @@ static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 						metadata->iov_len);
- 	}
- 
--	if (qos && qos->phy) {
-+	if (qos && qos->phys) {
- 		DBusMessageIter entry, variant, qos_dict;
- 
- 		key = "QoS";
-@@ -1065,7 +1065,7 @@ static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 							&qos->framing);
- 
- 		g_dbus_dict_append_entry(&qos_dict, "PHY", DBUS_TYPE_BYTE,
--							&qos->phy);
-+							&qos->phys);
- 
- 		g_dbus_dict_append_entry(&qos_dict, "Retransmissions",
- 					DBUS_TYPE_BYTE, &qos->rtn);
-@@ -1810,7 +1810,7 @@ static int parse_properties(DBusMessageIter *props, const char **uuid,
- 		} else if (strcasecmp(key, "PHY") == 0) {
+@@ -858,7 +858,7 @@ static int parse_ucast_qos(DBusMessageIter *iter, struct bt_bap_qos *qos)
  			if (var != DBUS_TYPE_BYTE)
- 				return -EINVAL;
--			dbus_message_iter_get_basic(&value, &qos->phy);
-+			dbus_message_iter_get_basic(&value, &qos->phys);
- 		} else if (strcasecmp(key, "Retransmissions") == 0) {
- 			if (var != DBUS_TYPE_BYTE)
- 				return -EINVAL;
-@@ -3073,7 +3073,7 @@ static void app_register_endpoint(void *data, void *user_data)
- 		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BYTE)
- 			goto fail;
+ 				goto fail;
  
--		dbus_message_iter_get_basic(&iter, &qos.phy);
-+		dbus_message_iter_get_basic(&iter, &qos.phys);
- 	}
- 
- 	if (g_dbus_proxy_get_property(proxy, "MaximumLatency", &iter)) {
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 6a35e4e1d948..cb6db8765e9f 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -374,14 +374,14 @@ struct bt_iso_qos bap_sink_pa_qos = {
- 			.interval	= 10000,
- 			.latency	= 10,
- 			.sdu		= 40,
--			.phy		= 0x02,
-+			.phys		= BIT(1),
- 			.rtn		= 2,
- 		},
- 		.out = {
- 			.interval	= 10000,
- 			.latency	= 10,
- 			.sdu		= 40,
--			.phy		= 0x02,
-+			.phys		= BIT(1),
- 			.rtn		= 2,
- 		}
- 	}
-@@ -1029,8 +1029,8 @@ static void stream_notify_config(struct bt_bap_stream *stream)
- 	status->state = ep->state;
- 
- 	/* Initialize preferred settings if not set */
--	if (!lpac->qos.phy)
--		lpac->qos.phy = 0x02;
-+	if (!lpac->qos.phys)
-+		lpac->qos.phys = BIT(1);
- 
- 	if (!lpac->qos.rtn)
- 		lpac->qos.rtn = 0x05;
-@@ -1053,7 +1053,7 @@ static void stream_notify_config(struct bt_bap_stream *stream)
- 	/* TODO:Add support for setting preferred settings on bt_bap_pac */
- 	config = (void *)status->params;
- 	config->framing = lpac->qos.framing;
--	config->phy = lpac->qos.phy;
-+	config->phy = lpac->qos.phys;
- 	config->rtn = lpac->qos.rtn;
- 	config->latency = cpu_to_le16(lpac->qos.latency);
- 	put_le24(lpac->qos.pd_min, config->pd_min);
-@@ -4237,7 +4237,7 @@ uint16_t bt_bap_pac_get_context(struct bt_bap_pac *pac)
- 
- struct bt_bap_pac_qos *bt_bap_pac_get_qos(struct bt_bap_pac *pac)
- {
--	if (!pac || !pac->qos.phy)
-+	if (!pac || !pac->qos.phys)
- 		return NULL;
- 
- 	return &pac->qos;
-@@ -5109,7 +5109,7 @@ static void ep_status_config(struct bt_bap *bap, struct bt_bap_endpoint *ep,
- 	/* Set preferred settings */
- 	if (ep->stream->rpac) {
- 		ep->stream->rpac->qos.framing = cfg->framing;
--		ep->stream->rpac->qos.phy = cfg->phy;
-+		ep->stream->rpac->qos.phys = cfg->phy;
- 		ep->stream->rpac->qos.rtn = cfg->rtn;
- 		ep->stream->rpac->qos.latency = le16_to_cpu(cfg->latency);
- 		ep->stream->rpac->qos.pd_min = pd_min;
-@@ -7861,7 +7861,7 @@ void bt_bap_iso_qos_to_bap_qos(struct bt_iso_qos *iso_qos,
- 	bap_qos->bcast.io_qos.interval =
- 			iso_qos->bcast.in.interval;
- 	bap_qos->bcast.io_qos.latency = iso_qos->bcast.in.latency;
--	bap_qos->bcast.io_qos.phy = iso_qos->bcast.in.phy;
-+	bap_qos->bcast.io_qos.phy = iso_qos->bcast.in.phys;
- 	bap_qos->bcast.io_qos.rtn = iso_qos->bcast.in.rtn;
- 	bap_qos->bcast.io_qos.sdu = iso_qos->bcast.in.sdu;
+-			dbus_message_iter_get_basic(&value, &io_qos.phy);
++			dbus_message_iter_get_basic(&value, &io_qos.phys);
+ 		} else if (!strcasecmp(key, "SDU")) {
+ 			if (var != DBUS_TYPE_UINT16)
+ 				goto fail;
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index fc23cf33d2b6..baf8432dece2 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -1241,7 +1241,7 @@ static void append_io_qos(DBusMessageIter *dict, struct bt_bap_io_qos *qos)
+ 	dict_append_entry(dict, "Interval", DBUS_TYPE_UINT32, &qos->interval);
+ 	dict_append_entry(dict, "Latency", DBUS_TYPE_UINT16, &qos->latency);
+ 	dict_append_entry(dict, "SDU", DBUS_TYPE_UINT16, &qos->sdu);
+-	dict_append_entry(dict, "PHY", DBUS_TYPE_BYTE, &qos->phy);
++	dict_append_entry(dict, "PHY", DBUS_TYPE_BYTE, &qos->phys);
+ 	dict_append_entry(dict, "Retransmissions", DBUS_TYPE_BYTE, &qos->rtn);
  }
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index 80e91f10a203..c1b75949f86b 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -55,7 +55,7 @@ extern struct bt_iso_qos bap_sink_pa_qos;
- /* Local PAC related functions */
- struct bt_bap_pac_qos {
+ 
+@@ -1460,7 +1460,7 @@ static gboolean qos_ucast_exists(const GDBusPropertyTable *property, void *data)
+ 	struct media_transport *transport = data;
+ 	struct bap_transport *bap = transport->data;
+ 
+-	return bap->qos.ucast.io_qos.phy != 0x00;
++	return bap->qos.ucast.io_qos.phys != 0x00;
+ }
+ 
+ static const GDBusPropertyTable transport_bap_uc_properties[] = {
+@@ -1533,7 +1533,7 @@ static gboolean qos_bcast_exists(const GDBusPropertyTable *property, void *data)
+ 	struct media_transport *transport = data;
+ 	struct bap_transport *bap = transport->data;
+ 
+-	return bap->qos.bcast.io_qos.phy != 0x00;
++	return bap->qos.bcast.io_qos.phys != 0x00;
+ }
+ 
+ static void bcast_qos_set(void *user_data, int err)
+diff --git a/src/shared/ascs.h b/src/shared/ascs.h
+index a409bad61681..494a153fec20 100644
+--- a/src/shared/ascs.h
++++ b/src/shared/ascs.h
+@@ -75,7 +75,7 @@ struct bt_ascs_ase_status {
+ /* ASE_State = 0x01 (Codec Configured), defined in Table 4.7. */
+ struct bt_ascs_ase_status_config {
  	uint8_t  framing;
 -	uint8_t  phy;
 +	uint8_t  phys;
  	uint8_t  rtn;
  	uint16_t latency;
- 	uint32_t pd_min;
-diff --git a/tools/btiotest.c b/tools/btiotest.c
-index f62248e32a8c..da50ad175c3f 100644
---- a/tools/btiotest.c
-+++ b/tools/btiotest.c
-@@ -35,7 +35,7 @@ static int opt_update_sec = 0;
- 	.interval = 10000, \
- 	.latency = 10, \
- 	.sdu = 40, \
--	.phy = 0x02, \
-+	.phys = 0x02, \
- 	.rtn = 2, \
+ 	uint8_t  pd_min[3];
+@@ -94,7 +94,7 @@ struct bt_ascs_ase_status_qos {
+ 	uint8_t  cis_id;
+ 	uint8_t  interval[3];
+ 	uint8_t  framing;
+-	uint8_t  phy;
++	uint8_t  phys;
+ 	uint16_t sdu;
+ 	uint8_t  rtn;
+ 	uint16_t latency;
+@@ -150,7 +150,7 @@ struct bt_ascs_qos {
+ 	uint8_t  cis;			/* CIG ID*/
+ 	uint8_t  interval[3];		/* Frame interval */
+ 	uint8_t  framing;		/* Frame framing */
+-	uint8_t  phy;			/* PHY */
++	uint8_t  phys;			/* PHY */
+ 	uint16_t sdu;			/* Maximum SDU Size */
+ 	uint8_t  rtn;			/* Retransmission Effort */
+ 	uint16_t latency;		/* Transport Latency */
+diff --git a/src/shared/bap-defs.h b/src/shared/bap-defs.h
+index 27fefa34f1ec..e5c2accb99f7 100644
+--- a/src/shared/bap-defs.h
++++ b/src/shared/bap-defs.h
+@@ -35,9 +35,9 @@
+ #define BT_BAP_CONFIG_LATENCY_BALANCED	0x02
+ #define BT_BAP_CONFIG_LATENCY_HIGH	0x03
+ 
+-#define BT_BAP_CONFIG_PHY_1M		0x01
+-#define BT_BAP_CONFIG_PHY_2M		0x02
+-#define BT_BAP_CONFIG_PHY_CODEC		0x03
++#define BT_BAP_CONFIG_PHY_1M		BIT(0)
++#define BT_BAP_CONFIG_PHY_2M		BIT(1)
++#define BT_BAP_CONFIG_PHY_CODEC		BIT(2)
+ 
+ struct bt_bap_codec {
+ 	uint8_t  id;
+@@ -55,7 +55,7 @@ struct bt_bap_io_qos {
+ 	uint32_t interval;	/* Frame interval */
+ 	uint16_t latency;	/* Transport Latency */
+ 	uint16_t sdu;		/* Maximum SDU Size */
+-	uint8_t  phy;		/* PHY */
++	uint8_t  phys;		/* PHY */
+ 	uint8_t  rtn;		/* Retransmission Effort */
+ };
+ 
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index cb6db8765e9f..37b04c5c1ea8 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -1053,7 +1053,7 @@ static void stream_notify_config(struct bt_bap_stream *stream)
+ 	/* TODO:Add support for setting preferred settings on bt_bap_pac */
+ 	config = (void *)status->params;
+ 	config->framing = lpac->qos.framing;
+-	config->phy = lpac->qos.phys;
++	config->phys = lpac->qos.phys;
+ 	config->rtn = lpac->qos.rtn;
+ 	config->latency = cpu_to_le16(lpac->qos.latency);
+ 	put_le24(lpac->qos.pd_min, config->pd_min);
+@@ -1097,7 +1097,7 @@ static void stream_notify_qos(struct bt_bap_stream *stream)
+ 	qos->cig_id = stream->qos.ucast.cig_id;
+ 	put_le24(stream->qos.ucast.io_qos.interval, qos->interval);
+ 	qos->framing = stream->qos.ucast.framing;
+-	qos->phy = stream->qos.ucast.io_qos.phy;
++	qos->phys = stream->qos.ucast.io_qos.phys;
+ 	qos->sdu = cpu_to_le16(stream->qos.ucast.io_qos.sdu);
+ 	qos->rtn = stream->qos.ucast.io_qos.rtn;
+ 	qos->latency = cpu_to_le16(stream->qos.ucast.io_qos.latency);
+@@ -1857,6 +1857,23 @@ static unsigned int bap_ucast_get_state(struct bt_bap_stream *stream)
+ 	return stream->ep->state;
  }
  
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index ff5c85ae410c..b851d2cd84bc 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -43,12 +43,12 @@
++static uint8_t bits_to_phy(uint8_t bits)
++{
++	uint8_t phy = 0x00;
++
++	/* Convert PHY bits to PHY values on a ascending order. */
++	if (bits & BIT(0))
++		phy = 0x01; /* LE 1M */
++
++	if (bits & BIT(1))
++		phy = 0x02; /* LE 2M */
++
++	if (bits & BIT(2))
++		phy = 0x03; /* LE Coded */
++
++	return phy;
++}
++
+ static unsigned int bap_ucast_config(struct bt_bap_stream *stream,
+ 					struct bt_bap_qos *qos,
+ 					struct iovec *data,
+@@ -1877,7 +1894,7 @@ static unsigned int bap_ucast_config(struct bt_bap_stream *stream,
  
- #define EIR_SERVICE_DATA_16	0x16
+ 	config.ase = stream->ep->id;
+ 	config.latency = qos->ucast.target_latency;
+-	config.phy = qos->ucast.io_qos.phy;
++	config.phy = bits_to_phy(qos->ucast.io_qos.phys);
+ 	config.codec = stream->rpac->codec;
  
--#define QOS_IO(_interval, _latency, _sdu, _phy, _rtn) \
-+#define QOS_IO(_interval, _latency, _sdu, _phys, _rtn) \
- { \
- 	.interval = _interval, \
- 	.latency = _latency, \
- 	.sdu = _sdu, \
--	.phy = _phy, \
-+	.phys = _phys, \
- 	.rtn = _rtn, \
+ 	if (config.codec.id == 0xff) {
+@@ -1936,7 +1953,7 @@ static unsigned int bap_ucast_qos(struct bt_bap_stream *stream,
+ 	qos.cis = data->ucast.cis_id;
+ 	put_le24(data->ucast.io_qos.interval, qos.interval);
+ 	qos.framing = data->ucast.framing;
+-	qos.phy = data->ucast.io_qos.phy;
++	qos.phys = data->ucast.io_qos.phys;
+ 	qos.sdu = cpu_to_le16(data->ucast.io_qos.sdu);
+ 	qos.rtn = data->ucast.io_qos.rtn;
+ 	qos.latency = cpu_to_le16(data->ucast.io_qos.latency);
+@@ -3162,8 +3179,8 @@ static uint8_t ascs_config(struct bt_ascs *ascs, struct bt_bap *bap,
+ 
+ 	req = util_iov_pull_mem(iov, sizeof(*req));
+ 
+-	DBG(bap, "codec 0x%02x phy 0x%02x latency %u", req->codec.id, req->phy,
+-							req->latency);
++	DBG(bap, "codec 0x%02x phy 0x%02x latency %u", req->codec.id,
++						req->phy, req->latency);
+ 
+ 	ep = bap_get_local_endpoint_id(bap, req->ase);
+ 	if (!ep) {
+@@ -3236,16 +3253,16 @@ static uint8_t ascs_qos(struct bt_ascs *ascs, struct bt_bap *bap,
+ 	qos.ucast.cis_id = req->cis;
+ 	qos.ucast.io_qos.interval = get_le24(req->interval);
+ 	qos.ucast.framing = req->framing;
+-	qos.ucast.io_qos.phy = req->phy;
++	qos.ucast.io_qos.phys = req->phys;
+ 	qos.ucast.io_qos.sdu = le16_to_cpu(req->sdu);
+ 	qos.ucast.io_qos.rtn = req->rtn;
+ 	qos.ucast.io_qos.latency = le16_to_cpu(req->latency);
+ 	qos.ucast.delay = get_le24(req->pd);
+ 
+ 	DBG(bap, "CIG 0x%02x CIS 0x%02x interval %u framing 0x%02x "
+-			"phy 0x%02x SDU %u rtn %u latency %u pd %u",
++			"phys 0x%02x SDU %u rtn %u latency %u pd %u",
+ 			req->cig, req->cis, qos.ucast.io_qos.interval,
+-			qos.ucast.framing, qos.ucast.io_qos.phy,
++			qos.ucast.framing, qos.ucast.io_qos.phys,
+ 			qos.ucast.io_qos.sdu, qos.ucast.io_qos.rtn,
+ 			qos.ucast.io_qos.latency, qos.ucast.delay);
+ 
+@@ -5061,9 +5078,9 @@ static void ep_status_config(struct bt_bap *bap, struct bt_bap_endpoint *ep,
+ 	ppd_min = get_le24(cfg->ppd_min);
+ 	ppd_max = get_le24(cfg->ppd_max);
+ 
+-	DBG(bap, "codec 0x%02x framing 0x%02x phy 0x%02x rtn %u "
++	DBG(bap, "codec 0x%02x framing 0x%02x.phys 0x%02x rtn %u "
+ 			"latency %u pd %u - %u ppd %u - %u", cfg->codec.id,
+-			cfg->framing, cfg->phy, cfg->rtn,
++			cfg->framing, cfg->phys, cfg->rtn,
+ 			le16_to_cpu(cfg->latency),
+ 			pd_min, pd_max, ppd_min, ppd_max);
+ 
+@@ -5109,7 +5126,7 @@ static void ep_status_config(struct bt_bap *bap, struct bt_bap_endpoint *ep,
+ 	/* Set preferred settings */
+ 	if (ep->stream->rpac) {
+ 		ep->stream->rpac->qos.framing = cfg->framing;
+-		ep->stream->rpac->qos.phys = cfg->phy;
++		ep->stream->rpac->qos.phys = cfg->phys;
+ 		ep->stream->rpac->qos.rtn = cfg->rtn;
+ 		ep->stream->rpac->qos.latency = le16_to_cpu(cfg->latency);
+ 		ep->stream->rpac->qos.pd_min = pd_min;
+@@ -5175,8 +5192,8 @@ static void ep_status_qos(struct bt_bap *bap, struct bt_bap_endpoint *ep,
+ 	latency = le16_to_cpu(qos->latency);
+ 
+ 	DBG(bap, "CIG 0x%02x CIS 0x%02x interval %u framing 0x%02x "
+-			"phy 0x%02x rtn %u latency %u pd %u", qos->cig_id,
+-			qos->cis_id, interval, qos->framing, qos->phy,
++			"phys 0x%02x rtn %u latency %u pd %u", qos->cig_id,
++			qos->cis_id, interval, qos->framing, qos->phys,
+ 			qos->rtn, latency, pd);
+ 
+ 	if (!ep->stream)
+@@ -5184,7 +5201,7 @@ static void ep_status_qos(struct bt_bap *bap, struct bt_bap_endpoint *ep,
+ 
+ 	ep->stream->qos.ucast.io_qos.interval = interval;
+ 	ep->stream->qos.ucast.framing = qos->framing;
+-	ep->stream->qos.ucast.io_qos.phy = qos->phy;
++	ep->stream->qos.ucast.io_qos.phys = qos->phys;
+ 	ep->stream->qos.ucast.io_qos.sdu = sdu;
+ 	ep->stream->qos.ucast.io_qos.rtn = qos->rtn;
+ 	ep->stream->qos.ucast.io_qos.latency = latency;
+@@ -7861,7 +7878,7 @@ void bt_bap_iso_qos_to_bap_qos(struct bt_iso_qos *iso_qos,
+ 	bap_qos->bcast.io_qos.interval =
+ 			iso_qos->bcast.in.interval;
+ 	bap_qos->bcast.io_qos.latency = iso_qos->bcast.in.latency;
+-	bap_qos->bcast.io_qos.phy = iso_qos->bcast.in.phys;
++	bap_qos->bcast.io_qos.phys = iso_qos->bcast.in.phys;
+ 	bap_qos->bcast.io_qos.rtn = iso_qos->bcast.in.rtn;
+ 	bap_qos->bcast.io_qos.sdu = iso_qos->bcast.in.sdu;
+ }
+diff --git a/src/shared/lc3.h b/src/shared/lc3.h
+index cb78b668dbe5..e5999f88f9ee 100644
+--- a/src/shared/lc3.h
++++ b/src/shared/lc3.h
+@@ -491,7 +491,7 @@
+ 	.ucast.io_qos.interval = _interval, \
+ 	.ucast.io_qos.latency = _lat, \
+ 	.ucast.io_qos.sdu = _sdu, \
+-	.ucast.io_qos.phy = BT_BAP_CONFIG_PHY_2M, \
++	.ucast.io_qos.phys = BT_BAP_CONFIG_PHY_2M, \
+ 	.ucast.io_qos.rtn = _rtn, \
  }
  
-@@ -2171,9 +2171,9 @@ static bool check_io_qos(const struct bt_iso_io_qos *io1,
- 		return false;
- 	}
- 
--	if (io1->phy && io2->phy && io1->phy != io2->phy) {
-+	if (io1->phys && io2->phys && io1->phys != io2->phys) {
- 		tester_warn("Unexpected IO PHY: 0x%02x != 0x%02x",
--				io1->phy, io2->phy);
-+				io1->phys, io2->phys);
- 		return false;
- 	}
- 
-diff --git a/tools/isotest.c b/tools/isotest.c
-index e3d2d63ce1ff..ca59ea5b3ea6 100644
---- a/tools/isotest.c
-+++ b/tools/isotest.c
-@@ -270,13 +270,13 @@ static void print_ucast_qos(int sk)
- 		qos.ucast.packing, qos.ucast.framing);
- 
- 	syslog(LOG_INFO, "Input QoS [Interval %u us Latency %u "
--		"ms SDU %u PHY 0x%02x RTN %u]", qos.ucast.in.interval,
--		qos.ucast.in.latency, qos.ucast.in.sdu, qos.ucast.in.phy,
-+		"ms SDU %u PHYs 0x%02x RTN %u]", qos.ucast.in.interval,
-+		qos.ucast.in.latency, qos.ucast.in.sdu, qos.ucast.in.phys,
- 		qos.ucast.in.rtn);
- 
- 	syslog(LOG_INFO, "Output QoS [Interval %u us Latency %u "
--		"ms SDU %u PHY 0x%02x RTN %u]", qos.ucast.out.interval,
--		qos.ucast.out.latency, qos.ucast.out.sdu, qos.ucast.out.phy,
-+		"ms SDU %u PHYs 0x%02x RTN %u]", qos.ucast.out.interval,
-+		qos.ucast.out.latency, qos.ucast.out.sdu, qos.ucast.out.phys,
- 		qos.ucast.out.rtn);
+@@ -947,7 +947,7 @@
+ 	.bcast.io_qos.interval = _interval, \
+ 	.bcast.io_qos.latency = _lat, \
+ 	.bcast.io_qos.sdu = _sdu, \
+-	.bcast.io_qos.phy = BT_BAP_CONFIG_PHY_2M, \
++	.bcast.io_qos.phys = BT_BAP_CONFIG_PHY_2M, \
+ 	.bcast.io_qos.rtn = _rtn, \
  }
  
-@@ -311,14 +311,14 @@ static void print_bcast_qos(int sk)
- 		qos.bcast.bcode[13], qos.bcast.bcode[14], qos.bcast.bcode[15]);
- 
- 	syslog(LOG_INFO, "Input QoS [Interval %u us Latency %u "
--		"ms SDU %u PHY 0x%02x RTN %u]", qos.bcast.in.interval,
-+		"ms SDU %u PHYs 0x%02x RTN %u]", qos.bcast.in.interval,
- 		qos.bcast.in.latency, qos.bcast.in.sdu,
--		qos.bcast.in.phy, qos.bcast.in.rtn);
-+		qos.bcast.in.phys, qos.bcast.in.rtn);
- 
- 	syslog(LOG_INFO, "Output QoS [Interval %u us Latency %u "
--		"ms SDU %u PHY 0x%02x RTN %u]", qos.bcast.out.interval,
-+		"ms SDU %u PHYs 0x%02x RTN %u]", qos.bcast.out.interval,
- 		qos.bcast.out.latency, qos.bcast.out.sdu,
--		qos.bcast.out.phy, qos.bcast.out.rtn);
-+		qos.bcast.out.phys, qos.bcast.out.rtn);
- }
- 
- static int do_connect(char *peer)
-@@ -350,7 +350,7 @@ static int do_connect(char *peer)
- 	/* Set QoS if available */
- 	if (iso_qos) {
- 		if (!inout || !strcmp(peer, "00:00:00:00:00:00")) {
--			iso_qos->ucast.in.phy = 0x00;
-+			iso_qos->ucast.in.phys = 0x00;
- 			iso_qos->ucast.in.sdu = 0;
- 		}
- 
-@@ -1020,12 +1020,12 @@ static void multy_connect_mode(char *peer)
- 	}
- }
- 
--#define QOS_IO(_interval, _latency, _sdu, _phy, _rtn) \
-+#define QOS_IO(_interval, _latency, _sdu, _phys, _rtn) \
- { \
- 	.interval = _interval, \
- 	.latency = _latency, \
- 	.sdu = _sdu, \
--	.phy = _phy, \
-+	.phys = _phys, \
- 	.rtn = _rtn, \
- }
- 
-@@ -1339,7 +1339,7 @@ int main(int argc, char *argv[])
- 
- 		case 'Y':
- 			if (optarg)
--				iso_qos->ucast.out.phy = atoi(optarg);
-+				iso_qos->ucast.out.phys = atoi(optarg);
- 			break;
- 
- 		case 'R':
 diff --git a/unit/test-bap.c b/unit/test-bap.c
-index be838cb99f24..cdd1bed7e1ff 100644
+index cdd1bed7e1ff..3a67e7016e4e 100644
 --- a/unit/test-bap.c
 +++ b/unit/test-bap.c
-@@ -101,7 +101,7 @@ static struct iovec lc3_caps = LC3_CAPABILITIES(LC3_FREQ_ANY, LC3_DURATION_ANY,
- 								3u, 26, 240);
+@@ -1576,7 +1576,7 @@ static void test_disc(void)
+ #define QOS_BALANCED_2M \
+ 	{ \
+ 		.target_latency = BT_BAP_CONFIG_LATENCY_BALANCED, \
+-		.io_qos.phy = BT_BAP_CONFIG_PHY_2M, \
++		.io_qos.phys = BT_BAP_CONFIG_PHY_2M, \
+ 	}
+ #define QOS_UCAST \
+ {\
+@@ -7533,7 +7533,7 @@ static struct test_config cfg_bsrc_48_6_2 = {
+ 	.bcast.io_qos.interval = 7500, \
+ 	.bcast.io_qos.latency = 10, \
+ 	.bcast.io_qos.sdu = 40, \
+-	.bcast.io_qos.phy = BT_BAP_CONFIG_PHY_2M, \
++	.bcast.io_qos.phys = BT_BAP_CONFIG_PHY_2M, \
+ 	.bcast.io_qos.rtn = 2, \
+ }
  
- static struct bt_bap_pac_qos lc3_qos = {
--	.phy = 0x02,
-+	.phys = BIT(1),
- 	.rtn = 0x01,
- 	.location = 0x00000003,
- 	.supported_context = 0x0fff,
 -- 
 2.52.0
 
