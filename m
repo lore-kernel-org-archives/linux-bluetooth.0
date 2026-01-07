@@ -1,129 +1,112 @@
-Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DBA396D2E
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 17:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5452C3A7F54
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 17:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767807270; cv=none; b=AbGTT7Vd360rX0861qPqHUWrqVWgEPrqfaQfMvFUc6qqNu9gUaGNOn8GGQxNU/hmwio8cvkCIplcH2Nf+Qr1pRX6HvN1bkbmjLn4pbqti9inB6f/LRvqhljKN/KTMImBilhGb2YvNf+hXM/7LigWJBJavvTPSXDeFmnvXlOKpbc=
+	t=1767807445; cv=none; b=lCldfHdgp8zBoPArROTbqb3F5BmmYg5+HXYKr9Ox0cniMMcKIDuMlDem/bNXo0muDmeYR/kT4CiILtrU1NnD7hSEPKG2d6vpbXIxb8wNC7uCVHTjzxZwLtz2F2hPBHpZI5VKux2+yzXUbKLUwSlPtM76klb9lKor0B1+YPwVieM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767807270; c=relaxed/simple;
-	bh=T8p9x7YcHH4RBi5k9EYCafGeHl5JeFf5qbbqC19P2CE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u4RZJx9hfidOsnkghoohlg6uvrAHlB305JoyArMNYIAj0dlWpKajqQVnc8vhzcNI0rMKIjgEmQ8jTjgLBgjO1ENj1JXnMpajwaaGHlJqQMukFtJrE2eSz0ho4KTSMMx6jEYqTRqmoP8ouTe4kNXDZRUID1jEX9qc3p+AxHXb65E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-65b153371efso2074772eaf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jan 2026 09:34:28 -0800 (PST)
+	s=arc-20240116; t=1767807445; c=relaxed/simple;
+	bh=amRYf8gEydXnO6PV4BSQzAiPWhS+zAdCysmV2muCz5Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lCSX4GbqLtUAK6Q8jMdkWN+0cPs7b8q+fZz+9+Qpzv8lQ8QG0yfvCwm0z9+d4WQVsfHAD91gm9ngF6DlchnjPLHhQJMBzeeM6adsG8wTrB+EkuHB4/jWUrLsuPlnaC51pZO3xAwU9xpQLQYmgBCMxYU9eWV4bDFNYHB0Yjo2cTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hVeKEqXa; arc=none smtp.client-ip=74.125.224.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hVeKEqXa"
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-6455a60c12bso2224032d50.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jan 2026 09:37:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767807440; x=1768412240; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=amRYf8gEydXnO6PV4BSQzAiPWhS+zAdCysmV2muCz5Y=;
+        b=hVeKEqXatWvIOheO9X5Mp7dKRWzSY9zEfg+205jixR7YeKnDRJM+DqhnaVqM04jQ5G
+         LOF3ODTkU59EITqLWxWuxyLFu7oZqykLyE0lX389tAzjF3rdCdfOBl8w79+UGTm33ma0
+         F1DOulZYo3M8k+LDE/D/cDk1RUfhFH6saze1vUqUprJsYHci+syH9fBaPqJrpXiu7St/
+         L2jlYck6JkkoqE77p/3aitEDa/YZe2y7XoLvtZnGlT/ws1v5laTczUt1BHEqGVsehj+W
+         CTyUhUH4cET1V+U4snr2UJNR6RkN/urArvRVrdRnxDcqFd2+3CSeij2I8RhWdGLnw1Do
+         aAyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767807268; x=1768412068;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YXJ9WC2NmU9YEErBDW4d1c4BSngY0akKh966eavx5Fk=;
-        b=qqqC8Fk9UIPTDjT5yynDpUsxbQcWYUt+ug0IkDaAsC6itQs/pVZNp2Ubhxu0yzElvF
-         6hI6WfmAHqPdPnY4rJU+orUZbz+IIHguWe1iVNQbAq0WRfy5rOGygzFsXEsykTEG8mAL
-         +S/tmqzyhZ0pNH6DV0odMoR3HwyABF/DP8o6f9MZbufTVMTo7a79c3D9JdH3t1jcPNMO
-         Rm0EY3Mndu2rw0jDf5OUh27564vb/oGg97JRF61DMUivCRUS7TEIEDejG044XvxWou8M
-         gLDPuHfhWAYOX+dmLZOf38zSDi98Jg2BCqsgHJdI4FMUtHydBOPzLGEd+Lj5rHbPSvMZ
-         QV2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWsRrWjZBBRy/PG1Nd5RTWEUN0G57Ar+vwSsX5thnSbjUh7v7ERwWdp617sKI0RKtBVhsEXLiPuaLC+3y5ujSY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRSjL8878Sfhh8jiueAUgLtzA4ZTuoHhoCwZ9urV7nw2fM+H0S
-	r2g3osM25pUU8l9Hk5IojH432iY5RLH7f9mUwxHjg1I2iGvR5zBGfgoFGHKynJcUZABBL51g5Gg
-	u1MmUL1dCwckIOaAU0kDBUWOq/HmwtsDUyZdxRh4hmIuJBRcC4uFxf+hfka0=
-X-Google-Smtp-Source: AGHT+IH4AnecHwe1eU+seiZT8AASstncmzFKC7GVs7sp+BqLT+rUYXqD/TFtAndib/yxC1B/VhUmEO2OoS2WpKMEmKAy6Syz4FVi
+        d=1e100.net; s=20230601; t=1767807440; x=1768412240;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=amRYf8gEydXnO6PV4BSQzAiPWhS+zAdCysmV2muCz5Y=;
+        b=jjIHNuA49IjgjNipcKk7KR952TAK8bPqkpxNFhMHuf7EyrapU0c3uAMEnapCXtEPiG
+         fcG8XCJ7+JnkbMr98DVSqkgpgYFMVFYACuFGFSGB0xdvn72I59xEZLVYYrmjx7v6x/WO
+         ov0/ofbukc1YNvGiH62kQFSEqaswA/H0e/Ql1ETYIFMBNaMh86uL8NeRMN5EyhkAF4ir
+         xTfjbB3STcvZG2lIPps+RVttHTc1drIy7pfzcF3Pv6EN5DWutCG7R2VH4LRCYOCBXLgE
+         jOTUqtaG23uJjmGCL+3wYVLi2wOogFUSpcqx12uPI7NNN0lnAsjtzMmEnq6keWGXWZyD
+         q1JQ==
+X-Gm-Message-State: AOJu0Yxj/1lM75pEVa11ufqBQ0e0HD3QvUZDG2lFBY+pkQsbB8EYeCMb
+	qIMLkzBOwEqFvN1k6QrQNEKvxrHU6om8zUdRMnWEfNtIXBAI0x+k5cG6y+ALmdjqKtxIGaTlLz1
+	34EjHY8QNNqMV0rLqkB9wTLcDAahcXerUWA==
+X-Gm-Gg: AY/fxX7iTigmUwCHSnW0phXnuXonPeCcqDnv+SOfpQkzzGC0z867n6cptusMA0EJVqU
+	yMIzLbG5Z3Xs8iLHnpKNKvq+YVqkp3sCa41xMRdx8m1bDWuYewRuhF4H6siDgYbyDI6WV0l4OQH
+	xzlh1DXQN0yxKKUVOBbZ0eQM5A7i5gogSyizif7a8uP6AnP4aFrQTGSgmpf75s5fIV+mIvI9Djp
+	IoLhgONuJlFW98IUHVIfn8Wr7cJWDD9dSsNlgFOKtXIkh2foM5jJLuobozPe4a6GP+RXv2dofTC
+	ZrBSd6LEaVXT9TdDpmzUpySRYx03SWZQVg9ZF6mDHyiNoq3NEF+WOHQBig==
+X-Google-Smtp-Source: AGHT+IH0GnRsHA9gRSlNYc6R9FaHK6so5r/dtNJRBoTPW4ls0oqqrY5dNcKSN8lwyB8bgnEUbZ6Np5XEn7ET5rs8Xa8=
+X-Received: by 2002:a05:690e:24c1:b0:641:f5bc:6995 with SMTP id
+ 956f58d0204a3-64716c79edamr2297984d50.81.1767807440281; Wed, 07 Jan 2026
+ 09:37:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:e645:0:b0:65b:299f:8947 with SMTP id
- 006d021491bc7-65f481e96e9mr3009818eaf.14.1767807267978; Wed, 07 Jan 2026
- 09:34:27 -0800 (PST)
-Date: Wed, 07 Jan 2026 09:34:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <695e9923.050a0220.1c677c.0370.GAE@google.com>
-Subject: [syzbot] [batman?] [bluetooth?] memory leak in skb_clone (3)
-From: syzbot <syzbot+6e76aa21aaf2d8be6034@syzkaller.appspotmail.com>
-To: antonio@mandelbit.com, b.a.t.m.a.n@lists.open-mesh.org, 
-	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	marek.lindner@mailbox.org, netdev@vger.kernel.org, sven@narfation.org, 
-	sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com
+References: <3679882.dWV9SEqChM@n9w6sw14>
+In-Reply-To: <3679882.dWV9SEqChM@n9w6sw14>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 7 Jan 2026 12:37:09 -0500
+X-Gm-Features: AQt7F2pUegSgktgB-VxzzkOSZOjskpBf84g1M49al2cr35tCp30fqyR2-YS9mBA
+Message-ID: <CABBYNZLYn1=3WgVujb9nLdXNrfmDxo=uQvPLfZHgmABM_MiRtw@mail.gmail.com>
+Subject: Re: How to perform Bluetooth SIG qualification of a Linux / BlueZ
+ based product?
+To: Christian Eggers <ceggers@arri.de>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi Christian,
 
-syzbot found the following issue on:
+On Wed, Jan 7, 2026 at 12:17=E2=80=AFPM Christian Eggers <ceggers@arri.de> =
+wrote:
+>
+> I feel that I can't see the forest for the trees...
+>
+> I am in the process of performing Bluetooth SIG qualification of our
+> first Bluetooth product. According to what I understand, an end user prod=
+uct
+> (Core-Complete configuration) consists of a hardware (controller) part an=
+d a
+> software (host) part. I already have a QDID from the controller vendor,
+> but I feel unable to provide the QDID for Linux/BlueZ.
+>
+> Of course I understand that Linux/BlueZ is open source, so there is no
+> company behind for performing qualification (But I found one qualificatio=
+n
+> for Zephyr OS made by Linux corporation).
+>
+> So do I need to qualify the concrete version of Linux/BlueZ myself? How
+> much effort would this cause? Google KI mentions a tool named
+> "Bluetooth Launch Studio" for this, but visiting launchstudio.bluetooth.c=
+om
+> redirects to the qualification workspace.
+>
+> So how to obtain a proper QDID/DN for the host part of my product?
 
-HEAD commit:    4a26e7032d7d Merge tag 'core-bugs-2025-12-01' of git://git..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=116a9512580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cbf343972ee89096
-dashboard link: https://syzkaller.appspot.com/bug?extid=6e76aa21aaf2d8be6034
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=179be192580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15cd92b4580000
+In the past each vendor used to qualify BlueZ by themselves as it
+normally involves a specific kernel and userspace version, we are
+discussing the possibility to have a generic host qualification for
+BlueZ under the BlueZ's steering group, the group is closed to only
+BT-SIG members though but Id be happy to add you if Arri is a BT-SIG
+member and is interested to join.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3f4ff8b7d65f/disk-4a26e703.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2fbb585ef1ac/vmlinux-4a26e703.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/dfdc58db78d3/bzImage-4a26e703.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6e76aa21aaf2d8be6034@syzkaller.appspotmail.com
-
-2025/12/03 00:25:54 executed programs: 5
-BUG: memory leak
-unreferenced object 0xffff88811a1e1100 (size 240):
-  comm "kworker/u9:0", pid 51, jiffies 4294944590
-  hex dump (first 32 bytes):
-    90 50 50 42 81 88 ff ff 90 50 50 42 81 88 ff ff  .PPB.....PPB....
-    00 00 00 00 00 00 00 00 00 50 50 42 81 88 ff ff  .........PPB....
-  backtrace (crc eed28d2d):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4983 [inline]
-    slab_alloc_node mm/slub.c:5288 [inline]
-    kmem_cache_alloc_noprof+0x397/0x5a0 mm/slub.c:5295
-    skb_clone+0xae/0x2b0 net/core/skbuff.c:2050
-    __skb_tstamp_tx+0x3a0/0x4c0 net/core/skbuff.c:5636
-    hci_conn_tx_queue+0x11c/0x1d0 net/bluetooth/hci_conn.c:3026
-    hci_send_conn_frame net/bluetooth/hci_core.c:3086 [inline]
-    hci_sched_acl_pkt net/bluetooth/hci_core.c:3701 [inline]
-    hci_sched_acl net/bluetooth/hci_core.c:3726 [inline]
-    hci_tx_work+0x437/0x570 net/bluetooth/hci_core.c:3820
-    process_one_work+0x26b/0x620 kernel/workqueue.c:3263
-    process_scheduled_works kernel/workqueue.c:3346 [inline]
-    worker_thread+0x2c4/0x4f0 kernel/workqueue.c:3427
-    kthread+0x15b/0x310 kernel/kthread.c:463
-    ret_from_fork+0x2af/0x2e0 arch/x86/kernel/process.c:158
-    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--=20
+Luiz Augusto von Dentz
