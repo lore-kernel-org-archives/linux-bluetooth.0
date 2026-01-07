@@ -1,38 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4492D1F7C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3462749ED
 	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 08:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767775903; cv=none; b=cxMit3+anAL2ZsZyQkeO6hKGNLDsdpIvk9WHfqEkMnJA3Fvvs05frOSAYwdGjeaTc/EegCgkVqSeqKxQxLsYRznxFzLbP7QlMhL4tpPoxkthpud6hCCI09czBYUP0cO7QCDGF1l4wmSk5tOh8pFF2gvsVLmv8FDyfohXSc51Vss=
+	t=1767775903; cv=none; b=W1ckPd/t3pBIhs8PVFLPN6DZG7IjW1z5ILKKRVGmg1TSo0U08PYDihCWXGKPbpggBFJvem78Vvv20Xed6U6Jw9z6e8HjCc+5d7e5SEZviV7t8/KiXRnl10oCOeE4x42UfmAvLHu5BhtKAbyzmQ7SM0PK5jbF+ZYty2iZldz/pzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767775903; c=relaxed/simple;
-	bh=+5MUKVQg2Im+DmLMhyHT00cMub/gct4SnvZeicO1yKM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=g/UlmDj1mTC4CnaDt66k93bGiE5matAMXdzxo9OE5hSV/PwqHHg+Ne2chh3xaFsMFpmIRlgQn/ORI0EM5WaCsN/6saXSdwb+oz/hJFh2DgOftTxh/Rlcbsne9FkSgQjfe3s5blZtxpN31SvrKQhIRy9pBn2I8yJRA+sQhILKSOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOUl6Oeh; arc=none smtp.client-ip=10.30.226.201
+	bh=BB6Zo9Ch6b6qrvLJcbZ84/9go69rlEbnAxDnI8Luqhw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=SK0evo/CwQX6Y8qUDd3nb5SmYrAVTeCDDghmgED8pniSpHFiIOoK9s5vwUEG5L9XLp0V7v308YRoEhDdmU+zhhN2rDG1S2OD9JXL/dKAgpfmATsxJtKhcG/zj8yqubKcy9K7HdSCBCrABaXSkmxrVC42qrz2IcpoRsLMbXjwKK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqtI6oNT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOUl6Oeh"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B8AE8C19421;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqtI6oNT"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A613DC4CEF7;
 	Wed,  7 Jan 2026 08:51:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1767775902;
-	bh=+5MUKVQg2Im+DmLMhyHT00cMub/gct4SnvZeicO1yKM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=HOUl6OehNWXeqMZQT8wN5/eekRioDvnPHOcZSglxFXXIVBeSxuWd5oa6XgSsLMOkd
-	 K7dOXerfceP0xPDHY62BvIkI0tBInQTgE3LxG++PRkvet9Y1NyvW00iY1aGOiusQPq
-	 jeq8WR6EoN6cdBct8ObSOhC7bMOGTiCPEla0MTQcX25AyUc/xXoWNQnbtnAT4BWNOg
-	 OaxBrDpHRrEZyhTnpFZT87J7HS2U1HeVnd2ZkQwmDY2C55cX4USvQyacocMetQ8sGz
-	 PZcJbO3BVFFg4AEP8I470t5hhkqucPPBeG/l2Zjhc40u7aYRFRTEDJ9uGUuYAYyXRi
-	 KXyzoh3Tph+Cg==
+	bh=BB6Zo9Ch6b6qrvLJcbZ84/9go69rlEbnAxDnI8Luqhw=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=DqtI6oNTDRi/48qcf+B2dWEvvdPB6qRfpjd2QF3TCjxNMCTVhvmFnhQPA5i6BZGAU
+	 lH3mv0pdiVBCRkL5nf6HNJgdqWN6DJluXt+stTY2ebuhUFew2UW/xNiJyYHdHcUinm
+	 Sqsa7qeZo6R0138gQ9xdhh8UZRHhvWqFWfkb/SkDcduIboP9z6FoVuWp0yoa2mIhHw
+	 ECm4+b1nDwKWl92fiFqTlX6sff0SxfV/uliAbVvEhwLKPVNtzZUJbwQD+Yf7pTuTgm
+	 Ar3kFNGvc5G3I9X7TKOYvuGITzRl/gy4bS12LSC1TlCwEKZ+RoMgFNIhG5ygiIWQ/r
+	 MrTSoWBIqNPBw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BB5CF6C11;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9467ECF6C0F;
 	Wed,  7 Jan 2026 08:51:42 +0000 (UTC)
 From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Wed, 07 Jan 2026 16:51:36 +0800
-Subject: [PATCH BlueZ bluez 1/2] adapter: add MGMT_EV_EXT_ADV_SID_CHANGED
- mgmt event
+Subject: [PATCH BlueZ bluez 0/2] Optimize the PA sync flow
+Date: Wed, 07 Jan 2026 16:51:35 +0800
+Message-Id: <20260107-mgmt_ext_adv_sid-v1-0-6832b40813fd@amlogic.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,17 +40,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260107-mgmt_ext_adv_sid-v1-1-6832b40813fd@amlogic.com>
-References: <20260107-mgmt_ext_adv_sid-v1-0-6832b40813fd@amlogic.com>
-In-Reply-To: <20260107-mgmt_ext_adv_sid-v1-0-6832b40813fd@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAJceXmkC/x2MywqAIBAAfyX2nGAe7PErEWK51UIv1CSK/r2lw
+ xzmMPNAQE8YoMke8Jgo0L6xFHkGw2y3CQU5dlBSaVnIUqzTGg1e0ViXTCAntLajsrJmKuDs8Dj
+ S9S9b6JcTb+je9wMZ+sigaQAAAA==
 To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 Cc: Yang Li <yang.li@amlogic.com>
 X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1767775901; l=5030;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1767775901; l=665;
  i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=s9S/xcKkxqt1zVHUxTFusxppBE5BL2rzP7clSEle5l8=;
- b=wior3eFE/TuOU/s/TDu8t13dwyLFd+dcYiTN17A+5kXT0MmQa92JsD1VF3Jl00MwDaMDZCPF4
- /1haZ34rMBwDzc+Tpuo+0hGJvzoMNKQI5jBYKdsXmIT7si9J7OQjgPc
+ bh=BB6Zo9Ch6b6qrvLJcbZ84/9go69rlEbnAxDnI8Luqhw=;
+ b=/yyOb0GJXmRIAuYi5KOedfouW/u2aWtGWSXZ6YUA7mFX87U46dVMeLnENWR8PZ2D2TMBgPaZL
+ 9PmvEWftCioB+l8rPqLzVFV5yu20zM/k5221DOq7FITT0MYzuODCcfK
 X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
  pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
 X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
@@ -59,176 +58,24 @@ X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
 X-Original-From: Yang Li <yang.li@amlogic.com>
 Reply-To: yang.li@amlogic.com
 
-From: Yang Li <yang.li@amlogic.com>
-
-Add the MGMT_EV_EXT_ADV_SID_CHANGED mgmt event to notify userspace
-of SID updates for extended advertising.
-
 Signed-off-by: Yang Li <yang.li@amlogic.com>
 ---
+Yang Li (2):
+      adapter: add MGMT_EV_EXT_ADV_SID_CHANGED mgmt event
+      bap: add timer to wait for SID update before PA sync
+
  lib/bluetooth/mgmt.h |  7 +++++++
+ profiles/audio/bap.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++-
  src/adapter.c        | 39 +++++++++++++++++++++++++++++++++++++--
  src/device.c         | 22 ++++++++++++++++++++++
  src/device.h         |  2 ++
- 4 files changed, 68 insertions(+), 2 deletions(-)
+ 5 files changed, 114 insertions(+), 3 deletions(-)
+---
+base-commit: b35b6befb12c91c1802d09208ea5a00f0b0bc614
+change-id: 20260107-mgmt_ext_adv_sid-66af2a092a08
 
-diff --git a/lib/bluetooth/mgmt.h b/lib/bluetooth/mgmt.h
-index 1ad52529f..338d2a732 100644
---- a/lib/bluetooth/mgmt.h
-+++ b/lib/bluetooth/mgmt.h
-@@ -1107,6 +1107,12 @@ struct mgmt_ev_mesh_pkt_cmplt {
- 	uint8_t	handle;
- } __packed;
- 
-+#define MGMT_EV_EXT_ADV_SID_CHANGED		0x0033
-+struct mgmt_ev_ext_adv_sid_changed {
-+	struct mgmt_addr_info addr;
-+	uint8_t	sid;
-+} __packed;
-+
- static const char *mgmt_op[] = {
- 	"<0x0000>",
- 	"Read Version",
-@@ -1253,6 +1259,7 @@ static const char *mgmt_ev[] = {
- 	"Advertisement Monitor Device Lost",
- 	"Mesh Packet Found",
- 	"Mesh Packet Complete",
-+	"Extended Advertising SID Changed",
- 	"PA Sync Established",
- 	"BIG Sync Established",
- 	"BIG Sync Lost",
-diff --git a/src/adapter.c b/src/adapter.c
-index a5de7cee1..ee6a1e711 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -84,6 +84,7 @@
- #define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
- 
- #define HCI_RSSI_INVALID	127
-+#define HCI_SID_INVALID		0xff
- #define DISTANCE_VAL_INVALID	0x7FFF
- #define PATHLOSS_MAX		137
- 
-@@ -7446,6 +7447,7 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
- 	}
- 
- 	device_set_legacy(dev, legacy);
-+	device_set_sid(dev, HCI_SID_INVALID);
- 
- 	if (name_resolve_failed)
- 		device_name_resolve_fail(dev);
-@@ -7601,14 +7603,42 @@ static void device_found_callback(uint16_t index, uint16_t length,
- 	flags = le32_to_cpu(ev->flags);
- 
- 	ba2str(&ev->addr.bdaddr, addr);
--	DBG("hci%u addr %s, rssi %d flags 0x%04x eir_len %u",
--			index, addr, ev->rssi, flags, eir_len);
-+	DBG("hci%u addr %s type %u, rssi %d flags 0x%04x eir_len %u",
-+			index, addr, ev->addr.type, ev->rssi, flags, eir_len);
- 
- 	btd_adapter_device_found(adapter, &ev->addr.bdaddr,
- 					ev->addr.type, ev->rssi, flags,
- 					eir, eir_len, false);
- }
- 
-+static void device_ext_adv_sid_changed_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_ev_ext_adv_sid_changed *ev = param;
-+	struct btd_adapter *adapter = user_data;
-+	struct btd_device *dev;
-+	char addr[18];
-+
-+	if (length < sizeof(*ev)) {
-+		btd_error(adapter->dev_id,
-+			"Too short ext adv sid changed event (%u bytes)",
-+			length);
-+		return;
-+	}
-+
-+	ba2str(&ev->addr.bdaddr, addr);
-+	DBG("hci%u addr %s type %u, sid %u", index, addr, ev->addr.type, ev->sid);
-+
-+	dev = btd_adapter_find_device(adapter, &ev->addr.bdaddr,
-+							ev->addr.type);
-+	if (!dev) {
-+		DBG("No device found for ext adv sid change event");
-+		return;
-+	}
-+
-+	device_set_sid(dev, ev->sid);
-+}
-+
- struct agent *adapter_get_agent(struct btd_adapter *adapter)
- {
- 	return agent_get(NULL);
-@@ -10424,6 +10454,11 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 						device_found_callback,
- 						adapter, NULL);
- 
-+	mgmt_register(adapter->mgmt, MGMT_EV_EXT_ADV_SID_CHANGED,
-+						adapter->dev_id,
-+						device_ext_adv_sid_changed_callback,
-+						adapter, NULL);
-+
- 	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_DISCONNECTED,
- 						adapter->dev_id,
- 						disconnected_callback,
-diff --git a/src/device.c b/src/device.c
-index c8aaf042f..827b897ab 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -298,6 +298,7 @@ struct btd_device {
- 	gboolean	general_connect;
- 
- 	bool		legacy;
-+	uint8_t		sid;
- 	int8_t		rssi;
- 	int8_t		tx_power;
- 
-@@ -7106,6 +7107,27 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
- 	device_set_rssi_with_delta(device, rssi, RSSI_THRESHOLD);
- }
- 
-+void device_set_sid(struct btd_device *device, uint8_t sid)
-+{
-+	if (!device)
-+		return;
-+
-+	if (device->sid == sid)
-+		return;
-+
-+	DBG("sid %d", sid);
-+
-+	device->sid = sid;
-+}
-+
-+uint8_t device_get_sid(struct btd_device *device)
-+{
-+	if (!device)
-+		return 0xFF;
-+
-+	return device->sid;
-+}
-+
- void device_set_tx_power(struct btd_device *device, int8_t tx_power)
- {
- 	if (!device)
-diff --git a/src/device.h b/src/device.h
-index c7b8b2a16..82332001e 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -108,6 +108,8 @@ void device_set_cable_pairing(struct btd_device *device, bool cable_pairing);
- void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
- 							int8_t delta_threshold);
- void device_set_rssi(struct btd_device *device, int8_t rssi);
-+void device_set_sid(struct btd_device *device, uint8_t sid);
-+uint8_t device_get_sid(struct btd_device *device);
- void device_set_tx_power(struct btd_device *device, int8_t tx_power);
- void device_set_flags(struct btd_device *device, uint8_t flags);
- bool btd_device_is_connected(struct btd_device *dev);
-
+Best regards,
 -- 
-2.42.0
+Yang Li <yang.li@amlogic.com>
 
 
