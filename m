@@ -1,84 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from o3.sgmail.github.com (o3.sgmail.github.com [192.254.112.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5575F27602C
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 21:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E5BF4FA
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 21:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.254.112.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767820409; cv=none; b=djh1FT4LZ9jtWm6SdoIc36fHOfi5G1OU5pql7F4jeiC6cVqqsMlhZsXCB1owcsCj2nvcrqvDQ/6ULovYbnpaYrrESlYmjDm/NNxkrD0T7t1CecWWEQFDaZd+UQBH62MbzdyZQhWxIkubT4R5F41gk29VvBy8PcTdEHHCfU2lSxM=
+	t=1767820831; cv=none; b=Buh3DzxMX9fFEbDFM0AIE/v0gZ/AgpJS8bAaB0omnoKx95sOZzzYjAYr1DA1KRzfe+Nr2fVpEyZde8lQXHSUGj4l0V/oWBr5Q0I2bRp9FrJq2u/6k3fkzPYVdBemX/7gXosClsMHp8ch8gP1fVmEMs4FCz1FNIdgdSL4lzQvAoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767820409; c=relaxed/simple;
-	bh=AOeUsMXLmsFRbDWapb+uuLhd8GzUH3Lc21sGx3/2/LA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=smzvXZlIDcykC1YDkTFpI8jyc82dXL0JCN3o8KM9bzI/EminP2sVt/tY4RvaTKceyb1sTHbueU4e81ulS1xUylh82ON7YHobWdZy824OLBEd6C6aHr4GwND1AfEyUnVoTSb3JSeAld61BT6Cy7HpslNHtazG3V8+GVKtqZ/vK90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UKjCE7sR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767820831; c=relaxed/simple;
+	bh=mWP4OQiNS26nMxzUBSdlb0NpNRp8kjwjO8cXNuRfelg=;
+	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=pv2BEMAqFV/FoU5uy9K+WzrR1wII6ADcn4e27iM6jQe7v3ojG7qjZcScLFPg5Osch9ifLKk5fKx5pQmmauiqHP07ZWf6s/k9gyrX6hcFukVS/0RMHNmhcGnll1UnA3T5D4Tg4/LzeDcMYysBtVjfIadt1uZKoY1cfsbIuxAzhwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=r9zEXsDO; arc=none smtp.client-ip=192.254.112.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UKjCE7sR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC4A2C4CEF1;
-	Wed,  7 Jan 2026 21:13:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767820408;
-	bh=AOeUsMXLmsFRbDWapb+uuLhd8GzUH3Lc21sGx3/2/LA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UKjCE7sRGoKFQKWAqAcoPuLtYgAdfXfE8d4b6bAufh5uzX8Y7DOpetFDjZ1Htn6m4
-	 Pf7QMKGiH0/L7MPBSBXBxRT208/UFabQ4nFOCUqE3sYxDSSqkGs//wQjx3lWVH/iB3
-	 IigRoG0DXpVhkRPnmrkjPhTl0gKhPs/Fh++k9nrzbQm/xa/6AaAOEYUw4W6OVRMha7
-	 5EbH2quE13vhIL47OBvjSgUDAn3eCk9epjOBHtFtZ4QEniEviQUqdFkki2STD0Re2V
-	 rt0D1i/TZWs/xMI5VAetHTByLaExcmGcpw0vu1wnV1cYHtXg9ORI/YhIFCuH/rTgnN
-	 HzNtUQ2OKvjlw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2BB93A40FDD;
-	Wed,  7 Jan 2026 21:10:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="r9zEXsDO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	h=date:from:subject:mime-version:content-type:content-transfer-encoding:
+	list-unsubscribe:to:cc:content-type:date:from:subject:to;
+	s=smtpapi; bh=3uYeXdHCLZgxhm+MeWH/PkT+Cv1DRBkdQc44U2Wqm1o=;
+	b=r9zEXsDOKiAOmkH7/5Cg2V3DInc1BJVkTgJv/YY8/2GTdIJe8pvtVkTBq6DI0Jr+SvUY
+	X7Oh5ohe/GhJNKt22O24r63gLwff+TIauGV05VkMdmf88FKVb5EuN0XPRPa6AvpQcOgUh1
+	LXSM9C9qX86AFOVMtd9KeCqOQZ4I9RwWo=
+Received: by recvd-948c5cd45-xpwtl with SMTP id recvd-948c5cd45-xpwtl-1-695ECE1C-8D
+	2026-01-07 21:20:28.819123487 +0000 UTC m=+1811492.104879312
+Received: from out-28.smtp.github.com (unknown)
+	by geopod-ismtpd-30 (SG)
+	with ESMTP id X0D40HX3Sia_ZFiEdkLcqg
+	for <linux-bluetooth@vger.kernel.org>;
+	Wed, 07 Jan 2026 21:20:28.810 +0000 (UTC)
+Received: from github.com (hubbernetes-node-51553c9.ash1-iad.github.net [10.56.206.39])
+	by smtp.github.com (Postfix) with ESMTPA id BF81192129B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 13:20:22 -0800 (PST)
+Date: Wed, 07 Jan 2026 21:20:28 +0000 (UTC)
+From: Luiz Augusto von Dentz <noreply@github.com>
+Message-ID: <bluez/bluez/push/refs/heads/master/38ac68-561d4e@github.com>
+Subject: [bluez/bluez] 924762: lib: Rename bt_iso_io_qos phy field to phys
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/2] lib: Rename bt_iso_io_qos phy field to phys
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176782020579.2982139.5033707749337353004.git-patchwork-notify@kernel.org>
-Date: Wed, 07 Jan 2026 21:10:05 +0000
-References: <20260106200913.3419162-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260106200913.3419162-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+X-SG-EID: 
+ =?us-ascii?Q?u001=2E8ki=2FFbqwlQO04QBiriT34f6qhM6wd38+BQvADylPPTIQmeZqt0Mdj+E9P?=
+ =?us-ascii?Q?ngWQlMPxccS8u9EBUyRL9UmZaAIAnT8bkKEyjHd?=
+ =?us-ascii?Q?tRlILOGcD+fl31sk=2FqsVQHwAmqykEALZZv=2FJ0y=2F?=
+ =?us-ascii?Q?KCBSdOkKbLB67E7ZYBzPrcJGYoanMoOWq67rv9e?=
+ =?us-ascii?Q?RPUkU0FGk3A+wAPIuWOaeWex0ZcTIBf7Hrl7pzc?=
+ =?us-ascii?Q?8ujRBmiMeGn0LwVWmAJbIzsGWkKyiWamQrqLgAI?=
+ =?us-ascii?Q?BYvil7LiV2qLM+36ksznnBpExg=3D=3D?=
+To: linux-bluetooth@vger.kernel.org
+X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 9247623a8d148230af3a80db751cda67acecc536
+      https://github.com/bluez/bluez/commit/9247623a8d148230af3a80db751cda67acecc536
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-01-07 (Wed, 07 Jan 2026)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M emulator/bthost.c
+    M lib/bluetooth/bluetooth.h
+    M profiles/audio/bap.c
+    M profiles/audio/media.c
+    M src/shared/bap.c
+    M src/shared/bap.h
+    M tools/btiotest.c
+    M tools/iso-tester.c
+    M tools/isotest.c
+    M unit/test-bap.c
 
-On Tue,  6 Jan 2026 15:09:12 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This renames the bt_iso_io_qos phy field to phys to emphasize it is
-> actually a bitfield rather than a single value.
-> ---
->  emulator/bthost.c         |  8 ++++----
->  lib/bluetooth/bluetooth.h |  2 +-
->  profiles/audio/bap.c      |  4 ++--
->  profiles/audio/media.c    |  8 ++++----
->  src/shared/bap.c          | 16 ++++++++--------
->  src/shared/bap.h          |  2 +-
->  tools/btiotest.c          |  2 +-
->  tools/iso-tester.c        |  8 ++++----
->  tools/isotest.c           | 24 ++++++++++++------------
->  unit/test-bap.c           |  2 +-
->  10 files changed, 38 insertions(+), 38 deletions(-)
+  Log Message:
+  -----------
+  lib: Rename bt_iso_io_qos phy field to phys
 
-Here is the summary with links:
-  - [BlueZ,v1,1/2] lib: Rename bt_iso_io_qos phy field to phys
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9247623a8d14
-  - [BlueZ,v1,2/2] shared/bap: Fix PHY fields being treated as single value
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=561d4e815f28
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This renames the bt_iso_io_qos phy field to phys to emphasize it is
+actually a bitfield rather than a single value.
 
 
+  Commit: 561d4e815f288b570ad283692291f4064d52f586
+      https://github.com/bluez/bluez/commit/561d4e815f288b570ad283692291f4064d52f586
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-01-07 (Wed, 07 Jan 2026)
+
+  Changed paths:
+    M client/player.c
+    M profiles/audio/bap.c
+    M profiles/audio/media.c
+    M profiles/audio/transport.c
+    M src/shared/ascs.h
+    M src/shared/bap-defs.h
+    M src/shared/bap.c
+    M src/shared/lc3.h
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Fix PHY fields being treated as single value
+
+BP PHY fields always refer to bitfields with the exception of target
+PHY field in bt_ascs_config.
+
+
+Compare: https://github.com/bluez/bluez/compare/38ac68e23909...561d4e815f28
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
