@@ -1,207 +1,220 @@
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022108.outbound.protection.outlook.com [52.101.126.108])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2972C224F3;
-	Wed,  7 Jan 2026 05:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.108
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767764332; cv=fail; b=PFTDQP9U/HdLXNeaI65UxaK0EeYcEhDLY8ltDCCKWzegbkLkuILW7IhY6+hDhriS0h3MhTqUMxtVlwZt/VQIdoR71EctYGe5QZuD3u/BhTGKuLbYCRXpXf00J4Kv4hjJPxIi3HYL9tFYwbNvCwGp0Lx7ZwJVghjf2UCMC42BI+M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767764332; c=relaxed/simple;
-	bh=aXl7jVSBYpKFuR6PqSreaJgHBeou/qgHk1jawWIzJvY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=JX+FHzbqLyKHuCP3nP4FTuQFIE2+5rUxyeFOgyw72DsLAQcO6cVa85Womu6B02ghin1tPZmU5LZKj1qpsitYSHkYqX6VVA0dpcitml8Cmfq3wEUbcf9x8cl4ZPDhlz2SG/b1yqNBFn8n6jiymiFlXTc9FAhnUy5e60r/EHwuwGI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=UXODHU+j; arc=fail smtp.client-ip=52.101.126.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296D527B347
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 07:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767770431; cv=none; b=VtbSc8TlHQ8uTW04eylx9bN4hBS+Iqs9LEgrABVBRKcro3UGndranJV1sGV68Dp2fYL/5XVsJTxIPtDkIcYCBbLFY4bRKSrI/rhDsj6cqU1NwyAm+doCEuJ+BCI+S1i7vc7OBfwRxaw2t3FkrzjwTAQ+ALoPA6eqxWyR2kPJnGE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767770431; c=relaxed/simple;
+	bh=hn3kVdb4aa9sWrqJzNBczdYj2m7KfDYePW/W0GkFT+I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=vFLaCG7Ka1Ef9VfwVaHP3QzMm9hIWcgIIu+rgIREOPgelxgHdPnoZ/QPQtC8/mnSVaBFmbkaVmo6D2PQl7bBA+scoazo/1VllxnLNZBRLr2EBAX0xjfg2qcf5w4p+jci3gedD0MrRt/TMYLhocEKQS8uVQ1KVwHItv9BPEqNncc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=cV6ye+US; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=S7u78Vc5; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="UXODHU+j"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tb4aTVEqxNT01D3UC+xQirJG+2uYzQ6TA+VLhWKE6UqYrY9GFdnAfTU9UnGdCDM7kaCKLgv/7CnVKLZj6XplA/y7bUOHWlOdP2DB2X9V2YdejbxiiIHLNXQseDSiMex8gV+PJRxaQ50afKuFG3TrhPmlJbIg4vYHo0oG95celSLqYvYQW+zxsqtGBXtsF7DVqGPzGVH8Mi330ZcxjsbK19aB8jtID8UhdUGNtJ29ToYwqcutugFAUAaWLilgCMk7ekSv/2UOuj+QZo0erIVQI2xP3Ei6vR+iT3ifZwIxsQET8/wHmka9KzbOBMnBEnsliAkw1cqDyfTJIsOHN1BNdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l2G7X8wpL41jjCmcYDSZuhDPvLqbz48WqtciaWm9ldA=;
- b=ErCLP8o0597vrb2Me8DddKnOq9GFPD8n54FCR8rMA3KZC+7roaXeDGGYJ0BA5e2dgM6K0GcsEe9fXy7wt6w3R97zvFe7IVyp4QehHnwwwbjEIj8UXLffymKJTLFXaYHz5bDV9vo0LXkTKn+L1XFe2GEBhnr6u0ckVrj+ICZTuOl40Kz29MpCN863t+IY945SBa+Lzt7ycjJPi5I4k4Te3Omk4CcTMGOwOn9Fj7zDn6+ve4Fyc5rEadXmNqUDV8aE5jGhGsX3n4q7UriNFkTzT/4X1LLc1v1w1Flmr6UGYhuMdxxpkx7FD0YEtgLSQ7Qh/6vy14yG410onNut4sKvgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
- dkim=pass header.d=amlogic.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l2G7X8wpL41jjCmcYDSZuhDPvLqbz48WqtciaWm9ldA=;
- b=UXODHU+j5fR/P+E/DiAFtWH/37FZ9bjJ2APnRxPU3n6d8Z0l3dBqGVvLIfwx3Bwxzrjcmrr8RBxF2fx2IxdeZmumx+JZYjv6a8ztvU6EH9qydDLHFdIsyCc7N4LAbPpq1SreqbtcaM4bs2dd/+mYAwdx8I2tFmEoZUATI2Nk9Tpfd71zKOyUL6+cAPE0qmXj5vszhkR/gL8WbHXJoZiwy9IwC0jcbe3L7drozAoDFoQxFOS6RJoP5iRXzLWslQYX2OIigkdHOziFK2g5cAdWavfCOqEwHunOeaOlO31/CrVo9nYT2PFHuFhBJfrAU2zoqrUoOlTkXo2N7+WnbJ+Scw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amlogic.com;
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
- by SI6PR03MB8610.apcprd03.prod.outlook.com (2603:1096:4:244::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.14; Wed, 7 Jan
- 2026 05:38:46 +0000
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd%4]) with mapi id 15.20.9499.002; Wed, 7 Jan 2026
- 05:38:46 +0000
-Message-ID: <93015e38-a906-43ff-8b04-921328d351e0@amlogic.com>
-Date: Wed, 7 Jan 2026 13:38:04 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_sync: enable PA Sync Lost event
-To: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251219-enable_pa_sync_lost_mask-v1-1-2769917f44e2@amlogic.com>
-Content-Language: en-US
-From: Yang Li <yang.li@amlogic.com>
-In-Reply-To: <20251219-enable_pa_sync_lost_mask-v1-1-2769917f44e2@amlogic.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TPYP295CA0023.TWNP295.PROD.OUTLOOK.COM (2603:1096:7d0:a::7)
- To JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="cV6ye+US";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="S7u78Vc5"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6070qXWi1979567
+	for <linux-bluetooth@vger.kernel.org>; Wed, 7 Jan 2026 07:20:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	I5rtVm8kNFSFhoT2yKf6mXo3wnmnNY7xaHa+NsjBgro=; b=cV6ye+USs5P5wt1n
+	k6ys4SVj7O8Aajl7GmFu2o5gdDl0dgVeNOisVrkiWZnO66i2ac5YG0w7mWm21X/Y
+	E5/7EkUEUPPjqoUIs10tfcHVgM5kuuJFoygriBJZ9DMn1k9zFFJKUS34sna5IX7c
+	Rwf7TsuxovPqI8sSgsYZSOS1bWq2T8dfl7WPyU56z9T1bU7D/qsS0p0Yp71RH5k1
+	gL8qEe1rIAfqZMEUA9Cb3entCGBsS7I8+wyPx2nO5kXfq1tkBKJUYD3YnGjl6r5E
+	nFMD1GmCMsGcGNupdC3bk14edWQ0Alhjz09YcL6Y9xuO6O2QQBccVZOsR/SF5aRl
+	ii8bWA==
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bhdavh1vp-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jan 2026 07:20:26 +0000 (GMT)
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-34ab8693a2cso4235023a91.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Jan 2026 23:20:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1767770426; x=1768375226; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=I5rtVm8kNFSFhoT2yKf6mXo3wnmnNY7xaHa+NsjBgro=;
+        b=S7u78Vc5HNKt6kc0T/k+DE2fKWj/1WnGiSl8P06T/RWxIGfrMaDaeHFvmIGHGARUfr
+         D7VbV/xNYg2pT4rxrIlo6ifNJgKvVJ+uqOmvr56n340+RarbQu9OmZfazX8H0NggjQCR
+         kvu3jT/m9bwoNXod+yATeC+yee0VuucFC83bAXJQOo51iZv2ADOaeWjN75cZQ4uRVPhn
+         PtNFmfmxkYN9X66E+Co2xnszX1t3w8Msl8AtC4h1hZ59urkWO8PnjfelFki/smazmkTi
+         JamrNfrwiEyrvv4T4jO0CeCsvB5qmlOO41iIJkMl9dTx8VDx3zhheogv5JOuG8MTiybT
+         2GaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767770426; x=1768375226;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I5rtVm8kNFSFhoT2yKf6mXo3wnmnNY7xaHa+NsjBgro=;
+        b=v+5lwvu0qDU1arKqPMmEZjcJ6ZaQLB2LxfgjVKqZhPbzfZK95kcK8gysCZudvrWAnP
+         ulukVxOW3NsnKV0xc14ccRKgmN49KbSM1XNTXgWK98R+kKlSfhm4sAsST95rbpgf3Uu7
+         E+ZuAMTtEgJNy3FwaG5cDySEqLghJyW0YlAwnqWH1oDTFhuE4KghUAA/TZ3zIcuV1ASq
+         iKEKT9+4aoj8Q+7pCL5H8mwuomDtpI26CAQ+YvzNkOctA3UzZYo3fR8lsiDqHjkAnQkn
+         jsk5GiySy8huuMJD8wu830S5CVQdsXE1ZtbSFf4OIRA+LSvloCLGDwBJf1IETQaNaOEH
+         LrkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2o49lQF3wJnu3/povnBnyJA+2DPM6EiBJB4ZQdr+4plUhJVxbGsEAyL0dIV8Z3Isb8SZxeNh9i/SCGdXagXo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzgcbk1qGQvF9LCSbNxPysJG6oi5rtq1HpAo2/RVKYS7d6qBiWf
+	WZshXp6IWmEwfhsdnaHcnS1TrOktGMSQ1TguU8NE5o4aKWOxd+jJE6E3EQdV1Qwy4+wRHJ2BPVW
+	ik9HEYKvc0eg5rsvudMYUaASckiqRbLLa7DzWrtUpvFy4syXZia50gNVSnF137D1Yn/IOhFY=
+X-Gm-Gg: AY/fxX7HOt6ndyqJg0FvvIZXgcg7gw9JSymyzTHTewFELE1vENhGIruv9kIIGv9Tyvg
+	idTjl5msRJycRVNlGWPSDtYyeTDXXOXWZkZPrNWmHkw9tk+4CgPT5Yn3ag5v74OHD2mycPJVU8m
+	kU3nn16o+h3ZAm7TAIkgbyqREu+0uqQOR/7bXfVo+/uho9sdvOILlSwI/wepHJ4KqGpUEqIUnVT
+	x+B8GEyz8EMr0MgFzwWjlR9ZARL65S77eN6ONM3q7vEe9/cihKZjM1Mgz7ru5sU4J5WReoruUGK
+	foBrQPqUMIAReHeEboa4UPyhhrG9ado7tK3e1FCkEB3Go81VcfRVlax181AgEH9bM2sHD2NvKEh
+	cdu61dQrx7F1Gt0jRKEa+Ldjcwcqqbcyk0Lvl
+X-Received: by 2002:a17:90b:2692:b0:34c:99d6:175d with SMTP id 98e67ed59e1d1-34f68c30794mr1329895a91.2.1767770425993;
+        Tue, 06 Jan 2026 23:20:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHG16DMkcL/CSNKiRMdoKO6+UgbIG597U/d9qnrM/4cda0X/Fn3XSdRKRhGTTuG7Yiy/hqTtA==
+X-Received: by 2002:a17:90b:2692:b0:34c:99d6:175d with SMTP id 98e67ed59e1d1-34f68c30794mr1329869a91.2.1767770425544;
+        Tue, 06 Jan 2026 23:20:25 -0800 (PST)
+Received: from [10.218.16.122] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5f7c4118sm4089665a91.7.2026.01.06.23.20.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Jan 2026 23:20:25 -0800 (PST)
+Message-ID: <baa1a047-0866-4e5f-b550-97d43d825c8c@oss.qualcomm.com>
+Date: Wed, 7 Jan 2026 12:50:19 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|SI6PR03MB8610:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0eaacb30-5c1f-4dc2-4a95-08de4daf06a6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UWd5ZjQyWWtNVEtjN2k1enQ2Zkd6Rk1yNFdCVjIxYmJXN3ljR2dqaFZXYXN4?=
- =?utf-8?B?bkdyNUFIVzZtSUMzWmk5UGNmeThCaS9LMjdQMmkzVkgveXRZTGFaS1VBN2dL?=
- =?utf-8?B?ek9QWjJsSXYyd3RNeHJoSTRDbzZnY21FbW1TREVPZ0pQZFJxOEZiUmdHRUor?=
- =?utf-8?B?VzMweDhMSnovNUVCMTdzbVZtOXhiVWlVek5KRnl0NGsxTFNhYkxXcUJuNHRG?=
- =?utf-8?B?ZlRPYi9aSXJSV0Z4Sm9VV1BETS82aGVvcm1ZYlQ1SExUSFJiRCtuRFRvczYx?=
- =?utf-8?B?dUJIa1IzV01MUXN3OG9aZHpXSFVTVlBENkpzakVJYXhlUUxpNWFiTElobmZo?=
- =?utf-8?B?YWk3bWxldlRPM2lnNjZ4ZkpGZEx5MFUzWDAwOXR0QlZJOXNuNGhNcXlyR01p?=
- =?utf-8?B?R3lKcVIxeFY2V1Fyc1NrUmY0R0EvREJ5RHhwQVdUNTdzNnFWNHFqbVVMUzhz?=
- =?utf-8?B?UGRPT3VKNmJwSCtkTkF4RTBEUXlYS0YwcGxGNVhkUjZwQ1RaV1pPNzhlM0VI?=
- =?utf-8?B?MUdWUFMzTVJVUnJSQmdjNHR3OE0xdkRFNkNPZ3lDNkFCbUh6QURKV084N1Jv?=
- =?utf-8?B?RXQrbzVFUm00QWNRNkJYVHpVUzI5Z3pMWm5KWWlWVFdvcENJMTYvQk5WZjJT?=
- =?utf-8?B?N2lYZWxyZFNacTB2d0JoZ01LVWxPUmpiaU45cU5Wb0t6MWc1WjlkS0VkaHFZ?=
- =?utf-8?B?dzQ4b2I5Uk92MXEzVGtBdnhHT29lU3pmajlBRVpxdlAydDBrWnY5RGlHN1ZH?=
- =?utf-8?B?amk1S0RvZUxhS252T2xGVGhVS1pQd0E0TVNLaS8xSThONzRZMjNQSXVmK2M3?=
- =?utf-8?B?alA1T1dpUHRWNDdrRnNoWXJWb1Fla29FWHcxU0xTL2JMY1dBN1piSkJ3eHQw?=
- =?utf-8?B?MFRwRkFPTmhBOHBCeUNpbGg0WVVXdTI1dDAyaTF1ZGJMTGo5UWFFMytBSTZh?=
- =?utf-8?B?Nmt6VG05aFVKZ0pERlZ6ekRNSlZUNFJ5MlZabVRXM3RqSGs5UFlWMUNVeDN3?=
- =?utf-8?B?cXdWdzRVSCswZldrYUttVGtkYUhEb3RIQ2dNdU8wdzg5Tnl4WlRkQml3R1Q4?=
- =?utf-8?B?NXJOTUx0bk5YNW05RGtDYS81QVFwS20wSTI1Q1BXcm1wbStMd1FnZ2lNOFdH?=
- =?utf-8?B?TzdYQk0wTU9scUNzU0lOZG9td1R2bUZUZE0zWG5xQ1ptMk5nMW1NWTkzMjN5?=
- =?utf-8?B?anRsWUxNRzJkQ1cvOURjbzAxVXlGNUxWenNJY0xpK2dwVTZoWlh0WG5zRm1E?=
- =?utf-8?B?dHR6QktuWFdhMUxhTHNQWGNIRUxJYkF5U3NvQWkrUmpWTlRNbmV4OXYzT0c3?=
- =?utf-8?B?Zy9WK3JjMkFaTzdsa1hRMWc3QlM4ZjAxa01FcFZ6UkIzUG9SRzA0d0ZHaitq?=
- =?utf-8?B?clAwbkFtSWttNHFDcXZzOHFqL04rTVkrdDQ0bFEvd1FOdy9YdFZiWXoyVHBJ?=
- =?utf-8?B?R3k0L1Mvc3Z2Q1BpRUlXZjRtdzBBSHd6bFpyQ0FjQ0Evd3FEek9pN3ZOZlB6?=
- =?utf-8?B?SGtTdG15ZXlMb09SWkZRUUo2RHNCRVY4cU0zM1JuekZFNkVkdzdIajZ5Vllo?=
- =?utf-8?B?bnhNc3ppSDRhOEdRUzc0aWUyam1pZUVzM1JIOWU1N3FEcm5iaFovQUdoSlhZ?=
- =?utf-8?B?aHVZY0V5aXZrYklBZHdmMnhTZUlMQVZaUkpvQklFb3BuemdncWFHdzlrMFZB?=
- =?utf-8?B?SW1IeWc3VisvS0ZuUmZhSnVsbmdvbGI2SDl1OXFnbG5wb25YQ05qdE9xTkFp?=
- =?utf-8?B?MEl2WEcrYS9HZHk2U3RSazV2NFRXY0tFM1R3YjJzejhsMXMxenAyOEhuaGNN?=
- =?utf-8?B?RXBhY3o3OU9rT3l4Q0tlS3MzcjdMdkhkKy9jMms0V2hFb3VsMG5MeURjelZT?=
- =?utf-8?B?VVRTUW9EbFJsakFBNFU4UXFjUm5peXJ0Ti8zZW9LQUVocWpBMXErQkNNVzhs?=
- =?utf-8?Q?4mxShWSzG8mlBNv4T2DCGyp/EsFb44aX?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QThRdlhmTjFNOE5XWnhIYmtLNDdRb053MGtOdjFyakhlUjV4bHdwZ0tjQWI0?=
- =?utf-8?B?QXBBWDRwVDBZTmt2NklrUlhMSlNKMlFsU1RRNHB3VGh5Rm50Zkd3Tk9RdUdx?=
- =?utf-8?B?ZWp6b3ZJTy9vaTdoRlc5Mm1IRE9BY1dBRVZEdVRLbktINkJqVmZRV0p4M2gz?=
- =?utf-8?B?VUJuZEc2VG81dE1nTjQrUlprVFpFOVI3ZXNaYjhOMmVKZVFSOGZiMDRrOHhB?=
- =?utf-8?B?K2Y5SDBpUFNURnlpVWRob3JDRGZEb3hSNVJSUGJnem5OWXBsK05ha2hnYXBp?=
- =?utf-8?B?cFh2a0diSDM1STBwMWxaVStDWWhWbWdPREZvZ2ROTUNOUVl6b3FTOUFZdS9m?=
- =?utf-8?B?Um9uQUZRS3FDbGV4a2pseFJ2RXc4V1lrR2hEeHFuMDFYWEJxcW5WMEMzMktW?=
- =?utf-8?B?cVNOdHJOdzViNGN4bEJodUNvRURvT0xOb2VWeHNNdG9uZVNxeE1BRm5nemJx?=
- =?utf-8?B?QVQzVU9MKzJrVURNS0liTTc3ZkRtL3NuUW52MUlMRXRyLzRYQlRRb2h6QXA0?=
- =?utf-8?B?ZkQ0Q0x6dGFSUjNSeWhtZm1SSGFhQlFMQVM5NmswMUVka2p2Q0cwYnFzcldP?=
- =?utf-8?B?dWJBV3JzVUE1LzRIY29nU01aOE8vMmZxbk9heUczQ0l1Zm1KK1FIUmhkY1hC?=
- =?utf-8?B?am9GRndkdGt1d1orQ3lFRVJlcndyWEMxajQ3UExTK3pOVTh5UkprZkpaL3Nz?=
- =?utf-8?B?TjhGSDhwUUc0OFIxUzkwcjUxSHVBUW5UWTRpczN5cmc1VlVpekNhbjVneFN2?=
- =?utf-8?B?VGw1a2x3UzRvT3J4T2FBanhjSjVSV0RhWHFsSmltQmFIVGFiSndiQU5VN0pK?=
- =?utf-8?B?aDVLdDdCeUJEMEtxVG9FL0NsNXl1b0RHbittT3VsZ0RlaXE3a0p3QUs4Znli?=
- =?utf-8?B?cWNjaFJkeGxCaVNrYkdjTFZyOGRTTVUxUVQ5V1hHQ0p4YmhBcHE4YTNRSHl4?=
- =?utf-8?B?dkJQQlJPaU1xVFpqSHZPSmkwN25uMzdyQkZXWFB2NWYzV0tsYy81UjBQVEQy?=
- =?utf-8?B?dkpETFl2MUswcE5lVDFBWWwwbEFoQmw3MUNobzNvRU02eXhQM3lzb0RmeWNh?=
- =?utf-8?B?QlZmOURTYzRqeUJiOTB0SGVIQmhyMXRiamVsQXczNlJpTnRVVTYrYVM3YTlj?=
- =?utf-8?B?K0gySzU2bkNrNGFiVHc1MkJnVVZDWHJoRWIxdldlZEo4QnQvb2x2OGNxWUFJ?=
- =?utf-8?B?Nm91TXl6WjNVYnlSN3ZQOW0wU1RTQ3QwVzIrS0poeHNPejZRb2dBOHg0bW5k?=
- =?utf-8?B?aHlCaGVFSFZveXArUm5UbjFrWVdrVVJscFRGeW9lei9FaXZZMS9rdFduNHIw?=
- =?utf-8?B?anpjN1JvWWdhUTF1MS9hWUZXMitNYVVsSUdYdTgyaVJwRHg0cXpsbzR4cmxk?=
- =?utf-8?B?YmFEb0N4ZFhNeUlTZDRMRXRnZGVDUGZhT3V6OGtDUjIybjYvTEFLZHpOYm1X?=
- =?utf-8?B?Q2NwamJyYXNQVXNJNGhqZVNEbjJEa0tCZDVPdjk3MVh6SnYxSU1GNlRFM3RY?=
- =?utf-8?B?WHovVExyN0FtSUxvV0lUdVZDaHNPMnJUb21XU2t0cEdqTTk5WVhOK0R6enVx?=
- =?utf-8?B?MUsyOWZoQ1R5ZmpDRmVmOFkvc3lsTFQrUllEcU5Gdy81MTR6RU0xa1hJWDhm?=
- =?utf-8?B?Qkt0UFcwbHRoODFCK3ZTbkhBeXJpeFRSU2xzRTdXYW56N2EzTHZndmRMMXNY?=
- =?utf-8?B?citxUENFRHhhVytxV2g1RVRjMlMrRjdFT2VWNHhVck5TeWxUMWVxTXE5RUNH?=
- =?utf-8?B?S3dSQ05wcTRmWVVTUXhoQ0lYZTBsN3gwZFdGOFNNbkI2Um55b2ZUUkxLTlhz?=
- =?utf-8?B?ZnNackdVbTBiT2dmbm01clNwemhUN2tneURHN09iSzZPZVdLWmYydFo2T1pq?=
- =?utf-8?B?UGptTXdFKy9DcjJ5cndSeXRKemRMNXFTbkJsa2hMTElMTzk1OFkyTlQxYnVF?=
- =?utf-8?B?OGRQU2p0NXRzVGVhbTNjZnR0ODJpck4yOFZqNzM1UUsrOGNmUzNaZW9KRFZi?=
- =?utf-8?B?U3g3L0xSbnJGK1pWSkUrOE5QZlZWSmFkRkhqcUlnb1M2SmxFVXNSSEhCMHRR?=
- =?utf-8?B?MnFRM2Irb2ptRk9RTkFTcU9qTmQ5M0NnVThuWC9mVUV6S3lJK01aRGYxWlJY?=
- =?utf-8?B?clJSNDZBZkZrejJNYy9DSmdXcDcxdUVwU0ZPQ0JIbEYvMGg5R0hxK01wN2Iz?=
- =?utf-8?B?c2dIRHpqUzA4MGxmUEJYeldQQ2hYSTdKTnkwck1xTEZjZ2g0VHAvVHZnZTl4?=
- =?utf-8?B?Q1ROSVNzbnZ3QVpFSE1kVmN0Tkx3ZmNJMGJrZDJIRXQzOU5BbkJGM3kyNnVa?=
- =?utf-8?B?c2xzRXMyZWk2TjdOdTFLdHF0RlYrZlBOdUdUT3FkWDVMV2I5WXRHUT09?=
-X-OriginatorOrg: amlogic.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0eaacb30-5c1f-4dc2-4a95-08de4daf06a6
-X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2026 05:38:46.0938
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PKqzDDcxhIvN9w13CIPXIIx28K8hzsG/d96LwVMHTxtigQvM3wID3KX59VthvUgTMo34+NwNBOFOmsP/swhZIQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI6PR03MB8610
+User-Agent: Mozilla Thunderbird
+Subject: Re: Fw: [PATCH 2/2] Bluetooth: hci_qca: QCC2072 enablement
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+References: <20251217112850.520572-1-vivesahu@qti.qualcomm.com>
+ <20251217112850.520572-2-vivesahu@qti.qualcomm.com>
+ <xv7zlaoymcuq5kirrgu3thp3trmbdry5maraz34v4tkekinyaf@wgrfk7ukiilk>
+ <BY5PR02MB69467A78CA2F2929B6618343F186A@BY5PR02MB6946.namprd02.prod.outlook.com>
+Content-Language: en-US
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rob Herring
+ <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        "Balakrishna Godavarthi (QUIC)" <quic_bgodavar@quicinc.com>,
+        "Rocky Liao (QUIC)" <quic_rjliao@quicinc.com>,
+        "Mohammed Sameer Mulla (QUIC)" <quic_mohamull@quicinc.com>,
+        "Harish Bandi (QUIC)" <quic_hbandi@quicinc.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        quic_janathot@quicinc.com
+From: Vivek Sahu <vivek.sahu@oss.qualcomm.com>
+In-Reply-To: <BY5PR02MB69467A78CA2F2929B6618343F186A@BY5PR02MB6946.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA3MDA1OCBTYWx0ZWRfX7EDsEs2T27S7
+ Eo06shVmsALtbZ92HQzfgjk7mzD7EZmPTq88X6xW+N6f4PqDC7mOu7lLSDFi8BAfOpegN/sJWqd
+ RYooLaWWthMyDodRbkXGmyCJgypl8B0RwvFvTLFg0r67b3yvUw/0YCbYOzMo+OM2ItG4K4uwvWl
+ gfomMN5TY9e59LyedT8UTvXmuT/pOInt0CZaVw81YCw3MUqqj0mOVPRHQc6AunBu6ouxICDN5bW
+ QZ0du+NvQCrYlQDpz5AGGcWIAltbJgLbCTqM4OVo78SLEl3qPL8Sse6q+7ditpgY0wf7nECLBuy
+ hn5eWD/VD7f75bpuz4boKEF2EiViApv2/PUUYeVl6icsvabW2GXAw28emNl5zxyP5ejp+20080v
+ 2bTQH7HNk5NVr6u6XvoQmboQ+iUQO2S3hQ+JlUNtuGesePYUNElZyg4NmULP3TMaj27fjGrNzx2
+ fleYRWTSXVaAtbu+zDQ==
+X-Proofpoint-ORIG-GUID: 21dGoD-03fRCIjnIlHGRxvb5mJk0bgzK
+X-Authority-Analysis: v=2.4 cv=comWUl4i c=1 sm=1 tr=0 ts=695e093b cx=c_pps
+ a=vVfyC5vLCtgYJKYeQD43oA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=Dei6p5SHAAAA:8 a=pGLkceISAAAA:8
+ a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=-uHN8is5J-lzmrAJaG4A:9 a=QEXdDO2ut3YA:10
+ a=rl5im9kqc5Lf4LNbBjHf:22 a=M-Yerj1wOn-OpK7r_3ei:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: 21dGoD-03fRCIjnIlHGRxvb5mJk0bgzK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-06_03,2026-01-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 lowpriorityscore=0 adultscore=0 priorityscore=1501
+ phishscore=0 malwarescore=0 bulkscore=0 clxscore=1011 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2512120000
+ definitions=main-2601070058
 
-Hi,
-
-Just a gentle ping regarding this patch.
+> From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+> Sent: 17 December 2025 19:59
+> To: Vivek Sahu <vivesahu@qti.qualcomm.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>; Luiz Augusto von Dentz <luiz.dentz@gmail.com>; Rob Herring <robh@kernel.org>; Krzysztof Kozlowski <krzk+dt@kernel.org>; Conor Dooley <conor+dt@kernel.org>; Bartosz Golaszewski <brgl@bgdev.pl>; Balakrishna Godavarthi (QUIC) <quic_bgodavar@quicinc.com>; Rocky Liao (QUIC) <quic_rjliao@quicinc.com>; Mohammed Sameer Mulla (QUIC) <quic_mohamull@quicinc.com>; Harish Bandi (QUIC) <quic_hbandi@quicinc.com>; linux-bluetooth@vger.kernel.org <linux-bluetooth@vger.kernel.org>; devicetree@vger.kernel.org <devicetree@vger.kernel.org>; linux-kernel@vger.kernel.org <linux-kernel@vger.kernel.org>; linux-arm-msm@vger.kernel.org <linux-arm-msm@vger.kernel.org>
+> Subject: Re: [PATCH 2/2] Bluetooth: hci_qca: QCC2072 enablement
+>
+> On Wed, Dec 17, 2025 at 04:58:50PM +0530, Vivek Kumar Sahu wrote:
+>> Adding support for BT SoC QCC2072.
+>> Set appropriate configurations for BT UART
+>> transport.
+> Read Documentation/process/submitting-patches.rst
 
 
-Best regards,
+I'll make the commit message more clear in the next patch set of this 
+commit.
 
-Yang
+
+>
+>> Signed-off-by: Vivek Kumar Sahu <vivesahu@qti.qualcomm.com>
+>> ---
+>>   drivers/bluetooth/btqca.c   |  8 ++++++++
+>>   drivers/bluetooth/btqca.h   |  1 +
+>>   drivers/bluetooth/hci_qca.c | 17 +++++++++++++++++
+>>   3 files changed, 26 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>> index 7c958d6065be..7eb095db4a1d 100644
+>> --- a/drivers/bluetooth/btqca.c
+>> +++ b/drivers/bluetooth/btqca.c
+>> @@ -854,6 +854,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>                         snprintf(config.fwname, sizeof(config.fwname),
+>>                                  "qca/hmtbtfw%02x.tlv", rom_ver);
+>>                         break;
+>> +             case QCA_QCC2072:
+> Please keep the file sorted. Find a correct place to insert your changes
+> rather than randomly sticking them to the end. This applies to _all_ the
+> changes you've made here.
 
 
-> [ EXTERNAL EMAIL ]
+I'll address this in the next patch set of this commit.
+
 >
-> From: Yang Li <yang.li@amlogic.com>
+>> +                     snprintf(config.fwname, sizeof(config.fwname),
+>> +                              "qca/ornbtfw%02x.tlv", rom_ver);
+> I hope to see the firmware being submitted to linux-firmware.
+
+
+"YES", firmware is being submitted.
+
+
 >
-> Enable the PA Sync Lost event mask to ensure
-> PA sync loss is properly reported and handled.
+>> +                     break;
+>>                 default:
+>>                         snprintf(config.fwname, sizeof(config.fwname),
+>>                                  "qca/rampatch_%08x.bin", soc_ver);
+>> @@ -929,6 +933,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>                         qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
+>>                                  "hmtnv", soc_type, ver, rom_ver, boardid);
+>>                         break;
+>> +             case QCA_QCC2072:
+>> +                     snprintf(config.fwname, sizeof(config.fwname),
+>> +                              "qca/ornnv%02x.bin", rom_ver);
+> No board-specific NVMEM dumps?
+
+
+"NO", for this BT SoC there is no board specific NVM.
+
+
 >
-> Fixes 59e5396a2579 ("Bluetooth: hci_event: Fix not handling PA Sync Lost event")
->
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> ---
->   net/bluetooth/hci_sync.c | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 5de98be752bc..3f04510b806b 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -4420,6 +4420,7 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
->          if (bis_capable(hdev)) {
->                  events[1] |= 0x20;      /* LE PA Report */
->                  events[1] |= 0x40;      /* LE PA Sync Established */
-> +               events[1] |= 0x80;      /* LE PA Sync Lost */
->                  events[3] |= 0x04;      /* LE Create BIG Complete */
->                  events[3] |= 0x08;      /* LE Terminate BIG Complete */
->                  events[3] |= 0x10;      /* LE BIG Sync Established */
->
-> ---
-> base-commit: 98246938a0e66e4100e95b6b7881843a9a4e4882
-> change-id: 20251219-enable_pa_sync_lost_mask-ae0fb71f29f3
->
-> Best regards,
+>> +                     break;
+>>                 default:
+>>                         snprintf(config.fwname, sizeof(config.fwname),
+>>                                  "qca/nvm_%08x.bin", soc_ver);
 > --
-> Yang Li <yang.li@amlogic.com>
->
->
+> With best wishes
+> Dmitry
