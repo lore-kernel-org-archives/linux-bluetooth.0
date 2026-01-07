@@ -1,77 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from xtrwsrct.outbound-mail.sendgrid.net (xtrwsrct.outbound-mail.sendgrid.net [167.89.101.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1752033B95E
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 18:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5067835293B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 18:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.89.101.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767811463; cv=none; b=CVc7wLGoHKigd+aDyEenWILyPsZeg68VXz+/C9/fWFyHiF6+zTDSJsaqHaTvHhYioptIOPEuJ7kzzRt3I3SLHQqlOKW1Jgu1HYS/17qP82phIeeIHQ2u99YfKRz4gu/DzMC7gpDKpV41fzhISJIoqCUNZz+3mDkiiI4pJx7qxh0=
+	t=1767812131; cv=none; b=O9PjtTY5Lww+gA0lmLWGgFoYKud+dIyYGL6QtDaZV0U9EN3a3C4HnJb3thoZf3w961B4YqVXZw90CM6CpG1M9hrNnMVGc7rjys+OZV5TseiSVGGpajJWgUaS+1betGxFypO6oe6sxLpT3uLbwSRHRnag4+Jq9ONCIh5evklgwMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767811463; c=relaxed/simple;
-	bh=oAZw8u6bbX6nn5ViCgtevYml3oWYQX2j9AKKRjnHZEk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KdshaZ6N4K9RvsSQAMp7vKfGuU21d4AK7c/P7LF8gY3tOxuzIGn0pcl2SbVtubr4oVsu1FH4e3YOqmBRujq9hQa4U+ApfMWdOQazAVV/U/Ng6I157y8O0IacEJ1rvWyL+eJtNhL2+/tHq2lveldVTgT4jtm2tvNi6EyGL2ZpgiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oRE6HpFh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767812131; c=relaxed/simple;
+	bh=m08QAfN66GWKV6nk2k/C7i1C98vjOv/qTT3PIr+GUZ4=;
+	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=tdFVma1MIVrr4gvroMTd2qel8tr+50BfRBgIW99mZIT4fUs8Ja0i10icG2U6ZSapMnCPk7M5iOCRuCN2dBesrDC2UUHt6hMBTyunK33zlzXQVulcAeyH7BnkdyE4OwT02IyXphz6hg6USYrovx7yNaBWhNWLZwFUfW72YD8ZVmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=V4jc0GIR; arc=none smtp.client-ip=167.89.101.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oRE6HpFh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03388C4CEF1;
-	Wed,  7 Jan 2026 18:44:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767811462;
-	bh=oAZw8u6bbX6nn5ViCgtevYml3oWYQX2j9AKKRjnHZEk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oRE6HpFhjAmFeg/uwyRSpmQYQ4CDaOCyt8PGRhlK1gVClzTRw5BSvW95a3dyB2CoK
-	 J1PTRY6g2fXxBUFUpoDkV5/izbIXqQ58g0/kNEVYxNEMyXD0MLwSQYO163a+ChQ3M6
-	 oJLNOcljuTgQYYCrGLSuQhxxAFTpvUPaqCY+aX+f2N+DyQ+fSqXrEG2p2nSOcbjjLR
-	 V09DWJOv4FS/w0Ca3Wtx8Y8eEhbdAx4dLyQvcNyEFTuc/ksTBzWbT21w/ddlO4rPK0
-	 B0658AY6qWYW9AqEVT95WZpqBrzAp2oYe8ozkQdWwXnujcgehKqFBAA8MVyrEzaaqe
-	 NaHpPX7UH6GrQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B8153A40FD9;
-	Wed,  7 Jan 2026 18:41:00 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="V4jc0GIR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	h=date:from:subject:mime-version:content-type:content-transfer-encoding:
+	list-unsubscribe:to:cc:content-type:date:from:subject:to;
+	s=smtpapi; bh=fsOZoaUszczFSqSo2luywl+RAulGgglp3GDmNqc5ZwA=;
+	b=V4jc0GIRH6Y5C1rs+Yh1wYL54WUNNE0u2+MoEXKvIOZ/BHef2gajs3iJytBT3cIsx12n
+	gbJ5sznXIgkuuuezGvYQAhro3EAEYNQ078yojwmeUDv9sQwMqlrLoVkLDk7kbcdXwtC7oC
+	ChE2tP/R9P+nxxr+SubeJ40taU+BJp5JE=
+Received: by recvd-678ccb598b-rzcsz with SMTP id recvd-678ccb598b-rzcsz-1-695EAC1F-34
+	2026-01-07 18:55:27.986154867 +0000 UTC m=+1802941.671337832
+Received: from out-24.smtp.github.com (unknown)
+	by geopod-ismtpd-16 (SG)
+	with ESMTP id EckIsaPPRGyNCFe04E3yBQ
+	for <linux-bluetooth@vger.kernel.org>;
+	Wed, 07 Jan 2026 18:55:27.964 +0000 (UTC)
+Received: from github.com (hubbernetes-node-9fe6a79.ac4-iad.github.net [10.52.145.30])
+	by smtp.github.com (Postfix) with ESMTPA id 554D6640BC6
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 10:55:21 -0800 (PST)
+Date: Wed, 07 Jan 2026 18:55:28 +0000 (UTC)
+From: Dmitry Baryshkov <noreply@github.com>
+Message-ID: <bluez/bluez/push/refs/heads/master/b35b6b-38ac68@github.com>
+Subject: [bluez/bluez] e73bf5: shared/shell: Don't init input for
+ non-interactive...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] shared/shell: Don't init input for non-interactive
- shells
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176781125904.2867211.5094661689920998617.git-patchwork-notify@kernel.org>
-Date: Wed, 07 Jan 2026 18:40:59 +0000
-References: <20251219080633.394709-1-dmitry.baryshkov@oss.qualcomm.com>
-In-Reply-To: <20251219080633.394709-1-dmitry.baryshkov@oss.qualcomm.com>
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+X-SG-EID: 
+ =?us-ascii?Q?u001=2E3tJAIsPS2eJvEZdbdOipSFHMeIdYceY9IQHBHxVyi4FCEd8uOxM+FJ0GG?=
+ =?us-ascii?Q?0Wa5ftnwomUe4GYgxDYKU9O92QecVjv5PD4aFNl?=
+ =?us-ascii?Q?1r7EKbHoHR=2FgHXe3XCCGmjVX9F74adXm78kh3aJ?=
+ =?us-ascii?Q?JW4VzdYtYXQf1eX7A3VGllUn4bK2dUDYkZ8S9X3?=
+ =?us-ascii?Q?f0w1HgtIc=2FXfnvES3meep=2FRhpqhuM2OAI1BtIde?=
+ =?us-ascii?Q?3HOtU+63=2FQ1dhbcPapQeUoDKfFYFD7Zeem4LwGx?= =?us-ascii?Q?Yu0L?=
+To: linux-bluetooth@vger.kernel.org
+X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: e73bf582dae60356641a32fc27ae03d359ec4c47
+      https://github.com/bluez/bluez/commit/e73bf582dae60356641a32fc27ae03d359ec4c47
+  Author: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+  Date:   2026-01-07 (Wed, 07 Jan 2026)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/shell.c
 
-On Fri, 19 Dec 2025 10:06:32 +0200 you wrote:
-> Only the interactive shell is supposed to read comments from the input
-> file descriptor. Rework bt_attach_shell() in order to stop calling
-> input_new() / io_new() in a non-interactive case.
-> 
-> Fixes #700
-> ---
->  src/shared/shell.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+  Log Message:
+  -----------
+  shared/shell: Don't init input for non-interactive shells
 
-Here is the summary with links:
-  - [1/2] shared/shell: Don't init input for non-interactive shells
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e73bf582dae6
-  - [2/2] shared/shell: make bt_attach_shell more obvious
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=38ac68e23909
+Only the interactive shell is supposed to read comments from the input
+file descriptor. Rework bt_attach_shell() in order to stop calling
+input_new() / io_new() in a non-interactive case.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: https://github.com/bluez/bluez/issues/700
 
 
+  Commit: 38ac68e239090f01eb39511921a703667266c310
+      https://github.com/bluez/bluez/commit/38ac68e239090f01eb39511921a703667266c310
+  Author: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+  Date:   2026-01-07 (Wed, 07 Jan 2026)
+
+  Changed paths:
+    M src/shared/shell.c
+
+  Log Message:
+  -----------
+  shared/shell: make bt_attach_shell more obvious
+
+There are only two cases, interactive and non-interactive. Make that
+more obvious by using if-else rather than two if-checks.
+
+
+Compare: https://github.com/bluez/bluez/compare/b35b6befb12c...38ac68e23909
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
