@@ -1,165 +1,170 @@
-Received: from mail-qt1-f196.google.com (mail-qt1-f196.google.com [209.85.160.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500F62D6E64
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 08:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9017083C;
+	Wed,  7 Jan 2026 08:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767775483; cv=none; b=Ykt4l+C/q7hV8dbSkvgiTvJ2Ua6R4e8uu5szqz2/wh56S3Dmm7KUkRDBFrygb1ruJvPPDYoysYumsyoIry4Ec7Q3zHNhnPdq0gj9CsKAAW+tCVUv9yQdQF6pfOPXVGUU196mKbe2s3Z2p93W39/PUfzaq9pgBwal0arqPYIbJ18=
+	t=1767775694; cv=none; b=hQjDrgHrrO2T2qDQ+l7yO7yQ6wJ3RNoNxxHUsUWVAM1q6sMHWtA1eboXkBa1kvkL0MuRXPWan8Yo4WfQYl2uoCB++/8XWuV8UIv0+vPmLtPa/6Jn/fytNg9mkAu9o0sC/ZBHqAtqFX86jJmXmQG7z2lAKyysu2BMgopXRmMUVpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767775483; c=relaxed/simple;
-	bh=cwFImRhBRuqQTNDrYa2zmy/2R7itttm8gNuZVrYfaDY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Q4adjuO3SvFJVqXpp5HVsSMBYHUSUy6XRDfOe3CGO8MoSy90FXEhqncZj68WQ27BAEPzgFrhpqeKLgLjB4tZF6XS3BH5thUNU2wE5C8pE68C+Ul8QoMhr5OM807Go9VkPeV1dgr6/1u8LuQwDNaboKVV1kxdh5DHnJhunYJG+wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I53sviaX; arc=none smtp.client-ip=209.85.160.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767775694; c=relaxed/simple;
+	bh=pGxNbgaMb+VJxYIO05kdvF6BUm0EeGaXKDqBwmMff8w=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=bgB6hTUcjfnCiPfbozelZXVlZC+UGVPcU0Y5ZJyhBs+eQKmiEaBOthbl0AsBUYJ/60l0oIMea9aOzDDMd1iG7f7HILSPQbJ46nVkdbPFS/YkJy7iGmWR8LwKGp95j0TBzhPyWFsGkKsSiLrQS4AtajXutZ+NAE/L0+bSe/TlprI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WvmoXEp7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I53sviaX"
-Received: by mail-qt1-f196.google.com with SMTP id d75a77b69052e-4f4a88e75a5so16397681cf.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jan 2026 00:44:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767775481; x=1768380281; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7CAKwH3QK/uK/KpuasqaCxjSGWebeNc93WtkyasjnMI=;
-        b=I53sviaX4oOKf/7rxdzD6A2FvDzFTI080CE80wXNHixhUglX+mCu+s/SiSREaocHZ8
-         WSBJlZpepORb9DJvEFLEtMY0Wp3/rQ3f/9EUQDnhtxsdxMJTXPNBAv3fJOR/YdnEZXHv
-         00kuBReUlBuCtWEQYgiG5/Lt7A6pXDi6wYERosJ+xX6vMzZpySi/v0/D76AZqnMuO242
-         47ZPa6HWrNagof6G1nH2xp7BuSkU+Dcm1qxZ/OAR80bFf8TXFoE9b8Ix8g2kok/8Y/Uh
-         RTmutCTAm2hqw2iMYdqzISnCg1PvO4F26osPezu9eRyVAw4r1jE/4s8dERCBkCSw51nr
-         YD6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767775481; x=1768380281;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7CAKwH3QK/uK/KpuasqaCxjSGWebeNc93WtkyasjnMI=;
-        b=wax9WrzW+zqWucMIMHiGJpYY7du6gSMVIHGsrLxJyYVedM2zT+eemEfT9bPenYZEz2
-         S1KQDDpOkGQEyGLUkr+/BnoBDrBgw3ORJgDRBzI5LEoUXo8pmjZvP1LFNHtpk7f0X9r9
-         108Dx5oygl3Zg5FwuRavImteMytu9L48E7P9dhdeaqzIpWTKv7IcP1M47bNPjLbKfAt0
-         J9e/f19Ey9stQ0y9bYMH0JkAhnPjEwIBlHlVS5bAd6EdZTH0sn+J1SK4CkEbWeUkpw9x
-         mm+fNA9tNgfKJZAPMiI8JbvZ4UMgab81B7aniSgDIvcZyWF+qraMIVTLIJhmcS9b42va
-         djaw==
-X-Gm-Message-State: AOJu0YyPMGNFAW3rKQCL0xaA2iQq1wCcQp3uhiNccD1xV/UKPcTgcvKX
-	0xfaAexst6QL1EloIdC1jqG8UqIgYqQKwT0Zt3HIgysCXLiwHWmhebtehykDyAth
-X-Gm-Gg: AY/fxX4JqpYqk0D4aI16nHOjAcsLHlp5BPd/9+YA81rlpcsTJ3zytawbdlvcuz0HEux
-	6DuHtv2VPk9x6fh2h8j/vOjGgdk13PmF2b4EvpHj97qu8m1GHtaX9fZe1Lwq2GWSqmSWe3jVXhS
-	oRrVF2P4cjPxCaeZUfKgqP9DygWr4TfBitBkfTaqYYLQ/Pd8VEjT7JnarwLg0kSuCNM1HAVuM5o
-	sDGR4ZO4VTdIo0Zr6YYTgbGPqn4u5PNmNDPhb5mZy+XjLgJfdMnPbvaXzgllPp1l2SvLDyiViyR
-	lfzvK2gW1oPnCsz0HMUXopeBK8HOWSG5pAst5zsbeXDY3uUc5re/k/LQni2ta0oFvhFt23xqiCY
-	Lt47UNJPL+0UBnI/tVzj9s0iT6A9zE5ui5S89H37AgSScaSr7pIa6wMBOOrd97PVKJ+2AAV5QFY
-	ajiDN15fN3fGu0aJjnWpE=
-X-Google-Smtp-Source: AGHT+IELLGyyVkEhBd+iLqRt4lPyzPj/BE9Eqdn8DX/F0mvnVh+KclRU1H4hOUilFmuoO14MIxPOEg==
-X-Received: by 2002:ac8:5755:0:b0:4ff:b27c:c023 with SMTP id d75a77b69052e-4ffb4875cb9mr23570321cf.27.1767775480836;
-        Wed, 07 Jan 2026 00:44:40 -0800 (PST)
-Received: from [172.17.0.2] ([172.174.223.246])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffa8e5d4c8sm26167071cf.28.2026.01.07.00.44.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 00:44:40 -0800 (PST)
-Message-ID: <695e1cf8.c80a0220.35d582.a123@mx.google.com>
-Date: Wed, 07 Jan 2026 00:44:40 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3488409540113960747=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WvmoXEp7"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1DE4DC4CEF7;
+	Wed,  7 Jan 2026 08:48:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767775694;
+	bh=pGxNbgaMb+VJxYIO05kdvF6BUm0EeGaXKDqBwmMff8w=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=WvmoXEp773IvzFofUNXvRaDoT1UWsjOYHUDKVtBLUm5HUcp5sKjWUAKEKQXqSDh0e
+	 0nfSNTB++9PC3lt6LAqjkqn+5tdD3Vp6PZAeNNqWVoY2dFQQkEuyvqtg349p1tR2BN
+	 fESn0hHudMgaLOhpr/YOB1sTdc5/AXg4XQuonm3W9bPrxGOuAjna04qgwXiXNhtSgK
+	 fuIx9B7M+y5AGPmMS0rAQTN/XlAn3/OLXiNZ+SY/c2jPcSt5MkP5Ldh5/quuhpl0SG
+	 Iyuc0UP/Yy6quHdxzn45Mf8P7mN9btwlWTYX8LF3rjBbZbnZ7nmvcf2s1Zi8uir3uB
+	 osR8ycdxO/8Ug==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F7ECF6C04;
+	Wed,  7 Jan 2026 08:48:14 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Wed, 07 Jan 2026 16:48:08 +0800
+Subject: [PATCH] Bluetooth: mgmt: report extended advertising SID to
+ userspace
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ot_zhangchao.zhang@mediatek.com
-Subject: RE: Bluetooth:btusb:MT7922:Add VID/PID 0e8d/e0d8
-In-Reply-To: <20260107080154.2635403-1-ot_zhangchao.zhang@mediatek.com>
-References: <20260107080154.2635403-1-ot_zhangchao.zhang@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============3488409540113960747==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260107-mgmt_ext_adv_sid-v1-1-1cb570c7adf7@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAMcdXmkC/x3MTQqAIBBA4avErBO0P6mrRIjkZLPQQiME8e5Jy
+ 2/xXoaIgTDC0mQI+FKky1eItoH91N4iI1MNHe8mLrhkzrpHYXqUNq+KZJhEPfIeh0nOAmp2Bzw
+ o/ct1K+UDF5DVL2IAAAA=
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1767775689; l=3615;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=jBmr5FIDDl995BF+9DomJoZAhCWPM4Uef0JY/2Np600=;
+ b=V/ux01+VdAla+V1PNlq5O7Wq86VMgMjszSE8gr9GydbRRVIc6rljMD+tOkvcIXXf/g38GIi5f
+ 9DmB2ewp1MJAewxWuRow2dUwyZr4+D7Zx/RbH+5dw5a6wFydOuxlZrq
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-This is automated email and please do not reply to this email!
+From: Yang Li <yang.li@amlogic.com>
 
-Dear submitter,
+Add a new mgmt event to report the SID of extended advertising
+to userspace. This allows userspace to obtain the SID before
+initiating PA sync, without waiting for the next extended
+advertising report to update the SID.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1039270
+By providing the SID earlier, the PA sync flow can be simplified
+and the overall latency reduced.
 
----Test result---
+Link: https://github.com/bluez/bluez/issues/1758
 
-Test Summary:
-CheckPatch                    PENDING   0.32 seconds
-GitLint                       PENDING   0.27 seconds
-SubjectPrefix                 FAIL      0.37 seconds
-BuildKernel                   PASS      25.33 seconds
-CheckAllWarning               PASS      27.76 seconds
-CheckSparse                   PASS      33.52 seconds
-BuildKernel32                 PASS      25.08 seconds
-TestRunnerSetup               PASS      549.88 seconds
-TestRunner_l2cap-tester       PASS      28.34 seconds
-TestRunner_iso-tester         PASS      69.22 seconds
-TestRunner_bnep-tester        PASS      6.19 seconds
-TestRunner_mgmt-tester        FAIL      114.34 seconds
-TestRunner_rfcomm-tester      PASS      9.40 seconds
-TestRunner_sco-tester         FAIL      14.66 seconds
-TestRunner_ioctl-tester       PASS      10.20 seconds
-TestRunner_mesh-tester        FAIL      11.53 seconds
-TestRunner_smp-tester         PASS      8.58 seconds
-TestRunner_userchan-tester    PASS      6.55 seconds
-IncrementalBuild              PENDING   0.80 seconds
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+ include/net/bluetooth/hci_core.h |  2 ++
+ include/net/bluetooth/mgmt.h     |  7 +++++++
+ net/bluetooth/hci_event.c        |  3 +++
+ net/bluetooth/mgmt.c             | 13 +++++++++++++
+ 4 files changed, 25 insertions(+)
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 488 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.105 seconds
-LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.147 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.821 seconds
-Mesh - Send cancel - 2                               Timed out    1.995 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7bffb908c1e..81ef3e94e3af 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -2469,6 +2469,8 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len,
+ 		       u64 instant);
++void mgmt_ext_adv_sid_changed(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				     u8 addr_type, u8 sid);
+ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len);
+ void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 8234915854b6..7ee38ebaccd8 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -1195,3 +1195,10 @@ struct mgmt_ev_mesh_device_found {
+ struct mgmt_ev_mesh_pkt_cmplt {
+ 	__u8	handle;
+ } __packed;
++
++#define MGMT_EV_EXT_ADV_SID_CHANGED		0x0033
++struct mgmt_ev_ext_adv_sid_changed {
++	struct mgmt_addr_info addr;
++	__u8	sid;
++} __packed;
++
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 467710a42d45..f4463e71b424 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6519,6 +6519,9 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
+ 					   info->rssi, info->data, info->length,
+ 					   !(evt_type & LE_EXT_ADV_LEGACY_PDU),
+ 					   false, instant);
++			mgmt_ext_adv_sid_changed(hdev, &info->bdaddr,
++						      info->bdaddr_type,
++						      info->sid);
+ 		}
+ 	}
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5be9b8c91949..4e0f8c43e387 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -208,6 +208,7 @@ static const u16 mgmt_untrusted_events[] = {
+ 	MGMT_EV_EXT_INDEX_REMOVED,
+ 	MGMT_EV_EXT_INFO_CHANGED,
+ 	MGMT_EV_EXP_FEATURE_CHANGED,
++	MGMT_EV_EXT_ADV_SID_CHANGED,
+ };
+ 
+ #define CACHE_TIMEOUT	secs_to_jiffies(2)
+@@ -10516,6 +10517,18 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	mgmt_adv_monitor_device_found(hdev, bdaddr, report_device, skb, NULL);
+ }
+ 
++void mgmt_ext_adv_sid_changed(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				     u8 addr_type, u8 sid)
++{
++	struct mgmt_ev_ext_adv_sid_changed ev;
++
++	bacpy(&ev.addr.bdaddr, bdaddr);
++	ev.addr.type = link_to_bdaddr(LE_LINK, addr_type);
++	ev.sid = sid;
++
++	mgmt_event(MGMT_EV_EXT_ADV_SID_CHANGED, hdev, &ev, sizeof(ev), NULL);
++}
++
+ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len)
+ {
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: 030d2c0e9c1d68e67f91c08704482ad9881583eb
+change-id: 20260107-mgmt_ext_adv_sid-7ea503e46791
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
 
 
---===============3488409540113960747==--
