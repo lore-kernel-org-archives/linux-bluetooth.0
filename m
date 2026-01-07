@@ -1,81 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from o7.sgmail.github.com (o7.sgmail.github.com [167.89.101.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3462749ED
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 08:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB628285C8D
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 09:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.89.101.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767775903; cv=none; b=W1ckPd/t3pBIhs8PVFLPN6DZG7IjW1z5ILKKRVGmg1TSo0U08PYDihCWXGKPbpggBFJvem78Vvv20Xed6U6Jw9z6e8HjCc+5d7e5SEZviV7t8/KiXRnl10oCOeE4x42UfmAvLHu5BhtKAbyzmQ7SM0PK5jbF+ZYty2iZldz/pzA=
+	t=1767776640; cv=none; b=Zxc+BW1S5+1GhSr1MH4Sk5KJGM3f80p+Bk2cUdGyo4Ow/+RF7lE1ewcokV40CmEzHyIDhqcfbGFKIZIIOGMGfO+NhNrPm56Rl8M7v3BjH7ksI0Xtee3kJFgz2wGNLKjzEkH3XuKhpdeZKZbo2klYuTTJIIJNlHSBykLC95mEAzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767775903; c=relaxed/simple;
-	bh=BB6Zo9Ch6b6qrvLJcbZ84/9go69rlEbnAxDnI8Luqhw=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=SK0evo/CwQX6Y8qUDd3nb5SmYrAVTeCDDghmgED8pniSpHFiIOoK9s5vwUEG5L9XLp0V7v308YRoEhDdmU+zhhN2rDG1S2OD9JXL/dKAgpfmATsxJtKhcG/zj8yqubKcy9K7HdSCBCrABaXSkmxrVC42qrz2IcpoRsLMbXjwKK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqtI6oNT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767776640; c=relaxed/simple;
+	bh=Pvu3TY/1Z1NejXDFW85Y1FTeUHJLzHpB8Lm7FLRKITw=;
+	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=JQzy+Er3BPl52vzWK99fI6tfBfy+Zfb/foDYcRXhWhg/2kIx2QppAjNPuWMWvij3EmCzOx5rBe7lE1dkpoMQzMHOMIAD54gTlB56QTlFB/mwfp892y7bPs+C3NmNS68LNR0e9Se/xGcvX1GJdiKExD9AFX/C+0PpKTrnAGsejjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=MLQTlgAD; arc=none smtp.client-ip=167.89.101.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqtI6oNT"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A613DC4CEF7;
-	Wed,  7 Jan 2026 08:51:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767775902;
-	bh=BB6Zo9Ch6b6qrvLJcbZ84/9go69rlEbnAxDnI8Luqhw=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=DqtI6oNTDRi/48qcf+B2dWEvvdPB6qRfpjd2QF3TCjxNMCTVhvmFnhQPA5i6BZGAU
-	 lH3mv0pdiVBCRkL5nf6HNJgdqWN6DJluXt+stTY2ebuhUFew2UW/xNiJyYHdHcUinm
-	 Sqsa7qeZo6R0138gQ9xdhh8UZRHhvWqFWfkb/SkDcduIboP9z6FoVuWp0yoa2mIhHw
-	 ECm4+b1nDwKWl92fiFqTlX6sff0SxfV/uliAbVvEhwLKPVNtzZUJbwQD+Yf7pTuTgm
-	 Ar3kFNGvc5G3I9X7TKOYvuGITzRl/gy4bS12LSC1TlCwEKZ+RoMgFNIhG5ygiIWQ/r
-	 MrTSoWBIqNPBw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9467ECF6C0F;
-	Wed,  7 Jan 2026 08:51:42 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Subject: [PATCH BlueZ bluez 0/2] Optimize the PA sync flow
-Date: Wed, 07 Jan 2026 16:51:35 +0800
-Message-Id: <20260107-mgmt_ext_adv_sid-v1-0-6832b40813fd@amlogic.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="MLQTlgAD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	h=date:from:subject:mime-version:content-type:content-transfer-encoding:
+	list-unsubscribe:to:cc:content-type:date:from:subject:to;
+	s=smtpapi; bh=O+cyMBAYFBfXm54t845PHdT6oFESNaIGdpCwjWxzIgU=;
+	b=MLQTlgADBSzCFPCn7FlcgI9lYAqwHT1aPhlNWJe1jEHcGWgQr2gj6HuxtCZV9jPLxiwJ
+	xtcEGYCyON3NMMeEJYY3102YDG+bXR+7vllUif5e8HeW6v7oy+aGtHZnuZV7ldVzC13ZTY
+	IB1waBTv43Y1HtijACa2jyv/QR3rugK9s=
+Received: by recvd-874656597-vhgq4 with SMTP id recvd-874656597-vhgq4-1-695E217D-6A
+	2026-01-07 09:03:57.944418697 +0000 UTC m=+1767180.653616592
+Received: from out-22.smtp.github.com (unknown)
+	by geopod-ismtpd-62 (SG)
+	with ESMTP id bopWbwHCQMazLT9dGmY-6A
+	for <linux-bluetooth@vger.kernel.org>;
+	Wed, 07 Jan 2026 09:03:57.890 +0000 (UTC)
+Received: from github.com (hubbernetes-node-acf3dfe.ac4-iad.github.net [10.52.211.38])
+	by smtp.github.com (Postfix) with ESMTPA id 8818C21037
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jan 2026 01:03:51 -0800 (PST)
+Date: Wed, 07 Jan 2026 09:03:57 +0000 (UTC)
+From: "github-actions[bot]" <noreply@github.com>
+Message-ID: <bluez/bluez/push/refs/heads/1039291/000000-31b82c@github.com>
+Subject: [bluez/bluez] b495ad: adapter: add MGMT_EV_EXT_ADV_SID_CHANGED mgmt
+ event
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJceXmkC/x2MywqAIBAAfyX2nGAe7PErEWK51UIv1CSK/r2lw
- xzmMPNAQE8YoMke8Jgo0L6xFHkGw2y3CQU5dlBSaVnIUqzTGg1e0ViXTCAntLajsrJmKuDs8Dj
- S9S9b6JcTb+je9wMZ+sigaQAAAA==
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1767775901; l=665;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=BB6Zo9Ch6b6qrvLJcbZ84/9go69rlEbnAxDnI8Luqhw=;
- b=/yyOb0GJXmRIAuYi5KOedfouW/u2aWtGWSXZ6YUA7mFX87U46dVMeLnENWR8PZ2D2TMBgPaZL
- 9PmvEWftCioB+l8rPqLzVFV5yu20zM/k5221DOq7FITT0MYzuODCcfK
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+X-SG-EID: 
+ =?us-ascii?Q?u001=2EOmaFr=2F1UU=2FZnDLH7OeuCdRX0CsxIfcrGHCrZFU+6memyJLWEfoVOzRRry?=
+ =?us-ascii?Q?oaLUMWT5aK+P15stzHrMb2=2Fq5PF2q8ST+3DpYgR?=
+ =?us-ascii?Q?Gbd9G1lmyhWpgFzsnpr1RMei06rdRl5xQEaAP1B?=
+ =?us-ascii?Q?YHZbWhSRTzu2ZwVpZhDpz9ZgEiYlyHprHQC6FK+?=
+ =?us-ascii?Q?xw2GqZOmMym7La4aBMBbl0LNFD48zaEO2mZ+eP0?=
+ =?us-ascii?Q?5nxrCS=2Fpj5pa=2FW5OotKBnSL+i+bKt1oMTKU=2F9NC?=
+ =?us-ascii?Q?HV2PxxbOBLx3pgsz2uMxbnTUKg=3D=3D?=
+To: linux-bluetooth@vger.kernel.org
+X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
+
+  Branch: refs/heads/1039291
+  Home:   https://github.com/bluez/bluez
+  Commit: b495ad25ed257bdbe1fe4f10ad6e146430664841
+      https://github.com/bluez/bluez/commit/b495ad25ed257bdbe1fe4f10ad6e146430664841
+  Author: Yang Li <yang.li@amlogic.com>
+  Date:   2026-01-07 (Wed, 07 Jan 2026)
+
+  Changed paths:
+    M lib/bluetooth/mgmt.h
+    M src/adapter.c
+    M src/device.c
+    M src/device.h
+
+  Log Message:
+  -----------
+  adapter: add MGMT_EV_EXT_ADV_SID_CHANGED mgmt event
+
+Add the MGMT_EV_EXT_ADV_SID_CHANGED mgmt event to notify userspace
+of SID updates for extended advertising.
 
 Signed-off-by: Yang Li <yang.li@amlogic.com>
----
-Yang Li (2):
-      adapter: add MGMT_EV_EXT_ADV_SID_CHANGED mgmt event
-      bap: add timer to wait for SID update before PA sync
-
- lib/bluetooth/mgmt.h |  7 +++++++
- profiles/audio/bap.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++-
- src/adapter.c        | 39 +++++++++++++++++++++++++++++++++++++--
- src/device.c         | 22 ++++++++++++++++++++++
- src/device.h         |  2 ++
- 5 files changed, 114 insertions(+), 3 deletions(-)
----
-base-commit: b35b6befb12c91c1802d09208ea5a00f0b0bc614
-change-id: 20260107-mgmt_ext_adv_sid-66af2a092a08
-
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
 
 
+  Commit: 31b82c0d7a368771770814be96ec68db42406812
+      https://github.com/bluez/bluez/commit/31b82c0d7a368771770814be96ec68db42406812
+  Author: Yang Li <yang.li@amlogic.com>
+  Date:   2026-01-07 (Wed, 07 Jan 2026)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: add timer to wait for SID update before PA sync
+
+Add a timer to wait for the SID to become valid before triggering
+PA sync. Once the SID is available, PA sync is initiated accordingly.
+
+Fixes: https://github.com/bluez/bluez/issues/1758
+
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+
+
+Compare: https://github.com/bluez/bluez/compare/b495ad25ed25%5E...31b82c0d7a36
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
