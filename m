@@ -1,131 +1,122 @@
 Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83C2A86347
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Jan 2026 15:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3F9248F47
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Jan 2026 15:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767885745; cv=none; b=TfYgnkDxtXsNxA2YyOLmKKkkbeyy25T6OUKy0WOO8jB1oDOHpzOypbXhmIsZaGBA+TfqU/NUP/1JXmArV4oowC+G4xoqTVkT/85HM7Eir9BD23/fLVWsobW8+hoJbO5v4GUXru8N1ESLGID0eDqso5Ku498r/5AI5xTmWPCZ9UA=
+	t=1767885827; cv=none; b=WwNvAuQK9WxGnvmYEdAIYJjGSRZ+7+j/rVsXnCbf4pUqm8A3lqDlOs1whLkY/F9DjGkwRKI/ahSjckI8uQdrGycx3TSPnmhLBVvPtDbcCbUpGXY69qN1rMGqsrkvfrj2c92dRP9HsNuZzdY4mtz+36kUE74TZg/yafiCNCSeUso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767885745; c=relaxed/simple;
-	bh=ELsBd5ylv33lMqvy+hEWDOsky2gZq+7ygyp2EwWV/4Q=;
+	s=arc-20240116; t=1767885827; c=relaxed/simple;
+	bh=/VkObNxcQ3jGk7C5TDyEVDnc8ZvIAl9lHPEGVQwsewo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xba0P/Aecvjgsvk+oU4zxDGvwEJVJkAIEw046KH7x2wtP0dJk0POAZ4CtLzKpHvYqhwXqVa3EyuzVyxXyRTJ9xyZwUdlZkkJ0gWLapaglzBuYlnaK+ck/1UhJxZVJnvpGPH4d0+CnD247XF+713kKYSULY8M7Dw4tf8MsjraPXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ai+8WHvq; arc=none smtp.client-ip=209.85.128.171
+	 To:Cc:Content-Type; b=StaotqIad3ZOa6u9Yn5FRiD67daiMRQ8a97j1+p/MckP/miSSIxj3J99w1ML7TQcQrRot3L+8r2NwMVo8FJFR/jM9SwwgWiKkPQFvJXg6F/p/2lyiQOkJd+xE+BA9p8nuVroEUW4FoFlQRWL8JBC74A2Mqh2jWjPaZEmd/FU79E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YBXVOCkN; arc=none smtp.client-ip=209.85.128.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ai+8WHvq"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-790b7b3e581so30470397b3.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Jan 2026 07:22:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YBXVOCkN"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-79088484065so35071727b3.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Jan 2026 07:23:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767885743; x=1768490543; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767885825; x=1768490625; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7ubv1cC/wetHyZTxz0TlMz0v8CxYB1pjALJuv1zH90g=;
-        b=ai+8WHvqI4mBK935S3JDMb0OanZ8UmTg1Ufk37CDSNUGmtu5s+iR+kWPye9tM6R+V8
-         4NSSUZsmZg97+tc2LarQtfOT2xpEqnVmA8wv5n41Gv4HVmPqI+MDkE96VdbaI2xDPwjt
-         II/0rtNY3bDqNubhIeaKoDJPSMlMBPJ8hsMnufeaq4DnrgyfL/DQHPid79qzLN1+9nkT
-         7O57FLh6k6p9r9EUHQqLZ4rUuoeZSjPekjpkbJEzuMQDHibkOpUxwqInc7NQnbhUHpWL
-         69VFwIyOPBmRoE6BUG57p30g/a/KHcSwEuOFgT/JEvV18OAPjPBAOr7O2NZJBz1GrgrQ
-         wkoQ==
+        bh=QPqRM1/NaFCpQxMWAsclJFsZZ8eS60tSxFGDEGVG6So=;
+        b=YBXVOCkNjJL6ewST7zJjORt73YiVX93AlPhq6sLhSffpulRoXZfGaZvbN2nnk67XC8
+         DQC/wz323zff37QkLtDgQcporOekbUU72cf2Isr0jcDQHrtaaeSV69zEICgTHmWGLHgN
+         rUYdbts3jpug5GGHnKxxzDPZuZ1fwr9iz8Eg7UhOLhPG9EgnEE8a6Rv35umuP0QnYzvG
+         sZF5JkeZEIdswfes5i83tp7KL1cleQqZckjv/bbtsIvyKEHb2IuRUKdWtgdDc+BIfRQK
+         L1zNpyZ9QVr3qDN4KgIL3WthO8sCTFLNz4VFvqcj+Ay8JljBhrj3PyO1dw87LpzUNSzG
+         HEqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767885743; x=1768490543;
+        d=1e100.net; s=20230601; t=1767885825; x=1768490625;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=7ubv1cC/wetHyZTxz0TlMz0v8CxYB1pjALJuv1zH90g=;
-        b=BtMYVnMTtL4ZT96D8bxYgaoZ4j9qwJy7PUThhp3ayBBZNZ1EzvJJ6H5bPx8MsyIUsC
-         93t5nU1gEvgxjI3PSU56stXPJ0FLR7VHiKqou3tWnU7OGR+9U6kKJNBczecBqM98HG4G
-         7Ymaemccliw8d7B/9wMDgvSgnlFPm0oH1dtGnk5TkvJqbjzR+2WrLsDkkB8WorKMaUQC
-         wOPCsrR6IPKSLVFxKA0aNPvXWSOr1csbkkeOHthdIHLLCFuI9XCXqnuUGn3hUnW2Zqx+
-         cvl5mMWeYv1POyEhnzqTRQGqPeZSbTFMSAbJZCDiVHELXnenTEH0yvpTFONyQr3PG6Gb
-         6h7A==
-X-Forwarded-Encrypted: i=1; AJvYcCVIlrXS0UMOONpulSKyznTyqH3cjSM7pjIc/iCTZOIX/yr8U3QSY/xOVciBh9li0Ay0hse7oplM500xptWXKN8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKeoCbl8MeBjThl5yTOCdxIhmRJoCEPqZs01ePkVLRlczXnzS1
-	Ge1AF8l1UE0dAHj7vnelaIV2SD0SIjbhUbCl8fQ/g5aXrD7oPht1L1DEoawqoPvxJ2gq10NtxrE
-	lSyVoG/o+LxLLVf0F2YrTWqPpEVDyjxCfrIKx
-X-Gm-Gg: AY/fxX6ahOJ7yNQIGiKvCRjrGFruJ40bX4ePDRu1Hg/bFPv3kBwLrhKwn0bKeZwf3VQ
-	F5gRPqW/n00NPwkO7QeGRogA4vETsGgJXYAouXkJvJQl+ToNnd4QUXyInZeOnY/aa7hfF5oVBnI
-	2oc5orXkxMv59FDVrB1TkQvHAzmKsB7QK8X4dPt6smxN3Zh5vmVjejehyo3iK7+G37RMMU2l4Ux
-	xj1lRPa8RWboXNZYk87EpLXQ+4GfempbQrPwatK6LdBYwHqOtIaW3nokcnMNTWhq4ZnzOtPCpXW
-	m7XnQiS4cbL0hSDrNHSTNP1jQSmECf4w8E2VQ5BGWyuJqLgfEvBvEgt4dQ==
-X-Google-Smtp-Source: AGHT+IH9qGa3lpodqLWP0JxS8mqmxVJBktZSar5s78Hg8U1ffRAZmV7FymDwhHiGTzZqHJZY/0d8/1PNJxJU1mONU6c=
-X-Received: by 2002:a05:690e:140d:b0:644:50c7:a50a with SMTP id
- 956f58d0204a3-6470d2f3e09mr8799232d50.32.1767885743449; Thu, 08 Jan 2026
- 07:22:23 -0800 (PST)
+        bh=QPqRM1/NaFCpQxMWAsclJFsZZ8eS60tSxFGDEGVG6So=;
+        b=HKVeSSLJn4yRbHrdP+AB2IT25kO9kiBxmGVnJgZKg89R/yf3M+lC8DqY/Z8wFnlQPb
+         oH1dsv5MZFIYMuQZZJQ2mL3Lbk2N2aX4ydqO7VSwqxAEELl72V3f3YzJSbnwUSBzNlok
+         pI/ntFKoER3PCJwZ44BN0E9En8LEB06Y/9fg71wKJ30U8TNBhRXkKRDDp/1wmtauCKLN
+         4NdVG2zWOayefCIkIfRU/8a+z2BaF2zydohdBiU0C2r4ZXdMKV+hTGPYjfIyN5Y3ddkL
+         9fbrkN/5KEgT7Zmp438RAs49/7p4Ksc4rQQnlEwvI7sMHR/EeCuEs1yD5ZmKY4dU45Y+
+         aDaQ==
+X-Gm-Message-State: AOJu0YwLKGjVOpHaLJmxqm8AT4HBmFsIdfGg17iwiEL+Gd6NRgtNcOx9
+	nljpUcHeXaKKaePOxwx4AlUSlTGVE3JY01GydFzcws5Cj2U7l4X1W4ZuJo4MpslCzRAIzlcOcYv
+	TIVzN0yOFCaC3TMOahfF7cTdoF+QiyFLRaOaD
+X-Gm-Gg: AY/fxX5bJbBSmSM/QjGR9sJYprORrdILeZTwracHLlpeAM/anShsdj8CspciTay6Gfi
+	zM2EK7UGwDDWZLr5MuXPRMhZJdUxrZXDJvDuib32aGRE7UzOWRxpbXZJQW1b6P2D+13Xm/nUXNk
+	0v/WlttDCRM+TXze1IxPKi9IbjWYhovmtbRMUH/pf+mrnr1BGieOGykfRSqyP24vJZRZsSxPmx+
+	/rVJ65N6uUKNpNW2KDcjqKI5QUZVvZjxrbUhIYQJkhYtvHow1J9WlrVKahmpsRmQe6wgY0H8Bqy
+	nBhovBKuu7yHB8ot4iaxLR0kB+3DAV0kznGdtnrIAqpC9QGEpCNM6Cd/sQ==
+X-Google-Smtp-Source: AGHT+IGvWttxB+bmcpcyFH3jcvvZwO7Ado55/I+oCJrotpIPGwqp/KSRWqIsCC/CEpYF1gCmusJ9KckRCip/0cTpweY=
+X-Received: by 2002:a05:690c:e0d:b0:78f:984b:4bef with SMTP id
+ 00721157ae682-790b5858f18mr132519787b3.68.1767885824857; Thu, 08 Jan 2026
+ 07:23:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABBYNZ+Zq2HYsfGbOi7V=pnV1GczSv6--rMEbi+=yCXE4p+-6g@mail.gmail.com>
- <20260108020633.1729637-1-lilinmao@kylinos.cn> <19c219ec-a4a2-45a1-b50c-db42fb6db4be@kylinos.cn>
-In-Reply-To: <19c219ec-a4a2-45a1-b50c-db42fb6db4be@kylinos.cn>
+References: <20260108100136.486675-1-dalegaard@gmail.com>
+In-Reply-To: <20260108100136.486675-1-dalegaard@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 8 Jan 2026 10:22:12 -0500
-X-Gm-Features: AQt7F2rikSMfkpaYfUDePUUN5QrfAlswNGlT70OKL10pf3VsVRrBYSPReiskwJc
-Message-ID: <CABBYNZJR9SB4EAMi5C0bf-ezMSa0rt02W8zVM0ypBwrqqxcPuQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Reject autosuspend if discovery is active
-To: Linmao Li <lilinmao@kylinos.cn>
-Cc: marcel@holtmann.org, linux-kernel@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org
+Date: Thu, 8 Jan 2026 10:23:33 -0500
+X-Gm-Features: AQt7F2pKsHN4PDPAcN5mE18G4KXyVfnMtq4K5tBKdrKSddKiG-IdL3rZ4q-jpE8
+Message-ID: <CABBYNZLfjWHAUorAmRvam+2NnGqRw0HF50XBoQNEXVEdzpQBjQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] gatt-client: fix use-after-free
+To: Lasse Dalegaard <dalegaard@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Linmao,
+Hi Lasse,
 
-On Wed, Jan 7, 2026 at 9:53=E2=80=AFPM Linmao Li <lilinmao@kylinos.cn> wrot=
-e:
+On Thu, Jan 8, 2026 at 5:56=E2=80=AFAM Lasse Dalegaard <dalegaard@gmail.com=
+> wrote:
 >
-> =E5=9C=A8 2026/1/8 10:06, Linmao Li =E5=86=99=E9=81=93:
+> Clients with an acquired characteristic subscription would free the
+> client during disconnect. When notify_io_destroy then tries to remove
+> the client, it'll use-after-free.
 >
-> > If USB autosuspend occurs while discovery is active, the ongoing
-> > HCI operation may not complete successfully. On some devices, this
-> > can leave discovery.state stuck in DISCOVERY_FINDING.
-> >
-> > Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
-> > ---
-> >   drivers/bluetooth/btusb.c | 7 ++++---
-> >   1 file changed, 4 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index ded09e94d296..565e276be3b2 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -4469,10 +4469,11 @@ static int btusb_suspend(struct usb_interface *=
-intf, pm_message_t message)
-> >
-> >       BT_DBG("intf %p", intf);
-> >
-> > -     /* Don't auto-suspend if there are connections; external suspend =
-calls
-> > -      * shall never fail.
-> > +     /* Don't auto-suspend if there are connections or discovery in
-> > +      * progress; external suspend calls shall never fail.
-> >        */
-> > -     if (PMSG_IS_AUTO(message) && hci_conn_count(data->hdev))
-> > +     if (PMSG_IS_AUTO(message) &&
-> > +         (hci_conn_count(data->hdev) || hci_discovery_active(data->hde=
-v)))
-> >               return -EBUSY;
-> >
-> >       if (data->suspend_count++)
-> Hi Luiz,
->
-> I found that hci_discovery_active() is not exported, so btusb as a
-> module cannot use it:
->
-> ERROR: modpost: "hci_discovery_active" [drivers/bluetooth/btusb.ko]
-> undefined!
->
-> Should I send a separate patch to export hci_discovery_active(), or
-> revert to v1 using test_bit(HCI_INQUIRY) and hci_dev_test_flag(HCI_LE_SCA=
-N)?
+> Add another reference when allocating the notify_io and unref it again
+> in notify_io_destroy.
 
-Just add a patch exporting it.
+Please add a backtrace to the patch description.
+
+> ---
+>  src/gatt-client.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/gatt-client.c b/src/gatt-client.c
+> index 44ec95db0..374e67c34 100644
+> --- a/src/gatt-client.c
+> +++ b/src/gatt-client.c
+> @@ -1566,6 +1566,7 @@ static void notify_io_destroy(void *data)
+>
+>         if (queue_remove(client->chrc->notify_clients, client))
+>                 notify_client_unref(client);
+> +       notify_client_unref(client);
+>  }
+>
+>  static DBusMessage *characteristic_acquire_notify(DBusConnection *conn,
+> @@ -1607,7 +1608,7 @@ static DBusMessage *characteristic_acquire_notify(D=
+BusConnection *conn,
+>         queue_push_tail(chrc->notify_clients, client);
+>
+>         chrc->notify_io =3D new0(struct sock_io, 1);
+> -       chrc->notify_io->data =3D client;
+> +       chrc->notify_io->data =3D notify_client_ref(client);
+>         chrc->notify_io->msg =3D dbus_message_ref(msg);
+>         chrc->notify_io->destroy =3D notify_io_destroy;
+>
+> --
+> 2.52.0
+>
+>
+
 
 --=20
 Luiz Augusto von Dentz
