@@ -1,173 +1,129 @@
-Received: from mail-qv1-f67.google.com (mail-qv1-f67.google.com [209.85.219.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC42A368290
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Jan 2026 07:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8772736B071;
+	Thu,  8 Jan 2026 07:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767858222; cv=none; b=AtjUCxG7Pdb6yI0it8vZFMIlXCbQ3OZN9Gq4HvOMAkjVJu0uLJ+GmT2P1imYni1KNl3AKAAKu6y1Gv1MIZbWQK+K/XvKOicvM6P1VmsYuJEbKBVjCzg1svU7jzoqL6FQcYKSdXKy6cwt+U6r1xxa5fRzsaccE5FKH4Ri2FgsJpA=
+	t=1767858301; cv=none; b=vA5rLAAtTghMszsSTBZljHCYxJUHOMKaHHxh9tMsFa/2ujq6tSv3aAqKWlnaPBIdKK4r9LTD4kv3EEqENgVFsBI7fLbHes96HxTqtQwdfCpsZvdwqEOg7oDCihzXkRjZpFYeUC28s+kX8UJU/XWX9oEkeFqS22+QwgA1YChWQsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767858222; c=relaxed/simple;
-	bh=nkacX5LZF3PKW7MTb9w7McZ2oyGqH/bnFCpS00n5NdU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=j/XEzWqo81CkVAEqI6DGCK8s07LjLETNOo1RMImb6m4KMFosJOEzmoFdrCOKPfnlDNvjgDAl7FrGV4NoBAAIOV4YIKuNKhkzN15Oh3lv2feX5UTxsmH7APLVXRTZeiVJjNAopdqPa77wY8WnaT6UiGGP1cmtOhTwuPAhjaTRlwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PK5CBucY; arc=none smtp.client-ip=209.85.219.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767858301; c=relaxed/simple;
+	bh=m3gMLRxPKbsUtvt6CWgtd5bNPhWycsw38uLmRL2hME4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kt1Nq4h+F9US31DVFj+5lKJk8oKPQeSEzyk41mMvM4/+BZgXuZpOooEw888FGaCFzuEqqMaQFY265bi7iIngMiNpp1RLr5zFr7ctJwTSA7CESK1okDqgmsBfiw0keH1vtbR5mlMc65tVmJrhA0+clRb9ULwrGYCxmA5G+kq/sbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=F+B+EyV1; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PK5CBucY"
-Received: by mail-qv1-f67.google.com with SMTP id 6a1803df08f44-88a34450f19so29197326d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jan 2026 23:43:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767858198; x=1768462998; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3d/g14TFJQ7VmqaQ1kVvMbu2ZGWLJwEHqwIJaEzJRbk=;
-        b=PK5CBucY3VtcmjyMRVjB5lGPRIb897AHc22WI/qej5DaspG8OKFPS5fvIMyQ8MUDH6
-         jUtCwda5muLd+KHBgL2ppLt2IvQwxw6bJdkQSeQdYsFgouDHj+n+myw3YPSxa+NWPbRP
-         KwovLv4kdRgw/0ccRSdrx52K8fNMPQEBPHLKUKFE01d6O2t8VTZDPWF8OtLv4GJ+/Rlb
-         gYPRK3qJ+yVF2npfF5KhyI2OpiktWCJAxadcXrBBg7f7YVMnn3TZupWdP3Ftz75PeW9o
-         ORrVPgJHWPNNqCQ0lHikN8oo8AesJgHZVHXX8Z9vS0sDlaE9mJTTEZ9tTu0mhdxQprQw
-         f9xQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767858198; x=1768462998;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3d/g14TFJQ7VmqaQ1kVvMbu2ZGWLJwEHqwIJaEzJRbk=;
-        b=qnnVe13lvxrHGvXi6UGubd12Fiz9RaWPqQZ+L/8XHhRekomDa+dZ94Z8oo2SxPxAji
-         gW+AiV1fXs+5vMaqBLO7zd9Ufyk4Y4G8dkeHfXAavWK5GP9o+EX76l8k9YFjXUakN9bw
-         /E2GEaxqgdIr+kWMT6YdRDZ/MaanF7cfd3zM3yyGxwIPmCqGkGUrV/z2e77fvBATBhoa
-         2b8OGL2mKHRflbV/XvRXQMM1SQOS9FcLdvIDGLUfh2bZxahRx/9N3dz80FEacvcR81A2
-         l1sSd2kx73l/EoM9DvV6R7o56zar5Y0oKje8gJChPFO6xFCWY0qRw3xuthOV/FSpfNQx
-         23zQ==
-X-Gm-Message-State: AOJu0YwawjCaZ24xhL0XSf0z3OF1J/iKaiZGEdygEkcGmQtlOSqxUBr2
-	+JoroHQpa4XNS/6l1VSkKZBfVmQJojeBo02UY8Yzk/frrkdvb3Bnln6gopvag8EA
-X-Gm-Gg: AY/fxX4G6r+H0TbFYWsdSNbQ/e5v7ibZs6oyg1XdeQKBhw+/O2CFJQmKmdR2+F1NB8x
-	She/6w4RXG3T4YgJ4M9gkDLfcKf59tkrVhyUNgvwSH8zYiVfjQ36H9hNs5HNelRdnti1TTamaX0
-	4Nsg6Ln3+FTYdORBegUlXPzToO2Ap4xIED2PgTRyETsMO+w4/YO/UWOi9942ktDNnMHB3OsYALm
-	N+5TtcM8EGH8AmL8RgCU7M2y97Ybo1/YBxxm5PK7H4j+dApQ5sVU5mAD7SbFoS/ZiwWAtKCMlIn
-	3mh4NuXLZO46ctDcbxA4hYEVFyUwaw4S8MHKJGfJXRITiYcK8yQP+uDWQOAtDRQ18DL99kC9gZF
-	KEpAi9JQkdZFe8ku3yZkNNkUmNu45CcFPJlxtCRACVfZMoQvZFtEnNmg186LhyAqGTtM7uuHdrT
-	IDc0brltsRJZHYSMM=
-X-Google-Smtp-Source: AGHT+IFWZoxhfNEqJbb4wt7w5cWGGAyAD4Z9J2bQ+6xe6W8lRZyGtCmnCLGU7jZI8MPB2U660uXs9w==
-X-Received: by 2002:a05:6214:268d:b0:768:f173:a0a1 with SMTP id 6a1803df08f44-8908423577bmr81783406d6.42.1767858197803;
-        Wed, 07 Jan 2026 23:43:17 -0800 (PST)
-Received: from [172.17.0.2] ([172.214.44.2])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8907723469fsm54706776d6.37.2026.01.07.23.43.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 23:43:17 -0800 (PST)
-Message-ID: <695f6015.050a0220.5b0e3.fa4f@mx.google.com>
-Date: Wed, 07 Jan 2026 23:43:17 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0578832475829540801=="
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="F+B+EyV1"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6085U9UT3890457;
+	Thu, 8 Jan 2026 07:44:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=pSi4ogZirCStVwGq0i6Hks6fhl+3DHoBDrW
+	DQdXQzxE=; b=F+B+EyV1hu59lC8sa5j5SDawwPlHBpAMIJEsm5Z7YS55UfwGuSl
+	j1xwFW5QMy6wbwpKk2IAIsHMZIluLunytOmZ/Lb+xr3ZpFGS+rIeUU1xFifyOCWE
+	SORWOb3JZsIMNOCu3gdVUcDr5nAgpKvUDS1LZ6pdZXkcOZSo4HDk/9iRO1XPUiW0
+	IoiFwGuYrG18qvHdhye5UyhJZf+c0ZcUOpATxR3oIjYb74g+OvPPp7LhkxsEXChs
+	BgCKCCy13DevmnD8n3kYh6mxrfR+Zf18vGC5BTphNSh9l8Yb5PDLHbFAUXdFVMdH
+	AXw5WtD1HaXrWjaDg/muGfmk3EIk8ZZHKpg==
+Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bhuy7272t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Jan 2026 07:44:38 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 6087euWe007468;
+	Thu, 8 Jan 2026 07:44:35 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4bev6meg3f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Jan 2026 07:44:35 +0000
+Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 6087iZIq010974;
+	Thu, 8 Jan 2026 07:44:35 GMT
+Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 6087iZ9a010973
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Jan 2026 07:44:35 +0000
+Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
+	id 37C055BC; Thu,  8 Jan 2026 15:44:34 +0800 (CST)
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
+        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
+        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
+        shuai.zhang@oss.qualcomm.com
+Subject: [PATCH v1] Bluetooth: btusb: Allow firmware re-download when version matches
+Date: Thu,  8 Jan 2026 15:43:53 +0800
+Message-Id: <20260108074353.1027877-1-shuai.zhang@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ot_zhangchao.zhang@mediatek.com
-Subject: RE: [v2] Bluetooth:btusb:MT7922:Add VID/PID 0e8d/e0d8
-In-Reply-To: <20260108070656.2769061-1-ot_zhangchao.zhang@mediatek.com>
-References: <20260108070656.2769061-1-ot_zhangchao.zhang@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: sK7kBtM9Npfopx2148fp9YtezrFMBxw2
+X-Proofpoint-GUID: sK7kBtM9Npfopx2148fp9YtezrFMBxw2
+X-Authority-Analysis: v=2.4 cv=DZEaa/tW c=1 sm=1 tr=0 ts=695f6066 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8
+ a=s_TqnAvjE5RFW65GVocA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA4MDA1MSBTYWx0ZWRfX8fVeuJX4L3/c
+ zm7/7Z1pnlyRB2eDAdFZJMDkeDHMWNjhrOpMgCW7TwzpHmc64eDlhbqMziU5hZ4bFS6Kcjf2VNK
+ NMCVYXmRbKzNWBFGoKzN7INnHhj4N68oVFR/SQa5glQzEeDqKLHhx4fgTWdSP3C8l3lLsNCYGYI
+ bv9tYjTsn0jLsL56i+aiHNjhGVsWk7TXZ0gmnNMbfZFab1TP0RhwBLfr8XC1gnNVOyO7v/eHeJB
+ +qTNYJAzSaY6OUUOtIYay8AfCMTTzN+dTPKiUNNCo5OZr5hSX6X7hhD1dlj+nSolI9k1Oa1Wgqg
+ bGyl9D7ltaPPYm4mqbmlnYBKjX5DdRfs+/zpT3lUzya7LdWR7wbhG0OJVsiyZV5cZvPGJe9BcWV
+ fN2aoZyXm/2h8PIyl002hdzKnLPjfa0EiSVPmSAhr85AKvhPoa32aMaSG7yLs0gLzW43xGe9Vjy
+ d7kitTsFdpXbR+V8cXg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-08_01,2026-01-07_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 impostorscore=0 phishscore=0 bulkscore=0 adultscore=0
+ spamscore=0 clxscore=1015 suspectscore=0 lowpriorityscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2512120000 definitions=main-2601080051
 
---===============0578832475829540801==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Since USB can disconnect at any time, if it disconnects during
+the BT firmware download, the BT controller firmware version may still
+be updated even without completing the download.
 
-This is automated email and please do not reply to this email!
+When USB reconnects, the BT host detects the same version as in the
+firmware file, which prevents the firmware from being downloaded again.
 
-Dear submitter,
+Therefore, remove the equality check to ensure that after
+USB reconnection, the BT host can still download the firmware.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1039713
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.27 seconds
-GitLint                       PENDING   0.35 seconds
-SubjectPrefix                 FAIL      0.38 seconds
-BuildKernel                   PASS      25.65 seconds
-CheckAllWarning               PASS      28.02 seconds
-CheckSparse                   PASS      31.57 seconds
-BuildKernel32                 PASS      25.24 seconds
-TestRunnerSetup               PASS      558.08 seconds
-TestRunner_l2cap-tester       FAIL      29.00 seconds
-TestRunner_iso-tester         PASS      82.70 seconds
-TestRunner_bnep-tester        PASS      6.44 seconds
-TestRunner_mgmt-tester        FAIL      127.36 seconds
-TestRunner_rfcomm-tester      PASS      9.40 seconds
-TestRunner_sco-tester         FAIL      14.21 seconds
-TestRunner_ioctl-tester       PASS      10.14 seconds
-TestRunner_mesh-tester        FAIL      11.52 seconds
-TestRunner_smp-tester         PASS      8.47 seconds
-TestRunner_userchan-tester    PASS      6.59 seconds
-IncrementalBuild              PENDING   0.49 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Total: 96, Passed: 95 (99.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-L2CAP BR/EDR Server - Set PHY 3M                     Failed       0.122 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 488 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.105 seconds
-LL Privacy - Set Flags 4 (RL is full)                Failed       0.218 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.805 seconds
-Mesh - Send cancel - 2                               Timed out    1.998 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 646de80c7..991064a25 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3503,7 +3503,10 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 		    "firmware rome 0x%x build 0x%x",
+ 		    rver_rom, rver_patch, ver_rom, ver_patch);
+ 
+-	if (rver_rom != ver_rom || rver_patch <= ver_patch) {
++	/* Allow rampatch if version is greater than or equal to firmware version.
++	 * Equal versions are acceptable for re-flashing or recovery scenarios.
++	 */
++	if (rver_rom != ver_rom || rver_patch < ver_patch) {
+ 		bt_dev_err(hdev, "rampatch file version did not match with firmware");
+ 		err = -EINVAL;
+ 		goto done;
+-- 
+2.34.1
 
---===============0578832475829540801==--
