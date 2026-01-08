@@ -1,138 +1,78 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4BA3148B2
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Jan 2026 19:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FDBB2D8DB5
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Jan 2026 19:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767899306; cv=none; b=dR36HVSk7cfEUEgrGlhHFst5WmLSObqWGXdRmGhZO/QFSnIuxjkczHhpQ+REX/Q/sLiKWQvNds6gdBNB8Of4CKYLAdoeBtWqEGuSOmx2wJlyy/PcfHqM9dXoKOSDOU/CyLIDVt60mtcJWdqi9RXvNQANyLLsuUovL1N6f4eddwo=
+	t=1767902010; cv=none; b=DZRj4e6CEGD3P3F+thkHiMRFsrsjaZ4zoupOw1M1ClQX6RLMOzBAe5CCp+Ggzk9gCoK4ZcsuVZ975UDKPlI02SidVDwgF1DGF402cYetdi/avZ5pbAViSR0hZeL6Bh7Y/lQ8QLyBe834kqjjFtfz4B+zoxiodOfuDcyOKwOAYfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767899306; c=relaxed/simple;
-	bh=paj68YlKuDhphsTveBORIQr4jqi0QmKHl7Ze+tZI5DY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QUu/IhiQIVBjNfb/Y5iA6rDKdDzVsSgjK5uO4jSEYcGcByQZnRAtIwba6DhaW04yo8c2es++XduvoJeJD/uChhyF/LMChWBAlTyAA8RTGdFfOsNR+fuuOwtrP4wsr/JFxUUDdBfGJBOIZuVrf07UfMqX4KPvuj5MxtQHiGpM77Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFuDslvv; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767902010; c=relaxed/simple;
+	bh=yaTFUVbnhwEb8UBDd0vb7JaiHGwM3UezILTXGAa3ofk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WhzIjLjTpApTUxpZzeDdfsDAVxJCa9DtZtPk1UvqG00vRiKUrwGeCn0KH+IDbV6T/pUkqKt6IOSFZxBUH5IHZgGX/9kkW4b26gXrRqe6vGh3MDEDMTKrUesPwjAWXM2aBz3wnPqenVIXJ3byy246/D68GiEkt9WrPF4FKY7ibkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XewtQvCl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFuDslvv"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7904a401d5cso39252187b3.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Jan 2026 11:08:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767899304; x=1768504104; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OZ+Ju5pkye5pKeBr6/aXHrkqHDRAXzZc4AYMADkQUTQ=;
-        b=UFuDslvvARbgCR3DXD9ec5PkgUc4Mwh/2XSI7yIGSabFXGTxfto+sAiBjpElilmp9W
-         Q6kEp4SMkFK7BhkMmcoVQPNrXDdMvNoS/TUXBBrTZUxhgzUr4NqghfeI3Vr22PBqBM6u
-         n5q2BzSbw9tojpb6bcnhyE+Yqo0ktW7j0ATIGgN6NdRSP8fj/NMNgAKg5FDwQmfhWFcQ
-         ZqAQMiduAcq0gGXAxgx/ACmqCUGTO/Qomvv6sZpI861do+PoGSQKhRlwN2l7OJonRS4G
-         /SBT80LkJBeBOXFWjyUdU6lfMAlj6h8OEQnGofM6/Hud6zkDuq6niMw9uU0YRpMC48Vw
-         8gUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767899304; x=1768504104;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OZ+Ju5pkye5pKeBr6/aXHrkqHDRAXzZc4AYMADkQUTQ=;
-        b=pFY69Lah/o93/Tfepa9jpokjXdkPZKOsk2UZ3JVN/WToPduPJ9i3rscqlIDdE3cgay
-         ZpN21vmdWOXIoNavDGFEkJ8rTxxYAUhtTOEXnS+AjB9D+j4T8t0aybtG55X0n2L4WjyK
-         AJlzPBfO8DzI8g9kHdrOxCu42vzyK02Itz9fQ6rjM7r+Yf7U/9m6O9UWawuCAeDedIpA
-         gbH2pDY0beDYaqxw/zD+Pb51viDSsUVb3NUXQYr+lu16b9bQ+6ilT0C8k0Kt2sx2+IeF
-         zbhIghXspXQdXm7i5jJYlgc6zAvf0jqMPVvpVbf/1RvHpYHYeabGuvQqehjidJoVJWXE
-         e2Sg==
-X-Gm-Message-State: AOJu0YzV6ctaPzdEV7tIZx9EBkOd2822kxSWTJaLBVl1XF5L+aM54lfA
-	zcMdVv2dvjpN06ma1amlozVXyjZxaAVNlJCUEMDfHcl21+/Z3YATh/VdMMzoXytJ3Iko+MwQtls
-	pepYAXsTFiJC9waHdbycF8xhOp4PM4V8=
-X-Gm-Gg: AY/fxX7DU/SMYHKKCaWYtVuCiaHMxxPecupe3FZoTv1XJL5Z56oUxgn6x6KPPaBzCu3
-	aPz80utXa1hDiYr71AgyN73vxoof72xuWq8N727p9RZi9w9ImUzna2suQ7fuKBW2ya9sauG45qW
-	XiZfkp/Z+UQ1a3JIL1Xthy3EZ3H5KVWwvU6CZnsniYPpQhwf9v8SgoSmM27AmXOtLCjpVmUqB/X
-	6wIWoS/ITA4SFvQ3vFy7hdezk97fzICgJ8TWPdj7XH4mPVKTEgOAnfVSvzzWYG0TU3v6FY+vtR6
-	35h5mSIF8PNa0QERTotzkat7KdGwSwQ0wi3/SH1lMKXZR41ET7J6QFM=
-X-Google-Smtp-Source: AGHT+IFR5Eq5/InMp1p62pjk/Q1CmbdRJFd59dlZ/1s+Cfy8rkWpE+g1rssfeSt1l6gXvKyPNIiYxOSWtv17OJ9RPls=
-X-Received: by 2002:a05:690e:169e:b0:644:5c0a:6bd4 with SMTP id
- 956f58d0204a3-64716c1354amr5750950d50.70.1767899303096; Thu, 08 Jan 2026
- 11:08:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XewtQvCl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB428C16AAE;
+	Thu,  8 Jan 2026 19:53:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767902009;
+	bh=yaTFUVbnhwEb8UBDd0vb7JaiHGwM3UezILTXGAa3ofk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XewtQvClSgiYssJ9wFXCAIHZM279skKDYjjcVyByDOD0Sr6FdCRPfq+gmP/k24PRd
+	 UsrFhZ8uJkBEIWThLofO2J4tNUcJe0FtRaPMJwo8CIa2F8fMBCdvhe8eWIYseoUD6L
+	 zg1F1CzkSHbhasZdshjkTV9S26vkvSdv0vxGBijO5IDOiB5XkBN8yhCpo8llVIk+cj
+	 2gbmFJ37YvG9rXnSDOvUDd5D66ceQXCA+awllwUP1bprwwdMWbchafvRUQJQDcVv9r
+	 BgF3maz5YAFZ2szh76bQBXu3v4LsVN1vRw9v920oYIBIJsLrv7ekGzB4g9zRv0svTz
+	 AGwndbZnOlA3A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78A3D3AA9429;
+	Thu,  8 Jan 2026 19:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260108100136.486675-1-dalegaard@gmail.com> <20260108100136.486675-2-dalegaard@gmail.com>
- <CABBYNZKT91_1arQSNSxzy-4RVVnAX+BV=Vw6qBMyCHjQSdE_KA@mail.gmail.com> <CAJWtJbasVwvFsdhOpc_fBUW_vSyS6=YbRza7LRw3e8mWH44ZbQ@mail.gmail.com>
-In-Reply-To: <CAJWtJbasVwvFsdhOpc_fBUW_vSyS6=YbRza7LRw3e8mWH44ZbQ@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 8 Jan 2026 14:08:11 -0500
-X-Gm-Features: AQt7F2oXt2ohGtk6iZgXt_SdE6Du3T1IAog29EJ4ZCRiSZJ8ArLP0MEhenbdilg
-Message-ID: <CABBYNZ+gqdm2a53T_8wY1Fkjre0mZmH0kpCoYOVO5G_izvpzXA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] device: fix memory leak
-To: Lasse Dalegaard <dalegaard@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 0/2] transport: distinguish BAP mic and playback
+ volumes
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176790180629.3782583.6297172225546713069.git-patchwork-notify@kernel.org>
+Date: Thu, 08 Jan 2026 19:50:06 +0000
+References: <cover.1767647222.git.pav@iki.fi>
+In-Reply-To: <cover.1767647222.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Lasse,
+Hello:
 
-On Thu, Jan 8, 2026 at 1:50=E2=80=AFPM Lasse Dalegaard <dalegaard@gmail.com=
-> wrote:
->
-> Hi Luiz,
->
-> On Thu, Jan 8, 2026 at 4:28=E2=80=AFPM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Lasse,
-> >
-> > On Thu, Jan 8, 2026 at 7:29=E2=80=AFAM Lasse Dalegaard <dalegaard@gmail=
-.com> wrote:
-> > >
-> > > device_add_eir_uuids creates a list of added UUIDs, but it was never
-> > > freed.
-> >
-> > This seems valid, how did you find it though, I don't recall seeing it
-> > with the likes of valgrind, anyway it would be great to have the
-> > information how this was detected.
->
-> This was detected with the address sanitizer leak checker.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Interesting, Ive haven't seen it although I have the sanitizer
-enabled, I think, but anyway it seem to be correct, do add its output
-though so in case someone e.g google for it it shows up in the git
-commit message.
+On Mon,  5 Jan 2026 23:07:53 +0200 you wrote:
+> v2:
+> - Drop the bt_bap_stream_is_server() function. The direction can be
+>   found based on bt_bap_stream_get_dir(), which for BAP Client indicates
+>   the remote endpoint, and for BAP Server the local endpoint direction.
+> 
+>   Its return value is a bit strange for broadcast, as
+>   lpac BCAST_SINK -> dir BCAST_SOURCE.
+> 
+> [...]
 
-> >
-> > > ---
-> > >  src/device.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/src/device.c b/src/device.c
-> > > index c8aaf042f..0842becde 100644
-> > > --- a/src/device.c
-> > > +++ b/src/device.c
-> > > @@ -2453,6 +2453,7 @@ void device_add_eir_uuids(struct btd_device *de=
-v, GSList *uuids)
-> > >         }
-> > >
-> > >         device_probe_profiles(dev, added);
-> > > +       g_slist_free(added);
-> > >  }
-> > >
-> > >  static void add_manufacturer_data(void *data, void *user_data)
-> > > --
-> > > 2.52.0
-> > >
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Best regards,
-> Lasse
+Here is the summary with links:
+  - [BlueZ,v2,1/2] transport: clean up volume set/get for A2DP and VCP
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=76933585dc48
+  - [BlueZ,v2,2/2] transport: distinguish BAP mic and playback volumes
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1287ac9068b7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
---=20
-Luiz Augusto von Dentz
