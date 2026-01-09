@@ -1,68 +1,72 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F94B500969
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Jan 2026 20:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F8B500969
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Jan 2026 20:30:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767990584; cv=none; b=KKnqz6vNJA1aBVFl/gnwzWgHpJEV/e4fAJZ4ispcP02NNOYtAltaHFahfwWegLSzNOFiebyX9dVAFxPhtQfmGdy5bYZw3M29QoRRpQkLuZCS352nehNLpsqKkbGo05undDZ/vFLnY4gWoeCM+1TNmIjIgsJivk+8EF5YZL0cYdg=
+	t=1767990601; cv=none; b=FMabeXYcziojTTcUVzkdhFQqCesdg26bzMKXW8TPLgSxbSUqx+/LI2oXASNgJU82/tg2CLn4JuEIE4amqTp7Mb7u/MGU7Enm5zJb8PaggkAIgMb/kp7DZ+0NDH/Qvr4t5yawMKGp/FWa8p0Bgqjjpym25OerxmwUuBs6dK3jsDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767990584; c=relaxed/simple;
-	bh=Xom+rkXT/+fCjODqmL+3ZKGeVak6Ni+6P1iMqP2+g7s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NJshlwvgSVOqBH1AWbZ34Fd1uHYh/3HHLoCVUa0UBI0ZF2raVYCYYtjX6xxgU0Dibjy2ZI/7smeSbKukLs4jy9gz8dvG2K1VeSJmGe03Npv6KzSdX/fT750nFAQeuGGMtH5/Ul8f5mriujAFeDa52j+skfOwlEpRALbVqd9MbQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PZWlndax; arc=none smtp.client-ip=209.85.218.43
+	s=arc-20240116; t=1767990601; c=relaxed/simple;
+	bh=REAZBVbrO1FwI080cNyaQYjsl8kxqEa4NqmGcUm5Ljw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NB9IL5OR3A4dAGOuOJ5pzOE7DnZrKuX4vLJ2PnRmLSzt4sm/q5HOdgXEJa69Fk1UUSdy34n9O3P7eIcUCgSGJpt/h+HUs+Muy0BH3YXgwdAyybzzoCuTUjpXklqxUYG77R0Wyr8Z0Kn8XIRu8tzFORsAgNj2gzPvM6Rm2m1kMb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KOL8V5Pr; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PZWlndax"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b86ef1e864cso3766366b.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Jan 2026 12:29:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOL8V5Pr"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b734fcbf1e3so917115266b.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Jan 2026 12:29:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767990581; x=1768595381; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q9O1PsgoKzDT6sdr7P5AM3IJaKyb/sfxXIRINVjYFB8=;
-        b=PZWlndaxRb17qmR683EIlswHmHR+pKJistAhZFXIiE4qbE36gwnQxOJ/H1IBznV/LW
-         YjYL4/tUFEx4oJGwpRIGhv5plHRb4srpl20S191yTkES3QcpHnksroA0ge7Bn4KjT62B
-         9Rw/KBwQ9Nlcz6WOm40cEqIf1ejbFoHFCQCBNfY3LwlXSR7z89XOvn8hEVAGDQFoBVEc
-         a0963YxbpCcX6Ix8qlMylR9Wa8JFQZvks4AhuHxONpkP58GKn4+zINHMv677wnIAOTAp
-         JevpSIa4sgv44fvEh16nqt4QNAWNBjkzViOTPqutqIfU3j0S0FU7zCJEaJ4sJvS7dwEk
-         PKBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767990581; x=1768595381;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1767990598; x=1768595398; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q9O1PsgoKzDT6sdr7P5AM3IJaKyb/sfxXIRINVjYFB8=;
-        b=nWDcBEX6Aqp6xTeOx2u+wA7O9BazoEgUwNbCS1d2v4RRoqZSe4iVWNPO9XHe0my/7F
-         4wj/B8BrrpAKTRNiNurjpZs+7lwbkOS0X87RFTSEcKrvx41jQhE3WW5bsfbVl/he6hNw
-         d1nK7ZBHZnGAY4X2uVzrjw9bVe691/APM+5mEK2uLNMXKBKC962X5Q+UBJdGFYcfQUnV
-         PHqf1N6sz2CuPr5vcBDXbZgdPnipLhv+WrXfsN2y4lgdjUaIY2CquaW9ceUsMm7HGkpu
-         3EghBovVan/4/6vJxdicGOEEKXUDXi9g1Bu3RX8YBazT6qP+p628L8MSvwtrhbRcEJCg
-         XNCw==
-X-Gm-Message-State: AOJu0Yzo0+hFs3O+RQxOvg57cukaEj0iJSdGvmT42bhsKyA9/pIHtMCB
-	bM/4oewp4r48lBt+3Mkjrhb6csYL1gHODBwn4/wws/xIEAMcWiqzfyq+01w0cM7y
-X-Gm-Gg: AY/fxX7nZDZWJ15QlYrvhVWHQDJW3By3GkMkyvtUww44pG4BA4emGOaE+3k5mKH4ltx
-	5zQsF+CZm8odzwA+beRWSHbJsBB9KE8vlFgDujIPjycC7r8yK5cfn2qxiNjVnqS190zTAS2Pwc6
-	D9/jfPlahSelNo54lS31tKbz9PEZ41UCK6TcGcIuherJta4CuJ3Qx5XCLdLlxB1NPLsWDBqqW8n
-	7weEj7emK7uNws92CKR/3DdoWLfxtER6zdmjp5k0QuOZHJYAN6drXL/AsfNfP4KUAdFSM3CCK9D
-	ntRi3+Xtbnbc7DkxVHrjBqrg+sTLueg43vx1ykO5u/gzZm7SwcDxE6vdl+/L1HHcbBO3k9kIaTn
-	2Z9p718RWNawFuahYXTQhsXEbJKc3V/txA6cAeX2+v92ErhpzCYa+f9R/Ix86o2KxeYVsFXUiIa
-	zzvkYdkpsAq/rUa+BV1vvd84Oula5RKXWL
-X-Google-Smtp-Source: AGHT+IGTmIQWZLyViW42inCu6LgLnsOwSEUpejWKDPWS5f7Zr2eGOXnQJSBSJ2+MAwR7ZBJBiPhsPQ==
-X-Received: by 2002:a17:907:3f1a:b0:b7d:1a23:81a0 with SMTP id a640c23a62f3a-b8445460664mr1018468766b.63.1767990581151;
-        Fri, 09 Jan 2026 12:29:41 -0800 (PST)
+        bh=b2HH/HvrY8SenmCg+1YYwB0PKYGe0iuypcbG2EIkYmk=;
+        b=KOL8V5Prc/IHP85+qtMu/K7/xS/cyTaQql6DjG5tu9S94/DiZPn2Gil7xZUBB6x41V
+         lTKtiVzOu4/oO368OkkmrfGuAaLNeA4yWm4NnHmqXbknA+PvZoAUN4UmapSHoGO/GaYb
+         5k+WFf88Sq7BcTyLMzEvCjibqmFiKtB8/9TcvueLDuU6692cOrLB4PMPWESnOO6LeOj+
+         lxwMkaGyTA0KRo0rTzGleJiYkRO/byQQVskx+FMfOYiSGeOpUZtZ9eYeSHxSqhiiAKCN
+         VUUVDD5bWDce7YTr/sA0k5vxI51LZHuYzUFQK75nAZMSvbTyKUCmWmVJanTccGIjYsYh
+         QU7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767990598; x=1768595398;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=b2HH/HvrY8SenmCg+1YYwB0PKYGe0iuypcbG2EIkYmk=;
+        b=Q6FpDFL9nKNMdzp76Hm0jEdFH3gDl7Lm9c8TS9u9dpTNG7sDn3Fjg1sUIooYgfJ8qc
+         7KjMHzcpB+mGrYE7FsdNjfVbOkAv2HxVOQ08FaVDsybEQ5cAkZlOwUvoyIOf7PZKKLVX
+         3o9AtDsOn+2KkXvhxefi3evHUZchsGVAh2wZnvqldYZrWn5Li2uHlcwvikfz2mj51Gnr
+         K9ZfXP+rcK22W0e9DQ3anggQnI6xU0zp68BF/bTcI+p1ybbEM1Y92o4SbqK4+gX0JrHJ
+         p6FcjIvcKw7ALYOWb3sMM/+tfQKoeTQ0Sy9LnyoXhjIzRS2BAONM0zQ5mBqt+ei+LuN/
+         A+5g==
+X-Gm-Message-State: AOJu0YyngcrI2rdJoaUa9OtLUeXlIy7Hr/kUhYcgLDPIyzVQL+vO9x+C
+	gT0AD0sWvbCx8MGhcV3Ja5poOcSlbkPEGB0YNisX0n9cjiuaQ4Mh5i0DX5VFUFkH
+X-Gm-Gg: AY/fxX7hipuF0UiBhe4D0ZpTtw6A5YNz7Lg6vwoEt2QYF7sFznSdTatJbzrxBysSs9d
+	gJLmuge/wqcswvkS9kP+Y+EfWBRfqTdfhSRAlk7FWNEWANT+HE2DNWNvAIM4fECRvOuNw88awHi
+	Sksjt+7hzyPULF19x1Acc+js8Ng5xC3QONeyH9FY9u9qTuX0xIGOc1wgRzqvUfHHGpE5KdHCN4a
+	y3Hlc0VLi5s1QM3eZcUKoBWzVrJIGgRYiCAXaimv6tpmHbjNoybgm+DNdXORW/Tf0r70ksblEtj
+	ofrfUVQK+LYeGstGHdOXKhQPGf5SSoYaW14MpIidCSoEKEsTj6ym7nyzHMQA6oJFNB8FtOsXWAV
+	UVlfEXHhPqROIZ7kF+9cFtu/imcUJv+idSygxF0uxuMhbYtoOE9XzGWwyFnppF4miPZDAE72SsD
+	BiL/8iAmUdmbGnUX2V4t+GRJrLdWwc1vis
+X-Google-Smtp-Source: AGHT+IEYx4drA1UizXre/uRw+0P4CeJYm4ubmxPIKcvi97Bs/fBHoJZee3EjcjTHnDM+YGSfHdKpCg==
+X-Received: by 2002:a17:907:9802:b0:b7c:e320:5232 with SMTP id a640c23a62f3a-b8444c4ce48mr1001651066b.5.1767990598046;
+        Fri, 09 Jan 2026 12:29:58 -0800 (PST)
 Received: from devrnd0.tailf8d75f.ts.net ([2a09:5e41:e74:6400:1e80:613f:f534:6580])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a51577bsm1191918366b.56.2026.01.09.12.29.40
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a51577bsm1191918366b.56.2026.01.09.12.29.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 12:29:40 -0800 (PST)
+        Fri, 09 Jan 2026 12:29:57 -0800 (PST)
 From: Lasse Dalegaard <dalegaard@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lasse Dalegaard <dalegaard@gmail.com>
-Subject: [PATCH v2] device: fix memory leak
-Date: Fri,  9 Jan 2026 21:29:25 +0100
-Message-ID: <20260109202925.774809-2-dalegaard@gmail.com>
+Subject: [PATCH v2] gatt-client: prevent use-after-free when clients disconnect
+Date: Fri,  9 Jan 2026 21:29:27 +0100
+Message-ID: <20260109202925.774809-4-dalegaard@gmail.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260109202925.774809-2-dalegaard@gmail.com>
+References: <20260109202925.774809-2-dalegaard@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,41 +75,66 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-device_add_eir_uuids creates a list of added UUIDs, but it was never
-freed.
+Clients with an acquired characteristic subscription would free the
+client during disconnect. When notify_io_destroy then tries to remove
+the client, it'll use-after-free.
 
-This was found with LeakSanitizer from the following backtrace:
+Add another reference when allocating the notify_io and unref it again
+in notify_io_destroy.
 
-==764182==ERROR: LeakSanitizer: detected memory leaks
+This was found with AddressSanitizer:
 
-Direct leak of 16 byte(s) in 1 object(s) allocated from:
-    #0 0x7f3c7db20cb5 in malloc /usr/src/debug/gcc/gcc/libsanitizer/asan/asan_malloc_linux.cpp:67
-    #1 0x7f3c7d870afa in g_malloc (/usr/lib/libglib-2.0.so.0+0x65afa) (BuildId: 8b07c017773317c7341f72bb8ca4a7a78b323f37)
-    #2 0x7f3c7d88e31f in g_slist_append (/usr/lib/libglib-2.0.so.0+0x8331f) (BuildId: 8b07c017773317c7341f72bb8ca4a7a78b323f37)
-    #3 0x564fa6ad9153 in device_add_eir_uuids src/device.c:2451
-    #4 0x564fa6a6b2ec in btd_adapter_device_found src/adapter.c:7481
-    #5 0x564fa6a6c5cd in device_found_callback src/adapter.c:7607
-    #6 0x564fa6b9b73d in notify_handler src/shared/mgmt.c:337
-    #7 0x564fa6b91ad8 in queue_foreach src/shared/queue.c:207
-    #8 0x564fa6b9ba3f in process_notify src/shared/mgmt.c:349
-    #9 0x564fa6b9c899 in can_read_data src/shared/mgmt.c:409
+==766875==ERROR: AddressSanitizer: heap-use-after-free on address 0x7b7782a31df0 at pc 0x55d19ae87cf0 bp 0x7ffcc28ea0d0 sp 0x7ffcc28ea0c0
+READ of size 8 at 0x7b7782a31df0 thread T0
+    #0 0x55d19ae87cef in notify_io_destroy src/gatt-client.c:1567
+    #1 0x55d19ae83462 in sock_io_destroy src/gatt-client.c:1171
+    #2 0x55d19ae83a4b in destroy_sock src/gatt-client.c:1192
+    #3 0x55d19ae83c52 in sock_hup src/gatt-client.c:1207
     ...
----
- src/device.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/src/device.c b/src/device.c
-index c8aaf042f..0842becde 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2453,6 +2453,7 @@ void device_add_eir_uuids(struct btd_device *dev, GSList *uuids)
- 	}
+0x7b7782a31df0 is located 0 bytes inside of 32-byte region [0x7b7782a31df0,0x7b7782a31e10)
+freed by thread T0 here:
+    #0 0x7f4784d1f79d in free /usr/src/debug/gcc/gcc/libsanitizer/asan/asan_malloc_linux.cpp:51
+    #1 0x55d19ae85c57 in notify_client_free src/gatt-client.c:1360
+    #2 0x55d19ae85dd5 in notify_client_unref src/gatt-client.c:1372
+    #3 0x55d19ae86517 in notify_client_disconnect src/gatt-client.c:1418
+    ...
+
+previously allocated by thread T0 here:
+    #0 0x7f4784d20cb5 in malloc /usr/src/debug/gcc/gcc/libsanitizer/asan/asan_malloc_linux.cpp:67
+    #1 0x55d19af6154d in util_malloc src/shared/util.c:46
+    #2 0x55d19ae86550 in notify_client_create src/gatt-client.c:1426
+    #3 0x55d19ae880cd in characteristic_acquire_notify src/gatt-client.c:1593
+    ...
+
+Other avenues could also result in this use-after-free. The root issue
+is that the client struct is put in to both the notify list, and the
+notify_io struct, but without an extra reference increment.
+---
+ src/gatt-client.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 44ec95db0..374e67c34 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1566,6 +1566,7 @@ static void notify_io_destroy(void *data)
  
- 	device_probe_profiles(dev, added);
-+	g_slist_free(added);
+ 	if (queue_remove(client->chrc->notify_clients, client))
+ 		notify_client_unref(client);
++	notify_client_unref(client);
  }
  
- static void add_manufacturer_data(void *data, void *user_data)
+ static DBusMessage *characteristic_acquire_notify(DBusConnection *conn,
+@@ -1607,7 +1608,7 @@ static DBusMessage *characteristic_acquire_notify(DBusConnection *conn,
+ 	queue_push_tail(chrc->notify_clients, client);
+ 
+ 	chrc->notify_io = new0(struct sock_io, 1);
+-	chrc->notify_io->data = client;
++	chrc->notify_io->data = notify_client_ref(client);
+ 	chrc->notify_io->msg = dbus_message_ref(msg);
+ 	chrc->notify_io->destroy = notify_io_destroy;
+ 
 -- 
 2.52.0
 
