@@ -1,123 +1,151 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EC928690
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 14:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342A6306B12;
+	Mon, 12 Jan 2026 16:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768227924; cv=none; b=I+FOza2nbV+OVwjTzQoGSC7OhocIkrOqVpBXnn3is2fNhf0tafBsR9NiT1CmD+Fib/unLzWne9zvjNYX2gSmlNyVlyttWAZP6pQ1PPnMnGzjTVFaw/Jm/FM3m+pZ1zOz42pl+pK3F4vBDg8k28bXlUeXnsHz0L/MgdGp3gxnp3w=
+	t=1768235313; cv=none; b=F8hVcokTJEAUK/f6jIHpq/Arsz6SEON0car4aAZ1N88GOsieVUGsyOcWoDeTMkBvGekAd3uIwqwYVOpj/YCAKzZ6cIF/uzBb4Rs7IuzWs4fMmJY1FUfBI3aL6PHsemLCCnhAnJb0gcQCbpV/LwNSeYojAON+6jY9exX+mHqAP3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768227924; c=relaxed/simple;
-	bh=Rh8to1apCtCElzn+BT8OHw4BHSTHKVS5vRZF6y2V0GI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QgzVyRbN1sW/T609a0hYYxJHTE3OOtk0TOk+pQNDFMIk909hRzqBpFwg8kfJ10UOa0b9LevlTan9wNEzIDNdt1Kqba7gg2URiy3joXgAHy3xltIVWirhra8KqQFu2lBY2MfKZ4NqXU/OXFJN/ANCiyUcFPrS3diXew+ohf6L98I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BTe8n21j; arc=none smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768235313; c=relaxed/simple;
+	bh=GlJ71tujJcltgFnDfKrfK0RHu+muqUMEqgwXCraygEc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=WPe0jGXBjEqXepV8yV59nLelKQPqUA97ya2SQ+hSXPF1Q1UvX03M3LFvd51SrZzII4C/pglEmjV7fJkQTBTIdIHTdQcXYRPOHh+GMmdH8HWe2ZbHH7HHjAs1T/7Wv2uXk5pSXv1O2YlqstUajXP/VVPjRTKN2nOOnmy7JZw/rwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PaUH/J9R; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BTe8n21j"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-6467bed0d2fso6200721d50.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 06:25:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768227922; x=1768832722; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sL4TzgOyfcmh27MdquoSmz+Miu1KQMGgo4w1Cj/kmQc=;
-        b=BTe8n21j8rLkmc5o/36SoHcRHHkC4ERqD71W4vNH+ZA4TwlD+30tqtRxYakmRYhO6i
-         hChatqX6X1m8DmSWzBOUbemH1p9Z6ymUDXGU21pctgUs6VBJzBRjx1c5Ss5MCnYT/pMz
-         YgJ8Gyew83e7MDK3p95EdBgyJ+0FrOwUyqFUk6j7zptJcJmo0At3w5rofJ6sMUIh0L7g
-         mLKzrI6NGrhId6NI2vVAVF/wVDdp3vBy4R6k+d8BONAdBTPkLf2AzT99WATTth5GSAbo
-         Ux68zW1HtOLKQFKHeo1cK8ahsr0Gr/FbeNEec2P9ZapxtloLqyfqSfBpsNcp5sBB16Px
-         4b+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768227922; x=1768832722;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sL4TzgOyfcmh27MdquoSmz+Miu1KQMGgo4w1Cj/kmQc=;
-        b=sRpofY4uil2ZB8zoCj+0F0N/B+t0fcnY3nmkay8flCRtIcXbWR6zG8XUyj980rKuEj
-         lsp3iLH+K+AOSzPk3avIc9UbUuRgOfRq8B73/Ac/NhH8l+Fi42AteUb7TVgjLbjTnC1V
-         KHnnl5e4hWzonZLGxP59FdtCaZ91mNqKeInC/nCL5I+dh/gFxfI2E56wDrdKqgeL4zSn
-         OCo/l3SNEL3Lu/5aEz4XI1GuCY0Vb3iYYiHJ9GSTmrP9b4yFi2lal5lPinJwg7kS3KNM
-         aO8PjtUs1FYD02Ihqb1xzbgezpMOildjQrBnbmQIq22B6Y6qksIQIGmugSCNwgVNB1EZ
-         0IwQ==
-X-Gm-Message-State: AOJu0YzMOi9VRh2kPLlqSIV43x+H5bmHE+HCnWVpxBXiLCzXqeg2/IgJ
-	FfjFxrE0nQZ2iqCsQM2tSk4V5jtRWFV8JmQ8/HFfV4cKJnX72ol40lUexnwsobCM3RRTnhR78jc
-	i59AcCOdidBnldk2fLaNl+N0lQ4P7YxhMrnhh
-X-Gm-Gg: AY/fxX4ke/bNbo9TFQEY8xN8iQLno99N1oo6B/lE+xhNBKlUW8b5plY0Wv9UMqSJL2G
-	wnHijk9ZT/L3BKKxbp7rc7nfe8zUaz3oluwCLmBbXzy22PUw/A/1R4WkySobN8cZcyHKPjszjiK
-	chK3yLP6GIbRuQgUQ7F9Dw4AzVwah7ed5rqs3Xklx1tX5ZiN/k9m1fxefMxGlwngOfAVVV7v+fA
-	l33iNTaSlsPIrSmzceA/yI3zGEfBc/a4SEk+srZDTiDsAXG4BPueDXTvAxw97Y267HI63QzHgXd
-	gWy51zuk+iKdB9hVrtR3kgy9j3cw+eya7PNUybEATG8nE55E0gcc2SY=
-X-Google-Smtp-Source: AGHT+IHg0WvfqCzq0j/x6Lh2bHNz/K96ZvMwh7tASRYAaMBhPYEv7RHC/w3h+BEmK2ykOMFGocNee1cwuis5OY1Ak2A=
-X-Received: by 2002:a05:690e:bcd:b0:646:518b:9fc9 with SMTP id
- 956f58d0204a3-64716c54bc8mr15957354d50.78.1768227922179; Mon, 12 Jan 2026
- 06:25:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PaUH/J9R"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 07FE9C16AAE;
+	Mon, 12 Jan 2026 16:28:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768235313;
+	bh=GlJ71tujJcltgFnDfKrfK0RHu+muqUMEqgwXCraygEc=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=PaUH/J9RPZmbIvHp2Fn+kT5AYtWmn23AwVRzXo0vhaxyzQifOAi0+znz4sLkMxQBa
+	 J6Pwj+gwDTJM5TxkiOEdSus301MZUeGZrvvS/joQgoGBPtPGmOBxTrGyspe+UCXmKf
+	 yXmFHxTXh1dRZWSfBcSvHeDvRkaewgB1o9hWxuI7SJTFfMkj2Mv87QBVPAKgosUJGR
+	 wVt2XxGpd/twxXNR51uvuqK9/kUYRwVlocXpd7IAtq1/t0BkJI0K/GdzBf8l5b0oRE
+	 fBLp1A9+rjuVWxEsbB7mi3G8yXVMLDXO3ah01prMR0DpYlJA1BTFQZq9UR7XwBFesV
+	 nirHgWt74kmgA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3306D25041;
+	Mon, 12 Jan 2026 16:28:32 +0000 (UTC)
+From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
+Date: Mon, 12 Jan 2026 21:56:00 +0530
+Subject: [PATCH v4 1/9] serdev: Convert to_serdev_*() helpers to macros and
+ use container_of_const()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112-iso_sync_timeout-v1-1-9a3e99259a3f@amlogic.com>
-In-Reply-To: <20260112-iso_sync_timeout-v1-1-9a3e99259a3f@amlogic.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Jan 2026 09:25:11 -0500
-X-Gm-Features: AZwV_QjgjIAUoyOyd-ZKoFcGpo71fqtCyLncyMIBA_3ufJsz1iej-DoQjG0No7Y
-Message-ID: <CABBYNZ+xrCofAHqVOs4SDn3avXQenNbv4L-sys6_2Lf9PAXFOg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ bluez] bap: reduce ISO sync timeout to 2s
-To: yang.li@amlogic.com
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260112-pci-m2-e-v4-1-eff84d2c6d26@oss.qualcomm.com>
+References: <20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com>
+In-Reply-To: <20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com>
+To: Rob Herring <robh@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+ Mark Pearson <mpearson-lenovo@squebb.ca>, 
+ "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+ linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+ linux-acpi@vger.kernel.org, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2192;
+ i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
+ bh=07vK9ciXXRPSn3N/nNhnkZAEN4PO5YKuZEczKGyjzQ4=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpZSEtLU1+T/SQ8muTj88PMLYAc1JIDUMVESqYm
+ PJvutm3t5WJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaWUhLQAKCRBVnxHm/pHO
+ 9ZvgCACOa5aYDJDQeVpU6yq+fCGtKV9Xz1BGEatNRuENRILo7sSUAPtGbyGfxzQ/0vcy4Gb+3tW
+ jcnVrjZLjEZ+dCXlNXAFyy6VwIckMC8ZO8GOlS67JL5iOmWHfQ/aFzmBY9Uz79eiPwI6BCQTliK
+ 1hhKWLBCLzlvHxyooeqQs1gksE36iewETbO1uczvYdH5m2JtG9K6jY89FC7YE756kTcdmskU6B4
+ CKcv2Zojofh08iFJ1rz0zid+PoQTNbqCffd6F7xPEkCRAl31mzXhHRzRKNItT5fgOdkhPKgCVC7
+ YRafq06sSCerUESzjyX7I3cqm12BXILp3NiBAcA8WQ3w/Pxo
+X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
+ fpr=C668AEC3C3188E4C611465E7488550E901166008
+X-Endpoint-Received: by B4 Relay for
+ manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
+X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
-Hi Yang,
+From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-On Mon, Jan 12, 2026 at 1:42=E2=80=AFAM Yang Li via B4 Relay
-<devnull+yang.li.amlogic.com@kernel.org> wrote:
->
-> From: Yang Li <yang.li@amlogic.com>
->
-> The ISO sync timeout was previously set to 20 seconds,
-> which is too long for PA sync. This could leave the userspace
-> flow pending for an extended period of time.
+If these helpers receive the 'const struct device' pointer, then the const
+qualifier will get dropped, leading to below warning:
 
-I think we used 20 seconds based on the connection timeout, that said
-I do wonder if 2 seconds is going to be enough given that the
-advertisement window can be wider than that, specially when SID needs
-to be resolved.
+ warning: passing argument 1 of ‘to_serdev_device_driver’ discards 'const'
+ qualifier from pointer target type [-Wdiscarded-qualifiers]
 
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> ---
->  lib/bluetooth/bluetooth.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/lib/bluetooth/bluetooth.h b/lib/bluetooth/bluetooth.h
-> index f9f22c3f7..572009e75 100644
-> --- a/lib/bluetooth/bluetooth.h
-> +++ b/lib/bluetooth/bluetooth.h
-> @@ -152,7 +152,7 @@ struct bt_voice {
->  #define BT_ISO_QOS_BIG_UNSET   0xff
->  #define BT_ISO_QOS_BIS_UNSET   0xff
->
-> -#define BT_ISO_SYNC_TIMEOUT    0x07d0 /* 20 secs */
-> +#define BT_ISO_SYNC_TIMEOUT    0x00c8 /* 2 secs */
->
->  /* For an ISO Broadcaster, this value is used to compute
->   * the desired Periodic Advertising Interval as a function
->
-> ---
-> base-commit: a94f994201a69a36753abda65cc51937de9cd3e3
-> change-id: 20260112-iso_sync_timeout-8e3ecf43d82e
->
-> Best regards,
-> --
-> Yang Li <yang.li@amlogic.com>
->
->
->
+This is not an issue as of now, but with the future commits adding serdev
+device based driver matching, this warning will get triggered. Hence,
+convert these helpers to macros so that the qualifier get preserved and
+also use container_of_const() as container_of() is deprecated.
+
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+---
+ include/linux/serdev.h | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
+
+diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+index 34562eb99931..ecde0ad3e248 100644
+--- a/include/linux/serdev.h
++++ b/include/linux/serdev.h
+@@ -49,10 +49,7 @@ struct serdev_device {
+ 	struct mutex write_lock;
+ };
+ 
+-static inline struct serdev_device *to_serdev_device(struct device *d)
+-{
+-	return container_of(d, struct serdev_device, dev);
+-}
++#define to_serdev_device(d) container_of_const(d, struct serdev_device, dev)
+ 
+ /**
+  * struct serdev_device_driver - serdev slave device driver
+@@ -67,10 +64,7 @@ struct serdev_device_driver {
+ 	void	(*remove)(struct serdev_device *);
+ };
+ 
+-static inline struct serdev_device_driver *to_serdev_device_driver(struct device_driver *d)
+-{
+-	return container_of(d, struct serdev_device_driver, driver);
+-}
++#define to_serdev_device_driver(d) container_of_const(d, struct serdev_device_driver, driver)
+ 
+ enum serdev_parity {
+ 	SERDEV_PARITY_NONE,
+@@ -111,10 +105,7 @@ struct serdev_controller {
+ 	const struct serdev_controller_ops *ops;
+ };
+ 
+-static inline struct serdev_controller *to_serdev_controller(struct device *d)
+-{
+-	return container_of(d, struct serdev_controller, dev);
+-}
++#define to_serdev_controller(d) container_of_const(d, struct serdev_controller, dev)
+ 
+ static inline void *serdev_device_get_drvdata(const struct serdev_device *serdev)
+ {
+
+-- 
+2.48.1
 
 
---=20
-Luiz Augusto von Dentz
