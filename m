@@ -1,62 +1,109 @@
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2792B34DB50
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 10:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED69234F465
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 10:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768215100; cv=none; b=cYnNc3nTRiLZqfnDRnoDF39enqS73wCj76xOp225csZnV3dFQYT5I4rV5fXjRprLq0YigeAdePh4ILIKXFK8Al6dIFTkdiKCYFhjc9j3AkPf+uWGYjqsnzcec7m1+HKQ8W0GoQGRdvUarnUbQG84i355PVeo6gijGjqotQJwxG4=
+	t=1768215260; cv=none; b=BajYWFebMQ3ylA9pOY+1p00nhliYyPaFETZDUe2wYcyMbDFC4h5gaUw1k4R0FV7mr1Bo1p5AKE5eR+MFy138J+3pcts3Sy3On1CfD47GzE5O0zLNV0HV/IRb6NvLfK/tFGVAU1NgqN7XxpE4PWPf3bVjitABVZIzfwJ3s7Zcfpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768215100; c=relaxed/simple;
-	bh=UnH0e+LMQ0FXWSBKQIbLBDyX/rIhqOW/FDWaItuClac=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BtH3BjGWKlnibbvujvaFC/wbDKnBYWvz8Gd4LkGUfo/kdGbyt29ehIBSJ/f0plANTjkwGonm8NsStPKdjaU/obfRPk6xB8b7V6JzP5CkyJbwcHKKs90oClS4iGXj/GkrmC2QmGsarfUIJKkDde+F1JCl5f5MP6FlEDTQmLfNay8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 82A644329B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 10:51:36 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Use pm_ptr instead of #ifdef CONFIG_PM
-Date: Mon, 12 Jan 2026 11:51:13 +0100
-Message-ID: <20260112105127.3664608-1-hadess@hadess.net>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1768215260; c=relaxed/simple;
+	bh=JN8Tx9lcEFa1feWSSo2+DawtEa+D5nz6pKkmTYdd80o=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cfQ2OZv+ONmBoPgSbJG4oJXsMUg1lbs3YUb7GephxfvlxBnn9rfLvrpHSwpkR/R1M/n2b10TIROvWZYcANHEaqQM5TeI5XdUIQa9oqzQ0Is87z/SLWxDPUGlQPyTKmKxeahes+r79FDBgpWyY0oB4g2iOxN7lQiOFaoEnTLPhIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ER9uDpKU; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ER9uDpKU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65951C19424
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 10:54:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768215259;
+	bh=JN8Tx9lcEFa1feWSSo2+DawtEa+D5nz6pKkmTYdd80o=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
+	b=ER9uDpKU0gKhm7Mmd4Cxsn7MpqOQ7vgt/ZcySJ+A9bsTzXxToNbycaa4e7QBta8wD
+	 T8NSpwycbQYwIUTgh19uyJzFyLVV6QQKvVGN6qt0KMPkIdc7nYA5/U/QaOUJfI/kHy
+	 4Sd8Rvl0QCaU2Atg20NBcAm9QKTOwrxoxTsSOFizYh1bMtgu6MnsGhGFxsls0+Oizc
+	 Xfu6WwhJvA9CBk8mYony8E2iuqdfKr+rPvb+ZNEc0SiWYI7T1hZhsiyqoKBkOzwwuA
+	 E1rPydvvuBL8GGQHD+ufLKpzTd1tbTNHHZ6tGNWh5Zxq05oWl3ZtIWyApP4xskyR6/
+	 fc8kgRKSlTMpg==
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-38316445a67so26641321fa.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 02:54:19 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUfAM/D+PPLJ2C2/ftbbjqTSWRlz4voaBDo7vda0q2W5lLRz2JA8/bBURW/XwJAIt6et0+3q7cQyHq7lRef79c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywgc/CKL3JYy2buYRzwUBlALUBLM637i49zxP7dFnvN8hx3xoZr
+	GtS0TxZPUCrhEEx64Qq4oX7NYL9YvgK3KEU9TnmBhnEk0QuoPCe1k3ta0YAcUJUaGhG8vYnzCJr
+	ukDeVhZCkkRSugsi8sTDVFt7DbziUczWF1ugex0DcAA==
+X-Google-Smtp-Source: AGHT+IFOFA8kXD2/ntFFnMuqlDdI+7/+mE0Jg2kNrYOPk8LLfb+NDy962k4fw01JMa4nCZndlay6ttujw6BSDeEvZxc=
+X-Received: by 2002:a05:651c:210d:b0:383:4b8:435c with SMTP id
+ 38308e7fff4ca-38304b844c3mr52338991fa.9.1768215257586; Mon, 12 Jan 2026
+ 02:54:17 -0800 (PST)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 12 Jan 2026 02:54:16 -0800
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 12 Jan 2026 02:54:16 -0800
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <aWSq_7_5kkQIv9Hc@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduudejvdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeffleeuffejvdeufeffvdejjedvheekgfeltdejhfeitdettefgjedvuedvhfejueenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeekvdetieeggeefvdeluedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com> <aWSq_7_5kkQIv9Hc@smile.fi.intel.com>
+Date: Mon, 12 Jan 2026 02:54:16 -0800
+X-Gmail-Original-Message-ID: <CAMRc=MfoUi-qvZnOcM5pgvmVhPMEK+gvs5m2APrqLXc2J7x1AQ@mail.gmail.com>
+X-Gm-Features: AZwV_Qgkgd0gbVuBhbU6fLauSpqstnPMp3OpP37gMnJcwjV2eQkZ3qyjBa1-dnE
+Message-ID: <CAMRc=MfoUi-qvZnOcM5pgvmVhPMEK+gvs5m2APrqLXc2J7x1AQ@mail.gmail.com>
+Subject: Re: [PATCH v3 00/14] Add support for handling PCIe M.2 Key E
+ connectors in devicetree
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
+	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Daniel Scally <djrscally@gmail.com>, 
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
+	Sakari Ailus <sakari.ailus@linux.intel.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Sui Jingfeng <sui.jingfeng@linux.dev>, 
+	manivannan.sadhasivam@oss.qualcomm.com
+Content-Type: text/plain; charset="UTF-8"
 
-This increases build coverage and allows to drop an #ifdef.
+On Mon, 12 Jan 2026 09:04:15 +0100, Andy Shevchenko
+<andriy.shevchenko@linux.intel.com> said:
+> On Sat, Jan 10, 2026 at 12:26:18PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
+>>
 
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
----
- drivers/bluetooth/btusb.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+[snip]
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8ed3883ab8ee..539e93227b5c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4627,10 +4627,8 @@ static struct usb_driver btusb_driver = {
- 	.name		= "btusb",
- 	.probe		= btusb_probe,
- 	.disconnect	= btusb_disconnect,
--#ifdef CONFIG_PM
--	.suspend	= btusb_suspend,
--	.resume		= btusb_resume,
--#endif
-+	.suspend	= pm_ptr(btusb_suspend),
-+	.resume		= pm_ptr(btusb_resume),
- 	.id_table	= btusb_table,
- 	.supports_autosuspend = 1,
- 	.disable_hub_initiated_lpm = 1,
--- 
-2.52.0
+>> Though this series adds the relevant functionality for handling the M.2 Key M
+>> connectors, there are still a few open questions exists on the design.
+>>
+>> 1. I've used the DT compatible for the serdev swnode to match the existing OF
+>> device_id of the bluetooth driver. This avoids implementing custom serdev id
+>> matching as implemented till v2.
+>
+> Yeah, swnodes are not designed to replace the real DT or other firmware
+> interface. The idea of swnodes is to have them providing quirks if needed (i.e.
+> fixing up the broken or missed FW device properties). This should not have been
+> done this way. Please, consider another approach, e.g. DT-overlay.
+>
 
+This may have been true historically but software nodes were introduced before
+the auxiliary bus. With platform devices, the question has a clear response:
+DT or ACPI first, then possibly additional software node. But with auxiliary
+devices, where does the entirety of device properties come from if we - for
+whatever reason - don't want to propagate any "real" firmware node?
+
+This is not even about this particular series, rather it's a wider architecture
+question.
+
+Bartosz
