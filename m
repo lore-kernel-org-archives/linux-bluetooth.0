@@ -1,87 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2BE2C028B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 10:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2792B34DB50
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 10:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768212920; cv=none; b=HaWE1GMXTiJYYxVK8v8FwXLzz8OjNzdTuLc6v8EINkYk8ewnz6nCl+CK0S0HcA/WqEjTr+puc0SHxxGsGXSzkHXjsChgXkjcLbPFLLGlYxLohTeGT7EFO3+4E9dkICbQNN+TaLz8DaeN8PRjHjR4f1rm77YM/2jxIxtDljmnM6k=
+	t=1768215100; cv=none; b=cYnNc3nTRiLZqfnDRnoDF39enqS73wCj76xOp225csZnV3dFQYT5I4rV5fXjRprLq0YigeAdePh4ILIKXFK8Al6dIFTkdiKCYFhjc9j3AkPf+uWGYjqsnzcec7m1+HKQ8W0GoQGRdvUarnUbQG84i355PVeo6gijGjqotQJwxG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768212920; c=relaxed/simple;
-	bh=/JNVV1keZG7AzhICMUwAABvyOdquHyAG1/aTGJcjggM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ILwLbztapcbeyNwJH3+WgyT6hE2ziZwrS1AASE9g1ea8QEFULSNA8jP8vwGy3e7aONjN/j5j54NfaBoo7DqSTYunv0kr+QDiOQKTvCLoCzQRIj/HZo5B+I1rn9Q4g5zAIEBRQb+4QjbAzAwUR+29flNAuXnOwzcVdBDQ1GVsTKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FRMClkuu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FRMClkuu"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D4D49C19422
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 10:15:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768212919;
-	bh=/JNVV1keZG7AzhICMUwAABvyOdquHyAG1/aTGJcjggM=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=FRMClkuuS7GMFoyhhYAgm+0wau+2ibibofIVnSLGFSnfVQYrCJD5+eTkxLmwdOGCs
-	 yZIVJ/I5d99oywJL+HoFXKO87qgyQqloLMSvX+I0HqG3SY6WYWJyAMadC07Qg0ASvs
-	 EUFGBsP+En50wvtnvosNhuZozQ1ETpTm90GaNoxNG0mtqGa3tFusmiHO5uR+ojaRnb
-	 YqlWf+eb/clHUvmPA1boCHfWbg4XWS9qA/+qklOOBElxgntGvjES8Epzli1B2DORx6
-	 k/z+7tfrnUOzz+6HM6mSMnaesYRmy34+07uu0Wfni35Ky1nGR0xJTUS2p6K/zB1Xku
-	 D8NSZnNqAe77Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id CD777C41612; Mon, 12 Jan 2026 10:15:19 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	s=arc-20240116; t=1768215100; c=relaxed/simple;
+	bh=UnH0e+LMQ0FXWSBKQIbLBDyX/rIhqOW/FDWaItuClac=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BtH3BjGWKlnibbvujvaFC/wbDKnBYWvz8Gd4LkGUfo/kdGbyt29ehIBSJ/f0plANTjkwGonm8NsStPKdjaU/obfRPk6xB8b7V6JzP5CkyJbwcHKKs90oClS4iGXj/GkrmC2QmGsarfUIJKkDde+F1JCl5f5MP6FlEDTQmLfNay8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 82A644329B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 10:51:36 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 86931] hid-generic 0005:099A:0500.0001: unknown main item tag
- 0x0
-Date: Mon, 12 Jan 2026 10:15:19 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: bugzilla@hadess.net
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status cc
-Message-ID: <bug-86931-62941-JF4ywN4Rcx@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-86931-62941@https.bugzilla.kernel.org/>
-References: <bug-86931-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH] Bluetooth: btusb: Use pm_ptr instead of #ifdef CONFIG_PM
+Date: Mon, 12 Jan 2026 11:51:13 +0100
+Message-ID: <20260112105127.3664608-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduudejvdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeffleeuffejvdeufeffvdejjedvheekgfeltdejhfeitdettefgjedvuedvhfejueenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeekvdetieeggeefvdeluedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D86931
+This increases build coverage and allows to drop an #ifdef.
 
-Bastien Nocera (bugzilla@hadess.net) changed:
+Signed-off-by: Bastien Nocera <hadess@hadess.net>
+---
+ drivers/bluetooth/btusb.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |NEEDINFO
-                 CC|                            |bugzilla@hadess.net
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8ed3883ab8ee..539e93227b5c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4627,10 +4627,8 @@ static struct usb_driver btusb_driver = {
+ 	.name		= "btusb",
+ 	.probe		= btusb_probe,
+ 	.disconnect	= btusb_disconnect,
+-#ifdef CONFIG_PM
+-	.suspend	= btusb_suspend,
+-	.resume		= btusb_resume,
+-#endif
++	.suspend	= pm_ptr(btusb_suspend),
++	.resume		= pm_ptr(btusb_resume),
+ 	.id_table	= btusb_table,
+ 	.supports_autosuspend = 1,
+ 	.disable_hub_initiated_lpm = 1,
+-- 
+2.52.0
 
---- Comment #14 from Bastien Nocera (bugzilla@hadess.net) ---
-This should have been fixed by:
-https://github.com/bluez/bluez/commit/2645d3f662ebe8e601df628432886d3712b42=
-1b3
-which will be in the next bluez release after 5.85.
-
-You might need to re-pair your device, would appreciate a test from someone
-who's seen the problem.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
