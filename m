@@ -1,149 +1,78 @@
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2E92E265A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 16:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BBA2E265A;
+	Mon, 12 Jan 2026 16:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768235973; cv=none; b=TVzeYlmFPkYf4UPfTV0hgSzhBiZDimTJqUVNsmEho5OzX6IXHDNhDntDudArFbGih2wDuMHGl+0x222JHELVIl40vHXk5M7x5FBzUfETA0B32uo32FWBdMDjNkc/Hue2VQ9e4Uk9hAZpgj/YybYq7V51uRaCoKSrmOCXOyuxg90=
+	t=1768236133; cv=none; b=H9q+y51QMndzKRQRIjuXSVTIaHdryxwVapwrF2mwa/flKIggkfYYRT50zVM15/piBOBmUABSdLKzFfhmlkQRmIENB49TOkZNdc2LpS8+4b5P2OT41LyJLqa1pGy+1zwU8ERUcwc/TpQL8QyfTBt+/rXnjFac5JhkYaDDH5/hVvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768235973; c=relaxed/simple;
-	bh=8AGbsg0vnhJ/oAVXXMtbOjUAUxQCh1X602TaOx6x7BU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S/9h9bIUVBgr+SNLn7L+CToJaqvBeCsxPdbmXaOfxRhuwLCW8tmGRmmNJSbPb7SrMePd4CTe8G4VKzRNcg6BkIIeDW4kUzYjd7f5l0HKLTgXr0aZ2qvx/+JHdSEziuAF6pqbAmd+h5z5tLNW6VpKDJIqnnc+RICil3Pvjl9NKC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O/c+bD/C; arc=none smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O/c+bD/C"
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-6446d7a8eadso5877560d50.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 08:39:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768235971; x=1768840771; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AqdVzEPYnRnIl6GYs+maD4WQ9RVyHlMeLrRVPR2sDxI=;
-        b=O/c+bD/CC6fDFtN8pG5XqVZ8W20kgVTVGbdMVAGY0V2UWV1tSStBeDqTxLDegH753I
-         q8Pb8pbrSLkUmemhRqixvke16+s2O8jl7d5YXzQedIMupIvl86f9WPZ12VcmO4vyME6U
-         vP8I/LEY9b3E61Wdpuln9q7RQpr3yuPo0eI2ibY60aPvaMvVpy0mSI7pY5IXi0+R8ocM
-         Lc9Mc9BcyoMrAtvUer3PCuQo6O8oEl8Ld5C6F4QAIAZVGpb1lAsX8IIdUTqLLZp3oADl
-         5EDvTET8+UHQX5PKc96xP+Ii4raA9XQU2G8KP/QrRHzmq7U1UeZrowqFUdZIDS7B5W/3
-         JFcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768235971; x=1768840771;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=AqdVzEPYnRnIl6GYs+maD4WQ9RVyHlMeLrRVPR2sDxI=;
-        b=F2HaSag4E+3vjiCzB97zP2mGXqStS+cj1n1x+uTTuZ1cZoWEIBRFbDU26FRGVxXqlk
-         JX2apSksuAZph+mF3idyF4r9yNez0ebZFGehF+iL1gJ9uHu1EBXawclO3zsSCRPZ4xQy
-         vkfwOqZSmtmME8Yly/rVRS0QpBN4BlWR2JUS6KHiVWWUzaDc3/2tb15U6KMP1+FzkSI5
-         Svtt5ct2AAahB9PJBvUj7Fc26baommyDeiRe5cvSF/BErPIsMQIooCUiMUJ99i0sLuIZ
-         y+2pVaixRM/Dkbj2ydhZ3LLOPL10TAj1YCqxJVORUSiMBKV2DsMkzNn3VtkzmwxlS4N7
-         LDdg==
-X-Forwarded-Encrypted: i=1; AJvYcCWmWBTNalKTO+cdfboOAAvIi89f2OZl8+Hd63ndq/vnH4Z+U4+CAAnvZWwmLElTqmC5got08eMibr9I9pPDf5M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEwqgNqV6YEugrXsgpnMuBfV5vFKLBqIZP2bhWEQmUx63WWce+
-	OqerX6HSXfFZBawSL+y9yvh12AJC23iWaj4tJbmAyY0vp0S39oW/Nz/fR6W4ReSGQjag1Wy/AZb
-	1goohjrKuaJOxKqYsD0EP/aNqAsA/vPg=
-X-Gm-Gg: AY/fxX7CQaNaq1zLNTKipep32PCbjIXANlSANdfaKR2FgQ5GhLlKaEyo7iNjaY9llER
-	4/eo30S5Id3HqtIWkp6GzlFAZWtkdl/Qders2E8cgBcW1nLzkjwXueSfpNL7HfsmGDDmNAC+Id5
-	oN3IjJoIlXp89yG+0U/qnZeXoaUYzLAUBaTpA+1vSWcp5XXCPCqldkkKX1/9+FmTQErGD0taqmX
-	U3hpmLdFC6dQC2Zg27+u9DZYAaRs9VGkELJXhlfZps4mB5y6vB18Z4yZWJ1jfqdVWJgp/o8hkCo
-	XYGf30JZXJUEe9GtWBeJfXcytMysHXmFyG8upXDkI/Y8ZR11UVKZYaM=
-X-Google-Smtp-Source: AGHT+IH2QBsqE9vgWnD+6OTXPtBJh46Hw8c4lbxUNab+T7tuWjxaS4kJ0So8fxukziSFSqgrX8HWf5+3+DPJefESM3I=
-X-Received: by 2002:a05:690e:140b:b0:646:c661:8f98 with SMTP id
- 956f58d0204a3-64716bb9b79mr15001831d50.40.1768235970693; Mon, 12 Jan 2026
- 08:39:30 -0800 (PST)
+	s=arc-20240116; t=1768236133; c=relaxed/simple;
+	bh=p+zhbcd+Ejgo7BjYXu0FBHtSgAxS8QssHtymENbdr3g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ne4AcgnaFmV0yF/V9UOVJLaxtg4+1et3Fl6HUmv2y7/S30n+R07z6iDJLv9CMMG936TtPO6/IHY/8twHkGF3XG/B7WC7XIqWCHH8j6/Y3MX5PENm31Y5EIAaAMjdiF7Lpblt4U0emcg7k2tA/v24QB4YuL7WpWko9np0hzHjLn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63631C116D0;
+	Mon, 12 Jan 2026 16:42:01 +0000 (UTC)
+Date: Mon, 12 Jan 2026 22:11:57 +0530
+From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: Manivannan Sadhasivam <mani@kernel.org>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+	Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, Mark Pearson <mpearson-lenovo@squebb.ca>, 
+	"Derek J. Clark" <derekjohn.clark@gmail.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Daniel Scally <djrscally@gmail.com>, Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
+	Sakari Ailus <sakari.ailus@linux.intel.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+	linux-acpi@vger.kernel.org, Sui Jingfeng <sui.jingfeng@linux.dev>
+Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
+ fwnode callback
+Message-ID: <6xnoqml2iwipcfm2byrswm7xmhehzbjbdgeets7qpyiez6le6z@vrtcqoaaqwgx>
+References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
+ <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
+ <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
+ <6l3rs5pv6xnrbygpvqrdxqoqtybjyefsltk5bl4336q56rfoza@ejo3sxuufghe>
+ <20260112-miniature-quiet-gorilla-263fed@lemur>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <tencent_2FAB909645504A5E0FDC88F125E139242C05@qq.com>
-In-Reply-To: <tencent_2FAB909645504A5E0FDC88F125E139242C05@qq.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Jan 2026 11:39:18 -0500
-X-Gm-Features: AZwV_QhlM5oO126AHcNDDpkB6HWVq5_O7legyRFi5b8QtaJsCFQrKng60k_qxrg
-Message-ID: <CABBYNZJ+brhf-h7HU63vRah9uBNx3UT=kxTQjr74vuJRG+3B0g@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Perform careful capability checks in hci_sock_bind()
-To: Jerry Wu <w.7erry@foxmail.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260112-miniature-quiet-gorilla-263fed@lemur>
 
-Hi Jerry,
+On Mon, Jan 12, 2026 at 08:37:02AM -0500, Konstantin Ryabitsev wrote:
+> On Mon, Jan 12, 2026 at 01:49:54PM +0530, Manivannan Sadhasivam wrote:
+> > > I really do not want to see this patch without very good justification
+> > > (note, there were at least two attempts in the past to add this stuff
+> > >  and no-one was merged, have you studied those cases?).
+> > > 
+> > 
+> > Yes I did. I didn't put the above justification in the cover letter, as it was
+> > already overwhelmed with too much information regarding the connector node.
+> > Maybe I should've added it in the comments section of this patch. But I didn't
+> > know how to do that with b4.
+> 
+> You can just amend the commit directly and put comments under "---". They
+> will be preserved when email is sent, but won't be applied when the maintainer
+> pulls the series.
+> 
 
-On Thu, Jan 8, 2026 at 8:57=E2=80=AFPM Jerry Wu <w.7erry@foxmail.com> wrote=
-:
->
-> Previously, the HCI_SOCK_TRUSTED flag was set in hci_sock_bind() by
-> checking capable(CAP_NET_ADMIN). This function verifies that the
-> current caller of the bind system call has the required capability.
->
-> However, this approach is vulnerable to a "confused deputy" attack. A
-> malicious unprivileged program can open an HCI socket and deliberately
-> share it with a privileged task (e.g., via file descriptor passing).
-> If the privileged task is tricked into calling bind() on that socket,
-> the capable() check will pass, and the socket will be marked as
-> trusted. The original unprivileged program then retains access to this
-> now-trusted socket, allowing it to perform privileged operations.
->
-> This issue mirrors the vulnerability previously identified and fixed
-> in hci_sock_ioctl().
->
-> Fix this by using sk_capable() instead of capable(). This ensures that
-> both the task performing the bind and the socket opener must have the
-> CAP_NET_ADMIN capability before the socket is granted the
-> HCI_SOCK_TRUSTED status.
->
-> Fixes: f4cdbb3f25c1 ("Bluetooth: Handle HCI raw socket transition from un=
-bound to bound")
-> Signed-off-by: Jerry Wu <w.7erry@foxmail.com>
-> ---
-> Commit 25c150ac103a ("bluetooth: Perform careful capability checks in hci=
-_sock_ioctl()")
-> fixed CVE-2023-2002. hci_sock_bind contains a similar logic. Would it mak=
-e sense to
-> fix it in the same way?
->
-> Thank you for spending time reading this. Apologies if I missed anything.
->
->  net/bluetooth/hci_sock.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 4e7bf63af9c5..2bab2532dd9a 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -1259,7 +1259,7 @@ static int hci_sock_bind(struct socket *sock, struc=
-t sockaddr_unsized *addr,
->                         }
->                 }
->
-> -               if (capable(CAP_NET_ADMIN))
-> +               if (sk_capable(CAP_NET_ADMIN))
->                         hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
->
->                 hci_pi(sk)->hdev =3D hdev;
-> @@ -1427,7 +1427,7 @@ static int hci_sock_bind(struct socket *sock, struc=
-t sockaddr_unsized *addr,
->                  * untrusted users the interface is restricted and
->                  * also only untrusted events are sent.
->                  */
-> -               if (capable(CAP_NET_ADMIN))
-> +               if (sk_capable(CAP_NET_ADMIN))
->                         hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
->
->                 hci_pi(sk)->channel =3D haddr.hci_channel;
-> --
-> 2.52.0
+Ah, thanks for the info!
 
-Seems like you didn't build test this before sending, it should have
-been sk_capable(sk, CAP_NET_ADMIN).
+- Mani
 
-
---=20
-Luiz Augusto von Dentz
+-- 
+மணிவண்ணன் சதாசிவம்
