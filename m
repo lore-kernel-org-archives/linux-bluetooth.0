@@ -1,73 +1,76 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DEC17BB21
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 19:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362EF2F49FD;
+	Mon, 12 Jan 2026 21:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768247726; cv=none; b=s/+bU53gpxVgkBUFXvNKXj0tSjXlmXW4ayYFkF6dkrhPMWeEObYnRPip3SxzIVKFDP+TJ37ZvZ+naNrLjjj/2HZqpkVwPQDYY04GvHm1vCD2FTumyM7LPe1PTpUCf4rQDBOz3pgOvk5DdqqNfGPyLf1fi4rE1BAT+XZ3fIhDVuA=
+	t=1768251625; cv=none; b=aOvMvyG39SzexwZ5Lc+bZzWwKFGnstULT3z84vspuAz858rl14nci3B1Ri/pocrdZvcuBinli13RuSwrCarmYnakLA87P0f/VOv1/e95ck+QtGaF6ygCsmrLsk3Fm8Z9/6LN3sKxZETnQhFg5cCmiHNSYAxTTxlmD9FkPZ2Lmkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768247726; c=relaxed/simple;
-	bh=4MFEmNreU7Mw8LkNpYWbJzgdSPpm4Or5fbx9ysEnx3E=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=P7YqEuERTbb8v5Yl8aZGJn83l9GojGeIpH/luuc2+t+6i+qfoXLCeJ0nm3cMRwj04iHrwK/j6QqXCBBcYx021SohkvI/Yx5zy5LcI5dyrqpyzLoryR0GiDB5DnU5hnS05xN8tyYg6diLaGmbXeU3JlaIOpcxsOERkfJ/NJ9Fa58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u8we4V+B; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768251625; c=relaxed/simple;
+	bh=fxntyZDKwAr1NS/5LQRCWHoyFlbp632aDyhSQQ1Tr94=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=u+El2W8TEcFXEYQDzKbFaNGQoH3HboEj0cQY9rFIS6KXog7qr6v2c2bea6vgZNAKoeBToW72BAqNPtKSf6G1A4GHy1m6U2QgoKhJ8llx1pAk45cKSGkzg6fdfDy78Wh770rS0D6JXUeYWvgT/i9T+Z/CJDpaHy7JC6O0jfd8FMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neSLd5kh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u8we4V+B"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2C346C16AAE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jan 2026 19:55:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neSLd5kh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEB95C116D0;
+	Mon, 12 Jan 2026 21:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768247726;
-	bh=4MFEmNreU7Mw8LkNpYWbJzgdSPpm4Or5fbx9ysEnx3E=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=u8we4V+BOqNjJJgpdZ8/tlrPHzD1oPt+c58bHgS83ilG35b/GkPVpY9yVvCEFhMDw
-	 EAZOOHAfZaQEO0+UOmZMdFE/IDlbaUuvi8y/ISmcwLAaJMqe1eaViyOHETpMd4I8sj
-	 lMu516gOA04nzcNnoh0+3mP8dhicDw6rgHSm5tKfCKzjv8qpmwBcTLKEyzjY2r81EL
-	 PQOND26cCayIKGQBTO5ECRXbN235KUXL1cvO/+PoQw6UhKf0+DDOrIrKVNYgjg3XIL
-	 1gEtTSLDoV1DOKkU67R8voAmXf8ju4KStV0529PzoXi5iuA0X/fil+jQqkYOrwmeFm
-	 zrrKg/sSEWoVw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 19185C433E1; Mon, 12 Jan 2026 19:55:26 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220922] btusb: Add USB ID 0x13d3:0x3625 for MediaTek MT7922
-Date: Mon, 12 Jan 2026 19:55:25 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: lucenz@proton.me
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-220922-62941-cpltv9eUny@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220922-62941@https.bugzilla.kernel.org/>
-References: <bug-220922-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1768251622;
+	bh=fxntyZDKwAr1NS/5LQRCWHoyFlbp632aDyhSQQ1Tr94=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=neSLd5khzODlZk22TLBWbY1iNDVuEdtRGc8RQZA8gMoE8EFtQQNSkVYiUVfS3q5EW
+	 tSyoPBISumcU6vNwVSnY1ulTpMWZEW90bQU3OO7y2MaFq5slEgXVk+vGb50axln3FN
+	 l3DGh85/epGRAiIMy/EA+uRz/spsGjXlDMsg/8Ek3lw9Sx2a2kMI2Xrf93Y06IScVk
+	 du+b28bXyUUfhuasMyezyoW8/fdtwal/6mpZAo+qh0IHPg0vLhHQqUuSAoupGmIWkI
+	 r8KZHPgYexvcaGrRmTkISFjhBG8m+vaxYRjby+KT4GGOtH95Rysd+Ph9nSI4zcJn66
+	 rz7lYoYPUjxnQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F37A5380CFD5;
+	Mon, 12 Jan 2026 20:56:57 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] bluetooth 2026-01-09
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176825141653.1092878.14076029591226241236.git-patchwork-notify@kernel.org>
+Date: Mon, 12 Jan 2026 20:56:56 +0000
+References: <20260109211949.236218-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260109211949.236218-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220922
+Hello:
 
---- Comment #3 from lucenz@proton.me ---
-Any updates on this?
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
---=20
-You may reply to this email to add a comment.
+On Fri,  9 Jan 2026 16:19:49 -0500 you wrote:
+> The following changes since commit 872ac785e7680dac9ec7f8c5ccd4f667f49d6997:
+> 
+>   ipv4: ip_tunnel: spread netdev_lockdep_set_classes() (2026-01-08 18:02:35 -0800)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-01-09
+> 
+> [...]
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Here is the summary with links:
+  - [GIT,PULL] bluetooth 2026-01-09
+    https://git.kernel.org/netdev/net/c/c8a49a2f9117
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
