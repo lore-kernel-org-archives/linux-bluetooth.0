@@ -1,46 +1,46 @@
 Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010052.outbound.protection.outlook.com [52.101.69.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC3F314A89;
-	Tue, 13 Jan 2026 07:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283FD318B8F;
+	Tue, 13 Jan 2026 07:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768290435; cv=fail; b=mEUWBQpygmbWg0HSC1pePLN0wbNsV2UdwBzg4Ypr1j1ChikQopa/XH69Dm/t42kDJzDbvaUehpNPOjaGEw5bbD9hd9diqM2mN09496OKpL2ZToL8oKO/hSWK9inIAUr7Tqlr5S4v31xSh4tvY6GsdRrNZYMI3xqNeVp77LGw/HY=
+	t=1768290445; cv=fail; b=XY7Z7/WVLCWKoLUY3imMAlOdx4dePddMB/4fC8N9BV56BgtAb9BJqvlsSdYG8Iuk/JOVSpsY7Rw4dR1sv+RpoYhfegJMJ58pcB1JgFGlqVlXwY3q+lNcMu6f/WCmMppmigtcEis0i2vnp2OwgbREGPKjHvXoNFrz4zeHJpqfHd0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768290435; c=relaxed/simple;
-	bh=CmaiCwS45Me+s454rXQi2XdQHRTBGAPTV4b19nqDUGk=;
+	s=arc-20240116; t=1768290445; c=relaxed/simple;
+	bh=MWhA2gh+XBoFj+Ck1/Hr91rPrUZ98eyGvCaYZWcV7OI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=P3L9k45LuvacEyNMyTxnrUjkS6r4Gsni6ev6vMPFesvVnzKhRFsAxc6KhYlyNo4GowB7HCemgLbIER/KCIAPYpWP7nJpqC47lthQg8RYfJt40CJ/QJstGW4TEBNwgmp7j2T6yn0eQ6868wQzCMLqxB6ZStzwjRywrye2FyniLs0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=W3dLPFcy; arc=fail smtp.client-ip=52.101.69.52
+	 Content-Type:MIME-Version; b=W9Ku6dX+FRdQuNe/YkqUjic2EebmPJWfjz2Osfuopnc/OBbicIWYq/8Fiqq8SqEFTRizXhq0v8DmId5/Mx4ocj9t6X3ZQsWNbfkOiIQPVETSPOFPToR6TXSbTn0mKEWraBGM0Vyz7DRJpMYanPPK5Trv0hVY9/mFDsTGLwjFrIw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=f8Pp6bKU; arc=fail smtp.client-ip=52.101.69.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="W3dLPFcy"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="f8Pp6bKU"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Iv4O3qdO7nfX8gxKQOSeuhcVNJaiv7k5LfHwn/+++RoyK1q+KuQ40/9fY0xpmcMJwO+46/qiMoOYmmEUkq64xHzj/v0zuPZeUdUtGIg8E3NSSpqG9iQag0mNxNjoaEjfTkFQ75+9hvE0ILzDgT96+A1WxhUyj6U53djtMLGb0bBvdIP9p70MLg1oB4TKH4RXZ2omVmPyiVA/wnnfIe5dmnD2VYHr8Pr7yef2o6ZZ6hhgttxeXqLoncug2Vy+1V9uY1KfOsxE/g1z+eoJqFZd/2Ol+poJGveTVv4npNuonIvsHHN8Z+Aa4f2Ungb/M+Xt+dJLo8ykWFvIIMXiUxWIVQ==
+ b=HfhpxCz4znQeKR/fXfofeUwOSx1dAsBSld7OPvc6THrtSPs2pNH1QsaCYZaCjIP8U3wbGDrtTswD/jKJVQBiJavVTWGMsJR7EHIYqp/zxEmPLXQNcmI6BVopqRTXbze1jNqD0aG+Ubk3YT4p21KcWufpQ9NY+66IYzQNEGMB0ATJIKkMYgwhTC6cgn/M9Ft7iLDBl9bMHuNNzy37LHyT8PQ8LGmAOzI2sXg/+i0chdMxJAF3m4fzgPBjwqaZoiQ9NzD3/vWEsTSo2ZTvbZ/NNG4yzLtJmdURl2MAwV8CDaViYqMlIYdB4wX9DuCekJcr1MjxbPGTniaBUNNadL9Ing==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tvyUPpjImRls9SVxtFgJP0Ji0abVMi7jLMTMOCKM3I8=;
- b=NTEyCl9MTcC11hMTAAKcNnb78TKEoHTMhK8PqQgjAR3sxK38cr4KQWEhElZ2sUecAQD/QO4JnsUMyVI/rEEu6jrNu43+1x1yWMErusVOcJQYC5LMI9JMIaCCYkNyUagsMYAq+O1lNmeRZUcC4smdtmFR3l3egf3QsFeLUnPssd4XMTCMTUXukOzKCnlQD7/UuH9hFGQWenK/LSQ8toiFNhi5v0sPJCAFRuJMKEvALairkU69TtZM8PXEc9oDb1p0IlEgta+kPv512lVqQpiEWDHzHU8M6qhl3HhBTSPUgRULUl907empJYCiinU4Nl1tVv6RWDZaprIAroOOtypffA==
+ bh=3LzgoS5MjdutMLtDtQCIrAgjtRl8ZGvBSRk6aaJ+YRU=;
+ b=qBVxIiX4xg6wF05uczpgZX7BrxHtsp0GbcgZ4UWk2LvFZIIajSvUS3Ka8XF4ju9GRUi647Aref9VCl20qOyWnnG2zNY/ZTL1AhKNvNI86QcHso8PwL2fYVGOzCswa4ru0qpw3sXTNeD2m0eKinM7Te3C4Zi/P38E1kd8ZxDe0Z9KInAkcToK5feObg+JXDlrtusFkjX2lD9jnWyZph0JoNLBtYMRtqvUki0ut/hrrZPhNi12ObSY6sFzZ9aQDIt2IR0VtlHb8jTVUCgMwIPVnOvVpnrRlbKb4Kyz+pz9777h5/7jE0Jyp9Yvq+OHwDdAx/yfIxKTyX/GG4xUZd4pLw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tvyUPpjImRls9SVxtFgJP0Ji0abVMi7jLMTMOCKM3I8=;
- b=W3dLPFcyE3iaCFi7YABU7DCSjqw0X58ShSDidXUkqcO3DiLFVn0e6td1iOfuYEyLOzochkGBlcTxSh/MYnDtl+4ZDlnjm0w4G5IcdY527ZwOQgFLf6RuBkaObxkjlR78HP1/mFEDHDFA44UCIrtPani2QJDaMYeOrniSGi4SPkir3qHfd7abgutZEZOKKLFo5kVaw5eBU4pljcprjj10bXYajxtzqzSh6b4Z4df2CeZsgWH+JLjt/UxQ827vM1VvcZUSHBEAGVO/YqxLTQqwd8Gunt6/vZj1Gr4qf/WwvlafAG3nahxTmuVIZGR5nepTxFZoJzbiaHdvjrHM8FXJWg==
+ bh=3LzgoS5MjdutMLtDtQCIrAgjtRl8ZGvBSRk6aaJ+YRU=;
+ b=f8Pp6bKUlu8vx6HtKvfHuMfz5iEQLiP+n6IOTmmZsrsIEtO78/sWBaaObbaFgE+VXV5D5ay3nYJLaXlcQa6Rk7AxBTVNhOusPnJmnmMs/rhDpf+AkqvO+0xAcGHVDZgkW/DTXnhJ9caAk+UyA7BipfmaDReoDE8DbsD6MbjqSQ4gXmMQHmJef5e38e3g2uJhe2rAjp0y3UL9Ii6SjJJwlemqwf179h+yQe4d0S41NXdJ3wIb7q1DRAaQjAxNP3fQV6XUFmn37+zs1f4dzeQQMaL/lKg4P3yJrwMvsx7uGWU89L4pzHF8vfLCS8rzIh0B5v71BSXjDAXUV8zJYcyJEA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
  by PAXPR04MB8144.eurprd04.prod.outlook.com (2603:10a6:102:1cc::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.6; Tue, 13 Jan
- 2026 07:47:05 +0000
+ 2026 07:47:07 +0000
 Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
  ([fe80::a2bf:4199:6415:f299]) by AS4PR04MB9692.eurprd04.prod.outlook.com
  ([fe80::a2bf:4199:6415:f299%4]) with mapi id 15.20.9520.003; Tue, 13 Jan 2026
- 07:47:05 +0000
+ 07:47:07 +0000
 From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -50,9 +50,9 @@ Cc: amitkumar.karwar@nxp.com,
 	dmitrii.lebed@nxp.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 08/11] Bluetooth: btnxpuart: Derive traffic keys from TLS 1.3 handshake
-Date: Tue, 13 Jan 2026 13:17:15 +0530
-Message-ID: <20260113074718.2384043-9-neeraj.sanjaykale@nxp.com>
+Subject: [PATCH v2 09/11] Bluetooth: btnxpuart: Add command encryption for sensitive HCI commands
+Date: Tue, 13 Jan 2026 13:17:16 +0530
+Message-ID: <20260113074718.2384043-10-neeraj.sanjaykale@nxp.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260113074718.2384043-1-neeraj.sanjaykale@nxp.com>
 References: <20260113074718.2384043-1-neeraj.sanjaykale@nxp.com>
@@ -69,223 +69,211 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS4PR04MB9692:EE_|PAXPR04MB8144:EE_
-X-MS-Office365-Filtering-Correlation-Id: 29a91da1-fb25-449b-3102-08de5277f260
+X-MS-Office365-Filtering-Correlation-Id: 4c340f0a-8db1-44fd-d5d6-08de5277f394
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|52116014|366016|19092799006|1800799024|38350700014|7142099003;
+	BCL:0;ARA:13230040|376014|52116014|366016|19092799006|1800799024|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?HIzpqmw4Ow9iFh3rLFKsrA2Yq62PFpqsN34MTHBo8vqNoXqEDychAWVJELoP?=
- =?us-ascii?Q?6j4OvrruHtD0DTVIgcl2SadJXVOiJ8Sln0/pJd+u5HH67fOkGVqG6NFrCyBC?=
- =?us-ascii?Q?zoRwB7DEMO9fqUl1ByymSixjrvdyIMh0QCoEZVc64Vi/hk+5HjCPe/1IEYN/?=
- =?us-ascii?Q?tq7ULtvGFZ1kKit/b9JZ0dExV/Y7p42X7+LuTg8E0ESc6QfYr4T51WY5K0vy?=
- =?us-ascii?Q?D7hLh7/Rr/7hS0DPPxpAYtUWWv0Q4j5zU4nG9gkyyxZ0+dVRvmLcQmClzrZn?=
- =?us-ascii?Q?riH7r2Fft0QKGI/t3rjHaEYSeu0L28BXbS4VDD2vEEtRo+3juusbJm1Ug+V0?=
- =?us-ascii?Q?zxV+loXSodSgZQw1wa8hf1QXweXI3s0ScMAV8trJVPfff5NEkesxv+tdBD0G?=
- =?us-ascii?Q?Y4Ur7GsQZZB0zIxe7/AMO8d5xdht9RFyr5jyBD3hsEEnBQa0SrZrYtlVKzeR?=
- =?us-ascii?Q?YWAmW7bK5Xfe5PlRFzGDdAikT8ewhViNWrhmoWJ6sBr5S4P6RE31JqmlWAyR?=
- =?us-ascii?Q?seLP77FI2bm9cKPGZ3TZMJVVGDh00O/KS2EGg1OUZbCcFfpuwdgK3/PZtB3D?=
- =?us-ascii?Q?Sfl9uZgdvMO+aaYHCDdnfy5L2Kg6hXtcXXH6/qLEqX9bzLHtCap/kBO0fGVc?=
- =?us-ascii?Q?pG9PZa2/i/7Q/TQG7Shza0Go+XNALQIOcVzgNeTqeh0f2SUhKtbs+kaHjvad?=
- =?us-ascii?Q?e8c35KkIKxZbjnPJDZvfNfjmnB+Acyu3zF9BxKFi98SWevv+/PVzEuwr86e7?=
- =?us-ascii?Q?nnKs2+2spFrf1A0+i5+bmJEtrQQa/zo1rhUuD4r04T55F0MNj0Qcn63yK8i3?=
- =?us-ascii?Q?MJhonoY1n9W/2slOPB6S/tlUSD0pnG9IG3NiFeAZmeWbnWA7FmkvZNk2aOeo?=
- =?us-ascii?Q?Cb8s7/fHcbKBTeozgwrovhhF3BbWWL/1b4iyTcfyzIi4L0isybZI/m1TBOvj?=
- =?us-ascii?Q?/DG6LOZriutw6uxYZUILXR7mDLsI4eyzVkeB25DQ3pyN0POg1CFIPaXkEvlh?=
- =?us-ascii?Q?GSwQ5oeu30vKyF1pE2ZCI4oOtSTzFw5LheUBGU1032/tr0afB7GVptqbgHvo?=
- =?us-ascii?Q?645izuJUgn6NRjAv3Fzitjeely9uj7Ar6/HKgbOeuW5rOVBOY1Mafe/NzvCP?=
- =?us-ascii?Q?GGO0GX6ZxT2ltDBqGBy0YfdUjFJLJ7VBBueZ28VkryOtp6+/aMAdnGbAoXww?=
- =?us-ascii?Q?DJ/PSRwc4pZbcNloaruP2yxJ9WzFT+Vvjc+KwA9ZRp9KgdUMAGMEdtXIC5DU?=
- =?us-ascii?Q?Ue/eO6kcFX6FbR77cTwXYu8he8wkuGFnjEzrKxLrD94Scb42eUhi5iALgpcI?=
- =?us-ascii?Q?ijWDoIpf2bvgtYTqcrIaVbFQr4dgFmUHVnZGnvDXv6kHHPnMhP9GboK1GA5i?=
- =?us-ascii?Q?rZPk4B3ZVoABSiqIGjFZsKt3i0Jt/Nqmt+Hgx0oXbJ5LvVPJQWwW67xAeyYB?=
- =?us-ascii?Q?EvjHQmIvzErq4ect9kZYtqUdah7yuYrWire3Id+pJU/c8nmAvr1VQshBpYDr?=
- =?us-ascii?Q?nK6DEmImGjaNKULnRsBJSWbjGcOU5D9dr3pm?=
+	=?us-ascii?Q?Sa2C7vGWiCKx09C1Vu/zk366ROrqJJ+Wd1/rhykBSLAXwiKDrwWyg5gAy2eC?=
+ =?us-ascii?Q?ZfnZLn9kfoSeTC5EGpohnx2SyaceWHksbaDLONGYbtS0t4uetyo5kIHrelwK?=
+ =?us-ascii?Q?TNoVhhEBJmIzEPWGzEy4Jk6cnhoFsRYpZJ/deM+oer4EeiqojCYncpMswfdH?=
+ =?us-ascii?Q?gWv0PYOA5haPihus+FbzZ/alggmOeSa82TFvsXH2m3krHK/x5xfDLbi2O01S?=
+ =?us-ascii?Q?2RHZwBx8eSKy35lBHckDxS6UD3zkWO4Hh//DJfEe3cXbXH54dJp1BKCaMTFQ?=
+ =?us-ascii?Q?2ACnoMzw4dnXknzbaaEmqEkUPzigIyZ1i0AqutV0XGxgkIIMXkv8hF2AXiPr?=
+ =?us-ascii?Q?JCEWXAeFBvD5ZNbWfpPaixq/x3yj+jvJyZpp1mGeHtJue7VMq1YVI4D3ftD5?=
+ =?us-ascii?Q?jEQe+JjFoJfLIjoCcCHYWrb9Lt3vWgMHs8M9+LVP1dRMfI9Z+YSPHf+VEZJ4?=
+ =?us-ascii?Q?crwliyJG+w+QyblkbHtxplJQvOm1xM4D3Oc6+7MdEYGXDpKnPEIshh1lzuGT?=
+ =?us-ascii?Q?PlXm8PBy3VClAk/NBOVEgfjE9L/wmj/tFikvDkhDSb2H2q2P2AcxBngcFByi?=
+ =?us-ascii?Q?aEB0bWIWh7Y7e1NnwjsJxRXjIHYxTX2FySwzcP5HZ3SavASytAXdDHdxgME5?=
+ =?us-ascii?Q?WnBTVgTDrswHEqrrDzxP9nv1z8PYcbJPTmFhBYhRSaoS0eXl3Hb2p3O7S4yJ?=
+ =?us-ascii?Q?3h0evYmpZpZTcIInBVR4bnVYDTGt117P4OA5cJt9YzNRIbAU5zXXQZukMeYj?=
+ =?us-ascii?Q?7A4OTEX2dowewgAnme6Ul0yA1SZlAP3B9wDWfcM8T5/LNbZQ31JpaKVk7aII?=
+ =?us-ascii?Q?RccVMvPKv/0cNY5uaN3EavV4m4nBJL1XvUOZxgYXVL9DWFGnyVdAEFpVOXpR?=
+ =?us-ascii?Q?WC8BUNuU3ep8XKLETcAEpzMrJS1nZ6aC7SHYSQ7+Vy9A2L6hYv9udDfnKFoq?=
+ =?us-ascii?Q?xqaAxXJRXFzBvZ3O6Liv5cR5hfN+wyz8mZ2dBYZrQ7jSPq3lHNA65s/USIrM?=
+ =?us-ascii?Q?CpxyOQUG0QGsjFmNfR2c5RYQ3r4rK/OWlVboJyp27kiEJ7JrYtuT9ptnlB2a?=
+ =?us-ascii?Q?IeBZmg+0pUUvHDsRQl0tlxGlJFoHCMXtr0MptN+lkqu+nShFq6X6pW2bxy+K?=
+ =?us-ascii?Q?v6Reh8v2ytz3AB0g66qAaMTQLpej+TET63eAW5pavU7qKhpeUSZP1q3Nqmtz?=
+ =?us-ascii?Q?pYRbdG/1MvRD/JCF1x7krGjVp2cYddoP5E+B8CPHawP2g0iYednxz5Hyy1rc?=
+ =?us-ascii?Q?/iEb7tu7lpSnkvz0h21kLqAkeoeErUNBifs/bPnT2brWb09aO0uPAAdp059u?=
+ =?us-ascii?Q?kt2qmZFGE5MI9RwRGbLrO7bn96Rlg9cL/ufLl8SkTRO04yjpAEveeDfj/fwq?=
+ =?us-ascii?Q?CSAiBD13KfZisSJMBQXeCJjxyBpAUwCTLQ5VzOT3DSPk7pJ0Twv2Mv4tnPP0?=
+ =?us-ascii?Q?UM/SK+izqVWwkJbeVx5LfN8vC/0vYg6SSVmPgLDPrSL5AZmYSflxiuSrP7DM?=
+ =?us-ascii?Q?KiAB+1jR8Bx7pc4mKnmFIk3399FrdhbtIYAg?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(366016)(19092799006)(1800799024)(38350700014)(7142099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(366016)(19092799006)(1800799024)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?UHv5FvjZ3ma2m5XCo2IWJaz8b9MweQPQ2J3rJ4RtkfaXHEAkdM4zfF/9xvJD?=
- =?us-ascii?Q?Zf7rhX0op1QxrNVYr2GmgUTjugIyVFWbeBte9vo2nvsad9h2NAUrvSW+1L2M?=
- =?us-ascii?Q?Ed1jhFMqvk6OpBOQP7MEkhnAla2vQu1BcXiKM809fCSRPy7obcXwvDl8maam?=
- =?us-ascii?Q?IxTnHxLOu2worqnhEL5MFS4Pjj2jY9Y27d/D5o/pt5NHUHGBoWWPoBgA4FDY?=
- =?us-ascii?Q?cWmFHzwkq0ekqtx/Nr+7zresCm46BLk3icWiMSJveo86/iXCDxHyJ/JqNq9f?=
- =?us-ascii?Q?JBocio4y97RvnJkx/9bfm/JCy/KxxWhOAA79d6wOWdFnJU4KYPnEYzAstrQa?=
- =?us-ascii?Q?C3t6jk93Gr7DZIqpdeYmuohdxCkPtLDzIvIzrYqEoPcyGHEiqlAUKnEosgi4?=
- =?us-ascii?Q?2HqsEZoMadd5ze4sVfenzBvWYaRXeCzy31sqtIb/tOZNL5og1boSB27avkQ5?=
- =?us-ascii?Q?Ff+Guxy1cZSYjJx9TLMyVBhugdmo0NeheyrcRxXo3ffYrU6R5REQu/dCdzA5?=
- =?us-ascii?Q?MUE8Rpln0CYRjCEolaiqu3J23lrVW1xCrnWdSAWRvgt3matqg++jP3rk7HqH?=
- =?us-ascii?Q?Wvmv80P0ufXQ/bSAoyEsuFJN2GUtNcvaFW091YnqB9F3uC6L1Ec2eHsvmAMk?=
- =?us-ascii?Q?EaXcvCzilLxE6Z7kovFoxT4gg35OBjEs1wA8THMX9fKpXO2cVHWdR90sGrJ+?=
- =?us-ascii?Q?po2WzOJV7WiGqeL5Qy3X2tfdedsqhdIuJlVWvVGuDkD0D6tLYq4yjI17J5TC?=
- =?us-ascii?Q?IipflEbAlQ2K4JP+zm4LgQCKO8A+diHB1MEPuVMfKL2GplofpPxd1wBAz8yq?=
- =?us-ascii?Q?999TwYFXQx/U6BHVkM5YwvmNXZNqt3Q5mswMMw+flGEI5x0ZSQ/CLwlr64lh?=
- =?us-ascii?Q?mEx5Jdb85P/VGB2RWdRr7Ui0amhjgvk1juJqZKS20gz7dgFgx/5XugpTtAgN?=
- =?us-ascii?Q?6iI+OV3MdjSgbBvlea/ssQ+1TIp5CBmrCXac51KlcpRbwBje91QbwyTY+T9T?=
- =?us-ascii?Q?RmGIDw550mA2XjvZulJal+zSoSE7Kona1GwyGSpjkmptmeOa6hyPqF+rWmwR?=
- =?us-ascii?Q?tUGur+KqFhpm1WdHuB7CX8OjOhqPRDfsgj5vYSiHgmeDxiwTqIs8SqKxMmnv?=
- =?us-ascii?Q?rlWUSsj0YcK06tyaoiXsVPxvxxe1lDKQkNGANb/b+lzRNH/CuCep3PFPXwgk?=
- =?us-ascii?Q?+EeWT3lyXfd8tYA+7onasn9SXwYEyxk4dRZbnhxZc0je4OinuKt78XK5suGW?=
- =?us-ascii?Q?th7dkGtA4O+5SVKxQt7Ulx0mtDcrjzzdXj6ZNtd5lAypbkc0uLS4iYK5bFc+?=
- =?us-ascii?Q?3kzNSskWw8G9PR/aqzZ8Lf1y7OXRrvJDJnTKu2BKkIPc3wXT7tjLJccBV/XG?=
- =?us-ascii?Q?YYdLud0zUTeOiPOHIOuKS2xBBg9IiNYd92WxJB/ZHd5VOsf2wa6Y433pGroa?=
- =?us-ascii?Q?23qc3n2AMmWbVcQ4nwDyJRySY+T6lbcl5wdxQLfEmLMttxR1b6O+EMxwalwL?=
- =?us-ascii?Q?HJ/0fKkI4C5UZC00TNizYEI9aAwK3w7Hy5HE+Dk6lXVH57UOxTMXeezH9JV6?=
- =?us-ascii?Q?ifm/bk4m2eKcKMJClPaD0LpBqfYIXfrzcK+uCtnATro2AyCK7KMfnKCZVXJk?=
- =?us-ascii?Q?0u8oio0gaWJBZcWZDJHCESdinoqMMfL3TeLfzA+GGbZPtSbJxrPZD8mWaUTC?=
- =?us-ascii?Q?wnrYMpKCWWd/9RtYTOb7w7zhs9Y3IC07iK0HSTfL+3eJ3XTH62ioTERlNBRm?=
- =?us-ascii?Q?1pxHHpN2MfWSa2NYwjRoLMFBdsXUQL8=3D?=
+	=?us-ascii?Q?YS2BgVCOTbl1Pb6wIEEYA3V+Pjy+/z8Gb3rxa0pU33CjUZuo8IynnZiktTIy?=
+ =?us-ascii?Q?OlUngppNsKzgLc5BCwwfRuiz4HVjgMassUs/tTgCeuPFLTlsaYTTimZ8mJSQ?=
+ =?us-ascii?Q?faoLrnJHNAwmDwMIumLlYCwzXS6rGPpXo2MJ6nO4zqgmLlhnKO97N+ZxGcKK?=
+ =?us-ascii?Q?Z7VpolqNWqT80PslZDrUWqlg5QlaYLepk002LQF3XcfOsbXFGaR4/Q46MG7S?=
+ =?us-ascii?Q?WKlWhQSX/B6XTCaEWypsXkNIJKhqlR/sZxIiHW7UccybY61Vtdz+NOgrwIED?=
+ =?us-ascii?Q?CpDxpWfaBaRWy7UUcfrQgWE+f7iIqJR+2OhK6ajHQoRg4WOirgWTUXvg0Ykq?=
+ =?us-ascii?Q?2bqLV1JD79LPnLsaYixczfLHHl8pBL41nU2687tG5dmkeY7CnfN1NWOJYMfe?=
+ =?us-ascii?Q?vFNE4nYPLCjnTCcePBe8lUVrc1iVTX0vLJtXilYIFAkzu9piasBuH5D7oS86?=
+ =?us-ascii?Q?dZusHEoEYXxnVRGZLkc94gP8OIdQS8IV40LU//q1nMhcExAEYKLmBDMuE6GN?=
+ =?us-ascii?Q?X7Uio6M2BbK5vjrpXWsQsbQGXvpQfPnEB3kf2nUbvPBgi65tH/GoR05HzqC6?=
+ =?us-ascii?Q?SwGR2aoSu1ZLaZhOWiPPsy6gDKLl/XTTYmLAecmk6XPFItXk77e6jZ3nYO3r?=
+ =?us-ascii?Q?7rwIBxX3MB7NEpEcggK+XRVTdPxinyJHBu7mfckA0FuyDk15Dq5jgMStSeGK?=
+ =?us-ascii?Q?p5xUTevXN5h6tGibjDTH3h788XrZWaBws0DoBbFozKJg85Tc5tHC8JlpgHIf?=
+ =?us-ascii?Q?1gqYsnv2SswdIR1mjODukJqPG+3PFtE7G2ujY+qEPQsfTpqZDm8cCIR8PdG9?=
+ =?us-ascii?Q?HoxA/tVvbADU4veS0dAbGM98AtkM7o95KAsrRl4zK9VOxlzeJIewaCPPQIxx?=
+ =?us-ascii?Q?FQ88fNzVgoIpArFxgNBsIWdIW8vhI6WAlDIATOIFs+NMWSCT00IGWdipkBlA?=
+ =?us-ascii?Q?SXEfcAB82NeE1iFRwZMFWvSVzMZ0xAZbj8FIPYM/EGeNJipVMy0/igIb7/Qd?=
+ =?us-ascii?Q?8RH/o8jhFyvPv93pGPP8mUNatQEubtBNmls0lr86mVEbPLzGcCLGQvqi1Rb5?=
+ =?us-ascii?Q?5jZ3/4DIJRnvluy3zn341/Pk9lrQSGVGxe14m6jEDiMgMIik+UroyAkoYNQi?=
+ =?us-ascii?Q?Kf7PTYi0sSsilEMh62veEvnvHIS8dm7Drt8Za8Qv9gkBpzkE30TkcKV2AKLh?=
+ =?us-ascii?Q?xgwXfoVpbn8e+wZc8bCfRjOmqT6T3gOvfdgE6mpaikt/8KODA5dYHDHD/RoV?=
+ =?us-ascii?Q?uiMEsIKLhOExwaeH1KnBxy4kU7w/goDrWtyxbNcppsmJOvZewtUNUULKWaNV?=
+ =?us-ascii?Q?Tq3gFg/mfFMzZyty98t5LjgKVSVIcdJIzteRtg2nHmmM9YNZ11M2GRcIEWfc?=
+ =?us-ascii?Q?sSW3xWbcA5tHSVvIm93mEeggOiqkQG8mp+ncX0n26sUam5IcR6NamAQqo3Zs?=
+ =?us-ascii?Q?DSkCvj6MOQbh+6UH8m4+yg3bW1dbFaJAb5dXA4waH1hWOYV0K7r5rFcaru43?=
+ =?us-ascii?Q?dW6nszLhfLVndpf4AB0bwzK11SucyTLyuJnHIi5Hry/Hg/ao4kZ3Qakx3Yix?=
+ =?us-ascii?Q?T4cBg95/Y2PTYta8u9P8imxj6e6rJgoNkjUpVZ+uihw4sIG/TBF+zqOKjnjv?=
+ =?us-ascii?Q?nziXoiOmhxBVhCDAe+Esv+xssMdubMqGyXREYW+s9QNg9sVh0JsWkrqCJmPt?=
+ =?us-ascii?Q?Zlf55qpFpbw+uFtMJlW5KfQBH4aBA+QuJ8xxjrPBTDA4pR18Csh+ICbEJVQc?=
+ =?us-ascii?Q?mL8kBkAiaJuElwNMtwzo4YfCsOsRi9s=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29a91da1-fb25-449b-3102-08de5277f260
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c340f0a-8db1-44fd-d5d6-08de5277f394
 X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2026 07:47:05.6748
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2026 07:47:07.7146
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SCXWYm+ZWmadaiuozmPiIKli7ATKSKchWgoQF6XQPlSEbtFD08AtV0xjgeKnqlE0CHETSLZNjKP4MySJA/6kss9e2izEuvz2vEZKZ/gamiY=
+X-MS-Exchange-CrossTenant-UserPrincipalName: BGEtVBU+g3mhGP32kjVu4QXQbBGCn6X0Sxhem8R0+XVcoRgGOkQm/i+kaHASJZz90xKVYqkgVgVsWarcjnKRiyuCLiRuk/m0QgvN8gzI+9A=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8144
 
-This completes the TLS handshake implementation by adding master secret
-derivation and traffic key generation. These traffic keys will be used
-to encrypt/decrypt sensitive HCI commands, response and events.
+This adds support for command encryption for sensitive HCI commands when
+secure interface is enabled. This commands containt sensitive data such
+as Link Key in plain text over UART lines.
+
+AES-GCM encryption is used to encrypt sensitive commands using
+encryption key and IV derived from traffic keys.
 
 Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 ---
- drivers/bluetooth/btnxpuart.c | 88 +++++++++++++++++++++++++++++++++--
- 1 file changed, 84 insertions(+), 4 deletions(-)
+v2: Fix cocci warnings. (kernel test robot)
+---
+ drivers/bluetooth/btnxpuart.c | 81 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
 
 diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index 9ed4cece7e42..cabed02e0964 100644
+index cabed02e0964..e2be9012ef58 100644
 --- a/drivers/bluetooth/btnxpuart.c
 +++ b/drivers/bluetooth/btnxpuart.c
-@@ -206,6 +206,16 @@ enum bootloader_param_change {
- 	changed
- };
+@@ -159,6 +159,7 @@
+ #define NXP_FW_UUID_SIZE		16
+ #define NXP_FW_ECDH_PUBKEY_SIZE		64
+ #define NXP_FW_ECDSA_PUBKEY_SIZE	65
++#define NXP_MAX_ENCRYPT_CMD_LEN		256
  
-+struct nxp_tls_traffic_keys {
-+	u8 h2d_secret[SHA256_DIGEST_SIZE];
-+	u8 d2h_secret[SHA256_DIGEST_SIZE];
-+	/* These keys below should be used for message encryption/decryption */
-+	u8 h2d_iv[GCM_AES_IV_SIZE];
-+	u8 h2d_key[AES_KEYSIZE_128];
-+	u8 d2h_iv[GCM_AES_IV_SIZE];
-+	u8 d2h_key[AES_KEYSIZE_128];
-+};
-+
- struct btnxpuart_crypto {
- 	struct crypto_shash *tls_handshake_hash_tfm;
- 	struct shash_desc *tls_handshake_hash_desc;
-@@ -215,8 +225,10 @@ struct btnxpuart_crypto {
- 	u8 fw_uuid[NXP_FW_UUID_SIZE];
+ struct ps_data {
+ 	u8    target_ps_mode;	/* ps mode to be set */
+@@ -226,6 +227,7 @@ struct btnxpuart_crypto {
  	u8 handshake_h2_hash[SHA256_DIGEST_SIZE];
  	u8 handshake_secret[SHA256_DIGEST_SIZE];
-+	u8 master_secret[SHA256_DIGEST_SIZE];
+ 	u8 master_secret[SHA256_DIGEST_SIZE];
++	u64 enc_seq_no;
  	struct completion completion;
  	int decrypt_result;
-+	struct nxp_tls_traffic_keys keys;
- };
- 
- struct btnxpuart_dev {
-@@ -416,7 +428,10 @@ union nxp_set_bd_addr_payload {
- #define NXP_TLS_KEYING_IV_LABEL		NXP_TLS_LABEL("iv")
- #define NXP_TLS_KEYING_KEY_LABEL	NXP_TLS_LABEL("key")
- #define NXP_TLS_FINISHED_LABEL		NXP_TLS_LABEL("finished")
-+#define NXP_TLS_DERIVED_LABEL		NXP_TLS_LABEL("derived")
- #define NXP_TLS_HOST_HS_TS_LABEL	NXP_TLS_LABEL("H HS TS")
-+#define NXP_TLS_D_AP_TS_LABEL		NXP_TLS_LABEL("D AP TS")
-+#define NXP_TLS_H_AP_TS_LABEL		NXP_TLS_LABEL("H AP TS")
- 
- enum nxp_tls_signature_algorithm {
- 	NXP_TLS_ECDSA_SECP256R1_SHA256 = 0x0403,
-@@ -2526,6 +2541,71 @@ static int nxp_host_do_finished(struct hci_dev *hdev)
+ 	struct nxp_tls_traffic_keys keys;
+@@ -2682,6 +2684,71 @@ static int nxp_authenticate_device(struct hci_dev *hdev)
  	return ret;
  }
  
-+static void nxp_handshake_derive_master_secret(u8 master_secret[SHA256_DIGEST_SIZE],
-+					       u8 handshake_secret[SHA256_DIGEST_SIZE])
++static void nxp_data_calc_nonce(u8 iv[GCM_AES_IV_SIZE], u64 seq_no,
++				u8 nonce[GCM_AES_IV_SIZE])
 +{
-+	u8 zeros[SHA256_DIGEST_SIZE] = {0};
-+	u8 dhs[SHA256_DIGEST_SIZE];
++	u64 tmp;
 +
-+	/* Derive intermediate secret */
-+	nxp_hkdf_expand_label(handshake_secret, NXP_TLS_DERIVED_LABEL,
-+			      NULL, 0, dhs, sizeof(dhs));
-+	/* Extract master secret from derived handshake secret */
-+	nxp_hkdf_sha256_extract(dhs, SHA256_DIGEST_SIZE, zeros,
-+				sizeof(zeros), master_secret);
-+
-+	memset(dhs, 0, sizeof(dhs));
++	/* XOR sequence number with IV to create unique nonce */
++	memcpy(&tmp, iv, sizeof(tmp));
++	tmp ^= seq_no;
++	memcpy(nonce, &tmp, sizeof(tmp));
++	memcpy(nonce + sizeof(tmp), iv + sizeof(tmp),
++	       GCM_AES_IV_SIZE - sizeof(tmp));
 +}
 +
-+static int nxp_handshake_derive_traffic_keys(struct hci_dev *hdev)
++static struct sk_buff *nxp_crypto_encrypt_cmd(struct hci_dev *hdev,
++					      struct sk_buff *skb)
 +{
 +	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
++	__le16 vendor_opcode = __cpu_to_le16(HCI_NXP_SHI_ENCRYPT);
++	u8 nonce[GCM_AES_IV_SIZE];
++	u8 tag[NXP_ENC_AUTH_TAG_SIZE];
++	u8 *enc_data;
++	u8 sub_opcode = 0x10;
++	int ret;
++	u32 plen, enc_data_len;
 +	struct nxp_tls_traffic_keys *keys = &nxpdev->crypto.keys;
-+	u8 hash[SHA256_DIGEST_SIZE];
-+	int ret = 0;
 +
-+	ret = crypto_shash_final(nxpdev->crypto.tls_handshake_hash_desc, hash);
-+	if (ret)
-+		return ret;
++	if (skb->len > NXP_MAX_ENCRYPT_CMD_LEN) {
++		bt_dev_err(hdev, "Invalid skb->len: %d", skb->len);
++		return skb;
++	}
 +
-+	ret = nxp_hkdf_derive_secret(nxpdev->crypto.master_secret,
-+				     NXP_TLS_D_AP_TS_LABEL, hash, keys->d2h_secret);
-+	if (ret)
-+		return ret;
++	nxp_data_calc_nonce(keys->h2d_iv, nxpdev->crypto.enc_seq_no, nonce);
 +
-+	ret = nxp_hkdf_expand_label(keys->d2h_secret,
-+				    NXP_TLS_KEYING_KEY_LABEL, NULL, 0,
-+				    keys->d2h_key, AES_KEYSIZE_128);
-+	if (ret)
-+		return ret;
++	enc_data_len = skb->len;
++	enc_data = kmemdup(skb->data, skb->len, GFP_KERNEL);
++	if (!enc_data)
++		return skb;
 +
-+	ret = nxp_hkdf_expand_label(keys->d2h_secret,
-+				    NXP_TLS_KEYING_IV_LABEL, NULL, 0,
-+				    keys->d2h_iv, GCM_AES_IV_SIZE);
-+	if (ret)
-+		return ret;
++	ret = nxp_aes_gcm_encrypt(hdev, enc_data, enc_data_len, tag,
++				  keys->h2d_key, nonce);
++	if (ret) {
++		kfree(enc_data);
++		return skb;
++	}
 +
-+	ret = nxp_hkdf_derive_secret(nxpdev->crypto.master_secret,
-+				     NXP_TLS_H_AP_TS_LABEL, hash, keys->h2d_secret);
-+	if (ret)
-+		return ret;
++	kfree_skb(skb);
 +
-+	ret = nxp_hkdf_expand_label(keys->h2d_secret,
-+				    NXP_TLS_KEYING_KEY_LABEL, NULL, 0,
-+				    keys->h2d_key, AES_KEYSIZE_128);
-+	if (ret)
-+		return ret;
++	plen = enc_data_len + NXP_ENC_AUTH_TAG_SIZE + 1;
++	skb = bt_skb_alloc(plen, GFP_ATOMIC);
++	if (!skb) {
++		kfree(enc_data);
++		return ERR_PTR(-ENOMEM);
++	}
++	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
++	skb_put_data(skb, &vendor_opcode, 2);
++	skb_put_data(skb, &plen, 1);
++	skb_put_data(skb, &sub_opcode, 1);
++	skb_put_data(skb, enc_data, enc_data_len);
++	skb_put_data(skb, tag, NXP_ENC_AUTH_TAG_SIZE);
 +
-+	ret = nxp_hkdf_expand_label(keys->h2d_secret,
-+				    NXP_TLS_KEYING_IV_LABEL, NULL, 0,
-+				    keys->h2d_iv, GCM_AES_IV_SIZE);
-+	if (ret)
-+		return ret;
-+
-+	memset(hash, 0, sizeof(hash));
-+	return ret;
++	nxpdev->crypto.enc_seq_no++;
++	kfree(enc_data);
++	return skb;
 +}
 +
- static int nxp_authenticate_device(struct hci_dev *hdev)
+ /* NXP protocol */
+ static int nxp_setup(struct hci_dev *hdev)
  {
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-@@ -2580,10 +2660,10 @@ static int nxp_authenticate_device(struct hci_dev *hdev)
- 	if (ret)
- 		goto free_skb;
- 
--	/* TODO: Implement actual TLS handshake protocol
--	 * This will include:
--	 * 1. Master secret and traffic key derivation
--	 */
-+	nxp_handshake_derive_master_secret(nxpdev->crypto.master_secret,
-+					   nxpdev->crypto.handshake_secret);
-+
-+	nxp_handshake_derive_traffic_keys(hdev);
- 
- free_skb:
- 	kfree_skb(skb);
+@@ -2885,6 +2952,20 @@ static int nxp_enqueue(struct hci_dev *hdev, struct sk_buff *skb)
+ 				goto free_skb;
+ 			}
+ 			break;
++		case HCI_OP_LINK_KEY_REPLY:
++		case HCI_OP_LE_START_ENC:
++		case HCI_OP_LE_LTK_REPLY:
++		case HCI_OP_LE_ADD_TO_RESOLV_LIST:
++			if (nxpdev->secure_interface) {
++				/* Re-alloc skb and encrypt sensitive command
++				 * and payload. Command complete event
++				 * won't be encrypted.
++				 */
++				skb = nxp_crypto_encrypt_cmd(hdev, skb);
++				if (IS_ERR(skb))
++					return PTR_ERR(skb);
++			}
++			break;
+ 		default:
+ 			break;
+ 		}
 -- 
 2.43.0
 
