@@ -1,338 +1,202 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F081392B68
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jan 2026 14:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438E8284B37
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jan 2026 15:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768313513; cv=none; b=lp1DypQ6tpsMqY50dJhsVRCqHNg0VyrbOyVuy4F2E5/Yd93X9wYu5REM+GKCVlKHQMmAb0Mf1lscurKg3eQlVHvsAvqvU3y68EDwD2JuMoAMHJbWlNLqugoCgumntgVvkRC5mpCjXxYVk5T7bC5LhIBu9ekAPFAvSvea2bbVckk=
+	t=1768316428; cv=none; b=cIqgZ3fduBMZUkcpcJni2oBzMGzePf+wQl4PBUGcfkpw7A2I4am5He0qQXsTHxmi6fddnfxUpJbO8CTztD3bxQZ4dIoe/LNACZbd6A/QxSGLKo2KLsVTgr2GtzPfGzhJ2iCu7VuSKDH+TIVSosweFD4So60VYi4/bEcJgNyFnVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768313513; c=relaxed/simple;
-	bh=2o4fVLbj2q/juHrQ29zfxRlsPMFPI33ueLLq8D8m2z8=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s0dXiHXy6XauLUCezbz/SsFit1gjJ89SmxImK1HAZPlhG9rDVZa8ACNg5tZcZDLfdXcGyNPfS7kAkyOr4HyjIGc9ZbF0V//vb1DU3ElPr6MHacT36a7MmWPf9XvPLGxZboVbys797/CxcB0DDH/fb959ZcMxN0OSExlJ0ZPmWFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W8sL/Nwz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768316428; c=relaxed/simple;
+	bh=GCXUMW4wHKCIiIYAyShbpobArzWko78A0+eks2o2As8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r9GK6m28+sgvq0vCRbGcvoMfYNRL+GoEkfcWorPj3+mmB7h48kUvP1u1T1FtB7QaapBcq2ri+z73iY0eXrYvhRy4dU9+dGHd0AodQnIdQgCU2z1pXsi3LFVTeVyfpf0QVR7ajAUEbq07bj/MXsUCCIyr7Jto4qrzY+penjzyHyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ONsbZcCb; arc=none smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W8sL/Nwz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3A55C2BCB5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jan 2026 14:11:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768313512;
-	bh=2o4fVLbj2q/juHrQ29zfxRlsPMFPI33ueLLq8D8m2z8=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=W8sL/NwzlaWzWubNWcJpoDGOzscVAJzioDKK7dAWaTM4Wr/4ELYqiY9f/N6kZjM8Z
-	 OfgC4dl/GPTNPpZfddzwYCy6AG/utPG0aRUhBxMtPHN2StpkFGCiYateDgTxHW2Vd5
-	 sB3vkGN6ihv/BWC53Jw8pQNiCkE/A1g5Fk8uMqKPmwF55YtAQD1tJdyYeS7WApzG1H
-	 kcxSQw5BClPnzEhak9epDujg/AUWGriJP4CAmHeoL4dPwHRJ+Pq7NhYgQs6uRQ11c9
-	 Z4TTmTLRbVcMZjGC9Zw0bGRFsF84RejcyZMhPEl3hGUr6KidQ0sjw8VYrZF4ikxYQD
-	 /Q86a00se/A6w==
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-59b30275e69so9228482e87.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jan 2026 06:11:52 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVIN8OfZK3AuOAdVuiuEZjYTUH62JOBNJSsFCTKx2gugFtXR6wuxzyve6Sh+PL6WPsCZ0sze9We+/8tLa11R7s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzj56Jl0hkrGnoueyWaoYsjU5YD4W9b+vxqW/vgjn9Kkj75XY/B
-	y4fnCtYtAQ2KkgA2Idbw/MMKg/n5g44oT5IBUIUG00KduhPASR8GQwIJT+vbU54Re/QAZyu8u4o
-	o73v/cVVrG/IXT0vxWB5LZbdGcjvJeKR0mppMBlW68w==
-X-Google-Smtp-Source: AGHT+IHgO6vQGVDAoaDpXL7sqdQ9dk9g/IUD4KvpqB+NS3F4pyKCpRT9NezHlfM6BjRDI2utaK1So06W8B6m0G6XZlg=
-X-Received: by 2002:a05:6512:3dac:b0:598:e8b7:665d with SMTP id
- 2adb3069b0e04-59b6ef0698bmr8302723e87.3.1768313511342; Tue, 13 Jan 2026
- 06:11:51 -0800 (PST)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 13 Jan 2026 06:11:50 -0800
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 13 Jan 2026 06:11:50 -0800
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260112-pci-m2-e-v4-9-eff84d2c6d26@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ONsbZcCb"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-644715aad1aso7948318d50.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jan 2026 07:00:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768316425; x=1768921225; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZshDbN23kyiK0aJaxxbMDv9Sil3+LsBU7rxuoqtSk/o=;
+        b=ONsbZcCb5l/qWoI4NwJsVxpVWimRLK+NuHzjRVsLdC/F+lcKkIHzMBl11JyHtId9Z4
+         yyHugsFBe2qmnm+OLuKBBIFe4Tqdn532EbcICLqyCkT/MmggAh/ta8Rk6xHnIOnzFnde
+         0dAEj4Muxcw9+oqFqbA7rcQjWY6HvwZOxbyfiF9/qPWAPxhbDLyWCZTGcBUnNN8mgu5e
+         gpX4CAttq1n+UIxCni/X/rxH4zwu6+YUZlpOk4SdEEEp3QDbSQUYsWpyCa3SY0RFx9nw
+         uVxle5iDrTqtpku0Q+XsR48a0KZQar1U4m3lDVWevPEMeLUaeUqybBq7qQMBFuILQGM7
+         +b6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768316425; x=1768921225;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZshDbN23kyiK0aJaxxbMDv9Sil3+LsBU7rxuoqtSk/o=;
+        b=Egr605hO8A8AolxgJLbZ/GQJJykdIAW7Q+/ryDvO2j2lU0rZcQdI0HLg1UDCLUG9zd
+         cRXpnOvFKNMUFYZQwqHX5HLaKL3sUyHLUBBm2ooAV1an5SVngnMKiiJ2/T/5MFFiLSIo
+         tdjetcsl/5jIFBVZAVxaudS6M9vze9YAdg/83rMau92WlS43jnM5DMgwxw2ZUiWt7GYO
+         87uQCWWuxamUtLmRar/J6XLVyIcpFNtrdFAgDNPi8juhwi9mH13dq/sBd14QtiVJVGL8
+         cPEq1wyxXjDnE0hZuySZ7Ic/23WCilVqbJGCjVKZI7UNA8GRvVjGTtK3AXg8U18H/sQ+
+         iuhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBljtEhk0S5s4IiLLBqq9/Bx0ZuMXAZSu+3Sk1KsET0fGXEOIi2nZyeIB0bZHJjgIn6yFrcXzTngMOEH0+Vro=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7Wb+pm12wOIDclju+ZXY8PGrMnHIEYb7xloXSoNIpPGZkrA4u
+	m2BzJvl+iuORUOZ1FYo5povAlYGzcQkNnHuC/DdY4DHaSK5B07eqEyf4dtXjjso2sMPjHrnuhxR
+	8o1H1ptvShF/ImHJ8e0oP51lWYTZGfng=
+X-Gm-Gg: AY/fxX6kQ+1BoLv5qY835DinYiNWsi/vI9uW/2dNpCvYIitRDCTCVUgC8CgwAdkkCdW
+	Z8mcJJdWRskWsBsp8BAcRRuj6pZyWtJjKjVt2fmkRe2PyfBY3FEaEBjj72RDfnqyWLnHJ/pW7wF
+	2CNxWLFeVmDU42HqL7HCQDF+gu0uCdL9a/NxTNkJOyjgSusOatPC/SYNn/w/y4C2tNeOtneUx+k
+	Ke/Xg5NGrYZnooneDSWbv5iITBKCE9K+m9hVsuiACk8ocGLrG3d6kEwhqrZdrF5qqDopj6LcziR
+	wAMjDuC3X3F4T8gcbyjeo3Y0JUNjWRuM6mU9xtR8OlC/e+4cLH2uYcOxyuXn9J+D7ApJ
+X-Google-Smtp-Source: AGHT+IE9VU1ZW1CmN5ubs5ekzlMA9Biwm4NJqhl9gxQAhI8xy7X1c5xWGZtopInPC7nJ0LQVT+bkL7ernSH4jUDOm0s=
+X-Received: by 2002:a05:690e:d0f:b0:646:5375:b7a0 with SMTP id
+ 956f58d0204a3-648f62257c7mr2770039d50.13.1768316423142; Tue, 13 Jan 2026
+ 07:00:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com> <20260112-pci-m2-e-v4-9-eff84d2c6d26@oss.qualcomm.com>
-Date: Tue, 13 Jan 2026 06:11:50 -0800
-X-Gmail-Original-Message-ID: <CAMRc=Me3vW+7HF4Xn3YbO=8gPuE5qNDr_7G3ML1i9FNf4__MNw@mail.gmail.com>
-X-Gm-Features: AZwV_QhKs9mbfNudW09wPN-rpaKD-7Pg9ZU_jQe7S1RnAaBm7jn4QSxPwzhOrL0
-Message-ID: <CAMRc=Me3vW+7HF4Xn3YbO=8gPuE5qNDr_7G3ML1i9FNf4__MNw@mail.gmail.com>
-Subject: Re: [PATCH v4 9/9] power: sequencing: pcie-m2: Create serdev device
- for WCN7850 bluetooth
-To: manivannan.sadhasivam@oss.qualcomm.com
-Cc: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, 
-	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org, 
-	Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>
+References: <20260113074718.2384043-1-neeraj.sanjaykale@nxp.com>
+In-Reply-To: <20260113074718.2384043-1-neeraj.sanjaykale@nxp.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 13 Jan 2026 10:00:11 -0500
+X-Gm-Features: AZwV_Qh3ypT5N1z8f3lSRrnyaoqR3NML5bNXq3m_v1vyciEkBPJb9xWr3FkKIWw
+Message-ID: <CABBYNZ+crY9eDfy6=cz8FwbUqFbjWjqjiVTHanw2J-7QB-Wh_g@mail.gmail.com>
+Subject: Re: [RESEND PATCH v2 00/11] Bluetooth: btnxpuart: Add secure
+ interface support for NXP chipsets
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc: marcel@holtmann.org, amitkumar.karwar@nxp.com, sherry.sun@nxp.com, 
+	dmitrii.lebed@nxp.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 12 Jan 2026 17:26:08 +0100, Manivannan Sadhasivam via B4 Relay
-<devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
-> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Hi,
+
+On Tue, Jan 13, 2026 at 2:46=E2=80=AFAM Neeraj Sanjay Kale
+<neeraj.sanjaykale@nxp.com> wrote:
 >
-> For supporting bluetooth over the non-discoverable UART interface of
-> WCN7850, create the serdev device after enumerating the PCIe interface.
-> This is mandatory since the device ID is only known after the PCIe
-> enumeration and the ID is used for creating the serdev device.
+> This patch series adds secure interface support for NXP Bluetooth chipset=
+s
+> to protect against UART-based attacks on Bluetooth security keys.
 >
-> Since by default there is no OF or ACPI node for the created serdev,
-> create a dynamic OF 'bluetooth' node with the 'compatible' property and
-> attach it to the serdev device. This will allow the serdev device to bind
-> to the existing bluetooth driver.
+> Problem Statement:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Bluetooth UART drivers are vulnerable to physical attacks where adversari=
+es
+> can monitor UART TX/RX lines to extract sensitive cryptographic material.
+> As demonstrated in research [1], attackers can capture H4 packets
+> containing Link Keys, LTKs, and other pairing data transmitted in plainte=
+xt
+> over UART.
 >
-> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> ---
->  drivers/power/sequencing/pwrseq-pcie-m2.c | 170 +++++++++++++++++++++++++++++-
->  1 file changed, 169 insertions(+), 1 deletion(-)
+> Once an attacker obtains these keys from UART traffic, they can:
+> - Decrypt all Bluetooth communication for paired devices
+> - Impersonate trusted devices
+> - Perform man-in-the-middle attacks
 >
-> diff --git a/drivers/power/sequencing/pwrseq-pcie-m2.c b/drivers/power/sequencing/pwrseq-pcie-m2.c
-> index 4b85a40d7692..5f9232e6c700 100644
-> --- a/drivers/power/sequencing/pwrseq-pcie-m2.c
-> +++ b/drivers/power/sequencing/pwrseq-pcie-m2.c
-> @@ -17,6 +17,7 @@
->  #include <linux/platform_device.h>
->  #include <linux/pwrseq/provider.h>
->  #include <linux/regulator/consumer.h>
-> +#include <linux/serdev.h>
->  #include <linux/slab.h>
+> This vulnerability affects any Bluetooth implementation using UART
+> transport, making physical access to UART lines equivalent to compromisin=
+g
+> all paired device security.
 >
->  struct pwrseq_pcie_m2_pdata {
-> @@ -32,6 +33,9 @@ struct pwrseq_pcie_m2_ctx {
->  	struct gpio_desc *w_disable1_gpio;
->  	struct gpio_desc *w_disable2_gpio;
->  	struct device *dev;
-> +	struct serdev_device *serdev;
-> +	struct notifier_block nb;
-
-Ah, looks like this should have not appeared here before this patch?
-
-> +	struct of_changeset *ocs;
->  };
+> Solution:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Implement a TLS 1.3-inspired secure interface that:
+> - Authenticates the chipset using ECDSA signature verification
+> - Establishes shared encryption keys via ECDH key exchange
+> - Encrypts sensitive HCI commands (Link Key Reply, LTK Reply, etc.) using
+>   AES-GCM
+> - Decrypts encrypted vendor events from the chipset
 >
->  static int pwrseq_pcie_m2_vregs_enable(struct pwrseq_device *pwrseq)
-> @@ -178,9 +182,169 @@ static void pwrseq_pcie_free_resources(void *data)
->  {
->  	struct pwrseq_pcie_m2_ctx *ctx = data;
+> This ensures that even with full UART access, attackers cannot extract
+> usable cryptographic keys from the communication channel.
 >
-> +	serdev_device_remove(ctx->serdev);
-> +	of_changeset_revert(ctx->ocs);
-> +	of_changeset_destroy(ctx->ocs);
-
-Don't you need to depend on CONFIG_OF_DYNAMIC? These symbols are not
-stubbed out.
-
-> +	bus_unregister_notifier(&pci_bus_type, &ctx->nb);
-
-Shouldn't this happen earlier? What if a notification happens when you're
-reverting previous changesets?
-
->  	regulator_bulk_free(ctx->num_vregs, ctx->regs);
->  }
+> Implementation Overview:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> The solution is implemented in 11 incremental patches:
 >
-> +static int pwrseq_m2_pcie_create_bt_node(struct pwrseq_pcie_m2_ctx *ctx,
-> +					struct device_node *parent)
-> +{
-> +	struct device *dev = ctx->dev;
-> +	struct device_node *np;
-> +	int ret;
-
-Are we sure this will not happen twice for some reason?
-
-> +
-> +	ctx->ocs = devm_kzalloc(dev, sizeof(*ctx->ocs), GFP_KERNEL);
-> +	if (!ctx->ocs)
-> +		return -ENOMEM;
-> +
-> +	of_changeset_init(ctx->ocs);
-> +
-> +	np = of_changeset_create_node(ctx->ocs, parent, "bluetooth");
-> +	if (!np) {
-> +		dev_err(dev, "Failed to create bluetooth node\n");
-> +		ret = -ENODEV;
-> +		goto err_destroy_changeset;
-> +	}
-> +
-> +	ret = of_changeset_add_prop_string(ctx->ocs, np, "compatible", "qcom,wcn7850-bt");
-> +	if (ret) {
-> +		dev_err(dev, "Failed to add bluetooth compatible: %d\n", ret);
-> +		goto err_destroy_changeset;
-> +	}
-> +
-> +	ret = of_changeset_apply(ctx->ocs);
-> +	if (ret) {
-> +		dev_err(dev, "Failed to apply changeset: %d\n", ret);
-> +		goto err_destroy_changeset;
-> +	}
-> +
-> +	ret = device_add_of_node(&ctx->serdev->dev, np);
-> +	if (ret) {
-> +		dev_err(dev, "Failed to add OF node: %d\n", ret);
-> +		goto err_revert_changeset;
-> +	}
-> +
-> +	return 0;
-> +
-> +err_revert_changeset:
-> +	of_changeset_revert(ctx->ocs);
-> +err_destroy_changeset:
-> +	of_changeset_destroy(ctx->ocs);
-> +
-> +	return ret;
-> +}
-> +
-> +static int pwrseq_m2_pcie_notify(struct notifier_block *nb, unsigned long action,
-> +			      void *data)
-> +{
-> +	struct pwrseq_pcie_m2_ctx *ctx = container_of(nb, struct pwrseq_pcie_m2_ctx, nb);
-> +	struct pci_dev *pdev = to_pci_dev(data);
-> +	struct serdev_controller *serdev_ctrl;
-> +	struct device *dev = ctx->dev;
-> +	struct device_node *pci_parent;
-> +	int ret;
-> +
-> +	/*
-> +	 * Check whether the PCI device is associated with this M.2 connector or
-> +	 * not, by comparing the OF node of the PCI device parent and the Port 0
-> +	 * (PCIe) remote node parent OF node.
-> +	 */
-> +	pci_parent = of_graph_get_remote_node(dev_of_node(ctx->dev), 0, 0);
-
-struct device_node *pci_parent __free(device_node) ?
-
-> +	if (!pci_parent || (pci_parent != pdev->dev.parent->of_node)) {
-> +		of_node_put(pci_parent);
-> +		return NOTIFY_DONE;
-> +	}
-> +	of_node_put(pci_parent);
-> +
-> +	switch (action) {
-> +	case BUS_NOTIFY_ADD_DEVICE:
-> +		/* Create serdev device for WCN7850 */
-> +		if (pdev->vendor == PCI_VENDOR_ID_QCOM && pdev->device == 0x1107) {
-> +			struct device_node *serdev_parent __free(device_node) =
-> +				of_graph_get_remote_node(dev_of_node(ctx->dev), 1, 1);
-> +			if (!serdev_parent)
-> +				return NOTIFY_DONE;
-> +
-> +			serdev_ctrl = of_find_serdev_controller_by_node(serdev_parent);
-> +			if (!serdev_ctrl)
-> +				return NOTIFY_DONE;
-> +
-> +			ctx->serdev = serdev_device_alloc(serdev_ctrl);
-> +			if (!ctx->serdev)
-> +				return NOTIFY_BAD;
-> +
-> +			ret = pwrseq_m2_pcie_create_bt_node(ctx, serdev_parent);
-> +			if (ret) {
-> +				serdev_device_put(ctx->serdev);
-> +				return notifier_from_errno(ret);
-> +			}
-> +
-> +			ret = serdev_device_add(ctx->serdev);
-> +			if (ret) {
-> +				dev_err(dev, "Failed to add serdev for WCN7850: %d\n", ret);
-> +				of_changeset_revert(ctx->ocs);
-> +				of_changeset_destroy(ctx->ocs);
-
-You're almost always doing both, maybe it's time to add of_changeset_undo() or
-something that wraps these?
-
-> +				serdev_device_put(ctx->serdev);
-
-And since you're touching serdev, maybe DEFINE_FREE(serdev_device_put)?
-
-> +				return notifier_from_errno(ret);
-
-Thanks for including this.
-
-> +			}
-> +		}
-> +		break;
-> +	case BUS_NOTIFY_REMOVED_DEVICE:
-> +		/* Destroy serdev device for WCN7850 */
-> +		if (pdev->vendor == PCI_VENDOR_ID_QCOM && pdev->device == 0x1107) {
-> +			serdev_device_remove(ctx->serdev);
-> +			of_changeset_revert(ctx->ocs);
-> +			of_changeset_destroy(ctx->ocs);
-> +		}
-> +		break;
-> +	}
-> +
-> +	return NOTIFY_OK;
-> +}
-> +
-> +static bool pwrseq_pcie_m2_check_remote_node(struct device *dev, u8 port, u8 endpoint,
-> +					     const char *node)
-> +{
-> +	struct device_node *remote __free(device_node) =
-> +			of_graph_get_remote_node(dev_of_node(dev), port, endpoint);
-> +
-> +	if (remote && of_node_name_eq(remote, node))
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
-> +/*
-> + * If the connector exposes a non-discoverable bus like UART, the respective
-> + * protocol device needs to be created manually with the help of the notifier
-> + * of the discoverable bus like PCIe.
-> + */
-> +static int pwrseq_pcie_m2_register_notifier(struct pwrseq_pcie_m2_ctx *ctx, struct device *dev)
-> +{
-> +	int ret;
-> +
-> +	/*
-> +	 * Register a PCI notifier for Key E connector that has PCIe as Port
-> +	 * 0/Endpoint 0 interface and Serial as Port 1/Endpoint 1 interface.
-> +	 */
-> +	if (pwrseq_pcie_m2_check_remote_node(dev, 1, 1, "serial")) {
-> +		if (pwrseq_pcie_m2_check_remote_node(dev, 0, 0, "pcie")) {
-> +			ctx->dev = dev;
-> +			ctx->nb.notifier_call = pwrseq_m2_pcie_notify;
-> +			ret = bus_register_notifier(&pci_bus_type, &ctx->nb);
-> +			if (ret) {
-> +				dev_err_probe(dev, ret, "Failed to register notifier for serdev\n");
-> +				return ret;
-
-Return dev_err_probe()?
-
-> +			}
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int pwrseq_pcie_m2_probe(struct platform_device *pdev)
->  {
->  	struct device *dev = &pdev->dev;
-> @@ -235,7 +399,11 @@ static int pwrseq_pcie_m2_probe(struct platform_device *pdev)
->  		return dev_err_probe(dev, PTR_ERR(ctx->pwrseq),
->  				     "Failed to register the power sequencer\n");
+> 1-2:   Add firmware metadata parsing and version detection
+> 3-4:   Establish secure interface framework and crypto setup
+> 5-7:   Implement TLS handshake (Host Hello, Device Hello, authentication)
+> 8:     Derive application traffic keys for encryption/decryption
+> 9-10:  Add command encryption and event decryption support
+> 11:    Add required crypto algorithm dependencies
 >
-> -	return 0;
-> +	/*
-> +	 * Register a notifier for creating protocol devices for
-> +	 * non-discoverable busses like UART.
-> +	 */
-> +	return pwrseq_pcie_m2_register_notifier(ctx, dev);
->  }
+> The implementation automatically detects secure interface capability via
+> firmware version strings and enables encryption only when needed. Legacy
+> chipsets continue to work without modification.
 >
->  static const struct of_device_id pwrseq_pcie_m2_of_match[] = {
+> Security Properties:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> - Chipset authentication prevents rogue device substitution
+> - Forward secrecy through ephemeral ECDH key exchange
+> - Authenticated encryption (AES-GCM) prevents tampering
+> - Per-session keys limit exposure from key compromise
+>
+> Testing:
+> =3D=3D=3D=3D=3D=3D=3D=3D
+> Tested on AW693 chipsets with secure firmware. Verified that:
+> - Authentication handshake completes successfully
+> - Sensitive commands are encrypted before transmission
+> - Encrypted events are properly decrypted
+> - UART monitoring shows only encrypted payloads for sensitive operations
+> - Legacy chipsets remain unaffected
+>
+> [1] "BLAP: Bluetooth Low Energy Attacks on Pairing" - DSN 2022
+>     https://netsec.ethz.ch/publications/papers/dsn22_blap.pdf
+
+Ok, I start reading the document above but it says the problem is with
+HCI itself though:
+
+'We first present a link key extraction attack that exploits
+the security flaw in the HCI dump, which records all data
+passed through the HCI interface in a log file, including
+link keys.'
+
+It does say that it is passed to a log file though, maybe the
+permission of the file is the problem then, either way this would be
+UART expecific. We do require NET_ADMIN (aka. root) for accessing HCI
+though, both for monitoring or generating HCI traffic (e.g.
+HCI_USER_CHANNEL), so I don't believe these claims are valid with
+respect to Linux since for collecting the logs with the likes of btmon
+that will require root access, that said perhaps the -w option shall
+limit the permission of the file to root only as well, in any case it
+is not like btmon can be run by an attacker without root access, so it
+beats me how Linux could be considered vulnerable here.
+
+>
+>
+>
+> Neeraj Sanjay Kale (11):
+>   Bluetooth: btnxpuart: Add firmware metadata parsing for secure
+>     interface
+>   Bluetooth: btnxpuart: Print FW version and enable chip specific
+>     features
+>   Bluetooth: btnxpuart: Add secure interface TLS authentication support
+>   Bluetooth: btnxpuart: Implement TLS authentication crypto framework
+>   Bluetooth: btnxpuart: Add TLS host hello handshake implementation
+>   Bluetooth: btnxpuart: Add TLS device hello processing
+>   Bluetooth: btnxpuart: Add device authentication
+>   Bluetooth: btnxpuart: Derive traffic keys from TLS 1.3 handshake
+>   Bluetooth: btnxpuart: Add command encryption for sensitive HCI
+>     commands
+>   Bluetooth: btnxpuart: Add encrypted event handling
+>   Bluetooth: btnxpuart: Select crypto algorithms for secure interface
+>
+>  drivers/bluetooth/Kconfig     |    7 +
+>  drivers/bluetooth/btnxpuart.c | 1442 ++++++++++++++++++++++++++++++++-
+>  2 files changed, 1440 insertions(+), 9 deletions(-)
 >
 > --
-> 2.48.1
->
->
+> 2.43.0
 >
 
-Bart
+
+--=20
+Luiz Augusto von Dentz
