@@ -1,146 +1,201 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF49F2D8371;
-	Wed, 14 Jan 2026 14:01:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAF8280331
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jan 2026 14:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768399319; cv=none; b=XQiOvRnxHTqWGontaEdcXhPAfLJ/mnWZBkE6Yydz3EhmCDEOxV4VqudEDm4VMxUt1EG3QfQyUSm1gmivjb805041wQCV+/Xc7NVmU4ueyi8kFqD4Jl6JsPClIpyrhjXdXXMnGDyHFBAon/NHbSaQlKUso5hUmrFWzHlXRIHReXE=
+	t=1768400676; cv=none; b=hRCRXFyJyfdJzyB9eIeEt4vtoQIG6drK6f8gIdBXj0EARvP+ifWxdUlyRhKNPn7Zm/uuXD2fs8Me65Ju7MeTsmLbC5G2+lBpGOLS/SRwbzNSLRBrUufIz/1o3IKsfe15WZWNzmqn97PDBNt01EC6y6ECOG/I9N4cknB1PjLbdnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768399319; c=relaxed/simple;
-	bh=YThRr+SqFQrj1xWYbkZyAQfpTQhSxOJrEz7Vmu8eYO0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D9vQBa5OfCgazENkjB0mwTCmeN0N5uI2g4mu9qPFtlpNLEV6HFB75GGCyg/5BUd6MTRQ5LDeH9DJJ3Y6e3u1euYS/J+ItnsGT/UDxC8TUUInzeIA7jD5i8GjoE8c91cpVvlT0eEWvV9vB3tg5VQTFyqwg1y054cJ75T+RaoG//8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GamcmtOM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768400676; c=relaxed/simple;
+	bh=va0XmQImQD5JRc9CtXk3gcTToUJxruEUH8jhfHJFxBc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g9jmkFM+S6gE0Ls77CvindXgysHxJUeJ8siodwE0PmJ2ExMLTRIjAXTfcSCQIYxviAmmMXtRGLAuVM9qRbPl3TPu8eMDs9ZgC1o996IpJWt8l7oBKrCF1e9hVyhGAxL7htsECbrc1zrytJ5mc7rRq68CfOZzQOw9xdxZK0UkwZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z06FQr2I; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GamcmtOM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62176C19423;
-	Wed, 14 Jan 2026 14:01:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768399318;
-	bh=YThRr+SqFQrj1xWYbkZyAQfpTQhSxOJrEz7Vmu8eYO0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GamcmtOMZjUjnBtKP0uhc41XsMqZ5fSe9+uXZ30TVeZpZSpRIIMXLIZ6LSMmqmxZJ
-	 NMpWBOrVCw5ay9J9pII8Hg/QzzTF8slSB/w2unqe4TNoWuGWzngFiEoJoUAvAmqFB5
-	 Iwga7pBiI5Zhqw1J+tOTc30FaWvGC89yLrq+JlbFxL2kl2s3LxRjEpWvdFoSPyfKHh
-	 jTw7x+USzU8jCMBBzyudL54Ry+Ze3oj0BmfkDgneM6dbU0fXZXjVgZ4iNhOuJykciN
-	 khzGT4OdT3Wu+wQV1jAF14IH2be73WBLizVZPZCNbT/eImzvDLUXbcLvK5UdivHV/a
-	 mq/qzYKU6Fp5w==
-Message-ID: <2a44e967-ebae-4641-88d7-ccb4536ee3b7@kernel.org>
-Date: Wed, 14 Jan 2026 15:01:51 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z06FQr2I"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-78fc174ada4so81176177b3.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jan 2026 06:24:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768400672; x=1769005472; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NYNwB4R+v+F0+MWgInWWK39pHalCMZRumjXQxmXGNRs=;
+        b=Z06FQr2I2UkK6966ISFL18BGFi94vlMsP6Q8SyMd2CFs9QngAYd0KwNVE0SM8PbDgE
+         8R/cS2jzF0WLp2jARf/Vx74nglCdzE7FT/Jpd/oTLxSUM31hYNp+SWULlRzeRtqnzLOk
+         e8slVlSivNBFmPoJ96sZciF6PnpuJmIvgfwXgpsY2g3BZ51neUYCfIGqZJlPwRRNHUOE
+         cWQ01nkOMJrcHWzSh5D3Xw7wn+fxkr5Vn421B1OWsyfQTpDx7DdihNKBvNg7mD8+tdwf
+         MThWS4fTKICDHPcxV49geMGapQQz2j8n27IoL/AfFhyX7/9OpfXqwLLg3ZzI2zRhodnK
+         Rj0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768400672; x=1769005472;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=NYNwB4R+v+F0+MWgInWWK39pHalCMZRumjXQxmXGNRs=;
+        b=INE/QKLvnL/3RjrlV/vgQhzOE+/RC3l8QO2lVGmfzx3JyEni+kEPQjdR4Rwri5/njz
+         IDA02lcAzjr+ahDCFUx/Ley+52tKm4J3ojGguOafsECP+u8BHePxC5FO67S89I0MU6JQ
+         n9ma3XkZyZ5kTqrvRzYOfMMtnTYcF+1iXUkbRqh2b6i+EBH+aXALPqdC7suzqYyQKADG
+         LCPeU/jZYYn2jO99mxp4IngH3Rgy79phMqnV9WKYlTz20/ugr2VwDR/fbLQQ57CDXgKe
+         9kdR0FF5GxpvQo0dB6TfgiW8pjZsxGh8ukdema8JlpelBojUQVsd5ip58U4QlKp5BHsv
+         nx0g==
+X-Gm-Message-State: AOJu0YxoC205l47qWrURa28lezTSjzFZNMEF3Gk33hcBhweDmx6dLcjw
+	2eLO7r3lEDXCRjwUwiA5DhNpWmfoFolpjiBqSeiZEjFt5DmxezVAwQWoFncVoEe5+sI6pCrumSV
+	meQmNeVWRoUdFOMXioac/4Zczml5nIqs=
+X-Gm-Gg: AY/fxX6Bkre7iL4iR7ujd4l7st5q3FWJ9F8X5LFDguxMgTnbnhkM9iq8rU7rgYltrua
+	9CHn8sXUk6gUAVmfGpEGj+DLW/9n4Q1zWdtWlCG+Ri7pplzgG5IISycen+6c7/Xzt1LycSgqXWm
+	e9BIKQHn8JnpvQ06x+/flAovt25nYxHrU6Pts6JkhDA7ZyjDnf3WAEbbL8t614wsETqMIqW4NjF
+	/k8z62E4QoJiA7UYlioWEjWppbig/FPymT90pYtSx8KWYUICSEqLE/qq63EhqVf4RNtrKfVjfsR
+	w5/ookOuhHlhFPtz3ZZzPmuc6RCDrqf51Ke0Xa5Y43sxDT+1BsDqcl198Q==
+X-Received: by 2002:a05:690e:d4a:b0:644:60d9:8650 with SMTP id
+ 956f58d0204a3-64901b364dbmr1872104d50.95.1768400671545; Wed, 14 Jan 2026
+ 06:24:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/9] serdev: Add an API to find the serdev controller
- associated with the devicetree node
-To: manivannan.sadhasivam@oss.qualcomm.com, Rob Herring <robh@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nicolas.schier@linux.dev>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Mark Pearson <mpearson-lenovo@squebb.ca>,
- "Derek J. Clark" <derekjohn.clark@gmail.com>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Bartosz Golaszewski <brgl@bgdev.pl>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Bartosz Golaszewski <brgl@kernel.org>
-Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org,
- linux-pci@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- linux-acpi@vger.kernel.org
-References: <20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com>
- <20260112-pci-m2-e-v4-2-eff84d2c6d26@oss.qualcomm.com>
-From: Hans de Goede <hansg@kernel.org>
-Content-Language: en-US, nl
-In-Reply-To: <20260112-pci-m2-e-v4-2-eff84d2c6d26@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20251224063439.2477969-1-mahesh.talewad@nxp.com> <20251224063439.2477969-2-mahesh.talewad@nxp.com>
+In-Reply-To: <20251224063439.2477969-2-mahesh.talewad@nxp.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 14 Jan 2026 09:24:20 -0500
+X-Gm-Features: AZwV_QinJ-8uCG2WjA-KJni2MU3dWDuDeZWKkVjIHyIBwdUX5S4dk5XZi8DEX5o
+Message-ID: <CABBYNZ+zsqdf4rmO8e+rb1ZNxJRxC31K_aa8kCaOHp53BqGUKA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 1/1] Enhanced Accept Synchronous Connection
+ Request command is handled in emulator.
+To: Mahesh Talewad <mahesh.talewad@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, devyani.godbole@nxp.com, 
+	sarveshwar.bajaj@nxp.com, vinit.mehta@nxp.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Mani,
+Hi Mahesh,
 
-Thank you for your work in this.
-
-On 12-Jan-26 17:26, Manivannan Sadhasivam via B4 Relay wrote:
-> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> 
-> Add of_find_serdev_controller_by_node() API to find the serdev controller
-> device associated with the devicetree node.
-> 
-> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+On Wed, Dec 24, 2025 at 1:30=E2=80=AFAM Mahesh Talewad <mahesh.talewad@nxp.=
+com> wrote:
+>
+> Implemented the command - Enhanced Accept Synchronous Connection Request
+> command in emulator[emulator/btdev.c].
+>
+> Signed-off-by: Mahesh Talewad <mahesh.talewad@nxp.com>
 > ---
->  drivers/tty/serdev/core.c | 16 ++++++++++++++++
->  include/linux/serdev.h    |  9 +++++++++
->  2 files changed, 25 insertions(+)
-> 
-> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> index b33e708cb245..25382c2d63e6 100644
-> --- a/drivers/tty/serdev/core.c
-> +++ b/drivers/tty/serdev/core.c
-> @@ -504,6 +504,22 @@ struct serdev_controller *serdev_controller_alloc(struct device *host,
+>  emulator/btdev.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 63 insertions(+), 1 deletion(-)
+>
+> diff --git a/emulator/btdev.c b/emulator/btdev.c
+> index be43623e8..55367cc7d 100644
+> --- a/emulator/btdev.c
+> +++ b/emulator/btdev.c
+> @@ -3434,6 +3434,64 @@ static int cmd_get_mws_transport_config(struct btd=
+ev *dev, const void *data,
+>         return 0;
 >  }
->  EXPORT_SYMBOL_GPL(serdev_controller_alloc);
->  
-> +/**
-> + * of_find_serdev_controller_by_node() - Find the serdev controller associated
-> + *					 with the devicetree node
-> + * @node:	Devicetree node
-> + *
-> + * Return: Pointer to the serdev controller associated with the node. NULL if
-> + * the controller is not found.
-> + */
-> +struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
+>
+> +static int cmd_enhanced_accept_sync_conn_req(struct btdev *dev,
+> +                               const void *data, uint8_t len)
 > +{
-> +	struct device *dev = bus_find_device_by_of_node(&serdev_bus_type, node);
+> +       const struct bt_hci_cmd_enhanced_accept_sync_conn_request *cmd =
+=3D data;
+> +       uint8_t status =3D BT_HCI_ERR_SUCCESS;
 > +
-> +	return (dev && dev->type == &serdev_ctrl_type) ? to_serdev_controller(dev) : NULL;
+> +       if (cmd->tx_coding_format[0] > 5)
+> +               status =3D BT_HCI_ERR_INVALID_PARAMETERS;
+> +
+> +       cmd_status(dev, status, BT_HCI_CMD_ENHANCED_ACCEPT_SYNC_CONN_REQU=
+EST);
+> +
+> +       return 0;
 > +}
-> +EXPORT_SYMBOL_GPL(of_find_serdev_controller_by_node);
 > +
+> +static int cmd_enhanced_accept_sync_conn_req_complete(struct btdev *dev,
+> +                                       const void *data, uint8_t len)
+> +{
+> +       const struct bt_hci_cmd_enhanced_accept_sync_conn_request *cmd =
+=3D data;
+> +       struct bt_hci_evt_sync_conn_complete cc;
+> +       struct btdev_conn *conn;
+> +
+> +       memset(&cc, 0, sizeof(cc));
+> +
+> +       conn =3D queue_find(dev->conns, match_bdaddr, cmd->bdaddr);
+> +       if (!conn) {
+> +               cc.status =3D BT_HCI_ERR_INVALID_PARAMETERS;
+> +               goto done;
+> +       }
+> +
+> +       conn =3D conn_add_sco(conn);
+> +       if (!conn) {
+> +               cc.status =3D BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
+> +               goto done;
+> +       }
+> +
+> +
+> +       cc.status =3D BT_HCI_ERR_SUCCESS;
+> +       memcpy(cc.bdaddr, conn->link->dev->bdaddr, 6);
+> +
+> +       cc.handle =3D cpu_to_le16(conn->handle);
+> +       cc.link_type =3D 0x02;
+> +       cc.tx_interval =3D 0x000c;
+> +       cc.retrans_window =3D 0x06;
+> +       cc.rx_pkt_len =3D 60;
+> +       cc.tx_pkt_len =3D 60;
+> +       cc.air_mode =3D cmd->tx_coding_format[0];
 
-This new of_find_serdev_controller_by_node() function needs:
+Why are you harding most of the field above, aren't they available from the=
+ cmd?
 
-#ifdef CONFIG_OF ... #endif
-
-around it, to match the stubbing you are doing in serdev.h
-
->  static int of_serdev_register_devices(struct serdev_controller *ctrl)
->  {
->  	struct device_node *node;
-> diff --git a/include/linux/serdev.h b/include/linux/serdev.h
-> index ecde0ad3e248..db9bfaba0662 100644
-> --- a/include/linux/serdev.h
-> +++ b/include/linux/serdev.h
-> @@ -333,4 +333,13 @@ static inline bool serdev_acpi_get_uart_resource(struct acpi_resource *ares,
+> +
+> +done:
+> +       send_event(dev, BT_HCI_EVT_SYNC_CONN_COMPLETE, &cc, sizeof(cc));
+> +
+> +       if (conn)
+> +               send_event(conn->link->dev, BT_HCI_EVT_SYNC_CONN_COMPLETE=
+,
+> +                                                       &cc, sizeof(cc));
+> +
+> +       return 0;
+> +
+> +}
+> +
+>  #define CMD_BREDR \
+>         CMD(BT_HCI_CMD_SETUP_SYNC_CONN, cmd_setup_sync_conn, \
+>                                         cmd_setup_sync_conn_complete), \
+> @@ -3471,7 +3529,10 @@ static int cmd_get_mws_transport_config(struct btd=
+ev *dev, const void *data,
+>         CMD(BT_HCI_CMD_GET_MWS_TRANSPORT_CONFIG, cmd_get_mws_transport_co=
+nfig, \
+>                                         NULL), \
+>         CMD(BT_HCI_CMD_ENHANCED_SETUP_SYNC_CONN, cmd_enhanced_setup_sync_=
+conn, \
+> -                                       cmd_enhanced_setup_sync_conn_comp=
+lete)
+> +                       cmd_enhanced_setup_sync_conn_complete), \
+> +       CMD(BT_HCI_CMD_ENHANCED_ACCEPT_SYNC_CONN_REQUEST, \
+> +                       cmd_enhanced_accept_sync_conn_req, \
+> +                       cmd_enhanced_accept_sync_conn_req_complete)
+>
+>  static int cmd_set_event_mask_2(struct btdev *dev, const void *data,
+>                                                         uint8_t len)
+> @@ -3604,6 +3665,7 @@ static void set_bredr_commands(struct btdev *btdev)
+>         btdev->commands[23] |=3D 0x04;    /* Read Data Block Size */
+>         btdev->commands[29] |=3D 0x20;    /* Read Local Supported Codecs =
+*/
+>         btdev->commands[29] |=3D 0x08;    /* Enhanced Setup Synchronous C=
+onn */
+> +       btdev->commands[29] |=3D 0x10;    /* Enhanced Accept Sync Connect=
+ion */
+>         btdev->commands[30] |=3D 0x08;    /* Get MWS Transport Layer Conf=
+ig */
+>         btdev->cmds =3D cmd_bredr;
 >  }
->  #endif /* CONFIG_ACPI */
->  
-> +#ifdef CONFIG_OF
-> +struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node);
-> +#else
-> +struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
-> +{
-> +	return NULL;
-> +}
-
-stubs like this one should be static inline to avoid warnings like this one:
-
-In file included from drivers/tty/serdev/core.c:21:
-./include/linux/serdev.h:339:27: warning: no previous prototype for ‘of_find_serdev_controller_by_node’ [-Wmissing-prototypes]
-  339 | struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
-      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Regards,
-
-Hans
+> --
+> 2.34.1
+>
 
 
+--=20
+Luiz Augusto von Dentz
