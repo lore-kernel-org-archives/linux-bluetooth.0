@@ -1,155 +1,148 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000162D5924
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jan 2026 03:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F894225415
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jan 2026 04:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768362077; cv=none; b=iJRG5n8lZe2CJAFJIo+dX/++GeUII2v3sjcGnyhnLOSNpb+QOJ4s/NcCJJaRwH7vFnqTG6hclINwA2KO4kb1XUJYLiKBCWlRk5fK4jofj6HQ5O3RFHxNqXDw5AGsbOV1ZiyHBoQl1q1Qv1sHm0lJEd2YFSYh9nqWEnkEMkYs3Pk=
+	t=1768363443; cv=none; b=KEDGvdOOFB8WbQTe5FBD1snIcA6xKmJnaGDfNQtMTgUk3eG6em0zpJUSmNKmDr1QMhivbVrMoVUTEXhWLGDxAtjze0MPBqAV415QSRtBg27/PtTQBFEjAV3wNSFCDCDLue2D5QuZYq8YB11phdg2KzeiYwFp02GQSrRRJ+hlBA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768362077; c=relaxed/simple;
-	bh=fuHX1gJvEHLXSbrpNZBA4M1RZiyGD+1HT2Iv1MurZ9o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xaf1QGlNa7eJXhno2LdDZs58EF0zeNKYtZst/wMAgqMtUZZhGbYbqXz4XQeGniAeeaLZ12vCladFxIS2UyQWhCUDvQ7jJngSdLVEseLGejsVmq3zOV058yoSUjyxXqSTsRuG6/tEJqbuZNqdVmGG3tigYqDB+R7uk15qSMoJS1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kkyEAjf3; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1768363443; c=relaxed/simple;
+	bh=rQm1M7YBpSWS6onORR3w/UEiUbii+4joW8pNsDdGBh0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Lnvwr612T21K9k4lBVyxUpLV6fcA/RF2rknoDvnsoZmFcfb8jth50Lucc1GYgAUSDPodfvOahcm8n3vmTsB7XAXPpiqfsRhyIBf693VuWgZvpWF2HVE8l9P6qqmX9wBjGZYGIXNRvdCSBwBhMT1fLUlwu6g6m8L8hE/dJPlayc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sorz.org; spf=pass smtp.mailfrom=sorz.org; dkim=pass (2048-bit key) header.d=sorz.org header.i=@sorz.org header.b=toU8iHLq; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YSFdBwAB; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sorz.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sorz.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kkyEAjf3"
-Message-ID: <977d29f6-4157-4fdb-b0d6-c24def482c06@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768362064;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wzuS26H8SYTScmOx3++ZwcMsS+D3jzSzvm/KUyjaJik=;
-	b=kkyEAjf3vAwmkpA6qQLnuaSZre5hBN1zivZR7feQaZvMwILYv8oANx8h+F6HDtKtMjlTGd
-	gn0lxegePRhz+XBSWXtBXaiKo9+/Gdy9/KJsL/7dx5iYjqhXvnXEZ+zWcHtH+MjVlHKQFM
-	4yb2rB8VCNXVTy1HzFsLEuwTZ+qx5q0=
-Date: Wed, 14 Jan 2026 11:40:51 +0800
+	dkim=pass (2048-bit key) header.d=sorz.org header.i=@sorz.org header.b="toU8iHLq";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YSFdBwAB"
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 8ACB81400009;
+	Tue, 13 Jan 2026 23:04:00 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Tue, 13 Jan 2026 23:04:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sorz.org; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1768363440; x=1768449840; bh=K8c19Q+ze7fIwmXOrtZ1o
+	iF9rQEPab6IHqyoj4LjBUg=; b=toU8iHLqjePHaK7uV6+1BWamfoOPK1xIn/A6Q
+	wnfHOBAVEXpLFZhTPzfnS0XZBimRXwSyH4CwLmIcQGmdTxCI2tbnWBZLQP6CJ3Vu
+	3sC9U+9hbMr+VGqvvMFAkpCgAUfN3Oh5GTZatubT+GN2u7oSoT4rndcI6lUQXD9B
+	wHuYaWHZ/Bk/DrX9FWM7i/apQShFbLjdyRfR/Vtcd0MQroaAkUGiHNrJ3dHGkJpc
+	4DCbL8QuVki/RfIMPxAAiU/2Z3uwFlLjA0u5x4N7Kl3YZKg4sn0XgsmYOu/P2mtO
+	PJXr5Ye3TUfud6v4Dvo3CY5eRi/ogMRr6TgXDT9IpXAq/c5Kw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1768363440; x=1768449840; bh=K8c19Q+ze7fIwmXOrtZ1oiF9rQEPab6IHqy
+	oj4LjBUg=; b=YSFdBwABP7xI7s1dOWlDqT7QKHTiwCid5t5HWcFrxhr5D9JSEB6
+	5d55q20LcfTHgFBJaimmTkmJcQh/zZDOHVEPTdTwKkklZcYqu0PcTm2eeArhc+MW
+	IopCKqzCoE+EoWkvPFaJJ1kW/xWzVxjYZm0ZHJKK1J6qVQCEflryzfz+C+UE/rQO
+	D9cInRgpktcaHOTudc9X9YehBsnCwLDhBuzhIlgfClTc0VLx0DCh8SCXk5PkzmH3
+	u+yD/uX7BrfaR/T4NbXyUnhgYlfkZosk3wxqEOrYKrh1DcYqPMskfyh1VQT1GBr/
+	/R2H+W20ni0PXXLKAEiQqXWT05/CFRGUZpQ==
+X-ME-Sender: <xms:sBVnaeGsLjIrBxpGS98FLGj1CfzRSCsgAEPPCQBM_Nup60exydU4lA>
+    <xme:sBVnaWWCzC2jsjhuCLoir5wbOr21ROaOYD3PBU8OG5z7_6lDCVC8DLlq3CR6P5pH1
+    CRb6hUAV4wp5aSnIfJosJRbtNloZTckQlAr51GU-G6-II9VwhJljA>
+X-ME-Received: <xmr:sBVnadJQQHaw5CKbpkV7trqfsdbeRlqpRoC9tj7ikzX4nTrQ1fImaw-zaQteXOKOWvCuTremlDgROiAOBJ1e>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvddvudejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepufhhvghllhcuvehh
+    vghnuceofidvjeesshhorhiirdhorhhgqeenucggtffrrghtthgvrhhnpeeihffgkeekie
+    duudeutdekjeefveejkeetveegleeiieeghfehffelteejudduffenucevlhhushhtvghr
+    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpeifvdejsehsohhriidrohhrgh
+    dpnhgspghrtghpthhtohepgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhi
+    nhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehmrghrtggvlheshhholhhtmhgrnhhnrdhorhhgpdhrtghpthhtoheplhhuihiirdgu
+    vghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtohepfidvjeesshhorhiirdhorhhg
+X-ME-Proxy: <xmx:sBVnaW8jt5jxFYIjlU9yLUd3xtt69XFUhEkkg81o3axAloEeCiJVsA>
+    <xmx:sBVnaQIGZSl1pv6vmFoPcnwA3EMG_SVGj2qzkPhaEgoumIozMK1_KQ>
+    <xmx:sBVnabmo1_fcDKAOpBUHVQPX7sqiXpleEs5Kyf1l0tMbfMqF6tZ3Mw>
+    <xmx:sBVnaUMg4MhSpLeurT3NfsXHATNDlgmb0ZfuY3qwGUa-TCtbe-d79Q>
+    <xmx:sBVnadFKY9s-3yx79L9wwgieyO1R6cgkO1Wgw1dP6s8xGoXf238OOOkE>
+Feedback-ID: ic14149f4:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 13 Jan 2026 23:03:57 -0500 (EST)
+From: Shell Chen <w27@sorz.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Shell Chen <w27@sorz.org>
+Subject: [PATCH] Bluetooth: btusb: Add new VID/PID for RTL8852CE
+Date: Wed, 14 Jan 2026 15:03:35 +1100
+Message-ID: <20260114040335.118108-1-w27@sorz.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 03/14] software node: Implement device_get_match_data
- fwnode callback
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- manivannan.sadhasivam@oss.qualcomm.com
-Cc: Rob Herring <robh@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Mark Pearson <mpearson-lenovo@squebb.ca>,
- "Derek J. Clark" <derekjohn.clark@gmail.com>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Daniel Scally <djrscally@gmail.com>,
- Heikki Krogerus <heikki.krogerus@linux.intel.com>,
- Sakari Ailus <sakari.ailus@linux.intel.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
- Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
- platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
- Stephan Gerhold <stephan.gerhold@linaro.org>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- linux-acpi@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
- <20260110-pci-m2-e-v3-3-4faee7d0d5ae@oss.qualcomm.com>
- <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sui Jingfeng <sui.jingfeng@linux.dev>
-In-Reply-To: <aWSpFk9z0zpyKjr6@smile.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
+Add VID:PID 13d3:3612 to the quirks_table.
 
+This ID pair is found in the Realtek RTL8852CE PCIe module
+in an ASUS TUF A14 2025 (FA401KM) laptop.
 
-On 2026/1/12 15:56, Andy Shevchenko wrote:
-> On Sat, Jan 10, 2026 at 12:26:21PM +0530, Manivannan Sadhasivam via B4 Relay wrote:
-> 
->> Because the software node backend of the fwnode API framework lacks an
->> implementation for the .device_get_match_data function callback.
-> 
-> Maybe this is done on purpose. 
+Tested on aforementioned laptop.
 
+The device info from /sys/kernel/debug/usb/devices is listed as below.
 
-It is a *fact* that the broken swnode lacks an implementation for the 
-.device_get_match_data stub.
+T:  Bus=03 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3612 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 
+Signed-off-by: Shell Chen <w27@sorz.org>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Otherwise, If it is really done *on purpose*, the maintainers of swnode
-backend probably shall document it in the source file *explicitly*.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 51278a0e4..236701283 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -559,6 +559,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3592), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3612), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe122), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 
+-- 
+2.52.0
 
-Have you thought about this aspect?
-> 
-
-If it is sure thing, then it shouldn't start with "Maybe ..."
-
-
->> This makes it difficult to use(and/or test) a few drivers that originates
->> from DT world on the non-DT platform.
-> 
-> How difficult? 
-
-The emphasis isn't on the 'difficult' word, it means 'inconvenience'
-
-> DSA implementation went to the way of taking DT overlay
-> approach. Why that one can't be applied here?
-
-
-Software node as an complement of ACPI, Therefore should do the same.
-
-
-
-DT overlay introduce extra overhead/side effects on the non-DT systems.
-
-Besides, DT overlay requires the OS distribution(such as ubuntu) has the 
-DT overlay config option selected.
-
-
-
-> 
->> Implement the .device_get_match_data fwnode callback, which helps to keep
->> the three backends of the fwnode API aligned as much as possible. This is
->> also a fundamental step to make a few drivers OF-independent truely
->> possible.
->>
->> Device drivers or platform setup codes are expected to provide a software
->> node string property, named as "compatible". At this moment, the value of
->> this string property is being used to match against the compatible entries
->> in the of_device_id table. It can be extended in the future though.
-> 
-> I really do not want to see this patch
-
-You can do that by dropping the maintainer-ship.
-
-Your endless, bruth-force ranting on such a straight-forward thing 
-doesn't make much sense, because that waste everybody's time.
-
-> without very good justification
-
-
-Justifications has been provided over and over again.
-
-> (note, there were at least two attempts in the past to add this stuff
-
-This exactly saying that the implementation is missing.
-
->   and no-one was merged, 
-
-That's the reason why you see it at least the second time.
-
-have you studied those cases?).
-> 
-
-The first one is not 100% correct.
