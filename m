@@ -1,229 +1,649 @@
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022125.outbound.protection.outlook.com [52.101.126.125])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F2835BDDB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 09:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.125
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768470128; cv=fail; b=QPYedJkiW3vWyHnd2IrX8MP+wui2/UMCiN033DkzXyXsVV6g7/oW0HP2zMkAP78E/2HYa4M3n9r9zUA9SHfWFURIqVAldBH9uvpnz5QSgTud1JE04S2RdFywS2ugCMw7j2fUaxS9YzDrbVWZx+mphC4q9Vjcjrp8RagITZcw9Ww=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768470128; c=relaxed/simple;
-	bh=xKm6FShErAnCuZN+oKj2PaB29jX7sRURrcGynDLSOH8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=k7tn381/CNwGYYbJwmdo8n22geZiO6nLjsRoMdg+szmLCmjwjiqOz4q3Ot2ahZo+uP8q7qIiWGWQRTlATJqRuorLRdfPUDfv18ZAMLMauI4/Ty5TmRy9vUjAGmi1EYAbSWR2Zd1WKEu5EpBrROa1XZUALInEOIcjEAstwkTl0hY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=zWkOrYKv; arc=fail smtp.client-ip=52.101.126.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="zWkOrYKv"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZKdMD7QMpyesF2VvTNpg/CsVX5N9tTy6pJIKCb4H4JNn8/bOYmzx2IdmEg21RjXdUyJPTSl8PcOwPTEiOLeq2qciEfDrlVYU3e4CcCAkxB1PyTvrH20jMoq533JM5XOV8K9HkIVk4lbvw9BNdTqRv8AaRQZ7zirz4rC+DxOvlfvwboyO3ZMU8FeOueG2ohapUIA86YhTuIZYdKdI75a0AMD/M3uV2oQS004q8b1dDi9DLAyyAnpq1RCBB6/jDF9n4xJYsi4zY3a6gq9XUCb9otFLImzYqjh6KxlYqcAamulyCzBzJu6MXoHrxVzmLW7pESa02SEBpNwu2bFqDIFEZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2e3LnepHHLV4BSlZ2cM3bShsTrpk5iZuQXvFnzVVz5s=;
- b=zGxUKouG9AeEHSzi+MN4/JS5aVW6wqwo5APg/m17lKwtu0QkZZz/t6HAwkMdQBUKPxOeswlyvAB8bPk8ApHiQQ85Nis1MUh6dp0hlgQ5YKeZd/jGDmZkXupRb2/Qb1dOgzXTYtMNlqy8u/j0/RZhzV70RkD14TBK2hI1tODpfpQFvNqdO/nNFKLFBALiwmuqr1Fq2dSrLkf+KUH+/UxUUo+zqrcdC6mfCc8nTeY6pb2/jg80gP377CVkaZJ2SHEOmRTQbiBbIh8K9bdtgVwMLSprp968PdM+preAaBLe8MDhR45qyhmssO9UE6dq0Yvgv5Z+J2E1xmn5nabKz57+AQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
- dkim=pass header.d=amlogic.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2e3LnepHHLV4BSlZ2cM3bShsTrpk5iZuQXvFnzVVz5s=;
- b=zWkOrYKvfCQf3LjnMBYSJ0WwWgescmuT+2pM5kt9q1D5O1D3trI4BcFUY5+UrzfMULdHKZsK0YfLyFzDoqoiHBc2B6NyifqeNvrtqVIf9VSha7ccyTU00vb53LWOULvTSqBoYyCQ/kk6fA00iGAGrguRGbRn89k1cKN8NK9JQ9LfXEUn7q4GGiligKCu9pzzr8eRV3Ysi6UBbTWMTBVqGcnXVK5C9nBCyGEcmL93QQTbHUXk9x4p+Zc6+XsPE8W31INDFFWjDwXevvztUHtv0Hry0HjlRL2ahh08bghDi9ZzgmcZ7/lWr19qR8us4nN2M4EX1Ly1zfbGkb39KjB9gQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amlogic.com;
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
- by KL1PR03MB7454.apcprd03.prod.outlook.com (2603:1096:820:ed::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.5; Thu, 15 Jan
- 2026 09:42:04 +0000
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::eef5:1228:beac:be69]) by JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::eef5:1228:beac:be69%5]) with mapi id 15.20.9520.005; Thu, 15 Jan 2026
- 09:42:02 +0000
-Message-ID: <7a1da200-d909-4795-9f64-e7c86d53e0c0@amlogic.com>
-Date: Thu, 15 Jan 2026 17:41:19 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ bluez] bap: reduce ISO sync timeout to 2s
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-References: <20260112-iso_sync_timeout-v1-1-9a3e99259a3f@amlogic.com>
- <CABBYNZ+xrCofAHqVOs4SDn3avXQenNbv4L-sys6_2Lf9PAXFOg@mail.gmail.com>
-Content-Language: en-US
-From: Yang Li <yang.li@amlogic.com>
-In-Reply-To: <CABBYNZ+xrCofAHqVOs4SDn3avXQenNbv4L-sys6_2Lf9PAXFOg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SGXP274CA0019.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b8::31)
- To JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90FF221DAE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 10:21:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768472520; cv=none; b=TS0T78EPic48ol0kI8stJXYaJCHWektfBGvbOYHgGtWiS0FFIb/Ylq1w82royA/EhVSgoOI5iNrThATx7w1oz0j3D2vrOBQ/2iMp9eG4RcB5GWo/bX8rxjgKMoA8cZ/xZfuihKgoQaevdGMIbJytZo5HhmAei/7NyQQVvh2VWHU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768472520; c=relaxed/simple;
+	bh=nCDswTcg9qWt164HNgWyb+xcIFd7mfGAbLsf8VAyE+c=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=kuwDlLl4rcvCKvbvR4vGeHhmeLtweykWXeBZ8yYKbZPOmELEJzN5Kc5ajNM+rxErpk7qmDFXz8DDIyDiR1c5Q07hT7uYkbf5c4WQU/CfYZ5vqp9RoK9kN3/4uVHAzxKkntC3TUA6KbN37gF087Gan29OOm5tWvaACgTNPVRu9Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1B6674333B;
+	Thu, 15 Jan 2026 10:21:49 +0000 (UTC)
+Message-ID: <8b6eda3466156d30824be3e1fce3a1c9cba1141b.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v3 1/1] Support for config fragments (conf.d style
+ dirs)
+From: Bastien Nocera <hadess@hadess.net>
+To: "Manuel A. Fernandez Montecelo" <mafm@igalia.com>, 
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 15 Jan 2026 11:21:49 +0100
+In-Reply-To: <20260115022852.2841362-2-mafm@igalia.com>
+References: <20260115022852.2841362-1-mafm@igalia.com>
+	 <20260115022852.2841362-2-mafm@igalia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|KL1PR03MB7454:EE_
-X-MS-Office365-Filtering-Correlation-Id: 724f1560-4077-49dc-0dbe-08de541a55f4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?elFwaVRrVnRBTWFTQ0IwaXBwckFGZGlhZCs3OTdJUnVYbFJubzlIRTBmc1kx?=
- =?utf-8?B?Tng0UnBvb1JEbEhVSU5SdGV5eVA1UlRyd3pTYW9JL1NUOUZ1b2ZjK0pTNW9T?=
- =?utf-8?B?N3NLOE5JT1ZtQ25jekM2WjZMVFpwZk1rcUVHaHRLUGQ3MFZ4SXVhdzF2TlRo?=
- =?utf-8?B?VGYvMzA1cE53alNMZE1DNVNBc2lTTE5FbGJsR3Rhb1RjblMxVUNLOE42OWxj?=
- =?utf-8?B?TTV3NytyYWtYYkVVeXdSaHI5YnRibk83TUNsWGJwem9pb0didGxHQis4QjZ5?=
- =?utf-8?B?SUI5OEQzWExrSk9kSE5vZnJockRuajZuWk9lWjI2dUVhSjNya2NTdmc5NlhF?=
- =?utf-8?B?dXFucUpaeUMxanN4OW5ET1Z1alJUeFpKT3ZaUlhmbHRYVG1WQ2d0ekYyTzdC?=
- =?utf-8?B?ak8zSUpJUlFPYlJhZ2NmWkJBYWVJMTZWdmVyczZZT1poQ1FlZnJJMkxpVDU5?=
- =?utf-8?B?S01IWEhGOWordG9IK2lIZTJBRDY0WVBiTEtMUTFwaDFXWTF6aGkwTzNMb1RD?=
- =?utf-8?B?UzBwLytnelN1UGJVZmU2dndIVkc2R2pva0NPbUsvTXhyV1FZZWVBdUtMMUE1?=
- =?utf-8?B?TGhGODMwL013VzZLRzlsd3FsbTdkUDlvVjNaR29QWUx4bjQzZm0zc3FieTZH?=
- =?utf-8?B?UXpaK1gvUnk5RExHMFg2OXQ0QWE5ZitPc3FUTHFjOUpVb0REZlg0S3hDYzNB?=
- =?utf-8?B?RnpxUFQ0aHByTkR1MFZlc3BVUUljbGhDN0gyOVBLWnk3L2t1VGZnSUp5MGVL?=
- =?utf-8?B?alhiOGwxRHlmeGFCNkljbU90S0Vua0pFb08xRnY3dFRid0UrRm5JY3A0SkN6?=
- =?utf-8?B?Q1hrTzNoajB2UmNvNDNuN2VFR2JoL3IyYVVCZVVNWG5JVUNoSW42MndvTGJG?=
- =?utf-8?B?dnV0bDVidzc3bG94eGtaNyttaUZVYWJOUGhzT1VqMGZwWEpYRmxVU012ajV1?=
- =?utf-8?B?Nkh2dXMvOE5nb2w2d2k3aTBxVzJmNnhOVEZpSFpKcnBKQkcrclpzR2RqN1ZP?=
- =?utf-8?B?Wm9SY3pEcVFXekFFUmR4VzFtSk0vc2pGWE1VSFNta21YL1BJaWxzdjFydldk?=
- =?utf-8?B?ZCtCS0VKa0FXQ1JYeTVkbWNJUE9ycU1tSSsrRU1sTWZpQ2xyU0VsUFowQzll?=
- =?utf-8?B?WUcxK3N2Zk52UkZHd2M5cGRpc2pBZzBqaGM3VzZvU0tCL1NOQzNPa2pkRTd5?=
- =?utf-8?B?d1l3U09XbUh6dUJxSitHSFZKQzRZMXJIUjdvMUJqOElibnBFVi9uUEVrSW9x?=
- =?utf-8?B?ZVhBVk9FT3BqYTk5N3gvdGs1dk9kb0IxTHlkMEttMSs3WC9NZkNDczJKZVFj?=
- =?utf-8?B?N2FDeGhwZlYweFp6b25Md0hnckJjOXFKZVRWK3hYRk11eFM5Q1RBSjZTMk9J?=
- =?utf-8?B?aUllYm5ZNDFRYkU5Tmdxbk9zZ1RwZnJRS0VMS3N0Sm1pQ1R4YVRXNFhoNUpS?=
- =?utf-8?B?bUgrNUorcHl3NmF1TytLNlIrd21LdDN1eVd3TlNuUHZ4eFJaMkpLK0RKYlZ1?=
- =?utf-8?B?dnJ5UExOODVjZklBelZ3aUt1YTd0WHRIYk5VRkp6cmI4QWF2SGRJZG9WbVlu?=
- =?utf-8?B?ck9rME5ZMzNTdkd5VzZ2NXY3V3BITnNlZFNnbEtBbU4rYXltaHU0ZlRuK0Q2?=
- =?utf-8?B?b3lObldkVUpEWFFaSStqdkNYQXdoTXFGKzlrTXpGQ1dEU0U1SEFCdUt4cmdJ?=
- =?utf-8?B?bmZlcWZiUGxROU80Q1FaUHlrTnpsTTMyVDZGd2g0aXhucHpQcFRZVWswcUNv?=
- =?utf-8?B?QzhNbkxpdTBwd3VxVlZBdUV5cVNRNFllUGxCQUxJWENKMTArTU9iaDlUdDVx?=
- =?utf-8?B?OEFRNGN2WkxYWWU5TVc2a0ZySzhSS2ZQbnNZdmRmTVpranUvOUFJY0pzUTNp?=
- =?utf-8?B?U3RuanMvcVVXOVFNcjU1M1ZKM0V6SEgvV3MzMTZuNzBKYXhkNTZ4d0QwdlFt?=
- =?utf-8?B?K0xKSWkxaFQxRXByaHdkQjJtYTVqQ2RJKzFUekUybEVrWTdxd28vaFNqQUtH?=
- =?utf-8?B?UUNGRE9meFdOWG5reU94S0hvMnVzN2VzQVZUVitwTVlqNWJ1Qzd1TWZ0WGFl?=
- =?utf-8?B?SzR5a2NoUDAySUFicnFNeVBzdXI0TmRIbkFDNlpuUEE0dm5yQ3NhdEFRY21k?=
- =?utf-8?Q?RUik=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZTkyL295L2YwcnA2bDdoZm1ETnhTKzMxMGVZeEszeVpWR292UU0ySEpxQUVq?=
- =?utf-8?B?QWtiQ3hyY1k5dW10K3dxbEN2U3Zsa2Z1Nm54bER4NTZBYWtkdXlvY01LM093?=
- =?utf-8?B?MXlpcGtSaTVtUnJNZ2lTZzArNUdLaE5mUGt4ZWNoVkNKQmtDUFA1aHczb2V0?=
- =?utf-8?B?YjRLNFN1N0tyVnNwcHhybVhtVG9CcThGOC9GdTFwaGU5OGhGT0Z2dmNJK3hM?=
- =?utf-8?B?QUVoWU9xZm9YZFZVMGx2SFc3T2ZHRllDQlZCRkVwcTBHd25qR2xJaHV6YSs2?=
- =?utf-8?B?UExJSWU1Ym5PYzNjT2E2aCtFR3NTU3NnQlpGdkRGcFQ4Yi9VNzNKY0VCTHcz?=
- =?utf-8?B?aXVNaFU3QlhEZWFGckdmTlUweCtSaE1zYXZNVXR3SVh3SnAyWlZmOTMvUktW?=
- =?utf-8?B?aHJnWGpxMFNsMVhZbVkyVFgxekRPY2RHUHlDZHo0Ny9SVXdFakZrbVZaWERZ?=
- =?utf-8?B?RmJpYk1yaVFRcFduU3dYSitEUitBbWNsMUFGenQrekpNcEZjR3lpUXhVUVd2?=
- =?utf-8?B?TWNia0pGMEI2M205QWhWS2N0dUV5MGJCUTB2c0hIYmRHY0w1djU5eFBSc21t?=
- =?utf-8?B?YlFaTkZqVC9JbVZWMzdwSGhlcitraDVGcHorMWtHMXBLbnk3RERqZ1gwekZa?=
- =?utf-8?B?bC9mS0F4bTJISkdvcEZaYUc2OEN1VGp0Zi9yQjQ0UDB2NnRXeVdoZjlMWTh2?=
- =?utf-8?B?NC9QQkJ1S05kejF0Yk1kKzMwOFA4ZUcrRk9tV29YR2JZb25FbDQ0SlJzSksr?=
- =?utf-8?B?c2k3YWVrMmhjZklrSHpUWVpmM2wzK0VNUXNQR3dIYWNmb3pOdm1Rb0xieEJp?=
- =?utf-8?B?eXBySVhPeXVOMzF5MjdwbHFhem5wdU5ybFZUZVNlRGJobExlcC9JaDZvMTFI?=
- =?utf-8?B?NHBxRm5vWGt3TXlEUHhlQ3kxaW9rMlhkUzE3NVp2ZkhseGpLTm1OU2p1azBC?=
- =?utf-8?B?eVZSc0ozNUwwdzErbDlRdUxGZk0rL0hjMENmV0hweS9nWTczUW03bGd2ZDdi?=
- =?utf-8?B?cW1nbVRsK0ZWN2MvR052cUxrSzRreGNrUmNiQ3ZxUjdoZTZWVFRXSFJzdUYy?=
- =?utf-8?B?Zml2MCsrQlZFVnJFNjNHcXk1ZTlwUG03dUZNcDB6S1NlTEdMRUt3V0dnRGsx?=
- =?utf-8?B?bU5aeUtBRW00NkNSbVpmeXFKMlBHZTF5UzUyVHJ1Y1MxUnJKUStCR2xQQWg4?=
- =?utf-8?B?Z2tzeElQYXVKeWdYUXY4eWJFeENhK2lOMERSZzBQQ09HUW5GaEJSVmREdWw2?=
- =?utf-8?B?cDl3cWE5SDFaRnFWNWJZRlp4WGJOY0NiejNuQXU3U3RpaXFuSnZWLy9XcmZk?=
- =?utf-8?B?R2lJOFNLSTIybFBMVG9UZEVLdzh2WXFTemc2MGp2VDh0QmM0V0lBZU4wTEp2?=
- =?utf-8?B?UGNhTWkzNXFvZVdzUU0zUkppSGdNeDR0WTVtanZZbjAvb0FONXR1a0tpTmhk?=
- =?utf-8?B?WFBtMnZGU1I4NlBZbVlmSFFja050MkZyTCs5YWIwcWdINnJCNVg0S21DeEJM?=
- =?utf-8?B?UE1Hd21wdXRLamcrL1dFd0M2ZUUzMnRRZ1F4OVJ1c1ZENHFuZzNVaWlLK2hX?=
- =?utf-8?B?VmN2TzhRR0F1Q0thVHNlTDV1UkorSUtoc2lqcU9STWdCblhaWFVJMkpMUThF?=
- =?utf-8?B?Z1hoS0pYTjVJYTJXYWJIMFdQcU1LcDVXNnNvNmdDRSs5cUtwOW5ETVRJcnVo?=
- =?utf-8?B?UVkzSFJoU0tDV2t6RjBOeDJVekVwS0VlQzArT3JIdzZDSkVRa2JWeloxdEZN?=
- =?utf-8?B?eVU1VE5oSUJ2VExBS2p4cS9BajRVVHNmRVZNNENyWGRER0dVR1RxVkxvUXkx?=
- =?utf-8?B?RmxWQ2daQ2xNSUxOYm51MGVlaGc5Si9adHIvOW9IQnpVNnhYUXRYVEtGQ2hz?=
- =?utf-8?B?NXRybEJLeHlqUmxMUFBib1plM214NnFrZzE0NC9aeEZqZkFwUGFqTVJXNlNE?=
- =?utf-8?B?eTNqU1VxZ01Pb3plTXFlcTNTKzBhTEtGTllPOHJHNGJjeFhYM2RkMWVPQ3Jz?=
- =?utf-8?B?UHJhMysvRmVwa2dESU1sL3pUY0lhUnZPb3B6MmxTeEt3K0xXZU41cjJKR2hE?=
- =?utf-8?B?aE84aWNKYUZySElJYnliUEduTWVrRk5TZkwvMHM5bUo4bmQ2UitNYW9FOW5Z?=
- =?utf-8?B?MWdJVnRQZWxkazNHcEVxdURMcS80N0REMlRtWkdlYUZpVTM2alIzWkx1ek1F?=
- =?utf-8?B?VFVIU05iTXhCV3IydkVHQWtZcjlVREQvLzJmalRpbTlmTHNCNnAyVGExVUpC?=
- =?utf-8?B?S1ZPLzJWa3lZQlQ2Um1VL25iRDNEUVE0cWM4MnREZUE2LytYQXNMSXpHUzJ2?=
- =?utf-8?B?UStVaG1QRE9mR3VHWXFjbXozUFRveU9GZzBHbDlmNHQzblozR0Zhdz09?=
-X-OriginatorOrg: amlogic.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 724f1560-4077-49dc-0dbe-08de541a55f4
-X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2026 09:42:02.1933
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e0bN/fiOFo4bj5bWChxoJqhkYnzMqZdFUgHLCU3vKTWt2tNmYgWa5rimzo9meUsP6ertqpIP/jZfbcInijA3QQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR03MB7454
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvdehkeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhepkffuhffvffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepvdduheehleehgffgleekhffhueegleejueeigfeggeelheekffekfeeiveehffdunecuffhomhgrihhnpehfrhgvvgguvghskhhtohhprdhorhhgnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepudeuieeijeegfeeffeeupdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepvddprhgtphhtthhopehmrghfmhesihhgrghlihgrrdgtohhmpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesv
+ hhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-State: clean
+X-GND-Score: 0
 
-Hi Luiz,
+Hey,
 
-> [ EXTERNAL EMAIL ]
->
-> Hi Yang,
->
-> On Mon, Jan 12, 2026 at 1:42 AM Yang Li via B4 Relay
-> <devnull+yang.li.amlogic.com@kernel.org> wrote:
->> From: Yang Li <yang.li@amlogic.com>
->>
->> The ISO sync timeout was previously set to 20 seconds,
->> which is too long for PA sync. This could leave the userspace
->> flow pending for an extended period of time.
-> I think we used 20 seconds based on the connection timeout, that said
-> I do wonder if 2 seconds is going to be enough given that the
-> advertisement window can be wider than that, specially when SID needs
-> to be resolved.
+I've not completely read-through the patch (and I'm going to hazard a
+guess that the new GLib usage isn't going to go down well) but I would
+highly recommend removing all the explanations of configuration
+precedence to instead refer to:
+https://www.freedesktop.org/software/systemd/man/latest/system.conf.d.html#=
+Configuration%20Directories%20and%20Precedence
+and make sure that your implementation respects it (or mentions what
+the differences are to it).
 
+You might also want to move the majority of the new code to src/shared
+so it can be reused, most notably by the mesh daemon, and a unit test
+that verifies that configuration precedence works as expected.
 
-Yes, the Core Specification defines a PA sync timeout when no PA reports 
-are received for six consecutive PA intervals. In our testing across a 
-wide range of devices, a PA sync timeout of around 3.6 seconds works well.
+Cheers
 
-This assumes a PA interval of 500 ms, which is already a relatively 
-large value. Taking into account six intervals plus the time needed to 
-receive extended advertising during scanning, this timeout should cover 
-most practical use cases.
-
-I understand this is ultimately an empirical choice, and I am happy to 
-adjust it based on feedback. From your experience, do you have a 
-recommended timeout value?
-
-
->
->> Signed-off-by: Yang Li <yang.li@amlogic.com>
->> ---
->>   lib/bluetooth/bluetooth.h | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/lib/bluetooth/bluetooth.h b/lib/bluetooth/bluetooth.h
->> index f9f22c3f7..572009e75 100644
->> --- a/lib/bluetooth/bluetooth.h
->> +++ b/lib/bluetooth/bluetooth.h
->> @@ -152,7 +152,7 @@ struct bt_voice {
->>   #define BT_ISO_QOS_BIG_UNSET   0xff
->>   #define BT_ISO_QOS_BIS_UNSET   0xff
->>
->> -#define BT_ISO_SYNC_TIMEOUT    0x07d0 /* 20 secs */
->> +#define BT_ISO_SYNC_TIMEOUT    0x00c8 /* 2 secs */
->>
->>   /* For an ISO Broadcaster, this value is used to compute
->>    * the desired Periodic Advertising Interval as a function
->>
->> ---
->> base-commit: a94f994201a69a36753abda65cc51937de9cd3e3
->> change-id: 20260112-iso_sync_timeout-8e3ecf43d82e
->>
->> Best regards,
->> --
->> Yang Li <yang.li@amlogic.com>
->>
->>
->>
->
-> --
-> Luiz Augusto von Dentz
+On Thu, 2026-01-15 at 03:28 +0100, Manuel A. Fernandez Montecelo wrote:
+> Support config fragments, to read config from conf.d directories.
+> Those dirs will be main.conf.d for main.conf, analog for input.conf
+> and network.conf.
+>=20
+> This is commonly supported by other tools, as an extension of the
+> main
+> config file(s).=C2=A0 It is useful and convenient in several situations,
+> for example:
+>=20
+> * distributions can set different values from the defaults shipped
+> =C2=A0 upstream, without having to modify the config file
+>=20
+> * different packages or config-management tools can change config
+> just
+> =C2=A0 by adding, removing or modifying files in that directory; instead
+> of
+> =C2=A0 editing the main config files
+>=20
+> The main or base config files will be processed first, and then files
+> in the corresponding conf.d dirs, if existing.
+>=20
+> When reading these config files in conf.d dirs, they override values
+> for keys in the base config files (or default config set in code).
+> For example, for "main.conf" the directory to be processed will be
+> "main.conf.d", in the same basedir as the config file
+> (e.g. /etc/bluetooth/main.conf, /etc/bluetooth/main.conf.d/).=C2=A0 The
+> same for input.conf and network.conf.
+>=20
+> Within the conf.d directory, the format of the filename should be
+> '^([0-9][0-9])-([a-zA-Z0-9-_])*\.conf$', that is, starting with "00-"
+> to "99-", ending in ".conf", and with a mix of alphanumeric
+> characters
+> with dashes and underscores in between.=C2=A0 For example:
+> '01-override-general-secureconnections.conf'.
+>=20
+> Files with a different name scheme will not be considered.=C2=A0 Acceptin=
+g
+> groups or keys not present in the base config depends on the code,
+> currently set to "NOT accept new groups" but "YES to accept new
+> keys".
+> This is because the base config files as shipped contain all the
+> groups, but most keys are commented-out, with the default values set
+> in code.
+>=20
+> The candidate files within the given directory are sorted (with
+> g_strcmp0(), so the ordering will be as with strcmp()).=C2=A0 The
+> configuration in the files being processed later will override
+> previous config, in particular the main/base config files, but also
+> the one from previous files processed, if the Group and Key coincide.
+>=20
+> For example, consider 'main.conf' that contains the defaults:
+>=20
+> =C2=A0 [General]
+> =C2=A0 DiscoverableTimeout=3D0
+> =C2=A0 PairableTimeout=3D0
+>=20
+> and there is a file 'main.conf.d/70-default-timeouts-vendor.conf'
+> containing settings for these keys:
+>=20
+> =C2=A0 [General]
+> =C2=A0 DiscoverableTimeout=3D30
+> =C2=A0 PairableTimeout=3D30
+>=20
+> and another 'main.conf.d/99-default-timeouts-local.conf'
+> containing settings only for 'PairableTimeout':
+>=20
+> =C2=A0 [General]
+> =C2=A0 PairableTimeout=3D15
+>=20
+> What happens is:
+> 1) First, the 'main.conf' is processed as usual;
+> 2) then 'main.conf.d/70-default-timeouts-vendor.conf' is processed,
+> =C2=A0=C2=A0 overriding the two values from the main config file with the=
+ given
+> =C2=A0=C2=A0 values;
+> 3) and finally 'main.conf.d/99-default-timeouts-local.conf' is
+> =C2=A0=C2=A0 processed, overriding once again only 'PairableTimeout'.
+>=20
+> The final, effective values are:
+>=20
+> =C2=A0 DiscoverableTimeout=3D30
+> =C2=A0 PairableTimeout=3D15
+> ---
+> =C2=A0Makefile.am=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
+> =C2=A0profiles/input/hog.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=
+=A0 9 ++
+> =C2=A0profiles/input/manager.c=C2=A0=C2=A0 |=C2=A0=C2=A0 9 ++
+> =C2=A0profiles/network/manager.c |=C2=A0=C2=A0 9 ++
+> =C2=A0src/conf_d.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 208
+> +++++++++++++++++++++++++++++++++++++
+> =C2=A0src/conf_d.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 83 +++++++++++++++
+> =C2=A0src/main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 9 ++
+> =C2=A07 files changed, 328 insertions(+)
+> =C2=A0create mode 100644 src/conf_d.c
+> =C2=A0create mode 100644 src/conf_d.h
+>=20
+> diff --git a/Makefile.am b/Makefile.am
+> index 3adfa6cd5..dbd937268 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -308,6 +308,7 @@ pkglibexec_PROGRAMS +=3D src/bluetoothd
+> =C2=A0bluetoothd_internal_sources =3D \
+> =C2=A0			$(attrib_sources) $(btio_sources) \
+> =C2=A0			src/log.h src/log.c \
+> +			src/conf_d.h src/conf_d.c \
+> =C2=A0			src/backtrace.h src/backtrace.c \
+> =C2=A0			src/rfkill.c src/btd.h src/sdpd.h \
+> =C2=A0			src/sdpd-server.c src/sdpd-request.c \
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> index f50a0f217..9a23a10ff 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -39,6 +39,7 @@
+> =C2=A0#include "src/shared/att.h"
+> =C2=A0#include "src/shared/gatt-client.h"
+> =C2=A0#include "src/plugin.h"
+> +#include "src/conf_d.h"
+> =C2=A0
+> =C2=A0#include "suspend.h"
+> =C2=A0#include "attrib/att.h"
+> @@ -246,6 +247,14 @@ static void hog_read_config(void)
+> =C2=A0		return;
+> =C2=A0	}
+> =C2=A0
+> +	confd_process_config(config, filename, FALSE, TRUE, &err);
+> +	if (err) {
+> +		error("Parsing conf.d file failed: %s", err-
+> >message);
+> +		g_error_free(err);
+> +		g_key_file_free(config);
+> +		return;
+> +	}
+> +
+> =C2=A0	config_auto_sec =3D g_key_file_get_boolean(config, "General",
+> =C2=A0					"LEAutoSecurity", &err);
+> =C2=A0	if (!err) {
+> diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+> index 0fcd6728c..36b78c3f5 100644
+> --- a/profiles/input/manager.c
+> +++ b/profiles/input/manager.c
+> @@ -27,6 +27,7 @@
+> =C2=A0#include "src/device.h"
+> =C2=A0#include "src/profile.h"
+> =C2=A0#include "src/service.h"
+> +#include "src/conf_d.h"
+> =C2=A0
+> =C2=A0#include "device.h"
+> =C2=A0#include "server.h"
+> @@ -75,6 +76,14 @@ static GKeyFile *load_config_file(const char
+> *file)
+> =C2=A0		return NULL;
+> =C2=A0	}
+> =C2=A0
+> +	confd_process_config(keyfile, file, FALSE, TRUE, &err);
+> +	if (err) {
+> +		error("Parsing conf.d failed: %s", err->message);
+> +		g_error_free(err);
+> +		g_key_file_free(keyfile);
+> +		return NULL;
+> +	}
+> +
+> =C2=A0	return keyfile;
+> =C2=A0}
+> =C2=A0
+> diff --git a/profiles/network/manager.c b/profiles/network/manager.c
+> index 693547d45..7f180ed0b 100644
+> --- a/profiles/network/manager.c
+> +++ b/profiles/network/manager.c
+> @@ -28,6 +28,7 @@
+> =C2=A0#include "src/device.h"
+> =C2=A0#include "src/profile.h"
+> =C2=A0#include "src/service.h"
+> +#include "src/conf_d.h"
+> =C2=A0
+> =C2=A0#include "bnep.h"
+> =C2=A0#include "connection.h"
+> @@ -43,6 +44,14 @@ static void read_config(const char *file)
+> =C2=A0	keyfile =3D g_key_file_new();
+> =C2=A0
+> =C2=A0	if (!g_key_file_load_from_file(keyfile, file, 0, &err)) {
+> +		DBG("Parsing file %s failed: %s", file, err-
+> >message);
+> +		g_clear_error(&err);
+> +		goto done;
+> +	}
+> +
+> +	confd_process_config(keyfile, file, FALSE, TRUE, &err);
+> +	if (err) {
+> +		DBG("Parsing conf.d file failed: %s", err->message);
+> =C2=A0		g_clear_error(&err);
+> =C2=A0		goto done;
+> =C2=A0	}
+> diff --git a/src/conf_d.c b/src/conf_d.c
+> new file mode 100644
+> index 000000000..b60303661
+> --- /dev/null
+> +++ b/src/conf_d.c
+> @@ -0,0 +1,208 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + *
+> + *=C2=A0 BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *=C2=A0 Copyright (C) 2025-2026=C2=A0 Valve Corporation
+> + *
+> + */
+> +
+> +#include "conf_d.h"
+> +
+> +#include "src/log.h"
+> +
+> +static gint confd_compare_filenames(gconstpointer a, gconstpointer
+> b)
+> +{
+> +	return g_strcmp0(*(const gchar**)(a), *(const gchar**)(b));
+> +}
+> +
+> +static GPtrArray *confd_get_valid_files_sorted(const gchar
+> *confd_path)
+> +{
+> +	const char *regex_pattern =3D "^([0-9][0-9])-([a-zA-Z0-9-
+> _])*\\.conf$";
+> +	g_autoptr(GRegex) regex =3D NULL;
+> +	g_autoptr(GPtrArray) ret_confd_files =3D NULL;
+> +	GDir *dir =3D NULL;
+> +	GError *error =3D NULL;
+> +	const gchar *filename =3D NULL;
+> +
+> +	/* the 2nd and 3rd arguments (0, 0), are equivalent to
+> (G_REGEX_DEFAULT,
+> +	 * G_REGEX_MATCH_DEFAULT) in newer versions of glib */
+> +	regex =3D g_regex_new(regex_pattern, 0, 0, &error);
+> +	if (!regex) {
+> +		DBG("Invalid regex: %s", error->message);
+> +		g_clear_error(&error);
+> +		return NULL;
+> +	}
+> +
+> +	dir =3D g_dir_open(confd_path, 0, &error);
+> +	if (!dir) {
+> +		DBG("%s", error->message);
+> +		g_clear_error(&error);
+> +		return NULL;
+> +	}
+> +
+> +	ret_confd_files =3D g_ptr_array_new_full(0, g_free);
+> +
+> +	while ((filename =3D g_dir_read_name(dir)) !=3D NULL) {
+> +		g_autofree gchar *file_path =3D NULL;
+> +
+> +		if (!g_regex_match(regex, filename, 0, NULL)) {
+> +			DBG("Ignoring file in conf.d dir: '%s'",
+> filename);
+> +			continue;
+> +		}
+> +
+> +		file_path =3D g_build_filename(confd_path, filename,
+> NULL);
+> +		if (file_path)
+> +			g_ptr_array_add(ret_confd_files,
+> g_strdup(file_path));
+> +	}
+> +
+> +	g_dir_close(dir);
+> +
+> +	if (ret_confd_files && ret_confd_files->len > 0) {
+> +		g_ptr_array_sort(ret_confd_files,
+> confd_compare_filenames);
+> +
+> +		DBG("Will consider additional config files (in
+> order):");
+> +		for (guint i =3D 0; i < ret_confd_files->len; i++) {
+> +			DBG(" - %s",
+> +			=C2=A0=C2=A0=C2=A0 (const gchar
+> *)(g_ptr_array_index(ret_confd_files,
+> +							=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i)));
+> +		}
+> +
+> +		return g_ptr_array_ref(ret_confd_files);
+> +	} else {
+> +		g_ptr_array_free(ret_confd_files, TRUE);
+> +		ret_confd_files =3D NULL;
+> +		return NULL;
+> +	}
+> +}
+> +
+> +static void confd_override_config(GKeyFile *keyfile,
+> +				=C2=A0 const gchar *new_conf_file_path,
+> +				=C2=A0 gboolean accept_new_groups,
+> +				=C2=A0 gboolean accept_new_keys,
+> +				=C2=A0 GError **err)
+> +{
+> +	g_autoptr(GKeyFile) new_keyfile =3D NULL;
+> +	gchar **existing_groups =3D NULL;
+> +	gchar **groups =3D NULL;
+> +	gchar **keys =3D NULL;
+> +	gsize existing_groups_size =3D 0;
+> +	gsize groups_size =3D 0;
+> +	gsize keys_size =3D 0;
+> +
+> +	new_keyfile =3D g_key_file_new();
+> +	if (!g_key_file_load_from_file(new_keyfile,
+> new_conf_file_path,
+> +				=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 G_KEY_FILE_NONE, err)) {
+> +		/* the caller can further process 'err' */
+> +		gchar *new_message =3D g_strdup_printf("%s: %s",
+> +						=C2=A0=C2=A0=C2=A0=C2=A0
+> new_conf_file_path,
+> +						=C2=A0=C2=A0=C2=A0=C2=A0 (*err)-
+> >message);
+> +		g_free((*err)->message);
+> +		(*err)->message =3D new_message;
+> +		return;
+> +	}
+> +
+> +	existing_groups =3D g_key_file_get_groups(keyfile,
+> &existing_groups_size);
+> +
+> +	groups =3D g_key_file_get_groups(new_keyfile, &groups_size);
+> +	for (gsize gi =3D 0; gi < groups_size; gi++) {
+> +		bool match =3D false;
+> +		const gchar *group =3D groups[gi];
+> +
+> +		for (gsize egi =3D 0; egi < existing_groups_size;
+> egi++) {
+> +			if (g_str_equal(group,
+> existing_groups[egi])) {
+> +				match =3D true;
+> +				break;
+> +			}
+> +		}
+> +
+> +		if (!match) {
+> +			if (accept_new_groups =3D=3D FALSE) {
+> +				warn("Skipping group '%s' in '%s' "
+> +				=C2=A0=C2=A0=C2=A0=C2=A0 "not known in previous config",
+> +				=C2=A0=C2=A0=C2=A0=C2=A0 group, new_conf_file_path);
+> +				continue;
+> +			} else {
+> +				DBG("Accepting group '%s' in '%s' "
+> +				=C2=A0=C2=A0=C2=A0 "not known in previous config",
+> +				=C2=A0=C2=A0=C2=A0 group, new_conf_file_path);
+> +			}
+> +		}
+> +
+> +		keys =3D g_key_file_get_keys(new_keyfile, group,
+> &keys_size,
+> +					=C2=A0=C2=A0 NULL);
+> +		if (keys =3D=3D NULL) {
+> +			DBG("No keys found in '%s' for group '%s'",
+> +			=C2=A0=C2=A0=C2=A0 new_conf_file_path, group);
+> +			continue;
+> +		}
+> +
+> +		for (gsize ki =3D 0; ki < keys_size; ki++) {
+> +			const gchar *key =3D keys[ki];
+> +			g_autofree gchar *value =3D NULL;
+> +			g_autofree gchar *old_value =3D NULL;
+> +
+> +			value =3D g_key_file_get_value(new_keyfile,
+> group, key,
+> +						=C2=A0=C2=A0=C2=A0=C2=A0 NULL);
+> +			if (!value)
+> +				continue;
+> +
+> +			old_value =3D
+> +				g_key_file_get_value(keyfile, group,
+> key, NULL);
+> +			if (old_value !=3D NULL) {
+> +				DBG("Overriding config value from "
+> +				=C2=A0=C2=A0=C2=A0 "conf.d file: [%s] %s: '%s'-
+> >'%s'",
+> +				=C2=A0=C2=A0=C2=A0 group, key, old_value, value);
+> +				g_key_file_set_value(keyfile, group,
+> key,
+> +						=C2=A0=C2=A0=C2=A0=C2=A0 value);
+> +			} else {
+> +				if (accept_new_keys =3D=3D TRUE) {
+> +					DBG("Adding new config value
+> from "
+> +					=C2=A0=C2=A0=C2=A0 "conf.d file: [%s] %s:
+> '%s'",
+> +					=C2=A0=C2=A0=C2=A0 group, key, value);
+> +					g_key_file_set_value(keyfile
+> , group,
+> +							=C2=A0=C2=A0=C2=A0=C2=A0 key,
+> value);
+> +				} else {
+> +					DBG("Ignoring config value
+> from "
+> +					=C2=A0=C2=A0=C2=A0 "conf.d, unknown keys
+> not allowed: "
+> +					=C2=A0=C2=A0=C2=A0 "[%s] %s: '%s'",
+> +					=C2=A0=C2=A0=C2=A0 group, key, value);
+> +				}
+> +			}
+> +		}
+> +		g_strfreev(keys);
+> +	}
+> +	g_strfreev(groups);
+> +	g_strfreev(existing_groups);
+> +}
+> +
+> +void confd_process_config(GKeyFile *keyfile, const gchar
+> *base_conf_file_path,
+> +			=C2=A0 gboolean accept_new_groups, gboolean
+> accept_new_keys,
+> +			=C2=A0 GError **err)
+> +{
+> +	g_autofree gchar *confd_path =3D NULL;
+> +	g_autoptr(GPtrArray) confd_files =3D NULL;
+> +
+> +	confd_path =3D g_strconcat(base_conf_file_path, ".d", NULL);
+> +
+> +	if (!g_file_test(confd_path,
+> +			 (G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)))
+> {
+> +		DBG("'%s' does not exist or not a directory",
+> confd_path);
+> +		return;
+> +	}
+> +
+> +	confd_files =3D confd_get_valid_files_sorted(confd_path);
+> +
+> +	if (confd_files && confd_files->len > 0) {
+> +		for (guint i =3D 0; i < confd_files->len; i++) {
+> +			const gchar *confd_file =3D
+> +				(const gchar
+> *)(g_ptr_array_index(confd_files,
+> +								=C2=A0
+> i));
+> +			DBG("Processing config file: '%s'",
+> confd_file);
+> +			confd_override_config(keyfile, confd_file,
+> +					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 accept_new_groups,
+> +					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 accept_new_keys,
+> +					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 err);
+> +		}
+> +	}
+> +}
+> diff --git a/src/conf_d.h b/src/conf_d.h
+> new file mode 100644
+> index 000000000..e5cb4ae16
+> --- /dev/null
+> +++ b/src/conf_d.h
+> @@ -0,0 +1,83 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + *
+> + *=C2=A0 BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *=C2=A0 Copyright (C) 2025-2026=C2=A0 Valve Corporation
+> + *
+> + */
+> +
+> +#include <glib.h>
+> +
+> +/**
+> + * confd_process_config:
+> + *
+> + * @keyfile: keyfile already initialized and parsed
+> + *
+> + * @base_conf_file_path: base config file (e.g.
+> /etc/bluetooth/main.conf,
+> + * input.conf, network.conf).=C2=A0 The directory to be processed will b=
+e
+> same path
+> + * with ".d" appended.
+> + *
+> + * @accept_new_groups: whether to accept groups not appearing in the
+> base config
+> + * file
+> + *
+> + * @accept_new_keys: whether to accept keys not appearing in the
+> base config
+> + * file
+> + *
+> + * @err: error, taken as input to pass back to caller, if any
+> + *
+> + * Helper function to process config files in conf.d style dirs
+> (config
+> + * fragments), overriding values for keys in the base config files
+> (or default
+> + * config set in code).=C2=A0 For example, for "main.conf" the directory
+> to be
+> + * processed will be "main.conf.d", in the same basedir as the
+> config file.
+> + *
+> + * Within the .d directory, the format of the filename should be
+> + * '^([0-9][0-9])-([a-zA-Z0-9-_])*\.conf$', that is, starting with
+> "00-" to
+> + * "99-", ending in ".conf", and with a mix of alphanumeric
+> characters with
+> + * dashes and underscores in between.=C2=A0 For example:
+> + * '01-override-general-secureconnections.conf'.
+> + *
+> + * Files with a different name scheme will not be considered.=C2=A0
+> Accepting groups
+> + * or keys not present in the base config depends on the function
+> arguments.
+> + * Currently, the callers set it to "NOT accept new groups" but "YES
+> to accept
+> + * new keys".=C2=A0 This is because the base config files as shipped
+> contain all the
+> + * groups, but most keys are commented-out, with the default values
+> set in code.
+> + *
+> + * The candidate files within the given directory are sorted (with
+> g_strcmp0(),
+> + * so the ordering will be as with strcmp()).=C2=A0 The configuration in
+> the files
+> + * being processed later will override previous config, in
+> particular the main
+> + * config, but also the one from previous files processed, if the
+> Group and Key
+> + * coincide.
+> + *
+> + * For example, consider 'main.conf' that contains the defaults:
+> + *=C2=A0=C2=A0 [General]
+> + *=C2=A0=C2=A0 DiscoverableTimeout=3D0
+> + *=C2=A0=C2=A0 PairableTimeout=3D0
+> + *
+> + * and there is a file 'main.conf.d/70-default-timeouts-vendor.conf'
+> + * containing settings for these keys:
+> + *=C2=A0=C2=A0 [General]
+> + *=C2=A0=C2=A0 DiscoverableTimeout=3D30
+> + *=C2=A0=C2=A0 PairableTimeout=3D30
+> + *
+> + * and another 'main.conf.d/99-default-timeouts-local.conf'
+> + * containing settings only for 'PairableTimeout':
+> + *=C2=A0=C2=A0 [General]
+> + *=C2=A0=C2=A0 PairableTimeout=3D15
+> + *
+> + * What happens is:
+> + * 1) First, the 'main.conf' is processed as usual;
+> + * 2) then 'main.conf.d/70-default-timeouts-vendor.conf' is
+> processed,
+> + *=C2=A0=C2=A0=C2=A0 overriding the two values from the main config file=
+ with the
+> given values;
+> + * 3) and finally 'main.conf.d/99-default-timeouts-local.conf' is
+> processed,
+> + *=C2=A0=C2=A0=C2=A0 overriding once again only 'PairableTimeout'.
+> + *
+> + * The final, effective values are:
+> + *
+> + *=C2=A0=C2=A0 DiscoverableTimeout=3D30
+> + *=C2=A0=C2=A0 PairableTimeout=3D15
+> + *
+> + **/
+> +void confd_process_config(GKeyFile *keyfile, const gchar
+> *base_conf_file_path,
+> +			=C2=A0 gboolean accept_new_groups, gboolean
+> accept_new_keys,
+> +			=C2=A0 GError **err);
+> diff --git a/src/main.c b/src/main.c
+> index 59df0ad4c..1a4610188 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -54,6 +54,7 @@
+> =C2=A0#include "dbus-common.h"
+> =C2=A0#include "agent.h"
+> =C2=A0#include "profile.h"
+> +#include "conf_d.h"
+> =C2=A0
+> =C2=A0#define BLUEZ_NAME "org.bluez"
+> =C2=A0
+> @@ -285,6 +286,14 @@ static GKeyFile *load_config(const char *name)
+> =C2=A0		return NULL;
+> =C2=A0	}
+> =C2=A0
+> +	confd_process_config(keyfile, main_conf_file_path, FALSE,
+> TRUE, &err);
+> +	if (err) {
+> +		error("Parsing conf.d file failed: %s", err-
+> >message);
+> +		g_error_free(err);
+> +		g_key_file_free(keyfile);
+> +		return NULL;
+> +	}
+> +
+> =C2=A0	return keyfile;
+> =C2=A0}
+> =C2=A0
