@@ -1,131 +1,158 @@
-Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F822D7DE1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jan 2026 22:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE5A7E110
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 02:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768430524; cv=none; b=rFsYIR/EWtGHNZsOevAS92eXXNvIInIPIuxWcNg0kjEzT2JpnQnUhjdoDZm2jqpRBmuuImFgUH59ZYz3Ap//+Y3/UTin0cuXtLFz7p2oOk6NmjUb5xXrPZXiN7/GVhOFh6zqyhnIiB47qOXQ/UBCerJgVqPIf11d54OqvrfKR2o=
+	t=1768444176; cv=none; b=ABkFjwvdFu5oFjz7Gi4p8YUllisaZ/5NxUmt22lezYLTcIQtrsNxLHsC0BG9DTSx9Sx7cLp5z/x/4it3dgOZKwDzcrnZF+sSi2IS4/Uihopv61MJqRb/La+0Xp7DSYJ5T9Xbsxz873QLBU9cnF5WMAId/3aEAOkRgoDYTVcJX2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768430524; c=relaxed/simple;
-	bh=NUK97cjocTEM1S/hVmKV+iMa2a8lJC5TDDVtusaA2sY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=jD0gfj426WMsohxsg+evgSXqQkvT0jwr1URWhV5GRzmafWyiE/j/i1VpRRLarPh1zxU6BoPgvT9ZewuXxvEKXgKo0v6rOZM+aI3sVuLhfe13g6foYC5uLZoI2/MkM3++32uRyMqelnVTKBnjwd7wUy5g7cb6OIVWYw3kCBUrVDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NFMj9htf; arc=none smtp.client-ip=74.125.82.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768444176; c=relaxed/simple;
+	bh=UZ1dpQctMhlXK5jZJXx5zthz3qa6d2MHzKgHvIC/E14=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uuu1mei7Zi+yF+AJsMB9Dq0om2pbfkXLyVR9yKMvZarSnN/Z4cOCAO3bXvxNxLpgCiXfWI92bhm2QRp+EF/8sSJiBWg5Pcnyk4UA4U+G0dSlgp3K17tNaXj5XYXz2qgjblnDzDSwQaFb3vTCQsA15h4pat1nb5YRUa9TssrA1ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=LXBLrfKe; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NFMj9htf"
-Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-12332910300so793251c88.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jan 2026 14:41:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768430514; x=1769035314; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wd9BvHZF6m54q597nhyN3Cu6l6A/8ZHmYptP/Ae5Y8A=;
-        b=NFMj9htf7Mpm9NcPZrIWm4nCx3UoBSsm97vzbhLFogqO3ywnihOYolmZCZB9XYhKMM
-         AkrxXnb8APgQk3IIVJvloeRkz8r3E38/E84uQEgukAaY2iQ8PrNBpvKTVql7dpqYkOvv
-         bpNejsqbMcJSVy48guBuNcwZgHqStUchzRh8IRLkEQuEk05x519+wpS4kIcFN77Hidas
-         xMYrImc0D3EGDpbarBNOZR18tEhqWXea55qdM3xE67PQxBUOkg1yEaadsiDBqqDbIi3F
-         0r5f/tTlMcNx+pIrtJmxE/3hpZbukTM9wOwWP3YNr39c1b1eR3d+g2FjAo0zlwX7mcmf
-         SkKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768430514; x=1769035314;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wd9BvHZF6m54q597nhyN3Cu6l6A/8ZHmYptP/Ae5Y8A=;
-        b=f162LqmLlGn6BtfE/6zivz8+FAQJ8ZXp+DUxp+HoHW4xLVo2u00/17w1Djvo/LzRkX
-         s95wbM/pWQkn/zmu8EXwAzp8gTivADxOJqDFCUbhXjakW+nAS+AQ5OH8Jw5FTLtzd0hA
-         /1gSKlu0Z/IdBdipCrvOFp5Pibo2Bwf4L4IVr4Y0MR0S2IW2O7rTHgm1SfQoWNcuN13M
-         0hn8kewXJc3AK47tLQdaX9i/kVQuL4pxdgI0CARrGw/XBqBaG5lNmZs35WRsmK5POk7c
-         AMXsgppI7ggiHgR5uOtkIqmkZ+X8m+8QlZ/S802Z8baxwu9e9mNseSIa1Dk/8hwtRMeG
-         W6eA==
-X-Gm-Message-State: AOJu0Yyp+Xe1ZmZ85sKY+rsn2qIZVYPIUytiEmCBGWoozsNBCLWwwW9U
-	JZzhng7NAjAjvfrBORKtuq+ADYeU6etF8gKP+ou8+aINYFcxsxpV/Q/+sZo52e3o
-X-Gm-Gg: AY/fxX5+vXhxbpOZgGqqbflFPNdllo5lXiYnMjUjdNc2jWS2l9tT0RcFldUtUt08z14
-	xeHHGFDvZZFcJ4JvJkCbhb/2UNBVgEVf4beACImqeNeNqMlxnSag9gBLmMiK/1MTXMcsYlLXgmk
-	sO2OW6N8MK/g59GhuaWiJDAbeiX4Gj1YfLGHphHRbbDcay6BrHez6RiyPP7n53p7GWWtT/YJrKq
-	/uqjMSs/x/1/IavYI42dD12HxTCswgVvLjFPwqoXZaVDahYpQh6lM4XnJBN3nieLPOK3kLar8MZ
-	ud+b6bmd05JTjuJpg1GbtE0XtACVHf4inY6Jn5uF+J1FhkGpIMcE9StlxW3zt1iBbGY3fEGhko1
-	RkFwz3vS9jBXXlVwx8PlriLSeZOctuLeNRqgc/sT13iQ0tbRRqU9nHzUUB6AUo9bEp8VblY4690
-	42CMK0EnTWTZof207U
-X-Received: by 2002:a05:701b:2211:b0:123:2d38:929a with SMTP id a92af1059eb24-12336ab506emr4194889c88.38.1768430514426;
-        Wed, 14 Jan 2026 14:41:54 -0800 (PST)
-Received: from [172.17.0.2] ([52.161.55.201])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f248c246sm32292620c88.11.2026.01.14.14.41.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 14:41:54 -0800 (PST)
-Message-ID: <69681bb2.050a0220.81efc.d465@mx.google.com>
-Date: Wed, 14 Jan 2026 14:41:54 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8997731024580660837=="
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="LXBLrfKe"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=rYZEPM+bqulvUIVLPh45VUiOhekdLtEE0Z6fqD06ja8=; b=LXBLrfKenPG6tziVQ5iz8xC3Cu
+	6Mu3YL/8bOrqeK75mbhAyo/5kI+VH+s2V01iepKBm7AbcFeLsDpnGbEYt5V96DRi25FtgYLECHShY
+	CMPRn7FhtqFBTha5NIZQa+4/XofWo/p6AGRikpzgfeeERss2jVbsl62wYA/bct9bWrFQ1+KhsYGXL
+	wOUZUsCWk+FCLW+FIzbqG/zwFjt/NczfJl3m2uEgrt/m57tN1hHzRqBWlv9ZsuoTTU+yLDi8j3C8S
+	uXt6NE1UCaQOjRVuDYs+RpO9hP4o3LlHePttOxXQjW1ZAHzxf7275q2/1IzDzUCYP65ojSOT//EsK
+	6X9+PMIg==;
+Received: from 205.red-83-35-235.dynamicip.rima-tde.net ([83.35.235.205] helo=breogan.igalia.local)
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1vgD74-005YTj-8y; Thu, 15 Jan 2026 03:29:30 +0100
+From: "Manuel A. Fernandez Montecelo" <mafm@igalia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: "Manuel A. Fernandez Montecelo" <mafm@igalia.com>
+Subject: [PATCH BlueZ v3 0/1] Support for config fragments (conf.d style dirs)
+Date: Thu, 15 Jan 2026 03:28:51 +0100
+Message-ID: <20260115022852.2841362-1-mafm@igalia.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/6] shared/crypto: Add bt_crypto_rsi
-In-Reply-To: <20260114214938.1417430-1-luiz.dentz@gmail.com>
-References: <20260114214938.1417430-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8997731024580660837==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Support config fragments, to read config from conf.d directories.
 
-This is automated email and please do not reply to this email!
+This is commonly supported by other tools, as an extension of the main
+config file(s).  It is useful and convenient in several situations,
+for example:
 
-Dear submitter,
+* distributions can set different values from the defaults shipped
+  upstream, without having to modify the config file
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1042511
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.44 seconds
-GitLint                       PENDING   0.39 seconds
-BuildEll                      PASS      20.10 seconds
-BluezMake                     PASS      649.88 seconds
-MakeCheck                     PASS      18.45 seconds
-MakeDistcheck                 PASS      244.40 seconds
-CheckValgrind                 PASS      296.12 seconds
-CheckSmatch                   WARNING   352.55 seconds
-bluezmakeextell               PASS      185.09 seconds
-IncrementalBuild              PENDING   0.46 seconds
-ScanBuild                     PASS      1042.90 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/crypto.c:271:21: warning: Variable length array is used.src/shared/crypto.c:272:23: warning: Variable length array is used.src/shared/crypto.c:271:21: warning: Variable length array is used.src/shared/crypto.c:272:23: warning: Variable length array is used.src/shared/crypto.c:271:21: warning: Variable length array is used.src/shared/crypto.c:272:23: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+* different packages or config-management tools can change config just
+  by adding, removing or modifying files in that directory; instead of
+  editing the main config files
 
 ---
-Regards,
-Linux Bluetooth
+Notes on v3 non-changes:
 
+I considered other changes for v3 as requested in message
+https://marc.info/?l=linux-bluetooth&m=176557679130526 , but as
+explained in my next reply
+(https://marc.info/?l=linux-bluetooth&m=176558570102172&w=2), I didn't
+understand part of the request, so in the meantime I tried my best to
+interpret, to make some progress.
 
---===============8997731024580660837==--
+Experimenting and pondering for quite a while about the question of how
+to do the loading and parsing (as discussed in those messages), I came
+to the conclusion that in general it makes sense to keep the main idea
+of this patches' implementation:
+* to consider the config fragments (files in conf.d) part of the config
+  in each area (an extension of main.conf, input.conf, etc);
+* treat the whole set as a single unit, loading base and then one
+  fragment after another in place for that area (which means also
+  parsing the config file in text to convert it to a key_file in mem);
+* and only after an area is complete and all bits are in, invoke
+  parse_config(main_conf)-like functions to transfer values to code
+  variables, and do it only once.
+
+Problems mentioned in the message, like wrong groups in the base
+main.conf being then possible in the fragments, should not have a bad
+effect in practice -- there are specific checks with hardcoded "valid
+groups" and "keys" for each area.  And if the values of the keys
+overriden are not valid, it will also be noticed later in the
+processing.
+
+Another problem, perhaps more theoretical (I don't think that it will
+have much impact in the real-world, but nevertheless somewhat wasteful
+effort), is to do the loading and parsing over and over.
+parse_config()-like functions are trying to find values for all possible
+keys, that in case of fragments typically do not exist -- because
+fragments typically only contain one, or perhaps a handful of key=values
+only.  As I see it, the pre-existing code is based on the idea that the
+key_file representing each section (main.conf, input.conf, etc) contains
+all the config for that area, and it only loads and parses once each
+area.
+
+As an additional, more practical problem, for example main.conf (as
+represented in a key_file) is preserved for the whole lifetime of the
+program running, and there's the function:
+  GKeyFile *btd_get_main_conf(void) {
+          return main_conf;
+  }
+
+Then plugins/policy.c invokes this function and acts upon the values.  I
+think that the returned value of that function should include the extra
+config fragments, and not only exclusively the representation of the
+original main.conf file, both in theoretical terms but also in practice
+-- because otherwise this policy.c would not be able to act upon config
+coming via fragments.
+
+So, all in all, I think that merging all loaded config in a single
+key_file, and then transferring those values to program variables only
+once, is roughly the correct approach.
+
+But I'm completely open to change it if you are still not convinced or
+see other problems of this approach.  And please clarify your previous
+message if I misunderstood.
+
+---
+Changes in v3:
+- Minor rephrasing of commit message, fixing conf paths and others
+- Emit DBG message if network.conf fails to parse (silently ignored now)
+- Add err parameter to confd_process_config(), modify returned message
+  to include file that fails to parse, and check returned errors from
+  calling sites.
+- On the calling sites, next after loading the base config file, act on
+  errors in the same way as an err when loading each base config file
+  (the effect in all cases is to use the default hardcoded values, when
+  config is not present / not loadable)
+
+Changes in v2:
+- Use alternate functions to not change (raise) required Glib version
+- Reformat code (styling)
+
+---
+Manuel A. Fernandez Montecelo (1):
+  Support for config fragments (conf.d style dirs)
+
+ Makefile.am                |   1 +
+ profiles/input/hog.c       |   9 ++
+ profiles/input/manager.c   |   9 ++
+ profiles/network/manager.c |   9 ++
+ src/conf_d.c               | 208 +++++++++++++++++++++++++++++++++++++
+ src/conf_d.h               |  83 +++++++++++++++
+ src/main.c                 |   9 ++
+ 7 files changed, 328 insertions(+)
+ create mode 100644 src/conf_d.c
+ create mode 100644 src/conf_d.h
+
+-- 
+2.51.0
+
