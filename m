@@ -1,162 +1,84 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729412DA75A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 22:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BED329360
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 22:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768516228; cv=none; b=fqOPLa3vld875soXI7b85lnphlS1vkFkp8hnbutWSnJ2TXzpyr0WgO0Xv7h9Ur/90kdPd6SWWzg0TXMOG8DXYf3lCNkAmTX1hU508Ky28zA60CUy/Cklw8amNoH2/9bUoYgKrzZLKWsGBl+o115zRXVpSa+a0OvZOHWR5lv2C6Y=
+	t=1768517015; cv=none; b=ecjDNn+Lj4MoiJAFRHVD9Dsjuz5KkNZJ8NHVdsmFMK4EwikDzRPxzhGhJDG90qp8+ZHSeyjxwtAAXOi9JKQj6ChOQc0LYXL1/QrijD069YEYH7BjTGHRrVAiBhb7dCSBfGWze3jF4X8qAJYkJNNU7iFzrn4mKBgbR8a9AIdmEMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768516228; c=relaxed/simple;
-	bh=Q1ztBYZHbeuHfSYeh4P+EVbAsMT/PxPj5sxkIr1hX3A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gFtr1j1lz+lBz0Y9o09bPHS9Dn2m/m1s3Y7pGpTZU+3XWM2VTkaAw1UWNhMwh44fPNCTxZay7yGvdLDn/cUEvGtLtvxv2kE97fblkZGVUhfT6AqEHrbyvydBwNJUsMS7RyZQModtLG6TFGf9tSS7iWdEDJRK/S0mDKy6Yf9ZkXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZGfrPDJC; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=VFMkk6Gq; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1768517015; c=relaxed/simple;
+	bh=C2YOCtLH9cOOYvjAbPGXQbSU/NyHwa4eTdlW6dQgenM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PRtCUuIoWPxmthky3xakUZv59M2OBh6Q/ZH2GiwlxgmH9oZZ5kTHkVo8E74LmZTsswBZzhVPBfEtwH7eOeDJ+XE5X0B3w9wB5jdquRgCtiSzn9EM/p/86k+yRbWUw+wPSFTiI//H9mmMWSbx5USCdtZXRmdVrMm2XGf9q0Dmeu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EI9wMvIW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZGfrPDJC";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="VFMkk6Gq"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60FMILfg3152475
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 22:30:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	RLTv/1YWn/ElIxiYzdBl6a2RnzNYFUXfvjrstlyGkzI=; b=ZGfrPDJCgCWwJvNj
-	hcP4KgxMFEL81528zd9FqBDLEDfbg8JiPI2gwhtJH+eONFYsck1FyJzBfo2laI00
-	NjCEuBG5xIz2gne4zjurmMxzNMFEj+4hn193yEHjxi+E3BJqxcWhV37GYhgLZIgM
-	T5YmTWjLzCDIefmbFNr/bS6ms8SO2esYb9BHlbabAoADlRpUwaWOFviFXDEfTm1X
-	fl2SXfCNw6Hv7e7YAdLVIHH01FssSve4EtYDjJ37VLNJ8HAw+MeRwC56jFkvnCkM
-	efbDRSL8YNBS7UOWpBnHbiglZRAvzWES3P2kx8tbkr4PK0U0G4DASYNHKlMv03u+
-	331jAg==
-Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bq340h986-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 22:30:26 +0000 (GMT)
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2ae29a21e7eso1591136eec.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 14:30:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1768516226; x=1769121026; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RLTv/1YWn/ElIxiYzdBl6a2RnzNYFUXfvjrstlyGkzI=;
-        b=VFMkk6Gq0iFZS5VzIIKsz6r5kH+SZxnASpdyGCTo+DOwLWTfgLrGsr+6jzUec0Vkfy
-         O06+RmHj6FiOfj8zbVSQ3k+akddhNTg2te7IdoLNc3jCPIQ9FUeGJLz7/wbOpcMaHQEJ
-         iPDIE1m0H6MdvvWdlsZfG+e0SQngXUyQDFplVmxifxUNncuxktsGG2VDqiMRr3/j3Hhk
-         OAlGzwUHicJVp3yGfmy4uEe2qvru2okqrop3zSM8KrBdJfCaaHLrfNFlvXFBsPjXkyiZ
-         +Q640rN2vzupwgKghwR8jOe33QmZ29eapEoZMCHMtwcd6DvQlRdNatt8D6hyu3WPfl21
-         yr6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768516226; x=1769121026;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RLTv/1YWn/ElIxiYzdBl6a2RnzNYFUXfvjrstlyGkzI=;
-        b=a2yaaswA0wLzkGcvfsy+WbSUU1Z+oQN4cHQf8tD+AEy2gIRq4EOommaQwD7VULQ9Lh
-         G4W9w7XbkYpgbYCBcPuqgWTTPgVKBORgMyTa6V4ULs226AbN7NspPQP0qL50F+wzmfL1
-         UMmyDH6VqOgpwgd7Ijwo3qpcSYiG3ceSzxsPl0mkEgPfmI1cnEQ6rxcdZtdrbQpBEsY0
-         /bnWROfNfaL1tUfGpVHzSyKtHnlbEgmzIPp85Uj0BhoIqTMIZ2bVUksmYgPdZcGiN3P0
-         Gu/DT08U4Lww7lN5ji7kEgcPEQFhHNNWIpjcHtWhB31IfKUjs1fJPN3YWnPKmuTkb76V
-         ssiA==
-X-Forwarded-Encrypted: i=1; AJvYcCXBFlyrL29HtKD0vPDoDBVcdS+lihyRrz2RIkiWL/BrZ86h/b7PeKN8uG8KVs2/vAl2UOVS10KQRjwJ5lTTRtQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXJux/rRrfbamJY4uXAEYQfgCms1Re7Vt+rbYA4ccjvi9t9VaY
-	2EyKTmtLmWaIfGpY/LvtPbJp187ZkJnRXq7MKz1W51jutSlu2iejTaubg8tLfFr36zyknh4I4xg
-	1pEd7MpH45H4Q3pdijbbIbk7zZG87Ixaft5GZTTNK01uLmaIdGy1LiG8aJDNnCLd59GgOHYU=
-X-Gm-Gg: AY/fxX4L+mW3IOuHnCK7zBhT1smzUjKJ2uk+2kD/wIH6AGduZHFhTFZgA5UbA2nF2Jd
-	yXwZlq967zQ4+mAKd9ETAVu09QoSXuwWcV9JGnPTY3+G8sZw55W5gcvyw61npnwHllMyVUAe9oE
-	iX+iTwFnS3r2ctBT+6NFHxSTFB+25KXGDz+LFTjkAg3aryRzuh2hV2kBd4FSAAnpJy+havrmwUd
-	dAtKVgjdxrfRorq3u04HsMVggpOFEK5DahpBXyGz+DUohoHAT6UIOrTRHlbf5TTNPgQIS2qHoG6
-	iTOr7PJ1tJrGsVcdf38yBfQReYFlq0wGZydfT0Xv7Msukpu6218U7Hg8seq+D9cz/+/OKYiVThs
-	x8vGaVtoeG0HviJivE4N3RuxnXfbTlb/U3Vjyhs29n05j+jXfM2gwKzVMYK2uDLp0TAMqSqfoUe
-	HE
-X-Received: by 2002:a05:7300:640d:b0:2b0:487c:7aba with SMTP id 5a478bee46e88-2b66434e796mr6726496eec.21.1768516225260;
-        Thu, 15 Jan 2026 14:30:25 -0800 (PST)
-X-Received: by 2002:a05:7300:640d:b0:2b0:487c:7aba with SMTP id 5a478bee46e88-2b66434e796mr6726379eec.21.1768516223209;
-        Thu, 15 Jan 2026 14:30:23 -0800 (PST)
-Received: from [192.168.1.3] (c-24-130-122-79.hsd1.ca.comcast.net. [24.130.122.79])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6b36564ffsm635436eec.28.2026.01.15.14.30.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jan 2026 14:30:22 -0800 (PST)
-Message-ID: <52b2b799-09e6-40a4-bea8-c7e8bf21cf51@oss.qualcomm.com>
-Date: Thu, 15 Jan 2026 14:30:21 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EI9wMvIW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B073C116D0;
+	Thu, 15 Jan 2026 22:43:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768517015;
+	bh=C2YOCtLH9cOOYvjAbPGXQbSU/NyHwa4eTdlW6dQgenM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EI9wMvIWwAaawzwMogtDgHuqOGCLwlZxzTpg4+FoEm07F/EHgSzzAX3ALOP/oWpBD
+	 xjHIMEfEz+Oe0/JEcUGmGnDieDTb9D/evnGTikZ00NDBWr1a9C00zSUOcJNWL4Jsu3
+	 G6yuBcvMMvX2QZMBQ2Mt1qhK2a+tHGliDo3qO8EOjXe/QA+hBCPTRduS5NPzmEp2q7
+	 +MIXqHdxnptUN4IDJjNAMylDz5Jsr8ydrHbX+sWaxaoWSwjmqHYxVHSwNw79EKBzVv
+	 NXkzE5jcXtZAO+gfTlE+4Ne6eIZRiFxVUdiol+q4N+Ugd7uoGOVavfc4WS4GEFPKwQ
+	 fNwf5urhglpwQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7926F380AA42;
+	Thu, 15 Jan 2026 22:40:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/14] wifi: ath10k: snoc: support powering on the
- device via pwrseq
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Matthias Kaehlcke <mka@chromium.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
-        linux-pm@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-References: <20260106-wcn3990-pwrctl-v2-0-0386204328be@oss.qualcomm.com>
- <20260106-wcn3990-pwrctl-v2-4-0386204328be@oss.qualcomm.com>
-From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <20260106-wcn3990-pwrctl-v2-4-0386204328be@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: FPJ6sqR8vLlDXvc3mBWwDMjzpKius8Mg
-X-Authority-Analysis: v=2.4 cv=bp9BxUai c=1 sm=1 tr=0 ts=69696a82 cx=c_pps
- a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=Tg7Z00WN3eLgNEO9NLUKUQ==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=L2C35plnZqJTIQ-6vfsA:9
- a=QEXdDO2ut3YA:10 a=6Ab_bkdmUrQuMsNx7PHu:22
-X-Proofpoint-ORIG-GUID: FPJ6sqR8vLlDXvc3mBWwDMjzpKius8Mg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE1MDE3NyBTYWx0ZWRfXxXgPA3pcSSCe
- H06BQlpYShvW9medKjnZodofjtKIjKNRdl7iKpQ4oKdrNZ7Xi5RC/DEq/pMLBjojZv4ytrbnrXg
- U/eN32YdmZ8rcCRiY7z5QltJ6IG+e2br+7+3UR4O78LxoSoamwJFXaVhAYZecUgQEC5kQgroRBG
- XRX6AkC/XWF+ADp9N2D5XVYdQr09VOLBGdzQ91WYNphF+Ec2Nyx0I9DkjjJfK3ReoTlooPKKx1L
- 81ZANnHtf8Fmd1YFPm1gMh8HoQlulWqWy6wEdrwdPjiKFZDyQbIMsJvrvBI196b7QZrCFKx9B0s
- tTJGPBDLVHibHjoaTAYPOjv+Q6R6KjI4KOzIzVkrZnH9LKa4hdNb+mwnGoPWHl374iwkj/F9H1l
- MLgQL+dHLGryiKJz6PYC+S5VM9RT81MlGnlwAug4RtMV3pQoVgcH3V2JuDyHi6W7AKoEvjK1qt+
- F1sbHKfE7gKDTM6oyPg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-15_07,2026-01-15_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- lowpriorityscore=0 phishscore=0 clxscore=1011 priorityscore=1501 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2512120000 definitions=main-2601150177
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 1/6] shared/crypto: Add bt_crypto_rsi
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176851680744.4193484.12243082978824882040.git-patchwork-notify@kernel.org>
+Date: Thu, 15 Jan 2026 22:40:07 +0000
+References: <20260115205408.1554101-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260115205408.1554101-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-On 1/5/2026 5:01 PM, Dmitry Baryshkov wrote:
-> The WCN39xx family of WiFi/BT chips incorporates a simple PMU, spreading
-> voltages over internal rails. Implement support for using powersequencer
-> for this family of ATH10k devices in addition to using regulators.
+Hello:
+
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Thu, 15 Jan 2026 15:54:02 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-> ---
->  drivers/net/wireless/ath/ath10k/snoc.c | 54 ++++++++++++++++++++++++++++++++--
->  drivers/net/wireless/ath/ath10k/snoc.h |  2 ++
+> This adds bt_cryptor_rsi which can be used to generate a Resolvable Set
+> Identifier as per CSIS spec:
+> 
+> https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/28085-CSIS-html5/out/en/index-en.html#UUID-4dc0c19a-2900-d43e-6ea5-e651151d3c3e
+> 
+> [...]
 
-My automation flagged:
-* drivers/net/wireless/ath/ath10k/snoc.c has no QTI copyright
-* drivers/net/wireless/ath/ath10k/snoc.h has no QTI copyright
-* 2 copyright issues
+Here is the summary with links:
+  - [BlueZ,v2,1/6] shared/crypto: Add bt_crypto_rsi
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=07bd0d60bcef
+  - [BlueZ,v2,2/6] advertising: Use bt_crypto_rsi to generate RSI
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4ab2161b5328
+  - [BlueZ,v2,3/6] advtest: Use bt_crypto_rsi to generate RSI
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6d79d8a3a643
+  - [BlueZ,v2,4/6] shared/ad: Make bt_ad_has_data return the data
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=acc0a1d1c4eb
+  - [BlueZ,v2,5/6] advertising: Fix not verifying if RSI set is valid
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b9daa6718bdd
+  - [BlueZ,v2,6/6] advtest: Fix displaying RSI as a byte array rather then an address
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=62fdc13ed2ef
 
-I'll add these manually in my 'pending' branch
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-/jeff
+
