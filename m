@@ -1,69 +1,69 @@
 Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B6A30C62B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 20:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE1231AAA2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 20:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768510465; cv=none; b=nDYfbE3vd5trxbi6ZMnXlLkKZhjt7C7yHxdThcJqywx6P6uK0F8I93XUrTNqBJJC+0c1GNEnTLIlsr3h+dT/pp1m/R+i5mTDV79bMJs6QmE47pWCVA7eVl9K5CEwp7mBbXKXX35+KW9qYmfmNFk/v/YGyrxj2vuEEd6nRuiFRao=
+	t=1768510466; cv=none; b=UgqpFwQ64wT+D8n5vMCvE31tHCHwDQgwuI6TTGhSLlDB6Z6AnGQxwuxOsHem7qvu+2TDNk2zPb0fetXTZ+q03c9fS1HRgdEL8A7Q7NbF5dQ0SAtz82Dqz7Fx04vSuv8gZf9XOwWyhqPTEWUpXZ2Qcn8QjAKyMPug7ml/wWOkHgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768510465; c=relaxed/simple;
-	bh=zk342nU0Srqwai0A4BL9Mu9iumNQx2oCOYA66Py0Wxw=;
+	s=arc-20240116; t=1768510466; c=relaxed/simple;
+	bh=mGTDWk+2HNbND4rSKhYj3ONc4sSF8CdNRxHxiylQRoE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WdEPwYWwLN/s0BiTQjlpR/VTxN/wbzcYI4H10pcC22QcOuChwTayoK5o2SbcEHBF/acezbu8QlsZG4S7gM05q7Pg0RmsHXBrPQRVkGbr4HZmq/3gflH62vSp4P9O4w/gK/omfhKB5oGYnTszbiFP7UL5qnWebTkjJdqVCZjKq4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBcxhBCn; arc=none smtp.client-ip=209.85.221.170
+	 MIME-Version; b=socStCzZW4KcOe4jAEINuSo7Z6cuGRYq0twDtvx8Ya3AAp/PI3niLzjtlnnt68zghpGt1wuzn+zxbzEjx0ytv+vKFyCtZJk8LFsjStbG2p7bSJ7ghC2H8Ztf8seOW+S9mMy/Z589x9mvTfW1DfAIRkxWhufGLy9+4fKDxmEJcBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kPu04H3B; arc=none smtp.client-ip=209.85.221.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBcxhBCn"
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5636784883bso1140199e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 12:54:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPu04H3B"
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5637886c92aso465110e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 12:54:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768510463; x=1769115263; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768510464; x=1769115264; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=u4HHP6HjEr3Gekv5bQetD7gP4Pde3d88NSmEPM4ATGU=;
-        b=IBcxhBCnfZQNxXGIijt5I5aeO50QBq6R8zhD8lkpIJnec7d9aiWkMtocauy1qBWlpy
-         xPmoU70J23PJampjlSzZmvuN0Yy6Twv46i4kbx7oidqsAidg4kG8JZF34i/U1drPttfW
-         8feSeFJNUTbF+3MdGwCJpi097YbOJu6I4v/88YSZmlhgU5iGYhjvowDC5CjHwz39ioml
-         pVDsqWczkyvKn39AfoblhiTYNc0joP4xiq31moSVN1ujMur2cFs5JRpzr3nDIfWIUsYG
-         YbdkQrHyUSzohqymFT0EtgG1/vrCzthFDcKI6R8BlVYYetHEqFPhLY25x9MCPZYpDKKX
-         el5Q==
+        bh=ubu6wecu01rSKgtS5A9JrDV6StzpsrWnvWJhSUcZDxA=;
+        b=kPu04H3BscjKqgYuIbZ/BBN8YukugdIGJ5ki6s8nzT1fioxmaAApt5Oy6IjJd3HPJ/
+         NwIeg1VyWgtiuzFy3Jw3Mqse3iZrfn5R4MqWj4CrA2VlezrnJks8mHb9oiVckyd9ZmLw
+         4oi95wVjfgFED7VPYToteMEYY27b/oL/S75hLwNaRAqSWLA/kVcvKbYJ6CRNr9BNGk/c
+         G3PKhf6VZODFYM5/e3K5l6bTaDcCI2lwOSINeAyzrRaeC1Hi6um3PpDec1u4O1TuPeRm
+         9CAt0+HZI3JKjC8cu1VtPeiykcKTa1C6bN1AraMElHCpzzUw9IIrD8GyC4rqGxjlUREw
+         WZxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768510463; x=1769115263;
+        d=1e100.net; s=20230601; t=1768510464; x=1769115264;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=u4HHP6HjEr3Gekv5bQetD7gP4Pde3d88NSmEPM4ATGU=;
-        b=tzhj2481TEJiU0TvansxWFMV0nEKd3GQgBhVum1OPfDkr5zYqGJqM5p+zDx1txiyxM
-         Z+h65Sct5Lo7ICmVDK130AtDPeiGSR6VNYu/FlcGJ3U1xk87ugXH0xSQeCwRSkPd68bc
-         9hMhejCXznBYRyu2xFE9Qzf1FYkTnGWXfNaCYniV8fMh7rgfebC/7JCxZaP87k92iYfF
-         9Kqk8FWH4CE9fo/57xsZtomVsdwj/2h37xCJVmCmryjpr0JdJs7cyY3BQq2y4z5p7/0O
-         +4bgXKAXQBLabmS53HhjKwAu80tm5LVhaR7LLhnm1zIrD3Z4g+hPv3Fl4/ECvXt/4b1D
-         g92w==
-X-Gm-Message-State: AOJu0YyZjr+44MSK+aRIvqFqYqC4Fy3wKg7G1SYgaMAn55LJuTXPOkZJ
-	brBtfQwxpiDtYnEy1f/Mjm2cxm4HUbRVO5uhnbktoPpf9ChxPYXguQ670z8bMYwz
-X-Gm-Gg: AY/fxX4L8VQA/zVfj2tEtsvA85T+iuqlj/i9s2jMaeXooTdMoKs86rnlbATDzLQqxVh
-	acwOo8LHdv/hidGlxVIyKXxbzy1PeTnsCM3jML+STzhj+ax9+ihTVpfBed9MSEvFsJfJAdQiw/x
-	l9zrmLrQSFN4rAQL7VgLKaC3slxfm7sb9BKDZH/SdbWhN8SqIdjjwj/qi7Q+JXZ8/uGio+59sfV
-	Z8txsSXnCZgaOCFMzLV3VMK6yZTi9zHdkHz5wbOW1BrCjEXZBlpXSoMO3Gi0k89tX4E2SKZWG1c
-	8PY2Sq8nRC+mmqb/RID9RJxX9ryRidj1iosLlEANiISAaaFuPKjqz2vmWe+TcfO4ntv9FM2qcot
-	UW/l4+jMBmO9FTC6lvxJ0tKM942rRkNsQWX/RPWAXFOlsMN9zN2TfDSSOHpDqLak8h2xXj6uubP
-	ehv0+wDOV/jd1V6h4S1pYlfNgBahAKqMXjKG/u0UwDhOn7HMfpKGg3TJ40SjRrfLRXcClZMgI95
-	k0ibZB6h/vTWrHM
-X-Received: by 2002:a05:6122:459e:b0:563:687f:360c with SMTP id 71dfb90a1353d-563b719252bmr187011e0c.0.1768510462732;
-        Thu, 15 Jan 2026 12:54:22 -0800 (PST)
+        bh=ubu6wecu01rSKgtS5A9JrDV6StzpsrWnvWJhSUcZDxA=;
+        b=gqh5F0C7mB317RPNSAb4eGpXrscf9i03gQoUo/7v3d9T3tQpXbOE2ci4PSMsTUicqN
+         MQNdsO+8qzzfPmR5fr60dxOsfPObT3LxMgZPaqwEWNwowQzL4KxpZuOLTzcso8ZTHR1R
+         G9PwP6ruzq6qbJz0XBl7CYiQvF3WqAMkLZrp57rhZuufNGzghVhYCT7IeibkPWJkgcFD
+         RZPoS6CiDuJ92D10kse6I6PUJ1xDmYpfxVQQXTKqBqePim+UtaCaAFBIzcF/os46I/U+
+         TWsUf9t5h5ihB49JJvkdPX8KsSSEgHeGOvS8KOo7ZBDeeNMU82io8MmVf9XpAVVVn7fj
+         W51Q==
+X-Gm-Message-State: AOJu0YxF1xueVfIIoN3Llo64g6OOIixDxSV9kiem9MYbApRS/nLgMTdG
+	EksDApuXQx1DoX52SB+w5RDrpnU1nKZYVjBnLug6ag5Plh/OfFZBIrQeJd6qR5Ma
+X-Gm-Gg: AY/fxX7TH2Hg9CqHxJVLzSZ40iGqUcVFGvKbGpC11wQQVg7D2L7zs5oqPlhNWrtJA4J
+	fVPK2XPrAPKAWGbAISBHsBlEbWnfJW+D7M5HCsJvhHFyV18KNSd7Q1T+iePP/LTHrucsP7MRX4V
+	eaT8b+tXTYbsI41bmK0LDv8H3awpi6OyP5llpxCfcXBE2wTsVKgRvz7YwTRjn5Zv8pitL9/kSMY
+	85xRYeq+Y40FEYRxh8nFCKQAolO3/KNkDxIumDDii18kl8LDxh+P6Ww8gCw9rtOiBwY1FiMTRsH
+	ysU393iDJPszJPwc2Z6PrtJdq+ifAcPoqzg2N1RxBGgqlzPjXcetcQw1Q4hZoppfG9BMBY/YLPl
+	ldqSxbB4tHJYyQm3D5WbDRYA/LesJQqzEBXWc71ukdxUULI6zrpz6QIGw4WRYCyVve5hSB5K5oe
+	m60Bc4N85GgoR3xbdOmStzrFWrthi0opViNs0RBr4h7glA95pntNyitsU7zXxOjK7iKqC4P5SAb
+	G/EaA==
+X-Received: by 2002:a05:6122:512:b0:55f:c318:1afa with SMTP id 71dfb90a1353d-563b72dc295mr142044e0c.6.1768510463668;
+        Thu, 15 Jan 2026 12:54:23 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-563b6ffda3csm167159e0c.7.2026.01.15.12.54.21
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-563b6ffda3csm167159e0c.7.2026.01.15.12.54.22
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 12:54:22 -0800 (PST)
+        Thu, 15 Jan 2026 12:54:23 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 5/6] advertising: Fix not verifying if RSI set is valid
-Date: Thu, 15 Jan 2026 15:54:06 -0500
-Message-ID: <20260115205408.1554101-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 6/6] advtest: Fix displaying RSI as a byte array rather then an address
+Date: Thu, 15 Jan 2026 15:54:07 -0500
+Message-ID: <20260115205408.1554101-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260115205408.1554101-1-luiz.dentz@gmail.com>
 References: <20260115205408.1554101-1-luiz.dentz@gmail.com>
@@ -77,119 +77,40 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The hash portion of the RSI can be verified if it was set properly.
+RSI should be displayed as an address if the intention is to use big
+endian format.
 ---
- src/advertising.c | 69 +++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 61 insertions(+), 8 deletions(-)
+ src/advertising.c | 3 ---
+ tools/advtest.c   | 2 +-
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/src/advertising.c b/src/advertising.c
-index 5dc33c004f93..0543870eea02 100644
+index 0543870eea02..8970e65f7d13 100644
 --- a/src/advertising.c
 +++ b/src/advertising.c
-@@ -506,11 +506,52 @@ static bool parse_service_data_sr(DBusMessageIter *iter,
- 	return parse_service_data(iter, client->scan);
- }
+@@ -533,9 +533,6 @@ static bool validate_rsi(const uint8_t *data, uint8_t len)
+ 	ret = !(memcmp(hash, data, 3));
+ 	if (!ret) {
+ 		error("RSI set invalid: hash mismatch");
+-		printf("Random: %02x%02x%02x\n", data[3], data[4], data[5]);
+-		printf("Hash:   %02x%02x%02x\n", data[0], data[1], data[2]);
+-		printf("Match:   %02x%02x%02x\n", hash[0], hash[1], hash[2]);
+ 		goto done;
+ 	}
  
-+static bool validate_rsi(const uint8_t *data, uint8_t len)
-+{
-+	struct bt_crypto *crypto;
-+	uint8_t zero[16] = {};
-+	uint8_t hash[3];
-+	bool ret;
-+
-+	if (!data || len != 6)
-+		return false;
-+
-+	/* Check if a valid SIRK has been set */
-+	if (!memcmp(btd_opts.csis.sirk, zero, sizeof(zero)))
-+		return false;
-+
-+	crypto = bt_crypto_new();
-+	if (!crypto)
-+		return false;
-+
-+	/* Generate a hash using SIRK and prand as input */
-+	ret = bt_crypto_sih(crypto, btd_opts.csis.sirk, data + 3, hash);
-+	if (!ret)
-+		goto done;
-+
-+	/* Check if hash matches  */
-+	ret = !(memcmp(hash, data, 3));
-+	if (!ret) {
-+		error("RSI set invalid: hash mismatch");
-+		printf("Random: %02x%02x%02x\n", data[3], data[4], data[5]);
-+		printf("Hash:   %02x%02x%02x\n", data[0], data[1], data[2]);
-+		printf("Match:   %02x%02x%02x\n", hash[0], hash[1], hash[2]);
-+		goto done;
-+	}
-+
-+	DBG("RSI validated");
-+
-+done:
-+	bt_crypto_unref(crypto);
-+	return ret;
-+}
-+
- static bool set_rsi(struct btd_adv_client *client)
+diff --git a/tools/advtest.c b/tools/advtest.c
+index 706b2503b74c..7e744dca8021 100644
+--- a/tools/advtest.c
++++ b/tools/advtest.c
+@@ -53,7 +53,7 @@ static struct bt_hci *scan_dev;
+ 
+ static void print_rpa(const uint8_t addr[6])
  {
- 	struct bt_crypto *crypto;
- 	uint8_t zero[16] = {};
- 	struct bt_ad_data rsi = { .type = BT_AD_CSIP_RSI };
-+	struct bt_ad_data *ad;
- 	uint8_t data[6];
- 	bool ret;
- 
-@@ -518,23 +559,28 @@ static bool set_rsi(struct btd_adv_client *client)
- 	if (!memcmp(btd_opts.csis.sirk, zero, sizeof(zero)))
- 		return false;
- 
--	/* Check if RSI needs to be set or data already contains RSI data */
--	if (!client || bt_ad_has_data(client->data, &rsi))
-+	if (!client)
- 		return true;
- 
-+	/* Check if RSI needs to be set or data already contains RSI data */
-+	ad = bt_ad_has_data(client->data, &rsi);
-+	if (ad) {
-+		ret = validate_rsi(ad->data, ad->len);
-+		return ret;
-+	}
-+
- 	crypto = bt_crypto_new();
- 	if (!crypto)
- 		return false;
- 
- 	ret = bt_crypto_rsi(crypto, btd_opts.csis.sirk, data);
--	if (!ret)
--		goto done;
- 
--	ret = bt_ad_add_data(client->data, BT_AD_CSIP_RSI, data, sizeof(data));
--
--done:
- 	bt_crypto_unref(crypto);
--	return ret;
-+
-+	if (!ret)
-+		return ret;
-+
-+	return bt_ad_add_data(client->data, BT_AD_CSIP_RSI, data, sizeof(data));
- }
- 
- static struct adv_include {
-@@ -753,6 +799,13 @@ static bool parse_data(DBusMessageIter *iter, struct bt_ad *ad)
- 
- 		DBG("Adding Data for type 0x%02x len %u", type, len);
- 
-+		switch (type) {
-+		case BT_AD_CSIP_RSI:
-+			if (!validate_rsi(data, len))
-+				goto fail;
-+			break;
-+		}
-+
- 		if (!bt_ad_add_data(ad, type, data, len))
- 			goto fail;
- 
+-	printf("  RSI:\t0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x\n",
++	printf("  RSI:\t%02x-%02x-%02x-%02x-%02x-%02x\n",
+ 					addr[5], addr[4], addr[3],
+ 					addr[2], addr[1], addr[0]);
+ 	printf("    Random: %02x%02x%02x\n", addr[3], addr[4], addr[5]);
 -- 
 2.52.0
 
