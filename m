@@ -1,108 +1,153 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856B034C121
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 09:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BBC357727
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 09:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768555235; cv=none; b=C9PouT5LOMJrJtp4UlsAghSdewbM6Jb/3CfnYkMtNJoChbQUw9Sh6CLHSdYeS7iILSU5qQqzZM8jv+5u7itEqfGq8QMobWZfRY1IACnMWTmhzRH2YjmZ7mGBSTrqfkNxnP44yYq29P1O3ByRu7wOi/mqB+hIXnt4poejWDkyaA8=
+	t=1768556102; cv=none; b=Ea/+C3pq+J7IA3p6Q0aGrNrQMvvM8evcotbyuBr5rOxFrxKOxCxxHWakNpNtJ9/0bEiETu+M1ajixHZ84cDsqFKcGSU4T94fJu35QksOa9SkUZqmkenfatNiYAUvgJDmH82jwzWI/oIWyg5D6wcX7nzkcBKXk0792u6k7P+jLbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768555235; c=relaxed/simple;
-	bh=ykRh+caslnsL7rs3PRC0EI48axBYUPyRgjOFudUhuYM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A7hSr2Cd5oLUBufB5ylJ1DZQwl70dU89i2R7GVsaUqX+TeTPpivva89gJwc/xbO3xB5KRh6rH19/znNOCLYY1wD+FEbkpWspv7/DKtOv+YCEWKybRd/JarDawUEt+9QiTqiy+etbsZsYeemBg5FIC3mkLo8F38nGeowza3h/Ud8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pwW+mmyc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768556102; c=relaxed/simple;
+	bh=xlmRFGoX954HoRklT8/417Bxwkf2QRmEBZE+L4KR+hQ=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=jrH9k2NCUZTAm+rQNcddVwpa7VHQqroXmidvt9R1ueg93bPLzMBk1t59gCq4HyE1HVAzeVVK+nL4hROW1WYz0wddS32ei8hfZ2XiPiWk5yfiCUQI8xo5Ewt3X9wnlgTARQ+EyWLXU3c2NNvZK2/dPZ+CTsUFjClWrfz4qVM/Xxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CmUggFJQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pwW+mmyc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44E22C19425
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 09:20:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CmUggFJQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9A583C116C6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 09:35:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768555235;
-	bh=ykRh+caslnsL7rs3PRC0EI48axBYUPyRgjOFudUhuYM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=pwW+mmycTpxJZI9IEqLurTYErdQ4YW6yt0VzoNAH6d6bFEJSGsltF8G8qrai/CC5r
-	 0Q9kSssclk25DUgTSyUvM+PSVHdw9aFNTd2hrMpUw3f2gnbtdOXUamB4Bb0PbL9DH9
-	 YVYzxJytEkYdHKyIvvxYPrFkJMHA+ejyCM8JkkrG0QXGZbaRuBJ46XqbDXa9oqH4cI
-	 D5wzdJCjXgkkxHlWMsofNYdoHkXcu9DK9tk4k/tg1j1mGHthcLoCpufRgTCgvDvF9p
-	 Wv+3/EKfbvq2ILdAt8KxBuaB2CQGW1Ualu2PJOChld7ZhxxdPZ5JlpuuLH24jlxiab
-	 I8i0lFM1fktrw==
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59b6c13b68dso2604651e87.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 01:20:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV0t2FYkDLfx/NaUFItpVzzkEEkgXzXHEa+RmbDw8sxKq6xfAoHIv1XTeG0VbSRV6za9ceDsGTD2qAaBKPH+Iw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/pJyEwlglgQ2rB68FLH319fXuBexBK1vGGQARKLWBQfUwbrRT
-	7M2E0hBh8al9P4qgRu16vgzlN0xvCiGT7tRnJcjJhIZ2X5qxK0bjqytyQEw5U8OxTh6JQmk7HxG
-	Q5i0Gamz4JTVZ74Xli0qLf5XNAXXqt81EUg4W3W87IA==
-X-Received: by 2002:a05:6512:2c91:b0:59b:9ac4:2afe with SMTP id
- 2adb3069b0e04-59ba718ebacmr1882399e87.12.1768555233917; Fri, 16 Jan 2026
- 01:20:33 -0800 (PST)
+	s=k20201202; t=1768556101;
+	bh=xlmRFGoX954HoRklT8/417Bxwkf2QRmEBZE+L4KR+hQ=;
+	h=From:To:Subject:Date:From;
+	b=CmUggFJQK3PXj3fWmFlYmk0Rlu+thjHelGTQULptNJ/0XQaMUk4lSsIgTAc6S1LHT
+	 4Hs7Mc+FXMtJaH+RvFCfHXjfTnr3i1kt3vnsw2Gf7vROXh7eih8Qu1dwn3+580wOq1
+	 WDzOTNGbvFu+2FQA3GYjXAALF6lMLQKC3k9F7HBSjLg5r71Cuxo7HnyWnKMcwWd3UF
+	 lY2ba/XZTna5JuJ5rz0HzW2rV5YOi4H8VNHsOhJJNH0JKwfr5wfiO9fBP91EMIbef/
+	 QXVnFfXQhnEJClbt591w9RdnxBvWHGssCEcoiTi2zyVyMC41WOZf1ZHZ92yOBnOH+X
+	 KGH81NGMZ7Cmw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 89F4BC41612; Fri, 16 Jan 2026 09:35:01 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220986] New: MediaTek MT7925 Bluetooth adapter (USB 13d3:3596)
+ fails to initialize - reports as unsupported hardware variant 0x7902
+Date: Fri, 16 Jan 2026 09:35:01 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: aamolodc@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-220986-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251107033924.3707495-1-quic_shuaz@quicinc.com>
- <CAMRc=Mce4KU_zWzbmM=gNzHi4XOGQWdA_MTPBRt15GfnSX5Crg@mail.gmail.com> <212ec89d-0acd-4759-a793-3f25a5fbe778@oss.qualcomm.com>
-In-Reply-To: <212ec89d-0acd-4759-a793-3f25a5fbe778@oss.qualcomm.com>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Fri, 16 Jan 2026 10:20:21 +0100
-X-Gmail-Original-Message-ID: <CAMRc=MdoUvcMrMga6nNYt8d-o8P-r3M_xY_JHznP3ffmZv8vkQ@mail.gmail.com>
-X-Gm-Features: AZwV_QimTjzwHL8e3FnSCZ-a4okZnUriTz72sgP41cuJac4rqIKVV5VOYmjNOT8
-Message-ID: <CAMRc=MdoUvcMrMga6nNYt8d-o8P-r3M_xY_JHznP3ffmZv8vkQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] Fix SSR unable to wake up bug
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Cc: Shuai Zhang <quic_shuaz@quicinc.com>, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 16, 2026 at 9:37=E2=80=AFAM Shuai Zhang
-<shuai.zhang@oss.qualcomm.com> wrote:
->
-> Hi Bartosz
->
-> On 11/7/2025 11:37 PM, Bartosz Golaszewski wrote:
-> > On Fri, 7 Nov 2025 04:39:22 +0100, Shuai Zhang <quic_shuaz@quicinc.com>=
- said:
-> >> This patch series fixes delayed hw_error handling during SSR.
-> >>
-> >> Patch 1 adds a wakeup to ensure hw_error is processed promptly after c=
-oredump collection.
-> >> Patch 2 corrects the timeout unit from jiffies to ms.
-> >>
-> >> Changes v3:
-> >> - patch2 add Fixes tag
-> >> - Link to v2
-> >>    https://lore.kernel.org/all/20251106140103.1406081-1-quic_shuaz@qui=
-cinc.com/
-> >>
-> >> Changes v2:
-> >> - Split timeout conversion into a separate patch.
-> >> - Clarified commit messages and added test case description.
-> >> - Link to v1
-> >>    https://lore.kernel.org/all/20251104112601.2670019-1-quic_shuaz@qui=
-cinc.com/
-> >>
-> >> Shuai Zhang (2):
-> >>    Bluetooth: qca: Fix delayed hw_error handling due to missing wakeup
-> >>      during SSR
-> >>    Bluetooth: hci_qca: Convert timeout from jiffies to ms
-> >>
-> >>   drivers/bluetooth/hci_qca.c | 6 +++---
-> >>   1 file changed, 3 insertions(+), 3 deletions(-)
-> >>
-> >> --
-> > Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
->   Just a gentle ping. This patch series has been Acked but I haven=E2=80=
-=99t
-> seen it picked up by linux-next.
->
-> Do you need anything else from me?
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220986
 
-I don't pick up bluetooth patches, Luiz or Marcel do.
+            Bug ID: 220986
+           Summary: MediaTek MT7925 Bluetooth adapter (USB 13d3:3596)
+                    fails to initialize - reports as unsupported hardware
+                    variant 0x7902
+           Product: Drivers
+           Version: 2.5
+          Hardware: Other
+                OS: Linux
+            Status: NEW
+          Severity: blocking
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: aamolodc@gmail.com
+        Regression: No
 
-Thanks,
-Bartosz
+The MediaTek MT7925 WiFi/Bluetooth combo card with USB ID 13d3:3596 fails to
+initialize Bluetooth functionality. The chip reports hardware variant 0x7902
+instead of the expected 0x7925, causing the btmtk driver to request
+non-existent firmware (mt7902/BT_RAM_CODE_MT7902_1_1_hdr.bin).
+
+When attempting to use MT7925 firmware via symlink, the chip fails with
+HCI_Reset timeout (Opcode 0x0c03 failed: -110).
+
+WiFi functionality works (slowly) via the mt7925 driver, but Bluetooth is
+completely non-functional.
+
+STEPS TO REPRODUCE:
+1. Boot Linux with MediaTek MT7925 (USB 13d3:3596) present
+2. Observe Bluetooth fails to initialize
+3. Check dmesg for firmware load failure or HCI timeout
+
+ACTUAL RESULT:
+- Without firmware symlink: "Direct firmware load for
+mediatek/mt7902/BT_RAM_CODE_MT7902_1_1_hdr.bin failed with error -2"
+- With MT7925 firmware symlinked as MT7902: "Opcode 0x0c03 failed: -110"
+(HCI_Reset timeout)
+- No Bluetooth controller available
+
+EXPECTED RESULT:
+Bluetooth adapter should initialize and be usable
+
+SYSTEM INFORMATION:
+
+Kernel: 6.18.5-200.fc43.x86_64
+Distro: Fedora 43 (Workstation Edition)
+
+USB Device:
+  Bus 001 Device 003: ID 13d3:3596 IMC Networks Wireless_Device
+  Manufacturer: MediaTek Inc.
+  Product: Wireless_Device
+
+Loaded modules:
+  btusb, btmtk, bluetooth
+
+DMESG OUTPUT:
+
+[    5.657894] usbcore: registered new interface driver btusb
+[    5.669557] bluetooth hci0: Direct firmware load for
+mediatek/mt7902/BT_RAM_CODE_MT7902_1_1_hdr.bin failed with error -2
+[    5.669561] Bluetooth: hci0: Failed to load firmware file (-2)
+[    5.669563] Bluetooth: hci0: Failed to set up firmware (-2)
+[    5.669565] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection
+command is advertised, but not supported.
+
+After symlinking MT7925 firmware as MT7902 and reloading btusb:
+[  304.624964] Bluetooth: hci0: Opcode 0x0c03 failed: -110
+
+ANALYSIS:
+The btmtk driver reads hardware variant 0x7902 from the chip and constructs
+firmware path accordingly. However:
+1. No MT7902 Bluetooth firmware exists in linux-firmware
+2. MT7925 firmware is not compatible with the 0x7902 variant (causes HCI
+timeout)
+3. The 0x7902 variant may need specific firmware or driver modifications
+
+ADDITIONAL NOTES:
+- This device works correctly on Windows
+- WiFi portion of the combo card works (via mt7925 WiFi driver)
+- Multiple users report similar issues with MT7925 variants on various lapt=
+ops
+- Related: Launchpad bug #2078878
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
