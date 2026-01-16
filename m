@@ -1,135 +1,126 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f193.google.com (mail-qt1-f193.google.com [209.85.160.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1E0342528
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 19:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C93399A45
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 20:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768593081; cv=none; b=P010J8BKyBeIvfn8uOKLbGWtb7BKl/KlIcnIkN9wj3SCztfXq382tPyPNO3BcLPqzbrFKeox5NFlGGZxiUrw5uKIGfVGZREd3YjCLGwpBFs+MiKY3R6+VrhTt7RnANfZ2qIG1iUVi8hXKM779wz26zWmnIMFdvJulQy0yA2tPnc=
+	t=1768594327; cv=none; b=lCMr28UTwVZ+xFwS1wB5soJzqQWBkMxo/vfTmO3KK0mEvXWohku2iYhgIcbgOKr30myOAWAmRXy/O/EE/7MOY2HHyOzGftc+UMOGggg0Fbxi42f2luWR1p8Ywp65s8KDlZRItQIXFc7WT5qnQ7KNxVf+/j5uFhPf2F0ObuJquQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768593081; c=relaxed/simple;
-	bh=nMpC88Ebfx7H/t0BzpFXSSi7x3kkNI6T2P/RJ8Tgvk0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cHRLF0Wp7oNxCDzjX4OIQXlXgKRLCe6T1OEUw5u+c3evb5crLuEFKM9vpLLhdlX40J+QhiiOI73aXGtWiWB3mpP6brxw76uF6RFx+2T0Dz0fO4z1tiHqO2dT5T07icGafzBVQ0gzfcyKXNhKiaGw+xJqMHdDOOOq/nFSeYPukEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gm2/dPL0; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1768594327; c=relaxed/simple;
+	bh=tKs9JhzwSSq2AbMC+ocp8aQ6vwmIHyH4Gxm1r8qzyfo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=taL09z16QZA7y9aPma0Y5A1uIzHKi84NJqI6OV/AI1pL557LMCz1L33kQ61PfT71TJM14LdEHo4u+pJh9DGPEWG/o3WmPCGnaajiKrlb4QRLLiy7SLMfM24c4os8EEppJwNAu1TvRtIk97UejSNTRVCWeb29inOTkZm02a5VLzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V24HOjaC; arc=none smtp.client-ip=209.85.160.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gm2/dPL0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768593080; x=1800129080;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nMpC88Ebfx7H/t0BzpFXSSi7x3kkNI6T2P/RJ8Tgvk0=;
-  b=Gm2/dPL0dJleJFjVrLwbBRrhSC7aBdUGOpo1XvWW8JeZHlCvij1I2brm
-   Fu0ElsHgdGpTHvQKovcq9FFFCYZXr7c92Eq+BGXu54d3msbUjZT6FauQN
-   CwgyHM1vbeI4sBUQj0XZ2DNFpGjlA7ng853AfCl19V0TqWv/p3r99Zse5
-   jZr1R+OPYKq5qV01lb5yj54ijBxP/kx9m/VtRFthNoajFSfUFCiI2Ksiy
-   ngtk3dWfJRbe88QpYEi+5nqQU853IM2YiFZNHpPVcedmKeGPFx7j4qO/b
-   HpfGl+zdxnqq6qoJUnenrBinpZJdk7ynPcO8FsAvLaQZVpZAbVRzMl5YI
-   g==;
-X-CSE-ConnectionGUID: DCfL3Er3RpShJfLvYG7KkA==
-X-CSE-MsgGUID: umiiKtOPQFuNvhW/vhvVbA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="80633025"
-X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
-   d="scan'208";a="80633025"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 11:51:19 -0800
-X-CSE-ConnectionGUID: mPpZX8szQWm7Z+BNuPkCFQ==
-X-CSE-MsgGUID: OdyxXsAfS3S8DVtSIr7HwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
-   d="scan'208";a="210332627"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 16 Jan 2026 11:51:17 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vgpqk-00000000LBg-3XVw;
-	Fri, 16 Jan 2026 19:51:14 +0000
-Date: Sat, 17 Jan 2026 03:50:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH 2/3] Bluetooth: btnxpuart: Remove unneeded CONFIG_PM ifdef
-Message-ID: <202601170322.MZrwlt6M-lkp@intel.com>
-References: <20260116125803.598552-3-hadess@hadess.net>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V24HOjaC"
+Received: by mail-qt1-f193.google.com with SMTP id d75a77b69052e-50146fcf927so29767291cf.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 12:12:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768594325; x=1769199125; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xWdkCAX3DXEgza96g7CpAoU/Mmqlpmu8vtCD9giyfBk=;
+        b=V24HOjaCdQHxQ2M8ySYgCyGKjzdrqC+bEFrnyheC4pQGvC5xlB/G+/CYcKvvyh2JkA
+         10iHy//+GPDhDXWwK2x+OZYAQDdAM+D2m9XyXYhG1ekZxyuAHKNXWF10GKgQwwDTT7l1
+         Ti6PafKy8iGZC2vXpLfs81HkJ3ELaT++pNWI9zEbVu922zYcW35nWqvpxjB/D6S37Nsu
+         Dkex0YO5CpDn6Eu3k+05JVGPXwT68JyPKePyChL2TgPquLYmZUiJuIuj7VfEVBi3pOOF
+         h1L+FlwqBppfZzoQRj+ktU7XzhV/7vR1//0K7svPaixHvWy/xdFWeZanqDRLzzleUZxV
+         WF0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768594325; x=1769199125;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xWdkCAX3DXEgza96g7CpAoU/Mmqlpmu8vtCD9giyfBk=;
+        b=F6LVRWid6f82DkPzhGXfk4f009r2JYHmaLBqdNkAkgMhBG0Xs99hxzw3VU5U/tdmqw
+         24rtnVm+TSrJkFMLjIPWLoDX1JZBjc0vP32QsWhwa2P6GiR0lhUr+reoaZE0Dto0PBjo
+         KmC5wUBUrf3Blb+W7lnJexhsKnx2JkIM/3P8tgSv7XQ/n0E9xpyx+dH2IypDKGRHf1GE
+         0daeQHVDu9PFJmtV7gtpgqZDtvrG7N+OlsutKMt3HVBkw1riHDg7bXh7t0hP23HRlzWy
+         Ls9ZaV3ix0ePSayoG3gpqRhl3jfvi+xaVM9TGEwbVgNpxIZk0J82o0IbMsa+qyoIL43d
+         CROA==
+X-Gm-Message-State: AOJu0YzmpQ1qptlEoKXbveoER/YfdTRqY5GuoE3hgk2szUGbPMCG8uu3
+	osbQHFLZwK2Ws8QEQsM2Uc6seAwObBltwZMH5WJq2/wyUt/RSfYYiCAr4Mqv/8K5
+X-Gm-Gg: AY/fxX6KoMz58uMqYydv8Ll27nGyJZ8YZSdl/2AHbtcZj9SQbLBkDPmblli8zbOrZDZ
+	hkoUe7r2QqMxFSrsnr8CIc0RVRMv5QsKD9tz15ce4uP6B9Cb7sL4EoObZxFFRe6tLBaQ1sxOeRV
+	puA5Lf5LF3Xyw+57mD57/pLEB0GcWA5WnW0GsBv1LDT1XqssCGw9AiPwLYEMC5+3iBpQ6jcI4rY
+	MieZKTjqy4Nse6G6RZc/BI0owdnt/Hp/nXOJNWWwoGOjkXXGEyC0+mj1g3jpUzYhk71O0XslieG
+	9QftzvR0UacRqPliomu1cvQXgJYGYA1udrm3pbLsVQwhbbFA01YHx9R9L9486XilmDPLZxqFcnb
+	E3d9XrloyX6fVjM1zFhVAJYeACrdy6KeH4ZcMh4FDNdmSFKhuLgYx+wBBCrX+OZOEgGNXVe338k
+	WlQ1dSsSvQdtnX2QuY
+X-Received: by 2002:a05:622a:94:b0:501:4808:73fa with SMTP id d75a77b69052e-5019f8e3ef8mr101905311cf.26.1768594324944;
+        Fri, 16 Jan 2026 12:12:04 -0800 (PST)
+Received: from [172.17.0.2] ([20.51.198.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8942e5e5307sm30894916d6.9.2026.01.16.12.12.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jan 2026 12:12:04 -0800 (PST)
+Message-ID: <696a9b94.d40a0220.49b47.e864@mx.google.com>
+Date: Fri, 16 Jan 2026 12:12:04 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5533762202623759831=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260116125803.598552-3-hadess@hadess.net>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] shared/util: Add missing entries to bt_appear_to_str
+In-Reply-To: <20260116191120.1768270-1-luiz.dentz@gmail.com>
+References: <20260116191120.1768270-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
+--===============5533762202623759831==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-kernel test robot noticed the following build warnings:
+This is automated email and please do not reply to this email!
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on linus/master v6.19-rc5]
-[cannot apply to bluetooth-next/master next-20260116]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Dear submitter,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bastien-Nocera/Bluetooth-btmtksdio-Simplify-dev_pm_ops-usage/20260116-210400
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20260116125803.598552-3-hadess%40hadess.net
-patch subject: [PATCH 2/3] Bluetooth: btnxpuart: Remove unneeded CONFIG_PM ifdef
-config: x86_64-randconfig-002-20260116 (https://download.01.org/0day-ci/archive/20260117/202601170322.MZrwlt6M-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260117/202601170322.MZrwlt6M-lkp@intel.com/reproduce)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1043486
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601170322.MZrwlt6M-lkp@intel.com/
+---Test result---
 
-All warnings (new ones prefixed by >>):
+Test Summary:
+CheckPatch                    PENDING   0.29 seconds
+GitLint                       PENDING   0.38 seconds
+BuildEll                      PASS      20.34 seconds
+BluezMake                     PASS      653.54 seconds
+MakeCheck                     PASS      18.48 seconds
+MakeDistcheck                 PASS      244.62 seconds
+CheckValgrind                 PASS      296.11 seconds
+CheckSmatch                   PASS      351.37 seconds
+bluezmakeextell               PASS      184.18 seconds
+IncrementalBuild              PENDING   0.25 seconds
+ScanBuild                     PASS      1054.19 seconds
 
->> drivers/bluetooth/btnxpuart.c:1964:12: warning: 'nxp_serdev_resume' defined but not used [-Wunused-function]
-    1964 | static int nxp_serdev_resume(struct device *dev)
-         |            ^~~~~~~~~~~~~~~~~
->> drivers/bluetooth/btnxpuart.c:1950:12: warning: 'nxp_serdev_suspend' defined but not used [-Wunused-function]
-    1950 | static int nxp_serdev_suspend(struct device *dev)
-         |            ^~~~~~~~~~~~~~~~~~
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-vim +/nxp_serdev_resume +1964 drivers/bluetooth/btnxpuart.c
 
-689ca16e5232784 Neeraj Sanjay Kale 2023-03-16  1949  
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05 @1950  static int nxp_serdev_suspend(struct device *dev)
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1951  {
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1952  	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1953  	struct ps_data *psdata = &nxpdev->psdata;
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1954  
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1955  	ps_control(psdata->hdev, PS_STATE_SLEEP);
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1956  
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1957  	if (psdata->wakeup_source) {
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1958  		enable_irq_wake(psdata->irq_handler);
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1959  		enable_irq(psdata->irq_handler);
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1960  	}
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1961  	return 0;
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1962  }
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1963  
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05 @1964  static int nxp_serdev_resume(struct device *dev)
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1965  {
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1966  	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1967  	struct ps_data *psdata = &nxpdev->psdata;
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1968  
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1969  	if (psdata->wakeup_source) {
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1970  		disable_irq(psdata->irq_handler);
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1971  		disable_irq_wake(psdata->irq_handler);
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1972  	}
-c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14  1973  
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1974  	ps_control(psdata->hdev, PS_STATE_AWAKE);
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1975  	return 0;
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1976  }
-658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05  1977  
+---
+Regards,
+Linux Bluetooth
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+--===============5533762202623759831==--
