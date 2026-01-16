@@ -1,197 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA06328611
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 14:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC083375A6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 14:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768573161; cv=none; b=iS1vSyI75TRlF6FS0WMWIcY0Ub+iBM+j0LlXam1UnrYiR+fRroSX3VGeNAlNVv+ONdua2Ijrraqt23nJ++EWc58pOkXEbLUK+SwUPRfC+ymVz4tJcs3JyiaUdhL03Oo/auqvcVQ2IQpOlpRHFiuGN/2wFsJTJlprMIAuiiIDG58=
+	t=1768574165; cv=none; b=HGRXAovSp8HkKMKTSBX04nOXgXWwLFcQxti3tQchqeDfGIf/qNpN/PxOjRTIE0ABPzwaVBKaSsN+HaKisoYqhGLRlgTPg3PhhGrHvdMqEtjec0Uc4b/aJVOh1QwU/V0U/V9bux/XYe1RGVsx0cJpibSEETRHt9IAElybQtqwEk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768573161; c=relaxed/simple;
-	bh=JghXPm6HOBFNktLIBiI8eyfuN76nwomk97JpiXS3QS0=;
+	s=arc-20240116; t=1768574165; c=relaxed/simple;
+	bh=0UWEWOv32jL9B/FXucNUp6c9MQMhVgKwDMD2fPz2u5Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JTO8DqkDf0z0te3sV1FZDgg0jyqTY+JQ4SRWIJdcYkfYt1SupUjhGXwphsFFawwBinaa6ogNZROrsO6MLUCb8EAw5cjdOWjyn2egtfkdGcne40To/THhkfvgU50g/Mru3lVNX6W85M4oCo4C++l2jET/VIBDced/gg/BcU+YZXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxL4pcBU; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=oLqA/JN084BV2t/js0stjNvv+YUpyphaZzu1bEtVwFzE6icieKFJ5h8uNIjXiuJVqw6U4hwJ6AIBqu6h/OcezJ5Yq3KnmUuP1vTtV73APWHoN0hYvhmrZ6ElBuRuqx5UfMcgOu+Kj5akrCSCRebKosoiKI6M5Gtcovb4J4QdvY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dyMT1Qd+; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxL4pcBU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486BEC16AAE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 14:19:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768573161;
-	bh=JghXPm6HOBFNktLIBiI8eyfuN76nwomk97JpiXS3QS0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=OxL4pcBU9qQTdx9n8ylW4+63JJn3jJQq1mb+5GohfdbIkucdwgCLkyjualU8mlIyy
-	 KxP0DkLB/NyJewlJloc2Fr0VoT54B2cMfGhElk2oGuLk/HATJ2d9MzlmU+xlLNVKLi
-	 UdxOLCIiz/MBK4oMCLlstwC4mmVWzFqsjfE2WAPVfZ98PBKaU/gylwOIuMy3iBVnSS
-	 FI2bcwrjfnZ0xPfq38Jr5byWaPhIJFGWpXgFYfrCyyrVBEfGaUwReAp4jwJLCZoWvb
-	 O/8HwT//akwL51JCMSdMN8En3448ykrd3BUbpmXuYrUeQLGPvkOUu7Q9lJY0SGmlRm
-	 GUEfyx4z/vcsQ==
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-64d02c01865so3511454a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 06:19:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUcHvKsiFrm8MGIU6K8+nlN8R2W+ksDG9T6yQmXU/o3YZdU+/Syoh3TOVBNv3JgeeD7Nhg9ubzSomBbfbbvrV8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6grnIUl/t4Whz26JBGmjOxjQLPl76svT6R5LzgpkYb6ePbe8s
-	aafqPS4Z8J3goIxvtWlot2etLHcUeF4fAwiUcD7duBQRCCZxIkIZ1pOTxEtxtCgcuqVoqjJ0jSo
-	2eQ4phcmF/ma3Fs1W+xs8ahKpNfBWtw==
-X-Received: by 2002:a17:907:d03:b0:b87:892:f43f with SMTP id
- a640c23a62f3a-b87969386d0mr231202266b.29.1768573159725; Fri, 16 Jan 2026
- 06:19:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dyMT1Qd+"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-78d6a3c3b77so34688977b3.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 06:36:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768574163; x=1769178963; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K38T+RY7Eq7cXrwJxwrwODhwsFTQVEAqnZusGRST7Ik=;
+        b=dyMT1Qd+nD7qRevo+Snhp1+VmkG0nxezoQim/pyEGEgGFAHYC3muFecXJC/+YTK7yK
+         s0eP6wWWYiFQ5CWw4FJyYmIJ/lZeCb88xXWG6f4jtOpZDihXv/tZwMHvH+YSpNkzH8X4
+         KsGr7t/u/fuInm7ZVRjtufEQ/kY9cFhxt1x2hhZuMTEAwiDDO6ufhN0i447LpY3bYc+5
+         VYuPEeHu4c7GXJDl0DKkO12zYm4R+Cq4QyX1/JwTgZ7V9qHNbkN5B5D5mJnqSGq5NZc2
+         MUn7/I5HaXHqUB7n3IUQtoXCJL8SEIWZNuZQ/qGWEDg78UbGjEIhnF/fWA+7pdE/nnb9
+         4TKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768574163; x=1769178963;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=K38T+RY7Eq7cXrwJxwrwODhwsFTQVEAqnZusGRST7Ik=;
+        b=Q+vzYjJpkR2zqwDWljDRWozzPJ99jNbjkgYNj9rpym2sQymQBMhkgJdFFWS93MtTVo
+         9XcC0/5kwzR9dVFM5RP3x5XXVrkbEfMS87kaI5hy3V840IIwWrca70IPcnZxuoXEqgh1
+         eQAllhWtnY2hemaiPnsGFhABrpQJ6I+QHbrwHTEXDFvpKuqjrXcD7jb9mAyClZ6iouRW
+         BfnjkeliTrdyYoMwMbp98pQ/bWWwjeHp3Z3KvCHEzq/NCoNZgLogAar4o/wUkPr9GkZy
+         UE4KjgcTYBsDHKtLizbecTZEHI4UNlsiD+pP9v8l4ebng3Xr0DpgJo9tqThS/kCwyCmz
+         ei5w==
+X-Gm-Message-State: AOJu0Yz460C0oN6k8RbsZql9K4k4REFB7oZ5yUSeA9xPXWI+gkW/DkEt
+	TkUuylaPnx2TU8bF4/15kI1sv3EsMKOJm1INVWgr2aCX7Baa7wpC2uXsHFSkSuAGsJk4NYqmbYU
+	vNf0WhaoIJBhHGw8NUJq2fExoSUZPVJQ03e2F
+X-Gm-Gg: AY/fxX6WqxWtLaAEJkNZEbrzp26Uk4doI0iHDEcxcifNwEK1RUBY83ruopm1QDfsMYh
+	E9mXDnkaunFZLA24RnpJmVSSenrS+c6pQ4ArY0UW0G8sMq2rzhMwyv0Nd94ihVk8uDHb9OVTRa6
+	4hEAhAcJVt/W0JZ4wS+aMXEG57ECRD2loJV9RVzVq8Oyg8IHXtBmIG6Ra4syfBxAa/76VV4nUxQ
+	vpM4v3MIPGDaaKCXygBeCvRd8YktdKLYXDBqkESo93ShmCP/dKkzHHAGyxFasXealIz/OZ2TNFA
+	IS3n1JlMskiStS46w2xIBM4E01zNUfDR5XO3XP8jRMsv1XbnthMDBoMPgnO326k8g8yf
+X-Received: by 2002:a05:690e:1510:b0:63f:9fd6:94f5 with SMTP id
+ 956f58d0204a3-6490a5eee2bmr5244499d50.8.1768574162723; Fri, 16 Jan 2026
+ 06:36:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112-pci-m2-e-v4-0-eff84d2c6d26@oss.qualcomm.com>
- <20260112-pci-m2-e-v4-5-eff84d2c6d26@oss.qualcomm.com> <20260113171424.GA3925312-robh@kernel.org>
- <xyttom64ht5hrrp5hecjqehnyfgsv4mfl2t36e2sveu44ccpjl@lkzquse2kqsx>
- <CAL_JsqJxBNm0y6T7vji6MXgsO65iDJ-tdUEo0cOxkw7EuMKpkg@mail.gmail.com> <gcmm23ji4fkcqeshcyiehuyega7kdbtvmofp4usmol2icwn6gy@i46icelwwqh5>
-In-Reply-To: <gcmm23ji4fkcqeshcyiehuyega7kdbtvmofp4usmol2icwn6gy@i46icelwwqh5>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 16 Jan 2026 08:19:07 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqKKBjurY7ZrScayvkTijR-F6GWBofry48xoPFBFi55u4w@mail.gmail.com>
-X-Gm-Features: AZwV_QhaVXIgz8bq4CqPsm9NXLoIfFaoT-4jNhJ-ZskY8n0WuXohQmqAGOhuiUQ
-Message-ID: <CAL_JsqKKBjurY7ZrScayvkTijR-F6GWBofry48xoPFBFi55u4w@mail.gmail.com>
-Subject: Re: [PATCH v4 5/9] dt-bindings: connector: Add PCIe M.2 Mechanical
- Key E connector
-To: Manivannan Sadhasivam <mani@kernel.org>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org
+References: <20260116125803.598552-1-hadess@hadess.net> <20260116125803.598552-3-hadess@hadess.net>
+In-Reply-To: <20260116125803.598552-3-hadess@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 16 Jan 2026 09:35:50 -0500
+X-Gm-Features: AZwV_QiVMz_vuUW_poyiRrsowNxL6bDLqkvSTJYSAO0VLKhj6_FvW25fbZ_PZyI
+Message-ID: <CABBYNZ+Bkeuwogyj3TiZZV=kvv1oAw4y2gt8MfQb-WaYS-zQSQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] Bluetooth: btnxpuart: Remove unneeded CONFIG_PM ifdef
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 15, 2026 at 4:42=E2=80=AFAM Manivannan Sadhasivam <mani@kernel.=
-org> wrote:
->
-> On Wed, Jan 14, 2026 at 11:45:42AM -0600, Rob Herring wrote:
-> > On Wed, Jan 14, 2026 at 10:14=E2=80=AFAM Manivannan Sadhasivam <mani@ke=
-rnel.org> wrote:
-> > >
-> > > On Tue, Jan 13, 2026 at 11:14:24AM -0600, Rob Herring wrote:
-> > > > On Mon, Jan 12, 2026 at 09:56:04PM +0530, Manivannan Sadhasivam wro=
-te:
-> > > > > Add the devicetree binding for PCIe M.2 Mechanical Key E connecto=
-r defined
-> > > > > in the PCI Express M.2 Specification, r4.0, sec 5.1.2. This conne=
-ctor
-> > > > > provides interfaces like PCIe or SDIO to attach the WiFi devices =
-to the
-> > > > > host machine, USB or UART+PCM interfaces to attach the Bluetooth =
-(BT)
-> > > > > devices. Spec also provides an optional interface to connect the =
-UIM card,
-> > > > > but that is not covered in this binding.
-> > > > >
-> > > > > The connector provides a primary power supply of 3.3v, along with=
- an
-> > > > > optional 1.8v VIO supply for the Adapter I/O buffer circuitry ope=
-rating at
-> > > > > 1.8v sideband signaling.
-> > > > >
-> > > > > The connector also supplies optional signals in the form of GPIOs=
- for fine
-> > > > > grained power management.
-> > > > >
-> > > > > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.q=
-ualcomm.com>
-> > > > > ---
-> > > > >  .../bindings/connector/pcie-m2-e-connector.yaml    | 154 +++++++=
-++++++++++++++
-> > > > >  MAINTAINERS                                        |   1 +
-> > > > >  2 files changed, 155 insertions(+)
-> > > > >
-> > > > > diff --git a/Documentation/devicetree/bindings/connector/pcie-m2-=
-e-connector.yaml b/Documentation/devicetree/bindings/connector/pcie-m2-e-co=
-nnector.yaml
-> > > > > new file mode 100644
-> > > > > index 000000000000..b65b39ddfd19
-> > > > > --- /dev/null
-> > > > > +++ b/Documentation/devicetree/bindings/connector/pcie-m2-e-conne=
-ctor.yaml
-> > > > > @@ -0,0 +1,154 @@
-> > > > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > > > > +%YAML 1.2
-> > > > > +---
-> > > > > +$id: http://devicetree.org/schemas/connector/pcie-m2-e-connector=
-.yaml#
-> > > > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > > > > +
-> > > > > +title: PCIe M.2 Mechanical Key E Connector
-> > > > > +
-> > > > > +maintainers:
-> > > > > +  - Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.co=
-m>
-> > > > > +
-> > > > > +description:
-> > > > > +  A PCIe M.2 E connector node represents a physical PCIe M.2 Mec=
-hanical Key E
-> > > > > +  connector. Mechanical Key E connectors are used to connect Wir=
-eless
-> > > > > +  Connectivity devices including combinations of Wi-Fi, BT, NFC =
-to the host
-> > > > > +  machine over interfaces like PCIe/SDIO, USB/UART+PCM, and I2C.
-> > > > > +
-> > > > > +properties:
-> > > > > +  compatible:
-> > > > > +    const: pcie-m2-e-connector
-> > > > > +
-> > > > > +  vpcie3v3-supply:
-> > > > > +    description: A phandle to the regulator for 3.3v supply.
-> > > > > +
-> > > > > +  vpcie1v8-supply:
-> > > > > +    description: A phandle to the regulator for VIO 1.8v supply.
-> > > >
-> > > > I don't see any 1.8V supply on the connector. There are 1.8V IOs an=
-d you
-> > > > may need something in DT to ensure those are powered. However, ther=
-e's
-> > > > no guarantee that it's a single supply.
-> > > >
-> > >
-> > > 1.8v VIO supply is an optional supply and is only required if the pla=
-tform
-> > > supports 1.8v for sideband signals such as PERST#, WAKE#... I can inc=
-lude it in
-> > > the example for completeness.
-> >
-> > My point is that PERST# and WAKE# supplies could be 2 different 1.8V
-> > supplies and those supply the I/O pads of the GPIO pins (and possibly
-> > external pull-ups) that drive them. The 1.8V supply doesn't supply
-> > 1.8V to the slot, so making it a slot/connector property is wrong.
-> >
->
-> Ok, I get your point that VIO 1.8v supply is just limited to the I/O logi=
-c and
-> not the whole card/adapter. But I don't get your multiple supplies concer=
-n. Spec
-> says, "A 1.8 V supply pin called VIO 1.8 V is used to supply the on-Adapt=
-er I/O
-> buffer circuitry operating at 1.8 V." So it implies that either the singl=
-e
-> supply available to the card through VIO might be used to power the whole=
- I/O
-> circuit logic or the card can derive its own 1.8v supply from 3.3v supply=
-.
->
-> So how come the card can have 2 different 1.8v supplies powering the I/O
-> circuitry?
+Hi Bastien,
 
-Is there a pin on the connector for 1.8V supply? I don't have the
-spec, but the pinout I found[1] didn't show one. If there's a pin,
-then I have no concern.
+On Fri, Jan 16, 2026 at 7:58=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
+wrote:
+>
+> The functions are already disabled through the use of pm_ptr() when
+> CONFIG_PM is disabled, and won't be included in the final code if not
+> needed.
 
-Rob
+I guess it would be more correct to say that compilers will detect
+that these functions are not in use (aka. dead code) and just remove
+them.
 
-[1] https://pinoutguide.com/HD/M.2_NGFF_connector_pinout.shtml
+> This increases build coverage and allows to drop an #ifdef.
+>
+> Signed-off-by: Bastien Nocera <hadess@hadess.net>
+> ---
+>  drivers/bluetooth/btnxpuart.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.=
+c
+> index 3b1e9224e965..13daa174aaaa 100644
+> --- a/drivers/bluetooth/btnxpuart.c
+> +++ b/drivers/bluetooth/btnxpuart.c
+> @@ -1947,7 +1947,6 @@ static void nxp_serdev_remove(struct serdev_device =
+*serdev)
+>         hci_free_dev(hdev);
+>  }
+>
+> -#ifdef CONFIG_PM_SLEEP
+>  static int nxp_serdev_suspend(struct device *dev)
+>  {
+>         struct btnxpuart_dev *nxpdev =3D dev_get_drvdata(dev);
+> @@ -1975,7 +1974,6 @@ static int nxp_serdev_resume(struct device *dev)
+>         ps_control(psdata->hdev, PS_STATE_AWAKE);
+>         return 0;
+>  }
+> -#endif
+>
+>  #ifdef CONFIG_DEV_COREDUMP
+>  static void nxp_serdev_coredump(struct device *dev)
+> --
+> 2.52.0
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
