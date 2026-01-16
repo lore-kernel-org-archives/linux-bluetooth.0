@@ -1,161 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C903112BA;
-	Fri, 16 Jan 2026 16:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CB433A6E4
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 17:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768582044; cv=none; b=CpHH+1zZJllEib0iDg220BrLmgi5HwyAMqDH8nbP1uq/CA+bf4OVkPSpq8oI29IWrUnu7d9txabHbV3LKnRCE2V5m3ncyTEle5Qt+ZhNOv4UUwY8/LDpvJwZu01je+QTno2RXsUPYyA9xT20dbyi83Z9i0aDap6lGGeH7hCmIss=
+	t=1768583098; cv=none; b=KSMrF9F6D+JAbb/YER5KnUvDT2Gii3MOwoVyBozyCKPFgEVBuFEbAKUODzUTTCQSJW33pdtaA3JrCKFP4cFEjaSm5/aDGNS5Oqoo98u9d6cMch6PAq5My/WT1BChirKicPfhS7WGjEZaiiEFuUDIihnBIBsxrLiA7XL6ar7OFWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768582044; c=relaxed/simple;
-	bh=e8xHnIXHD8OCRmeLMtgO2Zm2XUqO+KGzAms+Oa6YeZ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aI3B2LZc0/uda21sbA+vYnH+VfSbK4eGCM/LKwG5KDEWTdvXfpAOHaEPRN2CULmzmRAG/wCZmN3Z4W2TlzCU1Q9KH7O9HcDyFTtnODBTWlMxoLHnHKxnDSwmcwKy/37tLe/X6IkBc0ttYhYQxtzus+s2QaaaiHmt6aWEAfE03Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g2KJoYv9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768583098; c=relaxed/simple;
+	bh=zYcI1cjFRwlDJyGxxaLHmTga2z6gYED1iHmw90cn8Ws=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=bbMCJY7LQf1NtWUYCI8T4l1+f4RnJUR/DRO6B40v3eeFpi90z8lTzNgWWX0NJk491Ra47A0abkeHgakUaEn0WxXPLIAnbfjX7ssL5vB7GvM9NFi4R9H4BHSgd4zJM4wzUxdkEVinwC7jIYYLssJGQgXTX0nUY91qKTjoLmF1MS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=GzCFOkWB; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g2KJoYv9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC468C19424;
-	Fri, 16 Jan 2026 16:47:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768582043;
-	bh=e8xHnIXHD8OCRmeLMtgO2Zm2XUqO+KGzAms+Oa6YeZ8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=g2KJoYv9gXTPMov8oaRJTyCyHpsgN9woWts91t4oGjXAjXWIvgRIFSUtKnlRO4Tjr
-	 PPJn91TM3LUzK6DDBaOqbF6LvFpknezv0o/8/dxHY7yxC8R82dPcm9IMPgBm7s1MZp
-	 ns7GHV4BiBM6IJPItVpwxaiBSj2gEvJKddeK56D6jHgiLc9lvLZ57c/7INzY6RRR2S
-	 1Cd+Mo2Juwb9B1IcARkGZrfmiJuBAlUcl17jqDdKKfedWNcmUSmVTFt7vl0ouViLei
-	 dnlqF63eOUoPaNY4wrrPawY3q/Y2Vw1+GLCjFulN2qyaWVSSCtQ9I5vH1NVuAW0xTW
-	 Ebsx6lq+ZzHew==
-Message-ID: <f7c93dbb-9633-4dc5-983e-2f0df13989ce@kernel.org>
-Date: Fri, 16 Jan 2026 17:47:16 +0100
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GzCFOkWB"
+Received: from github.com (hubbernetes-node-5447ff6.ac4-iad.github.net [10.52.205.39])
+	by smtp.github.com (Postfix) with ESMTPA id 2C3F820BCB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 09:04:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1768583096;
+	bh=bDJjNT7kJITbqEJMMByx2aHVva3p0ajhjLTCEd0N2aM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=GzCFOkWBn+I53vK0uyTTyzBom+owkYDGofGmUpohU9DShnDaKloblHxLtJYWXcMZf
+	 PRKHBwoMYNX7Zp4G7L1HCJoPn/jRXuKc/T9bMgLXjdijPAOZXUjw8D+DhXAKSqofE+
+	 GL4IG5DF3dqnZYjQPDG5mqgMycE8xfEncWu3pVAc=
+Date: Fri, 16 Jan 2026 09:04:56 -0800
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1034329/4fd06b-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/14] wifi: ath10k: snoc: support powering on the
- device via pwrseq
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Jeff Johnson <jjohnson@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Matthias Kaehlcke <mka@chromium.org>, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath10k@lists.infradead.org, linux-pm@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-References: <20260106-wcn3990-pwrctl-v2-0-0386204328be@oss.qualcomm.com>
- <20260106-wcn3990-pwrctl-v2-4-0386204328be@oss.qualcomm.com>
- <52b2b799-09e6-40a4-bea8-c7e8bf21cf51@oss.qualcomm.com>
- <15470b51-d398-449d-9017-304df5ad7cef@kernel.org>
- <132c34db-07c6-491b-bfda-f3c51462a184@oss.qualcomm.com>
- <f35b1380-b7d4-45e7-94ad-9f76973d3289@kernel.org>
- <d4ttsbhlw4c2fvgpfwgnc5mdh2egc6nwluj5pmkst2sunpn6m7@7b6by2eboob4>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <d4ttsbhlw4c2fvgpfwgnc5mdh2egc6nwluj5pmkst2sunpn6m7@7b6by2eboob4>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On 16/01/2026 17:41, Dmitry Baryshkov wrote:
-> On Fri, Jan 16, 2026 at 05:08:58PM +0100, Krzysztof Kozlowski wrote:
->> On 16/01/2026 16:18, Jeff Johnson wrote:
->>> On 1/15/2026 11:48 PM, Krzysztof Kozlowski wrote:
->>>> On 15/01/2026 23:30, Jeff Johnson wrote:
->>>>> On 1/5/2026 5:01 PM, Dmitry Baryshkov wrote:
->>>>>> The WCN39xx family of WiFi/BT chips incorporates a simple PMU, spreading
->>>>>> voltages over internal rails. Implement support for using powersequencer
->>>>>> for this family of ATH10k devices in addition to using regulators.
->>>>>>
->>>>>> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
->>>>>> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
->>>>>> ---
->>>>>>  drivers/net/wireless/ath/ath10k/snoc.c | 54 ++++++++++++++++++++++++++++++++--
->>>>>>  drivers/net/wireless/ath/ath10k/snoc.h |  2 ++
->>>>>
->>>>> My automation flagged:
->>>>> * drivers/net/wireless/ath/ath10k/snoc.c has no QTI copyright
->>>>> * drivers/net/wireless/ath/ath10k/snoc.h has no QTI copyright
->>>>> * 2 copyright issues
->>>>>
->>>>> I'll add these manually in my 'pending' branch
->>>>>
->>>>
->>>> And why is this a problem? You are not here to impose Qualcomm rules, bu
->>>> care about Linux kernel. You cannot add copyrights based on what exactly?
->>>
->>> I am a maintainer that is paid by Qualcomm to perform that role, and hence I
->>> have a duty to enforce the legal guidance from Qualcomm when it comes to
->>> contributions from other Qualcomm employees.
->>
->> No, it's not your duty to enforce rules from some other departments or
->> business units. Especially not without agreement of that person. You
->> cannot just add copyrights to other people's commits just because you
->> think that such copyrights should be there. Only the copyright owner -
->> which you did not identify here and email address of contributor does
->> not imply that (you don't even know what work contract a person has) -
->> can add such copyrights.
-> 
-> In this particular usecase Jeff has enough knowledge about me and my
-> working place. I will have to resend the series anyway, but otherwise it
-> was perfectly fine for him to correct the copyright.
+  Branch: refs/heads/1034329
+  Home:   https://github.com/bluez/bluez
 
-Fine, but please do not add copyrights yourself to any of my code. It's
-fine to point is a reviewing comment and expect clarifications on my
-side, I don't find changing people's code and adding there copyrights as
-right way.
-
-Best regards,
-Krzysztof
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
