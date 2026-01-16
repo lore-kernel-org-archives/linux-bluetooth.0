@@ -1,125 +1,108 @@
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E763009C1;
-	Fri, 16 Jan 2026 08:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856B034C121
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 09:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768553983; cv=none; b=IK1x56h44xopr6wwlJ3hBT9rPeQ864W5kYogTZjyt/8RBgwkqhkVd/tQuWSmloDFlPc7B13Wjii48CjeatzBJsMLgSgvkiGn+12c/W0VAwcKwaXWQIIe5rCA2NOxAcXn3eN55g+mcekzNpGsER9JpeMpQ5pJcbBbz4WnAi51hL8=
+	t=1768555235; cv=none; b=C9PouT5LOMJrJtp4UlsAghSdewbM6Jb/3CfnYkMtNJoChbQUw9Sh6CLHSdYeS7iILSU5qQqzZM8jv+5u7itEqfGq8QMobWZfRY1IACnMWTmhzRH2YjmZ7mGBSTrqfkNxnP44yYq29P1O3ByRu7wOi/mqB+hIXnt4poejWDkyaA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768553983; c=relaxed/simple;
-	bh=xzgUddSbKaBkwbY7GiSesJl1Edf0fbwGeuLoOSkGwnQ=;
-	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=sTsdLwF2G+k+ecCvEvUYUu/vGrGiJuWtyh8fPhqPwHQ5LAQAJlIBowkBS+PDXWNQ06wUSzHvQZr3/RR3qM94j0E4zbkGb9e+EnJtRk98QJGa8Vb86o0azuYb5SRYmNc11CUrul1CFyJH+DCDP2aKmr/vAhXwF3YrvXDWKYknzFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=e7W07z1h reason="key not found in DNS"; arc=none smtp.client-ip=129.150.39.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+	s=arc-20240116; t=1768555235; c=relaxed/simple;
+	bh=ykRh+caslnsL7rs3PRC0EI48axBYUPyRgjOFudUhuYM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A7hSr2Cd5oLUBufB5ylJ1DZQwl70dU89i2R7GVsaUqX+TeTPpivva89gJwc/xbO3xB5KRh6rH19/znNOCLYY1wD+FEbkpWspv7/DKtOv+YCEWKybRd/JarDawUEt+9QiTqiy+etbsZsYeemBg5FIC3mkLo8F38nGeowza3h/Ud8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pwW+mmyc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="e7W07z1h"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=stu.xidian.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID;
-	bh=/BrJcE1PsgJ+OzLLASkCs6t1iq33tQqHARF5r+C+qhI=; b=e7W07z1h18ofK
-	23Wwz/oeAM7R7BeyUzubiAUBuFkoXw+by/ssn0HMTkoBUCyXmpxDezfNzG9aMVeA
-	c63biKX0XbPYgd/UuWRumOMTjw189d1uEwgPFpjENrm2264/jvr8KYrRSvUALCFm
-	Yr8sw/c0xpFHv6bmirwnQIwsjytEMw=
-Received: from wangzhi_xd$stu.xidian.edu.cn ( [113.200.174.24] ) by
- ajax-webmail-hzbj-edu-front-4.icoremail.net (Coremail) ; Fri, 16 Jan 2026
- 16:59:22 +0800 (GMT+08:00)
-Date: Fri, 16 Jan 2026 16:59:22 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?546L5b+X?= <wangzhi_xd@stu.xidian.edu.cn>
-To: "Marcel Holtmann" <marcel@holtmann.org>,
-	"Maxim Krasnyansky" <maxk@qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dri-devel@lists.freedesktop.org
-Subject: [BUG] KASAN: null-ptr-deref in h5_recv during HCI UART handling on
- Linux 6.18
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
- 20250410(2f5ccd7f) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-8dfce572-2f24-404d-b59d-0dd2e304114c-icoremail.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pwW+mmyc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44E22C19425
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 09:20:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768555235;
+	bh=ykRh+caslnsL7rs3PRC0EI48axBYUPyRgjOFudUhuYM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=pwW+mmycTpxJZI9IEqLurTYErdQ4YW6yt0VzoNAH6d6bFEJSGsltF8G8qrai/CC5r
+	 0Q9kSssclk25DUgTSyUvM+PSVHdw9aFNTd2hrMpUw3f2gnbtdOXUamB4Bb0PbL9DH9
+	 YVYzxJytEkYdHKyIvvxYPrFkJMHA+ejyCM8JkkrG0QXGZbaRuBJ46XqbDXa9oqH4cI
+	 D5wzdJCjXgkkxHlWMsofNYdoHkXcu9DK9tk4k/tg1j1mGHthcLoCpufRgTCgvDvF9p
+	 Wv+3/EKfbvq2ILdAt8KxBuaB2CQGW1Ualu2PJOChld7ZhxxdPZ5JlpuuLH24jlxiab
+	 I8i0lFM1fktrw==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59b6c13b68dso2604651e87.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 01:20:35 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV0t2FYkDLfx/NaUFItpVzzkEEkgXzXHEa+RmbDw8sxKq6xfAoHIv1XTeG0VbSRV6za9ceDsGTD2qAaBKPH+Iw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/pJyEwlglgQ2rB68FLH319fXuBexBK1vGGQARKLWBQfUwbrRT
+	7M2E0hBh8al9P4qgRu16vgzlN0xvCiGT7tRnJcjJhIZ2X5qxK0bjqytyQEw5U8OxTh6JQmk7HxG
+	Q5i0Gamz4JTVZ74Xli0qLf5XNAXXqt81EUg4W3W87IA==
+X-Received: by 2002:a05:6512:2c91:b0:59b:9ac4:2afe with SMTP id
+ 2adb3069b0e04-59ba718ebacmr1882399e87.12.1768555233917; Fri, 16 Jan 2026
+ 01:20:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <4835da7e.dad1.19bc607dc1b.Coremail.wangzhi_xd@stu.xidian.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:BrQMCkBmzeDq_WlpOAoZAQ--.19452W
-X-CM-SenderInfo: qstqimqsqqliuu6v33wo0lvxldqovvfxof0/1tbiAgUPCGlo+NCX+
-	gAAsE
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+References: <20251107033924.3707495-1-quic_shuaz@quicinc.com>
+ <CAMRc=Mce4KU_zWzbmM=gNzHi4XOGQWdA_MTPBRt15GfnSX5Crg@mail.gmail.com> <212ec89d-0acd-4759-a793-3f25a5fbe778@oss.qualcomm.com>
+In-Reply-To: <212ec89d-0acd-4759-a793-3f25a5fbe778@oss.qualcomm.com>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Fri, 16 Jan 2026 10:20:21 +0100
+X-Gmail-Original-Message-ID: <CAMRc=MdoUvcMrMga6nNYt8d-o8P-r3M_xY_JHznP3ffmZv8vkQ@mail.gmail.com>
+X-Gm-Features: AZwV_QimTjzwHL8e3FnSCZ-a4okZnUriTz72sgP41cuJac4rqIKVV5VOYmjNOT8
+Message-ID: <CAMRc=MdoUvcMrMga6nNYt8d-o8P-r3M_xY_JHznP3ffmZv8vkQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/2] Fix SSR unable to wake up bug
+To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Cc: Shuai Zhang <quic_shuaz@quicinc.com>, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-RGVhciBNYWludGFpbmVycywKCldoZW4gdXNpbmcgb3VyIGN1c3RvbWl6ZWQgU3l6a2FsbGVyIHRv
-IGZ1enogdGhlIGxhdGVzdCBMaW51eCBrZXJuZWwsIHRoZSBmb2xsb3dpbmcgY3Jhc2ggd2FzIHRy
-aWdnZXJlZC4KCkhFQUQgY29tbWl0OjdkMGE2NmU0YmI5MDgxZDc1YzgyZWM0OTU3YzUwMDM0Y2Iw
-ZWE0NDkKZ2l0IHRyZWU6IHVwc3RyZWFtCk91dHB1dDpodHRwczovL2dpdGh1Yi5jb20vbWFudWFs
-MC9jcmFzaC9ibG9iL21haW4vcmVwb3J0XzgyNTBfbHBzcy50eHQKS2VybmVsIGNvbmZpZzogaHR0
-cHM6Ly9naXRodWIuY29tL21hbnVhbDAvY3Jhc2gvYmxvYi9tYWluL2NvbmZpZ19zeXpib3QudHh0
-CkMgcmVwcm9kdWNlcjpodHRwczovL2dpdGh1Yi5jb20vbWFudWFsMC9jcmFzaC9ibG9iL21haW4v
-cmVwcm9fODI1MF9scHNzLmMKU3l6IHJlcHJvZHVjZXI6aHR0cHM6Ly9naXRodWIuY29tL21hbnVh
-bDAvY3Jhc2gvYmxvYi9tYWluL3JlcHJvXzgyNTBfbHBzcy5zeXoKCktBU0FOIHJlcG9ydHMgYSBu
-dWxsLXBvaW50ZXIgZGVyZWZlcmVuY2UgaW4gaDVfcmVjdiB3aXRoaW4gZHJpdmVycy9ibHVldG9v
-dGgvaGNpX2g1LmMgd2hlbiBwcm9jZXNzaW5nIEhDSSBVQVJUIGlucHV0LiBUaGUgaXNzdWUgaXMg
-dHJpZ2dlcmVkIGR1cmluZyBub3JtYWwgaW9jdGwvc3lzY2FsbCBwYXRocyB3aGlsZSByZWNlaXZp
-bmcgZGF0YSB2aWEgaGNpX3VhcnRfdHR5X3JlY2VpdmUuIFRoaXMgaW5kaWNhdGVzIHRoYXQgYSBw
-b2ludGVyIHdhcyB1bmV4cGVjdGVkbHkgTlVMTCB3aGVuIGRlcmVmZXJlbmNlZCwgbGVhZGluZyB0
-byBhIGdlbmVyYWwgcHJvdGVjdGlvbiBmYXVsdCBvbiBhIG5vbi1jYW5vbmljYWwgYWRkcmVzcy4g
-VGhlIGJ1ZyBpcyBjb25zaXN0ZW50bHkgcmVwcm9kdWNpYmxlIHdpdGggb3VyIFN5emthbGxlciBm
-dXp6aW5nIHNldHVwIGFuZCBhZmZlY3RzIHRoZSBCbHVldG9vdGggSDUgZHJpdmVyIHN0YWNrIG9u
-IExpbnV4IDYuMTguCgpJZiB5b3UgZml4IHRoaXMgaXNzdWUsIHBsZWFzZSBhZGQgdGhlIGZvbGxv
-d2luZyB0YWcgdG8gdGhlIGNvbW1pdDoKUmVwb3J0ZWQtYnk6IFpoaSBXYW5nIDx3YW5nemhpQHN0
-dS54aWRpYW4uZWR1LmNuPiwgQmluIFl1PGJ5dUB4aWRpYW4uZWR1LmNuPiwgTWluZ1l1IFdhbmc8
-dzE1MzAzNzQ2MDYyQDE2My5jb20+LCBXZW5KaWFuIEx1PDE5ODYxNzAyNjc4QDE2My5jb20+LCBL
-ZUZlbmcgR2FvPDI0MDE1NTMwNjRAcXEuY29tPgoKCk9vcHM6IGdlbmVyYWwgcHJvdGVjdGlvbiBm
-YXVsdCwgcHJvYmFibHkgZm9yIG5vbi1jYW5vbmljYWwgYWRkcmVzcyAweGRmZmZmYzAwMDAwMDAw
-NWY6IDAwMDAgWyMxXSBTTVAgS0FTQU4gUFRJCktBU0FOOiBudWxsLXB0ci1kZXJlZiBpbiByYW5n
-ZSBbMHgwMDAwMDAwMDAwMDAwMmY4LTB4MDAwMDAwMDAwMDAwMDJmZl0KQ1BVOiAwIFVJRDogMCBQ
-SUQ6IDEwODI2MyBDb21tOiBzeXouMS45ODAzIE5vdCB0YWludGVkIDYuMTguMCAjMSBQUkVFTVBU
-KGZ1bGwpIApIYXJkd2FyZSBuYW1lOiBRRU1VIFN0YW5kYXJkIFBDIChpNDQwRlggKyBQSUlYLCAx
-OTk2KSwgQklPUyByZWwtMS4xNi4zLTAtZ2E2ZWQ2YjcwMWYwYS1wcmVidWlsdC5xZW11Lm9yZyAw
-NC8wMS8yMDE0ClJJUDogMDAxMDpoNV9yZWN2KzB4ZmMvMHg4ZjAgaG9tZS93bXkvRnV6emVyL3Ro
-aXJkX3Rvb2wvbGludXgtNi4xOC9kcml2ZXJzL2JsdWV0b290aC9oY2lfaDUuYzo1NzIKQ29kZTog
-YzEgZTggMDMgNGMgMDEgZjAgNDggODkgNDQgMjQgMDggNDggOGQgODMgMDggMDMgMDAgMDAgNDgg
-ODkgNDQgMjQgMzAgNDggYzEgZTggMDMgNDggODkgNDQgMjQgMTAgZTggNjkgY2MgOGYgZjkgNDgg
-OGIgNDQgMjQgMDggPDgwPiAzOCAwMCAwZiA4NSBhNyAwMSAwMCAwMCA0OCA4OSBlYSA0OCA4OSBl
-OSA0OCA4YiA4MyBmOCAwMiAwMCAwMApSU1A6IDAwMTg6ZmZmZmM5MDAwN2JhZmJlOCBFRkxBR1M6
-IDAwMDEwMjEyClJBWDogZGZmZmZjMDAwMDAwMDA1ZiBSQlg6IDAwMDAwMDAwMDAwMDAwMDAgUkNY
-OiBmZmZmYzkwMDE0MmUyMDAwClJEWDogMDAwMDAwMDAwMDA4MDAwMCBSU0k6IGZmZmZmZmZmODgy
-YThiOTcgUkRJOiAwMDAwMDAwMDAwMDAwMDA1ClJCUDogZmZmZmM5MDAwN2JhZmQ3OCBSMDg6IDAw
-MDAwMDAwMDAwMDAwMDAgUjA5OiBmZmZmZWQxMDA3M2RlMDgzClIxMDogMDAwMDAwMDAwMDAwMDAw
-MSBSMTE6IDAwMDAwMDAwMDAwMDAwMDAgUjEyOiAwMDAwMDAwMDAwMDAwMDAxClIxMzogMDAwMDAw
-MDAwMDAwMDAwMSBSMTQ6IGRmZmZmYzAwMDAwMDAwMDAgUjE1OiBmZmZmODg4MDM5ZWYwNDAwCkZT
-OiAgMDAwMDdmNjk1MzBlMjY0MCgwMDAwKSBHUzpmZmZmODg4MGNmMDAxMDAwKDAwMDApIGtubEdT
-OjAwMDAwMDAwMDAwMDAwMDAKQ1M6ICAwMDEwIERTOiAwMDAwIEVTOiAwMDAwIENSMDogMDAwMDAw
-MDA4MDA1MDAzMwpDUjI6IDAwMDAwMDAwMDAwMDAwMDAgQ1IzOiAwMDAwMDAwMDM2YjYwMDAwIENS
-NDogMDAwMDAwMDAwMDAwMDZmMApDYWxsIFRyYWNlOgogPFRBU0s+CiBoY2lfdWFydF90dHlfcmVj
-ZWl2ZSsweDI1Yi8weDgwMCBob21lL3dteS9GdXp6ZXIvdGhpcmRfdG9vbC9saW51eC02LjE4L2Ry
-aXZlcnMvYmx1ZXRvb3RoL2hjaV9sZGlzYy5jOjYyNwogdGlvY3N0aSBob21lL3dteS9GdXp6ZXIv
-dGhpcmRfdG9vbC9saW51eC02LjE4L2RyaXZlcnMvdHR5L3R0eV9pby5jOjIyOTAgW2lubGluZV0K
-IHR0eV9pb2N0bCsweDUwMi8weDE2OTAgaG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgt
-Ni4xOC9kcml2ZXJzL3R0eS90dHlfaW8uYzoyNzA2CiB2ZnNfaW9jdGwgaG9tZS93bXkvRnV6emVy
-L3RoaXJkX3Rvb2wvbGludXgtNi4xOC9mcy9pb2N0bC5jOjUxIFtpbmxpbmVdCiBfX2RvX3N5c19p
-b2N0bCBob21lL3dteS9GdXp6ZXIvdGhpcmRfdG9vbC9saW51eC02LjE4L2ZzL2lvY3RsLmM6NTk3
-IFtpbmxpbmVdCiBfX3NlX3N5c19pb2N0bCBob21lL3dteS9GdXp6ZXIvdGhpcmRfdG9vbC9saW51
-eC02LjE4L2ZzL2lvY3RsLmM6NTgzIFtpbmxpbmVdCiBfX3g2NF9zeXNfaW9jdGwrMHgxOGYvMHgy
-MTAgaG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9mcy9pb2N0bC5jOjU4Mwog
-ZG9fc3lzY2FsbF94NjQgaG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9hcmNo
-L3g4Ni9lbnRyeS9zeXNjYWxsXzY0LmM6NjMgW2lubGluZV0KIGRvX3N5c2NhbGxfNjQrMHhjYi8w
-eGZhMCBob21lL3dteS9GdXp6ZXIvdGhpcmRfdG9vbC9saW51eC02LjE4L2FyY2gveDg2L2VudHJ5
-L3N5c2NhbGxfNjQuYzo5NAogZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NzcvMHg3
-ZgpSSVA6IDAwMzM6MHg3ZjY5NTIxYjA1OWQKQ29kZTogMDIgYjggZmYgZmYgZmYgZmYgYzMgNjYg
-MGYgMWYgNDQgMDAgMDAgZjMgMGYgMWUgZmEgNDggODkgZjggNDggODkgZjcgNDggODkgZDYgNDgg
-ODkgY2EgNGQgODkgYzIgNGQgODkgYzggNGMgOGIgNGMgMjQgMDggMGYgMDUgPDQ4PiAzZCAwMSBm
-MCBmZiBmZiA3MyAwMSBjMyA0OCBjNyBjMSBhOCBmZiBmZiBmZiBmNyBkOCA2NCA4OSAwMSA0OApS
-U1A6IDAwMmI6MDAwMDdmNjk1MzBlMWY5OCBFRkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAwMDAw
-MDAwMDAwMDAwMDEwClJBWDogZmZmZmZmZmZmZmZmZmZkYSBSQlg6IDAwMDA3ZjY5NTI0MjVmYTAg
-UkNYOiAwMDAwN2Y2OTUyMWIwNTlkClJEWDogMDAwMDIwMDAwMDAwMDA4MCBSU0k6IDAwMDAwMDAw
-MDAwMDU0MTIgUkRJOiAwMDAwMDAwMDAwMDAwMDBjClJCUDogMDAwMDdmNjk1MjI0ZTA3OCBSMDg6
-IDAwMDAwMDAwMDAwMDAwMDAgUjA5OiAwMDAwMDAwMDAwMDAwMDAwClIxMDogMDAwMDAwMDAwMDAw
-MDAwMCBSMTE6IDAwMDAwMDAwMDAwMDAyNDYgUjEyOiAwMDAwMDAwMDAwMDAwMDAwClIxMzogMDAw
-MDdmNjk1MjQyNjAzOCBSMTQ6IDAwMDA3ZjY5NTI0MjVmYTAgUjE1OiAwMDAwN2Y2OTUzMGMyMDAw
-CiA8L1RBU0s+CgpUaGFua3MsClpoaSBXYW5nCgo=
+On Fri, Jan 16, 2026 at 9:37=E2=80=AFAM Shuai Zhang
+<shuai.zhang@oss.qualcomm.com> wrote:
+>
+> Hi Bartosz
+>
+> On 11/7/2025 11:37 PM, Bartosz Golaszewski wrote:
+> > On Fri, 7 Nov 2025 04:39:22 +0100, Shuai Zhang <quic_shuaz@quicinc.com>=
+ said:
+> >> This patch series fixes delayed hw_error handling during SSR.
+> >>
+> >> Patch 1 adds a wakeup to ensure hw_error is processed promptly after c=
+oredump collection.
+> >> Patch 2 corrects the timeout unit from jiffies to ms.
+> >>
+> >> Changes v3:
+> >> - patch2 add Fixes tag
+> >> - Link to v2
+> >>    https://lore.kernel.org/all/20251106140103.1406081-1-quic_shuaz@qui=
+cinc.com/
+> >>
+> >> Changes v2:
+> >> - Split timeout conversion into a separate patch.
+> >> - Clarified commit messages and added test case description.
+> >> - Link to v1
+> >>    https://lore.kernel.org/all/20251104112601.2670019-1-quic_shuaz@qui=
+cinc.com/
+> >>
+> >> Shuai Zhang (2):
+> >>    Bluetooth: qca: Fix delayed hw_error handling due to missing wakeup
+> >>      during SSR
+> >>    Bluetooth: hci_qca: Convert timeout from jiffies to ms
+> >>
+> >>   drivers/bluetooth/hci_qca.c | 6 +++---
+> >>   1 file changed, 3 insertions(+), 3 deletions(-)
+> >>
+> >> --
+> > Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+>   Just a gentle ping. This patch series has been Acked but I haven=E2=80=
+=99t
+> seen it picked up by linux-next.
+>
+> Do you need anything else from me?
+
+I don't pick up bluetooth patches, Luiz or Marcel do.
+
+Thanks,
+Bartosz
