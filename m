@@ -1,101 +1,114 @@
-Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85D120DD51
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 13:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59BAC11CBA
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 13:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768570601; cv=none; b=P3Q1Mf4r5NOX/dTr39EmbGyJihUgzhlnFFiLnt0eZVEWkMfrV4eIJPYs7Btnt6n05QZnb2sHxBLlA9MHkNK3X9FW0E1zkE0aGhaEv8L/2dDkWEJEgosWODVYp5Yv0D/zpgODwvI20LTBAuOiOi0dJNYThiU0HRqlcuc5wY2hL7g=
+	t=1768570603; cv=none; b=tlmU9c5rvI2j4wukyyQx5zcApqR9tY7SNdEjLU98YtZK4ZU3oIkXMNKHHzZosLgCAB1GeJM9+hGEK/ZQYdzR+WBjOXD2AP3937hm3RAoqHL8RAOL2kPP+kjHLMtocf0Qkbw1R6uw56AEehQQ91mrRqEFQjOd+sChHeLA9DOIN/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768570601; c=relaxed/simple;
-	bh=tQzDm5ksJ47Lxtqr2NTZ5oYXtOYq0vzcRE+LNA2OJe4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=IEEMSqq8c7kJP235s2v5ePnD07azEt1+Y/6v1rM2uSFtj9hLhoQ1TPWO0BkANAJ5WJrVZrRW2WVE9ZTNnj8PU2MfZ6mlYif/8iuN38t7uihnL3b+8/26dI3G3vLbY5zgxcD7gx7emyOoRsvCNLV9rJI7937HQKcG9t0uhHkZWwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MluxLA9C; arc=none smtp.client-ip=74.125.82.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MluxLA9C"
-Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-12336c0a8b6so4105958c88.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 05:36:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768570599; x=1769175399; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tQzDm5ksJ47Lxtqr2NTZ5oYXtOYq0vzcRE+LNA2OJe4=;
-        b=MluxLA9CdGjQpjSV0ipHQH+7wIpnEWj8h1p++H+BIPKzXyZZUqN9LPg4gOYqh0iLj/
-         +gbzTwG5HRP9t1fP/tSbJ5iiVeZlXuW8yp6fPonCwJ3mRgND0fubTTveCYQDVpaD0Pjq
-         JNQ5lzOhJfes03cbB21FiiNM9j4wWF+G3HPQaJpu9moOLQt+pAkJH+eru0JUmsOw4iFp
-         aNrMcYXFTRj6zZxLhxS3SoQNb/EDjwLpXW5gOPk3lVgG2MoPoTMnWwPSwbDee6afTe/a
-         utJhvZTwqrIAqkkJE7yk1eF76pzXH6YjmgO4G8vwshnZZaJtG782ZZnAhPpD1rl9kzAf
-         FfFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768570599; x=1769175399;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tQzDm5ksJ47Lxtqr2NTZ5oYXtOYq0vzcRE+LNA2OJe4=;
-        b=ehmwogyYlq8tuv2tVKMOntw3VkQI4bFriZo0d/lNQW/UvN0pUxtvKEUn4iAlYb+Cj3
-         m1SkByFNa6cBzOX5AV3WPyIAsAKvBiP1e3B/iO2sULt2AJqPNR3wAgOgSezMdbJIboHV
-         ri6hMcBONuz5lkaiEGofGaeOPEWSRN5IF4uZn7aGVzMOAij2Y98HBPOK68b3yKzHwI3z
-         Z7ItmOKRDRaaf6MozdDdTRgGL2n8zdrGOxqZizKx4CBQG0Ytmk9xBo7Fz9o+FNACZYFm
-         2zORB0iYnm39ZNhDg2DyKi9oR4JoHRkwJ2erDaY3xnUPMd9PckQ1+Xj/Nr3M6SqrCqmt
-         dNYg==
-X-Gm-Message-State: AOJu0YwKxhcXCqR2lNtYmCjiIM/ToAcDeN8GMTCX3rK8DuWJo9oWWJj1
-	3lwg25aRnWl0I59C3UZlddHUrKNrSE29KoxcBfeMlVLD4xBHud+MbWrpyP5O5oRM
-X-Gm-Gg: AY/fxX7ylig/F73fgAKNrhRbrKy7F60QRuQc1h2ZdWMIJX3dKgAuP9cgsqP1y64fiKm
-	vG1I4vkQYNYqMdqQKlbaPN20gUVMOU8yiUBN0QdnkQDu1dBuXru1ZBWTIGbixXxPJ90H+E8Lu6x
-	w3g7PJ4ZynSWlmDE09uWZYKFddAzA+SWEc2gSAY4++EgNyRdtfLIF401zqrkIXCjQTmV/1oDE1e
-	Y+juLYab2tDOOSAtnYUa7hb2o9XwOz+vynsYbwlrzOI3ST+KvXmPYSU8GS6F+NfOpbeZN78UH5b
-	QuZhQkneMCJL2oGSq3PMLPSwqR4PFBebWp684W3cHMqwFJ8T7rSrxeSd+LToYYcBIeLXlKXkLuZ
-	/uOViVG0ssR55XOyGPg60jvHfqt9k5V2EZpmjpkMwvbXQlZDuI4R5IDx1cHsm7D0k3i/eL3cUq5
-	vLjU11ouEwrk3y/DMp
-X-Received: by 2002:a05:7022:2206:b0:123:3bc6:1ffe with SMTP id a92af1059eb24-1244a70d2e6mr2814420c88.15.1768570599433;
-        Fri, 16 Jan 2026 05:36:39 -0800 (PST)
-Received: from [172.17.0.2] ([104.209.7.232])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244af10e21sm2348457c88.16.2026.01.16.05.36.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 05:36:38 -0800 (PST)
-Message-ID: <696a3ee6.050a0220.150ef5.4fe9@mx.google.com>
-Date: Fri, 16 Jan 2026 05:36:38 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8342116290448063844=="
+	s=arc-20240116; t=1768570603; c=relaxed/simple;
+	bh=VNPpU3kP+9mGZU6XHw0S2/hmxMa4poFxiUJBKNCyfCc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=Z21lFHZZ0oMlkxRCDsQfX0yM/i8xnUs/vvQr7TJj/HhY3/8o6qPGw35okckfUKvpEpd1GxMfXlf1OHlGAJYtnUHAxY5bMjUVbJQDsdKWb9QM2P+MIu48PNw19gaOG+NTskMOVyGRE6gU3AQRHjtIodIb1aEGJQsfyahHunFB94w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8E5AC4C442FC6E;
+	Fri, 16 Jan 2026 14:36:37 +0100 (CET)
+Message-ID: <04d31b37-05c0-4080-b175-56b601e6bb46@molgen.mpg.de>
+Date: Fri, 16 Jan 2026 14:36:37 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: More CONFIG_PM* simplifications
-In-Reply-To: <20260116125803.598552-2-hadess@hadess.net>
-References: <20260116125803.598552-2-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8342116290448063844==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] Bluetooth: btintel: Remove unneeded CONFIG_PM*
+ #ifdef's
+To: Bastien Nocera <hadess@hadess.net>
+References: <20260116125803.598552-1-hadess@hadess.net>
+ <20260116125803.598552-4-hadess@hadess.net>
+Content-Language: en-US
+Cc: linux-bluetooth@vger.kernel.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260116125803.598552-4-hadess@hadess.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: drivers/bluetooth/btmtksdio.c:1472
-error: drivers/bluetooth/btmtksdio.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
+Dear Bastien,
 
 
----
-Regards,
-Linux Bluetooth
+Thank you for your patch.
+
+Am 16.01.26 um 13:50 schrieb Bastien Nocera:
+> The functions are already disabled if CONFIG_PM or CONFIG_PM_SLEEP are
+> disabled through the use of SET_SYSTEM_SLEEP_PM_OPS() and
+> SET_RUNTIME_PM_OPS().
+> 
+> This increases build coverage and allows to drop a few #ifdef's.
+> 
+> Signed-off-by: Bastien Nocera <hadess@hadess.net>
+> ---
+>   drivers/bluetooth/hci_intel.c | 6 ------
+>   1 file changed, 6 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+> index 20baf2895dec..52dca7520fa0 100644
+> --- a/drivers/bluetooth/hci_intel.c
+> +++ b/drivers/bluetooth/hci_intel.c
+> @@ -126,7 +126,6 @@ static int intel_wait_booting(struct hci_uart *hu)
+>   	return err;
+>   }
+>   
+> -#ifdef CONFIG_PM
+>   static int intel_wait_lpm_transaction(struct hci_uart *hu)
+>   {
+>   	struct intel_data *intel = hu->priv;
+> @@ -237,7 +236,6 @@ static int intel_lpm_resume(struct hci_uart *hu)
+>   
+>   	return 0;
+>   }
+> -#endif /* CONFIG_PM */
+>   
+>   static int intel_lpm_host_wake(struct hci_uart *hu)
+>   {
+> @@ -1066,7 +1064,6 @@ static const struct acpi_device_id intel_acpi_match[] = {
+>   MODULE_DEVICE_TABLE(acpi, intel_acpi_match);
+>   #endif
+>   
+> -#ifdef CONFIG_PM
+>   static int intel_suspend_device(struct device *dev)
+>   {
+>   	struct intel_device *idev = dev_get_drvdata(dev);
+> @@ -1090,9 +1087,7 @@ static int intel_resume_device(struct device *dev)
+>   
+>   	return 0;
+>   }
+> -#endif
+>   
+> -#ifdef CONFIG_PM_SLEEP
+>   static int intel_suspend(struct device *dev)
+>   {
+>   	struct intel_device *idev = dev_get_drvdata(dev);
+> @@ -1112,7 +1107,6 @@ static int intel_resume(struct device *dev)
+>   
+>   	return intel_resume_device(dev);
+>   }
+> -#endif
+>   
+>   static const struct dev_pm_ops intel_pm_ops = {
+>   	SET_SYSTEM_SLEEP_PM_OPS(intel_suspend, intel_resume)
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
---===============8342116290448063844==--
+Kind regards,
+
+Paul
