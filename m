@@ -1,407 +1,207 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B90289E06
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 23:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C1527B4F5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 02:57:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768519250; cv=none; b=Wvo9SxruLumDC8HY5pvMc3QWei9FAL1Ou9YobZF10pLYT75E5x2Bod4K2OMYT28fmdfwhsg6EaP2Blad+ugJ3aQlMs5WWoG00JM5QqmupANf2x2NN7s2LAFtsSEnNvKRHZBFcMHJM7KXPzwNXg6AjKPsvzDMRSD33vj8lZC2prc=
+	t=1768532278; cv=none; b=hV9r1vCSrrRN9m/iqa9v8GlIqjn3wgMRHEbXK8LKVd6Y5CkP/qkHX38Tid9O9k9Oa1EF1O/IvMk4TNB75yigVj7YwtBajr1S2QNAGf0Lg5ISbIfORtPgX4QwJyV2cNxTPCbPt6tXWkMHAajlCf/OD0WbmIBdyHRwvbN9ZtGNLEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768519250; c=relaxed/simple;
-	bh=uLWZbt0VVZUkAGHWFkBWaHqDdrMQqi/kvgGbonRifK0=;
-	h=Message-ID:Date:From:To:Cc:Subject:MIME-Version:Content-Type:
-	 Content-Disposition; b=b6U2waJ0qgv54ZIJrpjusDV8kDlM2Wy77OJgsLqRSXkQBQidSq1NzgGpHL+Ucdlw8zSRtcJRP+nDyDA8l8AdnmdCLYHDX/sIsPniPoQNI7/1BrhIP2/9JxbIYwVdgRwLgRhbDcuGL14JZZUIyxXBQRhlHuk+ud1aJaF0pQGceDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fk9L0xaa; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768532278; c=relaxed/simple;
+	bh=mHFtDo1b6G4mIW5vvb4D8Xxgfyc5Fbt63oVVDEDFJcE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dmGSm1zidayuuSeagqS8rOEpfvniZpVB/zUjawyDCb0HgjE1oemJR++Abza4WQDo60B/vQT7BbCSVJke9lQDgIrM2Mggfdybg0d53+M6Vy0N5dqdzejWUgcT02rulr77tcZQuQl8GPKiJX5NfHqHTi+xYPm5NZnvMYLNySvlxAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=hvtn6roK; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=idKNgPg6; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fk9L0xaa"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-29f0f875bc5so10143335ad.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 15:20:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="hvtn6roK";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="idKNgPg6"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60FMhlZi2819530
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 02:57:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=EA0PgA0/LPBITWEYyXie9wh+
+	KymQ/5ynEDnlQXiuIHg=; b=hvtn6roKLvsf+MkLAkKGRtN7OwhnbvBf0c+RrLBA
+	Y+GIhhSS7dxlconWeSpzFS96+pdf7bqyPS4FyCVZVee5A4fAuhntpHPQCYyomOF+
+	l1WhTobjarfja+wJWC+9saFbB7a4GupYMIcqbOrSug8ztV0KWa+3X0Dnl0JbZrA3
+	1kYdnGcr2bVnNkjkuheJEPG+qsh+4iXlElaD+4Sp5kjDqlBIBkq7JtMs9TBNqvpG
+	jUd/+Kwd98BlGcV8+CI7oGvrVZl3tbGOcpqbxCa0rV2RASQT0r1s0PA42F3M3l32
+	DUvlVsp/FEXdYT83Gg9b23XMv7V5fXSAtLxQgYnSpNiAXA==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bq99aghr4-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 02:57:54 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8c6a5bc8c43so198925685a.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jan 2026 18:57:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768519248; x=1769124048; darn=vger.kernel.org;
-        h=content-disposition:mime-version:subject:cc:to:from:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pLzGIxlKGPDbAsK/1di5fB/zw1hRnchiacUNpFnDkjc=;
-        b=fk9L0xaaDNtQ+CpWgQpuB9Pdl+HMR80C8nU5jZyv4dmBSSDv4sXghsTi1Kk6defK5b
-         o8RBiLJjtDM8eaVGbCDFd5lK760oAVQXGMXmSqrvvNPvh0H52TwfhobcR3EorlaivYfn
-         HxcDb8MjL0m7w7WGE/Se07YKGKRx/hiewb7XszB3pcTc9Uc5E6PFYgVtJX8XS+Yh62DG
-         YGJTQDsEyHeX1O90iqIG0yegi4okh8+tWblQI4sTyX8X3v7lEVVaSyLgwlZ1nV6FNV2U
-         qe9Rf8Jqrz23Dgo8CVx588It1wtrPz3TTP/PoVGVid67Gk5fRRLx8Fel2B2oU1VG4S+x
-         pwUQ==
+        d=oss.qualcomm.com; s=google; t=1768532274; x=1769137074; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EA0PgA0/LPBITWEYyXie9wh+KymQ/5ynEDnlQXiuIHg=;
+        b=idKNgPg6HUfeAX3VOfyPWs83CfVdJnvXqWcgz/i88t7ZBSn2o7u7Y85iOYILsNN/mk
+         08d9zPKGIEadLKuGIlOsP6PrmuF1ltcoVPlqTnlthrv/BeQu3Chm40HgSvPTVUUYFr41
+         eZWlrvg9jZ0n5VLYv6nqEnIqnI+y/BP6OAAaxEfbh5pxNH9ZE9Ypo5h21rF2YjCwxb2u
+         Sz1joaqBCl3B62iCDIspaygH+BkKkp1nupNuV2QVL0DcpZJV5dzogqpelDH/Ede3rwZy
+         CHUtvaBcQ8iAQ9b348Nu+uGrKa093RIgKnMSEG9UpQY60Eb5bE8PyXfA1cGkcmWUfVBS
+         So8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768519248; x=1769124048;
-        h=content-disposition:mime-version:subject:cc:to:from:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pLzGIxlKGPDbAsK/1di5fB/zw1hRnchiacUNpFnDkjc=;
-        b=lgQFOmkl8jhcrDcT/SvGlu2Fcs9F6arfdZ6fWd71BMeeD8R40X2fjfvvQALFc3qejm
-         +xAzhYLHmYc6tuCzJyWW9KQyM6K43cm0SYK7b1pxxj9PxCuLn8n4mvvCrtd5zYk3o0Cu
-         90LRubkm+uwqH9G5AXKa6P7po2NLzrRL82+wex/D/bTJwzW1ysmLjPP944jj7jWrhyzw
-         dTu5+kRQzfPfrJ/zqi2qv/feQ6N5bN0bk9aAGkBTRDRhh9k+ygraOSPMI0UN4Ob5unlU
-         ADn7j8/Pb4MJWxZo4oK2gEoFrQl/SO79cbC2sHe2QqZPoS76Ats+De/vaw0OTFgIs01P
-         3JBw==
-X-Gm-Message-State: AOJu0YxXQb5/ZqQbCVxdCiqAHUAv106O5YFkk6mCjtDBqT6q/UDlVjI8
-	njQuMzvZxBZMKZTc0Rpt0GLv8QUS9OM9rS+1fp52MvdD3K9AbC9QjbsZ
-X-Gm-Gg: AY/fxX6UqCjLhv7w8waSfKM03eDzs9Ua5pkHi1DyL+WILFhtk6ofq5+L91eHgY/qs0m
-	gGJzVHYfL47Cs6qOabi7uc0Fs5Nn8gFzU5P2ihOzHo8M67aRacteyicSA4aSO4VALW4OtyWxQlZ
-	m9B/x2dk8AY/GPJaruzlRI/E7TKOiXFBU9iOHUG60g8hHOawwDTn1jfLzuj0xHo7YcLBDd7ErwA
-	9Ekiy7MgiAGM+F3dbfsPAsnIbVEUAps/qh/S5MJ4bZnipJkvAB7hWDMD0AqAuoYGqEM3DfMNI/j
-	VYuCFmlplb73RR0MNNZHCah/5yffIfeuZD8dtQGjr135sfZkTF1v++4vMoZYJC9AMLkDHCEfFMZ
-	9iOm1sqhEKgXk5Ge5z+kg8WP7XxJDOpvswsQ7e8VLhMRuPSHeJ/pBslhdER3Jh5+BOZNW8zzKGZ
-	MztupOjYdebL/B5EkpDE51/1OsvYrnkRr+f+AmIID+oXupKjKO0vuGS0+n7A==
-X-Received: by 2002:a17:902:d48c:b0:2a0:823f:4da6 with SMTP id d9443c01a7336-2a7177da66dmr9690825ad.50.1768519248108;
-        Thu, 15 Jan 2026 15:20:48 -0800 (PST)
-Received: from DESKTOP-85LD9SI. (118-167-197-253.dynamic-ip.hinet.net. [118.167.197.253])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a7190aa31dsm3486785ad.16.2026.01.15.15.20.46
+        d=1e100.net; s=20230601; t=1768532274; x=1769137074;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EA0PgA0/LPBITWEYyXie9wh+KymQ/5ynEDnlQXiuIHg=;
+        b=AQo/Lq4JnQ5JfpMuU394zHBhrGzhdDbpg6pfwTrGzwYxhySuouMCjCfcjOf9k4LAyc
+         dIaaTAh1SneuO0TyV6Jk1AwNrZbuDXuHgn9nU6ALujuwLb0NAevLKoxloFE2Bp2k0YSF
+         CFX9WmbBeOClCiP2wCvAlwhnsI6mrKD6DldX3aMQTHSs90818eD+EQ8SKDyIuJx1n3zY
+         qdLil6GIq+bdJ1Zf1hRg/przF0npdHHUPja7OzNhtWgDnTzkDFB+4MSt6ps57w4Fb1sz
+         Dyu/j+QnF9XtfdpMJowJ0VYDhHQuXO6FUS+qQ8gmRPFr7egiXYovZn4UbbzpEo2xrapO
+         mVWA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSTGT3CKHkoW1gUCM0jInySTlZI1M6cDA08AiK1p1sWfevr0ogTcNW7GqFxu03LyslqITw/q5AvUqR9znbLdU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyQE0ERJvBsWsVxYxNiixdqzyKWeAXh5yqx5F6aIPcyKaOJrmn
+	5edP99FW9IL6M/rzuSn8bdCEkrjxSAzOnoSGRrb7gFKuU3LVltMPGLXu310+VgFiipuB7iSqZsm
+	Vh4zcWtXK0K5iUtjHcp0cZDRQxHC+RCkCHz02xAhVE1R1PPDt/MJw7tXu2H1AcchxygBkAgE=
+X-Gm-Gg: AY/fxX4uenXxYDXQtkLJ2FOIoeKgwzeqBA0fCHOWeK/bkcbXDsKqvglx5YV/xOtYAiK
+	/GZucXUDYJZt11yDrn6XgbfuuMPR/AEhb54phAl9UhtEs2ho4Pe4ykSD/T92HNs0sMgBkvTD5m3
+	ORkXgPnUC5c6PSzTgS6JP+PgHMBawNsE2ExzFhVNlEYjkZJAScpDVUADUP6L9BJCWak3+2RJ4hP
+	V2rPet8gz8/kSILOOrHkigHMQRQ08nfXFigrX0LYubc9THJI88HYb7wtWC0o7bOxDzzuM7uFX8E
+	vS8lo4eGyDOuuT10QLdYZHK7oxWlhNH2YTLFVX3aj78TWplSQasFpft4dES23u1YKiEbv/HK/Lr
+	t8UCDbuOSub8STxzNdZwBQ/dePjktUGaD6/3erfrymbN4A/D8MwidI8ZrhCnP1VOqJsVXnfloil
+	YbuGpcx1r3pq2NPOfgtNggh5c=
+X-Received: by 2002:a05:620a:4544:b0:8c5:2b63:2d21 with SMTP id af79cd13be357-8c6a67bf47bmr235713585a.88.1768532273843;
+        Thu, 15 Jan 2026 18:57:53 -0800 (PST)
+X-Received: by 2002:a05:620a:4544:b0:8c5:2b63:2d21 with SMTP id af79cd13be357-8c6a67bf47bmr235709585a.88.1768532273306;
+        Thu, 15 Jan 2026 18:57:53 -0800 (PST)
+Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-38384f85b8csm3334171fa.37.2026.01.15.18.57.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 15:20:47 -0800 (PST)
-Message-ID: <6969764f.170a0220.2b9fc4.35a7@mx.google.com>
-X-Google-Original-Message-ID: <aWl2TEIjJXjjvhx9@DESKTOP-85LD9SI.>
-Date: Fri, 16 Jan 2026 07:20:44 +0800
-From: JiaHong Su <s11242586@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [BUG] Bluetooth: Use-after-free in hci_uart_write_work
+        Thu, 15 Jan 2026 18:57:51 -0800 (PST)
+Date: Fri, 16 Jan 2026 04:57:48 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Matthias Kaehlcke <mka@chromium.org>, linux-arm-msm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-pm@vger.kernel.org,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v2 04/14] wifi: ath10k: snoc: support powering on the
+ device via pwrseq
+Message-ID: <jxnfzb442ii2ucbttlcu47emycxeqn2bvu5vi6xjdis77hkes7@tshuuiwv6fte>
+References: <20260106-wcn3990-pwrctl-v2-0-0386204328be@oss.qualcomm.com>
+ <20260106-wcn3990-pwrctl-v2-4-0386204328be@oss.qualcomm.com>
+ <6db7a42e-7f12-499b-b36e-687ec93b2e62@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="XWg1CPvSxNCkOuFR"
-Content-Disposition: inline
-
-
---XWg1CPvSxNCkOuFR
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <6db7a42e-7f12-499b-b36e-687ec93b2e62@oss.qualcomm.com>
+X-Proofpoint-ORIG-GUID: CqopEB_f6kWSrpfbYdQnVW3lRR_JBT-j
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE2MDAyMyBTYWx0ZWRfXygzEKW06s9M9
+ cRHt4JSFUM2RZFJrTWNwfZynnpNW3077A79tUVf+8TKnLvDmtaNYcZP1+J0tdKfpOV6ojBW3G9L
+ UtqUwI5TznHHK5YYM94Bp51CnxdjdnyB8JWr6w7Nep2JOZU5gCmJIGhkRJNx5D6Kl5byVMB71TU
+ kfo5vFwlUxXHpvHzEtuUmeSc4ZbAd9GgTOICh52ZM3eKVwgTFVzMsA31Hnjk37PMg1kMrKkgW2K
+ p+S8VS58GNwBp/2Zdf/j3DPErHEHQoTIyHFD7YScpTRFnqi5X4exGI/R8XpD89aUBQ5Pp2e6jkr
+ hJTQdZox8rsKqmp0CL77W6RurJsTGpIJyBlokLCvXoPTT4q4dba/PooXvzwoQHfUK48T5PnzOF2
+ 1guToMkCsJgSCcCnhSF26gHvaHkYswJMkgo8f/a+YeV5bEmjhV3WHMUhj3mVng8/dWatxxxlkZM
+ k+3Gc4JIL8lh7k0nPCw==
+X-Proofpoint-GUID: CqopEB_f6kWSrpfbYdQnVW3lRR_JBT-j
+X-Authority-Analysis: v=2.4 cv=f5ZFxeyM c=1 sm=1 tr=0 ts=6969a932 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=mLrUVEitaDHWRjaOxVAA:9 a=CjuIK1q_8ugA:10 a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-16_01,2026-01-15_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 impostorscore=0 bulkscore=0 adultscore=0 lowpriorityscore=0
+ suspectscore=0 spamscore=0 malwarescore=0 priorityscore=1501 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2512120000 definitions=main-2601160023
 
-Hi,
+On Thu, Jan 15, 2026 at 03:12:19PM -0800, Jeff Johnson wrote:
+> On 1/5/2026 5:01 PM, Dmitry Baryshkov wrote:
+> > @@ -1023,9 +1024,15 @@ static int ath10k_hw_power_on(struct ath10k *ar)
+> >  
+> >  	ath10k_dbg(ar, ATH10K_DBG_SNOC, "soc power on\n");
+> >  
+> > +	if (ar_snoc->pwrseq) {
+> > +		ret = pwrseq_power_on(ar_snoc->pwrseq);
+> > +		if (ret)
+> > +			return ret;
+> > +	}
+> > +
+> >  	ret = regulator_bulk_enable(ar_snoc->num_vregs, ar_snoc->vregs);
+> >  	if (ret)
+> > -		return ret;
+> > +		goto pwrseq_off;
+> >  
+> >  	ret = clk_bulk_prepare_enable(ar_snoc->num_clks, ar_snoc->clks);
+> >  	if (ret)
+> > @@ -1035,18 +1042,28 @@ static int ath10k_hw_power_on(struct ath10k *ar)
+> >  
+> >  vreg_off:
+> >  	regulator_bulk_disable(ar_snoc->num_vregs, ar_snoc->vregs);
+> > +pwrseq_off:
+> > +	pwrseq_power_off(ar_snoc->pwrseq);
+> 
+> in this function you conditionally call pwrseq_power_on()
+> but on error you unconditionally call pwrseq_power_off()
+> 
+> in the below function you conditionally call pwrseq_power_off()
+> 
+> so there is inconsistency.
+> 
+> note that both pwrseq_power_on() and pwrseq_power_off() handle a NULL
+> pwrseq_desc so is there any reason to not just call both both functions
+> unconditionally everywhere?
 
-Found a use-after-free in hci_uart_write_work when running Syzkaller on
-Linux 6.19-rc5 (commit 0f61b18).
+Indeed, it should not be necessary. I'll send a new iteration (and also
+update the copyright).
 
-KASAN reports null-ptr-deref in the workqueue handler, looks like the
-work wasn't cancelled before the structure got freed.
+> 
+> > +
+> >  	return ret;
+> >  }
+> >  
+> >  static int ath10k_hw_power_off(struct ath10k *ar)
+> >  {
+> >  	struct ath10k_snoc *ar_snoc = ath10k_snoc_priv(ar);
+> > +	int ret_seq = 0;
+> > +	int ret_vreg;
+> >  
+> >  	ath10k_dbg(ar, ATH10K_DBG_SNOC, "soc power off\n");
+> >  
+> >  	clk_bulk_disable_unprepare(ar_snoc->num_clks, ar_snoc->clks);
+> >  
+> > -	return regulator_bulk_disable(ar_snoc->num_vregs, ar_snoc->vregs);
+> > +	ret_vreg = regulator_bulk_disable(ar_snoc->num_vregs, ar_snoc->vregs);
+> > +
+> > +	if (ar_snoc->pwrseq)
+> > +		ret_seq = pwrseq_power_off(ar_snoc->pwrseq);
+> > +
+> > +	return ret_vreg ? : ret_seq;
+> >  }
+> >  
+> >  static void ath10k_snoc_wlan_disable(struct ath10k *ar)
 
-C reproducer and dmesg attached.
-
-Thanks,
-JiaHong Su
-
---XWg1CPvSxNCkOuFR
-Content-Type: text/x-csrc; charset=us-ascii
-Content-Disposition: attachment; filename="repro.c"
-
-// autogenerated by syzkaller (https://github.com/google/syzkaller)
-
-#define _GNU_SOURCE 
-
-#include <dirent.h>
-#include <endian.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/prctl.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <unistd.h>
-
-static unsigned long long procid;
-
-static void sleep_ms(uint64_t ms)
-{
-	usleep(ms * 1000);
-}
-
-static uint64_t current_time_ms(void)
-{
-	struct timespec ts;
-	if (clock_gettime(CLOCK_MONOTONIC, &ts))
-	exit(1);
-	return (uint64_t)ts.tv_sec * 1000 + (uint64_t)ts.tv_nsec / 1000000;
-}
-
-static bool write_file(const char* file, const char* what, ...)
-{
-	char buf[1024];
-	va_list args;
-	va_start(args, what);
-	vsnprintf(buf, sizeof(buf), what, args);
-	va_end(args);
-	buf[sizeof(buf) - 1] = 0;
-	int len = strlen(buf);
-	int fd = open(file, O_WRONLY | O_CLOEXEC);
-	if (fd == -1)
-		return false;
-	if (write(fd, buf, len) != len) {
-		int err = errno;
-		close(fd);
-		errno = err;
-		return false;
-	}
-	close(fd);
-	return true;
-}
-
-static void kill_and_wait(int pid, int* status)
-{
-	kill(-pid, SIGKILL);
-	kill(pid, SIGKILL);
-	for (int i = 0; i < 100; i++) {
-		if (waitpid(-1, status, WNOHANG | __WALL) == pid)
-			return;
-		usleep(1000);
-	}
-	DIR* dir = opendir("/sys/fs/fuse/connections");
-	if (dir) {
-		for (;;) {
-			struct dirent* ent = readdir(dir);
-			if (!ent)
-				break;
-			if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
-				continue;
-			char abort[300];
-			snprintf(abort, sizeof(abort), "/sys/fs/fuse/connections/%s/abort", ent->d_name);
-			int fd = open(abort, O_WRONLY);
-			if (fd == -1) {
-				continue;
-			}
-			if (write(fd, abort, 1) < 0) {
-			}
-			close(fd);
-		}
-		closedir(dir);
-	} else {
-	}
-	while (waitpid(-1, status, __WALL) != pid) {
-	}
-}
-
-static void setup_test()
-{
-	prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
-	setpgrp();
-	write_file("/proc/self/oom_score_adj", "1000");
-}
-
-static void execute_one(void);
-
-#define WAIT_FLAGS __WALL
-
-static void loop(void)
-{
-	int iter = 0;
-	for (;; iter++) {
-		int pid = fork();
-		if (pid < 0)
-	exit(1);
-		if (pid == 0) {
-			setup_test();
-			execute_one();
-			exit(0);
-		}
-		int status = 0;
-		uint64_t start = current_time_ms();
-		for (;;) {
-			sleep_ms(10);
-			if (waitpid(-1, &status, WNOHANG | WAIT_FLAGS) == pid)
-				break;
-			if (current_time_ms() - start < 5000)
-				continue;
-			kill_and_wait(pid, &status);
-			break;
-		}
-	}
-}
-
-uint64_t r[2] = {0xffffffffffffffff, 0xffffffffffffffff};
-
-void execute_one(void)
-{
-		intptr_t res = 0;
-	if (write(1, "executing program\n", sizeof("executing program\n") - 1)) {}
-//  openat$ttyprintk arguments: [
-//    fd: const = 0xffffffffffffff9c (8 bytes)
-//    file: ptr[in, buffer] {
-//      buffer: {2f 64 65 76 2f 74 74 79 70 72 69 6e 74 6b 00} (length 0xf)
-//    }
-//    flags: open_flags = 0x1 (4 bytes)
-//    mode: const = 0x0 (2 bytes)
-//  ]
-//  returns fd_tty
-memcpy((void*)0x200000003040, "/dev/ttyprintk\000", 15);
-	res = syscall(__NR_openat, /*fd=*/0xffffffffffffff9cul, /*file=*/0x200000003040ul, /*flags=O_WRONLY*/1, /*mode=*/0);
-	if (res != -1)
-		r[0] = res;
-//  ioctl$TIOCSETD arguments: [
-//    fd: fd_tty (resource)
-//    cmd: const = 0x5423 (4 bytes)
-//    arg: ptr[in, int32] {
-//      int32 = 0x14 (4 bytes)
-//    }
-//  ]
-*(uint32_t*)0x200000000000 = 0x14;
-	syscall(__NR_ioctl, /*fd=*/r[0], /*cmd=*/0x5423, /*arg=*/0x200000000000ul);
-//  ioctl$TIOCVHANGUP arguments: [
-//    fd: fd_tty (resource)
-//    cmd: const = 0x5437 (4 bytes)
-//    arg: const = 0x0 (8 bytes)
-//  ]
-	syscall(__NR_ioctl, /*fd=*/r[0], /*cmd=*/0x5437, /*arg=*/0ul);
-//  openat$ttyprintk arguments: [
-//    fd: const = 0xffffffffffffff9c (8 bytes)
-//    file: ptr[in, buffer] {
-//      buffer: {2f 64 65 76 2f 74 74 79 70 72 69 6e 74 6b 00} (length 0xf)
-//    }
-//    flags: open_flags = 0x1 (4 bytes)
-//    mode: const = 0x0 (2 bytes)
-//  ]
-//  returns fd_tty
-memcpy((void*)0x200000003040, "/dev/ttyprintk\000", 15);
-	res = syscall(__NR_openat, /*fd=*/0xffffffffffffff9cul, /*file=*/0x200000003040ul, /*flags=O_WRONLY*/1, /*mode=*/0);
-	if (res != -1)
-		r[1] = res;
-//  ioctl$TIOCSETD arguments: [
-//    fd: fd_tty (resource)
-//    cmd: const = 0x5423 (4 bytes)
-//    arg: ptr[in, int32] {
-//      int32 = 0xf (4 bytes)
-//    }
-//  ]
-*(uint32_t*)0x200000000080 = 0xf;
-	syscall(__NR_ioctl, /*fd=*/r[1], /*cmd=*/0x5423, /*arg=*/0x200000000080ul);
-//  ioctl$TCFLSH arguments: [
-//    fd: fd_tty (resource)
-//    cmd: const = 0x400455c8 (4 bytes)
-//    arg: intptr = 0xb (8 bytes)
-//  ]
-	syscall(__NR_ioctl, /*fd=*/r[1], /*cmd=*/0x400455c8, /*arg=*/0xbul);
-
-}
-int main(void)
-{
-		syscall(__NR_mmap, /*addr=*/0x1ffffffff000ul, /*len=*/0x1000ul, /*prot=*/0ul, /*flags=MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE*/0x32ul, /*fd=*/(intptr_t)-1, /*offset=*/0ul);
-	syscall(__NR_mmap, /*addr=*/0x200000000000ul, /*len=*/0x1000000ul, /*prot=PROT_WRITE|PROT_READ|PROT_EXEC*/7ul, /*flags=MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE*/0x32ul, /*fd=*/(intptr_t)-1, /*offset=*/0ul);
-	syscall(__NR_mmap, /*addr=*/0x200001000000ul, /*len=*/0x1000ul, /*prot=*/0ul, /*flags=MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE*/0x32ul, /*fd=*/(intptr_t)-1, /*offset=*/0ul);
-	const char* reason;
-	(void)reason;
-	for (procid = 0; procid < 8; procid++) {
-		if (fork() == 0) {
-			loop();
-		}
-	}
-	sleep(1000000);
-	return 0;
-}
-
-
---XWg1CPvSxNCkOuFR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename=report
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000007: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
-CPU: 0 UID: 0 PID: 11930 Comm: kworker/0:8 Tainted: G             L      6.19.0-rc5 #11 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
-Workqueue: events hci_uart_write_work
-RIP: 0010:kasan_byte_accessible+0x15/0x30 mm/kasan/generic.c:210
-Code: 00 00 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 40 d6 48 b8 00 00 00 00 00 fc ff df 48 c1 ef 03 48 01 c7 <0f> b6 07 3c 07 0f 96 c0 e9 8e a0 37 09 66 66 2e 0f 1f 84 00 00 00
-RSP: 0018:ffffc900029ffa60 EFLAGS: 00010082
-RAX: dffffc0000000000 RBX: 0000000000000001 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8b5b2d9d RDI: dffffc0000000007
-RBP: 0000000000000038 R08: 0000000000000001 R09: 0000000000000000
-R10: ffffffff906888d7 R11: 0000000000000002 R12: 0000000000000000
-R13: ffffffff8b5b2d9d R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff888097d23000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f3e61db0bd8 CR3: 0000000026850000 CR4: 0000000000752ef0
-DR0: 00000000000007ff DR1: 0000000000000005 DR2: 0000000000000000
-DR3: 00000000000084e9 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-PKRU: 55555554
-Call Trace:
- <TASK>
- __kasan_check_byte+0x14/0x50 mm/kasan/common.c:573
- kasan_check_byte include/linux/kasan.h:402 [inline]
- lock_acquire kernel/locking/lockdep.c:5842 [inline]
- lock_acquire+0xfd/0x330 kernel/locking/lockdep.c:5825
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0x3d/0x60 kernel/locking/spinlock.c:162
- skb_dequeue+0x20/0x180 net/core/skbuff.c:3937
- mrvl_dequeue+0x3f/0xb0 drivers/bluetooth/hci_mrvl.c:126
- hci_uart_dequeue drivers/bluetooth/hci_ldisc.c:107 [inline]
- hci_uart_write_work+0x4d5/0x940 drivers/bluetooth/hci_ldisc.c:161
- process_one_work+0x992/0x1b00 kernel/workqueue.c:3257
- process_scheduled_works kernel/workqueue.c:3340 [inline]
- worker_thread+0x67e/0xe90 kernel/workqueue.c:3421
- kthread+0x3d0/0x780 kernel/kthread.c:463
- ret_from_fork+0x966/0xaf0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:kasan_byte_accessible+0x15/0x30 mm/kasan/generic.c:210
-Code: 00 00 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 40 d6 48 b8 00 00 00 00 00 fc ff df 48 c1 ef 03 48 01 c7 <0f> b6 07 3c 07 0f 96 c0 e9 8e a0 37 09 66 66 2e 0f 1f 84 00 00 00
-RSP: 0018:ffffc900029ffa60 EFLAGS: 00010082
-RAX: dffffc0000000000 RBX: 0000000000000001 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8b5b2d9d RDI: dffffc0000000007
-RBP: 0000000000000038 R08: 0000000000000001 R09: 0000000000000000
-R10: ffffffff906888d7 R11: 0000000000000002 R12: 0000000000000000
-R13: ffffffff8b5b2d9d R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff888097d23000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f3e61db0bd8 CR3: 0000000026850000 CR4: 0000000000752ef0
-DR0: 00000000000007ff DR1: 0000000000000005 DR2: 0000000000000000
-DR3: 00000000000084e9 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-PKRU: 55555554
-----------------
-Code disassembly (best guess):
-   0:	00 00                	add    %al,(%rax)
-   2:	0f 1f 00             	nopl   (%rax)
-   5:	90                   	nop
-   6:	90                   	nop
-   7:	90                   	nop
-   8:	90                   	nop
-   9:	90                   	nop
-   a:	90                   	nop
-   b:	90                   	nop
-   c:	90                   	nop
-   d:	90                   	nop
-   e:	90                   	nop
-   f:	90                   	nop
-  10:	90                   	nop
-  11:	90                   	nop
-  12:	90                   	nop
-  13:	90                   	nop
-  14:	90                   	nop
-  15:	0f 1f 40 d6          	nopl   -0x2a(%rax)
-  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  20:	fc ff df
-  23:	48 c1 ef 03          	shr    $0x3,%rdi
-  27:	48 01 c7             	add    %rax,%rdi
-* 2a:	0f b6 07             	movzbl (%rdi),%eax <-- trapping instruction
-  2d:	3c 07                	cmp    $0x7,%al
-  2f:	0f 96 c0             	setbe  %al
-  32:	e9 8e a0 37 09       	jmpq   0x937a0c5
-  37:	66                   	data16
-  38:	66                   	data16
-  39:	2e                   	cs
-  3a:	0f                   	.byte 0xf
-  3b:	1f                   	(bad)
-  3c:	84 00                	test   %al,(%rax)
-
-<<<<<<<<<<<<<<< tail report >>>>>>>>>>>>>>>
-
---XWg1CPvSxNCkOuFR--
+-- 
+With best wishes
+Dmitry
