@@ -1,72 +1,104 @@
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2C22236E0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 12:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E46313C9C4
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 13:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768568313; cv=none; b=Jf/TGM7QWoECXoA57E41X+7UoRzAyBECADN35ozKZGNElfvDrSYSUodvKc2zaBHJZlfnGa4nh3y3ntfgzqXI2zDgH1uj9ISkIj3/cJfpR10IFLTTtU117pXMFXrg2Dda01o6vfXnzqC6U47lfguQZ16E6uMg+gadEDymmK3Z7Vc=
+	t=1768570434; cv=none; b=PpGHZ8BwYZzGHFOEZir8UJyF4waudwd8g7f6czMr0rtZfWL07PJVLA7ymEnjDlOoqB6aQKGRuip59IVpU5rKxdRGMoOgWQv5kRW0Dd4FG4W/HCqzqrfzcuD5h+dwmurQcekUJfzn+xxiU0jdqohvsupCu049YiE9gBQh4yNaaYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768568313; c=relaxed/simple;
-	bh=SAYb7YSxG8LaPVFrVlBWms+9YMCKNP7EIb1K3TN6A6A=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=auT+AvrythxyEOA4BqXOSFGnQ2tzH7ZgMSmBlbKwpXTFYyK7noKFDropTTV7EDtxNKEhqtU9vzUoh0Kc0P5ZPCDTeew5+Re87MBQXz5hyHzbQQimq4bnbZ61YNPGBdk5sAVdTPvVhOrGhpG5kAoC/4xmO+cql3+WRI90+N4QJEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 719B8442EC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 12:58:12 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: btnxpuart: Remove unneeded CONFIG_PM ifdef
-Date: Fri, 16 Jan 2026 13:50:43 +0100
-Message-ID: <20260116125803.598552-3-hadess@hadess.net>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260116125803.598552-1-hadess@hadess.net>
-References: <20260116125803.598552-1-hadess@hadess.net>
+	s=arc-20240116; t=1768570434; c=relaxed/simple;
+	bh=HKfZAu36zFTLoNGU//bO14dU+hoLm4QXvYTAbGPImtc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=Cl4vzJIA3qkG76W1mOnN8Jb5eESFYh1ZduoJntxIRcoZ510wfdUYbHV5qX7wqGh2GbGD52cc+kuWgZU6d6NA5o5FMDCWUwVj/TURfKoVdlX0MMDLB8/UAIB6UXNVZMuK9lqzCTnsLFmTn7+HmB3UnH13LdHVQXgl3Qkoa3pGW6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id C883E4C442FC58;
+	Fri, 16 Jan 2026 14:33:46 +0100 (CET)
+Message-ID: <ebecbe2f-d770-477c-ab61-7513dc95b7a6@molgen.mpg.de>
+Date: Fri, 16 Jan 2026 14:33:46 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvdekleelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeekteetgeettdehieduiedttdetffelleehtdejkeeluedvgfffvdevteetudfhkeenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeejudelueekgeegvdfgvedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] Bluetooth: btmtksdio: Simplify dev_pm_ops usage
+To: Bastien Nocera <hadess@hadess.net>
+References: <20260116125803.598552-1-hadess@hadess.net>
+ <20260116125803.598552-2-hadess@hadess.net>
+Content-Language: en-US
+Cc: linux-bluetooth@vger.kernel.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260116125803.598552-2-hadess@hadess.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The functions are already disabled through the use of pm_ptr() when
-CONFIG_PM is disabled, and won't be included in the final code if not
-needed.
+Dear Bastien,
 
-This increases build coverage and allows to drop an #ifdef.
 
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
----
- drivers/bluetooth/btnxpuart.c | 2 --
- 1 file changed, 2 deletions(-)
+Thank you for your patch.
 
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index 3b1e9224e965..13daa174aaaa 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -1947,7 +1947,6 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
- 	hci_free_dev(hdev);
- }
- 
--#ifdef CONFIG_PM_SLEEP
- static int nxp_serdev_suspend(struct device *dev)
- {
- 	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
-@@ -1975,7 +1974,6 @@ static int nxp_serdev_resume(struct device *dev)
- 	ps_control(psdata->hdev, PS_STATE_AWAKE);
- 	return 0;
- }
--#endif
- 
- #ifdef CONFIG_DEV_COREDUMP
- static void nxp_serdev_coredump(struct device *dev)
--- 
-2.52.0
+Am 16.01.26 um 13:50 schrieb Bastien Nocera:
+> This increases build coverage and allows to drop a few #ifdef's.
+
+Should you resend, you could elaborate on the difference between 
+SYSTEM_SLEEP_PM_OPS and SET_SYSTEM_SLEEP_PM_OPS.
+
+> Signed-off-by: Bastien Nocera <hadess@hadess.net>
+> ---
+>   drivers/bluetooth/btmtksdio.c | 12 +++---------
+>   1 file changed, 3 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> index fba3ab6d30a5..ec17521d5b9f 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -1472,7 +1472,6 @@ static void btmtksdio_remove(struct sdio_func *func)
+>   	hci_free_dev(hdev);
+>   }
+>   
+> -#ifdef CONFIG_PM
+>   static int btmtksdio_runtime_suspend(struct device *dev)
+>   {
+>   	struct sdio_func *func = dev_to_sdio_func(dev);
+> @@ -1538,22 +1537,17 @@ static int btmtksdio_system_resume(struct device *dev)
+>   }
+>   
+>   static const struct dev_pm_ops btmtksdio_pm_ops = {
+> -	SYSTEM_SLEEP_PM_OPS(btmtksdio_system_suspend, btmtksdio_system_resume)
+> -	RUNTIME_PM_OPS(btmtksdio_runtime_suspend, btmtksdio_runtime_resume, NULL)
+> +	SET_SYSTEM_SLEEP_PM_OPS(btmtksdio_system_suspend, btmtksdio_system_resume)
+> +	SET_RUNTIME_PM_OPS(btmtksdio_runtime_suspend, btmtksdio_runtime_resume, NULL)
+>   };
+>   
+> -#define BTMTKSDIO_PM_OPS (&btmtksdio_pm_ops)
+> -#else	/* CONFIG_PM */
+> -#define BTMTKSDIO_PM_OPS NULL
+> -#endif	/* CONFIG_PM */
+> -
+>   static struct sdio_driver btmtksdio_driver = {
+>   	.name		= "btmtksdio",
+>   	.probe		= btmtksdio_probe,
+>   	.remove		= btmtksdio_remove,
+>   	.id_table	= btmtksdio_table,
+>   	.drv = {
+> -		.pm = BTMTKSDIO_PM_OPS,
+> +		.pm = &btmtksdio_pm_ops,
+>   	}
+>   };
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
