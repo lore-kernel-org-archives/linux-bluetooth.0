@@ -1,128 +1,215 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018C52566F7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jan 2026 21:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99DC42D73B5
+	for <linux-bluetooth@vger.kernel.org>; Sun, 18 Jan 2026 10:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768600225; cv=none; b=M7gvHq5ZEUVOaYnSan7vR/WnKBl8l3yRu4SpzCuksIlmuL4eeTslm5SsgxU7brFmrDvb8rMjzgDXJwuxW5TE5CcoJnuhNiFk01tj9VneaF7BX++5hmsY9k+Mc8+O2Ul++zCWFLUu8HNwwm2mWcrVxoia3BCZcTxikbQQ2EnQiL8=
+	t=1768731103; cv=none; b=oDWG0H74w5KrSf/phr13jOcaWy94Iixy1NltBWXJ4PKRttZmR49rfOpY/j61VUBuAKhsPtA6TNVSU4NKOqBgFX75V6Y8GD0DXyqxOburIpsuoimjdugjIWlNTsLYYDw+fwNQJxLNjAxZad/nCt9QxSGBa77Vvszw5pN/rX6Qjr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768600225; c=relaxed/simple;
-	bh=fF8lfZA+aQ0843Df3tGPAqtL39ko7kSyh1RXD5llta0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pkyKlI6E9o5oOsLa2Ay014Ek5TIW/88+XvkJxiY0YwUSgH/2p6AmiVnCD0gI08T5F785YLHMNDO7sINCWPyX1xuHrgvzwkvlkolPkZAwKuUbq9UG/RiHUA6NX1JS8GAo6PfUEG1lWuuhBUxXv+9yQ3nBkqJF5nKeLwmc/AXZ/xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gIUTJAHT; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1768731103; c=relaxed/simple;
+	bh=QRJDVO7ul0pMJI9rkaq0mvjAsTvDV8JJ1Mowtb5IoM0=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=CLzcH/B6H0jOkYgmFlM/gW+I/FGebctd+RohjudKbQ/BRCGorRn5w07pCxRAk71tK2EGhfLUb2ZsAqBeS32YmYGkTNBAqBnU98GqTMl5aJiJwQfhPWy6rBtyGSsW3PiAvU+ETF+X49U9+B5t6LYOqsxNZ2iScLCjahr4erZrFZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M8yHkOTB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gIUTJAHT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768600224; x=1800136224;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fF8lfZA+aQ0843Df3tGPAqtL39ko7kSyh1RXD5llta0=;
-  b=gIUTJAHT8pYmKUKDVtcD6reUNlx5ToAbXFXK1WyDgYoJ5VZUgZtnaj9y
-   qM5XVSMr5umzA1Zxs4DRoonb6KVDGHn8hfWiJpXGNqVJ4RySXEYn6nkCc
-   Vgk1pTKyjdPxafAzVhqXzJTtTknVsussVvdDJCzBJP6LSYohSLvd5Sour
-   RqhsNo7Ny4VDdWJ89ueDRsBgvdMM1oIyfu76yakXpuDcPMhlnkbWa7qsh
-   eS5a7OYl6ekEoSPx4CMBXxGPUBHtT5d3eeGVmX7eGXajDRpizDZUZv8ob
-   Cb6UtXjyd8qVNDziJRBzhcCAHlJb8ltGcxOmprh/zpYJtjjq6sJNt6RhR
-   A==;
-X-CSE-ConnectionGUID: qhk59zk6Qk+tYSEF9RyxWA==
-X-CSE-MsgGUID: 8eXlQ8z/QlCmTKeHMieOEA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="81364044"
-X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
-   d="scan'208";a="81364044"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 13:50:24 -0800
-X-CSE-ConnectionGUID: r5r5+870SVCDJ7FJTvTdHQ==
-X-CSE-MsgGUID: E9W7NGEuSz+w07Dgnd4ssw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
-   d="scan'208";a="210357911"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 16 Jan 2026 13:50:22 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vgrhz-00000000LHY-3kZt;
-	Fri, 16 Jan 2026 21:50:19 +0000
-Date: Sat, 17 Jan 2026 05:49:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH 3/3] Bluetooth: btintel: Remove unneeded CONFIG_PM*
- #ifdef's
-Message-ID: <202601170613.lx6wk4st-lkp@intel.com>
-References: <20260116125803.598552-4-hadess@hadess.net>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M8yHkOTB"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 457CCC19425
+	for <linux-bluetooth@vger.kernel.org>; Sun, 18 Jan 2026 10:11:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768731103;
+	bh=QRJDVO7ul0pMJI9rkaq0mvjAsTvDV8JJ1Mowtb5IoM0=;
+	h=From:To:Subject:Date:From;
+	b=M8yHkOTBV62LebYnnVIFo9bdnrxhCHmHwgqKeZdJ04I58eYRi3MksEMuIVuF46gCS
+	 brjoD/z4ojBw9CsJyawYAMAykhZ+dClKWEzjI5R9maCXMwm2jp70no1eJD0pdmoew8
+	 e1wDZ48OnWO9o2Hjo3wJA2vD2mO71FEJn8voN4dLTGzDXe51giEog0m6epV6+kOvl0
+	 Xeb5PCRk4jeFRxcjKTaOTpLj8fv6gvyxdPpdutmkHfbF9yG1jbRTIXEJDGABsIEeju
+	 tfxGqnBQHCtK9MH1RLnl4ts7MjNCobszvSWibhR5Ue/xkOyNuKPqzl1qUYZiWxeYW4
+	 roOPz0beOmdVQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 3337DC4160E; Sun, 18 Jan 2026 10:11:43 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220990] New: hci_uart_bcm: BCM43341 on Intel Atom (serdev)
+ fails init (MTU 0:0, DOWN RAW)
+Date: Sun, 18 Jan 2026 10:11:42 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: bugzilla@emircanerkul.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-220990-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260116125803.598552-4-hadess@hadess.net>
 
-Hi Bastien,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220990
 
-kernel test robot noticed the following build warnings:
+            Bug ID: 220990
+           Summary: hci_uart_bcm: BCM43341 on Intel Atom (serdev) fails
+                    init (MTU 0:0, DOWN RAW)
+           Product: Drivers
+           Version: 2.5
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: bugzilla@emircanerkul.com
+        Regression: No
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on linus/master v6.19-rc5]
-[cannot apply to bluetooth-next/master next-20260116]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Created attachment 309211
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D309211&action=3Dedit
+fix for llm models
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bastien-Nocera/Bluetooth-btmtksdio-Simplify-dev_pm_ops-usage/20260116-210400
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20260116125803.598552-4-hadess%40hadess.net
-patch subject: [PATCH 3/3] Bluetooth: btintel: Remove unneeded CONFIG_PM* #ifdef's
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260117/202601170613.lx6wk4st-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260117/202601170613.lx6wk4st-lkp@intel.com/reproduce)
+I applied solution in https://bugzilla.kernel.org/show_bug.cgi?id=3D100461
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601170613.lx6wk4st-lkp@intel.com/
+But now it do not detect my devices.
 
-All warnings (new ones prefixed by >>):
+=E2=9D=AF bluetoothctl=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+hci0 new_settings: powered bondable ssp br/edr le secure-conn=20
+Agent registered
+[CHG] Controller CD:74:2E:6E:CD:FA Pairable: yes
+[bluetoothctl]> power on
+Changing power on succeeded
+[bluetoothctl]> discover on
+Invalid command in menu main: discover
 
->> drivers/bluetooth/hci_intel.c:1101:12: warning: 'intel_resume' defined but not used [-Wunused-function]
-    1101 | static int intel_resume(struct device *dev)
-         |            ^~~~~~~~~~~~
->> drivers/bluetooth/hci_intel.c:1091:12: warning: 'intel_suspend' defined but not used [-Wunused-function]
-    1091 | static int intel_suspend(struct device *dev)
-         |            ^~~~~~~~~~~~~
+Use "help" for a list of available commands in a menu.
+Use "menu <submenu>" if you want to enter any submenu.
+Use "back" if you want to return to menu main.
+[bluetoothctl]> he
+[bluetoothctl]> scan on
+SetDiscoveryFilter success
+hci0 type 7 discovering on
+Discovery started
+[CHG] Controller CD:74:2E:6E:CD:FA Discovering: yes
+hci0 type 7 discovering off
+hci0 type 7 discovering on
+hci0 type 7 discovering off
+hci0 type 7 discovering on
+hci0 type 7 discovering off
+
+--- ISSUE SOVED WITH 100461 ---
+
+1. Hardware Description
+Device: Intel StickPC (Atom x5-Z8300 "Cherry Trail" / "Bay Trail" platform)
+Bluetooth/WiFi Chip: Broadcom BCM43341B0 (Combo Chip)
+ACPI ID: BCM2E95
+Interface: Intel HS-UART connected via serdev (serial0-0)
+Connection: UART (not USB)
 
 
-vim +/intel_resume +1101 drivers/bluetooth/hci_intel.c
+2. System Information
+OS: Debian 13 (Trixie)
+Kernel: 6.12.63+deb13-amd64 (Upstream 6.12 series)
+BlueZ Version: 5.82
+Firmware: BCM43341B0.hcd (Size: 41,333 bytes).
+Verified identical to working Windows 10 driver firmware.
 
-aa6802df09fe32 Loic Poulain 2015-09-02  1090  
-f755247379912f Loic Poulain 2015-09-09 @1091  static int intel_suspend(struct device *dev)
-f755247379912f Loic Poulain 2015-09-09  1092  {
-f755247379912f Loic Poulain 2015-09-09  1093  	struct intel_device *idev = dev_get_drvdata(dev);
-f755247379912f Loic Poulain 2015-09-09  1094  
-f755247379912f Loic Poulain 2015-09-09  1095  	if (device_may_wakeup(dev))
-f755247379912f Loic Poulain 2015-09-09  1096  		enable_irq_wake(idev->irq);
-f755247379912f Loic Poulain 2015-09-09  1097  
-f755247379912f Loic Poulain 2015-09-09  1098  	return intel_suspend_device(dev);
-f755247379912f Loic Poulain 2015-09-09  1099  }
-f755247379912f Loic Poulain 2015-09-09  1100  
-f755247379912f Loic Poulain 2015-09-09 @1101  static int intel_resume(struct device *dev)
-f755247379912f Loic Poulain 2015-09-09  1102  {
-f755247379912f Loic Poulain 2015-09-09  1103  	struct intel_device *idev = dev_get_drvdata(dev);
-f755247379912f Loic Poulain 2015-09-09  1104  
-f755247379912f Loic Poulain 2015-09-09  1105  	if (device_may_wakeup(dev))
-f755247379912f Loic Poulain 2015-09-09  1106  		disable_irq_wake(idev->irq);
-f755247379912f Loic Poulain 2015-09-09  1107  
-f755247379912f Loic Poulain 2015-09-09  1108  	return intel_resume_device(dev);
-f755247379912f Loic Poulain 2015-09-09  1109  }
-f755247379912f Loic Poulain 2015-09-09  1110  
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+3. Issue Description
+The Bluetooth controller is detected, and the hci_uart_bcm driver successfu=
+lly
+loads the specific firmware patch (build 0176). However, immediately after
+firmware loading, the device remains in a DOWN RAW state with MTU 0:0.
+Attempting to bring the device up fails with "Operation not supported". The
+device never registers with the BlueZ management layer (btmgmt info is empt=
+y).
+It appears the HCI_QUIRK_RAW_DEVICE flag (set by hci_serdev.c during setup)=
+ is
+never cleared, or the bcm_setup function completes but the driver fails to
+transition the device to a fully operational state.
+
+
+4. Steps to Reproduce
+Boot minimal Debian 13 with Kernel 6.12 on Intel Atom Z8300 device with
+BCM43341.
+Ensure correct firmware BCM43341B0.hcd is in /lib/firmware/brcm/.
+Check hciconfig -a.
+
+
+5. Logs & Output
+hciconfig -a
+hci0:   Type: Primary  Bus: UART
+        BD Address: 43:34:1B:00:1F:AC  ACL MTU: 0:0  SCO MTU: 0:0
+        DOWN RAW=20
+        RX bytes:2220 acl:0 sco:0 events:238 errors:0
+        TX bytes:41654 acl:0 sco:0 commands:238 errors:0
+        Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DH1 HV1=20
+        Link policy:=20
+        Link mode: PERIPHERAL ACCEPT
+(Note: Address is the default Broadcom address, indicating configuration di=
+dn't
+finish)
+dmesg (Filtered)
+[   10.438792] hci_uart_bcm serial0-0: supply vbat not found, using dummy
+regulator
+[   10.438896] hci_uart_bcm serial0-0: supply vddio not found, using dummy
+regulator
+...
+[   10.888224] Bluetooth: hci0: BCM: chip id 82
+[   10.902831] Bluetooth: hci0: BCM43341B0
+[   10.902851] Bluetooth: hci0: BCM43341B0 (002.001.014) build 0000
+[   10.929324] Bluetooth: hci0: BCM43341B0 'brcm/BCM43341B0.hcd' Patch
+...
+[   11.551231] Bluetooth: hci0: BCM43341B0 37.4 MHz Class 1 WLBGA iTR
+[   11.551245] Bluetooth: hci0: BCM43341B0 (002.001.014) build 0176
+[   11.552167] Bluetooth: hci0: BCM: Using default device address
+(43:34:1b:00:1f:ac)
+(Note: Firmware loads successfully - build number changes from 0000 to 0176.
+But then it stops.)
+btmgmt info
+Index list with 0 items
+Attempting to bring up
+# hciconfig hci0 up
+Can't init device hci0: Operation not supported (95)
+
+
+6. What Was Tried (Workarounds)
+Windows Firmware: Replaced Linux firmware with verified working Windows 10
+driver (BCM43341B0_002.001.014.0122.0176.hcd). Result: Identical behavior.
+Firmware load OK, Init fail.
+Kernel Parameters: Added intel_idle.max_cstate=3D1 to prevent BayTrail deep=
+ sleep
+issues. Result: No change.
+btattach: Attempted manual btattach but failed because serdev framework cla=
+ims
+the UART (serial0-0) and does not expose a /dev/ttyS* node to userspace even
+after unbinding the driver.
+
+
+7. Suspected Root Cause
+Regression in drivers/bluetooth/hci_bcm.c or hci_serdev.c on Kernel 6.12
+regarding the handling of HCI_QUIRK_RAW_DEVICE for ACPI-enumerated BCM devi=
+ces.
+The setup phase (firmware load) works, but the transition to operational mo=
+de
+is missing.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
