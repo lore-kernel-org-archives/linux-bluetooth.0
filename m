@@ -1,101 +1,114 @@
-Received: from mail-qt1-f196.google.com (mail-qt1-f196.google.com [209.85.160.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E80C932B99B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 17:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8D81DF987;
+	Mon, 19 Jan 2026 19:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768843342; cv=none; b=SfGbagDitgSPsDYF2xcQn/m+VlyQE98XSdwvh2Z1ZuUPGJQ5WoAyRSig04vK8YeWRtyf0r/vSBvzZiIfPGsLV7bIuR0lCCtQnZlI9aNYydib6uJNB+FfA1ONvqS016wvfPSYCFZ9Tt8tKbNXgyBhMc4xlEUkKPeifKQG7h+tiL4=
+	t=1768851488; cv=none; b=Iu1uelOt5LEGHHF+XZi7/icbzeRe4u9EOZ3g87LGJQAGQqudJX1/1B5ngAiuwCUvD77Q2pKgyvfBxkpnqSuFyNi8R9xUyoBRbe2aaOhmF2+0NfpM8KWV8tan/8X4chp1+2AZyeJiObs23XALBfhBrMKWj4PntDMK21HBXd9bC3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768843342; c=relaxed/simple;
-	bh=Vu9UidKu1HC8oIeO3l06dnOQydY0k0NN2cQJWu2N9tA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=RCi/kY1nULDSJv9/pkXCTsKIzaCwEvcpf/ZoeirASQOnXUrNokjaxlTnJLGfh34b631F7I/tHBLdi7ORNCKkDckqUwxNW14dTKU2svcq6WaHaTZ6IsEn//poLqIbixplmERaACj9hv9jlKD4n0w3B+waItD3UvSod3qYKhtChVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C0nBVSbq; arc=none smtp.client-ip=209.85.160.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768851488; c=relaxed/simple;
+	bh=FLrPm7zsFV+yX4Xhn4nI/GYSI+1XDBlel+KuBQu2hOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DAOgPw3cDMKozaTfHJxLToMwmBBXtIl3jyZ6kgtCZrGNXFhanuJhp9MbFor8RBN2wJrCPGpRx99bF0PEEgR/ptZzXPmV58Va1ldoo1skxQ9QCPIIfOUN8n7TR0BlYL+Vs1pm6LRDEtGO5auQ40i2alxOz8jEjLB6iBmgR5nSx14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8P5r7kN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0nBVSbq"
-Received: by mail-qt1-f196.google.com with SMTP id d75a77b69052e-5028fb9d03bso36490931cf.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 09:22:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768843339; x=1769448139; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vu9UidKu1HC8oIeO3l06dnOQydY0k0NN2cQJWu2N9tA=;
-        b=C0nBVSbqwVWe0Uze/ZxbzMnHBaCkFxFQmTI6RPOGTvBg7RuIZ1OcqsEx8RTPQreB+U
-         qiuHyIcoEusQjodxeub5WsqbFtjOpRNNuniEj8tAYzMok8pQT71SngAzWdgaqhHVEO9i
-         NSNjfPHx+Ex52hbdPBRoMF9HvfzNFbefXozRH38JT6q/ZbVQq1vHPBqrBjIzhQs3DbjY
-         SZNeuR5ui0urtsmSENQl2Cdr7pU3NR4fiyZZ/Lzum34aU2Gp9UxZODu+D5gwkbdnqprE
-         6ZcCm34ZG2v+MnJl4AlS8utkO94HNcYSeodRh9UgbGwnHUqO8Oaqn7w2eDFkVSUBAeas
-         ejNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768843339; x=1769448139;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vu9UidKu1HC8oIeO3l06dnOQydY0k0NN2cQJWu2N9tA=;
-        b=fCG12kSIL1La8qwVLaLACwjbFhsOZSIiH1Ut9TAeV4c2YlhMc0Ltifb9bibHhy3CXV
-         PhryX94G5rynvlwHNBxokipqd4VwQ4/hA1BV2GcWsrxm8hKj4D+Jw9KSOGHqcgHziOJJ
-         7b9MRzXFObEGjvzO5kBWxSXi1q8PBS0tj/qozxQXdYsOVy73oqMD18+EJLcix7ptXPe+
-         r2EuQVwiNMM/hD4Pgr9cHqsz1qrUtILGfseBJ2ON38AsxYYE52JI8fU4uKQoEb2ACqwa
-         E5RJOfJNwjMGT45cuTdqb4/8rVzuWrJfNaEy3k7pFXoS9viMJ0bGskYSWt42AApZGfLQ
-         TC1w==
-X-Gm-Message-State: AOJu0YzN34ZNM90m84i3iyACVxBGlXc+yAjBELXbGDYRjoNDgICEAhzb
-	5c4YukTjdr9XFxqOt1qC3fqVJHC8NxYmMr2GOSIxrnL4+ym8DsgJbU6d09Y6dmCt
-X-Gm-Gg: AY/fxX6tV2ShWufrxSdHOWou8sfjuwHniUSnuPTnL/maOR1FtNWlGohBHCgnDycm8VV
-	FGnwFHRZJRj8SyS3BFMVb1MWgaf481HDDolp+qo7WlROOCmfyqPerhbEVYFqI9HhbSQpT4Ce9NX
-	AR+73LbzcquLuVsJ7ERGJOgLL0yNNMLnxhlMwihmsOWhiSji1ZRSGqdHgz3sJaP5KOidqg74x1r
-	vHJ9xxgjX7ujQtdP9VbQqt11JwuFkBFcficuLVwgmwnM+ZEYeyK92nXzTH2I+cXA+NTKzX1MrnB
-	33wDSjv44E/rKB8SqWzQ0jA1rvywDw/ulUr80lnlh7oZyK98B7xOrRai1tYRu1LnwlxOBmfMcXE
-	83o+PeKxHxSyqmpi1jgY9IYW0L+1A3fxCi1RexsKUGfupZRNCaJ8LCDU33AIFMREqK2BMcJTtb6
-	KzrnjHUiLDtc4ypZ0=
-X-Received: by 2002:ac8:5a03:0:b0:4ff:c14d:65cc with SMTP id d75a77b69052e-502a1758662mr171794131cf.51.1768843339329;
-        Mon, 19 Jan 2026 09:22:19 -0800 (PST)
-Received: from [172.17.0.2] ([9.234.151.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-502a1ed3155sm73298761cf.19.2026.01.19.09.22.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 09:22:18 -0800 (PST)
-Message-ID: <696e684a.050a0220.385661.57be@mx.google.com>
-Date: Mon, 19 Jan 2026 09:22:18 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7335240667697987749=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8P5r7kN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B02FDC116C6;
+	Mon, 19 Jan 2026 19:38:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768851487;
+	bh=FLrPm7zsFV+yX4Xhn4nI/GYSI+1XDBlel+KuBQu2hOU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g8P5r7kN+crbt5ArXjg1zaCWV4KjGM+iprRXXofeTZQho+BwScXENhVk2qCItFMWf
+	 4kHnIr4y4U4szATf31Av5ybZGpye2wUPaxSRVTqW+m5O3+Z6wEHgZxgevPaIFTeowA
+	 UlW5Hi/Z7VOy6222WYI0OH//qpzxAYMy4rwZwMhBz4Lhk7hQDLhB+G3doi/e7RDNoE
+	 EGtAnZdsP1LC5o3g0hrn4u1Ilmngz5NUD+ZAs1EF6158fMMjM4bfRAa2PSH28iVaXu
+	 OCWQNWaOFZUHKu3viLyPj2y3IYKQYliU6Mef27oWfXMtvDCOnaZFszsLNB/lzCzqMz
+	 wwU7WS5c3/5nA==
+Date: Mon, 19 Jan 2026 13:38:04 -0600
+From: Bjorn Andersson <andersson@kernel.org>
+To: Konrad Dybcio <konradybcio@kernel.org>
+Cc: Jeff Johnson <jeff.johnson@oss.qualcomm.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Subject: Re: [PATCH 01/10] dt-bindings: net: bluetooth: qualcomm: Fix WCN6855
+ regulator names
+Message-ID: <5w7tocv5tciidh3ms6l267cw5rj5yvyvphmyjy3kp5xf36cavp@5g2vpi6vefzy>
+References: <20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com>
+ <20251205-topic-wcn6855_pmu_dtbdings-v1-1-165611f687c8@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, dmitry.baryshkov@oss.qualcomm.com
-Subject: RE: Bluetooth, wifi, arm64: extend WCN driver to support WCN399x device
-In-Reply-To: <20260119-wcn3990-pwrctl-v3-1-948df19f5ec2@oss.qualcomm.com>
-References: <20260119-wcn3990-pwrctl-v3-1-948df19f5ec2@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251205-topic-wcn6855_pmu_dtbdings-v1-1-165611f687c8@oss.qualcomm.com>
 
---===============7335240667697987749==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Dec 05, 2025 at 01:47:20PM +0100, Konrad Dybcio wrote:
+> From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> 
+> Commit 5f4f954bba12 ("dt-bindings: bluetooth: bring the HW description
+> closer to reality for wcn6855") changed the vddrfa1p7-supply to 1p8
+> for whatever reason.
+> 
+> The schematics footprint for this chip definitely says 7 on the input
+> leg and the driver still expects 1p7. Bring it back.
+> 
+> Fixes: 5f4f954bba12 ("dt-bindings: bluetooth: bring the HW description closer to reality for wcn6855")
+> Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-This is an automated email and please do not reply to this email.
+@Luiz, this would conflict with the change in your tree, so I can't take
+it together with the dts changes. Can you please pick this binding
+patch, so that I then can pick up the related dts changes?
 
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: arch/arm64/boot/dts/qcom/qrb2210-rb1.dts:235
-error: arch/arm64/boot/dts/qcom/qrb2210-rb1.dts: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
----
 Regards,
-Linux Bluetooth
+Bjorn
 
-
---===============7335240667697987749==--
+> ---
+>  .../devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml         | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml
+> index 45630067d3c8..0beda26ae8bb 100644
+> --- a/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml
+> @@ -50,9 +50,6 @@ properties:
+>      description: VDD_RFA_1P7 supply regulator handle
+>      deprecated: true
+>  
+> -  vddrfa1p8-supply:
+> -    description: VDD_RFA_1P8 supply regulator handle
+> -
+>    vddrfacmn-supply:
+>      description: VDD_RFA_CMN supply regulator handle
+>  
+> @@ -68,7 +65,7 @@ required:
+>    - vddbtcmx-supply
+>    - vddrfa0p8-supply
+>    - vddrfa1p2-supply
+> -  - vddrfa1p8-supply
+> +  - vddrfa1p7-supply
+>    - vddrfacmn-supply
+>    - vddwlcx-supply
+>    - vddwlmx-supply
+> @@ -91,7 +88,7 @@ examples:
+>              vddbtcmx-supply = <&vreg_pmu_btcmx_0p8>;
+>              vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
+>              vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
+> -            vddrfa1p8-supply = <&vreg_pmu_rfa_1p7>;
+> +            vddrfa1p7-supply = <&vreg_pmu_rfa_1p7>;
+>              vddrfacmn-supply = <&vreg_pmu_rfa_cmn_0p8>;
+>              vddwlcx-supply = <&vreg_pmu_wlcx_0p8>;
+>              vddwlmx-supply = <&vreg_pmu_wlmx_0p8>;
+> 
+> -- 
+> 2.52.0
+> 
