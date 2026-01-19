@@ -1,88 +1,88 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D1232AAA4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 17:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AED732BF24
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 17:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768842491; cv=none; b=KhWzeCh9+RtbIQLIwxlS8pZMiIIAAnFcgf70pb8nnTADRSyDii/DTLdYk5VKZBXnY06Ffwky1MpcHGBNdenlGGJ5bRY0VEDVgNoivmx3IQMneWUN02Zw5pz2pgw9ZvwUecTyrwPFzv/eNHO/DUp2spil5l3/1udcuyJzwDmI9H0=
+	t=1768842493; cv=none; b=HWWIvQAapLW2Sxe4u8oa5Wr3HdjEazXmM3x5zEJXJEIPvyaI+W9lSksuK+h/9OzT55LCeei0Fk503vz8oo9dzjpkk1/cHxVWTNJTAT4w+CFk6UWPRJbfUcUSFYShRzzHPrZF48RiZ6OW576qszs50lVM6OAycrio1bII7dbkoEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768842491; c=relaxed/simple;
-	bh=TngkZuAbDr5UJBjPXFExRZzr3EmJY7tCHVrw/IzceiU=;
+	s=arc-20240116; t=1768842493; c=relaxed/simple;
+	bh=enCKpNdnBrXZA+wiHIdAIv2kSpfxxx9vISm1ccZ1t9M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=k6KcVMIqZuKkd5O2RRCaawUgJGXbri07KaiIfC5Qf2ooqWfaZsUreExMLaH2JzTN3Nx6o2obWff4Zs0JTYuMB3hC/kminka38ScE0ivk/ohgkSMA255QCf5+6bzTmfp3VnA8zjExp3rc6zbc+a29Gb+T1NPMrjdTFJC/Wus7whg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WyeANskO; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=KEVzqgzL; arc=none smtp.client-ip=205.220.168.131
+	 In-Reply-To:To:Cc; b=tQCHDhI1rSr1lgP2a487ZUibfls8mI7bYzfni+eVxdkCmqKno0PZVfkv+uG8b28PUEjLpARimoEj6EWF2O/CeIVGjJqWGGYiQNzn77iTEsg9f1KGOP84CJUWZxGjP79jnaya5UQtx2+eEi/HIQmigdiMihEteLbLTpUsGMfdLZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=nx/2obPU; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=gGuG3T77; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="WyeANskO";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="KEVzqgzL"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60JGs4bd1044553
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 17:08:09 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="nx/2obPU";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="gGuG3T77"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60JEoT5Y2305834
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 17:08:11 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	z+CtHSvBIXD+GWDzkmgHnLc3U/47Ulr6j8JFJ4c1VOM=; b=WyeANskOrzN9I+2i
-	7ysU0LR9udeXIWGbRTBitfi7PLzYIecTUx3JChBch+8KHRB4GmVImtKFnw1g8z/F
-	JAwNFzJ2j5waNY45gdiBII5pP5zOzF+2oslIXhJzaDqVI9e2o18eLOGAnj/6sosO
-	wuQ59XlrO2c1oV2H7v475JNzwdT5IkDXcyolcbVbL7/tZsvwkjzMuX1wRfuHMF47
-	KdH7SjpcwJXrWUKarDkqmyhKaej6D3dsdjJcKQdr6Es+B8rlWTwPRFEdgWB6sVyM
-	PoPJF3lF0TaUacpkXn806U48Be314BEj+d8sSgGUSUld+psWNVATi4r289XIFm8P
-	sh9J2A==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bs79ejvkj-1
+	o8x59fxfdz/jGIQYFQNs+4+juRLg1OwAMr5vtnTuLy4=; b=nx/2obPUu9tYKqHU
+	+rbwAW2aeKNeBerwL67DGNZoRSyjrI+dmna7UByzpWob6bR79enVJrKrAKfOwYBo
+	r1nh4mw+lF3N27XKjUdtWz0iXQAIV7kYLQBmYE1Xc2tyDxXn7uN1TKikK5kppePb
+	FA24QR54L5STksjkaDAC84qK9awpp24kYFK7ssPHiE3n4p4eSTxFyzz1xMuYmPyl
+	Pv1ZUOx+v6bnYSB+aljz4DnC/v6DEovQRlTLiqJehLlnljhCsnhJoMxwr+WR4KC1
+	vddu+RJktX+a0nHeJdynb69o/HQZDGE2jwv1vQrrPGKgD2jJSfYH9BE/7rjel8/w
+	Foo7cw==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bspqv8drg-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 17:08:08 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8c52f89b415so15790985a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 09:08:08 -0800 (PST)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 17:08:11 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8c52f07fbd0so327783785a.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jan 2026 09:08:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1768842488; x=1769447288; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1768842490; x=1769447290; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=z+CtHSvBIXD+GWDzkmgHnLc3U/47Ulr6j8JFJ4c1VOM=;
-        b=KEVzqgzLzGWrqzytyMgtSb/KVF7SjQXUW+wkPQCO6uO9qCKQBXed9g/K650Y/mgPjl
-         1oOuJ2IT9f4jetg8smVoUg+JXeuSrAge05EzEM6zM8ITeSCJz9OugB6bk86grHcPlDPk
-         t02GB0UObnqbCCTzXXdb836JZm7ICr2VWGtk8dVrCs4QPyVOXLZ2nbYGNvZ4wAJZP57O
-         COkhwhPc+de2ZkDtIwPxCmYWUpjzTTnlwHleTXzW+RaxlSjo0Em/xp/fje2XlZGlKh6z
-         WqOggOPm12x5LY5MJ6uG+cWvtCzywAvw8tdFzDR39Kboe1uo5jEzpiTBHVbwzsCLtAwY
-         O4Bw==
+        bh=o8x59fxfdz/jGIQYFQNs+4+juRLg1OwAMr5vtnTuLy4=;
+        b=gGuG3T77WlyCz+T5Xm45MvA6yzXMJTZuma0ortE8ujZ1K9mzobEl1ncKzvovlo5yCy
+         sRGh0So8NkJG6xFFEsSrgicMSeKfCnilAlrpd9bPBD/dIqbyq+30cVvpB5riiFXydPAa
+         PNvkDnPsrxdqa/INQRr3JunJxjEAw0JE5qjjMaKsxPtZSh54IFR8bbSrKLKYuI2EKQ4w
+         /SIIUo7vIFdDJ3gOvUxNyVQ9n8pYDu78o1Nlr67Hn4l3sFxAkNVwGA4yhg7xbmI8RVy+
+         BYz9NUiufLfJhFmCp7WK4lGXF8X5zUgYSzRYANM45j6AWChdbKQPhGHR9v3LYrf9bFwq
+         YAEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768842488; x=1769447288;
+        d=1e100.net; s=20230601; t=1768842490; x=1769447290;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=z+CtHSvBIXD+GWDzkmgHnLc3U/47Ulr6j8JFJ4c1VOM=;
-        b=apFJ0DlqVFS10J4SOfXe7MuRZfBnHi1VNpG+UcVIe/RBZYzsqrNK4ifCndQDAFRwc7
-         D8/ukuuKd26YAfha2gFuJ73zhHY1XRvrZSMdG6yOKD20MjMCaRJb7jjcecpVd5CeDqhz
-         mXIcmcCKpQIj9c2BM3+nrxEOYAAXN4hoqwZ1YHr8LeVZ4fyvKb9qjjr7Hhdy7/eIroBX
-         yj/g+0mKoOBOsjaDR4auLWQxux42HYQfxEaSZtluNfunjFS1kqb5goC/jOYB3C+5zHwt
-         MJHkJbOh3j1rT4eI3yfe4H37aQtOni1CvPXDmhsaLbQ1vG2x33ZzI13xV/i3ZLZEPI8W
-         pzLw==
-X-Forwarded-Encrypted: i=1; AJvYcCVBBX+ZnfKbl44z/UjszsngsLdM4+3u1KoUphBSm+hH8aGcbs6M7YkED5Rj3k05cPsANMecZqumuQJJCBreG7w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHSIp8FJ3l6/ShLZHqnDP5Tc7MayV0va6b0veeUiYdKxb5f47h
-	AkAG44a45J1hHAPlsbRwZjUmd5VqmgGSSCJwpA0KFd+s5czd9zePh51Dgj7pEj1YjGD92Jqr+Ia
-	pt9XBP2z5oCvoDZoEnPvAzVIHEv8OeLfzQU8Hh/EPOfBEimix+Z2ykrL8R1bc6XX6v70cJtA=
-X-Gm-Gg: AY/fxX7RMPo2X2kq4fNdDgxZa1Pa7YVu4OpyxZ9oT/5RPZIC+LzVNM3aaHhUklHeULW
-	AACg42ifPX9mbFSVwKEl5+lhyFhi8NlvCMI7cF+R8OYkw/6bm+RR2a5VzI174PypW/oyG3Bzrue
-	Vkh0b5N++SHXy9NyOc6jZF5hUz4zagMxuVqgA3VZ/V5vel/4UiIAA3aETRddG4PTmKPVt365keQ
-	pjrCHx76Mv8Kgiqm2iPwJuAluTnC11Spf2Za3xcfnr6AE23jzvL3hKhu0z062hcD2+lEd8frv7h
-	xENlpCGshB7TlXAk9F/v8KIalrFqPoMJNOSjP0XJqFLqQpM+cUAxuZxGb0bohS+OD2e11c4W0zT
-	FMTluOIaSgpuOasV08ZNJBDKFTC58uPoAImzlKKdVb9anE1ZV6GNbJMMv+SkGzHaR8ZQ8LQwoFL
-	uYzg4MTBtd7KLKs3pwLyUcsEE=
-X-Received: by 2002:a05:620a:1911:b0:8c5:2032:3766 with SMTP id af79cd13be357-8c6a67099a9mr1629401285a.35.1768842487676;
-        Mon, 19 Jan 2026 09:08:07 -0800 (PST)
-X-Received: by 2002:a05:620a:1911:b0:8c5:2032:3766 with SMTP id af79cd13be357-8c6a67099a9mr1629394585a.35.1768842487011;
-        Mon, 19 Jan 2026 09:08:07 -0800 (PST)
+        bh=o8x59fxfdz/jGIQYFQNs+4+juRLg1OwAMr5vtnTuLy4=;
+        b=eBTEipzrStUUZwld4HbzfByCi/TDMe1WPAWMXjKZ5pFeUWfZ9XyYcPvrWgCPhIvlib
+         JJNBKKpJ2EZ7rRacLHglsNbHe8K9kSU0d6W8OivQOp43T2tZ3RDwUis3fy1qCwnFROAy
+         hjEnKBAet8IckeB1297RAHaYNq5+ol1VURPeOhR5X6dPYBuAmiEgrzK3dNazhk9DrDQx
+         7ow+D13RBAs9wPsDmezaFOWSrVbwsEB6rSOHTYjPrdIuyYuGfRndaN91fD0DzE/ZNuxP
+         5/8LTi3MtFUd4IMoQlSzKENsnS/mc5S8r3C9XFGzljHJqahMJmpjqtsSyrONyFEIlsc6
+         V/kQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZtiOQlN96eKwrp3iGvzIJkAngLEud9PmzeFXNlkMg5tgUTJqbzsafBQidb98VZEAhKM+fkT1oGl1KbfxtQpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZWC0VF5vu2FhDRDkfTD6dYLpy4U1kfeW+wWfQC6QL65DPnAPv
+	p58qQDR2z8SVRMR2YI04h9pjf28Q6CpiTO+NlsJUO7e5g6Z3TgvYUwZHAWcHRSg1P2HcEGLIpKd
+	uihSBUtxn5I6j/Nb4YRa18k6HD1r4Wczb7RoMKrv+tpJY7QFiVFt2tPl8089QN0Y27XYpOkw=
+X-Gm-Gg: AY/fxX6654g8e0CJ81raw2eYyVR2PIEljzUn1NlZc2jagsQ3tibvzrtvj3/o0M+cch0
+	0NKwbMu4IbzUcUIudE78b7pbGSTvQEHymjD8IctoiD1GODDJAAKz6yzziZi95aEJzkcldOb7Elz
+	YkPeA6gpdTEeylXyKn3x0E9IDMjnIHnQDxiSVSGcHpR3P4kfSrXniC5vQuDjHV3oXeur+g0mlw2
+	oECxbAVaCvl9BW3M9LwjnG4fCXAqlmiJFgKI5KR/yjpaADjkSdyX1ATtRcAcATN91yHdm1Wq4g/
+	nzKMzdcjeUg9Ai0jhf8TYm/OCEIetr5+uISBE3bhHWS0TzKOCkHAy1WvuDjHLagE5GR7AZgF0lS
+	7w7IiiRUSTE+7zQxSM0elWMORqkZqtzGu29p1zKhQY5//8pf7g++gBT3KXStPXdWOTFKLNQAgtF
+	a/8qaUzFs+j1X56mBGdZDFqJw=
+X-Received: by 2002:a05:620a:1909:b0:8c3:6f20:2ed2 with SMTP id af79cd13be357-8c6a6963386mr1569142185a.84.1768842490313;
+        Mon, 19 Jan 2026 09:08:10 -0800 (PST)
+X-Received: by 2002:a05:620a:1909:b0:8c3:6f20:2ed2 with SMTP id af79cd13be357-8c6a6963386mr1569135785a.84.1768842489685;
+        Mon, 19 Jan 2026 09:08:09 -0800 (PST)
 Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-38384e790a9sm32661211fa.26.2026.01.19.09.08.04
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-38384e790a9sm32661211fa.26.2026.01.19.09.08.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 09:08:04 -0800 (PST)
+        Mon, 19 Jan 2026 09:08:07 -0800 (PST)
 From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Date: Mon, 19 Jan 2026 19:07:57 +0200
-Subject: [PATCH v3 3/8] wifi: ath10k: snoc: support powering on the device
- via pwrseq
+Date: Mon, 19 Jan 2026 19:07:58 +0200
+Subject: [PATCH v3 4/8] arm64: dts: qcom: qrb2210-rb1: describe WiFi/BT
+ properly
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -91,7 +91,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260119-wcn3990-pwrctl-v3-3-948df19f5ec2@oss.qualcomm.com>
+Message-Id: <20260119-wcn3990-pwrctl-v3-4-948df19f5ec2@oss.qualcomm.com>
 References: <20260119-wcn3990-pwrctl-v3-0-948df19f5ec2@oss.qualcomm.com>
 In-Reply-To: <20260119-wcn3990-pwrctl-v3-0-948df19f5ec2@oss.qualcomm.com>
 To: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
@@ -111,190 +111,148 @@ Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
         devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
         linux-pm@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4976;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2734;
  i=dmitry.baryshkov@oss.qualcomm.com; h=from:subject:message-id;
- bh=TngkZuAbDr5UJBjPXFExRZzr3EmJY7tCHVrw/IzceiU=;
- b=owEBbQGS/pANAwAKAYs8ij4CKSjVAcsmYgBpbmTtAas0TfVBZ0zgaGJXwyQrA0uQ6KpWcbxdI
- h2osmaT/XeJATMEAAEKAB0WIQRMcISVXLJjVvC4lX+LPIo+Aiko1QUCaW5k7QAKCRCLPIo+Aiko
- 1ebQB/4o64wgCHd8jSj7Bz3CZ/+62x6a30IZawuIkYO3PivfZEHDbHoczj5oViXOUvo0FK9gpY+
- hykUvnNIU6bNL0iGUB4dDT+U3ZSIsqeNWAy9y3unwzTnNE1liGuOIlDPe2YMe3XPOPjJA8anID5
- JiLUCh+Vh7aQqH2I3JX7iezuUVscpFtGpDkQlxw9c5WofpRfrOFXlcITsLdaLimxyuGFOJC0W+3
- PAhC+dCvGuwkyD3zWsELpogZHWBhSlYHrwMgna5IoUK6nvyudXybtW7Q5/AgckAfHeYTCKpgLdM
- Cnvy2tBNGwS0HxWSaYMQSJbvTeW6EaFkBCb4KOnpwGwGh1XV
+ bh=enCKpNdnBrXZA+wiHIdAIv2kSpfxxx9vISm1ccZ1t9M=;
+ b=owEBbQGS/pANAwAKAYs8ij4CKSjVAcsmYgBpbmTtilwkBClWXXgiyKcWtWRAEl+wOgQ9AElnr
+ wN2H+oTvD+JATMEAAEKAB0WIQRMcISVXLJjVvC4lX+LPIo+Aiko1QUCaW5k7QAKCRCLPIo+Aiko
+ 1clcB/0bYfdqHWhPo5vtWeP35++T2K3Q9BRc7oVbgJJPq7w6Q2p4XxDPRwsC1AeWVNb0qyN+eg/
+ Q/8e7v89lH3+HAgOS/ujgI2BCddyoFflPbtxvmDrXIUCMcV8tPl/1L1DzpMIdE7mURoIC3hsWsZ
+ zsQidYoW/JEicp0mAfr4yQI3vEDiQA7VluDs87xUDOJLmvVtFIDN8Ayzy8T+F9klHdxVnSDPk+X
+ WFb5MeuUgA7qVR5CANAJu42J4Lg2WeMs8KPpY6BuWn5imcCd/T63SgntdkGu3qZ43/g7eEgwVw9
+ wQ9/2gDn7ksi/y4EjkSYhxVCn/1dPRKtbklYlWzu0IKLGJf8
 X-Developer-Key: i=dmitry.baryshkov@oss.qualcomm.com; a=openpgp;
  fpr=8F88381DD5C873E4AE487DA5199BF1243632046A
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE5MDE0MyBTYWx0ZWRfXxZ+ucbupBhKL
- Zai/NHBKULspsaFoUhby2KI4MHy8916DoiCdcQ+bAP4pE3ghXOsp8PVOFQuoPIh2QJCfje+hVgn
- thICt0ceGpU2ymnZr1K4TAdKeq6zzVOO1880VK197EAHljl96nejyqtBEjNsCeWqKFPbDdrINRW
- RZgqPf8iqvR+XNfWoR4eLyZvIojV4n9KqdeB4jW7mMeFN9LMdwe5UjPp6RUltKEtREYoOCLX0de
- EWFpD1CRG81Waog6HvmfZmUSt9zrhrf5hhHsfMwfHfaX81J8ewmc3JhsDj9NqhJYFLcAFrgY2CI
- 5RXDnnSPpZxyFII5KjPfhd/AYI2qAeyQlgrXPvbwAztx9DXbOfs0Lddbi56UnizjF5cs/ylUjuu
- PXmPglw7CrFBF3qVSV1ydCo2oyX7FSQTIJ9YZKNdacWTxQ+7XFVlZqtrqGKJXlvlDA1a36Jz9aI
- U8QnnTG0scFFSjuLQ1Q==
-X-Authority-Analysis: v=2.4 cv=NY3rFmD4 c=1 sm=1 tr=0 ts=696e64f8 cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+X-Authority-Analysis: v=2.4 cv=Js78bc4C c=1 sm=1 tr=0 ts=696e64fb cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
  a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=EUspDBNiAAAA:8 a=s7CvTC462Z5CboN7hzoA:9 a=QEXdDO2ut3YA:10
- a=PEH46H7Ffwr30OY-TuGO:22
-X-Proofpoint-ORIG-GUID: _VHYIO4IASK-PCiz3v1vL_X72kiUveNk
-X-Proofpoint-GUID: _VHYIO4IASK-PCiz3v1vL_X72kiUveNk
+ a=EUspDBNiAAAA:8 a=GWXae9BK5adipm9ZVUoA:9 a=QEXdDO2ut3YA:10
+ a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-ORIG-GUID: 5fdCA_chJXH0N-l_oasQGGbB7Gjvo9aQ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE5MDE0MyBTYWx0ZWRfX9IOqGeAU/rsW
+ Qx7Mk4nJ4dWohKvc85PtbUhRRR0NkwLkKzgxUG0MHWeXZIPh4BNyNzoAdvw3zL2FlmSX6vPEio4
+ Nr7mrlNM7ons2fdo3TVp/JYEuWQo2wWY8DMEAtU3VE0ep+HeMJsnw4szfhrgaxZPNDMjUzO+PaK
+ jxRkQ6UK7EqCHZg2km3jLv2rkPr+IsSdccFi4S5ufky2TLwR4ioiN+NyVYvONXp02aPBgnoFxec
+ Ygm9Y3ZqOM+h5whuT1QvOkRcV7dckZryOy+EAJhYZ6yrTWl9rzdTkZmj2wskSaq9SU2snV7MPDI
+ DC9Ye/HJKeRm9RnVyeLKO8XFtmJuqeILXkqPhb8w2EChkfPM0J2p73Hn4l8cjYrMGdlXpJ4nSrl
+ HA6jF0pzcC77bSVKs+UyEtmPc1DPVyF67Us0EmWyg9muIYUKjnZobcpj0lQcAj47hAQmf0amrU8
+ nktofbh2xJiu3OsQKkw==
+X-Proofpoint-GUID: 5fdCA_chJXH0N-l_oasQGGbB7Gjvo9aQ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2026-01-19_04,2026-01-19_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 impostorscore=0 suspectscore=0
- lowpriorityscore=0 adultscore=0 phishscore=0 bulkscore=0 clxscore=1015
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2601190143
+ clxscore=1015 phishscore=0 adultscore=0 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 spamscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601190143
 
-The WCN39xx family of WiFi/BT chips incorporates a simple PMU, spreading
-voltages over internal rails. Implement support for using powersequencer
-for this family of ATH10k devices in addition to using regulators.
+The onboard WiFi / BT device, WCN3950, has a simple on-chip PMU, which
+further spreads generated voltage. Describe the PMU in the device tree.
 
 Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
 ---
- drivers/net/wireless/ath/ath10k/snoc.c | 53 ++++++++++++++++++++++++++++++++--
- drivers/net/wireless/ath/ath10k/snoc.h |  3 ++
- 2 files changed, 53 insertions(+), 3 deletions(-)
+ arch/arm64/boot/dts/qcom/qrb2210-rb1.dts | 60 +++++++++++++++++++++++++++-----
+ 1 file changed, 52 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/wireless/ath/ath10k/snoc.c b/drivers/net/wireless/ath/ath10k/snoc.c
-index b3f6424c17d3..f72f236fb9eb 100644
---- a/drivers/net/wireless/ath/ath10k/snoc.c
-+++ b/drivers/net/wireless/ath/ath10k/snoc.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: ISC
- /*
-  * Copyright (c) 2018 The Linux Foundation. All rights reserved.
-+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-  */
- 
- #include <linux/bits.h>
-@@ -11,6 +12,7 @@
- #include <linux/of_device.h>
- #include <linux/platform_device.h>
- #include <linux/property.h>
-+#include <linux/pwrseq/consumer.h>
- #include <linux/regulator/consumer.h>
- #include <linux/remoteproc/qcom_rproc.h>
- #include <linux/of_reserved_mem.h>
-@@ -1023,10 +1025,14 @@ static int ath10k_hw_power_on(struct ath10k *ar)
- 
- 	ath10k_dbg(ar, ATH10K_DBG_SNOC, "soc power on\n");
- 
--	ret = regulator_bulk_enable(ar_snoc->num_vregs, ar_snoc->vregs);
-+	ret = pwrseq_power_on(ar_snoc->pwrseq);
- 	if (ret)
- 		return ret;
- 
-+	ret = regulator_bulk_enable(ar_snoc->num_vregs, ar_snoc->vregs);
-+	if (ret)
-+		goto pwrseq_off;
+diff --git a/arch/arm64/boot/dts/qcom/qrb2210-rb1.dts b/arch/arm64/boot/dts/qcom/qrb2210-rb1.dts
+index 9814ac4896c5..737794cb8b1c 100644
+--- a/arch/arm64/boot/dts/qcom/qrb2210-rb1.dts
++++ b/arch/arm64/boot/dts/qcom/qrb2210-rb1.dts
+@@ -235,6 +235,42 @@ platform {
+ 			};
+ 		};
+ 	};
 +
- 	ret = clk_bulk_prepare_enable(ar_snoc->num_clks, ar_snoc->clks);
- 	if (ret)
- 		goto vreg_off;
-@@ -1035,18 +1041,28 @@ static int ath10k_hw_power_on(struct ath10k *ar)
- 
- vreg_off:
- 	regulator_bulk_disable(ar_snoc->num_vregs, ar_snoc->vregs);
-+pwrseq_off:
-+	pwrseq_power_off(ar_snoc->pwrseq);
++	wcn3950-pmu {
++		compatible = "qcom,wcn3950-pmu";
 +
- 	return ret;
- }
- 
- static int ath10k_hw_power_off(struct ath10k *ar)
- {
- 	struct ath10k_snoc *ar_snoc = ath10k_snoc_priv(ar);
-+	int ret_seq = 0;
-+	int ret_vreg;
- 
- 	ath10k_dbg(ar, ATH10K_DBG_SNOC, "soc power off\n");
- 
- 	clk_bulk_disable_unprepare(ar_snoc->num_clks, ar_snoc->clks);
- 
--	return regulator_bulk_disable(ar_snoc->num_vregs, ar_snoc->vregs);
-+	ret_vreg = regulator_bulk_disable(ar_snoc->num_vregs, ar_snoc->vregs);
++		pinctrl-0 = <&sw_ctrl_default>;
++		pinctrl-names = "default";
 +
-+	if (ar_snoc->pwrseq)
-+		ret_seq = pwrseq_power_off(ar_snoc->pwrseq);
++		vddio-supply = <&pm4125_l15>;
++		vddxo-supply = <&pm4125_l13>;
++		vddrf-supply = <&pm4125_l10>;
++		vddch0-supply = <&pm4125_l22>;
 +
-+	return ret_vreg ? : ret_seq;
- }
- 
- static void ath10k_snoc_wlan_disable(struct ath10k *ar)
-@@ -1762,7 +1778,38 @@ static int ath10k_snoc_probe(struct platform_device *pdev)
- 		goto err_release_resource;
- 	}
- 
--	ar_snoc->num_vregs = ARRAY_SIZE(ath10k_regulators);
-+	/*
-+	 * devm_pwrseq_get() can return -EPROBE_DEFER in two cases:
-+	 * - it is not supposed to be used
-+	 * - it is supposed to be used, but the driver hasn't probed yet.
-+	 *
-+	 * There is no simple way to distinguish between these two cases, but:
-+	 * - if it is not supposed to be used, then regulator_bulk_get() will
-+	 *   return all regulators as expected, continuing the probe
-+	 * - if it is supposed to be used, but wasn't probed yet, we will get
-+	 *   -EPROBE_DEFER from regulator_bulk_get() too.
-+	 *
-+	 * For backwards compatibility with DTs specifying regulators directly
-+	 * rather than using the PMU device, ignore the defer error from
-+	 * pwrseq.
-+	 */
-+	ar_snoc->pwrseq = devm_pwrseq_get(&pdev->dev, "wlan");
-+	if (IS_ERR(ar_snoc->pwrseq)) {
-+		ret = PTR_ERR(ar_snoc->pwrseq);
-+		ar_snoc->pwrseq = NULL;
-+		if (ret != -EPROBE_DEFER)
-+			goto err_free_irq;
++		swctrl-gpios = <&tlmm 87 GPIO_ACTIVE_HIGH>;
 +
-+		ar_snoc->num_vregs = ARRAY_SIZE(ath10k_regulators);
-+	} else {
-+		/*
-+		 * The first regulator (vdd-0.8-cx-mx) is used to power on part
-+		 * of the SoC rather than the PMU on WCN399x, the rest are
-+		 * handled via pwrseq.
-+		 */
-+		ar_snoc->num_vregs = 1;
-+	}
++		regulators {
++			vreg_pmu_io: ldo0 {
++				regulator-name = "vreg_pmu_io";
++			};
 +
- 	ar_snoc->vregs = devm_kcalloc(&pdev->dev, ar_snoc->num_vregs,
- 				      sizeof(*ar_snoc->vregs), GFP_KERNEL);
- 	if (!ar_snoc->vregs) {
-diff --git a/drivers/net/wireless/ath/ath10k/snoc.h b/drivers/net/wireless/ath/ath10k/snoc.h
-index d4bce1707696..1ecae34687c2 100644
---- a/drivers/net/wireless/ath/ath10k/snoc.h
-+++ b/drivers/net/wireless/ath/ath10k/snoc.h
-@@ -1,6 +1,7 @@
- /* SPDX-License-Identifier: ISC */
- /*
-  * Copyright (c) 2018 The Linux Foundation. All rights reserved.
-+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-  */
- 
- #ifndef _SNOC_H_
-@@ -53,6 +54,7 @@ enum ath10k_snoc_flags {
++			vreg_pmu_xo: ldo1 {
++				regulator-name = "vreg_pmu_xo";
++			};
++
++			vreg_pmu_rf: ldo2 {
++				regulator-name = "vreg_pmu_rf";
++			};
++
++			vreg_pmu_ch0: ldo3 {
++				regulator-name = "vreg_pmu_ch0";
++			};
++
++			vreg_pmu_ch1: ldo4 {
++				regulator-name = "vreg_pmu_ch1";
++			};
++		};
++	};
  };
  
- struct clk_bulk_data;
-+struct pwrseq_desc;
- struct regulator_bulk_data;
+ &cpu_pd0 {
+@@ -754,6 +790,12 @@ lt9611_irq_pin: lt9611-irq-state {
+ 		bias-disable;
+ 	};
  
- struct ath10k_snoc {
-@@ -73,6 +75,7 @@ struct ath10k_snoc {
- 	struct ath10k_snoc_ce_irq ce_irqs[CE_COUNT_MAX];
- 	struct ath10k_ce ce;
- 	struct timer_list rx_post_retry;
-+	struct pwrseq_desc *pwrseq;
- 	struct regulator_bulk_data *vregs;
- 	size_t num_vregs;
- 	struct clk_bulk_data *clks;
++	sw_ctrl_default: sw-ctrl-default-state {
++		pins = "gpio87";
++		function = "gpio";
++		bias-pull-down;
++	};
++
+ 	sd_det_in_on: sd-det-in-on-state {
+ 		pins = "gpio88";
+ 		function = "gpio";
+@@ -789,11 +831,10 @@ &uart3 {
+ 	bluetooth {
+ 		compatible = "qcom,wcn3950-bt";
+ 
+-		vddio-supply = <&pm4125_l15>;
+-		vddxo-supply = <&pm4125_l13>;
+-		vddrf-supply = <&pm4125_l10>;
+-		vddch0-supply = <&pm4125_l22>;
+-		enable-gpios = <&tlmm 87 GPIO_ACTIVE_HIGH>;
++		vddio-supply = <&vreg_pmu_io>;
++		vddxo-supply = <&vreg_pmu_xo>;
++		vddrf-supply = <&vreg_pmu_rf>;
++		vddch0-supply = <&vreg_pmu_ch0>;
+ 		max-speed = <3200000>;
+ 	};
+ };
+@@ -834,10 +875,13 @@ &venus {
+ };
+ 
+ &wifi {
++	/* SoC */
+ 	vdd-0.8-cx-mx-supply = <&pm4125_l7>;
+-	vdd-1.8-xo-supply = <&pm4125_l13>;
+-	vdd-1.3-rfa-supply = <&pm4125_l10>;
+-	vdd-3.3-ch0-supply = <&pm4125_l22>;
++
++	/* WiFi / BT PMU */
++	vdd-1.8-xo-supply = <&vreg_pmu_xo>;
++	vdd-1.3-rfa-supply = <&vreg_pmu_rf>;
++	vdd-3.3-ch0-supply = <&vreg_pmu_ch0>;
+ 	qcom,calibration-variant = "Thundercomm_RB1";
+ 	firmware-name = "qcm2290";
+ 	status = "okay";
 
 -- 
 2.47.3
