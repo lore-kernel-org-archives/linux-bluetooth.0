@@ -1,39 +1,33 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CB93EFD02
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 21:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53943A89D1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 22:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768945129; cv=none; b=gi0A/+8p+VQ73EeKipOVGY+wsu3q2SRWneQLR80SXkjJbK7RaGL5Y24wrSltvJ6bpRq5em1alzsSnqWSMpJ9ghhbcOYvelC+qhUw5xvzxsGTCJEF5NYZwZEo6CBsIDQn+jdHyrf9Thqy9jwWIlG/Ms4/CU48mMcIhwAYl1fzSKE=
+	t=1768946455; cv=none; b=pwn/Ca78gjAP3SFRQol4kHz6HLVi+a5f0AmRy6MSwf5vK8SwXaRWtfbNrPGB28Ite52L1HBrFWWIuYCucDFYuypRgPzzA74cENjPjugcsDryakhEYom4sMel3arP3Y+gYxkgADKApw4egA6vuW7SrWkl9yyAFVSZJze5s2TDgkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768945129; c=relaxed/simple;
-	bh=VVuZPbICVIH8RHKuItopCF3VeQZ+lOfmZNEvc9PuhrQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SfntAi0V7LbCT8K9zjtDtNiwWtaW0iauVwKjKkHH8MI7ngj1lzyBSsXca0I06TLInw2lAG5n9vO9leuCSHHw97Iw82xrMkH73Wm9mStT0u7sh6+AcFaPob0TSQm2UVbWcNo+qTzKPBGCoe35l3T1+sJNZP3o5OIXcp+Pyoaq8lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
+	s=arc-20240116; t=1768946455; c=relaxed/simple;
+	bh=bkwTmc3t59B1CRnLqZGN+9XNpuTqLrElFEGSvfz6OpA=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=NWssFiZEHc7wQLgQohic+IadUO+20IPoUpnz7PN4Dsttt+It+HqXSCoPUsbZdFs0rukKVhsU4EncMVE4SExulqLN2814Qe3BcQ9dgOxM1J31J6RaUZbvA5syiPF+w6Ny910xX9kUYVtqhQuhR6DOszC+K3DGw2kdX9qqkKBbVJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A37AA43EED;
-	Tue, 20 Jan 2026 21:38:38 +0000 (UTC)
-Message-ID: <5498532ab2e09b4e0d6ccea09f0856b3df615331.camel@hadess.net>
-Subject: Re: [PATCH 2/3] Bluetooth: btnxpuart: Remove unneeded CONFIG_PM
- ifdef
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 81BF05801A2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 21:41:33 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A278A443B8;
+	Tue, 20 Jan 2026 21:41:25 +0000 (UTC)
+Message-ID: <a7ca31e78a187d6912dde7a3cb9dbddace349fc4.camel@hadess.net>
+Subject: Re: [PATCH v1] fixup! Bluetooth: btusb: Use pm_ptr instead of
+ #ifdef CONFIG_PM
 From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, kernel test robot
-	 <lkp@intel.com>, "linux-bluetooth@vger.kernel.org"
-	 <linux-bluetooth@vger.kernel.org>, "oe-kbuild-all@lists.linux.dev"
-	 <oe-kbuild-all@lists.linux.dev>
-Date: Tue, 20 Jan 2026 22:38:38 +0100
-In-Reply-To: <CABBYNZKP3ahsqi1XVPmD24RWkXnBbOAZ9NJpo3yg-6xBY22N4A@mail.gmail.com>
-References: <20260116125803.598552-3-hadess@hadess.net>
-	 <202601170322.MZrwlt6M-lkp@intel.com>
-	 <AS4PR04MB969210BA5934C14282B8F104E788A@AS4PR04MB9692.eurprd04.prod.outlook.com>
-	 <7a5b73b4c56d0bfb8742045a3f530cd3d2d25b53.camel@hadess.net>
-	 <CABBYNZL6hAxsnBt=HStvhnZmoTfagzGuJ0sGeqiqhXdpm0DZOA@mail.gmail.com>
-	 <c4be5c93c1d83ab8fa3ff0dafe8efc3a827e0ebb.camel@hadess.net>
-	 <CABBYNZKP3ahsqi1XVPmD24RWkXnBbOAZ9NJpo3yg-6xBY22N4A@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 20 Jan 2026 22:41:25 +0100
+In-Reply-To: <20260120181717.2321998-1-luiz.dentz@gmail.com>
+References: <20260120181717.2321998-1-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
@@ -44,71 +38,45 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-GND-Sasl: hadess@hadess.net
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeduheduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepffeiueduvedutdffieehudetlefggfefgeeufeehudeujefhtdduvdekhfdvkefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeetfeejteetgeefgffgffdpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopeehpdhrtghpthhtoheplhhuihiiuggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtt
- hhopehnvggvrhgrjhdrshgrnhhjrgihkhgrlhgvsehngihprdgtohhmpdhrtghpthhtoheplhhkphesihhnthgvlhdrtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohgvqdhksghuihhlugdqrghllheslhhishhtshdrlhhinhhugidruggvvh
 X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeduhedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfffjghftgfgfgggsehtqhertddtreejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeefleefkeejhfekffeltdetheekkeelhefhtdffkefgjeffudelgedugfelfffhudenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugeptedvjeekteeggeefueekpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepvddprhgtphhtthhopehluhhiiiguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhto
+ heplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 
-On Tue, 2026-01-20 at 13:05 -0500, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
+NAK, see explanation at:
+https://patchwork.kernel.org/project/bluetooth/patch/20260116125803.598552-=
+3-hadess@hadess.net/#26748187
+
+On Tue, 2026-01-20 at 13:17 -0500, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >=20
-> On Tue, Jan 20, 2026 at 12:17=E2=80=AFPM Bastien Nocera <hadess@hadess.ne=
-t>
-> wrote:
-> >=20
-> > On Tue, 2026-01-20 at 11:42 -0500, Luiz Augusto von Dentz wrote:
-> > > Hi Bastien,
-> > >=20
-> > > On Mon, Jan 19, 2026 at 4:13=E2=80=AFAM Bastien Nocera
-> > > <hadess@hadess.net>
-> > > wrote:
-> > > >=20
-> > > > On Mon, 2026-01-19 at 07:53 +0000, Neeraj Sanjay Kale wrote:
-> > > > > Hi Bastien,
-> > > > >=20
-> > > > > Thank you for your patch.
-> > > > >=20
-> > > > > Just an FYI, the " #ifdef CONFIG_PM_SLEEP" was added on
-> > > > > purpose
-> > > > > to
-> > > > > resolve such build warning reported by kernel test bot:
-> > > > > https://lore.kernel.org/all/20240710123426.935122-1-neeraj.sanjay=
-kale@nxp.com/
-> > > >=20
-> > > > I didn't see those warnings locally. They should be fixed by
-> > > > using
-> > > > __maybe_unused instead otherwise the "it extends the code
-> > > > coverage"
-> > > > justification wouldn't really apply anymore.
-> > >=20
-> > > Yes, I think we should mark the functions that are conditional
-> > > with
-> > > __maybe_unused, actually this might be the case with
-> > > btusb_resume/btusb_suspend as well, right?
-> >=20
-> > I believe that's what I've done that in v3. Let me know if there
-> > are
-> > any problems with that version still.
+> ---
+> =C2=A0drivers/bluetooth/btusb.c | 5 +++--
+> =C2=A01 file changed, 3 insertions(+), 2 deletions(-)
 >=20
-> You mean
-> https://patchwork.kernel.org/project/bluetooth/list/?series=3D1044140?
-> That doesn't contain any changes to btusb though, anyway I can fixup
-> the existing change just in case.
-
-Sorry, I read that a bit quickly, you're right.
-
-I made a bit of a mess of this patchset because I had real trouble
-trying to first disabling CONFIG_PM altogether (had success with this
-yesterday), and then trying to make the current btusb code throw a
-warning, but couldn't.
-
-And that's the case because pm_ptr() is based on PTR_IF() and its docs
-explain why __maybe_unused isn't necessary when using pm_ptr():
-https://kernel.org/doc/html//next/driver-api/basics.html#c.PTR_IF
-
-The other patches I sent used SET_SYSTEM_SLEEP_PM_OPS() and
-SET_RUNTIME_PM_OPS() which use #ifdef's.
-
-In short, the code in btusb.c was correct, no need for fixups.
-
-Cheers
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 759def260ed0..f9fba78f0a4a 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -4468,7 +4468,8 @@ static void btusb_disconnect(struct
+> usb_interface *intf)
+> =C2=A0	kfree(data);
+> =C2=A0}
+> =C2=A0
+> -static int btusb_suspend(struct usb_interface *intf, pm_message_t
+> message)
+> +static int __maybe_unused btusb_suspend(struct usb_interface *intf,
+> +					pm_message_t message)
+> =C2=A0{
+> =C2=A0	struct btusb_data *data =3D usb_get_intfdata(intf);
+> =C2=A0
+> @@ -4557,7 +4558,7 @@ static void play_deferred(struct btusb_data
+> *data)
+> =C2=A0	}
+> =C2=A0}
+> =C2=A0
+> -static int btusb_resume(struct usb_interface *intf)
+> +static int __maybe_unused btusb_resume(struct usb_interface *intf)
+> =C2=A0{
+> =C2=A0	struct btusb_data *data =3D usb_get_intfdata(intf);
+> =C2=A0	struct hci_dev *hdev =3D data->hdev;
