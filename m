@@ -1,134 +1,310 @@
-Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D00D337BAC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 16:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141A7366DD6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 17:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768928350; cv=none; b=Sx2KOunc8OjjPL923s8Fg9Soev4wcaAVZc7mmOjr0xW7UjlNVm341NlVu0tg7KDKCoKsAbiQm6x98rdbMatbQb+kNf9Sw0SGG8mmA5RfKm1F6JYDt0JpfG/3YoTTUEw7VbrKq/GgpwJ2r5apUzoBKOpjk+k109h921LCR0saod4=
+	t=1768929465; cv=none; b=ADlqd/BF5DI0+3CLT2ksB/kP0RGHPSYvbPG7t7si/skIBr5Drxee77Be2LZ4UfdZ8xMDU9MT0Vxp65hURYlwZ4KY6fH4n2gkXGqeqTfoa9UEkJoYBSfiP+SX8L1v7DKoGegA5BMRbHzW+0mG8KrW9kMIrTyqqnMsDs3NKOVik1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768928350; c=relaxed/simple;
-	bh=QG8od9E4u0pSV6yZRzJ7d9i7oFHecw0D3jyTglZAgwU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gIHg3AlgNjZIJ/fSh4k5PNMnRE8Zx6DnMnpt44jK2L4IsCroH4NxmtEdklKlo0Yh4wgn6yCBU5LWnIkDwoq0pK3fxy2WRiBVW4XYwKZgs2bKIO+vVHv8hi3Xd0Y43WoCZS9IB9fK5M6mSsIVQLd8EO5rPQOezwtbe/Cd9ikxud8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UOIGTnGa; arc=none smtp.client-ip=74.125.82.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UOIGTnGa"
-Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-1233702afd3so7185823c88.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 08:59:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768928346; x=1769533146; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AVpmgujw6l2yj98k9G40tIe6fzrgFUtOdpHQT7QjBgw=;
-        b=UOIGTnGaPX2DEDLk2UA6zQvR7iFbk0K6ImXjxwMCOtDQx7oCfZVp0B/4mr4vkEm4Tz
-         ZbHRpaaUEVPp4LX3g0OKFpYU5bArwNLoxdKf+5mrE8mU421ODtNVNKyHMXQSWGnMZrep
-         HqbFf01dRuSvV3d5IVROMeROVToB5rtxqKBmfzv+v64fian1DQPoq9j1E9kyKH/MpsW/
-         nG9gz/qKtC4Uu/vL+WVodNCXkGYFQR/+Y/VNtevQVFLc9QoWC5t5+laS0/s6GOkkExuD
-         rH040vYQOy5jRlR5uG0eXPbGopgw71SkpsOEOudFYpNO4LIiYh5Fis6IUYB5wSJhR+rS
-         OYwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768928346; x=1769533146;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AVpmgujw6l2yj98k9G40tIe6fzrgFUtOdpHQT7QjBgw=;
-        b=iv7lIXxXY9IfVWQvTAv/rnjhjnDK+A4f1kt7oWJsIwLbmxe/KrnLe5howy7xi4XGGs
-         hIGuulkFxuyZdW3K+HWM+/Fm8cTfrG0XUIvTRieRO+nwr/f4LD4MNINx42vtjeEgpkZq
-         79cSSwnjMf6lHvxks42t7E9dvEzf++YTY9F7dRFL0PIV2aiR5Xyv5on1Z9NgcdFff5Q1
-         TnyLfvc4iNQVcGSwfzklJjDv1kU5VNkigfi2Cl9TKuNbp5kllcJ+4kx1bNw7yVsFkT8B
-         l1MjtuvByAY99Iz/QrlqWbWkhFH+qWQiZN8R3jWbb7y7VOLZ/PMIen3fhdHvwHBXaQ5H
-         XOYg==
-X-Gm-Message-State: AOJu0YwvUzlRbN5rPUayeaLdKu9EODcspYxnHfhd3Fm4oN4O2LarPZ7C
-	Vf1UYo/r+JHT7n7NbWf1JPKyUkDQwd9Hm4Eov3psiq++TvGupQuPuQFLnMz50C7t
-X-Gm-Gg: AY/fxX48TydKpqpbpl0bmjlNoKDkULm9+wy+zJTbN4GYtTtbj2UV53OHH3qwaec8S8q
-	VuoE84qpA3E5ixAs+6hOPRH7df9sYcK7tjsWFl7LsgixDt2RfGpj5izpYJ+u4wZGQHQAraWOE+9
-	ZEvfq5fWxPDFo3Bvjoz7GZ64snLPTqilKp5OKQOvPBcNDm4goCq4DxDra53Zk0CHNuSsbLK4Uij
-	tyK3n+bUROu5hjkAm9nBIxMOLxDubmMl29P/16EgeHZ9nQqJWXZnslgKBnjazvMCqu1hBA5APS2
-	R52E6QLPDv4AR7H8yOfiICytTx1OJr1M89I9WRDlB3PvarHM/TCO9ReLu1m1xjIk9bhVw5aqyoG
-	37rGEl/JLsHOSVpFMHRPUvX44Ws7GFyqbkt5Jpx6oYp7PpoIut++NyKECI6jk1AAk+JP1lLevgD
-	I4FcPeC07owfbkNbsPiQ==
-X-Received: by 2002:a05:7022:2397:b0:119:e55a:9bf6 with SMTP id a92af1059eb24-1246a9683d2mr1531003c88.18.1768928345550;
-        Tue, 20 Jan 2026 08:59:05 -0800 (PST)
-Received: from [172.17.0.2] ([20.168.108.225])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244ad7201fsm21178536c88.7.2026.01.20.08.59.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 08:59:04 -0800 (PST)
-Message-ID: <696fb458.050a0220.1af079.9a30@mx.google.com>
-Date: Tue, 20 Jan 2026 08:59:04 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8392137331350200262=="
+	s=arc-20240116; t=1768929465; c=relaxed/simple;
+	bh=YY2+UGBboDQmUaxHtzliXuVbPQK29i7Dvofqz+vVF34=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DQybCceYz88Zgxs3Yag730Kjj3CTwINqehfga2btjMzQwwxwF/jj8QXKylZX5p9inYjTJ2Aoy/4kyxfzHTnzPsmhgkHJXB0nsprp0ZJS6wzl76/co+H35uXu9ebUO7EFzunCbJVhY4DzI7O0B9OWgMwKujdfkURPrtEfx6STjZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7D81E4435C;
+	Tue, 20 Jan 2026 17:17:33 +0000 (UTC)
+Message-ID: <c4be5c93c1d83ab8fa3ff0dafe8efc3a827e0ebb.camel@hadess.net>
+Subject: Re: [PATCH 2/3] Bluetooth: btnxpuart: Remove unneeded CONFIG_PM
+ ifdef
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, kernel test robot
+	 <lkp@intel.com>, "linux-bluetooth@vger.kernel.org"
+	 <linux-bluetooth@vger.kernel.org>, "oe-kbuild-all@lists.linux.dev"
+	 <oe-kbuild-all@lists.linux.dev>
+Date: Tue, 20 Jan 2026 18:17:32 +0100
+In-Reply-To: <CABBYNZL6hAxsnBt=HStvhnZmoTfagzGuJ0sGeqiqhXdpm0DZOA@mail.gmail.com>
+References: <20260116125803.598552-3-hadess@hadess.net>
+	 <202601170322.MZrwlt6M-lkp@intel.com>
+	 <AS4PR04MB969210BA5934C14282B8F104E788A@AS4PR04MB9692.eurprd04.prod.outlook.com>
+	 <7a5b73b4c56d0bfb8742045a3f530cd3d2d25b53.camel@hadess.net>
+	 <CABBYNZL6hAxsnBt=HStvhnZmoTfagzGuJ0sGeqiqhXdpm0DZOA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: Port text docs to RST
-In-Reply-To: <20260120160811.3394320-2-hadess@hadess.net>
-References: <20260120160811.3394320-2-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugedtleelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepieekjeffheefveelvdffudekudeikeffveduudetgeffgfekueeffeetueduveejnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpghhithdqshgtmhdrtghomhdpghhithhhuhgsrdgtohhmpdhlohhrvgdrkhgvpddvheegtdhhrgguvghsshdrnhgvthdptddurdhorhhgnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepjeffkedugfeggeefheevpdhmohguv
+ gepshhmthhpohhuthdpnhgspghrtghpthhtohephedprhgtphhtthhopehluhhiiiguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvvghrrghjrdhsrghnjhgrhihkrghlvgesnhigphdrtghomhdprhgtphhtthhopehlkhhpsehinhhtvghlrdgtohhmpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehovgdqkhgsuhhilhguqdgrlhhlsehlihhsthhsrdhlihhnuhigrdguvghv
+X-GND-State: clean
+X-GND-Score: -100
 
---===============8392137331350200262==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, 2026-01-20 at 11:42 -0500, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
+>=20
+> On Mon, Jan 19, 2026 at 4:13=E2=80=AFAM Bastien Nocera <hadess@hadess.net=
+>
+> wrote:
+> >=20
+> > On Mon, 2026-01-19 at 07:53 +0000, Neeraj Sanjay Kale wrote:
+> > > Hi Bastien,
+> > >=20
+> > > Thank you for your patch.
+> > >=20
+> > > Just an FYI, the " #ifdef CONFIG_PM_SLEEP" was added on purpose
+> > > to
+> > > resolve such build warning reported by kernel test bot:
+> > > https://lore.kernel.org/all/20240710123426.935122-1-neeraj.sanjaykale=
+@nxp.com/
+> >=20
+> > I didn't see those warnings locally. They should be fixed by using
+> > __maybe_unused instead otherwise the "it extends the code coverage"
+> > justification wouldn't really apply anymore.
+>=20
+> Yes, I think we should mark the functions that are conditional with
+> __maybe_unused, actually this might be the case with
+> btusb_resume/btusb_suspend as well, right?
 
-This is automated email and please do not reply to this email!
+I believe that's what I've done that in v3. Let me know if there are
+any problems with that version still.
 
-Dear submitter,
+Cheers
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1044766
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.38 seconds
-GitLint                       PENDING   0.32 seconds
-BuildEll                      PASS      17.83 seconds
-BluezMake                     PASS      654.90 seconds
-MakeCheck                     PASS      17.79 seconds
-MakeDistcheck                 FAIL      6.61 seconds
-CheckValgrind                 PASS      280.22 seconds
-CheckSmatch                   PASS      318.18 seconds
-bluezmakeextell               PASS      168.22 seconds
-IncrementalBuild              PENDING   0.36 seconds
-ScanBuild                     PASS      925.08 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-make[2]: *** No rule to make target 'doc/sap-api.txt', needed by 'distdir-am'.  Stop.
-make[1]: *** [Makefile:10870: distdir] Error 2
-make: *** [Makefile:10946: dist] Error 2
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8392137331350200262==--
+>=20
+> >=20
+> > Cheers
+> >=20
+> > >=20
+> > > Thanks,
+> > > Neeraj
+> > >=20
+> > > > Hi Bastien,
+> > > >=20
+> > > > kernel test robot noticed the following build warnings:
+> > > >=20
+> > > > [auto build test WARNING on bluetooth/master] [also build test
+> > > > WARNING on
+> > > > linus/master v6.19-rc5] [cannot apply to bluetooth-next/master
+> > > > next-
+> > > > 20260116] [If your patch is applied to the wrong git tree,
+> > > > kindly
+> > > > drop us a
+> > > > note.
+> > > > And when submitting patch, we suggest to use '--base' as
+> > > > documented
+> > > > in
+> > > > https://git-/
+> > > > scm.com%2Fdocs%2Fgit-format-
+> > > > patch%23_base_tree_information&data=3D05%7C02%7Cneeraj.sanjaykale
+> > > > %40n
+> > > > xp.com%7C6f3219146a7540774eda08de5538a471%7C686ea1d3bc2b4c6fa92
+> > > > cd99c5c301635%7C0%7C0%7C639041898935601715%7CUnknown%7CTWFp
+> > > > bGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4
+> > > > z
+> > > > MiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3DW4jhk2S
+> > > > VUr77jirvKdK%2FrKuKAVyXSbY9iO2pQ1%2BL7Fs%3D&reserved=3D0]
+> > > >=20
+> > > > url:
+> > > > https://github/.
+> > > > com%2Fintel-lab-lkp%2Flinux%2Fcommits%2FBastien-
+> > > > Nocera%2FBluetooth-
+> > > > btmtksdio-Simplify-dev_pm_ops-usage%2F20260116-
+> > > > 210400&data=3D05%7C02%7Cneeraj.sanjaykale%40nxp.com%7C6f3219146a7
+> > > > 54
+> > > > 0774eda08de5538a471%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0
+> > > > %7C639041898935632879%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcG
+> > > > kiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsI
+> > > > ldUI
+> > > > j
+> > > > oyfQ%3D%3D%7C0%7C%7C%7C&sdata=3Dl2nEr61x%2F00NrtEqmvX2qhJ%2F0d
+> > > > %2Fc6T%2BI6e5YRiz1TAM%3D&reserved=3D0
+> > > > base:
+> > > > https://git.kern/
+> > > > el.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Fbluetooth%2Fbluetoo
+> > > > th.g
+> > > > i
+> > > > t&data=3D05%7C02%7Cneeraj.sanjaykale%40nxp.com%7C6f3219146a754077
+> > > > 4e
+> > > > da08de5538a471%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C63
+> > > > 9041898935651605%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRy
+> > > > dWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjo
+> > > > yfQ%
+> > > > 3
+> > > > D%3D%7C0%7C%7C%7C&sdata=3D%2BKZxHj6EXqJXKC8%2FsiYrPOJczts%2BMEX
+> > > > ycXixKcxUcf8%3D&reserved=3D0 master
+> > > > patch link:
+> > > > https://lore.ke/
+> > > > rnel.org%2Fr%2F20260116125803.598552-3-
+> > > > hadess%2540hadess.net&data=3D05%7C02%7Cneeraj.sanjaykale%40nxp.co
+> > > > m%
+> > > > 7C6f3219146a7540774eda08de5538a471%7C686ea1d3bc2b4c6fa92cd99c5c
+> > > > 3
+> > > > 01635%7C0%7C0%7C639041898935668808%7CUnknown%7CTWFpbGZsb3d8
+> > > > eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkF
+> > > > OIj
+> > > > oiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3Da3gomBec5GENv5B
+> > > > RsBv%2Butzd11I3QunXE2yAaDg5f4Q%3D&reserved=3D0
+> > > > patch subject: [PATCH 2/3] Bluetooth: btnxpuart: Remove
+> > > > unneeded
+> > > > CONFIG_PM ifdef
+> > > > config: x86_64-randconfig-002-20260116
+> > > > (https://downl/
+> > > > oad.01.org%2F0day-
+> > > > ci%2Farchive%2F20260117%2F202601170322.MZrwlt6M-
+> > > > lkp%40intel.com%2Fconfig&data=3D05%7C02%7Cneeraj.sanjaykale%40nxp
+> > > > .com
+> > > > %7C6f3219146a7540774eda08de5538a471%7C686ea1d3bc2b4c6fa92cd99c5
+> > > > c
+> > > > 301635%7C0%7C0%7C639041898935685518%7CUnknown%7CTWFpbGZsb3d
+> > > > 8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIk
+> > > > FOI
+> > > > joiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3DhR230cwqc4FucDn
+> > > > 9TPmv79VLdAd8kHHwc2Q8SdPtHtk%3D&reserved=3D0)
+> > > > compiler: gcc-14 (Debian 14.2.0-19) 14.2.0 reproduce (this is a
+> > > > W=3D1
+> > > > build):
+> > > > (https://downl/
+> > > > oad.01.org%2F0day-
+> > > > ci%2Farchive%2F20260117%2F202601170322.MZrwlt6M-
+> > > > lkp%40intel.com%2Freproduce&data=3D05%7C02%7Cneeraj.sanjaykale%40
+> > > > nxp.
+> > > > com%7C6f3219146a7540774eda08de5538a471%7C686ea1d3bc2b4c6fa92cd9
+> > > > 9c5c301635%7C0%7C0%7C639041898935702245%7CUnknown%7CTWFpbGZ
+> > > > sb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMi
+> > > > Is
+> > > > IkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3DdsZA9O8KQy
+> > > > QZJK2Fn%2FYtexA8zdrw%2FCcpwnEb7AwhiqU%3D&reserved=3D0)
+> > > >=20
+> > > > If you fix the issue in a separate patch/commit (i.e. not just
+> > > > a
+> > > > new version of
+> > > > the same patch/commit), kindly add following tags
+> > > > > Reported-by: kernel test robot <lkp@intel.com>
+> > > > > Closes:
+> > > > > https://lore/
+> > > > > .kernel.org%2Foe-kbuild-all%2F202601170322.MZrwlt6M-
+> > > > lkp%40intel.com%2F
+> > > > >=20
+> > > > &data=3D05%7C02%7Cneeraj.sanjaykale%40nxp.com%7C6f3219146a7540774
+> > > > e
+> > > > da08de
+> > > > >=20
+> > > > 5538a471%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C63904189
+> > > > 89357202
+> > > > >=20
+> > > > 33%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjA
+> > > > uMDAwMCI
+> > > > >=20
+> > > > sIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&
+> > > > sd
+> > > > ata=3D2
+> > > > > s046Nm4SrgCfY%2BqPyoYr8tf5xqoBw%2BqDiJ0YQ%2BiAt8%3D&reserved=3D
+> > > > > 0
+> > > >=20
+> > > > All warnings (new ones prefixed by >>):
+> > > >=20
+> > > > > > drivers/bluetooth/btnxpuart.c:1964:12: warning:
+> > > > > > 'nxp_serdev_resume'
+> > > > > > defined but not used [-Wunused-function]
+> > > > =C2=A0=C2=A0=C2=A0 1964 | static int nxp_serdev_resume(struct devic=
+e *dev)
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~~~~~
+> > > > > > drivers/bluetooth/btnxpuart.c:1950:12: warning:
+> > > > > > 'nxp_serdev_suspend'
+> > > > > > defined but not used [-Wunused-function]
+> > > > =C2=A0=C2=A0=C2=A0 1950 | static int nxp_serdev_suspend(struct devi=
+ce *dev)
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~~~~~~
+> > > >=20
+> > > >=20
+> > > > vim +/nxp_serdev_resume +1964 drivers/bluetooth/btnxpuart.c
+> > > >=20
+> > > > 689ca16e5232784 Neeraj Sanjay Kale 2023-03-16=C2=A0 1949
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05 @1950=C2=A0 static in=
+t
+> > > > nxp_serdev_suspend(struct device *dev)
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1951=C2=A0 {
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1952=C2=A0=C2=
+=A0=C2=A0=C2=A0 struct
+> > > > btnxpuart_dev *nxpdev =3D dev_get_drvdata(dev);
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1953=C2=A0=C2=
+=A0=C2=A0=C2=A0 struct
+> > > > ps_data
+> > > > *psdata =3D &nxpdev->psdata;
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1954
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1955
+> > > > ps_control(psdata-
+> > > > > hdev, PS_STATE_SLEEP);
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1956
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1957=C2=A0=C2=
+=A0=C2=A0=C2=A0 if
+> > > > (psdata-
+> > > > > wakeup_source) {
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1958
+> > > > enable_irq_wake(psdata->irq_handler);
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1959
+> > > > enable_irq(psdata->irq_handler);
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1960=C2=A0=C2=
+=A0=C2=A0=C2=A0 }
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1961=C2=A0=C2=
+=A0=C2=A0=C2=A0 return
+> > > > 0;
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1962=C2=A0 }
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1963
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05 @1964=C2=A0 static in=
+t
+> > > > nxp_serdev_resume(struct device *dev)
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1965=C2=A0 {
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1966=C2=A0=C2=
+=A0=C2=A0=C2=A0 struct
+> > > > btnxpuart_dev *nxpdev =3D dev_get_drvdata(dev);
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1967=C2=A0=C2=
+=A0=C2=A0=C2=A0 struct
+> > > > ps_data
+> > > > *psdata =3D &nxpdev->psdata;
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1968
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1969=C2=A0=C2=
+=A0=C2=A0=C2=A0 if
+> > > > (psdata-
+> > > > > wakeup_source) {
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1970
+> > > > disable_irq(psdata->irq_handler);
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1971
+> > > > disable_irq_wake(psdata->irq_handler);
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1972=C2=A0=C2=
+=A0=C2=A0=C2=A0 }
+> > > > c50b56664e48b66 Neeraj Sanjay Kale 2025-04-14=C2=A0 1973
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1974
+> > > > ps_control(psdata-
+> > > > > hdev, PS_STATE_AWAKE);
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1975=C2=A0=C2=
+=A0=C2=A0=C2=A0 return
+> > > > 0;
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1976=C2=A0 }
+> > > > 658c56d5b3b3a41 Neeraj Sanjay Kale 2024-07-05=C2=A0 1977
+> > > >=20
+> > > > --
+> > > > 0-DAY CI Kernel Test Service
+> > > > https://github/.
+> > > > com%2Fintel%2Flkp-
+> > > > tests%2Fwiki&data=3D05%7C02%7Cneeraj.sanjaykale%40nxp.com%7C6f321
+> > > > 914
+> > > > 6a7540774eda08de5538a471%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0
+> > > > %7C0%7C639041898935740752%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0e
+> > > > U1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFp
+> > > > bCI
+> > > > sIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3DIqE%2B%2BS2ZXcZb5PFvsvemp
+> > > > dQffNOiktBLNpxdDx5JJJg%3D&reserved=3D0
+> > >=20
+> >=20
+>=20
