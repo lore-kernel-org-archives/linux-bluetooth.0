@@ -1,68 +1,35 @@
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9736234404B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 18:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9362F3C22
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 18:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768933051; cv=none; b=LN6ye4odFeihdkqPB8gOgTNG+/+q94kBVOpY9LuUYiGGY1oWikDVKVA3/J6mkzLfHyJ5dYJTQO5b+UTEtjc7WSdhRav9fJD26+oABSdhvtpVPDZ1tqHJCgH+itWKGTSmgm2hWtQtw8hqivBMkX8x3nM8OVr0zbOEutbryF9DYm8=
+	t=1768933207; cv=none; b=UAKwQNbql6JmIRhVd1Q/dpYEcbH83S40sofOoqjvXbzgwnz+dCpPahiAmzJ/sH0TFFE1UMF6ZOFQxlZmT1Y4l7JlN7n8MidHjfotZHsuil1bdmMF86pFDB0v0CKyS4QwekTH0xZFsL825hb0Js8p+RN2Yl+IUGGscBC2SV86RxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768933051; c=relaxed/simple;
-	bh=scKh6R9EUSlQ4lKA0Rk4N72H3a0RDd5kYfxeKb3C5BM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BeUxx1jDgblkm2j395cfTdWEMFrdSbb6Yl0pcVNPkGac0F3u6QqFi3Fp2HyqhZHJ+XOfOvxXui5BMq5C4gWoADrCCghfSg41sgsEuDVWQe0FD6ZpIjDjGAuAV5VjKWiMRA1cvSY24Tch6XMx9Jkb87Oxjx9yeOR9ntqXrNxfF3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VL+VLZ+8; arc=none smtp.client-ip=209.85.221.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768933207; c=relaxed/simple;
+	bh=AeEoRRDFoRLgLEIPe06xANju/gQ9/ZFxuKdO6nia9Ok=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IDnA/gN/ftHRHgga1oWDlGxce+XcsCxLGPeu2hTvX8rfy1cMeDFcnoJSKJkytoU9BISait6TECm5lSn0NVHJ8N+3e9zpp09HrolJw4GTreApNrdyWrMq1rlaDUfaO5ki7ljRTSOqkmFX+le/x+rYBtCBRp/5iHtaZI4NZkZBB6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbSvhwZW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VL+VLZ+8"
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-56365984503so3678499e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 10:17:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768933048; x=1769537848; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2N6YjdmiR1qKUM0fCUHaKgmHm/+5o3h2coxD74n6fqw=;
-        b=VL+VLZ+8OYlnKGpUOTivvTpiJwbmPry634HBgiiB0ZRgxEPuXbdeBFBE2EOmqNbfD5
-         4YbVd3tZeyzmL53Eyjot+Oc7Zh77Lb8uLLQOdAPlnB2quYyYUlrvr7pdAe1gaIaXgIXX
-         xHOMkDtVe4OIu8KU3ArZTHBAqNAbcIpSKsM1wAd6i2zp3Zrn3RC9SydlClpSRYYKrbPj
-         5Xoo0jVaOKBfTqpVByO5pbc99OwfsncX3BoFOH4OUHahYIBCSnBTjzGQdt8rsufOc+ay
-         Tii+MxHs/+UA2W21vnXKZbg/xeIMOpWuKDhhlAuASUOzhmqU31e3hIRUFynqTHUobhYa
-         4eng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768933048; x=1769537848;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2N6YjdmiR1qKUM0fCUHaKgmHm/+5o3h2coxD74n6fqw=;
-        b=pPLy3IBLCnN83842NulSxpylRX4Mm8v5EeeGEf3AvTJEful51TnYB31aQOsGp0gYtO
-         dYkVlUTxsusWSe1VrCXCE1yeNMXzyNSVS77eLdwY2jNKbvsSXJcbMDMZb32xpYBl3DKU
-         YZ2Ztrwc8fNY3odBya6yeGjRNIBJMGxRrstiGTHXWT3CnoybaTD0k76ug5Tp/+6R5byF
-         oEcZ8xRUbpkkbc65hqdjiE0lYPbgG30mwHz77tOGMJZrQPIOWB3xgEZuU/w7aa80lZOe
-         yuUzxg3zyKh18u6+CtMW6yPIZpgF8Wc0RI6Mpwro634uacZubP/gbqIHOgQwUNYp33CW
-         7lyw==
-X-Gm-Message-State: AOJu0YwNHHGDbj/4x1vkUCRNGvCRmsgQ956y6qbLYPz6QYRZAxBA7/ZQ
-	2735FuL1jlzFEcRSSSik7BKYfVVjYN1wwUM45+EAw+EVSeRfs9SqtgiOSk7yzK2c
-X-Gm-Gg: AZuq6aKs5fZ5YfRjQKPpvYExZIZl/64iSypk2PEL7YodGeBZDQRrd0MBm/BzcYEPFVx
-	oiA9/JfFrtfom5Jro+60dboyrxOhmxnqP3QtYZgdgUrIRblxNAuSue9cSp0ivzI/2pahs4C3wXb
-	wVKtbWV2wOs+f8A5jSc4kpb0y8rhCFaLrTZCtzPH0CHYdmhyTimELrDOS5omV0HSnORt4ZkadHf
-	IQ5yI+JOp6+E8OUBeeg/MKznB3+z7aZ1JrRcepxnsIGqkJO4CknuUYKdtg0Th/ENA+MvSG5eR1x
-	nSPkFxNmCBr8IOmuMiGL/TNv/Hid5Ana8BNbAfUKR2rB7E9hi58QT3WjkoAKlgEMP6VBsH+OOyB
-	tjMVQdEZnK4X2WfvGsCyrWZtiDRRY7d+zRtwv1IsJOUnuRGc1H4+rkkv+l74QfNOH40E1Lz+z/2
-	HC0q1ogkObblvW5aZ9kmrEbFJQmpsUaqtBwVZsaJgsZIG7J0cRAjDCOVjy7ds83ILhUA1dVaRsp
-	MsHjg==
-X-Received: by 2002:a05:6102:6cf:b0:5ec:c528:4df8 with SMTP id ada2fe7eead31-5f1a7129a0bmr5323070137.28.1768933046692;
-        Tue, 20 Jan 2026 10:17:26 -0800 (PST)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5f1a694494asm4574957137.8.2026.01.20.10.17.25
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 10:17:26 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] fixup! Bluetooth: btusb: Use pm_ptr instead of #ifdef CONFIG_PM
-Date: Tue, 20 Jan 2026 13:17:17 -0500
-Message-ID: <20260120181717.2321998-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbSvhwZW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C763C16AAE;
+	Tue, 20 Jan 2026 18:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768933207;
+	bh=AeEoRRDFoRLgLEIPe06xANju/gQ9/ZFxuKdO6nia9Ok=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WbSvhwZW5oNcIiAJMkVsw+R4a1/b3LxdQyaAa4NRz+5GrtSDou2bpg7G2bOL7W44Z
+	 qSIkSvwUEt71MmCb6mDaXC2crSkPyuKtu12q84erbm1JKPkJxcT+oTWwNHajwKS+Em
+	 5R3VmutCGsytS5ktcnBaRwgVrR2eY9Sz3pE+HzoBew09qV3/ODl7btXPtTwen1hXWF
+	 9Ui+gGflKHoUjbxlhlxipRPkCzl/vJhBUKjMshM62n9tHBgt6Y3EanJcpxhRBfIUGK
+	 0s9X4B1bYJ56RqRuWR5hreBGa2dLPewtovrzNHQ0MSvDPVbUpVK2pJb3SEqHakuapn
+	 HKiynUHZQX0Zw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EAC93810935;
+	Tue, 20 Jan 2026 18:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -70,36 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 0/2] More CONFIG_PM* simplifications
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176893320510.555371.12355664459156628417.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Jan 2026 18:20:05 +0000
+References: <20260119123537.2611794-1-hadess@hadess.net>
+In-Reply-To: <20260119123537.2611794-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
----
- drivers/bluetooth/btusb.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 759def260ed0..f9fba78f0a4a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4468,7 +4468,8 @@ static void btusb_disconnect(struct usb_interface *intf)
- 	kfree(data);
- }
- 
--static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
-+static int __maybe_unused btusb_suspend(struct usb_interface *intf,
-+					pm_message_t message)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
- 
-@@ -4557,7 +4558,7 @@ static void play_deferred(struct btusb_data *data)
- 	}
- }
- 
--static int btusb_resume(struct usb_interface *intf)
-+static int __maybe_unused btusb_resume(struct usb_interface *intf)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
- 	struct hci_dev *hdev = data->hdev;
+On Mon, 19 Jan 2026 13:34:58 +0100 you wrote:
+> Follow-up from the earlier "Bluetooth: btusb: Use pm_ptr instead of
+> #ifdef CONFIG_PM" patch.
+> 
+> Both drivers were successfully compiled with CONFIG_PM disabled.
+> 
+> Changes since v2:
+> - Drop btmtksdio.c changes, there's a fix in bluetooth-next
+> 
+> [...]
+
+Here is the summary with links:
+  - [v3,1/2] Bluetooth: btnxpuart: Remove unneeded CONFIG_PM ifdef
+    https://git.kernel.org/bluetooth/bluetooth-next/c/854aa613b6b3
+  - [v3,2/2] Bluetooth: btintel: Remove unneeded CONFIG_PM* #ifdef's
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ba93b539e8d4
+
+You are awesome, thank you!
 -- 
-2.52.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
