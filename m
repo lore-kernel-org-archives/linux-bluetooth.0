@@ -1,26 +1,26 @@
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E578E3C1FFF
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 17:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1D33D3331
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 17:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768929649; cv=none; b=SZzFR8Al4WZqyqS7OTyAmHKbO+fePMlHnu7uVerkDuqOkWGdtSdiGW3tuz+ZAbRYPFSGrFLHK669qdzw5gEKwNJ7la+sBYIGCCTOdAmnOmOboFRI5xEXlgCiORq5IPAVbtN2DTv1XAlvbKii2fM28s0TK8b80mEvnGlVOPTHlWw=
+	t=1768929649; cv=none; b=Fky87CUr1iRNLvBIOOVyZLMxxSZuUrJFcx2tQYpzokmtY3Qjy3f7erC4EyyI7SDbqpZ3eE3qmuODFw/lXciaPf7TQqg2RyJelEG3EyV8OUfJ4I20WnV74+FEW/P4Wiq07YoSzAFO+70PrPL3CQabt6Z/4uhFWuSp+iu1aUOdPpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768929649; c=relaxed/simple;
-	bh=zwrGl7lw3asglMEBbkCsuqNspds7Q4tdL+7mNg8JkT4=;
+	bh=HIV5dd4GrriCj/06DkgZrib/OAaWcpVKjn5QKZehZ9U=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SgNCE03g5UhPFhs3SojjU2RM1g+flVR8Ynuwt/ZCSQXKfaal8GEkojgyt87W9dgHxZrwQnROvNKmJ0UktB2HgyM7amHWT/6WeqY0xfPtd7QqfTpmjPA5yQaVJE3aETIxmVN5cZKrTaNwaUVL2qWWaHXG19tf2ksyLKtEn1WJ/A0=
+	 MIME-Version; b=C4Sw1+jFTmfmloWq5DZJQPCMz7wWwWATI2wtFdq+dGAEknwtQRx1uaYJU9TWyKwyrHLBksuYWK3SCHWNVfLgieQDYEsI4QRUaOzKFSq59/gVWmaVbyuTg+M99bRxjJzE6XsuxwRWHzywRoPiNawYMiQi/a204Onua//DktlQQAc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2489B44383
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9B61344386
 	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 17:20:44 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v2 4/7] doc: Port coding-style.txt to RST
-Date: Tue, 20 Jan 2026 18:18:49 +0100
-Message-ID: <20260120172034.3463151-5-hadess@hadess.net>
+Subject: [BlueZ v2 6/7] doc: Port maintainer-guidelines.txt to RST
+Date: Tue, 20 Jan 2026 18:18:51 +0100
+Message-ID: <20260120172034.3463151-7-hadess@hadess.net>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260120172034.3463151-1-hadess@hadess.net>
 References: <20260120172034.3463151-1-hadess@hadess.net>
@@ -32,657 +32,161 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugedtleelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeevudfgjeevveekgedvjefgffefjeeitdekgffffeegiedtveekvddvueffkeffueenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepvdegkeelueeggeefkeefpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugedtleelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeekteetgeettdehieduiedttdetffelleehtdejkeeluedvgfffvdevteetudfhkeenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeelueeiudefgeegfeekiedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 X-GND-State: clean
 X-GND-Score: 0
 
 ---
- doc/coding-style.rst | 349 +++++++++++++++++++++++++++++++++++++++++++
- doc/coding-style.txt | 279 ----------------------------------
- 2 files changed, 349 insertions(+), 279 deletions(-)
- create mode 100644 doc/coding-style.rst
- delete mode 100644 doc/coding-style.txt
+ ...idelines.txt => maintainer-guidelines.rst} | 61 +++++++++++--------
+ 1 file changed, 35 insertions(+), 26 deletions(-)
+ rename doc/{maintainer-guidelines.txt => maintainer-guidelines.rst} (65%)
 
-diff --git a/doc/coding-style.rst b/doc/coding-style.rst
-new file mode 100644
-index 000000000000..91250e867f09
---- /dev/null
-+++ b/doc/coding-style.rst
-@@ -0,0 +1,349 @@
-+==================
-+BlueZ coding style
-+==================
+diff --git a/doc/maintainer-guidelines.txt b/doc/maintainer-guidelines.rst
+similarity index 65%
+rename from doc/maintainer-guidelines.txt
+rename to doc/maintainer-guidelines.rst
+index b875f008258b..a6e756b81c51 100644
+--- a/doc/maintainer-guidelines.txt
++++ b/doc/maintainer-guidelines.rst
+@@ -1,25 +1,28 @@
++=====================
+ Maintainer guidelines
+-*********************
++=====================
+ 
+ This document is intended for the maintainers of the BlueZ project. It
+ serves as basic guidelines for handling patch review and commit access.
+ 
+ 
+ Rule 1: Keep the GIT tree clean and linear
+-==========================================
++------------------------------------------
+ 
+-The bluetooth.git, bluetooth-next.git and bluez.git trees are not your
++The ``bluetooth.git``, ``bluetooth-next.git`` and ``bluez.git`` trees are not your
+ private playground. The history is meant to be clean and linear.
+ 
+-	- NO merges
+-	- NO branches
+-	- NO tags
++- NO merges
++- NO branches
++- NO tags
+ 
+ If anyone needs testing or work on a feature, clone the tree and do
+ it in your own copy. The master trees are off limits.
+ 
+ One advise to avoid any accidental errors in this area to set proper
+-options in global ~/.gitconfig or local .git/config files.
++options in global ``~/.gitconfig`` or local ``.git/config`` files.
++
++.. code-block::
+ 
+ 	[merge]
+ 		ff = only
+@@ -29,7 +32,7 @@ in doubt ask one of the seasoned maintainers.
+ 
+ 
+ Rule 2: Enforce clean commit messages
+-=====================================
++-------------------------------------
+ 
+ The commit messages are required to be clean and follow style guidelines
+ to be consistent.
+@@ -45,20 +48,22 @@ job to ensure we get proper firstname lastname <email> authorship.
+ 
+ It is also important that the committer itself uses a valid name and
+ email address when committing patches. So ensure that either the
+-global ~/.gitconfig or local .git/config provides proper values.
++global ``~/.gitconfig`` or local ``.git/config`` provides proper values.
++
++.. code-block::
+ 
+ 	[user]
+ 		name = Peter Mustermann
+ 		email = peter@mustermann.de
+ 
+-Commit messages for bluez.git shall not contain Signed-off-by
++Commit messages for ``bluez.git`` shall not contain ``Signed-off-by``
+ signatures. They are not used in userspace and with that it is the
+ maintainers job to ensure they do not get committed to the repository.
+ 
+-For bluetooth.git and bluetooth-next.git The Signed-off-by process is
+-used and the signatures are required.
++For ``bluetooth.git`` and ``bluetooth-next.git``, the ``Signed-off-by``
++process is used and the signatures are required.
+ 
+-Tags like Change-Id generated from Gerrit are never acceptable. It is
++Tags like ``Change-Id`` generated from Gerrit are never acceptable. It is
+ the maintainers job to ensure that these are not committed into the
+ repositories.
+ 
+@@ -67,48 +72,52 @@ reversed. If in doubt ask one of the seasoned maintainers.
+ 
+ 
+ Rule 3: Enforce correct coding style
+-====================================
++------------------------------------
+ 
+ The coding style follows roughly the kernel coding style with any
+-exceptions documented in doc/coding-style.txt.
++exceptions documented in :doc:`coding-style <coding-style>`.
+ 
+ To ensure trivial white-space errors don't get committed, have the
+-following in your .gitconfig:
++following in your ``.gitconfig``:
++
++.. code-block::
+ 
+ 	[apply]
+ 		whitespace = error
+ 
+ It can also be helpful to use the checkpatch.pl script coming with the
+ Linux kernel to do some automated checking. Adding the following to your
+-.git/hooks/pre-commit and .git/hooks/pre-applypatch is a simple way to
++``.git/hooks/pre-commit`` and ``.git/hooks/pre-applypatch`` is a simple way to
+ do this:
+ 
++.. code-block::
+ 	exec git diff --cached | ~/src/linux/scripts/checkpatch.pl -q \
+ 		--no-tree --no-signoff --show-types \
+ 		--ignore CAMELCASE,NEW_TYPEDEFS,INITIALISED_STATIC -
+ 
+-The above assumes that a kernel tree resides in ~/src/linux/.
++The above assumes that a kernel tree resides in ``~/src/linux/``.
+ 
+ 
+ Rule 4: Pay extra attention to adding new files to the tree
+-===========================================================
++-----------------------------------------------------------
+ 
+ New files that are added to the tree require several things to be
+ verified first:
+ 
+-	- Check that the names are acceptable with other maintainers
+-	- Ensure that the file modes are correct
+-	- Verify that the license & copyright headers are correct
+-	- If the file is supposed to be part of the release tarball,
+-	  make sure that it gets picked up by 'make dist' (particularly
+-	  important for documentation or other files that are not code)
++- Check that the names are acceptable with other maintainers
++- Ensure that the file modes are correct
++- Verify that the license & copyright headers are correct
++- If the file is supposed to be part of the release tarball,
++  make sure that it gets picked up by 'make dist' (particularly
++  important for documentation or other files that are not code)
+ 
+ 
+ Rule 5: Keep the mailing list in sync with the commit process
+-=============================================================
++-------------------------------------------------------------
+ 
+ When applying patches, be sure to send a response to the mailing list as
+ soon as the code has been pushed to the upstream tree. Usually this
+ means one email per patch, however patch-sets may only have one response
+ covering the entire set. If applying a subset of a patch-set clearly
+ state what was applied in your response.
 +
-+Every project has its coding style, and BlueZ is not an exception. This
-+document describes the preferred coding style for BlueZ code, in order to keep
-+some level of consistency among developers so that code can be easily
-+understood and maintained.
-+
-+First of all, BlueZ coding style must follow every rule for Linux kernel
-+(https://www.kernel.org/doc/Documentation/process/coding-style.rst). There also
-+exists a tool named checkpatch.pl to help you check the compliance with it.
-+Just type ``checkpatch.pl --no-tree patch_name`` to check your patch. In theory,
-+you need to clean up all the warnings and errors except this one: ``ERROR:
-+Missing Signed-off-by: line(s)``. BlueZ does not used ``Signed-off-by`` lines, so
-+including them is actually an error. In certain circumstances one can ignore
-+the 80 character per line limit. This is generally only allowed if the
-+alternative would make the code even less readable.
-+
-+Besides the kernel coding style above, BlueZ has special flavors for its own.
-+Some of them are mandatory (marked as ``M``), while some others are optional
-+(marked as ``O``), but generally preferred.
-+
-+M1: Blank line before and after an if/while/do/for statement
-+------------------------------------------------------------
-+
-+There should be a blank line before ``if`` statement unless the ``if`` is nested and
-+not preceded by an expression or variable declaration.
-+
-+Example:
-+1)
-+
-+.. code-block:: C
-+
-+        a = 1;
-+        if (b) {  // wrong
-+
-+2)
-+
-+.. code-block:: C
-+
-+        a = 1
-+
-+        if (b) {
-+        }
-+        a = 2;	// wrong
-+
-+3)
-+
-+.. code-block:: C
-+
-+        if (a) {
-+	        if (b)  // correct
-+
-+4)
-+
-+.. code-block:: C
-+
-+        b = 2;
-+
-+        if (a) {	// correct
-+
-+        }
-+
-+        b = 3;
-+
-+The only exception to this rule applies when a variable is being checked for
-+errors as such:
-+
-+.. code-block:: C
-+
-+        err = stat(filename, &st);
-+        if (err || !S_ISDIR(st.st_mode))
-+	        return;
-+
-+M2: Multiple line comment
-+-------------------------
-+
-+If your comment has more than one line, please start it from the second line.
-+
-+Example:
-+
-+.. code-block:: C
-+
-+        /*
-+         * first line comment	// correct
-+         * ...
-+         * last line comment
-+         */
-+
-+M3: Space before and after operator
-+-----------------------------------
-+
-+There should be a space before and after each operator.
-+
-+Example:
-+
-+.. code-block:: C
-+
-+        a + b;  // correct
-+
-+
-+M4: Wrap long lines
-+-------------------
-+
-+If your condition in ``if``, ``while``, ``for`` statement or a function declaration is too
-+long to fit in one line, the new line needs to be indented not aligned with the
-+body.
-+
-+Example:
-+1)
-+
-+.. code-block:: C
-+
-+        if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
-+        	!(adapter->current_settings & MGMT_SETTING_SSP)) // wrong
-+
-+2)
-+
-+.. code-block:: C
-+
-+        if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
-+	        			!(adapter->current_settings & MGMT_SETTING_SSP))
-+
-+3)
-+
-+.. code-block:: C
-+
-+        void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
-+	        			 btd_adapter_pin_cb_t cb) // wrong
-+
-+4)
-+
-+.. code-block:: C
-+
-+        void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
-+	        						btd_adapter_pin_cb_t cb)
-+
-+The referred style for line wrapping is to indent as far as possible to the
-+right without hitting the 80 columns limit.
-+
-+M5: Space when doing type casting
-+---------------------------------
-+
-+There should be a space between new type and variable.
-+
-+Example:
-+1)
-+
-+.. code-block:: C
-+
-+        a = (int *)b;  // wrong
-+
-+2)
-+
-+.. code-block:: C
-+
-+        a = (int *) b;  // correct
-+
-+
-+M6: Don't initialize variable unnecessarily
-+-------------------------------------------
-+
-+When declaring a variable, try not to initialize it unless necessary.
-+
-+Example:
-+
-+.. code-block:: C
-+
-+        int i = 1;  // wrong
-+
-+        for (i = 0; i < 3; i++) {
-+        }
-+
-+M7: Follow the order of include header elements
-+-----------------------------------------------
-+
-+When writing an include header the various elements should be in the following
-+order:
-+
-+* ``#include``'s
-+* forward declarations
-+* ``#define``'s
-+* ``enum``'s
-+* ``typedef``'s
-+* function declarations and inline function definitions
-+
-+M8: Internal headers must not use include guards
-+------------------------------------------------
-+
-+Any time when creating a new header file with non-public API, that header
-+must not contain include guards.
-+
-+M9: Naming of enums
-+-------------------
-+
-+Enums must have a descriptive name.  The enum type should be small caps and
-+it should not be ``typedef``'ed.  Enum contents should be in CAPITAL letters and
-+prefixed by the ``enum`` type name.
-+
-+Example:
-+
-+.. code-block:: C
-+
-+        enum animal_type {
-+        	ANIMAL_TYPE_FOUR_LEGS,
-+        	ANIMAL_TYPE_EIGHT_LEGS,
-+        	ANIMAL_TYPE_TWO_LEGS,
-+        };
-+
-+If the enum contents have values (e.g. from specification) the formatting
-+should be as follows:
-+
-+.. code-block:: C
-+
-+        enum animal_type {
-+        	ANIMAL_TYPE_FOUR_LEGS =		4,
-+        	ANIMAL_TYPE_EIGHT_LEGS =	8,
-+        	ANIMAL_TYPE_TWO_LEGS =		2,
-+        };
-+
-+M10: Enum as switch variable
-+----------------------------
-+
-+If the variable of a ``switch`` is an enum, you must include all values in
-+switch body even if providing ``default``. This is enforced by compiler option
-+enabling extra warning in such case. The reason for this is to ensure that if
-+later on the enum is modified and one forget to change the ``switch`` accordingly, the
-+compiler will complain the new added type hasn't been handled.
-+
-+Example:
-+
-+.. code-block:: C
-+
-+        enum animal_type {
-+        	ANIMAL_TYPE_FOUR_LEGS =		4,
-+        	ANIMAL_TYPE_EIGHT_LEGS =	8,
-+        	ANIMAL_TYPE_TWO_LEGS =		2,
-+        };
-+
-+        enum animal_type t;
-+
-+        switch (t) { // OK
-+        case ANIMAL_TYPE_FOUR_LEGS:
-+        	...
-+        	break;
-+        case ANIMAL_TYPE_EIGHT_LEGS:
-+        	...
-+        	break;
-+        case ANIMAL_TYPE_TWO_LEGS:
-+        	...
-+        	break;
-+        default:
-+        	break;
-+        }
-+
-+        switch (t) { // Wrong
-+        case ANIMAL_TYPE_FOUR_LEGS:
-+        	...
-+        	break;
-+        case ANIMAL_TYPE_TWO_LEGS:
-+        	...
-+        	break;
-+        default:
-+        	break;
-+        }
-+
-+However if the enum comes from an external header file outside BlueZ, such as
-+Android headers, we cannot make any assumption of how the enum is defined and
-+this rule might not apply.
-+
-+M11: Always use parenthesis with sizeof
-+---------------------------------------
-+
-+The expression argument to the ``sizeof`` operator should always be in
-+parenthesis, too.
-+
-+Example:
-+1)
-+
-+.. code-block:: C
-+
-+        memset(stuff, 0, sizeof(*stuff));
-+
-+2)
-+
-+.. code-block:: C
-+
-+        memset(stuff, 0, sizeof *stuff); // Wrong
-+
-+M12: Use void if function has no parameters
-+-------------------------------------------
-+
-+A function with no parameters must use ``void`` in the parameter list.
-+
-+Example:
-+1)
-+
-+.. code-block:: C
-+
-+        void foo(void)
-+        {
-+        }
-+
-+2)
-+
-+.. code-block:: C
-+
-+        void foo()	// Wrong
-+        {
-+        }
-+
-+O1: Try to avoid complex if body
-+--------------------------------
-+
-+It's better not to have a complicated statement for ``if``. You may judge its
-+contrary condition and ``return``, ``break``, ``continue`` or ``goto`` as soon
-+as possible.
-+
-+Example:
-+
-+1)
-+
-+.. code-block:: C
-+
-+        if (device) {  // worse
-+        	memset(&eir_data, 0, sizeof(eir_data));
-+        	if (eir_len > 0)
-+        		eir_parse(&eir_data, ev->eir, eir_len);
-+        	...
-+        } else {
-+        	error("Unable to get device object for %s", addr);
-+        	return;
-+        }
-+
-+2)
-+
-+.. code-block:: C
-+
-+        if (!device) {
-+        	error("Unable to get device object for %s", addr);
-+        	return;
-+        }
-+
-+        memset(&eir_data, 0, sizeof(eir_data));
-+        if (eir_len > 0)
-+        	eir_parse(&eir_data, ev->eir, eir_len);
-+        ...
-+
-diff --git a/doc/coding-style.txt b/doc/coding-style.txt
-deleted file mode 100644
-index e73158840ff6..000000000000
---- a/doc/coding-style.txt
-+++ /dev/null
-@@ -1,279 +0,0 @@
--BlueZ coding style
--******************
--
--Every project has its coding style, and BlueZ is not an exception. This
--document describes the preferred coding style for BlueZ code, in order to keep
--some level of consistency among developers so that code can be easily
--understood and maintained.
--
--First of all, BlueZ coding style must follow every rule for Linux kernel
--(https://www.kernel.org/doc/Documentation/process/coding-style.rst). There also
--exists a tool named checkpatch.pl to help you check the compliance with it.
--Just type "checkpatch.pl --no-tree patch_name" to check your patch. In theory,
--you need to clean up all the warnings and errors except this one: "ERROR:
--Missing Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so
--including them is actually an error.  In certain circumstances one can ignore
--the 80 character per line limit.  This is generally only allowed if the
--alternative would make the code even less readable.
--
--Besides the kernel coding style above, BlueZ has special flavors for its own.
--Some of them are mandatory (marked as 'M'), while some others are optional
--(marked as 'O'), but generally preferred.
--
--M1: Blank line before and after an if/while/do/for statement
--============================================================
--
--There should be a blank line before if statement unless the if is nested and
--not preceded by an expression or variable declaration.
--
--Example:
--1)
--a = 1;
--if (b) {  // wrong
--
--2)
--a = 1
--
--if (b) {
--}
--a = 2;	// wrong
--
--3)
--if (a) {
--	if (b)  // correct
--
--4)
--b = 2;
--
--if (a) {	// correct
--
--}
--
--b = 3;
--
--The only exception to this rule applies when a variable is being checked for
--errors as such:
--
--err = stat(filename, &st);
--if (err || !S_ISDIR(st.st_mode))
--	return;
--
--M2: Multiple line comment
--=========================
--
--If your comment has more than one line, please start it from the second line.
--
--Example:
--/*
-- * first line comment	// correct
-- * ...
-- * last line comment
-- */
--
--
--M3: Space before and after operator
--===================================
--
--There should be a space before and after each operator.
--
--Example:
--a + b;  // correct
--
--
--M4: Wrap long lines
--===================
--
--If your condition in if, while, for statement or a function declaration is too
--long to fit in one line, the new line needs to be indented not aligned with the
--body.
--
--Example:
--1)
--if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
--	!(adapter->current_settings & MGMT_SETTING_SSP)) // wrong
--
--2)
--if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
--				!(adapter->current_settings & MGMT_SETTING_SSP))
--
--3)
--void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
--				 btd_adapter_pin_cb_t cb) // wrong
--
--4)
--void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
--							btd_adapter_pin_cb_t cb)
--
--The referred style for line wrapping is to indent as far as possible to the
--right without hitting the 80 columns limit.
--
--M5: Space when doing type casting
--=================================
--
--There should be a space between new type and variable.
--
--Example:
--1)
--a = (int *)b;  // wrong
--2)
--a = (int *) b;  // correct
--
--
--M6: Don't initialize variable unnecessarily
--===========================================
--
--When declaring a variable, try not to initialize it unless necessary.
--
--Example:
--int i = 1;  // wrong
--
--for (i = 0; i < 3; i++) {
--}
--
--M7: Follow the order of include header elements
--===============================================
--
--When writing an include header the various elements should be in the following
--order:
--	- #includes
--	- forward declarations
--	- #defines
--	- enums
--	- typedefs
--	- function declarations and inline function definitions
--
--M8: Internal headers must not use include guards
--================================================
--
--Any time when creating a new header file with non-public API, that header
--must not contain include guards.
--
--M9: Naming of enums
--===================
--
--Enums must have a descriptive name.  The enum type should be small caps and
--it should not be typedef-ed.  Enum contents should be in CAPITAL letters and
--prefixed by the enum type name.
--
--Example:
--
--enum animal_type {
--	ANIMAL_TYPE_FOUR_LEGS,
--	ANIMAL_TYPE_EIGHT_LEGS,
--	ANIMAL_TYPE_TWO_LEGS,
--};
--
--If the enum contents have values (e.g. from specification) the formatting
--should be as follows:
--
--enum animal_type {
--	ANIMAL_TYPE_FOUR_LEGS =		4,
--	ANIMAL_TYPE_EIGHT_LEGS =	8,
--	ANIMAL_TYPE_TWO_LEGS =		2,
--};
--
--M10: Enum as switch variable
--============================
--
--If the variable of a switch is an enum, you must include all values in
--switch body even if providing default. This is enforced by compiler option
--enabling extra warning in such case. The reason for this is to ensure that if
--later on enum is modified and one forget to change the switch accordingly, the
--compiler will complain the new added type hasn't been handled.
--
--Example:
--
--enum animal_type {
--	ANIMAL_TYPE_FOUR_LEGS =		4,
--	ANIMAL_TYPE_EIGHT_LEGS =	8,
--	ANIMAL_TYPE_TWO_LEGS =		2,
--};
--
--enum animal_type t;
--
--switch (t) { // OK
--case ANIMAL_TYPE_FOUR_LEGS:
--	...
--	break;
--case ANIMAL_TYPE_EIGHT_LEGS:
--	...
--	break;
--case ANIMAL_TYPE_TWO_LEGS:
--	...
--	break;
--default:
--	break;
--}
--
--switch (t) { // Wrong
--case ANIMAL_TYPE_FOUR_LEGS:
--	...
--	break;
--case ANIMAL_TYPE_TWO_LEGS:
--	...
--	break;
--default:
--	break;
--}
--
--However if the enum comes from an external header file outside BlueZ, such as
--Android headers, we cannot make any assumption of how the enum is defined and
--this rule might not apply.
--
--M11: Always use parenthesis with sizeof
--=======================================
--
--The expression argument to the sizeof operator should always be in
--parenthesis, too.
--
--Example:
--1)
--memset(stuff, 0, sizeof(*stuff));
--
--2)
--memset(stuff, 0, sizeof *stuff); // Wrong
--
--M12: Use void if function has no parameters
--===========================================
--
--A function with no parameters must use void in the parameter list.
--
--Example:
--1)
--void foo(void)
--{
--}
--
--2)
--void foo()	// Wrong
--{
--}
--
--O1: Try to avoid complex if body
--================================
--
--It's better not to have a complicated statement for if. You may judge its
--contrary condition and return | break | continue | goto ASAP.
--
--Example:
--1)
--if (device) {  // worse
--	memset(&eir_data, 0, sizeof(eir_data));
--	if (eir_len > 0)
--		eir_parse(&eir_data, ev->eir, eir_len);
--	...
--} else {
--	error("Unable to get device object for %s", addr);
--	return;
--}
--
--2)
--if (!device) {
--	error("Unable to get device object for %s", addr);
--	return;
--}
--
--memset(&eir_data, 0, sizeof(eir_data));
--if (eir_len > 0)
--	eir_parse(&eir_data, ev->eir, eir_len);
--...
 -- 
 2.52.0
 
