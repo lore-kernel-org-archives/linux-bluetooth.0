@@ -1,155 +1,82 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAE1314B97
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 16:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C223336ED1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 16:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768925927; cv=none; b=XcLYAPcb5W3KpNItHAHk/4SotFBe1dx7yXiKBWqAtrIGxNqkHx71Hgn/qH4qT9Dmh4MrvmCPuyDt0xoEiOjcAvBjgsBALwmD4Hrl0WWHpTWcJeF2/9ZRsE3GEk5Kr4g8/bkU6EIiLMYS6reXgQ68eem+nTibM/1UmCuDc+S+7LM=
+	t=1768926612; cv=none; b=d18c9bhLdgdIixNWL20p5BxfyHG7j5BHuV0A+D/HBH5567+BwoVys61SHPQTnKxKzClol9bZ30W2PH3CZ/uyahhQiXoPI5f2XmBFtRCmzyf0SGNzcwNvRh3kMzhu2bFajdu0kDQpPPu9bsJ4aYqNQcF71XBLjvVXmdd/XDx6e4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768925927; c=relaxed/simple;
-	bh=khTuFZBX8YyFLdbm+ng/9n585szFREbkxoZmi1lT0jM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=W7KVqCsmN0GFODJ5XtgahGCVflW7XcuFkyxfslWdLQ/l6smEcr8lrJELz43UDz1xhNR1lQa+Mw2FjzQ2inRPLmOG350/AwqYEULEKFDsPGNT4PWP+SRIV3zOh2B/8kmM9pAWla+DZm+EC7EOYlBJIOqg3Zx8aBeGOK6vLriV0PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ftjvc+/3; arc=none smtp.client-ip=192.30.252.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1768926612; c=relaxed/simple;
+	bh=Cm35LSw5OqFmrTTk2G4En4PdmrtnTFMjuqbfpoEwOQs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oRL01fPSJNxOAYyJ/2+OI/ueOtdi9v6fbrpw2WkQ6naOV/fXbzv3f5qJqpAM2azaa4uizVgRqXvfurds94rXGPee/VYSV6YEIFag9ldOdhCoVAheaCGJ9AWwlFhqLoo6i0e2zZlP7pazUuYzMBGzmqfEux7BVbTfvLZKgLWyKOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fdqUWUKm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ftjvc+/3"
-Received: from github.com (hubbernetes-node-0b24f29.va3-iad.github.net [10.48.142.32])
-	by smtp.github.com (Postfix) with ESMTPA id DB3ADE052A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 08:18:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1768925924;
-	bh=iAe45YWJSW/VNoLQBJF0F5+nGNqFHll6hxPUxzHa2Nc=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Ftjvc+/3oPyyVOG/pQckoqVAwtSLKhRpQhDAprNWoBeBYOLpMMc5dTrdndvngITJG
-	 0pp7Ld2CrLA+f248qKpGc+f9KVeSXuX6d4zFeYTrM+8Am1GU1hSLkDYH/V8RCmnte3
-	 SCGfiG/bLtBGt+XSQLadry6x0VBCwUlJ+LshQm+g=
-Date: Tue, 20 Jan 2026 08:18:44 -0800
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1044766/000000-f2670a@github.com>
-Subject: [bluez/bluez] 9334f6: doc: Port assigned-numbers.txt to RST
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fdqUWUKm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 079C8C16AAE;
+	Tue, 20 Jan 2026 16:30:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768926612;
+	bh=Cm35LSw5OqFmrTTk2G4En4PdmrtnTFMjuqbfpoEwOQs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fdqUWUKmdJ74JxPCIYGC1mkDGsJ1h8J2nmzTs0tBQhT80lmAbxZGApxImbNcltSJc
+	 GrK6FGD2f8DFXuvuHTNHeHT3grhgWFONnLc34DVFpxUayjtrkuLJhU2aeJ5h8C3jSz
+	 B3OjTRfWwQlMgu4Kz0lUiuUw8O1TzMPXrEFn/xhWuQNy2jSGTXqPK4+0JkKh8H1uXG
+	 QOqIqL9aFvwG7bZ+8Amouhpy2U/XbUiXl7PUk1iYcYwdM3OOlzfFbJdz0E4P6Ez0Dz
+	 TqlSjGAd8EeELITRUCW6gG4u61qGjYwFjdE/7h+VlP9dvwVZjxoL9AMMIHL82aCSlG
+	 wEoppqqyzsUiw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C89C73806671;
+	Tue, 20 Jan 2026 16:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [BlueZ 0/4] API fixes to make better bindings
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176892660934.117222.16357560256198589969.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Jan 2026 16:30:09 +0000
+References: <20260119141239.2683954-1-hadess@hadess.net>
+In-Reply-To: <20260119141239.2683954-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1044766
-  Home:   https://github.com/bluez/bluez
-  Commit: 9334f6d98de7f10f824ee4258885da4a002d8878
-      https://github.com/bluez/bluez/commit/9334f6d98de7f10f824ee4258885da4a002d8878
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-01-20 (Tue, 20 Jan 2026)
+Hello:
 
-  Changed paths:
-    M Makefile.am
-    A doc/assigned-numbers.rst
-    R doc/assigned-numbers.txt
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  doc: Port assigned-numbers.txt to RST
+On Mon, 19 Jan 2026 14:27:08 +0100 you wrote:
+> Those changes will make using the internal bluez API easier to access
+> from Rust.
+> 
+> Bastien Nocera (4):
+>   src: Turn available priority macros into an enum
+>   src: Prefix plugin-accessible adapter_set_name() function
+>   adapter: Fix const'ness of struct btd_adapter_driver
+>   src: Prefix plugin-accessible adapter_foreach() function
+> 
+> [...]
 
+Here is the summary with links:
+  - [BlueZ,1/4] src: Turn available priority macros into an enum
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a1f2e53de4e9
+  - [BlueZ,2/4] src: Prefix plugin-accessible adapter_set_name() function
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=69fd644df0a2
+  - [BlueZ,3/4] adapter: Fix const'ness of struct btd_adapter_driver
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=80828d5ff016
+  - [BlueZ,4/4] src: Prefix plugin-accessible adapter_foreach() function
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c24f0b487ca3
 
-  Commit: 4f9bde09a62a004b7fd6706534e21436ce77a1dd
-      https://github.com/bluez/bluez/commit/4f9bde09a62a004b7fd6706534e21436ce77a1dd
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-01-20 (Tue, 20 Jan 2026)
-
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.Thermometer.rst
-    A doc/org.bluez.ThermometerManager.rst
-    A doc/org.bluez.ThermometerWatcher.rst
-    R doc/thermometer-api.txt
-
-  Log Message:
-  -----------
-  doc: Port thermometer-api.txt to RST
-
-
-  Commit: 5acbb4eb07b2b422a0c2dfd7b1d598082f957bdf
-      https://github.com/bluez/bluez/commit/5acbb4eb07b2b422a0c2dfd7b1d598082f957bdf
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-01-20 (Tue, 20 Jan 2026)
-
-  Changed paths:
-    A doc/security-bugs.rst
-    R doc/security-bugs.txt
-
-  Log Message:
-  -----------
-  doc: Port security-bugs.txt to RST
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 7f3bb461b16db8ab744e3f7ecd7d3cfde7678a0f
-      https://github.com/bluez/bluez/commit/7f3bb461b16db8ab744e3f7ecd7d3cfde7678a0f
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-01-20 (Tue, 20 Jan 2026)
-
-  Changed paths:
-    A doc/coding-style.rst
-    R doc/coding-style.txt
-
-  Log Message:
-  -----------
-  doc: Port coding-style.txt to RST
-
-
-  Commit: b23fbf7f857917e5499bd135c8f3ad2423a59af7
-      https://github.com/bluez/bluez/commit/b23fbf7f857917e5499bd135c8f3ad2423a59af7
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-01-20 (Tue, 20 Jan 2026)
-
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.SimAccess.rst
-    R doc/sap-api.txt
-
-  Log Message:
-  -----------
-  doc: Port sap-api.txt to RST
-
-
-  Commit: ba7d2a37c023c39f25ee412f8fa2c98aa2dfcd0d
-      https://github.com/bluez/bluez/commit/ba7d2a37c023c39f25ee412f8fa2c98aa2dfcd0d
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-01-20 (Tue, 20 Jan 2026)
-
-  Changed paths:
-    A doc/maintainer-guidelines.rst
-    R doc/maintainer-guidelines.txt
-
-  Log Message:
-  -----------
-  doc: Port maintainer-guidelines.txt to RST
-
-
-  Commit: f2670a54379a15d0be1c3f9e8299306e7195e8dc
-      https://github.com/bluez/bluez/commit/f2670a54379a15d0be1c3f9e8299306e7195e8dc
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-01-20 (Tue, 20 Jan 2026)
-
-  Changed paths:
-    M Makefile.am
-    R doc/health-api.txt
-    A doc/org.bluez.HealthChannel.rst
-    A doc/org.bluez.HealthDevice.rst
-    A doc/org.bluez.HealthManager.rst
-
-  Log Message:
-  -----------
-  doc: Port health-api.txt to RST
-
-
-Compare: https://github.com/bluez/bluez/compare/9334f6d98de7%5E...f2670a54379a
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
