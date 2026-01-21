@@ -1,173 +1,48 @@
-Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com [209.85.167.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A05547B41E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 08:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BD844B697
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 09:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768985947; cv=none; b=N6rYASi6jyZMErBDUBiSMbGsBib/o6DhgofyomjReeAm5Db1GX6lHkPWlsLNZYjUmo0Lo9siDhHmKPqYU8ZPqC4L0MTGo4AI85wEuU4Pofk6u9AYHvat9u7JkHfDwwrHKWayaCjNRYIxPNAdf6YUj2HjkA0BwfYE2QNom9JUbBY=
+	t=1768987152; cv=none; b=k3yJ3+1anGj6yZo2zlbMydagWXoPGAVgLP32insA0BudHS4rfYs0nqPR0o2uH1txnCT9vMroTAdsfcZ+2MQ6NEvBdlVyJoYejp0gOoYDfBeKb0YY1wBC43xu0IbbKMFSbD2lDP8l18pxUj7qR+cElEasP1JK+3hNCknjpvUli78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768985947; c=relaxed/simple;
-	bh=hyQHHGosSjSHlfJpLI2PgexHdoiaY/uAgfmFx8D53UQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Mw1VnJpxDosKKNzRh1FnZbqpnYyM1vvbBBV4Eu3S2BO44BjMkS7iPZOnl7W7EX36cwbis/C1Ioyqa6VJvXPcd1PW0neETOSTxyvM+F0JrUzJjKQkFHotrwp4vdw++sPpid6gK7u3O155txF5gGU3h3BpaT2AKj9GhDWriLXsF50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vyax8GZk; arc=none smtp.client-ip=209.85.167.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768987152; c=relaxed/simple;
+	bh=TXFObLnArJGGZEAdPl6JyFDSkDTS6WV15q+1rcoiLrE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=B3A7oDpTL/D6tqs91CcYYldYM2dR0Tijh/yrai/2aMDafKzSLAmBCRSWYofCft5jBkOupnCaR2x0x7zLQPmv19kcTsSTGKt1nn5RPi8pmg0UML5e+HsvLjXXar5MsSTzqmoiaukHMC8qaTu4K7IniDddDnqP4SxPT7x54p26pUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=SNyE5L5M; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vyax8GZk"
-Received: by mail-oi1-f193.google.com with SMTP id 5614622812f47-45c70afbeebso3438438b6e.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 00:59:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768985945; x=1769590745; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hyQHHGosSjSHlfJpLI2PgexHdoiaY/uAgfmFx8D53UQ=;
-        b=Vyax8GZkfeFoOPNnZkPAc+44T/iUVEcMJgYXk97xhJ9QkMJaNbd7Ho7dDB1Xib1SPL
-         W2o7+Tk4XQVPxI9NPh/vdSz3tFvR5Csp4k1DHMIuYTd6LufScPig1vsCkmH43BJWA8Iu
-         Q2KHwG1xHmS73trrop/GsBGc9pzaByNr0P9Y0JK+dpkdNEJcr2kdHBNB7/1+uhe9QfrM
-         SixUbUo+rQN3f8PfI3rfMEcDeecLW/OCDTYQYbxEIamPPEKVnXJha5QPuFONhDgcmEQQ
-         9nBPfhpOo0BxNan8heSigH0b1Y4q6VaRE9bNXwazgJ6dKiFaejmJSrEqD4vcHEzFc+qa
-         MDow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768985945; x=1769590745;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hyQHHGosSjSHlfJpLI2PgexHdoiaY/uAgfmFx8D53UQ=;
-        b=T3IHkEkU3ZjKELaTRmMRH8Mf94wNFCg7FC69XQytxevCAlIB4fjftRTqP6HxhLWaHY
-         lXyREffdsa6Gpxiqylo/zFTzKAdXhjhCcdF7DTIMni4fY1NrU/3la+fH42tCs2H3SPKk
-         rWgoEKdFOmPSOowcm0FONeIUCiWzPY4IhDD/N3BM2Uu3eU/ZLQnccLaxZK3KGDyGD0Kz
-         idkloD04XMr9sPc6XgF7xnH5sFnNVOcxe8LphVeOPldcDk08oprQ/5UK0c5N0o5YMejx
-         xeGszvV+Vbp3139V8eCPkEdXJWsY6lMTOERYG25oaQWH+jDoXhTYqBG0PTeSZbHVsaB9
-         NhSg==
-X-Gm-Message-State: AOJu0Yxi0aSMQGj/Xpy0WnZy8dlJM0PwSA2u54muxOKgEv3hdRnybprh
-	Ky/rzSYR1awCGHJG6Q8l+TFy724FlHaB2zaOyvZiCuqAczBJaBeIu3JXQ8xQpne0
-X-Gm-Gg: AZuq6aL7UBUvrFPAsPQkd63JqwGslcFfXe/I6YYacl1bAWnkSWCPCTWE+sMHGn9Y9yh
-	Pvqjjq7N4uE8pZSWs0yu3+BQDzzlbnkG+CHJZhBlv9T+/9ZF/pUG6nPNQ3JX+Jhqml4dYUei0aK
-	1v/nF6DfdllDWmKb/JMgZVdKXxp1AM7ssccdS8Jhf3zAKuJQ/2UFQqu5/KMqEklTqBOeBUrpXb0
-	lA4Az3eOQKMQg8aCjQKkMHnGzh5BmyJSpGU1i7sYKB6IcU8lCgXwXgsjYOvwo4n+SeYkEesdQfr
-	iOP7vnggSbyMnPzkY51WMQH+0l59u+oQrxHkm3rQ+WzsEJeaiTOPQ4/O2RnyqwK7hf5lONwJF4r
-	bnPLW8u854A2ZdDJK9OdsDTXx5bbGHrF2f+j5YcUxqReDbtpruWgf97P+Vaf7SrrjFwo/8AVT7B
-	niDcU16GvU5w1bDqIWhg==
-X-Received: by 2002:a05:6808:3081:b0:44f:6def:3f3b with SMTP id 5614622812f47-45e8aa7354fmr1828746b6e.51.1768985944747;
-        Wed, 21 Jan 2026 00:59:04 -0800 (PST)
-Received: from [172.17.0.2] ([52.173.178.218])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4044b5c11e4sm10809078fac.0.2026.01.21.00.59.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 00:59:04 -0800 (PST)
-Message-ID: <69709558.050a0220.9983b.963c@mx.google.com>
-Date: Wed, 21 Jan 2026 00:59:04 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6746873549650987810=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="SNyE5L5M"
+Received: from github.com (hubbernetes-node-c1cb629.va3-iad.github.net [10.48.204.56])
+	by smtp.github.com (Postfix) with ESMTPA id DEB253C11DD
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 01:19:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1768987149;
+	bh=RbS8oJTGR9smzGqsPpMb2A10fnqxGml07lvqLxSBvi0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=SNyE5L5M8JWMbp8gB88ykSKKq2FhUmXTKGfpHl0l5jqelYqv/A5gEEx9BC48qNK1d
+	 +EW7IQEUg9cLm5AoWelpjs9e/hrimd9//putgaijvmYXgvV5pfQfT3mh0nN4XGHJFD
+	 8t+1IzxzlCnc3FynDONRyWFk5oB1HsjalqzQeIVM=
+Date: Wed, 21 Jan 2026 01:19:09 -0800
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1038430/192876-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, mengshi.wu@oss.qualcomm.com
-Subject: RE: gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching.
-In-Reply-To: <20260121083804.4010106-2-mengshi.wu@oss.qualcomm.com>
-References: <20260121083804.4010106-2-mengshi.wu@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
---===============6746873549650987810==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+  Branch: refs/heads/1038430
+  Home:   https://github.com/bluez/bluez
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTA0NTAzMgoKLS0t
-VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
-ICAgUEVORElORyAgIDAuMzQgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
-RU5ESU5HICAgMC4zMiBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
-ICAgICAxOS44NSBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAg
-ICAxMy41NSBzZWNvbmRzCk1ha2VDaGVjayAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAy
-NS40MCBzZWNvbmRzCk1ha2VEaXN0Y2hlY2sgICAgICAgICAgICAgICAgIFBBU1MgICAgICAyNDAu
-MDAgc2Vjb25kcwpDaGVja1ZhbGdyaW5kICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTEuODIg
-c2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTQuMDcgc2Vj
-b25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBGQUlMICAgICAgMTEuMzcgc2Vjb25k
-cwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBQRU5ESU5HICAgMC4zNiBzZWNvbmRzClNj
-YW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNC4wMyBzZWNvbmRzCgpEZXRh
-aWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gUEVO
-RElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgoKIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQRU5ESU5HCkRlc2M6IFJ1biBnaXRs
-aW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1h
-a2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnNyYy9zaGFyZWQvYXR0LmM6IElu
-IGZ1bmN0aW9uIOKAmGhhbmRsZV9yc3DigJk6CnNyYy9zaGFyZWQvYXR0LmM6OTAyOjIyOiBlcnJv
-cjogdGhpcyBzdGF0ZW1lbnQgbWF5IGZhbGwgdGhyb3VnaCBbLVdlcnJvcj1pbXBsaWNpdC1mYWxs
-dGhyb3VnaD1dCiAgOTAyIHwgICAgY2hhbi0+cGVuZGluZ19yZXEgPSBOVUxMOwogICAgICB8ICAg
-ICAgICAgICAgICAgICAgICAgIF4Kc3JjL3NoYXJlZC9hdHQuYzo5MDM6Mzogbm90ZTogaGVyZQog
-IDkwMyB8ICAgY2FzZSBCVF9BVFRfUkVUUllfWUVTOgogICAgICB8ICAgXn5+fgpjYzE6IGFsbCB3
-YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc4
-NTk6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWF0dC5sb10gRXJyb3IgMQptYWtl
-WzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2Vm
-aWxlOjQyNDM6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVz
-dDogTWFrZUNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjawpPdXRwdXQ6Cgpz
-cmMvc2hhcmVkL2F0dC5jOiBJbiBmdW5jdGlvbiDigJhoYW5kbGVfcnNw4oCZOgpzcmMvc2hhcmVk
-L2F0dC5jOjkwMjoyMjogZXJyb3I6IHRoaXMgc3RhdGVtZW50IG1heSBmYWxsIHRocm91Z2ggWy1X
-ZXJyb3I9aW1wbGljaXQtZmFsbHRocm91Z2g9XQogIDkwMiB8ICAgIGNoYW4tPnBlbmRpbmdfcmVx
-ID0gTlVMTDsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICBeCnNyYy9zaGFyZWQvYXR0LmM6
-OTAzOjM6IG5vdGU6IGhlcmUKICA5MDMgfCAgIGNhc2UgQlRfQVRUX1JFVFJZX1lFUzoKICAgICAg
-fCAgIF5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsx
-XTogKioqIFtNYWtlZmlsZTo3NTg2OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9nbGliX2xhLWF0dC5s
-b10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjExMDIyOiBjaGVja10gRXJyb3IgMgojIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tWYWxncmluZCAtIEZBSUwKRGVz
-YzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sgd2l0aCBWYWxncmluZApPdXRwdXQ6CgpzcmMvc2hhcmVk
-L2F0dC5jOiBJbiBmdW5jdGlvbiDigJhoYW5kbGVfcnNw4oCZOgpzcmMvc2hhcmVkL2F0dC5jOjkw
-MjoyMjogZXJyb3I6IHRoaXMgc3RhdGVtZW50IG1heSBmYWxsIHRocm91Z2ggWy1XZXJyb3I9aW1w
-bGljaXQtZmFsbHRocm91Z2g9XQogIDkwMiB8ICAgIGNoYW4tPnBlbmRpbmdfcmVxID0gTlVMTDsK
-ICAgICAgfCAgICAgICAgICAgICAgICAgICAgICBeCnNyYy9zaGFyZWQvYXR0LmM6OTAzOjM6IG5v
-dGU6IGhlcmUKICA5MDMgfCAgIGNhc2UgQlRfQVRUX1JFVFJZX1lFUzoKICAgICAgfCAgIF5+fn4K
-Y2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtN
-YWtlZmlsZTo3ODU5OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1hdHQubG9dIEVy
-cm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTog
-KioqIFtNYWtlZmlsZToxMTAyMjogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjClRlc3Q6IENoZWNrU21hdGNoIC0gRkFJTApEZXNjOiBSdW4gc21hdGNoIHRvb2wg
-d2l0aCBzb3VyY2UKT3V0cHV0OgoKc3JjL3NoYXJlZC9jcnlwdG8uYzoyNzE6MjE6IHdhcm5pbmc6
-IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2NyeXB0by5jOjI3Mjoy
-Mzogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0
-dC1oZWxwZXJzLmM6NzY4OjMxOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNl
-ZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo4NDY6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxl
-bmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjEzMzk6MzE6IHdh
-cm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVs
-cGVycy5jOjEzNzA6MjM6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpz
-cmMvc2hhcmVkL2F0dC5jOiBJbiBmdW5jdGlvbiDigJhoYW5kbGVfcnNw4oCZOgpzcmMvc2hhcmVk
-L2F0dC5jOjkwMjoyMjogZXJyb3I6IHRoaXMgc3RhdGVtZW50IG1heSBmYWxsIHRocm91Z2ggWy1X
-ZXJyb3I9aW1wbGljaXQtZmFsbHRocm91Z2g9XQogIDkwMiB8ICAgIGNoYW4tPnBlbmRpbmdfcmVx
-ID0gTlVMTDsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICBeCnNyYy9zaGFyZWQvYXR0LmM6
-OTAzOjM6IG5vdGU6IGhlcmUKICA5MDMgfCAgIGNhc2UgQlRfQVRUX1JFVFJZX1lFUzoKICAgICAg
-fCAgIF5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsx
-XTogKioqIFtNYWtlZmlsZTo3ODU5OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1h
-dHQubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4u
-Li4KbWFrZTogKioqIFtNYWtlZmlsZTo0MjQzOiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjClRlc3Q6IGJsdWV6bWFrZWV4dGVsbCAtIEZBSUwKRGVzYzogQnVpbGQg
-Qmx1ZXogd2l0aCBFeHRlcm5hbCBFTEwKT3V0cHV0OgoKc3JjL3NoYXJlZC9hdHQuYzogSW4gZnVu
-Y3Rpb24g4oCYaGFuZGxlX3JzcOKAmToKc3JjL3NoYXJlZC9hdHQuYzo5MDI6MjI6IGVycm9yOiB0
-aGlzIHN0YXRlbWVudCBtYXkgZmFsbCB0aHJvdWdoIFstV2Vycm9yPWltcGxpY2l0LWZhbGx0aHJv
-dWdoPV0KICA5MDIgfCAgICBjaGFuLT5wZW5kaW5nX3JlcSA9IE5VTEw7CiAgICAgIHwgICAgICAg
-ICAgICAgICAgICAgICAgXgpzcmMvc2hhcmVkL2F0dC5jOjkwMzozOiBub3RlOiBoZXJlCiAgOTAz
-IHwgICBjYXNlIEJUX0FUVF9SRVRSWV9ZRVM6CiAgICAgIHwgICBefn5+CmNjMTogYWxsIHdhcm5p
-bmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6Nzg1OTog
-c3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtYXR0LmxvXSBFcnJvciAxCm1ha2VbMV06
-ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6
-NDI0MzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJ
-bmNyZW1lbnRhbEJ1aWxkIC0gUEVORElORwpEZXNjOiBJbmNyZW1lbnRhbCBidWlsZCB3aXRoIHRo
-ZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjClRlc3Q6IFNjYW5CdWlsZCAtIEZBSUwKRGVzYzogUnVuIFNjYW4gQnVpbGQKT3V0cHV0
-OgoKc3JjL3NoYXJlZC9hdHQuYzogSW4gZnVuY3Rpb24g4oCYaGFuZGxlX3JzcOKAmToKc3JjL3No
-YXJlZC9hdHQuYzo5MDI6MjI6IGVycm9yOiB0aGlzIHN0YXRlbWVudCBtYXkgZmFsbCB0aHJvdWdo
-IFstV2Vycm9yPWltcGxpY2l0LWZhbGx0aHJvdWdoPV0KICA5MDIgfCAgICBjaGFuLT5wZW5kaW5n
-X3JlcSA9IE5VTEw7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgXgpzcmMvc2hhcmVkL2F0
-dC5jOjkwMzozOiBub3RlOiBoZXJlCiAgOTAzIHwgICBjYXNlIEJUX0FUVF9SRVRSWV9ZRVM6CiAg
-ICAgIHwgICBefn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
-a2VbMV06ICoqKiBbTWFrZWZpbGU6Nzg1OTogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3Bf
-bGEtYXR0LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpv
-YnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDI0MzogYWxsXSBFcnJvciAyCgoKLS0tClJlZ2Fy
-ZHMsCkxpbnV4IEJsdWV0b290aAoK
-
---===============6746873549650987810==--
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
