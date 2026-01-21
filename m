@@ -1,114 +1,173 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com [209.85.167.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C46478E45
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 08:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A05547B41E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 08:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768985567; cv=none; b=qGrOgFh/hoLn7gF/+0d8QH8U7KT+BpNG1dCgi2q0gS+sDiOM8/5P44ZO+UspGddXoND0FCVZydhbd6c5LAU9rKaYlsEfGD6IFPg4/mr2dpkKTGYoFkfZgqDMkzOrRf+sux0eOYzFaQpVJxH3jG8NZYO/P395qVD+d9pJpr64Sj4=
+	t=1768985947; cv=none; b=N6rYASi6jyZMErBDUBiSMbGsBib/o6DhgofyomjReeAm5Db1GX6lHkPWlsLNZYjUmo0Lo9siDhHmKPqYU8ZPqC4L0MTGo4AI85wEuU4Pofk6u9AYHvat9u7JkHfDwwrHKWayaCjNRYIxPNAdf6YUj2HjkA0BwfYE2QNom9JUbBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768985567; c=relaxed/simple;
-	bh=ReK8Hj6IFnHSM0ml/Cu3H8lZfK607/3w0BDimtfcQlU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=p9KNxPR5J8I2M43S4Vz3lpWiKlFuHj3/78e8+AMR6OR83cRhZirOdwB0LcM8mriWJjmhtRtZLMgRuN4ey5lVLMONqpOBz/ejLC6LVPbKU0szrhi0jIwanXruyrZ0kuUyGanG8QPZoGsbRCLWmx1lDZcv6qNeuoNn9opqjQC9CvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Dxizj2KK; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1768985947; c=relaxed/simple;
+	bh=hyQHHGosSjSHlfJpLI2PgexHdoiaY/uAgfmFx8D53UQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Mw1VnJpxDosKKNzRh1FnZbqpnYyM1vvbBBV4Eu3S2BO44BjMkS7iPZOnl7W7EX36cwbis/C1Ioyqa6VJvXPcd1PW0neETOSTxyvM+F0JrUzJjKQkFHotrwp4vdw++sPpid6gK7u3O155txF5gGU3h3BpaT2AKj9GhDWriLXsF50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vyax8GZk; arc=none smtp.client-ip=209.85.167.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Dxizj2KK"
-Received: from github.com (hubbernetes-node-899da76.ac4-iad.github.net [10.55.97.12])
-	by smtp.github.com (Postfix) with ESMTPA id 149E0400AA8
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 00:52:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1768985565;
-	bh=N3h6qf83V4mxqq6yUl9mBg1wGYCFOuEy8IFkmRsScNk=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Dxizj2KKTQKzvHHrbm/adsiYhdPx8nU5rbq8BMZ17c/Y3aqVLNfUxpRYNialZslxA
-	 jKxOZhrkb4IkyogkaIPGxRIfimi4iudFG16aH771m1N4RT98i/RCz7Dl+LV6drFSJh
-	 36vgwmZRhAqTwTlxjKc7zzxDJwigYqBoeSbJZIsc=
-Date: Wed, 21 Jan 2026 00:52:44 -0800
-From: MengshiWu-mengshiw <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1045032/000000-5a2416@github.com>
-Subject: [bluez/bluez] 0de9ce: shared/att: Implement ATT error retry mechanism
- wi...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vyax8GZk"
+Received: by mail-oi1-f193.google.com with SMTP id 5614622812f47-45c70afbeebso3438438b6e.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 00:59:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768985945; x=1769590745; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hyQHHGosSjSHlfJpLI2PgexHdoiaY/uAgfmFx8D53UQ=;
+        b=Vyax8GZkfeFoOPNnZkPAc+44T/iUVEcMJgYXk97xhJ9QkMJaNbd7Ho7dDB1Xib1SPL
+         W2o7+Tk4XQVPxI9NPh/vdSz3tFvR5Csp4k1DHMIuYTd6LufScPig1vsCkmH43BJWA8Iu
+         Q2KHwG1xHmS73trrop/GsBGc9pzaByNr0P9Y0JK+dpkdNEJcr2kdHBNB7/1+uhe9QfrM
+         SixUbUo+rQN3f8PfI3rfMEcDeecLW/OCDTYQYbxEIamPPEKVnXJha5QPuFONhDgcmEQQ
+         9nBPfhpOo0BxNan8heSigH0b1Y4q6VaRE9bNXwazgJ6dKiFaejmJSrEqD4vcHEzFc+qa
+         MDow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768985945; x=1769590745;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hyQHHGosSjSHlfJpLI2PgexHdoiaY/uAgfmFx8D53UQ=;
+        b=T3IHkEkU3ZjKELaTRmMRH8Mf94wNFCg7FC69XQytxevCAlIB4fjftRTqP6HxhLWaHY
+         lXyREffdsa6Gpxiqylo/zFTzKAdXhjhCcdF7DTIMni4fY1NrU/3la+fH42tCs2H3SPKk
+         rWgoEKdFOmPSOowcm0FONeIUCiWzPY4IhDD/N3BM2Uu3eU/ZLQnccLaxZK3KGDyGD0Kz
+         idkloD04XMr9sPc6XgF7xnH5sFnNVOcxe8LphVeOPldcDk08oprQ/5UK0c5N0o5YMejx
+         xeGszvV+Vbp3139V8eCPkEdXJWsY6lMTOERYG25oaQWH+jDoXhTYqBG0PTeSZbHVsaB9
+         NhSg==
+X-Gm-Message-State: AOJu0Yxi0aSMQGj/Xpy0WnZy8dlJM0PwSA2u54muxOKgEv3hdRnybprh
+	Ky/rzSYR1awCGHJG6Q8l+TFy724FlHaB2zaOyvZiCuqAczBJaBeIu3JXQ8xQpne0
+X-Gm-Gg: AZuq6aL7UBUvrFPAsPQkd63JqwGslcFfXe/I6YYacl1bAWnkSWCPCTWE+sMHGn9Y9yh
+	Pvqjjq7N4uE8pZSWs0yu3+BQDzzlbnkG+CHJZhBlv9T+/9ZF/pUG6nPNQ3JX+Jhqml4dYUei0aK
+	1v/nF6DfdllDWmKb/JMgZVdKXxp1AM7ssccdS8Jhf3zAKuJQ/2UFQqu5/KMqEklTqBOeBUrpXb0
+	lA4Az3eOQKMQg8aCjQKkMHnGzh5BmyJSpGU1i7sYKB6IcU8lCgXwXgsjYOvwo4n+SeYkEesdQfr
+	iOP7vnggSbyMnPzkY51WMQH+0l59u+oQrxHkm3rQ+WzsEJeaiTOPQ4/O2RnyqwK7hf5lONwJF4r
+	bnPLW8u854A2ZdDJK9OdsDTXx5bbGHrF2f+j5YcUxqReDbtpruWgf97P+Vaf7SrrjFwo/8AVT7B
+	niDcU16GvU5w1bDqIWhg==
+X-Received: by 2002:a05:6808:3081:b0:44f:6def:3f3b with SMTP id 5614622812f47-45e8aa7354fmr1828746b6e.51.1768985944747;
+        Wed, 21 Jan 2026 00:59:04 -0800 (PST)
+Received: from [172.17.0.2] ([52.173.178.218])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4044b5c11e4sm10809078fac.0.2026.01.21.00.59.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jan 2026 00:59:04 -0800 (PST)
+Message-ID: <69709558.050a0220.9983b.963c@mx.google.com>
+Date: Wed, 21 Jan 2026 00:59:04 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6746873549650987810=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, mengshi.wu@oss.qualcomm.com
+Subject: RE: gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching.
+In-Reply-To: <20260121083804.4010106-2-mengshi.wu@oss.qualcomm.com>
+References: <20260121083804.4010106-2-mengshi.wu@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1045032
-  Home:   https://github.com/bluez/bluez
-  Commit: 0de9ce8c6d80cb027bbe6f487601cb93ac464b39
-      https://github.com/bluez/bluez/commit/0de9ce8c6d80cb027bbe6f487601cb93ac464b39
-  Author: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-  Date:   2026-01-21 (Wed, 21 Jan 2026)
+--===============6746873549650987810==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-  Changed paths:
-    M src/shared/att.c
-    M src/shared/att.h
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTA0NTAzMgoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgUEVORElORyAgIDAuMzQgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+RU5ESU5HICAgMC4zMiBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAxOS44NSBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAg
+ICAxMy41NSBzZWNvbmRzCk1ha2VDaGVjayAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAy
+NS40MCBzZWNvbmRzCk1ha2VEaXN0Y2hlY2sgICAgICAgICAgICAgICAgIFBBU1MgICAgICAyNDAu
+MDAgc2Vjb25kcwpDaGVja1ZhbGdyaW5kICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTEuODIg
+c2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTQuMDcgc2Vj
+b25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBGQUlMICAgICAgMTEuMzcgc2Vjb25k
+cwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBQRU5ESU5HICAgMC4zNiBzZWNvbmRzClNj
+YW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNC4wMyBzZWNvbmRzCgpEZXRh
+aWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gUEVO
+RElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgoKIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQRU5ESU5HCkRlc2M6IFJ1biBnaXRs
+aW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1h
+a2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnNyYy9zaGFyZWQvYXR0LmM6IElu
+IGZ1bmN0aW9uIOKAmGhhbmRsZV9yc3DigJk6CnNyYy9zaGFyZWQvYXR0LmM6OTAyOjIyOiBlcnJv
+cjogdGhpcyBzdGF0ZW1lbnQgbWF5IGZhbGwgdGhyb3VnaCBbLVdlcnJvcj1pbXBsaWNpdC1mYWxs
+dGhyb3VnaD1dCiAgOTAyIHwgICAgY2hhbi0+cGVuZGluZ19yZXEgPSBOVUxMOwogICAgICB8ICAg
+ICAgICAgICAgICAgICAgICAgIF4Kc3JjL3NoYXJlZC9hdHQuYzo5MDM6Mzogbm90ZTogaGVyZQog
+IDkwMyB8ICAgY2FzZSBCVF9BVFRfUkVUUllfWUVTOgogICAgICB8ICAgXn5+fgpjYzE6IGFsbCB3
+YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc4
+NTk6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWF0dC5sb10gRXJyb3IgMQptYWtl
+WzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2Vm
+aWxlOjQyNDM6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVz
+dDogTWFrZUNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjawpPdXRwdXQ6Cgpz
+cmMvc2hhcmVkL2F0dC5jOiBJbiBmdW5jdGlvbiDigJhoYW5kbGVfcnNw4oCZOgpzcmMvc2hhcmVk
+L2F0dC5jOjkwMjoyMjogZXJyb3I6IHRoaXMgc3RhdGVtZW50IG1heSBmYWxsIHRocm91Z2ggWy1X
+ZXJyb3I9aW1wbGljaXQtZmFsbHRocm91Z2g9XQogIDkwMiB8ICAgIGNoYW4tPnBlbmRpbmdfcmVx
+ID0gTlVMTDsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICBeCnNyYy9zaGFyZWQvYXR0LmM6
+OTAzOjM6IG5vdGU6IGhlcmUKICA5MDMgfCAgIGNhc2UgQlRfQVRUX1JFVFJZX1lFUzoKICAgICAg
+fCAgIF5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsx
+XTogKioqIFtNYWtlZmlsZTo3NTg2OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9nbGliX2xhLWF0dC5s
+b10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjExMDIyOiBjaGVja10gRXJyb3IgMgojIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tWYWxncmluZCAtIEZBSUwKRGVz
+YzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sgd2l0aCBWYWxncmluZApPdXRwdXQ6CgpzcmMvc2hhcmVk
+L2F0dC5jOiBJbiBmdW5jdGlvbiDigJhoYW5kbGVfcnNw4oCZOgpzcmMvc2hhcmVkL2F0dC5jOjkw
+MjoyMjogZXJyb3I6IHRoaXMgc3RhdGVtZW50IG1heSBmYWxsIHRocm91Z2ggWy1XZXJyb3I9aW1w
+bGljaXQtZmFsbHRocm91Z2g9XQogIDkwMiB8ICAgIGNoYW4tPnBlbmRpbmdfcmVxID0gTlVMTDsK
+ICAgICAgfCAgICAgICAgICAgICAgICAgICAgICBeCnNyYy9zaGFyZWQvYXR0LmM6OTAzOjM6IG5v
+dGU6IGhlcmUKICA5MDMgfCAgIGNhc2UgQlRfQVRUX1JFVFJZX1lFUzoKICAgICAgfCAgIF5+fn4K
+Y2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtN
+YWtlZmlsZTo3ODU5OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1hdHQubG9dIEVy
+cm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTog
+KioqIFtNYWtlZmlsZToxMTAyMjogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjClRlc3Q6IENoZWNrU21hdGNoIC0gRkFJTApEZXNjOiBSdW4gc21hdGNoIHRvb2wg
+d2l0aCBzb3VyY2UKT3V0cHV0OgoKc3JjL3NoYXJlZC9jcnlwdG8uYzoyNzE6MjE6IHdhcm5pbmc6
+IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2NyeXB0by5jOjI3Mjoy
+Mzogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0
+dC1oZWxwZXJzLmM6NzY4OjMxOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNl
+ZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo4NDY6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxl
+bmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjEzMzk6MzE6IHdh
+cm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVs
+cGVycy5jOjEzNzA6MjM6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpz
+cmMvc2hhcmVkL2F0dC5jOiBJbiBmdW5jdGlvbiDigJhoYW5kbGVfcnNw4oCZOgpzcmMvc2hhcmVk
+L2F0dC5jOjkwMjoyMjogZXJyb3I6IHRoaXMgc3RhdGVtZW50IG1heSBmYWxsIHRocm91Z2ggWy1X
+ZXJyb3I9aW1wbGljaXQtZmFsbHRocm91Z2g9XQogIDkwMiB8ICAgIGNoYW4tPnBlbmRpbmdfcmVx
+ID0gTlVMTDsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICBeCnNyYy9zaGFyZWQvYXR0LmM6
+OTAzOjM6IG5vdGU6IGhlcmUKICA5MDMgfCAgIGNhc2UgQlRfQVRUX1JFVFJZX1lFUzoKICAgICAg
+fCAgIF5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsx
+XTogKioqIFtNYWtlZmlsZTo3ODU5OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1h
+dHQubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4u
+Li4KbWFrZTogKioqIFtNYWtlZmlsZTo0MjQzOiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjClRlc3Q6IGJsdWV6bWFrZWV4dGVsbCAtIEZBSUwKRGVzYzogQnVpbGQg
+Qmx1ZXogd2l0aCBFeHRlcm5hbCBFTEwKT3V0cHV0OgoKc3JjL3NoYXJlZC9hdHQuYzogSW4gZnVu
+Y3Rpb24g4oCYaGFuZGxlX3JzcOKAmToKc3JjL3NoYXJlZC9hdHQuYzo5MDI6MjI6IGVycm9yOiB0
+aGlzIHN0YXRlbWVudCBtYXkgZmFsbCB0aHJvdWdoIFstV2Vycm9yPWltcGxpY2l0LWZhbGx0aHJv
+dWdoPV0KICA5MDIgfCAgICBjaGFuLT5wZW5kaW5nX3JlcSA9IE5VTEw7CiAgICAgIHwgICAgICAg
+ICAgICAgICAgICAgICAgXgpzcmMvc2hhcmVkL2F0dC5jOjkwMzozOiBub3RlOiBoZXJlCiAgOTAz
+IHwgICBjYXNlIEJUX0FUVF9SRVRSWV9ZRVM6CiAgICAgIHwgICBefn5+CmNjMTogYWxsIHdhcm5p
+bmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6Nzg1OTog
+c3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtYXR0LmxvXSBFcnJvciAxCm1ha2VbMV06
+ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6
+NDI0MzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJ
+bmNyZW1lbnRhbEJ1aWxkIC0gUEVORElORwpEZXNjOiBJbmNyZW1lbnRhbCBidWlsZCB3aXRoIHRo
+ZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjClRlc3Q6IFNjYW5CdWlsZCAtIEZBSUwKRGVzYzogUnVuIFNjYW4gQnVpbGQKT3V0cHV0
+OgoKc3JjL3NoYXJlZC9hdHQuYzogSW4gZnVuY3Rpb24g4oCYaGFuZGxlX3JzcOKAmToKc3JjL3No
+YXJlZC9hdHQuYzo5MDI6MjI6IGVycm9yOiB0aGlzIHN0YXRlbWVudCBtYXkgZmFsbCB0aHJvdWdo
+IFstV2Vycm9yPWltcGxpY2l0LWZhbGx0aHJvdWdoPV0KICA5MDIgfCAgICBjaGFuLT5wZW5kaW5n
+X3JlcSA9IE5VTEw7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgXgpzcmMvc2hhcmVkL2F0
+dC5jOjkwMzozOiBub3RlOiBoZXJlCiAgOTAzIHwgICBjYXNlIEJUX0FUVF9SRVRSWV9ZRVM6CiAg
+ICAgIHwgICBefn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
+a2VbMV06ICoqKiBbTWFrZWZpbGU6Nzg1OTogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3Bf
+bGEtYXR0LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpv
+YnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDI0MzogYWxsXSBFcnJvciAyCgoKLS0tClJlZ2Fy
+ZHMsCkxpbnV4IEJsdWV0b290aAoK
 
-  Log Message:
-  -----------
-  shared/att: Implement ATT error retry mechanism with callback support
-
-Add a retry mechanism for ATT operations that allows upper layers to
-decide whether to retry failed requests. This includes:
-
-- Add retry callback registration (bt_att_set_retry_cb) to allow
-  applications to handle retry decisions
-- Implement pending_retry state tracking in att_send_op to store
-  operations awaiting retry approval
-- Add bt_att_retry_request() and bt_att_cancel_retry() functions to
-  approve or reject retry attempts
-- Store error PDUs during retry_pending state for callback inspection
-- Modify handle_error_rsp() to return retry decision codes instead of
-  boolean values
-- Add BT_ATT_RETRY_* constants for retry decision handling
-- Update GATT helpers to support retry callbacks for operations like
-  discovery and read/write requests
-
-This enables more robust error handling by allowing the application
-layer to implement custom retry logic based on ATT error codes.
-
-Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-
-
-  Commit: 5a2416d6630ee546d2e1b7c784afbcb744fe1ce0
-      https://github.com/bluez/bluez/commit/5a2416d6630ee546d2e1b7c784afbcb744fe1ce0
-  Author: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-  Date:   2026-01-21 (Wed, 21 Jan 2026)
-
-  Changed paths:
-    M src/shared/gatt-client.c
-    M src/shared/gatt-helpers.c
-    M src/shared/gatt-helpers.h
-
-  Log Message:
-  -----------
-  gatt-client: Add DB_OUT_OF_SYNC error handling with retry mechanism
-
-Implement automatic retry logic for GATT operations that fail with
-DB_OUT_OF_SYNC error. When this error occurs, the client now:
-
-- Reads and compares the remote Database Hash with the local cache
-- Retries the failed operation if hashes match (database is in sync)
-- Triggers service discovery if hashes differ or hash read fails
-- Handles Service Changed indications during retry by checking if
-  the error handle falls within the affected range
-
-Add retry callback infrastructure in gatt-helpers to support deferred
-retry decisions, allowing async verification before retrying requests.
-
-Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-
-
-Compare: https://github.com/bluez/bluez/compare/0de9ce8c6d80%5E...5a2416d6630e
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============6746873549650987810==--
