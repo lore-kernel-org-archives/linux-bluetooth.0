@@ -1,277 +1,377 @@
-Received: from TYDPR03CU002.outbound.protection.outlook.com (mail-japaneastazon11023121.outbound.protection.outlook.com [52.101.127.121])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD403644BE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 07:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.127.121
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768980446; cv=fail; b=UZTmLTm4rc65k6OlJiLoTvnYVwY23cmeZAJL89FTjJR1sqGuhleBNVZiXusZ1qY8+WxO1niEPFj1bjeNcoCJdDx5WWYoQd+yTmPOB7U80JpwkUIBulELUTji/8Bgk0EOA3x4VA/YIYXtAf9UnCojs4bhvA/MSB79SAUyOwr3aVY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768980446; c=relaxed/simple;
-	bh=mYlRBZACsMm/hONtPJm0wU05xkE3NoOY83eULJ198Qc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FGt3Sd9/hcLOSjg8hCf0hRJQiMZZOpoEmSuwxIYA/X9LsIsmH8VpTxZREO7azaL0Y+PpRh+sa5cGWxHiPx2obH5yZ4u70sbh4rXRUdwKUBSmOEv1VLwnqvNiqbQcvaeazBQ0yfOcb9hJU8LtGvQdk+Zb5cC0v6P7luScXe2foKE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=Gb3VY7hj; arc=fail smtp.client-ip=52.101.127.121
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9059359F8F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 08:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768984693; cv=none; b=mIEcV+nIfWqOjvWvSPNJCPFyws3nc1pYnbszQ/mLA+HoRtmhr3qCEhpZmBitsktB2ymMYlIy/gHq859BibrXF+NNMYpm5haIXd2vHUX64YS/myvzlOM2pqR0bn385JACMboGcNfyG6Vbyt3vT5llhEK9iVSQqCcvFcKYo7SZCRo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768984693; c=relaxed/simple;
+	bh=GexKHyTMeH0rTCmnDc5uwomhJWL0mn2C1WH6AvMBp+I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=nXg9N6oQDRONIRQv37i1GprdFuUzwnPy6FkCQQ/NVPZL0O8Fez6LOD54A0jkzKVXm+kA9+Fd6Ns1C9582FWXTmuDCahDn4gKqBp/2xC0xypMob1lLnyleveKcc99yahK+g73SPKWLz8SGxT+ED0shBm7+P8nDQZGj438MlTchnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=RriS4Uyh; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="Gb3VY7hj"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xOZA/p7C8rfIhU0dEFsstUVVzZ/Rm4xAsVVxLMT3kZZ+SA2Rc9x3a2QXHWDUYpt+42TS21/s9ZeTlM2mRHZP0WrRomlgc1ZZ5VQ9L+9qDiLV2hHNU26l6+FAW/xjzWFM/+AYULX6z2uA1ys7F1JLvdSYNpP+2gSmIkfhQSKxVXHoLubEIVOJlxUXqYdAY5tzV1dSzK5dB0JjdKv9m3QZyIjxwT98SrMBLiIzNgJv77kbWuaTvBRHACzFVXSFZGpuDDD0iyvk3IfJFzes+AyTJLpUsji+/4yJCTIkqN25whe8sBaoZik823yTFmcYhmrqI2UFWg+FJOVwZujY/bg8gA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SDGVIAlCQn8xnyU8MgyYqs2pWj8l6yeTPbF4+nd9zHg=;
- b=VznjwA7riR0QdaHDm/5JrA+1SZiysYou29VAwsy1jKvqk31wpd5K5VXzChegJv7vhskoItfThGjZ5DUYFuWZofW3vRhKhbbEdeDoyNaNbI89+Mu3+x/Gexy+b/31/sf1EIfVrr6YIhzR1MtFTk3/pGEaEeSI/f/QbTq0VjUo7R5zWR7UtHl3Kv353isbjgxgo6XGYQNhOR1sQLppPwUHm0PbyKFeRVdZcTzYEj85q1TfINPe8ggAz8vRnyRhL+TBHdDFnXpM8kwz+Fh4tNCAvrGwctHueSAXHuDSM8yQ9mov5HDBAkYdFdfpXzudlF23VsXn00VI9yeb7lia+Eenqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
- dkim=pass header.d=amlogic.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SDGVIAlCQn8xnyU8MgyYqs2pWj8l6yeTPbF4+nd9zHg=;
- b=Gb3VY7hjVwH2OH2O1wcwaZ4XeI46uddbT4HjPi8Pdr/JTbk36JHhf6tdxlPO17l5MbkCcmKpYgeVpZB07+ucMBj0osva6L3vJIe017r5YpE/nbygkxhANHrvtUL5X9Q0nz6ydIYiYzpABHCeMPSW0y/vOgCqNATqcQl4UEvNL9f0Wc5q6Vt39TtmFv5AE9e+Cc5UMI28PA4pL0HpPksKnuzDV9xWqfzLBUFqmxqb/G7cv/kukhbXFyU6Ftse3fAnogMOfbTgL4nmmYgg0TeXUGo/c6LDtCUs24VgNA4kLNLzvxZ7Nfpf6jjVKkrxeimL7SII5+yXkVLzzHcPXza0tw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amlogic.com;
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
- by SEZPR03MB8266.apcprd03.prod.outlook.com (2603:1096:101:19d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.9; Wed, 21 Jan
- 2026 07:27:21 +0000
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::eef5:1228:beac:be69]) by JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::eef5:1228:beac:be69%5]) with mapi id 15.20.9542.008; Wed, 21 Jan 2026
- 07:27:21 +0000
-Message-ID: <9f107c06-123a-468c-886e-4135a08595e2@amlogic.com>
-Date: Wed, 21 Jan 2026 15:26:37 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ bluez] bap: reduce ISO sync timeout to 2s
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-References: <20260112-iso_sync_timeout-v1-1-9a3e99259a3f@amlogic.com>
- <CABBYNZ+xrCofAHqVOs4SDn3avXQenNbv4L-sys6_2Lf9PAXFOg@mail.gmail.com>
- <7a1da200-d909-4795-9f64-e7c86d53e0c0@amlogic.com>
- <CABBYNZJgA-i7OFTSgJ=EJLRLR-B7CGSZL0+VfBuVXMoDpxVNGA@mail.gmail.com>
-Content-Language: en-US
-From: Yang Li <yang.li@amlogic.com>
-In-Reply-To: <CABBYNZJgA-i7OFTSgJ=EJLRLR-B7CGSZL0+VfBuVXMoDpxVNGA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2PR02CA0032.apcprd02.prod.outlook.com
- (2603:1096:4:195::12) To JH0PR03MB7468.apcprd03.prod.outlook.com
- (2603:1096:990:16::12)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="RriS4Uyh"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60L8YZca2065826;
+	Wed, 21 Jan 2026 08:38:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=6+SGDw/cR3HQ/CMAT9C13G
+	+lwBJrEgV60IX+06U+V5U=; b=RriS4UyhTogWztfyFxDBQOeERfsg5r/LV8SopN
+	paCTRTuPPtbEL7xBXn38jH3y14c0N0477Q2JuTg4dA3Ksjb86NVYyaZCJMl3E4fK
+	JwIgB07UWtD7p+mTe1av5n3hqUe/D3GKD5G1zikHqAXmVDVLnXMhnAzGQXhV4EMq
+	LCUiImHRwWvBCGd4QBWJlNnZuyAE8pC9tRHdxKZD/Zy2MzEItgS7fZAcuE1kGW9K
+	YSAHZwnQoRqXoqiKCiGt6jBztXyHa6gzMHSfxWl/Cn2krmVf51T8Fp6UhrHxDF8P
+	nMtD7cmoWA8t3vqQFpKK9WXctmexFn8CwY+9eJWtZJ2WAf/Q==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4btudp00cj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Jan 2026 08:38:10 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 60L8c7jH029066;
+	Wed, 21 Jan 2026 08:38:07 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4br3gms2rp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Jan 2026 08:38:07 +0000
+Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 60L8c7Ld029061;
+	Wed, 21 Jan 2026 08:38:07 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 60L8c6K1029060
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Jan 2026 08:38:07 +0000
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4766378)
+	id F267B23791; Wed, 21 Jan 2026 16:38:05 +0800 (CST)
+From: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+To: luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com,
+        cheng.jiang@oss.qualcomm.com, chezhou@qti.qualcomm.com,
+        wei.deng@oss.qualcomm.com, yiboz@qti.qualcomm.com,
+        Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+Subject: [PATCH v3 0/2] gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching.
+Date: Wed, 21 Jan 2026 16:38:02 +0800
+Message-Id: <20260121083804.4010106-1-mengshi.wu@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|SEZPR03MB8266:EE_
-X-MS-Office365-Filtering-Correlation-Id: c0f22cc3-e2c6-427b-7ac9-08de58be83c2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?YTgzOVFwcUlUaHNnSFNHU216Zm11L3hLOVBUVGovWDBHRFRaZ1F3cnZzZC9O?=
- =?utf-8?B?a3JOVFIrMmpmSE1seW5jZm1jLy9nNkFuVHd1Y2RUUzVQY2E1Q3FWbnYrdkxy?=
- =?utf-8?B?eGF5a2RFaWZKNnpqQmU2U1pObzRqWEgybXJQTUVCR2pvc2hKZkRNamRxVUtF?=
- =?utf-8?B?OGtrZXo3QmhDZzR2M3hRNFF4OE9JdG9Ub0pYK09MMkwvcmhJVjA5TlVBTTU0?=
- =?utf-8?B?a3V3Yitia3RJQ29ndDFSNnFleGFTRlNRcDFGVkV2Z2xlTm81TW15VEtqQzZ3?=
- =?utf-8?B?clVleFNNdmxQdUlGamxlK3NTRm5ZZS9SL0UxVlE0ZUI2OXU2R25uVTlKWnpE?=
- =?utf-8?B?d3J4Z3RMY0dQb3NmeVB6Y0hwRkhlZVcrVGFGRTZQRHdoMGVXSGtsdndCanlB?=
- =?utf-8?B?azhjb2k0UWx6cFNOdmVKOUJSNVU0NllLMzh6VUxNUHdodk5oVCtwRGJFaUdY?=
- =?utf-8?B?aUs4R0VaNWs4TGl3a2g2THZwcmhNbXFwZVZoOGxzM0U4YjBoMXVNaGc4b3di?=
- =?utf-8?B?TkFUbUpkYU91TXZ4MHhEVGpBRzJWZEd2LzVCVG0yMEFoSkVyVXVzZllHdy8r?=
- =?utf-8?B?TGc5OHVGanhQNjNHYU01YnhUNGU5Wm5yS3J6ZFBraVpVUlJZMUNnRy9iR3RM?=
- =?utf-8?B?RFkwZ1FsWVhSL3hCQnRSWjN2b0loM3EvTEl2ZGErTTJEL05VL2ZGNG1nb3Vj?=
- =?utf-8?B?YW0waGVna0Jiem8rTU5sN3ovUXFWeklrZTd0L25HODJIQS8zTm1Ec21BSkhZ?=
- =?utf-8?B?MFEvVTZWYlRDcU5jMW5TWjNIWXIwZVpCTTNVa1B2cmtCVWFyckZGUDZlZ1h2?=
- =?utf-8?B?MXVNNXdaa2xYR203emxlZUc5VEc0bTlTVUU0WE9aeC9lYzVyaU0wczhBdXln?=
- =?utf-8?B?NmhOUzJFTWpqNit2Y3paei9sVC81dFg5UVd6OWQ4NC9kWWpndlF0RTcxNlVF?=
- =?utf-8?B?dFJ5c3BFQzlhc3dXYlU5RzZNandCbEh5bWRLUXFTTWR5U0hZTjJxQ3dWVjMy?=
- =?utf-8?B?MXhrbDBhZkV3VmducUd6OTVPZDNhT2JSSXQ0QktYRHVhYUY5MHJZWHMrUFdM?=
- =?utf-8?B?TitoTVBXQ3JMcy9GTnVqaFp0QWl6UHdCREhVZUZ2N21SdG1GMWIzcSsyUGJw?=
- =?utf-8?B?YUF2ejVXbGd0cmUrWVp5cEdkOWFpUDF3cno4WEJxRytqRW9pc1VWWmN2Q1FJ?=
- =?utf-8?B?dzR6cVgzMzNLbnNhNFV3cTcyWmlxLzFMMmRrSC9nNzdvbjdYOXpvVkd0TUxI?=
- =?utf-8?B?Q3JLYzYzWGFyRjNrcWR5a250ZkdUZ3lyNXJrQlpmcnY4ajFEQjI0U3N3S3px?=
- =?utf-8?B?dGZCaWVIc1VwaFpVcUtxaFVxWG0vbGF4RHI1MGVzd0IwNmFLKzdPdldjR25B?=
- =?utf-8?B?b21OUnoyN3EraEVYT0d6a3A4QjZDQmFqUW5zRE1Fb2JKYmVGQW5BRkx5VmFK?=
- =?utf-8?B?MHhzQ05KTFJuaGdrbjN1ZzFBcGVFQ2YvL2JoM1k5Y2JtNk1ZTkhJOUFoTkdT?=
- =?utf-8?B?eDBEaEhBM1ZmT1FoOVBEaHpBZi91OW1UOE5meE9rREw2ak1TZmZVVnU5eGg2?=
- =?utf-8?B?ZC9TNE1ockdPdDdQS21CNWprV2Jqd0ZFZXlUUWpKTEVBNENidTRMYm1CRVdE?=
- =?utf-8?B?cVIxOGVOaTRFL0hacXRIaHpTRFJCOWRobGplYmRucXZHTHp3TUZDTk9KVVhu?=
- =?utf-8?B?VmNtdHNoWW1oelY0U1lnMTJDTURzU3hnc1Z1SS9JSURXcTBKRElKeG1aUzds?=
- =?utf-8?B?QnU4RzRxQjk5TGxUMHh6bG9nbTQ3UE8waDhvT3BmeFJUOFdrQXpiRGlvcjJU?=
- =?utf-8?B?YVluMUxOcGRkUWRnSzlXZnQ2ZDJ5Y1ZkOUdRZjdyM1drUkJJdW9kekloSkgw?=
- =?utf-8?B?TFcvczlxOHBycStDWWFYKzkvY1VEczFXQXM5VWJFNXBvTFh1cVl3MlFlQk90?=
- =?utf-8?B?UlNhM3FuLzFvYVJ2K0tjZTVGdXVkR2tpTG9UbkJHSGhlditSakpyQWpaaEFv?=
- =?utf-8?B?aitUTEU1QTMrUVhjNlVqOFBzR0NFZjBLbks1bW10UE5sUmdqam1FSVVBY2hS?=
- =?utf-8?B?d29Bai92SXlPWnBUaW1VSkc1dFR5V21FUWRTd3FpNTI2cjZ0TXlxWElvS3lW?=
- =?utf-8?Q?U7h8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?THpwZW80K2JrVnZ0VHV1UHBjNEUvbnZ6VGJGSzQ4WkZPaFpseUlPeE9iMnZZ?=
- =?utf-8?B?WEdJWHRlNU9ubW43dFpnM2tRTG9LWnNRVkxnb2Z2Qkk2azR5SHFMaHNrbGVl?=
- =?utf-8?B?K3ErUEFNNFdNd0dtbDNpSjVXWG8yc3lORDBiWEJld3FoR1lFaEVhRGx4SWhk?=
- =?utf-8?B?M0VxQTFIY2psS0x1Y1JCVDZpcmRKc2QyUTRCVlJRaXRJbjFWRUZySEs2WFJV?=
- =?utf-8?B?V2FzNDNJekJPRWRkbXkvcE85VE81akFTanVYekVIb0NMNEllYXN0ZGhYWHda?=
- =?utf-8?B?azM1cW9yc0U0T1hPTTBoWVA0eWxjb1BGM3B6OEw3Yi95VEFaT0lQTlFvNUxy?=
- =?utf-8?B?WEw1dTdBM0NNL2VzdUV0MWJGMXlyM3RHbmR3Rm5jSXNwOGs2VE5Nclp4Ymdp?=
- =?utf-8?B?c1F1Um05MDMrSU1CaXJ1UXBkcElZTEozSUZJM0RDN1VSKzVMY29uNkl0UEt4?=
- =?utf-8?B?TURkYTczRlBiMkx0VzcxQmM3Z1IxYUJFTjFFUzdzTk1BMEpPcndSVFZBUmI4?=
- =?utf-8?B?OWF4ekIwQkEwMHRzZ2Izd0p0dEkwbkpwM1pDNjY4Y1B1dlN1cWN0aHh0RVlv?=
- =?utf-8?B?ZHVsNVhSaTlXRlREQW1CeitvS0VpYWhFRHZtYlVCdW1XU1VXZWpNUWZxeXl1?=
- =?utf-8?B?blUxc1RsbzJSTmFBb29uY0xxa042N2FaR0VscWJ3NENWbVBFSGw1QVBMNEFq?=
- =?utf-8?B?QllnV2Ruakt0b0xtbWRYZFJTY1ZvL2ZBY1RwY0hGZW1jTHFQT1V4dFlPWEpB?=
- =?utf-8?B?cDRaenRjWVA0UjdENElzTG1nUDhZdlBMSW5SSTlNNzgxVEpNUEJ0V0dUL210?=
- =?utf-8?B?S0NQWXNFbE82ZHZzWmFIK00rMWlLVERTcUFZWGVpK2NPOXFiWGxhUkZXaVN0?=
- =?utf-8?B?eFdBRVBDR2l2MXpBZnlRakpqYytaMFVVRXBDWDlhSmNkOXd6WTVEV1lVM0pj?=
- =?utf-8?B?Tm16WWZIRWgzUnFXbitxby9tc3FUQndXdkJveDQ0anpIVVRra3RRemx0YjNo?=
- =?utf-8?B?RWxNa3NjNkY1dlBJQ0dFNDZEVXJ0SVVJeUg5VXQ0Q3U5WWN1SmVUbUExSktw?=
- =?utf-8?B?NTNEejhvYnIyVU9sOGROdlYrT2VtSC93SUxpTlFhQmtySzNyTW5ydkRFQ0Ux?=
- =?utf-8?B?L3oxcDhhWCt1Z05wS3BLbzd6NCthV2Y3WGd4UEtINGN4WnZ5WFFacDZMOERk?=
- =?utf-8?B?WFg5bVA3b1FxRDdKSUNLUlFBV0Z6WTNjV29XVEVpSEFUYzNUZE9ES3pyc0Ni?=
- =?utf-8?B?a3d1djF6b05nMlBGazZjWjF3YkZydlRicGpMeHVSaTVoVXdGbC9ON0JmNTZl?=
- =?utf-8?B?aDVucUR0ZThPVHFWaTNLdmpHdytzV2l4MlNCeXJNdGdWSGU4UUE4L3dxeTgr?=
- =?utf-8?B?MDJZOFJlOTFJTURzSVppR2xvSG9odElmeFkvK1VVcFhmcUtsbEQ1YjNSRjdr?=
- =?utf-8?B?M3RDck5mc1l6aTdHTHVqOHlKZUwxOGcrTWR6bWt3ekpySStQRzlCUVVYSUFO?=
- =?utf-8?B?STNScng4V3A4bm51NlhJSGF0T0JMSHpKTFJaaUtEZmpCYVQ5NFpPOW5KUklu?=
- =?utf-8?B?SWtHV0VpTHdzSHoray9Va0dGQTVBaXZEVU1LWE1EY2xPQUErL1N1OHlzRHVC?=
- =?utf-8?B?UmV3dkx3KzV1a3FnMFlzRDVUZWliTDZzcG5FeVR3WlZZSjRXamwrRG0yOGZz?=
- =?utf-8?B?bytuTkE4RFVLVEk4d2FCWlUrTWxob3dKQjB3YktlZGZMOEZjU3ZVNVMrTHc1?=
- =?utf-8?B?cENhaGd2VzdYZ1JpT2ZESTBGdGVMM0E3VEJ1SkRyTjJMblhFRTliWWoycnNs?=
- =?utf-8?B?dHdOdzRLUy81LzRtV3JWK0p1U0s5a3lWYXRnVlp0dnN1S0VWN29jWm1xY21C?=
- =?utf-8?B?L09vUTlnZlliVS9DbW5EMU9xTVlEaUlOOWV0eGh4L3JTT0pzMUQxajg3b2ZK?=
- =?utf-8?B?TjJ2K21YTWhmZTlpNjdPa0RxczMwQnM5TVlodTRTbTdiRTZqRmdWdTZXWWZs?=
- =?utf-8?B?UUJ3eE1LZzFUTjJwc0xxTVVwU0hWd216MTFaSjhhMzVNeWRhdWs4ZFU4bjc1?=
- =?utf-8?B?Sjg0Qk1SL2FsZHNaa1NSam1oaFpBcU15RGs0WGtlUmJSTnA2SWdCVE9qdmpW?=
- =?utf-8?B?Um9wUGhJcXZUQ2taTklsM3VrMlBpZGNnWmRYdVdtdGJFVzFqbWlQZjhndlVK?=
- =?utf-8?B?NlV2dzh6R0JpVmZIbmJETFh4cTZnS1hiR0lCSjlpcktFeTJZWCtGZE1LNG9P?=
- =?utf-8?B?Q1ZMRklvVkc4TUtLLy9mVnlKS1ZEcWRoRWtmeGxUQWFuTkJWQkhTa0MvTmFw?=
- =?utf-8?B?eFNVN2s4d0t5NUIxdXJheXh4RFZvVDJJR3NKZGxha0lleFNFTFdtZz09?=
-X-OriginatorOrg: amlogic.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c0f22cc3-e2c6-427b-7ac9-08de58be83c2
-X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2026 07:27:21.1727
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qHQllZ6F3TSHGh8J4It+L8fP2t2eZrT50GDtUzOx8A2+ac7Rj16jlCcDNNco6+cg60r2gi/gB+fm5MgkFt1fTA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR03MB8266
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: VStaM11G5G4BpubGk_V8jeecWOxEnvXh
+X-Authority-Analysis: v=2.4 cv=DJyCIiNb c=1 sm=1 tr=0 ts=69709072 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=Zg2JX6FJNO39zCPd_ggA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIxMDA3MCBTYWx0ZWRfX5rOOuMK/5TmL
+ Op/j05+ATC0LxvZnKJCg45VhxIntQ+CdfVh70OthJjKX5b+snszZKLAVJo0oX0De4IzUhRqwBE6
+ Ti5PqjgsjI8gCISLZWue+4GRrThymAlaHAXFNhPxFfhD6LoQRYemeP2eqCifEdSVQbps0hty/HA
+ L1gCeM6Ku3zkEnriNU3d7eE0dv5FzHniCOY/xX/q0Jo/Otz0MHIWxgUypLUG6IhWkz7BebNlWWC
+ BCaIXSgK/7K6oqKi9CXP6ZxLrGpkqIRDgmJGsrbQFkO64s3MYgydiObn0sQUW0vqtc6Tq9CbAMY
+ Rr7BiFD6xdDWvXaawEnFY4DfdnS6dhFgko7Zu5HN7s1TAOBFhciZ8J/SroGG6O4F2NfgqWfioy4
+ XwPvH7IEzuAAumynsjk7a3ZWaHZnVDx/DQ78Z0XYjHdQ1KsFYpixsvr6uvLptFSiLeRbdqFqx/C
+ PcVN5dUQMxIi9AuPDCQ==
+X-Proofpoint-GUID: VStaM11G5G4BpubGk_V8jeecWOxEnvXh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
+ definitions=2026-01-21_01,2026-01-20_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
+ bulkscore=0 adultscore=0 clxscore=1015 suspectscore=0 spamscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2601210070
 
-Hi Luiz,
+shared/att: Implement ATT error retry mechanism with callback support
+gatt-client: Add DB_OUT_OF_SYNC error handling with retry mechanism
+
+Here are the btmon logs showing the automatic recovery of a failed
+ATT request caused by a database out‑of‑sync error, when recovery
+is possible:
+
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 7       #1 [hci1] 3.4439
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000b
+> HCI Event: Number of Completed Packets (0x13) plen 5           #2 [hci1] 3.4588                              
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 6                        #3 [hci1] 3.4948
+      ATT: Read Response (0x0b) len 1
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 7       #4 [hci1] 23.7473
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000b
+> HCI Event: Number of Completed Packets (0x13) plen 5           #5 [hci1] 23.7722
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 9                        #6 [hci1] 23.8068
+      ATT: Error Response (0x01) len 4
+        Read Request (0x0a)
+        Handle: 0x000b
+        Error: Database Out of Sync (0x12)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11      #7 [hci1] 23.8093
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0001-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5           #8 [hci1] 23.8297
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 24                       #9 [hci1] 23.8668
+      ATT: Read By Type Response (0x09) len 19
+        Attribute data length: 18
+        Attribute data list: 1 entry
+        Handle: 0x000d
+        Value: a01f96d239c187f8ba218f084501dad9
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11      #10 [hci1] 23.8693
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x000e-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5           #11 [hci1] 23.8914
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 9                        #12 [hci1] 23.9268
+      ATT: Error Response (0x01) len 4
+        Read By Type Request (0x08)
+        Handle: 0x000e
+        Error: Attribute Not Found (0x0a)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 7       #13 [hci1] 23.9293
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000b
+> HCI Event: Number of Completed Packets (0x13) plen 5           #14 [hci1] 23.9497
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 6                        #15 [hci1] 23.9908
+      ATT: Read Response (0x0b) len 1
 
 
-> [ EXTERNAL EMAIL ]
->
-> Hi Yang,
->
-> On Thu, Jan 15, 2026 at 4:42 AM Yang Li <yang.li@amlogic.com> wrote:
->> Hi Luiz,
->>
->>> [ EXTERNAL EMAIL ]
->>>
->>> Hi Yang,
->>>
->>> On Mon, Jan 12, 2026 at 1:42 AM Yang Li via B4 Relay
->>> <devnull+yang.li.amlogic.com@kernel.org> wrote:
->>>> From: Yang Li <yang.li@amlogic.com>
->>>>
->>>> The ISO sync timeout was previously set to 20 seconds,
->>>> which is too long for PA sync. This could leave the userspace
->>>> flow pending for an extended period of time.
->>> I think we used 20 seconds based on the connection timeout, that said
->>> I do wonder if 2 seconds is going to be enough given that the
->>> advertisement window can be wider than that, specially when SID needs
->>> to be resolved.
->>
->> Yes, the Core Specification defines a PA sync timeout when no PA reports
->> are received for six consecutive PA intervals. In our testing across a
->> wide range of devices, a PA sync timeout of around 3.6 seconds works well.
->>
->> This assumes a PA interval of 500 ms, which is already a relatively
->> large value. Taking into account six intervals plus the time needed to
->> receive extended advertising during scanning, this timeout should cover
->> most practical use cases.
->>
->> I understand this is ultimately an empirical choice, and I am happy to
->> adjust it based on feedback. From your experience, do you have a
->> recommended timeout value?
-> Actually the code define some recommended values for us to scan:
->
-> TGAP(Sync_Scan_­Interval)
->
-> 320 ms
->
-> Interval between the start of adjacent synchronization scan windows
->
-> Recommended value
->
-> TGAP(Sync_Scan_­Window)
->
-> 91.25 ms
->
-> Duration of Synchronization scan window
->
-> Recommended value
->
-> TGAP(Sync_Train_­Duration)
->
-> 30.72 s
->
-> Duration of synchronizability mode
->
-> Required value
->
-> That said the duration seem to be only mention in the context of the
-> source, anyway perhaps we can use 6x320ms=1920ms(~2sec), this will
-> make us resolve the broadcasters a lot faster but then we need to
-> check in case we timeout we should try to rescan a few times.
+Here are the btmon logs showing the automatic rediscovery triggered by
+a database out‑of‑sync error:
+
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 7       #22 [hci1] 114.579 784
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000b
+> HCI Event: Number of Completed Packets (0x13) plen 5           #23 [hci1] 114.610 893
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 9                        #24 [hci1] 114.646 637
+      ATT: Error Response (0x01) len 4
+        Read Request (0x0a)
+        Handle: 0x000b
+        Error: Database Out of Sync (0x12)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11      #25 [hci1] 114.647 233
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0001-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5           #26 [hci1] 114.670 946
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 24                       #27 [hci1] 114.706 865
+      ATT: Read By Type Response (0x09) len 19
+        Attribute data length: 18
+        Attribute data list: 1 entry
+        Handle: 0x000d
+        Value: 9eada072929f475ffa51d09c55f5e178
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11      #28 [hci1] 114.709 230
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x000e-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5           #29 [hci1] 114.730 974
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 9                        #30 [hci1] 114.766 849
+      ATT: Error Response (0x01) len 4
+        Read By Type Request (0x08)
+        Handle: 0x000e
+        Error: Attribute Not Found (0x0a)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11      #31 [hci1] 114.769 215
+      ATT: Read By Group Type Request (0x10) len 6
+        Handle range: 0x0001-0xffff
+        Attribute group type: Primary Service (0x2800)
+> HCI Event: Number of Completed Packets (0x13) plen 5           #32 [hci1] 114.791 091
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 24                       #33 [hci1] 114.826 851
+      ATT: Read By Group Type Response (0x11) len 19
+        Attribute data length: 6
+        Attribute group list: 3 entries
+        Handle range: 0x0001-0x0005
+        UUID: Generic Access Profile (0x1800)
+        Handle range: 0x0006-0x000f
+        UUID: Generic Attribute Profile (0x1801)
+        Handle range: 0x0010-0x0012
+        UUID: Device Information (0x180a)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11     #34 [hci1] 114.829 308
+      ATT: Read By Group Type Request (0x10) len 6
+        Handle range: 0x0013-0xffff
+        Attribute group type: Primary Service (0x2800)
+> HCI Event: Number of Completed Packets (0x13) plen 5          #35 [hci1] 114.850 958
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 26                      #36 [hci1] 114.886 942
+      ATT: Read By Group Type Response (0x11) len 21
+        Attribute data length: 20
+        Attribute group list: 1 entry
+        Handle range: 0x0027-0x002a
+        UUID: Vendor specific (12345678-1234-5678-1234-56789abcdef0)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11     #37 [hci1] 114.887 480
+      ATT: Read By Group Type Request (0x10) len 6
+        Handle range: 0x002b-0xffff
+        Attribute group type: Primary Service (0x2800)
+> HCI Event: Number of Completed Packets (0x13) plen 5          #38 [hci1] 114.910 960
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 9                       #39 [hci1] 114.946 605
+      ATT: Error Response (0x01) len 4
+        Read By Group Type Request (0x10)
+        Handle: 0x002b
+        Error: Attribute Not Found (0x0a)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11     #40 [hci1] 114.949 145
+      ATT: Read By Group Type Request (0x10) len 6
+        Handle range: 0x0001-0xffff
+        Attribute group type: Secondary Service (0x2801)
+> HCI Event: Number of Completed Packets (0x13) plen 5          #41 [hci1] 114.970 937
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 9                       #42 [hci1] 115.006 864
+      ATT: Error Response (0x01) len 4
+        Read By Group Type Request (0x10)
+        Handle: 0x0001
+        Error: Attribute Not Found (0x0a)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11    #43 [hci1] 115.007 315
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0013-0x002a
+        Attribute type: Include (0x2802)
+> HCI Event: Number of Completed Packets (0x13) plen 5         #44 [hci1] 115.031 117
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 9                      #45 [hci1] 115.066 838
+      ATT: Error Response (0x01) len 4
+        Read By Type Request (0x08)
+        Handle: 0x0013
+        Error: Attribute Not Found (0x0a)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11    #46 [hci1] 115.067 316
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0013-0x002a
+        Attribute type: Characteristic (0x2803)
+> HCI Event: Number of Completed Packets (0x13) plen 5         #47 [hci1] 115.092 808
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 27                     #48 [hci1] 115.126 872
+      ATT: Read By Type Response (0x09) len 22
+        Attribute data length: 21
+        Attribute data list: 1 entry
+        Handle: 0x0028
+        Value: 1a2900f1debc9a785634127856341278563412
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11    #49 [hci1] 115.127 341
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0029-0x002a
+        Attribute type: Characteristic (0x2803)
+> HCI Event: Number of Completed Packets (0x13) plen 5         #50 [hci1] 115.150 892
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 9                      #51 [hci1] 115.186 863
+      ATT: Error Response (0x01) len 4
+        Read By Type Request (0x08)
+        Handle: 0x0029
+        Error: Attribute Not Found (0x0a)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11    #52 [hci1] 115.238 433
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0001-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5         #53 [hci1] 115.270 923
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 24                     #54 [hci1] 115.310 644
+      ATT: Read By Type Response (0x09) len 19
+        Attribute data length: 18
+        Attribute data list: 1 entry
+        Handle: 0x000d
+        Value: 9eada072929f475ffa51d09c55f5e178
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 11    #55 [hci1] 115.311 066
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x000e-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5         #56 [hci1] 115.332 821
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 9                      #57 [hci1] 115.366 878
+      ATT: Error Response (0x01) len 4
+        Read By Type Request (0x08)
+        Handle: 0x000e
+        Error: Attribute Not Found (0x0a)
+bluetoothd[650]: < ACL Data TX: Handle 1 flags 0x00 dlen 9    #58 [hci1] 115.367 532
+      ATT: Write Request (0x12) len 4
+        Handle: 0x0009
+          Data: 0200
+> HCI Event: Number of Completed Packets (0x13) plen 5        #59 [hci1] 115.392 826
+        Num handles: 1
+        Handle: 1
+        Count: 1
+> ACL Data RX: Handle 1 flags 0x02 dlen 5                     #60 [hci1] 115.426 845
+      ATT: Write Response (0x13) len 0
+> HCI Event: LE Meta Event (0x3e) plen 6                      #61 [hci1] 123.431 741
+      LE PHY Update Complete (0x0c)
+        Status: Success (0x00)
+        Handle: 1
+        TX PHY: LE 1M (0x01)
+        RX PHY: LE 2M (0x02)
 
 
-I understand.
+Changes from v2:
+ - Detects DB_OUT_OF_SYNC errors during GATT operations
+ - Extracts affected handles from the original request PDU
+ - Checks if Service Changed indications overlap with those handles
+ - Verifies database consistency using Database Hash characteristic
+ - Automatically retries the original request if DB is consistent
+ - Automatically retries the original request if handle is not affected
+ - Link to v2
+   https://lore.kernel.org/all/20260105103828.105346-1-mengshi.wu@oss.qualcomm.com/
 
-In our system, the application layer has a timer to monitor whether the 
-PA sync process times out. If it does, it will re-execute the scanning 
-and PA sync actions.
+Changes from v1:
+ - Implement automatic recovery when ATT_ECODE_DB_OUT_OF_SYNC error is
+   received from the remote device.
+ - Link to v1
+   https://lore.kernel.org/all/20251208101915.247459-1-mengshi.wu@oss.qualcomm.com/
 
->>>> Signed-off-by: Yang Li <yang.li@amlogic.com>
->>>> ---
->>>>    lib/bluetooth/bluetooth.h | 2 +-
->>>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/lib/bluetooth/bluetooth.h b/lib/bluetooth/bluetooth.h
->>>> index f9f22c3f7..572009e75 100644
->>>> --- a/lib/bluetooth/bluetooth.h
->>>> +++ b/lib/bluetooth/bluetooth.h
->>>> @@ -152,7 +152,7 @@ struct bt_voice {
->>>>    #define BT_ISO_QOS_BIG_UNSET   0xff
->>>>    #define BT_ISO_QOS_BIS_UNSET   0xff
->>>>
->>>> -#define BT_ISO_SYNC_TIMEOUT    0x07d0 /* 20 secs */
->>>> +#define BT_ISO_SYNC_TIMEOUT    0x00c8 /* 2 secs */
->>>>
->>>>    /* For an ISO Broadcaster, this value is used to compute
->>>>     * the desired Periodic Advertising Interval as a function
->>>>
->>>> ---
->>>> base-commit: a94f994201a69a36753abda65cc51937de9cd3e3
->>>> change-id: 20260112-iso_sync_timeout-8e3ecf43d82e
->>>>
->>>> Best regards,
->>>> --
->>>> Yang Li <yang.li@amlogic.com>
->>>>
->>>>
->>>>
->>> --
->>> Luiz Augusto von Dentz
->
->
-> --
-> Luiz Augusto von Dentz
+Mengshi Wu (2):
+  shared/att: Implement ATT error retry mechanism with callback support
+  gatt-client: Add DB_OUT_OF_SYNC error handling with retry mechanism
+
+ src/shared/att.c          | 182 ++++++++++++++++++++++++++++++++++++--
+ src/shared/att.h          |  16 ++++
+ src/shared/gatt-client.c  | 168 +++++++++++++++++++++++++++++++++++
+ src/shared/gatt-helpers.c |  16 ++++
+ src/shared/gatt-helpers.h |   3 +
+ 5 files changed, 378 insertions(+), 7 deletions(-)
+
+-- 
+2.34.1
+
