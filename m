@@ -1,94 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28B03A901E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 23:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB5031619C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 02:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768952501; cv=none; b=Od/8rRFtRT+OVqKpCZBTvczQF1e1LcjqyhhEouyl6svqln0C71Tw/GvVIBQt+hmTz6t2v08ou3hDx/if+b4otKmreZNqFnAzx8KVHY1ftooKjpdOQzce0N/OkqSkzjpdevO8Hj9bVazAd5X5epOKkJepQTwfTIbWHGij3H6fPtE=
+	t=1768961595; cv=none; b=nVSJupmZPznhrHZLeHJRlSoc/EEaskBuwrnCrIA2rdtVp7klKxlybR8FDpoOaUUbUqt3OIwiQGWKCpxPn1X3bimg+bD5AlVBCOhz421uvFgmuTjoiWyBKuJc00OLOGONnK7CEWPkXqPhMaEyEEPmJ/IrgCMdWG1Q4au6Gvr8puc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768952501; c=relaxed/simple;
-	bh=8HqEu+H/hjEdiK+L63LsgvDIATaCEjw1vpvr3BsOUYY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kbW0c5sfjXjO/rrf2d6hQQRocy4glecT5Y0x0PxI94y+Wa/p5GR+OU3zL5OddZHI6UZvs+avA8qX3u3JCCMjz8IXIRq8irwhD+dea6Aa33G1S5r8bseCSXM2RZ5+UpZlZFh6kXjAuoRILo/5UiqTMYRrxPXp6GsJXRKmoxPgEYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H4CnN/r+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768961595; c=relaxed/simple;
+	bh=VhM+6yBMxLlmIeQa2itjRUB0wc4wpTxrjjhUrDgJoDA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=W16wcLiCtvj/skCPDu42KeMjML9mUrTPY22R26VlqXdtS+4mzAHisTGeB9Dgl5ThMo2qNBhwMEamI4S8uL49ClmfpiaP7kXZ+96SLoNAYMivAOpbjOrQiFgFv9gVMGeXwY7khGMNkL0NOFDYaA+60g93Kr1I+3vZ3YpZBYPpVsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OQRB3t+Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H4CnN/r+"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5FB53C19423
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jan 2026 23:41:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OQRB3t+Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 426F4C16AAE;
+	Wed, 21 Jan 2026 02:13:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768952501;
-	bh=8HqEu+H/hjEdiK+L63LsgvDIATaCEjw1vpvr3BsOUYY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=H4CnN/r+T3easa0z+cDB9wkGGlllgYWLhSELjWiDONtjEha4zxo5zLJdyQ33Iky2/
-	 f71+hzSUT6kw7851GLvJf69OWq7Iz2QyNIb1L1Hnl7QoHiU9VIjigjcd+9t1NfhCWX
-	 eCMTxPouzOWrCnOUJmjB9YcERupRaXb2D3NTl59rfoKeC3flRafoz8oT2n/YHQGYVr
-	 0FbDgAfCu3ea2nyyChzDFR8CoAMWAMsz5AM3GN1nHOs1j3EnHuFbWQy1PmQkDtxnWc
-	 Asr/8ea+yLTAkxPo1nBTlCoyiK7AjFqk6AnnFBXzBYbblPxL6LgrQOb7EMQeeZTDIf
-	 T3bpo086jmUeA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 556A0C433E1; Tue, 20 Jan 2026 23:41:41 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220986] MediaTek MT7902 Bluetooth adapter (USB 13d3:3596) -
- missing kernel support for hardware variant 0x7902
-Date: Tue, 20 Jan 2026 23:41:41 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: aamolodc@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-220986-62941-sbF7NKkm7o@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220986-62941@https.bugzilla.kernel.org/>
-References: <bug-220986-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1768961595;
+	bh=VhM+6yBMxLlmIeQa2itjRUB0wc4wpTxrjjhUrDgJoDA=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=OQRB3t+QezMcvSXjPhNuX4ySDuacfVaTOwRF58ZcKoDZ5AfQVdSj5dM+qehca4skN
+	 BXGa/Z7O6V89AC8aGf5xXw3eXGeaayq2xqpgplV59/z5R51KUeH4jOIQorTFHUzzIp
+	 OiIWm564ktUDp0aOiFyWdaMdqX/iLCMyNkHVucz1yK/qyYwDY+b6Vns9KHK/uwyemw
+	 q0NuM3sadMre5CsYJLbVYcR2khSJpUxnDkldrKVbZlMCLDfIlbv83mG02tYp/CI608
+	 hUkcJGVW8FZ8+vfzeo3tCmpVn+w67SN0n9OcCy38/BK8jNhdO6y5IX9s7isXFa/Ady
+	 l8pvQoWJfFjOg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C8AD262B1;
+	Wed, 21 Jan 2026 02:13:15 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Wed, 21 Jan 2026 10:13:09 +0800
+Subject: [PATCH BlueZ bluez v2] bap: reduce ISO sync timeout to 3.6 secs
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260121-iso_sync_timeout-v2-1-efa52fdba244@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIADQ2cGkC/3WNQQ6DIBREr2L+ujQCbaNd9R6NMRY/+hORBpDUG
+ u5ewr6ryZvJzBzg0RF6uFcHOIzkya4ZxKkCNQ/rhIzGzCBqcas5F4y87f2+qj6QQbsF1qBEpS9
+ ybARCrr0davqUySe8lg2/0GV7Jh+s28tR5CX8vxk546wdJLatuGbVj8EsdiJ1VtZAl1L6AeQDW
+ 2G5AAAA
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768961593; l=1152;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=1u27ix1kl7OQvyW8a2HLNDg5ot2OEQvP578EPXDjjL0=;
+ b=ZimwYJ4/Mrcqvzo5MZA/Dr6vwctNQVs+AZ+jYiGlXXcfLvrL+JQ1eis031pvL9i7qrFRgd1bA
+ hM73pFh8z/GAwI+DApubk7WQ0n2mw1j8Fn/WgtYor2Lx6apJJPOwxfF
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220986
+From: Yang Li <yang.li@amlogic.com>
 
---- Comment #4 from Alex (aamolodc@gmail.com) ---
-UPDATE 2026-01-21: Root cause identified, kernel fix still needed
+The ISO sync timeout was previously set to 20 seconds,
+which is too long for PA sync. This could leave the userspace
+flow pending for an extended period of time.
 
-CORRECTION: This chip is MT7902, not MT7925.
-Evidence:
-- PCIe ID: 14c3:7902 ("MT7902 802.11ax PCIe Wireless Network Adapter")
-- Hardware variant reports: 0x7902
-- Firmware build: 20220107141051
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+Changes in v2:
+- Modified the BT_ISO_SYNC_TIMEOUT to 0x0168 (3.6 secs)
+- Link to v1: https://patch.msgid.link/20260112-iso_sync_timeout-v1-1-9a3e99259a3f@amlogic.com
+---
+ lib/bluetooth/bluetooth.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-KERNEL CHANGES REQUIRED:
+diff --git a/lib/bluetooth/bluetooth.h b/lib/bluetooth/bluetooth.h
+index f9f22c3f7..b9ea34847 100644
+--- a/lib/bluetooth/bluetooth.h
++++ b/lib/bluetooth/bluetooth.h
+@@ -152,7 +152,7 @@ struct bt_voice {
+ #define BT_ISO_QOS_BIG_UNSET	0xff
+ #define BT_ISO_QOS_BIS_UNSET	0xff
+ 
+-#define BT_ISO_SYNC_TIMEOUT	0x07d0 /* 20 secs */
++#define BT_ISO_SYNC_TIMEOUT	0x0168 /* 3.6 secs */
+ 
+ /* For an ISO Broadcaster, this value is used to compute
+  * the desired Periodic Advertising Interval as a function
 
-1. drivers/bluetooth/btusb.c - Add USB ID:
-   { USB_DEVICE(0x13d3, 0x3596), .driver_info =3D BTUSB_MEDIATEK |
-BTUSB_WIDEBAND_SPEECH }
+---
+base-commit: c24f0b487ca3d4e0ca315114a889dad4d2c3bb26
+change-id: 20260112-iso_sync_timeout-8e3ecf43d82e
 
-2. drivers/bluetooth/btmtk.c - Add hardware variant 0x7902 to switch statem=
-ent:
-   case 0x7902:
-   (alongside existing 0x7922, 0x7925, 0x7961)
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
 
-3. linux-firmware - Include MT7902 Bluetooth firmware
-(BT_RAM_CODE_MT7902_1_1_hdr.bin)
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
