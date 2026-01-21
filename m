@@ -1,62 +1,62 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7585B2FFFA5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 08:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D537392B98
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jan 2026 08:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768984694; cv=none; b=FhVd4mS4blly4quBpl8+bukdjvlhWMJ8s6P02Y8NQMT1GA6xKZp/Wjca6frRID4OjL1SjY9rUu6PwIjV41w6B7vk+6IjdlbDjU8u6/gusGOQNSHK1XeNCLSgCkofr32sGzvVnKB/KIkDCx0JviytsKOhbUrRAc5dISc/9X6wM3E=
+	t=1768984695; cv=none; b=mxhAFaKNLFh/NF8TqKuT2sGH41lkR+P7gOVhsz2qXYzL/TSv/qmO2L/3PurUmwPv903Wf9kco8mQnczwn4fasDd/qFg+QYFp2RRsXUXnuNrwb3mKPq90pIqcGb7t81QXC2px0jhqqzjLX9bIUPKunDTPdkXW06WKNl+b6mNOQPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768984694; c=relaxed/simple;
-	bh=mcY9owxR21urVK56T9v8POw0dhZwoG9ZOnEqIDG0HRw=;
+	s=arc-20240116; t=1768984695; c=relaxed/simple;
+	bh=wIcAOZk/w3uco+OmN5lRHdaj6Ggobe59hFF2/PCqlXU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=R83Vneh56PPs6FrrJqXN37xfJPUbkfOwj1cZouN9hlceBhDZskbNAUoWnlR4Elr23EIfS537nv/8+QGfn/DXpEsKWn2LW+ITEnO0GVAVF7r1LsaEpZXz60LyFqNRQ7fPZ7f7x+ZDNoMhcDR/QlVNX7c4NM3qwedI/0qLb/jeMb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=h+6buOdj; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version; b=AV27joYXnWH4ama/LwmQgpaeZaHLtM3wf77yDq4Gbs4mzo2z2QVg/LnDrXz/hnWD+j23neL94p4dUtHa3x/rW/AjSJukWAjbxayHCc6nBzmBdUaViDeWBYIEbsdSaoU7/3Sxu4y5rlXdGjymmSO86tCPFdqxLAHTg7x4c+JsLrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=CO3ZIIW9; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="h+6buOdj"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60L6XLLu2354294;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="CO3ZIIW9"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60L2d0Np314751;
 	Wed, 21 Jan 2026 08:38:11 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=QhJGGe8n5PC
-	IEASf0SbfEs4/nFSSerAQW7sPyMKwJaI=; b=h+6buOdjWRn+3X2kCWlVwnvXFwY
-	Uxrxnh7B/xxSC1Tfa22vhPJXPLdjlXVJvTco6kyltpRmoLGvk8WEnrKalN8z+dUh
-	5oPe0mzAisXcAaoK9bt00DNAZFAx0IhjG7sztQJgfPRz7kk6AFzBEd8SsXsGJ/rR
-	PkfCyB5x88OAw2s22FXdcCtezOCYEw7ufeud595BXRtawXav5d9AgF11RVPMSx7T
-	7+BYA5aKdO1yDcRoLa0lJpMGx81EK/XfDLPFNO/KVITXH6DIm+O7gj8y7Idi9UqB
-	UgA6UByH2XF3UCHKU2Di3ePTw0g05NsgJaTV3VsWLbev4PKtz4ZIrdDPSpg==
+	:mime-version:references:subject:to; s=qcppdkim1; bh=72sQOT5mmGy
+	5oaDuBxDooe70NS62/HJPzD9X6+nWgIk=; b=CO3ZIIW9fpuVdeCvsrnG3TaC6hO
+	gjz24TEVrhZk0WZrIVMlLlMlGHrT0H0OFOIKYkUTaqFhR8bOpQonFAcaQi67T/WR
+	dhW5LquW0nRtCV/t1PKgDaghKpAd67A5bvl7GfB1GRrjkMP/BErVT9v7eUUcjCRu
+	oHyZP5BuAtu5rsTvF9kgZgf5pSDF//0TwMbMOE3opn4PCEpXycZyQi5q3MZKXOIF
+	/uIMRdsN/JpXpozseqvrZjwGxJbbwZUDTogHkcDK7x18Zk1J9zOtaTCRtYNzScu5
+	ZQp/7u/sM6ftHoow6djFXVf145lfp6jJWPg3AQpsEIDNotcVU30YhOUwMQQ==
 Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4btsmprcsh-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4btdw2axhx-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Jan 2026 08:38:10 +0000 (GMT)
+	Wed, 21 Jan 2026 08:38:11 +0000 (GMT)
 Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 60L8c8vY029080;
+	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 60L8c8xI029095;
 	Wed, 21 Jan 2026 08:38:08 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4br3gms2ru-1
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4br3gms2s0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 21 Jan 2026 08:38:08 +0000
 Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 60L8c8U1029075;
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 60L8c8fX029090;
 	Wed, 21 Jan 2026 08:38:08 GMT
 Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 60L8c7Lv029072
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 60L8c8Fc029089
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 21 Jan 2026 08:38:08 +0000
 Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4766378)
-	id DCE1B23883; Wed, 21 Jan 2026 16:38:06 +0800 (CST)
+	id AA0A823791; Wed, 21 Jan 2026 16:38:07 +0800 (CST)
 From: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
 To: luiz.dentz@gmail.com
 Cc: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com,
         cheng.jiang@oss.qualcomm.com, chezhou@qti.qualcomm.com,
         wei.deng@oss.qualcomm.com, yiboz@qti.qualcomm.com,
         Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-Subject: [PATCH v3 1/2] shared/att: Implement ATT error retry mechanism with callback support
-Date: Wed, 21 Jan 2026 16:38:03 +0800
-Message-Id: <20260121083804.4010106-2-mengshi.wu@oss.qualcomm.com>
+Subject: [PATCH v3 2/2] gatt-client: Add DB_OUT_OF_SYNC error handling with retry mechanism
+Date: Wed, 21 Jan 2026 16:38:04 +0800
+Message-Id: <20260121083804.4010106-3-mengshi.wu@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260121083804.4010106-1-mengshi.wu@oss.qualcomm.com>
 References: <20260121083804.4010106-1-mengshi.wu@oss.qualcomm.com>
@@ -71,377 +71,279 @@ X-QCInternal: smtphost
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=EIcLElZC c=1 sm=1 tr=0 ts=69709072 cx=c_pps
+X-Proofpoint-ORIG-GUID: 9Xnv0WmxPPaB292c68Rtzy0bMDNXDzrq
+X-Proofpoint-GUID: 9Xnv0WmxPPaB292c68Rtzy0bMDNXDzrq
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIxMDA3MSBTYWx0ZWRfX5We1vl1n627v
+ 9RtZs18QeHdpvXd5hz5t3+aFABPu5zvx19mlwtqjJDUTYjZl741iiyW+b6loOLoIVJdG6klxolu
+ 8bDYxu3CarL1dFJg4zZkeRboZS7BxjG2kaeG5hkhwdP2l/rpuD10GuwwST+9hFH0aTtbKPnXcPy
+ qn9RPh0ml5PyEetsPJj7IyDrfufvf59WLwDKDK9f+bUot5eKpB5aj3qGN+XyeWV6aA3eLxb11Ux
+ L5sVHDIodLBOsROCVm3LboeJYMLkWEj01oykYP3M7gYfuN2uWfIdz5wf5MmrTeyIzbqTZxU3LJe
+ zPVEgOB5B/znRV/x45Lp0An4QvD/TbNe2sQU6Y8VlGuQWa2itF5qth97QoONFO1/hUF4sFnBOmX
+ 9MYaw/X4icpWY+rZwuNBqS3giXyy3TRJHQv9Wd8tTNl+0s3De91bIXpnXBeCcd6WOVgSlabntCb
+ wW8fiSSrGDXXEuvg+Vw==
+X-Authority-Analysis: v=2.4 cv=RqzI7SmK c=1 sm=1 tr=0 ts=69709073 cx=c_pps
  a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
  a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8
- a=ia_pDvnbsAvbDmiY8_EA:9
-X-Proofpoint-ORIG-GUID: Hnc0vW-PRoM6DcMCScyGo_oezBKFl_Ko
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIxMDA3MSBTYWx0ZWRfX7Yt3Wj45kvuS
- +uOckQter4zD9bU60r1EMBTu6NZZDMe6YJFKrLm0jzG/SJpDdiKapF4zmGTiY1UFeyGVGFWt5rn
- H9npD8NRa+pUbBr4PR0fYJy7GHApR6vB0wwXmcWF4d4KAuLLeSir6DbgjqU1lYYto2UcIIQpxbm
- S/rDEEDY4XpLTgZVOZLBET+veKWfttY/RaoIixFBEiFGPQh3EIi/Dcm0+c76pk4hqoeqghiavOe
- eilZV4oi+rQHhZFhYlA56OWVnBBrbNylDqAWuW2GS5Y2VVeRpCH425JvQ3DgeLDUW4AichBcuxI
- ERoGt/9Xwere6E3MfXuqRzAqTy0jr0K4O5/bpbEXXgWUZauj2XRueLpkTwrqMsw7pQbm9I9+Tlf
- D+1c5hc3Fzv1tFa1hJxB+SQ3nK4LjsmZ18Up1cEx+sw8D00Pr4fQcyKgodUNyrZBs/7xuWXuFja
- E80aB8ZMWcDB1PBIEhg==
-X-Proofpoint-GUID: Hnc0vW-PRoM6DcMCScyGo_oezBKFl_Ko
+ a=FP3Vu47zevXFEFS8Y5kA:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
  definitions=2026-01-21_01,2026-01-20_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 bulkscore=0 priorityscore=1501 adultscore=0 suspectscore=0
- impostorscore=0 lowpriorityscore=0 phishscore=0 malwarescore=0 spamscore=0
+ malwarescore=0 priorityscore=1501 bulkscore=0 suspectscore=0 spamscore=0
+ clxscore=1015 impostorscore=0 adultscore=0 lowpriorityscore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601210071
 
-Add a retry mechanism for ATT operations that allows upper layers to
-decide whether to retry failed requests. This includes:
+Implement automatic retry logic for GATT operations that fail with
+DB_OUT_OF_SYNC error. When this error occurs, the client now:
 
-- Add retry callback registration (bt_att_set_retry_cb) to allow
-  applications to handle retry decisions
-- Implement pending_retry state tracking in att_send_op to store
-  operations awaiting retry approval
-- Add bt_att_retry_request() and bt_att_cancel_retry() functions to
-  approve or reject retry attempts
-- Store error PDUs during retry_pending state for callback inspection
-- Modify handle_error_rsp() to return retry decision codes instead of
-  boolean values
-- Add BT_ATT_RETRY_* constants for retry decision handling
-- Update GATT helpers to support retry callbacks for operations like
-  discovery and read/write requests
+- Reads and compares the remote Database Hash with the local cache
+- Retries the failed operation if hashes match (database is in sync)
+- Triggers service discovery if hashes differ or hash read fails
+- Handles Service Changed indications during retry by checking if
+  the error handle falls within the affected range
 
-This enables more robust error handling by allowing the application
-layer to implement custom retry logic based on ATT error codes.
+Add retry callback infrastructure in gatt-helpers to support deferred
+retry decisions, allowing async verification before retrying requests.
 
 Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
 ---
- src/shared/att.c | 182 +++++++++++++++++++++++++++++++++++++++++++++--
- src/shared/att.h |  16 +++++
- 2 files changed, 191 insertions(+), 7 deletions(-)
+ src/shared/gatt-client.c  | 168 ++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-helpers.c |  16 ++++
+ src/shared/gatt-helpers.h |   3 +
+ 3 files changed, 187 insertions(+)
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 77ca4aa24..4ae97530a 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -47,6 +47,7 @@ struct bt_att_chan {
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index f8ebab3fa..bc8138e16 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -114,6 +114,10 @@ struct bt_gatt_client {
  
- 	struct att_send_op *pending_req;
- 	struct att_send_op *pending_ind;
-+	struct att_send_op *pending_retry;
- 	bool writer_active;
- 
- 	bool in_req;			/* There's a pending incoming request */
-@@ -78,6 +79,10 @@ struct bt_att {
- 	bt_att_destroy_func_t timeout_destroy;
- 	void *timeout_data;
- 
-+	bt_att_retry_func_t retry_callback;
-+	bt_att_destroy_func_t retry_destroy;
-+	void *retry_data;
+ 	struct bt_gatt_request *discovery_req;
+ 	unsigned int mtu_req_id;
 +
- 	uint8_t debug_level;
- 	bt_att_debug_func_t debug_callback;
- 	bt_att_destroy_func_t debug_destroy;
-@@ -194,6 +199,9 @@ struct att_send_op {
- 	void *pdu;
- 	uint16_t len;
- 	bool retry;
-+	bool retry_pending;  /* Waiting for approval to retry */
-+	uint8_t *error_pdu;  /* Stored error PDU for retry_pending */
-+	uint16_t error_pdu_len;
- 	bt_att_response_func_t callback;
- 	bt_att_destroy_func_t destroy;
- 	void *user_data;
-@@ -210,6 +218,7 @@ static void destroy_att_send_op(void *data)
- 		op->destroy(op->user_data);
++	/* Pending retry operation for DB out of sync handling */
++	unsigned int pending_retry_att_id;
++	uint16_t pending_error_handle;
+ };
  
- 	free(op->pdu);
-+	free(op->error_pdu);
- 	free(op);
+ struct request {
+@@ -2342,6 +2346,167 @@ static void att_disconnect_cb(int err, void *user_data)
+ 		notify_client_ready(client, false, 0);
  }
  
-@@ -644,6 +653,9 @@ static void bt_att_chan_free(void *data)
- 	if (chan->pending_ind)
- 		destroy_att_send_op(chan->pending_ind);
- 
-+	if (chan->pending_retry)
-+		destroy_att_send_op(chan->pending_retry);
-+
- 	queue_destroy(chan->queue, destroy_att_send_op);
- 
- 	io_destroy(chan->io);
-@@ -682,6 +694,11 @@ static bool disconnect_cb(struct io *io, void *user_data)
- 		chan->pending_ind = NULL;
- 	}
- 
-+	if (chan->pending_retry) {
-+		disc_att_send_op(chan->pending_retry);
-+		chan->pending_retry = NULL;
-+	}
-+
- 	bt_att_chan_free(chan);
- 
- 	/* Don't run disconnect callback if there are channels left */
-@@ -777,16 +794,17 @@ static bool change_security(struct bt_att_chan *chan, uint8_t ecode)
- 	return bt_att_chan_set_security(chan, security);
- }
- 
--static bool handle_error_rsp(struct bt_att_chan *chan, uint8_t *pdu,
-+static int handle_error_rsp(struct bt_att_chan *chan, uint8_t *pdu,
- 					ssize_t pdu_len, uint8_t *opcode)
- {
- 	struct bt_att *att = chan->att;
- 	const struct bt_att_pdu_error_rsp *rsp;
- 	struct att_send_op *op = chan->pending_req;
-+	int should_retry = BT_ATT_RETRY_NO;
- 
- 	if (pdu_len != sizeof(*rsp)) {
- 		*opcode = 0;
--		return false;
-+		return should_retry;
- 	}
- 
- 	rsp = (void *) pdu;
-@@ -797,11 +815,43 @@ static bool handle_error_rsp(struct bt_att_chan *chan, uint8_t *pdu,
- 	 * the security again.
- 	 */
- 	if (op->retry)
--		return false;
-+		return should_retry;
- 
- 	/* Attempt to change security */
--	if (!change_security(chan, rsp->ecode))
--		return false;
-+	if (change_security(chan, rsp->ecode)) {
-+		should_retry = BT_ATT_RETRY_YES;
-+	} else if (att->retry_callback) {
-+		should_retry = att->retry_callback(op->opcode, rsp->ecode,
-+						   op->pdu + 1, op->len - 1,
-+						   op->id, att->retry_data);
-+
-+		/* Check if callback wants to defer the retry decision */
-+		if (should_retry == BT_ATT_RETRY_PENDING) {
-+			op->retry_pending = true;
-+
-+			/* Store error PDU for later use */
-+			op->error_pdu = malloc(pdu_len);
-+			if (op->error_pdu) {
-+				memcpy(op->error_pdu, pdu, pdu_len);
-+				op->error_pdu_len = pdu_len;
-+			}
-+
-+			/* Remove timeout since we're waiting for approval */
-+			if (op->timeout_id) {
-+				timeout_remove(op->timeout_id);
-+				op->timeout_id = 0;
-+			}
-+
-+			/* Move from pending_req to pending_retry */
-+			chan->pending_retry = op;
-+
-+			DBG(att, "(chan %p) Retry pending for operation %p",
-+			    chan, op);
-+		}
-+	}
-+
-+	if (should_retry != BT_ATT_RETRY_YES)
-+		return should_retry;
- 
- 	/* Remove timeout_id if outstanding */
- 	if (op->timeout_id) {
-@@ -815,7 +865,8 @@ static bool handle_error_rsp(struct bt_att_chan *chan, uint8_t *pdu,
- 	op->retry = true;
- 
- 	/* Push operation back to channel queue */
--	return queue_push_head(chan->queue, op);
-+	return queue_push_head(chan->queue, op) ?
-+		BT_ATT_RETRY_YES : BT_ATT_RETRY_NO;
- }
- 
- static void handle_rsp(struct bt_att_chan *chan, uint8_t opcode, uint8_t *pdu,
-@@ -845,9 +896,15 @@ static void handle_rsp(struct bt_att_chan *chan, uint8_t opcode, uint8_t *pdu,
- 	 */
- 	if (opcode == BT_ATT_OP_ERROR_RSP) {
- 		/* Return if error response cause a retry */
--		if (handle_error_rsp(chan, pdu, pdu_len, &req_opcode)) {
-+		switch (handle_error_rsp(chan, pdu, pdu_len, &req_opcode)) {
-+		case BT_ATT_RETRY_PENDING:
-+			/* Operation moved to pending_retry, clear pending_req */
-+			chan->pending_req = NULL;
-+		case BT_ATT_RETRY_YES:
- 			wakeup_chan_writer(chan, NULL);
- 			return;
-+		default:
-+			break;
- 		}
- 	} else if (!(req_opcode = get_req_opcode(opcode)))
- 		goto fail;
-@@ -1142,6 +1199,9 @@ static void bt_att_free(struct bt_att *att)
- 	if (att->timeout_destroy)
- 		att->timeout_destroy(att->timeout_data);
- 
-+	if (att->retry_destroy)
-+		att->retry_destroy(att->retry_data);
-+
- 	if (att->debug_destroy)
- 		att->debug_destroy(att->debug_data);
- 
-@@ -1473,6 +1533,23 @@ bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
- 	return true;
- }
- 
-+bool bt_att_set_retry_cb(struct bt_att *att, bt_att_retry_func_t callback,
-+						void *user_data,
-+						bt_att_destroy_func_t destroy)
++static bool is_handle_out_of_range(uint16_t handle, struct bt_gatt_client *client)
 +{
-+	if (!att)
-+		return false;
++	bool handle_out_of_range = false;
++	uint16_t start_handle, end_handle;
 +
-+	if (att->retry_destroy)
-+		att->retry_destroy(att->retry_data);
++	if (handle) {
++		start_handle = bt_gatt_req_get_start_handle(
++				client->discovery_req);
++		end_handle = bt_gatt_req_get_end_handle(
++				client->discovery_req);
 +
-+	att->retry_callback = callback;
-+	att->retry_destroy = destroy;
-+	att->retry_data = user_data;
++		if (start_handle != 0 && end_handle != 0 &&
++			(handle < start_handle || handle > end_handle))
++			handle_out_of_range = true;
++	}
 +
-+	return true;
++	return handle_out_of_range;
 +}
 +
- unsigned int bt_att_register_disconnect(struct bt_att *att,
- 					bt_att_disconnect_func_t callback,
++static void db_hash_check_cb(bool success, uint8_t att_ecode,
++			      struct bt_gatt_result *result,
++			      void *user_data)
++{
++	struct bt_gatt_client *client = user_data;
++	struct gatt_db_attribute *hash_attr = NULL;
++	const uint8_t *local_hash = NULL;
++	const uint8_t *remote_hash;
++	uint16_t length, handle;
++	struct bt_gatt_iter iter;
++	bt_uuid_t uuid;
++	unsigned int att_id = client->pending_retry_att_id;
++	uint16_t pending_error_handle = client->pending_error_handle;
++	bool handle_out_of_range;
++
++	client->pending_retry_att_id = 0;
++	client->pending_error_handle = 0;
++
++	/* If a Service Changed indication is received at this stage, the
++	 * pending request may be retried once we have verified that the
++	 * affected attribute handle is not within the range impacted by
++	 * the service change.
++	 */
++	if (client->in_svc_chngd) {
++		handle_out_of_range =
++			is_handle_out_of_range(pending_error_handle, client);
++
++		if (handle_out_of_range) {
++			DBG(client, "Error handle not effected, approving retry");
++			bt_att_retry_request(client->att, att_id);
++		} else {
++			DBG(client, "Error handle is in range of svc chngd");
++			bt_att_cancel_retry(client->att, att_id);
++		}
++		return;
++	}
++
++	if (!att_id) {
++		DBG(client, "No pending retry operation");
++		return;
++	}
++
++	if (!success) {
++		DBG(client,
++		"Failed to read remote DB Hash, triggering full discovery");
++		goto trigger_discovery;
++	}
++
++	/* Extract hash value from result */
++	if (!result || !bt_gatt_iter_init(&iter, result))
++		goto trigger_discovery;
++
++	if (!bt_gatt_iter_next_read_by_type(&iter, &handle, &length,
++					     &remote_hash))
++		goto trigger_discovery;
++
++	if (length != 16) {
++		DBG(client, "Invalid DB Hash length: %u", length);
++		goto trigger_discovery;
++	}
++
++	/* Get local hash from database */
++	bt_uuid16_create(&uuid, GATT_CHARAC_DB_HASH);
++	gatt_db_find_by_type(client->db, 0x0001, 0xffff, &uuid,
++			     get_first_attribute, &hash_attr);
++
++	if (hash_attr) {
++		gatt_db_attribute_read(hash_attr, 0, BT_ATT_OP_READ_REQ, NULL,
++				       db_hash_read_value_cb, &local_hash);
++	}
++
++	/* Compare hashes */
++	if (local_hash && !memcmp(local_hash, remote_hash, 16)) {
++		/* Hashes match - safe to retry */
++		DBG(client, "DB Hash matches, approving retry");
++		bt_att_retry_request(client->att, att_id);
++		return;
++	}
++
++	/* Hashes differ - need service discovery */
++	DBG(client, "DB Hash differs, canceling retry and triggering discovery");
++
++trigger_discovery:
++	bt_att_cancel_retry(client->att, att_id);
++
++	if (!client->in_svc_chngd)
++		process_service_changed(client, 0x0001, 0xffff);
++}
++
++static int gatt_client_retry_cb(uint8_t opcode, uint8_t error_code,
++				 const void *pdu, uint16_t length,
++				 unsigned int att_id, void *user_data)
++{
++	struct bt_gatt_client *client = user_data;
++	bt_uuid_t uuid;
++	uint16_t error_handle = 0;
++	const struct bt_att_pdu_error_rsp *error_pdu;
++	bool handle_out_of_range = false;
++
++	assert(client);
++
++	/* Only handle DB_OUT_OF_SYNC errors */
++	if (error_code != BT_ATT_ERROR_DB_OUT_OF_SYNC)
++		return BT_ATT_RETRY_NO;
++
++	if (pdu && length >= sizeof(struct bt_att_pdu_error_rsp)) {
++		error_pdu = (void *)pdu;
++		error_handle = get_le16(&error_pdu->handle);
++		client->pending_error_handle = error_handle;
++	}
++
++	/* If a Service Changed indication is received at this stage, the
++	 * pending request may be retried once we have verified that the
++	 * affected attribute handle is not within the range impacted by
++	 * the service change.
++	 */
++	if (client->in_svc_chngd) {
++		handle_out_of_range =
++			is_handle_out_of_range(error_handle, client);
++
++		if (handle_out_of_range)
++			return BT_ATT_RETRY_YES;
++		else
++			return BT_ATT_RETRY_NO;
++	}
++
++	/* Store the att_id for later use */
++	client->pending_retry_att_id = att_id;
++
++	/* Read remote DB Hash to compare */
++	bt_uuid16_create(&uuid, GATT_CHARAC_DB_HASH);
++	if (!bt_gatt_read_by_type(client->att, 0x0001, 0xffff, &uuid,
++				   db_hash_check_cb, client, NULL)) {
++		DBG(client, "Failed to read DB Hash, canceling retry");
++		client->pending_retry_att_id = 0;
++		client->pending_error_handle = 0;
++		return BT_ATT_RETRY_NO;
++	}
++
++	return BT_ATT_RETRY_PENDING;
++}
++
+ static struct bt_gatt_client *gatt_client_new(struct gatt_db *db,
+ 							struct bt_att *att,
+ 							uint8_t features)
+@@ -2382,6 +2547,9 @@ static struct bt_gatt_client *gatt_client_new(struct gatt_db *db,
+ 	client->db = gatt_db_ref(db);
+ 	client->features = features;
+ 
++	/* Register retry callback for DB out of sync handling */
++	bt_att_set_retry_cb(att, gatt_client_retry_cb, client, NULL);
++
+ 	return client;
+ 
+ fail:
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index c1cbbdc91..8dee34a9e 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -790,6 +790,22 @@ done:
+ 	discovery_op_complete(op, success, att_ecode);
+ }
+ 
++uint16_t bt_gatt_req_get_start_handle(struct bt_gatt_request *req)
++{
++	if (!req)
++		return 0;
++
++	return req->start_handle;
++}
++
++uint16_t bt_gatt_req_get_end_handle(struct bt_gatt_request *req)
++{
++	if (!req)
++		return 0;
++
++	return req->end_handle;
++}
++
+ static struct bt_gatt_request *discover_services(struct bt_att *att,
+ 					bt_uuid_t *uuid,
+ 					uint16_t start, uint16_t end,
+diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
+index 7623862e9..2bf5aad46 100644
+--- a/src/shared/gatt-helpers.h
++++ b/src/shared/gatt-helpers.h
+@@ -101,3 +101,6 @@ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
+ 					bt_gatt_request_callback_t callback,
  					void *user_data,
-@@ -2051,6 +2128,97 @@ bool bt_att_has_crypto(struct bt_att *att)
- 	return att->crypto ? true : false;
- }
- 
-+bool bt_att_retry_request(struct bt_att *att, unsigned int id)
-+{
-+	const struct queue_entry *entry;
-+	struct bt_att_chan *chan = NULL;
-+	struct att_send_op *op;
+ 					bt_gatt_destroy_func_t destroy);
 +
-+	if (!att || !id)
-+		return false;
-+
-+	/* Find the channel with the pending retry operation */
-+	for (entry = queue_get_entries(att->chans); entry;
-+						entry = entry->next) {
-+		struct bt_att_chan *c = entry->data;
-+
-+		if (c->pending_retry && c->pending_retry->id == id &&
-+		    c->pending_retry->retry_pending) {
-+			chan = c;
-+			op = c->pending_retry;
-+			break;
-+		}
-+	}
-+
-+	if (!chan || !op)
-+		return false;
-+
-+	DBG(att, "(chan %p) Approving retry for operation %p", chan, op);
-+
-+	/* Clear pending retry state and mark for retry */
-+	op->retry_pending = false;
-+	op->retry = true;
-+	chan->pending_retry = NULL;
-+
-+	/* Free stored error PDU as we're retrying */
-+	free(op->error_pdu);
-+	op->error_pdu = NULL;
-+	op->error_pdu_len = 0;
-+
-+	/* Push operation back to channel queue for retry */
-+	if (!queue_push_head(chan->queue, op))
-+		return false;
-+
-+	/* Wake up writer to send the retry */
-+	wakeup_chan_writer(chan, NULL);
-+
-+	return true;
-+}
-+
-+bool bt_att_cancel_retry(struct bt_att *att, unsigned int id)
-+{
-+	const struct queue_entry *entry;
-+	struct bt_att_chan *chan = NULL;
-+	struct att_send_op *op;
-+
-+	if (!att || !id)
-+		return false;
-+
-+	/* Find the channel with the pending retry operation */
-+	for (entry = queue_get_entries(att->chans); entry;
-+						entry = entry->next) {
-+		struct bt_att_chan *c = entry->data;
-+
-+		if (c->pending_retry && c->pending_retry->id == id &&
-+		    c->pending_retry->retry_pending) {
-+			chan = c;
-+			op = c->pending_retry;
-+			break;
-+		}
-+	}
-+
-+	if (!chan || !op)
-+		return false;
-+
-+	DBG(att, "(chan %p) Canceling retry for operation %p", chan, op);
-+
-+	/* Clear pending retry state */
-+	op->retry_pending = false;
-+	chan->pending_retry = NULL;
-+
-+	/* Call the callback with stored error PDU to notify upper layer */
-+	if (op->callback)
-+		op->callback(BT_ATT_OP_ERROR_RSP, op->error_pdu,
-+			     op->error_pdu_len, op->user_data);
-+
-+	destroy_att_send_op(op);
-+
-+	/* Wake up writer in case there are other operations */
-+	wakeup_chan_writer(chan, NULL);
-+
-+	return true;
-+}
-+
- bool bt_att_set_retry(struct bt_att *att, unsigned int id, bool retry)
- {
- 	struct att_send_op *op;
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 53a3f7a2a..6dc9944bb 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -46,6 +46,15 @@ typedef void (*bt_att_disconnect_func_t)(int err, void *user_data);
- typedef void (*bt_att_exchange_func_t)(uint16_t mtu, void *user_data);
- typedef bool (*bt_att_counter_func_t)(uint32_t *sign_cnt, void *user_data);
- 
-+/* Return values for bt_att_retry_func_t */
-+#define BT_ATT_RETRY_NO	0	/* Don't retry */
-+#define BT_ATT_RETRY_YES	1	/* Retry immediately */
-+#define BT_ATT_RETRY_PENDING	2	/* Defer retry decision */
-+
-+typedef int (*bt_att_retry_func_t)(uint8_t opcode, uint8_t error_code,
-+					const void *pdu, uint16_t length,
-+					unsigned int att_id, void *user_data);
-+
- bool bt_att_set_debug(struct bt_att *att, uint8_t level,
- 			bt_att_debug_func_t callback, void *user_data,
- 			bt_att_destroy_func_t destroy);
-@@ -58,6 +67,13 @@ bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy);
- 
-+bool bt_att_set_retry_cb(struct bt_att *att, bt_att_retry_func_t callback,
-+						void *user_data,
-+						bt_att_destroy_func_t destroy);
-+
-+bool bt_att_retry_request(struct bt_att *att, unsigned int id);
-+bool bt_att_cancel_retry(struct bt_att *att, unsigned int id);
-+
- unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 					const void *pdu, uint16_t length,
- 					bt_att_response_func_t callback,
++uint16_t bt_gatt_req_get_end_handle(struct bt_gatt_request *req);
++uint16_t bt_gatt_req_get_start_handle(struct bt_gatt_request *req);
 -- 
 2.34.1
 
