@@ -1,26 +1,26 @@
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3785829A9C9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 09:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672B334DCE4
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 09:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769073023; cv=none; b=qfqo3nsWUiyx8861Yw5S492i+xEq65bgbGi/hKXndMvVpxKqOLc439cxU6n+CutTvaLzsS5Sn7pOmYz4cJnLlMT7dhv5apqqMoSIqlG6uAjhmnp8Poqnm7GLeSVyEJ+/Lqtw49EA96W+vK4e7ckDxOCc6AycEgVG74hZtDx1eXI=
+	t=1769073023; cv=none; b=ag54hIDbp6sTt1vtyT7nwTDA8BpECtPTWsQ/c5W4ScrC+fymFkZksqKHIFUxaqJgKsSKIDI+tZQcElnFoAa1IlMTyZpwEy8gZhS3F/N4ytQwjlMYpQt6Cot1VI60j1e3NM5XMxoAXZ+QiaW5XMknfwSiweILycZ99W+PZSQoCv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769073023; c=relaxed/simple;
-	bh=0uiKSFoWh3iUf4963zIv7sEhWCR57pwLJds8tokROB0=;
+	bh=+lB9w/1K/fplKxFOHqoTmRH1f276jTRCN/RycvnHdaA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VE/UYhwvive/JwjFMw8pz8xd2GljucRHlP+yyKHLJO2OXy+BAUVOpVsAuT3ExMjWJ6+AHmz/i9ioERHwGXdvFOLeLyPQkstzeU8RwBEqBTc6dqoRBVNaua83iFERy1Gx59qcmmWdaGA16YGjB9nVgdMSTGW4tJkZCO/pnfqX+fQ=
+	 MIME-Version:Content-Type; b=kv84PW9s9OErw4tko2iHrTSwQ5sTTXfioZCq0fweAMr4y4YJ5qYXhAXIEGwkgnLzKqqs3mGY7/zDMsGyyUsK60eN34xaAXO3KFJgIYC+6viyZL9LnwC/qojoiphbOn2YjRnYzlNX3bVCPogZ1n6Pu6Re8uV9oLZz7rwKZHivI/o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 550AB43140
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 87C4A43145
 	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 09:10:14 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v3 8/9] doc: Port maintainer-guidelines.txt to RST
-Date: Thu, 22 Jan 2026 10:05:07 +0100
-Message-ID: <20260122091003.398400-9-hadess@hadess.net>
+Subject: [BlueZ v3 9/9] doc: Port health-api.txt to RST
+Date: Thu, 22 Jan 2026 10:05:08 +0100
+Message-ID: <20260122091003.398400-10-hadess@hadess.net>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260122091003.398400-1-hadess@hadess.net>
 References: <20260122091003.398400-1-hadess@hadess.net>
@@ -30,163 +30,478 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeehjeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeekteetgeettdehieduiedttdetffelleehtdejkeeluedvgfffvdevteetudfhkeenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeehhedtteeugeefudegtddpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeehjeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepteegheeghfehhfdvkedutdfhffejjefgvdevgfekkeevleetheekhfetleelueefnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepkeejveegteegfedugeehpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
 X-GND-State: clean
 X-GND-Score: 0
 
 ---
- ...idelines.txt => maintainer-guidelines.rst} | 62 +++++++++++--------
- 1 file changed, 36 insertions(+), 26 deletions(-)
- rename doc/{maintainer-guidelines.txt => maintainer-guidelines.rst} (65%)
+ Makefile.am                     |  12 ++-
+ doc/health-api.txt              | 152 --------------------------------
+ doc/org.bluez.HealthChannel.rst |  72 +++++++++++++++
+ doc/org.bluez.HealthDevice.rst  |  94 ++++++++++++++++++++
+ doc/org.bluez.HealthManager.rst |  68 ++++++++++++++
+ 5 files changed, 244 insertions(+), 154 deletions(-)
+ delete mode 100644 doc/health-api.txt
+ create mode 100644 doc/org.bluez.HealthChannel.rst
+ create mode 100644 doc/org.bluez.HealthDevice.rst
+ create mode 100644 doc/org.bluez.HealthManager.rst
 
-diff --git a/doc/maintainer-guidelines.txt b/doc/maintainer-guidelines.rst
-similarity index 65%
-rename from doc/maintainer-guidelines.txt
-rename to doc/maintainer-guidelines.rst
-index b875f008258b..44d3e258db6e 100644
---- a/doc/maintainer-guidelines.txt
-+++ b/doc/maintainer-guidelines.rst
-@@ -1,25 +1,28 @@
-+=====================
- Maintainer guidelines
--*********************
-+=====================
+diff --git a/Makefile.am b/Makefile.am
+index c2abd06cc087..2f28747f9ee7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -403,6 +403,9 @@ man_MANS += doc/org.bluez.ThermometerManager.5 \
+ 		doc/org.bluez.Thermometer.5 \
+ 		doc/org.bluez.ThermometerWatcher.5
+ man_MANS += doc/org.bluez.SimAccess.5
++man_MANS += doc/org.bluez.HealthChannel.5 \
++	    doc/org.bluez.HealthDevice.5 \
++	    doc/org.bluez.HealthManager.5
  
- This document is intended for the maintainers of the BlueZ project. It
- serves as basic guidelines for handling patch review and commit access.
+ endif
+ manual_pages += doc/bluetoothd.8
+@@ -445,6 +448,9 @@ manual_pages += doc/org.bluez.ThermometerManager.5 \
+ 		doc/org.bluez.Thermometer.5 \
+ 		doc/org.bluez.ThermometerWatcher.5
+ manual_pages += doc/org.bluez.SimAccess.5
++manual_pages += doc/org.bluez.HealthChannel.5 \
++		doc/org.bluez.HealthDevice.5 \
++		doc/org.bluez.HealthManager.5
  
+ EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
+ 			src/main.conf profiles/network/network.conf \
+@@ -487,8 +493,6 @@ EXTRA_DIST += doc/assigned-numbers.rst doc/supported-features.txt \
+ 				doc/test-runner.rst \
+ 				doc/settings-storage.txt
  
- Rule 1: Keep the GIT tree clean and linear
--==========================================
-+------------------------------------------
+-EXTRA_DIST += doc/health-api.txt
+-
+ EXTRA_DIST += doc/hci-protocol.rst doc/mgmt-protocol.rst \
+ 	      doc/l2cap-protocol.rst doc/rfcomm-protocol.rst \
+ 	      doc/sco-protocol.rst doc/iso-protocol.rst
+@@ -537,6 +541,10 @@ EXTRA_DIST += doc/org.bluez.ThermometerManager.rst \
  
--The bluetooth.git, bluetooth-next.git and bluez.git trees are not your
-+The ``bluetooth.git``, ``bluetooth-next.git`` and ``bluez.git`` trees are not your
- private playground. The history is meant to be clean and linear.
+ EXTRA_DIST += doc/org.bluez.SimAccess.rst
  
--	- NO merges
--	- NO branches
--	- NO tags
-+- NO merges
-+- NO branches
-+- NO tags
- 
- If anyone needs testing or work on a feature, clone the tree and do
- it in your own copy. The master trees are off limits.
- 
- One advise to avoid any accidental errors in this area to set proper
--options in global ~/.gitconfig or local .git/config files.
-+options in global ``~/.gitconfig`` or local ``.git/config`` files.
++EXTRA_DIST += doc/org.bluez.HealthChannel.rst \
++	      doc/org.bluez.HealthDevice.rst \
++	      doc/org.bluez.HealthManager.rst
 +
-+.. code-block::
+ EXTRA_DIST += doc/pics-opp.txt doc/pixit-opp.txt \
+ 		doc/pts-opp.txt
  
- 	[merge]
- 		ff = only
-@@ -29,7 +32,7 @@ in doubt ask one of the seasoned maintainers.
- 
- 
- Rule 2: Enforce clean commit messages
--=====================================
-+-------------------------------------
- 
- The commit messages are required to be clean and follow style guidelines
- to be consistent.
-@@ -45,20 +48,22 @@ job to ensure we get proper firstname lastname <email> authorship.
- 
- It is also important that the committer itself uses a valid name and
- email address when committing patches. So ensure that either the
--global ~/.gitconfig or local .git/config provides proper values.
-+global ``~/.gitconfig`` or local ``.git/config`` provides proper values.
+diff --git a/doc/health-api.txt b/doc/health-api.txt
+deleted file mode 100644
+index 2c48ff20449d..000000000000
+--- a/doc/health-api.txt
++++ /dev/null
+@@ -1,152 +0,0 @@
+-BlueZ D-Bus Health API description
+-**********************************
+-
+-
+-HealthManager hierarchy
+-=======================
+-
+-Service		org.bluez
+-Interface	org.bluez.HealthManager1
+-Object path	/org/bluez/
+-
+-Methods		object CreateApplication(dict config)
+-
+-			Returns the path of the new registered application.
+-			Application will be closed by the call or implicitly
+-			when the programs leaves the bus.
+-
+-			config:
+-				uint16 DataType:
+-
+-					Mandatory
+-
+-				string Role:
+-
+-					Mandatory. Possible values: "source",
+-									"sink"
+-
+-				string Description:
+-
+-					Optional
+-
+-				ChannelType:
+-
+-					Optional, just for sources. Possible
+-					values: "reliable", "streaming"
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-
+-		void DestroyApplication(object application)
+-
+-			Closes the HDP application identified by the object
+-			path. Also application will be closed if the process
+-			that started it leaves the bus. Only the creator of the
+-			application will be able to destroy it.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.NotFound
+-					 org.bluez.Error.NotAllowed
+-
+-
+-HealthDevice hierarchy
+-======================
+-
+-Service		org.bluez
+-Interface	org.bluez.HealthDevice1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+-
+-Methods		boolean Echo()
+-
+-			Sends an echo petition to the remote service. Returns
+-			True if response matches with the buffer sent. If some
+-			error is detected False value is returned.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.OutOfRange
+-
+-		object CreateChannel(object application, string configuration)
+-
+-			Creates a new data channel.  The configuration should
+-			indicate the channel quality of service using one of
+-			this values "reliable", "streaming", "any".
+-
+-			Returns the object path that identifies the data
+-			channel that is already connected.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.HealthError
+-
+-		void DestroyChannel(object channel)
+-
+-			Destroys the data channel object. Only the creator of
+-			the channel or the creator of the HealthApplication
+-			that received the data channel will be able to destroy
+-			it.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.NotFound
+-				         org.bluez.Error.NotAllowed
+-
+-Signals		void ChannelConnected(object channel)
+-
+-			This signal is launched when a new data channel is
+-			created or when a known data channel is reconnected.
+-
+-		void ChannelDeleted(object channel)
+-
+-			This signal is launched when a data channel is deleted.
+-
+-			After this signal the data channel path will not be
+-			valid and its path can be reused for future data
+-			channels.
+-
+-Properties	object MainChannel [readonly]
+-
+-			The first reliable channel opened. It is needed by
+-			upper applications in order to send specific protocol
+-			data units. The first reliable can change after a
+-			reconnection.
+-
+-
+-HealthChannel hierarchy
+-=======================
+-
+-Service		org.bluez
+-Interface	org.bluez.HealthChannel1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/chanZZZ
+-
+-Only the process that created the data channel or the creator of the
+-HealthApplication that received it will be able to call these methods.
+-
+-Methods		fd Acquire()
+-
+-			Returns the file descriptor for this data channel. If
+-			the data channel is not connected it will also
+-			reconnect.
+-
+-			Possible Errors: org.bluez.Error.NotConnected
+-					 org.bluez.Error.NotAllowed
+-
+-		void Release()
+-
+-			Releases the fd. Application should also need to
+-			close() it.
+-
+-			Possible Errors: org.bluez.Error.NotAcquired
+-					 org.bluez.Error.NotAllowed
+-
+-Properties	string Type [readonly]
+-
+-			The quality of service of the data channel. ("reliable"
+-			or "streaming")
+-
+-		object Device [readonly]
+-
+-			Identifies the Remote Device that is connected with.
+-			Maps with a HealthDevice object.
+-
+-		object Application [readonly]
+-
+-			Identifies the HealthApplication to which this channel
+-			is related to (which indirectly defines its role and
+-			data type).
+diff --git a/doc/org.bluez.HealthChannel.rst b/doc/org.bluez.HealthChannel.rst
+new file mode 100644
+index 000000000000..f91a1ff94dc1
+--- /dev/null
++++ b/doc/org.bluez.HealthChannel.rst
+@@ -0,0 +1,72 @@
++=======================
++org.bluez.HealthChannel
++=======================
 +
-+.. code-block::
- 
- 	[user]
- 		name = Peter Mustermann
- 		email = peter@mustermann.de
- 
--Commit messages for bluez.git shall not contain Signed-off-by
-+Commit messages for ``bluez.git`` shall not contain ``Signed-off-by``
- signatures. They are not used in userspace and with that it is the
- maintainers job to ensure they do not get committed to the repository.
- 
--For bluetooth.git and bluetooth-next.git The Signed-off-by process is
--used and the signatures are required.
-+For ``bluetooth.git`` and ``bluetooth-next.git``, the ``Signed-off-by``
-+process is used and the signatures are required.
- 
--Tags like Change-Id generated from Gerrit are never acceptable. It is
-+Tags like ``Change-Id`` generated from Gerrit are never acceptable. It is
- the maintainers job to ensure that these are not committed into the
- repositories.
- 
-@@ -67,48 +72,53 @@ reversed. If in doubt ask one of the seasoned maintainers.
- 
- 
- Rule 3: Enforce correct coding style
--====================================
++----------------------------------
++BlueZ D-Bus Health API description
++----------------------------------
++
++:Version: BlueZ
++:Date: July 2010
++:Author: José Antonio Santos Cadenas <santoscadenas@gmail.com>
++:Manual section: 5
++:Manual group: Linux System Administration
++
++Interface
++=========
++
++:Service:	org.bluez
++:Interface:	org.bluez.HealthChannel1
++:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/chanZZZ
++
++Only the process that created the data channel or the creator of the
++HealthApplication that received it will be able to call these methods.
++
++Methods
++-------
++
++fd Acquire()
++````````````
++
++Returns the file descriptor for this data channel. If
++the data channel is not connected it will also
++reconnect.
++
++Possible Errors:
++
++:org.bluez.Error.NotConnected:
++:org.bluez.Error.NotAllowed:
++
++void Release()
++``````````````
++
++Releases the fd. Application should also need to
++close() it.
++
++Possible Errors:
++
++:org.bluez.Error.NotAcquired:
++:org.bluez.Error.NotAllowed:
++
++Properties
++----------
++
++string Type [readonly]
++``````````````````````
++
++The quality of service of the data channel. ("reliable"
++or "streaming")
++
++object Device [readonly]
++````````````````````````
++
++Identifies the Remote Device that is connected with.
++Maps with a HealthDevice object.
++
++object Application [readonly]
++`````````````````````````````
++
++Identifies the HealthApplication to which this channel
++is related to (which indirectly defines its role and
++data type).
++
+diff --git a/doc/org.bluez.HealthDevice.rst b/doc/org.bluez.HealthDevice.rst
+new file mode 100644
+index 000000000000..568f854b7768
+--- /dev/null
++++ b/doc/org.bluez.HealthDevice.rst
+@@ -0,0 +1,94 @@
++======================
++org.bluez.HealthDevice
++======================
++
 +------------------------------------
- 
- The coding style follows roughly the kernel coding style with any
--exceptions documented in doc/coding-style.txt.
-+exceptions documented in :doc:`coding-style <coding-style>`.
- 
- To ensure trivial white-space errors don't get committed, have the
--following in your .gitconfig:
-+following in your ``.gitconfig``:
++BlueZ D-Bus Health API documentation
++------------------------------------
 +
-+.. code-block::
- 
- 	[apply]
- 		whitespace = error
- 
- It can also be helpful to use the checkpatch.pl script coming with the
- Linux kernel to do some automated checking. Adding the following to your
--.git/hooks/pre-commit and .git/hooks/pre-applypatch is a simple way to
-+``.git/hooks/pre-commit`` and ``.git/hooks/pre-applypatch`` is a simple way to
- do this:
- 
-+.. code-block::
++:Version: BlueZ
++:Date: July 2010
++:Author: José Antonio Santos Cadenas <santoscadenas@gmail.com>
++:Manual section: 5
++:Manual group: Linux System Administration
 +
- 	exec git diff --cached | ~/src/linux/scripts/checkpatch.pl -q \
- 		--no-tree --no-signoff --show-types \
- 		--ignore CAMELCASE,NEW_TYPEDEFS,INITIALISED_STATIC -
- 
--The above assumes that a kernel tree resides in ~/src/linux/.
-+The above assumes that a kernel tree resides in ``~/src/linux/``.
- 
- 
- Rule 4: Pay extra attention to adding new files to the tree
--===========================================================
-+-----------------------------------------------------------
- 
- New files that are added to the tree require several things to be
- verified first:
- 
--	- Check that the names are acceptable with other maintainers
--	- Ensure that the file modes are correct
--	- Verify that the license & copyright headers are correct
--	- If the file is supposed to be part of the release tarball,
--	  make sure that it gets picked up by 'make dist' (particularly
--	  important for documentation or other files that are not code)
-+- Check that the names are acceptable with other maintainers
-+- Ensure that the file modes are correct
-+- Verify that the license & copyright headers are correct
-+- If the file is supposed to be part of the release tarball,
-+  make sure that it gets picked up by 'make dist' (particularly
-+  important for documentation or other files that are not code)
- 
- 
- Rule 5: Keep the mailing list in sync with the commit process
--=============================================================
-+-------------------------------------------------------------
- 
- When applying patches, be sure to send a response to the mailing list as
- soon as the code has been pushed to the upstream tree. Usually this
- means one email per patch, however patch-sets may only have one response
- covering the entire set. If applying a subset of a patch-set clearly
- state what was applied in your response.
++Interface
++=========
++
++:Service:	org.bluez
++:Interface:	org.bluez.HealthDevice1
++:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++
++Methods
++-------
++
++boolean Echo()
++``````````````
++
++Sends an echo petition to the remote service. Returns
++True if response matches with the buffer sent. If some
++error is detected False value is returned.
++
++Possible errors:
++
++:org.bluez.Error.InvalidArguments:
++:org.bluez.Error.OutOfRange:
++
++object CreateChannel(object application, string configuration)
++``````````````````````````````````````````````````````````````
++
++Creates a new data channel.  The configuration should
++indicate the channel quality of service using one of
++this values "reliable", "streaming", "any".
++
++Returns the object path that identifies the data
++channel that is already connected.
++
++Possible errors:
++
++:org.bluez.Error.InvalidArguments:
++:org.bluez.Error.HealthError:
++
++void DestroyChannel(object channel)
++```````````````````````````````````
++
++Destroys the data channel object. Only the creator of
++the channel or the creator of the HealthApplication
++that received the data channel will be able to destroy
++it.
++
++Possible errors:
++
++:org.bluez.Error.InvalidArguments:
++:org.bluez.Error.NotFound:
++:org.bluez.Error.NotAllowed:
++
++Signals
++-------
++
++void ChannelConnected(object channel)
++`````````````````````````````````````
++
++This signal is launched when a new data channel is
++created or when a known data channel is reconnected.
++
++void ChannelDeleted(object channel)
++```````````````````````````````````
++
++This signal is launched when a data channel is deleted.
++
++After this signal the data channel path will not be
++valid and its path can be reused for future data
++channels.
++
++Properties
++----------
++
++object MainChannel [readonly]
++`````````````````````````````
++
++The first reliable channel opened. It is needed by
++upper applications in order to send specific protocol
++data units. The first reliable can change after a
++reconnection.
++
+diff --git a/doc/org.bluez.HealthManager.rst b/doc/org.bluez.HealthManager.rst
+new file mode 100644
+index 000000000000..1eaaf7935eeb
+--- /dev/null
++++ b/doc/org.bluez.HealthManager.rst
+@@ -0,0 +1,68 @@
++=======================
++org.bluez.HealthManager
++=======================
++
++------------------------------------
++BlueZ D-Bus Health API documentation
++------------------------------------
++
++:Version: BlueZ
++:Date: July 2010
++:Author: José Antonio Santos Cadenas <santoscadenas@gmail.com>
++:Manual section: 5
++:Manual group: Linux System Administration
++
++Interface
++=========
++
++:Service:	org.bluez
++:Interface:	org.bluez.HealthManager1
++:Object path:	/org/bluez/
++
++Methods
++-------
++
++object CreateApplication(dict config)
++`````````````````````````````````````
++
++Returns the path of the new registered application.
++Application will be closed by the call or implicitly
++when the programs leaves the bus.
++
++Possible config value:
++
++:uint16 DataType:
++
++        Mandatory
++
++:string Role:
++
++	Mandatory. Possible values: "source", "sink"
++
++:string Description:
++
++	Optional
++
++:ChannelType:
++
++	Optional, just for sources. Possible
++	values: "reliable", "streaming"
++
++Possible Errors:
++
++:org.bluez.Error.InvalidArguments:
++
++void DestroyApplication(object application)
++```````````````````````````````````````````
++
++Closes the HDP application identified by the object
++path. Also application will be closed if the process
++that started it leaves the bus. Only the creator of the
++application will be able to destroy it.
++
++Possible errors:
++
++:org.bluez.Error.InvalidArguments:
++:org.bluez.Error.NotFound:
++:org.bluez.Error.NotAllowed:
 +
 -- 
 2.52.0
