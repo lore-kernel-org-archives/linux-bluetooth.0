@@ -1,35 +1,29 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5728635C1BF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 16:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE94328243
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 17:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769100609; cv=none; b=TrizI03q4yCtxP/aK516/9WMVVAM9ygJFDA8j4BR1DPlq4UkD20MAXOdgkZzJCgH2WVyKMe6STWxsdRbf6SZH2IP/kiiZqILlVTr8YSY2qN6BLH0mheEJVfk3uItuq6qVV2arTtOCUEtX4gPa+mk1WNO46cHU254iv6CBKIy9JI=
+	t=1769101226; cv=none; b=bxb4TvuG+IQy4navSnaH1L4ceTR/VWpMpBRPAkvMoVrLaW3rdFFjS/jCLKwhhYZ+G4ttBaEe6d7gxHU7LZ7mZJuYlrJPzL49/0FKfobCCD30sTLcRI/JUVG36TNRDc1K+UF8YsPkU9dVSj2PHHJaP09Lm3Zt08tEyjeaVAXrqRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769100609; c=relaxed/simple;
-	bh=egkdDJk1kPH+DG6hBhezd6Ft6eKRlbhrzeLv4FE/cJU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WthE9ngL6FPZsTD1QfqBjuu7IhJfUu/9xAiNH/Ve6fF0KnGvf3Jyu3potI1DjNyBnTZ5mQzBv1EcewtZnjsVswemI+Wx2vs7pRisIuwgSF/U5ngG2uBJIj3db5aAHhOQ0CxaZBXHAeNgNnakqbGodkdZBlqjejW1wzkMWegaWjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PtboSJe9; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtboSJe9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D89DAC116C6;
-	Thu, 22 Jan 2026 16:50:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769100608;
-	bh=egkdDJk1kPH+DG6hBhezd6Ft6eKRlbhrzeLv4FE/cJU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PtboSJe9Ls2cllcUbkw/QBJYquV/mCGXZ1ggsIcwTgRYNGOIGsMkYFn++N8453zwX
-	 pbXKl+tOinPHdXYGFz/8LRhPgVHWXCrF2lMh0b94us7KGp/fgXFZUIRq8SsgYtpDUc
-	 +g4A8tOUpv+d1fHGoBshhPK2DVapqJkSqRzYAWXwEvphZ4K1ib9NJFzHG/72XusHwS
-	 jOWphHhTotGCKju649SIJOLgChG7Sk4aANzD5pDiw0DOgVbucl/DXKiuNeEYjqMNC6
-	 a0u1UDj4Qxq4544jI1VyO8l8nh9JUsRHrKJgktKcf+wBHFHfP6MiMuunrSxCNCGJJw
-	 oZEbir9ZYsePw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8BC913808200;
-	Thu, 22 Jan 2026 16:50:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1769101226; c=relaxed/simple;
+	bh=TXPzKmLNE9+b2p0NWp2yqih8QLHYxdMzLMy3RrbbkIU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DJ2lvxHxFy2rEEPf1vhUJPOkDqgKOa8H9eCkhStEMQEBxsh6/Uvfz7XOqb6u4CP8GwMf4V6Eq/O4VH2wtf5t/lFdY+K8d3b4WkG+7FWa3FKrmn9aYeQGZ/QC+52RJDDBUmK+vTjyjNZn8/WSy8uj+WYs+r/PEsEYz1bQmls9JkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0A732444E2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 17:00:09 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ 2/2] doc: Update .gitignore for new daemon man page locations
+Date: Thu, 22 Jan 2026 17:58:58 +0100
+Message-ID: <20260122170001.122052-3-hadess@hadess.net>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260122170001.122052-1-hadess@hadess.net>
+References: <20260122170001.122052-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,56 +31,33 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [BlueZ v3 0/9] Port text docs to RST and move man pages
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176910060535.1806518.2169700983805092118.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Jan 2026 16:50:05 +0000
-References: <20260122091003.398400-1-hadess@hadess.net>
-In-Reply-To: <20260122091003.398400-1-hadess@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
+X-GND-Sasl: hadess@hadess.net
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeeijeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeffieffueegieejheeggfeukeehgfehueeuhefhudejiefhuedtvdelleffffegffenucffohhmrghinheprhhsthdrihhnnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugeptdetjeefvdeggeeggfdvpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-State: clean
 
-Hello:
+bluetoothd.rst.in and bluetooth-meshd.rst.in moved, so the generated
+".rst" files moved too. Update .gitignore to match the new location.
+---
+ .gitignore | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Thu, 22 Jan 2026 10:04:59 +0100 you wrote:
-> This supersedes the "Port text docs to RST" patchset
-> 
-> Changes since v2:
-> - Move all man pages under doc/ so make it easier to reference
->   in the HTML docs.
-> - Fix syntax error in maintainer-guidelines
-> Changes since v1:
-> - Fix distcheck
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,v3,1/9] doc: Rename section 7 man pages
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5e2bb7b1ba13
-  - [BlueZ,v3,2/9] doc: Move all the man pages to doc/
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=44e3dd321e4b
-  - [BlueZ,v3,3/9] doc: Port assigned-numbers.txt to RST
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e93d8cd4fe41
-  - [BlueZ,v3,4/9] doc: Port thermometer-api.txt to RST
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4371db7798b3
-  - [BlueZ,v3,5/9] doc: Port security-bugs.txt to RST
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=17d407e34cbe
-  - [BlueZ,v3,6/9] doc: Port coding-style.txt to RST
-    (no matching commit)
-  - [BlueZ,v3,7/9] doc: Port sap-api.txt to RST
-    (no matching commit)
-  - [BlueZ,v3,8/9] doc: Port maintainer-guidelines.txt to RST
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fddcda9751af
-  - [BlueZ,v3,9/9] doc: Port health-api.txt to RST
-    (no matching commit)
-
-You are awesome, thank you!
+diff --git a/.gitignore b/.gitignore
+index f8e4ad686065..27c9b8b6eb65 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -150,9 +150,9 @@ tools/mesh-cfgclient
+ tools/mesh-cfgtest
+ tools/mesh-tester
+ mesh/bluetooth-meshd
+-mesh/bluetooth-meshd.rst
++doc/bluetooth-meshd.rst
+ 
+-src/bluetoothd.rst
++doc/bluetoothd.rst
+ src/bluetooth.service
+ mesh/bluetooth-mesh.service
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.52.0
 
