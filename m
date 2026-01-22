@@ -1,83 +1,331 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D162D371068
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 17:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769103433; cv=none; b=gXCQhooyTK3kgXCPko8uEuirSdWklS2UTcIXGDABAgFqPz22RrNSX9Pc9Yw6ff3Gxh1MslHjfmIDavS1oSkPqO2igjvI8c1GUrSklYGkm2NaDv4QkgWXvmbtIJQKr90l6iYxUYgoYrudf/1QevyAjHKrNKKIJkDM7t/ZOKS3MnQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769103433; c=relaxed/simple;
-	bh=BIJBAXQOwOCShVUhGTyKwKOBIZDjyGA1mwp/hAeKdZ4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=fGEayUpo0TY0Nz4gI7zv44OJfA9eVB2IH8NgBQvUYhnZN+qHrG5ysFifrlBmfM9afkGiV+TWGFl1/NQUh87PAZQo9X59DC71h9ICgv8Nu/Nb9B91mbvbcBSNBuhgeeYBmr8JRRJX0V8A7ehVKa91jyTauidHYjP6/xjsZNRCrcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RX+8S2bs; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32327249E5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 18:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769105467; cv=pass; b=IRckk/mWiacddO9hjs/sNv7y+RpQGMMacyl+cqSetAttpbUPrnJPrsYTFosLNQjva56HDYAsCWoXJu5rVXuaHhTfMrKM2wdetl/legwtwbwIg6jNyCx2VPqhXq3Yr+/xDB8GT/fE6Ac4JtjCNsXKGH8l4KYdISKez55hJ36C4yA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769105467; c=relaxed/simple;
+	bh=8Lp4TlktEqNw2FGiLq/7PEpMmsShHPWTGK2QGeywVEs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aRxdPScXsBJO67mWGsnR0uox9mQ5npGBuQ95ATwR70R9rQztoLcHsFSPRKwTMutLV/KVnCSdNOV7P/mRkvYigiLljJFzKhBqB2gCHyuPYjVWIXr7dgAfpTVLPECdRmvpLiB4tyCXYifbkiUFsevReutRQB8zAyES4XcXv5AF11U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kSzyC2l3; arc=pass smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RX+8S2bs"
-Received: from github.com (hubbernetes-node-d242305.va3-iad.github.net [10.51.96.29])
-	by smtp.github.com (Postfix) with ESMTPA id 9BAB34E0E0D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 09:37:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1769103422;
-	bh=fQ2epCntrUWJsTCG4xePCu3P1ouTcfzbkLItZ31f/Z0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=RX+8S2bsBocaBC+Kyiv7OGdZm2dRnN/seN9L6wzGNO4rW943i/yT9HRtisDkTyuFy
-	 5cLsc5xpg09VFSe7JX9NL08+jdDz8KDpHgSQPcYRGHl2jPcU4Zvk0RjVVp2AIqJUm6
-	 4FCPFPjHNON6CBjHCbK21PZE69CeBQzViHhk+dsw=
-Date: Thu, 22 Jan 2026 09:37:02 -0800
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1045811/000000-36aafb@github.com>
-Subject: [bluez/bluez] a2537a: doc: Add "C" code-block markers for
- coding-style doc
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kSzyC2l3"
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-78fba1a1b1eso24793857b3.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 10:11:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769105458; cv=none;
+        d=google.com; s=arc-20240605;
+        b=BUxdnGhBARBL8Cka2eSJnFfjc2tav9x81klGv/ZiYwE313NBsYpvhL45kDTOndfdgw
+         WtrQDDFMeAGe2kXqD3h64YLipsS1s2WIZoLDTkMy+I2CiHeXwI89lTvOGk3hy4jz+NeV
+         zcbk/rmIN44UGrcMpl9gSTEg7jxwMatqGtcjxKX15mZ4V7WQMaq/vnqmukChEEGy3N8M
+         ExkV8eYUIRMj8bKqPFUpObeZycr1d2SZUB65auG27Cw6pCjv9KLxWTxkWBG2upuqp0Vn
+         93YD9DQ7HBBEO9Mvm1nixBxp/l5osL+mZsniji06FjgxuImhQt6bLmoRPrWkLt/CHNgT
+         6r2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IhcJDfk8+P/H/vEd6PBYPiBMC5o9bK+vPtxK3HqqlOo=;
+        fh=DBIRJP4DvnAE+M31BcQ50XI3CAn/idN52/MNTtsfw9E=;
+        b=HeQQwTxqApxyMa/2Pga03u/0MWuJg63zDSejqG+/o1JBSZEvf7C0UI+hnfWy737bny
+         eVhYyA1INuujR5fbDzC1zuDOb85Mq6FTOEOak00qbRwGTMaqTmed3jB3cGoZiDACWTo2
+         0bsOeCE1SIiUCzMtdbSz4vI/IHmBHFx+Z8XcLjbOfqAgCPhQj0+u/LXqom1aKbNmHy1D
+         2htpov90RiSnthG4euId/BocMFfzYkxE/24Nr1KU1tAqvvC8l613imRIpnWDT4XNXMeA
+         uSa2qOl23hf5HKbGf08oq3Isv6qxaPppKFS2Kr7LZP2ImAO6XmCGcZZoTiTMpLNMbuZH
+         3dSA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769105458; x=1769710258; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IhcJDfk8+P/H/vEd6PBYPiBMC5o9bK+vPtxK3HqqlOo=;
+        b=kSzyC2l3QMMw1ImOUgnFaFmy6gHk6/JYr1DhYeu19nsDT87c8jGZ8TmckMtH7kwzvx
+         g4XmrceYuzaEqFmtKcRpPoPqi9B5oPazKtJh41yJAtNDf6Rp+QswG52K15ZAEFkGq4Ra
+         p7uKtPJVkLx9uPjiwXBYDaHmsZA/5EbG74z2zv0ChQm99x1d7UrHa85KhWbGG58nVJqt
+         61QfdKS27YKHuVl3Bu1XCsIWLU5nSAKnEyMLz/01V8uq/IJnR1raGMtCpSi3E8fpmYxx
+         icibAp4rxfg/ber4uUDjVVz4XNlQfZrgJaDoQfqej5qbmzjlzRV0+PcdCCetoypbvodl
+         LQnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769105458; x=1769710258;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IhcJDfk8+P/H/vEd6PBYPiBMC5o9bK+vPtxK3HqqlOo=;
+        b=JcJ0JZhByeISbtmJD/OBhS0hHWG152x/lGNp3skFdgl2M1Qbri4U1VoZbWbwWkDOzW
+         QWNPxPXGlUiuBZFZN98y7Iv0QMwLpuFfc+V9yhp5wABYq0FCVLIlt4hPcl4+XcSbGRlc
+         NyHxezDDKZo6IXFMe6hlwbn2N65j/N6fEVIlchj3TpVEisczPMqQglkB8zcbPbeu6/x6
+         Ec/uZ9PD9tgMbjiLe4xrJ+pUR7JKvtvcMPumaEZiVb3wjEQTINq4zqQr1yTAheGUDij1
+         F+lLcOxZAv2fzDCXUu2EKVjL+MRrllpFF2O5H6BijVQF4oIL54IFmI6SFXprNw8p4nFi
+         sBgQ==
+X-Gm-Message-State: AOJu0YwqAkBhL1+G17zhmSPuRlYJu599Wz0+uTB0FuNY65EYKxuRnU40
+	y9vudq6+85/QdnXMmmhBg0y8kvGtdVmholRWyE2EnuVtZe8BhtvGnhyTEdsGvizL1lZlyvPQ0b6
+	xUKNgDUVgQwtyGKsrFAz49lbEYOlbM7iekS2B
+X-Gm-Gg: AZuq6aL03dha+pLLJsNuIPxCObleMUsMuUp93CqRp9i7Gu00lwDxYaCxUwa6cecEoCw
+	ccDIXBXQ4VPQl8eXu8QFFKGJS/BDN3+heCNP971jGftiOTp5IAVwpqZ5vR6ky1Zqz1pD3/Mb/WD
+	4vvCfluucHHADk2Ae/gjl7Xbqo+xcLoAmVLpbEyQM1Qj2JtHYl+2rxigDv/sonbxcvIiZUCNz4e
+	j3ADA8E0Jgnytdl5EFjCdX4sTSQLd1X9AfMfbLwpYk3EFSSvolS3MQ3wNvL3ERg3d38NRZogo12
+	cF0RUx7glqi/b0oLV5f9uteRkSgcRj2lqb32J62k/K0jakf47liyqPjHbw==
+X-Received: by 2002:a05:690c:6187:b0:790:7941:3604 with SMTP id
+ 00721157ae682-7942a76f15emr35642007b3.15.1769105458254; Thu, 22 Jan 2026
+ 10:10:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20260122170001.122052-1-hadess@hadess.net> <20260122170001.122052-2-hadess@hadess.net>
+In-Reply-To: <20260122170001.122052-2-hadess@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 22 Jan 2026 13:10:47 -0500
+X-Gm-Features: AZwV_QjUELR1SI-tT7sIRQO_KE8Hh56QtoQhnnrPCEfjhGM3yG2u9ew1aehpKlg
+Message-ID: <CABBYNZLKeCJLP=gDPx_PhDX3LvvmuEvr++JpAVpyhp=4znnf0Q@mail.gmail.com>
+Subject: Re: [BlueZ 1/2] doc: Add "C" code-block markers for coding-style doc
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/1045811
-  Home:   https://github.com/bluez/bluez
-  Commit: a2537a5e1fb5b1bcaa2b96eb3635682e528628e4
-      https://github.com/bluez/bluez/commit/a2537a5e1fb5b1bcaa2b96eb3635682e528628e4
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-01-22 (Thu, 22 Jan 2026)
+Hi Bastien,
 
-  Changed paths:
-    M doc/coding-style.rst
+On Thu, Jan 22, 2026 at 1:01=E2=80=AFPM Bastien Nocera <hadess@hadess.net> =
+wrote:
+>
+> The file isn't processed by rst2man, so this doesn't add a new
+> dependency as was the case in 0ea4e4d52c55 ("doc: Remove Pygments
+> dependency from manpage").
 
-  Log Message:
-  -----------
-  doc: Add "C" code-block markers for coding-style doc
+I'd leave this for later, when we actually add the dependency to deal
+with language specific blocks.
 
-The file isn't processed by rst2man, so this doesn't add a new
-dependency as was the case in 0ea4e4d52c55 ("doc: Remove Pygments
-dependency from manpage").
+> ---
+>  doc/coding-style.rst | 46 ++++++++++++++++++++++----------------------
+>  1 file changed, 23 insertions(+), 23 deletions(-)
+>
+> diff --git a/doc/coding-style.rst b/doc/coding-style.rst
+> index 585d14fd86d9..91250e867f09 100644
+> --- a/doc/coding-style.rst
+> +++ b/doc/coding-style.rst
+> @@ -30,14 +30,14 @@ not preceded by an expression or variable declaration=
+.
+>  Example:
+>  1)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          a =3D 1;
+>          if (b) {  // wrong
+>
+>  2)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          a =3D 1
+>
+> @@ -47,14 +47,14 @@ Example:
+>
+>  3)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          if (a) {
+>                 if (b)  // correct
+>
+>  4)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          b =3D 2;
+>
+> @@ -67,7 +67,7 @@ Example:
+>  The only exception to this rule applies when a variable is being checked=
+ for
+>  errors as such:
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          err =3D stat(filename, &st);
+>          if (err || !S_ISDIR(st.st_mode))
+> @@ -80,7 +80,7 @@ If your comment has more than one line, please start it=
+ from the second line.
+>
+>  Example:
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          /*
+>           * first line comment  // correct
+> @@ -95,7 +95,7 @@ There should be a space before and after each operator.
+>
+>  Example:
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          a + b;  // correct
+>
+> @@ -110,28 +110,28 @@ body.
+>  Example:
+>  1)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
+>                 !(adapter->current_settings & MGMT_SETTING_SSP)) // wrong
+>
+>  2)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
+>                                         !(adapter->current_settings & MGM=
+T_SETTING_SSP))
+>
+>  3)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
+>                                          btd_adapter_pin_cb_t cb) // wron=
+g
+>
+>  4)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
+>                                                                 btd_adapt=
+er_pin_cb_t cb)
+> @@ -147,13 +147,13 @@ There should be a space between new type and variab=
+le.
+>  Example:
+>  1)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          a =3D (int *)b;  // wrong
+>
+>  2)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          a =3D (int *) b;  // correct
+>
+> @@ -165,7 +165,7 @@ When declaring a variable, try not to initialize it u=
+nless necessary.
+>
+>  Example:
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          int i =3D 1;  // wrong
+>
+> @@ -200,7 +200,7 @@ prefixed by the ``enum`` type name.
+>
+>  Example:
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          enum animal_type {
+>                 ANIMAL_TYPE_FOUR_LEGS,
+> @@ -211,7 +211,7 @@ Example:
+>  If the enum contents have values (e.g. from specification) the formattin=
+g
+>  should be as follows:
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          enum animal_type {
+>                 ANIMAL_TYPE_FOUR_LEGS =3D         4,
+> @@ -230,7 +230,7 @@ compiler will complain the new added type hasn't been=
+ handled.
+>
+>  Example:
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          enum animal_type {
+>                 ANIMAL_TYPE_FOUR_LEGS =3D         4,
+> @@ -278,13 +278,13 @@ parenthesis, too.
+>  Example:
+>  1)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          memset(stuff, 0, sizeof(*stuff));
+>
+>  2)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          memset(stuff, 0, sizeof *stuff); // Wrong
+>
+> @@ -296,7 +296,7 @@ A function with no parameters must use ``void`` in th=
+e parameter list.
+>  Example:
+>  1)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          void foo(void)
+>          {
+> @@ -304,7 +304,7 @@ Example:
+>
+>  2)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          void foo()     // Wrong
+>          {
+> @@ -321,7 +321,7 @@ Example:
+>
+>  1)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          if (device) {  // worse
+>                 memset(&eir_data, 0, sizeof(eir_data));
+> @@ -335,7 +335,7 @@ Example:
+>
+>  2)
+>
+> -.. code-block::
+> +.. code-block:: C
+>
+>          if (!device) {
+>                 error("Unable to get device object for %s", addr);
+> --
+> 2.52.0
+>
+>
 
 
-  Commit: 36aafba400cdae822dd5dbe1f23a79ec0dbab17d
-      https://github.com/bluez/bluez/commit/36aafba400cdae822dd5dbe1f23a79ec0dbab17d
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-01-22 (Thu, 22 Jan 2026)
-
-  Changed paths:
-    M .gitignore
-
-  Log Message:
-  -----------
-  doc: Update .gitignore for new daemon man page locations
-
-bluetoothd.rst.in and bluetooth-meshd.rst.in moved, so the generated
-".rst" files moved too. Update .gitignore to match the new location.
-
-
-Compare: https://github.com/bluez/bluez/compare/a2537a5e1fb5%5E...36aafba400cd
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--=20
+Luiz Augusto von Dentz
