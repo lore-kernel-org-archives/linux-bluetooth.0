@@ -1,115 +1,173 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC953242A5;
-	Thu, 22 Jan 2026 08:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CFD33DEEB
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 09:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769071991; cv=none; b=rUv/RJ9tVcKqqYCXthQnzewNiD6W/p8Qs4V7XPKHn7mzr9SdNgC3vm85V5vP6mcrdstiZL3UgHVhELSk1D/7qJkyCkijIpZQK2m1PLd6R/XKE1Acp9v0ysMMnEG9JxUMuP98XzXOyaSh5EjWj8QAt3XPxyRrlxbI4X3Hhu/vmyw=
+	t=1769073022; cv=none; b=Kdh2k+a63SYEXWH6LDyLQpS6F4E5kgLU1stTZrk4o+KvCpLayPCVwuW3cYhjeM36qkWt9h5OdAY7QMqoZc47ZS0aYjTJVIYw9m1Nx+KFaYY/+xYNUdnX7O7rTtZ/tbdGWypSgBgaD1TnVEnFRSxzXCXorwm27+klocimC7xknrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769071991; c=relaxed/simple;
-	bh=8GXZ78y8CHLxVWaGUwAMSCcpjd9/2XbwpJa6NRVR70k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yq3dALbwoJCDoKckoSzY4Hp1+uwKAaW0CimvSEEjz0Zg4mmG4fTkVoM43qfOZ/puwAcelN5J5IfvPIgJgIaXhac3+JaFcbHveaz2kzk7MVBz5iQG6hFYXXdGJ7WdAVCjKkfyQmPAXY7HOR/V4BCklEXnMcnYHdCaMMz2cE4RgQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hP9b5Cx1; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hP9b5Cx1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769071989; x=1800607989;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8GXZ78y8CHLxVWaGUwAMSCcpjd9/2XbwpJa6NRVR70k=;
-  b=hP9b5Cx1Ur53efTptkYhkwKUAMqKXqlnj8JO3jzNJOw4a3zebVnRiuVT
-   olxDK3j37eNhexS0TYN7qM19Q6FREHydE8G/7b7rf+dETsRkq+PoRam/R
-   bO4FpKRFIs1cLyWobOCQePOo0ld+nRcslUtxR6uJSrOU64CwInJTFvzFX
-   jzNT0qRzrchERV/dLGHDQsjZ3C3ZSDYod5oz6sYbY/KV4WDIkKL07MfmV
-   i425q8wwqohS3hrC2OUQVulIUN6tO3AEeNfN5UDGOJF8t6sA6/oHotIus
-   QIE1bqbBZkpvdBV2uL1n8T78yXsk2izoOt+ugrZaEZU0KYB1C61Ov8A5H
-   Q==;
-X-CSE-ConnectionGUID: 60SKLjmwTP+ttGwZ4NKQuA==
-X-CSE-MsgGUID: 9Zj7jEq5ToiuZMRqfCLZ6Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="87886668"
-X-IronPort-AV: E=Sophos;i="6.21,245,1763452800"; 
-   d="scan'208";a="87886668"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 00:53:06 -0800
-X-CSE-ConnectionGUID: 2Ox0rrcrTtWxqhipEQyCNQ==
-X-CSE-MsgGUID: jXg7yxJ6Sq6lbQEsmhpcVg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,245,1763452800"; 
-   d="scan'208";a="211131120"
-Received: from smoticic-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.225])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 00:52:58 -0800
-Date: Thu, 22 Jan 2026 10:52:56 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: manivannan.sadhasivam@oss.qualcomm.com, Rob Herring <robh@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mark Pearson <mpearson-lenovo@squebb.ca>,
-	"Derek J. Clark" <derekjohn.clark@gmail.com>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Daniel Scally <djrscally@gmail.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
-	Stephan Gerhold <stephan.gerhold@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	linux-acpi@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Sui Jingfeng <sui.jingfeng@linux.dev>
-Subject: Re: [PATCH v3 00/14] Add support for handling PCIe M.2 Key E
- connectors in devicetree
-Message-ID: <aXHlaMQ1mpi4Tu-f@smile.fi.intel.com>
-References: <20260110-pci-m2-e-v3-0-4faee7d0d5ae@oss.qualcomm.com>
- <aWSq_7_5kkQIv9Hc@smile.fi.intel.com>
- <aWSuYd8zqCxZ9DYE@smile.fi.intel.com>
- <20260114134004.11023a7e@bootlin.com>
+	s=arc-20240116; t=1769073022; c=relaxed/simple;
+	bh=rw9vLb9RYRj8M3mvezUe8aRku9MqswvgQST04yCb4Lw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=V1Wk5UADlRgM+x00yEQalDPpZyS1enePChbwG0M2r+hJyAWf+l/3agi1APIKcRoslzcsWNtScGpYp3T473KZuclxwleGJnlWPDc0lUpTMESKrJl4fb3OayHse8KbCDWvFHNoSenAJC4Gh2k52CJNdBWS1gzcXKV0eS5Bc8SNl/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 64A77430BF
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jan 2026 09:10:12 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ v3 0/9] Port text docs to RST and move man pages
+Date: Thu, 22 Jan 2026 10:04:59 +0100
+Message-ID: <20260122091003.398400-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260114134004.11023a7e@bootlin.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeehjeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpefgfeeujeefveffgeevkeduieefueejgfegtddtkedtgfevgfekgeetfeeglefhueenucffohhmrghinheprhhsthdrihhnnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepieegteejjeegfedtuefhpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-State: clean
+X-GND-Score: 0
 
-On Wed, Jan 14, 2026 at 01:40:04PM +0100, Herve Codina wrote:
-> On Mon, 12 Jan 2026 10:18:41 +0200
-> Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
-> 
-> > +Cc: Herve (btw, any news on LAN966x support?)
-> 
-> Related to LAN966x support, I am still stucked on issues related to
-> fw_devlink and DT overlays [1].
+This supersedes the "Port text docs to RST" patchset
 
-Thank you for the update and your reply here!
+Changes since v2:
+- Move all man pages under doc/ so make it easier to reference
+  in the HTML docs.
+- Fix syntax error in maintainer-guidelines
+Changes since v1:
+- Fix distcheck
 
-> [1] https://lore.kernel.org/all/20260112154731.6540453b@bootlin.com/
+Bastien Nocera (9):
+  doc: Rename section 7 man pages
+  doc: Move all the man pages to doc/
+  doc: Port assigned-numbers.txt to RST
+  doc: Port thermometer-api.txt to RST
+  doc: Port security-bugs.txt to RST
+  doc: Port coding-style.txt to RST
+  doc: Port sap-api.txt to RST
+  doc: Port maintainer-guidelines.txt to RST
+  doc: Port health-api.txt to RST
+
+ Makefile.am                                   |  41 +-
+ Makefile.mesh                                 |   4 +-
+ Makefile.tools                                |  68 ++--
+ configure.ac                                  |   4 +-
+ doc/assigned-numbers.rst                      |  29 ++
+ doc/assigned-numbers.txt                      |  26 --
+ {tools => doc}/bdaddr.rst                     |   0
+ {mesh => doc}/bluetooth-meshd.rst.in          |   0
+ {client => doc}/bluetoothctl-admin.rst        |   0
+ {client => doc}/bluetoothctl-advertise.rst    |   0
+ {client => doc}/bluetoothctl-assistant.rst    |   0
+ {client => doc}/bluetoothctl-bredr.rst        |   0
+ {client => doc}/bluetoothctl-endpoint.rst     |   0
+ {client => doc}/bluetoothctl-gatt.rst         |   0
+ {client => doc}/bluetoothctl-hci.rst          |   0
+ {client => doc}/bluetoothctl-le.rst           |   0
+ {client => doc}/bluetoothctl-mgmt.rst         |   0
+ {client => doc}/bluetoothctl-monitor.rst      |   0
+ {client => doc}/bluetoothctl-player.rst       |   0
+ {client => doc}/bluetoothctl-scan.rst         |   0
+ {client => doc}/bluetoothctl-telephony.rst    |   0
+ {client => doc}/bluetoothctl-transport.rst    |   0
+ {client => doc}/bluetoothctl.rst              |   0
+ {src => doc}/bluetoothd.rst.in                |   0
+ {tools => doc}/btattach.rst                   |   0
+ {tools => doc}/btmgmt.rst                     |   0
+ {monitor => doc}/btmon.rst                    |   0
+ {tools => doc}/ciptool.rst                    |   0
+ doc/coding-style.rst                          | 349 ++++++++++++++++++
+ doc/coding-style.txt                          | 279 --------------
+ doc/{hci.rst => hci-protocol.rst}             |   0
+ {tools => doc}/hciattach.rst                  |   0
+ {tools => doc}/hciconfig.rst                  |   0
+ {tools => doc}/hcidump.rst                    |   0
+ {tools => doc}/hcitool.rst                    |   0
+ doc/health-api.txt                            | 152 --------
+ {tools => doc}/hid2hci.rst                    |   0
+ doc/{iso.rst => iso-protocol.rst}             |   0
+ {tools => doc}/isotest.rst                    |   0
+ doc/{l2cap.rst => l2cap-protocol.rst}         |   0
+ {tools => doc}/l2ping.rst                     |   0
+ ...idelines.txt => maintainer-guidelines.rst} |  62 ++--
+ doc/{mgmt.rst => mgmt-protocol.rst}           |   0
+ doc/org.bluez.HealthChannel.rst               |  72 ++++
+ doc/org.bluez.HealthDevice.rst                |  94 +++++
+ doc/org.bluez.HealthManager.rst               |  68 ++++
+ doc/org.bluez.SimAccess.rst                   |  40 ++
+ doc/org.bluez.Thermometer.rst                 |  51 +++
+ doc/org.bluez.ThermometerManager.rst          |  64 ++++
+ doc/org.bluez.ThermometerWatcher.rst          |  79 ++++
+ {tools => doc}/rctest.rst                     |   0
+ doc/rfcomm-protocol.rst                       | 212 +++++++++++
+ doc/rfcomm.rst                                | 234 +++---------
+ doc/sap-api.txt                               |  20 -
+ doc/{sco.rst => sco-protocol.rst}             |   0
+ {tools => doc}/sdptool.rst                    |   0
+ doc/{security-bugs.txt => security-bugs.rst}  |   1 +
+ doc/thermometer-api.txt                       | 134 -------
+ tools/rfcomm.rst                              | 100 -----
+ 59 files changed, 1226 insertions(+), 957 deletions(-)
+ create mode 100644 doc/assigned-numbers.rst
+ delete mode 100644 doc/assigned-numbers.txt
+ rename {tools => doc}/bdaddr.rst (100%)
+ rename {mesh => doc}/bluetooth-meshd.rst.in (100%)
+ rename {client => doc}/bluetoothctl-admin.rst (100%)
+ rename {client => doc}/bluetoothctl-advertise.rst (100%)
+ rename {client => doc}/bluetoothctl-assistant.rst (100%)
+ rename {client => doc}/bluetoothctl-bredr.rst (100%)
+ rename {client => doc}/bluetoothctl-endpoint.rst (100%)
+ rename {client => doc}/bluetoothctl-gatt.rst (100%)
+ rename {client => doc}/bluetoothctl-hci.rst (100%)
+ rename {client => doc}/bluetoothctl-le.rst (100%)
+ rename {client => doc}/bluetoothctl-mgmt.rst (100%)
+ rename {client => doc}/bluetoothctl-monitor.rst (100%)
+ rename {client => doc}/bluetoothctl-player.rst (100%)
+ rename {client => doc}/bluetoothctl-scan.rst (100%)
+ rename {client => doc}/bluetoothctl-telephony.rst (100%)
+ rename {client => doc}/bluetoothctl-transport.rst (100%)
+ rename {client => doc}/bluetoothctl.rst (100%)
+ rename {src => doc}/bluetoothd.rst.in (100%)
+ rename {tools => doc}/btattach.rst (100%)
+ rename {tools => doc}/btmgmt.rst (100%)
+ rename {monitor => doc}/btmon.rst (100%)
+ rename {tools => doc}/ciptool.rst (100%)
+ create mode 100644 doc/coding-style.rst
+ delete mode 100644 doc/coding-style.txt
+ rename doc/{hci.rst => hci-protocol.rst} (100%)
+ rename {tools => doc}/hciattach.rst (100%)
+ rename {tools => doc}/hciconfig.rst (100%)
+ rename {tools => doc}/hcidump.rst (100%)
+ rename {tools => doc}/hcitool.rst (100%)
+ delete mode 100644 doc/health-api.txt
+ rename {tools => doc}/hid2hci.rst (100%)
+ rename doc/{iso.rst => iso-protocol.rst} (100%)
+ rename {tools => doc}/isotest.rst (100%)
+ rename doc/{l2cap.rst => l2cap-protocol.rst} (100%)
+ rename {tools => doc}/l2ping.rst (100%)
+ rename doc/{maintainer-guidelines.txt => maintainer-guidelines.rst} (65%)
+ rename doc/{mgmt.rst => mgmt-protocol.rst} (100%)
+ create mode 100644 doc/org.bluez.HealthChannel.rst
+ create mode 100644 doc/org.bluez.HealthDevice.rst
+ create mode 100644 doc/org.bluez.HealthManager.rst
+ create mode 100644 doc/org.bluez.SimAccess.rst
+ create mode 100644 doc/org.bluez.Thermometer.rst
+ create mode 100644 doc/org.bluez.ThermometerManager.rst
+ create mode 100644 doc/org.bluez.ThermometerWatcher.rst
+ rename {tools => doc}/rctest.rst (100%)
+ create mode 100644 doc/rfcomm-protocol.rst
+ delete mode 100644 doc/sap-api.txt
+ rename doc/{sco.rst => sco-protocol.rst} (100%)
+ rename {tools => doc}/sdptool.rst (100%)
+ rename doc/{security-bugs.txt => security-bugs.rst} (99%)
+ delete mode 100644 doc/thermometer-api.txt
+ delete mode 100644 tools/rfcomm.rst
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.52.0
 
