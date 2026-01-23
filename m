@@ -1,62 +1,1082 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8212E093A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jan 2026 10:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F41430596F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jan 2026 10:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769165350; cv=none; b=huvl5/8kPQzdP8UAM2iPxkdCrk4V7ewYpHN+lxgevtze90P87H9B6tsQyGI/mAXeE4ExJWijBtUf79ziQ2PSkFGdFobZlpwEvfV5t5usCzI208lV2o/CLjCN535ox4BSi11LBn4QQldd/IuzxBeaLdftFkEBC/TIUax6t08c2lk=
+	t=1769165519; cv=none; b=GA7AghqPNZZ3zQ9mu2knnY9VQaT5lXTyMheC+HpUsG8ob1fWhMZD2Ni10e5ZeksAgN3RF27sN2ONpH4CGsQ7ggH/uN9jdeMWfN+TugcVIYwDdaeBLt4UG1Z/mjfDLQiAJMGYiEGS5AihGUyhaoUWlCGYt/ATxCnEg0RJY2XETbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769165350; c=relaxed/simple;
-	bh=zPBYU5BbeyynOaUTx4Wf+ohvFWHdm9E+vIkCcBBw8Gs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=B25GpaP/rpbt924X+OYqXbiY+i3bwvkEUK/ycPIhz40TGgJ5NHpYQYGIglAvtsVxBhm8u/x+XJeI/DyN17mXjLI2HRQsrEFY3eGQqEC+UOk6dMaB+nHUIzqzWy8QLDtCTp8QaspsbyMObbBIyxc6LmJPU48UPU1DiPnLSiJ9KP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=clVVBj6H; arc=none smtp.client-ip=192.30.252.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1769165519; c=relaxed/simple;
+	bh=j1AtaCi8msBoi7JeeXkYzpdWrqtQ50rEE80R+2QeyJc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hh12mWdZViVjs2mz71GBp2daTrHoms8G1YRHy3VvGOL9AWfEUPyBfF1P4Wb3HIvQ9cHsUUoUjXI81fS8JMHfMzn6YCXn+ib/z5BufD9UVZua11DbhGZRqceluLCcwGQiRlybgnBQlbCGoyDGKgJCkoJiNnN5yYQUZp9iNu0Qq40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=gZHnDq90; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="clVVBj6H"
-Received: from github.com (hubbernetes-node-2ab4973.ash1-iad.github.net [10.56.181.31])
-	by smtp.github.com (Postfix) with ESMTPA id C90926011E8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jan 2026 02:49:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1769165347;
-	bh=SyGWONxRoT0PPUtn4JAH1VUNuJhzZ6F2OeRCHqL6nCk=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=clVVBj6HW6g+ZXkHKzhfwRYd3F/lNO+tHwtxGNmgNE29F+O893pdVyPj/QhKVFr1h
-	 C0+6DQK1RFdNPi9TqBn4WHuMpagOwuL4DvIAQxPMNpTf9ReAySQ/I/TrXlbTfwpmO3
-	 7dBOWrXNzsfsWDv98/toVsqLB64sZHIGzwxywGpc=
-Date: Fri, 23 Jan 2026 02:49:07 -0800
-From: prathibhamadugonde <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="gZHnDq90"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1769165514;
+	bh=j1AtaCi8msBoi7JeeXkYzpdWrqtQ50rEE80R+2QeyJc=;
+	h=From:To:Subject:Date:From;
+	b=gZHnDq90O3oNWNUDcDSwTZ3lIQJcV8hycsiKlOJcv4QPSB+frYYJQs7m/NTjJEvk8
+	 KELuZw3WbO6RM6ktqaDhyxsuA61kUkk2BNAFe4N/8qPoRPyHSiy34XM3Tuy1blG/G2
+	 NWRu+hHX9NhZT0oZPCWCCza4QNs5y7zcRCV/cfaBcZILJTgjmXSzkvd8m9onzrM+dw
+	 2QzJjxQyQ9gTsVK2Ou1jb3XabaV1obq18ByWyLKShkCqvWuER03zue089AsH6gayQa
+	 DHv7HNzOx3K7N84KZAtV/a1c8rCwBWF6oa+SptxfDCtRRK/YxfCgKudwcrNVqmHVdY
+	 sqS6CYwFE6CmQ==
+Received: from fdanis-ThinkPad-X1.. (2a02-8428-Af44-1001-0A83-3Cb6-E898-a29d.rev.sfr.net [IPv6:2a02:8428:af44:1001:a83:3cb6:e898:a29d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 7F51F17E10F4
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jan 2026 11:51:54 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1046197/000000-d5ca4f@github.com>
-Subject: [bluez/bluez] d5ca4f: lib/uuid: Add RAS service and characteristic
- UUIDs
+Subject: [PATCH BlueZ] doc/qualification: Add PICS and howto for the SM qualification
+Date: Fri, 23 Jan 2026 11:51:49 +0100
+Message-ID: <20260123105149.676695-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1046197
-  Home:   https://github.com/bluez/bluez
-  Commit: d5ca4f82128737232ab9e136dc757b3531e283c5
-      https://github.com/bluez/bluez/commit/d5ca4f82128737232ab9e136dc757b3531e283c5
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-01-23 (Fri, 23 Jan 2026)
+---
+ doc/qualification/sm-pics.rst | 205 +++++++++
+ doc/qualification/sm-pts.rst  | 806 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 1011 insertions(+)
+ create mode 100644 doc/qualification/sm-pics.rst
+ create mode 100644 doc/qualification/sm-pts.rst
 
-  Changed paths:
-    M lib/bluetooth/uuid.h
+diff --git a/doc/qualification/sm-pics.rst b/doc/qualification/sm-pics.rst
+new file mode 100644
+index 000000000..4716297df
+--- /dev/null
++++ b/doc/qualification/sm-pics.rst
+@@ -0,0 +1,205 @@
++.. SPDX-License-Identifier: GPL-2.0-or-later
++.. Copyright © 2025-2026 Collabora Ltd.
++
++================
++Security Manager
++================
++(TCRL 2023-1, SM.ICS.p11)
++
++Roles and versions
++==================
++**Table 1: Role Requirements**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_1_1      | x        | Central Role (Initiator) (C.1)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_1_2      | x        | Peripheral Role (Responder) (C.1)            |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Mandatory to support at least one of SM 1/1 "Central Role (Initiator)"
++  OR SM 1/2 "Peripheral Role (Responder)".
++
++Security properties
++===================
++**Table 2: Security Properties**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_2_1      | x        | Authenticated MITM protection (O)            |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_2_2      | x        | Unauthenticated no MITM protection (C.1)     |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_2_3      | x        | No security requirements (M)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_2_4      |          | OOB supported (O)                            |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_2_5      | x        | LE Secure Connections (O)                    |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Mandatory IF SM 2/1 "Authenticated MITM protection",
++  otherwise Optional.
++
++Pairing algorithms
++==================
++**Table 3: Encryption Key Size**
++
++Prerequisite: SM 2/1 "Authenticated MITM protection" OR
++SM 2/2 "Unauthenticated no MITM protection" OR SM 2/4 "OOB supported"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_3_1      | x        | Encryption Key Size (M)                      |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++Pairing algorithms
++==================
++**Table 4: Pairing Method**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_4_1      | x        | Just Works (O)                               |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_4_2      | x        | Passkey Entry (C.1)                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_4_3      |          | Out of Band (C.1)                            |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++- C.1: Mandatory to support at least one of SM 4/2 "Passkey Entry" OR
++  SM 4/3 "Out of Band" IF SM 2/1 "Authenticated MITM protection",
++  otherwise Excluded.
++
++Key distribution and usage
++==========================
++**Table 5: Security Initiation**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_5_1      | x        | Encryption Setup using STK (C.3)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_5_2      | x        | Encryption Setup using LTK (O)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_5_3      | x        | Peripheral Initiated Security (C.1)          |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_5_4      | x        | Peripheral Initiated Security - Central      |
++|                  |          | response (C.2)                               |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_5_5      |          | CT2 bit (C.4)                                |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++- C.1: Optional IF SM 1/2 "Peripheral Role (Responder)", otherwise Excluded.
++- C.2: Mandatory IF SM 1/1 "Central Role (Initiator)", otherwise Excluded.
++- C.3: Mandatory IF SM 2/1 "Authenticated MITM protection" OR
++  SM 2/2 "Unauthenticated no MITM protection" OR SM 2/4 "OOB supported",
++  otherwise Excluded.
++- C.4: Excluded IF NOT SM 8a/1 "Cross Transport Key Derivation Supported"
++  AND NOT SM 8b/1 "Cross Transport Key Derivation Supported", otherwise
++  Mandatory IF NOT SUM ICS 31/17 "Core v4.2" AND NOT SUM ICS 31/18 
++  "Core v4.2+HS", otherwise Optional.
++
++Key distribution and usage
++==========================
++**Table 6: Signing Algorithm**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_6_1      |          | Signing Algorithm - Generation (O)           |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_6_2      |          | Signing Algorithm - Resolving (O)            |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Key distribution and usage
++==========================
++**Table 7a: Key Distribution by Central**
++
++Prerequisite: SM 1/1 "Central Role (Initiator)"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_7a_1     | x        | Encryption Key (O)                           |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_7a_2     | x        | Identity Key (O)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_7a_3     |          | Signing Key (O)                              |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Key distribution and usage
++==========================
++**Table 7b: Key Distribution by Peripheral**
++
++Prerequisite: SM 1/2 "Peripheral Role (Responder)"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_7b_1     | x        | Encryption Key (O)                           |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_7b_2     | x        | Identity Key (O)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_7b_3     | x        | Signing Key (O)                              |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Key distribution and usage
++==========================
++**Table 8a: Cross-Transport Key Derivation by Central**
++
++Prerequisite: SM 1/1 "Central Role (Initiator)"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_8a_1     |          | Cross Transport Key Derivation Supported     |
++|                  |          | (C.1)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_8a_2     |          | Derivation of LE LTK from BR/EDR Link Key    |
++|                  |          | (C.2)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_8a_3     |          | Derivation of BR/EDR Link Key from LE LTK    |
++|                  |          | (C.2)                                        |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Optional IF SM 2/5 "LE Secure Connections", otherwise Excluded.
++- C.2: Optional IF SM 8a/1 "Cross Transport Key Derivation Supported",
++  otherwise Excluded.
++
++Key distribution and usage
++==========================
++**Table 8b: Cross-Transport Key Derivation by Peripheral**
++
++Prerequisite: SM 1/2 "Peripheral Role (Responder)"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SM_8b_1     |          | Cross Transport Key Derivation Supported     |
++|                  |          | (C.1)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_8b_2     |          | Derivation of LE LTK from BR/EDR Link Key    |
++|                  |          | (C.2)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_SM_8b_3     |          | Derivation of BR/EDR Link Key from LE LTK    |
++|                  |          | (C.2)                                        |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Optional IF SM 2/5 "LE Secure Connections", otherwise Excluded.
++- C.2: Optional IF SM 8b/1 "Cross Transport Key Derivation Supported",
++  otherwise Excluded.
+diff --git a/doc/qualification/sm-pts.rst b/doc/qualification/sm-pts.rst
+new file mode 100644
+index 000000000..87fb0d7b6
+--- /dev/null
++++ b/doc/qualification/sm-pts.rst
+@@ -0,0 +1,806 @@
++.. SPDX-License-Identifier: GPL-2.0-or-later
++.. Copyright © 2025-2026 Collabora Ltd.
++
++===============
++SM test results
++===============
++
++:PTS version: 8.5.4
++
++Setup
++=====
++
++- Remove PTS device from Bluetooth devices
++
++- In IXIT update "TSPX_iut_device_name_in_adv_packet_for_random_address" to
++  the IUT name
++
++Tests
++=====
++
++The kernel and BlueZ versions represent the oldest version without backport
++for which we know the test passed.
++
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| Test name            | Result   | Kernel  | BlueZ |                                                                         |
+++======================+==========+=========+=======+=========================================================================+
++| SM/CEN/PROT/BV-01-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/JW/BV-05-C    | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | 'Restart the wizard' on further connection requests                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/JW/BI-04-C    | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/JW/BI-01-C    | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/PKE/BV-01-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/PKE/BV-04-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/PKE/BI-01-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/PKE/BI-02-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/OOB/BV-05-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/OOB/BV-07-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/EKS/BV-01-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | On connection request, re-connect to PTS                                |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/EKS/BI-01-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | On connection request, re-connect to PTS                                |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/KDU/BV-05-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Enable privacy mode:                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt power off'                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt privacy on'                                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt power on'                                               |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Disable privacy mode:                                                 |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt power off'                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt privacy off'                                            |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt power on'                                               |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/KDU/BV-06-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | On connection request, re-connect to PTS                                |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/KDU/BV-10-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Enable privacy mode:                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt power off'                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt privacy on'                                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt power on'                                               |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Disable privacy mode:                                                 |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt power off'                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt privacy off'                                            |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt power on'                                               |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/KDU/BI-01-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/SIP/BV-02-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/SCJW/BV-01-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/SCJW/BV-04-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/SCJW/BI-01-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/SCPK/BV-01-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run bluetoothctl                                                      |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - '[bluetooth]# agent off'                                            |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - '[bluetooth]# agent DisplayOnly'                                    |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/SCPK/BV-04-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/SCPK/BI-01-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection requests perform pairing with PTS                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Discard pairing dialog                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/CEN/SCPK/BI-02-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run bluetoothctl                                                      |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - '[bluetooth]# agent off'                                            |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - '[bluetooth]# agent DisplayOnly'                                    |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On connection request perform pairing with PTS                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | Disconnect on disconnection request                                     |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/PROT/BV-02-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/JW/BV-02-C    | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/JW/BI-03-C    | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/JW/BI-02-C    | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/PKE/BV-02-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - In a second terminal run to be able to see the requested passkey:     |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt                                                         |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/PKE/BV-05-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - l2test -r -J4 -AES -V le_public                                     |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/PKE/BI-03-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - In a second terminal run to be able to see the requested passkey:     |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt                                                         |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/OOB/BV-06-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/OOB/BV-08-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/EKS/BV-02-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/EKS/BI-02-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/KDU/BV-01-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/KDU/BV-02-C   | PASS     |     6.9 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run 'sudo bluetoothctl':                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# remove <bdaddr>                                        |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# power off                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# mgmt.privacy on                                        |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# power on                                               |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# advertise.name on                                      |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# power off                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# mgmt.privacy off                                       |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# power on                                               |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/KDU/BV-03-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/KDU/BV-07-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/KDU/BV-08-C   | PASS     |     6.9 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run 'sudo bluetoothctl':                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# remove <bdaddr>                                        |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# power off                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# mgmt.privacy on                                        |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# power on                                               |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# advertise.name on                                      |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# power off                                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# mgmt.privacy off                                       |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - [bluetooth]# power on                                               |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/KDU/BV-09-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/KDU/BI-01-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/KDU/BI-02-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/KDU/BI-03-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/SIP/BV-01-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | On request run:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - btmgmt pair -c 0x03 -t 0x01 <addr>                                    |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/SIE/BV-01-C   | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt io-cap 3                                                |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/SCJW/BV-02-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/SCJW/BV-03-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/SCJW/BI-02-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/SCPK/BV-02-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/SCPK/BV-03-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - In a second terminal run to be able to see the requested passkey:     |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |     - [mgmt]# io-cap 0                                                  |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/SCPK/BI-03-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - In a second terminal run to be able to see the requested passkey:     |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - sudo btmgmt                                                         |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SM/PER/SCPK/BI-04-C  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable on                              |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise on                                           |
++|                      |          |         |       +-------------------------------------------------------------------------+
++|                      |          |         |       | Post-condition:                                                         |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Run:                                                                  |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise.discoverable off                             |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       |   - bluetoothctl advertise off                                          |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
+-- 
+2.43.0
 
-  Log Message:
-  -----------
-  lib/uuid: Add RAS service and characteristic UUIDs
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
