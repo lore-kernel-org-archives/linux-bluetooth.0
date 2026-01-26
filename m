@@ -1,113 +1,65 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCEA280A5A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 14:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40E533374A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 14:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769438837; cv=none; b=TXZjiDs2FsIDtwWRi61ApDLxzokN7eETJ4/788hyZiFlERzhmg5wzwAVJKe0kX8bfWKBzEHa5BFhQDitaeQ/pCFrTiELsNuIf/cSwYwmH/S1oU5c+UStrVS4zCXl2vD92LU/tMXLhd7Blgdn+4asWESYZUaNKrUGZ+cbRIDVYLQ=
+	t=1769439360; cv=none; b=Fvjo6BoBBoV7Usryiip+nxsV61lmbsQPpZiStX7r3vVbobYq4gF/ffDMI/Z6eoZ5EEJF4lKAUMQai/WoyRm7Vwbrs980MAOMf2SfG5fdEpgAie5z3J6CgQHtk9Y47JuqtZMTK7qcrpu3rwU2DOvilth4NFjf1a/mvC0wGOTOV/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769438837; c=relaxed/simple;
-	bh=lUC8DDBvMhI0kQe1EfqR866g9h2a45E+fkOEdb9ZiN0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=oeJBkh1HFiyY78hx8XOm/xszkArgDNY92JxrknCE8TWYN3kUVYEEPqGNPgw3ZXDmS7Fztsi0tV58F+LLdOODdIUDFWwuRuc/0AocoG2gXgcm6YBqcw0i7tyXiumoagUrh6AUenkVl5SphhnVqxUkvU5i0VcUCQXCf1ePC3suNoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iG2t+ae8; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1769439360; c=relaxed/simple;
+	bh=pNDywTG6Y3kJMKSTXF0e/fotYC7CJ81/bF5vtVCaxmg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hxlCX0RPtYDy/EVrtNArsvvDmc410BKMlZd5DQvBAJLEjjmoiFSGFcPZtqq1Qk6YLR8db0dXh48GBEP4Zqd+WHCaCBthU7/Qbn9CMpqClFTn0BRLIYfZ7wjIHf/CYeAlJ2cs4b21ojnOQvCHJ0elpESi+3cHP2kHCQ64ba6MCOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dcsGfEAu; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iG2t+ae8"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-78fc0f33998so41831927b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 06:47:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769438835; x=1770043635; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CyXzXm9DFLWKKQM971RlgaJrivuTiFh0esBc1rsJWAA=;
-        b=iG2t+ae82+28XiVnqD16zNuXpPAhz+zdTJckBurPdTitgxufilaJHmE527bU+rqEZW
-         nKZ7rOKQdjs/GqO8z79PycdDs7/Ku66t2xsuJTfPtd38EXlxngYZjyzK6BIHtC0eqG/C
-         8eINsn/00vyF2c9mdbCBEWcIbNeJ5EBoPXkNVc+oUvr9MS0mRhruM7zn9aHhmrR56K1a
-         1tsg3kiQOtlUFt+jxBt3Ljbr8VMrsIJF+rQ/kJXk042dSoy9wJ5Tb3YP0VZBfi5TvGNf
-         bYwA3BtY+x0689LNwrO38r4BwQQqjdM7rhCuG3UZN4KJkGiii4nq70JImqDB3rTYnLse
-         Slbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769438835; x=1770043635;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CyXzXm9DFLWKKQM971RlgaJrivuTiFh0esBc1rsJWAA=;
-        b=o6b1SHNYCQ90IlSr5m00/w2FOX4/bzlqxS0HIUfkB41jEEBOFc21CVMRH8TzQHUvnC
-         1UD9SsdOMt0/MvxPMf/yFUzDnWrSfMTl8PJuOugsiAlh4wIMTPwZnBjgvDaKCbUEdzpE
-         Po9i013RvD8YbaYZ1VGgdCC+w22ztFNX1VmYDeGpFyTacuJUcuO+XrPZdZM4IzTj/Vj4
-         trHPi8r5JL0RwIYId7Oj25NjcH/zZOIqp0GqltuWX04DcTIF7OroUwpVsByGoaZWpG2y
-         l4MTdv/bIdUnahNdhP8NVCQ5FzehcNCEEltps6dOIa0rwpSRREqDCVW+mHWmWxqmeCNU
-         AW2w==
-X-Gm-Message-State: AOJu0Yx3DbrgExYFUtF1JbzpcQylCNMQUGU5joOjorJZQNIlhwacEtrF
-	rwhSMlPJZ+aGqah1a1CZerjmOnbuqCDvuCsFxHkCM4t6CYH3Ay0Re4wcRtFSGHYa
-X-Gm-Gg: AZuq6aJl871g0H0fC2HTKMesd0Q2sJ4fGVAoBASt49/UXD7YU7B7Wo/IGDZf1CyLoLL
-	fMlNuvj4U3SlYiSQxUdLCwhxJJQr7qRt7RsNV8e6rMrnxl0Bk1StZ6VY+s03UYC6FLr79aSybq2
-	EksauFwEpgDGUv+uWxYPYnLvsVe6g3HDFZeAYEGR9gbcQyePnRrrIirZwd11HdOdmKpE6WXpusH
-	2IdP9iitIJPvyCWxbj87MtkNdwfkD9qNj/Epp0pwPn3HloMF24dcTeH0FEYUQEkaRZgEMHCDjgr
-	K1ydKg+F1uV52+XpoQw3Ug63W4FSGGGN0dQpV/MxKLMHGt9hW+o3Xi2eDX6PkJxNbg0K3aPxmAu
-	nbN5mq1pqHHd8+lOpPJDVJMHdKl8768hvd+DQYxj4ciJCp8ICmM6xKYAIMRTkpkiTQXRE9UlXp5
-	nFmTmqeubiWRCRLLcCAGUbV4F37rTKZVXeC50bMdeXQYPuR8PSaaovCYf5bmm5Ez73wsXtCPxWx
-	MQzEQ==
-X-Received: by 2002:a05:690c:ec7:b0:794:2b18:5464 with SMTP id 00721157ae682-7945a86bab4mr86019427b3.11.1769438834923;
-        Mon, 26 Jan 2026 06:47:14 -0800 (PST)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7944aa7b302sm35811327b3.48.2026.01.26.06.47.13
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 06:47:14 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dcsGfEAu"
+Received: from github.com (hubbernetes-node-76e7b7b.va3-iad.github.net [10.48.204.84])
+	by smtp.github.com (Postfix) with ESMTPA id 1A0C23C0E06
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 06:55:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1769439358;
+	bh=8XnQbPBCyvmH9GdrTuHG1HoX/8UEVg1EaK/koReSBio=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=dcsGfEAu3T622lC6sYHt4Cb8X83MivYJmxDFBC2mh75MjgUTi8TtZC9Hjx1/v0w4j
+	 vBXjSWHnMO2hGRfkbKCFHqjmHfcClr0cCuPkPU7P5Yfa9xWPMsjUuYvxW43UaHg4ZO
+	 VleU+mTfapXjGgZ8xHvodDhIGdyI3BmLqNk5J6OU=
+Date: Mon, 26 Jan 2026 06:55:58 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] shared/shell: Fix not dequeueing command
-Date: Mon, 26 Jan 2026 09:47:05 -0500
-Message-ID: <20260126144705.3516388-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.52.0
+Message-ID: <bluez/bluez/push/refs/heads/1047149/000000-618fd0@github.com>
+Subject: [bluez/bluez] 618fd0: shared/shell: Fix not dequeueing command
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1047149
+  Home:   https://github.com/bluez/bluez
+  Commit: 618fd0e24dea5d6b8b76b5bc88b66e3dbb05a7f9
+      https://github.com/bluez/bluez/commit/618fd0e24dea5d6b8b76b5bc88b66e3dbb05a7f9
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-01-26 (Mon, 26 Jan 2026)
+
+  Changed paths:
+    M src/shared/shell.c
+
+  Log Message:
+  -----------
+  shared/shell: Fix not dequeueing command
 
 If script execution started with command that call
 bt_shell_noninteractive_quit directly it wouldn't execute the next
 command since data.line wouldn't be set.
----
- src/shared/shell.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 15f21efef61a..f014d8f7c2b2 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -269,8 +269,6 @@ static void cmd_export(int argc, char *argv[])
- 
- static int bt_shell_queue_exec(char *line)
- {
--	int err;
--
- 	/* Ignore comments */
- 	if (line[0] == '#')
- 		return 0;
-@@ -288,12 +286,9 @@ static int bt_shell_queue_exec(char *line)
- 	}
- 
- 	bt_shell_printf("%s\n", line);
-+	data.line = strdup(line);
- 
--	err = bt_shell_exec(line);
--	if (!err)
--		data.line = strdup(line);
--
--	return err;
-+	return bt_shell_exec(line);
- }
- 
- static bool bt_shell_input_line(struct input *input)
--- 
-2.52.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
