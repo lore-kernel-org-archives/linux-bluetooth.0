@@ -1,73 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3E130C36E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 23:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978B026299
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 23:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769468410; cv=none; b=DO4ops/N0VIud6UuFuOt7+TMONPFMh4pY1KARRJxD6r9+PasYs5CjKhZzWErlC+iL62osj5TwEK6FDvYm3Dbrl98lMGm0fYb4t2/eHM0blNwJ4Z0VnB2/eIpYH5K9TanD5g2nwTya57DBc50yGHK3cfLcDOusAJXcZXqgtX+AxQ=
+	t=1769468434; cv=none; b=S5bxkJKg1p2inM6aKpa5MGpeHWaOHAD8jw+a+4Ypj5WFulOn+KX6vM8Xk306L9rd9NMb6VtF9jh5cYMvxMydZvhTgkh2lWwQUm8cJDvFPbfaveGy8ZsC7IUWPg2gqftbFd3E4pJMy1jbMphLcUI9olSrbD7GUtKY/1t4v9Rvfn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769468410; c=relaxed/simple;
-	bh=rr/2zAyTOWVwVnptBriPZTHQF6D1qMwl86yJVPHHXGQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FLXVhTEhq2arVYSxDT6zXjDn/2GY12nj84PDKXL5EeMoYMvgkz66hzZZdtyRu5e5t4duv1D7WqI3ddXcpgC+gxFAjCnj0EXD7TZLOY7/NSRfwErMOXlPkBQdCII5xrgBQ2G7FG3fjoqFYnM4wSRtJRN7NM5GXwP8uDO7Q/iYdyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VE6w29CB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769468434; c=relaxed/simple;
+	bh=6V50vvfA2MV0hlZKvR5foF6sA/v83XfIwNvGHOQWT6w=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=e6cowJNMmhhJwGQ98RuW2TnGwu3kREabq1jDzf7lMDexyOJSjp6TKj2A5QNgIaLf9i/SUrfgCd9OUltuUPIYrUMmmQPivBer+nKIEYIfmqWBj7mSpxdjCjK1x9nDbu10/ZgbLU0GO9yZaO7nBZZe43VwvZurwU34dbcIeCI6XSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=YYf4kXMh; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VE6w29CB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C528C116C6;
-	Mon, 26 Jan 2026 23:00:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769468410;
-	bh=rr/2zAyTOWVwVnptBriPZTHQF6D1qMwl86yJVPHHXGQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VE6w29CBkM5lwDStxpFrf/x7t3HUpdKAilK4zvnbtPIk+haQKdMwhZDtXHMwLoLsN
-	 meh1roc2uIwFWhW/p2VjbtMzgAb0LRkikl5XMNY+bQllHjH12vLSUb1XySscBoBB6Q
-	 GOMcWTXOTlHGW1B8bnHkDHaNZNIDalCK6gz4wBGOm+74RBalZgPSC8tpMN3nE+Iyj6
-	 4Q6h6JVYDNLr8HTxH7sRfdxWbOktcjSJ1DOiQ2JZwnAHshXbqYnuNS4c6i9JZX5OZd
-	 zvvLxYEAbOZB2wPQQ48LPs5Qa6//v/y4nsY57YpiEbcM+0zXPdn2Sk1b1ykVUql64v
-	 dy09Q6OtMIWQA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8D72380A958;
-	Mon, 26 Jan 2026 23:00:05 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="YYf4kXMh"
+Received: from github.com (hubbernetes-node-afc708a.ash1-iad.github.net [10.59.96.25])
+	by smtp.github.com (Postfix) with ESMTPA id BF331140519
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 15:00:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1769468432;
+	bh=uZGcWmOTj4rmG5D6qoMc+YBwTo5KWpLFZU/dF8rfV2k=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=YYf4kXMhl4VBFmlQJvg8FMvBTN1fHYmNl+EiLCmEuvk7Z0LZU2OYk0HzAQE+8rAID
+	 gS9pTJkPS+PCzC8vKy/jz9j199WPwyMAxiY7dd+80JrbbMfQPlyCnsfID2MDILeB3h
+	 zWVMGAenCM8NTibzX+qKHkfA+VyhWF4Gsr2ASIXA=
+Date: Mon, 26 Jan 2026 15:00:32 -0800
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/687c62-2d5afe@github.com>
+Subject: [bluez/bluez] 2d5afe: plugins/admin: Fix storage file location
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] plugins/admin: Fix storage file location
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176946840460.208829.4470689210192866250.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Jan 2026 23:00:04 +0000
-References: <20260123164257.853415-1-frederic.danis@collabora.com>
-In-Reply-To: <20260123164257.853415-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 2d5afe34bb05fafcf3654dd7c413e586b4747268
+      https://github.com/bluez/bluez/commit/2d5afe34bb05fafcf3654dd7c413e=
+586b4747268
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-01-26 (Mon, 26 Jan 2026)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M doc/settings-storage.txt
+    M plugins/admin.c
 
-On Fri, 23 Jan 2026 17:42:57 +0100 you wrote:
-> The admin policy is set per adapter, as stated in
-> doc/settings-storage.txt and doc/org.bluez.AdminPolicySet.rst but
-> currently stored directly under STORAGEDIR.
-> ---
->  doc/settings-storage.txt |  2 +-
->  plugins/admin.c          | 20 ++++++++++----------
->  2 files changed, 11 insertions(+), 11 deletions(-)
+  Log Message:
+  -----------
+  plugins/admin: Fix storage file location
 
-Here is the summary with links:
-  - [BlueZ] plugins/admin: Fix storage file location
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2d5afe34bb05
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The admin policy is set per adapter, as stated in
+doc/settings-storage.txt and doc/org.bluez.AdminPolicySet.rst but
+currently stored directly under STORAGEDIR.
 
 
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
