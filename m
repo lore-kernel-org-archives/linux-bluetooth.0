@@ -1,73 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7432FF643
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 22:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C86219A8A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 22:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769465416; cv=none; b=W8L6XzTezgdN/FCExIyo12FknvehS5TJYdVR0KQXf9iWy6YdG1vH5AFVfhbeLjHx854ELRTYKif1GLyLilWUdHj+TcQM9DIVQhMPY1hUcc2S5+Q7af2Y2YB4W84JkkvIy7kP/8rSN+wjsra13LPIBQ4LvjHUuY945u+zasY4gu4=
+	t=1769465942; cv=none; b=mg+xs0XIH4ycoboreiTvWsduF6NkdzX2RNuzQ7Ab/vPlOZ7/DxZcm3nz/eGfoF5KJCHIgLYFB1oFzElkAcyU4xD8XEB4FDmogtgppZ3QPsxSug4VrL1Ogs5zITyxwqrjS7NLSJ3xj9PFRAbEdbff5taq9otC5EuVUo63ACZP5FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769465416; c=relaxed/simple;
-	bh=wD35OKcICYBDVNgzJZwJwIQbA+trXS/b0tg+yOcu49Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Yrp0zNCZppdUMUBUribgg/ztkVEuCkl7sTUxt9wS80Q5xf7k3o5YFanoRlvD33iKgGq0rXVZYUPiHhk0nVX9IxS3ct5wfUf/mQEk/cjn89Pt0UdcLGamm76L9AZgGZotC83vszhB7WzZBgMJ7ZQ0arTfT8r0ceGQZJHB02PumlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GoO6Adoh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769465942; c=relaxed/simple;
+	bh=yJ+n/CZlpIVZvAQxJTMP433NaEnNVPKCEz3uOedn8Ik=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=fW6mULL2psXj6rkHKlXTy9EwT0cp5734c1au8WYa0M6bscAVD6HKOn7K0iRCm7l3ytdePgnGQqtM9hkRFZyNj2PACWNV0WveeyE7to7Eygf5hmasGkHJH4PwqCk+aKaJ39xOHSQrlyMcBCU0qab2KOu5rkFjIla+UzCupsly5Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=IMHLuKB/; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GoO6Adoh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC1B7C116C6;
-	Mon, 26 Jan 2026 22:10:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769465416;
-	bh=wD35OKcICYBDVNgzJZwJwIQbA+trXS/b0tg+yOcu49Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GoO6AdohevOP1hQDW5XMqZQ0D+7hAIKnx88g3KykCvFkV/qzyOqsptnO1t0haNtx+
-	 jMjhuIOWCDsGuBvWneS6vzCcPFXOsCzd9q2wsyUxBGF/yzWF8Hu0ByFHXD+1WTu1CZ
-	 eznbwme1Z33MiwCGVGvhPny2CU7lGz6Td6J3H9LD/W58rvB5RRtkuPT7QpDU2gj8WR
-	 2aneVnG8QAIWQ8CnjlfxE6PPSi078DZJR9ahnv4llNFPTQ4F56kHIuAGppo86++iLN
-	 T2wqNb83V5a5EthHvGs4k+c4lbl8kLs7CIvVp6bcgeak9HL3N60ntxBdTwiOsYdaEf
-	 kAMOezJWd5umQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8BA62380A958;
-	Mon, 26 Jan 2026 22:10:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="IMHLuKB/"
+Received: from github.com (hubbernetes-node-eb39a88.ash1-iad.github.net [10.56.209.91])
+	by smtp.github.com (Postfix) with ESMTPA id 15D7A1410EC
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 14:19:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1769465940;
+	bh=Ta/AKBycKzkZzqY0ol2weuDnDc1M9yuZHWBdAfQg8B0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=IMHLuKB/ec46BKxSG7eSZ+q2I3Rr/BrMnRwmbkjgx/I84GeCgguMkyq3uF9gEW/aE
+	 xA35q2FDE9YzyZdi0loREK0Ktal6tDrQpkATSkN3iZMzrsryf8++9u8R5/gfjINWtE
+	 /OnrsTHOSwY5qdTAIL43Q5H1dBiNYD5yPjtYCMac=
+Date: Mon, 26 Jan 2026 14:19:00 -0800
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/521088-687c62@github.com>
+Subject: [bluez/bluez] 3f21f7: doc: Update .gitignore for new daemon man page
+ loc...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] doc/qualification: Add PICS and howto for the GAP
- qualification
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <176946541010.196436.13226765282271636788.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Jan 2026 22:10:10 +0000
-References: <20260123105249.677211-1-frederic.danis@collabora.com>
-In-Reply-To: <20260123105249.677211-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 3f21f7817a405c765737cc177148c31618bd0b69
+      https://github.com/bluez/bluez/commit/3f21f7817a405c765737cc177148c=
+31618bd0b69
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-01-26 (Mon, 26 Jan 2026)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M .gitignore
 
-On Fri, 23 Jan 2026 11:52:49 +0100 you wrote:
-> ---
->  doc/qualification/gap-pics.rst | 1642 +++++++++++++++++++++++
->  doc/qualification/gap-pts.rst  | 2228 ++++++++++++++++++++++++++++++++
->  2 files changed, 3870 insertions(+)
->  create mode 100644 doc/qualification/gap-pics.rst
->  create mode 100644 doc/qualification/gap-pts.rst
+  Log Message:
+  -----------
+  doc: Update .gitignore for new daemon man page locations
 
-Here is the summary with links:
-  - [BlueZ] doc/qualification: Add PICS and howto for the GAP qualification
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=76cfed12730d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+bluetoothd.rst.in and bluetooth-meshd.rst.in moved, so the generated
+".rst" files moved too. Update .gitignore to match the new location.
 
 
+  Commit: 76cfed12730d74ca634eb8001ef3d047af76ecb3
+      https://github.com/bluez/bluez/commit/76cfed12730d74ca634eb8001ef3d=
+047af76ecb3
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-01-26 (Mon, 26 Jan 2026)
+
+  Changed paths:
+    A doc/qualification/gap-pics.rst
+    A doc/qualification/gap-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: Add PICS and howto for the GAP qualification
+
+
+  Commit: 2c72364163e0db6b3f61ccb78a2b1b10f908c1cf
+      https://github.com/bluez/bluez/commit/2c72364163e0db6b3f61ccb78a2b1=
+b10f908c1cf
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-01-26 (Mon, 26 Jan 2026)
+
+  Changed paths:
+    A doc/qualification/gatt-pics.rst
+    A doc/qualification/gatt-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: Add PICS and howto for the GATT qualification
+
+
+  Commit: 687c62a08ee824edad4aab34c966b42ce7eb2a12
+      https://github.com/bluez/bluez/commit/687c62a08ee824edad4aab34c966b=
+42ce7eb2a12
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-01-26 (Mon, 26 Jan 2026)
+
+  Changed paths:
+    A doc/qualification/sm-pics.rst
+    A doc/qualification/sm-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: Add PICS and howto for the SM qualification
+
+
+Compare: https://github.com/bluez/bluez/compare/521088388bab...687c62a08e=
+e8
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
