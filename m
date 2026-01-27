@@ -1,89 +1,89 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279BC2E6CC8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 10:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BA91F63CD
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 10:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769508218; cv=none; b=fF1kSzvVAqgU8xFMz91fQqM43rjET8WdurRRCPB0GF7ysuAAH5ij0urqLXBPCEe98tlbMYEM6TIorl3JcU4dnjZPP1NK3fFHI3GM6DF8ETKT68vY0Z7++6sAYm0RxjF7K6w/wHiD7PXBPOlnY3Z445i0+IQF1HszAVnR9ZafJXY=
+	t=1769508220; cv=none; b=bP9ezIgw1dQpI63HvaGdnbF7AAW+Upv4tO0IUCVDBy2Zf86IcAYDxXDt6uOtp9KlzaO/W1ju0tS2qVMlOhoCsilAZxlALPQtSuZfCZMz5UfWyYRM30eJy1CrhXtcGJW8WMygvaNgPAfISXkoAMFdXx/5OWfpnpCjo7Uc0l1l/OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769508218; c=relaxed/simple;
-	bh=96u6c5txgHckjprmPS2MoykS+nlUxVY1PM5b681Q27I=;
+	s=arc-20240116; t=1769508220; c=relaxed/simple;
+	bh=S4CWTPconQRsPOQZitpt6kvdZWXDBWxdC9m4eDehnjk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VuxVtRXMkMMV8NoAVL9WCKGrIEPKVNFw6EG839ahlITwzm9bLv1MlaMgoDmiiKDa93C6yaY8pYveHdlGLKsaQQe/tSOSiyR7CIfYPDdNaggJ8LurbwHmTn04uV4l6Bq+yvxO+0OoLYHv+sOFlTnYbK6+lnRXAETdRjul7sVN71s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=BSaLDXJ5; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=O9mVP9+t; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version; b=cTIzf2a2eAmznnioV59s73LTIGQDLcKkcKqxI2sSmpFp5ygRVBkg2AfAx6H42F01CRYGvXK439BL/vuVqhvLkZg13AwlZfHZnlMjkrNgFzjyvh3eKacHZLluzcizX7ukiXtb/KdA2G5xDn37Ejb8zhBaikVJUc1CGs/u1Pzhx4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Tm5qk8XE; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=QTdncy0v; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="BSaLDXJ5";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="O9mVP9+t"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60R4U28B3857793
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 10:03:36 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Tm5qk8XE";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="QTdncy0v"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60R86vwp621204
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 10:03:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=DH2jN+u5hMK
-	zoRk1UVgE+dPS7iwFjY0XJf4DXCIYdtM=; b=BSaLDXJ5lRpT3C75tHc2gahUXQe
-	yZbNnPnNMCFIQKt+E0qgluK7LjFsFOrW/qXZoYs1taNFc64LXqRcy7jdU4bGFlkY
-	QledgXu2nRn+uzgwTzS/1Q8N+HrUbYV4lJBh/+4QRy6FfzSJXnC5jE2Uj6xaAcBV
-	Llnm/wsVgcVEG4u2E3Alon0NjLg4OLyYDVFou0wEVZIdyTqcjuAVhvCzr2/DybSn
-	T+X8VikPjFv+XKjnVmEjvtHEwpD6jZk2oqCABIN46h8hgjRwbtp06mEJqFXkhd5z
-	SXrLZQA22uezHNP1r4/gLj0jgw9dykVuSyzYGP5wmtreVCkBoRktWidO5Og==
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bxffs28cf-1
+	:mime-version:references:subject:to; s=qcppdkim1; bh=a5zlzfeY9O9
+	BtWUhcaXcJk+CitPtlA5QUiA0geh7SX4=; b=Tm5qk8XE83HwVhImP5i5P91Y6uH
+	Q/8lACYXKsY9WvVntLKSDXRBjGIxPS/aJozJ6JsOFezECzzFEzr0y2fhscpadmPK
+	SDtzYyPy/7f3Oivp8+vs4U0HIPA6/zXE/BJnmT56O74sswzMuOI8Hy8tQ6/5aScL
+	PppcF8y4hu96Yowtk71d3jtIOycFIjKygHHdRhY6fpo7Z/VcgFjKKfvvEA9g+UX2
+	hoMlyDDkAOgwozqHNjq5N/nxjHJnc4OtQDnVBdnL/DopDQKXgSKsAv0LWxJvK26i
+	lkfPxO1fD6G0lbWzUBsqO0EeAdKY/5yFgHJ3jlUf6d8c/ukZ+NUeDkAwcBw==
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bxsjegd3x-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 10:03:35 +0000 (GMT)
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2a07fa318fdso49168755ad.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 02:03:35 -0800 (PST)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 10:03:37 +0000 (GMT)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2a0f4822f77so129181155ad.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 02:03:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1769508215; x=1770113015; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1769508216; x=1770113016; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DH2jN+u5hMKzoRk1UVgE+dPS7iwFjY0XJf4DXCIYdtM=;
-        b=O9mVP9+tHp2erUKnbcoX0q6+gePVeUGQpojqwmMnFObH3PQFjkCU4fydDMZvctfFHF
-         2bBuI1Ws16b2iP8LyZGYBTaELVV8hrVP+CJnKD0pp9j6dg/lrH2vhNdd4NezMHhNEenB
-         9PaddXGv41wmnj6UgQsk9ks96r/OikXwejgJtkwVc+GZzatZlb0ry1YlDVWcg3Cj/t55
-         wFltOHmgN9Eo3CGrcqIRbCVTpO49iLBMtPcb7XxL3AW0tuVLH0f7Nwf8HW4d9SgbUnmG
-         TzPg+JnfKEesxd9/JE29WzR/PPLbqhBmDYlKqlKccc72Am6Q6+qkuAWRKuLhsbzyKmkC
-         TrIg==
+        bh=a5zlzfeY9O9BtWUhcaXcJk+CitPtlA5QUiA0geh7SX4=;
+        b=QTdncy0vlNkVVW5UFnObwv60Njkoldun5JeowA8oaUnduZchcSS+MTVIV7wo30FjI0
+         9DUZuLIDPc/YZSKekhfFdj6g19om1XoDD4lkClnA4qlA1IAWwbQ5vvF9rigN8xoaiM4L
+         u3XcaVyW82BVcIfMHb82o6WfFU/sjYHN4s7tU02j1kcogsWJFiEj48makZX1H+CPK7+4
+         pqSejKK1YlhpMaZfo8DfadjR8V0+Zdg/z0QglleNCuZh0pFQpmFS80ssnFGPjBzPChgv
+         /x72C5BD4KG8VLQX7HtiEaf/aYq4SuCTxzbVQnh4VLO/ctwf0oixm20XO5823abpjWso
+         y0ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769508215; x=1770113015;
+        d=1e100.net; s=20230601; t=1769508216; x=1770113016;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=DH2jN+u5hMKzoRk1UVgE+dPS7iwFjY0XJf4DXCIYdtM=;
-        b=wX9Rj/l2JboPr4T9o8lvsWeZwa8aRk1xEhSruTQOPAJV7XaQnCVjIAQj116CeutfZU
-         1NtgGZ54aCvz6nnQmaKaPiK3rf4TMdNkiSdptLx2zYRQ8KKDmgzV9K+ukGdofS4H9wQb
-         KpraTQcpaOz1l2kOK1V2wBW0w6HDAApxIEgwnK2u/WpS8ZrLj4hT5Yl/X4ffrPH+QpxD
-         ca3cA9NUG0R7cJcXeWZz/uYOqnVG/+zTh765oGcFm8Ti+miEqBC1ApQ2GH3u0prChPic
-         F76DHG2CWqPaEJdXRdSkbXEYRtzHlB1CpYC/nEX3C/PDXLTCPTMBdj/wsNCPpb+8iEMP
-         Ohzg==
-X-Gm-Message-State: AOJu0Yw6kVsTQf57rQ64nhghCBQwArhy1JEQS/M+n/jRRj0ygJ+TlT0G
-	s4jZ6tu7Cgz7eNFC93VU+dgUlVlSXMokq+r6rq+0GK2qCZjf5a035IwKNbCXNzL9j7vgvWi8EyJ
-	UwBtqgQYe2Br/EV+n+axeliv3tcp90IEcnJE/HxAraACCw4rHqVaMadgZuAM66mjeivt0DuOj/2
-	xFXdI=
-X-Gm-Gg: AZuq6aJOcmnyduxWrttZpfRwGfNAcVO8tel0tgF3QSSS9NW2I2wQiYwQccoJNZ73CMh
-	WNrXLT+ty6Rq4uZ6NwRUtWqRVlAkZFeb0X+YKoNTRGOO4ELzI0pNUO9w3sc5ua26elMg0elDEBu
-	ku8yoBb/s6aWaOra9KaLlxDCXWrwEUy5hjpcBBiQZxMKiR5pETxsQ6UZB6ltCcT6/Ptu1VBuQlF
-	NBeqYTasoNvpTFwTv54kJG4kZyn5WlUnWFf65+djDRGDPMznprJl+7RCNArY0pBmeAqGbgerOd4
-	QcbPkSPNSGGR08PHByMITmbAk+c9U6FE++u6tejHfuQy1L6bK2BXSuGFOW/2vuyZQ+TRKfWtNI9
-	znfzUFclNviWd3VwMKWL2/OSfAZDdZZHdNkRhM+u+bWTcrQWt
-X-Received: by 2002:a17:903:4585:b0:2a0:ba6d:d101 with SMTP id d9443c01a7336-2a870d69a20mr15215145ad.21.1769508214256;
-        Tue, 27 Jan 2026 02:03:34 -0800 (PST)
-X-Received: by 2002:a17:903:4585:b0:2a0:ba6d:d101 with SMTP id d9443c01a7336-2a870d69a20mr15214875ad.21.1769508213606;
-        Tue, 27 Jan 2026 02:03:33 -0800 (PST)
+        bh=a5zlzfeY9O9BtWUhcaXcJk+CitPtlA5QUiA0geh7SX4=;
+        b=Q2z70Qjkn4bn7wyTX5dpuy9mKNJtVMwPYxKJxi8N3CASY2N0qbe0IIvuYSsnezp+lR
+         Qz3Br2QAU33LFWFszkWaEO0VDBNOoUxlO7HPC7tR/00TZREQDNLDsdqT83GJL1cD0CAn
+         tyNF1hIG8Wq5UXBNDQkmP6JN375HvhoCBGj73S682m23AYRoIYOfftDyi/h60tvSzGdd
+         BU9QCLnEX69OOGk+QoibKYo6EX+jDXKVaG28nsL/AqdESSEhh4WnLJpvcuxQgd+dA+eJ
+         EOy8YtG8nVskG1O+i86Y/RBPB6fWcWYOE/uSylYIAS0+Wnro3xUBaRW8Md1ih3cC8T1T
+         Akgw==
+X-Gm-Message-State: AOJu0Yw35jKa+gyUrDQMRvtq1dth5OhjVBiYn3W8YrEJmdVo87kIPaPx
+	VdcmVIsJkStcHk7Ep9tvx4Rnc4Z+k4O3uUWJ1jHpkVyepPQjwhJ+zn+GLyOitUOQR5KS+AGpKTV
+	E1CecTB8qpHkq0miQvfA9hzkF8LN2MT+gdKWDD+JZxtfKhUxyC5pazCb54LQvR+QQkxsbJOKq23
+	2+L0Y=
+X-Gm-Gg: AZuq6aJAD9g16z9FY05cdXPamRHuyl9gmEtBTMLoJ9/KO3fSbB9+Z/JR0vKQXLfDaNy
+	yt4t4iyZwpzhH2huJx036Av02bUfCi3QmBrWMo/zrV7U0VFIFMslFz3GLEtJofqDsl+rZLZ6wqt
+	LuhUZGxIS49tduWcU8+421GAewlcSrXtQbJBri5U+963LKoi/hO3DOf39zGC4mxASY+XU33bW3J
+	BUXcZG4svdnuugAM2l/WOP9vNZRgdmhXnEserzzgDCuvrVclV0h90JvMw6QpRMhfB5s+HSpzfus
+	N7zpCszSMxYBHydjCjx8k/P7KANxJs6jY+tRVjYDzLTzosFKCovHiXMaotRvbnDEfminXK3KsvL
+	EJL8mujllMo1oHBDsCxBhuB0QmWLkb9bbdz7yWlpK7PodEv94
+X-Received: by 2002:a17:903:2bcc:b0:2a7:d729:6a76 with SMTP id d9443c01a7336-2a870e1890emr11389825ad.60.1769508216477;
+        Tue, 27 Jan 2026 02:03:36 -0800 (PST)
+X-Received: by 2002:a17:903:2bcc:b0:2a7:d729:6a76 with SMTP id d9443c01a7336-2a870e1890emr11389565ad.60.1769508215821;
+        Tue, 27 Jan 2026 02:03:35 -0800 (PST)
 Received: from hu-prathm-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a87842538bsm7619455ad.60.2026.01.27.02.03.31
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a87842538bsm7619455ad.60.2026.01.27.02.03.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jan 2026 02:03:33 -0800 (PST)
+        Tue, 27 Jan 2026 02:03:35 -0800 (PST)
 From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com
-Subject: [PATCH BlueZ v3 4/5] unit: Add test cases for Ranging Profile (RAP)
-Date: Tue, 27 Jan 2026 15:33:19 +0530
-Message-Id: <20260127100320.3055119-5-prathibha.madugonde@oss.qualcomm.com>
+Subject: [PATCH BlueZ v3 5/5] profiles: Add Ranging Profile (RAP) implementation
+Date: Tue, 27 Jan 2026 15:33:20 +0530
+Message-Id: <20260127100320.3055119-6-prathibha.madugonde@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260127100320.3055119-1-prathibha.madugonde@oss.qualcomm.com>
 References: <20260127100320.3055119-1-prathibha.madugonde@oss.qualcomm.com>
@@ -94,73 +94,59 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: lej_YvxnVMYaxTyF7QMmxbXlbm4-XItr
-X-Authority-Analysis: v=2.4 cv=YpcChoYX c=1 sm=1 tr=0 ts=69788d77 cx=c_pps
- a=JL+w9abYAAE89/QcEU+0QA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDA4MiBTYWx0ZWRfX/oJKz4rlKLq1
+ lFyMKws1IBZEltYWh1tGt9UMUsmaI7SmAPnjSC5Xs1klveVD0JeJUtBq6kShRzX2vwOTL9ZpBsx
+ MUGvmuWJR+wNda1avv6u3kaPvxx9BiShB9CHksMVEAYYrv1wnr6TDH09wRt7rl1496272pUcoFj
+ qPIxEP/JPy5DVCqTS/EyyuwxJU3AAm7gjjxjvnS7O+BkolH9KiaQIY6l3XKzQq96cJvaK7ReCMt
+ LqLMFOahNY95hJ/XYRGIKUAWc/UiYQ6VSofkdRM2+Lu8gzQx4uGM87sHmPtO8C29KrNCkOhG84o
+ XTAuliXzpjnLDGVmK6Uqhb/y6Kxg/me1s7n9VSYZUaY3BGsL3rBSVXJAqDgUqYXO514Og6ZPPSU
+ Ds6bve3gPM0EH7+UOG4Zer6CDhC2ATdaMkUYFLzako+VFR0wv3in38scHCWmYG6QcTUPAbVb63o
+ aTA1t4N2td7tFHBvRag==
+X-Authority-Analysis: v=2.4 cv=Qelrf8bv c=1 sm=1 tr=0 ts=69788d79 cx=c_pps
+ a=IZJwPbhc+fLeJZngyXXI0A==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
  a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=XA3xTWKml79YH-AOntAA:9 a=324X-CrmTo6CU4MGRt3R:22
-X-Proofpoint-ORIG-GUID: lej_YvxnVMYaxTyF7QMmxbXlbm4-XItr
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDA4MiBTYWx0ZWRfX1Kb2jJnQEE1n
- lZ9iv40v06NcjR62MNWW0Z6Z0+c+w54PLn8k9MMGUsKXtStr6P3mdIBlBW5YH2I9rG5yEGMz10f
- PhoB5HH8ukEb95XLWt6MeK1TBlOPmJQeynJa82arK9tJYrc5tBM9mE67vIX80lFidrn3L458cBK
- 7HR9RbN5c0iXNGGVIXxQP9oWBaF0IGPNCPz89xWWn5heyAOonQ5DyQGzE+q+kxTA89voY0bKg+w
- aeFCnSpqiD3MocN8iffcHqcsDdoOg97vnTFzQE1gLtoN6mj/Bf3VndgNaDmoBZS1xICoWw4Q/qG
- 5mHZZKx7M664p0vzNX+6Jrt21T40KA9rYVYq8SP/auNetw+e5uU2nmRY+EW7oejHbfTmYtjjm3D
- NdxaZ2w/FuJKV171Sk6/RvsN7kvCkUObjy1U62ITpTeVXMsT3vTiH3qN5dCDEvxdY+IZ/Yu/WEW
- 6ggRUq83d5kbWBlUBow==
+ a=3RD4Na1Ei-b115O2o2gA:9 a=uG9DUKGECoFWVXl0Dc02:22
+X-Proofpoint-ORIG-GUID: 5NkjsFV7lZC-tJBSxJqfJagaUsbrWHfq
+X-Proofpoint-GUID: 5NkjsFV7lZC-tJBSxJqfJagaUsbrWHfq
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
  definitions=2026-01-27_02,2026-01-26_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 clxscore=1015 phishscore=0 impostorscore=0 suspectscore=0
- spamscore=0 malwarescore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ spamscore=0 malwarescore=0 adultscore=0 phishscore=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 clxscore=1015 bulkscore=0 suspectscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601270082
 
-This adds unit test cases for the Ranging Profile (RAP)
- implementation, specifically testing the Ranging Service (RAS) server
- functionality.
-
-The test suite includes:
-- RAS/SR/SGGIT/SER/BV-01-C: Service discovery test
-- RAS/SR/SGGIT/CHA/BV-01-C: Characteristic GGIT -RAS Features
-- RAS/SR/SGGIT/CHA/BV-02-C: Characteristic GGIT -Real-time Ranging Data
-- RAS/SR/SGGIT/CHA/BV-03-C: Characteristic GGIT -On-demand Ranging Data
-- RAS/SR/SGGIT/CHA/BV-04-C: Characteristic GGIT -RAS Control Point
-
-These tests verify GATT server behavior for the Ranging Service,
-including service discovery, characteristic discovery.
+The profile is marked as experimental and requires D-Bus
+experimental flag to be enabled.
 
 ---
- Makefile.am     |   6 +
- unit/test-rap.c | 458 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 464 insertions(+)
- create mode 100644 unit/test-rap.c
+ Makefile.plugins       |   3 +
+ profiles/ranging/rap.c | 333 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 336 insertions(+)
+ create mode 100644 profiles/ranging/rap.c
 
-diff --git a/Makefile.am b/Makefile.am
-index cff5cc034..1f73a4fa0 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -757,6 +757,12 @@ unit_test_battery_SOURCES = unit/test-battery.c
- unit_test_battery_LDADD = src/libshared-glib.la \
- 				lib/libbluetooth-internal.la $(GLIB_LIBS)
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 654936176..b83a28257 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -106,6 +106,9 @@ endif
+ builtin_modules += battery
+ builtin_sources += profiles/battery/battery.c
  
-+unit_tests += unit/test-rap
++builtin_modules += rap
++builtin_sources += profiles/ranging/rap.c
 +
-+unit_test_rap_SOURCES = unit/test-rap.c $(btio_sources)
-+unit_test_rap_LDADD = src/libshared-glib.la \
-+				lib/libbluetooth-internal.la $(GLIB_LIBS)
-+
- if MIDI
- unit_tests += unit/test-midi
- unit_test_midi_CPPFLAGS = $(AM_CPPFLAGS) $(ALSA_CFLAGS) -DMIDI_TEST
-diff --git a/unit/test-rap.c b/unit/test-rap.c
+ if SIXAXIS
+ builtin_modules += sixaxis
+ builtin_sources += plugins/sixaxis.c
+diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
 new file mode 100644
-index 000000000..843c5f409
+index 000000000..f03454c72
 --- /dev/null
-+++ b/unit/test-rap.c
-@@ -0,0 +1,458 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
++++ b/profiles/ranging/rap.c
+@@ -0,0 +1,333 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * BlueZ - Bluetooth protocol stack for Linux
 + *
@@ -171,453 +157,328 @@ index 000000000..843c5f409
 +#include <config.h>
 +#endif
 +
-+#define _GNU_SOURCE
-+#include <unistd.h>
-+#include <string.h>
-+#include <sys/socket.h>
-+#include <fcntl.h>
-+
++#include <stdbool.h>
++#include <errno.h>
 +
 +#include <glib.h>
 +
++#include "gdbus/gdbus.h"
++
 +#include "bluetooth/bluetooth.h"
 +#include "bluetooth/uuid.h"
++
++#include "src/plugin.h"
++#include "src/adapter.h"
++#include "src/device.h"
++#include "src/profile.h"
++#include "src/service.h"
++#include "src/gatt-database.h"
++#include "attrib/gattrib.h"
 +#include "src/shared/util.h"
-+#include "src/shared/tester.h"
 +#include "src/shared/queue.h"
 +#include "src/shared/att.h"
 +#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-server.h"
 +#include "src/shared/gatt-client.h"
 +#include "src/shared/rap.h"
++#include "attrib/att.h"
++#include "src/log.h"
 +
-+struct test_data_ras {
-+	struct gatt_db *db;
-+	struct bt_gatt_server *server;
-+	struct bt_gatt_client *client;
-+	struct queue *ccc_states;
-+	size_t iovcnt;
-+	struct iovec *iov;
-+	unsigned int ras_id;
-+};
-+
-+struct test_data_rap {
-+	struct gatt_db *db;
++struct rap_data {
++	struct btd_device *device;
++	struct btd_service *service;
 +	struct bt_rap *rap;
-+	struct bt_gatt_client *client;
-+	size_t iovcnt;
-+	struct iovec *iov;
++	unsigned int ready_id;
 +};
 +
-+struct ccc_state {
-+	uint16_t handle;
-+	uint16_t value;
-+};
++static struct queue *sessions;
 +
-+struct notify {
-+	uint16_t handle, ccc_handle;
-+	uint8_t *value;
-+	uint16_t len;
-+	bt_gatt_server_conf_func_t conf;
-+	void *user_data;
-+};
-+
-+#define RAP_GATT_CLIENT_MTU	64
-+
-+#define iov_data(args...) ((const struct iovec[]) { args })
-+
-+#define define_test_ras(name, function, args...)		\
-+	do {							\
-+		const struct iovec iov[] = { args };		\
-+		static struct test_data_ras data;			\
-+		data.iovcnt = ARRAY_SIZE(iov_data(args));	\
-+		data.iov = util_iov_dup(iov, ARRAY_SIZE(iov_data(args))); \
-+		tester_add(name, &data, NULL, function,	\
-+				test_teardown_ras);			\
-+	} while (0)
-+
-+static void print_debug(const char *str, void *user_data)
++static struct rap_data *rap_data_new(struct btd_device *device)
 +{
-+	const char *prefix = user_data;
++	struct rap_data *data;
 +
-+	if (tester_use_debug())
-+		tester_debug("%s%s", prefix, str);
++	data = new0(struct rap_data, 1);
++	data->device = device;
++
++	return data;
 +}
 +
-+static void test_teardown_ras(const void *user_data)
++static void rap_debug(const char *str, void *user_data)
 +{
-+	struct test_data_ras *data = (void *)user_data;
-+
-+	bt_gatt_server_unref(data->server);
-+	util_iov_free(data->iov, data->iovcnt);
-+	gatt_db_unref(data->db);
-+	bt_rap_unregister(data->ras_id);
-+
-+	queue_destroy(data->ccc_states, free);
-+
-+	tester_teardown_complete();
++	DBG_IDX(0xffff, "%s", str);
 +}
 +
-+static void test_teardown_rap(const void *user_data)
++static void rap_data_add(struct rap_data *data)
 +{
-+	struct test_data_rap *data = (void *)user_data;
++	DBG("%p", data);
 +
-+	bt_rap_unref(data->rap);
-+	bt_gatt_client_unref(data->client);
-+	util_iov_free(data->iov, data->iovcnt);
-+	gatt_db_unref(data->db);
-+
-+	tester_teardown_complete();
-+}
-+
-+static void test_complete_cb(const void *user_data)
-+{
-+	tester_test_passed();
-+}
-+
-+static bool ccc_state_match(const void *a, const void *b)
-+{
-+	const struct ccc_state *ccc = a;
-+	uint16_t handle = PTR_TO_UINT(b);
-+
-+	return ccc->handle == handle;
-+}
-+
-+static struct ccc_state *find_ccc_state(struct test_data_ras *data,
-+			uint16_t handle)
-+{
-+	return queue_find(data->ccc_states, ccc_state_match,
-+				UINT_TO_PTR(handle));
-+}
-+
-+static struct ccc_state *get_ccc_state(struct test_data_ras *data,
-+			uint16_t handle)
-+{
-+	struct ccc_state *ccc;
-+
-+	ccc = find_ccc_state(data, handle);
-+	if (ccc)
-+		return ccc;
-+
-+	ccc = new0(struct ccc_state, 1);
-+	ccc->handle = handle;
-+	queue_push_tail(data->ccc_states, ccc);
-+
-+	return ccc;
-+}
-+
-+static void gatt_notify_cb(struct gatt_db_attribute *attrib,
-+					struct gatt_db_attribute *ccc,
-+					const uint8_t *value, size_t len,
-+					struct bt_att *att, void *user_data)
-+{
-+	struct test_data_ras *data = user_data;
-+	struct notify notify;
-+
-+	memset(&notify, 0, sizeof(notify));
-+
-+	notify.handle = gatt_db_attribute_get_handle(attrib);
-+	notify.ccc_handle = gatt_db_attribute_get_handle(ccc);
-+	notify.value = (void *) value;
-+	notify.len = len;
-+
-+	printf("%s: notify.value:%d notify->len:%d\n", __func__,
-+		(int)*(notify.value), notify.len);
-+	if (!bt_gatt_server_send_notification(data->server,
-+			notify.handle, notify.value,
-+			notify.len, false))
-+		printf("%s: Failed to send notification\n", __func__);
-+}
-+
-+static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
-+					unsigned int id, uint16_t offset,
-+					uint8_t opcode, struct bt_att *att,
-+					void *user_data)
-+{
-+	struct test_data_ras *data = user_data;
-+	struct ccc_state *ccc;
-+	uint16_t handle;
-+	uint8_t ecode = 0;
-+	const uint8_t *value = NULL;
-+	size_t len = 0;
-+
-+	handle = gatt_db_attribute_get_handle(attrib);
-+
-+	ccc = get_ccc_state(data, handle);
-+	if (!ccc) {
-+		ecode = BT_ATT_ERROR_UNLIKELY;
-+		goto done;
++	if (queue_find(sessions, NULL, data)) {
++		error("data %p already added", data);
++		return;
 +	}
 +
-+	len = sizeof(ccc->value);
-+	value = (void *) &ccc->value;
++	bt_rap_set_debug(data->rap, rap_debug, NULL, NULL);
 +
-+done:
-+	gatt_db_attribute_read_result(attrib, id, ecode, value, len);
++	if (!sessions)
++		sessions = queue_new();
++
++	queue_push_tail(sessions, data);
++
++	if (data->service)
++		btd_service_set_user_data(data->service, data);
 +}
 +
-+static void ras_attached(struct bt_rap *rap, void *user_data)
++static bool match_data(const void *data, const void *match_data)
 +{
++	const struct rap_data *mdata = data;
++	const struct bt_rap *rap = match_data;
++
++	return mdata->rap == rap;
 +}
 +
-+static void ras_detached(struct bt_rap *rap, void *user_data)
++static void rap_data_free(struct rap_data *data)
 +{
-+	bt_rap_unref(rap);
++	if (data->service) {
++		btd_service_set_user_data(data->service, NULL);
++		bt_rap_set_user_data(data->rap, NULL);
++	}
++
++	bt_rap_ready_unregister(data->rap, data->ready_id);
++	bt_rap_unref(data->rap);
++	free(data);
 +}
 +
-+static void test_server(const void *user_data)
++static void rap_data_remove(struct rap_data *data)
 +{
-+	struct test_data_ras *data = (void *)user_data;
++	DBG("%p", data);
++
++	if (!queue_remove(sessions, data))
++		return;
++
++	rap_data_free(data);
++
++	if (queue_isempty(sessions)) {
++		queue_destroy(sessions, NULL);
++		sessions = NULL;
++	}
++}
++
++static void rap_detached(struct bt_rap *rap, void *user_data)
++{
++	struct rap_data *data;
++
++	DBG("%p", rap);
++
++	data = queue_find(sessions, match_data, rap);
++	if (!data) {
++		error("unable to find session");
++		return;
++	}
++
++	rap_data_remove(data);
++}
++
++static void rap_ready(struct bt_rap *rap, void *user_data)
++{
++	DBG("%p", rap);
++}
++
++static void rap_attached(struct bt_rap *rap, void *user_data)
++{
++	struct rap_data *data;
 +	struct bt_att *att;
-+	struct io *io;
++	struct btd_device *device;
 +
-+	io = tester_setup_io(data->iov, data->iovcnt);
-+	g_assert(io);
++	DBG("%p", rap);
 +
-+	tester_io_set_complete_func(test_complete_cb);
++	data = queue_find(sessions, match_data, rap);
++	if (data) {
++		DBG("data is already present");
++		return;
++	}
 +
-+	att = bt_att_new(io_get_fd(io), false);
-+	g_assert(att);
++	att = bt_rap_get_att(rap);
++	if (!att) {
++		error("Unable to get att");
++		return;
++	}
 +
-+	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
++	device = btd_adapter_find_device_by_fd(bt_att_get_fd(att));
++	if (!device) {
++		error("unable to find device");
++		return;
++	}
 +
-+	data->db = gatt_db_new();
-+	g_assert(data->db);
++	data = rap_data_new(device);
++	data->rap = rap;
 +
-+	gatt_db_ccc_register(data->db, gatt_ccc_read_cb, NULL,
-+					gatt_notify_cb, data);
-+
-+	bt_rap_add_db(data->db);
-+
-+	data->ras_id = bt_rap_register(ras_attached, ras_detached, NULL);
-+
-+	data->server = bt_gatt_server_new(data->db, att, 64, 0);
-+	g_assert(data->server);
-+
-+	bt_gatt_server_set_debug(data->server, print_debug, "bt_gatt_server:",
-+					NULL);
-+
-+	data->ccc_states = queue_new();
-+
-+	tester_io_send();
-+
-+	bt_att_unref(att);
++	rap_data_add(data);
 +}
 +
-+/*
-+ *  ATT: Exchange MTU Request (0x02) len 2
-+ *       Client RX MTU: 64
-+ *
-+ *  ATT: Exchange MTU Response (0x03) len 2
-+ *        Server RX MTU: 64
-+ */
-+#define ATT_EXCHANGE_MTU	IOV_DATA(0x02, 0x40, 0x00), \
-+	IOV_DATA(0x03, 0x40, 0x00)
-+
-+/*
-+ *  ATT: Read By Group Type Request (0x10) len 6
-+ *       Handle range: 0x0001-0xffff
-+ *       Attribute group type: Primary Service (0x2800)
-+ *
-+ *  ATT: Read By Group Type Response (0x11) len 7
-+ *       Attribute data length: 6
-+ *       Attribute group list: 1 entry
-+ *       Handle range: 0x0001-0x0012
-+ *       UUID: Ranging Service (0x185b)
-+ *
-+ *  ATT: Read By Group Type Request (0x10) len 6
-+ *      Handle range: 0x0013-0xffff
-+ *      Attribute group type: Primary Service (0x2800)
-+ *
-+ *  ATT: Error Response (0x01) len 4
-+ *      Read By Group Type Request (0x10)
-+ *      Handle: 0x0013
-+ *      Error: Attribute Not Found (0x0a)
-+ */
-+#define DISCOVER_PRIM_SERV_NOTIF \
-+	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28), \
-+	IOV_DATA(0x11, 0x06, 0x01, 0x00, 0x12, 0x00, 0x5b, 0x18), \
-+	IOV_DATA(0x10, 0x13, 0x00, 0xff, 0xff, 0x00, 0x28), \
-+	IOV_DATA(0x01, 0x10, 0x13, 0x00, 0x0a)
-+
-+/*
-+ *  ATT: Find By Type Value Request (0x06) len 8
-+ *       Handle range: 0x0001-0xffff
-+ *       Attribute type: Primary Service (0x2800)
-+ *       UUID: Ranging Service (0x185b)
-+ *
-+ *  ATT: Find By Type Value Response (0x07) len 4
-+ *       Handle range: 0x0001-0x0012
-+ *
-+ *  ATT: Find By Type Value Request (0x06) len 8
-+ *       Handle range: 0x0013-0xffff
-+ *       Attribute type: Primary Service (0x2800)
-+ *       UUID: Ranging Service (0x185b)
-+ *
-+ *  ATT: Error Response (0x01) len 4
-+ *       Find By Type Value Request (0x06)
-+ *       Handle: 0x0013
-+ *       Error: Attribute Not Found (0x0a)
-+ */
-+#define RAS_FIND_BY_TYPE_VALUE \
-+	IOV_DATA(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x5b, 0x18), \
-+	IOV_DATA(0x07, 0x01, 0x00, 0x12, 0x00), \
-+	IOV_DATA(0x06, 0x13, 0x00, 0xff, 0xff, 0x00, 0x28, 0x5b, 0x18), \
-+	IOV_DATA(0x01, 0x06, 0x13, 0x00, 0x0a)
-+
-+/*
-+ *  ATT: Read By Type Request (0x08) len 6
-+ *       Handle range: 0x0001-0x0012
-+ *       Attribute type: Characteristic (0x2803)
-+ *
-+ *  ATT: Read By Type Response (0x09) len 44
-+ *       Attribute data length: 7
-+ *       Attribute data list: 6 entries
-+ *       Handle: 0x0002 - RAS Features
-+ *       Value: 020003142c
-+ *       Handle: 0x0004 - Real-time Ranging Data
-+ *       Value: 300005152c
-+ *       Handle: 0x0007 - On-demand Ranging Data
-+ *       Value: 300008162c
-+ *       Handle: 0x000a - RAS Control Point
-+ *       Value: 24000b172c
-+ *       Handle: 0x000d - RAS Data Ready
-+ *       Value: 32000e182c
-+ *       Handle: 0x0010 - RAS Data Overwritten
-+ *       Value: 320011192c
-+ *
-+ *  ATT: Read By Type Request (0x08) len 6
-+ *       Handle range: 0x0011-0x0012
-+ *       Attribute type: Characteristic (0x2803)
-+ *
-+ *  ATT: Error Response (0x01) len 4
-+ *       Read By Type Request (0x08)
-+ *       Handle: 0x0011
-+ *       Error: Attribute Not Found (0x0a)
-+ */
-+#define DISC_RAS_CHAR_AFTER_TYPE \
-+	IOV_DATA(0x08, 0x01, 0x00, 0x12, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x09, 0x07, \
-+		0x02, 0x00, 0x02, 0x03, 0x00, 0x14, 0x2c, \
-+		0x04, 0x00, 0x30, 0x05, 0x00, 0x15, 0x2c, \
-+		0x07, 0x00, 0x30, 0x08, 0x00, 0x16, 0x2c, \
-+		0x0a, 0x00, 0x24, 0x0b, 0x00, 0x17, 0x2c, \
-+		0x0d, 0x00, 0x32, 0x0e, 0x00, 0x18, 0x2c, \
-+		0x10, 0x00, 0x32, 0x11, 0x00, 0x19, 0x2c), \
-+	IOV_DATA(0x08, 0x11, 0x00, 0x12, 0x00, 0x03, 0x28), \
-+	IOV_DATA(0x01, 0x08, 0x11, 0x00, 0x0a)
-+
-+/*
-+ *  ATT: Find Information Request (0x04) len 4
-+ *       Handle range: 0x0006-0x0012
-+ *
-+ *  ATT: Find Information Response (0x05) len 53
-+ *       Format: UUID-16 (0x01)
-+ *       Handle: 0x0006
-+ *       UUID: Client Characteristic Configuration (0x2902)
-+ *       Handle: 0x0007
-+ *       UUID: Characteristic (0x2803)
-+ *       Handle: 0x0008
-+ *       UUID: On-demand Ranging Data (0x2c16)
-+ *       Handle: 0x0009
-+ *       UUID: Client Characteristic Configuration (0x2902)
-+ *       Handle: 0x000a
-+ *       UUID: Characteristic (0x2803)
-+ *       Handle: 0x000b
-+ *       UUID: RAS Control Point (0x2c17)
-+ *       Handle: 0x000c
-+ *       UUID: Client Characteristic Configuration (0x2902)
-+ *       Handle: 0x000d
-+ *       UUID: Characteristic (0x2803)
-+ *       Handle: 0x000e
-+ *       UUID: RAS Data Ready (0x2c18)
-+ *       Handle: 0x000f
-+ *       UUID: Client Characteristic Configuration (0x2902)
-+ *       Handle: 0x0010
-+ *       UUID: Characteristic (0x2803)
-+ *       Handle: 0x0011
-+ *       UUID: RAS Data Overwritten (0x2c19)
-+ *       Handle: 0x0012
-+ *       UUID: Client Characteristic Configuration (0x2902)
-+ *
-+ *  ATT: Find Information Request (0x04) len 4
-+ *       Handle range: 0x0013-0x0013
-+ *
-+ *  ATT: Error Response (0x01) len 4
-+ *       Find Information Request (0x04)
-+ *       Handle: 0x0013
-+ *       Error: Attribute Not Found (0x0a)
-+ */
-+#define RAS_FIND_INFO \
-+	IOV_DATA(0x04, 0x06, 0x00, 0x12, 0x00), \
-+	IOV_DATA(0x05, 0x01, \
-+		0x06, 0x00, 0x02, 0x29, \
-+		0x07, 0x00, 0x03, 0x28, \
-+		0x08, 0x00, 0x16, 0x2c, \
-+		0x09, 0x00, 0x02, 0x29, \
-+		0x0a, 0x00, 0x03, 0x28, \
-+		0x0b, 0x00, 0x17, 0x2c, \
-+		0x0c, 0x00, 0x02, 0x29, \
-+		0x0d, 0x00, 0x03, 0x28, \
-+		0x0e, 0x00, 0x18, 0x2c, \
-+		0x0f, 0x00, 0x02, 0x29, \
-+		0x10, 0x00, 0x03, 0x28, \
-+		0x11, 0x00, 0x19, 0x2c, \
-+		0x12, 0x00, 0x02, 0x29), \
-+	IOV_DATA(0x04, 0x13, 0x00, 0x13, 0x00), \
-+	IOV_DATA(0x01, 0x04, 0x13, 0x00, 0x0a)
-+
-+
-+#define RAS_SR_SGGIT_SER_BV_01_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE
-+
-+#define RAS_SR_SGGIT_CHA_BV_01_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE, \
-+	DISC_RAS_CHAR_AFTER_TYPE
-+
-+#define RAS_SR_SGGIT_CHA_BV_02_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE, \
-+	DISC_RAS_CHAR_AFTER_TYPE, \
-+	RAS_FIND_INFO
-+
-+#define RAS_SR_SGGIT_CHA_BV_03_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE, \
-+	DISC_RAS_CHAR_AFTER_TYPE, \
-+	RAS_FIND_INFO
-+
-+#define RAS_SR_SGGIT_CHA_BV_04_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE, \
-+	DISC_RAS_CHAR_AFTER_TYPE, \
-+	RAS_FIND_INFO
-+
-+int main(int argc, char *argv[])
++static int rap_probe(struct btd_service *service)
 +{
-+	tester_init(&argc, &argv);
++	struct btd_device *device = btd_service_get_device(service);
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++	struct rap_data *data = btd_service_get_user_data(service);
++	char addr[18];
 +
-+	/* RAS Testcases */
-+	define_test_ras("RAS/SR/SGGIT/SER/BV-01-C", test_server,
-+					RAS_SR_SGGIT_SER_BV_01_C);
-+	define_test_ras("RAS/SR/SGGIT/CHA/BV-01-C", test_server,
-+					RAS_SR_SGGIT_CHA_BV_01_C);
-+	define_test_ras("RAS/SR/SGGIT/CHA/BV-02-C", test_server,
-+					RAS_SR_SGGIT_CHA_BV_02_C);
-+	define_test_ras("RAS/SR/SGGIT/CHA/BV-03-C", test_server,
-+					RAS_SR_SGGIT_CHA_BV_03_C);
-+	define_test_ras("RAS/SR/SGGIT/CHA/BV-04-C", test_server,
-+					RAS_SR_SGGIT_CHA_BV_04_C);
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
 +
-+	return tester_run();
++	/*Ignore, if we probed for this device already */
++	if (data) {
++		error("Profile probed twice for this device");
++		return -EINVAL;
++	}
++
++	data = rap_data_new(device);
++	data->service = service;
++
++	data->rap = bt_rap_new(btd_gatt_database_get_db(database),
++				btd_device_get_gatt_db(device));
++
++	if (!data->rap) {
++		error("unable to create RAP instance");
++		free(data);
++		return -EINVAL;
++	}
++
++	rap_data_add(data);
++
++	data->ready_id = bt_rap_ready_register(data->rap, rap_ready, service,
++								NULL);
++
++	bt_rap_set_user_data(data->rap, service);
++
++	return 0;
 +}
++
++static void rap_remove(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct rap_data *data;
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	data = btd_service_get_user_data(service);
++	if (!data) {
++		error("RAP Service not handled by profile");
++		return;
++	}
++
++	rap_data_remove(data);
++}
++
++static int rap_accept(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
++	struct rap_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	if (!data) {
++		error("RAP Service not handled by profile");
++		return -EINVAL;
++	}
++
++	if (!bt_rap_attach(data->rap, client)) {
++		error("RAP unable to attach");
++		return -EINVAL;
++	}
++
++	btd_service_connecting_complete(service, 0);
++
++	return 0;
++}
++
++static int rap_disconnect(struct btd_service *service)
++{
++	DBG(" ");
++	btd_service_disconnecting_complete(service, 0);
++	return 0;
++}
++
++static int rap_connect(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	return 0;
++}
++
++static int rap_server_probe(struct btd_profile *p,
++				  struct btd_adapter *adapter)
++{
++
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++
++	DBG("RAP path %s", adapter_get_path(adapter));
++
++	bt_rap_add_db(btd_gatt_database_get_db(database));
++
++	return 0;
++}
++
++static void rap_server_remove(struct btd_profile *p,
++					struct btd_adapter *adapter)
++{
++	DBG("");
++}
++/* Profile definition */
++static struct btd_profile rap_profile = {
++	.name		= "rap",
++	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.remote_uuid	= GATT_UUID,
++	.local_uuid	= RAS_UUID,
++
++	.device_probe	= rap_probe,
++	.device_remove	= rap_remove,
++
++	.accept		= rap_accept,
++	.connect	= rap_connect,
++	.disconnect	= rap_disconnect,
++
++	.adapter_probe = rap_server_probe,
++	.adapter_remove = rap_server_remove,
++
++	.experimental	= true,
++};
++
++static unsigned int rap_id;
++/* Plugin init/exit */
++static int rap_init(void)
++{
++	DBG("");
++	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
++		DBG("D-Bus experimental not enabled");
++		return -ENOTSUP;
++	}
++
++	btd_profile_register(&rap_profile);
++	rap_id = bt_rap_register(rap_attached, rap_detached, NULL);
++
++	return 0;
++}
++
++static void rap_exit(void)
++{
++	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
++		btd_profile_unregister(&rap_profile);
++		bt_rap_unregister(rap_id);
++	}
++}
++
++/* Plugin definition */
++BLUETOOTH_PLUGIN_DEFINE(rap, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++			rap_init, rap_exit)
 -- 
 2.34.1
 
