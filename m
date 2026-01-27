@@ -1,36 +1,36 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1AE309DAF
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10C42EB878
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769534803; cv=none; b=T6PIMDTTClPOmMSn1yKb/Hc0bNsQ82rBAzUSHU57f/3wu45vxo+BJz5Hl4sN6/+c74uUREgmPHLvOOyGoPT9cUCZfi0WdRlQpiyawosEEYTEvP5zN/ENDZk0DkFXgQBfSFivQkMrgvCvAAK/z//7d7YkQfVQUAj0LXXe1+szN3E=
+	t=1769534806; cv=none; b=jBpWvTZf/IIydLbCesKEMW0r8rF+VDXfwmPRGQ5s+OXVgTPnnMwUdB/NEh/zm4txm8oiWVDJbYZEXSdNKyyIuIQC1aaie6PGkI4vs1qwANfOEyjJ37qoWglJpcKU1kezI2SdI8lTEAofBQxILjQze4+DJ8vdFwLkxgR1inoc2Sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769534803; c=relaxed/simple;
-	bh=zaYkYaFm8Ru/lpLBNbyobLpPPIp0lxuv7rJCMHbXPSs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=syrD5Rar5uYYFgVUb8EPPsG75xTcFaYnBoL71K42Cow5aKnYVCPmEo4wM09o+YKwxy/JKoeD8G5k8xGuD8OXYm5rdeyZ9wR25KdL422MpZj4t9W8NLtTfuY4dEigsonspvrW3Ww0ffJBVMhXS3ayND0+HI8LM9q9aAHwmXdI9JM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=nFh8drkV; arc=none smtp.client-ip=192.30.252.203
+	s=arc-20240116; t=1769534806; c=relaxed/simple;
+	bh=ezeAiWNHwIrNYn892y6oKJs0cXbjq4pif1zv4bqyhe4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=JdlQ+Ek+n8KMVynQN1zaWE2d8nl14KgDuwJ9rqKQiDmg2k6vADOUGYk8lTIXg7to+uBInsl3aIMnxLFSA/JU07Vo+c3lKN6jmB7YfcvuQmm7puqTn8GQUTRG7c2oK4qf6cHaVH6R+xukm9yqC2voUTXYf7Z6D+q1EFk4beAHSb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=izxG/dpy; arc=none smtp.client-ip=192.30.252.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="nFh8drkV"
-Received: from github.com (hubbernetes-node-a9cd48c.va3-iad.github.net [10.48.142.31])
-	by smtp.github.com (Postfix) with ESMTPA id 91DFF3C115F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 09:26:33 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="izxG/dpy"
+Received: from github.com (hubbernetes-node-4624538.va3-iad.github.net [10.48.130.39])
+	by smtp.github.com (Postfix) with ESMTPA id 73DC4E089C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 09:26:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1769534793;
-	bh=cJzV+pmNG7XSj2/LQuCXXYja8yxA4MdGH0F1GojyW3k=;
+	s=pf2023; t=1769534795;
+	bh=Fb5sVPhnv4VU8ICgCmKuJlzSJle7Lv3MewMztJS7Xrc=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=nFh8drkVjW/kIs1lBQyEaNFmptKPcNMnDrf6RIpi96MRtiq7OHnRGs4exSqkNT6eC
-	 ITW4ZIBRr476gNByhOVHht19jWDyRLNE/dQh6eWLa/GXBqly1IvZpGfv5UwI1kUq+O
-	 6jHD+4Bx4DnH84awtOW3By9KNujBbD4KIvAGuz+c=
-Date: Tue, 27 Jan 2026 09:26:33 -0800
+	b=izxG/dpy+ZS7yd8T9de2VabPQol/yAwzzu6JEgbWh+A1TNb1AxzSdfo8NfyFGITSs
+	 1JcrsmJCQ3SANwFkVud23eQD3lDwDYdxZxNYT4D9CkWAJSf5LtIAzq/pgiTbRRwco6
+	 V/+RYQAkSFrTrNPvUWdj5FlxD9J5AQ/1XlG//mXk=
+Date: Tue, 27 Jan 2026 09:26:35 -0800
 From: fdanis-oss <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1047700/000000-4b543c@github.com>
-Subject: [bluez/bluez] 4b543c: doc/qualification: Add PICS and howto for the
- HoGP...
+Message-ID: <bluez/bluez/push/refs/heads/1047701/000000-a15b57@github.com>
+Subject: [bluez/bluez] a15b57: doc/qualification: Add PICS and howto for the
+ HSP ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,21 +43,21 @@ Content-Transfer-Encoding: quoted-printable
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1047700
+  Branch: refs/heads/1047701
   Home:   https://github.com/bluez/bluez
-  Commit: 4b543c9b99d1e1dc97f3ee57df89c4577f659893
-      https://github.com/bluez/bluez/commit/4b543c9b99d1e1dc97f3ee57df89c=
-4577f659893
+  Commit: a15b577e4657f23d656a5f0a64adaf5b9cddbfdd
+      https://github.com/bluez/bluez/commit/a15b577e4657f23d656a5f0a64ada=
+f5b9cddbfdd
   Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
   Date:   2026-01-27 (Tue, 27 Jan 2026)
 
   Changed paths:
-    A doc/qualification/hogp-pics.rst
-    A doc/qualification/hogp-pts.rst
+    A doc/qualification/hsp-pics.rst
+    A doc/qualification/hsp-pts.rst
 
   Log Message:
   -----------
-  doc/qualification: Add PICS and howto for the HoGP qualification
+  doc/qualification: Add PICS and howto for the HSP qualification
 
 
 
