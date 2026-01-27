@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6B9310774
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C63F30E82B
 	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769535535; cv=none; b=K9zA6pNsGLnPyu0Uhw4YGYdNQ3SpelaWY8Qks8E4lPeqOXF8RL3fPqJk2etv1swQipitE5qe0n3HS7xw5DAgIyXmYpwGjz3gmVbKX6E+ZvAh7qSq+1OVL1aGEiiBflofpCo4qaJcD/H599Kj3Lr7kFJEDW2p+xRBS5vdOYY7qY0=
+	t=1769535535; cv=none; b=QvegxFbQjzgy9h0SEOnDXe3WnBPof3u6Ahn7erdmBX5Cyb32F1aOF1Ir24G3pcKSrvEtUfKhdI9+2CliUuLwQqdy0aQCWDNyYgJDjEHIHh0zyqCd8lTOYYcimz0vER2GQx6to6TYcJ+IIpYvyp3bpVvNmMdTF+Ce88AWA28P8fA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769535535; c=relaxed/simple;
-	bh=vRiqzp9Sl4ErRLjfcFjGruGsCchFE1iwgCEshue9DEA=;
+	bh=3sy1DVgexuVbIaQLzeR1o5NEoYbKKNgharqslxe58G0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A7csRfrf8HppXH7hl6XWZ6kkr26MRmotivE0duQGblc48FvfGozUx5FUgCSe4frH5iz7qCkMCVs8Z1PPCZPe1IJfRh4dBhKgPTC4P7X9NkNH0wAeL1wCsBKSllvIGpvK+GfQhAE2/d7ApaTfmESG2YcqBCW+s0raZjWY8QnI+Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=MDiGP6UH; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=WQoXQElSH5nF0GG/HCqp+upwJ4XnLGySwFXhVprsZpo8xySY4KJOpb/4/mo9X0uBAZHcuDXQzHgKkbCmFsfzvIxK75wVg42nnwWDifAX8Xq5kwUTVVa6Rq0V3n7rQFMnh6jAjQKY2gbiM8ccOxthbUhp2wIWZOOJ7kk14ZQNggs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=kNMp5l7m; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="MDiGP6UH"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="kNMp5l7m"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1769535529;
-	bh=vRiqzp9Sl4ErRLjfcFjGruGsCchFE1iwgCEshue9DEA=;
+	bh=3sy1DVgexuVbIaQLzeR1o5NEoYbKKNgharqslxe58G0=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=MDiGP6UH6dHwz/lGiOs2iMs6N4MBqJ9qhoQJ+QtIPFdKqhrWlkULs3Bu4iMxcxT9D
-	 f9sSprunM41GSp4Ks22irw534EXQTcdbJrukvigI/FprU7crwpIl9mMlUKTPOdunfM
-	 zbrFOiQaq09qaBEUx8xxrv71amL3svuT+GUeZO/3NGxaz44K9gD6jfK7VKhUCy0FTd
-	 BNoE4sAsUWiG4HW0eufQ/oUzuCZgYIUoqr0Ij4KyDuRwusAiFkckpzhXD7VRx0go1F
-	 IGOad41qiG2OcR98OTc6hpPdipV/gC8zKXxwa34K82UZlSXLPpYaRzWzvNrS1MPJxq
-	 Ja8yWOl/nuo2A==
+	b=kNMp5l7msTlGaVSZPZlTqiuUh0IkJaw3kc9Zr0L6wErAYqDUvbavKatVJejtcDmuq
+	 VzEuOr1xSciPh4dtqun1BPquQmC/O/dYNmAcAZZQ2qwb+9Ckdpjf8dKQYST2v+XjSF
+	 8rjcPHHRhi7DuM+Gm++wnYB/x/ChRRQWe0dPXHI0I0fnmJjxP19XsbEAJWMUhC3BDm
+	 39Y3s+VVFQnr9uO5JetBk2L9Qc+AAGAt5NQJ0iSzpKm0UxTXe9nDSD/hQAqz6JRdXW
+	 nqLuqScITIbdUkklZwzg7kdFBOdmG7BobfRKQTMS7dTcW3Qhujpi9TVQgn4cke9ySs
+	 w50Z/ycb5MlIg==
 Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-871c-6E70-D798-Dfc2.rev.sfr.net [IPv6:2a02:8428:af44:1001:871c:6e70:d798:dfc2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 96D3117E151C
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4D65017E1513
 	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 18:38:49 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 07/13] doc/qualification: Add PICS and howto for the RFComm qualification
-Date: Tue, 27 Jan 2026 18:38:35 +0100
-Message-ID: <20260127173841.153747-7-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2 06/13] doc/qualification: Add PICS and howto for the HID qualification
+Date: Tue, 27 Jan 2026 18:38:34 +0100
+Message-ID: <20260127173841.153747-6-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260127173841.153747-1-frederic.danis@collabora.com>
 References: <20260127173841.153747-1-frederic.danis@collabora.com>
@@ -51,137 +51,415 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
 ---
- doc/qualification/rfcomm-pics.rst | 106 ++++++++++++++++++++++++++++++
- doc/qualification/rfcomm-pts.rst  |  58 ++++++++++++++++
- 2 files changed, 164 insertions(+)
- create mode 100644 doc/qualification/rfcomm-pics.rst
- create mode 100644 doc/qualification/rfcomm-pts.rst
+ doc/qualification/hid-pics.rst | 385 +++++++++++++++++++++++++++++++++
+ doc/qualification/hid-pts.rst  |  61 ++++++
+ 2 files changed, 446 insertions(+)
+ create mode 100644 doc/qualification/hid-pics.rst
+ create mode 100644 doc/qualification/hid-pts.rst
 
-diff --git a/doc/qualification/rfcomm-pics.rst b/doc/qualification/rfcomm-pics.rst
+diff --git a/doc/qualification/hid-pics.rst b/doc/qualification/hid-pics.rst
 new file mode 100644
-index 000000000..5ab1b07be
+index 000000000..0f63efb93
 --- /dev/null
-+++ b/doc/qualification/rfcomm-pics.rst
-@@ -0,0 +1,106 @@
++++ b/doc/qualification/hid-pics.rst
+@@ -0,0 +1,385 @@
 +.. SPDX-License-Identifier: GPL-2.0-or-later
 +.. Copyright © 2025-2026 Collabora Ltd.
 +
-+===============
-+RFComm Protocol
-+===============
-+(TCRL pkg101, RFCOMM.ICS.p8)
-+
++==============================
++Human Interface Device Profile
++==============================
++(TCRL 2023-1, HID.ICS.p9)
 +
 +Versions
 +========
-+**Table 0: X.Y Versions**
++**Table 0: Major Versions (X.Y)**
 +
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_RFCOMM_0_1  |          | RFCOMM v1.1 with TS 07.10 (C.1)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_0_2  | x        | RFCOMM v1.2 with TS 07.10 (C.1)              |
-++------------------+----------+----------------------------------------------+
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_0_1   | x        | HID v1.0 (M)                                   |
+++----------------+----------+------------------------------------------------+
 +
-+- C.1: Mandatory to support one and only one.
++Roles
++=====
++**Table 1: Role Requirements**
 +
-+Core Configuration
-+==================
-+**Table 0a: Core Configuration Requirements**
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_1_1   | x        | Host, Report protocol (C.1)                    |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_1_2   |          | Device (C.1)                                   |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_1_3   |          | Host, Boot protocol (C.1)                      |
+++----------------+----------+------------------------------------------------+
 +
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_RFCOMM_0a_1 | x        | Protocol supported over BR/EDR (C.1, C.3)    |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_0a_2 |          | 2 Protocol supported over LE (C.2)           |
-++------------------+----------+----------------------------------------------+
++- C.1: Mandatory to support at least one of HID 1/1 "Host, Report protocol"
++  OR HID 1/2 "Device" OR HID 1/3 "Host, Boot protocol".
 +
-+- C.1: Excluded for this Protocol IF CORE 41/2 “LE Core Configuration”.
-+- C.2: Excluded for this Protocol.
-+- C.3: Mandatory for this Protocol.
++Host Role
++=========
++**Table 2: Application Procedures**
 +
-+2.3 Supported procedures
-+========================
-+**Table 1: Supported Procedures**
++Prerequisite: HID 1/1 "Host, Report protocol" OR HID 1/3 "Host, Boot protocol"
 +
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_RFCOMM_1_1  | x        | Initialize RFCOMM Session (C.5)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_2  | x        | Respond to Initialization of an RFCOMM       |
-+|                  |          | Session (C.5)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_3  | x        | Shutdown RFCOMM Session (M)                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_4  | x        | Respond to a Shutdown of an RFCOMM Session   |
-+|                  |          | (M)                                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_5  | x        | Establish DLC (C.2)                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_6  | x        | Respond to Establishment of a DLC (C.1)      |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_7  | x        | Disconnect DLC (M)                           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_8  | x        | Respond to Disconnection of a DLC (M)        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_9  | x        | Respond to and send MSC Command (M)          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_10 | x        | Initiate Transfer Information (M)            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_11 | x        | Respond to Test Command (M)                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_12 | x        | Send Test Command (O)                        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_13 | x        | React to Aggregate Flow Control (M)          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_14 | x        | Respond to RLS Command (M)                   |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_15 |          | Send RLS Command (O)                         |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_16 | x        | Respond to PN Command (M)                    |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_17 | x        | Send PN Command (C.3)                        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_18 | x        | Send Non-Supported Command (NSC) response    |
-+|                  |          | (C.4)                                        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_19 | x        | Respond to RPN Command (M)                   |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_20 | x        | Send RPN Command (O)                         |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_21 | x        | Closing Multiplexer by First Sending a DISC  |
-+|                  |          | Command (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_RFCOMM_1_22 | x        | Support of Credit Based Flow Control (M)     |
-++------------------+----------+----------------------------------------------+
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_2_1   | x        | Establish HID connection (C.4)                 |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_2   | x        | Accept HID connection (C.4)                    |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_3   | x        | Terminate HID connection (C.4)                 |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_4   | x        | Accept Termination of HID connection (C.4)     |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_5   | x        | Support for virtual cables (C.4)               |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_6   | x        | HID initiated reconnection (C.4)               |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_7   | x        | Host initiated reconnection (C.4)              |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_8   | x        | Host data transfer to HID (C.1)                |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_9   | x        | HID data transfer to Host (C.1)                |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_10  |          | HID Boot mode data transfer to Host (C.2)      |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_11  |          | Host Boot mode data transfer to HID (C.2)      |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_12  |          | Support for Application to send GET_REPORT (O) |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_13  |          | Support for Application to send SET_REPORT (O) |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_14  |          | Support for sending HCI_CONTROL with           |
++|                |          | VIRTUAL_CABLE_UNPLUG (C.3)                     |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_2_15  |          | Support for receiving HCI_CONTROL with         |
++|                |          | VIRTUAL_CABLE_UNPLUG (C.3)                     |
+++----------------+----------+------------------------------------------------+
++
++- O: Optional
++- C.1: Mandatory IF HID 1/1 "Host, Report protocol", otherwise Optional.
++- C.2: Mandatory IF HID 1/3 "Host, Boot protocol", otherwise Optional.
++- C.3: Optional IF HID 2/5 "Support for virtual cables", otherwise Excluded.
++- C.4: Mandatory IF HID 1/1 "Host, Report protocol", otherwise Optional.
++
++Host Role
++=========
++**Table 3: Device to Host Transfers**
++
++Prerequisite: HID 1/1 "Host, Report protocol" OR HID 1/3 "Host, Boot protocol"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_3_1   |          | Data reports larger than host MTU on Control   |
++|                |          | channel (O)                                    |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_3_2   |          | Data reports larger than host MTU on Interrupt |
++|                |          | channel (C.1)                                  |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_3_3   |          | Data reports to host (C.1)                     |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_3_4   |          | Boot mode reports to host (C.2)                |
+++----------------+----------+------------------------------------------------+
++
++- O: Optional
++- C.1: Excluded IF HID 1/3 "Host, Boot protocol", otherwise Mandatory IF HID
++  2/12 "Support for Application to send GET_REPORT", otherwise Optional.
++- C.2: Mandatory IF HID 1/3 "Host, Boot protocol", otherwise Optional.
++
++Host Role
++=========
++**Table 4: Host to Device Transfers**
++
++Prerequisite: HID 1/1 "Host, Report protocol" OR HID 1/3 "Host, Boot protocol"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_4_1   |          | Data reports larger than device MTU on Control |
++|                |          | channel (C.1)                                  |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_4_2   |          | Data reports larger than device MTU on         |
++|                |          | Interrupt channel (C.1)                        |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_4_3   | x        | Data reports to device (C.2)                   |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_4_4   |          | Boot mode reports to device (O)                |
+++----------------+----------+------------------------------------------------+
++
++- O: Optional
++- C.1: Excluded IF HID 1/3 "Host, Boot protocol", otherwise Optional.
++- C.2: Excluded IF HID 1/3 "Host, Boot protocol", otherwise Mandatory.
++
++Host Role
++=========
++**Table 5: HID Control Commands**
++
++Prerequisite: HID 1/1 "Host, Report protocol" OR HID 1/3 "Host, Boot protocol"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_5_1   |          | Set_Protocol command (C.1, C.4)                |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_5_2   |          | Get_Protocol command (C.1, C.4)                |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_5_3   |          | Set_Idle command (O)                           |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_5_4   |          | Get_Idle command (O)                           |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_5_5   |          | Set_Report command (C.2)                       |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_5_6   |          | Get_Report command (C.3)                       |
+++----------------+----------+------------------------------------------------+
++
++- O: Optional
++- C.1: Mandatory IF HID 1/3 "Host, Boot protocol", otherwise Optional.
++- C.2: Mandatory IF HID 1/1 "Host, Report protocol" AND HID 2/13 "Support for
++  Application to send SET_REPORT", otherwise Excluded.
++- C.3: Mandatory IF HID 1/1 "Host, Report protocol" AND HID 2/12 "Support for
++  Application to send GET_REPORT", otherwise Excluded.
++- C.4: Mandatory to support none or all of HID 5/1 "Set_Protocol command" OR
++  HID 5/2 "Get_Protocol command".
++
++Host Role
++=========
++**Table 6: LMP Requirements**
++
++Prerequisite: HID 1/1 "Host, Report protocol" OR HID 1/3 "Host, Boot protocol"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_6_8   | x        | Role switch (C.4)                              |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_6_9   | x        | Request role switch (C.4)                      |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_6_12  | x        | Sniff mode (C.4)                               |
+++----------------+----------+------------------------------------------------+
++
++- C.4: Mandatory IF HID 1/1 "Host, Report protocol", otherwise not defined.
++
++HID Role
++========
++**Table 8: HID Device Types**
++
++Prerequisite: HID 1/2 "Device"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_8_1   |          | Pointing HID (C.1)                             |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_8_2   |          | Keyboard HID (C.1)                             |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_8_3   |          | Identification HID (C.1)                       |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_8_4   |          | Other HID (C.1)                                |
+++----------------+----------+------------------------------------------------+
++
++- C.1: Mandatory to support at least one of HID 8/1 "Pointing HID" OR HID 8/2
++  "Keyboard HID" OR HID 8/3 "Identification HID" OR HID 8/4 "Other HID" IF
++  HID 1/2 "Device", otherwise Excluded.
++
++HID Role
++========
++**Table 9: Application Procedures**
++
++Prerequisite: HID 1/2 "Device"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_9_1   |          | Establish HID connection (O)                   |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_2   |          | Accept HID connection (M)                      |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_3   |          | Terminate HID connection (O)                   |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_4   |          | Accept Termination of HID connection (M)       |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_5   |          | Support for virtual cables (O)                 |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_6   |          | HID initiated reconnection (C.1)               |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_7   |          | Host initiated reconnection (C.1)              |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_8   |          | Host data transfer to HID (C.2)                |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_9   |          | HID data transfer to Host (C.2)                |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_10  |          | HID Boot mode data transfer to Host (C.3)      |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_11  |          | Host Boot mode data transfer to HID (C.4)      |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_12  |          | Output reports declared (C.4)                  |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_13  |          | Input reports declared (C.3)                   |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_14  |          | Feature reports declared (O)                   |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_15  |          | Support for sending HCI_CONTROL with           |
++|                |          | VIRTUAL_CABLE_UNPLUG (C.5)                     |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_9_16  |          | Support for receiving HCI_CONTROL with         |
++|                |          | VIRTUAL_CABLE_UNPLUG (C.5)                     |
+++----------------+----------+------------------------------------------------+
 +
 +- M: Mandatory
 +- O: Optional
-+- C.1: Mandatory IF RFCOMM 1/2 “Respond to Initialization of an RFCOMM
-+  Session”, otherwise Excluded.
-+- C.2: Mandatory IF RFCOMM 1/1 “Initialize RFCOMM Session”, otherwise
++- C.1: Mandatory to support at least one of HID 9/6 "HID initiated
++  reconnection" OR HID 9/7 "Host initiated reconnection" IF HID 9/5 "Support
++  for virtual cables", otherwise Excluded.
++- C.2: Mandatory to support at least one of HID 9/8 "Host data transfer to
++  HID" OR HID 9/9 "HID data transfer to Host" IF HID 1/2 "Device", otherwise
 +  Excluded.
-+- C.3: Mandatory IF RFCOMM 1/1 “Initialize RFCOMM Session”, otherwise
-+  Optional.
-+- C.4: Mandatory IF RFCOMM 0/2 “RFCOMM v1.2 with TS 07.10”, otherwise
-+  Optional.
-+- C.5: Mandatory to support at least one.
-\ No newline at end of file
-diff --git a/doc/qualification/rfcomm-pts.rst b/doc/qualification/rfcomm-pts.rst
++- C.3: Mandatory IF HID 8/1 "Pointing HID" OR HID 8/2 "Keyboard HID",
++  otherwise Excluded.
++- C.4: Mandatory IF HID 8/2 "Keyboard HID", otherwise Excluded.
++- C.5: Optional IF HID 9/5 "Support for virtual cables", otherwise Excluded.
++
++HID Role
++========
++**Table 10: Device to Host Transfers**
++
++Prerequisite: HID 9/13 "Input reports declared" OR HID 9/14 "Feature reports
++declared"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_10_1  |          | Data reports larger than host MTU on Control   |
++|                |          | channel (O)                                    |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_10_2  |          | Data reports larger than host MTU on Interrupt |
++|                |          | channel (O)                                    |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_10_3  |          | Data reports to host (O)                       |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_10_4  |          | Boot mode reports to host (C.1)                |
+++----------------+----------+------------------------------------------------+
++
++- O: Optional
++- C.1: Mandatory IF HID 8/1 "Pointing HID" OR HID 8/2 "Keyboard HID",
++  otherwise Optional IF HID 8/3 "Identification HID" OR HID 8/4 "Other HID",
++  otherwise Excluded.
++
++HID Role
++========
++**Table 11: Host to Device Transfers**
++
++Prerequisite: HID 9/12 "Output reports declared" OR HID 9/14 "Feature reports
++declared"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_11_1  |          | Data reports larger than device MTU on Control |
++|                |          | channel (O)                                    |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_11_2  |          | Data reports larger than device MTU on         |
++|                |          | Inetrrupt channel (O)                          |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_11_3  |          | Data reports to device (O)                     |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_11_4  |          | Boot mode reports to device (C.1)              |
+++----------------+----------+------------------------------------------------+
++
++- O: Optional
++- C.1: Mandatory IF HID 8/2 "Keyboard HID", otherwise Optional IF HID 8/1
++  "Pointing HID" OR HID 8/3 "Identification HID" OR HID 8/4 "Other HID",
++  otherwise Excluded.
++
++HID Role
++========
++**Table 12: HID Control Commands**
++
++Prerequisite: HID 1/2 "Device"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_12_1  |          | Set_Protocol command (C.1, C.5)                |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_12_2  |          | Get_Protocol command (C.1, C.5)                |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_12_3  |          | Set_Idle command (C.2)                         |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_12_4  |          | Get_Idle command (C.2)                         |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_12_5  |          | Set_Report command (C.3)                       |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_12_6  |          | Get_Report command (C.4)                       |
+++----------------+----------+------------------------------------------------+
++
++- C.1: Mandatory IF HID 8/1 "Pointing HID" OR HID 8/2 "Keyboard HID",
++  otherwise Optional IF HID 8/3 "Identification HID" OR HID 8/4 "Other HID",
++  otherwise Excluded.
++- C.2: Mandatory IF HID 8/2 "Keyboard HID", otherwise Optional IF HID 8/1
++  "Pointing HID" OR HID 8/3 "Identification HID" OR HID 8/4 "Other HID",
++  otherwise Excluded.
++- C.3: Mandatory IF HID 9/12 "Output reports declared" OR HID 9/14 "Feature
++  reports declared", otherwise Excluded.
++- C.4: Mandatory IF HID 9/13 "Input reports declared" OR HID 9/14 "Feature
++  reports declared", otherwise Excluded.
++- C.5: Mandatory to support none or all of HID 12/1 "Set_Protocol command" OR
++  HID 12/2 "Get_Protocol command".
++
++HID Role
++========
++**Table 13: LMP Requirements**
++
++Prerequisite: HID 1/2 "Device"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_13_8  |          | Role switch (C.3)                              |
+++----------------+----------+------------------------------------------------+
++
++- C.3: Mandatory IF HID 9/6 "HID initiated reconnection", otherwise not
++  defined.
++
++HID Role
++========
++**Table 15: SDP Requirements**
++
++Prerequisite: HID 1/2 "Device"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_HID_15_1  |          | Server (M)                                     |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_15_2  |          | LanguageBaseAttributeIdList (M)                |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_15_3  |          | ServiceClassIDList (M)                         |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_15_4  |          | ProtocolDescriptorList (M)                     |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_15_5  |          | BluetoothProfileDescriptorList (M)             |
+++----------------+----------+------------------------------------------------+
++| TSPC_HID_15_6  |          | AdditionalProtocolDescriptorList (M)           |
+++----------------+----------+------------------------------------------------+
++
++- M: Mandatory
+diff --git a/doc/qualification/hid-pts.rst b/doc/qualification/hid-pts.rst
 new file mode 100644
-index 000000000..860ef6508
+index 000000000..bc795c69d
 --- /dev/null
-+++ b/doc/qualification/rfcomm-pts.rst
-@@ -0,0 +1,58 @@
++++ b/doc/qualification/hid-pts.rst
+@@ -0,0 +1,61 @@
 +.. SPDX-License-Identifier: GPL-2.0-or-later
 +.. Copyright © 2025-2026 Collabora Ltd.
 +
-+===================
-+RFComm test results
-+===================
++================
++HID test results
++================
 +
 +:PTS version: 8.5.2 Build 5
 +
@@ -189,7 +467,6 @@ index 000000000..860ef6508
 +=====
 +
 +- Remove PTS device from Bluetooth devices
-+- Update "TSPX_server_channel_iut" in IXIT to "10"
 +
 +Tests
 +=====
@@ -200,39 +477,43 @@ index 000000000..860ef6508
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
 +| Test name                    | Result   | Kernel  | BlueZ |                                                                         |
 ++==============================+==========+=========+=======+=========================================================================+
-+| RFCOMM/DEVA/RFC/BV-01-C      | PASS     |     6.1 | 5.69  | Run 'rctest -n -U spp <BD_ADDR>' upon request                           |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA/RFC/BV-05-C      | PASS     |     6.1 | 5.69  | Run 'rctest -n -U spp <BD_ADDR>' upon request                           |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVB/RFC/BV-02-C      | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVB/RFC/BV-06-C      | PASS     |     6.1 | 5.69  | Run 'rctest -r -U spp -P 16' before starting the test                   |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-03-C | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-04-C | PASS     |     6.1 | 5.69  | Run 'rctest -r -U spp -P 16' before starting the test                   |
++| HID/HOS/CON/BV-01-I          | PASS     |     6.1 | 5.69  | On 1st request run:                                                     |
 +|                              |          |         |       |                                                                         |
-+|                              |          |         |       | Kill rctest upon request                                                |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-07-C | PASS     |     6.1 | 5.69  | Run 'rctest -r -U spp -P 16' before starting the test                   |
++|                              |          |         |       | - sudo btmgmt find                                                      |
 +|                              |          |         |       |                                                                         |
-+|                              |          |         |       | Kill rctest upon request                                                |
++|                              |          |         |       | PTS device should be found                                              |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | On 2nd  and 3rd request run:                                            |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | - sudo btmgmt find -L                                                   |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | PTS device should be found                                              |
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-08-C | PASS     |     6.1 | 5.69  | Run 'rctest -r -U spp -P 16' before starting the test                   |
++| HID/HOS/DAT/BV-01-C          | PASS     |     6.1 | 5.69  |                                                                         |
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-11-C | PASS     |     6.1 | 5.69  |                                                                         |
++| HID/HOS/HCE/BV-01-I          | PASS     |     6.1 | 5.69  |                                                                         |
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-13-C | PASS     |     6.1 | 5.69  | Run 'rctest -r -U spp -P 16' before starting the test                   |
++| HID/HOS/HCE/BV-03-I          | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | - this test requests a RF shielded box                                  |
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-15-C | PASS     |     6.1 | 5.69  | Run 'rctest -r -U spp -P 16' before starting the test                   |
++| HID/HOS/HCE/BV-04-I          | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | - this test requests a RF shielded box                                  |
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-17-C | PASS     |     6.1 | 5.69  |                                                                         |
++| HID/HOS/HCR/BV-01-I          | PASS     |     6.1 | 5.69  |                                                                         |
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-19-C | PASS     |     6.1 | 5.69  |                                                                         |
++| HID/HOS/HCR/BV-02-I          | PASS     |     6.1 | 5.69  |                                                                         |
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-21-C | PASS     |     6.1 | 5.69  | Run 'rctest -w -U spp -P 16' before starting the test                   |
++| HID/HOS/HDT/BV-01-I          | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | - Remove PTS device from Bluetooth devices                              |
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| RFCOMM/DEVA-DEVB/RFC/BV-22-C | PASS     |     6.1 | 5.69  | Run 'rctest -w -U spp -P 16' before starting the test                   |
++| HID/HOS/HDT/BV-02-I          | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| IOPT/CL/HID-HOS/SFC/BV-15-I  | PASS     |     6.1 | 5.69  |                                                                         |
 ++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
 -- 
 2.43.0
