@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A41E324716
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748323233F4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769535538; cv=none; b=XkPmmqexdnHBmv09HZr8q6fD7Q7DRT+Kvw78jRqzE3RQjPOVKhRgVoGoypuG4HXlAKO+ldRoksIxyRjsyhR9kJyGLcoixX/SHZYxw/IgxZTZPBKP03BDOv2eYHdap++KWP+5e4Y2vl1h7dNkq5zwRWXo1gX6rh5GkQub5SN9agE=
+	t=1769535538; cv=none; b=YLlt7yxfaWZi5RSIYqfitokMkOS4+s6wfDnFRwllV0TPkOScx+GCiTAvAb8P6/FFSZ5pVfIlCT67jo8wWEj965FBKD7yT7eSxcUIxl3sTFaEoYaFpPBBW/JBl1OXMX74cDGhfZpG2vf7w79mtLyQ5t3FR+9QDYQ+DmBXPDmJ7Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769535538; c=relaxed/simple;
-	bh=PelUspsn9uQ/pome5Ge4DRVs9Phi39AdUtiTIM7d6a8=;
+	bh=cS6GZCQ89cBII3TV8sNhoKd4XMr/j+tBehXA7ITVY1A=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZeIOvrp/hu5gPeBqfmU58BNhSbZuKmXDow/Huno1ko4Qawby2OZNy0qw4kh1vnN6y9deaO8E9k5PXyUaONxbHRXzlKfa9HJDR4Pdelt5qxnyAotqoy+pg8yqDDz4XEKy5xF+X6Sza4mwFGZONYYjNsLu5s2GDxEcLtNupBujbz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=J3o3TNYK; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=FKGO0ZXLBIMKR0BAY4ue76DSzr7zOQyrYPzzCBplvqI/EM097YJplYxEc2o2SE48lM2scd6SgC9udwiIZor2aQV2/PA0RfCQdGxearBmCVBlxjVfeoS/sKhHkG8nfZ9xvhzh6Jebf8PLa+KMU47yk10N12GqKLtTIQYbFV/J1LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=LQd9LTGw; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="J3o3TNYK"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="LQd9LTGw"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1769535531;
-	bh=PelUspsn9uQ/pome5Ge4DRVs9Phi39AdUtiTIM7d6a8=;
+	bh=cS6GZCQ89cBII3TV8sNhoKd4XMr/j+tBehXA7ITVY1A=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=J3o3TNYK5Aw2EngiF3hNUh6SaFVUNIb3CnrMn5xZQ7N9d0ZYSD/yIznwHOQy0J1us
-	 FdPclf9i1swb/8WqH4nTbW295xhm+KynRXnEGJlIxJGOKZhxpP8OzAowjhbtEDvqn0
-	 47WYmqhyZNyhAXQ74o1qxm+EwRXDVgajisQu9COplhBsUivw8NGxZcskk9jcY8WruN
-	 F3QtSPwpdgGNn23M57L8c/WpZm+mGoM08SMYs13ODaKV/i+kQmGx3L5Ry1BPI5ijYg
-	 iRkSsoswLmbjL7hu7iwFKutWH04jJN9TeHPMvhQt9U++PPyk6lTQHxwnZGiFFTXA9r
-	 o6Nkpmp6Tcrzw==
+	b=LQd9LTGw5dTGko6RGA6MEXa8Q5wOslqEYq4t9JBH5kmEwQ4LP61yknCFws4mPiwx0
+	 7FWa8XF1kYHaYX4FCgjopRoTZpCmIvT9bVoZj15ct9VP40eVzuIecCXor7gp6i2ukp
+	 +xfYNE4eiRvsfTD9DNSL/gGVZ5BSGuj3zIMW0qaF2xnMH7SZnrA126p4VKjJ0+vJu4
+	 TEFDclj2IifM0MAwXdIsT0gPHWKPYbVGzvc5+8cyzgkpkC1GiTJbNev7L2I+9eDM0o
+	 0by0XhHtddJZb2uWEzyN9Gk6dr+AEBLtSBaP+BT9lfFyEovia3ucTl0MHHqNumJ3XI
+	 RjK/T3anrCTpQ==
 Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-871c-6E70-D798-Dfc2.rev.sfr.net [IPv6:2a02:8428:af44:1001:871c:6e70:d798:dfc2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 6AEB817E35C8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 18:38:51 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id CAF7117E15C1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 18:38:50 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 13/13] doc/qualification: Add PICS and howto for the IOPT qualification
-Date: Tue, 27 Jan 2026 18:38:41 +0100
-Message-ID: <20260127173841.153747-13-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2 11/13] doc/qualification: Add PICS and howto for the HoGP qualification
+Date: Tue, 27 Jan 2026 18:38:39 +0100
+Message-ID: <20260127173841.153747-11-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260127173841.153747-1-frederic.danis@collabora.com>
 References: <20260127173841.153747-1-frederic.danis@collabora.com>
@@ -51,66 +51,621 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
 ---
- doc/qualification/iopt-pics.rst | 37 ++++++++++++++++
- doc/qualification/iopt-pts.rst  | 75 +++++++++++++++++++++++++++++++++
- 2 files changed, 112 insertions(+)
- create mode 100644 doc/qualification/iopt-pics.rst
- create mode 100644 doc/qualification/iopt-pts.rst
+ doc/qualification/hogp-pics.rst | 592 ++++++++++++++++++++++++++++++++
+ doc/qualification/hogp-pts.rst  | 104 ++++++
+ 2 files changed, 696 insertions(+)
+ create mode 100644 doc/qualification/hogp-pics.rst
+ create mode 100644 doc/qualification/hogp-pts.rst
 
-diff --git a/doc/qualification/iopt-pics.rst b/doc/qualification/iopt-pics.rst
+diff --git a/doc/qualification/hogp-pics.rst b/doc/qualification/hogp-pics.rst
 new file mode 100644
-index 000000000..2dab3c25d
+index 000000000..d5440e02f
 --- /dev/null
-+++ b/doc/qualification/iopt-pics.rst
-@@ -0,0 +1,37 @@
++++ b/doc/qualification/hogp-pics.rst
+@@ -0,0 +1,592 @@
 +.. SPDX-License-Identifier: GPL-2.0-or-later
 +.. Copyright © 2025-2026 Collabora Ltd.
 +
-+===========================
-+Interoperability Test Suite
-+===========================
-+(TCRL 2023-1)
++=====================
++HID over GATT Profile
++=====================
++(TCRL 2023-1, HOGP.ICS.p7)
 +
-+Interoperability
-+================
-+**Table 1: Interoperability Test Specification**
++Version
++=======
++**Table 0: Major Versions (X.Y)**
 +
 ++------------------+----------+----------------------------------------------+
 +| Parameter Name   | Selected | Description                                  |
 ++==================+==========+==============================================+
-+| TSPC_IOPT_1_1    | x        | Interoperability (M)                         |
++| TSPC_HOGP_0_1    | x        | HOGP v1.0 (M)                                |
 ++------------------+----------+----------------------------------------------+
 +
 +- M: Mandatory
 +
-+Interoperability
-+================
-+**Table 2: Design Configuration**
++Roles
++=====
++**Table 1: Role Requirements**
 +
 ++------------------+----------+----------------------------------------------+
 +| Parameter Name   | Selected | Description                                  |
 ++==================+==========+==============================================+
-+| TSPC_IOPT_2_1    | x        | BR/EDR (C.1, C.2)                            |
++| TSPC_HOGP_1_1    |          | HID Device (C.1)                             |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_IOPT_2_2    | x        | LE (C.1, C.2)                                |
++| TSPC_HOGP_1_2    | x        | Report Host (C.1)                            |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_IOPT_2_3    | x        | BR/EDR/LE (C.3)                              |
++| TSPC_HOGP_1_3    |          | Boot Host (C.1)                              |
 ++------------------+----------+----------------------------------------------+
 +
-+- C.1: Mandatory to support at least one transport.
-+- C.2: Mandatory If IOP 2/3 "BR/EDR/LE" is Supported, otherwise Optional.
-+- C.3: Mandatory if IOP 2/1 "BR/EDR" AND IOP 2/2 "LE" is Supported, otherwise Excluded.
-diff --git a/doc/qualification/iopt-pts.rst b/doc/qualification/iopt-pts.rst
++- C.1: Mandatory to support at least one of HOGP 1/1 "HID Device" OR HOGP 1/2
++  "Report Host" OR HOGP 1/3 "Boot Host".
++
++Transports
++==========
++**Table 2: Transport Requirements**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_2_1    |          | Profile supported over BR/EDR (C.1)          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_2_2    | x        | Profile supported over LE (M)                |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- C.1: Excluded for this Profile.
++
++HID Device
++==========
++**Table 3: Services - HID Device**
++
++Prerequisite: HOGP 1/1 "HID Device"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_3_1    |          | HID Service (M)                              |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_3_2    |          | Multiple Service instances - HID Service (O) |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_3_3    |          | Battery Service (M)                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_3_4    |          | Device Information Service (M)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_3_5    |          | Scan Parameters Service (O)                  |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++
++HID Device
++==========
++**Table 4: Features - HID Device**
++
++Prerequisite: HOGP 1/1 "HID Device"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_4_1    |          | Include HID Service UUID in AD in GAP        |
++|                  |          | Discoverable Mode (O)                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_4_2    |          | Include Local Name in AD or Scan Response    |
++|                  |          | Data (O)                                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_4_3    |          | Include Appearance in AD or Scan Response    |
++|                  |          | Data (O)                                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_4_4    |          | PnP ID (M)                                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_4_5    |          | Report Characteristic (C.1)                  |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_4_6    |          | Non-HID Service characteristic described     |
++|                  |          | within Report Map characteristic (C.1)       |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_4_7    |          | Report Map Characteristic - External Report  |
++|                  |          | Reference Characteristic descriptor (C.2)    |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Mandatory to support at least one of HOGP 4/5 "Report Characteristic"
++  OR HOGP 4/6 "Non-HID Service characteristic described within Report Map
++  characteristic".
++- C.2: Mandatory IF HOGP 4/6 "Non-HID Service characteristic described within
++  Report Map characteristic", otherwise not defined.
++
++HID Device
++==========
++**Table 5: GAP Requirements - HID Device**
++
++Prerequisite: HOGP 1/1 "HID Device"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_5_1    |          | Peripheral (M)                               |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_5_2    |          | Directed connectable mode (O)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_5_3    |          | Undirected connectable mode (M)              |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_5_4    |          | Bondable mode (Peripheral) (M)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_5_5    |          | Bonding procedure (Peripheral) (M)           |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_5_6    |          | LE security mode 1 (Peripheral) (M)          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_5_7    |          | Unauthenticated Pairing (LE security mode 1  |
++|                  |          | level 2) (Peripheral) (M)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_5_8    |          | Authenticated Pairing (LE security mode 1    |
++|                  |          | level 3) (Peripheral) (O)                    |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++
++HID Host
++========
++**Table 7a: GATT based Profile Support - Report Host**
++
++Prerequisite: HOGP 1/2 "Report Host"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_7a_1   | x        | Scan Client (M)                              |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++HID Host
++========
++**Table 9: Discover Service and Characteristics - Report Host**
++
++Prerequisite: HOGP 1/2 "Report Host"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_9_1    | x        | Discover HID Service (M)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_2    | x        | Discover Battery Service (M)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_3    | x        | Discover Device Information Service (M)      |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_4    | x        | Discover Scan Parameters Service (M)         |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_5    | x        | Discover HID Service characteristic: Report  |
++|                  |          | Map (M)                                      |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_6    | x        | Discover HID Service characteristic: Report  |
++|                  |          | Map - External Report Reference              |
++|                  |          | characteristic descriptor (M)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_7    | x        | Discover HID Service characteristic: Report  |
++|                  |          | (M)                                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_8    | x        | Discover HID Service characteristic: Report -|
++|                  |          | Client Characteristic Configuration          |
++|                  |          | characteristic descriptor (M)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_9    | x        | Discover HID Service characteristic: Report -|
++|                  |          | Report Reference characteristic descriptor   |
++|                  |          | (M)                                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_10   | x        | Discover HID Service characteristic: HID     |
++|                  |          | Information (M)                              |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_11   | x        | Discover HID Service characteristic: HID     |
++|                  |          | Control Point (M)                            |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_12   |          | Discover HID Service characteristic: Protocol|
++|                  |          | Mode (O)                                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_13   | x        | Discover Battery Service characteristic:     |
++|                  |          | Battery Level (M)                            |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_14   | x        | Discover Battery Service characteristic:     |
++|                  |          | Battery Level - Client Characteristic        |
++|                  |          | Configuration characteristic descriptor (M)  |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_15   | x        | Discover Device Information Service          |
++|                  |          | characteristic: PnP ID (M)                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_9_16   | x        | Discover non-HID Service characteristic:     |
++|                  |          | Report Reference characteristic descriptor   |
++|                  |          | (M)                                          |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++
++HID Host
++========
++**Table 10: Discover Service & Characteristics - Boot Host**
++
++Prerequisite: HOGP 1/3 "Boot Host"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_10_1   |          | Discover HID Service (M)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_2   |          | Discover Battery Service (O)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_3   |          | Discover Device Information Service (O)      |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_4   |          | Discover HID Service characteristic: Protocol|
++|                  |          | Mode (M)                                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_5   |          | Discover HID Service characteristic: Boot    |
++|                  |          | Keyboard Input Report (C.1, C.2)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_6   |          | Discover HID Service characteristic: Boot    |
++|                  |          | Keyboard Input Report - Client Characteristic|
++|                  |          | Configuration characteristic descriptor (C.3)|
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_7   |          | Discover HID Service characteristic: Boot    |
++|                  |          | Keyboard Output Report (C.1, C.2)            |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_8   |          | Discover HID Service characteristic: Boot    |
++|                  |          | Mouse Input Report (C.1)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_9   |          | Discover HID Service characteristic: Boot    |
++|                  |          | Mouse Input Report - Client Characteristic   |
++|                  |          | Configuration characteristic descriptor (C.4)|
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_10  |          | Discover Battery Service characteristic:     |
++|                  |          | Battery Level (O)                            |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_11  |          | Discover Battery Service characteristic:     |
++|                  |          | Battery Level - Client Characteristic        |
++|                  |          | Configuration characteristic descriptor (O)  |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_10_12  |          | Discover Device Information Service          |
++|                  |          | characteristic: PnP ID (O)                   |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Mandatory to support at least one of HOGP 10/5 "Discover HID Service
++  characteristic: Boot Keyboard Input Report" OR HOGP 10/7 "Discover HID
++  Service characteristic: Boot Keyboard Output Report" OR HOGP 10/8 "Discover
++  HID Service characteristic: Boot Mouse Input Report".
++- C.2: Mandatory to support none or all of HOGP 10/5 "Discover HID Service
++  characteristic: Boot Keyboard Input Report" OR HOGP 10/7 "Discover HID
++  Service characteristic: Boot Keyboard Output Report".
++- C.3: Mandatory IF HOGP 10/5 "Discover HID Service characteristic: Boot
++  Keyboard Input Report", otherwise Excluded.
++- C.4: Mandatory IF HOGP 10/8 "Discover HID Service characteristic: Boot
++  Mouse Input Report", otherwise Excluded.
++
++HID Host
++========
++**Table 11: Features - Report Host**
++
++Prerequisite: HOGP 1/2 "Report Host"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_11_1   | x        | Read Report Map characteristic (M)           |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_2   | x        | Read Report Map characteristic: External     |
++|                  |          | Report Reference characteristic descriptor   |
++|                  |          | (M)                                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_3   |          | Read Report characteristic: Report Type:     |
++|                  |          | Input Report (C.2)                           |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_4   |          | Write Report characteristic: Report Type:    |
++|                  |          | Input Report (C.2)                           |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_5   |          | Read Report characteristic: Report Type:     |
++|                  |          | Output Report (C.3)                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_6   |          | Write - Report characteristic: Report Type:  |
++|                  |          | Output Report (C.3)                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_7   |          | Read - Report characteristic: Report Type:   |
++|                  |          | Feature Report (C.4)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_8   |          | Write - Report characteristic: Report Type:  |
++|                  |          | Feature Report (C.4)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_9   | x        | Read Report characteristic: Report Reference |
++|                  |          | characteristic descriptor (M)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_10  | x        | Read Report characteristic: Input Report:    |
++|                  |          | Client Characteristic Configuration          |
++|                  |          | characteristic descriptor (M)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_11  | x        | Report characteristic configuration: enable  |
++|                  |          | notifications (M)                            |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_11a |          | Report characteristic configuration: disable |
++|                  |          | notifications (C.2)                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_12  |          | Read HID Information characteristic (O)      |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_13  |          | Suspend State (O)                            |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_14  |          | Exit Suspend State (C.1)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_15  |          | Write HID Control Point characteristic:      |
++|                  |          | Suspend command (C.1)                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_16  |          | Write HID Control Point characteristic: Exit |
++|                  |          | Suspend command (C.1)                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_17  |          | Read Protocol Mode characteristic: Get       |
++|                  |          | Protocol command (O)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_18  |          | Write Protocol Mode characteristic: Set      |
++|                  |          | Report Protocol Mode command (O)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_19  | x        | Read Battery Level characteristic (C.5)      |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_20  |          | Read Battery Level characteristic: Client    |
++|                  |          | Characteristic Configuration characteristic  |
++|                  |          | descriptor (C.6)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_21  |          | Battery Level characteristic configuration:  |
++|                  |          | enable notifications (C.6)                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_21a |          | Battery Level characteristic configuration:  |
++|                  |          | disable notifications (O)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_22  | x        | Read non-HID Service characteristic: Report  |
++|                  |          | Reference characteristic descriptor (M)      |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_23  | x        | Read PnP ID characteristic (M)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_24  | x        | Notify Report characteristic (M)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_25  |          | Notify Battery Level characteristic (C.5)    |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_26  | x        | Report Characteristic: Input Report type     |
++|                  |          | supported (M)                                |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_27  |          | Report Characteristic: Output Report type    |
++|                  |          | supported (O)                                |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_11_28  |          | Report Characteristic: Feature Report type   |
++|                  |          | supported (O)                                |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Mandatory IF HOGP 11/13 "Suspend State", otherwise Excluded.
++- C.2: Optional IF HOGP 11/26 "Report Characteristic: Input Report type
++  supported", otherwise Excluded.
++- C.3: Optional IF HOGP 11/27 "Report Characteristic: Output Report type
++  supported", otherwise Excluded.
++- C.4: Optional IF HOGP 11/28 "Report Characteristic: Feature Report type
++  supported", otherwise Excluded.
++- C.5: Mandatory to support at least one of HOGP 11/19 "Read Battery Level
++  characteristic" OR HOGP 11/25 "Notify Battery Level characteristic".
++- C.6: Mandatory IF HOGP 11/25 "Notify Battery Level characteristic",
++  otherwise Excluded.
++
++HID Host
++========
++**Table 12: Features - Boot Host**
++
++Prerequisite: HOGP 1/3 "Boot Host"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_12_1   |          | Read Protocol Mode characteristic: Get       |
++|                  |          | Protocol Mode command (M)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_2   |          | Write Protocol Mode characteristic: Set Boot |
++|                  |          | Protocol Mode command (M)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_3   |          | Read HID Service characteristic: Boot        |
++|                  |          | Keyboard Input Report (C.1)                  |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_4   |          | Write HID Service characteristic: Boot       |
++|                  |          | Keyboard Input Report (C.1)                  |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_5   |          | Read Client Characteristic Configuration     |
++|                  |          | characteristic descriptor for Boot Keyboard  |
++|                  |          | Input Report (C.1)                           |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_6   |          | Boot Keyboard Input Report characteristic    |
++|                  |          | configuration: enable notifications (C.1)    |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_6a  |          | Boot Keyboard Input Report characteristic    |
++|                  |          | configuration: disable notifications (O)     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_7   |          | Read HID Service characteristic: Boot        |
++|                  |          | Keyboard Output Report (C.1)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_8   |          | Write HID Service characteristic: Boot       |
++|                  |          | Keyboard Output Report (C.1)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_9   |          | Read HID Service characteristic: Boot Mouse  |
++|                  |          | Input Report (C.2)                           |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_10  |          | Write HID Service characteristic: Boot Mouse |
++|                  |          | Input Report (C.2)                           |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_11  |          | Read Client Characteristic Configuration     |
++|                  |          | characteristic descriptor for Boot Mouse     |
++|                  |          | Input Report (C.2)                           |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_12  |          | Boot Mouse Input Report characteristic       |
++|                  |          | configuration: enable notifications (C.2)    |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_12a |          | Boot Mouse Input Report characteristic       |
++|                  |          | configuration: disable notifications (O)     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_13  |          | Notify Boot Keyboard Input Report            |
++|                  |          | characteristic (C.1)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_14  |          | Notify Boot Mouse Input Report characteristic|
++|                  |          | (C.2)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_15  |          | Read Battery Level characteristic (O)        |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_16  |          | Read Battery Level characteristic: Client    |
++|                  |          | Characteristic Configuration characteristic  |
++|                  |          | descriptor (O)                               |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_17  |          | Battery Level characteristic configuration:  |
++|                  |          | enable notifications (O)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_17a |          | Battery Level characteristic configuration:  |
++|                  |          | disable notifications (O)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_18  |          | Notify Battery Level characteristic (O)      |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_12_19  |          | Read PnP ID characteristic (O)               |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Mandatory IF HOGP 10/5 "Discover HID Service characteristic: Boot
++  Keyboard Input Report" OR HOGP 10/7 "Discover HID Service characteristic:
++  Boot Keyboard Output Report", otherwise Excluded.
++- C.2: Mandatory IF HOGP 10/8 "Discover HID Service characteristic: Boot
++  Mouse Input Report", otherwise Excluded.
++
++HID Host
++========
++**Table 13: GATT Requirements - Report Host**
++
++Prerequisite: HOGP 1/2 "Report Host"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_13_1   | x        | GATT Client over LE (M)                      |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_3   | x        | Discover All Primary Services (C.1)          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_4   | x        | Discover Primary Services by Service UUID    |
++|                  |          | (C.1)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_5   | x        | Find Included Services (M)                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_6   | x        | Discover All Characteristics of a Service    |
++|                  |          | (C.2)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_7   | x        | Discover Characteristics by UUID (C.2)       |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_8   | x        | Discover All Characteristic Descriptors (M)  |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_9   | x        | Read Characteristic Value (C.3)              |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_10  | x        | Read Using Characteristic UUID (C.3)         |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_11  | x        | Read Long Characteristic Values (C.4)        |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_12  | x        | Read Characteristic Descriptors (M)          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_13  | x        | Write without Response (M)                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_14  | x        | Write Characteristic Value (M)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_15  | x        | Write Characteristic Descriptors (M)         |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_16  | x        | Notifications (M)                            |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_13_17  |          | Exchange MTU (O)                             |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Mandatory to support at least one of HOGP 13/3 "Discover All Primary
++  Services" OR HOGP 13/4 "Discover Primary Services by Service UUID".
++- C.2: Mandatory to support at least one of HOGP 13/6 "Discover All
++  Characteristics of a Service" OR HOGP 13/7 "Discover Characteristics by
++  UUID".
++- C.3: Mandatory to support at least one of HOGP 13/9 "Read Characteristic
++  Value" OR HOGP 13/10 "Read Using Characteristic UUID".
++- C.4: Mandatory IF HOGP 13/9 "Read Characteristic Value" OR HOGP 13/10 "Read
++  Using Characteristic UUID", otherwise not defined.
++
++HID Host
++========
++**Table 14: GATT Requirements - Boot Host**
++
++Prerequisite: HOGP 1/3 "Boot Host"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_14_1   |          | GATT Client over LE (M)                      |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_3   |          | Discover All Primary Services (C.1)          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_4   |          | Discover Primary Services by Service UUID    |
++|                  |          | (C.1)                                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_5   |          | Discover All Characteristics of a Service (O)|
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_6   |          | Discover Characteristics by UUID (O)         |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_7   |          | Discover All Characteristic Descriptors (M)  |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_8   |          | Read Characteristic Value (M)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_9   |          | Read Using Characteristic UUID (M)           |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_10  |          | Read Characteristic Descriptors (M)          |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_11  |          | Write without Response (M)                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_12  |          | Write Characteristic Value (M)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_13  |          | Write Characteristic Descriptors (M)         |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_14_14  |          | Notifications (M)                            |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Mandatory to support at least one of HOGP 14/3 "Discover All Primary
++  Services" OR HOGP 14/4 "Discover Primary Services by Service UUID".
++
++HID Host
++========
++**Table 15: GAP Requirements - HID Host**
++
++Prerequisite: HOGP 1/2 "Report Host" OR HOGP 1/3 "Boot Host"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_HOGP_15_1   | x        | Central (M)                                  |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_15_2   | x        | LE security mode 1 (Central) (M)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_15_3   | x        | Unauthenticated Pairing (LE security mode 1  |
++|                  |          | level 2) (Central) (M)                       |
+++------------------+----------+----------------------------------------------+
++| TSPC_HOGP_15_4   |          | Authenticated Pairing (LE security mode 1    |
++|                  |          | level 3) (Central) (O)                       |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
+diff --git a/doc/qualification/hogp-pts.rst b/doc/qualification/hogp-pts.rst
 new file mode 100644
-index 000000000..13f05d460
+index 000000000..9c82b70c2
 --- /dev/null
-+++ b/doc/qualification/iopt-pts.rst
-@@ -0,0 +1,75 @@
++++ b/doc/qualification/hogp-pts.rst
+@@ -0,0 +1,104 @@
 +.. SPDX-License-Identifier: GPL-2.0-or-later
 +.. Copyright © 2025-2026 Collabora Ltd.
 +
 +=================
-+IOPT test results
++HoGP test results
 +=================
 +
 +:PTS version: 8.5.3 Build 4
@@ -119,20 +674,6 @@ index 000000000..13f05d460
 +=====
 +
 +- Remove PTS device from Bluetooth devices
-+
-+- In ICS select:
-+
-+  - TSPC_support_AdvancedAudioDistributionProfile_Sink
-+
-+  - TSPC_support_AdvancedAudioDistributionProfile_Source
-+
-+  - TSPC_support_AVRemoteControlProfile_CT
-+
-+  - TSPC_support_AVRemoteControlProfile_TG
-+
-+  - TSPC_support_HeadsetProfile_AG
-+
-+  - TSPC_support_SerialPortProfile_Service
 +
 +Tests
 +=====
@@ -143,43 +684,86 @@ index 000000000..13f05d460
 ++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
 +| Test name            | Result   | Kernel  | BlueZ |                                                                         |
 ++======================+==========+=========+=======+=========================================================================+
-+| IOPT/SR/COD/BV-01-I  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       | - Start '$ bluetoothctl'                                                |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       |   - [bluetooth]# discoverable on                                        |
++| HOGP/RH/HGDS/BV-01-I | PASS     |     6.1 | 5.69  |                                                                         |
 ++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| IOPT/SR/SDSS/BV-02-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       | - Start '$ bluetoothctl'                                                |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       |   - [bluetooth]# discoverable on                                        |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       | - Run in a second terminal:                                             |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       |   - python ./test-profile -u spp -s -C 10                               |
++| HOGP/RH/HGDS/BV-02-I | PASS     |     6.1 | 5.69  |                                                                         |
 ++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| IOPT/SR/SDAS/BV-03-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       | - Start '$ bluetoothctl'                                                |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       |   - [bluetooth]# discoverable on                                        |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       | - Run in a second terminal:                                             |
-+|                      |          |         |       |                                                                         |
-+|                      |          |         |       |   - python ./test-profile -u spp -s -C 10                               |
++| HOGP/RH/HGDS/BV-03-I | PASS     |     6.1 | 5.69  |                                                                         |
 ++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| IOPT/CL/SDR/BV-04-I  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++| HOGP/RH/HGDR/BV-01-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
 +|                      |          |         |       |                                                                         |
 +|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-01-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
 +|                      |          |         |       |                                                                         |
-+|                      |          |         |       | - Start '$ bluetoothctl'                                                |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-02-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-03-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-04-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-05-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-06-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-07-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-14-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-15-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGDC/BV-16-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGRF/BV-01-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                      |          |         |       |                                                                         |
++|                      |          |         |       | - Remove PTS device from Bluetooth devices                              |
 +|                      |          |         |       +-------------------------------------------------------------------------+
-+|                      |          |         |       | - Pair PTS device                                                       |
++|                      |          |         |       | Use the following command to verify the Report Map Characteristic:      |
 +|                      |          |         |       |                                                                         |
-+|                      |          |         |       | - Check UUIDs in bluetoothctl: A2DP (110A, 110B), AVRCP (110C),         |
-+|                      |          |         |       |   HID (1124), HFP (111E, 111F), HSP(1112), OPP(1105), SAP(112D),        |
-+|                      |          |         |       |   SPP(1101)                                                             |
++|                      |          |         |       | - find /sys/class/misc/uhid/ -name report_descriptor -exec hexdump -C \ |
++|                      |          |         |       |   {} \;                                                                 |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGRF/BV-02-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGRF/BV-04-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGRF/BV-05-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGRF/BV-06-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGRF/BV-08-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGRF/BV-10-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGRF/BV-12-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGCF/BV-01-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGNF/BV-01-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGNF/BI-01-I | PASS     |     6.1 | 5.69  |                                                                         |
+++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| HOGP/RH/HGNF/BI-02-I | PASS     |     6.1 | 5.69  |                                                                         |
 ++----------------------+----------+---------+-------+-------------------------------------------------------------------------+
 -- 
 2.43.0
