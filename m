@@ -1,90 +1,89 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F1423AB81
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 07:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D4B2690C0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 07:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769500080; cv=none; b=oMBvp2eB/GL9DipkqOh8yXbh1sPw+mzwhw7qdmH1O8qBK+uuNQJhtScl4i/blT3IxOPVNeSV+iOYmJ05PcmQkLLCbAHgCdtWOx8OQ1gaR1Wwa4FxWY7Eco5Wu8hhxs4O9s5rlqYPN1Tmw0Qv1uqVy6WxGyQRi31wUnZbkqowLgU=
+	t=1769500081; cv=none; b=qd4D3EebHs+dSwhyQadup4K3LvzaiLSGX+VpNw6/kuKm9l+MBnEnEY9f8L/0MPbTGahPWK/D/kdvm7tJ4ailR/9yiyL81lKxiGYbJse7G2MmNMXvAxRe0LvsHyITqB0cl5XWHzPxAPSj8nq/Xz6HuU8e1YQ8b3KEoXu4IckTpGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769500080; c=relaxed/simple;
-	bh=ZCZEkb3Oq/4a2GLLQOkIQEMD71Ta+eioR67ypszVnr8=;
+	s=arc-20240116; t=1769500081; c=relaxed/simple;
+	bh=O2Fn3r81MRjOUdQ4MRHv+wMy2fgs0+EcUdV8HmjAa7c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YwOnJ2bm5yW9nUrTZe70t4i6cSIevbag6Wwg4knCLfJulAwMwVMFyLUgpDTSyHBGHTPmKbyq+AHlEmMUZdo0Xj000xmg5dlFDcH1wF/7cU0PEdYPwt5VZjvpfQSQAgOIxKuB+TguCYVJd3RcfMjo3Ulku/d+VdhpPwsckBUVGf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=dLnyAUCS; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=AiK8NIFd; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version; b=MPtH9uiQAH9OOkEMlutfNkx2FJlxDsxZyITcmgJPXFWvF5t0b3zuRHx0KLEjnaAFSc8W3DjJRwjPknSfOvm8TiK3UNV6aclg7G3wMMKAC381TdCeL8woBfUpAWsSbovT/lpU5wNeKhuICq9OrUkLBQFW18+O60K1IG5/UaiRFMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=g+CvNLO8; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=HZCvG7sp; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="dLnyAUCS";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="AiK8NIFd"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60R4Tx3J786322
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 07:47:57 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="g+CvNLO8";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="HZCvG7sp"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60R4UDYA3714704
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 07:47:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	q7EPbjX0UG1k1VYmm/wtZvdosyovsK9QiO3tQQyoQBs=; b=dLnyAUCSHW55D43f
-	hIuk5hlXt4mdtm/lkzupHiyVr4U0akeg8IFzc1+3jtXHeIDx1keqqjGxh2s+AFeH
-	TxCcRUfohkm8b05+ui9VE3jzfjOmUF8/X2gYgN6NxWgSdSRPC8Yjj2t4j5won8pY
-	VslRk16jepUZqz7xkbb689arcLdEFh1Y0/AXpd2kBq78i3PPqf+K9jtIKfkJywRN
-	LT8/G8xFUc9mbkgdBwdqrLymp1AWKBrWtSJE3Xumkr52xACT4VvAcQ6Eqe8QaQ3A
-	XOLUsWYKuQIDNwLF2lCZ13PzC6/NKcSVIk3HfGvtAwnq4u+vvdavviKRrCBCoDOW
-	N+iZEQ==
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bxg93hkjc-1
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=1TGN21vt54r
+	RxDMAbZfVQmAaHW5N4ITRdxTa9YXn9yw=; b=g+CvNLO8Ehnt/hHKmXah3huCwwU
+	UDkW3c+R2y8b1Tmm5lB2KdD4dJmbkAoR/IUh892HhMhvxnhibBXyTxHLkuYdvW4Z
+	QRCDBqKIgBiXCQKfqSOP+4t98rSVhu5u9+U3g9FU3pC+you/pgw7Ejbq/F39qucc
+	+q0JNNZJJQplmdikwgpsaf3SbN0143GuoEv07dG4FDfO1oV3i0t3RnX7OxvNYBdO
+	OAy2KxJHaZFodXrkcIdSAq+PYfC57ogYpelDg+KRKofiNw3t8hJFX+Df+xdkrIw6
+	hj36pFNoDeYlMazgGnDtDceYq8iMhQIt51B+X5EOmrSrep4PVdvRnjpzQUw==
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bxdv0a0uy-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 07:47:57 +0000 (GMT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2a0e952f153so10529035ad.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 23:47:57 -0800 (PST)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 07:47:59 +0000 (GMT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2a0e952f153so10529225ad.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jan 2026 23:47:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1769500076; x=1770104876; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1769500078; x=1770104878; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q7EPbjX0UG1k1VYmm/wtZvdosyovsK9QiO3tQQyoQBs=;
-        b=AiK8NIFdH5pGhN+w8wKQiq4dR1lq6QMV/azAkTehabvIz6cmKXZaN/BkG2UyNQ4jvO
-         m4bJ33EN5IZ9gCFFnTO7qP6SzHwwJcJQJMR0UFssZY4DFgS4Ag2xZ/3hNmofHZiVq7XF
-         zRRzpHSb5M57VqPic5KpnTTeEUf9rdQ5/1lVQfo/4uZougEbbq49dQ5ahgrD0u+H8KOt
-         kfNq9VZaxteyhjtE9NCC3Is92ndusrRK+zp7lD909szXHayRK6Xic+3wunWpsTsko8zH
-         HH/JhU8PMXLwdk5fam6cn/iWtc9dQe8szyMNHPEjFydF5sjuGyvpphTJaFybVR46kEmt
-         tTMg==
+        bh=1TGN21vt54rRxDMAbZfVQmAaHW5N4ITRdxTa9YXn9yw=;
+        b=HZCvG7spyvgTSQ5SLtUXJOrHVC8pL07+zdw3Lb2K286gfLVn+4TML7Xlr6TYGTcdy2
+         0frRyWH59Z8mX7YHO0YtISNyPzb9MuERQAqJ+FpuuAp5hHZ+biHAKIRTdrUGsQsWP7H+
+         pwurPnHpDtzQfoFAKJfr1PWa62bSdriGHmPPm1mz3sYy8oZfuW21JytXuwjZ+OqaLYut
+         ac/YbHmcGlV43hBZFKUAbHDfcVtZ9DVbaQc9b2F+cGcir9C2IvdksScG6YRkZoWQcB74
+         5stMtIRzYvuFbEs41ZM4cJ77MpsSk/AJKF/8OQfTbA2cVCoEqhyLqngvazTssyISpwYV
+         oCGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769500076; x=1770104876;
+        d=1e100.net; s=20230601; t=1769500078; x=1770104878;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=q7EPbjX0UG1k1VYmm/wtZvdosyovsK9QiO3tQQyoQBs=;
-        b=T1NeXbjBrkTYJJLTLNanczoN5z5fZ0fiDGWxA0TkSdPbcDIl0RKTTvTFtWp+fiw8sE
-         2fBa5Uxc/0iZeH41Jq+OF4ij01d1i1l/Lf+nBV7RiB6e/ALTli38cnCsbrzyJp2lpC2a
-         B50e4fiBG1Ehoicy3G+WPi+7CEd8iR3Y//v5KfFoO9izDXL7acvWl2JIuUsRzZb2pKNW
-         nzwBA/YkE0z/7n5xM2qvHO6CS1yceUUzN6cpflwu/2EEYZFSMaBn3EEGgIiB/j6/hj7z
-         HXtsgxOqW/reK4pgzYWSyZxAFlIyxlqCVt3mYvVzdmj2PtnXtz5XGx/LYBgVhyGS2V6i
-         yzvw==
-X-Gm-Message-State: AOJu0YynuI5BFxTgT7RJFQewrUvtZA1PjBVMeqbBHi5Ejv/qLHTCOnsw
-	zUD8BbRKSNCR8Ia5WR9K0hETluhBfB3cc9snoYhY17qfpkxhgXPbSObIAAAQaFJzlzXvvc+TOmY
-	v9CR2gCm3ILJTABMGSdSAuue4dF4dHT++Za6rfzpJD/Kccl/TtfYraWppSHbFK5v6ZxTMZDit1Z
-	ZgRbU=
-X-Gm-Gg: AZuq6aK4Zeg3X0J6b8aXmtwfndMMgJHpRmNhyD2dhtS/u1y/ASHwbXy63fSix72dnuM
-	gOSBPvIpjEBkE1G8QBx7tjhd+ZrEfdhh0uWKVPTuRzJNpozJIPAnS9zx3DsaOU0aOeAVR9SX057
-	6H2o4V2vRkJTzBarBZPbPoxyQUmPEMBcIyy3/TG9qxaDlmX4rLuY64pjyq5ZAge+wyhwEzdQ+wL
-	v0/EWUZJ/slJtdlcbOzfWgS32guaSnxVKwy2JobtJaslE1iE4Ucv94pY4fOl4uUKPyjQ/tLW6tI
-	uwSKvK2AnnRQfwudvoi+Nuss4tWcDM4WugD0iUb4ruE7z6d9nHktAHcqPA5urXRFuY73Ld1lKog
-	++ovTnVELFuVtZRbTU/GkyYLSDIPmEv4aUWK+SUfK+PJzqwHT
-X-Received: by 2002:a17:903:37d0:b0:2a1:14dd:573 with SMTP id d9443c01a7336-2a870db415emr12051075ad.23.1769500075590;
-        Mon, 26 Jan 2026 23:47:55 -0800 (PST)
-X-Received: by 2002:a17:903:37d0:b0:2a1:14dd:573 with SMTP id d9443c01a7336-2a870db415emr12050895ad.23.1769500074993;
-        Mon, 26 Jan 2026 23:47:54 -0800 (PST)
+        bh=1TGN21vt54rRxDMAbZfVQmAaHW5N4ITRdxTa9YXn9yw=;
+        b=ZS6zfd39bOr2DSTFHZn0WIxMPcUavRoo/zP29EnLgzTfXs9LcG9PN86TYqcUoCUGZ/
+         gZDfO19ym8tLdDb2CexZ2zq6/kKG9S1Ri30v9nSteTJpSjJjdXjZnUV0Vy9CnJQo/hWv
+         tLsf7MOZ2FxsDLqSgpmufjpAPhlW8CZdo0Ra3/kcXIyCy1xtWzZA8ilx70K2nR07iaoa
+         tHKjyIoqe64XKgJY9jbr34SXL4bp0D5SRQDJshaZt9OtUFgnW/n4Xjt7lay8buVqZwiA
+         W53WM1YLyIw/5uKU+lkXvis1NC88h4Ppq/oXrH1HU4N+QDTF7x0W2fsrGnhEs/AjT7Y2
+         +NWA==
+X-Gm-Message-State: AOJu0YzAgMBK5g5VaZxkaaCAzjPKzUgVTN1D3C+hwLhtIULe2mQf3ZxX
+	6q8++JaJdUm3xyyrPk8XSIIKVpUpmHGKfcoViozSyNRG32Jr6c0+VXs8qdmZHzvivvW11pBPqJ/
+	H8R/odK1+F31kprI98/CM4lJCfj7+XAQQfwNYlu8K6iwOmeKDy+hQwWJ7nywcyIB57tMD/7HDlc
+	VUbP0=
+X-Gm-Gg: AZuq6aIdpy+G+pVAYsmo2aMei/1Gux82ooVRIytrRofRhJoNkrLUp2C4TcpK8mxRXQC
+	+yvOtdL6iWTiBWKBGLQDzdMgEStCbYYMd7sYMZEWtB0ahtoFdMFHviRIDr1+nL8P1FPqJQnBidI
+	tw3jZAv0hE5Fzg7Wh2ISdEPZeseuhAd/JJIAoB0V0U1d+MD9KxZqLrJBjQxHgwoKBoUaaukWIta
+	IcIa9uYEeV+yWBuKt37VMjR3dZ7QjySmFyMaJvpyxbMBHYCxL5/ZcCnLgyave50xQg5tSIRu9z8
+	XRzNTn3BsAk3oxmZ6TPMu1Xne9/DU8LPS2jlFeBolXh60tWJ9BNcYYXguUscXtN2PE9MbtMwrxL
+	SrOWScr2jx7dyxsC3UaABYwM3Xy2LGLpjDJY6NtlHjgvs2CEQ
+X-Received: by 2002:a17:903:2acd:b0:2a1:10f7:9718 with SMTP id d9443c01a7336-2a870e18919mr11074785ad.30.1769500077651;
+        Mon, 26 Jan 2026 23:47:57 -0800 (PST)
+X-Received: by 2002:a17:903:2acd:b0:2a1:10f7:9718 with SMTP id d9443c01a7336-2a870e18919mr11074615ad.30.1769500077113;
+        Mon, 26 Jan 2026 23:47:57 -0800 (PST)
 Received: from hu-prathm-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802dcfaf7sm109483675ad.34.2026.01.26.23.47.53
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802dcfaf7sm109483675ad.34.2026.01.26.23.47.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 23:47:54 -0800 (PST)
+        Mon, 26 Jan 2026 23:47:56 -0800 (PST)
 From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com
-Subject: [PATCH BlueZ v2 3/5] Implement the Bluetooth Ranging Profile  GATT server and client support as specified by the Bluetooth SIG:
-Date: Tue, 27 Jan 2026 13:17:43 +0530
-Message-Id: <20260127074745.2984874-4-prathibha.madugonde@oss.qualcomm.com>
+Subject: [PATCH BlueZ v2 4/5] unit: Add test cases for Ranging Profile (RAP)
+Date: Tue, 27 Jan 2026 13:17:44 +0530
+Message-Id: <20260127074745.2984874-5-prathibha.madugonde@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260127074745.2984874-1-prathibha.madugonde@oss.qualcomm.com>
 References: <20260127074745.2984874-1-prathibha.madugonde@oss.qualcomm.com>
@@ -94,68 +93,72 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDA2MiBTYWx0ZWRfX9u12Sw9vemFe
- BlMjZYfXYsxatkrLFlMXRcIzDX1mUFr5pbf3MtqmhwEKhp7DRjn/MW65uePSePUT+A/DQpm9GfH
- 1gUgyAkjdN1MYN+JTXidsXwb6nEQV+MFAMm+yu8x4/Pr3WjccmmGrIWnEl6JomFetL0v4bavPjF
- LGOR1MojRyRPMwy+6BkMGRDRRNTojFjSMa6hhU+ZXDwQmj4XDxzqvt9uQlpl4suYWjtasQ/msiW
- 3fXWu861nFVfnUzCM+uQUBhyEseIfxcqcTi9yKAz43/6xqlwDNzQQBOEtPQiI6X/NOCV6jZotlM
- 6RGZUc5zv0eeomIAVLd7gaIPTXxnueL/8yxJVwWVjVOsJnZWaYhfqhBJNmBYKK4fi9mYxTpMZSU
- YJEXDUATyaiNNJzu0zCs7pGUkuLX0qEKdTeyGOVGAJn8OnNN145iflgHVHvRRvYGNKMm0mlMsrX
- ns01dWXThFwSf5eIgaA==
-X-Authority-Analysis: v=2.4 cv=Uc1ciaSN c=1 sm=1 tr=0 ts=69786dad cx=c_pps
- a=IZJwPbhc+fLeJZngyXXI0A==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=CgvfZk3UbeQEHd6wTg8A:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=uG9DUKGECoFWVXl0Dc02:22
-X-Proofpoint-ORIG-GUID: JdUxPTfA45KVO-OCkk6Ng2PGvMkZGiaR
-X-Proofpoint-GUID: JdUxPTfA45KVO-OCkk6Ng2PGvMkZGiaR
+X-Proofpoint-GUID: C9MzuuJsde9_-yA46yTYBQC4pRZU6mt5
+X-Authority-Analysis: v=2.4 cv=SvedKfO0 c=1 sm=1 tr=0 ts=69786daf cx=c_pps
+ a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=XA3xTWKml79YH-AOntAA:9 a=GvdueXVYPmCkWapjIL-Q:22
+X-Proofpoint-ORIG-GUID: C9MzuuJsde9_-yA46yTYBQC4pRZU6mt5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDA2MiBTYWx0ZWRfXxLN92aJtuPAq
+ /BWnPNsBxQjiqG4xtie3uMCNt9GgU+Dt7krHYLljr7k9DNTTgJsPbOupJ2wLGYYJknTsDuPi30Q
+ Z9nQkWOVJaS99yk7D0dy2eSjPLBIiCF4I7t0F7JsCEzZxS6meVkBTWdv7kcw+ZPNAAGfw8Ewx3e
+ iG7TY/a9lIq6YzRimHJUYP3TPMyulHkPNP1ehHYuaV7wbMogt2g9QLdoB9qf/DG2Q6+OeyNjP36
+ +MPqxhzETylCwD3cWMDUafJBrHcW7UTc9vaefM9DMLFJNpISFihmT9V0HLFJRVNAo4nKZ5bgljB
+ 35Vp6M7KeR06uGOiqY8k40ujpn20wt++z2IJ6x9QqhA9q6tA0d8oKFzbyvH7LIQGmLMGWyUAm33
+ /n/WedKeo9NC64Zqaw6OkymR69Vkbq4oa+PzyjbwOf0cdTW3UMrVRnoHNqmw1eivncxO9tnWELB
+ b+1pe11A4gbPCRp2zhA==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
  definitions=2026-01-27_01,2026-01-26_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
- impostorscore=0 malwarescore=0 phishscore=0 spamscore=0 bulkscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2601270062
+ priorityscore=1501 adultscore=0 clxscore=1015 suspectscore=0 impostorscore=0
+ spamscore=0 phishscore=0 malwarescore=0 bulkscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601270062
 
-Add RAS service, characteristics, and descriptors to the local GATT DB
-Implement server-side callbacks for RAS Features, Procedure Data,
-Data Ready and Data Overwritten characteristics
-Add client-side session handling, notification registration and
-ready callbacks
-Wire RAS attachment/detachment to ATT/GATT client and server
+This adds unit test cases for the Ranging Profile (RAP)
+ implementation, specifically testing the Ranging Service (RAS) server
+ functionality.
+
+The test suite includes:
+- RAS/SR/SGGIT/SER/BV-01-C: Service discovery test
+- RAS/SR/SGGIT/CHA/BV-01-C: Characteristic GGIT -RAS Features
+- RAS/SR/SGGIT/CHA/BV-02-C: Characteristic GGIT -Real-time Ranging Data
+- RAS/SR/SGGIT/CHA/BV-03-C: Characteristic GGIT -On-demand Ranging Data
+- RAS/SR/SGGIT/CHA/BV-04-C: Characteristic GGIT -RAS Control Point
+
+These tests verify GATT server behavior for the Ranging Service,
+including service discovery, characteristic discovery.
 ---
- Makefile.am      |   4 +-
- src/shared/rap.c | 874 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/rap.h |  45 +++
- 3 files changed, 922 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/rap.c
- create mode 100644 src/shared/rap.h
+ Makefile.am     |   6 +
+ unit/test-rap.c | 458 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 464 insertions(+)
+ create mode 100644 unit/test-rap.c
 
 diff --git a/Makefile.am b/Makefile.am
-index 2217bcf15..cff5cc034 100644
+index cff5cc034..1f73a4fa0 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -248,7 +248,9 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/bap-defs.h \
- 			src/shared/asha.h src/shared/asha.c \
- 			src/shared/battery.h src/shared/battery.c \
--			src/shared/uinput.h src/shared/uinput.c
-+			src/shared/uinput.h src/shared/uinput.c \
-+			src/shared/rap.h src/shared/rap.c
-+
+@@ -757,6 +757,12 @@ unit_test_battery_SOURCES = unit/test-battery.c
+ unit_test_battery_LDADD = src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la $(GLIB_LIBS)
  
- if READLINE
- shared_sources += src/shared/shell.c src/shared/shell.h
-diff --git a/src/shared/rap.c b/src/shared/rap.c
++unit_tests += unit/test-rap
++
++unit_test_rap_SOURCES = unit/test-rap.c $(btio_sources)
++unit_test_rap_LDADD = src/libshared-glib.la \
++				lib/libbluetooth-internal.la $(GLIB_LIBS)
++
+ if MIDI
+ unit_tests += unit/test-midi
+ unit_test_midi_CPPFLAGS = $(AM_CPPFLAGS) $(ALSA_CFLAGS) -DMIDI_TEST
+diff --git a/unit/test-rap.c b/unit/test-rap.c
 new file mode 100644
-index 000000000..605963c92
+index 000000000..a0cb14f7e
 --- /dev/null
-+++ b/src/shared/rap.c
-@@ -0,0 +1,874 @@
++++ b/unit/test-rap.c
+@@ -0,0 +1,458 @@
 +// SPDX-License-Identifier: LGPL-2.1-or-later
 +/*
 + * BlueZ - Bluetooth protocol stack for Linux
@@ -163,924 +166,457 @@ index 000000000..605963c92
 + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 + */
 +
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
 +#define _GNU_SOURCE
-+#include <inttypes.h>
-+#include <string.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
 +#include <unistd.h>
-+#include <errno.h>
++#include <string.h>
++#include <sys/socket.h>
++#include <fcntl.h>
++
++
 +#include <glib.h>
 +
 +#include "bluetooth/bluetooth.h"
 +#include "bluetooth/uuid.h"
-+
-+#include "src/shared/queue.h"
 +#include "src/shared/util.h"
-+#include "src/shared/timeout.h"
++#include "src/shared/tester.h"
++#include "src/shared/queue.h"
 +#include "src/shared/att.h"
 +#include "src/shared/gatt-db.h"
 +#include "src/shared/gatt-server.h"
 +#include "src/shared/gatt-client.h"
 +#include "src/shared/rap.h"
 +
-+#define DBG(_rap, fmt, arg...) \
-+	rap_debug(_rap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
-+
-+#define RAS_UUID16			0x185B
-+
-+/* Total number of attribute handles reserved for the RAS service */
-+#define RAS_TOTAL_NUM_HANDLES		18
-+
-+/* Ranging Service context */
-+struct ras {
-+	struct bt_rap_db *rapdb;
-+
-+	/* Service and characteristic attributes */
-+	struct gatt_db_attribute *svc;
-+	struct gatt_db_attribute *feat_chrc;
-+	struct gatt_db_attribute *realtime_chrc;
-+	struct gatt_db_attribute *realtime_chrc_ccc;
-+	struct gatt_db_attribute *ondemand_chrc;
-+	struct gatt_db_attribute *cp_chrc;
-+	struct gatt_db_attribute *ready_chrc;
-+	struct gatt_db_attribute *overwritten_chrc;
-+};
-+
-+struct bt_rap_db {
++struct test_data_ras {
 +	struct gatt_db *db;
-+	struct ras *ras;
-+};
-+
-+struct bt_rap {
-+	int ref_count;
-+	struct bt_rap_db *lrapdb;
-+	struct bt_rap_db *rrapdb;
++	struct bt_gatt_server *server;
 +	struct bt_gatt_client *client;
-+	struct bt_att *att;
-+
-+	unsigned int idle_id;
-+
-+	struct queue *notify;
-+	struct queue *pending;
-+	struct queue *ready_cbs;
-+
-+	bt_rap_debug_func_t debug_func;
-+	bt_rap_destroy_func_t debug_destroy;
-+	void *debug_data;
-+	void *user_data;
++	struct queue *ccc_states;
++	size_t iovcnt;
++	struct iovec *iov;
++	unsigned int ras_id;
 +};
 +
-+static struct queue *rap_db;
-+static struct queue *bt_rap_cbs;
-+static struct queue *sessions;
-+
-+struct bt_rap_cb {
-+	unsigned int id;
-+	bt_rap_func_t attached;
-+	bt_rap_func_t detached;
-+	void *user_data;
-+};
-+
-+typedef void (*rap_func_t)(struct bt_rap *rap, bool success,
-+			   uint8_t att_ecode, const uint8_t *value,
-+			   uint16_t length, void *user_data);
-+
-+struct bt_rap_pending {
-+	unsigned int id;
++struct test_data_rap {
++	struct gatt_db *db;
 +	struct bt_rap *rap;
-+	rap_func_t func;
-+	void *userdata;
++	struct bt_gatt_client *client;
++	size_t iovcnt;
++	struct iovec *iov;
 +};
 +
-+struct bt_rap_ready {
-+	unsigned int id;
-+	bt_rap_ready_func_t func;
-+	bt_rap_destroy_func_t destroy;
-+	void *data;
++struct ccc_state {
++	uint16_t handle;
++	uint16_t value;
 +};
 +
-+typedef void (*rap_notify_t)(struct bt_rap *rap, uint16_t value_handle,
-+			     const uint8_t *value, uint16_t length,
-+			     void *user_data);
-+
-+struct bt_rap_notify {
-+	unsigned int id;
-+	struct bt_rap *rap;
-+	rap_notify_t func;
++struct notify {
++	uint16_t handle, ccc_handle;
++	uint8_t *value;
++	uint16_t len;
++	bt_gatt_server_conf_func_t conf;
 +	void *user_data;
 +};
 +
-+static bool real_time_enabled;
-+static bool on_demand_enabled;
-+struct gatt_db_attribute *global_real_time_char;
-+struct gatt_db_attribute *global_on_demand_char;
-+struct gatt_db_attribute *global_data_ready_char;
-+struct gatt_db_attribute *global_data_overwritten_char;
-+struct gatt_db_attribute *global_control_point_char;
++#define RAP_GATT_CLIENT_MTU	64
 +
-+static struct bt_rap_db *rap_get_rapdb(struct bt_rap *rap)
++#define iov_data(args...) ((const struct iovec[]) { args })
++
++#define define_test_ras(name, function, args...)		\
++	do {							\
++		const struct iovec iov[] = { args };		\
++		static struct test_data_ras data;			\
++		data.iovcnt = ARRAY_SIZE(iov_data(args));	\
++		data.iov = util_iov_dup(iov, ARRAY_SIZE(iov_data(args))); \
++		tester_add(name, &data, NULL, function,	\
++				test_teardown_ras);			\
++	} while (0)
++
++static void print_debug(const char *str, void *user_data)
 +{
-+	if (!rap)
-+		return NULL;
++	const char *prefix = user_data;
 +
-+	if (rap->lrapdb)
-+		return rap->lrapdb;
-+
-+	return NULL;
++	if (tester_use_debug())
++		tester_debug("%s%s", prefix, str);
 +}
 +
-+struct ras *rap_get_ras(struct bt_rap *rap)
++static void test_teardown_ras(const void *user_data)
 +{
-+	if (!rap)
-+		return NULL;
++	struct test_data_ras *data = (void *)user_data;
 +
-+	if (rap->rrapdb->ras)
-+		return rap->rrapdb->ras;
++	bt_gatt_server_unref(data->server);
++	util_iov_free(data->iov, data->iovcnt);
++	gatt_db_unref(data->db);
++	bt_rap_unregister(data->ras_id);
 +
-+	rap->rrapdb->ras = new0(struct ras, 1);
-+	rap->rrapdb->ras->rapdb = rap->rrapdb;
++	queue_destroy(data->ccc_states, free);
 +
-+	return rap->rrapdb->ras;
++	tester_teardown_complete();
 +}
 +
-+static void rap_detached(void *data, void *user_data)
++static void test_teardown_rap(const void *user_data)
 +{
-+	struct bt_rap_cb *cb = data;
-+	struct bt_rap *rap = user_data;
++	struct test_data_rap *data = (void *)user_data;
 +
-+	cb->detached(rap, cb->user_data);
++	bt_rap_unref(data->rap);
++	bt_gatt_client_unref(data->client);
++	util_iov_free(data->iov, data->iovcnt);
++	gatt_db_unref(data->db);
++
++	tester_teardown_complete();
 +}
 +
-+void bt_rap_detach(struct bt_rap *rap)
++static void test_complete_cb(const void *user_data)
 +{
-+	if (!queue_remove(sessions, rap))
-+		return;
-+
-+	bt_gatt_client_idle_unregister(rap->client, rap->idle_id);
-+	bt_gatt_client_unref(rap->client);
-+	rap->client = NULL;
-+
-+	queue_foreach(bt_rap_cbs, rap_detached, rap);
++	tester_test_passed();
 +}
 +
-+static void rap_db_free(void *data)
++static bool ccc_state_match(const void *a, const void *b)
 +{
-+	struct bt_rap_db *rapdb = data;
++	const struct ccc_state *ccc = a;
++	uint16_t handle = PTR_TO_UINT(b);
 +
-+	if (!rapdb)
-+		return;
-+
-+	gatt_db_unref(rapdb->db);
-+
-+	free(rapdb->ras);
-+	free(rapdb);
++	return ccc->handle == handle;
 +}
 +
-+static void rap_ready_free(void *data)
++static struct ccc_state *find_ccc_state(struct test_data_ras *data,
++			uint16_t handle)
 +{
-+	struct bt_rap_ready *ready = data;
-+
-+	if (ready->destroy)
-+		ready->destroy(ready->data);
-+
-+	free(ready);
++	return queue_find(data->ccc_states, ccc_state_match,
++				UINT_TO_PTR(handle));
 +}
 +
-+static void rap_free(void *data)
++static struct ccc_state *get_ccc_state(struct test_data_ras *data,
++			uint16_t handle)
 +{
-+	struct bt_rap *rap = data;
++	struct ccc_state *ccc;
 +
-+	bt_rap_detach(rap);
++	ccc = find_ccc_state(data, handle);
++	if (ccc)
++		return ccc;
 +
-+	rap_db_free(rap->rrapdb);
++	ccc = new0(struct ccc_state, 1);
++	ccc->handle = handle;
++	queue_push_tail(data->ccc_states, ccc);
 +
-+	queue_destroy(rap->notify, free);
-+	queue_destroy(rap->pending, NULL);
-+	queue_destroy(rap->ready_cbs, rap_ready_free);
-+
-+	free(rap);
++	return ccc;
 +}
 +
-+bool bt_rap_set_user_data(struct bt_rap *rap, void *user_data)
++static void gatt_notify_cb(struct gatt_db_attribute *attrib,
++					struct gatt_db_attribute *ccc,
++					const uint8_t *value, size_t len,
++					struct bt_att *att, void *user_data)
 +{
-+	if (!rap)
-+		return false;
++	struct test_data_ras *data = user_data;
++	struct notify notify;
 +
-+	rap->user_data = user_data;
++	memset(&notify, 0, sizeof(notify));
 +
-+	return true;
++	notify.handle = gatt_db_attribute_get_handle(attrib);
++	notify.ccc_handle = gatt_db_attribute_get_handle(ccc);
++	notify.value = (void *) value;
++	notify.len = len;
++
++	printf("%s: notify.value:%d notify->len:%d\n", __func__,
++		(int)*(notify.value), notify.len);
++	if (!bt_gatt_server_send_notification(data->server,
++			notify.handle, notify.value,
++			notify.len, false))
++		printf("%s: Failed to send notification\n", __func__);
 +}
 +
-+static bool rap_db_match(const void *data, const void *match_data)
++static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
 +{
-+	const struct bt_rap_db *rapdb = data;
-+	const struct gatt_db *db = match_data;
++	struct test_data_ras *data = user_data;
++	struct ccc_state *ccc;
++	uint16_t handle;
++	uint8_t ecode = 0;
++	const uint8_t *value = NULL;
++	size_t len = 0;
 +
-+	return rapdb->db == db;
-+}
++	handle = gatt_db_attribute_get_handle(attrib);
 +
-+struct bt_att *bt_rap_get_att(struct bt_rap *rap)
-+{
-+	if (!rap)
-+		return NULL;
-+
-+	if (rap->att)
-+		return rap->att;
-+
-+	return bt_gatt_client_get_att(rap->client);
-+}
-+
-+struct bt_rap *bt_rap_ref(struct bt_rap *rap)
-+{
-+	if (!rap)
-+		return NULL;
-+
-+	__sync_fetch_and_add(&rap->ref_count, 1);
-+
-+	return rap;
-+}
-+
-+void bt_rap_unref(struct bt_rap *rap)
-+{
-+	if (!rap)
-+		return;
-+
-+	if (__sync_sub_and_fetch(&rap->ref_count, 1))
-+		return;
-+
-+	rap_free(rap);
-+}
-+
-+static void rap_debug(struct bt_rap *rap, const char *format, ...)
-+{
-+	va_list ap;
-+
-+	if (!rap || !format || !rap->debug_func)
-+		return;
-+
-+	va_start(ap, format);
-+	util_debug_va(rap->debug_func, rap->debug_data, format, ap);
-+	va_end(ap);
-+}
-+
-+bool bt_rap_set_debug(struct bt_rap *rap, bt_rap_debug_func_t func,
-+			void *user_data, bt_rap_destroy_func_t destroy)
-+{
-+	if (!rap)
-+		return false;
-+
-+	if (rap->debug_destroy)
-+		rap->debug_destroy(rap->debug_data);
-+
-+	rap->debug_func = func;
-+	rap->debug_destroy = destroy;
-+	rap->debug_data = user_data;
-+
-+	return true;
-+}
-+
-+static void ras_features_read_cb(struct gatt_db_attribute *attrib,
-+				 unsigned int id, uint16_t offset,
-+				 uint8_t opcode, struct bt_att *att,
-+				 void *user_data)
-+{
-+	/*
-+	 * Feature mask: bits 0-2 set:
-+	 *  - Real-time ranging
-+	 *  - Retrieve stored results
-+	 *  - Abort operation
-+	 */
-+	uint8_t value[4] = { 0x01, 0x00, 0x00, 0x00 };
-+
-+	gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
-+}
-+
-+static void ras_realtime_read_cb(struct gatt_db_attribute *attrib,
-+				 unsigned int id, uint16_t offset,
-+				 uint8_t opcode, struct bt_att *att,
-+				 void *user_data)
-+{
-+	/* No static read data; real-time data is provided via notifications. */
-+	gatt_db_attribute_read_result(attrib, id, 0, NULL, 0);
-+}
-+
-+static void ras_ondemand_read_cb(struct gatt_db_attribute *attrib,
-+				 unsigned int id, uint16_t offset,
-+				 uint8_t opcode, struct bt_att *att,
-+				 void *user_data)
-+{
-+	/* No static read data – on‑demand data is pushed via
-+	 * notifications
-+	 */
-+	gatt_db_attribute_read_result(attrib, id, 0, NULL, 0);
-+}
-+
-+/*
-+ * Control point handler.
-+ * Parses the opcode and acts on queued data (implementation TBD).
-+ */
-+static void ras_control_point_write_cb(struct gatt_db_attribute *attrib,
-+				       unsigned int id, uint16_t offset,
-+				       const uint8_t *value, size_t len,
-+				       uint8_t opcode, struct bt_att *att,
-+				       void *user_data)
-+{
-+	/* Control point handler - implementation TBD */
-+}
-+
-+/* Data Ready – returns the latest ranging counter. */
-+static void ras_data_ready_read_cb(struct gatt_db_attribute *attrib,
-+				   unsigned int id, uint16_t offset,
-+				   uint8_t opcode, struct bt_att *att,
-+				   void *user_data)
-+{
-+	uint16_t counter = 0;
-+	uint8_t value[2];
-+
-+	put_le16(counter, value);
-+	gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
-+}
-+
-+/* Data Overwritten – indicates how many results were overwritten. */
-+static void ras_data_overwritten_read_cb(struct gatt_db_attribute *attrib,
-+					 unsigned int id, uint16_t offset,
-+					 uint8_t opcode, struct bt_att *att,
-+					 void *user_data)
-+{
-+	uint8_t value[2] = { 0x00, 0x00 };
-+
-+	gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
-+}
-+
-+/* Service registration – store attribute pointers */
-+static struct ras *register_ras_service(struct gatt_db *db)
-+{
-+	struct ras *ras;
-+	struct gatt_db_attribute *service;
-+	bt_uuid_t uuid;
-+
-+	if (!db)
-+		return NULL;
-+
-+	ras = new0(struct ras, 1);
-+	if (!ras)
-+		return NULL;
-+
-+	/* Primary RAS service */
-+	bt_uuid16_create(&uuid, RAS_UUID16);
-+	service = gatt_db_add_service(db, &uuid, true, RAS_TOTAL_NUM_HANDLES);
-+	if (!service) {
-+		free(ras);
-+		return NULL;
++	ccc = get_ccc_state(data, handle);
++	if (!ccc) {
++		ecode = BT_ATT_ERROR_UNLIKELY;
++		goto done;
 +	}
 +
-+	ras->svc = service;
-+
-+	/* RAS Features */
-+	bt_uuid16_create(&uuid, RAS_FEATURES_UUID);
-+		ras->feat_chrc =
-+		gatt_db_service_add_characteristic(ras->svc, &uuid,
-+						  BT_ATT_PERM_READ |
-+						  BT_ATT_PERM_READ_ENCRYPT,
-+						  BT_GATT_CHRC_PROP_READ,
-+						  ras_features_read_cb,
-+						  NULL, ras);
-+
-+	/* Real-time Ranging Data */
-+	bt_uuid16_create(&uuid, RAS_REALTIME_DATA_UUID);
-+	ras->realtime_chrc =
-+		gatt_db_service_add_characteristic(ras->svc, &uuid,
-+						  BT_ATT_PERM_READ |
-+						  BT_ATT_PERM_READ_ENCRYPT,
-+						  BT_GATT_CHRC_PROP_NOTIFY |
-+						  BT_GATT_CHRC_PROP_INDICATE,
-+						  NULL, NULL, ras);
-+
-+	ras->realtime_chrc_ccc =
-+		gatt_db_service_add_ccc(ras->svc,
-+					BT_ATT_PERM_READ |
-+					BT_ATT_PERM_WRITE);
-+
-+	/* On-demand Ranging Data */
-+	bt_uuid16_create(&uuid, RAS_ONDEMAND_DATA_UUID);
-+	ras->ondemand_chrc =
-+		gatt_db_service_add_characteristic(ras->svc, &uuid,
-+						  BT_ATT_PERM_READ |
-+						  BT_ATT_PERM_READ_ENCRYPT,
-+						  BT_GATT_CHRC_PROP_NOTIFY |
-+						  BT_GATT_CHRC_PROP_INDICATE,
-+						  ras_ondemand_read_cb, NULL,
-+						  ras);
-+
-+	gatt_db_service_add_ccc(ras->svc,
-+				BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
-+
-+	/* RAS Control Point */
-+	bt_uuid16_create(&uuid, RAS_CONTROL_POINT_UUID);
-+	ras->cp_chrc =
-+		gatt_db_service_add_characteristic(ras->svc, &uuid,
-+						  BT_ATT_PERM_WRITE |
-+						  BT_ATT_PERM_WRITE_ENCRYPT,
-+				BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP |
-+						  BT_GATT_CHRC_PROP_INDICATE,
-+						  NULL,
-+						  ras_control_point_write_cb,
-+						  ras);
-+
-+	gatt_db_service_add_ccc(ras->svc,
-+				BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
-+
-+	/* RAS Data Ready */
-+	bt_uuid16_create(&uuid, RAS_DATA_READY_UUID);
-+	ras->ready_chrc =
-+		gatt_db_service_add_characteristic(ras->svc, &uuid,
-+						  BT_ATT_PERM_READ |
-+						  BT_ATT_PERM_READ_ENCRYPT,
-+						  BT_GATT_CHRC_PROP_READ |
-+						  BT_GATT_CHRC_PROP_NOTIFY |
-+						  BT_GATT_CHRC_PROP_INDICATE,
-+						  ras_data_ready_read_cb, NULL,
-+						  ras);
-+
-+	gatt_db_service_add_ccc(ras->svc,
-+				BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
-+
-+	/* RAS Data Overwritten */
-+	bt_uuid16_create(&uuid, RAS_DATA_OVERWRITTEN_UUID);
-+	ras->overwritten_chrc =
-+		gatt_db_service_add_characteristic(ras->svc, &uuid,
-+						  BT_ATT_PERM_READ |
-+						  BT_ATT_PERM_READ_ENCRYPT,
-+						  BT_GATT_CHRC_PROP_READ |
-+						  BT_GATT_CHRC_PROP_NOTIFY |
-+						  BT_GATT_CHRC_PROP_INDICATE,
-+						  ras_data_overwritten_read_cb,
-+						  NULL, ras);
-+
-+	gatt_db_service_add_ccc(ras->svc,
-+				BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
-+
-+	/* Activate the service */
-+	gatt_db_service_set_active(ras->svc, true);
-+
-+	return ras;
-+}
-+
-+static struct bt_rap_db *rap_db_new(struct gatt_db *db)
-+{
-+	struct bt_rap_db *rapdb;
-+
-+	if (!db)
-+		return NULL;
-+
-+	rapdb = new0(struct bt_rap_db, 1);
-+	if (!rapdb)
-+		return NULL;
-+
-+	rapdb->db = gatt_db_ref(db);
-+
-+	if (!rap_db)
-+		rap_db = queue_new();
-+
-+	rapdb->ras = register_ras_service(db);
-+	if (rapdb->ras)
-+		rapdb->ras->rapdb = rapdb;
-+
-+	queue_push_tail(rap_db, rapdb);
-+
-+	return rapdb;
-+}
-+
-+static struct bt_rap_db *rap_get_db(struct gatt_db *db)
-+{
-+	struct bt_rap_db *rapdb;
-+
-+	rapdb = queue_find(rap_db, rap_db_match, db);
-+	if (rapdb)
-+		return rapdb;
-+
-+	return rap_db_new(db);
-+}
-+
-+void bt_rap_add_db(struct gatt_db *db)
-+{
-+	rap_db_new(db);
-+}
-+
-+unsigned int bt_rap_register(bt_rap_func_t attached, bt_rap_func_t detached,
-+			     void *user_data)
-+{
-+	struct bt_rap_cb *cb;
-+	static unsigned int id;
-+
-+	if (!attached && !detached)
-+		return 0;
-+
-+	if (!bt_rap_cbs)
-+		bt_rap_cbs = queue_new();
-+
-+	cb = new0(struct bt_rap_cb, 1);
-+	cb->id = ++id ? id : ++id;
-+	cb->attached = attached;
-+	cb->detached = detached;
-+	cb->user_data = user_data;
-+
-+	queue_push_tail(bt_rap_cbs, cb);
-+
-+	return cb->id;
-+}
-+
-+static bool match_id(const void *data, const void *match_data)
-+{
-+	const struct bt_rap_cb *cb = data;
-+	unsigned int id = PTR_TO_UINT(match_data);
-+
-+	return cb->id == id;
-+}
-+
-+bool bt_rap_unregister(unsigned int id)
-+{
-+	struct bt_rap_cb *cb;
-+
-+	cb = queue_remove_if(bt_rap_cbs, match_id, UINT_TO_PTR(id));
-+	if (!cb)
-+		return false;
-+
-+	free(cb);
-+
-+	return true;
-+}
-+
-+struct bt_rap *bt_rap_new(struct gatt_db *ldb, struct gatt_db *rdb)
-+{
-+	struct bt_rap *rap;
-+	struct bt_rap_db *rapdb;
-+
-+	if (!ldb)
-+		return NULL;
-+
-+	rapdb = rap_get_db(ldb);
-+	if (!rapdb)
-+		return NULL;
-+
-+	rap = new0(struct bt_rap, 1);
-+	rap->lrapdb = rapdb;
-+	rap->pending = queue_new();
-+	rap->ready_cbs = queue_new();
-+	rap->notify = queue_new();
-+
-+	if (!rdb)
-+		goto done;
-+
-+	rapdb = new0(struct bt_rap_db, 1);
-+	rapdb->db = gatt_db_ref(rdb);
-+
-+	rap->rrapdb = rapdb;
++	len = sizeof(ccc->value);
++	value = (void *) &ccc->value;
 +
 +done:
-+	bt_rap_ref(rap);
-+
-+	return rap;
++	gatt_db_attribute_read_result(attrib, id, ecode, value, len);
 +}
 +
-+static void rap_pending_destroy(void *data)
++static void ras_attached(struct bt_rap *rap, void *user_data)
 +{
-+	struct bt_rap_pending *pending = data;
-+	struct bt_rap *rap = pending->rap;
-+
-+	if (queue_remove_if(rap->pending, NULL, pending))
-+		free(pending);
 +}
 +
-+static void rap_pending_complete(bool success, uint8_t att_ecode,
-+				 const uint8_t *value, uint16_t length,
-+				 void *user_data)
++static void ras_detached(struct bt_rap *rap, void *user_data)
 +{
-+	struct bt_rap_pending *pending = user_data;
-+
-+	if (pending->func)
-+		pending->func(pending->rap, success, att_ecode, value,
-+			      length, pending->userdata);
-+}
-+
-+static void rap_register(uint16_t att_ecode, void *user_data)
-+{
-+	struct bt_rap_notify *notify = user_data;
-+
-+	if (att_ecode)
-+		DBG(notify->rap, "RAS register failed 0x%04x", att_ecode);
-+}
-+
-+static void rap_notify(uint16_t value_handle, const uint8_t *value,
-+		       uint16_t length, void *user_data)
-+{
-+	struct bt_rap_notify *notify = user_data;
-+
-+	if (notify->func)
-+		notify->func(notify->rap, value_handle, value, length,
-+			     notify->user_data);
-+}
-+
-+static void rap_notify_destroy(void *data)
-+{
-+	struct bt_rap_notify *notify = data;
-+	struct bt_rap *rap = notify->rap;
-+
-+	if (queue_remove_if(rap->notify, NULL, notify))
-+		free(notify);
-+}
-+
-+static unsigned int bt_rap_register_notify(struct bt_rap *rap,
-+					   uint16_t value_handle,
-+					   rap_notify_t func,
-+					   void *user_data)
-+{
-+	struct bt_rap_notify *notify;
-+
-+	notify = new0(struct bt_rap_notify, 1);
-+	notify->rap = rap;
-+	notify->func = func;
-+	notify->user_data = user_data;
-+
-+	notify->id = bt_gatt_client_register_notify(rap->client,
-+						    value_handle,
-+						    rap_register,
-+						    rap_notify,
-+						    notify,
-+						    rap_notify_destroy);
-+	if (!notify->id) {
-+		DBG(rap, "Unable to register for notifications");
-+		free(notify);
-+		return 0;
-+	}
-+
-+	queue_push_tail(rap->notify, notify);
-+
-+	return notify->id;
-+}
-+
-+static void foreach_rap_char(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct bt_rap *rap = user_data;
-+	uint16_t value_handle;
-+	bt_uuid_t uuid;
-+	bt_uuid_t uuid_features;
-+	bt_uuid_t uuid_realtime;
-+	bt_uuid_t uuid_ondemand;
-+	bt_uuid_t uuid_cp;
-+	bt_uuid_t uuid_dataready;
-+	bt_uuid_t uuid_overwritten;
-+	struct ras *ras;
-+
-+	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
-+					     NULL, NULL, &uuid))
-+		return;
-+
-+	bt_uuid16_create(&uuid_features, RAS_FEATURES_UUID);
-+	bt_uuid16_create(&uuid_realtime, RAS_REALTIME_DATA_UUID);
-+	bt_uuid16_create(&uuid_ondemand, RAS_ONDEMAND_DATA_UUID);
-+	bt_uuid16_create(&uuid_cp, RAS_CONTROL_POINT_UUID);
-+	bt_uuid16_create(&uuid_dataready, RAS_DATA_READY_UUID);
-+	bt_uuid16_create(&uuid_overwritten, RAS_DATA_OVERWRITTEN_UUID);
-+
-+	if (!bt_uuid_cmp(&uuid, &uuid_features)) {
-+		DBG(rap, "Features characteristic found: handle 0x%04x",
-+		    value_handle);
-+
-+		ras = rap_get_ras(rap);
-+		if (!ras || ras->feat_chrc)
-+			return;
-+
-+		ras->feat_chrc = attr;
-+	}
-+
-+	if (!bt_uuid_cmp(&uuid, &uuid_realtime)) {
-+		DBG(rap, "Real Time Data characteristic found: handle 0x%04x",
-+		    value_handle);
-+
-+		ras = rap_get_ras(rap);
-+		if (!ras || ras->realtime_chrc)
-+			return;
-+
-+		ras->realtime_chrc = attr;
-+	}
-+
-+	if (!bt_uuid_cmp(&uuid, &uuid_ondemand)) {
-+		DBG(rap, "On-demand Data characteristic found: handle 0x%04x",
-+		    value_handle);
-+
-+		ras = rap_get_ras(rap);
-+		if (!ras || ras->ondemand_chrc)
-+			return;
-+
-+		ras->ondemand_chrc = attr;
-+	}
-+
-+	if (!bt_uuid_cmp(&uuid, &uuid_cp)) {
-+		DBG(rap, "Control Point characteristic found: handle 0x%04x",
-+		    value_handle);
-+
-+		ras = rap_get_ras(rap);
-+		if (!ras || ras->cp_chrc)
-+			return;
-+
-+		ras->cp_chrc = attr;
-+	}
-+
-+	if (!bt_uuid_cmp(&uuid, &uuid_dataready)) {
-+		DBG(rap, "Data Ready characteristic found: handle 0x%04x",
-+		    value_handle);
-+
-+		ras = rap_get_ras(rap);
-+		if (!ras || ras->ready_chrc)
-+			return;
-+
-+		ras->ready_chrc = attr;
-+	}
-+
-+	if (!bt_uuid_cmp(&uuid, &uuid_overwritten)) {
-+		DBG(rap, "Overwritten characteristic found: handle 0x%04x",
-+		    value_handle);
-+
-+		ras = rap_get_ras(rap);
-+		if (!ras || ras->overwritten_chrc)
-+			return;
-+
-+		ras->overwritten_chrc = attr;
-+	}
-+}
-+
-+static void foreach_rap_service(struct gatt_db_attribute *attr,
-+				void *user_data)
-+{
-+	struct bt_rap *rap = user_data;
-+	struct ras *ras = rap_get_ras(rap);
-+
-+	ras->svc = attr;
-+
-+	gatt_db_service_set_claimed(attr, true);
-+
-+	gatt_db_service_foreach_char(attr, foreach_rap_char, rap);
-+}
-+
-+unsigned int bt_rap_ready_register(struct bt_rap *rap,
-+				   bt_rap_ready_func_t func, void *user_data,
-+				   bt_rap_destroy_func_t destroy)
-+{
-+	struct bt_rap_ready *ready;
-+	static unsigned int id;
-+
-+	if (!rap)
-+		return 0;
-+
-+	DBG(rap, "bt_rap_ready_register");
-+
-+	ready = new0(struct bt_rap_ready, 1);
-+	ready->id = ++id ? id : ++id;
-+	ready->func = func;
-+	ready->destroy = destroy;
-+	ready->data = user_data;
-+
-+	queue_push_tail(rap->ready_cbs, ready);
-+
-+	return ready->id;
-+}
-+
-+static bool match_ready_id(const void *data, const void *match_data)
-+{
-+	const struct bt_rap_ready *ready = data;
-+	unsigned int id = PTR_TO_UINT(match_data);
-+
-+	return ready->id == id;
-+}
-+
-+bool bt_rap_ready_unregister(struct bt_rap *rap, unsigned int id)
-+{
-+	struct bt_rap_ready *ready;
-+
-+	ready = queue_remove_if(rap->ready_cbs, match_ready_id,
-+				UINT_TO_PTR(id));
-+	if (!ready)
-+		return false;
-+
-+	rap_ready_free(ready);
-+
-+	return true;
-+}
-+
-+static struct bt_rap *bt_rap_ref_safe(struct bt_rap *rap)
-+{
-+	if (!rap || !rap->ref_count)
-+		return NULL;
-+
-+	return bt_rap_ref(rap);
-+}
-+
-+static void rap_notify_ready(struct bt_rap *rap)
-+{
-+	const struct queue_entry *entry;
-+
-+	if (!bt_rap_ref_safe(rap))
-+		return;
-+
-+	for (entry = queue_get_entries(rap->ready_cbs); entry;
-+	     entry = entry->next) {
-+		struct bt_rap_ready *ready = entry->data;
-+
-+		ready->func(rap, ready->data);
-+	}
-+
 +	bt_rap_unref(rap);
 +}
 +
-+static void rap_idle(void *data)
++static void test_server(const void *user_data)
 +{
-+	struct bt_rap *rap = data;
++	struct test_data_ras *data = (void *)user_data;
++	struct bt_att *att;
++	struct io *io;
 +
-+	rap->idle_id = 0;
-+	rap_notify_ready(rap);
++	io = tester_setup_io(data->iov, data->iovcnt);
++	g_assert(io);
++
++	tester_io_set_complete_func(test_complete_cb);
++
++	att = bt_att_new(io_get_fd(io), false);
++	g_assert(att);
++
++	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
++
++	data->db = gatt_db_new();
++	g_assert(data->db);
++
++	gatt_db_ccc_register(data->db, gatt_ccc_read_cb, NULL,
++					gatt_notify_cb, data);
++
++	bt_rap_add_db(data->db);
++
++	data->ras_id = bt_rap_register(ras_attached, ras_detached, NULL);
++
++	data->server = bt_gatt_server_new(data->db, att, 64, 0);
++	g_assert(data->server);
++
++	bt_gatt_server_set_debug(data->server, print_debug, "bt_gatt_server:",
++					NULL);
++
++	data->ccc_states = queue_new();
++
++	tester_io_send();
++
++	bt_att_unref(att);
 +}
 +
-+bool bt_rap_attach(struct bt_rap *rap, struct bt_gatt_client *client)
-+{
-+	bt_uuid_t uuid;
-+
-+	if (!sessions)
-+		sessions = queue_new();
-+
-+	queue_push_tail(sessions, rap);
-+
-+	if (!client)
-+		return true;
-+
-+	if (rap->client)
-+		return false;
-+
-+	rap->client = bt_gatt_client_clone(client);
-+	if (!rap->client)
-+		return false;
-+
-+	bt_gatt_client_idle_register(rap->client, rap_idle, rap, NULL);
-+
-+	bt_uuid16_create(&uuid, RAS_UUID16);
-+
-+	gatt_db_foreach_service(rap->lrapdb->db, &uuid,
-+				foreach_rap_service, rap);
-+
-+	return true;
-+}
-diff --git a/src/shared/rap.h b/src/shared/rap.h
-new file mode 100644
-index 000000000..488172ac6
---- /dev/null
-+++ b/src/shared/rap.h
-@@ -0,0 +1,48 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
 +/*
-+ * BlueZ - Bluetooth protocol stack for Linux
++ *  ATT: Exchange MTU Request (0x02) len 2
++ *       Client RX MTU: 64
 + *
-+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
++ *  ATT: Exchange MTU Response (0x03) len 2
++ *        Server RX MTU: 64
 + */
++#define ATT_EXCHANGE_MTU	IOV_DATA(0x02, 0x40, 0x00), \
++	IOV_DATA(0x03, 0x40, 0x00)
 +
-+#include <stdbool.h>
-+#include <inttypes.h>
++/*
++ *  ATT: Read By Group Type Request (0x10) len 6
++ *       Handle range: 0x0001-0xffff
++ *       Attribute group type: Primary Service (0x2800)
++ *
++ *  ATT: Read By Group Type Response (0x11) len 7
++ *       Attribute data length: 6
++ *       Attribute group list: 1 entry
++ *       Handle range: 0x0001-0x0012
++ *       UUID: Ranging Service (0x185b)
++ *
++ *  ATT: Read By Group Type Request (0x10) len 6
++ *      Handle range: 0x0013-0xffff
++ *      Attribute group type: Primary Service (0x2800)
++ *
++ *  ATT: Error Response (0x01) len 4
++ *      Read By Group Type Request (0x10)
++ *      Handle: 0x0013
++ *      Error: Attribute Not Found (0x0a)
++ */
++#define DISCOVER_PRIM_SERV_NOTIF \
++	IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28), \
++	IOV_DATA(0x11, 0x06, 0x01, 0x00, 0x12, 0x00, 0x5b, 0x18), \
++	IOV_DATA(0x10, 0x13, 0x00, 0xff, 0xff, 0x00, 0x28), \
++	IOV_DATA(0x01, 0x10, 0x13, 0x00, 0x0a)
 +
-+#include "src/shared/io.h"
++/*
++ *  ATT: Find By Type Value Request (0x06) len 8
++ *       Handle range: 0x0001-0xffff
++ *       Attribute type: Primary Service (0x2800)
++ *       UUID: Ranging Service (0x185b)
++ *
++ *  ATT: Find By Type Value Response (0x07) len 4
++ *       Handle range: 0x0001-0x0012
++ *
++ *  ATT: Find By Type Value Request (0x06) len 8
++ *       Handle range: 0x0013-0xffff
++ *       Attribute type: Primary Service (0x2800)
++ *       UUID: Ranging Service (0x185b)
++ *
++ *  ATT: Error Response (0x01) len 4
++ *       Find By Type Value Request (0x06)
++ *       Handle: 0x0013
++ *       Error: Attribute Not Found (0x0a)
++ */
++#define RAS_FIND_BY_TYPE_VALUE \
++	IOV_DATA(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x5b, 0x18), \
++	IOV_DATA(0x07, 0x01, 0x00, 0x12, 0x00), \
++	IOV_DATA(0x06, 0x13, 0x00, 0xff, 0xff, 0x00, 0x28, 0x5b, 0x18), \
++	IOV_DATA(0x01, 0x06, 0x13, 0x00, 0x0a)
 +
-+struct bt_rap;
++/*
++ *  ATT: Read By Type Request (0x08) len 6
++ *       Handle range: 0x0001-0x0012
++ *       Attribute type: Characteristic (0x2803)
++ *
++ *  ATT: Read By Type Response (0x09) len 44
++ *       Attribute data length: 7
++ *       Attribute data list: 6 entries
++ *       Handle: 0x0002 - RAS Features
++ *       Value: 020003142c
++ *       Handle: 0x0004 - Real-time Ranging Data
++ *       Value: 300005152c
++ *       Handle: 0x0007 - On-demand Ranging Data
++ *       Value: 300008162c
++ *       Handle: 0x000a - RAS Control Point
++ *       Value: 24000b172c
++ *       Handle: 0x000d - RAS Data Ready
++ *       Value: 32000e182c
++ *       Handle: 0x0010 - RAS Data Overwritten
++ *       Value: 320011192c
++ *
++ *  ATT: Read By Type Request (0x08) len 6
++ *       Handle range: 0x0011-0x0012
++ *       Attribute type: Characteristic (0x2803)
++ *
++ *  ATT: Error Response (0x01) len 4
++ *       Read By Type Request (0x08)
++ *       Handle: 0x0011
++ *       Error: Attribute Not Found (0x0a)
++ */
++#define DISC_RAS_CHAR_AFTER_TYPE \
++	IOV_DATA(0x08, 0x01, 0x00, 0x12, 0x00, 0x03, 0x28), \
++	IOV_DATA(0x09, 0x07, \
++		0x02, 0x00, 0x02, 0x03, 0x00, 0x14, 0x2c, \
++		0x04, 0x00, 0x30, 0x05, 0x00, 0x15, 0x2c, \
++		0x07, 0x00, 0x30, 0x08, 0x00, 0x16, 0x2c, \
++		0x0a, 0x00, 0x24, 0x0b, 0x00, 0x17, 0x2c, \
++		0x0d, 0x00, 0x32, 0x0e, 0x00, 0x18, 0x2c, \
++		0x10, 0x00, 0x32, 0x11, 0x00, 0x19, 0x2c), \
++	IOV_DATA(0x08, 0x11, 0x00, 0x12, 0x00, 0x03, 0x28), \
++	IOV_DATA(0x01, 0x08, 0x11, 0x00, 0x0a)
 +
-+typedef void (*bt_rap_debug_func_t)(const char *str, void *user_data);
-+typedef void (*bt_rap_ready_func_t)(struct bt_rap *rap, void *user_data);
-+typedef void (*bt_rap_destroy_func_t)(void *user_data);
-+typedef void (*bt_rap_func_t)(struct bt_rap *rap, void *user_data);
++/*
++ *  ATT: Find Information Request (0x04) len 4
++ *       Handle range: 0x0006-0x0012
++ *
++ *  ATT: Find Information Response (0x05) len 53
++ *       Format: UUID-16 (0x01)
++ *       Handle: 0x0006
++ *       UUID: Client Characteristic Configuration (0x2902)
++ *       Handle: 0x0007
++ *       UUID: Characteristic (0x2803)
++ *       Handle: 0x0008
++ *       UUID: On-demand Ranging Data (0x2c16)
++ *       Handle: 0x0009
++ *       UUID: Client Characteristic Configuration (0x2902)
++ *       Handle: 0x000a
++ *       UUID: Characteristic (0x2803)
++ *       Handle: 0x000b
++ *       UUID: RAS Control Point (0x2c17)
++ *       Handle: 0x000c
++ *       UUID: Client Characteristic Configuration (0x2902)
++ *       Handle: 0x000d
++ *       UUID: Characteristic (0x2803)
++ *       Handle: 0x000e
++ *       UUID: RAS Data Ready (0x2c18)
++ *       Handle: 0x000f
++ *       UUID: Client Characteristic Configuration (0x2902)
++ *       Handle: 0x0010
++ *       UUID: Characteristic (0x2803)
++ *       Handle: 0x0011
++ *       UUID: RAS Data Overwritten (0x2c19)
++ *       Handle: 0x0012
++ *       UUID: Client Characteristic Configuration (0x2902)
++ *
++ *  ATT: Find Information Request (0x04) len 4
++ *       Handle range: 0x0013-0x0013
++ *
++ *  ATT: Error Response (0x01) len 4
++ *       Find Information Request (0x04)
++ *       Handle: 0x0013
++ *       Error: Attribute Not Found (0x0a)
++ */
++#define RAS_FIND_INFO \
++	IOV_DATA(0x04, 0x06, 0x00, 0x12, 0x00), \
++	IOV_DATA(0x05, 0x01, \
++		0x06, 0x00, 0x02, 0x29, \
++		0x07, 0x00, 0x03, 0x28, \
++		0x08, 0x00, 0x16, 0x2c, \
++		0x09, 0x00, 0x02, 0x29, \
++		0x0a, 0x00, 0x03, 0x28, \
++		0x0b, 0x00, 0x17, 0x2c, \
++		0x0c, 0x00, 0x02, 0x29, \
++		0x0d, 0x00, 0x03, 0x28, \
++		0x0e, 0x00, 0x18, 0x2c, \
++		0x0f, 0x00, 0x02, 0x29, \
++		0x10, 0x00, 0x03, 0x28, \
++		0x11, 0x00, 0x19, 0x2c, \
++		0x12, 0x00, 0x02, 0x29), \
++	IOV_DATA(0x04, 0x13, 0x00, 0x13, 0x00), \
++	IOV_DATA(0x01, 0x04, 0x13, 0x00, 0x0a)
 +
-+struct bt_rap *bt_rap_ref(struct bt_rap *rap);
-+void bt_rap_unref(struct bt_rap *rap);
 +
-+void bt_rap_add_db(struct gatt_db *db);
++#define RAS_SR_SGGIT_SER_BV_01_C \
++	ATT_EXCHANGE_MTU, \
++	DISCOVER_PRIM_SERV_NOTIF, \
++	RAS_FIND_BY_TYPE_VALUE
 +
-+bool bt_rap_attach(struct bt_rap *rap, struct bt_gatt_client *client);
-+void bt_rap_detach(struct bt_rap *rap);
++#define RAS_SR_SGGIT_CHA_BV_01_C \
++	ATT_EXCHANGE_MTU, \
++	DISCOVER_PRIM_SERV_NOTIF, \
++	RAS_FIND_BY_TYPE_VALUE, \
++	DISC_RAS_CHAR_AFTER_TYPE
 +
-+struct bt_att *bt_rap_get_att(struct bt_rap *rap);
++#define RAS_SR_SGGIT_CHA_BV_02_C \
++	ATT_EXCHANGE_MTU, \
++	DISCOVER_PRIM_SERV_NOTIF, \
++	RAS_FIND_BY_TYPE_VALUE, \
++	DISC_RAS_CHAR_AFTER_TYPE, \
++	RAS_FIND_INFO
 +
-+bool bt_rap_set_user_data(struct bt_rap *rap, void *user_data);
++#define RAS_SR_SGGIT_CHA_BV_03_C \
++	ATT_EXCHANGE_MTU, \
++	DISCOVER_PRIM_SERV_NOTIF, \
++	RAS_FIND_BY_TYPE_VALUE, \
++	DISC_RAS_CHAR_AFTER_TYPE, \
++	RAS_FIND_INFO
 +
-+bool bt_rap_set_debug(struct bt_rap *rap, bt_rap_debug_func_t func,
-+			void *user_data, bt_rap_destroy_func_t destroy);
++#define RAS_SR_SGGIT_CHA_BV_04_C \
++	ATT_EXCHANGE_MTU, \
++	DISCOVER_PRIM_SERV_NOTIF, \
++	RAS_FIND_BY_TYPE_VALUE, \
++	DISC_RAS_CHAR_AFTER_TYPE, \
++	RAS_FIND_INFO
 +
-+/* session related functions */
-+unsigned int bt_rap_register(bt_rap_func_t attached, bt_rap_func_t detached,
-+					void *user_data);
-+unsigned int bt_rap_ready_register(struct bt_rap *rap,
-+				bt_rap_ready_func_t func, void *user_data,
-+				bt_rap_destroy_func_t destroy);
-+bool bt_rap_ready_unregister(struct bt_rap *rap, unsigned int id);
++int main(int argc, char *argv[])
++{
++	tester_init(&argc, &argv);
 +
-+bool bt_rap_unregister(unsigned int id);
++	/* RAS Testcases */
++	define_test_ras("RAS/SR/SGGIT/SER/BV-01-C", test_server,
++					RAS_SR_SGGIT_SER_BV_01_C);
++	define_test_ras("RAS/SR/SGGIT/CHA/BV-01-C", test_server,
++					RAS_SR_SGGIT_CHA_BV_01_C);
++	define_test_ras("RAS/SR/SGGIT/CHA/BV-02-C", test_server,
++					RAS_SR_SGGIT_CHA_BV_02_C);
++	define_test_ras("RAS/SR/SGGIT/CHA/BV-03-C", test_server,
++					RAS_SR_SGGIT_CHA_BV_03_C);
++	define_test_ras("RAS/SR/SGGIT/CHA/BV-04-C", test_server,
++					RAS_SR_SGGIT_CHA_BV_04_C);
 +
-+struct bt_rap *bt_rap_new(struct gatt_db *ldb, struct gatt_db *rdb);
++	return tester_run();
++}
 -- 
 2.34.1
 
