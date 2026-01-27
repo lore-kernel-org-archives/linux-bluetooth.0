@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC3F314A67
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920D630C630
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769535531; cv=none; b=acKx4nBsl1zhjwZ2kD+k5IpFzIRoWnOIKfHg1ny3fnNPA9HEyQVsJ2gVWK7chqX/tlYPthM6mkWJjsRvkPXBC73ir66kG6rvMYg1PN7eo9ZyufexIhrQ1TjtKObgUlO2m70v5okZgGiHqZGk8B0+ai6Ic8FUfIdF1zPSX21gKtA=
+	t=1769535533; cv=none; b=gf/hCECpN/qVRLisY4p/ZhHN7gJegsisobfRaddGr+BG+UEEITpnUkjMrmPXNgMctw64aebPY4sh9nkKZk/lxSfo2JOmkZwpjXDqSatltje/ozJ8XP3mAdu97ydWyZu0zoAOpx35zTvWKkfETY7Zd2S3AAM2jzhXLvv7ULEtC3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769535531; c=relaxed/simple;
-	bh=TIjx1LcQy8SvQbvTRxOQzI0VT+iUQmgg68jIIWVNRLI=;
+	s=arc-20240116; t=1769535533; c=relaxed/simple;
+	bh=6EJiWVi9Qm80zEaKNNCF+6onj3YEtWvKNEvychXexb4=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HTg6Ty6GQLu10O8+lpJ5l/xZMD6J2iT7uJrqF0R4NYapzzUX4Q1OGpXE+nkW0vwdq3hpydp1HHkXO+XOgna6fZ8yj2+RaqflKbB/1EBqJiCEQfSlbLNQLvHcOuddPY1OuMMLjYRHh38XiJOL1Tq5PajTGqKTUWAKFmtE9cLogjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Aegx0dmx; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=CHT/xBPTYIk3+HZCNFBFT+/87irrj3FaehqYskPUeU5zReNd+4iGIVfGfFxGlZyGZuLJx7kRwVQjr7K5hyfyLhaFfS/JNvNvM1/LRWI7Eoxipu6AmfwbAFVzOUSZsyDb3mq+/G6wN1NoZsBtB6Po8uG+5PcOsh7g2hlx7i7XfWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=gV2zMBAW; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Aegx0dmx"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="gV2zMBAW"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1769535528;
-	bh=TIjx1LcQy8SvQbvTRxOQzI0VT+iUQmgg68jIIWVNRLI=;
+	s=mail; t=1769535529;
+	bh=6EJiWVi9Qm80zEaKNNCF+6onj3YEtWvKNEvychXexb4=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Aegx0dmx/WJeB0HhhoeUR+8C6JB5FwnkGx8H41j6LadeSZ2N+JGKIprpUcFkxHIuE
-	 A5IZ1yXUKjKaDGOKbEYnUmuFf8Ow6CE70Uz5dVBR0KzNo8L5VIpViUHrQ5kBVGxE7E
-	 GRG+6zb8sqyL+p/aP1Wjn1ELQxvSqHHon3rRrKQu6f7X0IKDFlTBc3XOjb2JZdgnvz
-	 Jf9CoShM8S0Ux/7qGDoCXUiS6KhH5S22J0yUxne6E6HjTMso5w7OEELW8De9YbD8H/
-	 QUOeWq1fM5BZvYKzeQlWVfLBp5gfef1i0qv8WeZak8hgUvH+RkaaboQpkPQt0rTuuY
-	 xjsZAry10VYTQ==
+	b=gV2zMBAWUG1xyQQhzscLtTmVaywgIcDFjoPr0HV3D8fUIT6Qwa/09kdL+LMH+Rkfm
+	 7B2TJN4dnrs/G8FqHf6Sv7eCNzASJ1O/gRbFpLwn+VqfbrvPVQNfpi39fRafFHVB5t
+	 fWi0kUkurMSmLQT6pyNI+41sWU+f1EIZ1+xUc3FcbYYUTm67Ex1wCtR6ReIb6PTeb2
+	 CwF5XiTzAhu+mOtzMltjid/ixLZbDVL1PjaWk1/vwt3R37Ujckg6Yg5yA25DLFqAxs
+	 idixVYcbgMw1IfpxoEIDBSqS1HzkatrWG77KrYBeB4+93AUNaQiiGV1Tfvm59mAupW
+	 aWn/mZSUGHXWw==
 Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-871c-6E70-D798-Dfc2.rev.sfr.net [IPv6:2a02:8428:af44:1001:871c:6e70:d798:dfc2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0CF6F17E0E3F
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 02EEA17E14F2
 	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 18:38:48 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 02/13] doc/qualification: Add PICS and howto for the AVCTP qualification
-Date: Tue, 27 Jan 2026 18:38:30 +0100
-Message-ID: <20260127173841.153747-2-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2 05/13] doc/qualification: Add PICS and howto for the GAVDP qualification
+Date: Tue, 27 Jan 2026 18:38:33 +0100
+Message-ID: <20260127173841.153747-5-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260127173841.153747-1-frederic.danis@collabora.com>
 References: <20260127173841.153747-1-frederic.danis@collabora.com>
@@ -51,35 +51,51 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
 ---
- doc/qualification/avctp-pics.rst | 116 +++++++++++++++++++++++++++++++
- doc/qualification/avctp-pts.rst  |  49 +++++++++++++
- 2 files changed, 165 insertions(+)
- create mode 100644 doc/qualification/avctp-pics.rst
- create mode 100644 doc/qualification/avctp-pts.rst
+ doc/qualification/gavdp-pics.rst | 170 +++++++++++++++++++++++++++++++
+ doc/qualification/gavdp-pts.rst  |  33 ++++++
+ 2 files changed, 203 insertions(+)
+ create mode 100644 doc/qualification/gavdp-pics.rst
+ create mode 100644 doc/qualification/gavdp-pts.rst
 
-diff --git a/doc/qualification/avctp-pics.rst b/doc/qualification/avctp-pics.rst
+diff --git a/doc/qualification/gavdp-pics.rst b/doc/qualification/gavdp-pics.rst
 new file mode 100644
-index 000000000..6c08d692e
+index 000000000..b1076c800
 --- /dev/null
-+++ b/doc/qualification/avctp-pics.rst
-@@ -0,0 +1,116 @@
++++ b/doc/qualification/gavdp-pics.rst
+@@ -0,0 +1,170 @@
 +.. SPDX-License-Identifier: GPL-2.0-or-later
 +.. Copyright © 2025-2026 Collabora Ltd.
 +
-+======================================
-+Audio/Video Control Transport Protocol
-+======================================
-+(TCRL 2023-1, AVCTP.ICS.1.4.2ed4)
++========================================
++Generic Audio/Video Distribution Profile
++========================================
++(TCRL 2023-1, GAVDP.ICS.1.3.2ed3)
 +
 +Versions
 +========
-+**Table 0: X.Y Versions**
++**Table 2a: GAVDP Initiator - X.Y Versions**
 +
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_AVCTP_0_4   | x        | AVCTP 1.4 (M)                                |
-++------------------+----------+----------------------------------------------+
++Prerequisite: GAVDP 1/1 "Initiator"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_GAVDP_2a_3| x        | GAVDP 1.3 (M)                                  |
+++----------------+----------+------------------------------------------------+
++
++- M: Mandatory
++
++Versions
++========
++**Table 3a: GAVDP Acceptor - X.Y Versions**
++
++Prerequisite: GAVDP 1/2 "Acceptor"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_GAVDP_3a_3| x        | GAVDP 1.3 (M)                                  |
+++----------------+----------+------------------------------------------------+
 +
 +- M: Mandatory
 +
@@ -87,109 +103,147 @@ index 000000000..6c08d692e
 +=====
 +**Table 1: Role Requirements**
 +
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_AVCTP_1_1   | x        | Controller (C.1)                             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_1_2   | x        | Target (C.1)                                 |
-++------------------+----------+----------------------------------------------+
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_GAVDP_1_1 | x        | Initiator (C.1)                                |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_1_2 | x        | Acceptor (C.1)                                 |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_1_3 | x        | Delay Reporting Initiator (O)                  |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_1_4 |          | Delay Reporting Acceptor (O)                   |
+++----------------+----------+------------------------------------------------+
 +
++- O: Optional
 +- C.1: Mandatory to support at least one.
 +
-+Controller Capabilities
-+=======================
-+**Table 2: Controller Features**
++Initiator Capabilities
++======================
++**Table 2: GAVDP Procedures (Initiator)**
 +
-+Prerequisite: AVCTP 1/1 "Controller"
++Prerequisite: GAVDP 1/1 "Initiator"
 +
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_AVCTP_2_1   |          | Message fragmentation (O)                    |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_2   | x        | Transaction label management (M)             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_3   | x        | Packet type field management (M)             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_4   | x        | Message type field management (M)            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_5   | x        | PID field management (M)                     |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_6   | x        | IPID field management (M)                    |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_7   | x        | Message information management (M)           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_8   | x        | Event registration for message reception (O) |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_9   | x        | Event registration for connection request (O)|
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_10  | x        | Event registration for disconnection request |
-+|                  |          | (O)                                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_11  | x        | Connect request (O)                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_12  | x        | Disconnect request (O)                       |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_13  | x        | Send message (O)                             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_2_14  |          | Support for multiple AVCTP channel           |
-+|                  |          | establishment requests (O)                   |
-++------------------+----------+----------------------------------------------+
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_GAVDP_2_1 | x        | Connection Establishment (M)                   |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_2_2 | x        | Transfer Control - Suspend (O)                 |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_2_3 |          | Transfer Control - Change Parameters (O)       |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_2_4 | x        | Start Streaming (M)                            |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_2_5 | x        | Connection Release (M)                         |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_2_6 | x        | Signaling Control - Abort (M)                  |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_2_7 |          | Security Control (O)                           |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_2_8 |          | Delay Reporting (O)                            |
+++----------------+----------+------------------------------------------------+
 +
 +- M: Mandatory
 +- O: Optional
 +
-+Target Capabilities
-+===================
-+**Table 3: Target Features**
++Initiator Capabilities
++======================
++**Table 4: AVDTP Procedures (Initiator)**
 +
-+Prerequisite: AVCTP 1/2 "Target"
++Prerequisite: GAVDP 1/1 "Initiator"
 +
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_AVCTP_3_1   |          | Message fragmentation (O)                    |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_2   | x        | Transaction label management (M)             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_3   | x        | Packet type field management (M)             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_4   | x        | Message type field management (M)            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_5   | x        | PID field management (M)                     |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_6   | x        | IPID field management (M)                    |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_7   | x        | Message information management (M)           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_8   | x        | Event registration for message reception (O) |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_9   | x        | Event registration for connection request (O)|
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_10  | x        | Event registration for disconnection request |
-+|                  |          | (O)                                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_11  | x        | Connect request (O)                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_12  | x        | Disconnect request (O)                       |
-++------------------+----------+----------------------------------------------+
-+| TSPC_AVCTP_3_13  | x        | Send message (O)                             |
-++------------------+----------+----------------------------------------------+
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_GAVDP_4_1 | x        | Stream discover command (M)                    |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_4_2 | x        | Stream get capabilities command (M)            |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_4_3 | x        | Set configuration command (M)                  |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_4_4 | x        | Open stream command (M)                        |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_4_5 | x        | Start stream command (M)                       |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_4_6 | x        | Close stream command (M)                       |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_4_7 | x        | Abort stream command (M)                       |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_4_8 | x        | Stream get all capabilities command (M)        |
+++----------------+----------+------------------------------------------------+
++
++- M: Mandatory
++
++Acceptor Capabilities
++=====================
++**Table 3: GAVDP Procedures (Acceptor)**
++
++Prerequisite: GAVDP 1/2 "Acceptor"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_GAVDP_3_1 | x        | Connection Establishment (M)                   |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_3_2 | x        | Transfer Control - Suspend (O)                 |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_3_3 |          | Transfer Control - Change Parameters (O)       |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_3_4 | x        | Start Streaming (M)                            |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_3_5 | x        | Connection Release (M)                         |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_3_6 | x        | Signaling Control - Abort (M)                  |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_3_7 |          | Security Control (O)                           |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_3_8 |          | Delay Reporting (O)                            |
+++----------------+----------+------------------------------------------------+
 +
 +- M: Mandatory
 +- O: Optional
-diff --git a/doc/qualification/avctp-pts.rst b/doc/qualification/avctp-pts.rst
++
++Acceptor Capabilities
++=====================
++**Table 5: AVDTP Procedures (Acceptor)**
++
++Prerequisite: GAVDP 1/2 "Acceptor"
++
+++----------------+----------+------------------------------------------------+
++| Parameter Name | Selected | Description                                    |
+++================+==========+================================================+
++| TSPC_GAVDP_5_1 | x        | Stream discover response (M)                   |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_5_2 | x        | Stream get capabilities response (M)           |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_5_3 | x        | Set configuration response (M)                 |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_5_4 | x        | Open stream response (M)                       |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_5_5 | x        | Start stream response (M)                      |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_5_6 | x        | Close stream response (M)                      |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_5_7 | x        | General reject message (M)                     |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_5_8 | x        | Abort stream response (M)                      |
+++----------------+----------+------------------------------------------------+
++| TSPC_GAVDP_5_9 | x        | Stream get all capabilities response (M)       |
+++----------------+----------+------------------------------------------------+
++
++- M: Mandatory
+diff --git a/doc/qualification/gavdp-pts.rst b/doc/qualification/gavdp-pts.rst
 new file mode 100644
-index 000000000..cb47eba0b
+index 000000000..7b0b7e93b
 --- /dev/null
-+++ b/doc/qualification/avctp-pts.rst
-@@ -0,0 +1,49 @@
++++ b/doc/qualification/gavdp-pts.rst
+@@ -0,0 +1,33 @@
 +.. SPDX-License-Identifier: GPL-2.0-or-later
 +.. Copyright © 2025-2026 Collabora Ltd.
 +
 +==================
-+AVCTP test results
++GAVDP test results
 +==================
 +
 +:PTS version: 8.5.2 Build 5
@@ -205,35 +259,19 @@ index 000000000..cb47eba0b
 +The kernel and BlueZ versions represent the oldest version without backport
 +for which we know the test passed.
 +
-++----------------------+----------+---------+-------+-----------------------+
-+| Test name            | Result   | Kernel  | BlueZ |                       |
-++======================+==========+=========+=======+=======================+
-+| AVCTP/CT/CCM/BV-01-C | PASS     |     6.1 | 5.69  |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/CT/CCM/BV-02-C | PASS     |     6.1 | 5.69  |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/CT/CCM/BV-03-C | PASS     |     6.1 | 5.69  |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/CT/CCM/BV-04-C |          |         |       |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/CT/NFR/BV-01-C | PASS     |     6.1 | 5.69  |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/CT/NFR/BV-04-C |          |         |       |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/TG/CCM/BV-01-C |          |         |       |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/TG/CCM/BV-02-C |          |         |       |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/TG/CCM/BV-03-C |          |         |       |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/TG/CCM/BV-04-C |          |         |       |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/TG/NFR/BI-01-C | PASS     |     6.1 | 5.69  |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/TG/NFR/BV-02-C |          |         |       |                       |
-++----------------------+----------+---------+-------+-----------------------+
-+| AVCTP/TG/NFR/BV-03-C |          |         |       |                       |
-++----------------------+----------+---------+-------+-----------------------+
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| Test name                    | Result   | Kernel  | BlueZ |                                                                         |
+++==============================+==========+=========+=======+=========================================================================+
++| GAVDP/ACP/APP/CON/BV-01-C    | PASS     |     6.1 | 5.69  | It may need to pair the device from IUT during the test                 |
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| GAVDP/ACP/APP/TRC/BV-02-C    | PASS     |     6.1 | 5.69  | It may need to pair the device from IUT during the test                 |
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| GAVDP/INT/APP/CON/BV-01-C    | PASS     |     6.1 | 5.69  |                                                                         |
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| GAVDP/INT/APP/TRC/BV-02-C    | PASS     |     6.1 | 5.69  | Wait for device to disconnect then connect from IUT                     |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | Wait on "Suspend the streaming channel"                                 |
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
 -- 
 2.43.0
 
