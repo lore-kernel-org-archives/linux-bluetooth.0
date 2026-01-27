@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56494322B72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795B23242A9
 	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769535537; cv=none; b=rA23eXj+EkK3nU3+dvB6AVBUgQ6D80Xs92njXybO368f4GVFB+qDQuVHqi6PE2eiOHB8gDbBCA8jizByh0ZnzrzSSgKPsnL48teCTJgLwUikZaZUMGhIILPe9WwWNIoE9bTYrSNWasgWIJUmJjp5MFGSG4knofwOs8JBKhAYwhI=
+	t=1769535538; cv=none; b=ObHa4bWKGXrOtn5RuQFUbVL7uYFmh+kNww7J43TiybRbIQIct9ZUPsPfAUDyOuuLdZAT4T8y7QZxiUZJ4d20fzyIgYQ++rOuxUQ2zVhuxshlrkJ69oFiQrCiXij1vPfMX7lccjaKjKKchMgV3LmTibGygpUKyVjYaredEpfe/Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769535537; c=relaxed/simple;
-	bh=2PJ7czI0zwmED19HlwowiKTsciu0QQ7/aea2xzhpHjE=;
+	s=arc-20240116; t=1769535538; c=relaxed/simple;
+	bh=i+wp1+ObUlM67tr4VX3INezo3CPBvyJ/OFKqfP721bo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CHpq+ZuflHqMxslpUVgeZb2nUyLwtvY73vsGgh5x48P+lZR34YGffR6cOEek6qecGUBDOXwsNoNKGfHBH4DWotKkf+E1i9v98JPYHDef1Ta36qNXF1houHmaiRjKSvrXUNHJvN+d75iWjXXAO64WLWTyvB15DpJy1xu8OAwZVzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=itHdMbJI; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=ZMewxFvdiOFtYeNXWFQ547QFYAXUx/2MjLcURs4iozOz/+wBBSN177+DxU5DyzAqxKBoFPDU5w6wOeTjj8RDMEPYeTMckfHtSDqBx1HlwtQMh+22f7abd15jymP1LXGX72nxuW9NFu1nG2uf5XbP6teN5fvTB+zQZYUZ4fLUMyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=e3Pk0ErJ; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="itHdMbJI"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="e3Pk0ErJ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1769535530;
-	bh=2PJ7czI0zwmED19HlwowiKTsciu0QQ7/aea2xzhpHjE=;
+	bh=i+wp1+ObUlM67tr4VX3INezo3CPBvyJ/OFKqfP721bo=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=itHdMbJI5ji7q2CZx6BZ0pR6WN+4Z8r2iHIt42RtqivnaAd8eeh+wGoBQZj2W3w98
-	 lQKhDJZkIyMklk9iWumjviTHieVPe7kb22RiPvt2L4sx//uDsziX8oQZDH5DakrX2F
-	 62dxnBAqgrAgjlInlRSx6g2duEZda5WmthDl/jjyRIZe8HG2VHc9BbBgll0l0rrUxM
-	 jfMPzlowvsG0VhV4NO02vi8SWXSD2rXtKFhuTcLJcFXNRAgu4ME8giTBKS82p4gWRj
-	 S9QsNVomhQ4mpbbPLmA9EN6rwuretlLmGNTcdhP/nJogDt5/jF+5+QLnsbLUbJszkZ
-	 ip6mPBBCoGUIg==
+	b=e3Pk0ErJ1gqgTLBRhukJwDafQy0F9uApqJjXqb7iDGUCnKwRsV2TfMtwEJ88bWYB7
+	 GPeX/5gVZWcBdR9PCayrC6dDqgr+cND+B90FHUOgJ8XeszTBVfs+OxDcFBpZlqi0Os
+	 82N6nnQ6Kd4E55pe3I/VcinDhgeLp1/ouwyLvrq4tUvyI9xwKujLgIrtpQAp0nbF3c
+	 1jWFKESwVpMLsP/pkZq01AxCZ2SjzwwISl2qF9fLDpEzCMQJv2k1kENZOAP+Edyjoh
+	 kh8AgQBtT0zWTZE8uW3DmsOaq67WnkBoAV9AMWKwPGF/J/9qmTBrbQe8Y2fWvRwZTI
+	 rqA4HCY99RW2g==
 Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-871c-6E70-D798-Dfc2.rev.sfr.net [IPv6:2a02:8428:af44:1001:871c:6e70:d798:dfc2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3633717E1543
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8034B17E157E
 	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 18:38:50 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 09/13] doc/qualification: Add PICS and howto for the SDP qualification
-Date: Tue, 27 Jan 2026 18:38:37 +0100
-Message-ID: <20260127173841.153747-9-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2 10/13] doc/qualification: Add PICS and howto for the SPP qualification
+Date: Tue, 27 Jan 2026 18:38:38 +0100
+Message-ID: <20260127173841.153747-10-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260127173841.153747-1-frederic.danis@collabora.com>
 References: <20260127173841.153747-1-frederic.danis@collabora.com>
@@ -51,234 +51,156 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
 ---
- doc/qualification/sdp-pics.rst | 205 +++++++++++++++++++++++++++++++++
- doc/qualification/sdp-pts.rst  |  63 ++++++++++
- 2 files changed, 268 insertions(+)
- create mode 100644 doc/qualification/sdp-pics.rst
- create mode 100644 doc/qualification/sdp-pts.rst
+ doc/qualification/spp-pics.rst | 127 +++++++++++++++++++++++++++++++++
+ doc/qualification/spp-pts.rst  |  35 +++++++++
+ 2 files changed, 162 insertions(+)
+ create mode 100644 doc/qualification/spp-pics.rst
+ create mode 100644 doc/qualification/spp-pts.rst
 
-diff --git a/doc/qualification/sdp-pics.rst b/doc/qualification/sdp-pics.rst
+diff --git a/doc/qualification/spp-pics.rst b/doc/qualification/spp-pics.rst
 new file mode 100644
-index 000000000..980f0fa37
+index 000000000..44fbec590
 --- /dev/null
-+++ b/doc/qualification/sdp-pics.rst
-@@ -0,0 +1,205 @@
-+==========================
-+Service Discovery Protocol
-+==========================
-+(TCRL 2023-1, SDP.ICS.p23)
++++ b/doc/qualification/spp-pics.rst
+@@ -0,0 +1,127 @@
++.. SPDX-License-Identifier: GPL-2.0-or-later
++.. Copyright © 2025-2026 Collabora Ltd.
 +
++==================
++Serial Port Pofile
++==================
++(TCRL 2023-1, SPP.ICS.p9)
++
++
++Versions
++========
++**Table 0: X.Y Versions**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SPP_0_2     | x        | SPP v1.2 (M)                                 |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++Core Configuration
++==================
++**Table 0a: Core Configuration Requirements**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SPP_0a_1    | x        | Profile supported over BR/EDR (C.1, C.3)     |
+++------------------+----------+----------------------------------------------+
++| TSPC_SPP_0a_2    |          | Profile supported over LE (C.2)              |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Excluded for this Profile IF CORE 41/2 “LE Core Configuration”.
++- C.2: Excluded for this Profile.
++- C.3: Mandatory for this Profile.
 +
 +Roles
 +=====
-+**Table 1b: Role Requirements**
++**Table 1: Role Requirements**
++
+++------------------+----------+----------------------------------------------+
+++ Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SPP_1_1     | x        | Device A (C.1)                               |
+++------------------+----------+----------------------------------------------+
++| TSPC_SPP_1_2     | x        | Device B (C.1)                               |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Mandatory to support at least one.
++
++Support of SPP Service
++======================
++**Table 2: Serial Port Service Support**
++
+++------------------+----------+----------------------------------------------+
+++ Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_SPP_2_1     | x        | Support of SPP as a standalone profile (O)   |
+++------------------+----------+----------------------------------------------+
++| TSPC_SPP_2_1a    | x        | SPP as a standalone profile - Device A (C.2, |
++|                  |          | C.3)                                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_SPP_2_1b    | x        | SPP as a standalone profile - Device B (C.2, |
++|                  |          | C.4)                                         |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++- C.2: Mandatory to support at least one IF SPP 2/1 “Support of SPP as a*
++  standalone profile”, otherwise Excluded.
++- C.3: Optional IF SPP 1/1 “Device A”, otherwise Excluded.
++- C.4: Optional IF SPP 1/2 “Device B”, otherwise Excluded.
++
++Application Procedures
++======================
++**Table 3: Application Procedures**
 +
 ++------------------+----------+----------------------------------------------+
 +| Parameter Name   | Selected | Description                                  |
 ++==================+==========+==============================================+
-+| TSPC_SDP_1b_1    | x        | Server (C.1)                                 |
++| TSPC_SPP_3_1     | x        | Establish link and set up virtual serial     |
++|                  |          | connection (C.1)                             |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_1b_2    | x        | Client (C.1)                                 |
++| TSPC_SPP_3_2     | x        | Accept link and virtual serial connection    |
++|                  |          | establishment (C.2)                          |
 ++------------------+----------+----------------------------------------------+
-+
-+- C.1: Mandatory to support at least one of SDP 1b/1 "Server" OR SDP 1b/2
-+  "Client".
-+
-+UUID capabilities
-+=================
-+**Table 1: Support Different Size Capabilities on UUID**
-+Prerequisite: SDP 1b/1 "Server"
-+
++| TSPC_SPP_3_3     | x        | Register Service record for application in   |
++|                  |          | local SDP database (C.3)                     |
 ++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_SDP_1_1     | x        | 128 bit UUID (M)                             |
++| TSPC_SPP_3_4     |          | No release in Sniff mode. Sniff mode enabled |
++|                  |          | in the Link Manager (O)                      |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_1_2     | x        | 32 bit UUID (M)                              |
++| TSPC_SPP_3_5     |          | No release in Hold mode. Hold mode enabled   |
++|                  |          | in the Link Manager (O)                      |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_1_3     | x        | 16 bit UUID (M)                              |
++| TSPC_SPP_3_7     |          | No release after Master/Slave switch. M/S    |
++|                  |          | switch enabled in the Link Manager (O)       |
 ++------------------+----------+----------------------------------------------+
 +
-+- M: Mandatory
++- O: Optional
++- C.1: Mandatory IF SPP 1/1 “Device A”, otherwise Optional.
++- C.2: Mandatory IF SPP 1/2 “Device B”, otherwise Optional.
++- C.3: Mandatory IF SPP 2/1b “SPP as a standalone profile – Device B”,
++  otherwise Optional.
 +
-+Service Search Request PDU
++Service Discovery Protocol
 +==========================
-+**Table 2: Service Search Request**
-+Prerequisite: SDP 1b/1 "Server"
++**Table 4: SDP Dependencies**
++Prerequisite: SPP 2/1b “SPP as a standalone profile – Device B”
 +
 ++------------------+----------+----------------------------------------------+
 +| Parameter Name   | Selected | Description                                  |
 ++==================+==========+==============================================+
-+| TSPC_SDP_2_1     | x        | Service Search Response (M)                  |
++| TSPC_SPP_4_1     | x        | ServiceClassIDList (M)                       |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_2_2     |          | Generates continuation state in Service      |
-+|                  |          | Search Response (O)                          |
++| TSPC_SPP_4_2     | x        | ProtocolDescriptorList (M)                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_SPP_4_5     | x        | ServiceName (O)                              |
+++------------------+----------+----------------------------------------------+
++| TSPC_SPP_4_6     | x        | BluetoothProfileDescriptorList (M)           |
 ++------------------+----------+----------------------------------------------+
 +
 +- M: Mandatory
 +- O: Optional
 +
-+Service Search Request PDU
-+==========================
-+**Table 3: Error Response to Invalid Service Search Request**
-+Prerequisite: SDP 1b/1 "Server"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_SDP_3_1     | x        | Error response to Service Search Request (M) |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+
-+Service Attribute Request PDU
-+=============================
-+**Table 4: Service Attribute Request**
-+Prerequisite: SDP 1b/1 "Server"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_SDP_4_1     | x        | Service Attribute Response (M)               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_4_2     |          | Generates continuation state in Service      |
-+|                  |          | Attribute Response (O)                       |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_4_3     | x        | Service Attribute Response with              |
-+|                  |          | AdditionalProtocolDescriptorList attribute   |
-+|                  |          | (O)                                          |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+
-+Service Attribute Request PDU
-+=============================
-+**Table 5: Error Response to Invalid Service Attribute Request**
-+Prerequisite: SDP 1b/1 "Server"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_SDP_5_1     | x        | Error response to Service Attribute Request  |
-+|                  |          | (M)                                          |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+
-+Service Search Attribute Request PDU
-+====================================
-+**Table 6: Service Search Attribute Request**
-+Prerequisite: SDP 1b/1 "Server"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_SDP_6_1     | x        | Service Search Attribute Response (M)        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_6_2     |          | Generates continuation state in Service      |
-+|                  |          | Search Attribute Response (O)                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_6_3     | x        | Service Search Attribute Response with       |
-+|                  |          | AdditionalProtocolDescriptorList attribute   |
-+|                  |          | (O)                                          |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+
-+Service Search Attribute Request PDU
-+====================================
-+**Table 7: Invalid Service Search Attribute Request**
-+Prerequisite: SDP 1b/1 "Server"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_SDP_7_1     | x        | Error response to Service Search Attribute   |
-+|                  |          | Request (M)                                  |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+
-+Service Browsing
-+================
-+**Table 8: Service Browsing**
-+Prerequisite: SDP 1b/1 "Server"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_SDP_8_1     |          | Browsing, using SDP_ServiceSearchRequest and |
-+|                  |          | SDP_ServiceAttributeRequest (O)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_8_2     |          | Browsing, using                              |
-+|                  |          | SDP_ServiceSearchAttributeRequest (O)        |
-++------------------+----------+----------------------------------------------+
-+
-+- O: Optional
-+
-+Attributes
-+==========
-+**Table 9: Attributes Present in IUT**
-+Prerequisite: SDP 1b/1 "Server"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_SDP_9_1     |          | ServiceID (O)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_2     | x        | ProtocolDescriptorList (O)                   |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_3     |          | ServiceRecordState (O)                       |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_4     |          | ServiceInfoTimeToLive (O)                    |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_5     |          | BrowseGroupList (O)                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_6     |          | LanguageBaseAttributeIdList (O)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_7     |          | ServiceAvailability (O)                      |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_8     |          | IconURL (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_9     | x        | ServiceName (O)                              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_10    | x        | ServiceDescription (O)                       |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_11    |          | ProviderName (O)                             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_12    |          | VersionNumberList (O)                        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_13    |          | ServiceDataBaseState (O)                     |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_14    | x        | BluetoothProfileDescriptorList (O)           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_15    |          | DocumentationURL (O)                         |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_16    |          | ClientExecutableURL (O)                      |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_17    |          | AdditionalProtocolDescriptorList (C.1)       |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_18    | x        | ServiceRecordHandle (O)                      |
-++------------------+----------+----------------------------------------------+
-+| TSPC_SDP_9_19    | x        | ServiceClassIDList (O)                       |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+- C.1: Optional IF SDP 9/2 "ProtocolDescriptorList", otherwise Excluded.
-diff --git a/doc/qualification/sdp-pts.rst b/doc/qualification/sdp-pts.rst
++Note: If more than one Serial Port Profile Service is available, more than one
++SerialPort SDP record can be registered
+diff --git a/doc/qualification/spp-pts.rst b/doc/qualification/spp-pts.rst
 new file mode 100644
-index 000000000..1c80c4c58
+index 000000000..8fd995d18
 --- /dev/null
-+++ b/doc/qualification/sdp-pts.rst
-@@ -0,0 +1,63 @@
++++ b/doc/qualification/spp-pts.rst
+@@ -0,0 +1,35 @@
 +.. SPDX-License-Identifier: GPL-2.0-or-later
 +.. Copyright © 2025-2026 Collabora Ltd.
 +
 +================
-+SDP test results
++SPP test results
 +================
 +
 +:PTS version: 8.5.2 Build 5
@@ -294,49 +216,21 @@ index 000000000..1c80c4c58
 +The kernel and BlueZ versions represent the oldest version without backport
 +for which we know the test passed.
 +
-++--------------------+----------+---------+-------+--------------------------+
-+| Test name          | Result   | Kernel  | BlueZ |                          |
-++====================+==========+=========+=======+==========================+
-+| SDP/SR/SA/BV-01-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SA/BV-05-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SA/BV-17-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SA/BV-20-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SA/BV-21-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SA/BI-01-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SA/BI-02-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SA/BI-03-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SS/BV-01-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SS/BV-04-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SS/BI-01-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SS/BI-02-C  | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SSA/BV-01-C | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SSA/BV-02-C | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SSA/BV-03-C | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SSA/BV-04-C | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SSA/BV-11-C | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SSA/BV-23-C | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SSA/BI-01-C | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
-+| SDP/SR/SSA/BI-02-C | PASS     |     6.1 | 5.69  |                          |
-++--------------------+----------+---------+-------+--------------------------+
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| Test name                    | Result   | Kernel  | BlueZ |                                                                         |
+++==============================+==========+=========+=======+=========================================================================+
++| SPP/DEVA/APP/BV-01-C         | PASS     |     6.1 | 5.69  | Run 'rctest -n -U spp <BD_ADDR>' before starting the test               |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | Kill rctest upon request                                                |
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| SPP/DEVB/APP/BV-02-C         | PASS     |     6.1 | 5.69  | Run 'python ./test-profile -u spp -s -C 10'                             |
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| IOPT/CL/SPP-DEVA/SFC/BV-24-I | PASS     |     6.1 | 5.69  | Remove PTS device from Bluetooth devices                                |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | Run 'rctest -n -U spp <BD_ADDR>'                                        |
++|                              |          |         |       |                                                                         |
++|                              |          |         |       | Kill rctest upon request                                                |
+++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
 -- 
 2.43.0
 
