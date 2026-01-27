@@ -1,43 +1,46 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D087313E3B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9343164C8
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 17:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769535534; cv=none; b=DIIyOAqKIu4lwLAQyVcuvfncJCnJxnB3opP3PvspCd8Moetq3MXSc3vtJABbUVDyy37Y2hQOfId8BkNuGtmkflk9k6hmNYbczAK881fa3p4VBFbsqYGfJCcL4tEku88pl0Fj5JbWNVu266odE/jVesqiPvP7y9XIXMPYng7G89A=
+	t=1769535534; cv=none; b=XDP+3B3fH8yVwIznaPs2qaWbqGMSYvLqMxJfq9xGAt4M37l4HQlvWHdzXRR9u8d7g+pXMODerUAm77z3e5gpdB+lFBjcVe/TdOmCDwU18mkIys3n0KMTCcn/zciNmtJOap7DAeCyjpPNuspyXH/HjgKcKdQY8rHd9YevWuQpxLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769535534; c=relaxed/simple;
-	bh=++0nU63kAhRFUAIG8sHptzEpwmXbLgTkTw6CXVcws+0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OYYL8RUAaTOJyksiycgGJrGj0ufMgdWNHGfHnmb0NsqFWgMByTOSCd9U9m/Zd7jVeCUQV82jc9PDfSUykZRrlNHoyMNTBRs07U3j4OuVirkti8rsCd3jvaoeo4kqSg9WY9vCt4B5CYoc2fhgDJzQsCHl0oIT0mxSBcIIJINjsVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=m3p05CbQ; arc=none smtp.client-ip=148.251.105.195
+	bh=Pbzfm2Z5CxSrlcOfZEh264XZYuVHMiincGrFxFdnIgc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UG0G7QpBca+sDFGs7vp4A5hDz3Wfv+cZAQU3epWMX02oSEE4RZRToYJWNg0E1jKAeXMgze57NQ+tAghuT/chjTjDxUsHPygfXMOHc/rg/TMkOYJWfXDnn9bUJDnJXYI8oA/MAvx/SPE1Nj90OS2lXR0Nb/Q385tNchvF+MAiVvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=jZlJTV+X; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="m3p05CbQ"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="jZlJTV+X"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1769535527;
-	bh=++0nU63kAhRFUAIG8sHptzEpwmXbLgTkTw6CXVcws+0=;
-	h=From:To:Subject:Date:From;
-	b=m3p05CbQOspxBPYODOapI2b4VMNGP4QZlJZZ+aJa4YqSKwyB+/FzWd6ufoDUaYPnS
-	 bgiKcYPCQgEA+SLT9I06O14XMxilH4Us88Pj6Zu0mw2oEdAAcEcBnFmaXv7jB/nIwS
-	 VySc3SZkBXk+6G0VjLSgXchB6/QpgCmzHZMKisd6KcoulJE6ptHzj3UBgLmtfzTb+6
-	 tasamXJNc+mooxUZ5Y7tdhBMqUp8tnA/HiuzYybKMsIcQDQ6977D6W5SOUQf9TMxyl
-	 VdFS0j3SSgJLM1xcIbCaV2G+uriBZjr9bZSzrMmB6Md+Yn9pBXL1wexlgY+8vIHKjR
-	 0qIbG7GdzVLyQ==
+	s=mail; t=1769535528;
+	bh=Pbzfm2Z5CxSrlcOfZEh264XZYuVHMiincGrFxFdnIgc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=jZlJTV+XxMCPxqpxiw7ROtdAXNqE5zYjGHOYtN+ubbh8JimaC6ofW1dt8opHzjGAr
+	 X0xxZnsbKwRwubcOU7pvG7xfr4cVbREagiBj0DWG0avBvm6a74NeNY2Px5AMz3iAg7
+	 S1UZARaUW1wCKA/qtvgRWXn7VLyO118m/gR2pGF/CMikZhznC6/ItjKgxR7mP2tGFL
+	 D6AJqRCPBkBhNgjidsz5af1rJwFSaqbsXfFegGUxg/deUAYOnT5TnHLDoyhl3FnhaQ
+	 /GSZqamsOvvw3t9IBL+F5ZDZ853SN5arSrS5nUyZWEwO+TpMHUfnTRkKmrqFblLOXD
+	 yOy5YC+HAsN8g==
 Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-871c-6E70-D798-Dfc2.rev.sfr.net [IPv6:2a02:8428:af44:1001:871c:6e70:d798:dfc2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id A4B2017E0679
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 18:38:47 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5815617E13A3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 18:38:48 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 01/13] doc/qualification: Add PICS and howto for the A2DP qualification
-Date: Tue, 27 Jan 2026 18:38:29 +0100
-Message-ID: <20260127173841.153747-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2 03/13] doc/qualification: Add PICS and howto for the AVDTP qualification
+Date: Tue, 27 Jan 2026 18:38:31 +0100
+Message-ID: <20260127173841.153747-3-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260127173841.153747-1-frederic.danis@collabora.com>
+References: <20260127173841.153747-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -48,934 +51,668 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
 ---
- doc/qualification/a2dp-pics.rst | 904 ++++++++++++++++++++++++++++++++
- doc/qualification/a2dp-pts.rst  | 273 ++++++++++
- 2 files changed, 1177 insertions(+)
- create mode 100644 doc/qualification/a2dp-pics.rst
- create mode 100644 doc/qualification/a2dp-pts.rst
+ doc/qualification/avdtp-pics.rst | 638 +++++++++++++++++++++++++++++++
+ doc/qualification/avdtp-pts.rst  | 405 ++++++++++++++++++++
+ 2 files changed, 1043 insertions(+)
+ create mode 100644 doc/qualification/avdtp-pics.rst
+ create mode 100644 doc/qualification/avdtp-pts.rst
 
-diff --git a/doc/qualification/a2dp-pics.rst b/doc/qualification/a2dp-pics.rst
+diff --git a/doc/qualification/avdtp-pics.rst b/doc/qualification/avdtp-pics.rst
 new file mode 100644
-index 000000000..12692901f
+index 000000000..d31872cc1
 --- /dev/null
-+++ b/doc/qualification/a2dp-pics.rst
-@@ -0,0 +1,904 @@
++++ b/doc/qualification/avdtp-pics.rst
+@@ -0,0 +1,638 @@
 +.. SPDX-License-Identifier: GPL-2.0-or-later
 +.. Copyright © 2025-2026 Collabora Ltd.
 +
-+===================================
-+Advanced Audio Distribution Profile
-+===================================
-+(TCRL 2023-1, A2DP.ICS.p16ed3)
++===========================================
++Audio/Video Distribution Transport Protocol
++===========================================
++(TCRL 2023-1, AVDTP.ICS.1.3.4ed3)
 +
-+Version
-+=======
-+**Table 2a: A2DP SRC X.Y Versions**
-+
-+Prerequisite: A2DP 1/1 "Source"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_2a_2   |          | A2DP 1.2 (C.1)                               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2a_3   | x        | A2DP 1.3 Withdrawn (C.1, C.2)                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2a_4   |          | A2DP 1.4 (C.1)                               |
-++------------------+----------+----------------------------------------------+
-+
-+- C.1: Mandatory to support one and only one.
-+- C.2: Can only be supported with an active X.Y.Z version after Deprecation.
-+  Deprecated 2021-02-01. Withdrawn 2024-02-01.
-+
-+Version
-+=======
-+**Table 2b: A2DP SRC X.Y.Z Versions**
-+
-+Prerequisite: A2DP 1/1 "Source"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_2b_2   | x        | A2DP 1.3.2 (C.1)                             |
-++------------------+----------+----------------------------------------------+
-+
-+- C.1: Mandatory IF A2DP 2a/3 "A2DP 1.3", otherwise Excluded.
-+
-+Version
-+=======
-+**Table 7a: A2DP SNK X.Y Versions**
-+
-+Prerequisite: A2DP 1/2 "Sink"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_7a_2   |          | A2DP 1.2 (C.1)                               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_7a_3   | x        | A2DP 1.3 Withdrawn (C.1, C.2)                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_7a_4   |          | A2DP 1.4 (C.1)                               |
-++------------------+----------+----------------------------------------------+
-+
-+- C.1: Mandatory to support one and only one.
-+- C.2: Can only be supported with an active X.Y.Z version after Deprecation.
-+  Deprecated 2021-02-01. Withdrawn 2024-02-01.
-+
-+Version
-+=======
-+**Table 7b: A2DP SNK X.Y.Z Versions**
-+
-+Prerequisite: A2DP 1/2 "Sink"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_7b_2   | x        | A2DP 1.3.2 (C.1)                             |
-++------------------+----------+----------------------------------------------+
-+
-+- C.1: Mandatory IF A2DP 7a/3 "A2DP 1.3", otherwise Excluded.
-+
-+Roles
-+=====
++Version and Role Declarations
++=============================
 +**Table 1: Role Requirements**
 +
 ++------------------+----------+----------------------------------------------+
 +| Parameter Name   | Selected | Description                                  |
 ++==================+==========+==============================================+
-+| TSPC_A2DP_1_1    | x        | Source (C.1)                                 |
++| TSPC_AVDTP_1_1   | x        | Source (C.1)                                 |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_1_2    | x        | Sink (C.1)                                   |
++| TSPC_AVDTP_1_2   | x        | Sink (C.1)                                   |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_1_3   | x        | Initiator (C.2)                              |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_1_4   | x        | Acceptor (C.2)                               |
 ++------------------+----------+----------------------------------------------+
 +
-+- C.1: Mandatory to support at least one.
++- C.1: Mandatory to support at least one of AVDTP 1/1 "Source" OR AVDTP 1/2
++  "Sink".
++- C.2: Mandatory to support at least one of AVDTP 1/3 "Initiator" OR AVDTP 1/4
++  "Acceptor". Note: It is within the scope of profiles using the AVDTP
++  specification to mandate Initiator/Acceptor capabilities.
 +
-+Source Features
-+===============
-+**Table 2: A2DP SRC Features**
++Source Capabilities
++===================
++**Table 14a: AVDTP Source - Major Versions (X.Y)**
 +
-+Prerequisite: A2DP 1/1 "Source"
++Prerequisite: AVDTP 1/1 "Source"
 +
 ++------------------+----------+----------------------------------------------+
 +| Parameter Name   | Selected | Description                                  |
 ++==================+==========+==============================================+
-+| TSPC_A2DP_2_1    | x        | Initiate Connection Establishment (M)        |
++| TSPC_AVDTP_14a_1 |          | AVDTP 1.0 Withdrawn (C.1, C.2)               |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_2    | x        | Accept Connection Establishment (M)          |
++| TSPC_AVDTP_14a_2 |          | AVDTP 1.2 Withdrawn (C.1, C.3)               |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_3    | x        | Initiate Start Streaming (M)                 |
++| TSPC_AVDTP_14a_3 | x        | AVDTP 1.3 (C.1)                              |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_4    | x        | Accept Start Streaming (M)                   |
++
++- C.1: Mandatory to support one and only one of AVDTP 14a/1 "AVDTP 1.0" OR
++  AVDTP 14a/2 "AVDTP 1.2" OR AVDTP 14a/3 "AVDTP 1.3".
++- C.2: Excluded after the date of deprecation. Deprecated 2022-02-01.
++  Withdrawn 2023-02-01.
++- C.3: Excluded after the date of deprecation. Deprecated 2023-02-01.
++  Withdrawn 2024-02-01.
++
++Source Capabilities
++===================
++**Table 14: Source Capabilities**
++
++Prerequisite: AVDTP 1/1 "Source"
++
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_5    | x        | Send Audio Stream (M)                        |
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_14_1  | x        | Basic transport service support (M)          |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_6    | x        | Initiate Connection Release (M)              |
++| TSPC_AVDTP_14_2  |          | Reporting service support (O)                |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_7    | x        | Accept Connection Release (M)                |
++| TSPC_AVDTP_14_3  |          | Recovery service support (O)                 |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_8    |          | Initiate Suspend (O)                         |
++| TSPC_AVDTP_14_4  |          | Multiplexing service support (O)             |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_9    |          | Accept Suspend (O)                           |
++| TSPC_AVDTP_14_5  |          | Robust header compression service support (O)|
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_10   | x        | SBC Encoder (M)                              |
++| TSPC_AVDTP_14_6  |          | Delay Reporting (C.1)                        |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_10a  |          | Encode and Forward Audio Stream (O)          |
++
++- M: Mandatory
++- O: Optional
++- C.1: Optional IF AVDTP 14a/3 "AVDTP 1.3" is supported, otherwise Excluded.
++
++Source Capabilities
++===================
++**Table 2: Signaling Message Format (Initiator, Source)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/1 "Source"
++
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_11   |          | SBC Configurations in 16 kHz sampling        |
-+|                  |          | frequency (O)                                |
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_2_1   | x        | Transaction Label (M)                        |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_12   |          | SBC Configurations in 32 kHz sampling        |
-+|                  |          | frequency (O)                                |
++| TSPC_AVDTP_2_2   | x        | Packet type (M)                              |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_13   | x        | SBC Configurations in 44.1 kHz sampling      |
-+|                  |          | frequency (C.1)                              |
++| TSPC_AVDTP_2_3   | x        | Message type (M)                             |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_14   |          | SBC Configurations in 48 kHz sampling        |
-+|                  |          | frequency (C.1)                              |
++| TSPC_AVDTP_2_4   | x        | Signal identifier (M)                        |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_15   |          | Delay Reporting (C.2)                        |
++
++- M: Mandatory
++
++Source Capabilities
++===================
++**Table 3: Signaling Channel Establishment/Disconnection (Initiator, Source)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/1 "Source"
++
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_16   |          | SRC video playback via Bluetooth VDP (C.3)   |
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_3_1   | x        | Establish signaling channel (O)              |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_2_17   |          | SRC video playback on a local video display  |
++| TSPC_AVDTP_3_2   | x        | Disconnect signaling channel (O)             |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Source Capabilities
++===================
++**Table 4: Stream Discovery and Configuration (Initiator, Source)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_4_1   | x        | Stream discover command (O)                  |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4_2   | x        | Stream get capabilities command (C.2)        |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4_3   | x        | Set configuration command (O)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4_4   | x        | Get configuration command (O)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4_5   |          | Reconfigure command (O)                      |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4_6   | x        | Stream get all capabilities command (C.1)    |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++- C.1: Optional IF AVDTP 14a/3 "AVDTP 1.3" is supported, otherwise Excluded.
++- C.2: Mandatory IF AVDTP 4/6 "Stream get all capabilities command" is
++  supported, otherwise Optional.
++
++Source Capabilities
++===================
++**Table 5: Stream Establishment, Suspension and Release (Initiator, Source)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_5_1   | x        | Open stream command (O)                      |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_5_2   | x        | Start stream command (O)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_5_3   | x        | Close stream command (O)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_5_4   | x        | Suspend command (O)                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_5_5   | x        | Abort stream command (O)                     |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Source Capabilities
++===================
++**Table 6: Security Signaling (Initiator, Source)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_6_1   |          | Content security control command (O)         |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Source Capabilities
++===================
++**Table 7: Message Fragmentation (Initiator, Source)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_7_1   | x        | Signaling message fragmentation (M)          |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++Source Capabilities
++===================
++**Table 8: Signaling Message Format (Acceptor, Source)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_8_1   | x        | Transaction Label (M)                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_8_2   | x        | Packet type (M)                              |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_8_3   | x        | Message type (M)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_8_4   | x        | Signal identifier (M)                        |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++Source Capabilities
++===================
++**Table 9: Signaling Channel Establishment/Disconnection (Acceptor, Source)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_9_1   | x        | Establish signaling channel (O)              |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_9_2   | x        | Disconnect signaling channel (O)             |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Source Capabilities
++===================
++**Table 10: Stream Discovery and Configuration (Acceptor, Source)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_10_1  | x        | Stream discover response (O)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10_2  | x        | Stream get capabilities response (C.2)       |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10_3  | x        | Set configuration response (O)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10_4  | x        | Get configuration response (O)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10_5  |          | Reconfigure response (O)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10_6  | x        | Stream get all capabilities response (C.1)   |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++- C.1: Optional IF AVDTP 14a/3 "AVDTP 1.3" is supported, otherwise Excluded.
++- C.2: Mandatory IF AVDTP 10/6 "Stream get all capabilities response" is
++  supported, otherwise Optional.
++
++Source Capabilities
++===================
++**Table 11: Stream Establishment, Suspension and Release (Acceptor, Source)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_11_1  | x        | Open stream response (O)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11_2  | x        | Start stream response (O)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11_3  | x        | Close stream response (O)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11_4  | x        | Suspend response (O)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11_5  | x        | Abort stream response (O)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11_6  | x        | General reject message (O)                   |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Source Capabilities
++===================
++**Table 12: Security Signaling (Acceptor, Source)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_12_1  |          | Content security control response (O)        |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Source Capabilities
++===================
++**Table 13: Message Fragmentation (Acceptor, Source)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/1 "Source"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_13_1  | x        | Signaling message fragmentation (M)          |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++Sink Capabilities
++=================
++**Table 15a: AVDTP Sink - Major Versions (X.Y)**
++
++Prerequisite: AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_15a_1 |          | AVDTP 1.0 Withdrawn (C.1, C.2)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_15a_2 |          | AVDTP 1.2 Withdrawn (C.1, C.3)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_15a_3 | x        | AVDTP 1.3 (C.1)                              |
+++------------------+----------+----------------------------------------------+
++
++- C.1: Mandatory to support one and only one of AVDTP 15a/1 "AVDTP 1.0" OR
++  AVDTP 15a/2 "AVDTP 1.2" OR AVDTP 15a/3 "AVDTP 1.3".
++- C.2: Excluded after the date of deprecation. Deprecated 2022-02-01.
++  Withdrawn 2023-02-01.
++- C.3: Excluded after the date of deprecation. Deprecated 2023-02-01.
++  Withdrawn 2024-02-01.
++
++Sink Capabilities
++=================
++**Table 15: Sink Capabilities**
++
++Prerequisite: AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_15_1  | x        | Basic transport service support (M)          |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_15_2  |          | Reporting service support (O)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_15_3  |          | Recovery service support (O)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_15_4  |          | Multiplexing service support (O)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_15_5  |          | Robust header compression service support (O)|
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_15_6  |          | Delay Reporting (C.1)                        |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++- O: Optional
++- C.1: Optional IF AVDTP 15a/3 "AVDTP 1.3" is supported, otherwise Excluded.
++
++Sink Capabilities
++=================
++**Table 2b: Signaling Message Format (Initiator, Sink)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_2b_1  | x        | Transaction Label (M)                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_2b_2  | x        | Packet type (M)                              |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_2b_3  | x        | Message type (M)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_2b_4  | x        | Signal identifier (M)                        |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++Sink Capabilities
++=================
++**Table 3b: Signaling Channel Establishment/Disconnection (Initiator, Sink)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_3b_1  |          | Establish signaling channel (O)              |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_3b_2  |          | Disconnect signaling channel (O)             |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Sink Capabilities
++=================
++**Table 4b: Stream Discovery and Configuration (Initiator, Sink)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_4b_1  | x        | Stream discover command (O)                  |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4b_2  | x        | Stream get capabilities command (C.2)        |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4b_3  | x        | Set configuration command (O)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4b_4  |          | Get configuration command (O)                |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4b_5  |          | Reconfigure command (O)                      |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_4b_6  | x        | Stream get all capabilities command (C.1)    |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++- C.1: Optional IF AVDTP 15a/3 "AVDTP 1.3" is supported, otherwise Excluded.
++- C.2: Mandatory IF AVDTP 4b/6 "Stream get all capabilities command" is
++  supported, otherwise Optional.
++
++Sink Capabilities
++=================
++**Table 5b: Stream Establishment, Suspension and Release (Initiator, Sink)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_5b_1  | x        | Open stream command (O)                      |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_5b_2  | x        | Start stream command (O)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_5b_3  | x        | Close stream command (O)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_5b_4  |          | Suspend command (O)                          |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_5b_5  | x        | Abort stream command (O)                     |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Sink Capabilities
++=================
++**Table 6b: Security Signaling (Initiator, Sink)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_6b_1  |          | Content security control command (O)         |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Sink Capabilities
++=================
++**Table 7b: Message Fragmentation (Initiator, Sink)**
++
++Prerequisite: AVDTP 1/3 "Initiator" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_7b_1  | x        | Signaling message fragmentation (M)          |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++Sink Capabilities
++=================
++**Table 8b: Signaling Message Format (Acceptor, Sink)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_8b_1  | x        | Transaction Label (M)                        |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_8b_2  | x        | Packet type (M)                              |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_8b_3  | x        | Message type (M)                             |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_8b_4  | x        | Signal identifier (M)                        |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++Sink Capabilities
++=================
++**Table 9b: Signaling Channel Establishment/Disconnection (Acceptor, Sink)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_9b_1  |          | Establish signaling channel (O)              |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_9b_2  |          | Disconnect signaling channel (O)             |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Sink Capabilities
++=================
++**Table 10b: Stream Discovery and Configuration (Acceptor, Sink)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_10b_1 | x        | Stream discover response (O)                 |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10b_2 | x        | Stream get capabilities response (C.2)       |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10b_3 | x        | Set configuration response (O)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10b_4 |          | Get configuration response (O)               |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10b_5 |          | Reconfigure response (O)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_10b_6 | x        | Stream get all capabilities response (C.1)   |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++- C.1: Optional IF AVDTP 15a/3 "AVDTP 1.3" is supported, otherwise Excluded.
++- C.2: Mandatory IF AVDTP 10b/6 "Stream get all capabilities response" is
++  supported, otherwise Optional.
++
++Sink Capabilities
++=================
++**Table 11b: Stream Establishment, Suspension and Release (Acceptor, Sink)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_11b_1 | x        | Open stream response (O)                     |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11b_2 | x        | Start stream response (O)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11b_3 | x        | Close stream response (O)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11b_4 |          | Suspend response (O)                         |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11b_5 | x        | Abort stream response (O)                    |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_11b_6 | x        | General reject message (O)                   |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Sink Capabilities
++=================
++**Table 12b: Security Signaling (Acceptor, Sink)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_12b_1 |          | Content security control response (O)        |
+++------------------+----------+----------------------------------------------+
++
++- O: Optional
++
++Sink Capabilities
++=================
++**Table 13b: Message Fragmentation (Acceptor, Sink)**
++
++Prerequisite: AVDTP 1/4 "Acceptor" AND AVDTP 1/2 "Sink"
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_13b_1 | x        | Signaling message fragmentation (M)          |
+++------------------+----------+----------------------------------------------+
++
++- M: Mandatory
++
++Message Error Handling Capabilities
++===================================
++**Table 16: Message Error Handling Capabilities**
++
+++------------------+----------+----------------------------------------------+
++| Parameter Name   | Selected | Description                                  |
+++==================+==========+==============================================+
++| TSPC_AVDTP_16_1  | x        | Reporting Capability Error (C.1)             |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_16_2  |          | Reject Corrupted Messages (C.2)              |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_16_3  | x        | General Reject Response Includes Signal ID   |
 +|                  |          | (C.3)                                        |
 ++------------------+----------+----------------------------------------------+
 +
-+- M: Mandatory
-+- O: Optional
-+- C.1: Mandatory to support at least one.
-+- C.2: Mandatory IF A2DP 2/16 "SRC video playback via Bluetooth VDP" OR A2DP
-+  2/17 "SRC video playback on a local video display", otherwise Excluded.
-+- C.3: Excluded IF A2DP 2a/2 "A2DP 1.2", otherwise Optional.
-+
-+SRC Implementation
-+==================
-+**Table 3: Supported Codec Interoperability Requirements in SRC**
-+
-+Prerequisite: A2DP 1/1 "Source"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_3_1    | x        | SBC encoder (M)                              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3_1a   |          | Encode and Forward SBC Audio Stream (O)      |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3_4    |          | Encode and forward MPEG-1,2 Audio Stream (O) |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3_6    |          | Encode and forward MPEG-2,4 AAC Audio Stream |
-+|                  |          | (O)                                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3_8    |          | Encode and forward ATRAC family Audio Stream |
-+|                  |          | (O)                                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3_10   |          | Encode and forward MPEG-D USAC Audio Stream  |
-+|                  |          | (C.6)                                        |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+- C.6: Excluded IF A2DP 2a/2 "A2DP 1.2" OR A2DP 2a/3 "A2DP 1.3", otherwise
++- C.1: Mandatory IF AVDTP 14a/2 "AVDTP 1.2" OR AVDTP 15a/2 "AVDTP 1.2" OR
++  AVDTP 14a/3 "AVDTP 1.3" OR AVDTP 15a/3 "AVDTP 1.3" is supported, otherwise
 +  Optional.
++- C.2: Excluded IF AVDTP 16/3 "General Reject Response Includes Signal ID" is
++  supported, otherwise Optional.
++- C.3: Mandatory IF AVDTP 14a/3 "AVDTP 1.3" OR AVDTP 15a/3 "AVDTP 1.3" is
++  supported, otherwise Optional.
 +
-+SRC Implementation
-+==================
-+**Table 3a: Supported Codec Feature Interoperability Requirements in SRC**
-+
-+Prerequisite: A2DP 3/1 "SBC encoder"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_3a_1   | x        | Channel Mode - Mono (M)                      |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_2   | x        | Channel Mode - Dual Channel (C.1)            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_3   |          | Channel Mode - Stereo (C.1)                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_4   |          | Channel Mode - Joint Stereo (C.1)            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_5   | x        | Block Length 4 (M)                           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_6   | x        | Block Length 8 (M)                           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_7   | x        | Block Length 12 (M)                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_8   | x        | Block Length 16 (M)                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_9   |          | Subbands - 4 (O)                             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_10  | x        | Subbands - 8 (M)                             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_11  |          | Allocation - SNR (O)                         |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3a_12  | x        | Allocation - Loudness (M)                    |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+- C.1: Mandatory to support at least one.
-+
-+SRC Implementation
-+==================
-+**Table 3g: Supported MPEG-2,4 AAC Object Type Interoperability Requirements
-+in SRC**
-+
-+Prerequisite: A2DP 3/6 "Encode and forward MPEG-2,4 AAC Audio Stream"
++Upper Tester Interface
++======================
++**Table 17: Upper Test Interface**
 +
 ++------------------+----------+----------------------------------------------+
 +| Parameter Name   | Selected | Description                                  |
 ++==================+==========+==============================================+
-+| TSPC_A2DP_3g_1   |          | MPEG-2 AAC LC (M)                            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3g_2   |          | MPEG-4 AAC LC (O)                            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3g_3   |          | MPEG-4 AAC LTP (O)                           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3g_4   |          | MPEG-4 AAC scalable (O)                      |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3g_5   |          | MPEG-4 HE-AAC (C.1)                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3g_6   |          | MPEG-4 HE-AACv2 (C.1)                        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3g_7   |          | MPEG-4 AAC-ELDv2 (C.1)                       |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+- C.1: Excluded IF A2DP 2a/2 "A2DP 1.2" OR A2DP 2a/3 "A2DP 1.3", otherwise
-+  Optional.
-+
-+SRC Implementation
-+==================
-+**Table 3h: Supported MPEG-2,4 AAC Channel Interoperability Requirements in
-+SRC**
-+
-+Prerequisite: A2DP 3/6 "Encode and forward MPEG-2,4 AAC Audio Stream"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_3h_1   |          | 1 Channel (C.1)                              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3h_2   |          | 2 Channels (C.1)                             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3h_3   |          | 6 (5.1) Channels (C.2)                       |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3h_4   |          | 8 (7.1) Channels (C.2)                       |
-++------------------+----------+----------------------------------------------+
-+
-+- C.1: Mandatory to support at least one.
-+- C.2: Excluded IF A2DP 2a/2 "A2DP 1.2" OR A2DP 2a/3 "A2DP 1.3", otherwise
-+  Optional.
-+
-+SRC Implementation
-+==================
-+**Table 3i: Supported MPEG-2,4 AAC Sampling Frequency Interoperability
-+Requirements in SRC**
-+
-+Prerequisite: A2DP 3/6 "Encode and forward MPEG-2,4 AAC Audio Stream"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_3i_1   |          | 8000 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_2   |          | 11025 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_3   |          | 12000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_4   |          | 16000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_5   |          | 22050 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_6   |          | 24000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_7   |          | 32000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_8   |          | 44100 Hz (C.1)                               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_9   |          | 48000 Hz (C.1)                               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_10  |          | 64000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_11  |          | 88200 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3i_12  |          | 96000 Hz (O)                                 |
++| TSPC_AVDTP_17_1  |          | Upper Tester Interface provided (O)          |
 ++------------------+----------+----------------------------------------------+
 +
 +- O: Optional
-+- C.1: Mandatory to support at least one.
 +
-+SRC Implementation
++L2CAP Capabilities
 +==================
-+**Table 3j: Supported MPEG-2,4 AAC Feature Interoperability Requirements in
-+SRC**
-+
-+Prerequisite: A2DP 3/6 "Encode and forward MPEG-2,4 AAC Audio Stream"
++**Table 18: L2CAP Capabilities**
 +
 ++------------------+----------+----------------------------------------------+
 +| Parameter Name   | Selected | Description                                  |
 ++==================+==========+==============================================+
-+| TSPC_A2DP_3j_1   |          | Variable Bit Rate (O)                        |
++| TSPC_AVDTP_18_1  |          | Enhanced Retransmission Mode preferred for   |
++|                  |          | signaling channel (O)                        |
 ++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3j_2   |          | MPEG-D DRC (C.1)                             |
++| TSPC_AVDTP_18_2  |          | Streaming Mode preferred for Media Transport |
++|                  |          | channel (O)                                  |
+++------------------+----------+----------------------------------------------+
++| TSPC_AVDTP_18_3  |          | FCS Option (C.1)                             |
 ++------------------+----------+----------------------------------------------+
 +
 +- O: Optional
-+- C.1: Excluded IF A2DP 2a/2 "A2DP 1.2" OR A2DP 2a/3 "A2DP 1.3", otherwise
-+  Optional IF A2DP 3g/2 "MPEG-4 AAC LC" OR A2DP 3g/3 "MPEG-4 AAC LTP" OR A2DP
-+  3g/4 "MPEG-4 AAC scalable" OR A2DP 3g/5 "MPEG-4 HE-AAC" OR A2DP 3g/6 "MPEG-4
-+  HE-AACv2" OR A2DP 3g/7 "MPEG-4 AAC-ELDv2", otherwise Excluded.
-+
-+SRC Implementation
-+==================
-+**Table 3k: Supported MPEG-D USAC Channel Interoperability Requirements in
-+SRC**
-+
-+Prerequisite: A2DP 3/10 "Encode and forward MPEG-D USAC Audio Stream"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_3k_1   |          | 1 Channel (C.1)                              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3k_2   |          | 2 Channels (C.1)                             |
-++------------------+----------+----------------------------------------------+
-+
-+- C.1: Mandatory to support at least one.
-+
-+SRC Implementation
-+==================
-+**Table 3l: Supported MPEG-D USAC Sampling Frequency Interoperability
-+Requirements in SRC**
-+
-+Prerequisite: A2DP 3/10 "Encode and forward MPEG-D USAC Audio Stream"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_3l_1   |          | 7350 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_2   |          | 8000 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_3   |          | 8820 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_4   |          | 9600 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_5   |          | 11025 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_6   |          | 11760 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_7   |          | 12000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_8   |          | 12800 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_9   |          | 14700 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_10  |          | 16000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_11  |          | 17640 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_12  |          | 19200 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_13  |          | 22050 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_14  |          | 24000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_15  |          | 29400 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_16  |          | 32000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_17  |          | 35280 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_18  |          | 38400 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_19  |          | 44100 Hz (C.1)                               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_20  |          | 48000 Hz (C.1)                               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_21  |          | 58800 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_22  |          | 64000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_23  |          | 70560 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_24  |          | 76800 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_25  |          | 88200 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3l_26  |          | 96000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+
-+- O: Optional
-+- C.1: Mandatory to support at least one.
-+
-+SRC Implementation
-+==================
-+**Table 3m: Supported MPEG-D USAC Feature Interoperability Requirements in
-+SRC**
-+
-+Prerequisite: A2DP 3/10 "Encode and forward MPEG-D USAC Audio Stream"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_3m_1   |          | Variable Bit Rate (O)                        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_3m_2   |          | MPEG-D DRC (M)                               |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+
-+SRC Implementation
-+==================
-+**Table 8: SDP Attributes (Source)**
-+
-+Prerequisite: A2DP 1/1 "Source"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_8_2    | x        | ProtocolDescriptorList (M)                   |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_8_3    | x        | BluetoothProfileDescriptorList (M)           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_8_4    |          | Supported Features (O)                       |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+
-+SRC Implementation
-+==================
-+**Table 9: GAVDP Roles (Source)**
-+
-+Prerequisite: A2DP 1/1 "Source"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_9_1    | x        | Initiator (M)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_9_2    | x        | Acceptor (M)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_9_3    |          | Delay Reporting Initiator (C.2)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_9_4    |          | Delay Reporting Acceptor (C.1)               |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- C.1: Excluded IF A2DP 2a/2 "A2DP 1.2", otherwise Optional.
-+- C.2: Excluded for this Role. Note: It is not permitted to be a delay
-+  reporting initiator for A2DP Source role.
-+
-+SRC Implementation
-+==================
-+**Table 11a: AVDTP Capabilities (Initiator, Source)**
-+
-+Prerequisite: A2DP 1/1 "Source"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_11a_1  | x        | Set configuration command (M)                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_11a_2  |          | Reconfigure command (O)                      |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+
-+SRC Implementation
-+==================
-+**Table 11b: AVDTP Capabilities (Acceptor, Source)**
-+
-+Prerequisite: A2DP 1/1 "Source"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_11b_1  | x        | Set configuration response (M)               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_11b_2  |          | Reconfigure response (O)                     |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+
-+Sink Features
-+=============
-+**Table 4: A2DP SNK Features**
-+
-+Prerequisite: A2DP 1/2 "Sink"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_4_1    |          | Initiate Connection Establishment (O)        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_2    | x        | Accept Connection Establishment (M)          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_3    |          | Initiate Start Streaming (O)                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_4    | x        | Accept Start Streaming (M)                   |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_5    | x        | Receive Audio Stream (M)                     |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_6    |          | Initiate Connection Release (O)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_7    | x        | Accept Connection Release (M)                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_8    |          | Initiate Suspend (O)                         |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_9    |          | Accept Suspend (O)                           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_10   | x        | SBC Decoder (M)                              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_10a  |          | Receive and Decode Audio Stream (O)          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_11   |          | SBC Configurations in 16 kHz sampling        |
-+|                  |          | frequency (O)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_12   |          | SBC Configurations in 32 kHz sampling        |
-+|                  |          | frequency (O)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_13   | x        | SBC Configurations in 44.1 kHz sampling      |
-+|                  |          | frequency (M)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_14   | x        | SBC Configurations in 48 kHz sampling        |
-+|                  |          | frequency (M)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_4_15   | x        | Delay Reporting (C.1)                        |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+- C.1: Excluded IF A2DP 7a/2 "A2DP 1.2", otherwise Mandatory.
-+
-+SNK Implementation
-+==================
-+**Table 5: Supported Codec Interoperability Requirements in SNK**
-+
-+Prerequisite: A2DP 1/2 "Sink"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_5_1    | x        | SBC Decoder (M)                              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5_3    |          | MPEG-1,2 Audio decoder (O)                   |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5_4    |          | MPEG-2,4 AAC decoder (O)                     |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5_5    |          | ATRAC family decoder (O)                     |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5_6    |          | MPEG-D USAC decoder (C.2)                    |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+- C.2: Excluded IF A2DP 7a/2 "A2DP 1.2" OR A2DP 7a/3 "A2DP 1.3", otherwise
-+  Optional.
-+
-+SNK Implementation
-+==================
-+**Table 5a: Supported Codec Feature Interoperability Requirements in SNK**
-+
-+Prerequisite: A2DP 5/1 "SBC Decoder"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_5a_1   | x        | Channel Mode - Mono (M)                      |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_2   | x        | Channel Mode - Dual Channel (M)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_3   | x        | Channel Mode - Stereo (M)                    |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_4   | x        | Channel Mode - Joint Stereo (M)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_5   | x        | Block Length 4 (M)                           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_6   | x        | Block Length 8 (M)                           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_7   | x        | Block Length 12 (M)                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_8   | x        | Block Length 16 (M)                          |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_9   | x        | Subbands - 4 (M)                             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_10  | x        | Subbands - 8 (M)                             |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_11  | x        | Allocation - SNR (M)                         |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5a_12  | x        | Allocation - Loudness (M)                    |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+
-+SNK Implementation
-+==================
-+**Table 5g: Supported MPEG-2,4 AAC Object Type Interoperability Requirements
-+in SNK**
-+
-+Prerequisite: A2DP 5/4 "MPEG-2,4 AAC decoder"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_5g_1   |          | MPEG-2 AAC LC (M)                            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5g_2   |          | MPEG-4 AAC LC (O)                            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5g_3   |          | MPEG-4 AAC LTP (O)                           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5g_4   |          | MPEG-4 AAC scalable (O)                      |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5g_5   |          | MPEG-4 HE-AAC (O)                            |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5g_6   |          | MPEG-4 HE-AACv2 (C.1)                        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5g_7   |          | MPEG-4 AAC-ELDv2 (C.1)                       |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+- C.1: Excluded IF A2DP 7a/2 "A2DP 1.2" OR A2DP 7a/3 "A2DP 1.3", otherwise
-+  Optional.
-+
-+SNK Implementation
-+==================
-+**Table 5h: Supported MPEG-2,4 AAC Channel Interoperability Requirements in
-+SNK**
-+
-+Prerequisite: A2DP 5/4 "MPEG-2,4 AAC decoder"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_5h_1   |          | 1 Channel (M)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5h_2   |          | 2 Channels (M)                               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5h_3   |          | 6 (5.1) Channels (C.1)                       |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5h_4   |          | 8 (7.1) Channels (C.1)                       |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- C.1: Excluded IF A2DP 7a/2 "A2DP 1.2" OR A2DP 7a/3 "A2DP 1.3", otherwise
-+  Optional.
-+
-+SNK Implementation
-+==================
-+**Table 5i: Supported MPEG-2,4 AAC Sampling Frequency Interoperability
-+Requirements in SNK**
-+
-+Prerequisite: A2DP 5/4 "MPEG-2,4 AAC decoder"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_5i_1   |          | 8000 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_2   |          | 11025 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_3   |          | 12000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_4   |          | 16000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_5   |          | 22050 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_6   |          | 24000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_7   |          | 32000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_8   |          | 44100 Hz (M)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_9   |          | 48000 Hz (M)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_10  |          | 64000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_11  |          | 88200 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5i_12  |          | 96000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+
-+SNK Implementation
-+==================
-+**Table 5j: Supported MPEG-2,4 AAC Feature Interoperability Requirements in
-+SNK**
-+
-+Prerequisite: A2DP 5/4 "MPEG-2,4 AAC decoder"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_5j_1   |          | Variable Bit Rate (M)                        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5j_2   |          | MPEG-D DRC (C.1)                             |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- C.1: Excluded IF A2DP 7a/2 "A2DP 1.2" OR A2DP 7a/3 "A2DP 1.3", otherwise
-+  Optional IF A2DP 5g/2 "MPEG-4 AAC LC" OR A2DP 5g/3 "MPEG-4 AAC LTP" OR A2DP
-+  5g/4 "MPEG-4 AAC scalable" OR A2DP 5g/5 "MPEG-4 HE-AAC" OR A2DP 5g/6 "MPEG-4
-+  HE-AACv2" OR A2DP 5g/7 "MPEG-4 AAC-ELDv2", otherwise Excluded.
-+
-+SNK Implementation
-+==================
-+**Table 5k: Supported MPEG-D USAC Channel Interoperability Requirements in
-+SNK**
-+
-+Prerequisite: A2DP 5/6 "MPEG-D USAC decoder"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_5k_1   |          | 1 Channel (M)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5k_2   |          | 2 Channels (M)                               |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+
-+SNK Implementation
-+==================
-+**Table 5l: Supported MPEG-D USAC Sampling Frequency Interoperability
-+Requirements in SNK**
-+
-+Prerequisite: A2DP 5/6 "MPEG-D USAC decoder"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_5l_1   |          | 7350 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_2   |          | 8000 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_3   |          | 8820 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_4   |          | 9600 Hz (O)                                  |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_5   |          | 11025 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_6   |          | 11760 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_7   |          | 12000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_8   |          | 12800 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_9   |          | 14700 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_10  |          | 16000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_11  |          | 17640 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_12  |          | 19200 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_13  |          | 22050 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_14  |          | 24000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_15  |          | 29400 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_16  |          | 32000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_17  |          | 35280 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_18  |          | 38400 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_19  |          | 44100 Hz (M)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_20  |          | 48000 Hz (M)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_21  |          | 58800 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_22  |          | 64000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_23  |          | 70560 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_24  |          | 76800 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_25  |          | 88200 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5l_26  |          | 96000 Hz (O)                                 |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+
-+SNK Implementation
-+==================
-+**Table 5m: Supported MPEG-D USAC Feature Interoperability Requirements in
-+SNK**
-+
-+Prerequisite: A2DP 5/6 "MPEG-D USAC decoder"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_5m_1   |          | Variable Bit Rate (M)                        |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_5m_2   |          | MPEG-D DRC (M)                               |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+
-+SNK Implementation
-+==================
-+**Table 12: SDP Attributes (Sink)**
-+
-+Prerequisite: A2DP 1/2 "Sink"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_12_2   | x        | ProtocolDescriptorList (M)                   |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_12_3   | x        | BluetoothProfileDescriptorList (M)           |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_12_4   |          | Supported Features (O)                       |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+
-+SNK Implementation
-+==================
-+**Table 13: GAVDP Roles (Sink)**
-+
-+Prerequisite: A2DP 1/2 "Sink"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_13_1   |          | Initiator (O)                                |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_13_2   | x        | Acceptor (M)                                 |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_13_3   | x        | Delay Reporting Initiator (C.1)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_13_4   |          | Delay Reporting Acceptor (C.2)               |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-+- C.1: Excluded IF A2DP 7a/2 "A2DP 1.2", otherwise Mandatory.
-+- C.2: Excluded for this Role. Note: It is not permitted to be a delay
-+  reporting acceptor for A2DP Sink role.
-+
-+SNK Implementation
-+==================
-+**Table 15a: AVDTP Capabilities (Initiator, Sink)**
-+
-+Prerequisite: A2DP 1/2 "Sink"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_15a_1  |          | Set configuration command (C.1)              |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_15a_2  |          | Reconfigure command (O)                      |
-++------------------+----------+----------------------------------------------+
-+
-+- O: Optional
-+- C.1: Mandatory IF A2DP 13/1 "Initiator", otherwise not defined.
-+
-+SNK Implementation
-+==================
-+**Table 15b: AVDTP Capabilities (Acceptor, Sink)**
-+
-+Prerequisite: A2DP 1/2 "Sink"
-+
-++------------------+----------+----------------------------------------------+
-+| Parameter Name   | Selected | Description                                  |
-++==================+==========+==============================================+
-+| TSPC_A2DP_15b_1  | x        | Set configuration response (M)               |
-++------------------+----------+----------------------------------------------+
-+| TSPC_A2DP_15b_2  |          | Reconfigure response (O)                     |
-++------------------+----------+----------------------------------------------+
-+
-+- M: Mandatory
-+- O: Optional
-diff --git a/doc/qualification/a2dp-pts.rst b/doc/qualification/a2dp-pts.rst
++- C.1: Mandatory IF AVDTP 18/1 "Enhanced Retransmission Mode preferred for
++  signaling channel" is supported, otherwise Optional.
+diff --git a/doc/qualification/avdtp-pts.rst b/doc/qualification/avdtp-pts.rst
 new file mode 100644
-index 000000000..43cedb09f
+index 000000000..4830e4529
 --- /dev/null
-+++ b/doc/qualification/a2dp-pts.rst
-@@ -0,0 +1,273 @@
++++ b/doc/qualification/avdtp-pts.rst
+@@ -0,0 +1,405 @@
 +.. SPDX-License-Identifier: GPL-2.0-or-later
 +.. Copyright © 2025-2026 Collabora Ltd.
 +
-+=================
-+A2DP test results
-+=================
++==================
++AVDTP test results
++==================
 +
 +:PTS version: 8.5.2 Build 5
 +
@@ -984,7 +721,7 @@ index 000000000..43cedb09f
 +
 +- Remove PTS device from Bluetooth devices
 +
-+- Update "TSPX_player_feature_bitmask" in IXIT to "1FFAFFBBF3BFF9040800000000000000"
++- Request avdtptest from bluez/android
 +
 +Tests
 +=====
@@ -992,257 +729,389 @@ index 000000000..43cedb09f
 +The kernel and BlueZ versions represent the oldest version without backport
 +for which we know the test passed.
 +
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| Test name                    | Result   | Kernel  | BlueZ |                                                                         |
-++==============================+==========+=========+=======+=========================================================================+
-+| A2DP/SNK/AS/BV-01-I          | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-03-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 195                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-08-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 196                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-10-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 193                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-11-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 197                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-12-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 199                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-13-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 201                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-14-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 203                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-15-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 205                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-16-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 221                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/AVP/BI-20-C         | PASS     |     6.1 | 5.71  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop WirePlumber by running:                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user stop wireplumber                                   |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Run:                                                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - sudo avtest --reject setconf --reject-code 194                      |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Post-condition:                                                         |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Restart WirePlumber by running:                                       |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       |   - systemctl --user start wireplumber                                  |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Stop 'avtest'                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/CC/BV-01-I          | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/CC/BV-02-I          | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/CC/BV-05-I          | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/CC/BV-06-I          | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/CC/BV-07-I          | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/CC/BV-08-I          | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/REL/BV-01-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/SDP/BV-02-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/SET/BV-01-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/SET/BV-03-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/SET/BV-05-I         | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - this test requests a RF shielded box                                  |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SNK/SYN/BV-01-C         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/AS/BV-01-I          | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Remove PTS device from Bluetooth devices                              |
-+|                              |          |         |       +-------------------------------------------------------------------------+
-+|                              |          |         |       | Sometimes inconclusive, retry                                           |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/AS/BI-01-I          | PASS     |     6.1 | 5.69  | Sometimes inconclusive, retry                                           |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/CC/BV-09-I          | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/REL/BV-01-I         | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Remove PTS device from Bluetooth devices                              |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/REL/BV-02-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/SDP/BV-01-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/SET/BV-01-I         | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Remove PTS device from Bluetooth devices                              |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Start Lollypop and play a file                                        |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/SET/BV-02-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/SET/BV-03-I         | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Remove PTS device from Bluetooth devices                              |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/SET/BV-04-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/SET/BV-05-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| A2DP/SRC/SET/BV-06-I         | PASS     |     6.1 | 5.69  |                                                                         |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-+| IOPT/CL/A2DP-SRC/SFC/BV-01-I | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
-+|                              |          |         |       |                                                                         |
-+|                              |          |         |       | - Remove PTS device from Bluetooth devices                              |
-++------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| Test name                     | Result   | Kernel  | BlueZ |                                                                         |
+++===============================+==========+=========+=======+=========================================================================+
++| AVDTP/SNK/ACP/SIG/SMG/BV-06-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BV-08-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BV-10-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BV-16-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BV-18-C | PASS     |     6.1 | 5.69  | Expect to hear sound                                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BV-20-C | PASS     |     6.1 | 5.69  | Expect to hear sound                                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BV-24-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BV-26-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BI-05-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BI-08-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BI-17-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BI-20-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BI-23-C | PASS     |     6.1 | 5.69  | Expect to hear sound                                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BI-38-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/SIG/SMG/BI-33-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/TRA/BTR/BV-02-C | PASS     |     6.1 | 5.69  | Expect to hear sound                                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/ACP/TRA/BTR/BI-01-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SINK -l                                           |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BV-05-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BV-07-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BV-09-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BV-15-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BV-19-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BV-25-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove BlueZ cache by running:                                        |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo rm /var/lib/bluetooth/<iut_bdaddr>/cache/<pts_bdaddr>          |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BV-28-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove BlueZ cache by running:                                        |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo rm /var/lib/bluetooth/<iut_bdaddr>/cache/<pts_bdaddr>          |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BV-31-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove BlueZ cache by running:                                        |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo rm /var/lib/bluetooth/<iut_bdaddr>/cache/<pts_bdaddr>          |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BI-30-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove BlueZ cache by running:                                        |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo rm /var/lib/bluetooth/<iut_bdaddr>/cache/<pts_bdaddr>          |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BI-35-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove BlueZ cache by running:                                        |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo rm /var/lib/bluetooth/<iut_bdaddr>/cache/<pts_bdaddr>          |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BI-36-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove BlueZ cache by running:                                        |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo rm /var/lib/bluetooth/<iut_bdaddr>/cache/<pts_bdaddr>          |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SNK/INT/SIG/SMG/BV-23-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | On demand run:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - avtest --send abort <BD_ADDR>                                         |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-06-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-08-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-10-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-12-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-16-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-18-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Start Lollypop and open a file                                        |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | On request play the file in Lollypop                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-20-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Start Lollypop and open a file                                        |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | On request play the file in Lollypop                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-22-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Start Lollypop and open a file                                        |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | On request play the file in Lollypop                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-24-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BV-26-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BI-05-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BI-08-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BI-11-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BI-17-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BI-20-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BI-23-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Start Lollypop and open a file                                        |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | On request play the file in Lollypop                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BI-26-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BI-33-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/SIG/SMG/BI-38-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-05-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-07-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-09-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-15-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-17-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Start Lollypop and open a file                                        |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | On request play the file in Lollypop                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-19-C | PASS     |     6.1 | 5.69  |                                                                         |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-21-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Start Lollypop and open a file                                        |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | On request play the file in Lollypop                                    |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | On request pause the file in Loolypop                                   |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/TRA/BTR/BV-01-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Start Lollypop and open a file                                        |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | On request play the file in Lollypop                                    |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/ACP/TRA/BTR/BI-01-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SRC -l -p                                         |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-11-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SRC -l -s getconf                                 |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-23-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SRC -l -p -s abort                                |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-25-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SRC -l -p                                         |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-28-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SRC -l -p                                         |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BV-31-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SRC -l -p -v 0x0100                               |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BI-30-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SRC -l -p -v 0x0100                               |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BI-35-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SRC -l -p                                         |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| AVDTP/SRC/INT/SIG/SMG/BI-36-C | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop WirePlumber by running:                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user stop wireplumber                                   |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Run:                                                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - sudo avdtptest -d SRC -l -p                                         |
++|                               |          |         |       +-------------------------------------------------------------------------+
++|                               |          |         |       | Post-condition:                                                         |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Restart WirePlumber by running:                                       |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       |   - systemctl --user start wireplumber                                  |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Stop 'avdtptest'                                                      |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
++| IOPT/CL/AVRCP-CT/SFC/BV-03-I  | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
++|                               |          |         |       |                                                                         |
++|                               |          |         |       | - Remove PTS device from Bluetooth devices                              |
+++-------------------------------+----------+---------+-------+-------------------------------------------------------------------------+
 -- 
 2.43.0
 
