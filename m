@@ -1,133 +1,3437 @@
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E71343207
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 18:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769624796; cv=pass; b=Rong+9Hye6wSo4WUsvVNgWBOGlqjUBcvvJQXGnWCsq9FP9HBJJCA7UuiFfmZ+BDJRY06VQ6d3lYXtil+VLSWQso587sJT6jzfdj3WBQP5heO/vZwR/wvgvkEn5233lpGlAB5lXIzuY3KEQLD3aA+PX/KcmOzZ4Mwe6YwRq+wcuI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769624796; c=relaxed/simple;
-	bh=EbWCtaTF/5ETZm6xKPyTEaBpW0sSQaeXXNcjHzOajdE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qID2yD+J3nNxLlkP1BI7d8uiSxBF3xp9CJZF2NxEuMOLwvSipSzD/WMynMZFCsVBHrSCQLRSjNcAnz0aY65k1+CuZu3V7jdJolYCtH92uLb3nCAErUDT2KDe/n5dTWx8hVnM6CWH28SENdKzV4brZ+ajvFXNzaxWs4QI0CER3Nc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RDLFklQA; arc=pass smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332D225A2B4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 18:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769625307; cv=none; b=l8jATLIX/xM69XtnO4eCFBOxUGIxB8zA5KyRNLpXGoN2knko/ZF8hLPltM+9d5zPoA4tU0frtuvxFWPqn4RiPb0z2bCdg4/9ik8NZXkmYq3ZpIPoYbYTElm3wjQ7qboTQYc/dQLtVx5eqpmmWnEX33XBSx4rwDEqdJ4XXc/LNsc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769625307; c=relaxed/simple;
+	bh=ilpL9W6zakslhiXI9T0IFPIwJR9dkl/cxGS3v7544cw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=OrgNi6EURELkwoTUQFRi/N6kLTEAnQSsai4++ME/pc5wVFC5UUKpEHkIQi6/REqiPVDXIrH5odAy/0LZpy54mbdy2SM1S20SC1Ed9h2y26zq0yHrMS9OiEy23RZ44tJTEwSXyG1GWebcF7ZbwbzNjbTCnLahx6RzRYWiEM8Pgbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EEcyyBQ7; arc=none smtp.client-ip=209.85.128.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RDLFklQA"
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-6446c924f9eso94164d50.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 10:26:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769624794; cv=none;
-        d=google.com; s=arc-20240605;
-        b=HIPgzokirAdxaaE7nZR8RbZaKKP6PL8ZWVcPTEBlNqN5os6P6/s7dSMXJJJQSM9QCy
-         xQ7MGs9uP3+ikUEmiIPR9ysWLqgJl/YyRKz18G5wfH4unmf8cWm0HKTYkMfYgBXO2aBB
-         lf6V4CCPnsAC7myTyz7ua37zWp8lCg8wTC0YQDu+WYdicHx/yoLtHg05JgIS7jIw3WxV
-         breJl1ZiWURPM6wJ0ngUIvzzC93bTAoaDhKL/p3nxNR1oCyjnfpTzV/Y5toHmYu3kInP
-         RZIJd/WOGEOpmH9zXQE+yc2/ZUC5u9GXaTvUwuU1jlHzEmMWXZhDkHGkQ3lwok0CqEh3
-         HKmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Bv9//WLlhd7ScuP1V2RDzRmJCiZS+8brU7BdsRLdhdI=;
-        fh=DBIRJP4DvnAE+M31BcQ50XI3CAn/idN52/MNTtsfw9E=;
-        b=eWfgAfFCjVT6It5y07oVIExcrchs2WAiykzO4Z3vMQc8iF0rrCRY+INRz8IcqZFJFM
-         mg0cljh3oLf2OILv/0jy3SvKb1DRq2Coot+geF1cI6hN7pE1eZ9uKLtY8VTfkByZz4HQ
-         QAEyM+fMe1GiTQxadZBZVRcFIEyssvtCEFXNZcJCouQYgdEJyA+pk0Q35lrX84FbV8ou
-         g1NAtSWixRzyFqV6g42eNZonIGLxz68M51q6sjz91HrdSzws7I1GB/mf0Tp+OHZaEjeG
-         EIvjT8iBXWAWXWRPyxqD4YX1XrOCaVCi1/ntzh8OWLN0AY1QIAvC0oM/zYq5OFwUkUXx
-         8zXg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EEcyyBQ7"
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-79478ec4cf1so1394457b3.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 10:35:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769624794; x=1770229594; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bv9//WLlhd7ScuP1V2RDzRmJCiZS+8brU7BdsRLdhdI=;
-        b=RDLFklQAZhRLT99Z+6UrcqlM8/FC5rJK3MOd7fU/Hg4dcvUEDqjtPZeqcVE0T/L569
-         xreiyTYVXSSDzVI6u3m0KTVFSSBC+3N6IxSeu5S3BP1cbPPOvK2wDsbZx3mE0sUEXMbg
-         MkPsqT5dqiSpm7JYwiLMnuQ8IUj0CVCwz8moSW7l+D4C1N7Uhuljj57QquilSslCWgZo
-         B+Uoj2FFOuokZoSRJ4d7EB5lsaowmjAR1aRVzGJyi0NZ19K2UBDLMKFTw5rpeF7L9YnO
-         KgwqbX8Zfq/+B6g0V/vsjy2C9TUpiSYbxd/tczy26eQ531ss5x7TANvVqhRWUSU4kYx2
-         2JkA==
+        d=gmail.com; s=20230601; t=1769625302; x=1770230102; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=O3CjXXV2cBDY5DQBa+Q58nRT9RtoZa2yfc0ey+Dskuc=;
+        b=EEcyyBQ7IFQLi2DxJuSkeF8/+021SvkH7dZs8CxJrgcRqQHN3Eg6toiudqwwomOw7Q
+         UHnR8v+3XUSya4/tzpzf/wUu5OE49dTPEC/VmB4IoHl3eP4J3AZmx57SjyOx0CdjK9eJ
+         zDFh1+zTq2bavpk9/ce69oEiWzcSurLmy7rklxACxViuAhmNPjH1WQqFHy5mQqC/1Ceq
+         GzAjsRaEdnknOedNF5iotZOTX+eXf6IPCK790LjA6ia6EGfcY5BiiP9mlILhv2HzCcep
+         wNwwIrn57DL6SfuUEHz8Qic5aaWeSnvXn39BfeH3hu2babT15n9WvU8gCXkjT4vZ8aEt
+         2+TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769624794; x=1770229594;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Bv9//WLlhd7ScuP1V2RDzRmJCiZS+8brU7BdsRLdhdI=;
-        b=bfGay1oKThJW/U6Fnj7lTXxW2LJEhK0smJa2t7Q+6oqb6Gr4Rk99NcRivAkn9AH96O
-         u3EVpxhoUUMXAU5OKAqrIbHjrb6zI6HE3zMNHmA+2oJxoNFIe6FXQm5tFbwgJCbdpg5E
-         4Bk0DhS3hadCl6NI2RaqcUT/OZ+gb2zYiW+bqfq6oJmQSSJ18500bWkZ+ifTYiY674iu
-         DJZjrW9SJxIHfMmDN25XmvK/CKWYrC976A+aLFF7b4Rwul8ELO6mYG+ck7ZVzR/fC2Uj
-         Jczh94N462QpwN21iIuFsTC1jpCtmjAu3701LXQh2xJXFvBnicaxwZ/VS1Zds/gElHQT
-         LO4A==
-X-Gm-Message-State: AOJu0Yy/JK4pGVBQ2ZK9UcoPM9vbZ1/+2qNQ3LRjmxnHMvqHNBnAJSW4
-	dmSyvq+3u0HJeKrIFB8lleTnNCNFUZTqxH9l+Aygs6D9M+9J1BWztu5Xu4ZmXi+HpTgKr4QGQ8e
-	LQctSHEdt/r6mHfXdfQZZfdfKW5x6Ol7OHA==
-X-Gm-Gg: AZuq6aL4NYJY1Hm6W/VCkeIKfIu44v6qB4SjLvoe6t+MsLUsj377tpLVsFrEasHXK8r
-	tlRRSWQT9Q+wwYiqJCjG49LMAD0kidvq8/LM6FwzbYpwKwv2c3CbEA5vvBwWJhj0EXfd6XqZu9S
-	TsXpEN8gySmVhw7C78b2E9IZglE6eaBBcefma3OzpXPFUak6gDHryANBhCA76SpyJ1bz188Bmo6
-	0RnUQs1Bp9A+FNZ5q5e14DX9vO421Vk9PtlIBJ9YDBFaQj+MiIBlxmc9eagMSOICIu7JnTwzAOW
-	E5I5byLbJcCECVNN2X6vzBHRfwSwpLqXGSMfNTiXcLK90QdYl0G28iizwg==
-X-Received: by 2002:a05:690c:6d8b:b0:792:7745:72d3 with SMTP id
- 00721157ae682-7947ac5d6bemr48906907b3.70.1769624793759; Wed, 28 Jan 2026
- 10:26:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769625302; x=1770230102;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O3CjXXV2cBDY5DQBa+Q58nRT9RtoZa2yfc0ey+Dskuc=;
+        b=HZz2imlT6ZMach8eBpZlAOshsMCcoAM866XrOFYinCRbdNA4pw5j4abrxS2gDmcjk1
+         XPkfhKaGfzvmnAr2F54qlMxkI3BaKCvfqmSOtz2CK5uX3XgQCYDpcQFMFe/T6Gz77qMd
+         Ztx8FCfW2vQOY80hGRMZns6p5QGOzlF7WJFxfLbOKVmmVEgmGTTpk5H64TyTKoDdovZb
+         fe0LQi9faDCuu1xim9g3BbXaRaOpHE8V1xjd27Js+kpdyOlyyIY0wD0NqDGMKYkSpRr5
+         KIDmRiv/GN8pPQomjGlmAqctzvqgGc5IJ59BWHmGC6Hm0qUPV3esBSwgAOgssKCseqqA
+         fSKQ==
+X-Gm-Message-State: AOJu0YxVVb4sZX/wzO2XGBf7QpzvDJ3+t7XN7PD7onPtn0WZf788GbJt
+	4PANSdKofsy8XKu4ERqKx97ADmkmICXR6miKkMFTXxR3wS+jA8Ge0yEpd0E4mA==
+X-Gm-Gg: AZuq6aLcxlIv+9F/PY1fM+QLyYCiA5YTwsnHby0MpoSKzcYOsMVyRU9CAi2MFFShshr
+	WA6tiGydX+ydQ2ukNghLOKExXJb7DEQix8oZZtR5S28DiQH5ENwHFDgHhcraWrPHR2ZvosLprvh
+	ACHspqZ7GL4RIsnHi47xuAhelNS7SguLxvvd0mrCdOWpx6U5//iaVWmIVEZsZs2kzMCF7YZnUQM
+	YRHD1K0QJD077JV9TNx0Uw1QTkIY20kQjElZTIEnnrDLFET/BOL4E70jzbdEKJERMQtZIKpRlML
+	0EZipxci0iclwBHPDKJK6FO044/v13MtQkfR817fGpizcELrlOCYTVH3bJplgwu6hWfVLsRcIeU
+	UUUczm9sZ9tW/AXMyCl73OKrTenH14hmTaj+uoT6ZwYKVhw9R7MVX7wDeZnjT5L/AG8uTvMTwuj
+	UUt062mi4FyBJpyUISDoeR7lHGaXK2gaBSlM3l4psc/f+ejmRBlEhZxf636pZVd675zZgSTNZDL
+	8ah6A==
+X-Received: by 2002:a05:690c:4e85:b0:78f:ba1a:6564 with SMTP id 00721157ae682-7947a9ffe86mr36177927b3.12.1769625300979;
+        Wed, 28 Jan 2026 10:35:00 -0800 (PST)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-794828f876fsm13589657b3.54.2026.01.28.10.34.59
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 10:35:00 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] build: Remove SAP support
+Date: Wed, 28 Jan 2026 13:34:53 -0500
+Message-ID: <20260128183454.545066-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260128155548.2025252-1-hadess@hadess.net> <20260128155548.2025252-11-hadess@hadess.net>
-In-Reply-To: <20260128155548.2025252-11-hadess@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 28 Jan 2026 13:26:21 -0500
-X-Gm-Features: AZwV_QjY1GfLoE-C0I1MoxKxuxmxb5FO5eXhGEQGpv2W-r4sin395bEIQKo_aoY
-Message-ID: <CABBYNZLzbZMfjW1RNOs8yiFdthPXgMukprbS2LO9EMAA+YbLXw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v6 10/20] tools: Install btmgmt along with other tools
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Bastien,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Jan 28, 2026 at 11:50=E2=80=AFAM Bastien Nocera <hadess@hadess.net>=
- wrote:
->
-> btmgmt is not installed by default, but it is useful for debugging
-> some issues and to set the MAC address on HCIs which don't have their
-> MAC address configured.
-> ---
->  tools/meson.build | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/meson.build b/tools/meson.build
-> index 63ae1363972e..40215df691b7 100644
-> --- a/tools/meson.build
-> +++ b/tools/meson.build
-> @@ -160,7 +160,8 @@ if get_option('tools').enabled()
->    if readline_dep.found()
->      executable('btmgmt',
->        sources: [ 'btmgmt.c', '../src/uuid-helper.c', '../client/display.=
-c', '../client/mgmt.c' ],
-> -      dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep,=
- readline_dep ]
-> +      dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep,=
- readline_dep ],
-> +      install: true
->      )
->      executable('obex-client-tool',
->        sources: [ 'obex-client-tool.c', gobex_sources, btio_sources ],
-> --
-> 2.52.0
->
+SAP plugin hasn't seen any updates in decades and the industry doesn't
+really use it anymore.
+---
+ .gitignore               |    1 -
+ Makefile.am              |    3 +-
+ Makefile.plugins         |    8 -
+ Makefile.tools           |    4 +-
+ README                   |   10 -
+ bootstrap-configure      |    1 -
+ configure.ac             |    4 -
+ doc/sap-api.txt          |   20 -
+ profiles/sap/main.c      |   31 -
+ profiles/sap/manager.c   |   60 --
+ profiles/sap/manager.h   |   10 -
+ profiles/sap/sap-dummy.c |  364 ----------
+ profiles/sap/sap.h       |  168 -----
+ profiles/sap/server.c    | 1411 --------------------------------------
+ profiles/sap/server.h    |   10 -
+ test/sap_client.py       |  930 -------------------------
+ test/test-sap-server     |  152 ----
+ 17 files changed, 3 insertions(+), 3184 deletions(-)
+ delete mode 100644 doc/sap-api.txt
+ delete mode 100644 profiles/sap/main.c
+ delete mode 100644 profiles/sap/manager.c
+ delete mode 100644 profiles/sap/manager.h
+ delete mode 100644 profiles/sap/sap-dummy.c
+ delete mode 100644 profiles/sap/sap.h
+ delete mode 100644 profiles/sap/server.c
+ delete mode 100644 profiles/sap/server.h
+ delete mode 100644 test/sap_client.py
+ delete mode 100755 test/test-sap-server
 
-Bluetoothctl support mgmt menu nowdays, the code behind it is the same
-as btmgmt.
+diff --git a/.gitignore b/.gitignore
+index 27c9b8b6eb65..61ed91a47474 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -97,7 +97,6 @@ tools/mcaptest
+ tools/bneptest
+ tools/isotest
+ tools/iso-tester
+-test/sap_client.pyc
+ test/bluezutils.pyc
+ unit/test-tester
+ unit/test-ringbuf
+diff --git a/Makefile.am b/Makefile.am
+index 1f73a4fa0ee7..8b3eef3a46a1 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -486,8 +486,7 @@ EXTRA_DIST += doc/assigned-numbers.rst doc/supported-features.txt \
+ 				doc/test-runner.rst \
+ 				doc/settings-storage.txt
+ 
+-EXTRA_DIST += doc/health-api.txt \
+-		doc/sap-api.txt
++EXTRA_DIST += doc/health-api.txt
+ 
+ EXTRA_DIST += doc/hci-protocol.rst doc/mgmt-protocol.rst \
+ 	      doc/l2cap-protocol.rst doc/rfcomm-protocol.rst \
+diff --git a/Makefile.plugins b/Makefile.plugins
+index b83a28257021..c5b60e4dc033 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -22,14 +22,6 @@ builtin_modules += neard
+ builtin_sources += plugins/neard.c
+ endif
+ 
+-if SAP
+-builtin_modules += sap
+-builtin_sources += profiles/sap/main.c profiles/sap/manager.h \
+-			profiles/sap/manager.c profiles/sap/server.h \
+-			profiles/sap/server.c profiles/sap/sap.h \
+-			profiles/sap/sap-dummy.c
+-endif
+-
+ if A2DP
+ builtin_modules += a2dp
+ builtin_sources += profiles/audio/source.h profiles/audio/source.c \
+diff --git a/Makefile.tools b/Makefile.tools
+index b9a092f87168..f6c1c1931ff0 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -575,11 +575,11 @@ profiles_cups_bluetooth_LDADD = $(GLIB_LIBS) $(DBUS_LIBS) \
+ 				gdbus/libgdbus-internal.la
+ endif
+ 
+-test_scripts += test/sap_client.py test/bluezutils.py \
++test_scripts += test/bluezutils.py \
+ 		test/dbusdef.py test/monitor-bluetooth test/list-devices \
+ 		test/test-discovery test/test-manager test/test-adapter \
+ 		test/test-device test/simple-agent \
+-		test/simple-endpoint test/test-sap-server \
++		test/simple-endpoint \
+ 		test/test-network test/test-profile test/test-health \
+ 		test/test-health-sink test/service-record.dtd \
+ 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+diff --git a/README b/README
+index c68f12de31d3..4c369952cf39 100644
+--- a/README
++++ b/README
+@@ -272,16 +272,6 @@ For a working system, certain configuration options need to be enabled:
+ 		The plugin is built into bluetoothd therefore it does not need
+ 		to be package separately.
+ 
+-	--enable-sap
+-
+-		This option enable SAP profile using sap plugin.
+-
+-		By default sap plugin is disabled since it requires tight
+-		integration with systems and is very rarely required.
+-
+-		The plugin is built into bluetoothd therefore it does not need
+-		to be package separately.
+-
+ 	--enable-health
+ 
+ 		This option enable health profiles.
+diff --git a/bootstrap-configure b/bootstrap-configure
+index f89759bd2a78..df072cf965b1 100755
+--- a/bootstrap-configure
++++ b/bootstrap-configure
+@@ -18,7 +18,6 @@ fi
+ 		--enable-experimental \
+ 		--enable-deprecated \
+ 		--enable-nfc \
+-		--enable-sap \
+ 		--enable-health \
+ 		--enable-sixaxis \
+ 		--enable-hid2hci \
+diff --git a/configure.ac b/configure.ac
+index a21cac81f5c3..bbe05583cd16 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -162,10 +162,6 @@ AC_ARG_ENABLE(nfc, AS_HELP_STRING([--enable-nfc],
+ 		[enable NFC pairing]), [enable_nfc=${enableval}])
+ AM_CONDITIONAL(NFC, test "${enable_nfc}" = "yes")
+ 
+-AC_ARG_ENABLE(sap, AS_HELP_STRING([--enable-sap],
+-		[enable SAP profile]), [enable_sap=${enableval}])
+-AM_CONDITIONAL(SAP, test "${enable_sap}" = "yes")
+-
+ AC_ARG_ENABLE(a2dp, AS_HELP_STRING([--disable-a2dp],
+ 		[disable A2DP profile]), [enable_a2dp=${enableval}])
+ AM_CONDITIONAL(A2DP, test "${enable_a2dp}" != "no")
+diff --git a/doc/sap-api.txt b/doc/sap-api.txt
+deleted file mode 100644
+index b28c4e305964..000000000000
+--- a/doc/sap-api.txt
++++ /dev/null
+@@ -1,20 +0,0 @@
+-BlueZ D-Bus Sim Access API description
+-**************************************
+-
+-
+-Sim Access Profile hierarchy
+-============================
+-
+-Service		org.bluez
+-Interface	org.bluez.SimAccess1
+-Object path	[variable prefix]/{hci0,hci1,...}
+-
+-Methods		void Disconnect()
+-
+-			Disconnects SAP client from the server.
+-
+-			Possible errors: org.bluez.Error.Failed
+-
+-Properties	boolean Connected [readonly]
+-
+-			Indicates if SAP client is connected to the server.
+diff --git a/profiles/sap/main.c b/profiles/sap/main.c
+deleted file mode 100644
+index 321ed3282e2d..000000000000
+--- a/profiles/sap/main.c
++++ /dev/null
+@@ -1,31 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <errno.h>
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "src/plugin.h"
+-#include "manager.h"
+-
+-static int sap_init(void)
+-{
+-	return sap_manager_init();
+-}
+-
+-static void sap_exit(void)
+-{
+-	sap_manager_exit();
+-}
+-
+-BLUETOOTH_PLUGIN_DEFINE(sap, VERSION,
+-		BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, sap_init, sap_exit)
+diff --git a/profiles/sap/manager.c b/profiles/sap/manager.c
+deleted file mode 100644
+index 306472166c77..000000000000
+--- a/profiles/sap/manager.c
++++ /dev/null
+@@ -1,60 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <stdbool.h>
+-
+-#include "bluetooth/bluetooth.h"
+-#include "bluetooth/sdp.h"
+-
+-#include "src/log.h"
+-#include "src/adapter.h"
+-#include "src/device.h"
+-#include "src/profile.h"
+-#include "src/service.h"
+-
+-#include "manager.h"
+-#include "server.h"
+-
+-static int sap_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
+-{
+-	DBG("path %s", adapter_get_path(adapter));
+-
+-	return sap_server_register(adapter);
+-}
+-
+-static void sap_server_remove(struct btd_profile *p,
+-						struct btd_adapter *adapter)
+-{
+-	const char *path = adapter_get_path(adapter);
+-
+-	DBG("path %s", path);
+-
+-	sap_server_unregister(path);
+-}
+-
+-static struct btd_profile sap_profile = {
+-	.name		= "sap-server",
+-	.adapter_probe	= sap_server_probe,
+-	.adapter_remove	= sap_server_remove,
+-};
+-
+-int sap_manager_init(void)
+-{
+-	btd_profile_register(&sap_profile);
+-
+-	return 0;
+-}
+-
+-void sap_manager_exit(void)
+-{
+-	btd_profile_unregister(&sap_profile);
+-}
+diff --git a/profiles/sap/manager.h b/profiles/sap/manager.h
+deleted file mode 100644
+index 2a1f5a6d16b5..000000000000
+--- a/profiles/sap/manager.h
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
+- *
+- */
+-
+-int sap_manager_init(void);
+-void sap_manager_exit(void);
+diff --git a/profiles/sap/sap-dummy.c b/profiles/sap/sap-dummy.c
+deleted file mode 100644
+index 92adea3842db..000000000000
+--- a/profiles/sap/sap-dummy.c
++++ /dev/null
+@@ -1,364 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 ST-Ericsson SA
+- *  Copyright (C) 2011 Tieto Poland
+- *
+- *  Author: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+- *          for ST-Ericsson
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <glib.h>
+-#include <stdint.h>
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "src/dbus-common.h"
+-#include "src/error.h"
+-#include "src/log.h"
+-
+-#include "sap.h"
+-
+-#define SAP_DUMMY_IFACE "org.bluez.SimAccessTest1"
+-#define SAP_DUMMY_PATH "/org/bluez/test"
+-
+-enum {
+-	SIM_DISCONNECTED = 0x00,
+-	SIM_CONNECTED	 = 0x01,
+-	SIM_POWERED_OFF	 = 0x02,
+-	SIM_MISSING	 = 0x03
+-};
+-
+-static unsigned int init_cnt = 0;
+-
+-static int sim_card_conn_status = SIM_DISCONNECTED;
+-static void *sap_data = NULL; /* SAP server private data. */
+-static gboolean ongoing_call_status = FALSE;
+-static int max_msg_size_supported = 512;
+-
+-void sap_connect_req(void *sap_device, uint16_t maxmsgsize)
+-{
+-	DBG("status: %d", sim_card_conn_status);
+-
+-	if (sim_card_conn_status != SIM_DISCONNECTED) {
+-		sap_connect_rsp(sap_device, SAP_STATUS_CONNECTION_FAILED);
+-		return;
+-	}
+-
+-	if (max_msg_size_supported > maxmsgsize) {
+-		sap_connect_rsp(sap_device, SAP_STATUS_MAX_MSG_SIZE_TOO_SMALL);
+-		return;
+-	}
+-
+-	if (max_msg_size_supported < maxmsgsize) {
+-		sap_connect_rsp(sap_device,
+-					SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED);
+-		return;
+-	}
+-
+-	if (ongoing_call_status) {
+-		sap_connect_rsp(sap_device, SAP_STATUS_OK_ONGOING_CALL);
+-		return;
+-	}
+-
+-	sim_card_conn_status = SIM_CONNECTED;
+-	sap_data = sap_device;
+-
+-	sap_connect_rsp(sap_device, SAP_STATUS_OK);
+-	sap_status_ind(sap_device, SAP_STATUS_CHANGE_CARD_RESET);
+-}
+-
+-void sap_disconnect_req(void *sap_device, uint8_t linkloss)
+-{
+-	sim_card_conn_status = SIM_DISCONNECTED;
+-	sap_data = NULL;
+-	ongoing_call_status = FALSE;
+-
+-	DBG("status: %d", sim_card_conn_status);
+-
+-	if (linkloss)
+-		return;
+-
+-	sap_disconnect_rsp(sap_device);
+-}
+-
+-void sap_transfer_apdu_req(void *sap_device, struct sap_parameter *param)
+-{
+-	char apdu[] = "APDU response!";
+-
+-	DBG("status: %d", sim_card_conn_status);
+-
+-	switch (sim_card_conn_status) {
+-	case SIM_MISSING:
+-		sap_transfer_apdu_rsp(sap_device,
+-				SAP_RESULT_ERROR_CARD_REMOVED, NULL, 0);
+-		break;
+-	case SIM_POWERED_OFF:
+-		sap_transfer_apdu_rsp(sap_device, SAP_RESULT_ERROR_POWERED_OFF,
+-								NULL, 0);
+-		break;
+-	case SIM_DISCONNECTED:
+-		sap_transfer_apdu_rsp(sap_device,
+-				SAP_RESULT_ERROR_NOT_ACCESSIBLE, NULL, 0);
+-		break;
+-	case SIM_CONNECTED:
+-		sap_transfer_apdu_rsp(sap_device, SAP_RESULT_OK,
+-						(uint8_t *)apdu, sizeof(apdu));
+-		break;
+-	}
+-}
+-
+-void sap_transfer_atr_req(void *sap_device)
+-{
+-	char atr[] = "ATR response!";
+-
+-	DBG("status: %d", sim_card_conn_status);
+-
+-	switch (sim_card_conn_status) {
+-	case SIM_MISSING:
+-		sap_transfer_atr_rsp(sap_device, SAP_RESULT_ERROR_CARD_REMOVED,
+-								NULL, 0);
+-		break;
+-	case SIM_POWERED_OFF:
+-		sap_transfer_atr_rsp(sap_device, SAP_RESULT_ERROR_POWERED_OFF,
+-								NULL, 0);
+-		break;
+-	case SIM_DISCONNECTED:
+-		sap_transfer_atr_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON,
+-								NULL, 0);
+-		break;
+-	case SIM_CONNECTED:
+-		sap_transfer_atr_rsp(sap_device, SAP_RESULT_OK,
+-						(uint8_t *)atr, sizeof(atr));
+-		break;
+-	}
+-}
+-
+-void sap_power_sim_off_req(void *sap_device)
+-{
+-	DBG("status: %d", sim_card_conn_status);
+-
+-	switch (sim_card_conn_status) {
+-	case SIM_MISSING:
+-		sap_power_sim_off_rsp(sap_device,
+-					SAP_RESULT_ERROR_CARD_REMOVED);
+-		break;
+-	case SIM_POWERED_OFF:
+-		sap_power_sim_off_rsp(sap_device,
+-					SAP_RESULT_ERROR_POWERED_OFF);
+-		break;
+-	case SIM_DISCONNECTED:
+-		sap_power_sim_off_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON);
+-		break;
+-	case SIM_CONNECTED:
+-		sap_power_sim_off_rsp(sap_device, SAP_RESULT_OK);
+-		sim_card_conn_status = SIM_POWERED_OFF;
+-		break;
+-	}
+-}
+-
+-void sap_power_sim_on_req(void *sap_device)
+-{
+-	DBG("status: %d", sim_card_conn_status);
+-
+-	switch (sim_card_conn_status) {
+-	case SIM_MISSING:
+-		sap_power_sim_on_rsp(sap_device,
+-					SAP_RESULT_ERROR_CARD_REMOVED);
+-		break;
+-	case SIM_POWERED_OFF:
+-		sap_power_sim_on_rsp(sap_device, SAP_RESULT_OK);
+-		sim_card_conn_status = SIM_CONNECTED;
+-		break;
+-	case SIM_DISCONNECTED:
+-		sap_power_sim_on_rsp(sap_device,
+-					SAP_RESULT_ERROR_NOT_ACCESSIBLE);
+-		break;
+-	case SIM_CONNECTED:
+-		sap_power_sim_on_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON);
+-		break;
+-	}
+-}
+-
+-void sap_reset_sim_req(void *sap_device)
+-{
+-	DBG("status: %d", sim_card_conn_status);
+-
+-	switch (sim_card_conn_status) {
+-	case SIM_MISSING:
+-		sap_reset_sim_rsp(sap_device, SAP_RESULT_ERROR_CARD_REMOVED);
+-		break;
+-	case SIM_POWERED_OFF:
+-		sap_reset_sim_rsp(sap_device, SAP_RESULT_ERROR_POWERED_OFF);
+-		break;
+-	case SIM_DISCONNECTED:
+-		sap_reset_sim_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON);
+-		break;
+-	case SIM_CONNECTED:
+-		sap_reset_sim_rsp(sap_device, SAP_RESULT_OK);
+-		break;
+-	}
+-}
+-
+-void sap_transfer_card_reader_status_req(void *sap_device)
+-{
+-	DBG("status: %d", sim_card_conn_status);
+-
+-	if (sim_card_conn_status != SIM_CONNECTED) {
+-		sap_transfer_card_reader_status_rsp(sap_device,
+-					SAP_RESULT_ERROR_NO_REASON, 0xF1);
+-		return;
+-	}
+-
+-	sap_transfer_card_reader_status_rsp(sap_device, SAP_RESULT_OK, 0xF1);
+-}
+-
+-void sap_set_transport_protocol_req(void *sap_device,
+-					struct sap_parameter *param)
+-{
+-	sap_transport_protocol_rsp(sap_device, SAP_RESULT_NOT_SUPPORTED);
+-}
+-
+-static DBusMessage *ongoing_call(DBusConnection *conn, DBusMessage *msg,
+-						void *data)
+-{
+-	dbus_bool_t ongoing;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_BOOLEAN, &ongoing,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	if (ongoing_call_status && !ongoing) {
+-		/* An ongoing call has finished. Continue connection.*/
+-		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_RESET);
+-		ongoing_call_status = FALSE;
+-	} else if (!ongoing_call_status && ongoing) {
+-		/* An ongoing call has started.*/
+-		ongoing_call_status = TRUE;
+-	}
+-
+-	DBG("OngoingCall status set to %d", ongoing_call_status);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *max_msg_size(DBusConnection *conn, DBusMessage *msg,
+-						void *data)
+-{
+-	dbus_uint32_t size;
+-
+-	if (sim_card_conn_status == SIM_CONNECTED)
+-		return btd_error_failed(msg,
+-				"Can't change msg size when connected.");
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &size,
+-							DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	max_msg_size_supported = size;
+-
+-	DBG("MaxMessageSize set to %d", max_msg_size_supported);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *disconnect_immediate(DBusConnection *conn, DBusMessage *msg,
+-						void *data)
+-{
+-	if (sim_card_conn_status == SIM_DISCONNECTED)
+-		return btd_error_failed(msg, "Already disconnected.");
+-
+-	sim_card_conn_status = SIM_DISCONNECTED;
+-	sap_disconnect_ind(sap_data, SAP_DISCONNECTION_TYPE_IMMEDIATE);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static DBusMessage *card_status(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	dbus_uint32_t status;
+-
+-	DBG("status %d", sim_card_conn_status);
+-
+-	if (sim_card_conn_status != SIM_CONNECTED)
+-		return btd_error_failed(msg,
+-				"Can't change msg size when not connected.");
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &status,
+-							DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	switch (status) {
+-	case 0: /* card removed */
+-		sim_card_conn_status = SIM_MISSING;
+-		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_REMOVED);
+-		break;
+-
+-	case 1: /* card inserted */
+-		if (sim_card_conn_status == SIM_MISSING) {
+-			sim_card_conn_status = SIM_CONNECTED;
+-			sap_status_ind(sap_data,
+-					SAP_STATUS_CHANGE_CARD_INSERTED);
+-		}
+-		break;
+-
+-	case 2: /* card not longer available*/
+-		sim_card_conn_status = SIM_POWERED_OFF;
+-		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_NOT_ACCESSIBLE);
+-		break;
+-
+-	default:
+-		return btd_error_failed(msg,
+-					"Unknown card status. Use 0, 1 or 2.");
+-	}
+-
+-	DBG("Card status changed to %d", status);
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static const GDBusMethodTable dummy_methods[] = {
+-	{ GDBUS_EXPERIMENTAL_METHOD("OngoingCall",
+-				GDBUS_ARGS({ "ongoing", "b" }), NULL,
+-				ongoing_call) },
+-	{ GDBUS_EXPERIMENTAL_METHOD("MaxMessageSize",
+-				GDBUS_ARGS({ "size", "u" }), NULL,
+-				max_msg_size) },
+-	{ GDBUS_EXPERIMENTAL_METHOD("DisconnectImmediate", NULL, NULL,
+-				disconnect_immediate) },
+-	{ GDBUS_EXPERIMENTAL_METHOD("CardStatus",
+-				GDBUS_ARGS({ "status", "" }), NULL,
+-				card_status) },
+-	{ }
+-};
+-
+-int sap_init(void)
+-{
+-	if (init_cnt++)
+-		return 0;
+-
+-	if (g_dbus_register_interface(btd_get_dbus_connection(), SAP_DUMMY_PATH,
+-				SAP_DUMMY_IFACE, dummy_methods, NULL, NULL,
+-				NULL, NULL) == FALSE) {
+-		init_cnt--;
+-		return -1;
+-	}
+-
+-	return 0;
+-}
+-
+-void sap_exit(void)
+-{
+-	if (--init_cnt)
+-		return;
+-
+-	g_dbus_unregister_interface(btd_get_dbus_connection(),
+-					SAP_DUMMY_PATH, SAP_DUMMY_IFACE);
+-}
+diff --git a/profiles/sap/sap.h b/profiles/sap/sap.h
+deleted file mode 100644
+index 30ed7c50c103..000000000000
+--- a/profiles/sap/sap.h
++++ /dev/null
+@@ -1,168 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
+- *  Copyright (C) 2010 ST-Ericsson SA
+- *
+- *  Author: Marek Skowron <marek.skowron@tieto.com> for ST-Ericsson.
+- *  Author: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+- *          for ST-Ericsson.
+- *
+- */
+-
+-#include <stdint.h>
+-#include <glib.h>
+-
+-#ifdef SAP_DEBUG
+-#define SAP_VDBG(fmt, arg...) DBG(fmt, arg)
+-#else
+-#define SAP_VDBG(fmt...)
+-#endif
+-
+-#define SAP_VERSION 0x0101
+-
+-/* Connection Status - SAP v1.1 section 5.2.2 */
+-enum sap_status {
+-	SAP_STATUS_OK				= 0x00,
+-	SAP_STATUS_CONNECTION_FAILED		= 0x01,
+-	SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED	= 0x02,
+-	SAP_STATUS_MAX_MSG_SIZE_TOO_SMALL	= 0x03,
+-	SAP_STATUS_OK_ONGOING_CALL		= 0x04
+-};
+-
+-/* Disconnection Type - SAP v1.1 section 5.2.3 */
+-enum sap_disconnection_type {
+-	SAP_DISCONNECTION_TYPE_GRACEFUL		= 0x00,
+-	SAP_DISCONNECTION_TYPE_IMMEDIATE	= 0x01
+-};
+-
+-/* Result codes - SAP v1.1 section 5.2.4 */
+-enum sap_result {
+-	SAP_RESULT_OK			= 0x00,
+-	SAP_RESULT_ERROR_NO_REASON	= 0x01,
+-	SAP_RESULT_ERROR_NOT_ACCESSIBLE	= 0x02,
+-	SAP_RESULT_ERROR_POWERED_OFF	= 0x03,
+-	SAP_RESULT_ERROR_CARD_REMOVED	= 0x04,
+-	SAP_RESULT_ERROR_POWERED_ON	= 0x05,
+-	SAP_RESULT_ERROR_NO_DATA	= 0x06,
+-	SAP_RESULT_NOT_SUPPORTED	= 0x07
+-};
+-
+-/* Status Change - SAP v1.1 section 5.2.8 */
+-enum sap_status_change {
+-	SAP_STATUS_CHANGE_UNKNOWN_ERROR		= 0x00,
+-	SAP_STATUS_CHANGE_CARD_RESET		= 0x01,
+-	SAP_STATUS_CHANGE_CARD_NOT_ACCESSIBLE	= 0x02,
+-	SAP_STATUS_CHANGE_CARD_REMOVED		= 0x03,
+-	SAP_STATUS_CHANGE_CARD_INSERTED		= 0x04,
+-	SAP_STATUS_CHANGE_CARD_RECOVERED	= 0x05
+-};
+-
+-/* Message format - SAP v1.1 section 5.1 */
+-struct sap_parameter {
+-	uint8_t id;
+-	uint8_t reserved;
+-	uint16_t len;
+-	uint8_t val[];
+-	/*
+-	 * Padding bytes 0-3 bytes
+-	 */
+-} __attribute__((packed));
+-
+-struct sap_message {
+-	uint8_t id;
+-	uint8_t nparam;
+-	uint16_t reserved;
+-	struct sap_parameter param[];
+-} __attribute__((packed));
+-
+-#define SAP_BUF_SIZE		512
+-#define SAP_MSG_HEADER_SIZE	4
+-
+-enum sap_protocol {
+-	SAP_CONNECT_REQ		= 0x00,
+-	SAP_CONNECT_RESP	= 0x01,
+-	SAP_DISCONNECT_REQ	= 0x02,
+-	SAP_DISCONNECT_RESP	= 0x03,
+-	SAP_DISCONNECT_IND	= 0x04,
+-	SAP_TRANSFER_APDU_REQ	= 0x05,
+-	SAP_TRANSFER_APDU_RESP	= 0x06,
+-	SAP_TRANSFER_ATR_REQ	= 0x07,
+-	SAP_TRANSFER_ATR_RESP	= 0x08,
+-	SAP_POWER_SIM_OFF_REQ	= 0x09,
+-	SAP_POWER_SIM_OFF_RESP	= 0x0A,
+-	SAP_POWER_SIM_ON_REQ	= 0x0B,
+-	SAP_POWER_SIM_ON_RESP	= 0x0C,
+-	SAP_RESET_SIM_REQ	= 0x0D,
+-	SAP_RESET_SIM_RESP	= 0x0E,
+-	SAP_TRANSFER_CARD_READER_STATUS_REQ	= 0x0F,
+-	SAP_TRANSFER_CARD_READER_STATUS_RESP	= 0x10,
+-	SAP_STATUS_IND	= 0x11,
+-	SAP_ERROR_RESP	= 0x12,
+-	SAP_SET_TRANSPORT_PROTOCOL_REQ	= 0x13,
+-	SAP_SET_TRANSPORT_PROTOCOL_RESP	= 0x14
+-};
+-
+-/* Parameters Ids - SAP 1.1 section 5.2 */
+-enum sap_param_id {
+-	SAP_PARAM_ID_MAX_MSG_SIZE	= 0x00,
+-	SAP_PARAM_ID_CONN_STATUS	= 0x01,
+-	SAP_PARAM_ID_RESULT_CODE	= 0x02,
+-	SAP_PARAM_ID_DISCONNECT_IND	= 0x03,
+-	SAP_PARAM_ID_COMMAND_APDU	= 0x04,
+-	SAP_PARAM_ID_COMMAND_APDU7816	= 0x10,
+-	SAP_PARAM_ID_RESPONSE_APDU	= 0x05,
+-	SAP_PARAM_ID_ATR		= 0x06,
+-	SAP_PARAM_ID_CARD_READER_STATUS	= 0x07,
+-	SAP_PARAM_ID_STATUS_CHANGE	= 0x08,
+-	SAP_PARAM_ID_TRANSPORT_PROTOCOL	= 0x09
+-};
+-
+-#define SAP_PARAM_ID_MAX_MSG_SIZE_LEN		0x02
+-#define SAP_PARAM_ID_CONN_STATUS_LEN		0x01
+-#define SAP_PARAM_ID_RESULT_CODE_LEN		0x01
+-#define SAP_PARAM_ID_DISCONNECT_IND_LEN		0x01
+-#define SAP_PARAM_ID_CARD_READER_STATUS_LEN	0x01
+-#define SAP_PARAM_ID_STATUS_CHANGE_LEN		0x01
+-#define SAP_PARAM_ID_TRANSPORT_PROTO_LEN	0x01
+-
+-/* Transport Protocol - SAP v1.1 section 5.2.9 */
+-enum sap_transport_protocol {
+-	SAP_TRANSPORT_PROTOCOL_T0 = 0x00,
+-	SAP_TRANSPORT_PROTOCOL_T1 = 0x01
+-};
+-
+-/*SAP driver init and exit routines. Implemented by sap-*.c */
+-int sap_init(void);
+-void sap_exit(void);
+-
+-/* SAP requests implemented by sap-*.c */
+-void sap_connect_req(void *sap_device, uint16_t maxmsgsize);
+-void sap_disconnect_req(void *sap_device, uint8_t linkloss);
+-void sap_transfer_apdu_req(void *sap_device, struct sap_parameter *param);
+-void sap_transfer_atr_req(void *sap_device);
+-void sap_power_sim_off_req(void *sap_device);
+-void sap_power_sim_on_req(void *sap_device);
+-void sap_reset_sim_req(void *sap_device);
+-void sap_transfer_card_reader_status_req(void *sap_device);
+-void sap_set_transport_protocol_req(void *sap_device,
+-					struct sap_parameter *param);
+-
+-/*SAP responses to SAP requests. Implemented by server.c */
+-int sap_connect_rsp(void *sap_device, uint8_t status);
+-int sap_disconnect_rsp(void *sap_device);
+-int sap_transfer_apdu_rsp(void *sap_device, uint8_t result,
+-				uint8_t *sap_apdu_resp, uint16_t length);
+-int sap_transfer_atr_rsp(void *sap_device, uint8_t result,
+-				uint8_t *sap_atr, uint16_t length);
+-int sap_power_sim_off_rsp(void *sap_device, uint8_t result);
+-int sap_power_sim_on_rsp(void *sap_device, uint8_t result);
+-int sap_reset_sim_rsp(void *sap_device, uint8_t result);
+-int sap_transfer_card_reader_status_rsp(void *sap_device, uint8_t result,
+-						uint8_t status);
+-int sap_transport_protocol_rsp(void *sap_device, uint8_t result);
+-
+-/* Event indication. Implemented by server.c*/
+-int sap_status_ind(void *sap_device, uint8_t status_change);
+-int sap_disconnect_ind(void *sap_device, uint8_t disc_type);
+diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+deleted file mode 100644
+index c1f07701fcc1..000000000000
+--- a/profiles/sap/server.c
++++ /dev/null
+@@ -1,1411 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
+- *  Copyright (C) 2010 ST-Ericsson SA
+- *  Copyright (C) 2011 Tieto Poland
+- *
+- *  Author: Marek Skowron <marek.skowron@tieto.com> for ST-Ericsson.
+- *  Author: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+- *          for ST-Ericsson.
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <errno.h>
+-#include <glib.h>
+-
+-#include "bluetooth/sdp.h"
+-#include "bluetooth/sdp_lib.h"
+-#include "bluetooth/uuid.h"
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "btio/btio.h"
+-#include "src/adapter.h"
+-#include "src/sdpd.h"
+-#include "src/log.h"
+-#include "src/error.h"
+-#include "src/dbus-common.h"
+-#include "src/shared/timeout.h"
+-#include "src/shared/util.h"
+-
+-#include "sap.h"
+-#include "server.h"
+-
+-#define SAP_SERVER_INTERFACE	"org.bluez.SimAccess1"
+-#define SAP_SERVER_CHANNEL	8
+-
+-#define PADDING4(x) ((4 - ((x) & 0x03)) & 0x03)
+-#define PARAMETER_SIZE(x) (sizeof(struct sap_parameter) + x + PADDING4(x))
+-
+-#define SAP_NO_REQ 0xFF
+-#define SAP_DISCONNECTION_TYPE_CLIENT 0xFF
+-
+-#define SAP_TIMER_GRACEFUL_DISCONNECT 30
+-#define SAP_TIMER_NO_ACTIVITY 30
+-
+-enum {
+-	SAP_STATE_DISCONNECTED,
+-	SAP_STATE_CONNECT_IN_PROGRESS,
+-	SAP_STATE_CONNECT_MODEM_BUSY,
+-	SAP_STATE_CONNECTED,
+-	SAP_STATE_GRACEFUL_DISCONNECT,
+-	SAP_STATE_IMMEDIATE_DISCONNECT,
+-	SAP_STATE_CLIENT_DISCONNECT
+-};
+-
+-struct sap_connection {
+-	GIOChannel *io;
+-	uint32_t state;
+-	uint8_t processing_req;
+-	unsigned int timer_id;
+-};
+-
+-struct sap_server {
+-	struct btd_adapter *adapter;
+-	uint32_t record_id;
+-	GIOChannel *listen_io;
+-	struct sap_connection *conn;
+-};
+-
+-static void start_guard_timer(struct sap_server *server, guint interval);
+-static void stop_guard_timer(struct sap_server *server);
+-static bool guard_timeout(gpointer data);
+-
+-static size_t add_result_parameter(uint8_t result,
+-					struct sap_parameter *param)
+-{
+-	param->id = SAP_PARAM_ID_RESULT_CODE;
+-	param->len = htons(SAP_PARAM_ID_RESULT_CODE_LEN);
+-	*param->val = result;
+-
+-	return PARAMETER_SIZE(SAP_PARAM_ID_RESULT_CODE_LEN);
+-}
+-
+-static int is_power_sim_off_req_allowed(uint8_t processing_req)
+-{
+-	switch (processing_req) {
+-	case SAP_NO_REQ:
+-	case SAP_TRANSFER_APDU_REQ:
+-	case SAP_TRANSFER_ATR_REQ:
+-	case SAP_POWER_SIM_ON_REQ:
+-	case SAP_RESET_SIM_REQ:
+-	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
+-		return 1;
+-	default:
+-		return 0;
+-	}
+-}
+-
+-static int is_reset_sim_req_allowed(uint8_t processing_req)
+-{
+-	switch (processing_req) {
+-	case SAP_NO_REQ:
+-	case SAP_TRANSFER_APDU_REQ:
+-	case SAP_TRANSFER_ATR_REQ:
+-	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
+-		return 1;
+-	default:
+-		return 0;
+-	}
+-}
+-
+-static int check_msg(struct sap_message *msg)
+-{
+-	switch (msg->id) {
+-	case SAP_CONNECT_REQ:
+-		if (msg->nparam != 0x01)
+-			return -EBADMSG;
+-
+-		if (msg->param->id != SAP_PARAM_ID_MAX_MSG_SIZE)
+-			return -EBADMSG;
+-
+-		if (ntohs(msg->param->len) != SAP_PARAM_ID_MAX_MSG_SIZE_LEN)
+-			return -EBADMSG;
+-
+-		break;
+-
+-	case SAP_TRANSFER_APDU_REQ:
+-		if (msg->nparam != 0x01)
+-			return -EBADMSG;
+-
+-		if (msg->param->id != SAP_PARAM_ID_COMMAND_APDU)
+-			if (msg->param->id != SAP_PARAM_ID_COMMAND_APDU7816)
+-				return -EBADMSG;
+-
+-		if (msg->param->len == 0x00)
+-			return -EBADMSG;
+-
+-		break;
+-
+-	case SAP_SET_TRANSPORT_PROTOCOL_REQ:
+-		if (msg->nparam != 0x01)
+-			return -EBADMSG;
+-
+-		if (msg->param->id != SAP_PARAM_ID_TRANSPORT_PROTOCOL)
+-			return -EBADMSG;
+-
+-		if (ntohs(msg->param->len) != SAP_PARAM_ID_TRANSPORT_PROTO_LEN)
+-			return -EBADMSG;
+-
+-		if (*msg->param->val != SAP_TRANSPORT_PROTOCOL_T0)
+-			if (*msg->param->val != SAP_TRANSPORT_PROTOCOL_T1)
+-				return -EBADMSG;
+-
+-		break;
+-
+-	case SAP_DISCONNECT_REQ:
+-	case SAP_TRANSFER_ATR_REQ:
+-	case SAP_POWER_SIM_OFF_REQ:
+-	case SAP_POWER_SIM_ON_REQ:
+-	case SAP_RESET_SIM_REQ:
+-	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
+-		if (msg->nparam != 0x00)
+-			return -EBADMSG;
+-
+-		break;
+-	}
+-
+-	return 0;
+-}
+-
+-static sdp_record_t *create_sap_record(uint8_t channel)
+-{
+-	sdp_list_t *apseq, *aproto, *profiles, *proto[2], *root, *svclass_id;
+-	uuid_t sap_uuid, gt_uuid, root_uuid, l2cap, rfcomm;
+-	sdp_profile_desc_t profile;
+-	sdp_record_t *record;
+-	sdp_data_t *ch;
+-
+-	record = sdp_record_alloc();
+-	if (!record)
+-		return NULL;
+-
+-	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
+-	root = sdp_list_append(NULL, &root_uuid);
+-	sdp_set_browse_groups(record, root);
+-	sdp_list_free(root, NULL);
+-
+-	sdp_uuid16_create(&sap_uuid, SAP_SVCLASS_ID);
+-	svclass_id = sdp_list_append(NULL, &sap_uuid);
+-	sdp_uuid16_create(&gt_uuid, GENERIC_TELEPHONY_SVCLASS_ID);
+-	svclass_id = sdp_list_append(svclass_id, &gt_uuid);
+-
+-	sdp_set_service_classes(record, svclass_id);
+-	sdp_list_free(svclass_id, NULL);
+-
+-	sdp_uuid16_create(&profile.uuid, SAP_PROFILE_ID);
+-	profile.version = SAP_VERSION;
+-	profiles = sdp_list_append(NULL, &profile);
+-	sdp_set_profile_descs(record, profiles);
+-	sdp_list_free(profiles, NULL);
+-
+-	sdp_uuid16_create(&l2cap, L2CAP_UUID);
+-	proto[0] = sdp_list_append(NULL, &l2cap);
+-	apseq = sdp_list_append(NULL, proto[0]);
+-
+-	sdp_uuid16_create(&rfcomm, RFCOMM_UUID);
+-	proto[1] = sdp_list_append(NULL, &rfcomm);
+-	ch = sdp_data_alloc(SDP_UINT8, &channel);
+-	proto[1] = sdp_list_append(proto[1], ch);
+-	apseq = sdp_list_append(apseq, proto[1]);
+-
+-	aproto = sdp_list_append(NULL, apseq);
+-	sdp_set_access_protos(record, aproto);
+-
+-	sdp_set_info_attr(record, "SIM Access Server", NULL, NULL);
+-
+-	sdp_data_free(ch);
+-	sdp_list_free(proto[0], NULL);
+-	sdp_list_free(proto[1], NULL);
+-	sdp_list_free(apseq, NULL);
+-	sdp_list_free(aproto, NULL);
+-
+-	return record;
+-}
+-
+-static int send_message(struct sap_connection *conn, void *buf, size_t size)
+-{
+-	size_t written = 0;
+-	GError *gerr = NULL;
+-	GIOStatus gstatus;
+-
+-	SAP_VDBG("conn %p, size %zu", conn, size);
+-
+-	gstatus = g_io_channel_write_chars(conn->io, buf, size, &written,
+-									&gerr);
+-	if (gstatus != G_IO_STATUS_NORMAL) {
+-		if (gerr)
+-			g_error_free(gerr);
+-
+-		error("write error (0x%02x).", gstatus);
+-		return -EIO;
+-	}
+-
+-	if (written != size) {
+-		error("written %zu bytes out of %zu", written, size);
+-		return -EIO;
+-	}
+-
+-	return written;
+-}
+-
+-static int disconnect_ind(struct sap_connection *conn, uint8_t disc_type)
+-{
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	struct sap_parameter *param = (struct sap_parameter *) msg->param;
+-	size_t size = sizeof(struct sap_message);
+-
+-	DBG("data %p state %d disc_type 0x%02x", conn, conn->state, disc_type);
+-
+-	memset(buf, 0, sizeof(buf));
+-	msg->id = SAP_DISCONNECT_IND;
+-	msg->nparam = 0x01;
+-
+-	/* Add disconnection type param. */
+-	param->id  = SAP_PARAM_ID_DISCONNECT_IND;
+-	param->len = htons(SAP_PARAM_ID_DISCONNECT_IND_LEN);
+-	*param->val = disc_type;
+-	size += PARAMETER_SIZE(SAP_PARAM_ID_DISCONNECT_IND_LEN);
+-
+-	return send_message(conn, buf, size);
+-}
+-
+-static int sap_error_rsp(struct sap_connection *conn)
+-{
+-	struct sap_message msg;
+-
+-	memset(&msg, 0, sizeof(msg));
+-	msg.id = SAP_ERROR_RESP;
+-
+-	error("SAP error (state %d pr 0x%02x).", conn->state,
+-							conn->processing_req);
+-
+-	return send_message(conn, &msg, sizeof(msg));
+-}
+-
+-static void connect_req(struct sap_server *server,
+-				struct sap_parameter *param)
+-{
+-	struct sap_connection *conn = server->conn;
+-	uint16_t maxmsgsize;
+-
+-	DBG("conn %p state %d", conn, conn->state);
+-
+-	if (!param)
+-		goto error_rsp;
+-
+-	if (conn->state != SAP_STATE_DISCONNECTED)
+-		goto error_rsp;
+-
+-	stop_guard_timer(server);
+-
+-	maxmsgsize = get_be16(&param->val);
+-
+-	DBG("Connect MaxMsgSize: 0x%04x", maxmsgsize);
+-
+-	conn->state = SAP_STATE_CONNECT_IN_PROGRESS;
+-
+-	if (maxmsgsize <= SAP_BUF_SIZE) {
+-		conn->processing_req = SAP_CONNECT_REQ;
+-		sap_connect_req(server, maxmsgsize);
+-	} else {
+-		sap_connect_rsp(server, SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED);
+-	}
+-
+-	return;
+-
+-error_rsp:
+-	sap_error_rsp(conn);
+-}
+-
+-static int disconnect_req(struct sap_server *server, uint8_t disc_type)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	DBG("conn %p state %d disc_type 0x%02x", conn, conn->state, disc_type);
+-
+-	switch (disc_type) {
+-	case SAP_DISCONNECTION_TYPE_GRACEFUL:
+-		if (conn->state == SAP_STATE_DISCONNECTED ||
+-				conn->state == SAP_STATE_CONNECT_IN_PROGRESS ||
+-				conn->state == SAP_STATE_CONNECT_MODEM_BUSY)
+-			return -EPERM;
+-
+-		if (conn->state == SAP_STATE_CONNECTED) {
+-			conn->state = SAP_STATE_GRACEFUL_DISCONNECT;
+-			conn->processing_req = SAP_NO_REQ;
+-
+-			disconnect_ind(conn, disc_type);
+-			/* Timer will disconnect if client won't do.*/
+-			start_guard_timer(server,
+-					SAP_TIMER_GRACEFUL_DISCONNECT);
+-		}
+-
+-		return 0;
+-
+-	case SAP_DISCONNECTION_TYPE_IMMEDIATE:
+-		if (conn->state == SAP_STATE_DISCONNECTED ||
+-				conn->state == SAP_STATE_CONNECT_IN_PROGRESS ||
+-				conn->state == SAP_STATE_CONNECT_MODEM_BUSY)
+-			return -EPERM;
+-
+-		if (conn->state == SAP_STATE_CONNECTED ||
+-				conn->state == SAP_STATE_GRACEFUL_DISCONNECT) {
+-			conn->state = SAP_STATE_IMMEDIATE_DISCONNECT;
+-			conn->processing_req = SAP_NO_REQ;
+-
+-			stop_guard_timer(server);
+-			disconnect_ind(conn, disc_type);
+-			sap_disconnect_req(server, 0);
+-		}
+-
+-		return 0;
+-
+-	case SAP_DISCONNECTION_TYPE_CLIENT:
+-		if (conn->state != SAP_STATE_CONNECTED &&
+-				conn->state != SAP_STATE_GRACEFUL_DISCONNECT) {
+-			sap_error_rsp(conn);
+-			return -EPERM;
+-		}
+-
+-		conn->state = SAP_STATE_CLIENT_DISCONNECT;
+-		conn->processing_req = SAP_NO_REQ;
+-
+-		stop_guard_timer(server);
+-		sap_disconnect_req(server, 0);
+-
+-		return 0;
+-
+-	default:
+-		error("Unknown disconnection type (0x%02x).", disc_type);
+-		return -EINVAL;
+-	}
+-}
+-
+-static void transfer_apdu_req(struct sap_server *server,
+-					struct sap_parameter *param)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	SAP_VDBG("conn %p state %d", conn, conn->state);
+-
+-	if (!param)
+-		goto error_rsp;
+-
+-	param->len = ntohs(param->len);
+-
+-	if (conn->state != SAP_STATE_CONNECTED &&
+-			conn->state != SAP_STATE_GRACEFUL_DISCONNECT)
+-		goto error_rsp;
+-
+-	if (conn->processing_req != SAP_NO_REQ)
+-		goto error_rsp;
+-
+-	conn->processing_req = SAP_TRANSFER_APDU_REQ;
+-	sap_transfer_apdu_req(server, param);
+-
+-	return;
+-
+-error_rsp:
+-	sap_error_rsp(conn);
+-}
+-
+-static void transfer_atr_req(struct sap_server *server)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	DBG("conn %p state %d", conn, conn->state);
+-
+-	if (conn->state != SAP_STATE_CONNECTED)
+-		goto error_rsp;
+-
+-	if (conn->processing_req != SAP_NO_REQ)
+-		goto error_rsp;
+-
+-	conn->processing_req = SAP_TRANSFER_ATR_REQ;
+-	sap_transfer_atr_req(server);
+-
+-	return;
+-
+-error_rsp:
+-	sap_error_rsp(conn);
+-}
+-
+-static void power_sim_off_req(struct sap_server *server)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	DBG("conn %p state %d", conn, conn->state);
+-
+-	if (conn->state != SAP_STATE_CONNECTED)
+-		goto error_rsp;
+-
+-	if (!is_power_sim_off_req_allowed(conn->processing_req))
+-		goto error_rsp;
+-
+-	conn->processing_req = SAP_POWER_SIM_OFF_REQ;
+-	sap_power_sim_off_req(server);
+-
+-	return;
+-
+-error_rsp:
+-	sap_error_rsp(conn);
+-}
+-
+-static void power_sim_on_req(struct sap_server *server)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	DBG("conn %p state %d", conn, conn->state);
+-
+-	if (conn->state != SAP_STATE_CONNECTED)
+-		goto error_rsp;
+-
+-	if (conn->processing_req != SAP_NO_REQ)
+-		goto error_rsp;
+-
+-	conn->processing_req = SAP_POWER_SIM_ON_REQ;
+-	sap_power_sim_on_req(server);
+-
+-	return;
+-
+-error_rsp:
+-	sap_error_rsp(conn);
+-}
+-
+-static void reset_sim_req(struct sap_server *server)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	DBG("conn %p state %d", conn, conn->state);
+-
+-	if (conn->state != SAP_STATE_CONNECTED)
+-		goto error_rsp;
+-
+-	if (!is_reset_sim_req_allowed(conn->processing_req))
+-		goto error_rsp;
+-
+-	conn->processing_req = SAP_RESET_SIM_REQ;
+-	sap_reset_sim_req(server);
+-
+-	return;
+-
+-error_rsp:
+-	sap_error_rsp(conn);
+-}
+-
+-static void transfer_card_reader_status_req(struct sap_server *server)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	DBG("conn %p state %d", conn, conn->state);
+-
+-	if (conn->state != SAP_STATE_CONNECTED)
+-		goto error_rsp;
+-
+-	if (conn->processing_req != SAP_NO_REQ)
+-		goto error_rsp;
+-
+-	conn->processing_req = SAP_TRANSFER_CARD_READER_STATUS_REQ;
+-	sap_transfer_card_reader_status_req(server);
+-
+-	return;
+-
+-error_rsp:
+-	sap_error_rsp(conn);
+-}
+-
+-static void set_transport_protocol_req(struct sap_server *server,
+-					struct sap_parameter *param)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	if (!param)
+-		goto error_rsp;
+-
+-	DBG("conn %p state %d param %p", conn, conn->state, param);
+-
+-	if (conn->state != SAP_STATE_CONNECTED)
+-		goto error_rsp;
+-
+-	if (conn->processing_req != SAP_NO_REQ)
+-		goto error_rsp;
+-
+-	conn->processing_req = SAP_SET_TRANSPORT_PROTOCOL_REQ;
+-	sap_set_transport_protocol_req(server, param);
+-
+-	return;
+-
+-error_rsp:
+-	sap_error_rsp(conn);
+-}
+-
+-static void start_guard_timer(struct sap_server *server, guint interval)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	if (!conn)
+-		return;
+-
+-	if (!conn->timer_id)
+-		conn->timer_id = timeout_add_seconds(interval, guard_timeout,
+-								server, NULL);
+-	else
+-		error("Timer is already active.");
+-}
+-
+-static void stop_guard_timer(struct sap_server *server)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	if (conn  && conn->timer_id) {
+-		timeout_remove(conn->timer_id);
+-		conn->timer_id = 0;
+-	}
+-}
+-
+-static bool guard_timeout(gpointer data)
+-{
+-	struct sap_server *server = data;
+-	struct sap_connection *conn = server->conn;
+-
+-	if (!conn)
+-		return FALSE;
+-
+-	DBG("conn %p state %d pr 0x%02x", conn, conn->state,
+-						conn->processing_req);
+-
+-	conn->timer_id = 0;
+-
+-	switch (conn->state) {
+-	case SAP_STATE_DISCONNECTED:
+-		/* Client opened RFCOMM channel but didn't send CONNECT_REQ,
+-		 * in fixed time or client disconnected SAP connection but
+-		 * didn't closed RFCOMM channel in fixed time.*/
+-		if (conn->io) {
+-			g_io_channel_shutdown(conn->io, TRUE, NULL);
+-			g_io_channel_unref(conn->io);
+-			conn->io = NULL;
+-		}
+-		break;
+-
+-	case SAP_STATE_GRACEFUL_DISCONNECT:
+-		/* Client didn't disconnect SAP connection in fixed time,
+-		 * so close SAP connection immediately. */
+-		disconnect_req(server, SAP_DISCONNECTION_TYPE_IMMEDIATE);
+-		break;
+-
+-	default:
+-		error("Unexpected state (%d).", conn->state);
+-		break;
+-	}
+-
+-	return FALSE;
+-}
+-
+-static void sap_set_connected(struct sap_server *server)
+-{
+-	server->conn->state = SAP_STATE_CONNECTED;
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+-					adapter_get_path(server->adapter),
+-					SAP_SERVER_INTERFACE, "Connected");
+-}
+-
+-int sap_connect_rsp(void *sap_device, uint8_t status)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	struct sap_parameter *param = (struct sap_parameter *) msg->param;
+-	size_t size = sizeof(struct sap_message);
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	DBG("state %d pr 0x%02x status 0x%02x", conn->state,
+-						conn->processing_req, status);
+-
+-	if (conn->state != SAP_STATE_CONNECT_IN_PROGRESS)
+-		return -EPERM;
+-
+-	memset(buf, 0, sizeof(buf));
+-	msg->id = SAP_CONNECT_RESP;
+-	msg->nparam = 0x01;
+-
+-	/* Add connection status */
+-	param->id = SAP_PARAM_ID_CONN_STATUS;
+-	param->len = htons(SAP_PARAM_ID_CONN_STATUS_LEN);
+-	*param->val = status;
+-	size += PARAMETER_SIZE(SAP_PARAM_ID_CONN_STATUS_LEN);
+-
+-
+-	switch (status) {
+-	case SAP_STATUS_OK:
+-		sap_set_connected(server);
+-		break;
+-	case SAP_STATUS_OK_ONGOING_CALL:
+-		DBG("ongoing call. Wait for reset indication!");
+-		conn->state = SAP_STATE_CONNECT_MODEM_BUSY;
+-		break;
+-	case SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED: /* Add MaxMsgSize */
+-		msg->nparam++;
+-		param = (struct sap_parameter *) &buf[size];
+-		param->id = SAP_PARAM_ID_MAX_MSG_SIZE;
+-		param->len = htons(SAP_PARAM_ID_MAX_MSG_SIZE_LEN);
+-		put_be16(SAP_BUF_SIZE, &param->val);
+-		size += PARAMETER_SIZE(SAP_PARAM_ID_MAX_MSG_SIZE_LEN);
+-		/* fall through */
+-	default:
+-		conn->state = SAP_STATE_DISCONNECTED;
+-
+-		/* Timer will shutdown channel if client doesn't send
+-		 * CONNECT_REQ or doesn't shutdown channel itself.*/
+-		start_guard_timer(server, SAP_TIMER_NO_ACTIVITY);
+-		break;
+-	}
+-
+-	conn->processing_req = SAP_NO_REQ;
+-
+-	return send_message(conn, buf, size);
+-}
+-
+-int sap_disconnect_rsp(void *sap_device)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	struct sap_message msg;
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
+-
+-	switch (conn->state) {
+-	case SAP_STATE_CLIENT_DISCONNECT:
+-		memset(&msg, 0, sizeof(msg));
+-		msg.id = SAP_DISCONNECT_RESP;
+-
+-		conn->state = SAP_STATE_DISCONNECTED;
+-		conn->processing_req = SAP_NO_REQ;
+-
+-		/* Timer will close channel if client doesn't do it.*/
+-		start_guard_timer(server, SAP_TIMER_NO_ACTIVITY);
+-
+-		return send_message(conn, &msg, sizeof(msg));
+-
+-	case SAP_STATE_IMMEDIATE_DISCONNECT:
+-		conn->state = SAP_STATE_DISCONNECTED;
+-		conn->processing_req = SAP_NO_REQ;
+-
+-		if (conn->io) {
+-			g_io_channel_shutdown(conn->io, TRUE, NULL);
+-			g_io_channel_unref(conn->io);
+-			conn->io = NULL;
+-		}
+-
+-		return 0;
+-
+-	default:
+-		break;
+-	}
+-
+-	return 0;
+-}
+-
+-int sap_transfer_apdu_rsp(void *sap_device, uint8_t result, uint8_t *apdu,
+-					uint16_t length)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	struct sap_parameter *param = (struct sap_parameter *) msg->param;
+-	size_t size = sizeof(struct sap_message);
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	SAP_VDBG("state %d pr 0x%02x", conn->state, conn->processing_req);
+-
+-	if (conn->processing_req != SAP_TRANSFER_APDU_REQ)
+-		return 0;
+-
+-	if (result == SAP_RESULT_OK && (!apdu || (apdu && length == 0x00)))
+-		return -EINVAL;
+-
+-	memset(buf, 0, sizeof(buf));
+-	msg->id = SAP_TRANSFER_APDU_RESP;
+-	msg->nparam = 0x01;
+-	size += add_result_parameter(result, param);
+-
+-	/* Add APDU response. */
+-	if (result == SAP_RESULT_OK) {
+-		msg->nparam++;
+-		param = (struct sap_parameter *) &buf[size];
+-		param->id = SAP_PARAM_ID_RESPONSE_APDU;
+-		param->len = htons(length);
+-
+-		size += PARAMETER_SIZE(length);
+-
+-		if (size > SAP_BUF_SIZE)
+-			return -EOVERFLOW;
+-
+-		memcpy(param->val, apdu, length);
+-	}
+-
+-	conn->processing_req = SAP_NO_REQ;
+-
+-	return send_message(conn, buf, size);
+-}
+-
+-int sap_transfer_atr_rsp(void *sap_device, uint8_t result, uint8_t *atr,
+-					uint16_t length)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	struct sap_parameter *param = (struct sap_parameter *) msg->param;
+-	size_t size = sizeof(struct sap_message);
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	DBG("result 0x%02x state %d pr 0x%02x len %d", result, conn->state,
+-			conn->processing_req, length);
+-
+-	if (conn->processing_req != SAP_TRANSFER_ATR_REQ)
+-		return 0;
+-
+-	if (result == SAP_RESULT_OK && (!atr || (atr && length == 0x00)))
+-		return -EINVAL;
+-
+-	memset(buf, 0, sizeof(buf));
+-	msg->id = SAP_TRANSFER_ATR_RESP;
+-	msg->nparam = 0x01;
+-	size += add_result_parameter(result, param);
+-
+-	/* Add ATR response */
+-	if (result == SAP_RESULT_OK) {
+-		msg->nparam++;
+-		param = (struct sap_parameter *) &buf[size];
+-		param->id = SAP_PARAM_ID_ATR;
+-		param->len = htons(length);
+-		size += PARAMETER_SIZE(length);
+-
+-		if (size > SAP_BUF_SIZE)
+-			return -EOVERFLOW;
+-
+-		memcpy(param->val, atr, length);
+-	}
+-
+-	conn->processing_req = SAP_NO_REQ;
+-
+-	return send_message(conn, buf, size);
+-}
+-
+-int sap_power_sim_off_rsp(void *sap_device, uint8_t result)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	size_t size = sizeof(struct sap_message);
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
+-
+-	if (conn->processing_req != SAP_POWER_SIM_OFF_REQ)
+-		return 0;
+-
+-	memset(buf, 0, sizeof(buf));
+-	msg->id = SAP_POWER_SIM_OFF_RESP;
+-	msg->nparam = 0x01;
+-	size += add_result_parameter(result, msg->param);
+-
+-	conn->processing_req = SAP_NO_REQ;
+-
+-	return send_message(conn, buf, size);
+-}
+-
+-int sap_power_sim_on_rsp(void *sap_device, uint8_t result)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	size_t size = sizeof(struct sap_message);
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
+-
+-	if (conn->processing_req != SAP_POWER_SIM_ON_REQ)
+-		return 0;
+-
+-	memset(buf, 0, sizeof(buf));
+-	msg->id = SAP_POWER_SIM_ON_RESP;
+-	msg->nparam = 0x01;
+-	size += add_result_parameter(result, msg->param);
+-
+-	conn->processing_req = SAP_NO_REQ;
+-
+-	return send_message(conn, buf, size);
+-}
+-
+-int sap_reset_sim_rsp(void *sap_device, uint8_t result)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	size_t size = sizeof(struct sap_message);
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	DBG("state %d pr 0x%02x result 0x%02x", conn->state,
+-						conn->processing_req, result);
+-
+-	if (conn->processing_req != SAP_RESET_SIM_REQ)
+-		return 0;
+-
+-	memset(buf, 0, sizeof(buf));
+-	msg->id = SAP_RESET_SIM_RESP;
+-	msg->nparam = 0x01;
+-	size += add_result_parameter(result, msg->param);
+-
+-	conn->processing_req = SAP_NO_REQ;
+-
+-	return send_message(conn, buf, size);
+-}
+-
+-int sap_transfer_card_reader_status_rsp(void *sap_device, uint8_t result,
+-						uint8_t status)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	struct sap_parameter *param = (struct sap_parameter *) msg->param;
+-	size_t size = sizeof(struct sap_message);
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	DBG("state %d pr 0x%02x result 0x%02x", conn->state,
+-						conn->processing_req, result);
+-
+-	if (conn->processing_req != SAP_TRANSFER_CARD_READER_STATUS_REQ)
+-		return 0;
+-
+-	memset(buf, 0, sizeof(buf));
+-	msg->id = SAP_TRANSFER_CARD_READER_STATUS_RESP;
+-	msg->nparam = 0x01;
+-	size += add_result_parameter(result, param);
+-
+-	/* Add card reader status. */
+-	if (result == SAP_RESULT_OK) {
+-		msg->nparam++;
+-		param = (struct sap_parameter *) &buf[size];
+-		param->id = SAP_PARAM_ID_CARD_READER_STATUS;
+-		param->len = htons(SAP_PARAM_ID_CARD_READER_STATUS_LEN);
+-		*param->val = status;
+-		size += PARAMETER_SIZE(SAP_PARAM_ID_CARD_READER_STATUS_LEN);
+-	}
+-
+-	conn->processing_req = SAP_NO_REQ;
+-
+-	return send_message(conn, buf, size);
+-}
+-
+-int sap_transport_protocol_rsp(void *sap_device, uint8_t result)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	size_t size = sizeof(struct sap_message);
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	DBG("state %d pr 0x%02x result 0x%02x", conn->state,
+-						conn->processing_req, result);
+-
+-	if (conn->processing_req != SAP_SET_TRANSPORT_PROTOCOL_REQ)
+-		return 0;
+-
+-	memset(buf, 0, sizeof(buf));
+-	msg->id = SAP_SET_TRANSPORT_PROTOCOL_RESP;
+-	msg->nparam = 0x01;
+-	size += add_result_parameter(result, msg->param);
+-
+-	conn->processing_req = SAP_NO_REQ;
+-
+-	return send_message(conn, buf, size);
+-}
+-
+-int sap_status_ind(void *sap_device, uint8_t status_change)
+-{
+-	struct sap_server *server = sap_device;
+-	struct sap_connection *conn = server->conn;
+-	char buf[SAP_BUF_SIZE];
+-	struct sap_message *msg = (struct sap_message *) buf;
+-	struct sap_parameter *param = (struct sap_parameter *) msg->param;
+-	size_t size = sizeof(struct sap_message);
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	DBG("state %d pr 0x%02x sc 0x%02x", conn->state, conn->processing_req,
+-								status_change);
+-
+-	switch (conn->state) {
+-	case SAP_STATE_CONNECT_MODEM_BUSY:
+-		if (status_change != SAP_STATUS_CHANGE_CARD_RESET)
+-			break;
+-
+-		/* Change state to connected after ongoing call ended */
+-		sap_set_connected(server);
+-		/* fall through */
+-	case SAP_STATE_CONNECTED:
+-	case SAP_STATE_GRACEFUL_DISCONNECT:
+-		memset(buf, 0, sizeof(buf));
+-		msg->id = SAP_STATUS_IND;
+-		msg->nparam = 0x01;
+-
+-		/* Add status change. */
+-		param->id  = SAP_PARAM_ID_STATUS_CHANGE;
+-		param->len = htons(SAP_PARAM_ID_STATUS_CHANGE_LEN);
+-		*param->val = status_change;
+-		size += PARAMETER_SIZE(SAP_PARAM_ID_STATUS_CHANGE_LEN);
+-
+-		return send_message(conn, buf, size);
+-	case SAP_STATE_DISCONNECTED:
+-	case SAP_STATE_CONNECT_IN_PROGRESS:
+-	case SAP_STATE_IMMEDIATE_DISCONNECT:
+-	case SAP_STATE_CLIENT_DISCONNECT:
+-		break;
+-	}
+-
+-	return 0;
+-}
+-
+-int sap_disconnect_ind(void *sap_device, uint8_t disc_type)
+-{
+-	return disconnect_req(sap_device, SAP_DISCONNECTION_TYPE_IMMEDIATE);
+-}
+-
+-static int handle_cmd(struct sap_server *server, void *buf, size_t size)
+-{
+-	struct sap_connection *conn = server->conn;
+-	struct sap_message *msg = buf;
+-
+-	if (!conn)
+-		return -EINVAL;
+-
+-	if (size < sizeof(struct sap_message))
+-		goto error_rsp;
+-
+-	if (msg->nparam != 0 && size < (sizeof(struct sap_message) +
+-					sizeof(struct sap_parameter) + 4))
+-		goto error_rsp;
+-
+-	if (check_msg(msg) < 0)
+-		goto error_rsp;
+-
+-	switch (msg->id) {
+-	case SAP_CONNECT_REQ:
+-		connect_req(server, msg->param);
+-		return 0;
+-	case SAP_DISCONNECT_REQ:
+-		disconnect_req(server, SAP_DISCONNECTION_TYPE_CLIENT);
+-		return 0;
+-	case SAP_TRANSFER_APDU_REQ:
+-		transfer_apdu_req(server, msg->param);
+-		return 0;
+-	case SAP_TRANSFER_ATR_REQ:
+-		transfer_atr_req(server);
+-		return 0;
+-	case SAP_POWER_SIM_OFF_REQ:
+-		power_sim_off_req(server);
+-		return 0;
+-	case SAP_POWER_SIM_ON_REQ:
+-		power_sim_on_req(server);
+-		return 0;
+-	case SAP_RESET_SIM_REQ:
+-		reset_sim_req(server);
+-		return 0;
+-	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
+-		transfer_card_reader_status_req(server);
+-		return 0;
+-	case SAP_SET_TRANSPORT_PROTOCOL_REQ:
+-		set_transport_protocol_req(server, msg->param);
+-		return 0;
+-	default:
+-		DBG("Unknown SAP message id 0x%02x.", msg->id);
+-		break;
+-	}
+-
+-error_rsp:
+-	DBG("Invalid SAP message format.");
+-	sap_error_rsp(conn);
+-	return -EBADMSG;
+-}
+-
+-static void sap_server_remove_conn(struct sap_server *server)
+-{
+-	struct sap_connection *conn = server->conn;
+-
+-	DBG("conn %p", conn);
+-
+-	if (!conn)
+-		return;
+-
+-	if (conn->io) {
+-		g_io_channel_shutdown(conn->io, TRUE, NULL);
+-		g_io_channel_unref(conn->io);
+-	}
+-
+-	g_free(conn);
+-	server->conn = NULL;
+-}
+-
+-static gboolean sap_io_cb(GIOChannel *io, GIOCondition cond, gpointer data)
+-{
+-	char buf[SAP_BUF_SIZE];
+-	size_t bytes_read = 0;
+-	GError *gerr = NULL;
+-	GIOStatus gstatus;
+-
+-	SAP_VDBG("conn %p io %p", conn, io);
+-
+-	if (cond & G_IO_NVAL) {
+-		DBG("ERR (G_IO_NVAL) on rfcomm socket.");
+-		return FALSE;
+-	}
+-
+-	if (cond & G_IO_ERR) {
+-		DBG("ERR (G_IO_ERR) on rfcomm socket.");
+-		return FALSE;
+-	}
+-
+-	if (cond & G_IO_HUP) {
+-		DBG("HUP on rfcomm socket.");
+-		return FALSE;
+-	}
+-
+-	gstatus = g_io_channel_read_chars(io, buf, sizeof(buf) - 1,
+-							&bytes_read, &gerr);
+-	if (gstatus != G_IO_STATUS_NORMAL) {
+-		if (gerr)
+-			g_error_free(gerr);
+-
+-		return TRUE;
+-	}
+-
+-	if (handle_cmd(data, buf, bytes_read) < 0)
+-		error("SAP protocol processing failure.");
+-
+-	return TRUE;
+-}
+-
+-static void sap_io_destroy(void *data)
+-{
+-	struct sap_server *server = data;
+-	struct sap_connection *conn = server->conn;
+-
+-	DBG("conn %p", conn);
+-
+-	if (!conn || !conn->io)
+-		return;
+-
+-	stop_guard_timer(server);
+-
+-	if (conn->state != SAP_STATE_CONNECT_IN_PROGRESS &&
+-				conn->state != SAP_STATE_CONNECT_MODEM_BUSY)
+-		g_dbus_emit_property_changed(btd_get_dbus_connection(),
+-					adapter_get_path(server->adapter),
+-					SAP_SERVER_INTERFACE,
+-					"Connected");
+-
+-	if (conn->state == SAP_STATE_CONNECT_IN_PROGRESS ||
+-			conn->state == SAP_STATE_CONNECT_MODEM_BUSY ||
+-			conn->state == SAP_STATE_CONNECTED ||
+-			conn->state == SAP_STATE_GRACEFUL_DISCONNECT)
+-		sap_disconnect_req(server, 1);
+-
+-	sap_server_remove_conn(server);
+-}
+-
+-static void sap_connect_cb(GIOChannel *io, GError *gerr, gpointer data)
+-{
+-	struct sap_server *server = data;
+-	struct sap_connection *conn = server->conn;
+-
+-	DBG("conn %p, io %p", conn, io);
+-
+-	if (!conn)
+-		return;
+-
+-	/* Timer will shutdown the channel in case of lack of client
+-	   activity */
+-	start_guard_timer(server, SAP_TIMER_NO_ACTIVITY);
+-
+-	g_io_add_watch_full(io, G_PRIORITY_DEFAULT,
+-			G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-			sap_io_cb, server, sap_io_destroy);
+-}
+-
+-static void connect_auth_cb(DBusError *derr, void *data)
+-{
+-	struct sap_server *server = data;
+-	struct sap_connection *conn = server->conn;
+-	GError *gerr = NULL;
+-
+-	DBG("conn %p", conn);
+-
+-	if (!conn)
+-		return;
+-
+-	if (derr && dbus_error_is_set(derr)) {
+-		error("Access has been denied (%s)", derr->message);
+-		sap_server_remove_conn(server);
+-		return;
+-	}
+-
+-	if (!bt_io_accept(conn->io, sap_connect_cb, server, NULL, &gerr)) {
+-		error("bt_io_accept: %s", gerr->message);
+-		g_error_free(gerr);
+-		sap_server_remove_conn(server);
+-		return;
+-	}
+-
+-	DBG("Access has been granted.");
+-}
+-
+-static void connect_confirm_cb(GIOChannel *io, gpointer data)
+-{
+-	struct sap_server *server = data;
+-	struct sap_connection *conn = server->conn;
+-	GError *gerr = NULL;
+-	bdaddr_t src, dst;
+-	char dstaddr[18];
+-	guint ret;
+-
+-	DBG("conn %p io %p", conn, io);
+-
+-	if (!io)
+-		return;
+-
+-	if (conn) {
+-		DBG("Another SAP connection already exists.");
+-		g_io_channel_shutdown(io, TRUE, NULL);
+-		return;
+-	}
+-
+-	conn = g_try_new0(struct sap_connection, 1);
+-	if (!conn) {
+-		error("Can't allocate memory for incoming SAP connection.");
+-		g_io_channel_shutdown(io, TRUE, NULL);
+-		return;
+-	}
+-
+-	g_io_channel_set_encoding(io, NULL, NULL);
+-	g_io_channel_set_buffered(io, FALSE);
+-
+-	server->conn = conn;
+-	conn->io = g_io_channel_ref(io);
+-	conn->state = SAP_STATE_DISCONNECTED;
+-
+-	bt_io_get(io, &gerr,
+-			BT_IO_OPT_SOURCE_BDADDR, &src,
+-			BT_IO_OPT_DEST_BDADDR, &dst,
+-			BT_IO_OPT_INVALID);
+-	if (gerr) {
+-		error("%s", gerr->message);
+-		g_error_free(gerr);
+-		sap_server_remove_conn(server);
+-		return;
+-	}
+-
+-	ba2str(&dst, dstaddr);
+-
+-	ret = btd_request_authorization(&src, &dst, SAP_UUID, connect_auth_cb,
+-								server);
+-	if (ret == 0) {
+-		error("Authorization failure");
+-		sap_server_remove_conn(server);
+-		return;
+-	}
+-
+-	DBG("Authorizing incoming SAP connection from %s", dstaddr);
+-}
+-
+-static DBusMessage *disconnect(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	struct sap_server *server = data;
+-
+-	if (!server)
+-		return btd_error_failed(msg, "Server internal error.");
+-
+-	DBG("conn %p", server->conn);
+-
+-	if (!server->conn)
+-		return btd_error_failed(msg, "Client already disconnected");
+-
+-	if (disconnect_req(server, SAP_DISCONNECTION_TYPE_GRACEFUL) < 0)
+-		return btd_error_failed(msg, "There is no active connection");
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static gboolean server_property_get_connected(
+-					const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct sap_server *server = data;
+-	struct sap_connection *conn = server->conn;
+-	dbus_bool_t connected;
+-
+-	if (!conn) {
+-		connected = FALSE;
+-		goto append;
+-	}
+-
+-	connected = (conn->state == SAP_STATE_CONNECTED ||
+-				conn->state == SAP_STATE_GRACEFUL_DISCONNECT);
+-
+-append:
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &connected);
+-
+-	return TRUE;
+-}
+-
+-static const GDBusMethodTable server_methods[] = {
+-	{ GDBUS_METHOD("Disconnect", NULL, NULL, disconnect) },
+-	{ }
+-};
+-
+-static const GDBusPropertyTable server_properties[] = {
+-	{ "Connected", "b", server_property_get_connected },
+-	{ }
+-};
+-
+-static void server_remove(struct sap_server *server)
+-{
+-	if (!server)
+-		return;
+-
+-	sap_server_remove_conn(server);
+-
+-	adapter_service_remove(server->adapter, server->record_id);
+-
+-	if (server->listen_io) {
+-		g_io_channel_shutdown(server->listen_io, TRUE, NULL);
+-		g_io_channel_unref(server->listen_io);
+-		server->listen_io = NULL;
+-	}
+-
+-	btd_adapter_unref(server->adapter);
+-	g_free(server);
+-}
+-
+-static void destroy_sap_interface(void *data)
+-{
+-	struct sap_server *server = data;
+-
+-	DBG("Unregistered interface %s on path %s", SAP_SERVER_INTERFACE,
+-					adapter_get_path(server->adapter));
+-
+-	server_remove(server);
+-}
+-
+-int sap_server_register(struct btd_adapter *adapter)
+-{
+-	sdp_record_t *record = NULL;
+-	GError *gerr = NULL;
+-	GIOChannel *io;
+-	struct sap_server *server;
+-
+-	if (sap_init() < 0) {
+-		error("Sap driver initialization failed.");
+-		return -1;
+-	}
+-
+-	record = create_sap_record(SAP_SERVER_CHANNEL);
+-	if (!record) {
+-		error("Creating SAP SDP record failed.");
+-		goto sdp_err;
+-	}
+-
+-	if (adapter_service_add(adapter, record) < 0) {
+-		error("Adding SAP SDP record to the SDP server failed.");
+-		sdp_record_free(record);
+-		goto sdp_err;
+-	}
+-
+-	server = g_new0(struct sap_server, 1);
+-	server->adapter = btd_adapter_ref(adapter);
+-	server->record_id = record->handle;
+-
+-	io = bt_io_listen(NULL, connect_confirm_cb, server,
+-			NULL, &gerr,
+-			BT_IO_OPT_SOURCE_BDADDR,
+-			btd_adapter_get_address(adapter),
+-			BT_IO_OPT_CHANNEL, SAP_SERVER_CHANNEL,
+-			BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_HIGH,
+-			BT_IO_OPT_CENTRAL, TRUE,
+-			BT_IO_OPT_INVALID);
+-	if (!io) {
+-		error("Can't listen at channel %d.", SAP_SERVER_CHANNEL);
+-		g_error_free(gerr);
+-		goto server_err;
+-	}
+-	server->listen_io = io;
+-
+-	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+-					adapter_get_path(server->adapter),
+-					SAP_SERVER_INTERFACE,
+-					server_methods, NULL,
+-					server_properties, server,
+-					destroy_sap_interface)) {
+-		error("D-Bus failed to register %s interface",
+-							SAP_SERVER_INTERFACE);
+-		goto server_err;
+-	}
+-
+-	DBG("server %p, listen socket 0x%02x", server,
+-						g_io_channel_unix_get_fd(io));
+-
+-	return 0;
+-
+-server_err:
+-	server_remove(server);
+-sdp_err:
+-	sap_exit();
+-
+-	return -1;
+-}
+-
+-void sap_server_unregister(const char *path)
+-{
+-	g_dbus_unregister_interface(btd_get_dbus_connection(),
+-						path, SAP_SERVER_INTERFACE);
+-
+-	sap_exit();
+-}
+diff --git a/profiles/sap/server.h b/profiles/sap/server.h
+deleted file mode 100644
+index b774230f52cd..000000000000
+--- a/profiles/sap/server.h
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 ST-Ericsson SA
+- *
+- */
+-
+-int sap_server_register(struct btd_adapter *adapter);
+-void sap_server_unregister(const char *path);
+diff --git a/test/sap_client.py b/test/sap_client.py
+deleted file mode 100644
+index 2da46eee36bc..000000000000
+--- a/test/sap_client.py
++++ /dev/null
+@@ -1,930 +0,0 @@
+-# SPDX-License-Identifier: LGPL-2.1-or-later
+-""" Copyright (C) 2010-2011 ST-Ericsson SA """
+-
+-""" Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson. """
+-
+-from array import array
+-from bluetooth import *
+-import time
+-import re
+-
+-class SAPParam:
+-    """ SAP Parameter Class """
+-
+-    MaxMsgSize = 0x00
+-    ConnectionStatus = 0x01
+-    ResultCode = 0x02
+-    DisconnectionType = 0x03
+-    CommandAPDU = 0x04
+-    ResponseAPDU = 0x05
+-    ATR = 0x06
+-    CardReaderStatus = 0x07
+-    StatusChange = 0x08
+-    TransportProtocol = 0x09
+-    CommandAPDU7816 = 0x10
+-
+-    def __init__(self, name, id, value = None):
+-        self.name = name
+-        self.id = id
+-        self.value = value
+-
+-    def _padding(self,  buf):
+-        pad = array('B')
+-        while ( (len(buf) + len(pad)) % 4 ) != 0:
+-            pad.append(0)
+-        return pad
+-
+-    def _basicCheck(self,  buf):
+-        if len(buf) < 4 or (len(buf) % 4) != 0 or buf[1] != 0:
+-                return (-1,  -1)
+-        if buf[0] != self.id:
+-            return (-1,  -1)
+-        plen = buf[2] * 256 + buf[3] + 4
+-        if plen > len(buf):
+-            return (-1,  -1)
+-        pad = plen
+-        while (pad % 4) != 0:
+-            if buf[pad] != 0:
+-                return (-1,  -1)
+-            pad+=1
+-        return (plen,  pad)
+-
+-    def getID(self):
+-        return self.id
+-
+-    def getValue(self):
+-        return self.value
+-
+-    def getContent(self):
+-        return "%s(id=0x%.2X), value=%s \n" %  (self.name,  self.id, self.value)
+-
+-    def serialize(self):
+-        a = array('B', '\00\00\00\00')
+-        a[0] = self.id
+-        a[1] = 0	# reserved
+-        a[2] = 0	# length
+-        a[3] = 1	# length
+-        a.append(self.value)
+-        a.extend(self._padding(a))
+-        return a
+-
+-    def deserialize(self,  buf):
+-        p = self._basicCheck(buf)
+-        if p[0] == -1:
+-            return -1
+-        self.id = buf[0]
+-        self.value = buf[4]
+-        return p[1]
+-
+-
+-class SAPParam_MaxMsgSize(SAPParam):
+-    """MaxMsgSize Param """
+-
+-    def __init__(self,  value = None):
+-        SAPParam.__init__(self,"MaxMsgSize",  SAPParam.MaxMsgSize, value)
+-        self.__validate()
+-
+-    def __validate(self):
+-        if self.value > 0xFFFF:
+-             self.value = 0xFFFF
+-
+-    def serialize(self):
+-        a = array('B', '\00\00\00\00')
+-        a[0] = self.id
+-        a[3] = 2
+-        a.append(self.value / 256)
+-        a.append(self.value % 256)
+-        a.extend(self._padding(a))
+-        return a
+-
+-    def deserialize(self,  buf):
+-        p = self._basicCheck(buf)
+-        if p[0] == -1 :
+-            return -1
+-        self.value = buf[4] * 256 + buf[5]
+-        return p[1]
+-
+-class SAPParam_CommandAPDU(SAPParam):
+-    def __init__(self,  value = None):
+-        if value is None:
+-            SAPParam.__init__(self, "CommandAPDU",  SAPParam.CommandAPDU, array('B'))
+-        else:
+-            SAPParam.__init__(self, "CommandAPDU",  SAPParam.CommandAPDU, array('B', value))
+-
+-    def serialize(self):
+-        a = array('B', '\00\00\00\00')
+-        a[0] = self.id
+-        plen = len(self.value)
+-        a[2] = plen / 256
+-        a[3] = plen % 256
+-        a.extend(self.value)
+-        a.extend(self._padding(a))
+-        return a
+-
+-    def deserialize(self,  buf):
+-        p = self._basicCheck(buf)
+-        if p[0] == -1:
+-            return -1
+-        self.value = buf[4:p[0]]
+-        return p[1]
+-
+-class SAPParam_ResponseAPDU(SAPParam_CommandAPDU):
+-    """ResponseAPDU Param """
+-
+-    def __init__(self,  value = None):
+-        if value is None:
+-            SAPParam.__init__(self, "ResponseAPDU",  SAPParam.ResponseAPDU, array('B'))
+-        else:
+-            SAPParam.__init__(self, "ResponseAPDU",  SAPParam.ResponseAPDU, array('B', value))
+-
+-class SAPParam_ATR(SAPParam_CommandAPDU):
+-    """ATR Param """
+-
+-    def __init__(self,  value = None):
+-        if value is None:
+-            SAPParam.__init__(self, "ATR",  SAPParam.ATR, array('B'))
+-        else:
+-            SAPParam.__init__(self, "ATR",  SAPParam.ATR, array('B', value))
+-
+-class SAPParam_CommandAPDU7816(SAPParam_CommandAPDU):
+-    """Command APDU7816 Param."""
+-
+-    def __init__(self,  value = None):
+-        if value is None:
+-            SAPParam.__init__(self, "CommandAPDU7816",  SAPParam.CommandAPDU7816, array('B'))
+-        else:
+-            SAPParam.__init__(self, "CommandAPDU7816",  SAPParam.CommandAPDU7816, array('B', value))
+-
+-
+-class SAPParam_ConnectionStatus(SAPParam):
+-    """Connection status Param."""
+-
+-    def __init__(self,  value = None):
+-        SAPParam.__init__(self,"ConnectionStatus",  SAPParam.ConnectionStatus, value)
+-        self.__validate()
+-
+-    def __validate(self):
+-        if self.value is not None and self.value not in (0x00,  0x01,  0x02,  0x03,  0x04):
+-            print("Warning. ConnectionStatus value in reserved range (0x%x)" % self.value)
+-
+-    def deserialize(self,  buf):
+-        ret = SAPParam.deserialize(self, buf)
+-        if ret == -1:
+-            return -1
+-        self.__validate()
+-        return ret
+-
+-class SAPParam_ResultCode(SAPParam):
+-    """ Result Code Param """
+-
+-    def __init__(self,  value = None):
+-        SAPParam.__init__(self,"ResultCode",  SAPParam.ResultCode, value)
+-        self.__validate()
+-
+-    def __validate(self):
+-        if self.value is not None and self.value not in (0x00,  0x01,  0x02,  0x03,  0x04,  0x05,  0x06,  0x07):
+-            print("Warning. ResultCode value in reserved range (0x%x)" % self.value)
+-
+-    def deserialize(self,  buf):
+-        ret = SAPParam.deserialize(self, buf)
+-        if ret == -1:
+-            return -1
+-        self.__validate()
+-        return ret
+-
+-class SAPParam_DisconnectionType(SAPParam):
+-    """Disconnection Type Param."""
+-
+-    def __init__(self,  value = None):
+-        SAPParam.__init__(self,"DisconnectionType",  SAPParam.DisconnectionType, value)
+-        self.__validate()
+-
+-    def __validate(self):
+-        if self.value is not None and self.value not in (0x00,  0x01):
+-            print("Warning. DisconnectionType value in reserved range (0x%x)" % self.value)
+-
+-    def deserialize(self,  buf):
+-        ret = SAPParam.deserialize(self, buf)
+-        if ret == -1:
+-            return -1
+-        self.__validate()
+-        return ret
+-
+-class SAPParam_CardReaderStatus(SAPParam_CommandAPDU):
+-    """Card reader Status Param."""
+-
+-    def __init__(self,  value = None):
+-        if value is None:
+-            SAPParam.__init__(self, "CardReaderStatus",  SAPParam.CardReaderStatus, array('B'))
+-        else:
+-            SAPParam.__init__(self, "CardReaderStatus",  SAPParam.CardReaderStatus, array('B', value))
+-
+-class SAPParam_StatusChange(SAPParam):
+-    """Status Change Param """
+-
+-    def __init__(self,  value = None):
+-        SAPParam.__init__(self,"StatusChange",  SAPParam.StatusChange, value)
+-
+-    def __validate(self):
+-        if self.value is not None and self.value not in (0x00,  0x01,  0x02,  0x03,  0x04,  0x05):
+-            print("Warning. StatusChange value in reserved range (0x%x)" % self.value)
+-
+-    def deserialize(self,  buf):
+-        ret = SAPParam.deserialize(self, buf)
+-        if ret == -1:
+-            return -1
+-        self.__validate()
+-        return ret
+-
+-class SAPParam_TransportProtocol(SAPParam):
+-    """Transport Protocol Param """
+-
+-    def __init__(self,  value = None):
+-        SAPParam.__init__(self,"TransportProtocol",  SAPParam.TransportProtocol, value)
+-        self.__validate()
+-
+-    def __validate(self):
+-        if self.value is not None and self.value not in (0x00,  0x01):
+-            print("Warning. TransportProtoco value in reserved range (0x%x)" % self.value)
+-
+-    def deserialize(self,  buf):
+-        ret = SAPParam.deserialize(self, buf)
+-        if ret == -1:
+-            return -1
+-        self.__validate()
+-        return ret
+-
+-class SAPMessage:
+-
+-    CONNECT_REQ = 0x00
+-    CONNECT_RESP = 0x01
+-    DISCONNECT_REQ = 0x02
+-    DISCONNECT_RESP =0x03
+-    DISCONNECT_IND = 0x04
+-    TRANSFER_APDU_REQ = 0x05
+-    TRANSFER_APDU_RESP = 0x06
+-    TRANSFER_ATR_REQ = 0x07
+-    TRANSFER_ATR_RESP = 0x08
+-    POWER_SIM_OFF_REQ = 0x09
+-    POWER_SIM_OFF_RESP = 0x0A
+-    POWER_SIM_ON_REQ = 0x0B
+-    POWER_SIM_ON_RESP = 0x0C
+-    RESET_SIM_REQ = 0x0D
+-    RESET_SIM_RESP = 0x0E
+-    TRANSFER_CARD_READER_STATUS_REQ = 0x0F
+-    TRANSFER_CARD_READER_STATUS_RESP = 0x10
+-    STATUS_IND = 0x11
+-    ERROR_RESP = 0x12
+-    SET_TRANSPORT_PROTOCOL_REQ = 0x13
+-    SET_TRANSPORT_PROTOCOL_RESP = 0x14
+-
+-    def __init__(self,  name,  id):
+-        self.name = name
+-        self.id = id
+-        self.params = []
+-        self.buf = array('B')
+-
+-    def _basicCheck(self,  buf):
+-        if len(buf) < 4 or (len(buf) % 4) != 0 :
+-            return False
+-
+-        if buf[0] != self.id:
+-            return False
+-
+-        return True
+-
+-    def getID(self):
+-        return self.id
+-
+-    def getContent(self):
+-        s = "%s(id=0x%.2X) " % (self.name,  self.id)
+-        if len( self.buf): s = s + "[%s]" % re.sub("(.{2})", "0x\\1 " , self.buf.tostring().encode("hex").upper(), re.DOTALL)
+-        s = s + "\n\t"
+-        for p in self.params:
+-            s = s + "\t" + p.getContent()
+-        return s
+-
+-    def getParams(self):
+-        return self.params
+-
+-    def addParam(self,  param):
+-        self.params.append(param)
+-
+-    def serialize(self):
+-        ret = array('B', '\00\00\00\00')
+-        ret[0] = self.id
+-        ret[1] = len(self.params)
+-        ret[2] = 0	# reserved
+-        ret[3] = 0	# reserved
+-        for p in self.params:
+-            ret.extend(p.serialize())
+-
+-        self.buf = ret
+-        return ret
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        return len(buf) == 4 and buf[1] == 0 and self._basicCheck(buf)
+-
+-
+-class SAPMessage_CONNECT_REQ(SAPMessage):
+-    def __init__(self,  MaxMsgSize = None):
+-        SAPMessage.__init__(self,"CONNECT_REQ",  SAPMessage.CONNECT_REQ)
+-        if MaxMsgSize is not None:
+-            self.addParam(SAPParam_MaxMsgSize(MaxMsgSize))
+-
+-    def _validate(self):
+-        if len(self.params) == 1:
+-            if self.params[0].getID() == SAPParam.MaxMsgSize:
+-                return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-        if SAPMessage._basicCheck(self,  buf):
+-            p = SAPParam_MaxMsgSize()
+-            if p.deserialize(buf[4:]) == len(buf[4:]):
+-                self.addParam(p)
+-                return self._validate()
+-
+-        return False
+-
+-class SAPMessage_CONNECT_RESP(SAPMessage):
+-    def __init__(self,  ConnectionStatus = None,  MaxMsgSize = None):
+-        SAPMessage.__init__(self,"CONNECT_RESP",  SAPMessage.CONNECT_RESP)
+-        if ConnectionStatus is not None:
+-            self.addParam(SAPParam_ConnectionStatus(ConnectionStatus))
+-            if MaxMsgSize is not None:
+-                self.addParam(SAPParam_MaxMsgSize(MaxMsgSize))
+-
+-    def _validate(self):
+-        if len(self.params) > 0:
+-            if self.params[0] .getID() == SAPParam.ConnectionStatus:
+-                if self.params[0].getValue() ==  0x02:
+-                    if len(self.params) == 2:
+-                        return True
+-                else:
+-                    if len(self.params) == 1:
+-                        return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-
+-        if SAPMessage._basicCheck(self,  buf):
+-            p = SAPParam_ConnectionStatus()
+-            r = p.deserialize(buf[4:])
+-            if  r != -1:
+-                self.addParam(p)
+-                if buf[1] == 2:
+-                    p = SAPParam_MaxMsgSize()
+-                    r = p.deserialize(buf[4+r:])
+-                    if r != -1:
+-                        self.addParam(p)
+-
+-                return self._validate()
+-
+-        return False
+-
+-class SAPMessage_DISCONNECT_REQ(SAPMessage):
+-    def __init__(self):
+-        SAPMessage.__init__(self,"DISCONNECT_REQ",  SAPMessage.DISCONNECT_REQ)
+-
+-class SAPMessage_DISCONNECT_RESP(SAPMessage):
+-    def __init__(self):
+-        SAPMessage.__init__(self,"DISCONNECT_RESP",  SAPMessage.DISCONNECT_RESP)
+-
+-class SAPMessage_DISCONNECT_IND(SAPMessage):
+-    def __init__(self,  Type = None):
+-        SAPMessage.__init__(self,"DISCONNECT_IND",  SAPMessage.DISCONNECT_IND)
+-        if Type is not None:
+-            self.addParam(SAPParam_DisconnectionType(Type))
+-
+-    def _validate(self):
+-        if len(self.params) == 1:
+-            if self.params[0].getID() == SAPParam.DisconnectionType:
+-                return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-        if SAPMessage._basicCheck(self,  buf):
+-            p = SAPParam_DisconnectionType()
+-            if p.deserialize(buf[4:]) == len(buf[4:]):
+-                self.addParam(p)
+-                return self._validate()
+-
+-        return False
+-
+-
+-class SAPMessage_TRANSFER_APDU_REQ(SAPMessage):
+-    def __init__(self,  APDU = None,  T = False):
+-        SAPMessage.__init__(self,"TRANSFER_APDU_REQ",  SAPMessage.TRANSFER_APDU_REQ)
+-        if APDU is not None:
+-            if T :
+-                self.addParam(SAPParam_CommandAPDU(APDU))
+-            else:
+-                self.addParam(SAPParam_CommandAPDU7816(APDU))
+-
+-    def _validate(self):
+-        if len(self.params) == 1:
+-            if self.params[0].getID() == SAPParam.CommandAPDU or self.params[0].getID() == SAPParam.CommandAPDU7816:
+-                return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-        if SAPMessage._basicCheck(self,  buf):
+-
+-            p = SAPParam_CommandAPDU()
+-            p2 = SAPParam_CommandAPDU7816()
+-            if p.deserialize(buf[4:]) == len(buf[4:]):
+-                self.addParam(p)
+-                return self._validate()
+-            elif p2.deserialize(buf[4:]) == len(buf[4:]):
+-                self.addParam(p2)
+-                return self._validate()
+-
+-        return False
+-
+-class SAPMessage_TRANSFER_APDU_RESP(SAPMessage):
+-    def __init__(self,  ResultCode = None,  Response = None):
+-        SAPMessage.__init__(self,"TRANSFER_APDU_RESP",  SAPMessage.TRANSFER_APDU_RESP)
+-        if ResultCode is not None:
+-            self.addParam(SAPParam_ResultCode(ResultCode))
+-            if Response is not None:
+-                self.addParam(SAPParam_ResponseAPDU(Response))
+-
+-    def _validate(self):
+-        if len(self.params) > 0:
+-            if self.params[0] .getID() == SAPParam.ResultCode:
+-                if self.params[0].getValue() == 0x00:
+-                    if len(self.params) == 2:
+-                        return True
+-                else:
+-                    if len(self.params) == 1:
+-                        return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-
+-        if SAPMessage._basicCheck(self,  buf):
+-            p = SAPParam_ResultCode()
+-            r = p.deserialize(buf[4:])
+-            if  r != -1:
+-                self.addParam(p)
+-                if buf[1] == 2:
+-                    p = SAPParam_ResponseAPDU()
+-                    r = p.deserialize(buf[4+r:])
+-                    if r != -1:
+-                        self.addParam(p)
+-
+-                return self._validate()
+-
+-        return False
+-
+-class SAPMessage_TRANSFER_ATR_REQ(SAPMessage):
+-    def __init__(self):
+-        SAPMessage.__init__(self,"TRANSFER_ATR_REQ",  SAPMessage.TRANSFER_ATR_REQ)
+-
+-class SAPMessage_TRANSFER_ATR_RESP(SAPMessage):
+-    def __init__(self,  ResultCode = None,  ATR = None):
+-        SAPMessage.__init__(self,"TRANSFER_ATR_RESP",  SAPMessage.TRANSFER_ATR_RESP)
+-        if ResultCode is not None:
+-            self.addParam(SAPParam_ResultCode(ResultCode))
+-            if ATR is not None:
+-                self.addParam(SAPParam_ATR(ATR))
+-
+-    def _validate(self):
+-        if len(self.params) > 0:
+-            if self.params[0] .getID() == SAPParam.ResultCode:
+-                if self.params[0].getValue() == 0x00:
+-                    if len(self.params) == 2:
+-                        return True
+-                else:
+-                    if len(self.params) == 1:
+-                        return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-
+-        if SAPMessage._basicCheck(self,  buf):
+-
+-            p = SAPParam_ResultCode()
+-            r = p.deserialize(buf[4:])
+-
+-            if  r != -1:
+-
+-                self.addParam(p)
+-                if buf[1] == 2:
+-
+-                    p = SAPParam_ATR()
+-                    r = p.deserialize(buf[4+r:])
+-                    if r != -1:
+-                        self.addParam(p)
+-
+-                return self._validate()
+-
+-        return False
+-
+-class SAPMessage_POWER_SIM_OFF_REQ(SAPMessage):
+-    def __init__(self):
+-        SAPMessage.__init__(self,"POWER_SIM_OFF_REQ",  SAPMessage.POWER_SIM_OFF_REQ)
+-
+-class SAPMessage_POWER_SIM_OFF_RESP(SAPMessage):
+-    def __init__(self,  ResultCode = None):
+-        SAPMessage.__init__(self,"POWER_SIM_OFF_RESP",  SAPMessage.POWER_SIM_OFF_RESP)
+-        if ResultCode is not None:
+-            self.addParam(SAPParam_ResultCode(ResultCode))
+-
+-    def _validate(self):
+-        if len(self.params) == 1:
+-            if self.params[0].getID() == SAPParam.ResultCode:
+-                return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-        if SAPMessage._basicCheck(self,  buf):
+-            p = SAPParam_ResultCode()
+-            if p.deserialize(buf[4:]) == len(buf[4:]):
+-                self.addParam(p)
+-                return self._validate()
+-
+-        return False
+-
+-class SAPMessage_POWER_SIM_ON_REQ(SAPMessage):
+-    def __init__(self):
+-        SAPMessage.__init__(self,"POWER_SIM_ON_REQ",  SAPMessage.POWER_SIM_ON_REQ)
+-
+-class SAPMessage_POWER_SIM_ON_RESP(SAPMessage_POWER_SIM_OFF_RESP):
+-    def __init__(self,  ResultCode = None):
+-        SAPMessage.__init__(self,"POWER_SIM_ON_RESP",  SAPMessage.POWER_SIM_ON_RESP)
+-        if ResultCode is not None:
+-            self.addParam(SAPParam_ResultCode(ResultCode))
+-
+-class SAPMessage_RESET_SIM_REQ(SAPMessage):
+-    def __init__(self):
+-        SAPMessage.__init__(self,"RESET_SIM_REQ",  SAPMessage.RESET_SIM_REQ)
+-
+-class SAPMessage_RESET_SIM_RESP(SAPMessage_POWER_SIM_OFF_RESP):
+-    def __init__(self,  ResultCode = None):
+-        SAPMessage.__init__(self,"RESET_SIM_RESP",  SAPMessage.RESET_SIM_RESP)
+-        if ResultCode is not None:
+-            self.addParam(SAPParam_ResultCode(ResultCode))
+-
+-class SAPMessage_STATUS_IND(SAPMessage):
+-    def __init__(self,  StatusChange = None):
+-        SAPMessage.__init__(self,"STATUS_IND",  SAPMessage.STATUS_IND)
+-        if StatusChange is not None:
+-            self.addParam(SAPParam_StatusChange(StatusChange))
+-
+-    def _validate(self):
+-        if len(self.params) == 1:
+-            if self.params[0].getID() == SAPParam.StatusChange:
+-                return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-        if SAPMessage._basicCheck(self,  buf):
+-            p = SAPParam_StatusChange()
+-            if p.deserialize(buf[4:]) == len(buf[4:]):
+-                self.addParam(p)
+-                return self._validate()
+-
+-        return False
+-
+-class SAPMessage_TRANSFER_CARD_READER_STATUS_REQ(SAPMessage):
+-    def __init__(self):
+-        SAPMessage.__init__(self,"TRANSFER_CARD_READER_STATUS_REQ",  SAPMessage.TRANSFER_CARD_READER_STATUS_REQ)
+-
+-class SAPMessage_TRANSFER_CARD_READER_STATUS_RESP(SAPMessage):
+-    def __init__(self,  ResultCode = None,  Status = None):
+-        SAPMessage.__init__(self,"TRANSFER_CARD_READER_STATUS_RESP",  SAPMessage.TRANSFER_CARD_READER_STATUS_RESP)
+-        if ResultCode is not None:
+-            self.addParam(SAPParam_ResultCode(ResultCode))
+-            if Status is not None:
+-                self.addParam(SAPParam_CardReaderStatus(Status))
+-
+-    def _validate(self):
+-        if len(self.params) > 0:
+-            if self.params[0] .getID() == SAPParam.ResultCode:
+-                if self.params[0].getValue() == 0x00:
+-                    if len(self.params) == 2:
+-                        return True
+-                else:
+-                    if len(self.params) == 1:
+-                        return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-
+-        if SAPMessage._basicCheck(self,  buf):
+-            p = SAPParam_ResultCode()
+-            r = p.deserialize(buf[4:])
+-            if  r != -1:
+-                self.addParam(p)
+-                if buf[1] == 2:
+-                    p = SAPParam_CardReaderStatus()
+-                    r = p.deserialize(buf[4+r:])
+-                    if r != -1:
+-                        self.addParam(p)
+-
+-                return self._validate()
+-
+-        return False
+-
+-class SAPMessage_ERROR_RESP(SAPMessage):
+-    def __init__(self):
+-        SAPMessage.__init__(self,"ERROR_RESP",  SAPMessage.ERROR_RESP)
+-
+-
+-class SAPMessage_SET_TRANSPORT_PROTOCOL_REQ(SAPMessage):
+-    def __init__(self,  protocol = None):
+-        SAPMessage.__init__(self,"SET_TRANSPORT_PROTOCOL_REQ",  SAPMessage.SET_TRANSPORT_PROTOCOL_REQ)
+-        if protocol is not None:
+-            self.addParam(SAPParam_TransportProtocol(protocol))
+-
+-    def _validate(self):
+-        if len(self.params) == 1:
+-            if self.params[0].getID() == SAPParam.TransportProtocol:
+-                return True
+-        return False
+-
+-    def deserialize(self,  buf):
+-        self.buf = buf
+-        self.params[:] = []
+-        if SAPMessage._basicCheck(self,  buf):
+-            p = SAPParam_TransportProtocol()
+-            if p.deserialize(buf[4:]) == len(buf[4:]):
+-                self.addParam(p)
+-                return self._validate()
+-
+-        return False
+-
+-class SAPMessage_SET_TRANSPORT_PROTOCOL_RESP(SAPMessage_POWER_SIM_OFF_RESP):
+-    def __init__(self,  ResultCode = None):
+-        SAPMessage.__init__(self,"SET_TRANSPORT_PROTOCOL_RESP",  SAPMessage.SET_TRANSPORT_PROTOCOL_RESP)
+-        if ResultCode is not None:
+-            self.addParam(SAPParam_ResultCode(ResultCode))
+-
+-
+-class SAPClient:
+-
+-    CONNECTED = 1
+-    DISCONNECTED = 0
+-
+-    uuid = "0000112D-0000-1000-8000-00805F9B34FB"
+-    bufsize = 1024
+-    timeout = 20
+-    state = DISCONNECTED
+-
+-    def __init__(self,  host = None,  port = None):
+-        self.sock = None
+-
+-        if host is None or is_valid_address(host):
+-            self.host = host
+-        else:
+-            raise BluetoothError ("%s is not a valid BT address." % host)
+-            self.host = None
+-            return
+-
+-        if port is None:
+-            self.__discover()
+-        else:
+-            self.port = port
+-
+-        self.__connectRFCOMM()
+-
+-    def __del__(self):
+-        self.__disconnectRFCOMM()
+-
+-    def __disconnectRFCOMM(self):
+-        if self.sock is not None:
+-            self.sock.close()
+-            self.state = self.DISCONNECTED
+-
+-    def __discover(self):
+-        service_matches = find_service(self.uuid, self.host)
+-
+-        if len(service_matches) == 0:
+-            raise BluetoothError ("No SAP service found")
+-            return
+-
+-        first_match = service_matches[0]
+-        self.port = first_match["port"]
+-        self.host = first_match["host"]
+-
+-        print("SAP Service found on %s(%s)" % first_match["name"] % self.host)
+-
+-    def __connectRFCOMM(self):
+-        self.sock=BluetoothSocket( RFCOMM )
+-        self.sock.connect((self.host, self.port))
+-        self.sock.settimeout(self.timeout)
+-        self.state = self.CONNECTED
+-
+-    def __sendMsg(self, msg):
+-        if isinstance(msg,  SAPMessage):
+-            s = msg.serialize()
+-            print("\tTX: " + msg.getContent())
+-            return self.sock.send(s.tostring())
+-
+-    def __rcvMsg(self,  msg):
+-        if isinstance(msg,  SAPMessage):
+-            print("\tRX Wait: %s(id = 0x%.2x)" % (msg.name, msg.id))
+-            data = self.sock.recv(self.bufsize)
+-            if data:
+-                if msg.deserialize(array('B',data)):
+-                    print("\tRX: len(%d) %s" % (len(data), msg.getContent()))
+-                    return msg
+-                else:
+-                    print("msg: %s" % array('B',data))
+-                    raise BluetoothError ("Message deserialization failed.")
+-            else:
+-                raise BluetoothError ("Timeout. No data received.")
+-
+-    def connect(self):
+-        self.__connectRFCOMM()
+-
+-    def disconnect(self):
+-        self.__disconnectRFCOMM()
+-
+-    def isConnected(self):
+-        return self.state
+-
+-    def proc_connect(self):
+-        try:
+-            self.__sendMsg(SAPMessage_CONNECT_REQ(self.bufsize))
+-            params = self.__rcvMsg(SAPMessage_CONNECT_RESP()).getParams()
+-
+-            if params[0].getValue() in (0x00,  0x04):
+-                pass
+-            elif params[0].getValue() == 0x02:
+-                self.bufsize = params[1].getValue()
+-
+-                self.__sendMsg(SAPMessage_CONNECT_REQ(self.bufsize))
+-                params = self.__rcvMsg(SAPMessage_CONNECT_RESP()).getParams()
+-
+-                if params[0].getValue() not in (0x00,  0x04):
+-                    return False
+-            else:
+-                return False
+-
+-            params = self.__rcvMsg(SAPMessage_STATUS_IND()).getParams()
+-            if params[0].getValue() == 0x00:
+-                return False
+-            elif params[0].getValue() == 0x01:
+-                """OK, Card reset"""
+-                return self.proc_transferATR()
+-            elif params[0].getValue() == 0x02:
+-                """T0 not supported"""
+-                if self.proc_transferATR():
+-                    return self.proc_setTransportProtocol(1)
+-                else:
+-                    return False
+-            else:
+-                return False
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_disconnectByClient(self, timeout=0):
+-        try:
+-            self.__sendMsg(SAPMessage_DISCONNECT_REQ())
+-            self.__rcvMsg(SAPMessage_DISCONNECT_RESP())
+-            time.sleep(timeout) # let srv to close rfcomm
+-            self.__disconnectRFCOMM()
+-            return True
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_disconnectByServer(self, timeout=0):
+-        try:
+-            params = self.__rcvMsg(SAPMessage_DISCONNECT_IND()).getParams()
+-
+-            """graceful"""
+-            if params[0].getValue() == 0x00:
+-                if not self.proc_transferAPDU():
+-                    return False
+-
+-            return self.proc_disconnectByClient(timeout)
+-
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_transferAPDU(self,  apdu = "Sample APDU command"):
+-        try:
+-            self.__sendMsg(SAPMessage_TRANSFER_APDU_REQ(apdu))
+-            params = self.__rcvMsg(SAPMessage_TRANSFER_APDU_RESP()).getParams()
+-            return True
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_transferATR(self):
+-        try:
+-            self.__sendMsg(SAPMessage_TRANSFER_ATR_REQ())
+-            params = self.__rcvMsg(SAPMessage_TRANSFER_ATR_RESP()).getParams()
+-            return True
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_powerSimOff(self):
+-        try:
+-            self.__sendMsg(SAPMessage_POWER_SIM_OFF_REQ())
+-            params = self.__rcvMsg(SAPMessage_POWER_SIM_OFF_RESP()).getParams()
+-            return True
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_powerSimOn(self):
+-        try:
+-            self.__sendMsg(SAPMessage_POWER_SIM_ON_REQ())
+-            params = self.__rcvMsg(SAPMessage_POWER_SIM_ON_RESP()).getParams()
+-            if params[0].getValue() == 0x00:
+-                return self.proc_transferATR()
+-
+-            return True
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_resetSim(self):
+-        try:
+-            self.__sendMsg(SAPMessage_RESET_SIM_REQ())
+-            params = self.__rcvMsg(SAPMessage_RESET_SIM_RESP()).getParams()
+-            if params[0].getValue() == 0x00:
+-                return self.proc_transferATR()
+-
+-            return True
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_reportStatus(self):
+-        try:
+-            params = self.__rcvMsg(SAPMessage_STATUS_IND()).getParams()
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_transferCardReaderStatus(self):
+-        try:
+-            self.__sendMsg(SAPMessage_TRANSFER_CARD_READER_STATUS_REQ())
+-            params = self.__rcvMsg(SAPMessage_TRANSFER_CARD_READER_STATUS_RESP()).getParams()
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_errorResponse(self):
+-        try:
+-            """ send malformed message, no mandatory maxmsgsize parameter"""
+-            self.__sendMsg(SAPMessage_CONNECT_REQ())
+-
+-            params = self.__rcvMsg(SAPMessage_ERROR_RESP()).getParams()
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-    def proc_setTransportProtocol(self,  protocol = 0):
+-        try:
+-            self.__sendMsg(SAPMessage_SET_TRANSPORT_PROTOCOL_REQ(protocol))
+-            params = self.__rcvMsg(SAPMessage_SET_TRANSPORT_PROTOCOL_RESP()).getParams()
+-
+-            if params[0].getValue() == 0x00:
+-                params = self.__rcvMsg(SAPMessage_STATUS_IND()).getParams()
+-                if params[0].getValue() in (0x01,  0x02):
+-                    return self.proc_transferATR()
+-                else:
+-                    return True
+-                    """return False ???"""
+-            elif params[0].getValue == 0x07:
+-                """not supported"""
+-                return True
+-                """return False ???"""
+-            else:
+-                return False
+-
+-        except BluetoothError as e:
+-            print("Error. " +str(e))
+-            return False
+-
+-if __name__ == "__main__":
+-    pass
+diff --git a/test/test-sap-server b/test/test-sap-server
+deleted file mode 100755
+index 161a4bfec58e..000000000000
+--- a/test/test-sap-server
++++ /dev/null
+@@ -1,152 +0,0 @@
+-#!/usr/bin/env python3
+-# SPDX-License-Identifier: LGPL-2.1-or-later
+-
+-from __future__ import absolute_import, print_function, unicode_literals
+-
+-from sap_client import *
+-import time
+-import sys
+-
+-def connect_disconnect_by_client(sap):
+-
+-    print("[Test] Connect - Disconnect by client \n")
+-
+-    try:
+-        if not sap.isConnected():
+-           sap.connect()
+-
+-        if sap.proc_connect():
+-            if sap.proc_disconnectByClient():
+-                print("OK")
+-                return 0
+-
+-        print("NOT OK")
+-        return 1
+-
+-    except BluetoothError as e:
+-        print("Error " + str(e))
+-
+-
+-def connect_disconnect_by_server_gracefully(sap, timeout=0):
+-
+-    print("[Test] Connect - Disconnect by server with timer \n")
+-
+-    try:
+-        if not sap.isConnected():
+-           sap.connect()
+-
+-        if sap.proc_connect():
+-            if sap.proc_disconnectByServer(timeout):
+-                print("OK")
+-                return 0
+-
+-        print("NOT OK")
+-        return 1
+-
+-    except BluetoothError as e:
+-        print("Error " + str(e))
+-
+-
+-def connect_txAPDU_disconnect_by_client(sap):
+-
+-    print("[Test] Connect - TX APDU - Disconnect by client \n")
+-
+-    try:
+-        if not sap.isConnected():
+-           sap.connect()
+-
+-        if sap.proc_connect():
+-            if not sap.proc_transferAPDU():
+-                print("NOT OK 1")
+-                return 1
+-
+-            if not sap.proc_transferAPDU():
+-                print("NOT OK 2")
+-                return 1
+-
+-            if not sap.proc_transferAPDU():
+-                print("NOT OK 3")
+-                return 1
+-
+-            if not sap.proc_transferAPDU():
+-                print("NOT OK 4")
+-                return 1
+-
+-            if sap.proc_disconnectByClient():
+-                print("OK")
+-                return 0
+-
+-        print("NOT OK")
+-        return 1
+-
+-    except BluetoothError as e:
+-        print("Error " + str(e))
+-
+-def connect_rfcomm_only_and_wait_for_close_by_server(sap):
+-
+-    print("[Test] Connect rfcomm only  - Disconnect by server timeout \n")
+-
+-    if not sap.isConnected():
+-       sap.connect()
+-
+-    time.sleep(40)
+-    print("OK")
+-
+-def power_sim_off_on(sap):
+-
+-    print("[Test] Powe sim off \n")
+-
+-    try:
+-        if not sap.isConnected():
+-           sap.connect()
+-
+-        if sap.proc_connect():
+-            if not sap.proc_resetSim():
+-                print("NOT OK")
+-                return 1
+-
+-            if not sap.proc_powerSimOff():
+-                print("NOT OK")
+-                return 1
+-
+-            if not sap.proc_powerSimOn():
+-                print("NOT OK")
+-                return 1
+-
+-            if sap.proc_disconnectByClient():
+-                print("OK")
+-                return 0
+-
+-        print("NOT OK")
+-        return 1
+-
+-    except BluetoothError as e:
+-        print("Error " + str(e))
+-
+-
+-if __name__ == "__main__":
+-
+-    host = None  # server bd_addr
+-    port = 8  # sap server port
+-
+-    if (len(sys.argv) < 2):
+-        print("Usage: %s <address> [port]" % (sys.argv[0]))
+-        sys.exit(1)
+-
+-    host = sys.argv[1]
+-
+-    if (len(sys.argv) == 3):
+-        port = sys.argv[2]
+-
+-    try:
+-        s = SAPClient(host, port)
+-    except BluetoothError as e:
+-        print("Error: " + str(e))
+-        sys.exit(1)
+-
+-    connect_disconnect_by_client(s)
+-    connect_disconnect_by_server_gracefully(s)
+-    connect_disconnect_by_server_gracefully(s, 40)  #  wait 40 sec for srv to close rfcomm sock
+-    connect_rfcomm_only_and_wait_for_close_by_server(s)
+-    connect_txAPDU_disconnect_by_client(s)
+-    power_sim_off_on(s)
+-- 
+2.52.0
 
-
---=20
-Luiz Augusto von Dentz
