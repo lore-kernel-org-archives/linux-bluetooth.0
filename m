@@ -1,126 +1,129 @@
-Received: from mail-dl1-f67.google.com (mail-dl1-f67.google.com [74.125.82.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E7928CF6F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 11:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C282BD5A8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 11:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769600099; cv=none; b=jeDfUaXgPLARXKQ7fq4RAUj4SR3xXvEAq/EQe5O+1sNK+NO/B/8njpyU4q3e4/45FOwMMb7jgpG1MyXvkMeKf6J47x2PMtlgTHz+4E1YicaTwbNOBkvjB7JzehWNJZYpWoGzVF8jKzvU2THH9LZ4JJJlcaTAATaEfh8ZzdJf7Zw=
+	t=1769601256; cv=none; b=cwWhcasAIEL6+ri6+zYrOCRA7oaKfCpOw2093I0yRA21UarPjv04KsGoQzK9HnPWDCX1h8i/GmeuF0NyvRdkbS3t1/tc6eRLA0smpzmqZJLQ/Zm5ZMbGS7f2TeQRddoJNG/YLOCYBcW+AAiV24oF4+8n6u63U7a0mlwcKFulq7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769600099; c=relaxed/simple;
-	bh=HtBR8NMEltNomHnjrO9g2bJP9SJ1pVmn7CoJ1Iryso8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NdxvZ7xMpa5QYjMz5f0TbUN6O/9YZbHb1ZMvKM70JFoUaYUX+ilcfNM4yfD6GBaP1G3aDQS/UzjpdDXmsMTKxKaMzqoaakiPxJUc7BqSf82U8tWDR/c+62NmSBDXAOcGQTv8wkIjO6gJ+iw2P59tUjnBS+7MSvT+7lzYLC/Wpp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cuf1V2Dt; arc=none smtp.client-ip=74.125.82.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1769601256; c=relaxed/simple;
+	bh=yYBoK23s7NVHXPErSKzxTgz1dfC/INCWCUkLU2t+q0I=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D3KDanxhKql4kSz49CI16ho7v+8McOArEKn8+ESG/wFflyoz+SFo+HpBFa52RQuZB0ILpOrfjZ7o41/Lc+04MRUo407m9t8/anzEQ81ukwW5paIPsyfEdYZNK4MnyBPqmHHxJAeoyXXLInwPg6DNwF7oRiyUJvEpMiWN8Z74YwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=pLbfF6//; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cuf1V2Dt"
-Received: by mail-dl1-f67.google.com with SMTP id a92af1059eb24-1233c155a42so9735517c88.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 03:34:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769600097; x=1770204897; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=h7LT5vhqb++8w10zJXirctA8Qwd638+iAOkpaZKs0p0=;
-        b=cuf1V2DtxrnhIQzRKjXuKth6cUCQwjOVqlZgJDtUtzOK1WgCJri7wkZdn0zHY39p8j
-         ZRocA3hVw7rNfS0D6/XRLkf8gThAQzYoKOBJKsdaZVZmuk3wiC5Ts57CMKL9Ms2USwBu
-         3hywPyeabTWmIaqTZZu8uzFxsbw95QV3dmmKZ9wT383c/vjQt87GVJqBUaBg2TOYv0Xt
-         dtV7pGOxXUVPKIHGyNllexiR2ADWN/MWufD9+fCPW42Xs375nyMS80PYd1AY4IhZj4gZ
-         MQcYmIez7zaO0n57Dpa7H7qctURZWAXNGPfrpshSN+XkZe2anyGjoDmGZxRS6KymEb1E
-         lt8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769600097; x=1770204897;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h7LT5vhqb++8w10zJXirctA8Qwd638+iAOkpaZKs0p0=;
-        b=TMzJogxTqIs+k1fl6gyVfu5sECZCnRWPy0k2pzDLAiZWrnrZP0OepUIsProAZNC26u
-         5ggnQX4Uvw87uxyZ8egE8O6IoLSZr5On8u/b4z0/oz+E4ArPgvIDGr7m9vhJUCePRym2
-         NY3QzEYEnCUQIf0RNnUm7fKLJxQ0qRtXMlpTSKenks0i4Y50iHrh2Uz9kpaHkxdS1rS9
-         54vxm7vppHAs4You4KW2S/b9uY26wQ2h8xYOA8n+k0qHEv39VAG62LstLZr8aoH9I9O1
-         frfnwerbNKNVBVV36pQtXBndOSc4Os5OGnOZpqeQso99C50rK2y67nvjgtikQK4bXSww
-         zH9Q==
-X-Gm-Message-State: AOJu0YzUlJVJjf1oaF6GoW03NohhLWVibbTJqfG4jg51TdoxOSvKqkPN
-	GuLyYtfs4K0h9zKjZpim6xx4Ho5eHlLLo47ZCuaf+5Kb6pSBNA1SAJGQnPuVDyWC
-X-Gm-Gg: AZuq6aKxQPK/M8nT60aWNpdMrsTlsTmH4u2T78dSyOs2mqETYX/T1piu3y/Swi+9gPH
-	OVPooADclBgcNMNTHT9Wbw1rrChWDmjlzj1p7ttqMNHRejxEm1ezjM5EiAHNKRnsV5St/HjaYZ2
-	zeieOwxLE6ZhIRtbZFY4iTs9htrtDLYiwVmTY5F5IhAqqKqCh8Nr0uiUdun/duc9F0fqGm/OtXC
-	+xUt0jsTGQZ3kMFCYTiaR7ZApn3Zjl6nD3LE51Y2bCem9uBs8Znk4NKd8j1hOIjotv4pYGTyy9l
-	slJrpYRdDkquaisUpRkrjLSgxL1mQoSs/MqOluAtZuFcgXbZmRuXZ7jTW4ey6cW35b0qXgVvEwp
-	7VgNTEhS6LbkbhreRhOJau3HtlxJvjB6n8nzsL3adKF1wlOkV3wK7rVEUNUZOZNh8nphNeY6PFP
-	BJi/JGKHrExWlgu0Ldc/M=
-X-Received: by 2002:a05:7022:1288:b0:11d:f44d:401d with SMTP id a92af1059eb24-124a007b8c8mr2927218c88.22.1769600097192;
-        Wed, 28 Jan 2026 03:34:57 -0800 (PST)
-Received: from [172.17.0.2] ([172.215.210.225])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a16cfa25sm2177550eec.5.2026.01.28.03.34.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 03:34:56 -0800 (PST)
-Message-ID: <6979f460.050a0220.2fc056.340a@mx.google.com>
-Date: Wed, 28 Jan 2026 03:34:56 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0781372397271753978=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="pLbfF6//"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1769601245;
+	bh=yYBoK23s7NVHXPErSKzxTgz1dfC/INCWCUkLU2t+q0I=;
+	h=From:To:Subject:Date:From;
+	b=pLbfF6//MGlSISsEfQomSwwefpCtkpqP84EhChomiDf/9CbSDEpoOFQUV039LQrFr
+	 WNJ6BWIYbOdcSAg5+vcD3bMw5INHt1Bh+DsmuZMgvVkt2Z8rVp87mAK2zwdL5Jyk7E
+	 ydtzImjZtlorPcLzSxtljKfrQ190abXVejKHz3WdZWwjd4T8hhAjAJFCdKpLb6RhVf
+	 p+8g+YhKvpjptQhO8BaR84hCqCKsu/j4qnS7GFCcJ95sznoXuBjUsX4MSG1pnrLmNf
+	 iQkFqIN9Ev1ERql6JcesVH9A3dA0j6/rss88F7zsKawGE8n6QVcdF/WE0A6YX7GtUT
+	 l8X5lpPz+pE9Q==
+Received: from fdanis-ThinkPad-X1.. (2a02-8428-Af44-1001-C806-A574-25Cc-A244.rev.sfr.net [IPv6:2a02:8428:af44:1001:c806:a574:25cc:a244])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8377B17E138B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 12:54:05 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] doc/qualification: Fix typos
+Date: Wed, 28 Jan 2026 12:53:59 +0100
+Message-ID: <20260128115359.222251-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
-Subject: RE: media: Fix G.722 @ 16 kHz codec ID value reported by transport
-In-Reply-To: <20260128103809.2679085-1-arkadiusz.bokowy@gmail.com>
-References: <20260128103809.2679085-1-arkadiusz.bokowy@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============0781372397271753978==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1047987
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.46 seconds
-GitLint                       PENDING   0.43 seconds
-BuildEll                      PASS      17.85 seconds
-BluezMake                     PASS      614.95 seconds
-MakeCheck                     PASS      18.22 seconds
-MakeDistcheck                 PASS      221.51 seconds
-CheckValgrind                 PASS      280.21 seconds
-CheckSmatch                   PASS      315.20 seconds
-bluezmakeextell               PASS      169.43 seconds
-IncrementalBuild              PENDING   0.40 seconds
-ScanBuild                     PASS      940.29 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+This fix the errors and warnings found during HTML generation.
 ---
-Regards,
-Linux Bluetooth
+ doc/qualification/avrcp-pics.rst |  2 +-
+ doc/qualification/gap-pics.rst   | 12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
+diff --git a/doc/qualification/avrcp-pics.rst b/doc/qualification/avrcp-pics.rst
+index ee7acd6f2..802ea3775 100644
+--- a/doc/qualification/avrcp-pics.rst
++++ b/doc/qualification/avrcp-pics.rst
+@@ -17,7 +17,7 @@ Prerequisite: AVRCP 1/1 "Controller"
+ +==================+==========+==============================================+
+ | TSPC_AVRCP_2b_4  |          | AVRCP v1.5 (C.1)                             |
+ +------------------+----------+----------------------------------------------+
+-| TSPC_AVRCP_2b_5  | x        | AVRCP v1.6	(C.1, C.2)                       |
++| TSPC_AVRCP_2b_5  | x        | AVRCP v1.6 (C.1, C.2)                        |
+ +------------------+----------+----------------------------------------------+
+ 
+ - C.1: Mandatory to support one and only one.
+diff --git a/doc/qualification/gap-pics.rst b/doc/qualification/gap-pics.rst
+index aef0b3cbd..f5b63a00a 100644
+--- a/doc/qualification/gap-pics.rst
++++ b/doc/qualification/gap-pics.rst
+@@ -1069,7 +1069,7 @@ AND NOT (SUM ICS 31/17 "Core v4.2" OR SUM ICS 31/18 "Core v4.2+HS" OR SUM ICS
+ +------------------+----------+----------------------------------------------+
+ | TSPC_GAP_27a_3   |          | Periodic Advertising Synchronization         |
+ |                  |          | Establishment procedure over an LE connection|
+-|                  |          |  with listening for periodic advertising     |
++|                  |          | with listening for periodic advertising      |
+ |                  |          | (C.3)                                        |
+ +------------------+----------+----------------------------------------------+
+ 
+@@ -1548,7 +1548,7 @@ Prerequisite: GAP 5/4 "Central (LE)" OR GAP 38/4 "Central (BR/EDR/LE)"
+   not defined.
+ 
+ BR/EDR/LE Capability Statement
+-=======================
++==============================
+ **Table 38: BR/EDR/LE Roles**
+ 
+ Prerequisite: GAP 0/3 "BR/EDR/LE"
+@@ -1568,7 +1568,7 @@ Prerequisite: GAP 0/3 "BR/EDR/LE"
+ - C.1: Mandatory to support at least one.
+ 
+ BR/EDR/LE Capability Statement
+-=======================
++==============================
+ **Table 41: Central BR/EDR/LE Security Aspects**
+ 
+ Prerequisite: GAP 38/4 "Central (BR/EDR/LE)"
+@@ -1587,7 +1587,7 @@ Prerequisite: GAP 38/4 "Central (BR/EDR/LE)"
+ - O: Optional
+ 
+ BR/EDR/LE Capability Statement
+-=======================
++==============================
+ **Table 44: Central Simultaneous BR/EDR and LE Transports**
+ 
+ Prerequisite: GAP 38/4 "Central (BR/EDR/LE)"
+@@ -1605,7 +1605,7 @@ Prerequisite: GAP 38/4 "Central (BR/EDR/LE)"
+ - O: Optional
+ 
+ BR/EDR/LE Capability Statement
+-=======================
++==============================
+ **Table 43: Peripheral BR/EDR/LE Security Aspects**
+ 
+ Prerequisite: GAP 38/3 "Peripheral (BR/EDR/LE)"
+@@ -1624,7 +1624,7 @@ Prerequisite: GAP 38/3 "Peripheral (BR/EDR/LE)"
+ - O: Optional
+ 
+ BR/EDR/LE Capability Statement
+-=======================
++==============================
+ **Table 45: Peripheral Simultaneous BR/EDR and LE Transports**
+ 
+ Prerequisite: GAP 38/3 "Peripheral (BR/EDR/LE)"
+-- 
+2.43.0
 
---===============0781372397271753978==--
