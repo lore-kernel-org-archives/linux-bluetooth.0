@@ -1,48 +1,60 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0F133C19C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 22:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520EF25782D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 22:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769637755; cv=none; b=lVEixd/b0eJjv7MByB3fLKCCCKZhH2nxBDmR97nfai7vH0x6TAbppZTerIaJ1VmwGAzcDLKBB9DxV0w3x9KnJA7F+KbiZ5IajNJ1Fkrh7dvJr9fQ4asxkiuA9wuJJ/PyMrVKpt8WLLKT5GWRUpmdsouqASIQf1MVPQC8wyfVZZw=
+	t=1769638554; cv=none; b=o6F2yAKKbhXf2X53xkZnL1GLNjGsnk62pVonV/424luB5psEV98o8HLi2sQq3Kdk3dYB9STLqpGHKEgpvyjCwPgnDvca+UXGVO5/K/vOOiGqVFRjVUjsSi7rKesTMOAiPCESFjX8Nyg/uxRn4a8FGEP0ID+VilZU01iY6gfOIQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769637755; c=relaxed/simple;
-	bh=BY/YhDEJV5hUIbH5FwParuVffs2G+wyaa2i86jONrow=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GkEdIcFU1S+Hz8N6+iSc7QF8tEErT0PdQPPSTLtkVGoOWWI4pAxMg9vQDwDg6mEUdKAsf1PUgWjwBon0xdhsMHFyNrm3d39qFN6VdGMrymQ1z5EMYAZteriPw2mheT1BdLM+V+/vjmiK9VjIUF4EmFCEtioCeR/1UkEWu4WrJA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=BidknyHW; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="BidknyHW"
-Received: from github.com (hubbernetes-node-e595e05.ash1-iad.github.net [10.56.162.35])
-	by smtp.github.com (Postfix) with ESMTPA id AEB4C921345
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 14:02:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1769637753;
-	bh=YLgaBhd1n8AW+nlpjHn2gY+bB8VFuBJLC1id6PrTRVU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=BidknyHWmvLlzfVCzHeqWTXV8Xkdbgz/IbTiv273z0bIFHYnl5BY0iRMT/jFuI0K7
-	 mxlxNH7EvhZBHYc2+CKkb3DxWzqulj8lR0YO1BozrN+VVTK7lAFbKer2iip7YwmXo1
-	 xUhtfSudTds+Lv4zNhN99zD0h8c8CwCmTQ0uAVYw=
-Date: Wed, 28 Jan 2026 14:02:33 -0800
-From: BluezTestBot <noreply@github.com>
+	s=arc-20240116; t=1769638554; c=relaxed/simple;
+	bh=Bpg0ki4o8s846ERbB60s1Xv+XqtP+3CFVio82a04zdY=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rzCzTVSe7Gfk7ezy0xb9hPuinfGblfNpkNi8AFpeUQUOO+8Ssab1Hn64nzTAShwSTWCdrcLeaCdMAYHy76wU/2NCGCStemvFM5dPeijmd2lg9IPve2AX4C7+og/ItDC7iop0zXToYXjpCzmKHMU20xGv0o2W8h7yTGqLA+6e0hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 13A0D44403
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 22:15:45 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1048215/969859-000000@github.com>
-Subject: [bluez/bluez]
+Subject: [PATCH BlueZ v7 05/16] tools: Install gatttool if deprecated tools are enabled
+Date: Wed, 28 Jan 2026 23:11:55 +0100
+Message-ID: <20260128221536.2319084-6-hadess@hadess.net>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260128221536.2319084-1-hadess@hadess.net>
+References: <20260128221536.2319084-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieeggeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeeiudejjedujeegheegleefjeehgfevteefffeitdefjeehuefhgfejueejtdekueenucffohhmrghinheprhgvughhrghtrdgtohhmpdguvggsihgrnhdrohhrghenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupedufeettdffgeeggedtfedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-State: clean
+X-GND-Score: 0
 
-  Branch: refs/heads/1048215
-  Home:   https://github.com/bluez/bluez
+Fixes:
+https://bugzilla.redhat.com/show_bug.cgi?id=1141909
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=720486
+---
+ tools/meson.build | 1 +
+ 1 file changed, 1 insertion(+)
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+diff --git a/tools/meson.build b/tools/meson.build
+index e945fcaed953..431082cba94a 100644
+--- a/tools/meson.build
++++ b/tools/meson.build
+@@ -216,6 +216,7 @@ if get_option('tools').enabled()
+     executable('gatttool',
+       sources: gatttool_sources,
+       dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, readline_dep ],
++      install: true
+     )
+     executable('hciattach',
+       sources: [
+-- 
+2.52.0
+
