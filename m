@@ -1,27 +1,26 @@
 Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AE230EF71
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 15:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E6930DD3A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 15:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769615771; cv=none; b=HxYrLc0Vm3AYu9Jn0y0P4PFPyJtkoX/VgV5MiGsp2mio8io7XJqEItKZAFTepv1Xuhk/XAPIvgIQDcJSOZLdjyjS/mm3Hd/9AeDglxFuARzGa8wdaGdKBEQjYjLx8729sWrGqApLN0YsRhAyHOEl0IbpHJcCrEW1bcJui4wrZTM=
+	t=1769615771; cv=none; b=JzFNuKvyYCkk8wjJmR+oOji7KLbHQ2tE263sK/EbvIKsHBgqkrzozfqAYXrxq2Lrw/kGo9A4QK76qBhWtM1t+XUR2neW7pLSn7akDHFyNMCcbCmCGIOb+3x6osD4cykAi5H0CZAy+CpwatE3257wCRSzj4/f7gK7um2OKGMgd2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769615771; c=relaxed/simple;
-	bh=hn9Xl2XOeHBPyx+rqTk65BM70aRnx2eHhjU9+IQfn7g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=otair9pgBX3iBlWooddPrrL3jSg+gfS7UgQ2fK4fQ9rs4vveRyIHY+/jM0iE6s6811KzeU2pq+RosAPPj4vwJFBLYnxinpQKQ1vw29YG41yu1DUu93tvJBxJQ6zSBhF+gzPOAdoqWL6LbxmeCAmOC3wA2byOTxBjBXPT+7PnIO0=
+	bh=p0IRn8yIfsmInYRtgdRa773pacgdPqREhHQ1OK1LhL0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rT76/T3th06f/8WPtm3D4GEBq8cev7K79OFJcIoMUTfrLLgLZ9k2NxBcogKDdEFWDFjlTQRa+9s4cI3wVaE7zBbSuvC9elpbqfI6mLOm5AgLpfPqTHfmHx7aWM6BUJzHcjQwBCVyGDJTtRht9hTmFzn2KjDS9pJX/WBRIORcRNg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 52CFA4432D;
-	Wed, 28 Jan 2026 15:56:02 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 820DD44014
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 15:56:00 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Paul Otto <potto@ieee.org>
-Subject: [PATCH BlueZ v6 20/20] doc: Add introduction to GATT
-Date: Wed, 28 Jan 2026 16:11:58 +0100
-Message-ID: <20260128155548.2025252-21-hadess@hadess.net>
+Subject: [PATCH BlueZ v6 15/20] build: Only build profiles if the daemon is built
+Date: Wed, 28 Jan 2026 16:11:53 +0100
+Message-ID: <20260128155548.2025252-16-hadess@hadess.net>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260128155548.2025252-1-hadess@hadess.net>
 References: <20260128155548.2025252-1-hadess@hadess.net>
@@ -33,169 +32,29 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieefjeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpedvveeiheefkeehheekkedttdejkedvledugeeukeehfedtfeekjeetgfdvfeeuhfenucffohhmrghinhepghhithhhuhgsrdgtohhmpdhsvghtthhinhhgshdrrhgvrggunecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemlegsvdelmegtugefieemieekfhgumegttdelfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemlegsvdelmegtugefieemieekfhgumegttdelfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugephedvvefhteeggeefvdffpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepvddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphhothhtohesihgvvggvr
- dhorhhg
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieefjeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeekteetgeettdehieduiedttdetffelleehtdejkeeluedvgfffvdevteetudfhkeenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeekvddtffffgeegtddugedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 X-GND-State: clean
 
-From: Paul Otto <potto@ieee.org>
-
-As originally written for the bluetoothctl gatt submenu at:
-https://github.com/potto216/bluez/blob/master/client/bluetoothctl-gatt.rst
-
-Closes: https://github.com/bluez/bluez/issues/747
 ---
- doc/gatt-intro.rst | 141 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 141 insertions(+)
- create mode 100644 doc/gatt-intro.rst
+ meson.build | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/doc/gatt-intro.rst b/doc/gatt-intro.rst
-new file mode 100644
-index 000000000000..271f9bac08ce
---- /dev/null
-+++ b/doc/gatt-intro.rst
-@@ -0,0 +1,141 @@
-+=========================================
-+Intro to GATT (Generic Attribute Profile)
-+=========================================
-+
-+The Generic Attribute Profile (GATT) defines how two connected Bluetooth
-+LE devices can share data using concepts called Services and Characteristics.
-+Data is orgnaized into a hierarchical structure of profiles, services, and
-+characteristics in the GATT database. The device containing the GATT database
-+is known as the server device and the device accessing the GATT database is
-+the client device. Only the database's services and characteristics are
-+documented here.
-+
-+BlueZ provides D-Bus interfaces for accessing GATT services and profiles which
-+are documented in the :doc:`D-Bus GATT APIs <dbus>` document.
-+
-+One-off usage and prototyping can also be done using the bluetoothctl
-+command-line utility.
-+
-+UUIDs
-+-----
-+
-+Services and characteristics are differentiated by Universally Unique
-+Identifiers (UUIDs). For GATT there are several formats of UUIDs: 128-bit,
-+32-bit, and 16-bit.
-+
-+128-bit UUIDs: Displayed in five groups of 32 hexadecimal digits separated
-+by hyphens (e.g., 123e4567-e89b-12d3-a456-426614174000). 128-bit UUIDs allow
-+for custom services and characteristics that do not conflict with those of
-+other vendors or standard profiles defined by the Bluetooth SIG.
-+
-+32-bit UUIDs: A subset of the 128-bit UUID, where only 32 bits are used to
-+represent the UUID. The UUID values fall within a certain range defined by
-+the Bluetooth specification. The 32-bit value is inserted into a base UUID
-+(UUUUUUUU-0000-1000-8000-00805F9B34FB) to form a full 128-bit UUID. The
-+UUUUUUUU in the base UUID is replaced by the 32-bit value. This format is
-+used within the Bluetooth protocol for standardized services and profiles.
-+
-+16-bit UUIDs: Similar to the 32-bit UUID, but more common. This is also
-+used for standardized services, characteristics, and descriptors defined by
-+the Bluetooth SIG. The 16-bit value is inserted into a base UUID
-+(0000UUUU-0000-1000-8000-00805F9B34FB) to form a full 128-bit UUID.
-+
-+Services and Characteristics
-+----------------------------
-+
-+Services: Collections of related data that together perform a specific
-+function or feature of the device. Each service is identified by a
-+UUID and contains Characteristics that define the actual data and behaviors
-+of the service.
-+
-+Characteristics: Pieces of data under a service, representing a specific
-+piece of information or a function of the device. Each characteristic can
-+have its own unique value, associated properties and access permissions that
-+define how it can be interacted with. These properties include read, write,
-+notify, indicate, and more. A Characteristic may include one or more
-+Descriptors that provide additional metadata or control specific aspects
-+of the Characteristic's behavior.
-+
-+Properties
-+----------
-+
-+Read Property: Allows a connected device to read the value of a characteristic.
-+Information meant to be consumed but not altered by the client device, such
-+as the device's battery level or sensor readings. Characteristics marked with
-+the read property are essentially broadcasting their data to be accessed by
-+other devices, ensuring that the information can be consumed without
-+being modified.
-+
-+Write Property: Enables a connected device to change the value of a
-+characteristic. An example of when a client device needs to alter data on the
-+server device is a Bluetooth controlled light bulb, where the characteristic
-+controlling the color or brightness of the light would have the write property,
-+allowing external devices to modify these settings.
-+
-+Read/Write Property: Characteristics can also be configured to support both
-+read and write properties simultaneously. This dual capability is useful for
-+characteristics that hold information which not only needs to be displayed to
-+external devices but also can be updated by them. For example, a Bluetooth
-+thermostat may have a characteristic with read/write properties for the target
-+temperature, enabling devices to both monitor the current setting and adjust
-+it as needed.
-+
-+Notifications and Indications
-+-----------------------------
-+
-+In addition to read and write properties,
-+Bluetooth characteristics can also be configured to notify or indicate to
-+connected devices when their value has changed. This is particularly useful
-+for dynamic data that changes over time, such as sensor measurements or
-+device status updates.
-+
-+Notifications: When a characteristic's notify property is enabled, it can
-+send an update to connected devices whenever its value changes. This allows
-+for real-time data streaming without the client having to continuously read
-+the characteristic's value. Notifications are unacknowledged, meaning the
-+sender does not receive confirmation that the message has been
-+received successfully.
-+
-+Indications: Similar to notifications, indications inform connected devices
-+about changes in a characteristic's value. The key difference is that
-+indications are acknowledged; the receiver sends back a confirmation to the
-+sender upon successfully receiving the update. This ensures reliable delivery
-+of important data changes but at the cost of higher power consumption and
-+potentially lower throughput due to the additional confirmation step.
-+
-+Organization of a GATT database The Bluetooth GATT database is a structured
-+collection of values that are used to share information between two Bluetooth
-+Low Energy (LE) devices. The GATT database is organized as a hierarchical
-+structure composed of Services, Characteristics, and Descriptors. The two LE
-+devices share the database information through read, writes, and subscription
-+to notifications or indications of data values. The two LE devices perform
-+this sharing by referencing 16-bit indexes known as "handles" which are
-+numerical identifiers for each element in the GATT database. This avoids
-+the need to use the UUIDs to reference the elements in the database.
-+
-+Service: A GATT database service is a collection of related functionalities
-+that a device offers. It groups together one or more Characteristics that are
-+logically related to perform a specific function or feature of the server
-+device. Each service is identified by a UUID and contains Characteristics
-+that define the actual data and behaviors of the service.
-+
-+Characteristic: Each characteristic can have its own unique value, associated
-+properties, and access permissions that define how it can be interacted with.
-+These properties include read, write, notify, indicate, and more. A
-+Characteristic may include one or more Descriptors that provide additional
-+metadata or control specific aspects of the Characteristic's behavior.
-+
-+Descriptors: A descriptor is an optional attribute that describes or controls
-+certain aspects of a Characteristic's behavior. They provide additional context
-+or metadata about a Characteristic. Some common types of Descriptors include the
-+Characteristic User Description (provides human-readable description), the
-+Characteristic Presentation Format (defines the format of the Characteristic
-+value), and the Client Characteristic Configuration (used to enable or
-+disable notifications or indications for a Characteristic).
-+
-+Handles: Every element in the GATT database (Service, Characteristic,
-+Descriptor) is assigned a unique handle. Handles are 16-bit numerical
-+identifiers that are used to reference these elements in GATT operations.
-+The handles are used to avoid the need to use the UUIDs to reference the
-+elements in the database.
-+
+diff --git a/meson.build b/meson.build
+index f2220b2c4613..ab21fd80e76e 100644
+--- a/meson.build
++++ b/meson.build
+@@ -251,7 +251,9 @@ subdir('gdbus')
+ subdir('attrib')
+ subdir('btio')
+ subdir('plugins')
+-subdir('profiles')
++if get_option('daemon').enabled()
++  subdir('profiles')
++endif
+ subdir('src')
+ subdir('client')
+ if get_option('monitor').enabled()
 -- 
 2.52.0
 
