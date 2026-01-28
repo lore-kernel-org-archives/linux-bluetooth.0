@@ -1,164 +1,133 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354B9333434
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 17:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E71343207
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 18:26:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769621311; cv=pass; b=jO9PbS/XMB1CdecGKhZo+dW3m9UefykNpE5fYNwp/mUT8SosJ6WSzdmeGAzuO0hmFanfTAza8dJR4LMpXKN6t/UnkxYz+fhcCTEKC0n8aqZjgN+COFt0J9xlkfDfwOy4jhEYDhVwVzmbb/HJVHF/BVsPqzE7nkEvRib66Y+3njY=
+	t=1769624796; cv=pass; b=Rong+9Hye6wSo4WUsvVNgWBOGlqjUBcvvJQXGnWCsq9FP9HBJJCA7UuiFfmZ+BDJRY06VQ6d3lYXtil+VLSWQso587sJT6jzfdj3WBQP5heO/vZwR/wvgvkEn5233lpGlAB5lXIzuY3KEQLD3aA+PX/KcmOzZ4Mwe6YwRq+wcuI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769621311; c=relaxed/simple;
-	bh=sReP2lw8NpDv1Ji0G1OSF9hyOIgG8wk2RcN32VGoNCQ=;
+	s=arc-20240116; t=1769624796; c=relaxed/simple;
+	bh=EbWCtaTF/5ETZm6xKPyTEaBpW0sSQaeXXNcjHzOajdE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A+7PPB3L3nZpUcEWks7dCB04+aYgUyCSODfzA9Xqi6vdnmaInOYIzJ/9MUKEdnXhYnBkCyEbEvrmZ0Uhv6GJ+YjCBmKN6BgLVjYjhpqiW9dM8OuhCybT4aOZKv43H5/6bWrSx6rZvD88XAUfb1ZXa/hdLNSn1bePKxOSnwzsZZY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EUe51Tb5; arc=pass smtp.client-ip=209.85.128.176
+	 To:Cc:Content-Type; b=qID2yD+J3nNxLlkP1BI7d8uiSxBF3xp9CJZF2NxEuMOLwvSipSzD/WMynMZFCsVBHrSCQLRSjNcAnz0aY65k1+CuZu3V7jdJolYCtH92uLb3nCAErUDT2KDe/n5dTWx8hVnM6CWH28SENdKzV4brZ+ajvFXNzaxWs4QI0CER3Nc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RDLFklQA; arc=pass smtp.client-ip=74.125.224.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUe51Tb5"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-79472374371so622057b3.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 09:28:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769621309; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RDLFklQA"
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-6446c924f9eso94164d50.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 10:26:34 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769624794; cv=none;
         d=google.com; s=arc-20240605;
-        b=VTR4vZDdeUODtjoXxemFjHkREgDqPEehS38RxGD9IteGASkBakAHJplapK0prCVaW/
-         O2WvYo2iugoxsQgqz/QBKuOgjrq9AsB86m3Cj2r1zm0elLVOjhLH/ZQyDV5otipYL0im
-         jWHP6t1XZ+dzUXzqJ3eyMxQ668wA1f05F5o7qexQoy1poax3th3df7c/z52jUtqnZvrE
-         ILhIhf3oLUIQBm8zIDL3MNyyI291m3ja9JJQhrUtD/tffo0h2U4QeiSS20acRcaf6AMm
-         +8lJbAnTU9O2F+F/hWXlFX5OYQ4oNksOMQLvtwh77bB1CsRyYrzV89S0qENfj6CchvCP
-         Nn0A==
+        b=HIPgzokirAdxaaE7nZR8RbZaKKP6PL8ZWVcPTEBlNqN5os6P6/s7dSMXJJJQSM9QCy
+         xQ7MGs9uP3+ikUEmiIPR9ysWLqgJl/YyRKz18G5wfH4unmf8cWm0HKTYkMfYgBXO2aBB
+         lf6V4CCPnsAC7myTyz7ua37zWp8lCg8wTC0YQDu+WYdicHx/yoLtHg05JgIS7jIw3WxV
+         breJl1ZiWURPM6wJ0ngUIvzzC93bTAoaDhKL/p3nxNR1oCyjnfpTzV/Y5toHmYu3kInP
+         RZIJd/WOGEOpmH9zXQE+yc2/ZUC5u9GXaTvUwuU1jlHzEmMWXZhDkHGkQ3lwok0CqEh3
+         HKmQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=G42JRVu3qsiA3fB7Z6xOAFyMzMqgtqYneFh2pi5QCC8=;
-        fh=bocf+UmptUO3P+wkoLclDfAaavtXZ8jWTx/jckueLA0=;
-        b=kLUfcs1xx5QsdT9FZ2rGF+6GlRVdyMCWozAyGxXJv9zlpJZoFh2qCfI3ZIsYK34vey
-         8itPNogQybEA76hKBi2mOH0htYM7pNdXV0iMjluYvfxiSn3w6DcP7dPJbPFLt1i+j8XZ
-         a0bUu6vhbgSqOPCy72wVJmuygiVxRjxrejya6PdOkKS5/ZQbuhFRYQY/RJ22Rgzw+C9c
-         NXUiPygYfjUBFLFYyng/LSgAD6cF4ZtqEZQt2D1b9iOq0uG5zvschGqP9Q0lAiV31EQZ
-         69kNZiuNgVHxyO+kGf767ul2krzajsaFF2jX/W00ezT6h/mPigkFABruxzs3hizdKSGR
-         loLA==;
+        bh=Bv9//WLlhd7ScuP1V2RDzRmJCiZS+8brU7BdsRLdhdI=;
+        fh=DBIRJP4DvnAE+M31BcQ50XI3CAn/idN52/MNTtsfw9E=;
+        b=eWfgAfFCjVT6It5y07oVIExcrchs2WAiykzO4Z3vMQc8iF0rrCRY+INRz8IcqZFJFM
+         mg0cljh3oLf2OILv/0jy3SvKb1DRq2Coot+geF1cI6hN7pE1eZ9uKLtY8VTfkByZz4HQ
+         QAEyM+fMe1GiTQxadZBZVRcFIEyssvtCEFXNZcJCouQYgdEJyA+pk0Q35lrX84FbV8ou
+         g1NAtSWixRzyFqV6g42eNZonIGLxz68M51q6sjz91HrdSzws7I1GB/mf0Tp+OHZaEjeG
+         EIvjT8iBXWAWXWRPyxqD4YX1XrOCaVCi1/ntzh8OWLN0AY1QIAvC0oM/zYq5OFwUkUXx
+         8zXg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769621309; x=1770226109; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769624794; x=1770229594; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=G42JRVu3qsiA3fB7Z6xOAFyMzMqgtqYneFh2pi5QCC8=;
-        b=EUe51Tb5kxqu4y58t9teMC2rO/UxpH6lXmAihD4jNXvPKnQkaztDDgf8qECrx32WR0
-         +Tj0s4ZOIB9IFBNaArX5+RGnisHQxGMwu3Ve8ykDg+18QYYXANFBG+dpp+dMUQtsTqMx
-         fy2A+cgFq5rmZ1Z+uGM4zmhC5e63UI5fAFTqHhrGNfS1baUHbxcmUp3u7+kaNy9OuPT6
-         JpAHmMV2+FmfUmkTtCwcQlk9Ne4spIY7ChDfnBTbJaK4Cj7NAXrCo2df/vga7t2B5GcE
-         MHWd5vu1jwga9MirCS39vXELekqVtYXI5Xq9AfI8mavS1IFcBddBclYgxl6jqsukmYrs
-         bx5Q==
+        bh=Bv9//WLlhd7ScuP1V2RDzRmJCiZS+8brU7BdsRLdhdI=;
+        b=RDLFklQAZhRLT99Z+6UrcqlM8/FC5rJK3MOd7fU/Hg4dcvUEDqjtPZeqcVE0T/L569
+         xreiyTYVXSSDzVI6u3m0KTVFSSBC+3N6IxSeu5S3BP1cbPPOvK2wDsbZx3mE0sUEXMbg
+         MkPsqT5dqiSpm7JYwiLMnuQ8IUj0CVCwz8moSW7l+D4C1N7Uhuljj57QquilSslCWgZo
+         B+Uoj2FFOuokZoSRJ4d7EB5lsaowmjAR1aRVzGJyi0NZ19K2UBDLMKFTw5rpeF7L9YnO
+         KgwqbX8Zfq/+B6g0V/vsjy2C9TUpiSYbxd/tczy26eQ531ss5x7TANvVqhRWUSU4kYx2
+         2JkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769621309; x=1770226109;
+        d=1e100.net; s=20230601; t=1769624794; x=1770229594;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=G42JRVu3qsiA3fB7Z6xOAFyMzMqgtqYneFh2pi5QCC8=;
-        b=g9lK5J6vb3BObpzWV4Fi1ocXVnykQvCmLrhoy1lzrpEzU07pPkX2jQ2/v0lMrHitgD
-         UpWG9jjGG9+Cu8QYKTGegwMoWJ3gDajqh7033Vei53RniP72MnYAOJiRN3mVWTLqE15C
-         4Xp/JkHFUpvd8fNBR5GWX0+R8g1QWQFgUIUe5KSGngBQKhxUb+sFrHq5lyrL+KRKtF08
-         LMVG3lB0XcAOVkrD2V2bC7+Qq8NvAfBjL51uFfdG8Mz0xQzr4wtwAqC6rHAYGeBbyDb7
-         LhwfpFDf29L1cyDIU+9CJN0CgsmRseElxUQXzOms3wyDfpvxDVtnXqd0kVt8IP88KOwd
-         gP5A==
-X-Gm-Message-State: AOJu0YwfG9OPXBZw/gv0x+PfjhOL6O3SeXOe/wK6Ip1SUzfPvRgVym8R
-	sZAvlFXSv1KeYnIGSUv6Kjlm+77axAytp5XdJ607hsTAV0kQyclRaYY9lG3t8QawB73OAb554UC
-	H54v6iuRTlxY3XPQtaUgR5Dh+m141RfdKsbzp
-X-Gm-Gg: AZuq6aJF0uLNCHyPTn9iVpw42TnTeweo7hKDDSTWRIg2Y0dSuj9GS9Os/mY7pM1ofAv
-	GcXHppLj2trFPbBYAxSK8b32vdYs8Sh0cyam8gJbgRbJIHYAxqdqHZh3jXJ3ubXzFNijln/SlhY
-	iKol2n2qTqVUi7L2lR4DO5lIFzaTrj+zZU9rNFuisGPpPhv4vZxeM4RBJ4RuvbTwBJNsFks2tre
-	M/SOvxSkuWF2Fl5C4H9jpi4KLdArxlM7Q+2WbperHK7nNd7vFulnM5STiIcXrTz3YTw6GfYwuwt
-	Xv+IbzpDvwC37ZBelglC9H2uEJQlJRdfdAcCHheK1r4rqv5J7+M0OLqj6w==
-X-Received: by 2002:a05:690c:829:b0:793:a2fa:b97b with SMTP id
- 00721157ae682-7947a8b0af8mr36286237b3.0.1769621309076; Wed, 28 Jan 2026
- 09:28:29 -0800 (PST)
+        bh=Bv9//WLlhd7ScuP1V2RDzRmJCiZS+8brU7BdsRLdhdI=;
+        b=bfGay1oKThJW/U6Fnj7lTXxW2LJEhK0smJa2t7Q+6oqb6Gr4Rk99NcRivAkn9AH96O
+         u3EVpxhoUUMXAU5OKAqrIbHjrb6zI6HE3zMNHmA+2oJxoNFIe6FXQm5tFbwgJCbdpg5E
+         4Bk0DhS3hadCl6NI2RaqcUT/OZ+gb2zYiW+bqfq6oJmQSSJ18500bWkZ+ifTYiY674iu
+         DJZjrW9SJxIHfMmDN25XmvK/CKWYrC976A+aLFF7b4Rwul8ELO6mYG+ck7ZVzR/fC2Uj
+         Jczh94N462QpwN21iIuFsTC1jpCtmjAu3701LXQh2xJXFvBnicaxwZ/VS1Zds/gElHQT
+         LO4A==
+X-Gm-Message-State: AOJu0Yy/JK4pGVBQ2ZK9UcoPM9vbZ1/+2qNQ3LRjmxnHMvqHNBnAJSW4
+	dmSyvq+3u0HJeKrIFB8lleTnNCNFUZTqxH9l+Aygs6D9M+9J1BWztu5Xu4ZmXi+HpTgKr4QGQ8e
+	LQctSHEdt/r6mHfXdfQZZfdfKW5x6Ol7OHA==
+X-Gm-Gg: AZuq6aL4NYJY1Hm6W/VCkeIKfIu44v6qB4SjLvoe6t+MsLUsj377tpLVsFrEasHXK8r
+	tlRRSWQT9Q+wwYiqJCjG49LMAD0kidvq8/LM6FwzbYpwKwv2c3CbEA5vvBwWJhj0EXfd6XqZu9S
+	TsXpEN8gySmVhw7C78b2E9IZglE6eaBBcefma3OzpXPFUak6gDHryANBhCA76SpyJ1bz188Bmo6
+	0RnUQs1Bp9A+FNZ5q5e14DX9vO421Vk9PtlIBJ9YDBFaQj+MiIBlxmc9eagMSOICIu7JnTwzAOW
+	E5I5byLbJcCECVNN2X6vzBHRfwSwpLqXGSMfNTiXcLK90QdYl0G28iizwg==
+X-Received: by 2002:a05:690c:6d8b:b0:792:7745:72d3 with SMTP id
+ 00721157ae682-7947ac5d6bemr48906907b3.70.1769624793759; Wed, 28 Jan 2026
+ 10:26:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260128153905.163137-1-trivin2024@gmail.com>
-In-Reply-To: <20260128153905.163137-1-trivin2024@gmail.com>
+References: <20260128155548.2025252-1-hadess@hadess.net> <20260128155548.2025252-11-hadess@hadess.net>
+In-Reply-To: <20260128155548.2025252-11-hadess@hadess.net>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 28 Jan 2026 12:28:17 -0500
-X-Gm-Features: AZwV_QgvOgeht9U1NontFf8rUJ5zZPURLjgwyFppMAEF-DuxLKiF_aRqtRvnOYU
-Message-ID: <CABBYNZKDvgSJYTAyaco6ZVz-HHZUoFz22ZSwDHsfoMD0BZK2dw@mail.gmail.com>
-Subject: Re: [PATCH] tools/sdptool: report error when local SDP server is not found
-To: Magdalena Trivina Sihotang <trivin2024@gmail.com>
+Date: Wed, 28 Jan 2026 13:26:21 -0500
+X-Gm-Features: AZwV_QjY1GfLoE-C0I1MoxKxuxmxb5FO5eXhGEQGpv2W-r4sin395bEIQKo_aoY
+Message-ID: <CABBYNZLzbZMfjW1RNOs8yiFdthPXgMukprbS2LO9EMAA+YbLXw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v6 10/20] tools: Install btmgmt along with other tools
+To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Magdalena,
+Hi Bastien,
 
-On Wed, Jan 28, 2026 at 11:18=E2=80=AFAM Magdalena Trivina Sihotang
-<trivin2024@gmail.com> wrote:
+On Wed, Jan 28, 2026 at 11:50=E2=80=AFAM Bastien Nocera <hadess@hadess.net>=
+ wrote:
 >
-> From: Magdalena Trivina <trivin2024@gmail.com>
->
-> Currently, the sdptool add, setattr and setseq commands do not
-> report any error when the local SDP server is unavailable.
->
-> Add an explicit error message so users can distinguish between
-> successful execution and failure due to a missing local server.
->
-> Signed-off-by: Magdalena Trivina Sihotang <trivin2024@gmail.com>
+> btmgmt is not installed by default, but it is useful for debugging
+> some issues and to set the MAC address on HCIs which don't have their
+> MAC address configured.
 > ---
->  tools/sdptool.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
+>  tools/meson.build | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> diff --git a/tools/sdptool.c b/tools/sdptool.c
-> index 4e95a18d0..4f4dd41ac 100644
-> --- a/tools/sdptool.c
-> +++ b/tools/sdptool.c
-> @@ -871,8 +871,10 @@ static int cmd_setattr(int argc, char **argv)
->
->         /* Do it */
->         sess =3D sdp_connect(BDADDR_ANY, BDADDR_LOCAL, 0);
-> -       if (!sess)
-> +       if (!sess) {
-> +               printf("No local SDP server!\n");
->                 return -1;
-> +       }
->
->         status =3D set_attrib(sess, handle, attrib, argv[2]);
->         sdp_close(sess);
-> @@ -1033,8 +1035,10 @@ static int cmd_setseq(int argc, char **argv)
->
->         /* Do it */
->         sess =3D sdp_connect(BDADDR_ANY, BDADDR_LOCAL, 0);
-> -       if (!sess)
-> +       if (!sess) {
-> +               printf("No local SDP server!\n");
->                 return -1;
-> +       }
->
->         status =3D set_attribseq(sess, handle, attrib, argc, argv);
->         sdp_close(sess);
-> @@ -3692,8 +3696,10 @@ static int add_service(bdaddr_t *bdaddr, svc_info_=
-t *si)
->                 return -1;
->
->         sess =3D sdp_connect(&interface, BDADDR_LOCAL, SDP_RETRY_IF_BUSY)=
-;
-> -       if (!sess)
-> +       if (!sess) {
-> +               printf("No local SDP server!\n");
->                 return -1;
-> +       }
->
->         for (i =3D 0; service[i].name; i++)
->                 if (!strcasecmp(service[i].name, si->name)) {
+> diff --git a/tools/meson.build b/tools/meson.build
+> index 63ae1363972e..40215df691b7 100644
+> --- a/tools/meson.build
+> +++ b/tools/meson.build
+> @@ -160,7 +160,8 @@ if get_option('tools').enabled()
+>    if readline_dep.found()
+>      executable('btmgmt',
+>        sources: [ 'btmgmt.c', '../src/uuid-helper.c', '../client/display.=
+c', '../client/mgmt.c' ],
+> -      dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep,=
+ readline_dep ]
+> +      dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep,=
+ readline_dep ],
+> +      install: true
+>      )
+>      executable('obex-client-tool',
+>        sources: [ 'obex-client-tool.c', gobex_sources, btio_sources ],
 > --
-> 2.34.1
+> 2.52.0
+>
 
-Tools such as sdptool shall be considered deprecated, if you want to
-add records please use:
+Bluetoothctl support mgmt menu nowdays, the code behind it is the same
+as btmgmt.
 
-https://github.com/bluez/bluez/blob/master/doc/org.bluez.ProfileManager.rst
 
 --=20
 Luiz Augusto von Dentz
