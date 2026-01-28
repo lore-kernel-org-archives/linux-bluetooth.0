@@ -1,95 +1,52 @@
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com [209.85.160.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DD6343D64
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 22:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7AC33E37A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 22:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769639915; cv=none; b=Rt9EVCuBeZGP+F4Tv3Zigbul0PO+HcJxANKcIbUgtTqmJLp4ufuUB0QS3TS8oJY39jSPDw3cGQMAQs675sQNRFUmVP9yiHQyF4VTwcwbjPW36tTm4xRnrjzecB+P6YrgRkUNbr4w1NS4AuLyg9sMYW/pFMulNjZ9whMBGC4bIgU=
+	t=1769641089; cv=none; b=rya7A20Gms2WpmSm5arTfm7AOYpp3ZrbrAe/rk8GI6BFcFT7Z3povciOw5Tno+FBkw0jaOjlARYPoH97xUzMX5IH0CsVZMBnv9NSIfNEmFqezzpnoygMPTZXfrvdlXKdrg1ncHAENxA/xrajv+EzPAeZGHac1/cwhtSIWlPYc+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769639915; c=relaxed/simple;
-	bh=zXNWvIjs4F6YqMULk2tJeDRU9S2IuJD2liZZibV1TkI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fWvtcNFBmW5mx7JbhKlHs5aBGLXBefwZUIHTVmIyCQSx5ghTLTq4+t1lKle8Zkmm9+h2vCt+PT5swCoMyBHNzShS9cED1VgY6YzgSzCX9HWUps8ltNcELD67x2gANnilm/FGb2/zPV7hrxg50MUYp6MYQ1BFzwQwkHQZNCa+mww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-404332162d9so1284353fac.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 14:38:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769639912; x=1770244712;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yycyJvje41UjYay12DlpUJ1KoA4ywrwBoBvXPu+kvYg=;
-        b=w27Ji6xbXNBypS4pCfa+YMZM++l76/o+xCQlAIed4IXq9TC7trrsG7LcZRgJjzGPxV
-         i1Od6AZrJvcCWsAVDijppMbq0TuQ0ENBABFO9PEXos6rpYihY33BThOnS65ecnU9A5QT
-         VUp67bHGLgurDJZ73PdBxAvD0ao9ozuBNfbyHJj3Ha6ZKeVQF+tjFtjJJDGuRumTdg33
-         jwXBIHZcsEDMNwAef7NqU8C7JhqflGtL8YVU+7vPfnh4gTObPu2oLlxc+9thiWtEarsN
-         jhjkmY/46MVLfi0FiZgWShr1T33KdFmRSUEAT9p+ZpaOz3IsCecV3a33GBVyK4pvRMCe
-         vK7g==
-X-Gm-Message-State: AOJu0YwxRVpxs4aw8INcrcQBnVoiBQYFXAEQfE6PDclSrNLE3yUkCAdy
-	oZEJusU/xKQadVcd76vONi2V/uAg2VL7hoIBf5SrgAz30Gn+4qzLjwD3QOBVJuQWGBtRkGFFJBc
-	klcQ+otAMaFmQAboA7dajfnvWRwIkAPN3QohkqWEcFu3KeH2ACXIgCsbMkPY=
+	s=arc-20240116; t=1769641089; c=relaxed/simple;
+	bh=8tQDN7OnssdhWV5VueG4126AqmDU5gfkRVMSoeW8T6E=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qfK7OnbNbjPhNUO+bdDfzQ1YBwZUCdp2inhTlNIOhC+nq6NAisNJpfwFUVLGWSEpPWOH1K1xDrp9jPTg4tEEvK0NocA9Xu2FfzsuFGzCRkcs+rhhFHdN7yLL/DWkFks0+OgIhZJyu3vGNcUrkvk50kJSjK+HIDvTcvf756dZdDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C7F9541C06;
+	Wed, 28 Jan 2026 22:58:05 +0000 (UTC)
+Message-ID: <a19a6b2cc4b6639171f9c0588b2efdd99101259f.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v1 2/2] build: Remove health profiles support
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Date: Wed, 28 Jan 2026 23:58:05 +0100
+In-Reply-To: <20260128183454.545066-2-luiz.dentz@gmail.com>
+References: <20260128183454.545066-1-luiz.dentz@gmail.com>
+	 <20260128183454.545066-2-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1c8b:b0:659:9a49:9047 with SMTP id
- 006d021491bc7-662f20342d1mr3911938eaf.18.1769639912346; Wed, 28 Jan 2026
- 14:38:32 -0800 (PST)
-Date: Wed, 28 Jan 2026 14:38:32 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <697a8fe8.a70a0220.9914.000a.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (Jan 2026)
-From: syzbot <syzbot+listcdce069f94e74912c477@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieegheekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfffjghftgfgfgggsehtsgertddtreejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeevuedtleduteehfefhleeuhfffgfelvdejtdeifedvgffhtdetffelfedvhefhhfenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeevjefhleehgeduvedtiedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheplhhuihiiuggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvg
+ hgvrhdrkhgvrhhnvghlrdhorhhg
 
-Hello bluetooth maintainers/developers,
+T24gV2VkLCAyMDI2LTAxLTI4IGF0IDEzOjM0IC0wNTAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
+IHdyb3RlOgo+IEZyb206IEx1aXogQXVndXN0byB2b24gRGVudHogPGx1aXoudm9uLmRlbnR6QGlu
+dGVsLmNvbT4KPiAKPiBIZWFsdGggcGx1Z2luIGhhc24ndCBzZWVuIGFueSB1cGRhdGVzIGluIGRl
+Y2FkZXMgYW5kIG1vc3Qgb2YgdGhlCj4gaW5kdXN0cnkKPiBoYXMgcHJvYmFibHkgbW92ZSBvbiB0
+byBMRSBhbmQgR0FUVC4KPiAtLS0KPiDCoC5naXRpZ25vcmXCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgIDEgLQo+IMKgTWFrZWZpbGUuYW3CoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoCAyIC0KClRoZXJlJ3Mgc3RpbGwgLS1lbmFi
+bGUtaGVhbHRoIGluIHRoZSBBTV9ESVNUQ0hFQ0tfQ09ORklHVVJFX0ZMQUdTIGluCk1ha2VmaWxl
+LmFtCgpDaGVlcnMK
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
-
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 43 issues are still open and 96 have already been fixed.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  45919   Yes   KASAN: slab-use-after-free Read in l2cap_unregister_user
-                   https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
-<2>  8086    Yes   WARNING in call_timer_fn
-                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<3>  7211    Yes   WARNING in hci_conn_timeout (2)
-                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
-<4>  4192    Yes   general protection fault in lock_sock_nested
-                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
-<5>  3504    Yes   general protection fault in h5_recv
-                   https://syzkaller.appspot.com/bug?extid=b5691bb559396b262064
-<6>  827     No    KASAN: vmalloc-out-of-bounds Read in kcov_remote_start
-                   https://syzkaller.appspot.com/bug?extid=8a173e13208949931dc7
-<7>  770     Yes   KASAN: slab-use-after-free Write in hci_conn_drop (3)
-                   https://syzkaller.appspot.com/bug?extid=3609b9b48e68e1fe47fd
-<8>  502     Yes   possible deadlock in l2cap_conn_del
-                   https://syzkaller.appspot.com/bug?extid=b71bb48c13bf3fed3692
-<9>  494     Yes   KASAN: slab-use-after-free Write in le_read_features_complete
-                   https://syzkaller.appspot.com/bug?extid=87badbb9094e008e0685
-<10> 452     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
-                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
