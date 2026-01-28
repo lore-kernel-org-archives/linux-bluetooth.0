@@ -1,68 +1,72 @@
 Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332D225A2B4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 18:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA422D97AA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 18:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769625307; cv=none; b=l8jATLIX/xM69XtnO4eCFBOxUGIxB8zA5KyRNLpXGoN2knko/ZF8hLPltM+9d5zPoA4tU0frtuvxFWPqn4RiPb0z2bCdg4/9ik8NZXkmYq3ZpIPoYbYTElm3wjQ7qboTQYc/dQLtVx5eqpmmWnEX33XBSx4rwDEqdJ4XXc/LNsc=
+	t=1769625314; cv=none; b=PYUSALMLLsx7mfQ77IVFSHO6FEEvVZOwfne4xEjIU6DCE1umEh7nwRi5zt49ofoYolyLGNBDpVDidPEY9+C5RpC5zWzdLUslp10l27kcYEWn9+R5LJSCCGqF0fJ2PmuklCH6NmPlk4IjmpWNelswDaWJrOkj1UAwHzfRW+UDt6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769625307; c=relaxed/simple;
-	bh=ilpL9W6zakslhiXI9T0IFPIwJR9dkl/cxGS3v7544cw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=OrgNi6EURELkwoTUQFRi/N6kLTEAnQSsai4++ME/pc5wVFC5UUKpEHkIQi6/REqiPVDXIrH5odAy/0LZpy54mbdy2SM1S20SC1Ed9h2y26zq0yHrMS9OiEy23RZ44tJTEwSXyG1GWebcF7ZbwbzNjbTCnLahx6RzRYWiEM8Pgbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EEcyyBQ7; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1769625314; c=relaxed/simple;
+	bh=o7pUAaqV3SvBdfV+quwjJwi6Bvio+07w7QJ3i1TZZ+E=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kWlHqf8Cv+j29ccwffWyKzrBGmtwJKWM6DT657oXC87Ezy4klMBagAJE8gdXR2umysFTv+CIuB9RCMbt6rJdn0avrvaQuSRGN1pvYQlh9CxvkOnoBOvUmZTWXAyTmuQrI5j6Z35uooQmwYNrbg5z/5Xt8omuwuQHpOoHbXPS+wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cbAiS7pz; arc=none smtp.client-ip=209.85.128.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EEcyyBQ7"
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-79478ec4cf1so1394457b3.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 10:35:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cbAiS7pz"
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7942fca0da6so1161497b3.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 10:35:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769625302; x=1770230102; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O3CjXXV2cBDY5DQBa+Q58nRT9RtoZa2yfc0ey+Dskuc=;
-        b=EEcyyBQ7IFQLi2DxJuSkeF8/+021SvkH7dZs8CxJrgcRqQHN3Eg6toiudqwwomOw7Q
-         UHnR8v+3XUSya4/tzpzf/wUu5OE49dTPEC/VmB4IoHl3eP4J3AZmx57SjyOx0CdjK9eJ
-         zDFh1+zTq2bavpk9/ce69oEiWzcSurLmy7rklxACxViuAhmNPjH1WQqFHy5mQqC/1Ceq
-         GzAjsRaEdnknOedNF5iotZOTX+eXf6IPCK790LjA6ia6EGfcY5BiiP9mlILhv2HzCcep
-         wNwwIrn57DL6SfuUEHz8Qic5aaWeSnvXn39BfeH3hu2babT15n9WvU8gCXkjT4vZ8aEt
-         2+TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769625302; x=1770230102;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1769625305; x=1770230105; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=O3CjXXV2cBDY5DQBa+Q58nRT9RtoZa2yfc0ey+Dskuc=;
-        b=HZz2imlT6ZMach8eBpZlAOshsMCcoAM866XrOFYinCRbdNA4pw5j4abrxS2gDmcjk1
-         XPkfhKaGfzvmnAr2F54qlMxkI3BaKCvfqmSOtz2CK5uX3XgQCYDpcQFMFe/T6Gz77qMd
-         Ztx8FCfW2vQOY80hGRMZns6p5QGOzlF7WJFxfLbOKVmmVEgmGTTpk5H64TyTKoDdovZb
-         fe0LQi9faDCuu1xim9g3BbXaRaOpHE8V1xjd27Js+kpdyOlyyIY0wD0NqDGMKYkSpRr5
-         KIDmRiv/GN8pPQomjGlmAqctzvqgGc5IJ59BWHmGC6Hm0qUPV3esBSwgAOgssKCseqqA
-         fSKQ==
-X-Gm-Message-State: AOJu0YxVVb4sZX/wzO2XGBf7QpzvDJ3+t7XN7PD7onPtn0WZf788GbJt
-	4PANSdKofsy8XKu4ERqKx97ADmkmICXR6miKkMFTXxR3wS+jA8Ge0yEpd0E4mA==
-X-Gm-Gg: AZuq6aLcxlIv+9F/PY1fM+QLyYCiA5YTwsnHby0MpoSKzcYOsMVyRU9CAi2MFFShshr
-	WA6tiGydX+ydQ2ukNghLOKExXJb7DEQix8oZZtR5S28DiQH5ENwHFDgHhcraWrPHR2ZvosLprvh
-	ACHspqZ7GL4RIsnHi47xuAhelNS7SguLxvvd0mrCdOWpx6U5//iaVWmIVEZsZs2kzMCF7YZnUQM
-	YRHD1K0QJD077JV9TNx0Uw1QTkIY20kQjElZTIEnnrDLFET/BOL4E70jzbdEKJERMQtZIKpRlML
-	0EZipxci0iclwBHPDKJK6FO044/v13MtQkfR817fGpizcELrlOCYTVH3bJplgwu6hWfVLsRcIeU
-	UUUczm9sZ9tW/AXMyCl73OKrTenH14hmTaj+uoT6ZwYKVhw9R7MVX7wDeZnjT5L/AG8uTvMTwuj
-	UUt062mi4FyBJpyUISDoeR7lHGaXK2gaBSlM3l4psc/f+ejmRBlEhZxf636pZVd675zZgSTNZDL
-	8ah6A==
-X-Received: by 2002:a05:690c:4e85:b0:78f:ba1a:6564 with SMTP id 00721157ae682-7947a9ffe86mr36177927b3.12.1769625300979;
-        Wed, 28 Jan 2026 10:35:00 -0800 (PST)
+        bh=gcC3DGcl6XXt9/EhEbBpMgeG6yu4Yk+X5YovqnSf2Cg=;
+        b=cbAiS7pzSLL2yeNEsiRuOZny7ZfVAuL1QNWqIaUTE0mChvp+AincSpQUzDo9XWUdDN
+         Y6EK26YMeBx1ksk1RBriHMYIIr8gTI51+o3YfR9yNqQm4nm66NtmSdGM4d3FMNtDOnKR
+         2zIrm+3PIb86wuVxr7ZuKWkmg9aw7NKWJdX9qfqPEpeOsTjDFUwi5v403GG8SHiDwI1P
+         5v2qVk3FiJM7Qz8GBeg+SA3u+aMP2vmAEoq0xur1Tw4RptI2eVWwBXouc7XYtqEH7LN/
+         xF6yAWjccu+3sFSsjMjnRblq6TxPXx9syvCuFl000gB8Wmeuia5vEKC9DbJ6YERtgXIi
+         NiGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769625305; x=1770230105;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gcC3DGcl6XXt9/EhEbBpMgeG6yu4Yk+X5YovqnSf2Cg=;
+        b=QigeGXxXENMkMrj2qxfoclPbsr37IFkIoFQ9H5pDpdg/MBkgrs6msDiWCyIe5suX17
+         +f5tWIyqmSHsAJckAMbC0gz7dcqOidPAAZb6ZQWUSYhcoVgveqtJDtX0B/vVggAvk/9v
+         wu9PV38c5OBt+9bu18FsDUPZRkYSkt2yyzVCpM1YRorg8uHveZZTmawQMoQY24GwMyz2
+         +1bHArTX0wJyivEsjRWTlcr8hAy1P4RnFLYtp2mFs6hawI5wPfW4RZ+pOMaBA5n1CuT2
+         qbulyZEDeLKIoNTFmpZi4s+b1F6cGBNUVvL9donLXEJghniH1dik/GeAL5+mNdrirnEN
+         3/XA==
+X-Gm-Message-State: AOJu0YzmaPzDnNNpLuCWIFy49GBNwkCZyVPMeOopvfrhHAf357fZytZH
+	jHDkXsnlGWUFjRXWH6br8K4kea7RY0P+nGK2I65GgI8Wdn7OsfdthUvYNKwQng==
+X-Gm-Gg: AZuq6aLRegq6X3dT5jA37e6C116lqskOFZJ7VVVC4L6zeKSh8jcysD9F9WgkknL6Tfz
+	uytZv8SnmAAve0Aq+hgw99qbCqvxOK2UlUAQbu/F0lT4sJXxrXk7d/Ew9cRtaIGi68MWG8QdXLl
+	cbQJ5LlxsOU1FcJ9tLzcgmqpeZsr5pk9QLreU3It/UqwfrmAcrABiFqvBOklP7qC8vAKGEZLce4
+	5ltM45QCgw5G405cJhqlIK9IxGTAlnMlGnP1to4eWFRWdapkoy8mGIwzSLCegjiyEGMj7rNGQJW
+	D+mF+k0T86i3VpL3FMCq4DE1l9N7R0QNRUxLAPHVY01d+GGHlFBZu8/SxCSb3OrTUS8vxeOMfL4
+	0zswfUdXX3af33AWTWzfXNttEfBs3WlQItC+Wu5Oosobj7PKO8wLmiz1cCPIPg933pzmRLAaNwa
+	iCPH7xXXGOcIz9+tfcZRrhMAi2Yu13i62v4fuopu+c8jhpOBk6HOCMAfASpRW5a/w5Bpts7fQdN
+	G3YJ3HTYeWN1iq0
+X-Received: by 2002:a0d:dcc7:0:b0:793:c86c:4b55 with SMTP id 00721157ae682-7947abfb114mr34699307b3.40.1769625303178;
+        Wed, 28 Jan 2026 10:35:03 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-794828f876fsm13589657b3.54.2026.01.28.10.34.59
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-794828f876fsm13589657b3.54.2026.01.28.10.35.01
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 10:35:00 -0800 (PST)
+        Wed, 28 Jan 2026 10:35:02 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] build: Remove SAP support
-Date: Wed, 28 Jan 2026 13:34:53 -0500
-Message-ID: <20260128183454.545066-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/2] build: Remove health profiles support
+Date: Wed, 28 Jan 2026 13:34:54 -0500
+Message-ID: <20260128183454.545066-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260128183454.545066-1-luiz.dentz@gmail.com>
+References: <20260128183454.545066-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,186 +77,2635 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-SAP plugin hasn't seen any updates in decades and the industry doesn't
-really use it anymore.
+Health plugin hasn't seen any updates in decades and most of the industry
+has probably move on to LE and GATT.
 ---
- .gitignore               |    1 -
- Makefile.am              |    3 +-
- Makefile.plugins         |    8 -
- Makefile.tools           |    4 +-
- README                   |   10 -
- bootstrap-configure      |    1 -
- configure.ac             |    4 -
- doc/sap-api.txt          |   20 -
- profiles/sap/main.c      |   31 -
- profiles/sap/manager.c   |   60 --
- profiles/sap/manager.h   |   10 -
- profiles/sap/sap-dummy.c |  364 ----------
- profiles/sap/sap.h       |  168 -----
- profiles/sap/server.c    | 1411 --------------------------------------
- profiles/sap/server.h    |   10 -
- test/sap_client.py       |  930 -------------------------
- test/test-sap-server     |  152 ----
- 17 files changed, 3 insertions(+), 3184 deletions(-)
- delete mode 100644 doc/sap-api.txt
- delete mode 100644 profiles/sap/main.c
- delete mode 100644 profiles/sap/manager.c
- delete mode 100644 profiles/sap/manager.h
- delete mode 100644 profiles/sap/sap-dummy.c
- delete mode 100644 profiles/sap/sap.h
- delete mode 100644 profiles/sap/server.c
- delete mode 100644 profiles/sap/server.h
- delete mode 100644 test/sap_client.py
- delete mode 100755 test/test-sap-server
+ .gitignore                    |    1 -
+ Makefile.am                   |    2 -
+ Makefile.plugins              |   10 -
+ Makefile.tools                |   13 +-
+ README                        |   10 -
+ bootstrap-configure           |    1 -
+ configure.ac                  |    4 -
+ doc/health-api.txt            |  152 --
+ profiles/health/hdp.c         | 2256 -----------------------
+ profiles/health/hdp.h         |   19 -
+ profiles/health/hdp_main.c    |   32 -
+ profiles/health/hdp_manager.c |   96 -
+ profiles/health/hdp_manager.h |   11 -
+ profiles/health/hdp_types.h   |  107 --
+ profiles/health/hdp_util.c    | 1193 ------------
+ profiles/health/hdp_util.h    |   45 -
+ profiles/health/mcap.c        | 3206 ---------------------------------
+ profiles/health/mcap.h        |  424 -----
+ test/test-health              |  243 ---
+ test/test-health-sink         |  114 --
+ tools/mcaptest.c              |  484 -----
+ 21 files changed, 3 insertions(+), 8420 deletions(-)
+ delete mode 100644 doc/health-api.txt
+ delete mode 100644 profiles/health/hdp.c
+ delete mode 100644 profiles/health/hdp.h
+ delete mode 100644 profiles/health/hdp_main.c
+ delete mode 100644 profiles/health/hdp_manager.c
+ delete mode 100644 profiles/health/hdp_manager.h
+ delete mode 100644 profiles/health/hdp_types.h
+ delete mode 100644 profiles/health/hdp_util.c
+ delete mode 100644 profiles/health/hdp_util.h
+ delete mode 100644 profiles/health/mcap.c
+ delete mode 100644 profiles/health/mcap.h
+ delete mode 100755 test/test-health
+ delete mode 100755 test/test-health-sink
+ delete mode 100644 tools/mcaptest.c
 
 diff --git a/.gitignore b/.gitignore
-index 27c9b8b6eb65..61ed91a47474 100644
+index 61ed91a47474..0eba3cdd57ac 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -97,7 +97,6 @@ tools/mcaptest
+@@ -93,7 +93,6 @@ tools/btgatt-server
+ tools/create-image
+ tools/test-runner
+ tools/check-selftest
+-tools/mcaptest
  tools/bneptest
  tools/isotest
  tools/iso-tester
--test/sap_client.pyc
- test/bluezutils.pyc
- unit/test-tester
- unit/test-ringbuf
 diff --git a/Makefile.am b/Makefile.am
-index 1f73a4fa0ee7..8b3eef3a46a1 100644
+index 8b3eef3a46a1..ce30da79cba6 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -486,8 +486,7 @@ EXTRA_DIST += doc/assigned-numbers.rst doc/supported-features.txt \
+@@ -486,8 +486,6 @@ EXTRA_DIST += doc/assigned-numbers.rst doc/supported-features.txt \
  				doc/test-runner.rst \
  				doc/settings-storage.txt
  
--EXTRA_DIST += doc/health-api.txt \
--		doc/sap-api.txt
-+EXTRA_DIST += doc/health-api.txt
- 
+-EXTRA_DIST += doc/health-api.txt
+-
  EXTRA_DIST += doc/hci-protocol.rst doc/mgmt-protocol.rst \
  	      doc/l2cap-protocol.rst doc/rfcomm-protocol.rst \
+ 	      doc/sco-protocol.rst doc/iso-protocol.rst
 diff --git a/Makefile.plugins b/Makefile.plugins
-index b83a28257021..c5b60e4dc033 100644
+index c5b60e4dc033..c9efadb45262 100644
 --- a/Makefile.plugins
 +++ b/Makefile.plugins
-@@ -22,14 +22,6 @@ builtin_modules += neard
- builtin_sources += plugins/neard.c
+@@ -67,16 +67,6 @@ builtin_sources += profiles/input/hog.c \
+ 			profiles/input/suspend.h profiles/input/suspend-none.c
  endif
  
--if SAP
--builtin_modules += sap
--builtin_sources += profiles/sap/main.c profiles/sap/manager.h \
--			profiles/sap/manager.c profiles/sap/server.h \
--			profiles/sap/server.c profiles/sap/sap.h \
--			profiles/sap/sap-dummy.c
+-if HEALTH
+-builtin_modules += health
+-builtin_sources += profiles/health/mcap.h profiles/health/mcap.c \
+-			profiles/health/hdp_main.c profiles/health/hdp_types.h \
+-			profiles/health/hdp_manager.h \
+-			profiles/health/hdp_manager.c \
+-			profiles/health/hdp.h profiles/health/hdp.c \
+-			profiles/health/hdp_util.h profiles/health/hdp_util.c
 -endif
 -
- if A2DP
- builtin_modules += a2dp
- builtin_sources += profiles/audio/source.h profiles/audio/source.c \
+ builtin_modules += gap
+ builtin_sources += profiles/gap/gas.c
+ 
 diff --git a/Makefile.tools b/Makefile.tools
-index b9a092f87168..f6c1c1931ff0 100644
+index f6c1c1931ff0..b75e9782cd75 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -575,11 +575,11 @@ profiles_cups_bluetooth_LDADD = $(GLIB_LIBS) $(DBUS_LIBS) \
- 				gdbus/libgdbus-internal.la
- endif
+@@ -243,7 +243,7 @@ noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
+ 			tools/hcieventmask tools/hcisecfilter \
+ 			tools/btinfo tools/btconfig \
+ 			tools/btsnoop tools/btproxy \
+-			tools/btiotest tools/bneptest tools/mcaptest \
++			tools/btiotest tools/bneptest \
+ 			tools/cltest tools/oobtest tools/advtest \
+ 			tools/seq2bseq tools/nokfw tools/rtlfw \
+ 			tools/bcmfw tools/create-image \
+@@ -283,13 +283,6 @@ tools_btproxy_LDADD = src/libshared-mainloop.la
+ tools_btiotest_SOURCES = tools/btiotest.c btio/btio.h btio/btio.c
+ tools_btiotest_LDADD = lib/libbluetooth-internal.la $(GLIB_LIBS)
  
--test_scripts += test/sap_client.py test/bluezutils.py \
-+test_scripts += test/bluezutils.py \
- 		test/dbusdef.py test/monitor-bluetooth test/list-devices \
+-tools_mcaptest_SOURCES = tools/mcaptest.c \
+-				btio/btio.h btio/btio.c \
+-				src/log.c src/log.h \
+-				profiles/health/mcap.h profiles/health/mcap.c
+-tools_mcaptest_LDADD = lib/libbluetooth-internal.la $(GLIB_LIBS) \
+-				src/libshared-mainloop.la -lrt
+-
+ tools_bneptest_SOURCES = tools/bneptest.c \
+ 				btio/btio.h btio/btio.c \
+ 				src/log.h src/log.c \
+@@ -580,8 +573,8 @@ test_scripts += test/bluezutils.py \
  		test/test-discovery test/test-manager test/test-adapter \
  		test/test-device test/simple-agent \
--		test/simple-endpoint test/test-sap-server \
-+		test/simple-endpoint \
- 		test/test-network test/test-profile test/test-health \
- 		test/test-health-sink test/service-record.dtd \
+ 		test/simple-endpoint \
+-		test/test-network test/test-profile test/test-health \
+-		test/test-health-sink test/service-record.dtd \
++		test/test-network test/test-profile \
++		test/service-record.dtd \
  		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+ 		test/service-ftp.xml test/simple-player test/test-nap \
+ 		test/test-hfp test/opp-client test/ftp-client \
 diff --git a/README b/README
-index c68f12de31d3..4c369952cf39 100644
+index 4c369952cf39..74221a29ca91 100644
 --- a/README
 +++ b/README
 @@ -272,16 +272,6 @@ For a working system, certain configuration options need to be enabled:
  		The plugin is built into bluetoothd therefore it does not need
  		to be package separately.
  
--	--enable-sap
+-	--enable-health
 -
--		This option enable SAP profile using sap plugin.
+-		This option enable health profiles.
 -
--		By default sap plugin is disabled since it requires tight
--		integration with systems and is very rarely required.
+-		By default health plugin is disabled since its profiles are
+-		target for the health industry.
 -
 -		The plugin is built into bluetoothd therefore it does not need
 -		to be package separately.
 -
- 	--enable-health
+ 	--enable-midi
  
- 		This option enable health profiles.
+ 		This option enable MIDI support via ALSA Sequencer.
 diff --git a/bootstrap-configure b/bootstrap-configure
-index f89759bd2a78..df072cf965b1 100755
+index df072cf965b1..50d8124fdd09 100755
 --- a/bootstrap-configure
 +++ b/bootstrap-configure
 @@ -18,7 +18,6 @@ fi
  		--enable-experimental \
  		--enable-deprecated \
  		--enable-nfc \
--		--enable-sap \
- 		--enable-health \
+-		--enable-health \
  		--enable-sixaxis \
  		--enable-hid2hci \
+ 		--enable-midi \
 diff --git a/configure.ac b/configure.ac
-index a21cac81f5c3..bbe05583cd16 100644
+index bbe05583cd16..e8c5e2a96e0e 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -162,10 +162,6 @@ AC_ARG_ENABLE(nfc, AS_HELP_STRING([--enable-nfc],
- 		[enable NFC pairing]), [enable_nfc=${enableval}])
- AM_CONDITIONAL(NFC, test "${enable_nfc}" = "yes")
+@@ -188,10 +188,6 @@ AC_ARG_ENABLE(hog, AS_HELP_STRING([--disable-hog],
+ 		[disable HoG profile]), [enable_hog=${enableval}])
+ AM_CONDITIONAL(HOG, test "${enable_hog}" != "no")
  
--AC_ARG_ENABLE(sap, AS_HELP_STRING([--enable-sap],
--		[enable SAP profile]), [enable_sap=${enableval}])
--AM_CONDITIONAL(SAP, test "${enable_sap}" = "yes")
+-AC_ARG_ENABLE(health, AS_HELP_STRING([--enable-health],
+-		[enable health profiles]), [enable_health=${enableval}])
+-AM_CONDITIONAL(HEALTH, test "${enable_health}" = "yes")
 -
- AC_ARG_ENABLE(a2dp, AS_HELP_STRING([--disable-a2dp],
- 		[disable A2DP profile]), [enable_a2dp=${enableval}])
- AM_CONDITIONAL(A2DP, test "${enable_a2dp}" != "no")
-diff --git a/doc/sap-api.txt b/doc/sap-api.txt
+ AC_ARG_ENABLE(bap, AS_HELP_STRING([--disable-bap],
+ 		[disable BAP profile]), [enable_bap=${enableval}])
+ AM_CONDITIONAL(BAP, test "${enable_bap}" != "no")
+diff --git a/doc/health-api.txt b/doc/health-api.txt
 deleted file mode 100644
-index b28c4e305964..000000000000
---- a/doc/sap-api.txt
+index 2c48ff20449d..000000000000
+--- a/doc/health-api.txt
 +++ /dev/null
-@@ -1,20 +0,0 @@
--BlueZ D-Bus Sim Access API description
--**************************************
+@@ -1,152 +0,0 @@
+-BlueZ D-Bus Health API description
+-**********************************
 -
 -
--Sim Access Profile hierarchy
--============================
+-HealthManager hierarchy
+-=======================
 -
 -Service		org.bluez
--Interface	org.bluez.SimAccess1
--Object path	[variable prefix]/{hci0,hci1,...}
+-Interface	org.bluez.HealthManager1
+-Object path	/org/bluez/
 -
--Methods		void Disconnect()
+-Methods		object CreateApplication(dict config)
 -
--			Disconnects SAP client from the server.
+-			Returns the path of the new registered application.
+-			Application will be closed by the call or implicitly
+-			when the programs leaves the bus.
 -
--			Possible errors: org.bluez.Error.Failed
+-			config:
+-				uint16 DataType:
 -
--Properties	boolean Connected [readonly]
+-					Mandatory
 -
--			Indicates if SAP client is connected to the server.
-diff --git a/profiles/sap/main.c b/profiles/sap/main.c
+-				string Role:
+-
+-					Mandatory. Possible values: "source",
+-									"sink"
+-
+-				string Description:
+-
+-					Optional
+-
+-				ChannelType:
+-
+-					Optional, just for sources. Possible
+-					values: "reliable", "streaming"
+-
+-			Possible Errors: org.bluez.Error.InvalidArguments
+-
+-		void DestroyApplication(object application)
+-
+-			Closes the HDP application identified by the object
+-			path. Also application will be closed if the process
+-			that started it leaves the bus. Only the creator of the
+-			application will be able to destroy it.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.NotFound
+-					 org.bluez.Error.NotAllowed
+-
+-
+-HealthDevice hierarchy
+-======================
+-
+-Service		org.bluez
+-Interface	org.bluez.HealthDevice1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+-
+-Methods		boolean Echo()
+-
+-			Sends an echo petition to the remote service. Returns
+-			True if response matches with the buffer sent. If some
+-			error is detected False value is returned.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.OutOfRange
+-
+-		object CreateChannel(object application, string configuration)
+-
+-			Creates a new data channel.  The configuration should
+-			indicate the channel quality of service using one of
+-			this values "reliable", "streaming", "any".
+-
+-			Returns the object path that identifies the data
+-			channel that is already connected.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.HealthError
+-
+-		void DestroyChannel(object channel)
+-
+-			Destroys the data channel object. Only the creator of
+-			the channel or the creator of the HealthApplication
+-			that received the data channel will be able to destroy
+-			it.
+-
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.NotFound
+-				         org.bluez.Error.NotAllowed
+-
+-Signals		void ChannelConnected(object channel)
+-
+-			This signal is launched when a new data channel is
+-			created or when a known data channel is reconnected.
+-
+-		void ChannelDeleted(object channel)
+-
+-			This signal is launched when a data channel is deleted.
+-
+-			After this signal the data channel path will not be
+-			valid and its path can be reused for future data
+-			channels.
+-
+-Properties	object MainChannel [readonly]
+-
+-			The first reliable channel opened. It is needed by
+-			upper applications in order to send specific protocol
+-			data units. The first reliable can change after a
+-			reconnection.
+-
+-
+-HealthChannel hierarchy
+-=======================
+-
+-Service		org.bluez
+-Interface	org.bluez.HealthChannel1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/chanZZZ
+-
+-Only the process that created the data channel or the creator of the
+-HealthApplication that received it will be able to call these methods.
+-
+-Methods		fd Acquire()
+-
+-			Returns the file descriptor for this data channel. If
+-			the data channel is not connected it will also
+-			reconnect.
+-
+-			Possible Errors: org.bluez.Error.NotConnected
+-					 org.bluez.Error.NotAllowed
+-
+-		void Release()
+-
+-			Releases the fd. Application should also need to
+-			close() it.
+-
+-			Possible Errors: org.bluez.Error.NotAcquired
+-					 org.bluez.Error.NotAllowed
+-
+-Properties	string Type [readonly]
+-
+-			The quality of service of the data channel. ("reliable"
+-			or "streaming")
+-
+-		object Device [readonly]
+-
+-			Identifies the Remote Device that is connected with.
+-			Maps with a HealthDevice object.
+-
+-		object Application [readonly]
+-
+-			Identifies the HealthApplication to which this channel
+-			is related to (which indirectly defines its role and
+-			data type).
+diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
 deleted file mode 100644
-index 321ed3282e2d..000000000000
---- a/profiles/sap/main.c
+index ac5023b067c6..000000000000
+--- a/profiles/health/hdp.c
 +++ /dev/null
-@@ -1,31 +0,0 @@
+@@ -1,2256 +0,0 @@
 -// SPDX-License-Identifier: GPL-2.0-or-later
 -/*
+- *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#define _GNU_SOURCE
+-#include <stdlib.h>
+-#include <stdint.h>
+-#include <stdbool.h>
+-#include <unistd.h>
+-
+-#include <glib.h>
+-
+-#include "bluetooth/bluetooth.h"
+-#include "bluetooth/l2cap.h"
+-#include "bluetooth/sdp.h"
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "src/dbus-common.h"
+-#include "src/log.h"
+-#include "src/error.h"
+-#include "src/adapter.h"
+-#include "src/device.h"
+-#include "src/sdpd.h"
+-#include "src/shared/timeout.h"
+-#include "src/shared/util.h"
+-#include "btio/btio.h"
+-
+-#include "hdp_types.h"
+-#include "hdp_util.h"
+-#include "hdp.h"
+-#include "mcap.h"
+-
+-#define ECHO_TIMEOUT	1 /* second */
+-#define HDP_ECHO_LEN	15
+-
+-static GSList *applications = NULL;
+-static GSList *devices = NULL;
+-static uint8_t next_app_id = HDP_MDEP_INITIAL;
+-
+-static GSList *adapters;
+-
+-static struct hdp_device *create_health_device(struct btd_device *device);
+-static void free_echo_data(struct hdp_echo_data *edata);
+-
+-struct hdp_create_dc {
+-	DBusMessage			*msg;
+-	struct hdp_application		*app;
+-	struct hdp_device		*dev;
+-	uint8_t				config;
+-	uint8_t				mdep;
+-	guint				ref;
+-	mcap_mdl_operation_cb		cb;
+-};
+-
+-struct hdp_tmp_dc_data {
+-	DBusMessage			*msg;
+-	struct hdp_channel		*hdp_chann;
+-	guint				ref;
+-	mcap_mdl_operation_cb		cb;
+-};
+-
+-struct hdp_echo_data {
+-	gboolean		echo_done;	/* Is a echo was already done */
+-	gpointer		buf;		/* echo packet sent */
+-	unsigned int		tid;		/* echo timeout */
+-};
+-
+-static struct hdp_channel *hdp_channel_ref(struct hdp_channel *chan)
+-{
+-	if (chan == NULL)
+-		return NULL;
+-
+-	chan->ref++;
+-
+-	DBG("(%p): ref=%d", chan, chan->ref);
+-	return chan;
+-}
+-
+-static void free_health_channel(struct hdp_channel *chan)
+-{
+-	if (chan->mdep == HDP_MDEP_ECHO) {
+-		free_echo_data(chan->edata);
+-		chan->edata = NULL;
+-	}
+-
+-	mcap_mdl_unref(chan->mdl);
+-	hdp_application_unref(chan->app);
+-	health_device_unref(chan->dev);
+-	g_free(chan->path);
+-	g_free(chan);
+-}
+-
+-static void hdp_channel_unref(struct hdp_channel *chan)
+-{
+-	if (chan == NULL)
+-		return;
+-
+-	chan->ref --;
+-	DBG("(%p): ref=%d", chan, chan->ref);
+-
+-	if (chan->ref > 0)
+-		return;
+-
+-	free_health_channel(chan);
+-}
+-
+-static void free_hdp_create_dc(struct hdp_create_dc *dc_data)
+-{
+-	dbus_message_unref(dc_data->msg);
+-	hdp_application_unref(dc_data->app);
+-	health_device_unref(dc_data->dev);
+-
+-	g_free(dc_data);
+-}
+-
+-static struct hdp_create_dc *hdp_create_data_ref(struct hdp_create_dc *dc_data)
+-{
+-	dc_data->ref++;
+-
+-	DBG("(%p): ref=%d", dc_data, dc_data->ref);
+-
+-	return dc_data;
+-}
+-
+-static void hdp_create_data_unref(struct hdp_create_dc *dc_data)
+-{
+-	dc_data->ref--;
+-
+-	DBG("(%p): ref=%d", dc_data, dc_data->ref);
+-
+-	if (dc_data->ref > 0)
+-		return;
+-
+-	free_hdp_create_dc(dc_data);
+-}
+-
+-static void free_hdp_conn_dc(struct hdp_tmp_dc_data *data)
+-{
+-	dbus_message_unref(data->msg);
+-	hdp_channel_unref(data->hdp_chann);
+-
+-	g_free(data);
+-}
+-
+-static struct hdp_tmp_dc_data *hdp_tmp_dc_data_ref(struct hdp_tmp_dc_data *data)
+-{
+-	data->ref++;
+-
+-	DBG("hdp_conn_data_ref(%p): ref=%d", data, data->ref);
+-
+-	return data;
+-}
+-
+-static void hdp_tmp_dc_data_unref(struct hdp_tmp_dc_data *data)
+-{
+-	data->ref--;
+-
+-	DBG("hdp_conn_data_unref(%p): ref=%d", data, data->ref);
+-
+-	if (data->ref > 0)
+-		return;
+-
+-	free_hdp_conn_dc(data);
+-}
+-
+-static int cmp_app_id(gconstpointer a, gconstpointer b)
+-{
+-	const struct hdp_application *app = a;
+-	const uint8_t *id = b;
+-
+-	return app->id - *id;
+-}
+-
+-static int cmp_adapter(gconstpointer a, gconstpointer b)
+-{
+-	const struct hdp_adapter *hdp_adapter = a;
+-	const struct btd_adapter *adapter = b;
+-
+-	if (hdp_adapter->btd_adapter == adapter)
+-		return 0;
+-
+-	return -1;
+-}
+-
+-static int cmp_device(gconstpointer a, gconstpointer b)
+-{
+-	const struct hdp_device *hdp_device = a;
+-	const struct btd_device *device = b;
+-
+-	if (hdp_device->dev == device)
+-		return 0;
+-
+-	return -1;
+-}
+-
+-static int cmp_dev_addr(gconstpointer a, gconstpointer dst)
+-{
+-	const struct hdp_device *device = a;
+-
+-	return bacmp(device_get_address(device->dev), dst);
+-}
+-
+-static int cmp_dev_mcl(gconstpointer a, gconstpointer mcl)
+-{
+-	const struct hdp_device *device = a;
+-
+-	if (mcl == device->mcl)
+-		return 0;
+-	return -1;
+-}
+-
+-static int cmp_chan_mdlid(gconstpointer a, gconstpointer b)
+-{
+-	const struct hdp_channel *chan = a;
+-	const uint16_t *mdlid = b;
+-
+-	return chan->mdlid - *mdlid;
+-}
+-
+-static int cmp_chan_path(gconstpointer a, gconstpointer b)
+-{
+-	const struct hdp_channel *chan = a;
+-	const char *path = b;
+-
+-	return g_ascii_strcasecmp(chan->path, path);
+-}
+-
+-static int cmp_chan_mdl(gconstpointer a, gconstpointer mdl)
+-{
+-	const struct hdp_channel *chan = a;
+-
+-	if (chan->mdl == mdl)
+-		return 0;
+-	return -1;
+-}
+-
+-static uint8_t get_app_id(void)
+-{
+-	uint8_t id = next_app_id;
+-
+-	do {
+-		GSList *l = g_slist_find_custom(applications, &id, cmp_app_id);
+-
+-		if (l == NULL) {
+-			next_app_id = (id % HDP_MDEP_FINAL) + 1;
+-			return id;
+-		} else
+-			id = (id % HDP_MDEP_FINAL) + 1;
+-	} while (id != next_app_id);
+-
+-	/* No more ids available */
+-	return 0;
+-}
+-
+-static int cmp_app(gconstpointer a, gconstpointer b)
+-{
+-	const struct hdp_application *app = a;
+-
+-	return g_strcmp0(app->path, b);
+-}
+-
+-static gboolean set_app_path(struct hdp_application *app)
+-{
+-	app->id = get_app_id();
+-	if (app->id == 0)
+-		return FALSE;
+-	app->path = g_strdup_printf(MANAGER_PATH "/health_app_%d", app->id);
+-
+-	return TRUE;
+-};
+-
+-static void device_unref_mcl(struct hdp_device *hdp_device)
+-{
+-	if (hdp_device->mcl == NULL)
+-		return;
+-
+-	mcap_close_mcl(hdp_device->mcl, FALSE);
+-	mcap_mcl_unref(hdp_device->mcl);
+-	hdp_device->mcl = NULL;
+-	hdp_device->mcl_conn = FALSE;
+-}
+-
+-static void free_health_device(struct hdp_device *device)
+-{
+-	if (device->dev != NULL) {
+-		btd_device_unref(device->dev);
+-		device->dev = NULL;
+-	}
+-
+-	device_unref_mcl(device);
+-
+-	g_free(device);
+-}
+-
+-static void update_adapter_cb(void *data, void *user_data);
+-
+-static void remove_application(struct hdp_application *app)
+-{
+-	DBG("Application %s deleted", app->path);
+-	hdp_application_unref(app);
+-
+-	g_slist_foreach(adapters, update_adapter_cb, NULL);
+-}
+-
+-static void client_disconnected(DBusConnection *conn, void *user_data)
+-{
+-	struct hdp_application *app = user_data;
+-
+-	DBG("Client disconnected from the bus, deleting hdp application");
+-	applications = g_slist_remove(applications, app);
+-
+-	app->dbus_watcher = 0; /* Watcher shouldn't be freed in this case */
+-	remove_application(app);
+-}
+-
+-static DBusMessage *manager_create_application(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct hdp_application *app;
+-	const char *name;
+-	DBusMessageIter iter;
+-	GError *err = NULL;
+-
+-	dbus_message_iter_init(msg, &iter);
+-	app = hdp_get_app_config(&iter, &err);
+-	if (err != NULL) {
+-		g_error_free(err);
+-		return btd_error_invalid_args(msg);
+-	}
+-
+-	name = dbus_message_get_sender(msg);
+-	if (name == NULL) {
+-		hdp_application_unref(app);
+-		return g_dbus_create_error(msg,
+-					ERROR_INTERFACE ".HealthError",
+-					"Can't get sender name");
+-	}
+-
+-	if (!set_app_path(app)) {
+-		hdp_application_unref(app);
+-		return g_dbus_create_error(msg,
+-				ERROR_INTERFACE ".HealthError",
+-				"Can't get a valid id for the application");
+-	}
+-
+-	app->oname = g_strdup(name);
+-
+-	applications = g_slist_prepend(applications, app);
+-
+-	app->dbus_watcher =
+-			g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
+-					name, client_disconnected, app, NULL);
+-	g_slist_foreach(adapters, update_adapter_cb, NULL);
+-
+-	DBG("Health application created with id %s", app->path);
+-
+-	return g_dbus_create_reply(msg, DBUS_TYPE_OBJECT_PATH, &app->path,
+-							DBUS_TYPE_INVALID);
+-}
+-
+-static DBusMessage *manager_destroy_application(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	const char *path;
+-	struct hdp_application *app;
+-	GSList *l;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+-						DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	l = g_slist_find_custom(applications, path, cmp_app);
+-
+-	if (l == NULL)
+-		return g_dbus_create_error(msg,
+-					ERROR_INTERFACE ".InvalidArguments",
+-					"Invalid arguments in method call, "
+-					"no such application");
+-
+-	app = l->data;
+-	applications = g_slist_remove(applications, app);
+-
+-	remove_application(app);
+-
+-	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+-}
+-
+-static void application_unref(void *data, void *user_data)
+-{
+-	hdp_application_unref(data);
+-}
+-
+-static void manager_path_unregister(gpointer data)
+-{
+-	g_slist_foreach(applications, application_unref, NULL);
+-
+-	g_slist_free(applications);
+-	applications = NULL;
+-
+-	g_slist_foreach(adapters, update_adapter_cb, NULL);
+-}
+-
+-static const GDBusMethodTable health_manager_methods[] = {
+-	{ GDBUS_METHOD("CreateApplication",
+-			GDBUS_ARGS({ "config", "a{sv}" }),
+-			GDBUS_ARGS({ "application", "o" }),
+-			manager_create_application) },
+-	{ GDBUS_METHOD("DestroyApplication",
+-			GDBUS_ARGS({ "application", "o" }), NULL,
+-			manager_destroy_application) },
+-	{ }
+-};
+-
+-static gboolean channel_property_get_device(const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct hdp_channel *chan = data;
+-	const char *path = device_get_path(chan->dev->dev);
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
+-
+-	return TRUE;
+-}
+-
+-static gboolean channel_property_get_application(
+-					const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct hdp_channel *chan = data;
+-	const char *path = chan->app->path;
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
+-
+-	return TRUE;
+-}
+-
+-static gboolean channel_property_get_type(const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct hdp_channel *chan = data;
+-	const char *type;
+-
+-	if (chan->config == HDP_RELIABLE_DC)
+-		type = "reliable";
+-	else
+-		type = "streaming";
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &type);
+-
+-	return TRUE;
+-}
+-
+-static void hdp_tmp_dc_data_destroy(gpointer data)
+-{
+-	struct hdp_tmp_dc_data *hdp_conn = data;
+-
+-	hdp_tmp_dc_data_unref(hdp_conn);
+-}
+-
+-static void abort_mdl_cb(GError *err, gpointer data)
+-{
+-	if (err != NULL)
+-		error("Aborting error: %s", err->message);
+-}
+-
+-static void hdp_mdl_reconn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
+-{
+-	DBusConnection *conn = btd_get_dbus_connection();
+-	struct hdp_tmp_dc_data *dc_data = data;
+-	DBusMessage *reply;
+-	int fd;
+-
+-	if (err != NULL) {
+-		struct hdp_channel *chan = dc_data->hdp_chann;
+-		GError *gerr = NULL;
+-
+-		error("%s", err->message);
+-		reply = g_dbus_create_error(dc_data->msg,
+-					ERROR_INTERFACE ".HealthError",
+-					"Cannot reconnect: %s", err->message);
+-		g_dbus_send_message(conn, reply);
+-
+-		/* Send abort request because remote side */
+-		/* is now in PENDING state */
+-		if (!mcap_mdl_abort(chan->mdl, abort_mdl_cb, NULL, NULL,
+-								&gerr)) {
+-			error("%s", gerr->message);
+-			g_error_free(gerr);
+-		}
+-		return;
+-	}
+-
+-	fd = mcap_mdl_get_fd(dc_data->hdp_chann->mdl);
+-	if (fd < 0) {
+-		reply = g_dbus_create_error(dc_data->msg,
+-						ERROR_INTERFACE ".HealthError",
+-						"Cannot get file descriptor");
+-		g_dbus_send_message(conn, reply);
+-		return;
+-	}
+-
+-	reply = g_dbus_create_reply(dc_data->msg, DBUS_TYPE_UNIX_FD,
+-							&fd, DBUS_TYPE_INVALID);
+-	g_dbus_send_message(conn, reply);
+-
+-	g_dbus_emit_signal(conn, device_get_path(dc_data->hdp_chann->dev->dev),
+-			HEALTH_DEVICE, "ChannelConnected",
+-			DBUS_TYPE_OBJECT_PATH, &dc_data->hdp_chann->path,
+-			DBUS_TYPE_INVALID);
+-}
+-
+-static void hdp_get_dcpsm_cb(uint16_t dcpsm, gpointer user_data, GError *err)
+-{
+-	struct hdp_tmp_dc_data *hdp_conn = user_data;
+-	struct hdp_channel *hdp_chann = hdp_conn->hdp_chann;
+-	GError *gerr = NULL;
+-	uint8_t mode;
+-
+-	if (err != NULL) {
+-		hdp_conn->cb(hdp_chann->mdl, err, hdp_conn);
+-		return;
+-	}
+-
+-	if (hdp_chann->config == HDP_RELIABLE_DC)
+-		mode = BT_IO_MODE_ERTM;
+-	else
+-		mode = BT_IO_MODE_STREAMING;
+-
+-	if (mcap_connect_mdl(hdp_chann->mdl, mode, dcpsm, hdp_conn->cb,
+-					hdp_tmp_dc_data_ref(hdp_conn),
+-					hdp_tmp_dc_data_destroy, &gerr))
+-		return;
+-
+-	hdp_conn->cb(hdp_chann->mdl, err, hdp_conn);
+-	g_error_free(gerr);
+-	hdp_tmp_dc_data_unref(hdp_conn);
+-}
+-
+-static void device_reconnect_mdl_cb(struct mcap_mdl *mdl, GError *err,
+-								gpointer data)
+-{
+-	DBusConnection *conn = btd_get_dbus_connection();
+-	struct hdp_tmp_dc_data *dc_data = data;
+-	GError *gerr = NULL;
+-	DBusMessage *reply;
+-
+-	if (err != NULL) {
+-		reply = g_dbus_create_error(dc_data->msg,
+-					ERROR_INTERFACE ".HealthError",
+-					"Cannot reconnect: %s", err->message);
+-		g_dbus_send_message(conn, reply);
+-		return;
+-	}
+-
+-	dc_data->cb = hdp_mdl_reconn_cb;
+-
+-	if (hdp_get_dcpsm(dc_data->hdp_chann->dev, hdp_get_dcpsm_cb,
+-					hdp_tmp_dc_data_ref(dc_data),
+-					hdp_tmp_dc_data_destroy, &gerr))
+-		return;
+-
+-	error("%s", gerr->message);
+-
+-	reply = g_dbus_create_error(dc_data->msg,
+-					ERROR_INTERFACE ".HealthError",
+-					"Cannot reconnect: %s", gerr->message);
+-	g_dbus_send_message(conn, reply);
+-	hdp_tmp_dc_data_unref(dc_data);
+-	g_clear_error(&gerr);
+-
+-	/* Send abort request because remote side is now in PENDING state */
+-	if (!mcap_mdl_abort(mdl, abort_mdl_cb, NULL, NULL, &gerr)) {
+-		error("%s", gerr->message);
+-		g_error_free(gerr);
+-	}
+-}
+-
+-static DBusMessage *channel_acquire_continue(struct hdp_tmp_dc_data *data,
+-								GError *err)
+-{
+-	DBusMessage *reply;
+-	GError *gerr = NULL;
+-	int fd;
+-
+-	if (err != NULL) {
+-		return g_dbus_create_error(data->msg,
+-						ERROR_INTERFACE ".HealthError",
+-						"%s", err->message);
+-	}
+-
+-	fd = mcap_mdl_get_fd(data->hdp_chann->mdl);
+-	if (fd >= 0)
+-		return g_dbus_create_reply(data->msg, DBUS_TYPE_UNIX_FD, &fd,
+-							DBUS_TYPE_INVALID);
+-
+-	hdp_tmp_dc_data_ref(data);
+-	if (mcap_reconnect_mdl(data->hdp_chann->mdl, device_reconnect_mdl_cb,
+-					data, hdp_tmp_dc_data_destroy, &gerr))
+-		return NULL;
+-
+-	reply = g_dbus_create_error(data->msg, ERROR_INTERFACE ".HealthError",
+-					"Cannot reconnect: %s", gerr->message);
+-	g_error_free(gerr);
+-	hdp_tmp_dc_data_unref(data);
+-
+-	return reply;
+-}
+-
+-static void channel_acquire_cb(gpointer data, GError *err)
+-{
+-	DBusMessage *reply;
+-
+-	reply = channel_acquire_continue(data, err);
+-
+-	if (reply != NULL)
+-		g_dbus_send_message(btd_get_dbus_connection(), reply);
+-}
+-
+-static DBusMessage *channel_acquire(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct hdp_channel *chan = user_data;
+-	struct hdp_tmp_dc_data *dc_data;
+-	GError *gerr = NULL;
+-	DBusMessage *reply;
+-
+-	dc_data = g_new0(struct hdp_tmp_dc_data, 1);
+-	dc_data->msg = dbus_message_ref(msg);
+-	dc_data->hdp_chann = hdp_channel_ref(chan);
+-
+-	if (chan->dev->mcl_conn) {
+-		reply = channel_acquire_continue(hdp_tmp_dc_data_ref(dc_data),
+-									NULL);
+-		hdp_tmp_dc_data_unref(dc_data);
+-		return reply;
+-	}
+-
+-	if (hdp_establish_mcl(chan->dev, channel_acquire_cb,
+-						hdp_tmp_dc_data_ref(dc_data),
+-						hdp_tmp_dc_data_destroy, &gerr))
+-		return NULL;
+-
+-	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
+-					"%s", gerr->message);
+-	hdp_tmp_dc_data_unref(dc_data);
+-	g_error_free(gerr);
+-
+-	return reply;
+-}
+-
+-static void close_mdl(struct hdp_channel *hdp_chann)
+-{
+-	int fd;
+-
+-	fd = mcap_mdl_get_fd(hdp_chann->mdl);
+-	if (fd < 0)
+-		return;
+-
+-	close(fd);
+-}
+-
+-static DBusMessage *channel_release(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct hdp_channel *hdp_chann = user_data;
+-
+-	close_mdl(hdp_chann);
+-
+-	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+-}
+-
+-static void free_echo_data(struct hdp_echo_data *edata)
+-{
+-	if (edata == NULL)
+-		return;
+-
+-	if (edata->tid > 0)
+-		timeout_remove(edata->tid);
+-
+-	if (edata->buf != NULL)
+-		g_free(edata->buf);
+-
+-
+-	g_free(edata);
+-}
+-
+-static void health_channel_destroy(void *data)
+-{
+-	struct hdp_channel *hdp_chan = data;
+-	struct hdp_device *dev = hdp_chan->dev;
+-
+-	DBG("Destroy Health Channel %s", hdp_chan->path);
+-	if (g_slist_find(dev->channels, hdp_chan) == NULL)
+-		goto end;
+-
+-	dev->channels = g_slist_remove(dev->channels, hdp_chan);
+-
+-	if (hdp_chan->mdep != HDP_MDEP_ECHO)
+-		g_dbus_emit_signal(btd_get_dbus_connection(),
+-					device_get_path(dev->dev),
+-					HEALTH_DEVICE, "ChannelDeleted",
+-					DBUS_TYPE_OBJECT_PATH, &hdp_chan->path,
+-					DBUS_TYPE_INVALID);
+-
+-	if (hdp_chan == dev->fr) {
+-		hdp_channel_unref(dev->fr);
+-		dev->fr = NULL;
+-	}
+-
+-end:
+-	hdp_channel_unref(hdp_chan);
+-}
+-
+-static const GDBusMethodTable health_channels_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("Acquire",
+-			NULL, GDBUS_ARGS({ "fd", "h" }),
+-			channel_acquire) },
+-	{ GDBUS_METHOD("Release", NULL, NULL, channel_release) },
+-	{ }
+-};
+-
+-static const GDBusPropertyTable health_channels_properties[] = {
+-	{ "Device", "o",  channel_property_get_device },
+-	{ "Application", "o", channel_property_get_application },
+-	{ "Type", "s", channel_property_get_type },
+-	{ }
+-};
+-
+-static struct hdp_channel *create_channel(struct hdp_device *dev,
+-						uint8_t config,
+-						struct mcap_mdl *mdl,
+-						uint16_t mdlid,
+-						struct hdp_application *app,
+-						GError **err)
+-{
+-	struct hdp_channel *hdp_chann;
+-
+-	if (dev == NULL) {
+-		g_set_error(err, HDP_ERROR, HDP_UNSPECIFIED_ERROR,
+-					"HDP device uninitialized");
+-		return NULL;
+-	}
+-
+-	hdp_chann = g_new0(struct hdp_channel, 1);
+-	hdp_chann->config = config;
+-	hdp_chann->dev = health_device_ref(dev);
+-	hdp_chann->mdlid = mdlid;
+-
+-	if (mdl != NULL)
+-		hdp_chann->mdl = mcap_mdl_ref(mdl);
+-
+-	if (app != NULL) {
+-		hdp_chann->mdep = app->id;
+-		hdp_chann->app = hdp_application_ref(app);
+-	} else
+-		hdp_chann->edata = g_new0(struct hdp_echo_data, 1);
+-
+-	hdp_chann->path = g_strdup_printf("%s/chan%d",
+-					device_get_path(hdp_chann->dev->dev),
+-					hdp_chann->mdlid);
+-
+-	dev->channels = g_slist_append(dev->channels,
+-						hdp_channel_ref(hdp_chann));
+-
+-	if (hdp_chann->mdep == HDP_MDEP_ECHO)
+-		return hdp_channel_ref(hdp_chann);
+-
+-	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+-					hdp_chann->path, HEALTH_CHANNEL,
+-					health_channels_methods, NULL,
+-					health_channels_properties, hdp_chann,
+-					health_channel_destroy)) {
+-		g_set_error(err, HDP_ERROR, HDP_UNSPECIFIED_ERROR,
+-					"Can't register the channel interface");
+-		health_channel_destroy(hdp_chann);
+-		return NULL;
+-	}
+-
+-	return hdp_channel_ref(hdp_chann);
+-}
+-
+-static void remove_channels(struct hdp_device *dev)
+-{
+-	struct hdp_channel *chan;
+-	char *path;
+-
+-	while (dev->channels != NULL) {
+-		chan = dev->channels->data;
+-
+-		path = g_strdup(chan->path);
+-		if (!g_dbus_unregister_interface(btd_get_dbus_connection(),
+-							path, HEALTH_CHANNEL))
+-			health_channel_destroy(chan);
+-		g_free(path);
+-	}
+-}
+-
+-static void close_device_con(struct hdp_device *dev, gboolean cache)
+-{
+-	if (dev->mcl == NULL)
+-		return;
+-
+-	mcap_close_mcl(dev->mcl, cache);
+-	dev->mcl_conn = FALSE;
+-
+-	if (cache)
+-		return;
+-
+-	device_unref_mcl(dev);
+-	remove_channels(dev);
+-
+-	if (!dev->sdp_present) {
+-		const char *path;
+-
+-		path = device_get_path(dev->dev);
+-		g_dbus_unregister_interface(btd_get_dbus_connection(),
+-							path, HEALTH_DEVICE);
+-	}
+-}
+-
+-static int send_echo_data(int sock, const void *buf, uint32_t size)
+-{
+-	const uint8_t *buf_b = buf;
+-	uint32_t sent = 0;
+-
+-	while (sent < size) {
+-		int n = write(sock, buf_b + sent, size - sent);
+-		if (n < 0)
+-			return -1;
+-		sent += n;
+-	}
+-
+-	return 0;
+-}
+-
+-static gboolean serve_echo(GIOChannel *io_chan, GIOCondition cond,
+-								gpointer data)
+-{
+-	struct hdp_channel *chan = data;
+-	uint8_t buf[MCAP_DC_MTU];
+-	int fd, len;
+-
+-	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
+-		hdp_channel_unref(chan);
+-		return FALSE;
+-	}
+-
+-	if (chan->edata->echo_done)
+-		goto fail;
+-
+-	chan->edata->echo_done = TRUE;
+-
+-	fd = g_io_channel_unix_get_fd(io_chan);
+-
+-	len = read(fd, buf, sizeof(buf));
+-	if (len < 0)
+-		goto fail;
+-
+-	if (send_echo_data(fd, buf, len)  >= 0)
+-		return TRUE;
+-
+-fail:
+-	close_device_con(chan->dev, FALSE);
+-	hdp_channel_unref(chan);
+-	return FALSE;
+-}
+-
+-static gboolean check_channel_conf(struct hdp_channel *chan)
+-{
+-	GError *err = NULL;
+-	GIOChannel *io;
+-	uint8_t mode;
+-	uint16_t imtu, omtu;
+-	int fd;
+-
+-	fd = mcap_mdl_get_fd(chan->mdl);
+-	if (fd < 0)
+-		return FALSE;
+-	io = g_io_channel_unix_new(fd);
+-
+-	if (!bt_io_get(io, &err,
+-			BT_IO_OPT_MODE, &mode,
+-			BT_IO_OPT_IMTU, &imtu,
+-			BT_IO_OPT_OMTU, &omtu,
+-			BT_IO_OPT_INVALID)) {
+-		error("Error: %s", err->message);
+-		g_io_channel_unref(io);
+-		g_error_free(err);
+-		return FALSE;
+-	}
+-
+-	g_io_channel_unref(io);
+-
+-	switch (chan->config) {
+-	case HDP_RELIABLE_DC:
+-		if (mode != BT_IO_MODE_ERTM)
+-			return FALSE;
+-		break;
+-	case HDP_STREAMING_DC:
+-		if (mode != BT_IO_MODE_STREAMING)
+-			return FALSE;
+-		break;
+-	default:
+-		error("Error: Connected with unknown configuration");
+-		return FALSE;
+-	}
+-
+-	DBG("MDL imtu %d omtu %d Channel imtu %d omtu %d", imtu, omtu,
+-						chan->imtu, chan->omtu);
+-
+-	if (chan->imtu == 0)
+-		chan->imtu = imtu;
+-	if (chan->omtu == 0)
+-		chan->omtu = omtu;
+-
+-	if (chan->imtu != imtu || chan->omtu != omtu)
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-static void hdp_mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	struct hdp_device *dev = data;
+-	struct hdp_channel *chan;
+-
+-	DBG("");
+-
+-	if (dev->ndc == NULL)
+-		return;
+-
+-	chan = dev->ndc;
+-	if (chan->mdl == NULL)
+-		chan->mdl = mcap_mdl_ref(mdl);
+-
+-	if (g_slist_find(dev->channels, chan) == NULL)
+-		dev->channels = g_slist_prepend(dev->channels,
+-							hdp_channel_ref(chan));
+-
+-	if (!check_channel_conf(chan)) {
+-		close_mdl(chan);
+-		goto end;
+-	}
+-
+-	if (chan->mdep == HDP_MDEP_ECHO) {
+-		GIOChannel *io;
+-		int fd;
+-
+-		fd = mcap_mdl_get_fd(chan->mdl);
+-		if (fd < 0)
+-			goto end;
+-
+-		chan->edata->echo_done = FALSE;
+-		io = g_io_channel_unix_new(fd);
+-		g_io_add_watch(io, G_IO_ERR | G_IO_HUP | G_IO_NVAL | G_IO_IN,
+-				serve_echo, hdp_channel_ref(chan));
+-		g_io_channel_unref(io);
+-		goto end;
+-	}
+-
+-	g_dbus_emit_signal(btd_get_dbus_connection(), device_get_path(dev->dev),
+-				HEALTH_DEVICE, "ChannelConnected",
+-				DBUS_TYPE_OBJECT_PATH, &chan->path,
+-				DBUS_TYPE_INVALID);
+-
+-	if (dev->fr != NULL)
+-		goto end;
+-
+-	dev->fr = hdp_channel_ref(chan);
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+-				device_get_path(dev->dev), HEALTH_DEVICE,
+-				"MainChannel");
+-
+-end:
+-	hdp_channel_unref(dev->ndc);
+-	dev->ndc = NULL;
+-}
+-
+-static void hdp_mcap_mdl_closed_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	/* struct hdp_device *dev = data; */
+-
+-	DBG("");
+-
+-	/* Nothing to do */
+-}
+-
+-static void hdp_mcap_mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	struct hdp_device *dev = data;
+-	struct hdp_channel *chan;
+-	char *path;
+-	GSList *l;
+-
+-	DBG("");
+-
+-	l = g_slist_find_custom(dev->channels, mdl, cmp_chan_mdl);
+-	if (l == NULL)
+-		return;
+-
+-	chan = l->data;
+-
+-	path = g_strdup(chan->path);
+-	if (!g_dbus_unregister_interface(btd_get_dbus_connection(),
+-							path, HEALTH_CHANNEL))
+-		health_channel_destroy(chan);
+-	g_free(path);
+-}
+-
+-static void hdp_mcap_mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	struct hdp_device *dev = data;
+-
+-	DBG("");
+-
+-	if (dev->ndc == NULL)
+-		return;
+-
+-	dev->ndc->mdl = mcap_mdl_ref(mdl);
+-
+-	if (g_slist_find(dev->channels, dev->ndc) == NULL)
+-		dev->channels = g_slist_prepend(dev->channels,
+-						hdp_channel_ref(dev->ndc));
+-
+-	if (dev->ndc->mdep != HDP_MDEP_ECHO)
+-		g_dbus_emit_signal(btd_get_dbus_connection(),
+-					device_get_path(dev->dev),
+-					HEALTH_DEVICE, "ChannelConnected",
+-					DBUS_TYPE_OBJECT_PATH, &dev->ndc->path,
+-					DBUS_TYPE_INVALID);
+-
+-	hdp_channel_unref(dev->ndc);
+-	dev->ndc = NULL;
+-}
+-
+-static uint8_t hdp2l2cap_mode(uint8_t hdp_mode)
+-{
+-	return hdp_mode == HDP_STREAMING_DC ? BT_IO_MODE_STREAMING :
+-								BT_IO_MODE_ERTM;
+-}
+-
+-static uint8_t hdp_mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
+-				uint16_t mdlid, uint8_t *conf, void *data)
+-{
+-	struct hdp_device *dev = data;
+-	struct hdp_application *app;
+-	GError *err = NULL;
+-	GSList *l;
+-
+-	DBG("Data channel request");
+-
+-	if (mdepid == HDP_MDEP_ECHO) {
+-		switch (*conf) {
+-		case HDP_NO_PREFERENCE_DC:
+-			*conf = HDP_RELIABLE_DC;
+-			break;
+-		case HDP_RELIABLE_DC:
+-			break;
+-		case HDP_STREAMING_DC:
+-			return MCAP_CONFIGURATION_REJECTED;
+-		default:
+-			/* Special case defined in HDP spec 3.4. When an invalid
+-			* configuration is received we shall close the MCL when
+-			* we are still processing the callback. */
+-			close_device_con(dev, FALSE);
+-			return MCAP_CONFIGURATION_REJECTED; /* not processed */
+-		}
+-
+-		if (!mcap_set_data_chan_mode(dev->hdp_adapter->mi,
+-						BT_IO_MODE_ERTM, &err)) {
+-			error("Error: %s", err->message);
+-			g_error_free(err);
+-			return MCAP_MDL_BUSY;
+-		}
+-
+-		dev->ndc = create_channel(dev, *conf, NULL, mdlid, NULL, NULL);
+-		if (dev->ndc == NULL)
+-			return MCAP_MDL_BUSY;
+-
+-		return MCAP_SUCCESS;
+-	}
+-
+-	l = g_slist_find_custom(applications, &mdepid, cmp_app_id);
+-	if (l == NULL)
+-		return MCAP_INVALID_MDEP;
+-
+-	app = l->data;
+-
+-	/* Check if is the first dc if so,
+-	* only reliable configuration is allowed */
+-	switch (*conf) {
+-	case HDP_NO_PREFERENCE_DC:
+-		if (app->role == HDP_SINK)
+-			return MCAP_CONFIGURATION_REJECTED;
+-		else if (dev->fr && app->chan_type_set)
+-			*conf = app->chan_type;
+-		else
+-			*conf = HDP_RELIABLE_DC;
+-		break;
+-	case HDP_STREAMING_DC:
+-		if (!dev->fr || app->role == HDP_SOURCE)
+-			return MCAP_CONFIGURATION_REJECTED;
+-		break;
+-	case HDP_RELIABLE_DC:
+-		if (app->role == HDP_SOURCE)
+-			return MCAP_CONFIGURATION_REJECTED;
+-		break;
+-	default:
+-		/* Special case defined in HDP spec 3.4. When an invalid
+-		* configuration is received we shall close the MCL when
+-		* we are still processing the callback. */
+-		close_device_con(dev, FALSE);
+-		return MCAP_CONFIGURATION_REJECTED; /* not processed */
+-	}
+-
+-	l = g_slist_find_custom(dev->channels, &mdlid, cmp_chan_mdlid);
+-	if (l != NULL) {
+-		struct hdp_channel *chan = l->data;
+-		char *path;
+-
+-		path = g_strdup(chan->path);
+-		g_dbus_unregister_interface(btd_get_dbus_connection(),
+-							path, HEALTH_CHANNEL);
+-		g_free(path);
+-	}
+-
+-	if (!mcap_set_data_chan_mode(dev->hdp_adapter->mi,
+-						hdp2l2cap_mode(*conf), &err)) {
+-		error("Error: %s", err->message);
+-		g_error_free(err);
+-		return MCAP_MDL_BUSY;
+-	}
+-
+-	dev->ndc = create_channel(dev, *conf, NULL, mdlid, app, NULL);
+-	if (dev->ndc == NULL)
+-		return MCAP_MDL_BUSY;
+-
+-	return MCAP_SUCCESS;
+-}
+-
+-static uint8_t hdp_mcap_mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	struct hdp_device *dev = data;
+-	struct hdp_channel *chan;
+-	GError *err = NULL;
+-	GSList *l;
+-
+-	l = g_slist_find_custom(dev->channels, mdl, cmp_chan_mdl);
+-	if (l == NULL)
+-		return MCAP_INVALID_MDL;
+-
+-	chan = l->data;
+-
+-	if (dev->fr == NULL && chan->config != HDP_RELIABLE_DC &&
+-						chan->mdep != HDP_MDEP_ECHO)
+-		return MCAP_UNSPECIFIED_ERROR;
+-
+-	if (!mcap_set_data_chan_mode(dev->hdp_adapter->mi,
+-					hdp2l2cap_mode(chan->config), &err)) {
+-		error("Error: %s", err->message);
+-		g_error_free(err);
+-		return MCAP_MDL_BUSY;
+-	}
+-
+-	dev->ndc = hdp_channel_ref(chan);
+-
+-	return MCAP_SUCCESS;
+-}
+-
+-gboolean hdp_set_mcl_cb(struct hdp_device *device, GError **err)
+-{
+-	gboolean ret;
+-
+-	if (device->mcl == NULL)
+-		return FALSE;
+-
+-	ret = mcap_mcl_set_cb(device->mcl, device, err,
+-		MCAP_MDL_CB_CONNECTED, hdp_mcap_mdl_connected_cb,
+-		MCAP_MDL_CB_CLOSED, hdp_mcap_mdl_closed_cb,
+-		MCAP_MDL_CB_DELETED, hdp_mcap_mdl_deleted_cb,
+-		MCAP_MDL_CB_ABORTED, hdp_mcap_mdl_aborted_cb,
+-		MCAP_MDL_CB_REMOTE_CONN_REQ, hdp_mcap_mdl_conn_req_cb,
+-		MCAP_MDL_CB_REMOTE_RECONN_REQ, hdp_mcap_mdl_reconn_req_cb,
+-		MCAP_MDL_CB_INVALID);
+-	if (ret)
+-		return TRUE;
+-
+-	error("Can't set mcl callbacks, closing mcl");
+-	close_device_con(device, TRUE);
+-
+-	return FALSE;
+-}
+-
+-static void mcl_connected(struct mcap_mcl *mcl, gpointer data)
+-{
+-	struct hdp_device *hdp_device;
+-	bdaddr_t addr;
+-	GSList *l;
+-
+-	mcap_mcl_get_addr(mcl, &addr);
+-	l = g_slist_find_custom(devices, &addr, cmp_dev_addr);
+-	if (l == NULL) {
+-		struct hdp_adapter *hdp_adapter = data;
+-		struct btd_device *device;
+-
+-		device = btd_adapter_get_device(hdp_adapter->btd_adapter,
+-							&addr, BDADDR_BREDR);
+-		if (!device)
+-			return;
+-		hdp_device = create_health_device(device);
+-		if (!hdp_device)
+-			return;
+-		devices = g_slist_append(devices, hdp_device);
+-	} else
+-		hdp_device = l->data;
+-
+-	hdp_device->mcl = mcap_mcl_ref(mcl);
+-	hdp_device->mcl_conn = TRUE;
+-
+-	DBG("New mcl connected from  %s", device_get_path(hdp_device->dev));
+-
+-	hdp_set_mcl_cb(hdp_device, NULL);
+-}
+-
+-static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
+-{
+-	struct hdp_device *hdp_device;
+-	GSList *l;
+-
+-	l = g_slist_find_custom(devices, mcl, cmp_dev_mcl);
+-	if (l == NULL)
+-		return;
+-
+-	hdp_device = l->data;
+-	hdp_device->mcl_conn = TRUE;
+-
+-	DBG("MCL reconnected %s", device_get_path(hdp_device->dev));
+-
+-	hdp_set_mcl_cb(hdp_device, NULL);
+-}
+-
+-static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+-{
+-	struct hdp_device *hdp_device;
+-	GSList *l;
+-
+-	l = g_slist_find_custom(devices, mcl, cmp_dev_mcl);
+-	if (l == NULL)
+-		return;
+-
+-	hdp_device = l->data;
+-	hdp_device->mcl_conn = FALSE;
+-
+-	DBG("Mcl disconnected %s", device_get_path(hdp_device->dev));
+-}
+-
+-static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
+-{
+-	struct hdp_device *hdp_device;
+-	const char *path;
+-	GSList *l;
+-
+-	l = g_slist_find_custom(devices, mcl, cmp_dev_mcl);
+-	if (l == NULL)
+-		return;
+-
+-	hdp_device = l->data;
+-	device_unref_mcl(hdp_device);
+-
+-	if (hdp_device->sdp_present)
+-		return;
+-
+-	/* Because remote device hasn't announced an HDP record */
+-	/* the Bluetooth daemon won't notify when the device shall */
+-	/* be removed. Then we have to remove the HealthDevice */
+-	/* interface manually */
+-	path = device_get_path(hdp_device->dev);
+-	g_dbus_unregister_interface(btd_get_dbus_connection(),
+-							path, HEALTH_DEVICE);
+-	DBG("Mcl uncached %s", path);
+-}
+-
+-static void check_devices_mcl(void)
+-{
+-	struct hdp_device *dev;
+-	GSList *l, *to_delete = NULL;
+-
+-	for (l = devices; l; l = l->next) {
+-		dev = l->data;
+-		device_unref_mcl(dev);
+-
+-		if (!dev->sdp_present)
+-			to_delete = g_slist_append(to_delete, dev);
+-		else
+-			remove_channels(dev);
+-	}
+-
+-	for (l = to_delete; l; l = l->next) {
+-		const char *path;
+-
+-		path = device_get_path(dev->dev);
+-		g_dbus_unregister_interface(btd_get_dbus_connection(),
+-							path, HEALTH_DEVICE);
+-	}
+-
+-	g_slist_free(to_delete);
+-}
+-
+-static void release_adapter_instance(struct hdp_adapter *hdp_adapter)
+-{
+-	if (hdp_adapter->mi == NULL)
+-		return;
+-
+-	check_devices_mcl();
+-	mcap_release_instance(hdp_adapter->mi);
+-	mcap_instance_unref(hdp_adapter->mi);
+-	hdp_adapter->mi = NULL;
+-}
+-
+-static gboolean update_adapter(struct hdp_adapter *hdp_adapter)
+-{
+-	GError *err = NULL;
+-	const bdaddr_t *src;
+-
+-	if (applications == NULL) {
+-		release_adapter_instance(hdp_adapter);
+-		goto update;
+-	}
+-
+-	if (hdp_adapter->mi != NULL)
+-		goto update;
+-
+-	src = btd_adapter_get_address(hdp_adapter->btd_adapter);
+-
+-	hdp_adapter->mi = mcap_create_instance(src,
+-				BT_IO_SEC_MEDIUM, 0, 0,
+-				mcl_connected, mcl_reconnected,
+-				mcl_disconnected, mcl_uncached,
+-				NULL, /* CSP is not used by now */
+-				hdp_adapter, &err);
+-	if (hdp_adapter->mi == NULL) {
+-		error("Error creating the MCAP instance: %s", err->message);
+-		g_error_free(err);
+-		return FALSE;
+-	}
+-
+-	hdp_adapter->ccpsm = mcap_get_ctrl_psm(hdp_adapter->mi, &err);
+-	if (err != NULL) {
+-		error("Error getting MCAP control PSM: %s", err->message);
+-		goto fail;
+-	}
+-
+-	hdp_adapter->dcpsm = mcap_get_data_psm(hdp_adapter->mi, &err);
+-	if (err != NULL) {
+-		error("Error getting MCAP data PSM: %s", err->message);
+-		goto fail;
+-	}
+-
+-update:
+-	if (hdp_update_sdp_record(hdp_adapter, applications))
+-		return TRUE;
+-	error("Error updating the SDP record");
+-
+-fail:
+-	release_adapter_instance(hdp_adapter);
+-	if (err != NULL)
+-		g_error_free(err);
+-
+-	return FALSE;
+-}
+-
+-static void update_adapter_cb(void *data, void *user_data)
+-{
+-	update_adapter(data);
+-}
+-
+-int hdp_adapter_register(struct btd_adapter *adapter)
+-{
+-	struct hdp_adapter *hdp_adapter;
+-
+-	hdp_adapter = g_new0(struct hdp_adapter, 1);
+-	hdp_adapter->btd_adapter = btd_adapter_ref(adapter);
+-
+-	if(!update_adapter(hdp_adapter))
+-		goto fail;
+-
+-	adapters = g_slist_append(adapters, hdp_adapter);
+-
+-	return 0;
+-
+-fail:
+-	btd_adapter_unref(hdp_adapter->btd_adapter);
+-	g_free(hdp_adapter);
+-	return -1;
+-}
+-
+-void hdp_adapter_unregister(struct btd_adapter *adapter)
+-{
+-	struct hdp_adapter *hdp_adapter;
+-	GSList *l;
+-
+-	l = g_slist_find_custom(adapters, adapter, cmp_adapter);
+-
+-	if (l == NULL)
+-		return;
+-
+-	hdp_adapter = l->data;
+-	adapters = g_slist_remove(adapters, hdp_adapter);
+-	if (hdp_adapter->sdp_handler > 0)
+-		adapter_service_remove(adapter, hdp_adapter->sdp_handler);
+-	release_adapter_instance(hdp_adapter);
+-	btd_adapter_unref(hdp_adapter->btd_adapter);
+-	g_free(hdp_adapter);
+-}
+-
+-static void delete_echo_channel_cb(GError *err, gpointer chan)
+-{
+-	if (err != NULL && err->code != MCAP_INVALID_MDL) {
+-		/* TODO: Decide if more action is required here */
+-		error("Error deleting echo channel: %s", err->message);
+-		return;
+-	}
+-
+-	health_channel_destroy(chan);
+-}
+-
+-static void delete_echo_channel(struct hdp_channel *chan)
+-{
+-	GError *err = NULL;
+-
+-	if (!chan->dev->mcl_conn) {
+-		error("Echo channel cannot be deleted: mcl closed");
+-		return;
+-	}
+-
+-	if (mcap_delete_mdl(chan->mdl, delete_echo_channel_cb,
+-				hdp_channel_ref(chan),
+-				(GDestroyNotify) hdp_channel_unref, &err))
+-		return;
+-
+-	hdp_channel_unref(chan);
+-	error("Error deleting the echo channel: %s", err->message);
+-	g_error_free(err);
+-
+-	/* TODO: Decide if more action is required here */
+-}
+-
+-static void abort_echo_channel_cb(GError *err, gpointer data)
+-{
+-	struct hdp_channel *chan = data;
+-
+-	if (err != NULL && err->code != MCAP_ERROR_INVALID_OPERATION) {
+-		error("Aborting error: %s", err->message);
+-		if (err->code == MCAP_INVALID_MDL) {
+-			/* MDL is removed from MCAP so we can */
+-			/* free the data channel without sending */
+-			/* a MD_DELETE_MDL_REQ */
+-			/* TODO review the above comment */
+-			/* hdp_channel_unref(chan); */
+-		}
+-		return;
+-	}
+-
+-	delete_echo_channel(chan);
+-}
+-
+-static void destroy_create_dc_data(gpointer data)
+-{
+-	struct hdp_create_dc *dc_data = data;
+-
+-	hdp_create_data_unref(dc_data);
+-}
+-
+-static void *generate_echo_packet(void)
+-{
+-	uint8_t *buf;
+-
+-	buf = g_malloc(HDP_ECHO_LEN);
+-	if (!buf)
+-		return NULL;
+-
+-	if (util_getrandom(buf, HDP_ECHO_LEN, 0) < 0) {
+-		g_free(buf);
+-		return NULL;
+-	}
+-
+-	return buf;
+-}
+-
+-static gboolean check_echo(GIOChannel *io_chan, GIOCondition cond,
+-								gpointer data)
+-{
+-	struct hdp_tmp_dc_data *hdp_conn =  data;
+-	struct hdp_echo_data *edata = hdp_conn->hdp_chann->edata;
+-	struct hdp_channel *chan = hdp_conn->hdp_chann;
+-	uint8_t buf[MCAP_DC_MTU];
+-	DBusMessage *reply;
+-	gboolean value;
+-	int fd, len;
+-
+-	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
+-		value = FALSE;
+-		goto end;
+-	}
+-
+-	fd = g_io_channel_unix_get_fd(io_chan);
+-
+-	len = read(fd, buf, sizeof(buf));
+-	if (len != HDP_ECHO_LEN) {
+-		value = FALSE;
+-		goto end;
+-	}
+-
+-	value = (memcmp(buf, edata->buf, len) == 0);
+-
+-end:
+-	reply = g_dbus_create_reply(hdp_conn->msg, DBUS_TYPE_BOOLEAN, &value,
+-							DBUS_TYPE_INVALID);
+-	g_dbus_send_message(btd_get_dbus_connection(), reply);
+-	timeout_remove(edata->tid);
+-	edata->tid = 0;
+-	g_free(edata->buf);
+-	edata->buf = NULL;
+-
+-	if (!value)
+-		close_device_con(chan->dev, FALSE);
+-	else
+-		delete_echo_channel(chan);
+-	hdp_tmp_dc_data_unref(hdp_conn);
+-
+-	return FALSE;
+-}
+-
+-static bool echo_timeout(gpointer data)
+-{
+-	struct hdp_channel *chan = data;
+-	GIOChannel *io;
+-	int fd;
+-
+-	error("Error: Echo request timeout");
+-	chan->edata->tid = 0;
+-
+-	fd = mcap_mdl_get_fd(chan->mdl);
+-	if (fd < 0)
+-		return FALSE;
+-
+-	io = g_io_channel_unix_new(fd);
+-	g_io_channel_shutdown(io, TRUE, NULL);
+-
+-	return FALSE;
+-}
+-
+-static void hdp_echo_connect_cb(struct mcap_mdl *mdl, GError *err,
+-								gpointer data)
+-{
+-	DBusConnection *conn = btd_get_dbus_connection();
+-	struct hdp_tmp_dc_data *hdp_conn =  data;
+-	struct hdp_echo_data *edata;
+-	GError *gerr = NULL;
+-	DBusMessage *reply;
+-	GIOChannel *io;
+-	int fd;
+-
+-	if (err != NULL) {
+-		reply = g_dbus_create_error(hdp_conn->msg,
+-						ERROR_INTERFACE ".HealthError",
+-						"%s", err->message);
+-		g_dbus_send_message(conn, reply);
+-
+-		/* Send abort request because remote */
+-		/* side is now in PENDING state. */
+-		if (!mcap_mdl_abort(hdp_conn->hdp_chann->mdl,
+-					abort_echo_channel_cb,
+-					hdp_channel_ref(hdp_conn->hdp_chann),
+-					(GDestroyNotify) hdp_channel_unref,
+-					&gerr)) {
+-			error("%s", gerr->message);
+-			g_error_free(gerr);
+-			hdp_channel_unref(hdp_conn->hdp_chann);
+-		}
+-		return;
+-	}
+-
+-	fd = mcap_mdl_get_fd(hdp_conn->hdp_chann->mdl);
+-	if (fd < 0) {
+-		reply = g_dbus_create_error(hdp_conn->msg,
+-						ERROR_INTERFACE ".HealthError",
+-						"Can't write in echo channel");
+-		g_dbus_send_message(conn, reply);
+-		delete_echo_channel(hdp_conn->hdp_chann);
+-		return;
+-	}
+-
+-	edata = hdp_conn->hdp_chann->edata;
+-	edata->buf = generate_echo_packet();
+-	send_echo_data(fd, edata->buf, HDP_ECHO_LEN);
+-
+-	io = g_io_channel_unix_new(fd);
+-	g_io_add_watch(io, G_IO_ERR | G_IO_HUP | G_IO_NVAL | G_IO_IN,
+-			check_echo, hdp_tmp_dc_data_ref(hdp_conn));
+-
+-	edata->tid = timeout_add_seconds(ECHO_TIMEOUT, echo_timeout,
+-				hdp_channel_ref(hdp_conn->hdp_chann),
+-				(timeout_destroy_func_t) hdp_channel_unref);
+-
+-	g_io_channel_unref(io);
+-}
+-
+-static void delete_mdl_cb(GError *err, gpointer data)
+-{
+-	if (err != NULL)
+-		error("Deleting error: %s", err->message);
+-}
+-
+-static void abort_and_del_mdl_cb(GError *err, gpointer data)
+-{
+-	struct mcap_mdl *mdl = data;
+-	GError *gerr = NULL;
+-
+-	if (err != NULL) {
+-		error("%s", err->message);
+-		if (err->code == MCAP_INVALID_MDL) {
+-			/* MDL is removed from MCAP so we don't */
+-			/* need to delete it. */
+-			return;
+-		}
+-	}
+-
+-	if (!mcap_delete_mdl(mdl, delete_mdl_cb, NULL, NULL, &gerr)) {
+-		error("%s", gerr->message);
+-		g_error_free(gerr);
+-	}
+-}
+-
+-static void abort_mdl_connection_cb(GError *err, gpointer data)
+-{
+-	struct hdp_tmp_dc_data *hdp_conn = data;
+-	struct hdp_channel *hdp_chann = hdp_conn->hdp_chann;
+-
+-	if (err != NULL)
+-		error("Aborting error: %s", err->message);
+-
+-	/* Connection operation has failed but we have to */
+-	/* notify the channel created at MCAP level */
+-	if (hdp_chann->mdep != HDP_MDEP_ECHO)
+-		g_dbus_emit_signal(btd_get_dbus_connection(),
+-					device_get_path(hdp_chann->dev->dev),
+-					HEALTH_DEVICE, "ChannelConnected",
+-					DBUS_TYPE_OBJECT_PATH, &hdp_chann->path,
+-					DBUS_TYPE_INVALID);
+-}
+-
+-static void hdp_mdl_conn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
+-{
+-	DBusConnection *conn = btd_get_dbus_connection();
+-	struct hdp_tmp_dc_data *hdp_conn =  data;
+-	struct hdp_channel *hdp_chann = hdp_conn->hdp_chann;
+-	struct hdp_device *dev = hdp_chann->dev;
+-	DBusMessage *reply;
+-	GError *gerr = NULL;
+-
+-	if (err != NULL) {
+-		error("%s", err->message);
+-		reply = g_dbus_create_reply(hdp_conn->msg,
+-					DBUS_TYPE_OBJECT_PATH, &hdp_chann->path,
+-					DBUS_TYPE_INVALID);
+-		g_dbus_send_message(conn, reply);
+-
+-		/* Send abort request because remote side */
+-		/* is now in PENDING state */
+-		if (!mcap_mdl_abort(hdp_chann->mdl, abort_mdl_connection_cb,
+-					hdp_tmp_dc_data_ref(hdp_conn),
+-					hdp_tmp_dc_data_destroy, &gerr)) {
+-			hdp_tmp_dc_data_unref(hdp_conn);
+-			error("%s", gerr->message);
+-			g_error_free(gerr);
+-		}
+-		return;
+-	}
+-
+-	reply = g_dbus_create_reply(hdp_conn->msg,
+-					DBUS_TYPE_OBJECT_PATH, &hdp_chann->path,
+-					DBUS_TYPE_INVALID);
+-	g_dbus_send_message(conn, reply);
+-
+-	g_dbus_emit_signal(conn, device_get_path(hdp_chann->dev->dev),
+-				HEALTH_DEVICE, "ChannelConnected",
+-				DBUS_TYPE_OBJECT_PATH, &hdp_chann->path,
+-				DBUS_TYPE_INVALID);
+-
+-	if (!check_channel_conf(hdp_chann)) {
+-		close_mdl(hdp_chann);
+-		return;
+-	}
+-
+-	if (dev->fr != NULL)
+-		return;
+-
+-	dev->fr = hdp_channel_ref(hdp_chann);
+-
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+-				device_get_path(dev->dev), HEALTH_DEVICE,
+-				"MainChannel");
+-}
+-
+-static void device_create_mdl_cb(struct mcap_mdl *mdl, uint8_t conf,
+-						GError *err, gpointer data)
+-{
+-	DBusConnection *conn = btd_get_dbus_connection();
+-	struct hdp_create_dc *user_data = data;
+-	struct hdp_tmp_dc_data *hdp_conn;
+-	struct hdp_channel *hdp_chan;
+-	GError *gerr = NULL;
+-	DBusMessage *reply;
+-
+-	if (err != NULL) {
+-		reply = g_dbus_create_error(user_data->msg,
+-					ERROR_INTERFACE ".HealthError",
+-					"%s", err->message);
+-		g_dbus_send_message(conn, reply);
+-		return;
+-	}
+-
+-	if (user_data->mdep != HDP_MDEP_ECHO &&
+-				user_data->config == HDP_NO_PREFERENCE_DC) {
+-		if (user_data->dev->fr == NULL && conf != HDP_RELIABLE_DC) {
+-			g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-					"Data channel aborted, first data "
+-					"channel should be reliable");
+-			goto fail;
+-		} else if (conf == HDP_NO_PREFERENCE_DC ||
+-						conf > HDP_STREAMING_DC) {
+-			g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-							"Data channel aborted, "
+-							"configuration error");
+-			goto fail;
+-		}
+-	}
+-
+-	hdp_chan = create_channel(user_data->dev, conf, mdl,
+-							mcap_mdl_get_mdlid(mdl),
+-							user_data->app, &gerr);
+-	if (hdp_chan == NULL)
+-		goto fail;
+-
+-	hdp_conn = g_new0(struct hdp_tmp_dc_data, 1);
+-	hdp_conn->msg = dbus_message_ref(user_data->msg);
+-	hdp_conn->hdp_chann = hdp_chan;
+-	hdp_conn->cb = user_data->cb;
+-	hdp_chan->mdep = user_data->mdep;
+-
+-	if (hdp_get_dcpsm(hdp_chan->dev, hdp_get_dcpsm_cb,
+-						hdp_tmp_dc_data_ref(hdp_conn),
+-						hdp_tmp_dc_data_destroy, &gerr))
+-		return;
+-
+-	error("%s", gerr->message);
+-	g_clear_error(&gerr);
+-
+-	reply = g_dbus_create_reply(hdp_conn->msg,
+-					DBUS_TYPE_OBJECT_PATH, &hdp_chan->path,
+-					DBUS_TYPE_INVALID);
+-	g_dbus_send_message(conn, reply);
+-	hdp_tmp_dc_data_unref(hdp_conn);
+-
+-	/* Send abort request because remote side is now in PENDING state */
+-	if (!mcap_mdl_abort(hdp_chan->mdl, abort_mdl_connection_cb,
+-					hdp_tmp_dc_data_ref(hdp_conn),
+-					hdp_tmp_dc_data_destroy, &gerr)) {
+-		hdp_tmp_dc_data_unref(hdp_conn);
+-		error("%s", gerr->message);
+-		g_error_free(gerr);
+-	}
+-
+-	return;
+-
+-fail:
+-	reply = g_dbus_create_error(user_data->msg,
+-						ERROR_INTERFACE ".HealthError",
+-						"%s", gerr->message);
+-	g_dbus_send_message(conn, reply);
+-	g_clear_error(&gerr);
+-
+-	/* Send abort request because remote side is now in PENDING */
+-	/* state. Then we have to delete it because we couldn't */
+-	/* register the HealthChannel interface */
+-	if (!mcap_mdl_abort(mdl, abort_and_del_mdl_cb, mcap_mdl_ref(mdl),
+-				(GDestroyNotify) mcap_mdl_unref, &gerr)) {
+-		error("%s", gerr->message);
+-		g_error_free(gerr);
+-		mcap_mdl_unref(mdl);
+-	}
+-}
+-
+-static void device_create_dc_cb(gpointer user_data, GError *err)
+-{
+-	DBusConnection *conn = btd_get_dbus_connection();
+-	struct hdp_create_dc *data = user_data;
+-	DBusMessage *reply;
+-	GError *gerr = NULL;
+-
+-	if (err != NULL) {
+-		reply = g_dbus_create_error(data->msg,
+-					ERROR_INTERFACE ".HealthError",
+-					"%s", err->message);
+-		g_dbus_send_message(conn, reply);
+-		return;
+-	}
+-
+-	if (data->dev->mcl == NULL) {
+-		g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-				"Mcl was closed");
+-		goto fail;
+-	}
+-
+-	hdp_create_data_ref(data);
+-
+-	if (mcap_create_mdl(data->dev->mcl, data->mdep, data->config,
+-						device_create_mdl_cb, data,
+-						destroy_create_dc_data, &gerr))
+-		return;
+-	hdp_create_data_unref(data);
+-
+-fail:
+-	reply = g_dbus_create_error(data->msg, ERROR_INTERFACE ".HealthError",
+-							"%s", gerr->message);
+-	g_error_free(gerr);
+-	g_dbus_send_message(conn, reply);
+-}
+-
+-static DBusMessage *device_echo(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct hdp_device *device = user_data;
+-	struct hdp_create_dc *data;
+-	DBusMessage *reply;
+-	GError *err = NULL;
+-
+-	data = g_new0(struct hdp_create_dc, 1);
+-	data->dev = health_device_ref(device);
+-	data->mdep = HDP_MDEP_ECHO;
+-	data->config = HDP_RELIABLE_DC;
+-	data->msg = dbus_message_ref(msg);
+-	data->cb = hdp_echo_connect_cb;
+-	hdp_create_data_ref(data);
+-
+-	if (device->mcl_conn && device->mcl) {
+-		if (mcap_create_mdl(device->mcl, data->mdep, data->config,
+-						device_create_mdl_cb, data,
+-						destroy_create_dc_data, &err))
+-			return NULL;
+-		goto fail;
+-	}
+-
+-	if (hdp_establish_mcl(data->dev, device_create_dc_cb,
+-					data, destroy_create_dc_data, &err))
+-		return NULL;
+-
+-fail:
+-	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
+-							"%s", err->message);
+-	g_error_free(err);
+-	hdp_create_data_unref(data);
+-	return reply;
+-}
+-
+-static void device_get_mdep_cb(uint8_t mdep, gpointer data, GError *err)
+-{
+-	DBusConnection *conn = btd_get_dbus_connection();
+-	struct hdp_create_dc *dc_data, *user_data = data;
+-	DBusMessage *reply;
+-	GError *gerr = NULL;
+-
+-	if (err != NULL) {
+-		reply = g_dbus_create_error(user_data->msg,
+-						ERROR_INTERFACE ".HealthError",
+-						"%s", err->message);
+-		g_dbus_send_message(conn, reply);
+-		return;
+-	}
+-
+-	dc_data = hdp_create_data_ref(user_data);
+-	dc_data->mdep = mdep;
+-
+-	if (user_data->dev->mcl_conn) {
+-		device_create_dc_cb(dc_data, NULL);
+-		hdp_create_data_unref(dc_data);
+-		return;
+-	}
+-
+-	if (hdp_establish_mcl(dc_data->dev, device_create_dc_cb,
+-					dc_data, destroy_create_dc_data, &gerr))
+-		return;
+-
+-	reply = g_dbus_create_error(user_data->msg,
+-						ERROR_INTERFACE ".HealthError",
+-						"%s", gerr->message);
+-	hdp_create_data_unref(dc_data);
+-	g_error_free(gerr);
+-	g_dbus_send_message(conn, reply);
+-}
+-
+-static DBusMessage *device_create_channel(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct hdp_device *device = user_data;
+-	struct hdp_application *app;
+-	struct hdp_create_dc *data;
+-	char *app_path, *conf;
+-	DBusMessage *reply;
+-	GError *err = NULL;
+-	uint8_t config;
+-	GSList *l;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &app_path,
+-							DBUS_TYPE_STRING, &conf,
+-							DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
+-
+-	l = g_slist_find_custom(applications, app_path, cmp_app);
+-	if (l == NULL)
+-		return btd_error_invalid_args(msg);
+-
+-	app = l->data;
+-
+-	if (g_ascii_strcasecmp("reliable", conf) == 0)
+-		config = HDP_RELIABLE_DC;
+-	else if (g_ascii_strcasecmp("streaming", conf) == 0)
+-		config = HDP_STREAMING_DC;
+-	else if (g_ascii_strcasecmp("any", conf) == 0)
+-		config = HDP_NO_PREFERENCE_DC;
+-	else
+-		return btd_error_invalid_args(msg);
+-
+-	if (app->role == HDP_SINK && config != HDP_NO_PREFERENCE_DC)
+-		return btd_error_invalid_args(msg);
+-
+-	if (app->role == HDP_SOURCE && config == HDP_NO_PREFERENCE_DC)
+-		return btd_error_invalid_args(msg);
+-
+-	if (!device->fr && config == HDP_STREAMING_DC)
+-		return btd_error_invalid_args(msg);
+-
+-	data = g_new0(struct hdp_create_dc, 1);
+-	data->dev = health_device_ref(device);
+-	data->config = config;
+-	data->app = hdp_application_ref(app);
+-	data->msg = dbus_message_ref(msg);
+-	data->cb = hdp_mdl_conn_cb;
+-
+-	if (hdp_get_mdep(device, l->data, device_get_mdep_cb,
+-						hdp_create_data_ref(data),
+-						destroy_create_dc_data, &err))
+-		return NULL;
+-
+-	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
+-							"%s", err->message);
+-	g_error_free(err);
+-	hdp_create_data_unref(data);
+-	return reply;
+-}
+-
+-static void hdp_mdl_delete_cb(GError *err, gpointer data)
+-{
+-	DBusConnection *conn = btd_get_dbus_connection();
+-	struct hdp_tmp_dc_data *del_data = data;
+-	DBusMessage *reply;
+-	char *path;
+-
+-	if (err != NULL && err->code != MCAP_INVALID_MDL) {
+-		reply = g_dbus_create_error(del_data->msg,
+-						ERROR_INTERFACE ".HealthError",
+-						"%s", err->message);
+-		g_dbus_send_message(conn, reply);
+-		return;
+-	}
+-
+-	path = g_strdup(del_data->hdp_chann->path);
+-	g_dbus_unregister_interface(conn, path, HEALTH_CHANNEL);
+-	g_free(path);
+-
+-	reply = g_dbus_create_reply(del_data->msg, DBUS_TYPE_INVALID);
+-	g_dbus_send_message(conn, reply);
+-}
+-
+-static void hdp_continue_del_cb(gpointer user_data, GError *err)
+-{
+-	DBusConnection *conn = btd_get_dbus_connection();
+-	struct hdp_tmp_dc_data *del_data = user_data;
+-	GError *gerr = NULL;
+-	DBusMessage *reply;
+-
+-	if (err != NULL) {
+-		reply = g_dbus_create_error(del_data->msg,
+-					ERROR_INTERFACE ".HealthError",
+-					"%s", err->message);
+-		g_dbus_send_message(conn, reply);
+-		return;
+-	}
+-
+-	if (mcap_delete_mdl(del_data->hdp_chann->mdl, hdp_mdl_delete_cb,
+-						hdp_tmp_dc_data_ref(del_data),
+-						hdp_tmp_dc_data_destroy, &gerr))
+-			return;
+-
+-	reply = g_dbus_create_error(del_data->msg,
+-						ERROR_INTERFACE ".HealthError",
+-						"%s", gerr->message);
+-	hdp_tmp_dc_data_unref(del_data);
+-	g_error_free(gerr);
+-	g_dbus_send_message(conn, reply);
+-}
+-
+-static DBusMessage *device_destroy_channel(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
+-{
+-	struct hdp_device *device = user_data;
+-	struct hdp_tmp_dc_data *del_data;
+-	struct hdp_channel *hdp_chan;
+-	DBusMessage *reply;
+-	GError *err = NULL;
+-	char *path;
+-	GSList *l;
+-
+-	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+-							DBUS_TYPE_INVALID)){
+-		return btd_error_invalid_args(msg);
+-	}
+-
+-	l = g_slist_find_custom(device->channels, path, cmp_chan_path);
+-	if (l == NULL)
+-		return btd_error_invalid_args(msg);
+-
+-	hdp_chan = l->data;
+-	del_data = g_new0(struct hdp_tmp_dc_data, 1);
+-	del_data->msg = dbus_message_ref(msg);
+-	del_data->hdp_chann = hdp_channel_ref(hdp_chan);
+-
+-	if (device->mcl_conn) {
+-		if (mcap_delete_mdl(hdp_chan->mdl, hdp_mdl_delete_cb,
+-						hdp_tmp_dc_data_ref(del_data),
+-						hdp_tmp_dc_data_destroy, &err))
+-			return NULL;
+-		goto fail;
+-	}
+-
+-	if (hdp_establish_mcl(device, hdp_continue_del_cb,
+-						hdp_tmp_dc_data_ref(del_data),
+-						hdp_tmp_dc_data_destroy, &err))
+-		return NULL;
+-
+-fail:
+-	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
+-							"%s", err->message);
+-	hdp_tmp_dc_data_unref(del_data);
+-	g_error_free(err);
+-	return reply;
+-}
+-
+-static gboolean dev_property_exists_main_channel(
+-				const GDBusPropertyTable *property, void *data)
+-{
+-	struct hdp_device *device = data;
+-	return device->fr != NULL;
+-}
+-
+-static gboolean dev_property_get_main_channel(
+-					const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct hdp_device *device = data;
+-
+-	if (device->fr == NULL)
+-		return FALSE;
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
+-							&device->fr->path);
+-
+-	return TRUE;
+-}
+-
+-static void health_device_destroy(void *data)
+-{
+-	struct hdp_device *device = data;
+-
+-	DBG("Unregistered interface %s on path %s", HEALTH_DEVICE,
+-						device_get_path(device->dev));
+-
+-	remove_channels(device);
+-	if (device->ndc != NULL) {
+-		hdp_channel_unref(device->ndc);
+-		device->ndc = NULL;
+-	}
+-
+-	devices = g_slist_remove(devices, device);
+-	health_device_unref(device);
+-}
+-
+-static const GDBusMethodTable health_device_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("Echo",
+-			NULL, GDBUS_ARGS({ "value", "b" }), device_echo) },
+-	{ GDBUS_ASYNC_METHOD("CreateChannel",
+-			GDBUS_ARGS({ "application", "o" },
+-					{ "configuration", "s" }),
+-			GDBUS_ARGS({ "channel", "o" }),
+-			device_create_channel) },
+-	{ GDBUS_ASYNC_METHOD("DestroyChannel",
+-			GDBUS_ARGS({ "channel", "o" }), NULL,
+-			device_destroy_channel) },
+-	{ }
+-};
+-
+-static const GDBusSignalTable health_device_signals[] = {
+-	{ GDBUS_SIGNAL("ChannelConnected",
+-			GDBUS_ARGS({ "channel", "o" })) },
+-	{ GDBUS_SIGNAL("ChannelDeleted",
+-			GDBUS_ARGS({ "channel", "o" })) },
+-	{ }
+-};
+-
+-static const GDBusPropertyTable health_device_properties[] = {
+-	{ "MainChannel", "o", dev_property_get_main_channel, NULL,
+-					dev_property_exists_main_channel },
+-	{ }
+-};
+-
+-static struct hdp_device *create_health_device(struct btd_device *device)
+-{
+-	struct btd_adapter *adapter = device_get_adapter(device);
+-	const char *path = device_get_path(device);
+-	struct hdp_device *dev;
+-	GSList *l;
+-
+-	if (device == NULL)
+-		return NULL;
+-
+-	dev = g_new0(struct hdp_device, 1);
+-	dev->dev = btd_device_ref(device);
+-	health_device_ref(dev);
+-
+-	l = g_slist_find_custom(adapters, adapter, cmp_adapter);
+-	if (l == NULL)
+-		goto fail;
+-
+-	dev->hdp_adapter = l->data;
+-
+-	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+-					path, HEALTH_DEVICE,
+-					health_device_methods,
+-					health_device_signals,
+-					health_device_properties,
+-					dev, health_device_destroy)) {
+-		error("D-Bus failed to register %s interface", HEALTH_DEVICE);
+-		goto fail;
+-	}
+-
+-	DBG("Registered interface %s on path %s", HEALTH_DEVICE, path);
+-	return dev;
+-
+-fail:
+-	health_device_unref(dev);
+-	return NULL;
+-}
+-
+-int hdp_device_register(struct btd_device *device)
+-{
+-	struct hdp_device *hdev;
+-	GSList *l;
+-
+-	l = g_slist_find_custom(devices, device, cmp_device);
+-	if (l != NULL) {
+-		hdev = l->data;
+-		hdev->sdp_present = TRUE;
+-		return 0;
+-	}
+-
+-	hdev = create_health_device(device);
+-	if (hdev == NULL)
+-		return -1;
+-
+-	hdev->sdp_present = TRUE;
+-
+-	devices = g_slist_prepend(devices, hdev);
+-	return 0;
+-}
+-
+-void hdp_device_unregister(struct btd_device *device)
+-{
+-	struct hdp_device *hdp_dev;
+-	const char *path;
+-	GSList *l;
+-
+-	l = g_slist_find_custom(devices, device, cmp_device);
+-	if (l == NULL)
+-		return;
+-
+-	hdp_dev = l->data;
+-	path = device_get_path(hdp_dev->dev);
+-	g_dbus_unregister_interface(btd_get_dbus_connection(),
+-							path, HEALTH_DEVICE);
+-}
+-
+-int hdp_manager_start(void)
+-{
+-	DBG("Starting Health manager");
+-
+-	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+-					MANAGER_PATH, HEALTH_MANAGER,
+-					health_manager_methods, NULL, NULL,
+-					NULL, manager_path_unregister)) {
+-		error("D-Bus failed to register %s interface", HEALTH_MANAGER);
+-		return -1;
+-	}
+-
+-	return 0;
+-}
+-
+-void hdp_manager_stop(void)
+-{
+-	g_dbus_unregister_interface(btd_get_dbus_connection(),
+-						MANAGER_PATH, HEALTH_MANAGER);
+-
+-	DBG("Stopped Health manager");
+-}
+-
+-struct hdp_device *health_device_ref(struct hdp_device *hdp_dev)
+-{
+-	hdp_dev->ref++;
+-
+-	DBG("(%p): ref=%d", hdp_dev, hdp_dev->ref);
+-
+-	return hdp_dev;
+-}
+-
+-void health_device_unref(struct hdp_device *hdp_dev)
+-{
+-	hdp_dev->ref--;
+-
+-	DBG("(%p): ref=%d", hdp_dev, hdp_dev->ref);
+-
+-	if (hdp_dev->ref > 0)
+-		return;
+-
+-	free_health_device(hdp_dev);
+-}
+diff --git a/profiles/health/hdp.h b/profiles/health/hdp.h
+deleted file mode 100644
+index 114453493faf..000000000000
+--- a/profiles/health/hdp.h
++++ /dev/null
+@@ -1,19 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *
+- */
+-
+-int hdp_adapter_register(struct btd_adapter *btd_adapter);
+-void hdp_adapter_unregister(struct btd_adapter *btd_adapter);
+-
+-int hdp_device_register(struct btd_device *device);
+-void hdp_device_unregister(struct btd_device *device);
+-
+-int hdp_manager_start(void);
+-void hdp_manager_stop(void);
+-
+-gboolean hdp_set_mcl_cb(struct hdp_device *device, GError **err);
+diff --git a/profiles/health/hdp_main.c b/profiles/health/hdp_main.c
+deleted file mode 100644
+index 4a0edf9c846e..000000000000
+--- a/profiles/health/hdp_main.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
 - *
 - */
 -
@@ -265,31 +2718,32 @@ index 321ed3282e2d..000000000000
 -#include "gdbus/gdbus.h"
 -
 -#include "src/plugin.h"
--#include "manager.h"
+-#include "hdp_manager.h"
 -
--static int sap_init(void)
+-static int hdp_init(void)
 -{
--	return sap_manager_init();
+-	return hdp_manager_init();
 -}
 -
--static void sap_exit(void)
+-static void hdp_exit(void)
 -{
--	sap_manager_exit();
+-	hdp_manager_exit();
 -}
 -
--BLUETOOTH_PLUGIN_DEFINE(sap, VERSION,
--		BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, sap_init, sap_exit)
-diff --git a/profiles/sap/manager.c b/profiles/sap/manager.c
+-BLUETOOTH_PLUGIN_DEFINE(health, VERSION,
+-			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, hdp_init, hdp_exit)
+diff --git a/profiles/health/hdp_manager.c b/profiles/health/hdp_manager.c
 deleted file mode 100644
-index 306472166c77..000000000000
---- a/profiles/sap/manager.c
+index 72b69428036d..000000000000
+--- a/profiles/health/hdp_manager.c
 +++ /dev/null
-@@ -1,60 +0,0 @@
+@@ -1,96 +0,0 @@
 -// SPDX-License-Identifier: GPL-2.0-or-later
 -/*
+- *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
 - *
 - */
 -
@@ -299,629 +2753,229 @@ index 306472166c77..000000000000
 -
 -#include <stdbool.h>
 -
--#include "bluetooth/bluetooth.h"
 -#include "bluetooth/sdp.h"
+-#include "bluetooth/sdp_lib.h"
+-#include "bluetooth/uuid.h"
 -
--#include "src/log.h"
+-#include "btio/btio.h"
 -#include "src/adapter.h"
 -#include "src/device.h"
 -#include "src/profile.h"
 -#include "src/service.h"
--
--#include "manager.h"
--#include "server.h"
--
--static int sap_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
--{
--	DBG("path %s", adapter_get_path(adapter));
--
--	return sap_server_register(adapter);
--}
--
--static void sap_server_remove(struct btd_profile *p,
--						struct btd_adapter *adapter)
--{
--	const char *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	sap_server_unregister(path);
--}
--
--static struct btd_profile sap_profile = {
--	.name		= "sap-server",
--	.adapter_probe	= sap_server_probe,
--	.adapter_remove	= sap_server_remove,
--};
--
--int sap_manager_init(void)
--{
--	btd_profile_register(&sap_profile);
--
--	return 0;
--}
--
--void sap_manager_exit(void)
--{
--	btd_profile_unregister(&sap_profile);
--}
-diff --git a/profiles/sap/manager.h b/profiles/sap/manager.h
-deleted file mode 100644
-index 2a1f5a6d16b5..000000000000
---- a/profiles/sap/manager.h
-+++ /dev/null
-@@ -1,10 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-or-later */
--/*
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
-- *
-- */
--
--int sap_manager_init(void);
--void sap_manager_exit(void);
-diff --git a/profiles/sap/sap-dummy.c b/profiles/sap/sap-dummy.c
-deleted file mode 100644
-index 92adea3842db..000000000000
---- a/profiles/sap/sap-dummy.c
-+++ /dev/null
-@@ -1,364 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2010 ST-Ericsson SA
-- *  Copyright (C) 2011 Tieto Poland
-- *
-- *  Author: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-- *          for ST-Ericsson
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <glib.h>
--#include <stdint.h>
--
--#include "gdbus/gdbus.h"
--
--#include "src/dbus-common.h"
--#include "src/error.h"
+-#include "src/uuid-helper.h"
 -#include "src/log.h"
 -
--#include "sap.h"
+-#include "hdp_types.h"
+-#include "hdp_manager.h"
+-#include "hdp.h"
 -
--#define SAP_DUMMY_IFACE "org.bluez.SimAccessTest1"
--#define SAP_DUMMY_PATH "/org/bluez/test"
+-static int hdp_adapter_probe(struct btd_profile *p,
+-						struct btd_adapter *adapter)
+-{
+-	return hdp_adapter_register(adapter);
+-}
 -
--enum {
--	SIM_DISCONNECTED = 0x00,
--	SIM_CONNECTED	 = 0x01,
--	SIM_POWERED_OFF	 = 0x02,
--	SIM_MISSING	 = 0x03
+-static void hdp_adapter_remove(struct btd_profile *p,
+-						struct btd_adapter *adapter)
+-{
+-	hdp_adapter_unregister(adapter);
+-}
+-
+-static int hdp_driver_probe(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-
+-	return hdp_device_register(device);
+-}
+-
+-static void hdp_driver_remove(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-
+-	hdp_device_unregister(device);
+-}
+-
+-static struct btd_profile hdp_source_profile = {
+-	.name		= "hdp-source",
+-	.bearer		= BTD_PROFILE_BEARER_BREDR,
+-	.remote_uuid	= HDP_SOURCE_UUID,
+-
+-	.device_probe	= hdp_driver_probe,
+-	.device_remove	= hdp_driver_remove,
+-
+-	.adapter_probe	= hdp_adapter_probe,
+-	.adapter_remove	= hdp_adapter_remove,
 -};
 -
--static unsigned int init_cnt = 0;
+-static struct btd_profile hdp_sink_profile = {
+-	.name		= "hdp-sink",
+-	.bearer		= BTD_PROFILE_BEARER_BREDR,
+-	.remote_uuid	= HDP_SINK_UUID,
 -
--static int sim_card_conn_status = SIM_DISCONNECTED;
--static void *sap_data = NULL; /* SAP server private data. */
--static gboolean ongoing_call_status = FALSE;
--static int max_msg_size_supported = 512;
--
--void sap_connect_req(void *sap_device, uint16_t maxmsgsize)
--{
--	DBG("status: %d", sim_card_conn_status);
--
--	if (sim_card_conn_status != SIM_DISCONNECTED) {
--		sap_connect_rsp(sap_device, SAP_STATUS_CONNECTION_FAILED);
--		return;
--	}
--
--	if (max_msg_size_supported > maxmsgsize) {
--		sap_connect_rsp(sap_device, SAP_STATUS_MAX_MSG_SIZE_TOO_SMALL);
--		return;
--	}
--
--	if (max_msg_size_supported < maxmsgsize) {
--		sap_connect_rsp(sap_device,
--					SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED);
--		return;
--	}
--
--	if (ongoing_call_status) {
--		sap_connect_rsp(sap_device, SAP_STATUS_OK_ONGOING_CALL);
--		return;
--	}
--
--	sim_card_conn_status = SIM_CONNECTED;
--	sap_data = sap_device;
--
--	sap_connect_rsp(sap_device, SAP_STATUS_OK);
--	sap_status_ind(sap_device, SAP_STATUS_CHANGE_CARD_RESET);
--}
--
--void sap_disconnect_req(void *sap_device, uint8_t linkloss)
--{
--	sim_card_conn_status = SIM_DISCONNECTED;
--	sap_data = NULL;
--	ongoing_call_status = FALSE;
--
--	DBG("status: %d", sim_card_conn_status);
--
--	if (linkloss)
--		return;
--
--	sap_disconnect_rsp(sap_device);
--}
--
--void sap_transfer_apdu_req(void *sap_device, struct sap_parameter *param)
--{
--	char apdu[] = "APDU response!";
--
--	DBG("status: %d", sim_card_conn_status);
--
--	switch (sim_card_conn_status) {
--	case SIM_MISSING:
--		sap_transfer_apdu_rsp(sap_device,
--				SAP_RESULT_ERROR_CARD_REMOVED, NULL, 0);
--		break;
--	case SIM_POWERED_OFF:
--		sap_transfer_apdu_rsp(sap_device, SAP_RESULT_ERROR_POWERED_OFF,
--								NULL, 0);
--		break;
--	case SIM_DISCONNECTED:
--		sap_transfer_apdu_rsp(sap_device,
--				SAP_RESULT_ERROR_NOT_ACCESSIBLE, NULL, 0);
--		break;
--	case SIM_CONNECTED:
--		sap_transfer_apdu_rsp(sap_device, SAP_RESULT_OK,
--						(uint8_t *)apdu, sizeof(apdu));
--		break;
--	}
--}
--
--void sap_transfer_atr_req(void *sap_device)
--{
--	char atr[] = "ATR response!";
--
--	DBG("status: %d", sim_card_conn_status);
--
--	switch (sim_card_conn_status) {
--	case SIM_MISSING:
--		sap_transfer_atr_rsp(sap_device, SAP_RESULT_ERROR_CARD_REMOVED,
--								NULL, 0);
--		break;
--	case SIM_POWERED_OFF:
--		sap_transfer_atr_rsp(sap_device, SAP_RESULT_ERROR_POWERED_OFF,
--								NULL, 0);
--		break;
--	case SIM_DISCONNECTED:
--		sap_transfer_atr_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON,
--								NULL, 0);
--		break;
--	case SIM_CONNECTED:
--		sap_transfer_atr_rsp(sap_device, SAP_RESULT_OK,
--						(uint8_t *)atr, sizeof(atr));
--		break;
--	}
--}
--
--void sap_power_sim_off_req(void *sap_device)
--{
--	DBG("status: %d", sim_card_conn_status);
--
--	switch (sim_card_conn_status) {
--	case SIM_MISSING:
--		sap_power_sim_off_rsp(sap_device,
--					SAP_RESULT_ERROR_CARD_REMOVED);
--		break;
--	case SIM_POWERED_OFF:
--		sap_power_sim_off_rsp(sap_device,
--					SAP_RESULT_ERROR_POWERED_OFF);
--		break;
--	case SIM_DISCONNECTED:
--		sap_power_sim_off_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON);
--		break;
--	case SIM_CONNECTED:
--		sap_power_sim_off_rsp(sap_device, SAP_RESULT_OK);
--		sim_card_conn_status = SIM_POWERED_OFF;
--		break;
--	}
--}
--
--void sap_power_sim_on_req(void *sap_device)
--{
--	DBG("status: %d", sim_card_conn_status);
--
--	switch (sim_card_conn_status) {
--	case SIM_MISSING:
--		sap_power_sim_on_rsp(sap_device,
--					SAP_RESULT_ERROR_CARD_REMOVED);
--		break;
--	case SIM_POWERED_OFF:
--		sap_power_sim_on_rsp(sap_device, SAP_RESULT_OK);
--		sim_card_conn_status = SIM_CONNECTED;
--		break;
--	case SIM_DISCONNECTED:
--		sap_power_sim_on_rsp(sap_device,
--					SAP_RESULT_ERROR_NOT_ACCESSIBLE);
--		break;
--	case SIM_CONNECTED:
--		sap_power_sim_on_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON);
--		break;
--	}
--}
--
--void sap_reset_sim_req(void *sap_device)
--{
--	DBG("status: %d", sim_card_conn_status);
--
--	switch (sim_card_conn_status) {
--	case SIM_MISSING:
--		sap_reset_sim_rsp(sap_device, SAP_RESULT_ERROR_CARD_REMOVED);
--		break;
--	case SIM_POWERED_OFF:
--		sap_reset_sim_rsp(sap_device, SAP_RESULT_ERROR_POWERED_OFF);
--		break;
--	case SIM_DISCONNECTED:
--		sap_reset_sim_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON);
--		break;
--	case SIM_CONNECTED:
--		sap_reset_sim_rsp(sap_device, SAP_RESULT_OK);
--		break;
--	}
--}
--
--void sap_transfer_card_reader_status_req(void *sap_device)
--{
--	DBG("status: %d", sim_card_conn_status);
--
--	if (sim_card_conn_status != SIM_CONNECTED) {
--		sap_transfer_card_reader_status_rsp(sap_device,
--					SAP_RESULT_ERROR_NO_REASON, 0xF1);
--		return;
--	}
--
--	sap_transfer_card_reader_status_rsp(sap_device, SAP_RESULT_OK, 0xF1);
--}
--
--void sap_set_transport_protocol_req(void *sap_device,
--					struct sap_parameter *param)
--{
--	sap_transport_protocol_rsp(sap_device, SAP_RESULT_NOT_SUPPORTED);
--}
--
--static DBusMessage *ongoing_call(DBusConnection *conn, DBusMessage *msg,
--						void *data)
--{
--	dbus_bool_t ongoing;
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_BOOLEAN, &ongoing,
--						DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
--
--	if (ongoing_call_status && !ongoing) {
--		/* An ongoing call has finished. Continue connection.*/
--		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_RESET);
--		ongoing_call_status = FALSE;
--	} else if (!ongoing_call_status && ongoing) {
--		/* An ongoing call has started.*/
--		ongoing_call_status = TRUE;
--	}
--
--	DBG("OngoingCall status set to %d", ongoing_call_status);
--
--	return dbus_message_new_method_return(msg);
--}
--
--static DBusMessage *max_msg_size(DBusConnection *conn, DBusMessage *msg,
--						void *data)
--{
--	dbus_uint32_t size;
--
--	if (sim_card_conn_status == SIM_CONNECTED)
--		return btd_error_failed(msg,
--				"Can't change msg size when connected.");
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &size,
--							DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
--
--	max_msg_size_supported = size;
--
--	DBG("MaxMessageSize set to %d", max_msg_size_supported);
--
--	return dbus_message_new_method_return(msg);
--}
--
--static DBusMessage *disconnect_immediate(DBusConnection *conn, DBusMessage *msg,
--						void *data)
--{
--	if (sim_card_conn_status == SIM_DISCONNECTED)
--		return btd_error_failed(msg, "Already disconnected.");
--
--	sim_card_conn_status = SIM_DISCONNECTED;
--	sap_disconnect_ind(sap_data, SAP_DISCONNECTION_TYPE_IMMEDIATE);
--
--	return dbus_message_new_method_return(msg);
--}
--
--static DBusMessage *card_status(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	dbus_uint32_t status;
--
--	DBG("status %d", sim_card_conn_status);
--
--	if (sim_card_conn_status != SIM_CONNECTED)
--		return btd_error_failed(msg,
--				"Can't change msg size when not connected.");
--
--	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &status,
--							DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
--
--	switch (status) {
--	case 0: /* card removed */
--		sim_card_conn_status = SIM_MISSING;
--		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_REMOVED);
--		break;
--
--	case 1: /* card inserted */
--		if (sim_card_conn_status == SIM_MISSING) {
--			sim_card_conn_status = SIM_CONNECTED;
--			sap_status_ind(sap_data,
--					SAP_STATUS_CHANGE_CARD_INSERTED);
--		}
--		break;
--
--	case 2: /* card not longer available*/
--		sim_card_conn_status = SIM_POWERED_OFF;
--		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_NOT_ACCESSIBLE);
--		break;
--
--	default:
--		return btd_error_failed(msg,
--					"Unknown card status. Use 0, 1 or 2.");
--	}
--
--	DBG("Card status changed to %d", status);
--
--	return dbus_message_new_method_return(msg);
--}
--
--static const GDBusMethodTable dummy_methods[] = {
--	{ GDBUS_EXPERIMENTAL_METHOD("OngoingCall",
--				GDBUS_ARGS({ "ongoing", "b" }), NULL,
--				ongoing_call) },
--	{ GDBUS_EXPERIMENTAL_METHOD("MaxMessageSize",
--				GDBUS_ARGS({ "size", "u" }), NULL,
--				max_msg_size) },
--	{ GDBUS_EXPERIMENTAL_METHOD("DisconnectImmediate", NULL, NULL,
--				disconnect_immediate) },
--	{ GDBUS_EXPERIMENTAL_METHOD("CardStatus",
--				GDBUS_ARGS({ "status", "" }), NULL,
--				card_status) },
--	{ }
+-	.device_probe	= hdp_driver_probe,
+-	.device_remove	= hdp_driver_remove,
 -};
 -
--int sap_init(void)
+-int hdp_manager_init(void)
 -{
--	if (init_cnt++)
--		return 0;
--
--	if (g_dbus_register_interface(btd_get_dbus_connection(), SAP_DUMMY_PATH,
--				SAP_DUMMY_IFACE, dummy_methods, NULL, NULL,
--				NULL, NULL) == FALSE) {
--		init_cnt--;
+-	if (hdp_manager_start() < 0)
 -		return -1;
--	}
+-
+-	btd_profile_register(&hdp_source_profile);
+-	btd_profile_register(&hdp_sink_profile);
 -
 -	return 0;
 -}
 -
--void sap_exit(void)
+-void hdp_manager_exit(void)
 -{
--	if (--init_cnt)
--		return;
+-	btd_profile_unregister(&hdp_sink_profile);
+-	btd_profile_unregister(&hdp_source_profile);
 -
--	g_dbus_unregister_interface(btd_get_dbus_connection(),
--					SAP_DUMMY_PATH, SAP_DUMMY_IFACE);
+-	hdp_manager_stop();
 -}
-diff --git a/profiles/sap/sap.h b/profiles/sap/sap.h
+diff --git a/profiles/health/hdp_manager.h b/profiles/health/hdp_manager.h
 deleted file mode 100644
-index 30ed7c50c103..000000000000
---- a/profiles/sap/sap.h
+index 55b51ef34584..000000000000
+--- a/profiles/health/hdp_manager.h
 +++ /dev/null
-@@ -1,168 +0,0 @@
+@@ -1,11 +0,0 @@
 -/* SPDX-License-Identifier: GPL-2.0-or-later */
 -/*
+- *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
-- *  Copyright (C) 2010 ST-Ericsson SA
-- *
-- *  Author: Marek Skowron <marek.skowron@tieto.com> for ST-Ericsson.
-- *  Author: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-- *          for ST-Ericsson.
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
 - *
 - */
 -
--#include <stdint.h>
--#include <glib.h>
--
--#ifdef SAP_DEBUG
--#define SAP_VDBG(fmt, arg...) DBG(fmt, arg)
--#else
--#define SAP_VDBG(fmt...)
--#endif
--
--#define SAP_VERSION 0x0101
--
--/* Connection Status - SAP v1.1 section 5.2.2 */
--enum sap_status {
--	SAP_STATUS_OK				= 0x00,
--	SAP_STATUS_CONNECTION_FAILED		= 0x01,
--	SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED	= 0x02,
--	SAP_STATUS_MAX_MSG_SIZE_TOO_SMALL	= 0x03,
--	SAP_STATUS_OK_ONGOING_CALL		= 0x04
--};
--
--/* Disconnection Type - SAP v1.1 section 5.2.3 */
--enum sap_disconnection_type {
--	SAP_DISCONNECTION_TYPE_GRACEFUL		= 0x00,
--	SAP_DISCONNECTION_TYPE_IMMEDIATE	= 0x01
--};
--
--/* Result codes - SAP v1.1 section 5.2.4 */
--enum sap_result {
--	SAP_RESULT_OK			= 0x00,
--	SAP_RESULT_ERROR_NO_REASON	= 0x01,
--	SAP_RESULT_ERROR_NOT_ACCESSIBLE	= 0x02,
--	SAP_RESULT_ERROR_POWERED_OFF	= 0x03,
--	SAP_RESULT_ERROR_CARD_REMOVED	= 0x04,
--	SAP_RESULT_ERROR_POWERED_ON	= 0x05,
--	SAP_RESULT_ERROR_NO_DATA	= 0x06,
--	SAP_RESULT_NOT_SUPPORTED	= 0x07
--};
--
--/* Status Change - SAP v1.1 section 5.2.8 */
--enum sap_status_change {
--	SAP_STATUS_CHANGE_UNKNOWN_ERROR		= 0x00,
--	SAP_STATUS_CHANGE_CARD_RESET		= 0x01,
--	SAP_STATUS_CHANGE_CARD_NOT_ACCESSIBLE	= 0x02,
--	SAP_STATUS_CHANGE_CARD_REMOVED		= 0x03,
--	SAP_STATUS_CHANGE_CARD_INSERTED		= 0x04,
--	SAP_STATUS_CHANGE_CARD_RECOVERED	= 0x05
--};
--
--/* Message format - SAP v1.1 section 5.1 */
--struct sap_parameter {
--	uint8_t id;
--	uint8_t reserved;
--	uint16_t len;
--	uint8_t val[];
--	/*
--	 * Padding bytes 0-3 bytes
--	 */
--} __attribute__((packed));
--
--struct sap_message {
--	uint8_t id;
--	uint8_t nparam;
--	uint16_t reserved;
--	struct sap_parameter param[];
--} __attribute__((packed));
--
--#define SAP_BUF_SIZE		512
--#define SAP_MSG_HEADER_SIZE	4
--
--enum sap_protocol {
--	SAP_CONNECT_REQ		= 0x00,
--	SAP_CONNECT_RESP	= 0x01,
--	SAP_DISCONNECT_REQ	= 0x02,
--	SAP_DISCONNECT_RESP	= 0x03,
--	SAP_DISCONNECT_IND	= 0x04,
--	SAP_TRANSFER_APDU_REQ	= 0x05,
--	SAP_TRANSFER_APDU_RESP	= 0x06,
--	SAP_TRANSFER_ATR_REQ	= 0x07,
--	SAP_TRANSFER_ATR_RESP	= 0x08,
--	SAP_POWER_SIM_OFF_REQ	= 0x09,
--	SAP_POWER_SIM_OFF_RESP	= 0x0A,
--	SAP_POWER_SIM_ON_REQ	= 0x0B,
--	SAP_POWER_SIM_ON_RESP	= 0x0C,
--	SAP_RESET_SIM_REQ	= 0x0D,
--	SAP_RESET_SIM_RESP	= 0x0E,
--	SAP_TRANSFER_CARD_READER_STATUS_REQ	= 0x0F,
--	SAP_TRANSFER_CARD_READER_STATUS_RESP	= 0x10,
--	SAP_STATUS_IND	= 0x11,
--	SAP_ERROR_RESP	= 0x12,
--	SAP_SET_TRANSPORT_PROTOCOL_REQ	= 0x13,
--	SAP_SET_TRANSPORT_PROTOCOL_RESP	= 0x14
--};
--
--/* Parameters Ids - SAP 1.1 section 5.2 */
--enum sap_param_id {
--	SAP_PARAM_ID_MAX_MSG_SIZE	= 0x00,
--	SAP_PARAM_ID_CONN_STATUS	= 0x01,
--	SAP_PARAM_ID_RESULT_CODE	= 0x02,
--	SAP_PARAM_ID_DISCONNECT_IND	= 0x03,
--	SAP_PARAM_ID_COMMAND_APDU	= 0x04,
--	SAP_PARAM_ID_COMMAND_APDU7816	= 0x10,
--	SAP_PARAM_ID_RESPONSE_APDU	= 0x05,
--	SAP_PARAM_ID_ATR		= 0x06,
--	SAP_PARAM_ID_CARD_READER_STATUS	= 0x07,
--	SAP_PARAM_ID_STATUS_CHANGE	= 0x08,
--	SAP_PARAM_ID_TRANSPORT_PROTOCOL	= 0x09
--};
--
--#define SAP_PARAM_ID_MAX_MSG_SIZE_LEN		0x02
--#define SAP_PARAM_ID_CONN_STATUS_LEN		0x01
--#define SAP_PARAM_ID_RESULT_CODE_LEN		0x01
--#define SAP_PARAM_ID_DISCONNECT_IND_LEN		0x01
--#define SAP_PARAM_ID_CARD_READER_STATUS_LEN	0x01
--#define SAP_PARAM_ID_STATUS_CHANGE_LEN		0x01
--#define SAP_PARAM_ID_TRANSPORT_PROTO_LEN	0x01
--
--/* Transport Protocol - SAP v1.1 section 5.2.9 */
--enum sap_transport_protocol {
--	SAP_TRANSPORT_PROTOCOL_T0 = 0x00,
--	SAP_TRANSPORT_PROTOCOL_T1 = 0x01
--};
--
--/*SAP driver init and exit routines. Implemented by sap-*.c */
--int sap_init(void);
--void sap_exit(void);
--
--/* SAP requests implemented by sap-*.c */
--void sap_connect_req(void *sap_device, uint16_t maxmsgsize);
--void sap_disconnect_req(void *sap_device, uint8_t linkloss);
--void sap_transfer_apdu_req(void *sap_device, struct sap_parameter *param);
--void sap_transfer_atr_req(void *sap_device);
--void sap_power_sim_off_req(void *sap_device);
--void sap_power_sim_on_req(void *sap_device);
--void sap_reset_sim_req(void *sap_device);
--void sap_transfer_card_reader_status_req(void *sap_device);
--void sap_set_transport_protocol_req(void *sap_device,
--					struct sap_parameter *param);
--
--/*SAP responses to SAP requests. Implemented by server.c */
--int sap_connect_rsp(void *sap_device, uint8_t status);
--int sap_disconnect_rsp(void *sap_device);
--int sap_transfer_apdu_rsp(void *sap_device, uint8_t result,
--				uint8_t *sap_apdu_resp, uint16_t length);
--int sap_transfer_atr_rsp(void *sap_device, uint8_t result,
--				uint8_t *sap_atr, uint16_t length);
--int sap_power_sim_off_rsp(void *sap_device, uint8_t result);
--int sap_power_sim_on_rsp(void *sap_device, uint8_t result);
--int sap_reset_sim_rsp(void *sap_device, uint8_t result);
--int sap_transfer_card_reader_status_rsp(void *sap_device, uint8_t result,
--						uint8_t status);
--int sap_transport_protocol_rsp(void *sap_device, uint8_t result);
--
--/* Event indication. Implemented by server.c*/
--int sap_status_ind(void *sap_device, uint8_t status_change);
--int sap_disconnect_ind(void *sap_device, uint8_t disc_type);
-diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+-int hdp_manager_init(void);
+-void hdp_manager_exit(void);
+diff --git a/profiles/health/hdp_types.h b/profiles/health/hdp_types.h
 deleted file mode 100644
-index c1f07701fcc1..000000000000
---- a/profiles/sap/server.c
+index 805b3bae2ad5..000000000000
+--- a/profiles/health/hdp_types.h
 +++ /dev/null
-@@ -1,1411 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
+@@ -1,107 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
 -/*
+- *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2010 Instituto Nokia de Tecnologia - INdT
-- *  Copyright (C) 2010 ST-Ericsson SA
-- *  Copyright (C) 2011 Tieto Poland
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
 - *
-- *  Author: Marek Skowron <marek.skowron@tieto.com> for ST-Ericsson.
-- *  Author: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-- *          for ST-Ericsson.
+- */
+-
+-#ifndef __HDP_TYPES_H__
+-#define __HDP_TYPES_H__
+-
+-#define MANAGER_PATH		"/org/bluez"
+-
+-#define HEALTH_MANAGER		"org.bluez.HealthManager1"
+-#define HEALTH_DEVICE		"org.bluez.HealthDevice1"
+-#define HEALTH_CHANNEL		"org.bluez.HealthChannel1"
+-
+-#define HDP_VERSION		0x0100
+-
+-#define HDP_SERVICE_NAME	"Bluez HDP"
+-#define HDP_SERVICE_DSC		"A Bluez health device profile implementation"
+-#define HDP_SERVICE_PROVIDER	"Bluez"
+-
+-#define HDP_MDEP_ECHO		0x00
+-#define HDP_MDEP_INITIAL	0x01
+-#define HDP_MDEP_FINAL		0x7F
+-
+-#define HDP_ERROR		g_quark_from_static_string("hdp-error-quark")
+-
+-#define HDP_NO_PREFERENCE_DC	0x00
+-#define HDP_RELIABLE_DC		0x01
+-#define HDP_STREAMING_DC	0x02
+-
+-#define HDP_SINK_ROLE_AS_STRING		"sink"
+-#define HDP_SOURCE_ROLE_AS_STRING	"source"
+-
+-typedef enum {
+-	HDP_SOURCE = 0x00,
+-	HDP_SINK = 0x01
+-} HdpRole;
+-
+-typedef enum {
+-	HDP_DIC_PARSE_ERROR,
+-	HDP_DIC_ENTRY_PARSE_ERROR,
+-	HDP_CONNECTION_ERROR,
+-	HDP_UNSPECIFIED_ERROR,
+-	HDP_UNKNOWN_ERROR
+-} HdpError;
+-
+-enum data_specs {
+-	DATA_EXCHANGE_SPEC_11073 = 0x01
+-};
+-
+-struct hdp_application {
+-	char			*path;		/* The path of the application */
+-	uint16_t		data_type;	/* Data type handled for this application */
+-	gboolean		data_type_set;	/* Flag for dictionary parsing */
+-	uint8_t			role;		/* Role of this application */
+-	gboolean		role_set;	/* Flag for dictionary parsing */
+-	uint8_t			chan_type;	/* QoS preferred by source applications */
+-	gboolean		chan_type_set;	/* Flag for dictionary parsing */
+-	char			*description;	/* Options description for SDP record */
+-	uint8_t			id;		/* The identification is also the mdepid */
+-	char			*oname;		/* Name of the owner application */
+-	guint			dbus_watcher;	/* Watch for clients disconnection */
+-	int			ref;		/* Reference counter */
+-};
+-
+-struct hdp_adapter {
+-	struct btd_adapter	*btd_adapter;	/* Bluetooth adapter */
+-	struct mcap_instance	*mi;		/* Mcap instance in */
+-	uint16_t		ccpsm;		/* Control channel psm */
+-	uint16_t		dcpsm;		/* Data channel psm */
+-	uint32_t		sdp_handler;	/* SDP record handler */
+-	uint32_t		record_state;	/* Service record state */
+-};
+-
+-struct hdp_device {
+-	struct btd_device	*dev;		/* Device reference */
+-	struct hdp_adapter	*hdp_adapter;	/* hdp_adapater */
+-	struct mcap_mcl		*mcl;		/* The mcap control channel */
+-	gboolean		mcl_conn;	/* Mcl status */
+-	gboolean		sdp_present;	/* Has an sdp record */
+-	GSList			*channels;	/* Data Channel list */
+-	struct hdp_channel	*ndc;		/* Data channel being negotiated */
+-	struct hdp_channel	*fr;		/* First reliable data channel */
+-	int			ref;		/* Reference counting */
+-};
+-
+-struct hdp_echo_data;
+-
+-struct hdp_channel {
+-	struct hdp_device	*dev;		/* Device where this channel belongs */
+-	struct hdp_application	*app;		/* Application */
+-	struct mcap_mdl		*mdl;		/* The data channel reference */
+-	char			*path;		/* The path of the channel */
+-	uint8_t			config;		/* Channel configuration */
+-	uint8_t			mdep;		/* Remote MDEP */
+-	uint16_t		mdlid;		/* Data channel Id */
+-	uint16_t		imtu;		/* Channel incoming MTU */
+-	uint16_t		omtu;		/* Channel outgoing MTU */
+-	struct hdp_echo_data	*edata;		/* private data used by echo channels */
+-	int			ref;		/* Reference counter */
+-};
+-
+-#endif /* __HDP_TYPES_H__ */
+diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
+deleted file mode 100644
+index 267fdecdee59..000000000000
+--- a/profiles/health/hdp_util.c
++++ /dev/null
+@@ -1,1193 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
 - *
 - */
 -
@@ -929,9 +2983,13 @@ index c1f07701fcc1..000000000000
 -#include <config.h>
 -#endif
 -
--#include <errno.h>
+-#define _GNU_SOURCE
+-#include <stdint.h>
+-#include <stdbool.h>
+-
 -#include <glib.h>
 -
+-#include "bluetooth/bluetooth.h"
 -#include "bluetooth/sdp.h"
 -#include "bluetooth/sdp_lib.h"
 -#include "bluetooth/uuid.h"
@@ -940,2498 +2998,5723 @@ index c1f07701fcc1..000000000000
 -
 -#include "btio/btio.h"
 -#include "src/adapter.h"
+-#include "src/device.h"
 -#include "src/sdpd.h"
+-#include "src/sdp-client.h"
+-#include "src/uuid-helper.h"
 -#include "src/log.h"
--#include "src/error.h"
 -#include "src/dbus-common.h"
--#include "src/shared/timeout.h"
--#include "src/shared/util.h"
 -
--#include "sap.h"
--#include "server.h"
+-#include "mcap.h"
+-#include "hdp_types.h"
+-#include "hdp.h"
+-#include "hdp_util.h"
 -
--#define SAP_SERVER_INTERFACE	"org.bluez.SimAccess1"
--#define SAP_SERVER_CHANNEL	8
+-typedef gboolean (*parse_item_f)(DBusMessageIter *iter, gpointer user_data,
+-								GError **err);
 -
--#define PADDING4(x) ((4 - ((x) & 0x03)) & 0x03)
--#define PARAMETER_SIZE(x) (sizeof(struct sap_parameter) + x + PADDING4(x))
--
--#define SAP_NO_REQ 0xFF
--#define SAP_DISCONNECTION_TYPE_CLIENT 0xFF
--
--#define SAP_TIMER_GRACEFUL_DISCONNECT 30
--#define SAP_TIMER_NO_ACTIVITY 30
--
--enum {
--	SAP_STATE_DISCONNECTED,
--	SAP_STATE_CONNECT_IN_PROGRESS,
--	SAP_STATE_CONNECT_MODEM_BUSY,
--	SAP_STATE_CONNECTED,
--	SAP_STATE_GRACEFUL_DISCONNECT,
--	SAP_STATE_IMMEDIATE_DISCONNECT,
--	SAP_STATE_CLIENT_DISCONNECT
+-struct dict_entry_func {
+-	const char	*key;
+-	parse_item_f	func;
 -};
 -
--struct sap_connection {
--	GIOChannel *io;
--	uint32_t state;
--	uint8_t processing_req;
--	unsigned int timer_id;
+-struct get_mdep_data {
+-	struct hdp_application	*app;
+-	gpointer		data;
+-	hdp_continue_mdep_f	func;
+-	GDestroyNotify		destroy;
 -};
 -
--struct sap_server {
--	struct btd_adapter *adapter;
--	uint32_t record_id;
--	GIOChannel *listen_io;
--	struct sap_connection *conn;
+-struct conn_mcl_data {
+-	int			refs;
+-	gpointer		data;
+-	hdp_continue_proc_f	func;
+-	GDestroyNotify		destroy;
+-	struct hdp_device	*dev;
 -};
 -
--static void start_guard_timer(struct sap_server *server, guint interval);
--static void stop_guard_timer(struct sap_server *server);
--static bool guard_timeout(gpointer data);
+-struct get_dcpsm_data {
+-	gpointer		data;
+-	hdp_continue_dcpsm_f	func;
+-	GDestroyNotify		destroy;
+-};
 -
--static size_t add_result_parameter(uint8_t result,
--					struct sap_parameter *param)
+-static gboolean parse_dict_entry(const struct dict_entry_func dict_context[],
+-							DBusMessageIter *iter,
+-							GError **err,
+-							gpointer user_data)
 -{
--	param->id = SAP_PARAM_ID_RESULT_CODE;
--	param->len = htons(SAP_PARAM_ID_RESULT_CODE_LEN);
--	*param->val = result;
--
--	return PARAMETER_SIZE(SAP_PARAM_ID_RESULT_CODE_LEN);
--}
--
--static int is_power_sim_off_req_allowed(uint8_t processing_req)
--{
--	switch (processing_req) {
--	case SAP_NO_REQ:
--	case SAP_TRANSFER_APDU_REQ:
--	case SAP_TRANSFER_ATR_REQ:
--	case SAP_POWER_SIM_ON_REQ:
--	case SAP_RESET_SIM_REQ:
--	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
--		return 1;
--	default:
--		return 0;
--	}
--}
--
--static int is_reset_sim_req_allowed(uint8_t processing_req)
--{
--	switch (processing_req) {
--	case SAP_NO_REQ:
--	case SAP_TRANSFER_APDU_REQ:
--	case SAP_TRANSFER_ATR_REQ:
--	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
--		return 1;
--	default:
--		return 0;
--	}
--}
--
--static int check_msg(struct sap_message *msg)
--{
--	switch (msg->id) {
--	case SAP_CONNECT_REQ:
--		if (msg->nparam != 0x01)
--			return -EBADMSG;
--
--		if (msg->param->id != SAP_PARAM_ID_MAX_MSG_SIZE)
--			return -EBADMSG;
--
--		if (ntohs(msg->param->len) != SAP_PARAM_ID_MAX_MSG_SIZE_LEN)
--			return -EBADMSG;
--
--		break;
--
--	case SAP_TRANSFER_APDU_REQ:
--		if (msg->nparam != 0x01)
--			return -EBADMSG;
--
--		if (msg->param->id != SAP_PARAM_ID_COMMAND_APDU)
--			if (msg->param->id != SAP_PARAM_ID_COMMAND_APDU7816)
--				return -EBADMSG;
--
--		if (msg->param->len == 0x00)
--			return -EBADMSG;
--
--		break;
--
--	case SAP_SET_TRANSPORT_PROTOCOL_REQ:
--		if (msg->nparam != 0x01)
--			return -EBADMSG;
--
--		if (msg->param->id != SAP_PARAM_ID_TRANSPORT_PROTOCOL)
--			return -EBADMSG;
--
--		if (ntohs(msg->param->len) != SAP_PARAM_ID_TRANSPORT_PROTO_LEN)
--			return -EBADMSG;
--
--		if (*msg->param->val != SAP_TRANSPORT_PROTOCOL_T0)
--			if (*msg->param->val != SAP_TRANSPORT_PROTOCOL_T1)
--				return -EBADMSG;
--
--		break;
--
--	case SAP_DISCONNECT_REQ:
--	case SAP_TRANSFER_ATR_REQ:
--	case SAP_POWER_SIM_OFF_REQ:
--	case SAP_POWER_SIM_ON_REQ:
--	case SAP_RESET_SIM_REQ:
--	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
--		if (msg->nparam != 0x00)
--			return -EBADMSG;
--
--		break;
--	}
--
--	return 0;
--}
--
--static sdp_record_t *create_sap_record(uint8_t channel)
--{
--	sdp_list_t *apseq, *aproto, *profiles, *proto[2], *root, *svclass_id;
--	uuid_t sap_uuid, gt_uuid, root_uuid, l2cap, rfcomm;
--	sdp_profile_desc_t profile;
--	sdp_record_t *record;
--	sdp_data_t *ch;
--
--	record = sdp_record_alloc();
--	if (!record)
--		return NULL;
--
--	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
--	root = sdp_list_append(NULL, &root_uuid);
--	sdp_set_browse_groups(record, root);
--	sdp_list_free(root, NULL);
--
--	sdp_uuid16_create(&sap_uuid, SAP_SVCLASS_ID);
--	svclass_id = sdp_list_append(NULL, &sap_uuid);
--	sdp_uuid16_create(&gt_uuid, GENERIC_TELEPHONY_SVCLASS_ID);
--	svclass_id = sdp_list_append(svclass_id, &gt_uuid);
--
--	sdp_set_service_classes(record, svclass_id);
--	sdp_list_free(svclass_id, NULL);
--
--	sdp_uuid16_create(&profile.uuid, SAP_PROFILE_ID);
--	profile.version = SAP_VERSION;
--	profiles = sdp_list_append(NULL, &profile);
--	sdp_set_profile_descs(record, profiles);
--	sdp_list_free(profiles, NULL);
--
--	sdp_uuid16_create(&l2cap, L2CAP_UUID);
--	proto[0] = sdp_list_append(NULL, &l2cap);
--	apseq = sdp_list_append(NULL, proto[0]);
--
--	sdp_uuid16_create(&rfcomm, RFCOMM_UUID);
--	proto[1] = sdp_list_append(NULL, &rfcomm);
--	ch = sdp_data_alloc(SDP_UINT8, &channel);
--	proto[1] = sdp_list_append(proto[1], ch);
--	apseq = sdp_list_append(apseq, proto[1]);
--
--	aproto = sdp_list_append(NULL, apseq);
--	sdp_set_access_protos(record, aproto);
--
--	sdp_set_info_attr(record, "SIM Access Server", NULL, NULL);
--
--	sdp_data_free(ch);
--	sdp_list_free(proto[0], NULL);
--	sdp_list_free(proto[1], NULL);
--	sdp_list_free(apseq, NULL);
--	sdp_list_free(aproto, NULL);
--
--	return record;
--}
--
--static int send_message(struct sap_connection *conn, void *buf, size_t size)
--{
--	size_t written = 0;
--	GError *gerr = NULL;
--	GIOStatus gstatus;
--
--	SAP_VDBG("conn %p, size %zu", conn, size);
--
--	gstatus = g_io_channel_write_chars(conn->io, buf, size, &written,
--									&gerr);
--	if (gstatus != G_IO_STATUS_NORMAL) {
--		if (gerr)
--			g_error_free(gerr);
--
--		error("write error (0x%02x).", gstatus);
--		return -EIO;
--	}
--
--	if (written != size) {
--		error("written %zu bytes out of %zu", written, size);
--		return -EIO;
--	}
--
--	return written;
--}
--
--static int disconnect_ind(struct sap_connection *conn, uint8_t disc_type)
--{
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	struct sap_parameter *param = (struct sap_parameter *) msg->param;
--	size_t size = sizeof(struct sap_message);
--
--	DBG("data %p state %d disc_type 0x%02x", conn, conn->state, disc_type);
--
--	memset(buf, 0, sizeof(buf));
--	msg->id = SAP_DISCONNECT_IND;
--	msg->nparam = 0x01;
--
--	/* Add disconnection type param. */
--	param->id  = SAP_PARAM_ID_DISCONNECT_IND;
--	param->len = htons(SAP_PARAM_ID_DISCONNECT_IND_LEN);
--	*param->val = disc_type;
--	size += PARAMETER_SIZE(SAP_PARAM_ID_DISCONNECT_IND_LEN);
--
--	return send_message(conn, buf, size);
--}
--
--static int sap_error_rsp(struct sap_connection *conn)
--{
--	struct sap_message msg;
--
--	memset(&msg, 0, sizeof(msg));
--	msg.id = SAP_ERROR_RESP;
--
--	error("SAP error (state %d pr 0x%02x).", conn->state,
--							conn->processing_req);
--
--	return send_message(conn, &msg, sizeof(msg));
--}
--
--static void connect_req(struct sap_server *server,
--				struct sap_parameter *param)
--{
--	struct sap_connection *conn = server->conn;
--	uint16_t maxmsgsize;
--
--	DBG("conn %p state %d", conn, conn->state);
--
--	if (!param)
--		goto error_rsp;
--
--	if (conn->state != SAP_STATE_DISCONNECTED)
--		goto error_rsp;
--
--	stop_guard_timer(server);
--
--	maxmsgsize = get_be16(&param->val);
--
--	DBG("Connect MaxMsgSize: 0x%04x", maxmsgsize);
--
--	conn->state = SAP_STATE_CONNECT_IN_PROGRESS;
--
--	if (maxmsgsize <= SAP_BUF_SIZE) {
--		conn->processing_req = SAP_CONNECT_REQ;
--		sap_connect_req(server, maxmsgsize);
--	} else {
--		sap_connect_rsp(server, SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED);
--	}
--
--	return;
--
--error_rsp:
--	sap_error_rsp(conn);
--}
--
--static int disconnect_req(struct sap_server *server, uint8_t disc_type)
--{
--	struct sap_connection *conn = server->conn;
--
--	DBG("conn %p state %d disc_type 0x%02x", conn, conn->state, disc_type);
--
--	switch (disc_type) {
--	case SAP_DISCONNECTION_TYPE_GRACEFUL:
--		if (conn->state == SAP_STATE_DISCONNECTED ||
--				conn->state == SAP_STATE_CONNECT_IN_PROGRESS ||
--				conn->state == SAP_STATE_CONNECT_MODEM_BUSY)
--			return -EPERM;
--
--		if (conn->state == SAP_STATE_CONNECTED) {
--			conn->state = SAP_STATE_GRACEFUL_DISCONNECT;
--			conn->processing_req = SAP_NO_REQ;
--
--			disconnect_ind(conn, disc_type);
--			/* Timer will disconnect if client won't do.*/
--			start_guard_timer(server,
--					SAP_TIMER_GRACEFUL_DISCONNECT);
--		}
--
--		return 0;
--
--	case SAP_DISCONNECTION_TYPE_IMMEDIATE:
--		if (conn->state == SAP_STATE_DISCONNECTED ||
--				conn->state == SAP_STATE_CONNECT_IN_PROGRESS ||
--				conn->state == SAP_STATE_CONNECT_MODEM_BUSY)
--			return -EPERM;
--
--		if (conn->state == SAP_STATE_CONNECTED ||
--				conn->state == SAP_STATE_GRACEFUL_DISCONNECT) {
--			conn->state = SAP_STATE_IMMEDIATE_DISCONNECT;
--			conn->processing_req = SAP_NO_REQ;
--
--			stop_guard_timer(server);
--			disconnect_ind(conn, disc_type);
--			sap_disconnect_req(server, 0);
--		}
--
--		return 0;
--
--	case SAP_DISCONNECTION_TYPE_CLIENT:
--		if (conn->state != SAP_STATE_CONNECTED &&
--				conn->state != SAP_STATE_GRACEFUL_DISCONNECT) {
--			sap_error_rsp(conn);
--			return -EPERM;
--		}
--
--		conn->state = SAP_STATE_CLIENT_DISCONNECT;
--		conn->processing_req = SAP_NO_REQ;
--
--		stop_guard_timer(server);
--		sap_disconnect_req(server, 0);
--
--		return 0;
--
--	default:
--		error("Unknown disconnection type (0x%02x).", disc_type);
--		return -EINVAL;
--	}
--}
--
--static void transfer_apdu_req(struct sap_server *server,
--					struct sap_parameter *param)
--{
--	struct sap_connection *conn = server->conn;
--
--	SAP_VDBG("conn %p state %d", conn, conn->state);
--
--	if (!param)
--		goto error_rsp;
--
--	param->len = ntohs(param->len);
--
--	if (conn->state != SAP_STATE_CONNECTED &&
--			conn->state != SAP_STATE_GRACEFUL_DISCONNECT)
--		goto error_rsp;
--
--	if (conn->processing_req != SAP_NO_REQ)
--		goto error_rsp;
--
--	conn->processing_req = SAP_TRANSFER_APDU_REQ;
--	sap_transfer_apdu_req(server, param);
--
--	return;
--
--error_rsp:
--	sap_error_rsp(conn);
--}
--
--static void transfer_atr_req(struct sap_server *server)
--{
--	struct sap_connection *conn = server->conn;
--
--	DBG("conn %p state %d", conn, conn->state);
--
--	if (conn->state != SAP_STATE_CONNECTED)
--		goto error_rsp;
--
--	if (conn->processing_req != SAP_NO_REQ)
--		goto error_rsp;
--
--	conn->processing_req = SAP_TRANSFER_ATR_REQ;
--	sap_transfer_atr_req(server);
--
--	return;
--
--error_rsp:
--	sap_error_rsp(conn);
--}
--
--static void power_sim_off_req(struct sap_server *server)
--{
--	struct sap_connection *conn = server->conn;
--
--	DBG("conn %p state %d", conn, conn->state);
--
--	if (conn->state != SAP_STATE_CONNECTED)
--		goto error_rsp;
--
--	if (!is_power_sim_off_req_allowed(conn->processing_req))
--		goto error_rsp;
--
--	conn->processing_req = SAP_POWER_SIM_OFF_REQ;
--	sap_power_sim_off_req(server);
--
--	return;
--
--error_rsp:
--	sap_error_rsp(conn);
--}
--
--static void power_sim_on_req(struct sap_server *server)
--{
--	struct sap_connection *conn = server->conn;
--
--	DBG("conn %p state %d", conn, conn->state);
--
--	if (conn->state != SAP_STATE_CONNECTED)
--		goto error_rsp;
--
--	if (conn->processing_req != SAP_NO_REQ)
--		goto error_rsp;
--
--	conn->processing_req = SAP_POWER_SIM_ON_REQ;
--	sap_power_sim_on_req(server);
--
--	return;
--
--error_rsp:
--	sap_error_rsp(conn);
--}
--
--static void reset_sim_req(struct sap_server *server)
--{
--	struct sap_connection *conn = server->conn;
--
--	DBG("conn %p state %d", conn, conn->state);
--
--	if (conn->state != SAP_STATE_CONNECTED)
--		goto error_rsp;
--
--	if (!is_reset_sim_req_allowed(conn->processing_req))
--		goto error_rsp;
--
--	conn->processing_req = SAP_RESET_SIM_REQ;
--	sap_reset_sim_req(server);
--
--	return;
--
--error_rsp:
--	sap_error_rsp(conn);
--}
--
--static void transfer_card_reader_status_req(struct sap_server *server)
--{
--	struct sap_connection *conn = server->conn;
--
--	DBG("conn %p state %d", conn, conn->state);
--
--	if (conn->state != SAP_STATE_CONNECTED)
--		goto error_rsp;
--
--	if (conn->processing_req != SAP_NO_REQ)
--		goto error_rsp;
--
--	conn->processing_req = SAP_TRANSFER_CARD_READER_STATUS_REQ;
--	sap_transfer_card_reader_status_req(server);
--
--	return;
--
--error_rsp:
--	sap_error_rsp(conn);
--}
--
--static void set_transport_protocol_req(struct sap_server *server,
--					struct sap_parameter *param)
--{
--	struct sap_connection *conn = server->conn;
--
--	if (!param)
--		goto error_rsp;
--
--	DBG("conn %p state %d param %p", conn, conn->state, param);
--
--	if (conn->state != SAP_STATE_CONNECTED)
--		goto error_rsp;
--
--	if (conn->processing_req != SAP_NO_REQ)
--		goto error_rsp;
--
--	conn->processing_req = SAP_SET_TRANSPORT_PROTOCOL_REQ;
--	sap_set_transport_protocol_req(server, param);
--
--	return;
--
--error_rsp:
--	sap_error_rsp(conn);
--}
--
--static void start_guard_timer(struct sap_server *server, guint interval)
--{
--	struct sap_connection *conn = server->conn;
--
--	if (!conn)
--		return;
--
--	if (!conn->timer_id)
--		conn->timer_id = timeout_add_seconds(interval, guard_timeout,
--								server, NULL);
--	else
--		error("Timer is already active.");
--}
--
--static void stop_guard_timer(struct sap_server *server)
--{
--	struct sap_connection *conn = server->conn;
--
--	if (conn  && conn->timer_id) {
--		timeout_remove(conn->timer_id);
--		conn->timer_id = 0;
--	}
--}
--
--static bool guard_timeout(gpointer data)
--{
--	struct sap_server *server = data;
--	struct sap_connection *conn = server->conn;
--
--	if (!conn)
+-	DBusMessageIter entry;
+-	char *key;
+-	int ctype, i;
+-
+-	dbus_message_iter_recurse(iter, &entry);
+-	ctype = dbus_message_iter_get_arg_type(&entry);
+-	if (ctype != DBUS_TYPE_STRING) {
+-		g_set_error(err, HDP_ERROR, HDP_DIC_ENTRY_PARSE_ERROR,
+-			"Dictionary entries should have a string as key");
 -		return FALSE;
+-	}
 -
--	DBG("conn %p state %d pr 0x%02x", conn, conn->state,
--						conn->processing_req);
+-	dbus_message_iter_get_basic(&entry, &key);
+-	dbus_message_iter_next(&entry);
+-	/* Find function and call it */
+-	for (i = 0; dict_context[i].key; i++) {
+-		if (g_ascii_strcasecmp(dict_context[i].key, key) == 0)
+-			return dict_context[i].func(&entry, user_data, err);
+-	}
 -
--	conn->timer_id = 0;
+-	g_set_error(err, HDP_ERROR, HDP_DIC_ENTRY_PARSE_ERROR,
+-			"No function found for parsing value for key %s", key);
+-	return FALSE;
+-}
 -
--	switch (conn->state) {
--	case SAP_STATE_DISCONNECTED:
--		/* Client opened RFCOMM channel but didn't send CONNECT_REQ,
--		 * in fixed time or client disconnected SAP connection but
--		 * didn't closed RFCOMM channel in fixed time.*/
--		if (conn->io) {
--			g_io_channel_shutdown(conn->io, TRUE, NULL);
--			g_io_channel_unref(conn->io);
--			conn->io = NULL;
+-static gboolean parse_dict(const struct dict_entry_func dict_context[],
+-							DBusMessageIter *iter,
+-							GError **err,
+-							gpointer user_data)
+-{
+-	int ctype;
+-	DBusMessageIter dict;
+-
+-	ctype = dbus_message_iter_get_arg_type(iter);
+-	if (ctype != DBUS_TYPE_ARRAY) {
+-		g_set_error(err, HDP_ERROR, HDP_DIC_PARSE_ERROR,
+-					"Dictionary should be an array");
+-		return FALSE;
+-	}
+-
+-	dbus_message_iter_recurse(iter, &dict);
+-	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
+-							DBUS_TYPE_INVALID) {
+-		if (ctype != DBUS_TYPE_DICT_ENTRY) {
+-			g_set_error(err, HDP_ERROR, HDP_DIC_PARSE_ERROR,
+-						"Dictionary array should "
+-						"contain dict entries");
+-			return FALSE;
 -		}
--		break;
 -
--	case SAP_STATE_GRACEFUL_DISCONNECT:
--		/* Client didn't disconnect SAP connection in fixed time,
--		 * so close SAP connection immediately. */
--		disconnect_req(server, SAP_DISCONNECTION_TYPE_IMMEDIATE);
--		break;
+-		/* Start parsing entry */
+-		if (!parse_dict_entry(dict_context, &dict, err,
+-							user_data))
+-			return FALSE;
+-		/* Finish entry parsing */
 -
--	default:
--		error("Unexpected state (%d).", conn->state);
--		break;
+-		dbus_message_iter_next(&dict);
+-	}
+-
+-	return TRUE;
+-}
+-
+-static gboolean parse_data_type(DBusMessageIter *iter, gpointer data,
+-								GError **err)
+-{
+-	struct hdp_application *app = data;
+-	DBusMessageIter *value;
+-	DBusMessageIter variant;
+-	int ctype;
+-
+-	ctype = dbus_message_iter_get_arg_type(iter);
+-	value = iter;
+-	if (ctype == DBUS_TYPE_VARIANT) {
+-		/* Get value inside the variable */
+-		dbus_message_iter_recurse(iter, &variant);
+-		ctype = dbus_message_iter_get_arg_type(&variant);
+-		value = &variant;
+-	}
+-
+-	if (ctype != DBUS_TYPE_UINT16) {
+-		g_set_error(err, HDP_ERROR, HDP_DIC_ENTRY_PARSE_ERROR,
+-			"Final value for data type should be uint16");
+-		return FALSE;
+-	}
+-
+-	dbus_message_iter_get_basic(value, &app->data_type);
+-	app->data_type_set = TRUE;
+-	return TRUE;
+-}
+-
+-static gboolean parse_role(DBusMessageIter *iter, gpointer data, GError **err)
+-{
+-	struct hdp_application *app = data;
+-	DBusMessageIter *string;
+-	DBusMessageIter value;
+-	int ctype;
+-	const char *role;
+-
+-	ctype = dbus_message_iter_get_arg_type(iter);
+-	if (ctype == DBUS_TYPE_VARIANT) {
+-		/* Get value inside the variable */
+-		dbus_message_iter_recurse(iter, &value);
+-		ctype = dbus_message_iter_get_arg_type(&value);
+-		string = &value;
+-	} else {
+-		string = iter;
+-	}
+-
+-	if (ctype != DBUS_TYPE_STRING) {
+-		g_set_error(err, HDP_ERROR, HDP_UNSPECIFIED_ERROR,
+-				"Value data spec should be variable or string");
+-		return FALSE;
+-	}
+-
+-	dbus_message_iter_get_basic(string, &role);
+-	if (g_ascii_strcasecmp(role, HDP_SINK_ROLE_AS_STRING) == 0) {
+-		app->role = HDP_SINK;
+-	} else if (g_ascii_strcasecmp(role, HDP_SOURCE_ROLE_AS_STRING) == 0) {
+-		app->role = HDP_SOURCE;
+-	} else {
+-		g_set_error(err, HDP_ERROR, HDP_UNSPECIFIED_ERROR,
+-			"Role value should be \"source\" or \"sink\"");
+-		return FALSE;
+-	}
+-
+-	app->role_set = TRUE;
+-
+-	return TRUE;
+-}
+-
+-static gboolean parse_desc(DBusMessageIter *iter, gpointer data, GError **err)
+-{
+-	struct hdp_application *app = data;
+-	DBusMessageIter *string;
+-	DBusMessageIter variant;
+-	int ctype;
+-	const char *desc;
+-
+-	ctype = dbus_message_iter_get_arg_type(iter);
+-	if (ctype == DBUS_TYPE_VARIANT) {
+-		/* Get value inside the variable */
+-		dbus_message_iter_recurse(iter, &variant);
+-		ctype = dbus_message_iter_get_arg_type(&variant);
+-		string = &variant;
+-	} else {
+-		string = iter;
+-	}
+-
+-	if (ctype != DBUS_TYPE_STRING) {
+-		g_set_error(err, HDP_ERROR, HDP_DIC_ENTRY_PARSE_ERROR,
+-				"Value data spec should be variable or string");
+-		return FALSE;
+-	}
+-
+-	dbus_message_iter_get_basic(string, &desc);
+-	app->description = g_strdup(desc);
+-	return TRUE;
+-}
+-
+-static gboolean parse_chan_type(DBusMessageIter *iter, gpointer data,
+-								GError **err)
+-{
+-	struct hdp_application *app = data;
+-	DBusMessageIter *value;
+-	DBusMessageIter variant;
+-	char *chan_type;
+-	int ctype;
+-
+-	ctype = dbus_message_iter_get_arg_type(iter);
+-	value = iter;
+-	if (ctype == DBUS_TYPE_VARIANT) {
+-		/* Get value inside the variable */
+-		dbus_message_iter_recurse(iter, &variant);
+-		ctype = dbus_message_iter_get_arg_type(&variant);
+-		value = &variant;
+-	}
+-
+-	if (ctype != DBUS_TYPE_STRING) {
+-		g_set_error(err, HDP_ERROR, HDP_DIC_ENTRY_PARSE_ERROR,
+-			"Final value for channel type should be an string");
+-		return FALSE;
+-	}
+-
+-	dbus_message_iter_get_basic(value, &chan_type);
+-
+-	if (g_ascii_strcasecmp("reliable", chan_type) == 0)
+-		app->chan_type = HDP_RELIABLE_DC;
+-	else if (g_ascii_strcasecmp("streaming", chan_type) == 0)
+-		app->chan_type = HDP_STREAMING_DC;
+-	else {
+-		g_set_error(err, HDP_ERROR, HDP_DIC_ENTRY_PARSE_ERROR,
+-						"Invalid value for data type");
+-		return FALSE;
+-	}
+-
+-	app->chan_type_set = TRUE;
+-
+-	return TRUE;
+-}
+-
+-static const struct dict_entry_func dict_parser[] = {
+-	{"DataType",		parse_data_type},
+-	{"Role",		parse_role},
+-	{"Description",		parse_desc},
+-	{"ChannelType",		parse_chan_type},
+-	{NULL, NULL}
+-};
+-
+-struct hdp_application *hdp_get_app_config(DBusMessageIter *iter, GError **err)
+-{
+-	struct hdp_application *app;
+-
+-	app = g_new0(struct hdp_application, 1);
+-	app->ref = 1;
+-	if (!parse_dict(dict_parser, iter, err, app))
+-		goto fail;
+-	if (!app->data_type_set || !app->role_set) {
+-		g_set_error(err, HDP_ERROR, HDP_DIC_PARSE_ERROR,
+-						"Mandatory fields aren't set");
+-		goto fail;
+-	}
+-	return app;
+-
+-fail:
+-	hdp_application_unref(app);
+-	return NULL;
+-}
+-
+-static gboolean is_app_role(GSList *app_list, HdpRole role)
+-{
+-	GSList *l;
+-
+-	for (l = app_list; l; l = l->next) {
+-		struct hdp_application *app = l->data;
+-
+-		if (app->role == role)
+-			return TRUE;
 -	}
 -
 -	return FALSE;
 -}
 -
--static void sap_set_connected(struct sap_server *server)
+-static gboolean set_sdp_services_uuid(sdp_record_t *record, HdpRole role)
 -{
--	server->conn->state = SAP_STATE_CONNECTED;
+-	uuid_t svc_uuid_source, svc_uuid_sink;
+-	sdp_list_t *svc_list = NULL;
 -
--	g_dbus_emit_property_changed(btd_get_dbus_connection(),
--					adapter_get_path(server->adapter),
--					SAP_SERVER_INTERFACE, "Connected");
--}
+-	sdp_uuid16_create(&svc_uuid_sink, HDP_SINK_SVCLASS_ID);
+-	sdp_uuid16_create(&svc_uuid_source, HDP_SOURCE_SVCLASS_ID);
 -
--int sap_connect_rsp(void *sap_device, uint8_t status)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	struct sap_parameter *param = (struct sap_parameter *) msg->param;
--	size_t size = sizeof(struct sap_message);
+-	sdp_get_service_classes(record, &svc_list);
 -
--	if (!conn)
--		return -EINVAL;
--
--	DBG("state %d pr 0x%02x status 0x%02x", conn->state,
--						conn->processing_req, status);
--
--	if (conn->state != SAP_STATE_CONNECT_IN_PROGRESS)
--		return -EPERM;
--
--	memset(buf, 0, sizeof(buf));
--	msg->id = SAP_CONNECT_RESP;
--	msg->nparam = 0x01;
--
--	/* Add connection status */
--	param->id = SAP_PARAM_ID_CONN_STATUS;
--	param->len = htons(SAP_PARAM_ID_CONN_STATUS_LEN);
--	*param->val = status;
--	size += PARAMETER_SIZE(SAP_PARAM_ID_CONN_STATUS_LEN);
--
--
--	switch (status) {
--	case SAP_STATUS_OK:
--		sap_set_connected(server);
--		break;
--	case SAP_STATUS_OK_ONGOING_CALL:
--		DBG("ongoing call. Wait for reset indication!");
--		conn->state = SAP_STATE_CONNECT_MODEM_BUSY;
--		break;
--	case SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED: /* Add MaxMsgSize */
--		msg->nparam++;
--		param = (struct sap_parameter *) &buf[size];
--		param->id = SAP_PARAM_ID_MAX_MSG_SIZE;
--		param->len = htons(SAP_PARAM_ID_MAX_MSG_SIZE_LEN);
--		put_be16(SAP_BUF_SIZE, &param->val);
--		size += PARAMETER_SIZE(SAP_PARAM_ID_MAX_MSG_SIZE_LEN);
--		/* fall through */
--	default:
--		conn->state = SAP_STATE_DISCONNECTED;
--
--		/* Timer will shutdown channel if client doesn't send
--		 * CONNECT_REQ or doesn't shutdown channel itself.*/
--		start_guard_timer(server, SAP_TIMER_NO_ACTIVITY);
--		break;
+-	if (role == HDP_SOURCE) {
+-		if (!sdp_list_find(svc_list, &svc_uuid_source, sdp_uuid_cmp))
+-			svc_list = sdp_list_append(svc_list, &svc_uuid_source);
+-	} else if (role == HDP_SINK) {
+-		if (!sdp_list_find(svc_list, &svc_uuid_sink, sdp_uuid_cmp))
+-			svc_list = sdp_list_append(svc_list, &svc_uuid_sink);
 -	}
 -
--	conn->processing_req = SAP_NO_REQ;
--
--	return send_message(conn, buf, size);
--}
--
--int sap_disconnect_rsp(void *sap_device)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	struct sap_message msg;
--
--	if (!conn)
--		return -EINVAL;
--
--	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
--
--	switch (conn->state) {
--	case SAP_STATE_CLIENT_DISCONNECT:
--		memset(&msg, 0, sizeof(msg));
--		msg.id = SAP_DISCONNECT_RESP;
--
--		conn->state = SAP_STATE_DISCONNECTED;
--		conn->processing_req = SAP_NO_REQ;
--
--		/* Timer will close channel if client doesn't do it.*/
--		start_guard_timer(server, SAP_TIMER_NO_ACTIVITY);
--
--		return send_message(conn, &msg, sizeof(msg));
--
--	case SAP_STATE_IMMEDIATE_DISCONNECT:
--		conn->state = SAP_STATE_DISCONNECTED;
--		conn->processing_req = SAP_NO_REQ;
--
--		if (conn->io) {
--			g_io_channel_shutdown(conn->io, TRUE, NULL);
--			g_io_channel_unref(conn->io);
--			conn->io = NULL;
--		}
--
--		return 0;
--
--	default:
--		break;
--	}
--
--	return 0;
--}
--
--int sap_transfer_apdu_rsp(void *sap_device, uint8_t result, uint8_t *apdu,
--					uint16_t length)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	struct sap_parameter *param = (struct sap_parameter *) msg->param;
--	size_t size = sizeof(struct sap_message);
--
--	if (!conn)
--		return -EINVAL;
--
--	SAP_VDBG("state %d pr 0x%02x", conn->state, conn->processing_req);
--
--	if (conn->processing_req != SAP_TRANSFER_APDU_REQ)
--		return 0;
--
--	if (result == SAP_RESULT_OK && (!apdu || (apdu && length == 0x00)))
--		return -EINVAL;
--
--	memset(buf, 0, sizeof(buf));
--	msg->id = SAP_TRANSFER_APDU_RESP;
--	msg->nparam = 0x01;
--	size += add_result_parameter(result, param);
--
--	/* Add APDU response. */
--	if (result == SAP_RESULT_OK) {
--		msg->nparam++;
--		param = (struct sap_parameter *) &buf[size];
--		param->id = SAP_PARAM_ID_RESPONSE_APDU;
--		param->len = htons(length);
--
--		size += PARAMETER_SIZE(length);
--
--		if (size > SAP_BUF_SIZE)
--			return -EOVERFLOW;
--
--		memcpy(param->val, apdu, length);
--	}
--
--	conn->processing_req = SAP_NO_REQ;
--
--	return send_message(conn, buf, size);
--}
--
--int sap_transfer_atr_rsp(void *sap_device, uint8_t result, uint8_t *atr,
--					uint16_t length)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	struct sap_parameter *param = (struct sap_parameter *) msg->param;
--	size_t size = sizeof(struct sap_message);
--
--	if (!conn)
--		return -EINVAL;
--
--	DBG("result 0x%02x state %d pr 0x%02x len %d", result, conn->state,
--			conn->processing_req, length);
--
--	if (conn->processing_req != SAP_TRANSFER_ATR_REQ)
--		return 0;
--
--	if (result == SAP_RESULT_OK && (!atr || (atr && length == 0x00)))
--		return -EINVAL;
--
--	memset(buf, 0, sizeof(buf));
--	msg->id = SAP_TRANSFER_ATR_RESP;
--	msg->nparam = 0x01;
--	size += add_result_parameter(result, param);
--
--	/* Add ATR response */
--	if (result == SAP_RESULT_OK) {
--		msg->nparam++;
--		param = (struct sap_parameter *) &buf[size];
--		param->id = SAP_PARAM_ID_ATR;
--		param->len = htons(length);
--		size += PARAMETER_SIZE(length);
--
--		if (size > SAP_BUF_SIZE)
--			return -EOVERFLOW;
--
--		memcpy(param->val, atr, length);
--	}
--
--	conn->processing_req = SAP_NO_REQ;
--
--	return send_message(conn, buf, size);
--}
--
--int sap_power_sim_off_rsp(void *sap_device, uint8_t result)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	size_t size = sizeof(struct sap_message);
--
--	if (!conn)
--		return -EINVAL;
--
--	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
--
--	if (conn->processing_req != SAP_POWER_SIM_OFF_REQ)
--		return 0;
--
--	memset(buf, 0, sizeof(buf));
--	msg->id = SAP_POWER_SIM_OFF_RESP;
--	msg->nparam = 0x01;
--	size += add_result_parameter(result, msg->param);
--
--	conn->processing_req = SAP_NO_REQ;
--
--	return send_message(conn, buf, size);
--}
--
--int sap_power_sim_on_rsp(void *sap_device, uint8_t result)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	size_t size = sizeof(struct sap_message);
--
--	if (!conn)
--		return -EINVAL;
--
--	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
--
--	if (conn->processing_req != SAP_POWER_SIM_ON_REQ)
--		return 0;
--
--	memset(buf, 0, sizeof(buf));
--	msg->id = SAP_POWER_SIM_ON_RESP;
--	msg->nparam = 0x01;
--	size += add_result_parameter(result, msg->param);
--
--	conn->processing_req = SAP_NO_REQ;
--
--	return send_message(conn, buf, size);
--}
--
--int sap_reset_sim_rsp(void *sap_device, uint8_t result)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	size_t size = sizeof(struct sap_message);
--
--	if (!conn)
--		return -EINVAL;
--
--	DBG("state %d pr 0x%02x result 0x%02x", conn->state,
--						conn->processing_req, result);
--
--	if (conn->processing_req != SAP_RESET_SIM_REQ)
--		return 0;
--
--	memset(buf, 0, sizeof(buf));
--	msg->id = SAP_RESET_SIM_RESP;
--	msg->nparam = 0x01;
--	size += add_result_parameter(result, msg->param);
--
--	conn->processing_req = SAP_NO_REQ;
--
--	return send_message(conn, buf, size);
--}
--
--int sap_transfer_card_reader_status_rsp(void *sap_device, uint8_t result,
--						uint8_t status)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	struct sap_parameter *param = (struct sap_parameter *) msg->param;
--	size_t size = sizeof(struct sap_message);
--
--	if (!conn)
--		return -EINVAL;
--
--	DBG("state %d pr 0x%02x result 0x%02x", conn->state,
--						conn->processing_req, result);
--
--	if (conn->processing_req != SAP_TRANSFER_CARD_READER_STATUS_REQ)
--		return 0;
--
--	memset(buf, 0, sizeof(buf));
--	msg->id = SAP_TRANSFER_CARD_READER_STATUS_RESP;
--	msg->nparam = 0x01;
--	size += add_result_parameter(result, param);
--
--	/* Add card reader status. */
--	if (result == SAP_RESULT_OK) {
--		msg->nparam++;
--		param = (struct sap_parameter *) &buf[size];
--		param->id = SAP_PARAM_ID_CARD_READER_STATUS;
--		param->len = htons(SAP_PARAM_ID_CARD_READER_STATUS_LEN);
--		*param->val = status;
--		size += PARAMETER_SIZE(SAP_PARAM_ID_CARD_READER_STATUS_LEN);
--	}
--
--	conn->processing_req = SAP_NO_REQ;
--
--	return send_message(conn, buf, size);
--}
--
--int sap_transport_protocol_rsp(void *sap_device, uint8_t result)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	size_t size = sizeof(struct sap_message);
--
--	if (!conn)
--		return -EINVAL;
--
--	DBG("state %d pr 0x%02x result 0x%02x", conn->state,
--						conn->processing_req, result);
--
--	if (conn->processing_req != SAP_SET_TRANSPORT_PROTOCOL_REQ)
--		return 0;
--
--	memset(buf, 0, sizeof(buf));
--	msg->id = SAP_SET_TRANSPORT_PROTOCOL_RESP;
--	msg->nparam = 0x01;
--	size += add_result_parameter(result, msg->param);
--
--	conn->processing_req = SAP_NO_REQ;
--
--	return send_message(conn, buf, size);
--}
--
--int sap_status_ind(void *sap_device, uint8_t status_change)
--{
--	struct sap_server *server = sap_device;
--	struct sap_connection *conn = server->conn;
--	char buf[SAP_BUF_SIZE];
--	struct sap_message *msg = (struct sap_message *) buf;
--	struct sap_parameter *param = (struct sap_parameter *) msg->param;
--	size_t size = sizeof(struct sap_message);
--
--	if (!conn)
--		return -EINVAL;
--
--	DBG("state %d pr 0x%02x sc 0x%02x", conn->state, conn->processing_req,
--								status_change);
--
--	switch (conn->state) {
--	case SAP_STATE_CONNECT_MODEM_BUSY:
--		if (status_change != SAP_STATUS_CHANGE_CARD_RESET)
--			break;
--
--		/* Change state to connected after ongoing call ended */
--		sap_set_connected(server);
--		/* fall through */
--	case SAP_STATE_CONNECTED:
--	case SAP_STATE_GRACEFUL_DISCONNECT:
--		memset(buf, 0, sizeof(buf));
--		msg->id = SAP_STATUS_IND;
--		msg->nparam = 0x01;
--
--		/* Add status change. */
--		param->id  = SAP_PARAM_ID_STATUS_CHANGE;
--		param->len = htons(SAP_PARAM_ID_STATUS_CHANGE_LEN);
--		*param->val = status_change;
--		size += PARAMETER_SIZE(SAP_PARAM_ID_STATUS_CHANGE_LEN);
--
--		return send_message(conn, buf, size);
--	case SAP_STATE_DISCONNECTED:
--	case SAP_STATE_CONNECT_IN_PROGRESS:
--	case SAP_STATE_IMMEDIATE_DISCONNECT:
--	case SAP_STATE_CLIENT_DISCONNECT:
--		break;
--	}
--
--	return 0;
--}
--
--int sap_disconnect_ind(void *sap_device, uint8_t disc_type)
--{
--	return disconnect_req(sap_device, SAP_DISCONNECTION_TYPE_IMMEDIATE);
--}
--
--static int handle_cmd(struct sap_server *server, void *buf, size_t size)
--{
--	struct sap_connection *conn = server->conn;
--	struct sap_message *msg = buf;
--
--	if (!conn)
--		return -EINVAL;
--
--	if (size < sizeof(struct sap_message))
--		goto error_rsp;
--
--	if (msg->nparam != 0 && size < (sizeof(struct sap_message) +
--					sizeof(struct sap_parameter) + 4))
--		goto error_rsp;
--
--	if (check_msg(msg) < 0)
--		goto error_rsp;
--
--	switch (msg->id) {
--	case SAP_CONNECT_REQ:
--		connect_req(server, msg->param);
--		return 0;
--	case SAP_DISCONNECT_REQ:
--		disconnect_req(server, SAP_DISCONNECTION_TYPE_CLIENT);
--		return 0;
--	case SAP_TRANSFER_APDU_REQ:
--		transfer_apdu_req(server, msg->param);
--		return 0;
--	case SAP_TRANSFER_ATR_REQ:
--		transfer_atr_req(server);
--		return 0;
--	case SAP_POWER_SIM_OFF_REQ:
--		power_sim_off_req(server);
--		return 0;
--	case SAP_POWER_SIM_ON_REQ:
--		power_sim_on_req(server);
--		return 0;
--	case SAP_RESET_SIM_REQ:
--		reset_sim_req(server);
--		return 0;
--	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
--		transfer_card_reader_status_req(server);
--		return 0;
--	case SAP_SET_TRANSPORT_PROTOCOL_REQ:
--		set_transport_protocol_req(server, msg->param);
--		return 0;
--	default:
--		DBG("Unknown SAP message id 0x%02x.", msg->id);
--		break;
--	}
--
--error_rsp:
--	DBG("Invalid SAP message format.");
--	sap_error_rsp(conn);
--	return -EBADMSG;
--}
--
--static void sap_server_remove_conn(struct sap_server *server)
--{
--	struct sap_connection *conn = server->conn;
--
--	DBG("conn %p", conn);
--
--	if (!conn)
--		return;
--
--	if (conn->io) {
--		g_io_channel_shutdown(conn->io, TRUE, NULL);
--		g_io_channel_unref(conn->io);
--	}
--
--	g_free(conn);
--	server->conn = NULL;
--}
--
--static gboolean sap_io_cb(GIOChannel *io, GIOCondition cond, gpointer data)
--{
--	char buf[SAP_BUF_SIZE];
--	size_t bytes_read = 0;
--	GError *gerr = NULL;
--	GIOStatus gstatus;
--
--	SAP_VDBG("conn %p io %p", conn, io);
--
--	if (cond & G_IO_NVAL) {
--		DBG("ERR (G_IO_NVAL) on rfcomm socket.");
+-	if (sdp_set_service_classes(record, svc_list) < 0) {
+-		sdp_list_free(svc_list, NULL);
 -		return FALSE;
 -	}
 -
--	if (cond & G_IO_ERR) {
--		DBG("ERR (G_IO_ERR) on rfcomm socket.");
+-	sdp_list_free(svc_list, NULL);
+-
+-	return TRUE;
+-}
+-
+-static gboolean register_service_protocols(struct hdp_adapter *adapter,
+-						sdp_record_t *sdp_record)
+-{
+-	gboolean ret;
+-	uuid_t l2cap_uuid, mcap_c_uuid;
+-	sdp_list_t *l2cap_list, *proto_list = NULL, *mcap_list = NULL;
+-	sdp_list_t *access_proto_list = NULL;
+-	sdp_data_t *psm = NULL, *mcap_ver = NULL;
+-	uint16_t version = MCAP_VERSION;
+-
+-	/* set l2cap information */
+-	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
+-	l2cap_list = sdp_list_append(NULL, &l2cap_uuid);
+-	if (l2cap_list == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	psm = sdp_data_alloc(SDP_UINT16, &adapter->ccpsm);
+-	if (psm == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	if (sdp_list_append(l2cap_list, psm) == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	proto_list = sdp_list_append(NULL, l2cap_list);
+-	if (proto_list == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	/* set mcap information */
+-	sdp_uuid16_create(&mcap_c_uuid, MCAP_CTRL_UUID);
+-	mcap_list = sdp_list_append(NULL, &mcap_c_uuid);
+-	if (mcap_list == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	mcap_ver = sdp_data_alloc(SDP_UINT16, &version);
+-	if (mcap_ver == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	if (sdp_list_append(mcap_list, mcap_ver) == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	if (sdp_list_append(proto_list, mcap_list) == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	/* attach protocol information to service record */
+-	access_proto_list = sdp_list_append(NULL, proto_list);
+-	if (access_proto_list == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	ret = TRUE;
+-	sdp_set_access_protos(sdp_record, access_proto_list);
+-
+-end:
+-	if (l2cap_list != NULL)
+-		sdp_list_free(l2cap_list, NULL);
+-	if (mcap_list != NULL)
+-		sdp_list_free(mcap_list, NULL);
+-	if (proto_list != NULL)
+-		sdp_list_free(proto_list, NULL);
+-	if (access_proto_list != NULL)
+-		sdp_list_free(access_proto_list, NULL);
+-	if (psm != NULL)
+-		sdp_data_free(psm);
+-	if (mcap_ver != NULL)
+-		sdp_data_free(mcap_ver);
+-
+-	return ret;
+-}
+-
+-static gboolean register_service_profiles(sdp_record_t *sdp_record)
+-{
+-	gboolean ret;
+-	sdp_list_t *profile_list;
+-	sdp_profile_desc_t hdp_profile;
+-
+-	/* set hdp information */
+-	sdp_uuid16_create(&hdp_profile.uuid, HDP_SVCLASS_ID);
+-	hdp_profile.version = HDP_VERSION;
+-	profile_list = sdp_list_append(NULL, &hdp_profile);
+-	if (profile_list == NULL)
+-		return FALSE;
+-
+-	/* set profile descriptor list */
+-	if (sdp_set_profile_descs(sdp_record, profile_list) < 0)
+-		ret = FALSE;
+-	else
+-		ret = TRUE;
+-
+-	sdp_list_free(profile_list, NULL);
+-
+-	return ret;
+-}
+-
+-static gboolean register_service_additional_protocols(
+-						struct hdp_adapter *adapter,
+-						sdp_record_t *sdp_record)
+-{
+-	gboolean ret = TRUE;
+-	uuid_t l2cap_uuid, mcap_d_uuid;
+-	sdp_list_t *l2cap_list, *proto_list = NULL, *mcap_list = NULL;
+-	sdp_list_t *access_proto_list = NULL;
+-	sdp_data_t *psm = NULL;
+-
+-	/* set l2cap information */
+-	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
+-	l2cap_list = sdp_list_append(NULL, &l2cap_uuid);
+-	if (l2cap_list == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	psm = sdp_data_alloc(SDP_UINT16, &adapter->dcpsm);
+-	if (psm == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	if (sdp_list_append(l2cap_list, psm) == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	proto_list = sdp_list_append(NULL, l2cap_list);
+-	if (proto_list == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	/* set mcap information */
+-	sdp_uuid16_create(&mcap_d_uuid, MCAP_DATA_UUID);
+-	mcap_list = sdp_list_append(NULL, &mcap_d_uuid);
+-	if (mcap_list == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	if (sdp_list_append(proto_list, mcap_list) == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	/* attach protocol information to service record */
+-	access_proto_list = sdp_list_append(NULL, proto_list);
+-	if (access_proto_list == NULL) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-
+-	sdp_set_add_access_protos(sdp_record, access_proto_list);
+-
+-end:
+-	if (l2cap_list != NULL)
+-		sdp_list_free(l2cap_list, NULL);
+-	if (mcap_list != NULL)
+-		sdp_list_free(mcap_list, NULL);
+-	if (proto_list  != NULL)
+-		sdp_list_free(proto_list, NULL);
+-	if (access_proto_list != NULL)
+-		sdp_list_free(access_proto_list, NULL);
+-	if (psm != NULL)
+-		sdp_data_free(psm);
+-
+-	return ret;
+-}
+-
+-static sdp_list_t *app_to_sdplist(struct hdp_application *app)
+-{
+-	sdp_data_t *mdepid,
+-		*dtype = NULL,
+-		*role = NULL,
+-		*desc = NULL;
+-	sdp_list_t *f_list = NULL;
+-
+-	mdepid = sdp_data_alloc(SDP_UINT8, &app->id);
+-	if (mdepid == NULL)
+-		return NULL;
+-
+-	dtype = sdp_data_alloc(SDP_UINT16, &app->data_type);
+-	if (dtype == NULL)
+-		goto fail;
+-
+-	role = sdp_data_alloc(SDP_UINT8, &app->role);
+-	if (role == NULL)
+-		goto fail;
+-
+-	if (app->description != NULL) {
+-		desc = sdp_data_alloc(SDP_TEXT_STR8, app->description);
+-		if (desc == NULL)
+-			goto fail;
+-	}
+-
+-	f_list = sdp_list_append(NULL, mdepid);
+-	if (f_list == NULL)
+-		goto fail;
+-
+-	if (sdp_list_append(f_list, dtype) == NULL)
+-		goto fail;
+-
+-	if (sdp_list_append(f_list, role) == NULL)
+-		goto fail;
+-
+-	if (desc != NULL)
+-		if (sdp_list_append(f_list, desc) == NULL)
+-			goto fail;
+-
+-	return f_list;
+-
+-fail:
+-	if (f_list != NULL)
+-		sdp_list_free(f_list, NULL);
+-	if (mdepid != NULL)
+-		sdp_data_free(mdepid);
+-	if (dtype != NULL)
+-		sdp_data_free(dtype);
+-	if (role != NULL)
+-		sdp_data_free(role);
+-	if (desc != NULL)
+-		sdp_data_free(desc);
+-
+-	return NULL;
+-}
+-
+-static void free_hdp_list(void *list)
+-{
+-	sdp_list_t *hdp_list = list;
+-
+-	sdp_list_free(hdp_list, (sdp_free_func_t)sdp_data_free);
+-}
+-
+-static gboolean register_features(struct hdp_application *app,
+-						sdp_list_t **sup_features)
+-{
+-	sdp_list_t *hdp_feature;
+-
+-	hdp_feature = app_to_sdplist(app);
+-	if (hdp_feature == NULL)
+-		goto fail;
+-
+-	if (*sup_features == NULL) {
+-		*sup_features = sdp_list_append(NULL, hdp_feature);
+-		if (*sup_features == NULL)
+-			goto fail;
+-	} else if (sdp_list_append(*sup_features, hdp_feature) == NULL) {
+-		goto fail;
+-	}
+-
+-	return TRUE;
+-
+-fail:
+-	if (hdp_feature != NULL)
+-		sdp_list_free(hdp_feature, (sdp_free_func_t)sdp_data_free);
+-	if (*sup_features != NULL)
+-		sdp_list_free(*sup_features, free_hdp_list);
+-	return FALSE;
+-}
+-
+-static gboolean register_service_sup_features(GSList *app_list,
+-						sdp_record_t *sdp_record)
+-{
+-	GSList *l;
+-	sdp_list_t *sup_features = NULL;
+-
+-	for (l = app_list; l; l = l->next) {
+-		if (!register_features(l->data, &sup_features))
+-			return FALSE;
+-	}
+-
+-	if (sdp_set_supp_feat(sdp_record, sup_features) < 0) {
+-		sdp_list_free(sup_features, free_hdp_list);
 -		return FALSE;
 -	}
 -
--	if (cond & G_IO_HUP) {
--		DBG("HUP on rfcomm socket.");
+-	sdp_list_free(sup_features, free_hdp_list);
+-
+-	return TRUE;
+-}
+-
+-static gboolean register_data_exchange_spec(sdp_record_t *record)
+-{
+-	sdp_data_t *spec;
+-	uint8_t data_spec = DATA_EXCHANGE_SPEC_11073;
+-	/* As by now 11073 is the only supported we set it by default */
+-
+-	spec = sdp_data_alloc(SDP_UINT8, &data_spec);
+-	if (spec == NULL)
+-		return FALSE;
+-
+-	if (sdp_attr_add(record, SDP_ATTR_DATA_EXCHANGE_SPEC, spec) < 0) {
+-		sdp_data_free(spec);
 -		return FALSE;
 -	}
 -
--	gstatus = g_io_channel_read_chars(io, buf, sizeof(buf) - 1,
--							&bytes_read, &gerr);
--	if (gstatus != G_IO_STATUS_NORMAL) {
--		if (gerr)
--			g_error_free(gerr);
+-	return TRUE;
+-}
+-
+-static gboolean register_mcap_features(sdp_record_t *sdp_record)
+-{
+-	sdp_data_t *mcap_proc;
+-	uint8_t mcap_sup_proc = MCAP_SUP_PROC;
+-
+-	mcap_proc = sdp_data_alloc(SDP_UINT8, &mcap_sup_proc);
+-	if (mcap_proc == NULL)
+-		return FALSE;
+-
+-	if (sdp_attr_add(sdp_record, SDP_ATTR_MCAP_SUPPORTED_PROCEDURES,
+-							mcap_proc) < 0) {
+-		sdp_data_free(mcap_proc);
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-gboolean hdp_update_sdp_record(struct hdp_adapter *adapter, GSList *app_list)
+-{
+-	sdp_record_t *sdp_record;
+-
+-	if (adapter->sdp_handler > 0)
+-		adapter_service_remove(adapter->btd_adapter,
+-					adapter->sdp_handler);
+-
+-	if (app_list == NULL) {
+-		adapter->sdp_handler = 0;
+-		return TRUE;
+-	}
+-
+-	sdp_record = sdp_record_alloc();
+-	if (sdp_record == NULL)
+-		return FALSE;
+-
+-	if (adapter->sdp_handler > 0)
+-		sdp_record->handle = adapter->sdp_handler;
+-	else
+-		sdp_record->handle = 0xffffffff; /* Set automatically */
+-
+-	if (is_app_role(app_list, HDP_SINK))
+-		set_sdp_services_uuid(sdp_record, HDP_SINK);
+-	if (is_app_role(app_list, HDP_SOURCE))
+-		set_sdp_services_uuid(sdp_record, HDP_SOURCE);
+-
+-	if (!register_service_protocols(adapter, sdp_record))
+-		goto fail;
+-	if (!register_service_profiles(sdp_record))
+-		goto fail;
+-	if (!register_service_additional_protocols(adapter, sdp_record))
+-		goto fail;
+-
+-	sdp_set_info_attr(sdp_record, HDP_SERVICE_NAME, HDP_SERVICE_PROVIDER,
+-							HDP_SERVICE_DSC);
+-	if (!register_service_sup_features(app_list, sdp_record))
+-		goto fail;
+-	if (!register_data_exchange_spec(sdp_record))
+-		goto fail;
+-
+-	register_mcap_features(sdp_record);
+-
+-	if (sdp_set_record_state(sdp_record, adapter->record_state++) < 0)
+-		goto fail;
+-
+-	if (adapter_service_add(adapter->btd_adapter, sdp_record) < 0)
+-		goto fail;
+-	adapter->sdp_handler = sdp_record->handle;
+-	return TRUE;
+-
+-fail:
+-	if (sdp_record != NULL)
+-		sdp_record_free(sdp_record);
+-	return FALSE;
+-}
+-
+-static gboolean check_role(uint8_t rec_role, uint8_t app_role)
+-{
+-	if ((rec_role == HDP_SINK && app_role == HDP_SOURCE) ||
+-			(rec_role == HDP_SOURCE && app_role == HDP_SINK))
+-		return TRUE;
+-
+-	return FALSE;
+-}
+-
+-static gboolean get_mdep_from_rec(const sdp_record_t *rec, uint8_t role,
+-				uint16_t d_type, uint8_t *mdep, char **desc)
+-{
+-	sdp_data_t *list, *feat;
+-
+-	if (desc == NULL && mdep == NULL)
+-		return TRUE;
+-
+-	list = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES_LIST);
+-	if (list == NULL || !SDP_IS_SEQ(list->dtd))
+-		return FALSE;
+-
+-	for (feat = list->val.dataseq; feat; feat = feat->next) {
+-		sdp_data_t *data_type, *mdepid, *role_t, *desc_t;
+-
+-		if (!SDP_IS_SEQ(feat->dtd))
+-			continue;
+-
+-		mdepid = feat->val.dataseq;
+-		if (mdepid == NULL)
+-			continue;
+-
+-		data_type = mdepid->next;
+-		if (data_type == NULL)
+-			continue;
+-
+-		role_t = data_type->next;
+-		if (role_t == NULL)
+-			continue;
+-
+-		desc_t = role_t->next;
+-
+-		if (data_type->dtd != SDP_UINT16 || mdepid->dtd != SDP_UINT8 ||
+-						role_t->dtd != SDP_UINT8)
+-			continue;
+-
+-		if (data_type->val.uint16 != d_type ||
+-					!check_role(role_t->val.uint8, role))
+-			continue;
+-
+-		if (mdep != NULL)
+-			*mdep = mdepid->val.uint8;
+-
+-		if (desc != NULL && desc_t != NULL &&
+-						SDP_IS_TEXT_STR(desc_t->dtd))
+-			*desc = g_strdup(desc_t->val.str);
 -
 -		return TRUE;
 -	}
 -
--	if (handle_cmd(data, buf, bytes_read) < 0)
--		error("SAP protocol processing failure.");
+-	return FALSE;
+-}
+-
+-static void get_mdep_cb(sdp_list_t *recs, int err, gpointer user_data)
+-{
+-	struct get_mdep_data *mdep_data = user_data;
+-	GError *gerr = NULL;
+-	uint8_t mdep;
+-
+-	if (err < 0 || recs == NULL) {
+-		g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-					"Error getting remote SDP records");
+-		mdep_data->func(0, mdep_data->data, gerr);
+-		g_error_free(gerr);
+-		return;
+-	}
+-
+-	if (!get_mdep_from_rec(recs->data, mdep_data->app->role,
+-				mdep_data->app->data_type, &mdep, NULL)) {
+-		g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-					"No matching MDEP found");
+-		mdep_data->func(0, mdep_data->data, gerr);
+-		g_error_free(gerr);
+-		return;
+-	}
+-
+-	mdep_data->func(mdep, mdep_data->data, NULL);
+-}
+-
+-static void free_mdep_data(gpointer data)
+-{
+-	struct get_mdep_data *mdep_data = data;
+-
+-	if (mdep_data->destroy)
+-		mdep_data->destroy(mdep_data->data);
+-	hdp_application_unref(mdep_data->app);
+-
+-	g_free(mdep_data);
+-}
+-
+-gboolean hdp_get_mdep(struct hdp_device *device, struct hdp_application *app,
+-				hdp_continue_mdep_f func, gpointer data,
+-				GDestroyNotify destroy, GError **err)
+-{
+-	struct get_mdep_data *mdep_data;
+-	const bdaddr_t *src;
+-	const bdaddr_t *dst;
+-	uuid_t uuid;
+-
+-	src = btd_adapter_get_address(device_get_adapter(device->dev));
+-	dst = device_get_address(device->dev);
+-
+-	mdep_data = g_new0(struct get_mdep_data, 1);
+-	mdep_data->app = hdp_application_ref(app);
+-	mdep_data->func = func;
+-	mdep_data->data = data;
+-	mdep_data->destroy = destroy;
+-
+-	bt_string2uuid(&uuid, HDP_UUID);
+-	if (bt_search_service(src, dst, &uuid, get_mdep_cb, mdep_data,
+-						free_mdep_data, 0) < 0) {
+-		g_set_error(err, HDP_ERROR, HDP_CONNECTION_ERROR,
+-						"Can't get remote SDP record");
+-		g_free(mdep_data);
+-		return FALSE;
+-	}
 -
 -	return TRUE;
 -}
 -
--static void sap_io_destroy(void *data)
+-static gboolean get_prot_desc_entry(sdp_data_t *entry, int type, guint16 *val)
 -{
--	struct sap_server *server = data;
--	struct sap_connection *conn = server->conn;
+-	sdp_data_t *iter;
+-	int proto;
 -
--	DBG("conn %p", conn);
+-	if (entry == NULL || !SDP_IS_SEQ(entry->dtd))
+-		return FALSE;
 -
--	if (!conn || !conn->io)
--		return;
+-	iter = entry->val.dataseq;
+-	if (!(iter->dtd & SDP_UUID_UNSPEC))
+-		return FALSE;
 -
--	stop_guard_timer(server);
+-	proto = sdp_uuid_to_proto(&iter->val.uuid);
+-	if (proto != type)
+-		return FALSE;
 -
--	if (conn->state != SAP_STATE_CONNECT_IN_PROGRESS &&
--				conn->state != SAP_STATE_CONNECT_MODEM_BUSY)
--		g_dbus_emit_property_changed(btd_get_dbus_connection(),
--					adapter_get_path(server->adapter),
--					SAP_SERVER_INTERFACE,
--					"Connected");
+-	if (val == NULL)
+-		return TRUE;
 -
--	if (conn->state == SAP_STATE_CONNECT_IN_PROGRESS ||
--			conn->state == SAP_STATE_CONNECT_MODEM_BUSY ||
--			conn->state == SAP_STATE_CONNECTED ||
--			conn->state == SAP_STATE_GRACEFUL_DISCONNECT)
--		sap_disconnect_req(server, 1);
+-	iter = iter->next;
+-	if (iter->dtd != SDP_UINT16)
+-		return FALSE;
 -
--	sap_server_remove_conn(server);
--}
--
--static void sap_connect_cb(GIOChannel *io, GError *gerr, gpointer data)
--{
--	struct sap_server *server = data;
--	struct sap_connection *conn = server->conn;
--
--	DBG("conn %p, io %p", conn, io);
--
--	if (!conn)
--		return;
--
--	/* Timer will shutdown the channel in case of lack of client
--	   activity */
--	start_guard_timer(server, SAP_TIMER_NO_ACTIVITY);
--
--	g_io_add_watch_full(io, G_PRIORITY_DEFAULT,
--			G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--			sap_io_cb, server, sap_io_destroy);
--}
--
--static void connect_auth_cb(DBusError *derr, void *data)
--{
--	struct sap_server *server = data;
--	struct sap_connection *conn = server->conn;
--	GError *gerr = NULL;
--
--	DBG("conn %p", conn);
--
--	if (!conn)
--		return;
--
--	if (derr && dbus_error_is_set(derr)) {
--		error("Access has been denied (%s)", derr->message);
--		sap_server_remove_conn(server);
--		return;
--	}
--
--	if (!bt_io_accept(conn->io, sap_connect_cb, server, NULL, &gerr)) {
--		error("bt_io_accept: %s", gerr->message);
--		g_error_free(gerr);
--		sap_server_remove_conn(server);
--		return;
--	}
--
--	DBG("Access has been granted.");
--}
--
--static void connect_confirm_cb(GIOChannel *io, gpointer data)
--{
--	struct sap_server *server = data;
--	struct sap_connection *conn = server->conn;
--	GError *gerr = NULL;
--	bdaddr_t src, dst;
--	char dstaddr[18];
--	guint ret;
--
--	DBG("conn %p io %p", conn, io);
--
--	if (!io)
--		return;
--
--	if (conn) {
--		DBG("Another SAP connection already exists.");
--		g_io_channel_shutdown(io, TRUE, NULL);
--		return;
--	}
--
--	conn = g_try_new0(struct sap_connection, 1);
--	if (!conn) {
--		error("Can't allocate memory for incoming SAP connection.");
--		g_io_channel_shutdown(io, TRUE, NULL);
--		return;
--	}
--
--	g_io_channel_set_encoding(io, NULL, NULL);
--	g_io_channel_set_buffered(io, FALSE);
--
--	server->conn = conn;
--	conn->io = g_io_channel_ref(io);
--	conn->state = SAP_STATE_DISCONNECTED;
--
--	bt_io_get(io, &gerr,
--			BT_IO_OPT_SOURCE_BDADDR, &src,
--			BT_IO_OPT_DEST_BDADDR, &dst,
--			BT_IO_OPT_INVALID);
--	if (gerr) {
--		error("%s", gerr->message);
--		g_error_free(gerr);
--		sap_server_remove_conn(server);
--		return;
--	}
--
--	ba2str(&dst, dstaddr);
--
--	ret = btd_request_authorization(&src, &dst, SAP_UUID, connect_auth_cb,
--								server);
--	if (ret == 0) {
--		error("Authorization failure");
--		sap_server_remove_conn(server);
--		return;
--	}
--
--	DBG("Authorizing incoming SAP connection from %s", dstaddr);
--}
--
--static DBusMessage *disconnect(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	struct sap_server *server = data;
--
--	if (!server)
--		return btd_error_failed(msg, "Server internal error.");
--
--	DBG("conn %p", server->conn);
--
--	if (!server->conn)
--		return btd_error_failed(msg, "Client already disconnected");
--
--	if (disconnect_req(server, SAP_DISCONNECTION_TYPE_GRACEFUL) < 0)
--		return btd_error_failed(msg, "There is no active connection");
--
--	return dbus_message_new_method_return(msg);
--}
--
--static gboolean server_property_get_connected(
--					const GDBusPropertyTable *property,
--					DBusMessageIter *iter, void *data)
--{
--	struct sap_server *server = data;
--	struct sap_connection *conn = server->conn;
--	dbus_bool_t connected;
--
--	if (!conn) {
--		connected = FALSE;
--		goto append;
--	}
--
--	connected = (conn->state == SAP_STATE_CONNECTED ||
--				conn->state == SAP_STATE_GRACEFUL_DISCONNECT);
--
--append:
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &connected);
+-	*val = iter->val.uint16;
 -
 -	return TRUE;
 -}
 -
--static const GDBusMethodTable server_methods[] = {
--	{ GDBUS_METHOD("Disconnect", NULL, NULL, disconnect) },
--	{ }
--};
--
--static const GDBusPropertyTable server_properties[] = {
--	{ "Connected", "b", server_property_get_connected },
--	{ }
--};
--
--static void server_remove(struct sap_server *server)
+-static gboolean hdp_get_prot_desc_list(const sdp_record_t *rec, guint16 *psm,
+-							guint16 *version)
 -{
--	if (!server)
+-	sdp_data_t *pdl, *p0, *p1;
+-
+-	if (psm == NULL && version == NULL)
+-		return TRUE;
+-
+-	pdl = sdp_data_get(rec, SDP_ATTR_PROTO_DESC_LIST);
+-	if (pdl == NULL || !SDP_IS_SEQ(pdl->dtd))
+-		return FALSE;
+-
+-	p0 = pdl->val.dataseq;
+-	if (!get_prot_desc_entry(p0, L2CAP_UUID, psm))
+-		return FALSE;
+-
+-	p1 = p0->next;
+-	if (!get_prot_desc_entry(p1, MCAP_CTRL_UUID, version))
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-static gboolean hdp_get_add_prot_desc_list(const sdp_record_t *rec,
+-								guint16 *psm)
+-{
+-	sdp_data_t *pdl, *p0, *p1;
+-
+-	if (psm == NULL)
+-		return TRUE;
+-
+-	pdl = sdp_data_get(rec, SDP_ATTR_ADD_PROTO_DESC_LIST);
+-	if (pdl == NULL || pdl->dtd != SDP_SEQ8)
+-		return FALSE;
+-	pdl = pdl->val.dataseq;
+-	if (pdl->dtd != SDP_SEQ8)
+-		return FALSE;
+-
+-	p0 = pdl->val.dataseq;
+-
+-	if (!get_prot_desc_entry(p0, L2CAP_UUID, psm))
+-		return FALSE;
+-	p1 = p0->next;
+-	if (!get_prot_desc_entry(p1, MCAP_DATA_UUID, NULL))
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-static gboolean get_ccpsm(sdp_list_t *recs, uint16_t *ccpsm)
+-{
+-	sdp_list_t *l;
+-
+-	for (l = recs; l; l = l->next) {
+-		sdp_record_t *rec = l->data;
+-
+-		if (hdp_get_prot_desc_list(rec, ccpsm, NULL))
+-			return TRUE;
+-	}
+-
+-	return FALSE;
+-}
+-
+-static gboolean get_dcpsm(sdp_list_t *recs, uint16_t *dcpsm)
+-{
+-	sdp_list_t *l;
+-
+-	for (l = recs; l; l = l->next) {
+-		sdp_record_t *rec = l->data;
+-
+-		if (hdp_get_add_prot_desc_list(rec, dcpsm))
+-			return TRUE;
+-	}
+-
+-	return FALSE;
+-}
+-
+-static void con_mcl_data_unref(struct conn_mcl_data *conn_data)
+-{
+-	if (conn_data == NULL)
 -		return;
 -
--	sap_server_remove_conn(server);
+-	if (--conn_data->refs > 0)
+-		return;
 -
--	adapter_service_remove(server->adapter, server->record_id);
+-	if (conn_data->destroy)
+-		conn_data->destroy(conn_data->data);
 -
--	if (server->listen_io) {
--		g_io_channel_shutdown(server->listen_io, TRUE, NULL);
--		g_io_channel_unref(server->listen_io);
--		server->listen_io = NULL;
--	}
--
--	btd_adapter_unref(server->adapter);
--	g_free(server);
+-	health_device_unref(conn_data->dev);
+-	g_free(conn_data);
 -}
 -
--static void destroy_sap_interface(void *data)
+-static void destroy_con_mcl_data(gpointer data)
 -{
--	struct sap_server *server = data;
--
--	DBG("Unregistered interface %s on path %s", SAP_SERVER_INTERFACE,
--					adapter_get_path(server->adapter));
--
--	server_remove(server);
+-	con_mcl_data_unref(data);
 -}
 -
--int sap_server_register(struct btd_adapter *adapter)
+-static struct conn_mcl_data *con_mcl_data_ref(struct conn_mcl_data *conn_data)
 -{
--	sdp_record_t *record = NULL;
+-	if (conn_data == NULL)
+-		return NULL;
+-
+-	conn_data->refs++;
+-	return conn_data;
+-}
+-
+-static void create_mcl_cb(struct mcap_mcl *mcl, GError *err, gpointer data)
+-{
+-	struct conn_mcl_data *conn_data = data;
+-	struct hdp_device *device = conn_data->dev;
 -	GError *gerr = NULL;
--	GIOChannel *io;
--	struct sap_server *server;
 -
--	if (sap_init() < 0) {
--		error("Sap driver initialization failed.");
--		return -1;
+-	if (err != NULL) {
+-		conn_data->func(conn_data->data, err);
+-		return;
 -	}
 -
--	record = create_sap_record(SAP_SERVER_CHANNEL);
--	if (!record) {
--		error("Creating SAP SDP record failed.");
--		goto sdp_err;
--	}
+-	if (device->mcl == NULL)
+-		device->mcl = mcap_mcl_ref(mcl);
+-	device->mcl_conn = TRUE;
 -
--	if (adapter_service_add(adapter, record) < 0) {
--		error("Adding SAP SDP record to the SDP server failed.");
--		sdp_record_free(record);
--		goto sdp_err;
--	}
+-	hdp_set_mcl_cb(device, &gerr);
 -
--	server = g_new0(struct sap_server, 1);
--	server->adapter = btd_adapter_ref(adapter);
--	server->record_id = record->handle;
--
--	io = bt_io_listen(NULL, connect_confirm_cb, server,
--			NULL, &gerr,
--			BT_IO_OPT_SOURCE_BDADDR,
--			btd_adapter_get_address(adapter),
--			BT_IO_OPT_CHANNEL, SAP_SERVER_CHANNEL,
--			BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_HIGH,
--			BT_IO_OPT_CENTRAL, TRUE,
--			BT_IO_OPT_INVALID);
--	if (!io) {
--		error("Can't listen at channel %d.", SAP_SERVER_CHANNEL);
+-	conn_data->func(conn_data->data, gerr);
+-	if (gerr != NULL)
 -		g_error_free(gerr);
--		goto server_err;
--	}
--	server->listen_io = io;
--
--	if (!g_dbus_register_interface(btd_get_dbus_connection(),
--					adapter_get_path(server->adapter),
--					SAP_SERVER_INTERFACE,
--					server_methods, NULL,
--					server_properties, server,
--					destroy_sap_interface)) {
--		error("D-Bus failed to register %s interface",
--							SAP_SERVER_INTERFACE);
--		goto server_err;
--	}
--
--	DBG("server %p, listen socket 0x%02x", server,
--						g_io_channel_unix_get_fd(io));
--
--	return 0;
--
--server_err:
--	server_remove(server);
--sdp_err:
--	sap_exit();
--
--	return -1;
 -}
 -
--void sap_server_unregister(const char *path)
+-static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
 -{
--	g_dbus_unregister_interface(btd_get_dbus_connection(),
--						path, SAP_SERVER_INTERFACE);
+-	struct conn_mcl_data *conn_data = user_data;
+-	GError *gerr = NULL;
+-	uint16_t ccpsm;
 -
--	sap_exit();
+-	if (conn_data->dev->hdp_adapter->mi == NULL) {
+-		g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-						"Mcap instance released");
+-		goto fail;
+-	}
+-
+-	if (err < 0 || recs == NULL) {
+-		g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-					"Error getting remote SDP records");
+-		goto fail;
+-	}
+-
+-	if (!get_ccpsm(recs, &ccpsm)) {
+-		g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-				"Can't get remote PSM for control channel");
+-		goto fail;
+-	}
+-
+-	conn_data = con_mcl_data_ref(conn_data);
+-
+-	if (!mcap_create_mcl(conn_data->dev->hdp_adapter->mi,
+-					device_get_address(conn_data->dev->dev),
+-					ccpsm, create_mcl_cb, conn_data,
+-					destroy_con_mcl_data, &gerr)) {
+-		con_mcl_data_unref(conn_data);
+-		goto fail;
+-	}
+-	return;
+-fail:
+-	conn_data->func(conn_data->data, gerr);
+-	g_error_free(gerr);
 -}
-diff --git a/profiles/sap/server.h b/profiles/sap/server.h
+-
+-gboolean hdp_establish_mcl(struct hdp_device *device,
+-						hdp_continue_proc_f func,
+-						gpointer data,
+-						GDestroyNotify destroy,
+-						GError **err)
+-{
+-	struct conn_mcl_data *conn_data;
+-	const bdaddr_t *src;
+-	const bdaddr_t *dst;
+-	uuid_t uuid;
+-
+-	src = btd_adapter_get_address(device_get_adapter(device->dev));
+-	dst = device_get_address(device->dev);
+-
+-	conn_data = g_new0(struct conn_mcl_data, 1);
+-	conn_data->refs = 1;
+-	conn_data->func = func;
+-	conn_data->data = data;
+-	conn_data->destroy = destroy;
+-	conn_data->dev = health_device_ref(device);
+-
+-	bt_string2uuid(&uuid, HDP_UUID);
+-	if (bt_search_service(src, dst, &uuid, search_cb, conn_data,
+-					destroy_con_mcl_data, 0) < 0) {
+-		g_set_error(err, HDP_ERROR, HDP_CONNECTION_ERROR,
+-						"Can't get remote SDP record");
+-		g_free(conn_data);
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-static void get_dcpsm_cb(sdp_list_t *recs, int err, gpointer data)
+-{
+-	struct get_dcpsm_data *dcpsm_data = data;
+-	GError *gerr = NULL;
+-	uint16_t dcpsm;
+-
+-	if (err < 0 || recs == NULL) {
+-		g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-					"Error getting remote SDP records");
+-		goto fail;
+-	}
+-
+-	if (!get_dcpsm(recs, &dcpsm)) {
+-		g_set_error(&gerr, HDP_ERROR, HDP_CONNECTION_ERROR,
+-				"Can't get remote PSM for data channel");
+-		goto fail;
+-	}
+-
+-	dcpsm_data->func(dcpsm, dcpsm_data->data, NULL);
+-	return;
+-
+-fail:
+-	dcpsm_data->func(0, dcpsm_data->data, gerr);
+-	g_error_free(gerr);
+-}
+-
+-static void free_dcpsm_data(gpointer data)
+-{
+-	struct get_dcpsm_data *dcpsm_data = data;
+-
+-	if (dcpsm_data == NULL)
+-		return;
+-
+-	if (dcpsm_data->destroy)
+-		dcpsm_data->destroy(dcpsm_data->data);
+-
+-	g_free(dcpsm_data);
+-}
+-
+-gboolean hdp_get_dcpsm(struct hdp_device *device, hdp_continue_dcpsm_f func,
+-							gpointer data,
+-							GDestroyNotify destroy,
+-							GError **err)
+-{
+-	struct get_dcpsm_data *dcpsm_data;
+-	const bdaddr_t *src;
+-	const bdaddr_t *dst;
+-	uuid_t uuid;
+-
+-	src = btd_adapter_get_address(device_get_adapter(device->dev));
+-	dst = device_get_address(device->dev);
+-
+-	dcpsm_data = g_new0(struct get_dcpsm_data, 1);
+-	dcpsm_data->func = func;
+-	dcpsm_data->data = data;
+-	dcpsm_data->destroy = destroy;
+-
+-	bt_string2uuid(&uuid, HDP_UUID);
+-	if (bt_search_service(src, dst, &uuid, get_dcpsm_cb, dcpsm_data,
+-						free_dcpsm_data, 0) < 0) {
+-		g_set_error(err, HDP_ERROR, HDP_CONNECTION_ERROR,
+-						"Can't get remote SDP record");
+-		g_free(dcpsm_data);
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-static void hdp_free_application(struct hdp_application *app)
+-{
+-	if (app->dbus_watcher > 0)
+-		g_dbus_remove_watch(btd_get_dbus_connection(),
+-							app->dbus_watcher);
+-
+-	g_free(app->oname);
+-	g_free(app->description);
+-	g_free(app->path);
+-	g_free(app);
+-}
+-
+-struct hdp_application *hdp_application_ref(struct hdp_application *app)
+-{
+-	if (app == NULL)
+-		return NULL;
+-
+-	app->ref++;
+-
+-	DBG("health_application_ref(%p): ref=%d", app, app->ref);
+-	return app;
+-}
+-
+-void hdp_application_unref(struct hdp_application *app)
+-{
+-	if (app == NULL)
+-		return;
+-
+-	app->ref--;
+-
+-	DBG("health_application_unref(%p): ref=%d", app, app->ref);
+-	if (app->ref > 0)
+-		return;
+-
+-	hdp_free_application(app);
+-}
+diff --git a/profiles/health/hdp_util.h b/profiles/health/hdp_util.h
 deleted file mode 100644
-index b774230f52cd..000000000000
---- a/profiles/sap/server.h
+index 0b556f568d9f..000000000000
+--- a/profiles/health/hdp_util.h
 +++ /dev/null
-@@ -1,10 +0,0 @@
+@@ -1,45 +0,0 @@
 -/* SPDX-License-Identifier: GPL-2.0-or-later */
 -/*
+- *
 - *  BlueZ - Bluetooth protocol stack for Linux
 - *
-- *  Copyright (C) 2010 ST-Ericsson SA
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
 - *
 - */
 -
--int sap_server_register(struct btd_adapter *adapter);
--void sap_server_unregister(const char *path);
-diff --git a/test/sap_client.py b/test/sap_client.py
+-#ifndef __HDP_UTIL_H__
+-#define __HDP_UTIL_H__
+-
+-typedef void (*hdp_continue_mdep_f)(uint8_t mdep, gpointer user_data,
+-								GError *err);
+-typedef void (*hdp_continue_dcpsm_f)(uint16_t dcpsm, gpointer user_data,
+-								GError *err);
+-typedef void (*hdp_continue_proc_f)(gpointer user_data, GError *err);
+-
+-struct hdp_application *hdp_get_app_config(DBusMessageIter *iter, GError **err);
+-gboolean hdp_update_sdp_record(struct hdp_adapter *adapter, GSList *app_list);
+-gboolean hdp_get_mdep(struct hdp_device *device, struct hdp_application *app,
+-				hdp_continue_mdep_f func,
+-				gpointer data, GDestroyNotify destroy,
+-				GError **err);
+-
+-gboolean hdp_establish_mcl(struct hdp_device *device,
+-						hdp_continue_proc_f func,
+-						gpointer data,
+-						GDestroyNotify destroy,
+-						GError **err);
+-
+-gboolean hdp_get_dcpsm(struct hdp_device *device, hdp_continue_dcpsm_f func,
+-							gpointer data,
+-							GDestroyNotify destroy,
+-							GError **err);
+-
+-
+-struct hdp_application *hdp_application_ref(struct hdp_application *app);
+-void hdp_application_unref(struct hdp_application *app);
+-
+-struct hdp_device *health_device_ref(struct hdp_device *hdp_dev);
+-void health_device_unref(struct hdp_device *hdp_dev);
+-
+-
+-#endif /* __HDP_UTIL_H__ */
+diff --git a/profiles/health/mcap.c b/profiles/health/mcap.c
 deleted file mode 100644
-index 2da46eee36bc..000000000000
---- a/test/sap_client.py
+index b7e51d15cdb5..000000000000
+--- a/profiles/health/mcap.c
 +++ /dev/null
-@@ -1,930 +0,0 @@
--# SPDX-License-Identifier: LGPL-2.1-or-later
--""" Copyright (C) 2010-2011 ST-Ericsson SA """
--
--""" Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson. """
--
--from array import array
--from bluetooth import *
--import time
--import re
--
--class SAPParam:
--    """ SAP Parameter Class """
--
--    MaxMsgSize = 0x00
--    ConnectionStatus = 0x01
--    ResultCode = 0x02
--    DisconnectionType = 0x03
--    CommandAPDU = 0x04
--    ResponseAPDU = 0x05
--    ATR = 0x06
--    CardReaderStatus = 0x07
--    StatusChange = 0x08
--    TransportProtocol = 0x09
--    CommandAPDU7816 = 0x10
--
--    def __init__(self, name, id, value = None):
--        self.name = name
--        self.id = id
--        self.value = value
--
--    def _padding(self,  buf):
--        pad = array('B')
--        while ( (len(buf) + len(pad)) % 4 ) != 0:
--            pad.append(0)
--        return pad
--
--    def _basicCheck(self,  buf):
--        if len(buf) < 4 or (len(buf) % 4) != 0 or buf[1] != 0:
--                return (-1,  -1)
--        if buf[0] != self.id:
--            return (-1,  -1)
--        plen = buf[2] * 256 + buf[3] + 4
--        if plen > len(buf):
--            return (-1,  -1)
--        pad = plen
--        while (pad % 4) != 0:
--            if buf[pad] != 0:
--                return (-1,  -1)
--            pad+=1
--        return (plen,  pad)
--
--    def getID(self):
--        return self.id
--
--    def getValue(self):
--        return self.value
--
--    def getContent(self):
--        return "%s(id=0x%.2X), value=%s \n" %  (self.name,  self.id, self.value)
--
--    def serialize(self):
--        a = array('B', '\00\00\00\00')
--        a[0] = self.id
--        a[1] = 0	# reserved
--        a[2] = 0	# length
--        a[3] = 1	# length
--        a.append(self.value)
--        a.extend(self._padding(a))
--        return a
--
--    def deserialize(self,  buf):
--        p = self._basicCheck(buf)
--        if p[0] == -1:
--            return -1
--        self.id = buf[0]
--        self.value = buf[4]
--        return p[1]
--
--
--class SAPParam_MaxMsgSize(SAPParam):
--    """MaxMsgSize Param """
--
--    def __init__(self,  value = None):
--        SAPParam.__init__(self,"MaxMsgSize",  SAPParam.MaxMsgSize, value)
--        self.__validate()
--
--    def __validate(self):
--        if self.value > 0xFFFF:
--             self.value = 0xFFFF
--
--    def serialize(self):
--        a = array('B', '\00\00\00\00')
--        a[0] = self.id
--        a[3] = 2
--        a.append(self.value / 256)
--        a.append(self.value % 256)
--        a.extend(self._padding(a))
--        return a
--
--    def deserialize(self,  buf):
--        p = self._basicCheck(buf)
--        if p[0] == -1 :
--            return -1
--        self.value = buf[4] * 256 + buf[5]
--        return p[1]
--
--class SAPParam_CommandAPDU(SAPParam):
--    def __init__(self,  value = None):
--        if value is None:
--            SAPParam.__init__(self, "CommandAPDU",  SAPParam.CommandAPDU, array('B'))
--        else:
--            SAPParam.__init__(self, "CommandAPDU",  SAPParam.CommandAPDU, array('B', value))
--
--    def serialize(self):
--        a = array('B', '\00\00\00\00')
--        a[0] = self.id
--        plen = len(self.value)
--        a[2] = plen / 256
--        a[3] = plen % 256
--        a.extend(self.value)
--        a.extend(self._padding(a))
--        return a
--
--    def deserialize(self,  buf):
--        p = self._basicCheck(buf)
--        if p[0] == -1:
--            return -1
--        self.value = buf[4:p[0]]
--        return p[1]
--
--class SAPParam_ResponseAPDU(SAPParam_CommandAPDU):
--    """ResponseAPDU Param """
--
--    def __init__(self,  value = None):
--        if value is None:
--            SAPParam.__init__(self, "ResponseAPDU",  SAPParam.ResponseAPDU, array('B'))
--        else:
--            SAPParam.__init__(self, "ResponseAPDU",  SAPParam.ResponseAPDU, array('B', value))
--
--class SAPParam_ATR(SAPParam_CommandAPDU):
--    """ATR Param """
--
--    def __init__(self,  value = None):
--        if value is None:
--            SAPParam.__init__(self, "ATR",  SAPParam.ATR, array('B'))
--        else:
--            SAPParam.__init__(self, "ATR",  SAPParam.ATR, array('B', value))
--
--class SAPParam_CommandAPDU7816(SAPParam_CommandAPDU):
--    """Command APDU7816 Param."""
--
--    def __init__(self,  value = None):
--        if value is None:
--            SAPParam.__init__(self, "CommandAPDU7816",  SAPParam.CommandAPDU7816, array('B'))
--        else:
--            SAPParam.__init__(self, "CommandAPDU7816",  SAPParam.CommandAPDU7816, array('B', value))
--
--
--class SAPParam_ConnectionStatus(SAPParam):
--    """Connection status Param."""
--
--    def __init__(self,  value = None):
--        SAPParam.__init__(self,"ConnectionStatus",  SAPParam.ConnectionStatus, value)
--        self.__validate()
--
--    def __validate(self):
--        if self.value is not None and self.value not in (0x00,  0x01,  0x02,  0x03,  0x04):
--            print("Warning. ConnectionStatus value in reserved range (0x%x)" % self.value)
--
--    def deserialize(self,  buf):
--        ret = SAPParam.deserialize(self, buf)
--        if ret == -1:
--            return -1
--        self.__validate()
--        return ret
--
--class SAPParam_ResultCode(SAPParam):
--    """ Result Code Param """
--
--    def __init__(self,  value = None):
--        SAPParam.__init__(self,"ResultCode",  SAPParam.ResultCode, value)
--        self.__validate()
--
--    def __validate(self):
--        if self.value is not None and self.value not in (0x00,  0x01,  0x02,  0x03,  0x04,  0x05,  0x06,  0x07):
--            print("Warning. ResultCode value in reserved range (0x%x)" % self.value)
--
--    def deserialize(self,  buf):
--        ret = SAPParam.deserialize(self, buf)
--        if ret == -1:
--            return -1
--        self.__validate()
--        return ret
--
--class SAPParam_DisconnectionType(SAPParam):
--    """Disconnection Type Param."""
--
--    def __init__(self,  value = None):
--        SAPParam.__init__(self,"DisconnectionType",  SAPParam.DisconnectionType, value)
--        self.__validate()
--
--    def __validate(self):
--        if self.value is not None and self.value not in (0x00,  0x01):
--            print("Warning. DisconnectionType value in reserved range (0x%x)" % self.value)
--
--    def deserialize(self,  buf):
--        ret = SAPParam.deserialize(self, buf)
--        if ret == -1:
--            return -1
--        self.__validate()
--        return ret
--
--class SAPParam_CardReaderStatus(SAPParam_CommandAPDU):
--    """Card reader Status Param."""
--
--    def __init__(self,  value = None):
--        if value is None:
--            SAPParam.__init__(self, "CardReaderStatus",  SAPParam.CardReaderStatus, array('B'))
--        else:
--            SAPParam.__init__(self, "CardReaderStatus",  SAPParam.CardReaderStatus, array('B', value))
--
--class SAPParam_StatusChange(SAPParam):
--    """Status Change Param """
--
--    def __init__(self,  value = None):
--        SAPParam.__init__(self,"StatusChange",  SAPParam.StatusChange, value)
--
--    def __validate(self):
--        if self.value is not None and self.value not in (0x00,  0x01,  0x02,  0x03,  0x04,  0x05):
--            print("Warning. StatusChange value in reserved range (0x%x)" % self.value)
--
--    def deserialize(self,  buf):
--        ret = SAPParam.deserialize(self, buf)
--        if ret == -1:
--            return -1
--        self.__validate()
--        return ret
--
--class SAPParam_TransportProtocol(SAPParam):
--    """Transport Protocol Param """
--
--    def __init__(self,  value = None):
--        SAPParam.__init__(self,"TransportProtocol",  SAPParam.TransportProtocol, value)
--        self.__validate()
--
--    def __validate(self):
--        if self.value is not None and self.value not in (0x00,  0x01):
--            print("Warning. TransportProtoco value in reserved range (0x%x)" % self.value)
--
--    def deserialize(self,  buf):
--        ret = SAPParam.deserialize(self, buf)
--        if ret == -1:
--            return -1
--        self.__validate()
--        return ret
--
--class SAPMessage:
--
--    CONNECT_REQ = 0x00
--    CONNECT_RESP = 0x01
--    DISCONNECT_REQ = 0x02
--    DISCONNECT_RESP =0x03
--    DISCONNECT_IND = 0x04
--    TRANSFER_APDU_REQ = 0x05
--    TRANSFER_APDU_RESP = 0x06
--    TRANSFER_ATR_REQ = 0x07
--    TRANSFER_ATR_RESP = 0x08
--    POWER_SIM_OFF_REQ = 0x09
--    POWER_SIM_OFF_RESP = 0x0A
--    POWER_SIM_ON_REQ = 0x0B
--    POWER_SIM_ON_RESP = 0x0C
--    RESET_SIM_REQ = 0x0D
--    RESET_SIM_RESP = 0x0E
--    TRANSFER_CARD_READER_STATUS_REQ = 0x0F
--    TRANSFER_CARD_READER_STATUS_RESP = 0x10
--    STATUS_IND = 0x11
--    ERROR_RESP = 0x12
--    SET_TRANSPORT_PROTOCOL_REQ = 0x13
--    SET_TRANSPORT_PROTOCOL_RESP = 0x14
--
--    def __init__(self,  name,  id):
--        self.name = name
--        self.id = id
--        self.params = []
--        self.buf = array('B')
--
--    def _basicCheck(self,  buf):
--        if len(buf) < 4 or (len(buf) % 4) != 0 :
--            return False
--
--        if buf[0] != self.id:
--            return False
--
--        return True
--
--    def getID(self):
--        return self.id
--
--    def getContent(self):
--        s = "%s(id=0x%.2X) " % (self.name,  self.id)
--        if len( self.buf): s = s + "[%s]" % re.sub("(.{2})", "0x\\1 " , self.buf.tostring().encode("hex").upper(), re.DOTALL)
--        s = s + "\n\t"
--        for p in self.params:
--            s = s + "\t" + p.getContent()
--        return s
--
--    def getParams(self):
--        return self.params
--
--    def addParam(self,  param):
--        self.params.append(param)
--
--    def serialize(self):
--        ret = array('B', '\00\00\00\00')
--        ret[0] = self.id
--        ret[1] = len(self.params)
--        ret[2] = 0	# reserved
--        ret[3] = 0	# reserved
--        for p in self.params:
--            ret.extend(p.serialize())
--
--        self.buf = ret
--        return ret
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        return len(buf) == 4 and buf[1] == 0 and self._basicCheck(buf)
--
--
--class SAPMessage_CONNECT_REQ(SAPMessage):
--    def __init__(self,  MaxMsgSize = None):
--        SAPMessage.__init__(self,"CONNECT_REQ",  SAPMessage.CONNECT_REQ)
--        if MaxMsgSize is not None:
--            self.addParam(SAPParam_MaxMsgSize(MaxMsgSize))
--
--    def _validate(self):
--        if len(self.params) == 1:
--            if self.params[0].getID() == SAPParam.MaxMsgSize:
--                return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--        if SAPMessage._basicCheck(self,  buf):
--            p = SAPParam_MaxMsgSize()
--            if p.deserialize(buf[4:]) == len(buf[4:]):
--                self.addParam(p)
--                return self._validate()
--
--        return False
--
--class SAPMessage_CONNECT_RESP(SAPMessage):
--    def __init__(self,  ConnectionStatus = None,  MaxMsgSize = None):
--        SAPMessage.__init__(self,"CONNECT_RESP",  SAPMessage.CONNECT_RESP)
--        if ConnectionStatus is not None:
--            self.addParam(SAPParam_ConnectionStatus(ConnectionStatus))
--            if MaxMsgSize is not None:
--                self.addParam(SAPParam_MaxMsgSize(MaxMsgSize))
--
--    def _validate(self):
--        if len(self.params) > 0:
--            if self.params[0] .getID() == SAPParam.ConnectionStatus:
--                if self.params[0].getValue() ==  0x02:
--                    if len(self.params) == 2:
--                        return True
--                else:
--                    if len(self.params) == 1:
--                        return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--
--        if SAPMessage._basicCheck(self,  buf):
--            p = SAPParam_ConnectionStatus()
--            r = p.deserialize(buf[4:])
--            if  r != -1:
--                self.addParam(p)
--                if buf[1] == 2:
--                    p = SAPParam_MaxMsgSize()
--                    r = p.deserialize(buf[4+r:])
--                    if r != -1:
--                        self.addParam(p)
--
--                return self._validate()
--
--        return False
--
--class SAPMessage_DISCONNECT_REQ(SAPMessage):
--    def __init__(self):
--        SAPMessage.__init__(self,"DISCONNECT_REQ",  SAPMessage.DISCONNECT_REQ)
--
--class SAPMessage_DISCONNECT_RESP(SAPMessage):
--    def __init__(self):
--        SAPMessage.__init__(self,"DISCONNECT_RESP",  SAPMessage.DISCONNECT_RESP)
--
--class SAPMessage_DISCONNECT_IND(SAPMessage):
--    def __init__(self,  Type = None):
--        SAPMessage.__init__(self,"DISCONNECT_IND",  SAPMessage.DISCONNECT_IND)
--        if Type is not None:
--            self.addParam(SAPParam_DisconnectionType(Type))
--
--    def _validate(self):
--        if len(self.params) == 1:
--            if self.params[0].getID() == SAPParam.DisconnectionType:
--                return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--        if SAPMessage._basicCheck(self,  buf):
--            p = SAPParam_DisconnectionType()
--            if p.deserialize(buf[4:]) == len(buf[4:]):
--                self.addParam(p)
--                return self._validate()
--
--        return False
--
--
--class SAPMessage_TRANSFER_APDU_REQ(SAPMessage):
--    def __init__(self,  APDU = None,  T = False):
--        SAPMessage.__init__(self,"TRANSFER_APDU_REQ",  SAPMessage.TRANSFER_APDU_REQ)
--        if APDU is not None:
--            if T :
--                self.addParam(SAPParam_CommandAPDU(APDU))
--            else:
--                self.addParam(SAPParam_CommandAPDU7816(APDU))
--
--    def _validate(self):
--        if len(self.params) == 1:
--            if self.params[0].getID() == SAPParam.CommandAPDU or self.params[0].getID() == SAPParam.CommandAPDU7816:
--                return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--        if SAPMessage._basicCheck(self,  buf):
--
--            p = SAPParam_CommandAPDU()
--            p2 = SAPParam_CommandAPDU7816()
--            if p.deserialize(buf[4:]) == len(buf[4:]):
--                self.addParam(p)
--                return self._validate()
--            elif p2.deserialize(buf[4:]) == len(buf[4:]):
--                self.addParam(p2)
--                return self._validate()
--
--        return False
--
--class SAPMessage_TRANSFER_APDU_RESP(SAPMessage):
--    def __init__(self,  ResultCode = None,  Response = None):
--        SAPMessage.__init__(self,"TRANSFER_APDU_RESP",  SAPMessage.TRANSFER_APDU_RESP)
--        if ResultCode is not None:
--            self.addParam(SAPParam_ResultCode(ResultCode))
--            if Response is not None:
--                self.addParam(SAPParam_ResponseAPDU(Response))
--
--    def _validate(self):
--        if len(self.params) > 0:
--            if self.params[0] .getID() == SAPParam.ResultCode:
--                if self.params[0].getValue() == 0x00:
--                    if len(self.params) == 2:
--                        return True
--                else:
--                    if len(self.params) == 1:
--                        return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--
--        if SAPMessage._basicCheck(self,  buf):
--            p = SAPParam_ResultCode()
--            r = p.deserialize(buf[4:])
--            if  r != -1:
--                self.addParam(p)
--                if buf[1] == 2:
--                    p = SAPParam_ResponseAPDU()
--                    r = p.deserialize(buf[4+r:])
--                    if r != -1:
--                        self.addParam(p)
--
--                return self._validate()
--
--        return False
--
--class SAPMessage_TRANSFER_ATR_REQ(SAPMessage):
--    def __init__(self):
--        SAPMessage.__init__(self,"TRANSFER_ATR_REQ",  SAPMessage.TRANSFER_ATR_REQ)
--
--class SAPMessage_TRANSFER_ATR_RESP(SAPMessage):
--    def __init__(self,  ResultCode = None,  ATR = None):
--        SAPMessage.__init__(self,"TRANSFER_ATR_RESP",  SAPMessage.TRANSFER_ATR_RESP)
--        if ResultCode is not None:
--            self.addParam(SAPParam_ResultCode(ResultCode))
--            if ATR is not None:
--                self.addParam(SAPParam_ATR(ATR))
--
--    def _validate(self):
--        if len(self.params) > 0:
--            if self.params[0] .getID() == SAPParam.ResultCode:
--                if self.params[0].getValue() == 0x00:
--                    if len(self.params) == 2:
--                        return True
--                else:
--                    if len(self.params) == 1:
--                        return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--
--        if SAPMessage._basicCheck(self,  buf):
--
--            p = SAPParam_ResultCode()
--            r = p.deserialize(buf[4:])
--
--            if  r != -1:
--
--                self.addParam(p)
--                if buf[1] == 2:
--
--                    p = SAPParam_ATR()
--                    r = p.deserialize(buf[4+r:])
--                    if r != -1:
--                        self.addParam(p)
--
--                return self._validate()
--
--        return False
--
--class SAPMessage_POWER_SIM_OFF_REQ(SAPMessage):
--    def __init__(self):
--        SAPMessage.__init__(self,"POWER_SIM_OFF_REQ",  SAPMessage.POWER_SIM_OFF_REQ)
--
--class SAPMessage_POWER_SIM_OFF_RESP(SAPMessage):
--    def __init__(self,  ResultCode = None):
--        SAPMessage.__init__(self,"POWER_SIM_OFF_RESP",  SAPMessage.POWER_SIM_OFF_RESP)
--        if ResultCode is not None:
--            self.addParam(SAPParam_ResultCode(ResultCode))
--
--    def _validate(self):
--        if len(self.params) == 1:
--            if self.params[0].getID() == SAPParam.ResultCode:
--                return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--        if SAPMessage._basicCheck(self,  buf):
--            p = SAPParam_ResultCode()
--            if p.deserialize(buf[4:]) == len(buf[4:]):
--                self.addParam(p)
--                return self._validate()
--
--        return False
--
--class SAPMessage_POWER_SIM_ON_REQ(SAPMessage):
--    def __init__(self):
--        SAPMessage.__init__(self,"POWER_SIM_ON_REQ",  SAPMessage.POWER_SIM_ON_REQ)
--
--class SAPMessage_POWER_SIM_ON_RESP(SAPMessage_POWER_SIM_OFF_RESP):
--    def __init__(self,  ResultCode = None):
--        SAPMessage.__init__(self,"POWER_SIM_ON_RESP",  SAPMessage.POWER_SIM_ON_RESP)
--        if ResultCode is not None:
--            self.addParam(SAPParam_ResultCode(ResultCode))
--
--class SAPMessage_RESET_SIM_REQ(SAPMessage):
--    def __init__(self):
--        SAPMessage.__init__(self,"RESET_SIM_REQ",  SAPMessage.RESET_SIM_REQ)
--
--class SAPMessage_RESET_SIM_RESP(SAPMessage_POWER_SIM_OFF_RESP):
--    def __init__(self,  ResultCode = None):
--        SAPMessage.__init__(self,"RESET_SIM_RESP",  SAPMessage.RESET_SIM_RESP)
--        if ResultCode is not None:
--            self.addParam(SAPParam_ResultCode(ResultCode))
--
--class SAPMessage_STATUS_IND(SAPMessage):
--    def __init__(self,  StatusChange = None):
--        SAPMessage.__init__(self,"STATUS_IND",  SAPMessage.STATUS_IND)
--        if StatusChange is not None:
--            self.addParam(SAPParam_StatusChange(StatusChange))
--
--    def _validate(self):
--        if len(self.params) == 1:
--            if self.params[0].getID() == SAPParam.StatusChange:
--                return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--        if SAPMessage._basicCheck(self,  buf):
--            p = SAPParam_StatusChange()
--            if p.deserialize(buf[4:]) == len(buf[4:]):
--                self.addParam(p)
--                return self._validate()
--
--        return False
--
--class SAPMessage_TRANSFER_CARD_READER_STATUS_REQ(SAPMessage):
--    def __init__(self):
--        SAPMessage.__init__(self,"TRANSFER_CARD_READER_STATUS_REQ",  SAPMessage.TRANSFER_CARD_READER_STATUS_REQ)
--
--class SAPMessage_TRANSFER_CARD_READER_STATUS_RESP(SAPMessage):
--    def __init__(self,  ResultCode = None,  Status = None):
--        SAPMessage.__init__(self,"TRANSFER_CARD_READER_STATUS_RESP",  SAPMessage.TRANSFER_CARD_READER_STATUS_RESP)
--        if ResultCode is not None:
--            self.addParam(SAPParam_ResultCode(ResultCode))
--            if Status is not None:
--                self.addParam(SAPParam_CardReaderStatus(Status))
--
--    def _validate(self):
--        if len(self.params) > 0:
--            if self.params[0] .getID() == SAPParam.ResultCode:
--                if self.params[0].getValue() == 0x00:
--                    if len(self.params) == 2:
--                        return True
--                else:
--                    if len(self.params) == 1:
--                        return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--
--        if SAPMessage._basicCheck(self,  buf):
--            p = SAPParam_ResultCode()
--            r = p.deserialize(buf[4:])
--            if  r != -1:
--                self.addParam(p)
--                if buf[1] == 2:
--                    p = SAPParam_CardReaderStatus()
--                    r = p.deserialize(buf[4+r:])
--                    if r != -1:
--                        self.addParam(p)
--
--                return self._validate()
--
--        return False
--
--class SAPMessage_ERROR_RESP(SAPMessage):
--    def __init__(self):
--        SAPMessage.__init__(self,"ERROR_RESP",  SAPMessage.ERROR_RESP)
--
--
--class SAPMessage_SET_TRANSPORT_PROTOCOL_REQ(SAPMessage):
--    def __init__(self,  protocol = None):
--        SAPMessage.__init__(self,"SET_TRANSPORT_PROTOCOL_REQ",  SAPMessage.SET_TRANSPORT_PROTOCOL_REQ)
--        if protocol is not None:
--            self.addParam(SAPParam_TransportProtocol(protocol))
--
--    def _validate(self):
--        if len(self.params) == 1:
--            if self.params[0].getID() == SAPParam.TransportProtocol:
--                return True
--        return False
--
--    def deserialize(self,  buf):
--        self.buf = buf
--        self.params[:] = []
--        if SAPMessage._basicCheck(self,  buf):
--            p = SAPParam_TransportProtocol()
--            if p.deserialize(buf[4:]) == len(buf[4:]):
--                self.addParam(p)
--                return self._validate()
--
--        return False
--
--class SAPMessage_SET_TRANSPORT_PROTOCOL_RESP(SAPMessage_POWER_SIM_OFF_RESP):
--    def __init__(self,  ResultCode = None):
--        SAPMessage.__init__(self,"SET_TRANSPORT_PROTOCOL_RESP",  SAPMessage.SET_TRANSPORT_PROTOCOL_RESP)
--        if ResultCode is not None:
--            self.addParam(SAPParam_ResultCode(ResultCode))
--
--
--class SAPClient:
--
--    CONNECTED = 1
--    DISCONNECTED = 0
--
--    uuid = "0000112D-0000-1000-8000-00805F9B34FB"
--    bufsize = 1024
--    timeout = 20
--    state = DISCONNECTED
--
--    def __init__(self,  host = None,  port = None):
--        self.sock = None
--
--        if host is None or is_valid_address(host):
--            self.host = host
--        else:
--            raise BluetoothError ("%s is not a valid BT address." % host)
--            self.host = None
--            return
--
--        if port is None:
--            self.__discover()
--        else:
--            self.port = port
--
--        self.__connectRFCOMM()
--
--    def __del__(self):
--        self.__disconnectRFCOMM()
--
--    def __disconnectRFCOMM(self):
--        if self.sock is not None:
--            self.sock.close()
--            self.state = self.DISCONNECTED
--
--    def __discover(self):
--        service_matches = find_service(self.uuid, self.host)
--
--        if len(service_matches) == 0:
--            raise BluetoothError ("No SAP service found")
--            return
--
--        first_match = service_matches[0]
--        self.port = first_match["port"]
--        self.host = first_match["host"]
--
--        print("SAP Service found on %s(%s)" % first_match["name"] % self.host)
--
--    def __connectRFCOMM(self):
--        self.sock=BluetoothSocket( RFCOMM )
--        self.sock.connect((self.host, self.port))
--        self.sock.settimeout(self.timeout)
--        self.state = self.CONNECTED
--
--    def __sendMsg(self, msg):
--        if isinstance(msg,  SAPMessage):
--            s = msg.serialize()
--            print("\tTX: " + msg.getContent())
--            return self.sock.send(s.tostring())
--
--    def __rcvMsg(self,  msg):
--        if isinstance(msg,  SAPMessage):
--            print("\tRX Wait: %s(id = 0x%.2x)" % (msg.name, msg.id))
--            data = self.sock.recv(self.bufsize)
--            if data:
--                if msg.deserialize(array('B',data)):
--                    print("\tRX: len(%d) %s" % (len(data), msg.getContent()))
--                    return msg
--                else:
--                    print("msg: %s" % array('B',data))
--                    raise BluetoothError ("Message deserialization failed.")
--            else:
--                raise BluetoothError ("Timeout. No data received.")
--
--    def connect(self):
--        self.__connectRFCOMM()
--
--    def disconnect(self):
--        self.__disconnectRFCOMM()
--
--    def isConnected(self):
--        return self.state
--
--    def proc_connect(self):
--        try:
--            self.__sendMsg(SAPMessage_CONNECT_REQ(self.bufsize))
--            params = self.__rcvMsg(SAPMessage_CONNECT_RESP()).getParams()
--
--            if params[0].getValue() in (0x00,  0x04):
--                pass
--            elif params[0].getValue() == 0x02:
--                self.bufsize = params[1].getValue()
--
--                self.__sendMsg(SAPMessage_CONNECT_REQ(self.bufsize))
--                params = self.__rcvMsg(SAPMessage_CONNECT_RESP()).getParams()
--
--                if params[0].getValue() not in (0x00,  0x04):
--                    return False
--            else:
--                return False
--
--            params = self.__rcvMsg(SAPMessage_STATUS_IND()).getParams()
--            if params[0].getValue() == 0x00:
--                return False
--            elif params[0].getValue() == 0x01:
--                """OK, Card reset"""
--                return self.proc_transferATR()
--            elif params[0].getValue() == 0x02:
--                """T0 not supported"""
--                if self.proc_transferATR():
--                    return self.proc_setTransportProtocol(1)
--                else:
--                    return False
--            else:
--                return False
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_disconnectByClient(self, timeout=0):
--        try:
--            self.__sendMsg(SAPMessage_DISCONNECT_REQ())
--            self.__rcvMsg(SAPMessage_DISCONNECT_RESP())
--            time.sleep(timeout) # let srv to close rfcomm
--            self.__disconnectRFCOMM()
--            return True
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_disconnectByServer(self, timeout=0):
--        try:
--            params = self.__rcvMsg(SAPMessage_DISCONNECT_IND()).getParams()
--
--            """graceful"""
--            if params[0].getValue() == 0x00:
--                if not self.proc_transferAPDU():
--                    return False
--
--            return self.proc_disconnectByClient(timeout)
--
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_transferAPDU(self,  apdu = "Sample APDU command"):
--        try:
--            self.__sendMsg(SAPMessage_TRANSFER_APDU_REQ(apdu))
--            params = self.__rcvMsg(SAPMessage_TRANSFER_APDU_RESP()).getParams()
--            return True
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_transferATR(self):
--        try:
--            self.__sendMsg(SAPMessage_TRANSFER_ATR_REQ())
--            params = self.__rcvMsg(SAPMessage_TRANSFER_ATR_RESP()).getParams()
--            return True
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_powerSimOff(self):
--        try:
--            self.__sendMsg(SAPMessage_POWER_SIM_OFF_REQ())
--            params = self.__rcvMsg(SAPMessage_POWER_SIM_OFF_RESP()).getParams()
--            return True
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_powerSimOn(self):
--        try:
--            self.__sendMsg(SAPMessage_POWER_SIM_ON_REQ())
--            params = self.__rcvMsg(SAPMessage_POWER_SIM_ON_RESP()).getParams()
--            if params[0].getValue() == 0x00:
--                return self.proc_transferATR()
--
--            return True
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_resetSim(self):
--        try:
--            self.__sendMsg(SAPMessage_RESET_SIM_REQ())
--            params = self.__rcvMsg(SAPMessage_RESET_SIM_RESP()).getParams()
--            if params[0].getValue() == 0x00:
--                return self.proc_transferATR()
--
--            return True
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_reportStatus(self):
--        try:
--            params = self.__rcvMsg(SAPMessage_STATUS_IND()).getParams()
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_transferCardReaderStatus(self):
--        try:
--            self.__sendMsg(SAPMessage_TRANSFER_CARD_READER_STATUS_REQ())
--            params = self.__rcvMsg(SAPMessage_TRANSFER_CARD_READER_STATUS_RESP()).getParams()
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_errorResponse(self):
--        try:
--            """ send malformed message, no mandatory maxmsgsize parameter"""
--            self.__sendMsg(SAPMessage_CONNECT_REQ())
--
--            params = self.__rcvMsg(SAPMessage_ERROR_RESP()).getParams()
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--    def proc_setTransportProtocol(self,  protocol = 0):
--        try:
--            self.__sendMsg(SAPMessage_SET_TRANSPORT_PROTOCOL_REQ(protocol))
--            params = self.__rcvMsg(SAPMessage_SET_TRANSPORT_PROTOCOL_RESP()).getParams()
--
--            if params[0].getValue() == 0x00:
--                params = self.__rcvMsg(SAPMessage_STATUS_IND()).getParams()
--                if params[0].getValue() in (0x01,  0x02):
--                    return self.proc_transferATR()
--                else:
--                    return True
--                    """return False ???"""
--            elif params[0].getValue == 0x07:
--                """not supported"""
--                return True
--                """return False ???"""
--            else:
--                return False
--
--        except BluetoothError as e:
--            print("Error. " +str(e))
--            return False
--
--if __name__ == "__main__":
--    pass
-diff --git a/test/test-sap-server b/test/test-sap-server
+@@ -1,3206 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *  Copyright (C) 2010 Signove
+- *  Copyright (C) 2014 Intel Corporation. All rights reserved.
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#define _GNU_SOURCE
+-#include <netinet/in.h>
+-#include <stdlib.h>
+-#include <errno.h>
+-#include <unistd.h>
+-#include <time.h>
+-
+-#include <glib.h>
+-
+-#include "bluetooth/bluetooth.h"
+-#include "bluetooth/l2cap.h"
+-#include "btio/btio.h"
+-#include "src/log.h"
+-#include "src/shared/timeout.h"
+-#include "src/shared/util.h"
+-
+-#include "mcap.h"
+-
+-#define MCAP_BTCLOCK_HALF (MCAP_BTCLOCK_FIELD / 2)
+-#define CLK CLOCK_MONOTONIC
+-
+-#define MCAP_CSP_ERROR g_quark_from_static_string("mcap-csp-error-quark")
+-#define MAX_RETRIES	10
+-#define SAMPLE_COUNT	20
+-
+-#define RESPONSE_TIMER	6	/* seconds */
+-#define MAX_CACHED	10	/* 10 devices */
+-
+-#define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
+-
+-#define RELEASE_TIMER(__mcl) do {		\
+-	if (__mcl->tid) {			\
+-		timeout_remove(__mcl->tid);	\
+-		__mcl->tid = 0;			\
+-	}					\
+-} while(0)
+-
+-struct mcap_csp {
+-	uint64_t	base_tmstamp;	/* CSP base timestamp */
+-	struct timespec	base_time;	/* CSP base time when timestamp set */
+-	guint		local_caps;	/* CSP-Cent.: have got remote caps */
+-	guint		remote_caps;	/* CSP-Perip: remote central got caps */
+-	guint		rem_req_acc;	/* CSP-Perip: accuracy req by central */
+-	guint		ind_expected;	/* CSP-Cent.: indication expected */
+-	uint8_t		csp_req;	/* CSP-Cent.: Request control flag */
+-	guint		ind_timer;	/* CSP-Perip: indication timer */
+-	guint		set_timer;	/* CSP-Perip: delayed set timer */
+-	void		*set_data;	/* CSP-Perip: delayed set data */
+-	void		*csp_priv_data;	/* CSP-Cent.: In-flight request data */
+-};
+-
+-struct mcap_sync_cap_cbdata {
+-	mcap_sync_cap_cb	cb;
+-	gpointer		user_data;
+-};
+-
+-struct mcap_sync_set_cbdata {
+-	mcap_sync_set_cb	cb;
+-	gpointer		user_data;
+-};
+-
+-struct csp_caps {
+-	int ts_acc;		/* timestamp accuracy */
+-	int ts_res;		/* timestamp resolution */
+-	int latency;		/* Read BT clock latency */
+-	int preempt_thresh;	/* Preemption threshold for latency */
+-	int syncleadtime_ms;	/* SyncLeadTime in ms */
+-};
+-
+-struct sync_set_data {
+-	uint8_t update;
+-	uint32_t sched_btclock;
+-	uint64_t timestamp;
+-	int ind_freq;
+-	gboolean role;
+-};
+-
+-struct connect_mcl {
+-	struct mcap_mcl		*mcl;		/* MCL for this operation */
+-	mcap_mcl_connect_cb	connect_cb;	/* Connect callback */
+-	GDestroyNotify		destroy;	/* Destroy callback */
+-	gpointer		user_data;	/* Callback user data */
+-};
+-
+-typedef union {
+-	mcap_mdl_operation_cb		op;
+-	mcap_mdl_operation_conf_cb	op_conf;
+-	mcap_mdl_notify_cb		notify;
+-} mcap_cb_type;
+-
+-struct mcap_mdl_op_cb {
+-	struct mcap_mdl		*mdl;		/* MDL for this operation */
+-	mcap_cb_type		cb;		/* Operation callback */
+-	GDestroyNotify		destroy;	/* Destroy callback */
+-	gpointer		user_data;	/* Callback user data */
+-};
+-
+-/* MCAP finite state machine functions */
+-static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
+-static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
+-static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
+-
+-static void (*proc_req[])(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len) = {
+-	proc_req_connected,
+-	proc_req_pending,
+-	proc_req_active
+-};
+-
+-static gboolean csp_caps_initialized = FALSE;
+-struct csp_caps _caps;
+-
+-static void mcap_cache_mcl(struct mcap_mcl *mcl);
+-
+-static void default_mdl_connected_cb(struct mcap_mdl *mdl, gpointer data)
+-{
+-	DBG("MCAP Unmanaged mdl connection");
+-}
+-
+-static void default_mdl_closed_cb(struct mcap_mdl *mdl, gpointer data)
+-{
+-	DBG("MCAP Unmanaged mdl closed");
+-}
+-
+-static void default_mdl_deleted_cb(struct mcap_mdl *mdl, gpointer data)
+-{
+-	DBG("MCAP Unmanaged mdl deleted");
+-}
+-
+-static void default_mdl_aborted_cb(struct mcap_mdl *mdl, gpointer data)
+-{
+-	DBG("MCAP Unmanaged mdl aborted");
+-}
+-
+-static uint8_t default_mdl_conn_req_cb(struct mcap_mcl *mcl,
+-						uint8_t mdepid, uint16_t mdlid,
+-						uint8_t *conf, gpointer data)
+-{
+-	DBG("MCAP mdl remote connection aborted");
+-	/* Due to this callback isn't managed this request won't be supported */
+-	return MCAP_REQUEST_NOT_SUPPORTED;
+-}
+-
+-static uint8_t default_mdl_reconn_req_cb(struct mcap_mdl *mdl,
+-						gpointer data)
+-{
+-	DBG("MCAP mdl remote reconnection aborted");
+-	/* Due to this callback isn't managed this request won't be supported */
+-	return MCAP_REQUEST_NOT_SUPPORTED;
+-}
+-
+-static void set_default_cb(struct mcap_mcl *mcl)
+-{
+-	if (!mcl->cb)
+-		mcl->cb = g_new0(struct mcap_mdl_cb, 1);
+-
+-	mcl->cb->mdl_connected = default_mdl_connected_cb;
+-	mcl->cb->mdl_closed = default_mdl_closed_cb;
+-	mcl->cb->mdl_deleted = default_mdl_deleted_cb;
+-	mcl->cb->mdl_aborted = default_mdl_aborted_cb;
+-	mcl->cb->mdl_conn_req = default_mdl_conn_req_cb;
+-	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
+-}
+-
+-static char *error2str(uint8_t rc)
+-{
+-	switch (rc) {
+-	case MCAP_SUCCESS:
+-		return "Success";
+-	case MCAP_INVALID_OP_CODE:
+-		return "Invalid Op Code";
+-	case MCAP_INVALID_PARAM_VALUE:
+-		return "Invalid Parameter Value";
+-	case MCAP_INVALID_MDEP:
+-		return "Invalid MDEP";
+-	case MCAP_MDEP_BUSY:
+-		return "MDEP Busy";
+-	case MCAP_INVALID_MDL:
+-		return "Invalid MDL";
+-	case MCAP_MDL_BUSY:
+-		return "MDL Busy";
+-	case MCAP_INVALID_OPERATION:
+-		return "Invalid Operation";
+-	case MCAP_RESOURCE_UNAVAILABLE:
+-		return "Resource Unavailable";
+-	case MCAP_UNSPECIFIED_ERROR:
+-		return "Unspecified Error";
+-	case MCAP_REQUEST_NOT_SUPPORTED:
+-		return "Request Not Supported";
+-	case MCAP_CONFIGURATION_REJECTED:
+-		return "Configuration Rejected";
+-	default:
+-		return "Unknown Response Code";
+-	}
+-}
+-
+-static gboolean mcap_send_std_opcode(struct mcap_mcl *mcl, void *cmd,
+-						uint32_t size, GError **err)
+-{
+-	if (mcl->state == MCL_IDLE) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
+-							"MCL is not connected");
+-		return FALSE;
+-	}
+-
+-	if (mcl->req != MCL_AVAILABLE) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_RESOURCE_UNAVAILABLE,
+-							"Pending request");
+-		return FALSE;
+-	}
+-
+-	if (!(mcl->ctrl & MCAP_CTRL_STD_OP)) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_REQUEST_NOT_SUPPORTED,
+-				"Remote does not support standard opcodes");
+-		return FALSE;
+-	}
+-
+-	if (mcl->state == MCL_PENDING) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_OPERATION,
+-			"Not Std Op. Codes can be sent in PENDING State");
+-		return FALSE;
+-	}
+-
+-	if (mcap_send_data(g_io_channel_unix_get_fd(mcl->cc), cmd, size) < 0) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
+-					"Command can't be sent, write error");
+-		return FALSE;
+-	}
+-
+-	mcl->lcmd = cmd;
+-	mcl->req = MCL_WAITING_RSP;
+-
+-	return TRUE;
+-}
+-
+-static void update_mcl_state(struct mcap_mcl *mcl)
+-{
+-	GSList *l;
+-	struct mcap_mdl *mdl;
+-
+-	if (mcl->state == MCL_PENDING)
+-		return;
+-
+-	for (l = mcl->mdls; l; l = l->next) {
+-		mdl = l->data;
+-
+-		if (mdl->state == MDL_CONNECTED) {
+-			mcl->state = MCL_ACTIVE;
+-			return;
+-		}
+-	}
+-
+-	mcl->state = MCL_CONNECTED;
+-}
+-
+-static void shutdown_mdl(struct mcap_mdl *mdl)
+-{
+-	mdl->state = MDL_CLOSED;
+-
+-	if (mdl->wid) {
+-		g_source_remove(mdl->wid);
+-		mdl->wid = 0;
+-	}
+-
+-	if (mdl->dc) {
+-		g_io_channel_shutdown(mdl->dc, TRUE, NULL);
+-		g_io_channel_unref(mdl->dc);
+-		mdl->dc = NULL;
+-	}
+-}
+-
+-static void free_mdl(struct mcap_mdl *mdl)
+-{
+-	if (!mdl)
+-		return;
+-
+-	mcap_mcl_unref(mdl->mcl);
+-	g_free(mdl);
+-}
+-
+-static int cmp_mdl_state(gconstpointer a, gconstpointer b)
+-{
+-	const struct mcap_mdl *mdl = a;
+-	const MDLState *st = b;
+-
+-	if (mdl->state == *st)
+-		return 0;
+-	else if (mdl->state < *st)
+-		return -1;
+-	else
+-		return 1;
+-}
+-
+-static void free_mcap_mdl_op(struct mcap_mdl_op_cb *op)
+-{
+-	if (op->destroy)
+-		op->destroy(op->user_data);
+-
+-	if (op->mdl)
+-		mcap_mdl_unref(op->mdl);
+-
+-	g_free(op);
+-}
+-
+-static void free_mcl_priv_data(struct mcap_mcl *mcl)
+-{
+-	free_mcap_mdl_op(mcl->priv_data);
+-	mcl->priv_data = NULL;
+-}
+-
+-static void mcap_notify_error(struct mcap_mcl *mcl, GError *err)
+-{
+-	struct mcap_mdl_op_cb *con = mcl->priv_data;
+-	struct mcap_mdl *mdl;
+-	MDLState st;
+-	GSList *l;
+-
+-	if (!con || !mcl->lcmd)
+-		return;
+-
+-	switch (mcl->lcmd[0]) {
+-	case MCAP_MD_CREATE_MDL_REQ:
+-		st = MDL_WAITING;
+-		l = g_slist_find_custom(mcl->mdls, &st, cmp_mdl_state);
+-		if (!l)
+-			return;
+-
+-		mdl = l->data;
+-		mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+-		mcap_mdl_unref(mdl);
+-		update_mcl_state(mcl);
+-		con->cb.op_conf(NULL, 0, err, con->user_data);
+-		break;
+-	case MCAP_MD_ABORT_MDL_REQ:
+-		st = MDL_WAITING;
+-		l = g_slist_find_custom(mcl->mdls, &st, cmp_mdl_state);
+-		if (!l)
+-			return;
+-
+-		shutdown_mdl(l->data);
+-		update_mcl_state(mcl);
+-		con->cb.notify(err, con->user_data);
+-		break;
+-	case MCAP_MD_DELETE_MDL_REQ:
+-		for (l = mcl->mdls; l; l = l->next) {
+-			mdl = l->data;
+-			if (mdl->state == MDL_DELETING)
+-				mdl->state = (mdl->dc) ? MDL_CONNECTED :
+-								MDL_CLOSED;
+-		}
+-		update_mcl_state(mcl);
+-		con->cb.notify(err, con->user_data);
+-		break;
+-	case MCAP_MD_RECONNECT_MDL_REQ:
+-		st = MDL_WAITING;
+-		l = g_slist_find_custom(mcl->mdls, &st, cmp_mdl_state);
+-		if (!l)
+-			return;
+-
+-		shutdown_mdl(l->data);
+-		update_mcl_state(mcl);
+-		con->cb.op(NULL, err, con->user_data);
+-		break;
+-	}
+-
+-	free_mcl_priv_data(mcl);
+-	g_free(mcl->lcmd);
+-	mcl->lcmd = NULL;
+-}
+-
+-int mcap_send_data(int sock, const void *buf, uint32_t size)
+-{
+-	const uint8_t *buf_b = buf;
+-	uint32_t sent = 0;
+-
+-	while (sent < size) {
+-		int n = write(sock, buf_b + sent, size - sent);
+-		if (n < 0)
+-			return -1;
+-		sent += n;
+-	}
+-
+-	return 0;
+-}
+-
+-static int mcap_send_cmd(struct mcap_mcl *mcl, uint8_t oc, uint8_t rc,
+-					uint16_t mdl, uint8_t *data, size_t len)
+-{
+-	mcap_rsp *cmd;
+-	int sock, sent;
+-
+-	if (mcl->cc == NULL)
+-		return -1;
+-
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-
+-	cmd = g_malloc(sizeof(mcap_rsp) + len);
+-	cmd->op = oc;
+-	cmd->rc = rc;
+-	cmd->mdl = htons(mdl);
+-
+-	if (data && len > 0)
+-		memcpy(cmd->data, data, len);
+-
+-	sent = mcap_send_data(sock, cmd, sizeof(mcap_rsp) + len);
+-	g_free(cmd);
+-
+-	return sent;
+-}
+-
+-static struct mcap_mdl *get_mdl(struct mcap_mcl *mcl, uint16_t mdlid)
+-{
+-	GSList *l;
+-	struct mcap_mdl *mdl;
+-
+-	for (l = mcl->mdls; l; l = l->next) {
+-		mdl = l->data;
+-		if (mdlid == mdl->mdlid)
+-			return mdl;
+-	}
+-
+-	return NULL;
+-}
+-
+-static uint16_t generate_mdlid(struct mcap_mcl *mcl)
+-{
+-	uint16_t mdlid = mcl->next_mdl;
+-	struct mcap_mdl *mdl;
+-
+-	do {
+-		mdl = get_mdl(mcl, mdlid);
+-		if (!mdl) {
+-			mcl->next_mdl = (mdlid % MCAP_MDLID_FINAL) + 1;
+-			return mdlid;
+-		} else
+-			mdlid = (mdlid % MCAP_MDLID_FINAL) + 1;
+-	} while (mdlid != mcl->next_mdl);
+-
+-	/* No more mdlids availables */
+-	return 0;
+-}
+-
+-static mcap_md_req *create_req(uint8_t op, uint16_t mdl_id)
+-{
+-	mcap_md_req *req_cmd;
+-
+-	req_cmd = g_new0(mcap_md_req, 1);
+-
+-	req_cmd->op = op;
+-	req_cmd->mdl = htons(mdl_id);
+-
+-	return req_cmd;
+-}
+-
+-static mcap_md_create_mdl_req *create_mdl_req(uint16_t mdl_id, uint8_t mdep,
+-								uint8_t conf)
+-{
+-	mcap_md_create_mdl_req *req_mdl;
+-
+-	req_mdl = g_new0(mcap_md_create_mdl_req, 1);
+-
+-	req_mdl->op = MCAP_MD_CREATE_MDL_REQ;
+-	req_mdl->mdl = htons(mdl_id);
+-	req_mdl->mdep = mdep;
+-	req_mdl->conf = conf;
+-
+-	return req_mdl;
+-}
+-
+-static int compare_mdl(gconstpointer a, gconstpointer b)
+-{
+-	const struct mcap_mdl *mdla = a;
+-	const struct mcap_mdl *mdlb = b;
+-
+-	if (mdla->mdlid == mdlb->mdlid)
+-		return 0;
+-	else if (mdla->mdlid < mdlb->mdlid)
+-		return -1;
+-	else
+-		return 1;
+-}
+-
+-static bool wait_response_timer(gpointer data)
+-{
+-	struct mcap_mcl *mcl = data;
+-
+-	GError *gerr = NULL;
+-
+-	RELEASE_TIMER(mcl);
+-
+-	g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
+-					"Timeout waiting response");
+-
+-	mcap_notify_error(mcl, gerr);
+-
+-	g_error_free(gerr);
+-	mcl->mi->mcl_disconnected_cb(mcl, mcl->mi->user_data);
+-	mcap_cache_mcl(mcl);
+-
+-	return FALSE;
+-}
+-
+-gboolean mcap_create_mdl(struct mcap_mcl *mcl,
+-				uint8_t mdepid,
+-				uint8_t conf,
+-				mcap_mdl_operation_conf_cb connect_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err)
+-{
+-	struct mcap_mdl *mdl;
+-	struct mcap_mdl_op_cb *con;
+-	mcap_md_create_mdl_req *cmd;
+-	uint16_t id;
+-
+-	id = generate_mdlid(mcl);
+-	if (!id) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
+-					"Not more mdlids available");
+-		return FALSE;
+-	}
+-
+-	mdl = g_new0(struct mcap_mdl, 1);
+-	mdl->mcl = mcap_mcl_ref(mcl);
+-	mdl->mdlid = id;
+-	mdl->mdep_id = mdepid;
+-	mdl->state = MDL_WAITING;
+-
+-	con = g_new0(struct mcap_mdl_op_cb, 1);
+-	con->mdl = mcap_mdl_ref(mdl);
+-	con->cb.op_conf = connect_cb;
+-	con->destroy = destroy;
+-	con->user_data = user_data;
+-
+-	cmd = create_mdl_req(id, mdepid, conf);
+-	if (!mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_create_mdl_req),
+-									err)) {
+-		mcap_mdl_unref(con->mdl);
+-		g_free(con);
+-		g_free(cmd);
+-		return FALSE;
+-	}
+-
+-	mcl->state = MCL_ACTIVE;
+-	mcl->priv_data = con;
+-
+-	mcl->mdls = g_slist_insert_sorted(mcl->mdls, mcap_mdl_ref(mdl),
+-								compare_mdl);
+-	mcl->tid = timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
+-					mcl, NULL);
+-	return TRUE;
+-}
+-
+-gboolean mcap_reconnect_mdl(struct mcap_mdl *mdl,
+-				mcap_mdl_operation_cb reconnect_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err)
+-{
+-	struct mcap_mdl_op_cb *con;
+-	struct mcap_mcl *mcl = mdl->mcl;
+-	mcap_md_req *cmd;
+-
+-	if (mdl->state != MDL_CLOSED) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
+-					"MDL is not closed");
+-		return FALSE;
+-	}
+-
+-	cmd = create_req(MCAP_MD_RECONNECT_MDL_REQ, mdl->mdlid);
+-	if (!mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err)) {
+-		g_free(cmd);
+-		return FALSE;
+-	}
+-
+-	mdl->state = MDL_WAITING;
+-
+-	con = g_new0(struct mcap_mdl_op_cb, 1);
+-	con->mdl = mcap_mdl_ref(mdl);
+-	con->cb.op = reconnect_cb;
+-	con->destroy = destroy;
+-	con->user_data = user_data;
+-
+-	mcl->state = MCL_ACTIVE;
+-	mcl->priv_data = con;
+-
+-	mcl->tid = timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
+-					mcl, NULL);
+-	return TRUE;
+-}
+-
+-static gboolean send_delete_req(struct mcap_mcl *mcl,
+-						struct mcap_mdl_op_cb *con,
+-						uint16_t mdlid,
+-						GError **err)
+-{
+-	mcap_md_req *cmd;
+-
+-	cmd = create_req(MCAP_MD_DELETE_MDL_REQ, mdlid);
+-	if (!mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err)) {
+-		g_free(cmd);
+-		return FALSE;
+-	}
+-
+-	mcl->priv_data = con;
+-
+-	mcl->tid = timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
+-					mcl, NULL);
+-	return TRUE;
+-}
+-
+-gboolean mcap_delete_all_mdls(struct mcap_mcl *mcl,
+-					mcap_mdl_notify_cb delete_cb,
+-					gpointer user_data,
+-					GDestroyNotify destroy,
+-					GError **err)
+-{
+-	GSList *l;
+-	struct mcap_mdl *mdl;
+-	struct mcap_mdl_op_cb *con;
+-
+-	DBG("MCL in state: %d", mcl->state);
+-	if (!mcl->mdls) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
+-				"There are not MDLs created");
+-		return FALSE;
+-	}
+-
+-	for (l = mcl->mdls; l; l = l->next) {
+-		mdl = l->data;
+-		if (mdl->state != MDL_WAITING)
+-			mdl->state = MDL_DELETING;
+-	}
+-
+-	con = g_new0(struct mcap_mdl_op_cb, 1);
+-	con->mdl = NULL;
+-	con->cb.notify = delete_cb;
+-	con->destroy = destroy;
+-	con->user_data = user_data;
+-
+-
+-	if (!send_delete_req(mcl, con, MCAP_ALL_MDLIDS, err)) {
+-		g_free(con);
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-gboolean mcap_delete_mdl(struct mcap_mdl *mdl, mcap_mdl_notify_cb delete_cb,
+-							gpointer user_data,
+-							GDestroyNotify destroy,
+-							GError **err)
+-{
+-	struct mcap_mcl *mcl= mdl->mcl;
+-	struct mcap_mdl_op_cb *con;
+-	GSList *l;
+-
+-	l = g_slist_find(mcl->mdls, mdl);
+-
+-	if (!l) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_MDL,
+-					"%s" , error2str(MCAP_INVALID_MDEP));
+-		return FALSE;
+-	}
+-
+-	if (mdl->state == MDL_WAITING) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
+-							"Mdl is not created");
+-		return FALSE;
+-	}
+-
+-	mdl->state = MDL_DELETING;
+-
+-	con = g_new0(struct mcap_mdl_op_cb, 1);
+-	con->mdl = mcap_mdl_ref(mdl);
+-	con->cb.notify = delete_cb;
+-	con->destroy = destroy;
+-	con->user_data = user_data;
+-
+-	if (!send_delete_req(mcl, con, mdl->mdlid, err)) {
+-		mcap_mdl_unref(con->mdl);
+-		g_free(con);
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-gboolean mcap_mdl_abort(struct mcap_mdl *mdl, mcap_mdl_notify_cb abort_cb,
+-							gpointer user_data,
+-							GDestroyNotify destroy,
+-							GError **err)
+-{
+-	struct mcap_mdl_op_cb *con;
+-	struct mcap_mcl *mcl = mdl->mcl;
+-	mcap_md_req *cmd;
+-
+-	if (mdl->state != MDL_WAITING) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
+-							"Mdl in invalid state");
+-		return FALSE;
+-	}
+-
+-	cmd = create_req(MCAP_MD_ABORT_MDL_REQ, mdl->mdlid);
+-	if (!mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err)) {
+-		g_free(cmd);
+-		return FALSE;
+-	}
+-
+-	con = g_new0(struct mcap_mdl_op_cb, 1);
+-	con->mdl = mcap_mdl_ref(mdl);
+-	con->cb.notify = abort_cb;
+-	con->destroy = destroy;
+-	con->user_data = user_data;
+-
+-	mcl->priv_data = con;
+-	mcl->tid = timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
+-					mcl, NULL);
+-	return TRUE;
+-}
+-
+-static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
+-{
+-	struct mcap_mcl *mcl;
+-
+-	for (; list; list = list->next) {
+-		mcl = list->data;
+-
+-		if (!bacmp(&mcl->addr, addr))
+-			return mcl;
+-	}
+-
+-	return NULL;
+-}
+-
+-int mcap_mdl_get_fd(struct mcap_mdl *mdl)
+-{
+-	if (!mdl || mdl->state != MDL_CONNECTED)
+-		return -ENOTCONN;
+-
+-	return g_io_channel_unix_get_fd(mdl->dc);
+-}
+-
+-uint16_t mcap_mdl_get_mdlid(struct mcap_mdl *mdl)
+-{
+-	if (!mdl)
+-		return MCAP_MDLID_RESERVED;
+-
+-	return mdl->mdlid;
+-}
+-
+-static void shutdown_mdl_cb(void *data, void *user_data)
+-{
+-	shutdown_mdl(data);
+-}
+-
+-static void mdl_unref_cb(void *data, void *user_data)
+-{
+-	mcap_mdl_unref(data);
+-}
+-
+-static void close_mcl(struct mcap_mcl *mcl, gboolean cache_requested)
+-{
+-	gboolean save = ((!(mcl->ctrl & MCAP_CTRL_FREE)) && cache_requested);
+-
+-	RELEASE_TIMER(mcl);
+-
+-	if (mcl->cc) {
+-		g_io_channel_shutdown(mcl->cc, TRUE, NULL);
+-		g_io_channel_unref(mcl->cc);
+-		mcl->cc = NULL;
+-	}
+-
+-	if (mcl->wid) {
+-		g_source_remove(mcl->wid);
+-		mcl->wid = 0;
+-	}
+-
+-	if (mcl->lcmd) {
+-		g_free(mcl->lcmd);
+-		mcl->lcmd = NULL;
+-	}
+-
+-	if (mcl->priv_data)
+-		free_mcl_priv_data(mcl);
+-
+-	g_slist_foreach(mcl->mdls, shutdown_mdl_cb, NULL);
+-
+-	mcap_sync_stop(mcl);
+-
+-	mcl->state = MCL_IDLE;
+-
+-	if (save)
+-		return;
+-
+-	g_slist_foreach(mcl->mdls, mdl_unref_cb, NULL);
+-	g_slist_free(mcl->mdls);
+-	mcl->mdls = NULL;
+-}
+-
+-static void mcap_mcl_shutdown(struct mcap_mcl *mcl)
+-{
+-	close_mcl(mcl, TRUE);
+-}
+-
+-static void mcap_mcl_release(struct mcap_mcl *mcl)
+-{
+-	close_mcl(mcl, FALSE);
+-}
+-
+-static void mcap_cache_mcl(struct mcap_mcl *mcl)
+-{
+-	GSList *l;
+-	struct mcap_mcl *last;
+-	int len;
+-
+-	if (mcl->ctrl & MCAP_CTRL_CACHED)
+-		return;
+-
+-	mcl->mi->mcls = g_slist_remove(mcl->mi->mcls, mcl);
+-
+-	if (mcl->ctrl & MCAP_CTRL_NOCACHE) {
+-		mcl->mi->cached = g_slist_remove(mcl->mi->cached, mcl);
+-		mcap_mcl_release(mcl);
+-		mcap_mcl_unref(mcl);
+-		return;
+-	}
+-
+-	DBG("Caching MCL");
+-
+-	len = g_slist_length(mcl->mi->cached);
+-	if (len == MAX_CACHED) {
+-		/* Remove the latest cached mcl */
+-		l = g_slist_last(mcl->mi->cached);
+-		last = l->data;
+-		mcl->mi->cached = g_slist_remove(mcl->mi->cached, last);
+-		last->ctrl &= ~MCAP_CTRL_CACHED;
+-		if (last->ctrl & MCAP_CTRL_CONN) {
+-			/*
+-			 * We have to release this MCL if connection is not
+-			 * successful
+-			 */
+-			last->ctrl |= MCAP_CTRL_FREE;
+-		} else {
+-			mcap_mcl_release(last);
+-			last->mi->mcl_uncached_cb(last, last->mi->user_data);
+-		}
+-		mcap_mcl_unref(last);
+-	}
+-
+-	mcl->mi->cached = g_slist_prepend(mcl->mi->cached, mcl);
+-	mcl->ctrl |= MCAP_CTRL_CACHED;
+-	mcap_mcl_shutdown(mcl);
+-}
+-
+-static void mcap_uncache_mcl(struct mcap_mcl *mcl)
+-{
+-	if (!(mcl->ctrl & MCAP_CTRL_CACHED))
+-		return;
+-
+-	DBG("Got MCL from cache");
+-
+-	mcl->mi->cached = g_slist_remove(mcl->mi->cached, mcl);
+-	mcl->mi->mcls = g_slist_prepend(mcl->mi->mcls, mcl);
+-	mcl->ctrl &= ~MCAP_CTRL_CACHED;
+-	mcl->ctrl &= ~MCAP_CTRL_FREE;
+-}
+-
+-void mcap_close_mcl(struct mcap_mcl *mcl, gboolean cache)
+-{
+-	if (!mcl)
+-		return;
+-
+-	if (mcl->ctrl & MCAP_CTRL_FREE) {
+-		mcap_mcl_release(mcl);
+-		return;
+-	}
+-
+-	if (!cache)
+-		mcl->ctrl |= MCAP_CTRL_NOCACHE;
+-
+-	if (mcl->cc) {
+-		g_io_channel_shutdown(mcl->cc, TRUE, NULL);
+-		g_io_channel_unref(mcl->cc);
+-		mcl->cc = NULL;
+-		mcl->state = MCL_IDLE;
+-	} else if ((mcl->ctrl & MCAP_CTRL_CACHED) &&
+-					(mcl->ctrl & MCAP_CTRL_NOCACHE)) {
+-		mcl->ctrl &= ~MCAP_CTRL_CACHED;
+-		mcl->mi->cached = g_slist_remove(mcl->mi->cached, mcl);
+-		mcap_mcl_release(mcl);
+-		mcap_mcl_unref(mcl);
+-	}
+-}
+-
+-struct mcap_mcl *mcap_mcl_ref(struct mcap_mcl *mcl)
+-{
+-	mcl->ref++;
+-
+-	DBG("mcap_mcl_ref(%p): ref=%d", mcl, mcl->ref);
+-
+-	return mcl;
+-}
+-
+-void mcap_mcl_unref(struct mcap_mcl *mcl)
+-{
+-	mcl->ref--;
+-
+-	DBG("mcap_mcl_unref(%p): ref=%d", mcl, mcl->ref);
+-
+-	if (mcl->ref > 0)
+-		return;
+-
+-	mcap_mcl_release(mcl);
+-	mcap_instance_unref(mcl->mi);
+-	g_free(mcl->cb);
+-	g_free(mcl);
+-}
+-
+-static gboolean parse_set_opts(struct mcap_mdl_cb *mdl_cb, GError **err,
+-						McapMclCb cb1, va_list args)
+-{
+-	McapMclCb cb = cb1;
+-	struct mcap_mdl_cb *c;
+-
+-	c = g_new0(struct mcap_mdl_cb, 1);
+-
+-	while (cb != MCAP_MDL_CB_INVALID) {
+-		switch (cb) {
+-		case MCAP_MDL_CB_CONNECTED:
+-			c->mdl_connected = va_arg(args, mcap_mdl_event_cb);
+-			break;
+-		case MCAP_MDL_CB_CLOSED:
+-			c->mdl_closed = va_arg(args, mcap_mdl_event_cb);
+-			break;
+-		case MCAP_MDL_CB_DELETED:
+-			c->mdl_deleted = va_arg(args, mcap_mdl_event_cb);
+-			break;
+-		case MCAP_MDL_CB_ABORTED:
+-			c->mdl_aborted = va_arg(args, mcap_mdl_event_cb);
+-			break;
+-		case MCAP_MDL_CB_REMOTE_CONN_REQ:
+-			c->mdl_conn_req = va_arg(args,
+-						mcap_remote_mdl_conn_req_cb);
+-			break;
+-		case MCAP_MDL_CB_REMOTE_RECONN_REQ:
+-			c->mdl_reconn_req = va_arg(args,
+-						mcap_remote_mdl_reconn_req_cb);
+-			break;
+-		case MCAP_MDL_CB_INVALID:
+-		default:
+-			g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
+-						"Unknown option %d", cb);
+-			g_free(c);
+-			return FALSE;
+-		}
+-		cb = va_arg(args, int);
+-	}
+-
+-	/* Set new callbacks */
+-	if (c->mdl_connected)
+-		mdl_cb->mdl_connected = c->mdl_connected;
+-	if (c->mdl_closed)
+-		mdl_cb->mdl_closed = c->mdl_closed;
+-	if (c->mdl_deleted)
+-		mdl_cb->mdl_deleted = c->mdl_deleted;
+-	if (c->mdl_aborted)
+-		mdl_cb->mdl_aborted = c->mdl_aborted;
+-	if (c->mdl_conn_req)
+-		mdl_cb->mdl_conn_req = c->mdl_conn_req;
+-	if (c->mdl_reconn_req)
+-		mdl_cb->mdl_reconn_req = c->mdl_reconn_req;
+-
+-	g_free(c);
+-
+-	return TRUE;
+-}
+-
+-gboolean mcap_mcl_set_cb(struct mcap_mcl *mcl, gpointer user_data,
+-					GError **gerr, McapMclCb cb1, ...)
+-{
+-	va_list args;
+-	gboolean ret;
+-
+-	va_start(args, cb1);
+-	ret = parse_set_opts(mcl->cb, gerr, cb1, args);
+-	va_end(args);
+-
+-	if (!ret)
+-		return FALSE;
+-
+-	mcl->cb->user_data = user_data;
+-	return TRUE;
+-}
+-
+-void mcap_mcl_get_addr(struct mcap_mcl *mcl, bdaddr_t *addr)
+-{
+-	bacpy(addr, &mcl->addr);
+-}
+-
+-static void mcap_del_mdl(gpointer elem, gpointer user_data)
+-{
+-	struct mcap_mdl *mdl = elem;
+-	gboolean notify = *(gboolean *) user_data;
+-
+-	if (notify)
+-		mdl->mcl->cb->mdl_deleted(mdl, mdl->mcl->cb->user_data);
+-
+-	shutdown_mdl(mdl);
+-	mcap_mdl_unref(mdl);
+-}
+-
+-static gboolean check_cmd_req_length(struct mcap_mcl *mcl, void *cmd,
+-				uint32_t rlen, uint32_t explen, uint8_t rspcod)
+-{
+-	mcap_md_req *req;
+-	uint16_t mdl_id;
+-
+-	if (rlen != explen) {
+-		if (rlen >= sizeof(mcap_md_req)) {
+-			req = cmd;
+-			mdl_id = ntohs(req->mdl);
+-		} else {
+-			/* We can't get mdlid */
+-			mdl_id = MCAP_MDLID_RESERVED;
+-		}
+-		mcap_send_cmd(mcl, rspcod, MCAP_INVALID_PARAM_VALUE, mdl_id,
+-								NULL, 0);
+-		return FALSE;
+-	}
+-	return TRUE;
+-}
+-
+-static void process_md_create_mdl_req(struct mcap_mcl *mcl, void *cmd,
+-								uint32_t len)
+-{
+-	mcap_md_create_mdl_req *req;
+-	struct mcap_mdl *mdl;
+-	uint16_t mdl_id;
+-	uint8_t mdep_id;
+-	uint8_t cfga, conf;
+-	uint8_t rsp;
+-
+-	if (!check_cmd_req_length(mcl, cmd, len, sizeof(mcap_md_create_mdl_req),
+-							MCAP_MD_CREATE_MDL_RSP))
+-		return;
+-
+-	req = cmd;
+-	mdl_id = ntohs(req->mdl);
+-	if (mdl_id < MCAP_MDLID_INITIAL || mdl_id > MCAP_MDLID_FINAL) {
+-		mcap_send_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, MCAP_INVALID_MDL,
+-							mdl_id, NULL, 0);
+-		return;
+-	}
+-
+-	mdep_id = req->mdep;
+-	if (mdep_id > MCAP_MDEPID_FINAL) {
+-		mcap_send_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, MCAP_INVALID_MDEP,
+-							mdl_id, NULL, 0);
+-		return;
+-	}
+-
+-	mdl = get_mdl(mcl, mdl_id);
+-	if (mdl && (mdl->state == MDL_WAITING || mdl->state == MDL_DELETING )) {
+-		/*
+-		 *  Creation request arrives for a MDL that is being managed
+-		 * at current moment
+-		 */
+-		mcap_send_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, MCAP_MDL_BUSY,
+-							mdl_id, NULL, 0);
+-		return;
+-	}
+-
+-	cfga = conf = req->conf;
+-	/* Callback to upper layer */
+-	rsp = mcl->cb->mdl_conn_req(mcl, mdep_id, mdl_id, &conf,
+-							mcl->cb->user_data);
+-	if (mcl->state == MCL_IDLE) {
+-		/* MCL has been closed int the callback */
+-		return;
+-	}
+-
+-	if (cfga != 0 && cfga != conf) {
+-		/*
+-		 * Remote device set default configuration but upper profile
+-		 * has changed it. Protocol Error: force closing the MCL by
+-		 * remote device using UNSPECIFIED_ERROR response
+-		 */
+-		mcap_send_cmd(mcl, MCAP_MD_CREATE_MDL_RSP,
+-				MCAP_UNSPECIFIED_ERROR, mdl_id, NULL, 0);
+-		return;
+-	}
+-	if (rsp != MCAP_SUCCESS) {
+-		mcap_send_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, rsp, mdl_id,
+-								NULL, 0);
+-		return;
+-	}
+-
+-	if (!mdl) {
+-		mdl = g_new0(struct mcap_mdl, 1);
+-		mdl->mcl = mcap_mcl_ref(mcl);
+-		mdl->mdlid = mdl_id;
+-		mcl->mdls = g_slist_insert_sorted(mcl->mdls, mcap_mdl_ref(mdl),
+-								compare_mdl);
+-	} else if (mdl->state == MDL_CONNECTED) {
+-		/*
+-		 * MCAP specification says that we should close the MCL if
+-		 * it is open when we receive a MD_CREATE_MDL_REQ
+-		 */
+-		shutdown_mdl(mdl);
+-	}
+-
+-	mdl->mdep_id = mdep_id;
+-	mdl->state = MDL_WAITING;
+-
+-	mcl->state = MCL_PENDING;
+-	mcap_send_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, MCAP_SUCCESS, mdl_id,
+-								&conf, 1);
+-}
+-
+-static void process_md_reconnect_mdl_req(struct mcap_mcl *mcl, void *cmd,
+-								uint32_t len)
+-{
+-	mcap_md_req *req;
+-	struct mcap_mdl *mdl;
+-	uint16_t mdl_id;
+-	uint8_t rsp;
+-
+-	if (!check_cmd_req_length(mcl, cmd, len, sizeof(mcap_md_req),
+-						MCAP_MD_RECONNECT_MDL_RSP))
+-		return;
+-
+-	req = cmd;
+-	mdl_id = ntohs(req->mdl);
+-
+-	mdl = get_mdl(mcl, mdl_id);
+-	if (!mdl) {
+-		mcap_send_cmd(mcl, MCAP_MD_RECONNECT_MDL_RSP, MCAP_INVALID_MDL,
+-							mdl_id, NULL, 0);
+-		return;
+-	} else if (mdl->state == MDL_WAITING || mdl->state == MDL_DELETING ) {
+-		/*
+-		 * Creation request arrives for a MDL that is being managed
+-		 * at current moment
+-		 */
+-		mcap_send_cmd(mcl, MCAP_MD_RECONNECT_MDL_RSP, MCAP_MDL_BUSY,
+-							mdl_id, NULL, 0);
+-		return;
+-	}
+-
+-	/* Callback to upper layer */
+-	rsp = mcl->cb->mdl_reconn_req(mdl, mcl->cb->user_data);
+-	if (mcl->state == MCL_IDLE)
+-		return;
+-
+-	if (rsp != MCAP_SUCCESS) {
+-		mcap_send_cmd(mcl, MCAP_MD_RECONNECT_MDL_RSP, rsp, mdl_id,
+-								NULL, 0);
+-		return;
+-	}
+-
+-	if (mdl->state == MDL_CONNECTED)
+-		shutdown_mdl(mdl);
+-
+-	mdl->state = MDL_WAITING;
+-	mcl->state = MCL_PENDING;
+-	mcap_send_cmd(mcl, MCAP_MD_RECONNECT_MDL_RSP, MCAP_SUCCESS, mdl_id,
+-								NULL, 0);
+-}
+-
+-static void process_md_abort_mdl_req(struct mcap_mcl *mcl, void *cmd,
+-								uint32_t len)
+-{
+-	mcap_md_req *req;
+-	GSList *l;
+-	struct mcap_mdl *mdl, *abrt;
+-	uint16_t mdl_id;
+-
+-	if (!check_cmd_req_length(mcl, cmd, len, sizeof(mcap_md_req),
+-							MCAP_MD_ABORT_MDL_RSP))
+-		return;
+-
+-	req = cmd;
+-	mdl_id = ntohs(req->mdl);
+-	mcl->state = MCL_CONNECTED;
+-	abrt = NULL;
+-	for (l = mcl->mdls; l; l = l->next) {
+-		mdl = l->data;
+-		if (mdl_id == mdl->mdlid && mdl->state == MDL_WAITING) {
+-			abrt = mdl;
+-			if (mcl->state != MCL_CONNECTED)
+-				break;
+-			continue;
+-		}
+-		if (mdl->state == MDL_CONNECTED && mcl->state != MCL_ACTIVE)
+-			mcl->state = MCL_ACTIVE;
+-
+-		if (abrt && mcl->state == MCL_ACTIVE)
+-			break;
+-	}
+-
+-	if (!abrt) {
+-		mcap_send_cmd(mcl, MCAP_MD_ABORT_MDL_RSP, MCAP_INVALID_MDL,
+-							mdl_id, NULL, 0);
+-		return;
+-	}
+-
+-	mcl->cb->mdl_aborted(abrt, mcl->cb->user_data);
+-	abrt->state = MDL_CLOSED;
+-	mcap_send_cmd(mcl, MCAP_MD_ABORT_MDL_RSP, MCAP_SUCCESS, mdl_id,
+-								NULL, 0);
+-}
+-
+-static void process_md_delete_mdl_req(struct mcap_mcl *mcl, void *cmd,
+-								uint32_t len)
+-{
+-	mcap_md_req *req;
+-	struct mcap_mdl *mdl, *aux;
+-	uint16_t mdlid;
+-	gboolean notify;
+-	GSList *l;
+-
+-	if (!check_cmd_req_length(mcl, cmd, len, sizeof(mcap_md_req),
+-							MCAP_MD_DELETE_MDL_RSP))
+-		return;
+-
+-	req = cmd;
+-	mdlid = ntohs(req->mdl);
+-	if (mdlid == MCAP_ALL_MDLIDS) {
+-		notify = TRUE;
+-		g_slist_foreach(mcl->mdls, mcap_del_mdl, &notify);
+-		g_slist_free(mcl->mdls);
+-		mcl->mdls = NULL;
+-		mcl->state = MCL_CONNECTED;
+-		goto resp;
+-	}
+-
+-	if (mdlid < MCAP_MDLID_INITIAL || mdlid > MCAP_MDLID_FINAL) {
+-		mcap_send_cmd(mcl, MCAP_MD_DELETE_MDL_RSP, MCAP_INVALID_MDL,
+-								mdlid, NULL, 0);
+-		return;
+-	}
+-
+-	for (l = mcl->mdls, mdl = NULL; l; l = l->next) {
+-		aux = l->data;
+-		if (aux->mdlid == mdlid) {
+-			mdl = aux;
+-			break;
+-		}
+-	}
+-
+-	if (!mdl || mdl->state == MDL_WAITING) {
+-		mcap_send_cmd(mcl, MCAP_MD_DELETE_MDL_RSP, MCAP_INVALID_MDL,
+-								mdlid, NULL, 0);
+-		return;
+-	}
+-
+-	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+-	update_mcl_state(mcl);
+-	notify = TRUE;
+-	mcap_del_mdl(mdl, &notify);
+-
+-resp:
+-	mcap_send_cmd(mcl, MCAP_MD_DELETE_MDL_RSP, MCAP_SUCCESS, mdlid,
+-								NULL, 0);
+-}
+-
+-static void invalid_req_state(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	uint16_t mdlr;
+-
+-	error("Invalid cmd received (op code = %d) in state %d", cmd[0],
+-								mcl->state);
+-	/*
+-	 * Get previously mdlid sent to generate an appropriate
+-	 * response if it is possible
+-	 */
+-	mdlr = len < sizeof(mcap_md_req) ? MCAP_MDLID_RESERVED :
+-					ntohs(((mcap_md_req *) cmd)->mdl);
+-	mcap_send_cmd(mcl, cmd[0]+1, MCAP_INVALID_OPERATION, mdlr, NULL, 0);
+-}
+-
+-/* Function used to process commands depending of MCL state */
+-static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	switch (cmd[0]) {
+-	case MCAP_MD_CREATE_MDL_REQ:
+-		process_md_create_mdl_req(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_RECONNECT_MDL_REQ:
+-		process_md_reconnect_mdl_req(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_DELETE_MDL_REQ:
+-		process_md_delete_mdl_req(mcl, cmd, len);
+-		break;
+-	default:
+-		invalid_req_state(mcl, cmd, len);
+-	}
+-}
+-
+-static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	if (cmd[0] == MCAP_MD_ABORT_MDL_REQ)
+-		process_md_abort_mdl_req(mcl, cmd, len);
+-	else
+-		invalid_req_state(mcl, cmd, len);
+-}
+-
+-static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	switch (cmd[0]) {
+-	case MCAP_MD_CREATE_MDL_REQ:
+-		process_md_create_mdl_req(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_RECONNECT_MDL_REQ:
+-		process_md_reconnect_mdl_req(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_DELETE_MDL_REQ:
+-		process_md_delete_mdl_req(mcl, cmd, len);
+-		break;
+-	default:
+-		invalid_req_state(mcl, cmd, len);
+-	}
+-}
+-
+-/* Function used to process replies */
+-static gboolean check_err_rsp(struct mcap_mcl *mcl, mcap_rsp *rsp,
+-				uint32_t rlen, uint32_t len, GError **gerr)
+-{
+-	mcap_md_req *cmdlast = (mcap_md_req *) mcl->lcmd;
+-	int err = MCAP_ERROR_FAILED;
+-	gboolean close = FALSE;
+-	char *msg;
+-
+-	if (rsp->op == MCAP_ERROR_RSP) {
+-		msg = "MCAP_ERROR_RSP received";
+-		close = FALSE;
+-		goto fail;
+-	}
+-
+-	/* Check if the response matches with the last request */
+-	if (rlen < sizeof(mcap_rsp) || (mcl->lcmd[0] + 1) != rsp->op) {
+-		msg = "Protocol error";
+-		close = FALSE;
+-		goto fail;
+-	}
+-
+-	if (rlen < len) {
+-		msg = "Protocol error";
+-		close = FALSE;
+-		goto fail;
+-	}
+-
+-	if (rsp->mdl != cmdlast->mdl) {
+-		msg = "MDLID received doesn't match with MDLID sent";
+-		close = TRUE;
+-		goto fail;
+-	}
+-
+-	if (rsp->rc == MCAP_REQUEST_NOT_SUPPORTED) {
+-		msg = "Remote does not support opcodes";
+-		mcl->ctrl &= ~MCAP_CTRL_STD_OP;
+-		goto fail;
+-	}
+-
+-	if (rsp->rc == MCAP_UNSPECIFIED_ERROR) {
+-		msg = "Unspecified error";
+-		close = TRUE;
+-		goto fail;
+-	}
+-
+-	if (rsp->rc != MCAP_SUCCESS) {
+-		msg = error2str(rsp->rc);
+-		err = rsp->rc;
+-		goto fail;
+-	}
+-
+-	return FALSE;
+-
+-fail:
+-	g_set_error(gerr, MCAP_ERROR, err, "%s", msg);
+-	return close;
+-}
+-
+-static gboolean process_md_create_mdl_rsp(struct mcap_mcl *mcl,
+-						mcap_rsp *rsp, uint32_t len)
+-{
+-	mcap_md_create_mdl_req *cmdlast = (mcap_md_create_mdl_req *) mcl->lcmd;
+-	struct mcap_mdl_op_cb *conn = mcl->priv_data;
+-	mcap_mdl_operation_conf_cb connect_cb = conn->cb.op_conf;
+-	gpointer user_data = conn->user_data;
+-	struct mcap_mdl *mdl = conn->mdl;
+-	uint8_t conf = cmdlast->conf;
+-	gboolean close;
+-	GError *gerr = NULL;
+-
+-	close = check_err_rsp(mcl, rsp, len, sizeof(mcap_rsp) + 1, &gerr);
+-	g_free(mcl->lcmd);
+-	mcl->lcmd = NULL;
+-	mcl->req = MCL_AVAILABLE;
+-
+-	if (gerr)
+-		goto fail;
+-
+-	/* Check if preferences changed */
+-	if (conf != 0x00 && rsp->data[0] != conf) {
+-		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
+-						"Configuration changed");
+-		close = TRUE;
+-		goto fail;
+-	}
+-
+-	connect_cb(mdl, rsp->data[0], gerr, user_data);
+-	return close;
+-
+-fail:
+-	connect_cb(NULL, 0, gerr, user_data);
+-	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+-	mcap_mdl_unref(mdl);
+-	g_error_free(gerr);
+-	update_mcl_state(mcl);
+-	return close;
+-}
+-
+-static gboolean process_md_reconnect_mdl_rsp(struct mcap_mcl *mcl,
+-						mcap_rsp *rsp, uint32_t len)
+-{
+-	struct mcap_mdl_op_cb *reconn = mcl->priv_data;
+-	mcap_mdl_operation_cb reconn_cb = reconn->cb.op;
+-	gpointer user_data = reconn->user_data;
+-	struct mcap_mdl *mdl = reconn->mdl;
+-	GError *gerr = NULL;
+-	gboolean close;
+-
+-	close = check_err_rsp(mcl, rsp, len, sizeof(mcap_rsp), &gerr);
+-
+-	g_free(mcl->lcmd);
+-	mcl->lcmd = NULL;
+-	mcl->req = MCL_AVAILABLE;
+-
+-	reconn_cb(mdl, gerr, user_data);
+-	if (!gerr)
+-		return close;
+-
+-	g_error_free(gerr);
+-	shutdown_mdl(mdl);
+-	update_mcl_state(mcl);
+-
+-	if (rsp->rc != MCAP_INVALID_MDL)
+-		return close;
+-
+-	/* Remove cached mdlid */
+-	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+-	mcl->cb->mdl_deleted(mdl, mcl->cb->user_data);
+-	mcap_mdl_unref(mdl);
+-
+-	return close;
+-}
+-
+-static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
+-						mcap_rsp *rsp, uint32_t len)
+-{
+-	struct mcap_mdl_op_cb *abrt = mcl->priv_data;
+-	mcap_mdl_notify_cb abrt_cb = abrt->cb.notify;
+-	gpointer user_data = abrt->user_data;
+-	struct mcap_mdl *mdl = abrt->mdl;
+-	GError *gerr = NULL;
+-	gboolean close;
+-
+-	close = check_err_rsp(mcl, rsp, len, sizeof(mcap_rsp), &gerr);
+-
+-	g_free(mcl->lcmd);
+-	mcl->lcmd = NULL;
+-	mcl->req = MCL_AVAILABLE;
+-
+-	abrt_cb(gerr, user_data);
+-	shutdown_mdl(mdl);
+-
+-	if (len >= sizeof(mcap_rsp) && rsp->rc == MCAP_INVALID_MDL) {
+-		mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+-		mcl->cb->mdl_deleted(mdl, mcl->cb->user_data);
+-		mcap_mdl_unref(mdl);
+-	}
+-
+-	if (gerr)
+-		g_error_free(gerr);
+-
+-	update_mcl_state(mcl);
+-
+-	return close;
+-}
+-
+-static void restore_mdl(gpointer elem, gpointer data)
+-{
+-	struct mcap_mdl *mdl = elem;
+-
+-	if (mdl->state == MDL_DELETING) {
+-		if (mdl->dc)
+-			mdl->state = MDL_CONNECTED;
+-		else
+-			mdl->state = MDL_CLOSED;
+-	} else if (mdl->state == MDL_CLOSED)
+-		mdl->mcl->cb->mdl_closed(mdl, mdl->mcl->cb->user_data);
+-}
+-
+-static void check_mdl_del_err(struct mcap_mdl *mdl, mcap_rsp *rsp)
+-{
+-	if (rsp->rc != MCAP_ERROR_INVALID_MDL) {
+-		restore_mdl(mdl, NULL);
+-		return;
+-	}
+-
+-	/* MDL does not exist in remote side, we can delete it */
+-	mdl->mcl->mdls = g_slist_remove(mdl->mcl->mdls, mdl);
+-	mcap_mdl_unref(mdl);
+-}
+-
+-static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, mcap_rsp *rsp,
+-								uint32_t len)
+-{
+-	struct mcap_mdl_op_cb *del = mcl->priv_data;
+-	struct mcap_mdl *mdl = del->mdl;
+-	mcap_mdl_notify_cb deleted_cb = del->cb.notify;
+-	gpointer user_data = del->user_data;
+-	mcap_md_req *cmdlast = (mcap_md_req *) mcl->lcmd;
+-	uint16_t mdlid = ntohs(cmdlast->mdl);
+-	GError *gerr = NULL;
+-	gboolean close;
+-	gboolean notify = FALSE;
+-
+-	close = check_err_rsp(mcl, rsp, len, sizeof(mcap_rsp), &gerr);
+-
+-	g_free(mcl->lcmd);
+-	mcl->lcmd = NULL;
+-	mcl->req = MCL_AVAILABLE;
+-
+-	if (gerr) {
+-		if (mdl)
+-			check_mdl_del_err(mdl, rsp);
+-		else
+-			g_slist_foreach(mcl->mdls, restore_mdl, NULL);
+-		deleted_cb(gerr, user_data);
+-		g_error_free(gerr);
+-		return close;
+-	}
+-
+-	if (mdlid == MCAP_ALL_MDLIDS) {
+-		g_slist_foreach(mcl->mdls, mcap_del_mdl, &notify);
+-		g_slist_free(mcl->mdls);
+-		mcl->mdls = NULL;
+-		mcl->state = MCL_CONNECTED;
+-	} else {
+-		mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+-		update_mcl_state(mcl);
+-		mcap_del_mdl(mdl, &notify);
+-	}
+-
+-	deleted_cb(gerr, user_data);
+-
+-	return close;
+-}
+-
+-static void post_process_rsp(struct mcap_mcl *mcl, struct mcap_mdl_op_cb *op)
+-{
+-	if (mcl->priv_data != op) {
+-		/*
+-		 * Queued MCAP request in some callback.
+-		 * We should not delete the mcl private data
+-		 */
+-		free_mcap_mdl_op(op);
+-	} else {
+-		/*
+-		 * This is not a queued request. It's safe
+-		 * delete the mcl private data here.
+-		 */
+-		free_mcl_priv_data(mcl);
+-	}
+-}
+-
+-static void proc_response(struct mcap_mcl *mcl, void *buf, uint32_t len)
+-{
+-	struct mcap_mdl_op_cb *op = mcl->priv_data;
+-	mcap_rsp *rsp = buf;
+-	gboolean close;
+-
+-	RELEASE_TIMER(mcl);
+-
+-	switch (mcl->lcmd[0] + 1) {
+-	case MCAP_MD_CREATE_MDL_RSP:
+-		close = process_md_create_mdl_rsp(mcl, rsp, len);
+-		post_process_rsp(mcl, op);
+-		break;
+-	case MCAP_MD_RECONNECT_MDL_RSP:
+-		close = process_md_reconnect_mdl_rsp(mcl, rsp, len);
+-		post_process_rsp(mcl, op);
+-		break;
+-	case MCAP_MD_ABORT_MDL_RSP:
+-		close = process_md_abort_mdl_rsp(mcl, rsp, len);
+-		post_process_rsp(mcl, op);
+-		break;
+-	case MCAP_MD_DELETE_MDL_RSP:
+-		close = process_md_delete_mdl_rsp(mcl, rsp, len);
+-		post_process_rsp(mcl, op);
+-		break;
+-	default:
+-		DBG("Unknown cmd response received (op code = %d)", rsp->op);
+-		close = TRUE;
+-		break;
+-	}
+-
+-	if (close) {
+-		mcl->mi->mcl_disconnected_cb(mcl, mcl->mi->user_data);
+-		mcap_cache_mcl(mcl);
+-	}
+-}
+-
+-static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	GError *gerr = NULL;
+-
+-	if (cmd[0] > MCAP_MD_SYNC_INFO_IND ||
+-					(cmd[0] > MCAP_MD_DELETE_MDL_RSP &&
+-					cmd[0] < MCAP_MD_SYNC_CAP_REQ)) {
+-		error("Unknown cmd received (op code = %d)", cmd[0]);
+-		mcap_send_cmd(mcl, MCAP_ERROR_RSP, MCAP_INVALID_OP_CODE,
+-						MCAP_MDLID_RESERVED, NULL, 0);
+-		return;
+-	}
+-
+-	if (cmd[0] >= MCAP_MD_SYNC_CAP_REQ &&
+-					cmd[0] <= MCAP_MD_SYNC_INFO_IND) {
+-		proc_sync_cmd(mcl, cmd, len);
+-		return;
+-	}
+-
+-	if (!(mcl->ctrl & MCAP_CTRL_STD_OP)) {
+-		/* In case the remote device doesn't work correctly */
+-		error("Remote device does not support opcodes, cmd ignored");
+-		return;
+-	}
+-
+-	if (mcl->req == MCL_WAITING_RSP) {
+-		if (cmd[0] & 0x01) {
+-			/* Request arrived when a response is expected */
+-			if (mcl->role == MCL_INITIATOR)
+-				/* ignore */
+-				return;
+-			/* Initiator will ignore our last request */
+-			RELEASE_TIMER(mcl);
+-			mcl->req = MCL_AVAILABLE;
+-			g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_REQ_IGNORED,
+-				"Initiator sent a request with more priority");
+-			mcap_notify_error(mcl, gerr);
+-			proc_req[mcl->state](mcl, cmd, len);
+-			return;
+-		}
+-		proc_response(mcl, cmd, len);
+-	} else if (cmd[0] & 0x01)
+-		proc_req[mcl->state](mcl, cmd, len);
+-}
+-
+-static gboolean mdl_event_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+-{
+-
+-	struct mcap_mdl *mdl = data;
+-	gboolean notify;
+-
+-	DBG("Close MDL %d", mdl->mdlid);
+-
+-	notify = (mdl->state == MDL_CONNECTED);
+-	shutdown_mdl(mdl);
+-
+-	update_mcl_state(mdl->mcl);
+-
+-	if (notify) {
+-		/*Callback to upper layer */
+-		mdl->mcl->cb->mdl_closed(mdl, mdl->mcl->cb->user_data);
+-	}
+-
+-	return FALSE;
+-}
+-
+-static void mcap_connect_mdl_cb(GIOChannel *chan, GError *conn_err,
+-								gpointer data)
+-{
+-	struct mcap_mdl_op_cb *con = data;
+-	struct mcap_mdl *mdl = con->mdl;
+-	mcap_mdl_operation_cb cb = con->cb.op;
+-	gpointer user_data = con->user_data;
+-
+-	DBG("mdl connect callback");
+-
+-	if (conn_err) {
+-		DBG("ERROR: mdl connect callback");
+-		mdl->state = MDL_CLOSED;
+-		g_io_channel_unref(mdl->dc);
+-		mdl->dc = NULL;
+-		cb(mdl, conn_err, user_data);
+-		return;
+-	}
+-
+-	mdl->state = MDL_CONNECTED;
+-	mdl->wid = g_io_add_watch_full(mdl->dc, G_PRIORITY_DEFAULT,
+-					G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-					(GIOFunc) mdl_event_cb,
+-					mcap_mdl_ref(mdl),
+-					(GDestroyNotify) mcap_mdl_unref);
+-
+-	cb(mdl, conn_err, user_data);
+-}
+-
+-gboolean mcap_connect_mdl(struct mcap_mdl *mdl, uint8_t mode,
+-					uint16_t dcpsm,
+-					mcap_mdl_operation_cb connect_cb,
+-					gpointer user_data,
+-					GDestroyNotify destroy,
+-					GError **err)
+-{
+-	struct mcap_mdl_op_cb *con;
+-
+-	if (mdl->state != MDL_WAITING) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_MDL,
+-					"%s", error2str(MCAP_INVALID_MDL));
+-		return FALSE;
+-	}
+-
+-	if ((mode != BT_IO_MODE_ERTM) && (mode != BT_IO_MODE_STREAMING)) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
+-						"Invalid MDL configuration");
+-		return FALSE;
+-	}
+-
+-	con = g_new0(struct mcap_mdl_op_cb, 1);
+-	con->mdl = mcap_mdl_ref(mdl);
+-	con->cb.op = connect_cb;
+-	con->destroy = destroy;
+-	con->user_data = user_data;
+-
+-	mdl->dc = bt_io_connect(mcap_connect_mdl_cb, con,
+-				(GDestroyNotify) free_mcap_mdl_op, err,
+-				BT_IO_OPT_SOURCE_BDADDR, &mdl->mcl->mi->src,
+-				BT_IO_OPT_DEST_BDADDR, &mdl->mcl->addr,
+-				BT_IO_OPT_PSM, dcpsm,
+-				BT_IO_OPT_MTU, MCAP_DC_MTU,
+-				BT_IO_OPT_SEC_LEVEL, mdl->mcl->mi->sec,
+-				BT_IO_OPT_MODE, mode,
+-				BT_IO_OPT_INVALID);
+-	if (!mdl->dc) {
+-		DBG("MDL Connection error");
+-		mdl->state = MDL_CLOSED;
+-		mcap_mdl_unref(con->mdl);
+-		g_free(con);
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
+-								gpointer data)
+-{
+-	GError *gerr = NULL;
+-	struct mcap_mcl *mcl = data;
+-	int sk, len;
+-	uint8_t buf[MCAP_CC_MTU];
+-
+-	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
+-		goto fail;
+-
+-	sk = g_io_channel_unix_get_fd(chan);
+-	len = read(sk, buf, sizeof(buf));
+-	if (len < 0)
+-		goto fail;
+-
+-	proc_cmd(mcl, buf, (uint32_t) len);
+-	return TRUE;
+-
+-fail:
+-	if (mcl->state != MCL_IDLE) {
+-		if (mcl->req == MCL_WAITING_RSP) {
+-			/* notify error in pending callback */
+-			g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_MCL_CLOSED,
+-								"MCL closed");
+-			mcap_notify_error(mcl, gerr);
+-			g_error_free(gerr);
+-		}
+-		mcl->mi->mcl_disconnected_cb(mcl, mcl->mi->user_data);
+-	}
+-	mcap_cache_mcl(mcl);
+-	return FALSE;
+-}
+-
+-static void mcap_connect_mcl_cb(GIOChannel *chan, GError *conn_err,
+-							gpointer user_data)
+-{
+-	char dstaddr[18];
+-	struct connect_mcl *con = user_data;
+-	struct mcap_mcl *aux, *mcl = con->mcl;
+-	mcap_mcl_connect_cb connect_cb = con->connect_cb;
+-	gpointer data = con->user_data;
+-	GError *gerr = NULL;
+-
+-	mcl->ctrl &= ~MCAP_CTRL_CONN;
+-
+-	if (conn_err) {
+-		if (mcl->ctrl & MCAP_CTRL_FREE) {
+-			mcap_mcl_release(mcl);
+-			mcl->mi->mcl_uncached_cb(mcl, mcl->mi->user_data);
+-		}
+-		connect_cb(NULL, conn_err, data);
+-		return;
+-	}
+-
+-	ba2str(&mcl->addr, dstaddr);
+-
+-	aux = find_mcl(mcl->mi->mcls, &mcl->addr);
+-	if (aux) {
+-		/* Double MCL connection case */
+-		error("MCL error: Device %s is already connected", dstaddr);
+-		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_ALREADY_EXISTS,
+-					"MCL %s is already connected", dstaddr);
+-		connect_cb(NULL, gerr, data);
+-		g_error_free(gerr);
+-		return;
+-	}
+-
+-	mcl->state = MCL_CONNECTED;
+-	mcl->role = MCL_INITIATOR;
+-	mcl->req = MCL_AVAILABLE;
+-	mcl->ctrl |= MCAP_CTRL_STD_OP;
+-
+-	mcap_sync_init(mcl);
+-
+-	if (mcl->ctrl & MCAP_CTRL_CACHED)
+-		mcap_uncache_mcl(mcl);
+-	else {
+-		mcl->ctrl &= ~MCAP_CTRL_FREE;
+-		mcl->mi->mcls = g_slist_prepend(mcl->mi->mcls,
+-							mcap_mcl_ref(mcl));
+-	}
+-
+-	mcl->wid = g_io_add_watch_full(mcl->cc, G_PRIORITY_DEFAULT,
+-				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-				(GIOFunc) mcl_control_cb,
+-				mcap_mcl_ref(mcl),
+-				(GDestroyNotify) mcap_mcl_unref);
+-	connect_cb(mcl, gerr, data);
+-}
+-
+-static void set_mdl_properties(GIOChannel *chan, struct mcap_mdl *mdl)
+-{
+-	struct mcap_mcl *mcl = mdl->mcl;
+-
+-	mdl->state = MDL_CONNECTED;
+-	mdl->dc = g_io_channel_ref(chan);
+-	mdl->wid = g_io_add_watch_full(mdl->dc, G_PRIORITY_DEFAULT,
+-					G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-					(GIOFunc) mdl_event_cb,
+-					mcap_mdl_ref(mdl),
+-					(GDestroyNotify) mcap_mdl_unref);
+-
+-	mcl->state = MCL_ACTIVE;
+-	mcl->cb->mdl_connected(mdl, mcl->cb->user_data);
+-}
+-
+-static void mcl_io_destroy(gpointer data)
+-{
+-	struct connect_mcl *con = data;
+-
+-	mcap_mcl_unref(con->mcl);
+-	if (con->destroy)
+-		con->destroy(con->user_data);
+-	g_free(con);
+-}
+-
+-gboolean mcap_create_mcl(struct mcap_instance *mi,
+-				const bdaddr_t *addr,
+-				uint16_t ccpsm,
+-				mcap_mcl_connect_cb connect_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err)
+-{
+-	struct mcap_mcl *mcl;
+-	struct connect_mcl *con;
+-	uint16_t val;
+-
+-	mcl = find_mcl(mi->mcls, addr);
+-	if (mcl) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_ALREADY_EXISTS,
+-					"MCL is already connected.");
+-		return FALSE;
+-	}
+-
+-	mcl = find_mcl(mi->cached, addr);
+-	if (!mcl) {
+-		mcl = g_new0(struct mcap_mcl, 1);
+-		mcl->mi = mcap_instance_ref(mi);
+-		mcl->state = MCL_IDLE;
+-		bacpy(&mcl->addr, addr);
+-		set_default_cb(mcl);
+-		if (util_getrandom(&val, sizeof(val), 0) < 0) {
+-			mcap_instance_unref(mcl->mi);
+-			g_free(mcl->cb);
+-			g_free(mcl);
+-			return FALSE;
+-		}
+-		mcl->next_mdl = (val % MCAP_MDLID_FINAL) + 1;
+-	}
+-
+-	mcl->ctrl |= MCAP_CTRL_CONN;
+-
+-	con = g_new0(struct connect_mcl, 1);
+-	con->mcl = mcap_mcl_ref(mcl);
+-	con->connect_cb = connect_cb;
+-	con->destroy = destroy;
+-	con->user_data = user_data;
+-
+-	mcl->cc = bt_io_connect(mcap_connect_mcl_cb, con,
+-				mcl_io_destroy, err,
+-				BT_IO_OPT_SOURCE_BDADDR, &mi->src,
+-				BT_IO_OPT_DEST_BDADDR, addr,
+-				BT_IO_OPT_PSM, ccpsm,
+-				BT_IO_OPT_MTU, MCAP_CC_MTU,
+-				BT_IO_OPT_SEC_LEVEL, mi->sec,
+-				BT_IO_OPT_MODE, BT_IO_MODE_ERTM,
+-				BT_IO_OPT_INVALID);
+-	if (!mcl->cc) {
+-		mcl->ctrl &= ~MCAP_CTRL_CONN;
+-		if (mcl->ctrl & MCAP_CTRL_FREE) {
+-			mcap_mcl_release(mcl);
+-			mcl->mi->mcl_uncached_cb(mcl, mcl->mi->user_data);
+-		}
+-		mcap_mcl_unref(con->mcl);
+-		g_free(con);
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-static void connect_dc_event_cb(GIOChannel *chan, GError *gerr,
+-							gpointer user_data)
+-{
+-	struct mcap_instance *mi = user_data;
+-	struct mcap_mcl *mcl;
+-	struct mcap_mdl *mdl;
+-	GError *err = NULL;
+-	bdaddr_t dst;
+-	GSList *l;
+-
+-	if (gerr)
+-		return;
+-
+-	bt_io_get(chan, &err, BT_IO_OPT_DEST_BDADDR, &dst, BT_IO_OPT_INVALID);
+-	if (err) {
+-		error("%s", err->message);
+-		g_error_free(err);
+-		goto drop;
+-	}
+-
+-	mcl = find_mcl(mi->mcls, &dst);
+-	if (!mcl || mcl->state != MCL_PENDING)
+-		goto drop;
+-
+-	for (l = mcl->mdls; l; l = l->next) {
+-		mdl = l->data;
+-		if (mdl->state == MDL_WAITING) {
+-			set_mdl_properties(chan, mdl);
+-			return;
+-		}
+-	}
+-
+-drop:
+-	g_io_channel_shutdown(chan, TRUE, NULL);
+-}
+-
+-static void set_mcl_conf(GIOChannel *chan, struct mcap_mcl *mcl)
+-{
+-	gboolean reconn;
+-
+-	mcl->state = MCL_CONNECTED;
+-	mcl->role = MCL_ACCEPTOR;
+-	mcl->req = MCL_AVAILABLE;
+-	mcl->cc = g_io_channel_ref(chan);
+-	mcl->ctrl |= MCAP_CTRL_STD_OP;
+-
+-	mcap_sync_init(mcl);
+-
+-	reconn = (mcl->ctrl & MCAP_CTRL_CACHED);
+-	if (reconn)
+-		mcap_uncache_mcl(mcl);
+-	else
+-		mcl->mi->mcls = g_slist_prepend(mcl->mi->mcls,
+-							mcap_mcl_ref(mcl));
+-
+-	mcl->wid = g_io_add_watch_full(mcl->cc, G_PRIORITY_DEFAULT,
+-				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-				(GIOFunc) mcl_control_cb,
+-				mcap_mcl_ref(mcl),
+-				(GDestroyNotify) mcap_mcl_unref);
+-
+-	/* Callback to report new MCL */
+-	if (reconn)
+-		mcl->mi->mcl_reconnected_cb(mcl, mcl->mi->user_data);
+-	else
+-		mcl->mi->mcl_connected_cb(mcl, mcl->mi->user_data);
+-}
+-
+-static void connect_mcl_event_cb(GIOChannel *chan, GError *gerr,
+-							gpointer user_data)
+-{
+-	struct mcap_instance *mi = user_data;
+-	struct mcap_mcl *mcl;
+-	bdaddr_t dst;
+-	char address[18], srcstr[18];
+-	GError *err = NULL;
+-	uint16_t val;
+-
+-	if (gerr)
+-		return;
+-
+-	bt_io_get(chan, &err,
+-			BT_IO_OPT_DEST_BDADDR, &dst,
+-			BT_IO_OPT_DEST, address,
+-			BT_IO_OPT_INVALID);
+-	if (err) {
+-		error("%s", err->message);
+-		g_error_free(err);
+-		goto drop;
+-	}
+-
+-	ba2str(&mi->src, srcstr);
+-	mcl = find_mcl(mi->mcls, &dst);
+-	if (mcl) {
+-		error("Control channel already created with %s on adapter %s",
+-				address, srcstr);
+-		goto drop;
+-	}
+-
+-	mcl = find_mcl(mi->cached, &dst);
+-	if (!mcl) {
+-		mcl = g_new0(struct mcap_mcl, 1);
+-		mcl->mi = mcap_instance_ref(mi);
+-		bacpy(&mcl->addr, &dst);
+-		set_default_cb(mcl);
+-		if (util_getrandom(&val, sizeof(val), 0) < 0) {
+-			mcap_instance_unref(mcl->mi);
+-			g_free(mcl->cb);
+-			g_free(mcl);
+-			goto drop;
+-		}
+-		mcl->next_mdl = (val % MCAP_MDLID_FINAL) + 1;
+-	}
+-
+-	set_mcl_conf(chan, mcl);
+-
+-	return;
+-drop:
+-	g_io_channel_shutdown(chan, TRUE, NULL);
+-}
+-
+-struct mcap_instance *mcap_create_instance(const bdaddr_t *src,
+-					BtIOSecLevel sec,
+-					uint16_t ccpsm,
+-					uint16_t dcpsm,
+-					mcap_mcl_event_cb mcl_connected,
+-					mcap_mcl_event_cb mcl_reconnected,
+-					mcap_mcl_event_cb mcl_disconnected,
+-					mcap_mcl_event_cb mcl_uncached,
+-					mcap_info_ind_event_cb mcl_sync_info_ind,
+-					gpointer user_data,
+-					GError **gerr)
+-{
+-	struct mcap_instance *mi;
+-
+-	if (sec < BT_IO_SEC_MEDIUM) {
+-		g_set_error(gerr, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
+-				"Security level can't be minor of %d",
+-				BT_IO_SEC_MEDIUM);
+-		return NULL;
+-	}
+-
+-	if (!(mcl_connected && mcl_reconnected &&
+-			mcl_disconnected && mcl_uncached)) {
+-		g_set_error(gerr, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
+-				"The callbacks can't be null");
+-		return NULL;
+-	}
+-
+-	mi = g_new0(struct mcap_instance, 1);
+-
+-	bacpy(&mi->src, src);
+-
+-	mi->sec = sec;
+-	mi->mcl_connected_cb = mcl_connected;
+-	mi->mcl_reconnected_cb = mcl_reconnected;
+-	mi->mcl_disconnected_cb = mcl_disconnected;
+-	mi->mcl_uncached_cb = mcl_uncached;
+-	mi->mcl_sync_infoind_cb = mcl_sync_info_ind;
+-	mi->user_data = user_data;
+-	mi->csp_enabled = FALSE;
+-
+-	/* Listen incoming connections in control channel */
+-	mi->ccio = bt_io_listen(connect_mcl_event_cb, NULL, mi,
+-				NULL, gerr,
+-				BT_IO_OPT_SOURCE_BDADDR, &mi->src,
+-				BT_IO_OPT_PSM, ccpsm,
+-				BT_IO_OPT_MTU, MCAP_CC_MTU,
+-				BT_IO_OPT_SEC_LEVEL, sec,
+-				BT_IO_OPT_MODE, BT_IO_MODE_ERTM,
+-				BT_IO_OPT_INVALID);
+-	if (!mi->ccio) {
+-		error("%s", (*gerr)->message);
+-		g_free(mi);
+-		return NULL;
+-	}
+-
+-	/* Listen incoming connections in data channels */
+-	mi->dcio = bt_io_listen(connect_dc_event_cb, NULL, mi,
+-				NULL, gerr,
+-				BT_IO_OPT_SOURCE_BDADDR, &mi->src,
+-				BT_IO_OPT_PSM, dcpsm,
+-				BT_IO_OPT_MTU, MCAP_DC_MTU,
+-				BT_IO_OPT_SEC_LEVEL, sec,
+-				BT_IO_OPT_INVALID);
+-	if (!mi->dcio) {
+-		g_io_channel_shutdown(mi->ccio, TRUE, NULL);
+-		g_io_channel_unref(mi->ccio);
+-		mi->ccio = NULL;
+-		error("%s", (*gerr)->message);
+-		g_free(mi);
+-		return NULL;
+-	}
+-
+-	/* Initialize random seed to generate mdlids for this instance */
+-	srand(time(NULL));
+-
+-	return mcap_instance_ref(mi);
+-}
+-
+-void mcap_release_instance(struct mcap_instance *mi)
+-{
+-	GSList *l;
+-
+-	if (!mi)
+-		return;
+-
+-	if (mi->ccio) {
+-		g_io_channel_shutdown(mi->ccio, TRUE, NULL);
+-		g_io_channel_unref(mi->ccio);
+-		mi->ccio = NULL;
+-	}
+-
+-	if (mi->dcio) {
+-		g_io_channel_shutdown(mi->dcio, TRUE, NULL);
+-		g_io_channel_unref(mi->dcio);
+-		mi->dcio = NULL;
+-	}
+-
+-	for (l = mi->mcls; l; l = l->next) {
+-		mcap_mcl_release(l->data);
+-		mcap_mcl_unref(l->data);
+-	}
+-
+-	g_slist_free(mi->mcls);
+-	mi->mcls = NULL;
+-
+-	for (l = mi->cached; l; l = l->next) {
+-		mcap_mcl_release(l->data);
+-		mcap_mcl_unref(l->data);
+-	}
+-
+-	g_slist_free(mi->cached);
+-	mi->cached = NULL;
+-}
+-
+-struct mcap_instance *mcap_instance_ref(struct mcap_instance *mi)
+-{
+-	mi->ref++;
+-
+-	DBG("mcap_instance_ref(%p): ref=%d", mi, mi->ref);
+-
+-	return mi;
+-}
+-
+-void mcap_instance_unref(struct mcap_instance *mi)
+-{
+-	mi->ref--;
+-
+-	DBG("mcap_instance_unref(%p): ref=%d", mi, mi->ref);
+-
+-	if (mi->ref > 0)
+-		return;
+-
+-	mcap_release_instance(mi);
+-	g_free(mi);
+-}
+-
+-uint16_t mcap_get_ctrl_psm(struct mcap_instance *mi, GError **err)
+-{
+-	uint16_t lpsm;
+-
+-	if (!(mi && mi->ccio)) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
+-			"Invalid MCAP instance");
+-		return 0;
+-	}
+-
+-	if (!bt_io_get(mi->ccio, err, BT_IO_OPT_PSM, &lpsm, BT_IO_OPT_INVALID))
+-		return 0;
+-
+-	return lpsm;
+-}
+-
+-uint16_t mcap_get_data_psm(struct mcap_instance *mi, GError **err)
+-{
+-	uint16_t lpsm;
+-
+-	if (!(mi && mi->dcio)) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
+-			"Invalid MCAP instance");
+-		return 0;
+-	}
+-
+-	if (!bt_io_get(mi->dcio, err, BT_IO_OPT_PSM, &lpsm, BT_IO_OPT_INVALID))
+-		return 0;
+-
+-	return lpsm;
+-}
+-
+-gboolean mcap_set_data_chan_mode(struct mcap_instance *mi, uint8_t mode,
+-								GError **err)
+-{
+-	if (!(mi && mi->dcio)) {
+-		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
+-						"Invalid MCAP instance");
+-		return FALSE;
+-	}
+-
+-	return bt_io_set(mi->dcio, err, BT_IO_OPT_MODE, mode,
+-							BT_IO_OPT_INVALID);
+-}
+-
+-struct mcap_mdl *mcap_mdl_ref(struct mcap_mdl *mdl)
+-{
+-	mdl->ref++;
+-
+-	DBG("mcap_mdl_ref(%p): ref=%d", mdl, mdl->ref);
+-
+-	return mdl;
+-}
+-
+-void mcap_mdl_unref(struct mcap_mdl *mdl)
+-{
+-	mdl->ref--;
+-
+-	DBG("mcap_mdl_unref(%p): ref=%d", mdl, mdl->ref);
+-
+-	if (mdl->ref > 0)
+-		return;
+-
+-	free_mdl(mdl);
+-}
+-
+-
+-static int send_sync_cmd(struct mcap_mcl *mcl, const void *buf, uint32_t size)
+-{
+-	int sock;
+-
+-	if (mcl->cc == NULL)
+-		return -1;
+-
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-	return mcap_send_data(sock, buf, size);
+-}
+-
+-static int send_unsupported_cap_req(struct mcap_mcl *mcl)
+-{
+-	mcap_md_sync_cap_rsp *cmd;
+-	int sent;
+-
+-	cmd = g_new0(mcap_md_sync_cap_rsp, 1);
+-	cmd->op = MCAP_MD_SYNC_CAP_RSP;
+-	cmd->rc = MCAP_REQUEST_NOT_SUPPORTED;
+-
+-	sent = send_sync_cmd(mcl, cmd, sizeof(*cmd));
+-	g_free(cmd);
+-
+-	return sent;
+-}
+-
+-static int send_unsupported_set_req(struct mcap_mcl *mcl)
+-{
+-	mcap_md_sync_set_rsp *cmd;
+-	int sent;
+-
+-	cmd = g_new0(mcap_md_sync_set_rsp, 1);
+-	cmd->op = MCAP_MD_SYNC_SET_RSP;
+-	cmd->rc = MCAP_REQUEST_NOT_SUPPORTED;
+-
+-	sent = send_sync_cmd(mcl, cmd, sizeof(*cmd));
+-	g_free(cmd);
+-
+-	return sent;
+-}
+-
+-static void reset_tmstamp(struct mcap_csp *csp, struct timespec *base_time,
+-				uint64_t new_tmstamp)
+-{
+-	csp->base_tmstamp = new_tmstamp;
+-	if (base_time)
+-		csp->base_time = *base_time;
+-	else
+-		clock_gettime(CLK, &csp->base_time);
+-}
+-
+-void mcap_sync_init(struct mcap_mcl *mcl)
+-{
+-	if (!mcl->mi->csp_enabled) {
+-		mcl->csp = NULL;
+-		return;
+-	}
+-
+-	mcl->csp = g_new0(struct mcap_csp, 1);
+-
+-	mcl->csp->rem_req_acc = 10000; /* safe divisor */
+-	mcl->csp->set_data = NULL;
+-	mcl->csp->csp_priv_data = NULL;
+-
+-	reset_tmstamp(mcl->csp, NULL, 0);
+-}
+-
+-void mcap_sync_stop(struct mcap_mcl *mcl)
+-{
+-	if (!mcl->csp)
+-		return;
+-
+-	if (mcl->csp->ind_timer)
+-		g_source_remove(mcl->csp->ind_timer);
+-
+-	if (mcl->csp->set_timer)
+-		g_source_remove(mcl->csp->set_timer);
+-
+-	if (mcl->csp->set_data)
+-		g_free(mcl->csp->set_data);
+-
+-	if (mcl->csp->csp_priv_data)
+-		g_free(mcl->csp->csp_priv_data);
+-
+-	mcl->csp->ind_timer = 0;
+-	mcl->csp->set_timer = 0;
+-	mcl->csp->set_data = NULL;
+-	mcl->csp->csp_priv_data = NULL;
+-
+-	g_free(mcl->csp);
+-	mcl->csp = NULL;
+-}
+-
+-static uint64_t time_us(struct timespec *tv)
+-{
+-	return tv->tv_sec * 1000000ll + tv->tv_nsec / 1000ll;
+-}
+-
+-static int64_t bt2us(int bt)
+-{
+-	return bt * 312.5;
+-}
+-
+-static int bt2ms(int bt)
+-{
+-	return bt * 312.5 / 1000;
+-}
+-
+-static int btoffset(uint32_t btclk1, uint32_t btclk2)
+-{
+-	int offset = btclk2 - btclk1;
+-
+-	if (offset <= -MCAP_BTCLOCK_HALF)
+-		offset += MCAP_BTCLOCK_FIELD;
+-	else if (offset > MCAP_BTCLOCK_HALF)
+-		offset -= MCAP_BTCLOCK_FIELD;
+-
+-	return offset;
+-}
+-
+-static int btdiff(uint32_t btclk1, uint32_t btclk2)
+-{
+-	return btoffset(btclk1, btclk2);
+-}
+-
+-static gboolean valid_btclock(uint32_t btclk)
+-{
+-	return btclk <= MCAP_BTCLOCK_MAX;
+-}
+-
+-/* This call may fail; either deal with retry or use read_btclock_retry */
+-static gboolean read_btclock(struct mcap_mcl *mcl, uint32_t *btclock,
+-							uint16_t *btaccuracy)
+-{
+-	/*
+-	 * FIXME: btd_adapter_read_clock(...) always return FALSE, current
+-	 * code doesn't support CSP (Clock Synchronization Protocol). To avoid
+-	 * build dependency on struct 'btd_adapter', removing this code.
+-	 */
+-
+-	return FALSE;
+-}
+-
+-static gboolean read_btclock_retry(struct mcap_mcl *mcl, uint32_t *btclock,
+-							uint16_t *btaccuracy)
+-{
+-	int retries = 5;
+-
+-	while (--retries >= 0) {
+-		if (read_btclock(mcl, btclock, btaccuracy))
+-			return TRUE;
+-		DBG("CSP: retrying to read bt clock...");
+-	}
+-
+-	return FALSE;
+-}
+-
+-static gboolean get_btrole(struct mcap_mcl *mcl)
+-{
+-	int sock, flags;
+-	socklen_t len;
+-
+-	if (mcl->cc == NULL)
+-		return -1;
+-
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-	len = sizeof(flags);
+-
+-	if (getsockopt(sock, SOL_L2CAP, L2CAP_LM, &flags, &len))
+-		DBG("CSP: could not read role");
+-
+-	return flags & L2CAP_LM_MASTER;
+-}
+-
+-uint64_t mcap_get_timestamp(struct mcap_mcl *mcl,
+-				struct timespec *given_time)
+-{
+-	struct timespec now;
+-	uint64_t tmstamp;
+-
+-	if (!mcl->csp)
+-		return MCAP_TMSTAMP_DONTSET;
+-
+-	if (given_time)
+-		now = *given_time;
+-	else
+-		if (clock_gettime(CLK, &now) < 0)
+-			return MCAP_TMSTAMP_DONTSET;
+-
+-	tmstamp = time_us(&now) - time_us(&mcl->csp->base_time)
+-		+ mcl->csp->base_tmstamp;
+-
+-	return tmstamp;
+-}
+-
+-uint32_t mcap_get_btclock(struct mcap_mcl *mcl)
+-{
+-	uint32_t btclock;
+-	uint16_t accuracy;
+-
+-	if (!mcl->csp)
+-		return MCAP_BTCLOCK_IMMEDIATE;
+-
+-	if (!read_btclock_retry(mcl, &btclock, &accuracy))
+-		btclock = 0xffffffff;
+-
+-	return btclock;
+-}
+-
+-static gboolean initialize_caps(struct mcap_mcl *mcl)
+-{
+-	struct timespec t1, t2;
+-	int latencies[SAMPLE_COUNT];
+-	int latency, avg, dev;
+-	uint32_t btclock;
+-	uint16_t btaccuracy;
+-	int i;
+-	int retries;
+-
+-	clock_getres(CLK, &t1);
+-
+-	_caps.ts_res = time_us(&t1);
+-	if (_caps.ts_res < 1)
+-		_caps.ts_res = 1;
+-
+-	_caps.ts_acc = 20; /* ppm, estimated */
+-
+-	/* A little exercise before measuring latency */
+-	clock_gettime(CLK, &t1);
+-	read_btclock_retry(mcl, &btclock, &btaccuracy);
+-
+-	/* Read clock a number of times and measure latency */
+-	avg = 0;
+-	i = 0;
+-	retries = MAX_RETRIES;
+-	while (i < SAMPLE_COUNT && retries > 0) {
+-		clock_gettime(CLK, &t1);
+-		if (!read_btclock(mcl, &btclock, &btaccuracy)) {
+-			retries--;
+-			continue;
+-		}
+-		clock_gettime(CLK, &t2);
+-
+-		latency = time_us(&t2) - time_us(&t1);
+-		latencies[i] = latency;
+-		avg += latency;
+-		i++;
+-	}
+-
+-	if (retries <= 0)
+-		return FALSE;
+-
+-	/* Calculate average and deviation */
+-	avg /= SAMPLE_COUNT;
+-	dev = 0;
+-	for (i = 0; i < SAMPLE_COUNT; ++i)
+-		dev += abs(latencies[i] - avg);
+-	dev /= SAMPLE_COUNT;
+-
+-	/* Calculate corrected average, without 'freak' latencies */
+-	latency = 0;
+-	for (i = 0; i < SAMPLE_COUNT; ++i) {
+-		if (latencies[i] > (avg + dev * 6))
+-			latency += avg;
+-		else
+-			latency += latencies[i];
+-	}
+-	latency /= SAMPLE_COUNT;
+-
+-	_caps.latency = latency;
+-	_caps.preempt_thresh = latency * 4;
+-	_caps.syncleadtime_ms = latency * 50 / 1000;
+-
+-	csp_caps_initialized = TRUE;
+-	return TRUE;
+-}
+-
+-static struct csp_caps *caps(struct mcap_mcl *mcl)
+-{
+-	if (!csp_caps_initialized)
+-		if (!initialize_caps(mcl)) {
+-			/* Temporary failure in reading BT clock */
+-			return NULL;
+-		}
+-
+-	return &_caps;
+-}
+-
+-static int send_sync_cap_rsp(struct mcap_mcl *mcl, uint8_t rspcode,
+-			uint8_t btclockres, uint16_t synclead,
+-			uint16_t tmstampres, uint16_t tmstampacc)
+-{
+-	mcap_md_sync_cap_rsp *rsp;
+-	int sent;
+-
+-	rsp = g_new0(mcap_md_sync_cap_rsp, 1);
+-
+-	rsp->op = MCAP_MD_SYNC_CAP_RSP;
+-	rsp->rc = rspcode;
+-
+-	rsp->btclock = btclockres;
+-	rsp->sltime = htons(synclead);
+-	rsp->timestnr = htons(tmstampres);
+-	rsp->timestna = htons(tmstampacc);
+-
+-	sent = send_sync_cmd(mcl, rsp, sizeof(*rsp));
+-	g_free(rsp);
+-
+-	return sent;
+-}
+-
+-static void proc_sync_cap_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	mcap_md_sync_cap_req *req;
+-	uint16_t required_accuracy;
+-	uint16_t our_accuracy;
+-	uint32_t btclock;
+-	uint16_t btres;
+-
+-	if (len != sizeof(mcap_md_sync_cap_req)) {
+-		send_sync_cap_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
+-					0, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (!caps(mcl)) {
+-		send_sync_cap_rsp(mcl, MCAP_RESOURCE_UNAVAILABLE,
+-					0, 0, 0, 0);
+-		return;
+-	}
+-
+-	req = (mcap_md_sync_cap_req *) cmd;
+-	required_accuracy = ntohs(req->timest);
+-	our_accuracy = caps(mcl)->ts_acc;
+-	btres = 0;
+-
+-	if (required_accuracy < our_accuracy || required_accuracy < 1) {
+-		send_sync_cap_rsp(mcl, MCAP_RESOURCE_UNAVAILABLE,
+-					0, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (!read_btclock_retry(mcl, &btclock, &btres)) {
+-		send_sync_cap_rsp(mcl, MCAP_RESOURCE_UNAVAILABLE,
+-					0, 0, 0, 0);
+-		return;
+-	}
+-
+-	mcl->csp->remote_caps = 1;
+-	mcl->csp->rem_req_acc = required_accuracy;
+-
+-	send_sync_cap_rsp(mcl, MCAP_SUCCESS, btres,
+-				caps(mcl)->syncleadtime_ms,
+-				caps(mcl)->ts_res, our_accuracy);
+-}
+-
+-static int send_sync_set_rsp(struct mcap_mcl *mcl, uint8_t rspcode,
+-			uint32_t btclock, uint64_t timestamp,
+-			uint16_t tmstampres)
+-{
+-	mcap_md_sync_set_rsp *rsp;
+-	int sent;
+-
+-	rsp = g_new0(mcap_md_sync_set_rsp, 1);
+-
+-	rsp->op = MCAP_MD_SYNC_SET_RSP;
+-	rsp->rc = rspcode;
+-	rsp->btclock = htonl(btclock);
+-	rsp->timestst = hton64(timestamp);
+-	rsp->timestsa = htons(tmstampres);
+-
+-	sent = send_sync_cmd(mcl, rsp, sizeof(*rsp));
+-	g_free(rsp);
+-
+-	return sent;
+-}
+-
+-static gboolean get_all_clocks(struct mcap_mcl *mcl, uint32_t *btclock,
+-				struct timespec *base_time,
+-				uint64_t *timestamp)
+-{
+-	int latency;
+-	int retry = 5;
+-	uint16_t btres;
+-	struct timespec t0;
+-
+-	if (!caps(mcl))
+-		return FALSE;
+-
+-	latency = caps(mcl)->preempt_thresh + 1;
+-
+-	while (latency > caps(mcl)->preempt_thresh && --retry >= 0) {
+-
+-		if (clock_gettime(CLK, &t0) < 0)
+-			return FALSE;
+-
+-		if (!read_btclock(mcl, btclock, &btres))
+-			continue;
+-
+-		if (clock_gettime(CLK, base_time) < 0)
+-			return FALSE;
+-
+-		/*
+-		 * Tries to detect preemption between clock_gettime
+-		 * and read_btclock by measuring transaction time
+-		 */
+-		latency = time_us(base_time) - time_us(&t0);
+-	}
+-
+-	if (retry < 0)
+-		return FALSE;
+-
+-	*timestamp = mcap_get_timestamp(mcl, base_time);
+-
+-	return TRUE;
+-}
+-
+-static gboolean sync_send_indication(gpointer user_data)
+-{
+-	struct mcap_mcl *mcl;
+-	mcap_md_sync_info_ind *cmd;
+-	uint32_t btclock;
+-	uint64_t tmstamp;
+-	struct timespec base_time;
+-	int sent;
+-
+-	if (!user_data)
+-		return FALSE;
+-
+-	btclock = 0;
+-	mcl = user_data;
+-
+-	if (!caps(mcl))
+-		return FALSE;
+-
+-	if (!get_all_clocks(mcl, &btclock, &base_time, &tmstamp))
+-		return FALSE;
+-
+-	cmd = g_new0(mcap_md_sync_info_ind, 1);
+-
+-	cmd->op = MCAP_MD_SYNC_INFO_IND;
+-	cmd->btclock = htonl(btclock);
+-	cmd->timestst = hton64(tmstamp);
+-	cmd->timestsa = htons(caps(mcl)->latency);
+-
+-	sent = send_sync_cmd(mcl, cmd, sizeof(*cmd));
+-	g_free(cmd);
+-
+-	return !sent;
+-}
+-
+-static gboolean proc_sync_set_req_phase2(gpointer user_data)
+-{
+-	struct mcap_mcl *mcl;
+-	struct sync_set_data *data;
+-	uint8_t update;
+-	uint32_t sched_btclock;
+-	uint64_t new_tmstamp;
+-	int ind_freq;
+-	int role;
+-	uint32_t btclock;
+-	uint64_t tmstamp;
+-	struct timespec base_time;
+-	uint16_t tmstampacc;
+-	gboolean reset;
+-	int delay;
+-
+-	if (!user_data)
+-		return FALSE;
+-
+-	mcl = user_data;
+-
+-	if (!mcl->csp->set_data)
+-		return FALSE;
+-
+-	btclock = 0;
+-	data = mcl->csp->set_data;
+-	update = data->update;
+-	sched_btclock = data->sched_btclock;
+-	new_tmstamp = data->timestamp;
+-	ind_freq = data->ind_freq;
+-	role = data->role;
+-
+-	if (!caps(mcl)) {
+-		send_sync_set_rsp(mcl, MCAP_UNSPECIFIED_ERROR, 0, 0, 0);
+-		return FALSE;
+-	}
+-
+-	if (!get_all_clocks(mcl, &btclock, &base_time, &tmstamp)) {
+-		send_sync_set_rsp(mcl, MCAP_UNSPECIFIED_ERROR, 0, 0, 0);
+-		return FALSE;
+-	}
+-
+-	if (get_btrole(mcl) != role) {
+-		send_sync_set_rsp(mcl, MCAP_INVALID_OPERATION, 0, 0, 0);
+-		return FALSE;
+-	}
+-
+-	reset = (new_tmstamp != MCAP_TMSTAMP_DONTSET);
+-
+-	if (reset) {
+-		if (sched_btclock != MCAP_BTCLOCK_IMMEDIATE) {
+-			delay = bt2us(btdiff(sched_btclock, btclock));
+-			if (delay >= 0 || ((new_tmstamp - delay) > 0)) {
+-				new_tmstamp += delay;
+-				DBG("CSP: reset w/ delay %dus, compensated",
+-									delay);
+-			} else
+-				DBG("CSP: reset w/ delay %dus, uncompensated",
+-									delay);
+-		}
+-
+-		reset_tmstamp(mcl->csp, &base_time, new_tmstamp);
+-		tmstamp = new_tmstamp;
+-	}
+-
+-	tmstampacc = caps(mcl)->latency + caps(mcl)->ts_acc;
+-
+-	if (mcl->csp->ind_timer) {
+-		g_source_remove(mcl->csp->ind_timer);
+-		mcl->csp->ind_timer = 0;
+-	}
+-
+-	if (update) {
+-		int when = ind_freq + caps(mcl)->syncleadtime_ms;
+-		mcl->csp->ind_timer = g_timeout_add(when,
+-						sync_send_indication,
+-						mcl);
+-	}
+-
+-	send_sync_set_rsp(mcl, MCAP_SUCCESS, btclock, tmstamp, tmstampacc);
+-
+-	/* First indication after set is immediate */
+-	if (update)
+-		sync_send_indication(mcl);
+-
+-	return FALSE;
+-}
+-
+-static void proc_sync_set_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	mcap_md_sync_set_req *req;
+-	uint32_t sched_btclock, cur_btclock;
+-	uint16_t btres;
+-	uint8_t update;
+-	uint64_t timestamp;
+-	struct sync_set_data *set_data;
+-	int phase2_delay, ind_freq, when;
+-
+-	if (len != sizeof(mcap_md_sync_set_req)) {
+-		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
+-		return;
+-	}
+-
+-	req = (mcap_md_sync_set_req *) cmd;
+-	sched_btclock = ntohl(req->btclock);
+-	update = req->timestui;
+-	timestamp = ntoh64(req->timestst);
+-	cur_btclock = 0;
+-
+-	if (sched_btclock != MCAP_BTCLOCK_IMMEDIATE &&
+-			!valid_btclock(sched_btclock)) {
+-		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (update > 1) {
+-		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (!mcl->csp->remote_caps) {
+-		/* Remote side did not ask our capabilities yet */
+-		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (!caps(mcl)) {
+-		send_sync_set_rsp(mcl, MCAP_UNSPECIFIED_ERROR, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (!read_btclock_retry(mcl, &cur_btclock, &btres)) {
+-		send_sync_set_rsp(mcl, MCAP_UNSPECIFIED_ERROR, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (sched_btclock == MCAP_BTCLOCK_IMMEDIATE)
+-		phase2_delay = 0;
+-	else {
+-		phase2_delay = btdiff(cur_btclock, sched_btclock);
+-
+-		if (phase2_delay < 0) {
+-			/* can not reset in the past tense */
+-			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
+-						0, 0, 0);
+-			return;
+-		}
+-
+-		/* Convert to milliseconds */
+-		phase2_delay = bt2ms(phase2_delay);
+-
+-		if (phase2_delay > 61*1000) {
+-			/* More than 60 seconds in the future */
+-			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
+-						0, 0, 0);
+-			return;
+-		} else if (phase2_delay < caps(mcl)->latency / 1000) {
+-			/* Too fast for us to do in time */
+-			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
+-						0, 0, 0);
+-			return;
+-		}
+-	}
+-
+-	if (update) {
+-		/*
+-		 * Indication frequency: required accuracy divided by ours
+-		 * Converted to milisseconds
+-		 */
+-		ind_freq = (1000 * mcl->csp->rem_req_acc) / caps(mcl)->ts_acc;
+-
+-		if (ind_freq < MAX(caps(mcl)->latency * 2 / 1000, 100)) {
+-			/* Too frequent, we can't handle */
+-			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
+-						0, 0, 0);
+-			return;
+-		}
+-
+-		DBG("CSP: indication every %dms", ind_freq);
+-	} else
+-		ind_freq = 0;
+-
+-	if (mcl->csp->ind_timer) {
+-		/* Old indications are no longer sent */
+-		g_source_remove(mcl->csp->ind_timer);
+-		mcl->csp->ind_timer = 0;
+-	}
+-
+-	if (!mcl->csp->set_data)
+-		mcl->csp->set_data = g_new0(struct sync_set_data, 1);
+-
+-	set_data = (struct sync_set_data *) mcl->csp->set_data;
+-
+-	set_data->update = update;
+-	set_data->sched_btclock = sched_btclock;
+-	set_data->timestamp = timestamp;
+-	set_data->ind_freq = ind_freq;
+-	set_data->role = get_btrole(mcl);
+-
+-	/*
+-	 * TODO is there some way to schedule a call based directly on
+-	 * a BT clock value, instead of this estimation that uses
+-	 * the SO clock?
+-	 */
+-
+-	if (phase2_delay > 0) {
+-		when = phase2_delay + caps(mcl)->syncleadtime_ms;
+-		mcl->csp->set_timer = g_timeout_add(when,
+-						proc_sync_set_req_phase2,
+-						mcl);
+-	} else
+-		proc_sync_set_req_phase2(mcl);
+-
+-	/* First indication is immediate */
+-	if (update)
+-		sync_send_indication(mcl);
+-}
+-
+-static void proc_sync_cap_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	mcap_md_sync_cap_rsp *rsp;
+-	uint8_t mcap_err;
+-	uint8_t btclockres;
+-	uint16_t synclead;
+-	uint16_t tmstampres;
+-	uint16_t tmstampacc;
+-	struct mcap_sync_cap_cbdata *cbdata;
+-	mcap_sync_cap_cb cb;
+-	gpointer user_data;
+-
+-	if (mcl->csp->csp_req != MCAP_MD_SYNC_CAP_REQ) {
+-		DBG("CSP: got unexpected cap response");
+-		return;
+-	}
+-
+-	if (!mcl->csp->csp_priv_data) {
+-		DBG("CSP: no priv data for cap response");
+-		return;
+-	}
+-
+-	cbdata = mcl->csp->csp_priv_data;
+-	cb = cbdata->cb;
+-	user_data = cbdata->user_data;
+-	g_free(cbdata);
+-
+-	mcl->csp->csp_priv_data = NULL;
+-	mcl->csp->csp_req = 0;
+-
+-	if (len != sizeof(mcap_md_sync_cap_rsp)) {
+-		DBG("CSP: got corrupted cap response");
+-		return;
+-	}
+-
+-	rsp = (mcap_md_sync_cap_rsp *) cmd;
+-	mcap_err = rsp->rc;
+-	btclockres = rsp->btclock;
+-	synclead = ntohs(rsp->sltime);
+-	tmstampres = ntohs(rsp->timestnr);
+-	tmstampacc = ntohs(rsp->timestna);
+-
+-	if (!mcap_err)
+-		mcl->csp->local_caps = TRUE;
+-
+-	cb(mcl, mcap_err, btclockres, synclead, tmstampres, tmstampacc, NULL,
+-								user_data);
+-}
+-
+-static void proc_sync_set_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	mcap_md_sync_set_rsp *rsp;
+-	uint8_t mcap_err;
+-	uint32_t btclock;
+-	uint64_t timestamp;
+-	uint16_t accuracy;
+-	struct mcap_sync_set_cbdata *cbdata;
+-	mcap_sync_set_cb cb;
+-	gpointer user_data;
+-
+-	if (mcl->csp->csp_req != MCAP_MD_SYNC_SET_REQ) {
+-		DBG("CSP: got unexpected set response");
+-		return;
+-	}
+-
+-	if (!mcl->csp->csp_priv_data) {
+-		DBG("CSP: no priv data for set response");
+-		return;
+-	}
+-
+-	cbdata = mcl->csp->csp_priv_data;
+-	cb = cbdata->cb;
+-	user_data = cbdata->user_data;
+-	g_free(cbdata);
+-
+-	mcl->csp->csp_priv_data = NULL;
+-	mcl->csp->csp_req = 0;
+-
+-	if (len != sizeof(mcap_md_sync_set_rsp)) {
+-		DBG("CSP: got corrupted set response");
+-		return;
+-	}
+-
+-	rsp = (mcap_md_sync_set_rsp *) cmd;
+-	mcap_err = rsp->rc;
+-	btclock = ntohl(rsp->btclock);
+-	timestamp = ntoh64(rsp->timestst);
+-	accuracy = ntohs(rsp->timestsa);
+-
+-	if (!mcap_err && !valid_btclock(btclock))
+-		mcap_err = MCAP_ERROR_INVALID_ARGS;
+-
+-	cb(mcl, mcap_err, btclock, timestamp, accuracy, NULL, user_data);
+-}
+-
+-static void proc_sync_info_ind(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	mcap_md_sync_info_ind *req;
+-	struct sync_info_ind_data data;
+-	uint32_t btclock;
+-
+-	if (!mcl->csp->ind_expected) {
+-		DBG("CSP: received unexpected info indication");
+-		return;
+-	}
+-
+-	if (len != sizeof(mcap_md_sync_info_ind))
+-		return;
+-
+-	req = (mcap_md_sync_info_ind *) cmd;
+-
+-	btclock = ntohl(req->btclock);
+-
+-	if (!valid_btclock(btclock))
+-		return;
+-
+-	data.btclock = btclock;
+-	data.timestamp = ntoh64(req->timestst);
+-	data.accuracy = ntohs(req->timestsa);
+-
+-	if (mcl->mi->mcl_sync_infoind_cb)
+-		mcl->mi->mcl_sync_infoind_cb(mcl, &data);
+-}
+-
+-void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	if (!mcl->mi->csp_enabled || !mcl->csp) {
+-		switch (cmd[0]) {
+-		case MCAP_MD_SYNC_CAP_REQ:
+-			send_unsupported_cap_req(mcl);
+-			break;
+-		case MCAP_MD_SYNC_SET_REQ:
+-			send_unsupported_set_req(mcl);
+-			break;
+-		}
+-		return;
+-	}
+-
+-	switch (cmd[0]) {
+-	case MCAP_MD_SYNC_CAP_REQ:
+-		proc_sync_cap_req(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_SYNC_CAP_RSP:
+-		proc_sync_cap_rsp(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_SYNC_SET_REQ:
+-		proc_sync_set_req(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_SYNC_SET_RSP:
+-		proc_sync_set_rsp(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_SYNC_INFO_IND:
+-		proc_sync_info_ind(mcl, cmd, len);
+-		break;
+-	}
+-}
+-
+-void mcap_sync_cap_req(struct mcap_mcl *mcl, uint16_t reqacc,
+-			mcap_sync_cap_cb cb, gpointer user_data,
+-			GError **err)
+-{
+-	struct mcap_sync_cap_cbdata *cbdata;
+-	mcap_md_sync_cap_req *cmd;
+-
+-	if (!mcl->mi->csp_enabled || !mcl->csp) {
+-		g_set_error(err,
+-			MCAP_CSP_ERROR,
+-			MCAP_ERROR_RESOURCE_UNAVAILABLE,
+-			"CSP not enabled for the instance");
+-		return;
+-	}
+-
+-	if (mcl->csp->csp_req) {
+-		g_set_error(err,
+-			MCAP_CSP_ERROR,
+-			MCAP_ERROR_RESOURCE_UNAVAILABLE,
+-			"Pending CSP request");
+-		return;
+-	}
+-
+-	mcl->csp->csp_req = MCAP_MD_SYNC_CAP_REQ;
+-	cmd = g_new0(mcap_md_sync_cap_req, 1);
+-
+-	cmd->op = MCAP_MD_SYNC_CAP_REQ;
+-	cmd->timest = htons(reqacc);
+-
+-	cbdata = g_new0(struct mcap_sync_cap_cbdata, 1);
+-	cbdata->cb = cb;
+-	cbdata->user_data = user_data;
+-	mcl->csp->csp_priv_data = cbdata;
+-
+-	send_sync_cmd(mcl, cmd, sizeof(*cmd));
+-
+-	g_free(cmd);
+-}
+-
+-void mcap_sync_set_req(struct mcap_mcl *mcl, uint8_t update, uint32_t btclock,
+-			uint64_t timestamp, mcap_sync_set_cb cb,
+-			gpointer user_data, GError **err)
+-{
+-	mcap_md_sync_set_req *cmd;
+-	struct mcap_sync_set_cbdata *cbdata;
+-
+-	if (!mcl->mi->csp_enabled || !mcl->csp) {
+-		g_set_error(err,
+-			MCAP_CSP_ERROR,
+-			MCAP_ERROR_RESOURCE_UNAVAILABLE,
+-			"CSP not enabled for the instance");
+-		return;
+-	}
+-
+-	if (!mcl->csp->local_caps) {
+-		g_set_error(err,
+-			MCAP_CSP_ERROR,
+-			MCAP_ERROR_RESOURCE_UNAVAILABLE,
+-			"Did not get CSP caps from peripheral yet");
+-		return;
+-	}
+-
+-	if (mcl->csp->csp_req) {
+-		g_set_error(err,
+-			MCAP_CSP_ERROR,
+-			MCAP_ERROR_RESOURCE_UNAVAILABLE,
+-			"Pending CSP request");
+-		return;
+-	}
+-
+-	mcl->csp->csp_req = MCAP_MD_SYNC_SET_REQ;
+-	cmd = g_new0(mcap_md_sync_set_req, 1);
+-
+-	cmd->op = MCAP_MD_SYNC_SET_REQ;
+-	cmd->timestui = update;
+-	cmd->btclock = htonl(btclock);
+-	cmd->timestst = hton64(timestamp);
+-
+-	mcl->csp->ind_expected = update;
+-
+-	cbdata = g_new0(struct mcap_sync_set_cbdata, 1);
+-	cbdata->cb = cb;
+-	cbdata->user_data = user_data;
+-	mcl->csp->csp_priv_data = cbdata;
+-
+-	send_sync_cmd(mcl, cmd, sizeof(*cmd));
+-
+-	g_free(cmd);
+-}
+-
+-void mcap_enable_csp(struct mcap_instance *mi)
+-{
+-	mi->csp_enabled = TRUE;
+-}
+-
+-void mcap_disable_csp(struct mcap_instance *mi)
+-{
+-	mi->csp_enabled = FALSE;
+-}
+diff --git a/profiles/health/mcap.h b/profiles/health/mcap.h
+deleted file mode 100644
+index 00f3fa851003..000000000000
+--- a/profiles/health/mcap.h
++++ /dev/null
+@@ -1,424 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
+- *  Copyright (C) 2010 Signove
+- *  Copyright (C) 2014 Intel Corporation. All rights reserved.
+- *
+- */
+-
+-#define MCAP_VERSION	0x0100	/* current version 01.00 */
+-
+-/* bytes to get MCAP Supported Procedures */
+-#define MCAP_SUP_PROC	0x06
+-
+-/* maximum transmission unit for channels */
+-#define MCAP_CC_MTU	48
+-#define MCAP_DC_MTU	65535
+-
+-/* MCAP Standard Op Codes */
+-#define MCAP_ERROR_RSP			0x00
+-#define MCAP_MD_CREATE_MDL_REQ		0x01
+-#define MCAP_MD_CREATE_MDL_RSP		0x02
+-#define MCAP_MD_RECONNECT_MDL_REQ	0x03
+-#define MCAP_MD_RECONNECT_MDL_RSP	0x04
+-#define MCAP_MD_ABORT_MDL_REQ		0x05
+-#define MCAP_MD_ABORT_MDL_RSP		0x06
+-#define MCAP_MD_DELETE_MDL_REQ		0x07
+-#define MCAP_MD_DELETE_MDL_RSP		0x08
+-
+-/* MCAP Clock Sync Op Codes */
+-#define MCAP_MD_SYNC_CAP_REQ		0x11
+-#define MCAP_MD_SYNC_CAP_RSP		0x12
+-#define MCAP_MD_SYNC_SET_REQ		0x13
+-#define MCAP_MD_SYNC_SET_RSP		0x14
+-#define MCAP_MD_SYNC_INFO_IND		0x15
+-
+-/* MCAP Response codes */
+-#define MCAP_SUCCESS			0x00
+-#define MCAP_INVALID_OP_CODE		0x01
+-#define MCAP_INVALID_PARAM_VALUE	0x02
+-#define MCAP_INVALID_MDEP		0x03
+-#define MCAP_MDEP_BUSY			0x04
+-#define MCAP_INVALID_MDL		0x05
+-#define MCAP_MDL_BUSY			0x06
+-#define MCAP_INVALID_OPERATION		0x07
+-#define MCAP_RESOURCE_UNAVAILABLE	0x08
+-#define MCAP_UNSPECIFIED_ERROR		0x09
+-#define MCAP_REQUEST_NOT_SUPPORTED	0x0A
+-#define MCAP_CONFIGURATION_REJECTED	0x0B
+-
+-/* MDL IDs */
+-#define MCAP_MDLID_RESERVED		0x0000
+-#define MCAP_MDLID_INITIAL		0x0001
+-#define MCAP_MDLID_FINAL		0xFEFF
+-#define MCAP_ALL_MDLIDS			0xFFFF
+-
+-/* MDEP IDs */
+-#define MCAP_MDEPID_INITIAL		0x00
+-#define MCAP_MDEPID_FINAL		0x7F
+-
+-/* CSP special values */
+-#define MCAP_BTCLOCK_IMMEDIATE		0xffffffffUL
+-#define MCAP_TMSTAMP_DONTSET		0xffffffffffffffffULL
+-#define MCAP_BTCLOCK_MAX		0x0fffffff
+-#define MCAP_BTCLOCK_FIELD		(MCAP_BTCLOCK_MAX + 1)
+-
+-#define	MCAP_CTRL_CACHED	0x01	/* MCL is cached */
+-#define	MCAP_CTRL_STD_OP	0x02	/* Support for standard op codes */
+-#define	MCAP_CTRL_SYNC_OP	0x04	/* Support for synchronization commands */
+-#define	MCAP_CTRL_CONN		0x08	/* MCL is in connecting process */
+-#define	MCAP_CTRL_FREE		0x10	/* MCL is marked as releasable */
+-#define	MCAP_CTRL_NOCACHE	0x20	/* MCL is marked as not cacheable */
+-
+-/*
+- * MCAP Request Packet Format
+- */
+-
+-typedef struct {
+-	uint8_t		op;
+-	uint16_t	mdl;
+-	uint8_t		mdep;
+-	uint8_t		conf;
+-} __attribute__ ((packed)) mcap_md_create_mdl_req;
+-
+-typedef struct {
+-	uint8_t		op;
+-	uint16_t	mdl;
+-} __attribute__ ((packed)) mcap_md_req;
+-
+-/* MCAP Response Packet Format */
+-
+-typedef struct {
+-	uint8_t		op;
+-	uint8_t		rc;
+-	uint16_t	mdl;
+-	uint8_t		data[0];
+-} __attribute__ ((packed)) mcap_rsp;
+-
+-/*  MCAP Clock Synchronization Protocol */
+-
+-typedef struct {
+-	uint8_t		op;
+-	uint16_t	timest;
+-} __attribute__ ((packed)) mcap_md_sync_cap_req;
+-
+-typedef struct {
+-	uint8_t		op;
+-	uint8_t		rc;
+-} __attribute__ ((packed)) mcap_md_sync_rsp;
+-
+-typedef struct {
+-	uint8_t		op;
+-	uint8_t		rc;
+-	uint8_t		btclock;
+-	uint16_t	sltime;
+-	uint16_t	timestnr;
+-	uint16_t	timestna;
+-} __attribute__ ((packed)) mcap_md_sync_cap_rsp;
+-
+-typedef struct {
+-	uint8_t		op;
+-	uint8_t		timestui;
+-	uint32_t	btclock;
+-	uint64_t	timestst;
+-} __attribute__ ((packed)) mcap_md_sync_set_req;
+-
+-typedef struct {
+-	int8_t		op;
+-	uint8_t		rc;
+-	uint32_t	btclock;
+-	uint64_t	timestst;
+-	uint16_t	timestsa;
+-} __attribute__ ((packed)) mcap_md_sync_set_rsp;
+-
+-typedef struct {
+-	uint8_t		op;
+-	uint32_t	btclock;
+-	uint64_t	timestst;
+-	uint16_t	timestsa;
+-} __attribute__ ((packed)) mcap_md_sync_info_ind;
+-
+-typedef enum {
+-/* MCAP Error Response Codes */
+-	MCAP_ERROR_INVALID_OP_CODE = 1,
+-	MCAP_ERROR_INVALID_PARAM_VALUE,
+-	MCAP_ERROR_INVALID_MDEP,
+-	MCAP_ERROR_MDEP_BUSY,
+-	MCAP_ERROR_INVALID_MDL,
+-	MCAP_ERROR_MDL_BUSY,
+-	MCAP_ERROR_INVALID_OPERATION,
+-	MCAP_ERROR_RESOURCE_UNAVAILABLE,
+-	MCAP_ERROR_UNSPECIFIED_ERROR,
+-	MCAP_ERROR_REQUEST_NOT_SUPPORTED,
+-	MCAP_ERROR_CONFIGURATION_REJECTED,
+-/* MCAP Internal Errors */
+-	MCAP_ERROR_INVALID_ARGS,
+-	MCAP_ERROR_ALREADY_EXISTS,
+-	MCAP_ERROR_REQ_IGNORED,
+-	MCAP_ERROR_MCL_CLOSED,
+-	MCAP_ERROR_FAILED
+-} McapError;
+-
+-typedef enum {
+-	MCAP_MDL_CB_INVALID,
+-	MCAP_MDL_CB_CONNECTED,		/* mcap_mdl_event_cb */
+-	MCAP_MDL_CB_CLOSED,		/* mcap_mdl_event_cb */
+-	MCAP_MDL_CB_DELETED,		/* mcap_mdl_event_cb */
+-	MCAP_MDL_CB_ABORTED,		/* mcap_mdl_event_cb */
+-	MCAP_MDL_CB_REMOTE_CONN_REQ,	/* mcap_remote_mdl_conn_req_cb */
+-	MCAP_MDL_CB_REMOTE_RECONN_REQ	/* mcap_remote_mdl_reconn_req_cb */
+-} McapMclCb;
+-
+-typedef enum {
+-	MCL_CONNECTED,
+-	MCL_PENDING,
+-	MCL_ACTIVE,
+-	MCL_IDLE
+-} MCLState;
+-
+-typedef enum {
+-	MCL_ACCEPTOR,
+-	MCL_INITIATOR
+-} MCLRole;
+-
+-typedef enum {
+-	MCL_AVAILABLE,
+-	MCL_WAITING_RSP
+-} MCAPCtrl;
+-
+-typedef enum {
+-	MDL_WAITING,
+-	MDL_CONNECTED,
+-	MDL_DELETING,
+-	MDL_CLOSED
+-} MDLState;
+-
+-struct mcap_csp;
+-struct mcap_mdl_op_cb;
+-struct mcap_instance;
+-struct mcap_mcl;
+-struct mcap_mdl;
+-struct sync_info_ind_data;
+-
+-/************ Callbacks ************/
+-
+-/* MDL callbacks */
+-
+-typedef void (* mcap_mdl_event_cb) (struct mcap_mdl *mdl, gpointer data);
+-typedef void (* mcap_mdl_operation_conf_cb) (struct mcap_mdl *mdl, uint8_t conf,
+-						GError *err, gpointer data);
+-typedef void (* mcap_mdl_operation_cb) (struct mcap_mdl *mdl, GError *err,
+-						gpointer data);
+-typedef void (* mcap_mdl_notify_cb) (GError *err, gpointer data);
+-
+-/* Next function should return an MCAP appropriate response code */
+-typedef uint8_t (* mcap_remote_mdl_conn_req_cb) (struct mcap_mcl *mcl,
+-						uint8_t mdepid, uint16_t mdlid,
+-						uint8_t *conf, gpointer data);
+-typedef uint8_t (* mcap_remote_mdl_reconn_req_cb) (struct mcap_mdl *mdl,
+-						gpointer data);
+-
+-/* MCL callbacks */
+-
+-typedef void (* mcap_mcl_event_cb) (struct mcap_mcl *mcl, gpointer data);
+-typedef void (* mcap_mcl_connect_cb) (struct mcap_mcl *mcl, GError *err,
+-								gpointer data);
+-
+-/* CSP callbacks */
+-
+-typedef void (* mcap_info_ind_event_cb) (struct mcap_mcl *mcl,
+-					struct sync_info_ind_data *data);
+-
+-typedef void (* mcap_sync_cap_cb) (struct mcap_mcl *mcl,
+-					uint8_t mcap_err,
+-					uint8_t btclockres,
+-					uint16_t synclead,
+-					uint16_t tmstampres,
+-					uint16_t tmstampacc,
+-					GError *err,
+-					gpointer data);
+-
+-typedef void (* mcap_sync_set_cb) (struct mcap_mcl *mcl,
+-					uint8_t mcap_err,
+-					uint32_t btclock,
+-					uint64_t timestamp,
+-					uint16_t accuracy,
+-					GError *err,
+-					gpointer data);
+-
+-struct mcap_mdl_cb {
+-	mcap_mdl_event_cb		mdl_connected;	/* Remote device has created a MDL */
+-	mcap_mdl_event_cb		mdl_closed;	/* Remote device has closed a MDL */
+-	mcap_mdl_event_cb		mdl_deleted;	/* Remote device requested deleting a MDL */
+-	mcap_mdl_event_cb		mdl_aborted;	/* Remote device aborted the mdl creation */
+-	mcap_remote_mdl_conn_req_cb	mdl_conn_req;	/* Remote device requested creating a MDL */
+-	mcap_remote_mdl_reconn_req_cb	mdl_reconn_req;	/* Remote device requested reconnecting a MDL */
+-	gpointer			user_data;	/* User data */
+-};
+-
+-struct mcap_instance {
+-	bdaddr_t		src;			/* Source address */
+-	GIOChannel		*ccio;			/* Control Channel IO */
+-	GIOChannel		*dcio;			/* Data Channel IO */
+-	GSList			*mcls;			/* MCAP instance list */
+-	GSList			*cached;		/* List with all cached MCLs (MAX_CACHED macro) */
+-	BtIOSecLevel		sec;			/* Security level */
+-	mcap_mcl_event_cb	mcl_connected_cb;	/* New MCL connected */
+-	mcap_mcl_event_cb	mcl_reconnected_cb;	/* Old MCL has been reconnected */
+-	mcap_mcl_event_cb	mcl_disconnected_cb;	/* MCL disconnected */
+-	mcap_mcl_event_cb	mcl_uncached_cb;	/* MCL has been removed from MCAP cache */
+-	mcap_info_ind_event_cb	mcl_sync_infoind_cb;	/* (CSP Central) Received info indication */
+-	gpointer		user_data;		/* Data to be provided in callbacks */
+-	int			ref;			/* Reference counter */
+-
+-	gboolean		csp_enabled;		/* CSP: functionality enabled */
+-};
+-
+-struct mcap_mcl {
+-	struct mcap_instance	*mi;		/* MCAP instance where this MCL belongs */
+-	bdaddr_t		addr;		/* Device address */
+-	GIOChannel		*cc;		/* MCAP Control Channel IO */
+-	guint			wid;		/* MCL Watcher id */
+-	GSList			*mdls;		/* List of Data Channels shorted by mdlid */
+-	MCLState		state;		/* Current MCL State */
+-	MCLRole			role;		/* Initiator or acceptor of this MCL */
+-	MCAPCtrl		req;		/* Request control flag */
+-	struct mcap_mdl_op_cb	*priv_data;	/* Temporal data to manage responses */
+-	struct mcap_mdl_cb	*cb;		/* MDL callbacks */
+-	guint			tid;		/* Timer id for waiting for a response */
+-	uint8_t			*lcmd;		/* Last command sent */
+-	int			ref;		/* References counter */
+-	uint8_t			ctrl;		/* MCL control flag */
+-	uint16_t		next_mdl;	/* id used to create next MDL */
+-	struct mcap_csp		*csp;		/* CSP control structure */
+-};
+-
+-struct mcap_mdl {
+-	struct mcap_mcl		*mcl;		/* MCL where this MDL belongs */
+-	GIOChannel		*dc;		/* MCAP Data Channel IO */
+-	guint			wid;		/* MDL Watcher id */
+-	uint16_t		mdlid;		/* MDL id */
+-	uint8_t			mdep_id;	/* MCAP Data End Point */
+-	MDLState		state;		/* MDL state */
+-	int			ref;		/* References counter */
+-};
+-
+-struct sync_info_ind_data {
+-	uint32_t	btclock;
+-	uint64_t	timestamp;
+-	uint16_t	accuracy;
+-};
+-
+-/************ Operations ************/
+-
+-/* MDL operations */
+-
+-gboolean mcap_create_mdl(struct mcap_mcl *mcl,
+-				uint8_t mdepid,
+-				uint8_t conf,
+-				mcap_mdl_operation_conf_cb connect_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err);
+-gboolean mcap_reconnect_mdl(struct mcap_mdl *mdl,
+-				mcap_mdl_operation_cb reconnect_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err);
+-gboolean mcap_delete_all_mdls(struct mcap_mcl *mcl,
+-				mcap_mdl_notify_cb delete_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err);
+-gboolean mcap_delete_mdl(struct mcap_mdl *mdl,
+-				mcap_mdl_notify_cb delete_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err);
+-gboolean mcap_connect_mdl(struct mcap_mdl *mdl,
+-				uint8_t mode,
+-				uint16_t dcpsm,
+-				mcap_mdl_operation_cb connect_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err);
+-gboolean mcap_mdl_abort(struct mcap_mdl *mdl,
+-				mcap_mdl_notify_cb abort_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err);
+-
+-int mcap_mdl_get_fd(struct mcap_mdl *mdl);
+-uint16_t mcap_mdl_get_mdlid(struct mcap_mdl *mdl);
+-struct mcap_mdl *mcap_mdl_ref(struct mcap_mdl *mdl);
+-void mcap_mdl_unref(struct mcap_mdl *mdl);
+-
+-/* MCL operations */
+-
+-gboolean mcap_create_mcl(struct mcap_instance *mi,
+-				const bdaddr_t *addr,
+-				uint16_t ccpsm,
+-				mcap_mcl_connect_cb connect_cb,
+-				gpointer user_data,
+-				GDestroyNotify destroy,
+-				GError **err);
+-void mcap_close_mcl(struct mcap_mcl *mcl, gboolean cache);
+-gboolean mcap_mcl_set_cb(struct mcap_mcl *mcl, gpointer user_data,
+-					GError **gerr, McapMclCb cb1, ...);
+-void mcap_mcl_get_addr(struct mcap_mcl *mcl, bdaddr_t *addr);
+-struct mcap_mcl *mcap_mcl_ref(struct mcap_mcl *mcl);
+-void mcap_mcl_unref(struct mcap_mcl *mcl);
+-
+-/* CSP operations */
+-
+-void mcap_enable_csp(struct mcap_instance *mi);
+-void mcap_disable_csp(struct mcap_instance *mi);
+-uint64_t mcap_get_timestamp(struct mcap_mcl *mcl,
+-				struct timespec *given_time);
+-uint32_t mcap_get_btclock(struct mcap_mcl *mcl);
+-
+-void mcap_sync_cap_req(struct mcap_mcl *mcl,
+-			uint16_t reqacc,
+-			mcap_sync_cap_cb cb,
+-			gpointer user_data,
+-			GError **err);
+-
+-void mcap_sync_set_req(struct mcap_mcl *mcl,
+-			uint8_t update,
+-			uint32_t btclock,
+-			uint64_t timestamp,
+-			mcap_sync_set_cb cb,
+-			gpointer user_data,
+-			GError **err);
+-
+-/* MCAP main operations */
+-
+-struct mcap_instance *mcap_create_instance(const bdaddr_t *src,
+-					BtIOSecLevel sec, uint16_t ccpsm,
+-					uint16_t dcpsm,
+-					mcap_mcl_event_cb mcl_connected,
+-					mcap_mcl_event_cb mcl_reconnected,
+-					mcap_mcl_event_cb mcl_disconnected,
+-					mcap_mcl_event_cb mcl_uncached,
+-					mcap_info_ind_event_cb mcl_sync_info_ind,
+-					gpointer user_data,
+-					GError **gerr);
+-void mcap_release_instance(struct mcap_instance *mi);
+-
+-struct mcap_instance *mcap_instance_ref(struct mcap_instance *mi);
+-void mcap_instance_unref(struct mcap_instance *mi);
+-
+-uint16_t mcap_get_ctrl_psm(struct mcap_instance *mi, GError **err);
+-uint16_t mcap_get_data_psm(struct mcap_instance *mi, GError **err);
+-
+-gboolean mcap_set_data_chan_mode(struct mcap_instance *mi, uint8_t mode,
+-								GError **err);
+-
+-int mcap_send_data(int sock, const void *buf, uint32_t size);
+-
+-void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+-void mcap_sync_init(struct mcap_mcl *mcl);
+-void mcap_sync_stop(struct mcap_mcl *mcl);
+diff --git a/test/test-health b/test/test-health
 deleted file mode 100755
-index 161a4bfec58e..000000000000
---- a/test/test-sap-server
+index f26def906fc0..000000000000
+--- a/test/test-health
 +++ /dev/null
-@@ -1,152 +0,0 @@
+@@ -1,243 +0,0 @@
 -#!/usr/bin/env python3
 -# SPDX-License-Identifier: LGPL-2.1-or-later
 -
 -from __future__ import absolute_import, print_function, unicode_literals
+-# -*- coding: utf-8 -*-
 -
--from sap_client import *
--import time
 -import sys
+-import dbus
+-import dbus.service
+-from dbus.mainloop.glib import DBusGMainLoop
+-try:
+-  from gi.repository import GObject
+-except ImportError:
+-  import gobject as GObject
 -
--def connect_disconnect_by_client(sap):
+-BUS_NAME = 'org.bluez'
+-PATH = '/org/bluez'
+-ADAPTER_INTERFACE = 'org.bluez.Adapter1'
+-HEALTH_MANAGER_INTERFACE = 'org.bluez.HealthManager1'
+-HEALTH_DEVICE_INTERFACE = 'org.bluez.HealthDevice1'
 -
--    print("[Test] Connect - Disconnect by client \n")
+-DBusGMainLoop(set_as_default=True)
+-loop = GObject.MainLoop()
 -
--    try:
--        if not sap.isConnected():
--           sap.connect()
+-bus = dbus.SystemBus()
 -
--        if sap.proc_connect():
--            if sap.proc_disconnectByClient():
--                print("OK")
--                return 0
--
--        print("NOT OK")
--        return 1
--
--    except BluetoothError as e:
--        print("Error " + str(e))
--
--
--def connect_disconnect_by_server_gracefully(sap, timeout=0):
--
--    print("[Test] Connect - Disconnect by server with timer \n")
--
--    try:
--        if not sap.isConnected():
--           sap.connect()
--
--        if sap.proc_connect():
--            if sap.proc_disconnectByServer(timeout):
--                print("OK")
--                return 0
--
--        print("NOT OK")
--        return 1
--
--    except BluetoothError as e:
--        print("Error " + str(e))
+-def sig_received(*args, **kwargs):
+-	if "member" not in kwargs:
+-		return
+-	if "path" not in kwargs:
+-		return;
+-	sig_name = kwargs["member"]
+-	path = kwargs["path"]
+-	print(sig_name)
+-	print(path)
+-	if sig_name == "PropertyChanged":
+-		k, v = args
+-		print(k)
+-		print(v)
+-	else:
+-		ob = args[0]
+-		print(ob)
 -
 -
--def connect_txAPDU_disconnect_by_client(sap):
+-def enter_mainloop():
+-	bus.add_signal_receiver(sig_received, bus_name=BUS_NAME,
+-				dbus_interface=HEALTH_DEVICE_INTERFACE,
+-				path_keyword="path",
+-				member_keyword="member",
+-				interface_keyword="interface")
 -
--    print("[Test] Connect - TX APDU - Disconnect by client \n")
+-	try:
+-		print("Entering main lopp, push Ctrl+C for finish")
 -
--    try:
--        if not sap.isConnected():
--           sap.connect()
+-		mainloop = GObject.MainLoop()
+-		mainloop.run()
+-	except KeyboardInterrupt:
+-		pass
+-	finally:
+-		print("Exiting, bye")
 -
--        if sap.proc_connect():
--            if not sap.proc_transferAPDU():
--                print("NOT OK 1")
--                return 1
+-hdp_manager = dbus.Interface(bus.get_object(BUS_NAME, PATH),
+-						HEALTH_MANAGER_INTERFACE)
 -
--            if not sap.proc_transferAPDU():
--                print("NOT OK 2")
--                return 1
+-role = None
+-while role == None:
+-	print("Select 1. source or 2. sink: ",)
+-	try:
+-		sel = int(sys.stdin.readline())
+-		if sel == 1:
+-			role = "source"
+-		elif sel == 2:
+-			role = "sink"
+-		else:
+-			raise ValueError
+-	except (TypeError, ValueError):
+-		print("Wrong selection, try again: ",)
+-	except KeyboardInterrupt:
+-		sys.exit()
 -
--            if not sap.proc_transferAPDU():
--                print("NOT OK 3")
--                return 1
+-dtype = None
+-while dtype == None:
+-	print("Select a data type: ",)
+-	try:
+-		sel = int(sys.stdin.readline())
+-		if (sel < 0) or (sel > 65535):
+-			raise ValueError
+-		dtype = sel;
+-	except (TypeError, ValueError):
+-		print("Wrong selection, try again: ",)
+-	except KeyboardInterrupt:
+-		sys.exit()
 -
--            if not sap.proc_transferAPDU():
--                print("NOT OK 4")
--                return 1
+-pref = None
+-if role == "source":
+-	while pref == None:
+-		try:
+-			print("Select a preferred data channel type 1.",)
+-			print("reliable 2. streaming: ",)
+-			sel = int(sys.stdin.readline())
+-			if sel == 1:
+-				pref = "reliable"
+-			elif sel == 2:
+-				pref = "streaming"
+-			else:
+-				raise ValueError
 -
--            if sap.proc_disconnectByClient():
--                print("OK")
--                return 0
+-		except (TypeError, ValueError):
+-			print("Wrong selection, try again")
+-		except KeyboardInterrupt:
+-			sys.exit()
 -
--        print("NOT OK")
--        return 1
+-	app_path = hdp_manager.CreateApplication({
+-					"DataType": dbus.types.UInt16(dtype),
+-					"Role": role,
+-					"Description": "Test Source",
+-					"ChannelType": pref})
+-else:
+-	app_path = hdp_manager.CreateApplication({
+-					"DataType": dbus.types.UInt16(dtype),
+-					"Description": "Test sink",
+-					"Role": role})
 -
--    except BluetoothError as e:
--        print("Error " + str(e))
+-print("New application created:", app_path)
 -
--def connect_rfcomm_only_and_wait_for_close_by_server(sap):
+-con = None
+-while con == None:
+-	try:
+-		print("Connect to a remote device (y/n)? ",)
+-		sel = sys.stdin.readline()
+-		if sel in ("y\n", "yes\n", "Y\n", "YES\n"):
+-			con = True
+-		elif sel in ("n\n", "no\n", "N\n", "NO\n"):
+-			con = False
+-		else:
+-			print("Wrong selection, try again.")
+-	except KeyboardInterrupt:
+-		sys.exit()
 -
--    print("[Test] Connect rfcomm only  - Disconnect by server timeout \n")
+-if not con:
+-	enter_mainloop()
+-	sys.exit()
 -
--    if not sap.isConnected():
--       sap.connect()
+-manager = dbus.Interface(bus.get_object(BUS_NAME, "/"),
+-					"org.freedesktop.DBus.ObjectManager")
 -
--    time.sleep(40)
--    print("OK")
+-objects = manager.GetManagedObjects()
+-adapters = []
 -
--def power_sim_off_on(sap):
+-for path, ifaces in objects.items():
+-	if ifaces.has_key(ADAPTER_INTERFACE):
+-		adapters.append(path)
 -
--    print("[Test] Powe sim off \n")
+-i = 1
+-for ad in adapters:
+-	print("%d. %s" % (i, ad))
+-	i = i + 1
 -
--    try:
--        if not sap.isConnected():
--           sap.connect()
+-print("Select an adapter: ",)
+-select = None
+-while select == None:
+-	try:
+-		pos = int(sys.stdin.readline()) - 1
+-		if pos < 0:
+-			raise TypeError
+-		select = adapters[pos]
+-	except (TypeError, IndexError, ValueError):
+-		print("Wrong selection, try again: ",)
+-	except KeyboardInterrupt:
+-		sys.exit()
 -
--        if sap.proc_connect():
--            if not sap.proc_resetSim():
--                print("NOT OK")
--                return 1
+-adapter = dbus.Interface(bus.get_object(BUS_NAME, select), ADAPTER_INTERFACE)
 -
--            if not sap.proc_powerSimOff():
--                print("NOT OK")
--                return 1
+-devices = []
+-for path, interfaces in objects.items():
+-	if "org.bluez.Device1" not in interfaces:
+-		continue
+-	properties = interfaces["org.bluez.Device1"]
+-	if properties["Adapter"] != select:
+-		continue;
 -
--            if not sap.proc_powerSimOn():
--                print("NOT OK")
--                return 1
+-	if HEALTH_DEVICE_INTERFACE not in interfaces:
+-		continue
+-	devices.append(path)
 -
--            if sap.proc_disconnectByClient():
--                print("OK")
--                return 0
+-if len(devices) == 0:
+-	print("No devices available")
+-	sys.exit()
 -
--        print("NOT OK")
--        return 1
+-i = 1
+-for dev in devices:
+-	print("%d. %s" % (i, dev))
+-	i = i + 1
 -
--    except BluetoothError as e:
--        print("Error " + str(e))
+-print("Select a device: ",)
+-select = None
+-while select == None:
+-	try:
+-		pos = int(sys.stdin.readline()) - 1
+-		if pos < 0:
+-			raise TypeError
+-		select = devices[pos]
+-	except (TypeError, IndexError, ValueError):
+-		print("Wrong selection, try again: ",)
+-	except KeyboardInterrupt:
+-		sys.exit()
 -
+-device = dbus.Interface(bus.get_object(BUS_NAME, select),
+-					HEALTH_DEVICE_INTERFACE)
 -
--if __name__ == "__main__":
+-echo = None
+-while echo == None:
+-	try:
+-		print("Perform an echo (y/n)? ",)
+-		sel = sys.stdin.readline()
+-		if sel in ("y\n", "yes\n", "Y\n", "YES\n"):
+-			echo = True
+-		elif sel in ("n\n", "no\n", "N\n", "NO\n"):
+-			echo = False
+-		else:
+-			print("Wrong selection, try again.")
+-	except KeyboardInterrupt:
+-		sys.exit()
 -
--    host = None  # server bd_addr
--    port = 8  # sap server port
+-if echo:
+-	if device.Echo():
+-		print("Echo was ok")
+-	else:
+-		print("Echo war wrong, exiting")
+-		sys.exit()
 -
--    if (len(sys.argv) < 2):
--        print("Usage: %s <address> [port]" % (sys.argv[0]))
--        sys.exit(1)
+-print("Connecting to device %s" % (select))
 -
--    host = sys.argv[1]
+-if role == "source":
+-	chan = device.CreateChannel(app_path, "reliable")
+-else:
+-	chan = device.CreateChannel(app_path, "any")
 -
--    if (len(sys.argv) == 3):
--        port = sys.argv[2]
+-print(chan)
 -
--    try:
--        s = SAPClient(host, port)
--    except BluetoothError as e:
--        print("Error: " + str(e))
--        sys.exit(1)
+-enter_mainloop()
 -
--    connect_disconnect_by_client(s)
--    connect_disconnect_by_server_gracefully(s)
--    connect_disconnect_by_server_gracefully(s, 40)  #  wait 40 sec for srv to close rfcomm sock
--    connect_rfcomm_only_and_wait_for_close_by_server(s)
--    connect_txAPDU_disconnect_by_client(s)
--    power_sim_off_on(s)
+-hdp_manager.DestroyApplication(app_path)
+diff --git a/test/test-health-sink b/test/test-health-sink
+deleted file mode 100755
+index fcdc58e3d009..000000000000
+--- a/test/test-health-sink
++++ /dev/null
+@@ -1,114 +0,0 @@
+-#!/usr/bin/env python3
+-# SPDX-License-Identifier: LGPL-2.1-or-later
+-
+-from __future__ import absolute_import, print_function, unicode_literals
+-# -*- coding: utf-8 -*-
+-
+-import sys
+-import dbus
+-import dbus.service
+-from dbus.mainloop.glib import DBusGMainLoop
+-try:
+-  from gi.repository import GObject
+-except ImportError:
+-  import gobject as GObject
+-
+-BUS_NAME = 'org.bluez'
+-PATH = '/org/bluez'
+-ADAPTER_INTERFACE = 'org.bluez.Adapter1'
+-HEALTH_MANAGER_INTERFACE = 'org.bluez.HealthManager1'
+-HEALTH_DEVICE_INTERFACE = 'org.bluez.HealthDevice1'
+-
+-DBusGMainLoop(set_as_default=True)
+-loop = GObject.MainLoop()
+-
+-bus = dbus.SystemBus()
+-
+-type = 4103
+-if len(sys.argv) > 1:
+-	type = int(sys.argv[1])
+-
+-hdp_manager = dbus.Interface(bus.get_object(BUS_NAME, PATH),
+-						HEALTH_MANAGER_INTERFACE)
+-app_path = hdp_manager.CreateApplication({"DataType": dbus.types.UInt16(type),
+-					"Role": "sink"})
+-
+-print(app_path)
+-
+-manager = dbus.Interface(bus.get_object(BUS_NAME, "/"),
+-					"org.freedesktop.DBus.ObjectManager")
+-
+-objects = manager.GetManagedObjects()
+-adapters = []
+-
+-for path, ifaces in objects.items():
+-	if ifaces.has_key(ADAPTER_INTERFACE):
+-		adapters.append(path)
+-
+-i = 1
+-for ad in adapters:
+-	print("%d. %s" % (i, ad))
+-	i = i + 1
+-
+-print("Select an adapter: ",)
+-select = None
+-while select == None:
+-	try:
+-		pos = int(sys.stdin.readline()) - 1
+-		if pos < 0:
+-			raise TypeError
+-		select = adapters[pos]
+-	except (TypeError, IndexError, ValueError):
+-		print("Wrong selection, try again: ",)
+-	except KeyboardInterrupt:
+-		sys.exit()
+-
+-adapter =  dbus.Interface(bus.get_object(BUS_NAME, select),
+-						ADAPTER_INTERFACE)
+-
+-devices = []
+-for path, interfaces in objects.items():
+-	if "org.bluez.Device1" not in interfaces:
+-		continue
+-	properties = interfaces["org.bluez.Device1"]
+-	if properties["Adapter"] != select:
+-		continue;
+-
+-	if HEALTH_DEVICE_INTERFACE not in interfaces:
+-		continue
+-	devices.append(path)
+-
+-if len(devices) == 0:
+-	print("No devices available")
+-	sys.exit()
+-
+-i = 1
+-for dev in devices:
+-	print("%d. %s" % (i, dev))
+-	i = i + 1
+-
+-print("Select a device: ",)
+-select = None
+-while select == None:
+-	try:
+-		pos = int(sys.stdin.readline()) - 1
+-		if pos < 0:
+-			raise TypeError
+-		select = devices[pos]
+-	except (TypeError, IndexError, ValueError):
+-		print("Wrong selection, try again: ",)
+-	except KeyboardInterrupt:
+-		sys.exit()
+-
+-print("Connecting to %s" % (select))
+-device = dbus.Interface(bus.get_object(BUS_NAME, select),
+-						HEALTH_DEVICE_INTERFACE)
+-
+-chan = device.CreateChannel(app_path, "Any")
+-
+-print(chan)
+-
+-print("Push Enter for finishing")
+-sys.stdin.readline()
+-
+-hdp_manager.DestroyApplication(app_path)
+diff --git a/tools/mcaptest.c b/tools/mcaptest.c
+deleted file mode 100644
+index c37d8cbb97da..000000000000
+--- a/tools/mcaptest.c
++++ /dev/null
+@@ -1,484 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2014 Intel Corporation
+- *
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#define _GNU_SOURCE
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <getopt.h>
+-#include <unistd.h>
+-
+-#include <glib.h>
+-
+-#include "bluetooth/bluetooth.h"
+-#include "bluetooth/hci.h"
+-#include "bluetooth/hci_lib.h"
+-
+-#include "btio/btio.h"
+-#include "bluetooth/l2cap.h"
+-#include "profiles/health/mcap.h"
+-
+-enum {
+-	MODE_NONE,
+-	MODE_CONNECT,
+-	MODE_LISTEN,
+-};
+-
+-static GMainLoop *mloop;
+-
+-static int ccpsm = 0x1003, dcpsm = 0x1005;
+-
+-static struct mcap_instance *mcap = NULL;
+-static struct mcap_mdl *mdl = NULL;
+-static uint16_t mdlid;
+-
+-static int control_mode = MODE_LISTEN;
+-static int data_mode = MODE_LISTEN;
+-
+-static int mdl_conn_req_result = MCAP_SUCCESS;
+-
+-static gboolean send_synccap_req = FALSE;
+-static gboolean mcl_disconnect = FALSE;
+-static gboolean mdl_disconnect = FALSE;
+-static int mcl_disconnect_timeout = -1;
+-static int mdl_disconnect_timeout = -1;
+-
+-static struct mcap_mcl *mcl = NULL;
+-
+-static gboolean no_close = FALSE;
+-
+-#define REQ_CLOCK_ACC 0x1400
+-
+-static void mdl_close(struct mcap_mdl *mdl)
+-{
+-	int fd = -1;
+-
+-	printf("%s\n", __func__);
+-
+-	if (mdl_disconnect_timeout >= 0)
+-		sleep(mdl_disconnect_timeout);
+-
+-	fd = mcap_mdl_get_fd(mdl);
+-
+-	if (fd > 0)
+-		close(fd);
+-}
+-
+-static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	printf("%s\n", __func__);
+-
+-	if (mdl_disconnect)
+-		mdl_close(mdl);
+-}
+-
+-static void mdl_closed_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	printf("%s\n", __func__);
+-
+-	if (mcl_disconnect && mcl_disconnect_timeout >= 0) {
+-		sleep(mcl_disconnect_timeout);
+-
+-		printf("Closing MCAP communication link\n");
+-		mcap_close_mcl(mcl, TRUE);
+-
+-		if (no_close)
+-			return;
+-
+-		g_main_loop_quit(mloop);
+-	}
+-}
+-
+-static void mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	/* TODO */
+-	printf("%s\n", __func__);
+-
+-	/* Disconnecting MDL latency timeout */
+-	if (mdl_disconnect_timeout >= 0)
+-		sleep(mdl_disconnect_timeout);
+-}
+-
+-static void mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	/* TODO */
+-	printf("%s\n", __func__);
+-}
+-
+-static uint8_t mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
+-				uint16_t mdlid, uint8_t *conf, void *data)
+-{
+-	int ret;
+-
+-	printf("%s\n", __func__);
+-
+-	ret = mdl_conn_req_result;
+-
+-	mdl_conn_req_result = MCAP_SUCCESS;
+-
+-	return ret;
+-}
+-
+-static uint8_t mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
+-{
+-	printf("%s\n", __func__);
+-
+-	return MCAP_SUCCESS;
+-}
+-
+-static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
+-								gpointer data);
+-
+-static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
+-{
+-	GError *gerr = NULL;
+-
+-	printf("%s\n", __func__);
+-
+-	if (data_mode == MODE_CONNECT) {
+-		mcap_create_mdl(mcl, 1, 0, create_mdl_cb, NULL, NULL, &gerr);
+-		if (gerr) {
+-			printf("Could not connect MDL: %s\n", gerr->message);
+-			g_error_free(gerr);
+-		}
+-	}
+-}
+-
+-static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+-{
+-	/* TODO */
+-	printf("%s\n", __func__);
+-
+-	if (no_close)
+-		return;
+-
+-	g_main_loop_quit(mloop);
+-}
+-
+-static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
+-{
+-	/* TODO */
+-	printf("%s\n", __func__);
+-}
+-
+-static void connect_mdl_cb(struct mcap_mdl *mdl, GError *gerr, gpointer data)
+-{
+-	mdlid = mcap_mdl_get_mdlid(mdl);
+-
+-	printf("%s\n", __func__);
+-
+-	if (mdlid == MCAP_MDLID_RESERVED)
+-		printf("MCAP mdlid is reserved");
+-	else
+-		printf("MDL %d connected\n", mdlid);
+-}
+-
+-static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
+-								gpointer data)
+-{
+-	GError *err = NULL;
+-
+-	printf("%s\n", __func__);
+-
+-	if (gerr) {
+-		printf("MDL error: %s\n", gerr->message);
+-
+-		if (!no_close)
+-			g_main_loop_quit(mloop);
+-
+-		return;
+-	}
+-
+-	if (mdl)
+-		mcap_mdl_unref(mdl);
+-
+-	mdl = mcap_mdl_ref(mcap_mdl);
+-
+-	if (!mcap_connect_mdl(mdl, L2CAP_MODE_ERTM, dcpsm, connect_mdl_cb, NULL,
+-								NULL, &err)) {
+-		printf("Error connecting to mdl: %s\n", err->message);
+-		g_error_free(err);
+-
+-		if (no_close)
+-			return;
+-
+-		g_main_loop_quit(mloop);
+-	}
+-}
+-
+-static void sync_cap_cb(struct mcap_mcl *mcl, uint8_t mcap_err,
+-			uint8_t btclockres, uint16_t synclead,
+-			uint16_t tmstampres, uint16_t tmstampacc, GError *err,
+-			gpointer data)
+-{
+-	/* TODO */
+-	printf("%s\n", __func__);
+-}
+-
+-static void trigger_mdl_action(int mode)
+-{
+-	GError *gerr = NULL;
+-	gboolean ret;
+-
+-	ret = mcap_mcl_set_cb(mcl, NULL, &gerr,
+-		MCAP_MDL_CB_CONNECTED, mdl_connected_cb,
+-		MCAP_MDL_CB_CLOSED, mdl_closed_cb,
+-		MCAP_MDL_CB_DELETED, mdl_deleted_cb,
+-		MCAP_MDL_CB_ABORTED, mdl_aborted_cb,
+-		MCAP_MDL_CB_REMOTE_CONN_REQ, mdl_conn_req_cb,
+-		MCAP_MDL_CB_REMOTE_RECONN_REQ, mdl_reconn_req_cb,
+-		MCAP_MDL_CB_INVALID);
+-
+-	if (!ret && gerr) {
+-		printf("MCL cannot handle connection %s\n",
+-							gerr->message);
+-		g_error_free(gerr);
+-	}
+-
+-	if (mode == MODE_CONNECT) {
+-		printf("Creating MCAP Data End Point\n");
+-		mcap_create_mdl(mcl, 1, 0, create_mdl_cb, NULL, NULL, &gerr);
+-		if (gerr) {
+-			printf("Could not connect MDL: %s\n", gerr->message);
+-			g_error_free(gerr);
+-		}
+-	}
+-
+-	if (send_synccap_req && mcap->csp_enabled) {
+-		mcap_sync_init(mcl);
+-
+-		mcap_sync_cap_req(mcl, REQ_CLOCK_ACC, sync_cap_cb, NULL, &gerr);
+-		if (gerr) {
+-			printf("MCAP Sync req error: %s\n", gerr->message);
+-			g_error_free(gerr);
+-		}
+-	}
+-}
+-
+-static void mcl_connected(struct mcap_mcl *mcap_mcl, gpointer data)
+-{
+-	printf("%s\n", __func__);
+-
+-	if (mcl) {
+-		mcap_sync_stop(mcl);
+-		mcap_mcl_unref(mcl);
+-	}
+-
+-	mcl = mcap_mcl_ref(mcap_mcl);
+-	trigger_mdl_action(data_mode);
+-}
+-
+-static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
+-{
+-	printf("%s\n", __func__);
+-
+-	if (err) {
+-		printf("Could not connect MCL: %s\n", err->message);
+-
+-		if (!no_close)
+-			g_main_loop_quit(mloop);
+-
+-		return;
+-	}
+-
+-	if (mcl) {
+-		mcap_sync_stop(mcl);
+-		mcap_mcl_unref(mcl);
+-	}
+-
+-	mcl = mcap_mcl_ref(mcap_mcl);
+-	trigger_mdl_action(data_mode);
+-}
+-
+-static void usage(void)
+-{
+-	printf("mcaptest - MCAP testing ver %s\n", VERSION);
+-	printf("Usage:\n"
+-		"\tmcaptest <control_mode> <data_mode> [options]\n");
+-	printf("Control Link Mode:\n"
+-		"\t-c connect <dst_addr>\n"
+-		"\t-b close control link after closing data link\n"
+-		"\t-e <timeout> disconnect MCL and quit after MDL is closed\n"
+-		"\t-g send clock sync capability request if MCL connected\n");
+-	printf("Data Link Mode:\n"
+-		"\t-d connect\n"
+-		"\t-a close data link immediately after being connected"
+-		"\t-f <timeout> disconnect MDL after it's connected\n"
+-		"\t-u send \'Unavailable\' on first MDL connection request\n");
+-	printf("Options:\n"
+-		"\t-n don't exit after mcl disconnect/err receive\n"
+-		"\t-i <hcidev>        HCI device\n"
+-		"\t-C <control_ch>    Control channel PSM\n"
+-		"\t-D <data_ch>       Data channel PSM\n");
+-}
+-
+-static struct option main_options[] = {
+-	{ "help",		0, 0, 'h' },
+-	{ "device",		1, 0, 'i' },
+-	{ "connect_cl",		1, 0, 'c' },
+-	{ "disconnect_cl",	1, 0, 'e' },
+-	{ "synccap_req",	0, 0, 'g' },
+-	{ "connect_dl",		0, 0, 'd' },
+-	{ "disconnect_da",	0, 0, 'a' },
+-	{ "disconnect_ca",	0, 0, 'b' },
+-	{ "disconnect_dl",	1, 0, 'f' },
+-	{ "unavailable_dl",	0, 0, 'u' },
+-	{ "no exit mcl dis/err",0, 0, 'n' },
+-	{ "control_ch",		1, 0, 'C' },
+-	{ "data_ch",		1, 0, 'D' },
+-	{ 0, 0, 0, 0 }
+-};
+-
+-int main(int argc, char *argv[])
+-{
+-	GError *err = NULL;
+-	bdaddr_t src, dst;
+-	int opt;
+-	char bdastr[18];
+-
+-	hci_devba(0, &src);
+-	bacpy(&dst, BDADDR_ANY);
+-
+-	mloop = g_main_loop_new(NULL, FALSE);
+-	if (!mloop) {
+-		printf("Cannot create main loop\n");
+-
+-		exit(1);
+-	}
+-
+-	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dghunab",
+-						main_options, NULL)) != EOF) {
+-		switch (opt) {
+-		case 'i':
+-			if (!strncmp(optarg, "hci", 3))
+-				hci_devba(atoi(optarg + 3), &src);
+-			else
+-				str2ba(optarg, &src);
+-
+-			break;
+-
+-		case 'c':
+-			control_mode = MODE_CONNECT;
+-			str2ba(optarg, &dst);
+-
+-			break;
+-
+-		case 'd':
+-			data_mode = MODE_CONNECT;
+-
+-			break;
+-
+-		case 'a':
+-			mdl_disconnect = TRUE;
+-
+-			break;
+-
+-		case 'b':
+-			mcl_disconnect = TRUE;
+-
+-			break;
+-
+-		case 'e':
+-			mcl_disconnect_timeout = atoi(optarg);
+-
+-			break;
+-
+-		case 'f':
+-			mdl_disconnect_timeout = atoi(optarg);
+-
+-			break;
+-
+-		case 'g':
+-			send_synccap_req = TRUE;
+-
+-			break;
+-
+-		case 'u':
+-			mdl_conn_req_result = MCAP_RESOURCE_UNAVAILABLE;
+-
+-			break;
+-
+-		case 'n':
+-			no_close = TRUE;
+-
+-			break;
+-
+-		case 'C':
+-			ccpsm = atoi(optarg);
+-
+-			break;
+-
+-		case 'D':
+-			dcpsm = atoi(optarg);
+-
+-			break;
+-
+-		case 'h':
+-		default:
+-			usage();
+-			exit(0);
+-		}
+-	}
+-
+-	mcap = mcap_create_instance(&src, BT_IO_SEC_MEDIUM, ccpsm, dcpsm,
+-					mcl_connected, mcl_reconnected,
+-					mcl_disconnected, mcl_uncached,
+-					NULL, /* CSP is not used right now */
+-					NULL, &err);
+-
+-	if (!mcap) {
+-		printf("MCAP instance creation failed %s\n", err->message);
+-		g_error_free(err);
+-
+-		exit(1);
+-	}
+-
+-	mcap_enable_csp(mcap);
+-
+-	switch (control_mode) {
+-	case MODE_CONNECT:
+-		ba2str(&dst, bdastr);
+-		printf("Connecting to %s\n", bdastr);
+-
+-		mcap_create_mcl(mcap, &dst, ccpsm, create_mcl_cb, NULL, NULL,
+-									&err);
+-
+-		if (err) {
+-			printf("MCAP create error %s\n", err->message);
+-			g_error_free(err);
+-
+-			exit(1);
+-		}
+-
+-		break;
+-	case MODE_LISTEN:
+-		printf("Listening for control channel connection\n");
+-
+-		break;
+-	case MODE_NONE:
+-	default:
+-		goto done;
+-	}
+-
+-	g_main_loop_run(mloop);
+-
+-done:
+-	printf("Done\n");
+-
+-	if (mcap)
+-		mcap_instance_unref(mcap);
+-
+-	g_main_loop_unref(mloop);
+-
+-	return 0;
+-}
 -- 
 2.52.0
 
