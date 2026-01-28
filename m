@@ -1,26 +1,26 @@
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B338D2BE7BA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6215324B1E
 	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 22:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769638557; cv=none; b=o5gnbSI4gNpWWefryCZV9P9J5cv1sPADkj4UP2g82NHt7jXjwURmaJyfD0igZ0AEaT+oVt41PglTmogKFdkl2P8TMdRRkwt3wGm46wp2JoGlrVk0H42rgeKkEYCsBMpa7GxownJeeT16Oiprvkm8mBeXMmsjcggjVcFiOozhvAY=
+	t=1769638557; cv=none; b=gUvijQ8ZzSMOuG+x8w+n/24iHOsfSXpMt4BfizckjRuvmW2+836D21dzeXZMemsZ9XtZ9+afCjwUQicwxCEgSaWJJHR/6msJ+CPRf7gz9o2yFWBVVp40pSeawvDwfbOFvReUKvRqEIoJDZ9bGC6zfzpaolz+JJ5byh2gngkeab4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769638557; c=relaxed/simple;
-	bh=Bcmb6bAc+0dEy0x/RKsH/kNtWiX7FibkaIZ5fz3fsdE=;
+	bh=UozeGtWAEAbLLTAdfRediERR/fgNH42W0WG0oo43/Ho=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dlbw7GhTb/1eHy1TLUrXM4BeyHF4MLnFm5HtNSNIh4nGUhg85/nC3e6Oii1J7OxZIBoYgwz7PUAHKs0DF5lOp5Aj0C+RR0Jnr5/5tdhpdJy66V24YhKQO4iseLXrepsN7Aga+UeqWMi+9N2hvDM39w9NJ4yXwNzgPFgxC/qj8CE=
+	 MIME-Version; b=pYIQeFVnNORoqR2Ur89hBMMevhC7GePxEuhE93+Kqqlu2nZENhBM4k4CQC5hx4sbITnGY+ZzUfMDZ9jCyYtsn+PgayZzKk0UzFHmc8GCZrExlmo4Jz8znaTAq6xJwvZ2PFijPvv908acZBEH5UnHM/Eo8J4zShIK57fQ77bhjKY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BDE9E44406
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 07EEA44407
 	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 22:15:46 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v7 08/16] build: Add option to allow disabling bluetoothd
-Date: Wed, 28 Jan 2026 23:11:58 +0100
-Message-ID: <20260128221536.2319084-9-hadess@hadess.net>
+Subject: [PATCH BlueZ v7 09/16] unit: Run test-bap tests concurrently
+Date: Wed, 28 Jan 2026 23:11:59 +0100
+Message-ID: <20260128221536.2319084-10-hadess@hadess.net>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260128221536.2319084-1-hadess@hadess.net>
 References: <20260128221536.2319084-1-hadess@hadess.net>
@@ -32,240 +32,115 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieeggeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeevhfffgffgjeekueeihfdtffefuefgkefhieehfeevhedtvdejfeevvdfffeefveenucffohhmrghinhepshgvrhhvihgtvgdrihhnnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemlegsvdelmegtugefieemieekfhgumegttdelfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemlegsvdelmegtugefieemieekfhgumegttdelfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepueffgfelgfeggeegtdeipdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieeggeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeekteetgeettdehieduiedttdetffelleehtdejkeeluedvgfffvdevteetudfhkeenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefnecuvehluhhsthgvrhfuihiivgepvdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupedtjefggfetgeeggedtjedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 X-GND-State: clean
 X-GND-Score: 0
 
-This makes it possible to build, for example, just the library, or the
-command-line client, without also building and installing bluetoothd.
 ---
- doc/meson.build   |   3 +-
- meson.build       |   8 ++-
- meson_options.txt |   1 +
- src/meson.build   | 164 +++++++++++++++++++++++-----------------------
- 4 files changed, 92 insertions(+), 84 deletions(-)
+ meson.build           |  2 +-
+ unit/meson.build      | 25 ++++++++++++++++++++++---
+ unit/unittest_list.sh | 15 +++++++++++++++
+ 3 files changed, 38 insertions(+), 4 deletions(-)
+ create mode 100644 unit/unittest_list.sh
 
-diff --git a/doc/meson.build b/doc/meson.build
-index d587c03aa0c6..db13911c2e73 100644
---- a/doc/meson.build
-+++ b/doc/meson.build
-@@ -143,7 +143,8 @@ bluetoothd_rst = configure_file(
-   output: 'bluetoothd.rst',
-   configuration: man_conf
- )
--if get_option('manpages').enabled()
-+
-+if get_option('daemon').enabled() and get_option('manpages').enabled()
-   custom_target(
-     input: bluetoothd_rst,
-     output: 'bluetoothd.8',
 diff --git a/meson.build b/meson.build
-index 099ad5e0dd49..2d4203a02a0b 100644
+index 2d4203a02a0b..f2220b2c4613 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -281,8 +281,12 @@ endif
+@@ -273,6 +273,7 @@ endif
+ if rst2man.found()
+   subdir('doc')
+ endif
++sh = find_program('sh')
+ if not get_option('tests').disabled()
+   subdir('test')
+   subdir('unit')
+@@ -280,7 +281,6 @@ endif
+ 
  # Fix permissions on install
  install = find_program('install')
- sh = find_program('sh')
--meson.add_install_script(sh, '-c', 'install -dm755 ${DESTDIR}/' + configdir)
--meson.add_install_script(sh, '-c', 'install -dm700 ${DESTDIR}/' + storagedir)
-+if get_option('daemon').enabled()
-+  meson.add_install_script(sh, '-c', 'install -dm755 ${DESTDIR}/' + configdir)
-+endif
-+if get_option('daemon').enabled() or get_option('mesh').enabled()
-+  meson.add_install_script(sh, '-c', 'install -dm700 ${DESTDIR}/' + storagedir)
-+endif
- if get_option('mesh').enabled()
-   meson.add_install_script(sh, '-c', 'install -dm700 ${DESTDIR}/' + meshstoragedir)
+-sh = find_program('sh')
+ if get_option('daemon').enabled()
+   meson.add_install_script(sh, '-c', 'install -dm755 ${DESTDIR}/' + configdir)
  endif
-diff --git a/meson_options.txt b/meson_options.txt
-index b72080f87813..aad131212886 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -6,6 +6,7 @@ option('tests', type: 'feature', value: 'auto', description: 'Enable testing too
- option('tools', type: 'feature', value: 'enabled', description: 'Enable Bluetooth tools')
- option('monitor', type: 'feature', value: 'enabled', description: 'Enable Bluetooth monitor')
- option('client', type: 'feature', value: 'enabled', description: 'Enable command line client')
-+option('daemon', type: 'feature', value: 'enabled', description: 'Enable bluetoothd daemon')
- option('systemd', type: 'feature', value: 'enabled', description: 'Install systemd service files')
- option('logind', type: 'feature', value: 'enabled', description: 'Enable logind integration in obexd')
- option('udev', type: 'feature', value: 'enabled', description: 'Enable udev device support')
-diff --git a/src/meson.build b/src/meson.build
-index bf2155e13d89..22d142d1ceb6 100644
---- a/src/meson.build
-+++ b/src/meson.build
-@@ -1,88 +1,90 @@
- subdir('shared')
+diff --git a/unit/meson.build b/unit/meson.build
+index 1e9b7020c089..b74a67541e99 100644
+--- a/unit/meson.build
++++ b/unit/meson.build
+@@ -7,7 +7,6 @@ tests1 = [
+   [ 'test-avrcp.c', '../src/log.c', 'avctp.c', 'avrcp-lib.c' ],
+   [ 'test-lib.c' ],
+   [ 'test-gatt.c' ],
+-  [ 'test-bap.c' ],
+   [ 'test-micp.c' ],
+   [ 'test-bass.c' ],
+   [ 'test-vcp.c' ],
+@@ -39,6 +38,26 @@ foreach t: tests1
+ endforeach
  
--if get_option('datafiles').enabled()
--  install_data('bluetooth.conf',
--    install_dir: dbusconfdir / 'dbus-1/system.d'
--  )
--  install_data('main.conf',
--    install_dir: configdir
--  )
--endif
-+if get_option('daemon').enabled()
-+  if get_option('datafiles').enabled()
-+    install_data('bluetooth.conf',
-+      install_dir: dbusconfdir / 'dbus-1/system.d'
-+    )
-+    install_data('main.conf',
-+      install_dir: configdir
-+    )
-+  endif
- 
--if systemd_dep.found()
--  configure_file(
--    input: 'bluetooth.service.in',
--    output: 'bluetooth.service',
--    install: true,
--    install_dir: systemdsystemunitdir,
--    configuration: service_conf
-+  if systemd_dep.found()
-+    configure_file(
-+      input: 'bluetooth.service.in',
-+      output: 'bluetooth.service',
-+      install: true,
-+      install_dir: systemdsystemunitdir,
-+      configuration: service_conf
-+    )
+ tests2 = [
++  [ 'test-bap.c' ],
++]
 +
-+    install_data('org.bluez.service',
-+      install_dir: dbussystembusdir
-+    )
-+  endif
++unittest_list = find_program('unittest_list.sh')
 +
-+  genbuiltin = find_program('genbuiltin')
-+  builtin_h = custom_target('src-builtin.h',
-+    output: 'builtin.h',
-+    capture: true,
-+    command: [ genbuiltin, builtin_modules ]
-   )
++foreach t: tests2
++  test_name = t[0].substring(0, -2)
++  exe = executable(test_name,
++    sources: t,
++    dependencies: [ libshared_glib_dep, libbluetooth_internal_dep ],
++  )
++
++  r = run_command(sh, unittest_list, t, check: true)
++  unit_tests = r.stdout().strip().split(' ')
++  foreach ut: unit_tests
++    test(ut, exe, args: [ '-p', ut ])
++  endforeach
++endforeach
++
++tests3 = [
+   [ 'test-textfile.c', '../src/textfile.c' ],
+   [ 'test-crc.c', '../monitor/crc.c' ],
+   [ 'test-crypto.c' ],
+@@ -53,7 +72,7 @@ tests2 = [
+ ]
  
--  install_data('org.bluez.service',
--    install_dir: dbussystembusdir
-+  executable('bluetoothd',
-+    sources: [ builtin_sources,
-+      attrib_sources,
-+      btio_sources,
-+      builtin_h,
-+      'main.c',
-+      'log.c',
-+      'backtrace.c',
-+      'rfkill.c',
-+      'sdpd-server.c',
-+      'sdpd-request.c',
-+      'sdpd-service.c',
-+      'sdpd-database.c',
-+      'gatt-database.c',
-+      'sdp-xml.c',
-+      'sdp-client.c',
-+      'textfile.c',
-+      'uuid-helper.c',
-+      'plugin.c',
-+      'storage.c',
-+      'advertising.c',
-+      'agent.c',
-+      'bearer.c',
-+      'error.c',
-+      'adapter.c',
-+      'profile.c',
-+      'service.c',
-+      'gatt-client.c',
-+      'device.c',
-+      'dbus-common.c',
-+      'eir.c',
-+      'adv_monitor.c',
-+      'battery.c',
-+      'settings.c',
-+      'set.c' ],
-+    dependencies: [
-+      libbluetooth_internal_dep,
-+      libgdbus_internal_dep,
-+      libshared_glib_dep,
-+      backtrace_dep,
-+      glib_dep,
-+      dbus_dep,
-+      udevlib_dep,
-+      builtin_deps
-+    ],
-+    override_options: [ 'b_lundef=false' ],
-+    c_args: [
-+      '-DBLUETOOTH_PLUGIN_BUILTIN',
-+      '-DPLUGINDIR="@0@"'.format(plugindir),
-+      '-DSTORAGEDIR="@0@"'.format(storagedir),
-+      '-DCONFIGDIR="@0@"'.format(configdir)
-+    ],
-+    link_args: [ '-Wl,--gc-sections', external_plugins_link_args ],
-+    install: true,
-+    install_dir: pkglibexecdir
-   )
+ if ical_dep.found()
+-  tests2 += [
++  tests3 += [
+     [ 'test-gobex.c', 'util.c', gobex_sources ],
+     [ 'test-gobex-packet.c', 'util.c', gobex_sources ],
+     [ 'test-gobex-header.c', 'util.c', gobex_sources ],
+@@ -62,7 +81,7 @@ if ical_dep.found()
+   ]
  endif
--
--genbuiltin = find_program('genbuiltin')
--builtin_h = custom_target('src-builtin.h',
--  output: 'builtin.h',
--  capture: true,
--  command: [ genbuiltin, builtin_modules ]
--)
--
--executable('bluetoothd',
--  sources: [ builtin_sources,
--    attrib_sources,
--    btio_sources,
--    builtin_h,
--    'main.c',
--    'log.c',
--    'backtrace.c',
--    'rfkill.c',
--    'sdpd-server.c',
--    'sdpd-request.c',
--    'sdpd-service.c',
--    'sdpd-database.c',
--    'gatt-database.c',
--    'sdp-xml.c',
--    'sdp-client.c',
--    'textfile.c',
--    'uuid-helper.c',
--    'plugin.c',
--    'storage.c',
--    'advertising.c',
--    'agent.c',
--    'bearer.c',
--    'error.c',
--    'adapter.c',
--    'profile.c',
--    'service.c',
--    'gatt-client.c',
--    'device.c',
--    'dbus-common.c',
--    'eir.c',
--    'adv_monitor.c',
--    'battery.c',
--    'settings.c',
--    'set.c' ],
--  dependencies: [
--    libbluetooth_internal_dep,
--    libgdbus_internal_dep,
--    libshared_glib_dep,
--    backtrace_dep,
--    glib_dep,
--    dbus_dep,
--    udevlib_dep,
--    builtin_deps
--  ],
--  override_options: [ 'b_lundef=false' ],
--  c_args: [
--    '-DBLUETOOTH_PLUGIN_BUILTIN',
--    '-DPLUGINDIR="@0@"'.format(plugindir),
--    '-DSTORAGEDIR="@0@"'.format(storagedir),
--    '-DCONFIGDIR="@0@"'.format(configdir)
--  ],
--  link_args: [ '-Wl,--gc-sections', external_plugins_link_args ],
--  install: true,
--  install_dir: pkglibexecdir
--)
+ 
+-foreach t: tests2
++foreach t: tests3
+   test_name = t[0].substring(0, -2)
+   exe = executable(test_name,
+     sources: t,
+diff --git a/unit/unittest_list.sh b/unit/unittest_list.sh
+new file mode 100644
+index 000000000000..c478edc9d3e4
+--- /dev/null
++++ b/unit/unittest_list.sh
+@@ -0,0 +1,15 @@
++#!/bin/sh
++
++if [ $# -lt 1 ] ; then
++	echo "Usage: $0 FILE..."
++	exit 1
++fi
++
++TESTS=$(grep '^[[:space:]]*define_test[_a-z]*("' $* | cut -d \" -f 2 | cut -d " " -f 1)
++if [ -z "$TESTS" ] ; then
++	TESTS=$(grep '^[[:space:]]*tester_add("' $* | cut -d \" -f 2 | cut -d " " -f 1)
++fi
++if [ -z "$TESTS" ] ; then
++	TESTS=$(grep '^[[:space:]]*g_test_add_*func("' $* | cut -d \" -f 2 | cut -d " " -f 1)
++fi
++echo $TESTS
 -- 
 2.52.0
 
