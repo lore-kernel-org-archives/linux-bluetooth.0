@@ -1,70 +1,65 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from relay9-d.mail.gandi.net (relay9.mail.gandi.net [217.70.178.229])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06B930BBA5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 16:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951663093A8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 16:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769616016; cv=none; b=hHWZLetyBKXCgZsUHNtGvkyuUzbZxdER0bb4hniufrUFvG5K7Yf+5Dx6gXsz7TZat4DOU0EXwJaJjsr23idpxT2BpIv0r1SI57lcgF2ZuetxEcGxA3bfrHnQ0Ivr4Hoh98qj7FaGqkv1KNcMuc/oXfw7eqX3Rw3wD5IV1031Jq0=
+	t=1769616722; cv=none; b=YXoEBSLX8XBRGpRHaJwJ920rHSd4PdkX52BMchB2WJ7JbnqsBvehl2pMfGfcbuis/nopVaCU3AOdqkP4iKUlhIJICnIn+AOgwqqn+sx2EdSXQ2Zlv+T8JKdH0QcBE5sdP1hX6mNuDi6wHLrbHbXNB22lz8JuR2vDK6UmPYmo+wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769616016; c=relaxed/simple;
-	bh=uVVUFyqksOMHKRTTAMVXKnuwR/5m0lKD1egE7WsW0jQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Z5UxaSCRapidKUDu6lmmHj4AHtishSwyQ51r0DfdpL8hMQGVTcyxJIzQrx8kb7zke0JV6ma9XDKADbwNRHUTk4IlUbErZzqIAaP0SRQdz2zVUl6t77cypJBT1/1rtwQDM8Ck8TpAEsSbovOiOc1eSK/NazrNSLKvUO8mI/lcusU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lhtnTBj+; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lhtnTBj+"
-Received: from github.com (hubbernetes-node-d4e2d4e.ac4-iad.github.net [10.52.223.72])
-	by smtp.github.com (Postfix) with ESMTPA id C491F40136A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 08:00:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1769616013;
-	bh=lF1F/GyIycipwv0vEOJBQkakcZzyuzfCAFR1EP2QLcM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=lhtnTBj+HvMOJmtrn/F80EKsjDtC2z1SLUaf2uzQhe6CYmacHqrvgzIFkFJCFbFfg
-	 pO7ibKUJYgJoKZg72HG8HWZpZb3x3lDhFNXyDedJB64/C33u8hi+HtokciAfdIPgQI
-	 0D9OPQXnjG2g0/KNnsOff4eyzxI84ugHQH1cAKHE=
-Date: Wed, 28 Jan 2026 08:00:13 -0800
-From: Magdalena Trivina <noreply@github.com>
+	s=arc-20240116; t=1769616722; c=relaxed/simple;
+	bh=wQjU0hnRMH50v2d7L9dsSq5qgMGWYTv5I1O3dzNlnjU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XMk3NjqnPGrX+XaPxsFeZaW4Mf0/ZhNspFQQv8TQGutdzUUjZhwEa3inRob6E6LzBRyWaB6cp0EpAGYR7Z4VMF9Wj2FBiXVtEY3Tht2AvRaZ5dZbTj9u7te8bTEoNTt0l9ERQub5b7xQ8fk27QjnHOsiz47ZWeZL0vygQO5HRVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by relay9-d.mail.gandi.net (Postfix) with ESMTP id 7D52444C15
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 16:55:59 +0100 (CET)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 56E5B44007
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 15:55:59 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1048150/000000-d8aa72@github.com>
-Subject: [bluez/bluez] d8aa72: tools/sdptool: report error when local SDP
- server ...
+Subject: [PATCH BlueZ v6 10/20] tools: Install btmgmt along with other tools
+Date: Wed, 28 Jan 2026 16:11:48 +0100
+Message-ID: <20260128155548.2025252-11-hadess@hadess.net>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260128155548.2025252-1-hadess@hadess.net>
+References: <20260128155548.2025252-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-Score: 300
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieefjeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecundevohgrshhtrghlucdlfedttddmnecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeeuueeuieefgfeiudeiteduvdduffeihfetjedvtdevfeejudejveduieevgefgjeenucffohhmrghinhepmhgvshhonhdrsghuihhlugenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeehiefgheeugeegtddtjedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-State: spam:medium
 
-  Branch: refs/heads/1048150
-  Home:   https://github.com/bluez/bluez
-  Commit: d8aa72c79fa742245eedd92ac39191aa414486be
-      https://github.com/bluez/bluez/commit/d8aa72c79fa742245eedd92ac39191aa414486be
-  Author: Magdalena Trivina <trivin2024@gmail.com>
-  Date:   2026-01-28 (Wed, 28 Jan 2026)
+btmgmt is not installed by default, but it is useful for debugging
+some issues and to set the MAC address on HCIs which don't have their
+MAC address configured.
+---
+ tools/meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  Changed paths:
-    M tools/sdptool.c
+diff --git a/tools/meson.build b/tools/meson.build
+index 63ae1363972e..40215df691b7 100644
+--- a/tools/meson.build
++++ b/tools/meson.build
+@@ -160,7 +160,8 @@ if get_option('tools').enabled()
+   if readline_dep.found()
+     executable('btmgmt',
+       sources: [ 'btmgmt.c', '../src/uuid-helper.c', '../client/display.c', '../client/mgmt.c' ],
+-      dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep, readline_dep ]
++      dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep, readline_dep ],
++      install: true
+     )
+     executable('obex-client-tool',
+       sources: [ 'obex-client-tool.c', gobex_sources, btio_sources ],
+-- 
+2.52.0
 
-  Log Message:
-  -----------
-  tools/sdptool: report error when local SDP server is not found
-
-Currently, the sdptool add, setattr and setseq commands do not
-report any error when the local SDP server is unavailable.
-
-Add an explicit error message so users can distinguish between
-successful execution and failure due to a missing local server.
-
-Signed-off-by: Magdalena Trivina Sihotang <trivin2024@gmail.com>
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
