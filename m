@@ -1,192 +1,118 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A84127815D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 04:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4427B34D93C;
+	Wed, 28 Jan 2026 09:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769572995; cv=none; b=E0Ly/sMcZPhiyGVNmW7WlAB+ZD55ge+wC7yph7OnHJ4iBqNMRh4TLORKxViKfA25OeY39oiPgJ1YHfqbwWBYnB4aqMiIjpGCmnQbQd2lQXb39iOOXlDLtpV1ptOKYxAf+oK0Set0ZMXer4x0OBzLpycJiTqQIBfB6txOXdK2CKE=
+	t=1769594161; cv=none; b=Tw/a5TQJ6a1r1bFbYgp/G16usdIBGi3bq1hF9IqJkAz0HiVgZI7gdeayjWePaKhua2XK+fAeGXrwelK8Ciy9Was8eCC6vj74BFraDe0j1rsPVl47a3z/vJ3QWzmgXvoFZ8zOH2XP/qm7rDQSMh6MWZtPbKX1shMSuQDDm+J+hz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769572995; c=relaxed/simple;
-	bh=kB8xsjBTb/gFKpjEArBn86GeVi12fURxDbiZebCBmFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DNJCGROijF2Ycn69xNw3t184cbTbeCfYrndtfu69OOLFQZsXF7Hg65GVOZX0Mkb5HubjxoNhRmyN7s3YRb1FNASPrfvVXeLjf/CSjpU3UEmSwsLcqwUQdvJ7eGkbRefTLQv8h+7zejxMHH6qvsiL9yXQp6G28jfmzKfdU3UUS0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Vdr9VO0s; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=AjPgLQfz; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1769594161; c=relaxed/simple;
+	bh=yk1FIvyoEPqAhkl2kx8p28tmn8zn2oKyb6WJYkA9S5o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=neNRR0qW9/M7DIlKKVs94htckoDxFSWC7TpQOpe7xuEGU4vX1qS6NLpvLdf5KDilABVzs+mPWuuyLbVmREBVNVzLhlPvmzD5R6iXSZOJaow/HQc9wfJCd7H/Ak5HfiRDKHhOjizYV3trTMmC/fJrfHyW2bs9B27mvbiC8o5oJew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TxnPgQqS; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mrXzxxt0; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Vdr9VO0s";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="AjPgLQfz"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60S25CnF1714655
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 04:03:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	MUoswFlJ+yiIr8sXirOxgbmRv5wfMSzY+cd2zV55w+o=; b=Vdr9VO0sywE/pNOl
-	cvkUInN2H/mY+ukQm+6Te9BjAS9eIS6Clv94KXYjt80lk8CESFHoi+tAuzd44KFF
-	VZyO+qJcIqwkl/Ss03/kVgfVyc8WZgOOF8KiqsDUIHA1kpgvXAcjTqKbFzdpd/XD
-	ZrlM3PDxGbrmVVYZjkZtApcpO5THE/FyXZAfEwXvpF0Dv/OXxf9lsjifLue+s1kF
-	s2QS78uBaSscwvHcDnbDUOYbnLrMkHP3U3S+FAnndVEeP2kO4FpqB69nFZU2MlL2
-	G3d0YecyOCG7SYawKbZskcVy6VgS0dU4HYFmJTRy7Zzx8UlMJEEe97fVTg5ovmX7
-	Fc2R4g==
-Received: from mail-dy1-f197.google.com (mail-dy1-f197.google.com [74.125.82.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4by0g0a646-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jan 2026 04:03:13 +0000 (GMT)
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-2b71c5826fbso7016548eec.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jan 2026 20:03:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1769572992; x=1770177792; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MUoswFlJ+yiIr8sXirOxgbmRv5wfMSzY+cd2zV55w+o=;
-        b=AjPgLQfzp+wg7nGNRZZVjOdc80e3+c3KjneAHSAcPhxmoXIKCYud0r8Q54N4PmeYlW
-         5NifFYN/YpDNkvQas2J0cemBeu2LH4VNfcrfBEhEk6EkzNuM6FAsYlKcDXeSRDo1CZl0
-         V1G1AjmzDBVkRWW/01CEtmOcPpZUhSZxppPYD0+aKOu+Afysy91ZUGB/xCBznfy5g+sv
-         Yq7mFmREE68jQm6RMxKRYwhUcwZcVg4EjBTwTh7ODKlZoElVxHPdIpN7KmFa9Ivlyhbn
-         wk7ZwFCvRmU6dh/UVZdp7k10HZT/hbiB1z7W3+tdDvtMrJ0+w2UzyuR+lLHfzFE4mRu/
-         JKyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769572992; x=1770177792;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MUoswFlJ+yiIr8sXirOxgbmRv5wfMSzY+cd2zV55w+o=;
-        b=iAn8Rx0L3PMY9oi1z73psxqwNmYPH1uEeXpXT4w5hEOs3HIVDkKtX715zn5fOs4pT2
-         NivVSzgxu1p/Uj29yXit1SE6FLtoIlhtuq7azfM1EVicOOeO9I3SIh5YIXDdhr7r2Kgd
-         fyTxL1XfSPd24kX1Q4vew7iGUw+Cr3h1GUc17oIhpKI43nzLTSbKynGHcvdfZkHfsbif
-         tQCj8lCDalFbCR39pF2HzjoLnzzfiAHZZfjgPy5pQF7KAywy9npNc1OkQmHQJmHHgFHO
-         Hj08g5He4v8OiB1BjKUAOX7BrnucQjSgFGVWfi8bsqsMmXRg92Y/ThmVW12KELWFWZsK
-         Mggw==
-X-Forwarded-Encrypted: i=1; AJvYcCXExvMlqINCRy880wEcN3umIMYEB6n+kpEOoUPiM0wOf2bvp/0kgSQ9Bf92eWyiZSBkIUVooA/vZS3KDyG130o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEDfPFKU4X3eztftWvOvOBjqAokAMl1sP1d2OAOHE9cCBfOp5z
-	eZrkXWYp1c5RFuE4hPDZbZN45QrpTVoFnG+8ao5ThBoxrRLx8YQRTObmoQHM73YQ+QzIAB4zax9
-	9AAZPL3WrK/obk6PH9+3d+ukXqjfz5SoWGMjq+b5YVsHaTFhDw9EYRXoFjtIiB4hrWBP/B38=
-X-Gm-Gg: AZuq6aJBbQ8+9Dx2HnkVAInha1TWP8JbiXzjl2I5/A+fh/BILxu1rVPjYi52RaWiI+z
-	HAVc1N/gV0iFlk2umBdf6ZRAW06ZSTj57lTZsDaQsyP0udRe47ixQzAozWVUSY75Nfummr9d4C7
-	MVxADiLBGLUN8W5qGSiQZFPDN8JFVFWSqJKq7i0CiqDxdr85X9voPcPTB/HjK1fkwbYQ46nR/qJ
-	XXXwlLtss8dcvUj/BEr/p/GHKoHX5MRtxYmOmEw1G/TQzz/Y3BFm5hOJbuZTk68zQrg0NbMt7gT
-	Z2w/b+RuFoFLqINfFEoTEF9hZ/P2MKyH7ByKoW7QLqVPw/qND7Shk0kemwGZS0QZeSGipTHz/ry
-	kJjEkho/qVPJQScUrE5LPjtHsziM190k2Emei574i2eaDoxVzQ0fuFNXLb50KJwy6
-X-Received: by 2002:a05:7300:8c9f:b0:2ab:ca55:89c6 with SMTP id 5a478bee46e88-2b78da3eea0mr2595606eec.41.1769572991950;
-        Tue, 27 Jan 2026 20:03:11 -0800 (PST)
-X-Received: by 2002:a05:7300:8c9f:b0:2ab:ca55:89c6 with SMTP id 5a478bee46e88-2b78da3eea0mr2595561eec.41.1769572991167;
-        Tue, 27 Jan 2026 20:03:11 -0800 (PST)
-Received: from [10.110.57.207] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1af88c4sm976319eec.31.2026.01.27.20.03.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jan 2026 20:03:10 -0800 (PST)
-Message-ID: <a1f8d7f5-8a32-4d27-869b-4ef2c18250c3@oss.qualcomm.com>
-Date: Wed, 28 Jan 2026 12:03:06 +0800
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TxnPgQqS";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mrXzxxt0"
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1769594159;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vGFJMl/POgeIcIQDzxkyyJOUi9lJfcsim0vwE3YsQR4=;
+	b=TxnPgQqSTTn+rJ2WUCqR7N3+WJBA4py4P43Q/Tybyda7vMOvfkNFhKr1V9oPz42ejAd36x
+	2hKAaoKNXJsYfw6X6T8tP8cU2MhYtdP+GPQwVdLz0UKXdhgeAQAkM/yQSQo4On4fHYTtYA
+	SST8yILLFCbJg6bGHT6xYfTEV32/flco8zLEgWmtSH7xZ3p2nhMadD4z2LeJoJzfF6yqOb
+	Fr3jBDeU9axYkeSfcNRi0rv0YHOTJ9LNC4f9Nn7y6vOyUWszMNwMw1kMI00DTwkTsTUHHh
+	nwETpMxIivtX9V6jHzinNtNjJxCeFhJ4/Sweh9s9Vqtrqp94rBP42sZNTQm/pg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1769594159;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vGFJMl/POgeIcIQDzxkyyJOUi9lJfcsim0vwE3YsQR4=;
+	b=mrXzxxt0i2k1TS7oIa61AYNPY5GLxhF7IgFZbEctXGQGxOhUvmq+nD2lWc09CfAsBqXS2n
+	v29H52CiRI1cSQCg==
+To: linux-kernel@vger.kernel.org
+Cc: "Thomas Gleixner" <tglx@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 06/20] Bluetooth: btintel_pcie: Use IRQF_ONESHOT and default primary handler
+Date: Wed, 28 Jan 2026 10:55:26 +0100
+Message-ID: <20260128095540.863589-7-bigeasy@linutronix.de>
+In-Reply-To: <20260128095540.863589-1-bigeasy@linutronix.de>
+References: <20260128095540.863589-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] Bluetooth: hci_qca: Enable HFP hardware offload
- for WCN6855
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>, linux-arm-msm@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        shuai.zhang@oss.qualcomm.com, cheng.jiang@oss.qualcomm.com,
-        chezhou@qti.qualcomm.com, wei.deng@oss.qualcomm.com,
-        yiboz@qti.qualcomm.com
-References: <20260126162444.4194293-1-mengshi.wu@oss.qualcomm.com>
- <20260126162444.4194293-3-mengshi.wu@oss.qualcomm.com>
- <kej5u2hjxjtfdzmgtebns3amz7gmb5d2nciy45jsyglkprgh6s@kt6fodrc3oll>
- <7b9fec28-2272-4ff7-9575-76e72cecada5@oss.qualcomm.com>
- <l2ib5kalse4nop6e6ak5xronejxusnprl4qgz2wxvdw7wpzw6e@aa6fn35id4we>
- <CABBYNZL-J3-kcrN-B_1yXci+nw8zjgiiD_YFH0i4xeRNvY_Jrw@mail.gmail.com>
-Content-Language: en-US
-From: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-In-Reply-To: <CABBYNZL-J3-kcrN-B_1yXci+nw8zjgiiD_YFH0i4xeRNvY_Jrw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: qk9C3Q2nYZhDlTUvthZncaWUYNNR4yhf
-X-Proofpoint-GUID: qk9C3Q2nYZhDlTUvthZncaWUYNNR4yhf
-X-Authority-Analysis: v=2.4 cv=UPXQ3Sfy c=1 sm=1 tr=0 ts=69798a81 cx=c_pps
- a=Uww141gWH0fZj/3QKPojxA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=jLO2Fxiw5Y3_fRslxeUA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=PxkB5W3o20Ba91AHUih5:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDAyOSBTYWx0ZWRfXxIGfxMHUPj3v
- //oUsYv0ODUzeT23qeJh+yHwt7ZKA5NqxoTePDxO9saXAnDP9ilqJ86T0905o9cGernZghDn1E/
- 44BItp0x93B3wDnifccPEQJ1e1M6JKjKbVWlBjqMirjtlCzWjaWBblGljiTuB6ww9Tl6RuCVbqq
- VU0E+yvwT0n/+iz3ogYLGgniJq8yTJ5L6gdWlDitUwFqyQSovtbiMqbh6eIAgP5TLsDumfOMaxq
- oFxeNHU+kIUo+LGorZXrfnLYbcB8UgsgYBJFX7XHxlhXMc9T+l89u73O3a2ekr/ZeR9ONpnLJeo
- 21g+r8INHM8c7hSTiVslwjgcBR9SHSAau16dOkhEl5w1FtvWFnnZmZibE7fCELwMq51TYrN77nk
- Xq9liN9TbmGri+bhwcDDYtZBzrQmXWj+ksFNTnziAPfQWJXbAK7U/WP0c+IAajRj4PedELh6USf
- mktmhrmLfvKFSgxOy+A==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-27_05,2026-01-27_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
- suspectscore=0 spamscore=0 adultscore=0 impostorscore=0 bulkscore=0
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2601280029
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+There is no added value in btintel_pcie_msix_isr() compared to
+irq_default_primary_handler().
+Using a threaded interrupt without a dedicated primary handler mandates
+the IRQF_ONESHOT flag to mask the interrupt source while the threaded
+handler is active. Otherwise the interrupt can fire again before the
+threaded handler had a chance to run.
 
-On 1/27/2026 11:47 PM, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Tue, Jan 27, 2026 at 10:06 AM Dmitry Baryshkov
-> <dmitry.baryshkov@oss.qualcomm.com> wrote:
->>
->> On Tue, Jan 27, 2026 at 10:32:58AM +0800, Mengshi Wu wrote:
->>>
->>>
->>> On 1/27/2026 1:51 AM, Dmitry Baryshkov wrote:
->>>> On Tue, Jan 27, 2026 at 12:24:44AM +0800, Mengshi Wu wrote:
->>>>> Add QCA_CAP_HFP_HW_OFFLOAD capability flag to WCN6855 device
->>>>> data structures to enable Hands-Free Profile (HFP) hardware
->>>>> offload support on these Qualcomm Bluetooth chipsets.
->>>>>
->>>>> Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
->>>>> ---
->>>>>  drivers/bluetooth/hci_qca.c | 3 ++-
->>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>
->>>>
->>>> Any other chips which would benefit from this flag? If you are setting
->>>> it for WCN6855, I'd assume that it also applies to WCN7850. Should it be
->>>> set for WCN6750?
->>>>
->>>
->>> Thanks for the reminder. This should also apply to WCN7850. WCN6750 is not
->>> considered at this time.
->>
->> What does it mean? It either supports HFP ofload, or not. Does it?
-> 
-> Or does that mean offload is considered the default over HCI, and in
-> that case does it actually work with the likes of Linux
-> distros/Pipewire or it is Android only? The fact that it is mentioning
-> HFP rather than SCO is already concerning to me, the kernel driver
-> shouldn't be involved with profile layers other than core.
-> 
-> 
+Use the default primary interrupt handler by specifying NULL and set
+IRQF_ONESHOT so the interrupt source is masked until the secondary
+handler is done.
 
-Offload over HCI is the default way in most cases, but I don't mean it
-here. Offload over non-HCI ways (such as I2S, Slimbus) need other supports
-from software aspect, but these supports are not ready for other chips yet.
+Fixes: c2b636b3f788d ("Bluetooth: btintel_pcie: Add support for PCIe transp=
+ort")
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+---
+ drivers/bluetooth/btintel_pcie.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-I use HFP because I noticed that it was used before, like qca_configure_hfp_offload().
-Should I change to use SCO if HFP is not proper here?
-
->>
->> --
->> With best wishes
->> Dmitry
-> 
-> 
-> 
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_p=
+cie.c
+index 2936b535479f2..704767b334b98 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -1431,11 +1431,6 @@ static void btintel_pcie_msix_rx_handle(struct btint=
+el_pcie_data *data)
+ 	}
+ }
+=20
+-static irqreturn_t btintel_pcie_msix_isr(int irq, void *data)
+-{
+-	return IRQ_WAKE_THREAD;
+-}
+-
+ static inline bool btintel_pcie_is_rxq_empty(struct btintel_pcie_data *dat=
+a)
+ {
+ 	return data->ia.cr_hia[BTINTEL_PCIE_RXQ_NUM] =3D=3D data->ia.cr_tia[BTINT=
+EL_PCIE_RXQ_NUM];
+@@ -1537,9 +1532,9 @@ static int btintel_pcie_setup_irq(struct btintel_pcie=
+_data *data)
+=20
+ 		err =3D devm_request_threaded_irq(&data->pdev->dev,
+ 						msix_entry->vector,
+-						btintel_pcie_msix_isr,
++						NULL,
+ 						btintel_pcie_irq_msix_handler,
+-						IRQF_SHARED,
++						IRQF_ONESHOT | IRQF_SHARED,
+ 						KBUILD_MODNAME,
+ 						msix_entry);
+ 		if (err) {
+--=20
+2.51.0
 
