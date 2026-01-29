@@ -1,228 +1,66 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1151B357735
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 20:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EAE374743
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 23:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769718983; cv=none; b=d06eQCOf7qUJzvOVJZc7xpxl12xF6JJAXrDsz/f8f8JZA/xxfflTs51wDOoiy53+PVMNmf8JguKPXP58j58MDGdl7NePt/C4mwleco1P/kTsnpGvIsAWU3xM38SuwT1jSt5ihOMMiFbzgHaWuEwY47bo8xwvmJtJFmX4c/e/+SE=
+	t=1769728405; cv=none; b=AvhjIdAaqBI/NPny8+v35Q7opf+YMv8LLKscLTQEvpZWZL+aWus/CwhKfG0CTM2ZAB69IVSW7SMQi8ulJ4UkULHpvlVtVVvM5TRzguEMgFr/XbqzwaBcrMgM2WszO9B3yB77zNlV5mc4BCJE2Xbs1Uen6To1vO7avjCiWq5/aNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769718983; c=relaxed/simple;
-	bh=mCZT6iNg7gKMzkLtsEj0LIQjLlTWczs7QUPdYdsbPHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pZDPWY1AM9dm3miM2GxyMut8DCvEg93P4TTNpGJkZMjXW/vnqouTQa6syZcIN9zKk4ZJu4pBTT8WxxT/zIk4PyvAL2J2LRQIwtidOFW/kxjo16jUrkJhAYCfBnv41KvDZI2z3xvQRjamxPGwfwrniEhQQia6Z8L2Gn0ZQsxCt+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bi5aJQtg; arc=none smtp.client-ip=209.85.217.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1769728405; c=relaxed/simple;
+	bh=kQadUWDM7dTnM9z/Zc3WgYMtjj4lbXhsUBUtHQp3G3A=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=bwfmpbQFobAmVwPYaej2cbw6cklbvH0j+6vkh+kCTrjcG9it26vMWYpI0tvSlB6oWaNQBRy923eE8hdZifJquINPYSiugM1+ciN0fR7Fv6XY9kQBZoTh+xJ8lhg8jJD1llQLz1k/Q8PBZUkxHJbEnjjeMZVkDR8ty83JD/uUglQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FN4pLSUk; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bi5aJQtg"
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-5ef5c04151dso505898137.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 12:36:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769718981; x=1770323781; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gU28sCIPntBEZxaakUuTOfrt7q3mPeeicSw0ouXxbFQ=;
-        b=Bi5aJQtg5Jzeq3t8148xIp9RewrsVUQUruKF+4Op4UsWDrIjJRlZWCwqtZeyD3cJ1w
-         RXaVdK0VR8RrvmhrGIeao08IJ9n2pq4M2J6e8UfJvSmVVZweLnDIHNdSGo9K3TETrTTW
-         tA6uAcqwDDaZX1K0uIILbdLQbJMUzQCOkrNhr+8HCEPieICJwvR5wOCVy2z149nYmJdA
-         Rse4HqD/RO9GgxxxbREMlS6aVN732FOTkra1e6ZI8hueWD1oqiMHW1XkHV4EnpQwf8xx
-         j4MsCUrXkSFhBmqkqafU6fpeLLpKP2HIfGyf/jBQeug1XSVGpEEEC7B1P04i6LVR8/EK
-         EyOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769718981; x=1770323781;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gU28sCIPntBEZxaakUuTOfrt7q3mPeeicSw0ouXxbFQ=;
-        b=uLcfDQySXToMVKuju0JK5YzVla1L97FHW2lpJ0Z9Du62C0NW2kFb+LFRcfGGBwF8G7
-         c+0iKqOU6+ctOIUroWFl9ABXWD88EmTjPysNwOX11S5r2VuYT+ZFUAM+xOAPZaD3XwuD
-         qWYtZPBR8brcUum+8w774AuuKQDYo2QbiFxrPQWd31a3x3kt7nsnSkgNfhlOla7QTfE3
-         n9KGFBSiwuRWzHcrnEvF2DRiK/V5HNJVUA14JH27coKgU9kS1WxZrKLC95jNB+tPzZXM
-         ryt0OTH/HOtZBcmhGkRKhaQQK1111gj9oJJMZIcJJz2SfQaie87DG7e8lh2Pd8TKc6KX
-         seJg==
-X-Gm-Message-State: AOJu0YxXKoPXMr2FkVIZtDubmJYyBGztiTGS8Sy6k8VjkgBOkTI9I2EE
-	zS6WDokU9pLac4NL2aoR6Z1GT9ox0ALHUFbmeCw0mSrl53y/EXJCj1sR
-X-Gm-Gg: AZuq6aIV6tlUCSGvzQD3OmVChSRyIcP1GpbpMia26xt+H1Ee9mRBjHL9lESM+nL9fg5
-	86uDz0alsbsLtHAy0dxOmveUW7AbyCRWA5mIkL0CUHa4zgPotThyzKQEF35P7GUASz9C5hxJXIS
-	wfNTL7g4LSJNZfhjPv95B/IA8K/Td7uZg10GRoN8RoySuH2jVzcJOn6HVR9syY7f4Vomg6ZOAc5
-	WwhiNUXgWWbDTwp+U+2QS39w8SXC36meQrwN40EsrhwNq7BaIMspjVg22JXM0HE7rvGZMQf7quD
-	9kPQolry2bAK28rIE41whLFyUNbAs8KTfwNzQ/byS96AWCQQuKPArioHmrqPwqfJ53I5/wKXew/
-	u1c2tMUUaLBbhZuJ4DN8usOZpbSj72OunQwhMz4PDD1h8ec8VybR72N+spTupI5+HPihTk2Z1ia
-	QTsUJvVCAcZLoxmWrLBrrlxc69o9+N/MCdt0CXdN+RH2BjE/Q3ZbcexJJbrvJq3wHeqLr1S7SJs
-	Y1AsQ==
-X-Received: by 2002:a05:6102:370d:b0:5dd:f9c2:551c with SMTP id ada2fe7eead31-5f8e26c2e8cmr233627137.27.1769718980753;
-        Thu, 29 Jan 2026 12:36:20 -0800 (PST)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5f734c8ed1esm1438279137.6.2026.01.29.12.36.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 12:36:20 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth-next 2026-01-29
-Date: Thu, 29 Jan 2026 15:36:09 -0500
-Message-ID: <20260129203610.963067-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FN4pLSUk"
+Received: from github.com (hubbernetes-node-ba83afb.ash1-iad.github.net [10.56.130.38])
+	by smtp.github.com (Postfix) with ESMTPA id C91526005D3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 15:13:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1769728403;
+	bh=DCg5WMNiqmLbiJF5KevwffqtKHyGsySjbR/CHSAqZdY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=FN4pLSUkxp4GblMDaH8C/tAQwnV9s4VCi0GP66YMdjdQMzn2zZYoR4BAB8tPi/fox
+	 urKLDgubEOOKIkh3Oz7Tsi1jPkP42GTPdO+/zP/30tDJ5rxlG5lMrl+h4dBmQ+x+Fr
+	 9OQg3oGPGPOSzTnA4X0srb2nFho0CQ4C3GIRbLF0=
+Date: Thu, 29 Jan 2026 15:13:23 -0800
+From: Paul Otto <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/ebb331-358ab8@github.com>
+Subject: [bluez/bluez] 358ab8: client: Expand GATT submenu documentation
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-The following changes since commit e75e408dc524ba32b3bd66e89d2ba1e337877bfa:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 358ab8994207ddbe601631dcf0725a939030463e
+      https://github.com/bluez/bluez/commit/358ab8994207ddbe601631dcf0725a939030463e
+  Author: Paul Otto <potto@ieee.org>
+  Date:   2026-01-29 (Thu, 29 Jan 2026)
 
-  Merge tag 'nf-next-26-01-29' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next (2026-01-29 14:56:13 +0100)
+  Changed paths:
+    M doc/bluetoothctl-gatt.rst
 
-are available in the Git repository at:
+  Log Message:
+  -----------
+  client: Expand GATT submenu documentation
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2026-01-29
+From:
+https://github.com/potto216/bluez/blob/master/client/bluetoothctl-gatt.rst
 
-for you to fetch changes up to eba86d86eec8428bd743523ec76932838e0b30f7:
+Closes: https://github.com/bluez/bluez/issues/747
 
-  Bluetooth: hci_qca: Enable HFP hardware offload for WCN6855 and WCN7850 (2026-01-29 13:37:44 -0500)
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
 
-core:
- - L2CAP: Add support for setting BT_PHY
- - HCI: Add LE Channel Sounding HCI Command/event structures
- - hci_conn: Set link_policy on incoming ACL connections
- - MGMT: Add idle_timeout to configurable system parameters
-
-drivers:
- - btusb: Add support for MediaTek7920 0489:e158
- - btusb: Add device ID for Realtek RTL8761BU
- - btusb: Reject autosuspend if discovery is active
- - btusb: Add new VID/PID for RTL8852CE
- - btusb: Add USB ID 0489:e112 for Realtek 8851BE
- - dt-bindings: qcom: Split to separate schema
- - btqca: Add WCN6855 firmware priority selection feature
-
-----------------------------------------------------------------
-Bastien Nocera (3):
-      Bluetooth: btusb: Use pm_ptr instead of #ifdef CONFIG_PM
-      Bluetooth: btnxpuart: Remove unneeded CONFIG_PM ifdef
-      Bluetooth: btintel: Remove unneeded CONFIG_PM* #ifdef's
-
-Bluecross (1):
-      Bluetooth: btusb: Add support for MediaTek7920 0489:e158
-
-Chen Ni (1):
-      Bluetooth: btintel_pcie: Remove unnecessary check before kfree_skb()
-
-Jacopo Scannella (1):
-      Bluetooth: btusb: Add device ID for Realtek RTL8761BU
-
-Jia-Hong Su (1):
-      Bluetooth: hci_uart: fix null-ptr-deref in hci_uart_write_work
-
-Jianpeng Chang (1):
-      Bluetooth: MGMT: Fix memory leak in set_ssp_complete
-
-Krzysztof Kozlowski (11):
-      dt-bindings: bluetooth: qcom,qca2066-bt: Split to separate schema
-      dt-bindings: bluetooth: qcom,qca9377-bt: Split to separate schema
-      dt-bindings: bluetooth: qcom,qca6390-bt: Split to separate schema
-      dt-bindings: bluetooth: qcom,wcn3950-bt: Split to separate schema
-      dt-bindings: bluetooth: qcom,wcn3990-bt: Split to separate schema
-      dt-bindings: bluetooth: qcom,wcn6750-bt: Split to separate schema
-      dt-bindings: bluetooth: qcom,wcn6750-bt: Deprecate old supplies
-      dt-bindings: bluetooth: qcom,wcn6855-bt: Split to separate schema
-      dt-bindings: bluetooth: qcom,wcn6855-bt: Deprecate old supplies
-      dt-bindings: bluetooth: qcom,wcn7850-bt: Split to separate schema
-      dt-bindings: bluetooth: qcom,wcn7850-bt: Deprecate old supplies
-
-Linmao Li (3):
-      Bluetooth: hci_core: Export hci_discovery_active
-      Bluetooth: btusb: Reject autosuspend if discovery is active
-      Bluetooth: btusb: Remove duplicate entry for 0x13d3/0x3618
-
-Luiz Augusto von Dentz (4):
-      Bluetooth: hci_conn: Fix using conn->le_{tx,rx}_phy as supported PHYs
-      Bluetooth: L2CAP: Add support for setting BT_PHY
-      Bluetooth: Fix using PHYs bitfields as PHY value
-      Bluetooth: L2CAP: Fix not tracking outstanding TX ident
-
-Mengshi Wu (2):
-      Bluetooth: hci_qca: Refactor HFP hardware offload capability handling
-      Bluetooth: hci_qca: Enable HFP hardware offload for WCN6855 and WCN7850
-
-Naga Bhavani Akella (1):
-      Bluetooth: hci_sync: Add LE Channel Sounding HCI Command/event structures
-
-Shell Chen (1):
-      Bluetooth: btusb: Add new VID/PID for RTL8852CE
-
-Shuai Zhang (3):
-      Bluetooth: hci_qca: Fix SSR (SubSystem Restart) fail when BT_EN is pulled up by hw
-      Bluetooth: btqca: move WCN7850 workaround to the caller
-      Bluetooth: btqca: Add WCN6855 firmware priority selection feature
-
-Stefan Sørensen (3):
-      Bluetooth: hci_conn: use mod_delayed_work for active mode timeout
-      Bluetooth: hci_conn: Set link_policy on incoming ACL connections
-      Bluetooth: mgmt: Add idle_timeout to configurable system parameters
-
-Techie Ernie (1):
-      Bluetooth: btusb: Add USB ID 0489:e112 for Realtek 8851BE
-
-Uwe Kleine-König (1):
-      Bluetooth: btmtksdio: Use pm_ptr instead of #ifdef CONFIG_PM
-
-Vaibhav Gupta (1):
-      Bluetooth: hci_bcm4377: Use generic power management
-
-Zenm Chen (1):
-      Bluetooth: btusb: Add USB ID 7392:e611 for Edimax EW-7611UXB
-
- .../net/bluetooth/qcom,bluetooth-common.yaml       |  25 ++
- .../bindings/net/bluetooth/qcom,qca2066-bt.yaml    |  49 +++
- .../bindings/net/bluetooth/qcom,qca6390-bt.yaml    |  64 ++++
- .../bindings/net/bluetooth/qcom,qca9377-bt.yaml    |  58 ++++
- .../bindings/net/bluetooth/qcom,wcn3950-bt.yaml    |  67 ++++
- .../bindings/net/bluetooth/qcom,wcn3990-bt.yaml    |  66 ++++
- .../bindings/net/bluetooth/qcom,wcn6750-bt.yaml    |  91 ++++++
- .../bindings/net/bluetooth/qcom,wcn6855-bt.yaml    |  99 ++++++
- .../bindings/net/bluetooth/qcom,wcn7850-bt.yaml    |  94 ++++++
- .../bindings/net/bluetooth/qualcomm-bluetooth.yaml | 259 ----------------
- MAINTAINERS                                        |   1 +
- drivers/bluetooth/btintel_pcie.c                   |   3 +-
- drivers/bluetooth/btmtksdio.c                      |   8 +-
- drivers/bluetooth/btnxpuart.c                      |   6 +-
- drivers/bluetooth/btqca.c                          |  58 ++--
- drivers/bluetooth/btusb.c                          |  26 +-
- drivers/bluetooth/hci_bcm4377.c                    |  11 +-
- drivers/bluetooth/hci_intel.c                      |  10 +-
- drivers/bluetooth/hci_ldisc.c                      |   4 +-
- drivers/bluetooth/hci_qca.c                        |  52 +++-
- include/net/bluetooth/bluetooth.h                  |  47 +--
- include/net/bluetooth/hci.h                        | 336 ++++++++++++++++++++-
- include/net/bluetooth/hci_core.h                   |   9 +
- include/net/bluetooth/hci_sync.h                   |   3 +
- include/net/bluetooth/l2cap.h                      |   3 +-
- net/bluetooth/hci_conn.c                           | 162 ++++++++--
- net/bluetooth/hci_core.c                           |   1 +
- net/bluetooth/hci_event.c                          |  79 ++++-
- net/bluetooth/hci_sync.c                           | 125 +++++++-
- net/bluetooth/iso.c                                |  10 +-
- net/bluetooth/l2cap_core.c                         |  46 ++-
- net/bluetooth/l2cap_sock.c                         |  20 +-
- net/bluetooth/mgmt.c                               |   3 +
- net/bluetooth/mgmt_config.c                        |  21 ++
- 34 files changed, 1503 insertions(+), 413 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,bluetooth-common.yaml
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,qca2066-bt.yaml
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,qca6390-bt.yaml
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,qca9377-bt.yaml
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,wcn3950-bt.yaml
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,wcn3990-bt.yaml
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6750-bt.yaml
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,wcn7850-bt.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
