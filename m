@@ -1,68 +1,138 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0379337BAB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 15:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8258F326D53;
+	Thu, 29 Jan 2026 16:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769702245; cv=none; b=GGCvdLxpPJxtvZn1xP8qBTljBjhHEYNnAfqi61m/sxrWBuCaXelN1DnwQ8FzGr2Wpp+Z6AL7mBudEqEjDVCXTAUgcGlrtYkkv6Am8mEpxrOvcj8XOqwau4tcGDPdB+ZZpQQqF75vFQwoDyp2LtaaUaqCva9C//dCSkaKFY9fq9g=
+	t=1769703513; cv=none; b=tkarn/GPUSKrZCBxQ7K5qKfu/LFYzo+uGqV4K8fs8Cw86QPUHHNgrUjQUzhouxlFr4dfxG+qNEgXBVndY7vTmvfb8QFA/tP/MRnoAL7hfZ5H9mtYe2kf8crChg4VeZiSNz9cYteJk+VQHFsDv7751RHKj5A1lIWue9Utlj8SgbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769702245; c=relaxed/simple;
-	bh=sYxFq6CR1qcUrczJ3fj1/wLVn2Vq12RBPPtXgLaRK9Q=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=aJEQ8suZ9QPJj9DIZXE1XRJgQxFKRYa6XJ0QYLPal9EjfKluEYh3v9evzMt5cO3bmI2QGsommEo0aULaKO+GFBmVEB2WHT9L99zFxdCw7MTSFLwKIvEOkPKNIejGeRvNwZjeG+CtGEmQ2/90GZj5MsRMG3ai8JlvijQf5y+EYsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=UixhG/o7; arc=none smtp.client-ip=192.30.252.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="UixhG/o7"
-Received: from github.com (hubbernetes-node-1789f09.ash1-iad.github.net [10.56.131.46])
-	by smtp.github.com (Postfix) with ESMTPA id 0AD776003B6
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 07:57:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1769702243;
-	bh=l3+h0P5pvKCYJlIUIdWzvvk1j0Cm78EZL1Tk/tjCKj8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=UixhG/o7CYwAKCVQ+0WPXeeoiWzvbcP02EtCHgpFlQ7HA+piGR2KezzPXDox0uei6
-	 YKW+/tXUxmuNf5eSnY4ECTW5G5xMpMMrlRztExNY9sBSw5s2g+BQMONhFhKYjtJPHg
-	 WF3cBqTWwr30xdqQ9hWrK480+wNHNyF8dtIfS5t8=
-Date: Thu, 29 Jan 2026 07:57:23 -0800
-From: Arun Raghavan <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1048593/000000-58b07f@github.com>
-Subject: [bluez/bluez] 58b07f: media: Fix G.722 @ 16 kHz codec ID value
- reported ...
+	s=arc-20240116; t=1769703513; c=relaxed/simple;
+	bh=EggWaypS0xDUElOgXjuA/Mh+bWM7LI3BNFGtKj4jLhI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XHpES8EVvHR9EpmY2d3bZalBNJZzg0Eh/V1aJIX4w9MRALxG8ricZbpja4r80oH6pN9UOVoPMJU7ndekgZYjj3FhDsb2ydmxgJWF7m5Xah6mQ5Hx/HYO3TPdV7NnwqqQiwd1krE7QM5//fjzjI6QANjXO8Ox6jPrR7Mou1nz/1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8CCCC4C442FB0B;
+	Thu, 29 Jan 2026 17:18:00 +0100 (CET)
+Message-ID: <b1c51aa9-19e5-4335-9b70-bbcc4d6def85@molgen.mpg.de>
+Date: Thu, 29 Jan 2026 17:18:00 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] DT: add bindings for QCC2072 Add DT compatible string
+ "qcom,qcc2072-bt" to yaml file.
+To: Vivek Sahu <vivek.sahu@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Rocky Liao <quic_rjliao@quicinc.com>,
+ Mohammed Sameer Mulla <quic_mohamull@quicinc.com>,
+ Harish Bandi <quic_hbandi@quicinc.com>, linux-bluetooth@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org
+References: <20251217112850.520572-1-vivesahu@qti.qualcomm.com>
+ <d180711b-7957-4252-b34b-81312705555b@molgen.mpg.de>
+ <BY5PR02MB6946637904902544E6767829F189A@BY5PR02MB6946.namprd02.prod.outlook.com>
+ <279d96ed-865c-4f15-a67c-ee1a94ea2c3e@oss.qualcomm.com>
+ <fdc9cc27-aa12-4b62-bece-8bcc8c680ace@oss.qualcomm.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <fdc9cc27-aa12-4b62-bece-8bcc8c680ace@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1048593
-  Home:   https://github.com/bluez/bluez
-  Commit: 58b07fe0e09ca613bcbd3295daab8ebf277768a4
-      https://github.com/bluez/bluez/commit/58b07fe0e09ca613bcbd3295daab8ebf277768a4
-  Author: Arun Raghavan <arun@arunraghavan.net>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M profiles/audio/media.c
-
-  Log Message:
-  -----------
-  media: Fix G.722 @ 16 kHz codec ID value reported by transport
-
-The G.722 @ 16 kHz codec ID is 0x01, not 0x02. The 0x02 value comes from
-the ASHA ReadOnlyProperties GATT characteristic which is a bitmask with
-bits corresponding to codec IDs - setting bit 1 gives bitmask value 0x02.
-
-Reviewed-by: Arun Raghavan <arun@arunraghavan.net>
+Dear Vivek,
 
 
+Am 29.01.26 um 06:59 schrieb Vivek Sahu:
+> 
+> On 1/20/2026 3:38 PM, Vivek Sahu wrote:
+>>> ________________________________
+>>> From: Paul Menzel <pmenzel@molgen.mpg.de>
+>>> Sent: 17 December 2025 19:44
+>>> To: Vivek Sahu <vivesahu@qti.qualcomm.com>
+>>> Cc: Marcel Holtmann <marcel@holtmann.org>; Luiz Augusto von Dentz 
+>>> <luiz.dentz@gmail.com>; Rob Herring <robh@kernel.org>; Krzysztof 
+>>> Kozlowski <krzk+dt@kernel.org>; Conor Dooley <conor+dt@kernel.org>; 
+>>> Bartosz Golaszewski <brgl@bgdev.pl>; Balakrishna Godavarthi (QUIC) 
+>>> <quic_bgodavar@quicinc.com>; Rocky Liao (QUIC) 
+>>> <quic_rjliao@quicinc.com>; Mohammed Sameer Mulla (QUIC) 
+>>> <quic_mohamull@quicinc.com>; Harish Bandi (QUIC) 
+>>> <quic_hbandi@quicinc.com>; linux-bluetooth@vger.kernel.org <linux- 
+>>> bluetooth@vger.kernel.org>; devicetree@vger.kernel.org 
+>>> <devicetree@vger.kernel.org>; linux-kernel@vger.kernel.org <linux- 
+>>> kernel@vger.kernel.org>; linux-arm-msm@vger.kernel.org <linux-arm- 
+>>> msm@vger.kernel.org>
+>>> Subject: Re: [PATCH 1/2] DT: add bindings for QCC2072 Add DT 
+>>> compatible string "qcom,qcc2072-bt" to yaml file.
+>>>
+>>> WARNING: This email originated from outside of Qualcomm. Please be 
+>>> wary of any links or attachments, and do not enable macros.
+>>>
+>>> Dear Vivek,
+>>>
+>>>
+>>> Thank you for your patch. The formatting is off, and the summary/title
+>>> (subject) has two statements – look yourself in the archive [1]. Also
+>>> the prefix seems wrong.
+>>>
+>>> Am 17.12.25 um 12:28 schrieb Vivek Kumar Sahu:
+>>>> Signed-off-by: Vivek Kumar Sahu <vivesahu@qti.qualcomm.com>
+>>> Please elaborate by giving more context, why it is compatible, and I’d
+>>> like to see how you tested this.
+>>
+>> The compatible string "qcom,qcc2072-bt" is defined in target dtsi file 
+>> and it was tested on the hardware. The corresponding target specific 
+>> dtsi file is currently merged in downstream.
+> Please let me know if above statement gets you the answer of your question.
+>>
+>>>
+>>>> ---
+>>>> .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml | 1 +
+>>>>    1 file changed, 1 insertion(+)
+>>>>
+>>>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+>>>> index 6353a336f382..197248d6f7b8 100644
+>>>> --- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+>>>> +++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+>>>> @@ -28,6 +28,7 @@ properties:
+>>>>          - qcom,wcn6750-bt
+>>>>          - qcom,wcn6855-bt
+>>>>          - qcom,wcn7850-bt
+>>>> +      - qcom,qcc2072-bt
+>>> Lacking more lines, I am not certain, but I maybe this should be sorted.
+>> I'll address it in next patch of this commit.
+> I just checked that "qca_btsoc_type" enum contains all the soc type 
+> which need to be enabled for BT enablement on the target device.
+> There are few places where logic of framing packets transferring
+> between SoC  and Host depends on the which generation of the chip it
+> is, refer api "qca_read_soc_version".>
+> Do you still suggest to sort it here ?
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Yes, I’d prefer it sorted to easily find entries in the list. I suggest 
+to create a separate commit to sort qcom,qca6390-bt correctly, and then 
+your patch on top with qcc ordered after qca.
+
+>>>>      enable-gpios:
+>>>>        maxItems: 1
+
+
+Kind regards,
+
+Paul
+
+
+>>> [1]: https://lore.kernel.org/all/20251217112850.520572-1-vivesahu@qti.qualcomm.com/
