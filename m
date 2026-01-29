@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D0D346792
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 16:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0671E346A02
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 16:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769704212; cv=none; b=C6Xk806jenWKgXeLPngBjm8ZEj+9VbgafA5W1MZozu4QWtoymOHD32xFeqLwX1tyO8DiWFEah9gELWuo4Hygk1pLgVUTIFQpoMa/3oUyuXCYYB+v5KuRLJclQj+Foiq0o8QmiizHoENpA6MWc6XnAlnbJIEi+jrOqVcH1MWzG8g=
+	t=1769704213; cv=none; b=RStjDNdyTTbqqQrXy4Hlw94M1HhCFrk5IQ6rxR7lTRV57uUjToZp3ZKLJZRznekbE/NGB9lCGrjwLgRZ+r/0NH+NTirQn4rzQwA8DOS+6AiFbOrE/s0udQIbF4wdUsWhQxXw+G/MlNhzaIkKHx3+sAXQITVSSwGsBprJSLN6IIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769704212; c=relaxed/simple;
-	bh=n66D/MNNFEBL3GF/+dZjE/xAaesgZpTG3yhJVq9iN4g=;
+	s=arc-20240116; t=1769704213; c=relaxed/simple;
+	bh=wfClSVRN+fFsKBDCcyrkVDxDGPhGoUtY+ZaC6xnR97Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oT+b8goeWaBO8KgRGZYfVbe4Ox+23lRDhxQ/Qtv7cOghfmhkMAJjMOCTYU0ygG3Ri88pZlmd8TVlQr+jWgG4DlFoNbEDjlwS8kanpfDBYKdVK1qyKCM4PIl/D+bcYhzO88J7m638ONxZx6r4xJl028SWpEsGWlmKbiIomSpf/rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WFi2bMSa; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=RAT/a+DaXF7uCSwM5GPFjBrebHDhLnT9zKT4dAs3TX0sSmkmhMtW7W66KZ0GXnU8TullDsXiYqc9esUuNn2MgIyMcZI5KjQgCktrDiVEr1puewzvRvgLr+w+QIYfo9gCk+fbkuZC729lrAL3QzltXRTPEuH5CyNqxbeMcmvKcKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pt+eFdHS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WFi2bMSa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FCE7C4CEF7;
-	Thu, 29 Jan 2026 16:30:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pt+eFdHS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E08AEC4CEF7;
+	Thu, 29 Jan 2026 16:30:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769704211;
-	bh=n66D/MNNFEBL3GF/+dZjE/xAaesgZpTG3yhJVq9iN4g=;
+	s=k20201202; t=1769704212;
+	bh=wfClSVRN+fFsKBDCcyrkVDxDGPhGoUtY+ZaC6xnR97Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WFi2bMSao2v1qbr0gGrQVTyORXyvSbp+Dq5WEka2pY8oaidpb0kPrifBWoEfO2L5V
-	 e2/9Rqu1nE4q7U/+2UlfM3LMACUoa0AG1csXwPDxDP8oLS/k0SYlhyhXUgtIaI/izc
-	 LN5WLsH1rsWa7J9TRZooUbKUHmovQ1eqhv68FxEMC68rwLWd/8rdQzKaAnQWSf5zu1
-	 eiQfPqNeviKY/R60YGLMy7fW6ILOSCLgRs9EJGYLkXK8yru4ua3LkyVIQspo+uWQRX
-	 bCcQcyMOI7JGJebDSM3fQp7b41tUQWhHDn8E/xhQ+KrmuPKpoWhFN6HO2BzlWmG5ZF
-	 4k76GV+i3w/dQ==
+	b=Pt+eFdHSchHDZpH1LiGoYySJflRM+wCt2l4Z3vLnldiDNvKmLEbA8/gYzwYfzsliC
+	 J9rSdvANCl+wcvcd9S5TeuCP2Qa+IBTIpXKJYX6DLYl0yiMjySVknTM1i+71QHSgI6
+	 LzuBb/g/Lqz9VpVBCmkWI8+P21bAj0LTiRtcPQj+dm8LgYMhrJ51m6v0nFL29vnQOA
+	 3oY9QMKA8CEqGb0ncC9VAM5K2a+IROFGqx3UeQfJ470swZ6ynDlfVnWMxamYQ20Zax
+	 o+5vFTu8GTfguXiq3zn1GpwHod/qvfiYUiuZNEPtdQQ95Z89JJbI1Zynar2XgvS+Rl
+	 kBfCKD1wYLN5g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8CA7380CECB;
-	Thu, 29 Jan 2026 16:30:05 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 119F9380CECB;
+	Thu, 29 Jan 2026 16:30:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -41,22 +41,24 @@ Subject: Re: [PATCH] media: Fix G.722 @ 16 kHz codec ID value reported by
  transport
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <176970420460.2563498.7347833153547034544.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Jan 2026 16:30:04 +0000
-References: <20260128103809.2679085-1-arkadiusz.bokowy@gmail.com>
-In-Reply-To: <20260128103809.2679085-1-arkadiusz.bokowy@gmail.com>
-To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <176970420584.2563498.10397591263771732571.git-patchwork-notify@kernel.org>
+Date: Thu, 29 Jan 2026 16:30:05 +0000
+References: <20260129154755.410853-1-arun@arunraghavan.net>
+In-Reply-To: <20260129154755.410853-1-arun@arunraghavan.net>
+To: Arun Raghavan <arun@arunraghavan.net>
+Cc: arkadiusz.bokowy@gmail.com, linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 28 Jan 2026 11:38:09 +0100 you wrote:
+On Thu, 29 Jan 2026 07:47:52 -0800 you wrote:
 > The G.722 @ 16 kHz codec ID is 0x01, not 0x02. The 0x02 value comes from
 > the ASHA ReadOnlyProperties GATT characteristic which is a bitmask with
 > bits corresponding to codec IDs - setting bit 1 gives bitmask value 0x02.
+> 
+> Reviewed-by: Arun Raghavan <arun@arunraghavan.net>
 > ---
 >  profiles/audio/media.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
