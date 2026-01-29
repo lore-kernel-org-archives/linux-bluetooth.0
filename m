@@ -1,127 +1,126 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f194.google.com (mail-qt1-f194.google.com [209.85.160.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC3A30CDA6;
-	Thu, 29 Jan 2026 13:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A8128852E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 14:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769693950; cv=none; b=ifnGcevpy3dDCPXpc/0UkA5lqBlY+FDL2CEKKnwLfgYkmbxBR0UTjZB0pJWpwtIxYAoDN4BR7L6a4cPxDT6zZPtKNgaTD9dA3FfyhBqZgmFDdon+NCJYaYkZelcpsSS7pbrdNioSJiE84wT8PTedzhmuclLkOUHHL+q0leyPyR0=
+	t=1769696669; cv=none; b=Re+tAch/y0gofbR/NM3v+YbZK/P9S6V5FbuQ4qMYEhlfyLrjwnHAoZLiaQ5tJixw1mcioy3kh4Bjd22voKzcojogb7+6nYfE7YuHwld8EhphyvK/DkgV+hEo5Pe9nWnya73CIw/ikBagG8CazY7Q1cvuYX1x8QCI7A7cz/vFdp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769693950; c=relaxed/simple;
-	bh=lCCJP9TKzKtmH+2dqO9VlG6Tq3KxehrAZ36G0NLEfJU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WdGMaF7TXCFgCKFPbiKg6n+gcAMfc4fA4LXzvb1Fz41DJ7Cb02J/m72Dx9fdlaJKGPsoGV37LxuKJ7a+5EI561y5T+Qhv+Dqm9dqd0YPISgjK7DysQXGXGdw1vMSH7I/IPc6ENDWWf6CvSMr3o7LO2v/XTtLdupQzW3ljaAcThw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AA3304C442FB0B;
-	Thu, 29 Jan 2026 14:38:37 +0100 (CET)
-Message-ID: <60c9afa4-6c61-49cb-9ad7-bdc916b7e853@molgen.mpg.de>
-Date: Thu, 29 Jan 2026 14:38:33 +0100
+	s=arc-20240116; t=1769696669; c=relaxed/simple;
+	bh=9Q/0Q6Z5Rn8ssngovr++Gk5+WJy7gM9v582k0EZa2KQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=JWPOfaZphApSsEvvOMSIfQFIzj72m43AJgWLuW6GA05P/5ukD5bDV8V7IW4yUyXGryJGt/7SjLW7DoauwVwGyFF7ydj4K9CMeCs15zwqewGR5iM++I2D9OpZfK7nKhDCs+3uOUzda8Q3p1MbDJRbP7LcDSW5Ib3MrV/koSdwets=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YD2dS0bZ; arc=none smtp.client-ip=209.85.160.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YD2dS0bZ"
+Received: by mail-qt1-f194.google.com with SMTP id d75a77b69052e-5029901389dso7697461cf.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 06:24:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769696667; x=1770301467; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ASSpQFfWsSXa2LpRK3EIAEZ7EYcfVl7YaGEOJbtE4gk=;
+        b=YD2dS0bZyHrC42Pt6jPx6J1r6CjHxhA/XZGLYy2nU2szcxd8xjMvHJZmL1gGlwqFvH
+         tIZ95j/WqztT4PXwJkzYqWyV8vwSa20GMVShJ+SIvUsJrlZ11WKwgDhC+jZehjFGqWnN
+         Ob1KzZEkT+lWCnIyeYHhmRRU771zjAH8LrMaCdQaLb0GT3FRorqVtl13HmHn/mmtIlzC
+         qlYvlosC8vpdDLl+Tah9cBE0BQBLp19ZQQiFFdLG4vfXlYUICYhwwdrhk2BF3i+HVrea
+         uIuD839vh15AajE9on2Ywzu6pNcwnaVRMem7RFz+9Zfsw8dyNb/KZ4TdiecF1GJbJM8e
+         I1Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769696667; x=1770301467;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ASSpQFfWsSXa2LpRK3EIAEZ7EYcfVl7YaGEOJbtE4gk=;
+        b=QhEA8x57dMq5qfW41DsPG8nFgfCSFNPFBAAyGVoPbYt0VUvbD1XCV7FazAwqvJQNKL
+         b3uml4IVTthhSs37JQHBpQCLFEEZfTYmO3r77A+DtiaTjKJT38zFzg1p2g9DRIF1HdWy
+         EEqgeRmgd2tRZZm/0tjYAVlOJWpiZeRX664783OnDvpUAjanJcaZyTOpYA1+2M1cRijg
+         NexLRBqQf2m61OsJuuXqEkRNwgPno52WySlLMkpXzTY8HohEWYWdTbnRuxPwwwSxF6N0
+         mYwmQ7nLyWssfujW5rvhGBljrcwTNJ3F3DnLbrafnwsWJfbY+OLJGUE6+viHCTxhWxyH
+         9NqA==
+X-Gm-Message-State: AOJu0Yzd9e21xipDiR5TA5+vMJ2WntdhHt6yRGWHGnIYC8UHE5su6Cy0
+	3GYkYIvynGASA+1qFXm/h///HYNcQ5IOyyDFzpbb//14GTNk/y7q0L7rbSgLNilH
+X-Gm-Gg: AZuq6aKLj3VkvalSo7cPtKzXxa4RDJDexgaMUL+mj2//A8JgNvPL959xskuZszBPe3m
+	vAwsmlMnY7noirsO6rsBqBJwb2q/7wd2PmkPeoSYWsTjtJF2aGjFGADgrj+7fCWEj6xaQQfw9R8
+	eETYyIu+zx006yuszc4Bf/lrhVZExDgtN9FnMk/abBLXt93DXzc6HnmzK2mTC3R8KFeYxgp2BsJ
+	KQO8kcM+OAjefcDTp9DI8FVu6tSMnDPKLaRSu4bM1lMQSCcYremBfdbUrhZAKRECm1qaYaSE+7X
+	xVueCA/gGWBl9cgKj4vkO2IG6yNoFWytMIzZf95eBIy2XbsX0e92EpVOs+NW+RjUrDsJLetWGkO
+	1PtXZuyd6d44tllwlIM9RivEuKMhQV9BW0voW6JUs5Ch62bK8+uYaLQIqskKDnzy+YUY5mI1nMz
+	5L0iCtTWmZGDJhyy3MTQ==
+X-Received: by 2002:ac8:570d:0:b0:4ed:de14:b374 with SMTP id d75a77b69052e-5032fc13f36mr113410561cf.64.1769696665312;
+        Thu, 29 Jan 2026 06:24:25 -0800 (PST)
+Received: from [172.17.0.2] ([64.236.141.218])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50337bb9d21sm34716991cf.26.2026.01.29.06.24.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 06:24:24 -0800 (PST)
+Message-ID: <697b6d98.050a0220.11aa80.fb42@mx.google.com>
+Date: Thu, 29 Jan 2026 06:24:24 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5581184883760278402=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: Add USB ID 7392:e611 for Edimax
- EW-7611UXB
-To: Zenm Chen <zenmchen@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- pkshih@realtek.com, max.chou@realtek.com, hildawu@realtek.com,
- rtl8821cerfe2@gmail.com, stable@vger.kernel.org
-References: <20260129022819.61290-1-zenmchen@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260129022819.61290-1-zenmchen@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: build: Don't install btmgmt man page as tool isn't
+In-Reply-To: <20260129125948.2724071-2-hadess@hadess.net>
+References: <20260129125948.2724071-2-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5581184883760278402==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Dear Zenm,
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1048529
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.34 seconds
+GitLint                       PENDING   0.36 seconds
+BuildEll                      PASS      20.54 seconds
+BluezMake                     PASS      657.46 seconds
+MakeCheck                     PASS      18.49 seconds
+MakeDistcheck                 PASS      247.04 seconds
+CheckValgrind                 PASS      300.76 seconds
+CheckSmatch                   PASS      360.98 seconds
+bluezmakeextell               PASS      189.95 seconds
+IncrementalBuild              PENDING   0.33 seconds
+ScanBuild                     PASS      1089.17 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Thank you for your patch.
 
-Am 29.01.26 um 03:28 schrieb Zenm Chen:
-> Add USB ID 7392:e611 for Edimax EW-7611UXB which is RTL8851BU-based
-> Wi-Fi + Bluetooth adapter.
-> 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below:
-> 
-> T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  6 Spd=480  MxCh= 0
-> D:  Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=7392 ProdID=e611 Rev= 0.00
-> S:  Manufacturer=Realtek
-> S:  Product=802.11ax WLAN Adapter
-> S:  SerialNumber=00e04c000001
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
-> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 8 Cls=ff(vend.) Sub=ff Prot=ff Driver=rtw89_8851bu_git
-> E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=07(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=09(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=0a(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=0b(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=0c(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> 
-> Cc: stable@vger.kernel.org # 6.6.x
-> Signed-off-by: Zenm Chen <zenmchen@gmail.com>
-> ---
->   drivers/bluetooth/btusb.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 8c34a17ed..fcec8e589 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -529,6 +529,8 @@ static const struct usb_device_id quirks_table[] = {
->   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x2001, 0x332a), .driver_info = BTUSB_REALTEK |
->   						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x7392, 0xe611), .driver_info = BTUSB_REALTEK |
-> +						     BTUSB_WIDEBAND_SPEECH },
->   
->   	/* Realtek 8852AE Bluetooth devices */
->   	{ USB_DEVICE(0x0bda, 0x2852), .driver_info = BTUSB_REALTEK |
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+---
+Regards,
+Linux Bluetooth
 
 
-Kind regards,
-
-Paul
+--===============5581184883760278402==--
