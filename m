@@ -1,69 +1,69 @@
-Received: from mail-ua1-f66.google.com (mail-ua1-f66.google.com [209.85.222.66])
+Received: from mail-vs1-f67.google.com (mail-vs1-f67.google.com [209.85.217.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1860F37647A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 23:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33813446C0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 23:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769728948; cv=none; b=TFolHujftp6F7JqtsNZBGBEyvlazB948CdJoczwCh4riZ5RtGGbU21EETX8JKftG92el8Y7lnwIONRJ39S+nVUhSx0KRYKpbe+uQDHybMhGQ3cPKrMzMxU5LUzBmCSPDt5fw/sO5i3+98hBObekh5ldApsJqR+Y+0tudEgOc95M=
+	t=1769728950; cv=none; b=FubCeq+ndQZ/oGHKtxfRXgKEOM8nbfXXHv7/cRBoIJZyDgdluz7JeP3dg22YzQUvprMUXCkoVwuGHU+7TOpylgUOzH/W+I46+Y83hBLN7eRoujA/OcZXw0zFj1+jIUlzkW00q0A0NXGM2Kfa6xHgiOgGLBn1vMrzC4vVViWbE2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769728948; c=relaxed/simple;
-	bh=FSenn7kpmLKI5do5DZrgMsSI3mkOJVOhZbF6iKb/+kM=;
+	s=arc-20240116; t=1769728950; c=relaxed/simple;
+	bh=0MGkyIs7NvJt3RpL2e4qVN8DaJMm3s0B8GIgUjaQgyM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y6Acfr/0a/cviCytt0m1EcluO/BgH3Yu2UHZnJij1mwgeQaldSspCk3rbTuYOPmGam/w9icXCzpcScao0FkQ3Q/Y38SXpkn03iLZ5oN3xioZ9ovwi9pG9iRLXZGeXaIIN0pW9Cn2bxiE10yKgwMfm7HoyArcEMLtAW+GqqPlok8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m0YfSQTp; arc=none smtp.client-ip=209.85.222.66
+	 MIME-Version; b=psazKGIMOz7ppZYfII7dHnQ2y2fbcInm9p/tNpuWhuUQhE57NkXRzxRaMUsh2XGtwXhoJ5dOH84eOs21/J4YX/D3NiNEr/3FZIp7Ut2U19xWfKjY4TWYUSDEx2ac1hxsasajR0hN1tFYr87ez6VhCzaVSnt1cdzg5SxD9bRSuRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IYJqZLrW; arc=none smtp.client-ip=209.85.217.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0YfSQTp"
-Received: by mail-ua1-f66.google.com with SMTP id a1e0cc1a2514c-94849af2400so457262241.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 15:22:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYJqZLrW"
+Received: by mail-vs1-f67.google.com with SMTP id ada2fe7eead31-5f54d6b4047so995783137.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 15:22:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769728946; x=1770333746; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769728947; x=1770333747; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wBzKiOWJxuXPtIB6K9WcjvDCnDSArjkPW/xIPOMEfMs=;
-        b=m0YfSQTpd8zMd8QAJd8DhhWFmLAZH3Enek9RSxIKNRV2Hr7ZvIceLzdo+Tf+OCDN4t
-         rIX3oo6TCYMSde9h0+KghcNdhpVtUtU6tq6+Ngc3ytXhnn0giRw835ZDP61XvrEoRBgx
-         pRShDgm0Wt1ZeYZFHtDUXkE1MXJxuP0EgaqrTqxTyBFWKHPU4iDexzgRflyfBGxt4if8
-         Wv6lHwu5ktpD9YZd5PuOmynIYCnDS5K0xShQ1F6CaOPSJPUREz5uBh9xzjkOG1QUfNdI
-         oZ4t2igPDCdRhXkszf1g+wnBXwBpMAytq1CaxiaTwMFukI7UYrNktbCY0KYyhk3OGMAt
-         NgQA==
+        bh=5iDksbITcu3MV8MiNOiu6dcMz2o3OsxIEJLww01wtOQ=;
+        b=IYJqZLrW/lJuMgHuSOPp1WW3nGi1cKoEwxqIE+hQD2aU7N9shjGOCRVMLU4UBbdfsX
+         sOnyWgSN0GUsqzXPR3Hn42jcnG4YPWh5p6CzVoYEnkOfDEG7veR1rcU5s5amvn3wGSZ5
+         YW9wWT1It9GnvzVdKceM97yX3r+gF/WlLoU5AlYahIF8zU2fhOBitJLP6ntMTBETf30G
+         TViUB5h9dGQRVte+M2lWuCeRYYwJMR8avyVKH9f/FHqWXxGlkWEA9W9zL3079Qj+PPwS
+         ZOsusN6OKUjvsJsbAZHBkoCb25VMEk0lWZzpmDg/KFa9urB3+3XILzLmbLkCAi2+0ibI
+         TdHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769728946; x=1770333746;
+        d=1e100.net; s=20230601; t=1769728947; x=1770333747;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=wBzKiOWJxuXPtIB6K9WcjvDCnDSArjkPW/xIPOMEfMs=;
-        b=W8sqsdgRwaWdsUoxjlkkYsmxMCCZN4eXcJBT1xMVjvBGA61jQjz2VtzbbTQ6THji9s
-         jTQ1Q024qWyQisnxQXqdCaYtRGzfPAoVg/nl6EjhbfYTDLLy7oGEkEJBzOVq0BVDWm8y
-         TLwzRhhp5wPjW8x3nb1NlKGD1i2GIWt/GswnFWFzV5c/eRni5RUsvWNeOth6JuwBgdDa
-         HkmE6lU6LyWFyc4vpjXqWHvlUTz9QQOgkYUCQk8f08tM6HorfnSwJFQowCEamgXZkVJW
-         ssS57FP57WCDChdSzOEjUgok/kVasCV8Sn5JyyqFQTXt7FQ2RjIQPQQKW+Q9tuAvCZPq
-         CHvg==
-X-Gm-Message-State: AOJu0YzrOdSpfAxvqYPoVpgThJWvV6fdcHl+uX/dtjt+xpstOwXDUQ+d
-	OOhmPr1wQkg0VdVMNyj6Fca3i0m9NMx/2OzcYper+jio17LuCueR0z6rXRxluPLipSA=
-X-Gm-Gg: AZuq6aLskCYJUaOk+gNbgB8dJHjaOn2N2jGRx4TX2fOnZyumC0tFm57s0sWAksiStIw
-	0u7zPJ8z7O5b9l5uj+QMwD2nhU4KaRAFTGEHddwWla6vx0EV1hJ+tBmi+1e3s0xOGjvcKHIs7nt
-	kPY4CRFPeaiMBoHGtuJnRtaiJhJFOlu+FDuyEFUMMsx1oMV5hZzuJTX8cURVabAKix5vdQyT0K1
-	nH7Y123dZfzAqBBslej1GqChRafyyzMvUu8hFs/YIQsO86sI6lXOmlkOkQVl8pTo2w1jcGVsVLx
-	/coCsbKZ/3cdnHT0ZU/k9N/Ny4RvCGdGUzilvYdikfCd/V5CC56vcNdFAJfWiGCQ4zE9g4E4cpo
-	67pQWECsx9N716wjOOs8TTDNMgdoViV8mJhqnWdOcyaDA0lWtumWgy9UG3WnNzLlxi6x8rjE7Lu
-	Ze4M5oiQNybXaFP+r6dFEW0yP1pFAEUBsRMcFpmvzpbJp9oJapVgMmuoQHK2JNe0iEHgbbAdMx+
-	KxDcw==
-X-Received: by 2002:a05:6102:3e89:b0:5db:cba0:941 with SMTP id ada2fe7eead31-5f8e26860f1mr368996137.38.1769728945803;
-        Thu, 29 Jan 2026 15:22:25 -0800 (PST)
+        bh=5iDksbITcu3MV8MiNOiu6dcMz2o3OsxIEJLww01wtOQ=;
+        b=Kg3d1wwWuYpZpKe1XJufZjD3L94v+qyfv5LMgrfGixNrPpxRAR+ngjliMjz7ArbrBZ
+         YJHy7DqLLFeHEtn+tTXFCi/BfJFMI+MdHI2RS14e6WyBMpyAqa26PfWHOY3G83tzPlDO
+         XniMbNmjyyaYjeBy/nne/LRYQkFc4MCho5I+ma1XxFsljwWrvyQmdjcL5b2ZDeVE0nBL
+         C6D2r83YVN2rUMoU0Zdkhkb0UlSDsRBLKFb4gHtO1tBz089AXa09Aq2iSob+c9X+Dlla
+         pwvJUja9iIS9hn2hxMjXSiLpnns/J0g8sSV/oMoOlDSAK1JE/iD9UKhMVpKI0aIgAcry
+         WnLw==
+X-Gm-Message-State: AOJu0YxsxGehQXQM1tW8ksoOMx4t/L+zk8ulYUnajrzDySgwtr2YsOLD
+	IxmA/jvYXvjHumwhAYXg4ZXQ/3EUORwmlAX8tFZPTrfKahqAapGNYXaUJP7zspGealI=
+X-Gm-Gg: AZuq6aIpVSqOrk9NDSFuTQ9984CXjHyhzkNy1QmW1OaoPrMZ/tRDHZ7H4nsQ9mJNkiD
+	haP3Rys6NFy9NMCgU4SpIsvXQXJlhuBnIEHefNEijohbOj+epfzZblffPlG+PoXzeIuziPtB20M
+	aLbpvxW63wlZYF4ECE0LdejG+nSD64cVCf6rlP03vUF6PrefiZxzerGhqVXSjkf1FheZOiFRgd5
+	NUc8BuOMDkLqcKBloP2ery+DGOiyl4Iv7A0w63UhcqNFyPXX7DmN0ZT3ABybyF+4R32ileRseO2
+	+v444yWx2Ohmu9eW2rgaqpz7pLVO3bB/pq+EifUSkiqqQgywWIwVoDjoUO5OtR1B8ZpnYkwpFkP
+	X5B+O3ktIbytyjOL9oPJ+riys8eUnIIUte/uLJMeyXCoqHd+KsDUQtijwuICZ1CSzIxwHSelV6a
+	O+nL2B/JOAuM5oGsTO4/nI2VZTSFGh8IF/bOhN9nglS7HyL+71J2/7cAeuNFBbPfRlB3k4Jt3e2
+	dZRGQ==
+X-Received: by 2002:a05:6102:c48:b0:5df:b57a:ad28 with SMTP id ada2fe7eead31-5f8e23e7d45mr387065137.6.1769728947382;
+        Thu, 29 Jan 2026 15:22:27 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948724cb7casm1535890241.9.2026.01.29.15.22.24
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948724cb7casm1535890241.9.2026.01.29.15.22.26
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 15:22:25 -0800 (PST)
+        Thu, 29 Jan 2026 15:22:26 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 10/15] doc/bluetoothctl-le: Document arguments and add examples
-Date: Thu, 29 Jan 2026 18:21:49 -0500
-Message-ID: <20260129232201.1049568-10-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 11/15] doc/bluetoothctl-monitor: Document arguments and add examples
+Date: Thu, 29 Jan 2026 18:21:50 -0500
+Message-ID: <20260129232201.1049568-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260129232201.1049568-1-luiz.dentz@gmail.com>
 References: <20260129232201.1049568-1-luiz.dentz@gmail.com>
@@ -77,63 +77,141 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add parameter documentation for show, connect and disconnect commands
-explaining device address and object path parameters for LE operations.
-Documents optional vs required device parameters for Low Energy
-Bluetooth device management.
+Add parameter documentation for all monitor commands including RSSI
+threshold, timeout and sampling period settings. Documents pattern
+management, monitor ID parameters and threshold values for
+advertisement monitoring.
 ---
- doc/bluetoothctl-le.rst | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ doc/bluetoothctl-monitor.rst | 72 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 70 insertions(+), 2 deletions(-)
 
-diff --git a/doc/bluetoothctl-le.rst b/doc/bluetoothctl-le.rst
-index 808d5786ee80..11f26d30ab6d 100644
---- a/doc/bluetoothctl-le.rst
-+++ b/doc/bluetoothctl-le.rst
-@@ -27,6 +27,8 @@ list
- List available le devices.
+diff --git a/doc/bluetoothctl-monitor.rst b/doc/bluetoothctl-monitor.rst
+index 1e2bfeecc931..51552f1b2011 100644
+--- a/doc/bluetoothctl-monitor.rst
++++ b/doc/bluetoothctl-monitor.rst
+@@ -27,6 +27,16 @@ set-rssi-threshold
+ Set RSSI threshold parameter
  
- :Usage: **> list**
-+:Example Display all LE (Low Energy) devices that have been discovered:
-+	| **> list**
+ :Usage: **> set-rssi-threshold <low_threshold> <high_threshold>**
++:<low_threshold>: Lower RSSI threshold value in dBm for monitoring
++:<high_threshold>: Higher RSSI threshold value in dBm for monitoring
++:Example Set low threshold to -80 dBm and high threshold to -40 dBm:
++	| **> set-rssi-threshold -80 -40**
++:Example Set low threshold to -70 dBm and high threshold to -30 dBm:
++	| **> set-rssi-threshold -70 -30**
++:Example Set very sensitive low threshold and moderate high threshold:
++	| **> set-rssi-threshold -90 -50**
++:Example Set less sensitive thresholds for close range monitoring:
++	| **> set-rssi-threshold -60 -20**
  
- show
- ----
-@@ -34,6 +36,11 @@ show
- Show le bearer information on a device.
+ set-rssi-timeout
+ ----------------
+@@ -34,20 +44,55 @@ set-rssi-timeout
+ Set RSSI timeout parameter
  
- :Usage: **> show [dev]**
-+:[dev]: Bluetooth device address (optional, shows all LE bearers if omitted)
-+:Example Show all LE bearer information:
-+	| **> show**
-+:Example Show LE bearer info for device with specified address:
-+	| **> show 00:11:22:33:44:55**
+ :Usage: **> set-rssi-timeout <low_timeout> <high_timeout>**
++:<low_timeout>: Timeout value in seconds for low RSSI threshold
++:<high_timeout>: Timeout value in seconds for high RSSI threshold
++:Example Set low timeout to 5 seconds, high timeout to 10 seconds:
++	| **> set-rssi-timeout 5 10**
++:Example Set quick timeout response for both thresholds:
++	| **> set-rssi-timeout 1 5**
++:Example Set longer timeout periods for stable monitoring:
++	| **> set-rssi-timeout 10 30**
++:Example Set asymmetric timeout values:
++	| **> set-rssi-timeout 3 15**
  
- connect
- -------
-@@ -46,8 +53,10 @@ An active scan report is required before the connection can be
- established. If no advertising report is received before the timeout,
- a le-connection-abort-by-local error will be issued.
+ set-rssi-sampling-period
+ -------------------------
  
--:Usage: > connect <dev>
--:Example: > connect 1C:48:F9:9D:81:5C
-+:Usage: **> connect <dev>**
-+:<dev>: Bluetooth device address to connect to
-+:Example Connect to another LE device:
-+	| **> connect 00:11:22:33:44:55**
+ Set RSSI sampling period parameter
  
- disconnect
- ----------
-@@ -57,8 +66,11 @@ Disconnect device over le.
- By default this command disconnects all profiles/services associated with the le
- connection, and then terminates the le link.
+-:Usage: **> set-rssi-timeout <low_timeout> <high_timeout>**
++:Usage: **> set-rssi-sampling-period <sampling_period>**
++:<sampling_period>: Sampling period in 100ms units (0-255, where 0 means report all, 255 means report only first)
++:Example Set sampling period to 100ms (1 unit):
++	| **> set-rssi-sampling-period 1**
++:Example Set sampling period to 500ms (5 units):
++	| **> set-rssi-sampling-period 5**
++:Example Set sampling period to 1 second (10 units):
++	| **> set-rssi-sampling-period 10**
++:Example Report all advertisements (no sampling):
++	| **> set-rssi-sampling-period 0**
++:Example Report only first advertisement:
++	| **> set-rssi-sampling-period 255**
  
--:Usage: > disconnect <dev>
--:Example: > disconnect 1C:48:F9:9D:81:5C
-+:Usage: **> disconnect <dev>**
-+:<dev>: Bluetooth device address to disconnect from
-+:Example Disconnect from another LE device:
-+	| **> disconnect 00:11:22:33:44:55**
+ add-or-pattern
+ --------------
+ 
+ Register 'or pattern' type monitor with the specified RSSI parameters
+ 
+-:Usage: **> add-or-pattern [patterns=pattern1 pattern2 ...]**
++Each pattern requires 3 arguments: <start_position> <ad_data_type> <content_of_pattern>
++Multiple patterns can be specified to create an OR condition.
 +
++:Usage: **> add-or-pattern <start_pos> <ad_type> <content> [start_pos ad_type content ...]**
++:<start_pos>: Byte position in advertisement data where pattern matching starts (0-based)
++:<ad_type>: Advertisement data type (e.g., 9 for Complete Local Name, 1 for Flags)
++:<content>: Hexadecimal pattern content to match
++:Example Monitor for "Samsung" in Complete Local Name (type 9):
++	| **> add-or-pattern 0 9 53616d73756e67**
++:Example Monitor for devices with Flags type (type 1) containing 0x06:
++	| **> add-or-pattern 0 1 06**
++:Example Monitor for two different patterns (OR condition):
++	| **> add-or-pattern 0 9 53616d73756e67 0 9 4170706c65**
++:Example Monitor for specific manufacturer data (type 255):
++	| **> add-or-pattern 0 255 4c000215**
+ 
+ get-pattern
+ -----------
+@@ -55,6 +100,15 @@ get-pattern
+ Get advertisement monitor
+ 
+ :Usage: **> get-pattern <monitor-id/all>**
++:<monitor-id/all>: Monitor ID number to retrieve details for, or "all" for all active monitors
++:Example Get details of monitor ID 0:
++	| **> get-pattern 0**
++:Example Get details of monitor ID 1:
++	| **> get-pattern 1**
++:Example Get details of monitor ID 5:
++	| **> get-pattern 5**
++:Example Get details of all active monitors:
++	| **> get-pattern all**
+ 
+ remove-pattern
+ --------------
+@@ -62,6 +116,15 @@ remove-pattern
+ Remove advertisement monitor
+ 
+ :Usage: **> remove-pattern <monitor-id/all>**
++:<monitor-id/all>: Monitor ID number to remove, or "all" to remove all active monitors
++:Example Remove monitor with ID 0:
++	| **> remove-pattern 0**
++:Example Remove monitor with ID 1:
++	| **> remove-pattern 1**
++:Example Remove monitor with ID 3:
++	| **> remove-pattern 3**
++:Example Remove all active advertisement monitors:
++	| **> remove-pattern all**
+ 
+ get-supported-info
+ ------------------
+@@ -69,6 +132,8 @@ get-supported-info
+ Get advertisement manager supported features and supported monitor types
+ 
+ :Usage: **> get-supported-info**
++:Example Display supported monitor features and types:
++	| **> get-supported-info**
+ 
+ print-usage
+ -----------
+@@ -76,6 +141,9 @@ print-usage
+ Print the command usage
+ 
+ :Usage: **> print-usage <add-or-pattern>**
++:<add-or-pattern>: Command name to display detailed usage information for
++:Example Show detailed usage for add-or-pattern command:
++	| **> print-usage add-or-pattern**
  
  RESOURCES
  =========
