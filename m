@@ -1,69 +1,69 @@
-Received: from mail-vk1-f195.google.com (mail-vk1-f195.google.com [209.85.221.195])
+Received: from mail-vk1-f193.google.com (mail-vk1-f193.google.com [209.85.221.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CC62FE071
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 19:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D7A274FEB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 19:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769801982; cv=none; b=FHst2DCoz6aBkEWWA4BE/zIn9w4ihlqhVGl4wyq57oVHfv9edy5kaGpHQvXuuDtc3p8atZ7918zWGdxK/z1a/0i9Lqz4zGXdISqqEAEAC3Dxt3p1/0SEmJE1bpyKHU9qFwji4dz3xlhoUfmTr4Snmj8vWTzGYXspb6F5J+gNo7U=
+	t=1769801982; cv=none; b=GvBTOuLQeo/1VJ+HHoe37Sf2x20ZxsXsBaLrz4G3zZ5A4UY5WUEAzBX2J8sPZyAiAKDJ+p5CsvHBVyfB1xpilneW3/NrQN8K4nA9HThv5ewo0DJkf1kPmgjG41zA5ZMJ0XOv7SnFYhBvnYTI/tNaCMQzmJ1N7eD5asBQSkW/eV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769801982; c=relaxed/simple;
-	bh=4m/eXjuor5sn/XH/m8iFrQaNnL9rLbxtPRr6zv5fRQ0=;
+	bh=d9dZoNo7g5TXn3o2aw62KlA73fT6o38IGNkAhknTVHw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r4rhcUhtmxXl+3tJSNUxvkyuzqeCkoSWwWo2J/hlM5qR+NacQAEhG5hoL3H7kdSFX37kRjbiFG/o8jihyrb3G5dbaCRfXfn7iWegzjOan76LZcGhHwQiFfKtRYEmIwSoG9CSAJciruUfwp2wcpIJxDNvpSq/XtVX8qBeEL4sa/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aIPKIv5r; arc=none smtp.client-ip=209.85.221.195
+	 MIME-Version; b=PWiNshyD+Nboe1y1pD5RHPJKO8EJ4XjQtYrAMiYKoLDoTqaNu50CQ4J1oK5NL3UYPylU65qs+xqJ9BUbrXBNHKlEohDYxIw13RdUi3gI+V0qBk70Ag9p1SBFTUN4JTYG9GU7yXa8hY9/4qX8oF6zL+ucsqRZCHi2xUXOJJM65qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BpG+Fk2M; arc=none smtp.client-ip=209.85.221.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aIPKIv5r"
-Received: by mail-vk1-f195.google.com with SMTP id 71dfb90a1353d-5664393d409so934754e0c.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BpG+Fk2M"
+Received: by mail-vk1-f193.google.com with SMTP id 71dfb90a1353d-56643f72af5so874884e0c.0
         for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 11:39:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769801979; x=1770406779; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769801980; x=1770406780; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rvotALpb6c1UIWkDCkGmFEiFUaIjIkhDJVMLfM+MIK0=;
-        b=aIPKIv5rRXTxLZT5hscKEvU1zW+o1kWHE3N0va1T1dc1Djz1IPohC5bhxuKINWVHcY
-         GCQJQPyguZi4XqxmWrZg+H11MDWiShMUg9F9XWqlxuqFsrn+Ezww8cECb7koKuLV1AnP
-         syWq1eE0lMIAXa6umaTx1XpycMxqIi5+tAU/GFsuFRdLDnC/iGOtVzZHutTtJ5droWOT
-         GhnvbhZRgWo2oe/vsQfwaTRX62kNERM0SXKKHYfAUhyoJR3faQfurhh4Z52cLmdQAUc5
-         +0865IAHVNCxsK3Xy9qDof18rPFc1gD4W5gJO1BFr49YT4DB3pFnQdKN/dZkw3IGL9UK
-         GAmQ==
+        bh=WkF72W+Olr1cWxBAbMglgj7E/Gk8247G0rxnWjbgskw=;
+        b=BpG+Fk2MS81sTikAD4DL49jo4U7gZEnayyliyNh0HNvsBO3oMSTPJ7BX+Sv1xazIO/
+         BcW1NNfUNzQBTm0rdTIfCWgdB8qpePG2csZGP6F85s/6ZUOUdXBz11P65V8u8MDJb8nd
+         9Vg8O5nq5vrZcCT0Xq4dy6arC25xXVkqE2mpcGEvcQ6+odfiFpTCQFD6yDRSUs6eDY7p
+         FUDrAWg1ZrG4YLpQBU+ZdLeUJnTPqWEfW4eIriu6DYo7aJDnVgosJqp4pJ6+1+fjYZLY
+         xfqzySuUCjptmZ3zWcvVFqf0ncNglXW9zKYXrnY01tKGdHUD6+coMO0Svi5aTxPOAPWk
+         I8Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769801979; x=1770406779;
+        d=1e100.net; s=20230601; t=1769801980; x=1770406780;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=rvotALpb6c1UIWkDCkGmFEiFUaIjIkhDJVMLfM+MIK0=;
-        b=RikPYumuv+a/Qex0+x+X3Yv7QH5s2kAviA75LFLvdgRwuBf9Z4mxFDUmCVBGJSO/G0
-         ibjcqbDpdpYD46V6HEi8Ho0dyQNHQjgYzEHXHqEy62VtgksaunFKCEwZFwGVHESMhCio
-         ZIpPk6PNGrLFZnzEkASgD4I7+PhqXBjdOPRVWoMYI/RYmcy7PqC3Y1bOBQKTRy9ZC8kB
-         N9azi7RUygpXg3FDFyzTdXyFnl3B4p4yz+GaJ/O6bPagTOxEgjEyo8TJD9dZimPNtdKx
-         owsrx4cveI9dJ2mftM05TULgcbxoXhApKBnpcMC0cvvkc4jGep+NqvuDrPrXl550BDpD
-         ++qQ==
-X-Gm-Message-State: AOJu0Ywp9nj6K2fki6/RzFUxPFpw8y3Cp9WC5V+HnbVDU5XDEsBZoqPn
-	sRQpkm/MfdSYZWGjvL7lCJsJ0872SmkvPmTcXOg9Gxb6CtMqbHVjTHJWKPOgCWRf
-X-Gm-Gg: AZuq6aL9mqRm+TqASGp2xDcCOVgrjtlRgEaK5sFa5ECCxnqsqvNkNWwy4HOh9GaeyEf
-	T0IEg+Y6jHbQbP9qUSKPgm0zXqmVyOXI6lrc4bKH+9Afj3bpXsJb+CHTyYyX7zVxkLHwLliVIRg
-	2k83fnsVwTlQ7sWx5evMc60hDr/jKUu+zJHZVp36FztyTz0uA2DdXqU4fNNyAbb9jRs3VsNy37i
-	EjFaoaWW72TmrMQR4Rq8tCi6k9/2Ez9eKY2rlQMKjMPwbZOlkqa6LAhxobHQSLmsaxHoP6IeamP
-	L05wlu5Ts5igEghLwN5T5A+3mrVNktZL+nJ6kXmzhkLARIFaEWdksknKFT6iCZ05/LrRY36XWFD
-	AuhMJH1g9A4cMXo74AeFP1KRbRBnrdbLTp+y+Z/STSL7HLp9QRYlvXBgO8HA/Lstq6KBHLAWdx7
-	cdZrCT8Vdzpr0/IbpurRBGufsrDDYJw33yLyOyqHvaFgMumVl9xdZ/eNkTbPLi2fV712JlczGYM
-	Gh+Gg==
-X-Received: by 2002:a05:6122:f93:b0:54c:da0:f711 with SMTP id 71dfb90a1353d-566a006c029mr1103889e0c.7.1769801978751;
-        Fri, 30 Jan 2026 11:39:38 -0800 (PST)
+        bh=WkF72W+Olr1cWxBAbMglgj7E/Gk8247G0rxnWjbgskw=;
+        b=N+Rf9PghB6+JmtHnwE6rSc5USOlAXmvyPkHZywxZWTkp+j8BCGgrgEr1UP84uZ+ebG
+         orHzqnvz4Cx1ujce50brja9dCOFmmFMxWgztxA7YqvrN2IBOOJEqVYArdUJrbkiehuq6
+         gV6d5t1uGieCEn/Mr6Iqq/t7GIMXpC8OVAN4+rTRtYsQ4C0gRB++FbGX4dyFuUqI36xH
+         KZEpU2ZOByJVxftBFxHwSyqBaB6nA20QPuJKcGI49ns51bhN8aUeLJM2ORpJTWSIXzy2
+         D4VSQgB6OQU+YeInNnZvyQGNH6MRbgoWB9sJ6M6dsqE29fb7ftcf4qlJIBMskNVm7IH6
+         EYLQ==
+X-Gm-Message-State: AOJu0Ywgsh/CduWWNPVhrqtfvU2CKOaZSAGkPYSIktHDlvK6KlJmahwi
+	8xf2XGSYaV7Vo9h8psPu6VUGO6vmYA8+fGQkHf5eB+py7HPC0qtT9axBM37nS7Hg
+X-Gm-Gg: AZuq6aL3olL4ZWbZweJ8CyOUwfovttVjp/vq8yXRiBAVScT1K9qEWCz+9RhfC72giMU
+	CXd9AQSy10YOBtvqajnKXyKg4n/4K6nzU/UAgwlIyZ4GxyBi2Jw1ybgZPM3/DaSCBFhfGpN3oA9
+	T1WySZvEpwOevok0O+StBMvQOPKC5zAtP8xa0X2OGsHytZqx/tDBICD+mBpFiVzRpeRjEnlNB7r
+	lOwwngO1Zu7OPQfTPG5sGrtp4prt9GhY50iP1hUV9aht83/IP6YSn9dHf8tkDZXR4MUN2xTF603
+	PGuL5fiEqvmaKJNTRUJ3zpfp/k26YdUIfmSnQ30QztLeFv0fE1lQTQ4Zkb6tNSr4uMC6bpbsgsi
+	hk5wdEupz1oQIjOXV9DFb/4lPyB+pkvd6be8wvMQLwl5Fu65AI7yYq9pkaJZvicXrjAIVkd0QtV
+	h0MVrWPzQ0ecj/0FMlPc6rj/lGXm485yoH41Y+KU6QWA6qmnqaM1v2F5HnS6wOF0MLcoWPfTNlp
+	hke9w==
+X-Received: by 2002:a05:6122:1692:b0:55b:305b:4e45 with SMTP id 71dfb90a1353d-566a0143c31mr1087914e0c.17.1769801979778;
+        Fri, 30 Jan 2026 11:39:39 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56685b0360fsm2523603e0c.1.2026.01.30.11.39.37
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56685b0360fsm2523603e0c.1.2026.01.30.11.39.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 11:39:38 -0800 (PST)
+        Fri, 30 Jan 2026 11:39:39 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 08/35] doc/bluetoothctl-gatt: Add :Uses: fields and document arguments
-Date: Fri, 30 Jan 2026 14:38:50 -0500
-Message-ID: <20260130193921.1273263-9-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 09/35] doc/bluetoothctl-hci: Add :Uses: fields and document arguments
+Date: Fri, 30 Jan 2026 14:38:51 -0500
+Message-ID: <20260130193921.1273263-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260130193921.1273263-1-luiz.dentz@gmail.com>
 References: <20260130193921.1273263-1-luiz.dentz@gmail.com>
@@ -80,412 +80,170 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Add :Uses: fields to link commands to their corresponding D-Bus API
 methods, and document command arguments with usage examples.
 ---
- doc/bluetoothctl-gatt.rst | 249 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 244 insertions(+), 5 deletions(-)
+ doc/bluetoothctl-hci.rst | 112 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 99 insertions(+), 13 deletions(-)
 
-diff --git a/doc/bluetoothctl-gatt.rst b/doc/bluetoothctl-gatt.rst
-index 6c72302ae935..493c7cf3b2c1 100644
---- a/doc/bluetoothctl-gatt.rst
-+++ b/doc/bluetoothctl-gatt.rst
-@@ -18,6 +18,10 @@ SYNOPSIS
+diff --git a/doc/bluetoothctl-hci.rst b/doc/bluetoothctl-hci.rst
+index 70aa5e7afaa4..05cd763f5465 100644
+--- a/doc/bluetoothctl-hci.rst
++++ b/doc/bluetoothctl-hci.rst
+@@ -18,6 +18,11 @@ SYNOPSIS
  
- **bluetoothctl** [--options] [gatt.commands]
+ **bluetoothctl** [--options] [hci.commands]
  
-+This submenu interacts with GATT services, characteristics, and descriptors
-+using the **org.bluez.GattService(5)**, **org.bluez.GattCharacteristic(5)**,
-+**org.bluez.GattDescriptor(5)**, and **org.bluez.GattManager(5)** interfaces.
++.. note::
++   This submenu communicates directly with the Bluetooth controller via HCI
++   socket, bypassing the BlueZ D-Bus API. Commands use the Host Controller
++   Interface (HCI) protocol.
 +
+ Commands
+ ========
  
- Generic Attribute Commands
- ==========================
-@@ -30,7 +34,24 @@ encompassing services, characteristics, and handles. This command provides
- a comprehensive overview of the available Bluetooth attributes, which can
- be further interacted with using other commands.
+@@ -27,12 +32,22 @@ open
+ Open HCI channel.
  
--:Usage: **> list-attributes <attribute/UUID> <dev/local>**
-+:Usage: **> list-attributes [dev/local]**
-+:[dev/local]: Device MAC address, object path, or "local" to list locally registered attributes (optional, lists all if omitted)
-+:Example List attributes for specific service:
-+	| **> list-attributes /org/bluez/hci0/dev_00_11_22_33_44_55/service001a**
-+:Example List attributes for specific characteristic:
-+	| **> list-attributes /org/bluez/hci0/dev_00_11_22_33_44_55/service001a/char001c**
-+:Example List attributes for service on different device:
-+	| **> list-attributes /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0020**
-+:Example List all Generic Access service attributes:
-+	| **> list-attributes 0x1800**
-+:Example List all Battery Service attributes:
-+	| **> list-attributes 0x180F**
-+:Example List all Device Name characteristic attributes:
-+	| **> list-attributes 0x2A00**
-+:Example List attributes using full UUID:
-+	| **> list-attributes 00001801-0000-1000-8000-00805f9b34fb**
-+:Example List attributes for custom service UUID:
-+	| **> list-attributes 12345678-1234-5678-9abc-123456789abc**
+ :Usage: **> open <index> <chan=raw,user>**
+-:Example open user channel:
+-	| In order to open a user channel the controller needs to be power off
+-	| first:
+-	| > power off
+-	| > hci.open 0 user
+-	| HCI index 0 user channel opened
++:index: HCI controller index number (e.g., 0, 1, 2)
++:chan: Channel type (raw or user)
++:Example Open user channel (controller needs to be powered off first):
++	| **> power off**
++	| **> hci.open 0 user**
++	| **HCI index 0 user channel opened**
++:Example Open user channel for HCI controller 0:
++	| **> hci.open 0 user**
++:Example Open user channel for HCI controller 1:
++	| **> hci.open 1 user**
++:Example Open user channel for HCI controller 2:
++	| **> hci.open 2 user**
++:Example Open raw channel for HCI controller 0:
++	| **> hci.open 0 raw**
++:Example Open raw channel for HCI controller 1:
++	| **> hci.open 1 raw**
  
- select-attribute
- ----------------
-@@ -41,7 +62,25 @@ must select it with this command. This establishes a context for many
- other commands (read, write, notify, etc.), specifying the attribute
- they should operate on.
+ cmd
+ ---
+@@ -40,10 +55,30 @@ cmd
+ Send HCI command.
  
--:Usage: **> select-attribute <attribute/UUID/local>**
-+:Usage: **> select-attribute <attribute/UUID/local> [attribute/UUID]**
-+:<attribute/UUID/local>: GATT attribute path, UUID, or "local" to select from local attributes
-+:[attribute/UUID]: Additional attribute path or UUID when using "local" (optional)
-+:Example Select specific characteristic:
-+	| **> select-attribute /org/bluez/hci0/dev_00_11_22_33_44_55/service001a/char001c**
-+:Example Select specific descriptor:
-+	| **> select-attribute /org/bluez/hci0/dev_00_11_22_33_44_55/service0020/char0022/desc0024**
-+:Example Select service on different device:
-+	| **> select-attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service001a**
-+:Example Select Device Name characteristic:
-+	| **> select-attribute 0x2A00**
-+:Example Select Battery Level characteristic:
-+	| **> select-attribute 0x2A19**
-+:Example Select Client Characteristic Configuration descriptor:
-+	| **> select-attribute 0x2902**
-+:Example Select Temperature characteristic using full UUID:
-+	| **> select-attribute 00002a6e-0000-1000-8000-00805f9b34fb**
-+:Example Select custom characteristic:
-+	| **> select-attribute 12345678-1234-5678-9abc-123456789abc**
+ :Usage: **> cmd <opcode> [parameters...]**
+-:Example send HCI Reset command:
+-	| > hci.cmd 0x0c03
+-	| HCI Command complete:
+-	|  00
++:opcode: HCI command opcode in hexadecimal format (e.g., 0x0c03)
++:parameters: Optional command parameters as hexadecimal bytes
++:Example Send HCI Reset command:
++	| **> hci.cmd 0x0c03**
++	| **HCI Command complete:**
++	| **00**
++:Example Send HCI Reset command (no parameters):
++	| **> hci.cmd 0x0c03**
++:Example Send HCI Read Local Version Information:
++	| **> hci.cmd 0x1003**
++:Example Send HCI Read BD Address:
++	| **> hci.cmd 0x1009**
++:Example Send HCI Set Event Filter with parameter 0x01:
++	| **> hci.cmd 0x0c01 0x01**
++:Example Send LE Set Advertising Parameters with 2 parameters:
++	| **> hci.cmd 0x200f 0x00 0x08**
++:Example Send LE Set Advertising Data with length and data bytes:
++	| **> hci.cmd 0x2008 0x20 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08**
++:Example Send HCI Set Event Mask command:
++	| **> hci.cmd 0x0c05 0x02**
++:Example Send HCI Write Scan Enable:
++	| **> hci.cmd 0x0c2a 0x01**
++:Example Send HCI Write Class of Device:
++	| **> hci.cmd 0x0c23 0x00 0x08**
  
- attribute-info
- --------------
-@@ -52,6 +91,17 @@ attribute. This command is useful for understanding the properties and
- capabilities of an attribute.
- 
- :Usage: **> attribute-info [attribute/UUID]**
-+:[attribute/UUID]: GATT attribute path or UUID to get info for (optional, uses current if omitted)
-+:Example Show information for currently selected attribute:
-+	| **> attribute-info**
-+:Example Show info for specific characteristic:
-+	| **> attribute-info /org/bluez/hci0/dev_00_11_22_33_44_55/service001a/char001c**
-+:Example Show info for Battery Level characteristic:
-+	| **> attribute-info 0x2A19**
-+:Example Show info for Device Name characteristic:
-+	| **> attribute-info 0x2A00**
-+:Example Show info for Temperature characteristic:
-+	| **> attribute-info 00002a6e-0000-1000-8000-00805f9b34fb**
- 
- read
+ send
  ----
-@@ -61,6 +111,18 @@ beforehand with select-attribute. The optional offset parameter can be
- used for attributes that allow partial reads.
+@@ -51,8 +86,29 @@ send
+ Send HCI data packet.
  
- :Usage: **> read [offset]**
-+:Uses: **org.bluez.GattCharacteristic(5)** method **ReadValue**
-+:[offset]: Byte offset to start reading from (optional, defaults to 0)
-+:Example Read attribute value from offset 0:
-+	| **> read**
-+:Example Read attribute value from offset 0 (explicit):
-+	| **> read 0**
-+:Example Read attribute value starting from offset 4:
-+	| **> read 4**
-+:Example Read attribute value starting from offset 10:
-+	| **> read 10**
-+:Example Read attribute value starting from offset 16:
-+	| **> read 16**
+ :Usage: **> send <type=acl,sco,iso> <handle> [data...]**
+-:Example send ACL data packet to connection handle 0x0000:
+-	| > hci.send acl 0x0000
++:type: Packet type (acl, sco, or iso)
++:handle: Connection handle in hexadecimal format (e.g., 0x0000)
++:data: Optional data bytes in hexadecimal format
++:Example Send ACL data packet to connection handle 0x0000:
++	| **> hci.send acl 0x0000**
++:Example Send empty ACL packet to handle 0x0000:
++	| **> hci.send acl 0x0000**
++:Example Send ACL packet with "Hello" data to handle 0x0001:
++	| **> hci.send acl 0x0001 0x48 0x65 0x6c 0x6c 0x6f**
++:Example Send ACL packet with custom data to handle 0x0010:
++	| **> hci.send acl 0x0010 0x01 0x02 0x03 0x04**
++:Example Send empty SCO packet to handle 0x0000:
++	| **> hci.send sco 0x0000**
++:Example Send SCO packet with audio data:
++	| **> hci.send sco 0x0001 0xaa 0xbb 0xcc**
++:Example Send SCO packet with sine wave pattern:
++	| **> hci.send sco 0x0002 0x80 0x00 0x80 0x00**
++:Example Send empty ISO packet to handle 0x0000:
++	| **> hci.send iso 0x0000**
++:Example Send ISO packet with sample data:
++	| **> hci.send iso 0x0001 0x12 0x34 0x56 0x78**
++:Example Send ISO packet for LE Audio stream:
++	| **> hci.send iso 0x0020 0xa0 0xa1 0xa2 0xa3**
  
- write
+ register
+ --------
+@@ -60,6 +116,21 @@ register
+ Register HCI event handler.
+ 
+ :Usage: **> register <event>**
++:event: HCI event code in hexadecimal format (e.g., 0x0e)
++:Example Register handler for Command Complete event:
++	| **> register 0x0e**
++:Example Register handler for Command Status event:
++	| **> register 0x0f**
++:Example Register handler for Connection Complete event:
++	| **> register 0x03**
++:Example Register handler for Disconnection Complete event:
++	| **> register 0x05**
++:Example Register handler for LE Meta events:
++	| **> register 0x3e**
++:Example Register handler for Inquiry Complete event:
++	| **> register 0x02**
++:Example Register handler for Role Change event:
++	| **> register 0x22**
+ 
+ unregister
+ ----------
+@@ -67,13 +138,28 @@ unregister
+ Unregister HCI event handler.
+ 
+ :Usage: **> unregister <event>**
++:event: HCI event code in hexadecimal format (e.g., 0x0e)
++:Example Unregister Command Complete event handler:
++	| **> unregister 0x0e**
++:Example Unregister Command Status event handler:
++	| **> unregister 0x0f**
++:Example Unregister Connection Complete event handler:
++	| **> unregister 0x03**
++:Example Unregister Disconnection Complete event handler:
++	| **> unregister 0x05**
++:Example Unregister LE Meta event handler:
++	| **> unregister 0x3e**
+ 
+ close
  -----
-@@ -70,7 +132,25 @@ be selected in advance using select-attribute. Data must be provided in
- hexadecimal format. Optional offset and type parameters can accommodate
- specific write requirements.
  
--:Usage: **> write <data=xx xx ...> [offset] [type]**
-+:Usage: **> write <data="xx xx ..."> [offset] [type]**
-+:Uses: **org.bluez.GattCharacteristic(5)** method **WriteValue**
-+:<xx xx ...>: Hexadecimal data bytes to write to the attribute
-+:[offset]: Byte offset to start writing at (optional, defaults to 0)
-+:[type]: Write type - request, command, or reliable (optional, defaults to request)
-+:Example Write "Hello" to attribute (ASCII bytes):
-+	| **> write "48 65 6C 6C 6F"**
-+:Example Write binary data to attribute:
-+	| **> write "01 02 03 04"**
-+:Example Write single byte value:
-+	| **> write "FF"**
-+:Example Write 2 bytes starting at offset 4:
-+	| **> write "01 02" 4**
-+:Example Write with write request (default):
-+	| **> write "48 65 6C 6C 6F" 0 request**
-+:Example Write with write command (no response):
-+	| **> write "01 02 03" 0 command**
-+:Example Write with reliable write:
-+	| **> write "FF EE DD" 0 reliable**
+ Close HCI channel.
  
- acquire-write
- -------------
-@@ -80,6 +160,9 @@ is useful for applications that need a file descriptor to perform
- write operations.
- 
- :Usage: **> acquire-write**
-+:Uses: **org.bluez.GattCharacteristic(5)** method **AcquireWrite**
-+:Example Acquire write file descriptor for current attribute:
-+	| **> acquire-write**
- 
- release-write
- -------------
-@@ -89,6 +172,8 @@ command is necessary to clean up resources after you're done with the
- write operation.
- 
- :Usage: **> release-write**
-+:Example Release write file descriptor for current attribute:
-+	| **> release-write**
- 
- acquire-notify
- --------------
-@@ -98,6 +183,9 @@ This enables applications to listen for notifications on attribute
- value changes.
- 
- :Usage: **> acquire-notify**
-+:Uses: **org.bluez.GattCharacteristic(5)** method **AcquireNotify**
-+:Example Acquire notify file descriptor for current attribute:
-+	| **> acquire-notify**
- 
- release-notify
- --------------
-@@ -106,6 +194,8 @@ Releases the Notify file descriptor obtained with acquire-notify. Ensures
- resources are freed once notification listening is no longer needed.
- 
- :Usage: **> release-notify**
-+:Example Release notify file descriptor for current attribute:
-+	| **> release-notify**
- 
- notify
- ------
-@@ -116,6 +206,12 @@ command allows applications to be notified of attribute changes without
- polling.
- 
- :Usage: **> notify <on/off>**
-+:Uses: **org.bluez.GattCharacteristic(5)** methods **StartNotify**, **StopNotify**
-+:<on/off>: Enable or disable notifications for the current attribute
-+:Example Enable notifications for current attribute:
-+	| **> notify on**
-+:Example Disable notifications for current attribute:
-+	| **> notify off**
- 
- clone
- -----
-@@ -124,6 +220,21 @@ Creates a clone of a device or attribute. This can be useful for creating
- a backup or working with a copy for testing purposes.
- 
- :Usage: **> clone [dev/attribute/UUID]**
-+:[dev/attribute/UUID]: Device MAC address, attribute path, or UUID to clone (optional, clones current if omitted)
-+:Example Clone entire device GATT database:
-+	| **> clone 00:11:22:33:44:55**
-+:Example Clone another device:
-+	| **> clone AA:BB:CC:DD:EE:FF**
-+:Example Clone specific service:
-+	| **> clone /org/bluez/hci0/dev_00_11_22_33_44_55/service001a**
-+:Example Clone specific characteristic:
-+	| **> clone /org/bluez/hci0/dev_00_11_22_33_44_55/service001a/char001c**
-+:Example Clone Generic Access service:
-+	| **> clone 0x1800**
-+:Example Clone Battery Service:
-+	| **> clone 0x180F**
-+:Example Clone Battery Level characteristic:
-+	| **> clone 0x2A19**
- 
- register-application
- --------------------
-@@ -133,6 +244,18 @@ management of services, characteristics, and descriptors under this
- application.
- 
- :Usage: **> register-application [UUID ...]**
-+:Uses: **org.bluez.GattManager(5)** method **RegisterApplication**
-+:[UUID ...]: Optional list of service UUIDs to register with the application
-+:Example Register GATT application without specific UUIDs:
-+	| **> register-application**
-+:Example Register application with Battery Service:
-+	| **> register-application 0x180F**
-+:Example Register with Generic Access and Battery Service:
-+	| **> register-application 0x1800 0x180F**
-+:Example Register application with custom service UUID:
-+	| **> register-application 12345678-1234-5678-9abc-123456789abc**
-+:Example Register with multiple standard services:
-+	| **> register-application 0x1800 0x180F 0x180A**
- 
- unregister-application
- ----------------------
-@@ -140,6 +263,9 @@ unregister-application
- Removes a previously registered application from the Bluetooth system.
- 
- :Usage: **> unregister-application**
-+:Uses: **org.bluez.GattManager(5)** method **UnregisterApplication**
-+:Example Unregister current GATT application:
-+	| **> unregister-application**
- 
- register-service
- ----------------
-@@ -148,6 +274,24 @@ Adds a new service under a registered application. This command is
- crucial for defining new services that devices can offer.
- 
- :Usage: **> register-service <UUID> [handle]**
-+:<UUID>: Service UUID to register (16-bit, 32-bit, or 128-bit format)
-+:[handle]: Specific attribute handle to assign (optional, auto-assigned if omitted)
-+:Example Register Generic Access service (auto handle):
-+	| **> register-service 0x1800**
-+:Example Register Battery Service (auto handle):
-+	| **> register-service 0x180F**
-+:Example Register Device Information service (auto handle):
-+	| **> register-service 0x180A**
-+:Example Register Generic Access service at handle 1:
-+	| **> register-service 0x1800 0x0001**
-+:Example Register Battery Service at handle 16:
-+	| **> register-service 0x180F 0x0010**
-+:Example Register Device Info service at handle 32:
-+	| **> register-service 0x180A 0x0020**
-+:Example Register custom service (auto handle):
-+	| **> register-service 12345678-1234-5678-9abc-123456789abc**
-+:Example Register custom service at specific handle:
-+	| **> register-service 12345678-1234-5678-9abc-123456789abc 0x0050**
- 
- unregister-service
- ------------------
-@@ -156,6 +300,17 @@ Removes a service from a registered application, effectively ceasing
- its availability.
- 
- :Usage: **> unregister-service <UUID/object>**
-+:<UUID/object>: Service UUID or object path of the service to unregister
-+:Example Unregister Generic Access service:
-+	| **> unregister-service 0x1800**
-+:Example Unregister Battery Service:
-+	| **> unregister-service 0x180F**
-+:Example Unregister custom service:
-+	| **> unregister-service 12345678-1234-5678-9abc-123456789abc**
-+:Example Unregister service by object path:
-+	| **> unregister-service /org/bluez/example/service0**
-+:Example Unregister another service:
-+	| **> unregister-service /org/bluez/example/service1**
- 
- register-includes
- -----------------
-@@ -163,14 +318,28 @@ register-includes
- Marks a service as included within another service, allowing for
- service hierarchies and complex service structures.
- 
--:Usage: **>r egister-includes <UUID> [handle]**
-+:Usage: **> register-includes <UUID> [handle]**
-+:<UUID>: Service UUID to register as included service
-+:[handle]: Specific attribute handle to assign (optional, auto-assigned if omitted)
-+:Example Register Generic Access as included service:
-+	| **> register-includes 0x1800**
-+:Example Register Battery Service as included at handle 21:
-+	| **> register-includes 0x180F 0x0015**
-+:Example Register custom service as included:
-+	| **> register-includes 12345678-1234-5678-9abc-123456789abc**
- 
- unregister-includes
- -------------------
- 
- Removes an included service relationship, simplifying the service structure.
- 
--:Usage: **> unregister-includes <Service-UUID><Inc-UUID>**
-+:Usage: **> unregister-includes <Service-UUID> <Inc-UUID>**
-+:<Service-UUID>: Parent service UUID that contains the included service
-+:<Inc-UUID>: Included service UUID to remove from the parent service
-+:Example Unregister Battery Service inclusion from Generic Access:
-+	| **> unregister-includes 0x1800 0x180F**
-+:Example Unregister Device Info inclusion from custom service:
-+	| **> unregister-includes 12345678-1234-5678-9abc-123456789abc 0x180A**
- 
- register-characteristic
- -----------------------
-@@ -179,6 +348,31 @@ Introduces a new characteristic under a service, specifying its properties
- and access permissions with flags.
- 
- :Usage: **> register-characteristic <UUID> <Flags=read,write,notify...> [handle]**
-+:<UUID>: Characteristic UUID to register (16-bit, 32-bit, or 128-bit format)
-+:<Flags=read,write,notify...>: Comma-separated list of characteristic properties and permissions
-+:[handle]: Specific attribute handle to assign (optional, auto-assigned if omitted)
-+:Example Register Device Name (read-only):
-+	| **> register-characteristic 0x2A00 read**
-+:Example Register Battery Level (read + notifications):
-+	| **> register-characteristic 0x2A19 read,notify**
-+:Example Register Heart Rate Measurement (notify-only):
-+	| **> register-characteristic 0x2A37 notify**
-+:Example Register Device Name (read + write):
-+	| **> register-characteristic 0x2A00 read,write**
-+:Example Register Battery Level (read + write + notify):
-+	| **> register-characteristic 0x2A19 read,write,notify**
-+:Example Register Temperature (read + indications):
-+	| **> register-characteristic 0x2A6E read,indicate**
-+:Example Register Device Name at handle 3:
-+	| **> register-characteristic 0x2A00 read 0x0003**
-+:Example Register Battery Level at handle 19:
-+	| **> register-characteristic 0x2A19 read,notify 0x0013**
-+:Example Register custom characteristic with full capabilities:
-+	| **> register-characteristic 12345678-1234-5678-9abc-123456789abc read,write,notify**
-+:Example Register custom write-only characteristic:
-+	| **> register-characteristic ABCD1234-ABCD-1234-ABCD-123456789ABC write-without-response**
-+:Example Register with all flags:
-+	| **> register-characteristic 0x2A00 read,write,write-without-response,notify,indicate**
- 
- unregister-characteristic
- -------------------------
-@@ -186,6 +380,17 @@ unregister-characteristic
- Eliminates a characteristic from a service, removing its functionality.
- 
- :Usage: **> unregister-characteristic <UUID/object>**
-+:<UUID/object>: Characteristic UUID or object path of the characteristic to unregister
-+:Example Unregister Device Name characteristic:
-+	| **> unregister-characteristic 0x2A00**
-+:Example Unregister Battery Level characteristic:
-+	| **> unregister-characteristic 0x2A19**
-+:Example Unregister custom characteristic:
-+	| **> unregister-characteristic 12345678-1234-5678-9abc-123456789abc**
-+:Example Unregister characteristic by object path:
-+	| **> unregister-characteristic /org/bluez/example/service0/char0**
-+:Example Unregister another characteristic:
-+	| **> unregister-characteristic /org/bluez/example/service1/char1**
- 
- register-descriptor
- -------------------
-@@ -194,6 +399,29 @@ Adds a descriptor to a characteristic, further defining its behavior and
- access controls.
- 
- :Usage: **> register-descriptor <UUID> <Flags=read,write...> [handle]**
-+:<UUID>: Descriptor UUID to register (16-bit, 32-bit, or 128-bit format)
-+:<Flags=read,write...>: Comma-separated list of descriptor properties and permissions
-+:[handle]: Specific attribute handle to assign (optional, auto-assigned if omitted)
-+:Example Register Client Characteristic Configuration:
-+	| **> register-descriptor 0x2902 read,write**
-+:Example Register Characteristic User Description:
-+	| **> register-descriptor 0x2901 read**
-+:Example Register Characteristic Presentation Format:
-+	| **> register-descriptor 0x2904 read**
-+:Example Register CCCD at handle 5:
-+	| **> register-descriptor 0x2902 read,write 0x0005**
-+:Example Register User Description at handle 21:
-+	| **> register-descriptor 0x2901 read 0x0015**
-+:Example Register custom descriptor:
-+	| **> register-descriptor 12345678-1234-5678-9abc-123456789abc read,write**
-+:Example Register custom read-only descriptor:
-+	| **> register-descriptor ABCD1234-ABCD-1234-ABCD-123456789ABC read**
-+:Example Register Valid Range descriptor:
-+	| **> register-descriptor 0x2906 read**
-+:Example Register External Report Reference:
-+	| **> register-descriptor 0x2907 read**
-+:Example Register Report Reference:
-+	| **> register-descriptor 0x2908 read**
- 
- unregister-descriptor
- ---------------------
-@@ -201,6 +429,17 @@ unregister-descriptor
- Removes a descriptor from a characteristic, simplifying its behavior.
- 
- :Usage: **> unregister-descriptor <UUID/object>**
-+:<UUID/object>: Descriptor UUID or object path of the descriptor to unregister
-+:Example Unregister Client Characteristic Configuration:
-+	| **> unregister-descriptor 0x2902**
-+:Example Unregister Characteristic User Description:
-+	| **> unregister-descriptor 0x2901**
-+:Example Unregister custom descriptor:
-+	| **> unregister-descriptor 12345678-1234-5678-9abc-123456789abc**
-+:Example Unregister descriptor by object path:
-+	| **> unregister-descriptor /org/bluez/example/service0/char0/desc0**
-+:Example Unregister another descriptor:
-+	| **> unregister-descriptor /org/bluez/example/service1/char1/desc1**
+-:Usage: **> close <index>**
++Closes the currently open HCI channel.
++
++:Usage: **> close**
++:Example Close the current HCI channel:
++	| **> close**
  
  RESOURCES
  =========
