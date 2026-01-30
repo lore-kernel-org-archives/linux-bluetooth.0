@@ -1,126 +1,190 @@
-Received: from mail-qk1-f195.google.com (mail-qk1-f195.google.com [209.85.222.195])
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382B532B99F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 20:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0782EB5CD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769805455; cv=none; b=oPtTl0Py9Mjkov9KxvbCoXO09z9OF5A7tLd4sewb9HRlxqd9rA6qUyXipY1OUw1AdQM+3qih6JWzFFt/DnhhFY1d8QSCCuObhegiBSvdjhEho2EYyQBm9Up8dxkEHwwIEUkiNWRIgzEbkDxqrFwPh1X90Lfn7wecihLYDnoCDwQ=
+	t=1769810562; cv=none; b=krLx+oT+AEbsFZY56XNWc3Sc8oGO403lc4sncVa2GYDD/fy9kOuUmdPrusAS+hxHPSs/TdXLFH82RtMGe3/Qw4YrQScXsCQSNpXOnDQkAH6OnO2UaxlwVzTaJW9ATClskLszgUSmGLubUgv6OPAR864vIqW7p8HqCGSWZ76MkoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769805455; c=relaxed/simple;
-	bh=H+kExBMcRBAZn7Nk6moGPxvJl9yI8ASarCoBM5xfaBk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=T62D8cwz17MD1g01cP6f8bzz5W7ju8hMkAdOlLM/OafxzzDBKRfXz7NvWbyIFBGdEkVv9kdniOP2d4YPj9ecVLbzj+vsVKj6oNhMrR7rR7C2DhAUkKpCtHc2SVm9h5I9SnRAaKL/PS/sOATUmBOvJp20yBmPuYR/b0gNXFqS+ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NpMKLzVI; arc=none smtp.client-ip=209.85.222.195
+	s=arc-20240116; t=1769810562; c=relaxed/simple;
+	bh=kKEz9uHL5p8lva4iV3TeMl2Zx9xaPvD/5lLvSBLNPyk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WDREpvjLQqDi7N4PrjSju0uSbjkMjzEjr0DJv5Ndtk6HS5s/uzSiOnEwHxIiCMZ/vhxE+9gmCi8dimmZ6bH4b5pYI9LxdFcQOw37vSugXmixM2v2a8xeqz/TXziOrSqWjPnih3o6HXeI+7ROCLst/y25hTlY25aPIYzsioEPts0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uc9UGSPC; arc=none smtp.client-ip=209.85.217.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NpMKLzVI"
-Received: by mail-qk1-f195.google.com with SMTP id af79cd13be357-8c07bc2ad13so198198085a.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 12:37:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uc9UGSPC"
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-5eae7bb8018so824883137.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:02:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769805453; x=1770410253; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ANR1ZRMV5B7ei0JVL7qUO2FUcXdPFx0Zjuc4ianxrb8=;
-        b=NpMKLzVI5SAuSHYmzUa5wTMRyv0vkOpyoMb5zXxREk7g/eKBzUyNbKOn2DRg87oPuC
-         ZavEQcgSimV6UamIHt6j2oj9LgRMx1DvLlp4vWfRU60sEaRtJAah1fJdIAKFs7CA3JQK
-         GxVoo+CK32zFQcYpND2Y6CS8zuBfu43bvzRtQn5xh24RO0VC3+5eTipUCiugKdKseKm4
-         k4yzByWiCwJ/5HTdkPi2xjOIwAuZtRbc+teoFvvoK4iM3z6C0C4vYky66DhXW0zOuxm1
-         A0QQ5ppWuBpnj10aHHj4oJoOulb67b8NcnPv+WH9o39DijzTaBrymSKv/pnIPI8oxtNQ
-         ynVw==
+        d=gmail.com; s=20230601; t=1769810560; x=1770415360; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wnWziWRhKs2raRFCb6JFOCjsljcubfQrCJfcxNn/xNg=;
+        b=Uc9UGSPCL46jtC5fmODyFLJlaOd27Oh4UimIYkRUpdXWX9RmZGs2kfCkU+bZ/cQzJB
+         dkG1PxiCj2xGKM4RPJU2eD89QVGpF/E/dhF6S/MwwF/Mf/p6pThk6hCvli3SMWSae908
+         DKWY6/Nm3FYd6iy3rTb+Aogl31b7CchbO0VCicagb80dYRoHtCiUsdgDpsQBtfsy4yeU
+         vCuTiiY5YV4nJD2OdhqDsXVZzogVkpn8PRl/pnCNjwfo5KiZZSVpftp4oaUoJVGuO/8L
+         uVx9t1WVs584sKvHfJ7+9dow52I1etg/LAszjp4/i2yLYxkla66LQOfGGBU1W9o2Xn7A
+         COPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769805453; x=1770410253;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ANR1ZRMV5B7ei0JVL7qUO2FUcXdPFx0Zjuc4ianxrb8=;
-        b=M+TRgDY7kl4/ByUfQ/WKN4JOS1UhxDpOWN1f8UPhoNwzGh2cl9zgh4VmGva4bQe92y
-         8DXSOgYAPQU4dvdrUvSfM/pZcVR9RNQIMDrjADUZbnzNHanCYhiufB24ARaDIBKtxb8L
-         xvcNdmRQsy+5h2olDCIK0IDNMucs6KHFuWmtl1zUHvZ7HFmSJ3E56QwNgmqgYsjif9Gf
-         dnwSyn0lggKYxzWXeREgvn9zSx/rq0WhsjrcVf2cHcKGQyJC4NeEeRBYOYpLoG8j9I64
-         WJ96gR2buaYI5NtStwijKXV202Q1Wd10npRBCw79zx5jaY5wuC0FQ2KOxxRexvaPoCbp
-         mRaQ==
-X-Gm-Message-State: AOJu0Yy+Y7HwALwn3AEY15mgHrTgiIc6tJvfyIOcX5JRhbGFaZP8klkz
-	so/UHBNPEZRgsqwjRlkG6V3vJ4C/afHln7lCed25NLtK1iqhZlz7mPHbqxhP6dMv
-X-Gm-Gg: AZuq6aKuPkg2wh2K/+uoX/vi+ZYmZX7CtZtGggVTkmofg8u2BJ2wMoc1Ezkz0oXfMc8
-	sMKhWr7FUQOiaKm2i26m23LZJsUwyvtcOEViXuPBnxSOYfhseEJcvdq0ilAwpp77dqdRYh51lkA
-	sqrwtdHH+Hxduy3SDmd0RYthMmpxIgkle3b0yIqgQyUJXl/2W9kaB1EICQuAE5pDHO3x0Xhmjul
-	aqGThncgtadOkZD0pYapthLNoGmfMmYS+j/+q7bRBQPbpBCio7CW8goDDx1WH/knpmmPv7W9K+o
-	iNR9PEMwP7shnUPEMTbq7zY45MF0SIVgWrZCECGf2mGtupZZ0I92Q4l3G6McPa4F8PM/M/BSo5F
-	7stTzk4VG7GRBTQgRIBHfsiO86suA8z24SKlWXxAw9RGB5tn7pmomc2K7YQ1yf2LjOExjigGXxF
-	DZAhatlLSpu5Mkght/1t2iI2sLGzW/
-X-Received: by 2002:a05:620a:3704:b0:8c5:310d:3b39 with SMTP id af79cd13be357-8c9eb276cccmr531917085a.33.1769805452909;
-        Fri, 30 Jan 2026 12:37:32 -0800 (PST)
-Received: from [172.17.0.2] ([135.232.225.19])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5033745d7a9sm60711321cf.5.2026.01.30.12.37.31
+        d=1e100.net; s=20230601; t=1769810560; x=1770415360;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wnWziWRhKs2raRFCb6JFOCjsljcubfQrCJfcxNn/xNg=;
+        b=DldITOdGG///G/eh+Veq2MNqt+Hj1mCUdxqsgwO4AtkxZ5l1gZ+4Mb9zZWi9+29tCQ
+         iyMglNWqwae6GjaMQKcV8ujc4TMORJuhrCUB3nAN3/3AfIkMJyWTL1ezVm6qK+sml11Y
+         DewVnQ5MDe87OK61HiD9zLNKlVKc71ZKr+vfgfkzsdTR5YNbtJfzAxzuU7F2ZWoXzeHZ
+         EKGzr6PlKQKBcBKG8ZdBwBs8sipAVAvd/yMiMpsz/dgbWrpPVTmhPy/f9eoMYMHYK/Ro
+         1xNvpQpi/dXCC+P1JIR7X6iJvLQJBnfJufsEraaNo7syo0M8FPG6fT1wIophU86IXZBt
+         eBPA==
+X-Gm-Message-State: AOJu0YwCA/dsbJCNZsSjs5LN8t3i029PtJxjx6svp1b2SkYLIDSQK5ST
+	on356+ZB2xSUdKCdsDmUsMD7hUpCc7EUw4FzEnjbOqs9f2jg6w35PZjQhjD2Mw==
+X-Gm-Gg: AZuq6aJrzLE4Dh9qUByOu2YNTr4fNlrsLAn17paYS1sueGzHuGq30MUD48sHrAtdaSF
+	qa1aZIZ64yHHptQtVxM/ixmnvxbyHAzXee+sUSWyp8KhdGkuxX8zDpRbBDNWOHB3pa9pq3JsEML
+	vfdHsmFagfhLLLBqzo30BlMTr9gK55baTfUwslUDcPsbinZbrpJUXN2zaOks4zW5MhKRfCdQzUh
+	lRSdU4yZo7YMdItoMXCvn3Qqt5rrXzN6wEUW9jXKjZmVNEj7IPNMRqkiJ0X9ZLrLjjVaAZmQ7cm
+	2BWz1MTByQiWzJQ6TMqiwF4WRBpfw98KZyycxTVkCIWNDauNS/f15oCagU/DHmCEjNPIpzNGypg
+	W+CuzDbaKsohA8PiVH/2BLuQIFYK28p7gnZSD8eiesfCX6JRF8EgOBf7Vacez18Hmv4+MMYTvbd
+	/hz9YFlJjzT9uS4nAvoFPiQXxFxTHWjN4lnMxCXqx6wihQ0JEDDwdXu1+cGhA5DmNyHoZR3uaia
+	ln0sQ==
+X-Received: by 2002:a05:6102:32c3:b0:5ee:a0de:65ea with SMTP id ada2fe7eead31-5f8e25fcd99mr1314543137.38.1769810559806;
+        Fri, 30 Jan 2026 14:02:39 -0800 (PST)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.02.38
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 12:37:32 -0800 (PST)
-Message-ID: <697d168c.050a0220.236269.4fba@mx.google.com>
-Date: Fri, 30 Jan 2026 12:37:32 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8783903629231291401=="
+        Fri, 30 Jan 2026 14:02:38 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 00/37] doc: Add cross-references between bluetoothctl and D-Bus API docs
+Date: Fri, 30 Jan 2026 17:01:51 -0500
+Message-ID: <20260130220229.1346261-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: doc: Add cross-references between bluetoothctl and D-Bus API documentation
-In-Reply-To: <20260130193921.1273263-2-luiz.dentz@gmail.com>
-References: <20260130193921.1273263-2-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8783903629231291401==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This patch series adds cross-references between bluetoothctl man pages
+and D-Bus API documentation to improve discoverability and help users
+navigate between the command-line interface and the underlying D-Bus
+APIs.
 
-Dear submitter,
+Changes include:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1049133
+1. bluetoothctl documentation (patches 01-15):
+   - Add :Uses: fields linking commands to D-Bus interfaces they use
+   - Document command arguments with descriptions and examples
 
----Test result---
+2. D-Bus API documentation (patches 16-37):
+   - Add :Used by: fields linking interfaces to bluetoothctl man pages
+   - Add Examples: sections showing corresponding bluetoothctl commands
+     for both methods and properties
 
-Test Summary:
-CheckPatch                    PENDING   0.39 seconds
-GitLint                       PENDING   0.32 seconds
-BuildEll                      PASS      21.05 seconds
-BluezMake                     PASS      661.04 seconds
-MakeCheck                     PASS      18.38 seconds
-MakeDistcheck                 PASS      246.26 seconds
-CheckValgrind                 PASS      298.17 seconds
-CheckSmatch                   PASS      357.79 seconds
-bluezmakeextell               PASS      183.36 seconds
-IncrementalBuild              PENDING   0.37 seconds
-ScanBuild                     PASS      1034.66 seconds
+Changes in v3:
+- Add Examples for properties:
+  - org.bluez.Adapter: Alias, Powered, Discoverable, Pairable,
+    DiscoverableTimeout
+  - org.bluez.Device: Alias, PreferredBearer (Trusted, Blocked,
+    WakeAllowed were already present)
+  - org.bluez.MediaPlayer: Equalizer, Repeat, Shuffle, Scan
+  - org.bluez.MediaTransport: Volume
+- Add Examples for additional methods:
+  - org.bluez.AdvertisementMonitorManager: RegisterMonitor,
+    UnregisterMonitor
+  - org.bluez.GattDescriptor: ReadValue, WriteValue
+  - org.bluez.MediaFolder: Search, ListItems, ChangeFolder
+  - org.bluez.MediaItem: Play, AddtoNowPlaying
+- Add new documentation files:
+  - org.bluez.MediaFolder: Add Used by reference and Examples
+  - org.bluez.MediaItem: Add Used by reference and Examples
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+Luiz Augusto von Dentz (37):
+  doc/bluetoothctl: Add :Uses: fields and document arguments
+  doc/bluetoothctl-mgmt: Add :Uses: fields and document arguments
+  doc/bluetoothctl-admin: Add :Uses: fields and document arguments
+  doc/bluetoothctl-advertise: Add :Uses: fields and document arguments
+  doc/bluetoothctl-assistant: Add :Uses: fields and document arguments
+  doc/bluetoothctl-bredr: Add :Uses: fields and document arguments
+  doc/bluetoothctl-endpoint: Add :Uses: fields and document arguments
+  doc/bluetoothctl-gatt: Add :Uses: fields and document arguments
+  doc/bluetoothctl-hci: Add :Uses: fields and document arguments
+  doc/bluetoothctl-le: Add :Uses: fields and document arguments
+  doc/bluetoothctl-monitor: Add :Uses: fields and document arguments
+  doc/bluetoothctl-player: Add :Uses: fields and document arguments
+  doc/bluetoothctl-scan: Add :Uses: fields and document arguments
+  doc/bluetoothctl-telephony: Add :Uses: fields and document arguments
+  doc/bluetoothctl-transport: Add :Uses: fields and document arguments
+  doc/org.bluez.Adapter: Add Used by reference and Examples
+  doc/org.bluez.AdminPolicySet: Add Used by reference and Examples
+  doc/org.bluez.AdminPolicyStatus: Add Used by reference
+  doc/org.bluez.AdvertisementMonitor: Add Used by reference
+  doc/org.bluez.AdvertisementMonitorManager: Add Used by reference
+  doc/org.bluez.AgentManager: Add Used by reference and Examples
+  doc/org.bluez.Call: Add Used by reference and Examples
+  doc/org.bluez.Device: Add Used by reference and Examples
+  doc/org.bluez.GattCharacteristic: Add Used by reference and Examples
+  doc/org.bluez.GattDescriptor: Add Used by reference
+  doc/org.bluez.GattManager: Add Used by reference and Examples
+  doc/org.bluez.GattService: Add Used by reference
+  doc/org.bluez.LEAdvertisement: Add Used by reference
+  doc/org.bluez.LEAdvertisingManager: Add Used by reference and Examples
+  doc/org.bluez.Media: Add Used by reference
+  doc/org.bluez.MediaAssistant: Add Used by reference and Examples
+  doc/org.bluez.MediaEndpoint: Add Used by reference
+  doc/org.bluez.MediaPlayer: Add Used by reference and Examples
+  doc/org.bluez.MediaTransport: Add Used by reference and Examples
+  doc/org.bluez.Telephony: Add Used by reference and Examples
+  doc/org.bluez.MediaFolder: Add Used by reference and Examples
+  doc/org.bluez.MediaItem: Add Used by reference and Examples
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+ doc/bluetoothctl-admin.rst                    |  28 +-
+ doc/bluetoothctl-advertise.rst                | 356 ++++++++-
+ doc/bluetoothctl-assistant.rst                |  24 +-
+ doc/bluetoothctl-bredr.rst                    |  25 +-
+ doc/bluetoothctl-endpoint.rst                 | 217 +++--
+ doc/bluetoothctl-gatt.rst                     | 249 +++++-
+ doc/bluetoothctl-hci.rst                      | 112 ++-
+ doc/bluetoothctl-le.rst                       |  26 +-
+ doc/bluetoothctl-mgmt.rst                     | 743 +++++++++++++++++-
+ doc/bluetoothctl-monitor.rst                  |  79 +-
+ doc/bluetoothctl-player.rst                   | 118 +++
+ doc/bluetoothctl-scan.rst                     | 126 ++-
+ doc/bluetoothctl-telephony.rst                |  75 +-
+ doc/bluetoothctl-transport.rst                |  78 +-
+ doc/bluetoothctl.rst                          | 250 +++++-
+ doc/org.bluez.Adapter.rst                     |  41 +
+ doc/org.bluez.AdminPolicySet.rst              |   5 +
+ doc/org.bluez.AdminPolicyStatus.rst           |   1 +
+ doc/org.bluez.AdvertisementMonitor.rst        |   1 +
+ doc/org.bluez.AdvertisementMonitorManager.rst |   9 +
+ doc/org.bluez.AgentManager.rst                |   9 +
+ doc/org.bluez.Call.rst                        |   9 +
+ doc/org.bluez.Device.rst                      |  39 +
+ doc/org.bluez.GattCharacteristic.rst          |  21 +
+ doc/org.bluez.GattDescriptor.rst              |   9 +
+ doc/org.bluez.GattManager.rst                 |   9 +
+ doc/org.bluez.GattService.rst                 |   1 +
+ doc/org.bluez.LEAdvertisement.rst             |   1 +
+ doc/org.bluez.LEAdvertisingManager.rst        |   5 +
+ doc/org.bluez.Media.rst                       |   9 +
+ doc/org.bluez.MediaAssistant.rst              |   5 +
+ doc/org.bluez.MediaEndpoint.rst               |   5 +
+ doc/org.bluez.MediaFolder.rst                 |  13 +
+ doc/org.bluez.MediaItem.rst                   |   9 +
+ doc/org.bluez.MediaPlayer.rst                 |  45 ++
+ doc/org.bluez.MediaTransport.rst              |  21 +
+ doc/org.bluez.Telephony.rst                   |   9 +
+ 37 files changed, 2622 insertions(+), 160 deletions(-)
 
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+-- 
+2.52.0
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8783903629231291401==--
