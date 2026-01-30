@@ -1,69 +1,69 @@
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E4334D4E0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EAD3542C5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769810585; cv=none; b=hGQr0taL96Am6+S6TKA0cxwr1Tx0Qw3d18P9xmFVVNyazv42Uh71ijsr5GJvr2SNLs7jJ7PBE9PTbLM7yohd9XQRp9uWKeQcddTFhi6ZMV+Qjvx/1Lm029sv4bcUxNGAPN/g+z5FkFHU3Jr9EpnCoN3bTN0EAdYu9uAYfFlg2NI=
+	t=1769810587; cv=none; b=GNTKaIVBKSYH5Ah/9FxiiKVzD+y+sQUyCSwqfr8LZIPL1vrWAZ2+4LAoFqiom2DCZcdohoRJ93yYOwS+PsSfdK5cUgWyIgSIXbIGI3xBtWRbwfQlrDPJAhU4CG9lJ+Jm94Sk+c1pD+p34lTvaiE7rMumNEDXuNIxnje0sO9A5YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769810585; c=relaxed/simple;
-	bh=is+1b0WjjpyO9YYEFvpFspqAlW9puUvIAOguU0ShuUI=;
+	s=arc-20240116; t=1769810587; c=relaxed/simple;
+	bh=2WJUwud4Oo18KqPGs5B1Z35GG8qQBMCKMy3G9i4B7HU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NQZ9EbUAqilYUQejtswJxXkBfXHReRlHcwO7XFLWPECxW+aLfIPa/a7tkUDNnyFP+XzlbBCnsS4/8SYdVNGmrzbDsAtwyTcX9n+Fh6KUajmeK3GOdeeKclfsil9+Xa2WjKIP3GPVfz2EGlIckm2NHnzC4Y45oR/kZ75Uiw1ElRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UQY2F+kc; arc=none smtp.client-ip=209.85.222.50
+	 MIME-Version; b=BjwzUrZ8xv5522oAxUOYSSSZl8qM5goDnQ4x+zR8pmm2VaZYz7U78e95RXnQrYQ0iXNhLoiuIr+Fefq6/RgVLHQ43bVtT8FVeHiRxJO6bMS9ZANBWjKtRkgtFTSJwsILSLpsGxJc91Eo/hg4zwX+Tfk0OIyw/JjrpP6L2Iej8fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qh8qGqZ6; arc=none smtp.client-ip=209.85.221.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQY2F+kc"
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-948029fb1f2so777253241.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:03:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qh8qGqZ6"
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-56635de8acfso826249e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:03:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769810583; x=1770415383; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769810585; x=1770415385; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nR61vLy48uIjAcZWLVw094JSelS8Pam3NnHyQiQ50sI=;
-        b=UQY2F+kcqpgqqL8NRQ02cS+AegrS50xYpAui8jLlYGJ45fri9YEw6C9/KxzI8gWShk
-         lvCr5Ec3XgATJ1ivcRra7TzsiV1WJcnlWhBmUeeEgK12baMF7ax47G9Tjkm6Kl5wl7J6
-         WyJygyTVYaC6b27zDgL/fMcQd000dcVbn78mvtLyjShR5egV5xF5WTziC+kWcP6Mukj6
-         ttEEJNJClJoPhwfvAveJMkYaQAgm/pClitUP2WN8oboZ6g+Zfq+55jT/xCCsveN++x3u
-         EDaQnHK+DAeBXdVOCCVfDvhaIP8C06o9sWPEKfI3KMctIjQ8FxS08D63yC/fRl6XOjZH
-         COIQ==
+        bh=4cFpL/swKZnEGreY0rfFeXi+dB5lnofejhfp5kQkcNc=;
+        b=Qh8qGqZ6tuppymUblrPmsmZsn/TrNYt5MH/uGD6MhZv54L7E0VZl55PCo6WT5bSJeF
+         YqoEE2m/fY3wo/6NKt6Gam03QWzGZMGWED3maeHm1OyfrvhRd2LoNwh1dqGfbn2neHRk
+         Da2PG62v7mOnOT3s6uuZVT6mMh7sVl25wX3noqrL6W1FCOy2rinekImdGJrK0Vb1csAe
+         xxm2CmuIJ5kCpwlbwwB6JnlXPSJQB1urX9Zt4CvlFQ4YuU2tqKveecqB6pbdzEyogzpT
+         eAiz90cxlGAswL1vFcEqL2wUcFO+FfBZEHdc78Pkdie+KONFou7BPMcQ0u1Hh7HKxFpC
+         jjyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769810583; x=1770415383;
+        d=1e100.net; s=20230601; t=1769810585; x=1770415385;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=nR61vLy48uIjAcZWLVw094JSelS8Pam3NnHyQiQ50sI=;
-        b=ASNjXZ03LVfwjpXJ7zwgh+xwkSH/oyfrAjvqz6hWn0HrWme2EkgF2AvWMLS6kXua4G
-         OZdzitTJXf4t6V4YpTWpIEnNmznnWLjdqpKLdppSCODD0qttjjK650ttTvPXI73p9xcG
-         qVV2CUPeWvuJXQBOy48DnfX+G5ngpqC2Vr0EcYCmOaG0TduImIYHsjkousOPNfhYVChy
-         fW+Res6cNYs7OBRzDR2fAB4tcfALiGXJTPGmxRM4GczrDOb+lBJPDZiOm6cFeTcXQBt5
-         wZNj0aCIWTpNIaeHlxcUmYJWPzZJfPQLYdfFfpdVgi9cNj7AXoeUqI4jjAeef6iTLyUk
-         LYoQ==
-X-Gm-Message-State: AOJu0YxHf8actrPTiLVb+hUdRQoElXUoaT3wJyUNLNIwG2F2vPPbjedN
-	I3Zmw1KEBXBvigfjjjfoq1pZN+/zA6rzrNvULpmYj+nIfBcS5T+O8+5VV5b5sw==
-X-Gm-Gg: AZuq6aKwHHV8/kn8Gp3UruWSuODwbV2/rSzV2hxn56bNAipfHha9HasRGR+IJAhUkSL
-	2cnJVpH50GoYYI4MCZy8Xlm+JM5C693nnX3vg+khIBC09vrafS32hHameuxAmVuOig21ZFKLxsG
-	9qySlVk+HRGpxArohnVWUPnf7tGKidt6r72iZhp16mr/lZRegDFEgRjFMiSbLHkWaMIVMGhZcQX
-	m5TIrwnISfDVCcG142ut0Jr3lJ4qXBXfU2gmOCiDduV7ZR2zLAas4k1iokv6l174dTksRfzxqfX
-	zvLtqlN9XuU8j+ahY7hDfS3yrsvVhN+QtjOp3tHOzrJDfzVCPM2VAAaE3p4OLUZRK2l/NgpuYKa
-	5bjRJiJIEh8oO+uOReGvBBp5srgC1AoeXa3SNxx3DBfppZb81orBmIgT2sIZ2Q6tzojWgkhInNY
-	3Zms2BG3Lu8mIJfJCtDL511cho5eW1+UsfTNcn8ImppgEOB0Ic1eu8oyWsMbtJE+QAIVD86tCLS
-	2xvBA==
-X-Received: by 2002:a05:6102:3713:b0:5ef:6709:4738 with SMTP id ada2fe7eead31-5f8e260dbd6mr1578298137.30.1769810583327;
-        Fri, 30 Jan 2026 14:03:03 -0800 (PST)
+        bh=4cFpL/swKZnEGreY0rfFeXi+dB5lnofejhfp5kQkcNc=;
+        b=jBo/d1Z6oTl6orT9uPbdVBA1lF5AY/XxiieQ1V+/hKkO/aTowPCwAdeu4ZjJ87nMSo
+         xuiMD0mqIukgZYjMPOcZLxE0hhUtAhD7v5jMo87Mo/7xxcbU7vk77wIQjTZ11tKmJ34b
+         pCbvu844sK1wk2xepyLoWV2UO9kuOxcfw0dYtHtQzrGzq2XU+7ohnxdUlGCuzK1aiSaV
+         lvB4rKbU1K4gLwdgsIBnBzdTKhhVeWS8pP5cGgciKBaX4yRW0f6sdPfs+szA4hhYgqvz
+         frI7XJItju8CXxW8ncyGoKkI8G8Qe02vRP5D3Ff4U6eBDTqRq8kaXXrXoxnVzK5Sl2Ye
+         2sjw==
+X-Gm-Message-State: AOJu0YxzdTbmtOOYsLdy9Cl8s60jdlumWmCZIcJsxlgaJsYYTsIrGlTT
+	RgqOUlGET8R0t1mlKyHnaLcyM6I6rHaOtb0TfcDinw8PvFrtnPKZ5lxzfohUIw==
+X-Gm-Gg: AZuq6aKpoXWnoP7If28yZf18+42r489pvui6NgRR1rOcJsFc5TVilo2rm4ZoZ7y3+gN
+	M/Nhg4lUZVG2cHPlI6sBSFqh8GUJGxq4mWqUGAEh0F1dIoy6rNCt89pDlY3S7DOiZjLtjRephx7
+	7r35s8DlVAundwlQGPA55qibAB+t+gAyPN6kCfIS+RtIQhelAgT5iUU1WfCppOXmy08OLNXSKR4
+	znCmk1lAfhoxZ0LlJB55TsuFx611XRf/Fr3hJGLOGaUabksx5C5OYU24kmntXNA2+11viM5JL8/
+	M/UBtTdWDpd/PWbTzFkVx8Y/0fZc+nBihVL0gICj6X81DP25jjnrTPpHm7drHuIhSjdcPGCPfR4
+	VQsgiMbHuXXGjSJ7PU3Xngw6hgVr/y7qw0BYcJKipZhi/mD1Pi7i+ii+FT6uKpa5n4X9B3MIhTO
+	Z2HyoD9Qj/G2FfehitX2CRWUZj4ddsIyNWBEStuL8bJ+sXO86tOMqJet2bpKZpYVuVTJZ9vQdRj
+	UXPzA==
+X-Received: by 2002:a05:6122:2a4b:b0:563:62ce:b28e with SMTP id 71dfb90a1353d-5669ffd8f54mr1168107e0c.2.1769810584668;
+        Fri, 30 Jan 2026 14:03:04 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.03.02
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.03.03
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 14:03:02 -0800 (PST)
+        Fri, 30 Jan 2026 14:03:03 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 19/37] doc/org.bluez.AdvertisementMonitor: Add Used by reference
-Date: Fri, 30 Jan 2026 17:02:10 -0500
-Message-ID: <20260130220229.1346261-20-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 20/37] doc/org.bluez.AdvertisementMonitorManager: Add Used by reference
+Date: Fri, 30 Jan 2026 17:02:11 -0500
+Message-ID: <20260130220229.1346261-21-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260130220229.1346261-1-luiz.dentz@gmail.com>
 References: <20260130220229.1346261-1-luiz.dentz@gmail.com>
@@ -77,24 +77,46 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add :Used by: field linking to bluetoothctl-monitor for this callback
-interface implemented by advertisement monitor clients.
+Add :Used by: field linking to bluetoothctl-monitor for this interface
+used to register advertisement monitors.
 ---
- doc/org.bluez.AdvertisementMonitor.rst | 1 +
- 1 file changed, 1 insertion(+)
+ doc/org.bluez.AdvertisementMonitorManager.rst | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/doc/org.bluez.AdvertisementMonitor.rst b/doc/org.bluez.AdvertisementMonitor.rst
-index e08bf41e7a58..ddcc7b0b432d 100644
---- a/doc/org.bluez.AdvertisementMonitor.rst
-+++ b/doc/org.bluez.AdvertisementMonitor.rst
-@@ -29,6 +29,7 @@ Interface
+diff --git a/doc/org.bluez.AdvertisementMonitorManager.rst b/doc/org.bluez.AdvertisementMonitorManager.rst
+index 3860429b0cee..efc1c12ba7c1 100644
+--- a/doc/org.bluez.AdvertisementMonitorManager.rst
++++ b/doc/org.bluez.AdvertisementMonitorManager.rst
+@@ -17,6 +17,7 @@ Interface
  :Service:	org.bluez
- :Interface:	org.bluez.AdvertisementMonitor1 [experimental]
- :Object path:	freely definable
+ :Interface:	org.bluez.AdvertisementMonitorManager1 [experimental]
+ :Object path:	/org/bluez/{hci0,hci1,...}
 +:Used by:	**bluetoothctl-monitor(1)**
  
  Methods
  -------
+@@ -43,6 +44,10 @@ Possible errors:
+ :org.bluez.Error.AlreadyExists:
+ :org.bluez.Error.Failed:
+ 
++Examples:
++
++:bluetoothctl: [monitor] > add-or-pattern <start_pos> <ad_type> <content>
++
+ void UnregisterMonitor(object application)
+ ``````````````````````````````````````````
+ 
+@@ -59,6 +64,10 @@ Possible errors:
+ :org.bluez.Error.InvalidArguments:
+ :org.bluez.Error.DoesNotExist:
+ 
++Examples:
++
++:bluetoothctl: [monitor] > remove-pattern <monitor-id/all>
++
+ Properties
+ ----------
+ 
 -- 
 2.52.0
 
