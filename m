@@ -1,69 +1,69 @@
-Received: from mail-vs1-f65.google.com (mail-vs1-f65.google.com [209.85.217.65])
+Received: from mail-vk1-f194.google.com (mail-vk1-f194.google.com [209.85.221.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998D02FB093
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8622EB5CD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769810581; cv=none; b=aETuuxSUoM5phMPbBbOj+eqDlIxY+EO3frCHQNuTRV7fEVHoYvWUYTtC0L5FCcSUT1m5OFRa55cx0WOXWfNJyiKnQtDN2UCC7RhnsnaYx3jDyx2I35LxwIhoblW8/5ZwBAs6x1TKo4Ui/jKW/yfJbjXd34bJb/6Fwvi4LZdLy5g=
+	t=1769810581; cv=none; b=iLvlItJr1Ldz0qcE7uH1ffa9/OQNzjIwZgFvTbqtvlSFjtMLwMU9u58zORJeNd0AZKVWZSCwZDePFLtFQf/HbaCqNtdxKeZuEjH2jQiNwYiW6P6rCM6MRyd4sogXCqgzLHkoyCzBuOd0mnOhrTNkdOjnpKs6M1J92SdLXbmHmHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769810581; c=relaxed/simple;
-	bh=rUE5HZgo1c2zzKWDGgWnOkHm5Ox6izAIHvkfveqplpw=;
+	bh=U12YggAc//1bv+uspaYqXIzKsHI1nWTvAPMCd2E7IwQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=StvH1Q/ye4DBYyuRdRNBPAHrszUFNxxS3pQLnVGFJYQ1GZynRxxVPo1IRWiN8U0qihf9M4nce3L2R4JAxzr1lYp1czEONyCapHu57kiDxtjr04YtBnfSAamXcV5h74V69wRuAmSPWL/sM/jnmxvg4NZtlre5f51ORiP/t421KiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L0rHiDUM; arc=none smtp.client-ip=209.85.217.65
+	 MIME-Version; b=i1VAmX3aQe7Z+Qb2QF7CGttuUEvXuLWotV5Bxo+zPfONILojtN14VmAr1T8tCCHZhoE4jkcfOR8+hMVm8ej/+yCiP6WMLIPMe7QBHzqWUiM7TSRi73L0COfv+zxxu+/Rqdv+NC8SGBCK8DKrvmzGViObV5Vzr7xK9V6XAfXBOkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YuYKpmqr; arc=none smtp.client-ip=209.85.221.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L0rHiDUM"
-Received: by mail-vs1-f65.google.com with SMTP id ada2fe7eead31-5f53021703aso845671137.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:02:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YuYKpmqr"
+Received: by mail-vk1-f194.google.com with SMTP id 71dfb90a1353d-56637ab30b8so2207022e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:03:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769810578; x=1770415378; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769810579; x=1770415379; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4IfTXbPMbgVtzF/gDYXEBrFe5L1j4eJB2s2bTx/9zE4=;
-        b=L0rHiDUMV9dcM4CwAGdHO4o1b1cUvXUC1u0JE4Xc9cm+YYrk7Pk3s6TP9XOPXOeJrk
-         mr31RHGm8HmJkvOELMlEmw8YDuTVOO6he+EIZRPshf1eqa0RrN2h7JFsUqUzmfg1Jed1
-         MisdJmHTx6RLY5Ktexx6AR+CIgb+gu11/k58GVNGLpgdwYjVXPa020mOfabJVjt9dK/i
-         NqSi8gE7qgBchhiPfeIYT7fzlhDBkejP0B9eQiRpLO7O7tg402iscujTJJrtMUM4/gxe
-         6yJLzF6vqOOyiMOSJMK5UlFy+p1L3RVsWpWUyqSIOJ/o7YS0abHf6fDFvh4O8eKrTP0x
-         Vt3A==
+        bh=jhlgYY9r5KTZIeBhSzNDjcbZ4V0gtimcWaWiuie20Oo=;
+        b=YuYKpmqrV2Dom48w+BjNVEubxkcwC3V6Df5fwfvDacAvYxAVd0J3PPhNLQMTEmVXQg
+         Km9OlZzGgAIucBNfJxP9ymNGFrk0gfNb9MYDAy4aQ82cw19rgxlXo91ng6H411iAYw/c
+         xAP8aGinwuAH4yjLo8v9+HZta1LDLdEfnuc4UKuKRf2FUukwf5Si2zbhCcFcoVXgQRKI
+         d3ZZNLQq2fsgQYQXJ0pe3TmdJ1K8BkedM8dlee2akGTaGN3bKHK41tK39aWDo/2reAl2
+         aezy7n3IApofNFGo7qFllcxecEQu7V71lMW1qny1cnF144mERunevuxW5AZsLI6GPg4t
+         ShvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769810578; x=1770415378;
+        d=1e100.net; s=20230601; t=1769810579; x=1770415379;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=4IfTXbPMbgVtzF/gDYXEBrFe5L1j4eJB2s2bTx/9zE4=;
-        b=GVXdzxaEi1QXdLJcJtEG2zkkvbS9A9fYKmFwXs54dz8HXXNcrfBxoGeGcQ7qwp8yIx
-         W6bH6WspciYqsHAS6JyY8yOiXCM12Fss7a9Tz7pccogd2YhyNkji10qviGUve+/kTtf2
-         XKjStB1wTx20C/Y4inipQFs6urCjBMeXBjQesP9cIQ0WPfWn+fFvs8bSleZpkpip+kur
-         m7bn6I4mP0IIgn8OsOpKaJ2HsmozrumaEMeoOCR72GkLV0NGMZkjX6+4cmH0kkZewTMB
-         mdXwFARPHZ6rOQeSRefLiDMgtKRI34j+w1jPHgDQ9J+qSfU7hMP3E6Wq8lE8IxEv0bYx
-         1qXg==
-X-Gm-Message-State: AOJu0YxUJtETt+iY8f1qEOtMMgjm1Ak7hD535FNj+EBYrxAd+7QO9IXC
-	2u0CE3Fk1FdBQvsk7+orXINAoVDIi/0zwJA0gFtCnkpGbQe3Hkxp540nhiKDX83u
-X-Gm-Gg: AZuq6aJl16Hq1xJQBSFs9TrZv5fveZQ8K1Ijz5MOol6NF3KMq8As8MG3IXrdxhZ5UFc
-	XOmAZ93UigQ7/pApDI5YzJsXvBm8XEcGwGdm5Fv1lIWlRjmDrvY8EXFVMgTzIgGM5wEM8nZWTRx
-	VBKxooFyZfujEWFkjzc29w1S0RSIq4Jo3ZwyDGdDGHcN5XG6NaRBuhDGY3a7NulTNYCPeOqGWiG
-	876z0wx0+LebUq7nWRI6jTpPh6BBBEMwU4jExe6RdRRVnP8MnCH3+50Kve3tGoLr3LnSd7DsO/M
-	6Qpe2tIdRuYH85yg0SXmGOjnC+KQLNssj6W5jm0sTLzKcvk/pm4oAqowhhANWNro8e4hy0haEZ/
-	EbQlJoJlNVVlnzyaUMdWwQQpVuyvsm9/fNEer8OW75Tb1a9ZVNFqgxKSBBEv28ZrWBxjsIKkKjo
-	t5/RtjJLbP8mj0n/2cpKOlDWIU8NFdzo0h1h3zSFZqDPCBKJ4ofiOzGpfDByXs94VvuK3OJeQYd
-	PCYsixBPJ+BXT6r
-X-Received: by 2002:a05:6102:3e89:b0:5db:cba0:941 with SMTP id ada2fe7eead31-5f8e26860f1mr1496739137.38.1769810576670;
-        Fri, 30 Jan 2026 14:02:56 -0800 (PST)
+        bh=jhlgYY9r5KTZIeBhSzNDjcbZ4V0gtimcWaWiuie20Oo=;
+        b=OEl66iqcWP9/SWz9zC57uyK8bu3sQqyDUmxisTLFAGBiyfEjzwOysyyzqS4dOE7Waf
+         c5Q3oOfnT/5b7uV0zsKQ7Cu/reimrbYtNY8LHaqEqoP1W52N+m52s50DAj1wb4Q9nTD5
+         TSa9znK1tCwdvg9arHImJdfYW7wzaa9Vubi2HuroRobOoGwrLP5Acxhuv1YdwVNliqjN
+         amrmjanxa5//ql8ExH6EVUM1PRDH/jdvnZXEh07oRe8wWxQDoCUwYakpSoc5BjsWrNQc
+         0npYvXUEZj8F03hhps5PSxVAlAa1QQkK9WbAxIvehcPTHTTPiYQCt/toWuzXblhoiPh3
+         /K6g==
+X-Gm-Message-State: AOJu0YwG3TxLF08FSXcX5TyxJKV+9zejcQJE1K0//OfTPgagQqlqY4OP
+	1t/ANhfvBobDIaVCHNuRJNK1uQ71MADoJv/FuBz80s1643G+l3g+ceH+CTId8e43
+X-Gm-Gg: AZuq6aLOB/FILvf6LYQkzWC6Kmm5sk35jO9kJlp+tuYMGle8+CJC0lMpFe3GW9sRSay
+	lIZc7dJVdEmQCnNmMBxZO9G/WgjHt9haeK2JO3a7JXXf1YgkTQp8+nRltUHkhaQVtv5q0+jslcc
+	GserhsCpz44V5PLNWQw0a/kyVqjaB/Hhrp3UQUgqwxgMB/2BV1DsRKsiUCJjebHFzL3t6Nxc1qr
+	31MwHyw29FzpcsZ/U9xUMBUIYA+QPbmnxLP2oi26U6RO5kTbYRsE8YNZQixteg9PmnSvfRx7t+I
+	QkoNMPM/DjxReRFOnF8XvUBxPNIz3N/8fGMbc9YluRZL74j8lS22cF1WsppmOP+kLFBmntGVZ6Z
+	p8wdAV5Y3JfH+Wlr+SP9GPFbsF8R3SrBA4/9UWl/3XppGkagJX1ipIrGOSjKAnfYDf0euZhoBft
+	NrLP/NkhtjdGlNDqdRhKnBx/qfLQM0D47QtKPjbpjGXg/Td5XJq5qsAP5Dz0Rr9rBqAAQvTETOd
+	R14FA==
+X-Received: by 2002:a05:6102:440b:b0:5ef:a416:be63 with SMTP id ada2fe7eead31-5f8cdc8e1famr2858846137.22.1769810578732;
+        Fri, 30 Jan 2026 14:02:58 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.02.55
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.02.57
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 14:02:56 -0800 (PST)
+        Fri, 30 Jan 2026 14:02:58 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 13/37] doc/bluetoothctl-scan: Add :Uses: fields and document arguments
-Date: Fri, 30 Jan 2026 17:02:04 -0500
-Message-ID: <20260130220229.1346261-14-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 15/37] doc/bluetoothctl-transport: Add :Uses: fields and document arguments
+Date: Fri, 30 Jan 2026 17:02:06 -0500
+Message-ID: <20260130220229.1346261-16-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260130220229.1346261-1-luiz.dentz@gmail.com>
 References: <20260130220229.1346261-1-luiz.dentz@gmail.com>
@@ -73,7 +73,6 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
@@ -81,205 +80,157 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Add :Uses: fields to link commands to their corresponding D-Bus API
 methods, and document command arguments with usage examples.
 ---
- doc/bluetoothctl-scan.rst | 126 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 122 insertions(+), 4 deletions(-)
+ doc/bluetoothctl-transport.rst | 78 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 77 insertions(+), 1 deletion(-)
 
-diff --git a/doc/bluetoothctl-scan.rst b/doc/bluetoothctl-scan.rst
-index cee255131622..16b4d08daddf 100644
---- a/doc/bluetoothctl-scan.rst
-+++ b/doc/bluetoothctl-scan.rst
+diff --git a/doc/bluetoothctl-transport.rst b/doc/bluetoothctl-transport.rst
+index 77d8457a5d6f..7e3809e5ac18 100644
+--- a/doc/bluetoothctl-transport.rst
++++ b/doc/bluetoothctl-transport.rst
 @@ -18,6 +18,9 @@ SYNOPSIS
  
- **bluetoothctl** [--options] [scan.commands]
+ **bluetoothctl** [--options] [transport.commands]
  
-+This submenu configures discovery filters using **org.bluez.Adapter(5)**
-+method **SetDiscoveryFilter**.
++This submenu manages media transports for audio streaming using the
++**org.bluez.MediaTransport(5)** interface.
 +
- Scan Commands
- =============
+ Media Transport Commands
+ =========================
  
-@@ -27,6 +30,24 @@ uuids
- Set/Get UUIDs filter.
+@@ -28,12 +31,23 @@ List available transports.
  
- :Usage: **> uuids [all/uuid1 uuid2 ...]**
-+:Uses: **org.bluez.Adapter(5)** method **SetDiscoveryFilter** property **UUIDs**
-+:[all/uuid1 uuid2 ...]: List of UUIDs to filter for during scanning (default: none, use "all" to scan for any UUID)
-+:Example Show current UUID filter settings:
-+	| **> uuids**
-+:Example Filter for Generic Access service only:
-+	| **> uuids 0x1800**
-+:Example Filter for Battery service only:
-+	| **> uuids 0x180F**
-+:Example Filter for Generic Access and Battery services:
-+	| **> uuids 0x1800 0x180F**
-+:Example Filter for Device Info, Battery, and Environmental Sensing:
-+	| **> uuids 0x180A 0x180F 0x181A**
-+:Example Filter for Generic Access using full UUID:
-+	| **> uuids 00001800-0000-1000-8000-00805f9b34fb**
-+:Example Filter using mixed short and long forms:
-+	| **> uuids 00001800-0000-1000-8000-00805f9b34fb 0000180f-0000-1000-8000-00805f9b34fb**
-+:Example Remove UUID filtering (scan for all devices):
-+	| **> uuids all**
+ :Usage: **> list**
  
- rssi
++:Example Display all available media transports (A2DP, LE Audio, etc.):
++	| **> list**
++
+ show
  ----
-@@ -41,7 +62,20 @@ If one or more discovery filters have been set, the RSSI delta-threshold imposed
- by starting discovery by default will not be applied.
  
- :Usage: **> rssi [rssi]**
--:Example: **> rssi -60**
-+:Uses: **org.bluez.Adapter(5)** method **SetDiscoveryFilter** property **RSSI**
-+:[rssi]: Minimum RSSI threshold value in dBm (optional, shows current if omitted)
-+:Example Show current RSSI filter setting:
-+	| **> rssi**
-+:Example Only report devices with RSSI ≥ -60 dBm (close range):
-+	| **> rssi -60**
-+:Example Report devices with RSSI ≥ -80 dBm (medium range):
-+	| **> rssi -80**
-+:Example Report devices with RSSI ≥ -90 dBm (extended range):
-+	| **> rssi -90**
-+:Example Report only very close devices (RSSI ≥ -40 dBm):
-+	| **> rssi -40**
-+:Example Report devices with very weak signals (maximum sensitivity):
-+	| **> rssi -100**
+ Show transport information.
  
- pathloss
- --------
-@@ -55,7 +89,20 @@ If one or more discovery filters have been set, the RSSI delta-threshold
- imposed by starting discovery by default will not be applied.
+ :Usage: **> show [transport]**
++:Uses: **org.bluez.MediaTransport(5)** properties
++:[transport]: Specific transport object path (optional, shows current if omitted)
++:Example Show information for currently selected transport:
++	| **> show**
++:Example Show transport information:
++	| **> show /org/bluez/hci0/dev_00_11_22_33_44_55/fd0**
++:Example Show Broadcast Isochronous Stream transport:
++	| **> show /org/bluez/hci0/dev_11_22_33_44_55_66/bis1**
  
- :Usage: **> pathloss [pathloss]**
--:Example: **> pathloss 4**
-+:Uses: **org.bluez.Adapter(5)** method **SetDiscoveryFilter** property **Pathloss**
-+:[pathloss]: Maximum pathloss threshold value in dB (optional, shows current if omitted)
-+:Example Show current pathloss filter setting:
-+	| **> pathloss**
-+:Example Report devices with maximum 4 dB pathloss (very close):
-+	| **> pathloss 4**
-+:Example Report devices with maximum 10 dB pathloss (close range):
-+	| **> pathloss 10**
-+:Example Report devices with maximum 20 dB pathloss (medium range):
-+	| **> pathloss 20**
-+:Example Report devices with maximum 30 dB pathloss (extended range):
-+	| **> pathloss 30**
-+:Example Report devices with maximum 50 dB pathloss (maximum range):
-+	| **> pathloss 50**
- 
- transport
- ---------
-@@ -79,6 +126,15 @@ If "auto" transport is requested, the scan will use LE, BREDR, or both,
- depending on what's currently enabled on the controller.
- 
- :Usage: **> transport [auto/bredr/le]**
-+:[auto/bredr/le]: Transport type for scanning (optional, shows current if omitted)
-+:Example Show current transport filter setting:
-+	| **> transport**
-+:Example Use automatic transport selection (LE + BR/EDR):
-+	| **> transport auto**
-+:Example Scan only Low Energy devices:
-+	| **> transport le**
-+:Example Scan only BR/EDR (Classic Bluetooth) devices:
-+	| **> transport bredr**
- 
- duplicate-data
- --------------
-@@ -91,6 +147,13 @@ When enabled, PropertiesChanged signals will be generated for ManufacturerData
- and ServiceData every time they are discovered.
- 
- :Usage: **> duplicate-data [on/off]**
-+:[on/off]: Enable or disable duplicate advertisement data reporting (optional, shows current if omitted)
-+:Example Show current duplicate data filter setting:
-+	| **> duplicate-data**
-+:Example Enable reporting of duplicate advertisement data:
-+	| **> duplicate-data on**
-+:Example Disable duplicate data reporting (filter duplicates):
-+	| **> duplicate-data off**
- 
- discoverable
- ------------
-@@ -103,6 +166,13 @@ If the adapter is already discoverable, setting this filter won't have any
- effect.
- 
- :Usage: **> discoverable [on/off]**
-+:[on/off]: Make adapter discoverable during scanning (optional, shows current if omitted)
-+:Example Show current discoverable filter setting:
-+	| **> discoverable**
-+:Example Make adapter discoverable during scanning:
-+	| **> discoverable on**
-+:Example Keep adapter non-discoverable during scanning:
-+	| **> discoverable off**
- 
- pattern
+ acquire
  -------
-@@ -120,7 +190,21 @@ When set, it disregards device discoverable flags.
-        string "" pattern will match any device found.
+@@ -41,6 +55,13 @@ acquire
+ Acquire transport.
  
- :Usage: **> pattern [value]**
--
-+:[value]: Pattern to match device address prefix or name (optional, shows current if omitted)
-+:Example Show current pattern filter setting:
-+	| **> pattern**
-+:Example Discover devices with "Samsung" in the name:
-+	| **> pattern Samsung**
-+:Example Discover devices with "iPhone" in the name:
-+	| **> pattern iPhone**
-+:Example Discover devices with "Headphones" in the name:
-+	| **> pattern Headphones**
-+:Example Discover devices with addresses starting with 00:11:22:
-+	| **> pattern 00:11:22**
-+:Example Discover devices with addresses starting with AA:BB:CC:
-+	| **> pattern AA:BB:CC**
-+:Example Clear pattern filter (match any device):
-+	| **> pattern ""**
+ :Usage: **> acquire <transport> [transport1...]**
++:Uses: **org.bluez.MediaTransport(5)** method **Acquire**
++:<transport>: Media transport object path to acquire for audio streaming
++:[transport1...]: Additional transport paths for multi-stream acquisition (optional)
++:Example Acquire transport:
++	| **> acquire /org/bluez/hci0/dev_00_11_22_33_44_55/fd0**
++:Example Acquire multiple transports:
++	| **> acquire /org/bluez/hci0/dev_00_11_22_33_44_55/fd0 /org/bluez/hci0/dev_00_11_22_33_44_55/fd1**
  
- auto-connect
- ------------
-@@ -131,13 +215,47 @@ Connect to discovered devices automatically if pattern filter has been set and
- it matches the device address or name and the device is connectable.
+ Note:
  
- :Usage: **> auto-connect [on/off]**
-+:[on/off]: Automatically connect to discovered devices matching pattern filter (optional, shows current if omitted)
-+:Example Show current auto-connect filter setting:
-+	| **> auto-connect**
-+:Example Enable automatic connection to matching devices:
-+	| **> auto-connect on**
-+:Example Disable automatic connection (manual connection required):
-+	| **> auto-connect off**
+@@ -54,6 +75,13 @@ Select transport. For transports created on a Broadcast Sink device only. This m
+ the transport to the "broadcasting" state, pending acquire.
  
- clear
- -----
+ :Usage: **> select <transport> [transport1...]**
++:Uses: **org.bluez.MediaTransport(5)** method **Select**
++:<transport>: Broadcast sink transport path to move to broadcasting state
++:[transport1...]: Additional transport paths for multi-stream selection (optional)
++:Example Select single Broadcast Isochronous Stream:
++	| **> select /org/bluez/hci0/dev_00_11_22_33_44_55/bis1**
++:Example Select stereo broadcast streams:
++	| **> select /org/bluez/hci0/dev_00_11_22_33_44_55/bis1 /org/bluez/hci0/dev_00_11_22_33_44_55/bis2**
  
- Clears discovery filter.
+ Note:
  
--:Usage: **> clear [uuids/rssi/pathloss/transport/duplicate-data/discoverable/pattern]**
-+:Usage: **> clear [uuids/rssi/pathloss/transport/duplicate-data/discoverable/pattern/auto-connect]**
-+:[uuids/rssi/pathloss/transport/duplicate-data/discoverable/pattern/auto-connect]: Specific filter(s) to clear (optional, clears all if omitted)
-+:Example Clear all discovery filters:
-+	| **> clear**
-+:Example Clear only UUID filter:
-+	| **> clear uuids**
-+:Example Clear only RSSI filter:
-+	| **> clear rssi**
-+:Example Clear only pathloss filter:
-+	| **> clear pathloss**
-+:Example Clear only transport filter:
-+	| **> clear transport**
-+:Example Clear only duplicate data filter:
-+	| **> clear duplicate-data**
-+:Example Clear only discoverable filter:
-+	| **> clear discoverable**
-+:Example Clear only pattern filter:
-+	| **> clear pattern**
-+:Example Clear only auto-connect filter:
-+	| **> clear auto-connect**
-+:Example Clear UUID and RSSI filters:
-+	| **> clear uuids rssi**
-+:Example Clear transport and pattern filters:
-+	| **> clear transport pattern**
-+:Example Clear pattern and auto-connect filters:
-+	| **> clear pattern auto-connect**
-+:Example Clear RSSI, pathloss, and discoverable filters:
-+	| **> clear rssi pathloss discoverable**
+@@ -77,6 +105,12 @@ was acquired by bluetoothctl it can be released straight away, without having to
+ unselected.
+ 
+ :Usage: **> unselect <transport> [transport1...]**
++:<transport>: Broadcast sink transport path to move to idle state
++:[transport1...]: Additional transport paths for multi-stream unselection (optional)
++:Example Unselect broadcast stream transport:
++	| **> unselect /org/bluez/hci0/dev_00_11_22_33_44_55/bis1**
++:Example Unselect multiple broadcast streams:
++	| **> unselect /org/bluez/hci0/dev_00_11_22_33_44_55/bis1 /org/bluez/hci0/dev_00_11_22_33_44_55/bis2**
+ 
+ Note:
+ If running the setup with an audio server that has LE Audio support (such as PipeWire), it will
+@@ -88,6 +122,13 @@ release
+ Release transport.
+ 
+ :Usage: **> release <transport> [transport1...]**
++:Uses: **org.bluez.MediaTransport(5)** method **Release**
++:<transport>: Media transport object path to release from audio streaming
++:[transport1...]: Additional transport paths for multi-stream release (optional)
++:Example Release transport:
++	| **> release /org/bluez/hci0/dev_00_11_22_33_44_55/fd0**
++:Example Release multiple transports:
++	| **> release /org/bluez/hci0/dev_00_11_22_33_44_55/fd0 /org/bluez/hci0/dev_00_11_22_33_44_55/fd1**
+ 
+ Note:
+ 
+@@ -98,7 +139,14 @@ send
+ 
+ Send contents of a file.
+ 
+-:Usage: **> send <transport> <filename>**
++:Usage: **> send <transport> <filename> [transport1...]**
++:<transport>: Media transport object path to send audio data through
++:<filename>: Path to audio file to transmit (supports WAV, MP3, PCM formats)
++:[transport1...]: Additional transport paths for multi-stream sending (optional)
++:Example Send encoded audio file via transport:
++	| **> send /org/bluez/hci0/dev_00_11_22_33_44_55/fd0 /home/user/music.<format>**
++:Example Send to multiple transports simultaneously:
++	| **> send /org/bluez/hci0/dev_00_11_22_33_44_55/fd0 /home/user/stereo-left.<format> /org/bluez/hci0/dev_00_11_22_33_44_55/fd1 /home/user/stereo-rigth.<format>**
+ 
+ receive
+ -------
+@@ -106,6 +154,14 @@ receive
+ Get/Set file to receive.
+ 
+ :Usage: **> receive <transport> [filename]**
++:<transport>: Media transport object path to receive audio data from
++:[filename]: Path to save received audio data (optional, shows current if omitted)
++:Example Show current receive file for transport:
++	| **> receive /org/bluez/hci0/dev_00_11_22_33_44_55/fd0**
++:Example Set file to receive audio data:
++	| **> receive /org/bluez/hci0/dev_00_11_22_33_44_55/fd0 /tmp/recorded_audio.wav**
++:Example Set file for broadcast audio capture (note quotes):
++	| **> receive /org/bluez/hci0/dev_11_22_33_44_55_66/bis1 "/home/user/My Recordings/broadcast.wav"**
+ 
+ volume
+ ------
+@@ -113,6 +169,26 @@ volume
+ Get/Set transport volume.
+ 
+ :Usage: **> volume <transport> [value]**
++:Uses: **org.bluez.MediaTransport(5)** property **Volume**
++:<transport>: Media transport object path to control volume for
++:[value]: Volume level (0-127, optional, shows current if omitted)
++:Example Show current volume level:
++	| **> volume /org/bluez/hci0/dev_00_11_22_33_44_55/fd0**
++:Example Set volume to 100:
++	| **> volume /org/bluez/hci0/dev_00_11_22_33_44_55/fd0 100**
++
++metadata
++--------
++
++Get/Set Transport Metadata.
++
++:Usage: **> metadata <transport> [value...]**
++:<transport>: Media transport object path
++:[value...]: Metadata value as hex string (optional, shows current if omitted)
++:Example Show current metadata for transport:
++	| **> metadata /org/bluez/hci0/dev_00_11_22_33_44_55/fd0**
++:Example Set metadata value:
++	| **> metadata /org/bluez/hci0/dev_00_11_22_33_44_55/fd0 0x03020100**
  
  RESOURCES
  =========
