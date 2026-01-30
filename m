@@ -1,69 +1,69 @@
-Received: from mail-vk1-f193.google.com (mail-vk1-f193.google.com [209.85.221.193])
+Received: from mail-vk1-f195.google.com (mail-vk1-f195.google.com [209.85.221.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D7A274FEB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 19:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062472FD1C1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 19:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769801982; cv=none; b=GvBTOuLQeo/1VJ+HHoe37Sf2x20ZxsXsBaLrz4G3zZ5A4UY5WUEAzBX2J8sPZyAiAKDJ+p5CsvHBVyfB1xpilneW3/NrQN8K4nA9HThv5ewo0DJkf1kPmgjG41zA5ZMJ0XOv7SnFYhBvnYTI/tNaCMQzmJ1N7eD5asBQSkW/eV4=
+	t=1769801984; cv=none; b=rcJFuqkrRJsu1iMQOJvAEpki6e15e5KTs/GhX4X7uizWEhPMWeATwqKV2DdntScxcvwRy5bMKUuo/dgNSUlZpeurFv7KHGqiLfCwKCmz1ysDg1i6Vw29jsXhfkYN3dD4/XLJLma7gei7xy8K8LiRNfJEimEH0rgAIPaei0wM3cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769801982; c=relaxed/simple;
-	bh=d9dZoNo7g5TXn3o2aw62KlA73fT6o38IGNkAhknTVHw=;
+	s=arc-20240116; t=1769801984; c=relaxed/simple;
+	bh=3dyIQDoxQL940go/6Pg4cTdZVy4bFcGmz5cXI2fHaec=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PWiNshyD+Nboe1y1pD5RHPJKO8EJ4XjQtYrAMiYKoLDoTqaNu50CQ4J1oK5NL3UYPylU65qs+xqJ9BUbrXBNHKlEohDYxIw13RdUi3gI+V0qBk70Ag9p1SBFTUN4JTYG9GU7yXa8hY9/4qX8oF6zL+ucsqRZCHi2xUXOJJM65qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BpG+Fk2M; arc=none smtp.client-ip=209.85.221.193
+	 MIME-Version; b=LttBHZ9ZUyxPrJQl7qxV0NN2xZrEh6tBThcxRMEBgY2hVZZ8HCIWrXLy15s0DiUeFAvc0zzThiFws6zFyV+WotQOzsKRT1B4vsVDxGjrgqSAhN56S8fLdqp1nWnaWnH3AexPLEvvUIweH9OcUOE78GqPvyxr8oHG2EHYMPlsTp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CIu35MQd; arc=none smtp.client-ip=209.85.221.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BpG+Fk2M"
-Received: by mail-vk1-f193.google.com with SMTP id 71dfb90a1353d-56643f72af5so874884e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 11:39:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CIu35MQd"
+Received: by mail-vk1-f195.google.com with SMTP id 71dfb90a1353d-5637886c92aso843583e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 11:39:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769801980; x=1770406780; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769801981; x=1770406781; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WkF72W+Olr1cWxBAbMglgj7E/Gk8247G0rxnWjbgskw=;
-        b=BpG+Fk2MS81sTikAD4DL49jo4U7gZEnayyliyNh0HNvsBO3oMSTPJ7BX+Sv1xazIO/
-         BcW1NNfUNzQBTm0rdTIfCWgdB8qpePG2csZGP6F85s/6ZUOUdXBz11P65V8u8MDJb8nd
-         9Vg8O5nq5vrZcCT0Xq4dy6arC25xXVkqE2mpcGEvcQ6+odfiFpTCQFD6yDRSUs6eDY7p
-         FUDrAWg1ZrG4YLpQBU+ZdLeUJnTPqWEfW4eIriu6DYo7aJDnVgosJqp4pJ6+1+fjYZLY
-         xfqzySuUCjptmZ3zWcvVFqf0ncNglXW9zKYXrnY01tKGdHUD6+coMO0Svi5aTxPOAPWk
-         I8Ag==
+        bh=04/7DrTA4Du2day76YYueoteBpggMV9ufyq1EteqNcU=;
+        b=CIu35MQdTIiCEMSWjs9flMrk1BOrRlmXQlY3G7WHx6uyReqPKDqprWMVAKTOCIyMjc
+         nEHxki5sbH3NaPANbOkS0JXTACZzk+pFJGL3HzUkr/9NGwUUXQ+wqDJnan8/fa9ey6zs
+         GLenLzyoga8QGBfg7z2svYOwUrz7Bo6lYs8H+gxb565N0P8qDQ/qTIrs7eDPOE/bCVTh
+         BI2jcYn41aIFZWF/iL3oummgh1Ig71ySVW6i6DEH6syhMznMeopEHr3iMXBCTYxVW/Np
+         MuQ5eObxzZ0x5qCSj6wZ6AWtiLb8l4uV3IXsv3XTHfwP9SyT+KBUQcYtXQuLaJriZ2Xh
+         RL8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769801980; x=1770406780;
+        d=1e100.net; s=20230601; t=1769801981; x=1770406781;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=WkF72W+Olr1cWxBAbMglgj7E/Gk8247G0rxnWjbgskw=;
-        b=N+Rf9PghB6+JmtHnwE6rSc5USOlAXmvyPkHZywxZWTkp+j8BCGgrgEr1UP84uZ+ebG
-         orHzqnvz4Cx1ujce50brja9dCOFmmFMxWgztxA7YqvrN2IBOOJEqVYArdUJrbkiehuq6
-         gV6d5t1uGieCEn/Mr6Iqq/t7GIMXpC8OVAN4+rTRtYsQ4C0gRB++FbGX4dyFuUqI36xH
-         KZEpU2ZOByJVxftBFxHwSyqBaB6nA20QPuJKcGI49ns51bhN8aUeLJM2ORpJTWSIXzy2
-         D4VSQgB6OQU+YeInNnZvyQGNH6MRbgoWB9sJ6M6dsqE29fb7ftcf4qlJIBMskNVm7IH6
-         EYLQ==
-X-Gm-Message-State: AOJu0Ywgsh/CduWWNPVhrqtfvU2CKOaZSAGkPYSIktHDlvK6KlJmahwi
-	8xf2XGSYaV7Vo9h8psPu6VUGO6vmYA8+fGQkHf5eB+py7HPC0qtT9axBM37nS7Hg
-X-Gm-Gg: AZuq6aL3olL4ZWbZweJ8CyOUwfovttVjp/vq8yXRiBAVScT1K9qEWCz+9RhfC72giMU
-	CXd9AQSy10YOBtvqajnKXyKg4n/4K6nzU/UAgwlIyZ4GxyBi2Jw1ybgZPM3/DaSCBFhfGpN3oA9
-	T1WySZvEpwOevok0O+StBMvQOPKC5zAtP8xa0X2OGsHytZqx/tDBICD+mBpFiVzRpeRjEnlNB7r
-	lOwwngO1Zu7OPQfTPG5sGrtp4prt9GhY50iP1hUV9aht83/IP6YSn9dHf8tkDZXR4MUN2xTF603
-	PGuL5fiEqvmaKJNTRUJ3zpfp/k26YdUIfmSnQ30QztLeFv0fE1lQTQ4Zkb6tNSr4uMC6bpbsgsi
-	hk5wdEupz1oQIjOXV9DFb/4lPyB+pkvd6be8wvMQLwl5Fu65AI7yYq9pkaJZvicXrjAIVkd0QtV
-	h0MVrWPzQ0ecj/0FMlPc6rj/lGXm485yoH41Y+KU6QWA6qmnqaM1v2F5HnS6wOF0MLcoWPfTNlp
-	hke9w==
-X-Received: by 2002:a05:6122:1692:b0:55b:305b:4e45 with SMTP id 71dfb90a1353d-566a0143c31mr1087914e0c.17.1769801979778;
-        Fri, 30 Jan 2026 11:39:39 -0800 (PST)
+        bh=04/7DrTA4Du2day76YYueoteBpggMV9ufyq1EteqNcU=;
+        b=svyIFvBkvGfRhU9NpNIQSnWtB1TYPBwC4jA70EuMZZg7UdiqsEcdPUdCqWKQGPLCRS
+         cyEVLdJpLzvVf2p0BcvwGbWF3Kz11HL9UgIwzoaoUcy+tOZ6FAuBQ91WtunqjKJi630I
+         dQ6KsXkIHWkbmkS5L36Bg4nsT1vK4G1/R4KPEEtLyRJ4QcVtbNAzjI77Px7y2w42ZT0B
+         X2xYxYZVG5OvwTBKHdfIL0R3D9TQIA8rOZUgqZgqstpI2N3Y056sk+ilbe5a9v3Gqzsy
+         LMwvhAPwOr3cYWpSyG9LoUXa2jHj9h+kTT6gLsusZ/jUYHlalq1mFBaigRb2c/AHIU6/
+         mY0Q==
+X-Gm-Message-State: AOJu0YwDodGJz1pUVCddEfPFX87h9hfaUbuWBNNa0YNAzqFyB7NAgE3H
+	EDdd4HXP5vOq+h1O6HIdsmnhcFx05SXL88bW1ccdaXoQ2m7FpuK5zwYyjql1XMbb
+X-Gm-Gg: AZuq6aL4q9lyxmTIMJ9LJXcygiqjPPp7lInv7sR370p5uBMbiaVJHErG2mHV5zDZtFE
+	Ijrd0Pssbv8+UudnCddmeauOdx+XjcLevdF8OeypujMN3UrMM82I1UbvdyQZrb91om8li0Q+4H+
+	j2UqQYWtuOQDU7TUHtU/4CiRQMqxB/tYG98Bwz6g4hqNRKQlStzg4WM9NMehy4abOiRA/Ifht+2
+	rSa7Z5dlpnV6g90bwVKln5ZTDxTVcoUk3DmGkLEgdp2+ZchsR7/x72+7K4JndMAWVMj4vdH04ii
+	x4X1OjFAXDk3Px/7LT3MaM1hl/dsqw+OE/e3qCrVXCn8Y6y8mFViVMSTTr3Sf8mF3214AITWlxJ
+	iZ21Xw5IGSTDzbS75BIiHRWab7sPTRuFNdx2u3E/vJqsLrYzqRGiPxmUjAmBSrGt7IhDVcJ9Z/s
+	OlO5j6KOjvpn69PrWUGmAZZi+HLZHCqF4OlYJFvcOe7hWMYoHDWZSWT1JIaBIcRoS3nSp9cBXqO
+	KkceQ==
+X-Received: by 2002:a05:6122:f89:b0:55b:1aa5:bf88 with SMTP id 71dfb90a1353d-566a0034a6dmr1036162e0c.7.1769801980844;
+        Fri, 30 Jan 2026 11:39:40 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56685b0360fsm2523603e0c.1.2026.01.30.11.39.38
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56685b0360fsm2523603e0c.1.2026.01.30.11.39.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 11:39:39 -0800 (PST)
+        Fri, 30 Jan 2026 11:39:40 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 09/35] doc/bluetoothctl-hci: Add :Uses: fields and document arguments
-Date: Fri, 30 Jan 2026 14:38:51 -0500
-Message-ID: <20260130193921.1273263-10-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 10/35] doc/bluetoothctl-le: Add :Uses: fields and document arguments
+Date: Fri, 30 Jan 2026 14:38:52 -0500
+Message-ID: <20260130193921.1273263-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260130193921.1273263-1-luiz.dentz@gmail.com>
 References: <20260130193921.1273263-1-luiz.dentz@gmail.com>
@@ -80,170 +80,71 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Add :Uses: fields to link commands to their corresponding D-Bus API
 methods, and document command arguments with usage examples.
 ---
- doc/bluetoothctl-hci.rst | 112 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 99 insertions(+), 13 deletions(-)
+ doc/bluetoothctl-le.rst | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/doc/bluetoothctl-hci.rst b/doc/bluetoothctl-hci.rst
-index 70aa5e7afaa4..05cd763f5465 100644
---- a/doc/bluetoothctl-hci.rst
-+++ b/doc/bluetoothctl-hci.rst
-@@ -18,6 +18,11 @@ SYNOPSIS
+diff --git a/doc/bluetoothctl-le.rst b/doc/bluetoothctl-le.rst
+index 808d5786ee80..a6e1074ffa87 100644
+--- a/doc/bluetoothctl-le.rst
++++ b/doc/bluetoothctl-le.rst
+@@ -18,6 +18,9 @@ SYNOPSIS
  
- **bluetoothctl** [--options] [hci.commands]
+ **bluetoothctl** [--options] [le.commands]
  
-+.. note::
-+   This submenu communicates directly with the Bluetooth controller via HCI
-+   socket, bypassing the BlueZ D-Bus API. Commands use the Host Controller
-+   Interface (HCI) protocol.
++This submenu manages LE (Low Energy) bearer connections using the
++**org.bluez.Device(5)** interface.
 +
- Commands
- ========
+ LE Commands
+ ===========
  
-@@ -27,12 +32,22 @@ open
- Open HCI channel.
+@@ -27,6 +30,8 @@ list
+ List available le devices.
  
- :Usage: **> open <index> <chan=raw,user>**
--:Example open user channel:
--	| In order to open a user channel the controller needs to be power off
--	| first:
--	| > power off
--	| > hci.open 0 user
--	| HCI index 0 user channel opened
-+:index: HCI controller index number (e.g., 0, 1, 2)
-+:chan: Channel type (raw or user)
-+:Example Open user channel (controller needs to be powered off first):
-+	| **> power off**
-+	| **> hci.open 0 user**
-+	| **HCI index 0 user channel opened**
-+:Example Open user channel for HCI controller 0:
-+	| **> hci.open 0 user**
-+:Example Open user channel for HCI controller 1:
-+	| **> hci.open 1 user**
-+:Example Open user channel for HCI controller 2:
-+	| **> hci.open 2 user**
-+:Example Open raw channel for HCI controller 0:
-+	| **> hci.open 0 raw**
-+:Example Open raw channel for HCI controller 1:
-+	| **> hci.open 1 raw**
+ :Usage: **> list**
++:Example Display all LE (Low Energy) devices that have been discovered:
++	| **> list**
  
- cmd
- ---
-@@ -40,10 +55,30 @@ cmd
- Send HCI command.
- 
- :Usage: **> cmd <opcode> [parameters...]**
--:Example send HCI Reset command:
--	| > hci.cmd 0x0c03
--	| HCI Command complete:
--	|  00
-+:opcode: HCI command opcode in hexadecimal format (e.g., 0x0c03)
-+:parameters: Optional command parameters as hexadecimal bytes
-+:Example Send HCI Reset command:
-+	| **> hci.cmd 0x0c03**
-+	| **HCI Command complete:**
-+	| **00**
-+:Example Send HCI Reset command (no parameters):
-+	| **> hci.cmd 0x0c03**
-+:Example Send HCI Read Local Version Information:
-+	| **> hci.cmd 0x1003**
-+:Example Send HCI Read BD Address:
-+	| **> hci.cmd 0x1009**
-+:Example Send HCI Set Event Filter with parameter 0x01:
-+	| **> hci.cmd 0x0c01 0x01**
-+:Example Send LE Set Advertising Parameters with 2 parameters:
-+	| **> hci.cmd 0x200f 0x00 0x08**
-+:Example Send LE Set Advertising Data with length and data bytes:
-+	| **> hci.cmd 0x2008 0x20 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08**
-+:Example Send HCI Set Event Mask command:
-+	| **> hci.cmd 0x0c05 0x02**
-+:Example Send HCI Write Scan Enable:
-+	| **> hci.cmd 0x0c2a 0x01**
-+:Example Send HCI Write Class of Device:
-+	| **> hci.cmd 0x0c23 0x00 0x08**
- 
- send
+ show
  ----
-@@ -51,8 +86,29 @@ send
- Send HCI data packet.
+@@ -34,6 +39,12 @@ show
+ Show le bearer information on a device.
  
- :Usage: **> send <type=acl,sco,iso> <handle> [data...]**
--:Example send ACL data packet to connection handle 0x0000:
--	| > hci.send acl 0x0000
-+:type: Packet type (acl, sco, or iso)
-+:handle: Connection handle in hexadecimal format (e.g., 0x0000)
-+:data: Optional data bytes in hexadecimal format
-+:Example Send ACL data packet to connection handle 0x0000:
-+	| **> hci.send acl 0x0000**
-+:Example Send empty ACL packet to handle 0x0000:
-+	| **> hci.send acl 0x0000**
-+:Example Send ACL packet with "Hello" data to handle 0x0001:
-+	| **> hci.send acl 0x0001 0x48 0x65 0x6c 0x6c 0x6f**
-+:Example Send ACL packet with custom data to handle 0x0010:
-+	| **> hci.send acl 0x0010 0x01 0x02 0x03 0x04**
-+:Example Send empty SCO packet to handle 0x0000:
-+	| **> hci.send sco 0x0000**
-+:Example Send SCO packet with audio data:
-+	| **> hci.send sco 0x0001 0xaa 0xbb 0xcc**
-+:Example Send SCO packet with sine wave pattern:
-+	| **> hci.send sco 0x0002 0x80 0x00 0x80 0x00**
-+:Example Send empty ISO packet to handle 0x0000:
-+	| **> hci.send iso 0x0000**
-+:Example Send ISO packet with sample data:
-+	| **> hci.send iso 0x0001 0x12 0x34 0x56 0x78**
-+:Example Send ISO packet for LE Audio stream:
-+	| **> hci.send iso 0x0020 0xa0 0xa1 0xa2 0xa3**
+ :Usage: **> show [dev]**
++:Uses: **org.bluez.Device(5)** properties
++:[dev]: Bluetooth device address (optional, shows all LE bearers if omitted)
++:Example Show all LE bearer information:
++	| **> show**
++:Example Show LE bearer info for device with specified address:
++	| **> show 00:11:22:33:44:55**
  
- register
- --------
-@@ -60,6 +116,21 @@ register
- Register HCI event handler.
+ connect
+ -------
+@@ -46,8 +57,11 @@ An active scan report is required before the connection can be
+ established. If no advertising report is received before the timeout,
+ a le-connection-abort-by-local error will be issued.
  
- :Usage: **> register <event>**
-+:event: HCI event code in hexadecimal format (e.g., 0x0e)
-+:Example Register handler for Command Complete event:
-+	| **> register 0x0e**
-+:Example Register handler for Command Status event:
-+	| **> register 0x0f**
-+:Example Register handler for Connection Complete event:
-+	| **> register 0x03**
-+:Example Register handler for Disconnection Complete event:
-+	| **> register 0x05**
-+:Example Register handler for LE Meta events:
-+	| **> register 0x3e**
-+:Example Register handler for Inquiry Complete event:
-+	| **> register 0x02**
-+:Example Register handler for Role Change event:
-+	| **> register 0x22**
+-:Usage: > connect <dev>
+-:Example: > connect 1C:48:F9:9D:81:5C
++:Usage: **> connect <dev>**
++:Uses: **org.bluez.Device(5)** method **Connect**
++:<dev>: Bluetooth device address to connect to
++:Example Connect to another LE device:
++	| **> connect 00:11:22:33:44:55**
  
- unregister
+ disconnect
  ----------
-@@ -67,13 +138,28 @@ unregister
- Unregister HCI event handler.
+@@ -57,8 +71,12 @@ Disconnect device over le.
+ By default this command disconnects all profiles/services associated with the le
+ connection, and then terminates the le link.
  
- :Usage: **> unregister <event>**
-+:event: HCI event code in hexadecimal format (e.g., 0x0e)
-+:Example Unregister Command Complete event handler:
-+	| **> unregister 0x0e**
-+:Example Unregister Command Status event handler:
-+	| **> unregister 0x0f**
-+:Example Unregister Connection Complete event handler:
-+	| **> unregister 0x03**
-+:Example Unregister Disconnection Complete event handler:
-+	| **> unregister 0x05**
-+:Example Unregister LE Meta event handler:
-+	| **> unregister 0x3e**
- 
- close
- -----
- 
- Close HCI channel.
- 
--:Usage: **> close <index>**
-+Closes the currently open HCI channel.
+-:Usage: > disconnect <dev>
+-:Example: > disconnect 1C:48:F9:9D:81:5C
++:Usage: **> disconnect <dev>**
++:Uses: **org.bluez.Device(5)** method **Disconnect**
++:<dev>: Bluetooth device address to disconnect from
++:Example Disconnect from another LE device:
++	| **> disconnect 00:11:22:33:44:55**
 +
-+:Usage: **> close**
-+:Example Close the current HCI channel:
-+	| **> close**
  
  RESOURCES
  =========
