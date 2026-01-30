@@ -1,69 +1,69 @@
-Received: from mail-vs1-f67.google.com (mail-vs1-f67.google.com [209.85.217.67])
+Received: from mail-vk1-f193.google.com (mail-vk1-f193.google.com [209.85.221.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5AA3542C5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8753859EC
 	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.67
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769810571; cv=none; b=DCt/DDiuw1oOns/3P+IPj6aD2O+fTBP7IP4bvAGJmkeyO/DvHUvKfpzUD8Fm+gfDwOwySncEsenw1TP7waEA49uKRiRLe1wWniIW0TmiYbz4mBUhBX7ooEa+OwzCqhK7Y5Z3i8W1NSxv7dPtKcFjGziwoZmneDNl4ntmqKEtRaQ=
+	t=1769810572; cv=none; b=CN0XWwt3mcMvdXR9FVcYSmNo31VGfd8v2sarn6WuZLZLCB0wFRt2fYaN/qHjYLA3HuNM57IAvmourDfK2/RyQXdI5yLVF6+XURrytV0cSe2S/O4ZmiOshCP9EH2GvogDnVQyMwpuhY9k3e83lF+hppR1zOLq2nOuLs09qXB9XEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769810571; c=relaxed/simple;
-	bh=9c7R2N5seOTyjsS0aWHZe8B7abWwqUBQ0sGVTLdFo/8=;
+	s=arc-20240116; t=1769810572; c=relaxed/simple;
+	bh=bEel7GG3FINQpPszrDgwa96RKYIsXmrogbWVjbDnTH8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SD36zE7TOnxbGa3QVZ356XpPItttCzD0lAmo/QJ85/TlF6T056gwkuZTZqXu3X4uuNkeac+dLd0XUmiX/FrCUjobdG+SXdvbf4ce8OC9yIZ+CHlUqkZlJMVtfoK7uD8ElydDwTAhtsRfP+OKIMpAbWADGOZyHIzdFY4tNsNXp9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iS9Rr9Dc; arc=none smtp.client-ip=209.85.217.67
+	 MIME-Version; b=iJF0BYyH1taXv+VqbC61MRd+7aS9iQdXBUC6HeNcMgUQk/SqBkLvOVRtnFsQJzAxcn8fdBE2TsmRTc3U+qGTfHhEwp7MfxK03vB9f3bekMQtpyWIufu0CG34uodsq31I8DoW3oIdFOGDdU3TfT2Pkbf2wiB+TgfbrCjiQnNsJxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWpSIkpZ; arc=none smtp.client-ip=209.85.221.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iS9Rr9Dc"
-Received: by mail-vs1-f67.google.com with SMTP id ada2fe7eead31-5f52aa95279so1641613137.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWpSIkpZ"
+Received: by mail-vk1-f193.google.com with SMTP id 71dfb90a1353d-56635de8acfso826187e0c.0
         for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:02:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1769810569; x=1770415369; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=SnVJ2CRjkqiLXMMFesIs3WyqsEpTqadys+AoA+Zu/zQ=;
-        b=iS9Rr9DcoWVbn9gzDCYxbLv0BYvvNmQJe9iht/IZ2ABeh2qluTNDiMiYinooEhaekT
-         J8PZgmA+itKJoACurSlRrcykpeWaS7eJxSQr9uZlXOE7fO5avAG49QWsvi28n2A04NJG
-         Eps6L7sCZA/19iV1Y5Gx1v9SZsAqD8ghFSgR8zlVi8WocEB2QGSc/0bd64/JnYCoWhPZ
-         T/JkafLSaUbIkTriRgKXt5hoswuWkn8TCiLWqS2+FautCKxG7jW68xdj7LjPet2Ei2t4
-         2IYorLSABEvRG7xL8iV03lQr/REAEeTadjG5r+w7ffjAgBAkl1kNqU0oA2XY9bCAMbrB
-         +P2w==
+        bh=eYiCAkSmDkUDT3RT8wBl29YPj2K1XoHlz/YFLXH/IfM=;
+        b=hWpSIkpZTtc96FCjZokEaG/riMQxfjlnfnR//nTKKCqqy/BNh/GLPzDZ9gsf8Bm8vV
+         wnT9bLdlh//jhGRmb6Rbf3jJEqLVtKiOk/6MoLM81tSMm8MkdTUhs717dOF4v4HUvCcx
+         sj0Ubget3b0jNF20KZ4yrUor6LIYCj1FIHhhacZjWbb7OFW61j3KXMXTcdJkEIgLfSg7
+         DJ7dRm0lxT9d5FHuIXVXfcuGMwEDuFSsQFwRUZiBE/6nrEh2OmammYBxcbRuCjKZ2eOp
+         ueIXKfu8XhGqxkIEK1z604LQx4qfxRNwe8UBRGJt/Tg2HTAMWndpPjt/t9ZrFZTOGPcT
+         b1JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1769810569; x=1770415369;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=SnVJ2CRjkqiLXMMFesIs3WyqsEpTqadys+AoA+Zu/zQ=;
-        b=cmR/tzhYnEMCcXwQ1XFflNKgNUJLK0NTJWNRrWPhfEotcStr6c+Z5zqbn3IIwYbToP
-         jeQwo+v1wGVjKZqKiLdhcZT4aPx9VxX3whCVkGCLSiDRWRCbOKVSP2kssVf0g2HXlhNa
-         6Br1eLA4SYHgacEo2UHM8v3sn198cVAqKUpNU+56/n+KlwOCF40GoLXVLas4GpNTuuCP
-         00KxLY7rYrtIm9OPXea3aippA517QBdMJvzVFLNNRjm2Ipu5BU+humbf6Uh5cPVn4Q4r
-         wiKyKm9iYPXRC/HzluhdKrMRPeY638Zh3iwz2PtS2mjKH2DjjXAqTng+zEfaeom0hygq
-         dyxw==
-X-Gm-Message-State: AOJu0YwlDB3nY2QmEHY325Js6VJjaXjRdN/4TlLe9t2ca0tS4OjK+HRW
-	k494mXTqf/FJYZHAvWsUkododOuIcGSDqHfb4LnLgZlFtpsx+EhjFlnmFXchK4QE
-X-Gm-Gg: AZuq6aI102kzYT7yuk/UBG5kgGdc/ji6cgWLZEFgPUF7ksS6wabGWxQzxLYHyD0Ijah
-	f7eGOvYyARG8z593Eh/Ncih9HwLcCErCBgco9v12nwUMEzfA67115V25p1M52odU1Xju8CQU9Xl
-	pmf/3kOdDkPA0trqll2Xuh2P9ww7QphKzabMKpdBTRoVlk0tquwwpSmjugBkvwXOt2i6IykiR4s
-	qAKCI256eZv7Qtg8WHyDbWH2TR9Gemibi2KaX+WRtIkXvt4f65tSCPU+VpnRCuhaQOAueK3/GGB
-	CdzbefRhqgEUS2gKRz1YO6hfdf1FvnwSVX1eyO567Areih7T56xCOImWRxiZT3hK51RIqK//cfF
-	qThkFmN2lcKJr5xh5iGPHEmgKTlYx6pFhYJKtdNlaTPQLmbLYEn7zTbqldG7nShT5DCg8pPVUUo
-	RB+o2PRyZ112po06e481G7/Xt1+gibu31kuFBmZt6FDmxKyh8cvdFqafH5uaA/acekNexiQqm+5
-	BbN0g==
-X-Received: by 2002:a05:6102:e12:b0:5ef:a3c1:86e1 with SMTP id ada2fe7eead31-5f8cdbcdd81mr2615696137.11.1769810567670;
-        Fri, 30 Jan 2026 14:02:47 -0800 (PST)
+        bh=eYiCAkSmDkUDT3RT8wBl29YPj2K1XoHlz/YFLXH/IfM=;
+        b=KSgq9J3qLpqXnKxZJJDvtHe67vVaU72llM2JMBgPmaU/orqMfp2L7j96GQbNbHdfxU
+         eaojlU39B3Hb7ctyNIiEk8ii8HjlagFkN9gJZybwyioP+Hg0iS0HGgea+jSkQO08rByA
+         Ad3G+Z5qXBIFtEJ+bCB7M8qoNHlkArL6AmB4sHGWVPUiA9eYaBf+TRWl/6HKVI8uSLGJ
+         QDSThSTjTSdRrOpOpYzu4/PlbsZI9sjdiKG/lp3OOQimpHH7O5go8cyScebyUAdu+o8D
+         QYntA9it8KVJ+vDUHyr5DukfTaqhKyEJuIXKgrEMQ9BobvaNUOsxtfuiRxuCgpaShntX
+         bUIA==
+X-Gm-Message-State: AOJu0Yz2rzJ3E6cKb01TFWDziSV6WbYO7pWzDET0zxneoXL49+vWuCcd
+	fa+rueYR/Vg2jgM3y8hsciTwEmHLuY4Xoay+NfPjGEzOD5bELBvnstp16NDw3m1F
+X-Gm-Gg: AZuq6aI6eTjx5SyL/yp2wvf99FPN1uwUIhyV66pMQulvBDzbEddUmJjVIgkaqrcbQDT
+	nVgpxVmqnF635PnRaKp46k2ePbzwZNshoBRw90DjlGYwLCYk0BPJlYRkHojKUzYHZFUXncSYr+o
+	puNa5/jCNlfJUt/KWNdxnr3znfFt0du2VuWzfsekYW0zRgt2o6BhHZpMH1Zs+5dn65AqdmPjJeU
+	5OZw1B7KOEQPUYmqUCFdCfLd2dPOoWOmHOpeNGKFJClSPsPPVN3MxJDYct2FFeQL7mbG7fOqatY
+	SDL3AUjJnFFg0g914ZA25R8h3Bx8xei5UDSK5YIUFToKCLxmt4f5OLl6kLeYZALlY89jwAbIXkT
+	79bNVI+VAK88C/xF2qNQrG2n5PPN8QUapieRaH45lCjw+WHKZnprLWWWlmxi+TqLh3Ot+oGGVpU
+	BMFoyyZDEa5ZKf+fKPOC8gT4KF8IOJPOCdgqWmX75lqy+1+ZzO6E4BWgcGgyKemtHXNBl6bto+d
+	Fk8KN0ErA/yXMzh
+X-Received: by 2002:a05:6102:3f09:b0:5db:e909:aa0d with SMTP id ada2fe7eead31-5f8e2680347mr1395213137.37.1769810569202;
+        Fri, 30 Jan 2026 14:02:49 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.02.46
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.02.47
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 14:02:46 -0800 (PST)
+        Fri, 30 Jan 2026 14:02:48 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 06/37] doc/bluetoothctl-bredr: Add :Uses: fields and document arguments
-Date: Fri, 30 Jan 2026 17:01:57 -0500
-Message-ID: <20260130220229.1346261-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 07/37] doc/bluetoothctl-endpoint: Add :Uses: fields and document arguments
+Date: Fri, 30 Jan 2026 17:01:58 -0500
+Message-ID: <20260130220229.1346261-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260130220229.1346261-1-luiz.dentz@gmail.com>
 References: <20260130220229.1346261-1-luiz.dentz@gmail.com>
@@ -80,70 +80,284 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Add :Uses: fields to link commands to their corresponding D-Bus API
 methods, and document command arguments with usage examples.
 ---
- doc/bluetoothctl-bredr.rst | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ doc/bluetoothctl-endpoint.rst | 217 +++++++++++++++++++++++-----------
+ 1 file changed, 145 insertions(+), 72 deletions(-)
 
-diff --git a/doc/bluetoothctl-bredr.rst b/doc/bluetoothctl-bredr.rst
-index 3ec702a59ff3..2425707f3285 100644
---- a/doc/bluetoothctl-bredr.rst
-+++ b/doc/bluetoothctl-bredr.rst
+diff --git a/doc/bluetoothctl-endpoint.rst b/doc/bluetoothctl-endpoint.rst
+index b7ecd96244b7..019e64e38452 100644
+--- a/doc/bluetoothctl-endpoint.rst
++++ b/doc/bluetoothctl-endpoint.rst
 @@ -18,6 +18,9 @@ SYNOPSIS
  
- **bluetoothctl** [--options] [bredr.commands]
+ **bluetoothctl** [--options] [endpoint.commands]
  
-+This submenu manages BR/EDR (Classic Bluetooth) bearer connections using the
-+**org.bluez.Device(5)** interface.
++This submenu manages media endpoints for audio streaming using the
++**org.bluez.MediaEndpoint(5)** and **org.bluez.Media(5)** interfaces.
 +
- BREDR Commands
- ==============
+ Endpoint Commands
+ =================
  
-@@ -27,6 +30,8 @@ list
- List available bredr devices.
+@@ -27,6 +30,11 @@ list
+ List available endpoints.
  
- :Usage: **> list**
-+:Example Display all BR/EDR (Classic Bluetooth) devices that have been discovered:
+ :Usage: **> list [local]**
++:[local]: Only show locally registered endpoints (optional, shows all if omitted)
++:Example List all available endpoints (local and remote):
 +	| **> list**
++:Example List only locally registered endpoints:
++	| **> list local**
  
  show
  ----
-@@ -34,6 +39,12 @@ show
- Show bredr bearer information on a device.
+@@ -34,6 +42,16 @@ show
+ Endpoint information.
  
- :Usage: **> show [dev]**
-+:Uses: **org.bluez.Device(5)** properties
-+:[dev]: Bluetooth device address or object path (optional, uses current device if omitted)
-+:Example Show BR/EDR bearer information for currently selected device:
+ :Usage: **> show [endpoint]**
++:Uses: **org.bluez.MediaEndpoint(5)** properties
++:[endpoint]: Path to specific endpoint to display (optional, shows current selection if omitted)
++:Example Show information for currently selected endpoint:
 +	| **> show**
-+:Example Show BR/EDR bearer info for device with specified address:
-+	| **> show 00:11:22:33:44:55**
++:Example Show local endpoint information:
++	| **> show /local/endpoint/ep0**
++:Example Show remote endpoint information:
++	| **> show /org/bluez/hci0/dev_00_11_22_33_44_55/ep1**
++:Example Show another local endpoint:
++	| **> show /local/endpoint/ep1**
  
- connect
- -------
-@@ -45,8 +56,11 @@ This command initiates a bredr connection to a remote device.
- By default, it establishes the bredr connection and then connects all profiles
- that marked as auto-connectable.
+ register
+ --------
+@@ -41,37 +59,41 @@ register
+ Register Endpoint.
  
--:Usage: > connect <dev>
--:Example: > connect 1C:48:F9:9D:81:5C
-+:Usage: **> connect <dev>**
-+:Uses: **org.bluez.Device(5)** method **Connect**
-+:<dev>: Bluetooth device address to connect to
-+:Example Connect to BR/EDR device:
-+	| **> connect 00:11:22:33:44:55**
+ :Usage: **> register <UUID> <codec[:company]> [capabilities...]**
++:Uses: **org.bluez.Media(5)** method **RegisterEndpoint**
++:<UUID>: Bluetooth service UUID for the endpoint type (required)
++:<codec[:company]>: Codec ID in hex format, optionally with company ID (required)
++:[capabilities...]: Optional codec-specific capability data in hex format
+ :Example LC3 BAP source:
+-	 | **>endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb 0x06**
+-	 | **>Auto Accept (yes/no):** y
+-	 | **>Max Transports (auto/value):** a
+-	 | **>Locations:** a
+-	 | **>Supported Context (value):** 3
+-	 | **>Context (value):** 3
+-	 | **>CIG (auto/value):** a
+-	 | **>CIS (auto/value):** a
++	| **>endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb 0x06**
++	| **>Auto Accept (yes/no):** y
++	| **>Max Transports (auto/value):** a
++	| **>Locations:** a
++	| **>Supported Context (value):** 3
++	| **>Context (value):** 3
++	| **>CIG (auto/value):** a
++	| **>CIS (auto/value):** a
+ :Example LC3 BAP sink with extra capabilities:
+-	 | **>endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06 "0x03 0xe5 0x03 0x00 0x02 0xe6 0x07"**
+-	 | **>Enter Metadata (value/no):** n
+-	 | **>Auto Accept (yes/no):** y
+-	 | **>Max Transports (auto/value):** a
+-	 | **>Locations:** a
+-	 | **>Supported Context (value):** 3
+-	 | **>Context (value):** 3
+-	 | **>CIG (auto/value):** a
+-	 | **>CIS (auto/value):** a
++	| **>endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06 "0x03 0xe5 0x03 0x00 0x02 0xe6 0x07"**
++	| **>Enter Metadata (value/no):** n
++	| **>Auto Accept (yes/no):** y
++	| **>Max Transports (auto/value):** a
++	| **>Locations:** a
++	| **>Supported Context (value):** 3
++	| **>Context (value):** 3
++	| **>CIG (auto/value):** a
++	| **>CIS (auto/value):** a
+ :Example LC3 BAP Broadcast source:
+-	 | **>endpoint.register 00001852-0000-1000-8000-00805f9b34fb 0x06**
+-	 | **>Auto Accept (yes/no):** y
+-	 | **>Max Transports (auto/value):** a
+-	 | **>Locations:** 3
+-	 | **>Supported Context (value):** 1
++	| **>endpoint.register 00001852-0000-1000-8000-00805f9b34fb 0x06**
++	| **>Auto Accept (yes/no):** y
++	| **>Max Transports (auto/value):** a
++	| **>Locations:** 3
++	| **>Supported Context (value):** 1
+ :Example LC3 BAP Broadcast sink:
+-	 | **>endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06**
+-	 | **>Auto Accept (yes/no):** y
+-	 | **>Max Transports (auto/value):** a
+-	 | **>Locations:** 3
+-	 | **>Supported Context (value):** 1
++	| **>endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06**
++	| **>Auto Accept (yes/no):** y
++	| **>Max Transports (auto/value):** a
++	| **>Locations:** 3
++	| **>Supported Context (value):** 1
  
- disconnect
- ----------
-@@ -56,8 +70,11 @@ Disconnect device over bredr.
- By default this command disconnects all profiles associated with the bredr
- connection, and then terminates the bredr link.
+ Note:
  
--:Usage: > disconnect <dev>
--:Example: > disconnect 1C:48:F9:9D:81:5C
-+:Usage: **> disconnect <dev>**
-+:Uses: **org.bluez.Device(5)** method **Disconnect**
-+:<dev>: Bluetooth device address to disconnect from
-+:Example Disconnect from BR/EDR device:
-+	| **> disconnect 00:11:22:33:44:55**
+@@ -86,6 +108,24 @@ unregister
+ Unregister Endpoint.
+ 
+ :Usage: **> unregister <UUID/object>**
++:Uses: **org.bluez.Media(5)** method **UnregisterEndpoint**
++:<UUID/object>: Either the service UUID or the object path of the endpoint to unregister
++:Example Unregister LC3 source endpoint by UUID:
++	| **> unregister 00002bcb-0000-1000-8000-00805f9b34fb**
++:Example Unregister LC3 sink endpoint by UUID:
++	| **> unregister 00002bc9-0000-1000-8000-00805f9b34fb**
++:Example Unregister broadcast source endpoint by UUID:
++	| **> unregister 00001852-0000-1000-8000-00805f9b34fb**
++:Example Unregister broadcast sink endpoint by UUID:
++	| **> unregister 00001851-0000-1000-8000-00805f9b34fb**
++:Example Unregister endpoint by object path:
++	| **> unregister /local/endpoint/ep0**
++:Example Unregister another endpoint by object path:
++	| **> unregister /local/endpoint/ep1**
++:Example Unregister source endpoint by path:
++	| **> unregister /local/endpoint/source0**
++:Example Unregister sink endpoint by path:
++	| **> unregister /local/endpoint/sink0**
+ 
+ Note:
+ 
+@@ -98,6 +138,16 @@ config
+ Configure Endpoint.
+ 
+ :Usage: **> config <endpoint> <local endpoint> [preset]**
++:Uses: **org.bluez.MediaEndpoint(5)** method **SetConfiguration**
++:<endpoint>: Path to the remote endpoint to configure
++:<local endpoint>: Path to the local endpoint to use for the configuration
++:[preset]: Audio quality preset name (optional, auto-detected if omitted)
++:Example Configure remote endpoint with local endpoint (auto preset):
++	| **> config /org/bluez/hci0/dev_00_11_22_33_44_55/ep0 /local/endpoint/ep0**
++:Example Configure LE Audio Unicast with BAP setting 32_1_1:
++	| **> config /org/bluez/hci0/dev_00_11_22_33_44_55/ep0 /local/endpoint/ep0 32_1_1**
++:Example Configure LE Audio Broadcast Source:
++	| **> config /org/bluez/hci0/dev_00_11_22_33_44_55/bis0 /local/endpoint/broadcast0**
+ 
+ Note:
+ 
+@@ -110,55 +160,78 @@ presets
+ List available presets.
+ 
+ :Usage: **> presets <endpoint>/<UUID> [codec[:company]] [preset] [codec config] [metadata]**
++:<endpoint>/<UUID>: Either endpoint path or service UUID to work with presets
++:[codec[:company]]: Codec ID with optional company identifier
++:[preset]: Preset name to display details or create custom preset
++:[codec config]: Custom codec configuration data in hex format
++:[metadata]: Additional metadata for the preset
+ :Example using endpoint:
+-	  | **>presets /local/endpoint/ep0 32_1_1**
+-	  | **>presets /local/endpoint/ep0**
+-	  | Preset 32_1_1
+-	  | Configuration.**>0: len 0x02 type 0x01
+-          | Configuration.Sampling Frequency: 32 Khz (0x06)
+-          | Configuration.**>1: len 0x02 type 0x02
+-          | Configuration.Frame Duration: 7.5 ms (0x00)
+-          | Configuration.**>2: len 0x03 type 0x04
+-          | Configuration.Frame Length: 60 (0x003c)
++	| **>presets /local/endpoint/ep0 32_1_1**
++	| **>presets /local/endpoint/ep0**
++	| Preset 32_1_1
++	| Configuration.**>0: len 0x02 type 0x01
++	| Configuration.Sampling Frequency: 32 Khz (0x06)
++	| Configuration.**>1: len 0x02 type 0x02
++	| Configuration.Frame Duration: 7.5 ms (0x00)
++	| Configuration.**>2: len 0x03 type 0x04
++	| Configuration.Frame Length: 60 (0x003c)
++:Example List all available presets for local endpoint:
++	| **>presets /local/endpoint/ep0**
++:Example List all presets for another endpoint:
++	| **>presets /local/endpoint/ep1**
+ :Example using UUID:
+-	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 32_1_1**
+-	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
+-	  | ...
+-	  | ***32_1_1**
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 32_1_1**
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
++	| ...
++	| ***32_1_1**
++:Example List all LC3 sink presets:
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
++:Example List all LC3 source presets:
++	| **>presets 00002bcb-0000-1000-8000-00805f9b34fb 0x06**
++:Example List all broadcast source presets:
++	| **>presets 00001852-0000-1000-8000-00805f9b34fb 0x06**
++:Example List all broadcast sink presets:
++	| **>presets 00001851-0000-1000-8000-00805f9b34fb 0x06**
++:Example Show details for 48kHz stereo preset:
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 48_2_1**
++:Example Show details for 24kHz mono high-quality preset:
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 24_1_2**
++:Example Show details for 16kHz mono preset:
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 16_1_1**
+ :Example setting up LC3 custom preset:
+-	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom**
+-	  | **>[Codec] Enter frequency (Khz):** 48
+-	  | **>[Codec] Enter frame duration (ms):** 10
+-	  | **>[Codec] Enter channel allocation:** 3
+-	  | **>[Codec] Enter frame length:** 100
+-	  | **>[QoS] Enter Target Latency (Low, Balance, High):** Low
+-	  | **>[QoS] Enter SDU Interval (us):** 1000
+-	  | **>[QoS] Enter Framing (Unframed, Framed):** Unframed
+-	  | **>[QoS] Enter PHY (1M, 2M):** 2M
+-	  | **>[QoS] Enter Max SDU:** 200
+-	  | **>[QoS] Enter RTN:** 3
+-	  | **>[QoS] Enter Max Transport Latency (ms):** 10
+-	  | **>[QoS] Enter Presentation Delay (us):** 20000
+-	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
+-	  | ...
+-	  | ***custom**
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom**
++	| **>[Codec] Enter frequency (Khz):** 48
++	| **>[Codec] Enter frame duration (ms):** 10
++	| **>[Codec] Enter channel allocation:** 3
++	| **>[Codec] Enter frame length:** 100
++	| **>[QoS] Enter Target Latency (Low, Balance, High):** Low
++	| **>[QoS] Enter SDU Interval (us):** 1000
++	| **>[QoS] Enter Framing (Unframed, Framed):** Unframed
++	| **>[QoS] Enter PHY (1M, 2M):** 2M
++	| **>[QoS] Enter Max SDU:** 200
++	| **>[QoS] Enter RTN:** 3
++	| **>[QoS] Enter Max Transport Latency (ms):** 10
++	| **>[QoS] Enter Presentation Delay (us):** 20000
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
++	| ...
++	| ***custom**
+ :Example setting up LC3 custom preset with extra configuration:
+-	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom "0x03 0xe8 0x00 0x00 0x02 0xe9 0x00"**
+-	  | **>[Codec] Enter frequency (Khz):** 48
+-	  | **>[Codec] Enter frame duration (ms):** 10
+-	  | **>[Codec] Enter channel allocation:** 3
+-	  | **>[Codec] Enter frame length:** 100
+-	  | **>[QoS] Enter Target Latency (Low, Balance, High):** Low
+-	  | **>[QoS] Enter SDU Interval (us):** 1000
+-	  | **>[QoS] Enter Framing (Unframed, Framed):** Unframed
+-	  | **>[QoS] Enter PHY (1M, 2M):** 2M
+-	  | **>[QoS] Enter Max SDU:** 200
+-	  | **>[QoS] Enter RTN:** 3
+-	  | **>[QoS] Enter Max Transport Latency (ms):** 10
+-	  | **>[QoS] Enter Presentation Delay (us):** 20000
+-	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
+-	  | ...
+-	  | ***custom**
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom "0x03 0xe8 0x00 0x00 0x02 0xe9 0x00"**
++	| **>[Codec] Enter frequency (Khz):** 48
++	| **>[Codec] Enter frame duration (ms):** 10
++	| **>[Codec] Enter channel allocation:** 3
++	| **>[Codec] Enter frame length:** 100
++	| **>[QoS] Enter Target Latency (Low, Balance, High):** Low
++	| **>[QoS] Enter SDU Interval (us):** 1000
++	| **>[QoS] Enter Framing (Unframed, Framed):** Unframed
++	| **>[QoS] Enter PHY (1M, 2M):** 2M
++	| **>[QoS] Enter Max SDU:** 200
++	| **>[QoS] Enter RTN:** 3
++	| **>[QoS] Enter Max Transport Latency (ms):** 10
++	| **>[QoS] Enter Presentation Delay (us):** 20000
++	| **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
++	| ...
++	| ***custom**
  
  RESOURCES
  =========
