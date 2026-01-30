@@ -1,317 +1,126 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f65.google.com (mail-qv1-f65.google.com [209.85.219.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015E1376BD1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 23:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ECE925C809
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 00:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769730049; cv=none; b=OEZjKFGleXOhCqdJeEddggdENYJOW1IFtWoZgD8tccP2bdYPY1ExP804GyHdl5kGP5hcOdspDWwL08Vm+OoTjcrqclXxpHQo9uULEBrjM+478GDE2ETnQoqMjpsGw2VizUSXEusi0w0GtDPHO6jhPKYgOScgupG5ymfk9iza8GI=
+	t=1769732874; cv=none; b=OVBEiR7GXKAxPsldcpzhH26A4W5xFbFpY3cPXXQDG5MjJBtA6WYva7Mnnlb59bZRqCFzpO/xlcDWmNQeQDWRvvmpOepafr3z4tULeXifygJgoFCGQKa5w/e84dBUrCb+YBaWyPTfLS55e6pUttxtcAcTh0T7ebaqv95z2N78UeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769730049; c=relaxed/simple;
-	bh=l1XLa5TjNVFcaMwF40PpPbpYH7kSYFpylsd4ARTWK8Q=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=apa2WrBVrtG6nR+SawRjCivxMUO0w1ARt1Bu7k2/h3LskY6L2a6D+hBA+3rKshvtQWKDqwWjI4zrqsDn5mIeGS+RRsqDA+rrdjbzOe2oouI+T1MEx281iW2BUsSDYt57qA+1kMs6T3YDAJ5f3KATEP2CJozvOPNS3AWDw7bhQlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HBJNQlOQ; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1769732874; c=relaxed/simple;
+	bh=Suq6uS2AaELJQOMp1cTNWUuQiYHkzIXlVdMpOPtl6xU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hcrlNxqeUuW2P4RJz2KLqQhHk+tTWjxkfC2B1wN6DGYv3Mnr0WfR2F7gJIBORMgRy/uu4F4yT/hpG7WckidNbb3onZ1dEdfgHCAkEPZibAPoyX3KPperW9em5vX8b6kC63maezkoloXcVDw1iUwZBYI8ywzmrHU7txDtH9mFM6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WDjuKffm; arc=none smtp.client-ip=209.85.219.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HBJNQlOQ"
-Received: from github.com (hubbernetes-node-d99c119.ash1-iad.github.net [10.56.202.70])
-	by smtp.github.com (Postfix) with ESMTPA id 24BED14121A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 15:40:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1769730047;
-	bh=XQFjR/POR2D7KlXTf+vV4Gxf03OaXDGUEN+pJgF8Z2g=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=HBJNQlOQttzrqPW44stSNUbgKNSDPDziyQ0TFEA8pN7FSL3pQg4k5OVHaAM3xRUfN
-	 vuCsJrnmWq6tuxeCTsjMMum3u0WukLsyJlbrYvf8e5VvYL/nVwXtcEuH1aByEq1JE6
-	 VMzrknQxZ1ogZfJvsxxwRDI5JfdYCCzs9n5uN55s=
-Date: Thu, 29 Jan 2026 15:40:47 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1048745/000000-b5d9f1@github.com>
-Subject: [bluez/bluez] f439eb: doc/bluetoothctl: Document arguments and add
- examples
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WDjuKffm"
+Received: by mail-qv1-f65.google.com with SMTP id 6a1803df08f44-8947e6ffd20so18935126d6.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jan 2026 16:27:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769732872; x=1770337672; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=DpdLVV9Yipdfk6f5wwDtgxwbMJNCOkGbU9NRzLUHVag=;
+        b=WDjuKffmRmmIs9D1uxeVW7hcqxTKSmM7GHiS5Wwek3Ec01XhaSyIYykQIhvr2k28kz
+         6TM4k4hlEM1aDvlZwpjWL64pOchWrByoBqKN3QW7c90qh9ebKd4LqA44kwLwlbAS+Ygr
+         4AiQJEBV8O8kySxwW8+8MACX7j8m4SL3ZNe2+KY8Vr5EuVQxXe7qU4Cu4t0T8dzv/2T8
+         9H+06kFGlCI+IKqY4HuA6Cue/F7P5gOP3tes4oavWnn7w/OSGPBrbbeek5Aw2m4CgFJP
+         W6K/XymvmtlsAswBwUaLRIMmQzPA9EwmfeCjY2CwpsGWV+PZp1Sok10mVWrly9XdqZwG
+         C+7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769732872; x=1770337672;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DpdLVV9Yipdfk6f5wwDtgxwbMJNCOkGbU9NRzLUHVag=;
+        b=n0vJMhXG4ZEB7nM4wZou2s7wA0JvYLLgaegOGrEgAf7eDOWl8vbMAP7AxcSbi022ep
+         Wv500E87QGD3C5kRGvXz1sT+kcp1a3VY8sNMcbfU07u36itvg+11zrPSg3Sne83INDTB
+         m6RlHtclOYTKAXFZZKDjU5F8lbXM02YtaU05vvj+eHMLfZkVWkc4Pu6ZJuMYEVAufw94
+         XDD/NdN8s9/H7H+1ivF1gHtA7wU8UKkf6e7IrxwjGPVsj4Y7ktgv8HiHL8fFaAjasHBO
+         XxCVEpOVWLZcYMwSKQ7aJnRb3urrn00mDM9fLLzLW3tHh9QOzIaCTua9RR+TtBD7MWyU
+         bzrQ==
+X-Gm-Message-State: AOJu0YzYZuYp0bPXEMUeUSG6VBGacgBY8LfZvHf8K66P1C7gPB2ckQ1u
+	3/UlFrprQ1XCcNeQBP27bvaxkhjCsGF6wjNafRSdzPWtpb05XOhZG/BuTyp8NROU
+X-Gm-Gg: AZuq6aLfQn8uM8thYsV32ZcUWYejwfrej8OFkuqNYGloIbjcHmq/w3ndSQcL9P82nnY
+	qj2BTcSgrwEHxnC5trJ8vYgH+OyzCVvLHhBgV0kjg2/4A73IDksmC5VNbrUJW4kGTlkO7moCiCX
+	oQZiCVU26Ja/gh+AwPYzcoOHavQxuJjcm6wbvERJ532x+W1rUIyRPZ3tF49X0MA8GHpex0FU7ED
+	1jH1RYdGeool0AIF2dDMDDNwBOqCPTXsAeLIdoiafqKj/YMtfE8ED1hKSPoYERzLmz+sgf6uJrj
+	hHH3M7ULLlrHuJvtJL1yydo6QoSwJy2VdTEiN3EDqe7LuNI2uwUKF4jvuZWu3scttKT8VHuUqDq
+	ZNWggzaXY78j6yGgi387FuGIQ4uN1oyoUlLc/FiLrPBC6gywRdX8yb/LEALlG1z2DIekPCyyipG
+	mMGtYkTkYPu33g/Z9n4lOOSwYJ0EHa
+X-Received: by 2002:ad4:4eac:0:b0:894:7a20:4ce7 with SMTP id 6a1803df08f44-894e9f762c4mr18067526d6.28.1769732871700;
+        Thu, 29 Jan 2026 16:27:51 -0800 (PST)
+Received: from [172.17.0.2] ([64.236.192.145])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50337bbb66dsm43948851cf.29.2026.01.29.16.27.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 16:27:51 -0800 (PST)
+Message-ID: <697bfb07.050a0220.1201c.1766@mx.google.com>
+Date: Thu, 29 Jan 2026 16:27:51 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7206078344246353242=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,01/15] doc/bluetoothctl: Document arguments and add examples
+In-Reply-To: <20260129232201.1049568-1-luiz.dentz@gmail.com>
+References: <20260129232201.1049568-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============7206078344246353242==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1048745
-  Home:   https://github.com/bluez/bluez
-  Commit: f439eb4431dfb80e73da8e6366433ec8323323de
-      https://github.com/bluez/bluez/commit/f439eb4431dfb80e73da8e6366433ec8323323de
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M doc/bluetoothctl.rst
+Dear submitter,
 
-  Log Message:
-  -----------
-  doc/bluetoothctl: Document arguments and add examples
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1048745
 
-This commit adds comprehensive parameter documentation for all commands
-that accept arguments in the main bluetoothctl interface including show,
-select, devices, power, advertise, scan, pair, connect, disconnect,
-trust, untrust, block, unblock, remove, info, bearer and agent commands.
+---Test result---
 
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.31 seconds
+BuildEll                      PASS      19.95 seconds
+BluezMake                     PASS      656.27 seconds
+MakeCheck                     PASS      18.72 seconds
+MakeDistcheck                 PASS      248.74 seconds
+CheckValgrind                 PASS      300.98 seconds
+CheckSmatch                   PASS      353.32 seconds
+bluezmakeextell               PASS      182.38 seconds
+IncrementalBuild              PENDING   0.28 seconds
+ScanBuild                     PASS      1012.82 seconds
 
-  Commit: 81fefbc86b7b7093ef4bece129c9557fed60c1fe
-      https://github.com/bluez/bluez/commit/81fefbc86b7b7093ef4bece129c9557fed60c1fe
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Changed paths:
-    M doc/bluetoothctl-mgmt.rst
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Log Message:
-  -----------
-  doc/bluetoothctl-mgmt: Document arguments and add examples
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
-Add comprehensive parameter documentation for all management interface
-commands including select, power, discov, class, name, pair, privacy,
-scan-params, phy and other mgmt commands with detailed descriptions
-of required vs optional parameters and acceptable values.
 
 
-  Commit: f223e568a07f4ec982d34671b284b42f55fdae98
-      https://github.com/bluez/bluez/commit/f223e568a07f4ec982d34671b284b42f55fdae98
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
+---
+Regards,
+Linux Bluetooth
 
-  Changed paths:
-    M doc/bluetoothctl-admin.rst
 
-  Log Message:
-  -----------
-  doc/bluetoothctl-admin: Document arguments and add examples
-
-Add parameter documentation for the allow command explaining the UUID
-and clear parameter options for admin policy management. Documents
-how to allow specific service UUIDs or clear all restrictions.
-
-
-  Commit: 21cf218ce62d271f8ae3b811a07d27366680defe
-      https://github.com/bluez/bluez/commit/21cf218ce62d271f8ae3b811a07d27366680defe
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-advertise.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-advertise: Document arguments and add examples
-
-Fix critical syntax errors in tx-power and interval commands and add
-comprehensive parameter documentation. Corrects tx-power to use only
-on/off parameters and updates interval to use min/max format. Adds
-parameter documentation for all advertising commands.
-
-
-  Commit: 9738bc13a6197a78fd7178431692c0195182fccd
-      https://github.com/bluez/bluez/commit/9738bc13a6197a78fd7178431692c0195182fccd
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-assistant.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-assistant: Document arguments and add examples
-
-Add parameter documentation for show and push commands explaining
-BAP Broadcast Assistant path parameters for media assistant operations.
-Documents optional vs required parameters for assistant management.
-
-
-  Commit: 25ab718b497c3c50bd4ad53a7195fccea22fdbe8
-      https://github.com/bluez/bluez/commit/25ab718b497c3c50bd4ad53a7195fccea22fdbe8
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-bredr.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-bredr: Document arguments and add examples
-
-Add parameter documentation for show, connect and disconnect commands
-explaining device address and object path parameters for BR/EDR
-operations. Documents optional vs required device parameters.
-
-
-  Commit: 0c0a4774c831bd82171578da2dfd990ae0e55f9b
-      https://github.com/bluez/bluez/commit/0c0a4774c831bd82171578da2dfd990ae0e55f9b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-endpoint.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-endpoint: Document arguments and add examples
-
-Add comprehensive parameter documentation for all endpoint commands
-including list, show, register, unregister, config and presets.
-Documents UUID, codec, capabilities and preset parameters for
-Bluetooth audio endpoint management.
-
-
-  Commit: 999d4721a698cbd2b63c6ab3a70a850faeeec288
-      https://github.com/bluez/bluez/commit/999d4721a698cbd2b63c6ab3a70a850faeeec288
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-gatt.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-gatt: Document arguments and add examples
-
-Add comprehensive parameter documentation for all GATT commands
-including list-attributes, select-attribute, read, write, register
-operations and descriptor management. Documents attribute paths,
-UUIDs, data formats and handle parameters.
-
-
-  Commit: 40a84a9d0115cec38b62f06df30fc4db6ceee214
-      https://github.com/bluez/bluez/commit/40a84a9d0115cec38b62f06df30fc4db6ceee214
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-hci.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-hci: Document arguments and add examples
-
-Add parameter documentation for all HCI commands including open, cmd,
-send, register, unregister and close. Documents controller indices,
-command opcodes, packet types, handles and event codes for low-level
-HCI operations.
-
-
-  Commit: 9aa8faf322d6d8278b530c2b32ff1f914eaf76ff
-      https://github.com/bluez/bluez/commit/9aa8faf322d6d8278b530c2b32ff1f914eaf76ff
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-le.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-le: Document arguments and add examples
-
-Add parameter documentation for show, connect and disconnect commands
-explaining device address and object path parameters for LE operations.
-Documents optional vs required device parameters for Low Energy
-Bluetooth device management.
-
-
-  Commit: 59fe6488822b7e150d114e329669029cc0568755
-      https://github.com/bluez/bluez/commit/59fe6488822b7e150d114e329669029cc0568755
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-monitor.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-monitor: Document arguments and add examples
-
-Add parameter documentation for all monitor commands including RSSI
-threshold, timeout and sampling period settings. Documents pattern
-management, monitor ID parameters and threshold values for
-advertisement monitoring.
-
-
-  Commit: ee1e2443d37a63555e83530553958b31549377d9
-      https://github.com/bluez/bluez/commit/ee1e2443d37a63555e83530553958b31549377d9
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-player.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-player: Document arguments and add examples
-
-Add comprehensive parameter documentation for all media player commands
-including show, select, play, equalizer, repeat, shuffle, scan, search,
-queue and folder navigation. Documents player paths, item selection
-and media control parameters.
-
-
-  Commit: 98827185cf9e187857c6451755ec934746947dc5
-      https://github.com/bluez/bluez/commit/98827185cf9e187857c6451755ec934746947dc5
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-scan.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-scan: Document arguments and add examples
-
-Add comprehensive parameter documentation for all scan filter commands
-including uuids, rssi, pathloss, transport, duplicate-data, discoverable,
-pattern, auto-connect and clear options. Documents filter parameters
-and threshold values for device discovery.
-
-
-  Commit: 03011cacb26c35024712c1243bfb48839688b1c4
-      https://github.com/bluez/bluez/commit/03011cacb26c35024712c1243bfb48839688b1c4
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-telephony.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-telephony: Document arguments and add examples
-
-Add parameter documentation for telephony commands including show,
-select, dial, show-call, answer and hangup. Documents audio gateway
-paths, phone numbers and call object parameters for telephony
-operations.
-
-
-  Commit: b5d9f11789bf1441c771e1a32d2690ddf6596f59
-      https://github.com/bluez/bluez/commit/b5d9f11789bf1441c771e1a32d2690ddf6596f59
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-29 (Thu, 29 Jan 2026)
-
-  Changed paths:
-    M doc/bluetoothctl-transport.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-transport: Document arguments and add examples
-
-Add parameter documentation for all transport commands including show,
-acquire, release, send, receive, volume, select and unselect. Documents
-transport object paths, file parameters and volume settings for
-media transport operations.
-
-
-Compare: https://github.com/bluez/bluez/compare/f439eb4431df%5E...b5d9f11789bf
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============7206078344246353242==--
