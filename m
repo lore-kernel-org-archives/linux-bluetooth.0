@@ -1,69 +1,69 @@
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192632EB5CD
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323093542C5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769810602; cv=none; b=gPmJAlbgOQ+nYneIObPzOG8p9rx5aKoSEDKnztgYXMuN+6GX+cqUbySs4bUkqoejIaRvEyo/e4EiIr5sx9xiDQdQNoT+akYU0o62pjqXK3Bq4tTXtyvXmx4Nx0utT7irh+IZOkqw2VA3tsyZrRHAWqevCDNqJVzFddln03ynHAk=
+	t=1769810603; cv=none; b=UVZtZ8s0SPzZGXO3/lc4MiqnAfPLtMWbLc9kQoWqbYIIFkYtXsdKImXIDYwWtWy55ER+7hecU/8oH7ORc0Xf7WPsXuGXM9u4odwKFFRM01BNLyHHNJZZnmFLiTfnGQVKnh0JKLqTtnIfLtet6GlsKLG4veZ8ozSc894QIcQ9ax0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769810602; c=relaxed/simple;
-	bh=kS7qcyg1JzC0JX6oQ5lTeUunDZ7FfpkyUMDyLc98Eg8=;
+	s=arc-20240116; t=1769810603; c=relaxed/simple;
+	bh=4+WlYpWqZMC1EFSaVmltcR2KRHYaADccCW1Yr6u+WIk=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dRyX0pxN8JPC/wAmVKgwzOB0+UcinLY67+/qnyOz1s8naFgLZDS+4tFnhp3awBj+fuowEx3ErXNiEpDRI6F28xJu4hootiocUPatZqhElU1jOMy+vBd46zi6BpCYhDt7y5ZPxD5MLxU4oQWAQuHzZgUqTXYTy0Xi5Lq0NFYN0lQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K4PiGQr8; arc=none smtp.client-ip=209.85.222.54
+	 MIME-Version; b=fQvrXz0uWEYWmGjUImnN6vAMjzXIzHF9CPm9DVkrPE1A2Tkj0mGvW5c45UUszJT6bUnHb6Glzj83C4m2YHZCecwtfBa1psgmw+Y2CyuH3pTkXFde7kqG6hPAr2qU2ZUEXbS4i5bss0yoyDBkG+EghmlCp8c2Vtp2FEth+PypWFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IbgYmuWT; arc=none smtp.client-ip=209.85.221.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K4PiGQr8"
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-9489bf609bcso171783241.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:03:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IbgYmuWT"
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-56637565faaso2097429e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:03:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769810599; x=1770415399; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769810601; x=1770415401; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lOZel/RR3FVXGtQePbnVhx7Fp0+hXbVh1nNa9FJksSU=;
-        b=K4PiGQr80hJyx47Clrd/TarNfhbJieklO5Gqs8EJWqQSVCDm8L/vnqYyIAUcYS7zKt
-         IFkxwE5PtCnaO+fSjZWtkMnYSjDnB6nep59Z172n/w3MfDu2A6Uppm2v+apERJfz3XAx
-         IcGy6jBsbscVmXre7rU8Nve0Jw3bMLturCeulCGR7J58JIh8HFEpKYZ6h9s8mKgePByI
-         yUOZt1EL9Omp2Gc7cTV39vrlocnZRfY/Pr4GHht69FZtJyA12npREyo7j/mX0yXcda8q
-         l8p6IDGutMAgU0j/ef3+cYkvJbiuhiVEFEYNQKI5FwylUPUyYW/qQf0uBk+E41YLEu0v
-         +lAw==
+        bh=AuD9R5Yu8WdB1Vcj5aKKlpgIDYVmgIgkC3ePDVluN5Q=;
+        b=IbgYmuWT+IO19g+wnSyIputBzyroiP7Gbf8ipakexnvbV8P7Ki7qQwjClyz/0JpAOH
+         xSBa2M06HtFwJiuriKHM1Zzok+5Q9H7L0xVpRITrMPeC28dyuV8eGfBNEY1Enx4Vp4rn
+         x8Oie6Cd3zWhSfu2Vgr5Tr2XHZdE6wIIFogTqlUC9tMzlNei/VEBQHDxB4FG0JKqaYrE
+         aHvpCtm61pBqaHuhXugZNQdfFq+cY6OS8AmB50GZS2sJClUhhvqxgm4Tl2DfR6dEvxDo
+         YdXyFeVZCbboc9iRh+sVUZmlR14Sm2wkO7291L84dwu1fk0QsWSJumn+A5DEywpFCXAn
+         QdDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769810599; x=1770415399;
+        d=1e100.net; s=20230601; t=1769810601; x=1770415401;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=lOZel/RR3FVXGtQePbnVhx7Fp0+hXbVh1nNa9FJksSU=;
-        b=kBdgyWPRHTh18k7KKdSDlyZ5zQZgJC1koEk2sQDQmt273pNkkTdbOhCpt57JrpSDG0
-         eoXK1OH87Jo3xiQy/agU72VXqxZ42yd6IYh1hJRBjSdbEZ+QZ36tR55vpJ+MUV9/qdGB
-         owWJLFLG+FEpH+ajJESjDHHPf4RzvasPyuG4FVV6K8igCuLz6u0qGQlZKQkhwEdsDzhx
-         WMOMLJlrkWm/JBBVJ3V+IEbMoiUHkF5ZDAIfwaQx8TaKS/Ctt8YspH+zCcnJWii80mJx
-         OtSpRgi3i3enzvzghKqqF6G6/6kDzgVuK8WZW5IgnJFrpcqOtcAlVb9kuZXtgwqZGY79
-         G0MQ==
-X-Gm-Message-State: AOJu0YybkhUzZ47VNnq/3oJBCpYQdhWRPJd1z+68vdL1Wm9p3/Yr8v5k
-	CWAe4VxkaZdt0oAiSYp+i8+95bKGZ2UWX8pOXS3HnexwyFKYCu05EvmZqae3LA==
-X-Gm-Gg: AZuq6aJ0v1wf+AUJj0pABFt3sjFVzQwjoogIedLAUwloTDUBihMB+mk1N76qEpnRL31
-	NnsGXW7QAUZMzvBj7+gpB8l5xoFw+Zh1WNONs/Z+z1WyIEL25fZAxiy1Ai8ejV5Gxi5DNE87XLV
-	M2w2RZAyAOsmdYoHyocym3YwySFHrlvu0KcO+TPi5zVVB+rCaEqrOcBxmk1ZrlODl/J3wK1L7Dj
-	CnaIJ13aZtLLkyG9QmSs/4SXyNDlAeDpRjQz14XniEwblBMQznB5EgB/CAd2p05rUsEP6gClsJh
-	/FVtJjK2R5l3b2dO3ugQRJdAzWlVrUgl1VvwMBQnzl1ehuYHvXwE6Fev+jvlxIa5r/oowHgJSgQ
-	hjBkQhV3UvKp/ir3cqHONxBgA3EgE25NxnzRiTrV6BnOaHR0lsTQE/Id5MshQoJwPDxZjk827yq
-	4leFTWtmT0CoeGMMvfUbPsH78N6ZV/NH5HDLnSC+kwLIXPa3ZUoV3BJTD7MrmKw+HtQAhx7Hd9M
-	jkgaDrDCzIkAgg/
-X-Received: by 2002:a05:6102:3243:20b0:5f8:e373:50cd with SMTP id ada2fe7eead31-5f8e3735e7emr799120137.16.1769810598618;
-        Fri, 30 Jan 2026 14:03:18 -0800 (PST)
+        bh=AuD9R5Yu8WdB1Vcj5aKKlpgIDYVmgIgkC3ePDVluN5Q=;
+        b=iPMqNlP04uADj0CZtA0SjPcMVAfLjBCCkZ1qgLqHNwKb871IHMj1flCdyP7WowiAx2
+         bcqfDRo/1rEwjr2N4IzgJLpqtyTWSjGhKae3/YRpKxTy20RD+8HhWsFJlPDg9PQF5fin
+         juyMTV7BorpveMIrqS0XkXWVX+0KQvL4Py8Qqd4MeEtxM7bSQbDjKedrP5LxiPowqdEK
+         xpql4jSfT63UnLF8K2Ao4Ex4Y3mAiqtT3+BrqOfp/txtgVXrJJyQLs+2dyMpWMZRaLHG
+         Brkx2+PIlMuYWgMqBz3fycn4OzgWR/koOQJsZyEC9gkoDb3awO7ohloMejxK1+p/4T9y
+         ctZw==
+X-Gm-Message-State: AOJu0YzFnDKj3sOxEfptLdj0CS3Oprq/l2hlgPN2RwEZvTjSNBC30LPk
+	+ZGTd/JRRpfYVhhFofD8RijTz4XlIay9q7qVUI2A2AvG1mtJHyNhwJC5PioNig==
+X-Gm-Gg: AZuq6aL0L4SD5AUHl+qwEiwQ/2yaEm3cmCpKF9ytHZsTkr0mxbf7cqJ/uge9ySSWM/9
+	aRWijjPLfH+tumesww081SxCE7Ht8zlU7xhe6yjZ4a9O+ZLlnZIwGB0GRuAYGEnXS0GtFA20kLJ
+	VW4nHijpVzSjwamNc+nfNap0qpDUZiAGBPJEPEdrFJ7u7lCNKE7mMStZtj+/FeDXsnU7zrdbH0D
+	OnU6QMrpcMgyFrfBS8N4YF4lIc6vX1cA44fcNQXU49454AqiXGggDHsgB866GNAQrEQOV0tqojP
+	VF6EvRXtK/4f1ilJOd5blhHZ3PYU2nJ+d+hMAZmddfxgkqCn2d/QGDnQkMy8ML+cw81MYLyhzDi
+	uSgPnT1tkM0bqMfhx0jnDS1DlPeWlXCnyBEYGu9wp24bL3ODSouwIu8A/Xlt7fkCdnUWzDAbIkb
+	5QJ6rAk7NoGWEBZCIyoS4HD47TPTsbAGRsqKY96gYNeTwYdyCVJc8frkojyUE8Uim/4ildMIVLl
+	4vNYQ==
+X-Received: by 2002:a05:6122:130a:b0:566:3548:815c with SMTP id 71dfb90a1353d-5669ffc970dmr1544479e0c.1.1769810600975;
+        Fri, 30 Jan 2026 14:03:20 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.03.17
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.03.19
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 14:03:17 -0800 (PST)
+        Fri, 30 Jan 2026 14:03:20 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 32/37] doc/org.bluez.MediaEndpoint: Add Used by reference
-Date: Fri, 30 Jan 2026 17:02:23 -0500
-Message-ID: <20260130220229.1346261-33-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 34/37] doc/org.bluez.MediaTransport: Add Used by reference and Examples
+Date: Fri, 30 Jan 2026 17:02:25 -0500
+Message-ID: <20260130220229.1346261-35-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260130220229.1346261-1-luiz.dentz@gmail.com>
 References: <20260130220229.1346261-1-luiz.dentz@gmail.com>
@@ -77,34 +77,78 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add :Used by: field linking to bluetoothctl-endpoint for this callback
-interface implemented by media endpoint clients.
+Add :Used by: field linking to bluetoothctl-transport and Examples
+sections showing corresponding bluetoothctl transport commands.
 ---
- doc/org.bluez.MediaEndpoint.rst | 5 +++++
- 1 file changed, 5 insertions(+)
+ doc/org.bluez.MediaTransport.rst | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoint.rst
-index 8202b2fdfec2..d1b9c8114052 100644
---- a/doc/org.bluez.MediaEndpoint.rst
-+++ b/doc/org.bluez.MediaEndpoint.rst
-@@ -19,6 +19,7 @@ Interface
- :Interface:	org.bluez.MediaEndpoint1
- :Object path:	freely definable (Server role)
- 		[variable prefix]/{hci0,hci1,...}/dev_{BDADDR}/sep# (Client role)
-+:Used by:	**bluetoothctl-endpoint(1)**
+diff --git a/doc/org.bluez.MediaTransport.rst b/doc/org.bluez.MediaTransport.rst
+index 3d1e8c5b5a40..81cf9e4da572 100644
+--- a/doc/org.bluez.MediaTransport.rst
++++ b/doc/org.bluez.MediaTransport.rst
+@@ -17,6 +17,7 @@ Interface
+ :Service:	org.bluez
+ :Interface:	org.bluez.MediaTransport1
+ :Object path:	[variable prefix]/{hci0,hci1,...}/dev_{BDADDR}/fd#
++:Used by:	**bluetoothctl-transport(1)**
  
  Methods
  -------
-@@ -91,6 +92,10 @@ Possible errors for A2DP endpoints:
- 	:org.bluez.Error.A2DP.InvalidDRC:
- 	:org.bluez.Error.A2DP.NotSupportedDRC:
+@@ -31,6 +32,10 @@ Possible Errors:
+ :org.bluez.Error.NotAuthorized:
+ :org.bluez.Error.Failed:
  
 +Examples:
 +
-+:bluetoothctl: > endpoint.config <endpoint> <local endpoint> [preset]
++:bluetoothctl: > transport.acquire <transport> [transport1...]
 +
- array{byte} SelectConfiguration(array{byte} capabilities)
- `````````````````````````````````````````````````````````
+ fd, uint16, uint16 TryAcquire()
+ ```````````````````````````````
+ 
+@@ -50,6 +55,10 @@ void Release()
+ 
+ Releases file descriptor.
+ 
++Examples:
++
++:bluetoothctl: > transport.release <transport> [transport1...]
++
+ void Select()
+ `````````````
+ 
+@@ -68,6 +77,10 @@ Possible Errors:
+ 
+ :org.bluez.Error.NotAuthorized:
+ 
++Examples:
++
++:bluetoothctl: > transport.select <transport> [transport1...]
++
+ void Unselect()
+ ```````````````
+ 
+@@ -84,6 +97,10 @@ Possible Errors:
+ 
+ :org.bluez.Error.NotAuthorized:
+ 
++Examples:
++
++:bluetoothctl: > transport.unselect <transport> [transport1...]
++
+ Properties
+ ----------
+ 
+@@ -139,6 +156,10 @@ Possible Values:
+ :0-127 (A2DP):
+ :0-255 (BAP):
+ 
++Examples:
++
++:bluetoothctl: > transport.volume <transport> [value]
++
+ object Endpoint [readonly, optional, experimental]
+ ``````````````````````````````````````````````````
  
 -- 
 2.52.0
