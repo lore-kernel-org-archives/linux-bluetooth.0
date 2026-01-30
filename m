@@ -1,158 +1,184 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6EB4221F20
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 15:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AEB32E6BF
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 15:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769786140; cv=none; b=rKN8AsOe1NAhbvLrhbRwPoU7GiyUCO6wIcyhn7qdDtIIV1HvklVteUPc/MVH/mIb1qbDA6FOpGVKVnwyZctM9i+w9GDPHWx+ftUH7uUlbPfER+ugqaf/VQFXoLUCmUz4IbrZ1EokNF49aax8Xb9w/OXdI6ebWCNfJQnEJ/ub69U=
+	t=1769788610; cv=none; b=KCz8roiK4Nb6PUNOIAKXZPcSOFTf9xsHNzYk8mKQRY8m///nH4xtG8BpfdP5yYodwdHUEyvLv/kAxP3knfWl6iyBu7U/2p1/ZVfxl2YmjOxz3vbrTrDSwWAyeRxY3Cdh/loWapQz+jfwCJtBydfz4NDCuxPzATEPJTkWNDQ0vj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769786140; c=relaxed/simple;
-	bh=QMaFrcjLt4waT97iMzumzlM+XY3F1p9RNuu8D7U/QZo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=jDSzj7WzThQmGhKS6J/gBvpTh0+H9w4/1Bndrvfj13nXrPg27YR3JN5PEhHIFRozd4eUNAcAgSL+emV8ZsrsqZfBPmI8cMQNxY8pSE8svf4M40ZDetPjLr4ZHXDrTQwSqH8oG1uM7h0SSX8KIDBwC1Jd1fN+iDM3mFU5pI9+6aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=gmy6svRU; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=gDCeJ8X+; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1769788610; c=relaxed/simple;
+	bh=JV1HDMN/3vpccOCfKUw5arFWWbSDX93MFb74Vann+9A=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=LCARJbqaEVWOIRlT75ollggOY9+B6Y9WphEPceDPpkozkd3Wysx56bfaW1S+3l1vPRUPI89wOBl5uyBii9ShrM3nZVKl/JF4tA9j/QMTbHng87r/98Rrgwwxe0sMwuZMt35nbxq5/Kaq4UWTZFp1EHXruXpS0vepGHW2uHVe6Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k7Tum9Oc; arc=none smtp.client-ip=209.85.222.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="gmy6svRU";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="gDCeJ8X+"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60UAoXWa995907
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 15:15:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	mIZREWITnjl1/FIFaSe23yCY0lDik0S4hWoOA7m7i1A=; b=gmy6svRUWsYWQg1H
-	gWSRgxZf0Y0BcJ+NOrGdoSUG5V7/ls2X5r52gEI9QycnVMPVifK48Mrt5GBRwtLs
-	KZ3AGcmmf7/Xqp/htdSQJ/cD3kp+iTy2l3RzxfQdC/TOFRcZsgFQoO/taFNk57Ke
-	tDWiLOow69qFqk1Drw1xWQtl/UibG1/NncZpP/UJOIGGfOQtt5f3wKcXO+eIrhlA
-	DBpvKLoM+dSTgfW7Z3KbAtoZSTG8XrBEvVlUf55jeccCvNcXGen46bcVNUjj+NoM
-	Gaez8yIhsu4pQ4PIRdbeMF6L0GPKcP8pNWJvmI3YbhesqEqYOCjZISXxuWc8/qbm
-	OQjBKg==
-Received: from mail-dl1-f72.google.com (mail-dl1-f72.google.com [74.125.82.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c0bvvkkdn-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 15:15:37 +0000 (GMT)
-Received: by mail-dl1-f72.google.com with SMTP id a92af1059eb24-11b94abc09dso3308075c88.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 07:15:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k7Tum9Oc"
+Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-9489fb38cbeso12433241.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 07:56:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1769786136; x=1770390936; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mIZREWITnjl1/FIFaSe23yCY0lDik0S4hWoOA7m7i1A=;
-        b=gDCeJ8X+QDm8FMscUWiCbTh5m6rXlpxg8rz1LlHncSpIs9ivh6/5XdGPCdWun8LJit
-         2Q9S2s5QQ92FoxEDmkiaLFsu9lpQx+y6kLmxmvO5Hx4nI2guKNT/EqB3wAYYpEqES1V4
-         QSYG/LP2Y7Gg1JW6V1gtkDnGxbIuVRv+u58tF5+bcGnd3d1RuDIKnHylX1dgBbSYJhju
-         3VWLiT1yZY2h9pjerBaY0qd2sYpknBO57pWg24ZZYTZX02rZpDOOWi3hhKhIz4KAOb4X
-         lCuJxLzQ3WgsE00cUxDuqykf7HgT3CDRWAw+DK7VNPzglggZ2dk5SyAK8pjPwo5uRV0n
-         oUGg==
+        d=gmail.com; s=20230601; t=1769788608; x=1770393408; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dE8kDWA450sZhx8iPbGSIkLCD70bTPy4Q9EkVeZo9SI=;
+        b=k7Tum9OcF21tF/6KsZgQrnCs9HdHtssn60JACXk/A89k0XMJMpic5y3yyBpYftSSo7
+         ZJYOpHsgdk3nGnrdKjak0ltwCjbAxZPA5R7wDnRd55tM3yYAynuxVkC2+w3hbjXr0fst
+         atXz36+ACsxggNYIR6pGE3dGUx/9Jk32mC/esw6QcQjHSQsu1Bjmfhf+TXUsmXzxdePY
+         L/0FSD6Q98ycr/Jo/IAr731hdkUj1aD9gGqelBuQRWYt9UdryIHEDW/TRibhBzUX2HGY
+         Rx9kavTn98bDoM54h7cU5JBX++zKYIt00ZONIC5lPx4eJtBU+njwHQ+UNMWGpsvxpP8y
+         AEQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769786136; x=1770390936;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mIZREWITnjl1/FIFaSe23yCY0lDik0S4hWoOA7m7i1A=;
-        b=QZQzk+egmCY39UiY82W8SA0xX2avT6UJqC6WhubAzKkFj9Q0T8pSO7m/WEMHn9DLe8
-         TYh1zF3AkRwJof2FsV8Si0mCyVBRjnYZyAJVUXdZ5nyLvPRcKEMgC/SiuLnYJkC9iQf7
-         stW02xRA2451yWwO9RtvTx8NLYMumvcBDyZEiIQOB1Ro7pOUiNoGcuY3mZubXlGhLPb2
-         0aGNklVUfuVEwbgGFCfruwiE/ueW5I5/3FZLd4g1PhSVjZHzSCdmlH0rQ7hrn9e/rWYs
-         erSzfwxEGQiY4fMT3V+1VHoFumEdU/yvylh2gqG9seQ2Ng/CxLYufe/8tTK38ypeK7+q
-         U7Lg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwePrH8Y8sgykIlNGGKnEPKgGaDCknY2jkNDHueUHdn4/4N5lE2ar38qan8hV9iNJVKn2O1ENWZZMIof0OGi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGme99SDsFZ0cT7tPR2T2rbJTBwCalKc70vnImhnS/Irm0GUIb
-	Rlb/exsNkvIBtPstjF2B+hy6NglPGMIXYZ8q8tJdv+6L4ySUsthcMbAJ5v//dEArrjhpV4NE+zY
-	Dq3aDe49qKBhMdI1B4lRmWRMoG0ZIXH8/CCKmiSukIihMF/VlQKBLU5Bzs2IQXRJwIFXHtVA=
-X-Gm-Gg: AZuq6aKZOyG1ULaYo6EQBZnbMg3VCO5IE0+JDRKJAN/isVseAhdi6Gu1z8/X1uiDkqw
-	74GaQGH2G1Vpx0JUlCZLv6AmlJ0BS/D5sHFIm2+E/4I2jw05BYWgunDgkqG3xxNJBsiGepbcTV2
-	xc/pncCRNPCdDeNnrMXUJT6OhkszzqUpcRYK1LLQz5goTPGvCsvmcDrjAUm6AUPOtuQw09XmfIr
-	Zs+nZSOooOOt6GsqzVf9oOdco0oGz694rv9aZNdBLZ7z3XI/TKUnH+tE9g2b/en+90Bh7E5Sosc
-	SFjIHKFKFIbSXofFhvQpm34S6SfCU8STZ+ql8bXY42qoE1TNxSWjkjk6oEeBHFinR9vFK+AKzik
-	/kK+qS/PdrsMSvE/KpmdWXUsoFbMjB2co8l50BN3CdepIzssAWNUvxGRr+v0DoE3x
-X-Received: by 2002:a05:7022:396:b0:11b:d211:3a64 with SMTP id a92af1059eb24-125c0f1e671mr1354684c88.0.1769786136379;
-        Fri, 30 Jan 2026 07:15:36 -0800 (PST)
-X-Received: by 2002:a05:7022:396:b0:11b:d211:3a64 with SMTP id a92af1059eb24-125c0f1e671mr1354659c88.0.1769786135739;
-        Fri, 30 Jan 2026 07:15:35 -0800 (PST)
-Received: from hu-jjohnson-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-124a9d7f95asm10252849c88.7.2026.01.30.07.15.34
+        d=1e100.net; s=20230601; t=1769788608; x=1770393408;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dE8kDWA450sZhx8iPbGSIkLCD70bTPy4Q9EkVeZo9SI=;
+        b=qLnHCyEVjR8kQTO8mNhz9lKiGThMGqhUTC0nrzEicJ4O7mJgvqh2MHqf07FEbKOV+N
+         E4rXxqSO5A50LV47liU/K7rem3tt3FLliCiIkTyWlaTgyhP/0nSMZiG/OKD2zUlazL5v
+         MdtZvsS8SPaiXiRUOeszk7YZnelu/CtG/91bJnSyeIO9RrPDrPOEd3njQMTa6e5NiYrg
+         JWaROUN4zTOIhx6tXhu+2psqTiGFOOmHCIiPQ9a3YnzedVqgUf7JEsXg5faNKHEnIQPw
+         lNl2JplWhaLOMTyTUIsyXDDNH6xTw9VUAhXgZffSLY5P78vYsmEp+o1pGZ2RbRjOolS7
+         QqMQ==
+X-Gm-Message-State: AOJu0Yzu0Lo9CCaNbqY2hSi3fUmOgGC3wLWON2pD9bNISHx+iGtR1lcl
+	FDdb++dkVDOOb4dCfflH3YL+BZoQB2p15yhkhj3yPJzXiQmgHHS4nRevwj17mg==
+X-Gm-Gg: AZuq6aJdHr0f8JP+3YYVlTR+yP8cLlWoriMCra4oukyyiaao0tB7aZGJFLAWJ2TC6KW
+	AdMDtg56Elf6wPVw4r/jj7j+Wl/KNLjmhDhoT8bqsXj8yzF0hhyHVSwef2MbT32YX3fZSzadgNF
+	FRd4OwGU3DeVh6U1hF+p+QA9DeOGsSlvCjIj4P7P5ykNXZf2EYpaNOFn3ELGZK8ToINcX2TA0Ak
+	WjZwsvzZEC6De/+u7uxFE3HIP7fEarG56OWWdMYB8BJzPMNsNWFA6VWTqacP5RZScJFy7WqVq5+
+	0ZrKf86eRya9Y33143c5V8g0bIQ0ERstf0PnOY/Mz+o2W8rBI0PTwfoHmHmEtNGW10ossQEuuCf
+	UwyTB3eFdXt/7PIxHPygLafqhngkhyj/glr9S1t6YO+9YPhoGhUMKK7mc4f/bmJ8EXTdYSzvpMx
+	HQcc5MbXVhSO39KSHwbjkb5B6NLajZewjCzCFc0TDk77jrnn6RYbk5TTgQHQx6+/IV2F4cQsWgv
+	jHQCw==
+X-Received: by 2002:a05:6102:d89:b0:5ef:a312:e70c with SMTP id ada2fe7eead31-5f8e362fbacmr944243137.20.1769788606803;
+        Fri, 30 Jan 2026 07:56:46 -0800 (PST)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5f734b71547sm2176035137.3.2026.01.30.07.56.46
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 07:15:35 -0800 (PST)
-From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-To: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
-        linux-pm@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-In-Reply-To: <20260119-wcn3990-pwrctl-v3-3-948df19f5ec2@oss.qualcomm.com>
-References: <20260119-wcn3990-pwrctl-v3-0-948df19f5ec2@oss.qualcomm.com>
- <20260119-wcn3990-pwrctl-v3-3-948df19f5ec2@oss.qualcomm.com>
-Subject: Re: [PATCH v3 3/8] wifi: ath10k: snoc: support powering on the
- device via pwrseq
-Message-Id: <176978613488.3951544.16310124318895182345.b4-ty@oss.qualcomm.com>
-Date: Fri, 30 Jan 2026 07:15:34 -0800
+        Fri, 30 Jan 2026 07:56:46 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] monitor/att: Add initial decoding for HIDS attributes
+Date: Fri, 30 Jan 2026 10:56:36 -0500
+Message-ID: <20260130155637.1150573-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
-X-Authority-Analysis: v=2.4 cv=ZdEQ98VA c=1 sm=1 tr=0 ts=697ccb19 cx=c_pps
- a=bS7HVuBVfinNPG3f6cIo3Q==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=9BDlGpjYJg453-lo7M4A:9
- a=QEXdDO2ut3YA:10 a=vBUdepa8ALXHeOFLBtFW:22
-X-Proofpoint-GUID: wJqBoMwcYZJcSHiK6lSKO0ThwKcqW8lA
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTMwMDEyNSBTYWx0ZWRfXwQ/dkd23Blch
- C82SD/a8v/yTDsbBxWjdoKUjSTslHLhxAoC+07qtggfA5+brL4zyAgrw8wVPWsMMU+M0hw3N5gT
- INKUVAkeupD+izdCnJHIyh67lGJUFr8nLC/8QebzcI/urVM4BY/lTKACB5Y77mtb6hY/6r7jqq6
- 1pf2iVXhBR70m14T5dMGUmavmprFO057/oMCpxlfUF4Sgkil/BfQWGZ1oScXvUtIpP/oPP6OOb9
- DNy8kH1dYaelwjYBUgcxi+s8ECdaEkklNwJ5kBNImrvWBNnZyZ5V9pFq49AeQPhmH/sTZAqTNBd
- o2R10iyuDm9kmUDrjzvJ9aMpLm1MfHBXzxf8LIYPV/D5RCsKteKH6IU41Sqhm1GUz6mJxps45cf
- uPq4g7XWwovHArp4Cm3b6uMyLKDVqy4wa0qJ7uttnZaxkG946nbLnmSPsadHmVMcvSkyjnBlJxv
- 2NO/IyfoOBSifdijK/A==
-X-Proofpoint-ORIG-GUID: wJqBoMwcYZJcSHiK6lSKO0ThwKcqW8lA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-30_02,2026-01-29_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 clxscore=1015 phishscore=0 spamscore=0 suspectscore=0
- malwarescore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2601300125
+Content-Transfer-Encoding: 8bit
 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, 19 Jan 2026 19:07:57 +0200, Dmitry Baryshkov wrote:
-> The WCN39xx family of WiFi/BT chips incorporates a simple PMU, spreading
-> voltages over internal rails. Implement support for using powersequencer
-> for this family of ATH10k devices in addition to using regulators.
-> 
-> 
+This adds decoders to HID Information and HID Control Point
+characteristics.
+---
+ monitor/att.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 82 insertions(+)
 
-Applied, thanks!
-
-[3/8] wifi: ath10k: snoc: support powering on the device via pwrseq
-      commit: afcf3ec615c918dd71139e7ca2f4812ceea48cd7
-
-Best regards,
+diff --git a/monitor/att.c b/monitor/att.c
+index 24aaa264c2bd..b77ffb66e89d 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -4506,6 +4506,87 @@ static void ras_data_overwritten_notify(const struct l2cap_frame *frame)
+ 	GATT_HANDLER(0x2c19, ras_data_overwritten_read, NULL, \
+ 					ras_data_overwritten_notify)
+ 
++static const struct bitfield_data hog_info_flags[] = {
++	{  0, "RemoteWake (0x01)"		},
++	{  1, "NormallyConnectable (0x02)"	},
++	{ }
++};
++
++static void hog_info_read(const struct l2cap_frame *frame)
++{
++	uint16_t bcdhid;
++	uint8_t bcc, flags, mask;
++
++	if (!l2cap_frame_get_le16((void *)frame, &bcdhid)) {
++		print_text(COLOR_ERROR, "    bcdHID: invalid size");
++		goto done;
++	}
++
++	print_field("    bcdHID: 0x%4.4x", bcdhid);
++
++	if (!l2cap_frame_get_u8((void *)frame, &bcc)) {
++		print_text(COLOR_ERROR, "    bCountryCode: invalid size");
++		goto done;
++	}
++
++	print_field("    bCountryCode: 0x%2.2x", bcc);
++
++	if (!l2cap_frame_get_u8((void *)frame, &flags)) {
++		print_text(COLOR_ERROR, "    Flags: invalid size");
++		goto done;
++	}
++
++	print_field("    Flags: 0x%2.2x", flags);
++
++	mask = print_bitfield(4, flags, hog_info_flags);
++	if (mask)
++		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
++								mask);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static const char *hog_cmd_str(uint8_t opcode)
++{
++	switch (opcode) {
++	case 0x00:
++		return "Suspend";
++	case 0x01:
++		return "Exit Suspend";
++	default:
++		return NULL;
++	}
++}
++
++static void hog_cp_write(const struct l2cap_frame *frame)
++{
++	uint8_t opcode;
++	const char *str;
++
++	if (!l2cap_frame_get_u8((void *)frame, &opcode)) {
++		print_text(COLOR_ERROR, "    Opcode: invalid size");
++		goto done;
++	}
++
++	str = hog_cmd_str(opcode);
++	if (!str) {
++		print_field("    Opcode: Reserved (0x%2.2x)", opcode);
++		goto done;
++	}
++
++	print_field("    Opcode: %s (0x%2.2x)", str, opcode);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++#define HIDS \
++	GATT_HANDLER(0x2a4a, hog_info_read, NULL, NULL), \
++	GATT_HANDLER(0x2a4c, NULL, hog_cp_write, NULL)
++
+ #define GATT_HANDLER(_uuid, _read, _write, _notify) \
+ { \
+ 	.uuid = { \
+@@ -4588,6 +4669,7 @@ static const struct gatt_handler {
+ 	GATT_HANDLER(0x2bc1, incoming_call_read, NULL, incoming_call_notify),
+ 	GATT_HANDLER(0x2bc2, call_friendly_name_read, NULL,
+ 					call_friendly_name_notify),
++	HIDS,
+ 	GMAS,
+ 	RAS
+ };
 -- 
-Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+2.52.0
 
