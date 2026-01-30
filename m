@@ -1,69 +1,69 @@
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDAD3542C5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92BA2EB5CD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 22:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769810590; cv=none; b=g5sGa4OwmS0qNuo/3Zwh9G9X1XgrfAO5wMj0kqIImsypFSR4UhqkeXztpkX75N4q3A7LeQyfb4OqYz0VF5Dn1gEzke1Fjmx5SxVNSL0N5+oZrTjmKctC9UGG1Jv8iBxKIT8uzJFdoHAi8IpTzC7ojOuDwTWiH54qvKJwONUa5GY=
+	t=1769810591; cv=none; b=ALZA2yEYWI7g9dW92sr8H6jw7kgUO1Qh9/E40BLV3tLNwyLGHomByqsMxtP/3PKrarSK1/maVDbR5ylHqJFa3CI0eYpmEqCHJGlz+beomhTD76E6SsigFObMaH5Ae3X1HNpJkxka0onr407yk7xfBionDCXb2Sw5dK9WwJT3jzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769810590; c=relaxed/simple;
-	bh=BSgnFGS72HGvic933JJo1JvmBfFo38ewSpGi8NqFzv4=;
+	s=arc-20240116; t=1769810591; c=relaxed/simple;
+	bh=plJ6swdqUmTwovgKg2m+PLsz9rluDzyVWcgX5IjnYnc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nge+aG5chcXHamQaIk1wpO36DN6V6ZUjUBPZoQO24ljlPuZAovR6U97ekyDPBn7HYnDIrAEvI9a6s3l5gt6By2VjodivGHp+0CBQgGpKVlLN0fyRHohGPCHtvcaPdk/+IQ4zzb4eirGAM/zays+YudXfryAysMPa2/Ng5p2LDxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TFTAk71f; arc=none smtp.client-ip=209.85.217.45
+	 MIME-Version; b=EfTZtYNMsyUuFQbcU9xSROpAA3iru7ClVcc1LbbaRFPu1JHeCKLFxulMBuHHX023ebzJXkZalKg7Zj01OVthFBtgTb4o84QK4jcPNJiK/x8J0g4Hg20EfWTsYnoAX29LBNs98hNvYCccMTABSc/CFdyW34nhmH7bH1ENCqhF4Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HiAU16Hy; arc=none smtp.client-ip=209.85.217.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TFTAk71f"
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-5f178c83a3dso759643137.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:03:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HiAU16Hy"
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-5efa6d5dbf5so813366137.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jan 2026 14:03:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1769810588; x=1770415388; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IyhQdSfoulExYxfXRCKcjdrwSfBSqZU1fYWwDsMPPc4=;
-        b=TFTAk71fVN4CPJkc+1rPe2hPP6Rex4vXIN3mKFNas0Mm2J0rVZK3wmwvk+imTdmzxw
-         zU1aakXFukozcDYofDKjN6vKG6Re4fsDWl7kTInfvJ8tkQuuVOUqi/8BYhNjhgM/Jh2u
-         p/YrgnPZnNUHFTmkT494/tkGDzejwfXbW0K3uc9CDtqobsCVg7XWkgRcZ7IywXTZ9bqF
-         E7P9shEifxBnfE6sfJeQp9yQa6p27eVeXVJooKaeSoURZlQCZm/a3dBU1glIU0VsVHFj
-         nHSGUkk+E2hj7IlGl6Q38ZvurklLsqMOZ4h1Lffwn2UytljJKozBFA5dE7rIVq7Dzp+t
-         MeXg==
+        bh=qShBu038XhTZgMg/ANDarUIst8pTl/IGYhPYZ0YWOV4=;
+        b=HiAU16HymtjOjKuULCuZqgVH4CkfgiTCcak/b+gqDMU6K+GKMsbevA28syRgvwqR2y
+         PcvkYDh27cAUDqJ0J49lnNikjuVUHS7AXI0tMzwR/pIGHngnY/yKlEVOMswwub9O9cQw
+         +s86lv+VXuAm1n65/h7x+FVdm78q2PZ/6+YAjUnEEw329ZHsxYHAW2ZCH4swAwZi2Lmk
+         G6sW71xmLjiFCOpzL753lrPQJ5Cn/FjkKQBtV4dqfvzKvVbwecmvkSkoP4LT4of6EDsu
+         YDqnYwwBc7mWBCNHbfvOr6prgL/VQyFNlUmDNMOLXG0a5VKjPcZlB/fxSQHmbn6n2ejX
+         0izw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1769810588; x=1770415388;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=IyhQdSfoulExYxfXRCKcjdrwSfBSqZU1fYWwDsMPPc4=;
-        b=cWmUrebuufaQs8sOD0xKb7CH2dtsDZJZSDttn4a5u/4mpIBZvMRDh7FTn1kvFySWBm
-         MUiXhyN+4R+KfOyu4HdrP3K4LxegmJNm7YzK4F60sYOgnl37PcOzkHA61gBQNE49mSHd
-         20j5cbCe72B8OTnNG7v82wDyI3J0ushXm+PenA8cG5MtEqkHY2BqJK15ghdFXiwUARJl
-         KtVi0zTdu+Gu3aAh2OPQlXVeaCqSeDTaRS90xNXy+fvpJ6mzi0xGt2JQVZCHaU+zuy0u
-         XYYCHwIhM5BIWOfcOXGwG2YGyGUiTkZzxtWHA2EPsFaXP7HAoXr/cdeFbMhRVnRaWmC4
-         8qQg==
-X-Gm-Message-State: AOJu0Yz2sGKozV7+CHc7LDxs6gxVS4IoH+OxQI9zsCK5UQzgfTLQCnK9
-	Jjf2tIlZUrYpMmsnsdPb8bu1d93PM8S9bZT3YDAOxYhkehKI7JjyqHiWlpmwlw==
-X-Gm-Gg: AZuq6aJZa8PF42NRasgHRbhdk1GVzcitoV1ki75CLnaXW1zNfB2d5p4r/kV1sMhWpS9
-	ri4B8jhMkuYA2ouMPJ0qVA1a5hZvt/3R1o357Aq8x3HULC8bn/stZm+IbpfIqcgYW2gzqC8B8D2
-	2rpKeMUj7wxUAEcotB2yY2f034IsL6KNeFGfdbsk9Axfyck/SCSvcO10Vt2gvOg2hpFbVevlQU2
-	xPYDIWfHlxRFyqjQPd0dw4QzzNquexN8/zvjFdR87Zsf3UyyWb4nxuKI31uAtNg0z1wCE8jblde
-	z+BhrRl5tt3YaO6Fh9JRI8s79J7hImqjHhLZXjxFJLjBEoIQfzZZFAOVvXxGMkBpnJ9+UsdyyyA
-	mFVd/s/6N10tqXUWKnqUJUxy/Y9mwNn76GRfUcxESBag5jdOwpeO8uvswQNLFwR+6dHuj13O7sS
-	lMIHVFmFiqG7P27Hky6KG67vcFiLqO3G/+tY8r2ZKcrmFFwUPK4Z6cZWDbThp6Sf+YtOnjg2rUK
-	svlgg==
-X-Received: by 2002:a05:6102:3a0d:b0:5f5:33e4:12ea with SMTP id ada2fe7eead31-5f8e25b8bb5mr1217413137.31.1769810586104;
-        Fri, 30 Jan 2026 14:03:06 -0800 (PST)
+        bh=qShBu038XhTZgMg/ANDarUIst8pTl/IGYhPYZ0YWOV4=;
+        b=L855Oflm5BjUJ9Y+9AFRBIFXMbh8+BIqZfo2geDJQe9lYm920/KmfAZaoOnY2l1cwo
+         aLz33TGF4+BjfuaRhYMG2CPdnkmAfKbcVhuKnnBsumsqtTDGws7Epe6aC27VlqxTJdsY
+         St3XJ9PLHxXXeiU2+zIRmz7hRTziG4mkEpoKATuWLnEqvvFVwdW0nSEvHEgx5dbj14h5
+         RzOeOKA6tPo2wYgxyMSvKGi3JcensrXlv1dSXlFzHV962ub16SBubHCofuOHuTIz9MdK
+         jFU1EMLjXKUkIFFiIGIy4CmDKeUwessvCTSYFGmYskUOHLy9zULp2zRzF69j2tv9uL96
+         k27Q==
+X-Gm-Message-State: AOJu0YyiiznUNxCFN2h1RfDTL0TkI97IFBCo/fGOB4u5Kvzw3oFKJoLG
+	mEF0lNU860KuRO5GC3x/iKAJ8gqDfmUMY2oDF7CKJ1uoXu1dtmvq9gogPivMIA==
+X-Gm-Gg: AZuq6aJIvRk8c8Ug82er1sYvtGoTwRq3ROW3hdaY9/1SKVlmksiXWlAOFALeAEFMpAl
+	8FdVwg0RNN4zaF4vS3U4i+2SFtIM+JvkFYY+JZBqAoAliSCf7Sfl9GqlxKGzn+rc0Sr/pVU0GIq
+	TObiBk2B8/1DWs5PMpeqL1fLgrINMPeV+7a22zOTwa537eTBOrCSq6bVs1Hhi2LjZ3cz7VkggGj
+	VusjgcyD0XWBqlC6XywT7Hx5ZBO6UwSJu21LJ/byHXpSzgrRmJ0yHZGRz0scrsf+fsoxhW0Sjzu
+	VtBRPVo2Ii/MA0rdAEFr64tLoJ5b5aV4EHC1TkBxRy8JSoRR7BP3zfS1L7DnJpv4Buy9HCgbB4t
+	dotk9LoOPIHLLoD10STkmYj2MvXyiAHa65v06l8ceNeA+IxNKMHaA43wOVPHIL2A9U9cT78LH/R
+	7Xve1MCZopPg3sa2kbBY0OwFleDxauBd+daNZcUFm17ue98NpDgey59k6FWvl47iCCZJqJyDAiy
+	TSVCA==
+X-Received: by 2002:a05:6102:3e89:b0:5db:cba0:941 with SMTP id ada2fe7eead31-5f8e26860f1mr1496956137.38.1769810588363;
+        Fri, 30 Jan 2026 14:03:08 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.03.04
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-948723adb7csm2404052241.2.2026.01.30.14.03.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 14:03:05 -0800 (PST)
+        Fri, 30 Jan 2026 14:03:07 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 21/37] doc/org.bluez.AgentManager: Add Used by reference and Examples
-Date: Fri, 30 Jan 2026 17:02:12 -0500
-Message-ID: <20260130220229.1346261-22-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 23/37] doc/org.bluez.Device: Add Used by reference and Examples
+Date: Fri, 30 Jan 2026 17:02:14 -0500
+Message-ID: <20260130220229.1346261-24-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260130220229.1346261-1-luiz.dentz@gmail.com>
 References: <20260130220229.1346261-1-luiz.dentz@gmail.com>
@@ -78,42 +78,119 @@ Content-Transfer-Encoding: 8bit
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 Add :Used by: field linking to bluetoothctl and Examples sections
-showing corresponding bluetoothctl commands for agent methods.
+showing corresponding bluetoothctl commands for device methods.
 ---
- doc/org.bluez.AgentManager.rst | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ doc/org.bluez.Device.rst | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/doc/org.bluez.AgentManager.rst b/doc/org.bluez.AgentManager.rst
-index 77373c0153fd..23e4229adaf1 100644
---- a/doc/org.bluez.AgentManager.rst
-+++ b/doc/org.bluez.AgentManager.rst
+diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
+index 593ff06643f3..3e6a30aafb8a 100644
+--- a/doc/org.bluez.Device.rst
++++ b/doc/org.bluez.Device.rst
 @@ -17,6 +17,7 @@ Interface
  :Service:	org.bluez
- :Interface:	org.bluez.AgentManager1
- :Object path:	/org/bluez
+ :Interface:	org.bluez.Device1
+ :Object path:	[variable prefix]/{hci0,hci1,...}/dev_{BDADDR}
 +:Used by:	**bluetoothctl(1)**
  
  Methods
  -------
-@@ -57,6 +58,10 @@ Possible errors:
- :org.bluez.Error.InvalidArguments:
- :org.bluez.Error.AlreadyExists:
+@@ -51,6 +52,10 @@ Possible errors:
+ :org.bluez.Error.AlreadyConnected:
+ :org.bluez.Error.BREDR.ProfileUnavailable:
  
 +Examples:
 +
-+:bluetoothctl: > agent <on/off/auto/capability>
++:bluetoothctl: > connect <dev> [uuid]
 +
- void UnregisterAgent(object agent)
- ``````````````````````````````````
+ void Disconnect()
+ `````````````````
  
-@@ -79,3 +84,7 @@ Special permission might be required to become the default agent.
- Possible errors:
+@@ -69,6 +74,10 @@ Possible errors:
  
+ :org.bluez.Error.NotConnected:
+ 
++Examples:
++
++:bluetoothctl: > disconnect [dev] [uuid]
++
+ void ConnectProfile(string uuid)
+ ````````````````````````````````
+ 
+@@ -125,6 +134,10 @@ Possible errors:
+ :org.bluez.Error.AuthenticationTimeout:
+ :org.bluez.Error.ConnectionAttemptFailed:
+ 
++Examples:
++
++:bluetoothctl: > pair [dev]
++
+ void CancelPairing()
+ ````````````````````
+ 
+@@ -135,6 +148,10 @@ Possible errors:
  :org.bluez.Error.DoesNotExist:
+ :org.bluez.Error.Failed:
+ 
++Examples:
++
++:bluetoothctl: > cancel-pairing [dev]
++
+ array{array{byte}} GetServiceRecords() [experimental]
+ `````````````````````````````````````````````````````
+ 
+@@ -294,6 +311,11 @@ Indicates if the remote is seen as trusted.
+ 
+ This setting can be changed by the application.
+ 
++Examples:
++
++:bluetoothctl: > trust [dev]
++:bluetoothctl: > untrust [dev]
++
+ boolean Blocked [readwrite]
+ ```````````````````````````
+ 
+@@ -303,11 +325,20 @@ rejected.
+ Any device drivers will also be removed and no new ones will be probed as long
+ as the device is blocked.
+ 
++Examples:
++
++:bluetoothctl: > block [dev]
++:bluetoothctl: > unblock [dev]
++
+ boolean WakeAllowed [readwrite]
+ ```````````````````````````````
+ 
+ If set to true this device will be allowed to wake the host from system suspend.
+ 
++Examples:
++
++:bluetoothctl: > wake [dev] [on/off]
++
+ string Alias [readwrite]
+ ````````````````````````
+ 
+@@ -320,6 +351,10 @@ string as alias will convert it back to the remote device name.
+ When resetting the alias with an empty string, the property will default back to
+ the remote name.
+ 
++Examples:
++
++:bluetoothctl: > set-alias <alias>
++
+ object Adapter [readonly]
+ `````````````````````````
+ 
+@@ -439,3 +474,7 @@ Possible values:
+ :"last-seen":
+ 
+ 	Connect to last seen bearer first.
 +
 +Examples:
 +
-+:bluetoothctl: > default-agent
++:bluetoothctl: > bearer <dev> [last-seen/bredr/le]
 -- 
 2.52.0
 
