@@ -1,36 +1,35 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152C7387351
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Feb 2026 17:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10AD239086
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Feb 2026 17:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770051774; cv=none; b=K/W7JXH0qI2uAmctiSMu8p1IQ1bpOs2wZO0MGU9wfvKSvCoU2lnIHgVLMEmaMt5ZHK8TnQCgwW71WKL9MdJ2rmxgTlulmFzMXOWHjCj2PEjiniiHJx8mhZiplIFGqB8zedTxcKPlS4PiWl9U/FCXKqrV1t2Ha08KkO4/ea2kVXk=
+	t=1770051823; cv=none; b=U2gAsoHeuLZXgc/TzzVsLvkSNjGl7Aj+GeQCZH2PZL7XZeV4hQ+PmTT2yU7LsRIP1N5c0AJYhbsdxbJH1Yg5/3u9McLJZeX4xzpwEEMgQkGBr6jpjRsz9DRvyA6bSL/vwIMeC2miGQZaV+UXevtdwybU8RQFmf6pHFs83AEN1Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770051774; c=relaxed/simple;
-	bh=R0jmoYS4egpN1kyYhO5/IINCrI/0Stvbud3Rg2uMCy8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=BXeNjDdQP2+Ij8zbXqBFwfXhc+Obc9tvYWn0j99c9RP/lUl/oTiUBG9l9nf1+wck5/jMWrMZDtiwOuQz/pYKKXEDA6WVDfWTg/5VGqyIdirSgL7BmgmObLwJ1uIHoYs8VcLm/M5r0CexvwBrqFutV6eeie6V4og0hhupb7mnIXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NFrh8Vva; arc=none smtp.client-ip=192.30.252.204
+	s=arc-20240116; t=1770051823; c=relaxed/simple;
+	bh=zA2lfKJWVLYoLbk3suZX7Yincq3oL+nBhzYIHaknEHQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Vyc7JYMASyJ7pAxJEPquY9sTm1VDy0lUqMxQsDxno86q8kLFLT6kp0rc435OURUopOiTCYLZN65p88vOwYd4gOc9fuhK3S/uaaayu6grgCDf8ejEN9Fg0yJUOGXcv8qZ1Mj4gGPfrguQKhPqjBmuG9fP+rrbmpa2MzHUEF6llBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hk2hYxI4; arc=none smtp.client-ip=192.30.252.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NFrh8Vva"
-Received: from github.com (hubbernetes-node-c347433.ac4-iad.github.net [10.52.152.35])
-	by smtp.github.com (Postfix) with ESMTPA id F2BD640122B
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Feb 2026 09:02:51 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hk2hYxI4"
+Received: from github.com (hubbernetes-node-5040f2b.ash1-iad.github.net [10.56.202.49])
+	by smtp.github.com (Postfix) with ESMTPA id 1937A92114E
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Feb 2026 09:03:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1770051772;
-	bh=44WS+SIArstJzr3bhVCcKx4rcickx6Fu4ggCbcKuaio=;
+	s=pf2023; t=1770051821;
+	bh=UTk+q+jJYVekJgdAjUSaPVLtTHxyBEBg7tYJG2jV0fg=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=NFrh8Vvaw63qaf7u9HVGuudeHV+hp42JGh4RoW5qRKxpzhHR6l/OgAfDn7vHBBQI0
-	 B0hB6r0FQwWa8A8Mp2fLomZXaDNX0mfebEKHpc07coKr29NgkmD+U7pnR2JGBffWQ7
-	 s3gjC+3BESNybhtRCW+iUmUyumEH/4zZZ7D5rnDg=
-Date: Mon, 02 Feb 2026 09:02:51 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
+	b=hk2hYxI4pOeyepV0y8+YmmUn6xQbLMDWbUs9dPDxf0OJSYuEBSX6KvKkvx2TbX2pw
+	 l7mt0HADA1Lydt/44ZRoZoKZWJKe6Ys8ZgVedK0Pklr/PDYrJWMX2nlG6PBksHfov4
+	 TNZaS6hwavfaEBXlNBWS4dv4ipkNatu0ndhqMvYQ=
+Date: Mon, 02 Feb 2026 09:03:41 -0800
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/358ab8-4c963f@github.com>
-Subject: [bluez/bluez] ba27f7: monitor/att: Add initial decoding for HIDS
- attributes
+Message-ID: <bluez/bluez/push/refs/heads/1049069/55d9a7-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,61 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/1049069
   Home:   https://github.com/bluez/bluez
-  Commit: ba27f7a12246a09a2c53f695c15ac4972fcabb03
-      https://github.com/bluez/bluez/commit/ba27f7a12246a09a2c53f695c15ac4972fcabb03
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-30 (Fri, 30 Jan 2026)
-
-  Changed paths:
-    M monitor/att.c
-
-  Log Message:
-  -----------
-  monitor/att: Add initial decoding for HIDS attributes
-
-This adds decoders to HID Information and HID Control Point
-characteristics.
-
-
-  Commit: 4c963f21e56a5766fda63670c2ed4e12acc68ee1
-      https://github.com/bluez/bluez/commit/4c963f21e56a5766fda63670c2ed4e12acc68ee1
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-01-30 (Fri, 30 Jan 2026)
-
-  Changed paths:
-    M monitor/att.c
-
-  Log Message:
-  -----------
-  monitor/att: Fix printing data twice
-
-This fixes ATT Read Response printing the data read twice by checking if
-there is a dedicated decoder then skip printing the value since it is
-latter printed by att_read_func:
-
-== Before ==
-
-> ACL Data RX: Handle 2048 flags 0x02 dlen 7
-      ATT: Read Response (0x0b) len 2
-        Value[2]:
-        11 01
-        Handle: 0x0030 Type: Report Reference (0x2908)
-        Value Handle: 0x002e Type: Report (0x2a4d)
-        Value[2]:
-        11 01
-
-== After ==
-
-> ACL Data RX: Handle 2048 flags 0x02 dlen 7
-      ATT: Read Response (0x0b) len 2
-        Handle: 0x0030 Type: Report Reference (0x2908)
-        Value Handle: 0x002e Type: Report (0x2a4d)
-        Value[2]:
-        11 01
-
-
-Compare: https://github.com/bluez/bluez/compare/358ab8994207...4c963f21e56a
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
