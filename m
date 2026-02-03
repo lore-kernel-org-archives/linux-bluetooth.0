@@ -1,110 +1,104 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680663090E4;
-	Tue,  3 Feb 2026 08:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180A32C08D1;
+	Tue,  3 Feb 2026 09:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770108979; cv=none; b=FTbxLbQ4aZUuhnBeC2i2Sr1IR3eWQA7QCcVnRzdOYu9+9R3qXoEB++1B2FbmvLptj9xKJ3R885R0la+CFT/vEsqs3qmiBnTRnhhyNOUb1mAB0Fe1WqBJZt4ez/nRxJfWFdCqMcXiX4bEPyhBQTd1EAi/N3DmJd3/GLhK+vRq6AU=
+	t=1770111974; cv=none; b=oRakCp2KlZR+RMJ6RtuuUKp4M5PwSfudEx0xV8rA86Cqq889LInZ/maKs91tgfyzS4WZNLbX/6LNhSxZ9pCJqrT7T/VvnoEBtedY74cXnsP9crD+uZyuxMu73PNATY/gphPwAU9Sc9MLD8wL+q15KpM5FzPq0kPyVHrmuhRasTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770108979; c=relaxed/simple;
-	bh=YhGN1tpfZ10X46JV19w6EZSV8Pmy9NK+NVulfMGpRi4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DLWxVwCaY7YCe3dwRF6vheVCz8m0eeeWpPfySuoS8SgahsRqqdco36HZYLPx2vaJqp2e18bOBqWM58NekT4EGDrNRPiHXS5fRupXfzOddsVJT8JyxrXatKKR0q6qBV3fnuHZpTVp913m7PkynHkDb//dtzVIrMFUUcZ/vbGr+sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.59.18.202] (p57a7a2e8.dip0.t-ipconnect.de [87.167.162.232])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 217D44C442FB16;
-	Tue, 03 Feb 2026 09:55:29 +0100 (CET)
-Message-ID: <55b814a2-519b-431e-992b-12710e3cc0f6@molgen.mpg.de>
-Date: Tue, 3 Feb 2026 09:55:07 +0100
+	s=arc-20240116; t=1770111974; c=relaxed/simple;
+	bh=fQ2FzwfXgrS/TiJRtTMEvKyXzR0rJNiLn//mQeIMefM=;
+	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=nH92kEYFYdwxH/FDYIhGDbR2bTLZfQ2qSzr4SHte86MJFvHM3krryFqlUsYPbGtTzXEEJDAJspHDR37pNSpiywSdyWPN+AwCCRYHQNgv0cWs28wnrF1EZO+mU596PBMG4My0yS+cFfnvuvzv2S7FauwTjTgCgQ4HMKuHmVNiYOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=N2FUVb0O reason="key not found in DNS"; arc=none smtp.client-ip=162.243.161.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="N2FUVb0O"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=stu.xidian.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
+	Disposition-Notification-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-ID; bh=yayimUBX2i7aBKM4YjBc3rW
+	3Io0t7C1lfuEhGnd/rx0=; b=N2FUVb0OpCCZTtyIFMlgOUi0/ic88mI60vkHQKE
+	L4BBcKeg1+xX8MJUWyjAn63BgoLRTIflLZhLIKMKgmY9In3NeEoxJ0vAxrTr4sRB
+	5Gtejb9lL6E6yogTCdArpKMHzfoisxRcQC51n0JqJ+LCkb+P8+7aJqkf8fT79j1O
+	GXME=
+Received: from 25181214217$stu.xidian.edu.cn ( [115.53.189.223] ) by
+ ajax-webmail-hzbj-edu-front-4.icoremail.net (Coremail) ; Tue, 3 Feb 2026
+ 17:45:58 +0800 (GMT+08:00)
+Date: Tue, 3 Feb 2026 17:45:58 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?546L5piO54Wc?= <25181214217@stu.xidian.edu.cn>
+To: marcel@holtmann.org, luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [BUG] bluetooth: hci_h5: kernel panic in h5_recv (general
+ protection fault / KASAN null-ptr-deref) via TTY ioctls (syzkaller)
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
+ 20250410(2f5ccd7f) Copyright (c) 2002-2026 www.mailtech.cn
+ mispb-8dfce572-2f24-404d-b59d-0dd2e304114c-icoremail.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btbcm: remove done label in btbcm_patchram
-To: Dongyang Jin <jindongyang@kylinos.cn>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260203071048.1624461-1-jindongyang@kylinos.cn>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260203071048.1624461-1-jindongyang@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-ID: <1a0753ef.1084.19c22e4fde0.Coremail.25181214217@stu.xidian.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:BrQMCkCGLrrWw4FpkusQAA--.1803W
+X-CM-SenderInfo: qsvrmiqsrujiux6v33wo0lvxldqovvfxof0/1tbiAQUNEWmA4A+k5
+	wABsc
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-Dear Dongyang,
-
-
-Thank you for your patch.
-
-Am 03.02.26 um 08:10 schrieb Dongyang Jin:
-> There is no point in having the label since all it does is return the
-> value in the 'err' variable. Instead make every goto return directly
-> and remove the label.
-> 
-> Signed-off-by: Dongyang Jin <jindongyang@kylinos.cn>
-> ---
->   drivers/bluetooth/btbcm.c | 10 ++++------
->   1 file changed, 4 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index d33cc70eec66..dccfbeee4721 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-> @@ -223,7 +223,7 @@ int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
->   		err = PTR_ERR(skb);
->   		bt_dev_err(hdev, "BCM: Download Minidrv command failed (%d)",
->   			   err);
-> -		goto done;
-> +		return err;
->   	}
->   	kfree_skb(skb);
->   
-> @@ -242,8 +242,7 @@ int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
->   
->   		if (fw_size < cmd->plen) {
->   			bt_dev_err(hdev, "BCM: Patch is corrupted");
-> -			err = -EINVAL;
-> -			goto done;
-> +			return -EINVAL;
->   		}
->   
->   		cmd_param = fw_ptr;
-> @@ -258,7 +257,7 @@ int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
->   			err = PTR_ERR(skb);
->   			bt_dev_err(hdev, "BCM: Patch command %04x failed (%d)",
->   				   opcode, err);
-> -			goto done;
-> +			return err;
->   		}
->   		kfree_skb(skb);
->   	}
-> @@ -266,8 +265,7 @@ int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
->   	/* 250 msec delay after Launch Ram completes */
->   	msleep(250);
->   
-> -done:
-> -	return err;
-> +	return 0;
->   }
->   EXPORT_SYMBOL(btbcm_patchram);
->   
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
-
-
-PS: Do you have a device to test *btbcm*?
+RGVhciBCbHVldG9vdGggbWFpbnRhaW5lcnMsCgpXaGVuIGZ1enppbmcvdGVzdGluZyB0aGUgdXBz
+dHJlYW0ga2VybmVsIHdpdGggYSBzeXprYWxsZXIgcmVwcm9kdWNlciwgd2UgdHJpZ2dlcmVkIGEg
+a2VybmVsIHBhbmljIGluIHRoZSBCbHVldG9vdGggSENJIFVBUlQgSDUgcmVjZWl2ZSBwYXRoLgoK
+SEVBRCBjb21taXQ6N2QwYTY2ZTRiYjkwODFkNzVjODJlYzQ5NTdjNTAwMzRjYjBlYTQ0OQpLZXJu
+ZWw6IDYuMTguMCAoS0FTQU4gZW5hYmxlZCkKZ2l0IHRyZWU6IHVwc3RyZWFtCmRtZXNnOiBodHRw
+czovL2dpdGh1Yi5jb20vV21pbmd5dS9DcmFzaGVzL2Jsb2IvbWFpbi8wYmQ1ODk5MTZhY2ZkMjU3
+YTNjZjJjMjVjZDFjMjZlZTdhZmE1ZDU4L2RtZXNnLnR4dCAKS2VybmVsIGNvbmZpZzogaHR0cHM6
+Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21haW4vNi4xOF9zeXpib3QuY29uZmln
+IApDIHJlcHJvZHVjZXI6aHR0cHM6Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21h
+aW4vMGJkNTg5OTE2YWNmZDI1N2EzY2YyYzI1Y2QxYzI2ZWU3YWZhNWQ1OC9yZXByby5jIApTeXog
+cmVwcm9kdWNlcjpodHRwczovL2dpdGh1Yi5jb20vV21pbmd5dS9DcmFzaGVzL2Jsb2IvbWFpbi8w
+YmQ1ODk5MTZhY2ZkMjU3YTNjZjJjMjVjZDFjMjZlZTdhZmE1ZDU4L3JlcHJvLnN5egpIYXJkd2Fy
+ZTogUUVNVSBTdGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJWCwgMTk5NikKCj09IFN1bW1hcnkgPT0K
+VGhlIGtlcm5lbCBjcmFzaGVzIGluOgpoNV9yZWN2KzB4ZmMvMHg4ZjAgKGRyaXZlcnMvYmx1ZXRv
+b3RoL2hjaV9oNS5jKQoKVGhlIGNyYXNoIGlzIHJlcG9ydGVkIGFzOgpPb3BzOiBnZW5lcmFsIHBy
+b3RlY3Rpb24gZmF1bHQsIHByb2JhYmx5IGZvciBub24tY2Fub25pY2FsIGFkZHJlc3MKS0FTQU46
+IG51bGwtcHRyLWRlcmVmIGluIHJhbmdlIFsweDAwMDAwMDAwMDAwMDAyZjgtMHguLi5dCgpUaGUg
+Y2FsbCB0cmFjZSBpbmRpY2F0ZXMgdGhlIGZhdWx0IGhhcHBlbnMgd2hlbiB0aGUgVFRZIGxheWVy
+IGZlZWRzIHJlY2VpdmVkIGRhdGEgaW50byB0aGUgSENJIFVBUlQgbGluZSBkaXNjaXBsaW5lOgpo
+NV9yZWN2IC0+IGhjaV91YXJ0X3R0eV9yZWNlaXZlIC0+IHR0eV9pb2N0bCAtPiBfX3g2NF9zeXNf
+aW9jdGwKClRoaXMgaXNzdWUgaXMgdHJpZ2dlcmFibGUgZnJvbSBhbiB1bnByaXZpbGVnZWQgcmVw
+cm9kdWNlciB1c2luZyBUVFkgaW9jdGxzIChUSU9DU0VURCAvIFRJT0NTSUcgLyBUSU9DU1RJKSBh
+cyBzaG93biBiZWxvdy4KPT0gQ3Jhc2ggbG9nIChleGNlcnB0KSA9PQpbIDkxLjkwMjEwM11bIFQ5
+ODM2XSBPb3BzOiBnZW5lcmFsIHByb3RlY3Rpb24gZmF1bHQsIHByb2JhYmx5IGZvciBub24tY2Fu
+b25pY2FsClsgOTEuOTA2NjA3XVsgVDk4MzZdIEtBU0FOOiBudWxsLXB0ci1kZXJlZiBpbiByYW5n
+ZSBbMHgwMDAwMDAwMDAwMDAwMmY4LTB4MDAwXQpbIDkxLjkwOTQyNV1bIFQ5ODM2XSBDUFU6IDEg
+VUlEOiAwIFBJRDogOTgzNiBDb21tOiByZXBybyBOb3QgdGFpbnRlZCA2LjE4LjAKWyA5MS45MTY5
+MTRdWyBUOTgzNl0gUklQOiAwMDEwKzB4ZmMvMHg4ZjAKWyA5MS45NTA1ODZdWyBUOTgzNl0gQ2Fs
+bCBUcmFjZToKWyA5MS45NTI4NTNdWyBUOTgzNl0KWyA5MS45NTYwNzZdWyBUOTgzNl0gaGNpX3Vh
+cnRfdHR5X3JlY2VpdmUrMHgyNWIvMHg4MDAKWyA5MS45NTk3OTRdWyBUOTgzNl0gdHR5X2lvY3Rs
+KzB4NTAyLzB4MTY5MApbIDkxLjk3MzQzMl1bIFQ5ODM2XSBfX3g2NF9zeXNfaW9jdGwrMHgxOGYv
+MHgyMTAKWyA5MS45NzUwMjFdWyBUOTgzNl0gZG9fc3lzY2FsbF82NCsweGNiLzB4ZmEwClsgOTEu
+OTc3NDkwXVsgVDk4MzZdIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDc3LzB4N2YK
+WyA5Mi4wMzY0NDVdWyBUOTgzNl0gS2VybmVsIHBhbmljIC0gbm90IHN5bmNpbmc6IEZhdGFsIGV4
+Y2VwdGlvbgoKPT0gUmVwcm9kdWNlciAoc3l6IHByb2dyYW0pID09CnIwID0gb3BlbmF0JHR0eW51
+bGwoMHhmZmZmZmZmZmZmZmZmZjljLCAmKDB4N2YwMDAwMDAwNzgwKSwgMHgyMDAwLCAweDApCmlv
+Y3RsJFRJT0NTRVREKHIwLCAweDU0MjMsICYoMHg3ZjAwMDAwMDAxYzApPTB4ZikKcjEgPSBzeXpf
+b3Blbl9kZXYkdHR5MjAoMHhjLCAweDQsIDB4MCkKaW9jdGwkVlRfQUNUSVZBVEUocjEsIDB4NTYw
+NiwgMHgyKQppb2N0bCRUSU9DU0lHKHIwLCAweDQwMDQ1NWM4LCAweDIpCnIyID0gb3BlbmF0JHR0
+eW51bGwoMHhmZmZmZmZmZmZmZmZmZjljLCAmKDB4N2YwMDAwMDAwMDAwKSwgMHg4MDAwMCwgMHgw
+KQppb2N0bCRUSU9DU1RJKHIyLCAweDU0MTIsICYoMHg3ZjAwMDAwMDAwODApPTB4MTIpCgo9PSBO
+b3RlcyA9PQoKVGhlIGNyYXNoIGhhcHBlbnMgaW4gaDVfcmVjdigpIHZlcnkgZWFybHkgaW4gdGhl
+IHJlY2VpdmUgcGF0aCwgc3VnZ2VzdGluZyBhIG1pc3Npbmcgc3RhdGUgY2hlY2sgb3IgYW4gdW5l
+eHBlY3RlZCBOVUxML2ludmFsaWQgcG9pbnRlciBkZXJlZmVyZW5jZSByZWxhdGVkIHRvIHRoZSBI
+OjUgcmVjZWl2ZSBjb250ZXh0LgpUaGUgZmF1bHQgdHlwZSBpbmNsdWRlcyAibm9uLWNhbm9uaWNh
+bCBhZGRyZXNzIiBhbG9uZyB3aXRoIGEgS0FTQU4gbnVsbCBkZXJlZiByYW5nZSwgd2hpY2ggbWF5
+IGluZGljYXRlIGFuIGludmFsaWQgcG9pbnRlciBkZXJpdmVkIGZyb20gdW5pbml0aWFsaXplZCBv
+ciBjb3JydXB0ZWQgc3RhdGUuCgpJZiB5b3UgbmVlZCB0aGUgZnVsbCBkbWVzZyBvdXRwdXQsIC5j
+b25maWcsIG9yIGEgc3RhbmRhbG9uZSByZXByb2R1Y2VyIGxpbmssIHBsZWFzZSBsZXQgbWUga25v
+dyBhbmQgSSB3aWxsIHByb3ZpZGUgdGhlbS4KClRoYW5rIHlvdSEKCk1pbmd5dSBXYW5nCgoK
