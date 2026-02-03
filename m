@@ -1,130 +1,145 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EC13624BE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Feb 2026 17:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770141300; cv=pass; b=BNjTNAVLaN/n8Z6aRpgpL8CutY+gG/gVRlFBA5WRzjCx/3ZEofY5otACSdWwLsIe6Sq/REJITaZDn+q6xPqBfplABP3oOFZT6Kna/loRJ0so13Oy4Rq2A8mAFWMOv2Cy61ezDGDKG+OHC0gLMC1fS9TDfV9y5AdugQcNn4lnjeo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770141300; c=relaxed/simple;
-	bh=gpuGqaeJkr9yPbRbblAZ9dd3VyOI8NFdocGVxgjTXiY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XL4/ykSQ2FihuopB/9b35xxrLrdafBfZmn6cW43+xbIBxtGAgxtDDGPKVHEL6j8aXwIQxDDTItfLIZK9m2WLRCbR8UOTvXGqkpadi8FH9vldCtJMDJKW1p1oz40rHMnYSoie031jjTTrp+PVyJ5b5Ph7iL4bl66lrFwD6arUTO0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKbdIfr9; arc=pass smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1760F3ACF05
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Feb 2026 18:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770142819; cv=none; b=OGAdn7Ky3WBfwcugMg/YT89pAyXcKofouaHilBx6T/n3tRxXfG1nZBZd2HAYmVs166qndp2z6EJgxgCuiMwBrw/3cgYEp5j9AXxxdcVK+jK5rZyHkc44/9rr/jDbdsNUiQ7zAE1NN3/Lh0MPKr8uOxFZiXK1VpYGS6QLR2pV8pM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770142819; c=relaxed/simple;
+	bh=KK63u+Ionip2ABuMxargTsbL7hTByp4X1Fpe8KO5x/Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=M6WVdCm1bk+HZkI+3yS1/3lup+3ldAdBIQh9xe5hqo8XJNWM9IazDHe5aHY99ak6ntsEzQmrCLrriwFyWgoEY9q9IVLgdMCuS+MmboJOrUEEkfCc3+ANf+C2oeDTLCvmT4qmlJlV6OaInnJTgEjWvvnwi38ejvQ350E/8lQhaI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ABfPCdmI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKbdIfr9"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-794ed669269so1256297b3.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Feb 2026 09:54:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770141298; cv=none;
-        d=google.com; s=arc-20240605;
-        b=gRVGeEIGeFXcKsk2t7H6kSgtxkMJA+OojtR7X9AMwL3MULiBw8kKWmUXNKKuZmZuPr
-         EaSTefg06+ei6OGxjg1W3WOjZEd/rdpEg6FxY3Zvv1q2n2dnlB/nM5ODXqtBI5C/vAOT
-         7ROaiSiXU2lEJWalJdo+SNf/T/37zeRSIhWtPbwg4xql04Nh477PYtJSQVIRvk6R5grI
-         ++I51FCD5plUlOVmtiKmrPwLL2T4JvbJ3W3XKisDf0C5v2BVNR18LqBwykJ3Z11GijW9
-         XlmBCCztZXYEKi1tb1D2tu8HF/WddtvXdy1J8mcKT5gnAYmp8+VMtP2FvtEa9iG5bPnV
-         V7qQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gpuGqaeJkr9yPbRbblAZ9dd3VyOI8NFdocGVxgjTXiY=;
-        fh=1riOFKqEEicIHxx9JG4Y6uo5bLGLrAQuEqF0xUdvIp8=;
-        b=DJZp3Tlx+2tp4kP5e2PFcgc0Df/fUGmt/CYcNE5uLcUlyhqDyfr1Ng3teTilog+b1G
-         G8qsMkd1uu9aiI/P30S+Y1eOH1s/kDHzu2Dxr2FF8WIRKMxhKok6VZbGQgPimlxNOBk9
-         n9HEgogwn8tXicZjSmCQ8Mf7FEUwOyI/vBWgtDcgZu7UUHS5o9s0BZh8SQf3TVXGAuVy
-         n4kSjtCzsGvEysxNv2RCEKyzcJRvxtOV39J1H/VAL0RsswZizuTzGtzTbiT0xeSjH6h3
-         zTiH02hOsyDbazjmZV3kD2j2cbm4s3Z9MXPTFq7mxCED2W1UyHisY5mGLMXgkrMKGWwC
-         nZ4g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770141298; x=1770746098; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gpuGqaeJkr9yPbRbblAZ9dd3VyOI8NFdocGVxgjTXiY=;
-        b=LKbdIfr9+ikVcLzUsRuCJ6aOHhYMKvNN5emC6ZU3qqm35nOxsjOixDlYlYCe/e/mRd
-         4+vGAiN5nY6oWT9U2PNHemPc0NY6sXqPGtDR1lQU5+xp4CIx8udIywobjjQm/3/6m+7O
-         uLM2GIiosEuJn292pX7PjEyJcXSt1j6UXRhTMTaFba5XhMQ3vfo/3wa+vvWJdkhrb5fl
-         7CGWWsxLXKcW+pqFwRAWdwPKI9YGP1Qwl9c7HAA11SQA9/5GQzlrPgzN9899T9Irf4WI
-         OSSIZg9xWPBlNgxdhFSErfG7hfke11beji5GYCEzIDCXopTGOFYH5na/IeJ62M5gXS+b
-         gr4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770141298; x=1770746098;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gpuGqaeJkr9yPbRbblAZ9dd3VyOI8NFdocGVxgjTXiY=;
-        b=DV1HUhoWpcVa/WPbWzjxoJ+7QNGc+OMpAE7D3bX2Y1UlRNWLE5Ui/mv0T7yzkR5IdU
-         LYbtXB/pwBSWB0hv+4Z5YWuY4o9zm6IYugWGfFoMv6AuhQiLvN6tpds30TFecee5EUhK
-         tZmScmW5RsaXssoy2DyvdXUMV/dsZSZ5kxIpXa/NsF7F2e++IZeHTPzKESM5kNTdEtEK
-         ec42IQJkr4mKNXqB+2KLlCsNEeNV762Kqo6NFj59sTPObm/WoL+zwihu4+qMnCfRrawC
-         Kt0gy2wFYxuH8AQ/UXS/7qw6rEHwU1wwPtK5fK3xrE1HBTAxu/mnxzw+Lq2nQJcyR/Gd
-         xtvQ==
-X-Gm-Message-State: AOJu0YxQ81g6PppsQUq8HeF4mL85Q/ZJMSEFwwfYvvFX8shK5htkBlx7
-	b9dpyPPnzEuoNu3p/SqQkK2FmtUjilwZfIiNyBxWnuMfJK/ZStSZkRYYY0C/aF0VCLIKyUzkiNS
-	RbfYDPkMkokmPbMuA6pmwLI4pkTaNOuw=
-X-Gm-Gg: AZuq6aKUS6PkFaixmEdr1u5cS6QjuMWmIU5DIiU3WAigEBlCDmoEm25NnWxacMwyaNQ
-	VY6+RZbnTJdvj+ZwgNEGs+ApVJVsEKAju5jKbmNQUBllcBM2dFDgyHEkZvrj003xqmpi2DDgo7e
-	uV5J49cXMinVxPwBtOE495/1resbP42cKMX6Ii+w7KedPS69eJuakwVBH3k69DsymwyirJyZCFJ
-	X4f+bsVItyilLk3rLYQZ+I+xnX2w0K6Dyrr0IcMTDFxJ6g2Q2eQf0E0RUA2R0WDrdPoGhAyInkd
-	Epds2F8IhUGBFMPfO3C3akJXKy8SXhlH1sy75FBC0mV7L19eGp/g50I=
-X-Received: by 2002:a05:690c:ed5:b0:794:d9f0:2375 with SMTP id
- 00721157ae682-794fea323d4mr2988427b3.0.1770141297727; Tue, 03 Feb 2026
- 09:54:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ABfPCdmI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6C75C116D0;
+	Tue,  3 Feb 2026 18:20:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770142818;
+	bh=KK63u+Ionip2ABuMxargTsbL7hTByp4X1Fpe8KO5x/Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ABfPCdmI1sjJuDOhcAnxMpm1mor4sQBFLKU6/VXwJNxx/oA2vrHaAkIdpvJvhFr1C
+	 1YtQ7Ij7fVqi6fUlF3cjYJVVeoG/Vr8QNfI3ToIf1OS8uBbXNOGeNw7/rMdMkytmsw
+	 NDfh7Djp0dYNEa1uP0W8wRCR22QPy0XWdvvHNfQ+uW80iH71ib8pxcWOW/faIaO59n
+	 BRPHfxNKPoUPcKRxre5SMuD7ihMwWSvT1w3G68v+0WPgZZmeL8QeOpY6HAez/fYbGP
+	 nA4ZvICupFEeLaLoliI8Wh+9kcdnOvWNK4K6lBfcwK9LKPwEVnn58LEFHj1URJFii5
+	 VwJWdR6M7EgwQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 90EF03808200;
+	Tue,  3 Feb 2026 18:20:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALpOmYvQUnA6YGinVxfDzqewP1dcL_-X7NVfto4YsMtZL3x2og@mail.gmail.com>
-In-Reply-To: <CALpOmYvQUnA6YGinVxfDzqewP1dcL_-X7NVfto4YsMtZL3x2og@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 3 Feb 2026 12:54:46 -0500
-X-Gm-Features: AZwV_QhPsmwsvgbYy0IFjEr_MdKjain5a4pMDeMbRqwQd11JVNhHarWfx8UrtvM
-Message-ID: <CABBYNZJGUcO3AjVf-APKtmmvUHnq88SmNMmYCrhBXZEVpPDNog@mail.gmail.com>
-Subject: Re: Bluetooth not booting with MediaTek MT792
-To: "Khaleeli, Adnan" <khalee27@students.rowan.edu>, Chris Lu <chris.lu@mediatek.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 00/35] doc: Add cross-references between
+ bluetoothctl
+ and D-Bus API documentation
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177014281525.1588350.14020829158797445607.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Feb 2026 18:20:15 +0000
+References: <20260130193921.1273263-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260130193921.1273263-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Adnan,
+Hello:
 
-On Mon, Feb 2, 2026 at 9:26=E2=80=AFAM Khaleeli, Adnan
-<khalee27@students.rowan.edu> wrote:
->
-> Hello,
->
-> I am having an issue with Bluetooth not being detected on a new Ubuntu
-> PC using a MediaTeck MT7921 Wifi/Bluetooth combo adapter.
->
-> The Wifi interface works correctly, but bluetooth is not detected at
-> all. Running bluetoothctl results in "No Default controller
-> available". I previously managed to bring Bluetooth online temporarily
-> by running:
->
-> sudo rfkill unblock bluetooth
-> sudo systemctl stop bluetooth
-> sudo modprobe -r btusb
-> sudo modprobe btusb
-> sudo systemctl start bluetooth
->
-> However, this workaround no longer works after reinstalling the
-> linux-firmware for bluez. If I can get any help with this it would be
-> greatly appreciated.
->
-> From, Adnan Khaleeli
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-What is the kernel version, also it would help if you send us the HCI
-trace, you can collect it using btmon -r <filename> and then attempt
-to reload btusb to see if it captures anything.
+On Fri, 30 Jan 2026 14:38:42 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This patch series enhances the BlueZ documentation by adding cross-references
+> between bluetoothctl command documentation and D-Bus API documentation:
+> 
+> - bluetoothctl docs: Add :Uses: fields linking each command to its
+>   corresponding D-Bus interface method(s)
+> 
+> [...]
 
-@Chris Lu or perhaps you have any insight of what the problem could be?
+Here is the summary with links:
+  - [BlueZ,v2,01/35] doc/bluetoothctl: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b4284016a35b
+  - [BlueZ,v2,02/35] doc/bluetoothctl-mgmt: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8153258ebe6c
+  - [BlueZ,v2,03/35] doc/bluetoothctl-admin: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7213d8dfd041
+  - [BlueZ,v2,04/35] doc/bluetoothctl-advertise: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c5715df9adb1
+  - [BlueZ,v2,05/35] doc/bluetoothctl-assistant: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fefe8c741363
+  - [BlueZ,v2,06/35] doc/bluetoothctl-bredr: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=061759b8736c
+  - [BlueZ,v2,07/35] doc/bluetoothctl-endpoint: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e3c20c3183ed
+  - [BlueZ,v2,08/35] doc/bluetoothctl-gatt: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=459e46abd054
+  - [BlueZ,v2,09/35] doc/bluetoothctl-hci: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8e926e4d8f16
+  - [BlueZ,v2,10/35] doc/bluetoothctl-le: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6238b7c3cabd
+  - [BlueZ,v2,11/35] doc/bluetoothctl-monitor: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=192dd3f72f36
+  - [BlueZ,v2,12/35] doc/bluetoothctl-player: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0dfb1cad3863
+  - [BlueZ,v2,13/35] doc/bluetoothctl-scan: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=16057f2ea3ee
+  - [BlueZ,v2,14/35] doc/bluetoothctl-telephony: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d7119120d26c
+  - [BlueZ,v2,15/35] doc/bluetoothctl-transport: Add :Uses: fields and document arguments
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4d69f11acf8a
+  - [BlueZ,v2,16/35] doc/org.bluez.Adapter: Add Used by reference and Examples
+    (no matching commit)
+  - [BlueZ,v2,17/35] doc/org.bluez.AdminPolicySet: Add Used by reference and Examples
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d0841ac272dd
+  - [BlueZ,v2,18/35] doc/org.bluez.AdminPolicyStatus: Add Used by reference
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5490e7e4ccaf
+  - [BlueZ,v2,19/35] doc/org.bluez.AdvertisementMonitor: Add Used by reference
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=21732e9c6b9c
+  - [BlueZ,v2,20/35] doc/org.bluez.AdvertisementMonitorManager: Add Used by reference
+    (no matching commit)
+  - [BlueZ,v2,21/35] doc/org.bluez.AgentManager: Add Used by reference and Examples
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aeff7ee796ff
+  - [BlueZ,v2,22/35] doc/org.bluez.Call: Add Used by reference and Examples
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=58029c4cf245
+  - [BlueZ,v2,23/35] doc/org.bluez.Device: Add Used by reference and Examples
+    (no matching commit)
+  - [BlueZ,v2,24/35] doc/org.bluez.GattCharacteristic: Add Used by reference and Examples
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2123ab772fbe
+  - [BlueZ,v2,25/35] doc/org.bluez.GattDescriptor: Add Used by reference
+    (no matching commit)
+  - [BlueZ,v2,26/35] doc/org.bluez.GattManager: Add Used by reference and Examples
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fe274b385fda
+  - [BlueZ,v2,27/35] doc/org.bluez.GattService: Add Used by reference
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=313ea6ba6121
+  - [BlueZ,v2,28/35] doc/org.bluez.LEAdvertisement: Add Used by reference
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=056589a17947
+  - [BlueZ,v2,29/35] doc/org.bluez.LEAdvertisingManager: Add Used by reference and Examples
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4bb5abd20484
+  - [BlueZ,v2,30/35] doc/org.bluez.Media: Add Used by reference
+    (no matching commit)
+  - [BlueZ,v2,31/35] doc/org.bluez.MediaAssistant: Add Used by reference and Examples
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bd7396ef8a62
+  - [BlueZ,v2,32/35] doc/org.bluez.MediaEndpoint: Add Used by reference
+    (no matching commit)
+  - [BlueZ,v2,33/35] doc/org.bluez.MediaPlayer: Add Used by reference and Examples
+    (no matching commit)
+  - [BlueZ,v2,34/35] doc/org.bluez.MediaTransport: Add Used by reference and Examples
+    (no matching commit)
+  - [BlueZ,v2,35/35] doc/org.bluez.Telephony: Add Used by reference and Examples
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d390dbb58d45
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
