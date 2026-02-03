@@ -1,104 +1,130 @@
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180A32C08D1;
-	Tue,  3 Feb 2026 09:46:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770111974; cv=none; b=oRakCp2KlZR+RMJ6RtuuUKp4M5PwSfudEx0xV8rA86Cqq889LInZ/maKs91tgfyzS4WZNLbX/6LNhSxZ9pCJqrT7T/VvnoEBtedY74cXnsP9crD+uZyuxMu73PNATY/gphPwAU9Sc9MLD8wL+q15KpM5FzPq0kPyVHrmuhRasTk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770111974; c=relaxed/simple;
-	bh=fQ2FzwfXgrS/TiJRtTMEvKyXzR0rJNiLn//mQeIMefM=;
-	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=nH92kEYFYdwxH/FDYIhGDbR2bTLZfQ2qSzr4SHte86MJFvHM3krryFqlUsYPbGtTzXEEJDAJspHDR37pNSpiywSdyWPN+AwCCRYHQNgv0cWs28wnrF1EZO+mU596PBMG4My0yS+cFfnvuvzv2S7FauwTjTgCgQ4HMKuHmVNiYOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=N2FUVb0O reason="key not found in DNS"; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EC13624BE
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Feb 2026 17:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770141300; cv=pass; b=BNjTNAVLaN/n8Z6aRpgpL8CutY+gG/gVRlFBA5WRzjCx/3ZEofY5otACSdWwLsIe6Sq/REJITaZDn+q6xPqBfplABP3oOFZT6Kna/loRJ0so13Oy4Rq2A8mAFWMOv2Cy61ezDGDKG+OHC0gLMC1fS9TDfV9y5AdugQcNn4lnjeo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770141300; c=relaxed/simple;
+	bh=gpuGqaeJkr9yPbRbblAZ9dd3VyOI8NFdocGVxgjTXiY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XL4/ykSQ2FihuopB/9b35xxrLrdafBfZmn6cW43+xbIBxtGAgxtDDGPKVHEL6j8aXwIQxDDTItfLIZK9m2WLRCbR8UOTvXGqkpadi8FH9vldCtJMDJKW1p1oz40rHMnYSoie031jjTTrp+PVyJ5b5Ph7iL4bl66lrFwD6arUTO0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKbdIfr9; arc=pass smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="N2FUVb0O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKbdIfr9"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-794ed669269so1256297b3.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Feb 2026 09:54:58 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770141298; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gRVGeEIGeFXcKsk2t7H6kSgtxkMJA+OojtR7X9AMwL3MULiBw8kKWmUXNKKuZmZuPr
+         EaSTefg06+ei6OGxjg1W3WOjZEd/rdpEg6FxY3Zvv1q2n2dnlB/nM5ODXqtBI5C/vAOT
+         7ROaiSiXU2lEJWalJdo+SNf/T/37zeRSIhWtPbwg4xql04Nh477PYtJSQVIRvk6R5grI
+         ++I51FCD5plUlOVmtiKmrPwLL2T4JvbJ3W3XKisDf0C5v2BVNR18LqBwykJ3Z11GijW9
+         XlmBCCztZXYEKi1tb1D2tu8HF/WddtvXdy1J8mcKT5gnAYmp8+VMtP2FvtEa9iG5bPnV
+         V7qQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=gpuGqaeJkr9yPbRbblAZ9dd3VyOI8NFdocGVxgjTXiY=;
+        fh=1riOFKqEEicIHxx9JG4Y6uo5bLGLrAQuEqF0xUdvIp8=;
+        b=DJZp3Tlx+2tp4kP5e2PFcgc0Df/fUGmt/CYcNE5uLcUlyhqDyfr1Ng3teTilog+b1G
+         G8qsMkd1uu9aiI/P30S+Y1eOH1s/kDHzu2Dxr2FF8WIRKMxhKok6VZbGQgPimlxNOBk9
+         n9HEgogwn8tXicZjSmCQ8Mf7FEUwOyI/vBWgtDcgZu7UUHS5o9s0BZh8SQf3TVXGAuVy
+         n4kSjtCzsGvEysxNv2RCEKyzcJRvxtOV39J1H/VAL0RsswZizuTzGtzTbiT0xeSjH6h3
+         zTiH02hOsyDbazjmZV3kD2j2cbm4s3Z9MXPTFq7mxCED2W1UyHisY5mGLMXgkrMKGWwC
+         nZ4g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=stu.xidian.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
-	Disposition-Notification-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-ID; bh=yayimUBX2i7aBKM4YjBc3rW
-	3Io0t7C1lfuEhGnd/rx0=; b=N2FUVb0OpCCZTtyIFMlgOUi0/ic88mI60vkHQKE
-	L4BBcKeg1+xX8MJUWyjAn63BgoLRTIflLZhLIKMKgmY9In3NeEoxJ0vAxrTr4sRB
-	5Gtejb9lL6E6yogTCdArpKMHzfoisxRcQC51n0JqJ+LCkb+P8+7aJqkf8fT79j1O
-	GXME=
-Received: from 25181214217$stu.xidian.edu.cn ( [115.53.189.223] ) by
- ajax-webmail-hzbj-edu-front-4.icoremail.net (Coremail) ; Tue, 3 Feb 2026
- 17:45:58 +0800 (GMT+08:00)
-Date: Tue, 3 Feb 2026 17:45:58 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?546L5piO54Wc?= <25181214217@stu.xidian.edu.cn>
-To: marcel@holtmann.org, luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [BUG] bluetooth: hci_h5: kernel panic in h5_recv (general
- protection fault / KASAN null-ptr-deref) via TTY ioctls (syzkaller)
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
- 20250410(2f5ccd7f) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-8dfce572-2f24-404d-b59d-0dd2e304114c-icoremail.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        d=gmail.com; s=20230601; t=1770141298; x=1770746098; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gpuGqaeJkr9yPbRbblAZ9dd3VyOI8NFdocGVxgjTXiY=;
+        b=LKbdIfr9+ikVcLzUsRuCJ6aOHhYMKvNN5emC6ZU3qqm35nOxsjOixDlYlYCe/e/mRd
+         4+vGAiN5nY6oWT9U2PNHemPc0NY6sXqPGtDR1lQU5+xp4CIx8udIywobjjQm/3/6m+7O
+         uLM2GIiosEuJn292pX7PjEyJcXSt1j6UXRhTMTaFba5XhMQ3vfo/3wa+vvWJdkhrb5fl
+         7CGWWsxLXKcW+pqFwRAWdwPKI9YGP1Qwl9c7HAA11SQA9/5GQzlrPgzN9899T9Irf4WI
+         OSSIZg9xWPBlNgxdhFSErfG7hfke11beji5GYCEzIDCXopTGOFYH5na/IeJ62M5gXS+b
+         gr4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770141298; x=1770746098;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=gpuGqaeJkr9yPbRbblAZ9dd3VyOI8NFdocGVxgjTXiY=;
+        b=DV1HUhoWpcVa/WPbWzjxoJ+7QNGc+OMpAE7D3bX2Y1UlRNWLE5Ui/mv0T7yzkR5IdU
+         LYbtXB/pwBSWB0hv+4Z5YWuY4o9zm6IYugWGfFoMv6AuhQiLvN6tpds30TFecee5EUhK
+         tZmScmW5RsaXssoy2DyvdXUMV/dsZSZ5kxIpXa/NsF7F2e++IZeHTPzKESM5kNTdEtEK
+         ec42IQJkr4mKNXqB+2KLlCsNEeNV762Kqo6NFj59sTPObm/WoL+zwihu4+qMnCfRrawC
+         Kt0gy2wFYxuH8AQ/UXS/7qw6rEHwU1wwPtK5fK3xrE1HBTAxu/mnxzw+Lq2nQJcyR/Gd
+         xtvQ==
+X-Gm-Message-State: AOJu0YxQ81g6PppsQUq8HeF4mL85Q/ZJMSEFwwfYvvFX8shK5htkBlx7
+	b9dpyPPnzEuoNu3p/SqQkK2FmtUjilwZfIiNyBxWnuMfJK/ZStSZkRYYY0C/aF0VCLIKyUzkiNS
+	RbfYDPkMkokmPbMuA6pmwLI4pkTaNOuw=
+X-Gm-Gg: AZuq6aKUS6PkFaixmEdr1u5cS6QjuMWmIU5DIiU3WAigEBlCDmoEm25NnWxacMwyaNQ
+	VY6+RZbnTJdvj+ZwgNEGs+ApVJVsEKAju5jKbmNQUBllcBM2dFDgyHEkZvrj003xqmpi2DDgo7e
+	uV5J49cXMinVxPwBtOE495/1resbP42cKMX6Ii+w7KedPS69eJuakwVBH3k69DsymwyirJyZCFJ
+	X4f+bsVItyilLk3rLYQZ+I+xnX2w0K6Dyrr0IcMTDFxJ6g2Q2eQf0E0RUA2R0WDrdPoGhAyInkd
+	Epds2F8IhUGBFMPfO3C3akJXKy8SXhlH1sy75FBC0mV7L19eGp/g50I=
+X-Received: by 2002:a05:690c:ed5:b0:794:d9f0:2375 with SMTP id
+ 00721157ae682-794fea323d4mr2988427b3.0.1770141297727; Tue, 03 Feb 2026
+ 09:54:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <1a0753ef.1084.19c22e4fde0.Coremail.25181214217@stu.xidian.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:BrQMCkCGLrrWw4FpkusQAA--.1803W
-X-CM-SenderInfo: qsvrmiqsrujiux6v33wo0lvxldqovvfxof0/1tbiAQUNEWmA4A+k5
-	wABsc
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+References: <CALpOmYvQUnA6YGinVxfDzqewP1dcL_-X7NVfto4YsMtZL3x2og@mail.gmail.com>
+In-Reply-To: <CALpOmYvQUnA6YGinVxfDzqewP1dcL_-X7NVfto4YsMtZL3x2og@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 3 Feb 2026 12:54:46 -0500
+X-Gm-Features: AZwV_QhPsmwsvgbYy0IFjEr_MdKjain5a4pMDeMbRqwQd11JVNhHarWfx8UrtvM
+Message-ID: <CABBYNZJGUcO3AjVf-APKtmmvUHnq88SmNMmYCrhBXZEVpPDNog@mail.gmail.com>
+Subject: Re: Bluetooth not booting with MediaTek MT792
+To: "Khaleeli, Adnan" <khalee27@students.rowan.edu>, Chris Lu <chris.lu@mediatek.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-RGVhciBCbHVldG9vdGggbWFpbnRhaW5lcnMsCgpXaGVuIGZ1enppbmcvdGVzdGluZyB0aGUgdXBz
-dHJlYW0ga2VybmVsIHdpdGggYSBzeXprYWxsZXIgcmVwcm9kdWNlciwgd2UgdHJpZ2dlcmVkIGEg
-a2VybmVsIHBhbmljIGluIHRoZSBCbHVldG9vdGggSENJIFVBUlQgSDUgcmVjZWl2ZSBwYXRoLgoK
-SEVBRCBjb21taXQ6N2QwYTY2ZTRiYjkwODFkNzVjODJlYzQ5NTdjNTAwMzRjYjBlYTQ0OQpLZXJu
-ZWw6IDYuMTguMCAoS0FTQU4gZW5hYmxlZCkKZ2l0IHRyZWU6IHVwc3RyZWFtCmRtZXNnOiBodHRw
-czovL2dpdGh1Yi5jb20vV21pbmd5dS9DcmFzaGVzL2Jsb2IvbWFpbi8wYmQ1ODk5MTZhY2ZkMjU3
-YTNjZjJjMjVjZDFjMjZlZTdhZmE1ZDU4L2RtZXNnLnR4dCAKS2VybmVsIGNvbmZpZzogaHR0cHM6
-Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21haW4vNi4xOF9zeXpib3QuY29uZmln
-IApDIHJlcHJvZHVjZXI6aHR0cHM6Ly9naXRodWIuY29tL1dtaW5neXUvQ3Jhc2hlcy9ibG9iL21h
-aW4vMGJkNTg5OTE2YWNmZDI1N2EzY2YyYzI1Y2QxYzI2ZWU3YWZhNWQ1OC9yZXByby5jIApTeXog
-cmVwcm9kdWNlcjpodHRwczovL2dpdGh1Yi5jb20vV21pbmd5dS9DcmFzaGVzL2Jsb2IvbWFpbi8w
-YmQ1ODk5MTZhY2ZkMjU3YTNjZjJjMjVjZDFjMjZlZTdhZmE1ZDU4L3JlcHJvLnN5egpIYXJkd2Fy
-ZTogUUVNVSBTdGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJWCwgMTk5NikKCj09IFN1bW1hcnkgPT0K
-VGhlIGtlcm5lbCBjcmFzaGVzIGluOgpoNV9yZWN2KzB4ZmMvMHg4ZjAgKGRyaXZlcnMvYmx1ZXRv
-b3RoL2hjaV9oNS5jKQoKVGhlIGNyYXNoIGlzIHJlcG9ydGVkIGFzOgpPb3BzOiBnZW5lcmFsIHBy
-b3RlY3Rpb24gZmF1bHQsIHByb2JhYmx5IGZvciBub24tY2Fub25pY2FsIGFkZHJlc3MKS0FTQU46
-IG51bGwtcHRyLWRlcmVmIGluIHJhbmdlIFsweDAwMDAwMDAwMDAwMDAyZjgtMHguLi5dCgpUaGUg
-Y2FsbCB0cmFjZSBpbmRpY2F0ZXMgdGhlIGZhdWx0IGhhcHBlbnMgd2hlbiB0aGUgVFRZIGxheWVy
-IGZlZWRzIHJlY2VpdmVkIGRhdGEgaW50byB0aGUgSENJIFVBUlQgbGluZSBkaXNjaXBsaW5lOgpo
-NV9yZWN2IC0+IGhjaV91YXJ0X3R0eV9yZWNlaXZlIC0+IHR0eV9pb2N0bCAtPiBfX3g2NF9zeXNf
-aW9jdGwKClRoaXMgaXNzdWUgaXMgdHJpZ2dlcmFibGUgZnJvbSBhbiB1bnByaXZpbGVnZWQgcmVw
-cm9kdWNlciB1c2luZyBUVFkgaW9jdGxzIChUSU9DU0VURCAvIFRJT0NTSUcgLyBUSU9DU1RJKSBh
-cyBzaG93biBiZWxvdy4KPT0gQ3Jhc2ggbG9nIChleGNlcnB0KSA9PQpbIDkxLjkwMjEwM11bIFQ5
-ODM2XSBPb3BzOiBnZW5lcmFsIHByb3RlY3Rpb24gZmF1bHQsIHByb2JhYmx5IGZvciBub24tY2Fu
-b25pY2FsClsgOTEuOTA2NjA3XVsgVDk4MzZdIEtBU0FOOiBudWxsLXB0ci1kZXJlZiBpbiByYW5n
-ZSBbMHgwMDAwMDAwMDAwMDAwMmY4LTB4MDAwXQpbIDkxLjkwOTQyNV1bIFQ5ODM2XSBDUFU6IDEg
-VUlEOiAwIFBJRDogOTgzNiBDb21tOiByZXBybyBOb3QgdGFpbnRlZCA2LjE4LjAKWyA5MS45MTY5
-MTRdWyBUOTgzNl0gUklQOiAwMDEwKzB4ZmMvMHg4ZjAKWyA5MS45NTA1ODZdWyBUOTgzNl0gQ2Fs
-bCBUcmFjZToKWyA5MS45NTI4NTNdWyBUOTgzNl0KWyA5MS45NTYwNzZdWyBUOTgzNl0gaGNpX3Vh
-cnRfdHR5X3JlY2VpdmUrMHgyNWIvMHg4MDAKWyA5MS45NTk3OTRdWyBUOTgzNl0gdHR5X2lvY3Rs
-KzB4NTAyLzB4MTY5MApbIDkxLjk3MzQzMl1bIFQ5ODM2XSBfX3g2NF9zeXNfaW9jdGwrMHgxOGYv
-MHgyMTAKWyA5MS45NzUwMjFdWyBUOTgzNl0gZG9fc3lzY2FsbF82NCsweGNiLzB4ZmEwClsgOTEu
-OTc3NDkwXVsgVDk4MzZdIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDc3LzB4N2YK
-WyA5Mi4wMzY0NDVdWyBUOTgzNl0gS2VybmVsIHBhbmljIC0gbm90IHN5bmNpbmc6IEZhdGFsIGV4
-Y2VwdGlvbgoKPT0gUmVwcm9kdWNlciAoc3l6IHByb2dyYW0pID09CnIwID0gb3BlbmF0JHR0eW51
-bGwoMHhmZmZmZmZmZmZmZmZmZjljLCAmKDB4N2YwMDAwMDAwNzgwKSwgMHgyMDAwLCAweDApCmlv
-Y3RsJFRJT0NTRVREKHIwLCAweDU0MjMsICYoMHg3ZjAwMDAwMDAxYzApPTB4ZikKcjEgPSBzeXpf
-b3Blbl9kZXYkdHR5MjAoMHhjLCAweDQsIDB4MCkKaW9jdGwkVlRfQUNUSVZBVEUocjEsIDB4NTYw
-NiwgMHgyKQppb2N0bCRUSU9DU0lHKHIwLCAweDQwMDQ1NWM4LCAweDIpCnIyID0gb3BlbmF0JHR0
-eW51bGwoMHhmZmZmZmZmZmZmZmZmZjljLCAmKDB4N2YwMDAwMDAwMDAwKSwgMHg4MDAwMCwgMHgw
-KQppb2N0bCRUSU9DU1RJKHIyLCAweDU0MTIsICYoMHg3ZjAwMDAwMDAwODApPTB4MTIpCgo9PSBO
-b3RlcyA9PQoKVGhlIGNyYXNoIGhhcHBlbnMgaW4gaDVfcmVjdigpIHZlcnkgZWFybHkgaW4gdGhl
-IHJlY2VpdmUgcGF0aCwgc3VnZ2VzdGluZyBhIG1pc3Npbmcgc3RhdGUgY2hlY2sgb3IgYW4gdW5l
-eHBlY3RlZCBOVUxML2ludmFsaWQgcG9pbnRlciBkZXJlZmVyZW5jZSByZWxhdGVkIHRvIHRoZSBI
-OjUgcmVjZWl2ZSBjb250ZXh0LgpUaGUgZmF1bHQgdHlwZSBpbmNsdWRlcyAibm9uLWNhbm9uaWNh
-bCBhZGRyZXNzIiBhbG9uZyB3aXRoIGEgS0FTQU4gbnVsbCBkZXJlZiByYW5nZSwgd2hpY2ggbWF5
-IGluZGljYXRlIGFuIGludmFsaWQgcG9pbnRlciBkZXJpdmVkIGZyb20gdW5pbml0aWFsaXplZCBv
-ciBjb3JydXB0ZWQgc3RhdGUuCgpJZiB5b3UgbmVlZCB0aGUgZnVsbCBkbWVzZyBvdXRwdXQsIC5j
-b25maWcsIG9yIGEgc3RhbmRhbG9uZSByZXByb2R1Y2VyIGxpbmssIHBsZWFzZSBsZXQgbWUga25v
-dyBhbmQgSSB3aWxsIHByb3ZpZGUgdGhlbS4KClRoYW5rIHlvdSEKCk1pbmd5dSBXYW5nCgoK
+Hi Adnan,
+
+On Mon, Feb 2, 2026 at 9:26=E2=80=AFAM Khaleeli, Adnan
+<khalee27@students.rowan.edu> wrote:
+>
+> Hello,
+>
+> I am having an issue with Bluetooth not being detected on a new Ubuntu
+> PC using a MediaTeck MT7921 Wifi/Bluetooth combo adapter.
+>
+> The Wifi interface works correctly, but bluetooth is not detected at
+> all. Running bluetoothctl results in "No Default controller
+> available". I previously managed to bring Bluetooth online temporarily
+> by running:
+>
+> sudo rfkill unblock bluetooth
+> sudo systemctl stop bluetooth
+> sudo modprobe -r btusb
+> sudo modprobe btusb
+> sudo systemctl start bluetooth
+>
+> However, this workaround no longer works after reinstalling the
+> linux-firmware for bluez. If I can get any help with this it would be
+> greatly appreciated.
+>
+> From, Adnan Khaleeli
+
+What is the kernel version, also it would help if you send us the HCI
+trace, you can collect it using btmon -r <filename> and then attempt
+to reload btusb to see if it captures anything.
+
+@Chris Lu or perhaps you have any insight of what the problem could be?
+
+
+--=20
+Luiz Augusto von Dentz
