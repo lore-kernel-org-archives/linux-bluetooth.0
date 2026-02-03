@@ -1,163 +1,115 @@
-Received: from mail-ot1-f67.google.com (mail-ot1-f67.google.com [209.85.210.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A878F36829B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Feb 2026 21:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E2025DB0D;
+	Tue,  3 Feb 2026 21:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770153983; cv=none; b=k1G766TqqcpSdgKD9Z/TjsUmibKveD9Xfxvqy/m/ruD2PEOV3VXR24fiv09/mhkRykgHRi1WIoaZ1mzJCiIreuyk24h8wjEjBL2Jo/TqimZxdbZZXb9j2FWohTvGzm1PLAthUTWGe4fFA3xuYLn7eC/AlQUQjWvNCFXzo6aF0/M=
+	t=1770154495; cv=none; b=lYYZstQv7uW25WBaPCAJg+s0BuSyMf8oi2BUQyhuQ/xblv+EfD+6/hNuECDo+adviQduBFKUTfIFMKN7mQQj6F2schcsmZ451pdnb6e2GdbqwWd+2Lj85nPiklOhfELypdGzDY7utyaZ2nJseNFb5mF0fxEXVv8nZOb9KCYfaCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770153983; c=relaxed/simple;
-	bh=uAT6fnICmlw5ed+W1qguC3oIYerRmUYx1zLs94aUasw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=CP8DtgkJLT1P++jWobGIk2KIxlPobaRJkZXs9eceBYJ+1KjubEoGANi7dgxJYoGUog4p/UH+DFPnX2iroXbR55hTV/R+rSK7q+G0eLOckuId1fBQTc/Hh+by9UeyLZYb7ZFc8Lm1q6QkqNEahMo3TPjoxoWKO2Wgp++Yh7UjBAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=htxRYYkU; arc=none smtp.client-ip=209.85.210.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770154495; c=relaxed/simple;
+	bh=lkXIEMtijCiroYp61Hral6FLjWFoiOsLqFXBY9t0EvA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mPaLh1ZdhXrdhNDMrdfsVQ920S2f3SZps6dN4grkHtN/Pu0hERh3wA+LNNtNs7q1LhQcBkTyFidccV/mSmVr2KBbp4AJsHSjzWjPz5SNcsq+EI2IXhQhGYlHcvFT7TlMoBdYLtKhlZ1NaZnbyy9upUNHPqTFgf9+ZX6QMblh8iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CdOdwsXW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="htxRYYkU"
-Received: by mail-ot1-f67.google.com with SMTP id 46e09a7af769-7d196a2334fso244969a34.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Feb 2026 13:26:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770153980; x=1770758780; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yg3ctGa18WRcH+rCP+WEVXPPYFAwWZQG1eJrJDnWWH0=;
-        b=htxRYYkUps2j/yMwA3q4J2FICuuTn2kGOqlpuyDtVaAq9YQ7xg3zZLfaJCixrsRSrm
-         VKDOlI7jp4bp46/zeLBq1j8N4kIhoy44ZhlVab7opDhq3Kv+DkIsorl76cH5P8rPvu8v
-         gBJP610Dc74z/IdSvwy0ShZWryDYZuSvEy8luo9mD60U9qk2TwkXx1hiP+B1BvceR4Fn
-         ST3csrINoL9X0HF2g/lYg6OIir7uy/Lu6aTEvOKdObnM4Y1MRKNJugwJfjl5XoG9MK4L
-         9yCMB4po1q8TmNCsjFJl3urEGK1vKYFFEPo2NZADjK9vTvkvZGctEEP+UV8rfsHTV7IP
-         gSXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770153980; x=1770758780;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yg3ctGa18WRcH+rCP+WEVXPPYFAwWZQG1eJrJDnWWH0=;
-        b=qJb4Bxo02xsBcz149bMS0PZb/GbntpIA0WW9tDDCydRJj/L2ZdXXsAJHxyvRZ3eX5q
-         b8Ldq/dWaI441cbtmstR/W05zQrbdENGAeWVYYVLfX0CHddE8Yf1rwItk+yJvkEN01PZ
-         d9baT6JCQ65TL6WniYyc8QaT9iv9e12R/HoAc3a82UavPa77uwl35AINBmFc930ReSIK
-         LtBkjW/qxaYYn3NXDh+aeChwpsLmGF3yVadTn08nXjneFDFp4MvLpXxVPM+fXKhPGD2r
-         e8j3ZSHhGifb1UpWD4O3tad5cezGXcHjnHPIBodO6OK5aukrfmTY6uShobNswpT7RWA0
-         7H0w==
-X-Gm-Message-State: AOJu0YyAg4SjGY1itnFQE4ImaFWmKB1rlqJyr7qkXQFaz/vAO0oyIhaC
-	BGkL9txWj2Bzq7JsnFrLLIcLO7CrhW8wGCVg5QU44UyDcOFdANHCvQiCmzP7IFhL
-X-Gm-Gg: AZuq6aJEec/APFDkrqED6I/Jb48gdaRbepvW7b+WVgIjHZiyBLltvpFOP8SdjdLQquD
-	MmIjDAbr+MzS0Ejbs4d84Lm+DfoAZaz3/Rb/xny5nJsSa6d/6AuNVRoxP7WEhWP8ZKJHEJSjK2A
-	3ZdDua+T03YowA6xIaOxqXbSVyBF+D0jmKd3TuwTS1OcFYZWgENeDpkZ++osLKI+fg5PXANGJOc
-	sHuY6APdhj63H0NA1R+75lr17nqfpgyzT91/AKPk/Uz/8PCDiGpWavAZJsPAbhlOHsvtfNe5S6q
-	Ybo97J7AsFSxyXwiu3YQUTrqMoHUP8FAJK0zPY/pYgLwY/ZP5/R2XicQ/pUPvNvBibHqygPnyy/
-	Xo4pDW6xrmkEdj5nkqdAMtJz7YpZi3pUHZEDUwAt2pwhFikVZzcgyP7xufuOSw/ICCRYU5sOnDr
-	uDCvzuPQpIfPZiWQ==
-X-Received: by 2002:a05:6830:2043:b0:7d1:85c7:a6a9 with SMTP id 46e09a7af769-7d439e31baemr1508333a34.4.1770153980179;
-        Tue, 03 Feb 2026 13:26:20 -0800 (PST)
-Received: from [172.17.0.2] ([52.165.59.3])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d44925352bsm441980a34.30.2026.02.03.13.26.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 13:26:19 -0800 (PST)
-Message-ID: <698267fb.050a0220.36c3f2.3d5b@mx.google.com>
-Date: Tue, 03 Feb 2026 13:26:19 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4956315686836946851=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CdOdwsXW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F28DC116D0;
+	Tue,  3 Feb 2026 21:34:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770154494;
+	bh=lkXIEMtijCiroYp61Hral6FLjWFoiOsLqFXBY9t0EvA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CdOdwsXWKjL9K1kqjn/1lIlbctd7BgEz5wb61Ps9kFW7L/zMEOVkjOqRP9tlV988c
+	 8PMRA3/TEIp3K0HcDuH7Ppb3AVsC6J7sD+WeTQPoYy19D6Y7/ekEPMBYlSTM2T5+k3
+	 lCQAL0RRaIkz+HZXJuMTcifQ9uWr7lzfep2L1gkzqU368i/+jrq+QXewGg7DTl7d9O
+	 AKeqc9Uuf4M2XDyD3CBrDGafDDmg2ElBzSp7agolRAYOjYDFaCSpBK5p7rcI0jWQ7e
+	 +Yi38HJqqcQBQkzSzk+QANIFn2NpLek9kVWsNZJCXnKiXieyi6XXGh0nEZAWZHnFzx
+	 ZqkrboKeUYDgA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 16E723808200;
+	Tue,  3 Feb 2026 21:34:52 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: L2CAP: Fix invalid response to L2CAP_ECRED_RECONF_REQ
-In-Reply-To: <20260203203003.2110409-1-luiz.dentz@gmail.com>
-References: <20260203203003.2110409-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND v1] Bluetooth: btusb: MT7922: Add VID/PID 0489/e174
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177015449087.2033762.12254196526643936768.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Feb 2026 21:34:50 +0000
+References: <20260130061356.2343346-1-chris.lu@mediatek.com>
+In-Reply-To: <20260130061356.2343346-1-chris.lu@mediatek.com>
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ sean.wang@mediatek.com, will-cy.Lee@mediatek.com, ss.wu@mediatek.com,
+ steve.lee@mediatek.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
 
---===============4956315686836946851==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Fri, 30 Jan 2026 14:13:56 +0800 you wrote:
+> Add VID 0489 & PID e174 for MediaTek MT7922 USB Bluetooth chip.
+> 
+> The information in /sys/kernel/debug/usb/devices about the Bluetooth
+> device is listed as the below.
+> 
+> T:  Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0489 ProdID=e174 Rev= 1.00
+> S:  Manufacturer=MediaTek Inc.
+> S:  Product=Wireless_Device
+> S:  SerialNumber=000000000
+> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+> I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1050471
+Here is the summary with links:
+  - [RESEND,v1] Bluetooth: btusb: MT7922: Add VID/PID 0489/e174
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ba96a6fc642a
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.39 seconds
-GitLint                       PENDING   0.35 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      25.20 seconds
-CheckAllWarning               PASS      28.24 seconds
-CheckSparse                   WARNING   31.35 seconds
-BuildKernel32                 PASS      24.85 seconds
-TestRunnerSetup               PASS      552.94 seconds
-TestRunner_l2cap-tester       PASS      28.05 seconds
-TestRunner_iso-tester         PASS      87.28 seconds
-TestRunner_bnep-tester        PASS      6.20 seconds
-TestRunner_mgmt-tester        FAIL      112.23 seconds
-TestRunner_rfcomm-tester      PASS      9.52 seconds
-TestRunner_sco-tester         FAIL      14.59 seconds
-TestRunner_ioctl-tester       PASS      10.15 seconds
-TestRunner_mesh-tester        FAIL      11.45 seconds
-TestRunner_smp-tester         PASS      8.65 seconds
-TestRunner_userchan-tester    PASS      6.74 seconds
-IncrementalBuild              PENDING   0.68 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/l2cap_core.c:7735:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7736:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7738:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7739:1: error: bad constant expression
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.107 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.896 seconds
-Mesh - Send cancel - 2                               Timed out    1.991 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4956315686836946851==--
