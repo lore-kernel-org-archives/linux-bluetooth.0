@@ -1,126 +1,276 @@
-Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E91831A7EA
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Feb 2026 20:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A08303A1A
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Feb 2026 21:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770235852; cv=none; b=nmFgvOu/hCIGg2Tyov4h7GdkRNHpxIiRuyxn7OmUi9xu8W8OhPgKAOG7fuNetV2hHJIMHey+mRtPjIpAU5gxxc6M3GPx/Q7yODGXqpsEYUIbdza/exd10RsvB0T2BHP0OWd6kE0Sx2eVlYCV8ZW0sAT5gaNOa2XBEJhd+OOTYhk=
+	t=1770241451; cv=none; b=iCdwycrgSSS+zhfnqXEfrKYsXgcdtwhMGfvsPKeS+YrrbtzzOnhWny7DPb7Up4Knnun/1wB0jtYL+7JjMvLNO/jFUt5odCS6Zk7z1LcE5vcxgsZtc05j0jHegBB0Sual8xkdxuZ7XtasDI7hRpwK23PtrcdQUdODF1RaKUfq7dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770235852; c=relaxed/simple;
-	bh=6gbUlBl7vwSu6RIaZbQwACKENfMG883tO2qqBx1pxms=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=eH49wWAfBHge1w0LCrF15Gve8rYR0vOKYiAbis0FYvUoyx3Fi16dugnJ7nNJhaZxaURknnTgxD1WdhSlCcaxXLuW2waVOjQ5+kJn5iwEjx2zGu5QTOTJtGC6rxM/17/WvhIABq6nkPNKImZVe8gWfBenMiG1dVM/m0YrQTa5C08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zozzb+Pz; arc=none smtp.client-ip=74.125.82.68
+	s=arc-20240116; t=1770241451; c=relaxed/simple;
+	bh=dlPhcp1Z1ny7T6KAgAjhK93AClRKXOobjne9d1oJtCU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=SDNxa35ea+PeYlzxM1yt8CfBMAfeMUZem5xEPLnpX8ZgFLAKmprX3VHxBeKbU2r3p5Bh3muopHoKEetobcy3S1EevJHjAibgjYMSfyu6Nq/4Lfrvtx2eX85aJz/gLD3pj0nk+EovQqrcCSS3TZaDhsASBr7Q00N4jE4wDWHEwwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m2jqxB35; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zozzb+Pz"
-Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-12339e2e2c1so155099c88.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Feb 2026 12:10:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m2jqxB35"
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-794719afcd4so2776627b3.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Feb 2026 13:44:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770235851; x=1770840651; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ac6K33O6+wzEZldVQZ8mILycj2/5pYCF1G2ECFNbBP8=;
-        b=Zozzb+PzthE0DQeSFQMxcUOgU6lcfop9CInjhXFFcQ6kbiKgOdAl4+ISIAXL2T5vJ8
-         y7p6PHK+63LjSv9TAlaZCBeYkLfm6Ds+J8ehSGOBrfFY+IjBu6gBxDVnX1JhDraedEis
-         Jw0bNhf6uo8xXGBi/rFJL7m3Q+ugs02wVKPSqe2Jc/cQu5yyRaKEz9HF5OeGmX+dxqQ1
-         Ks+7K/MrP2l4Q0ZH/RzdYHKkLNFDt2k+cHERE8cYWXNxxvrVFhOv+V3SLtvhqmksF3np
-         NtcJi1/DZ/ae9Kirvc0r/1nKL0bno28hW8qQu2wvTCKrkqzEmxBcvQ9PslMWDF6ECB0H
-         DJ/g==
+        d=gmail.com; s=20230601; t=1770241449; x=1770846249; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KjrJ7wzATo2CcPPyN3hYXaD4OboVecu3SYh3iCj+mgE=;
+        b=m2jqxB35k9jhB4Wumm7PT1Eu5tmnU4hiuY56d6sCZNaBlRSYqTi25ZSnaDW0LPkP0t
+         dTF9hXOw4/qekyLIRvRuBvXKu5mgVmhNTA4cX6Q0ffot94jRTyMkJ6refPb6Zsl8nWBY
+         +WHkwjIWHMpKGZfnYIRUCDEM3+wWIj2AQ2QZ3sFcrkgLaAsHIorxfV9fEFquD7nJHJUH
+         tCaLOzzSGSGPKjlCNWOYksWGU/2P54jDqi/WVkRjP4b/YwKBNDeMdAy4tKOuaTygyMkG
+         cCfcFYhASniHeegoUk7VHKiOZJxXTvxMyO8QfQDy2nbwRqTnCfcyVJ7ifH4APt6Pi83x
+         gCMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770235851; x=1770840651;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ac6K33O6+wzEZldVQZ8mILycj2/5pYCF1G2ECFNbBP8=;
-        b=KqQqJmkuK1SMAUsCEul/ENWO0Fcfy08iR7UpCXNxRTCdqZU0wTu/9i22n/Qkrczhx+
-         W7QCxC+fZYmi5zYt/1bC0uAPkxmV+5tidQxc6p4SgplcaacKJWcHJU9vANWE28w0v5t4
-         gpIDipRJiUm5fPFZQWg4QlFuGMG/goXMjvaOeNJ0FpsLpgaiTIBYDbRanZ+Fyw3UK2JP
-         6JfPUEJ2F1kymGnw02dTBmFvLB0tk6/9AEGeu8NCrWomSEyReXNsAjSsoh3xKfXus51/
-         O+B3ZhtA/dIriOvdFWjk3VnJCQiMrodgVe5MfpDpI4IrMhRKhby5XVLl7V2vt8RjS3MJ
-         B3ow==
-X-Gm-Message-State: AOJu0Yz2F2CGPAZbqunuPT6MF7iI/J+5TgTB52JAykrAXRTX6HhDp9Os
-	AmT1bSoeaUhgA2ru/hEh/FnEOGFRox+ofcAOdD73NKktQ0AQDJ+tu9x1rpX/AzAc
-X-Gm-Gg: AZuq6aKNANZ0+Vwh0/RIO1Kc+5Xh4wajiJNL13CFa+UuQS3x6SXs/MFSZyXKEY9Jvsb
-	f1ylt6Ik9X0aloM6wxMBZXfmRmgbcjf3YGmsogEC5P6iZWSAygvOo7jfuYaU2hbwJqchkxZJpZr
-	5PRJVZpkBaN5IpNhchpFjIKZGJh25aqnbHT/yGzk5wh41WEMlfn4vSXOxqF5IQ4WtNxVyiBWlwA
-	Q5OiojWp5wWRK+PvZ2tqzrsPSwVGtfoaVD+eFfRv236KJlLfzgDmwHXX+cwEIUGTsBIIEBcoHbS
-	JqqJ4EvvLTf8RbeNV+qFY7t/ZqQsmVY/gkkXIdLwgnWQOt8XoHn5W1IYNeCyTzb+J+LCVpxjCqI
-	ZxBx3NlcSMgYxR8bjmUcIdhJOO1lQ4oXLTOWr0nNbxFztjdAqE02y/5xvld8YanYSFcP6rIwZ5I
-	afOWqd56JWPEbjwtCHCgcnHu+Tft3m
-X-Received: by 2002:a05:7022:629c:b0:119:e569:f86a with SMTP id a92af1059eb24-126fc2c2e35mr208207c88.7.1770235851319;
-        Wed, 04 Feb 2026 12:10:51 -0800 (PST)
-Received: from [172.17.0.2] ([172.208.153.18])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-126f4e04467sm2257092c88.2.2026.02.04.12.10.50
+        d=1e100.net; s=20230601; t=1770241449; x=1770846249;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KjrJ7wzATo2CcPPyN3hYXaD4OboVecu3SYh3iCj+mgE=;
+        b=EQiL1SENl7aFgs++S4CFV4wclRaGdmWuZedn4KDUb9TF8b2XwlCNPpMI8VwrDpzrma
+         qP/e5ZP7soUSb30Y5W3YRAugJRQXnpt60ZsJOkMaGghV4bs62X0qqVbUn/7x6OM+O14l
+         CF8w0QrXGHdUYs6+eubRh1FHneQH8lKyxLul4olpsiA/vtEWI7L469r5h6fqV0tRfkDR
+         hRjQ8DJWTNMfrU6mP3s7Wuut3zG0SbNKeGdW5RrD6Qd3N3RYdTYCQPWORJlXx7WGVBVs
+         2D5cyFw+YozGDp34WvUpGtHimwymPplX1UhnIR1ZhoFHkuAEgU/ZZ+iOEsCXVwHNIRNt
+         8FKg==
+X-Gm-Message-State: AOJu0Ywf3mHGpXvxos5wdCmfG2foxtfiPcQQTDT6AewhNxCwfwNwh++e
+	QKXzGxXsiWYN/1gb+OBa6QlCO2l7CNpbP8WhgMJGElPs0JcZh7XXv3NSwMhklQ==
+X-Gm-Gg: AZuq6aJe5qCtG23HNxHZCd7v4+s+7KHJJ5/Doy4v8gL6pnS6pr1bWDBN8ctukSNAxB5
+	anSByTHkxe7EgNSE+3hTeKopfykPzr4WPuQJIwNsvpcUhKAmxEdPxFvqQBQ9erG7xCGwAZxejD4
+	kuf6X4yiOyRiN7gw9vOsrp49yHbHq/F6xVFUNylCglPLlEjJL9rdnZyVGMfiVkzLxDnqkhuGDQT
+	1dY5S2wq9r+B8mMgmQjpkYkHDQjrlNZtahT64xPUv1BaSnuy5UPuQrgR4CCh27kIIICl/5zhFKg
+	ltACA9o7Qn8jSDRdAQ0m3ZDKE+P0L0XH+hQOZWei459/3jwP13Vh3kNXpCjzomZPegnZAZJ1SOC
+	l4iveW88ux7sFrYlP6F9CyxvAJ0X6/zKzQC6zqt3Xpg6lcfxh7oCAUJ9PcmdQb4D2vnpfQv1Uf2
+	BkmWDhqnCQeNQQp6bbeQUUU71MxmkNz7c0O6t9iXsMTA4zV0mX5IIT4aF6I91TtlH+Q8rxeFLDF
+	LK0aw==
+X-Received: by 2002:a05:690c:19:b0:794:f3dc:a75d with SMTP id 00721157ae682-794fe7b47camr42849507b3.49.1770241449531;
+        Wed, 04 Feb 2026 13:44:09 -0800 (PST)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-794fefa2aa1sm31678897b3.31.2026.02.04.13.44.08
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 12:10:50 -0800 (PST)
-Message-ID: <6983a7ca.050a0220.1cb2be.0534@mx.google.com>
-Date: Wed, 04 Feb 2026 12:10:50 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8350767668018029517=="
+        Wed, 04 Feb 2026 13:44:09 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: L2CAP: Fix invalid response to L2CAP_ECRED_RECONF_REQ
+Date: Wed,  4 Feb 2026 16:44:00 -0500
+Message-ID: <20260204214400.2376083-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] monitor/l2cap: Add missing result for BT_L2CAP_PDU_ECRED_RECONF_RSP
-In-Reply-To: <20260204185707.2327200-1-luiz.dentz@gmail.com>
-References: <20260204185707.2327200-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8350767668018029517==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This fixes responding with an invalid result caused by checking the
+wrong size of CID which should have been (cmd_len - sizeof(*req)) and
+on top of it the wrong result was use L2CAP_CR_LE_INVALID_PARAMS which
+is invalid/reserved for reconf when running test like L2CAP/ECFC/BI-03-C:
 
-Dear submitter,
+> ACL Data RX: Handle 64 flags 0x02 dlen 14
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 2 len 6
+        MTU: 64
+        MPS: 64
+        Source CID: 64
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!        Result: Reserved (0x000c)
+         Result: Reconfiguration failed - one or more Destination CIDs invalid (0x0003)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1050866
+Fiix L2CAP/ECFC/BI-04-C which expects L2CAP_RECONF_INVALID_MPS (0x0002)
+when more than one channel gets its MPS reduced:
 
----Test result---
+> ACL Data RX: Handle 64 flags 0x02 dlen 16
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 2 len 8
+        MTU: 264
+        MPS: 99
+        Source CID: 64
+!       Source CID: 65
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!        Result: Reconfiguration successful (0x0000)
+         Result: Reconfiguration failed - reduction in size of MPS not allowed for more than one channel at a time (0x0002)
 
-Test Summary:
-CheckPatch                    PENDING   0.37 seconds
-GitLint                       PENDING   0.41 seconds
-BuildEll                      PASS      20.80 seconds
-BluezMake                     PASS      648.70 seconds
-MakeCheck                     PASS      19.04 seconds
-MakeDistcheck                 PASS      247.83 seconds
-CheckValgrind                 PASS      298.90 seconds
-CheckSmatch                   PASS      359.17 seconds
-bluezmakeextell               PASS      189.42 seconds
-IncrementalBuild              PENDING   0.42 seconds
-ScanBuild                     PASS      1039.75 seconds
+Fix L2CAP/ECFC/BI-05-C when SCID is invalid (85 unconnected):
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+> ACL Data RX: Handle 64 flags 0x02 dlen 14
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 2 len 6
+        MTU: 65
+        MPS: 64
+!        Source CID: 85
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!        Result: Reconfiguration successful (0x0000)
+         Result: Reconfiguration failed - one or more Destination CIDs invalid (0x0003)
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+Fix L2CAP/ECFC/BI-06-C when MPS < L2CAP_ECRED_MIN_MPS (64):
 
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+> ACL Data RX: Handle 64 flags 0x02 dlen 14
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 2 len 6
+        MTU: 672
+!       MPS: 63
+        Source CID: 64
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!       Result: Reconfiguration failed - reduction in size of MPS not allowed for more than one channel at a time (0x0002)
+        Result: Reconfiguration failed - other unacceptable parameters (0x0004)
 
+Fix L2CAP/ECFC/BI-07-C when MPS reduced for more than one channel:
 
+> ACL Data RX: Handle 64 flags 0x02 dlen 16
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 3 len 8
+        MTU: 84
+!       MPS: 71
+        Source CID: 64
+!        Source CID: 65
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!       Result: Reconfiguration successful (0x0000)
+        Result: Reconfiguration failed - reduction in size of MPS not allowed for more than one channel at a time (0x0002)
 
+Link: https://github.com/bluez/bluez/issues/1865
+Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/l2cap.h |  2 +
+ net/bluetooth/l2cap_core.c    | 71 ++++++++++++++++++++++++-----------
+ 2 files changed, 51 insertions(+), 22 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index ec3af01e4db9..6f9cf7a05986 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -493,6 +493,8 @@ struct l2cap_ecred_reconf_req {
+ #define L2CAP_RECONF_SUCCESS		0x0000
+ #define L2CAP_RECONF_INVALID_MTU	0x0001
+ #define L2CAP_RECONF_INVALID_MPS	0x0002
++#define L2CAP_RECONF_INVALID_CID	0x0003
++#define L2CAP_RECONF_INVALID_PARAMS	0x0004
+ 
+ struct l2cap_ecred_reconf_rsp {
+ 	__le16 result;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b628b0fa39b2..119bbfcb8ff1 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5310,14 +5310,14 @@ static inline int l2cap_ecred_reconf_req(struct l2cap_conn *conn,
+ 	struct l2cap_ecred_reconf_req *req = (void *) data;
+ 	struct l2cap_ecred_reconf_rsp rsp;
+ 	u16 mtu, mps, result;
+-	struct l2cap_chan *chan;
++	struct l2cap_chan *chan[L2CAP_ECRED_MAX_CID] = {};
+ 	int i, num_scid;
+ 
+ 	if (!enable_ecred)
+ 		return -EINVAL;
+ 
+-	if (cmd_len < sizeof(*req) || cmd_len - sizeof(*req) % sizeof(u16)) {
+-		result = L2CAP_CR_LE_INVALID_PARAMS;
++	if (cmd_len < sizeof(*req) || (cmd_len - sizeof(*req)) % sizeof(u16)) {
++		result = L2CAP_RECONF_INVALID_CID;
+ 		goto respond;
+ 	}
+ 
+@@ -5327,42 +5327,69 @@ static inline int l2cap_ecred_reconf_req(struct l2cap_conn *conn,
+ 	BT_DBG("mtu %u mps %u", mtu, mps);
+ 
+ 	if (mtu < L2CAP_ECRED_MIN_MTU) {
+-		result = L2CAP_RECONF_INVALID_MTU;
++		result = L2CAP_RECONF_INVALID_PARAMS;
+ 		goto respond;
+ 	}
+ 
+ 	if (mps < L2CAP_ECRED_MIN_MPS) {
+-		result = L2CAP_RECONF_INVALID_MPS;
++		result = L2CAP_RECONF_INVALID_PARAMS;
+ 		goto respond;
+ 	}
+ 
+ 	cmd_len -= sizeof(*req);
+ 	num_scid = cmd_len / sizeof(u16);
++
++	if (num_scid > L2CAP_ECRED_MAX_CID) {
++		result = L2CAP_RECONF_INVALID_PARAMS;
++		goto respond;
++	}
++
+ 	result = L2CAP_RECONF_SUCCESS;
+ 
++	/* Check if each SCID, MTU and MPS are valid */
+ 	for (i = 0; i < num_scid; i++) {
+ 		u16 scid;
+ 
+ 		scid = __le16_to_cpu(req->scid[i]);
+-		if (!scid)
+-			return -EPROTO;
+-
+-		chan = __l2cap_get_chan_by_dcid(conn, scid);
+-		if (!chan)
+-			continue;
+-
+-		/* If the MTU value is decreased for any of the included
+-		 * channels, then the receiver shall disconnect all
+-		 * included channels.
+-		 */
+-		if (chan->omtu > mtu) {
+-			BT_ERR("chan %p decreased MTU %u -> %u", chan,
+-			       chan->omtu, mtu);
+-			result = L2CAP_RECONF_INVALID_MTU;
++		if (!scid) {
++			result = L2CAP_RECONF_INVALID_CID;
++			goto respond;
+ 		}
+ 
+-		chan->omtu = mtu;
+-		chan->remote_mps = mps;
++		chan[i] = __l2cap_get_chan_by_dcid(conn, scid);
++		if (!chan[i]) {
++			result = L2CAP_RECONF_INVALID_CID;
++			goto respond;
++		}
++
++		/* The MTU field shall be greater than or equal to the greatest
++		 * current MTU size of these channels.
++		 */
++		if (chan[i]->omtu >= mtu) {
++			BT_ERR("chan %p decreased MTU %u -> %u", chan[i],
++			       chan[i]->omtu, mtu);
++			result = L2CAP_RECONF_INVALID_MTU;
++			goto respond;
++		}
++
++		/* If more than one channel is being configured, the MPS field
++		 * shall be greater than or equal to the current MPS size of
++		 * each of these channels. If only one channel is being
++		 * configured, the MPS field may be less than the current MPS
++		 * of that channel.
++		 */
++		if (chan[i]->remote_mps >= mps && i) {
++			BT_ERR("chan %p decreased MPS %u -> %u", chan[i],
++			       chan[i]->remote_mps, mps);
++			result = L2CAP_RECONF_INVALID_MPS;
++			goto respond;
++		}
++	}
++
++	/* Commit the new MTU and MPS values after checking they are valid */
++	for (i = 0; i < num_scid; i++) {
++		chan[i]->omtu = mtu;
++		chan[i]->remote_mps = mps;
+ 	}
+ 
+ respond:
+-- 
+2.52.0
 
---===============8350767668018029517==--
