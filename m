@@ -1,79 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE3136EAA9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Feb 2026 22:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6042616CD33
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Feb 2026 02:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770156008; cv=none; b=LsNb3Y0VrNjpavvjxwaijymdi7tTx/grEw5ySm5FFt08j16dxxRrS4HxE7K3BG7LIliGnEQ9e6sUNXgC6CUSx0bxiIbiN/S6pj5ckxww+B8J44R/cCeC5JI4aCcF7DmIRgsdXiv56n/yw0D/GIWR1/tL6POUbxznz14fy3GzxJA=
+	t=1770172808; cv=none; b=CRpd3VyAwdp7HABhwqB8yRhPGVEGRKjXuNSwznNsrU4+AroDJQu7c/jyQ6A9B4VYLRRDbmC0GPXArG1P/UHZnY8X3UfhytbJDE2N7GbZon8MxG2ZOo1LCzhb8WaF22idpyRwgkxDLeidob3/8apzOADj/YFnachZMTipKY9/nK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770156008; c=relaxed/simple;
-	bh=hWIVHtOCfXJkjxtEsqhZNpTx4jUdx+sgruK86cF08ng=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ceafAb2WVqs/58ZdsTazTriHgMFIti7YofhoGxmM94xlDz8dnWbu1xNBV3NwwoTALtgtI+y/3HoXDi4AT196pVb/siXmFp4JNK+onKHSqnegSuy9pnOpIh7difp0by+BovSnxfgbtTf1Rpcy+DWwIArFlGxRai5A3lNIc9QWGk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/aPj4rX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770172808; c=relaxed/simple;
+	bh=SsHYRYBWwq0jTIL+K4bTczSc49klTxpiwQRrSp3Lkvs=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JTTR0Ppvim4W1PNOLRavYBtr/TNsB5sYEwB1TzfJdnzfrpVnNA6937MaoE5M1ZMJBQM4iwUzMIsQ1jCbYgPMPLSDklOGdP/vr2aAmKn7goftB2io7fQGNZN7DD+7hPT4DDUleUSVAuBUaBQ14Mk5vfAbQiODID9r2Y7+57KT7kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tIEozOF0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/aPj4rX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 167CFC116D0;
-	Tue,  3 Feb 2026 22:00:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tIEozOF0"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E208EC19425
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Feb 2026 02:40:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770156008;
-	bh=hWIVHtOCfXJkjxtEsqhZNpTx4jUdx+sgruK86cF08ng=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=j/aPj4rXhc7/DZCLyOC6TXJdTpqHbX8oc2ENF7XfjuPlVStnX/8V5qRc/cZw71ZvA
-	 MRMRjcGsoVPiLdAtqNjusDWjswOCDjsWxUKbRo1toh/DB0fezcoYRDm+XLuL4oqRo8
-	 1aLQKbs9Rk5P9aaczzdMbAFMJIYF8SYKHFmZwq7S2AZ7z+rL/uYNxN3Novneq15GYq
-	 rHwGoHmyM4cBu/hA9/CH8eqqlSfe7uUo5NjY1Rq0eUs/uFfxehBLMJAI2AZIVNwN1/
-	 j//g00LCO62E0gfNRlbIhr2QvMGJulg0hGxBygIiAGAr32IkL7fTV9xPhAhPN9rZyZ
-	 YpbSlFUwJ1mFA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 90F573808200;
-	Tue,  3 Feb 2026 22:00:05 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1770172807;
+	bh=SsHYRYBWwq0jTIL+K4bTczSc49klTxpiwQRrSp3Lkvs=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=tIEozOF072krlnmkpQvZV2m+cORO4itNnSwTZedXB2a0gT7kdtsdszVF1qTKXc1PK
+	 2WE2c6Idh8qQhIbpwkSlYJlvrPaC98k9Blh7JawTzlIPEBIrNL36yA8R5vz8wyy/ls
+	 txIQs3YBc8g6/dDEpxUusOVpBj2kY8xvIEica8/wgAW5/rQMhMKTBX6ovB+lXa2CvK
+	 9DdYkCK7DybULcuAIFt+BM+il/OHx1JClLYTg/a9UKcChk+UXGwWs7CovV82Kz12p0
+	 gnDbA+EdwEZ7MjSTkQpe06QeFiVuwL3W5xnIK7QN+MbJ8xqPGE6jaCbX0v7Xv6jxK7
+	 0t4VSDEI2fy0g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id D0AE4C4160E; Wed,  4 Feb 2026 02:40:07 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221041] [BUG] bluetooth: hci_h5: kernel panic in h5_recv
+ (general protection fault / KASAN null-ptr-deref) via TTY ioctls (syzkaller)
+Date: Wed, 04 Feb 2026 02:40:07 +0000
+X-Bugzilla-Reason: CC
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Linux
+X-Bugzilla-Component: Kernel
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: w15303746062@163.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-kernel@kernel-bugs.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-221041-62941-mB4esOV19o@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221041-62941@https.bugzilla.kernel.org/>
+References: <bug-221041-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_core: Rate limit the logging of invalid
- ISO
- handle
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177015600413.2076541.18136252143920998524.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Feb 2026 22:00:04 +0000
-References: 
- <a62daa4ff8e59ef01438d96484b45cc2273db1f3.1770146705.git.pav@iki.fi>
-In-Reply-To: 
- <a62daa4ff8e59ef01438d96484b45cc2273db1f3.1770146705.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221041
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+=E7=8E=8B=E6=98=8E=E7=85=9C (w15303746062@163.com) changed:
 
-On Tue,  3 Feb 2026 21:57:21 +0200 you wrote:
-> Some controller firmwares (eg for MT7925) continuously send invalid ISO
-> packet, which result to "ISO unknown handle" error spam in logs.  It's
-> not important to show all of them to the user.
-> 
-> Rate limit these ISO error messages, similarly as we do for SCO.
-> 
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> 
-> [...]
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |linux-bluetooth@vger.kernel
+                   |                            |.org
 
-Here is the summary with links:
-  - Bluetooth: hci_core: Rate limit the logging of invalid ISO handle
-    https://git.kernel.org/bluetooth/bluetooth-next/c/294cf04ca959
+--=20
+You may reply to this email to add a comment.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+You are receiving this mail because:
+You are on the CC list for the bug.=
