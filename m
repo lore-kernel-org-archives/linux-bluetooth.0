@@ -1,121 +1,276 @@
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F665347BAF;
-	Thu,  5 Feb 2026 08:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94212E7BB4
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Feb 2026 19:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770280570; cv=none; b=HMKB5RjyWQKUKzWu2L9d4ZQskm1LmXGGJORbj3EplLYx7oQkqGffKy7fscIsokAlqbkjEfD/sILb5fm3HKJfCPpws2Xb4D3BTejQpcGNoI0ABb7NoTccdjAEhEbZP37VsQIlkE5HijeKBWMN+G+x61FMwjdCyLjh6hm6NTJb59g=
+	t=1770321471; cv=none; b=np3MK8jPwe4/RDR4BSLU9izz+UfGC6H2cb2vUbpsFkV0TDZl+JINy2ZcHuzLs5SUojIapZWIi3rlX/8B+DGDhl+SjrBRvflrEJgv5qe5vdB1UtsoMUclVx2d6MQMRdLaGIEz4WeeBnP2m2CFalTCnxH30LD9Dg2ScrSrLTpcRec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770280570; c=relaxed/simple;
-	bh=RWaHo2Kw8N0mMedoe9sLtCQ2yjDzbNK4AOKB3FytKFw=;
-	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=RdYwrOw+IbjQy1vYgXWSZtgb5GPZvKfl51KBMhGpjev5QHMzrMR4Q+qXyLYfF377owfCPQee/cEF7bSvYUCpFK5q8zIKIstjWa0O+24W6xGtba4PXeFGww/18odmP3Eea3Xi0mzmoJs1hhKSvtVPMvUT8gSft3zll+cSMkWsVbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=fFvWs3hY reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+	s=arc-20240116; t=1770321471; c=relaxed/simple;
+	bh=jjZoyuyRq+VKS4D/396keBvpBzJD1HhpOp0dYl/U7UY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=XmV4X6zQmL0CnRNKSgDOnCFxSDChlnbW3DR6+tiIt/XngBxZ90/LRdEoc04IvMwh3AfdGuRu2KXhqBV8eA8l/XXEymiElHuCoprZNE8/CD2e3WPRZ6Bjky+wAUHG7LfmYACrstSXuI21XJHLn1LkIi2J+8mNO+uZEFBpQhdCJzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E23FwAvs; arc=none smtp.client-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="fFvWs3hY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E23FwAvs"
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-5fa3f2b8f82so330294137.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Feb 2026 11:57:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=stu.xidian.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
-	Disposition-Notification-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-ID; bh=Ebp3ijr1o9wOiSBBjOjOzLJ
-	hblaKXjGfjtrVZDmGmCk=; b=fFvWs3hYmecoufAkVJW5BQyzfxgugXBgQ4Ag+kz
-	I5DDhu4Vk+uimWAIhEWUMVyiuAj/M6+7kAeqgi1kCDOWVVJGjtZgG0Ey5/3Q53SB
-	IIWwxvUE5nRWjCf/mC3NLQ/FOGME214gC8NaXVLUnY/Gb6GaImNcWNVdoQ2eLanc
-	LySs=
-Received: from 25181214217$stu.xidian.edu.cn ( [115.53.142.71] ) by
- ajax-webmail-hzbj-edu-front-2.icoremail.net (Coremail) ; Thu, 5 Feb 2026
- 16:35:48 +0800 (GMT+08:00)
-Date: Thu, 5 Feb 2026 16:35:48 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?546L5piO54Wc?= <25181214217@stu.xidian.edu.cn>
-To: marcel@holtmann.org, luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [BUG] KASAN_ null-ptr-deref in h5_recv during HCI UART handling on
- Linux 6.18
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
- 20250410(2f5ccd7f) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-8dfce572-2f24-404d-b59d-0dd2e304114c-icoremail.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        d=gmail.com; s=20230601; t=1770321469; x=1770926269; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kua+2VqQi7IzAXSMn74oX1cKHKrPVJPO8qErfxsDBJA=;
+        b=E23FwAvs2oXYRU4xRL9/3o/TWKe2wPngz/simpN9bTBtH0TMfZQ/vAdzT4nvNbuTqH
+         bypHq+tMOeuqJqBPD6ndNM7BGI0/yF41VyS9/X3gii4ZZzBwmU9nr4g39FHdoAtrnofQ
+         BpiRU+9QpvVZ1qQSbNEhM2r/W+YJB+/yqXjpnIPyrPRNk0+wssfTXIrX/gmjgbXLvJ2i
+         EhUuk85PMpEohQwA1FmkcDFcHnlVxyAj5686m+8K7LhQHL3vFq8kcasvoM50kSnybCv3
+         fckK+IhTn5tRahiBA0O4LKWZ5Fn2S+WvwnIG/k4LggPiAWYlPLN4QcOcm4bcla4z8+pi
+         vitg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770321469; x=1770926269;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kua+2VqQi7IzAXSMn74oX1cKHKrPVJPO8qErfxsDBJA=;
+        b=gjnnjhkgOE9F9SM0zeY8gWHcYfHAQI3FUQMxVYQwQhPc9gYyXuUu4nZLfYvNGMIr5A
+         utohlhRzV1aNBCV4zsZ63sG8CdsyjusY8lDJXJJz/MUGFcZ5WaSh8EMWGrSb/gIZWTeS
+         KIT1fkE1/mEg+T1JWDHp+T6eU5DgdOuVwJRYKMfSvaPqUQMVvhC18yzgsqo3l8aP9TaI
+         m+T91ERKOEY2Im7JGaW0ztTU5B8NCW/qO12eMiqm00Ytjhu9i/1raIIug5O/LpEDwhFX
+         nXbbrdayvUYJ3+9Misx4huRE6lnh4ruN0I6nzqNIZG24ZGbs/cVsTTJFpZ8vBLIcKijD
+         vvSg==
+X-Gm-Message-State: AOJu0YwDjXdWfMPAD+o6F7bth/Ks9XdPJDhELAuPAZYTQ0Sus9yj1CU6
+	h2wazSede7GUayFPItN7Pp+t5viFvqtQQJfGlQ8QT4uvRPrigeNGIkTtIirRujvS
+X-Gm-Gg: AZuq6aJoxtbOwC9A2m1MPyjIz2FBeEK2tYZuOUQUznuo0OnM64Gjw2lUYNjExKXZUuf
+	OHVWk4ew99yufVaOOZKYZ+INRbceP88/q092vTUltSrMr41HSO6CxHynVDTAgTHOs32eRRVpICO
+	2NLjNHZvHkNOEf5yCTY7G0kcJRkMtfSfHAZ2VmRsOtaK0zcX/27y8kUQeQEcRELnD3GFDL1O/dr
+	YJStOgMXo7LDyeDLMAuppcpJv9EpkSeP6iMWEN1JJ9H8xqEh3+RQwUgfLry+NYftr+q4x0/IL7r
+	aJjMPzd8sVDf3IETTyc7VBUvMSDRpyxcFv4jJNxbSXCFJw4zscG44DJZMSEefykjYb+8Ddj/VKz
+	N99m68dHIIFXnRPSoMSWm+Hoi7VjLZq+MnuOUCONIa5TOVwmIWG91TuzFnIKfNftjRXOE/OEg+f
+	lU8BRsgEQKis0uQtDaVb9C1uyeKX6kcGCdPzG1F91fDMwJK4s/jaAsYQuy2+A+cP/6m1L8ah4UW
+	KY58Q==
+X-Received: by 2002:a05:6102:54ab:b0:5ee:a12d:55b7 with SMTP id ada2fe7eead31-5fae8c0335cmr45861137.29.1770321469371;
+        Thu, 05 Feb 2026 11:57:49 -0800 (PST)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5fae904dfffsm34493137.14.2026.02.05.11.57.48
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Feb 2026 11:57:48 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: L2CAP: Fix invalid response to L2CAP_ECRED_RECONF_REQ
+Date: Thu,  5 Feb 2026 14:57:42 -0500
+Message-ID: <20260205195742.55530-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <4ae89f04.1423.19c2cf17a5c.Coremail.25181214217@stu.xidian.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:BLQMCkCWf79lVoRpa2UYAA--.2457W
-X-CM-SenderInfo: qsvrmiqsrujiux6v33wo0lvxldqovvfxof0/1tbiAQUNEWmA4A+l6
-	gADsS
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Transfer-Encoding: 8bit
 
-RGVhciBNYWludGFpbmVycywKCldoZW4gdXNpbmcgb3VyIGN1c3RvbWl6ZWQgU3l6a2FsbGVyIHRv
-IGZ1enogdGhlIGxhdGVzdCBMaW51eCBrZXJuZWwsIHRoZSBmb2xsb3dpbmcgY3Jhc2ggd2FzIHRy
-aWdnZXJlZC4KCkhFQUQgY29tbWl0OjdkMGE2NmU0YmI5MDgxZDc1YzgyZWM0OTU3YzUwMDM0Y2Iw
-ZWE0NDkKZ2l0IHRyZWU6IHVwc3RyZWFtCk91dHB1dDpodHRwczovL2dpdGh1Yi5jb20vbWFudWFs
-MC9jcmFzaC9ibG9iL21haW4vcmVwb3J0XzgyNTBfbHBzcy50eHQKS2VybmVsIGNvbmZpZzogaHR0
-cHM6Ly9naXRodWIuY29tL21hbnVhbDAvY3Jhc2gvYmxvYi9tYWluL2NvbmZpZ19zeXpib3QudHh0
-CkMgcmVwcm9kdWNlcjpodHRwczovL2dpdGh1Yi5jb20vbWFudWFsMC9jcmFzaC9ibG9iL21haW4v
-cmVwcm9fODI1MF9scHNzLmMKU3l6IHJlcHJvZHVjZXI6aHR0cHM6Ly9naXRodWIuY29tL21hbnVh
-bDAvY3Jhc2gvYmxvYi9tYWluL3JlcHJvXzgyNTBfbHBzcy5zeXoKCktBU0FOIHJlcG9ydHMgYSBu
-dWxsLXBvaW50ZXIgZGVyZWZlcmVuY2UgaW4gaDVfcmVjdiB3aXRoaW4gZHJpdmVycy9ibHVldG9v
-dGgvaGNpX2g1LmMgd2hlbiBwcm9jZXNzaW5nIEhDSSBVQVJUIGlucHV0LiBUaGUgaXNzdWUgaXMg
-dHJpZ2dlcmVkIGR1cmluZyBub3JtYWwgaW9jdGwvc3lzY2FsbCBwYXRocyB3aGlsZSByZWNlaXZp
-bmcgZGF0YSB2aWEgaGNpX3VhcnRfdHR5X3JlY2VpdmUuIFRoaXMgaW5kaWNhdGVzIHRoYXQgYSBw
-b2ludGVyIHdhcyB1bmV4cGVjdGVkbHkgTlVMTCB3aGVuIGRlcmVmZXJlbmNlZCwgbGVhZGluZyB0
-byBhIGdlbmVyYWwgcHJvdGVjdGlvbiBmYXVsdCBvbiBhIG5vbi1jYW5vbmljYWwgYWRkcmVzcy4g
-VGhlIGJ1ZyBpcyBjb25zaXN0ZW50bHkgcmVwcm9kdWNpYmxlIHdpdGggb3VyIFN5emthbGxlciBm
-dXp6aW5nIHNldHVwIGFuZCBhZmZlY3RzIHRoZSBCbHVldG9vdGggSDUgZHJpdmVyIHN0YWNrIG9u
-IExpbnV4IDYuMTguCgpPb3BzOiBnZW5lcmFsIHByb3RlY3Rpb24gZmF1bHQsIHByb2JhYmx5IGZv
-ciBub24tY2Fub25pY2FsIGFkZHJlc3MgMHhkZmZmZmMwMDAwMDAwMDVmOiAwMDAwIFsjMV0gU01Q
-IEtBU0FOIFBUSQpLQVNBTjogbnVsbC1wdHItZGVyZWYgaW4gcmFuZ2UgWzB4MDAwMDAwMDAwMDAw
-MDJmOC0weDAwMDAwMDAwMDAwMDAyZmZdCkNQVTogMCBVSUQ6IDAgUElEOiAxMDgyNjMgQ29tbTog
-c3l6LjEuOTgwMyBOb3QgdGFpbnRlZCA2LjE4LjAgIzEgUFJFRU1QVChmdWxsKSAKSGFyZHdhcmUg
-bmFtZTogUUVNVSBTdGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJWCwgMTk5NiksIEJJT1MgcmVsLTEu
-MTYuMy0wLWdhNmVkNmI3MDFmMGEtcHJlYnVpbHQucWVtdS5vcmcgMDQvMDEvMjAxNApSSVA6IDAw
-MTA6aDVfcmVjdisweGZjLzB4OGYwIGhvbWUvd215L0Z1enplci90aGlyZF90b29sL2xpbnV4LTYu
-MTgvZHJpdmVycy9ibHVldG9vdGgvaGNpX2g1LmM6NTcyCkNvZGU6IGMxIGU4IDAzIDRjIDAxIGYw
-IDQ4IDg5IDQ0IDI0IDA4IDQ4IDhkIDgzIDA4IDAzIDAwIDAwIDQ4IDg5IDQ0IDI0IDMwIDQ4IGMx
-IGU4IDAzIDQ4IDg5IDQ0IDI0IDEwIGU4IDY5IGNjIDhmIGY5IDQ4IDhiIDQ0IDI0IDA4IDw4MD4g
-MzggMDAgMGYgODUgYTcgMDEgMDAgMDAgNDggODkgZWEgNDggODkgZTkgNDggOGIgODMgZjggMDIg
-MDAgMDAKUlNQOiAwMDE4OmZmZmZjOTAwMDdiYWZiZTggRUZMQUdTOiAwMDAxMDIxMgpSQVg6IGRm
-ZmZmYzAwMDAwMDAwNWYgUkJYOiAwMDAwMDAwMDAwMDAwMDAwIFJDWDogZmZmZmM5MDAxNDJlMjAw
-MApSRFg6IDAwMDAwMDAwMDAwODAwMDAgUlNJOiBmZmZmZmZmZjg4MmE4Yjk3IFJESTogMDAwMDAw
-MDAwMDAwMDAwNQpSQlA6IGZmZmZjOTAwMDdiYWZkNzggUjA4OiAwMDAwMDAwMDAwMDAwMDAwIFIw
-OTogZmZmZmVkMTAwNzNkZTA4MwpSMTA6IDAwMDAwMDAwMDAwMDAwMDEgUjExOiAwMDAwMDAwMDAw
-MDAwMDAwIFIxMjogMDAwMDAwMDAwMDAwMDAwMQpSMTM6IDAwMDAwMDAwMDAwMDAwMDEgUjE0OiBk
-ZmZmZmMwMDAwMDAwMDAwIFIxNTogZmZmZjg4ODAzOWVmMDQwMApGUzogIDAwMDA3ZjY5NTMwZTI2
-NDAoMDAwMCkgR1M6ZmZmZjg4ODBjZjAwMTAwMCgwMDAwKSBrbmxHUzowMDAwMDAwMDAwMDAwMDAw
-CkNTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMKQ1IyOiAw
-MDAwMDAwMDAwMDAwMDAwIENSMzogMDAwMDAwMDAzNmI2MDAwMCBDUjQ6IDAwMDAwMDAwMDAwMDA2
-ZjAKQ2FsbCBUcmFjZToKIDxUQVNLPgogaGNpX3VhcnRfdHR5X3JlY2VpdmUrMHgyNWIvMHg4MDAg
-aG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9kcml2ZXJzL2JsdWV0b290aC9o
-Y2lfbGRpc2MuYzo2MjcKIHRpb2NzdGkgaG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgt
-Ni4xOC9kcml2ZXJzL3R0eS90dHlfaW8uYzoyMjkwIFtpbmxpbmVdCiB0dHlfaW9jdGwrMHg1MDIv
-MHgxNjkwIGhvbWUvd215L0Z1enplci90aGlyZF90b29sL2xpbnV4LTYuMTgvZHJpdmVycy90dHkv
-dHR5X2lvLmM6MjcwNgogdmZzX2lvY3RsIGhvbWUvd215L0Z1enplci90aGlyZF90b29sL2xpbnV4
-LTYuMTgvZnMvaW9jdGwuYzo1MSBbaW5saW5lXQogX19kb19zeXNfaW9jdGwgaG9tZS93bXkvRnV6
-emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9mcy9pb2N0bC5jOjU5NyBbaW5saW5lXQogX19zZV9z
-eXNfaW9jdGwgaG9tZS93bXkvRnV6emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9mcy9pb2N0bC5j
-OjU4MyBbaW5saW5lXQogX194NjRfc3lzX2lvY3RsKzB4MThmLzB4MjEwIGhvbWUvd215L0Z1enpl
-ci90aGlyZF90b29sL2xpbnV4LTYuMTgvZnMvaW9jdGwuYzo1ODMKIGRvX3N5c2NhbGxfeDY0IGhv
-bWUvd215L0Z1enplci90aGlyZF90b29sL2xpbnV4LTYuMTgvYXJjaC94ODYvZW50cnkvc3lzY2Fs
-bF82NC5jOjYzIFtpbmxpbmVdCiBkb19zeXNjYWxsXzY0KzB4Y2IvMHhmYTAgaG9tZS93bXkvRnV6
-emVyL3RoaXJkX3Rvb2wvbGludXgtNi4xOC9hcmNoL3g4Ni9lbnRyeS9zeXNjYWxsXzY0LmM6OTQK
-IGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDc3LzB4N2YKUklQOiAwMDMzOjB4N2Y2
-OTUyMWIwNTlkCkNvZGU6IDAyIGI4IGZmIGZmIGZmIGZmIGMzIDY2IDBmIDFmIDQ0IDAwIDAwIGYz
-IDBmIDFlIGZhIDQ4IDg5IGY4IDQ4IDg5IGY3IDQ4IDg5IGQ2IDQ4IDg5IGNhIDRkIDg5IGMyIDRk
-IDg5IGM4IDRjIDhiIDRjIDI0IDA4IDBmIDA1IDw0OD4gM2QgMDEgZjAgZmYgZmYgNzMgMDEgYzMg
-NDggYzcgYzEgYTggZmYgZmYgZmYgZjcgZDggNjQgODkgMDEgNDgKUlNQOiAwMDJiOjAwMDA3ZjY5
-NTMwZTFmOTggRUZMQUdTOiAwMDAwMDI0NiBPUklHX1JBWDogMDAwMDAwMDAwMDAwMDAxMApSQVg6
-IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwN2Y2OTUyNDI1ZmEwIFJDWDogMDAwMDdmNjk1MjFi
-MDU5ZApSRFg6IDAwMDAyMDAwMDAwMDAwODAgUlNJOiAwMDAwMDAwMDAwMDA1NDEyIFJESTogMDAw
-MDAwMDAwMDAwMDAwYwpSQlA6IDAwMDA3ZjY5NTIyNGUwNzggUjA4OiAwMDAwMDAwMDAwMDAwMDAw
-IFIwOTogMDAwMDAwMDAwMDAwMDAwMApSMTA6IDAwMDAwMDAwMDAwMDAwMDAgUjExOiAwMDAwMDAw
-MDAwMDAwMjQ2IFIxMjogMDAwMDAwMDAwMDAwMDAwMApSMTM6IDAwMDA3ZjY5NTI0MjYwMzggUjE0
-OiAwMDAwN2Y2OTUyNDI1ZmEwIFIxNTogMDAwMDdmNjk1MzBjMjAwMAogPC9UQVNLPgoKVGhhbmtz
-LApNaW5neXUgV2FuZw==
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+This fixes responding with an invalid result caused by checking the
+wrong size of CID which should have been (cmd_len - sizeof(*req)) and
+on top of it the wrong result was use L2CAP_CR_LE_INVALID_PARAMS which
+is invalid/reserved for reconf when running test like L2CAP/ECFC/BI-03-C:
+
+> ACL Data RX: Handle 64 flags 0x02 dlen 14
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 2 len 6
+        MTU: 64
+        MPS: 64
+        Source CID: 64
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!        Result: Reserved (0x000c)
+         Result: Reconfiguration failed - one or more Destination CIDs invalid (0x0003)
+
+Fiix L2CAP/ECFC/BI-04-C which expects L2CAP_RECONF_INVALID_MPS (0x0002)
+when more than one channel gets its MPS reduced:
+
+> ACL Data RX: Handle 64 flags 0x02 dlen 16
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 2 len 8
+        MTU: 264
+        MPS: 99
+        Source CID: 64
+!       Source CID: 65
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!        Result: Reconfiguration successful (0x0000)
+         Result: Reconfiguration failed - reduction in size of MPS not allowed for more than one channel at a time (0x0002)
+
+Fix L2CAP/ECFC/BI-05-C when SCID is invalid (85 unconnected):
+
+> ACL Data RX: Handle 64 flags 0x02 dlen 14
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 2 len 6
+        MTU: 65
+        MPS: 64
+!        Source CID: 85
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!        Result: Reconfiguration successful (0x0000)
+         Result: Reconfiguration failed - one or more Destination CIDs invalid (0x0003)
+
+Fix L2CAP/ECFC/BI-06-C when MPS < L2CAP_ECRED_MIN_MPS (64):
+
+> ACL Data RX: Handle 64 flags 0x02 dlen 14
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 2 len 6
+        MTU: 672
+!       MPS: 63
+        Source CID: 64
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!       Result: Reconfiguration failed - reduction in size of MPS not allowed for more than one channel at a time (0x0002)
+        Result: Reconfiguration failed - other unacceptable parameters (0x0004)
+
+Fix L2CAP/ECFC/BI-07-C when MPS reduced for more than one channel:
+
+> ACL Data RX: Handle 64 flags 0x02 dlen 16
+      LE L2CAP: Enhanced Credit Reconfigure Request (0x19) ident 3 len 8
+        MTU: 84
+!       MPS: 71
+        Source CID: 64
+!        Source CID: 65
+< ACL Data TX: Handle 64 flags 0x00 dlen 10
+      LE L2CAP: Enhanced Credit Reconfigure Respond (0x1a) ident 2 len 2
+!       Result: Reconfiguration successful (0x0000)
+        Result: Reconfiguration failed - reduction in size of MPS not allowed for more than one channel at a time (0x0002)
+
+Link: https://github.com/bluez/bluez/issues/1865
+Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/l2cap.h |  2 +
+ net/bluetooth/l2cap_core.c    | 71 ++++++++++++++++++++++++-----------
+ 2 files changed, 51 insertions(+), 22 deletions(-)
+
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index ec3af01e4db9..6f9cf7a05986 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -493,6 +493,8 @@ struct l2cap_ecred_reconf_req {
+ #define L2CAP_RECONF_SUCCESS		0x0000
+ #define L2CAP_RECONF_INVALID_MTU	0x0001
+ #define L2CAP_RECONF_INVALID_MPS	0x0002
++#define L2CAP_RECONF_INVALID_CID	0x0003
++#define L2CAP_RECONF_INVALID_PARAMS	0x0004
+ 
+ struct l2cap_ecred_reconf_rsp {
+ 	__le16 result;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b628b0fa39b2..81038458be0c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5310,14 +5310,14 @@ static inline int l2cap_ecred_reconf_req(struct l2cap_conn *conn,
+ 	struct l2cap_ecred_reconf_req *req = (void *) data;
+ 	struct l2cap_ecred_reconf_rsp rsp;
+ 	u16 mtu, mps, result;
+-	struct l2cap_chan *chan;
++	struct l2cap_chan *chan[L2CAP_ECRED_MAX_CID] = {};
+ 	int i, num_scid;
+ 
+ 	if (!enable_ecred)
+ 		return -EINVAL;
+ 
+-	if (cmd_len < sizeof(*req) || cmd_len - sizeof(*req) % sizeof(u16)) {
+-		result = L2CAP_CR_LE_INVALID_PARAMS;
++	if (cmd_len < sizeof(*req) || (cmd_len - sizeof(*req)) % sizeof(u16)) {
++		result = L2CAP_RECONF_INVALID_CID;
+ 		goto respond;
+ 	}
+ 
+@@ -5327,42 +5327,69 @@ static inline int l2cap_ecred_reconf_req(struct l2cap_conn *conn,
+ 	BT_DBG("mtu %u mps %u", mtu, mps);
+ 
+ 	if (mtu < L2CAP_ECRED_MIN_MTU) {
+-		result = L2CAP_RECONF_INVALID_MTU;
++		result = L2CAP_RECONF_INVALID_PARAMS;
+ 		goto respond;
+ 	}
+ 
+ 	if (mps < L2CAP_ECRED_MIN_MPS) {
+-		result = L2CAP_RECONF_INVALID_MPS;
++		result = L2CAP_RECONF_INVALID_PARAMS;
+ 		goto respond;
+ 	}
+ 
+ 	cmd_len -= sizeof(*req);
+ 	num_scid = cmd_len / sizeof(u16);
++
++	if (num_scid > L2CAP_ECRED_MAX_CID) {
++		result = L2CAP_RECONF_INVALID_PARAMS;
++		goto respond;
++	}
++
+ 	result = L2CAP_RECONF_SUCCESS;
+ 
++	/* Check if each SCID, MTU and MPS are valid */
+ 	for (i = 0; i < num_scid; i++) {
+ 		u16 scid;
+ 
+ 		scid = __le16_to_cpu(req->scid[i]);
+-		if (!scid)
+-			return -EPROTO;
+-
+-		chan = __l2cap_get_chan_by_dcid(conn, scid);
+-		if (!chan)
+-			continue;
+-
+-		/* If the MTU value is decreased for any of the included
+-		 * channels, then the receiver shall disconnect all
+-		 * included channels.
+-		 */
+-		if (chan->omtu > mtu) {
+-			BT_ERR("chan %p decreased MTU %u -> %u", chan,
+-			       chan->omtu, mtu);
+-			result = L2CAP_RECONF_INVALID_MTU;
++		if (!scid) {
++			result = L2CAP_RECONF_INVALID_CID;
++			goto respond;
+ 		}
+ 
+-		chan->omtu = mtu;
+-		chan->remote_mps = mps;
++		chan[i] = __l2cap_get_chan_by_dcid(conn, scid);
++		if (!chan[i]) {
++			result = L2CAP_RECONF_INVALID_CID;
++			goto respond;
++		}
++
++		/* The MTU field shall be greater than or equal to the greatest
++		 * current MTU size of these channels.
++		 */
++		if (chan[i]->omtu > mtu) {
++			BT_ERR("chan %p decreased MTU %u -> %u", chan[i],
++			       chan[i]->omtu, mtu);
++			result = L2CAP_RECONF_INVALID_MTU;
++			goto respond;
++		}
++
++		/* If more than one channel is being configured, the MPS field
++		 * shall be greater than or equal to the current MPS size of
++		 * each of these channels. If only one channel is being
++		 * configured, the MPS field may be less than the current MPS
++		 * of that channel.
++		 */
++		if (chan[i]->remote_mps >= mps && i) {
++			BT_ERR("chan %p decreased MPS %u -> %u", chan[i],
++			       chan[i]->remote_mps, mps);
++			result = L2CAP_RECONF_INVALID_MPS;
++			goto respond;
++		}
++	}
++
++	/* Commit the new MTU and MPS values after checking they are valid */
++	for (i = 0; i < num_scid; i++) {
++		chan[i]->omtu = mtu;
++		chan[i]->remote_mps = mps;
+ 	}
+ 
+ respond:
+-- 
+2.52.0
+
