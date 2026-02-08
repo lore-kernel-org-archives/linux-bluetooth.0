@@ -1,145 +1,111 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from 10.mo533.mail-out.ovh.net (10.mo533.mail-out.ovh.net [46.105.72.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0849D231830;
-	Sun,  8 Feb 2026 12:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C12022156C
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Feb 2026 20:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.105.72.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770555489; cv=none; b=K8z/29F4i9I8aZdEvMhbWsREm4GFKLuqKtEjW7MIRHOxofwCgkxSxKdXeEUV46wJCWK7tG9lJ+jWIQqojD3Xo3v14Es8zParVZJskWgtuw8U/XsiHIZMaJvI3frbLRzJRCCc6bRnzjE+Mi7IW9Ie2tI4C5wFyRgCO3c0Tn7c4Bs=
+	t=1770582665; cv=none; b=Sk8LhHD3uVsIdV+Y7NdjHgSZ9Xx156GxFDnFAIuEsiNzmmexxaAWb+u/mTjhKt4yVAW1yJ7JgPbmZr/Xr6eRIAanKZNtiD4plMjUP9QH2i9Z3ngaqJwMw2anVxEhpXt5zqAUyrb3du9VcG+lRovzs3h2sjNwNLXv6XZz2JFdYSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770555489; c=relaxed/simple;
-	bh=4FckoU7tRGnFSwq6BDx3GvojKcsbtSbNB5qBJ37fJZY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pxhax3yYRxJIf2s4NtLFQePh4gp5sIT7VSw9wW6h5W+G13xp26NiT4h9Kl8NRiNXKxqoTwa+xSvjO1KZmt14KR9JsTkb7lHVyP0NbZBVBNfGgZNE23eACC9YceKKE/gc4uxIxbh4YE2iRg6QUMS4LWx+4c84nk2nUXYq/gHUep0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D6vR2zVW; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1770582665; c=relaxed/simple;
+	bh=Ir6jGC5ZTpof8bAFpvJ7tbopcztLzMi5ZOYusBgbx9U=;
+	h=Message-ID:Subject:From:To:CC:Date:Content-Type:MIME-Version; b=DM8mgZNht5eVaYIeguGdumqyHRJhkEWGizPIWHsItpcH+2Fe+LXOQpkBW+feG1tlKqhG6m67XfLTnmp3o1F/isrBJAtRJb2PqIxtn3hm4d5nrr6EqsVO+C3wdIDHVAb8PEEou46ozeq0JtTpl95zdX4grLbLQibiSqV5Mm/qCXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=marliere.fr; spf=pass smtp.mailfrom=marliere.fr; dkim=pass (2048-bit key) header.d=marliere.fr header.i=@marliere.fr header.b=iYm5TbNg; arc=none smtp.client-ip=46.105.72.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=marliere.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marliere.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D6vR2zVW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770555489; x=1802091489;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4FckoU7tRGnFSwq6BDx3GvojKcsbtSbNB5qBJ37fJZY=;
-  b=D6vR2zVW4uPtzMkqjacCKcHl0bJ7wn2r9D6HkQaOBWLflPU6VpmXAMO9
-   5OFasd3KT5BtO/ou1WPf6sYsQsyN3ZD1Achh71wFx5AijD0tXhOLw1Q0u
-   vEiRvD5223JlNS+729D1q6qbqU1IqiQMdeDFe9iWheODDsJTtItm1S2aV
-   FjNeXOlxzpHNVzUwlcWXJtfO5/zhYyrdWJTxK0wprslQitSmTGhWyn5WN
-   9hei5oFQqQ6Jry50G25sdPPQsG8wMdf5ydFkw71tG3M1uHuUgWj2icFZZ
-   HctdNLr1qkrL4l5BGpV8tm4lUtUomCnZwpFx5g1gx25KdvmrhOmymi8ET
-   Q==;
-X-CSE-ConnectionGUID: 813/vvhkRIaeWAkR0K510g==
-X-CSE-MsgGUID: DQjE4yNqTpqQAUM/zcrsFQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11694"; a="75309784"
-X-IronPort-AV: E=Sophos;i="6.21,280,1763452800"; 
-   d="scan'208";a="75309784"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2026 04:58:08 -0800
-X-CSE-ConnectionGUID: Ugz/4magQtehsCwHA2s29A==
-X-CSE-MsgGUID: J2CTL46ATPeAiMFkmMALLA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,280,1763452800"; 
-   d="scan'208";a="211028319"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 08 Feb 2026 04:58:06 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vp4MV-00000000mCU-3e7W;
-	Sun, 08 Feb 2026 12:58:03 +0000
-Date: Sun, 8 Feb 2026 20:57:06 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maiquel Paiva <maiquelpaiva@gmail.com>, linux-bluetooth@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, luiz.dentz@gmail.com,
-	gregkh@linuxfoundation.org, marcel@holtmann.org,
-	Maiquel Paiva <maiquelpaiva@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v4 2/2] Bluetooth: mgmt: Fix race conditions in mesh
- handling
-Message-ID: <202602082055.pF9xO7lP-lkp@intel.com>
-References: <20260208081559.44983-3-maiquelpaiva@gmail.com>
+	dkim=pass (2048-bit key) header.d=marliere.fr header.i=@marliere.fr header.b="iYm5TbNg"
+Received: from director2.derp.mail-out.ovh.net (director2.derp.mail-out.ovh.net [79.137.60.36])
+	by mo533.mail-out.ovh.net (Postfix) with ESMTPS id 4f8JQ33x35z5vSr;
+	Sun,  8 Feb 2026 19:52:27 +0000 (UTC)
+Received: from director2.derp.mail-out.ovh.net (director2.derp.mail-out.ovh.net. [127.0.0.1])
+        by director2.derp.mail-out.ovh.net (inspect_sender_mail_agent) with SMTP
+        for <linux-bluetooth@vger.kernel.org>; Sun,  8 Feb 2026 19:52:27 +0000 (UTC)
+Received: from DAG2EX2.emp3.local (unknown [10.108.54.195])
+	by director2.derp.mail-out.ovh.net (Postfix) with ESMTPS id 4f8JQ31wx4z20bK;
+	Sun,  8 Feb 2026 19:52:27 +0000 (UTC)
+Received: from [192.168.1.205] (90.55.234.88) by DAG2EX2.emp3.local
+ (172.16.2.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.35; Sun, 8 Feb
+ 2026 20:52:26 +0100
+Message-ID: <496b0f8505eb6ffb19fdbee6f963c62aa6790fba.camel@marliere.fr>
+Subject: [PATCH bluetooth] btmtk: fix MT7927 / MT6639 firmware loading and
+ section filtering
+From: =?ISO-8859-1?Q?Marli=E9re_?= =?ISO-8859-1?Q?Jean-Fran=E7ois?=
+	<freelance@marliere.fr>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>
+Date: Sun, 8 Feb 2026 20:52:25 +0100
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260208081559.44983-3-maiquelpaiva@gmail.com>
+X-ClientProxiedBy: CAS1.emp3.local (172.16.1.1) To DAG2EX2.emp3.local
+ (172.16.2.22)
+DKIM-Signature: v=1; a=rsa-sha256; d=marliere.fr; s=ovhemp1140077-selector1;
+ c=relaxed/relaxed; t=1770580347; h=from:to:subject:date;
+ bh=Ir6jGC5ZTpof8bAFpvJ7tbopcztLzMi5ZOYusBgbx9U=;
+ b=iYm5TbNgVAVdzV79ZFqPpAC62pmb47HVQxi3R5VprTc/jIWCzvtCheWF0x3hdmyvTGDOX1PtxYxhOe6H6TW4127lgBOgU4EPX/r/W69+9hC0eWMrG9YRFyZQpBdowVv45SHCAIBf0QlZmMGhVRcwi00GFYDsOYzVeuUV1NZ8Zz7eQWkKXAc/SOD3/71pFJRFwHZAWEkRJUoeiymCrdE9+j1ymV7MmW+eKQc3iOn3+W6NqPLC7wCI2gR/kAC0+0lJq0Rd/Xp+dsQN7/CVrbGSNee4xwLpavGcqRiFoSzY6QIyW5Sbf0Gdi5WtkUbSectBjF+HkUkivmhc7atMsHj9DA==
+X-Ovh-Tracer-Id: 16824040834501611483
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: dmFkZTEAuLgS5eAkBjgZVj/FKUA/TUZaLbOvOgz3rvhuxHtdRGLF9XLOXOrRkIA80/p2mARdpzh87RwtX4vmEuFPGaf46zNye8jabkt+udROkGZDBv/hqD0fSKm4Zy+WuE54hxVOcPDU6zG8WA2HANi9L8f8Pk89+zt0jbcd6D7q5G4jP/zwS8lD6mkD0z0ILChVJi3o2+HVTPQwL06wX9tnP84N2ghPSG2d1JrxNHw6uzcgUnJpCteJi5pemCyKhpQlW434l4XRiszQ0to03rR5PU7xmMWdMiWKCg8C3CG6P4QE33ihOmDpG3nw+8zL8ANiJwkqEPtDgN6tJrUEXdFbb3NUe2NMZao2tLAkicwlIjlWjaHUOCrnW+XOvi67i1zEzhCGNwTMhIabcIRKVsz1HgIE0UWQSKUC/xO94ymE/CjMhYb1h1onRS+1GYcv9jKnfdOqr94h0cxnKqhOlEWnS2sQwFfMpvJbFKYnHeXzpTJzYXmMXX/Cl0OSwYDZvBwH/nnBzjAMrYyYFjxzIKra1+iJtkHVCBdq/uSrUL2sQu83kvRsouPBikzczGIXgvhgLfm3g6n6vGcIUfa+bMzj9OcO3EFWKx33KGZy8BeIEfXSeyunDR0IvFUclX4628KQJRyO+uJAmBz3A1TnYWmQCDfqERUyPU9ghpnQOd+3e36YAw
 
-Hi Maiquel,
+Hi,
 
-kernel test robot noticed the following build errors:
+Bluetooth on MediaTek MT7927 (hardware variant 0x6639) is currently
+broken on Linux.
+The device is detected (USB VID:PID 0489:e13a, Foxconn/Hon Hai), but
+initialization
+fails with "Unsupported hardware variant (00006639)" or the chip hangs
+during
+firmware download.
 
-[auto build test ERROR on bluetooth/master]
-[also build test ERROR on bluetooth-next/master linus/master v6.19-rc8 next-20260205]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I investigated this issue by comparing Linux behavior with USB captures
+from the
+Windows driver and identified three root causes in btmtk:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Maiquel-Paiva/Bluetooth-mgmt-Fix-heap-overflow-in-mgmt_mesh_add/20260208-161842
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20260208081559.44983-3-maiquelpaiva%40gmail.com
-patch subject: [PATCH v4 2/2] Bluetooth: mgmt: Fix race conditions in mesh handling
-config: i386-randconfig-r071-20260208 (https://download.01.org/0day-ci/archive/20260208/202602082055.pF9xO7lP-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-smatch version: v0.5.0-8994-gd50c5a4c
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260208/202602082055.pF9xO7lP-lkp@intel.com/reproduce)
+1. Hardware variant 0x6639 is missing from btmtk switch/case handling
+2. Incorrect firmware naming is used (_1_1_hdr.bin instead of
+_2_1_hdr.bin)
+3. Critical issue: non-Bluetooth firmware sections are sent to the
+chip, which
+=C2=A0=C2=A0 causes an irreversible BT subsystem hang (requires full power =
+cycle)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602082055.pF9xO7lP-lkp@intel.com/
+The Windows driver only downloads firmware sections where
+(dlmodecrctype & 0xff) =3D=3D 0x01. The MT6639 firmware contains 9
+sections, but only
+the first 5 are Bluetooth-related. Sending the remaining sections
+(WiFi/other)
+causes the failure observed on Linux.
 
-All errors (new ones prefixed by >>):
+This patch:
 
->> net/bluetooth/mgmt_util.c:400:18: error: incompatible pointer types passing 'struct mutex *' to parameter of type 'spinlock_t *' (aka 'struct spinlock *') [-Werror,-Wincompatible-pointer-types]
-     400 |         guard(spinlock)(&hdev->lock);
-         |                         ^~~~~~~~~~~
-   include/linux/spinlock.h:565:1: note: passing argument to parameter 'l' here
-     565 | DEFINE_LOCK_GUARD_1(spinlock, spinlock_t,
-         | ^
-   include/linux/cleanup.h:508:60: note: expanded from macro 'DEFINE_LOCK_GUARD_1'
-     508 | __DEFINE_UNLOCK_GUARD(_name, _type, _unlock, __VA_ARGS__)               \
-         |                                                                         ^
-   include/linux/cleanup.h:490:77: note: expanded from macro '\
-   __DEFINE_LOCK_GUARD_1'
-     490 | static __always_inline class_##_name##_t class_##_name##_constructor(_type *l) \
-         |                                                                             ^
-   net/bluetooth/mgmt_util.c:422:18: error: incompatible pointer types passing 'struct mutex *' to parameter of type 'spinlock_t *' (aka 'struct spinlock *') [-Werror,-Wincompatible-pointer-types]
-     422 |         guard(spinlock)(&hdev->lock);
-         |                         ^~~~~~~~~~~
-   include/linux/spinlock.h:565:1: note: passing argument to parameter 'l' here
-     565 | DEFINE_LOCK_GUARD_1(spinlock, spinlock_t,
-         | ^
-   include/linux/cleanup.h:508:60: note: expanded from macro 'DEFINE_LOCK_GUARD_1'
-     508 | __DEFINE_UNLOCK_GUARD(_name, _type, _unlock, __VA_ARGS__)               \
-         |                                                                         ^
-   include/linux/cleanup.h:490:77: note: expanded from macro '\
-   __DEFINE_LOCK_GUARD_1'
-     490 | static __always_inline class_##_name##_t class_##_name##_constructor(_type *l) \
-         |                                                                             ^
-   2 errors generated.
+- Adds support for hardware variant 0x6639
+- Uses the correct firmware naming format for MT6639
+- Filters firmware sections to only download Bluetooth sections
+=C2=A0 (dlmodecrctype & 0xff =3D=3D 0x01), matching Windows driver behavior
 
+Tested on:
 
-vim +400 net/bluetooth/mgmt_util.c
+- Debian 13 (Trixie)
+- Kernel 6.12.63
+- ASUS ProArt X870E-CREATOR-WIFI motherboard
+- MediaTek MT7927 / MT6639 Bluetooth
 
-   395	
-   396	struct mgmt_mesh_tx *mgmt_mesh_find(struct hci_dev *hdev, u8 handle)
-   397	{
-   398		struct mgmt_mesh_tx *mesh_tx;
-   399	
- > 400		guard(spinlock)(&hdev->lock);
-   401	
-   402		list_for_each_entry(mesh_tx, &hdev->mesh_pending, list) {
-   403			if (mesh_tx->handle == handle)
-   404				return mesh_tx;
-   405		}
-   406	
-   407		return NULL;
-   408	}
-   409	
+A full technical analysis, reproduction steps, and testing details are
+available here:
+https://gitlab.com/jfmarliere/linux-driver-mediatek-mt7927-bluetooth
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Please let me know if you would prefer this split into multiple patches
+or if
+additional testing/logs are required.
+
+Best regards,
+Jean-Fran=C3=A7ois Marli=C3=A8re
