@@ -1,70 +1,75 @@
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8802836B1
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Feb 2026 08:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564CA33BBB8
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Feb 2026 08:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770538624; cv=none; b=b2neiDSDyGEFftIriCrH4A5kgA7tWJF2yq6aiMAIqQCGePQsNnF/xAXb/FqK79EuGNeezaNHzgx5cE80boSGi8ougTCl0KffZWFZgjNPK3f+XyGS5eyaBEL/4sNDDVAbzd+Kw1FEnB+3oS4BuemP44wogVY+37AxYuR5PDaWXBs=
+	t=1770538627; cv=none; b=YBNhWW0xETwxYZrDIxBCnSdNAz4Hx1trZpVSxon71ngXLBwZlUM4YJRmyfbdYrnxnPKd9hmn/v7DVHu0mK/EaB7/Vfd4Dso9TlGML5DZypHgZovvLZ7/+Qfs3UlcBod5vBWdkf2EJ8gaLpYyahxk6Iif1xur92fSX3fm9pUo7Kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770538624; c=relaxed/simple;
-	bh=2F0eTEsUsPogrrtWldAvIMPzTANo+7xsrnfLzY4YkRE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JN6N4ITncT3AANOkLWXZko2BI94IiDYMaVjOBz4XQI4pmW5HD3sflcL09AoNdDeXRp5Kq4sdkiFQNJhkpD0Rq4HgaGdNNt1V8uRzjbwwOpcp2IrzaExJl0ha8OZBgMnygSULfn9LeEG/Mxh6y+vRuSYe7j8S8eiHk5GIVc8iQFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m164v9q6; arc=none smtp.client-ip=74.125.224.41
+	s=arc-20240116; t=1770538627; c=relaxed/simple;
+	bh=F9bNjK+pzEpZsGayI6GYJIczHINzrgN7fQGyUMcEuz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Qes8CrRbkgDU5CgvIgbfuYh26P3mUlV21ss4efqoW2G2+HqhFj8lhnpaJKB0DzuYEBqQPr3uVFX92fOdqsyLapr78ZoDbGWGao77kcEAPoi83Tt85b7iwKgtLHsZV6WL5ReDdYI35OHDcnGAExcq6m2OglgDyNkELTP55Ako4rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jr66b2QE; arc=none smtp.client-ip=74.125.224.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m164v9q6"
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-649278a69c5so2912940d50.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Feb 2026 00:17:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jr66b2QE"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64acd19e1dfso1744246d50.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Feb 2026 00:17:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770538623; x=1771143423; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YYmyZ4dAbcgt20eJDm1830mz9l003fdJMi+pDwnX9c0=;
-        b=m164v9q6svA9zeE0t7wctGU5/ErBTSY12fK+TD7krzRT78O039Z0pyWye6LGup0ASn
-         6q3zU0nrefM3TVMde9r7rtZHfbV55XxyFOWCuRrVnQXRhETPD/t+SZmM6rYzmhQSmNtv
-         Y1OrS1KUMFZypYrGgH+twNI0d4pyF9HSM6tb0YhCcBPJPFSLSGAhinVg02qcgmWSPPYE
-         e8KDylkIZuLw2ZuNPa2GaBs3sQlrjv5JE/KCp2kAsc8JZwef27S1sKf8QW/RmdG/AOba
-         3J4yZjwhL82a7Ci/NPcH/Ws9BGFcKmNupOiHxjCEUHkOelmmSkmZGRA3aAggIl7qIHMM
-         A21g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770538623; x=1771143423;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1770538626; x=1771143426; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YYmyZ4dAbcgt20eJDm1830mz9l003fdJMi+pDwnX9c0=;
-        b=KOcgb5uIeeAlz0JIbyDKAmogGn8RGcMIsF9mHYcg1jxorU+TAAMAwObTVjxWbFpaws
-         ufqYN6cpbUtMjWZq0YSouLdpEyvJf/RsOQDWxHbHwNiJYTiuYdL8KJTVp0AXvHW474C1
-         CWUtlkWemNiFpzYcTHgQexPsOKB5cmNQZDf72w5IbzDhMGUkxDfsA2NdKuLo4hpqTajz
-         XTfolPCDeVGPojlhSbTGbY+ArQOh3cs5g1gVSRA2AhnyrkY3ybl1L7Qqo8UbznfoBBPb
-         HLFqAW5OZ3kp4NvcRwDnMBrHAfrU4sNJMy1prgElsqZLx30LfIx+K3+sOh+bOvMDIR0H
-         nOuA==
-X-Gm-Message-State: AOJu0YwvD+lmK0/nAQL5DFQ5bJHuJHQ8cz5H/XplLl6qMUt7BGporNVX
-	FYurNLig2+2mXN41zVCzDFidFf9ReIhKXSRE09co70+Lz8G0LX9lpMtv7zGCvA==
-X-Gm-Gg: AZuq6aJCfHar2JNt3xkzZPFM3xk4f0ESPTmJZXCihl2HaKcCaoMviXmAELJ4WUbTaGL
-	jj8nf0WpC5/83bkCMDV0nd7TgsmnfpRY/GC9ItEPgNEkpgoSjTFyQdmK1PUNbtD6aqCsBDWAupj
-	nKRe5XQFbX8YNpK0nYKGrEULHudl1z2o1vDC52/vnUlJ45B+SM8cFA/eRe7eb1TJA3DeGsP/mIF
-	++6K3IyAhluR0AXnUNoyivreVdUxg/W9QdsNwcWlwe1xCapAD483R0g6XzTHPZMabo1+32NIgEA
-	OsxeWv42DY9WKvalFw7VUivnFY84F/II11wWeF9IXdcnqAKiWyTuQEHb3ALcaiI1Ovz6/AAW0nU
-	uIEXrndb87bqvDZnRgdWFn7W+fRh7rEBefjv825ZVsIkfAxMOb6AzlfV2cBQbJc6fOomd3dOGG9
-	gLiBUdcTQ9wzhNvfmMajhATcOKAQ2Nxg0UIP6rKDA/HyqF01THZzmhqjzRzPUk4i521RW6
-X-Received: by 2002:a05:690e:4085:b0:64a:db22:1cef with SMTP id 956f58d0204a3-64adb221f23mr1870371d50.42.1770538623207;
-        Sun, 08 Feb 2026 00:17:03 -0800 (PST)
+        bh=oS/b5/sslw48AcYmgWpe60xwd/fLzbiXHPdcLj7bmSM=;
+        b=Jr66b2QE9Q+b0K1jgBEBa49a/gSvLj8y9Su/1JPEb3kSZlK9pKoaPqI+GbrLp4t5/t
+         4Jkde4qghtlixpuxLkMgDuMJ0wUrVw8K+mtFlpOoj2fKcv/roYucsEqc7HJwsq9c6vUQ
+         oztKNQ06OLL3n31CfleN5fiODbtVKVjm3oGIBEaYOEnFgNP4cFkEMgZNsRviEv03eFmf
+         q4PRUtaxoJbjWCS1wzpjROKCDMq5U4WaL+3hc9qiDD255Xz39YaU4cAMJ3VacZ/9llJf
+         G7LHHHDDgNUoC51d5fpmNHrb18ms+OQh2ccCoLQlk68CPQ13HTKapH21rq2rDfGmDboT
+         cd7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770538626; x=1771143426;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oS/b5/sslw48AcYmgWpe60xwd/fLzbiXHPdcLj7bmSM=;
+        b=Hxr/OReuo1lmRuFu9nz+nq+ylkh7lwQTJE1FtoA0tsQl0jQPVuEOLMqoXGyEbXRfZt
+         NUYUPUlWNDU1Hte8GUQbMz2MKT5+cfyozxXkwz396ZJ48A7b25ubndD1mYMeO5J2Csk+
+         CmOjDPAWHAkp3FtYcj4lSTK1BNUQHuM81q2b1jWq3l84mQEEWaPaK2wGvdoeEg/WiKM0
+         ucpmk/QmWb7dRFLVhqr3k5i/Hp1oca3V8QhjkJ36u6fnUehL/pD1nNUiz/Amf7oIq2NR
+         9f/JEfQLQq7OVw6W7vOslx+2kQQKeCGmxErbu3m6iASYJiK1YgW9p8XNwpiRUbMcc14L
+         WjwQ==
+X-Gm-Message-State: AOJu0YySpx3mxBj9bIqgz6SDXT32cI7xHMj7bWCsycFJQPBDmm5hEkzj
+	OnQZdRbxNusTWkZ6M5hjQPaTDKMmLf5NfHWueq4y+girXMDd8xf5Xu2vwvQJwA==
+X-Gm-Gg: AZuq6aLPoTzYlWfg2jVBIvjzJTVSMbc2FDNJ+sbf5a4I4YoJLmhzA5uW6E4VWDGCYyg
+	GRk2408RPxti//v3pJpAA0yHZaIAaCDpFdbuctFIAvM0+A1R32XgHt0khd9N1tr9FPo+sd6zJOd
+	uh3cqzK0SdmaBynMmptTLj/zXJgcHNI/FHBmG6M2dQvvrDL4WyzX4MnVTmSiGG3qR3z5G+Q/c8n
+	Q0fHwns+0NowSn+n6s6s7tTRpaR2ekGuXFDAg37+c4z+t6JwxkHtOCEXqFYE0n0sFG3TZeUgtdL
+	+b3jZiBECjdADjPIt1PeGj+t45FMJ4dgtu2e8YJQtvmMsQn85BIWUtGO1hwBZVo89bwBbPuR4xa
+	F0nbpJAbVH4+W1oewvAj3PEpZZwCpKG9C4AmRRfaKCgdDDQGZR1grAHWziuIDps0TaKxnKkhxdK
+	lEqoYo21JUW8Aifiop+ap7ER1MEqKJ5wqTMqhtgDDTZZGPue2nOrl8E0U366vSBih0p+/8
+X-Received: by 2002:a05:690e:e8c:b0:64a:d8a7:10a3 with SMTP id 956f58d0204a3-64ad8a71280mr2445654d50.91.1770538626217;
+        Sun, 08 Feb 2026 00:17:06 -0800 (PST)
 Received: from binary.. ([177.39.58.68])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64ad8a12432sm3521745d50.21.2026.02.08.00.17.00
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64ad8a12432sm3521745d50.21.2026.02.08.00.17.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Feb 2026 00:17:02 -0800 (PST)
+        Sun, 08 Feb 2026 00:17:05 -0800 (PST)
 From: Maiquel Paiva <maiquelpaiva@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com,
 	gregkh@linuxfoundation.org,
 	marcel@holtmann.org,
-	Maiquel Paiva <maiquelpaiva@gmail.com>
-Subject: [PATCH v4 0/2] Bluetooth: mgmt: Fix heap overflow and race condition
-Date: Sun,  8 Feb 2026 08:15:57 +0000
-Message-ID: <20260208081559.44983-1-maiquelpaiva@gmail.com>
+	Maiquel Paiva <maiquelpaiva@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v4 1/2] Bluetooth: mgmt: Fix heap overflow in mgmt_mesh_add
+Date: Sun,  8 Feb 2026 08:15:58 +0000
+Message-ID: <20260208081559.44983-2-maiquelpaiva@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260208081559.44983-1-maiquelpaiva@gmail.com>
+References: <20260208081559.44983-1-maiquelpaiva@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,26 +78,31 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series fixes two vulnerabilities found in net/bluetooth/mgmt_util.c related to mesh handling.
+Add a check for the user-provided length in mgmt_mesh_add() against
+the size of the param buffer. This prevents a heap buffer overflow
+if the user provides a length larger than the destination buffer.
 
-Patch 1 addresses a heap buffer overflow in mgmt_mesh_add by validating the user-provided length.
-Patch 2 resolves race conditions in mgmt_mesh_add and mgmt_mesh_find by protecting the list operations.
+Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
+Cc: stable@vger.kernel.org
+Signed-off-by: Maiquel Paiva <maiquelpaiva@gmail.com>
+---
+ net/bluetooth/mgmt_util.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Changes in v4:
-- Replaced guard(mutex) with guard(spinlock) using hdev->lock in Patch 2.
-- This fixes the "sleeping function called from invalid context" and circular locking warnings reported by the CI robot in v3.
-
-Changes in v3:
-- Added Fixes and Cc: stable tags as requested by maintainers.
-- No code changes from v2.
-
-Maiquel Paiva (2):
-  Bluetooth: mgmt: Fix heap overflow in mgmt_mesh_add
-  Bluetooth: mgmt: Fix race conditions in mesh handling
-
- net/bluetooth/mgmt_util.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
+diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
+index aa7b5585cb26..bdce52363332 100644
+--- a/net/bluetooth/mgmt_util.c
++++ b/net/bluetooth/mgmt_util.c
+@@ -413,6 +413,9 @@ struct mgmt_mesh_tx *mgmt_mesh_add(struct sock *sk, struct hci_dev *hdev,
+ {
+ 	struct mgmt_mesh_tx *mesh_tx;
+ 
++	if (len > sizeof(mesh_tx->param))
++			return NULL;
++
+ 	mesh_tx = kzalloc(sizeof(*mesh_tx), GFP_KERNEL);
+ 	if (!mesh_tx)
+ 		return NULL;
 -- 
 2.43.0
 
