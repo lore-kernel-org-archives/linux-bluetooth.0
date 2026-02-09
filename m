@@ -1,80 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D45311972
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 20:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EF124C676
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 20:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770667209; cv=none; b=gk2StgYoDOAVeK3z05IhYzT/+bZcJXrvdp6/MuAx6aCzKLc+RCTSb+o9LFU4im4v0bVFw0uidqOnCsS7YjQiHusJWBH3Ek1jCqWhAzG+BGPjUkXz/iw5e2rH8TSUJboSBmYKAUxUfvFAPLFchkCJzDSqPl0lqN3MluMsQMyyOrE=
+	t=1770669265; cv=none; b=r9YlFijo8+NSZ8CvY0s2KEEZZLOJ7cNDAAiA386ZCjdrlHhs3BnsUFJ1DXiIq3BfAZtm0WgiEAIqWYbq1dlVKPUo08Dfwfs4LDgWDg4+ONdxPj7xCJ7qtPPDfBZd5+a+JJ59x63TT96w1P4k+defWXyEZ97fc4PwpbcUy+0JyhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770667209; c=relaxed/simple;
-	bh=3HN18342yBZ/qEPr8f6KSBd8Uk4/ckULPXw8o2NHIB0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BvRangg6cfDRfvZOOiiQUWw14RW4EMLhMOr4L6KGUk+kAG6UmhJ7qDbA/Mo+tIOeVzleZ/TTPjjIAezoc8wPEcwN5C3Woz/2KUmTsfULqm6hNznP6Aafd7N7owwqHen8bcjnLQpD+SSSDckwISY8NBViYgDBkUpDqQ6uyYCB0jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qFK3oWv5; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qFK3oWv5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55E74C116C6;
-	Mon,  9 Feb 2026 20:00:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770667209;
-	bh=3HN18342yBZ/qEPr8f6KSBd8Uk4/ckULPXw8o2NHIB0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qFK3oWv5My8QtZsPd2QK4h72EFTp18FBCa1OXoOrmoGMxOyT4g/rInW6K6brG5ykT
-	 3fD4Z9EI3Z/tnApjMFLHXYtDlalXpZIA0ZiXc/8zKTRTohS/5vWaDFNroPT+Wu6as8
-	 qPpb4CGNiRusqhUr0uEB0tuyGG6iEd1NG16W/VdAqS26+Bs1CBRrCdWPxHQ19MohPb
-	 gPFDR3qmXGD4Ac6JUI5V0D27EmY82UmArPcu4g4w4IAer+deMlpWoGZz3UVJv5rWGU
-	 ks4ECOYcUA8QqIUMpqzcVfu+UdE+OHwTxqI0D4jCvjfn2sQriT4JPpgH3Gdo1fUvPi
-	 WieIhN+9YzxeQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 48107380AA48;
-	Mon,  9 Feb 2026 20:00:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1770669265; c=relaxed/simple;
+	bh=VvhC1qOv+DiHVpUkxkaObXF9WlCf+KkLBRxcn4ei5Ic=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DSIkRVxShj24/Sjmfde78CGLxEoFx2NScAW4wXwj/oNDgMUUELu62lJHYGtNei8rlAT07OsHV4ydWjARr9ltojZfNMDlPHzaM2CG3JfTObSDonTicvunIGyIzn7T//o6ArlVe84b1584y/96Yol47Svm/BcL1vmO/bp2wcgXUv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 8C42D581290
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 20:33:33 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BFC15441B7;
+	Mon,  9 Feb 2026 20:33:25 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 2/2] emulator: Fix compilation on big endian systems
+Date: Mon,  9 Feb 2026 21:33:13 +0100
+Message-ID: <20260209203316.3050687-2-hadess@hadess.net>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260209203316.3050687-1-hadess@hadess.net>
+References: <20260209203316.3050687-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 0/2] Bluetooth: mgmt: Fix heap overflow and race
- condition
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177066720482.3196175.13167614416923442442.git-patchwork-notify@kernel.org>
-Date: Mon, 09 Feb 2026 20:00:04 +0000
-References: <20260208081559.44983-1-maiquelpaiva@gmail.com>
-In-Reply-To: <20260208081559.44983-1-maiquelpaiva@gmail.com>
-To: Maiquel Paiva <maiquelpaiva@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- gregkh@linuxfoundation.org, marcel@holtmann.org
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduleejjeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnheptddtfeegffevteehfeejvdelvefhvdfgtdfhieeigeevleeitdegvdehfeekhffgnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemlegsvdelmegtugefieemieekfhgumegttdelfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemlegsvdelmegtugefieemieekfhgumegttdelfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepuefhveduheeggeduueejpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepvddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrvhesihhkihdrfhhi
+X-GND-State: clean
+X-GND-Score: -100
 
-Hello:
+Use new helper macros for byteswapping constants.
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This fixes the build on big endian systems like s390x:
 
-On Sun,  8 Feb 2026 08:15:57 +0000 you wrote:
-> This series fixes two vulnerabilities found in net/bluetooth/mgmt_util.c related to mesh handling.
-> 
-> Patch 1 addresses a heap buffer overflow in mgmt_mesh_add by validating the user-provided length.
-> Patch 2 resolves race conditions in mgmt_mesh_add and mgmt_mesh_find by protecting the list operations.
-> 
-> Changes in v4:
-> - Replaced guard(mutex) with guard(spinlock) using hdev->lock in Patch 2.
-> - This fixes the "sleeping function called from invalid context" and circular locking warnings reported by the CI robot in v3.
-> 
-> [...]
+emulator/bthost.c: In function ‘bthost_setup_sco’:
+./src/shared/util.h:43:26: error: initializer element is not constant
+   43 | #define cpu_to_le32(val) bswap_32(val)
+      |                          ^~~~~~~~
+etc.
 
-Here is the summary with links:
-  - [v4,1/2] Bluetooth: mgmt: Fix heap overflow in mgmt_mesh_add
-    (no matching commit)
-  - [v4,2/2] Bluetooth: mgmt: Fix race conditions in mesh handling
-    https://git.kernel.org/bluetooth/bluetooth-next/c/567233b63ddb
+Fixes: 85888a8357ea ("bthost: add bthost_setup_sco() and accept
+incoming eSCO")
+---
+ emulator/bthost.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-You are awesome, thank you!
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index d09ad1e76c50..37865f61bc52 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -3562,18 +3562,18 @@ int bthost_setup_sco(struct bthost *bthost, uint16_t acl_handle,
+ {
+ 	static const struct bt_hci_cmd_setup_sync_conn settings[] = {
+ 		{
+-			.tx_bandwidth = cpu_to_le32(0x00001f40),
+-			.rx_bandwidth = cpu_to_le32(0x00001f40),
+-			.max_latency = cpu_to_le16(0x000a),
++			.tx_bandwidth = cpu_constant_to_le32(0x00001f40),
++			.rx_bandwidth = cpu_constant_to_le32(0x00001f40),
++			.max_latency = cpu_constant_to_le16(0x000a),
+ 			.retrans_effort = 0x01,
+-			.voice_setting = cpu_to_le16(BT_VOICE_CVSD_16BIT),
++			.voice_setting = cpu_constant_to_le16(BT_VOICE_CVSD_16BIT),
+ 		},
+ 		{
+-			.tx_bandwidth = cpu_to_le32(0x00001f40),
+-			.rx_bandwidth = cpu_to_le32(0x00001f40),
+-			.max_latency = cpu_to_le16(0x000d),
++			.tx_bandwidth = cpu_constant_to_le32(0x00001f40),
++			.rx_bandwidth = cpu_constant_to_le32(0x00001f40),
++			.max_latency = cpu_constant_to_le16(0x000d),
+ 			.retrans_effort = 0x02,
+-			.voice_setting = cpu_to_le16(BT_VOICE_TRANSPARENT),
++			.voice_setting = cpu_constant_to_le16(BT_VOICE_TRANSPARENT),
+ 		}
+ 	};
+ 	struct bt_hci_cmd_setup_sync_conn cmd;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.52.0
 
