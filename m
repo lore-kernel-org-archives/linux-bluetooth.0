@@ -1,126 +1,352 @@
-Received: from mail-qk1-f194.google.com (mail-qk1-f194.google.com [209.85.222.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FD7371063
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 18:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB9E3F23D7;
+	Mon,  9 Feb 2026 19:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770662925; cv=none; b=JFBis5porGedomEZdJuGvGE6IzxNFBcZ3BhVqB9e7CZA4nzxAI5mvC2+IUe3Lo4AqJWLby7HvDvSnKugO97iOYHQMuODk0xZYp5pvOc/UKU99FPDpVOudGVFLFD1eX/p9CK+Fy69X9sZaiQ6P2gLXOpcIldsO6OzNRHTsaES/K8=
+	t=1770664319; cv=none; b=ObBkHJ8BKYNVq8By7o8ixMK1HRACY8XUtEU66XJz2zpQyixwuRHc6oIh57RYlrYJlBfZjzEZXuonLUHnTchgU0QiYLhmoNCBEchMAL3ivEGm/UWIu/kdugaVBQlLSA8bYr0ENjw/tPfu67K/ykXO6V4oAL/i8dGWP0vTEx3e7nM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770662925; c=relaxed/simple;
-	bh=OQ4nxT1B71WhwPoaWhkJLrclGn+cBAeQvJi0NvXd54A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=RufUY6Ita0+EAN9CU9VeYPgzzGa7Ivdi8q0DLY0FVnE5pGRbaI5z/kR6pk9bLCHwjpgZkoyHzeiz5+5E5PL5z2B0HI+X4XfN0tpnODrXCLsTc28/emQivFp3IbSEBp2TkDrepf8fbfQnipPRd5HSQa2JSgYcxIKU4gnQBhBP5s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lrjpQ8oJ; arc=none smtp.client-ip=209.85.222.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770664319; c=relaxed/simple;
+	bh=zR+Zs5URN3kh9VajH7r1F2ORsv8Ow7hJRaFQ/xw8DHg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HnkbOMmkh1LEVdXEuAk83FWggOQFCP6sJ6OiH9sCk3XF/mVC90Mrj2eVQNmpq634LzALDXNrqZD5y3ots/SRJTzq3WsqDEdFE3GdYJCjFTa7IkbqHZGB8LKnDu5bm0wWmQyX3ifhl7ao0yF8I5H/dWCsWtbbdJor8ySWT0S/k5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bffKQ7QW; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrjpQ8oJ"
-Received: by mail-qk1-f194.google.com with SMTP id af79cd13be357-8c6af798a83so511329985a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Feb 2026 10:48:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770662923; x=1771267723; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RnmvKu+nUeI1P88bkX/Nw8kWOtEZ/b7CtxC+TkQsXZM=;
-        b=lrjpQ8oJnoeYvXrK0VSomQ5uGEcmCWQhra1VMesx18Qf4rCPWIqWLEyerUKq+cABW+
-         SZfIUqifDyMnKvbU7HrfRx7HfmFv7TWD9iuV+imE62bgROKppyqCO+1Zq7xRI5otzSH2
-         /yrl2ddMOG8MxArd0iTthT0HudW1cVp6FHX8Lqk9NmC2qQF9OZYQRpxd6JtjryyLreHg
-         gQFnm38DL1OPAtDpWDOXUQrdfHyixeLPm04mMOA2BXkzCjHVuszjFzJ0hz/hqiVv038J
-         1rM1PheqCz5m0Tif57PQJ4xaMnNa5rQYO9B/tXJh9+qyeqc8GulB8U1GXHLGwRfYJVff
-         UHyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770662923; x=1771267723;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RnmvKu+nUeI1P88bkX/Nw8kWOtEZ/b7CtxC+TkQsXZM=;
-        b=Fl+TkYs99785m9vulLxb4xTienDXNLEOlHdy0Tm7/g4U5HZam0Q6C8zNnyOdkoOHOr
-         xx6612wBmWbjyVlC5lkiwFXBEIa1n7i2Wz0Z6f9szuXRjUqAa1L+D+qJue0QbpuxINQ0
-         wPjxglYZxv3CebVSnwOa5NENe5XvXj2lv7VvVekt4u/mvZMfzcmRTTTl7yp41XKC7Kqa
-         4wc+0ihvhTK/N6hujaurL0hJM9gX2HymciaHGypsH2dEC6PfItOPL7BYAun92T1dKRy2
-         JqGsxjK/F5A6Rt1jNyHknqzGXzFAN2iq8qNRoZja+198f5QQpxeEXU4Fa/6ptQrH41tG
-         3Opw==
-X-Gm-Message-State: AOJu0Yz3Yh/l7cSti4eU/BgbBXCbpfJcyhFMTlIbx0j19Ln6be/4Dzb7
-	mN8Cd2cTApBUT9DCIk88zMvqIuAvtohVpd1Dy4sFja6fDes13Zj2tw10C8E5plD7
-X-Gm-Gg: AZuq6aL+grkVi3ovq//4HbKyRxLMtQuEVgeCf2/HHoE8VO00Hw2DSG4nRa3Mep+Pp7j
-	+UusdZ5mQhRcot5mqEM/ABSMIlnvpkwrbquvlVIanna2RyU+jmk3D3vceNwXslRNSqORsWAFBIJ
-	dwS6X0BBZdbGJjrt9qLNmWKoDw6P6oZTEi06rfj8TcO5Aw5kap36ZsQ7wkkJmwIXdj7b7uGpyqk
-	v7/Zs6+2JFUn53K4fZ5PUSvqM5LYKhV5+H8qUscvDbDQl+nWi3jQH3vF9HUdUH9MWuscpeKA650
-	bH7U1PNQuKWPwoKRLRg6/QdE3JzyeY4f98iMHEEO/TgAc7gUS8R8Sq3sHoylSWp+rM78/dVgmMR
-	HNbWataOE1twVOLbREpzSPPEq+KaO0UtfuOAwvSD6fx5D3dOS1gRIH5egAZ2whISGH2lVHWTPXM
-	a6BV1AXmiSIE99UxJXSg==
-X-Received: by 2002:a05:620a:2684:b0:8ca:3c67:8923 with SMTP id af79cd13be357-8caf1307743mr1542181985a.53.1770662923296;
-        Mon, 09 Feb 2026 10:48:43 -0800 (PST)
-Received: from [172.17.0.2] ([64.236.141.211])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8caf9a16240sm873226085a.35.2026.02.09.10.48.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Feb 2026 10:48:42 -0800 (PST)
-Message-ID: <698a2c0a.050a0220.d3979.1278@mx.google.com>
-Date: Mon, 09 Feb 2026 10:48:42 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0309160550459170987=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bffKQ7QW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770664319; x=1802200319;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zR+Zs5URN3kh9VajH7r1F2ORsv8Ow7hJRaFQ/xw8DHg=;
+  b=bffKQ7QWY3z/npHnkbi2OL5Cc487Hj5D3TgVAjm9IgpMGJg+pJmYowQo
+   slOvpuXRHzQxE8owxxb2blm3fwbtfmO6M/Ky1+oIiHg0I2Vt1JUOlpqY2
+   igXu2dRSX/R2qhTdbpyi6TB3ZZcSeamquoYloyOQLsXON+cs+Yyslcfhl
+   T1bwH0fTu+qWVOwDMU3oJEeF21YG8bw3sDy/LCBFtQwOIvpqVaIHKQ435
+   H1ac7N9qdATsBqM3FshXtYM6eiB6rsmRb+CFnyMlvvklv6QSXjtaMB7y6
+   x6MUY1wV9+SdJq1ZjtP7C+7tBeTlkGEE1Wh+XhyZd54PHo0chwVLrrVj/
+   A==;
+X-CSE-ConnectionGUID: 3dn7LXgxQXq7J5dWlhy0AA==
+X-CSE-MsgGUID: csB2vvbzTkmBSX2WOVt47A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11696"; a="71684217"
+X-IronPort-AV: E=Sophos;i="6.21,282,1763452800"; 
+   d="scan'208";a="71684217"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 11:11:58 -0800
+X-CSE-ConnectionGUID: m71o2vQQR7yq8r6Iwm20Sw==
+X-CSE-MsgGUID: 05QVkUVNSpS/0UAIJnP/uQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,282,1763452800"; 
+   d="scan'208";a="210780646"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 09 Feb 2026 11:11:54 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vpWfo-00000000oGC-1lQM;
+	Mon, 09 Feb 2026 19:11:52 +0000
+Date: Tue, 10 Feb 2026 03:11:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vivek Sahu <vivek.sahu@oss.qualcomm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>
+Cc: oe-kbuild-all@lists.linux.dev, quic_mohamull@quicinc.com,
+	quic_hbandi@quicinc.com, linux-bluetooth@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	Vivek Sahu <vivek.sahu@oss.qualcomm.com>
+Subject: Re: [PATCH v2 2/2] Bluetooth: qca: add QCC2072 support
+Message-ID: <202602100332.6QKGVLHq-lkp@intel.com>
+References: <20260209070356.187301-2-vivek.sahu@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] adapter: Add btd_adapter_send_cmd_event_sync
-In-Reply-To: <20260209163420.844741-1-luiz.dentz@gmail.com>
-References: <20260209163420.844741-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260209070356.187301-2-vivek.sahu@oss.qualcomm.com>
 
---===============0309160550459170987==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Vivek,
 
-This is automated email and please do not reply to this email!
+kernel test robot noticed the following build warnings:
 
-Dear submitter,
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on robh/for-next linus/master v6.19]
+[cannot apply to bluetooth-next/master next-20260205]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1052360
+url:    https://github.com/intel-lab-lkp/linux/commits/Vivek-Sahu/Bluetooth-qca-add-QCC2072-support/20260209-150905
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20260209070356.187301-2-vivek.sahu%40oss.qualcomm.com
+patch subject: [PATCH v2 2/2] Bluetooth: qca: add QCC2072 support
+config: alpha-allmodconfig (https://download.01.org/0day-ci/archive/20260210/202602100332.6QKGVLHq-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260210/202602100332.6QKGVLHq-lkp@intel.com/reproduce)
 
----Test result---
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602100332.6QKGVLHq-lkp@intel.com/
 
-Test Summary:
-CheckPatch                    PENDING   0.37 seconds
-GitLint                       PENDING   0.42 seconds
-BuildEll                      PASS      19.89 seconds
-BluezMake                     PASS      639.08 seconds
-MakeCheck                     PASS      18.75 seconds
-MakeDistcheck                 PASS      240.42 seconds
-CheckValgrind                 PASS      289.97 seconds
-CheckSmatch                   PASS      347.61 seconds
-bluezmakeextell               PASS      180.75 seconds
-IncrementalBuild              PENDING   0.48 seconds
-ScanBuild                     PASS      995.05 seconds
+All warnings (new ones prefixed by >>):
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+   drivers/bluetooth/btqca.c: In function 'qca_uart_setup':
+>> drivers/bluetooth/btqca.c:828:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+     828 |                         snprintf(config.fwname, sizeof(config.fwname),
+         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     829 |                                  "qca/ornbtfw%02x.tlv", rom_ver);
+         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/bluetooth/btqca.c:830:17: note: here
+     830 |                 case QCA_WCN3950:
+         |                 ^~~~
 
 
+vim +828 drivers/bluetooth/btqca.c
 
----
-Regards,
-Linux Bluetooth
+   782	
+   783	int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+   784			   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+   785			   const char *firmware_name, const char *rampatch_name)
+   786	{
+   787		struct qca_fw_config config = {};
+   788		const char *variant = "";
+   789		int err;
+   790		u8 rom_ver = 0;
+   791		u32 soc_ver;
+   792		u16 boardid = 0;
+   793	
+   794		bt_dev_dbg(hdev, "QCA setup on UART");
+   795	
+   796		soc_ver = get_soc_ver(ver.soc_id, ver.rom_ver);
+   797	
+   798		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+   799	
+   800		config.user_baud_rate = baudrate;
+   801	
+   802		/* Firmware files to download are based on ROM version.
+   803		 * ROM version is derived from last two bytes of soc_ver.
+   804		 */
+   805		if (soc_type == QCA_WCN3988)
+   806			rom_ver = ((soc_ver & 0x00000f00) >> 0x05) | (soc_ver & 0x0000000f);
+   807		else
+   808			rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+   809	
+   810		if (soc_type == QCA_WCN6750)
+   811			qca_send_patch_config_cmd(hdev);
+   812	
+   813		/* Download rampatch file */
+   814		config.type = TLV_TYPE_PATCH;
+   815		if (rampatch_name) {
+   816			snprintf(config.fwname, sizeof(config.fwname), "qca/%s", rampatch_name);
+   817		} else {
+   818			switch (soc_type) {
+   819			case QCA_QCA2066:
+   820				snprintf(config.fwname, sizeof(config.fwname),
+   821					 "qca/hpbtfw%02x.tlv", rom_ver);
+   822				break;
+   823			case QCA_QCA6390:
+   824				snprintf(config.fwname, sizeof(config.fwname),
+   825					 "qca/htbtfw%02x.tlv", rom_ver);
+   826				break;
+   827			case QCA_QCC2072:
+ > 828				snprintf(config.fwname, sizeof(config.fwname),
+   829					 "qca/ornbtfw%02x.tlv", rom_ver);
+   830			case QCA_WCN3950:
+   831				snprintf(config.fwname, sizeof(config.fwname),
+   832					 "qca/cmbtfw%02x.tlv", rom_ver);
+   833				break;
+   834			case QCA_WCN3990:
+   835			case QCA_WCN3991:
+   836			case QCA_WCN3998:
+   837				snprintf(config.fwname, sizeof(config.fwname),
+   838					 "qca/crbtfw%02x.tlv", rom_ver);
+   839				break;
+   840			case QCA_WCN3988:
+   841				snprintf(config.fwname, sizeof(config.fwname),
+   842					 "qca/apbtfw%02x.tlv", rom_ver);
+   843				break;
+   844			case QCA_WCN6750:
+   845				/* Choose mbn file by default.If mbn file is not found
+   846				 * then choose tlv file
+   847				 */
+   848				config.type = ELF_TYPE_PATCH;
+   849				snprintf(config.fwname, sizeof(config.fwname),
+   850					 "qca/msbtfw%02x.mbn", rom_ver);
+   851				break;
+   852			case QCA_WCN6855:
+   853				snprintf(config.fwname, sizeof(config.fwname),
+   854					 "qca/hpbtfw%02x.tlv", rom_ver);
+   855				break;
+   856			case QCA_WCN7850:
+   857				snprintf(config.fwname, sizeof(config.fwname),
+   858					 "qca/hmtbtfw%02x.tlv", rom_ver);
+   859				break;
+   860			default:
+   861				snprintf(config.fwname, sizeof(config.fwname),
+   862					 "qca/rampatch_%08x.bin", soc_ver);
+   863			}
+   864		}
+   865	
+   866		err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
+   867		if (err < 0) {
+   868			bt_dev_err(hdev, "QCA Failed to download patch (%d)", err);
+   869			return err;
+   870		}
+   871	
+   872		/* Give the controller some time to get ready to receive the NVM */
+   873		msleep(10);
+   874	
+   875		if (soc_type == QCA_QCA2066 || soc_type == QCA_WCN7850)
+   876			qca_read_fw_board_id(hdev, &boardid);
+   877	
+   878		/* Download NVM configuration */
+   879		config.type = TLV_TYPE_NVM;
+   880		if (firmware_name) {
+   881			/* The firmware name has an extension, use it directly */
+   882			if (qca_filename_has_extension(firmware_name)) {
+   883				snprintf(config.fwname, sizeof(config.fwname), "qca/%s", firmware_name);
+   884			} else {
+   885				qca_read_fw_board_id(hdev, &boardid);
+   886				qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
+   887					 firmware_name, soc_type, ver, 0, boardid);
+   888			}
+   889		} else {
+   890			switch (soc_type) {
+   891			case QCA_QCA2066:
+   892				qca_get_nvm_name_by_board(config.fwname,
+   893					sizeof(config.fwname), "hpnv", soc_type, ver,
+   894					rom_ver, boardid);
+   895				break;
+   896			case QCA_QCA6390:
+   897				snprintf(config.fwname, sizeof(config.fwname),
+   898					 "qca/htnv%02x.bin", rom_ver);
+   899				break;
+   900			case QCA_QCC2072:
+   901				snprintf(config.fwname, sizeof(config.fwname),
+   902					 "qca/ornnv%02x.bin", rom_ver);
+   903				break;
+   904			case QCA_WCN3950:
+   905				if (le32_to_cpu(ver.soc_id) == QCA_WCN3950_SOC_ID_T)
+   906					variant = "t";
+   907				else if (le32_to_cpu(ver.soc_id) == QCA_WCN3950_SOC_ID_S)
+   908					variant = "s";
+   909	
+   910				snprintf(config.fwname, sizeof(config.fwname),
+   911					 "qca/cmnv%02x%s.bin", rom_ver, variant);
+   912				break;
+   913			case QCA_WCN3990:
+   914			case QCA_WCN3991:
+   915			case QCA_WCN3998:
+   916				if (le32_to_cpu(ver.soc_id) == QCA_WCN3991_SOC_ID)
+   917					variant = "u";
+   918	
+   919				snprintf(config.fwname, sizeof(config.fwname),
+   920					 "qca/crnv%02x%s.bin", rom_ver, variant);
+   921				break;
+   922			case QCA_WCN3988:
+   923				snprintf(config.fwname, sizeof(config.fwname),
+   924					 "qca/apnv%02x.bin", rom_ver);
+   925				break;
+   926			case QCA_WCN6750:
+   927				snprintf(config.fwname, sizeof(config.fwname),
+   928					 "qca/msnv%02x.bin", rom_ver);
+   929				break;
+   930			case QCA_WCN6855:
+   931				qca_read_fw_board_id(hdev, &boardid);
+   932				qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
+   933							  "hpnv", soc_type, ver, rom_ver, boardid);
+   934				break;
+   935			case QCA_WCN7850:
+   936				qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
+   937					 "hmtnv", soc_type, ver, rom_ver, boardid);
+   938				break;
+   939			default:
+   940				snprintf(config.fwname, sizeof(config.fwname),
+   941					 "qca/nvm_%08x.bin", soc_ver);
+   942			}
+   943		}
+   944	
+   945		err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
+   946		if (err < 0) {
+   947			bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
+   948			return err;
+   949		}
+   950	
+   951		switch (soc_type) {
+   952		case QCA_WCN3991:
+   953		case QCA_QCA2066:
+   954		case QCA_QCA6390:
+   955		case QCA_WCN6750:
+   956		case QCA_WCN6855:
+   957		case QCA_WCN7850:
+   958			err = qca_disable_soc_logging(hdev);
+   959			if (err < 0)
+   960				return err;
+   961			break;
+   962		default:
+   963			break;
+   964		}
+   965	
+   966		/* WCN399x and WCN6750 supports the Microsoft vendor extension with 0xFD70 as the
+   967		 * VsMsftOpCode.
+   968		 */
+   969		switch (soc_type) {
+   970		case QCA_WCN3950:
+   971		case QCA_WCN3988:
+   972		case QCA_WCN3990:
+   973		case QCA_WCN3991:
+   974		case QCA_WCN3998:
+   975		case QCA_WCN6750:
+   976			hci_set_msft_opcode(hdev, 0xFD70);
+   977			break;
+   978		default:
+   979			break;
+   980		}
+   981	
+   982		/* Perform HCI reset */
+   983		err = qca_send_reset(hdev);
+   984		if (err < 0) {
+   985			bt_dev_err(hdev, "QCA Failed to run HCI_RESET (%d)", err);
+   986			return err;
+   987		}
+   988	
+   989		switch (soc_type) {
+   990		case QCA_WCN3991:
+   991		case QCA_WCN6750:
+   992		case QCA_WCN6855:
+   993		case QCA_WCN7850:
+   994			/* get fw build info */
+   995			err = qca_read_fw_build_info(hdev);
+   996			if (err < 0)
+   997				return err;
+   998			break;
+   999		default:
+  1000			break;
+  1001		}
+  1002	
+  1003		err = qca_check_bdaddr(hdev, &config);
+  1004		if (err)
+  1005			return err;
+  1006	
+  1007		bt_dev_info(hdev, "QCA setup on UART is completed");
+  1008	
+  1009		return 0;
+  1010	}
+  1011	EXPORT_SYMBOL_GPL(qca_uart_setup);
+  1012	
 
-
---===============0309160550459170987==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
