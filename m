@@ -1,163 +1,159 @@
-Received: from r3-11.sinamail.sina.com.cn (r3-11.sinamail.sina.com.cn [202.108.3.11])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9F6125A0
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 13:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B3237F8DD
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 15:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770643591; cv=none; b=H+QlMXQUxpiNsuBEotLwG4wfavrxGd1lS5Bd3CZ9vXCZscwAey/xvQK/ySiUMZ/1gtEpEnkngC8KXtQ25sRQgbhqF3vUCDMPAxNoNqp9VAA73RFQ0p6LZjr+WhQTEb9JCvCNxjbKcZTOWYH4LWX1IzJsB/yShhXYngtr6MsiZdQ=
+	t=1770651834; cv=none; b=HemSiL2hduRmbawl8owH55kGU18UY29qE38NVSnFbb56GEWhgAd8dBszYJTLzoiOKRd/SMp3ANAMr7aZvb9r79yHKzimLUtqVEU9AU7/YfIJOud/6sgzYUeP3kIic9OcjcLr2gcrHosqbfx3wn2MUCC65aN4yNpo63lUkw8xvd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770643591; c=relaxed/simple;
-	bh=wmsdEgOnROu2CtuYYUwAcj+VSBj48p+Y4CiHly5Xt+8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I0Bhu1suGXqFKogM292A4xIQXA3WfxILisL2wClNizqUkPb0aknlj3nTnptAUFlcLP5rDnXXuyatSO7Bn50UNtwsj9QdC7zImf7DOKNsivlbIP9aw7G6LVBRqIxnXx5ycOJ3WTLIb/KDncARfvixrRwtz+T9v+v9IhSuMyXsR7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=XhCFnuZN; arc=none smtp.client-ip=202.108.3.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1770651834; c=relaxed/simple;
+	bh=pejDHyWUpgYcyOlJ64FLXWGKSBF60+zMdKwBdwSIais=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hz/tEEX3RLpyBTfULy+V8I0vGTQQHdMoqHqb7mtSnRQVQ7iubE1ryfK2uYEwH3OTnIdTCbBzQBtSNwuGwDpxQuutzj8D1aVRoopBpVmozRyp+GmqOo+EFFz5gDgmZbHy/4vNJcqqz9qpyFzN6IRusFfxWOkquYC5aWM91rwi1Es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=FQtse8AY; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=HcuKkMbb; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="XhCFnuZN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1770643590;
-	bh=7xdMeIMLp5QRX/x7oHbQrqds5PqEfD/OdXvxKy/2riE=;
-	h=From:Subject:Date:Message-ID;
-	b=XhCFnuZNR8ZA5rmYSyI8EHsiqLSIBKwAbyni10T++UXcvyVEATkRMDECHZOzxfasU
-	 iquw6xIpaEL2wa1sR6n3eYCSz3hBqLCUBKK+CPVodJ37Osu8E+rDjhYvH22FWDiHeE
-	 phrmp+mw/hz/khdlFkDwl+oV7xWWjYxYRkBZZK4w=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.34) with ESMTP
-	id 6989E0570000299E; Mon, 9 Feb 2026 21:25:44 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 9849856291932
-X-SMAIL-UIID: 4C00404A582A40DA8FEAAC4AA80A5B5A-20260209-212544-1
-From: Hillf Danton <hdanton@sina.com>
-To: Masahiro Kawada <youjingxiaogao2@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	linux-kernel@vger.kernel.org,
-	syzbot+3609b9b48e68e1fe47fd@syzkaller.appspotmail.com
-Subject: Re: [PATCH] Bluetooth: fix use-after-free in hci_conn_drop
-Date: Mon,  9 Feb 2026 21:25:33 +0800
-Message-ID: <20260209132535.2716-1-hdanton@sina.com>
-In-Reply-To: <20260209100211.36533-1-youjingxiaogao2@gmail.com>
-References: 
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="FQtse8AY";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="HcuKkMbb"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 619ApFmY2586852
+	for <linux-bluetooth@vger.kernel.org>; Mon, 9 Feb 2026 15:43:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	FOtvKz5XsYK8DeBlcq3YrSmTR4LSM+UOfrV33PKISmk=; b=FQtse8AYZRVjF3UU
+	JSgByOh9HyACVFbNxBxv/6j6M9BMPiXtUmOTYEz9Ua+MPkIqPMRNRM/M35JneDkW
+	oPtG8956EBfUH1b5yFZGymhkXrqhhrosF4wDkmaOKhAVZnuh8b3NtuXzEzQoLYzD
+	OC3Zb4ofdv6im6MM8ummEos1dyVwNH3UYm34BYkg+RYFdsRx3QTnTmKLT51CGjez
+	dGmTccjZOwXb03NLp0fPEb8tcCIU3U40ptYsWjr35tjn8QxxdQhsfKqzffjYxG2S
+	+3Bb7dOpmyuZn8GkP22iMsdG7QxTwMWf2jjxkFlAa3yzSnD3vjnCpetfsgQesINz
+	fYn9RQ==
+Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c793bj2c3-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 09 Feb 2026 15:43:53 +0000 (GMT)
+Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-2ba66faa692so1046774eec.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Feb 2026 07:43:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1770651832; x=1771256632; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FOtvKz5XsYK8DeBlcq3YrSmTR4LSM+UOfrV33PKISmk=;
+        b=HcuKkMbbMZD0JcJ1d8LoqNGMQf04uSD1eOmIUW0RnMIWGJVG/QJrocqOcbjl23JHmA
+         IvVCzp8qgzmOqUeoM7G5LlLY327qoiLR4h9/G5DcExmsrUBV+l5xmWlT/ylrDxV0IfVe
+         70zJ+oNCrxvGcohYRDc3lT/lUeefGBMEFig89moGjeDEODHm0YI5FWGTWAd/BXB3Hoxe
+         13f560iWALRMq/fFkRz/SJ7FHDJX94MkgqQ3+okTQgqLB0odJfLpUKgfFK6FpCLOaK2d
+         HYofxajUrJuYQ8ioeFYmKydOW0aYoGsB6aVcR52bnci2Lepb+meQOrHC7WWKEIdCuXrG
+         A/og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770651832; x=1771256632;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FOtvKz5XsYK8DeBlcq3YrSmTR4LSM+UOfrV33PKISmk=;
+        b=Du0yd+uy391F98S9agNY07Xldrgibz2Ae2Av2IWImBxnL8oQHtiT6QP6Qn9e/Ar2OO
+         7HzbKh0Ia+PfDggXSZ4ECecOxIpy03FWl3EuTMTGyxZQ3aLARjzBsEt+Ju+GsZXk2A2I
+         nyFwgcBcYQ7kIG44FMNnxLj9/+c4ZENxLHq2sltnZktOlAdIQPVYKv+d9ScCQtuv7Dfz
+         6j/E8jxZAWQUnZJqGOWDfhAlvZkij6+Tww2QVDKTg4cgF1npts5KfbTr67QLqWSPr7sd
+         ELfT3Y0kgOFqT88IN+pZ5eWNPq2cIYNwYh2/sJw0s2/7TL/UBLrW+E5zbY3W5MB5IOiz
+         1dqg==
+X-Forwarded-Encrypted: i=1; AJvYcCVHjd3MXa0GsU1NcaWvHHc4IcbAOuEkkwZFyfZAO4PODokVkXmdduZofIaOGlIpj42lltJhRkLTSOp8uRGYpIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9AfPSgKV0ayO2qc25eQFkOsVBL4lNSbrig/ab2XNfGGOuTlWM
+	kjx6nIVD0JfkrOUBYX0/epYkyj1qamBACD9O3td+jlw/v825eqMRxKG9ZgYGOEYeX5e17H1LGaM
+	JG0/PNWIAM8Z5+W1mriDQSeqbJ3whx/TTf3fP/nNsJQqkr6VxuGDa4rScnazefhPkLw6zXds=
+X-Gm-Gg: AZuq6aIOhYcVdoDRom0RXq9P8WlGxTzawEL1nbclf3fazjmgNkn5oUCR6C0g7suKNFZ
+	GrYAzvJUZPolEnvNUV1mcZrYVfVUU7ePd4XszdphHPpl0UtV2qLlwSdZXc0yGljaoU780e8V0Jb
+	xG8EvjCAeuFck5koAiXrRw+viEGjO9ipypMrC9oBGnKSSaXfCfbIcdQk7l8I5SM3NkIUzDvMZy1
+	DoxP7PJmtvk+/7qCWqehhq9IVsxIkq05S3rZLqbIgfU6ebxgKo2SCWzLZMtyq9WqFxGYC5sbDG+
+	g120Oo8y1doXgpphmD0Y1y4jgXyNC4LgyJ77RqL5slCtbehqJtmLVFx5cnE3c1TBjRX+9XqtuZw
+	zDpZ2a3trgr+ENo0d3y0TGhs/PYTm2IXq4xijZo4=
+X-Received: by 2002:a05:7300:54a:b0:2ae:5d3b:e1c6 with SMTP id 5a478bee46e88-2b856724153mr5412650eec.21.1770651832081;
+        Mon, 09 Feb 2026 07:43:52 -0800 (PST)
+X-Received: by 2002:a05:7300:54a:b0:2ae:5d3b:e1c6 with SMTP id 5a478bee46e88-2b856724153mr5412625eec.21.1770651831309;
+        Mon, 09 Feb 2026 07:43:51 -0800 (PST)
+Received: from [192.168.29.235] ([49.37.135.254])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b855b0f624sm8742742eec.14.2026.02.09.07.43.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Feb 2026 07:43:50 -0800 (PST)
+Message-ID: <8fab20ba-9924-48a6-b417-5ebd28b77cd9@oss.qualcomm.com>
+Date: Mon, 9 Feb 2026 21:13:43 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/2] dt-bindings: net: bluetooth: qualcomm: add
+ bindings for QCC2072
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rob Herring
+ <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>
+Cc: quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org
+References: <20260209080613.217578-1-vivek.sahu@oss.qualcomm.com>
+ <20260209080613.217578-2-vivek.sahu@oss.qualcomm.com>
+ <7cb9a945-651c-426d-8cc7-1ec1174ac68b@kernel.org>
+Content-Language: en-US
+From: Vivek Sahu <vivek.sahu@oss.qualcomm.com>
+In-Reply-To: <7cb9a945-651c-426d-8cc7-1ec1174ac68b@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=ctOWUl4i c=1 sm=1 tr=0 ts=698a00b9 cx=c_pps
+ a=wEP8DlPgTf/vqF+yE6f9lg==:117 a=z/GpFUkVOss2g+jQkJ5YVA==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
+ a=EUspDBNiAAAA:8 a=VwQbUJbxAAAA:8 a=OcUlRVwiwL7_3OGRxjQA:9 a=QEXdDO2ut3YA:10
+ a=bBxd6f-gb0O0v-kibOvt:22
+X-Proofpoint-ORIG-GUID: oZHLTmCCcsz1I5snu2eDxz7Q1MCaT5ht
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA5MDEzMiBTYWx0ZWRfX2VUU5/FDNhvC
+ a1+760Sz8mEi6qiHUQsTkOtMlEIzkqeOCag1EX4VLw05XoTUQbv7yqB61kgxlhS45fibfYgzbR4
+ pLSu0GcaOCJmEXPxvXqhUcZWxzuaub3O5iFPH/npGJ5I7FYBWBkgj/8QJYDKSHo4o6RshLHGCOq
+ volVnS91wjJDbtH8MdHMDR33aXPYzPffhMVWTM2Xw0sKe7v+0cyJJsE+0ihiW+cBeb5RTNLuvGs
+ Kkh12tRccDZJiLDhVSiYoNgoQRahy/D5hR/jQyifBkOTaJUAXg69MpXd51MW85sHGhKfMo+fmQv
+ rMOgsh332OQ5rliwbrZ82qv+xVAXq29ZkrC6HbGLaikAnqSrbeWKIEN3Gq1muLiDdEKlVv07xMU
+ 19G4FRvnlCHHdsXsizA3I4QPZzqiH/epltrauDCCZwv8y+APf92xZTAM8OMvCezAgS2C6zoCyrh
+ 2pyM9LEaxbdeCI3JseQ==
+X-Proofpoint-GUID: oZHLTmCCcsz1I5snu2eDxz7Q1MCaT5ht
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-09_01,2026-02-09_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 phishscore=0 suspectscore=0 spamscore=0 adultscore=0
+ malwarescore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602090132
 
-On Mon,  9 Feb 2026 19:02:11 +0900 Masahiro Kawada wrote:
-> Fix a use-after-free in hci_conn_drop triggered via hci_cmd_sync_work.
-> 
-> In hci_conn_del(), hci_cmd_sync_dequeue() is called after
-> hci_conn_cleanup() which may have already freed the conn pointer.
-> Fix by moving the dequeue before cleanup.
-> 
-> Additionally, le_read_features_complete() calls hci_conn_drop(conn)
-> without checking whether conn is still valid. When
-> hci_le_read_remote_features_sync() blocks waiting for an HCI event,
-> another thread can free conn through hci_conn_del(). Fix by adding
-> a hci_conn_valid() check before calling hci_conn_drop().
-> 
-> Fixes: 881559af5f5c ("Bluetooth: hci_sync: Attempt to dequeue connection attempt")
-> Fixes: a106e50be74b ("Bluetooth: HCI: Add support for LL Extended Feature Set")
-> Reported-by: syzbot+3609b9b48e68e1fe47fd@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3609b9b48e68e1fe47fd
-> Tested-by: syzbot+3609b9b48e68e1fe47fd@syzkaller.appspotmail.com
-> Signed-off-by: Masahiro Kawada <youjingxiaogao2@gmail.com>
-> ---
->  net/bluetooth/hci_conn.c | 6 +++---
->  net/bluetooth/hci_sync.c | 3 +++
->  2 files changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 0795818963a..aa3607327ad 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -1232,15 +1232,15 @@ void hci_conn_del(struct hci_conn *conn)
->  	skb_queue_purge(&conn->data_q);
->  	skb_queue_purge(&conn->tx_q.queue);
->  
-> +	/* Dequeue callbacks using connection pointer as data */
-> +	hci_cmd_sync_dequeue(hdev, NULL, conn, NULL);
-> +
->  	/* Remove the connection from the list and cleanup its remaining
->  	 * state. This is a separate function since for some cases like
->  	 * BT_CONNECT_SCAN we *only* want the cleanup part without the
->  	 * rest of hci_conn_del.
->  	 */
->  	hci_conn_cleanup(conn);
-> -
-> -	/* Dequeue callbacks using connection pointer as data */
-> -	hci_cmd_sync_dequeue(hdev, NULL, conn, NULL);
->  }
->  
->  struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src, uint8_t src_type)
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index f04a90bce4a..f31086c187f 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -7371,6 +7371,9 @@ static void le_read_features_complete(struct hci_dev *hdev, void *data, int err)
->  	if (err == -ECANCELED)
->  		return;
->  
-> +	if (!hci_conn_valid(hdev, conn))
-> +		return;
-> +
->  	hci_conn_drop(conn);
->  }
->  
-> -- 
-> 2.43.0
+
+On 2/9/2026 1:37 PM, Krzysztof Kozlowski wrote:
+> On 09/02/2026 09:06, Vivek Sahu wrote:
+>> QCC2072 is a WiFi/BT connectivity chip.
+>> It requires different firmware, so document it as a new compat string.
+>>
+>> Correct the sorting of other chipsets for better readability.
+>>
+>> Signed-off-by: Vivek Sahu <vivek.sahu@oss.qualcomm.com>
+>> ---
+>>   .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml  | 3 ++-
+> There is no such file.
 >
-The uaf [1] is due to the following race,
-
-	cpu1				cpu2
-	hci_cmd_sync_work()		hci_rx_work()
-	mutex_lock(&hdev->cmd_sync_work_lock);
-	entry = list_first_entry_or_null(&hdev->cmd_sync_work_list,
-					 struct hci_cmd_sync_work_entry,
-					 list);
-	if (entry)
-		list_del(&entry->list);
-	mutex_unlock(&hdev->cmd_sync_work_lock);
-
-					hci_conn_del()
-					hci_conn_hash_del(hdev, conn);
-					hci_conn_cleanup(conn)	// free conn
-					hci_cmd_sync_dequeue()
-					mutex_lock(&hdev->cmd_sync_work_lock);
-					while ((entry = _hci_cmd_sync_lookup_entry(hdev, func, data,
-						   destroy))) {
-						_hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
-						ret = true;
-					}
-					mutex_unlock(&hdev->cmd_sync_work_lock);
-
-	hci_req_sync_lock(hdev);
-	err = entry->func(hdev, entry->data);
-	if (entry->destroy)
-		entry->destroy(hdev, entry->data, err);
-		hci_conn_drop(conn)	// uaf
-	hci_req_sync_unlock(hdev);
-
-but the race still exists after this patch.
-
-	cpu1				cpu2
-	hci_conn_valid(hdev, conn)
-					hci_conn_hash_del(hdev, conn);
-					hci_cmd_sync_dequeue()
-					hci_conn_cleanup(conn)	// free conn
-	hci_conn_drop(conn); // uaf
-
-[1] Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in hci_conn_drop (3)
-https://lore.kernel.org/lkml/69301edd.a70a0220.2ea503.00cf.GAE@google.com/
+> Best regards,
+> Krzysztof
+The patch is updated on 
+"git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git" repo 
+but it appears that CI build is running on 
+"kernel/git/next/linux-next.git" where this file is not present. Let me 
+check linux-next branch and see how binding doc file is created. Will 
+upload a new patch set based on that.
