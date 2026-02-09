@@ -1,102 +1,75 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A950727C866
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 20:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB97330642;
+	Mon,  9 Feb 2026 20:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770669266; cv=none; b=htrNXKCd7ePFKarGbw2Hp+tI8NWG/bKHYyGQRsID1bO08Any+q1cdq+TkGpyADk5GCMrb4KomcFcRkF4fdE4ccJ6YqeV7f9xN0ppkFWxSCXPLmoRBykRKbyaYh+dYeVHXRAyNx2eXoQItWkkZu0zFqqza56lgxlDfqUMCG0uamM=
+	t=1770670021; cv=none; b=XuHSIWhiiMsyeGx2Ayr+PjdsvXFY8fF0xaIpYwW2UEi9LWmVfI4wMGZIwNVH6qBXsEezAX46Fhn0PeHibSteErspVYgJD/cz0acV6wnevw+81aEvkw2ZGoTZV2JKnLaWtm+4QP1RLcowHgxsiDratq534eQwEjoTtgnElh/pMFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770669266; c=relaxed/simple;
-	bh=VBaZZtWZfBNVrKki/L1/thLjNnBZQMDh1fxkdbgYnq4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WCWE8MZSOCEqnSoYPqoNeE2k5r95sXsH2lSkAdZoEnj/OevLSRrB31fUjCprfZDpRWeoKNMJF6v6FGy7F1iDfqxx+UR/O69hBdb888ZHgt45egEj2a6iuwmnAyRk89dhGyJV3QJISwQjQSser26JXKgd2NIMIFEduSfbPzwUlD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 8BC8258128D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 20:33:33 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5C48143859;
-	Mon,  9 Feb 2026 20:33:25 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 1/2] shared/util: Add byte-swapping macros for constants
-Date: Mon,  9 Feb 2026 21:33:12 +0100
-Message-ID: <20260209203316.3050687-1-hadess@hadess.net>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1770670021; c=relaxed/simple;
+	bh=E3QxQed1HKltKQiCDwcxMXDo4f6+z8VypXXMyMcjo7Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ftzWLBK9/5AAP98hizJZutnuKlcJqF1Wk5dAuf3EpMFNKwsO84OPj0kLjlCAdgHlyghSxcrHnULCElFMaxjHCB+82sa7O8dTjCu3vlAT9/o4kioEx1ukrG9njCEnzpd3A/TlVDPEraLV5e+gzI9/fUPYO22KBCJR5i5ng/FGvVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=TAEbQihp; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="TAEbQihp"
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DFDF011039C;
+	Mon,  9 Feb 2026 21:46:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1770670017;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=rJc2Iu6e1A8Sm9CEp/mEGiYxIK+xeCJ1+e5YyKIumiw=;
+	b=TAEbQihpfpuVQdw+mY8QmbYpugMr/aD64rSEJfXJP0hJtE2Zyzsm/2+mpGLj6ICUVtrcfE
+	dJjkUzmekE17gkcZYfDkayhZBc7uhbcdSNgksbKCgt0T+FkffC3iFY0xoEo/WGSqiqvHk/
+	WxC8Jk813tbC8RNFGuCWUO0+7Ka04Jv/XelhYE76KvMTpUFUjkHd9IAmjn7v3za39m48fB
+	K04iEY0PlYnozh1+apWEhL6uDYDvt0gMW2P1oLNneeuv9+5qqKPLPfxI2Mn08updNt9Yya
+	Lc7peGC+q/6ymxYRTH1Up78S9msOtO8EFX4HpzPifEQ6MfK/YGnVnmyyyoeQig==
+Message-ID: <7598a919-e42f-4f0a-92f7-1203ec5facf0@nabladev.com>
+Date: Mon, 9 Feb 2026 21:34:40 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btbcm: Add entry for BCM4343A2 UART Bluetooth
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-bluetooth@vger.kernel.org,
+ Christoph Niedermaier <cniedermaier@dh-electronics.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, kernel@dh-electronics.com,
+ linux-kernel@vger.kernel.org
+References: <20260209171158.22641-1-marex@nabladev.com>
+ <5225311e-4cd6-4227-9d0e-8c5f6676cdb8@molgen.mpg.de>
+Content-Language: en-US
+From: Marek Vasut <marex@nabladev.com>
+In-Reply-To: <5225311e-4cd6-4227-9d0e-8c5f6676cdb8@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduleejjeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeffteektdejuddvhfdtfedtvdetgeeileethfetgfdtheekvefgueeifffhvefhfeenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeelsgdvleemtggufeeimeeikehfugemtgdtleefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeehveegkedugeefkeehledpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehprghvsehikhhirdhfih
-X-GND-State: clean
-X-GND-Score: -100
+X-Last-TLS-Session-Version: TLSv1.3
 
-We can't use functions to populate constants, so add new helpers for
-the various __bswap_constant_XX macros available for that purpose.
----
- src/shared/util.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+On 2/9/26 7:19 PM, Paul Menzel wrote:
 
-diff --git a/src/shared/util.h b/src/shared/util.h
-index c480351d6e9f..8683684831c5 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -29,12 +29,24 @@
- #define cpu_to_le16(val) (val)
- #define cpu_to_le32(val) (val)
- #define cpu_to_le64(val) (val)
-+#define le16_constant_to_cpu(val) (val)
-+#define le32_constant_to_cpu(val) (val)
-+#define le64_constant_to_cpu(val) (val)
-+#define cpu_constant_to_le16(val) (val)
-+#define cpu_constant_to_le32(val) (val)
-+#define cpu_constant_to_le64(val) (val)
- #define be16_to_cpu(val) bswap_16(val)
- #define be32_to_cpu(val) bswap_32(val)
- #define be64_to_cpu(val) bswap_64(val)
- #define cpu_to_be16(val) bswap_16(val)
- #define cpu_to_be32(val) bswap_32(val)
- #define cpu_to_be64(val) bswap_64(val)
-+#define be16_constant_to_cpu(val) __bswap_constant_16(val)
-+#define be32_constant_to_cpu(val) __bswap_constant_32(val)
-+#define be64_constant_to_cpu(val) __bswap_constant_64(val)
-+#define cpu_constant_to_be16(val) __bswap_constant_16(val)
-+#define cpu_constant_to_be32(val) __bswap_constant_32(val)
-+#define cpu_constant_to_be64(val) __bswap_constant_64(val)
- #elif __BYTE_ORDER == __BIG_ENDIAN
- #define le16_to_cpu(val) bswap_16(val)
- #define le32_to_cpu(val) bswap_32(val)
-@@ -42,12 +54,24 @@
- #define cpu_to_le16(val) bswap_16(val)
- #define cpu_to_le32(val) bswap_32(val)
- #define cpu_to_le64(val) bswap_64(val)
-+#define le16_constant_to_cpu(val) __bswap_constant_16(val)
-+#define le32_constant_to_cpu(val) __bswap_constant_32(val)
-+#define le64_constant_to_cpu(val) __bswap_constant_64(val)
-+#define cpu_constant_to_le16(val) __bswap_constant_16(val)
-+#define cpu_constant_to_le32(val) __bswap_constant_32(val)
-+#define cpu_constant_to_le64(val) __bswap_constant_64(val)
- #define be16_to_cpu(val) (val)
- #define be32_to_cpu(val) (val)
- #define be64_to_cpu(val) (val)
- #define cpu_to_be16(val) (val)
- #define cpu_to_be32(val) (val)
- #define cpu_to_be64(val) (val)
-+#define be16_constant_to_cpu(val) (val)
-+#define be32_constant_to_cpu(val) (val)
-+#define be64_constant_to_cpu(val) (val)
-+#define cpu_constant_to_be16(val) (val)
-+#define cpu_constant_to_be32(val) (val)
-+#define cpu_constant_to_be64(val) (val)
- #else
- #error "Unknown byte order"
- #endif
--- 
-2.52.0
+Hello Paul,
 
+>> This patch adds the device ID for the BCM4343A2 module, found e.g.
+>> in the muRata 1YN WiFi+BT combined device. The required firmware
+>> file is named 'BCM4343A2.hcd'.
+> 
+> Where can this file be found? In the linux-firmare archive [1], I only see:
+> 
+>      brcm/bcm43xx_hdr-0.fw
+>      brcm/bcm43xx-0.fw
+
+Those patch files are distributed e.g. by muRata:
+
+https://github.com/murata-wireless/cyw-bt-patch
+
+> Should you resend, could you paste the related log messages to the 
+> commit message?
+Which log messages would those be ?
