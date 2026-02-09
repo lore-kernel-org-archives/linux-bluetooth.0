@@ -1,169 +1,322 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C502475F7
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 20:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08720C8F0
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 21:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770670777; cv=pass; b=no3hWQXfFQ9koo3NYrMIwN7iydV/pTxg/c7OZ38WQ2fHTvZ3UhbNN/27ISRG7rY5Tp0LSchD5FZBNyLZ5ZTNGj1g8oprNxnpi8z826s+QIAHjDPypzOI8KCMyi/Ysip/2aRsaUmwEtr3rz19c+5kfHrgH4Eb24R4ooYgusMfQug=
+	t=1770671253; cv=pass; b=lhu1SFMhW++iaCR6CFhS7gM5c4qAGetra/UpNlfjYKoeuDRk8UWJadJ4OzLdlyJo2ABIJql15BIPoeWfGF0bQCxwgZbzu8Ia0iIyq1b9kLs36/L8S7snwcODFhOrdXPmapK7T8mXaEt2KUCFoFv0ZpfL3ArXSarP9vdNGkaOauI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770670777; c=relaxed/simple;
-	bh=8rHp3vrfMjoGgrqPZfWT1UeyxOahswHFF6xi576VoEU=;
+	s=arc-20240116; t=1770671253; c=relaxed/simple;
+	bh=6lX6KfSLSlnGcw9LkhNC1YCYF5t9IC37P/s8cuQtlrc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kJs/944yw7d6tizfyoLrJ2jnS/hADugnciy431ZyeHGC0rJDPNv+7TCpyl3mnm8B3C0ojHFtmY9h2ysZKc5JGx0Edk6aM7OzWvDK3lf5TkgXDD3QBgFLLLt/zPMLEydGH1bIxauT0d/gbp4qBMuC0JYIyhMPY7skaiXaZXcwRyY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cet4wHWm; arc=pass smtp.client-ip=209.85.128.169
+	 To:Cc:Content-Type; b=LKAKSSpFKEQlUQ7z0WZqJqRbCclbV2pLE5tkWaNgEFLImuewPZvaLqznUNDjPH8M0u/jRnZAV4bea05YjCe3LFEiwLVkkjuWSrcIWqQ2ne/vhy5jaRyy/apqSjpfacD0u7tnpoJUYkNylBLtTQknKrlVRGNdTsHSwcFsqvRlziU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m6n6U0K4; arc=pass smtp.client-ip=74.125.224.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cet4wHWm"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7964f1405a0so12927467b3.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Feb 2026 12:59:35 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770670775; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m6n6U0K4"
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-64ae5f0777dso194072d50.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Feb 2026 13:07:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770671251; cv=none;
         d=google.com; s=arc-20240605;
-        b=hXyIOz57OX2XvqlWaHiIMPOyrvKnAj4JokE0+DTQgDq7AqeYjoXKE+jPHRU9tS7L6R
-         aNUKbE0zrOPcM39bjUOHp25Tsr4binzJcz/u+bdsRaPVMbFG+aByGIFobE/UpAIan8Xy
-         aaPJuSJQOd2OHJvQcQGVU85A1EDqrxKEnpt0oSX2QKXG5eGETEcf7eOSwDKBUxPyqPxo
-         m6hBTmnSWvYcfF7M58cl3yh43Y8pDt1TaelfvfOmYtmmpUPIOKSXDaRIywp16IKxuQJs
-         i0Aj75wPTFTBf4XUCM8vdTQ0Q3WkujzDNWkv9NAk6TGeyFnDg1CBp4SKCluQgjEJc7Hb
-         yS7g==
+        b=BvqdNjYr0cCNwVjx2TUneqAIjxTtZFNBneVImsgehMXMQxIYYKWKxOb1XqLWA25W+O
+         9nMKwVrIPpHYDTZdIsnQJCqXeBFpg5jEW2XyGlRSCALaRz3D7VAxfmTmIa8/6QMPMqON
+         1fvv7TIlfzaY/5fyZ573wq5spt1j377V5+Gg2G23fElayEeh+NNIZ1NKvessf95+S0Cf
+         hFo1hZfMRyPo9+/Xv2uEEww1au/e/l89p+gHqtsQCscd2Z6HyWZ8L7E1VeZtfXi9Lmp9
+         +5E6ljHNFpaMDByRPNiDqR3ai229wSCUBWfK7/9bdHrtlsW82mgHaxXrGnygMCFGIO+K
+         6W+Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=BcHooqqh9wfFdrg4geqT0rwP6cAsVaSy7mZTb15xsTY=;
-        fh=7LSxPbV2pQSQb1EL9491hTkyd1MOd7S12ATM8//Ti7U=;
-        b=OaxMUWpAo5S93ZSGutAyKCq4Jg7eJyBVPloM6bx81ms7pS5JaAOF//Mbba3s5pbC6Q
-         +eFboP93wYH9NV+66fZUnEX2jsxvGs5+JQSTr6DyBd7Xlaj9NeAOolNDc4IKINwXwtAx
-         xH1As0xcoU3Pir+wfw6DEaA1rMjqt21bPfeJIFYMvh6Vb48Aj0AcU4+FM9hoZroCb/rY
-         Zo8xeEjjorcaM0qXSqinq7cEbbKF4EboVg47CdLV0q5x/Kj3LIDjGRPxKiL5KDvmu6NU
-         u6TDl+mAeHMZaXVTLwQ2EHF997RGujfVPCEw4p9IpkXs1IBovA4hNZKY9UWt7hRa0+eW
-         ZS4Q==;
+        bh=42WLa4n5qh0yIZ8zs8eeEqfQPaFzELfuoqMN1DcSWvA=;
+        fh=jf0k0Oqa9xX8Ck2l94lUTtxB+ja/Kv+RIEGNjuW+Kcg=;
+        b=F1xK6jhzpQHA4F/QiD7xRQ/NZhZlrL9MEOebbKf+zhP1/ck4NG61AOJZWL18NeIAqB
+         9L2EUCjWmyq7+7LHSZQyRuAPX2SIUTpjoK1UxUnIK9xZ5bMwzy4O9MZYjV6uAUB27djR
+         1GPurTgsLQynI2InEqUThNMmJSGd8jeCG23Jjkz4ennmFHylpeJ2bkvYGNZLqz/6AcQ3
+         bYXLE6MEMKv51Ffm1W8LeImG717c0jCR/KHJdS7xhTcUp8A4DSCQfhwYiJCWJku1DFFt
+         qraMsfTIyIbFNHQ13Kq4OWeS+HNWYeTByyGkNv1PcpX+cfYWQrde9wwoAdjnwBWp1BOR
+         rbfw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770670775; x=1771275575; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770671251; x=1771276051; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BcHooqqh9wfFdrg4geqT0rwP6cAsVaSy7mZTb15xsTY=;
-        b=Cet4wHWmQdabuPw53SKJwcTNqXGjXS1CQMlvdMjs+8nnMO27gg0uS8HYk4sumllfg1
-         t/ZRuQf6yWAQSxFVGCZ7eEo/78qnKTHXIFXe216VoeTTtqzvTjbdL+E04swki+X7Tjp1
-         VM7xmjzV9nqaxsYnjjs/ztxxlSZY9L89FyS6nLUOxUoYx5kJCGS+sC1yfahNLXTnC6IU
-         699MSKQu9mWRsrlHicFHUD4zR5tbSDBoeF4k7mZStxd3nTd5t4w1HyiNz70cwMuSzPYc
-         YlOmrroMIwDMWUwu20sLBj7zBVCE2S25uM1ph47SIrQjY8MqsaWS+6WOWStvtqNdeShI
-         3ijA==
+        bh=42WLa4n5qh0yIZ8zs8eeEqfQPaFzELfuoqMN1DcSWvA=;
+        b=m6n6U0K4SMRQvmPNyzx9tPS4oQJToHohT1gk79KxMLg3BpPiq/DJAqmv7ZfxuXSjrB
+         d5ZLdxv1OV1+5pUkF//3NNGwICvFtn9n3jBVtDzCWOz7eTF/MIH4YGukwlkdnKe/pxnb
+         r3g0k+oUSjEXFKTwttPnxNax8h0t3O96ElbbZ9zYGOQkfiPZMbZtnUlbRw7LrKq36mlW
+         aKVkbZamT6CEUIowAgiNV2E8jZtbz/q/bwnWhnuJpnkGr0GU7aCfPQXZ1V0oCStw8IvD
+         /tAskbwconbEux6PCdXwP72MEO5p1P9RBMb+840vvf5YDs2FSSTX+rx2lAs+mSrl+fC6
+         wA3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770670775; x=1771275575;
+        d=1e100.net; s=20230601; t=1770671251; x=1771276051;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=BcHooqqh9wfFdrg4geqT0rwP6cAsVaSy7mZTb15xsTY=;
-        b=CJlB61hRSNN44U9SJc0WiZQwg62UYXNuZJfgKRkG2hfMDcQQBiPRQ6oskUTVZ9ppvL
-         PufNzyZW49tI3JfreI5qdL0FO0V1v46EtIJUlj8WvwTtPSEsXSWscE1LXnl5qzfgR+zC
-         CgosYB7TzMykf8OvneKedLExp/q78ak7LG+b7MvDLpb4UiD+jCMKwauEfu99347qA9Zu
-         boMyrVWaeTV65l6XPojOQilrGuzEBQ3dxD+JY9Bm6aLjzJvuwTEj2JcQybUGeaO3cDAv
-         g9LcaCU+3qf6ODk8u6IM9A+V7x6KH4YA1Js0gvvswD42X9o9/IXztVD4i4Wy5DQnHsfr
-         eiNg==
-X-Gm-Message-State: AOJu0YzSG6xL0yOnNfEN2ApvnwZpz2Qk1tLnveJYZTJC66LcMZdnPsMJ
-	+jZ/qcORrEFivuWKQLa3IbA9C7GAEQpimlYNXqu7cEbeGLiebBgQRNUc19ZwGNP7w/vCYdVsEbW
-	icNFpOeq60WdKU6rb47LJpgVHi4cttDg=
-X-Gm-Gg: AZuq6aLHlsTCPFEcIrhphI7DB6YlxTOqXldCuRKfjtFJvvRQlyoJ3mKtF5OK96OUZHU
-	Eas50iUPw9uk8xOaCejpMa/x6eXg46ut0fDiJXa9UEJnsv+k3auPQcNA4wL75XYmq7febYfxlGW
-	mQDcdfFpqnCj8ETTX0L0/2A7vEzWkzFbk62kYZ8APtI/TdwVtxyqpocA9rLw38tQZzDGV9jZjOM
-	DtsbQXmcxbtdm1jmnbMiLg3R/NEDvX99lPWPPkdPkHlRAEXn5jMrtzRBw1opBZ/QRRheo9f2MRH
-	MKMnoMYC7bGCccNKfDq/amIEfrEu0JvNFMS7/itCfLaZSuuuTv9s6qM7DA==
-X-Received: by 2002:a05:690c:f87:b0:796:3917:72ab with SMTP id
- 00721157ae682-7963917782bmr52424177b3.61.1770670774819; Mon, 09 Feb 2026
- 12:59:34 -0800 (PST)
+        bh=42WLa4n5qh0yIZ8zs8eeEqfQPaFzELfuoqMN1DcSWvA=;
+        b=Yz9nPKw9eqU2kd0eHKW2Ic1+y6MRo19m/0j0t+TmPZkR6tBwDyg84ATFbQo+DMqLqH
+         FztcLz3P1lRbkhKzaZuYY695u/P4RkYJaeMKfH0EKodleo99wlmjzc12/YtczHawkUDX
+         ghSoWCNfZFHmVo6gvWiRaeXTPTQ9CS1i3bafNPhGJ3QOs660rUkHjZKbXhRXC82+HbbM
+         lAyV/iVxa3FWeoNpktSxnCWOSyzgRgNjejbTHKkOFMS4cgi7Mt461qQR9P1gctZi3qCr
+         4teh8QSpinwZ/QW0rpxjWF7yeekfnb56MDfxkQK2mVGINgSjF40k1CBUEnPYHXiVJtoP
+         1woQ==
+X-Gm-Message-State: AOJu0Yxy+0X0sfPwWRq9JV3lIaTOF6wv/mNB49E/LB9kqpZvWmO95f8D
+	012033qeEsa6bFz1nbxeENBjkrkfv0KpqClrzKdyQw0VGHFwRzQ+4UraZs8mmSadCMo6/IygfH3
+	ZlqSU7SOziSmq081y4y4Qce+V6fIG2Vs=
+X-Gm-Gg: AZuq6aLZdLxgTEvGHtxaUFIVO+su7AVR2ke9OsUMYjCbahrXpxF6ZxwhDeY4a/hlyCH
+	/RaPye/aqjA8lDH+4qBpn1i212BZjfwn4R8wO+3cZykW0SWQzy36W4CcBNznvR/t4CiNAyRmE92
+	MVjxFBQotl7qRqNQPLEC11qEaqQvTSWZ4QYKoeAEgmincphBvd6oaVHvIsLRaopUQU+2Bal33Uw
+	PYV75w+4iIfh7uFHUXXvRlQZyH6kfNJKe7v2DHMONpbdgrgfwp3kK0EknIp6x3K+ExLffxrZBuF
+	TdUXf5BzVWi9Ee0LCRY28QCVEtUC3dY43wJqDD4pagdPV94NnQKa9tP+Jg==
+X-Received: by 2002:a05:690c:b9c:b0:794:73f7:ff81 with SMTP id
+ 00721157ae682-7952aa64975mr251854947b3.14.1770671250823; Mon, 09 Feb 2026
+ 13:07:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260209203316.3050687-1-hadess@hadess.net> <20260209203316.3050687-2-hadess@hadess.net>
-In-Reply-To: <20260209203316.3050687-2-hadess@hadess.net>
+References: <20251224063439.2477969-1-mahesh.talewad@nxp.com>
+ <20251224063439.2477969-2-mahesh.talewad@nxp.com> <CABBYNZ+zsqdf4rmO8e+rb1ZNxJRxC31K_aa8kCaOHp53BqGUKA@mail.gmail.com>
+ <DB9PR04MB94526C8409BC4F75CCA79CBE898CA@DB9PR04MB9452.eurprd04.prod.outlook.com>
+ <CABBYNZ+MN=f3chmT1zJnBTjmLLyz_tR36ivgaQXOWoVFYTAkgw@mail.gmail.com> <DB9PR04MB94527DD42500C2D579120B30898DA@DB9PR04MB9452.eurprd04.prod.outlook.com>
+In-Reply-To: <DB9PR04MB94527DD42500C2D579120B30898DA@DB9PR04MB9452.eurprd04.prod.outlook.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 9 Feb 2026 15:59:23 -0500
-X-Gm-Features: AZwV_Qit9m0gYWidZigqAKsIZo-MwAY8Hiq18JS7FaEs4Qk8Wq8wRv8wJ3zKq7M
-Message-ID: <CABBYNZKzHwLHUQKicjHVuMCTkEUoRWb9qAi+FLKoX=5A09-UeQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] emulator: Fix compilation on big endian systems
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org, Pauli Virtanen <pav@iki.fi>
+Date: Mon, 9 Feb 2026 16:07:17 -0500
+X-Gm-Features: AZwV_QiM3y0jWzb5hu7-slKFNSQMah5QJXBe0stA3_dxaqypO2IDWKXYAj-6dZs
+Message-ID: <CABBYNZLAeXDfUX3p4zDJ+kZ7rDs0L2u-78sZ1mUO6zK9zrJx3A@mail.gmail.com>
+Subject: Re: [EXT] Re: [PATCH BlueZ v1 1/1] Enhanced Accept Synchronous
+ Connection Request command is handled in emulator.
+To: Mahesh Talewad <mahesh.talewad@nxp.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
+	Devyani Godbole <devyani.godbole@nxp.com>, Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>, 
+	Vinit Mehta <vinit.mehta@nxp.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Bastien,
+Hi Mahesh,
 
-On Mon, Feb 9, 2026 at 3:34=E2=80=AFPM Bastien Nocera <hadess@hadess.net> w=
-rote:
+On Fri, Jan 16, 2026 at 10:15=E2=80=AFAM Mahesh Talewad <mahesh.talewad@nxp=
+.com> wrote:
 >
-> Use new helper macros for byteswapping constants.
+> Hi Luiz,
 >
-> This fixes the build on big endian systems like s390x:
+> -----Original Message-----
+> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Sent: Thursday, January 15, 2026 8:30 PM
+> To: Mahesh Talewad <mahesh.talewad@nxp.com>
+> Cc: linux-bluetooth@vger.kernel.org; Devyani Godbole <devyani.godbole@nxp=
+.com>; Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>; Vinit Mehta <vinit.meht=
+a@nxp.com>
+> Subject: Re: [EXT] Re: [PATCH BlueZ v1 1/1] Enhanced Accept Synchronous C=
+onnection Request command is handled in emulator.
 >
-> emulator/bthost.c: In function =E2=80=98bthost_setup_sco=E2=80=99:
-> ./src/shared/util.h:43:26: error: initializer element is not constant
->    43 | #define cpu_to_le32(val) bswap_32(val)
->       |                          ^~~~~~~~
-> etc.
+> Caution: This is an external email. Please take care when clicking links =
+or opening attachments. When in doubt, report the message using the 'Report=
+ this email' button
 >
-> Fixes: 85888a8357ea ("bthost: add bthost_setup_sco() and accept
-> incoming eSCO")
-> ---
->  emulator/bthost.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
 >
-> diff --git a/emulator/bthost.c b/emulator/bthost.c
-> index d09ad1e76c50..37865f61bc52 100644
-> --- a/emulator/bthost.c
-> +++ b/emulator/bthost.c
-> @@ -3562,18 +3562,18 @@ int bthost_setup_sco(struct bthost *bthost, uint1=
-6_t acl_handle,
->  {
->         static const struct bt_hci_cmd_setup_sync_conn settings[] =3D {
->                 {
-> -                       .tx_bandwidth =3D cpu_to_le32(0x00001f40),
-> -                       .rx_bandwidth =3D cpu_to_le32(0x00001f40),
-> -                       .max_latency =3D cpu_to_le16(0x000a),
-> +                       .tx_bandwidth =3D cpu_constant_to_le32(0x00001f40=
-),
-> +                       .rx_bandwidth =3D cpu_constant_to_le32(0x00001f40=
-),
-> +                       .max_latency =3D cpu_constant_to_le16(0x000a),
->                         .retrans_effort =3D 0x01,
-> -                       .voice_setting =3D cpu_to_le16(BT_VOICE_CVSD_16BI=
-T),
-> +                       .voice_setting =3D cpu_constant_to_le16(BT_VOICE_=
-CVSD_16BIT),
->                 },
->                 {
-> -                       .tx_bandwidth =3D cpu_to_le32(0x00001f40),
-> -                       .rx_bandwidth =3D cpu_to_le32(0x00001f40),
-> -                       .max_latency =3D cpu_to_le16(0x000d),
-> +                       .tx_bandwidth =3D cpu_constant_to_le32(0x00001f40=
-),
-> +                       .rx_bandwidth =3D cpu_constant_to_le32(0x00001f40=
-),
-> +                       .max_latency =3D cpu_constant_to_le16(0x000d),
->                         .retrans_effort =3D 0x02,
-> -                       .voice_setting =3D cpu_to_le16(BT_VOICE_TRANSPARE=
-NT),
-> +                       .voice_setting =3D cpu_constant_to_le16(BT_VOICE_=
-TRANSPARENT),
->                 }
+> Hi Mahesh,
+>
+> On Thu, Jan 15, 2026 at 7:47=E2=80=AFAM Mahesh Talewad <mahesh.talewad@nx=
+p.com> wrote:
+> >
+> > Hi Luiz,
+> >
+> > -----Original Message-----
+> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> > Sent: Wednesday, January 14, 2026 7:54 PM
+> > To: Mahesh Talewad <mahesh.talewad@nxp.com>
+> > Cc: linux-bluetooth@vger.kernel.org; Devyani Godbole
+> > <devyani.godbole@nxp.com>; Sarveshwar Bajaj
+> > <sarveshwar.bajaj@nxp.com>; Vinit Mehta <vinit.mehta@nxp.com>
+> > Subject: [EXT] Re: [PATCH BlueZ v1 1/1] Enhanced Accept Synchronous Con=
+nection Request command is handled in emulator.
+> >
+> > Caution: This is an external email. Please take care when clicking
+> > links or opening attachments. When in doubt, report the message using
+> > the 'Report this email' button
+> >
+> >
+> > Hi Mahesh,
+> >
+> > On Wed, Dec 24, 2025 at 1:30=E2=80=AFAM Mahesh Talewad <mahesh.talewad@=
+nxp.com> wrote:
+> > >
+> > > Implemented the command - Enhanced Accept Synchronous Connection
+> > > Request command in emulator[emulator/btdev.c].
+> > >
+> > > Signed-off-by: Mahesh Talewad <mahesh.talewad@nxp.com>
+> > > ---
+> > >  emulator/btdev.c | 64
+> > > +++++++++++++++++++++++++++++++++++++++++++++++-
+> > >  1 file changed, 63 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/emulator/btdev.c b/emulator/btdev.c index
+> > > be43623e8..55367cc7d 100644
+> > > --- a/emulator/btdev.c
+> > > +++ b/emulator/btdev.c
+> > > @@ -3434,6 +3434,64 @@ static int cmd_get_mws_transport_config(struct=
+ btdev *dev, const void *data,
+> > >         return 0;
+> > >  }
+> > >
+> > > +static int cmd_enhanced_accept_sync_conn_req(struct btdev *dev,
+> > > +                               const void *data, uint8_t len) {
+> > > +       const struct bt_hci_cmd_enhanced_accept_sync_conn_request *cm=
+d =3D data;
+> > > +       uint8_t status =3D BT_HCI_ERR_SUCCESS;
+> > > +
+> > > +       if (cmd->tx_coding_format[0] > 5)
+> > > +               status =3D BT_HCI_ERR_INVALID_PARAMETERS;
+> > > +
+> > > +       cmd_status(dev, status,
+> > > + BT_HCI_CMD_ENHANCED_ACCEPT_SYNC_CONN_REQUEST);
+> > > +
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static int cmd_enhanced_accept_sync_conn_req_complete(struct btdev *=
+dev,
+> > > +                                       const void *data, uint8_t
+> > > +len) {
+> > > +       const struct bt_hci_cmd_enhanced_accept_sync_conn_request *cm=
+d =3D data;
+> > > +       struct bt_hci_evt_sync_conn_complete cc;
+> > > +       struct btdev_conn *conn;
+> > > +
+> > > +       memset(&cc, 0, sizeof(cc));
+> > > +
+> > > +       conn =3D queue_find(dev->conns, match_bdaddr, cmd->bdaddr);
+> > > +       if (!conn) {
+> > > +               cc.status =3D BT_HCI_ERR_INVALID_PARAMETERS;
+> > > +               goto done;
+> > > +       }
+> > > +
+> > > +       conn =3D conn_add_sco(conn);
+> > > +       if (!conn) {
+> > > +               cc.status =3D BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
+> > > +               goto done;
+> > > +       }
+> > > +
+> > > +
+> > > +       cc.status =3D BT_HCI_ERR_SUCCESS;
+> > > +       memcpy(cc.bdaddr, conn->link->dev->bdaddr, 6);
+> > > +
+> > > +       cc.handle =3D cpu_to_le16(conn->handle);
+> > > +       cc.link_type =3D 0x02;
+> > > +       cc.tx_interval =3D 0x000c;
+> > > +       cc.retrans_window =3D 0x06;
+> > > +       cc.rx_pkt_len =3D 60;
+> > > +       cc.tx_pkt_len =3D 60;
+> > > +       cc.air_mode =3D cmd->tx_coding_format[0];
+> >
+> > Why are you harding most of the field above, aren't they available from=
+ the cmd?
+> > [Mahesh]: They aren't available from the cmd. Hence hardcoded.
+>
+> Well not the BT_HCI_EVT_CONN_REQUEST itself but the code that originate i=
+t, which I believe to be cmd_enhanced_setup_sync_conn_complete, it does sto=
+res bt_hci_cmd_enhanced_setup_sync_conn fields into conn->data which you sh=
+ould probably use that. Btw, make use you run sco-tester with these changes=
+ and the kernel changes to confirm it really works, you might want to run u=
+sing test-runner:
+>
+> https://github.com/bluez/bluez/blob/master/doc/test-runner.rst
+>
+> [Mahesh] : bt_hci_cmd_enhanced_setup_sync_conn fields do not have tx_inte=
+rval, retrans_window, rx_pkt_len, tx_pkt_len fields.
+> Hence we can not use conn->data (which contains bt_hci_cmd_enhanced_setup=
+_sync_conn fields), in cmd_enhanced_accept_sync_conn_req_complete().
+> Same fields are hardcoded in func - sync_conn_init_complete(), also.
 
-Perhaps we should change the above, I don't think it is really useful
-to have a table like this can then do memcpy, instead we can probably
-just use a switch (setting) and then initialize the values in the cmd
-directly, that way we can use the regular method of converting since
-it would not be required to be a constant.
+Looks like I never replied here. Yes, now I see why you need to
+initialize it here. That said, we should probably use
+sync_conn_init_complete then or maybe just call sync_conn_complete
+since the function you are introducing appears to be a duplicate of
+that.
 
->         };
->         struct bt_hci_cmd_setup_sync_conn cmd;
+> we are running sco-tester using test-runner using blow command
+> sudo tools/test-runner -m -k /home/Documents/Kernel_Image/bzImage -- tool=
+s/sco-tester
+>
+> With and without 'Enhanced Accept Synchronous Connection Request command'=
+ code (both in emulator and kernel), below testcases(4) are failing:
+> SCO CVSD Send - TX Timestamping                                        Fa=
+iled
+> SCO CVSD Send No Flowctl - TX Timestamping               Timed out
+> SCO Ethtool Get Ts Info - Success                                        =
+   Failed
+> SCO Ethtool Get Ts Info No Flowctl - Success                       Failed
+>
+>
+> > > +
+> > > +done:
+> > > +       send_event(dev, BT_HCI_EVT_SYNC_CONN_COMPLETE, &cc,
+> > > +sizeof(cc));
+> > > +
+> > > +       if (conn)
+> > > +               send_event(conn->link->dev, BT_HCI_EVT_SYNC_CONN_COMP=
+LETE,
+> > > +                                                       &cc,
+> > > + sizeof(cc));
+> > > +
+> > > +       return 0;
+> > > +
+> > > +}
+> > > +
+> > >  #define CMD_BREDR \
+> > >         CMD(BT_HCI_CMD_SETUP_SYNC_CONN, cmd_setup_sync_conn, \
+> > >
+> > > cmd_setup_sync_conn_complete), \ @@ -3471,7 +3529,10 @@ static int cm=
+d_get_mws_transport_config(struct btdev *dev, const void *data,
+> > >         CMD(BT_HCI_CMD_GET_MWS_TRANSPORT_CONFIG, cmd_get_mws_transpor=
+t_config, \
+> > >                                         NULL), \
+> > >         CMD(BT_HCI_CMD_ENHANCED_SETUP_SYNC_CONN, cmd_enhanced_setup_s=
+ync_conn, \
+> > > -                                       cmd_enhanced_setup_sync_conn_=
+complete)
+> > > +                       cmd_enhanced_setup_sync_conn_complete), \
+> > > +       CMD(BT_HCI_CMD_ENHANCED_ACCEPT_SYNC_CONN_REQUEST, \
+> > > +                       cmd_enhanced_accept_sync_conn_req, \
+> > > +                       cmd_enhanced_accept_sync_conn_req_complete)
+> > >
+> > >  static int cmd_set_event_mask_2(struct btdev *dev, const void *data,
+> > >                                                         uint8_t len)
+> > > @@ -3604,6 +3665,7 @@ static void set_bredr_commands(struct btdev *bt=
+dev)
+> > >         btdev->commands[23] |=3D 0x04;    /* Read Data Block Size */
+> > >         btdev->commands[29] |=3D 0x20;    /* Read Local Supported Cod=
+ecs */
+> > >         btdev->commands[29] |=3D 0x08;    /* Enhanced Setup Synchrono=
+us Conn */
+> > > +       btdev->commands[29] |=3D 0x10;    /* Enhanced Accept Sync Con=
+nection */
+> > >         btdev->commands[30] |=3D 0x08;    /* Get MWS Transport Layer =
+Config */
+> > >         btdev->cmds =3D cmd_bredr;
+> > >  }
+> > > --
+> > > 2.34.1
+> > >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+> >
+> > Thanks and regards,
+> > Mahesh Vithal Talewad
+>
+>
+>
 > --
-> 2.52.0
->
->
+> Luiz Augusto von Dentz
+
 
 
 --=20
