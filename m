@@ -1,110 +1,131 @@
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f195.google.com (mail-dy1-f195.google.com [74.125.82.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3993426ED48
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 21:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210C526ED48
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 21:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770673068; cv=none; b=uEKB4LNWuAcm4YYky0GbYYMFnTWDF2McXjysA+BcMYsfuhkujttjfguvVqWyRP/MxWXxpTGQDLX8DC2AtTLhVseTYLdOP/c64C2IzVcK9fQ8loEZYfJ1kvUyd9hJW2oFy7khbyZeNxSGx3A/JHXL2Vja+dZRoBrEJWTY3YJXiaM=
+	t=1770673356; cv=none; b=tWPuuXut1qBOiwGZ6P7q0IP5AQXtS7uND/vxKxqxDe0JbsH/jnYnldkB2R6nnApdB4KlN6huo9myxzyQCL1hUgUWBH6Gnm8oSqN5MuZ1iFu8FZHgdhKr/0aMKV+VR5Vi06YnnzlB38120JBd6b0xdIumhrOfafy9nexzotetroo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770673068; c=relaxed/simple;
-	bh=4u4OOSkdRkmTDkt7iUi9Yp3ijCvx3bpj5IvAAlczQTs=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HvupBWr0jbstlzs/n430WtLuu8WoErN3kSNIx326/9i1BAPIgEPmBRpC++PzIgBmSA/eYv2lJ03I3Pae3Gl6Mat078SmsfWdjVPPhyf7xAseE6puwQ19TuqVhJ0gIy02Zr0c8G+whu6/QyfnpXmm6ViwZj/Og9yDjU0Zhi3lRAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=fail smtp.mailfrom=iki.fi; arc=none smtp.client-ip=185.67.36.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=iki.fi
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout02.posteo.de (Postfix) with ESMTPS id D007E240103
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 22:36:35 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4f8ygl016Yz6tvx;
-	Mon,  9 Feb 2026 22:36:34 +0100 (CET)
-Message-ID: <8e576f35b6279255c1eed099c1142625c53a6be5.camel@iki.fi>
-Subject: Re: [PATCH BlueZ 2/2] emulator: Fix compilation on big endian
- systems
-From: Pauli Virtanen <pav@iki.fi>
-To: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
-Date: Mon, 09 Feb 2026 21:36:35 +0000
-In-Reply-To: <20260209203316.3050687-2-hadess@hadess.net>
-References: <20260209203316.3050687-1-hadess@hadess.net>
-	 <20260209203316.3050687-2-hadess@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1770673356; c=relaxed/simple;
+	bh=SUMmEpGMnpAsayKOq1c58R5JoUXQ7PSUWqUlZvrPunY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Op9d5PJcnibpDsUHHOsSbBFAX7yAn//hf6HLDpxQVHFh5jNJiTKHmCkhkTS1XfmM7adZdIu5ar9mik/V1hV5Yx83CVtBISxFDsq7Bc3VpIodaQMgOlWsvrjS3m/QPuLkL3ySHIF0c+KJFAWC4Q55fWSIqTfdCQGvfHW51t/apJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CdobQ/62; arc=none smtp.client-ip=74.125.82.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CdobQ/62"
+Received: by mail-dy1-f195.google.com with SMTP id 5a478bee46e88-2b4520f6b32so293242eec.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Feb 2026 13:42:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770673354; x=1771278154; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WJBrBoWF1l0BVM62Bq/gcMdbUe3LV+9zJYZ0UuL8DgM=;
+        b=CdobQ/626NVC0wSxVl/i5095hb4VzEfjhOuY415Wt5yH3I9YbD7RaXl5SkrWC8jKCc
+         KyIAIkE+1eQhXNszx/Qo4MGf171rB79knCYxiFXvVplyy+aCNm4khhUu0+dtp1F0FBOs
+         YifRV9C7sVMURam/krJMUAlGJjmeAvQaeebfB604zOgUbHp8jQSvLNppR9e84mlme2BK
+         WL0SO8EosDMQSOPl2skjrMIq8zUdTgFY5f+8+P0J/+DwzBgcp5DbKliSfRPE5S1uyACh
+         53iGyK1WAqp+EvXYCcNH3vTwuqt66DDLJbAPcofliNsRVNtG9nhoRinwUqtWd+pYUjZ1
+         ifqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770673354; x=1771278154;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WJBrBoWF1l0BVM62Bq/gcMdbUe3LV+9zJYZ0UuL8DgM=;
+        b=lqhdaQOS2tyhjSD3uFoMtBu3RlFPcSB38uZk3QxA6navR1UtVpSPeyJh7h6wgsa9rL
+         OvQMqfKKXC2q2hc6S/iMbjueuWOQTRcVLn+pdHqHUF5T1oNI2MHTVIk0SODo5a+e/YGo
+         1+I2VMQoOjuEwishNClLiFahXAbEiuYc+Nd1jeuTg16lknOkY1sN7spdM8CjlecuxWne
+         jJPd8qKmQORaczQwAxawwpfW32s/P5TH/Pn4908vPuZlk/m0mcDeFL389eVDpKEBoQj6
+         qgaJU4sCdphutPWXWfkn7erXyZq40J6tAWDJe4iqwaGKJ9RY929eJaJTzqJIeToEh8Jz
+         6HpQ==
+X-Gm-Message-State: AOJu0YxA8k2+gWHpgRKkV5UUvJ6B+9oMWPwK71TF8muFLG0ZEJE9mnqy
+	inBhDmMazxH2rneDT+07voTPiXiEHzK5vLNN1u7K/vanqLCJym0cd5WR+Kk74Zcu
+X-Gm-Gg: AZuq6aJfRefLSD0e98IGsvIDDGZw7WwHe3x/1hm2fQN8UdKOd+GFTOY15BhmcXBQf55
+	CcwUYpv3jiuacbHvHlLfpCNNdHbOmow5vCSCIJ1ZGo8F1N26Tcy5mkNO+/exCZ+1SheTdfqI+IM
+	hL9yAj2zs17OWRNjNMtqwqDG750rLqkcmoLA0Ij/wDrLVZLbQR2AynpZzTDJowt4N3g+ZqHDifl
+	CZG3OBIx/sYsLUZ7eKSwDTNmAMS+XpXO2jt1tLbzx3zNVS+TAyBa2QaZZHvX+DRRD33DV0RGLjA
+	dZL5rGK/CqUrME5/f19L7+kcv1nnpNTEqRgAGUfrD33Rk5ZLXAKNVD25pF1fFygJhKecziKEPiV
+	RFyLU/3HWe7YAxG4whKVrx9sPHBsjjyGDgvUfVIwTd8tkExWEcOKulSm5yPqAcHc+FXTZYcrziq
+	/GIntq4A/1u9uvW1g1Hg==
+X-Received: by 2002:a05:7300:7c09:b0:2ba:73b0:2ea0 with SMTP id 5a478bee46e88-2ba73b035b0mr1671488eec.11.1770673353839;
+        Mon, 09 Feb 2026 13:42:33 -0800 (PST)
+Received: from [172.17.0.2] ([52.190.140.136])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ba6c1bdf49sm3727909eec.2.2026.02.09.13.42.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Feb 2026 13:42:33 -0800 (PST)
+Message-ID: <698a54c9.050a0220.2a7f8e.3a69@mx.google.com>
+Date: Mon, 09 Feb 2026 13:42:33 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5492315934082669579=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: [BlueZ,1/2] shared/util: Add byte-swapping macros for constants
+In-Reply-To: <20260209203316.3050687-1-hadess@hadess.net>
+References: <20260209203316.3050687-1-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============5492315934082669579==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-ma, 2026-02-09 kello 21:33 +0100, Bastien Nocera kirjoitti:
-> Use new helper macros for byteswapping constants.
->=20
-> This fixes the build on big endian systems like s390x:
->=20
-> emulator/bthost.c: In function =E2=80=98bthost_setup_sco=E2=80=99:
-> ./src/shared/util.h:43:26: error: initializer element is not constant
-> =C2=A0=C2=A0 43 | #define cpu_to_le32(val) bswap_32(val)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~
-> etc.
->=20
-> Fixes: 85888a8357ea ("bthost: add bthost_setup_sco() and accept
-> incoming eSCO")
-> ---
-> =C2=A0emulator/bthost.c | 16 ++++++++--------
-> =C2=A01 file changed, 8 insertions(+), 8 deletions(-)
->=20
-> diff --git a/emulator/bthost.c b/emulator/bthost.c
-> index d09ad1e76c50..37865f61bc52 100644
-> --- a/emulator/bthost.c
-> +++ b/emulator/bthost.c
-> @@ -3562,18 +3562,18 @@ int bthost_setup_sco(struct bthost *bthost,
-> uint16_t acl_handle,
-> =C2=A0{
-> =C2=A0	static const struct bt_hci_cmd_setup_sync_conn settings[] =3D
-> {
+This is automated email and please do not reply to this email!
 
-Removing the "static" here would be another way to fix it, as it
-doesn't really need to be static here.
+Dear submitter,
 
-> =C2=A0		{
-> -			.tx_bandwidth =3D cpu_to_le32(0x00001f40),
-> -			.rx_bandwidth =3D cpu_to_le32(0x00001f40),
-> -			.max_latency =3D cpu_to_le16(0x000a),
-> +			.tx_bandwidth =3D
-> cpu_constant_to_le32(0x00001f40),
-> +			.rx_bandwidth =3D
-> cpu_constant_to_le32(0x00001f40),
-> +			.max_latency =3D cpu_constant_to_le16(0x000a),
-> =C2=A0			.retrans_effort =3D 0x01,
-> -			.voice_setting =3D
-> cpu_to_le16(BT_VOICE_CVSD_16BIT),
-> +			.voice_setting =3D
-> cpu_constant_to_le16(BT_VOICE_CVSD_16BIT),
-> =C2=A0		},
-> =C2=A0		{
-> -			.tx_bandwidth =3D cpu_to_le32(0x00001f40),
-> -			.rx_bandwidth =3D cpu_to_le32(0x00001f40),
-> -			.max_latency =3D cpu_to_le16(0x000d),
-> +			.tx_bandwidth =3D
-> cpu_constant_to_le32(0x00001f40),
-> +			.rx_bandwidth =3D
-> cpu_constant_to_le32(0x00001f40),
-> +			.max_latency =3D cpu_constant_to_le16(0x000d),
-> =C2=A0			.retrans_effort =3D 0x02,
-> -			.voice_setting =3D
-> cpu_to_le16(BT_VOICE_TRANSPARENT),
-> +			.voice_setting =3D
-> cpu_constant_to_le16(BT_VOICE_TRANSPARENT),
-> =C2=A0		}
-> =C2=A0	};
-> =C2=A0	struct bt_hci_cmd_setup_sync_conn cmd;
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1052425
 
---=20
-Pauli Virtanen
+---Test result---
 
+Test Summary:
+CheckPatch                    PENDING   0.45 seconds
+GitLint                       PENDING   0.51 seconds
+BuildEll                      PASS      20.62 seconds
+BluezMake                     PASS      676.16 seconds
+MakeCheck                     PASS      18.46 seconds
+MakeDistcheck                 PASS      250.39 seconds
+CheckValgrind                 PASS      299.39 seconds
+CheckSmatch                   WARNING   357.87 seconds
+bluezmakeextell               PASS      186.11 seconds
+IncrementalBuild              PENDING   0.46 seconds
+ScanBuild                     PASS      1046.68 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/bthost.c:700:28: warning: Variable length array is used.emulator/bthost.c:701:32: warning: Variable length array is used.emulator/bthost.c:918:28: warning: Variable length array is used.emulator/bthost.c:952:28: warning: Variable length array is used.emulator/bthost.c:953:32: warning: Variable length array is used.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5492315934082669579==--
