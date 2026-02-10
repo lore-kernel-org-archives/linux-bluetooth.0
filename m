@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395412877CF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27EF38A9B1
 	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 18:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770746410; cv=none; b=s827mIhxmbVnIK9eviYgxyUW2oaa4B7xxi1VzoHwfcsAWDeJO7y4SxE4y7l7+1pD+JLGKKJp90+B/aHTpnFXogeFrEmMpX5Xk4WN6RygbeUFCJnfP2xOI2thJCIaCdkqO/KKl15RMNFtkQo475qapMbGVcjRJW48zLi6xO3oGZA=
+	t=1770746410; cv=none; b=rEuDfRw76fzZMOgr0B1XNwO74YGhfhrivXW8QBKQVv+bHGZ0IlwmMiLCUzKAsEWv8CZ9uiLLJyG8UXEKS9SLlU8sJcKBGzJp0CZarnwF5NfnK221HQqEoquTeEteuXg/MPdGfsZnCuzYp6hLqifKBY+5bvERhMO/YEzdKmvLfhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770746410; c=relaxed/simple;
-	bh=MwCGYLSMHTQ6USEa2POxqQu3zno54HHNr+tCJWU0O14=;
+	bh=Cb4+LEPragJuCC/NeKrII2sV/xrrJ0EdXO/IOVfsFfA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nvvz1B0+XuG/moLF2bZEM/tHPnLSlRi48oxEbBCqw6Ppgo1ByZTofJenVMxEagS6OfdeKv4h+55a+1Fps88N8nu+YE3PAqhmTX8JpF1NLuAazYcHEHmKZutVk8kF5o3MmFDjjOobOfmdwifN/v7qsI71bzgZuybKKHsj7F/erCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvIH7W6z; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=r9IugKSw30k1QvI2FFHvrCZ6xGWoTi5wAq2I7H/QQJ2Zkkn39kER7FeuNoq9OmKdD9f/tcBaDUUA/QvkZKVKqdyu29GXp8eNhqXhGV1ztrMMTH29Fq7niTLXzwy9ubJzEImUWJ5+wQG4kbpYp7El0HkTPC1eKb+39xjI7hVvXqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qkJQXYfT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvIH7W6z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15EA5C116C6;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qkJQXYfT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81C15C116C6;
 	Tue, 10 Feb 2026 18:00:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1770746410;
-	bh=MwCGYLSMHTQ6USEa2POxqQu3zno54HHNr+tCJWU0O14=;
+	bh=Cb4+LEPragJuCC/NeKrII2sV/xrrJ0EdXO/IOVfsFfA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PvIH7W6zhewLpoRTAYyhrN/dGJjxJ/hG4XknXQ1M/Qn3aTHyQN5/tD2A/JYuK2o+b
-	 aynQA/7rrFlVbrQUnbHtXTNEfZnhqz/Izt/euyc0yVhEy4HHrGYVMvgShRei4s1JoR
-	 WmwpagrBkbBz8Yd5skNTrWb+CQjoEhTQs/2Jky3cdGAIkijJaBYOypAS6d7+MfkqwI
-	 dJUNHs4MxK4J1aLhCDLX+EA7J3ii2HWHuTXxzlEQCHsDXVGOK6e/2cvoZAd0CYTOlo
-	 BIi97dCOsA8WPUKKI5b3icWA7C1CTe6jfHw43RAMr8fJXCEpa0sa7tIlVmCX69OHwc
-	 x10wGOm6MqT3g==
+	b=qkJQXYfT2TXc5gUJpNdbHfbyZxGgVyf8riNOgyUI8DjAdBbi4yvxGPS2mYm/bGTxp
+	 ezS3EUbZ5YCuaas5X4J58KNFd1XBdV4fMLKLqssOsfHAxxVbw+n5T27Vlbij+vOJfT
+	 yP5JodYbaHLg/kaz1SytypFmUbhk1ynZKMx+w3LHqKSfm5UZHbhASYWJTJjihDSZbu
+	 jIz0/mJQ+Ffte37eyRA6s4NZtkHcvVhhKyPcJFueCLby216edMqn/3mH+yLMYnMxOV
+	 cqggmduSb9xxEmdXk7/o4CEIgJdhWHa454eTJtSkEJGuN2OTWyDaYsERdPD8H7sIgY
+	 HwW1JMQaBi4nw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 850D539E3B79;
-	Tue, 10 Feb 2026 18:00:05 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0AF1B39E3B79;
+	Tue, 10 Feb 2026 18:00:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,34 +37,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] adapter: Add btd_adapter_send_cmd_event_sync
+Subject: Re: [PATCH BlueZ v2] emulator: Fix compilation on big endian systems
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177074640408.3616367.6343089667493303605.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Feb 2026 18:00:04 +0000
-References: <20260209163420.844741-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260209163420.844741-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <177074640557.3616367.16240515640902857241.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Feb 2026 18:00:05 +0000
+References: <20260210093254.3246483-1-hadess@hadess.net>
+In-Reply-To: <20260210093254.3246483-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org, pav@iki.fi
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon,  9 Feb 2026 11:34:20 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, 10 Feb 2026 10:32:47 +0100 you wrote:
+> This fixes the build on big endian systems like s390x:
 > 
-> This adds btd_adapter_send_cmd_event_sync which acts as a function
-> helper to generate MGMT_OP_HCI_CMD_SYNC.
-> ---
->  src/adapter.c | 28 ++++++++++++++++++++++++++++
->  src/adapter.h | 13 +++++++++++++
->  2 files changed, 41 insertions(+)
+> Remove the "static" so the array doesn't need to be initialised
+> with constants.
+> 
+> emulator/bthost.c: In function ‘bthost_setup_sco’:
+> ./src/shared/util.h:43:26: error: initializer element is not constant
+>    43 | #define cpu_to_le32(val) bswap_32(val)
+>       |                          ^~~~~~~~
+> etc.
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v1] adapter: Add btd_adapter_send_cmd_event_sync
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ecf4448a5811
+  - [BlueZ,v2] emulator: Fix compilation on big endian systems
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f1eedda9cefc
 
 You are awesome, thank you!
 -- 
