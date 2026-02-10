@@ -1,110 +1,154 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E29330320
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 20:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770753603; cv=pass; b=uqAq+X9dcc1pFE/ZF+FPiNYIR7oZ1tCmtWxofBKTNI9fG6g2YxSC6z9EKSVdQLYonZhJR1B2zJYXbg6JxWYzGpie04WTRQX7o29FckBKuUS5swcLVDGTMrZKNFkfm0yk0YCE4mrqHmcxVfWkHQ659mUgSO5YbFHoEEVnMcmkrno=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770753603; c=relaxed/simple;
-	bh=rqbki6P+DEoHm2oL4eA5/sEcPxHR59X49IxDhWkt8/Q=;
-	h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To; b=LZAqNVln+OxJ1R8PiGEXQ+trpDz2g5V8TyTF+dVx0bl752NnZBn6UbU79NqZvNd9rO5tVxXRktMV3dB5XdHx+OPcZNHtMSjkyxlEcxsFQV3g78+Z1hyW/7xTe/spWRpBLy6Lp2ZfSOcK5cU/aXL903ABVwXpBySx7uzhnuXhJMg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=george.kiagiadakis@collabora.com header.b=Lmw9jOMo; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE64533344D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 20:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770757151; cv=none; b=favuXkF2gCGubshBUtESsjL5wNZXwC7dvWQrYI/bjL7371+9rcnJz2Yb3+JLMKZ4fcyK+val6la6LAB8lFJYT+hlwkPAVEbjf7OzJgUa4BoHD9JIfNpSveIWrelxA6RiT8PZav36saLb6/6Tzz8MvX4U/EKBxykIII5Pxgmx56o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770757151; c=relaxed/simple;
+	bh=XrqoF4ein+uWQmK7TwvWK+dG0C04EwqPo7SnlsmoOY8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=U6Gzg5uN3roPcXc7YjCj/OURp6R3L3VtspeB52ZeTUWXqVkg8YCgx46jsm2vm0ulF+tiEyoAOkxaxX0H0dY5Q7+b2M65l30pn+mBSAoYfwW431h0PxZtWfI2CiC1CNFwygCz/V4D2IReFLpQMFmPWnB1u29cRPGuMSAyckgrPXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iy3mUSh5; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=george.kiagiadakis@collabora.com header.b="Lmw9jOMo"
-ARC-Seal: i=1; a=rsa-sha256; t=1770753601; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=LtCO8Xapm++hOsy63vCgJuZWHio8fsK7kg0gsg6QPmuYAk3NnvoC//rmecr1DBYPFOCy+GVYq5o6q9jmvgIfif923/ADaNhwk7q8Fz2m8XUYEMNiDRvVxm6TOBE61xutKwRjPkBEbYE4p/7jmFXglTvALWP1HH+EJWsQYgtTjOU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1770753601; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:MIME-Version:Message-ID:Resent-Date:Resent-To:Resent-From:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
-	bh=rqbki6P+DEoHm2oL4eA5/sEcPxHR59X49IxDhWkt8/Q=; 
-	b=UCl5Wf5pwYvZ6H86/3Xio09IycPXVex2v2OzR/ct/tfmFDlsE3DvNcy0ZrB25RpYkH2OAz12hlI0DouST4qjGL7oflPJXadID4z8K7nASiVazJQbqXB7dAkfsnLaxDNrjOHPEj4p0qqRve87+Vt9ROKHvQJ7wFlOzo/fo1ZKqYQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=george.kiagiadakis@collabora.com;
-	dmarc=pass header.from=<george.kiagiadakis@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1770753601;
-	s=zohomail; d=collabora.com; i=george.kiagiadakis@collabora.com;
-	h=Content-Type:Mime-Version:Subject:Subject:From:From:Resent-From:Date:Date:Content-Transfer-Encoding:Resent-Date:Resent-To:Message-Id:Message-Id:To:To:Reply-To:Cc;
-	bh=rqbki6P+DEoHm2oL4eA5/sEcPxHR59X49IxDhWkt8/Q=;
-	b=Lmw9jOMo6XzIiCUFReBrjFXn4j6GStnZMXzqB2xrYT+SpS1CzjkqT3OlXKFvDA3/
-	76j9hnv6YUNzfzUHXVBkSmCSIDN3OsZFYjqhKfVSYHBCCDyXVRIYAvySatHeczlrFE+
-	HTepj0jd6Xcv9fC+4iKAbsoO85kpGo+IroW3shlE=
-Received: by mx.zohomail.com with SMTPS id 1770753598919614.939650018146;
-	Tue, 10 Feb 2026 11:59:58 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iy3mUSh5"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5673804da95so512047e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 12:59:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770757149; x=1771361949; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kusL26LPbMr5Rw9lnPWQ7dyRdI23xbuWq0ePAxcLlsI=;
+        b=Iy3mUSh5m+8CktpTTpIhx74z3jhEQKR8FIMo2f7YHOCBUs5zWLL40YEWkhu5P5OjfD
+         BbamIk6UvXrv3a7szPoNK3I6q2ZMbbtOLlFXzyQFo/EArUqS8nc2bl9DZn60XC/d5+if
+         f+tfI0P3IbQzWd4DXkWHxK9ClmlHIU1cV5/T6Fzgpt4OiAE0cBvbnMyk1As6vAW3Pic3
+         XUVfZ/C8grTNYXBbsEXqDl+HUbpDT6o0VtCg0O/MqsmB+lLV2zTKzvkA3FVCGjfToW9x
+         4aJPTR+Iycm4DSzU6Kflgy9qFHNofcQWta0muf2grd05F2aiSmJPoMUlrccuzeoe0S1G
+         Pq/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770757149; x=1771361949;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kusL26LPbMr5Rw9lnPWQ7dyRdI23xbuWq0ePAxcLlsI=;
+        b=D8tLbc0+pPRYnqgGDORokwm2jsLKJYoUhqUrENYB2kzIryhJT6IW6sXZgGxFGlbXL0
+         AgFf7gQ7zeWubr954uHibnNIUwEbzCy7eKbJV50EldLZTLKE6ODT2WrxrNxPwfbHw/wn
+         V2QUZ3QOWimMKJ/G6uw8erpY1LkJ4FJqWVgrLortfPpxHkQPQoNn366wzPSInc2QjzRY
+         cpXaWbzlu5xGezt5U3cpUEcoH+hRgiBaHG1JFwCzZCxpyn0OAWrf0p+GT5jDit5dyNmw
+         YXMrsCsQU95UBy61N3LFGaIvUQbXMT9TAu1K/cDpNY5r3GllmV3Etv9CPsNts86eI9Lu
+         sTlA==
+X-Gm-Message-State: AOJu0Yx5JQ7QTwmhr7iDHobtJrbBE1gtU+4DJwIJkAd/6aCFMPL5UjqJ
+	al251ZV9BWF8qdGtkgq35h5AgW3I3xgJn3oxR9AuNCSiTFoiuTxpXtskztoPGg==
+X-Gm-Gg: AZuq6aK++lnQZX9CLip5uofBKq6A4au5FfmFALNUJhIa1D0fz2DHJ4XZKfc2CSgieMc
+	4T+Mpg+w+lrO8qobQs88m1Kn4FNfiqANGqKT3d9/gm/7uSQUOWnNC2waO5aCBfKBHFNwUaKg8gq
+	miZEdipmaOD9Quz6CczMjJiAlfUpJS1apmryR3M0RyRl4OoaWGO8eZkaigsrtpnWsidOGTbbs9C
+	SnpSNSKUoK71dOix1HrHNJW/KnORoycbINkLnASgtItoXOu+ridaEY4QYjlseKebncAOxFygznH
+	vNF7tpTf5Rm5alsGtv2L/Xhx90H86ztRE4PTr7TOax7Xx8m9krypJwdFK+AMB7m6OeGCaIFVtSZ
+	61l/amQo990BKtt4sjq72VHopvJy3sbsXtWlthZm+xcWkZd+wH5IQ7dwHYvIo4DHRlAh/n0F09o
+	7eb0Ex/YG13Y/RgcTld0rreutelb1Q+qsqtGB4Ycy6+aLgjjnn/bRisZjFSsy7S3y4Zg1Nw0zaD
+	3NTInbH2MPFVms0Lw==
+X-Received: by 2002:a05:6122:a19:b0:563:8339:6201 with SMTP id 71dfb90a1353d-5670602e0fbmr3951672e0c.17.1770757149038;
+        Tue, 10 Feb 2026 12:59:09 -0800 (PST)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-567072e9586sm5080768e0c.1.2026.02.10.12.59.07
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Feb 2026 12:59:08 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] client: Add mgmt.exp-iso command
+Date: Tue, 10 Feb 2026 15:58:58 -0500
+Message-ID: <20260210205859.1240075-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.300.41.1.7\))
-Subject: BlueZ Face-to-Face Meetup - Nice, France, May 30-31, 2026
-From: George Kiagiadakis <george.kiagiadakis@collabora.com>
-Resent-From: George Kiagiadakis <george.kiagiadakis@collabora.com>
-Date: Tue, 10 Feb 2026 21:54:55 +0200
-Content-Transfer-Encoding: quoted-printable
-Resent-Date: Tue, 10 Feb 2026 21:59:45 +0200
-Resent-To: linux-bluetooth@vger.kernel.org
-Message-Id: <3B603994-659D-4AF2-9E7C-5DA00DE14C94@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-X-Mailer: Apple Mail (2.3864.300.41.1.7)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hello everyone,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-We are pleased to announce a BlueZ face-to-face meetup in Nice, France =
-on May 30-31, 2026. The meetup is organized and sponsored by Collabora =
-and will take place right after the Embedded Recipes [1] conference, =
-co-located also with other events.
+This adds mgmt.exp-iso command which can be used to toggle ISO socket
+support:
 
-This is an excellent opportunity for developers and stakeholders to meet =
-in person, discuss current development priorities, and collaborate on =
-technical challenges. You are very welcome to join us!
+@ MGMT Command: Set Experimental Feature (0x004a) plen 17
+        UUID: BlueZ Experimental ISO Socket
+        Action: Enabled (0x01)
+@ MGMT Event: Command Complete (0x0001) plen 23
+      Set Experimental Feature (0x004a) plen 20
+        Status: Success (0x00)
+        UUID: BlueZ Experimental ISO Socket
+        Flags: 0x00000001
+          Active
+@ MGMT Event: Experimental Feature Changed (0x0027) plen 20
+        UUID: BlueZ Experimental ISO Socket
+        Flags: 0x00000001
+          Active
+---
+ client/mgmt.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-Announcement: https://github.com/orgs/bluez/discussions/1881
-Dates: Saturday, May 30th & Sunday, May 31st, 2026
-Location: Radisson Blu Hotel Nice
-
-Registration is free of charge, but we kindly ask you to confirm your =
-attendance by commenting on the GitHub discussion thread: =
-https://github.com/orgs/bluez/discussions/1881#discussioncomment-15756005=20=
-
-
-The meetup is strategically scheduled adjacent to several related =
-events:
-
-- Embedded Recipes conference (May 27-28) [1]
-- PipeWire hackfest (May 29-30) [2]
-- Linux Media Summit, Buldroot hackathon, libcamera, Yocto Project and =
-others... [3]
-- Bluetooth SIG Member Summit & UPF in Milan (June 2-7) - conveniently =
-accessible via train from Nice
-
-Note that the meetup will share the venue with the PipeWire hackfest on =
-Saturday. This co-location offers additional opportunity to nail down LE =
-Audio integration topics that are shared between the two projects.
-
-We look forward to productive discussions and the opportunity to =
-strengthen collaboration within the BlueZ community.
-
-Best regards,
-George
-
-[1]. https://embedded-recipes.org/2026/
-[2]. =
-https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/PipeWire-Hackfest=
--in-Nice---May-2026
-[3]. https://embedded-recipes.org/2026/colo/
-
---
-George Kiagiadakis
-Principal Software Engineer
-
-Collabora Limited | Unit 1.06, St John's Innovation Centre, Cowley Road, =
-Cambridge, CB4 0WS, UK
-Registered in England and Wales | Company No. 05513718
+diff --git a/client/mgmt.c b/client/mgmt.c
+index 968efdbca5b0..4e68547ed33c 100644
+--- a/client/mgmt.c
++++ b/client/mgmt.c
+@@ -2751,6 +2751,42 @@ static void cmd_exp_offload_codecs(int argc, char **argv)
+ 	}
+ }
+ 
++static void exp_iso_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	if (status != 0)
++		error("Set ISO Socket failed with status 0x%02x (%s)", status,
++					mgmt_errstr(status));
++	else
++		print("ISO Socket successfully set");
++
++	bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void cmd_exp_iso(int argc, char **argv)
++{
++	/* 6fbaf188-05e0-496a-9885-d6ddfdb4e03e */
++	static const uint8_t uuid[16] = {
++		0x3e, 0xe0, 0xb4, 0xfd, 0xdd, 0xd6, 0x85, 0x98,
++		0x6a, 0x49, 0xe0, 0x05, 0x88, 0xf1, 0xba, 0x6f
++	};
++	struct mgmt_cp_set_exp_feature cp;
++	uint8_t val;
++
++	if (parse_setting(argc, argv, &val) == false)
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	memset(&cp, 0, sizeof(cp));
++	memcpy(cp.uuid, uuid, 16);
++	cp.action = val;
++
++	if (mgmt_send(mgmt, MGMT_OP_SET_EXP_FEATURE, MGMT_INDEX_NONE,
++			sizeof(cp), &cp, exp_iso_rsp, NULL, NULL) == 0) {
++		error("Unable to set ISO Socket experimental feature");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++}
++
+ static void class_rsp(uint16_t op, uint16_t id, uint8_t status, uint16_t len,
+ 							const void *param)
+ {
+@@ -6166,6 +6202,8 @@ static const struct bt_shell_menu mgmt_menu = {
+ 		"Set bluetooth quality report feature"			},
+ 	{ "exp-offload",		"<on/off>",
+ 		cmd_exp_offload_codecs,	"Toggle codec support"		},
++	{ "exp-iso",		"<on/off>",
++		cmd_exp_iso,	"Toggle ISO support"		},
+ 	{ "read-sysconfig",	NULL,
+ 		cmd_read_sysconfig,	"Read System Configuration"	},
+ 	{ "set-sysconfig",	"<-v|-h> [options...]",
+-- 
+2.52.0
 
