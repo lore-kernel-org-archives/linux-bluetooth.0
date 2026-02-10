@@ -1,100 +1,77 @@
-Received: from mail3-164.sinamail.sina.com.cn (mail3-164.sinamail.sina.com.cn [202.108.3.164])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DA5348866
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 10:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FF035C1AC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 10:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770718164; cv=none; b=I6Fa9drLnnyZ5xhGdvNxlDO7I8Pqpsqy1Df2fslTTOicJXHOKzK4rz9SnaVmJBh2KbwgGIPwYaqpKsQgfwzeGIEyokSzMiYVp5TEuY8UBq4OI6+lNOZhsCFdHvLSdigKkiHFq6YzHJGn2XqSrLNfu3yOrpUlMtNlUWSGViyROuA=
+	t=1770719398; cv=none; b=NJHbbe4TuOQlh+NHrCpf5n3fQLl+8I38mWCxJ8+gt5Iwq1qqfA9BbMwa0myhJ1hN0XZQ6tGlIEsnxufpktImtxYew8zFJ3Foxm2AM4rlfpSDVnbED5sp9Kky0J5d8U8yqm5qkXgBHkrwcaPX/I4yrwVQIQg/Z5L6tCSo+j4txZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770718164; c=relaxed/simple;
-	bh=n/LWQmIaDNE15ogeCKRe10+58+bltyU9snPMp6dekpU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UVlBLWuyFd2lYTp49BJ98YCD1WsgDRJP/w6rlWjMPG+kRKYTBvzrY+7zF8eyxHHB/j56ARa/Srwn5AOhs0Bhkm1bvYY/WVvGEU0lGwgkLpejcwMaT4c8MZBRsc/0/iKHvePgCMjTtxUdiQyrzGm8UDB20ZNC5tiNqz5JK+rfiLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=FFhawP5z; arc=none smtp.client-ip=202.108.3.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1770719398; c=relaxed/simple;
+	bh=iLxGioLLHwSvqS6u3mxyB4GQN8p69h+wnke3zPYLRKs=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Sr0TPngUbWWg9FJZhCfeLo/RWLd5p0qtpdzoew1Y/mBUM6JoT7ahAjqXnvUrZDdxi20yHUxMmkBj2Ew+XESx2jrWmuI6z3LP7eQRoghkePsZ9sqIyUwPeRBKNFvWLkK8GJtyIm+RJe47Igy8UhdTd84afWv1Efv0O5LKPwQ5jvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jAMfAubo; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="FFhawP5z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1770718160;
-	bh=rRIrUhNpfeVkB86kErAQtkpy8NlmH1T/c8olBO2w7m8=;
-	h=From:Subject:Date:Message-ID;
-	b=FFhawP5zfY9OZV3uXOh9eJsvSNm1N13SkjLAyhxylU93mJPIG0GZDER4IQ0Boktzj
-	 n4eguwG/MFtoMBXLP6xhyAgAZt+OunYdTXKJj52sqm69wCQWnG+0Zm+s16a5yBMBNO
-	 dJx4K6KEmUYoG36tzipF17af6VE1JPlShMXLeBVU=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.32) with ESMTP
-	id 698B03C5000018D0; Tue, 10 Feb 2026 18:09:11 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 592674456656
-X-SMAIL-UIID: F0991A04D51546A59FA1844DE68F0485-20260210-180911-1
-From: Hillf Danton <hdanton@sina.com>
-To: kawada <youjingxiaogao2@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	linux-kernel@vger.kernel.org,
-	syzbot+3609b9b48e68e1fe47fd@syzkaller.appspotmail.com
-Subject: Re: [PATCH] Bluetooth: fix use-after-free in hci_conn_drop
-Date: Tue, 10 Feb 2026 18:08:59 +0800
-Message-ID: <20260210100901.2769-1-hdanton@sina.com>
-In-Reply-To: <CAKZCeSVJQAsYVSDBHOmUyBMbQqBA1D7ZP4KK-azWUjb+p-vpJg@mail.gmail.com>
-References: 
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jAMfAubo"
+Received: from github.com (hubbernetes-node-e7ca5b0.va3-iad.github.net [10.48.210.59])
+	by smtp.github.com (Postfix) with ESMTPA id 3F2783C1279
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 02:29:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1770719397;
+	bh=H1crPKrGtvGNg9n50QdIqjlpWQekvIAQUj4slAaJrb8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=jAMfAuboaMqp/YePmK8PgFxPmkOI5RZOanQ25gSDSPJ9iINoaYTGiFbnNUyhgy3gO
+	 eMwYpHQ9DKhL8CP4Lnq2r0yqCJmhB67wFTZTxObbvx8n6Ie5J0tRU/MZVetnWYY4kW
+	 YZXpIstndPe6Zpk98VSTjAdIITsotsKdZ50i5nJ0=
+Date: Tue, 10 Feb 2026 02:29:57 -0800
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1052631/000000-e2bb5a@github.com>
+Subject: [bluez/bluez] e2bb5a: emulator: Fix compilation on big endian systems
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-[ hm... top reply looks no good ]
+  Branch: refs/heads/1052631
+  Home:   https://github.com/bluez/bluez
+  Commit: e2bb5a9cd38cae80490fbd12cd3861ed8180f3a7
+      https://github.com/bluez/bluez/commit/e2bb5a9cd38cae80490fbd12cd386=
+1ed8180f3a7
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-02-10 (Tue, 10 Feb 2026)
 
-On Tue, 10 Feb 2026 15:08:12 +0900 Masahiro Kawada wrote:
-> > but the race still exists after this patch.
-> 
-> I agree that the TOCTOU issue remains. I looked into all the functions
-> that can be called as entry->destroy in hci_cmd_sync_work where the
-> second argument (data) is used as hci_conn*. I found five such
-> functions across two files:
-> 
-> In hci_sync.c:
->   - create_le_conn_complete
->   - create_pa_complete
->   - create_big_complete
->   - le_read_features_complete
-> 
-> In hci_conn.c:
->   - create_big_complete (separate static function)
-> 
-> Of these, create_le_conn_complete and create_pa_complete already use
-> hci_dev_lock, which effectively prevents this TOCTOU issue.
-> 
-> The remaining three are vulnerable:
->   - create_big_complete in hci_sync.c calls hci_conn_valid without
->     holding hci_dev_lock (TOCTOU)
->   - le_read_features_complete calls hci_conn_drop with no validity
->     check at all
->   - create_big_complete in hci_conn.c calls hci_connect_cfm and
->     hci_conn_del with no validity check at all
-> 
-> Given this, I believe the following set of patches would be
-> appropriate:
-> 
-> 1. Reorder hci_cmd_sync_dequeue before hci_conn_cleanup in
->    hci_conn_del
-> 2. Wrap all three vulnerable callbacks with hci_dev_lock and
->    hci_conn_valid, following the same pattern used by
->    create_le_conn_complete and create_pa_complete
-> 
-> If this approach sounds reasonable, I will prepare updated patches.
->
-Better not before spotting the reason why conn->refcnt failed to make the
-entry->destroy callback safe, given the complexity of the race.
+  Changed paths:
+    M emulator/bthost.c
+
+  Log Message:
+  -----------
+  emulator: Fix compilation on big endian systems
+
+This fixes the build on big endian systems like s390x:
+
+Remove the "static" so the array doesn't need to be initialised
+with constants.
+
+emulator/bthost.c: In function =E2=80=98bthost_setup_sco=E2=80=99:
+./src/shared/util.h:43:26: error: initializer element is not constant
+   43 | #define cpu_to_le32(val) bswap_32(val)
+      |                          ^~~~~~~~
+etc.
+
+Fixes: 85888a8357ea ("bthost: add bthost_setup_sco() and accept
+incoming eSCO")
+
+
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
