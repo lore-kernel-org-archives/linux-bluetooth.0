@@ -1,317 +1,166 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D84296BC1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 03:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691891624D5
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 04:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770695752; cv=none; b=LlY+uxObOIHwBSWS7eLqMH/q3xhQT2OVtpwEFhtlcDRHJ4v6Q2V0BKxpkvl0T9EDK54A042ZkXUedV4wWpic+u6wTrwplrCxFGJRAxff/UP187PdOqsbDhZ+aEC/Q6nTNj2c4QufaQhU9/A7iPuLO3wuBnMx/4EdLO4coISpads=
+	t=1770696138; cv=none; b=UcfGLDOrUKYpOUYhuOjXRPj2Uvr8kTu7LyqAeqfDifDtQC+EKGOgHY4cbezAYR6eNDqGfJ1NZi/Zdz6n7H7G7M5m2ckk/e5Qto7VVYTQwj/PXblyesdS8UNSSDx9NYVXVKzT2y2+UwFT4l+8lnHXbtMNGGJRwinMJddY0mZE5/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770695752; c=relaxed/simple;
-	bh=P3ogeKHPlFr7KdXmQQpbpFUgeUGzH8mC8N/NJXa0dpg=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=dTvsWcs6+Xghfv5OtV+QB2GuDzyTDHDOIE6Nv4jNkseggvRaaGXFaDOXiUFciRyN/2z3b7cxH9kk3pcpxrbRpnVHHaqLtpI2JgJViZ/9mtNotMzWWOIfEjTNuLqZUYgOMAB2EbX85nFm28s4steZVKc1YhdZ9q1Hc9Mru95VwIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=e8gFSyrs; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1770696138; c=relaxed/simple;
+	bh=k0YPAnAXTr6Hzmtu44FovV5NKXSFt6qFC2qsj7Lat6M=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=LihL1QccMmdXjQpe3hpYtBZnnIRsYUA+QhHrMEHh53CkWymPLrKbGhbXADIAPp3iVjpOSI1WVycsSSO9n3fwYVoUtYAvcnSoHmzNjMMf/2w9Hx+d+/a/wuf6LpjkiYIy7ZBYFsAAG7Zze26pq7SsF4Jlbbfd0MGPsWaa7oYRUzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VeiJuXSl; arc=none smtp.client-ip=74.125.82.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="e8gFSyrs"
-Received: from github.com (hubbernetes-node-e9f81e4.ac4-iad.github.net [10.52.183.52])
-	by smtp.github.com (Postfix) with ESMTPA id B2F8140033F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Feb 2026 19:55:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1770695749;
-	bh=rmD2//DmTGcNfjBq2v1YQ5AJWYvx9fkIyRsPTAlFYIU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=e8gFSyrsNtr7EZ2MPGHHCugGnTnnFW8TBlMu8Gl2dD06ICWNmx3pqSoVHL3s34H0z
-	 cZZRtIIWXv+e9WyvtUK734VGFk0jrPEMTiu68t0c9W9JBrrnEiwLMg9F1uqGXwQDwl
-	 tdb/d1uEv0M4W7oZ3dmwlWBBELurBz/iCIQZS+v4=
-Date: Mon, 09 Feb 2026 19:55:49 -0800
-From: MengshiWu-mengshiw <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1052474/000000-1f28d0@github.com>
-Subject: [bluez/bluez] 1f28d0: gatt-client:Implement error handling for
- DB_OUT_OF...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VeiJuXSl"
+Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-1233b953bebso730104c88.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Feb 2026 20:02:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770696136; x=1771300936; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=k0YPAnAXTr6Hzmtu44FovV5NKXSFt6qFC2qsj7Lat6M=;
+        b=VeiJuXSlfS6xcarx7FEn3wkjofYmNa7IuLlNpfgOAm7b2MiYt6xo4BouGDPIUJzTJq
+         BYJmtpVnehk7xqH+eYu2PjMqqJarp6YmUPu3vNmRMO78fuqrznRq2GVR5zbxEZsVTaMM
+         tVflyo/UyK67LoM+/pt9eiU/4SyCsiQRXB9w8CYEq+dUAGvsumhEs5d70CaDpvUVQ41T
+         iAG9we7JFC1ppZKWlPDmqZbVV6CnPmjKegREjaS7qzdgLOPU9GHfWUPQOoBDWiJHu2iJ
+         mmcunZ+VqvXMsWaIBzs5DQr2s78Y7izKWzPV1LEqgI3/TpX2aqGfhBV80wWKCMBV0avS
+         CMpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770696136; x=1771300936;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k0YPAnAXTr6Hzmtu44FovV5NKXSFt6qFC2qsj7Lat6M=;
+        b=Vl575zKg3BQLtZG7ZJIk6lR5I60rLfbpOHOGLKrlBCM3UYy6MFQMFoSh97hK5IGou3
+         8IuJqVuR0ZBJ4WCQgwny7G8LvgpqzfHlonpEuNLvKD6kFkOjjeJdG5+Jh8zRCmVtT0R2
+         5LZTbXhourQz0HNZjTLZ7HbX07kmJRMmJOHGTGPVhGggoy8B8NqUDdstoWvO+/zkZsTf
+         hqL0YHJS/NpQCCGK+Fx3B/9rRkJwcLB2w2xLfn1eQNgKGfAyAZENhJDDZBVKyxpOc+w/
+         Gih8WzROrYnmx0sQs5O6zK7fQgCoK+Xf0zyMCNf0Lj5JkXqY4c/FH1rlVrzrx478APd6
+         +p4Q==
+X-Gm-Message-State: AOJu0YzcLyNfsOvnWz8GozioQFpAoLJQr+v/K/e9T+Muolk0XgWw7bJS
+	q3DNsnjeVCuyePHbMp4AI8xltaWfG/ChXdtyh5HmlgzqEKCVepAcCOgewrfPoMRe
+X-Gm-Gg: AZuq6aJo+kQEjR/aTv+gq5ZlhAqJxN9cRBrNNpwRXnUevukFKJBUJWZ/Eq2n9M0dwz4
+	25dwZq1icp2Im9ZvCsZQ3lPVmGVpD+A/aOnUw0Gi0gLN4kYThN70HIconCnesSa9rZAv+vFwGgb
+	XJekTsTRDs++FuQl9D2ufP4ai9rOANQjvRIK7RpxKAA1CXR0ZqC8sDHK9NIHq3hNzVaHwosyJtd
+	tNfy3VT8fSA4d33zkpmlwTzA34ef62zveiaBHyXF1h2AVEe9E3vKpBK778KdsMpvwl7uGn6SL/8
+	pKIZSHKGF2bh4U8lQy4IuunTYOxIKMlctPxUmlKqkS9zSbXRyhX0+zdP0O7sHDsuf93nxWE32cM
+	Y2wDMvidefXthIzUmSFyyDKDT/4k8Pp90s3+NDDC051vGDbwUTRyWJR4mvL/TXKbTPJsSObKZrr
+	x0aJRsgp03CEo8qer1hdey9u8Z+DGMAg==
+X-Received: by 2002:a05:7022:220b:b0:119:e56b:c74b with SMTP id a92af1059eb24-12704001542mr6333839c88.16.1770696136109;
+        Mon, 09 Feb 2026 20:02:16 -0800 (PST)
+Received: from [172.17.0.2] ([20.171.125.208])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12715c4dd76sm6478827c88.10.2026.02.09.20.02.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Feb 2026 20:02:15 -0800 (PST)
+Message-ID: <698aadc7.050a0220.122e9b.d67f@mx.google.com>
+Date: Mon, 09 Feb 2026 20:02:15 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4265204079367727214=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, mengshi.wu@oss.qualcomm.com
+Subject: RE: [v4] gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching
+In-Reply-To: <20260210011347.3237740-1-mengshi.wu@oss.qualcomm.com>
+References: <20260210011347.3237740-1-mengshi.wu@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1052474
-  Home:   https://github.com/bluez/bluez
-  Commit: 1f28d070b008f74dc6b40cbff443136e24836d46
-      https://github.com/bluez/bluez/commit/1f28d070b008f74dc6b40cbff4431=
-36e24836d46
-  Author: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-  Date:   2026-02-10 (Tue, 10 Feb 2026)
+--===============4265204079367727214==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-  Changed paths:
-    M src/shared/att.c
-    M src/shared/att.h
-    M src/shared/gatt-client.c
-    M src/shared/gatt-helpers.c
-    M src/shared/gatt-helpers.h
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTA1MjQ3NAoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgUEVORElORyAgIDAuMzcgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+RU5ESU5HICAgMC40MSBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAxOS45NSBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAg
+ICAxMy42MSBzZWNvbmRzCk1ha2VDaGVjayAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAy
+NS42MCBzZWNvbmRzCk1ha2VEaXN0Y2hlY2sgICAgICAgICAgICAgICAgIFBBU1MgICAgICAyNDIu
+NDEgc2Vjb25kcwpDaGVja1ZhbGdyaW5kICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTEuOTcg
+c2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTMuOTggc2Vj
+b25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBGQUlMICAgICAgMTEuMjcgc2Vjb25k
+cwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBQRU5ESU5HICAgMC40MCBzZWNvbmRzClNj
+YW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNC4xOSBzZWNvbmRzCgpEZXRh
+aWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gUEVO
+RElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgoKIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQRU5ESU5HCkRlc2M6IFJ1biBnaXRs
+aW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1h
+a2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnNyYy9zaGFyZWQvYXR0LmM6MTg3
+Mjo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0X2F0dF9kYl9zeW5j
+X2NhbmNlbOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KIDE4NzIgfCBib29sIGJ0
+X2F0dF9kYl9zeW5jX2NhbmNlbChzdHJ1Y3QgYnRfYXR0X2NoYW4gKmNoYW4sIHVuc2lnbmVkIGlu
+dCBpZCkKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5n
+cyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc4MDM6IHNy
+Yy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWF0dC5sb10gRXJyb3IgMQptYWtlWzFdOiAq
+KiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2VmaWxlOjQy
+MDU6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFr
+ZUNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjawpPdXRwdXQ6CgpzcmMvc2hh
+cmVkL2F0dC5jOjE4NzI6NjogZXJyb3I6IG5vIHByZXZpb3VzIGRlY2xhcmF0aW9uIGZvciDigJhi
+dF9hdHRfZGJfc3luY19jYW5jZWzigJkgWy1XZXJyb3I9bWlzc2luZy1kZWNsYXJhdGlvbnNdCiAx
+ODcyIHwgYm9vbCBidF9hdHRfZGJfc3luY19jYW5jZWwoc3RydWN0IGJ0X2F0dF9jaGFuICpjaGFu
+LCB1bnNpZ25lZCBpbnQgaWQpCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn4KY2Mx
+OiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtl
+ZmlsZTo3NTIzOiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9nbGliX2xhLWF0dC5sb10gRXJyb3IgMQpt
+YWtlOiAqKiogW01ha2VmaWxlOjEwODY4OiBjaGVja10gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tWYWxncmluZCAtIEZBSUwKRGVzYzogUnVuIEJsdWV6
+IE1ha2UgQ2hlY2sgd2l0aCBWYWxncmluZApPdXRwdXQ6CgpzcmMvc2hhcmVkL2F0dC5jOjE4NzI6
+NjogZXJyb3I6IG5vIHByZXZpb3VzIGRlY2xhcmF0aW9uIGZvciDigJhidF9hdHRfZGJfc3luY19j
+YW5jZWzigJkgWy1XZXJyb3I9bWlzc2luZy1kZWNsYXJhdGlvbnNdCiAxODcyIHwgYm9vbCBidF9h
+dHRfZGJfc3luY19jYW5jZWwoc3RydWN0IGJ0X2F0dF9jaGFuICpjaGFuLCB1bnNpZ25lZCBpbnQg
+aWQpCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3Mg
+YmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo3ODAzOiBzcmMv
+c2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1hdHQubG9dIEVycm9yIDEKbWFrZVsxXTogKioq
+IFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZToxMDg2
+ODogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENo
+ZWNrU21hdGNoIC0gRkFJTApEZXNjOiBSdW4gc21hdGNoIHRvb2wgd2l0aCBzb3VyY2UKT3V0cHV0
+OgoKc3JjL3NoYXJlZC9jcnlwdG8uYzoyNzE6MjE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBh
+cnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2NyeXB0by5jOjI3MjoyMzogd2FybmluZzogVmFyaWFi
+bGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1oZWxwZXJzLmM6NzY4OjMx
+OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0
+LWhlbHBlcnMuYzo4NDY6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2Vk
+LgpzcmMvc2hhcmVkL2F0dC5jOjE4NzI6NjogZXJyb3I6IG5vIHByZXZpb3VzIGRlY2xhcmF0aW9u
+IGZvciDigJhidF9hdHRfZGJfc3luY19jYW5jZWzigJkgWy1XZXJyb3I9bWlzc2luZy1kZWNsYXJh
+dGlvbnNdCiAxODcyIHwgYm9vbCBidF9hdHRfZGJfc3luY19jYW5jZWwoc3RydWN0IGJ0X2F0dF9j
+aGFuICpjaGFuLCB1bnNpZ25lZCBpbnQgaWQpCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn5+fn5+
+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzoxMzM5OjMxOiB3YXJuaW5nOiBWYXJpYWJs
+ZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzoxMzcwOjIz
+OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4KY2MxOiBhbGwgd2Fybmlu
+Z3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo3ODAzOiBz
+cmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1hdHQubG9dIEVycm9yIDEKbWFrZVsxXTog
+KioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0
+MjA1OiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IGJs
+dWV6bWFrZWV4dGVsbCAtIEZBSUwKRGVzYzogQnVpbGQgQmx1ZXogd2l0aCBFeHRlcm5hbCBFTEwK
+T3V0cHV0OgoKc3JjL3NoYXJlZC9hdHQuYzoxODcyOjY6IGVycm9yOiBubyBwcmV2aW91cyBkZWNs
+YXJhdGlvbiBmb3Ig4oCYYnRfYXR0X2RiX3N5bmNfY2FuY2Vs4oCZIFstV2Vycm9yPW1pc3Npbmct
+ZGVjbGFyYXRpb25zXQogMTg3MiB8IGJvb2wgYnRfYXR0X2RiX3N5bmNfY2FuY2VsKHN0cnVjdCBi
+dF9hdHRfY2hhbiAqY2hhbiwgdW5zaWduZWQgaW50IGlkKQogICAgICB8ICAgICAgXn5+fn5+fn5+
+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
+a2VbMV06ICoqKiBbTWFrZWZpbGU6NzgwMzogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3Bf
+bGEtYXR0LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpv
+YnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDIwNTogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJbmNyZW1lbnRhbEJ1aWxkIC0gUEVORElORwpEZXNj
+OiBJbmNyZW1lbnRhbCBidWlsZCB3aXRoIHRoZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0
+OgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFNjYW5CdWlsZCAtIEZBSUwK
+RGVzYzogUnVuIFNjYW4gQnVpbGQKT3V0cHV0OgoKc3JjL3NoYXJlZC9hdHQuYzoxODcyOjY6IGVy
+cm9yOiBubyBwcmV2aW91cyBkZWNsYXJhdGlvbiBmb3Ig4oCYYnRfYXR0X2RiX3N5bmNfY2FuY2Vs
+4oCZIFstV2Vycm9yPW1pc3NpbmctZGVjbGFyYXRpb25zXQogMTg3MiB8IGJvb2wgYnRfYXR0X2Ri
+X3N5bmNfY2FuY2VsKHN0cnVjdCBidF9hdHRfY2hhbiAqY2hhbiwgdW5zaWduZWQgaW50IGlkKQog
+ICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5n
+IHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NzgwMzogc3JjL3NoYXJl
+ZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtYXR0LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0
+aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDIwNTogYWxs
+XSBFcnJvciAyCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAoK
 
-  Log Message:
-  -----------
-  gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching=
-
-
-Implement automatic retry logic for GATT operations that fail with
-DB_OUT_OF_SYNC error (0x12).
-
-This implementation follows the GATT caching specification and provides
-robust error recovery while minimizing unnecessary service discovery
-operations.
-
-When a DB_OUT_OF_SYNC error occurs, the implementation:
-
-1. Pauses the failed operation in a pending_db_sync state
-2. Notifies the GATT client layer via db_sync_callback
-3. Reads the remote Database Hash characteristic (0x2B2A)
-4. Compares it with the locally cached hash value
-5. If hashes match: Retries the operation (database is in sync)
-6. If hashes differ: Triggers full service discovery
-
-Workflow:
----------
-
-Hash Match Case:
-  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
-                                      =E2=86=93 (DB_OUT_OF_SYNC error)
-  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
-                =E2=86=93
-         Read DB Hash (0x2B2A)
-                =E2=86=93
-         Compare with local cache
-                =E2=86=93 (Match)
-         bt_att_resend(att, id, ...)
-                =E2=86=93
-  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device (=
-retry)
-                                      =E2=86=93 (Success)
-  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
-
-Hash Differ Case:
-  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
-                                      =E2=86=93 (DB_OUT_OF_SYNC error)
-  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
-                =E2=86=93
-         Read DB Hash (0x2B2A)
-                =E2=86=93
-         Compare with local cache
-                =E2=86=93 (Differ)
-         bt_att_cancel(att, id)
-                =E2=86=93
-         Trigger Service Discovery
-                =E2=86=93
-  App =E2=86=90 GATT Client (operation failed, discovery in progress)
-
-Service Changed Ind Received (Handle Outside Affected Range):
-  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
-                                      =E2=86=93 (DB_OUT_OF_SYNC error)
-  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
-                =E2=86=93
-         Service Changed Ind arrives
-                =E2=86=93
-         Check error handle vs affected range
-                =E2=86=93 (Outside range)
-         bt_att_resend(att, id, ...)
-                =E2=86=93
-  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device (=
-retry)
-                                      =E2=86=93 (Success)
-  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
-
-Service Changed Ind Received (Handle Inside Affected Range):
-  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
-                                      =E2=86=93 (DB_OUT_OF_SYNC error)
-  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
-                =E2=86=93
-         Service Changed Ind arrives
-                =E2=86=93
-         Check error handle vs affected range
-                =E2=86=93 (Inside range)
-         bt_att_cancel(att, id)
-                =E2=86=93
-         Service Discovery already in progress
-                =E2=86=93
-  App =E2=86=90 GATT Client (operation failed, discovery in progress)
-
-btmon traffics:
---------------
-
-Hash Match Case:
-
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7   #1 [hci1]
-13.675271
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x000d
-> HCI Event: Number of Completed Packets (0x13) plen 5         #2 [hci1]
-> 13.694287
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 9                      #3 [hci1]
-> 13.728279
-      ATT: Error Response (0x01) len 4
-        Read Request (0x0a)
-        Handle: 0x000d
-        Error: Database Out of Sync (0x12)
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11  #4 [hci1]
-13.730759
-      ATT: Read By Type Request (0x08) len 6
-        Handle range: 0x0001-0xffff
-        Attribute type: Database Hash (0x2b2a)
-> HCI Event: Number of Completed Packets (0x13) plen 5         #5 [hci1]
-> 13.754290
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 24                     #6 [hci1]
-> 13.820283
-      ATT: Read By Type Response (0x09) len 19
-        Attribute data length: 18
-        Attribute data list: 1 entry
-        Handle: 0x000f
-        Value: f74347d19eef647d97f0b2f7af502e33
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11  #7 [hci1]
-13.822792
-      ATT: Read By Type Request (0x08) len 6
-        Handle range: 0x0010-0xffff
-        Attribute type: Database Hash (0x2b2a)
-> HCI Event: Number of Completed Packets (0x13) plen 5         #8 [hci1]
-> 13.842581
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 9                      #9 [hci1]
-> 13.880369
-      ATT: Error Response (0x01) len 4
-        Read By Type Request (0x08)
-        Handle: 0x0010
-        Error: Attribute Not Found (0x0a)
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7   #10
-[hci1] 13.880999
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x000d
-> HCI Event: Number of Completed Packets (0x13) plen 5         #11
-> [hci1] 13.904288
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 6                      #12
-> [hci1] 13.940273
-      ATT: Read Response (0x0b) len 1
-
---------------------
-Hash differ case:
-
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7
-#16 [hci1] 50.132674
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x000d
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> #17 [hci1] 50.171857
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 9
-> #18 [hci1] 50.171970
-      ATT: Error Response (0x01) len 4
-        Read Request (0x0a)
-        Handle: 0x000d
-        Error: Database Out of Sync (0x12)
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
-#19 [hci1] 50.172613
-      ATT: Read By Type Request (0x08) len 6
-        Handle range: 0x0001-0xffff
-        Attribute type: Database Hash (0x2b2a)
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> #20 [hci1] 50.201854
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 24
-> #21 [hci1] 50.268291
-      ATT: Read By Type Response (0x09) len 19
-        Attribute data length: 18
-        Attribute data list: 1 entry
-        Handle: 0x000f
-        Value: 5fa98eed072ee317aa521990be294bf3
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
-#22 [hci1] 50.269302
-      ATT: Read By Type Request (0x08) len 6
-        Handle range: 0x0010-0xffff
-        Attribute type: Database Hash (0x2b2a)
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> #23 [hci1] 50.291849
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 9
-> #24 [hci1] 50.419999
-      ATT: Error Response (0x01) len 4
-        Read By Type Request (0x08)
-        Handle: 0x0010
-        Error: Attribute Not Found (0x0a)
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
-#25 [hci1] 50.422616
-      ATT: Read By Group Type Request (0x10) len 6
-        Handle range: 0x0001-0xffff
-        Attribute group type: Primary Service (0x2800)
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> #26 [hci1] 50.471607
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 24
-> #27 [hci1] 50.471663
-      ATT: Read By Group Type Response (0x11) len 19
-        Attribute data length: 6
-        Attribute group list: 3 entries
-        Handle range: 0x0001-0x0007
-        UUID: Generic Access Profile (0x1800)
-        Handle range: 0x0008-0x0011
-        UUID: Generic Attribute Profile (0x1801)
-        Handle range: 0x0012-0x0014
-        UUID: Device Information (0x180a)
---------------------
-
-Changes from v3:
- - Reuses existing bt_att_resend() and bt_att_cancel() functions
- - Add new structure pending_db_sync
- - Link to v3
-   https://lore.kernel.org/all/20260121083804.4010106-1-mengshi.wu@oss.qu=
-alcomm.com/
-
-Changes from v2:
- - Detects DB_OUT_OF_SYNC errors during GATT operations
- - Extracts affected handles from the original request PDU
- - Checks if Service Changed indications overlap with those handles
- - Verifies database consistency using Database Hash characteristic
- - Automatically retries the original request if DB is consistent
- - Automatically retries the original request if handle is not affected
- - Link to v2
-   https://lore.kernel.org/all/20260105103828.105346-1-mengshi.wu@oss.qua=
-lcomm.com/
-
-Changes from v1:
- - Implement automatic recovery when ATT_ECODE_DB_OUT_OF_SYNC error is
-   received from the remote device.
- - Link to v1
-   https://lore.kernel.org/all/20251208101915.247459-1-mengshi.wu@oss.qua=
-lcomm.com/
-
-Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-
-
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+--===============4265204079367727214==--
