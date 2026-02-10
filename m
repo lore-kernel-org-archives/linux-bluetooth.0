@@ -1,855 +1,355 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BF5211A28
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 01:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DED248F47;
+	Tue, 10 Feb 2026 01:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770686037; cv=none; b=jTrsa12xRqxQ4Z11kxmtqOulZrBmSvEFoDtV5JqaiAhytXtKnLh5Lp7Fc+tknPbmV3KW2oOWylACvKACfYr76s5IUUtzvLWproqhn+IrEr9z9xU62ZUtwoAuU/s8POP3QBhmSZ+m0U3CUGMtbIwmfcYzfcxjOO4YlK1y7G8mxXs=
+	t=1770686657; cv=none; b=f3XjnQxEcqiYRZiYqCL9FU0XCd0HGVfi9py7Zu1mod7kPMyrAfH2UjESmGHCJfIM9ShmpdEI2X5c7Q+rmy48TikG+oG3RyRCBMuJVbSR7Peg+38BbdP47NLM09A9tzOWqtLhhZvtrLb83/lyKaFJV2z9bPIvXls27BRv++Ddl74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770686037; c=relaxed/simple;
-	bh=ymrSpHCsIxZtyQ2TeTkEMHkG5tnd5nhX+MB+dqRRpCg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=QIMvFEUjEagenIiu8VHyxNxKw7zPCzDRIa3OC/z/3BCbz40d77zUqScYQKdfd0XybEUJI3unOY6f7WKwQi45LVqZyXSKgVxusaKeMoCM6rYgTVwLQxXDoEByXgCshRYNw3tb8Rea7BkrLBtCV01kwIPYS3Or+/VhNho75Dma2Zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Bx2rbq7E; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1770686657; c=relaxed/simple;
+	bh=PvVwudmtPtjsX5UGyZSa5MCCsZnjurcZGYxWo/bgphY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KIy6XxfvW2DuxfWNYT8qjRce/vuSbKl1DXopzKBKUxnO4vVq0WeL/4VP6Hg/rQaWwSTN2VYup3W3brdb0hAIBXucjJ2Ftilug+na0b72HGbgguTscAkWTmv0QA7XNggN4kWQ7TkP1dZwugjGMi4/It1JS62NXUDVweQN0Q0vdAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CxZgKlNZ; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Bx2rbq7E"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 619I1mw73699967
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 01:13:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=Gr0FYIqSZKHIMV5+IGoyOP
-	UuQt1EGFSj6CLCGcql7Ws=; b=Bx2rbq7E+P7v5+zGtwMANTc9tusy/3TFJYSleR
-	KybeHlHH0rJpk/KfT4Xp9cQtnz9Ev8tFPifWLwKvf68srY/wGG1iZcTI+7gSEFvB
-	J7e4QWmVyi4RoDxiLuwwJqzvqL1WThHgKbSMiUbg1rNNtamy1+O4aGtEv7x0Mswm
-	a0/8mX7wwlIv3p6maMXyUNJO2Ma4R0GM6txnMwtEUAY6e2GwlpIkz9HzLHEw0QeI
-	xZNgSiZRr+tTJQpJCWJJvbQbLld0cU7ylXFA+Fm3IOvoVGa0wEQFoE4oOiKrIxat
-	J8tUPw/YGLbn1nF0Q8iJAaGUAO/p22BM/wkzXhacz4DjF2PQ==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c7e4mamm7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 01:13:54 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 61A1DpX2031973
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 01:13:51 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4c5xfmgg43-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 01:13:51 +0000
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 61A1DpG4031967
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 01:13:51 GMT
-Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 61A1DpwO031963
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Feb 2026 01:13:51 +0000
-Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4766378)
-	id 4673123256; Tue, 10 Feb 2026 09:13:50 +0800 (CST)
-From: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: shuai.zhang@oss.qualcomm.com, cheng.jiang@oss.qualcomm.com,
-        chezhou@qti.qualcomm.com, wei.deng@oss.qualcomm.com,
-        yiboz@qti.qualcomm.com, jinwang.li@oss.qualcomm.com,
-        Mengshi Wu <mengshi.wu@oss.qualcomm.com>
-Subject: [PATCH v4] gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching
-Date: Tue, 10 Feb 2026 09:13:47 +0800
-Message-Id: <20260210011347.3237740-1-mengshi.wu@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CxZgKlNZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770686655; x=1802222655;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PvVwudmtPtjsX5UGyZSa5MCCsZnjurcZGYxWo/bgphY=;
+  b=CxZgKlNZbYukUqhGElF6iTRnpfI5BnLlYTZI5Ogq3TOcMbUCrhSkVlWB
+   LzApT1QbNtgZ8QUsDoEjw7Z9Mq+wZ9j4/ovwz6jH1mAi11QnB22ozAEYf
+   j3B162S+iwrhxxD3Q+jv0/STykoasUennpwWpDBpzsDG2j4d8gUo9RCw6
+   ++ah2lC0WXnqNdBSV9Sp2CdNllkdSRM/BN0eh5Yl5lmzxqq8qKx3UmxFB
+   ACIm3rVXMsZAk0mgnSzokNRl2wmHbzA02MKzxLkf4olOWqRvUM35w8g1r
+   HBJc9reVeGRCV/ZMA7lxpbYaaE6GTgjMC/H3FFza3773DDCzb47Wd9WPU
+   g==;
+X-CSE-ConnectionGUID: Y+sSw/jVTLOAHCDcoWmIew==
+X-CSE-MsgGUID: LWuw1pdsQviUlhviNmwy7Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11696"; a="83179838"
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="83179838"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 17:24:14 -0800
+X-CSE-ConnectionGUID: VHgs0qttSjSFC5/I06D6MA==
+X-CSE-MsgGUID: 0TO677yTS66fSIKNkE1tNg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="216275893"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 09 Feb 2026 17:24:09 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vpcU2-00000000oUS-1Nar;
+	Tue, 10 Feb 2026 01:24:06 +0000
+Date: Tue, 10 Feb 2026 09:23:31 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vivek Sahu <vivek.sahu@oss.qualcomm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>
+Cc: oe-kbuild-all@lists.linux.dev, quic_mohamull@quicinc.com,
+	quic_hbandi@quicinc.com, linux-bluetooth@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	Vivek Sahu <vivek.sahu@oss.qualcomm.com>
+Subject: Re: [PATCH v2 2/2] Bluetooth: qca: add QCC2072 support
+Message-ID: <202602100949.3T4kUNgD-lkp@intel.com>
+References: <20260209070356.187301-2-vivek.sahu@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: -GihLjiXpc7rjQvu9d27sLVS_LqppOE9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEwMDAwOCBTYWx0ZWRfX7GlU8nIuJw8z
- mvXfJm373KzawIqXn6IKQnYmR38Ktyf+cgLjdoTUqfkf7Ul2o+/u6ZHSPzsEBos5hHmAqdv8RdL
- /tLub9KTHPiRHxLwyinZe81pqv1HwprBWv+DFZwf+fDkrTE/KOhmmqCRlvY81+o/4XZGseOZS64
- pvl3JUk9jvBXYrPY/QxHnfrN0iWKa22njfcjFqK+PaMqq68cTUZOMQt5Pr5DGTcyN8lQbGdhkjn
- UJ3iS0ZHatS2XlqHWrZ+65g0ceSWBGsTJ9+rCvU0hXtp/MXVuBHngyuBNLrxLsPZg/Ka0I6NYsD
- A5LoSadIAEIKnHMHd9VhIfDPUPm9KlBZBEwljoIlDMcZ0fM0jtQTR7m2PjNWNbXp4gZsD1jl3SK
- rh8Ik8jHnatYJLgiTx4BCGv5AyfX8gN/UJ3DXeKUQPIEDKq0B0O7rl9CpwyivdkdpYl3CIgjkL+
- JYMw0gi+N2gnWUDgtFQ==
-X-Proofpoint-ORIG-GUID: -GihLjiXpc7rjQvu9d27sLVS_LqppOE9
-X-Authority-Analysis: v=2.4 cv=WecBqkhX c=1 sm=1 tr=0 ts=698a8652 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=HLTaChWyi7ovutuIgR0A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-09_01,2026-02-09_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=0 malwarescore=0 bulkscore=0 phishscore=0
- spamscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602100008
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260209070356.187301-2-vivek.sahu@oss.qualcomm.com>
 
-Implement automatic retry logic for GATT operations that fail with
-DB_OUT_OF_SYNC error (0x12).
+Hi Vivek,
 
-This implementation follows the GATT caching specification and provides
-robust error recovery while minimizing unnecessary service discovery
-operations.
+kernel test robot noticed the following build warnings:
 
-When a DB_OUT_OF_SYNC error occurs, the implementation:
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on robh/for-next linus/master v6.19]
+[cannot apply to bluetooth-next/master next-20260205]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-1. Pauses the failed operation in a pending_db_sync state
-2. Notifies the GATT client layer via db_sync_callback
-3. Reads the remote Database Hash characteristic (0x2B2A)
-4. Compares it with the locally cached hash value
-5. If hashes match: Retries the operation (database is in sync)
-6. If hashes differ: Triggers full service discovery
+url:    https://github.com/intel-lab-lkp/linux/commits/Vivek-Sahu/Bluetooth-qca-add-QCC2072-support/20260209-150905
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20260209070356.187301-2-vivek.sahu%40oss.qualcomm.com
+patch subject: [PATCH v2 2/2] Bluetooth: qca: add QCC2072 support
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20260210/202602100949.3T4kUNgD-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260210/202602100949.3T4kUNgD-lkp@intel.com/reproduce)
 
-Workflow:
----------
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602100949.3T4kUNgD-lkp@intel.com/
 
-Hash Match Case:
-  App → GATT Client → ATT Layer → Remote Device
-                                      ↓ (DB_OUT_OF_SYNC error)
-  App ← GATT Client ← ATT Layer ← Remote Device
-                ↓
-         Read DB Hash (0x2B2A)
-                ↓
-         Compare with local cache
-                ↓ (Match)
-         bt_att_resend(att, id, ...)
-                ↓
-  App → GATT Client → ATT Layer → Remote Device (retry)
-                                      ↓ (Success)
-  App ← GATT Client ← ATT Layer ← Remote Device
+All warnings (new ones prefixed by >>):
 
-Hash Differ Case:
-  App → GATT Client → ATT Layer → Remote Device
-                                      ↓ (DB_OUT_OF_SYNC error)
-  App ← GATT Client ← ATT Layer ← Remote Device
-                ↓
-         Read DB Hash (0x2B2A)
-                ↓
-         Compare with local cache
-                ↓ (Differ)
-         bt_att_cancel(att, id)
-                ↓
-         Trigger Service Discovery
-                ↓
-  App ← GATT Client (operation failed, discovery in progress)
-
-Service Changed Ind Received (Handle Outside Affected Range):
-  App → GATT Client → ATT Layer → Remote Device
-                                      ↓ (DB_OUT_OF_SYNC error)
-  App ← GATT Client ← ATT Layer ← Remote Device
-                ↓
-         Service Changed Ind arrives
-                ↓
-         Check error handle vs affected range
-                ↓ (Outside range)
-         bt_att_resend(att, id, ...)
-                ↓
-  App → GATT Client → ATT Layer → Remote Device (retry)
-                                      ↓ (Success)
-  App ← GATT Client ← ATT Layer ← Remote Device
-
-Service Changed Ind Received (Handle Inside Affected Range):
-  App → GATT Client → ATT Layer → Remote Device
-                                      ↓ (DB_OUT_OF_SYNC error)
-  App ← GATT Client ← ATT Layer ← Remote Device
-                ↓
-         Service Changed Ind arrives
-                ↓
-         Check error handle vs affected range
-                ↓ (Inside range)
-         bt_att_cancel(att, id)
-                ↓
-         Service Discovery already in progress
-                ↓
-  App ← GATT Client (operation failed, discovery in progress)
-
-btmon traffics:
---------------
-
-Hash Match Case:
-
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7   #1 [hci1]
-13.675271
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x000d
-> HCI Event: Number of Completed Packets (0x13) plen 5         #2 [hci1]
-> 13.694287
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 9                      #3 [hci1]
-> 13.728279
-      ATT: Error Response (0x01) len 4
-        Read Request (0x0a)
-        Handle: 0x000d
-        Error: Database Out of Sync (0x12)
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11  #4 [hci1]
-13.730759
-      ATT: Read By Type Request (0x08) len 6
-        Handle range: 0x0001-0xffff
-        Attribute type: Database Hash (0x2b2a)
-> HCI Event: Number of Completed Packets (0x13) plen 5         #5 [hci1]
-> 13.754290
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 24                     #6 [hci1]
-> 13.820283
-      ATT: Read By Type Response (0x09) len 19
-        Attribute data length: 18
-        Attribute data list: 1 entry
-        Handle: 0x000f
-        Value: f74347d19eef647d97f0b2f7af502e33
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11  #7 [hci1]
-13.822792
-      ATT: Read By Type Request (0x08) len 6
-        Handle range: 0x0010-0xffff
-        Attribute type: Database Hash (0x2b2a)
-> HCI Event: Number of Completed Packets (0x13) plen 5         #8 [hci1]
-> 13.842581
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 9                      #9 [hci1]
-> 13.880369
-      ATT: Error Response (0x01) len 4
-        Read By Type Request (0x08)
-        Handle: 0x0010
-        Error: Attribute Not Found (0x0a)
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7   #10
-[hci1] 13.880999
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x000d
-> HCI Event: Number of Completed Packets (0x13) plen 5         #11
-> [hci1] 13.904288
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 6                      #12
-> [hci1] 13.940273
-      ATT: Read Response (0x0b) len 1
+>> drivers/bluetooth/btqca.c:830:3: warning: unannotated fall-through between switch labels [-Wimplicit-fallthrough]
+     830 |                 case QCA_WCN3950:
+         |                 ^
+   drivers/bluetooth/btqca.c:830:3: note: insert '__attribute__((fallthrough));' to silence this warning
+     830 |                 case QCA_WCN3950:
+         |                 ^
+         |                 __attribute__((fallthrough)); 
+   drivers/bluetooth/btqca.c:830:3: note: insert 'break;' to avoid fall-through
+     830 |                 case QCA_WCN3950:
+         |                 ^
+         |                 break; 
+   1 warning generated.
 
 
---------------------
-Hash differ case:
+vim +830 drivers/bluetooth/btqca.c
 
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7
-#16 [hci1] 50.132674
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x000d
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> #17 [hci1] 50.171857
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 9
-> #18 [hci1] 50.171970
-      ATT: Error Response (0x01) len 4
-        Read Request (0x0a)
-        Handle: 0x000d
-        Error: Database Out of Sync (0x12)
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
-#19 [hci1] 50.172613
-      ATT: Read By Type Request (0x08) len 6
-        Handle range: 0x0001-0xffff
-        Attribute type: Database Hash (0x2b2a)
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> #20 [hci1] 50.201854
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 24
-> #21 [hci1] 50.268291
-      ATT: Read By Type Response (0x09) len 19
-        Attribute data length: 18
-        Attribute data list: 1 entry
-        Handle: 0x000f
-        Value: 5fa98eed072ee317aa521990be294bf3
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
-#22 [hci1] 50.269302
-      ATT: Read By Type Request (0x08) len 6
-        Handle range: 0x0010-0xffff
-        Attribute type: Database Hash (0x2b2a)
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> #23 [hci1] 50.291849
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 9
-> #24 [hci1] 50.419999
-      ATT: Error Response (0x01) len 4
-        Read By Type Request (0x08)
-        Handle: 0x0010
-        Error: Attribute Not Found (0x0a)
-bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
-#25 [hci1] 50.422616
-      ATT: Read By Group Type Request (0x10) len 6
-        Handle range: 0x0001-0xffff
-        Attribute group type: Primary Service (0x2800)
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> #26 [hci1] 50.471607
-        Num handles: 1
-        Handle: 3
-        Count: 1
-> ACL Data RX: Handle 3 flags 0x02 dlen 24
-> #27 [hci1] 50.471663
-      ATT: Read By Group Type Response (0x11) len 19
-        Attribute data length: 6
-        Attribute group list: 3 entries
-        Handle range: 0x0001-0x0007
-        UUID: Generic Access Profile (0x1800)
-        Handle range: 0x0008-0x0011
-        UUID: Generic Attribute Profile (0x1801)
-        Handle range: 0x0012-0x0014
-        UUID: Device Information (0x180a)
---------------------
+e41137d8bd1a8e Zijun Hu                       2024-04-17   782  
+aadebac4639d84 Balakrishna Godavarthi         2018-08-03   783  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+059924fdf6c1c3 Venkata Lakshmi Narayana Gubba 2020-11-19   784  		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+30209aeff75fe1 Cheng Jiang                    2025-01-07   785  		   const char *firmware_name, const char *rampatch_name)
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   786  {
+dd336649ba8978 Johan Hovold                   2024-04-30   787  	struct qca_fw_config config = {};
+1cc41b5092e3aa Dmitry Baryshkov               2025-02-07   788  	const char *variant = "";
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   789  	int err;
+523760b7ff8871 Harish Bandi                   2019-04-26   790  	u8 rom_ver = 0;
+059924fdf6c1c3 Venkata Lakshmi Narayana Gubba 2020-11-19   791  	u32 soc_ver;
+a7f8dedb4be2cc Tim Jiang                      2023-09-12   792  	u16 boardid = 0;
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   793  
+ba493d4fbcb84b Balakrishna Godavarthi         2018-08-03   794  	bt_dev_dbg(hdev, "QCA setup on UART");
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   795  
+059924fdf6c1c3 Venkata Lakshmi Narayana Gubba 2020-11-19   796  	soc_ver = get_soc_ver(ver.soc_id, ver.rom_ver);
+059924fdf6c1c3 Venkata Lakshmi Narayana Gubba 2020-11-19   797  
+059924fdf6c1c3 Venkata Lakshmi Narayana Gubba 2020-11-19   798  	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+059924fdf6c1c3 Venkata Lakshmi Narayana Gubba 2020-11-19   799  
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   800  	config.user_baud_rate = baudrate;
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   801  
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   802  	/* Firmware files to download are based on ROM version.
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   803  	 * ROM version is derived from last two bytes of soc_ver.
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   804  	 */
+f904feefe60c28 Luca Weiss                     2023-08-02   805  	if (soc_type == QCA_WCN3988)
+f904feefe60c28 Luca Weiss                     2023-08-02   806  		rom_ver = ((soc_ver & 0x00000f00) >> 0x05) | (soc_ver & 0x0000000f);
+f904feefe60c28 Luca Weiss                     2023-08-02   807  	else
+99fba8e3f1d1fd Venkata Lakshmi Narayana Gubba 2021-05-18   808  		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+99fba8e3f1d1fd Venkata Lakshmi Narayana Gubba 2021-05-18   809  
+4fac8a7ac80b18 Sai Teja Aluvala               2022-01-07   810  	if (soc_type == QCA_WCN6750)
+4fac8a7ac80b18 Sai Teja Aluvala               2022-01-07   811  		qca_send_patch_config_cmd(hdev);
+4fac8a7ac80b18 Sai Teja Aluvala               2022-01-07   812  
+99fba8e3f1d1fd Venkata Lakshmi Narayana Gubba 2021-05-18   813  	/* Download rampatch file */
+99fba8e3f1d1fd Venkata Lakshmi Narayana Gubba 2021-05-18   814  	config.type = TLV_TYPE_PATCH;
+30209aeff75fe1 Cheng Jiang                    2025-01-07   815  	if (rampatch_name) {
+30209aeff75fe1 Cheng Jiang                    2025-01-07   816  		snprintf(config.fwname, sizeof(config.fwname), "qca/%s", rampatch_name);
+30209aeff75fe1 Cheng Jiang                    2025-01-07   817  	} else {
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   818  		switch (soc_type) {
+5590323f5a3811 Vivek Sahu                     2026-02-09   819  		case QCA_QCA2066:
+5590323f5a3811 Vivek Sahu                     2026-02-09   820  			snprintf(config.fwname, sizeof(config.fwname),
+5590323f5a3811 Vivek Sahu                     2026-02-09   821  				 "qca/hpbtfw%02x.tlv", rom_ver);
+5590323f5a3811 Vivek Sahu                     2026-02-09   822  			break;
+5590323f5a3811 Vivek Sahu                     2026-02-09   823  		case QCA_QCA6390:
+5590323f5a3811 Vivek Sahu                     2026-02-09   824  			snprintf(config.fwname, sizeof(config.fwname),
+5590323f5a3811 Vivek Sahu                     2026-02-09   825  				 "qca/htbtfw%02x.tlv", rom_ver);
+5590323f5a3811 Vivek Sahu                     2026-02-09   826  			break;
+5590323f5a3811 Vivek Sahu                     2026-02-09   827  		case QCA_QCC2072:
+5590323f5a3811 Vivek Sahu                     2026-02-09   828  			snprintf(config.fwname, sizeof(config.fwname),
+5590323f5a3811 Vivek Sahu                     2026-02-09   829  				 "qca/ornbtfw%02x.tlv", rom_ver);
+d5712c511cb358 Dmitry Baryshkov               2025-02-07  @830  		case QCA_WCN3950:
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   831  			snprintf(config.fwname, sizeof(config.fwname),
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   832  				 "qca/cmbtfw%02x.tlv", rom_ver);
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   833  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   834  		case QCA_WCN3990:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   835  		case QCA_WCN3991:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   836  		case QCA_WCN3998:
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   837  			snprintf(config.fwname, sizeof(config.fwname),
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   838  				 "qca/crbtfw%02x.tlv", rom_ver);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   839  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   840  		case QCA_WCN3988:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   841  			snprintf(config.fwname, sizeof(config.fwname),
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   842  				 "qca/apbtfw%02x.tlv", rom_ver);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   843  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   844  		case QCA_WCN6750:
+ecf6b2d9566606 Venkata Lakshmi Narayana Gubba 2021-05-18   845  			/* Choose mbn file by default.If mbn file is not found
+ecf6b2d9566606 Venkata Lakshmi Narayana Gubba 2021-05-18   846  			 * then choose tlv file
+ecf6b2d9566606 Venkata Lakshmi Narayana Gubba 2021-05-18   847  			 */
+ecf6b2d9566606 Venkata Lakshmi Narayana Gubba 2021-05-18   848  			config.type = ELF_TYPE_PATCH;
+d8f97da1b92d2f Venkata Lakshmi Narayana Gubba 2021-05-18   849  			snprintf(config.fwname, sizeof(config.fwname),
+ecf6b2d9566606 Venkata Lakshmi Narayana Gubba 2021-05-18   850  				 "qca/msbtfw%02x.mbn", rom_ver);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   851  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   852  		case QCA_WCN6855:
+095327fede005f Steev Klimaszewski             2023-03-26   853  			snprintf(config.fwname, sizeof(config.fwname),
+095327fede005f Steev Klimaszewski             2023-03-26   854  				 "qca/hpbtfw%02x.tlv", rom_ver);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   855  			break;
+e0c1278ac89b03 Neil Armstrong                 2023-08-16   856  		case QCA_WCN7850:
+e0c1278ac89b03 Neil Armstrong                 2023-08-16   857  			snprintf(config.fwname, sizeof(config.fwname),
+e0c1278ac89b03 Neil Armstrong                 2023-08-16   858  				 "qca/hmtbtfw%02x.tlv", rom_ver);
+e0c1278ac89b03 Neil Armstrong                 2023-08-16   859  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   860  		default:
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   861  			snprintf(config.fwname, sizeof(config.fwname),
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   862  				 "qca/rampatch_%08x.bin", soc_ver);
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   863  		}
+30209aeff75fe1 Cheng Jiang                    2025-01-07   864  	}
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   865  
+ecf6b2d9566606 Venkata Lakshmi Narayana Gubba 2021-05-18   866  	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   867  	if (err < 0) {
+ba493d4fbcb84b Balakrishna Godavarthi         2018-08-03   868  		bt_dev_err(hdev, "QCA Failed to download patch (%d)", err);
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   869  		return err;
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   870  	}
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   871  
+8059ba0bd0e469 Matthias Kaehlcke              2019-07-09   872  	/* Give the controller some time to get ready to receive the NVM */
+8059ba0bd0e469 Matthias Kaehlcke              2019-07-09   873  	msleep(10);
+8059ba0bd0e469 Matthias Kaehlcke              2019-07-09   874  
+e41137d8bd1a8e Zijun Hu                       2024-04-17   875  	if (soc_type == QCA_QCA2066 || soc_type == QCA_WCN7850)
+a7f8dedb4be2cc Tim Jiang                      2023-09-12   876  		qca_read_fw_board_id(hdev, &boardid);
+a7f8dedb4be2cc Tim Jiang                      2023-09-12   877  
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   878  	/* Download NVM configuration */
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   879  	config.type = TLV_TYPE_NVM;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   880  	if (firmware_name) {
+a4c5a468c6329b Cheng Jiang                    2025-01-07   881  		/* The firmware name has an extension, use it directly */
+a4c5a468c6329b Cheng Jiang                    2025-01-07   882  		if (qca_filename_has_extension(firmware_name)) {
+a4c5a468c6329b Cheng Jiang                    2025-01-07   883  			snprintf(config.fwname, sizeof(config.fwname), "qca/%s", firmware_name);
+a4c5a468c6329b Cheng Jiang                    2025-01-07   884  		} else {
+a4c5a468c6329b Cheng Jiang                    2025-01-07   885  			qca_read_fw_board_id(hdev, &boardid);
+a4c5a468c6329b Cheng Jiang                    2025-01-07   886  			qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
+a4c5a468c6329b Cheng Jiang                    2025-01-07   887  				 firmware_name, soc_type, ver, 0, boardid);
+a4c5a468c6329b Cheng Jiang                    2025-01-07   888  		}
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   889  	} else {
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   890  		switch (soc_type) {
+5590323f5a3811 Vivek Sahu                     2026-02-09   891  		case QCA_QCA2066:
+5590323f5a3811 Vivek Sahu                     2026-02-09   892  			qca_get_nvm_name_by_board(config.fwname,
+5590323f5a3811 Vivek Sahu                     2026-02-09   893  				sizeof(config.fwname), "hpnv", soc_type, ver,
+5590323f5a3811 Vivek Sahu                     2026-02-09   894  				rom_ver, boardid);
+5590323f5a3811 Vivek Sahu                     2026-02-09   895  			break;
+5590323f5a3811 Vivek Sahu                     2026-02-09   896  		case QCA_QCA6390:
+5590323f5a3811 Vivek Sahu                     2026-02-09   897  			snprintf(config.fwname, sizeof(config.fwname),
+5590323f5a3811 Vivek Sahu                     2026-02-09   898  				 "qca/htnv%02x.bin", rom_ver);
+5590323f5a3811 Vivek Sahu                     2026-02-09   899  			break;
+5590323f5a3811 Vivek Sahu                     2026-02-09   900  		case QCA_QCC2072:
+5590323f5a3811 Vivek Sahu                     2026-02-09   901  			snprintf(config.fwname, sizeof(config.fwname),
+5590323f5a3811 Vivek Sahu                     2026-02-09   902  				 "qca/ornnv%02x.bin", rom_ver);
+5590323f5a3811 Vivek Sahu                     2026-02-09   903  			break;
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   904  		case QCA_WCN3950:
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   905  			if (le32_to_cpu(ver.soc_id) == QCA_WCN3950_SOC_ID_T)
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   906  				variant = "t";
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   907  			else if (le32_to_cpu(ver.soc_id) == QCA_WCN3950_SOC_ID_S)
+e92900c9803fb3 Dmitry Baryshkov               2025-04-01   908  				variant = "s";
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   909  
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   910  			snprintf(config.fwname, sizeof(config.fwname),
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   911  				 "qca/cmnv%02x%s.bin", rom_ver, variant);
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   912  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   913  		case QCA_WCN3990:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   914  		case QCA_WCN3991:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   915  		case QCA_WCN3998:
+1cc41b5092e3aa Dmitry Baryshkov               2025-02-07   916  			if (le32_to_cpu(ver.soc_id) == QCA_WCN3991_SOC_ID)
+1cc41b5092e3aa Dmitry Baryshkov               2025-02-07   917  				variant = "u";
+1cc41b5092e3aa Dmitry Baryshkov               2025-02-07   918  
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   919  			snprintf(config.fwname, sizeof(config.fwname),
+1cc41b5092e3aa Dmitry Baryshkov               2025-02-07   920  				 "qca/crnv%02x%s.bin", rom_ver, variant);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   921  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   922  		case QCA_WCN3988:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   923  			snprintf(config.fwname, sizeof(config.fwname),
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   924  				 "qca/apnv%02x.bin", rom_ver);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   925  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   926  		case QCA_WCN6750:
+d8f97da1b92d2f Venkata Lakshmi Narayana Gubba 2021-05-18   927  			snprintf(config.fwname, sizeof(config.fwname),
+d8f97da1b92d2f Venkata Lakshmi Narayana Gubba 2021-05-18   928  				 "qca/msnv%02x.bin", rom_ver);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   929  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   930  		case QCA_WCN6855:
+a2fad248947d70 Zijun Hu                       2025-01-13   931  			qca_read_fw_board_id(hdev, &boardid);
+a2fad248947d70 Zijun Hu                       2025-01-13   932  			qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
+a2fad248947d70 Zijun Hu                       2025-01-13   933  						  "hpnv", soc_type, ver, rom_ver, boardid);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   934  			break;
+e0c1278ac89b03 Neil Armstrong                 2023-08-16   935  		case QCA_WCN7850:
+a4c5a468c6329b Cheng Jiang                    2025-01-07   936  			qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
+a4c5a468c6329b Cheng Jiang                    2025-01-07   937  				 "hmtnv", soc_type, ver, rom_ver, boardid);
+e0c1278ac89b03 Neil Armstrong                 2023-08-16   938  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   939  		default:
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   940  			snprintf(config.fwname, sizeof(config.fwname),
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   941  				 "qca/nvm_%08x.bin", soc_ver);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   942  		}
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   943  	}
+4219d4686875fd Balakrishna Godavarthi         2018-08-03   944  
+ecf6b2d9566606 Venkata Lakshmi Narayana Gubba 2021-05-18   945  	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   946  	if (err < 0) {
+ba493d4fbcb84b Balakrishna Godavarthi         2018-08-03   947  		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   948  		return err;
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   949  	}
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   950  
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   951  	switch (soc_type) {
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   952  	case QCA_WCN3991:
+a7f8dedb4be2cc Tim Jiang                      2023-09-12   953  	case QCA_QCA2066:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   954  	case QCA_QCA6390:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   955  	case QCA_WCN6750:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   956  	case QCA_WCN6855:
+e0c1278ac89b03 Neil Armstrong                 2023-08-16   957  	case QCA_WCN7850:
+590deccf4c0690 Balakrishna Godavarthi         2020-06-12   958  		err = qca_disable_soc_logging(hdev);
+590deccf4c0690 Balakrishna Godavarthi         2020-06-12   959  		if (err < 0)
+590deccf4c0690 Balakrishna Godavarthi         2020-06-12   960  			return err;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   961  		break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   962  	default:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   963  		break;
+590deccf4c0690 Balakrishna Godavarthi         2020-06-12   964  	}
+590deccf4c0690 Balakrishna Godavarthi         2020-06-12   965  
+d8f97da1b92d2f Venkata Lakshmi Narayana Gubba 2021-05-18   966  	/* WCN399x and WCN6750 supports the Microsoft vendor extension with 0xFD70 as the
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   967  	 * VsMsftOpCode.
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   968  	 */
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   969  	switch (soc_type) {
+d5712c511cb358 Dmitry Baryshkov               2025-02-07   970  	case QCA_WCN3950:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16   971  	case QCA_WCN3988:
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   972  	case QCA_WCN3990:
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   973  	case QCA_WCN3991:
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   974  	case QCA_WCN3998:
+d8f97da1b92d2f Venkata Lakshmi Narayana Gubba 2021-05-18   975  	case QCA_WCN6750:
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   976  		hci_set_msft_opcode(hdev, 0xFD70);
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   977  		break;
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   978  	default:
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   979  		break;
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   980  	}
+eaf19b0c47d142 Miao-chen Chou                 2020-12-17   981  
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   982  	/* Perform HCI reset */
+ba493d4fbcb84b Balakrishna Godavarthi         2018-08-03   983  	err = qca_send_reset(hdev);
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   984  	if (err < 0) {
+ba493d4fbcb84b Balakrishna Godavarthi         2018-08-03   985  		bt_dev_err(hdev, "QCA Failed to run HCI_RESET (%d)", err);
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   986  		return err;
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   987  	}
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10   988  
+095327fede005f Steev Klimaszewski             2023-03-26   989  	switch (soc_type) {
+095327fede005f Steev Klimaszewski             2023-03-26   990  	case QCA_WCN3991:
+095327fede005f Steev Klimaszewski             2023-03-26   991  	case QCA_WCN6750:
+095327fede005f Steev Klimaszewski             2023-03-26   992  	case QCA_WCN6855:
+e0c1278ac89b03 Neil Armstrong                 2023-08-16   993  	case QCA_WCN7850:
+c0187b0bd3e94c Venkata Lakshmi Narayana Gubba 2020-12-08   994  		/* get fw build info */
+c0187b0bd3e94c Venkata Lakshmi Narayana Gubba 2020-12-08   995  		err = qca_read_fw_build_info(hdev);
+c0187b0bd3e94c Venkata Lakshmi Narayana Gubba 2020-12-08   996  		if (err < 0)
+c0187b0bd3e94c Venkata Lakshmi Narayana Gubba 2020-12-08   997  			return err;
+095327fede005f Steev Klimaszewski             2023-03-26   998  		break;
+095327fede005f Steev Klimaszewski             2023-03-26   999  	default:
+095327fede005f Steev Klimaszewski             2023-03-26  1000  		break;
+c0187b0bd3e94c Venkata Lakshmi Narayana Gubba 2020-12-08  1001  	}
+c0187b0bd3e94c Venkata Lakshmi Narayana Gubba 2020-12-08  1002  
+dd336649ba8978 Johan Hovold                   2024-04-30  1003  	err = qca_check_bdaddr(hdev, &config);
+32868e126c7887 Johan Hovold                   2024-04-16  1004  	if (err)
+32868e126c7887 Johan Hovold                   2024-04-16  1005  		return err;
+32868e126c7887 Johan Hovold                   2024-04-16  1006  
+ba493d4fbcb84b Balakrishna Godavarthi         2018-08-03  1007  	bt_dev_info(hdev, "QCA setup on UART is completed");
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10  1008  
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10  1009  	return 0;
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10  1010  }
+ba493d4fbcb84b Balakrishna Godavarthi         2018-08-03  1011  EXPORT_SYMBOL_GPL(qca_uart_setup);
+83e81961ff7ef7 Ben Young Tae Kim              2015-08-10  1012  
 
-Changes from v3:
- - Reuses existing bt_att_resend() and bt_att_cancel() functions
- - Add new structure pending_db_sync
- - Link to v3
-   https://lore.kernel.org/all/20260121083804.4010106-1-mengshi.wu@oss.qualcomm.com/
-
-Changes from v2:
- - Detects DB_OUT_OF_SYNC errors during GATT operations
- - Extracts affected handles from the original request PDU
- - Checks if Service Changed indications overlap with those handles
- - Verifies database consistency using Database Hash characteristic
- - Automatically retries the original request if DB is consistent
- - Automatically retries the original request if handle is not affected
- - Link to v2
-   https://lore.kernel.org/all/20260105103828.105346-1-mengshi.wu@oss.qualcomm.com/
-
-Changes from v1:
- - Implement automatic recovery when ATT_ECODE_DB_OUT_OF_SYNC error is
-   received from the remote device.
- - Link to v1
-   https://lore.kernel.org/all/20251208101915.247459-1-mengshi.wu@oss.qualcomm.com/
-
-
-Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
----
- src/shared/att.c          | 144 ++++++++++++++++++++++++++++++++-
- src/shared/att.h          |   9 +++
- src/shared/gatt-client.c  | 166 ++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-helpers.c |  16 ++++
- src/shared/gatt-helpers.h |   3 +
- 5 files changed, 335 insertions(+), 3 deletions(-)
-
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 77ca4aa24..863449c90 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -35,6 +35,7 @@
- #define BT_ATT_SIGNATURE_LEN		12
- 
- struct att_send_op;
-+struct pending_db_sync;
- 
- struct bt_att_chan {
- 	struct bt_att *att;
-@@ -47,6 +48,7 @@ struct bt_att_chan {
- 
- 	struct att_send_op *pending_req;
- 	struct att_send_op *pending_ind;
-+	struct pending_db_sync *pending_db_sync;
- 	bool writer_active;
- 
- 	bool in_req;			/* There's a pending incoming request */
-@@ -78,6 +80,10 @@ struct bt_att {
- 	bt_att_destroy_func_t timeout_destroy;
- 	void *timeout_data;
- 
-+	bt_att_db_sync_func_t db_sync_callback;
-+	bt_att_destroy_func_t db_sync_destroy;
-+	void *db_sync_data;
-+
- 	uint8_t debug_level;
- 	bt_att_debug_func_t debug_callback;
- 	bt_att_destroy_func_t debug_destroy;
-@@ -199,6 +205,11 @@ struct att_send_op {
- 	void *user_data;
- };
- 
-+struct pending_db_sync {
-+	struct att_send_op *op;
-+	struct bt_att_pdu_error_rsp error;
-+};
-+
- static void destroy_att_send_op(void *data)
- {
- 	struct att_send_op *op = data;
-@@ -644,6 +655,11 @@ static void bt_att_chan_free(void *data)
- 	if (chan->pending_ind)
- 		destroy_att_send_op(chan->pending_ind);
- 
-+	if (chan->pending_db_sync) {
-+		destroy_att_send_op(chan->pending_db_sync->op);
-+		free(chan->pending_db_sync);
-+	}
-+
- 	queue_destroy(chan->queue, destroy_att_send_op);
- 
- 	io_destroy(chan->io);
-@@ -682,6 +698,12 @@ static bool disconnect_cb(struct io *io, void *user_data)
- 		chan->pending_ind = NULL;
- 	}
- 
-+	if (chan->pending_db_sync) {
-+		disc_att_send_op(chan->pending_db_sync->op);
-+		free(chan->pending_db_sync);
-+		chan->pending_db_sync = NULL;
-+	}
-+
- 	bt_att_chan_free(chan);
- 
- 	/* Don't run disconnect callback if there are channels left */
-@@ -800,9 +822,42 @@ static bool handle_error_rsp(struct bt_att_chan *chan, uint8_t *pdu,
- 		return false;
- 
- 	/* Attempt to change security */
--	if (!change_security(chan, rsp->ecode))
--		return false;
-+	if (change_security(chan, rsp->ecode))
-+		goto retry;
-+
-+	/* Check if this is DB_OUT_OF_SYNC and we have a callback */
-+	if (rsp->ecode == BT_ATT_ERROR_DB_OUT_OF_SYNC && att->db_sync_callback) {
-+		struct pending_db_sync *pending;
-+
-+		pending = new0(struct pending_db_sync, 1);
-+		if (!pending)
-+			return false;
- 
-+		pending->op = op;
-+		pending->error = *rsp;
-+
-+		/* Remove timeout since we're waiting for approval */
-+		if (op->timeout_id) {
-+			timeout_remove(op->timeout_id);
-+			op->timeout_id = 0;
-+		}
-+
-+		/* Move to pending_db_sync */
-+		chan->pending_db_sync = pending;
-+		chan->pending_req = NULL;
-+
-+		DBG(att, "(chan %p) DB sync pending for operation %p", chan, op);
-+
-+		/* Notify upper layer */
-+		att->db_sync_callback(&pending->error, op->pdu + 1, op->len - 1,
-+				      op->id, att->db_sync_data);
-+
-+		return true;
-+	}
-+
-+	return false;
-+
-+retry:
- 	/* Remove timeout_id if outstanding */
- 	if (op->timeout_id) {
- 		timeout_remove(op->timeout_id);
-@@ -1142,6 +1197,9 @@ static void bt_att_free(struct bt_att *att)
- 	if (att->timeout_destroy)
- 		att->timeout_destroy(att->timeout_data);
- 
-+	if (att->db_sync_destroy)
-+		att->db_sync_destroy(att->db_sync_data);
-+
- 	if (att->debug_destroy)
- 		att->debug_destroy(att->debug_data);
- 
-@@ -1473,6 +1531,23 @@ bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
- 	return true;
- }
- 
-+bool bt_att_set_db_sync_cb(struct bt_att *att, bt_att_db_sync_func_t callback,
-+						void *user_data,
-+						bt_att_destroy_func_t destroy)
-+{
-+	if (!att)
-+		return false;
-+
-+	if (att->db_sync_destroy)
-+		att->db_sync_destroy(att->db_sync_data);
-+
-+	att->db_sync_callback = callback;
-+	att->db_sync_destroy = destroy;
-+	att->db_sync_data = user_data;
-+
-+	return true;
-+}
-+
- unsigned int bt_att_register_disconnect(struct bt_att *att,
- 					bt_att_disconnect_func_t callback,
- 					void *user_data,
-@@ -1650,6 +1725,7 @@ int bt_att_resend(struct bt_att *att, unsigned int id, uint8_t opcode,
- {
- 	const struct queue_entry *entry;
- 	struct att_send_op *op;
-+	bool from_db_sync = false;
- 	bool result;
- 
- 	if (!att || !id)
-@@ -1662,11 +1738,41 @@ int bt_att_resend(struct bt_att *att, unsigned int id, uint8_t opcode,
- 
- 		if (chan->pending_req && chan->pending_req->id == id)
- 			break;
-+
-+		/* Also check pending_db_sync */
-+		if (chan->pending_db_sync && chan->pending_db_sync->op->id == id) {
-+			from_db_sync = true;
-+			break;
-+		}
- 	}
- 
- 	if (!entry)
- 		return -ENOENT;
- 
-+	/* If from pending_db_sync, extract operation details if not provided */
-+	if (from_db_sync) {
-+		struct bt_att_chan *chan = entry->data;
-+		struct pending_db_sync *pending = chan->pending_db_sync;
-+		struct att_send_op *stored_op = pending->op;
-+
-+		/* Auto-extract from stored operation if pdu is NULL */
-+		if (!pdu) {
-+			opcode = stored_op->opcode;
-+			pdu = stored_op->pdu + 1;
-+			length = stored_op->len - 1;
-+			callback = stored_op->callback;
-+			user_data = stored_op->user_data;
-+			destroy = stored_op->destroy;
-+		}
-+
-+		DBG(att, "(chan %p) Resending DB sync operation %p",
-+		    chan, stored_op);
-+
-+		/* Clear pending_db_sync state */
-+		chan->pending_db_sync = NULL;
-+		free(pending);
-+	}
-+
- 	/* Only allow requests to be resend */
- 	if (get_op_type(opcode) != ATT_OP_TYPE_REQ)
- 		return -EOPNOTSUPP;
-@@ -1763,6 +1869,34 @@ bool bt_att_chan_cancel(struct bt_att_chan *chan, unsigned int id)
- 	return true;
- }
- 
-+bool bt_att_db_sync_cancel(struct bt_att_chan *chan, unsigned int id)
-+{
-+	if (chan->pending_db_sync && chan->pending_db_sync->op->id == id) {
-+		struct pending_db_sync *pending = chan->pending_db_sync;
-+		struct att_send_op *op = pending->op;
-+		uint8_t error_pdu[sizeof(struct bt_att_pdu_error_rsp)];
-+
-+		/* Build error response PDU */
-+		memcpy(error_pdu, &pending->error, sizeof(pending->error));
-+
-+		/* Clear pending state */
-+		chan->pending_db_sync = NULL;
-+		free(pending);
-+
-+		/* Notify callback with error */
-+		if (op->callback)
-+			op->callback(BT_ATT_OP_ERROR_RSP, error_pdu,
-+				     sizeof(error_pdu), op->user_data);
-+
-+		destroy_att_send_op(op);
-+		wakeup_chan_writer(chan, NULL);
-+
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- static bool bt_att_disc_cancel(struct bt_att *att, unsigned int id)
- {
- 	struct att_send_op *op;
-@@ -1795,11 +1929,15 @@ bool bt_att_cancel(struct bt_att *att, unsigned int id)
- 	if (!att || !id)
- 		return false;
- 
--	/* Lookuo request on each channel first */
-+	/* Lookup request on each channel first */
- 	for (entry = queue_get_entries(att->chans); entry;
- 						entry = entry->next) {
- 		struct bt_att_chan *chan = entry->data;
- 
-+		/* Check pending_db_sync first on each channel */
-+		if (bt_att_db_sync_cancel(chan, id))
-+			return true;
-+
- 		if (bt_att_chan_cancel(chan, id))
- 			return true;
- 	}
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 53a3f7a2a..ba1f84677 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -46,6 +46,11 @@ typedef void (*bt_att_disconnect_func_t)(int err, void *user_data);
- typedef void (*bt_att_exchange_func_t)(uint16_t mtu, void *user_data);
- typedef bool (*bt_att_counter_func_t)(uint32_t *sign_cnt, void *user_data);
- 
-+/* DB sync callback - notifies upper layer of DB_OUT_OF_SYNC error */
-+typedef void (*bt_att_db_sync_func_t)(const struct bt_att_pdu_error_rsp *error,
-+					const void *req_pdu, uint16_t req_len,
-+					unsigned int att_id, void *user_data);
-+
- bool bt_att_set_debug(struct bt_att *att, uint8_t level,
- 			bt_att_debug_func_t callback, void *user_data,
- 			bt_att_destroy_func_t destroy);
-@@ -58,6 +63,10 @@ bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy);
- 
-+bool bt_att_set_db_sync_cb(struct bt_att *att, bt_att_db_sync_func_t callback,
-+						void *user_data,
-+						bt_att_destroy_func_t destroy);
-+
- unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 					const void *pdu, uint16_t length,
- 					bt_att_response_func_t callback,
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index f8ebab3fa..2056149ba 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -114,6 +114,10 @@ struct bt_gatt_client {
- 
- 	struct bt_gatt_request *discovery_req;
- 	unsigned int mtu_req_id;
-+
-+	/* Pending retry operation for DB out of sync handling */
-+	unsigned int pending_retry_att_id;
-+	uint16_t pending_error_handle;
- };
- 
- struct request {
-@@ -2342,6 +2346,165 @@ static void att_disconnect_cb(int err, void *user_data)
- 		notify_client_ready(client, false, 0);
- }
- 
-+static bool is_handle_out_of_range(uint16_t handle, struct bt_gatt_client *client)
-+{
-+	bool handle_out_of_range = false;
-+	uint16_t start_handle, end_handle;
-+
-+	if (handle) {
-+		start_handle = bt_gatt_req_get_start_handle(
-+				client->discovery_req);
-+		end_handle = bt_gatt_req_get_end_handle(
-+				client->discovery_req);
-+
-+		if (start_handle != 0 && end_handle != 0 &&
-+			(handle < start_handle || handle > end_handle))
-+			handle_out_of_range = true;
-+	}
-+
-+	return handle_out_of_range;
-+}
-+
-+static void db_hash_check_cb(bool success, uint8_t att_ecode,
-+			      struct bt_gatt_result *result,
-+			      void *user_data)
-+{
-+	struct bt_gatt_client *client = user_data;
-+	struct gatt_db_attribute *hash_attr = NULL;
-+	const uint8_t *local_hash = NULL;
-+	const uint8_t *remote_hash;
-+	uint16_t length, handle;
-+	struct bt_gatt_iter iter;
-+	bt_uuid_t uuid;
-+	unsigned int att_id = client->pending_retry_att_id;
-+	uint16_t pending_error_handle = client->pending_error_handle;
-+	bool handle_out_of_range;
-+
-+	client->pending_retry_att_id = 0;
-+	client->pending_error_handle = 0;
-+
-+	/* If a Service Changed indication is received at this stage, the
-+	 * pending request may be retried once we have verified that the
-+	 * affected attribute handle is not within the range impacted by
-+	 * the service change.
-+	 */
-+	if (client->in_svc_chngd) {
-+		handle_out_of_range =
-+			is_handle_out_of_range(pending_error_handle, client);
-+
-+		if (handle_out_of_range) {
-+			DBG(client, "Error handle not effected, approving retry");
-+			bt_att_resend(client->att, att_id, 0, NULL, 0,
-+				      NULL, NULL, NULL);
-+		} else {
-+			DBG(client, "Error handle is in range of svc chngd");
-+			bt_att_cancel(client->att, att_id);
-+		}
-+		return;
-+	}
-+
-+	if (!att_id) {
-+		DBG(client, "No pending retry operation");
-+		return;
-+	}
-+
-+	if (!success) {
-+		DBG(client,
-+		"Failed to read remote DB Hash, triggering full discovery");
-+		goto trigger_discovery;
-+	}
-+
-+	/* Extract hash value from result */
-+	if (!result || !bt_gatt_iter_init(&iter, result))
-+		goto trigger_discovery;
-+
-+	if (!bt_gatt_iter_next_read_by_type(&iter, &handle, &length,
-+					     &remote_hash))
-+		goto trigger_discovery;
-+
-+	if (length != 16) {
-+		DBG(client, "Invalid DB Hash length: %u", length);
-+		goto trigger_discovery;
-+	}
-+
-+	/* Get local hash from database */
-+	bt_uuid16_create(&uuid, GATT_CHARAC_DB_HASH);
-+	gatt_db_find_by_type(client->db, 0x0001, 0xffff, &uuid,
-+			     get_first_attribute, &hash_attr);
-+
-+	if (hash_attr) {
-+		gatt_db_attribute_read(hash_attr, 0, BT_ATT_OP_READ_REQ, NULL,
-+				       db_hash_read_value_cb, &local_hash);
-+	}
-+
-+	/* Compare hashes */
-+	if (local_hash && !memcmp(local_hash, remote_hash, 16)) {
-+		/* Hashes match - safe to retry */
-+		DBG(client, "DB Hash matches, approving retry");
-+		bt_att_resend(client->att, att_id, 0, NULL, 0,
-+			      NULL, NULL, NULL);
-+		return;
-+	}
-+
-+	/* Hashes differ - need service discovery */
-+	DBG(client, "DB Hash differs, canceling retry and triggering discovery");
-+
-+trigger_discovery:
-+	bt_att_cancel(client->att, att_id);
-+
-+	if (!client->in_svc_chngd)
-+		process_service_changed(client, 0x0001, 0xffff);
-+}
-+
-+static void gatt_client_db_sync_cb(const struct bt_att_pdu_error_rsp *error,
-+				    const void *req_pdu, uint16_t req_len,
-+				    unsigned int att_id, void *user_data)
-+{
-+	struct bt_gatt_client *client = user_data;
-+	bt_uuid_t uuid;
-+	uint16_t error_handle;
-+	bool handle_out_of_range = false;
-+
-+	assert(client);
-+
-+	/* Only handle DB_OUT_OF_SYNC errors */
-+	if (error->ecode != BT_ATT_ERROR_DB_OUT_OF_SYNC)
-+		return;
-+
-+	error_handle = get_le16(&error->handle);
-+	client->pending_error_handle = error_handle;
-+
-+	/* If a Service Changed indication is received at this stage, the
-+	 * pending request may be retried once we have verified that the
-+	 * affected attribute handle is not within the range impacted by
-+	 * the service change.
-+	 */
-+	if (client->in_svc_chngd) {
-+		handle_out_of_range =
-+			is_handle_out_of_range(error_handle, client);
-+
-+		if (handle_out_of_range)
-+			bt_att_resend(client->att, att_id, 0, NULL, 0,
-+				      NULL, NULL, NULL);
-+		else
-+			bt_att_cancel(client->att, att_id);
-+		return;
-+	}
-+
-+	/* Store the att_id for later use */
-+	client->pending_retry_att_id = att_id;
-+
-+	/* Read remote DB Hash to compare */
-+	bt_uuid16_create(&uuid, GATT_CHARAC_DB_HASH);
-+	if (!bt_gatt_read_by_type(client->att, 0x0001, 0xffff, &uuid,
-+				   db_hash_check_cb, client, NULL)) {
-+		DBG(client, "Failed to read DB Hash, rejecting retry");
-+		client->pending_retry_att_id = 0;
-+		client->pending_error_handle = 0;
-+		bt_att_cancel(client->att, att_id);
-+	}
-+}
-+
- static struct bt_gatt_client *gatt_client_new(struct gatt_db *db,
- 							struct bt_att *att,
- 							uint8_t features)
-@@ -2382,6 +2545,9 @@ static struct bt_gatt_client *gatt_client_new(struct gatt_db *db,
- 	client->db = gatt_db_ref(db);
- 	client->features = features;
- 
-+	/* Register DB sync callback for DB out of sync handling */
-+	bt_att_set_db_sync_cb(att, gatt_client_db_sync_cb, client, NULL);
-+
- 	return client;
- 
- fail:
-diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index c1cbbdc91..8dee34a9e 100644
---- a/src/shared/gatt-helpers.c
-+++ b/src/shared/gatt-helpers.c
-@@ -790,6 +790,22 @@ done:
- 	discovery_op_complete(op, success, att_ecode);
- }
- 
-+uint16_t bt_gatt_req_get_start_handle(struct bt_gatt_request *req)
-+{
-+	if (!req)
-+		return 0;
-+
-+	return req->start_handle;
-+}
-+
-+uint16_t bt_gatt_req_get_end_handle(struct bt_gatt_request *req)
-+{
-+	if (!req)
-+		return 0;
-+
-+	return req->end_handle;
-+}
-+
- static struct bt_gatt_request *discover_services(struct bt_att *att,
- 					bt_uuid_t *uuid,
- 					uint16_t start, uint16_t end,
-diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-index 7623862e9..2bf5aad46 100644
---- a/src/shared/gatt-helpers.h
-+++ b/src/shared/gatt-helpers.h
-@@ -101,3 +101,6 @@ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
- 					bt_gatt_request_callback_t callback,
- 					void *user_data,
- 					bt_gatt_destroy_func_t destroy);
-+
-+uint16_t bt_gatt_req_get_end_handle(struct bt_gatt_request *req);
-+uint16_t bt_gatt_req_get_start_handle(struct bt_gatt_request *req);
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
