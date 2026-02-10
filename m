@@ -1,78 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27EF38A9B1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 18:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E202FC004
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 18:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770746410; cv=none; b=rEuDfRw76fzZMOgr0B1XNwO74YGhfhrivXW8QBKQVv+bHGZ0IlwmMiLCUzKAsEWv8CZ9uiLLJyG8UXEKS9SLlU8sJcKBGzJp0CZarnwF5NfnK221HQqEoquTeEteuXg/MPdGfsZnCuzYp6hLqifKBY+5bvERhMO/YEzdKmvLfhw=
+	t=1770749025; cv=none; b=KxAV12l5sGUmypaDB/CfcwvCgkkEJs1eBLmX9MwKriItyKDOceZcH2vSn+CoxygZCbZOq5ojNLVUqL0JPeFIFXTiH9qb5Yi3Jj0hX0EAjVOYxGpTv63oQwErr4ZHS0sBOpHxQ0LC5EsiofjDsIabLurJgP14qvDkaDsJsAJTcmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770746410; c=relaxed/simple;
-	bh=Cb4+LEPragJuCC/NeKrII2sV/xrrJ0EdXO/IOVfsFfA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=r9IugKSw30k1QvI2FFHvrCZ6xGWoTi5wAq2I7H/QQJ2Zkkn39kER7FeuNoq9OmKdD9f/tcBaDUUA/QvkZKVKqdyu29GXp8eNhqXhGV1ztrMMTH29Fq7niTLXzwy9ubJzEImUWJ5+wQG4kbpYp7El0HkTPC1eKb+39xjI7hVvXqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qkJQXYfT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770749025; c=relaxed/simple;
+	bh=KBANAjLC0saxurdnNW7t1ohTLIASmWy2iojQOvC0GXc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iNfvZIQjSzwTyAoojbiKxMQUX9wkoSk+pMuC0eH7VDH9dQeAUos2l1faXtvthoc5ZnaA36jyKTHtIBCprRqev5mLs9Ssy7Mv3ZdjWpAapjS0CYriReI6eTC/4v3HHFLBlw9Slx+IzXoAL4ESKEtq4wYNlL/OlL82mtZgxS4Nijg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Kfe+eI+d; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qkJQXYfT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81C15C116C6;
-	Tue, 10 Feb 2026 18:00:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770746410;
-	bh=Cb4+LEPragJuCC/NeKrII2sV/xrrJ0EdXO/IOVfsFfA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qkJQXYfT2TXc5gUJpNdbHfbyZxGgVyf8riNOgyUI8DjAdBbi4yvxGPS2mYm/bGTxp
-	 ezS3EUbZ5YCuaas5X4J58KNFd1XBdV4fMLKLqssOsfHAxxVbw+n5T27Vlbij+vOJfT
-	 yP5JodYbaHLg/kaz1SytypFmUbhk1ynZKMx+w3LHqKSfm5UZHbhASYWJTJjihDSZbu
-	 jIz0/mJQ+Ffte37eyRA6s4NZtkHcvVhhKyPcJFueCLby216edMqn/3mH+yLMYnMxOV
-	 cqggmduSb9xxEmdXk7/o4CEIgJdhWHa454eTJtSkEJGuN2OTWyDaYsERdPD8H7sIgY
-	 HwW1JMQaBi4nw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0AF1B39E3B79;
-	Tue, 10 Feb 2026 18:00:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Kfe+eI+d"
+Received: from github.com (hubbernetes-node-2d2dc45.ash1-iad.github.net [10.56.207.82])
+	by smtp.github.com (Postfix) with ESMTPA id 8DE59939045
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 10:40:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1770748815;
+	bh=FgK2YwWvajoCgm24RzJFq7j0Vkh8PugCXqeU61O5YIk=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Kfe+eI+dKmEEM9gIyC12DQA+ikOCKmig28UO3V+vEj2hiwzKHpj9J4v0qByAxYUqx
+	 4LWtcpQlancuiiINw4tLJFUP9KXzhDBGwDqFOhXkNoenU7bz9JT2QRydk+16oV07LH
+	 qR47rTedTmmQJGWFi+eU98tFRIyJRGX0lzg8e/m4=
+Date: Tue, 10 Feb 2026 10:40:15 -0800
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1052631/e2bb5a-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2] emulator: Fix compilation on big endian systems
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177074640557.3616367.16240515640902857241.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Feb 2026 18:00:05 +0000
-References: <20260210093254.3246483-1-hadess@hadess.net>
-In-Reply-To: <20260210093254.3246483-1-hadess@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1052631
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Tue, 10 Feb 2026 10:32:47 +0100 you wrote:
-> This fixes the build on big endian systems like s390x:
-> 
-> Remove the "static" so the array doesn't need to be initialised
-> with constants.
-> 
-> emulator/bthost.c: In function ‘bthost_setup_sco’:
-> ./src/shared/util.h:43:26: error: initializer element is not constant
->    43 | #define cpu_to_le32(val) bswap_32(val)
->       |                          ^~~~~~~~
-> etc.
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,v2] emulator: Fix compilation on big endian systems
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f1eedda9cefc
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
