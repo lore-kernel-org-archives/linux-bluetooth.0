@@ -1,126 +1,108 @@
-Received: from mail-qk1-f194.google.com (mail-qk1-f194.google.com [209.85.222.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C9D36BCE7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Feb 2026 11:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E37280A5B;
+	Wed, 11 Feb 2026 12:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.243.71.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770808897; cv=none; b=cXX9P9TTNu5RlAmy1opD/bC0WuvWx1uz4YjC5tjpbadLQmnIWlJxcWndDTjVfvR7bH83XjMJl8UThjI8XD+qs+s2IZoRm0QYjZ6WF/3IZn/0bcnDW84AWSIbYdzt5ND+nfsgN/q53s8g1cQHaUwi0o0nEVqgToJ+fYD+qDR1GBY=
+	t=1770811469; cv=none; b=aRR0B+Ogps+uXFLqnB6PMbuSHGXJ6etpmWwS0OOo0SOPPdRtbBI/J9g0d3h6K8vYxp5Ywx1UVTKqFeu1nTRiPuEV89Z7Ocox6rjbsYpAeuAiVNxxirV7SSCLdrGWI77TeQF7IXlj05VNDkcIcdOhVxrTl/5YDCu93rAqlQLg4v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770808897; c=relaxed/simple;
-	bh=ZjY5+D30mGVRtvpz48RpTih282xPldm+6nqMJJiKpCA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=XU0tdzUXdv068s9w6BJaO4n1bMIUzSuZ6VuNVXbcfhQkzISl5jXLADbVBeKNo9Rju7qmE47JXb7dYGG5uyXfGsutMzh0CRQ9c6GT+iiAD0CbXyR9X4gzT48yMdKYYcEGGjdpAdjyVH6QR/7HgRwfFd+Qe7vFw7DVgB2qZTQkqRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cw8g9/Qg; arc=none smtp.client-ip=209.85.222.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770811469; c=relaxed/simple;
+	bh=F5ocLiFb5PagaCJNTCTkOoYR8su+CxhPpODAa4a2U68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JQ3wsPDDyZIikXJcvV4Ndrm+it1q1XwnuGq1kZEdQ4aLbSy7SC9dOiggCy7MOAC+Ja+3oohVLZfFq1EkCeEi/eUVq8bT5Kia8mumZRnaQSCRvHXVAtcLvl740Tv1YfT75ibjwyTyOGVyGVvlfyKP7Gh3pzhJgxjWEAf4NRyqRS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dominikbrodowski.net; spf=pass smtp.mailfrom=dominikbrodowski.net; dkim=pass (2048-bit key) header.d=dominikbrodowski.net header.i=@dominikbrodowski.net header.b=jTgTQfyk; arc=none smtp.client-ip=136.243.71.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dominikbrodowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dominikbrodowski.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cw8g9/Qg"
-Received: by mail-qk1-f194.google.com with SMTP id af79cd13be357-8ca01dc7d40so196412485a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Feb 2026 03:21:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770808894; x=1771413694; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kJ1UmQeK1czHWJFPsOHgPtl07Wj8Hq0aOIK/uj4SUUU=;
-        b=Cw8g9/QgV5flew5D7PnaNkCWXA8+nF7VUGr6RJI8HKoa7pYiav7Alp3GS+qwCsoU1s
-         rCJILuAnDrd12hZ7gMAyfgP/Ak8viWs0CFsMNC2BVJL2UdrypUN8eC2bG3Mn0+cXsig0
-         TAxPM4GfrsYw9MstkQUgRzZLbARIKMjcWQNTDJfkuEpXq0M1yGNMp3Cn00V6T9QSnm2x
-         sctReCY8T0fBe1ySnSqi5VGb3SbwPa+KJRrhABVH+OkMKz82m56hu6JeyjBFDMnJX5ZE
-         1TacANWtFoRm/Ejd7QynpJIKYtoZ5kTKXbP+e9v492/Ugvp7RcCIC8Zgjrk8lC5f4v34
-         aXEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770808894; x=1771413694;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kJ1UmQeK1czHWJFPsOHgPtl07Wj8Hq0aOIK/uj4SUUU=;
-        b=fUDAD0GHItGxdsaly/UOaIzLfSntDk9vZPWsqfbgMP9OBzV4d8pzX+D6EHfv0BfPDv
-         pnBEb0wXgrlCrptcdGn5sUROs3odJarZ456lUdMJEKhu/VdaIxbYpK6kz9ovQEMUPpnK
-         61kJyIBvSPHYVs2KkFjbWXC6ym9YxgeDwPoUTyia0aOUlnr723MAp9XN9kZSG5TRbZ7Q
-         Aat6vYESeWKkR+pmIrJBmBBqiMO/suBGAj5j7eW5S7TiRxXKHw+zyK/+oJw5cWAJ/XmJ
-         pT5Q6SQziruCx9clZlRtKtxetHwDoGCW2IsJjsvnM65ih1ZRwDyBZGGkTvPuQPWT7eq0
-         hnOg==
-X-Gm-Message-State: AOJu0YyhTBdUn4HIuBCWtERCqafChwcoejJejMMnZcX6DNAGLqBI+DbI
-	Wjb6cur3dUnhNTIfyH7tP1a8XOjvB2f7y5WmtoM8cfYTUENaghH7jDrlDT0AmOxf
-X-Gm-Gg: AZuq6aKZTsD/7UJU99Uo2ztIb8pJsjCIFV7LGz+Tf3OiAXlabCpaRlWhJbV3sh2g5TU
-	Y8yzAcHq9GMDgsY2n7ydojbsjkEHGz4dZxkeYSeotJmF28cGTJlGj74DXAQB3BnPEtk0EZDQngH
-	/qsu15gLFwM7ETj/JDne/oGCon8PD2QeHlRWmzj9MRUcd9id0fxnszDAAXY/RqwVTup2NqnLSlI
-	zeexkOgkuXvBMgI1YcX7X8x5dEOY+5Ynz5qtF856jdQ/1yLGwzZ3Qg0qYabtdzP5Vx4Du94iKdy
-	83pjaP4RTY4+TT0DYb2Oo14WRHJkdKNHeYJ4sFdJko5bzFckzNaVP54yzfyMvdB8PVhGlCuCYmp
-	bv/u/EFg0Gkggr2ZEwMCE6vqz+ZGmrl8pAEUsbt23lqGpgl4ajl+2r5zUDdHO/Gon9vP7f2QAz9
-	pCvddVVHBp+jfXlJ1n6XEZV6MCveGshLU=
-X-Received: by 2002:a05:620a:3953:b0:8b2:eae0:bbf4 with SMTP id af79cd13be357-8caf0487af1mr2147181285a.19.1770808894594;
-        Wed, 11 Feb 2026 03:21:34 -0800 (PST)
-Received: from [172.17.0.2] ([135.232.177.176])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8971cc7ff1csm12488646d6.3.2026.02.11.03.21.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Feb 2026 03:21:34 -0800 (PST)
-Message-ID: <698c663e.d40a0220.9aaea.5a14@mx.google.com>
-Date: Wed, 11 Feb 2026 03:21:34 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5489971740746234956=="
+	dkim=pass (2048-bit key) header.d=dominikbrodowski.net header.i=@dominikbrodowski.net header.b="jTgTQfyk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=dominikbrodowski.net;
+	s=k25.isilmar-4; t=1770810959;
+	bh=F5ocLiFb5PagaCJNTCTkOoYR8su+CxhPpODAa4a2U68=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jTgTQfyk6DGXiB6SilnA7QB+cED1F8DbgS8ibkkK8UXVYDVfrN+rBg5r0xCVxDzkd
+	 9R976RUlE5fn1V7Rfw3wLoE1fDG0RRvgjjP0//vNgDu8Yh5xzyy7Ze7iLuA8oYpRPx
+	 36/DviW67q9k704KNQh5o5xadJHyLqAMzkuXppIHIvdwCX4gjpiC/GfVTQpDC3tkzO
+	 2znC1pjOuu/lJgsFL/KY2AtuLyJZC16qktwHOv3b7cZu4tle29uqd6NUitUM9VXCs5
+	 M1P4eeMaQ9FI3kLXWCusR8U9RT3pc0thP2a7ol/dcyvYk0xuhQHbkuQTLgAo8Qnk+6
+	 fSkTTJWf4Xy2g==
+Received: from scops.dominikbrodowski.net (unknown [10.2.0.113])
+	by isilmar-4.linta.de (Postfix) with ESMTPSA id 58AE020033E;
+	Wed, 11 Feb 2026 11:55:59 +0000 (UTC)
+Received: by scops.dominikbrodowski.net (Postfix, from userid 1000)
+	id 366CA80054; Wed, 11 Feb 2026 11:02:27 +0100 (CET)
+Date: Wed, 11 Feb 2026 11:02:27 +0100
+From: Dominik Brodowski <linux@dominikbrodowski.net>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: linux-mips@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Ondrej Zary <linux@rainbow-software.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	=?iso-8859-1?Q?Andr=E9?= Draszik <andre.draszik@linaro.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>, Paul Moore <paul@paul-moore.com>,
+	Simon Horman <horms@kernel.org>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>
+Subject: Re: [RFC PATCH] bluetooth: remove all PCMCIA drivers
+Message-ID: <aYxTsxNj2NLj8I6y@scops.dominikbrodowski.net>
+References: <20260211082246.41148-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ,v2] tools/btpclient: Add GATT support to get Device name
-In-Reply-To: <20260211094726.198317-1-frederic.danis@collabora.com>
-References: <20260211094726.198317-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5489971740746234956==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1053057
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.45 seconds
-GitLint                       PENDING   0.46 seconds
-BuildEll                      PASS      19.97 seconds
-BluezMake                     PASS      639.90 seconds
-MakeCheck                     PASS      18.53 seconds
-MakeDistcheck                 PASS      242.00 seconds
-CheckValgrind                 PASS      293.99 seconds
-CheckSmatch                   PASS      349.38 seconds
-bluezmakeextell               PASS      182.90 seconds
-IncrementalBuild              PENDING   0.44 seconds
-ScanBuild                     PASS      1015.19 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260211082246.41148-1-enelsonmoore@gmail.com>
 
 
+Am Wed, Feb 11, 2026 at 12:22:04AM -0800 schrieb Ethan Nelson-Moore:
+> PCMCIA is almost completely obsolete (the last computers supporting it
+> natively were from ~2009), and the general consensus [1] seems to be
+> that support for it should be gradually removed from the kernel.
+> 
+> In 2023, an initial step of removing all the PCMCIA char drivers was
+> taken in commit 9b12f050c76f ("char: pcmcia: remove all the drivers"),
+> and that has not been reverted, so it seems logical to continue this
+> process by removing more low-hanging fruit.
+> 
+> These three Bluetooth drivers have had no meaningful changes since
+> their status was discussed in 2022 [2], and are unlikely to have any
+> remaining users. The latest functional change to any of them was a
+> patch to bluecard_cs to fix LED blinking behavior in 2017. The other
+> two drivers have not had any meaningful changes made since 2007. Remove
+> them.
+> 
+> Note that even with these drivers removed, it is still possible to use
+> other PCMCIA Bluetooth cards that present themselves as a standard
+> serial port via serial_cs and hciattach while the serial_cs driver is
+> still present.
+> 
+> [1] https://lore.kernel.org/all/c5b39544-a4fb-4796-a046-0b9be9853787@app.fastmail.com/
+> [2] https://lore.kernel.org/all/Y07d7rMvd5++85BJ@owl.dominikbrodowski.net/
+> 
+> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 
----
-Regards,
-Linux Bluetooth
+Acked-by: Dominik Brodowski <linux@dominikbrodowski.net>
 
+Which tree will this go through?
 
---===============5489971740746234956==--
+Thanks,
+	Dominik
