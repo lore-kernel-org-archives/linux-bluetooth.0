@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4C73563FB;
-	Wed, 11 Feb 2026 19:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61253542E7;
+	Wed, 11 Feb 2026 19:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770838812; cv=none; b=Lij3at4rZoIx8oYVuvMuXK9I/D0t/zX2q85l1XlPIT7O3K8CqPSieE8YgRIkSuY6c4o66DcH5Um2sD+8CmDzHzIDj0PY7EX6E1C0X7kgYrRlGPDXP+YuuKF/uWO5sVzgsaQq02cTZEeLf69OASHrjRUJ49BtqNBPi3W+VhDvL5U=
+	t=1770838813; cv=none; b=U8rCfFsSP3OoLobsJASkvm/jX1c/w4twPBLFCK9t2IAUTyU1CwntVuI4Y1EgSG3TbQGmEiswenmjCJGXXGvjGQWuF6z+80DSt7jZW7W3G2szcW8PlH53bc0QJvjtMXsKJS4hty6zpgj6GuLMIdNtyASmxq1KI+skPmMM6Xq055I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770838812; c=relaxed/simple;
-	bh=ylkijntF6b8qB/UpxOEE+EQeD3zPm1mGPfjFA64Ia4I=;
+	s=arc-20240116; t=1770838813; c=relaxed/simple;
+	bh=HvQ4cnixqUKyg+SllepuEvhBcD2/ieez5yuQtifif60=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=g9axJ0qgvhciLZELs/96IBRurglh2wcYk63lWQcvszooDEuRbSjwyKkcXnQlU7bY9vohBA2QHEsf9N+ylopg/FSNhDMa9m+1gY6ocIKRJfBQy94wv6XoZD0QjxBnQH1Ni64hexqWbNmLbb2WbybkTlfUQoxLroor95jNfm23cRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sosWoQQm; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=H/RfG/CKKNh0Hg//icO/v2ZBR9HCtzFjlPH18pQy6QouKbhz5FtHNX1SjkzfodP2UiMcJzUqzbFU8nXqs+nTY+GImSzg/h8uctsW+24UI2IHW/QY4+brkpNgqP+ln9fyx/2i+iIdwemd1Gp+hx7nkWVU0rdu+qvbQQt7xp3uyRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tQyk5deY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sosWoQQm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 102A8C19424;
-	Wed, 11 Feb 2026 19:40:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tQyk5deY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ED80C4CEF7;
+	Wed, 11 Feb 2026 19:40:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770838812;
-	bh=ylkijntF6b8qB/UpxOEE+EQeD3zPm1mGPfjFA64Ia4I=;
+	s=k20201202; t=1770838813;
+	bh=HvQ4cnixqUKyg+SllepuEvhBcD2/ieez5yuQtifif60=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sosWoQQmNOJZARi/cA6SgQD8k69p21tjDFrVbNaoCS+yMOMKP2BeK5HZXXEPU8kAe
-	 E3aiJre62mt3zbK+jI6MO2AGiitnyq59j2pa2d56SJc4sKoeQD9uVx0794tTbylbor
-	 ynbE+szE74lX56fWyThrIj0lKpQmsAoNeJYSY5WZqoLR680HO1K2yC18vHHjwSut2z
-	 PHA4vPqpQuCyYfCav95XiIBpTa6ZjviocnTAE+1ttMQ30Q98mkhmCQBvARFa5edkG6
-	 ww8UL4LVhQ5PaZn0Z2LlhqsPHXS4fo48KL+lYY2dN5pHpfaJgL9ZNA68D1UTFSoNOV
-	 XKgaPk03fgQbw==
+	b=tQyk5deYFw6bFD/1N5vIBOtHcCldMaHOkaF+CxtZMEfaGgKmutSNz1ql6tRroZ8bs
+	 Hp7vXKI4pyk3q35mr3OANxMIjdTyGobpiZ1k+avYVUUlYVyRLcnVai4OHGkLjrX+Bb
+	 EhMmoM4QzB5YOCrMODWI1YWdhkhOnUGFPaV2W8w++jLZFTXR7gWYG+g4Hbvv2fgwZa
+	 z6/pkBbA/c+FwjNJdFOd7pOHZ49Gj5dkPFxjylOwZefsR0/yZ8dylAAc5Hjz+VmLvh
+	 l/U4WET0/eGzTKGTbn2QC9qAamhg82/AArdSDzkxmXIblapKcVjM4ww8EskanP2NF+
+	 IccRpZSEMEkIA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0B38D39EF964;
-	Wed, 11 Feb 2026 19:40:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 851CD39EF964;
+	Wed, 11 Feb 2026 19:40:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,40 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5] Bluetooth: hci_qca: Cleanup on all setup failures
+Subject: Re: [PATCH] Bluetooth: purge error queues in socket destructors
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177083880682.688115.3353711638661870802.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Feb 2026 19:40:06 +0000
-References: <20260205062600.590342-1-jinwang.li@oss.qualcomm.com>
-In-Reply-To: <20260205062600.590342-1-jinwang.li@oss.qualcomm.com>
-To: Jinwang Li <jinwang.li@oss.qualcomm.com>
-Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
- abhishekpandit@chromium.org, quic_bgodavar@quicinc.com,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
- quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
- shuai.zhang@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
- bartosz.golaszewski@oss.qualcomm.com
+ <177083880807.688115.2802433045954977794.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Feb 2026 19:40:08 +0000
+References: <20260211-bt-purge-error-queue-v1-1-42159dd7bb28@igalia.com>
+In-Reply-To: <20260211-bt-purge-error-queue-v1-1-42159dd7bb28@igalia.com>
+To: Heitor Alves de Siqueira <halves@igalia.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ willemb@google.com, pav@iki.fi, luiz.von.dentz@intel.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-dev@igalia.com, syzbot+7ff4013eabad1407b70a@syzkaller.appspotmail.com,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu,  5 Feb 2026 14:26:00 +0800 you wrote:
-> The setup process previously combined error handling and retry gating
-> under one condition. As a result, the final failed attempt exited
-> without performing cleanup.
+On Wed, 11 Feb 2026 15:03:35 -0300 you wrote:
+> When TX timestamping is enabled via SO_TIMESTAMPING, SKBs may be queued
+> into sk_error_queue and will stay there until consumed. If userspace never
+> gets to read the timestamps, or if the controller is removed unexpectedly,
+> these SKBs will leak.
 > 
-> Update the failure path to always perform power and port cleanup on
-> setup failure, and reopen the port only when retrying.
+> Fix by adding skb_queue_purge() calls for sk_error_queue in affected
+> bluetooth destructors. RFCOMM does not currently use sk_error_queue.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v5] Bluetooth: hci_qca: Cleanup on all setup failures
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f266be5c8533
+  - Bluetooth: purge error queues in socket destructors
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d5e3243e55d7
 
 You are awesome, thank you!
 -- 
