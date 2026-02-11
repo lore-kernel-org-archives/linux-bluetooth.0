@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323FC2EA151;
-	Wed, 11 Feb 2026 19:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4C73563FB;
+	Wed, 11 Feb 2026 19:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770838811; cv=none; b=cNsjuXhciwfB09xA4y2Xyy80B/mNBPF/XmV11DXZan80oZfWYpF76uhBoKF0yjrj3X6DJlLZpEOeiXpiGRS0tk+Q+If0Mt1dsX5Qrv+S2U+8X0gmMihl/ErGfJsOTPI/3KabG+kMd+7LYKroLhPnQgoTei5i08VbxcoXvEszYUw=
+	t=1770838812; cv=none; b=Lij3at4rZoIx8oYVuvMuXK9I/D0t/zX2q85l1XlPIT7O3K8CqPSieE8YgRIkSuY6c4o66DcH5Um2sD+8CmDzHzIDj0PY7EX6E1C0X7kgYrRlGPDXP+YuuKF/uWO5sVzgsaQq02cTZEeLf69OASHrjRUJ49BtqNBPi3W+VhDvL5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770838811; c=relaxed/simple;
-	bh=pW6agFvFBsR3iZkfVOxXUj+mmNx/Qb1njeVmRcE3KOw=;
+	s=arc-20240116; t=1770838812; c=relaxed/simple;
+	bh=ylkijntF6b8qB/UpxOEE+EQeD3zPm1mGPfjFA64Ia4I=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KEc2hhL4OO40qPvr+yN/IcfpAozjxw2SNZqXR6jHTmXVxGqRfKNa9R++oLKujFaF/fDM/LATgqkv8aj+KudcmRRtHqW+nx5qCgLANUQtmn7zMDCwk+BsoIgzQB/JLZqvknleKoFpl8bU2KE+dGQHPZngbccPX6FxP2S3ou8MueA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h51bmuTB; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=g9axJ0qgvhciLZELs/96IBRurglh2wcYk63lWQcvszooDEuRbSjwyKkcXnQlU7bY9vohBA2QHEsf9N+ylopg/FSNhDMa9m+1gY6ocIKRJfBQy94wv6XoZD0QjxBnQH1Ni64hexqWbNmLbb2WbybkTlfUQoxLroor95jNfm23cRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sosWoQQm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h51bmuTB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCD58C4CEF7;
-	Wed, 11 Feb 2026 19:40:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sosWoQQm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 102A8C19424;
+	Wed, 11 Feb 2026 19:40:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770838810;
-	bh=pW6agFvFBsR3iZkfVOxXUj+mmNx/Qb1njeVmRcE3KOw=;
+	s=k20201202; t=1770838812;
+	bh=ylkijntF6b8qB/UpxOEE+EQeD3zPm1mGPfjFA64Ia4I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=h51bmuTBZx8atIlixmyh3ldYIZU3sjN6lV819BgEJJfCIfw7p9RNj+aVPVXHh+Mc0
-	 qZsKSVCVldxAPiSrVafey60loZa+YVIyYmMlnQ5BCrlkeO6Za1NUEY4lL3HYc1p6sG
-	 p2NcOTaOz4HIK8S8AiHfylpC5IDoRaLqsvksWFcv8gIGe/JXriA88u2JXhietIekV7
-	 AcdZXylUrO6CO32jApcbEhD38oIaFztf8vynA+W1OiD06PUhbGqQ7Oh7Gi2W7Je9m5
-	 d9ZDalh5Ux9dFTNol1LWbfI6r9Ew3WvkT2m71QAhO1TC/vwbVFVa6oqvav8UDt+FNm
-	 h568ayE37PoKw==
+	b=sosWoQQmNOJZARi/cA6SgQD8k69p21tjDFrVbNaoCS+yMOMKP2BeK5HZXXEPU8kAe
+	 E3aiJre62mt3zbK+jI6MO2AGiitnyq59j2pa2d56SJc4sKoeQD9uVx0794tTbylbor
+	 ynbE+szE74lX56fWyThrIj0lKpQmsAoNeJYSY5WZqoLR680HO1K2yC18vHHjwSut2z
+	 PHA4vPqpQuCyYfCav95XiIBpTa6ZjviocnTAE+1ttMQ30Q98mkhmCQBvARFa5edkG6
+	 ww8UL4LVhQ5PaZn0Z2LlhqsPHXS4fo48KL+lYY2dN5pHpfaJgL9ZNA68D1UTFSoNOV
+	 XKgaPk03fgQbw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C232239EF964;
-	Wed, 11 Feb 2026 19:40:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0B38D39EF964;
+	Wed, 11 Feb 2026 19:40:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,35 +37,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btbcm: remove done label in btbcm_patchram
+Subject: Re: [PATCH v5] Bluetooth: hci_qca: Cleanup on all setup failures
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177083880533.688115.14177184498868298088.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Feb 2026 19:40:05 +0000
-References: <20260203071048.1624461-1-jindongyang@kylinos.cn>
-In-Reply-To: <20260203071048.1624461-1-jindongyang@kylinos.cn>
-To: Dongyang Jin <jindongyang@kylinos.cn>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+ <177083880682.688115.3353711638661870802.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Feb 2026 19:40:06 +0000
+References: <20260205062600.590342-1-jinwang.li@oss.qualcomm.com>
+In-Reply-To: <20260205062600.590342-1-jinwang.li@oss.qualcomm.com>
+To: Jinwang Li <jinwang.li@oss.qualcomm.com>
+Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
+ abhishekpandit@chromium.org, quic_bgodavar@quicinc.com,
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
+ quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
+ shuai.zhang@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
+ bartosz.golaszewski@oss.qualcomm.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  3 Feb 2026 15:10:48 +0800 you wrote:
-> There is no point in having the label since all it does is return the
-> value in the 'err' variable. Instead make every goto return directly
-> and remove the label.
+On Thu,  5 Feb 2026 14:26:00 +0800 you wrote:
+> The setup process previously combined error handling and retry gating
+> under one condition. As a result, the final failed attempt exited
+> without performing cleanup.
 > 
-> Signed-off-by: Dongyang Jin <jindongyang@kylinos.cn>
-> ---
->  drivers/bluetooth/btbcm.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
+> Update the failure path to always perform power and port cleanup on
+> setup failure, and reopen the port only when retrying.
+> 
+> [...]
 
 Here is the summary with links:
-  - Bluetooth: btbcm: remove done label in btbcm_patchram
-    https://git.kernel.org/bluetooth/bluetooth-next/c/7351872d71d8
+  - [v5] Bluetooth: hci_qca: Cleanup on all setup failures
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f266be5c8533
 
 You are awesome, thank you!
 -- 
