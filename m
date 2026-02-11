@@ -1,42 +1,42 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1CC350D78
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Feb 2026 08:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683762F6192
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Feb 2026 09:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770800372; cv=none; b=U5RFUjoibgYpqkrI87wjgv8O7gvf8k0KIf1BIhK7YHhjbOITRWur+W3IYOKp3LVo3lPSR1/FN5WBX9Xe+T2+vCz72dUAIeY3dzFbRRt+6zbXoo5DvOoSyrLTloVhqlkGlEX7iS0z70QDybJJsndH+r2I/ynVmJnaMcYCrJLLTYs=
+	t=1770803254; cv=none; b=ZddbMd04vmgDOiIuxuv7gfjRpyqBb57QMfI9HTjhTfcrAT4GiNkBXNCitu7g9+6rVmRXQZ3LUIxrnUSfHIn+tL0BpZSalJOG39JjvuHFPOo+7oA2VoSi2cA/RsnjRBacV7532fEWMjxnxtCDODCYjoF3gxEybz2nv159U63O0NU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770800372; c=relaxed/simple;
-	bh=hyv9KR+st+wcjt9LTbLKNKLvjSL5fbQ1MOfbp8rDai8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VoBv+LExYrAZR2j7QCvQ5caPx3b5eCwZOrTuIKzXYMM4KIx1nCjNvWb27DGxtxZIHndSiQn11FRZ7Y0nMfKnnfbHf93+HKFFo08/UwCVhqZx1VwI+bBMsrA9EJZwrCPVoRtfwqKe6VPMVnacMitha69nUyc37rYOlUMjn1vpRjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=JZXiYe/D; arc=none smtp.client-ip=148.251.105.195
+	s=arc-20240116; t=1770803254; c=relaxed/simple;
+	bh=vN6Ldi968Ka0jA+5UKT1gJWmf7nDlcesQdxNmp7k+3w=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Vieo/ZLR5ZZRyoM8dcaWnordzzBIV0u5K04INY4qpWYmUua4O5KlaMRDHfKkq97PLKgbgoN3PG/XIhBtgfeNMzJ2UXMJriw1XnJK3Qs7q3UwX00XFJq4XEXYMuMt6UpS4bl5K3w4lphZUawj3qm20/8Z5Kt8F2t00KMIx4AIAnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Ndw2IIqY; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JZXiYe/D"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Ndw2IIqY"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1770800369;
-	bh=hyv9KR+st+wcjt9LTbLKNKLvjSL5fbQ1MOfbp8rDai8=;
+	s=mail; t=1770803251;
+	bh=vN6Ldi968Ka0jA+5UKT1gJWmf7nDlcesQdxNmp7k+3w=;
 	h=From:To:Subject:Date:From;
-	b=JZXiYe/DUp2SgTrKGk0gMOhoZqVIae51ZIkMO32mPQdeKGpHW7KWTb5lS2u4ozLT/
-	 Zow0MGUb8OoxMqs+8S3s/Gt0D7gkeNogkGE3lH+RRyxlU9n807GWFMxSvGGrKDpNK3
-	 S/LnUC/fahP1EPvs4970UxB4KOmgjBMdL6gccJZIUmx4Ryl6SCyz8W6rI6kgIhLOeW
-	 bgHILsb6o7TuuQffFqtwBPPj70ivW3s/b/gl8ZNCUMcji21VtYI1Pe7FGWe9E1kiHD
-	 h8ahY/uGkHCaAR2iXo3+QqUokXTRbwudqyMQhBSc22tCPO1Tge4AKFm0HMb3E1xqDq
-	 I2i5xuRTxLksQ==
-Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-3D27-F5d9-cB51-6B68.rev.sfr.net [IPv6:2a02:8428:af44:1001:3d27:f5d9:cb51:6b68])
+	b=Ndw2IIqYcli6fg7fJ8b/2oIU98FuedTKKuBdZDK7PoyobGdDHeoaKpbe8D9c6nVir
+	 lQja4QjfCU0ZInlYb8kn8lSf/yPy4kdi7rQrT0KOCiO+0S1asEvYz0iST3JkxSuXeC
+	 3W6T0bgr7ZNSgiUZUprSzZ6IKM9Lwax+hod3Gcv7AL32nf/AKmur58+QPGGIK9/bDy
+	 whxWthHsFxlv+qsqxauQ6MJmFGBq2sym/azqrNP7Pm7D1gcJAiGZvZEoZncLijaZ7Y
+	 /+hDyNTQqVD9bTuDMq8eOPUj4TSQgxpVGid7OthpA0SrVr1Y+1vbi8ktJwk23g2Jbu
+	 SDvkJCOE5LKOQ==
+Received: from fdanis-ThinkPad-X1.. (2A02-8428-AF44-1001-3D27-f5d9-cb51-6B68.rev.sfr.net [IPv6:2a02:8428:af44:1001:3d27:f5d9:cb51:6b68])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id F0B0F17E0E6A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Feb 2026 09:59:28 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 86C5D17E009B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Feb 2026 10:47:31 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] tools/btpclient: Add GATT support to get Device name
-Date: Wed, 11 Feb 2026 09:59:22 +0100
-Message-ID: <20260211085922.190675-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2] tools/btpclient: Add GATT support to get Device name
+Date: Wed, 11 Feb 2026 10:47:26 +0100
+Message-ID: <20260211094726.198317-1-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -53,9 +53,11 @@ property is updated.
 
 This allows to pass GAP/IDLE/NAMP/BV-01-C.
 ---
+v1 -> v2: Fix memory leak
+
  src/shared/btp.h  |  18 +++++++
- tools/btpclient.c | 119 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 137 insertions(+)
+ tools/btpclient.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 139 insertions(+)
 
 diff --git a/src/shared/btp.h b/src/shared/btp.h
 index ad18cfb3a..cf921e64a 100644
@@ -87,7 +89,7 @@ index ad18cfb3a..cf921e64a 100644
  
  typedef void (*btp_destroy_func_t)(void *user_data);
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index b70e2b573..cbfdf9ea6 100644
+index b70e2b573..8466d0606 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
 @@ -22,6 +22,7 @@
@@ -219,7 +221,7 @@ index b70e2b573..cbfdf9ea6 100644
  	case BTP_L2CAP_SERVICE:
  	case BTP_MESH_NODE_SERVICE:
  	case BTP_CORE_SERVICE:
-@@ -3162,6 +3249,38 @@ static void property_changed(struct l_dbus_proxy *proxy, const char *name,
+@@ -3162,6 +3249,40 @@ static void property_changed(struct l_dbus_proxy *proxy, const char *name,
  			 * type.
  			 */
  			btp_identity_resolved_ev(proxy);
@@ -255,6 +257,8 @@ index b70e2b573..cbfdf9ea6 100644
 +					3 + pts_name_len, rp);
 +
 +			gatt_uuid_name_in_progress = false;
++
++			free(rp);
  		}
  	}
  }
