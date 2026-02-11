@@ -1,163 +1,204 @@
-Received: from mail-qv1-f68.google.com (mail-qv1-f68.google.com [209.85.219.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673621946BC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 22:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.68
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770762449; cv=none; b=NywJjPnyh3AJBpbkz6Su0dCQCErawlTTevH6pcUWxqVuu0jmaRne2Lpna4anCc3SHD+/4fbjZYaPmQfxv9Q5I0vICdzcm3VhlW2p/VfWdf8fSoULDOFG+8LOHCB8j62EAyJM4h/SZuMNA8eHETO4jpTxy43OAJzb1ejgV6HKUpI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770762449; c=relaxed/simple;
-	bh=9F7G8BwIEOPyks89gVVg6rinpESfE6My45evZSy2pw8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Q1cg1Nb4ROr5hrtzd38t9EYWIXZcd8mf9VtrQ2kS7kGEIO0eF1xqwI5yRsOD2dx7z4v1Cf04fCmns6R80lxDUREzsq1XuRVEzjPw/i5dHqCfCErQ0/GESk022d0u5FVKOg8cEatGivo222Y1kuxrTDTAAPhvu1QU86P7uMtJulw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z6R8WMwJ; arc=none smtp.client-ip=209.85.219.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A09829B78F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Feb 2026 01:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=205.220.180.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770774531; cv=pass; b=XOzo5nyInHXBHe2fvSN5nOg7K5sw1koJQxVszI5ne2LJRboizs+8+PdFbmuGsL3LiLlTbEdccz1ZysojZK/IRnUJfIz9ivkRCxUvqEy1fv8Y/ssTFXOJtl2AoGrBXh8mW8B9KeUBJgNu3vrMr30PA0S0t/u1/eDHNNztV+bHowA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770774531; c=relaxed/simple;
+	bh=xSGeYmave0IMZ0SkXbSK3JzZpiVmg9C8P170/PXGWPo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WNrvcibrsgUmJm6+D/iBV7g19C4p8d9g6npbK1ER8bp0eNH/KIowghrVaofCEFiX4u6dD+EnBnlGyhhC9FLv2ua09sp7lzuj74sqQau3MBt1hVdIB+fGqQDZ0EQj45NBhkUKLK57U7dcy81HtuAvvIcXa45y/ZRQhA/kRc0wWv0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=fwGmUgjz; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=RzuGOxwg; arc=pass smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z6R8WMwJ"
-Received: by mail-qv1-f68.google.com with SMTP id 6a1803df08f44-897023602b1so17620116d6.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 14:27:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="fwGmUgjz";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="RzuGOxwg"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61AHFLSo2396794
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Feb 2026 01:48:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=EBuYjZ6aifGkd1dAhK++qfqm
+	5kl2DiQXlBUEgL/t//Y=; b=fwGmUgjzmRMwoYf1nUK2e1gsG0x1q/7axC9G1d/o
+	SaQKNu/YQ+QzxOUsrbCsXbiUGaLdCx/qnzMX5iWyDlQAZ+dzTH0a4Dke+L79hCUC
+	Dqe3ddE18USs0bSYjFB8w9E163NOMR6AFGc+UijVhis0AOcsDozykwDz7n7XnhTw
+	5rI9i+Fe7/2ST9BhStUfzp7S5fC1LoLhvZOLF31Leg37tpP8DuIakBI5hfxvv0G4
+	B7edLcFEpRuIHfvQhSjqF/cZTrAiNAPr7VJMNqcuVtVMLSjPHMpzDgoX0AiDLH0V
+	qnn2AlwZkAAnZy5MY4WReynLC1EU9PNwSqH+BXRqhqPPEg==
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c88wqhg1v-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Feb 2026 01:48:49 +0000 (GMT)
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-354bee18a62so3602138a91.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Feb 2026 17:48:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770774528; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DZ1KFm+ks79Vutohy00AH9efW6MxTj4FOE3E4Cskco/N+LHHwkuv+bwRxW/I2sEWCY
+         5WAUFhkNskeIiMEikEYG9BZpFcJ6vTwNGVPmNRVcj+CZfiTD3aLW3AQfxU+SN02lvnDU
+         QPNstXpXIsK10VzBvgIKIVjgno6xnGJfkkKNkSVK4JrIxX/E/F7tidrrs0rUmSWhR7Vh
+         pLtOQXZZEQAeNIgNYps3YxkZJQB/YzEohwDakuxMS6hCIRcqG61stnQl4dipk7PK+Oj7
+         gKPmlEhsqX0jvRGW75XQHTTLB+ItEpagymJgwxNrYYZVxbVLRDBojKC3cx175G8fsxBQ
+         JzCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=EBuYjZ6aifGkd1dAhK++qfqm5kl2DiQXlBUEgL/t//Y=;
+        fh=NnP4mcTL51yTkiE6ibr0eSmXShyQlF+hJ7Ag89GY610=;
+        b=OzyuASvRKp2gooShe8/rseyzVvm44NLHu7H18DUMRd4z4P3SGzttETHBuHFMJkjtxh
+         ueD2g9U+mGNkyK/J/4zsENam7SNc04O3bJm5j6cRAeuAT+7E3YiECuvqj0a6LyqKq5Dt
+         14/qs2pKalc/eFMSEv7tS2QjWiBrunCevmeFr/gPe2burzRg4TaDhiLwIE84FgyL+X30
+         0ObcD/+KzVazCHSOsGGZZTfCClUFzAJktpS8IDpPsY+0RcNz3ey2bCeEfeFcu0BdMKjT
+         4aq+a/ZJMIWtQthoHuj1A8lMvp9gp0RqTDC4Nc41W4iLEoCW+hNTSD9CgM3w+t4mtrkc
+         1RuA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770762447; x=1771367247; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=V5+/Ej5q1ihP+3ilkZtNwW4NYBwRVTB5cg35VjMmx4w=;
-        b=Z6R8WMwJI2yMI8TfeDNH2Bl1VTIsII+rU8pg3GfZtGzGqMvhlbRMq+7IEaP0XNwXUQ
-         zU/0WFRHQFkmLe/Y652KmkAKCr7Kq+Lt2raDhvQNOqSk0ZJFEKnAnDsZKnl99c7fxEUP
-         sxChruxpu6aubuXb87Jp+vwc2b2JTpKYy7hxO/qY0Wwo3EvC7ll4JEpGCwzGfFSItmqm
-         jUcah/MuBBEPkGsg7kQKthJFHFROC2DihZLSyaZ/COf0Dc349Uo3JrpWA3pV9qBLqmmG
-         FV+jP8WrGoL37Vb2lrIVpD6F7uQGSmCswGcCuZs00UiF6CSBsXvmtoiHNJnv1ZGUVkT9
-         bdHA==
+        d=oss.qualcomm.com; s=google; t=1770774528; x=1771379328; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EBuYjZ6aifGkd1dAhK++qfqm5kl2DiQXlBUEgL/t//Y=;
+        b=RzuGOxwgWi78utb++D/twBmVneUIv1b4zzpvOc9+IG51A1ho9KCNSUvUdvvpGmyOgU
+         phPNDY8K+72Uliim2w08E57AhKI6GsSFt2/wT1UV5cX/G1LpryEH5d7Hh0bh3pMZc3et
+         4QJNlX3/I+VruCgVX6PaLla9EyDWtYRbANxzpXkvHkVsG7SzjwddCD4AJhOFQ63VvO8D
+         rH8gtXIp/L1At/YWQ4qW5k0cO83LC7QvoxNXbvpryU4GzM2JO/nAQxme3Us6ogJ8WRwm
+         sWcdPtmhHaRATcXUEmjC1jIwSO7+NoGwEB/ze6Q0PyieFcKSua8hn++Lpm6y1yi271ce
+         x0/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770762447; x=1771367247;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1770774528; x=1771379328;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V5+/Ej5q1ihP+3ilkZtNwW4NYBwRVTB5cg35VjMmx4w=;
-        b=qYyjw/ptlWVHpYsPF5dRQBeZYtsd1FqiTFb4UmdgmqV6ert21FcvtBRYEzsjUg/Fuo
-         Fa8Vpiuk/5A4MVP+fn33dfZvlu5IrM3zyLrqozH3Edi09qSCDngAVLKyq/V1RDtmzfJe
-         9cUPDDh+16P5m4ClwUYQi5en5JWNaWALW5mAvVTr/wXS1V5hABxDYGFKKnrAxFnlwuKn
-         5RL5SeS880vRjhz0SvsYW0t0P1oomXhZU0yKSClGk7Gokg049fSfjm9mVS2YgeRQhXra
-         wWsrZMUL4yZ1GXjImjhSkYGkyVfghSY/fInAHEyCP5y5IvhxkU6F7uymS1LPnfAfDAVl
-         n05g==
-X-Gm-Message-State: AOJu0YzkfTAW1qdh6EJ+ZPnsQMZAECEVrx3q2yGcN9JdXpykptanqBw4
-	btBCSxX6/EIDcFRL2aWHaUe/PTuRZOMx2hxzbtIkULrKUWXEjv9Nqnt1I+ADasPf
-X-Gm-Gg: AZuq6aIYOtmFG9sDJott+iNCdTRzXPccJH41qkc3u2Qf+K3nxrpPJuoVyPtK9LwFJa7
-	osFZbT7vU5bI8jZb2F8mhO2rig5+y3OGCbV97rxWoBil6qUrG3EA38k+1yBhAvsU0dc43bO7Gpf
-	s+bWL5bnKi6Ah7XxITyEcv6ehvE5EykpYgXlOFHyDuZEX/0SIpxt+1BBcDR/E1w6aELqw3kKSlQ
-	joaumy4gjyGy7M3dY/ucITJ81N/+3BUIxIhJ3gy9uja5y6mFdxEdK/YqqbhPLGfzmqFxuV00pmc
-	SkKU+0LdkYpcNC9cgQ935s+2ftsSPNqzytL1ALaAIG1l30ie5O/A+v+yUp/G0i9Kv3iaaIEqmJD
-	Vguc4NdFntHXIGYssnvEfAEv5K/ucBLAnEimpdyzcWB73HctsS/QdN0AsByNSQWPkUZvzbCMoz3
-	9noXUfzsi4cgHvdEamEhsZJ/oLe0HPkQs=
-X-Received: by 2002:a05:6214:2123:b0:895:d652:e3a5 with SMTP id 6a1803df08f44-895d652e4c5mr181926756d6.23.1770762447051;
-        Tue, 10 Feb 2026 14:27:27 -0800 (PST)
-Received: from [172.17.0.2] ([145.132.102.242])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50682edecd8sm621631cf.5.2026.02.10.14.27.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 14:27:26 -0800 (PST)
-Message-ID: <698bb0ce.c80a0220.33fe0f.e15f@mx.google.com>
-Date: Tue, 10 Feb 2026 14:27:26 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7222303988389113786=="
+        bh=EBuYjZ6aifGkd1dAhK++qfqm5kl2DiQXlBUEgL/t//Y=;
+        b=X7aQo6dMvHxTNxigZ+H5Ynw3xTzCCFAEhwARWEZe4cp1yOSFXdwjjdo6oxlgzU9P7M
+         AixykuIvd2xul4xJjMDP/o7fNLiQMq6a0fDrzduAFi19wZxPUI8V53H28+fyU90Y7QRr
+         11VGr5OObWAZx063o7UzQkLCMaMPKdhWJeMTB5PF/GNCb1/7kWxlVoaSIyrw/L0dhJZa
+         FFOwcg8bb/tQSWYR5wRx0+zr97iLLSnAJf9Ph9SpLxQ3rO3zywq7lrSKaBx03wbGCey/
+         nMzmNiZ7UeNVljMVSJ9/h5PKYP7TiOG+gKAWvsL0xeEEu5pb3NwueCGRIMlgeeeWBQVN
+         pPuA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJxQRLdGs71CL26hWqCJSwpOAJ9LfMoeSTO5z/OextgT5QhPaC3foLYFWyehfZePa4DYPR6OVNsVwxsTHjOnQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1DGFm74eXp9fkbgTFG0kQPNskEplAM4Oo5zSdV3rZHMnWC10K
+	hpwcAgr2KgzsVgWewljpmfjL+3kaS3YHCbhVrJ3Vxdjlgcj9T5uMhgWTqIxEMIfUeu5inuEzw5l
+	1EVApKL1OTK1GuQijyhIR6O3dJzZI1itZO+Y7Ja3aNVMhzXLPh4NWkGVAxNU0YskjvVjUTR3iJe
+	bsMtFYgNWCvOn9XY9GtoXLfzCf7T0m/AHuCvcijCE/NOczkg==
+X-Gm-Gg: AZuq6aKfIBhHVa63KOYlDWDtkntiMujr72Kjbkvm1Ww+xB04O+45wQ+MR0fYQEIWt78
+	V3W+sTxfYfjcjuEOcMkFg1YXdDT1RfZsGzrft7bbcIdKL3XZLTUj7i4+569o0KmoXMFT8R3ZTU0
+	gWwNRZbhsIbtInIaY3ZT+9crjzPQyLDX57odJLeYTH44x/YzKr/b1QbdkPJe7VlHCjjaCc+3jkA
+	HYt
+X-Received: by 2002:a17:90b:3bc5:b0:34c:a29d:992a with SMTP id 98e67ed59e1d1-35667d72a8bmr3144203a91.34.1770774528468;
+        Tue, 10 Feb 2026 17:48:48 -0800 (PST)
+X-Received: by 2002:a17:90b:3bc5:b0:34c:a29d:992a with SMTP id
+ 98e67ed59e1d1-35667d72a8bmr3144179a91.34.1770774527960; Tue, 10 Feb 2026
+ 17:48:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v3] Bluetooth: L2CAP: Fix result of L2CAP_ECRED_CONN_RSP when MTU is too short
-In-Reply-To: <20260210212722.1250596-1-luiz.dentz@gmail.com>
-References: <20260210212722.1250596-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20260209080613.217578-1-vivek.sahu@oss.qualcomm.com>
+ <20260209080613.217578-3-vivek.sahu@oss.qualcomm.com> <CAMRc=MfT7ourMH+ShJpnBAjv_uOb_ds0rxJOYaz_HsoT45dJYA@mail.gmail.com>
+ <cbc0b42d-fb5f-45b8-9074-d0bcc64a9de1@oss.qualcomm.com> <erc5u6hzofidlf54dsz7htta55o4xwgihgh4tu6mqkg2ijz3fo@6hd6q6iljrfq>
+ <dada4a44-f464-4325-9082-50029d6a4555@oss.qualcomm.com>
+In-Reply-To: <dada4a44-f464-4325-9082-50029d6a4555@oss.qualcomm.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Date: Wed, 11 Feb 2026 03:48:37 +0200
+X-Gm-Features: AZwV_Qg2qm_Ag_s2JkmIG-Y77QYxnHbFnwvbLMtmQMEho97MeZnPXtM_u5rHzFo
+Message-ID: <CAO9ioeWhNO1vYVvN46wNfr2NFAjD-oERLhMKTXyRkRDLtJTMqA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] Bluetooth: qca: add QCC2072 support
+To: Vivek Sahu <vivek.sahu@oss.qualcomm.com>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, quic_mohamull@quicinc.com,
+        quic_hbandi@quicinc.com, linux-bluetooth@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjExMDAxMyBTYWx0ZWRfX51Hx+mTQkW6o
+ CJZy2mYUavXUkDct9DUf9lNmbtJMVTnE79iNsDaGRJIi8Ka8NjPYWnnpqNdzl6A8QO/zsiaKVyX
+ TOLRo10e5e/DIOvvKnwq3fLNYnMfKYufpknHV+RYmjWczowdsJ091y2Ybx959RlBTkBldKjvAhd
+ K9pP42k7EdSDT0watBkf5+JYb4qS3b4eSGlM9MCzaMJEeoZenB7Z8xXbWSs7yIzylj9e0DMkHH7
+ BDinXMT7HQTf9kyt3kpfU1m+fFg7DfRjtG3stuPBMK1dfHhEk4cSAvOkjgw8z++Ce4n9bV1pY/9
+ u6wLk7zPdr3/nDMhO7kPwSkJapOxUBWcYXVVa5Xgip1Kq7iK26twX86ehQqliwZIY5prNyeTqj1
+ 9uqUxqE1uWvCuuLgpESUhDcPbSodcIQZh92ZjWw3FwWm+9M7TSQhhJ5T4ecxG3SBdmzoURW7SZu
+ inOrPr85bvu6u03FBbA==
+X-Proofpoint-GUID: KJx97pSto8NSWwxUnjLHhXnMCVbHoPHp
+X-Authority-Analysis: v=2.4 cv=W7Q1lBWk c=1 sm=1 tr=0 ts=698be001 cx=c_pps
+ a=0uOsjrqzRL749jD1oC5vDA==:117 a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
+ a=GgsMoib0sEa3-_RKJdDe:22 a=EUspDBNiAAAA:8 a=TCK52CFr6wQZEBS1tEMA:9
+ a=QEXdDO2ut3YA:10 a=mQ_c8vxmzFEMiUWkPHU9:22
+X-Proofpoint-ORIG-GUID: KJx97pSto8NSWwxUnjLHhXnMCVbHoPHp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-10_03,2026-02-10_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015
+ suspectscore=0 adultscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602110013
 
---===============7222303988389113786==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, 10 Feb 2026 at 15:53, Vivek Sahu <vivek.sahu@oss.qualcomm.com> wrote:
+>
+>
+>
+> On 2/10/2026 5:46 PM, Dmitry Baryshkov wrote:
+> > On Tue, Feb 10, 2026 at 05:41:13PM +0530, Vivek Sahu wrote:
+> >>
+> >> On 2/9/2026 5:04 PM, Bartosz Golaszewski wrote:
+> >>> On Mon, 9 Feb 2026 09:06:13 +0100, Vivek Sahu
+> >>> <vivek.sahu@oss.qualcomm.com> said:
+> >>>> QCC2072 is a family of WiFi/BT connectivity chip.
+> >>>> It requires different firmware files and has different
+> >>>> configurations , so add it as a separate SoC type.
+> >>>>
+> >>>> Correct the sorting of other chipsets for better readability.
+> >>>>
+> >>>> The firmware for these chips has been recently added to the
+> >>>>       linux-firmware repository and will be a part of the upcoming
+> >>>>       release.
+> >>> Something is wrong with formatting here.
+> >>>
+> >>> I would personally split the sorting and support for the new model into two
+> >>> patches - without and with functional changes respectively - for easier review.
+> >>>
+> >>> Bartosz
+> >>
+> >> Yes, I'm now splitting this patch into 2 parts, one for sorting another one
+> >> for new model
+> >>
+> >> support. Please ignore this patch.
+> >
+> > Please stop adding extra empty lines between (or fix your email client).
+> >
+> >>
+> >> Sorting change has been raised with tittle "[PATCH v1] Bluetooth: qca:
+> >> Refactor code on
+> >>
+> >> the basis of chipset names". Please approve it at quickest so that we can
+> >> raise new model
+> >>
+> >> addition code changes on top of that.
+> >
+> >
+> > Why couldn't you send it as 2 patches in a single series?
+> >
+> this change includes driver change and yaml change. In recent
+> bluetooth-next branch there is a new style of documentation of bindings
+> comes as "Split to separate schema". I need to re-modify my patch again
+> and compile. Splitting patch seems more convenient for code submission
+> and addressing review comments.
 
-This is automated email and please do not reply to this email!
+It makes maintainer's life more complicated as they have to cope with
+dependencies between patch series.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1052898
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.39 seconds
-GitLint                       PENDING   0.31 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      25.58 seconds
-CheckAllWarning               PASS      27.97 seconds
-CheckSparse                   WARNING   31.73 seconds
-BuildKernel32                 PASS      24.92 seconds
-TestRunnerSetup               PASS      554.47 seconds
-TestRunner_l2cap-tester       PASS      27.83 seconds
-TestRunner_iso-tester         PASS      73.62 seconds
-TestRunner_bnep-tester        PASS      6.46 seconds
-TestRunner_mgmt-tester        FAIL      117.39 seconds
-TestRunner_rfcomm-tester      PASS      9.64 seconds
-TestRunner_sco-tester         FAIL      14.43 seconds
-TestRunner_ioctl-tester       PASS      10.15 seconds
-TestRunner_mesh-tester        FAIL      11.48 seconds
-TestRunner_smp-tester         PASS      8.62 seconds
-TestRunner_userchan-tester    PASS      6.69 seconds
-IncrementalBuild              PENDING   0.68 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/l2cap_core.c:7764:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7765:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7767:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7768:1: error: bad constant expression
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.100 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.856 seconds
-Mesh - Send cancel - 2                               Timed out    1.994 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7222303988389113786==--
+-- 
+With best wishes
+Dmitry
