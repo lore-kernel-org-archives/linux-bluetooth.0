@@ -1,126 +1,183 @@
-Received: from mail-qk1-f193.google.com (mail-qk1-f193.google.com [209.85.222.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C43273F9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Feb 2026 17:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771005033; cv=none; b=Qd5I0Yz2w7NFfyGreNTIYvqTUsewmVq7OG3WTTTrwwrdBhc64hVlNeu/tUlyAK78YV9EgUHIzEsswqnEp7Ef5Rx9kAMgoVkYne6xCdOAcebsY5xGOn+R9ntPQonjWDCjkfxk3AOpu7AWuI3FWJesRnEzPEKR1f8vAYe7g+6h5J4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771005033; c=relaxed/simple;
-	bh=nzLw08SzXDqFC3BZ+Su9aH6THwOKzo/XyYS2166Vj6A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=C1PVT9Py33VoGGO1TGvDtgN6So7muJQXTgZKWmQKsdLXYAP7AtPtC1qoVVpt8qheAvEJDbOLNpYwIi9EgXXMQgXZqJXF+yvxwgjXYb2U+ZL4drkvzQE9eq55UFoZcR7cde3ADBVPoizKHEhewNDZoG5SApYfVY7q65Tx6jN+9XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hyjDq00h; arc=none smtp.client-ip=209.85.222.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4F026738D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Feb 2026 18:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771006627; cv=pass; b=L5e5CsJYU1CUQq+7WMGUTweg5Ur5T5hazituQLBdafHMBQgHgliE3Z2l+wKfjC/UKpD3thqlIQk3W7hQJMgn/gw/qHcwnXZNtclByCMLTopQxYnf1WVuZm1676zmHt7mRGFK8BN9VWYV60EYAHUEji2FWoGayJH6RcDZYvY/OeU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771006627; c=relaxed/simple;
+	bh=DGvHmPtjMuTjBfZFmkTe/Ak7ZfLznfgcakZkpPcunJ0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HovzwvrFoW3t4bU0ElMrS4aji1PQMPHC/oxVVzLlyVwLZopPBwjZB7X0Exg1EteSJxJatgfNB897mfcie8B4BCbCVUQ2BJdbFI/AFBw8N2sAdnO2S6cHtrb4rhSCHPDjqi0CPNVphXmugIW2B8CJJjB1SG3UIfILlhpUSt/pNUs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=cL4m7Lj6; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hyjDq00h"
-Received: by mail-qk1-f193.google.com with SMTP id af79cd13be357-8cb3a8494c5so123721085a.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Feb 2026 09:50:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771005031; x=1771609831; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kGiKwZr/nTNLGxN452gD5f0Y1NmprCKywS9cM/ZP1v8=;
-        b=hyjDq00hLHYYz6cE/A7wqCyxchtIinwlH1Q71YevNGwScfXQmEc+un5uu7r1SbzkFM
-         suciqakeyLXe1TDUQxJxu3i0sNQZ8awrjJVpJFnqXy18AD0Yva46dgkeR5NZPiNdvvyR
-         MTEpp6SnliVTO5pDKdO3e5mmKJwJeJNP9BgQZgYRznpf2w2/+P74MAh/5Dn5C9wfsHoE
-         Au7tgLfwPD4bv4aBFoBqSJeYr4+E6FTtPbgqQZvLyOuNUeY4unGxMCu09O6AjLVfOg9M
-         nMMsku9yZ8tSqHbFEytt5VOTIVV22EAHSzavHLAUOEkofY7OCH38GGDmolJ2jatlZZBE
-         w3Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771005031; x=1771609831;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kGiKwZr/nTNLGxN452gD5f0Y1NmprCKywS9cM/ZP1v8=;
-        b=qkjPPJm5XT+AgBz7t4kbq+kfHrr5MjIigJOJVnWOG1Ut3+atKc7pii9szOj6rTiYIb
-         wj90MvlZFTUFXKPOFlzXo1YiOk8I1RI7l8oXqw0TG5lD5TK2t+NYP+1c9gNI1YqKIXF0
-         jQOconHH2Gar4pNQeLkQcA7Mb1IQCvYUgi82/W9V3LN5vHoAuFFJ3Z+OW7hbbpZDUAvC
-         GL5vpssjDRtU0BFvH/vvmHOpeBftoeHySu9RTPdJ25frSfD9rG9fSftx3XeKvl+fxob0
-         m5gzlJFesJCCu/ak3xuPErpk2Pu2ZW2Gsx9wKc9y15X5hTb246WUb5j995pVY05K3TxJ
-         zB+w==
-X-Gm-Message-State: AOJu0YyCs2i6OIbxP2F+48Fmam0eFspclWk4A/bnNcrylLJdCelKdU1j
-	+8Bq35RwMTekUXb0JdJEDWqee0AEGACGiQRoWHTQhBP1bzGX7xt1QIiGJcONV849
-X-Gm-Gg: AZuq6aKH0+FtxbIhz0SNvzHLqSvrN5of9SDIDsDowSkTLebSp1XYNg5EsfHDDNL2YvC
-	9/vXspu+xxOT5u2nHhkO8bl2ewIdo2o/59FZzzrQGp9pgMQaDgRgCnnQCAmJ7o25RmyKc057He9
-	DRldgpvpvJ2O2e2SH7PPj9oiX29mPo6anRsqPKKb37uwZ9w1MMEIWuQZri3mCQiQ22ilQ6QqLCS
-	IF2+oKXIxVac9YKGfKXlFcPLSd5k88VM54F1RG8Yx+HeP40nOR6kVxTZpHLWV5GLHNIlXG60uDj
-	Dkmaelx4pPXVhC11aV1FO0mH20vLndSx5US02lTa/14NHyiDHLagh0UEUR3dlz2Fw5DDcXBNp/c
-	QLkHJ/kEumRZUQGXWQjO7USaRdp9hXbAdv1Fhia4zfswbkqKPsVsXaNrYpDGwRCVRFOxorgfdN6
-	ziVnuwnWpPSClzDI9fyP8HUw/ECS+kL2FR42HPPbigFA==
-X-Received: by 2002:a05:620a:45a5:b0:8c8:82a1:11bf with SMTP id af79cd13be357-8cb4224b73emr325923385a.2.1771005031297;
-        Fri, 13 Feb 2026 09:50:31 -0800 (PST)
-Received: from [172.17.0.2] ([145.132.102.227])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8971cc959e0sm68796746d6.16.2026.02.13.09.50.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Feb 2026 09:50:30 -0800 (PST)
-Message-ID: <698f6466.050a0220.22d1df.4c0b@mx.google.com>
-Date: Fri, 13 Feb 2026 09:50:30 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3985027875339039519=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="cL4m7Lj6"
+Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:d:f011:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4fCL3X05jqz49Q5c;
+	Fri, 13 Feb 2026 20:16:55 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1771006616;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=JuYOyBxxbxwjl/HjAdAs9LfYbrA3M/s5aZOaNF6KsII=;
+	b=cL4m7Lj6gvmXf8SBKhnkVLaBH1aKZXYVQV0+wAdM+EQjeNWM+vB+wQUzo9PoMmiPNACKNH
+	PV4V3uvMDpCwox2vRkQJotcciN8C1pCREPFCK3Vl9K2Nz7DgdXTyQ1CTiwggoOQ/kMs4rC
+	q9f4KQTg/mgcCZe6vADibO7Tb03bawELKkLuhkWDRZpp7ZilkjsA4hmXPuBvHrjNU7dNZb
+	y+NdzHgLN7tJtdakF5AFv/fgTiYF8qrtzV5uISRHwNYVw1O6SlocqI6WmFgssC/AzXFcIo
+	rWhm3zvuuQgMoAITdHQaY7GFDWsNRz1vbsdLsWRkLMn8zqUeORYnvamc1mindA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1771006616;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=JuYOyBxxbxwjl/HjAdAs9LfYbrA3M/s5aZOaNF6KsII=;
+	b=pR3H0n+AurTJXSZc0hco0ICoKnyu2yzafAMHkN20iRjlSpIfeoGHalxuWyP56UB/JWCwgK
+	nmemBSuc0jX39e7sgjeBfmMqDri9nG3B5e+Tn1z+53pLKBuClGk1gUU0+L3dosdqB6+zP6
+	DYS5emniuYyOT2KmuyLIlCoMY9tPgdIiBkUKYJCKn/4D2DPEyENzaKD7/3cbfzBweX+SRx
+	I3KFptuIU0wRFxJuSf+Bo2AJrSVp6V4mrQ7+SCKV4BPS1Y2ZsBXnLRBedjIubmb3KNhbn9
+	C512RgOFZ/5kLA0FYcLfvhWK7vbTIdPY1g6iMC6bLoCWDJrItcB+VYjobwSUgw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1771006616;
+	b=t3epWioJtwHmU6Rcf4M3bps8MNUnFSthP6fW6KXPMaBrgJj4+e3SvRqo4oTxFUU8qdzFvB
+	Pk0EG0jBbL+e0KOO6TCwH3OpSfRLEHL12/koOt8OFCzUoSaCZ45DTItbFJZ9k5PeDpOsyV
+	PK5jl3MCH+gZLPjae+XUO+RcRZpGG1vMAphu4rDuPevneIt9iVcj91LS8IdaUU1RHuXJHO
+	7w0R32dVqiXTOwpPmoGSDZNPYamhEHFwxDNfHz8dJaKcCy0xwbGa2gWVqf9HL2rhfeU3xn
+	HtNkRWQhMWcDI+0ophtu5CB/XJ4kmksOcyRHL8+sCuQ3B1HQzthkfvp/W9RLQQ==
+Message-ID: <4ca527098ac88f029a5055bcbb8db75ef5f66634.camel@iki.fi>
+Subject: Re: [PATCH BlueZ v1 1/1] bap: Fix use-after-free in broadcast sink
+ cleanup
+From: Pauli Virtanen <pav@iki.fi>
+To: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>, 
+	linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc: vinit.mehta@nxp.com, devyani.godbole@nxp.com
+Date: Fri, 13 Feb 2026 20:16:53 +0200
+In-Reply-To: <20260213164120.502-2-sarveshwar.bajaj@nxp.com>
+References: <20260213164120.502-1-sarveshwar.bajaj@nxp.com>
+	 <20260213164120.502-2-sarveshwar.bajaj@nxp.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sarveshwar.bajaj@nxp.com
-Subject: RE: Fix use-after-free in BAP broadcast cleanup
-In-Reply-To: <20260213164120.502-2-sarveshwar.bajaj@nxp.com>
-References: <20260213164120.502-2-sarveshwar.bajaj@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============3985027875339039519==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+pe, 2026-02-13 kello 22:11 +0530, Sarveshwar Bajaj kirjoitti:
+> bap_data_free() was calling bt_bap_detach() before destroying
+> bcast_snks queue. bt_bap_detach() frees all streams but broadcast
+> sink setups in bcast_snks queue were still holding pointers to these
+> streams. When queue_destroy() calls setup_free() as its destructor,
+> it attempts to access these already-freed stream pointers, causing
+> a use-after-free.
+>=20
+> Fix this by destroying the bcast_snks queue before calling
+> bt_bap_detach() and ensuring stream references are released while the
+> streams are still valid. This matches the cleanup order already used
+> for unicast.
+>=20
+> Crash trace:
+>   AddressSanitizer: heap-use-after-free
+>   #0 bt_bap_stream_unlock src/shared/bap.c:6384
+>   #1 setup_free profiles/audio/bap.c:1123
+>   #2 queue_destroy src/shared/queue.c:60
+>   #3 bap_data_free profiles/audio/bap.c:210
+>=20
+> https://github.com/bluez/bluez/issues/1866
+> ---
+>  profiles/audio/bap.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+> index 90a978667..9108bf729 100644
+> --- a/profiles/audio/bap.c
+> +++ b/profiles/audio/bap.c
+> @@ -3822,6 +3822,12 @@ static void bap_bcast_remove(struct btd_service *s=
+ervice)
+>  		return;
+>  	}
+> =20
+> +	/* Clean up before bis_remove and data_remove */
+> +	if (data->bcast_snks) {
+> +		queue_destroy(data->bcast_snks, setup_free);
+> +		data->bcast_snks =3D NULL;
 
-Dear submitter,
+This probably should be done as in bap_data_free() since setup_free
+also removes the entry from data->bcast_snks,
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1053982
+	struct queue *bcast_snks =3D data->bcast_snks;
+	data->bcast_snks =3D NULL;
+	queue_destroy(bcast_snks, setup_free);
 
----Test result---
+as nested queue_destroy() -> queue_remove() is probably not safe.
 
-Test Summary:
-CheckPatch                    PENDING   0.34 seconds
-GitLint                       PENDING   0.44 seconds
-BuildEll                      PASS      21.03 seconds
-BluezMake                     PASS      657.97 seconds
-MakeCheck                     PASS      18.76 seconds
-MakeDistcheck                 PASS      246.97 seconds
-CheckValgrind                 PASS      298.14 seconds
-CheckSmatch                   PASS      363.40 seconds
-bluezmakeextell               PASS      184.16 seconds
-IncrementalBuild              PENDING   0.41 seconds
-ScanBuild                     PASS      1035.30 seconds
+> +	}
+> +
+>  	bt_bap_bis_remove(data->bap);
+> =20
+>  	bap_data_remove(data);
+> @@ -3938,6 +3944,11 @@ static int bap_bcast_disconnect(struct btd_service=
+ *service)
+>  		error("BAP service not handled by profile");
+>  		return -EINVAL;
+>  	}
+> +	/* Clean up broadcast sinks before detach (like unicast does) */
+> +	if (data->bcast_snks) {
+> +		queue_destroy(data->bcast_snks, setup_free);
+> +		data->bcast_snks =3D NULL;
+> +	}
+> =20
+>  	bt_bap_detach(data->bap);
+> =20
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3985027875339039519==--
+--=20
+Pauli Virtanen
