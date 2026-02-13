@@ -1,36 +1,36 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B701A3EBF34
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Feb 2026 19:33:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40899280CC1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Feb 2026 19:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771011182; cv=none; b=pznJiAdSRAfS1eYh6wrhGdPFO+m5G5ypoFTIn9tNtxF3hagIj97c5MHExznNTaya1NNBs0TYZrX2jHRDRYL2gCcgRNt/TYFi2tPyVVB6g4fOa5JDsxiiZSe5fHxvshZkBOOScjdJ3utBj+E1GyxRo5syj9YkFsksr0frMNKPOKg=
+	t=1771012713; cv=none; b=aV9cBGpTX7ZEMSGTS92ECVnlAe3cvRiz/b6T0UvTQAJoxtuRpEatjtQXd/YSfuslHHX4cATpP/sS8X1V3cEj4LY4Yl8m9tfpC5TZQcr2WfLTQv9CBVukMrS8O0XvA9cPd4Ld5lI3q3QMaoJ3rfmHJCeJ3rQVXWfnDQDkpktTSvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771011182; c=relaxed/simple;
-	bh=gXsNty2M7ycmjbhUH2W6ganzorB8I0Ia43vYPs+8ZpM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Ci/k3/ozpasEBl/RQnIzKQMNliRsDMmfON6CJrU3bfiIZHLKZiNjBxCT1hbeAX8rcTjqLGyYY89nyAozGFipy/XxXUh3G58hHOH+c2SZViOb9IA6/QDpYNQJ8QDEIINu8kt50evJX4jbqm3YBw4M/h1GHRG+sEWmoP/97leO9f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Rss48uSy; arc=none smtp.client-ip=192.30.252.207
+	s=arc-20240116; t=1771012713; c=relaxed/simple;
+	bh=KWtqwrd69riitB14zJ+UafOyPFCpuuRobq6FQdpmM50=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=agAlzeboOq1Zmjwf7wmfkkwOGsffdUsKMsX4MvDXxpIw0XleyHCb8O57I9eNGQkioimeDy9CpigXnsZSTv1K8U8y2TN4lVr4xM/KQjRczxGpM5TnbHqxTPrQWOLehqtUeAds+I8nsyxlPcpjBPcDc0nRntCQetbf5trVyNpAyKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RoL6doTc; arc=none smtp.client-ip=192.30.252.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Rss48uSy"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RoL6doTc"
 Received: from github.com (hubbernetes-node-e7df5c6.ac4-iad.github.net [10.52.211.99])
-	by smtp.github.com (Postfix) with ESMTPA id F09F4640830
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Feb 2026 11:33:00 -0800 (PST)
+	by smtp.github.com (Postfix) with ESMTPA id 63E03400AAA
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Feb 2026 11:58:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1771011180;
-	bh=EmuLAAuG1rlFRNduPtP9HERcYmDGeRa6VJz+sUvf4Ls=;
+	s=pf2023; t=1771012711;
+	bh=Pp/JU5AD4AxOt7YvNZTYLlH/1wttTlfB6IbVX8roLxU=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Rss48uSyoqtxMKl13MK1V8vykHdg2eQFAhg5LFLEmYli7mFoYsLKh9hU2qdRV9m2+
-	 1N9GtIYsCUax9GMOG/hqgjJDicV+VNrrfH2sQ6XMtuUNWQra2QLNF9/IqiprZhrbMF
-	 UsYpVSG5JE4icf3aHRMVZV4h8waMDxQFp+IxiQ8s=
-Date: Fri, 13 Feb 2026 11:33:00 -0800
+	b=RoL6doTcH4V0rTsg82xshCETVmQ46TiMLHmHJpLte2vfrMQsUQlTSJ4y1KskXCSu4
+	 8LA6F3qFWm4Cw26AhqxQrFKBgzoMAUyipzByVopmlBYLaiCXWXzMz4cc1e+Jlb+xCA
+	 TtqA/qtfht6kww2/3YB71ZwOHgNqdYSmuk+V1s1U=
+Date: Fri, 13 Feb 2026 11:58:31 -0800
 From: Copilot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/copilot/fix-dualshock4-random-inputs/902d82-dc0aee@github.com>
-Subject: [bluez/bluez] dc0aee: input: Refine documentation and combine warning
- me...
+Message-ID: <bluez/bluez/push/refs/heads/copilot/fix-lenovo-keyboard-input/5d9a86-cc63d2@github.com>
+Subject: [bluez/bluez] cc63d2: Add detailed btmon trace analysis for Lenovo
+ IdeaP...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,23 +43,19 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/copilot/fix-dualshock4-random-inputs
+  Branch: refs/heads/copilot/fix-lenovo-keyboard-input
   Home:   https://github.com/bluez/bluez
-  Commit: dc0aee85bad150208dfeba967ff06834f575b26f
-      https://github.com/bluez/bluez/commit/dc0aee85bad150208dfeba967ff06834f575b26f
+  Commit: cc63d26d7bdfdb3538acd849cac7a08f0488618a
+      https://github.com/bluez/bluez/commit/cc63d26d7bdfdb3538acd849cac7a08f0488618a
   Author: copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>
   Date:   2026-02-13 (Fri, 13 Feb 2026)
 
   Changed paths:
-    M profiles/input/device.c
+    A ANALYSIS.md
 
   Log Message:
   -----------
-  input: Refine documentation and combine warning messages
-
-- Clarify that continuation frames are logged but not processed
-- Combine two warn() calls into single message for cleaner logs
-- Final code review feedback addressed
+  Add detailed btmon trace analysis for Lenovo IdeaPad Duet keyboard issue
 
 Co-authored-by: Vudentz <2156363+Vudentz@users.noreply.github.com>
 
