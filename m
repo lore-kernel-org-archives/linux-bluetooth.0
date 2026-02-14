@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FED5142E83;
-	Sat, 14 Feb 2026 21:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21C03126B2;
+	Sat, 14 Feb 2026 21:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104416; cv=none; b=mtz7geoYBuu4Rtb3euGWJPHd/vPIfYxt0d6ffr52PFtOQIGn6jh3PPN2O5+sQYzQIUI7xNPEtUtdCB4gKTFPnnF1SmClrBvSvS+KcRkcf2+YOVINGfMuLx+4y7UHSbv69zfkSWkWKUz2hiT9USjQess2or6By17anAICUJ57rfY=
+	t=1771104447; cv=none; b=XZP+X6fi8EkWMQAg3cqdYuauFGCuFYmnBWjN+JrvUIbBf0SGU+3Uo842LMwJ7K2RLxlgN4m7uvAJ24mIFdwy0I9lu1yITB0b1m03HZLL9evj0lMTUeEfYzngVmJpdzlYQAMBzA0zMn4Ww+5Ut7jQSbIJRQZpdcSgbTHIAXUJv3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104416; c=relaxed/simple;
-	bh=zoMV/NzMg0A/PeUsA5HJP86gpV+x8YWFr2pJq9M8MxM=;
+	s=arc-20240116; t=1771104447; c=relaxed/simple;
+	bh=R+qX/dkrpBBCavbTroNjk+lNEn38yjTGaEYPb+S4W00=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gJf9DZEp8WipvicLy0G1WsVDD1/xu5YkPo6Udlmbgelb6PczNus4xx/E0C2Nox56iuDz2HC2hs9OCUSlROGbPA/HVKIvnjfALRbsRil3yDvJ4vpLlycm8r7R8MJTFyXW5HqGVLiRcc602QrESwZ+411feEpvp+Y05Q9TvliIT4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iqk6Mann; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=tcHyXUljOhudpW/1T8E5YsZcZU0he2z8MP9DJ5T/gHV+6NDNxM2Lhnv8mxDvQaVPJIH4MTSxz2Ljb1a4Eu/EWeAGeS1wAzYktI4fxTGwPDKxVI1J2IkoAr5Z/HeD48XKPfSwvZUc9pCv+uoALxa2lKQdiGdlOUTSf8VnD2Wqh64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LaF8n+Wd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iqk6Mann"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CE86C16AAE;
-	Sat, 14 Feb 2026 21:26:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LaF8n+Wd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D01CAC16AAE;
+	Sat, 14 Feb 2026 21:27:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104416;
-	bh=zoMV/NzMg0A/PeUsA5HJP86gpV+x8YWFr2pJq9M8MxM=;
+	s=k20201202; t=1771104447;
+	bh=R+qX/dkrpBBCavbTroNjk+lNEn38yjTGaEYPb+S4W00=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Iqk6Mann2/0YKesc32d0po8iLXM7dpBlaCq/EMm+MIkl5UjiI3Tn0NCcOqGrxlvxO
-	 RCGfd4Hh9R5H6EImikcgfyHoM+08tJSeSrVvj6cBcDm7TT4pIOCr9APiEf+qoONAcE
-	 meC3ia/1a/fIKiySEOJ02BVjZuzLfFo1ymXNfEIwgdOkwUpHs8KRZA3YHSZYIlOenv
-	 Thx0Nf0prDzD1GdPAN0gr30Jpx/YVsAciejm4mezTShCLvFRt+1rXxoCGfv+InMwJa
-	 oX3zpQxZ6V9rsxs1S39uQh4/IDVlybBnnA/iLI5wLxXCz5YvKoB1kuEfrKBEIFyFxQ
-	 K49IEQw7Dj7uw==
+	b=LaF8n+WdhwV4M+N/2/m80YrHiZ6MalvKhdJMln7I5ESUtEvOVr3BnbDe/p0lQ+RNG
+	 BGr+KYHV/wDNU6rFYj20wFvzsgd9hL/ikUWJFmg7iiZUuLa0AXXUOm5RqRZg5T5QKW
+	 ai5sX25Cv/xv6fNEiWFM0YvpqXT5U+lx4dvQU1XwoXEX9KtFzetYoznvEL6A1olYyW
+	 075ieIqCcyTKE3G+UC1XW6yjX/Q7zFgQRNS4Kv7dj0LfEZHCvxz7n7l5NUoVQTuv2i
+	 zLjZi3joRp8kAdZFdHpBAZqHiorSkEUHVk0IuUnr7BroS/LMuIJR12czs54I3LxLiA
+	 OqHq5s0PoXKpw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: =?UTF-8?q?Stefan=20S=C3=B8rensen?= <ssorensen@roku.com>,
+Cc: Jacopo Scannella <code@charlie.cat>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.6] Bluetooth: hci_conn: Set link_policy on incoming ACL connections
-Date: Sat, 14 Feb 2026 16:23:38 -0500
-Message-ID: <20260214212452.782265-73-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-5.10] Bluetooth: btusb: Add device ID for Realtek RTL8761BU
+Date: Sat, 14 Feb 2026 16:23:56 -0500
+Message-ID: <20260214212452.782265-91-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -48,159 +47,106 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.19
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Stefan Sørensen <ssorensen@roku.com>
+From: Jacopo Scannella <code@charlie.cat>
 
-[ Upstream commit 4bb091013ab0f2edfed3f58bebe658a798cbcc4d ]
+[ Upstream commit cc6383d4f0cf6127c0552f94cae517a06ccc6b17 ]
 
-The connection link policy is only set when establishing an outgoing
-ACL connection causing connection idle modes not to be available on
-incoming connections. Move the setting of the link policy to the
-creation of the connection so all ACL connection will use the link
-policy set on the HCI device.
+Add USB device ID 0x2c0a:0x8761 to the btusb driver fo the Realtek
+RTL8761BU Bluetooth adapter.
 
-Signed-off-by: Stefan Sørensen <ssorensen@roku.com>
+Reference:
+https://www.startech.com/en-us/networking-io/av53c1-usb-bluetooth
+
+Signed-off-by: Jacopo Scannella <code@charlie.cat>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Analysis of Bluetooth: hci_conn: Set link_policy on incoming ACL
-connections
+## Analysis
 
-### 1. COMMIT MESSAGE ANALYSIS
+### Commit Message Analysis
+The commit adds a USB device ID (0x2c0a:0x8761) for the Realtek
+RTL8761BU Bluetooth adapter to the btusb driver. It references a
+specific commercial product (StarTech USB Bluetooth adapter), confirming
+this is real hardware that users need supported.
 
-The commit message clearly describes a functional bug: the connection
-link policy is **only** set when establishing an **outgoing** ACL
-connection, which means **incoming** ACL connections don't get the link
-policy configured on the HCI device. This causes "connection idle modes
-not to be available on incoming connections."
+### Code Change Analysis
+The change is a single line addition:
+```c
+{ USB_DEVICE(0x2c0a, 0x8761), .driver_info = BTUSB_REALTEK },
+```
 
-The fix moves the `link_policy` assignment from the outgoing-connection-
-specific path (`hci_acl_create_conn_sync`) to the generic connection
-creation path (`__hci_conn_add`), so all ACL connections (both incoming
-and outgoing) inherit the device's link policy.
+This adds a new USB vendor/product ID entry to the `quirks_table[]` in
+`drivers/bluetooth/btusb.c`. The entry uses the `BTUSB_REALTEK`
+driver_info flag, which routes the device through the existing Realtek
+firmware loading and initialization path that is already well-tested for
+many other Realtek Bluetooth adapters.
 
-### 2. CODE CHANGE ANALYSIS
+### Classification
+This falls squarely into the **New Device IDs** exception category. The
+stable kernel rules explicitly allow adding device IDs to existing
+drivers:
+- The btusb driver already exists in all stable trees
+- The Realtek support code (`BTUSB_REALTEK`) is already present
+- Only the ID mapping is new — no new code paths are exercised
 
-The change is extremely small and surgical:
+### Scope and Risk Assessment
+- **Lines changed:** 1 (single line addition)
+- **Files touched:** 1 (`drivers/bluetooth/btusb.c`)
+- **Risk:** Essentially zero. This only affects devices with USB ID
+  0x2c0a:0x8761. It cannot affect any other hardware or code path. If
+  the ID is wrong, the worst case is that this specific adapter doesn't
+  work — no regression for anyone else.
 
-**In `net/bluetooth/hci_conn.c` (`__hci_conn_add`):**
-- Adds one line: `conn->link_policy = hdev->link_policy;` in the
-  `ACL_LINK` case of the switch statement during connection
-  initialization.
+### User Impact
+Without this device ID, users with the Realtek RTL8761BU (StarTech
+AV53C1) Bluetooth adapter simply cannot use it at all with Linux. The
+device won't be recognized by the btusb driver. This is a complete
+hardware enablement issue — the fix makes the difference between "device
+works" and "device doesn't work."
 
-**In `net/bluetooth/hci_sync.c` (`hci_acl_create_conn_sync`):**
-- Removes the line `conn->link_policy = hdev->link_policy;` from the
-  outgoing connection creation path (since it's now handled in the
-  common path).
+### Dependency Check
+No dependencies. The `BTUSB_REALTEK` flag and all associated Realtek
+support code have been in the kernel for years and are present in all
+actively maintained stable trees.
 
-This is a pure **move** of a single assignment from a specific path to a
-common path. The net effect:
-- Outgoing connections: behavior is unchanged (link_policy was set
-  before, still set now, just earlier in the flow)
-- Incoming connections: link_policy is now properly set (was previously
-  missing)
+### Minor Note on Placement
+The new entry is placed under the "Additional Realtek 8723BU Bluetooth
+devices" comment section, while the subject says "RTL8761BU." This is a
+minor organizational issue (it would fit better near the "Additional
+Realtek 8761BUV" section), but it has zero functional impact — the
+quirks_table is searched linearly and the position doesn't matter.
 
-### 3. CLASSIFICATION
-
-This is a **bug fix**. Incoming Bluetooth ACL connections were not
-getting the correct link policy, which means features like sniff mode
-(power saving) and role switching wouldn't work properly on incoming
-connections. This is a real functional issue affecting Bluetooth power
-management and connection behavior.
-
-### 4. SCOPE AND RISK ASSESSMENT
-
-- **Lines changed:** 2 (1 added, 1 removed - it's a move)
-- **Files changed:** 2
-- **Complexity:** Extremely low - moving an assignment to a more
-  appropriate location
-- **Risk of regression:** Minimal. The assignment already existed for
-  outgoing connections; this just ensures incoming connections get the
-  same treatment. The value being assigned (`hdev->link_policy`) is the
-  same in both cases.
-
-### 5. USER IMPACT
-
-Bluetooth is widely used on laptops, desktops, and embedded systems. The
-link policy controls important features like:
-- **Sniff mode**: Power-saving mode that reduces radio duty cycle
-- **Role switching**: Ability to switch between master and slave roles
-- **Hold mode**: Another power management feature
-
-Without the correct link policy on incoming connections, Bluetooth
-devices connecting to the affected system would not benefit from power-
-saving modes, potentially leading to increased battery drain and missing
-expected Bluetooth behavior.
-
-### 6. STABILITY INDICATORS
-
-- The author (Stefan Sørensen) submitted the fix and it was signed off
-  by Luiz Augusto von Dentz, the Bluetooth subsystem maintainer. This
-  indicates it was reviewed and approved by the person most
-  knowledgeable about the code.
-- The change is trivially correct - it's moving an existing assignment
-  to a more general location.
-
-### 7. DEPENDENCY CHECK
-
-This commit is completely self-contained. It doesn't depend on any other
-changes - it simply moves an existing line of code. The `link_policy`
-field, `hdev->link_policy`, and `__hci_conn_add` function have been in
-the kernel for a long time, so this should apply cleanly to stable
-trees.
-
-### 8. STABLE KERNEL CRITERIA
-
-- **Obviously correct:** Yes - it's a one-line move that ensures all ACL
-  connections get the device's link policy
-- **Fixes a real bug:** Yes - incoming connections missing link policy
-  settings
-- **Small and contained:** Yes - 2 lines across 2 files
-- **No new features:** Correct - this enables existing functionality
-  that was incorrectly not applied
-- **Risk vs benefit:** Very low risk (trivially correct code move) vs
-  meaningful benefit (proper Bluetooth power management on incoming
-  connections)
+### Conclusion
+This is a textbook example of a device ID addition that should be
+backported. It's a single-line, zero-risk change that enables real
+hardware for real users, using an existing well-tested driver path.
 
 **YES**
 
- net/bluetooth/hci_conn.c | 1 +
- net/bluetooth/hci_sync.c | 2 --
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c3f7828bf9d54..b5e345fa6c344 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1002,6 +1002,7 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type,
- 	switch (type) {
- 	case ACL_LINK:
- 		conn->pkt_type = hdev->pkt_type & ACL_PTYPE_MASK;
-+		conn->link_policy = hdev->link_policy;
- 		conn->mtu = hdev->acl_mtu;
- 		break;
- 	case LE_LINK:
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index cbc3a75d73262..334eb4376a266 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6897,8 +6897,6 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 972139729e8fd..cbb6ab2fd5e45 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -779,6 +779,7 @@ static const struct usb_device_id quirks_table[] = {
  
- 	conn->attempt++;
+ 	/* Additional Realtek 8723BU Bluetooth devices */
+ 	{ USB_DEVICE(0x7392, 0xa611), .driver_info = BTUSB_REALTEK },
++	{ USB_DEVICE(0x2c0a, 0x8761), .driver_info = BTUSB_REALTEK },
  
--	conn->link_policy = hdev->link_policy;
--
- 	memset(&cp, 0, sizeof(cp));
- 	bacpy(&cp.bdaddr, &conn->dst);
- 	cp.pscan_rep_mode = 0x02;
+ 	/* Additional Realtek 8723DE Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0xb009), .driver_info = BTUSB_REALTEK },
 -- 
 2.51.0
 
