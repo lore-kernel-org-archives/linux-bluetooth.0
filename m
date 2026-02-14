@@ -1,46 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057D4309DB1;
-	Sat, 14 Feb 2026 21:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A913115A1;
+	Sat, 14 Feb 2026 21:25:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104351; cv=none; b=RjOOXPfnPjZRPu/8s+FvCVBWqqtMHi7qqSc71cz3XmI7erWllTcUuvOcrhfC+3sfCJ3n2U8euK7HwPj4DUkIGq9uJe2zyQaBV8lwa9DyEf835oyOu1118zN7OL5ZbJkmmxcNMz+FkvSIbuPQVmvohqkfoCu0p+T10h35Ng4TrDM=
+	t=1771104359; cv=none; b=pOk2ho6p4U94Qpoy2VLiayPumPElBL9ODEUSvr70MnVXicLqUSznmXcjz+YLiuDfJqIRyDq61Qj/wuwfD+yUlvDA7zQlYXRXH4CasNmivkrIRKk7c/Flf1CvERD/uueQWVyXYZRaXhEO5p7CcbYVoWfhsKnNJXHcL0Vk02OIzYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104351; c=relaxed/simple;
-	bh=N6xMz5KoFVfzNcR2If2erhXZur3yHqb3P1eyI0nS6uQ=;
+	s=arc-20240116; t=1771104359; c=relaxed/simple;
+	bh=zmXNR+SoQG64hQCVZ+q10o3m1kyeY4kDeEJbkisVVWk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IAlnI6msO5qTn5BtGsG4MQ/5EqYbBnmeOEdrAG1iipi81EDqtbDb4kjgYG19Mjq0huQVoZ0KIUiFU9fO0TinsJi/0dsTkb+Opum3qEDIsx+oeBV9roYQz299ry4XcLS+chwEn6jeYukTQaC+eWWWJo0Cpmgfbajr7Tl96v50w6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EniqImIR; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=l5ONuu1y8pgxxnc0pnDjfrXzJWhu7GgycwvFUDWjWuAorV5uRHftsv7GaSSIDpdaBU8wFfyESG72ur5fUOkFHr77Ux1D5GPfSd1x5SQdBg6xxCZn6APxiIfrUz5mgy3Ii+3SrV3NafseKBj5ILz4WHSfC0yNKNz7OuI7ZgrHoOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnbjvOn3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EniqImIR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8004C19422;
-	Sat, 14 Feb 2026 21:25:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnbjvOn3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 975AAC16AAE;
+	Sat, 14 Feb 2026 21:25:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104350;
-	bh=N6xMz5KoFVfzNcR2If2erhXZur3yHqb3P1eyI0nS6uQ=;
+	s=k20201202; t=1771104359;
+	bh=zmXNR+SoQG64hQCVZ+q10o3m1kyeY4kDeEJbkisVVWk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EniqImIRhXkK27NvLvvWCAEuhUjGEtTV01hQ2NCAtUd68tqFiSr0j2Kzm19BhylkR
-	 QB6fG6a1NwPeoWTJSF8vZhhGf5PbkQpyNOuxBnbkkU/We6l4D4bjb4ApMtUQ6JfJC4
-	 WVWj0HUGOoygsfRn3I6UbeZJmcZNMX6uZNi9ff7YHxXY50EiUl4qmtnBT8KJ6Ux6oH
-	 7VtpLGMc7sbYEZzlhjOYX5vSELGTHcuPsseQ4ddTpncvvqHZ1nNQGy3qfbKiBguyG5
-	 cLR9f30OBU+rJmVa46Th7r2sT0hvcPvY7tDpZ/NEFJEsDCGEKKUS4YndLK9t4TIr5d
-	 scxUyOWIhKi7w==
+	b=SnbjvOn3LrYSEfjwPaCnTSLzBFvqg19Qvp7jT/ptYsEvdcTCzLvkkcMdLc6+Ykr3p
+	 SbfXiOBIss9I0dEasc1jt2/jMsqQGyQzzkvpHmqFRjpDjw5Q6zFZtB/WfUKCdWkkMz
+	 2b/Mhx2mZauIBw8/K21JStnheahSpn9Fn3+14FQGWOC7CbgDtNRP7bASunOKh59D2u
+	 DhtDWYGOnji5UjfVagAOTUyEkHSwoW1+bNy39n/CwGdMpxLJB1P2w6DUJPR9f59fNb
+	 DTf3znugSEBDHysgF6Kd9OGrVxbRkh1ngXBXW3nPaloSm9565A6VsR3Klk3YuXI5w5
+	 aJ/wOBDUIBZGQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Shuai Zhang <shuai.zhang@oss.qualcomm.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+Cc: Techie Ernie <techieernie@gmail.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	brgl@kernel.org,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
-	linux-arm-msm@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.18] Bluetooth: hci_qca: Fix SSR (SubSystem Restart) fail when BT_EN is pulled up by hw
-Date: Sat, 14 Feb 2026 16:22:57 -0500
-Message-ID: <20260214212452.782265-32-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-6.18] Bluetooth: btusb: Add USB ID 0489:e112 for Realtek 8851BE
+Date: Sat, 14 Feb 2026 16:23:04 -0500
+Message-ID: <20260214212452.782265-39-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -56,132 +53,109 @@ X-stable-base: Linux 6.19
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+From: Techie Ernie <techieernie@gmail.com>
 
-[ Upstream commit fce1a9244a0f85683be8530e623bc729f24c5067 ]
+[ Upstream commit e07094a51ad8faf98ea64320799ce550828e97cd ]
 
-On QCS9075 and QCA8275 platforms, the BT_EN pin is always pulled up by hw
-and cannot be controlled by the host. As a result, in case of a firmware
-crash, the host cannot trigger a cold reset. Instead, the BT controller
-performs a warm restart on its own, without reloading the firmware.
+Add USB ID 0489:e112 for the Realtek 8851BE Bluetooth adapter.
+Without this entry, the device is not handled correctly by btusb and Bluetooth fails to initialise.
+Adding the ID enables proper Realtek initialization for Bluetooth to work on various motherboards using this Bluetooth adapter.
 
-This leads to the controller remaining in IBS_WAKE state, while the host
-expects it to be in sleep mode. The mismatch causes HCI reset commands
-to time out. Additionally, the driver does not clear internal flags
-QCA_SSR_TRIGGERED and QCA_IBS_DISABLED, which blocks the reset sequence.
-If the SSR duration exceeds 2 seconds, the host may enter TX sleep mode
-due to tx_idle_timeout, further preventing recovery. Also, memcoredump_flag
-is not cleared, so only the first SSR generates a coredump.
+The device identifies as:
+  Bus 001 Device XXX: ID 0489:e112 Foxconn / Hon Hai Bluetooth Radio
 
-Tell the driver that the BT controller has undergone a proper restart sequence:
+Tested on Realtek 8851BE. Bluetooth works after this change is made.
 
-- Clear QCA_SSR_TRIGGERED and QCA_IBS_DISABLED flags after SSR.
-- Add a 50ms delay to allow the controller to complete its warm reset.
-- Reset tx_idle_timer to prevent the host from entering TX sleep mode.
-- Clear memcoredump_flag to allow multiple coredump captures.
-
-Apply these steps only when HCI_QUIRK_NON_PERSISTENT_SETUP is not set,
-which indicates that BT_EN is defined in DTS and cannot be toggled.
-
-Refer to the comment in include/net/bluetooth/hci.h for details on
-HCI_QUIRK_NON_PERSISTENT_SETUP.
-
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Signed-off-by: Techie Ernie <techieernie@gmail.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-`HCI_QUIRK_NON_PERSISTENT_SETUP` has existed since 2018 (commit
-`740011cfe9485`), so it's available in all stable trees. The only issue
-is the accessor macro change (`test_bit` → `hci_test_quirk`).
+## Analysis: Bluetooth: btusb: Add USB ID 0489:e112 for Realtek 8851BE
 
-### 8. FINAL ASSESSMENT
+### Commit Message Analysis
+The commit adds a new USB device ID (0489:e112, Foxconn/Hon Hai) for the
+Realtek 8851BE Bluetooth adapter to the btusb driver's quirks table. The
+commit message clearly states that without this entry, "Bluetooth fails
+to initialise" — the device simply doesn't work. The author tested it
+and confirmed Bluetooth works after the change.
 
-**Bug being fixed**: Real, user-impacting bug — Bluetooth SSR (SubSystem
-Restart) fails on specific Qualcomm platforms (QCS9075, QCA8275) where
-BT_EN is hardware-pulled high. After a firmware crash, Bluetooth becomes
-permanently non-functional until reboot.
+### Code Change Analysis
+The change is a **two-line addition** to the `quirks_table[]` array in
+`drivers/bluetooth/btusb.c`:
 
-**Severity**: HIGH — Complete loss of Bluetooth functionality after
-firmware crash with no recovery path.
+```c
+{ USB_DEVICE(0x0489, 0xe112), .driver_info = BTUSB_REALTEK |
+                                             BTUSB_WIDEBAND_SPEECH },
+```
 
-**Fix quality**: Well-documented, well-reviewed (by Qualcomm and
-Bluetooth maintainers), small and contained.
+This is placed in the "Realtek 8851BE Bluetooth devices" section
+alongside other existing 8851BE entries (0x0bda:0xb850, 0x13d3:0x3600,
+0x13d3:0x3601). The flags used (`BTUSB_REALTEK | BTUSB_WIDEBAND_SPEECH`)
+are consistent with nearly all other Realtek entries in this table, so
+this is well-established pattern.
 
-**Scope**: LOW risk — only affects platforms where
-`HCI_QUIRK_NON_PERSISTENT_SETUP` is NOT set (specific hardware
-configuration). Does not change behavior for any other platforms.
+### Classification: New Device ID Addition
+This falls squarely into the **"New Device IDs"** exception category for
+stable backports. This is one of the most common and safest types of
+stable patches:
+- The btusb driver already exists in all stable trees
+- The Realtek initialization path already exists
+- Only a new USB vendor/product ID pair is being added to route a
+  specific hardware variant through the correct initialization
 
-**Backportability concern**: The `hci_test_quirk()` macro only exists in
-v6.16+. For older stable trees (6.1.y, 6.6.y, 6.12.y, 6.13.y), the
-backport would need to use `!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP,
-&hu->hdev->quirks)` instead. This is a trivial adaptation but means the
-patch won't apply cleanly to older stable trees.
+### Scope and Risk Assessment
+- **Lines changed**: 2 lines added (trivially small)
+- **Files touched**: 1 file (`drivers/bluetooth/btusb.c`)
+- **Risk**: Essentially zero. This only affects systems with USB device
+  0489:e112 plugged in. It cannot regress any other hardware.
+- **Complexity**: None — it's a table entry addition following an
+  established pattern
 
-**Other concern**: The fix adds `msleep(50)` in the hw_error path, which
-is acceptable for an error recovery path but not something you'd want in
-a hot path.
+### User Impact
+- **Who is affected**: Users with motherboards that have the Foxconn/Hon
+  Hai variant of the Realtek 8851BE Bluetooth adapter
+- **Severity without the fix**: Complete Bluetooth failure — the device
+  doesn't initialize at all
+- **Benefit**: Bluetooth works properly on affected hardware
 
-**Verdict**: This fixes a real, important bug (complete Bluetooth
-failure after firmware crash) on specific hardware. The fix is small,
-well-contained, and guarded by a quirk check so it has minimal risk. It
-meets stable kernel criteria. The backport will need minor adaptation
-for older trees due to the quirk API change, but this is
-straightforward. The fix has proper review from Qualcomm and the
-Bluetooth subsystem maintainer.
+### Stability Indicators
+- Tested by the author on the actual hardware
+- Accepted by the Bluetooth subsystem maintainer (Luiz Augusto von
+  Dentz)
+- Follows the exact same pattern as dozens of other device ID entries in
+  the same table
+
+### Dependency Check
+No dependencies. This is a self-contained table entry addition.
+
+### Conclusion
+This is a textbook stable backport candidate: a trivial device ID
+addition to an existing driver that enables hardware that otherwise
+doesn't work at all. It's obviously correct, fixes a real problem
+(Bluetooth completely broken), is tiny in scope, and carries virtually
+no regression risk.
 
 **YES**
 
- drivers/bluetooth/hci_qca.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 888176b0faa90..a3c217571c3c4 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1653,6 +1653,39 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 		skb_queue_purge(&qca->rx_memdump_q);
- 	}
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 646de80c7e7be..de9e484efef71 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -521,6 +521,8 @@ static const struct usb_device_id quirks_table[] = {
+ 	{ USB_DEVICE(0x0bda, 0xb850), .driver_info = BTUSB_REALTEK },
+ 	{ USB_DEVICE(0x13d3, 0x3600), .driver_info = BTUSB_REALTEK },
+ 	{ USB_DEVICE(0x13d3, 0x3601), .driver_info = BTUSB_REALTEK },
++	{ USB_DEVICE(0x0489, 0xe112), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
  
-+	/*
-+	 * If the BT chip's bt_en pin is connected to a 3.3V power supply via
-+	 * hardware and always stays high, driver cannot control the bt_en pin.
-+	 * As a result, during SSR (SubSystem Restart), QCA_SSR_TRIGGERED and
-+	 * QCA_IBS_DISABLED flags cannot be cleared, which leads to a reset
-+	 * command timeout.
-+	 * Add an msleep delay to ensure controller completes the SSR process.
-+	 *
-+	 * Host will not download the firmware after SSR, controller to remain
-+	 * in the IBS_WAKE state, and the host needs to synchronize with it
-+	 *
-+	 * Since the bluetooth chip has been reset, clear the memdump state.
-+	 */
-+	if (!hci_test_quirk(hu->hdev, HCI_QUIRK_NON_PERSISTENT_SETUP)) {
-+		/*
-+		 * When the SSR (SubSystem Restart) duration exceeds 2 seconds,
-+		 * it triggers host tx_idle_delay, which sets host TX state
-+		 * to sleep. Reset tx_idle_timer after SSR to prevent
-+		 * host enter TX IBS_Sleep mode.
-+		 */
-+		mod_timer(&qca->tx_idle_timer, jiffies +
-+				  msecs_to_jiffies(qca->tx_idle_delay));
-+
-+		/* Controller reset completion time is 50ms */
-+		msleep(50);
-+
-+		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
-+		clear_bit(QCA_IBS_DISABLED, &qca->flags);
-+
-+		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
-+		qca->memdump_state = QCA_MEMDUMP_IDLE;
-+	}
-+
- 	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
- }
- 
+ 	/* Realtek 8851BU Bluetooth devices */
+ 	{ USB_DEVICE(0x3625, 0x010b), .driver_info = BTUSB_REALTEK |
 -- 
 2.51.0
 
