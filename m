@@ -1,84 +1,61 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92AD125F994
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Feb 2026 12:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771160090; cv=pass; b=h+LUI2yGzP+xdcRzA/BU3G9U32awz6HIXllUo7cbvgYjjEnrZo4YclsrjMCqOuEvGThZ6uh+0u1S7tQWG40y7lPNgVNOmtOa7ocUm3o//Zq80Fmuv2Byn4KgrkPRPNoFdG2gsQeLHiPo4ZJA7RKRedwQJp3PGHjBC2sCBunTefY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771160090; c=relaxed/simple;
-	bh=ZKHYs9jBU+32lxM/kgv/rMo/hRyYwpnT5wJTmuYXH3E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NDm9ObvwZBDSpaRqctnbLcZkSsdfQWOxlANwdRGksWUpMPdhcYVLz/+FvMq7izf5U+K1UJ2PE5Nw7fHaMkKyY5HGIdjXHjjV7q5Nt/vtx5z7dy5kblUSPwUVuxyQqK8h4gGJ5fvIekYhziOxHwEw5FYGCjwAseh3VMKAhI1s7aU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=e7wmxSZ/; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=bmPdFwdq; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA52815746F
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Feb 2026 13:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771162403; cv=none; b=mOidqg98EZg0o89qnylvaMTBUQha4B0JCeuk+dRCTKy5FOSIlsL+nLaS8WNe6qAjX7QrzSCWBeSCtG0YPd3g7ZiFfYi0xJSKMdZlVBOrVMyxvaiqbf4zJTx8BUQBR8P31sB1ysJjT7cPpfdYSEwYc03iLE/kLYpQxleB33dCd18=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771162403; c=relaxed/simple;
+	bh=qwUApQh0G+oeyqLEU0gaCyAQYv7nPbpSYyX47y3q6iw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=P4un7vFENhkhwD4q3Y+IqXYHoF2jj7mqwnaMeKmG+lbTJcZEX6S47sGrolFV9xrVd5ci8kZrcTPd5vjFiqutf4Vk+/LX9s7J0cuYp9hi8vHudYbEufnlBDjj3J4N1z2UR+inwTUro84Znk0lHsZzvvJRkjelQZfe8/Mz2pHG0vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dK14fW9j; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="e7wmxSZ/";
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="bmPdFwdq"
-Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4fDQpm5489z49PxF
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Feb 2026 14:54:40 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1771160080;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VipQ+N9bp0yCuzBywcS+ALkhbTZTdLBpHURqsVj7cFc=;
-	b=e7wmxSZ/KYyS9uutAIBK3/XlOgG8BecQwwMtUPqX41e15ltqRv8WUlY43LKiY3l7vSCNEG
-	6yUbBZntN52RGOo1ekjhL20qGYO5jRzSi9ieFY7U7KJhqJL7txHL1Mi2OLNK+n85Rjep/b
-	caOh5UVbCFbf5ZEQ0zjEPlt8yAxdRW7ZjbzQwk7mAP5R9XwzBvUGwXj+l/L2D1SZirifJ6
-	64v92eOjMEjrE9SWalvwn3g7gpATuvbuQy2mzqGX0fRwY1bEXUIpvhe5fsyg7Vj7X81+wL
-	Vile3f3JHkypRbf3qJtegTM/FJNnC0F0WLTZrIveSXqKKP2/3rwzV4ElHjcEGQ==
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fDQpc3JFfzyQC;
-	Sun, 15 Feb 2026 14:54:32 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1771160072;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VipQ+N9bp0yCuzBywcS+ALkhbTZTdLBpHURqsVj7cFc=;
-	b=bmPdFwdqPzmN1ELyhp73fEDuOsUPDcsrVio1CA3LUyaRCy6/F/cuaXOD3j4ltQNCYMhAJh
-	OdJWSxgfOol4/XKtvywy04KVkCDn7zE5XIJqO/lR5Ssuse94DV2XZ+/Y1ZGT0n9RIPP1Ca
-	fbO9sgzPKbC8pJ8rC0NwlsxgR361Fi8=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1771160072;
-	b=uGmnKVAQJw2tbAbOeOqeMgXKwU7hGYtdojIo/3chNDzd11yRYv1UeMBL/FU6IqHE7SIFCg
-	AhNeu4e2vLp6l77XUihyBpZUtbEuKjopzsbF/JOsUjFUqtFotvYmFEjCtNkJBAfOkx3Mz2
-	bqKxgdWzFUzo/DwuiFi9OveghMcNVuw=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1771160072;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VipQ+N9bp0yCuzBywcS+ALkhbTZTdLBpHURqsVj7cFc=;
-	b=Gml1J8MGUpjnVHjabr64RHi96Anbsidp78PKOXH+tvS2FOVJWLNVzEjDChuS1TkOAwh9Ye
-	Aohz0VZG1hvyVcnReZavghze0EFfhBwmHGjFLSMrGuiPaFFx17vL5ncHtFQU7Ku6v2agll
-	ldkktADvGKEx5XDguj1RQL/tNiWB3U8=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dK14fW9j"
+Received: from github.com (hubbernetes-node-be332c1.ash1-iad.github.net [10.56.169.38])
+	by smtp.github.com (Postfix) with ESMTPA id 07EEC920442
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Feb 2026 05:33:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1771162402;
+	bh=/QQfWdap+WntOBgZlTKsQhxDnzoko6VKi8nlZl3PwhE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=dK14fW9jn/8s4+jMayir6oqEHCzLzPTxpfPEvI1or/tbJAzZ/r73LMtLfRxz11bvl
+	 8bA/hqtG2V+p8hYO10picqgh7LqZDzMCgyCOqQI8KS6sNJFxGuNnUJSeXDALX81Qop
+	 i3zpexyvq5pZToIfXSYAPmo6rv/61+iLdXE4xg5I=
+Date: Sun, 15 Feb 2026 05:33:22 -0800
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] a2dp: start connecting sink profile before source
-Date: Sun, 15 Feb 2026 14:54:28 +0200
-Message-ID: <0b3d55690ff2f0ed72271f2760ace8f76a81fb43.1771160059.git.pav@iki.fi>
-X-Mailer: git-send-email 2.53.0
+Message-ID: <bluez/bluez/push/refs/heads/1054282/000000-93c85f@github.com>
+Subject: [bluez/bluez] 93c85f: a2dp: start connecting sink profile before
+ source
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1054282
+  Home:   https://github.com/bluez/bluez
+  Commit: 93c85f72947f5bcdd9642082ed0c9ed7ae5ea51a
+      https://github.com/bluez/bluez/commit/93c85f72947f5bcdd9642082ed0c9ed7ae5ea51a
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-02-15 (Sun, 15 Feb 2026)
+
+  Changed paths:
+    M profiles/audio/a2dp.c
+
+  Log Message:
+  -----------
+  a2dp: start connecting sink profile before source
 
 Since cdcd845f87ee the order in which profiles with the same priority are
 connected is the same order as btd_profile_register() is called, instead
@@ -91,24 +68,7 @@ currently.
 So swap the order of registration, to restore the previous behavior.
 
 Fixes: https://github.com/bluez/bluez/issues/1898
----
- profiles/audio/a2dp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 7a37003a2..7216ed017 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -3796,8 +3796,8 @@ static struct btd_adapter_driver media_driver = {
- static int a2dp_init(void)
- {
- 	btd_register_adapter_driver(&media_driver);
--	btd_profile_register(&a2dp_source_profile);
- 	btd_profile_register(&a2dp_sink_profile);
-+	btd_profile_register(&a2dp_source_profile);
- 
- 	return 0;
- }
--- 
-2.53.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
