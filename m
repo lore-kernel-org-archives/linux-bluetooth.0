@@ -1,90 +1,116 @@
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960DC5474F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Feb 2026 08:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855E317A2F6;
+	Mon, 16 Feb 2026 12:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771229903; cv=none; b=jqbJBEFhaaIx/59Yx4Psou1P/b1ywPoYKWrMWdNjp4VeuRMxNk7M6KV6UmoA7oJ8HL8d4uFvyVCEx8luCjHOJXKedMJWO9aO5I4v+mgBc6D05EfsN7vZ1fvVCM4wGxhwNNpKvXE/CZMqI096nRMQAKz4wUiGr0cAv1lF4nAHhBo=
+	t=1771246526; cv=none; b=helvbjwBL1+PiDmuohbiV2fOhCwhbUOP8d8sqcQDfwU01EmXG+QMLvrrUUj11AY9nDZSSAj0d8xcJlQsmUPtjGJpWkxON2PS1RNoVXdkNOamwBviuB/gvSGboq+6zvUO3gT6RhSjEqaW8m1s90j3kBOFCbmszu3YvIEJMeODt3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771229903; c=relaxed/simple;
-	bh=4ZZBXV9LxfuEAaGvGbp4HtGZAUGKocVr7DYfiilApro=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kZdFgZTLagQGblIQQ0Puih3aEx4gNJIpkJPykpU7jp/BOrTMoJ2IvYZsO/UrV5KVB4yjV/qCIcE6wUwJBF6Qwk5J/CWlCht1YZ5WmrMCxI/76OT6vuJaWzW/mwvU5XeYYVlj5rXPTxMwVxyBMXqsDSXIlcCQjvgO232+DoKrMNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=fail smtp.mailfrom=iki.fi; arc=none smtp.client-ip=185.67.36.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=iki.fi
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id B1D06240027
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Feb 2026 09:16:55 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4fDwbq1bdwz9rxR
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Feb 2026 09:16:55 +0100 (CET)
-Message-ID: <9728aa9a3d9bbd8034ea9760eb6206e44e859eb4.camel@iki.fi>
-Subject: Re: [PATCH BlueZ] a2dp: start connecting sink profile before source
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 16 Feb 2026 08:16:55 +0000
-In-Reply-To: <0b3d55690ff2f0ed72271f2760ace8f76a81fb43.1771160059.git.pav@iki.fi>
-References: 
-	<0b3d55690ff2f0ed72271f2760ace8f76a81fb43.1771160059.git.pav@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1771246526; c=relaxed/simple;
+	bh=wMud/zXsW57h/pzFLrQyWiLWanq9uGVhLdnmh94RKyY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BakWjVKeH78hsEj4xcuXLqJyeUjeypF5l2HhI/FjkVTP6F4o+QkiQZK3X1Pl9xkXRsDZhy27/ga8qHTnmPhQ3JwesxM4pJlamf0IRyAdkcnQPUZ+pKBnGaAk5KgbQrzuW4z/l2fKPboZJq81zh/lHW68fo0FsVdcAmc6KAApFEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=AC4bpm3t; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="AC4bpm3t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1771246523;
+	bh=wMud/zXsW57h/pzFLrQyWiLWanq9uGVhLdnmh94RKyY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AC4bpm3thsMtP87lemc3eM14HXqf4MEjhDK6TVvGXfJRYVT+6OrpM7w9MakmNjNRR
+	 orgwToWFJjxiMGL5YX/VN5TkTG0D/ZkAm+GUN3JquiQw+dyziBO0zO9t606R+Fpg4k
+	 UFKGzpCJlGbccREX9PNc6P241OZxCm6MGIxsly3rljmv7R1Mjb8UVrLcYMT4n+Fjm+
+	 UJeF+a+lFsAGvawT8e/K6pSjkWiAe6P1g9gy9hMm/NZcVWaQ9mDiDumTMmBcBunRpS
+	 zOP4cuXv8OVBvBL/o0BSG3Xk2uR+A2Mg3lnk8lu2XkW4od6CoLszW9EVbHhD7+Msug
+	 xgORXVDmAviYg==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9082D17E12A9;
+	Mon, 16 Feb 2026 13:55:23 +0100 (CET)
+Message-ID: <60ff7530-b9a4-47a7-b5bc-3c81a57a4fc0@collabora.com>
+Date: Mon, 16 Feb 2026 13:55:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for MediaTek MT7902
+To: OnlineLearningTutorials <kush.kulshrestha5@gmail.com>,
+ luiz.dentz@gmail.com, marcel@holtmann.org
+Cc: kush.kulshrestha.5@gmail.com, matthias.bgg@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20260214082738.139047-1-kush.kulshrestha.5@gmail.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <20260214082738.139047-1-kush.kulshrestha.5@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-su, 2026-02-15 kello 14:54 +0200, Pauli Virtanen kirjoitti:
-> Since cdcd845f87ee the order in which profiles with the same priority are
-> connected is the same order as btd_profile_register() is called, instead
-> of being the opposite order.
->=20
-> When initiating connections, we want to prefer a2dp-sink profile over
-> a2dp-source, as connecting both at the same time does not work
-> currently.
->=20
-> So swap the order of registration, to restore the previous behavior.
+Il 14/02/26 09:27, OnlineLearningTutorials ha scritto:
+> This patch adds USB IDs for the AzureWave/MediaTek MT7902 Bluetooth
+> module.
+> The device IDs included are:
+> - 13d3:3579
+> - 13d3:3580
+> - 13d3:3594
+> - 13d3:3596
+> 
+> Signed-off-by: OnlineLearningTutorials <kush.kulshrestha.5@gmail.com>
 
-Or maybe it's better to be more explicit, as in following -> v2
+Please use your real name when you send patches, and also use the get_maintainer.pl
+script.
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 7a37003a2..1e6300657 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -3769,6 +3769,8 @@ static struct btd_profile a2dp_source_profile =3D {
-=20
-        .adapter_probe  =3D a2dp_sink_server_probe,
-        .adapter_remove =3D a2dp_sink_server_remove,
-+
-+       .after_services =3D BTD_PROFILE_UUID_CB(NULL, A2DP_SINK_UUID),
- };
-=20
- static struct btd_profile a2dp_sink_profile =3D {
+Actually, just read: https://docs.kernel.org/process/submitting-patches.html
 
->=20
-> Fixes: https://github.com/bluez/bluez/issues/1898
+Regards,
+Angelo
+
 > ---
->  profiles/audio/a2dp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index 7a37003a2..7216ed017 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -3796,8 +3796,8 @@ static struct btd_adapter_driver media_driver =3D {
->  static int a2dp_init(void)
->  {
->  	btd_register_adapter_driver(&media_driver);
-> -	btd_profile_register(&a2dp_source_profile);
->  	btd_profile_register(&a2dp_sink_profile);
-> +	btd_profile_register(&a2dp_source_profile);
-> =20
->  	return 0;
->  }
+>   drivers/bluetooth/btmtk.c |  1 +
+>   drivers/bluetooth/btusb.c | 10 ++++++++++
+>   2 files changed, 11 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> index a8c520dc09e1..b793947dd920 100644
+> --- a/drivers/bluetooth/btmtk.c
+> +++ b/drivers/bluetooth/btmtk.c
+> @@ -1323,6 +1323,7 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+>   	case 0x7668:
+>   		fwname = FIRMWARE_MT7668;
+>   		break;
+> +	case 0x7902:
+>   	case 0x7922:
+>   	case 0x7925:
+>   	case 0x7961:
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index fcec8e589e81..13a2aa13b9f4 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -629,6 +629,16 @@ static const struct usb_device_id quirks_table[] = {
+>   	/* Additional MediaTek MT7668 Bluetooth devices */
+>   	{ USB_DEVICE(0x043e, 0x3109), .driver_info = BTUSB_MEDIATEK |
+>   						     BTUSB_WIDEBAND_SPEECH },
+> +
+> +	/* Additional MediaTek MT7902 Bluetooth devices */
+> +	{ USB_DEVICE(0x13d3, 0x3579), .driver_info = BTUSB_MEDIATEK |
+> +						     BTUSB_WIDEBAND_SPEECH },
+> +	{ USB_DEVICE(0x13d3, 0x3580), .driver_info = BTUSB_MEDIATEK |
+> +						     BTUSB_WIDEBAND_SPEECH },
+> +	{ USB_DEVICE(0x13d3, 0x3594), .driver_info = BTUSB_MEDIATEK |
+> +						     BTUSB_WIDEBAND_SPEECH },
+> +	{ USB_DEVICE(0x13d3, 0x3596), .driver_info = BTUSB_MEDIATEK |
+> +						     BTUSB_WIDEBAND_SPEECH },
+>   
+>   	/* Additional MediaTek MT7920 Bluetooth devices */
+>   	{ USB_DEVICE(0x0489, 0xe134), .driver_info = BTUSB_MEDIATEK |
 
---=20
-Pauli Virtanen
 
