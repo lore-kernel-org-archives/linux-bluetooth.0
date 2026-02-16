@@ -1,144 +1,112 @@
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8542D2488
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Feb 2026 17:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CCF236A73
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Feb 2026 19:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771264432; cv=none; b=Vfvz+Joa9vv9rZG3NOx0kmIK5EdEU5SyJnRku5aTOk19tZRG73nBNxPe2aT/U/lssa6b6A4o87LDxkQQ53iw6vbaAHJBbHvOx34/pCw/x89fNxau/dCV1jjcK5mpWX2pk8TDKXVuKjTJv9p8TSYnfXcEGWJGMFr4GdFvzqOvmYs=
+	t=1771270308; cv=none; b=f3ywzaH7SCzOOSZrKPL8u0v8T2l9rQkwdxzgH5Xp6FCyvD96AJJZhl36bw3TXE4vc6yRiBk4J/xTdP9dMg8epnmLZT+GpyAHdW7Y3Sk83QcXkmJu74YFpP4zZml8C5p3RDQ5yN+xtLW5tSNPYkQ4arT9830oWlo8MIEdZf5YVMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771264432; c=relaxed/simple;
-	bh=ZSYxJF40eqx04YAIkpb4eEfRyf0xTeB+PkQJ5ZjqKhg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=oVxA2xayefvxXO62Xr4SvfL+4dFZoSsznSOj38E4WY+sCuWZTx3AkCzBBPfOIa2eBxXiaV9opqWQci3jtelGhtci8xNxJOdH12iabilKOdRItbta7QDPM22yYZO1tuC1T98+8dmuP+vXkg0BiKOh9sPuLFvurpaX0XmaLb7yLes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RqXlklJg; arc=none smtp.client-ip=74.125.82.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1771270308; c=relaxed/simple;
+	bh=tCfMOSeVHKMlN5tfwaCoya3sUE+TCmWQVHCUi39DOcU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Sc41e6ib3lIR3paM4YdlC9+lPiYcbQPzRLnkF48UebQmScEuH8f2vQua+caVr52OpRlSjmXLtwy3WsaE0IK6rSBioiPlXjb3PzjBg1KbcJVAxz9czzW+L8zpI5Y//W1igpRd7Byi0FqbCoM71V2DlJY8I8v5T3/soo3qqhsHy9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VBwgn03x; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RqXlklJg"
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2baab3137bcso2995219eec.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Feb 2026 09:53:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771264431; x=1771869231; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PKmjesHgGKcsiuEg/nmvp+obo3j5LtWcxyebud5fjkQ=;
-        b=RqXlklJgh8+ucel6A6xEE0AEms0cFpB+FuZFGMM8C6wKjKgkQiH7XHgmu+h6Tk0V71
-         1WDzDkaAyyQbRwkmGkMdvMvjDq57dtBihxuEz7OT+xwbHbJHw88RG2R+Y9q1JGC0z/Mq
-         KiGgfpA1oCD0PGsaaCvqvShtRhLpLpDbrbYdolMV1RSxUErnWEJ79htXfu8Gtz/JHLhf
-         ulELksQjKDx5kGnK9j7R6vWq1UFShgKKysPMVDF0hoxf2NA/aOVuPGDSlgUc5fANJlL/
-         A4je4GSqNk9vLeXVJ+MyGuI9yhB8B4hBKlriFkRzJuUsq5dsafw6pIjzEZwYmrBvoSNV
-         5KaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771264431; x=1771869231;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PKmjesHgGKcsiuEg/nmvp+obo3j5LtWcxyebud5fjkQ=;
-        b=BA10LHYDRzb1qFn0ywokNoqrPGpibePC+4qBsXFUMkmhGCH1K97dRFHPT9UQHw5a7c
-         ggFuOWJU4kFfwXN2HY5eGInnzrhwctdtWiza39J7PJCS9LscEWyNZlJl1OxuQkGiso7h
-         L/5TCiXVbRY4SVAXtXBXWzBF/BR4CNjpvckKtdl6uRXn3wvFYmAQktbAop3miqs/nJ96
-         Oz2OMokeXKl0csiHqKJwj/GnsftCqTBbIWfTDY5zy++NzjWb4GnPiRuIdWN8NeAewArL
-         oL2YBbE4ulr6nkUALjK8B7LeaMr/O9mnYvc25FEga1IEONEg53L7s/ouDPNSZM/wzkwn
-         g0gQ==
-X-Gm-Message-State: AOJu0Yzi8/c1LBhyakKzTneRsu+cADHKZkzFFKo3ePmtjfCcqszO5Bk2
-	5HHmY1WjfomtqSsToOMdGFpVXxlM2n9g+3wllYpLp2QhP8SSiWV7E4h4QNFKeGHd
-X-Gm-Gg: AZuq6aICQnTv+CVjfHXI3sQIF05tOvfAGpuUAxtO//CR2wTN1AUY/NQvPdLYYxXvHu9
-	OA/zlW0ACzVuks7nH7ypUqOzIX3S7Dv5uzqGN7s5EjVfErofKMwNNoBfV2IlpTaYbb1waIoye/W
-	MtW+wOM5YAWY7hmrmuulAlUlO8cemfRv0ZofWU5YHuROH14ielDhsfTCHM73vWj6HHmGzqV7sDK
-	2ej9Rl2euztZYbsQgErTXLShB1jDgLKNyHrD7RxwTOKtcddk3FFuQe5PzmbG08+TdgIoJpyMMUF
-	0ZsLB9xOHt1sd7xrjfrZCkZxY+ZECBUwUtjm8LPJ2NAk31INGuZRTolJ9v2i4plpaOKyZ2zdy/v
-	tRMWKT1gJk4Zem4M5YIV0a3leJrQKHQHvVDcKuRF/CURaWrKuPHr60gopaLNujRCe6Gqenvnbjk
-	L79PDIEGbhjVGFLfQ+l/DQVIwonDpu
-X-Received: by 2002:a05:7300:df09:b0:2ba:8aa8:9c04 with SMTP id 5a478bee46e88-2bac933badfmr4005947eec.2.1771264430603;
-        Mon, 16 Feb 2026 09:53:50 -0800 (PST)
-Received: from [172.17.0.2] ([68.220.62.155])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bacb658fc4sm12080325eec.22.2026.02.16.09.53.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Feb 2026 09:53:50 -0800 (PST)
-Message-ID: <699359ae.050a0220.b0b47.0198@mx.google.com>
-Date: Mon, 16 Feb 2026 09:53:50 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2079807786610373356=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VBwgn03x"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1771270305;
+	bh=tCfMOSeVHKMlN5tfwaCoya3sUE+TCmWQVHCUi39DOcU=;
+	h=From:To:Subject:Date:From;
+	b=VBwgn03x9w2PffiD99RDCFCqSv/3lUwXcjw1nD84S2kAvNKOszY5ohRg7UsMaKiNQ
+	 tzREzspa9OPTAc6qFV6MiO6hPkVPC5KE8MzUt346jKlpusO9qTdvbGfvHBhsUhP+PC
+	 0KTP+3r9zIzMbuKzy4i7Fbt4bli2IrUqVBGercaSVPWgD9Jxpd+pvBxxdkMilwR+29
+	 AlDT5QA2DkKGnwm3uB1LDAMlqnF54B9Sb+7wsRzN/L0fEGDPG5Z4NK0LlY3wVoYcad
+	 KeDzSmHKreOztUTZNGxnFhTPKxcw4EM9rmzQKwK/7hKGP+gBFE5+o9tKrlqjF2LLhx
+	 lt9SKJ+2WW5/A==
+Received: from fdanis-ThinkPad-X1.. (2A02-8428-af44-1001-4C10-12D9-233c-Cfc3.rev.sfr.net [IPv6:2a02:8428:af44:1001:4c10:12d9:233c:cfc3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 43C8517E012E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Feb 2026 20:31:45 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/3] tools/btpclient: Move btpclient to client/btpclient directory
+Date: Mon, 16 Feb 2026 20:31:34 +0100
+Message-ID: <20260216193136.292051-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ,1/3] tools/btpclient: Move btpclient to client/btpclient directory
-In-Reply-To: <20260216165127.110686-1-frederic.danis@collabora.com>
-References: <20260216165127.110686-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============2079807786610373356==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1054634
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.44 seconds
-GitLint                       PENDING   0.39 seconds
-BuildEll                      PASS      20.97 seconds
-BluezMake                     PASS      670.34 seconds
-MakeCheck                     PASS      19.24 seconds
-MakeDistcheck                 FAIL      43.54 seconds
-CheckValgrind                 PASS      297.77 seconds
-CheckSmatch                   PASS      363.94 seconds
-bluezmakeextell               PASS      188.31 seconds
-IncrementalBuild              PENDING   0.36 seconds
-ScanBuild                     PASS      1059.02 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-../../client/btpclient/core.c:14:10: fatal error: btpclient.h: No such file or directory
-   14 | #include "btpclient.h"
-      |          ^~~~~~~~~~~~~
-compilation terminated.
-make[2]: *** [Makefile:7170: client/btpclient/core.o] Error 1
-make[2]: *** Waiting for unfinished jobs....
-../../client/btpclient/gap.c:20:10: fatal error: btpclient.h: No such file or directory
-   20 | #include "btpclient.h"
-      |          ^~~~~~~~~~~~~
-compilation terminated.
-make[2]: *** [Makefile:7170: client/btpclient/gap.o] Error 1
-make[1]: *** [Makefile:4218: all] Error 2
-make: *** [Makefile:10818: distcheck] Error 1
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+This prepares the split of btp services in per profile files for
+easier maintenance.
 ---
-Regards,
-Linux Bluetooth
+ .gitignore                                 |  4 ++--
+ Makefile.tools                             | 13 +++++++------
+ {tools => client/btpclient}/btpclient.c    |  0
+ {tools => client/btpclient}/btpclientctl.c |  0
+ 4 files changed, 9 insertions(+), 8 deletions(-)
+ rename {tools => client/btpclient}/btpclient.c (100%)
+ rename {tools => client/btpclient}/btpclientctl.c (100%)
 
+diff --git a/.gitignore b/.gitignore
+index ea895c064..71ef28e1e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -133,8 +133,8 @@ tools/btattach
+ tools/btconfig
+ tools/btmgmt
+ tools/btsnoop
+-tools/btpclient
+-tools/btpclientctl
++client/btpclient/btpclient
++client/btpclient/btpclientctl
+ tools/btmon-logger
+ tools/bluetooth-logger.service
+ tools/mpris-proxy.service
+diff --git a/Makefile.tools b/Makefile.tools
+index 4f4ee88de..edfb5282c 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -583,14 +583,15 @@ test_scripts += test/bluezutils.py \
+ 		test/test-gatt-profile test/test-mesh test/agent.py
+ 
+ if BTPCLIENT
+-noinst_PROGRAMS += tools/btpclient tools/btpclientctl
++noinst_PROGRAMS += client/btpclient/btpclient client/btpclient/btpclientctl
+ 
+-tools_btpclient_SOURCES = tools/btpclient.c src/shared/btp.c src/shared/btp.h
+-tools_btpclient_LDADD = lib/libbluetooth-internal.la \
++client_btpclient_btpclient_SOURCES = client/btpclient/btpclient.c \
++				src/shared/btp.c src/shared/btp.h
++client_btpclient_btpclient_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-ell.la $(ell_ldadd)
+-tools/btpclient.$(OBJEXT): src/libshared-ell.la ell/internal
++client/btpclient/btpclient.$(OBJEXT): src/libshared-ell.la ell/internal
+ 
+-tools_btpclientctl_SOURCES = tools/btpclientctl.c client/display.c
+-tools_btpclientctl_LDADD = src/libshared-mainloop.la src/libshared-glib.la \
++client_btpclient_btpclientctl_SOURCES = client/btpclient/btpclientctl.c client/display.c
++client_btpclient_btpclientctl_LDADD = src/libshared-mainloop.la src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la -lreadline
+ endif
+diff --git a/tools/btpclient.c b/client/btpclient/btpclient.c
+similarity index 100%
+rename from tools/btpclient.c
+rename to client/btpclient/btpclient.c
+diff --git a/tools/btpclientctl.c b/client/btpclient/btpclientctl.c
+similarity index 100%
+rename from tools/btpclientctl.c
+rename to client/btpclient/btpclientctl.c
+-- 
+2.43.0
 
---===============2079807786610373356==--
