@@ -1,43 +1,46 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E382737F2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D5A242D6C
 	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Feb 2026 16:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771260697; cv=none; b=RuYTdEZ6pah4u/lU3C7bguykgx7A2uAVC1dm7Rd+3CEqc8F5ZuQEk1e8pV+jQCTKcQILCI8XARJNpdMqxeDuRqHHk7MXEb1bAEOizy0RWUejG2V+ll+MONuGZww5nCgxzw0w7pqVPTjlIxlsDOVAWE+p1a/z7Z7WmRYUzYj67eo=
+	t=1771260697; cv=none; b=Pe5eO4yv/P2Z/G8wNBCoTVYp5x+OJDrwPBNrVFW/cESYxw61bc8QogvI1ZtsTwGCOrvIibJNtPdlJg3mBdCRmrSiY3qJPsEI/tlCZaKrvWwrpzl/4mIAixwlrDJTVhR//zp/4nicNM+Nh1P8Lk1avw7e5JDz4of1/vqYMeTKjH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771260697; c=relaxed/simple;
-	bh=tCfMOSeVHKMlN5tfwaCoya3sUE+TCmWQVHCUi39DOcU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mXXGYniFuN9IMTndVrYkfsLp3dFjy7WnIug94tvzQqLeL7x7RjibO/ygIthJ0gww8tnopcGzcfYhEEogWwXhWG/irtIWDXiN7aEHsozdFGdEWVkz68aA3PMP+50H7CEFadIHyy8LPiOI14MF+QpFH27EFn5jPb+I/7QvwSoPsI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=C6N2BOw/; arc=none smtp.client-ip=148.251.105.195
+	bh=NVrho32+u/CCSgaYTBAdeL3ix32A9/UdpZKKEu3iO1c=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Wi2d8fugU0j6q12NB1eOUE8ZPVZrt1OH2brChmBpHgSkXzjPm1XhlNq4ucvJnOMaSxKj9hKb0usuzS/fuX4J0M8r25CvuMY67a1Xd5Yvn9fzkWuBD+4yC0CNjGYY76U733VvFqLGtYRbvb2zAIiYITUQTrNi3/so9uZVZPJ7sgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Kiy2H0Du; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="C6N2BOw/"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Kiy2H0Du"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1771260693;
-	bh=tCfMOSeVHKMlN5tfwaCoya3sUE+TCmWQVHCUi39DOcU=;
-	h=From:To:Subject:Date:From;
-	b=C6N2BOw/jDnYa1Y6aRCmKzxS/2kTPOcufDUreMo2NCHmGiE6rN1gwYuQ8O5er0QNp
-	 7JjXush7wlpYgmxRv04O8rG4cCsQAb4wj/xZ7MI4DGWVlIL7ePrxOEtDgFduMIc2Ld
-	 ryjfqWQ0RqkPVAjQEYgJzutU6/n3ta+17TG5mNz/CcSYwJZcFbeHaRdw3zwlW60o7n
-	 AMoCkMPZ9MdflVVx6MELC1tD+Fu+7J4J7liEmuyNVQV9KGYUGOIgYrR7NVfuyBy2hf
-	 bJ2xXJg9PEC8BUNYq3kcVFrHUxCLWEX+VJ4XoufN8FrAu4vRU7Hbh6DU8yb+Tw/R/n
-	 TtbpzkLV7P2WQ==
+	bh=NVrho32+u/CCSgaYTBAdeL3ix32A9/UdpZKKEu3iO1c=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=Kiy2H0DuGE04CE7YnqfUvedYb/cQx0eAox4TYwbp6TZn3BnMEhUixgoU78/bHDbWC
+	 bE4wewk06P9PYwH9DKBZltJIwieXHs09fed/9IeJfTPa+HrO8mexozbckoA2VNYEyK
+	 4332SLOlhX+PY+BmsydLhZyh+PaP8qm4SYvWHofcnxS6CQ8SWkT6tnjr2M7RqG8UHT
+	 SMJrgTpSNB2PZxPB1ct1he/qE1bT4QjqOTpAm/sY407BNl4PjsZlHZhlNUD9Ezblx/
+	 CQ9xNSE9ws1/02MCIZ7mvjqTe3hMIWFMrJu6jw44bKLjxWsds/qZgIZzX6jxMHnqRN
+	 lIaEfbouc7HJA==
 Received: from fdanis-ThinkPad-X1.. (2a02-8428-Af44-1001-4c10-12D9-233c-cfc3.rev.sfr.net [IPv6:2a02:8428:af44:1001:4c10:12d9:233c:cfc3])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 477AC17E00A3
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9582B17E01E7
 	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Feb 2026 17:51:33 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] tools/btpclient: Move btpclient to client/btpclient directory
-Date: Mon, 16 Feb 2026 17:51:25 +0100
-Message-ID: <20260216165127.110686-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ 2/3] client/btpclient: Move btp core service in its own file
+Date: Mon, 16 Feb 2026 17:51:26 +0100
+Message-ID: <20260216165127.110686-2-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260216165127.110686-1-frederic.danis@collabora.com>
+References: <20260216165127.110686-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -47,66 +50,394 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-This prepares the split of btp services in per profile files for
-easier maintenance.
+Moving the btp services in their own files will simplify maintenance.
 ---
- .gitignore                                 |  4 ++--
- Makefile.tools                             | 13 +++++++------
- {tools => client/btpclient}/btpclient.c    |  0
- {tools => client/btpclient}/btpclientctl.c |  0
- 4 files changed, 9 insertions(+), 8 deletions(-)
- rename {tools => client/btpclient}/btpclient.c (100%)
- rename {tools => client/btpclient}/btpclientctl.c (100%)
+ Makefile.tools               |   3 +-
+ client/btpclient/btpclient.c | 139 ++++----------------------------
+ client/btpclient/btpclient.h |  12 +++
+ client/btpclient/core.c      | 150 +++++++++++++++++++++++++++++++++++
+ client/btpclient/core.h      |  10 +++
+ 5 files changed, 188 insertions(+), 126 deletions(-)
+ create mode 100644 client/btpclient/btpclient.h
+ create mode 100644 client/btpclient/core.c
+ create mode 100644 client/btpclient/core.h
 
-diff --git a/.gitignore b/.gitignore
-index ea895c064..71ef28e1e 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -133,8 +133,8 @@ tools/btattach
- tools/btconfig
- tools/btmgmt
- tools/btsnoop
--tools/btpclient
--tools/btpclientctl
-+client/btpclient/btpclient
-+client/btpclient/btpclientctl
- tools/btmon-logger
- tools/bluetooth-logger.service
- tools/mpris-proxy.service
 diff --git a/Makefile.tools b/Makefile.tools
-index 4f4ee88de..edfb5282c 100644
+index edfb5282c..d475fa1e8 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -583,14 +583,15 @@ test_scripts += test/bluezutils.py \
- 		test/test-gatt-profile test/test-mesh test/agent.py
+@@ -586,7 +586,8 @@ if BTPCLIENT
+ noinst_PROGRAMS += client/btpclient/btpclient client/btpclient/btpclientctl
  
- if BTPCLIENT
--noinst_PROGRAMS += tools/btpclient tools/btpclientctl
-+noinst_PROGRAMS += client/btpclient/btpclient client/btpclient/btpclientctl
- 
--tools_btpclient_SOURCES = tools/btpclient.c src/shared/btp.c src/shared/btp.h
--tools_btpclient_LDADD = lib/libbluetooth-internal.la \
-+client_btpclient_btpclient_SOURCES = client/btpclient/btpclient.c \
-+				src/shared/btp.c src/shared/btp.h
-+client_btpclient_btpclient_LDADD = lib/libbluetooth-internal.la \
+ client_btpclient_btpclient_SOURCES = client/btpclient/btpclient.c \
+-				src/shared/btp.c src/shared/btp.h
++				src/shared/btp.c src/shared/btp.h \
++				client/btpclient/core.c
+ client_btpclient_btpclient_LDADD = lib/libbluetooth-internal.la \
  				src/libshared-ell.la $(ell_ldadd)
--tools/btpclient.$(OBJEXT): src/libshared-ell.la ell/internal
-+client/btpclient/btpclient.$(OBJEXT): src/libshared-ell.la ell/internal
+ client/btpclient/btpclient.$(OBJEXT): src/libshared-ell.la ell/internal
+diff --git a/client/btpclient/btpclient.c b/client/btpclient/btpclient.c
+index b70e2b573..1e30f49eb 100644
+--- a/client/btpclient/btpclient.c
++++ b/client/btpclient/btpclient.c
+@@ -23,6 +23,8 @@
  
--tools_btpclientctl_SOURCES = tools/btpclientctl.c client/display.c
--tools_btpclientctl_LDADD = src/libshared-mainloop.la src/libshared-glib.la \
-+client_btpclient_btpclientctl_SOURCES = client/btpclient/btpclientctl.c client/display.c
-+client_btpclient_btpclientctl_LDADD = src/libshared-mainloop.la src/libshared-glib.la \
- 				lib/libbluetooth-internal.la -lreadline
- endif
-diff --git a/tools/btpclient.c b/client/btpclient/btpclient.c
-similarity index 100%
-rename from tools/btpclient.c
-rename to client/btpclient/btpclient.c
-diff --git a/tools/btpclientctl.c b/client/btpclient/btpclientctl.c
-similarity index 100%
-rename from tools/btpclientctl.c
-rename to client/btpclient/btpclientctl.c
+ #include "bluetooth/bluetooth.h"
+ #include "src/shared/btp.h"
++#include "btpclient.h"
++#include "core.h"
+ 
+ #define AD_PATH "/org/bluez/advertising"
+ #define AG_PATH "/org/bluez/agent"
+@@ -2769,138 +2771,25 @@ static void register_gap_service(void)
+ 					btp_gap_confirm_entry_rsp, NULL, NULL);
+ }
+ 
+-static void btp_core_read_commands(uint8_t index, const void *param,
+-					uint16_t length, void *user_data)
+-{
+-	uint8_t commands = 0;
+-
+-	if (index != BTP_INDEX_NON_CONTROLLER) {
+-		btp_send_error(btp, BTP_CORE_SERVICE, index,
+-						BTP_ERROR_INVALID_INDEX);
+-		return;
+-	}
+-
+-	commands |= (1 << BTP_OP_CORE_READ_SUPPORTED_COMMANDS);
+-	commands |= (1 << BTP_OP_CORE_READ_SUPPORTED_SERVICES);
+-	commands |= (1 << BTP_OP_CORE_REGISTER);
+-	commands |= (1 << BTP_OP_CORE_UNREGISTER);
+-
+-	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_READ_SUPPORTED_COMMANDS,
+-			BTP_INDEX_NON_CONTROLLER, sizeof(commands), &commands);
+-}
+-
+-static void btp_core_read_services(uint8_t index, const void *param,
+-					uint16_t length, void *user_data)
+-{
+-	uint8_t services = 0;
+-
+-	if (index != BTP_INDEX_NON_CONTROLLER) {
+-		btp_send_error(btp, BTP_CORE_SERVICE, index,
+-						BTP_ERROR_INVALID_INDEX);
+-		return;
+-	}
+-
+-	services |= (1 << BTP_CORE_SERVICE);
+-	services |= (1 << BTP_GAP_SERVICE);
+-
+-	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_READ_SUPPORTED_SERVICES,
+-			BTP_INDEX_NON_CONTROLLER, sizeof(services), &services);
+-}
+-
+-static void btp_core_register(uint8_t index, const void *param,
+-					uint16_t length, void *user_data)
++bool gap_register_service(void)
+ {
+-	const struct btp_core_register_cp  *cp = param;
+-
+-	if (length < sizeof(*cp))
+-		goto failed;
+-
+-	if (index != BTP_INDEX_NON_CONTROLLER) {
+-		btp_send_error(btp, BTP_CORE_SERVICE, index,
+-						BTP_ERROR_INVALID_INDEX);
+-		return;
+-	}
+-
+-	switch (cp->service_id) {
+-	case BTP_GAP_SERVICE:
+-		if (gap_service_registered)
+-			goto failed;
+-
+-		if (!register_default_agent(NULL,
+-					BTP_GAP_IOCAPA_NO_INPUT_NO_OUTPUT,
+-					register_default_agent_reply))
+-			goto failed;
+-
+-		return;
+-	case BTP_GATT_SERVICE:
+-	case BTP_L2CAP_SERVICE:
+-	case BTP_MESH_NODE_SERVICE:
+-	case BTP_CORE_SERVICE:
+-	default:
+-		goto failed;
+-	}
+-
+-	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_REGISTER,
+-					BTP_INDEX_NON_CONTROLLER, 0, NULL);
+-	return;
++	if (!register_default_agent(NULL,
++				BTP_GAP_IOCAPA_NO_INPUT_NO_OUTPUT,
++				register_default_agent_reply))
++		return false;
+ 
+-failed:
+-	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
++	return true;
+ }
+ 
+-static void btp_core_unregister(uint8_t index, const void *param,
+-					uint16_t length, void *user_data)
++void gap_unregister_service(void)
+ {
+-	const struct btp_core_unregister_cp  *cp = param;
+-
+-	if (length < sizeof(*cp))
+-		goto failed;
+-
+-	if (index != BTP_INDEX_NON_CONTROLLER) {
+-		btp_send_error(btp, BTP_CORE_SERVICE, index,
+-						BTP_ERROR_INVALID_INDEX);
+-		return;
+-	}
+-
+-	switch (cp->service_id) {
+-	case BTP_GAP_SERVICE:
+-		if (!gap_service_registered)
+-			goto failed;
+-
+-		btp_unregister_service(btp, BTP_GAP_SERVICE);
+-		gap_service_registered = false;
+-		break;
+-	case BTP_GATT_SERVICE:
+-	case BTP_L2CAP_SERVICE:
+-	case BTP_MESH_NODE_SERVICE:
+-	case BTP_CORE_SERVICE:
+-	default:
+-		goto failed;
+-	}
+-
+-	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_UNREGISTER,
+-					BTP_INDEX_NON_CONTROLLER, 0, NULL);
+-	return;
+-
+-failed:
+-	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
++	btp_unregister_service(btp, BTP_GAP_SERVICE);
++	gap_service_registered = false;
+ }
+ 
+-static void register_core_service(void)
++bool gap_is_service_registered(void)
+ {
+-	btp_register(btp, BTP_CORE_SERVICE,
+-					BTP_OP_CORE_READ_SUPPORTED_COMMANDS,
+-					btp_core_read_commands, NULL, NULL);
+-
+-	btp_register(btp, BTP_CORE_SERVICE,
+-					BTP_OP_CORE_READ_SUPPORTED_SERVICES,
+-					btp_core_read_services, NULL, NULL);
+-
+-	btp_register(btp, BTP_CORE_SERVICE, BTP_OP_CORE_REGISTER,
+-						btp_core_register, NULL, NULL);
+-
+-	btp_register(btp, BTP_CORE_SERVICE, BTP_OP_CORE_UNREGISTER,
+-					btp_core_unregister, NULL, NULL);
++	return gap_service_registered;
+ }
+ 
+ static void signal_handler(uint32_t signo, void *user_data)
+@@ -3196,7 +3085,7 @@ static void client_ready(struct l_dbus_client *client, void *user_data)
+ 
+ 	btp_set_disconnect_handler(btp, btp_disconnect_handler, NULL, NULL);
+ 
+-	register_core_service();
++	core_register_service(btp);
+ 
+ 	btp_send(btp, BTP_CORE_SERVICE, BTP_EV_CORE_READY,
+ 					BTP_INDEX_NON_CONTROLLER, 0, NULL);
+diff --git a/client/btpclient/btpclient.h b/client/btpclient/btpclient.h
+new file mode 100644
+index 000000000..467e48278
+--- /dev/null
++++ b/client/btpclient/btpclient.h
+@@ -0,0 +1,12 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011-2017  Intel Corporation. All rights reserved.
++ *
++ */
++
++bool gap_register_service(void);
++void gap_unregister_service(void);
++bool gap_is_service_registered(void);
+diff --git a/client/btpclient/core.c b/client/btpclient/core.c
+new file mode 100644
+index 000000000..9e87d8e9d
+--- /dev/null
++++ b/client/btpclient/core.c
+@@ -0,0 +1,150 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011-2017  Intel Corporation. All rights reserved.
++ *
++ */
++
++#include <ell/ell.h>
++
++#include "bluetooth/bluetooth.h"
++#include "src/shared/btp.h"
++#include "btpclient.h"
++#include "core.h"
++
++static struct btp *btp;
++
++static void btp_core_read_commands(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	uint8_t commands = 0;
++
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_CORE_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
++
++	commands |= (1 << BTP_OP_CORE_READ_SUPPORTED_COMMANDS);
++	commands |= (1 << BTP_OP_CORE_READ_SUPPORTED_SERVICES);
++	commands |= (1 << BTP_OP_CORE_REGISTER);
++	commands |= (1 << BTP_OP_CORE_UNREGISTER);
++
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_READ_SUPPORTED_COMMANDS,
++			BTP_INDEX_NON_CONTROLLER, sizeof(commands), &commands);
++}
++
++static void btp_core_read_services(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	uint8_t services = 0;
++
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_CORE_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
++
++	services |= (1 << BTP_CORE_SERVICE);
++	services |= (1 << BTP_GAP_SERVICE);
++
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_READ_SUPPORTED_SERVICES,
++			BTP_INDEX_NON_CONTROLLER, sizeof(services), &services);
++}
++
++static void btp_core_register(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	const struct btp_core_register_cp  *cp = param;
++
++	if (length < sizeof(*cp))
++		goto failed;
++
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_CORE_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
++
++	switch (cp->service_id) {
++	case BTP_GAP_SERVICE:
++		if (gap_is_service_registered())
++			goto failed;
++
++		if (!gap_register_service())
++			goto failed;
++
++		return;
++	case BTP_GATT_SERVICE:
++	case BTP_L2CAP_SERVICE:
++	case BTP_MESH_NODE_SERVICE:
++	case BTP_CORE_SERVICE:
++	default:
++		goto failed;
++	}
++
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_REGISTER,
++					BTP_INDEX_NON_CONTROLLER, 0, NULL);
++	return;
++
++failed:
++	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
++}
++
++static void btp_core_unregister(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	const struct btp_core_unregister_cp  *cp = param;
++
++	if (length < sizeof(*cp))
++		goto failed;
++
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_CORE_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
++
++	switch (cp->service_id) {
++	case BTP_GAP_SERVICE:
++		if (!gap_is_service_registered())
++			goto failed;
++
++		gap_unregister_service(btp);
++		break;
++	case BTP_GATT_SERVICE:
++	case BTP_L2CAP_SERVICE:
++	case BTP_MESH_NODE_SERVICE:
++	case BTP_CORE_SERVICE:
++	default:
++		goto failed;
++	}
++
++	btp_send(btp, BTP_CORE_SERVICE, BTP_OP_CORE_UNREGISTER,
++					BTP_INDEX_NON_CONTROLLER, 0, NULL);
++	return;
++
++failed:
++	btp_send_error(btp, BTP_CORE_SERVICE, index, BTP_ERROR_FAIL);
++}
++
++void core_register_service(struct btp *btp_)
++{
++	btp = btp_;
++
++	btp_register(btp, BTP_CORE_SERVICE,
++					BTP_OP_CORE_READ_SUPPORTED_COMMANDS,
++					btp_core_read_commands, NULL, NULL);
++
++	btp_register(btp, BTP_CORE_SERVICE,
++					BTP_OP_CORE_READ_SUPPORTED_SERVICES,
++					btp_core_read_services, NULL, NULL);
++
++	btp_register(btp, BTP_CORE_SERVICE, BTP_OP_CORE_REGISTER,
++					btp_core_register, NULL, NULL);
++
++	btp_register(btp, BTP_CORE_SERVICE, BTP_OP_CORE_UNREGISTER,
++					btp_core_unregister, NULL, NULL);
++}
+diff --git a/client/btpclient/core.h b/client/btpclient/core.h
+new file mode 100644
+index 000000000..4c6d0437a
+--- /dev/null
++++ b/client/btpclient/core.h
+@@ -0,0 +1,10 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011-2017  Intel Corporation. All rights reserved.
++ *
++ */
++
++void core_register_service(struct btp *btp);
 -- 
 2.43.0
 
