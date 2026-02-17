@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939BF32E122
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Feb 2026 14:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB2A32E122
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Feb 2026 14:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771339813; cv=none; b=BcGrYuh18vToohLxgHQtgrwUTnLwSDiRTVYsFUGNbKd7aSYsG1xJN6IlqN4gK5X1WWCpRw3zCRun9r8OaFpxC0FCxTAWpC2d5pY4CipZhF8X9kxyBqK2L+Cls64whkUU0VkYR8rRE0bmI/+yuzVRx8WmmkiO830uft9VqCoK8Tg=
+	t=1771339814; cv=none; b=pkKp+Kn6/2qRNMMVccfqZnTS1M2URUMpSL+B61ZLtMEOSH9BpcOJ9qBBMkLcDunQXBVlN2qEllSQbu9Mv2ncga20scKtW4GAXoKxQ+2nT0xI0QazHutNDcOZHVCRF+Z/EyG02iY22KT6Dgp1NJuPiubwXT/QGjRjjagaIF7sizE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771339813; c=relaxed/simple;
-	bh=xb9zEm032j2TZDqwRp3q5QIa1EchphOe/hTE4bcl4+8=;
+	s=arc-20240116; t=1771339814; c=relaxed/simple;
+	bh=HmCzGUbgFmaGwqrzwzIV+vZe6GZ2tuc39tcRG9ElpnE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nDMIIJPi46Cqb6ruKJHdM4IkTxRNmaEd79D9M1vV3GJE2Tec4JJnJlovIve+pzmV3LdmzO0t+E9EVBnMOuSFpRfDPXmxHM3Rhr/C4jGH9Uo+nITDvZlvslIXHNb6i4THXrd8mBdXClqFBwBDCAolnVh5h67ty2anJyV1bIaDiII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FHW2+7Ah; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=UA238QFdQLueIXd42iNEPpc/nij3aZS2NexhqLm9iBDjA5mpS9JXI2Uk0HdI/VSt2GKUUJQFdl/fIGkuLt0dHa2dBHvx1j5qns05IE1Xxolorb0TJJomZGTOyr1y0DRdknoFXbYZjFvMAuKQLt2UlwNkKsNweHLqmxoYqXzv6S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ergRCmXK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FHW2+7Ah"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 207F8C4CEF7;
-	Tue, 17 Feb 2026 14:50:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ergRCmXK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B8BDC4CEF7;
+	Tue, 17 Feb 2026 14:50:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771339813;
-	bh=xb9zEm032j2TZDqwRp3q5QIa1EchphOe/hTE4bcl4+8=;
+	s=k20201202; t=1771339814;
+	bh=HmCzGUbgFmaGwqrzwzIV+vZe6GZ2tuc39tcRG9ElpnE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FHW2+7AhN5DzFL8YyY0NX9ekKMcxxn5k9gdNX1cgk0CJ75a6nOokUwZXMspIMzG7u
-	 9VEpEuy1yUITOKUkmdvOtAdo8N68oNEO+6K3SYnqjInBZq5h3L9qoLrZB1F04asFyQ
-	 kEqlCyX/WYF2fsW/G7m2YxXhcYsUta4TS4nkQ5NNdIkpKcm9roJB3fsafK5lnvc2/3
-	 cF53cR+efQCJOz+fCsrNOVTK/ncdnazd4HHXNc1JjkXhHXGvaoehJAyTWneQ4nZ2T6
-	 8I2ud4T2n8OaynB1OmtTWzCcgV+XoeFcIETVmw1Hmic+aw4xL9O8k2O6DH7D1BL5N1
-	 Qzfe02Q5Zz/eQ==
+	b=ergRCmXK9Jch8je81/XYVHxgWpH1PuYNPgu2FFQC9aFZbQSNvluaI65KN60q/wYof
+	 nPuFDwhpu9SbkGEKzKukc3Mkk/z3aAqDppsW11bVt8zLKfWg+Yx8t+e3+Y/kjpn7DK
+	 4NEkMHL0F0jZmm9kwWtVEA+kmxqmFm0aAocFuCTvM0j4hlRoI1GEGQC/VvM6MzW+SS
+	 447HHa3Y18GVmxXD1j2IY5srxm8PGT3NCuf38oIW5ps2Uva9gHuN48PzNlKZTW92Gp
+	 ZJk1GcpRJ06jHk8Kf9725QIHLEink2yw3GMqzLV6bhDDchIOvwKNoxmW4C5hUWiTSz
+	 VgW+IZ7Z7PBqg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4818B380AAE0;
-	Tue, 17 Feb 2026 14:50:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 851F8380AAE0;
+	Tue, 17 Feb 2026 14:50:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,41 +37,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 1/3] tools/btpclient: Move btpclient to
- client/btpclient directory
+Subject: Re: [PATCH BlueZ v2 0/1] Fix use-after-free in BAP broadcast cleanup
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177133980508.109268.6813747240562081655.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Feb 2026 14:50:05 +0000
-References: <20260216193136.292051-1-frederic.danis@collabora.com>
-In-Reply-To: <20260216193136.292051-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+ <177133980631.109268.5480162574757779566.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Feb 2026 14:50:06 +0000
+References: <20260214153616.655-1-sarveshwar.bajaj@nxp.com>
+In-Reply-To: <20260214153616.655-1-sarveshwar.bajaj@nxp.com>
+To: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ vinit.mehta@nxp.com, devyani.godbole@nxp.com
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 16 Feb 2026 20:31:34 +0100 you wrote:
-> This prepares the split of btp services in per profile files for
-> easier maintenance.
-> ---
->  .gitignore                                 |  4 ++--
->  Makefile.tools                             | 13 +++++++------
->  {tools => client/btpclient}/btpclient.c    |  0
->  {tools => client/btpclient}/btpclientctl.c |  0
->  4 files changed, 9 insertions(+), 8 deletions(-)
->  rename {tools => client/btpclient}/btpclient.c (100%)
->  rename {tools => client/btpclient}/btpclientctl.c (100%)
+On Sat, 14 Feb 2026 21:06:14 +0530 you wrote:
+> This fixes a use-after-free crash when broadcast audio sources
+> disconnect or undergo RPA rotation as reported in issue #1866.
+> 
+> The crash occurs because bap_data_free() was freeing streams before
+> destroying the broadcast sink setups that still held references to them.
+> 
+> Tested with AddressSanitizer on latest 6.19 kernel with NXPs
+> controller as broadcast sink and Samsung S23 broadcast source.
+> No crashes observed with disconnect or RPA rotation after fix.
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v2,1/3] tools/btpclient: Move btpclient to client/btpclient directory
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a98f3d5abf14
-  - [BlueZ,v2,2/3] client/btpclient: Move btp core service in its own file
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e1c7988308e5
-  - [BlueZ,v2,3/3] client/btpclient: Move btp GAP service in its own file
-    (no matching commit)
+  - [BlueZ,v2,1/1] bap: Fix use-after-free in broadcast sink cleanup
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=feb4ee9dcd4b
 
 You are awesome, thank you!
 -- 
