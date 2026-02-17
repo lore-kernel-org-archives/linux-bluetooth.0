@@ -1,169 +1,105 @@
-Received: from mail-qv1-f66.google.com (mail-qv1-f66.google.com [209.85.219.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5D01D5CD1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Feb 2026 19:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97E71F0991
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Feb 2026 19:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771356253; cv=none; b=Js68qkku4eMyGxw1ch1MnQjtNnxdIDjt9nI3bE31eEZNYnWbGPIMpbtV+hO2Q8Xb8n132Exogi3o8bkK3IuQ1X0R28k5R5+TmCezQM7z43ALKaAEBjIZdbH4/9lxpf2HPh2cS+g9nwRwi8HqlgEPM0kjOwb1UVnnsmBBXG5Bl90=
+	t=1771356866; cv=none; b=kNP89Qy0xT3B0NE87NXE1w1tPuKoONI4VfX3FJ8wdIqAiHQPYetMZR4M+ntJ+EOIx2ra4Ru0IMS6qjEGy6kds8n+SZlApmN82ZrOnJfrNULXdKFEBbGRWlKbf53MTSgm6pgXuUhEm18WCIOIOUkf1idoMwUJpdRCqYgJrFjtqP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771356253; c=relaxed/simple;
-	bh=q4Hv9XF/VXY5UQcWKFr+1/YDcGKDIiuOy5apRi7OJuI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Cgq0xswirR7TawI+zUjyuxKUi2u8ob+Pu1fJt6U6WlgMr7hztHysPg82QUefeD8lDZnUWKzFfBm45BDD+BDkM01HvrLdKE30eKddcEjMCKlNFMYyMd6o5mPF49kcWgVnCiYii4mKB+BSk49ZcfoLpTHfcHm/W+iYyWeOulGeE2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WXrCDSPC; arc=none smtp.client-ip=209.85.219.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1771356866; c=relaxed/simple;
+	bh=hsCnwFBmrb7ljgQu5DeejaXYGFyUFqRO9wP4coA7AZw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=dBDH3f7B+zDlFnyo+klVNTKroDG3bTkR5tSJ8KVB3md1CswjQCmvVe51TqDw/XzUCBZ3E5xvXvmOSSnoHCf99Kdi8mn3Vu/QTY0m1vwvkajbXQe/4n0b8MtEjMZAdXxbzugcxjEZ8UWjy8XUdZjMTOOLMJXbEKpyEWn2YvHYnvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OlEJT0hv; arc=none smtp.client-ip=192.30.252.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXrCDSPC"
-Received: by mail-qv1-f66.google.com with SMTP id 6a1803df08f44-8954a050c19so56740326d6.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Feb 2026 11:24:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771356251; x=1771961051; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/gC+I+gdW/klj3TJosUGQOyj8kxcM2x0PMF0PTm3ic=;
-        b=WXrCDSPCVReSJzJ7ZuWc7KRj0diqiFF7SObpxBttogf9wgc7bHnq2qGNOTDkrNJdLd
-         ohAl9uHyaRnA9mpS5/LW7sOduNJ4S/iIneoqVIkCVEkRNzxnowxoXUwDtEkMvPMQRr+F
-         mTclHMdm6+sLD1zbGBhz1HGYNIRXuooBJUTE0QVlPXonwKwWY+dUA7ulAeFEgh4eHGOA
-         yzjWS3W1tjEAIwgX0jJ9hjrDfTGpFCacWyIwdyp4hn0U3GrrE0gMYZ8QZUOVhuUvtkvG
-         +X/9ZnINXmV8rdebWOQJ1x9FrmFbWasUfpMJvriDdzdv3Hit27PKQHDBs3TMeUiU+TLm
-         LK6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771356251; x=1771961051;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W/gC+I+gdW/klj3TJosUGQOyj8kxcM2x0PMF0PTm3ic=;
-        b=M/BJ+MbOnmCCNpNTT4oJmzQ84T7iTntvP7jVgfaEObHJVg3yn9yFJuP9pvkclHpJea
-         KVnubnH/fWoI6vTe30EDjXzD9NHkTDUA70uGdSkYRnKPDCP0yaEtqZVt//DhlZWxBIGQ
-         ifpZOE6Ej5n5XUlwxpGDh+bJRIS1Q8BApPJEjPNanAOSsRFXnP5xqGckeBezfm/mHRO9
-         fm4RgovPoFwEBbM+t/iFEtwzns7mI1cZpbIKWWFLLqL2SzjGdVEfOgQlu1/z2KAb1O0s
-         td+uDsp1it3wb62VgIdJ/ybXebrtYlUxzYHLzSSp/syynQHT1qbngpx1mwInfEn4QHr/
-         G5bQ==
-X-Gm-Message-State: AOJu0YyDWlAKdxgItJ4uZHLsXPn98FWSzYd9hV+4cktL7f08eCi7NNoI
-	+0YYqrwO3/7A6cVEQbUzN23NFD0CbjBPQyfOKgs5I7U7rfm91IJW0Ar1lE45x9kd
-X-Gm-Gg: AZuq6aIeWoLOQ+p9/j2mC0Hfk9HNjX6o5l7A/5GkSh7bC97M2MJ1JwZBb/HJQ8hz9BH
-	SliykGeuRVVGjv5g3XP7vAWIod+iEPJT7yhbg3dU8yVnyMj4C5C7kiW50xmOIx9DTnYTLV9dQzk
-	RhPVgG/dyCL82y5xapLi+bM+mnpwrLQwgGZleoGEu42rO4cU0DrNq5PmYe57MsN8esywCKqXZQR
-	K6LjHiIKnwsBF8buC8XhnahwHwLgoSFvxhtWhgsHIgkOpYV6z1ySL1D5ez5PfRg6SVWccLuVPtF
-	koiSvn9UM4nA89CqBsBeMMgM6YjQ+nw9rdvX8+jryX+j58z8c8L3eiMAWab1AiuYqZfuJysWOHO
-	spGIatUiypl9DOTIFzoJ6cVO52W3s7ICZnByGKjz6VhZiqmlvoDMklAtSFCCKTYCy+wAO5Vrqwr
-	WpaT0TYb3dh+89HYG+vn0Db1aDwTsf
-X-Received: by 2002:a05:6214:1c09:b0:882:4be6:9ab9 with SMTP id 6a1803df08f44-89734948f9fmr230218646d6.54.1771356251108;
-        Tue, 17 Feb 2026 11:24:11 -0800 (PST)
-Received: from [172.17.0.2] ([20.109.95.164])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8971cc7f82csm171162456d6.4.2026.02.17.11.24.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Feb 2026 11:24:10 -0800 (PST)
-Message-ID: <6994c05a.050a0220.11022b.e7d8@mx.google.com>
-Date: Tue, 17 Feb 2026 11:24:10 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3337317528834187538=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OlEJT0hv"
+Received: from github.com (hubbernetes-node-97ba547.ash1-iad.github.net [10.59.97.40])
+	by smtp.github.com (Postfix) with ESMTPA id 02E1C600B98
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Feb 2026 11:34:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1771356865;
+	bh=PxgRigoM8Tpa+mOt5y+QnNZerBSTt8yGvMmUS5L22fI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=OlEJT0hvcVRA2PlJvLJOBR5C8ULdDz/eXfqJzruaK0vq0MYpxmJ53UoGikR3a8Zvr
+	 TR/GzT+7FBl/HEw4SpqQPUjSxkWrSh7RhE1cvJcUtjsWNfZk9+siNixs0GcJETMpfJ
+	 hp9GVOosNRHw/dEcZPgp8AC9c1eh+ZZxwO8e5ptI=
+Date: Tue, 17 Feb 2026 11:34:25 -0800
+From: Rudi Heitbaum <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/feb4ee-450e99@github.com>
+Subject: [bluez/bluez] 998452: client/btpclient: Fix build warning
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: L2CAP: Fix not checking output MTU is acceptable on L2CAP_ECRED_CONN_REQ
-In-Reply-To: <20260217185620.2461151-1-luiz.dentz@gmail.com>
-References: <20260217185620.2461151-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
---===============3337317528834187538==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 99845224fd4aeadd5f2a860f1af804c5f127256e
+      https://github.com/bluez/bluez/commit/99845224fd4aeadd5f2a860f1af80=
+4c5f127256e
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-02-17 (Tue, 17 Feb 2026)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M client/btpclient/gap.c
 
-Dear submitter,
+  Log Message:
+  -----------
+  client/btpclient: Fix build warning
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1054964
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.42 seconds
-GitLint                       PENDING   0.31 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      26.99 seconds
-CheckAllWarning               PASS      29.44 seconds
-CheckSparse                   WARNING   33.60 seconds
-BuildKernel32                 PASS      26.34 seconds
-TestRunnerSetup               PASS      576.09 seconds
-TestRunner_l2cap-tester       PASS      29.66 seconds
-TestRunner_iso-tester         FAIL      64.06 seconds
-TestRunner_bnep-tester        PASS      6.49 seconds
-TestRunner_mgmt-tester        FAIL      124.94 seconds
-TestRunner_rfcomm-tester      PASS      9.83 seconds
-TestRunner_sco-tester         FAIL      14.73 seconds
-TestRunner_ioctl-tester       PASS      10.38 seconds
-TestRunner_mesh-tester        FAIL      12.50 seconds
-TestRunner_smp-tester         PASS      9.02 seconds
-TestRunner_userchan-tester    PASS      6.78 seconds
-IncrementalBuild              PENDING   0.87 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/l2cap_core.c:7773:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7774:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7776:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7777:1: error: bad constant expression
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
-Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.112 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.624 seconds
-Mesh - Send cancel - 2                               Timed out    1.995 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+client/btpclient/gap.c:2359:3: warning: Value stored to 'reply' is never
+read [deadcode.DeadStores]
+ 2359 |     reply =3D l_dbus_message_new_error(ag->pending_req,
+      |     ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 2360 |                                     "org.bluez.Error.Rejected",
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 2361 |                                     "Passkey mismatch");
+      |                                     ~~~~~~~~~~~~~~~~~~~
+1 warning generated.
 
 
+  Commit: 450e99f0801faa22d9a622b8c0d961641b407d2e
+      https://github.com/bluez/bluez/commit/450e99f0801faa22d9a622b8c0d96=
+1641b407d2e
+  Author: Rudi Heitbaum <rudi@heitbaum.com>
+  Date:   2026-02-17 (Tue, 17 Feb 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M src/shared/shell.c
+    M src/textfile.c
+    M tools/hciattach_ath3k.c
+
+  Log Message:
+  -----------
+  src: retain const qualifier from pointer
+
+Since glibc-2.43:
+
+For ISO C23, the functions bsearch, memchr, strchr, strpbrk, strrchr,
+strstr, wcschr, wcspbrk, wcsrchr, wcsstr and wmemchr that return
+pointers into their input arrays now have definitions as macros that
+return a pointer to a const-qualified type when the in put argument
+is a pointer to a const-qualified type.
+
+https://lists.gnu.org/archive/html/info-gnu/2026-01/msg00005.html
+
+fixes:
+- warning: assignment discards 'const' qualifier from pointer target
+    type [-Wdiscarded-qualifiers]
 
 
---===============3337317528834187538==--
+Compare: https://github.com/bluez/bluez/compare/feb4ee9dcd4b...450e99f080=
+1f
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
