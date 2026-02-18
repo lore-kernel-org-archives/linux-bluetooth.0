@@ -1,174 +1,151 @@
-Received: from mail-vk1-f196.google.com (mail-vk1-f196.google.com [209.85.221.196])
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8462638BA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Feb 2026 18:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771439486; cv=none; b=gUdvYjiv9YdvmVIOyVn1ywHM2eR/tnaRE8YdSkxAWf9ma5lAhyh4r8/HjCFz7GnUZKap42XXrRcGq6gUTy+05V6+Z1LU+ljU2iebkxmx8k4LbX7gW+Ym0aqq8ljjSvfDZXr5134IhClb3LPjg0XpCYtJzJiT8nqNPvNQv4WDhNY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771439486; c=relaxed/simple;
-	bh=JkYZP3JBz/ovYOwOjixhYUqk5jXGuD6SzRtYtu34UuM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UbNGumKBJT1pni4dWaIhNZiRbVQd0M2x/0c0QBwMPpAFndZURIIvND3aYqDKN7xK0hEjXU5+VQTYKt1Pa93P981rcpEYLrPMHQn+UI7dYZ+LzP4AaiB/RL857gCrONiLSog1k35njNISo/HWsViXM42MEKYElvf6b4Nn32eOQsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kVX375Y+; arc=none smtp.client-ip=209.85.221.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F25C346E72
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Feb 2026 18:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771440335; cv=pass; b=beZ9gMndt+DOe844MX2rStuLMW/gVNj6c6zdO9LY/+99Nri+pdH5oPSAQ2Ld4g8LnwbxUi1Stca1Bfk/T+paCntsreT+2CLCW67TgSugCXXmKnIoQYuCsYBBcc4y8ptKNLY3HUPA1JJmlPuaP1UY5Ds2hQi4IteVRk64AVzcQWQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771440335; c=relaxed/simple;
+	bh=TkWoV4eQ0tnjaInpZeYB3ffKShmKjVyNcCJ+GJGgrV8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X2qxCD4/m/GQjw1fb3fIqQoncDPOwmyZbGq0VoyRcUPHQ2dQckaJgS4Pm9T7hHDEsZXSSZ5bbGy/8c9SoHWill6isu9IOnulu6m/vLxM6ywmFBdPtmgXKVwSx4dJ0kTYmljShjDOl0wA0GHmAt3yNk+9NYR/CHzjSepp77X5x8Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G6oCsgzt; arc=pass smtp.client-ip=74.125.224.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kVX375Y+"
-Received: by mail-vk1-f196.google.com with SMTP id 71dfb90a1353d-56636dc53a6so60421e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Feb 2026 10:31:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G6oCsgzt"
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-64ae2ce2fe1so66832d50.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Feb 2026 10:45:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771440333; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cNshdci26zZQnd6zPmqgRcgU4P52PezUp4oKl3jun9Q9Vbt8CRwSTvz3aCTktUd2rC
+         8Vzt/FmiFkqkalZfAxKJ3qH99ehFyx51d4AC0K7VDGbQ9yGEvQa5MyMZKgvv/TGjHcLA
+         fxbZbGWAig18Lw2OfX1yt67W1slk+/u1uXdHGxQlWQJlMNok93WtZHysu3Xht7FmA8xg
+         91HLjor0iJU05M7Pjh4RehfDvP3wtJeL8BSf3RAq09wb3BhVnxgPpvmTtkPvgjMW8+e9
+         7KqYAMdGOmieZJQtU59Jc29GMkrlGdigIriPm69zKGNcheIHqlwy+yEVRW2DVtCtsriI
+         fKsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=TkWoV4eQ0tnjaInpZeYB3ffKShmKjVyNcCJ+GJGgrV8=;
+        fh=rmteJgQOrgLpzpZaGd/VFvWTOpwsG1FBlQ5jhGNsQFM=;
+        b=anD0XwwVDYNRzpZHBu00tr2Fh76T45fOwk83o2Ci9dgpqfWGU+D9OvQQVMTE6NdDX0
+         39mQpK2HkNHt3AaQjHcQ/icUWXZckhdcJaZAXpuMZyPbkjFbTIGtc8RXmbqlLRLTkk4o
+         ZttAd2yMEmC38WSLwH/z4g28E/qKilv//88blwfskg7EgLSjI1mOVxMy8NIx8XkKmPRp
+         iPFP2IffCndJQDWDNxcNbt8k0Cl6TZ6ujgq61zCLGxo6ZJSdA38MdqbjetBjb2bf9zGQ
+         RKz5GJq4oVUxv5fXbYReA0atf3+KxnE+UOdvgpcIBAWRcqicWP8ZvrAXkKQoehdGN6hH
+         I0qw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771439484; x=1772044284; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U2cJPOPF6syakadFoXXTnrP9LMIdS/ULz4KbpOEDK3w=;
-        b=kVX375Y+5CK9XNxcRkqKf/mURGrpd64yYrzyerjtPqXB3K+C53fyNzd6Li63N+eK4i
-         MG1Vr4sqMqSCSWi+GBDxij06lXbYkeivcuaCJ1PCyOyB5x7+h6DuOLUMhBKgOk/8G6Bf
-         GVNMkJPPGfuQ42UmME3MWTDeFEhsbcNjOMYGTstyJlDNIyi9hcgZeZg3IoUzvj/rEFwH
-         /ONlT88CkuMHO47JKIe24x+Sj8A3m9U6bU1AKmGXgb3daBR2nZjYtdRB66HiLaoYILSV
-         tJXtIQcIuGuhguRTAsKQlG/oTWHl9JQwFlYJGeW7xxFrB9g8UVMoan61c7mg7Z/72oVK
-         Nizg==
+        d=gmail.com; s=20230601; t=1771440333; x=1772045133; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TkWoV4eQ0tnjaInpZeYB3ffKShmKjVyNcCJ+GJGgrV8=;
+        b=G6oCsgztu+FjTlFJ1+18erinb5+7LQV2nIw/YzI5DKCgY0UX6bABaiB7AHfrWE43nq
+         vEQ/ezKMPBhOwyF7l9l1HiTe0fkijxnXP5OJ0BN7UN9i1Z9hM2Yn2Dld6PFxEbRQW5GT
+         nstnMsRRB+wBBZ+hFLgpDmgQnS89krw+o5lx728II7uMkPNPIGvaQrJfXyes0cHXPV/s
+         SFpmTOJ/7BaxJ798Bru5LcTLWs4ubKKQYu+wdG7Lbk8+uTVL/DCUD/KoWwAVMKIjEhAs
+         7qhgnktLjcjCal6oNBrCX5JXpLAViz2YiGV3WNY7rz1wFgwDt87oMmBisnG4GonyG+gf
+         +Scw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771439484; x=1772044284;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=U2cJPOPF6syakadFoXXTnrP9LMIdS/ULz4KbpOEDK3w=;
-        b=AL9DmxEJdrVpwIXC8/4HRfYImyz9uOvY8UvikCKZ0uUaUAKl5pe47Dv4eBhIax056+
-         f+zGly7f5TpvvhtTxgpjY/jmIgySfHhBFLRohUMkPrcTSXeP0o55wqTkcti/UviPYerK
-         YAQoQgF6oVJQfxITf/aDvxlxADKekfiuQhh/GKZ+Wj6jX51d6Em807mN3D/L08w8i4tY
-         DWbBasgQq+gcecdkPmYX9FdRU9M+UlYYU7fL1du9zLEJw2Kio774dE0m8+1dEokdBRbB
-         vt6+WVxCJqFyyoAAQFOwW8uki+o7TJuMlZUDR79I+MLM7OHvyACLEqAdRbP+38U6x+k5
-         Z0zQ==
-X-Gm-Message-State: AOJu0Yyz67KL/BsVusk0Mrs43rBnC7YVROZyUw1JuVsoSCvemCdOQTKn
-	C5KNoU0w6Uu/PwA71/nGo9pTQuhVVV8nmNKvTyFTNRnCWPpuJ4CN1jaqgzKipd9QUHk=
-X-Gm-Gg: AZuq6aK0LJQHcgKnPZSybUd1fLs06lNiJzKHhxp3PYsuDRZvY0bXSrEoOzVZDSg1WVO
-	I9uWrAHknmrxWtOjZqDVOMo4DOrd0e6En3KoFJUX/oElnMe/mvksexyDH+q3o1DMDhCTVAMvsQf
-	8VaRr/ufiM8ybmcq1enPjRbdI6loPwHkDK427T8DAGoHEth6VOWoxvBtwZRghVfo2UFtv96YpU7
-	Nx70ObKDO/26CKB+JKgzc3f1LKqfRCuUupscL5yU6zVpe3LusB3p5rCQjV2HGR2s7RzR9dzQbyq
-	zlXZpibM7ogTyopWufSBX/hwUI568ECmoBD55X4VIkzOI+W6EwENoGarE5g19eVC6Xuwm3wRltg
-	wLyL+QrO6tWPe+O6FOVXVn+OThFoBCRyhxT7lCRDzRW3ftD9ySodu3Ai6/8qCDeS8f5zDHF2Yt7
-	qsknSqaS1WWWkoVug10a1SWOezzYf1r84sHCK9FKINuG3p5ZvzMRfZfcKOze53lOyHYYpS+GFoQ
-	/sS4+SCLZqlYitxYA==
-X-Received: by 2002:a05:6122:658d:b0:566:36e7:8934 with SMTP id 71dfb90a1353d-568ca1702e1mr97794e0c.16.1771439484264;
-        Wed, 18 Feb 2026 10:31:24 -0800 (PST)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94afd1f1f82sm10959316241.8.2026.02.18.10.31.23
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Feb 2026 10:31:23 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 5/5] doc/btmon: Add a section for automated trace analysis
-Date: Wed, 18 Feb 2026 13:31:10 -0500
-Message-ID: <20260218183110.2840582-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260218183110.2840582-1-luiz.dentz@gmail.com>
-References: <20260218183110.2840582-1-luiz.dentz@gmail.com>
+        d=1e100.net; s=20230601; t=1771440333; x=1772045133;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TkWoV4eQ0tnjaInpZeYB3ffKShmKjVyNcCJ+GJGgrV8=;
+        b=uBVHSIm5IhEKTw9V1z9cOXeLB4Dp1xhEa+SGyouXrkXpavtNUvnxVy3Iap96emYcHf
+         mOJCe4QTHvlSREm9a+OXJsk4Cc9kKA2452CvlW0iXLCDLQX8Q7V/0QC7PZvn8BN57ECl
+         S5OnyAB4BzTrO5UifdFOQ25ncwgorP9gPutlEYbbunwvXpgYBoLmqRiKOmdEeAzmrQ6K
+         WW58XOac/st7opEBebYubAzUS6d4i2XNPJIH9y1gSqa2wH5Lvu51VZtr1WHAgtuDEmHL
+         B6pd46+dkMBVu1G0Okwla2bRW7ZeM6lYGFhcfBFC3xORBMUd8uiFsgt/dHQzxMrH+p7A
+         8LeA==
+X-Gm-Message-State: AOJu0YwLv0jJKJrtZ8tGKUHWXvs/9wvV0En0vfuHlS+xXIqfSlfys+EL
+	s6lMOVWfAu4vdmYrpYwqS1pr+rRtUpJfzWPKrkjv9z2d9A1z9Sv8uzJhK/k/BOdj31PGOaiF31N
+	7O7kP0hB/ev+IZ+Z90GAt/fI0uBpCp7mxvBUj
+X-Gm-Gg: AZuq6aLCWi2BCX3RLS5YOVasv2LEVOAcH8lPvVvkWDEi5IHgM4RFCFv7a9HuoDi176N
+	y7Y+EY07QU/QlDkl99P9l/6dQ20NkCLYJRhxCJWlM+gXYW2pnQ5wAIbvqNYH8O/PyaFnYELDyj4
+	ttF75vCPhQHLu7wTibpln8UIxRezwQnnF9O6cGb8/Fc7miprpNaxejD1wMPK2bBLWfmmb42vbKs
+	KPVI/7HZ4q+yPsCc5NGpnQHaRxdysHQMfyMnseTmjRVyhGxdTj++cMpczTQlQRwfbTvCkwfh0zx
+	InLeWvbvN1EYRNjTmbFChkcONKWPTl2X8xjlJptH4eyocTp64pwD0t1JWkRtp+lDmERm3A==
+X-Received: by 2002:a53:ac9b:0:b0:649:f272:4e88 with SMTP id
+ 956f58d0204a3-64c556c9d33mr1997601d50.67.1771440332989; Wed, 18 Feb 2026
+ 10:45:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260218024605.70890-1-ronan@rjp.ie> <20260218024605.70890-3-ronan@rjp.ie>
+ <CABBYNZJqjaDJmkEy0yvyqLXP6kFH-dVjnzcCVknAkpu39zspaA@mail.gmail.com> <defdb4fb77123ebe7abea7e8f225720e4e72e6c5@rjp.ie>
+In-Reply-To: <defdb4fb77123ebe7abea7e8f225720e4e72e6c5@rjp.ie>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 18 Feb 2026 13:45:20 -0500
+X-Gm-Features: AZwV_QiGQOdj0w16AIvhVuZ1FqUVKBz5T8F7RqmT_OPTQ7_jpSohcBaIjzfaxV4
+Message-ID: <CABBYNZLgugMFofwxAV4qFFP=RCnXG22MbcTgdt88ydbkSEKO9Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] shared/shell: gracefully recover from failed
+ input initialization
+To: Ronan Pigott <ronan@rjp.ie>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Ronan,
 
-This adds a section dedicated for automated trace analysis which can be
-used for analysing traces programmatically or with use of AI assistance.
----
- doc/btmon.rst | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+On Wed, Feb 18, 2026 at 12:45=E2=80=AFPM Ronan Pigott <ronan@rjp.ie> wrote:
+>
+> February 18, 2026 at 7:58 AM, "Luiz Augusto von Dentz" <luiz.dentz@gmail.=
+com> wrote:
+>
+> > Yeah, the revert part doesn't really fly since
+> > e73bf582dae60356641a32fc27ae03d359ec4c47 does fixes a valid issue,
+> > that said we do have another proposal under discussion:
+> >
+> > https://patchwork.kernel.org/project/bluetooth/patch/20260217222954.432=
+676-1-larsch@belunktum.dk/
+>
+> Hi Luiz,
+>
+> I'm aware it fixes a valid issue. My hope with the patch is to fix that s=
+ame issue in another way.
+>
+> The problem adressed IIUC is that once the input is initialized, a subseq=
+uent epoll_wait would hang
+> since the epoll_ctl call had failed to actually add the new event source.=
+ The reverted patch had
+> fixed this by trying to avoid initializing stdin in all cases, which inad=
+vertently broke
+> bluetoothctl. My suggestion is to revert that change, and instead check t=
+he return value of
+> io_set_read_handler so that we can avoid digging ourselves into a deeper =
+hole. Even if bt_shell_printf
+> is refactored so that it doesn't require the input fd, which sounds prude=
+nt, I think it probably makes
+> sense to check the return values here, so I believe the reverted patch wo=
+uld no longer be necessary.
+>
+> I have seen Lars's patch, and that is actually what prompted me to submit=
+ this one. Unfortunately,
+> it isn't correct since it causes non-interactive bluetoothctl invocations=
+ to also print several
+> extraneous lines relating to the interactive shell.
 
-diff --git a/doc/btmon.rst b/doc/btmon.rst
-index 66a97859a49e..70cdb90e37ab 100644
---- a/doc/btmon.rst
-+++ b/doc/btmon.rst
-@@ -740,6 +740,81 @@ Open the trace file with full date and time
- 
-    $ btmon -T -r hcidump.log
- 
-+AUTOMATED TRACE ANALYSIS
-+=========================
-+
-+This section provides guidance for analyzing btmon traces
-+programmatically or with AI assistance.
-+
-+Recommended Workflow
-+--------------------
-+
-+1. **Get an overview**: Start with ``btmon -a <file>`` to see packet
-+   counts, connection handles, device addresses, and traffic volumes.
-+
-+2. **Decode with timestamps**: Use ``btmon -t -r <file> > output.txt``
-+   to produce a text file with wall-clock timestamps for analysis.
-+
-+3. **Identify connections**: Search for connection establishment events
-+   to build a handle-to-address mapping::
-+
-+       grep -n "Connection Complete\|Enhanced Connection Complete\|CIS Established" output.txt
-+
-+4. **Track disconnections**: Search for disconnect events and their
-+   reasons::
-+
-+       grep -n "Disconnect Complete" output.txt
-+
-+   Then examine the lines following each match for the ``Reason:``
-+   field.
-+
-+5. **Identify LE Audio**: Search for ASCS and CIS activity::
-+
-+       grep -n "ASE Control Point\|CIG Parameters\|Create Connected Isochronous\|CIS Established\|Setup ISO Data Path" output.txt
-+
-+6. **Check for errors**: Search for non-success status codes::
-+
-+       grep -n "Status:" output.txt | grep -v "Success"
-+
-+Key Patterns for Connection Lifecycle
-+-------------------------------------
-+
-+A complete connection lifecycle for an LE ACL connection follows this
-+pattern in the trace:
-+
-+1. ``LE Enhanced Connection Complete`` -- connection established,
-+   note the Handle and Peer address
-+2. ``LE Connection Update Complete`` -- connection parameters changed
-+   (may occur zero or more times)
-+3. ``Encryption Change`` -- link encrypted (may show encryption
-+   algorithm)
-+4. ACL Data with ATT/SMP/L2CAP -- service discovery and data exchange
-+5. ``Disconnect Complete`` -- connection ended, check Reason field
-+
-+For LE Audio connections, additional steps appear between 3 and 5:
-+
-+- ATT operations on PACS/ASCS characteristics (codec negotiation)
-+- ``LE Set CIG Parameters`` command and response
-+- ``LE Create CIS`` command
-+- ``LE CIS Established`` event (note the CIS handle)
-+- ``LE Setup ISO Data Path`` command
-+- ISO Data TX/RX (audio streaming)
-+- ``Disconnect Complete`` on CIS handle (stream ended)
-+- ``LE Remove CIG`` (group removed)
-+
-+Vendor-Specific Events
-+----------------------
-+
-+Vendor-specific HCI events (event code 0xFF) contain
-+controller-manufacturer diagnostic data. btmon decodes some vendor
-+events for known manufacturers (Intel, Broadcom, etc.) but many
-+sub-events show as ``Unknown`` with raw hex data. These are expected
-+and generally not actionable without vendor documentation.
-+
-+Intel controllers emit extended telemetry events (subevent 0x8780)
-+that include connection quality metrics, error counters, and firmware
-+state. Partial decoding is available in ``monitor/intel.c``.
-+
- RESOURCES
- =========
- 
--- 
-2.52.0
+Feel free to git a review to Lars's patch; hopefully, that will help
+us get this resolved quicker. We might as well create a unit test for
+shell to try to emulate different modes and environments. That way, we
+prevent introducing regressions like this in the future.
 
+> I will submit the zsh changes separately as suggested.
+>
+> Cheers,
+>
+> Ronan
+
+
+
+--=20
+Luiz Augusto von Dentz
