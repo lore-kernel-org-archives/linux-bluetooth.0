@@ -1,92 +1,235 @@
 Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B47346771
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Feb 2026 17:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944EC346770
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Feb 2026 17:55:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771436705; cv=none; b=EoRdUkljXB2hVb/atZfif8IBZ5ZAO9AYm8vpwliU3Yr/KdeJ2HL4/+KwSYqEPo2RVMS+gs84dEm9GkVZFvISQ0dB4pTnIqKj0fESG6NmonoCmhYEXOvsWxsL6eCUrAOMK9qRzV8Bp+09mzOdZUPfFKi+1AUD1J+CflMF0Gc/5DQ=
+	t=1771437324; cv=none; b=WaIGm8Js9byl0w/btAxk0lWabQ2DuGbcaohfnvbYUYbq7wN6j+Y1AKhMHElYODhxnj2zz4oTcKjsCfrU1lyXNHNxlmA/CZSKP5ORz7/IdRuo6cfdMizjDpIGqfmyvQBvtkQjf/WNJj6Tx3SP4syebHWNNdy6SWQ7QcnRW2oJFj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771436705; c=relaxed/simple;
-	bh=7vaFhZrNm9QcC2MgavS9HKZnfik5aIl7Od15B1HQAFs=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=DiVc1LkGf525BFpdyKOWNT6kmdT8bUzLs9WMeRgJz+LZJrlwnoMPiNPAFGPMK0gy10K0aHdcHqgicB3iM5R+toRGLqlBCoAeKzZdu5+M+fOTQCbXYWX7WKg2e88k/NxmSvAqLO46chATvNZXO7eJnLNnKgiiuKVTt5nlTGlqFiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie; spf=pass smtp.mailfrom=rjp.ie; dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b=ouzhoXEw; arc=none smtp.client-ip=91.218.175.178
+	s=arc-20240116; t=1771437324; c=relaxed/simple;
+	bh=Nu3WYT5qVnLunqt/in+1HGYR6oNwdvu361q+e+GWsPE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HwkLNvF0aVzaz+d6kYOlIs/n1Be0rUKjj05i1hQtHHAlq8JyVzuXoCePUOlEllasaAowKStIto7Y1O6vZ6PJ4opg5keZaNZEsTcRA3XUFGC7tJ56NeTolpJIP/F+17gT7FCI/e+m3v+uYNDX6an0y/Suxy/iXcTYGeRYNKA0QxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie; spf=pass smtp.mailfrom=rjp.ie; dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b=VdlEUAjz; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjp.ie
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b="ouzhoXEw"
+	dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b="VdlEUAjz"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rjp.ie; s=key1;
+	t=1771437321;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zdQLkVyJCYqInp62rFNEWMf+c+jOP5Rk90zQCBmSdd0=;
+	b=VdlEUAjz7T2SnWeYkc9BAmD4NLY5cBK728vSJd1oUY4tAGB9re6oHgqaqI7sU5DG5nnVmo
+	iVtlZJSqi0O9zScEGBz6oRrJBh+g7PApLfHzLWdtz4GwIOac8MzhQoFQSpAFaupIM68x6H
+	poKapxo//s4JvGNXtQ1cpQBYo8aen5Y=
+From: Ronan Pigott <ronan@rjp.ie>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ronan Pigott <ronan@rjp.ie>
+Subject: [PATCH BlueZ v2] zsh: amend completions
+Date: Wed, 18 Feb 2026 10:47:30 -0700
+Message-ID: <20260218175439.15660-1-ronan@rjp.ie>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rjp.ie; s=key1;
-	t=1771436702;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7vaFhZrNm9QcC2MgavS9HKZnfik5aIl7Od15B1HQAFs=;
-	b=ouzhoXEwbc+vYoOCLWoEJ1gqOb6mmKUnqb3X5b/YC8DwWTurIlUuoBcQH22W8Q+qX9bF6F
-	KTD1xdJikjBBAUoR4c97/CwASkAF8veEsvrhy3gDfauTfRin9z5vCnYVApgPqfHx4CPjAH
-	ILOmC/SjwnLiAwW/tceMhsz7ITZvSZc=
-Date: Wed, 18 Feb 2026 17:45:00 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Ronan Pigott" <ronan@rjp.ie>
-Message-ID: <defdb4fb77123ebe7abea7e8f225720e4e72e6c5@rjp.ie>
-TLS-Required: No
-Subject: Re: [PATCH BlueZ 2/2] shared/shell: gracefully recover from failed
- input initialization
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <CABBYNZJqjaDJmkEy0yvyqLXP6kFH-dVjnzcCVknAkpu39zspaA@mail.gmail.com>
-References: <20260218024605.70890-1-ronan@rjp.ie>
- <20260218024605.70890-3-ronan@rjp.ie>
- <CABBYNZJqjaDJmkEy0yvyqLXP6kFH-dVjnzcCVknAkpu39zspaA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-February 18, 2026 at 7:58 AM, "Luiz Augusto von Dentz" <luiz.dentz@gmail.=
-com> wrote:
+First, use the correct completion return value.
 
-> Yeah, the revert part doesn't really fly since
-> e73bf582dae60356641a32fc27ae03d359ec4c47 does fixes a valid issue,
-> that said we do have another proposal under discussion:
->=20
->=20https://patchwork.kernel.org/project/bluetooth/patch/20260217222954.4=
-32676-1-larsch@belunktum.dk/
+The return value of a completion function is significant, if we fail to
+return success additional completers may be invoked when they otherwise
+should not be.
 
-Hi Luiz,
+Also cleanup up the zsh completion, removing the redundant definition of
+_bluetoothctl and using the _call_program helper where appropriate.
 
-I'm aware it fixes a valid issue. My hope with the patch is to fix that s=
-ame issue in another way.
+Finally, update the bluetoothctl invocations to be a little more robust
+when parsing the output of device and list commands in case new output
+lines are added.
+---
+Changes in v2:
+ - Dropped the hunk from src/shared/shell.c. I think it was left over
+   from a prior version of this patch on the branch where I had rebased
+   the input changes I submitted. This patch was originally submitted in
+   [1].
 
-The problem adressed IIUC is that once the input is initialized, a subseq=
-uent epoll_wait would hang
-since the epoll_ctl call had failed to actually add the new event source.=
- The reverted patch had
-fixed this by trying to avoid initializing stdin in all cases, which inad=
-vertently broke
-bluetoothctl. My suggestion is to revert that change, and instead check t=
-he return value of
-io_set_read_handler so that we can avoid digging ourselves into a deeper =
-hole. Even if bt_shell_printf
-is refactored so that it doesn't require the input fd, which sounds prude=
-nt, I think it probably makes
-sense to check the return values here, so I believe the reverted patch wo=
-uld no longer be necessary.
+[1] https://marc.info/?l=linux-bluetooth&m=175072534107658&w=2
 
-I have seen Lars's patch, and that is actually what prompted me to submit=
- this one. Unfortunately,
-it isn't correct since it causes non-interactive bluetoothctl invocations=
- to also print several
-extraneous lines relating to the interactive shell.
+ completion/zsh/_bluetoothctl | 133 ++++++++++++++++-------------------
+ 1 file changed, 62 insertions(+), 71 deletions(-)
 
-I will submit the zsh changes separately as suggested.
+diff --git a/completion/zsh/_bluetoothctl b/completion/zsh/_bluetoothctl
+index 610ca2b8d59c..b6f513376532 100644
+--- a/completion/zsh/_bluetoothctl
++++ b/completion/zsh/_bluetoothctl
+@@ -1,97 +1,88 @@
+ #compdef bluetoothctl
+ 
+-__bluetoothctl() {
+-	bluetoothctl "$@" 2>/dev/null
+-}
+-
+ _bluezcomp_controller() {
+ 	local -a controllers
+-	bluetoothctl list |
+-	while read _ MAC NAME; do
+-		controllers+="${MAC//:/\\:}:${NAME//:/\\:}"
++	_call_program bluez-controller bluetoothctl list |
++	while read KIND MAC NAME FLAG; do
++		[[ $KIND == Controller ]] &&
++			controllers+=("${MAC//:/\\:}:${NAME//:/\\:}")
+ 	done
+ 	_describe -t controllers 'controller' controllers
+ }
+ 
+ _bluezcomp_device() {
+ 	local -a devices
+-	bluetoothctl devices |
+-	while read _ MAC NAME; do
+-		devices+="${MAC//:/\\:}:${NAME//:/\\:}"
++	_call_program bluez-device bluetoothctl devices |
++	while read KIND MAC NAME; do
++		[[ $KIND == Device ]] &&
++			devices+=("${MAC//:/\\:}:${NAME//:/\\:}")
+ 	done
+ 	_describe -t devices 'device' devices
+ }
+ 
+ _bluezcomp_agentcap() {
+-	local -a agent_options=(${(f)"$(__bluetoothctl agent help)"})
+-	agent_options=( "${(@)agent_options:#(on|off)}" )
+-	compadd -a agent_options
++	local -a agent_options=(${${(@f)"$(_call_program bluez-agent bluetoothctl agent help)"}:#(on|off)})
++	compadd "$@" - -a agent_options
+ }
+ 
+ _bluetoothctl_agent() {
+-	local -a agent_options=(${(f)"$(__bluetoothctl agent help)"})
+-	agent_options+=help
+-	compadd -a agent_options
++	local -a agent_options=(help ${(@f)"$(_call_program bluez-agent bluetoothctl agent help)"})
++	compadd "$@" - -a agent_options
+ }
+ 
+-_bluetoothctl_advertise() {
+-	local -a ad_options=(${(f)"$(__bluetoothctl advertise help)"})
+-	ad_options+=help
+-	compadd -a ad_options
+-}
++local -a toggle_commands=(
++	"discoverable" "pairable" "power" "scan"
++)
+ 
+-_bluetoothctl() {
+-	local -a toggle_commands=(
+-		"discoverable" "pairable" "power" "scan"
+-	)
++local -a controller_commands=(
++	"select" "show"
++)
+ 
+-	local -a controller_commands=(
+-		"select" "show"
+-	)
++local -a device_commands=(
++	"block" "connect" "disconnect" "info"
++	"pair" "remove" "trust" "unblock" "untrust"
++)
+ 
+-	local -a device_commands=(
+-		"block" "connect" "disconnect" "info"
+-		"pair" "remove" "trust" "unblock" "untrust"
+-	)
++# Other commands may be handled by _bluetoothctl_$command
++local -a all_commands=( "${(@f)$(_call_program bluetoothctl bluetoothctl --zsh-complete help)}" )
+ 
+-	# Other commands may be handled by _bluetoothctl_$command
+-	local -a all_commands=( "${(@f)$(__bluetoothctl --zsh-complete help)}" )
++local curcontext=$curcontext state line ret=1
++_arguments -C \
++	+ '(info)' \
++	{-h,--help}'[Show help message and exit]' \
++	{-v,--version}'--version[Show version info and exit]' \
++	+ 'mod' \
++	'(info)'{-a+,--agent=}'[Register agent handler]:agent:_bluezcomp_agentcap' \
++	'(info)'{-t,--timeout}'[Timeout in seconds for non-interactive mode]' \
++	'(info)'{-m,--monitor}'[Enable monitor output]' \
++	+ 'command' \
++	'(info):command:->command' \
++	'(info):: :->argument'
+ 
+-	local curcontext=$curcontext state line ret=1
+-	_arguments -C \
+-		+ '(info)' \
+-		{-h,--help}'[Show help message and exit]' \
+-		{-v,--version}'--version[Show version info and exit]' \
+-		+ 'mod' \
+-		'(info)'{-a+,--agent=}'[Register agent handler]:agent:_bluezcomp_agentcap' \
+-		'(info)'{-t,--timeout}'[Timeout in seconds for non-interactive mode]' \
+-		'(info)'{-m,--monitor}'[Enable monitor output]' \
+-		+ 'command' \
+-		'(info):command:->command' \
+-		'(info):: :->argument'
+-
+-	if [[ $state == "command" ]]; then
+-		_describe -t commands 'command' all_commands
+-	elif [[ $state == "argument" ]]; then
+-		if (( ! ${"${(@)all_commands%%:*}"[(I)${line[1]}]} )); then
+-			_message "Unknown bluetoothctl command: $line[1]"
+-			return 1;
+-		fi
+-
+-		curcontext="${curcontext%:*:*}:bluetoothctl-$line[1]:"
+-		if ! _call_function ret _bluetoothctl_$line[1]; then
+-			case $line[1] in
+-				(${(~j.|.)toggle_commands})
+-					compadd on off
+-					;;
+-				(${(~j.|.)device_commands})
+-					_bluezcomp_device
+-					;;
+-				(${(~j.|.)controller_commands})
+-					_bluezcomp_controller
+-					;;
+-			esac
+-		fi
+-		return ret
++if [[ $state == "command" ]]; then
++	_describe -t commands 'command' all_commands
++elif [[ $state == "argument" ]]; then
++	if (( ! ${"${(@)all_commands%%:*}"[(I)${line[1]}]} )); then
++		_message "Unknown bluetoothctl command: $line[1]"
++		return 1;
+ 	fi
+-} && _bluetoothctl
++
++	curcontext="${curcontext%:*:*}:bluetoothctl-$line[1]:"
++	if ! _call_function ret _bluetoothctl_$line[1]; then
++		case $line[1] in
++			(advertise)
++				compadd - help on off type && ret=0
++				;;
++			(${(~j.|.)toggle_commands})
++				compadd on off && ret=0
++				;;
++			(${(~j.|.)device_commands})
++				_bluezcomp_device && ret=0
++				;;
++			(${(~j.|.)controller_commands})
++				_bluezcomp_controller && ret=0
++				;;
++		esac
++	fi
++	return ret
++fi
 
-Cheers,
+base-commit: eae36399e75807dcf3d88d9af18909288fa71ee4
+-- 
+2.53.0
 
-Ronan
