@@ -1,48 +1,48 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574C82E92BC
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 23:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA150211A14
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 23:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771542998; cv=none; b=HGmO+c8Gqgq20KfNHRgMoGdlopSZ9TKvXjmVEBQRR2rQ9RNrUXOzCcqvVJO8fQGVUxj74GiBn2zLP8yLBuQqhru8ET5QOXGZpNGmgOxdETzJWv5zbEhFAlu5kSCb8rtyfodh/3LWbYuTkRsIzU+/j+e+cP0KfyjANrJVcnm+ytQ=
+	t=1771542999; cv=none; b=CnwzJ9TCR09JUSN4Qa6ugnhTfGUiNAfNoQRVeoEP8sQvN1/sm90I2mL+QlyXBs2QgqO4il3iP9XRYRw3iETDVIddTBcOSovhHeVEzbWTKCtoTlE2y0u8m3MPfj7aD8c+y3ztb0HWb6/Bi2Pr13d/9MBM2y0Z4ZA+f7xACJq+Jrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771542998; c=relaxed/simple;
-	bh=gXeQW26jTSQTiyXN17bmGgnqjm5kMoyGJlU5U2LO70w=;
+	s=arc-20240116; t=1771542999; c=relaxed/simple;
+	bh=7dZorciU2KP9lG1fvNnp7Hzt933HofYs8gLFRF2PDy8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P2PGkLAaIoC9GVLDb2fevmfVD4FT3MNQtanBts9dOEbYAeq5rec9AATuJWL+a4j7B68loh3jx2P8O/mXexI92w2hxqH7kHw5XM3yRePM8DtmkFQa416WN8gf6YS2kMhHXIUYG9gHPKYYyFAoKwPpG8ZFjOvueB4DcZwzCDFyDh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.45
+	 MIME-Version; b=HAcfjFCDsr2IIgq9PgWnqjm1pmv2uPYdR2l571TJ+9bq7M4nyNHCWlgT+aPHfIPxPUtt2y8pfeqOXkY33f1zSExb6VzPalifGloVNMzMzYwG549ZApumLrD1jGZ5zeBmnffLzwL58E4IdvgGiH7HVcDTMY8pkF96s04deBcR20I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-40f20af93aaso520775fac.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 15:16:37 -0800 (PST)
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-404254ffe8aso955190fac.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 15:16:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771542996; x=1772147796;
+        d=1e100.net; s=20230601; t=1771542997; x=1772147797;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=2FrHlSkp37yYjUZdmhoLkWWfswktOZSb++6lxqz9IBM=;
-        b=oyqcARP0XF5N5JBYU0kujmtAFWz8LGN69yEGFJr5vTSIWR1XCzZbghs6LgZljAlA8p
-         inhFWlEuOrfbbaeglaZKW0IiLC0u3wpPMgJ5u7YSOFOETZ5LrMaIZyayZjSLvv0GRrZY
-         1ILa3jWNcBdCUZgMa6bA38HANI44WDUyAKtsdwox1SC/bJWnnuk1xAgbeIiEmYEeTav9
-         rpj/sazwtM9SQr3/7iAkRIFoyG6CMp+AtMcGIkRoMrjW2lFQpyxR5q5AyKse74w+w186
-         EOUPLxXOWc9T6Gle91TA6pQIkIrN3Cz3RT0VpyqL/CCmwPdL4gb2UuSzZhRJcNAhLCpK
-         Gvyw==
-X-Gm-Message-State: AOJu0YwEtge7cUaE3W2P7pmA6loHP9QFE/Z/weQUlBxlMOVPt5sTaUmT
-	7Y02y0rejLBvkW9+wL+yFz/pZtAnBHAY3327/h5Y+FQC6oUIfsDZjSLq
-X-Gm-Gg: AZuq6aKQ3skoCReOlVQflGr9lrfJBU7rIyxW/UqJsdGW2CNnBkaYLSJnRa/jGo9ruAd
-	0ZvMWV+llG0tkgtlSbLp6vjsi81hz2LUn6/O3b/i3Yiz19rX0NTcdSlRrlU2w4xLiT5beZlKhCu
-	nABZD49j02tyaHQ6jFkjwdZNkIRVLbKo+htpyDUdIzOrOJedFPpShAcWFFt1TmfWk9IcGXVKmqj
-	WgfzY3Bqb3i06JQGL8Mg4IC4wV7PJVmUyHerWfbldOEWhMzc40yvHRQ8G7/xo7E2Ujxok/70Iu/
-	5lVUVIWNL/kswlX0Rx3N6zsZP2Rh/YD4ccS+e6kZIAuR+grfWT4RJFTY8qip5qu9BlQYELFwQVi
-	W1gU/96B1pdEbUvBw/9+YoHwP259d6grrLeGnEL7KEHUQo6HI+nXJs1PG5sNQfSNX5pDse+t6NY
-	Y6M8MNohVssmfsjQSoiXpbQuyD29+8lNwMhVus49+aU0f4vbA=
-X-Received: by 2002:a05:6870:b529:b0:40b:77e0:7cb with SMTP id 586e51a60fabf-40ef3c10326mr11053198fac.19.1771542996041;
-        Thu, 19 Feb 2026 15:16:36 -0800 (PST)
+        bh=Os50U/6oPIcjA2CMN1raoU5d+8qh4ZaifQVvl0ajsGs=;
+        b=MOWEBjIfw3f9kuj9BhljknDVrgx8c6P6/FsmPVgGIkvP+Z3Fgx/okZz5L34YSllvMb
+         9H5uXIkA1i8Xa/7YRwlx7ILgIsWLTOnULqp7k0btfGKZQEGMeD/roweW3pvQ219VUBwk
+         f9jQYTY5SNsQPA8MsfWReaFfsPXfZeApv0K8dMcwG6qNPXG4SxeWt8M9FjVUDJ3DjGsc
+         cd8cMwG9Ami9QtZRldMg+UBxDWnPPPAjC6r0czkQLvCAQSjTsDlefXw2Nwz3VEVdjFLr
+         L1F6p5mCJpJZfSF+SZlaGtsOML26PqNM4tiU5Y+xnxBQPTFFRpqwMkyNDkX4Iw74EDnO
+         LFaQ==
+X-Gm-Message-State: AOJu0YwLLsn5hUxCXRiXkRwmatzizDz/C+paA+jR28fqxazOFy/wGZ1x
+	Ov0dOz2yP6j8WKehrYKihmCHgZjl43VwXz0VBgVevGwgqNFv7x5qvNU2cZysGQ==
+X-Gm-Gg: AZuq6aKBgM9+fM/mVJK3dEf1vp16QmMbN+HeMj+Aa+QDqzqZzWfy4jUqTPBKaxQq26m
+	LVzokp3bxFWPWvHy8hWxBoY/kOmMh+CYpcpSDpAgLsj/lnI0vb5gAzJxpQgv62ygdaNoLmfFIV9
+	nx5uwX5zYsJwG7/sLVQ37IrK9s1M9g+Z6mVxYzCbbIhIRuYHaTdQd9PCprTHnzQ/axJmC6v/Hqn
+	spybXHkDBr7ffjtmFgui9qrgCTADVi7r3HBKaY1TBd6zes3YQrAaSZS1+MIBU6QdiAkRyWjZ6Bg
+	8z104c61z/+1Jowcj7rJ8pVoMFcgTYkJzdiqINQ5j/KrVX4LFYmX9Hn137bPu1TcS1RPeGTeXV6
+	k4ZzpT6lpfKzT1p/d3zwA5npwhTzDKbuJ6iXrn1atFP1Ozqc1n96eFKMWSprydGfpP9QNrSzFz8
+	gOspizCQe7DXokOjvqn2lvrInF11P2tvms+bqE9w1RmmZJzYc=
+X-Received: by 2002:a05:6870:21d0:b0:40e:deac:4248 with SMTP id 586e51a60fabf-4154539da2emr2009359fac.3.1771542997672;
+        Thu, 19 Feb 2026 15:16:37 -0800 (PST)
 Received: from sean-HP-EliteBook-830-G6.lan ([207.191.35.252])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40eaee45d12sm26719644fac.1.2026.02.19.15.16.35
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40eaee45d12sm26719644fac.1.2026.02.19.15.16.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 15:16:35 -0800 (PST)
+        Thu, 19 Feb 2026 15:16:37 -0800 (PST)
 From: Sean Wang <sean.wang@kernel.org>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
@@ -51,9 +51,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-mediatek@lists.infradead.org,
 	linux-mmc@vger.kernel.org,
 	Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH 3/4] Bluetooth: btusb: Add new VID/PID 13d3/3579 for MT7902
-Date: Thu, 19 Feb 2026 17:16:23 -0600
-Message-ID: <20260219231624.8226-3-sean.wang@kernel.org>
+Subject: [PATCH 4/4] Bluetooth: btmtk: add MT7902 SDIO support
+Date: Thu, 19 Feb 2026 17:16:24 -0600
+Message-ID: <20260219231624.8226-4-sean.wang@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260219231624.8226-1-sean.wang@kernel.org>
 References: <20260219231624.8226-1-sean.wang@kernel.org>
@@ -67,70 +67,112 @@ Content-Transfer-Encoding: 8bit
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-Add VID 13d3 & PID 3633 for MediaTek MT7922 USB Bluetooth chip.
+Add MT7902 Bluetooth SDIO support by introducing chip data and
+registering the device ID.
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
-
-T:  Bus=01 Lev=01 Prnt=01 Port=09 Cnt=04 Dev#=  7 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3579 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+Runtime PM is not yet supported by the driver, but normal operation
+is unaffected.
 
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
- drivers/bluetooth/btusb.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btmtksdio.c | 42 ++++++++++++++++++++++++-----------
+ 1 file changed, 29 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 247d6aff5e79..c8c50daec967 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -671,7 +671,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3606), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
--
-+	{ USB_DEVICE(0x13d3, 0x3579), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	/* MediaTek MT7922 Bluetooth devices */
- 	{ USB_DEVICE(0x13d3, 0x3585), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index e986e5af51ae..042064464d34 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -42,24 +42,35 @@ struct btmtksdio_data {
+ 	const char *fwname;
+ 	u16 chipid;
+ 	bool lp_mbox_supported;
++	bool pm_runtime_supported;
+ };
+ 
+ static const struct btmtksdio_data mt7663_data = {
+ 	.fwname = FIRMWARE_MT7663,
+ 	.chipid = 0x7663,
+ 	.lp_mbox_supported = false,
++	.pm_runtime_supported = true,
+ };
+ 
+ static const struct btmtksdio_data mt7668_data = {
+ 	.fwname = FIRMWARE_MT7668,
+ 	.chipid = 0x7668,
+ 	.lp_mbox_supported = false,
++	.pm_runtime_supported = true,
+ };
+ 
+ static const struct btmtksdio_data mt7921_data = {
+ 	.fwname = FIRMWARE_MT7961,
+ 	.chipid = 0x7921,
+ 	.lp_mbox_supported = true,
++	.pm_runtime_supported = true,
++};
++
++static const struct btmtksdio_data mt7902_data = {
++	.fwname = FIRMWARE_MT7902,
++	.chipid = 0x7902,
++	.lp_mbox_supported = false,
++	.pm_runtime_supported = false,
+ };
+ 
+ static const struct sdio_device_id btmtksdio_table[] = {
+@@ -69,6 +80,8 @@ static const struct sdio_device_id btmtksdio_table[] = {
+ 	 .driver_data = (kernel_ulong_t)&mt7668_data },
+ 	{SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, SDIO_DEVICE_ID_MEDIATEK_MT7961),
+ 	 .driver_data = (kernel_ulong_t)&mt7921_data },
++	{SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, SDIO_DEVICE_ID_MEDIATEK_MT7902),
++	.driver_data = (kernel_ulong_t)&mt7902_data },
+ 	{ }	/* Terminating entry */
+ };
+ MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
+@@ -1090,6 +1103,7 @@ static int btmtksdio_setup(struct hci_dev *hdev)
+ 	set_bit(BTMTKSDIO_HW_TX_READY, &bdev->tx_state);
+ 
+ 	switch (bdev->data->chipid) {
++	case 0x7902:
+ 	case 0x7921:
+ 		if (test_bit(BTMTKSDIO_HW_RESET_ACTIVE, &bdev->tx_state)) {
+ 			err = btmtksdio_mtk_reg_read(hdev, MT7921_DLSTATUS,
+@@ -1167,22 +1181,24 @@ static int btmtksdio_setup(struct hci_dev *hdev)
+ 	delta = ktime_sub(rettime, calltime);
+ 	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
+ 
+-	pm_runtime_set_autosuspend_delay(bdev->dev,
+-					 MTKBTSDIO_AUTOSUSPEND_DELAY);
+-	pm_runtime_use_autosuspend(bdev->dev);
++	if (bdev->data->pm_runtime_supported) {
++		pm_runtime_set_autosuspend_delay(bdev->dev,
++						 MTKBTSDIO_AUTOSUSPEND_DELAY);
++		pm_runtime_use_autosuspend(bdev->dev);
+ 
+-	err = pm_runtime_set_active(bdev->dev);
+-	if (err < 0)
+-		return err;
++		err = pm_runtime_set_active(bdev->dev);
++		if (err < 0)
++			return err;
+ 
+-	/* Default forbid runtime auto suspend, that can be allowed by
+-	 * enable_autosuspend flag or the PM runtime entry under sysfs.
+-	 */
+-	pm_runtime_forbid(bdev->dev);
+-	pm_runtime_enable(bdev->dev);
++		/* Default forbid runtime auto suspend, that can be allowed by
++		 * enable_autosuspend flag or the PM runtime entry under sysfs.
++		 */
++		pm_runtime_forbid(bdev->dev);
++		pm_runtime_enable(bdev->dev);
+ 
+-	if (enable_autosuspend)
+-		pm_runtime_allow(bdev->dev);
++		if (enable_autosuspend)
++			pm_runtime_allow(bdev->dev);
++	}
+ 
+ 	bt_dev_info(hdev, "Device setup in %llu usecs", duration);
+ 
 -- 
 2.43.0
 
