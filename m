@@ -1,47 +1,48 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FFC72631
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 23:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954782E92BC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 23:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771542995; cv=none; b=Ai+yK7bgzakD/Ko5gsJ3jmAPYLzjnG7t39X23oqn1KwEkdpVgvjA36AsPbTDQHfYccJL06xPj0FEnYUp+USCKqlTMGiIQoAZz7ZSs1smVQUXVWMLA1mWbk4hT2LKQLouxVq2Sxg3v2DYlrfG+hHdvExk1df/zE130Z17do9GEps=
+	t=1771542996; cv=none; b=atQRJGiKkjhLV5swNXz8+zZz1oJCHYRhZ8dC6JFVDbNz8iqVGwpwkr6TJxz0R2hMDTnZq2k4bfx/aKci8z/sNIZ9zSQbcsZ0G61A9dOMvzELQo3di9dm3og6pkgicGYUHexhgvQ43Jw4Enyjg4nDiY2h/pndHugNHvF6Wc9USqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771542995; c=relaxed/simple;
-	bh=4EJuWggC5ynHFxILfFhxbh5SNzmvaoGDjGWGAhL/olg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WvIvGZDcCCoJoMo2Jz/6PCR6BSZ12pXtRFCrrVFrse/u6TZLR+L6Uo/gBVCJpGsJrzCpqAfRjnTb9kCYIziKTlOd9a1Rxs4syid3uJ77zAiblVxV2kMBRKP21PeGAAntnfd2punWCZ/dxrtHitBARNmVRVRM83D+alqrRZvWjaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.47
+	s=arc-20240116; t=1771542996; c=relaxed/simple;
+	bh=TT2KfFnQtzKOEbg8zbkMHf8b13f8CSixpl51XFpRQhg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qa1Y/+o/+lqggpGOhmKAuCPb8ILoLRFsv87tDQBrvfAxpcwJ5ClI0lvdZT/K4+cqgJ5/S2J+lk3vylChirdIfLtnroOCH95C4Vkb2i9z1iYuMkv1QlD/Iin6NB7yWi3b+FibeT7hU/u995Gq69MKsbsJoniveELf3j6OstGGDEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-40427db1300so880278fac.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 15:16:34 -0800 (PST)
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7d4be94eeacso1319607a34.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 15:16:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771542993; x=1772147793;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XOpRViDdy95oUvtjIbD1yNnLGcXCFi8ZfYmxd9/IW/Q=;
-        b=mmDKjrTFd4DWqSiEEtqv1bhLEU0RKDgEBfm05SU55wDUN0+W2kbDbHdU7WqNEhk/56
-         6C0yI7Fla/pc4GHMUEURMDYiwMZhv6a2lL8SHtAwJua94k2AmPSaK9abydGFpLWHvhDd
-         4CMYLV1du1KNJEhn1nyzZb+nFNQF7d6/0mzstepfcgvJNgFbIQyseqIgVNN05/d+1jND
-         vUWPlfMDvBmH3XUS0rbGxMhKAlWDFctKyr49+INOMz6g0EzODWgUbNVoxZVfkvTD7vFW
-         mz1z8Ee9QhTM1GEkEXKOBdOC2p/3UJZjrpnZcTCoOoscjT8HPhbKHRnMczfNIBuY4hTe
-         LGTQ==
-X-Gm-Message-State: AOJu0YxeEEIDQc0jot7nkF5SinypWHRw15rdDkWSI73VwDlXWBDj5n4d
-	bhEU1iPGNzMB5+HuUJObDUJDpaYaLvGXtjaIo5sS9qUpUMydIOVPVKy1
-X-Gm-Gg: AZuq6aInzVdLGAyB/QUKGUIcFGjnD4gfDMKo9j1qFMOS9KQQ/qehDBuOqZkqPorVZn2
-	qAjc7JNx7UCHzYTCfNC1TVXTvi96DZMRmiZpXGixsq95CnuzrbitsoLAWDTGZdr0hvuFUZL4CEM
-	zSxalE55MvhNuGuht7El4GIZbIQDhA7HwOSjC7j7SMELzJR1ItBxPNs63NsbkbuBXIUm/HLYi46
-	0oPu/1QSZj73NhO7UIy0dl9X1tzVp+TmAWUhT84uSul5Jm/+H9z9B6nu0JQpCdd6ks77xwVfc4v
-	+D+tN+Lzxpt2rTw0mYGBJZ6mWX163Q5oa/7kprvNBtzOAHuh8SGr4sQMInLHA+pNX4gBPfH+D5W
-	BYl4lShPCPJ+gccvhhMeAgIWIanwOrqRGSh9iC0MVrQ01mbZ8iB7Lv/AyNRrr+LuEh/1gs8INZd
-	CBjRdhqUsH/yoRrkTawvoGsmCa0Xc6C5Tfmdp72VJ+xr1xxJ8=
-X-Received: by 2002:a05:6870:1405:b0:40e:9550:3242 with SMTP id 586e51a60fabf-40eeea800famr13275159fac.16.1771542992946;
-        Thu, 19 Feb 2026 15:16:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771542994; x=1772147794;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZV3jSXI5ldR4jveK2PsLzkMeIX1O0Q5JVn7RfzOo4go=;
+        b=Q6iZiPtMSyr1Pu0rVOje0FJ9mawMFv6wFx34KGDNWoxSuuMTSZ0RkGIZu+h6vFOwSG
+         oQ41a0ze7N45NAIHrjNTXyvlfOJV+f0W5zG56gNAmy8AuZ/2XXf97Uze1TiniHUovGTK
+         jJNc7gx/ZHx0JzMvvN1Z3IxBVZRm6wkotkauWQIMgMDPAxZSBaeUbH2wVZKAxpPHhuwq
+         sJzTHqJWAyMnDtHu6uKYS3x9YVCaqg9/7hqTFqvXad51jINfvfQtkoL9hR0Mx9Rp4F9s
+         ay9YPyH81/0Ku6wsJ9gWo1r1skZ5IYsHXmEkiSXhF0scGYQPRJ+QbY8MG6vQ7OZdTn4d
+         U+tg==
+X-Gm-Message-State: AOJu0Yxea+a4eF5erfQGKdkBkK0+ULsm5mnYSAvtEvT1R5/6brBroz+U
+	jJd4xg9QmlTMrVgt8OcbFXGDXbjYhJ3cyl61gWVQj2+k3GmIep48/7WS
+X-Gm-Gg: AZuq6aJZ2AOtQn1Nb73nW3w5e+axFPFL25UqT8LWarQklSKauiUoRMQY+lsyWhZzi33
+	4qlztI/mcrcFXY2tZoNM+5IYoX9Jfq23nfoQNKoCePdQlScwudFbY9EeAH5zgM3WXci3Yt5JoGL
+	iqmMtAce0Ch5dJ+apQqUvtDq0oeY0xK6d0Nw3j0kFP19amJ/vXxg1Wqir4venVlDu8pQI25Joxk
+	vXAKjcazX7KhkDGJbDWPZW+zzZksU8eKicgESQ1hlgxmv5uhfhWvdnw0z/RMqeAu9wp/58mk6Rr
+	Jl053RXjeWcudoPQnFG3hxrAuAgQo2qm6FSAKa2q/UK4u+25qSqyX9JpJtJnvrIViBlJKxxMrrV
+	A0WCUBBE2+qIHjujRMQ11XfuUmCWUu2qzy7ZF7dOZyeQo8ffQcs//OQtVgDeeEq/sNEpcBZyb4/
+	qE2spq69gKmEtcftQ+ANcHHafhwu51mnJf/IPttEATrLAcqmY=
+X-Received: by 2002:a05:6820:a07:b0:674:5dbd:7859 with SMTP id 006d021491bc7-679a74430b4mr3886891eaf.55.1771542994551;
+        Thu, 19 Feb 2026 15:16:34 -0800 (PST)
 Received: from sean-HP-EliteBook-830-G6.lan ([207.191.35.252])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40eaee45d12sm26719644fac.1.2026.02.19.15.16.32
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40eaee45d12sm26719644fac.1.2026.02.19.15.16.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 15:16:32 -0800 (PST)
+        Thu, 19 Feb 2026 15:16:34 -0800 (PST)
 From: Sean Wang <sean.wang@kernel.org>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
@@ -50,10 +51,12 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-mediatek@lists.infradead.org,
 	linux-mmc@vger.kernel.org,
 	Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH 1/4] mmc: sdio: add MediaTek MT7902 SDIO device ID
-Date: Thu, 19 Feb 2026 17:16:21 -0600
-Message-ID: <20260219231624.8226-1-sean.wang@kernel.org>
+Subject: [PATCH 2/4] Bluetooth: btmtk: add MT7902 MCU support
+Date: Thu, 19 Feb 2026 17:16:22 -0600
+Message-ID: <20260219231624.8226-2-sean.wang@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260219231624.8226-1-sean.wang@kernel.org>
+References: <20260219231624.8226-1-sean.wang@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -64,25 +67,39 @@ Content-Transfer-Encoding: 8bit
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-Add SDIO device ID (0x790a) for MediaTek MT7902 to sdio_ids.h.
+Add MT7902 device ID and firmware filename to enable MCU firmware
+loading.
 
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
- include/linux/mmc/sdio_ids.h | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/bluetooth/btmtk.c | 1 +
+ drivers/bluetooth/btmtk.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/include/linux/mmc/sdio_ids.h b/include/linux/mmc/sdio_ids.h
-index 673cbdf43453..97cc834fb3d5 100644
---- a/include/linux/mmc/sdio_ids.h
-+++ b/include/linux/mmc/sdio_ids.h
-@@ -112,6 +112,7 @@
- #define SDIO_DEVICE_ID_MEDIATEK_MT7663		0x7663
- #define SDIO_DEVICE_ID_MEDIATEK_MT7668		0x7668
- #define SDIO_DEVICE_ID_MEDIATEK_MT7961		0x7961
-+#define SDIO_DEVICE_ID_MEDIATEK_MT7902		0x790a
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 14e2f4100806..2507d587f28a 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -1338,6 +1338,7 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 	case 0x7922:
+ 	case 0x7925:
+ 	case 0x7961:
++	case 0x7902:
+ 		btmtk_fw_get_filename(fw_bin_name, sizeof(fw_bin_name), dev_id,
+ 				      fw_version, fw_flavor);
  
- #define SDIO_VENDOR_ID_MICROCHIP_WILC		0x0296
- #define SDIO_DEVICE_ID_MICROCHIP_WILC1000	0x5347
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index b9df2b8f0627..adaf385626ee 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -5,6 +5,7 @@
+ #define FIRMWARE_MT7663		"mediatek/mt7663pr2h.bin"
+ #define FIRMWARE_MT7668		"mediatek/mt7668pr2h.bin"
+ #define FIRMWARE_MT7922		"mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin"
++#define FIRMWARE_MT7902		"mediatek/BT_RAM_CODE_MT7902_1_1_hdr.bin"
+ #define FIRMWARE_MT7961		"mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin"
+ #define FIRMWARE_MT7925		"mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin"
+ 
 -- 
 2.43.0
 
