@@ -1,391 +1,151 @@
-Received: from mail-vk1-f195.google.com (mail-vk1-f195.google.com [209.85.221.195])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C366D345CD9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 16:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771518170; cv=none; b=OLj4jTGxWzDz3tZifAVKT5V+9+tSOKJOgoKZ+/uglLEiJ+Hykv3DX6gUPDJc0ynCYpdeolpEBN8xHuT7pmRB/vlelMPmU4Fs0XONSmNxV+f5jcgrafc/vx5wnaTKDWxlAIBv6fH8RlPZNqnjaK28lJLTyQ2jJ9HCJTN2XfoVJkM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771518170; c=relaxed/simple;
-	bh=vwSVyKrm1S3cImEjxyS+0Lzvxz2Gcz3bPnd/wChzCKo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X5PyJ3lJCKtDKBdB/9VAXCgAIAL7opgVZtp9XCsGPbMr7bAfOYZy1cyUZijZZ4owRWmeSrMcFtUZHLl88Ti3postpGKk7Ta04k5TWMnliGtQao8ASlX8Vv1CLOEDO0LiLoAOMS3hhexcVTxH5gavMBbEKSZ6LFd+PIJGM0f1jU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ihampDLU; arc=none smtp.client-ip=209.85.221.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DE4340285
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 16:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771518240; cv=pass; b=OKp/dBcyoE1gUlAd2tRAZdAPY1Gn9bZLGKhZ8QgSTWV//6vSmeHg5wKrNOhj331jx8HVGlMiE8IU9TK1d+ciSePEl0TaFE1wyftCKkZn9mAqoW82BmKfNU0LB/ns/rnKmBK0MFnJR0bU/mITSiqb7PTf43mfCRsJ8rimEXJtc9E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771518240; c=relaxed/simple;
+	bh=Pet/c2OGnY1gfQmFiC8Mebb/GP6QRqCrlNN3wTZ2f2c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=USr3wMp9Aohfs6fB5/+Uiu8//hL1sBxatVvg0l2HrqKhgLb5EGH50wOBLeC75kgWMj2U1+ne4J3DsmLzw1J8ZiAJkcOGa9dRKcEDo17+HvJxTM4tJY1z03/Yb50FEt8v175ZprRM1IoPG4UnKt05e4uTKt5BY6bb0omdoy2HQX4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mrZJT7J4; arc=pass smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihampDLU"
-Received: by mail-vk1-f195.google.com with SMTP id 71dfb90a1353d-5673891928cso555608e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 08:22:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mrZJT7J4"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8947e6ffd20so12562416d6.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 08:23:58 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771518238; cv=none;
+        d=google.com; s=arc-20240605;
+        b=jjzTaxYkry8fvFkr1I3MSDWId1JaWrsfkVJEqvEleedGhlcio7AA3E7hzUXrHD0Grp
+         dgGxMUHEFJfW9OzbHKG+Fov7Oa5KOGuHgnw7Xk0UcALqi3VlwbrKbdzMGY8tOfbwDZIG
+         BHrBf0EkhRQTKGTZ6lqpLB9LZmi8/hQ2yIpxZJOfFUyVPMSHv/PPLrpXeWI4drf3k4xs
+         idIfiB0kWvr7Qp0bVPog0BHgAuI4ss09BP05g7wfx+tJ34MGhTPCMMqQVcUm0ARKIzDs
+         3LJ8uSyo7Ul1KeZxGtbaX9qMTys1r8A5lwl7UavTTxaI2nIah8S80912TWbfdy3b51YV
+         76IA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=f4yeHhzpJN+4nhHpP7a5dAzytay7Sndg0H7YbB+nOFY=;
+        fh=a3464CWZ3GN/AYyjOX915k2VheWVQUv+mA81mMAF/MM=;
+        b=EcVZ/Zv+QtOvtmBlrGG9aR2hUfHNgizKxx740seSiDuwLCjYL9fj8HcHeitTSSA72c
+         5y2x8FTDrzHDrDY6qYn5sEpIIqSO5FFE5FwyRYd82oYhEBlEuHbrK2sXVtxTfiFYP6Z7
+         3+TdM7pn62UFaXW609RWjnELmzbfBV4OszAepRIbEK2dvQsq0ZVYJK+W3VULRV/0Dp2+
+         WWQaJxM66yokc2BRLD9B3Qb1lVyCdQHUoBZFCEFrlOiDotL2hecKq3jNYnKuG6jtbFva
+         3FyJCdBvbHV7SA7COha5Evc3Q5hsmxwx/vAWgekBdcB2RVPJXKfFe4yBuXzLeipfoNBK
+         iHmQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771518167; x=1772122967; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+dEW+DH4tW8V4LkU7Pun4JiyvlXapof8twkYuk8NcHc=;
-        b=ihampDLULXZCyMNnm57gOg1M/QBgnXUnQLrf1Psh96iOJX/zbTotRVq/aTpnpuUJrR
-         jJTluRVva1kKo0uC9O4Ykav77pzb2PTFBW95H3kAhEFUJk6WV9d90fCY2NXQCWObZmAy
-         7UnEUpILe8XdARAWRkDosJ1xVX3tVpdQCQ38LprcRl/PS38eH9ss0mtc7gyuvOcyDzUH
-         kaNmsrUbOEM6EVs9CsQZntLDKPCeTShnKQWRsPKEp8qu+cnC7wYgqB4uM5HsY8xdKF88
-         ljVGnyCsR7detTYplVa5jcKu2ai511SKY0sJSSX7DwWmSZX3161iPfN8tXsnyWstuYn0
-         zYSg==
+        d=gmail.com; s=20230601; t=1771518238; x=1772123038; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f4yeHhzpJN+4nhHpP7a5dAzytay7Sndg0H7YbB+nOFY=;
+        b=mrZJT7J454lOVT2fHTGATGc4l8IO2bPDStIQnggw0HMTtL4ogP7jQP4B2SVnvHEQHS
+         6ZjV+PkQp59VtiFOYqr3o+cnTcAY47usUPIjkj/eqhojDO2zR+sZ2F0Dbh3l9A158lyj
+         TBKPq4T/kYOtPMAWoIzERcvj/Fh7M1BhLFce2yp4Pj8XKzYFk+P1iTiuKiV7Cuu+GOdg
+         jUJ7fC3/+mWXSx6eaGBfQQ8zk4Pz69t7RsnlphkJp2Jfe1hn0zC9SJpdyfkYwefRKutl
+         qL5ot5zxVg5oehijT0c5ji5vo5TLK+qkShxz1jsjx2CQE8ApboRDYcC7J/3VWlJZYCaB
+         FIDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771518167; x=1772122967;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+dEW+DH4tW8V4LkU7Pun4JiyvlXapof8twkYuk8NcHc=;
-        b=ZqwxvXY6gPl+FSydgZB2lViLpPFKTsLwcZ6j1w9PYLNJ7RTO3ozqxQHbgxgga2G5VF
-         5TN5IBXVY2O/3sroweqUNV3OUOHjCx/Sh3GDjaPyc4Rdg8zJ3eHt8rMOoVBTEy0yRUla
-         q2yI5HkI2kUYSCxenQspwfokX0vvJ2gFTz3iafIee2BKgouUOU+hLKuwaj995HDpN4Sm
-         fJVuajDcupwo2PqiSwGwRr1waxYA2FQR9vnw3hRqyGKwJ0Y4/kxT7JbN7uOHQPwl0p2a
-         am+oUgYCebh1KddRpj8s6oXgpHRxJddfL0c+HPIZwyk4rT4A49f9SHaIJ1t8+jM5Zpok
-         f45Q==
-X-Gm-Message-State: AOJu0YyN/I/4anwhtxzHRPISimpBNJ1Ri6HC/ITSMD+p61R4aaC1PFPC
-	mpitJ+cFfFpph0+bUhbO3xdcV2h8NdvR/0m0SJTxiTlDVyaRLN0lNzRzc/s7oz34
-X-Gm-Gg: AZuq6aJFMmd48oOpTmSun2rCbz17L9UlSlbFhUCdQlOk22u4I2PsK4b307vv5r+vxUX
-	2EqsdGOm2HnK4G3pySplcn2XePkXTchZsQTUDU8xkQ2qK15nGbrd/mU0uslzpHZ3aKS0y/355Kq
-	ZwsNJSFa9vV4iVoyqZYyXO3DtuhNxEm2ZV+wBOTQA8Jk+xmySKcFH0+bcE7aPkw4DaQgWK+71XY
-	ULOQQXxHslvJ26i1iiq59wAAWQS+NtEuVrCgLAtTidNsqlBgrsEqZO8PxD4He5hz7GqE9pgoHqk
-	DrLWfW81HdeAJzwSygVVraJ1Q5zILGXHZecb1a9B0/aM5xY+fUsCCHNEmxG59KsyzEQ6EEXTTDh
-	NpZW6ATCfAoaxLzOiq2M22m8dKADDE1TLVxpZkv1v91xqXORc/EksdbQSLgvbXGihNLcCi6eoZp
-	yIB6BTDgslJYJwZl6ZBZWqoDHwXHHkCShcRJLpF/WWNsGKfRS/xplb57cXV5ttGui/1Le4gPNop
-	dNlIjHT/C912eqvKg==
-X-Received: by 2002:a05:6123:10e:b0:566:29a6:1010 with SMTP id 71dfb90a1353d-56889b787c2mr6037260e0c.7.1771518167321;
-        Thu, 19 Feb 2026 08:22:47 -0800 (PST)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5674c20a659sm14435235e0c.11.2026.02.19.08.22.46
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 08:22:46 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 8/8] monitor: Add connection lifecycle to analyze summary
-Date: Thu, 19 Feb 2026 11:22:30 -0500
-Message-ID: <20260219162230.3074355-8-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260219162230.3074355-1-luiz.dentz@gmail.com>
-References: <20260219162230.3074355-1-luiz.dentz@gmail.com>
+        d=1e100.net; s=20230601; t=1771518238; x=1772123038;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=f4yeHhzpJN+4nhHpP7a5dAzytay7Sndg0H7YbB+nOFY=;
+        b=wCTmHEUs+cNXQGVHrkmtGvAZzzUuzU22CHEcEw1vHL1dwZq6b4J9fme4wXTv6dogyn
+         z7gx97/zhEAOuVYpUl1oy7leN9xG78dpjxgnIcL+1ZupSP5S+Fy3qWKJk95BIOgoTArM
+         wzFf1ykprPPzp3NCz9BXGN3QO5ZJHjsKgiqDGdKEj9eEgc6/b4QHMPC4AW2aJbDjoYaY
+         sl1Va6qEyuGJpLfg40RALPG4QIjn6iUSUJpw7b+ZJOps+NbBFzO0qOIGTuflBuPMx8DZ
+         I0GwHDyDsy+2Y4h1C/u6tyyDzivgkX31+nJblaataiMqcmH5vutFjFOEx+Z11afIm5W6
+         /Qpw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4EBelLdI8h6f4XCQNuDOjx/IkAO17jHIBxFNmDkdfYFM+/tuN5W5MEiPVgJNCb1tPmLoHpai9CrEbUa/YXLw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxtslxo5dJ7WnelnbDB8CRtaOQSRT00XKHD633zvI0FCRR2YK3f
+	p7HS4dvzfED185XMWZCn/G5T3soYtt6fNd+zXkWxMG0JXoo57OXdHiOA3IbIPeqnw335qgBUL81
+	FINFZkD+66+Cea9R1pZCzMlsOCKko4sQ=
+X-Gm-Gg: AZuq6aJ13ZtY6z7vpRhj+DgaWaQOX6nzlm/NFGzIGq3/bP/IcxjE+Sw7D332laTjIGE
+	3iPr7cINNvtksNZTKy1zWd4NPRj6VQO/AOylTMSMmmYPEiphLGQ4M7rc/FRywdvPQsMW0FOMAUy
+	ySxM+LeC26QKpcP0oeXOs03PEz33k37WdqI3qnq6nZK/QTmYsDqo5JKTK8pLExpDhSSWT9b4v5Z
+	dxXAx3rfWDgixXjDa5CvOgc+Q8ohCsZZwtbwW2kb9IxA4ye76PYBGhh5TQcREkJRMNCW28yV11p
+	o/omylk+WNcouTYwcD6u7MQBPaj86K6lCn6Hzoj3AOX133A3l6aBW1rA5yhpUp4fRZFyqArWnYi
+	ask2kGVrusHxBe9BayzQMB8G6
+X-Received: by 2002:ad4:4ea6:0:b0:896:fb02:e3fc with SMTP id
+ 6a1803df08f44-897361aba19mr295664726d6.38.1771518237674; Thu, 19 Feb 2026
+ 08:23:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CADbaWgHykWB_EBiqp15W1C+v0OUMG2RXWv7zG_gocp2kgmkcew@mail.gmail.com>
+ <CABBYNZKPyi=qz-XfiNex2oS3DaJUQq-JN7uOxip90jaaHC2cHg@mail.gmail.com>
+In-Reply-To: <CABBYNZKPyi=qz-XfiNex2oS3DaJUQq-JN7uOxip90jaaHC2cHg@mail.gmail.com>
+From: Daniel Matsumoto <insidetf2@gmail.com>
+Date: Thu, 19 Feb 2026 13:23:46 -0300
+X-Gm-Features: AaiRm50d6W_5fE_7G4yZsWAY8m58LxN519vozyjLw2jc2sNJvuLhnez0JhwrDVQ
+Message-ID: <CADbaWgEfX87oPoiO3vdn_s4=Q4TVRVzh=qDgewEC-t2Xa9gU7Q@mail.gmail.com>
+Subject: Re: Bluetooth: mgmt: Fix heap overflow in mgmt_mesh_add
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: luiz.von.dentz@intel.com, maiquelpaiva@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-Record the frame number at connection and disconnection time for each
-connection. Print the connected and disconnected frame numbers in the
-per-connection summary produced by analyze mode so that users can
-cross-reference with the btmon trace output:
+Makes perfect sense regarding EXPORT_SYMBOL. Thanks for taking a look
+and dropping it.
 
-  Found LE-ACL connection with handle 2051
-        Address: 66:B0:26:F1:D3:BC (Resolvable)
-        RX packets: 48/48
-        RX Latency: 1-7604 msec (~74 msec)
-        RX size: 5-51 octets (~13 octets)
-        RX speed: ~0 Kb/s
-        TX packets: 39/37
-        TX Latency: 12-426 msec (~43 msec)
-        TX size: 5-97 octets (~15 octets)
-        TX speed: ~1 Kb/s
-        Connected: #52044
-        Disconnected: #53069
-        Disconnect Reason: 0x08
+Regards,
+Daniel
 
-Also fix the TODO in conn_destroy() that was passing a hardcoded 0x00
-address type by using the stored bdaddr_type from the LE connection
-complete events.
----
- monitor/analyze.c | 73 ++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 59 insertions(+), 14 deletions(-)
 
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index 2cf42f903b61..1db1e7898132 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -68,8 +68,12 @@ struct hci_conn {
- 	uint16_t link;
- 	uint8_t type;
- 	uint8_t bdaddr[6];
-+	uint8_t bdaddr_type;
- 	bool setup_seen;
- 	bool terminated;
-+	uint8_t disconnect_reason;
-+	unsigned long frame_connected;
-+	unsigned long frame_disconnected;
- 	struct queue *tx_queue;
- 	struct timeval last_rx;
- 	struct queue *chan_list;
-@@ -241,13 +245,22 @@ static void conn_destroy(void *data)
- 	}
- 
- 	printf("  Found %s connection with handle %u\n", str, conn->handle);
--	/* TODO: Store address type */
--	packet_print_addr("Address", conn->bdaddr, 0x00);
-+	packet_print_addr("Address", conn->bdaddr, conn->bdaddr_type);
- 	if (!conn->setup_seen)
- 		print_field("Connection setup missing");
- 	print_stats(&conn->rx, "RX");
- 	print_stats(&conn->tx, "TX");
- 
-+	if (conn->setup_seen) {
-+		print_field("Connected: #%lu", conn->frame_connected);
-+		if (conn->terminated) {
-+			print_field("Disconnected: #%lu",
-+					conn->frame_disconnected);
-+			print_field("Disconnect Reason: 0x%02x",
-+						conn->disconnect_reason);
-+		}
-+	}
-+
- 	queue_destroy(conn->rx.plot, free);
- 	queue_destroy(conn->tx.plot, free);
- 	queue_destroy(conn->chan_list, chan_destroy);
-@@ -465,6 +478,7 @@ static void command_pkt(struct timeval *tv, uint16_t index,
- }
- 
- static void evt_conn_complete(struct hci_dev *dev, struct timeval *tv,
-+					unsigned long frame,
- 					const void *data, uint16_t size)
- {
- 	const struct bt_hci_evt_conn_complete *evt = data;
-@@ -478,10 +492,12 @@ static void evt_conn_complete(struct hci_dev *dev, struct timeval *tv,
- 		return;
- 
- 	memcpy(conn->bdaddr, evt->bdaddr, 6);
-+	conn->frame_connected = frame;
- 	conn->setup_seen = true;
- }
- 
- static void evt_disconnect_complete(struct hci_dev *dev, struct timeval *tv,
-+					unsigned long frame,
- 					const void *data, uint16_t size)
- {
- 	const struct bt_hci_evt_disconnect_complete *evt = data;
-@@ -494,6 +510,8 @@ static void evt_disconnect_complete(struct hci_dev *dev, struct timeval *tv,
- 	if (!conn)
- 		return;
- 
-+	conn->frame_disconnected = frame;
-+	conn->disconnect_reason = evt->reason;
- 	conn->terminated = true;
- }
- 
-@@ -555,6 +573,7 @@ static void plot_add(struct queue *queue, struct timeval *latency,
- }
- 
- static void evt_le_conn_complete(struct hci_dev *dev, struct timeval *tv,
-+					unsigned long frame,
- 					struct iovec *iov)
- {
- 	const struct bt_hci_evt_le_conn_complete *evt;
-@@ -569,10 +588,13 @@ static void evt_le_conn_complete(struct hci_dev *dev, struct timeval *tv,
- 		return;
- 
- 	memcpy(conn->bdaddr, evt->peer_addr, 6);
-+	conn->bdaddr_type = evt->peer_addr_type;
-+	conn->frame_connected = frame;
- 	conn->setup_seen = true;
- }
- 
- static void evt_le_enh_conn_complete(struct hci_dev *dev, struct timeval *tv,
-+					unsigned long frame,
- 					struct iovec *iov)
- {
- 	const struct bt_hci_evt_le_enhanced_conn_complete *evt;
-@@ -587,6 +609,8 @@ static void evt_le_enh_conn_complete(struct hci_dev *dev, struct timeval *tv,
- 		return;
- 
- 	memcpy(conn->bdaddr, evt->peer_addr, 6);
-+	conn->bdaddr_type = evt->peer_addr_type;
-+	conn->frame_connected = frame;
- 	conn->setup_seen = true;
- }
- 
-@@ -640,6 +664,7 @@ static void evt_num_completed_packets(struct hci_dev *dev, struct timeval *tv,
- }
- 
- static void evt_sync_conn_complete(struct hci_dev *dev, struct timeval *tv,
-+					unsigned long frame,
- 					const void *data, uint16_t size)
- {
- 	const struct bt_hci_evt_sync_conn_complete *evt = data;
-@@ -653,10 +678,12 @@ static void evt_sync_conn_complete(struct hci_dev *dev, struct timeval *tv,
- 		return;
- 
- 	memcpy(conn->bdaddr, evt->bdaddr, 6);
-+	conn->frame_connected = frame;
- 	conn->setup_seen = true;
- }
- 
- static void evt_le_cis_established(struct hci_dev *dev, struct timeval *tv,
-+					unsigned long frame,
- 					struct iovec *iov)
- {
- 	const struct bt_hci_evt_le_cis_established *evt;
-@@ -671,6 +698,7 @@ static void evt_le_cis_established(struct hci_dev *dev, struct timeval *tv,
- 	if (!conn)
- 		return;
- 
-+	conn->frame_connected = frame;
- 	conn->setup_seen = true;
- 
- 	link = link_lookup(dev, conn->handle);
-@@ -696,6 +724,7 @@ static void evt_le_cis_req(struct hci_dev *dev, struct timeval *tv,
- }
- 
- static void evt_le_big_complete(struct hci_dev *dev, struct timeval *tv,
-+					unsigned long frame,
- 					struct iovec *iov)
- {
- 	const struct bt_hci_evt_le_big_complete *evt;
-@@ -713,12 +742,15 @@ static void evt_le_big_complete(struct hci_dev *dev, struct timeval *tv,
- 			return;
- 
- 		conn = conn_lookup_type(dev, handle, BTMON_CONN_BIS);
--		if (conn)
-+		if (conn) {
- 			conn->setup_seen = true;
-+			conn->frame_connected = frame;
-+		}
- 	}
- }
- 
- static void evt_le_big_sync_established(struct hci_dev *dev, struct timeval *tv,
-+					unsigned long frame,
- 					struct iovec *iov)
- {
- 	const struct bt_hci_evt_le_big_sync_estabilished *evt;
-@@ -736,12 +768,15 @@ static void evt_le_big_sync_established(struct hci_dev *dev, struct timeval *tv,
- 			return;
- 
- 		conn = conn_lookup_type(dev, handle, BTMON_CONN_BIS);
--		if (conn)
-+		if (conn) {
- 			conn->setup_seen = true;
-+			conn->frame_connected = frame;
-+		}
- 	}
- }
- 
- static void evt_le_meta_event(struct hci_dev *dev, struct timeval *tv,
-+					unsigned long frame,
- 					const void *data, uint16_t size)
- {
- 	struct iovec iov = {
-@@ -755,27 +790,28 @@ static void evt_le_meta_event(struct hci_dev *dev, struct timeval *tv,
- 
- 	switch (subevt) {
- 	case BT_HCI_EVT_LE_CONN_COMPLETE:
--		evt_le_conn_complete(dev, tv, &iov);
-+		evt_le_conn_complete(dev, tv, frame, &iov);
- 		break;
- 	case BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE:
--		evt_le_enh_conn_complete(dev, tv, &iov);
-+		evt_le_enh_conn_complete(dev, tv, frame, &iov);
- 		break;
- 	case BT_HCI_EVT_LE_CIS_ESTABLISHED:
--		evt_le_cis_established(dev, tv, &iov);
-+		evt_le_cis_established(dev, tv, frame, &iov);
- 		break;
- 	case BT_HCI_EVT_LE_CIS_REQ:
- 		evt_le_cis_req(dev, tv, &iov);
- 		break;
- 	case BT_HCI_EVT_LE_BIG_COMPLETE:
--		evt_le_big_complete(dev, tv, &iov);
-+		evt_le_big_complete(dev, tv, frame, &iov);
- 		break;
- 	case BT_HCI_EVT_LE_BIG_SYNC_ESTABILISHED:
--		evt_le_big_sync_established(dev, tv, &iov);
-+		evt_le_big_sync_established(dev, tv, frame, &iov);
- 		break;
- 	}
- }
- 
- static void event_pkt(struct timeval *tv, uint16_t index,
-+					unsigned long frame,
- 					const void *data, uint16_t size)
- {
- 	const struct bt_hci_evt_hdr *hdr = data;
-@@ -793,10 +829,10 @@ static void event_pkt(struct timeval *tv, uint16_t index,
- 
- 	switch (hdr->evt) {
- 	case BT_HCI_EVT_CONN_COMPLETE:
--		evt_conn_complete(dev, tv, data, size);
-+		evt_conn_complete(dev, tv, frame, data, size);
- 		break;
- 	case BT_HCI_EVT_DISCONNECT_COMPLETE:
--		evt_disconnect_complete(dev, tv, data, size);
-+		evt_disconnect_complete(dev, tv, frame, data, size);
- 		break;
- 	case BT_HCI_EVT_CMD_COMPLETE:
- 		evt_cmd_complete(dev, tv, data, size);
-@@ -805,10 +841,10 @@ static void event_pkt(struct timeval *tv, uint16_t index,
- 		evt_num_completed_packets(dev, tv, data, size);
- 		break;
- 	case BT_HCI_EVT_SYNC_CONN_COMPLETE:
--		evt_sync_conn_complete(dev, tv, data, size);
-+		evt_sync_conn_complete(dev, tv, frame, data, size);
- 		break;
- 	case BT_HCI_EVT_LE_META_EVENT:
--		evt_le_meta_event(dev, tv, data, size);
-+		evt_le_meta_event(dev, tv, frame, data, size);
- 		break;
- 	}
- }
-@@ -1047,6 +1083,7 @@ void analyze_trace(const char *path)
- {
- 	struct btsnoop *btsnoop_file;
- 	unsigned long num_packets = 0;
-+	unsigned long num_frames = 0;
- 	uint32_t format;
- 
- 	btsnoop_file = btsnoop_open(path, BTSNOOP_FLAG_PKLG_SUPPORT);
-@@ -1084,21 +1121,27 @@ void analyze_trace(const char *path)
- 			del_index(&tv, index, buf, pktlen);
- 			break;
- 		case BTSNOOP_OPCODE_COMMAND_PKT:
-+			num_frames++;
- 			command_pkt(&tv, index, buf, pktlen);
- 			break;
- 		case BTSNOOP_OPCODE_EVENT_PKT:
--			event_pkt(&tv, index, buf, pktlen);
-+			num_frames++;
-+			event_pkt(&tv, index, num_frames, buf, pktlen);
- 			break;
- 		case BTSNOOP_OPCODE_ACL_TX_PKT:
-+			num_frames++;
- 			acl_pkt(&tv, index, true, buf, pktlen);
- 			break;
- 		case BTSNOOP_OPCODE_ACL_RX_PKT:
-+			num_frames++;
- 			acl_pkt(&tv, index, false, buf, pktlen);
- 			break;
- 		case BTSNOOP_OPCODE_SCO_TX_PKT:
-+			num_frames++;
- 			sco_pkt(&tv, index, true, buf, pktlen);
- 			break;
- 		case BTSNOOP_OPCODE_SCO_RX_PKT:
-+			num_frames++;
- 			sco_pkt(&tv, index, false, buf, pktlen);
- 			break;
- 		case BTSNOOP_OPCODE_OPEN_INDEX:
-@@ -1123,9 +1166,11 @@ void analyze_trace(const char *path)
- 			ctrl_msg(&tv, index, buf, pktlen);
- 			break;
- 		case BTSNOOP_OPCODE_ISO_TX_PKT:
-+			num_frames++;
- 			iso_pkt(&tv, index, true, buf, pktlen);
- 			break;
- 		case BTSNOOP_OPCODE_ISO_RX_PKT:
-+			num_frames++;
- 			iso_pkt(&tv, index, false, buf, pktlen);
- 			break;
- 		default:
--- 
-2.52.0
-
+On Thu, Feb 19, 2026 at 1:16=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Daniel,
+>
+> On Tue, Feb 17, 2026 at 1:09=E2=80=AFPM Daniel Matsumoto <me@celes.in> wr=
+ote:
+> >
+> > Regarding commit ac0c6f1b6a58 ("Bluetooth: mgmt: Fix heap overflow in
+> > mgmt_mesh_add"):
+> >
+> > I reviewed the call path for this patch and the overflow condition
+> > appears to be unreachable in the current tree.
+> > The only caller of mgmt_mesh_add() is mesh_send() in
+> > net/bluetooth/mgmt_util.c. The length parameter is explicitly
+> > sanitized before the call:
+> >
+> > if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED) ||
+> >    len <=3D MGMT_MESH_SEND_SIZE ||
+> >    len > (MGMT_MESH_SEND_SIZE + 31))
+> > return mgmt_cmd_status(sk, hdev->id, MGMT_OP_MESH_SEND,
+> >       MGMT_STATUS_REJECTED);
+> >
+> > Given that mgmt_mesh_add() allocates sizeof(*mesh_tx), which includes
+> > the param buffer sized for this maximum length, the bounds check
+> > introduced in the commit is redundant.
+> > While defensive programming is valid, tagging this as a fix for a heap
+> > overflow is misleading for backporters and security scanners, as the
+> > overflow cannot be triggered.
+>
+> Yeah, well I would say it would only be valid to apply defensive
+> programming if that function would be marked with EXPORT_SYMBOL so it
+> could be used outside of net/bluetooth context.
+>
+> > Please consider dropping this from the stable queue to avoid
+> > unnecessary code churn.
+>
+> +1, will drop it entirely, it seems I will need to ask for more
+> evidence as apparently people are relying too much on LLVM nowadays.
+>
+> --
+> Luiz Augusto von Dentz
+>
