@@ -1,63 +1,63 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9AB34DB72
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 17:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A740A343D64
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 17:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771521214; cv=none; b=n3Rjfn1wKY+mqifnskq8eypXza/B2BD/lVRsfqvoXyB5AQ34kptlfzd9p+5JJcqyV2cNWw0aBSDk/4Z4ViuxAcaEbXZThhYi3hq+Tya1ORlg/kiwqqQmA8/A6x5KIUTeKZf/OVg4ez6VuLy4k6rnwCsZFuWM7OYED8wsY3/Beck=
+	t=1771521218; cv=none; b=Wa6hvjarVnNIGJi7xBHM4T6wOQSeBKu7ffD7D8CAFWkCzOTuNSPQsDmQuFsG+sXT3odDKG3CLcmpa1lJP7ZZzxk/veyCrULDhmFtWbI7svYoebg1Y7/v2RG1Wt1+KQLGjKiYst8vxoPUrJWfqM2i++4Eu6+LNQgRXP4YrxH0pFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771521214; c=relaxed/simple;
-	bh=kyxULOv2H236l1ucHIwcTRr5nnWT32c4Zye+wWGrJ6s=;
+	s=arc-20240116; t=1771521218; c=relaxed/simple;
+	bh=HhT6z2DVcZ8yTv/m6DHxcDKqHPAmK3H4JJhD4dhIVH0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=araVMY8u3gT6z/5fNPm2pXSR8zURAkDH/ssKqhs+oyQ2QqdMJjqPT3+h2tyf8KD3iJ+l9qGGJZWbGc53IqYrOg4qd9yrA6hQ0aGJTr0Ql8FX/Rzku37LCrPHEccDOvkNKa3z0exgFu0p2DyAML5ZIAp82IA5ZuOuwzn13mVoFj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W3Bp0l3H; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=RnYBFv4Z5SvB0nBEXpi4RMYGdGUyfpjjROKGmsEGW9qyvVfjWMAzEhuN7z3KkGo1BlecI8Efb9TZDyP7z55i6mcqIayTjs5+ehWfVKdb978Mh7NRhErJvKfTHoAMV4AZVO/3xlUFPE2SGcLWN+a8Lj1uRTABxw3ZKg31IfGL4O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iSqKh1Et; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W3Bp0l3H"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82491fbf02cso631765b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 09:13:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iSqKh1Et"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8230f8f27cfso614582b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 09:13:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771521212; x=1772126012; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771521216; x=1772126016; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=scjH6AQBXgOEyOguxVYTHq5LOFFjJgFpmI1fsS6Z7tY=;
-        b=W3Bp0l3HAahee6jM1ZFsDQY48RFSKlrq9I2k1a0rW5Pr8PGi0dstQu6Ye4Pwlh//36
-         vyUFE2XWfsxvdUjrh3kFAWNcjJgBWHineh1GaJWMURPIlIPgyKh9KrSqcYQMkdLPrG5N
-         HlHfPj2BGJ3H+I/JXIwjZzZH9gZTEkFMPrgomSWxZq+A6igRcS7FmKMnbh6K0DudrhPM
-         TjLf/lqvebR+svC8AoIChIaxlUlM5H6bjQrRPFHPlM9lkluXqsq4gCA3Rn9z/9kXgUza
-         py6/waBbNlDwJ00ON8OIXF8dV0lE7aKrJ0O5hOxnT6fL0EZRJWDKp/hOMVCVXgcM4wcv
-         da7g==
+        bh=2Ivwth3bvYn00MIlpqUjU3pfVj9NAWsfF7rOKTWPDVU=;
+        b=iSqKh1EtcQq3Vw7JlOgIlbG/jUIdobO7x/7X68R9/m/62XmQG6tIi4l913RcKGad/u
+         ixrurEoIFtrSqU5NDv4klM4yFtm/Qa2NWFBu4Y6HDe9uRdXij2vCLmhXNPn2O6ddtfSk
+         0mX0osBfgp/93jWe+fRehNQ74bMml9qc4lAIusGSbdzpelqlZGt71UjSnIqIhl/gJT19
+         V+/1t+utSKktCRCyWbSLfs99k5i+bbkdI31jC589PB6cjQRQGia/ygRpAGmZ2ul6jCjo
+         P/3z8fQltix+jnxd9iHgEVBvFN2mbgjg386NI0MrR5c1sAjcZ/ZsLwTz+VGxKm22erfM
+         +rmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771521212; x=1772126012;
+        d=1e100.net; s=20230601; t=1771521216; x=1772126016;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=scjH6AQBXgOEyOguxVYTHq5LOFFjJgFpmI1fsS6Z7tY=;
-        b=Epw3MMlWgFp4ALrswexbc+81KehCPJjqMrJHHGRTq65WjiDakpFw3HURa6J7y4Xszn
-         VnZXZlJyD0z5sNUgaXA8z63dJTTo7E+4CK3PbVIphxrEwOPZEttK0pPc2KHjknyYihED
-         Col7tY8/FwNgp9RZgQ3Qgxp+oa69s09Qqm6rp6XZS3JforsnR/IJCzrGG8QRuYWipzAC
-         a76yBBd6h28f2yep69HmUgP7HmQ2oo7K/uZv1TFAQZtGY0W1MvydvL29Z1h+nsTZgpha
-         9ymJajHFMy91Fjvmm1/K5s5CafLgWWm/4RunIJd5T9TUBKShzk4nq7MIKYbGPuA1WY0b
-         5PPg==
-X-Forwarded-Encrypted: i=1; AJvYcCUaTxZp5l0JhetqAIPVFdWwE6sbNO20GJV0Veg+WyOFPAAjkEnJPuIcDaMH4fj6Ga7DS/E9idpWwo+JUUCixDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6j7veID1vK53VjVkBY6f9bCcxzT9wCWnrQ4ag5YpGnVygHDj6
-	lbhHAplq18p01RBMfA8RRREWO+oJE7Oq8AcAYtm1LIq5lsuGek37S2a8
-X-Gm-Gg: AZuq6aKAo5RKN3dyMi2X/SImFYkPcBpMMeUU5iHZNv3/g2vZvr47h8I2RG75FDwM+TC
-	MGvGA3D17zTmWEz+pzKt+Hh/XRLr0nA+WIcjKhvffSKl2n4igAHKGK4zqlCiDiTMkC4GEgY1oPC
-	DAC6XobVzn+IVay8UAA4k+WQ3+lRPyna7STLqhVKm1GPo901IuuZCWfQKY4UCs6febKIdkJQeHU
-	0UGOORS7s/yIgu2nLwLd+lev+mST2k2luflx5/WMAodvtn735MBoBb8ufYleha0D2hRJTnG9qCF
-	xWPfcHzG+L+MwAUapOpuh+ZdNNCbdpMU/rRIYtDBUJ5oMd0rWgAiY3rV+0zO6bgBBwi/Tfdnq4+
-	wvjBPJ7NwQAX4oDaobNingAYdYz67GgUomx1aNIlLFQfB8CwQT7psU4iU7LJpSNMG8d7HhIohFh
-	TbTwwZKWGq/czM8dlRo4pZKl/QxwoOIeMWRyOE398zlXb1XDIi0OSNUOiAhuWE
-X-Received: by 2002:a05:6a21:1645:b0:38d:f08d:b349 with SMTP id adf61e73a8af0-394839d554cmr16555786637.43.1771521212312;
-        Thu, 19 Feb 2026 09:13:32 -0800 (PST)
+        bh=2Ivwth3bvYn00MIlpqUjU3pfVj9NAWsfF7rOKTWPDVU=;
+        b=BxvE6KPaZo19srckUJF+NuANu1Z83f0TKr0r60tJZ8Ni1g+DwlJ80rroCjBYbGft+2
+         M0VvH9Riwre/jttvTIZp+gteM2dt4xErAMjo2aIboZsdKseY9ln2jGoJoL7NmQsE33ZI
+         gDnb67MCkTU0fQPYnBnBvjxyKUin3YFn4xvDfoDofUIjEwwcB2Llvx8uz33Q6sGS9PSk
+         UCeW2nJT/oOa01whYy5FnF8W1oevd8rcRyZNAL6sfX/dl3oPV4tp9lcZSvfgOS7QcwoD
+         6Jrn4SfRyemgu7Xvq/Pn3yakJQpya5XpKL4Imo1mbEJjEkkg/nAGETxu48qWkyTKSsQb
+         7lZw==
+X-Forwarded-Encrypted: i=1; AJvYcCVGyInBMGN+b1A/dFzfjs3YTHGJrfmJIum0xFFMt6UCkB2TgXUR/OUgtcgWLHHXKJFxuA4m+fYZqT7ICSABeEM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI704KeAg5naTDtYC6kVkhn6hJG5DsZxMhXyoVYtkBIFVFlFsr
+	T8l0/qGrE+2r2EiRlHh9/kt6Ev99iKjhNHxPsDmFSYxRyyRaP12/uHsa
+X-Gm-Gg: AZuq6aJ1NlbqgZgcgKh6vhP2ORfWnKvD3FE61fQHdBh3ZtBuTtD+Ia8hio7cpIajf/E
+	Sofh/ERyOHmcyCYfppg2VOaDXO1xiyqcbuHCPuN7enMlgX4TnItuNDyDukY4CU+M44PdIPyY+mN
+	i5bB7OcCjd0RZLdz369+JlsaNr9DcZn/DhZSXNhq0xmY2u5WGfQSapCxNxCnA7tIz643T0o0/KD
+	lERhXPEVR4o2BsL/zI/NrCxDre/IvXd6XdBfPbOHERQzNdRpnGhNVjeOiTtG4Lyo2d1rCkR1hMa
+	NUU6N1qjnPGsYZVwSk9xMrWYZrxE1sKd0G0491vrTtnjjN34eAiXEQtO1ldOe/yGQUXVIJOqs4q
+	2/EXQR81RF77xaMQppbvgbd+hPS1onKNy9QwcdNEYmqxnRK5ca2Yq74Tza/8WdJ+tXR82DStC+/
+	WLPuDCoAY7t7VVtGN2kswfMbabGx6kUFruGqD4o2rveGzjHZzvRRRRcphalp9W
+X-Received: by 2002:a05:6a21:6b05:b0:34f:b660:770d with SMTP id adf61e73a8af0-3946c95590dmr18861831637.55.1771521216447;
+        Thu, 19 Feb 2026 09:13:36 -0800 (PST)
 Received: from name2965-Precision-7820-Tower.. ([121.185.236.165])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c6e532fa2e5sm15895002a12.26.2026.02.19.09.13.28
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c6e532fa2e5sm15895002a12.26.2026.02.19.09.13.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 09:13:31 -0800 (PST)
+        Thu, 19 Feb 2026 09:13:35 -0800 (PST)
 From: Jeongjun Park <aha310510@gmail.com>
 To: stable@vger.kernel.org
 Cc: gregkh@linuxfoundation.org,
@@ -80,9 +80,9 @@ Cc: gregkh@linuxfoundation.org,
 	aha310510@gmail.com,
 	linux-staging@lists.linux.dev,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH 5.10.y 04/15] clocksource/drivers/sp804: Do not use timer namespace for timer_shutdown() function
-Date: Fri, 20 Feb 2026 02:12:59 +0900
-Message-Id: <20260219171310.118170-5-aha310510@gmail.com>
+Subject: [PATCH 5.10.y 05/15] timers: Get rid of del_singleshot_timer_sync()
+Date: Fri, 20 Feb 2026 02:13:00 +0900
+Message-Id: <20260219171310.118170-6-aha310510@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260219171310.118170-1-aha310510@gmail.com>
 References: <20260219171310.118170-1-aha310510@gmail.com>
@@ -94,60 +94,126 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+From: Thomas Gleixner <tglx@linutronix.de>
 
-[ Upstream commit 6e1fc2591f116dfb20b65cf27356475461d61bd8 ]
+[ Upstream commit 9a5a305686971f4be10c6d7251c8348d74b3e014 ]
 
-A new "shutdown" timer state is being added to the generic timer code. One
-of the functions to change the timer into the state is called
-"timer_shutdown()". This means that there can not be other functions
-called "timer_shutdown()" as the timer code owns the "timer_*" name space.
+del_singleshot_timer_sync() used to be an optimization for deleting timers
+which are not rearmed from the timer callback function.
 
-Rename timer_shutdown() to evt_timer_shutdown() to avoid this conflict.
+This optimization turned out to be broken and got mapped to
+del_timer_sync() about 17 years ago.
 
-Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+Get rid of the undocumented indirection and use del_timer_sync() directly.
+
+No functional change.
+
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Tested-by: Guenter Roeck <linux@roeck-us.net>
-Reviewed-by: Guenter Roeck <linux@roeck-us.net>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Link: https://lkml.kernel.org/r/20221106212702.182883323@goodmis.org
-Link: https://lore.kernel.org/all/20221105060155.592778858@goodmis.org/
-Link: https://lore.kernel.org/r/20221110064147.158230501@goodmis.org
-Link: https://lore.kernel.org/r/20221123201624.634354813@linutronix.de
+Link: https://lore.kernel.org/r/20221123201624.706987932@linutronix.de
 Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 ---
- drivers/clocksource/timer-sp804.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/char/tpm/tpm-dev-common.c     | 4 ++--
+ drivers/staging/wlan-ng/hfa384x_usb.c | 4 ++--
+ drivers/staging/wlan-ng/prism2usb.c   | 6 +++---
+ include/linux/timer.h                 | 2 --
+ kernel/time/timer.c                   | 2 +-
+ net/sunrpc/xprt.c                     | 2 +-
+ 6 files changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/clocksource/timer-sp804.c b/drivers/clocksource/timer-sp804.c
-index e6a87f4af2b5..cd1916c05325 100644
---- a/drivers/clocksource/timer-sp804.c
-+++ b/drivers/clocksource/timer-sp804.c
-@@ -155,14 +155,14 @@ static irqreturn_t sp804_timer_interrupt(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
--static inline void timer_shutdown(struct clock_event_device *evt)
-+static inline void evt_timer_shutdown(struct clock_event_device *evt)
+diff --git a/drivers/char/tpm/tpm-dev-common.c b/drivers/char/tpm/tpm-dev-common.c
+index 56e56a09cc90..c3fbbf4d3db7 100644
+--- a/drivers/char/tpm/tpm-dev-common.c
++++ b/drivers/char/tpm/tpm-dev-common.c
+@@ -157,7 +157,7 @@ ssize_t tpm_common_read(struct file *file, char __user *buf,
+ out:
+ 	if (!priv->response_length) {
+ 		*off = 0;
+-		del_singleshot_timer_sync(&priv->user_read_timer);
++		del_timer_sync(&priv->user_read_timer);
+ 		flush_work(&priv->timeout_work);
+ 	}
+ 	mutex_unlock(&priv->buffer_mutex);
+@@ -264,7 +264,7 @@ __poll_t tpm_common_poll(struct file *file, poll_table *wait)
+ void tpm_common_release(struct file *file, struct file_priv *priv)
  {
- 	writel(0, common_clkevt->ctrl);
+ 	flush_work(&priv->async_work);
+-	del_singleshot_timer_sync(&priv->user_read_timer);
++	del_timer_sync(&priv->user_read_timer);
+ 	flush_work(&priv->timeout_work);
+ 	file->private_data = NULL;
+ 	priv->response_length = 0;
+diff --git a/drivers/staging/wlan-ng/hfa384x_usb.c b/drivers/staging/wlan-ng/hfa384x_usb.c
+index 0d869b5e309c..8687e0bf3315 100644
+--- a/drivers/staging/wlan-ng/hfa384x_usb.c
++++ b/drivers/staging/wlan-ng/hfa384x_usb.c
+@@ -1116,8 +1116,8 @@ static int hfa384x_usbctlx_complete_sync(struct hfa384x *hw,
+ 		if (ctlx == get_active_ctlx(hw)) {
+ 			spin_unlock_irqrestore(&hw->ctlxq.lock, flags);
+ 
+-			del_singleshot_timer_sync(&hw->reqtimer);
+-			del_singleshot_timer_sync(&hw->resptimer);
++			del_timer_sync(&hw->reqtimer);
++			del_timer_sync(&hw->resptimer);
+ 			hw->req_timer_done = 1;
+ 			hw->resp_timer_done = 1;
+ 			usb_kill_urb(&hw->ctlx_urb);
+diff --git a/drivers/staging/wlan-ng/prism2usb.c b/drivers/staging/wlan-ng/prism2usb.c
+index 4b08dc1da4f9..83fcb937a58e 100644
+--- a/drivers/staging/wlan-ng/prism2usb.c
++++ b/drivers/staging/wlan-ng/prism2usb.c
+@@ -171,9 +171,9 @@ static void prism2sta_disconnect_usb(struct usb_interface *interface)
+ 		 */
+ 		prism2sta_ifstate(wlandev, P80211ENUM_ifstate_disable);
+ 
+-		del_singleshot_timer_sync(&hw->throttle);
+-		del_singleshot_timer_sync(&hw->reqtimer);
+-		del_singleshot_timer_sync(&hw->resptimer);
++		del_timer_sync(&hw->throttle);
++		del_timer_sync(&hw->reqtimer);
++		del_timer_sync(&hw->resptimer);
+ 
+ 		/* Unlink all the URBs. This "removes the wheels"
+ 		 * from the entire CTLX handling mechanism.
+diff --git a/include/linux/timer.h b/include/linux/timer.h
+index e78521bce565..3c166b4f704d 100644
+--- a/include/linux/timer.h
++++ b/include/linux/timer.h
+@@ -198,8 +198,6 @@ static inline int del_timer_sync(struct timer_list *timer)
+ 	return timer_delete_sync(timer);
  }
  
- static int sp804_shutdown(struct clock_event_device *evt)
- {
--	timer_shutdown(evt);
-+	evt_timer_shutdown(evt);
- 	return 0;
+-#define del_singleshot_timer_sync(t) del_timer_sync(t)
+-
+ extern void init_timers(void);
+ struct hrtimer;
+ extern enum hrtimer_restart it_real_fn(struct hrtimer *);
+diff --git a/kernel/time/timer.c b/kernel/time/timer.c
+index d4ce3ebe2c8c..6cd908cfbad4 100644
+--- a/kernel/time/timer.c
++++ b/kernel/time/timer.c
+@@ -1912,7 +1912,7 @@ signed long __sched schedule_timeout(signed long timeout)
+ 	timer_setup_on_stack(&timer.timer, process_timeout, 0);
+ 	__mod_timer(&timer.timer, expire, MOD_TIMER_NOTPENDING);
+ 	schedule();
+-	del_singleshot_timer_sync(&timer.timer);
++	del_timer_sync(&timer.timer);
+ 
+ 	/* Remove the timer from the object tracker */
+ 	destroy_timer_on_stack(&timer.timer);
+diff --git a/net/sunrpc/xprt.c b/net/sunrpc/xprt.c
+index 2db834318d14..2bccb5a90934 100644
+--- a/net/sunrpc/xprt.c
++++ b/net/sunrpc/xprt.c
+@@ -1160,7 +1160,7 @@ xprt_request_enqueue_receive(struct rpc_task *task)
+ 	spin_unlock(&xprt->queue_lock);
+ 
+ 	/* Turn off autodisconnect */
+-	del_singleshot_timer_sync(&xprt->timer);
++	del_timer_sync(&xprt->timer);
  }
  
-@@ -171,7 +171,7 @@ static int sp804_set_periodic(struct clock_event_device *evt)
- 	unsigned long ctrl = TIMER_CTRL_32BIT | TIMER_CTRL_IE |
- 			     TIMER_CTRL_PERIODIC | TIMER_CTRL_ENABLE;
- 
--	timer_shutdown(evt);
-+	evt_timer_shutdown(evt);
- 	writel(common_clkevt->reload, common_clkevt->load);
- 	writel(ctrl, common_clkevt->ctrl);
- 	return 0;
+ /**
 --
