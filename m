@@ -1,69 +1,69 @@
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CD9345CD9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 16:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9831B226D18
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 16:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771518167; cv=none; b=Y+qr7SwsxC8/yHuemw7D2lvdPFrSoFjBwazybpA9PqwjxXdRYMQnmASRt67asgrhYpUleAi4iyI4qOIwydJ68Z1C5122kg7aQe1GTWySpQ7ZHgFc1jMUQh9bC7NjlCo2C8PRHqtx/QS0QH9b3lUECJSQpfDf5FVrh9NhAkax6PA=
+	t=1771518169; cv=none; b=bxZYfapMdmLFHMhscgRxDFN4AtujOsprHZ/AuiN5u2VkyD5AvBnzHMtzKFKTtZx6VNNIyzKOBElobKSlsFusCIPfWTcXGcdXs38ltzJp3lMnuQD4Zx7VP/jpEtf+e8GSL4tW4h4Mk9UPILQxS4G0b+NGDW6TnDjkHkI6EH5ozBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771518167; c=relaxed/simple;
-	bh=DghqkDSZnJx7xPBxaYg1VtWc4EQewhnEUuHyrdZoayQ=;
+	s=arc-20240116; t=1771518169; c=relaxed/simple;
+	bh=kYYPuy0oj2bdt1xworBcrOGUsY13bnyhISUp4nGfU3w=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vERTRrxerW/do54acS8LPnyT088eRzZNCwcpF3owxqqxubnq/GA9ZCY0BpuMhYNowsOlnZ1VsyTNyvybfd/KGZH31wwdCy9QQmJlYy2taILCa1OSVwUQ9CzVZsvY/ZD1KhfGkJ79nYaykh0BwQrr5RgN0jkiPW8MtjwfTUC0iL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SnGljkIs; arc=none smtp.client-ip=209.85.221.175
+	 MIME-Version; b=SZiJFMuSETVSPc+KBUKt+0AyobFbXbwJB//uCGFmNBsp+gqKLzNaZ4T1CrhK+RXP7sZvYfCOqfUt1E7xq+ia7QZqKsiMrxBCtb5a5eVJnUGlFwG4q+ejP3jeuUl06HB7VEJsPM/f/vAWbrs1U7lfut74IRqYIrxonsOBg+UJED4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=amStFa/k; arc=none smtp.client-ip=209.85.221.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SnGljkIs"
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5665171836cso1211475e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 08:22:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="amStFa/k"
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5664393d409so447561e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Feb 2026 08:22:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771518165; x=1772122965; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771518166; x=1772122966; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+fFwFRec0/iMaA81v94JZTtdiByYb3b+1BAjF09gg5c=;
-        b=SnGljkIsWasQ3/8kmHP4bwngfp637J/J7drgC0sLI6rwHqa9PhH2bCVy7t/WB9vF5v
-         k+ZUbDhE0X2IZpatJRXWpEf4Ktf0e5GY94n8F/jMoHcTZdznKM8+1bnG/Ai4rGYCREJp
-         n9/55liMYWTIlrG/mZMhcHjMWJ0ZSLWCdmG+5dEDAT3Q6oEL1mmKvOoqelkXtnsBGb0U
-         p9mSX574aTLT9GmCLo4ROPiuVYWl94YNvN/vbArm6NI4p7jMhjUwtGA2Zt99Tm3ScKQu
-         Z+nPbKNAjL1AOJfCrwqbJrafla5mT+wikgqXh+6ZVWr1LemPoF0SJB4ZZUrtWcp3A3xR
-         CMag==
+        bh=QdGwVY+9ZZnAICRrPX+ORuNrgTFjNHf9CW+8SwGsam8=;
+        b=amStFa/kFW16rUbYK9nDUl4Zy5QEQh+M6pWYEWVnIqSZySYIdRf5PrfON8ovevTKtC
+         zdt2SVd40LKUEP1NSTeej4KgZcy6yDe5LVwVJ8uyPsmcGj4BmbwuBr/Xu+nQ9VJrNCl/
+         fEIY1ktbusR5JB/GkqceQT8TpROXB5tzY+W3ElZ2RZsI05VQmQeTs7g5g3SQzurxFkSA
+         863B6fdYVvz70CINXvdgajAMKb0uch8fMizUgEjAwFOB1JBHGoihSzxNdWrx8/zQh8oz
+         fX6HYubi2MAMwZeDoC3NfC0fOtuA5HOQ5/T8bNdjn+6mgHtvpNNLEuky3/VzvRx55uIb
+         XRNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771518165; x=1772122965;
+        d=1e100.net; s=20230601; t=1771518166; x=1772122966;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=+fFwFRec0/iMaA81v94JZTtdiByYb3b+1BAjF09gg5c=;
-        b=K7MC+saiLQD1No0HQBJ+WsxjNTewo4rLFgRN+2WbHQspfDjDG119gme4dkEpBXuhXV
-         gDkvwcSsop+YYg8Fek803k7YD22S0FguRb+8CGLd293YhydJIONAVGUrIx7ohMtJQ8SY
-         68N5Z0OGsjFIFNvphFB+7EZ2vqocK4bOSF6eSDyDDdx881b/VIko4zFf1qbdgGZhOdcI
-         qB5Up0RkR8o7nn9wrRs1lqQP4sdr9Bf1zuB1EGhbY8/WEV4Y3dpFGcgX+bRV1REkvswP
-         w8GKDKUjGFNcHZaOxbSzJwRFlpxK7Tw0SAESaZoVuUjQISa22UGPTvOvtYGfhIPrM1+X
-         SrDQ==
-X-Gm-Message-State: AOJu0YyIWtLmaNz5IpRFhwwDXtTMPM+feCrFNU3UWET2Gw7tLJCLa4wl
-	Nf3HX+sNLrMpV7CD1+33Jo3284N5sLMQVb9jpcu44DcNs7rIHeiLVjG2NIIErQ==
-X-Gm-Gg: AZuq6aIrxBVfEaOrndLX1a+vNhj1ugnF/84xjNtUs+mlUK3mx8qXqWVIBk1n2OlLwMf
-	U4PdRmlqdEnaRfGEC7fh4krK7XdzNum4685jT1WsFb90mca6Ks6Jznm2l6PTWXbpMnDz7LpdIld
-	HfUVmbLD9RsRmCZbYoi9LxHm4O9icqZGF0s/aD8F1Ges5X7K8jrMVUWKuJ/1upL2cXKgA++l3P4
-	oDXuCx8komxjR7H3PBBLWrbM64IeGL3c5fSgPQkMlMUZga47bNnXfrNNlEsvXOeZoxmAAeRH5XG
-	kluyy+/HGVTN3Kx4wPLKHD+ZTlJDiE4mB28b2v7UkkNd8/DzvyPD6PUcFbLPFYkfLpryACq+AUo
-	LpyKK9ym08Uvy6A9S/wawVBxI0Ee983wtVW7leWcrw39fGwIC/Cnyplx7CCPyP32tpS6wuidFm6
-	X8uL/9cLp+6FwLwqwbktUEl4HRcmUn+PtPNnLFZ30r2PET3ZvqpfF5jR3jtN4dl0CIRk+3WH6Gx
-	mHxPipN4uIuLbB7iA==
-X-Received: by 2002:a05:6123:125:b0:566:2302:f317 with SMTP id 71dfb90a1353d-568bf5faa72mr2958453e0c.20.1771518164714;
-        Thu, 19 Feb 2026 08:22:44 -0800 (PST)
+        bh=QdGwVY+9ZZnAICRrPX+ORuNrgTFjNHf9CW+8SwGsam8=;
+        b=Wb+B/ibpSkI7KLypbg88vKVqzI+wjCCI1XSQ2z8a6GkvTlYJXF/sUU+BQz2r+KISzc
+         9fywvY3qVbJk9YAYHTGsE7+YoWrp9Nf+WoqTYcsYr5NwkvV4st8FYAagm0AFh6hLK8eK
+         l50BQYRmFgZ5AWrmEbUiKp0fmF6Sw2CYsCrCsGuOnm6sPWy0jp6C8mwfu+u9KbQbzLRC
+         FTc7jJRlatM5HHxZnk2Dw1SZIJb7pJmt3sfprLvtTGuYUj3aFFCBswnT9065KXNfmMog
+         7bJmfU5yCCZTjeM/rV3gg+fKbDYN11+l8cuWC48qZCqfDfEINVzOsWkmQgi+IsnoabIe
+         AR+A==
+X-Gm-Message-State: AOJu0YzdswZuJvyn2cH6U1kGde6XszorClGp7+hA2PmblXnfhvvuSXUm
+	Bt3VL6gESNLQZFwCF6/ch+grDD2d/yxl+LQCsu2qFxq9lGkW6uy21Yj5jE/yhQ==
+X-Gm-Gg: AZuq6aL/rUlB0/F88sz9BdUL/8WF98hxIeKBAgsR5TPX3wrbJlpzIWS5srH9HnbgFWw
+	TmB7H3zrwQM8qR62ZMp6F+L89mokDO14MjoViC1s0KseZpy3AxoAZetnqgWR/VPGpKwpzZ2XI0i
+	3Mz9qbGGkSFE3sL3pTm5fZEHsBNkYk3N3kljgRVEZRWl4242ukuhIPb3AzwnGhf/mHWx01Oxeoj
+	glvcArRrIBljGkwTVxfoahh8qb7YM5z8Q/C4jAn9XvD/mGXqMTZXZuAjsuqXILiehJp6k7OBqpX
+	w3XNKqVRUyrbZTIfdtKftLNCHEEASfwwdIOc9tDYdLsFO7bTAhpi7InY8+o2WyrG4HplOJIGORn
+	erBRfQNGHpG0w+izd3lQg0m4mIRBXOR95yjZ5+BFWr6Gu00NwhdPa4ixkwbpweicLgach087LBQ
+	YZOiYYKjVtj+H1HpyaZBy+BbkK8FsES4XqRC6g5UN/5WlX8HeCj4cCgC2f5YN0x+9ftOGx5BYSS
+	+oJsDkGUj99352eAg==
+X-Received: by 2002:a05:6122:134c:b0:563:c868:a32d with SMTP id 71dfb90a1353d-568ca05a2admr1415953e0c.2.1771518165903;
+        Thu, 19 Feb 2026 08:22:45 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5674c20a659sm14435235e0c.11.2026.02.19.08.22.43
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5674c20a659sm14435235e0c.11.2026.02.19.08.22.44
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 08:22:43 -0800 (PST)
+        Thu, 19 Feb 2026 08:22:45 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 6/8] monitor: Annotate ACL/SCO/ISO data with device address
-Date: Thu, 19 Feb 2026 11:22:28 -0500
-Message-ID: <20260219162230.3074355-6-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 7/8] monitor: Print connection type in Disconnect Complete
+Date: Thu, 19 Feb 2026 11:22:29 -0500
+Message-ID: <20260219162230.3074355-7-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260219162230.3074355-1-luiz.dentz@gmail.com>
 References: <20260219162230.3074355-1-luiz.dentz@gmail.com>
@@ -77,218 +77,316 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add the remote device address to ACL, SCO and ISO data packet output
-so each data packet line shows which device it belongs to. This makes
-it much easier to follow multi-device traces without having to
-cross-reference handle numbers with earlier connection events:
-
-< ACL Data TX: Handle 2048 [1/6] [42:96:D7:49:78:CC (Resolvable)] flags 0x00 dlen 7
-      ATT: Exchange MTU Request (0x02) len 2
-        Client RX MTU: 527
-> ACL Data RX: Handle 256 [20:32:C6:09:FF:6C (Apple, Inc.)] flags 0x02 dlen 16
-      L2CAP: Connection Response (0x03) ident 33 len 8
-        Destination CID: 17169
-        Source CID: 64
-        Result: Connection successful (0x0000)
-        Status: No further information available (0x0000)
-
-Also fix the connection lookup in packet_hci_acldata() to use
-acl_handle() to mask off the flags bits, matching what assign_handle()
-stores.
+Print the connection type (BR-ACL, LE-ACL, BR-SCO, BR-ESCO, LE-CIS,
+LE-BIS) alongside the handle in Disconnect Complete events so the type
+of link being torn down is immediately visible without cross-referencing
+earlier connection events.
 ---
- monitor/packet.c | 92 +++++++++++++++++++++++++++++++++++++++++++++---
- monitor/packet.h |  4 +++
- 2 files changed, 92 insertions(+), 4 deletions(-)
+ monitor/analyze.c | 53 +++++++++++++++++++++++-------------------
+ monitor/packet.c  | 59 ++++++++++++++++++++++++++++++++++-------------
+ monitor/packet.h  |  9 ++++++++
+ 3 files changed, 81 insertions(+), 40 deletions(-)
 
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index 268ea10e29e6..2cf42f903b61 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -53,12 +53,6 @@ struct hci_dev {
+ 	struct queue *conn_list;
+ };
+ 
+-#define CONN_BR_ACL	0x01
+-#define CONN_BR_SCO	0x02
+-#define CONN_BR_ESCO	0x03
+-#define CONN_LE_ACL	0x04
+-#define CONN_LE_ISO	0x05
+-
+ struct hci_stats {
+ 	size_t bytes;
+ 	size_t num;
+@@ -223,20 +217,23 @@ static void conn_destroy(void *data)
+ 	const char *str;
+ 
+ 	switch (conn->type) {
+-	case CONN_BR_ACL:
++	case BTMON_CONN_ACL:
+ 		str = "BR-ACL";
+ 		break;
+-	case CONN_BR_SCO:
++	case BTMON_CONN_LE:
+ 		str = "BR-SCO";
+ 		break;
+-	case CONN_BR_ESCO:
++	case BTMON_CONN_SCO:
+ 		str = "BR-ESCO";
+ 		break;
+-	case CONN_LE_ACL:
++	case BTMON_CONN_ESCO:
+ 		str = "LE-ACL";
+ 		break;
+-	case CONN_LE_ISO:
+-		str = "LE-ISO";
++	case BTMON_CONN_CIS:
++		str = "LE-CIS";
++		break;
++	case BTMON_CONN_BIS:
++		str = "LE-BIS";
+ 		break;
+ 	default:
+ 		str = "unknown";
+@@ -476,7 +473,7 @@ static void evt_conn_complete(struct hci_dev *dev, struct timeval *tv,
+ 	if (evt->status)
+ 		return;
+ 
+-	conn = conn_lookup_type(dev, le16_to_cpu(evt->handle), CONN_BR_ACL);
++	conn = conn_lookup_type(dev, le16_to_cpu(evt->handle), BTMON_CONN_ACL);
+ 	if (!conn)
+ 		return;
+ 
+@@ -567,7 +564,7 @@ static void evt_le_conn_complete(struct hci_dev *dev, struct timeval *tv,
+ 	if (!evt || evt->status)
+ 		return;
+ 
+-	conn = conn_lookup_type(dev, le16_to_cpu(evt->handle), CONN_LE_ACL);
++	conn = conn_lookup_type(dev, le16_to_cpu(evt->handle), BTMON_CONN_LE);
+ 	if (!conn)
+ 		return;
+ 
+@@ -585,7 +582,7 @@ static void evt_le_enh_conn_complete(struct hci_dev *dev, struct timeval *tv,
+ 	if (!evt || evt->status)
+ 		return;
+ 
+-	conn = conn_lookup_type(dev, le16_to_cpu(evt->handle), CONN_LE_ACL);
++	conn = conn_lookup_type(dev, le16_to_cpu(evt->handle), BTMON_CONN_LE);
+ 	if (!conn)
+ 		return;
+ 
+@@ -670,7 +667,7 @@ static void evt_le_cis_established(struct hci_dev *dev, struct timeval *tv,
+ 		return;
+ 
+ 	conn = conn_lookup_type(dev, le16_to_cpu(evt->conn_handle),
+-						CONN_LE_ISO);
++						BTMON_CONN_CIS);
+ 	if (!conn)
+ 		return;
+ 
+@@ -715,7 +712,7 @@ static void evt_le_big_complete(struct hci_dev *dev, struct timeval *tv,
+ 		if (!util_iov_pull_le16(iov, &handle))
+ 			return;
+ 
+-		conn = conn_lookup_type(dev, handle, CONN_LE_ISO);
++		conn = conn_lookup_type(dev, handle, BTMON_CONN_BIS);
+ 		if (conn)
+ 			conn->setup_seen = true;
+ 	}
+@@ -738,7 +735,7 @@ static void evt_le_big_sync_established(struct hci_dev *dev, struct timeval *tv,
+ 		if (!util_iov_pull_le16(iov, &handle))
+ 			return;
+ 
+-		conn = conn_lookup_type(dev, handle, CONN_LE_ISO);
++		conn = conn_lookup_type(dev, handle, BTMON_CONN_BIS);
+ 		if (conn)
+ 			conn->setup_seen = true;
+ 	}
+@@ -928,9 +925,13 @@ static void sco_pkt(struct timeval *tv, uint16_t index, bool out,
+ 	dev->num_sco++;
+ 
+ 	conn = conn_lookup_type(dev, le16_to_cpu(hdr->handle) & 0x0fff,
+-								CONN_BR_SCO);
+-	if (!conn)
+-		return;
++							BTMON_CONN_SCO);
++	if (!conn) {
++		conn = conn_lookup_type(dev, le16_to_cpu(hdr->handle) & 0x0fff,
++							BTMON_CONN_ESCO);
++		if (!conn)
++			return;
++	}
+ 
+ 	if (out) {
+ 		conn_pkt_tx(conn, tv, size - sizeof(*hdr), NULL);
+@@ -1015,9 +1016,13 @@ static void iso_pkt(struct timeval *tv, uint16_t index, bool out,
+ 	dev->num_iso++;
+ 
+ 	conn = conn_lookup_type(dev, le16_to_cpu(hdr->handle) & 0x0fff,
+-								CONN_LE_ISO);
+-	if (!conn)
+-		return;
++							BTMON_CONN_CIS);
++	if (!conn) {
++		conn = conn_lookup_type(dev, le16_to_cpu(hdr->handle) & 0x0fff,
++							BTMON_CONN_BIS);
++		if (!conn)
++			return;
++	}
+ 
+ 	if (out) {
+ 		conn_pkt_tx(conn, tv, size - sizeof(*hdr), NULL);
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 3ba33f8f3afa..b8a48bb549af 100644
+index b8a48bb549af..92e23bf3a54b 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -322,6 +322,43 @@ static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
- 		memcpy(conn->dst, dst, sizeof(conn->dst));
- 		conn->dst_type = dst_type;
- 	}
-+
-+	switch (conn->dst_type) {
-+	case 0x00:
-+	case 0x02:
-+		/* If address public set dst_oui */
-+		hwdb_get_company(conn->dst, &conn->dst_oui);
-+		break;
-+	case 0x01:
-+	case 0x03:
-+		/* Attempt to resolve the identity if resolvable */
-+		if ((conn->dst[5] & 0xc0) == 0x40) {
-+			keys_resolve_identity(conn->dst, conn->dst,
-+						&conn->dst_type);
-+			/* If identity address is public set dst_out */
-+			if (conn->dst_type == 0x00 || conn->dst_type == 0x02) {
-+				hwdb_get_company(conn->dst, &conn->dst_oui);
-+				break;
-+			}
-+		}
-+
-+		/* Set the random type */
-+		switch ((conn->dst[5] & 0xc0) >> 6) {
-+		case 0x00:
-+			conn->dst_rtype = strdup("Non-Resolvable");
-+			break;
-+		case 0x01:
-+			conn->dst_rtype = strdup("Resolvable");
-+			break;
-+		case 0x03:
-+			conn->dst_rtype = strdup("Static");
-+			break;
-+		default:
-+			conn->dst_rtype = strdup("Reserved");
-+			break;
-+		}
-+		break;
-+	}
- }
+@@ -221,22 +221,24 @@ static struct index_buf_pool *get_pool(uint16_t index, uint8_t type)
+ 		return NULL;
  
- struct packet_conn_data *packet_get_conn_data(uint16_t handle)
-@@ -329,7 +366,7 @@ struct packet_conn_data *packet_get_conn_data(uint16_t handle)
- 	int i;
- 
- 	for (i = 0; i < MAX_CONN; i++) {
--		if (conn_list[i].handle == handle)
-+		if (conn_list[i].handle == acl_handle(handle))
- 			return &conn_list[i];
+ 	switch (type) {
+-	case 0x00:
++	case BTMON_CONN_ACL:
+ 		if (index_list[index].acl.total)
+ 			return &index_list[index].acl;
+ 		break;
+-	case 0x01:
++	case BTMON_CONN_LE:
+ 		if (index_list[index].le.total)
+ 			return &index_list[index].le;
+ 		break;
+-	case 0x05:
+-		if (index_list[index].iso.total)
+-			return &index_list[index].iso;
+-		break;
+-	default:
++	case BTMON_CONN_SCO:
++	case BTMON_CONN_ESCO:
+ 		if (index_list[index].sco.total)
+ 			return &index_list[index].sco;
+ 		break;
++	case BTMON_CONN_CIS:
++	case BTMON_CONN_BIS:
++		if (index_list[index].iso.total)
++			return &index_list[index].iso;
++		break;
  	}
  
-@@ -14047,6 +14084,43 @@ static void packet_enqueue_tx(struct timeval *tv, uint16_t handle,
- 	queue_push_tail(conn->tx_q, frame);
+ 	return NULL;
+@@ -922,10 +924,30 @@ static void print_lt_addr(uint8_t lt_addr)
+ 	print_field("LT address: %d", lt_addr);
  }
  
-+static void handle_str_append_addr(char *handle_str,
-+					struct packet_conn_data *conn)
++static const char *conn_type_str(uint8_t type)
 +{
-+	if (!conn)
-+		return;
-+
-+	switch (conn->dst_type) {
-+	case 0x00:
-+	case 0x02:
-+		if (conn->dst_oui) {
-+			sprintf(handle_str + strlen(handle_str),
-+				" [%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X (%.16s)]",
-+				conn->dst[5], conn->dst[4], conn->dst[3],
-+				conn->dst[2], conn->dst[1], conn->dst[0],
-+				conn->dst_oui);
-+			return;
-+		}
-+		break;
-+	case 0x01:
-+	case 0x03:
-+		if (conn->dst_rtype) {
-+			sprintf(handle_str + strlen(handle_str),
-+				" [%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X (%.16s)]",
-+				conn->dst[5], conn->dst[4], conn->dst[3],
-+				conn->dst[2], conn->dst[1], conn->dst[0],
-+				conn->dst_rtype);
-+			return;
-+		}
-+		break;
++	switch (type) {
++	case BTMON_CONN_ACL:
++		return "BR-ACL";
++	case BTMON_CONN_LE:
++		return "LE-ACL";
++	case BTMON_CONN_SCO:
++		return "BR-ESCO";
++	case BTMON_CONN_ESCO:
++		return "LE-ESCO";
++	case BTMON_CONN_CIS:
++		return "LE-CIS";
++	case BTMON_CONN_BIS:
++		return "LE-BIS";
++	default:
++		return "unknown";
 +	}
-+
-+	sprintf(handle_str + strlen(handle_str),
-+			" [%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X]",
-+			conn->dst[5], conn->dst[4], conn->dst[3],
-+			conn->dst[2], conn->dst[1], conn->dst[0]);
 +}
 +
- void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 				bool in, const void *data, uint16_t size)
+ static void print_handle_native(uint16_t handle)
  {
-@@ -14054,7 +14128,7 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint16_t dlen = le16_to_cpu(hdr->dlen);
- 	uint8_t flags = acl_flags(handle);
--	char handle_str[22], extra_str[32];
-+	char handle_str[58], extra_str[32];
  	struct packet_conn_data *conn;
- 	struct index_buf_pool *pool = &index_list[index].acl;
+-	char label[25];
++	char label[32];
  
-@@ -14089,6 +14163,8 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	else
- 		sprintf(handle_str, "Handle %d", acl_handle(handle));
- 
-+	handle_str_append_addr(handle_str, conn);
-+
- 	sprintf(extra_str, "flags 0x%2.2x dlen %d", flags, dlen);
- 
- 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_ACLDATA,
-@@ -14118,7 +14194,8 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	const hci_sco_hdr *hdr = data;
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint8_t flags = acl_flags(handle);
--	char handle_str[22], extra_str[32];
-+	char handle_str[42], extra_str[32];
-+	struct packet_conn_data *conn;
- 
- 	if (index >= MAX_INDEX) {
- 		print_field("Invalid index (%d).", index);
-@@ -14140,6 +14217,7 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 
- 	data += HCI_SCO_HDR_SIZE;
- 	size -= HCI_SCO_HDR_SIZE;
-+	conn = packet_get_conn_data(handle);
- 
- 	if (index_list[index].sco.total && !in)
- 		sprintf(handle_str, "Handle %d [%u/%u]", acl_handle(handle),
-@@ -14147,6 +14225,8 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	else
- 		sprintf(handle_str, "Handle %d", acl_handle(handle));
- 
-+	handle_str_append_addr(handle_str, conn);
-+
- 	sprintf(extra_str, "flags 0x%2.2x dlen %d", flags, hdr->dlen);
- 
- 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_SCODATA,
-@@ -14175,8 +14255,9 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	const struct bt_hci_iso_data_start *start;
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint8_t flags = acl_flags(handle);
--	char handle_str[36], extra_str[50], ts_str[16] = { 0 };
-+	char handle_str[56], extra_str[50], ts_str[16] = { 0 };
- 	struct index_buf_pool *pool = &index_list[index].iso;
-+	struct packet_conn_data *conn;
- 	size_t ts_size = 0;
- 
- 	if (index >= MAX_INDEX) {
-@@ -14206,6 +14287,7 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 	conn = packet_get_conn_data(handle);
+ 	if (!conn) {
+@@ -933,7 +955,8 @@ static void print_handle_native(uint16_t handle)
+ 		return;
  	}
  
- 	start = data;
-+	conn = packet_get_conn_data(handle);
+-	sprintf(label, "Handle: %d Address", handle);
++	sprintf(label, "Handle: %d (%s) Address", handle,
++				conn_type_str(conn->type));
+ 	print_addr(label, conn->dst, conn->dst_type);
+ }
  
- 	if (!in && pool->total)
- 		sprintf(handle_str, "Handle %d [%u/%u] SN %u",
-@@ -14214,6 +14296,8 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 		sprintf(handle_str, "Handle %u SN %u", acl_handle(handle),
- 			start->sn);
+@@ -10996,7 +11019,7 @@ static void conn_complete_evt(struct timeval *tv, uint16_t index,
+ 	print_enable("Encryption", evt->encr_mode);
  
-+	handle_str_append_addr(handle_str, conn);
-+
- 	sprintf(extra_str, "flags 0x%2.2x dlen %u slen %u%s", flags, hdr->dlen,
- 							start->slen, ts_str);
+ 	if (evt->status == 0x00)
+-		assign_handle(index, le16_to_cpu(evt->handle), 0x00,
++		assign_handle(index, le16_to_cpu(evt->handle), BTMON_CONN_ACL,
+ 					(void *)evt->bdaddr, BDADDR_BREDR);
+ }
+ 
+@@ -11583,7 +11606,9 @@ static void sync_conn_complete_evt(struct timeval *tv, uint16_t index,
+ 	print_air_mode(evt->air_mode);
+ 
+ 	if (evt->status == 0x00)
+-		assign_handle(index, le16_to_cpu(evt->handle), evt->link_type,
++		assign_handle(index, le16_to_cpu(evt->handle),
++					evt->link_type ? BTMON_CONN_ESCO :
++					BTMON_CONN_SCO,
+ 					(void *)evt->bdaddr, BDADDR_BREDR);
+ }
+ 
+@@ -12014,7 +12039,7 @@ static void le_conn_complete_evt(struct timeval *tv, uint16_t index,
+ 	print_field("Central clock accuracy: 0x%2.2x", evt->clock_accuracy);
+ 
+ 	if (evt->status == 0x00)
+-		assign_handle(index, le16_to_cpu(evt->handle), 0x01,
++		assign_handle(index, le16_to_cpu(evt->handle), BTMON_CONN_LE,
+ 				(void *)evt->peer_addr, evt->peer_addr_type);
+ }
+ 
+@@ -12145,7 +12170,7 @@ static void le_enhanced_conn_complete_evt(struct timeval *tv, uint16_t index,
+ 	print_field("Central clock accuracy: 0x%2.2x", evt->clock_accuracy);
+ 
+ 	if (evt->status == 0x00)
+-		assign_handle(index, le16_to_cpu(evt->handle), 0x01,
++		assign_handle(index, le16_to_cpu(evt->handle), BTMON_CONN_LE,
+ 				(void *)evt->peer_addr, evt->peer_addr_type);
+ }
+ 
+@@ -12545,7 +12570,8 @@ static void le_cis_established_evt(struct timeval *tv, uint16_t index,
+ 	print_slot_125("ISO Interval", evt->interval);
+ 
+ 	if (!evt->status)
+-		assign_handle(index, le16_to_cpu(evt->conn_handle), 0x05,
++		assign_handle(index, le16_to_cpu(evt->conn_handle),
++					BTMON_CONN_CIS,
+ 					NULL, BDADDR_LE_PUBLIC);
+ }
+ 
+@@ -12596,7 +12622,8 @@ static void le_big_complete_evt(struct timeval *tv, uint16_t index,
+ 
+ 		for (i = 0; i < evt->num_bis; i++)
+ 			assign_handle(index, le16_to_cpu(evt->bis_handle[i]),
+-					0x05, NULL, BDADDR_LE_PUBLIC);
++					BTMON_CONN_BIS, NULL,
++					BDADDR_LE_PUBLIC);
+ 	}
+ }
+ 
+@@ -12631,7 +12658,7 @@ static void le_big_sync_estabilished_evt(struct timeval *tv, uint16_t index,
+ 
+ 		for (i = 0; i < evt->num_bis; i++)
+ 			assign_handle(index, le16_to_cpu(evt->bis[i]),
+-					0x05, NULL, BDADDR_LE_PUBLIC);
++					BTMON_CONN_BIS, NULL, BDADDR_LE_PUBLIC);
+ 	}
+ }
  
 diff --git a/monitor/packet.h b/monitor/packet.h
-index 2990b795bd3e..f6547ec9b594 100644
+index f6547ec9b594..38f3f5514dba 100644
 --- a/monitor/packet.h
 +++ b/monitor/packet.h
-@@ -47,6 +47,10 @@ struct packet_conn_data {
- 	uint8_t  type;
- 	uint8_t  dst[6];
- 	uint8_t  dst_type;
-+	union {
-+		char *dst_oui;
-+		char *dst_rtype;
-+	};
- 	struct queue *tx_q;
- 	struct queue *chan_q;
- 	struct packet_latency tx_l;
+@@ -39,6 +39,15 @@ struct packet_frame {
+ 	size_t len;
+ };
+ 
++enum {
++	BTMON_CONN_ACL = 0x00,
++	BTMON_CONN_LE,
++	BTMON_CONN_SCO,
++	BTMON_CONN_ESCO,
++	BTMON_CONN_CIS,
++	BTMON_CONN_BIS
++};
++
+ struct packet_conn_data {
+ 	uint16_t index;
+ 	uint8_t  src[6];
 -- 
 2.52.0
 
