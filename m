@@ -1,69 +1,69 @@
 Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C9435EDC5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 17:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4C835F8D6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 17:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771608699; cv=none; b=NXk1LPHm7l6xsKYHn8KFXYkKRiEv9n+jWlNYX0IHw7ZnEriZ9fb/EcAMD638iogsQO8Ag9hFITm1ihMWuwrhXm8XRZx9i6qohZAJaXFCfCh88QzXR7saQR/BYm5XMzL68u0qdZbiuc3HjxkUudcOrRluQZF1xxV/aE2znlrSIYg=
+	t=1771608701; cv=none; b=Jh8aGO1UcKqt7E5jWzH7g4CdQrjfqd1uCKZoI3Nl7U6+X/CuirnOyXuulOCVoqTtIam9VoM1vxlkcMzAarksr600x/+YS6mTYsupDAcReZVudLgID4fkIOOmnZZ/KkhNO4SUUjYVKe8Y0KLDmZ3UhmkhFSWy1NoUTD12QDvdZ0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771608699; c=relaxed/simple;
-	bh=rq8gA2Zi8hu3QVzF+EwZmlaUdQSIIt8EvCh3wXvGGmI=;
+	s=arc-20240116; t=1771608701; c=relaxed/simple;
+	bh=DghqkDSZnJx7xPBxaYg1VtWc4EQewhnEUuHyrdZoayQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lOMWv6Scez4owjGM54nWdpij62Z87S36iFyPqnvdFjF27r2REStnWMboDZGH0pTSec4wDKGIAeVM70c2HPnPPM/h2euGzjd5arIGQbUsUpYJ/fNcMWkn3/nSPoIkaqGq97gCY37uBakt9z8fAzwy2yPFec8bdlSMMaBwqWokweI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UhbqwTEv; arc=none smtp.client-ip=209.85.221.178
+	 MIME-Version; b=QkSwMBQ01JtOP44GixRSDEEyf7mQvmdOO6ScFRFnwREa0jyL0/GJfUbh8M0eGPkNU2ySs5CzgmX0EPUVIusZTo8gpbtf5+eVYUz1czMENtld4p1X+I/GXXXQB47W7FPkeB2iOIzKU5Em8BPLbLRuitGQzA27vQaaeleIG6MvKZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DdLeni3a; arc=none smtp.client-ip=209.85.221.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UhbqwTEv"
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5688b9e4e80so2148436e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 09:31:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DdLeni3a"
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5662c2937fdso2110977e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 09:31:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771608695; x=1772213495; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771608699; x=1772213499; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=iOC0amBgOry/fS/cge6IzaEDhIf74Qzynj9rOeaTjlY=;
-        b=UhbqwTEvAo4nRVp/l6NGxzyS7EA63Ic8QEPTABJM1r9Qjuwz48Y1L2z3/gxWj6nPjA
-         od1OBT5RN03PDi68Rgkg0I3sE+8WFet6KtSFQncVG5XgoPUoFeYKMCOnLCu2Igry9EHS
-         p9uja/7ciGuIH0qJai1wuzTXLrsBk+pE21VN9aZb58EwVnjwFnxzohuvqBjn8g7troaR
-         OUJJobcqznW2M9Izu+9XeFve4mj2yJoSQY1cu+TqSlaomlWFenQeZjUR5SSot9o8vSVx
-         IUhWs3FJC2TdKNjwKn7qg/VJqyDlOR4NosaO//hhYFFobHJ5LLnzW3qgCS+KhCiA/qId
-         /fcA==
+        bh=+fFwFRec0/iMaA81v94JZTtdiByYb3b+1BAjF09gg5c=;
+        b=DdLeni3aCeQ4rK5MEW1O/OJdSEpP634OE6T+9oKRrZdWVQ7J0yPtKEFZSAbnb8NqNr
+         N6xHtper2yV30kD1zSoVd07m3efYRKjOe6eqj6HqRRrdkJud7llRboms8vty7CFFVNKt
+         6bsDdzDq4QcXdU55201/wllkfLmXS2PBwII7Io9M7k4ldPuwjeGKqt39TMKCr8wE/7yD
+         FeWKmODp4KIwn3TDyQHY4ZIaSMIixoOAX9mPesqj7AmVu1IVylWYDOAvqJkYvFpZr7UF
+         Uxssf+/ZqgYQDu0v7PgrKBCtJGkkVDdtneIwNt4udlVGLqaVLuVWwrVZ2/dIvFPOEnBM
+         7CAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771608695; x=1772213495;
+        d=1e100.net; s=20230601; t=1771608699; x=1772213499;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=iOC0amBgOry/fS/cge6IzaEDhIf74Qzynj9rOeaTjlY=;
-        b=TluCoSXXtiyUJL0UqUTy59xgnZ0ABJ/p7Ic1fKL7xYW0hnyPPokxOmI9S6+6xSZlHb
-         ZO7h47XtxYP8RzbX1SLLCLzzp/U+xlsh0qi41MBkZ9H1iSIesy0DiyUrg1Jqa3lbFGXo
-         Veq1AaylinkYccjObEdoMO0cLkUvG2THhlMNMlYgN+Y+6R9Lapk83ugd+1+UiOi9IHNN
-         sZ9xqW/PYrmcdNpmC7tc7mNjrquqGNQE4r5l4o4jT3ygcpCTB/y+E88mB63bIIjTmg+R
-         iEkKAaOlEuHwvLPmj17Zf8pdtO7InwxRBdx9Yv8oQgHGQuNhII2TDdLnd5jdJ1PGPvVe
-         fweQ==
-X-Gm-Message-State: AOJu0YzbCDOhrFheu/V7W7u5bMdiWAM2EtUeJt/q1507DWfE0lAyxnKt
-	Z9ucjJhjFbRp+vEb2AU+58H+PSpZQ4Ix2+pmv6ePdxfU00u3OSXo1kgEoU9RZw==
-X-Gm-Gg: AZuq6aJ6Sd6o+9VpUkBvEBofB1rtAgNw67FBfVL7E9xjQ8MebW2a13eQkqQsHMVdd6J
-	D3LyQ3ZHG3gisXhkrI8BL2+vJpOwzYAMhgQw+ySrizqMGHlZpIlr/6Re+1jl/5z6BD63it4R0cx
-	6UC7r2/n3ehBgKK1kgJ6DfRi/kOzs2uRWKznx3SzAehZ6QXf9X183WzBOS8fkIPZYELmfF+CabM
-	Bwub5XDG8zkWogv6Tf55M3LgPGTXrhA8ySqOr2msS79nSaJqsp3EdDYE+K2TknHzk2i+dd3oLLR
-	DUE+psTq1muhq2SL1EdXG3MkFUDrvm74Sqc0LGrdlrBvJ5Xu9hqwuNxgcACgvsVQlRLrBm3loky
-	NurJSy2f0hMJxkxcoI6tDlogX2fyNdF3JNuLt/fyELAB8vIp0BuBvrjOb80epXTjfteKyDSLC+o
-	8Lgho6qEIc7W30/CnB8hxCmWzd5STtJE8A0lTsELlNnEbPv2NPiXZYzTqm8gbJ53tHwY96djtQ5
-	ynDxSoIqN6BxJYUYVoes0Q385c2
-X-Received: by 2002:a05:6122:4b13:b0:567:4f98:fb82 with SMTP id 71dfb90a1353d-568e465dcccmr285346e0c.7.1771608695197;
-        Fri, 20 Feb 2026 09:31:35 -0800 (PST)
+        bh=+fFwFRec0/iMaA81v94JZTtdiByYb3b+1BAjF09gg5c=;
+        b=AvPd4sc5Mcf/IMMi4zI+0V5h6ztK+dnMloVoOBIRg8f1Q0rAXR7dHGhPXfdaqcQ9BF
+         LwCaW6oLtaywt7qaGHl01PdP0LLfOAtYJBjUR60j0hkrU2WTXNaopaoAeJeexhYEDpc3
+         4ZN281Yu0fy/R09MViBaGeAQITsuHt6O5dPmxHMsv2BQbKxqben0rXluwfntZVYXD3tH
+         R3AQSF8+4M30SDeI4uPqNeTFrKIPmXxwJtNUeX7bAL1viH+HdBKq8r2PH+gprIjtofIJ
+         jZqN04XsBlK1X40ud25Lp3iMjGPcexliyJPjrz0EafCK2xzHzC/BqvPy49sgCmEDr/wN
+         y4pg==
+X-Gm-Message-State: AOJu0Yy+H+fP8yVGqNh5Mk+zzWMNGE6w+C5N0UNJKjnSmt1zdwlNDpUa
+	F7skk3KX+rrLoekdlofdq/hTfx8vEeZuOEFbA6nZcgk/3wZ7lJZNV6mhDmrliQ==
+X-Gm-Gg: AZuq6aJUnwyWDThN9ChrzRYYGDbmZVAirNY0mAWdRBFm3iPxFSGS9H8yfjx4hN+F6UO
+	OgQrH+pRYcWsoDdUT34aVgw3kpH8FA0MCH39f8RHFg3udrsyoxyyBR5cQ7UzZ1XCWxfmOHw/aLk
+	Yp0XRqYzgeG0hHwv4cCt9j3TnWSvEzkpFxn/1RG/VYBJQCl+JBuUO/bcrYNfEn49KnnnTp5zCEI
+	IFJrlheL2t8oBqbpMpMCc+AVa0QtG17qiUNr0DdnQoRlT08ZlyrYCD+uqvVPJ/6hWv8WziZ685D
+	/bG32Kmb2Lm8+TRodmS2cjkNyO0uUs4W2RXBf6Y9AU3jozOF9YNTLuK0xISSk2dQ7hKdtIzI359
+	f/pn9q/WDUdez2+sRqeG/5wsgRrpe7PnuRy6jWiNGmffpDT3YZ2Stb1JpNPjK3Jd7LDHpymZfnK
+	V9U6yspQCksBpRZ5QDK22poF6+T+EZlZhbevDG9LyArsuTquoiig71VyKtrBkxozxsDnezKytz/
+	OJcn6Ub8pNFuJXrig==
+X-Received: by 2002:a05:6122:3c4e:b0:559:6788:7b55 with SMTP id 71dfb90a1353d-568e452a42emr316290e0c.3.1771608696948;
+        Fri, 20 Feb 2026 09:31:36 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94da8b3eefdsm77864241.9.2026.02.20.09.31.34
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94da8b3eefdsm77864241.9.2026.02.20.09.31.36
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Feb 2026 09:31:34 -0800 (PST)
+        Fri, 20 Feb 2026 09:31:36 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 06/12] doc: add btsnoop protocol manpage
-Date: Fri, 20 Feb 2026 12:31:10 -0500
-Message-ID: <20260220173120.3418666-6-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 08/12] monitor: Annotate ACL/SCO/ISO data with device address
+Date: Fri, 20 Feb 2026 12:31:12 -0500
+Message-ID: <20260220173120.3418666-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260220173120.3418666-1-luiz.dentz@gmail.com>
 References: <20260220173120.3418666-1-luiz.dentz@gmail.com>
@@ -77,459 +77,218 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add manpage-style RST doc/btsnoop-protocol.rst and synchronize opcodes
-with src/shared/btsnoop.h.
----
- Makefile.am              |   7 +-
- doc/btsnoop-protocol.rst | 221 +++++++++++++++++++++++++++++++++++++++
- doc/btsnoop.txt          | 178 -------------------------------
- 3 files changed, 225 insertions(+), 181 deletions(-)
- create mode 100644 doc/btsnoop-protocol.rst
- delete mode 100644 doc/btsnoop.txt
+Add the remote device address to ACL, SCO and ISO data packet output
+so each data packet line shows which device it belongs to. This makes
+it much easier to follow multi-device traces without having to
+cross-reference handle numbers with earlier connection events:
 
-diff --git a/Makefile.am b/Makefile.am
-index 064ee91698e2..dee6aa6d0d9b 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -367,7 +367,8 @@ CLEANFILES += $(builtin_files)
+< ACL Data TX: Handle 2048 [1/6] [42:96:D7:49:78:CC (Resolvable)] flags 0x00 dlen 7
+      ATT: Exchange MTU Request (0x02) len 2
+        Client RX MTU: 527
+> ACL Data RX: Handle 256 [20:32:C6:09:FF:6C (Apple, Inc.)] flags 0x02 dlen 16
+      L2CAP: Connection Response (0x03) ident 33 len 8
+        Destination CID: 17169
+        Source CID: 64
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+
+Also fix the connection lookup in packet_hci_acldata() to use
+acl_handle() to mask off the flags bits, matching what assign_handle()
+stores.
+---
+ monitor/packet.c | 92 +++++++++++++++++++++++++++++++++++++++++++++---
+ monitor/packet.h |  4 +++
+ 2 files changed, 92 insertions(+), 4 deletions(-)
+
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 3ba33f8f3afa..b8a48bb549af 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -322,6 +322,43 @@ static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
+ 		memcpy(conn->dst, dst, sizeof(conn->dst));
+ 		conn->dst_type = dst_type;
+ 	}
++
++	switch (conn->dst_type) {
++	case 0x00:
++	case 0x02:
++		/* If address public set dst_oui */
++		hwdb_get_company(conn->dst, &conn->dst_oui);
++		break;
++	case 0x01:
++	case 0x03:
++		/* Attempt to resolve the identity if resolvable */
++		if ((conn->dst[5] & 0xc0) == 0x40) {
++			keys_resolve_identity(conn->dst, conn->dst,
++						&conn->dst_type);
++			/* If identity address is public set dst_out */
++			if (conn->dst_type == 0x00 || conn->dst_type == 0x02) {
++				hwdb_get_company(conn->dst, &conn->dst_oui);
++				break;
++			}
++		}
++
++		/* Set the random type */
++		switch ((conn->dst[5] & 0xc0) >> 6) {
++		case 0x00:
++			conn->dst_rtype = strdup("Non-Resolvable");
++			break;
++		case 0x01:
++			conn->dst_rtype = strdup("Resolvable");
++			break;
++		case 0x03:
++			conn->dst_rtype = strdup("Static");
++			break;
++		default:
++			conn->dst_rtype = strdup("Reserved");
++			break;
++		}
++		break;
++	}
+ }
  
- if MANPAGES
- man_MANS += doc/bluetoothd.8
--man_MANS += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7 doc/iso.7
-+man_MANS += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7 doc/iso.7 \
-+		doc/btsnoop.7
- man_MANS += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
- 		doc/org.bluez.Bearer.LE.5 doc/org.bluez.Bearer.BREDR.5 \
- 		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
-@@ -407,7 +408,7 @@ man_MANS += doc/org.bluez.ThermometerManager.5 \
- endif
- manual_pages += doc/bluetoothd.8
- manual_pages += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7 \
--		doc/iso.7
-+		doc/iso.7 doc/btsnoop.7
- manual_pages += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
- 		doc/org.bluez.Bearer.LE.5 doc/org.bluez.Bearer.BREDR.5 \
- 		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
-@@ -535,7 +536,7 @@ EXTRA_DIST += doc/org.bluez.ThermometerManager.rst \
- EXTRA_DIST += doc/pics-opp.txt doc/pixit-opp.txt \
- 		doc/pts-opp.txt
+ struct packet_conn_data *packet_get_conn_data(uint16_t handle)
+@@ -329,7 +366,7 @@ struct packet_conn_data *packet_get_conn_data(uint16_t handle)
+ 	int i;
  
--EXTRA_DIST += doc/btsnoop.txt
-+EXTRA_DIST += doc/btsnoop-protocol.rst
+ 	for (i = 0; i < MAX_CONN; i++) {
+-		if (conn_list[i].handle == handle)
++		if (conn_list[i].handle == acl_handle(handle))
+ 			return &conn_list[i];
+ 	}
  
- EXTRA_DIST += tools/magic.btsnoop
+@@ -14047,6 +14084,43 @@ static void packet_enqueue_tx(struct timeval *tv, uint16_t handle,
+ 	queue_push_tail(conn->tx_q, frame);
+ }
  
-diff --git a/doc/btsnoop-protocol.rst b/doc/btsnoop-protocol.rst
-new file mode 100644
-index 000000000000..a875db63a9dd
---- /dev/null
-+++ b/doc/btsnoop-protocol.rst
-@@ -0,0 +1,221 @@
-+=======
-+btsnoop
-+=======
++static void handle_str_append_addr(char *handle_str,
++					struct packet_conn_data *conn)
++{
++	if (!conn)
++		return;
 +
-+-------------------------------------------
-+BTSnoop/Monitor protocol documentation
-+-------------------------------------------
++	switch (conn->dst_type) {
++	case 0x00:
++	case 0x02:
++		if (conn->dst_oui) {
++			sprintf(handle_str + strlen(handle_str),
++				" [%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X (%.16s)]",
++				conn->dst[5], conn->dst[4], conn->dst[3],
++				conn->dst[2], conn->dst[1], conn->dst[0],
++				conn->dst_oui);
++			return;
++		}
++		break;
++	case 0x01:
++	case 0x03:
++		if (conn->dst_rtype) {
++			sprintf(handle_str + strlen(handle_str),
++				" [%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X (%.16s)]",
++				conn->dst[5], conn->dst[4], conn->dst[3],
++				conn->dst[2], conn->dst[1], conn->dst[0],
++				conn->dst_rtype);
++			return;
++		}
++		break;
++	}
 +
-+:Version: BlueZ
-+:Copyright: Free use of this software is granted under the terms of the GNU
-+            Lesser General Public Licenses (LGPL).
-+:Date: February 2026
-+:Manual section: 7
-+:Manual group: Linux System Administration
++	sprintf(handle_str + strlen(handle_str),
++			" [%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X]",
++			conn->dst[5], conn->dst[4], conn->dst[3],
++			conn->dst[2], conn->dst[1], conn->dst[0]);
++}
 +
-+SYNOPSIS
-+========
+ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 				bool in, const void *data, uint16_t size)
+ {
+@@ -14054,7 +14128,7 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 	uint16_t handle = le16_to_cpu(hdr->handle);
+ 	uint16_t dlen = le16_to_cpu(hdr->dlen);
+ 	uint8_t flags = acl_flags(handle);
+-	char handle_str[22], extra_str[32];
++	char handle_str[58], extra_str[32];
+ 	struct packet_conn_data *conn;
+ 	struct index_buf_pool *pool = &index_list[index].acl;
+ 
+@@ -14089,6 +14163,8 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 	else
+ 		sprintf(handle_str, "Handle %d", acl_handle(handle));
+ 
++	handle_str_append_addr(handle_str, conn);
 +
-+This document describes the BTSnoop/Monitor formats used to record and
-+transport HCI/PHY traffic. The formats are used by tools such as btmon and the
-+BlueZ btsnoop implementation.
+ 	sprintf(extra_str, "flags 0x%2.2x dlen %d", flags, dlen);
+ 
+ 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_ACLDATA,
+@@ -14118,7 +14194,8 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 	const hci_sco_hdr *hdr = data;
+ 	uint16_t handle = le16_to_cpu(hdr->handle);
+ 	uint8_t flags = acl_flags(handle);
+-	char handle_str[22], extra_str[32];
++	char handle_str[42], extra_str[32];
++	struct packet_conn_data *conn;
+ 
+ 	if (index >= MAX_INDEX) {
+ 		print_field("Invalid index (%d).", index);
+@@ -14140,6 +14217,7 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 
+ 	data += HCI_SCO_HDR_SIZE;
+ 	size -= HCI_SCO_HDR_SIZE;
++	conn = packet_get_conn_data(handle);
+ 
+ 	if (index_list[index].sco.total && !in)
+ 		sprintf(handle_str, "Handle %d [%u/%u]", acl_handle(handle),
+@@ -14147,6 +14225,8 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 	else
+ 		sprintf(handle_str, "Handle %d", acl_handle(handle));
+ 
++	handle_str_append_addr(handle_str, conn);
 +
-+DESCRIPTION
-+===========
+ 	sprintf(extra_str, "flags 0x%2.2x dlen %d", flags, hdr->dlen);
+ 
+ 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_SCODATA,
+@@ -14175,8 +14255,9 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 	const struct bt_hci_iso_data_start *start;
+ 	uint16_t handle = le16_to_cpu(hdr->handle);
+ 	uint8_t flags = acl_flags(handle);
+-	char handle_str[36], extra_str[50], ts_str[16] = { 0 };
++	char handle_str[56], extra_str[50], ts_str[16] = { 0 };
+ 	struct index_buf_pool *pool = &index_list[index].iso;
++	struct packet_conn_data *conn;
+ 	size_t ts_size = 0;
+ 
+ 	if (index >= MAX_INDEX) {
+@@ -14206,6 +14287,7 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 	}
+ 
+ 	start = data;
++	conn = packet_get_conn_data(handle);
+ 
+ 	if (!in && pool->total)
+ 		sprintf(handle_str, "Handle %d [%u/%u] SN %u",
+@@ -14214,6 +14296,8 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 		sprintf(handle_str, "Handle %u SN %u", acl_handle(handle),
+ 			start->sn);
+ 
++	handle_str_append_addr(handle_str, conn);
 +
-+Opcode definitions
-+------------------
-+
-+The following opcodes are used by the BTSnoop/Monitor formats. The numeric
-+values match the definitions in ``src/shared/btsnoop.h``.
-+
-+.. list-table:: BTSnoop opcodes
-+   :header-rows: 1
-+
-+   * - Name
-+     - Code (dec)
-+     - Code (hex)
-+     - Meaning
-+   * - BTSNOOP_OPCODE_NEW_INDEX
-+     - 0
-+     - 0x0000
-+     - New controller index (parameters: type, bus, bdaddr, name)
-+   * - BTSNOOP_OPCODE_DEL_INDEX
-+     - 1
-+     - 0x0001
-+     - Deleted controller index
-+   * - BTSNOOP_OPCODE_COMMAND_PKT
-+     - 2
-+     - 0x0002
-+     - HCI Command packet
-+   * - BTSNOOP_OPCODE_EVENT_PKT
-+     - 3
-+     - 0x0003
-+     - HCI Event packet
-+   * - BTSNOOP_OPCODE_ACL_TX_PKT
-+     - 4
-+     - 0x0004
-+     - Outgoing ACL packet
-+   * - BTSNOOP_OPCODE_ACL_RX_PKT
-+     - 5
-+     - 0x0005
-+     - Incoming ACL packet
-+   * - BTSNOOP_OPCODE_SCO_TX_PKT
-+     - 6
-+     - 0x0006
-+     - Outgoing SCO packet
-+   * - BTSNOOP_OPCODE_SCO_RX_PKT
-+     - 7
-+     - 0x0007
-+     - Incoming SCO packet
-+   * - BTSNOOP_OPCODE_OPEN_INDEX
-+     - 8
-+     - 0x0008
-+     - HCI transport for the specified controller opened
-+   * - BTSNOOP_OPCODE_CLOSE_INDEX
-+     - 9
-+     - 0x0009
-+     - HCI transport for the specified controller closed
-+   * - BTSNOOP_OPCODE_INDEX_INFO
-+     - 10
-+     - 0x000a
-+     - Index information (parameters: bdaddr, manufacturer)
-+   * - BTSNOOP_OPCODE_VENDOR_DIAG
-+     - 11
-+     - 0x000b
-+     - Vendor diagnostic information
-+   * - BTSNOOP_OPCODE_SYSTEM_NOTE
-+     - 12
-+     - 0x000c
-+     - System note
-+   * - BTSNOOP_OPCODE_USER_LOGGING
-+     - 13
-+     - 0x000d
-+     - User logging (parameters: priority, ident_len, ident)
-+   * - BTSNOOP_OPCODE_CTRL_OPEN
-+     - 14
-+     - 0x000e
-+     - Control channel opened
-+   * - BTSNOOP_OPCODE_CTRL_CLOSE
-+     - 15
-+     - 0x000f
-+     - Control channel closed
-+   * - BTSNOOP_OPCODE_CTRL_COMMAND
-+     - 16
-+     - 0x0010
-+     - Control command packet
-+   * - BTSNOOP_OPCODE_CTRL_EVENT
-+     - 17
-+     - 0x0011
-+     - Control event packet
-+   * - BTSNOOP_OPCODE_ISO_TX_PKT
-+     - 18
-+     - 0x0012
-+     - Outgoing ISO packet
-+   * - BTSNOOP_OPCODE_ISO_RX_PKT
-+     - 19
-+     - 0x0013
-+     - Incoming ISO packet
-+
-+New Index
-+---------
-+
-+Code: 0x0000
-+
-+Parameters:
-+
-+- Type (1 octet)
-+- Bus (1 octet)
-+- BD_Addr (6 octets)
-+- Name (8 octets)
-+
-+This opcode indicates that a new controller instance with a given index was
-+added. With some transports (for example a single TTY device) the index is
-+implicitly 0.
-+
-+Deleted Index
-+-------------
-+
-+Code: 0x0001
-+
-+Indicates that the controller with a specific index was removed.
-+
-+TTY-based protocol
-+------------------
-+
-+The TTY protocol used by btmon with the ``--tty`` option is a little-endian
-+packet format. Each packet uses this header::
-+
-+    struct tty_hdr {
-+        uint16_t data_len;
-+        uint16_t opcode;
-+        uint8_t  flags;
-+        uint8_t  hdr_len;
-+        uint8_t  ext_hdr[0];
-+    } __attribute__ ((packed));
-+
-+The payload starts at ``ext_hdr + hdr_len`` and has length
-+``data_len - 4 - hdr_len``.
-+
-+Extended header format
-+----------------------
-+
-+Each extension field is encoded as::
-+
-+    struct {
-+        uint8_t type;
-+        uint8_t value[length];
-+    };
-+
-+Defined types:
-+
-+.. list-table:: Extended header types
-+   :header-rows: 1
-+
-+   * - Type
-+     - Length
-+     - Meaning
-+   * - 1
-+     - 1 byte
-+     - Command drops (dropped HCI command packets)
-+   * - 2
-+     - 1 byte
-+     - Event drops (dropped HCI event packets)
-+   * - 3
-+     - 1 byte
-+     - ACL TX drops
-+   * - 4
-+     - 1 byte
-+     - ACL RX drops
-+   * - 5
-+     - 1 byte
-+     - SCO TX drops
-+   * - 6
-+     - 1 byte
-+     - SCO RX drops
-+   * - 7
-+     - 1 byte
-+     - Other drops
-+   * - 8
-+     - 4 bytes
-+     - 32-bit timestamp (1/10th ms)
-+
-+The drops fields contain the number of packets the implementation had to drop
-+since the last reported drop count. Extension fields must be sorted by
-+increasing ``type`` so unknown types can be skipped and the payload location
-+discovered.
-+
-+RESOURCES
-+=========
-+
-+http://www.bluez.org
-+
-+REPORTING BUGS
-+==============
-+
-+linux-bluetooth@vger.kernel.org
-+
-+SEE ALSO
-+========
-+
-+btmon(1)
-diff --git a/doc/btsnoop.txt b/doc/btsnoop.txt
-deleted file mode 100644
-index 975a53f6dd44..000000000000
---- a/doc/btsnoop.txt
-+++ /dev/null
-@@ -1,178 +0,0 @@
--BTSnoop/Monitor protocol formats
--********************************
--
--Opcode definitions
--==================
--
--New Index
-----------
--
--	Code:        0x0000
--	Parameters:  Type (1 Octet
--		     Bus (1 Octet)
--		     BD_Addr (6 Octets)
--		     Name (8 Octets)
--
--	This opcode indicates that a new controller instance with a
--	given index was added. With some protocols, like the TTY-based
--	one there is only a single supported controller, meaning the
--	index is implicitly 0.
--
--Deleted Index
---------------
--
--	Code:        0x0001
--
--	This opcode indicates that the controller with a specific index
--	was removed.
--
--Command Packet
----------------
--
--	Code:        0x0002
--
--	HCI command packet.
--
--Event Packet
--------------
--
--	Code:        0x0003
--
--	HCI event packet.
--
--ACL TX Packet
---------------
--
--	Code:        0x0004
--
--	Outgoing ACL packet.
--
--ACL RX Packet
---------------
--
--	Code:        0x0005
--
--	Incoming ACL packet.
--
--SCO TX Packet
----------------
--
--	Code:        0x0006
--
--	Outgoing SCO packet.
--
--SCO RX Packet
---------------
--
--	Code:        0x0007
--
--	Incomnig SCO packet.
--
--Open Index
------------
--
--	Code:        0x0008
--
--	The HCI transport for the specified controller has been opened.
--
--Close Index
-------------
--
--	Code:        0x0009
--
--	The HCI transport for the specified controller has been closed.
--
--Index Information
-------------------
--
--	Code:        0x000a
--	Parameters:  BD_Addr (6 Octets)
--		     Manufacturer (2 Octets)
--
--	Information about a specific controller.
--
--Vendor Diagnostics
--------------------
--
--	Code:        0x000b
--
--	Vendor diagnostic information.
--
--System Note
-------------
--
--	Code:        0x000c
--
--	System note.
--
--User Logging
--------------
--
--	Code:        0x000d
--	Parameters:  Priority (1 Octet)
--		     Ident_Length (1 Octet)
--		     Ident (Ident_Length Octets)
--
--	User logging information.
--
--
--TTY-based protocol
--==================
--
--This section covers the protocol that can be parsed by btmon when
--passing it the --tty parameter. The protocol is little endian, packet
--based, and has the following header for each packet:
--
--struct tty_hdr {
--	uint16_t data_len;
--	uint16_t opcode;
--	uint8_t  flags;
--	uint8_t  hdr_len;
--	uint8_t  ext_hdr[0];
--} __attribute__ ((packed));
--
--The actual payload starts at ext_hdr + hdr_len and has the length of
--data_len - 4 - hdr_len. Each field of the header is defined as follows:
--
--data_len:
--	This is the total length of the entire packet, excuding the
--	data_len field itself.
--
--opcode:
--	The BTSnoop opcode
--
--flags:
--	Special flags for the packet. Currently no flags are defined.
--
--hdr_len:
--	Length of the extended header.
--
--ext_hdr:
--	This is a sequence of header extension fields formatted as:
--
--	struct {
--		uint8_t type;
--		uint8_t value[length];
--	}
--
--	The length of the value is dependent on the type. Currently the
--	following types are defined:
--
--	Type                 Length    Meaning
--	----------------------------------------------------------------
--	1  Command drops     1 byte    Dropped HCI command packets
--	2  Event drops       1 byte    Dropped HCI event packets
--	3  ACL TX drops      1 byte    Dropped ACL TX packets
--	4  ACL RX drops      1 byte    Dropped ACL RX packets
--	5  SCO TX drops      1 byte    Dropped SCO TX packets
--	6  SCO RX drops      1 byte    Dropped SCO RX packets
--	7  Other drops       1 byte    Dropped other packets
--	8  32-bit timestamp  4 bytes   Timestamp in 1/10th ms
--
--	The drops fields indicate the number of packets that the
--	implementation had to drop (e.g. due to lack of buffers) since
--	the last reported drop count.
--
--	The fields of the extended header must be sorted by increasing
--	type. This is essential so that unknown types can be ignored and
--	the parser can jump to processing the payload.
+ 	sprintf(extra_str, "flags 0x%2.2x dlen %u slen %u%s", flags, hdr->dlen,
+ 							start->slen, ts_str);
+ 
+diff --git a/monitor/packet.h b/monitor/packet.h
+index 2990b795bd3e..f6547ec9b594 100644
+--- a/monitor/packet.h
++++ b/monitor/packet.h
+@@ -47,6 +47,10 @@ struct packet_conn_data {
+ 	uint8_t  type;
+ 	uint8_t  dst[6];
+ 	uint8_t  dst_type;
++	union {
++		char *dst_oui;
++		char *dst_rtype;
++	};
+ 	struct queue *tx_q;
+ 	struct queue *chan_q;
+ 	struct packet_latency tx_l;
 -- 
 2.52.0
 
