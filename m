@@ -1,69 +1,69 @@
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-vk1-f194.google.com (mail-vk1-f194.google.com [209.85.221.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4C835F8D6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 17:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D69035F8D3
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 17:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771608701; cv=none; b=Jh8aGO1UcKqt7E5jWzH7g4CdQrjfqd1uCKZoI3Nl7U6+X/CuirnOyXuulOCVoqTtIam9VoM1vxlkcMzAarksr600x/+YS6mTYsupDAcReZVudLgID4fkIOOmnZZ/KkhNO4SUUjYVKe8Y0KLDmZ3UhmkhFSWy1NoUTD12QDvdZ0U=
+	t=1771608701; cv=none; b=g9rX7VpzT3YkkFaW5ywNCgB2qu7C4KrQOa6xOOfya+w7X8lVVhMRVsOieObLqx5WzFvmQJsS6mbsVY/dxBZP+iUkg2fnJfnJ8WoEb08UNLB9AzA9SMS7UBm3DlBtAkXtZ5rkShQDlleSXzdc2a3e5TRtJpee9J6Kb5+D4+b3JMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771608701; c=relaxed/simple;
-	bh=DghqkDSZnJx7xPBxaYg1VtWc4EQewhnEUuHyrdZoayQ=;
+	bh=vwSVyKrm1S3cImEjxyS+0Lzvxz2Gcz3bPnd/wChzCKo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QkSwMBQ01JtOP44GixRSDEEyf7mQvmdOO6ScFRFnwREa0jyL0/GJfUbh8M0eGPkNU2ySs5CzgmX0EPUVIusZTo8gpbtf5+eVYUz1czMENtld4p1X+I/GXXXQB47W7FPkeB2iOIzKU5Em8BPLbLRuitGQzA27vQaaeleIG6MvKZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DdLeni3a; arc=none smtp.client-ip=209.85.221.178
+	 MIME-Version; b=Rv6Bv0A8Kk0sADc5qm44/QbNUk/wmJh+j3oWhK+3tLXQZ/xsaHxfU0Lr13/5zpdmarCm9TSLCXRdhdusGFA/bCRu+inadRjc6bgA1VzcFhXetPln84Y6+h0qIwdwS1X6FpIbfVejcmWDFTssQ8LnAso+cbXdd7uTFE867hYiB7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CsJzKyLh; arc=none smtp.client-ip=209.85.221.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DdLeni3a"
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5662c2937fdso2110977e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 09:31:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CsJzKyLh"
+Received: by mail-vk1-f194.google.com with SMTP id 71dfb90a1353d-5665171836cso2484275e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 09:31:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1771608699; x=1772213499; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+fFwFRec0/iMaA81v94JZTtdiByYb3b+1BAjF09gg5c=;
-        b=DdLeni3aCeQ4rK5MEW1O/OJdSEpP634OE6T+9oKRrZdWVQ7J0yPtKEFZSAbnb8NqNr
-         N6xHtper2yV30kD1zSoVd07m3efYRKjOe6eqj6HqRRrdkJud7llRboms8vty7CFFVNKt
-         6bsDdzDq4QcXdU55201/wllkfLmXS2PBwII7Io9M7k4ldPuwjeGKqt39TMKCr8wE/7yD
-         FeWKmODp4KIwn3TDyQHY4ZIaSMIixoOAX9mPesqj7AmVu1IVylWYDOAvqJkYvFpZr7UF
-         Uxssf+/ZqgYQDu0v7PgrKBCtJGkkVDdtneIwNt4udlVGLqaVLuVWwrVZ2/dIvFPOEnBM
-         7CAg==
+        bh=+dEW+DH4tW8V4LkU7Pun4JiyvlXapof8twkYuk8NcHc=;
+        b=CsJzKyLhuj9ttLYx9jcbsQYGKPAgmD06xlgz0pQhhiAutwFP7DcCj+igMqUDh9COIT
+         Nifmde/6CzzAnYCoQBVUKDxcUX7qCr5nHVGuHjzsSEg3N7GwZvX9ZLjpKNYOYvcTEJAi
+         6eh+Jl1sZNbIyej4LHsi3sp+8kGoX3VGvIDut7KJiWkOjM0vAvabknGgMuP70MPWLUFq
+         GLrD+a3qHcz/YewjDCBzh0F98CXmXpVs/+/yIu1CNoMDe6vE/9jtNvofAi4ovDszaS33
+         ZQl8s1YYO40ILI7mSkcScJXVFKHPL4i5HpTaaVxaELljxPf6S+c15ZFhd+683JXCD196
+         1MzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1771608699; x=1772213499;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=+fFwFRec0/iMaA81v94JZTtdiByYb3b+1BAjF09gg5c=;
-        b=AvPd4sc5Mcf/IMMi4zI+0V5h6ztK+dnMloVoOBIRg8f1Q0rAXR7dHGhPXfdaqcQ9BF
-         LwCaW6oLtaywt7qaGHl01PdP0LLfOAtYJBjUR60j0hkrU2WTXNaopaoAeJeexhYEDpc3
-         4ZN281Yu0fy/R09MViBaGeAQITsuHt6O5dPmxHMsv2BQbKxqben0rXluwfntZVYXD3tH
-         R3AQSF8+4M30SDeI4uPqNeTFrKIPmXxwJtNUeX7bAL1viH+HdBKq8r2PH+gprIjtofIJ
-         jZqN04XsBlK1X40ud25Lp3iMjGPcexliyJPjrz0EafCK2xzHzC/BqvPy49sgCmEDr/wN
-         y4pg==
-X-Gm-Message-State: AOJu0Yy+H+fP8yVGqNh5Mk+zzWMNGE6w+C5N0UNJKjnSmt1zdwlNDpUa
-	F7skk3KX+rrLoekdlofdq/hTfx8vEeZuOEFbA6nZcgk/3wZ7lJZNV6mhDmrliQ==
-X-Gm-Gg: AZuq6aJUnwyWDThN9ChrzRYYGDbmZVAirNY0mAWdRBFm3iPxFSGS9H8yfjx4hN+F6UO
-	OgQrH+pRYcWsoDdUT34aVgw3kpH8FA0MCH39f8RHFg3udrsyoxyyBR5cQ7UzZ1XCWxfmOHw/aLk
-	Yp0XRqYzgeG0hHwv4cCt9j3TnWSvEzkpFxn/1RG/VYBJQCl+JBuUO/bcrYNfEn49KnnnTp5zCEI
-	IFJrlheL2t8oBqbpMpMCc+AVa0QtG17qiUNr0DdnQoRlT08ZlyrYCD+uqvVPJ/6hWv8WziZ685D
-	/bG32Kmb2Lm8+TRodmS2cjkNyO0uUs4W2RXBf6Y9AU3jozOF9YNTLuK0xISSk2dQ7hKdtIzI359
-	f/pn9q/WDUdez2+sRqeG/5wsgRrpe7PnuRy6jWiNGmffpDT3YZ2Stb1JpNPjK3Jd7LDHpymZfnK
-	V9U6yspQCksBpRZ5QDK22poF6+T+EZlZhbevDG9LyArsuTquoiig71VyKtrBkxozxsDnezKytz/
-	OJcn6Ub8pNFuJXrig==
-X-Received: by 2002:a05:6122:3c4e:b0:559:6788:7b55 with SMTP id 71dfb90a1353d-568e452a42emr316290e0c.3.1771608696948;
-        Fri, 20 Feb 2026 09:31:36 -0800 (PST)
+        bh=+dEW+DH4tW8V4LkU7Pun4JiyvlXapof8twkYuk8NcHc=;
+        b=r/9L4riyDfte6T0Y1ALop9o7V8kaTobTq3/XfMTrWSoLL8opdhxIuM2nuhhtM+q9LS
+         yFtHaCyy7LnIhqsry/ggB6WVd9Cjxw3OVGr2Q6tAqu1Q6/qqR2FSbBNeqJAipBM20a57
+         v1pGjoSCczTsz2NkcsThJZ5InAmPdl7ZEiI1zmKTHDo7S1di5RyRQZ81GVghEZqV9kSJ
+         5pCdn1roZPJYyYrPiTjZEBfXC5AgRHX3oIJsow3iPYi6H/pdqCw++7YeITfqJcdJQLit
+         ZEczSKOSQMLFCDsjLyLNwQZAFt6yt7bCaW1LbG2rmWlRt8IFY56KOki3BqPWu/4GQSj9
+         ze8Q==
+X-Gm-Message-State: AOJu0YyG5/kKgaNQnJAUtnRL9p0RYAbl7MUz/tr1wZ6ZVL4PWoJQ9zVF
+	+FzW69OEmDFJyjfI037CR+uKp50olFgPolsq4YwSkOypfgzNvIrOV0wH5+sENr4Y
+X-Gm-Gg: AZuq6aIjkk+aq7gfclYpIDkzVWOGDVnweXqM54mDH8aDY7ZTzYp9Ag6bNWCYedK1w6m
+	klaj4XpHNDmmVicXGHgW7XzHWY8UQx5j5mEdJlY4FGnvaJVTYPYyT0qnyovL4KMlewg9uMUaxxC
+	0FaPu990432E88uhfz1ZUeiHUzlizYDnMztrwlUd1F/4GnvhgaQgEZC4T/lDWIHmFm781mkKyed
+	Ce05tc2cHADcO2t9jKTfSCml4KTekG/SO7bw8Dh6kPh1XyRim9QfAsHEtl1hF38ehvanuBS7izc
+	C3GbQh1l4PEsBDjfcya2FZOOke/917zjMFD9WppTl9ZqzqR1ZtnQpwNPlOlR1KhraDJgLpVaGmw
+	GrkPOkOFfvILNLAhuc3kAoZc5IBinIpaPLhzeqen6TyL9ddekA8zdQPW2WUngbsRYceKwelxu9m
+	lIi7nLzQ96YO8TKXOHKRXMKBWlc++BfblJLBpJtaHmAyo/2Axb+XK3Yly9D3MIzalPJRD/ulc6S
+	oSRbIhXuq1NGrOyBNCpo9ycrZyo
+X-Received: by 2002:a05:6122:17a6:b0:566:24fc:9501 with SMTP id 71dfb90a1353d-568e47a9d6fmr295556e0c.6.1771608698725;
+        Fri, 20 Feb 2026 09:31:38 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94da8b3eefdsm77864241.9.2026.02.20.09.31.36
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94da8b3eefdsm77864241.9.2026.02.20.09.31.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Feb 2026 09:31:36 -0800 (PST)
+        Fri, 20 Feb 2026 09:31:38 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 08/12] monitor: Annotate ACL/SCO/ISO data with device address
-Date: Fri, 20 Feb 2026 12:31:12 -0500
-Message-ID: <20260220173120.3418666-8-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 10/12] monitor: Add connection lifecycle to analyze summary
+Date: Fri, 20 Feb 2026 12:31:14 -0500
+Message-ID: <20260220173120.3418666-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260220173120.3418666-1-luiz.dentz@gmail.com>
 References: <20260220173120.3418666-1-luiz.dentz@gmail.com>
@@ -77,218 +77,315 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add the remote device address to ACL, SCO and ISO data packet output
-so each data packet line shows which device it belongs to. This makes
-it much easier to follow multi-device traces without having to
-cross-reference handle numbers with earlier connection events:
+Record the frame number at connection and disconnection time for each
+connection. Print the connected and disconnected frame numbers in the
+per-connection summary produced by analyze mode so that users can
+cross-reference with the btmon trace output:
 
-< ACL Data TX: Handle 2048 [1/6] [42:96:D7:49:78:CC (Resolvable)] flags 0x00 dlen 7
-      ATT: Exchange MTU Request (0x02) len 2
-        Client RX MTU: 527
-> ACL Data RX: Handle 256 [20:32:C6:09:FF:6C (Apple, Inc.)] flags 0x02 dlen 16
-      L2CAP: Connection Response (0x03) ident 33 len 8
-        Destination CID: 17169
-        Source CID: 64
-        Result: Connection successful (0x0000)
-        Status: No further information available (0x0000)
+  Found LE-ACL connection with handle 2051
+        Address: 66:B0:26:F1:D3:BC (Resolvable)
+        RX packets: 48/48
+        RX Latency: 1-7604 msec (~74 msec)
+        RX size: 5-51 octets (~13 octets)
+        RX speed: ~0 Kb/s
+        TX packets: 39/37
+        TX Latency: 12-426 msec (~43 msec)
+        TX size: 5-97 octets (~15 octets)
+        TX speed: ~1 Kb/s
+        Connected: #52044
+        Disconnected: #53069
+        Disconnect Reason: 0x08
 
-Also fix the connection lookup in packet_hci_acldata() to use
-acl_handle() to mask off the flags bits, matching what assign_handle()
-stores.
+Also fix the TODO in conn_destroy() that was passing a hardcoded 0x00
+address type by using the stored bdaddr_type from the LE connection
+complete events.
 ---
- monitor/packet.c | 92 +++++++++++++++++++++++++++++++++++++++++++++---
- monitor/packet.h |  4 +++
- 2 files changed, 92 insertions(+), 4 deletions(-)
+ monitor/analyze.c | 73 ++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 59 insertions(+), 14 deletions(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 3ba33f8f3afa..b8a48bb549af 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -322,6 +322,43 @@ static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
- 		memcpy(conn->dst, dst, sizeof(conn->dst));
- 		conn->dst_type = dst_type;
- 	}
-+
-+	switch (conn->dst_type) {
-+	case 0x00:
-+	case 0x02:
-+		/* If address public set dst_oui */
-+		hwdb_get_company(conn->dst, &conn->dst_oui);
-+		break;
-+	case 0x01:
-+	case 0x03:
-+		/* Attempt to resolve the identity if resolvable */
-+		if ((conn->dst[5] & 0xc0) == 0x40) {
-+			keys_resolve_identity(conn->dst, conn->dst,
-+						&conn->dst_type);
-+			/* If identity address is public set dst_out */
-+			if (conn->dst_type == 0x00 || conn->dst_type == 0x02) {
-+				hwdb_get_company(conn->dst, &conn->dst_oui);
-+				break;
-+			}
-+		}
-+
-+		/* Set the random type */
-+		switch ((conn->dst[5] & 0xc0) >> 6) {
-+		case 0x00:
-+			conn->dst_rtype = strdup("Non-Resolvable");
-+			break;
-+		case 0x01:
-+			conn->dst_rtype = strdup("Resolvable");
-+			break;
-+		case 0x03:
-+			conn->dst_rtype = strdup("Static");
-+			break;
-+		default:
-+			conn->dst_rtype = strdup("Reserved");
-+			break;
-+		}
-+		break;
-+	}
- }
- 
- struct packet_conn_data *packet_get_conn_data(uint16_t handle)
-@@ -329,7 +366,7 @@ struct packet_conn_data *packet_get_conn_data(uint16_t handle)
- 	int i;
- 
- 	for (i = 0; i < MAX_CONN; i++) {
--		if (conn_list[i].handle == handle)
-+		if (conn_list[i].handle == acl_handle(handle))
- 			return &conn_list[i];
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index 2cf42f903b61..1db1e7898132 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -68,8 +68,12 @@ struct hci_conn {
+ 	uint16_t link;
+ 	uint8_t type;
+ 	uint8_t bdaddr[6];
++	uint8_t bdaddr_type;
+ 	bool setup_seen;
+ 	bool terminated;
++	uint8_t disconnect_reason;
++	unsigned long frame_connected;
++	unsigned long frame_disconnected;
+ 	struct queue *tx_queue;
+ 	struct timeval last_rx;
+ 	struct queue *chan_list;
+@@ -241,13 +245,22 @@ static void conn_destroy(void *data)
  	}
  
-@@ -14047,6 +14084,43 @@ static void packet_enqueue_tx(struct timeval *tv, uint16_t handle,
- 	queue_push_tail(conn->tx_q, frame);
- }
+ 	printf("  Found %s connection with handle %u\n", str, conn->handle);
+-	/* TODO: Store address type */
+-	packet_print_addr("Address", conn->bdaddr, 0x00);
++	packet_print_addr("Address", conn->bdaddr, conn->bdaddr_type);
+ 	if (!conn->setup_seen)
+ 		print_field("Connection setup missing");
+ 	print_stats(&conn->rx, "RX");
+ 	print_stats(&conn->tx, "TX");
  
-+static void handle_str_append_addr(char *handle_str,
-+					struct packet_conn_data *conn)
-+{
-+	if (!conn)
-+		return;
-+
-+	switch (conn->dst_type) {
-+	case 0x00:
-+	case 0x02:
-+		if (conn->dst_oui) {
-+			sprintf(handle_str + strlen(handle_str),
-+				" [%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X (%.16s)]",
-+				conn->dst[5], conn->dst[4], conn->dst[3],
-+				conn->dst[2], conn->dst[1], conn->dst[0],
-+				conn->dst_oui);
-+			return;
++	if (conn->setup_seen) {
++		print_field("Connected: #%lu", conn->frame_connected);
++		if (conn->terminated) {
++			print_field("Disconnected: #%lu",
++					conn->frame_disconnected);
++			print_field("Disconnect Reason: 0x%02x",
++						conn->disconnect_reason);
 +		}
-+		break;
-+	case 0x01:
-+	case 0x03:
-+		if (conn->dst_rtype) {
-+			sprintf(handle_str + strlen(handle_str),
-+				" [%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X (%.16s)]",
-+				conn->dst[5], conn->dst[4], conn->dst[3],
-+				conn->dst[2], conn->dst[1], conn->dst[0],
-+				conn->dst_rtype);
-+			return;
-+		}
-+		break;
 +	}
 +
-+	sprintf(handle_str + strlen(handle_str),
-+			" [%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X]",
-+			conn->dst[5], conn->dst[4], conn->dst[3],
-+			conn->dst[2], conn->dst[1], conn->dst[0]);
-+}
-+
- void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 				bool in, const void *data, uint16_t size)
+ 	queue_destroy(conn->rx.plot, free);
+ 	queue_destroy(conn->tx.plot, free);
+ 	queue_destroy(conn->chan_list, chan_destroy);
+@@ -465,6 +478,7 @@ static void command_pkt(struct timeval *tv, uint16_t index,
+ }
+ 
+ static void evt_conn_complete(struct hci_dev *dev, struct timeval *tv,
++					unsigned long frame,
+ 					const void *data, uint16_t size)
  {
-@@ -14054,7 +14128,7 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint16_t dlen = le16_to_cpu(hdr->dlen);
- 	uint8_t flags = acl_flags(handle);
--	char handle_str[22], extra_str[32];
-+	char handle_str[58], extra_str[32];
- 	struct packet_conn_data *conn;
- 	struct index_buf_pool *pool = &index_list[index].acl;
+ 	const struct bt_hci_evt_conn_complete *evt = data;
+@@ -478,10 +492,12 @@ static void evt_conn_complete(struct hci_dev *dev, struct timeval *tv,
+ 		return;
  
-@@ -14089,6 +14163,8 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	else
- 		sprintf(handle_str, "Handle %d", acl_handle(handle));
+ 	memcpy(conn->bdaddr, evt->bdaddr, 6);
++	conn->frame_connected = frame;
+ 	conn->setup_seen = true;
+ }
  
-+	handle_str_append_addr(handle_str, conn);
-+
- 	sprintf(extra_str, "flags 0x%2.2x dlen %d", flags, dlen);
+ static void evt_disconnect_complete(struct hci_dev *dev, struct timeval *tv,
++					unsigned long frame,
+ 					const void *data, uint16_t size)
+ {
+ 	const struct bt_hci_evt_disconnect_complete *evt = data;
+@@ -494,6 +510,8 @@ static void evt_disconnect_complete(struct hci_dev *dev, struct timeval *tv,
+ 	if (!conn)
+ 		return;
  
- 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_ACLDATA,
-@@ -14118,7 +14194,8 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	const hci_sco_hdr *hdr = data;
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint8_t flags = acl_flags(handle);
--	char handle_str[22], extra_str[32];
-+	char handle_str[42], extra_str[32];
-+	struct packet_conn_data *conn;
++	conn->frame_disconnected = frame;
++	conn->disconnect_reason = evt->reason;
+ 	conn->terminated = true;
+ }
  
- 	if (index >= MAX_INDEX) {
- 		print_field("Invalid index (%d).", index);
-@@ -14140,6 +14217,7 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+@@ -555,6 +573,7 @@ static void plot_add(struct queue *queue, struct timeval *latency,
+ }
  
- 	data += HCI_SCO_HDR_SIZE;
- 	size -= HCI_SCO_HDR_SIZE;
-+	conn = packet_get_conn_data(handle);
+ static void evt_le_conn_complete(struct hci_dev *dev, struct timeval *tv,
++					unsigned long frame,
+ 					struct iovec *iov)
+ {
+ 	const struct bt_hci_evt_le_conn_complete *evt;
+@@ -569,10 +588,13 @@ static void evt_le_conn_complete(struct hci_dev *dev, struct timeval *tv,
+ 		return;
  
- 	if (index_list[index].sco.total && !in)
- 		sprintf(handle_str, "Handle %d [%u/%u]", acl_handle(handle),
-@@ -14147,6 +14225,8 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	else
- 		sprintf(handle_str, "Handle %d", acl_handle(handle));
+ 	memcpy(conn->bdaddr, evt->peer_addr, 6);
++	conn->bdaddr_type = evt->peer_addr_type;
++	conn->frame_connected = frame;
+ 	conn->setup_seen = true;
+ }
  
-+	handle_str_append_addr(handle_str, conn);
-+
- 	sprintf(extra_str, "flags 0x%2.2x dlen %d", flags, hdr->dlen);
+ static void evt_le_enh_conn_complete(struct hci_dev *dev, struct timeval *tv,
++					unsigned long frame,
+ 					struct iovec *iov)
+ {
+ 	const struct bt_hci_evt_le_enhanced_conn_complete *evt;
+@@ -587,6 +609,8 @@ static void evt_le_enh_conn_complete(struct hci_dev *dev, struct timeval *tv,
+ 		return;
  
- 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_SCODATA,
-@@ -14175,8 +14255,9 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	const struct bt_hci_iso_data_start *start;
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint8_t flags = acl_flags(handle);
--	char handle_str[36], extra_str[50], ts_str[16] = { 0 };
-+	char handle_str[56], extra_str[50], ts_str[16] = { 0 };
- 	struct index_buf_pool *pool = &index_list[index].iso;
-+	struct packet_conn_data *conn;
- 	size_t ts_size = 0;
+ 	memcpy(conn->bdaddr, evt->peer_addr, 6);
++	conn->bdaddr_type = evt->peer_addr_type;
++	conn->frame_connected = frame;
+ 	conn->setup_seen = true;
+ }
  
- 	if (index >= MAX_INDEX) {
-@@ -14206,6 +14287,7 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+@@ -640,6 +664,7 @@ static void evt_num_completed_packets(struct hci_dev *dev, struct timeval *tv,
+ }
+ 
+ static void evt_sync_conn_complete(struct hci_dev *dev, struct timeval *tv,
++					unsigned long frame,
+ 					const void *data, uint16_t size)
+ {
+ 	const struct bt_hci_evt_sync_conn_complete *evt = data;
+@@ -653,10 +678,12 @@ static void evt_sync_conn_complete(struct hci_dev *dev, struct timeval *tv,
+ 		return;
+ 
+ 	memcpy(conn->bdaddr, evt->bdaddr, 6);
++	conn->frame_connected = frame;
+ 	conn->setup_seen = true;
+ }
+ 
+ static void evt_le_cis_established(struct hci_dev *dev, struct timeval *tv,
++					unsigned long frame,
+ 					struct iovec *iov)
+ {
+ 	const struct bt_hci_evt_le_cis_established *evt;
+@@ -671,6 +698,7 @@ static void evt_le_cis_established(struct hci_dev *dev, struct timeval *tv,
+ 	if (!conn)
+ 		return;
+ 
++	conn->frame_connected = frame;
+ 	conn->setup_seen = true;
+ 
+ 	link = link_lookup(dev, conn->handle);
+@@ -696,6 +724,7 @@ static void evt_le_cis_req(struct hci_dev *dev, struct timeval *tv,
+ }
+ 
+ static void evt_le_big_complete(struct hci_dev *dev, struct timeval *tv,
++					unsigned long frame,
+ 					struct iovec *iov)
+ {
+ 	const struct bt_hci_evt_le_big_complete *evt;
+@@ -713,12 +742,15 @@ static void evt_le_big_complete(struct hci_dev *dev, struct timeval *tv,
+ 			return;
+ 
+ 		conn = conn_lookup_type(dev, handle, BTMON_CONN_BIS);
+-		if (conn)
++		if (conn) {
+ 			conn->setup_seen = true;
++			conn->frame_connected = frame;
++		}
  	}
+ }
  
- 	start = data;
-+	conn = packet_get_conn_data(handle);
+ static void evt_le_big_sync_established(struct hci_dev *dev, struct timeval *tv,
++					unsigned long frame,
+ 					struct iovec *iov)
+ {
+ 	const struct bt_hci_evt_le_big_sync_estabilished *evt;
+@@ -736,12 +768,15 @@ static void evt_le_big_sync_established(struct hci_dev *dev, struct timeval *tv,
+ 			return;
  
- 	if (!in && pool->total)
- 		sprintf(handle_str, "Handle %d [%u/%u] SN %u",
-@@ -14214,6 +14296,8 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 		sprintf(handle_str, "Handle %u SN %u", acl_handle(handle),
- 			start->sn);
+ 		conn = conn_lookup_type(dev, handle, BTMON_CONN_BIS);
+-		if (conn)
++		if (conn) {
+ 			conn->setup_seen = true;
++			conn->frame_connected = frame;
++		}
+ 	}
+ }
  
-+	handle_str_append_addr(handle_str, conn);
-+
- 	sprintf(extra_str, "flags 0x%2.2x dlen %u slen %u%s", flags, hdr->dlen,
- 							start->slen, ts_str);
+ static void evt_le_meta_event(struct hci_dev *dev, struct timeval *tv,
++					unsigned long frame,
+ 					const void *data, uint16_t size)
+ {
+ 	struct iovec iov = {
+@@ -755,27 +790,28 @@ static void evt_le_meta_event(struct hci_dev *dev, struct timeval *tv,
  
-diff --git a/monitor/packet.h b/monitor/packet.h
-index 2990b795bd3e..f6547ec9b594 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -47,6 +47,10 @@ struct packet_conn_data {
- 	uint8_t  type;
- 	uint8_t  dst[6];
- 	uint8_t  dst_type;
-+	union {
-+		char *dst_oui;
-+		char *dst_rtype;
-+	};
- 	struct queue *tx_q;
- 	struct queue *chan_q;
- 	struct packet_latency tx_l;
+ 	switch (subevt) {
+ 	case BT_HCI_EVT_LE_CONN_COMPLETE:
+-		evt_le_conn_complete(dev, tv, &iov);
++		evt_le_conn_complete(dev, tv, frame, &iov);
+ 		break;
+ 	case BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE:
+-		evt_le_enh_conn_complete(dev, tv, &iov);
++		evt_le_enh_conn_complete(dev, tv, frame, &iov);
+ 		break;
+ 	case BT_HCI_EVT_LE_CIS_ESTABLISHED:
+-		evt_le_cis_established(dev, tv, &iov);
++		evt_le_cis_established(dev, tv, frame, &iov);
+ 		break;
+ 	case BT_HCI_EVT_LE_CIS_REQ:
+ 		evt_le_cis_req(dev, tv, &iov);
+ 		break;
+ 	case BT_HCI_EVT_LE_BIG_COMPLETE:
+-		evt_le_big_complete(dev, tv, &iov);
++		evt_le_big_complete(dev, tv, frame, &iov);
+ 		break;
+ 	case BT_HCI_EVT_LE_BIG_SYNC_ESTABILISHED:
+-		evt_le_big_sync_established(dev, tv, &iov);
++		evt_le_big_sync_established(dev, tv, frame, &iov);
+ 		break;
+ 	}
+ }
+ 
+ static void event_pkt(struct timeval *tv, uint16_t index,
++					unsigned long frame,
+ 					const void *data, uint16_t size)
+ {
+ 	const struct bt_hci_evt_hdr *hdr = data;
+@@ -793,10 +829,10 @@ static void event_pkt(struct timeval *tv, uint16_t index,
+ 
+ 	switch (hdr->evt) {
+ 	case BT_HCI_EVT_CONN_COMPLETE:
+-		evt_conn_complete(dev, tv, data, size);
++		evt_conn_complete(dev, tv, frame, data, size);
+ 		break;
+ 	case BT_HCI_EVT_DISCONNECT_COMPLETE:
+-		evt_disconnect_complete(dev, tv, data, size);
++		evt_disconnect_complete(dev, tv, frame, data, size);
+ 		break;
+ 	case BT_HCI_EVT_CMD_COMPLETE:
+ 		evt_cmd_complete(dev, tv, data, size);
+@@ -805,10 +841,10 @@ static void event_pkt(struct timeval *tv, uint16_t index,
+ 		evt_num_completed_packets(dev, tv, data, size);
+ 		break;
+ 	case BT_HCI_EVT_SYNC_CONN_COMPLETE:
+-		evt_sync_conn_complete(dev, tv, data, size);
++		evt_sync_conn_complete(dev, tv, frame, data, size);
+ 		break;
+ 	case BT_HCI_EVT_LE_META_EVENT:
+-		evt_le_meta_event(dev, tv, data, size);
++		evt_le_meta_event(dev, tv, frame, data, size);
+ 		break;
+ 	}
+ }
+@@ -1047,6 +1083,7 @@ void analyze_trace(const char *path)
+ {
+ 	struct btsnoop *btsnoop_file;
+ 	unsigned long num_packets = 0;
++	unsigned long num_frames = 0;
+ 	uint32_t format;
+ 
+ 	btsnoop_file = btsnoop_open(path, BTSNOOP_FLAG_PKLG_SUPPORT);
+@@ -1084,21 +1121,27 @@ void analyze_trace(const char *path)
+ 			del_index(&tv, index, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_COMMAND_PKT:
++			num_frames++;
+ 			command_pkt(&tv, index, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_EVENT_PKT:
+-			event_pkt(&tv, index, buf, pktlen);
++			num_frames++;
++			event_pkt(&tv, index, num_frames, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_ACL_TX_PKT:
++			num_frames++;
+ 			acl_pkt(&tv, index, true, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_ACL_RX_PKT:
++			num_frames++;
+ 			acl_pkt(&tv, index, false, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_SCO_TX_PKT:
++			num_frames++;
+ 			sco_pkt(&tv, index, true, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_SCO_RX_PKT:
++			num_frames++;
+ 			sco_pkt(&tv, index, false, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_OPEN_INDEX:
+@@ -1123,9 +1166,11 @@ void analyze_trace(const char *path)
+ 			ctrl_msg(&tv, index, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_ISO_TX_PKT:
++			num_frames++;
+ 			iso_pkt(&tv, index, true, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_ISO_RX_PKT:
++			num_frames++;
+ 			iso_pkt(&tv, index, false, buf, pktlen);
+ 			break;
+ 		default:
 -- 
 2.52.0
 
