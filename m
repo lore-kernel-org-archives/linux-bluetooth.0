@@ -1,109 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A125D23C4F2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 18:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6622189F30
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 18:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771612270; cv=none; b=WCyy420B3NONXKBfEkWVkbCiff6pBuQ0SlqTViONRDr1RI3uePyo4VJONMgr7t3hjyL6h2J5rZVZGjb91zIm6Py2uwU8lSzW0HJA0nm1Ds5DIyDCX+2rSDUQGouRw91XGvQznBX5xEYXSkGntcQbQ94irL0SxigCi8wpR8trGkY=
+	t=1771613418; cv=none; b=AbBm20W7w8Pfe0VW89hQVOEJSSKFbJeIF8UebBgoqcRRyzbo/MTzKaALXW9qQNBAC5nemzD4/00xZoppiVCBi5qlKF6/HcPOEiLTJ9ONJkXZotkeOg3Qn3lfiTDXjQRYWWcKoLbQi3+oMJNCpCWDfV8f5Au2/iWjfFBnqPoHPh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771612270; c=relaxed/simple;
-	bh=jtxdnsFoaJ7ZZ3Cqn+tSp7m5G53dJk4cSH6H7At3v18=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Kp+rtEdgDOEtbWG7SCBtv4TW0TrfNUrlv9mj/mYcyfGxxatKWUIFc1dOjdF5G4MffLKPRWa7FJ/Z28d1jL1YfwrFGH3NQCTBO3sX/jIVXPlvhMUV/l/e8R5CnKVhZeBc94DAfKXuU97NROSZIyyhMnX4H85XzsmGrA9YJjueW50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a6uJkrPw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771613418; c=relaxed/simple;
+	bh=WQN/hPuVqc5wNEUr0uNDJdj19dtXMWTU4hkKHdTjtbQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=req4x+QK7ROHYW4igwSRG7QrWtoIGNWnVAyYlWOBARE7tIRHt+MAM6VSDSEsZbeB9UAc2ripM93AXKO2KsCj3tMv9emqzjW4FcsZ2qUvB18qSDmQsAYPGHpCPOTjwoIf2ml85n4tSqIHj2d/enMRPRQ+GBMdwZQm+/CqkZ8Suf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f9pY9BUe; arc=none smtp.client-ip=74.125.82.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a6uJkrPw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D7B8C2BC87
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 18:31:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771612270;
-	bh=jtxdnsFoaJ7ZZ3Cqn+tSp7m5G53dJk4cSH6H7At3v18=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=a6uJkrPwgYJUifSyCTS6qLRblT3UuP8pQhDCmNAd2ogqq5vgBEsHwq8dslg95Fr1M
-	 QE1qEwpPqLbgGyGBKdPG/vP4VNWVDlhs9IYK06sSbep9fCo3MBIK+S5fNuzsKmGmWL
-	 h2/G71sxc2mVMfFqbdMY7IclfV225a4CVo51pykG11YGDk2h68oBqoWRHwrOTXN+eB
-	 HsbrO5uBlRdRKmL/zJwkT1bbPqJYSawCm7Zz78cgYbavZ+KUnACdpmbZj5IO+i0aRE
-	 XNBFYKoaXBvfdKZOJURklibqI4NNg3hc/C/o8ekrxP3QxYh6KF4Kdav65dJaAoaVfg
-	 nEz+gA8l7HzDQ==
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-38706b63929so22062611fa.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 10:31:10 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVxuMiHjAdaRzfADq4qAP+w9oZoU1jLLHLEJmW8Zp7/7lJmqV6pRshe5qGnQQ+qnv4jXyVPrX2iffeDHgWHKUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGOae5pNHRit1jxzQbRqZjhuokFzmh1og9/Nu1KsVbx0K6H3SF
-	Q1NNrFK3JVDVvpZ59RZf2NtvOxT1/vhkxHPS5hz8OKMBM6xFdHHbkjd5mbXCi7/mHoBVcHyDm2g
-	BzMon0kSaNidkPYSf4EeJT3ohB7H5c8E=
-X-Received: by 2002:ac2:4f0d:0:b0:59d:f2a4:3e98 with SMTP id
- 2adb3069b0e04-5a0ed88d733mr123595e87.4.1771612268567; Fri, 20 Feb 2026
- 10:31:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f9pY9BUe"
+Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-124afd03fd1so3327171c88.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 10:50:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771613416; x=1772218216; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wWM3dvEUSC1KFoJeuORbkiqYDOt90SuJs5GcHkdkAn4=;
+        b=f9pY9BUeI0K8dWpcVL4QLb5AAhLhsRK6ZqeJfF88c300JyOriGiB9jX7rsYALV79TV
+         P8kBzh9o8viIsXj4gEq4YtNa/+nOKbVXn93PHk+graMa9dESlUjXOh6Bggf+s7h6rUtc
+         zPSqWypSA7ZZQojjiIDI38OPA9vfGuCmJ/mMGghDNZv9riqsaPr2JW4CE0EiFaM2xwcu
+         /D0W0x7wSZbNIvY3/adQ1MKrPZ8Ckn0LBA8baH/6Wv3PY79qBZTIzEh3OEYYShaScuQq
+         cJH67jqckqZ+fbvpGmNVtAoU2u1FnM6oqEwjd5WqLfFngACa+M300V7kkc9aN6gHBQow
+         rPsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771613416; x=1772218216;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wWM3dvEUSC1KFoJeuORbkiqYDOt90SuJs5GcHkdkAn4=;
+        b=eCaTjtpLorLRmDa0PRE7xCfarWfKQfvAZjGC0IHNJaHzhqhqddeLYVdOTJ3lCqQui9
+         FaJrtQXynXNW+pYhB/5owodu4B0YfrbP8r1cvmylvFs3LvOcBh8KqXAfqSy/cmz6TBbw
+         RB8J1b2tEXouZbRGvnc7TxJQfVNCMWlp1qQY71EXw19nrvm5A6jbkVTtcyTld6Hc0FYv
+         uWYTZCtxhiAgg9D7TUPivzTp8G1fN7dzCrLpHpmMQsgk1lk1rGg2y1egUgMU7Ul0jt/W
+         bV+ThxNipcXNtP45HQMsXHtJmXL5+5QtwzQEPH7agB3F+c5rRvxD+yaXJefxnEu0biUz
+         DClQ==
+X-Gm-Message-State: AOJu0YxZGC/Dg+CEnCVdbc2hEV0yZphSdaEbFVBpaBg/cJbA26l0cVo+
+	as4HBeXOYIaimFGwUjE5SsGwzdtJTU1NTDhuxKiNLBv2LK5pkXr2TMwNLRE6sLB2
+X-Gm-Gg: AZuq6aJmEJMmccY+GAxitMzcrY3MeeSWm7huMXWOO9AZi75SzGQBe0q9VZ43yZRzi9i
+	ShxVLkib7FUL0uEPLWOIMuT5vV2hLRs1ggiw939CikAwUjEu1FRY37b/OLElH1cVFlfzumYhTqn
+	cSpdtRLj2pXs0VuBtYRWJDLiSPyO9Z88jQQmq3DmCvGvA8fZlWZ0oGHGmHEB9MLqzkhk82CF4Il
+	2qg3zl4Xk579KbIo+6Z/g7fo3Qr/m/K5/GZI+POoELtZ6AmS8iLQovaUjdFT7QcQ8vJZjeLbeWf
+	LjbVFcR1+qHtm8eo30GX6+nZZEHjz708krkHAVzNi2IkjasgLBoUpo1W2SKNJemxhuLzw4t/gxD
+	VuCW1jRAxoEzKyPUwX6kU6hv2sIO2A5RgFN9+uaDIO9VFMAKU1Uj49+xfG0a2rTiu6ZIplT3xnd
+	n90hx9hS2C4eFIQJuDD+lf29Z/RvBi
+X-Received: by 2002:a05:7022:f96:b0:119:e56b:91f2 with SMTP id a92af1059eb24-1276ad59485mr200253c88.35.1771613416454;
+        Fri, 20 Feb 2026 10:50:16 -0800 (PST)
+Received: from [172.17.0.2] ([20.169.74.230])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1276af7b4c7sm298059c88.9.2026.02.20.10.50.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Feb 2026 10:50:15 -0800 (PST)
+Message-ID: <6998ace7.050a0220.3daf40.2ba8@mx.google.com>
+Date: Fri, 20 Feb 2026 10:50:15 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3636718783085019203=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260219231624.8226-1-sean.wang@kernel.org> <0cb6c45b-a5a4-46bf-a73d-97c482da9339@molgen.mpg.de>
-In-Reply-To: <0cb6c45b-a5a4-46bf-a73d-97c482da9339@molgen.mpg.de>
-From: Sean Wang <sean.wang@kernel.org>
-Date: Fri, 20 Feb 2026 12:30:56 -0600
-X-Gmail-Original-Message-ID: <CAGp9LzqYB=xPfAuL61xi-ve=f6PZWWaa2gpf50-75yXWee-ZHA@mail.gmail.com>
-X-Gm-Features: AaiRm50CGzZAUpdHBs8DARRVcPhWLB2FVeLnVfyzVg436zGF1NWQ8dHO4F1lG6w
-Message-ID: <CAGp9LzqYB=xPfAuL61xi-ve=f6PZWWaa2gpf50-75yXWee-ZHA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] mmc: sdio: add MediaTek MT7902 SDIO device ID
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, ulf.hansson@linaro.org, 
-	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org, 
-	linux-mmc@vger.kernel.org, Sean Wang <sean.wang@mediatek.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] l2test: Attempt to use BT_SNDMTU if output MTU has been set
+In-Reply-To: <20260220174044.3421300-1-luiz.dentz@gmail.com>
+References: <20260220174044.3421300-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear Paul,
+--===============3636718783085019203==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 19, 2026 at 5:28=E2=80=AFPM Paul Menzel <pmenzel@molgen.mpg.de>=
- wrote:
->
-> Dear Sean,
->
->
-> Thank you for the patch.
->
-> Am 20.02.26 um 00:16 schrieb Sean Wang:
-> > From: Sean Wang <sean.wang@mediatek.com>
-> >
-> > Add SDIO device ID (0x790a) for MediaTek MT7902 to sdio_ids.h.
->
-> Tested how?
+This is automated email and please do not reply to this email!
 
-Tested on real hardware with successful card detection, driver
-initialization and the connectivity.
+Dear submitter,
 
->
-> > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> > ---
-> >   include/linux/mmc/sdio_ids.h | 1 +
-> >   1 file changed, 1 insertion(+)
-> >
-> > diff --git a/include/linux/mmc/sdio_ids.h b/include/linux/mmc/sdio_ids.=
-h
-> > index 673cbdf43453..97cc834fb3d5 100644
-> > --- a/include/linux/mmc/sdio_ids.h
-> > +++ b/include/linux/mmc/sdio_ids.h
-> > @@ -112,6 +112,7 @@
-> >   #define SDIO_DEVICE_ID_MEDIATEK_MT7663              0x7663
-> >   #define SDIO_DEVICE_ID_MEDIATEK_MT7668              0x7668
-> >   #define SDIO_DEVICE_ID_MEDIATEK_MT7961              0x7961
-> > +#define SDIO_DEVICE_ID_MEDIATEK_MT7902               0x790a
->
-> Please sort it.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1055977
 
-I will address the sorting in v2.
-Thanks for the review.
+---Test result---
 
->
-> >
-> >   #define SDIO_VENDOR_ID_MICROCHIP_WILC               0x0296
-> >   #define SDIO_DEVICE_ID_MICROCHIP_WILC1000   0x5347
->
->
-> Kind regards,
->
-> Paul
+Test Summary:
+CheckPatch                    PENDING   0.44 seconds
+GitLint                       PENDING   0.41 seconds
+BuildEll                      PASS      17.77 seconds
+BluezMake                     PASS      647.35 seconds
+MakeCheck                     PASS      18.10 seconds
+MakeDistcheck                 PASS      218.80 seconds
+CheckValgrind                 PASS      278.31 seconds
+CheckSmatch                   PASS      312.34 seconds
+bluezmakeextell               PASS      168.30 seconds
+IncrementalBuild              PENDING   0.32 seconds
+ScanBuild                     PASS      914.40 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3636718783085019203==--
