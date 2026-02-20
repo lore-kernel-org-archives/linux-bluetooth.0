@@ -1,231 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BEE719C546;
-	Fri, 20 Feb 2026 12:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BAD132142B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 14:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771590784; cv=none; b=eboBrRJa86Obfyrf33fSQZg1BQbFp3P8EjdhfS4Z6rApippN5PM1cLDJzVBbGHwQcP2qjFZz0f9ngIDAQmNZyO4uUeYg24ixre8ZEeFc4PeJRARS84vkjewMfmKTwZP7aeCEkSIEYJCpMilHP8Xufr/86lSXlwOfOh2D3yWQjBU=
+	t=1771596582; cv=none; b=rOr6+KZvG/3aUmBqD3cKUQ5uDK5tYXqJW3iTy5YdqGtlmHaHfhJKePYac3yfPsxOmftA2pcleqcWEOCVZ4Mrblp7OODaHitEBDnrImmRuctQkNauL71jq0e0egeaBBzHe87DVOzBGM5dbTK8GsMRJd79ijN+pytfHanVrHaLZF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771590784; c=relaxed/simple;
-	bh=Rry95Gc2fxlT8GKfq8DTVucLDStkB3OQ9fJQxU3L/9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NKUtyorJyiec7HkPFppkPiPatcsmB1Ba5GzRUp9mrRhtgYS02IfLeCGOsEdnAsoxAC51c9zVXNcXAYmk8HzQkVhqySWhLCuQc0GYhkCYzH2G69BSw5CGgcsqLfGPrURlRoDrUPqWg+wuLSSlKJpBDPKo4u+RNrl4IhkrTtAdWfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MEqg237b; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771596582; c=relaxed/simple;
+	bh=joiDOVXpyVmOio2XeAgoYkDgV906iKdBijZs78blfDY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=NCC7b/B5c/AGVq1vscTccH7vKdkTQPZEcOuGR07gaJSgah+/2ato2gni8re+6kv0cWOr6fa9ucTz19IaaJyQ0K/oH0Z1g/mZ7hRUyslNFY3j7M6dHdpf2U9mbSeiIwN/E7NYlrKIBtK2JJSN/Yu4WwEDz2ronKJkxGRZKkL10j4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YFo+KMo/; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MEqg237b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D37DEC116C6;
-	Fri, 20 Feb 2026 12:32:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771590783;
-	bh=Rry95Gc2fxlT8GKfq8DTVucLDStkB3OQ9fJQxU3L/9k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MEqg237blb0EzAeyK7sgE8RTY7jPQs2RJ3yJZGj8EsxZ9z3VZKDXXCUcOfv2SGPSF
-	 Dqq8bG6gl0V+M7EdmjNHQS0jbFpPGk9313u53+4uExBia7yyKgsEqFko2Hat531cnb
-	 ME/jtmzVqUYa3KqbS2G/n+8Mah/B0iY+ZTR+dthQQ5VRCyLSh7XQPWONbNJLH/J5wY
-	 2Nc/W3IozHsCOc7S4Jx7Gy5JICilEOFaMaIby4OoZ3EvMOC63b6GTrpnGyUlltiWWI
-	 nODBNUHrsSzv1BS6e6rKcMWPLCoYyPfmnZujA12vok7ANOFlsG7qESsh7vnzNk7Evw
-	 wIL1Ax5eKW2pg==
-Message-ID: <f8f6a51e-cc25-496e-ac42-4b8af276451f@kernel.org>
-Date: Fri, 20 Feb 2026 13:32:57 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YFo+KMo/"
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-948af5e704cso673811241.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 06:09:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771596580; x=1772201380; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cGmDzTvJtYrLldcrBBe+r4j6aP+uXfRvmgMv6j4MdJA=;
+        b=YFo+KMo/e2pPaLMJrkXtmcoZHB5hrHVwx8tGgigr633NlAZ4tzIRmmcUQWwuZhSMDu
+         GFNnlSSD9HINEEbY6VGfnq9m+UJa13am1EtbvNonymisv1IapeZjsHI8PnvaYRE1He1T
+         kNt4SHX1B1bHF6o2g7JZ4WUg6H5DHfW9IfcmEnAJmrGJJRCSuk2NJ6D2MCV4aD7GWQDc
+         1gM6oTbuzWA7yYgiB3jXH9CCOFuI7ozCIIlo2EggNC0Y2ZYWVjxbKEIvpEygGpdO0mtB
+         vM61OtNgbXyRX7INtBZEjbU/UIpBA0b1OjDiIa9ojpVDww/HxfFTFrw21hRWUgV/oe9v
+         KNZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771596580; x=1772201380;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cGmDzTvJtYrLldcrBBe+r4j6aP+uXfRvmgMv6j4MdJA=;
+        b=LvszY8GAIiipxPMlpkiN4veof4q1Dp+DkZlQLed341BDBbK3p2GFn4NnoFeY08m3lc
+         mTosaCI9hAHn/hPPG4PE+Jo7jcX1kLH3DiKCxrRvrtJxl7DmJL7QzBmLTbsc5GBKhofl
+         Bhy0FULde/0B/t0aGlGZskrKudeQreuBP5t71Zn/GcdLVdW2exryRm3oebQ9wsED+TPp
+         VoRN3Jet+MAdX6e1OjYzU+rYvy5fRc4IwAGBTv4xH3edUUwGJ6L8YxQAITLFviVwETqC
+         1fLhSrcnV1PWUYgBoe0c04r54ioVrO+F8mib/oknjt7+BYoF9PrJLoMoMY7G0QHlwMVA
+         T0tw==
+X-Gm-Message-State: AOJu0YzzHVsC4vfJR0edtMWJTfpAEMwabvshwD58GbMMZ5QOP/l2nrZJ
+	5QtSrZW/2hQ5VLJAqxTvUQ/Dvedtbuhi7+uupdGFXwblhfjPy1CwANZRMsva/g==
+X-Gm-Gg: AZuq6aIMg1Knd9ZzcWsgsY7RLRMifLf2aQgyIeE89aIwWXPfeOFGqspwgGBQtiY2oNk
+	2/o3vuHY4Nj8y2j44Xz1XleOoQ/zr82KT4jlTrAaur5DuzasslZXEByrcyP5aWhNfAajLF3gAQy
+	RQeu5rTUVQe7AzlBs3HmQMBlf6R+QtLFK2vcX0cVMYua/lI9geuvj9C69rghc3HBHwQJgMaAhk3
+	468gNSQNoIHFDqBCgzqqfMrQgUgieTAwtYWFEJrqfOo2UZ1rC1pJwvDTyYy9jihwr6SwU6dgTpL
+	fdNc8iSz2QL78f4ck7AFIG9ZsyJMcW8qp8/+xW0OGMzNrV6PqNay76EVdO1xR2UeD9DmaXX6S/N
+	mLYEZB4ytBf9zIxyTEKEnao6eRwjHvw6qx0AaKA9E8DgIVRGAWv+CgT5M301JWtnAqZ0S5aCEcD
+	AghmQObb9gh61IPE8xbvDsuLFERb8nsB6X4G5Jj/RdnhDVoMen1+8U3KhfhalABfQYYOLg7J3nU
+	p5mrj0HVnBB+NU9tYYCKkntKpec
+X-Received: by 2002:a05:6122:3483:b0:55f:c6c9:e4ba with SMTP id 71dfb90a1353d-568ca1420c1mr2728691e0c.13.1771596579935;
+        Fri, 20 Feb 2026 06:09:39 -0800 (PST)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5674bfc973asm17678571e0c.2.2026.02.20.06.09.39
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Feb 2026 06:09:39 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: L2CAP: Fix not checking output MTU is acceptable on L2CAP_ECRED_CONN_REQ
+Date: Fri, 20 Feb 2026 09:09:30 -0500
+Message-ID: <20260220140930.3367106-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/2] dt-bindings: bluetooth: qcom,qcc2072-bt: add
- bindings for QCC2072
-To: Vivek Sahu <vivek.sahu@oss.qualcomm.com>,
- Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann
- <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>
-Cc: quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
- janaki.thota@oss.qualcomm.com, linux-arm-msm@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260218114955.3970974-1-vivek.sahu@oss.qualcomm.com>
- <20260218114955.3970974-2-vivek.sahu@oss.qualcomm.com>
- <af950713-4a0d-43ec-8000-3400f546acbd@kernel.org>
- <55b6051f-dee6-4f05-96ac-e24752030d4c@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <55b6051f-dee6-4f05-96ac-e24752030d4c@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 20/02/2026 13:05, Vivek Sahu wrote:
-> 
-> 
-> On 2/18/2026 5:23 PM, Krzysztof Kozlowski wrote:
->> On 18/02/2026 12:49, Vivek Sahu wrote:
->>> QCC2072 is a WiFi/BT connectivity radios which exposes
->>> UART as an interface for Bluetooth part.
->>> It requires different configuartions and firmware, so
->>
->> different than what?
->>
->> Also typo configurations.
->>
->>> document it as a new compatible string.
->>
->> Please wrap commit message according to Linux coding style / submission
->> process (neither too early nor over the limit):
->> https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
->>
-> 
-> Different configurations like interrupts GPIOs, firmware binaries, 
-> compat string. Commit msg, I'll correct it in next patch of this commit.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I asked not what is different but against which this is different.
-Different than <here goes explanation>?
+In order for L2CAP_ECRED_CONN_REQ the given MTU shall be checked
+against the suggested MTU of the listening socket as that is required
+by the likes of PTS L2CAP/ECFC/BV-27-C test which expects
+L2CAP_CR_LE_UNACCEPT_PARAMS if the MTU is lowers than socket omtu.
 
-> 
->>>
->>> Signed-off-by: Vivek Sahu <vivek.sahu@oss.qualcomm.com>
->>> ---
->>>   .../net/bluetooth/qcom,qcc2072-bt.yaml        | 47 +++++++++++++++++++
->>>   1 file changed, 47 insertions(+)
->>>   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/qcom,qcc2072-bt.yaml
->>>
->>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qcom,qcc2072-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/qcom,qcc2072-bt.yaml
->>> new file mode 100644
->>> index 000000000000..7b27c2c651fa
->>> --- /dev/null
->>> +++ b/Documentation/devicetree/bindings/net/bluetooth/qcom,qcc2072-bt.yaml
->>> @@ -0,0 +1,47 @@
->>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
->>> +%YAML 1.2
->>> +---
->>> +$id: http://devicetree.org/schemas/net/bluetooth/qcom,qcc2072-bt.yaml#
->>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->>> +
->>> +title: Qualcomm QCC2072 Bluetooth
->>> +
->>> +maintainers:
->>> +  - Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
->>> +  - Rocky Liao <quic_rjliao@quicinc.com>
->>> +
->>> +description:
->>> +  Qualcomm QCC2072 is a UART-based Bluetooth controller.
->>> +
->>> +properties:
->>> +  compatible:
->>> +    enum:
->>> +      - qcom,qcc2072-bt
->>> +
->>
->> Where are clocks?
->>
->> Where are supplies?
->>
-> QCC2072 exposes M.2 UART as an interface for Bluetooth part. It doesn't 
-> require clocks and voltage regulators to power it up.
+In order to be able to set chan->omtu the code now allows setting
+setsockopt(BT_SNDMTU), but it is only allowed when connection has not
+been stablished.
 
-Clocks, maybe, but power - I don't believe. AFAIK, sending radio
-communication like Bluetooth requires energy. It is BLE, not BNE
-(Bluetooth Non Energy)
+Link: https://github.com/bluez/bluez/issues/1895
+Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c |  8 ++++++++
+ net/bluetooth/l2cap_sock.c | 15 +++++++++++----
+ 2 files changed, 19 insertions(+), 4 deletions(-)
 
-> 
->>> +  enable-gpios:
->>> +    maxItems: 1
->>> +    description: GPIO specifier for the chip interrupt.
->>
->> Interrupt? No, it cannot be interrupt. This can be only enable pin and
->> then description is redundant. Look at other bindings.
->>
->> Looks like matching QCA2066, except missing clocks, or like other QCA
->> devices with proper supplies.
->>
->> I don't believe that Bluetooth device works without power.
->>
-> It is an interrupt to the HOST. I'll make it more comprehensive in the 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9452c6179acb..90676ca0e92b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5117,6 +5117,14 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
+ 		goto unlock;
+ 	}
+ 
++	/* Check if the listening channel has set an output MTU then the
++	 * requested MTU shall be less than or equal to that value.
++	 */
++	if (pchan->omtu && mtu < pchan->omtu) {
++		result = L2CAP_CR_LE_UNACCEPT_PARAMS;
++		goto unlock;
++	}
++
+ 	result = L2CAP_CR_LE_SUCCESS;
+ 
+ 	for (i = 0; i < num_scid; i++) {
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 62ceda979f39..477b4d145459 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1029,10 +1029,17 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
+-		/* Setting is not supported as it's the remote side that
+-		 * decides this.
+-		 */
+-		err = -EPERM;
++		/* Only allow setting output MTU when not connected */
++		if (sk->sk_state == BT_CONNECTED) {
++			err = -EISCONN;
++			break;
++		}
++
++		err = copy_safe_from_sockptr(&mtu, sizeof(mtu), optval, optlen);
++		if (err)
++			break;
++
++		chan->omtu = mtu;
+ 		break;
+ 
+ 	case BT_RCVMTU:
+-- 
+2.52.0
 
-Still not.
-
-> next patch of this commit. QCC2072 exposes M.2 UART as an interface for 
-> Bluetooth part. It doesn't require clocks and voltage regulators to 
-> power it up.
-> 
->>> +
->>> +required:
->>> +  - compatible
->>> +  - enable-gpios
->>> +
->>> +allOf:
->>> +  - $ref: bluetooth-controller.yaml#
->>> +  - $ref: qcom,bluetooth-common.yaml
->>> +  - $ref: /schemas/serial/serial-peripheral-props.yaml#
->>> +
->>> +unevaluatedProperties: false
->>> +
->>> +examples:
->>> +  - |
->>> +    #include <dt-bindings/gpio/gpio.h>
->>> +    #include <dt-bindings/interrupt-controller/irq.h>
->>> +
->>> +    serial {
->>> +        bluetooth {
->>> +            compatible = "qcom,qcc2072-bt";
->>> +            enable-gpios = <&tlmm 19 IRQ_TYPE_EDGE_FALLING>;
->>> +            max-speed = <3200000>;
->>
->> No firmware?
->>
-> 
-> Firmware is required, it is just I've not added all the fields in the 
-> example.
-
-
-Add complete example.
-
-
-Best regards,
-Krzysztof
