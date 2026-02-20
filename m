@@ -1,69 +1,69 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from mail-vk1-f195.google.com (mail-vk1-f195.google.com [209.85.221.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F8C35F8C1
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 17:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57324364025
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 17:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771608705; cv=none; b=Y9xBY0iqkRD4rMJpRCZD9UgMZKvjZrjrWx+TooAyNz5ANkyQJeFhFeXytDWcpwtuZEJO1p3J7pP3z8XxlxMt3p5AhOWLrWgonELNSoJrVAszu4OGUpiOm2KQI554FqrKxLQfPzLnW7wgjdI9uu+iGS0RXwiHrZAiessyAJ/wli4=
+	t=1771608733; cv=none; b=i7eEWR6b85LGwL1A68NLXR/2T08b7ST5G/o1LS+6balTaQPOcSwQ8UxEP6FR9zUkAz3OdppjvhpD9+14OsG+Mko7OGZt+nEKDU0A90RNkw6WT7NAev2bgxsw84B8y2VI9kZgBO4r6m41TDgFZzSUq9Z39duLGUjz4IN7L9SxTFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771608705; c=relaxed/simple;
-	bh=H4zjT+BLKCBWcQS02Fi3hrtt6oqjnk/2YIkK+PPQUB4=;
+	s=arc-20240116; t=1771608733; c=relaxed/simple;
+	bh=AK3ESpyMA/3hfE6lVWh9WYOUEltkTEMiW7zhLdgIAhg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JKqGsXo5nCR13Y6+IxK+FwUMjCXHnLuo+fwwwVNdif4WqxPTlbmgA9raQltyJK8ar9zpfYPRl9ux2KnU1bdR8CKHzkbk8bLXgqdiVNYWzw/9LmLKduZgsyalMFZkY4belwbV/fYCSexvx+DhK4ghZJfs9vhnR8apcnHNKCj/sLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S/a4YClo; arc=none smtp.client-ip=209.85.221.182
+	 MIME-Version:Content-Type; b=YmmeqxgyNS7g4bioZ/RlgUV2YQ6oyqGGZ3+jHQpaZyl+1Piz5fH72nTO9dKJDvxeCZKyu7zDktvjX6OSYj+uaSoNLljQWaKy8P+x8j4RqEmstH4t/3+ITYcMC1oJVtUfma0YTd6gO5TdwPB+5wpfi2pA9zwCs7+NNhHG2S3h9eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ec8gH2PW; arc=none smtp.client-ip=209.85.221.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S/a4YClo"
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5673fd077b4so1120664e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 09:31:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ec8gH2PW"
+Received: by mail-vk1-f195.google.com with SMTP id 71dfb90a1353d-567543b8989so1095785e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 09:32:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771608703; x=1772213503; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771608731; x=1772213531; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=A2rIh0SOIfZLLJEFPvUCOVpLnOusiQsVKVkKXhuxsaY=;
-        b=S/a4YClodykAi5v8H4guWLLvcFvuZWXjXb0Z68kJWF5ne3mHddZ94eSbuWf2g9+Rjj
-         CtVkB7UXADnMOVaq/RJ/1Cr7bZd0fSEyna961M6CkHKvUg8EUeO79Ew8tJ1hCR5lUyme
-         VyJau8QAQollZo6hPPxgfazvbIZoo72CGtF0fdjN1f3rVoQ1Uejxgg7e8d2QH/myjmCu
-         CbuuE4HheKUnx6k1Tjv3OdrO8A6dkK1R0/1gFUViTQOZqdCbI7L0WR7ymw2OpDO5Kth5
-         eH+HsS0O/3yEj9uaYGGs29qCd2oCe2o4L/jsjvtXggpqwPIHTHPV5a+31b2iuMs+Mom/
-         JPfA==
+        bh=HIzk8YS6txQaybkNG3dTM3/tYy/Tz1mbYnidfaS8yl4=;
+        b=ec8gH2PWFvgVmn3tLV/Tftgfj7Z2Yr3Ci8nTSet4ZaXc62UJ20R4915U8mIuy4mEWC
+         LakJqN1k34NR2h5wmqOXk8Gut0X5LFhgbZ/+FHd5TP1+QaUbRhIfiMM0ym4ebm8QOmhe
+         N2DcPcbIkStuUXRp9IOwO4ARTfjndRUYGrCCIVmQzYuPXSAzE1yNuuciXtA+dIymQWWw
+         M3OGEItF5+7whSJTaoVEyJRmT/dqIQrEghlO84hHT9fZtrdb/z4gVC4tn3ckIANouqyZ
+         VOsxg8015/G8BaqNLA5L2BXEYstgGTBNNgdCc3IVdNfBWKMKi0R6ATOlKjIzRiLndZjF
+         TSfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771608703; x=1772213503;
+        d=1e100.net; s=20230601; t=1771608731; x=1772213531;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=A2rIh0SOIfZLLJEFPvUCOVpLnOusiQsVKVkKXhuxsaY=;
-        b=bh9icxhHu/sZUYPihaE6fokss4DaYlBA283XZcI97JGm8gX0CD7qEmYqOzyE6Aw2vx
-         /uX33wijDCel9k+DxkNB3iYqLgrs/PxciChSQNBUD7nwJFdW0alXsLIT/IP5WdFt7x7L
-         le+Xl9zNDsHklKEteRRjEKaz1Ol76fnaIBnHwATIANymiXJ8DF4b/JLih1XeRir9lDjb
-         SToPCkajIRqnDKF9aJMHpC5ud+FO9pVs02haert+wUCzYWZGqj+NWwZ3GpCcM75+38pP
-         8PpMZmgInqn9LsGuVZyTBR09x72NqvNfeXiq4EMeZ0lqiBjxhYRLrRbev6gy/mDVtxI6
-         mVlA==
-X-Gm-Message-State: AOJu0YzjGttnNCXi70GgstjxnHX7qFvdeTgOgjHRWxQoyU1c3B1ggiW9
-	FWsviu3syY72kEq9cUZ9TNyaLsbNT9YUVAYPXS+1QlfICo4qYd8omGGcE6S3LQ==
-X-Gm-Gg: AZuq6aIYB1AZxiEgA6tv8ojhJUinDHf3nelo3wr8i1zKTYdka6hMp7R2x2x8jQBnKE2
-	ns/d+bCFSKiSADKJwE0a7RNhGJXOHLo+jxMaOonyAM/VIVoz+obp2C3FfwrFbMJUyTx2DeOz+sH
-	WVEqDKrpdQ5ah6aFucyRVGbWGKJHVWUCZlY/1Kbc7eSIhuxrx6kDRkW4EZdvckSh+Oz6wTwnsYU
-	XZQBnFe8BqCT9SpMMyoL53mUuA9I1Uu9IWWmvlRMIt6Rr5cjcJbCHsrS2TbNJl82um4f8vEwSFn
-	DpvvKoKgFQoW56LOIr+9uqQXAd5fNR/EMxIh/ol1lsW/qMDzJsYbx1NcHuH5HNyC81RxfF7tGBe
-	gHEheqnSre0+eg+TcejUWLzJbAQNbPvvn5uysFV7ng0DLEgVmDv9cF6RkVvWTtXy6bFODOsfT3i
-	1PAceGp77LhCDxWnPh3RoHXYDQJrcPxfsgu9SMXDb8KZWMXxABdQIrq//xAWABrLjG3YB2uHjrj
-	BwEzC3qpb9Dx89Gxg==
-X-Received: by 2002:a05:6122:459a:b0:566:7d83:dfdc with SMTP id 71dfb90a1353d-568e48800ebmr248675e0c.9.1771608699713;
-        Fri, 20 Feb 2026 09:31:39 -0800 (PST)
+        bh=HIzk8YS6txQaybkNG3dTM3/tYy/Tz1mbYnidfaS8yl4=;
+        b=GIIwXxxfogjP8JN71Nqh0kESslllr4RNZnvOag1iuDxkMnaozmscMVnlBk3W7m406U
+         symaOJ8chnZf2iCmkikD/fkUdaUiT/CJ1LdKC9PiO4fxFIXY2mfl5D20Psge9gesRNUk
+         VzfoBXz0dWqQ6T0u3DbTWSDK4W/wr4sTiPeF3MNrzfNMrMtH/jIvD56DG7GnjIHF73SZ
+         Oaf8rGiH0xnhu/nFxTVF39Ft4h4Vv/fbm/0LvxoJqsG3MDqGWHs2PfVtDp/e6v5bPXiq
+         2wI/bIxxgtj+6LnZeGb2MJWy8bo+x9VLsJSY8fYI8Wqp9KTGWGAZF/du6/KcEaqwTiCI
+         aSuQ==
+X-Gm-Message-State: AOJu0Yx1aASVYitUegRp4MN7auc1olVnOpwTE3LVgBMtNdiQHQ+voP+s
+	iWLHPSeJBDHhbqRFWiyYUsOBV84pYGiZ1fm4MNzbR2oy+Y6+l4IuXzVMIx+8BIRQ
+X-Gm-Gg: AZuq6aLpfxz0+KaEMF0ToT+8N3UrpF1KpkDiLuKoNCISYkIy6g1uLo0eQHRliDnQzL1
+	9xrnu7hennve/PuLe5dhCCnDd3TnhY/uhRzktBSpajsKTOy89TyqTh9Iv5cOxI6rO1ds6GWJKg3
+	n9OYHxLClj3ZzfRIeEJvqmTAxH8iMB9yTN65W6cZblzeJ5337L3ngi3jvM89UFE8qESEvy+Gbco
+	Uu+RUhIlx8+2ZdtnaMNFyB0evjMlCvmklXiTyiewrOXFJuc+l2T9hp5A2fNI0P7okZcCL3kJpQU
+	oL06Q7x4UCO18y3uThkFETHkKoVTVCev5tSBF9r2jAuH1Lek9BrjfuXM5VJ4QOUEivOOVynsxs4
+	ZiSBcjSFyKnunenNi4YYP4VQm2//N7VN5h17n+TeVXeANaXesEZLZiu7bw1jPOuXz3mOpr2SUVF
+	AsIYnJqoLCSRi71Tij1BvfTU4wXetibYvbY6zB2j6rsN2HUb2I+5S8k1x8ZJ9BqvHWzuIIiN4cw
+	59Nt1dCUZH2dArfAw==
+X-Received: by 2002:a05:6122:2191:b0:563:c3e7:6132 with SMTP id 71dfb90a1353d-568e4880bbdmr231014e0c.10.1771608700558;
+        Fri, 20 Feb 2026 09:31:40 -0800 (PST)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94da8b3eefdsm77864241.9.2026.02.20.09.31.38
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94da8b3eefdsm77864241.9.2026.02.20.09.31.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Feb 2026 09:31:39 -0800 (PST)
+        Fri, 20 Feb 2026 09:31:40 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 11/12] monitor: Prefix data packets with proper type
-Date: Fri, 20 Feb 2026 12:31:15 -0500
-Message-ID: <20260220173120.3418666-11-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 12/12] doc/btmon: Update documentation to reflect lastest changes
+Date: Fri, 20 Feb 2026 12:31:16 -0500
+Message-ID: <20260220173120.3418666-12-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260220173120.3418666-1-luiz.dentz@gmail.com>
 References: <20260220173120.3418666-1-luiz.dentz@gmail.com>
@@ -73,97 +73,89 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This attemps to prefix data packets using conn_type_str so it
-properly differentiate BR and LE bearers and CIS from BIS and also
-eliminate "Data TX/RX" labels as they are implicit from the direction
-marker:
-
-< LE-CIS: Handle 2304 [8/8] SN 15 ...
-> LE-ACL: Handle 2048 ...
+This update the diagram showing where each information is displayed to
+include the connection type and peer address.
 ---
- monitor/packet.c | 27 +++++++++++++++++++++------
- 1 file changed, 21 insertions(+), 6 deletions(-)
+ doc/btmon.rst | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index a4930c855144..fbe773ffbdfe 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -14155,6 +14155,7 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint16_t dlen = le16_to_cpu(hdr->dlen);
- 	uint8_t flags = acl_flags(handle);
-+	char label[8];
- 	char handle_str[58], extra_str[32];
- 	struct packet_conn_data *conn;
- 	struct index_buf_pool *pool = &index_list[index].acl;
-@@ -14194,9 +14195,13 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
+diff --git a/doc/btmon.rst b/doc/btmon.rst
+index c1616318a004..e1e362b7c1b6 100644
+--- a/doc/btmon.rst
++++ b/doc/btmon.rst
+@@ -255,23 +255,26 @@ completes and the result status.
  
- 	sprintf(extra_str, "flags 0x%2.2x dlen %d", flags, dlen);
+ **ACL Data** shows data plane traffic with handle and protocol decoding::
  
-+	if (conn)
-+		sprintf(label, "%s", conn_type_str(conn->type));
-+	else
-+		sprintf(label, "ACL");
-+
- 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_ACLDATA,
--				in ? "ACL Data RX" : "ACL Data TX",
--						handle_str, extra_str);
-+				label, handle_str, extra_str);
+-    < ACL Data TX: Handle 2048 [1.. flags 0x00 dlen 16  #493 [hci0] 12:36:18.977915
+-    │              │              │            │          │    │       │
+-    │              │              │            │          │    │       └─ Timestamp
+-    │              │              │            │          │    └─ Controller
+-    │              │              │            │          └─ Frame number
+-    │              │              │            └─ Data length
+-    │              │              └─ Fragment info / flags
+-    │              └─ Connection handle
+-    └─ Direction: TX = outgoing, RX = incoming
++    < LE-ACL: Handle 2048 [66:B0:26:F1:D3:BC] [1/6] flags 0x00 dlen 16  #493 [hci0] 12:36:18.977915
++    │   │            │     │                   │          │         │    │    │     │
++    │   │            │     │                   │          │         │    │    │     └─ Timestamp
++    │   │            │     │                   │          │         │    │    └─ Controller
++    │   │            │     │                   │          │         │    └─ Frame number
++    │   │            │     │                   │          │         └─ Data length
++    │   │            │     │                   │          └─ flags
++    │   │            │     │                   └─ Buffer tracking (optional)
++    │   │            │     └─ Peer address (optional)
++    │   │            └─ Handle number
++    │   └─ Connection-type-aware label (e.g. BR-ACL, LE-ACL, BR-SCO, LE-ISO)
++    └─ Direction marker: '<' = host->controller (TX), '>' = controller->host (RX)
  
- 	if (!in)
- 		packet_enqueue_tx(tv, acl_handle(handle),
-@@ -14221,6 +14226,7 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	const hci_sco_hdr *hdr = data;
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint8_t flags = acl_flags(handle);
-+	char label[8];
- 	char handle_str[42], extra_str[32];
- 	struct packet_conn_data *conn;
+ ACL data is automatically decoded into higher-layer protocols::
  
-@@ -14256,9 +14262,13 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+-    < ACL Data TX: Handle 2048 [2/6] flags 0x00 dlen 7  #494 [hci0] 12:36:18.978488
++    < LE-ACL: Handle 2048 [2/6] flags 0x00 dlen 7  #494 [hci0] 12:36:18.978488
+           ATT: Exchange MTU Request (0x02) len 2
+             Client RX MTU: 517
  
- 	sprintf(extra_str, "flags 0x%2.2x dlen %d", flags, hdr->dlen);
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #497 [hci0] 12:36:19.000048
++    > LE-ACL: Handle 2048 flags 0x02 dlen 11       #497 [hci0] 12:36:19.000048
+           SMP: Pairing Request (0x01) len 6
+             IO capability: NoInputNoOutput (0x03)
+             OOB data: Authentication data not present (0x00)
+@@ -435,7 +438,7 @@ frame. The indentation level indicates the protocol layer:
  
-+	if (conn)
-+		sprintf(label, "%s", conn_type_str(conn->type));
-+	else
-+		sprintf(label, "SCO");
-+
- 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_SCODATA,
--				in ? "SCO Data RX" : "SCO Data TX",
--						handle_str, extra_str);
-+				label, handle_str, extra_str);
+ Example of protocol layering in ACL data::
  
- 	if (!in)
- 		packet_enqueue_tx(tv, acl_handle(handle),
-@@ -14282,6 +14292,7 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	const struct bt_hci_iso_data_start *start;
- 	uint16_t handle = le16_to_cpu(hdr->handle);
- 	uint8_t flags = acl_flags(handle);
-+	char label[8];
- 	char handle_str[56], extra_str[50], ts_str[16] = { 0 };
- 	struct index_buf_pool *pool = &index_list[index].iso;
- 	struct packet_conn_data *conn;
-@@ -14328,9 +14339,13 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	sprintf(extra_str, "flags 0x%2.2x dlen %u slen %u%s", flags, hdr->dlen,
- 							start->slen, ts_str);
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #497 [hci0] 12:36:19.000048
++    > ACL: Handle 2048 flags 0x02 dlen 11       #497 [hci0] 12:36:19.000048
+           SMP: Pairing Request (0x01) len 6                          ← L2CAP/SMP layer
+             IO capability: NoInputNoOutput (0x03)                    ← SMP fields
+             OOB data: Authentication data not present (0x00)
+@@ -520,9 +523,9 @@ MGMT Command Complete event back to bluetoothd.
+             Peer address: AA:BB:CC:DD:EE:FF (OUI Company)
+     @ MGMT Event: Device Connec.. (0x000b) plen 13  {0x0001} [hci0] 12:36:18.974319
+     = bluetoothd: src/adapter.c:connected_callback() hci0 devic..   12:36:18.975307
+-    < ACL Data TX: Handle 2048 [1.. flags 0x00 dlen 16  #493 [hci0] 12:36:18.977915
++    < ACL: Handle 2048 [1.. flags 0x00 dlen 16  #493 [hci0] 12:36:18.977915
+           LE L2CAP: Connection Parameter Update Request (0x12) ident 1 len 8
+-    < ACL Data TX: Handle 2048 [2/6] flags 0x00 dlen 7  #494 [hci0] 12:36:18.978488
++    < ACL: Handle 2048 [2/6] flags 0x00 dlen 7  #494 [hci0] 12:36:18.978488
+           ATT: Exchange MTU Request (0x02) len 2
+             Client RX MTU: 517
  
-+	if (conn)
-+		sprintf(label, "%s", conn_type_str(conn->type));
-+	else
-+		sprintf(label, "ISO");
-+
- 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_ISODATA,
--				in ? "ISO Data RX" : "ISO Data TX",
--						handle_str, extra_str);
-+				label, handle_str, extra_str);
+@@ -579,7 +582,7 @@ Controller Buffer Tracking
  
- 	if (!in)
- 		packet_enqueue_tx(tv, acl_handle(handle),
+ Buffer tracking may show a indicator in square brackets::
+ 
+-    < ACL Data TX: Handle 2048 [1/6] flags 0x00 dlen 16
++    < ACL: Handle 2048 [1/6] flags 0x00 dlen 16
+ 
+ The ``[1/6]`` means this is buffer slot 1 of 6 available controller
+ ACL buffers. This reflects the host-side HCI flow control: the host
 -- 
 2.52.0
 
