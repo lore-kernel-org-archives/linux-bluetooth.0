@@ -1,77 +1,48 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4810D334C13
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 08:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D653115B1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 09:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771574549; cv=none; b=DwUh+pGwUgtbNyiinS2xcKj1uY/YREb9janY7H91RGrVVPL/WuRp/nOkpRf7hClCNcvgJ4jq6kulnhS13KCWxxpSmr//L8F77imnJhKMz0ozVj5BNxI8+I2O8XVv+UiGbxCZNcaXMNV49mT8rj48cXQQLpU7QG8PiaJBkXzJglU=
+	t=1771578226; cv=none; b=OB+XCCQpPWE/cgHgbg+iT1SNREuCK9Hfw3WZOBWDGmf4DWrrz2WhUsvyJohI7Rm7cuGYrmPK0bzw/CwvJMclUpHjKer+m/dUEDu6b4XS03Udj3R/oFMhUBtqTD/GnY/O2Dz/DPI7wjD1FmaBzK+PFCLZrXAT/tqN5gJp7/vGh54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771574549; c=relaxed/simple;
-	bh=5c1gP6x4dLJeq1KTHb9rDAfWjbYQRtgyLYkYgEkv240=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F98hHiB0tIFrOo9sbKZUuooDoqZ/iEbyMZWj+noR4eRQnM2DoQxqlisKPtdxkG/zzjkEzB1ySroqimcq7xfY1dLriVKi7ehKUEqbXAJX88bmq8WRrNu4mJjeADXpyy6R09+1m7LvPNrhkOpaNrXepQZWJ/rSB6lcN2wF/c0NTu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oVyKxb1v; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1771578226; c=relaxed/simple;
+	bh=trcXWHQftXl/DjaD8q/PKEPVjHbHiWJmHcJhHP1uC9o=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=d82LJwv4syx4drPj8ZypsBZOE4jFaEMeVw7M+SYVAjnXRhMKcsCFrcqtQqU2wAYX39IAOjfP6tfsyFNsCBR+kkuldhMkOcyRY5RO2TjnmLWNx70UqkLYWJEa2+eXPkAb4nB08KFIhkLdS9+DLgF4V9m4bJDDDd7BPmp6DU7XHP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DUy2/kHL; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oVyKxb1v"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771574536;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=aB4n5OGLZi0GRqIuGAXu+AgsLlHy39nmgJ8AKbZreq4=;
-	b=oVyKxb1vH6nf29w2xHflwlpQnNUXJlEyB23K1pClgA8/2jNr8CpzUHrNPUYdeZfP74eTA8
-	GA6QMA6vQplh46lTMJS6fyS1mU1mxwsy7rh/Lb6IvcTyLXX+51cuPTe0bbWbQguLfDfG+r
-	n0cNCTRI1S8gugayybnBFaq8vUE1sKE=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btintel_pcie: Replace snprintf("%s") with strscpy
-Date: Fri, 20 Feb 2026 09:00:59 +0100
-Message-ID: <20260220080058.1112042-2-thorsten.blum@linux.dev>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DUy2/kHL"
+Received: from github.com (hubbernetes-node-b8dc33b.va3-iad.github.net [10.48.184.53])
+	by smtp.github.com (Postfix) with ESMTPA id 4CA8B3C1258
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Feb 2026 01:03:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1771578224;
+	bh=FdaI0cGLrbIB3Xd2APRtnvQbCwP8ck9jn4KLlpEbJVY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=DUy2/kHLRGxsIX7yUP015MJojhsf3gdUjs1XUrtBHBFPjXjSNtd6SiOmBlev6fILl
+	 hRminHpxxbgWeyquzmY6NFSWI7MiuweSkthl2YCpIW+GnhtQI4SFSXnJAP7q8TKWso
+	 PdMZ+XfHugljM2AbR3+KIybG+a0oCImTPc6FxxZ8=
+Date: Fri, 20 Feb 2026 01:03:44 -0800
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1045032/5a2416-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Replace snprintf("%s", ...) with the faster and more direct strscpy().
+  Branch: refs/heads/1045032
+  Home:   https://github.com/bluez/bluez
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/bluetooth/btintel_pcie.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index eaf5de46a702..82399ad99d96 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -10,6 +10,7 @@
- #include <linux/module.h>
- #include <linux/firmware.h>
- #include <linux/pci.h>
-+#include <linux/string.h>
- #include <linux/wait.h>
- #include <linux/delay.h>
- #include <linux/interrupt.h>
-@@ -268,7 +269,7 @@ static inline void btintel_pcie_dump_debug_registers(struct hci_dev *hdev)
- 	if (!skb)
- 		return;
- 
--	snprintf(buf, sizeof(buf), "%s", "---- Dump of debug registers ---");
-+	strscpy(buf, "---- Dump of debug registers ---");
- 	bt_dev_dbg(hdev, "%s", buf);
- 	skb_put_data(skb, buf, strlen(buf));
- 
--- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
