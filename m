@@ -1,133 +1,254 @@
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDB03074AE
-	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Feb 2026 20:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E6D368288
+	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Feb 2026 20:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771704210; cv=none; b=BfgCS/pQXKxYBrcngD1bIrm7poUSoywWF0sHvgCUX+NojJTlNOZyTmYjL2HXtAINd98c0sKWSAf2rRqaMMQMNt2lssuhVGPeHShCtCKESk/NHUslum+B0ZVInH+f0Br00boY1oOnfmZ383uRDKwdXTj33Blknehv54ulxgRckV0=
+	t=1771705674; cv=none; b=EnUhe1tI024dqn3zdKtV/5emjbIKYStutLJBv2lNUYhfUWCJYDz2baqBc5WjgbGErR4dndridy40S5hFAd+hBIOxacFsOrI7RRbOD2wKmECALSsXlPURKFv+WTqLASWgvkQUAma4eaIyWvGPEAwrSqkAiXUCB5+tLN8AgK/svas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771704210; c=relaxed/simple;
-	bh=oqZmh17IilL5q9EU+kYhqkvWjQeupDKmPVQZ9xntLnA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JIfdCf4NvOtp6BioLIiUQm4dx+tnv0HtsgzdjyN+/l+EceJOWwiD7bL2K/uZZoGXmO7xWcCfrPzO7tbPuc6MEeMG/cwBUPJVvQ5xbEXycNUKe9ZJZWG4fNlbdZs8q9RF0aBBAqbJ5dA0WfCOCa3mBWijsljSW+SOvy+tHFJDXaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7d498212845so15086272a34.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 21 Feb 2026 12:03:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771704208; x=1772309008;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mVeOluBrE/mIepsp5N9A2vw3i+Y5Ua9q02m2COguD04=;
-        b=WbD9+Aj1XK+n54sfuX+l2p9m8XSGpFIJWZfoepEYWSoshXM/cQcaozZ0QnRtsYd10y
-         Vpvwc4uWUUFIB5iD33pJThOJ6a4yt1shndo90iOpSuyFTsS1KqNAJpY0/elQp0XU8+ky
-         Q0q9FbVjtiy6lEKgPKNiFlpK8/XC6FWuxGrTAlOHjOXO1Rck+S+0HLykPW1FTu27FXyC
-         dOAECnDlIlsOKXDtu6ObgrjtDZGhysDdc3gpGTk7dIlCi3ypNyv5RL+cnZAMOHeL5hNa
-         XN8grV9jP8nWQF4iB8QRGF0GdBAWUuAVkL7W0YfpxxVxhveeq4Dz5IEuK4RfCVzorRoF
-         m/kQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVlV09ipCBCxvb13zJ3/bfTi0jeeuD+aPVIIUatKtJe2G1SpMXvIu0A5CP8YSIQYlJ4Zz10cmSiE489P9LtlXw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7jNYRd6fFrpLhTKQD5PgUWW5gdOkVvxkyeW5i5NEa3zWQkOCy
-	x97xriGX5kxG1chPpQKB2dL91XF9xWRZZDvnxrK72pc8UFh5aZ1RZNJYp3Jq+UOkoHbygPUwUDL
-	FaeAgEVExLzTTuUYIJxKj7TgDx4QhI6ARxMWp1k6bl75InPpdwIe8+odvCqY=
+	s=arc-20240116; t=1771705674; c=relaxed/simple;
+	bh=zneKyBJndQq0Mj4R/3czIhM2Q/54LTosY2Thm/qYPqQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZImzAeh49gha9Ns/1gaZP59huqymir/VW5mvxhnycPXnM66ComfZ7zJgFcUOt2uHWuA4g00M+/TaFcrs9jNmjuNGiCb4wVJiCBxbu1NjO77h51f68AllB/F0NPXo5/S+nIR1KYk5OZ10G9MQeFa99+6S6gcIyP5oMetBDN8Pgfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eD3ip8A+; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eD3ip8A+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DE5EC4CEF7
+	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Feb 2026 20:27:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771705674;
+	bh=zneKyBJndQq0Mj4R/3czIhM2Q/54LTosY2Thm/qYPqQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=eD3ip8A+YBW3KNk2kDd6MXbtXNuRSpQdp+c9+UBK5cs7m4Ltt6fVt8BRxOQxXSDJe
+	 fXZb5Xu25fXXKlX5Qiy04NxE/ek9dIHIhyPTTPfvGakk9wFcbYWz4YpnqMc5uJek6g
+	 p56xMVQ6+GuYL6RmEK8AKFcAkmI/yfnC/0UDCgFGkYKbIbweqBj7/7Ms9JQWSU5xrR
+	 WbpUjCswf/VvBEFSsBRdfuJn+XV0xgO7SRsWlX4PNnWqIGZo7Uv2doyepdw78t2iDn
+	 Wbz6i0lmBPLzQRansr4DdTcy9F2NhzqM9MEtGP1iAy3O78fjtw1enSbffGdZ38QXnn
+	 5pslqUa5AkPMA==
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-38713b53915so29833721fa.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 21 Feb 2026 12:27:54 -0800 (PST)
+X-Gm-Message-State: AOJu0Yw25D+zlVEA92aYk5GQRqrJSX0v0PD2M4Xx3NBINRibr7A58zCp
+	BtdsR00bqM1ZTzPWuQzcFUmrO4HdhKUaZUJN4bPg4f+e1zpGVXGYBpRxl3rW/ER1fv2nfflcIax
+	wWp3bUUghakTL3ZSh/Hm1JBERpXZ3yRk=
+X-Received: by 2002:a2e:3212:0:b0:386:4942:246d with SMTP id
+ 38308e7fff4ca-38853a09209mr26215631fa.21.1771705672809; Sat, 21 Feb 2026
+ 12:27:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:448d:b0:66e:9d89:d8b7 with SMTP id
- 006d021491bc7-679c44d33famr1431542eaf.49.1771704208610; Sat, 21 Feb 2026
- 12:03:28 -0800 (PST)
-Date: Sat, 21 Feb 2026 12:03:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <699a0f90.a70a0220.2c38d7.015f.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KCSAN: data-race in bacpy / memcmp
-From: syzbot <syzbot+dabcf90d3a2acf24b4a3@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20260219231624.8226-3-sean.wang@kernel.org> <20260221133748.309045-1-kush.kulshrestha.5@gmail.com>
+In-Reply-To: <20260221133748.309045-1-kush.kulshrestha.5@gmail.com>
+From: Sean Wang <sean.wang@kernel.org>
+Date: Sat, 21 Feb 2026 14:27:41 -0600
+X-Gmail-Original-Message-ID: <CAGp9Lzoq3nZS8A9m=H9JJmiCv11bWDmoLXqBLCU-Qm80k7=R1Q@mail.gmail.com>
+X-Gm-Features: AaiRm51aTshfZS8JovVoAN872wiVNqYZMZDUTqUzHSK5_NRtRPr2fd9rGAtzk0U
+Message-ID: <CAGp9Lzoq3nZS8A9m=H9JJmiCv11bWDmoLXqBLCU-Qm80k7=R1Q@mail.gmail.com>
+Subject: Re: [PATCH 3/4] Bluetooth: btusb: Add new VID/PID 13d3/3579 for MT7902
+To: OnlineLearningTutorials <kush.kulshrestha5@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	linux-mmc@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	sean.wang@mediatek.com, ulf.hansson@linaro.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Sat, Feb 21, 2026 at 7:38=E2=80=AFAM OnlineLearningTutorials
+<kush.kulshrestha5@gmail.com> wrote:
+>
+> Hi Sean,
+>
+> Thanks for helping me to add driver for mt7902 chip.
+>
+> I have checked the wifi driver for mt7902 and it is working correctly wit=
+h new firmware,
+> earlier I have issue with old firmware, thanks.
+>
+> For Bluetooth driver, you already added VID/PID 13d3/3579 for MT7902
+> There are some other VID/PID which are part of mt7902 bluetooth chip
+>         13d3/3580 - (my chip)
+>         13d3/3594 - https://github.com/OnlineLearningTutorials/mt7902_tem=
+p/commit/f94e0075ca04e50629852adbb567e130f8784873
+>         13d3/3596 - https://github.com/OnlineLearningTutorials/mt7902_tem=
+p/commit/2a3db89c7a87241846d166defa17ebd22d4be337
+>
+> Please add these VID/PID or instruct me to add,
 
-syzbot found the following issue on:
+Hi Kush,
 
-HEAD commit:    72c395024dac Merge tag 'docs-7.0' of git://git.kernel.org/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16b38ae6580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c653aa4dc2fe740b
-dashboard link: https://syzkaller.appspot.com/bug?extid=dabcf90d3a2acf24b4a3
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+Glad to hear Wi-Fi works with the new firmware.
+I=E2=80=99ll add the additional Bluetooth VID/PIDs in the next version to m=
+ake
+the MT7902 chipset more accessible.
+Appreciate the report and logs.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c143500d000f/disk-72c39502.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/734418a35433/vmlinux-72c39502.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/97548c6e5a9b/bzImage-72c39502.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+dabcf90d3a2acf24b4a3@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KCSAN: data-race in bacpy / memcmp
-
-write to 0xffff888199203818 of 6 bytes by task 18359 on cpu 1:
- bacpy+0x1e/0x30 include/net/bluetooth/bluetooth.h:380
- l2cap_sock_bind+0x275/0x5b0 net/bluetooth/l2cap_sock.c:132
- __sys_bind_socket net/socket.c:1874 [inline]
- __sys_bind+0x1d0/0x290 net/socket.c:1905
- __do_sys_bind net/socket.c:1910 [inline]
- __se_sys_bind net/socket.c:1908 [inline]
- __x64_sys_bind+0x3f/0x50 net/socket.c:1908
- x64_sys_call+0x2ceb/0x3000 arch/x86/include/generated/asm/syscalls_64.h:50
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xc0/0x2a0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-read to 0xffff88819920381b of 1 bytes by task 18360 on cpu 0:
- memcmp+0x52/0x90 lib/string.c:694
- memcmp include/linux/fortify-string.h:727 [inline]
- bacmp+0x1e/0x30 include/net/bluetooth/bluetooth.h:376
- l2cap_sock_connect+0x25a/0x4c0 net/bluetooth/l2cap_sock.c:218
- __sys_connect_file net/socket.c:2089 [inline]
- __sys_connect+0x1f1/0x2a0 net/socket.c:2108
- __do_sys_connect net/socket.c:2114 [inline]
- __se_sys_connect net/socket.c:2111 [inline]
- __x64_sys_connect+0x3f/0x50 net/socket.c:2111
- x64_sys_call+0x2e09/0x3000 arch/x86/include/generated/asm/syscalls_64.h:43
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xc0/0x2a0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-value changed: 0x00 -> 0xff
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 0 UID: 0 PID: 18360 Comm: syz.0.12425 Tainted: G        W           syzkaller #0 PREEMPT(voluntary) 
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/24/2026
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> below are device debug - cat /sys/kernel/debug/usb/devices
+>
+>
+> cat /sys/kernel/debug/usb/devices
+>
+> T:  Bus=3D03 Lev=3D01 Prnt=3D01 Port=3D02 Cnt=3D01 Dev#=3D  2 Spd=3D480  =
+MxCh=3D 0
+> D:  Ver=3D 2.10 Cls=3Def(misc ) Sub=3D02 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
+> P:  Vendor=3D13d3 ProdID=3D3580 Rev=3D 1.00
+> S:  Manufacturer=3DMediaTek Inc.
+> S:  Product=3DWireless_Device
+> S:  SerialNumber=3D000000000
+> C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
+> A:  FirstIf#=3D 0 IfCount=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01
+> I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D125us
+> E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 6 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  63 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  63 Ivl=3D1ms
+> I:  If#=3D 2 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D125us
+> E:  Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D125us
+> I:* If#=3D 2 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125us
+> E:  Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125us
+>
+>
+>
+> cat /sys/kernel/debug/usb/devices
+>
+> T: Bus=3D03 Lev=3D01 Prnt=3D01 Port=3D02 Cnt=3D01 Dev#=3D 3 Spd=3D480 MxC=
+h=3D 0
+> D: Ver=3D 2.10 Cls=3Def(misc ) Sub=3D02 Prot=3D01 MxPS=3D64 #Cfgs=3D 1
+> P: Vendor=3D13d3 ProdID=3D3594 Rev=3D 1.00
+> S: Manufacturer=3DMediaTek Inc.
+> S: Product=3DWireless_Device
+> S: SerialNumber=3D000000000
+> C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
+> A: FirstIf#=3D 0 IfCount=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01
+> I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E: Ad=3D81(I) Atr=3D03(Int.) MxPS=3D 16 Ivl=3D125us
+> E: Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> E: Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 0 Ivl=3D1ms
+> E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 0 Ivl=3D1ms
+> I: If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 9 Ivl=3D1ms
+> E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 9 Ivl=3D1ms
+> I: If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 17 Ivl=3D1ms
+> E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 17 Ivl=3D1ms
+> I: If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 25 Ivl=3D1ms
+> E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 25 Ivl=3D1ms
+> I: If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 33 Ivl=3D1ms
+> E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 33 Ivl=3D1ms
+> I: If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 49 Ivl=3D1ms
+> E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 49 Ivl=3D1ms
+> I: If#=3D 1 Alt=3D 6 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 63 Ivl=3D1ms
+> E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 63 Ivl=3D1ms
+> I:* If#=3D 2 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+> E: Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D 64 Ivl=3D125us
+> E: Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D 64 Ivl=3D125us
+> I: If#=3D 2 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+> E: Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125us
+> E: Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125us
+>
+>
+> cat /sys/kernel/debug/usb/devices
+>
+> T:  Bus=3D07 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  2 Spd=3D480  =
+MxCh=3D 0
+> D:  Ver=3D 2.10 Cls=3Def(misc ) Sub=3D02 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
+> P:  Vendor=3D13d3 ProdID=3D3596 Rev=3D 1.00
+> S:  Manufacturer=3DMediaTek Inc.
+> S:  Product=3DWireless_Device
+> S:  SerialNumber=3D000000000
+> C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
+> A:  FirstIf#=3D 0 IfCount=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01
+> I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D125us
+> E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 6 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  63 Ivl=3D1ms
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  63 Ivl=3D1ms
+> I:* If#=3D 2 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+> E:  Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D125us
+> E:  Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D125us
+> I:  If#=3D 2 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+> E:  Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125us
+> E:  Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125us
+>
+>
+> Thanks
+>
