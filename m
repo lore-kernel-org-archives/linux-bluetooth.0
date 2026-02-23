@@ -1,97 +1,126 @@
-Received: from arke.cc (arke.cc [93.95.231.48])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A33A930
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Feb 2026 23:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.95.231.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483543644CD
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 11:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771801725; cv=none; b=TXXJ2ZiWkvTlTwWxABzqW/d3JZP8rHjONTJMJ7GeUM/TT2XblLXm+CtN0YJopXTyiJmsqvlo0qNU2IcefxRYbPLCRiImM9upMFED2N1TlxGrcHP/aKuX8kA6+1qsZa6SSqz/qDXnAIT/Gp7mz/ZVzaGujE3jfZ70Ex7sXkLDuR0=
+	t=1771847672; cv=none; b=Xvl29hY3xbopGX9m1XcrsV1iLQSt5XPd4DX+s3Xahy4c3ZJQbz7bELY8D7yxwpYcQtMxZvdetooGJ6F6Oq6GhucCX5Pokwgo3GVCAIXxI51sTy0p1/AzTjgTJC6zYfRD7P80N2xKT9+Q9lhnevPs975KNcRGQDqaf5zssaXNt3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771801725; c=relaxed/simple;
-	bh=vkU0N3xU4TumOqmY/rf0TMca9R1bXUGud03naZgj67Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pw4iy1xqI8wRZ2bJln5rJMZBLCZCJIv/zBe8AJcPG3uoqSTUyDzKTwpIEpBuTVPOlk2L8qMABU+E40FuxjF0FBiZUlOWBXKha5hsUwqSOoFK65Uww0EJYNfuYn7wrgm1JAoS8hzT4nQHWJBmUI60ZWmnGJBiEZ0uj2VW5HQ2TGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arke.cc; spf=fail smtp.mailfrom=arke.cc; dkim=permerror (0-bit key) header.d=arke.cc header.i=daniele.quasimodo@arke.cc header.b=iJZRAuzX; dkim=pass (2048-bit key) header.d=arke.cc header.i=daniele.quasimodo@arke.cc header.b=GBlr6ejF; arc=none smtp.client-ip=93.95.231.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arke.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=arke.cc
+	s=arc-20240116; t=1771847672; c=relaxed/simple;
+	bh=PqsF+4zwG6Kx0+/858uFg72Vx3sisHkJfn9+kpGwq5k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kkBsCCBcKpn1K1RwVywJLRi6kP+TUlytMQdIod9NpvZlqsKSPIz8y/cSyM/WvBA+ive/GYeFgZCLuyD/SG2JdTSfJ8jSgfAniKefqGoxQlDu++biqaHIEG9St+S2mO1+AweyEZHTQLP9tJthiGlw2HH839Ut/Ruk4ajEmh3TUOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SqUpoqjw; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=arke.cc header.i=daniele.quasimodo@arke.cc header.b="iJZRAuzX";
-	dkim=pass (2048-bit key) header.d=arke.cc header.i=daniele.quasimodo@arke.cc header.b="GBlr6ejF"
-Received: from arke.cc by arke.cc ([93.95.231.48]) via tcp with ESMTPSA id
-	J-reXtgMrnked_35Tq1nOg (TLS1.3 TLS_CHACHA20_POLY1305_SHA256)
-	23 Feb 2026 00:01:15 +0100
-DKIM-Signature: v=1; d=arke.cc; s=2023a; i=daniele.quasimodo@arke.cc;
-	a=ed25519-sha256; t=1771801275; x=1772060475; h=From:To:Cc:Bcc:Reply-To:
-	References:In-Reply-To:Subject:Date:Message-Id:Content-Type:From:To:Cc:
-	References:In-Reply-To:Subject:Date:Message-Id:Content-Type;
-	bh=vkU0N3xU4TumOqmY/rf0TMca9R1bXUGud03naZgj67Q=; b=iJZRAuzXtldFOx6jpAv07dlj
-	t/7OWU7/pDSmAlKykQCale3DdVGZ3RXIfOGmTGQ97PcPfaIgyWdP5N4JOtGJDA==
-DKIM-Signature: v=1; d=arke.cc; s=2023b; i=daniele.quasimodo@arke.cc;
-	a=rsa-sha256; t=1771801275; x=1772060475; h=From:To:Cc:Bcc:Reply-To:
-	References:In-Reply-To:Subject:Date:Message-Id:Content-Type:From:To:Cc:
-	References:In-Reply-To:Subject:Date:Message-Id:Content-Type;
-	bh=vkU0N3xU4TumOqmY/rf0TMca9R1bXUGud03naZgj67Q=; b=GBlr6ejFYQvTP7bIe6gHP7Jc
-	pbxrgUTf3hOI/5CGTpwEoKW5dwJmyDT0PF42IfEc7moX1ZYlhpCipmkZbsIf0Oqq/4PKDB6Nccu
-	UUvsNDWVE+fb0HzUIXbr5eaPOgAp0VMTk67J6WIkVNGj03vy4frvwHorR2Fdpt2SzgUX7LNkour
-	wdF0AYy2CIzC3YMr1NPeNsBZc/lPv32bVhe0Sh5qDxIgmojyxxJMZTUDdKRCoojZG3m74iP0/AJ
-	rnVzIvsQdkPjZYOIgqlu3ZcQKQ43iZ2MYxy5Hg6S4S6VlGMUNARx2+5z9gN7elPYkhn5zqwpIud
-	XHPNZ9HWwJjiZqXRIA==
-Authentication-Results: arke.cc;
-	auth=pass smtp.mailfrom=daniele.quasimodo@arke.cc
-Message-ID: <e8a15eed-d4fb-42e2-ad9d-363cbc80e544@arke.cc>
-Date: Mon, 23 Feb 2026 00:01:13 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SqUpoqjw"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4376acce52eso2599387f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 03:54:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771847670; x=1772452470; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kNxS1AmPeFHtSbNUYhLk4x54/3BVPXVEpv7vdMsG6kA=;
+        b=SqUpoqjwJyrDLKuuxlJ5Sye3T7RTzuJZTd6Tw85Gd2lg2uw018tTU5vKrDYzliGsRu
+         GVvC1+H2fkhlAwY8/yk4xPZKdEKdL/TWnuEIYeJyKx+j4SJnUrsqYO5GBmuecWOIZlnR
+         t4d65d+vc5OLbmnBf5U1nwy//qLKsgjGbDcnK+Z6abSLi5LoBk3zDBvuK0S4kaG5JVWh
+         kZJTClTHpJrfpT3pESict0HZBsfEX3jri5f+DE+v/I4IohwhJpGWOLQWqpNYi/jDtxvf
+         KBxlFJzwgt0KijYe6Fzj8HL7YxnPvfVjPrpI/kjKpNSMdq9Jg8VsacFJfd+ay0oVvgyz
+         vOfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771847670; x=1772452470;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kNxS1AmPeFHtSbNUYhLk4x54/3BVPXVEpv7vdMsG6kA=;
+        b=uwKRD3MsLdnJA3XMOfKLVdVzkzuYclkMOrMZAqwA7Qrd0lgFAtXmYOmFtzG1UeJHf0
+         mn1LTdv2Q0YBc8jF9esISZks3e1jO6MedQtvDfknw/W0/abrYWGo6WKKsKUyclYmVe+n
+         cGnr5KXj8fqy+TALQY+EZLxe4j2/bRuTmwwXfWzFeBhIN2dVn5bBgSmAO/XZ+Shh0Akb
+         Nt8Nfs4Eutlh09AvnvqJr+Vtb3KQ8BpUyQy11k60j1xXG2Vud/NVAwiWNcS9ZToS7yFG
+         t+qO9QH3N812bcFawUhxn1xZYL5lYtOGUAgZe01VFSDpmPgSffUf9TsNvRuWhiOrynrS
+         rkug==
+X-Forwarded-Encrypted: i=1; AJvYcCXhpnrnQQoyJIIp4BmN82KcR1xsQVqeVeUXcaIj0FX1Po65htwVr01IE9Egj23LowXzTIGWRV9fZ70nYdkXgqs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJjuUtteY4baZJRepW4e4vi6oxTXkpyHS+ekrZmLgp/64L1hjb
+	1FBmgiI6R/aByxqm13sbkloCebFXIPU5mUIKsMIlQHtwlLo+1Z8JN44I
+X-Gm-Gg: ATEYQzxkeLBU3olS7trNXhpA22B9r5mELrQqd2pCXqAUhFuq9/dXGPSSABw3hvpaRW0
+	gwlG/dJ9oSQkUN1rkZSRCD2au/ciUkl64Su6uo+ufZJoeRZQcO4c48JTJslZdMwA4wLmVMVOOeL
+	pDhi9/qBwVEauTPrE9+N3PKdGh3TK0ogJEBPiGPMM1vAafN1wa0VcJEE9YVm2++B1Vfs4QI7WAU
+	lqlzmbZaQwFqL5vasxmxjLn5vajlCxCQK4H547zaRtbpFcTkt1uhSM7eTcjzYQNy0YfjOBA5lMu
+	Du7QI90SomVr61YpDJxamikrCj+I7Hq16gdUZIMNFT7u++TVA8y97n/FQVvoyYxlgpcUViQjK6V
+	ItvxFgJ00vLonH/ACciC96bBAzkxQbce/83wwxwPPAPuzXDnZ6s/mxz5XBDUw9guRArjZipnypr
+	Rx89i4+Qn2O5+Z08irEVQJaNdpIf05J++4ZIYgHKLCrgoFisFlSAIpoH4jCDjt3E7oUORWZjvMy
+	nzYV5TZcaYWSjp9hO9QKr3/ZpyZ3qE7whPQJ0OB
+X-Received: by 2002:a5d:5d84:0:b0:437:6b62:4540 with SMTP id ffacd0b85a97d-4396f15ac48mr16299942f8f.19.1771847669312;
+        Mon, 23 Feb 2026 03:54:29 -0800 (PST)
+Received: from Lord-Beerus.station (net-188-152-100-94.cust.vodafonedsl.it. [188.152.100.94])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970c00e8bsm15675668f8f.15.2026.02.23.03.54.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Feb 2026 03:54:28 -0800 (PST)
+From: Stefano Radaelli <stefano.radaelli21@gmail.com>
+X-Google-Original-From: Stefano Radaelli <stefano.r@variscite.com>
+To: linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Cc: pierluigi.p@variscite.com,
+	Stefano Radaelli <stefano.r@variscite.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	David Lechner <david@lechnology.com>
+Subject: [PATCH v1 0/2] Bluetooth: hci_ll: Add DT control for enhanced SCO setup erratum
+Date: Mon, 23 Feb 2026 12:52:54 +0100
+Message-ID: <cover.1771847350.git.stefano.r@variscite.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: Add support for 2c4e:0115 (Mercusys
- MA530)
-To: Edo Akse <edo@akse.cloud>, linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com
-References: <20260214215815.26248-1-edo@akse.cloud>
-Content-Language: en-US, it-IT
-From: Daniele Quasimodo <daniele.quasimodo@arke.cc>
-In-Reply-To: <20260214215815.26248-1-edo@akse.cloud>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Tested-by: Daniele Quasimodo <daniele.quasimodo@arke.cc>
+While validating SCO audio on a platform using TI WL183x Bluetooth
+modules with the hci_ll driver, we observed failures when the
+HCI Enhanced Setup Synchronous Connection command was used.
 
-I can confirm this patch fixes the issue on my Mercusys MA530
-(VID:PID 2c4e:0115, RTL8761BU).
+Although the controller advertises support for the command, SCO setup
+fails in certain configurations (e.g. BT_VOICE_TRANSPARENT/mSBC).
+This matches the scenario described in commit 05abad857277
+("Bluetooth: HCI: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk").
 
-Before applying the patch, firmware (rtl8761bu_fw.bin) was not loaded
-properly and LE discovery was continuously toggling on and off.
+Initially, we considered setting the
+HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk unconditionally in
+hci_ll. However, this would affect all TI controllers handled by the
+driver, including configurations where the enhanced setup command
+works correctly.
 
-After applying the patch, firmware loads correctly and the device
-operates reliably. I tested classic Bluetooth audio as well as BLE
-scanning and connections without issues.
+To avoid hardcoding the quirk globally, this series introduces an
+optional DT property that describes the controller limitation and
+allows enabling the quirk on affected boards only.
 
-Given that this change only adds a USB device ID enabling already
-supported hardware, it might also be suitable for stable backporting.
+Patch 1 updates the TI Bluetooth DT binding.
+Patch 2 adds support for the property in hci_ll and sets the quirk
+during controller setup when requested.
 
-On 14/02/2026 22:57, Edo Akse wrote:
-> Add USB ID 2c4e:0115 for the Mercusys MA530 which is a
-> Realtek RTL8761BU-based Bluetooth adapter.
->
-> Signed-off-by: Edo Akse <edo@akse.cloud>
-> ---
->   drivers/bluetooth/btusb.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index fcec8e589e81..a52e05062199 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -802,6 +802,8 @@ static const struct usb_device_id quirks_table[] = {
->   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x2b89, 0x6275), .driver_info = BTUSB_REALTEK |
->   						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x2c4e, 0x0115), .driver_info = BTUSB_REALTEK |
-> +						     BTUSB_WIDEBAND_SPEECH },
->   
->   	/* Additional Realtek 8821AE Bluetooth devices */
->   	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
+Tested on VAR-SOM-MX6 using TI WL183x modules where SCO audio was
+previously failing.
+
+Comments welcome.
+
+Stefano Radaelli (2):
+  dt-bindings: net: bluetooth: ti: Add property for enhanced SCO setup
+    erratum
+  Bluetooth: hci_ll: Add DT property to disable enhanced SCO setup
+
+ .../devicetree/bindings/net/bluetooth/ti,bluetooth.yaml  | 7 +++++++
+ drivers/bluetooth/hci_ll.c                               | 9 +++++++++
+ 2 files changed, 16 insertions(+)
+
+
+base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+-- 
+2.47.3
+
