@@ -1,93 +1,92 @@
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29AE632C942
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 17:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF6033067F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 17:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771866574; cv=pass; b=DudpHPEiXOpPF/UK6NoPlWTtccWgjDkqo+qs+C2/69bMTJ9Y5IAFQe2Vd/e0zQvjRiN5y3NqyRfIew9u21FviHFO5nRe/MVc/ZVWEj+yPGL+IWRMWd8sMfT1yy8g8PWdMTrGDZFeEsIRqbmfewLUwQnLQBd2NoSN2BoZfqhQlao=
+	t=1771866925; cv=pass; b=opuM1M+fxwDhtYE/kIg15EJqBmGfwg+CwU66LRhVKDpv5N5nhTBcFel+9e1hJMx+ym5xb80+yIRcbFMW5VwwhwyPzvGvT6d+b2C8H8R4wiL3B1ASloLoEq0SV853qTCdJkPIDPkZeh9YVUAP+HvoiXaCgHNpz5TdcqjAmuq8jfQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771866574; c=relaxed/simple;
-	bh=KBKyASkiYAPecNSWI1tSmWEwZel6jFyn1r4aKVQcwqM=;
+	s=arc-20240116; t=1771866925; c=relaxed/simple;
+	bh=8LBpJUX6sqfl8pjZj4Eze8zvI8svMmsISofMQpIeJS0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KGn1nYAxfltNbAfblKb1IlnCKuv5U5kxXLfQZodQHS6bI/jGdQe8/nZM7hPGxiaTRZ0xqWUR8Fnu7BQomzqbiUMQeiQhcHogcFV6+95j+DqSqxaQJu94Te168Ti6zc3RixZg6DFRHUbaD2sePpsIR+8UuIh2D/5n46nd4aIzhuE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TVmyxIq4; arc=pass smtp.client-ip=74.125.224.44
+	 To:Cc:Content-Type; b=nvEUKhp13PTgJG186SXtKFngpZlFXyCNGxcnwZjAUFGRuXAF1+cZ2D179Ces7R8KqHAhucM7Ysil+92uYVZh7lk6z/Y+gNbDec7jgUGXjbbFVImN2zLhnTRiyiylKsfb1aOn4bCtC73E54/XjhIU0GffuPFJcESyAj/v0aqe1xk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=INu4H3CS; arc=pass smtp.client-ip=74.125.224.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TVmyxIq4"
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-64ad79dfb6eso4369865d50.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 09:09:31 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771866571; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="INu4H3CS"
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64aea64bf15so4375428d50.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 09:15:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771866923; cv=none;
         d=google.com; s=arc-20240605;
-        b=faVXJLmueCU5+pgRyiveEwpX4IWe+ETg6xQH9q1HOV9c5NFnqOllvKudXBw7FO+Tmx
-         jpntnNt6x+JKyf06zFD13RDkgnTe/E7plWQFuOBf7iiSHH1unrbqzhtzli+wlOX4eQsy
-         pe+T2YkUv6AF6oS0/ehCmZSqJXPwZxf7TeqXEVCTzm68SagBmbs+lLsKW9tRJJAZVPMg
-         lSETVAGK2ZhtOCAkFPyOE11+DVCtvx4XChPSKFcfe1Ucs5b4NkOJvMFIB1vWB/UP04TD
-         kh9zbgLU874+fWqZJ7pda+G5vNFjcX1ezzfA/KujHsYvMtBqA+/iIL/Duy4v+njkg7sX
-         L22w==
+        b=g5wb4vlOn6IBYig0TYAK1UC0oClAWMgFYTPlkllJ5CFtSqD5MaD4VkOLmWBggH5ZOI
+         5anAqdNIXhXePxdq40aQLCkMkP6a+gPAZXg4G0yCIupCWu8ZpuG38YrrpR7AM0DuRwUq
+         u7+ouwCB5kEVwZjucLzBgN6CR8QUWPSIC4nX3sSs/jluZO54pcxlW4MJqboI0CYINBAS
+         sm0Y4n0gdt99/3KC6FTn5hToSNX/RZZbArw6sP4E6R5ihr7309JzzDkKzFcNVNtlDJN0
+         VWx0YBH9JvDISCmMImKN1ufY8NuxBW5qQOrU7qhHXdqP82HjmlNGkm6sNrzKYrE13JKP
+         frkA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=04VXN+RHugn0PukodBzqIaQpJiSnu+2ROrgCLcgAJqE=;
+        bh=RKw9FpYNJc9uXgQymDa8IbRRJjWafX+WP6kcs7dQC/k=;
         fh=9gkv1ylc8Kr7SGdXa37vqx4HvMaOCKwNAYgxumIeplk=;
-        b=delCMn0lyo28BhDEzgdIeUVi1M2n5vE1I4KB6++pN21QxE/hoLgEGqHF99aBSfJT41
-         R8uDYfRcGyKs0jwv4+aLQg135lmZc4RcaktHaTAIKX4rn0/3Pl3LYetMzru+wj8kQbc1
-         0ly9KlAGFK6jMQyzI7KODuH25IAIZWcp027VGRfbauumjOuH5VUS7YsyowwSjUwR3rYs
-         bOmiHNAsR6i0s/2L3AUlUQXN2EYuBo0lCLV5WA+IDj5cCjZaODtVYwzkQpfP/Uar2J1u
-         W3G95gFCuZhk0sZW2jQNbz7WU0WF7dhReti+yesX9CX7PsZHt7I1NglyHjkim/zYsoG/
-         ECgQ==;
+        b=laBpfof2Tv1R+kXJ3fIYB7rh4FTBgRWD2Dbol8jtp5SifVDHI6sxq2E9UmbIyZWL9f
+         CnmsCx0PHExsGNMMuN2eB46xd9NGHZZeoQ0vi+y3Ops6KQVT24RK53YHZ7s6NqaKRd6p
+         DIxUSjLp0mFj3DoikanlvMVEyKSF+SyJArQcfhs6x9Q1JNUJhOpt/vCeTAs5XYrcDPKN
+         weIK5rAPp4La0wyTDgBcLh7rWjSU3VvlwQPl4rJ/R7QGJPr/11qmeYO1fIvkX31mGro1
+         S2rmuTzUySwSz6wrti01X65T+XqWawVLN9D6/1kwer3C6yVSlHHXvmq68isGolmbB5vp
+         azdw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771866571; x=1772471371; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1771866923; x=1772471723; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=04VXN+RHugn0PukodBzqIaQpJiSnu+2ROrgCLcgAJqE=;
-        b=TVmyxIq4dIRXMzv2co4QOPH9XLTpY1S9K1CwIfYAMub2FgofhXzXu3xICokti4X1zF
-         X8IhbdPFl12Yctnl/YJbOmR2w+2Rz6WQiAOvbUydWdHNbffWVE2H6lmSE9fyPFuaU8/7
-         s7fmOD8rq9WqVZtHfGYvCgYwIKi70uErs/doCX4UJKuAdjkdKZEYS0LqoWuepCX0gmRw
-         +vjJWuURV0QZhRf1p2igUC3YJA8D3mwHN7UvcD4conUUNzNQDSBk+6c6Hh6qv2FZpPL2
-         rSU0Tdv41N3RVcl2brjQmDfJgQ49ga3Np/Qq02+JWvw5ft9OIweXFCMg/H6NXGgGFHep
-         ov6w==
+        bh=RKw9FpYNJc9uXgQymDa8IbRRJjWafX+WP6kcs7dQC/k=;
+        b=INu4H3CSB56bfLrZM/GmKdsyMrboqTueNjyGgnziEJRyJU6bmHhC6CZ+BONFOA6CTW
+         z4no6WxpNAJzPqsObpnBRVuWveztosDl+bJXfxDDylMKOsgfMEf1qcU9Tjk6/KavCG9y
+         5TGb0L47TNu/LpP31I/xg8mRHrSZya9PNjhgJCcOxVdrqXCm6ufsTd9o4Lfhecf9oiUz
+         4xcSFP8OFfe2h25ZVyLdZcBF6NrcvliO9WgD57tSLcKj4D+8iqUfQsOTyBjYhSdzAED6
+         4TirsMRYuz97EowrP0Xg7HqlZxsQg4OiBl4SQfwSrM8eDgimd4q+TBszKpBExf0LStTl
+         iWyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771866571; x=1772471371;
+        d=1e100.net; s=20230601; t=1771866923; x=1772471723;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=04VXN+RHugn0PukodBzqIaQpJiSnu+2ROrgCLcgAJqE=;
-        b=i5lt2x5qMsvFIvZB+XDvBWAoaAkkj58xY60SckoGg81BW3IV7KkcF7Ow+dcckivsCr
-         rNZCtx4RY97vuYT5Vuqa4ROYCGmUFLPznhxC3kRH+I9yA2Uu1SPBBVqgYfCpaY+PsZ94
-         pfmp6w4JUeTbDpR4Qjsy+GuquG4c7yxZhAO4MdePfVSFEioCX2WVtSz+VTsgt5Heqikc
-         frBd97qNMlqz1DVkgzLwSKkoKE3hbOE7A79dPf+gufzdJGEAsHs1OBAqMaQ6VFDRYkXc
-         fez8hnOux1dPzTPpje7QTm59ukXr+5NcYDaMtPiQeHZwzcAlEKvipl+KHNBTIUkZHGf4
-         3vIw==
-X-Gm-Message-State: AOJu0Yx1vJZ/A2y5+IS5xNGoAPEXPwJsnLWhen2E2+TlVmeF6rYrgsEA
-	SaaHqfYHa0nKqNPYC3YpkKIc96vlYxYL+nrpJi3ekKiH0U4CGipzSBLoyd9SbyTdVdwcC3UnSTc
-	NxTI8iRI0hIKQTrHSGoI4NEiW/rkqYdXBkA==
-X-Gm-Gg: ATEYQzxV/SPEq4UVFKYzZnjTJBbYntU0VRMjYjyUKnNMC4qFk/2J104h2xmM/uYwlmq
-	EmIV1ejAp+WDrD2HZTr7nNdcMdmt5pBpwLOdIrnnbjMlVPIV0dJK6N7f6aIXjK33Rs3IPmk1VNi
-	hAqSOC7DeCTpceaY34Q3zEwU0iAYaf7JeosUUK6bAsj1R9ZDvEIP3od/67cEsjlMy0h0fbEDCkm
-	lDODjy5NJD9rfof5orlBGTahP0CnD88Bb4X1rygJuk0JAL192qUXgupzOjQz4fC3Lk5bxhSwwe1
-	S2BKZ5paixt1dicRMVJ03eYt1Ij+NG7E3JZhrt5GEa1lT1KodGXAm61AQ9dJy2Op+k2dOULnlRV
-	QNzcm
-X-Received: by 2002:a53:e01c:0:b0:64a:dd3c:2d05 with SMTP id
- 956f58d0204a3-64c78c10535mr5568298d50.54.1771866570819; Mon, 23 Feb 2026
- 09:09:30 -0800 (PST)
+        bh=RKw9FpYNJc9uXgQymDa8IbRRJjWafX+WP6kcs7dQC/k=;
+        b=HScstOBFta8ZO2rVxrWSb8hqhBpeAROuuR8wIXkleA5B7GdGNL2zctcLKl2zwE+O3Y
+         epwZd6x6+FGUqCJE2AUOO4uhn44WeoQIKL4AHKwSNaQb3gnmFJVKhG+PJZIxVKSVyV67
+         ly2AW/b7vI+BwxnFZ1kN7P+LdI53rYBl3WIupQcjFT+qMoPVr3wyqpVmd1S7T7p/SbkQ
+         U4Cg7OXQFN4B10Ttt/jUDGwenHFpdRLHXgntRYk9RNx1Rg8tRMritlenO4bj5rXfw5OF
+         SR5lQqWdzJE/l+8gLUHtZOHQ8OAjyDrT+jfJQl0USxn3W7Vef6ntPEYfloZdgbDeGIM0
+         vt2A==
+X-Gm-Message-State: AOJu0YxtIufSOcjf4nQZgSPcvzT4Mb0vqkhHdlTaTh1g4Dc1RM+/LLht
+	ZjbRLo1j95TvDuAOSLmQHGV4AmVlN5NkkEeJPgg3yKT0OwgQB/Zat414jP48CgmydhSt6m304Xt
+	qEIvz6flIK/FJ6XPXHynRz+67uQ3E278=
+X-Gm-Gg: ATEYQzyWZFsSm8fFuIz87Aa4aXu5lZ0FQW4QYYAWMBk6y+WYN4C5uUsPPVrKdzsWpcP
+	Q2uK7xY5RIcW/lY8/XWRe444LSa55Ky1qMwd0ppaEC0zbN08PGD/nz2PmI0WOph5Ws5oP7MlAAb
+	DhFVP1P7adlv8Zw5yRumtTgC3ZxLfwbBvs6gKrNoU9Lt8Gd3aqq9dqgfOdAD/73PyOGxRtOg3Wg
+	SdtNUCyyRIP367sXTBVkbi3s9GGyzJN1CKdcKSy8rEsg1IiGWzBWbZHnnDRRLhtuEcbV+N9zc8I
+	BcMIOBgmLSRCzreV4A/chDNAGBW9e0UpNsjYG6yxvfzMgN6lFTjFFbJpfDLKjvzCNp2hjQ==
+X-Received: by 2002:a05:690e:1653:b0:64a:db34:8506 with SMTP id
+ 956f58d0204a3-64c787d6f54mr5993715d50.17.1771866923359; Mon, 23 Feb 2026
+ 09:15:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223172104.167471-1-kiran.k@intel.com> <20260223172104.167471-2-kiran.k@intel.com>
-In-Reply-To: <20260223172104.167471-2-kiran.k@intel.com>
+References: <20260223172104.167471-1-kiran.k@intel.com> <20260223172104.167471-7-kiran.k@intel.com>
+In-Reply-To: <20260223172104.167471-7-kiran.k@intel.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 23 Feb 2026 12:09:19 -0500
-X-Gm-Features: AaiRm53NEIIhULtT7_gn4Oh_h5bj6QnkiarjcMk8YmdMB1LGHxzB_cPjhzGz2DQ
-Message-ID: <CABBYNZK5SHfiTNivJP4fKeLbRQOAyeY-cGcofrpJCWcCi2WUZA@mail.gmail.com>
-Subject: Re: [PATCH v1 2/7] Bluetooth: btintel: Replace CNVi id with hardware variant
+Date: Mon, 23 Feb 2026 12:15:11 -0500
+X-Gm-Features: AaiRm51kMOhNf3ZSK1yWK3wudoNh7thGWglJvoB141gVbQ9wrvjnCuOlFT8_GhI
+Message-ID: <CABBYNZLa+=ynikAJ3ivM5c-Gu6zbg0MiiSuFReGRL5hTSu-ExA@mail.gmail.com>
+Subject: Re: [PATCH v1 7/7] btintel_pcie: Add support for exception dump for ScP2F
 To: Kiran K <kiran.k@intel.com>
 Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com, 
 	chandrashekar.devegowda@intel.com, chethan.tumkur.narayan@intel.com
@@ -96,83 +95,46 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Kiran,
 
-On Mon, Feb 23, 2026 at 12:05=E2=80=AFPM Kiran K <kiran.k@intel.com> wrote:
+On Mon, Feb 23, 2026 at 12:02=E2=80=AFPM Kiran K <kiran.k@intel.com> wrote:
 >
-> Use hardware variant instead of CNVi to send dsbr command.
-
-I guess by this you mean to say that is what the firmware expects, right?
-
+> Add device coredump support for Scorpious Peak2F product.
 >
 > Signed-off-by: Kiran K <kiran.k@intel.com>
 > ---
->  drivers/bluetooth/btintel.c | 18 +++++++++---------
->  drivers/bluetooth/btintel.h |  7 +++++++
->  2 files changed, 16 insertions(+), 9 deletions(-)
+>  drivers/bluetooth/btintel.h      | 1 +
+>  drivers/bluetooth/btintel_pcie.c | 1 +
+>  2 files changed, 2 insertions(+)
 >
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 5999be2efef8..2547b590f87a 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -2813,31 +2813,31 @@ static int btintel_set_dsbr(struct hci_dev *hdev,=
- struct intel_version_tlv *ver)
->
->         struct btintel_dsbr_cmd cmd;
->         struct sk_buff *skb;
-> -       u32 dsbr, cnvi;
-> -       u8 status;
-> +       u32 dsbr;
-> +       u8 status, hw_variant;
->         int err;
->
-> -       cnvi =3D ver->cnvi_top & 0xfff;
-> +       hw_variant =3D INTEL_HW_VARIANT(ver->cnvi_bt);
->         /* DSBR command needs to be sent for,
->          * 1. BlazarI or BlazarIW + B0 step product in IML image.
->          * 2. Gale Peak2 or BlazarU in OP image.
->          * 3. Scorpious Peak in IML image.
->          */
->
-> -       switch (cnvi) {
-> -       case BTINTEL_CNVI_BLAZARI:
-> -       case BTINTEL_CNVI_BLAZARIW:
-> +       switch (hw_variant) {
-> +       case BTINTEL_HWID_BZRI:
-> +       case BTINTEL_HWID_BZRIW:
->                 if (ver->img_type =3D=3D BTINTEL_IMG_IML &&
->                     INTEL_CNVX_TOP_STEP(ver->cnvi_top) =3D=3D 0x01)
->                         break;
->                 return 0;
-> -       case BTINTEL_CNVI_GAP:
-> -       case BTINTEL_CNVI_BLAZARU:
-> +       case BTINTEL_HWID_GAP:
-> +       case BTINTEL_HWID_BZRU:
->                 if (ver->img_type =3D=3D BTINTEL_IMG_OP &&
->                     hdev->bus =3D=3D HCI_USB)
->                         break;
->                 return 0;
-> -       case BTINTEL_CNVI_SCP:
-> +       case BTINTEL_HWID_SCP:
->                 if (ver->img_type =3D=3D BTINTEL_IMG_IML)
->                         break;
->                 return 0;
 > diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index 431998049e68..21c9a6c9eb9e 100644
+> index bef7ea84b1e4..b5e7f0aafb4c 100644
 > --- a/drivers/bluetooth/btintel.h
 > +++ b/drivers/bluetooth/btintel.h
-> @@ -69,6 +69,13 @@ struct intel_tlv {
+> @@ -60,6 +60,7 @@ struct intel_tlv {
+>  #define BTINTEL_CNVI_BLAZARU           0x930
+>  #define BTINTEL_CNVI_SCP               0xA00
+>  #define BTINTEL_CNVI_SCP2              0xA10
+> +#define BTINTEL_CNVI_SCP2F             0xA20
+
+Let's document these definitions with Marketing Product Name/Platform
+Name e.g. /* BE2XX/Panther Lake */ to make correlation easier.
+
 >
->  #define BTINTEL_FWID_MAXLEN 64
->
-> +/* Hardware ID */
-> +#define BTINTEL_HWID_GAP       0x1c
-> +#define BTINTEL_HWID_BZRI      0x1e
-> +#define BTINTEL_HWID_BZRU      0x1d
-> +#define BTINTEL_HWID_SCP       0x1f
-> +#define BTINTEL_HWID_BZRIW     0x22
-> +
->  struct intel_version_tlv {
->         u32     cnvi_top;
->         u32     cnvr_top;
+>  /* CNVR */
+>  #define BTINTEL_CNVR_FMP2              0x910
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel=
+_pcie.c
+> index d0cabf4df7c0..d903460bea76 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -1234,6 +1234,7 @@ static void btintel_pcie_read_hwexp(struct btintel_=
+pcie_data *data)
+>                 addr =3D BTINTEL_PCIE_SCP_HWEXP_DMP_ADDR;
+>         break;
+>         case BTINTEL_CNVI_SCP2:
+> +       case BTINTEL_CNVI_SCP2F:
+>                 len =3D BTINTEL_PCIE_SCP2_HWEXP_SIZE;
+>                 addr =3D BTINTEL_PCIE_SCP2_HWEXP_DMP_ADDR;
+>         break;
 > --
 > 2.43.0
 >
