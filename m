@@ -1,196 +1,139 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74654365A05
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 12:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFAE1E8826;
+	Mon, 23 Feb 2026 12:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771848117; cv=none; b=Yd8joTSlNVolYYKKNd1OnhnmWIiRNb/+PQVhxcPD+uDdr7uP7ZsjcMNSq+4/1TufYTKrxPFD1ytUTclveNcaaoALNym8V6pCrnpYEGs4ttynNVJjgYTpKK2DW71hbY5sQ4qOi8Q4gEf2ZnHAnPdPhyazmL2gcAWt0KDi7Wz2288=
+	t=1771848211; cv=none; b=Ftqboh9fj3PVXx8f0A4fPj/0GICmw2rwD8eicM8CPBZza9Lw8e4ciB4chdOyQzII5jou0P2dcbLsRGYHFGxQZhVYGxkqxHUaeY1IVYY5GVgrVPEitzzYUe7V5kUKFtpVamTpdHJpKm9+QQ5RLHj5pijLuHUmDcy0ihwovUzdUwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771848117; c=relaxed/simple;
-	bh=iiB7pchE4S04Cg8Opj5Xsod10fWNtMiWOs0glLPcnuk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ReYb4iUY7fg+P2R63CMuS7/Kb2J2RjAhzYBAJZHGOELDcr9wxniu8+7ffK+/EbMLtsLp0yQYLdxWx5txiWbdhIP/IWPMEsTexxdp0fHUhvRWBzwraUKM+x1m2zJrie3RhGRRPI5eqL9vfQcckOfqvALdUs4Ur5MhLY9d3tgdZwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=UDJaisQB; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1771848211; c=relaxed/simple;
+	bh=IaMmGdspUNNCNtc+Hjx08GJ1ueA6TR73WOYLu1ABTyg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DIP62wdyyaPoxTh2r155fn6H925nW90+UKFUJu5QExlN2dDe6tPSSkrkVazyC0hNLekx5GT5ik/1GfEp3Jp5k8OntUpQVJBs62tomZFblzRqr88oTR5IKwBjbruI7J3f6F5b9H8V4+9OYrMwagbwl25sVkaoJ5m960aKT1Jhc5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hwN/UUln; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="UDJaisQB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1771848107;
-	bh=iiB7pchE4S04Cg8Opj5Xsod10fWNtMiWOs0glLPcnuk=;
-	h=From:To:Subject:Date:From;
-	b=UDJaisQBZAjgL2ytTQgK18bha+S3Kk5Bhwst+TMdz1dty9lqd//tySgq4UB2Cq0IW
-	 GqaKtm5QF6wX0vhyi7ONTfeOYY+qiwVU+rm8khIJzHc/CcF6xrZwPsSfbm3mawqYr2
-	 xA+ete3ovRzL43/dnGHUVSIU39YCnHIil2lPd9QxMbRehWfNKm+XF7p5fFzuybYkDC
-	 u7RJqye9MqLjjQs4wLT+cIch369SE12XX+goo3brIQbf3On5xmKvltQcusyOz6mk6T
-	 /3TbwyaAiTyBwSVUX5Roe/Brj75jpb60pyUGZHvLObPxLe6zurFv+c3ebYMTsZxugF
-	 c6QQBsLugcG+A==
-Received: from fdanis-ThinkPad-X1.. (2a02-8428-af44-1001-0F6F-a0F8-dAdF-0a2c.rev.sfr.net [IPv6:2a02:8428:af44:1001:f6f:a0f8:dadf:a2c])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8BC7817E04C4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 13:01:47 +0100 (CET)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] shared/bap: Fix endpoint configuration
-Date: Mon, 23 Feb 2026 13:01:42 +0100
-Message-ID: <20260223120142.205159-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hwN/UUln"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2AC4C116C6;
+	Mon, 23 Feb 2026 12:03:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771848211;
+	bh=IaMmGdspUNNCNtc+Hjx08GJ1ueA6TR73WOYLu1ABTyg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hwN/UUlnkDRi04yIKwdb9z9hbavnx61qFbu8FQv+edy8YGv4ztGacwQE/krB2l/fU
+	 dYBlLaHJxRLMBZoM/b0i7oNHF7LFTc1AZcD9N4hftYGFZ/UmDYHMGR3PJaiZaCyMKL
+	 pQSp3ww/K2jwUoQvjBw5WDGMGCDJKnvrRhVrn9xg56D7pZ+dPf5hV3tnlpH+aTjjuj
+	 gpz4/jh3KBHxGKjMrh7GsesmreWCFJEvjFBIrYlfnZIraVeigdZ5rgesPxFu0uuzjR
+	 ehRW+Lf3daELPhBw980jGfWB3bkxW9+/HG6hnE2R2Ivgb7BPE6WD3XfY6LsXX9XLk/
+	 HaWuLF0hA7QKA==
+Message-ID: <a5d4ebf0-9d99-494c-b46b-a6140610c9e2@kernel.org>
+Date: Mon, 23 Feb 2026 13:03:27 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/2] dt-bindings: net: bluetooth: ti: Add property for
+ enhanced SCO setup erratum
+To: Stefano Radaelli <stefano.radaelli21@gmail.com>,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
+Cc: pierluigi.p@variscite.com, Stefano Radaelli <stefano.r@variscite.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, David Lechner <david@lechnology.com>
+References: <cover.1771847350.git.stefano.r@variscite.com>
+ <db4c7eab9d0c2f71eb61baff240957596f099401.1771847350.git.stefano.r@variscite.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <db4c7eab9d0c2f71eb61baff240957596f099401.1771847350.git.stefano.r@variscite.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When a first local endpoint is created after connection to a remote
-device this doesn't trigger the SelectProperties request because
-bt_bap_bac ops are not yet set when bt_bap_select() is called.
-Creating a second local endpoint allows to trigger SelectProperties
-request for the first endpoint.
+On 23/02/2026 12:52, Stefano Radaelli wrote:
+> From: Stefano Radaelli <stefano.r@variscite.com>
+> 
+> Some Bluetooth controller/firmware combinations advertise support for the
 
-This commit fixes this behavior by setting the ops during bt_bap_pac
-creation.
----
-v1->v2: Add bt_bap_add_vendor_pac_full() instead of changing
-        bt_bap_add_vendor_pac()
+Which ones?
 
- profiles/audio/media.c |  9 ++++-----
- src/shared/bap.c       | 20 ++++++++++++++++++--
- src/shared/bap.h       | 33 +++++++++++++++++++++------------
- 3 files changed, 43 insertions(+), 19 deletions(-)
+> HCI Enhanced Setup Synchronous Connection command but do not handle it
+> correctly for SCO setup in certain configurations (e.g.
+> BT_VOICE_TRANSPARENT/mSBC). This results in SCO audio not working unless
+> the enhanced setup path is avoided.
+> 
+> Add an optional boolean property, ti,no-enhanced-setup-sync-conn, to
+> describe this controller limitation.
+> 
+> Signed-off-by: Stefano Radaelli <stefano.r@variscite.com>
+> ---
+>  .../devicetree/bindings/net/bluetooth/ti,bluetooth.yaml    | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/ti,bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/ti,bluetooth.yaml
+> index 290abc22e18a..92ed443cb427 100644
+> --- a/Documentation/devicetree/bindings/net/bluetooth/ti,bluetooth.yaml
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/ti,bluetooth.yaml
+> @@ -71,6 +71,13 @@ properties:
+>      items:
+>        - const: bd-address
+>  
+> +  ti,no-enhanced-setup-sync-conn:
+> +    type: boolean
+> +    description:
+> +      Indicates that the Bluetooth controller/firmware does not correctly
+> +      handle the HCI Enhanced Setup Synchronous Connection command for SCO
+> +      setup, despite advertising support for it.
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 772af1014..cdaafb04e 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1361,9 +1361,10 @@ static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
- 		metadata->iov_len = endpoint->metadata_size;
- 	}
- 
--	endpoint->pac = bt_bap_add_vendor_pac(db, name, type, endpoint->codec,
--				endpoint->cid, endpoint->vid, &endpoint->qos,
--				&data, metadata);
-+	endpoint->pac = bt_bap_add_vendor_pac_full(db, name, type,
-+				endpoint->codec, endpoint->cid, endpoint->vid,
-+				&endpoint->qos, &data, metadata,
-+				&pac_ops, endpoint);
- 	if (!endpoint->pac) {
- 		error("Unable to create PAC");
- 		free(name);
-@@ -1371,8 +1372,6 @@ static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
- 		return false;
- 	}
- 
--	bt_bap_pac_set_ops(endpoint->pac, &pac_ops, endpoint);
--
- 	DBG("PAC %s registered", name);
- 
- 	free(name);
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 37b04c5c1..8da626fe3 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -4124,12 +4124,14 @@ static void notify_session_pac_added(void *data, void *user_data)
- 	queue_foreach(bap->pac_cbs, notify_pac_added, user_data);
- }
- 
--struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
-+struct bt_bap_pac *bt_bap_add_vendor_pac_full(struct gatt_db *db,
- 					const char *name, uint8_t type,
- 					uint8_t id, uint16_t cid, uint16_t vid,
- 					struct bt_bap_pac_qos *qos,
- 					struct iovec *data,
--					struct iovec *metadata)
-+					struct iovec *metadata,
-+					struct bt_bap_pac_ops *ops,
-+					void *ops_user_data)
- {
- 	struct bt_bap_db *bdb;
- 	struct bt_bap_pac *pac;
-@@ -4150,6 +4152,8 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
- 	codec.vid = vid;
- 
- 	pac = bap_pac_new(bdb, name, type, &codec, qos, data, metadata);
-+	if (ops)
-+		bt_bap_pac_set_ops(pac, ops, ops_user_data);
- 
- 	switch (type) {
- 	case BT_BAP_SINK:
-@@ -4174,6 +4178,18 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
- 	return pac;
- }
- 
-+struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
-+					const char *name, uint8_t type,
-+					uint8_t id, uint16_t cid, uint16_t vid,
-+					struct bt_bap_pac_qos *qos,
-+					struct iovec *data,
-+					struct iovec *metadata)
-+{
-+	return bt_bap_add_vendor_pac_full(db, name, type, id, cid, vid, qos,
-+							data, metadata,
-+							NULL, NULL);
-+}
-+
- struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
- 					uint8_t type, uint8_t id,
- 					struct bt_bap_pac_qos *qos,
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index c1b75949f..5bdc5f8db 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -67,6 +67,27 @@ struct bt_bap_pac_qos {
- 	uint16_t context;
- };
- 
-+struct bt_bap_pac_ops {
-+	int (*select)(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+			uint32_t chan_alloc, struct bt_bap_pac_qos *qos,
-+			bt_bap_pac_select_t cb, void *cb_data, void *user_data);
-+	void (*cancel_select)(struct bt_bap_pac *lpac,
-+			bt_bap_pac_select_t cb, void *cb_data, void *user_data);
-+	int (*config)(struct bt_bap_stream *stream, struct iovec *cfg,
-+			struct bt_bap_qos *qos, bt_bap_pac_config_t cb,
-+			void *user_data);
-+	void (*clear)(struct bt_bap_stream *stream, void *user_data);
-+};
-+
-+struct bt_bap_pac *bt_bap_add_vendor_pac_full(struct gatt_db *db,
-+					const char *name, uint8_t type,
-+					uint8_t id, uint16_t cid, uint16_t vid,
-+					struct bt_bap_pac_qos *qos,
-+					struct iovec *data,
-+					struct iovec *metadata,
-+					struct bt_bap_pac_ops *ops,
-+					void *ops_user_data);
-+
- struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
- 					const char *name, uint8_t type,
- 					uint8_t id, uint16_t cid, uint16_t vid,
-@@ -80,18 +101,6 @@ struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
- 					struct iovec *data,
- 					struct iovec *metadata);
- 
--struct bt_bap_pac_ops {
--	int (*select)(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			uint32_t chan_alloc, struct bt_bap_pac_qos *qos,
--			bt_bap_pac_select_t cb, void *cb_data, void *user_data);
--	void (*cancel_select)(struct bt_bap_pac *lpac,
--			bt_bap_pac_select_t cb, void *cb_data, void *user_data);
--	int (*config)(struct bt_bap_stream *stream, struct iovec *cfg,
--			struct bt_bap_qos *qos, bt_bap_pac_config_t cb,
--			void *user_data);
--	void (*clear)(struct bt_bap_stream *stream, void *user_data);
--};
--
- bool bt_bap_pac_set_ops(struct bt_bap_pac *pac, struct bt_bap_pac_ops *ops,
- 					void *user_data);
- 
--- 
-2.43.0
+This looks a lot like controller issue, thus deducible from the
+compatible. And even if particular firmware has problem, how do you see
+changing static DTS on linux-firmware update?
 
+Best regards,
+Krzysztof
