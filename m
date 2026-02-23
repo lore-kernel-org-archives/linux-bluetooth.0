@@ -1,62 +1,64 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483543644CD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81A3364E8C
 	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 11:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771847672; cv=none; b=Xvl29hY3xbopGX9m1XcrsV1iLQSt5XPd4DX+s3Xahy4c3ZJQbz7bELY8D7yxwpYcQtMxZvdetooGJ6F6Oq6GhucCX5Pokwgo3GVCAIXxI51sTy0p1/AzTjgTJC6zYfRD7P80N2xKT9+Q9lhnevPs975KNcRGQDqaf5zssaXNt3U=
+	t=1771847673; cv=none; b=m3oMzYDxdvftzBoA6dZg5pCa5EQw9qWfLowcu0s03sd/Upyz3W/JzqYWChLiaZSXidW8QquNG+J/a2J/OCYS8tNUx4hpVW9DoOsi++7j8d0BebO+DBcvPyPsW7i48XJ1TV+h1DKjKzX4j1Tj4iSIvB879r/sYLzSAjxHhNIi6WI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771847672; c=relaxed/simple;
-	bh=PqsF+4zwG6Kx0+/858uFg72Vx3sisHkJfn9+kpGwq5k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kkBsCCBcKpn1K1RwVywJLRi6kP+TUlytMQdIod9NpvZlqsKSPIz8y/cSyM/WvBA+ive/GYeFgZCLuyD/SG2JdTSfJ8jSgfAniKefqGoxQlDu++biqaHIEG9St+S2mO1+AweyEZHTQLP9tJthiGlw2HH839Ut/Ruk4ajEmh3TUOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SqUpoqjw; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1771847673; c=relaxed/simple;
+	bh=uxs/O1t4MJgE83VLwLmZ5lLCdtI8c+c02jiKLX03oek=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Hee3pZIWahdDEcfvcKKJPgSCBTtFt6ezpSm+AcesgLjhcWGKKB9Wjy6oMUCbepu095oGg5j70Ii0fM2o+G1+01j3oxygH3QxO6HZLh52ijNwLkvOemNqJiQgygRL5tVzaAgkvFZn47sCdhX3BAuBljF4DsJfgoifo7LR/z9Q07c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KxM/iGMz; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SqUpoqjw"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4376acce52eso2599387f8f.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KxM/iGMz"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-48371119eacso48999455e9.2
         for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 03:54:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1771847670; x=1772452470; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kNxS1AmPeFHtSbNUYhLk4x54/3BVPXVEpv7vdMsG6kA=;
-        b=SqUpoqjwJyrDLKuuxlJ5Sye3T7RTzuJZTd6Tw85Gd2lg2uw018tTU5vKrDYzliGsRu
-         GVvC1+H2fkhlAwY8/yk4xPZKdEKdL/TWnuEIYeJyKx+j4SJnUrsqYO5GBmuecWOIZlnR
-         t4d65d+vc5OLbmnBf5U1nwy//qLKsgjGbDcnK+Z6abSLi5LoBk3zDBvuK0S4kaG5JVWh
-         kZJTClTHpJrfpT3pESict0HZBsfEX3jri5f+DE+v/I4IohwhJpGWOLQWqpNYi/jDtxvf
-         KBxlFJzwgt0KijYe6Fzj8HL7YxnPvfVjPrpI/kjKpNSMdq9Jg8VsacFJfd+ay0oVvgyz
-         vOfA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ruQhGiuF9FhysktRv+P3PWPBS4mTnGG0CPJP27Fqqnc=;
+        b=KxM/iGMzgwXL8s/ade6h8ZkXQehyLDIrxRSAJC8mXMnbQEHY8jRQoOBEFtSmvwxszZ
+         /6jFqZjre5NvhPW58nl3GmNP+LDqEGQ+4C8TC7jpZ4GGO4yuMUAxdNCVYED5Yquh4w2H
+         o92PNyIpXycPgWXQyjcd0/DmXn09HsribWm+avamosx5ovlbkHcVo8hCbHa+z+BJRBfA
+         fV23F5lK3+7Hw+xHeDLMx37RsOVDN9F4QhHIpK3O3OoLtEbL8g48m2a+ywFezHtjS5Gm
+         t0fChT4LO6XlkOPgLB+WZqDXgCiGGCqYZi3cEKLgOgUOJ71vw+vu8XbGOwvclsJ+MvTH
+         5kqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1771847670; x=1772452470;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kNxS1AmPeFHtSbNUYhLk4x54/3BVPXVEpv7vdMsG6kA=;
-        b=uwKRD3MsLdnJA3XMOfKLVdVzkzuYclkMOrMZAqwA7Qrd0lgFAtXmYOmFtzG1UeJHf0
-         mn1LTdv2Q0YBc8jF9esISZks3e1jO6MedQtvDfknw/W0/abrYWGo6WKKsKUyclYmVe+n
-         cGnr5KXj8fqy+TALQY+EZLxe4j2/bRuTmwwXfWzFeBhIN2dVn5bBgSmAO/XZ+Shh0Akb
-         Nt8Nfs4Eutlh09AvnvqJr+Vtb3KQ8BpUyQy11k60j1xXG2Vud/NVAwiWNcS9ZToS7yFG
-         t+qO9QH3N812bcFawUhxn1xZYL5lYtOGUAgZe01VFSDpmPgSffUf9TsNvRuWhiOrynrS
-         rkug==
-X-Forwarded-Encrypted: i=1; AJvYcCXhpnrnQQoyJIIp4BmN82KcR1xsQVqeVeUXcaIj0FX1Po65htwVr01IE9Egj23LowXzTIGWRV9fZ70nYdkXgqs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJjuUtteY4baZJRepW4e4vi6oxTXkpyHS+ekrZmLgp/64L1hjb
-	1FBmgiI6R/aByxqm13sbkloCebFXIPU5mUIKsMIlQHtwlLo+1Z8JN44I
-X-Gm-Gg: ATEYQzxkeLBU3olS7trNXhpA22B9r5mELrQqd2pCXqAUhFuq9/dXGPSSABw3hvpaRW0
-	gwlG/dJ9oSQkUN1rkZSRCD2au/ciUkl64Su6uo+ufZJoeRZQcO4c48JTJslZdMwA4wLmVMVOOeL
-	pDhi9/qBwVEauTPrE9+N3PKdGh3TK0ogJEBPiGPMM1vAafN1wa0VcJEE9YVm2++B1Vfs4QI7WAU
-	lqlzmbZaQwFqL5vasxmxjLn5vajlCxCQK4H547zaRtbpFcTkt1uhSM7eTcjzYQNy0YfjOBA5lMu
-	Du7QI90SomVr61YpDJxamikrCj+I7Hq16gdUZIMNFT7u++TVA8y97n/FQVvoyYxlgpcUViQjK6V
-	ItvxFgJ00vLonH/ACciC96bBAzkxQbce/83wwxwPPAPuzXDnZ6s/mxz5XBDUw9guRArjZipnypr
-	Rx89i4+Qn2O5+Z08irEVQJaNdpIf05J++4ZIYgHKLCrgoFisFlSAIpoH4jCDjt3E7oUORWZjvMy
-	nzYV5TZcaYWSjp9hO9QKr3/ZpyZ3qE7whPQJ0OB
-X-Received: by 2002:a5d:5d84:0:b0:437:6b62:4540 with SMTP id ffacd0b85a97d-4396f15ac48mr16299942f8f.19.1771847669312;
-        Mon, 23 Feb 2026 03:54:29 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ruQhGiuF9FhysktRv+P3PWPBS4mTnGG0CPJP27Fqqnc=;
+        b=MvREBGyAzWoyc9taFV8JOiWl382zBWWd/BVOhZNXBPUgOrH/YSUa9Rgmx7R0LcW0vL
+         NME0FjNMnMvgros8H/bZfrFSBPUEryn+SMNSXO/KJKhx9kVY4xUBlWRRFEw8noufBs9N
+         JxsBSwzyLYKxLJl009vARjqvCqUWcBzSj/jcDXeaARf1HP3LP1U7U8tn5ewogAIXhG0u
+         JaLShxfG/ZRdSM0jk+ZWoPRo8tQWdX28vNhp8AkPCRtOODGjvg+YuhDzAf9mGPNfKqhz
+         1ielqKpfggbAmmPiypjP+BMj9kAvd0S3KBQAR1xZZmuDi3FDRIlpKTl0kWbaeJvf3Cls
+         wicQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHha9ovVts9uDq8cz6UKv2qYJv1iQfvA/7u7CwUocQ3yODVqH/4ZvxAYI7bIT1kkCfvgWl6HUJoS4YwiHsuoI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEp29BeVtG843yro202XbNQv5Q5N6nXvC1lIZGUaT8xK/3Pohy
+	X+d0Fx1rPk3buB2b0zSiIcx4XqTOfigEVopDX2aw9NgqGOCY6anbmsuuOMFdgQ==
+X-Gm-Gg: ATEYQzw2kp8xpi3ACLOLCBLqX3wyHflbzVcyBdnxFvxwykWnjpqjDrwNiYNyAlUNUg6
+	NKmSP5xxDpQMWqhlSJlOUtQ326jvtXxjwgshx+3Sc7U2GNc1jSZSkLNzTtDTIZprcbQNHmGb9Pd
+	uC+P71m9guq6wbszPTcMz0MeMTcKmry+Bblr7D+SmT0parPO/oN7tVevgHHVfSRqAtEXG4l/hHU
+	Azjhg7F20iJUrafZIDuAsn8k1SBRheNiGOuBblEzY2jTKtPHl+McDJyEWUZrxL14hKWdVESrmNd
+	DiQkT2kNHxq6XF4FilxZTGXKH79xQGpANhsdQe1mOl67WybZsGtPTMwLUo8uQUKfee+SDFXcZV9
+	mlj8fa9OnD3s+U8KDGrqNVgN+gftggatIhtlK0tw047kL5xM52Oe7KYnyqq2Iug7v9k+nDuC6XO
+	GJUGROw1AFyi9dowiNimU3icnWJAUZ/4V4O/5nS/fiDxR/GsedCOIy2GtRdNgxLsKA3dh5odsTj
+	HqSHFW5LuR0cWJ/CpG7E7ZReDHgRHNYXTBcUUkO
+X-Received: by 2002:a05:6000:4381:b0:435:96b7:e0db with SMTP id ffacd0b85a97d-4396f153a34mr13314214f8f.17.1771847670129;
+        Mon, 23 Feb 2026 03:54:30 -0800 (PST)
 Received: from Lord-Beerus.station (net-188-152-100-94.cust.vodafonedsl.it. [188.152.100.94])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970c00e8bsm15675668f8f.15.2026.02.23.03.54.28
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970c00e8bsm15675668f8f.15.2026.02.23.03.54.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 03:54:28 -0800 (PST)
+        Mon, 23 Feb 2026 03:54:29 -0800 (PST)
 From: Stefano Radaelli <stefano.radaelli21@gmail.com>
 X-Google-Original-From: Stefano Radaelli <stefano.r@variscite.com>
 To: linux-kernel@vger.kernel.org,
@@ -70,10 +72,12 @@ Cc: pierluigi.p@variscite.com,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	David Lechner <david@lechnology.com>
-Subject: [PATCH v1 0/2] Bluetooth: hci_ll: Add DT control for enhanced SCO setup erratum
-Date: Mon, 23 Feb 2026 12:52:54 +0100
-Message-ID: <cover.1771847350.git.stefano.r@variscite.com>
+Subject: [PATCH v1 1/2] dt-bindings: net: bluetooth: ti: Add property for enhanced SCO setup erratum
+Date: Mon, 23 Feb 2026 12:52:55 +0100
+Message-ID: <db4c7eab9d0c2f71eb61baff240957596f099401.1771847350.git.stefano.r@variscite.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <cover.1771847350.git.stefano.r@variscite.com>
+References: <cover.1771847350.git.stefano.r@variscite.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -82,45 +86,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-While validating SCO audio on a platform using TI WL183x Bluetooth
-modules with the hci_ll driver, we observed failures when the
-HCI Enhanced Setup Synchronous Connection command was used.
+From: Stefano Radaelli <stefano.r@variscite.com>
 
-Although the controller advertises support for the command, SCO setup
-fails in certain configurations (e.g. BT_VOICE_TRANSPARENT/mSBC).
-This matches the scenario described in commit 05abad857277
-("Bluetooth: HCI: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk").
+Some Bluetooth controller/firmware combinations advertise support for the
+HCI Enhanced Setup Synchronous Connection command but do not handle it
+correctly for SCO setup in certain configurations (e.g.
+BT_VOICE_TRANSPARENT/mSBC). This results in SCO audio not working unless
+the enhanced setup path is avoided.
 
-Initially, we considered setting the
-HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk unconditionally in
-hci_ll. However, this would affect all TI controllers handled by the
-driver, including configurations where the enhanced setup command
-works correctly.
+Add an optional boolean property, ti,no-enhanced-setup-sync-conn, to
+describe this controller limitation.
 
-To avoid hardcoding the quirk globally, this series introduces an
-optional DT property that describes the controller limitation and
-allows enabling the quirk on affected boards only.
+Signed-off-by: Stefano Radaelli <stefano.r@variscite.com>
+---
+ .../devicetree/bindings/net/bluetooth/ti,bluetooth.yaml    | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Patch 1 updates the TI Bluetooth DT binding.
-Patch 2 adds support for the property in hci_ll and sets the quirk
-during controller setup when requested.
-
-Tested on VAR-SOM-MX6 using TI WL183x modules where SCO audio was
-previously failing.
-
-Comments welcome.
-
-Stefano Radaelli (2):
-  dt-bindings: net: bluetooth: ti: Add property for enhanced SCO setup
-    erratum
-  Bluetooth: hci_ll: Add DT property to disable enhanced SCO setup
-
- .../devicetree/bindings/net/bluetooth/ti,bluetooth.yaml  | 7 +++++++
- drivers/bluetooth/hci_ll.c                               | 9 +++++++++
- 2 files changed, 16 insertions(+)
-
-
-base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/ti,bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/ti,bluetooth.yaml
+index 290abc22e18a..92ed443cb427 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/ti,bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/ti,bluetooth.yaml
+@@ -71,6 +71,13 @@ properties:
+     items:
+       - const: bd-address
+ 
++  ti,no-enhanced-setup-sync-conn:
++    type: boolean
++    description:
++      Indicates that the Bluetooth controller/firmware does not correctly
++      handle the HCI Enhanced Setup Synchronous Connection command for SCO
++      setup, despite advertising support for it.
++
+ required:
+   - compatible
+ 
 -- 
 2.47.3
 
