@@ -1,135 +1,74 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E723534D391
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 12:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267A8364EBF
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 12:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771848965; cv=none; b=loF+avh2fyxJKgI/ezbfRyrZMawlknmexdlZ0cka5qqREA+phH+G3C8os3gvJDs/QyXwYdryYzaP78QcmXH5rGF5TMfDdF8Zcp7yJSUutWxigooqB9GA7r04LzS/fX8/DoeAsubG4Gk7m95v+YQgupWJt44cxQs6VnC+ci7Oe4I=
+	t=1771851305; cv=none; b=JSPCVzFiHkktirGNygytZcXneEkZd/t6ptfTEaD0pxO4xV3ZbhWE05Z1QM3gLT0X6J/JNXJZFznxxuQTg4zhJNMj9rha/N59AktmY0ZS9AX/YoJDvqMglvVumyD5o8H4DIr0ySVJQYg1EN6MtFuIqskFntxDPWqpaCEpz7ebNNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771848965; c=relaxed/simple;
-	bh=1PBTJcbxdrzYQvPiFSi53oe6XZEeWPFTEREfJJP/dlU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g/4aO5ZkpU6nDXrCrTr80mrGvu6/jMTdE5Q+xfc8/32zeVeZDzIunCTXup4BmGagrv1Oj6CmCTnHLKcsiygQ01YmOJ3QudrE20BhQBv3W2BW7xRjpive8AcJawWm/pMhwdp0WfhiLeEgBdZveoYb7jR3RCeZH/H8Mi4UTUwgWAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dji4vIBl; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1771851305; c=relaxed/simple;
+	bh=WGG7/mg0spZ5w/d64/ymyUNt/SB5wQ7ZP64jpMQMDx4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hTXlhTaDyRMVe9YrLujuJy2kSSdMtT5Zm7uJz52MB3y5CnRTYj8BUnoUZWbAhXktXuao0UAl+yUCdqo9sDaEgoXdIgqRRe5sx0Y74aLRGb3WU+oLcoTgauL2CMnGaa98yAQ4XqJ0FMQHiKvlryzSWN/Tt6nBDgexUJNdQpfzYM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gU7eV4Nw; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dji4vIBl"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-48375f1defeso29950195e9.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 04:16:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771848962; x=1772453762; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=277rMcw8kS5ArMiSvCyfzkh6h/qmIKxeYvWi7CCtUrU=;
-        b=Dji4vIBlz0B52Jhx0T+82/D7AyCU+A74ATyVCFrSxLZOHuefIkZFqYdiFtfFX55BS2
-         1UqeB/E6oCv2vUwEZMSRRDtrlQimW4zdVasuJJreDg5EOpd6KctpJCc8rRQEp6uC2QFz
-         OMo66hrmc96gmn+szmHMO5MfbEICv3zaVYOaNiLOP4Nt/xkdIznfcqb04qWIBXP+WKqs
-         7hRGzNBVioST3yCAlZIrFwnkCAlwqnHMU9huTGf/KcGBLgeZMSswxfoWR4QTKoPVjRqd
-         jYKhHcNeiuy2QbLe1NDgOzDIyh2wht3QeFoUx51mPyYbtLiBlAvXxUAoxGu4qs3EGGch
-         kuQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771848962; x=1772453762;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=277rMcw8kS5ArMiSvCyfzkh6h/qmIKxeYvWi7CCtUrU=;
-        b=FUA9eBUKNidyolPnYSxFAUgHisJ4B4y1b/dfcS0mbJO2aM1edoENsXPLbQoiceCNGv
-         apnwDIie591FM77cqkPEkf2e8pQb5l2f61nr0RS6LwJZh9oUfdmuQg4Kx/7FJ8dFX8ul
-         5pxdHsi7foO27YF/dWuYAhiu7iJjb94XLbVfYkUXR75VI4zBEfKBHDYdpDUM1a6RyVlz
-         FiZeuSCEHNUUMIJ9gjl6yRpzYtCKyy45xbkgqH+duWe64TvVHygvMfwInOMBkCLd0nBK
-         6/7MH+bH2FVx+duQFrKZal7Q67K1xpXwuU+zjFu+0kKZA/FxeW86S1JR2pexS8jO8oie
-         4uPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWp0CeV3I1set9nvU86UUrCR20qIQEGMkvAoeenWKW7MsnBJTXD/eaINHAFlq/hwfgcfA9wegaZ2y5qo23v1ow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDNM+4w6C5px7UXciWYnHK2vXB9SY8M+AKOHjY95qq5B+vUtWW
-	u8NQN1aU5xl1ADn5CvoTBJjCc6QWjSjATF72f5IkHVyQ6Dkb5AKVR3X/
-X-Gm-Gg: AZuq6aLHAsT5tTnqgzFV0hyDqEzilDHl1vak5NNafUaxQyCr1XJUbTFAD6pn5Md9piF
-	t1LvFELEP7Gplb0kMQEGBBHkKprOjqaKZxaWMdlFYCkq5hsUIPVlLOe5mvIfNEx2Io+Aj4AlpTt
-	aUPZ+Kk1lIpU2wx51bZPME17Mghe/98GskYf4b/SwL8rvRLp/dL34dZH9wBNK+fXMnAwbfwdnOn
-	EFxSO7psYNT8xyTzujl1nl+P5XjzmkEBO1rpRy66vQKozoD6T3dv3k1Fq0BxwvVEUAZWN5es1YC
-	nCkb1wkwN7Yqzl8HIRUn+jNAnnkzB50tcv1nEG6ZkPd4A8PJrRFLylsnR2PlDNW4wnXAWPIVq4/
-	FDlf59I0hrjg2m+5ro3XiyaKpfau1IPChV9uncIblpHOZ5SN5P0TfyNJtJbBvetASMLBoVhhSQ9
-	LVpF8VuVa3+jb4NGQtZfnYMLn77pbhzrHPmxDWovUkAKMMDpqiPwkTubNoHUauNzSpGonp5BvUX
-	FzuSV39Gb2ZMFzvdoAIpYaDZHlzh3YlIKxeOjWTBxnHciM=
-X-Received: by 2002:a05:600c:1f8f:b0:47e:e57d:404 with SMTP id 5b1f17b1804b1-483a962e459mr162439725e9.16.1771848962174;
-        Mon, 23 Feb 2026 04:16:02 -0800 (PST)
-Received: from Lord-Beerus.station (net-188-152-100-94.cust.vodafonedsl.it. [188.152.100.94])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a31bc0e3sm242454895e9.5.2026.02.23.04.16.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 04:16:01 -0800 (PST)
-Date: Mon, 23 Feb 2026 13:15:59 +0100
-From: Stefano Radaelli <stefano.radaelli21@gmail.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, pierluigi.p@variscite.com,
-	Stefano Radaelli <stefano.r@variscite.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	David Lechner <david@lechnology.com>
-Subject: Re: [PATCH v1 1/2] dt-bindings: net: bluetooth: ti: Add property for
- enhanced SCO setup erratum
-Message-ID: <aZxE__Ybg5p2DaFM@Lord-Beerus.station>
-References: <cover.1771847350.git.stefano.r@variscite.com>
- <db4c7eab9d0c2f71eb61baff240957596f099401.1771847350.git.stefano.r@variscite.com>
- <a5d4ebf0-9d99-494c-b46b-a6140610c9e2@kernel.org>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gU7eV4Nw"
+Received: from github.com (hubbernetes-node-873c785.va3-iad.github.net [10.48.142.39])
+	by smtp.github.com (Postfix) with ESMTPA id 439A73C1308
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 04:55:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1771851303;
+	bh=EQum2ljfWEQgGm1hf+/tudrXQrb+ZwCWFz7qiXg/pjo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=gU7eV4NwBVmntxtNAhy58CUdqbueZFZj1lk2rc+asYQwd1sNmywDb97ZqbAbfavHB
+	 4JoqSqkNp7gEYfsOuRiMVjz5k22DD9mRi8K9byU7ieLQtzSNqr3W2Fl8UtY7mFrhnf
+	 av2T+zmC/NVVyvl6ppqbYVDNatlrk/EQYi7Jxa2M=
+Date: Mon, 23 Feb 2026 04:55:03 -0800
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1056469/000000-928fa9@github.com>
+Subject: [bluez/bluez] 928fa9: shared/bap: Fix endpoint configuration
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a5d4ebf0-9d99-494c-b46b-a6140610c9e2@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Mon, Feb 23, 2026 at 01:03:27PM +0100, Krzysztof Kozlowski wrote:
-> On 23/02/2026 12:52, Stefano Radaelli wrote:
-> > From: Stefano Radaelli <stefano.r@variscite.com>
-> > 
-> > Some Bluetooth controller/firmware combinations advertise support for the
-> 
-> Which ones?
-> 
-> 
-> This looks a lot like controller issue, thus deducible from the
-> compatible. And even if particular firmware has problem, how do you see
-> changing static DTS on linux-firmware update?
-> 
-> Best regards,
-> Krzysztof
+  Branch: refs/heads/1056469
+  Home:   https://github.com/bluez/bluez
+  Commit: 928fa9eb095d4fef96668541b17312e5800d6de2
+      https://github.com/bluez/bluez/commit/928fa9eb095d4fef96668541b1731=
+2e5800d6de2
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-02-23 (Mon, 23 Feb 2026)
 
-Hi Krzysztof,
+  Changed paths:
+    M profiles/audio/media.c
+    M src/shared/bap.c
+    M src/shared/bap.h
 
-thank you for your review!
+  Log Message:
+  -----------
+  shared/bap: Fix endpoint configuration
 
-We have observed this behaviour specifically on TI WL1831 modules.
+When a first local endpoint is created after connection to a remote
+device this doesn't trigger the SelectProperties request because
+bt_bap_bac ops are not yet set when bt_bap_select() is called.
+Creating a second local endpoint allows to trigger SelectProperties
+request for the first endpoint.
 
-When using the HCI Enhanced Setup Synchronous Connection command,
-SCO setup fails even though the controller reports the command as
-supported. The only working path for this controller is to fall back
-to the legacy HCI Setup Synchronous Connection (0x0028).
-The behaviour matches the scenario described in commit 05abad857277,
-which introduced HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for that
-reason.
+This commit fixes this behavior by setting the ops during bt_bap_pac
+creation.
 
-We are using the latest firmware available from TI for the wl18xx
-family (from the official TI repository), so this is not related to
-an outdated firmware version.
 
-The reason for proposing a DT property was to keep the workaround
-flexible and avoid forcing the quirk on all TI controllers handled
-by hci_ll without confirmation.
 
-However, since this may be considered deducible from the compatible,
-would you prefer enabling
-HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN automatically for
-"ti,wl1831-st" instead of using a DT property?
-
-Thanks for the feedback.
-
-Best regards,
-Stefano
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
