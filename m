@@ -1,90 +1,180 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7878E33A6E1;
-	Tue, 24 Feb 2026 20:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF8B33DEDD;
+	Tue, 24 Feb 2026 21:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771965002; cv=none; b=H4gCc0i5uQDJicqrjzWOhX16wu9M8b9R2bmeKYFC6UHqkbZuY6GjsWZR9IVZMkK0c1tpDhAfxOB3AUxX/oc5KZG6qlhpSOZGMY4n19d7p1mkZIDm0nxNDfeAZ8CaXKtR4f24d3acGjlY0WSfKfrOom7CrMZXgJZlyDc95gsYtAs=
+	t=1771968701; cv=none; b=uun8bTMk0Vy376tIc1sAC9vFCw4PL3yWCxl+PH04767d0xL/WY7u4s8grjzsKo+190ZzIV6qElL2l/Pqx/a+xovesj9UXQBUmMxA0XngIyp8mecJUq/gwl/gewQdm8WrQUQDMnPTn0iZCk5zQsh2LNXJhAJ33sSaMYm4hnbOrYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771965002; c=relaxed/simple;
-	bh=FWVYnHrFiSYu00+TBU/59piex8zCA4H56AvpNx3WHdg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BLTX4Voy88m28EHzKEZyBK7hfiqkpJL7toRLHmxshc3H5tDFdOc+2xjEK9g/IDiDnqKDSH9bj8fPlcgiJv+8WirL6iXUG61xjnxKvIZNwyuvFfLGeNplbONnE2HPy1DkfBuaLS5xrnpCpOC613SWV8EinGZCO2kH4u0nIGc35GI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CEUt6gcv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771968701; c=relaxed/simple;
+	bh=YIlxGwPr5hMd/xYC92n77YTEg4ZxfpXED5MmFXnriGA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LgoLwXMs+ix978Q7k/9wpcrPXePuxz26lx4DXfRGvvbvfcyjVQvqP6TI1G7zbr9umKJuPa9mXS8A+ebKdIWF+YRP/w8LP3HRUoBBD8sE0DkFwzYhaaGQNzqFxR5CC9TsiskaILe//z81agNC6c4Jzy7zMLmyMxMeCyimZeyeO5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGHAp1VY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CEUt6gcv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 367DCC19422;
-	Tue, 24 Feb 2026 20:30:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGHAp1VY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A998BC116D0;
+	Tue, 24 Feb 2026 21:31:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771965002;
-	bh=FWVYnHrFiSYu00+TBU/59piex8zCA4H56AvpNx3WHdg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CEUt6gcvAPFUlr+xHssLhKRVQe38OL2rOMJGDwF+c74dWcPnwx9hCYikAT3RoVf1E
-	 T6UD3EHBj4zLQczqd4Slp5X/zDA7pb536IQ4b9Veq1SvQj+4NCjYENJwZnw/6ArEzg
-	 XDP0TMO8rArYELaqhOxT1KyARjMmOgs5k45oYZRWaA2hTe0ptwr6Fu9bDzFP5whgws
-	 3Cjk6vGtjjOkIxbRYrHXSqaPxOJv9FPYwB+CCYqOQH1Id0dEc4dAY7BjjqEbY/aw+b
-	 cROVkBoejhAzIcjfOMF3/RghVY2DIX4EsUSsEbIio3uRQAgJfVxckVuU3LFljIMLCQ
-	 K0oKsFdJ/eBAw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02CDE3808200;
-	Tue, 24 Feb 2026 20:30:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1771968701;
+	bh=YIlxGwPr5hMd/xYC92n77YTEg4ZxfpXED5MmFXnriGA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=AGHAp1VYfEp8JV0mtoHFu/TlxSn1frOQtTrUcFQKzGqTe0q7YGXqPbrN44SgKLePx
+	 zVmCQqhQki+nTDHMfT4GRqwGhBnYYNN0DWenHLjJV13eYD8RJ6jniJIe8vaDGKqXMa
+	 H61sSnNocbGNbxoJ8v9IoJJP+n+tOY0Dm7xoK7yFHc5mkvnBk4HiLsv+9wYJF7128/
+	 NjFIIYz4sypjpOAPUXrdXGVK6wbh2V7KIVfHZgDcRy1vMLuBmxZeeNAuxT7BnhDkbz
+	 qs2csCdBhnDHI6Q0V7nPM6RwNKOcKkgsLnhVgMci4d4vnkrkaU8qNAbGZNV+JT42xX
+	 UEuAQy5VyxfBg==
+Date: Tue, 24 Feb 2026 15:31:08 +0900
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] Bluetooth: hci.h: Avoid a couple
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <aZ1FrL8qvvKuktBF@kspp>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/8] mmc: sdio: add MediaTek MT7902 SDIO device ID
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177196500778.4139022.732715685642852259.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Feb 2026 20:30:07 +0000
-References: <20260224061325.20189-1-sean.wang@kernel.org>
-In-Reply-To: <20260224061325.20189-1-sean.wang@kernel.org>
-To: Sean Wang <sean.wang@kernel.org>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, ulf.hansson@linaro.org,
- linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-mmc@vger.kernel.org, sean.wang@mediatek.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello:
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+struct hci_std_codecs and struct hci_std_codecs_v2 are flexible
+structures, this is structures that contain a flexible-array member
+(__u8 codec[]; and struct hci_std_codec_v2 codec[];, correspondingly.)
 
-On Tue, 24 Feb 2026 00:13:18 -0600 you wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
-> 
-> Add SDIO device ID (0x790a) for MediaTek MT7902 to sdio_ids.h.
-> 
-> Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> 
-> [...]
+Since struct hci_rp_read_local_supported_codecs and struct
+hci_rp_read_local_supported_codecs_v2 are defined by hardware, we
+create the new struct hci_std_codecs_hdr and struct hci_std_codecs_v2_hdr
+types, and use them to replace the object types causing trouble in
+struct hci_rp_read_local_supported_codecs and struct
+hci_rp_read_local_supported_codecs_v2, namely struct hci_std_codecs
+std_codecs; and struct hci_std_codecs_v2_hdr std_codecs;.
 
-Here is the summary with links:
-  - [v2,1/8] mmc: sdio: add MediaTek MT7902 SDIO device ID
-    https://git.kernel.org/bluetooth/bluetooth-next/c/30c211ed0440
-  - [v2,2/8] Bluetooth: btmtk: add MT7902 MCU support
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ad7c85c44e42
-  - [v2,3/8] Bluetooth: btusb: Add new VID/PID 13d3/3579 for MT7902
-    https://git.kernel.org/bluetooth/bluetooth-next/c/39b32232e047
-  - [v2,4/8] Bluetooth: btusb: Add new VID/PID 13d3/3580 for MT7902
-    https://git.kernel.org/bluetooth/bluetooth-next/c/cde58a6f8d84
-  - [v2,5/8] Bluetooth: btusb: Add new VID/PID 13d3/3594 for MT7902
-    https://git.kernel.org/bluetooth/bluetooth-next/c/71fa9af03199
-  - [v2,6/8] Bluetooth: btusb: Add new VID/PID 13d3/3596 for MT7902
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2dbd6783e368
-  - [v2,7/8] Bluetooth: btusb: Add new VID/PID 0e8d/1ede for MT7902
-    https://git.kernel.org/bluetooth/bluetooth-next/c/df6be153d1bb
-  - [v2,8/8] Bluetooth: btmtk: add MT7902 SDIO support
-    https://git.kernel.org/bluetooth/bluetooth-next/c/287f90321f25
+Also, once -fms-extensions is enabled, we can use transparent struct
+members in both struct hci_std_codecs and struct hci_std_codecs_v2_hdr.
 
-You are awesome, thank you!
+Notice that the newly created types does not contain the flex-array
+member `codec`, which is the object causing the -Wfamnae warnings.
+
+After these changes, the size of struct hci_rp_read_local_supported_codecs
+and struct hci_rp_read_local_supported_codecs_v2, along with their
+member's offsets remain the same, hence the memory layouts don't
+change:
+
+Before changes:
+struct hci_rp_read_local_supported_codecs {
+        __u8                       status;               /*     0     1 */
+        struct hci_std_codecs      std_codecs;           /*     1     1 */
+        struct hci_vnd_codecs      vnd_codecs;           /*     2     1 */
+
+        /* size: 3, cachelines: 1, members: 3 */
+        /* last cacheline: 3 bytes */
+} __attribute__((__packed__));
+
+struct hci_rp_read_local_supported_codecs_v2 {
+        __u8                       status;               /*     0     1 */
+        struct hci_std_codecs_v2   std_codecs;           /*     1     1 */
+        struct hci_vnd_codecs_v2   vendor_codecs;        /*     2     1 */
+
+        /* size: 3, cachelines: 1, members: 3 */
+        /* last cacheline: 3 bytes */
+} __attribute__((__packed__));
+
+After changes:
+struct hci_rp_read_local_supported_codecs {
+	__u8                       status;               /*     0     1 */
+	struct hci_std_codecs_hdr  std_codecs;           /*     1     1 */
+	struct hci_vnd_codecs      vnd_codecs;           /*     2     1 */
+
+	/* size: 3, cachelines: 1, members: 3 */
+	/* last cacheline: 3 bytes */
+} __attribute__((__packed__));
+
+struct hci_rp_read_local_supported_codecs_v2 {
+	__u8                       status;               /*     0     1 */
+	struct hci_std_codecs_v2_hdr std_codecs;         /*     1     1 */
+	struct hci_vnd_codecs_v2   vendor_codecs;        /*     2     1 */
+
+	/* size: 3, cachelines: 1, members: 3 */
+	/* last cacheline: 3 bytes */
+} __attribute__((__packed__));
+
+With these changes fix the following warnings:
+
+include/net/bluetooth/hci.h:1490:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/net/bluetooth/hci.h:1525:34: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ include/net/bluetooth/hci.h | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 89ad9470fa71..572b1c620c5d 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1468,8 +1468,12 @@ struct hci_rp_read_data_block_size {
+ } __packed;
+ 
+ #define HCI_OP_READ_LOCAL_CODECS	0x100b
+-struct hci_std_codecs {
++struct hci_std_codecs_hdr {
+ 	__u8	num;
++} __packed;
++
++struct hci_std_codecs {
++	struct hci_std_codecs_hdr;
+ 	__u8	codec[];
+ } __packed;
+ 
+@@ -1487,7 +1491,7 @@ struct hci_vnd_codecs {
+ 
+ struct hci_rp_read_local_supported_codecs {
+ 	__u8	status;
+-	struct hci_std_codecs std_codecs;
++	struct hci_std_codecs_hdr std_codecs;
+ 	struct hci_vnd_codecs vnd_codecs;
+ } __packed;
+ 
+@@ -1504,8 +1508,12 @@ struct hci_std_codec_v2 {
+ 	__u8	transport;
+ } __packed;
+ 
+-struct hci_std_codecs_v2 {
++struct hci_std_codecs_v2_hdr {
+ 	__u8	num;
++} __packed;
++
++struct hci_std_codecs_v2 {
++	struct hci_std_codecs_v2_hdr;
+ 	struct hci_std_codec_v2 codec[];
+ } __packed;
+ 
+@@ -1522,7 +1530,7 @@ struct hci_vnd_codecs_v2 {
+ 
+ struct hci_rp_read_local_supported_codecs_v2 {
+ 	__u8	status;
+-	struct hci_std_codecs_v2 std_codecs;
++	struct hci_std_codecs_v2_hdr std_codecs;
+ 	struct hci_vnd_codecs_v2 vendor_codecs;
+ } __packed;
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
