@@ -1,145 +1,319 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B7F379999
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 11:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E744637F75D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 11:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771931578; cv=none; b=qc3v9kK19JPTbHFx6vpFaL8l9y52EOeM5KXp2/sMlFNY5XaOkd6Tts4C5xUlss0FVenx3SlYhe+XduYB+S4nu6iiNfvZXYAeyKniKk6jrJLNgu57rWXK2efutMU7mBOP1oaPYDEpBdnU5w1syguBHH26RPz3IGA5tJccRroalXo=
+	t=1771932408; cv=none; b=tllmG3miO5mPGQLq1S9Op1dRe10jZT9CwWFXo1hZtEO6aDlw0K91qFlbQCQQD7glhBQ6lBgzbNmEnSdHK0kL4PIrzjZiTdd5Rj7Yu8aMacPijWqvyxuOAGRMb68DWf8aZW63K5NFERRz9c9EIl+wiZRmb9dISAr9cz5XQohWn4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771931578; c=relaxed/simple;
-	bh=+NP8AtkPelglsgG9lKiUIkf3uGAVg5HfsX8OqOth+nE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R8BTPhYT2PN2hKACRLiO8mwu0bZD9tEuEkpefh8DdTKUAHm5txaM3dZ73LqDmxE3++4vbImPAiwgMLQGfeoaLPy4d8FucYvGTQtCI6RXGdG/4Mg0In04xB6H/cB1vu5IKf8tgqp/FQsFDbvzzLnmz6Kz+DdXyLhfSvyTiW1hfRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=boajaD0z; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1771932408; c=relaxed/simple;
+	bh=I9yx5m/8ZbT73Ha0iED2I0J86SY8SlyxbQu+eaSvoSc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=f8hyIgsMPqVezKEnn/vKS4Y29u5Je+e6ZJgAeYNs9OsXG1TqZeK7p/Za8XzIMzZbRu/FfJwJqnNn6r1R3/tVQGGwhCEjvZPYgleIUAqXNkTdSKBgfphrqt5J6duBaNWZAJRSy8UbKHso1uOS4yeOv6MLetAQcPyTeeaECjUq83I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=k8cy94AS; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="boajaD0z"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-436309f1ad7so4109769f8f.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 03:12:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771931574; x=1772536374; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d9Tn4lW/TMZkLp3AuUAwTlmXi/dcr0iOq7DY8TGFLb4=;
-        b=boajaD0zeByjIEq22MtSnm4M0D59aSYevwwceTj7x1XPqU5vfpeMLKZDkFqNgCaAxp
-         w2UvEpqPleFJwrDQJgwY42jLp10DxOdR2lPtreaCoUofhGwa7DhulKZc7YivoU3/22yT
-         FBDk6E6wmIGly4GO7oC+H4QIMQBhbWcIA7GsjtFiMPabzVigScLvXIdaK0kjz3tyKGK2
-         KvMbmt134E7lBnRsMa17DlG74ITESSXwdx7pAFyMYDmHTV4f+2GLvsHrNxPjWG378jPm
-         kV7PBITJN+VUQDV3vrvFw2kokvxdG8zJ1okYyYZ8GYhkIWDgGyxHt1ts8N8Rhp+FzD2z
-         ZU6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771931574; x=1772536374;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=d9Tn4lW/TMZkLp3AuUAwTlmXi/dcr0iOq7DY8TGFLb4=;
-        b=rQCrIHmZ6sPqSHVkdHteN6vMC2sQGuUj4OU4kGT+tL1G8BwxqlwN0XRmmQ1Yo31ZpZ
-         JY41bXNYG2yna1FidkiTzMBWy1JlssAa+ThQ02nwtoVmKk30yoeodUvaatrvyuvt3ytG
-         SisX9Ru4OXQEnSD68x+WM104nJrLQJA8sJVMKfEXoW3L5bG5XJJ1KiKI64+mbDnaq88V
-         uzqjiURHcvKbQMvWkoh2QqYj9UaJ+mORdyIU+ry5hJPPqTfmf9wLNHbVNhd+fOyPbNAw
-         tqMpkP+0u1F1r8hzSQAUx4kAjMmN5wI5q3AE6U/gnLTPfjVX020vJldwbcAqN/VFaRK1
-         o7cA==
-X-Forwarded-Encrypted: i=1; AJvYcCUE018CK+dxAsREAYVC3raxeOw5SzxuXYwWupjjQTkxGqvDWgnfjiWxu4LrPtf7SDCWOXK/DyCGAphKmntkgAM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTQddCVS07D6C94v+C7p+Gfnw7nBnPgOw3MwPRdheDcfymaqeV
-	m1LeqYQQl00bPSbrCrY1VE0zsdh0xnpJb386DnB6nwEhls/pjcGhsEOH
-X-Gm-Gg: AZuq6aJtv9RJwzyocWh2Y6U+ycLuHxyHWbbMdIT3j8a61xhxpf79hLn0ac7QNuKcQBO
-	ZK8OAuPBIRO+BexZLfeefF/pJkp6UqsHMDOAgXYNM//oVyjfi7aePnZerJCVCGl9avThB9mFmBW
-	CbriBXj7mDM2F56m/H+Au1SPtdZ2Zo7sbA6jgD+J5i4Mh7FmD8M9XU7sjfd5ECQ7Cpd4X2sroeM
-	p05y2p+kCNsOO7npplTv2Wbe5J2RdZh4JXnl+KNMz9LHIBskkIosIla70kyDfa5fCDIEInbIbSE
-	QKZQRFR8Rj571+MUmF7Z438b/lip5D7QVa6KErtNlt0f99CuhkHKKWR68d9O2sNZpAE7ddEhgre
-	jsJ3UOjqr7yOQ13C1s0f6DSEe4ZWpZedm+yOwjWPIWD8oE7I86WrUvFSrdTUaCo2tvH/nFJebY8
-	ZPH4cZycdk56Zl2VG+pvmC0phUA38o97KE1xSuLwxWTr7A6xogX7n/Asd60oVYeTP2n1E1MZFyw
-	czzLeT1rUSnGbf063BB00ixmlngIbYvmgIB/r3q
-X-Received: by 2002:a05:600c:4f94:b0:480:1c53:2085 with SMTP id 5b1f17b1804b1-483a95eb365mr177247755e9.19.1771931574276;
-        Tue, 24 Feb 2026 03:12:54 -0800 (PST)
-Received: from Lord-Beerus.station (net-188-152-100-94.cust.vodafonedsl.it. [188.152.100.94])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a9cb4bb3sm259474545e9.14.2026.02.24.03.12.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Feb 2026 03:12:53 -0800 (PST)
-From: Stefano Radaelli <stefano.radaelli21@gmail.com>
-X-Google-Original-From: Stefano Radaelli <stefano.r@variscite.com>
-To: linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Cc: pierluigi.p@variscite.com,
-	Stefano Radaelli <stefano.r@variscite.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v2 1/1] Bluetooth: hci_ll: Enable BROKEN_ENHANCED_SETUP_SYNC_CONN for WL183x
-Date: Tue, 24 Feb 2026 12:12:35 +0100
-Message-ID: <36a2c4c75e557527d101897b649f9de8d2180fb6.1771930508.git.stefano.r@variscite.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1771930508.git.stefano.r@variscite.com>
-References: <cover.1771930508.git.stefano.r@variscite.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="k8cy94AS"
+Received: from github.com (hubbernetes-node-0d4476a.va3-iad.github.net [10.51.92.32])
+	by smtp.github.com (Postfix) with ESMTPA id 13B4AE0973
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 03:26:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1771932405;
+	bh=9ZK6fUNRivbYjluG4gaS7KZPEL28039AFXNrJh9hzJI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=k8cy94ASZ9T3IcgemZPgJHTTMQJoKYGK/UPngrAs+6jy/Sp2Rv8vJNn8r0zcf/oG0
+	 gcfaJHOvoJkVRqLbH8G9bBpazpcfRIk0TwzteIjLqvz4Mie1miNOdR6gMsoJKbT/BG
+	 aJJdYQrfWzC3k7jkgVRhgVpeogFuIA5sizljX73Y=
+Date: Tue, 24 Feb 2026 03:26:45 -0800
+From: MengshiWu-mengshiw <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1057153/000000-cde4bf@github.com>
+Subject: [bluez/bluez] cde4bf: gatt-client:Implement error handling for
+ DB_OUT_OF...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Stefano Radaelli <stefano.r@variscite.com>
+  Branch: refs/heads/1057153
+  Home:   https://github.com/bluez/bluez
+  Commit: cde4bfa2c6ba4c0d62598493210bd95afc658867
+      https://github.com/bluez/bluez/commit/cde4bfa2c6ba4c0d62598493210bd=
+95afc658867
+  Author: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+  Date:   2026-02-24 (Tue, 24 Feb 2026)
 
-TI WL183x controllers advertise support for the HCI Enhanced Setup
-Synchronous Connection command, but SCO setup fails when the enhanced
-path is used. The only working configuration is to fall back to the
-legacy HCI Setup Synchronous Connection (0x0028).
+  Changed paths:
+    M src/shared/att.c
+    M src/shared/att.h
+    M src/shared/gatt-client.c
+    M src/shared/gatt-helpers.c
+    M src/shared/gatt-helpers.h
 
-This matches the scenario described in commit 05abad857277
-("Bluetooth: HCI: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk").
+  Log Message:
+  -----------
+  gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching=
 
-Enable HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN automatically for
-devices compatible with:
-  - ti,wl1831-st
-  - ti,wl1835-st
-  - ti,wl1837-st
 
-Signed-off-by: Stefano Radaelli <stefano.r@variscite.com>
----
-v1->v2:
- - 
+Implement automatic retry logic for GATT operations that fail with
+DB_OUT_OF_SYNC error (0x12).
 
- drivers/bluetooth/hci_ll.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+This implementation follows the GATT caching specification and provides
+robust error recovery while minimizing unnecessary service discovery
+operations.
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 91acf24f1ef5..6f060eec3b81 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -68,6 +68,7 @@ struct ll_device {
- 	struct gpio_desc *enable_gpio;
- 	struct clk *ext_clk;
- 	bdaddr_t bdaddr;
-+	bool broken_enhanced_setup;
- };
- 
- struct ll_struct {
-@@ -656,6 +657,10 @@ static int ll_setup(struct hci_uart *hu)
- 			hci_set_quirk(hu->hdev, HCI_QUIRK_INVALID_BDADDR);
- 	}
- 
-+	if (lldev->broken_enhanced_setup)
-+		hci_set_quirk(hu->hdev,
-+			      HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
-+
- 	/* Operational speed if any */
- 	if (hu->oper_speed)
- 		speed = hu->oper_speed;
-@@ -710,6 +715,11 @@ static int hci_ti_probe(struct serdev_device *serdev)
- 	of_property_read_u32(serdev->dev.of_node, "max-speed", &max_speed);
- 	hci_uart_set_speeds(hu, 115200, max_speed);
- 
-+	if (of_device_is_compatible(serdev->dev.of_node, "ti,wl1831-st") ||
-+	    of_device_is_compatible(serdev->dev.of_node, "ti,wl1835-st") ||
-+	    of_device_is_compatible(serdev->dev.of_node, "ti,wl1837-st"))
-+		lldev->broken_enhanced_setup = true;
-+
- 	/* optional BD address from nvram */
- 	bdaddr_cell = nvmem_cell_get(&serdev->dev, "bd-address");
- 	if (IS_ERR(bdaddr_cell)) {
--- 
-2.47.3
+When a DB_OUT_OF_SYNC error occurs, the implementation:
 
+1. Pauses the failed operation in a pending_db_sync state
+2. Notifies the GATT client layer via db_sync_callback
+3. Reads the remote Database Hash characteristic (0x2B2A)
+4. Compares it with the locally cached hash value
+5. If hashes match: Retries the operation (database is in sync)
+6. If hashes differ: Triggers full service discovery
+
+Workflow:
+---------
+
+Hash Match Case:
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
+                                      =E2=86=93 (DB_OUT_OF_SYNC error)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+                =E2=86=93
+         Read DB Hash (0x2B2A)
+                =E2=86=93
+         Compare with local cache
+                =E2=86=93 (Match)
+         bt_att_resend(att, id, ...)
+                =E2=86=93
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device (=
+retry)
+                                      =E2=86=93 (Success)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+
+Hash Differ Case:
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
+                                      =E2=86=93 (DB_OUT_OF_SYNC error)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+                =E2=86=93
+         Read DB Hash (0x2B2A)
+                =E2=86=93
+         Compare with local cache
+                =E2=86=93 (Differ)
+         bt_att_cancel(att, id)
+                =E2=86=93
+         Trigger Service Discovery
+                =E2=86=93
+  App =E2=86=90 GATT Client (operation failed, discovery in progress)
+
+Service Changed Ind Received (Handle Outside Affected Range):
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
+                                      =E2=86=93 (DB_OUT_OF_SYNC error)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+                =E2=86=93
+         Service Changed Ind arrives
+                =E2=86=93
+         Check error handle vs affected range
+                =E2=86=93 (Outside range)
+         bt_att_resend(att, id, ...)
+                =E2=86=93
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device (=
+retry)
+                                      =E2=86=93 (Success)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+
+Service Changed Ind Received (Handle Inside Affected Range):
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
+                                      =E2=86=93 (DB_OUT_OF_SYNC error)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+                =E2=86=93
+         Service Changed Ind arrives
+                =E2=86=93
+         Check error handle vs affected range
+                =E2=86=93 (Inside range)
+         bt_att_cancel(att, id)
+                =E2=86=93
+         Service Discovery already in progress
+                =E2=86=93
+  App =E2=86=90 GATT Client (operation failed, discovery in progress)
+
+btmon traffics:
+--------------
+
+Hash Match Case:
+
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7   #1 [hci1]
+13.675271
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000d
+> HCI Event: Number of Completed Packets (0x13) plen 5         #2 [hci1]
+> 13.694287
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 9                      #3 [hci1]
+> 13.728279
+      ATT: Error Response (0x01) len 4
+        Read Request (0x0a)
+        Handle: 0x000d
+        Error: Database Out of Sync (0x12)
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11  #4 [hci1]
+13.730759
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0001-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5         #5 [hci1]
+> 13.754290
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 24                     #6 [hci1]
+> 13.820283
+      ATT: Read By Type Response (0x09) len 19
+        Attribute data length: 18
+        Attribute data list: 1 entry
+        Handle: 0x000f
+        Value: f74347d19eef647d97f0b2f7af502e33
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11  #7 [hci1]
+13.822792
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0010-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5         #8 [hci1]
+> 13.842581
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 9                      #9 [hci1]
+> 13.880369
+      ATT: Error Response (0x01) len 4
+        Read By Type Request (0x08)
+        Handle: 0x0010
+        Error: Attribute Not Found (0x0a)
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7   #10
+[hci1] 13.880999
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000d
+> HCI Event: Number of Completed Packets (0x13) plen 5         #11
+> [hci1] 13.904288
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 6                      #12
+> [hci1] 13.940273
+      ATT: Read Response (0x0b) len 1
+
+--------------------
+Hash differ case:
+
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000d
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> #17 [hci1] 50.171857
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 9
+> #18 [hci1] 50.171970
+      ATT: Error Response (0x01) len 4
+        Read Request (0x0a)
+        Handle: 0x000d
+        Error: Database Out of Sync (0x12)
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0001-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> #20 [hci1] 50.201854
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 24
+> #21 [hci1] 50.268291
+      ATT: Read By Type Response (0x09) len 19
+        Attribute data length: 18
+        Attribute data list: 1 entry
+        Handle: 0x000f
+        Value: 5fa98eed072ee317aa521990be294bf3
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0010-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> #23 [hci1] 50.291849
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 9
+> #24 [hci1] 50.419999
+      ATT: Error Response (0x01) len 4
+        Read By Type Request (0x08)
+        Handle: 0x0010
+        Error: Attribute Not Found (0x0a)
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
+      ATT: Read By Group Type Request (0x10) len 6
+        Handle range: 0x0001-0xffff
+        Attribute group type: Primary Service (0x2800)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> #26 [hci1] 50.471607
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 24
+> #27 [hci1] 50.471663
+      ATT: Read By Group Type Response (0x11) len 19
+        Attribute data length: 6
+        Attribute group list: 3 entries
+        Handle range: 0x0001-0x0007
+        UUID: Generic Access Profile (0x1800)
+        Handle range: 0x0008-0x0011
+        UUID: Generic Attribute Profile (0x1801)
+        Handle range: 0x0012-0x0014
+        UUID: Device Information (0x180a)
+--------------------
+
+Changes from v4:
+ - Fix errors reported by bluez.test.bot
+ - Link to v4
+   https://lore.kernel.org/all/20260210011347.3237740-1-mengshi.wu@oss.qu=
+alcomm.com/
+
+Changes from v3:
+ - Reuses existing bt_att_resend() and bt_att_cancel() functions
+ - Add new structure pending_db_sync
+ - Link to v3
+   https://lore.kernel.org/all/20260121083804.4010106-1-mengshi.wu@oss.qu=
+alcomm.com/
+
+Changes from v2:
+ - Detects DB_OUT_OF_SYNC errors during GATT operations
+ - Extracts affected handles from the original request PDU
+ - Checks if Service Changed indications overlap with those handles
+ - Verifies database consistency using Database Hash characteristic
+ - Automatically retries the original request if DB is consistent
+ - Automatically retries the original request if handle is not affected
+ - Link to v2
+   https://lore.kernel.org/all/20260105103828.105346-1-mengshi.wu@oss.qua=
+lcomm.com/
+
+Changes from v1:
+ - Implement automatic recovery when ATT_ECODE_DB_OUT_OF_SYNC error is
+   received from the remote device.
+ - Link to v1
+   https://lore.kernel.org/all/20251208101915.247459-1-mengshi.wu@oss.qua=
+lcomm.com/
+
+Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+
+
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
