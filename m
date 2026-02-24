@@ -1,180 +1,168 @@
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+Received: from mail-dy1-f195.google.com (mail-dy1-f195.google.com [74.125.82.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B03E29BD95
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 06:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F00A304BDF
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 06:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771913679; cv=none; b=LqBoAsiUYZETilNuyZjJv/W+vX5+3hDU5uV9jzI3XEbHXARYm8sIWrGdLK5QcCBuky/RuQzeYENYw/wEktQR8GLjr//sHgfV2n2n+0FjtsD7fV0KjgyCVh/WmEbirYO1m5N6RQ40J8O0rZGwDqdhtfKWTQubFBXmW0V5hkDxS+Y=
+	t=1771916283; cv=none; b=hnhOR+nQTldKQmpgkgy4HETZexAnE6OnrJVJ+AJVzTS340o5I4nlpPjgICDGIkDJ1DELURWUjsFQkMNkLuSPrWmqUBwox79Qj7rM8hUXFqhGtF907U74uIJczflX+a1v3jZQygU1P9raG/GBJ19SnmuXoozJ5CH6jHJvu0LXfcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771913679; c=relaxed/simple;
-	bh=0PBvdJqAbSRqDqNaFsvrlM8Zju0hcAR5wr7VhLHEc6E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=klvt9Qguqp/fBaNjZh+MLHOCMQcBE14H160fBbaAhVLe4RWfT6VILeyrPX7j8qGaYgpuZKjXNV08yTALAgYuduXaheS6rzapHmJYePzMThN2uDAP6A7k0cweezAiC7w3SKlVl8+eovPeQ38JNF6+5q+peCSVJcOxV845jOMboC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+	s=arc-20240116; t=1771916283; c=relaxed/simple;
+	bh=gQnx/i1E4Dt+5ybPFY6/vsGpH5T6Pnke6vElZvLPW/Q=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=r/ilbQRIN1iAPDG4p304Cx2PP0yYe9dq7OVayKTmmU/q6Sg9ypQ98sc7wNzyN0YVWhHcABZpn/Vek5C+orXfeHgw17Gm6ur31YiWhkjo0NQipGj9XIns1DMZ2xnQiqFbciY+Mm1GxJRTmKygoUN/eF6Kp4Y64Cv3IGx+e1bSoV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c0Lf+JAN; arc=none smtp.client-ip=74.125.82.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-679b072ed3aso2686294eaf.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 22:14:38 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c0Lf+JAN"
+Received: by mail-dy1-f195.google.com with SMTP id 5a478bee46e88-2bd3b0bc201so598794eec.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 22:57:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771916277; x=1772521077; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=IQ6A/kQv/ygupFrJORFJjC1hOiTtIzkWrcTGWSrzy8w=;
+        b=c0Lf+JANOlQUBg4D+ZueXraPeNbLWgOCQgc90KCHmfW6mXyHUCamqtHn8Yvkfzu075
+         YjezA/QrxkT7e6oA0V8fcqCklybWDqX5QWPmQUjMc3QxXCnQZ7zPgsWeGfdA08iBD+kh
+         eMPTBcIUWB6rfrrswBDaFxKt6NRZY3Y3lp7+kbiMWdHTcGUcy0UyukZyirgdrCetIrcr
+         /6Aj86FdKEUjqcvSrc9TLaQNcXO3P09HPxXnPEWPZapAYaXbiYclmuiotEtq7e0ObCVi
+         FpraudNYsqoN6I852EgiUtHkK5HxrmFkQq7n/7BUXxK/aMo+VlnB+Xn2+3Te6ubAOEmW
+         NHpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771913677; x=1772518477;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rQv1yJimGlxvy4yGPgOsX/UNrk5wbgDTKKecRY0I1tE=;
-        b=JPZLCkuywqcC8HcqiY/+OCem11zWWXyULydG43Dom61ijyCge4vW2Ip/s+yvACdhcO
-         lpNNtP/3ifFI9HueCW6j2+FR7b5GdDChR94Nps02VfBWX/J3E0sDtBPSzgivHp7f4yRD
-         JySu53nwVl8IhjkxZ4fQBxxZUx1fE4M6ooe9yfAsmfoFWhJSPgZv1P1fxaH+43xC1DhK
-         jZiiYq0zmBV492buVkUw/MMKB/tbSYEscHcKKTrifiPa4CNlKWhBOYt575929WtniV4D
-         DvCpjTfESOTWZhCciJnX4SmfxHZEdjAVVRotRBPgFjg5DDE83uqfFEng+hMGdJHu8Thb
-         vEgQ==
-X-Gm-Message-State: AOJu0Yy83Lr14OHhtymxtf7eiIq/TXuwRDjE7nRHxJWC0cyw/ZWnowD8
-	CTAU1UJnIYH7AwEawmRonwXLyFL0/vyCP/8peIEHoUPOuGDqgWTt2I8B
-X-Gm-Gg: AZuq6aITiOWxk4PxdZnb7uAYQOC/UzmhGumgIISEXOp7/oNxJ1E0sTfqkm7/dFOJWbe
-	Fz273yZibju2SVscp7NBZybB8ttsGlJJaXF9WxMjg1/yOafMrKGKB1ogwlRSHY0kUYfbc2MEBbd
-	BzpLN4hij76SkREVmvhMmV4d7Eb82WAB2rRnmaVNAUtmVqGlVIhQWfktHrepjZIXzDsOzwgjnN4
-	zjfBTCe6XfIQ0lOW+t3OOrRnWZtJNgfpbL0ohmBG3ZYtZ4/72DIra/Ct2nsNa3hFTp0k54PiJnz
-	Fo9s7qKwkSgyxtmr2doPnFKTVU6vZS0omKLpCoFxR2IP0m3WG4REY6VZdbBBCsGSgAGcebm4dXn
-	Xql7exuArC15HfOowCu+QdDo+jTloeqJOPB7z3LuL1vcBiaL7t/xL05kG/2zcfEgVrXpsieALu1
-	AxnqpFq/2KVVgVR3JyFQGkmAB1wGxDOgJOD9e5etqQe0SApS4tS1wrk7JSeoElhqE=
-X-Received: by 2002:a05:6820:4c04:b0:661:1d0c:a5af with SMTP id 006d021491bc7-679c461247dmr5953555eaf.69.1771913677584;
-        Mon, 23 Feb 2026 22:14:37 -0800 (PST)
-Received: from sean-HP-EliteBook-830-G6.attlocal.net ([2600:1702:5083:7610:8ac2:4fdd:a742:61b8])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-679c56dbde9sm7895306eaf.11.2026.02.23.22.14.35
+        d=1e100.net; s=20230601; t=1771916277; x=1772521077;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IQ6A/kQv/ygupFrJORFJjC1hOiTtIzkWrcTGWSrzy8w=;
+        b=Igx+UXKfcY97sgRxBGwU5kE6epJSJzhNNkuY6oUHsoJsgGGvOHHfVWTivn+I6Qv+ZJ
+         CeAz25eytZfhVa9m+WIPy1dgRZgDAk2KadAc3MMdduHaK2XQ3terwY2uiPGFOH+xvzRW
+         IOXx4zMUFKA2qbR9r2WQRNduKaqIimhep0eMm1wBM6ZvwWBB/QfrFf7XBxra7g2jDkoN
+         P1vSGF9wvvt8LIqn1yLLlODu3OorGgR1vB2i4lcsMx0CZb0Ex4J9Z3CF5pUvyxJNw01k
+         B0PevhTMRh2c1KfBKnAi1Dkqv4tBdGzBm8Ad2FPAhdGd5KMs7gkleO1v3zj3ZY7ZLCpC
+         jGqg==
+X-Gm-Message-State: AOJu0YxdA9A7G3QEwA96VAEzqcUK0j74UTKf+uewKomftzACXcAUyr6J
+	rU8kMGUm/N1ozSkp6rqXv/RYpGWn6ewME4MKHTnHoppPwPzIaAdyZ5vI8ENlQMZf
+X-Gm-Gg: ATEYQzytGwor7YaTQte35yyR6aWJmSfepf+Oh9rhsoy86bMe8oojrtVXDXufMHBe93w
+	3zzH/po6/LWBYJmKQ+MNa8pZxEOmZ8G8hR6RNBgvZLlx70jggyC3t0mDhtzPV5G5zsscUzsnfy1
+	Np/4eV4LYNPavvVitdIde/QStWqSVmE3B/TozEPAZfElAcdAIK72BULOPUndu0kNrxv9G5/PQkO
+	6RNnZljP+cDHAWolyC+SvEVagb+XYkLM994bPMVxYJBCd8WN9034KAbqxTyjeCJAI2n3OlrcavU
+	13JupGwCyB4N2V2EnkK3GJ52dYcJ3YkWYCdVmByZt5KwpLjElfqjqcWfbPYnqWgL4OeqGeET+kF
+	rG+7T4oYX80u+zjRz72QPKGCBV71nnHHHUi51bJNNCiA0CcEXvGZJoCZssUY4uvUm3WM4n4vJbn
+	qK3R1wRsE8LUaq/O78/mHKpx5jzPBR
+X-Received: by 2002:a05:7300:a949:b0:2ba:73db:3e81 with SMTP id 5a478bee46e88-2bd7bd6a424mr4189264eec.33.1771916276609;
+        Mon, 23 Feb 2026 22:57:56 -0800 (PST)
+Received: from [172.17.0.2] ([128.24.161.86])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bd7da45537sm6198825eec.7.2026.02.23.22.57.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 22:14:35 -0800 (PST)
-From: Sean Wang <sean.wang@kernel.org>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	ulf.hansson@linaro.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linux-mmc@vger.kernel.org,
-	Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH v2 8/8] Bluetooth: btmtk: add MT7902 SDIO support
-Date: Tue, 24 Feb 2026 00:13:25 -0600
-Message-ID: <20260224061325.20189-8-sean.wang@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260224061325.20189-1-sean.wang@kernel.org>
-References: <20260224061325.20189-1-sean.wang@kernel.org>
+        Mon, 23 Feb 2026 22:57:55 -0800 (PST)
+Message-ID: <699d4bf3.050a0220.2bf6cb.a9ae@mx.google.com>
+Date: Mon, 23 Feb 2026 22:57:55 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4581573018264933993=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, sean.wang@kernel.org
+Subject: RE: [v2,1/8] mmc: sdio: add MediaTek MT7902 SDIO device ID
+In-Reply-To: <20260224061325.20189-1-sean.wang@kernel.org>
+References: <20260224061325.20189-1-sean.wang@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+--===============4581573018264933993==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add MT7902 Bluetooth SDIO support by introducing chip data and
-registering the device ID.
+This is automated email and please do not reply to this email!
 
-Runtime PM is not yet supported by the driver, but normal operation
-is unaffected.
+Dear submitter,
 
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1057030
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.40 seconds
+GitLint                       PENDING   0.26 seconds
+SubjectPrefix                 FAIL      0.85 seconds
+BuildKernel                   PASS      25.85 seconds
+CheckAllWarning               PASS      28.49 seconds
+CheckSparse                   WARNING   34.06 seconds
+BuildKernel32                 PASS      25.19 seconds
+TestRunnerSetup               PASS      563.84 seconds
+TestRunner_l2cap-tester       PASS      28.67 seconds
+TestRunner_iso-tester         PASS      114.15 seconds
+TestRunner_bnep-tester        PASS      6.53 seconds
+TestRunner_mgmt-tester        FAIL      115.33 seconds
+TestRunner_rfcomm-tester      PASS      9.59 seconds
+TestRunner_sco-tester         FAIL      14.79 seconds
+TestRunner_ioctl-tester       PASS      10.31 seconds
+TestRunner_mesh-tester        FAIL      12.60 seconds
+TestRunner_smp-tester         PASS      9.09 seconds
+TestRunner_userchan-tester    PASS      6.84 seconds
+IncrementalBuild              PENDING   0.50 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/btmtk.c:1508:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1509:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1510:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1511:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1512:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1512:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1513:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1514:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1515:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1516:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1517:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1518:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4671:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4672:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4674:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4675:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4677:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4678:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4680:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4681:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4683:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4684:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4685:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4671:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4672:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4674:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4675:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4677:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4678:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4680:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4681:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4683:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4684:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4685:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4671:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4672:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4674:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4675:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4677:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4678:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4680:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4681:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4683:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4684:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4685:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4671:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4672:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4674:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4675:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4677:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4678:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4680:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4681:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4683:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4684:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4685:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4671:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4672:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4674:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4675:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4677:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4678:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4680:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4681:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4683:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4684:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4685:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btmtksdio.c:1572:1: error: bad constant expressiondrivers/bluetooth/btmtksdio.c:1573:1: error: bad constant expressiondrivers/bluetooth/btmtksdio.c:1575:1: error: bad constant expressiondrivers/bluetooth/btmtksdio.c:1576:1: error: bad constant expressiondrivers/bluetooth/btmtksdio.c:1577:1: error: bad constant expressiondrivers/bluetooth/btmtksdio.c:1578:1: error: bad constant expressiondrivers/bluetooth/btmtksdio.c:1578:1: error: bad constant expression
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.106 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.715 seconds
+Mesh - Send cancel - 2                               Timed out    1.991 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
-v2: no changes
----
- drivers/bluetooth/btmtksdio.c | 42 ++++++++++++++++++++++++-----------
- 1 file changed, 29 insertions(+), 13 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index e986e5af51ae..042064464d34 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -42,24 +42,35 @@ struct btmtksdio_data {
- 	const char *fwname;
- 	u16 chipid;
- 	bool lp_mbox_supported;
-+	bool pm_runtime_supported;
- };
- 
- static const struct btmtksdio_data mt7663_data = {
- 	.fwname = FIRMWARE_MT7663,
- 	.chipid = 0x7663,
- 	.lp_mbox_supported = false,
-+	.pm_runtime_supported = true,
- };
- 
- static const struct btmtksdio_data mt7668_data = {
- 	.fwname = FIRMWARE_MT7668,
- 	.chipid = 0x7668,
- 	.lp_mbox_supported = false,
-+	.pm_runtime_supported = true,
- };
- 
- static const struct btmtksdio_data mt7921_data = {
- 	.fwname = FIRMWARE_MT7961,
- 	.chipid = 0x7921,
- 	.lp_mbox_supported = true,
-+	.pm_runtime_supported = true,
-+};
-+
-+static const struct btmtksdio_data mt7902_data = {
-+	.fwname = FIRMWARE_MT7902,
-+	.chipid = 0x7902,
-+	.lp_mbox_supported = false,
-+	.pm_runtime_supported = false,
- };
- 
- static const struct sdio_device_id btmtksdio_table[] = {
-@@ -69,6 +80,8 @@ static const struct sdio_device_id btmtksdio_table[] = {
- 	 .driver_data = (kernel_ulong_t)&mt7668_data },
- 	{SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, SDIO_DEVICE_ID_MEDIATEK_MT7961),
- 	 .driver_data = (kernel_ulong_t)&mt7921_data },
-+	{SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, SDIO_DEVICE_ID_MEDIATEK_MT7902),
-+	.driver_data = (kernel_ulong_t)&mt7902_data },
- 	{ }	/* Terminating entry */
- };
- MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
-@@ -1090,6 +1103,7 @@ static int btmtksdio_setup(struct hci_dev *hdev)
- 	set_bit(BTMTKSDIO_HW_TX_READY, &bdev->tx_state);
- 
- 	switch (bdev->data->chipid) {
-+	case 0x7902:
- 	case 0x7921:
- 		if (test_bit(BTMTKSDIO_HW_RESET_ACTIVE, &bdev->tx_state)) {
- 			err = btmtksdio_mtk_reg_read(hdev, MT7921_DLSTATUS,
-@@ -1167,22 +1181,24 @@ static int btmtksdio_setup(struct hci_dev *hdev)
- 	delta = ktime_sub(rettime, calltime);
- 	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
- 
--	pm_runtime_set_autosuspend_delay(bdev->dev,
--					 MTKBTSDIO_AUTOSUSPEND_DELAY);
--	pm_runtime_use_autosuspend(bdev->dev);
-+	if (bdev->data->pm_runtime_supported) {
-+		pm_runtime_set_autosuspend_delay(bdev->dev,
-+						 MTKBTSDIO_AUTOSUSPEND_DELAY);
-+		pm_runtime_use_autosuspend(bdev->dev);
- 
--	err = pm_runtime_set_active(bdev->dev);
--	if (err < 0)
--		return err;
-+		err = pm_runtime_set_active(bdev->dev);
-+		if (err < 0)
-+			return err;
- 
--	/* Default forbid runtime auto suspend, that can be allowed by
--	 * enable_autosuspend flag or the PM runtime entry under sysfs.
--	 */
--	pm_runtime_forbid(bdev->dev);
--	pm_runtime_enable(bdev->dev);
-+		/* Default forbid runtime auto suspend, that can be allowed by
-+		 * enable_autosuspend flag or the PM runtime entry under sysfs.
-+		 */
-+		pm_runtime_forbid(bdev->dev);
-+		pm_runtime_enable(bdev->dev);
- 
--	if (enable_autosuspend)
--		pm_runtime_allow(bdev->dev);
-+		if (enable_autosuspend)
-+			pm_runtime_allow(bdev->dev);
-+	}
- 
- 	bt_dev_info(hdev, "Device setup in %llu usecs", duration);
- 
--- 
-2.43.0
 
+--===============4581573018264933993==--
