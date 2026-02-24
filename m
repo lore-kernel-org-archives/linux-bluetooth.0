@@ -1,99 +1,319 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD1B3A1A2C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 15:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F0D3A4F3E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 15:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771946190; cv=none; b=fM3MvKw6p2vTCoaWgSNCoPRNc7coRm0G8FusDgWEBfbkK9E7XSApqJURopIDDeSwsB6DE6dshgVv9azlIcaX22uADmMSYSTVamLsn+VxcPlmOWjXbkE5TZWC4DqmrGdFCIzrmsP87/iDVqZ5ZzHNt1apIcqGj2yMbG6cblaPdiM=
+	t=1771947706; cv=none; b=mEmU+ILLXMRSCEwPBTnpXG2a4+Gb9Ri3RhhypVlcwbTDQLbBEIk9MNP/jsRZnmNQD7VGC5l2uNoIseziVKYNqw4O87n6SLwY/hs1Na00DoidRv2av/8my+TZ6GzOkznVhGoMxjhz07ZSkvTW29WK/OObxaZz1EUEtFL6A8VRTsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771946190; c=relaxed/simple;
-	bh=mZS8IcLZB8uqmpbvEZSQhb4v95EuXqeQqY7tOkpGOgU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SXtDy+Bob4AGTtNQOvcnMuC6c1C4wnM5fpVjXMImsQIjnUFckVLYSC/p6F0JA9+Snxtfpw1T7Ic2d847WpmXTIFE9cnipELdk8GyeTlg+R3Zu6UEG+1wHpsowexLppD6+/el+QHiOSHaTetfbuAWVdXXHrbEmyHiWIfr2CsJG7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HOx1ifhB; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1771947706; c=relaxed/simple;
+	bh=ILM+cM/PE1gI09DfVOlyepZ5Qi4UvMF6DLKIKl+ItKQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=tGpDO2/iTWJwV8I3VqqRJL8uI4ZU9+QciRZtiXdbPw1pjq1qgNUzgyYQWYpPae3nxXAnDD9PIUhxm87q0EiAxGlRfFznAsGfXXvkkxqi7A1iFSPKkRD3i4tCBfE0TZaCWOY6QmIBgfhberPYAHcYe9VJy+qLqq1gWsx6RKK6wE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=VYfVHGo2; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HOx1ifhB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771946189; x=1803482189;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mZS8IcLZB8uqmpbvEZSQhb4v95EuXqeQqY7tOkpGOgU=;
-  b=HOx1ifhBf2W4nLjC+SFoOelmLDu537LnUtBX+e/RP0sSvxwZmd12C1wK
-   eFzCxfyrMDIukr1GZsJ44JoYAol39nXIYJm0Pi36OzBiF51flWhhFBTl5
-   NNdNMrZEq7P7B3Mnvjo6Q43gbev18IwGbOshIMF05wWg6ML18eNNeG1JJ
-   ipyjw6W8kIarBmpR2QDGl4DZ1TMLnXgl493SmHmvfzXlaPC1frcM1EhzR
-   hpjrbr09gHOlrHhXb5b3WtkVlBoLppm8/5sUv24QykbJOAM6YNUkqZ0ng
-   dnq6DeQNB4FMIRZlfuyuvogcBuFs2tSqbXzf8yyk1mdatO473Qq6r0rc3
-   g==;
-X-CSE-ConnectionGUID: v5MavujnSbKwOU1CdgU9wA==
-X-CSE-MsgGUID: h3/LD0S9Qn+I/LoFZjljqA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11711"; a="72874711"
-X-IronPort-AV: E=Sophos;i="6.21,308,1763452800"; 
-   d="scan'208";a="72874711"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2026 07:16:29 -0800
-X-CSE-ConnectionGUID: PDOEzDizRq+KC0SNywkhVg==
-X-CSE-MsgGUID: 9g3dzH1aT1+lOK77onF6Cw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,308,1763452800"; 
-   d="scan'208";a="253676541"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orviesa001.jf.intel.com with ESMTP; 24 Feb 2026 07:16:27 -0800
-From: Kiran K <kiran.k@intel.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="VYfVHGo2"
+Received: from github.com (hubbernetes-node-627ae99.ash1-iad.github.net [10.56.158.20])
+	by smtp.github.com (Postfix) with ESMTPA id B717114120E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 07:41:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1771947703;
+	bh=YaS3WcsHC4y1AsmnGJeYtHWbJ5u6DAWABD6FZtJNfCU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=VYfVHGo2w6bzoDyvCR51MstHRpuzjlDJT3KnOnTtyQA66pB1EYf4pYC/vzWWMU0W/
+	 n99/d0EM5Gu3tRtZGimLhkLuAxpYix7MXdcmyWDnC3IjTf1sadcwL3iHgAmUaLNMYk
+	 Q24fmDSRAIWVQWFbkibSh9xe5ORbWTKij148qv6Q=
+Date: Tue, 24 Feb 2026 07:41:43 -0800
+From: MengshiWu-mengshiw <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chandrashekar.devegowda@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 9/9] Bluetooth: btintel_pcie: Add device id of Scorpious2, Nova Lake-PCD-S
-Date: Tue, 24 Feb 2026 21:04:48 +0530
-Message-ID: <20260224153449.193551-9-kiran.k@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260224153449.193551-1-kiran.k@intel.com>
-References: <20260224153449.193551-1-kiran.k@intel.com>
+Message-ID: <bluez/bluez/push/refs/heads/master/290f99-7c9c86@github.com>
+Subject: [bluez/bluez] 7c9c86: gatt-client:Implement error handling for
+ DB_OUT_OF...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-sudo lspci -v -k -d 8086:6e74
-	80:14.7 Bluetooth: Intel Corporation Device 6e74 (rev 10)
-        Subsystem: Intel Corporation Device 0011
-        Flags: bus master, fast devsel, latency 0, IRQ 16
-        Memory at 200002a8000 (64-bit, non-prefetchable) [size=16K]
-        Capabilities: [c8] Power Management version 3
-        Capabilities: [d0] MSI: Enable- Count=1/1 Maskable- 64bit+
-        Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
-        Capabilities: [80] MSI-X: Enable+ Count=32 Masked-
-        Capabilities: [100] Latency Tolerance Reporting
-        Kernel driver in use: btintel_pcie
-        Kernel modules: btintel_pcie
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 7c9c8630c171093f7c347245ca132ab522b5859b
+      https://github.com/bluez/bluez/commit/7c9c8630c171093f7c347245ca132=
+ab522b5859b
+  Author: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+  Date:   2026-02-24 (Tue, 24 Feb 2026)
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 2 ++
- 1 file changed, 2 insertions(+)
+  Changed paths:
+    M src/shared/att.c
+    M src/shared/att.h
+    M src/shared/gatt-client.c
+    M src/shared/gatt-helpers.c
+    M src/shared/gatt-helpers.h
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index b63b2ea9e296..e19b2c7750f1 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -48,6 +48,8 @@ static const struct pci_device_id btintel_pcie_table[] = {
- 	{ BTINTEL_PCI_DEVICE(0xE476, PCI_ANY_ID) },
- 	 /* Scorpious2, Nova Lake-PCD-H */
- 	{ BTINTEL_PCI_DEVICE(0xD346, PCI_ANY_ID) },
-+	 /* Scorpious2, Nova Lake-PCD-S */
-+	{ BTINTEL_PCI_DEVICE(0x6E74, PCI_ANY_ID) },
- 	{ 0 }
- };
- MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
--- 
-2.43.0
+  Log Message:
+  -----------
+  gatt-client:Implement error handling for DB_OUT_OF_SYNC in GATT caching=
 
+
+Implement automatic retry logic for GATT operations that fail with
+DB_OUT_OF_SYNC error (0x12).
+
+This implementation follows the GATT caching specification and provides
+robust error recovery while minimizing unnecessary service discovery
+operations.
+
+When a DB_OUT_OF_SYNC error occurs, the implementation:
+
+1. Pauses the failed operation in a pending_db_sync state
+2. Notifies the GATT client layer via db_sync_callback
+3. Reads the remote Database Hash characteristic (0x2B2A)
+4. Compares it with the locally cached hash value
+5. If hashes match: Retries the operation (database is in sync)
+6. If hashes differ: Triggers full service discovery
+
+Workflow:
+---------
+
+Hash Match Case:
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
+                                      =E2=86=93 (DB_OUT_OF_SYNC error)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+                =E2=86=93
+         Read DB Hash (0x2B2A)
+                =E2=86=93
+         Compare with local cache
+                =E2=86=93 (Match)
+         bt_att_resend(att, id, ...)
+                =E2=86=93
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device (=
+retry)
+                                      =E2=86=93 (Success)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+
+Hash Differ Case:
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
+                                      =E2=86=93 (DB_OUT_OF_SYNC error)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+                =E2=86=93
+         Read DB Hash (0x2B2A)
+                =E2=86=93
+         Compare with local cache
+                =E2=86=93 (Differ)
+         bt_att_cancel(att, id)
+                =E2=86=93
+         Trigger Service Discovery
+                =E2=86=93
+  App =E2=86=90 GATT Client (operation failed, discovery in progress)
+
+Service Changed Ind Received (Handle Outside Affected Range):
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
+                                      =E2=86=93 (DB_OUT_OF_SYNC error)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+                =E2=86=93
+         Service Changed Ind arrives
+                =E2=86=93
+         Check error handle vs affected range
+                =E2=86=93 (Outside range)
+         bt_att_resend(att, id, ...)
+                =E2=86=93
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device (=
+retry)
+                                      =E2=86=93 (Success)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+
+Service Changed Ind Received (Handle Inside Affected Range):
+  App =E2=86=92 GATT Client =E2=86=92 ATT Layer =E2=86=92 Remote Device
+                                      =E2=86=93 (DB_OUT_OF_SYNC error)
+  App =E2=86=90 GATT Client =E2=86=90 ATT Layer =E2=86=90 Remote Device
+                =E2=86=93
+         Service Changed Ind arrives
+                =E2=86=93
+         Check error handle vs affected range
+                =E2=86=93 (Inside range)
+         bt_att_cancel(att, id)
+                =E2=86=93
+         Service Discovery already in progress
+                =E2=86=93
+  App =E2=86=90 GATT Client (operation failed, discovery in progress)
+
+btmon traffics:
+--------------
+
+Hash Match Case:
+
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7   #1 [hci1]
+13.675271
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000d
+> HCI Event: Number of Completed Packets (0x13) plen 5         #2 [hci1]
+> 13.694287
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 9                      #3 [hci1]
+> 13.728279
+      ATT: Error Response (0x01) len 4
+        Read Request (0x0a)
+        Handle: 0x000d
+        Error: Database Out of Sync (0x12)
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11  #4 [hci1]
+13.730759
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0001-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5         #5 [hci1]
+> 13.754290
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 24                     #6 [hci1]
+> 13.820283
+      ATT: Read By Type Response (0x09) len 19
+        Attribute data length: 18
+        Attribute data list: 1 entry
+        Handle: 0x000f
+        Value: f74347d19eef647d97f0b2f7af502e33
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11  #7 [hci1]
+13.822792
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0010-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5         #8 [hci1]
+> 13.842581
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 9                      #9 [hci1]
+> 13.880369
+      ATT: Error Response (0x01) len 4
+        Read By Type Request (0x08)
+        Handle: 0x0010
+        Error: Attribute Not Found (0x0a)
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7   #10
+[hci1] 13.880999
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000d
+> HCI Event: Number of Completed Packets (0x13) plen 5         #11
+> [hci1] 13.904288
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 6                      #12
+> [hci1] 13.940273
+      ATT: Read Response (0x0b) len 1
+
+--------------------
+Hash differ case:
+
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x000d
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> #17 [hci1] 50.171857
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 9
+> #18 [hci1] 50.171970
+      ATT: Error Response (0x01) len 4
+        Read Request (0x0a)
+        Handle: 0x000d
+        Error: Database Out of Sync (0x12)
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0001-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> #20 [hci1] 50.201854
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 24
+> #21 [hci1] 50.268291
+      ATT: Read By Type Response (0x09) len 19
+        Attribute data length: 18
+        Attribute data list: 1 entry
+        Handle: 0x000f
+        Value: 5fa98eed072ee317aa521990be294bf3
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0010-0xffff
+        Attribute type: Database Hash (0x2b2a)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> #23 [hci1] 50.291849
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 9
+> #24 [hci1] 50.419999
+      ATT: Error Response (0x01) len 4
+        Read By Type Request (0x08)
+        Handle: 0x0010
+        Error: Attribute Not Found (0x0a)
+bluetoothd[91554]: < ACL Data TX: Handle 3 flags 0x00 dlen 11
+      ATT: Read By Group Type Request (0x10) len 6
+        Handle range: 0x0001-0xffff
+        Attribute group type: Primary Service (0x2800)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> #26 [hci1] 50.471607
+        Num handles: 1
+        Handle: 3
+        Count: 1
+> ACL Data RX: Handle 3 flags 0x02 dlen 24
+> #27 [hci1] 50.471663
+      ATT: Read By Group Type Response (0x11) len 19
+        Attribute data length: 6
+        Attribute group list: 3 entries
+        Handle range: 0x0001-0x0007
+        UUID: Generic Access Profile (0x1800)
+        Handle range: 0x0008-0x0011
+        UUID: Generic Attribute Profile (0x1801)
+        Handle range: 0x0012-0x0014
+        UUID: Device Information (0x180a)
+--------------------
+
+Changes from v4:
+ - Fix errors reported by bluez.test.bot
+ - Link to v4
+   https://lore.kernel.org/all/20260210011347.3237740-1-mengshi.wu@oss.qu=
+alcomm.com/
+
+Changes from v3:
+ - Reuses existing bt_att_resend() and bt_att_cancel() functions
+ - Add new structure pending_db_sync
+ - Link to v3
+   https://lore.kernel.org/all/20260121083804.4010106-1-mengshi.wu@oss.qu=
+alcomm.com/
+
+Changes from v2:
+ - Detects DB_OUT_OF_SYNC errors during GATT operations
+ - Extracts affected handles from the original request PDU
+ - Checks if Service Changed indications overlap with those handles
+ - Verifies database consistency using Database Hash characteristic
+ - Automatically retries the original request if DB is consistent
+ - Automatically retries the original request if handle is not affected
+ - Link to v2
+   https://lore.kernel.org/all/20260105103828.105346-1-mengshi.wu@oss.qua=
+lcomm.com/
+
+Changes from v1:
+ - Implement automatic recovery when ATT_ECODE_DB_OUT_OF_SYNC error is
+   received from the remote device.
+ - Link to v1
+   https://lore.kernel.org/all/20251208101915.247459-1-mengshi.wu@oss.qua=
+lcomm.com/
+
+Signed-off-by: Mengshi Wu <mengshi.wu@oss.qualcomm.com>
+
+
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
