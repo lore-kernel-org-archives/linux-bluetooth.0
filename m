@@ -1,54 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1809124E4A8;
-	Tue, 24 Feb 2026 07:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D99834AB17;
+	Tue, 24 Feb 2026 07:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771917628; cv=none; b=MDIXz+BRQJiwo3HozFhmAHq00XWeitH5uXV18+Q7nr8X+njpiO15CTvuFuCzGPLCUpv/MxICKEmu/kXPPE1/LY9NMPwoq8yUEC/mmgE0JS1Jy27HQcqt2G+jBXi3kUKVIWRXEY6YScIpTA7zQUvjSqdYbTTmYzZCeyBwcGy8XGI=
+	t=1771918533; cv=none; b=YW6Q4GvhFoB6RzyTAAXlH5NP5Pu2BcYuzkk2MSn8Xn9CDi+cX8tclZod0MVBFwGehM4p3A7QQz2GI5QESt3cbZUhSJEATb6srQTQKIl5X2GlBzcJIDKzrg9fe/+s1DKdeIV++D1R2x56KOTB2VfFDpO7T2tU2EsElAduUh8QCvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771917628; c=relaxed/simple;
-	bh=kBzq8KMP7val1p5xI4CESezdEo4yOCLfz3X2Wfw1N4I=;
+	s=arc-20240116; t=1771918533; c=relaxed/simple;
+	bh=dhSwf3k1HrmWVHlZ3Q/Y2/I5lhf86qqq7D1+qtQ+b7U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TCz28axzIQaMk22xEgBPAr6SMlZYHfzA8P9RK9DRJLVaT2vjMyvPX5bT2q15IPVoR4RgLn1Tx67Eibu8SLiilvPFXB45+7jfIAFD1Lv4YaquzttATKUv8FhKbivZyp7Y1+P2LAtsntV0qYm8//6/3dNdEPmuh8nRuBK4OJrbADE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g76zi9AW; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=sah/16YmwBzmDzcQaZY54xYshh6bnOS1nPsyiNsmM5PwT3rhrpJTP3LVcz5SqNRlP2Dv0uUsNfBT+H6sSJZ44jsZ1KdJv+mKkhJrMt1rd0othanX1gu0iMkTutOiTx0qAIjiazCVX9KE0uqGx0n3s7KDSh0l0M1EtxP9gViMZGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HL2GlmaL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g76zi9AW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83940C116D0;
-	Tue, 24 Feb 2026 07:20:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HL2GlmaL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E445C116D0;
+	Tue, 24 Feb 2026 07:35:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771917627;
-	bh=kBzq8KMP7val1p5xI4CESezdEo4yOCLfz3X2Wfw1N4I=;
+	s=k20201202; t=1771918533;
+	bh=dhSwf3k1HrmWVHlZ3Q/Y2/I5lhf86qqq7D1+qtQ+b7U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g76zi9AWaRL22GcB1ov0eE6v8L3z27l5KSQVxeYxuwnYTUnNyZV+r8nQ18i5UNkQT
-	 WtzSVuqWUfwQ6Sn9ss27TRukoIpX9ej9mbrynGIO5gZ0IXxlejfFHQHonGz8HmjFan
-	 wXdIAkhfDzAQbjgQdE0Rn6PPfsPn4CCHnnycTLzfenzeO2V/7S76/WxZTppa6FIMra
-	 g8Lx9hcvEnaJtjnw1GCPhMWDs4CmEdci7audwJ/s/d/ckb2jnSWuTR0c6jmF/cwJb+
-	 cmCsSRMlw/Aj1kPVs8RU5HY3IibTQPJVedU5E7yFeNkSQIbaWfOghfZbD8ScVv64Y1
-	 hG5Kvo5fmiQXg==
-Date: Tue, 24 Feb 2026 12:50:12 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
-	Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, Mark Pearson <mpearson-lenovo@squebb.ca>, 
-	"Derek J. Clark" <derekjohn.clark@gmail.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Bartosz Golaszewski <brgl@kernel.org>, 
-	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Stephan Gerhold <stephan.gerhold@linaro.org>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
-	linux-acpi@vger.kernel.org, Hans de Goede <johannes.goede@oss.qualcomm.com>, 
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Subject: Re: [PATCH v5 4/9] dt-bindings: serial: Document the graph port
-Message-ID: <z42xyou35nuyt2f3rxxzzndleir66w3nxeidjmgxg6l4uem6st@fj473jdiau3p>
-References: <20260224-pci-m2-e-v5-0-dd9b9501d33c@oss.qualcomm.com>
- <20260224-pci-m2-e-v5-4-dd9b9501d33c@oss.qualcomm.com>
- <20260224-peacock-of-improbable-poetry-b4cfdc@quoll>
+	b=HL2GlmaL52g+UexPBFB5+UeLxzZ/RlXW7EY/UtD8nysDHRkcsdFdhrkeg2OPxC13b
+	 iSAhM5ndpcBBp1bY0QV1Fuvt3yIBrLA8v2Xq57SmPUbDxElSZ6nzJyZDZZsJ6wvKhr
+	 /5KPDsTmr+Ybm9seywWMhWeYIjvz5yE0LIgFKa1hRruo1E0fHjfPlxwt/n8rjTsivn
+	 TTcQ5iUyFxokdQd16g3fMjgYfm01CxIqSVeI90YQDGsF/2B88gJZMQbkLdL4Xt46ld
+	 j6/FTBbrWIrloDBDLTBm2VeB5ZQqYWGALNOl3t7pf3ZwT7dQs8UMqGEbzgtban7b+N
+	 8Kcyz/T9jtxTA==
+Date: Tue, 24 Feb 2026 08:35:30 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Stefano Radaelli <stefano.radaelli21@gmail.com>
+Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, pierluigi.p@variscite.com, 
+	Stefano Radaelli <stefano.r@variscite.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	David Lechner <david@lechnology.com>
+Subject: Re: [PATCH v1 1/2] dt-bindings: net: bluetooth: ti: Add property for
+ enhanced SCO setup erratum
+Message-ID: <20260224-ancient-herring-of-debate-c3b5f8@quoll>
+References: <cover.1771847350.git.stefano.r@variscite.com>
+ <db4c7eab9d0c2f71eb61baff240957596f099401.1771847350.git.stefano.r@variscite.com>
+ <a5d4ebf0-9d99-494c-b46b-a6140610c9e2@kernel.org>
+ <aZxE__Ybg5p2DaFM@Lord-Beerus.station>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -57,27 +50,58 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260224-peacock-of-improbable-poetry-b4cfdc@quoll>
+In-Reply-To: <aZxE__Ybg5p2DaFM@Lord-Beerus.station>
 
-On Tue, Feb 24, 2026 at 08:09:17AM +0100, Krzysztof Kozlowski wrote:
-> On Tue, Feb 24, 2026 at 11:00:50AM +0530, Manivannan Sadhasivam wrote:
-> > A serial controller could be connected to an external connector like PCIe
-> > M.2 for controlling the serial interface of the card. Hence, document the
-> > OF graph port.
+On Mon, Feb 23, 2026 at 01:15:59PM +0100, Stefano Radaelli wrote:
+> On Mon, Feb 23, 2026 at 01:03:27PM +0100, Krzysztof Kozlowski wrote:
+> > On 23/02/2026 12:52, Stefano Radaelli wrote:
+> > > From: Stefano Radaelli <stefano.r@variscite.com>
+> > > 
+> > > Some Bluetooth controller/firmware combinations advertise support for the
 > > 
-> > Tested-by: Hans de Goede <johannes.goede@oss.qualcomm.com> # ThinkPad T14s gen6 (arm64)
+> > Which ones?
+> > 
+> > 
+> > This looks a lot like controller issue, thus deducible from the
+> > compatible. And even if particular firmware has problem, how do you see
+> > changing static DTS on linux-firmware update?
+> > 
+> > Best regards,
+> > Krzysztof
 > 
-> Please drop. The binding is not being sent to the device during testing,
-> thus it is impossible to test it.
+> Hi Krzysztof,
 > 
+> thank you for your review!
+> 
+> We have observed this behaviour specifically on TI WL1831 modules.
+> 
+> When using the HCI Enhanced Setup Synchronous Connection command,
+> SCO setup fails even though the controller reports the command as
+> supported. The only working path for this controller is to fall back
+> to the legacy HCI Setup Synchronous Connection (0x0028).
+> The behaviour matches the scenario described in commit 05abad857277,
+> which introduced HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for that
+> reason.
+> 
+> We are using the latest firmware available from TI for the wl18xx
+> family (from the official TI repository), so this is not related to
+> an outdated firmware version.
+> 
+> The reason for proposing a DT property was to keep the workaround
+> flexible and avoid forcing the quirk on all TI controllers handled
+> by hci_ll without confirmation.
 
-b4 picked it up since the tag was given in the cover letter and I forgot to
-remove it while sending.
+I did not propose to enable it on ALL TI controllers. I asked to deduce
+it from given compatible, so to enable it on affected devices.
 
-If I happen to send next version, I will drop it from all bindings patches.
+> 
+> However, since this may be considered deducible from the compatible,
+> would you prefer enabling
+> HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN automatically for
+> "ti,wl1831-st" instead of using a DT property?
 
-- Mani
+Yes
 
--- 
-மணிவண்ணன் சதாசிவம்
+Best regards,
+Krzysztof
+
