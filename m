@@ -1,158 +1,152 @@
-Received: from mail-qv1-f66.google.com (mail-qv1-f66.google.com [209.85.219.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928671548C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Feb 2026 00:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47961917F1;
+	Tue, 24 Feb 2026 05:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771892293; cv=none; b=dX0zMvFtNERPxTwAjVLIoY2zzC6QLd+mr6SAlHbu/MeX0k11CbhxA1nETtNo1w3Sd+9d9gMOBwrx1Cf8yba9/+TqMl4+0UrxLsdGo6E/+FsmVEvuIWu4EReUIy/TOvRDfb1itCHIK71BWuIN01Z+974WAxryVhYLKoBPEcyDQR0=
+	t=1771911052; cv=none; b=EB/7iTdUvY7RqC1sOXHw3wF2JNiIZFgKMlA3YFI+0mH8EOqVYQS94b1ZDGs/rwDKQp06rLe484cEsVTnA/+7FiY47IgoEDpTf6UaJP2P2QeZ4CiS9ys4qKkP8q6hJVsovH+ojIa6vd/9DszCgSNjRmb/URh5dzGwnUZW/6U8i4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771892293; c=relaxed/simple;
-	bh=FDNH/cRX08GBwo1n5UPkbZYyzIT/fXrWniKexa8uCRo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=L+vWmAVMCLr/ZQnNnWrZ9NTql7htIZCa4fZJW9iewg9dnVke8/N2kftmCn+Edv5Hznm8RrBPIRYmBgyAsQSJRLVPqK6Xhe/6mC63iLG4I8unNnNa0F0phQ1TVbrlZ7BarF62E5FBU2bQXbQnxnCO+g3gi1Jst7Nr8igAUjpQXmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EvX/IgJn; arc=none smtp.client-ip=209.85.219.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1771911052; c=relaxed/simple;
+	bh=vHdj4hh+S9toSEoaqsyFG1+YlfiQ88QjpMwJdxwcVKw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=EHukVlOvLLYtVQJ3bpdmd3qZ8RqhrUeT0LwRyge9LEqlk9Aj/qOLxmVQps/OwABa2LQlGiUJtILMu+cOe3VNGFxiwipnzSPp4jkvVbjwbojnFzhL5yOPCDCAnYRD+L+Oh3LLarYDRLJoPSLJnRR/JNE6kf7t5W3iWqNKHK3lMZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+tKSlMM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EvX/IgJn"
-Received: by mail-qv1-f66.google.com with SMTP id 6a1803df08f44-896f4627dffso66688336d6.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Feb 2026 16:18:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771892291; x=1772497091; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hhfcVFZUynCfub1WOU3JF4N3LJrNy2flUNaZwvNMmmk=;
-        b=EvX/IgJnIl8qs8iEmOopiaAm/ZIQWCMy1SLA2wHMEo2Xe+vaCaboojtmNhrVL9zdGZ
-         lIO1/g/05ivHrDQQbW9FtdDfTnpMRMzB4JgqotsleK500ootvVxhtRLCDlDq8ZVx4NHJ
-         A2VeNxsaf3AsSuLkNmZocZkrU1l1lIKZUPtNzdadOWwkU0zti1WCv/C2Dftq0FA8HIju
-         +J2B7BbWQWRbB/2WmgRa2o0R89Qu9ZWuoi1vJDB/utH982s8gTfr673J6SkI0exnQW2M
-         +mmBQ8Ci6WkhjlYA4fifF41QJfePqilmXBi89ZENVc+CvbVp6tdsJ0tsZ+RX6DHBhQUV
-         UxFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771892291; x=1772497091;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hhfcVFZUynCfub1WOU3JF4N3LJrNy2flUNaZwvNMmmk=;
-        b=rQ27PvZuauMP38xH5KbHTDlxukGp2zDHnOTTdevtkn1kQklHC328LST9tNqzY/dtHG
-         AS7pOLgpwi18g+z2spU79U0v8jOLqB2sWwwZ1jhC408oaBGW3QgYMUv5hVqh48KZHsys
-         PYCeYpnXgzf4Abu3qKPds013d/EArmmK4A460PpvNSPLCU2H+b1t8Tv2yPcAMo9SdkFF
-         FyFRu2v353zZivNjnLe+oe2GtR3i4GeWusHxLV+QS5K7To6We1kiCULHzo/UGU+5ZyFh
-         tcnHLrfeRzp+8ZHp0w0kP/XqIVlkZ7iPX7zbqEiz8+81iqDyI790H17PSMR/dkDaYrqv
-         wIGA==
-X-Gm-Message-State: AOJu0YyVuA93ksI0KcY8pZuKHKBJymAvRF3T6K/InJ3tW94q4F6aMNw1
-	ToFSaEPlLewtmbhK1rTmrCBih9F7tHONhMHrES7NcIOFbM0W6EWF6Mutv2B8gbgF
-X-Gm-Gg: ATEYQzxpApdvzdlPU6o7v6QMpykKWgVCzbhXE/tqpXEDbJsXhfFbIqCYveAFZVKVcZ/
-	IwqU3pEk0kSYDzQUjq/6f5Oj/myMRScbllq2P1hWkt8JzhssDgpjbob8xwTU2cUBv49tOZ3mCXr
-	0J0+sb3Lzb/YXYQOccoKhTj4NmWuJ5xh+EYLe1NlDeVZnrfz/mnpwdPfQ44RlzLC0l2wbxtlb5b
-	Ips+4gr4LMQpQkh2oshyw2K/KHrqPx9nhZMXDF8SDfit0fvO7H4yDdmt5sdUS29/HyUjr6zibac
-	WVM56bxSFQflN9FFJFp6cMrGBI8Xw55P1GoYTw+wfKsQ/YdMlJ2NlBysP78w500uX0sPifeVP1a
-	gf72Tk9v+uFKP6dX5+21HTTcVIsMJZitYXNLInbEfzbNwheS7CW9L0OoOa6KHfBAfe9OCQsZ2mY
-	KPc+FjtFULpGipS2S/AWWWoIiqc5K9
-X-Received: by 2002:ad4:574d:0:b0:896:ff3d:18d3 with SMTP id 6a1803df08f44-89979c74aabmr156437136d6.23.1771892291210;
-        Mon, 23 Feb 2026 16:18:11 -0800 (PST)
-Received: from [172.17.0.2] ([172.172.87.70])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899a55a1b05sm4420296d6.14.2026.02.23.16.18.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Feb 2026 16:18:10 -0800 (PST)
-Message-ID: <699cee42.050a0220.22548e.5774@mx.google.com>
-Date: Mon, 23 Feb 2026 16:18:10 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7074022310146396126=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+tKSlMM"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 86FC2C2BCB0;
+	Tue, 24 Feb 2026 05:30:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771911052;
+	bh=vHdj4hh+S9toSEoaqsyFG1+YlfiQ88QjpMwJdxwcVKw=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=L+tKSlMMT5r6dc2EMjgCGCq9a59fjbudd7g4l1yW3qtkpGcf01ND92z1k8iKKH7T9
+	 mJWL9OD4gaDEJaTABJ0hI9KdKN2PDVkxpxoSS1q3KBNosXQkSrhJGjfyn/BQyFN7nk
+	 a3HR8WewK58BhSJGJqkvJsTTLyCFGHjZAE0dhLaNdZ2wAw1PGTt/RgKZ9gBlUbo3u+
+	 bKnFROsYxjv2adEu8kalrWHmKyztOYBUxepBo1q/1d2LdQ22nxGckgB7WXKakxf9oS
+	 87C0iVnS62nNRJ/WvgFSOfIwzgamQhFkPuHZr29NfESE/yZZrP6I9YDai8LSoRcBl7
+	 hSCT4UhtMxcqQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78160EFB7FF;
+	Tue, 24 Feb 2026 05:30:52 +0000 (UTC)
+From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
+Date: Tue, 24 Feb 2026 11:00:48 +0530
+Subject: [PATCH v5 2/9] serdev: Add an API to find the serdev controller
+ associated with the devicetree node
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, thorsten.blum@linux.dev
-Subject: RE: Bluetooth: btintel_pcie: Use struct_size to improve hci_drv_read_info
-In-Reply-To: <20260223233341.426067-2-thorsten.blum@linux.dev>
-References: <20260223233341.426067-2-thorsten.blum@linux.dev>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7074022310146396126==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260224-pci-m2-e-v5-2-dd9b9501d33c@oss.qualcomm.com>
+References: <20260224-pci-m2-e-v5-0-dd9b9501d33c@oss.qualcomm.com>
+In-Reply-To: <20260224-pci-m2-e-v5-0-dd9b9501d33c@oss.qualcomm.com>
+To: Rob Herring <robh@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Jiri Slaby <jirislaby@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, Hans de Goede <hansg@kernel.org>, 
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+ Mark Pearson <mpearson-lenovo@squebb.ca>, 
+ "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+ linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+ linux-acpi@vger.kernel.org, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
+ Hans de Goede <johannes.goede@oss.qualcomm.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2175;
+ i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
+ bh=ZvwvgoFlf4z/ag5/olaI5ILEIEPSFo6zg+vO7wuanOo=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpnTeIa56ffrPgmNucV18RPYqRHO94dF3VIWvvp
+ Zp7yqucqEWJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaZ03iAAKCRBVnxHm/pHO
+ 9QihB/4pXR5cfUc1yznfMiQgbOZgzBXVtinCek2mr0WZVDia+3o/PbEyb03v5G1SyzX7+yxoOKA
+ UNAe/ugQlDvJuSaXmmKeZ2dnbghjwiqQpVGdTH6He1icNr0ieEQLGk/kk0g2R8SsIiP6DfF6bdd
+ aIF71gAd45wbJE5TTyrtEzID7oTSxBeBxBq45T1pSxXD+gATuUn8RC8BJ3i74DL4xg0Oz1dUkGi
+ 5KHBd3mSW7rwzoBPSseevM7nCO4+l9fw/LN2hiVA17m9J1mA9gA4qxX4AMGPM0hogrrkE6GO9gw
+ gwle1YNRoxaCtGCSnMvsfLTYLHl+pX58DEkQFkEnANIR9Kws
+X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
+ fpr=C668AEC3C3188E4C611465E7488550E901166008
+X-Endpoint-Received: by B4 Relay for
+ manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
+X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
-This is automated email and please do not reply to this email!
+From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-Dear submitter,
+Add of_find_serdev_controller_by_node() API to find the serdev controller
+device associated with the devicetree node.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1056905
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.31 seconds
-GitLint                       PENDING   0.28 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      25.71 seconds
-CheckAllWarning               PASS      28.26 seconds
-CheckSparse                   PASS      31.34 seconds
-BuildKernel32                 PASS      24.94 seconds
-TestRunnerSetup               PASS      555.80 seconds
-TestRunner_l2cap-tester       PASS      28.49 seconds
-TestRunner_iso-tester         PASS      108.08 seconds
-TestRunner_bnep-tester        PASS      6.34 seconds
-TestRunner_mgmt-tester        FAIL      117.06 seconds
-TestRunner_rfcomm-tester      PASS      10.04 seconds
-TestRunner_sco-tester         FAIL      14.47 seconds
-TestRunner_ioctl-tester       PASS      10.26 seconds
-TestRunner_mesh-tester        FAIL      11.53 seconds
-TestRunner_smp-tester         PASS      8.66 seconds
-TestRunner_userchan-tester    PASS      6.78 seconds
-IncrementalBuild              PENDING   0.76 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.105 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.822 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Tested-by: Hans de Goede <johannes.goede@oss.qualcomm.com> # ThinkPad T14s gen6 (arm64)
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/tty/serdev/core.c | 19 +++++++++++++++++++
+ include/linux/serdev.h    |  9 +++++++++
+ 2 files changed, 28 insertions(+)
+
+diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+index 8f25510f89b6..bf88b95f7458 100644
+--- a/drivers/tty/serdev/core.c
++++ b/drivers/tty/serdev/core.c
+@@ -514,6 +514,25 @@ struct serdev_controller *serdev_controller_alloc(struct device *host,
+ }
+ EXPORT_SYMBOL_GPL(serdev_controller_alloc);
+ 
++#ifdef CONFIG_OF
++/**
++ * of_find_serdev_controller_by_node() - Find the serdev controller associated
++ *					 with the devicetree node
++ * @node:	Devicetree node
++ *
++ * Return: Pointer to the serdev controller associated with the node. NULL if
++ * the controller is not found. Caller is responsible for calling
++ * serdev_controller_put() to drop the reference.
++ */
++struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
++{
++	struct device *dev = bus_find_device_by_of_node(&serdev_bus_type, node);
++
++	return (dev && dev->type == &serdev_ctrl_type) ? to_serdev_controller(dev) : NULL;
++}
++EXPORT_SYMBOL_GPL(of_find_serdev_controller_by_node);
++#endif
++
+ static int of_serdev_register_devices(struct serdev_controller *ctrl)
+ {
+ 	struct device_node *node;
+diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+index 0c7d3c27d1f8..188c0ba62d50 100644
+--- a/include/linux/serdev.h
++++ b/include/linux/serdev.h
+@@ -334,4 +334,13 @@ static inline bool serdev_acpi_get_uart_resource(struct acpi_resource *ares,
+ }
+ #endif /* CONFIG_ACPI */
+ 
++#ifdef CONFIG_OF
++struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node);
++#else
++static inline struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
++{
++	return NULL;
++}
++#endif /* CONFIG_OF */
++
+ #endif /*_LINUX_SERDEV_H */
+
+-- 
+2.51.0
 
 
---===============7074022310146396126==--
