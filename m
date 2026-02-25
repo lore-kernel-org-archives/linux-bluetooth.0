@@ -1,125 +1,206 @@
-Received: from mail.schildbach.de (mail.schildbach.de [162.55.211.168])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010006.outbound.protection.outlook.com [52.101.69.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A553101D0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 08:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.55.211.168
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772007493; cv=none; b=Ynn8GzA4H+zqUTKdT0GSzZnuIDdjJ0jCpZ4u5FHBM/EULyktHRqR4c1EjcgHVrmUEeGdQSF/U9HkCZy6SPTK9rvp+480Ogtuv/uKfamu3BWfgvoY9GnMQvZp0GpqQsSCh6zmFYkLsufXyNHW25a4HJ7PLQNttIflqO7E5t9vYjI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772007493; c=relaxed/simple;
-	bh=uyvj4UXa/74nX/7Rc1AfqhJIFZPrHxy+mSWNFR/wLHo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=cUTM8y6WnYmuaOyydKv8frSQ5qgskXn/glLvEoCN5HuMAuUqu0yyok4PltQrKz4wKeAVex3oCIT3XIj7ZNeilbut7Qw+ZNq/HhMH5beB/eVoTnbTZNBLOQvXWAiY1PefNyB04rLwG8HymOHuepepxfZjiSdGqBVQBVWiIhQr5U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=schildbach.de; spf=pass smtp.mailfrom=schildbach.de; dkim=pass (2048-bit key) header.d=schildbach.de header.i=@schildbach.de header.b=gg+bvFz0; arc=none smtp.client-ip=162.55.211.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=schildbach.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schildbach.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1534D374178
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 09:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.6
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772010461; cv=fail; b=g2IwMnn4qsYdYsB0dnzt83GqAlDxdBtGS/mBSzOf5bb5XtFYlnyZz6SowJ/+NxnGrc43N116MixOkW3ezQBmDpXdSwCmIGUExBf7os5GIWS7JzVsqYlbHWDnyQjP2irwZU/wedMKMzccuOHUqaRPwtMH5ccT3WptSqMQY9t/QVM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772010461; c=relaxed/simple;
+	bh=NMc3wsfmaXks259AIrh/qt+NzAq8XfIJ83dSG9RxWEo=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HDGWd0knqdUDdZXTJNCFpbAm00z5yrp0qiKmufaDmczajCHLXxaNSFKI7hGHbZSjCdplplurXjuNVhvsFVUWA+YcCVWcQVk6+HbgzlJ+9mBWSQw1c8thJK1Uo4v7gpbBtUxRRt4GU7SZ0kuWMjCOXwjWoLHPM6nm5LTkesV6j6E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=volvo.com; spf=fail smtp.mailfrom=volvo.com; dkim=pass (1024-bit key) header.d=volvo.com header.i=@volvo.com header.b=GIiJrYHu; arc=fail smtp.client-ip=52.101.69.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=volvo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=volvo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=schildbach.de header.i=@schildbach.de header.b="gg+bvFz0"
-Received: from [IPV6:2a02:3100:2e46:4400:e04d:e52e:cd9a:2ba7] (dynamic-2a02-3100-2e46-4400-e04d-e52e-cd9a-2ba7.310.pool.telefonica.de [IPv6:2a02:3100:2e46:4400:e04d:e52e:cd9a:2ba7])
-	by mail.schildbach.de (Postfix) with ESMTPSA id 3D7963A84992
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 08:18:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=schildbach.de;
-	s=default; t=1772007488;
-	bh=uyvj4UXa/74nX/7Rc1AfqhJIFZPrHxy+mSWNFR/wLHo=;
-	h=Date:Subject:To:References:From:In-Reply-To;
-	b=gg+bvFz0XWc0gPm4Bisex6XyyWp4K8lAOqSi0fHfehlMwzBBlzpBCL2vRzoLlK6sR
-	 wTIlp8EbZ20tD/uvLPhidAboebhqkWBWaTzx6NDpZhhxy98ijwdjuU6/q5iIs+R1sO
-	 4RA7Uk0Ox4fKoa3Z2fJLnVPBJ0VPjrTD1/4RGmYsogbcNUIW7yxqymKcYi4rXCKzS9
-	 lZZU8u3ruXQgQhWggAp0U4egjXvjtzYReUokCakLg7CpzpcEVjmUj/b/cSvQETww8T
-	 gXNJdxPM1MdhghJGGm1oTZYKd5IupSsZ7NFwbyKXzvogGGKtrGWzye42Y7ivCoFf1I
-	 wnr0f4VcNiiGw==
-Message-ID: <2f31dea0-205e-4e1b-a85e-276658535493@schildbach.de>
-Date: Wed, 25 Feb 2026 09:18:07 +0100
+	dkim=pass (1024-bit key) header.d=volvo.com header.i=@volvo.com header.b="GIiJrYHu"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=v41q3DTECXWWzdYfT6ZBQy8eqaH/rk41J6ydgpBrLCLAmi3vEtwUS1qClwxXRNecx4Aw9TmLR+yTYxHZ/yQvJu3+ZSXHuRi9UF1/GWZpIQTJKwWIref7MQfoG3MTGvlETQbvWKo6PTX1VpImDxdoWE4OVGkJOSuZdnM6BK/lizhyP1NwZ+aGtB/wtDGaZzrewUjpjOqXdbkmW0q/jnrX9ZdvRMAlDFp4jsA4pU8FhAgUTUS2tBTj6EFWRxOQyAfhvV8VwRlPPhCunNa0dvm5tqpjtrJmDCChi4IOBS9oLu7CxZItu06nfGv+LqIc+VpHU4pzrskdo83aNhCm8iJ1cA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T5IbKJ1vLxavwURP2aZxhUg6WK7CUmUo8R9bzXEaquw=;
+ b=poolwUCg/9zhoNl3D6539GH3fqRToQN/F9pSGFD9uLAif5wEF6BEe8zn0ES+vap2EO+OxcWZ+L+ByncsrclYAOW/Az2LIIoQr1yFZt4HlmreY6XDVUajy4zEbPlLaDM7XCN2gQoWlc/Ld4MARQOIGOhEFKB1M2NKAef1V/81ymuuTuqg5bm4zbt2yv7fUF1H+GvWViu14q2kPR2Z7lTd+zstYdNc6/Txdt6O4iKvm+4Z+D6N2qeA4onjLP+ZGnHTQr61ipmg+eKp6vy/1djIdFX6wZ2XDI5F+00lOgPhCwRp9hEyWsBSmKGXJJtzcbGG84Oo2XSccT7yZ14n+n/D6w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=volvo.com; dmarc=pass action=none header.from=volvo.com;
+ dkim=pass header.d=volvo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=volvo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T5IbKJ1vLxavwURP2aZxhUg6WK7CUmUo8R9bzXEaquw=;
+ b=GIiJrYHuSpfUPjOF0J5q/03tOp44YRJWM7zMrdYNeRg5mPX224Pgt+zjP1PXW1AappyL95XAxaHQakohR2GoNj4BuChcrYMutN4lMiXadUoeg7sW4JITwwmzSggWV+mwdMVI2GTl4ZXBwuoi57WDD9QJ3J1BRlRZ/7dADMlDgG8=
+Received: from AM7PR05MB6790.eurprd05.prod.outlook.com (2603:10a6:20b:13f::20)
+ by AS4PR05MB9669.eurprd05.prod.outlook.com (2603:10a6:20b:4cf::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Wed, 25 Feb
+ 2026 09:07:32 +0000
+Received: from AM7PR05MB6790.eurprd05.prod.outlook.com
+ ([fe80::37f7:d824:94d1:cdf2]) by AM7PR05MB6790.eurprd05.prod.outlook.com
+ ([fe80::37f7:d824:94d1:cdf2%2]) with mapi id 15.20.9632.017; Wed, 25 Feb 2026
+ 09:07:32 +0000
+From: Dajid Morel <dajid.morel@volvo.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth: Increase LE connection timeout for industrial
+ sensors
+Thread-Topic: [PATCH] Bluetooth: Increase LE connection timeout for industrial
+ sensors
+Thread-Index: AQHcpjXVT+W9IbPTN0aOERCOoK0qUA==
+Date: Wed, 25 Feb 2026 09:07:32 +0000
+Message-ID:
+ <AM7PR05MB679030C679B87FCDEF903CAAEC75A@AM7PR05MB6790.eurprd05.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_Enabled=True;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_SiteId=f25493ae-1c98-41d7-8a33-0be75f5fe603;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_SetDate=2026-02-25T09:07:32.101Z;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_Name=Open;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_ContentBits=1;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_Method=Privileged;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=volvo.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM7PR05MB6790:EE_|AS4PR05MB9669:EE_
+x-ms-office365-filtering-correlation-id: efc2c7c3-1b34-4ffb-00cd-08de744d4f40
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ IRa84tEzrK/LKrKPlgvrhSekdg+G/R/5qWKhYakASp9DhJsgso2u7YgRrGpxo3tz4fUlDy/Q8KGpnAhE0xWYWj8qSuuXtoAcGdw+Zwssbu8twOAPHM0fh+G2MaIW0JeDMu/L+ykv3yYzFiSVAMVtcgC2iDGbaAhHQicj/MrWNbib9E5tmwP0kPgxek5b0AgujUMwPgr8NiiiDAiH2uU3fPWGlTV1dB4arOJYvGrjthMMJp6vdVWRiDKn0YVpqq2oECT9uMLZOVsJpWJaoFkKXKQZ7yFYJ/t7+xrxsWpjnF5NOn9AzosCWhH/6Tf0/093FdppKQSVy28SDXw7gaew9RoiiXFnEvxdE7YfmOhCiaudKE9S61Nx+zRP/gfV4vdJyRd8W34+ZUzmQN5sZ/IO5WuZQ4PTlLGc5GxvNkGY7u7lrSvOBLPO5EwF6ahogpl30JU2glJ4x5zGiFb7AFp3WssHS5sTDoA3ePEMRArvTG/YlaCW6FD0l0dAEu5AJgsqx73kUANcdALfLT3bxcW17MVjg45Htt0SZJTY9Lsm8AWaX8IY+WdRoEbOtZoZyLo+SPG8blWL6d9PuaKYYfBdHtvil/0m8BDmzV5NnFnOvJIftOlpctREIcRbXnLeU4ql30DufKpmEg1nZcsXcoPZneyp21r7XRPlB0xr9KfPuovyN2Fv55UPyXnDtglHKt95CgV/ZsuUwyQkT12kQb92foYu1L0Bx833AoCph4ZlDGJlTvOZJB2aEQ7DW+mAJN9PpWkME9+fHhWff2eVTcR7P0k3HzGKeMC4JKYRlfnwdXM=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM7PR05MB6790.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?Ys++EB2wKBYO0SecoHb1HmPJd7ikSgjDzXslfc311euBXUdKwgbWf4p1Bv?=
+ =?iso-8859-1?Q?vKG41orjN3X3jv/a4EZwfEscd/8sOUvMtdUU5YJqQ2PMVJ+T10abxUhDIu?=
+ =?iso-8859-1?Q?4mCRvT0lfX33HoqKAoaKKsfHGQGi7lyM/iFTrFsNZxuQSHdqVLgrDr9W0i?=
+ =?iso-8859-1?Q?Bjl01LRbBDRo7jjnzOq99Fc5pgmyJfpwDPKLSpysjtdH07z8O0GEdMORKV?=
+ =?iso-8859-1?Q?Fgfj5JmNUL2g4Bwyy5WsZMv2/ncG7V2RxDYWZazLtFXhnokcw+ZcnOb7h9?=
+ =?iso-8859-1?Q?PmT9vpwKhibtRm/ntdIMKubfc77ELjG5eal0sGDq9SljSPWpLQpjR9hHUj?=
+ =?iso-8859-1?Q?qmrO0A2PFvlKs9zwa8wzpk3Pi3a+ce++Ecbtiddx0LOm6cOzO1uv34ehs/?=
+ =?iso-8859-1?Q?wVaiaHkh9ElrlSXQ9CA6Dw8/zaPh2/v9pwCirrfBp6m+6zqIHIv3YZxeLC?=
+ =?iso-8859-1?Q?sR7pq0yYrji0DaejR8iFtZkYGZF5e6hYdk4ZNfCKp5XXxHLTVbth4J/+Nq?=
+ =?iso-8859-1?Q?JNPzj6Z3ra3IKFTpSU0R11Mde8PosgGRTN1J18JqakQohcNkXPhxRl4GE+?=
+ =?iso-8859-1?Q?eFbvwEE+tYSx8JM4x3w/DBHheEyl+p62SkzuFGj6E5WWqh1NSZSXakEzxw?=
+ =?iso-8859-1?Q?29wGNYkxyse/FZzL0I6NfPwRf1F8gfBnqgrfdTCxzFd2HcBF/QCfYtqNIu?=
+ =?iso-8859-1?Q?OFWSTZAlTwVbPFt05Sspf5KYFAqXtaYNZxPhA0itdDQIe/OiP9L6AfYJwE?=
+ =?iso-8859-1?Q?X6UrmX+brx1QM4S5zz2F5W699LlsthlOurzmuhTL2JBBEStHrjHnU7mLDP?=
+ =?iso-8859-1?Q?JUOxQoIBhx4wFPTlwk3W/Pi+hBXpVFSLvqjZ/TF72P0s2dX/FvxedJLYmW?=
+ =?iso-8859-1?Q?e5k/88qRSDbJA9a5e7GXRXYoyjPYiovtsRfIbqsdz9uZChjJJovm6AhX9L?=
+ =?iso-8859-1?Q?vBy3b2Z2odiJR+aS5tIls0HWwIZHK5BelHMp30KDm/vWaiNT9ByOJruhDK?=
+ =?iso-8859-1?Q?oEB9Bp14xCHgW/jIet7PtUZaLMdSvDjSk+kYPh8TjVP+6ZX42FhhF4Tpoh?=
+ =?iso-8859-1?Q?xIcA2jwrAKMQ2oYlHCja4fgFvo5x/aeU4H1ZoxBs6H1rJIGS4DFgsPU12I?=
+ =?iso-8859-1?Q?0PnvK5V5ZlaLM4r3s4rr3W0CPtjdTTUfk5a6lm3O3dEWqa2cnM01auICbR?=
+ =?iso-8859-1?Q?SdKiFRxfTLIsw8Jx8s00IW/oaHDUoZH5gYePSgskgMk7smuAKih5mmyTOj?=
+ =?iso-8859-1?Q?Y19tkxz7I77PCbgAP36cuFlmSNe62wi0V/mkHqHfiPW5FIbl+RiICQLFKs?=
+ =?iso-8859-1?Q?v419qhMKOyqn7Ae04kZWuWmpMC3PpvqXdA7CjHNrmlbwZ0y24t7Ziu1fRK?=
+ =?iso-8859-1?Q?Y0BM0jklXleLPE5ZECaLBGAQssbkjILg7cC6R5r2F0DEZS//2udOS1MF9S?=
+ =?iso-8859-1?Q?nyq+UvOtu+ynTf76Nmtxdue55ExtyiwAiAqanKQMU6fuJVpUUO9sob4Wmr?=
+ =?iso-8859-1?Q?1JosxWYVgVBV/hK+6KZYLLaCWB5Csl2lsCExOQDrJO3hRg4MbQUD1Eeud1?=
+ =?iso-8859-1?Q?uJhC/nTsx9z7MNQe3KESoGZOkrMadj57l0vbrIwajeWxW9m3MHmM1IHGFV?=
+ =?iso-8859-1?Q?8S3XyV+pmnj1Na3W5wsLr21n14x+8ugYrHccf3EO0xxEQWMLNi++tW0udg?=
+ =?iso-8859-1?Q?1sI2gyrC2W1gSigYkD/JNDm+snhhhAh2M5/b+w2lz0OMoQUHmjYyjkdXDQ?=
+ =?iso-8859-1?Q?GwNI+6WTugobdrWHJrO23N1qKxldHe1UGOKiPp4crG7Vi3gd2vlCqJY9sN?=
+ =?iso-8859-1?Q?Ft1T1Xk+1g=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: minimal permissions for BLE operations?
-Content-Language: en-US
-To: linux-bluetooth@vger.kernel.org
-References: <1c887efa-9722-4e24-b49a-da21eadc2ce0@schildbach.de>
- <CABBYNZLyBD2uJZpMEiu6NZYzivwnQprsAHW7Dfqr4L4ydcmaOw@mail.gmail.com>
-From: Andreas Schildbach <kernel.org@schildbach.de>
-Autocrypt: addr=andreas@schildbach.de; keydata=
- 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
- 69yjlFa2b6oZFE5Xd5Ba2O/1TbXtog==
-In-Reply-To: <CABBYNZLyBD2uJZpMEiu6NZYzivwnQprsAHW7Dfqr4L4ydcmaOw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: volvo.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR05MB6790.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: efc2c7c3-1b34-4ffb-00cd-08de744d4f40
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Feb 2026 09:07:32.3904
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: f25493ae-1c98-41d7-8a33-0be75f5fe603
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8edw4Hiv5wNmcDNBmBgR0zJiOkHj3iJtEMqerx0rwWPPSma4NARg4e5dYLU5oEwVGH1UkbXmOlLciLfs3750Pg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR05MB9669
 
-Hi Luiz,
+From 7945e077525b9ddcbbfd2d4f7251c6f669f7cccb Mon Sep 17 00:00:00 2001
 
-> On Tue, Feb 24, 2026 at 11:57 AM Andreas Schildbach
-> <kernel.org@schildbach.de> wrote:
->>
->> I wonder what kernel capabilities or permissions are needed to use HCI for
->>
->> 1. passive BLE scan on channels 37, 38, 39,
->> 2. (read) access to a BLE GAP (for Thread/Matter device commissioning)
->> 3. hciconfig hci0 up/down
-> 
-> If really want to do low level access to HCI then you probably need to
-> use HCI_CHANNEL_USER and take full ownership of HCI state machine…
+From: Dajid Morel <dajid.morel@volvo.com>
 
-Sorry, for I should have made this clearer: the software is already 
-written (by others) and works, given root privileges. Now I want to 
-allow it to run under an unprivileged user and grant just the 
-right/minimal set of permissions/capabilities.
+Date: Tue, 24 Feb 2026 22:10:35 +0100
 
-Let's take the probably easiest example from above (because it's part of 
-Bluez): hciconfig hci0 up/down
+Subject: [PATCH] Bluetooth: Increase LE connection timeout for industrial
 
-What kernel capability does hciconfig need in oder to open and close HCI 
-devices (and not print "Operation not permitted" when trying)? It's not 
-mentioned in its man page.
+ sensors
 
-> If you don't want to take ownership of HCI, …
 
-Yes, I assume the software already takes ownership of the HCI.
 
-> in the worst case, you will need a socket for GAP (is that an L2CAP channel that is used as transport for> Thread/Matter?).
+Signed-off-by: Dajid Morel <dajid.morel@volvo.com>
 
-It's just one small data packet that gets "broadcasted" via a GAP by the 
-commissionee (the device being commissioned) and needs to be received by 
-the commissioner (the "device" I'm trying to harden). After that, 
-"device discovery" is finished and BLE isn't used again by the Matter 
-protocol.
+---
 
-So I assume (but don't know for sure) no BLE channel is needed, I would 
-expect more like a characteristic/beacon.
+ net/bluetooth/hci_conn.c | 4 ++--
 
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+
+index d177b7f49..8aeed0962 100644
+
+--- a/net/bluetooth/hci_conn.c
+
++++ b/net/bluetooth/hci_conn.c
+
+@@ -1131,7 +1131,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev,=
+ bdaddr_t *dst,
+
+
+
+  conn->dst_type =3D dst_type;
+
+  conn->sec_level =3D BT_SECURITY_LOW;
+
+- conn->conn_timeout =3D conn_timeout;
+
++ conn->conn_timeout =3D msecs_to_jiffies(20000);
+
+
+
+  hci_req_init(&req, hdev);
+
+
+
+@@ -1301,7 +1301,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *=
+hdev, bdaddr_t *dst,
+
+  conn->dst_type =3D dst_type;
+
+  conn->sec_level =3D BT_SECURITY_LOW;
+
+  conn->pending_sec_level =3D sec_level;
+
+- conn->conn_timeout =3D conn_timeout;
+
++ conn->conn_timeout =3D msecs_to_jiffies(20000);
+
+  conn->conn_reason =3D conn_reason;
+
+
+
+  hci_update_background_scan(hdev);
+
+--
+
+2.34.1
+
+This email message (including its attachments) is confidential and may cont=
+ain privileged information and is intended solely for the use of the indivi=
+dual and/or entity to whom it is addressed. If you are not the intended rec=
+ipient of this e-mail you may not disseminate, distribute or copy this e-ma=
+il (including its attachments), or any part thereof. If this e-mail is rece=
+ived in error, please notify the sender immediately by return e-mail and ma=
+ke sure that this e-mail (including its attachments), and all copies thereo=
+f, are immediately deleted from your system. Please further note that when =
+you communicate with us via email or visit our website we process your pers=
+onal data. See our privacy policy for more information about how we process=
+ it: https://www.volvogroup.com/en-en/privacy.html
