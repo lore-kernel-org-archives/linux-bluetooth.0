@@ -1,101 +1,132 @@
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2B133CE90
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 09:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D7E33CE85;
+	Wed, 25 Feb 2026 10:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772012951; cv=none; b=P1xb4iJjioS0q9PE6q4Vmjv1+fma1LqLVAu45Twe0sxO/Ck5PMy40g5uZ8wnx+CCJJ2LGney/PU6NI0p0tWOlD5xGF1OZ1t0g7B5CtdMtaO9zQ6khyaWUkiZSTQWZLgasCJ7bEugQeFbyzEYLerm0h9reEBUAfgyDspqt9bF2mg=
+	t=1772016106; cv=none; b=HodPAdJqtIEbOn3Cif13IkbI9htKMPE6Whj0tDvYxOk0I9NSnyI4ArBMb4PJ+SplA4gBw0wnaSbx1QgxT+t2THKulxb0Os6WEQEqmUj+JAW1p6LBM8/S0yp9PzGOvrJO7agbTt0PTRy//23CvsDPOoU288uawD5y6WOZJ+5gSxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772012951; c=relaxed/simple;
-	bh=aPkKnLWx/rLAeB2z6QOGylFvXmeQEK93aJVNnn90ZjU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=E4ItFGWddRn2ff1RFy40wEi1GrZoz13izTtbUMq13oe7pZJ0qzYiiY/oNSCArRljOa1hTPOc+7PVKReOeZDL6IJ6D+czLgPnuuw47ATTjdTj1oFhV0TmpvVitobu/VHQBewIbjhSg0aITgF6N3QHmE1/WjfgFGJiqKDS+dQOQj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nW17oxYW; arc=none smtp.client-ip=74.125.82.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772016106; c=relaxed/simple;
+	bh=lQrnKRa3jOWiZGQcUD8boVBRzWl//aNIC1YT85BdAVg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dZ/Kw34SkLf1mAIeCzdlTBQRbIi6TDY5c84rLymI+jisgosqp3G/YFdKYeJvIxbrPNmk6YvB7DipYX/7MRGLiMIICRAHWJaxg4cu69Gy+wTXlZ3f6vvfRRGKrezzOZ3AXpZMiDvRvkPU7lDu1IR1SlGJ3+SnBgPV85SDyxZXsvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=iN3HL4GB; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nW17oxYW"
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2bdc4f2b680so362283eec.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 01:49:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772012949; x=1772617749; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aPkKnLWx/rLAeB2z6QOGylFvXmeQEK93aJVNnn90ZjU=;
-        b=nW17oxYW4r+f6O+dZaCph1pLvJHiSHasYLu/8jymKdR65jBV8LOQYRa0bgf2IcXHcF
-         GRmAioEW6Kodx0H+bPgY1KHwWet3pWBbzxsCOaCDZHbXhMf1Uo98GdeNXBK6fbmUTXzA
-         l0RQiuKzXGOkuf+ZEpcgVnOruiovpHSt0g5nFSj3qSF/1EtkLyqUMbtnHxS95LKKTuUs
-         +azmJdVE8N3gRkfATgkhFMIwNRxZshPQ4smH0ezTWmzRAYxy6Z1wCGVIVdf6Od0KR/kv
-         LW0mNsALr6RSNu3lYhEi65HXr7ulWqTdfINEoeNUyutHHKzU6tl4rAKCIvx0nimzxnsK
-         2OiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772012949; x=1772617749;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aPkKnLWx/rLAeB2z6QOGylFvXmeQEK93aJVNnn90ZjU=;
-        b=GhiQsDQtRx/uuPHjBKWbvncMZ/jE/uwXoSBiDbXLUl3XwO9+Q2vNR/sg4r8kLKbuE3
-         MIYknTpG070zov2X4FIs7tb7IvE6x20nwoY2uFM8ElInSwUKQpChwtGQpZ/rCVXugp55
-         JZuAWMV0rKZKadmGyoljiqWjpBIriNTXpi7M+4iKwVE0Aw3qYsv936clRx6H4leulXnY
-         +SmjqKaDu/y2qfJpN5uzipIaRoBvj+QwLm+GJhcAYhSl6PdOe7jBvSFRxT5Xo700+Can
-         v43GqBjQOQKqUfWOsA287hKeAtD4/URjHqMPr8A/q0nLQqgG7NE9uJYcnB0uMMTGT+66
-         UzuA==
-X-Gm-Message-State: AOJu0YyMdgEObzj0P09qKxDHIwJ/uIF6GL9Rivepo+xiUZ1CzxQR0aa6
-	6TECvPcUXdaFx2zGiv9cSFRiZvFq+kQrJzMUCcwXIc1DZlKsZy8hXRvqWRrmHf93
-X-Gm-Gg: ATEYQzymjnEHhAS6fREDd1K3BUqAWXJIJy2qJ3rMJGbfEXrZ4gQ4e9N8coS4DtVJsFz
-	JcGc60/tOHAoM1Pdnlv+D3mrIKj8DVsA39mnuJpJUnz8Zy2dq/rzvX4xAK5EpstjWN3oDFrWURn
-	brOYoe14OtBtExgcr0+hxJYz/DyUy6G9kPj27/CK8Ezd7gF6hbg6anr6q3CzFv1SmLjdhG4kxAO
-	H5FPOtDeDfXP3GX/Tdio1ClVs96zVE9xwO7gYQ2keJQHPBkqlMFIeTnv/F8+OBhUrolMysalpmX
-	owPnyGww92G16PbwgctWJfUBgbpCJh2U8L9trwa0w5xXL//5q6smBtgBZ3z63N4QgdNSGzub4cf
-	yncH1FdmfLWQdUnTa+XIupJDwzSJJ88b9Aux3AdbRQPaE7AkMjZgO5GmxBIYFxYhBl94d+4iofC
-	s/a0xVIyk+ePfUUq5zAvRuhtG67ODVSw==
-X-Received: by 2002:a05:7300:e8a3:b0:2b7:ee0e:e9ca with SMTP id 5a478bee46e88-2bd7b9e708fmr5821789eec.13.1772012949224;
-        Wed, 25 Feb 2026 01:49:09 -0800 (PST)
-Received: from [172.17.0.2] ([172.215.217.97])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bd7da47778sm8754699eec.6.2026.02.25.01.49.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 01:49:08 -0800 (PST)
-Message-ID: <699ec594.050a0220.9c28a.7b8d@mx.google.com>
-Date: Wed, 25 Feb 2026 01:49:08 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2612184953359978753=="
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="iN3HL4GB"
+X-UUID: 91f968e4123611f1b7fc4fdb8733b2bc-20260225
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=hLSmdwEWae9IQdlbU6DZdZZBigKJ9gwYpd2Oml3/yz8=;
+	b=iN3HL4GB6sX3AQyUZOnsjXQd4rXZqyq+yvvAtIOlS9pqWSFwZ+W3AxtPbC/D3dWEptffN0zTJaCxpMQhhsok28OZ2nzWD2ZiM0SO9xhYEebqJXVA1164MLVt+UUXbhJyk71jotMTHMmlydMWEX2tj3LyTym/q1AnBOrpOGQXcZk=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.11,REQID:e1ce6ee0-5be9-476f-b204-ca529583d99d,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:89c9d04,CLOUDID:6aa0417b-8c8a-4fc4-88c0-3556e7711556,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
+	0,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,OSA
+	:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 91f968e4123611f1b7fc4fdb8733b2bc-20260225
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw02.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1075470567; Wed, 25 Feb 2026 18:41:41 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Wed, 25 Feb 2026 18:41:39 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Wed, 25 Feb 2026 18:41:39 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
+	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [RESEND PATCH v1 1/2] Bluetooth: btusb: MT7922: Add VID/PID 0e8d/223c
+Date: Wed, 25 Feb 2026 18:41:35 +0800
+Message-ID: <20260225104136.3943529-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, wei.deng@oss.qualcomm.com
-Subject: RE: [V3] arm64: dts: qcom: qcs8300-ride: Enable Bluetooth support
-In-Reply-To: <20260225091700.286108-1-wei.deng@oss.qualcomm.com>
-References: <20260225091700.286108-1-wei.deng@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
---===============2612184953359978753==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add VID 0e8d & PID 223c for MediaTek MT7922 USB Bluetooth chip.
 
-This is an automated email and please do not reply to this email.
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-Dear Submitter,
+T:  Bus=07 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0e8d ProdID=223c Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: arch/arm64/boot/dts/qcom/qcs8300-ride.dts:107
-error: arch/arm64/boot/dts/qcom/qcs8300-ride.dts: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 247d6aff5e79..c60f9be0699f 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -709,6 +709,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0e8d, 0x223c), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3568), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3584), .driver_info = BTUSB_MEDIATEK |
+-- 
+2.45.2
 
---===============2612184953359978753==--
