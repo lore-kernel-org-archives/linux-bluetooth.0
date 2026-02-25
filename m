@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D50F1F17E8;
-	Wed, 25 Feb 2026 12:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE563ACF1E;
+	Wed, 25 Feb 2026 12:24:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772022244; cv=none; b=slEYGJnMC/c1/E5sSASde7UQ0ByDRVaXFTTBfN08sCM5q0vZwtNeVSXv9iLRg7VnXXu4yx0xquDZjof9uQLLCxp60Y46L9l1NzpF3kiNlHI1Z8ptB9oJjoKJw76eWaHQaY2dX+FjQZow8nC/u7R0N7NWeqSA0Sr2UbMqIIRf8iU=
+	t=1772022250; cv=none; b=M9xETetHzx4jCDIopcKkUdiV9FCmLbRpTJqLG65Mf/Xnw/QHm/5j9ikSsX7sfhDV2ahOKWi0dUISohzFmU6etYc4pq+eu5b/yoHIqD58X/sVYY7HDwR1avnC40TU5ov1IWtKeAYQl3YNyaxComBbvO97bGlPJXJ9li9NbYPpDeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772022244; c=relaxed/simple;
-	bh=5S8s9wBsu0POu0fhrPSWuEa4tcoSLqgVNor9jPqxTZw=;
+	s=arc-20240116; t=1772022250; c=relaxed/simple;
+	bh=u1b3bu03v2Abs/kmiHx7MWgNFzJZCV7yQm4TlCgPFtQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Bea44Nxk90Vzn5DzGNw2Rdv+2Kn02YwSgeBGzZ1ne86x5G9GwBP9HYbl1Z8a61JJs/HLTedwMIHXJYp/EMAKMLH/KYF6hyd0z6saSb4LxU7SQ/qnDnuc3gMrDpFYTTGn+WiZyPzp/Fqm643iNEfZRb9C76SvuuJLW5Xbzp43OW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eOIdrVJf; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=QVLqFJDpnMGMlnK3sFhLMexsGl3iAbAR8GvKOpFOC4Qvv7MOyj63EsJq4DesPtp/F98QdTObwreHuFoqfKfNa1G1mcHdTSQVTLAWZ7QcIK/UoINf81uxiOlN6z+z8ZZN6uMP2d2Vc2dE3eN/RI1ala5GVBvGEcNqqtymZrkdCPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N1c2ytAe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eOIdrVJf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67684C19423;
-	Wed, 25 Feb 2026 12:23:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N1c2ytAe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A697C116D0;
+	Wed, 25 Feb 2026 12:24:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772022244;
-	bh=5S8s9wBsu0POu0fhrPSWuEa4tcoSLqgVNor9jPqxTZw=;
+	s=k20201202; t=1772022249;
+	bh=u1b3bu03v2Abs/kmiHx7MWgNFzJZCV7yQm4TlCgPFtQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=eOIdrVJfgOBPhcPw4wi9eV9a/MZi0LPHZuuJriATh8RRF9kkpobQmxEMFhs+x5+Bs
-	 Z0IPd8ymr1AM4DP5xSkzJCSKrG/o4IiRR2GG/BcR/XLxqlajJa0BN4Cc6yFSw1JP9w
-	 tNh9vw3TJu7gI26JVUZcktC4kN9v1wBG6XHgPNoKlSKSDvRU6UsS96FRRSaBypGNe/
-	 wyE7rM948Kpclm0Duf6JpeaoVy1Jz2rUSiT71SaV9jLyypv0a5nQwDJKyKwjuV3Z+M
-	 Fp+dqU9Gutp5CjLn/h4RxNl1wxjFC0rtLZjs4WGIy2mAqyHB98jugF7t2m/w58327F
-	 +NWc7oSRKIxig==
+	b=N1c2ytAeJVkyiFZOcWemvbARoT9Zl/smwPKD8eOO7bLT+hEplYSS90Cd+HS7ih70N
+	 roRu4jeUTHlfTtZOhipUNCInJ8ZbwdeUKofhmM+oFpqmwiJp2J9umL19cZKr7hnDGe
+	 7pfscD+91BgTrho3jksrd7qNpceNHKb8w372PdBkh1xrDaPKw6ghybcoGxlIf9krnB
+	 cRxO06jiBQc8NcFWhVlwFdj//uzbh5LTR9g7EWDEJo+Bs4ERPsQcWs6VNVeXFgWvlp
+	 DICbwuZvC5qpnDTOmhd7gpqQbcOVK+WL/hV8P3rGuyo60p3fBSPHtdjOkH9m8WaMc0
+	 J7okv54J9AeMg==
 From: Konrad Dybcio <konradybcio@kernel.org>
-Date: Wed, 25 Feb 2026 13:23:25 +0100
-Subject: [PATCH v3 05/10] arm64: dts: qcom: sc8280xp-x13s: Fix BT RFA
+Date: Wed, 25 Feb 2026 13:23:26 +0100
+Subject: [PATCH v3 06/10] arm64: dts: qcom: sc8280xp-blackrock: Fix BT RFA
  supply name
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260225-topic-wcn6855_pmu_dtbdings-v3-5-576ec5c4e631@oss.qualcomm.com>
+Message-Id: <20260225-topic-wcn6855_pmu_dtbdings-v3-6-576ec5c4e631@oss.qualcomm.com>
 References: <20260225-topic-wcn6855_pmu_dtbdings-v3-0-576ec5c4e631@oss.qualcomm.com>
 In-Reply-To: <20260225-topic-wcn6855_pmu_dtbdings-v3-0-576ec5c4e631@oss.qualcomm.com>
 To: Jeff Johnson <jeff.johnson@oss.qualcomm.com>, 
@@ -58,11 +58,11 @@ Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
  Abel Vesa <abel.vesa@oss.qualcomm.com>, 
  Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772022207; l=976;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772022207; l=969;
  i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
- bh=5/4XzDPzB+/SfDFy+8ruZ9GavHTyq5ADjjYuopEUns8=;
- b=no6OcnFzGON0TFAyh6wOlW3bjlvNuTNMrvz7YYxYH1ylxiVv8PO6z0qq4Oi0u1HDNHVQPrc01
- Z7FiOe3aqlAB9NKLXQGvHfvnRm4kwhdd1FnqHp9EEtGyUqHlejeJqLX
+ bh=WW6OSOcSc/uvisTpRKcCveeZbqF0YKsShpN/AKjthWU=;
+ b=bM4zeQ+5quFnLWll7vCJbpfTJHSRkN9Bbi4ZaZrzhFnkQYjlRBZ4BTOG7xa4pSwEatQnzxOeR
+ 8/jUqyYb3icAZdyKPoZgV5Cm6ozaj/QRCVW9d9PLmraiPDg5vF2teK6
 X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
  pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 
@@ -74,14 +74,14 @@ Reviewed-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
 Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 ---
- arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts | 2 +-
+ arch/arm64/boot/dts/qcom/sc8280xp-microsoft-blackrock.dts | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-index d84ca010ab9d..abd9c5a67b9f 100644
---- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-+++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-@@ -1331,7 +1331,7 @@ bluetooth {
+diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-microsoft-blackrock.dts b/arch/arm64/boot/dts/qcom/sc8280xp-microsoft-blackrock.dts
+index 00bbeeef6f14..125af356e24b 100644
+--- a/arch/arm64/boot/dts/qcom/sc8280xp-microsoft-blackrock.dts
++++ b/arch/arm64/boot/dts/qcom/sc8280xp-microsoft-blackrock.dts
+@@ -976,7 +976,7 @@ bluetooth {
  		vddbtcmx-supply = <&vreg_pmu_btcmx_0p8>;
  		vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
  		vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
