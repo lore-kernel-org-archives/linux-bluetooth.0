@@ -1,46 +1,46 @@
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010011.outbound.protection.outlook.com [52.101.69.11])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013061.outbound.protection.outlook.com [40.107.159.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FE83D7D93
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 16:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F2D2C21DF
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 16:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772036367; cv=fail; b=r62vUaureP/p0U4NSlaL3QqZnrfreRS23dPIQkddhA0mse5r5Nt241cGFLKZkyUIeRCVh72patuqdKC3M+mo28SwgVefzL5KDtvN09dx4l4h5eYe6dNXNjmo7IVU+sKyTlKoB/hROJURmQG4AV4NwIcou11cvMtjPYbA1FEhtDk=
+	t=1772036383; cv=fail; b=X2onspCA/7kChhGKMyAUx+kZ3Kd3wmDIpeVXMzcl5iColXuKWa+H65/9OVSLE2yScKT8riBPPM1c0gMd0HHOpRoKjZ1dymHw6CQHtC9PLNDdWEbzpoy+ydn0QzCI9HP1YPcpJa47ytQxHv5BM4NhsqrHU5koUrXqZjyRNp416xw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772036367; c=relaxed/simple;
-	bh=r2iIgWFk10LoOgC0+Y+pYB3fbb3PkfqEbd0n7uGAwoc=;
+	s=arc-20240116; t=1772036383; c=relaxed/simple;
+	bh=WLpLjjB1ji9iaskG+rE2OJyuP3+IdhevajXuTtjWWBE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nr0kCTkx5jrLCg2HKGRkmKBywC+mPDjFe9AjfB1tMqFfOOkyG1ycYWvlYqpx0UzLwGx/pPm2i8xBvdprAvlbIhRC4sc6OccTSbVPVXkOrXwOFCGqY5ihZw7asysz2FKXJRG/5qlMagxMwQCvjbxSroyF6GT5Mey6CXMOkSoVvL4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=LWuGheWb; arc=fail smtp.client-ip=52.101.69.11
+	 MIME-Version:Content-Type; b=RCtfm39i96OzTQjKBvew+1ChOAEcUs5FSrgxvsLm1YJyVP8GaXYCJbCwO+v9tMTrW5aY1j9hrIaqg/IYLyAu02DLQtNdYRVuFOA9RgdwlnTvG5MuLob3u892c3W6+UGZxDC5+2+DwfbpPrpOrNwX8MtmhEPoZiWidOzq0SLRxPg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=KY0xwcYf; arc=fail smtp.client-ip=40.107.159.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="LWuGheWb"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="KY0xwcYf"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RGvDM/uDXTna/OOd2A4cdKUUqtuOADtpNNDvrNXxNO3qerv2Bk0Y/NIO+wsWoUAkutkzkF7FMfEBs062U+nBelXnNBB0UNfw3NKmtUpwB2xoIIa751Jk5Y4na0uzhtxt4rn7dDz5smu6kPwo5dI0lHKWLC0QOjaEsDHpLk3//f6m0tAxhSIoSSKi+DdczdszARv+kHwmDLIFGL4maROUJvov/xS6BcSk2m1KJkcfZVgSuXT6V4BulKaNK1fI9tMVYkVHKn0rRuH2qtZUqmlCz8oDfPja5sgI38Rdn6fymnI/mPKiJKQMeicHLLsFYbLdl8qEh9/RhsecA/gFeqaciA==
+ b=MH4iyTbBU9KKEdgl/KmE5cnoxycXBt7A0LWDNlHt1NH+Ux1mU9+6iXPrUEmk7OC2XhioJsb+drjb2jdRBjsOVACDEcqXQN++3fuQ2vM9pv78wtjMuMbac+hq2EsgRqBIOqIgDFYtsYPFGcGKJQnM14cSc2evA1S59UO6Njwl9VdJ1vuXbjC5HgJFgb2DSnKXlJUqEAPJ0X4PxfMqp1dzoIIWkSrfLo3kwYmNoUBHcgD2B0UmdAdDx4hVPYe9pIKDFH6Vnt+NyWCFYwd/6ylgIoo6XzNjieJnezr9durpfAYvVICg397pKJlcS/jVBsGzXoc58KuJl+ml6TuJeW0rsA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kxvGoeB/70mDTrJ6uS9RZ5mk7rJ6rkKgZ9XyHh6owQs=;
- b=sW9gO0EIb3/Gc3CEe3V3QzdwqelBMSb1a/MjEjDb81SPTm8yki3AQh7vd/Jd+jyqd1VYUD3O5IwO18Vvcii7aoJIj7Oz2kqDkHN45dg4k+08GTnTpF4maPQk6tl9mg4TnP8kDQW5CKRR0++k6RnUhA1Fa5pp7Q9FPozGiJHmnox62ZYpsGWj9+KpAdrgFjKJcwZ1SSlurP0v8V3/o5mZVd6FI+5aM8reKOQIBzPlwmbbNqn0HNHRAybKLu0AE4og34Os/sxapScFJRzeb5i2AczNd7MQlM5E3ndTMotOktPq5gGTckYNv1FQPsETxLjPHQ2QDysGSvT2VzvkydXNXw==
+ bh=+awnCZFCyVbNyGo0o4xLlO6vxlJiuiLdaOUE0B75zIA=;
+ b=IIEBKb70rhJI4tBkMiXF5HFf7qo6bLyF6NkmxMnm0xz8aa1wE1E0XFV3DV+rllssyj4IA5/qnCYVmt3wuH5xV3ZuMRqMkYNiOExScD6C0m4kafnKsOcU0JPN4CPihpAYwyjSkTjOhtwGfTSFOeu89pHMBfPBNBmX9nBVAXZQU1t2Zmdmpkhdtjm2jYBEwyF9XFR978rPOVZQRHuIBd5gn+M8WVZV4oOgv4iy/y73x0aU5OWnRzii8TMEwreRO8MhmGZ+FBlcJWLxsofCw8xoci3bRXE7gRrHUMoYsYCPAmIi/clg1RozQDObURUnWBuhjfrGaanRwzq+34safiq5Mg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
  dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kxvGoeB/70mDTrJ6uS9RZ5mk7rJ6rkKgZ9XyHh6owQs=;
- b=LWuGheWbL+acTHQ3yVxIyfN4u4nRIKVCqwny7CWsYiaNsNQGx9v7KDfDVhUjwcXTKY8dH3RXBVk6DbKWl74+qmilE9v8jI3Hsr6xdTpmui/WLErwLWAe/uk/CSiD9Cs9dr2r/qPWcf8N2wAJl4hpvyIP/z+yxhFatQIguZzKnVE=
-Received: from DB8PR06CA0063.eurprd06.prod.outlook.com (2603:10a6:10:120::37)
- by DB9PR03MB9733.eurprd03.prod.outlook.com (2603:10a6:10:459::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.16; Wed, 25 Feb
- 2026 16:19:16 +0000
-Received: from DB1PEPF000509F4.eurprd02.prod.outlook.com
- (2603:10a6:10:120:cafe::91) by DB8PR06CA0063.outlook.office365.com
- (2603:10a6:10:120::37) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.22 via Frontend Transport; Wed,
- 25 Feb 2026 16:19:05 +0000
+ bh=+awnCZFCyVbNyGo0o4xLlO6vxlJiuiLdaOUE0B75zIA=;
+ b=KY0xwcYfa5BYeJuxe/9QFIHfh+wc1m6MXQ0BZ/rajxju2mgIdZqIOM37G42ORSFyaJFurVZNgqAx9b6r27qDUGlAtXt1rf8/Pa4ej3/Tscejiwft7XKqiDPSC7Xyk7ETbF+H0uEj4V7jrN7h0ZNrSYtsG/9N8Y2DRO9ZNwVWbm0=
+Received: from DB9PR01CA0007.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:1d8::12) by GV1PR03MB10425.eurprd03.prod.outlook.com
+ (2603:10a6:150:167::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Wed, 25 Feb
+ 2026 16:19:33 +0000
+Received: from DB1PEPF000509F3.eurprd02.prod.outlook.com
+ (2603:10a6:10:1d8:cafe::82) by DB9PR01CA0007.outlook.office365.com
+ (2603:10a6:10:1d8::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.23 via Frontend Transport; Wed,
+ 25 Feb 2026 16:19:25 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -48,19 +48,19 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- DB1PEPF000509F4.mail.protection.outlook.com (10.167.242.150) with Microsoft
+ DB1PEPF000509F3.mail.protection.outlook.com (10.167.242.149) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 16:19:15 +0000
+ 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 16:19:32 +0000
 Received: from N9W6SW14.arri.de (10.30.5.38) by mta.arri.de (10.10.18.5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 25 Feb
- 2026 17:19:15 +0100
+ 2026 17:19:32 +0100
 From: Christian Eggers <ceggers@arri.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Christian Eggers <ceggers@arri.de>
-Subject: [PATCH BlueZ 08/12] l2test: add comment to -F <fcs> option
-Date: Wed, 25 Feb 2026 17:17:11 +0100
-Message-ID: <20260225161715.20394-8-ceggers@arri.de>
+Subject: [PATCH BlueZ 09/12] l2test: add comment to -O <omtu> option
+Date: Wed, 25 Feb 2026 17:17:12 +0100
+Message-ID: <20260225161715.20394-9-ceggers@arri.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260225161715.20394-1-ceggers@arri.de>
 References: <20260225161715.20394-1-ceggers@arri.de>
@@ -74,74 +74,50 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF000509F4:EE_|DB9PR03MB9733:EE_
-X-MS-Office365-Filtering-Correlation-Id: bad1db0c-bf62-44de-7813-08de74899ef2
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509F3:EE_|GV1PR03MB10425:EE_
+X-MS-Office365-Filtering-Correlation-Id: ea8afe1f-041d-4a37-584d-08de7489a90d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	xeuxwWtVfnvutjYycU9dqKY+6tRj97Np9O4lHy+061POS18HkfQ7ZweR9jVwTAS8fKGngJ4OjO5f9CkvfE/2MHQQQmE4Sc9uqErDdM9UU3sGh7TW9ciLIF1VAwvLRPs+yga/w47uZdMB6wXRFPL9IXopAbh+9fWurBhgqSvZSafyrjcFWADGh2wqjKx7s13gBxJA0Vtr3Kw2QZdUtS/4oLKF3Mt3TPOKnTeNmKTbDKkHVuYilCpwIqqcSKk7l+fGerGmo4eVTwyRaxc3Pcrn/fCVUq6DVh5f776BUr95PwTu9uUHv1LO2GreSp0XXbP1jxMvemx6ipvS3i609PQZNrwflF134pwy0DzDqux8DPqslIFDPXXpWGyUBBuWhz0ba730p86Grpb+tKoVmdYSAk7tvgewu1V+Bnqedzp7r1tACN7tD6DmzYgwuJwzDj5hDtq1jUhrvSYcWpWSo1kQgRSffBvcqflKEe7UrGl6rHaAK7iesm6UVXG6PX8r2iXo42m57U/GaKgpsvDibTQtmEmMPFMh7WCKWnQAxG1KyArf9jTiKyxPROd67BFxowRCPeiwuBlqkfNEKVuAWkmkUu0+Mq9dt6KrfZRZNnyt1Q/Ame0FHsBO40ddf1e0OaQee/vcuXtZurJCqdXKPTkz02CWzOEksjTZ5R1FkAYIqBP0/wfZEeffVxpFnrnHvER5ZhXAvPfm86d8EjdnwKFThz6ckKK6MCiiCoAeumwhYFB4tatOgRJXEwvjUA6AVcFKDA9m5tGpLm9Y2K8A8N5cPQzT0WLigezmTAh9QIA+4RGGSnr2CSZ2c1xnnprA8N/OD/svgPAdyTfGr7VVWXG8LQ==
+	NeIt2r1uaNiDRr+xhudfJ7NvXeilQnYeclNqUobpUR+RAiEhjCZE0n/zeBAL1kEEGza4SO3FrwjN/fIeJn0CywN3F99A/oY1JPijXxLIC/vNgRmI7fRh6KubUZ6qiQhWMsvJlzAiN8K0YUY9oNQUwDYNc66o9Lro0gYvY0m9qCHkdMWsIprrBjvMTmtGIpGu+rtbOIQBua/HSEtgTUuSqL5gOOZVJ0gK4g4tw9EkWaIuTYFv+8kVPgXEjvW8GghPM5/AmXALFg3yltOtnHQPmygKM2IEt64u4FgI5u5fN1L0EnuBO7v0eHUwfB9MjxZUMNjw1bcPh0sTVPRNGSGY2Dcs2MYRTMuPn4Bf7ddrsAewxFKV+h2YQaetmGKGOa1Gl96gigHf3FIm1VtUgHDAPRt5otK9nQX/j++7/2x4j81qPJqvyxsNAm2EHxlEmLreV53p0Nrw3OTul9HR8005+sZfwwpDG2E/sRkyF81FAvWJigu1mdNvd64gLHyJnaAHoqewNa9z6lXsrlWWmdmV0alIPBcaHYb0njxxrxnO75XAky191OkkwlV/YTFktOJV8YpyIt2+EOcmMwhGlk1mXQMCTlHtBq1rv2yS97P70lhMoxGRm6Yw3SfM17TYOut5wQBo2njgTDQTiJJFvyo7+Gas5ldk9ZvPpzLsBSMs1YEF4pI7ZhGWdpIej6N7Q0mX9IO65AGVhzTFo2CIboohp2Pm52s1kJExUF5v+iUqfP8/Z15p38C+Iit6E6kyiB9Dax6lefyiUFhYcKFvvmfw0FB8fEIelWMgksuNMquo6FbDbjLObgktvzo5Gl2AcU/j9F5ES0ujq33d39L4iexP9w==
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	P0LU6i64siSJxu2zMn/RBjHu2ew8QIDqqhy0whDvxvGpUXz5FSUyfVQKS+bnxmrMDE5On2A8fUDmpdiTWLB5r7y9ALhUyuQpZ6RKLAadpYylF4OVL/+mT8uHtILv9+lI5X8CMPg37/XGl/az2I0nillHyDRH29r1DsnA3CiSNBJGY5f10pA21t4qv2T0C+vkhtmBPpVDt/zpaaHPMmRHhQ2ckM3hZZD4V9xKGK+9FZ1bISVXjiETDSVgyFFfNjeqtKpaJp9dANNpPpS1d4mb0u0Jb88RH4nCB1pUQyM8R1DU9482oFthIQKfkGa9mba15RLNTZs+gQz8IX0M/HAYG8FfDozw7Dsg6DPiy8VGCkmVZB1xjvND9qhsU29NZ/OVpTt06ZLNLWo8xoXojGw+kJPCTn//Y4kdnhLv7xr07HYvLS5uSY8hb08asj5oB73j
+	bVrWDE2vEKAKCKhrnFjC9k1+5Gpu78ojrrBO6ti7iXs1RXLRnUeJoYCKNEaldbWMxwvsWzNEOl1RhquVew9MIGJjToE0/L+P+ZFUy1bxKXiRc8YtF25AYtE8nixX27izRFUBtpnyw/CJP2ItIIzYkeU0RzncktZpxOlLXfsT5ZAi745OKf3e5cGg5vRMjqJEusoZsu01EAXJNOfS4D96TEEirM9F9QFN8jgGK4ztJCo66ysMCbFsGAXljvB4WUGLrO/WvhusEsf5F57DSZP9zEAIZTY9FiyjhGKZQuUdB1qJxLVB3LZLxMjSqe9Ydib8M9kPJQIZByyO/AnMIYSA3vZV7Af9gzFy0Tg5/6o8LV1x/8lmxjC48JGsn0BFlFrbcjPWvvQFh/hNRzTEntsEvdb9ohZt6BbbcmESGYlONfKJ6GQgS/d3dc92GfxnB4hd
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 16:19:15.8499
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 16:19:32.8032
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bad1db0c-bf62-44de-7813-08de74899ef2
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea8afe1f-041d-4a37-584d-08de7489a90d
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509F4.eurprd02.prod.outlook.com
+	DB1PEPF000509F3.eurprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR03MB9733
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR03MB10425
 
-Clarify that this option has affect for BR/EDR sockets only. Use defines
-instead of magic numbers.
+Clarify that this option has affect for BR/EDR sockets only.
 ---
- lib/bluetooth/l2cap.h | 3 +++
- tools/l2test.c        | 4 ++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ tools/l2test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/lib/bluetooth/l2cap.h b/lib/bluetooth/l2cap.h
-index 62cc04b57ae9..8b54233ef9c2 100644
---- a/lib/bluetooth/l2cap.h
-+++ b/lib/bluetooth/l2cap.h
-@@ -187,6 +187,9 @@ typedef struct {
- #define L2CAP_MODE_LE_FLOWCTL	0x80
- #define L2CAP_MODE_ECRED		0x81
- 
-+#define L2CAP_FCS_NONE		0x00
-+#define L2CAP_FCS_CRC16		0x01
-+
- #define L2CAP_SERVTYPE_NOTRAFFIC	0x00
- #define L2CAP_SERVTYPE_BESTEFFORT	0x01
- #define L2CAP_SERVTYPE_GUARANTEED	0x02
 diff --git a/tools/l2test.c b/tools/l2test.c
-index 2cf3a47e7cdf..e49289a4c774 100644
+index e49289a4c774..7bdf58f0e776 100644
 --- a/tools/l2test.c
 +++ b/tools/l2test.c
-@@ -72,7 +72,7 @@ static int imtu = 672;
- static int omtu = 0;
+@@ -1338,7 +1338,8 @@ static void usage(void)
  
- /* Default FCS option */
--static int fcs = 0x01;
-+static int fcs = L2CAP_FCS_CRC16;
- 
- /* Default Transmission Window */
- static int txwin_size = 63;
-@@ -1349,7 +1349,7 @@ static void usage(void)
- 		"\t[-g milliseconds] delay before disconnecting (default = 0)\n"
- 		"\t[-X mode] l2cap mode (help for list, default = basic)\n"
- 		"\t[-a policy] chan policy (help for list, default = bredr)\n"
--		"\t[-F fcs] use CRC16 check (default = 1)\n"
-+		"\t[-F fcs] use CRC16 check (default = 1, affects BR/EDR only)\n"
- 		"\t[-Q num] Max Transmit value (default = 3)\n"
- 		"\t[-Z size] Transmission Window size (default = 63)\n"
- 		"\t[-Y priority] socket priority\n"
+ 	printf("Options:\n"
+ 		"\t[-b bytes] [-i device] [-P psm] [-J cid]\n"
+-		"\t[-I imtu] [-O omtu]\n"
++		"\t[-I imtu]\n"
++		"\t[-O omtu] (affects BR/EDR sockets only)\n"
+ 		"\t[-L seconds] enable SO_LINGER\n"
+ 		"\t[-W seconds] enable deferred setup\n"
+ 		"\t[-B filename] use data packets from file\n"
 -- 
 2.51.0
 
