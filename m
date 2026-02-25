@@ -1,46 +1,46 @@
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011050.outbound.protection.outlook.com [52.101.65.50])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013011.outbound.protection.outlook.com [40.107.162.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894EB3D7D81
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 16:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46413D6698
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 16:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.11
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772036266; cv=fail; b=D5hHozjpYZ6MSzgf5wE5G93r6FyXTS1V3mexzbfZx9i9tGm/rT08GpLjYaMbvd31bypbamz4/wI8f2f9ELyg0/GFfVXZj6+UHnCQL7ix/IDwC2fZAI95pLAqt6ZniccTHN2uiL5c6oIhMarAx0KGgodJ7uNuWcgoYbLvaBse/vQ=
+	t=1772036279; cv=fail; b=ONd62+t1wo/5vwQcnZ5sAWXiB7CT1D6/ckayh3bih94kUZZzlvSJ5tz33ZLoltksxfdE35jwF6wwEZ2NyDlHHqh3jyRmte9PN76pVVZaP8b3tRXEX+9g5TlQuIH/A3tdm/sKKWIXJFz3Mv+vjbPE6kI9apebUVsYYur52PU2Mk0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772036266; c=relaxed/simple;
-	bh=PB0G9jLF3PhBPTUAZqDez/6NRnyxKTxyONJQZBVEdWQ=;
+	s=arc-20240116; t=1772036279; c=relaxed/simple;
+	bh=zmXPyYp4iB0Kz0ByXlAF/FB28+rB1lB9gCubM6UPQEw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hu+a342lT2IsWXXXU5h3DbjlXdy2uO6Z7u1zZk3XQ71313JURsqPbXc8rIJzcOO0g1ryZPfzoI69EtoFqjA3F4YJJ/oL/ILiGkl6C+bplhnsRhSxZgzNpi9s8S/M71vHTkp0W7xUVuftDYCEOqlwrktRviNeBhCeDzRRQLlD3as=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=o8IoXW2I; arc=fail smtp.client-ip=52.101.65.50
+	 MIME-Version:Content-Type; b=iFOj6NdOftgizAIePdPSnVKq+W16C6kD1j2njrxBZT3dipCa5+mZf3iGAR0KVM5+sn0k51XUmIbyW64WqIRsd3EigdP5FcHqJdDWyq0rGY+pEtpdjiVQYaZT9pNO/s6ajNzAP7wT+AXDoeanlmXMy47fSkz68PC7xJpWxphgW/M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=bsdTMz0Y; arc=fail smtp.client-ip=40.107.162.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="o8IoXW2I"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="bsdTMz0Y"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qcn+FFLKOYNtvSWitH0z06v5u3OdBw7lxwbLNfSzE8qDLXeBQL5t3BK4MlFF1xKGNF9YOdxTwdmyNtO02lM9nRyU6a+cnN/0pU9UK9XWXQ52sFa2BwJeKZG8mMlG+EU/PPY9rbpqRdm1AkTq5Gk4/k7A0r/A+HDYCR9CUWfnc0mRlF7MoW4YIAkdGRAxLmeBFTvBeBqbMS0t+KFnFlgQ7Y9YaYsYtVqnPhYGDbIwrN28LX/LJ27h9Iirj+8U+r0jQFPjEcoKcpF4aSemZtsn+A0WGJzCHO629Zw2bjCxTDWPG4E4B0uiRgx6yjKZR3TLOUrrb0eq2XM2DsvrMdyWWg==
+ b=zMzCemk0g0Q4wwVNSrcWGU1+Kb7ktaGgqkII/l7LabPdUGr2h7oO0tfVjIxCy3j8dkvtRM0AY5ZN/BOyInpJOfUh4lvdh/dbKFyNDkHlKUpuY/rGFbSbsQ0h1psirXRzeJ2Gc3xlmhlBpbX4E/5gOxfFDxwN5xmU+OFM2GHc6J+XKcx+boGFtaYSTcLOgMSzX45iyM7EG/2btg9U8uIFvMqXFEu4gnZUHROt3l7MZFRTJaRnbIPZPq9y/GFeQn5kSyO2yYhKFbLchpGbKIGvHmPaCo6emB96YxqrJxVijArrysevP3dzVpjOoa8sT8dH6jZ4uw87K59sEjEWr023Bg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uWEsg3sYd2V+bvG9o0a6rqiI5MGdWKNalLEGR8IvjCg=;
- b=zOpjWWdMVEtaCvCDH27DcrzGCvOH686VDVCUzVBOXaybeOlf6pgN/c7eM213Fw6dZjusPVQqqwnSB59ivMiU1xztainTi4qwZlx1qWaTOyMCuVMS2hcu4U8VdJZTImGO/FRpIfvTbdt755QAYVRw5/r+RYAn2mr9XZ7ZDFhDu1XE6/EX0DlwVBWNDNAbP4bvlDew84ecJP0Jw6MAXWJCgdtsbdYo7DuvmTPjazJQcIBbJTynmYjDQp8t/jbVE75Zj5ImoljiRRaZdYdhum3UQ0R3MpeqY/9FwhltmfNmcmclAKXL76zLn31MwUDCrvYizcOTg63cdBmmKoZryiwSKA==
+ bh=b3GvI3tIGH2SvJE3qcw993hDUXVeF3A1H9ln5QcYfGo=;
+ b=hKKthqa9MOKSfhgFc3dNJx2GouK6uZNp+bSQM92Fdne0dU0BS949DZMoE4wwIUTth4I3YMBF6df0vG2HvzQbX09A/Vcme/f4Nfo1XWA/lZzhW5PPJgH4p+1vXjJSzgKtso9Ux4h8yR8EykdQIxG1EqmaICGLFCZdhHSRO0XOMf+mTGGYKfUWclM20kGaqmunKyhS8G0HitS8CxUGM0xwMnIIqejO5L51I29kU8cPKc5FuDhM9081K09wEBs/AO4AarjKTvcRF1VosLa9CkMFM4xx59202sI55+24qwezKhiu7H8Qx0fHKokpQ5pIo9DEknmQQVKATzV+5o4kJwyp1A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
  dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uWEsg3sYd2V+bvG9o0a6rqiI5MGdWKNalLEGR8IvjCg=;
- b=o8IoXW2IGl6Aedcop+MgjAmuexYvGDtbGKHOjHK/LnlKH6EXzcWZp0OfgT48DFBrOSG7pPbsUFxAmESyl+mBd8RupoFFEJujHd+JHJYechEVQqh3DrHw04v3YBFB7WEbsAiolIkwPALz528K7E3DsMf5xT8TgtOjREyW/JuM6ZI=
-Received: from DU7P191CA0001.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:54e::20)
- by PA4PR03MB7232.eurprd03.prod.outlook.com (2603:10a6:102:109::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.11; Wed, 25 Feb
- 2026 16:17:38 +0000
-Received: from DB1PEPF000509F8.eurprd02.prod.outlook.com
- (2603:10a6:10:54e:cafe::37) by DU7P191CA0001.outlook.office365.com
- (2603:10a6:10:54e::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.24 via Frontend Transport; Wed,
- 25 Feb 2026 16:17:27 +0000
+ bh=b3GvI3tIGH2SvJE3qcw993hDUXVeF3A1H9ln5QcYfGo=;
+ b=bsdTMz0YEruteLJ5cy4evxiLld3AG03pHLM5Y2hel162m3z0YcUU2HbZWvYdnL5GoobymFrn8+C6xIRKe3iSccpgTrSYfogAxeFBRe07GX7NwR/em+1i5C7jQBWgooearsIugZZdu03OKbLCirreaKYEmJmMr1FHuOR7HcQb2lw=
+Received: from DUZPR01CA0079.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:46a::16) by DB9PR03MB7401.eurprd03.prod.outlook.com
+ (2603:10a6:10:221::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Wed, 25 Feb
+ 2026 16:17:51 +0000
+Received: from DB1PEPF000509F7.eurprd02.prod.outlook.com
+ (2603:10a6:10:46a:cafe::cd) by DUZPR01CA0079.outlook.office365.com
+ (2603:10a6:10:46a::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.23 via Frontend Transport; Wed,
+ 25 Feb 2026 16:17:51 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -48,19 +48,19 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- DB1PEPF000509F8.mail.protection.outlook.com (10.167.242.154) with Microsoft
+ DB1PEPF000509F7.mail.protection.outlook.com (10.167.242.153) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 16:17:38 +0000
+ 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 16:17:51 +0000
 Received: from N9W6SW14.arri.de (10.30.5.38) by mta.arri.de (10.10.18.5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 25 Feb
- 2026 17:17:37 +0100
+ 2026 17:17:50 +0100
 From: Christian Eggers <ceggers@arri.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Christian Eggers <ceggers@arri.de>
-Subject: [PATCH BlueZ 02/12] tools: btgatt-client/-server: replace ATT_CID with 'shared' BT_ATT_CID
-Date: Wed, 25 Feb 2026 17:17:05 +0100
-Message-ID: <20260225161715.20394-2-ceggers@arri.de>
+Subject: [PATCH BlueZ 03/12] src: replace ATT_CID with 'shared' BT_ATT_CID
+Date: Wed, 25 Feb 2026 17:17:06 +0100
+Message-ID: <20260225161715.20394-3-ceggers@arri.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260225161715.20394-1-ceggers@arri.de>
 References: <20260225161715.20394-1-ceggers@arri.de>
@@ -74,89 +74,80 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF000509F8:EE_|PA4PR03MB7232:EE_
-X-MS-Office365-Filtering-Correlation-Id: bffb9f86-3f4e-4bc1-dd8c-08de748964b0
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509F7:EE_|DB9PR03MB7401:EE_
+X-MS-Office365-Filtering-Correlation-Id: b25dbbe8-6f80-4d41-c9a3-08de74896c79
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	DW0Au+8STsZ8SsDEgIZaaBg+miS3K0Ld8r8ni638SlDB1SSGfjmrh2BRr8onwYw5VyGI9TvPENYAtKXCLvFhhvLt79niHbc5MJU/zkkzNFHaQNVVq131L7QTsOmDS3hwlcQmkxeQW1wLd5VmKq1MaHPCR20c6YmrjKdRShLZN86cp1i4YqjBCyw0jgt/BsKKHeJlR2wLgeXH7WoPso9fAMbSqCsb+y79eyj6GtXCKTPrs0JeWLTPL3Nu32RWz90x4z5Rye+zSV1nNsQXsxhPoGPNVzmSvZapBifOmieMNrBOqttKS9tPAqdja4FtBsYrDiinjBqJ3OW36j9B+nATlAhoUuFgA9sh+fgIPzexOBNsFpd0i7SeLRsdvpdVmcWU+O4TKWAmDjE9guEiE9nhA2vKsXXeg14SsjHoJh/PowBX3VkPG9aFAF1pcGt2Y7My58JYz8vHPMKvG333G3DIKyVW/Aamn9jUZPYNrDkgE4CqQn/d3NQS0SAykq9WmEzihnSAciF7XbZCuFAs928DJhD/HZvNhDYmGiX/H3vkj83+iTo3mCtO6ndRvsSNfPQk32Q106Gmj+T3zycOjDLKBKemR16+GGWpf87xNPWO+fFe4gDauJSyTFbgMqqKwtrWegq6/CYHqnE20PKQ+qsefqVF8etX1zHWkOD5896BJKILnZhZr16dTNQOEtgB1zI5KPgwjEl2jsRU5SoYyTBPzvU/xJxFjarXDihP2ywex7fbdO+x+kL6HiW1parlNoYXpXCQjm9Pga8ZIi8JPk+RKMe1mgSHf65p5d9lB3OqbOxP+9+iErFxLTJOHF1A7WCYcVNAV4d+jDypW7qrnb0BbA==
+	y+iBlwVo4US1mEw38ZX5ds9zG9CXUNes9Kf88WS6i3L06UR/Uma9qMdxC3rPNa9T+wm5M7y+Gad+vfWEpdy6QFUsL2AEXitaI6fjrB3eGSvv61cW+qgg01/iHeOVbkWB6MW+TjXLXH5elDwed2foLTtFC2Rmarm9zbBWhLE9r/je22ohOj9XXMrP9PLMZVrYw77CkuHZCKjwoZZJRf2viX2pXfs9TN+n8BBJydt8lJFgwD46w0RDdHSxfK6uivXOc/ENUGPz+GIhE6nwxwwE7tqyDBwrZxJCguZGIDp9Ux8LonAz8Tjk9wtOIe1qwtOmvop4xXdziv2d+wVwKY3LxyJeZ7r4tXYy2JEeQnn9ENIvzfduHTk5A91y5bjuWNhWsqOURxAZBKcEDW+OR0DVuCTjf1alzHLLBBG9rBTQ736mS4AtFjDOvMSqkTMCCzaeDhuaWMJKfqF16SmtibZNZnhuYc6gPmdd6XMSqGT/DapWdLeJY4TkaToTKQ3aIEy/nckGMcA+8e2TC+LitqZ1qFaLY7w5rmCeGrjTDh38aOcRzIVgB5qiKFWfz8MeADXi6FlJlgR6FjDJ7VyelW4ZuDeiG8/DyjZcvXeZU6SkVqztL9Ro+vCjG9F36OSM7cxxo2dlvRIVC2WZi03mGTKCmGZwzSFatQG1g9u+2lCes6UDqrslYfm4B4tPHRCLHe4qai6VWnEHgsXK1Oo8kFPIb37JSBAob6005b49hYrwukKm6PEHI99a/1Bm5dMA+Tl809U+IySAkcpFByXs/ZbL03PwVAIsUVZWkb2uZ//rxboyGOMmkN90YWvzS/vibrg+Ohi1N2vS8jp4NoHcV0ASPg==
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	9GfEm/cfWRIdt+JzB1/cOgnXOJFOSfW1DJ9c2e6Qm0B6QhpKx24/ACrVxBgFkQkzwXRITjGKWwhAeRunC8CuNmBhWuB74n1P5pR3mWuSFStQZ02Pr4Vibjmtw+4Mr/q58B1zRCvG6xCfjfRVG2ZTHiG+TNjYzy4qPIlWalITwrXlprsNHpOxEql4IqR7HWdkNs5vq/KFgEWdh4uz2+L4xTk+exmDjgh6uIzJgals3DcJ8oP9Jtv7wyg+e8bUBc3r6J49WQmOV8/GoeIUOwjIpCg/sOaPKT9qvPuUeXmjmZyZKwwTdwotHI4WVLVsrIAXIQqdlnj4diOK1p8WvvWFAmZhz/kAhcRz37GurJP5ra4hISqE+yofpu21i9m9cj3cIE3iNFdlDrqYD7qsvPJORh8EXRwNF+CmfMSon9MK469tIMyUuqTrfXg2F9qKAG5y
+	LpTiP5C15oC9eWfyJorDhF718Pp8oNYhUhPQfWbwAiqViiZHjm8L6w7RwivMS+znPeDZ8S46u0pur1HV876+tjE2JbhHs/JhnCCl+P1NYNBA7Ffx+wxXkTIfxC3Rv8i7e+q4e6AfiYIlpyRHpIWPbliQf0lwV8n/atyWky/q2LNeWbSrztFgbXsvlHe7omSGEldGTKmXIrVuLtiYHMpidPO1R8WrMFXjIhPbf6DlJHvwx6iMoMZ/2QEcqX0kbM3JYcwFCTOMACLmIhC8QJNK2nW2SovXSSoF9MUBfufKfsZYHZxdkF4mJYS6AQh2gdod02mNPIVcMG2IPuiHsGD0GhdWgU67rleCu26rgu1gzDDAUKW/dBlqO36Dl8/N49XHdEpQsNPTMd2JRme98q5QNc0ezKu5LhufSJ3DCaVxVjhEd1q2tnKJIG2g75iIAsQK
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 16:17:38.1127
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 16:17:51.1717
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bffb9f86-3f4e-4bc1-dd8c-08de748964b0
+X-MS-Exchange-CrossTenant-Network-Message-Id: b25dbbe8-6f80-4d41-c9a3-08de74896c79
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509F8.eurprd02.prod.outlook.com
+	DB1PEPF000509F7.eurprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR03MB7232
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR03MB7401
 
 Avoid multiple definitions of the same value.
 ---
- tools/btgatt-client.c | 6 ++----
- tools/btgatt-server.c | 4 +---
- 2 files changed, 3 insertions(+), 7 deletions(-)
+ src/adapter.c | 2 +-
+ src/device.c  | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 54a3cc8763f2..667b3d651616 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -35,8 +35,6 @@
- #include "src/shared/gatt-client.h"
- #include "src/shared/gatt-helpers.h"
+diff --git a/src/adapter.c b/src/adapter.c
+index 6aa7c0ed0df4..9bb1950a9f7d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3768,7 +3768,7 @@ static void device_connect(struct btd_adapter *adapter, const bdaddr_t *dst,
+ 				BT_IO_OPT_SOURCE_TYPE, adapter->bdaddr_type,
+ 				BT_IO_OPT_DEST_BDADDR, dst,
+ 				BT_IO_OPT_DEST_TYPE, dst_type,
+-				BT_IO_OPT_CID, ATT_CID,
++				BT_IO_OPT_CID, BT_ATT_CID,
+ 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 				BT_IO_OPT_INVALID);
  
--#define ATT_CID 4
--
- #define PRLOG(...) \
- 	printf(__VA_ARGS__); print_prompt();
+diff --git a/src/device.c b/src/device.c
+index af8df5f29b97..2efbc1e148a8 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6453,7 +6453,7 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
  
-@@ -1660,7 +1658,7 @@ static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
- 	/* Set up source address */
- 	memset(&srcaddr, 0, sizeof(srcaddr));
- 	srcaddr.l2_family = AF_BLUETOOTH;
--	srcaddr.l2_cid = htobs(ATT_CID);
-+	srcaddr.l2_cid = htobs(BT_ATT_CID);
- 	srcaddr.l2_bdaddr_type = 0;
- 	bacpy(&srcaddr.l2_bdaddr, src);
+ 	dev->att_mtu = MIN(mtu, btd_opts.gatt_mtu);
+ 	attrib = g_attrib_new(io,
+-			cid == ATT_CID ? BT_ATT_DEFAULT_LE_MTU : dev->att_mtu,
++			cid == BT_ATT_CID ? BT_ATT_DEFAULT_LE_MTU : dev->att_mtu,
+ 			false);
+ 	if (!attrib) {
+ 		error("Unable to create new GAttrib instance");
+@@ -6610,7 +6610,7 @@ int device_connect_le(struct btd_device *dev)
+ 			btd_adapter_get_address_type(adapter),
+ 			BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
+ 			BT_IO_OPT_DEST_TYPE, dev->bdaddr_type,
+-			BT_IO_OPT_CID, ATT_CID,
++			BT_IO_OPT_CID, BT_ATT_CID,
+ 			BT_IO_OPT_SEC_LEVEL, sec_level,
+ 			BT_IO_OPT_INVALID);
  
-@@ -1683,7 +1681,7 @@ static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
- 	/* Set up destination address */
- 	memset(&dstaddr, 0, sizeof(dstaddr));
- 	dstaddr.l2_family = AF_BLUETOOTH;
--	dstaddr.l2_cid = htobs(ATT_CID);
-+	dstaddr.l2_cid = htobs(BT_ATT_CID);
- 	dstaddr.l2_bdaddr_type = dst_type;
- 	bacpy(&dstaddr.l2_bdaddr, dst);
- 
-diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index 66523c1b3306..1690b0dd059f 100644
---- a/tools/btgatt-server.c
-+++ b/tools/btgatt-server.c
-@@ -42,8 +42,6 @@
- #define UUID_HEART_RATE_BODY		0x2a38
- #define UUID_HEART_RATE_CTRL		0x2a39
- 
--#define ATT_CID 4
--
- #define PRLOG(...) \
- 	do { \
- 		printf(__VA_ARGS__); \
-@@ -663,7 +661,7 @@ static int l2cap_le_att_listen_and_accept(bdaddr_t *src, int sec,
- 	/* Set up source address */
- 	memset(&srcaddr, 0, sizeof(srcaddr));
- 	srcaddr.l2_family = AF_BLUETOOTH;
--	srcaddr.l2_cid = htobs(ATT_CID);
-+	srcaddr.l2_cid = htobs(BT_ATT_CID);
- 	srcaddr.l2_bdaddr_type = src_type;
- 	bacpy(&srcaddr.l2_bdaddr, src);
+@@ -6705,7 +6705,7 @@ static int device_browse_gatt(struct btd_device *device, DBusMessage *msg)
+ 				btd_adapter_get_address_type(adapter),
+ 				BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
+ 				BT_IO_OPT_DEST_TYPE, device->bdaddr_type,
+-				BT_IO_OPT_CID, ATT_CID,
++				BT_IO_OPT_CID, BT_ATT_CID,
+ 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 				BT_IO_OPT_INVALID);
  
 -- 
 2.51.0
