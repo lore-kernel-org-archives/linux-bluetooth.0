@@ -1,206 +1,242 @@
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013068.outbound.protection.outlook.com [40.107.162.68])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010044.outbound.protection.outlook.com [52.101.69.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D7F3D3312;
-	Wed, 25 Feb 2026 17:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1F02D837C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 17:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772040888; cv=fail; b=jq3ahpY867FE3n3dlLvHhEV5uv1q/CSvoTtYWC52LPZnptBxwqHlvm38ej5730GCVbXTlu/NmoCjxM+LyEzYOV6826T6r8OPGv3Y+RsVPsymzrn4LM5VxJXiiMgepIi4mEqMsFvsju5MxdebYuqjeG0U72DUihpdd6xDn78DpBc=
+	t=1772041748; cv=fail; b=p+XdssIyrDvsnLAiDGAFKnacck5SpwZp7jV7kIDPMlf5HIUNh322rB7qFbUbAjfgRVNsS67GjIebiNkCQJ+cWlJ7N3HO0lI/736FPoFy4KtpHIIaIO4vMLDdHhPoZe1YnNU+4oTbfijizU0JyyS5swTYaUgvAtFfldEagjY+jDc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772040888; c=relaxed/simple;
-	bh=m1fFhDMJv9S4ZM/1D4FzPbVdy6vkZrgE7V9sIiSO+gU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kUyCRr0AlTzOVhq4skrVZ+x0wS8FRrWkiXSvWxP1TmTB9NVZA4VRFW4Gc53JoIZbm9eufqzWXsjrKmKyzZm5/Tt3ALka6xT/C8Yk6h50qk8oZT+DZXcyGa0Cb9M0rtUsetxPOaNkIaHCvoXwLwCmuhkkUFHdMlF4lvNouUfnWRM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=Cz1RCCWQ; arc=fail smtp.client-ip=40.107.162.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+	s=arc-20240116; t=1772041748; c=relaxed/simple;
+	bh=JldyOn8jhVvRDV8FarizxWycKKsXiqqfdUQ2XGqkqH4=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=WxuCgDdc7PiEbwMYJBjUygyKRodJjZzDENWmBEjN9wfohBcfUI5WFsssZntv+OYbeGZUuxyhYe+Jz4c+l3oFW0uM2rKd2YxgivYqBwC54IpfZ7fCUU/ZMR0nIG3W10V2qY70Hsf2dGbAZ4+snX2QbgYp3oPWmmcrRYXX+rWv0ko=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=volvo.com; spf=fail smtp.mailfrom=volvo.com; dkim=pass (1024-bit key) header.d=volvo.com header.i=@volvo.com header.b=drsxZaHQ; arc=fail smtp.client-ip=52.101.69.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=volvo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=volvo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="Cz1RCCWQ"
+	dkim=pass (1024-bit key) header.d=volvo.com header.i=@volvo.com header.b="drsxZaHQ"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Nk+IZJyutSBT1o9sg/mxz3ZwhpChlIWRorv1IPkRg0FdIRvX59yoG8BczHcURQ2tpYJ3ZuLqvh4MnRZ/vPCCptCeHI7fC7qP7KzeGX09OAgmcClxm07SAM+XBx9F7xKg+G7IyyGQlzWmKKU+wahfjsw67yqMhpViJHMXBfOe/p51eCKQ+sdqI+chp51MwOTR7Fm/rlC4T/B4d6qXDBp4DxOhPYDLCbxqyFTy39tZ3jyrVxX4g65r0hRU5B/U0iWIiTGxQn/OklCXhLbsbLFEMGlQ0k/WEZ9W4mMqMP7DBHyFdDurINWbgbxplvGVaYmiQ2gf/qJ27CpMtKOSSHW0rg==
+ b=H4G54jKiWAo1cqedLiTt6D997P5pL5eGOn4HvrGB9X4R2Xxzk5BuLUFklxIvg9nVwmKF6O2HnLoo4DA9aOt3DfAUKMyMhtDGR+BfEQ5a0UOJNQaTueWxNAecIR1tRmvvFt5LkxFiVoTwlmJBkVUh3EMPyf97LBoiJo0FskkmWuj6oYLSlvgt6L1BmabWYiCtj7E8btbxnRvCYMdRIpu/VLw09ABh6HkYwa4nw+W+ZYPA86MPL4rpgl7LvpEJyN+IkfhkOrCS2bV+jcaNp9xah+Y65K1gQeRDGOa0PM8C40NdzwBVzOVmhF0VJC2xXqWZKQM4POc4GVB9KtgzkKIMQQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=InvB6fpmp1wt9FKrkh1a9AM05oytVTzc1erksJSmY8E=;
- b=VortNAuluh+xilhjgs611L2XBZy1tqipBWxXkX9nycwBKbNByYx9w9+id+RL3SVexsTNxWLGd5bqSC1MXXb3X1GoUDOxBWmLVxX2T2XAzl4e8fgdLdgXhfjYZgTTZFajEm+tUyZiSLo4Hys3joNchW6vAZFlCJiBG5vCXqRqExfbI+mlfnUJEhimMdu9hZs/DExbtFRI+j9yKptjqPI/8vYYecWNpfmuwojzsgf8++Dyoiwc8wJikDrUkEWi9dwTUVfKmTpmciC1lFWZNTgNnpTDPsGsiYUVVOd6EDyrzvp38Yqhayn+ZoR93DGJdSZUZRzDUgfjBqvyJgXe9fpQsQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=gmail.com smtp.mailfrom=arri.de; dmarc=fail
- (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ bh=8Ad05RRl/joSr+eJdzoPwKhmTFiVkbh1GI1aRo7JXJw=;
+ b=Ql4OsaJc9E5a24YyZcR7P82UlVWiPKpLLoLgSLsNONL/+w1VvvnTmjWqPBnCbOC1eZ3auME2BfNBLCIMCI4vgGmiznOBoGGy3cbEp73OsUVJiRmRB7kkymmB6bjuo5UJ8c+mPxk0HsI7/YphmW1pl0RR4UzNOItXhNWClmHYVTpnonGArbvGKfRwHnqWPLjlF94+zkhTUv2wmOd2fioy86Eyl+jB5BjABqj3qNHwHpLB91ssOb1r0/zaQmu9X5y9GbWb8lYV74FgeRQbWcdrgVO8/e2BmBUAo3Z6YKcn3UGrNLW0d9ji0ExoTELjOR0rKU/ms/HV11AV8/KCGycKqA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=volvo.com; dmarc=pass action=none header.from=volvo.com;
+ dkim=pass header.d=volvo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=volvo.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=InvB6fpmp1wt9FKrkh1a9AM05oytVTzc1erksJSmY8E=;
- b=Cz1RCCWQoe3tfBH+cObDShAz+cW3wxPJNlS5rQox5Mv0TeG6zqcG+jShAkHE5c0TQc1FQ+HCYo8RP4CmOH9glmZrJUBI6mzzSYXhye5qq9JxcODPJOdkbETD7TzI44I3XlC86ucHxqzvpgoDTe5vNWJIhjbsbMLuMhdVqFQYPfw=
-Received: from DUZPR01CA0014.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:3c3::7) by DB9PR03MB9855.eurprd03.prod.outlook.com
- (2603:10a6:10:45e::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Wed, 25 Feb
- 2026 17:34:42 +0000
-Received: from DB1PEPF000509F2.eurprd02.prod.outlook.com
- (2603:10a6:10:3c3:cafe::f9) by DUZPR01CA0014.outlook.office365.com
- (2603:10a6:10:3c3::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.23 via Frontend Transport; Wed,
- 25 Feb 2026 17:34:44 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- DB1PEPF000509F2.mail.protection.outlook.com (10.167.242.148) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 17:34:40 +0000
-Received: from n9w6sw14.localnet (10.30.5.38) by mta.arri.de (10.10.18.5) with
+ bh=8Ad05RRl/joSr+eJdzoPwKhmTFiVkbh1GI1aRo7JXJw=;
+ b=drsxZaHQJLBu0dW+sNE7WVqWqgpMUi30jZVfpNx+pDCytY2GJqiGTl7/BZmuxaR1QASQfTv8BRl4nMcYKJswspPmoEaSMaQorNTjphVnfxdcu159RL4ShU3g+BLaKjvD04F5ES4svAk3msg2Yf1X8hAqcc9wBzpyMmImQEwBh+E=
+Received: from AM7PR05MB6790.eurprd05.prod.outlook.com (2603:10a6:20b:13f::20)
+ by PAVPR05MB10331.eurprd05.prod.outlook.com (2603:10a6:102:2fa::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 25 Feb
- 2026 18:34:40 +0100
-From: Christian Eggers <ceggers@arri.de>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/4] Bluetooth: L2CAP: CoC: Disconnect if received packet size
- exceeds MPS
-Date: Wed, 25 Feb 2026 18:34:40 +0100
-Message-ID: <27266297.1r3eYUQgxm@n9w6sw14>
-Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
-In-Reply-To: <CABBYNZ+VjSe9J-UzkVGt1opK+7PbnrbuxHmqZo9WPHxxa3kzgQ@mail.gmail.com>
-References: <20260225170728.30327-1-ceggers@arri.de>
- <20260225170728.30327-2-ceggers@arri.de>
- <CABBYNZ+VjSe9J-UzkVGt1opK+7PbnrbuxHmqZo9WPHxxa3kzgQ@mail.gmail.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.11; Wed, 25 Feb
+ 2026 17:49:02 +0000
+Received: from AM7PR05MB6790.eurprd05.prod.outlook.com
+ ([fe80::37f7:d824:94d1:cdf2]) by AM7PR05MB6790.eurprd05.prod.outlook.com
+ ([fe80::37f7:d824:94d1:cdf2%2]) with mapi id 15.20.9632.017; Wed, 25 Feb 2026
+ 17:49:01 +0000
+From: Dajid Morel <dajid.morel@volvo.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v2] Bluetooth: Increase LE connection timeout for industrial
+ sensors
+Thread-Topic: [PATCH v2] Bluetooth: Increase LE connection timeout for
+ industrial sensors
+Thread-Index: AQHcpn5EHxDMkbPdNECHUo2YD90JYA==
+Date: Wed, 25 Feb 2026 17:49:01 +0000
+Message-ID:
+ <AM7PR05MB6790817B215F2B9B88B8C4EBEC75A@AM7PR05MB6790.eurprd05.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_Enabled=True;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_SiteId=f25493ae-1c98-41d7-8a33-0be75f5fe603;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_SetDate=2026-02-25T17:49:01.517Z;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_Name=Open;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_ContentBits=1;MSIP_Label_bd2ff15f-6ce8-47f3-93ce-f81f88196d24_Method=Privileged;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=volvo.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM7PR05MB6790:EE_|PAVPR05MB10331:EE_
+x-ms-office365-filtering-correlation-id: bbffc074-bd4b-4770-c8d9-08de74962940
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ tzkzULrLzUQQD+vBRopVn85h8man/5zBLJ80D4yQLIQhmGgn9O9UERY/lN6JIqgfv3WcXuqQKGXxkpgpgC1yDqT8v8pP2V/YmXQ2MeVEtwWDV9A96Z7OLMn2fjjPRVbidxcx93dID3YaV31f/3xrTzeWdTdIAVH6kZMDnp5TbxI7/qolVmD4jAj0IdgKVwFZbP4Rn49zddkN7WEYEqGFf654mVes1P3GuUZ+w8vhLuZPXkW22XuaRkNVHQ9JsqLhETV8sREWgLxiFkN19eICNoBNWmdgq1fQ1N8AEp2/ZJywAMBLza5T+sMwpFb5qYjNpcHxeOmOn1qpgMJcCRT+JkUKFythhIHcSQsrdJL5weMU3hnVckn1JwPS9SCwMl+BAu8fNAD8DnUAfWjXXkEhbV1OTjqHLme+ULAk5KWuvvDPuqrjYrswteGwgcMIOu2nvH0L5L4YUX1+5yFG6z4+yYEMYY9zA22EKyx+km4OT+PFRfSLxn9WgXLH107UAGwSG4C5+Xw5N9An1oa1v9K4G0UXsm9X/SmIRqqsNJi30mpRRtRd/Pzdza7oMc+766i3+zSs2eMS8mIBJi0IH4x0TwKV7L9B50CijXDGni/QQ3EyyTReTG3Xa+e6Rdor4R0NXzPbiXZqYTxgne3Yvi2LpdaNcRz8t3XSAOt0gGeZlBKsuUdsss9OAvkxLa7ad9TzKGNTVU8P2Xo150nyUlS5/JEinop+Em1japksmwS7djrxk9ppzZydADk54AxnsL4TjR/73jmoDG1/NG4t1DsanVqSggbtrtfCq84nbRqp0LY=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM7PR05MB6790.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?5R9gn1Hd2/I+XPwrAdbspl7IDqeAE54iraEPMjjzLp7v2BqCNkD9guocFZ?=
+ =?iso-8859-1?Q?boJkReYgghj4R5ZhYU+62I8L5/HwtPnKg15T2q73iUCMFLKs9pcCd/0/6B?=
+ =?iso-8859-1?Q?vUD9R8xQkwFFvQgumEH4/wrJyC7kgKifpNEc3UbWI01K98kIJl6dQcfT9B?=
+ =?iso-8859-1?Q?GCQPtIZGF5ZnYGjfIZsrjJFO8WoAfekx8LcNNGsPbTSw/G8PIcAZYZk3im?=
+ =?iso-8859-1?Q?6zPLDavteVhWAwz6Eco6evtEEexZwD2gaU8nYwxE5cG23F7ZE56zWIlBnR?=
+ =?iso-8859-1?Q?ZPi4ZWS3IO4E04YQGC0k8CrN+3/DF2FcFS3WaACVn5k0vOVc63dWzOKqL/?=
+ =?iso-8859-1?Q?eEUc6C+DwXFPgyc9kpNGjkEilSaaXU1FTI+tGEXhoRB2ba6ZMMBkR/VWvR?=
+ =?iso-8859-1?Q?0w27r8JoVbCosWJSLJxuA61aSGAj41OERidjEYDY8Nsri5AuJhghttchAt?=
+ =?iso-8859-1?Q?QgDDzJCmCOAIPx1FOXVNfK6FMB7l313o5SzMP0hYZecj6lmvM+4aDM3XT1?=
+ =?iso-8859-1?Q?ZMgVNPhDB3a4ne0Pii0h0Fph6RP8I2m0ygbHoor5lxE/7EitZ+TgsHPzlz?=
+ =?iso-8859-1?Q?Tao3vM/cxVLjcXqMXc4ThYy9iRjmTThvw+CPOj6cugV4WG5vH5pPPIFD4L?=
+ =?iso-8859-1?Q?MPHt1AwPFgXUOmHSkHuklcYfjVWbIyZBB40X9oSxJDdI9kRP4JaTFJPbhw?=
+ =?iso-8859-1?Q?jHXdHcS6WS1kHfv87hGug4A6okzP0VP7/b5m07a/diJByzM38bLaNISqbe?=
+ =?iso-8859-1?Q?4beTb0tU2xWNnFCl9fmXDwFZGX55wucdUU1CbUOItGdzfuXFvBMV0vgIQ+?=
+ =?iso-8859-1?Q?1nJj6yT1Ue+miqYGZDLxxbKgRF940QlwlYIUazkf83jJL1IBw5g5V+VrxK?=
+ =?iso-8859-1?Q?mN8QGE5sPcb3gEYK7tXRkrV96pNBMImqHz0WZDf2dwgKfJTDJ7rUyfgU8h?=
+ =?iso-8859-1?Q?yzvs8vJrYESFP5fTIaB/zT4Sk9jLstkpWPNxUEL5vxJ31eSTBUZjggH2fY?=
+ =?iso-8859-1?Q?BMKxlnJMRtm62VM5GCvte2pRmTgSjJLVeC6z2oiWRPyfWmKkTR18QXkrny?=
+ =?iso-8859-1?Q?R5bShi03elQTNnzFHK3hjmjq+m946L5EtXHHw4O44w58GVRhtkfGB7zhtk?=
+ =?iso-8859-1?Q?sA+N1OK6BE22CBC7SO+gx4wi7ew9DpfsRKjJGyRTFmxguKMItWoKsNQ7mb?=
+ =?iso-8859-1?Q?AwBa0dwbcdE1w5eMGTB7IbR3qQ+xmgzjSX+gHhd3rz08DytyKhGKSPMibp?=
+ =?iso-8859-1?Q?pN/5covXATamEPzkE5X3VcJmALbA3qULuxJjsYMvUkDWwzREM7StfElKy1?=
+ =?iso-8859-1?Q?2kE4cbAO8zdltraSMjJF9LBXQr9EXbUx3JT8dIphteoXJPjHsct4ZICJxX?=
+ =?iso-8859-1?Q?sWGoj1TDLot56QUJ1j49X4pzFkhGC/DYSOS6rlYC4rJv9lqHNnbQ8DMjIu?=
+ =?iso-8859-1?Q?Mv068qOOhqQddsxxVfAbZUhNnYyyFnRGVIeKMZiXWJr3s//st+dG1kMwo2?=
+ =?iso-8859-1?Q?NTkA/3Lufopxup8q0O+Z1UtW4396D8MMdvemfaD0tNpO5LMJQY3e2gODmL?=
+ =?iso-8859-1?Q?d9FBQCwJtlPmrXti0+T0k5Dfvtej0ZwWwkRuNKegJ4dz61CeBDfNmu/1/M?=
+ =?iso-8859-1?Q?yCu60rSNdwKb/BRARFOa8zVeGKPh1QVoWCUfnEW3xe1BiITh0eKPlP8rZQ?=
+ =?iso-8859-1?Q?OslbfFz8G4zT1O8fmTWsXIIpgYU1ZluwzlKK8lwD24C462A8TRwlOexCVe?=
+ =?iso-8859-1?Q?cZ7XbQJBdJSQCMj5ATxKXHRRdY755F55lTnT+++NWE2UI9?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF000509F2:EE_|DB9PR03MB9855:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6dadea85-0934-4ec0-4efd-08de749427fa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	+cmNOa7NF1iN+Xoi9X4VgQdp3udrDp3oci5vpLDNQu+jZ/dTU/8QScBxBrdI+G2DnRCsjHsve7Hgyn9oW07MzGa3oauZLKtc2ex+d5trUiCSEJp0954Pw4CQ8suCNZuthi982m+p6XtzId1PG92cw1tJ+ppIc/uobqtvPmnF9gnG6XrIy/qqV46hssSi2qesROC3czx6itaBYjmWyDTLSVCc+9alJHV8b+Vx9IJx2W062OYbKT9mGPEyhjpbAdqtnDcFEWmp3K91Nb26J3CPfxptOgB4aSzIudNVoXKgZ4fcmakjRivPIMuQ7dfe4KYwBgP6Olt7Ju4f9BTjbtgKch7OzX87qs+CGuiLuZT5hjq87KxRjzCYBlZGdQwCD7vtWNLPO0wUMeg5/YLPs8L0GWIKrM92NycaVRltZX67S6tYzzUGcmRwqGxt3B5A0f4ka0fEpYT8lc9PZNssA8u1yaFtxE4B5Vy5Q/UQfbL/SqL55AeOJMljB/c+D3jQ/McqKbtOgfuwJhyZuQgR1ET8RbNCmLbs6lSeCBjJI/FyZbh4Sb82VR09XZCPrXZYQNWXM6i9Dqfela1wnDuONuqw7GJ9C7OMi3Jcz1igU4+ufhYuOhQlQiV8f8YqfdWstArhT3p033B54gmk+p/DjQqj/4dwHulOzWqphgSo4r0Y8/EDQPjwulSkEd6MM+vEurpRIO2oqD8LWhdS8Lh0GaONbW3+SQFNQmgGHwNvwo4yk4DKfexLxwRnp0Fp/6WVEddP4bAT6E7o0yBvWWwwfONOmRZdZ2Y/E4/i39xZIsb4S+9g2kjY6IyGjm5/6RmgKEcp2NIZe8kDFmxtm3NAHUxmPg==
-X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	uu2tCb1SIESErx01fBphF21MTksgvGsHXy9eIKX+ouCInozSlc2B53LXFeyUKpSSDk6MqjO59FN9bV+iZGhfki39KH0SGG1Rn1aLnBGfhIRKWFM4hVxi/0z+n2X/Di9AtL65fU8EHkFm4k1tDtaUtNyC56PhHKagxbC3k7EiZVGEwWM2gWbFheDo9MZGqd/i8TPoA1v6WgAnTA/eEie7HMPr+AvLpiLg6x9smGk1DkTUIusYHzVGQOokEaGlCSeNOQIC0kRqJ5FshS2CJ2q3zAuYi3iprnz29gWBBGNV85UkfJmeXyZ3UQWaA2nmWWX99EE797I3piUjBDzhl2cKsCHoO3KSgLN38Yr1bEZagPBRdNWZVRZxHf7d9C1D1mfF0XqkJbp6Jx2kDQGbnBJ5ehI4wf7YAOvkWPwXIhOBRD4KlrlEI3y7XTDBoegEBYb+
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 17:34:40.7141
+X-OriginatorOrg: volvo.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR05MB6790.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bbffc074-bd4b-4770-c8d9-08de74962940
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Feb 2026 17:49:01.9082
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6dadea85-0934-4ec0-4efd-08de749427fa
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509F2.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR03MB9855
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: f25493ae-1c98-41d7-8a33-0be75f5fe603
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PITuJ13iyJOwZax61C2tNWDosQlwp7WQUfrYMDoQEg+uJcIVV+Qqh144Br9CtZ2JL3Nssl5iP9j+b9Dwwh6BdQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR05MB10331
 
-Hi Luiz,
+From f3b8a3b01db23e9adc59ba5dbf99b1a83741e32b Mon Sep 17 00:00:00 2001
 
-On Wednesday, 25 February 2026, 18:24:16 CET, Luiz Augusto von Dentz wrote:
-> Hi Christian,
->=20
-> On Wed, Feb 25, 2026 at 12:07=E2=80=AFPM Christian Eggers <ceggers@arri.d=
-e> wrote:
-> >
-> > Core 6.0, Vol 3, Part A, 3.4.3:
-> > "... If the payload size of any K-frame exceeds the receiver's MPS, the
-> > receiver shall disconnect the channel..."
-> >
-> > This fixes L2CAP/LE/CFC/BV-27-C (running together with 'l2test -r -P
-> > 0x0027 -V le_public -I 100').
-> >
-> > Signed-off-by: Christian Eggers <ceggers@arri.de>
-> > ---
-> > Maybe the naming of 'mps_orig_le' could be improved...
-> >
-> >  include/net/bluetooth/l2cap.h | 1 +
-> >  net/bluetooth/l2cap_core.c    | 4 +++-
-> >  2 files changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2ca=
-p.h
-> > index 010f1a8fd15f..c6744cce75b1 100644
-> > --- a/include/net/bluetooth/l2cap.h
-> > +++ b/include/net/bluetooth/l2cap.h
-> > @@ -552,6 +552,7 @@ struct l2cap_chan {
-> >         __u16           retrans_timeout;
-> >         __u16           monitor_timeout;
-> >         __u16           mps;
-> > +       __u16           mps_orig_le;
->=20
-> Hmm, I wonder if it wouldn't make more sense to have imps/mps_rx and
-> omps/mps_tx? I guess that is why you need a separate field; otherwise,
-> the MPS is updated with the remote MPS, causing us to accept the
-> packets as valid.=20
+From: Dajid Morel <dajid.morel@volvo.com>
 
-I can confirm that I needed to introduce the new member because of this.
+Date: Tue, 24 Feb 2026 22:10:35 +0100
 
-> That said it would need to change quite a few more
-> places it seems
+Subject: [PATCH v2] Bluetooth: Increase LE connection timeout for industria=
+l
 
-I feel that I don't have enough oversight for fixing this everywhere (but of
-course I could try). I just did the minimum amount of changes to fix this
-particular test.
-
-Could you eventually take this over and propose a patch?
-
-Thanks,
-Christian
->=20
-> >
-> >         __u16           tx_credits;
-> >         __u16           rx_credits;
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index ddac5b9270bf..c9555b0a3461 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -568,6 +568,7 @@ static void l2cap_le_flowctl_init(struct l2cap_chan=
- *chan, u16 tx_credits)
-> >         chan->tx_credits =3D tx_credits;
-> >         /* Derive MPS from connection MTU to stop HCI fragmentation */
-> >         chan->mps =3D min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HD=
-R_SIZE);
-> > +       chan->mps_orig_le =3D chan->mps;
-> >         chan->rx_credits =3D l2cap_le_rx_credits(chan);
-> >
-> >         skb_queue_head_init(&chan->tx_q);
-> > @@ -580,6 +581,7 @@ static void l2cap_ecred_init(struct l2cap_chan *cha=
-n, u16 tx_credits)
-> >         /* L2CAP implementations shall support a minimum MPS of 64 octe=
-ts */
-> >         if (chan->mps < L2CAP_ECRED_MIN_MPS) {
-> >                 chan->mps =3D L2CAP_ECRED_MIN_MPS;
-> > +               chan->mps_orig_le =3D L2CAP_ECRED_MIN_MPS;
-> >                 chan->rx_credits =3D l2cap_le_rx_credits(chan);
-> >         }
-> >  }
-> > @@ -6662,7 +6664,7 @@ static int l2cap_ecred_data_rcv(struct l2cap_chan=
- *chan, struct sk_buff *skb)
-> >                 return -ENOBUFS;
-> >         }
-> >
-> > -       if (chan->imtu < skb->len) {
-> > +       if (chan->mps_orig_le < skb->len || chan->imtu < skb->len) {
-> >                 BT_ERR("Too big LE L2CAP PDU");
-> >                 l2cap_send_disconn_req(chan, ECONNRESET);
-> >                 return -ENOBUFS;
-> > --
-> > 2.44.4
-> >
->=20
->=20
->=20
+ sensors
 
 
 
+Signed-off-by: Dajid Morel <dajid.morel@volvo.com>
 
+
+
+Bluetooth: Increase LE connection timeout for industrial sensors
+
+
+
+The hardcoded 2-second timeout in hci_conn.c is insufficient for certain
+
+industrial BLE sensors, specifically all the TE Connectivity sensors.
+
+
+
+These devices often exhibit high latency during the initial connection
+
+handshake in electrically noisy industrial environments. Testing showed
+
+that a 2-second window leads to a 100% failure rate, whereas increasing
+
+this to 20 seconds ensures reliable connectivity without negatively
+
+impacting the rest of the Bluetooth stack for these specific use cases.
+
+
+
+This value was chosen to provide a comfortable margin for handshake
+
+retries in degraded RF environments typical of manufacturing plants.
+
+
+A more scalable solution might be to introduce a variable whose value can b=
+e defined by the user ?
+
+
+
+Signed-off-by: Dajid Morel <dajid.morel@volvo.com>
+
+---
+
+ net/bluetooth/hci_conn.c | 4 ++--
+
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+
+index d177b7f49..8aeed0962 100644
+
+--- a/net/bluetooth/hci_conn.c
+
++++ b/net/bluetooth/hci_conn.c
+
+@@ -1131,7 +1131,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev,=
+ bdaddr_t *dst,
+
+
+
+  conn->dst_type =3D dst_type;
+
+  conn->sec_level =3D BT_SECURITY_LOW;
+
+- conn->conn_timeout =3D conn_timeout;
+
++ conn->conn_timeout =3D msecs_to_jiffies(20000);
+
+
+
+  hci_req_init(&req, hdev);
+
+
+
+@@ -1301,7 +1301,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *=
+hdev, bdaddr_t *dst,
+
+  conn->dst_type =3D dst_type;
+
+  conn->sec_level =3D BT_SECURITY_LOW;
+
+  conn->pending_sec_level =3D sec_level;
+
+- conn->conn_timeout =3D conn_timeout;
+
++ conn->conn_timeout =3D msecs_to_jiffies(20000);
+
+  conn->conn_reason =3D conn_reason;
+
+
+
+  hci_update_background_scan(hdev);
+
+--
+
+2.34.1
+
+This email message (including its attachments) is confidential and may cont=
+ain privileged information and is intended solely for the use of the indivi=
+dual and/or entity to whom it is addressed. If you are not the intended rec=
+ipient of this e-mail you may not disseminate, distribute or copy this e-ma=
+il (including its attachments), or any part thereof. If this e-mail is rece=
+ived in error, please notify the sender immediately by return e-mail and ma=
+ke sure that this e-mail (including its attachments), and all copies thereo=
+f, are immediately deleted from your system. Please further note that when =
+you communicate with us via email or visit our website we process your pers=
+onal data. See our privacy policy for more information about how we process=
+ it: https://www.volvogroup.com/en-en/privacy.html
