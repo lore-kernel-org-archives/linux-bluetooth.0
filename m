@@ -1,214 +1,133 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013021.outbound.protection.outlook.com [40.107.162.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B743E2DCF55
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 16:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772035309; cv=none; b=X1KcIbzrrVdBGXtzo31wxsWtDbts+cK3qiJ/KEKVt84szVpAeiPXffvqI4AxSGSaoJYOwPJR4+Z7NLTVzbqgN6oHN/xm1y/2wpDYOjFmB7PzGTm2+By7ONcmS9lWR5BIuoQbRZwB6bZ4rH5p9DVEXY1CFVaLDoFGR2/hSO/rfg0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772035309; c=relaxed/simple;
-	bh=2ewoFYgfjTPYL1wB3PQGQrloK4FoFsGkI3RVkRUIrgU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TWEUPnlOfjUqs+tdqwvw2NiJFuWh07xxPN9kWSBAhKecONJPNrpDev8WvAP6l+JrSADGWMN3MSIvVOlT+3cIloRx4LBJvnXCnfKRYX+zWjqqdnL5dZ5/DI7ZLbZoWktFrhxvFFNMWiLcQT9PW57+DK61UQXuaFMEP+iUv/dANGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A2BD5432F2;
-	Wed, 25 Feb 2026 16:01:38 +0000 (UTC)
-Message-ID: <cc92dcae7bf3c7832643071df30eb5734097d2d1.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 2/2] shared/shell: gracefully recover from failed
- input initialization
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Ronan Pigott
- <ronan@rjp.ie>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 25 Feb 2026 17:01:38 +0100
-In-Reply-To: <CABBYNZLgugMFofwxAV4qFFP=RCnXG22MbcTgdt88ydbkSEKO9Q@mail.gmail.com>
-References: <20260218024605.70890-1-ronan@rjp.ie>
-	 <20260218024605.70890-3-ronan@rjp.ie>
-	 <CABBYNZJqjaDJmkEy0yvyqLXP6kFH-dVjnzcCVknAkpu39zspaA@mail.gmail.com>
-	 <defdb4fb77123ebe7abea7e8f225720e4e72e6c5@rjp.ie>
-	 <CABBYNZLgugMFofwxAV4qFFP=RCnXG22MbcTgdt88ydbkSEKO9Q@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="=-zdJAYxf5jdCn/Tm71mLI"
-User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBC63DA7D9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 16:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772036264; cv=fail; b=mFpj8HBXEhOiFzvcN8llVe06Pq7V1fkFZ0tSUl27r6XG9iPWxVtAzUWN6N4WRXQXdY6fWdT+osoiVhAYUHIjexyYYa22Hg8ESkqXlDoFntksk7iLV3hhkdhEia0QCPqK6jkMlnJapT1NEghJ4UsSogg1DYkQBR9NvWsHjMwxXMo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772036264; c=relaxed/simple;
+	bh=3EkkC0beJXhBVOfjjhy2FuhvHjX9nxlxKo8DmSA55S4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q/Pk9O4iNKxjF0X2IQLBl8X9e8/WNiJwfKeAXrsO/PMeFycOZqQ1y3B0I79diiUNzesdkHBtZTN3D6+goBVijO4v3KVKixwK+TOQ68T+p5MIRjGjTa8dzUL3yrA+rYfKz/GkC2OkePdiUAFnW5/btsp8DAvCNUY08bZYqK7PiHo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=eE5rPNMC; arc=fail smtp.client-ip=40.107.162.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="eE5rPNMC"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=orCHHLekycoC7dfb7zegNBjAbwZR2SooGUglUDv6Zjai9+Pa8I8cBbuuMQNmX1QkXazIraM0tED5FCGRxT0kRHLWw9Aqj0VRDrk5S5GVknLepe8uFRUI+HQQnFg4iktMPVJcYBJO8a5tjC7pB2Q70XPgAqmkgnGxkPuCm5XeOaDZvumytxBB/0edFmWEy02qWgVjIYJoFCj5Rifo3QHExpwFIiGUt/JE7FRaYtjNy73Lpw2q7dVMyjhVf9Oh1tckkyWqYXFZxfEner2jq3xcMJ9AvoFwgAM45ybobyPRugY0VkdAbeJdAsK83ldzrhQrPtEgdOXPYW5mAbLFJwn2cQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2x8AU32bJB3yoz5ie+/4w9nKaQfVc8dQS7x4iVyuED4=;
+ b=G8AGL69sKsR/jO0tV9YOpE14xffVm5fKs1g8V7hVJRhEOHX/it+UZg4u7VurkMhP+AaOlz0lcZbZlLdx4Tm2gGBoiyBNed5y0GO8SRt4fBv4IOtJfLetN/qANHFKn5ptKM9GILyv8SYkml5D28IHxLBBS7OoPBrr//olcjck92CTcSk0xl6Pno5aq5SkFZEBWFfAcEBxZpifbegHT8GDg3+ffMfBqpK7lW9TVbbrSMF1Ch/CMsyOykyH3pKY/zDX9cLgSlBiwCC8r9Sk25sIhE70nZ/Th+eTn2tcyXe8vTsBh6pjB6epWpa9aanNno1GEWcRrON+ikfz9UK8I6B5NQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2x8AU32bJB3yoz5ie+/4w9nKaQfVc8dQS7x4iVyuED4=;
+ b=eE5rPNMCSP/Y2JRblU6TlvnrfL8kJUtcQCtew93aNrg5AI4CZp+jllwHE07WlnFy7Ql3JxytsQWDIMCAkrDF2uMP759vJ4FxnIHz1Pe6aFm716qPv711Z/qxFizKYoIv5xj7oRIw1HXBMoJCtG1M+dVL/0EYNpwOgEnOga0hBkc=
+Received: from DB9PR01CA0008.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:1d8::13) by DU4PR03MB10911.eurprd03.prod.outlook.com
+ (2603:10a6:10:590::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.11; Wed, 25 Feb
+ 2026 16:17:34 +0000
+Received: from DB1PEPF000509F3.eurprd02.prod.outlook.com
+ (2603:10a6:10:1d8:cafe::c8) by DB9PR01CA0008.outlook.office365.com
+ (2603:10a6:10:1d8::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.23 via Frontend Transport; Wed,
+ 25 Feb 2026 16:17:26 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ DB1PEPF000509F3.mail.protection.outlook.com (10.167.242.149) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 16:17:33 +0000
+Received: from N9W6SW14.arri.de (10.30.5.38) by mta.arri.de (10.10.18.5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 25 Feb
+ 2026 17:17:33 +0100
+From: Christian Eggers <ceggers@arri.de>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Christian Eggers <ceggers@arri.de>
+Subject: [PATCH BlueZ 01/12] client/mgmt: fix compiler error
+Date: Wed, 25 Feb 2026 17:17:04 +0100
+Message-ID: <20260225161715.20394-1-ceggers@arri.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeefhedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtfgggsehmtderredtreejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpefhgfetvdeuueejveefgfehuddvjedvudfhgeeuieefhedtvefftdffteefgfefhfenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugeptedvueffheegfedvhfdvpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepfedprhgtphhtthhopehluhhiiiguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhto
- heprhhonhgrnhesrhhjphdrihgvpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-State: clean
-
---=-zdJAYxf5jdCn/Tm71mLI
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509F3:EE_|DU4PR03MB10911:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5bf20691-8449-4d38-07c7-08de7489622f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	b6c8Q9YJpaCLNfwkGHxqhOLBOLwKpfQnv5MCGQR7VrJJfqDOtMJQ9EYcT/W3xxHweQU3VDu+BJ991MvKw2SGfZV+zcTYcAU/9IWrPwoaUoMopQcztERj3JS5C08C0h4R0iwZjOXwJYw5qAxXkDhC82ft7bltZ57R0tl+T5lc64LBXn0wFgtAai/Dy8nyfwLImzB9ZqP9N9B10A6ho6crZSswCpg+Gpg8rGaANLUhoSsjCfdPLpEvnibDab2Ln6r38AAZFygCdrw3fawFYK7VlQa8AYGVdG4XJb2gTU60QtUEhBxPHgMCh0BzkOGxZa/alEJPxzCKCi43rwI1AWXm6meQeuw7WccGk4NDeuzBO0dbr3kLHTrqBTwBIlw7Ov+Ey4Qng/eDwk9rYV461iR2JSJTP17zNbbQrdLL1W/jY8in1aP37kvZz2BzliPm02mtmYrvboNklxU2J2yZSFQZmjoimwvmpH9+VaKb/RjZt/wSWpKthiz5aEJkZkDu0qIi+zvL9iIwJhIHkfbWijPG9H4Yoiufh2W8okmP1I9q73w1lBy8EHlcmqLPpeDhn80GoCsWDsoR7lIrNIea5m6kzhbbI8nIA3vsY9YGlLLJ5K5qSRBC2vhpnvHG+/qW+p4IEiFYwivlemZO21QSh3jsy3CuiEZOdgD/2TlshZiMY3CNdHde0nbxeOe3lrCoidN/ShoTuBqctRK25p8272e1gGX7LZGDIs2eGJnPs2g9QwSfqLzdfeGs1O5sG+fsSJTMk7YgSXnHA+boJy9A+30gkHd6j4EYE56PMkc/1FR5ak6dMoYdVC6bVS3EDuQjM3cYZr5AfoHeg9Nw+jf24B1EAw==
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	htrl4NLKdVGEtbPy/8zxfJncxiPNCGobz1V2U9GJfc0JKtUTnFXUTQ98hNf55mde7ex0V4WYSbhMn1FbTC4Si8ib4mOQqtDxjegXF/QAI+mnye+YjCc5jViSGGuDHx8oLFS0FKg1z9twDH3+lEPLDpWIniv6IBfh96/qQkKU3yYKovv9eSy9S/5mRq+SPQQIWWfX+gLwpwqz4WiWb/UX/VjHwz3tIfFTjLWAatdYcEZtJ19uihN7/F1RuC11ijAa6T2rVIAkdRY3w+4sWLI53q9oSjAtxK6vTjJacH58/sInfth25d1VSntGtd2eSBsdxdu0yw1aI5wNTazm+FibLowiKYjWGAUIiQrlQlKH2vZE2m72ndza0bP8QmfzB6rE/7nw8gX7PhTmW3eT4u2bvSnxkFDW/CJILspuoN1ksovaZuXCXX7bIcco1H/mutN7
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 16:17:33.9042
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5bf20691-8449-4d38-07c7-08de7489622f
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF000509F3.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR03MB10911
 
-On Wed, 2026-02-18 at 13:45 -0500, Luiz Augusto von Dentz wrote:
-> Hi Ronan,
->=20
-> On Wed, Feb 18, 2026 at 12:45=E2=80=AFPM Ronan Pigott <ronan@rjp.ie> wrot=
-e:
-> >=20
-> > February 18, 2026 at 7:58 AM, "Luiz Augusto von Dentz"
-> > <luiz.dentz@gmail.com> wrote:
-> >=20
-> > > Yeah, the revert part doesn't really fly since
-> > > e73bf582dae60356641a32fc27ae03d359ec4c47 does fixes a valid
-> > > issue,
-> > > that said we do have another proposal under discussion:
-> > >=20
-> > > https://patchwork.kernel.org/project/bluetooth/patch/20260217222954.4=
-32676-1-larsch@belunktum.dk/
-> >=20
-> > Hi Luiz,
-> >=20
-> > I'm aware it fixes a valid issue. My hope with the patch is to fix
-> > that same issue in another way.
-> >=20
-> > The problem adressed IIUC is that once the input is initialized, a
-> > subsequent epoll_wait would hang
-> > since the epoll_ctl call had failed to actually add the new event
-> > source. The reverted patch had
-> > fixed this by trying to avoid initializing stdin in all cases,
-> > which inadvertently broke
-> > bluetoothctl. My suggestion is to revert that change, and instead
-> > check the return value of
-> > io_set_read_handler so that we can avoid digging ourselves into a
-> > deeper hole. Even if bt_shell_printf
-> > is refactored so that it doesn't require the input fd, which sounds
-> > prudent, I think it probably makes
-> > sense to check the return values here, so I believe the reverted
-> > patch would no longer be necessary.
-> >=20
-> > I have seen Lars's patch, and that is actually what prompted me to
-> > submit this one. Unfortunately,
-> > it isn't correct since it causes non-interactive bluetoothctl
-> > invocations to also print several
-> > extraneous lines relating to the interactive shell.
->=20
-> Feel free to git a review to Lars's patch; hopefully, that will help
-> us get this resolved quicker. We might as well create a unit test for
-> shell to try to emulate different modes and environments. That way,
-> we
-> prevent introducing regressions like this in the future.
+client/mgmt.c: In function ‘str2bytearray’:
+client/mgmt.c:2385:23: error: comparison of integer expressions of
+different signedness: ‘unsigned int’ and ‘long int’
+[-Werror=sign-compare]
+ 2385 |                 if (i >= *val_len) {
+      |                       ^~
+---
+ client/mgmt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I wrote one, which I can integrate into meson.
+diff --git a/client/mgmt.c b/client/mgmt.c
+index 4e68547ed33c..1d3a842afd55 100644
+--- a/client/mgmt.c
++++ b/client/mgmt.c
+@@ -2373,7 +2373,7 @@ static void cmd_set_flags(int argc, char **argv)
+ static uint8_t *str2bytearray(char *arg, uint8_t *val, long *val_len)
+ {
+ 	char *entry;
+-	unsigned int i;
++	long i;
+ 
+ 	for (i = 0; (entry = strsep(&arg, " \t")) != NULL; i++) {
+ 		long v;
+@@ -2389,7 +2389,7 @@ static uint8_t *str2bytearray(char *arg, uint8_t *val, long *val_len)
+ 
+ 		v = strtol(entry, &endptr, 0);
+ 		if (!endptr || *endptr != '\0' || v > UINT8_MAX) {
+-			bt_shell_printf("Invalid value at index %d\n", i);
++			bt_shell_printf("Invalid value at index %ld\n", i);
+ 			return NULL;
+ 		}
+ 
+-- 
+2.51.0
 
-This starts "btvirt" (so requires root), launches bluetoothd if there
-isn't a daemon already running, and launches "bluetoothctl list".
-
-You can run it manually with:
-$ sudo top_builddir=3D/path/to/bluez/builddir/ ./integration-test.py
-
-If "bluetoothctl list" doesn't output any text, the test errors out.
-I've tested that pointing the bluetoothctl_path() output at an old
-version of bluetoothctl worked.
-
-This pattern of using Python to create test suites using python-
-dbusmock is something I've already used in PolicyKit, upower, power-
-profiles-daemon, gnome-bluetooth and many other places.
-
-This test is pretty heavy-handed if we just want to test whether
-bluetoothctl outputs things correctly, but it has the benefit of
-testing the emulator as well as bluetoothd. We could start adding more
-tests to the mix, such as creating more adapters, pairing them, etc.
-
-Hopefully, this is a useful test to run on CIs, although I'm probably
-missing spawning a system bus on top of everything else.
-
-What do you think?
-
---=-zdJAYxf5jdCn/Tm71mLI
-Content-Disposition: attachment; filename="bluez-btvirt-integration-test.py"
-Content-Type: text/x-python3; name="bluez-btvirt-integration-test.py"; charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-IyEvdXNyL2Jpbi9weXRob24zCgojIENvcHlyaWdodDogKEMpIDIwMjUgQmFzdGllbiBOb2NlcmEg
-PGhhZGVzc0BoYWRlc3MubmV0PgojCiMgVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7IHlv
-dSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkKIyBpdCB1bmRlciB0aGUgdGVybXMg
-b2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBieQojIHRoZSBG
-cmVlIFNvZnR3YXJlIEZvdW5kYXRpb247IGVpdGhlciB2ZXJzaW9uIDIgb2YgdGhlIExpY2Vuc2Us
-IG9yCiMgKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lvbi4KIwojIFRoaXMgcHJvZ3Jh
-bSBpcyBkaXN0cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLAojIGJ1
-dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5
-IG9mCiMgTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NF
-LiAgU2VlIHRoZQojIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMu
-CgppbXBvcnQgb3MKaW1wb3J0IHN5cwppbXBvcnQgc3VicHJvY2VzcwppbXBvcnQgdW5pdHRlc3QK
-aW1wb3J0IHRpbWUKCnRyeToKICAgIGltcG9ydCBnaQogICAgZnJvbSBnaS5yZXBvc2l0b3J5IGlt
-cG9ydCBHTGliCmV4Y2VwdCBJbXBvcnRFcnJvciBhcyBlOgogICAgc3lzLnN0ZGVyci53cml0ZSgn
-U2tpcHBpbmcgdGVzdHMsIFB5R29iamVjdCBub3QgYXZhaWxhYmxlIGZvciBQeXRob24gMywgb3Ig
-bWlzc2luZyBHSSB0eXBlbGliczogJXNcbicgJSBzdHIoZSkpCiAgICBzeXMuZXhpdCg3NykKCmJ1
-aWxkZGlyID0gb3MuZ2V0ZW52KCd0b3BfYnVpbGRkaXInLCAnLicpCgp0cnk6CiAgICBpbXBvcnQg
-ZGJ1c21vY2sKZXhjZXB0IEltcG9ydEVycm9yOgogICAgc3lzLnN0ZGVyci53cml0ZSgnU2tpcHBp
-bmcgdGVzdHMsIHB5dGhvbi1kYnVzbW9jayBub3QgYXZhaWxhYmxlIChodHRwOi8vcHlwaS5weXRo
-b24ub3JnL3B5cGkvcHl0aG9uLWRidXNtb2NrKS5cbicpCiAgICBzeXMuZXhpdCg3NykKCmNsYXNz
-IFRlc3RzKGRidXNtb2NrLkRCdXNUZXN0Q2FzZSk6CgogICAgQGNsYXNzbWV0aG9kCiAgICBkZWYg
-c2V0VXBDbGFzcyhjbHMpOgogICAgICAgIHN1cGVyKCkuc2V0VXBDbGFzcygpCiAgICAgICAgY2xz
-LnN0YXJ0X3N5c3RlbV9idXMoKQogICAgICAgIGNscy5kYnVzX2NvbiA9IGNscy5nZXRfZGJ1cyhU
-cnVlKQoKICAgIEBjbGFzc21ldGhvZAogICAgZGVmIHRlYXJEb3duQ2xhc3MoY2xzKToKICAgICAg
-ICBzdXBlcigpLnRlYXJEb3duQ2xhc3MoKQoKICAgIGRlZiBzZXRVcChzZWxmKToKICAgICAgICBz
-dXBlcigpLnNldFVwKCkKICAgICAgICBzZWxmLmxvZyA9IE5vbmUKCiAgICBkZWYgc3RvcF92aXJ0
-KHNlbGYpOgogICAgICAgIGlmIHNlbGYudmlydDoKICAgICAgICAgICAgdHJ5OgogICAgICAgICAg
-ICAgICAgc2VsZi52aXJ0LnRlcm1pbmF0ZSgpCiAgICAgICAgICAgIGV4Y2VwdCBPU0Vycm9yOgog
-ICAgICAgICAgICAgICAgcGFzcwogICAgICAgICAgICBzZWxmLmFzc2VydEVxdWFsKHNlbGYudmly
-dC53YWl0KHRpbWVvdXQ9MzAwMCksIDApCgogICAgICAgIHNlbGYudmlydCA9IE5vbmUKCiAgICBk
-ZWYgc3RhcnRfdmlydChzZWxmKToKICAgICAgICBzZWxmLnZpcnQgPSBzdWJwcm9jZXNzLlBvcGVu
-KAogICAgICAgICAgICBbIHNlbGYuYnR2aXJ0X3BhdGgoKSwgJy1sMScgXSwgc3Rkb3V0PXNlbGYu
-bG9nLCBzdGRlcnI9c3lzLnN0ZGVycgogICAgICAgICkKICAgICAgICBzZWxmLmFkZENsZWFudXAo
-c2VsZi5zdG9wX3ZpcnQpCiAgICAgICAgIyB0aW1lLnNsZWVwKDEpCgogICAgZGVmIHN0b3BfZGFl
-bW9uKHNlbGYpOgogICAgICAgIGlmIHNlbGYuZGFlbW9uOgogICAgICAgICAgICB0cnk6CiAgICAg
-ICAgICAgICAgICBzZWxmLmRhZW1vbi50ZXJtaW5hdGUoKQogICAgICAgICAgICBleGNlcHQgT1NF
-cnJvcjoKICAgICAgICAgICAgICAgIHBhc3MKICAgICAgICAgICAgc2VsZi5hc3NlcnRFcXVhbChz
-ZWxmLmRhZW1vbi53YWl0KHRpbWVvdXQ9MzAwMCksIDApCgogICAgICAgIHNlbGYuZGFlbW9uID0g
-Tm9uZQoKICAgIGRlZiBkYWVtb25fY2hlY2soc2VsZik6CiAgICAgICAgZGFlbW9uX2NoZWNrID0g
-c3VicHJvY2Vzcy5ydW4oWydnZGJ1cycsICdpbnRyb3NwZWN0JywgJy0tc3lzdGVtJywgJy0tZGVz
-dCcsICdvcmcuYmx1ZXonLCAnLS1vYmplY3QtcGF0aCcsICcvJyBdLAogICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHN0ZG91dCA9IHN1YnByb2Nlc3MuREVWTlVMTCwKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjaGVjaz1GYWxzZSwKICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBjYXB0dXJlX291dHB1dD1GYWxzZSkKICAgICAgICBy
-ZXR1cm4gZGFlbW9uX2NoZWNrLnJldHVybmNvZGUgPT0gMAoKICAgIGRlZiBzdGFydF9kYWVtb24o
-c2VsZik6CiAgICAgICAgIyBPbmx5IHN0YXJ0IGRhZW1vbiBpZiBvbmUgaXMgbm90IGFscmVhZHkg
-YXZhaWxhYmxlCiAgICAgICAgaWYgbm90IHNlbGYuZGFlbW9uX2NoZWNrKCk6CiAgICAgICAgICAg
-IHNlbGYuZGFlbW9uID0gc3VicHJvY2Vzcy5Qb3BlbigKICAgICAgICAgICAgICAgIFsgc2VsZi5i
-bHVldG9vdGhkX3BhdGgoKSwgJy0tbm9kZXRhY2gnIF0sIHN0ZG91dD1zZWxmLmxvZywgc3RkZXJy
-PXN5cy5zdGRlcnIKICAgICAgICAgICAgKQogICAgICAgICAgICBzZWxmLmFkZENsZWFudXAoc2Vs
-Zi5zdG9wX2RhZW1vbikKCiAgICAgICAgICAgIHNlbGYuYXNzZXJ0X2V2ZW50dWFsbHkobGFtYmRh
-OiBzZWxmLmRhZW1vbl9jaGVjaygpKQoKICAgIGRlZiBibHVldG9vdGhjdGxfcGF0aChzZWxmKToK
-ICAgICAgICBidWlsZGRpciA9IG9zLmdldGVudigidG9wX2J1aWxkZGlyIiwgIi4iKQogICAgICAg
-IHJldHVybiBvcy5wYXRoLmpvaW4oYnVpbGRkaXIsICJjbGllbnQiLCAiYmx1ZXRvb3RoY3RsIikK
-CiAgICBkZWYgYnR2aXJ0X3BhdGgoc2VsZik6CiAgICAgICAgYnVpbGRkaXIgPSBvcy5nZXRlbnYo
-InRvcF9idWlsZGRpciIsICIuIikKICAgICAgICByZXR1cm4gb3MucGF0aC5qb2luKGJ1aWxkZGly
-LCAiZW11bGF0b3IiLCAiYnR2aXJ0IikKCiAgICBkZWYgYmx1ZXRvb3RoZF9wYXRoKHNlbGYpOgog
-ICAgICAgIGJ1aWxkZGlyID0gb3MuZ2V0ZW52KCJ0b3BfYnVpbGRkaXIiLCAiLiIpCiAgICAgICAg
-cmV0dXJuIG9zLnBhdGguam9pbihidWlsZGRpciwgInNyYyIsICJibHVldG9vdGhkIikKCiAgICBk
-ZWYgYXNzZXJ0X2V2ZW50dWFsbHkoc2VsZiwgY29uZGl0aW9uLCBtZXNzYWdlPU5vbmUsIHRpbWVv
-dXQ9NTAwMCwga2VlcF9jaGVja2luZz0wKToKICAgICAgICAiIiJBc3NlcnQgdGhhdCBjb25kaXRp
-b24gZnVuY3Rpb24gZXZlbnR1YWxseSByZXR1cm5zIFRydWUuCgogICAgICAgIFRpbWVvdXQgaXMg
-aW4gbWlsbGlzZWNvbmRzLCBkZWZhdWx0aW5nIHRvIDUwMDAgKDUgc2Vjb25kcykuIG1lc3NhZ2Ug
-aXMKICAgICAgICBwcmludGVkIG9uIGZhaWx1cmUuCiAgICAgICAgIiIiCiAgICAgICAgaWYgbm90
-IGtlZXBfY2hlY2tpbmc6CiAgICAgICAgICAgIGlmIGNvbmRpdGlvbigpOgogICAgICAgICAgICAg
-ICAgcmV0dXJuCgogICAgICAgIGRvbmUgPSBGYWxzZQoKICAgICAgICBkZWYgb25fdGltZW91dF9y
-ZWFjaGVkKCk6CiAgICAgICAgICAgIG5vbmxvY2FsIGRvbmUKICAgICAgICAgICAgZG9uZSA9IFRy
-dWUKCiAgICAgICAgc291cmNlID0gR0xpYi50aW1lb3V0X2FkZCh0aW1lb3V0LCBvbl90aW1lb3V0
-X3JlYWNoZWQpCiAgICAgICAgd2hpbGUgbm90IGRvbmU6CiAgICAgICAgICAgIGlmIGNvbmRpdGlv
-bigpOgogICAgICAgICAgICAgICAgR0xpYi5zb3VyY2VfcmVtb3ZlKHNvdXJjZSkKICAgICAgICAg
-ICAgICAgIGlmIGtlZXBfY2hlY2tpbmcgPiAwOgogICAgICAgICAgICAgICAgICAgIHNlbGYuYXNz
-ZXJ0X2NvbmRpdGlvbl9wZXJzaXN0cygKICAgICAgICAgICAgICAgICAgICAgICAgY29uZGl0aW9u
-LCBtZXNzYWdlLCB0aW1lb3V0PWtlZXBfY2hlY2tpbmcKICAgICAgICAgICAgICAgICAgICApCiAg
-ICAgICAgICAgICAgICByZXR1cm4KICAgICAgICAgICAgR0xpYi5NYWluQ29udGV4dC5kZWZhdWx0
-KCkuaXRlcmF0aW9uKEZhbHNlKQoKICAgICAgICBzZWxmLmZhaWwobWVzc2FnZSgpIGlmIG1lc3Nh
-Z2UgZWxzZSBmInRpbWVkIG91dCB3YWl0aW5nIGZvciB7Y29uZGl0aW9ufSIpCgogICAgZGVmIHRl
-c3RfYmx1ZXRvb3RoY3RsKHNlbGYpOgogICAgICAgIHNlbGYuc3RhcnRfdmlydCgpCiAgICAgICAg
-c2VsZi5zdGFydF9kYWVtb24oKQoKICAgICAgICBjbWQgPSBzdWJwcm9jZXNzLnJ1bihbIHNlbGYu
-Ymx1ZXRvb3RoY3RsX3BhdGgoKSwgJ2xpc3QnIF0sIGNoZWNrPUZhbHNlLCBjYXB0dXJlX291dHB1
-dD1UcnVlKQogICAgICAgIHNlbGYuYXNzZXJ0UmVnZXgoY21kLnN0ZG91dC5kZWNvZGUoJ1VURi04
-JyksICcuKlxcW2RlZmF1bHRcXF0nKQoKaWYgX19uYW1lX18gPT0gJ19fbWFpbl9fJzoKICAgIHVu
-aXR0ZXN0Lm1haW4oKQo=
-
-
---=-zdJAYxf5jdCn/Tm71mLI--
