@@ -1,237 +1,379 @@
-Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013028.outbound.protection.outlook.com [52.101.83.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D273F1CBEB9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 18:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3CC2701CF
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 18:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.28
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772043703; cv=pass; b=kJyske6tOxa2Xpx6mzGFjxLLXAUVOAwjqOmzwD/6vnotMopZZnnEQuMP/EZH/3zA5DYMZLgaNgvWRZgAn6Bp/lXSz4Wz8uX6vViBqgEJ25QxGvV1L1ROryw6fk/trchitB08XCRrA4YOKamZnOJiojGbpTC9ZxhBJoaGBrKw2tY=
+	t=1772044805; cv=fail; b=GIXMVhupQ6DFzssZJ6Q/aqTbnMUgnmZu32SXE4qF/+BRygr2yxQfYu3AZ7enPT4OlM2p9hbXt2VGLh5knZ9J7WAU/xWSR/PGtC/qOLRGcv1UWbxH8Cp9IQEJuuAkHDYB9rdoKb8r4zKS9hyKuAdKLQnRXvYtpEoE2s46H3+pKbc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772043703; c=relaxed/simple;
-	bh=6nnAEQqCetLfypBZGb2kHScazi/bBUBAZakfEpxnsMg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pCCae2P/h9Fm1wNQkcN0XhFZLDc34V2f7+V3pPVhMlae2vkuar7s9uxjdnsBdQj1Af8DblK3nwgg72YHHQZ5SnPxaTyxy8AkPMGUnA7QrNg+dBB9Hks9p0qWGnYCvrnBqNsUxY7FqSVpPVoA7+LjZ5/3TqzDlghShf9HoTaMGB8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+Pns1h7; arc=pass smtp.client-ip=74.125.224.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772044805; c=relaxed/simple;
+	bh=6Cfpa2HZrIdDOw+c2asj7ySdsuTlOXsqvE1ciwWopGg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q7UrArqVFSD5MrL0+X9NCvk5atLSzAP8URdj4lSJRtqZ33fnz3iXit94XzTBefU38vdYv2MphrO6Is4IUjIZILL8/QR1Iz44qXhFLCTXoWnwLrAYt2a5/ruHYLae5tF8DXKNJKb4HpAYEPi2ZjXBCK8NvNr1dv/Tz6SukVCC4Sg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=lM+tzbGT; arc=fail smtp.client-ip=52.101.83.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+Pns1h7"
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-64ad46a44easo6814698d50.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 10:21:41 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772043701; cv=none;
-        d=google.com; s=arc-20240605;
-        b=TEGINJsFphQVJEZzkCvawwVHZM7sIqhf/BD5VOp0lwfj6KUEdXXg2VwXxVK4K/6S6B
-         1zOLHRKPDn+Q7hH2r9SlMQYkUCOZKJqNQyRCqUxId49HCw7FyQ8u+vsw2m9nOE4z/aZy
-         QfO03w7A0x6amGG62BNQGPONGV9V8sjuj62Vm+3Vi6uEdxPLBsfZSRM+VwzGLme4mOye
-         wChYv2nXnBL+uv+lvwvSR/ORc8ipHSIkCA/6tQZVOpAQgKSrHcuEioGLX8G9O3d4brnH
-         ld02aed+/8f6mkzJ53ZkpMzyHa07rotQxHR5acsd8X8TCBMg3Kyy8Mzqp73+c6wjdrqs
-         V/zQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=eA6lqsokdPVenf+hGF5HxWrUPj81pjqWcbF9WN+X4Eo=;
-        fh=RWBVPlIyNTUzfMyP4bUC/PZbm0yvAvwEsBrINF3jbGE=;
-        b=e0xVr6Jyb2YxgqLr+/VZXEcjibCEEZqnccv0Zv4jXBF8yoZgwekyTs0Lu1wXxtZLex
-         G6Ar3ZKwBDQuhjL+tEnH4RHjTDo+Zj6Any49esMkPEjuump8C1p+jzurjP/gnusycwg9
-         AEGi8IvDzbWy3r/q2nvgacdK8hZI0LjLRVMPIfIRMyNrMXYoO4PoQLMhkM0RAc92hYtZ
-         aoLwYS2KalF4gQDZ/cxDCUTFB+3iAROA3cyqp0tu5PEWJ1LCkCxFN3iKs2EQJDmX8J/q
-         47Ln7qCUhhuQ9PuxeuuQefgL1Ew2kV37xj78mxiD3K9kmBfvS/IhIheZTNipA2mnGxCL
-         JCqw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772043701; x=1772648501; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eA6lqsokdPVenf+hGF5HxWrUPj81pjqWcbF9WN+X4Eo=;
-        b=g+Pns1h7/Jbp+mnqR2DgROKBvzwk1/5vaKxaN81IAQX3akuo6on4m2huDE5Qpk95mU
-         7svEA2kyGea5GlkEZm97uWtcf8H0r+XZXo+KXMP+ZopCbc4tRJ1iEmww/Hh/HPSgq/IG
-         cP+/fvt/VVdGk+04CdI6Woo2xfLMKrfhpewdT1GSicndHYt8WR35LTmzsbb/W8mZmdJh
-         e1sceqCdjpypy/C4ZoNzjdj1S+a8PGp6rJZODaLX/0iSens1u1Lgvy3BI3RRnlddb4z8
-         K0snk5C8jjBVG7uiRv58XZIkTU8vqZUvNPmwts6+XF6aH6XgZMljvEUqWwAy7JSiLN2f
-         t1nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772043701; x=1772648501;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eA6lqsokdPVenf+hGF5HxWrUPj81pjqWcbF9WN+X4Eo=;
-        b=obj5TM813Lcy8DB7JLzBI+xKwoeli/dOfBWT4riHVDtJ5j8fHTS6wR7nfzXRpB9aH3
-         7PNQUoLtKn6Bcw0JA9CHvPPEVIuGX/y2cLxLwqbn11ExB17RgnYg7ntiIa/IRg+sysY5
-         vpi+umeL9020jTidkL7ntoJcc8BKIxTooaDJEF+m566aQZGbdThdNaiFSYDJ7FP2pVTi
-         08Xnoic3PJkDTZJE3hLpYyPWs7/sEoUML2mNitDF4XsVjA93Mz9yAVOpN7vMo5y6lfni
-         57nfEMWLp2gYObefye9YYiNuLz058beS1CU7RNllVAQuksEGCijjwCixOu0FKFbaXEaF
-         Slpw==
-X-Gm-Message-State: AOJu0YyMDJ5I2HLwZY+UA3zehg2qHBkS4xF6hs3KPBDJDuUtePeGmauz
-	fxhv/QTfOHDJZhmFI9No8ayq6SJSj6FNOvCfzdesjROi7Bmb+vhrGARxPc0X7sIhlhNlSQFmNXz
-	TY4f+nDg3jXIPq57b3iaE/R622ssp5ZM=
-X-Gm-Gg: ATEYQzzTdcig5IDHCGHsnrNS3SDi9+8rsfGr74GFdZYAiMSzmhnXNgkU/VVLBztMBfq
-	IPt15snajuXJEsdc1Adq3iV40OmEPkQ0l4g8l+oFI2/GxH1ji7/rCit7rJtY8K+OrJOzXt2G9hG
-	eU7n33q1ccjCaOE8IbtCFLosFjP3lIFoJRwvuC5ZQiRHvrFSc+SZxGN7Ub3yBEmTQYesRW0848p
-	cWV9IYCBRl6Z5uqSVB+0idwiCifz7HY7piqrgT270WxY2udAtG79e6Dd4RJDc3oVm94jyo1xFE3
-	+sLKj+7A2hKvfz2dvuuIZR6oCGIsQJKKbsPQyFr2N6DEMFW4EA/FTEdAQWNWoqnQ13UHkg==
-X-Received: by 2002:a53:ac8f:0:b0:649:c6d4:898a with SMTP id
- 956f58d0204a3-64c789d169emr14842619d50.28.1772043700749; Wed, 25 Feb 2026
- 10:21:40 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="lM+tzbGT"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ct3L2brWcWz80VLxx30hOPIO9lL8G1JeBcgejxwBVtDKfV4M5IVttnSjAw1cxAOk6HfdKuTHcFBUNghD9WWj4Cdd+bBNdN7OzI3kUvWGjJKaGNWylT2WlngxnLfvLYww2H2IbicrGMfBnr1Mw9xtgXFS+BcHAHCFk4IQz4EhYqxCqt6Gq8gOqYlZFmnN9FXFg3L6VAqm1PZv9eRL6i6g0SNQa9bqesWBv5fyyIpduh1oLn48qU8Rkw2ndawiVl4u3OYXgLRAWp7hbVyy9c9/mbXee8GBbGiZo3MpmwNWvh1EFF99JpWE5vRz1wthL4xeZS/qFhnfbyy0c27xFc09gw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3SFTBuhNVgegU1+hqpjL4gYj12fKotcqdUGGeps9rfI=;
+ b=xvLJesrje8CS9tCMuKHfUNZSY0NQv7i/VYTeg95a/FoqJok9cprJUpHq3xqw4kwvl7HidJkGMZMHUrTbqUJwvZZ8LE9Nh8E6o4jhPme9w1obVzrwR7Btb8DNkl2ydcVVI5CPW1+A4Urodsy7Bqg2A/G9ebNOU1AfMoHE7aA2e1ZkuTSZoCyUJhTDYeJgdQCPXGPYEMz7vHqigVK+HrzOzlK6nlhbDiW0IiszofXTT5ivxkS9qkthAECMfdeYv6GE/yCkBe9BNAVPJxQITeZGuZv1VkYn6+3Tdkikw1OSURsrrCiCxrC+9T0DlRWAi3ZVMxqem/+G4fPjzvzHnQNo3Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=gmail.com smtp.mailfrom=arri.de; dmarc=fail
+ (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
+ not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3SFTBuhNVgegU1+hqpjL4gYj12fKotcqdUGGeps9rfI=;
+ b=lM+tzbGTuPTpMrEUKbD9xKEiqf/t4ZjCWQqho/oo7o1K4PPWQKpUhDu7DpWLe4NHe99husfM/qN6DHW6GC2aW5ln18ypDv0yCKe1hnnVOAcKhzrq/RXAjbwKdZcjtb2DNCfGw25AIdqwd1cJaALPcmrQ5/tFFoqj7BBfIBvQalc=
+Received: from DU2PR04CA0235.eurprd04.prod.outlook.com (2603:10a6:10:2b1::30)
+ by DBBPR03MB6857.eurprd03.prod.outlook.com (2603:10a6:10:202::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Wed, 25 Feb
+ 2026 18:38:45 +0000
+Received: from DB1PEPF000509E8.eurprd03.prod.outlook.com
+ (2603:10a6:10:2b1:cafe::7f) by DU2PR04CA0235.outlook.office365.com
+ (2603:10a6:10:2b1::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.23 via Frontend Transport; Wed,
+ 25 Feb 2026 18:38:30 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ DB1PEPF000509E8.mail.protection.outlook.com (10.167.242.58) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 18:38:42 +0000
+Received: from n9w6sw14.localnet (10.30.5.38) by mta.arri.de (10.10.18.5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 25 Feb
+ 2026 19:38:42 +0100
+From: Christian Eggers <ceggers@arri.de>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 11/12] agent: move defines and parsing for I/O capability to
+ shared/mgnt
+Date: Wed, 25 Feb 2026 19:38:42 +0100
+Message-ID: <3672959.dWV9SEqChM@n9w6sw14>
+Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+In-Reply-To: <CABBYNZLgQWy_+gZmWXRmQx1g7P3pT3=ZLjFa7FuUnpWH4Huf3g@mail.gmail.com>
+References: <20260225161715.20394-1-ceggers@arri.de>
+ <20260225161715.20394-11-ceggers@arri.de>
+ <CABBYNZLgQWy_+gZmWXRmQx1g7P3pT3=ZLjFa7FuUnpWH4Huf3g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <AM7PR05MB6790817B215F2B9B88B8C4EBEC75A@AM7PR05MB6790.eurprd05.prod.outlook.com>
-In-Reply-To: <AM7PR05MB6790817B215F2B9B88B8C4EBEC75A@AM7PR05MB6790.eurprd05.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 25 Feb 2026 13:21:29 -0500
-X-Gm-Features: AaiRm504OPPNxMyvppyCluYZh_RZCrctiLd5l74sotoPJjhD8ZB-QdpYNESOUTo
-Message-ID: <CABBYNZLZVNf2i6UeAMwYr+X1Xfi8uXGtObnoBgQPzp8mPEEH-Q@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Increase LE connection timeout for
- industrial sensors
-To: Dajid Morel <dajid.morel@volvo.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509E8:EE_|DBBPR03MB6857:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5080319a-0ca9-4bd2-8060-08de749d1a16
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	kxwxruW/HPyPnYhgUHIhG/XYVLYgmsmsSG5RXKFU5o1a96tdnTW7ns1fBJgrnXnjjJ8RGHh3o6yIZiOArBeITgui6uELltnxk+IWSNsB1D0dEKBQLhc356ivj5YH9502SOP4tA6/AN8VCmvXRb3cDb9bdud1ifFx5D8V+x7/ET1PLvnqwKUHyY7lMjNGAENuq321IEjJTjJw/OZ28q73YwIGzR2nSW5zfdTDDueA+5CAKTwGSqfG0/hzZxCHpPWvEYZRsJVe1JmsXnTiTiFpS9SlsfCfYfAIYJVFCOpmk9bsYaQcM36OSO8B6tPycEeDri5ShuBtDykGhnnrQo/ZprRSLvxqklhvGlgSVSmrcH0eb++2Xg/fg85Z4ie2fHRHEMszV2M7WtKmmbChvqpx8aNrj/2gmN13Ks+0wfQLHpPBOuJx3+1F8Tdcr1QKf7a6Nsv+qROxWtGNbLrtCQa2NdFE8z0kn89+NLed2WmJNoZZ/KBfiVCQkg0d3wpOQKnTy4IsSSqLaQ9IfD5wNqgaNprYnIt8tiXspTgIjF986yJozyhoZO9VYK507zZTK60A+LDrv2qW9nEq/e4ka3k7hQkwCDRTbbOZaqULVZMvyN27RSExnwGRYMre1wFiKPvU8pdh5fAArtf24FAs/OVRR70wkShQM157teaV/5jUcbrsrSpRrdKlvu/hMYv3/pR8opZY4kASPz+P+j4pDj+mLwh4CoN2MLRdg+eAOYYTF8cfUWo9HeO20U5AzUOSSYpOTSKTD8IJl5hiJ5/MXPLxmtZL1fasdbZ0uD6BuD5lzxvwtcUMeb/WIZQDk20jmSKghDVvqu/9bxCJUJYc5HQMbA==
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	0RsfsAJwJX5D++H4vmVE9EAAsW70uhgUmM2UFieOyDnx0FKq1zbtIHCVYYMdbGTWF9sdCx5iW9iPBypFVAFukNET8RTXuzt8b4HDHri3qI5y8M4Xnqa2kXstm69G1QLZfrZvVQBkyDr1uCJGxMwn8A7Yv1hNwpHxv6ZGF/837sSgsNYLwKTS3jw+goZbyxUeMp+1oayYxu621YOMh7+/hg1PKQ+FtCwR6ZCGvTCNod0Qlc7pr4y0XtmWwieDzkoBup8qJ4GWeKgugAbXuAoXIGlgYC6J3JQqd5nD2frCKNxs0oDqTau2jm6aQ/J1MZodjVgJGNcnG4QJV5QQuW84+oBjgVaJIE6TNIXlmYzjlzd1HoLlQ7UbdhDZEa+M0dDBPYNHICOaDJBKD/wyb02RN1rjezxgHwE2EekriZmTJyQYvQIlYNFARC5byjEdH43K
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 18:38:42.8837
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5080319a-0ca9-4bd2-8060-08de749d1a16
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF000509E8.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR03MB6857
 
-Hi Dajid,
+Hi Luiz,
 
-On Wed, Feb 25, 2026 at 12:49=E2=80=AFPM Dajid Morel <dajid.morel@volvo.com=
-> wrote:
->
-> From f3b8a3b01db23e9adc59ba5dbf99b1a83741e32b Mon Sep 17 00:00:00 2001
->
-> From: Dajid Morel <dajid.morel@volvo.com>
->
-> Date: Tue, 24 Feb 2026 22:10:35 +0100
->
-> Subject: [PATCH v2] Bluetooth: Increase LE connection timeout for industr=
-ial
->
->  sensors
->
->
->
-> Signed-off-by: Dajid Morel <dajid.morel@volvo.com>
->
->
->
-> Bluetooth: Increase LE connection timeout for industrial sensors
->
->
->
-> The hardcoded 2-second timeout in hci_conn.c is insufficient for certain
->
-> industrial BLE sensors, specifically all the TE Connectivity sensors.
->
->
->
-> These devices often exhibit high latency during the initial connection
->
-> handshake in electrically noisy industrial environments. Testing showed
->
-> that a 2-second window leads to a 100% failure rate, whereas increasing
->
-> this to 20 seconds ensures reliable connectivity without negatively
->
-> impacting the rest of the Bluetooth stack for these specific use cases.
->
->
->
-> This value was chosen to provide a comfortable margin for handshake
->
-> retries in degraded RF environments typical of manufacturing plants.
->
->
-> A more scalable solution might be to introduce a variable whose value can=
- be defined by the user ?
+On Wednesday, 25 February 2026, 17:38:49 CET, Luiz Augusto von Dentz wrote:
+> Hi Christian,
+>=20
+> On Wed, Feb 25, 2026 at 11:22=E2=80=AFAM Christian Eggers <ceggers@arri.d=
+e> wrote:
+> >
+> > Allow reusing in client/mgmt.c (next commit)
+> > ---
+> >  src/adapter.c     |  6 +++---
+> >  src/agent.c       | 24 ++++--------------------
+> >  src/agent.h       |  7 -------
+> >  src/device.c      |  7 ++++---
+>=20
+> Shared changed should be sent separately since its license (LGPL) is
+> different than the daemon (GPL).
 
-It is already user defined by setting setsockopt(SO_SNDTIMEO).
+done
 
->
->
-> Signed-off-by: Dajid Morel <dajid.morel@volvo.com>
->
-> ---
->
->  net/bluetooth/hci_conn.c | 4 ++--
->
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
->
->
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->
-> index d177b7f49..8aeed0962 100644
->
-> --- a/net/bluetooth/hci_conn.c
->
-> +++ b/net/bluetooth/hci_conn.c
->
-> @@ -1131,7 +1131,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hde=
-v, bdaddr_t *dst,
->
->
->
->   conn->dst_type =3D dst_type;
->
->   conn->sec_level =3D BT_SECURITY_LOW;
->
-> - conn->conn_timeout =3D conn_timeout;
->
-> + conn->conn_timeout =3D msecs_to_jiffies(20000);
+>=20
+> >  src/shared/mgmt.c | 32 ++++++++++++++++++++++++++++++++
+> >  src/shared/mgmt.h | 10 ++++++++++
+> >  6 files changed, 53 insertions(+), 33 deletions(-)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index 9bb1950a9f7d..bfabdf9a62ef 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -9156,7 +9156,7 @@ int adapter_set_io_capability(struct btd_adapter =
+*adapter, uint8_t io_cap)
+> >         struct mgmt_cp_set_io_capability cp;
+> >
+> >         if (!btd_opts.pairable) {
+> > -               if (io_cap =3D=3D IO_CAPABILITY_INVALID) {
+> > +               if (io_cap =3D=3D MGMT_IO_CAPABILITY_INVALID) {
+> >                         if (adapter->current_settings & MGMT_SETTING_BO=
+NDABLE)
+> >                                 set_mode(adapter, MGMT_OP_SET_BONDABLE,=
+ 0x00);
+> >
+> > @@ -9165,8 +9165,8 @@ int adapter_set_io_capability(struct btd_adapter =
+*adapter, uint8_t io_cap)
+> >
+> >                 if (!(adapter->current_settings & MGMT_SETTING_BONDABLE=
+))
+> >                         set_mode(adapter, MGMT_OP_SET_BONDABLE, 0x01);
+> > -       } else if (io_cap =3D=3D IO_CAPABILITY_INVALID)
+> > -               io_cap =3D IO_CAPABILITY_NOINPUTNOOUTPUT;
+> > +       } else if (io_cap =3D=3D MGMT_IO_CAPABILITY_INVALID)
+> > +               io_cap =3D MGMT_IO_CAPABILITY_NOINPUTNOOUTPUT;
+> >
+> >         memset(&cp, 0, sizeof(cp));
+> >         cp.io_capability =3D io_cap;
+> > diff --git a/src/agent.c b/src/agent.c
+> > index 3696575b83e6..794f81ebf18a 100644
+> > --- a/src/agent.c
+> > +++ b/src/agent.c
+> > @@ -35,6 +35,7 @@
+> >  #include "adapter.h"
+> >  #include "device.h"
+> >  #include "agent.h"
+> > +#include "shared/mgmt.h"
+> >  #include "shared/queue.h"
+> >
+> >  #define REQUEST_TIMEOUT (60 * 1000)            /* 60 seconds */
+> > @@ -131,7 +132,7 @@ static void set_io_cap(struct btd_adapter *adapter,=
+ gpointer user_data)
+> >         if (agent)
+> >                 io_cap =3D agent->capability;
+> >         else
+> > -               io_cap =3D IO_CAPABILITY_INVALID;
+> > +               io_cap =3D MGMT_IO_CAPABILITY_INVALID;
+> >
+> >         adapter_set_io_capability(adapter, io_cap);
+> >  }
+> > @@ -944,23 +945,6 @@ static void agent_destroy(gpointer data)
+> >         agent_unref(agent);
+> >  }
+> >
+> > -static uint8_t parse_io_capability(const char *capability)
+> > -{
+> > -       if (g_str_equal(capability, ""))
+> > -               return IO_CAPABILITY_KEYBOARDDISPLAY;
+> > -       if (g_str_equal(capability, "DisplayOnly"))
+> > -               return IO_CAPABILITY_DISPLAYONLY;
+> > -       if (g_str_equal(capability, "DisplayYesNo"))
+> > -               return IO_CAPABILITY_DISPLAYYESNO;
+> > -       if (g_str_equal(capability, "KeyboardOnly"))
+> > -               return IO_CAPABILITY_KEYBOARDONLY;
+> > -       if (g_str_equal(capability, "NoInputNoOutput"))
+> > -               return IO_CAPABILITY_NOINPUTNOOUTPUT;
+> > -       if (g_str_equal(capability, "KeyboardDisplay"))
+> > -               return IO_CAPABILITY_KEYBOARDDISPLAY;
+> > -       return IO_CAPABILITY_INVALID;
+> > -}
+> > -
+> >  static DBusMessage *register_agent(DBusConnection *conn,
+> >                                         DBusMessage *msg, void *user_da=
+ta)
+> >  {
+> > @@ -979,8 +963,8 @@ static DBusMessage *register_agent(DBusConnection *=
+conn,
+> >                                                 DBUS_TYPE_INVALID) =3D=
+=3D FALSE)
+> >                 return btd_error_invalid_args(msg);
+> >
+> > -       cap =3D parse_io_capability(capability);
+> > -       if (cap =3D=3D IO_CAPABILITY_INVALID)
+> > +       cap =3D mgmt_parse_io_capability(capability);
+> > +       if (cap =3D=3D MGMT_IO_CAPABILITY_INVALID)
+> >                 return btd_error_invalid_args(msg);
+> >
+> >         agent =3D agent_create(sender, path, cap);
+> > diff --git a/src/agent.h b/src/agent.h
+> > index bd0502030fa0..03731756849c 100644
+> > --- a/src/agent.h
+> > +++ b/src/agent.h
+> > @@ -9,13 +9,6 @@
+> >   *
+> >   */
+> >
+> > -#define IO_CAPABILITY_DISPLAYONLY      0x00
+> > -#define IO_CAPABILITY_DISPLAYYESNO     0x01
+> > -#define IO_CAPABILITY_KEYBOARDONLY     0x02
+> > -#define IO_CAPABILITY_NOINPUTNOOUTPUT  0x03
+> > -#define IO_CAPABILITY_KEYBOARDDISPLAY  0x04
+> > -#define IO_CAPABILITY_INVALID          0xFF
+> > -
+> >  struct agent;
+> >
+> >  typedef void (*agent_cb) (struct agent *agent, DBusError *err,
+> > diff --git a/src/device.c b/src/device.c
+> > index 0ef7dcc244d2..f7a84b807878 100644
+> > --- a/src/device.c
+> > +++ b/src/device.c
+> > @@ -43,6 +43,7 @@
+> >  #include "src/shared/gatt-client.h"
+> >  #include "src/shared/gatt-server.h"
+> >  #include "src/shared/ad.h"
+> > +#include "src/shared/mgmt.h"
+> >  #include "src/shared/timeout.h"
+> >  #include "btio/btio.h"
+> >  #include "bluetooth/mgmt.h"
+> > @@ -3375,7 +3376,7 @@ static DBusMessage *pair_device(DBusConnection *c=
+onn, DBusMessage *msg,
+> >         if (agent)
+> >                 io_cap =3D agent_get_io_capability(agent);
+> >         else
+> > -               io_cap =3D IO_CAPABILITY_NOINPUTNOOUTPUT;
+> > +               io_cap =3D MGMT_IO_CAPABILITY_NOINPUTNOOUTPUT;
+> >
+> >         bonding =3D bonding_request_new(msg, device, bdaddr_type, agent=
+);
+> >
+> > @@ -6544,7 +6545,7 @@ static void att_connect_cb(GIOChannel *io, GError=
+ *gerr, gpointer user_data)
+> >         if (device->bonding->agent)
+> >                 io_cap =3D agent_get_io_capability(device->bonding->age=
+nt);
+> >         else
+> > -               io_cap =3D IO_CAPABILITY_NOINPUTNOOUTPUT;
+> > +               io_cap =3D MGMT_IO_CAPABILITY_NOINPUTNOOUTPUT;
+> >
+> >         err =3D adapter_create_bonding(device->adapter, &device->bdaddr,
+> >                                         device->bdaddr_type, io_cap);
+> > @@ -7452,7 +7453,7 @@ static gboolean device_bonding_retry(gpointer dat=
+a)
+> >         if (bonding->agent)
+> >                 io_cap =3D agent_get_io_capability(bonding->agent);
+> >         else
+> > -               io_cap =3D IO_CAPABILITY_NOINPUTNOOUTPUT;
+> > +               io_cap =3D MGMT_IO_CAPABILITY_NOINPUTNOOUTPUT;
+> >
+> >         err =3D adapter_bonding_attempt(adapter, &device->bdaddr,
+> >                                 device->bdaddr_type, io_cap);
+> > diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+> > index 6a7eb5798cb8..300abbae1c50 100644
+> > --- a/src/shared/mgmt.c
+> > +++ b/src/shared/mgmt.c
+> > @@ -81,6 +81,20 @@ struct mgmt_tlv_list {
+> >         uint16_t size;
+> >  };
+> >
+> > +struct arg_table {
+> > +       const char *name;
+> > +       unsigned value;
+> > +};
+> > +
+> > +static const struct arg_table iocap_arguments[] =3D {
+> > +       { "DisplayOnly", MGMT_IO_CAPABILITY_DISPLAYONLY },
+> > +       { "DisplayYesNo", MGMT_IO_CAPABILITY_DISPLAYYESNO },
+> > +       { "KeyboardOnly", MGMT_IO_CAPABILITY_KEYBOARDONLY },
+> > +       { "NoInputNoOutput", MGMT_IO_CAPABILITY_NOINPUTNOOUTPUT },
+> > +       { "KeyboardDisplay", MGMT_IO_CAPABILITY_KEYBOARDDISPLAY },
+> > +       { NULL, 0}
+> > +};
+> > +
+> >  static void destroy_request(void *data)
+> >  {
+> >         struct mgmt_request *request =3D data;
+> > @@ -1039,3 +1053,21 @@ uint16_t mgmt_get_mtu(struct mgmt *mgmt)
+> >
+> >         return mgmt->mtu;
+> >  }
+> > +
+> > +uint8_t mgmt_parse_io_capability(const char *capability)
+> > +{
+> > +       const char *arg;
+> > +       int index =3D 0;
+> > +
+> > +       if (!strcmp(capability, ""))
+> > +               return MGMT_IO_CAPABILITY_KEYBOARDDISPLAY;
+> > +
+> > +       while ((arg =3D iocap_arguments[index].name)) {
+> > +               if (!strncmp(arg, capability, strlen(capability)))
+> > +                       return iocap_arguments[index].value;
+> > +
+> > +               index++;
+> > +       }
+> > +
+> > +       return MGMT_IO_CAPABILITY_INVALID;
+> > +}
+> > diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
+> > index 2629fbd59cf6..a4c30075f7b7 100644
+> > --- a/src/shared/mgmt.h
+> > +++ b/src/shared/mgmt.h
+> > @@ -13,6 +13,14 @@
+> >
+> >  #define MGMT_VERSION(v, r) (((v) << 16) + (r))
+> >
+> > +#define MGMT_IO_CAPABILITY_DISPLAYONLY         0x00
+> > +#define MGMT_IO_CAPABILITY_DISPLAYYESNO                0x01
+> > +#define MGMT_IO_CAPABILITY_KEYBOARDONLY                0x02
+> > +#define MGMT_IO_CAPABILITY_NOINPUTNOOUTPUT     0x03
+> > +#define MGMT_IO_CAPABILITY_KEYBOARDDISPLAY     0x04
+> > +#define MGMT_IO_CAPABILITY_INVALID             0xFF
+>=20
+> Perhaps this should be an enum to ensure things like switch statements
+> do check for unhandled values.
 
-You are the one hardcoding here. The code actually uses the
-sk_sndtimeo to determine how long it should wait for connect to
-complete which is set by default with sk->sk_sndtimeo =3D
-L2CAP_CONN_TIMEOUT, L2CAP_CONN_TIMEOUT is msecs_to_jiffies(40000) so
-it actually higher than what you are setting, so I suspect it is the
-userspace socket that is setting it to 2 seconds not the kernel.
+also done. But now using an enum in src/adapter.h requires also including
+"src/shared/mgmt.h" in every file where src/adapter.h is used. I've made
+all these changes, but maybe we should really think about include guards.
 
->
->
->
->   hci_req_init(&req, hdev);
->
->
->
-> @@ -1301,7 +1301,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev=
- *hdev, bdaddr_t *dst,
->
->   conn->dst_type =3D dst_type;
->
->   conn->sec_level =3D BT_SECURITY_LOW;
->
->   conn->pending_sec_level =3D sec_level;
->
-> - conn->conn_timeout =3D conn_timeout;
->
-> + conn->conn_timeout =3D msecs_to_jiffies(20000);
->
->   conn->conn_reason =3D conn_reason;
->
->
->
->   hci_update_background_scan(hdev);
->
-> --
->
-> 2.34.1
->
-> This email message (including its attachments) is confidential and may co=
-ntain privileged information and is intended solely for the use of the indi=
-vidual and/or entity to whom it is addressed. If you are not the intended r=
-ecipient of this e-mail you may not disseminate, distribute or copy this e-=
-mail (including its attachments), or any part thereof. If this e-mail is re=
-ceived in error, please notify the sender immediately by return e-mail and =
-make sure that this e-mail (including its attachments), and all copies ther=
-eof, are immediately deleted from your system. Please further note that whe=
-n you communicate with us via email or visit our website we process your pe=
-rsonal data. See our privacy policy for more information about how we proce=
-ss it: https://www.volvogroup.com/en-en/privacy.html
+Shall I resubmit the whole series or do you want to pick the fine commits
+first?
 
-Looks like your corporate email server is mangling the patch, use git
-send-email with gmail (or any other email server that don't mangle the
-patches), git am will preserve the email you configured in git config.
+regards,
+Christian
 
---=20
-Luiz Augusto von Dentz
+>=20
+> > +
+> > +
+> >  typedef void (*mgmt_destroy_func_t)(void *user_data);
+> >
+> >  struct mgmt;
+> > @@ -89,3 +97,5 @@ bool mgmt_unregister_index(struct mgmt *mgmt, uint16_=
+t index);
+> >  bool mgmt_unregister_all(struct mgmt *mgmt);
+> >
+> >  uint16_t mgmt_get_mtu(struct mgmt *mgmt);
+> > +
+> > +uint8_t mgmt_parse_io_capability(const char *capability);
+> > --
+> > 2.51.0
+> >
+> >
+>=20
+>=20
+>=20
+
+
+
+
