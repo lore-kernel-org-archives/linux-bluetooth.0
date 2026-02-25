@@ -1,210 +1,167 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453082D3ED2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 19:19:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D52F3ECBC9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 19:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772047194; cv=none; b=TnyZ7RulnhwlwbUNh63H9R+AzMGp7jGf2CUexltoi/IvAdK51bQ/yl1dpCAGgw8mGvvTVODTfXzLw0EViX2RGzwFwIbRhh2aLV4L4P+YMkjeJfg48ZUn/sp5olAkbRBKPLYaTSm59IoIN9q1wMP6MW3Gq2z3wG4AQ8D7hinPX5Q=
+	t=1772049507; cv=none; b=DaPK027jR5rvg2pdZtdkZpSTXuxu4YFlRi+WZtXbln2WgLP42QR2zFML5YYk4ADe4CZbJwurRKQekfqwAB1hMueN4OyPyT1gxxT/nAI/GG+lGRVLgFQW/MUu2PJNJL3Vb5axpj2b6nGvU4ZFEt1/+fL9PRt7ZULYOLcKX4L9obs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772047194; c=relaxed/simple;
-	bh=es0nRDta2z4CDBICJb2FrkNVsBS05hR8iWJ4YQMdpx8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ETCMNfck/WWTYKgoB6npPssGwRbE0h2GxXcDXx391ebR/7xNvI7Ce1Q7A4g0vac+9NNQWKiBW3L2nkkOvzlGvT06zgr2aozb/w0Imt7sI+e3iA6cG/k90079bqT1Jk2V/fbdvN2CiWe7k14SdQCC5ELzKvbZ7qQGbjWCzWj4ftU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NVybxzYP; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1772049507; c=relaxed/simple;
+	bh=WkUFTJtEz7dV8gtyIcn8aMI5f2FyVSzZb7zN5d/3tq8=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=AYpNioWHRE4qeSIK27t9ezdsYaHxJMqIGSzq6upgZpUd3KXSae2KxoefZB16l4W5B2TnA7/VRO9+RBgHgEi2pgXnji+so5mKiec6vRhBCoKPKVD62j/rd5FhTbtVw/PH1bZpDsnb4RwljJ/myIaO4TnwcxnC6+5k4nwiS+3oB64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GsHwI2C4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NVybxzYP"
-Received: from github.com (hubbernetes-node-e6fac74.ash1-iad.github.net [10.56.155.40])
-	by smtp.github.com (Postfix) with ESMTPA id 87CB01411B7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 11:19:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1772047192;
-	bh=wCbJdzWadU95zNwtF6yqWwXo2voIcz9mXlAEeM7AC0I=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=NVybxzYPKBhZaQBuTh1PZXJgDu1HSP21YzJPL0+/Lgynw2p8yL3WEuD++teGedMBf
-	 knW/IOEMzFM2v7DiiydHCuknNexkpuWMEUYEk35ojo0tAqqUuwHlf/xoZJxp89s73G
-	 +t8d05gBia31fucxbPikclFIwGUIy74wIQL4Jrxc=
-Date: Wed, 25 Feb 2026 11:19:52 -0800
-From: Christian Eggers <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GsHwI2C4"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D04DDC116D0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 19:58:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772049506;
+	bh=WkUFTJtEz7dV8gtyIcn8aMI5f2FyVSzZb7zN5d/3tq8=;
+	h=From:To:Subject:Date:From;
+	b=GsHwI2C4Ih9FAcnssxAAq5e+BRdcr+t8B60t1otMscCRKjJA2nwuOWU49FwNF9rNk
+	 RekPft6VsiduAG4dS4W1Wh2R+Jx3dzHxAHXpP2c7L35IPdsK6LKeOu1ZaIp/0b0CV0
+	 MKAe8dfO+QP3ylSxTesI+AAYyhM1cC+18dz8WftkpHL7y+OBpXKtYHz6CLFHZ9i98T
+	 nr1NI9MFjRsc10sGRHJUyAfUDT7xSK3MPGtoGlJgHFUCKt7RKvWv9nD4skgpDd6AND
+	 VWCftwjP1hUbzE8wWPHkXJ669rFKWyEDjJs3wS2pvQ3bC88idIXnYLDcxhqLO1Kfmn
+	 IzqwgFxtZkPIA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id C12F1C433E1; Wed, 25 Feb 2026 19:58:26 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/a96f5f-bf52d6@github.com>
-Subject: [bluez/bluez] 451fff: client/mgmt: fix compiler error
+Subject: [Bug 221140] New: 0000:00:14.7 btintel_pcie ibt-0190-0291 HP
+ Omnibook Ultra Flip 14
+Date: Wed, 25 Feb 2026 19:58:26 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: paolo.baruffa@protonmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-221140-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 451fff520c8a02dd8d45c9c676a206d1c06b5325
-      https://github.com/bluez/bluez/commit/451fff520c8a02dd8d45c9c676a20=
-6d1c06b5325
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2026-02-25 (Wed, 25 Feb 2026)
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221140
 
-  Changed paths:
-    M client/mgmt.c
+            Bug ID: 221140
+           Summary: 0000:00:14.7 btintel_pcie ibt-0190-0291 HP Omnibook
+                    Ultra Flip 14
+           Product: Drivers
+           Version: 2.5
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: paolo.baruffa@protonmail.com
+        Regression: No
 
-  Log Message:
-  -----------
-  client/mgmt: fix compiler error
+There are some problems on loading of bluetooth firmware on HP Omnibook Ult=
+ra
+Flip 14
 
-client/mgmt.c: In function =E2=80=98str2bytearray=E2=80=99:
-client/mgmt.c:2385:23: error: comparison of integer expressions of
-different signedness: =E2=80=98unsigned int=E2=80=99 and =E2=80=98long in=
-t=E2=80=99
-[-Werror=3Dsign-compare]
- 2385 |                 if (i >=3D *val_len) {
-      |                       ^~
+Here's the dmesg error:
 
+[    8.684465] Bluetooth: Core ver 2.22
+[    8.684492] NET: Registered PF_BLUETOOTH protocol family
+[    8.684494] Bluetooth: HCI device and connection manager initialized
+[    8.684498] Bluetooth: HCI socket layer initialized
+[    8.684500] Bluetooth: L2CAP socket layer initialized
+[    8.684503] Bluetooth: SCO socket layer initialized
+[    8.709513] Bluetooth: hci0: Device revision is 0
+[    8.709518] Bluetooth: hci0: Secure boot is enabled
+[    8.709519] Bluetooth: hci0: OTP lock is disabled
+[    8.709520] Bluetooth: hci0: API lock is enabled
+[    8.709520] Bluetooth: hci0: Debug lock is disabled
+[    8.709521] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[    8.709522] Bluetooth: hci0: Bootloader timestamp 2023.33 buildtype 1 bu=
+ild
+45995
+[    8.710085] Bluetooth: hci0: Found device firmware:
+intel/ibt-0190-0291-iml.sfi
+[    8.710089] Bluetooth: hci0: Boot Address: 0x30098800
+[    8.710090] Bluetooth: hci0: Firmware Version: 15-3.26
+[    8.786307] Bluetooth: hci0: Waiting for firmware download to complete
+[    8.786311] Bluetooth: hci0: Firmware loaded in 74436 usecs
+[    8.788788] Bluetooth: hci0: Waiting for device to boot
+[    8.788790] Bluetooth: hci0: Device booted in 2413 usecs
+[    8.788790] Bluetooth: hci0: Waiting for device transition to d0
+[    8.788790] Bluetooth: hci0: Device moved to D0 in 0 usecs
+[    8.788940] Bluetooth: hci0: dsbr: enable: 0x01 value: 0x0b
+[    8.792639] Bluetooth: hci0: Found device firmware:
+intel/ibt-0190-0291-pci.sfi
+[    8.792648] Bluetooth: hci0: Boot Address: 0x10000800
+[    8.792649] Bluetooth: hci0: Firmware Version: 15-3.26
+[   10.947311] Bluetooth: hci0: command 0xfc09 tx timeout
+[   10.947406] Bluetooth: hci0: Failed to send firmware data (-110)
+[   10.947458] Bluetooth: hci0: Firmware download retry count: 1
+[   10.993178] Bluetooth: hci0: Device revision is 0
+[   10.993184] Bluetooth: hci0: Secure boot is enabled
+[   10.993186] Bluetooth: hci0: OTP lock is disabled
+[   10.993187] Bluetooth: hci0: API lock is enabled
+[   10.993188] Bluetooth: hci0: Debug lock is disabled
+[   10.993190] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[   10.993193] Bluetooth: hci0: Bootloader timestamp 2023.33 buildtype 1 bu=
+ild
+45995
+[   10.993615] Bluetooth: hci0: Found device firmware:
+intel/ibt-0190-0291-iml.sfi
+[   10.993619] Bluetooth: hci0: Boot Address: 0x30098800
+[   10.993623] Bluetooth: hci0: Firmware Version: 15-3.26
+[   11.053096] Bluetooth: hci0: Waiting for firmware download to complete
+[   11.053108] Bluetooth: hci0: Firmware loaded in 58096 usecs
+[   11.055474] Bluetooth: hci0: Waiting for device to boot
+[   11.055483] Bluetooth: hci0: Device booted in 2288 usecs
+[   11.055486] Bluetooth: hci0: Waiting for device transition to d0
+[   11.055488] Bluetooth: hci0: Device moved to D0 in 1 usecs
+[   11.055789] Bluetooth: hci0: dsbr: enable: 0x01 value: 0x0b
+[   11.062520] Bluetooth: hci0: Found device firmware:
+intel/ibt-0190-0291-pci.sfi
+[   11.062551] Bluetooth: hci0: Boot Address: 0x10000800
+[   11.062554] Bluetooth: hci0: Firmware Version: 15-3.26
+[   12.513763] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   12.513766] Bluetooth: BNEP filters: protocol multicast
+[   12.513768] Bluetooth: BNEP socket layer initialized
+[   13.251304] Bluetooth: hci0: command 0xfc09 tx timeout
+[   13.251322] Bluetooth: hci0: Failed to send firmware data (-110)
+[   13.251406] Bluetooth: hci0: Received gp1 mailbox interrupt
+[   13.251450] Bluetooth: hci0: MSFT supported features length mismatch
 
-  Commit: 9648dbaa8d01090353c7987a709ab9c6ba5bda3c
-      https://github.com/bluez/bluez/commit/9648dbaa8d01090353c7987a709ab=
-9c6ba5bda3c
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2026-02-25 (Wed, 25 Feb 2026)
+kernel version: 6.18.9
+linux-firmware version: 20260221-1
 
-  Changed paths:
-    M tools/btgatt-client.c
-    M tools/btgatt-server.c
+The only fix found for now is resetting the bluetooth device with this scri=
+pt:
 
-  Log Message:
-  -----------
-  tools: btgatt-client/-server: replace ATT_CID with 'shared' BT_ATT_CID
+#!/bin/sh
+echo 1 > /sys/bus/pci/devices/0000:00:14.7/remove
+sleep 1
+echo 1 > /sys/bus/pci/rescan
 
-Avoid multiple definitions of the same value.
+--=20
+You may reply to this email to add a comment.
 
-
-  Commit: 7617732fd20b39144e9a430e625a071af4f2225c
-      https://github.com/bluez/bluez/commit/7617732fd20b39144e9a430e625a0=
-71af4f2225c
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2026-02-25 (Wed, 25 Feb 2026)
-
-  Changed paths:
-    M src/adapter.c
-    M src/device.c
-
-  Log Message:
-  -----------
-  src: replace ATT_CID with 'shared' BT_ATT_CID
-
-Avoid multiple definitions of the same value.
-
-
-  Commit: 5767a7dded4f7b8424d8f803f9ae84a3cacba259
-      https://github.com/bluez/bluez/commit/5767a7dded4f7b8424d8f803f9ae8=
-4a3cacba259
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2026-02-25 (Wed, 25 Feb 2026)
-
-  Changed paths:
-    M peripheral/gatt.c
-
-  Log Message:
-  -----------
-  peripheral: replace ATT_CID with shared BT_ATT_CID
-
-Avoid multiple definitions of the same value.
-
-
-  Commit: cd6a809f7b43b00f3e05f4c46ffa74756aaa2a7d
-      https://github.com/bluez/bluez/commit/cd6a809f7b43b00f3e05f4c46ffa7=
-4756aaa2a7d
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2026-02-25 (Wed, 25 Feb 2026)
-
-  Changed paths:
-    M attrib/att.h
-    M attrib/gatttool.c
-    M attrib/interactive.c
-    M attrib/utils.c
-
-  Log Message:
-  -----------
-  attrib: replace ATT_CID with 'shared' BT_ATT_CID
-
-Avoid multiple definitions of the same value.
-
-
-  Commit: 776f9062c8450bb9b37297f1f01c0c9800dfdc91
-      https://github.com/bluez/bluez/commit/776f9062c8450bb9b37297f1f01c0=
-c9800dfdc91
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2026-02-25 (Wed, 25 Feb 2026)
-
-  Changed paths:
-    M attrib/att.h
-    M src/device.c
-
-  Log Message:
-  -----------
-  src: replace ATT_PSM with 'shared' BT_ATT_PSM
-
-Avoid multiple definitions of the same value.
-
-
-  Commit: d5c85b052eeaf34dec1b2e85144615c7b99d0af2
-      https://github.com/bluez/bluez/commit/d5c85b052eeaf34dec1b2e8514461=
-5c7b99d0af2
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2026-02-25 (Wed, 25 Feb 2026)
-
-  Changed paths:
-    M tools/btgatt-server.c
-
-  Log Message:
-  -----------
-  tools: btgatt-server: remove unused member 'fd'
-
-
-  Commit: c8a7462f34907248a6259e8a26b79baaa1f7245b
-      https://github.com/bluez/bluez/commit/c8a7462f34907248a6259e8a26b79=
-baaa1f7245b
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2026-02-25 (Wed, 25 Feb 2026)
-
-  Changed paths:
-    M lib/bluetooth/l2cap.h
-    M tools/l2test.c
-
-  Log Message:
-  -----------
-  l2test: add comment to -F <fcs> option
-
-Clarify that this option has affect for BR/EDR sockets only. Use defines
-instead of magic numbers.
-
-
-  Commit: bf52d63014fb68ba027629118837a8031abfeff4
-      https://github.com/bluez/bluez/commit/bf52d63014fb68ba027629118837a=
-8031abfeff4
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2026-02-25 (Wed, 25 Feb 2026)
-
-  Changed paths:
-    M tools/l2test.c
-
-  Log Message:
-  -----------
-  l2test: small improvements for deferred setup
-
-- don't pass arbitrary option values to the kernel (the kernel only
-checks for zero / non-zero)
-- centralize authorization of new connections in listen()
-- improve documentation of command line option
-
-
-Compare: https://github.com/bluez/bluez/compare/a96f5f4eba9a...bf52d63014=
-fb
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+You are receiving this mail because:
+You are the assignee for the bug.=
