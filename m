@@ -1,127 +1,149 @@
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013013.outbound.protection.outlook.com [40.107.159.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECC43D646B;
-	Wed, 25 Feb 2026 17:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F783D6684
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 17:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.181
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772039312; cv=fail; b=Ns11/+i9i3IEBeqQzMLsPvZXyw+br2L4cGwdlXfXgageXEkPzCGt/GMl4s4nPX5A/2SMSxR0q8+QyT0f9rznL3njLpoIit+eGWm8HDqH4ipACIXa1HQNCY+MLbEopDouVu+pIOuLJ/FxYAlgVorMwIGSAZVvxpOPkNos00shhsI=
+	t=1772039687; cv=pass; b=irp+6ph1gYpDULg/O6pJcAc3j8FOcPzVAXiOGCJh+TRhxt+cBi7/RbHUJ2lwGKEpV68uo4avVzASj3LzRVmXidwjpeXWslEoaQrjh1Vaq5Dyba7pTIE8rnfFLTGVL7ePi+hbrVNYsoBqSBUANDFhc7MmbX8RC1Z205H1o/WHdRk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772039312; c=relaxed/simple;
-	bh=INSxnBghFi64KwSdyWilPJXq6rQEkJlTN6ZWPLv5+sE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y1+xGwG5RfUL7EfohQpeIl98vfpKUyNgESoM5tAR1QoCuIyLCbb6UmJJZIMIXyRlP8aA5in/fr9OhHbKinZjndEUIXW+t1xUvGUTnTGAR4gMC78AN36Vav0hyeNNIQY3Izbo6TMLJgOd+uw0hj7ULTMsGbtwk7rTfmbpfU4FPgI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=cmr3eHZx; arc=fail smtp.client-ip=40.107.159.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+	s=arc-20240116; t=1772039687; c=relaxed/simple;
+	bh=G9XeQd+PkYiumoPZ//vz9gkebQiRZ6DTiC3+eewkCsI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZhpN4NkRITP8Q01/EQ+88w7r81CXOrwU35+mPWORe4r5EyiX5tg/DrRGUcrt+SC6erq0RU4pH3/tl63xhstxcrKydXJRnAACjyK5uRf3ql6qTaC85tlLZYS+0Sone9pjBOxfMSAzAghZ/NE8XxUGdsSjz35suvRXXKoMAni1LBo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZpA4fPlN; arc=pass smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="cmr3eHZx"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JbruQ8knDjMMLL5D7wMj1NKMaSM8BNgkgHrMVyjD7dWC9wRSbBiUdplKrJoEZAlSZWukX/SYp9YORW562a3x3MlBE2b+L8VbRhi+jUS7StPC0ENVdhqywe3U1tISezIve5ZjIng5k+AVkWN9r8Gmqt05E6XxzC5nel9xhF139R4jiSEZv3b0lICTEWg+fQEw2m758XZDW2kUqieDUi0QApdSXoW7kC6H4ezJs9nQHpN1AjACJILk8qywDxqqRrOrxO5BVrkTHQx4G5+59gvlFprSrp+TH5kTuEVh/CTo9ZH87esQetaI5z87N4n5pxqPwXHoje4uf32511Eb7TER8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yYBGgqn4D7m0Bdfw9Fl5wQABvV0qnhvWBjXkq9fEs7g=;
- b=DwQUyVkpaajKKds1E8BhAeip4E0/T3FOYrdz6uP+GOPSS5pOw55MhyV6DhGdKPLu2w5GFiXHWOUxHu4IE9s7eKBhzsWqIi9RCgAWJTFEuSXOjVQzw3/QSSzvuOKiRnd6xGM4xN1Fjpn7YQznepbX3TMwsBWRN+06iJNRkA64VEWiNP0kVYecvgiOb9GWOQG3hJjrcdX/K0Dqh0Gdj/aVysCn2zepiww+Z9WfY+SbWY6IBnjBEfrzgTpU06uw/M4gvgBJ743QBAvYpmUQX4enpDzLiUFiSlOuoYHE3wNn/0en9hXZwFJ2ctfOwj131xQeJF2ZXHj/UhFAzqbWMf3Miw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=holtmann.org smtp.mailfrom=arri.de;
- dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yYBGgqn4D7m0Bdfw9Fl5wQABvV0qnhvWBjXkq9fEs7g=;
- b=cmr3eHZx+JttC7y15MOCQTY03DY9wHjceBmlcQNJS1fdVhtOtXsjyrDE1EOILzWLJnJ1DHpall1714k+ms5BFNdVxfFmBk7rHchVMLuDou95x1wfBeY0VC6mM564q4bjj9Inzrqx+yceqI/5rbXYMKLGUFSU4EtMxfTCNGjG0+Y=
-Received: from AS4P191CA0002.EURP191.PROD.OUTLOOK.COM (2603:10a6:20b:5d5::6)
- by AS8PR03MB7430.eurprd03.prod.outlook.com (2603:10a6:20b:2ef::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Wed, 25 Feb
- 2026 17:08:27 +0000
-Received: from AMS0EPF000001A3.eurprd05.prod.outlook.com
- (2603:10a6:20b:5d5:cafe::8a) by AS4P191CA0002.outlook.office365.com
- (2603:10a6:20b:5d5::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.23 via Frontend Transport; Wed,
- 25 Feb 2026 17:08:24 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- AMS0EPF000001A3.mail.protection.outlook.com (10.167.16.228) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 17:08:25 +0000
-Received: from N9W6SW14.arri.de (10.30.5.38) by mta.arri.de (10.10.18.5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 25 Feb
- 2026 18:08:25 +0100
-From: Christian Eggers <ceggers@arri.de>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	Christian Eggers <ceggers@arri.de>
-Subject: [PATCH 4/4] Bluetooth: SMP: make SM/PER/KDU/BI-04-C happy
-Date: Wed, 25 Feb 2026 18:07:28 +0100
-Message-ID: <20260225170728.30327-4-ceggers@arri.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260225170728.30327-1-ceggers@arri.de>
-References: <20260225170728.30327-1-ceggers@arri.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZpA4fPlN"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-798374d0f44so16913787b3.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 09:14:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772039685; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dp/x3KFRoB1mxZPtGgMRv1No5LXmuyV8/RqeR4Jx4cr22adAVF8Ewo+H3CH5bE4Qgp
+         +EI16KKQfOwYfdF3kS3qh8l+FUv6Mo7K9rh+sbAYeAo8DcXrC7jk+EC1NUJtUG1YpHat
+         0tg9gRp3SRkBWoywM9UZCa7mWO2L/ilhZEekOWnNNxSqUf4Q7t5Ic2QGTeqR1ktS2sF3
+         9lAQVZiRrOWvQACq/0dkG4sEzIGQiR96NbGXGjUPXmpXOlYEszIwzMbXJZcpZE2vvkeX
+         zyFi+x/uWk7kz9bBY4EOSOYSKPGUTbtbgsIaMnlMB82aG2IXLp3DV2zTvLkiA2DbxCRW
+         MOSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=WD4tYb2GEL4uvQV0O+hiYbC+0GLw/+2g89cALZ6+4ZM=;
+        fh=ANo+pce2kMx0aoUf156W/rnC+EPTUoh3qXTjPJNpl0Q=;
+        b=LCJCouocPYhtVVYNFFTcnujEf3ubwFodfBnyJh6lFsJH2Hqzowu83jrtJcSkXkDTGe
+         TV8zxKYF26S94FBN5fRHaLf8KOmtArX3oF7iUEXKC0gAcdggTHQHk12g/4rZ5iTkANHa
+         rB/eCtX0jibINH3MuiBz/oeHEoKfx8MpJ6zaFQtRgL09XvBwGJylfAwhJnYUjLVtQ4Vg
+         GX1MRH+a/PEBzrW0F1HoHh0yj+RLOj8TMhtHzXkUbD+bC+1Dch7QPEP3JsQBZldoUk8Q
+         8GT0sIekORFJkTRx4i9xW3hPgekbOAXVuDJ1yNimz+QC50Hh4QX79m43xu2NpJDn0HrF
+         P8Mw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772039685; x=1772644485; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WD4tYb2GEL4uvQV0O+hiYbC+0GLw/+2g89cALZ6+4ZM=;
+        b=ZpA4fPlNW3sWLJ9hnGBvLpTf3WofIdtQEE6B78CbLALAyNW+ZbwVN7Emhm+ynWZ8qV
+         LSQMvkn+xLBzssaTKV8VGTEPaUQVR+PX1JbbOqvOJkmtzzMnZC9VuSgNpCboeLb+e8J7
+         /z6yQEUYCttSM6ZY2n+aTdfp7cmb7ICc7EsjFRYeSEoNO0lNrDAQZOVk5KZ/+E0uVHDH
+         EV2WUdKdWKl+FZGn/PBcUdb6tiDsehOJHzB3IsduzvSM6obrGQW/MDdHJ47MnoSzdbxn
+         1iHNsvsi6jn0L9YiiST6FuSc5cMREQYAgGpF/c7dOUh9/votbitU1yS5AVRg3t3Phidt
+         aWFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772039685; x=1772644485;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=WD4tYb2GEL4uvQV0O+hiYbC+0GLw/+2g89cALZ6+4ZM=;
+        b=nc8Z4lwj87zzAMh3cMnRuEPtXzVWOuvSQm+TbL9kU/Fyv/Pf07fhePN7iA0sGdkmUV
+         NHNU0fZ0c1JWhVbpXxhjBEkp0dLbgXBO9/tgqBDmwUwvQIUun27//LmptLXoHsOnAXQT
+         S5OeLNQPiKAVTAElCtTv8BcH3o+5xQcS+Uone+FA/O0B6mS1VZ+9SHSccTk+K4mwX5BR
+         r45QLddgD73CvuP+/L2nO75lnpy0InZYwAggE5wdIlHaAYk6EGgS+iO8M8X6wDtHE3Bq
+         ILqHIFexa6N07vyw/FgrSLt87ashqjY1b36jVKeQ0TfLIoUitNvT5AGCZlZBSkAaO2pu
+         rr5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVz/NyYljfgxr4AOiZVldJlg+EedOjQAz5gIAQeO5w4a7T+lM/aIFTTky9uwh5WBclmFLNkQsGbcsGbddCR3eg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZTO+APAZj2XBUrCfDXPn8m2wbijhRz9Y7989U34M+B7xvyOV4
+	s2Sybb4Kb4ziEKVmKbEHiyEe0DVqPb5CownmjQU1R8ehMgiOf+8fh4ns4HG8z2aAY6TIPK+znLT
+	4JYujc5fKcZBHMAksRc8ihZoIEJ6tbIc=
+X-Gm-Gg: ATEYQzzrYagp0vbLIa1qyb1AP4XzCA8lZEKXHcsjAKymJDZZk0Z03ck6Osnu0jsCYWV
+	+8pLlgq/JfZlsns9o2V7sPYAp3EQLETL/xFq0BLC+FLRBaDdPbYp3/crXhNbJLI2hSp2OkftrT5
+	RT1godNDfxiRR2PM4zL0WfHt4sFW5zvIm11lQ5gZQ4sHKQJuMmiPYC1gexD0UrJVkqDDLJ5TDmS
+	V4Bfn4dMDYp5hmz4dgShQk2wj1lt8yjdRyGnZnHGLKrOAoHikRyuTR+ACy+E5kpprHYguDnUf3l
+	bb2Pj5RVOEeIrAIxibClisbr8ks2YpE7YqZC+tr4ecj3fi3Prxy8SfqpP00vBDGa/sg=
+X-Received: by 2002:a53:ee43:0:b0:644:4eec:22a with SMTP id
+ 956f58d0204a3-64ca60dc51emr2870116d50.2.1772039685172; Wed, 25 Feb 2026
+ 09:14:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF000001A3:EE_|AS8PR03MB7430:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ab0769d-aa12-4ee9-334e-08de74907d2b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	akNA+soz8mgz8Qcm5LP3MoBkbqPnE13865GPQlk8bo05BXHCVjMvu+JryLKAFKwVlEDA+jTSkb2tvXBcMhOJ0ptaRiKdlXp1zdr3K2FNtLQ6REx4QabFHW1Wyj10vcsNSahHb0U6Q/IjJv2KIxjYIx83U16XOW3Ek//we2so7uj6d6DtToa2JRfB8Qya55H48oZqk4e7boyTkVKMhwqDumC0WgH2l1KuV7VzXZ4c3oAtVkBC28YIn29aCNOIWe15lsfCk2OdSM3Sk/PbiE0OCUsZdgucyaAIxemrfhtpGkepFQYus1nqGTDTsM4whPvW0mYWw9qfoUbyrxw7CntVHd8vIFFxO/E1KvJcvdBdwQ/QSHpZRK+zB2cY+Aj8WYNcd01uWtEsCelUfxSPOBM1OSJXCvgSYEl9wjjwyxOZbaVNJK37589Y6x2WdYgpbUQ2xzpMIsR+NRzSqs6nayXvp2RXm6e+I4X/PpAeQIotUv+4moitja3+HcwBSu0XBM0xz3YnfMSKF2zF773FyuWHgk1cS2WHTCtBwl96/AnxWpByrJexSdNS5IHYh3c5Kh8MMdt6RGQf++xmtZ7NI6QFXpX61fKb3B46s0M+cit0hoYW1PSD4Ypv9aMgSOrtpGAIADUZ+aMmlcK0GwLyVC/BYlU11UEa4dp75k+lc+viBP/ufo03jdYCXgLWHntFF44nSL6dcX1GkrZYYQuR1zU0yFr8c0Lvc1ZxMmUJZVuBNpG/5kyCEGbFpgC2OW124zzgrE16Saq02XzRtinOSTsv6wM8P2Rx7Nx0rBkAelG74nTF1Gwk01y2gjg+uzej35TV4l43GWqOwndqILwKTLaDXg==
-X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	yrlFaIkrguOcKKyFOO89QuptU3CLlngYFf1UdxY6o6lfsLD9WQaRtVtSeMbMr638WtAcCFNJSKJu4UscuLBvkvDXVhyNEHocKXet+sL7213fPzLZgLNKsofX2xI+FoDWJJz8oy28RbAykGdpHt+QrhcOfreTADIs4nvZlEdzAeiGS1IPqM7j0QC4K4yvEwnT8AErrDJ7vGwejSijL5N6+kGauevY6x3mx0hrhOGYxi1VCzGH6shN1NOy+4NIUhYEDWYd2/ERboFF7fGrsse6qfif4H4x6/O36hQSqpeYhT9trjQbyUyYq+F07dW1mQIb/1gkPZhVL41Jhqm0T9QsDLv8scvRcYc4lFK5zbLVObU3gM9h7YCLz4m+PUm83S5xrRA5mnz2BtTTnuATOJYnj2b0a9duorZdpJLXgS/LPMuAKPjhntYHxY1sh6MIgfj1
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 17:08:25.6856
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ab0769d-aa12-4ee9-334e-08de74907d2b
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS0EPF000001A3.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR03MB7430
+References: <20260225170728.30327-1-ceggers@arri.de>
+In-Reply-To: <20260225170728.30327-1-ceggers@arri.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 25 Feb 2026 12:14:33 -0500
+X-Gm-Features: AaiRm50cWadyPcnl-D43367XooQbns1JJYchHYyNZNIb5KyxK8BaUb-7FHYSsd4
+Message-ID: <CABBYNZKnnVLiCRCJBwJQtqazsZ8_56dCpM4oCQvPbutxP9sKBg@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Bluetooth: L2CAP: CoC: Disconnect if received
+ packet's SDU exceeds IMTU
+To: Christian Eggers <ceggers@arri.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The last test step ("Test with Invalid public key X and Y, all set to
-0") expects to get an "DHKEY check failed" instead of "unspecified".
+Hi Christian,
 
-Signed-off-by: Christian Eggers <ceggers@arri.de>
----
- net/bluetooth/smp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Feb 25, 2026 at 12:07=E2=80=AFPM Christian Eggers <ceggers@arri.de>=
+ wrote:
+>
+> Core 6.0, Vol 3, Part A, 3.4.3:
+> "If the SDU length field value exceeds the receiver's MTU, the receiver
+> shall disconnect the channel..."
+>
+> This fixes L2CAP/LE/CFC/BV-26-C (running together with 'l2test -r -P
+> 0x0027 -V le_public -I 100').
+>
+> Signed-off-by: Christian Eggers <ceggers@arri.de>
+> ---
+>  net/bluetooth/l2cap_core.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 2dcc5bb907b8..ddac5b9270bf 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -6664,6 +6664,7 @@ static int l2cap_ecred_data_rcv(struct l2cap_chan *=
+chan, struct sk_buff *skb)
+>
+>         if (chan->imtu < skb->len) {
+>                 BT_ERR("Too big LE L2CAP PDU");
+> +               l2cap_send_disconn_req(chan, ECONNRESET);
+>                 return -ENOBUFS;
+>         }
+>
+> @@ -6690,6 +6691,7 @@ static int l2cap_ecred_data_rcv(struct l2cap_chan *=
+chan, struct sk_buff *skb)
+>
+>                 if (sdu_len > chan->imtu) {
+>                         BT_ERR("Too big LE L2CAP SDU length received");
+> +                       l2cap_send_disconn_req(chan, ECONNRESET);
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index bf61e8841535..6b35645e0996 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -2743,7 +2743,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (!test_bit(SMP_FLAG_DEBUG_KEY, &smp->flags) &&
- 	    !crypto_memneq(key, smp->local_pk, 64)) {
- 		bt_dev_err(hdev, "Remote and local public keys are identical");
--		return SMP_UNSPECIFIED;
-+		return SMP_DHKEY_CHECK_FAILED;
- 	}
- 
- 	memcpy(smp->remote_pk, key, 64);
--- 
-2.44.4
+We might want to update the error to something like ...SDU %d > %d
+disconnecting... so it more descriptive by informing what it received,
+what the maximum expected value is, and that it will disconnect
+because of the error.
 
+>                         err =3D -EMSGSIZE;
+>                         goto failed;
+>                 }
+> --
+> 2.44.4
+>
+
+
+--=20
+Luiz Augusto von Dentz
