@@ -1,149 +1,267 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F783D6684
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 17:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772039687; cv=pass; b=irp+6ph1gYpDULg/O6pJcAc3j8FOcPzVAXiOGCJh+TRhxt+cBi7/RbHUJ2lwGKEpV68uo4avVzASj3LzRVmXidwjpeXWslEoaQrjh1Vaq5Dyba7pTIE8rnfFLTGVL7ePi+hbrVNYsoBqSBUANDFhc7MmbX8RC1Z205H1o/WHdRk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772039687; c=relaxed/simple;
-	bh=G9XeQd+PkYiumoPZ//vz9gkebQiRZ6DTiC3+eewkCsI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZhpN4NkRITP8Q01/EQ+88w7r81CXOrwU35+mPWORe4r5EyiX5tg/DrRGUcrt+SC6erq0RU4pH3/tl63xhstxcrKydXJRnAACjyK5uRf3ql6qTaC85tlLZYS+0Sone9pjBOxfMSAzAghZ/NE8XxUGdsSjz35suvRXXKoMAni1LBo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZpA4fPlN; arc=pass smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A428522157B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 17:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772039887; cv=none; b=DjfVFxr48Fved3UruDJ2nDSclDasfl0BU3ls8YCfQFYkHHGl/I4CtzYeBUkaeQJRtYEv22lzvMHk+hEWg243Qt6mXzPJeSthWKc4H56N1BWjLEYmaA+h84qYpgbvJZQ8PxtV8ALLe02IBVX8R8xnTCM+eHQty/mmjmUPjkdecXA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772039887; c=relaxed/simple;
+	bh=C4MgY4ljlz8bCvROoJA10occUy+7/eKM8E3w5pDxoa0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=g1EzBEBqyfmJSdFMtWgblPZsXxXez1xAUe3S9DWcMadkLCMdX68YS4qMIEPgRopYdpt7bu06grBzuzwIkJKLSVfhFQ++nDl/2xYlPW4NpeQmLkTqWT6Fdbz7/fGb0JAhWvRBWZtLXlS58LS0CXPRfBzQt/4bMMzFkAKGtVPusWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hFVtQRKs; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZpA4fPlN"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-798374d0f44so16913787b3.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 09:14:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772039685; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dp/x3KFRoB1mxZPtGgMRv1No5LXmuyV8/RqeR4Jx4cr22adAVF8Ewo+H3CH5bE4Qgp
-         +EI16KKQfOwYfdF3kS3qh8l+FUv6Mo7K9rh+sbAYeAo8DcXrC7jk+EC1NUJtUG1YpHat
-         0tg9gRp3SRkBWoywM9UZCa7mWO2L/ilhZEekOWnNNxSqUf4Q7t5Ic2QGTeqR1ktS2sF3
-         9lAQVZiRrOWvQACq/0dkG4sEzIGQiR96NbGXGjUPXmpXOlYEszIwzMbXJZcpZE2vvkeX
-         zyFi+x/uWk7kz9bBY4EOSOYSKPGUTbtbgsIaMnlMB82aG2IXLp3DV2zTvLkiA2DbxCRW
-         MOSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WD4tYb2GEL4uvQV0O+hiYbC+0GLw/+2g89cALZ6+4ZM=;
-        fh=ANo+pce2kMx0aoUf156W/rnC+EPTUoh3qXTjPJNpl0Q=;
-        b=LCJCouocPYhtVVYNFFTcnujEf3ubwFodfBnyJh6lFsJH2Hqzowu83jrtJcSkXkDTGe
-         TV8zxKYF26S94FBN5fRHaLf8KOmtArX3oF7iUEXKC0gAcdggTHQHk12g/4rZ5iTkANHa
-         rB/eCtX0jibINH3MuiBz/oeHEoKfx8MpJ6zaFQtRgL09XvBwGJylfAwhJnYUjLVtQ4Vg
-         GX1MRH+a/PEBzrW0F1HoHh0yj+RLOj8TMhtHzXkUbD+bC+1Dch7QPEP3JsQBZldoUk8Q
-         8GT0sIekORFJkTRx4i9xW3hPgekbOAXVuDJ1yNimz+QC50Hh4QX79m43xu2NpJDn0HrF
-         P8Mw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772039685; x=1772644485; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WD4tYb2GEL4uvQV0O+hiYbC+0GLw/+2g89cALZ6+4ZM=;
-        b=ZpA4fPlNW3sWLJ9hnGBvLpTf3WofIdtQEE6B78CbLALAyNW+ZbwVN7Emhm+ynWZ8qV
-         LSQMvkn+xLBzssaTKV8VGTEPaUQVR+PX1JbbOqvOJkmtzzMnZC9VuSgNpCboeLb+e8J7
-         /z6yQEUYCttSM6ZY2n+aTdfp7cmb7ICc7EsjFRYeSEoNO0lNrDAQZOVk5KZ/+E0uVHDH
-         EV2WUdKdWKl+FZGn/PBcUdb6tiDsehOJHzB3IsduzvSM6obrGQW/MDdHJ47MnoSzdbxn
-         1iHNsvsi6jn0L9YiiST6FuSc5cMREQYAgGpF/c7dOUh9/votbitU1yS5AVRg3t3Phidt
-         aWFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772039685; x=1772644485;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WD4tYb2GEL4uvQV0O+hiYbC+0GLw/+2g89cALZ6+4ZM=;
-        b=nc8Z4lwj87zzAMh3cMnRuEPtXzVWOuvSQm+TbL9kU/Fyv/Pf07fhePN7iA0sGdkmUV
-         NHNU0fZ0c1JWhVbpXxhjBEkp0dLbgXBO9/tgqBDmwUwvQIUun27//LmptLXoHsOnAXQT
-         S5OeLNQPiKAVTAElCtTv8BcH3o+5xQcS+Uone+FA/O0B6mS1VZ+9SHSccTk+K4mwX5BR
-         r45QLddgD73CvuP+/L2nO75lnpy0InZYwAggE5wdIlHaAYk6EGgS+iO8M8X6wDtHE3Bq
-         ILqHIFexa6N07vyw/FgrSLt87ashqjY1b36jVKeQ0TfLIoUitNvT5AGCZlZBSkAaO2pu
-         rr5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVz/NyYljfgxr4AOiZVldJlg+EedOjQAz5gIAQeO5w4a7T+lM/aIFTTky9uwh5WBclmFLNkQsGbcsGbddCR3eg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZTO+APAZj2XBUrCfDXPn8m2wbijhRz9Y7989U34M+B7xvyOV4
-	s2Sybb4Kb4ziEKVmKbEHiyEe0DVqPb5CownmjQU1R8ehMgiOf+8fh4ns4HG8z2aAY6TIPK+znLT
-	4JYujc5fKcZBHMAksRc8ihZoIEJ6tbIc=
-X-Gm-Gg: ATEYQzzrYagp0vbLIa1qyb1AP4XzCA8lZEKXHcsjAKymJDZZk0Z03ck6Osnu0jsCYWV
-	+8pLlgq/JfZlsns9o2V7sPYAp3EQLETL/xFq0BLC+FLRBaDdPbYp3/crXhNbJLI2hSp2OkftrT5
-	RT1godNDfxiRR2PM4zL0WfHt4sFW5zvIm11lQ5gZQ4sHKQJuMmiPYC1gexD0UrJVkqDDLJ5TDmS
-	V4Bfn4dMDYp5hmz4dgShQk2wj1lt8yjdRyGnZnHGLKrOAoHikRyuTR+ACy+E5kpprHYguDnUf3l
-	bb2Pj5RVOEeIrAIxibClisbr8ks2YpE7YqZC+tr4ecj3fi3Prxy8SfqpP00vBDGa/sg=
-X-Received: by 2002:a53:ee43:0:b0:644:4eec:22a with SMTP id
- 956f58d0204a3-64ca60dc51emr2870116d50.2.1772039685172; Wed, 25 Feb 2026
- 09:14:45 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hFVtQRKs"
+Received: from github.com (hubbernetes-node-82bc4b2.va3-iad.github.net [10.48.13.39])
+	by smtp.github.com (Postfix) with ESMTPA id C74A7E1412
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 09:18:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1772039885;
+	bh=ZRchbOocArfoiTxzagtSIngGIYShGEaZXh13XIfKOuM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=hFVtQRKsEuRqinC1wcuCAWgI8mmgfqSdQ4kS86QEwaIG5yeFdgWVrIZPJ4E5bKNxp
+	 cNgtO2RCJWkyh66gFwivq5+RqmxqoeQWjqUqhpQnqzfN8qw3VuduzRUAtvkKWBu+0S
+	 ZHYTuss5n2fyNteZzqgUev15GW0vPBQpWcZS+gz8=
+Date: Wed, 25 Feb 2026 09:18:05 -0800
+From: Christian Eggers <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1057897/000000-22a0cb@github.com>
+Subject: [bluez/bluez] e3b913: client/mgmt: fix compiler error
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260225170728.30327-1-ceggers@arri.de>
-In-Reply-To: <20260225170728.30327-1-ceggers@arri.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 25 Feb 2026 12:14:33 -0500
-X-Gm-Features: AaiRm50cWadyPcnl-D43367XooQbns1JJYchHYyNZNIb5KyxK8BaUb-7FHYSsd4
-Message-ID: <CABBYNZKnnVLiCRCJBwJQtqazsZ8_56dCpM4oCQvPbutxP9sKBg@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Bluetooth: L2CAP: CoC: Disconnect if received
- packet's SDU exceeds IMTU
-To: Christian Eggers <ceggers@arri.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Christian,
+  Branch: refs/heads/1057897
+  Home:   https://github.com/bluez/bluez
+  Commit: e3b913c5749a3c2c9bd6b94b2e3270cccd22ecac
+      https://github.com/bluez/bluez/commit/e3b913c5749a3c2c9bd6b94b2e327=
+0cccd22ecac
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
 
-On Wed, Feb 25, 2026 at 12:07=E2=80=AFPM Christian Eggers <ceggers@arri.de>=
- wrote:
->
-> Core 6.0, Vol 3, Part A, 3.4.3:
-> "If the SDU length field value exceeds the receiver's MTU, the receiver
-> shall disconnect the channel..."
->
-> This fixes L2CAP/LE/CFC/BV-26-C (running together with 'l2test -r -P
-> 0x0027 -V le_public -I 100').
->
-> Signed-off-by: Christian Eggers <ceggers@arri.de>
-> ---
->  net/bluetooth/l2cap_core.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 2dcc5bb907b8..ddac5b9270bf 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -6664,6 +6664,7 @@ static int l2cap_ecred_data_rcv(struct l2cap_chan *=
-chan, struct sk_buff *skb)
->
->         if (chan->imtu < skb->len) {
->                 BT_ERR("Too big LE L2CAP PDU");
-> +               l2cap_send_disconn_req(chan, ECONNRESET);
->                 return -ENOBUFS;
->         }
->
-> @@ -6690,6 +6691,7 @@ static int l2cap_ecred_data_rcv(struct l2cap_chan *=
-chan, struct sk_buff *skb)
->
->                 if (sdu_len > chan->imtu) {
->                         BT_ERR("Too big LE L2CAP SDU length received");
-> +                       l2cap_send_disconn_req(chan, ECONNRESET);
+  Changed paths:
+    M client/mgmt.c
 
-We might want to update the error to something like ...SDU %d > %d
-disconnecting... so it more descriptive by informing what it received,
-what the maximum expected value is, and that it will disconnect
-because of the error.
+  Log Message:
+  -----------
+  client/mgmt: fix compiler error
 
->                         err =3D -EMSGSIZE;
->                         goto failed;
->                 }
-> --
-> 2.44.4
->
+client/mgmt.c: In function =E2=80=98str2bytearray=E2=80=99:
+client/mgmt.c:2385:23: error: comparison of integer expressions of
+different signedness: =E2=80=98unsigned int=E2=80=99 and =E2=80=98long in=
+t=E2=80=99
+[-Werror=3Dsign-compare]
+ 2385 |                 if (i >=3D *val_len) {
+      |                       ^~
 
 
---=20
-Luiz Augusto von Dentz
+  Commit: 473e7bf48989dd9947a212aba862430b69e58e26
+      https://github.com/bluez/bluez/commit/473e7bf48989dd9947a212aba8624=
+30b69e58e26
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M tools/btgatt-client.c
+    M tools/btgatt-server.c
+
+  Log Message:
+  -----------
+  tools: btgatt-client/-server: replace ATT_CID with 'shared' BT_ATT_CID
+
+Avoid multiple definitions of the same value.
+
+
+  Commit: 38fec54e72381961bf9f2815285bc611b8d6a7b9
+      https://github.com/bluez/bluez/commit/38fec54e72381961bf9f2815285bc=
+611b8d6a7b9
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M src/adapter.c
+    M src/device.c
+
+  Log Message:
+  -----------
+  src: replace ATT_CID with 'shared' BT_ATT_CID
+
+Avoid multiple definitions of the same value.
+
+
+  Commit: dfc1947986c120c066a8206824b27c9cbbad574b
+      https://github.com/bluez/bluez/commit/dfc1947986c120c066a8206824b27=
+c9cbbad574b
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M peripheral/gatt.c
+
+  Log Message:
+  -----------
+  peripheral: replace ATT_CID with shared BT_ATT_CID
+
+Avoid multiple definitions of the same value.
+
+
+  Commit: e11aecc6e1b267afb6eb90d84f2454458f80f624
+      https://github.com/bluez/bluez/commit/e11aecc6e1b267afb6eb90d84f245=
+4458f80f624
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M attrib/att.h
+    M attrib/gatttool.c
+    M attrib/interactive.c
+    M attrib/utils.c
+
+  Log Message:
+  -----------
+  attrib: replace ATT_CID with 'shared' BT_ATT_CID
+
+Avoid multiple definitions of the same value.
+
+
+  Commit: 17b3369d77fd97ebd01fc350ae10a2d3d7b0b07e
+      https://github.com/bluez/bluez/commit/17b3369d77fd97ebd01fc350ae10a=
+2d3d7b0b07e
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M attrib/att.h
+    M src/device.c
+
+  Log Message:
+  -----------
+  src: replace ATT_PSM with 'shared' BT_ATT_PSM
+
+Avoid multiple definitions of the same value.
+
+
+  Commit: eaefdefa0d413cb4abfc2d363614eecfb8a90662
+      https://github.com/bluez/bluez/commit/eaefdefa0d413cb4abfc2d363614e=
+ecfb8a90662
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M tools/btgatt-server.c
+
+  Log Message:
+  -----------
+  tools: btgatt-server: remove unused member 'fd'
+
+
+  Commit: 918d0c739ab43c0c4305c7a05100382a8edfbb4e
+      https://github.com/bluez/bluez/commit/918d0c739ab43c0c4305c7a051003=
+82a8edfbb4e
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M lib/bluetooth/l2cap.h
+    M tools/l2test.c
+
+  Log Message:
+  -----------
+  l2test: add comment to -F <fcs> option
+
+Clarify that this option has affect for BR/EDR sockets only. Use defines
+instead of magic numbers.
+
+
+  Commit: c85f68b3bc2d883ebbd285bd54eda1d0f571833e
+      https://github.com/bluez/bluez/commit/c85f68b3bc2d883ebbd285bd54eda=
+1d0f571833e
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M tools/l2test.c
+
+  Log Message:
+  -----------
+  l2test: add comment to -O <omtu> option
+
+Clarify that this option has affect for BR/EDR sockets only.
+
+
+  Commit: 75ee8b37985e73efd560606f9f11377a514d8206
+      https://github.com/bluez/bluez/commit/75ee8b37985e73efd560606f9f113=
+77a514d8206
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M tools/l2test.c
+
+  Log Message:
+  -----------
+  l2test: small improvements for deferred setup
+
+- don't pass arbitrary option values to the kernel (the kernel only
+checks for zero / non-zero)
+- centralize authorization of new connections in listen()
+- improve documentation of command line option
+
+
+  Commit: dea2035ea920e634bebe18b4f64ddaf2bc67c9bc
+      https://github.com/bluez/bluez/commit/dea2035ea920e634bebe18b4f64dd=
+af2bc67c9bc
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M src/adapter.c
+    M src/agent.c
+    M src/agent.h
+    M src/device.c
+    M src/shared/mgmt.c
+    M src/shared/mgmt.h
+
+  Log Message:
+  -----------
+  agent: move defines and parsing for I/O capability to shared/mgnt
+
+Allow reusing in client/mgmt.c (next commit)
+
+
+  Commit: 22a0cb92cd0353a90fd77276f64706757faabf37
+      https://github.com/bluez/bluez/commit/22a0cb92cd0353a90fd77276f6470=
+6757faabf37
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-02-25 (Wed, 25 Feb 2026)
+
+  Changed paths:
+    M client/mgmt.c
+    M src/shared/mgmt.c
+    M src/shared/mgmt.h
+
+  Log Message:
+  -----------
+  client/mgmt: align implementation cmd_io_cap with its documentation
+
+Documentation of io-cap in doc/bluetootctl-mgmt.rst states that the IO
+capability has to passed as string instead of an integer. Additionally
+improve error checking after calling strtol().
+
+
+Compare: https://github.com/bluez/bluez/compare/e3b913c5749a%5E...22a0cb9=
+2cd03
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
