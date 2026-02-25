@@ -1,163 +1,133 @@
-Received: from mail-dy1-f194.google.com (mail-dy1-f194.google.com [74.125.82.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52129350287
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 12:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED170392C27;
+	Wed, 25 Feb 2026 12:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772020813; cv=none; b=NalHEKyiZQsSz/ceGJVWjptBro1D2eEkMR6RBETCW4xjZjTYHkdLAxkBmWdo3RRYGlsNE5i9ILM9H4r4skKdx9sj2ic8oeNJzQ/xsrab9HjtWG0gnsQ9c6eyaCblKQUHPHkXVuUV6wiB2Z2rY60rvycrypajFy33h8kKJVKg538=
+	t=1772022215; cv=none; b=qXQCxPCb/cUx9mdFBpLK4/lEUd90cHDq+nqkX5cCRJVEKrSS8omyvDT+KydeDU18Rz461XRO9GoeduGIgi1FnuMscNzcJ3Kf+tZbblPkpxGnbRdm+G3SkxNtWk5mfbTByTdlzQMTpt0PukZdd+ZIQs7ZcYQlgDW3rEeutf3Oyec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772020813; c=relaxed/simple;
-	bh=vo6a0/xlNk/fvA/8WrlQomGOPTuDBsh2Lcxt7zkldGM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=VjnejGPobaCiwOBpY7JsAjbYhG4ES8sljtwurJvKPuEwVnCbe25RC2f5tNbXBsY7h9qYI/yR3BcaY8Ker115OGc7cRPKXUq8BoDDU22FHS1HHcZxDMqHGWmhrenzhqhirhhf8lPEwurpqWIswIcXBiudbKlioVXGTnN2/EGW6Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SFfsejov; arc=none smtp.client-ip=74.125.82.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772022215; c=relaxed/simple;
+	bh=C7Zenm+BDARl0dby+xvY6F+YytdyD7GpTvVJArMA95Y=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=LiGeFQ09ceKupzvV7UFXaxZArQX0H/IOM1o/fSS6drplRXWk3+OTK923VASBWLH0HJod0jixCQJYOYYE2HaTEq5G1jK/YFEfofp4UmdufFmeGoffzughrqKtM4CRYbv/bkWp55B31C0K/8DRlO5qyDuWjja1ypSFCp3EpvV4YLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W6ZRjqdI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SFfsejov"
-Received: by mail-dy1-f194.google.com with SMTP id 5a478bee46e88-2bdca815fdfso372022eec.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Feb 2026 04:00:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772020811; x=1772625611; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qTk7zQml9lxp+ZyuhcfS9TWrOQs8Zheq0CkHM9lcBYk=;
-        b=SFfsejovyaVUt4A4rlLIcRB9efnVpHU/jScl2OvSU+NBpT2r/XQWaMLx4oT43iTGG8
-         +u7ehv0Q32i95BAxMMv7VbBSU/2Ikuid/QISg0O+KYvtMbKFVMNC/9hx79MI456U1NIb
-         hQUlclhgGYKG7/XjVCnFq3dPeniUJUPkHrjCEYElZC9Tn4ARrWK8eSAu9FNS1vKh27cJ
-         Ow7WiDMsaYsEPKOuV+ZN9s5LYYj/pzlh27l3Fkjt8GuJom1eYnl9HmtJQJLK99leyIPG
-         mT83Sb8V5GuiI7KgHrpZpdldBFI5l5qB6Vcx38olJuXZ57vdEO6b8F36tnBF6d/RiKYl
-         IACQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772020811; x=1772625611;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qTk7zQml9lxp+ZyuhcfS9TWrOQs8Zheq0CkHM9lcBYk=;
-        b=kZsKfqrxqIZeY2Rsh5YZbbEIw0X6uGNL74j46Z1H8mm0ToASK+ILs42ItD5PL5Xtqk
-         1LCneBmgjhipjb+TCY4/jImaYqMX7XIy6vHuKPPIu0AM8tmCv13Fdspo4Low/awx0+Ju
-         cP8vAt86Jy01QiCXvkAPjH9FuRHhuqzOJngNcc19FHs7xrBNyP5+Dzmxzt4jNZ/oSGrk
-         rXJTyI3Jalwx11GELNJbMck/7gF37JZyp+hs6jwsoFJ65hx4PP5E7iTjPoFHj6pFj9sM
-         qo2iHrvUqi2/pxPv3DLwQr6AyxlX5sK7NZ5wC/2Zyn+TJdHjRtorOjJU3Rvfgtby/2Sw
-         ZWsw==
-X-Gm-Message-State: AOJu0YxHUm7ATpwCt6fTMI7HTWRlUxxpfLLxCqg03q3kBpB3M6KPHT3c
-	WHOIwPRuoneOtaMBK4t0jKDGh47dxEd9ykAeJSFvyaVXbVaTZmkdSemBBCekxDfR
-X-Gm-Gg: ATEYQzxKM4VVzjWhWPwXjT/T0c204i72bINHc/7q72p6Xhv6kTdVIUVvtA7dNSuussq
-	KKdGRwXKFfPPCxdkPZxd9nV911Y9MzZghq/FC37ysHIsECN0Lnm5wU8BfbtRKi8CQTB7FrHvSBG
-	9JDD1xbFsIHVSlkhZbwvt650dpKSJtX2l0u4ynx5Tid751Z/NWpFy8Qn11TkLsJqY0aET5xhe0K
-	UVanHsgyNWnYviFS1AjJdTAGAg98Xt5OGLdmBEWdN0IdmhcbieaAqXw1Spcz7IPyk8O73a2ipfS
-	UytLUR/OpNF3DOqiURsfIwddo4m75cxkhicVNlKmKETukENq3Q2JUHiA4ZVmbxfZdnh07KOzIW0
-	MGi6yEV8UY05CLPhtKrF/OWOcgzrf/IeGRJcU0D/5v33IMPJ71ZIjk8ZcRwQxsr5uCEUsbGuIYb
-	M78BBsytW0jLjRKywonnukjcfU0Hkt
-X-Received: by 2002:a05:693c:25c7:b0:2ba:a1a5:b5b1 with SMTP id 5a478bee46e88-2bd7b9efc61mr6187117eec.7.1772020810938;
-        Wed, 25 Feb 2026 04:00:10 -0800 (PST)
-Received: from [172.17.0.2] ([52.234.45.177])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bd7dbe78b9sm8580443eec.18.2026.02.25.04.00.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 04:00:08 -0800 (PST)
-Message-ID: <699ee448.050a0220.3e725.0be2@mx.google.com>
-Date: Wed, 25 Feb 2026 04:00:08 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5047527733837485694=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W6ZRjqdI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4BD7C116D0;
+	Wed, 25 Feb 2026 12:23:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772022214;
+	bh=C7Zenm+BDARl0dby+xvY6F+YytdyD7GpTvVJArMA95Y=;
+	h=From:Subject:Date:To:Cc:From;
+	b=W6ZRjqdIhUXsLeQuw8feYPhc6cGB1+shjpCatqqXnW/EsWRF8zGsAf+P8gCsV69JS
+	 AYfTrudbgYo7cKxc/ADorXEMi5GsDNPBL0gku1I/W7jYFzcNO9l5vTjqePrsniIrZX
+	 DroA//GrkaCrLciryMpAM9/SaDXe7ssVja+Q+aA5YjkKAO/7BV5VQsOOuYIX8oy7bB
+	 AbQsvnWbkStKl6UzaW8Qe8p4sLuSCT/+LdvHQMtThMrbkzM85SC9ih0pR0GCA9ejZE
+	 5lvcInv2KwlHDpBLeIMZBrqqXs54ImzNQ8MFGXJNGmj4w56sk9/1oMZG7N0Iqp+Vu0
+	 yCMVkfFA/rKtw==
+From: Konrad Dybcio <konradybcio@kernel.org>
+Subject: [PATCH v3 00/10] Fix up WCN6855 RFA power supply name
+Date: Wed, 25 Feb 2026 13:23:20 +0100
+Message-Id: <20260225-topic-wcn6855_pmu_dtbdings-v3-0-576ec5c4e631@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: [RESEND,v1,1/2] Bluetooth: btusb: MT7922: Add VID/PID 0e8d/223c
-In-Reply-To: <20260225104136.3943529-1-chris.lu@mediatek.com>
-References: <20260225104136.3943529-1-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5047527733837485694==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/33O0Q6CIBQG4FdxXEfjYCB21Xu01hJQ2RIU1GrOd
+ 490rZvmzdn+/+L7z4SC9kYHdEwm5PVognE2hnSXIFnfbKWxUTEjSigDQgnuXWskfkjLBWPXthm
+ uqi+UsVXAOVXikDJBpU5RBFqvS/Nc8PNlzV53Q9zof2VtQu/8a3lghE+7blHCtrZGwAQDZxyg5
+ CKT4uRC2HfD7S5d0+zjQR99pF+RE4B8U6RR5ApkxjgRRVH8Eed5fgNyhSUVMgEAAA==
+X-Change-ID: 20251020-topic-wcn6855_pmu_dtbdings-92d843582ce3
+To: Jeff Johnson <jeff.johnson@oss.qualcomm.com>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+ Rocky Liao <quic_rjliao@quicinc.com>, 
+ Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, 
+ Bartosz Golaszewski <brgl@kernel.org>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
+ Abel Vesa <abel.vesa@oss.qualcomm.com>, 
+ Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772022207; l=2912;
+ i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
+ bh=C7Zenm+BDARl0dby+xvY6F+YytdyD7GpTvVJArMA95Y=;
+ b=M0W4BCygdBRj+oP2rwNVYFBWtk+sDXJ0eExHNJ1I9Zyh56eFvO40TmsxhZXsa+7mqERo7LSTe
+ wbwxkYQytfTBhQeZ6f1DNyAEbZZI0pM8CMlKpbS31l77ndvU8EfoLPO
+X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
+ pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 
-This is automated email and please do not reply to this email!
+Commit 5f4f954bba12 ("dt-bindings: bluetooth: bring the HW description
+closer to reality for wcn6855") renamed the supply representing the
+VDD17_PMU_RFA leg to mention "1p8" instead.
 
-Dear submitter,
+While the supply's voltage is normally 1.8 V, the bindings should
+reflect the actual naming of the pin. Moreover, almost all DTs define
+the output as 1p7, so that ends up looking a little odd..
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1057705
+Ultimately, this is a "fake" regulator that is consumed for the sake
+of DT sanity and this series is meant to bring uniformity and squash
+checker errors.
 
----Test result---
+The last patch fixes up a less-trivial warning.
+sc8280xp-microsoft-arcata is left out because I don't know whether the
+mounting of the chip is on-board or as an M.2-y card (although I would
+guesstimate the prior).
 
-Test Summary:
-CheckPatch                    PENDING   0.37 seconds
-GitLint                       PENDING   0.32 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      27.23 seconds
-CheckAllWarning               PASS      30.23 seconds
-CheckSparse                   WARNING   34.11 seconds
-BuildKernel32                 PASS      27.28 seconds
-TestRunnerSetup               PASS      583.74 seconds
-TestRunner_l2cap-tester       PASS      29.57 seconds
-TestRunner_iso-tester         PASS      91.76 seconds
-TestRunner_bnep-tester        PASS      6.70 seconds
-TestRunner_mgmt-tester        FAIL      125.37 seconds
-TestRunner_rfcomm-tester      PASS      9.90 seconds
-TestRunner_sco-tester         FAIL      15.20 seconds
-TestRunner_ioctl-tester       PASS      10.89 seconds
-TestRunner_mesh-tester        FAIL      12.54 seconds
-TestRunner_smp-tester         PASS      9.16 seconds
-TestRunner_userchan-tester    PASS      6.97 seconds
-IncrementalBuild              PENDING   0.62 seconds
+Depends on the long-ready-for-the-merge series by Krzysztof (per-chip
+bindings split of qualcomm-bluetooth.yaml), mentioned below
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+---
+Changes in v3:
+- Rebase once more, pick up more tags, it's more than ready to pick up
+- Link to v2: https://lore.kernel.org/r/20260119-topic-wcn6855_pmu_dtbdings-v2-0-6d1c75608bbb@oss.qualcomm.com
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-drivers/bluetooth/btusb.c:4675:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4676:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4678:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4679:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4681:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4682:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4684:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4685:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4687:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4688:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4689:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4690:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4690:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4675:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4676:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4678:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4679:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4681:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4682:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4684:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4685:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4687:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4688:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4689:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4690:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4690:1: error: bad constant expression
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.109 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.295 seconds
-Mesh - Send cancel - 2                               Timed out    1.990 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+Changes in v2:
+- Rebase, drop dependency (in -next now), pick up tags
+- Link to v1: https://lore.kernel.org/r/20251205-topic-wcn6855_pmu_dtbdings-v1-0-165611f687c8@oss.qualcomm.com
 
 ---
-Regards,
-Linux Bluetooth
+Konrad Dybcio (10):
+      dt-bindings: net: bluetooth: qualcomm: Fix WCN6855 regulator names
+      arm64: dts: qcom: qcs615-ride: Fix BT RFA supply name
+      arm64: dts: qcom: sc8280xp-crd: Fix BT RFA supply name
+      arm64: dts: qcom: sc8280xp-gaokun3: Fix BT RFA supply name
+      arm64: dts: qcom: sc8280xp-x13s: Fix BT RFA supply name
+      arm64: dts: qcom: sc8280xp-blackrock: Fix BT RFA supply name
+      arm64: dts: qcom: sm8450-hdk: Fix BT RFA supply name
+      arm64: dts: qcom: x1-omnibook-x14: Fix BT RFA supply name
+      arm64: dts: qcom: x1-zenbook-a14: Fix BT RFA supply name
+      arm64: dts: qcom: lemans-ride-common: Fix up WCN power grid
 
+ .../bindings/net/bluetooth/qcom,wcn6855-bt.yaml    |  7 ++---
+ arch/arm64/boot/dts/qcom/lemans-ride-common.dtsi   | 32 ++++++++++++++++++++++
+ arch/arm64/boot/dts/qcom/qcs615-ride.dts           |  2 +-
+ arch/arm64/boot/dts/qcom/sc8280xp-crd.dts          |  2 +-
+ .../boot/dts/qcom/sc8280xp-huawei-gaokun3.dts      |  2 +-
+ .../dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts     |  2 +-
+ .../boot/dts/qcom/sc8280xp-microsoft-blackrock.dts |  2 +-
+ arch/arm64/boot/dts/qcom/sm8450-hdk.dts            |  2 +-
+ arch/arm64/boot/dts/qcom/x1-hp-omnibook-x14.dtsi   |  2 +-
+ .../boot/dts/qcom/x1p42100-asus-zenbook-a14.dtsi   |  2 +-
+ 10 files changed, 42 insertions(+), 13 deletions(-)
+---
+base-commit: 3ef088b0c5772a6f75634e54aa34f5fc0a2c041c
+change-id: 20251020-topic-wcn6855_pmu_dtbdings-92d843582ce3
 
---===============5047527733837485694==--
+Best regards,
+-- 
+Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+
