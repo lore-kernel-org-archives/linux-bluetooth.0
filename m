@@ -1,178 +1,108 @@
-Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F0044B674
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Feb 2026 21:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7648536C0CE;
+	Fri, 27 Feb 2026 11:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772141207; cv=none; b=anDd3Il+8HgE7r6L4rxSZ+TbdNXA9dlp77SgVH8L/AB1lqSumvmAJJJwBD2hDVNDnSdYsdwrtSfkIzuMfvAfiJ+fyqbcgbGeqS1/7AQItz6fAptjOTJyHW0awnnYYq5C0PjzYmgb0GkggrXKequbahZhTbcJTRbYavJ420AxaCw=
+	t=1772191453; cv=none; b=nPyHLk9rijlLnBnIhmjjI7fW6smHzr1v+V/9feBMteADc4F1esP3pm7ujN4zxMhe1qhafE6AvzXMLmLno6tlqY4xVg/7EscuW2J1Gp4/H4A+SrD5cL2rbA9LMeHd/7/PEHR3qvq7Kn6paI/l5xluKxZMy4er5iGRkEiA9DD+Chk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772141207; c=relaxed/simple;
-	bh=RW8JGDCpIcKrzxIm14OJOWAxuNEpxyXiQWs7i7TT8Gw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DlxQnlR/pqLRNAhIyymj7g/BWETLQ2eVdcqZz08S9hrDNhKcClHTE4VnmQt5eI5hf2vfIisormHrweWi2bxOi6Ze4dI7+walwxVYaAv5RSyhpLCgK/Q+vpjMZZqx8GGjp2hTY63xVhynxuKKN3sMj3JveiqvV13LH9zMJg3rgQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+6pvtTl; arc=none smtp.client-ip=74.125.82.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772191453; c=relaxed/simple;
+	bh=5QjAjo5uDOX1TV4BvMSo0+rPv0iJk3LgL9i77oAwYQE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IlLctEeRkoBuYrp4jEn25m0HnP4o6lAKBpKqETillaFR/U49nTaV0djKMrkzNIbzfudS9QcRkX6kNNHm8AtIOyW6Shwk7MaX2WpM6dHvY6BGFDMar7ciIs4PqZuDEcfiTDVcbXRIlRq2bJk6ua5p/EMMaXJT2Dmmm+9/FukAh1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=zpQOeSZq; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+6pvtTl"
-Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-127380532eeso2894016c88.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Feb 2026 13:26:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772141202; x=1772746002; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mZW5+8bpcp7jCYvU+zOeQTIA2poApqluY8dCQc7PoQk=;
-        b=i+6pvtTlgpxpwVQ6kvtDt2o0qM4Rovu6fFT4Zj5+eaM9apLa+TrOgUyHUc9TWMzgnV
-         +gfHXQJnxK4UNDVEx4FW7OZ0lGOdbSOF0YV4gtAhFzBUuggrmwuD2O2cbCrgFe0wgaQv
-         +Xn1Y2c1uQ9Rl1D6+KDjb9M3MjWReqhL5IIazYmry9t5s1+6oVu14tIbqMQjop9gZRo/
-         j8RknxyMM9oqRmUPgqrCmLNLZiyYwsoef94NWNlwmDl9GM4Ls8q76/Fl+shTERJXLiii
-         2AQHNPm+Lk6AEVqu4WtiQTaTcfBKHF+huIbB60R1gsM0MdldDSYkVTPMpER+aoorJLyi
-         uIJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772141202; x=1772746002;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mZW5+8bpcp7jCYvU+zOeQTIA2poApqluY8dCQc7PoQk=;
-        b=wzeGMJcpWCGVwiaWE4PGa1QgKQFNrDWZuPyWPc48uHstdvopsxYcjbkfiEP4s47dLZ
-         UV8JitWlYsVwqW0f72U+bdDz24K6oupSweqAsZmQfce6iy79tJnPyHmKj8E4SyNW9Q9V
-         hi7q0nEsapx7ug6pd63sDe7I/f7o+c2j8NXmKIPJiXspSnTXMgHz+Kf0FhvwbZB4xqKR
-         UNpJ1V3KyPVvsEJa0WkdNCcftGQf2BBlrh6BuVsh9JDogsj+ccLkjDfbPoR+2IOhjlbo
-         Ivlr4lO0vrqve3dyg5kOW7za+eNEXGyIY9QpiWlaUEZq6dI0MbvsTMcXNURC60DSQsKo
-         fSQw==
-X-Gm-Message-State: AOJu0Yz6ZH8kYJ3FlLrIoixCBYL1wHjK/rbb5XfGfhw54d3+5ASfzMsM
-	ZdHqx0V1zycv7UeaK8ZSG+wKQZVWr3S9mykublqdXXNoTkAAwEnMRg8Sln6AQ2jN
-X-Gm-Gg: ATEYQzxl62IKNS7yx/hzumOamVC4X8d0qnLh0Cs0uCjTPWXksMQwI+ohTFLpjdX4z+5
-	qP+Ef/DAgL7Ff/DFngJbhdf5yIAhpVrWCE3HSMxPCmshjoT0SJ62K61ky/FEHpJzT1fY7AMf0Lx
-	7qWrMk2gsp5R7pGlSoaKt8FQJoc+UIQTXxJubYh8BLlzZGFfHfVEg7oJCbi5pwY0G9IqKPCwAdm
-	I8ZrD8rETR484JPoYo1xhF2xwevpNzDkHEic3DcKoteIVJc7HK0opUfD5E7LIV++4jkclZ5k8cM
-	DBlPGLcINmxpf/oXWu8ciZeuG0A0SX+zJuD8czF++L5tuAwTomKxoq2zC8Qzk9JMJcLaIUJHsOC
-	stn/wVTvLHBf602V0Ygii12WMRjHgJMfd4mKO65dpaZF0PmQUkGy30SLbgh/jCE7u5ndipwH9Rs
-	Rn/zh1BDlAkKRy/F57CHxDTLY7CT5LC79kRx7N
-X-Received: by 2002:a05:7022:a88:b0:11d:e25a:d9ca with SMTP id a92af1059eb24-1278fce01f3mr192153c88.26.1772141202031;
-        Thu, 26 Feb 2026 13:26:42 -0800 (PST)
-Received: from [172.17.0.2] ([68.220.58.2])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12789a32633sm3660146c88.9.2026.02.26.13.26.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 13:26:41 -0800 (PST)
-Message-ID: <69a0ba91.050a0220.4804c.0511@mx.google.com>
-Date: Thu, 26 Feb 2026 13:26:41 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2461959876655827845=="
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="zpQOeSZq"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=88NWIMzdut4wFYMN/IOL9CvyxMsxNH1iWh6cKQMW8xo=;
+	b=zpQOeSZq3Pgz7opP9P+ETO/ttfub9s8ZYPaBefUs15ClqGzFG3X15+YVhcqH7YRRlP9NTq5L4
+	Hri7Yp6d8FEH1FWnjrg1XVHB1VwLzP5hz4KMpgySpkTSckx+m1l7o4G6W4iehC+GEVrkXSUqDlO
+	RRHHXXBZIqmN7JdeIZBGDOw=
+Received: from mail.maildlp.com (unknown [172.19.163.15])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4fMm7957xtzLlTr;
+	Fri, 27 Feb 2026 19:19:17 +0800 (CST)
+Received: from dggpemf100009.china.huawei.com (unknown [7.185.36.128])
+	by mail.maildlp.com (Postfix) with ESMTPS id AFCDC40539;
+	Fri, 27 Feb 2026 19:24:05 +0800 (CST)
+Received: from huawei.com (10.67.175.29) by dggpemf100009.china.huawei.com
+ (7.185.36.128) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 27 Feb
+ 2026 19:24:05 +0800
+From: Wang Tao <wangtao554@huawei.com>
+To: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<zhangqiao22@huawei.com>, <tanghui20@huawei.com>, <wangtao554@huawei.com>
+Subject: [PATCH] Bluetooth: MGMT: Fix list corruption and UAF in command complete handlers
+Date: Fri, 27 Feb 2026 11:03:39 +0000
+Message-ID: <20260227110339.919014-1-wangtao554@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2] Bluetooth: L2CAP: CoC: Disconnect if received packet size exceeds MPS
-In-Reply-To: <20260226204357.361000-1-luiz.dentz@gmail.com>
-References: <20260226204357.361000-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ dggpemf100009.china.huawei.com (7.185.36.128)
 
---===============2461959876655827845==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Commit 302a1f674c00 ("Bluetooth: MGMT: Fix possible UAFs") introduced
+mgmt_pending_valid(), which not only validates the pending command but
+also unlinks it from the pending list if it is valid. This change in
+semantics requires updates to several completion handlers to avoid list
+corruption and memory safety issues.
 
-This is automated email and please do not reply to this email!
+This patch addresses two left-over issues from the aforementioned rework:
 
-Dear submitter,
+1. In mgmt_add_adv_patterns_monitor_complete(), mgmt_pending_remove()
+is replaced with mgmt_pending_free() in the success path. Since
+mgmt_pending_valid() already unlinks the command at the beginning of
+the function, calling mgmt_pending_remove() leads to a double list_del()
+and subsequent list corruption/kernel panic.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1058650
+2. In set_mesh_complete(), the use of mgmt_pending_foreach() in the error
+path is removed. Since the current command is already unlinked by
+mgmt_pending_valid(), this foreach loop would incorrectly target other
+pending mesh commands, potentially freeing them while they are still being
+processed concurrently (leading to UAFs). The redundant mgmt_cmd_status()
+is also simplified to use cmd->opcode directly.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.51 seconds
-GitLint                       PENDING   0.41 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      26.47 seconds
-CheckAllWarning               PASS      28.77 seconds
-CheckSparse                   WARNING   32.37 seconds
-BuildKernel32                 PASS      25.65 seconds
-TestRunnerSetup               PASS      572.31 seconds
-TestRunner_l2cap-tester       FAIL      33.20 seconds
-TestRunner_iso-tester         FAIL      43.43 seconds
-TestRunner_bnep-tester        PASS      6.53 seconds
-TestRunner_mgmt-tester        FAIL      115.20 seconds
-TestRunner_rfcomm-tester      PASS      9.37 seconds
-TestRunner_sco-tester         FAIL      14.74 seconds
-TestRunner_ioctl-tester       PASS      10.20 seconds
-TestRunner_mesh-tester        FAIL      12.42 seconds
-TestRunner_smp-tester         PASS      8.53 seconds
-TestRunner_userchan-tester    PASS      6.57 seconds
-IncrementalBuild              PENDING   0.81 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/l2cap_core.c:7792:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7793:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7795:1: error: bad constant expressionnet/bluetooth/l2cap_core.c:7796:1: error: bad constant expression
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Total: 96, Passed: 94 (97.9%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-L2CAP LE Client - Read 32k Success                   Timed out    2.371 seconds
-L2CAP LE Client - RX Timestamping 32k                Timed out    1.896 seconds
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
-Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.107 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.718 seconds
-Mesh - Send cancel - 2                               Timed out    1.991 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Fixes: 302a1f674c00 ("Bluetooth: MGMT: Fix possible UAFs")
+Signed-off-by: Wang Tao <wangtao554@huawei.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/mgmt.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a7238fd3b03b..d52238ce6a9a 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2195,10 +2195,7 @@ static void set_mesh_complete(struct hci_dev *hdev, void *data, int err)
+ 	sk = cmd->sk;
+ 
+ 	if (status) {
+-		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_MESH_RECEIVER,
+-				status);
+-		mgmt_pending_foreach(MGMT_OP_SET_MESH_RECEIVER, hdev, true,
+-				     cmd_status_rsp, &status);
++		mgmt_cmd_status(cmd->sk, hdev->id, cmd->opcode, status);
+ 		goto done;
+ 	}
+ 
+@@ -5377,7 +5374,7 @@ static void mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev,
+ 
+ 	mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode,
+ 			  mgmt_status(status), &rp, sizeof(rp));
+-	mgmt_pending_remove(cmd);
++	mgmt_pending_free(cmd);
+ 
+ 	hci_dev_unlock(hdev);
+ 	bt_dev_dbg(hdev, "add monitor %d complete, status %d",
+-- 
+2.34.1
 
---===============2461959876655827845==--
