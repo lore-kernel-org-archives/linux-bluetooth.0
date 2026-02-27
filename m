@@ -1,68 +1,135 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D227F3EFD34
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Feb 2026 11:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62302313523
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Feb 2026 11:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772191762; cv=none; b=jxByfnhPX3TCb7XflFJUnEmYULr3utAVfWgResxF/WdGO3rjtt5uCYI6MKzKdq3XXXAg45CH1JFIzBC4emmiTt6THFg2I+weIGlovbIe4Mj/6FNe+nqvNV2y4PSRvFRGNhSso1bfgRWE5mUcw+NR9x4NjHASSOZjm6Zcz/LVTRY=
+	t=1772191911; cv=none; b=jjqtr1QvJXt31dOE+6HbvI8RhTvNfGMRYs9O+HovKVECUruHcLqHacq/1Tt1Vbl5YDGrrgaGUdDRZs9bwx3zQpKEfquwy3G4W+itIRrLQ5H2MGQYxuhsu2PQDHPabQQH7Ie2coXSY0NKzDsVHHcTIqCEdlG22Iifc/AXquzDzEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772191762; c=relaxed/simple;
-	bh=2eh/7FxtbZNCk3td+up9MB2TjMm//7saPQYgYlhx4Z8=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qGc31cXADvLqUyTQAQnbUKIKpHpJFPCfOAL/ZANUA9rmQN36lCXqH+RA29RGn10MTLo74pBi+zbcdQjtxEURoNJT4D/UeEUnuvWZiOR0V7/7WHnrCu+rBE56CKhm8sy7l9JKchWwfDb0+XQmw+EQ0Oe6IGCEAQSpuqPBjbEjJOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
+	s=arc-20240116; t=1772191911; c=relaxed/simple;
+	bh=g9736/J+HcVOoMLHSMw5bkUDwOo1HsQp2CVM4vrG+eo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=D9kTZkviPoFPTw3G8W1AR3sisgN1JuxxVrVX3FJWo8PT42MTsQYh1uoQ03UWrXNb5yEoDdvkXQxCnSYN8CzsuXKhHG133W2qJmjloYaNThROHwRFY1zw13O74cdHLpIvdNWXPHh6sUrwmZQ6lAnRsLfF5uv5c+mEuX3uDAlEzZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8652F4333F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Feb 2026 11:29:09 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 813954388D;
+	Fri, 27 Feb 2026 11:31:40 +0000 (UTC)
+Message-ID: <62306adc1550b46aa164ddb57e8a4167dddeb261.camel@hadess.net>
+Subject: Re: [PATCH BlueZ 2/2] shared/shell: gracefully recover from failed
+ input initialization
 From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] tools: Work-around broken stdin handling in home-made mainloop
-Date: Fri, 27 Feb 2026 12:27:18 +0100
-Message-ID: <20260227112900.1946851-3-hadess@hadess.net>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260227112900.1946851-1-hadess@hadess.net>
-References: <20260227112900.1946851-1-hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Ronan Pigott
+ <ronan@rjp.ie>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 27 Feb 2026 12:31:39 +0100
+In-Reply-To: <cc92dcae7bf3c7832643071df30eb5734097d2d1.camel@hadess.net>
+References: <20260218024605.70890-1-ronan@rjp.ie>
+		 <20260218024605.70890-3-ronan@rjp.ie>
+		 <CABBYNZJqjaDJmkEy0yvyqLXP6kFH-dVjnzcCVknAkpu39zspaA@mail.gmail.com>
+		 <defdb4fb77123ebe7abea7e8f225720e4e72e6c5@rjp.ie>
+		 <CABBYNZLgugMFofwxAV4qFFP=RCnXG22MbcTgdt88ydbkSEKO9Q@mail.gmail.com>
+	 <cc92dcae7bf3c7832643071df30eb5734097d2d1.camel@hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeekkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpedufffhffegveeijeekgfefvdetieekjeduhfelheettdehudfhjeevgeelvdejjeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepkeeihedvhfegfeeffefhpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeekkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepheeifeeivdffgfefgedvtdfhteelveegieetgfehgfdvuedvtedufeetgeelgfeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpghhithhhuhgsrdgtohhmnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepkedufeelheegfeekkeffpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepfedprhgtphhtthhopehluhhiiiguvghnthiisehgmhgri
+ hhlrdgtohhmpdhrtghpthhtoheprhhonhgrnhesrhhjphdrihgvpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 X-GND-State: clean
+X-GND-Score: -100
 
-bluetoothd has 3 mainloop implementations, one relying on ell, one
-relying on glib, and another home-made.
+On Wed, 2026-02-25 at 17:01 +0100, Bastien Nocera wrote:
+> On Wed, 2026-02-18 at 13:45 -0500, Luiz Augusto von Dentz wrote:
+> > Hi Ronan,
+> >=20
+> > On Wed, Feb 18, 2026 at 12:45=E2=80=AFPM Ronan Pigott <ronan@rjp.ie> wr=
+ote:
+> > >=20
+> > > February 18, 2026 at 7:58 AM, "Luiz Augusto von Dentz"
+> > > <luiz.dentz@gmail.com> wrote:
+> > >=20
+> > > > Yeah, the revert part doesn't really fly since
+> > > > e73bf582dae60356641a32fc27ae03d359ec4c47 does fixes a valid
+> > > > issue,
+> > > > that said we do have another proposal under discussion:
+> > > >=20
+> > > > https://patchwork.kernel.org/project/bluetooth/patch/20260217222954=
+.432676-1-larsch@belunktum.dk/
+> > >=20
+> > > Hi Luiz,
+> > >=20
+> > > I'm aware it fixes a valid issue. My hope with the patch is to
+> > > fix
+> > > that same issue in another way.
+> > >=20
+> > > The problem adressed IIUC is that once the input is initialized,
+> > > a
+> > > subsequent epoll_wait would hang
+> > > since the epoll_ctl call had failed to actually add the new event
+> > > source. The reverted patch had
+> > > fixed this by trying to avoid initializing stdin in all cases,
+> > > which inadvertently broke
+> > > bluetoothctl. My suggestion is to revert that change, and instead
+> > > check the return value of
+> > > io_set_read_handler so that we can avoid digging ourselves into a
+> > > deeper hole. Even if bt_shell_printf
+> > > is refactored so that it doesn't require the input fd, which
+> > > sounds
+> > > prudent, I think it probably makes
+> > > sense to check the return values here, so I believe the reverted
+> > > patch would no longer be necessary.
+> > >=20
+> > > I have seen Lars's patch, and that is actually what prompted me
+> > > to
+> > > submit this one. Unfortunately,
+> > > it isn't correct since it causes non-interactive bluetoothctl
+> > > invocations to also print several
+> > > extraneous lines relating to the interactive shell.
+> >=20
+> > Feel free to git a review to Lars's patch; hopefully, that will
+> > help
+> > us get this resolved quicker. We might as well create a unit test
+> > for
+> > shell to try to emulate different modes and environments. That way,
+> > we
+> > prevent introducing regressions like this in the future.
+>=20
+> I wrote one, which I can integrate into meson.
+>=20
+> This starts "btvirt" (so requires root), launches bluetoothd if there
+> isn't a daemon already running, and launches "bluetoothctl list".
+>=20
+> You can run it manually with:
+> $ sudo top_builddir=3D/path/to/bluez/builddir/ ./integration-test.py
+>=20
+> If "bluetoothctl list" doesn't output any text, the test errors out.
+> I've tested that pointing the bluetoothctl_path() output at an old
+> version of bluetoothctl worked.
+>=20
+> This pattern of using Python to create test suites using python-
+> dbusmock is something I've already used in PolicyKit, upower, power-
+> profiles-daemon, gnome-bluetooth and many other places.
+>=20
+> This test is pretty heavy-handed if we just want to test whether
+> bluetoothctl outputs things correctly, but it has the benefit of
+> testing the emulator as well as bluetoothd. We could start adding
+> more
+> tests to the mix, such as creating more adapters, pairing them, etc.
+>=20
+> Hopefully, this is a useful test to run on CIs, although I'm probably
+> missing spawning a system bus on top of everything else.
 
-The home-made mainloop handler use epoll() without any fallbacks, and
-will hang if one tries to epoll() an stdin that redirects from
-/dev/null.
+I've integrated tests for both bugs (no output in 5.86 and btmgmt
+hanging) into the integration tests at:
+https://github.com/hadess/bluez/commits/wip/hadess/add-integration-tests/
 
-Closes: https://github.com/bluez/bluez/issues/700
----
- Makefile.tools | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile.tools b/Makefile.tools
-index 589f7c94f9df..7c52e053ffee 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -531,8 +531,8 @@ tools_obexctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
- 
- tools_btmgmt_SOURCES = tools/btmgmt.c src/uuid-helper.c client/display.c \
- 			client/mgmt.c
--tools_btmgmt_LDADD = lib/libbluetooth-internal.la src/libshared-mainloop.la \
--				-lreadline
-+tools_btmgmt_LDADD = lib/libbluetooth-internal.la src/libshared-glib.la \
-+				$(GLIB_LIBS) -lreadline
- if DEPRECATED
- noinst_PROGRAMS += attrib/gatttool
- 
--- 
-2.53.0
-
+and I've independently tested that both problems were fixed by the
+patches I sent to the list this instant.
