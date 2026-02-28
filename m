@@ -1,57 +1,57 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8D41CEACB
-	for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 08:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32703E8C6F
+	for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 08:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772268847; cv=none; b=t/wthxSO1VkS7rf5SCBboPXlOnx3AZjCPMi/NVcl16kC4Rp/sgDNBRE06dNDGAPErA9f817dMXXVvuva/AcyEQzDxwyrGIjlxmWx2fNb500IkrM5HbhUWmpL5Hdu0Vl664ZdiuJ7C4T2QDxzXWNWqjP8hDE2Z0OWYWP45lFlWbg=
+	t=1772268848; cv=none; b=nfGGKyollV9uz3GBJVsRLLNQkzS+zHa1GoeLfEV6WuAzK+vDPC1CiBnFXXAAy8ZMCYOSFFDBrUkKBWgZABc3Wz8EXzAuLqpD2unwkUWlieDuAzTt9BMvBis/CZIcrzxX2oQD3m8jAE4Qia9R5ACKvHyVWh+/5ma/mLSFBiFhJow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772268847; c=relaxed/simple;
-	bh=v6sdt6KqCsa9pSpcbRXQ6sdkkZu+XjoKZx2rgNDfFTQ=;
+	s=arc-20240116; t=1772268848; c=relaxed/simple;
+	bh=1u5wXeQsC2BUklEy4+AMQOqDvMM4CDqnApcWtCU/r+w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OUSwPFH3+8gAsAz48BvAhMRFvS/iZZGBQhRxQ22/ENS0diI3QI7nLgct25vvvsUB93VYMrL/pf4Xvp8NGYCfsE0+o9dfad7D3Uy0HL0jf7ii8u1s0yqc3V8B4+mDTsL5UxY00gKOpj6Z8AaNx3axe8pNWkcEr5ACrfj+z75L7QU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PU/90NIn; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=JZa5daF5TAYlrrszlJE7aAHS0We0cOJiMawJvwOuNV0avGfAWI4oNGz53lSxRWDMHmQ13tu4PxrLrJ+lhxjEH8Er1mBG0r9i13kxE2iYmVjJPC8CaOSwKUTxAiVIFqEhBWKibgNK8JsxEgzDybTzTRiglquHNHbL33Nl1O14EVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jK5unwVI; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PU/90NIn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jK5unwVI"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772268846; x=1803804846;
+  t=1772268847; x=1803804847;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=v6sdt6KqCsa9pSpcbRXQ6sdkkZu+XjoKZx2rgNDfFTQ=;
-  b=PU/90NInLor5yBUroGKoXolS3l+0A8dT40MNtZ4WOrLF7Sjr0fS/MfNc
-   0KD0/7dVsJsNR7FKPJSlVklS5d9O+XgaE5joXoJD4OqUcErNqfbwSqkF0
-   fz+AdbaSmfFlWJkrtCOLrcFZMV62sCZ20j6/u1THMEkwN1O66H5YFGjFC
-   SFWctNmEdWBMetli8l/RXuc/9WUtv8b/p7hdQZZRMbKagT2fpd51BSf3t
-   0XFRI4N9IiYRSG8kqAw6kfrBfR2VeEWUg5c19V7nhtXtBxjd8o1Nw5fSx
-   P8z497UmD070+SwAI/0ZDIy4tFIUjG18PiU22OKseq/HPi1/qimHazVr5
-   g==;
-X-CSE-ConnectionGUID: K/TldFN/Rxu6TdWpqqnWjQ==
-X-CSE-MsgGUID: xTRhhKxJQ/SO+IWNO4wonw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11714"; a="77189235"
+  bh=1u5wXeQsC2BUklEy4+AMQOqDvMM4CDqnApcWtCU/r+w=;
+  b=jK5unwVIQahEJ88USb/ab4Pu4gdaM7GYzho2I/tZLu/fdle1Iq0OtPJ9
+   IIxMmlJYxk2TdVvuR8bG4Uzr52BsA6eHH5SpFF1E1iBK2VjXiLJnvX/jL
+   HPUCBXp/akwt+hIJhNEia0krWiinSB9wUX/2TL10tV+DQH9Roqugpxvx6
+   c88KuhzEICNod4DfEBgn6ENXZfQVABa/R09SYejw/y8R+++tVE7xyIdoT
+   wpnuP1fqAGaDsfhwjh2IsJRHsg7w44rSJxPKPsKDTIesZuIrMFSMCwmOs
+   IhPM1AtXj31iu+QAGEJsIzpe+7BzuAmxN0bKKgU+fe7E6epcb2m8tZzPV
+   Q==;
+X-CSE-ConnectionGUID: XdR58584TwOxbttYiqr4Bw==
+X-CSE-MsgGUID: JHSe4w26T72FzQSIeP/1Sw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11714"; a="77189237"
 X-IronPort-AV: E=Sophos;i="6.21,315,1763452800"; 
-   d="scan'208";a="77189235"
+   d="scan'208";a="77189237"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2026 00:54:05 -0800
-X-CSE-ConnectionGUID: rod6OnnTQ7Cy4/T3iZTPHA==
-X-CSE-MsgGUID: rwhgTIGwSaqGDaFUKzFmzg==
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2026 00:54:07 -0800
+X-CSE-ConnectionGUID: 5P8pR5QNSzeJa4aG7YEm3Q==
+X-CSE-MsgGUID: ka17FyefSbyFolciiOIFQw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,315,1763452800"; 
-   d="scan'208";a="221630142"
+   d="scan'208";a="221630145"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orviesa004.jf.intel.com with ESMTP; 28 Feb 2026 00:54:03 -0800
+  by orviesa004.jf.intel.com with ESMTP; 28 Feb 2026 00:54:05 -0800
 From: Kiran K <kiran.k@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: ravishankar.srivatsa@intel.com,
 	chandrashekar.devegowda@intel.com,
 	chethan.tumkur.narayan@intel.com,
 	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v3 2/9] Bluetooth: btintel: Replace CNVi id with hardware variant
-Date: Sat, 28 Feb 2026 14:42:32 +0530
-Message-ID: <20260228091239.230284-2-kiran.k@intel.com>
+Subject: [PATCH v3 3/9] Bluetooth: btintel: Add support for Scorpious Peak2 support
+Date: Sat, 28 Feb 2026 14:42:33 +0530
+Message-ID: <20260228091239.230284-3-kiran.k@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260228091239.230284-1-kiran.k@intel.com>
 References: <20260228091239.230284-1-kiran.k@intel.com>
@@ -63,77 +63,54 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use hardware variant instead of CNVi to send dsbr command.
+Add support for Intel Bluetooth Scorpious Peak2 core.
 
 Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- drivers/bluetooth/btintel.c | 18 +++++++++---------
- drivers/bluetooth/btintel.h |  7 +++++++
- 2 files changed, 16 insertions(+), 9 deletions(-)
+ drivers/bluetooth/btintel.c      | 3 +++
+ drivers/bluetooth/btintel_pcie.c | 1 +
+ 2 files changed, 4 insertions(+)
 
 diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 5999be2efef8..2547b590f87a 100644
+index 2547b590f87a..26aa8ea7d33e 100644
 --- a/drivers/bluetooth/btintel.c
 +++ b/drivers/bluetooth/btintel.c
-@@ -2813,31 +2813,31 @@ static int btintel_set_dsbr(struct hci_dev *hdev, struct intel_version_tlv *ver)
- 
- 	struct btintel_dsbr_cmd cmd;
- 	struct sk_buff *skb;
--	u32 dsbr, cnvi;
--	u8 status;
-+	u32 dsbr;
-+	u8 status, hw_variant;
- 	int err;
- 
--	cnvi = ver->cnvi_top & 0xfff;
-+	hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
- 	/* DSBR command needs to be sent for,
- 	 * 1. BlazarI or BlazarIW + B0 step product in IML image.
- 	 * 2. Gale Peak2 or BlazarU in OP image.
- 	 * 3. Scorpious Peak in IML image.
- 	 */
- 
--	switch (cnvi) {
--	case BTINTEL_CNVI_BLAZARI:
--	case BTINTEL_CNVI_BLAZARIW:
-+	switch (hw_variant) {
-+	case BTINTEL_HWID_BZRI:
-+	case BTINTEL_HWID_BZRIW:
- 		if (ver->img_type == BTINTEL_IMG_IML &&
- 		    INTEL_CNVX_TOP_STEP(ver->cnvi_top) == 0x01)
- 			break;
- 		return 0;
--	case BTINTEL_CNVI_GAP:
--	case BTINTEL_CNVI_BLAZARU:
-+	case BTINTEL_HWID_GAP:
-+	case BTINTEL_HWID_BZRU:
- 		if (ver->img_type == BTINTEL_IMG_OP &&
- 		    hdev->bus == HCI_USB)
- 			break;
- 		return 0;
--	case BTINTEL_CNVI_SCP:
-+	case BTINTEL_HWID_SCP:
- 		if (ver->img_type == BTINTEL_IMG_IML)
- 			break;
- 		return 0;
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 431998049e68..b7ff183f8886 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -69,6 +69,13 @@ struct intel_tlv {
- 
- #define BTINTEL_FWID_MAXLEN 64
- 
-+/* CNVi Hardware variant */
-+#define BTINTEL_HWID_GAP	0x1c	/* Gale Peak2 - Meteor Lake */
-+#define BTINTEL_HWID_BZRI	0x1e	/* BlazarI - Lunar Lake */
-+#define BTINTEL_HWID_BZRU	0x1d	/* BlazarU - Meteor Lake */
-+#define BTINTEL_HWID_SCP	0x1f	/* Scorpius Peak - Panther Lake */
-+#define BTINTEL_HWID_BZRIW	0x22	/* BlazarIW - Wildcat Lake */
-+
- struct intel_version_tlv {
- 	u32	cnvi_top;
- 	u32	cnvr_top;
+@@ -497,6 +497,7 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
+ 	case 0x1d:	/* BlazarU (BzrU) */
+ 	case 0x1e:	/* BlazarI (Bzr) */
+ 	case 0x1f:      /* Scorpious Peak */
++	case 0x20:	/* Scorpious Peak2 */
+ 	case 0x22:	/* BlazarIW (BzrIW) */
+ 		break;
+ 	default:
+@@ -3318,6 +3319,7 @@ void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
+ 	case 0x1d:
+ 	case 0x1e:
+ 	case 0x1f:
++	case 0x20:
+ 	case 0x22:
+ 		hci_set_msft_opcode(hdev, 0xFC1E);
+ 		break;
+@@ -3659,6 +3661,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 	case 0x1d:
+ 	case 0x1e:
+ 	case 0x1f:
++	case 0x20:
+ 	case 0x22:
+ 		/* Display version information of TLV type */
+ 		btintel_version_info_tlv(hdev, &ver_tlv);
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 5442a6af5cca..308482d0c581 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2100,6 +2100,7 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
+ 	switch (INTEL_HW_VARIANT(ver_tlv.cnvi_bt)) {
+ 	case 0x1e:	/* BzrI */
+ 	case 0x1f:	/* ScP  */
++	case 0x20:	/* ScP2 */
+ 	case 0x22:	/* BzrIW */
+ 		/* Display version information of TLV type */
+ 		btintel_version_info_tlv(hdev, &ver_tlv);
 -- 
 2.43.0
 
