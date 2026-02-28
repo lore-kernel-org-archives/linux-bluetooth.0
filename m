@@ -1,99 +1,172 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035B9350295
-	for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 08:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9086B20D4E9
+	for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 09:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772268859; cv=none; b=GcyXlT9AT3u5gpqPukgpzfsT/LZkFNj0zIxkaSyMNvwD/wPIEBBUsT/gQFSg3wZUQz2XBgIRsJMlsWadH56qHDQMrxoVeLQni9//ClijDi1qQ8hWpmqyGAgojnE8d2awt+D7nNJkTOSj4Sq+h+pta4dqL9CWIt/z4y9lsZ2znJI=
+	t=1772271855; cv=none; b=GkbC4iMpPeNtwKhl7Q1ShqFP1Uh243hs+DwMwYu3dOfuuW64KbnOFyelS/xT0pyXWHbtqpfgt8w9DbV9EkKI3NMDN2pXX3drmFk+tWpCZOidu+N4pRJzEnGtpox8QOBXmH0TOORBwVdf3Eh4aosZ3Kw3kkFpOR8qY46DUYuGG5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772268859; c=relaxed/simple;
-	bh=7fYfhOiNkahL5AU+qPNzZkzZMCwRiCSfs0oXStuwqSY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k6I+6NmCpCN9zV0LIQd5b0D2hnUKy7adfvsnhJ71dTfrv9YeMKdibzUOLMInsrVFkPeEdGTgPrQec7rKghPdK2Nba1wZMSRK1r6lOE4c1YsmFjaoedYxzLHGBgRvfAQa6Vnfg0Misziv8OIm9dKE1TVh+lT93vAXMvhtJdL3bjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A82DCDk/; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1772271855; c=relaxed/simple;
+	bh=aZvDCwciVrNSqT/FUcIOcP0xvFANuWs/JEvNFT5Y0sc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=dXnSiYQHqM2X8pCge4CRwYr1U+W+PZz1W9n5zYPb0QLGa+RaZGT6GKfKU3FlMoU5u95INvrsv4hw0UuoMBX1WAnU6YbgOpgIe9bn3MezHof0KocZ+BFM4d2FSn064h9sEwVZsBeYbFfgdKPG1oDE4UCwPUMHEuzUUQDG6z08xI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CQYpiqor; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A82DCDk/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772268859; x=1803804859;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7fYfhOiNkahL5AU+qPNzZkzZMCwRiCSfs0oXStuwqSY=;
-  b=A82DCDk/DnrKmuYwALSv7GXMKbhyJKdCcqvTQPiA4uKem26RNHFxjzWq
-   wrT+yjlr0yY2LwQq5T670RnZMgD94ufKHPLYXPG20qJ25vqX+7ur4lvpJ
-   E/STfMV8ISG7J3BWLzkCAHRbURxO81RMX9TsYD7cbcmrYU+GdtvKueBcq
-   76HnurAuxFfPRSRT+rL2810uo9fFMAo5I4Uu7BvTouqD1jM2fafZt1Ejp
-   SpwKUc7WasGhn8WWw2SRcI++uK3Aa1gR6K5+kSZOtFSJ+18l5F1OqHx/G
-   gYhxyGShFeu4+lFFQ2716gZ8woNeSjamLLfO4S404d23tPMqZCQ17WjuP
-   w==;
-X-CSE-ConnectionGUID: 7VJl7FwNScuYQYAhKuf2wg==
-X-CSE-MsgGUID: IWupWKjXQBO8ZiS41Cg/VQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11714"; a="77189248"
-X-IronPort-AV: E=Sophos;i="6.21,315,1763452800"; 
-   d="scan'208";a="77189248"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2026 00:54:18 -0800
-X-CSE-ConnectionGUID: NAjwMYBNRwSH2tahA+jsJA==
-X-CSE-MsgGUID: Jrdyr53BQbqM5bcR9pCl9g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,315,1763452800"; 
-   d="scan'208";a="221630166"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orviesa004.jf.intel.com with ESMTP; 28 Feb 2026 00:54:16 -0800
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chandrashekar.devegowda@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v3 9/9] Bluetooth: btintel_pcie: Add device id of Scorpious2, Nova Lake-PCD-S
-Date: Sat, 28 Feb 2026 14:42:39 +0530
-Message-ID: <20260228091239.230284-9-kiran.k@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260228091239.230284-1-kiran.k@intel.com>
-References: <20260228091239.230284-1-kiran.k@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CQYpiqor"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-506c00df428so28404851cf.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 01:44:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772271853; x=1772876653; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9FoERd9ZghRkFw4Sh8IQ8gad4Dc0XgJ96YVSnnhjayU=;
+        b=CQYpiqorfLuypFicnJBX+t8F7GgKEZGlQ62FsqnzyAqxKGAd8lPU/cT8LeZTBgfq+7
+         xfdsC3fAbO1fhlUvH/QdZx/nqeY69R6Z7kglX+VHIJnXmeWUEcZ76Xin/SOIArggSKrX
+         fz2ciOwlB7+EqlzoSgbFezyNY+moQzynY3dkq7afhPweAVdlNYmE6ZwtCOpJCZpEOE8z
+         8w+hMea8MxTZMg8/lV7h1aU5Ym1I2rewCfGoAU6EztwhdR9orY4T/wmYsYkIdSk9ND5n
+         T9SSBASt3a7+Zny0Lss/dPAeMrQw0nFV76CxBXlTPuOiItV3HSPtUjKrHmmx18rdxnwj
+         x2FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772271853; x=1772876653;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9FoERd9ZghRkFw4Sh8IQ8gad4Dc0XgJ96YVSnnhjayU=;
+        b=phH+1Oau5wnNqb/IC2oSwmbestXNKLAS2UxiC2tkxtaDi7VXPOkDndQ242R02PeBhm
+         j6+hF7Lyx02glwuoicYX5a2PTwm3GwwtXeWJIL2bqVEV5+oB4Oe4UQ+C7F39n4V6qnqm
+         oQnj8qSXcNGg1DJcx3m4klimqSlcUCHQ2xT2fVWbQsZLnJlaJLxuzxnn/qM/0GGSU17b
+         iuV30IAWwWgCTh/005Hghpq8akvpZvOd2LU8Vg2+Ap4Ns0LVSk32daMnzCaf9u3M1hRi
+         u9nkzXFslFSA9BoCiBnfuRecaw62WsM+azFcqMWZEvdbSDiMer3fNXTlqqr9Tf2usI+S
+         1vgA==
+X-Gm-Message-State: AOJu0YwEf1tgvwaul26Bi3qOJ4dQNc0b7B74YSheTDsLEZKM5bP5BbGc
+	cB/d0ePaxuJHfSJZptvLubXC91x+KIMhxO2cgOU7m/oPun6Lo+nN+XC2hnAGVw==
+X-Gm-Gg: ATEYQzwEAz9d8HWi6XxACDujuXMw6CW1dXwdIH/T0KxlyAWS7111VfR16I2DNT2lVmn
+	Rpmb8xgY0w8TlNZShAOsv0zbygjBSq/j4X3IxJPf9uuNprL/h3x0SUfdEPy1mG9W9tknRpNzpdV
+	Oz2V3FV3LwnHUt44fJMNTMP3/HaMSRrEOvt4+K1PHSv50MaMCYsZ6iFr6/CabZBKSineAgClmI7
+	BLRLrmipbYU/45/czgDbbNzmfZiReAwJSWNkCTBi3jchRXUVtwQxf0GUcW8PCCD0F9DEW9PEuy0
+	7En/qZUicpR4AskJS2Lhe0BdrdPRbO3BBougx27JBS8NfQ/gQVoSxBIwQrg9WD3+S0LX4QkLK2o
+	M+EXLkW55GoeGzlmrs4knK8b3FKrYRMGbfvH1vEReRLDbNIGsRPPeLaFmEiXNmH711BAGYw9l3p
+	hnJykDp3FGYtwnr9UUQuILrjPwUWQW
+X-Received: by 2002:a05:622a:288:b0:4ee:2721:9ebe with SMTP id d75a77b69052e-5075293a93emr70008471cf.53.1772271853117;
+        Sat, 28 Feb 2026 01:44:13 -0800 (PST)
+Received: from [172.17.0.2] ([20.109.38.166])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-507451cda23sm69176821cf.18.2026.02.28.01.44.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Feb 2026 01:44:12 -0800 (PST)
+Message-ID: <69a2b8ec.050a0220.1b5bfd.5139@mx.google.com>
+Date: Sat, 28 Feb 2026 01:44:12 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4810890085903513191=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v3,1/9] Bluetooth: btintel: Add support for hybrid signature for ScP2 onwards
+In-Reply-To: <20260228091239.230284-1-kiran.k@intel.com>
+References: <20260228091239.230284-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-sudo lspci -v -k -d 8086:6e74
-	80:14.7 Bluetooth: Intel Corporation Device 6e74 (rev 10)
-        Subsystem: Intel Corporation Device 0011
-        Flags: bus master, fast devsel, latency 0, IRQ 16
-        Memory at 200002a8000 (64-bit, non-prefetchable) [size=16K]
-        Capabilities: [c8] Power Management version 3
-        Capabilities: [d0] MSI: Enable- Count=1/1 Maskable- 64bit+
-        Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
-        Capabilities: [80] MSI-X: Enable+ Count=32 Masked-
-        Capabilities: [100] Latency Tolerance Reporting
-        Kernel driver in use: btintel_pcie
-        Kernel modules: btintel_pcie
+--===============4810890085903513191==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1059383
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 PASS      1.10 seconds
+BuildKernel                   PASS      26.36 seconds
+CheckAllWarning               PASS      28.75 seconds
+CheckSparse                   WARNING   33.57 seconds
+BuildKernel32                 PASS      25.51 seconds
+TestRunnerSetup               PASS      564.20 seconds
+TestRunner_l2cap-tester       FAIL      32.72 seconds
+TestRunner_iso-tester         PASS      109.99 seconds
+TestRunner_bnep-tester        PASS      6.52 seconds
+TestRunner_mgmt-tester        FAIL      127.78 seconds
+TestRunner_rfcomm-tester      PASS      9.70 seconds
+TestRunner_sco-tester         FAIL      14.62 seconds
+TestRunner_ioctl-tester       PASS      10.45 seconds
+TestRunner_mesh-tester        FAIL      12.45 seconds
+TestRunner_smp-tester         PASS      8.88 seconds
+TestRunner_userchan-tester    PASS      6.87 seconds
+IncrementalBuild              PENDING   0.45 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/btintel.c:3867:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3868:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3869:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3871:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3872:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3873:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3874:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3867:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3868:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3869:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3871:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3872:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3873:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3874:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3867:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3868:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3869:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3871:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3872:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3873:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3874:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3867:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3868:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3869:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3871:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3872:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3873:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3874:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3867:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3868:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3869:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3870:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3871:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3872:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3873:1: error: bad constant expressiondrivers/bluetooth/btintel.c:3874:1: error: bad constant expression
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
+Total: 96, Passed: 94 (97.9%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+L2CAP LE Client - Read 32k Success                   Timed out    2.232 seconds
+L2CAP LE Client - RX Timestamping 32k                Timed out    1.877 seconds
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.107 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.725 seconds
+Mesh - Send cancel - 2                               Timed out    1.998 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btintel_pcie.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 7aef219770e5..943e5704f5e4 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -49,6 +49,8 @@ static const struct pci_device_id btintel_pcie_table[] = {
- 	{ BTINTEL_PCI_DEVICE(0xE476, PCI_ANY_ID) },
- 	 /* Scorpious2, Nova Lake-PCD-H */
- 	{ BTINTEL_PCI_DEVICE(0xD346, PCI_ANY_ID) },
-+	 /* Scorpious2, Nova Lake-PCD-S */
-+	{ BTINTEL_PCI_DEVICE(0x6E74, PCI_ANY_ID) },
- 	{ 0 }
- };
- MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
--- 
-2.43.0
 
+--===============4810890085903513191==--
