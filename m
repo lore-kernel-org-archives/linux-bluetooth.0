@@ -1,167 +1,208 @@
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C37346AEEE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Feb 2026 21:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A0BC184524
+	for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 08:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772226833; cv=none; b=FcTJFsgmig02txEEKPs0+tB7KVDxE0qrG1vmInCH0yfJ0WCH//qPFH4o+azgwQXAQSiVITln1f9okbg6qKlASkks4eE0JduJNQN1KbNwzvLvCDGmSrHM65zVYKPC3oYdNdHzOXeP7rL4N2BsLQ3Eb4eOHKWyCMZB2eps/noPMRE=
+	t=1772268846; cv=none; b=QelhpqjSeBDvOV0hEtTBOfw2VDjSNlHgJ9/9hG5u5iag3m4OvM94LPBs/ojJw/ibjsctRArFE58T3ocknxW0XpsJOaoqIxaKxnhiFr0LxzbjVK7t7NeS5v9296QRMIXGzko8AaaDxFRxa5YFGloviA3iqoLcx/Nj1g8YER/gYYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772226833; c=relaxed/simple;
-	bh=OECSLvmceagdel41JSP3SToNJ3OKG1nD67jO/C6Lt/8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=LVeNwAx/Yoo0KK4vNRSyJ3PabIBf28UqdKVByzZOwdvODZjQjIikjP4XyQy6fRsQHv+Rr97hJoUC3NB/PCRQTFj23ueDFNVE2szAg1P0epvsK10ACdrkpAIWqWlhzRAy6l+++B/oW3aLzWE9g7wVsm38Iiw7OG8xQBPD5KAba3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KRWDdblq; arc=none smtp.client-ip=74.125.82.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772268846; c=relaxed/simple;
+	bh=x1wdSEoakn+xeY1V05XBPL9T+5MTeS8Zg5/CU6EklnM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UogwpPKl4s9XUAIVvTqmhWXly8RIpFb+nyxbO+cO3/+0+M0MvAZycYdFLkD7WqNJyn/GB8j1eOGFHFhmBz9UjxcKCa6QKt2xh6cWH8ljrA2qZy0IN5DU/NLfUF4qDkLS23/mtUxQhHutFzmMgRYjbk4zsZGx+1/Zj92eiSdWf7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NVVe5q2r; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRWDdblq"
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2bdc47747e2so2038403eec.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Feb 2026 13:13:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772226831; x=1772831631; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SlLgKHCudjS1qNJse/klAQRvMY9DXGLkgkdnEqDj3K8=;
-        b=KRWDdblqsROi9xmshS1j4PVb7pX3yH4SWBzku3eVfcaY2lhjury0AzQt6Bigs7Cnie
-         NUx/6xqFKXruJVCmWQU2xlo9Fk0HVXXrkBgYluI973oCvb9j7ptGUhmRhpR2XDbCL9lL
-         AG/NAw2rF4jnCFHQq5/qZTDz5h7cQ4kcyGzAbHozW+MW4eDJkWHyAAZzAT4PZZezzSzB
-         NHxDR2YsXYaJTUtitH+PA7rWZw71BiNPJsWiZMcFGpXiZQT7sIH/DtsEPQFBFbOPygjx
-         9vOY5m7M11mkAk/EihgFjm/zPnD5gzFBckDTcZhizJ9UPdNhQ8v2wDD4aJv3HJMELJ/4
-         VfgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772226831; x=1772831631;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SlLgKHCudjS1qNJse/klAQRvMY9DXGLkgkdnEqDj3K8=;
-        b=J5R6iKOx3snkUEikhM/06xDOruNuy+UHPKSVOWQPm5QaMuT/nOQ4Lo8wFW/ctoMlwk
-         QXO5G7L6oiNQoAvyRCgmBDPifMCmpE8niuFHuE+gdNspjEfjCNDry4Rabgqzz4wZNVWX
-         wHQQBedAbDlW21YeFjwnezhfxY1y1wIMJBMzaCIBCVVgdXBlNNpTH7x7NED+PtqUrokt
-         2Ye4IjpaVfSo3MVI0HJ4PVvw9ZwK7cG3mzn0BXPg9xtSI1T7RrS5LHDBXogs9NuAgII+
-         RZvHif4s09QyenuLVrr5WFLpJ/2plvCnyngN0C8Mvdmwkj1en+xZnPmhecaCFrDbJbop
-         LZ8g==
-X-Gm-Message-State: AOJu0Yxzu33IH4Z87IqN2vf9BUhQeVw6ZHO/x9C7eZHSN/pQWqTN1QUC
-	SDHRNKSgNs7+w3KJz9Akz77X4uSH67r4yktnPd1GS5xC0Ny2r+9OPHkZNN9ysg==
-X-Gm-Gg: ATEYQzynDFgi9li+SxRValGwZfePyX+wBzriAkQ5pLo3s315i3bZnM3xsTKdcHfjWmT
-	0grkAeETSC1rmzUMhrLYDQrHmJYgWQYxkbPcNO5KeR5Xxua2j/YbHzwDGT/Vp8vYeq1dwGRObG6
-	YuxizCVeAWmR82Yy0TdqPamb++lS8QFUDxsQnNXqxigGZEhGb/osbQD/UQCCj5i27OIz/RPJW5j
-	FBGdalYPEgL9h3IkFHsxvIP8CIyYhEO5At5Uiu5CH3TC45J39x85EXidP7iuIo6oergjd79xp9r
-	unIY/WMz5fsOQS+fEgdY5nxJl4W+u0ZZ/bdv+a8xPzrpPLGM6PtH/QTu6YYpS2eLFUt/ppfS7v5
-	7BlwVJ5F1O9G0S0QQYzpxPOVu2V5I3KVysggLDF5aliioOjQ+XZv/SL1qpYymfzyonZWmaPzh3d
-	hzeCKAJg+fI4h1aYglpzKy3R3do60BGg==
-X-Received: by 2002:a05:7301:1008:b0:2ba:8f0d:cfe with SMTP id 5a478bee46e88-2bde1bb30b7mr1558759eec.9.1772226831112;
-        Fri, 27 Feb 2026 13:13:51 -0800 (PST)
-Received: from [172.17.0.2] ([128.24.163.102])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bdd1bcea4esm4473472eec.5.2026.02.27.13.13.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Feb 2026 13:13:50 -0800 (PST)
-Message-ID: <69a2090e.050a0220.d5d23.5c7e@mx.google.com>
-Date: Fri, 27 Feb 2026 13:13:50 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============9118544418995445441=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NVVe5q2r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772268844; x=1803804844;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=x1wdSEoakn+xeY1V05XBPL9T+5MTeS8Zg5/CU6EklnM=;
+  b=NVVe5q2rqSOTocKK04IlG3kS5QuUC0TijfkitayVze5IVMH6xHJ9eHwZ
+   AOKr3M+pME94Z8lGJjc6QdmD09Enx3NJQKBsV4j7n3ecnX4Nn4iEy32HM
+   TySzldLQzxC5mqU3Oiuw47hu34CZmdS3WQpEm6hKL7ZyJms8Hkuf9UOAx
+   q5K6u/UGGXHj85SfP7r6tmUQ2dkrlLV1yULxcmwfLODYTVpchRmHUhIUo
+   wWNaRuX0+1iJmVTusPC4LKxSQQc1slO/VBPbqfR+K3GuwRYaSVcy7TFA1
+   3qtS/f6pH4/GgS2wuOWkzs57pQKCa9iuyi7nM40NXONO6hTwJ1ctI3v9J
+   w==;
+X-CSE-ConnectionGUID: v2xzBe4+TwqdIbszTx3ymw==
+X-CSE-MsgGUID: IMIcO42DQPyzC4OrC3i5wA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11714"; a="77189234"
+X-IronPort-AV: E=Sophos;i="6.21,315,1763452800"; 
+   d="scan'208";a="77189234"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2026 00:54:03 -0800
+X-CSE-ConnectionGUID: JERw4NcvS5mcOhc04CID/Q==
+X-CSE-MsgGUID: SakIwywyTemM+8pepUE0pw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,315,1763452800"; 
+   d="scan'208";a="221630136"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa004.jf.intel.com with ESMTP; 28 Feb 2026 00:54:01 -0800
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chandrashekar.devegowda@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v3 1/9] Bluetooth: btintel: Add support for hybrid signature for ScP2 onwards
+Date: Sat, 28 Feb 2026 14:42:31 +0530
+Message-ID: <20260228091239.230284-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: ISO: Fix defer tests being unstable
-In-Reply-To: <20260227203506.573494-1-luiz.dentz@gmail.com>
-References: <20260227203506.573494-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============9118544418995445441==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+If FW image has hybrid signature (ECDSA and LMS) then send CSS header,
+ECDSA public key, ECDSA signature, LMS public key, LMS signature and
+command buffer to device.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1059247
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.40 seconds
-GitLint                       PENDING   0.31 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      24.35 seconds
-CheckAllWarning               PASS      26.44 seconds
-CheckSparse                   PASS      29.51 seconds
-BuildKernel32                 PASS      23.55 seconds
-TestRunnerSetup               PASS      522.70 seconds
-TestRunner_l2cap-tester       FAIL      32.67 seconds
-TestRunner_iso-tester         PASS      80.33 seconds
-TestRunner_bnep-tester        PASS      6.40 seconds
-TestRunner_mgmt-tester        FAIL      125.56 seconds
-TestRunner_rfcomm-tester      PASS      9.76 seconds
-TestRunner_sco-tester         FAIL      17.74 seconds
-TestRunner_ioctl-tester       PASS      10.37 seconds
-TestRunner_mesh-tester        FAIL      12.47 seconds
-TestRunner_smp-tester         PASS      8.93 seconds
-TestRunner_userchan-tester    PASS      6.76 seconds
-IncrementalBuild              PENDING   0.81 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Total: 96, Passed: 94 (97.9%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-L2CAP LE Client - Read 32k Success                   Timed out    2.512 seconds
-L2CAP LE Client - RX Timestamping 32k                Timed out    1.895 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.114 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.642 seconds
-Mesh - Send cancel - 2                               Timed out    1.993 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel.c | 80 +++++++++++++++++++++++++++++++++----
+ 1 file changed, 72 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 9d29ab811f80..5999be2efef8 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -35,6 +35,19 @@ enum {
+ 	DSM_SET_RESET_METHOD = 3,
+ };
+ 
++/* Hybrid ECDSA + LMS */
++#define BTINTEL_RSA_HEADER_VER		0x00010000
++#define BTINTEL_ECDSA_HEADER_VER	0x00020000
++#define BTINTEL_HYBRID_HEADER_VER	0x00069700
++#define BTINTEL_ECDSA_OFFSET		128
++#define BTINTEL_CSS_HEADER_SIZE		128
++#define BTINTEL_ECDSA_PUB_KEY_SIZE	96
++#define BTINTEL_ECDSA_SIG_SIZE		96
++#define BTINTEL_LMS_OFFSET		320
++#define BTINTEL_LMS_PUB_KEY_SIZE	52
++#define BTINTEL_LMS_SIG_SIZE		1744
++#define BTINTEL_CMD_BUFFER_OFFSET	2116
++
+ #define BTINTEL_BT_DOMAIN		0x12
+ #define BTINTEL_SAR_LEGACY		0
+ #define BTINTEL_SAR_INC_PWR		1
+@@ -505,8 +518,8 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
+ 			return -EINVAL;
+ 		}
+ 
+-		/* Secure boot engine type should be either 1 (ECDSA) or 0 (RSA) */
+-		if (version->sbe_type > 0x01) {
++		/* Secure boot engine type can be 0 (RSA), 1 (ECDSA), 2 (LMS), 3 (ECDSA + LMS) */
++		if (version->sbe_type > 0x03) {
+ 			bt_dev_err(hdev, "Unsupported Intel secure boot engine type (0x%x)",
+ 				   version->sbe_type);
+ 			return -EINVAL;
+@@ -1025,6 +1038,48 @@ static int btintel_sfi_ecdsa_header_secure_send(struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
++static int btintel_sfi_hybrid_header_secure_send(struct hci_dev *hdev,
++						 const struct firmware *fw)
++{
++	int err;
++
++	err = btintel_secure_send(hdev, 0x00, BTINTEL_CSS_HEADER_SIZE, fw->data);
++	if (err < 0) {
++		bt_dev_err(hdev, "Failed to send firmware CSS header (%d)", err);
++		return err;
++	}
++
++	err = btintel_secure_send(hdev, 0x03, BTINTEL_ECDSA_PUB_KEY_SIZE,
++				  fw->data + BTINTEL_ECDSA_OFFSET);
++	if (err < 0) {
++		bt_dev_err(hdev, "Failed to send firmware ECDSA pkey (%d)", err);
++		return err;
++	}
++
++	err = btintel_secure_send(hdev, 0x02, BTINTEL_ECDSA_SIG_SIZE,
++				  fw->data + BTINTEL_ECDSA_OFFSET + BTINTEL_ECDSA_PUB_KEY_SIZE);
++	if (err < 0) {
++		bt_dev_err(hdev, "Failed to send firmware ECDSA signature (%d)", err);
++		return err;
++	}
++
++	err = btintel_secure_send(hdev, 0x05, BTINTEL_LMS_PUB_KEY_SIZE,
++				  fw->data + BTINTEL_LMS_OFFSET);
++	if (err < 0) {
++		bt_dev_err(hdev, "Failed to send firmware LMS pkey (%d)", err);
++		return err;
++	}
++
++	err = btintel_secure_send(hdev, 0x04, BTINTEL_LMS_SIG_SIZE,
++				  fw->data + BTINTEL_LMS_OFFSET + BTINTEL_LMS_PUB_KEY_SIZE);
++	if (err < 0) {
++		bt_dev_err(hdev, "Failed to send firmware LMS signature (%d)", err);
++		return err;
++	}
++
++	return 0;
++}
++
+ static int btintel_download_firmware_payload(struct hci_dev *hdev,
+ 					     const struct firmware *fw,
+ 					     size_t offset)
+@@ -1198,11 +1253,12 @@ static int btintel_download_fw_tlv(struct hci_dev *hdev,
+ 	 * Command Buffer.
+ 	 *
+ 	 * CSS Header byte positions 0x08 to 0x0B represent the CSS Header
+-	 * version: RSA(0x00010000) , ECDSA (0x00020000)
++	 * version: RSA(0x00010000) , ECDSA (0x00020000) , HYBRID (0x00069700)
+ 	 */
+ 	css_header_ver = get_unaligned_le32(fw->data + CSS_HEADER_OFFSET);
+-	if (css_header_ver != 0x00010000) {
+-		bt_dev_err(hdev, "Invalid CSS Header version");
++	if (css_header_ver != BTINTEL_RSA_HEADER_VER &&
++	    css_header_ver != BTINTEL_HYBRID_HEADER_VER) {
++		bt_dev_err(hdev, "Invalid CSS Header version: 0x%8.8x", css_header_ver);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -1220,15 +1276,15 @@ static int btintel_download_fw_tlv(struct hci_dev *hdev,
+ 		err = btintel_download_firmware_payload(hdev, fw, RSA_HEADER_LEN);
+ 		if (err)
+ 			return err;
+-	} else if (hw_variant >= 0x17) {
++	} else if (hw_variant >= 0x17 && css_header_ver == BTINTEL_RSA_HEADER_VER) {
+ 		/* Check if CSS header for ECDSA follows the RSA header */
+ 		if (fw->data[ECDSA_OFFSET] != 0x06)
+ 			return -EINVAL;
+ 
+ 		/* Check if the CSS Header version is ECDSA(0x00020000) */
+ 		css_header_ver = get_unaligned_le32(fw->data + ECDSA_OFFSET + CSS_HEADER_OFFSET);
+-		if (css_header_ver != 0x00020000) {
+-			bt_dev_err(hdev, "Invalid CSS Header version");
++		if (css_header_ver != BTINTEL_ECDSA_HEADER_VER) {
++			bt_dev_err(hdev, "Invalid CSS Header version: 0x%8.8x", css_header_ver);
+ 			return -EINVAL;
+ 		}
+ 
+@@ -1251,6 +1307,14 @@ static int btintel_download_fw_tlv(struct hci_dev *hdev,
+ 			if (err)
+ 				return err;
+ 		}
++	} else if (hw_variant >= 0x20 && css_header_ver == BTINTEL_HYBRID_HEADER_VER) {
++		err = btintel_sfi_hybrid_header_secure_send(hdev, fw);
++		if (err)
++			return err;
++
++		err = btintel_download_firmware_payload(hdev, fw, BTINTEL_CMD_BUFFER_OFFSET);
++		if (err)
++			return err;
+ 	}
+ 	return 0;
+ }
+-- 
+2.43.0
 
---===============9118544418995445441==--
