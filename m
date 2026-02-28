@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0543093B2
-	for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 12:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2075A438FE4
+	for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 12:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772283098; cv=pass; b=fS5gGDYzMFLtMxz0dZyPbKSN8vglxXB6teiqLLJdQBvPyh+I6e+2jhwIeg10OrdoHQm4w+00qcn9/yZroK5W2ye8NzYOK6lbKK6+vQyKAiwHR5IpbgnacDj0bPAVrz1lFdk39UslzagKNTKm1sqb6XE2SX2hKWyjGmx4bDq5W10=
+	t=1772283100; cv=pass; b=N3SZ6MVhE5jgjZ9qzJdvCfC6tJKcbihnDV5ayHM76VJKy41WBt/Sz6lmqIEYsv5nmtuITc2bSBPzt1Pv2IqCVLnPZtbaMhdMiAwzsJLmi/c2QsqTL03heMB5L0xpXndLwiwcErCFZHLpvGgbK5WfSo61+Qn2ni73bFYksYyB/Cc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772283098; c=relaxed/simple;
-	bh=ISKrlIYuEWro/9lX/ytK0xZCWwSiuJ6gpEn5YXD2Bho=;
+	s=arc-20240116; t=1772283100; c=relaxed/simple;
+	bh=LKKSP3dQLqgvTnY+2SQc2nhfNMkFn7ANOycavU6jKPM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qXFJNTHT0Um7P8Tk4wl1zFCCNT14CQ/drbTXaMIMUzc1IKphH+7S/uCIk2wBfDTKyW/WGnLt3WjRy3MmR/f0Fn72GkFjAJJl1gL/oEOecBnvcOMGV3vgAKzS0qQXjaRVablSZE5/E8WOgA/yE5QTWPJViNxR8SjJh3iC/TdKvM8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=g3h5zTPf; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=Gdl98Ml2ZcI+Y03fjbtyiEWjhayJp7qZfB818wfH8sZz6qxB5vIwy7eCNmkKtKoWioB4H3oKBgC8z96O9D2GPcbXtL24gpGauRe3Q/GNvzFahJXg6CrdOFYXcmNCDnW6trSXiyWtUgtOSH8PZQ4efmsKBZ72P/azWMHfn0nT7+0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=wISEWuyx; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="g3h5zTPf"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="wISEWuyx"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:2::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fNQ701CG9zyNV;
-	Sat, 28 Feb 2026 14:51:24 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fNQ782HvrzyS8;
+	Sat, 28 Feb 2026 14:51:32 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1772283084;
+	t=1772283092;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3QFAKJpmbOODJkGZVG9u64BvaO3fOqu7Q+0F65XvjIM=;
-	b=g3h5zTPfLkjOPfpXRh+zv+wcLhzUfrLtCrBjEufCShlgpAPRM6fdXXpDKhgt4E/gcZk0Q8
-	mNA+CUmS0PcjaA/UNJ7XfPl/gNsNcncfgw02GuppsjQG6qPJT8sITAJLsyOq2ZT8t0OJzr
-	+4ioVGb9RjizYAR7lEI5JKJDZCJBws0=
+	bh=JocDmbEuZ9SEcJAp4t0XOudg+aYaqzVazjMKADxkPbQ=;
+	b=wISEWuyxQrBmEi7hbQOHbkYxf7iGND88Gi6IvN1i53gg82Duq54NSX+nlXNIJbqd89gdCW
+	e0b087vF6unbQUg8rgdkhxuiuA5oieLg0KjkSkzW22MGd+cF0sMF/22JnXCZH4u0sc5CYs
+	2qh+2XIP1fOsPm6fAG7VBngkStERcQU=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1772283084;
+	s=meesny; t=1772283092;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3QFAKJpmbOODJkGZVG9u64BvaO3fOqu7Q+0F65XvjIM=;
-	b=s35JV99CekgXxQBxloeuYDmR9smS35+lDxATlkbwDacGkfafSTGt53Qwfp0+UOS3Lc++Vs
-	OJW6pw1J6zMxGVCN0Ejr52RPCSK9XR0SC643emskgtMkdf0+RmHffpvWrLLj9fZGKG6YDT
-	/VDPspt+EIECp+ATj+Ns/JZz9/AgHQQ=
+	bh=JocDmbEuZ9SEcJAp4t0XOudg+aYaqzVazjMKADxkPbQ=;
+	b=rlGye7n3jXJTjsYDgvmQgL0MXFxGbwxaGfjsu4XmJEageay/xQadWOZ37Rta3rylHpzXye
+	FKCM6KHf3zo8TZ+T7mZaBKibw7eIrrM0quKwso59DqnrDn+X6pM3m1PkXfnU1vohJpWdZH
+	2PsyvFnU7Ey/hYDfoiybuXzCdD/qAx4=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1772283084;
-	b=Ci9Wx37ANWpVxprigKJ3b4IX+dnPDEZ9Aqwje2oXjiPE2D07rlfdXQA2tN8dzkp828Xba+
-	wvU3oIHg1RoF9/vbFhhkQ3j8fwJkKb34aPrUGcdc3VfGOnxLG7tZGeLaetTEKa++qYCcOc
-	nBX0WUQdpvVrNDAK2/rkVO3feHvCrbs=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1772283092;
+	b=TdzrbDC5b2WB/VG0uaIu0va+Ivp7vSszhXA6EAScLV06yuL9VS1oFZd7Ym9oxexm1n/92m
+	iTXrXS/IapnYtwHr/O9fXK8/R8ZDXNXHO1JHp3tJyquvbY7mZicZUvxEN0ncLZDf627Jqy
+	rMUJfUmywWdhnf6mSvGJa9ewlp7U/jw=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 06/11] doc: enable CONFIG_VIRTIO_CONSOLE in tester config
-Date: Sat, 28 Feb 2026 14:51:12 +0200
-Message-ID: <565eda3e788389ca53d66547f3f957aa54e01cbc.1772282574.git.pav@iki.fi>
+Subject: [PATCH BlueZ 08/11] doc: add functional/integration testing documentation
+Date: Sat, 28 Feb 2026 14:51:14 +0200
+Message-ID: <8be4b71f43456eb2148bd5a6b8369a3f7af414cf.1772282574.git.pav@iki.fi>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1772282574.git.pav@iki.fi>
 References: <cover.1772282574.git.pav@iki.fi>
@@ -67,50 +67,392 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Enable kernel option that allows using -device virtserialport in qemu.
-This is easier to make work reliably than pci-serial channel.
+Add documentation for functional/integration test suite.
 ---
- doc/ci.config       | 1 +
- doc/test-runner.rst | 1 +
- doc/tester.config   | 1 +
- 3 files changed, 3 insertions(+)
+ doc/test-functional.rst | 374 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 374 insertions(+)
+ create mode 100644 doc/test-functional.rst
 
-diff --git a/doc/ci.config b/doc/ci.config
-index 31e49ba96..a48c1af9d 100644
---- a/doc/ci.config
-+++ b/doc/ci.config
-@@ -6,6 +6,7 @@
- 
- CONFIG_VIRTIO=y
- CONFIG_VIRTIO_PCI=y
-+CONFIG_VIRTIO_CONSOLE=y
- 
- CONFIG_NET=y
- CONFIG_INET=y
-diff --git a/doc/test-runner.rst b/doc/test-runner.rst
-index 64715e2e7..d030787a4 100644
---- a/doc/test-runner.rst
-+++ b/doc/test-runner.rst
-@@ -45,6 +45,7 @@ option (like the Bluetooth subsystem) can be enabled on top of this.
- 
- 	CONFIG_VIRTIO=y
- 	CONFIG_VIRTIO_PCI=y
-+	CONFIG_VIRTIO_CONSOLE=y
- 
- 	CONFIG_NET=y
- 	CONFIG_INET=y
-diff --git a/doc/tester.config b/doc/tester.config
-index 4ee306405..015e7cc1a 100644
---- a/doc/tester.config
-+++ b/doc/tester.config
-@@ -1,6 +1,7 @@
- CONFIG_PCI=y
- CONFIG_VIRTIO=y
- CONFIG_VIRTIO_PCI=y
-+CONFIG_VIRTIO_CONSOLE=y
- 
- CONFIG_NET=y
- CONFIG_INET=y
+diff --git a/doc/test-functional.rst b/doc/test-functional.rst
+new file mode 100644
+index 000000000..72325ec25
+--- /dev/null
++++ b/doc/test-functional.rst
+@@ -0,0 +1,374 @@
++===============
++test-functional
++===============
++
++**test-functional** [*OPTIONS*]
++
++DESCRIPTION
++===========
++
++**test-functional(1)** is used for functional testing of BlueZ and
++kernel using multiple virtual machine environments, connected by real
++or virtual controllers.
++
++OPTIONS
++=======
++
++The `test-functional` script simply runs `Pytest
++<https://pytest.org>`__ which can take the following options:
++https://docs.pytest.org/en/stable/reference/reference.html#command-line-flags
++
++The following additional options apply:
++
++:--kernel=<image>: Kernel image (or built Linux source tree root) to
++	use.  See **test-runner(1)** and `tester.config` for required
++	kernel config.
++
++	If not provided, value from `FUNCTIONAL_TESTING_KERNEL`
++	environment variable is used. If none, no image is used.
++
++:--usb=hci0,hci1: USB controllers to use in tests that require use of
++	real controllers.
++
++	If not provided, value from `FUNCTIONAL_TESTING_CONTROLLERS`
++	environment variable is used. If none, all USB controllers
++	with suitable permissions are considered.
++
++:--force-usb: Force tests to use USB controllers instead of `btvirt`.
++
++:--vm-timeout=<seconds>: Specify timeout for communication with VM hosts.
++
++:--log-filter=[+-]<pattern>,[+-]<pattern>,...: Allow/deny lists
++	for filtering logging output. The pattern is a shell glob matching
++	to the logger names.
++
++:--build-dir=<path>: Path to build directory where to search for BlueZ
++        executables.
++
++:--list: Output brief lists of existing tests.
++
++Tests that require kernel image or USB controllers are skipped if none
++are available. Normally, tests use `btvirt`.
++
++
++REQUIREMENTS
++============
++
++Python
++------
++
++The following Python packages are required:
++
++.. code-block::
++
++   pytest
++   pexpect
++   dbus-python
++
++To install them via pip::
++
++	python3 -m pip install -r unit/func_test/requirements.txt
++
++On Fedora / RHEL::
++
++	sudo dnf install python3-pytest python3-pexpect python3-dbus
++
++
++Kernel
++------
++
++The **test-functional(1)** tool requires a kernel image with similar
++config as **test-runner(1)**.  Simplest setup is
++
++.. code-block::
++
++	cp ../bluez/doc/tester.config .config
++	make olddefconfig
++	make -j8
++
++USB
++---
++
++Some tests may require a hardware controller instead of the virtual `btvirt` one.
++
++
++EXAMPLES
++========
++
++Run all tests
++-------------
++
++.. code-block::
++
++	$ unit/test-functional --kernel=/pathto/bzImage
++
++	$ export FUNCTIONAL_TESTING_KERNEL=/pathto/bzImage
++	$ unit/test-functional
++
++Show output during run
++----------------------
++
++.. code-block::
++
++	$ unit/test-functional --log-cli-level=0
++
++Show only specific loggers:
++
++.. code-block::
++
++	$ unit/test-functional --log-cli-level=0 --log-filter=rpc,host
++
++	$ unit/test-functional --log-cli-level=0 --log-filter=*.bluetoothctl
++
++Filter out loggers:
++
++.. code-block::
++
++	$ unit/test-functional --log-cli-level=0 --log-filter=-host
++
++	$ unit/test-functional --log-cli-level=0 --log-filter=host,-host.*.1
++
++Run selected tests
++------------------
++
++.. code-block::
++
++	$ unit/test-functional unit/func_test/test_cli_simple.py::test_bluetoothctl_script_show
++
++	$ unit/test-functional -k test_bluetoothctl_script_show
++
++	$ unit/test-functional -k 'test_btmgmt or test_bluetoothctl'
++
++Don't run tests with a given marker:
++
++.. code-block::
++
++	$ unit/test-functional -m "not pipewire"
++
++Don't run known-failing tests:
++
++.. code-block::
++
++	$ unit/test-functional -m "not xfail"
++
++Note that otherwise known-failing tests would be run, but with
++failures suppressed.
++
++Run previously failed and stop on failure
++-----------------------------------------
++
++.. code-block::
++
++	$ unit/test-functional -x --ff
++
++List all tests
++--------------
++
++.. code-block::
++
++	$ unit/test-functional --list
++
++Show errors from know-failing test
++----------------------------------
++
++.. code-block::
++
++	$ unit/test-functional --runxfail -k test_btmgmt_info
++
++Redirect USB devices
++--------------------
++
++.. code-block::
++
++	$ unit/test-functional --usb=hci0,hci1
++
++	$ export FUNCTIONAL_TESTING_CONTROLLERS=hci0,hci1
++	$ unit/test-functional
++
++
++WRITING TESTS
++=============
++
++The functional tests are written in files (test modules) names
++`unit/func_test/test_*.py`.  They are written using standard Pytest
++style.  See https://docs.pytest.org/en/stable/getting-started.html
++
++Example: Virtual machines
++-------------------------
++
++.. code-block:: python
++
++   from .lib import host_config, Bluetoothd, Bluetoothctl
++
++   @host_config(
++       [Bluetoothd(), Bluetoothctl()],
++       [Bluetoothd(), Bluetoothctl()],
++   )
++   def test_bluetoothctl_pair(hosts):
++       host0, host1 = hosts
++
++       host0.bluetoothctl.send("show\n")
++       host0.bluetoothctl.expect("Powered: yes")
++
++       host1.bluetoothctl.send("show\n")
++       host1.bluetoothctl.expect("Powered: yes")
++
++       host0.bluetoothctl.send("scan on\n")
++       host0.bluetoothctl.expect(f"Controller {host0.bdaddr.upper()} Discovering: yes")
++
++       host1.bluetoothctl.send("pairable on\n")
++       host1.bluetoothctl.expect("Changing pairable on succeeded")
++       host1.bluetoothctl.send("discoverable on\n")
++       host1.bluetoothctl.expect(f"Controller {host1.bdaddr.upper()} Discoverable: yes")
++
++       host0.bluetoothctl.expect(f"Device {host1.bdaddr.upper()}")
++       host0.bluetoothctl.send(f"pair {host1.bdaddr}\n")
++
++       idx, m = host0.bluetoothctl.expect(r"Confirm passkey (\d+).*:")
++       key = m[0].decode("utf-8")
++
++       host1.bluetoothctl.expect(f"Confirm passkey {key}")
++
++       host0.bluetoothctl.send("yes\n")
++       host1.bluetoothctl.send("yes\n")
++
++       host0.bluetoothctl.expect("Pairing successful")
++
++The test declares a VM setup with two Qemu instances, where both hosts
++run bluetoothd and start a bluetoothctl process.  The Qemu instances
++have `btvirt` virtual BT controllers and can see each other.
++
++The test itself runs on the parent host.
++
++The `host0/1.bluetoothctl.*` commands invoke RPC calls to one of the
++the two VM instances. In this case, they are controlling the
++`bluetoothctl` process using `pexpect` library to deal with its
++command line.
++
++When the test body finishes executing, the test passes. Or, it fails
++if any ``assert`` statement fails or an error is raised. For example,
++above ``RemoteError`` due to bluetoothctl not proceeding as expected
++in pairing is possible.
++
++The host configuration (bluetoothd + bluetoothctl above) is torn down
++between test (SIGTERM/SIGKILL sent etc.).
++
++By default the VM instance itself continues running, and may be used
++for other tests that share the same VM setup.
++
++Generally, the framework automatically orders the tests so that the VM
++setup does not need to be restarted unless needed.
++
++
++Example host plugin
++-------------------
++
++The `host.bluetoothctl` implementation used above is as follows:
++
++.. code-block:: python
++
++   from .lib import HostPlugin
++
++   class Bluetoothctl(HostPlugin):
++       # Declare a unique name:
++
++       name = "bluetoothctl"
++
++       # Declare dependencies on other plugins
++
++       depends = [Bluetoothd()]
++
++       # The following is to be run on parent host outside VMs:
++
++       def __init__(self):
++           self.exe = utils.find_exe("client", "bluetoothctl")
++
++       # These run inside VM on plugin setup / teardown:
++
++       def setup(self, impl):
++           self.logger = utils.LogStream("bluetoothctl")
++           self.ctl = pexpect.spawn(self.exe, logfile=self.logger.stream)
++
++       def teardown(self):
++           self.ctl.terminate()
++           self.ctl.wait()
++
++       # These declare the custom RPC-callable methods of the plugin:
++
++       def expect(self, *a, **kw):
++           ret = self.ctl.expect(*a, **kw)
++           log.debug("pexpect: found")
++           return ret, self.ctl.match.groups()
++
++       def expect_prompt(self):
++           prompt = "\\[[a-zA-Z0-9. -]+\\]>"
++           return self.expect(prompt)
++
++       def send(self, *a, **kw):
++           return self.ctl.send(*a, **kw)
++
++Host plugins are for injecting code to run on the VM side test hosts.
++The host plugins have scope of one test.  The VM side test framework
++sends SIGTERM and SIGKILL to all processes in the test process group
++to reset the state between each test.
++
++The plugins are declared by inheriting from `HostPlugin`. Their
++`__init__()` is supposed to only store declarative configuration on
++`self` and runs on parent side early in the test discovery phase. The
++`setup()` and `teardown()` methods run on VM-side at host environment
++start and end.  All other methods can be invoked via RPC by the parent
++tester, and any values returned by them are passed via RPC back to the
++parent.
++
++To load a plugin to a VM host, pass it to `host_config()` in the
++declaration of a given test.
++
++Reference
++---------
++
++In addition to standard Pytest features, the following items are
++available in the `.lib` submodule.
++
++TODO: not complete
++
++host_config
++~~~~~~~~~~~
++
++.. code-block::
++
++   def host_config(*host_setup, hw=False)
++
++Declare host configuration.
++
++- \*host_setup: each argument is a list of plugins to be loaded on a host.
++  The number of arguments specifies the number of hosts.
++
++- hw (bool): whether to require hardware BT controller
++
++find_exe
++~~~~~~~~
++
++.. code-block::
++
++   from .lib import find_exe
++   bluetoothctl = find_exe("client", "bluetoothctl")
++
++Find absolute path to the given executable, either within BlueZ build
++directory or on host.
++
++RemoteError
++~~~~~~~~~~~
++
++.. code-block::
++
++   from .lib import RemoteError
++
++   try:
++       host.call(foo)
++   except RemoteError as exc:
++       print("    ".join(exc.traceback))
++       original_exception = exc.exc
++
++Exception raised on the VM side, passed through RPC. Properties:
++`traceback` is a list of traceback lines and `exc` is the original
++exception instance raised on the remote side.
 -- 
 2.53.0
 
