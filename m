@@ -1,138 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03792F39BE;
-	Sun,  1 Mar 2026 02:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDD92C3257
+	for <linux-bluetooth@vger.kernel.org>; Sun,  1 Mar 2026 06:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772330556; cv=none; b=kUhNdbZUZAqX2mEqik/oUCHEWEADYPsNZMkzSpYXWf2PK25nLG/Uzdk/u2vT/MX+ipu/IvzK/CIkiYizVWt7cw8eK9fn0nw1igUykyuaDWAqRycXbGfPuF7YhQsGl8Q/GJZx86hor4wIuXwBSLHwFkKbn504JdMtjRBp0umIJXc=
+	t=1772346210; cv=none; b=fSWtk20txjxhqtOxQ6uFFlSPGkd4rEb+IvS3SSkqdXYSweC00hTcUWCwv7B7N42i2ZP8eDqypNZUHXCtFkv5ABUs0m63XYOd8uQLHSm78LrySB/QYP10l/AaHmK6Zm9kC+oZS/qYn+Nq1rK073B9+ZbMyb4ujRASgRHuFu4uvh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772330556; c=relaxed/simple;
-	bh=qkqjRa3wsDLzGrsSgYPRQlxzZlw1kz5wyxSIfm9/9Zg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OPu4ThqIVmJhqLFle7Pte7rMJs1Y2WtfgAnPNjFzIeXwxY6tQH+E/3XV+8Ae2iP1rGnzHlXeMhU2RcWQI1rCDf34RpXw9ZZ9VljsPoLTj+368+Mh8SCJUMGMj4OPodj1eZiu3CYyCgHpqKFwYwHzSQEtf2NUURlr3SY2Uymb6Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOvDOd5j; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOvDOd5j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AB31C19421;
-	Sun,  1 Mar 2026 02:02:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772330555;
-	bh=qkqjRa3wsDLzGrsSgYPRQlxzZlw1kz5wyxSIfm9/9Zg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=IOvDOd5j6yngnuki4vwQsv5zH4QKrV0SdeZKTRAbhP3YiQ3PB5doehEgLQ/UHJarO
-	 s6ebjoIYsrUv51WBBc9Ea9ecUIIpfPq9T2QTL+paa+yPbXUAmKldNtvw+QHWYKobFw
-	 Y9ELXec1SiQnTWZqVxFCk9xbs56QfLfr11g2aRmxIp+/lsamTndaR04xj/Z/chDdHi
-	 JXZgo3dN5SMh0diutifmjTKg9Zec0WCu2aUDaKUpsm+W1igCFavb1gm4fdgjw0hy/j
-	 c8WKnqni6ZSdE2KBnuQGuPvISWfYRZVZbPBVJ39u9p6yz27cvSh6HKNd7SJ2oQGOG2
-	 3ngDHhxnSsC4A==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org,
-	zenmchen@gmail.com
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: FAILED: Patch "Bluetooth: btusb: Add USB ID 7392:e611 for Edimax EW-7611UXB" failed to apply to 5.10-stable tree
-Date: Sat, 28 Feb 2026 21:02:33 -0500
-Message-ID: <20260301020234.1730360-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1772346210; c=relaxed/simple;
+	bh=ZtgAQKGxttvbLp5UclXrsIvRKvhGCmPWupiyo0rv6bs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=e3hrGFeKet/QPTlPkC6GRk1CWpkhFBBPjs/tyISchuvxF9Rq1SJjGr7kGwTzpr5HIxU64FmEzXKoRMRk+StmrKTsILY625gKVNGm0zVWVZZACmey8T4Z3QUOC9dLEb/6tNkYAFXslP44OGTYOaN38ZVnp6ZUdX13QvshO2pFXWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-679c29b437cso30329355eaf.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 22:23:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772346208; x=1772951008;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+mP+R9zaDDsUjx+WhIpBXgtaUAljb2vLHaseaw78qjo=;
+        b=JWQupCnih1ldVqbVLAPX/hFE6M7iSCLTnMQyL3Ik9SDQgLfltTWWpxXzLskpv1pvps
+         Eb3ajkid8j6YTo7W8KrPJbubrBPt/aiam/LRTHwIJO6W5HDwckJfiRaPDHRrVtOj64JG
+         GNraiU+ePD/mRPxn4d2MEhQgdyZoLtTSSxOLgqc/JLEmm6Y+V3uQEO77eLrHsLaUbaaS
+         bs4lZPsM5v6OM7hkm52qLAVijvS/uM04m+vm19Dr0RePZa/CWeTpEFcj01XxCW64QhJb
+         lGhS51vWuriFWziENE02lm5osU/e6K5k9OyiubS4Axn1A45ev8Tk2aUjKFpmbc0ZbI85
+         uq6g==
+X-Gm-Message-State: AOJu0Yyk0umcUSGhqAyZ7CmJmiiDLjoZaX6HtLk1It/eV50PoHt84HRV
+	aP7Sx/jHbYyvw1cyfvr4y4fgLL5iOJDJK1Gyq9DBax/xfO6qr1JXwnu3C+NoiEeS/65LyD6mCil
+	l/VDs5f4CoDbF8Quf/gg7c3kVQklh6fjxq7och+E1VZerR4cPt+z0Lmpd9fo=
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Patchwork-Hint: ignore
-X-stable: review
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a4a:e918:0:b0:663:517:7d8e with SMTP id
+ 006d021491bc7-679fadee2c8mr4429591eaf.17.1772346207992; Sat, 28 Feb 2026
+ 22:23:27 -0800 (PST)
+Date: Sat, 28 Feb 2026 22:23:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69a3db5f.050a0220.3a55be.0054.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Mar 2026)
+From: syzbot <syzbot+list681cfcaa8eead23a8dda@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The patch below does not apply to the 5.10-stable tree.
-If someone wants it applied there, or to any other stable or longterm
-tree, then please email the backport, including the original git commit
-id to <stable@vger.kernel.org>.
+Hello bluetooth maintainers/developers,
 
-Thanks,
-Sasha
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
------------------- original commit in Linus's tree ------------------
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 37 issues are still open and 96 have already been fixed.
 
-From 6c0568b7741a346088fd6dfced2d871f7d481d06 Mon Sep 17 00:00:00 2001
-From: Zenm Chen <zenmchen@gmail.com>
-Date: Thu, 29 Jan 2026 10:28:19 +0800
-Subject: [PATCH] Bluetooth: btusb: Add USB ID 7392:e611 for Edimax EW-7611UXB
+Some of the still happening issues:
 
-Add USB ID 7392:e611 for Edimax EW-7611UXB which is RTL8851BU-based
-Wi-Fi + Bluetooth adapter.
+Ref  Crashes Repro Title
+<1>  46025   Yes   KASAN: slab-use-after-free Read in l2cap_unregister_user
+                   https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
+<2>  11911   Yes   WARNING in hci_conn_timeout (2)
+                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
+<3>  8268    Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<4>  4349    Yes   general protection fault in lock_sock_nested
+                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+<5>  985     Yes   KASAN: slab-use-after-free Write in hci_conn_drop (3)
+                   https://syzkaller.appspot.com/bug?extid=3609b9b48e68e1fe47fd
+<6>  538     Yes   possible deadlock in l2cap_conn_del
+                   https://syzkaller.appspot.com/bug?extid=b71bb48c13bf3fed3692
+<7>  497     Yes   KASAN: slab-use-after-free Write in le_read_features_complete
+                   https://syzkaller.appspot.com/bug?extid=87badbb9094e008e0685
+<8>  480     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
+                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
+<9>  348     No    WARNING in l2cap_chan_del
+                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
+<10> 231     Yes   KASAN: wild-memory-access Read in l2cap_connect_cfm
+                   https://syzkaller.appspot.com/bug?extid=0e4ebcc970728e056324
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below:
-
-T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  6 Spd=480  MxCh= 0
-D:  Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=7392 ProdID=e611 Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=802.11ax WLAN Adapter
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
-A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 8 Cls=ff(vend.) Sub=ff Prot=ff Driver=rtw89_8851bu_git
-E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=07(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=09(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=0a(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=0b(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=0c(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-
-Cc: stable@vger.kernel.org # 6.6.x
-Signed-off-by: Zenm Chen <zenmchen@gmail.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8c34a17edae5d..fcec8e589e814 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -529,6 +529,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x2001, 0x332a), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x7392, 0xe611), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Realtek 8852AE Bluetooth devices */
- 	{ USB_DEVICE(0x0bda, 0x2852), .driver_info = BTUSB_REALTEK |
--- 
-2.51.0
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-
-
+You may send multiple commands in a single email message.
