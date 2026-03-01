@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C502FDC27;
-	Sun,  1 Mar 2026 01:52:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03792F39BE;
+	Sun,  1 Mar 2026 02:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772329958; cv=none; b=bfkYg++kHtPKV970nprWEYb+t5Ukt8CAPISxpkn/GyPB+4Zp14qG9VHdkU0AeQ1g/l5jLg0ux4yQ5Z9+dzS4G7JFhQRr0um6hMBKaZPs/UDyJNf6XOQo4YEhhXPtn1U3pafMsBbGrnhu/MYgDq9pqt2f91j5VRX6w/ecVDOWskg=
+	t=1772330556; cv=none; b=kUhNdbZUZAqX2mEqik/oUCHEWEADYPsNZMkzSpYXWf2PK25nLG/Uzdk/u2vT/MX+ipu/IvzK/CIkiYizVWt7cw8eK9fn0nw1igUykyuaDWAqRycXbGfPuF7YhQsGl8Q/GJZx86hor4wIuXwBSLHwFkKbn504JdMtjRBp0umIJXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772329958; c=relaxed/simple;
-	bh=q5d+bu6BOCxtFIZOt+sTICK0HoFfeXt22KGAslDWD74=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mSIIZebuh1ZQky/YYf9lS56nHPasfSv7AkLLJWliuleNmV9FekF0MQVZIRrnRZ2sq0cxm7YXru0NhS+7PoDvLeEyfy8iE1L82F6acdOeas4gJu4M6Zai2CxfJimfwmxdOEFlhGepkva7HfrbIt1Y5lw/q4WPgsuQun68os0tAyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A4J89XfL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772330556; c=relaxed/simple;
+	bh=qkqjRa3wsDLzGrsSgYPRQlxzZlw1kz5wyxSIfm9/9Zg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OPu4ThqIVmJhqLFle7Pte7rMJs1Y2WtfgAnPNjFzIeXwxY6tQH+E/3XV+8Ae2iP1rGnzHlXeMhU2RcWQI1rCDf34RpXw9ZZ9VljsPoLTj+368+Mh8SCJUMGMj4OPodj1eZiu3CYyCgHpqKFwYwHzSQEtf2NUURlr3SY2Uymb6Mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOvDOd5j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A4J89XfL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D0B9C19421;
-	Sun,  1 Mar 2026 01:52:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOvDOd5j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AB31C19421;
+	Sun,  1 Mar 2026 02:02:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772329958;
-	bh=q5d+bu6BOCxtFIZOt+sTICK0HoFfeXt22KGAslDWD74=;
+	s=k20201202; t=1772330555;
+	bh=qkqjRa3wsDLzGrsSgYPRQlxzZlw1kz5wyxSIfm9/9Zg=;
 	h=From:To:Cc:Subject:Date:From;
-	b=A4J89XfL6EMalD/4VrPqt/5aqF5+nZXxPhQauUlo3M9linizXu+Vr/LA2VRhNRKDO
-	 QHR2OpKBY8UldlK3GUaz8U+z3MNuEk7O3eD+gCTjJgNxoJZUHzShN578ayiWxlBdAW
-	 vv6ldJr7/WMo+BGtKClp62Xt/48He4+Ix4VVXl08InzI8yS9yu972vrlByU8ILf13U
-	 9DhmzoNfTXNoDVMaR+M4Dxs7VrJ6/6aXre+PQ1pBep3ekruR7Cfg8eDD9ZAsFhFY41
-	 u3CjGBCs6MDC0SaWW5CIxoA/5uyGM8iTNTbL7L2ZjyHwsdc4o2QckZx0Ho0bi1T3sQ
-	 lQ06W18KUbC7g==
+	b=IOvDOd5j6yngnuki4vwQsv5zH4QKrV0SdeZKTRAbhP3YiQ3PB5doehEgLQ/UHJarO
+	 s6ebjoIYsrUv51WBBc9Ea9ecUIIpfPq9T2QTL+paa+yPbXUAmKldNtvw+QHWYKobFw
+	 Y9ELXec1SiQnTWZqVxFCk9xbs56QfLfr11g2aRmxIp+/lsamTndaR04xj/Z/chDdHi
+	 JXZgo3dN5SMh0diutifmjTKg9Zec0WCu2aUDaKUpsm+W1igCFavb1gm4fdgjw0hy/j
+	 c8WKnqni6ZSdE2KBnuQGuPvISWfYRZVZbPBVJ39u9p6yz27cvSh6HKNd7SJ2oQGOG2
+	 3ngDHhxnSsC4A==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	zenmchen@gmail.com
 Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	linux-bluetooth@vger.kernel.org
-Subject: FAILED: Patch "Bluetooth: btusb: Add USB ID 7392:e611 for Edimax EW-7611UXB" failed to apply to 5.15-stable tree
-Date: Sat, 28 Feb 2026 20:52:36 -0500
-Message-ID: <20260301015236.1719175-1-sashal@kernel.org>
+Subject: FAILED: Patch "Bluetooth: btusb: Add USB ID 7392:e611 for Edimax EW-7611UXB" failed to apply to 5.10-stable tree
+Date: Sat, 28 Feb 2026 21:02:33 -0500
+Message-ID: <20260301020234.1730360-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -45,7 +45,7 @@ X-Patchwork-Hint: ignore
 X-stable: review
 Content-Transfer-Encoding: 8bit
 
-The patch below does not apply to the 5.15-stable tree.
+The patch below does not apply to the 5.10-stable tree.
 If someone wants it applied there, or to any other stable or longterm
 tree, then please email the backport, including the original git commit
 id to <stable@vger.kernel.org>.
