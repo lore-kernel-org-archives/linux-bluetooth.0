@@ -1,95 +1,94 @@
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDD92C3257
-	for <linux-bluetooth@vger.kernel.org>; Sun,  1 Mar 2026 06:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6A42C3261;
+	Sun,  1 Mar 2026 09:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772346210; cv=none; b=fSWtk20txjxhqtOxQ6uFFlSPGkd4rEb+IvS3SSkqdXYSweC00hTcUWCwv7B7N42i2ZP8eDqypNZUHXCtFkv5ABUs0m63XYOd8uQLHSm78LrySB/QYP10l/AaHmK6Zm9kC+oZS/qYn+Nq1rK073B9+ZbMyb4ujRASgRHuFu4uvh0=
+	t=1772356770; cv=none; b=PuvxrLOAntlMfM7QzRYYnBy5znZvmiu5p/2t23iz3DKcXH7bCssgsTwFfTFophfFsP3i/hI+lboep6VQowCHR6mCFgluIB+nDbTrsF14yQAKbggFMf4dh2r+1oqDmElT1IvPhI4p9Uw7/4N9av6iRMzJqCktdA85AJcV/5mDBQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772346210; c=relaxed/simple;
-	bh=ZtgAQKGxttvbLp5UclXrsIvRKvhGCmPWupiyo0rv6bs=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=e3hrGFeKet/QPTlPkC6GRk1CWpkhFBBPjs/tyISchuvxF9Rq1SJjGr7kGwTzpr5HIxU64FmEzXKoRMRk+StmrKTsILY625gKVNGm0zVWVZZACmey8T4Z3QUOC9dLEb/6tNkYAFXslP44OGTYOaN38ZVnp6ZUdX13QvshO2pFXWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-679c29b437cso30329355eaf.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Feb 2026 22:23:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772346208; x=1772951008;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+mP+R9zaDDsUjx+WhIpBXgtaUAljb2vLHaseaw78qjo=;
-        b=JWQupCnih1ldVqbVLAPX/hFE6M7iSCLTnMQyL3Ik9SDQgLfltTWWpxXzLskpv1pvps
-         Eb3ajkid8j6YTo7W8KrPJbubrBPt/aiam/LRTHwIJO6W5HDwckJfiRaPDHRrVtOj64JG
-         GNraiU+ePD/mRPxn4d2MEhQgdyZoLtTSSxOLgqc/JLEmm6Y+V3uQEO77eLrHsLaUbaaS
-         bs4lZPsM5v6OM7hkm52qLAVijvS/uM04m+vm19Dr0RePZa/CWeTpEFcj01XxCW64QhJb
-         lGhS51vWuriFWziENE02lm5osU/e6K5k9OyiubS4Axn1A45ev8Tk2aUjKFpmbc0ZbI85
-         uq6g==
-X-Gm-Message-State: AOJu0Yyk0umcUSGhqAyZ7CmJmiiDLjoZaX6HtLk1It/eV50PoHt84HRV
-	aP7Sx/jHbYyvw1cyfvr4y4fgLL5iOJDJK1Gyq9DBax/xfO6qr1JXwnu3C+NoiEeS/65LyD6mCil
-	l/VDs5f4CoDbF8Quf/gg7c3kVQklh6fjxq7och+E1VZerR4cPt+z0Lmpd9fo=
+	s=arc-20240116; t=1772356770; c=relaxed/simple;
+	bh=L2SdQH8ywpK/e6o+yBg3PENhr+Mc69+1QMFSMkGaQJw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=KDQrWr/pe1tObZu3nO01aDHZlQDs3Vdlb/RqBBWU3mB6wRHAZvhX548lSCCS7VFFomPFUxVFNcYcv+SaRdlQf7ntISo/tizqLXHSyykuj5HO8AfgaKGNb8Pkdo2oQwsGh1OyUh/8sXpHUsU1KT555tB3QXo2r1AegpDxzZrbFY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 65B894316C;
+	Sun,  1 Mar 2026 09:19:19 +0000 (UTC)
+Message-ID: <ee5fc583c7d6dad138db759cddd84e409190d1ae.camel@hadess.net>
+Subject: Re: [PATCH v2] Bluetooth: HIDP: cap report descriptor size in HID
+ setup
+From: Bastien Nocera <hadess@hadess.net>
+To: Eric-Terminal <ericterminal@gmail.com>, marcel@holtmann.org, 
+	johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-input@vger.kernel.org
+Date: Sun, 01 Mar 2026 10:19:19 +0100
+In-Reply-To: <20260228172657.53040-1-ericterminal@gmail.com>
+References: 
+	<CABBYNZ+9Z8Yd9mRhgz0N9kSSvLR-6euPf9CRA1Sop_D8zV8wqQ@mail.gmail.com>
+	 <20260228172657.53040-1-ericterminal@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:e918:0:b0:663:517:7d8e with SMTP id
- 006d021491bc7-679fadee2c8mr4429591eaf.17.1772346207992; Sat, 28 Feb 2026
- 22:23:27 -0800 (PST)
-Date: Sat, 28 Feb 2026 22:23:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69a3db5f.050a0220.3a55be.0054.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (Mar 2026)
-From: syzbot <syzbot+list681cfcaa8eead23a8dda@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvheeggeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepieffgfehtedtgefgjeeggfffgeeuvdegveekveejfeekkedujeehteffueefffeunecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepieehueekleegfeduieevpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepjedprhgtphhtthhopegvrhhitghtvghrmhhinhgrlhesghhmrghilhdrtghomhdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrn
+ hhnrdhorhhgpdhrtghpthhtohepjhhohhgrnhhhvggusggvrhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhuihiiuggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
 
-Hello bluetooth maintainers/developers,
+On Sun, 2026-03-01 at 01:26 +0800, Eric-Terminal wrote:
+> From: Yufan Chen <ericterminal@gmail.com>
+>=20
+> hidp_setup_hid() duplicates the report descriptor from userspace
+> based on
+> req->rd_size. Large values can trigger oversized copies.
+>=20
+> Do not reject the connection when rd_size exceeds
+> HID_MAX_DESCRIPTOR_SIZE. Instead, cap rd_size in hidp_setup_hid()
+> and use the capped value for memdup_user() and session->rd_size.
+>=20
+> This keeps compatibility with existing userspace behavior while
+> bounding memory usage in the HID setup path.
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+Cross-sending this to linux-input@ for review, they would know the best
+way to deal with oversized HID descriptors.
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 37 issues are still open and 96 have already been fixed.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  46025   Yes   KASAN: slab-use-after-free Read in l2cap_unregister_user
-                   https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
-<2>  11911   Yes   WARNING in hci_conn_timeout (2)
-                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
-<3>  8268    Yes   WARNING in call_timer_fn
-                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<4>  4349    Yes   general protection fault in lock_sock_nested
-                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
-<5>  985     Yes   KASAN: slab-use-after-free Write in hci_conn_drop (3)
-                   https://syzkaller.appspot.com/bug?extid=3609b9b48e68e1fe47fd
-<6>  538     Yes   possible deadlock in l2cap_conn_del
-                   https://syzkaller.appspot.com/bug?extid=b71bb48c13bf3fed3692
-<7>  497     Yes   KASAN: slab-use-after-free Write in le_read_features_complete
-                   https://syzkaller.appspot.com/bug?extid=87badbb9094e008e0685
-<8>  480     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
-                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-<9>  348     No    WARNING in l2cap_chan_del
-                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
-<10> 231     Yes   KASAN: wild-memory-access Read in l2cap_connect_cfm
-                   https://syzkaller.appspot.com/bug?extid=0e4ebcc970728e056324
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+>=20
+> Signed-off-by: Yufan Chen <ericterminal@gmail.com>
+> ---
+> =C2=A0net/bluetooth/hidp/core.c | 7 +++++--
+> =C2=A01 file changed, 5 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index 6fe815241..31aeffa39 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -755,13 +755,16 @@ static int hidp_setup_hid(struct hidp_session
+> *session,
+> =C2=A0				const struct hidp_connadd_req *req)
+> =C2=A0{
+> =C2=A0	struct hid_device *hid;
+> +	unsigned int rd_size;
+> =C2=A0	int err;
+> =C2=A0
+> -	session->rd_data =3D memdup_user(req->rd_data, req->rd_size);
+> +	rd_size =3D min_t(unsigned int, req->rd_size,
+> HID_MAX_DESCRIPTOR_SIZE);
+> +
+> +	session->rd_data =3D memdup_user(req->rd_data, rd_size);
+> =C2=A0	if (IS_ERR(session->rd_data))
+> =C2=A0		return PTR_ERR(session->rd_data);
+> =C2=A0
+> -	session->rd_size =3D req->rd_size;
+> +	session->rd_size =3D rd_size;
+> =C2=A0
+> =C2=A0	hid =3D hid_allocate_device();
+> =C2=A0	if (IS_ERR(hid)) {
