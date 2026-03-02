@@ -1,372 +1,118 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [152.89.196.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3387175A6E
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 09:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772442016; cv=pass; b=Yh3nmrHBHCN8XWbWhkSQEFh6uM5H2+D+FAxpDcdgdynIsusFmMr4MPf0bZOy8sAHMDXUlQQJj17JB5LcFUqdOlpBFJoxQa+UbqWAlmmKO5S8/GHzbqy3GEGRVqdmDcMK7goINDGGyrBdYBbINoovzwazYDXXd//VXrFYrgwmR04=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772442016; c=relaxed/simple;
-	bh=Eq9PLsqU6n4hyxaOIGX869l+UBMAVJ3r4TuxlH8U9YI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=krJdMJOeHCPSGjyYjoDX0bs7dAbMPADXkWaNHXxO0IaRA+nEyPfPVnxpc/GJuLxaGEmhYEO35t6fRkkyhNHfOwid+SnA0Kf1HpWzuwjL2o+je6Kkr91EXEToFmbWW+TQ9iw3Fz5RqUUwbVz2TNvAOP5n/l0yya/1aSLMnUr6QiI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=hkcCR/tB; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A18C38F622
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 09:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.89.196.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772443336; cv=none; b=hrHrKDhNPQbmTsJNuvU2Wy8D+bTrRlp5Pw+5Iu4EfHE3aLIbF8WdgjSoLog/bkVwGS0d3p1+3OBtajRCHMqdczLilbz70INxnz1u/cBmt6O2Z5CjAodxrgQaGFIXjiYA3DCBnulnhsJrk6ZkPEHIi+inbJzDmmcWfl65DSZoXgY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772443336; c=relaxed/simple;
+	bh=y52Ptbu7oc7pUYN1GSyheVQoKFkgY8J4ZHk5AELFMSY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WNmSgD3Pr7TkpKCcCa8wbErdhXXXLtGfXeddZuHhJC+yYXjxkUOzIw4RVXeeIl3Ez0VVS4pdINzC7XK/DqF6gnhROs/w6F7vpOpC3goH+6hwjdZkxs4t3cBSXd0WE7gdf+DZA0JFM/M+8X2sIX1IRC2AaEyBGrbUjVHOa8KJ4SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=DYtyMzmM; arc=none smtp.client-ip=152.89.196.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="hkcCR/tB"
-ARC-Seal: i=1; a=rsa-sha256; t=1772442006; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=H7295RdxDQc81piMFgNnR+oF8KdfRiNt0zWQufNRXea9NsAEOxF+ulj/TPDQWi9Zz0TMiER186HhWwEJ45/8lTbQ5LA8tkTPFJaYnGW6u43cTEsrTLTriZHs6G4Ic5ad8Yi106tF1wrLpJPyyR3Vis4y+Ydaq2p9O64iu6aeA2Q=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1772442006; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
-	bh=J5WWr7u7V8PgqoSqCoN2hfQhB6KpOUsCdjkVlhTtqg8=; 
-	b=BoIZAxptYubN3O5n3U4TsRvhQFZq+pJFi5ME7i0XRNQsdi1dnsrBr1D3+kvKpGkmQzVg73to1TbDhN1mpntuKoGgYeBPUSKiGmkHZ6T90YMHykZ/9hfepPSjQ0b/pc98TGwho+fRYYTQI4+uUk2QjKsikQD56KEe28sdScPMeYs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
-	dmarc=pass header.from=<frederic.danis@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1772442006;
-	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
-	bh=J5WWr7u7V8PgqoSqCoN2hfQhB6KpOUsCdjkVlhTtqg8=;
-	b=hkcCR/tBMb318STGsJCvy2VIrfX4M/Xf+LFUcXxy39sxU1LUhW0Wt2tFUuoyORQa
-	XTjgH+Wxf6HtrvD2Lh91mlAAEGG7ZCK35S5dw/ijzXKCr26679u/dQdOPEUDY400lYW
-	ZhNCIK597GmijPCqbMOxKI/1CkAL8kOONQRjs7dc=
-Received: by mx.zohomail.com with SMTPS id 1772442004819825.569561025359;
-	Mon, 2 Mar 2026 01:00:04 -0800 (PST)
-Message-ID: <26087e38-531d-4cbe-b7f3-b68d39f0d70d@collabora.com>
-Date: Mon, 2 Mar 2026 10:00:02 +0100
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="DYtyMzmM"
+Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx4.sberdevices.ru (Postfix) with ESMTP id 3818440003
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 12:22:11 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru 3818440003
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=post; t=1772443331;
+	bh=YDNEiVUyBzYgG4r6acNE7FMyaWK26TwBDqfA+KiBtTE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=DYtyMzmMebBdt5PlzV6MllKWI6te/t5Fk7UssQKoFZZqe9rlficDATn1E/FHbXJX9
+	 NfoRHMlJ/rlG5R0a7Zj40ukAVhSlAXdLay43xR6OHBB1y0PtNnMfOwsMKMXLmIeRso
+	 Dr21qRR5Zff1Qd6VxVT54vKxNOhBR61TOHIqAiTcL8ZZGtYhwTMvrAp3UbTsrYRAfw
+	 bivDkRMsZTvtmTXo9/aY0+ZhcqBTcYSibbGgsYa7PIO4laCozdXzoxdI1ie1CWFIy+
+	 xzur+oZf67qJCZsPDgOSXnM+ip8VggvmreRYWdF3s3VbcbkJjEseZoLn3MTgG0Updl
+	 ixtQ4BQHPMcVw==
+Received: from smtp.sberdevices.ru (p-exch-cas-s-m1.sberdevices.ru [172.16.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "sberdevices.ru", Issuer "R12" (verified OK))
+	by mx4.sberdevices.ru (Postfix) with ESMTPS
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 12:22:11 +0300 (MSK)
+From: Pavel Bozhko <pvbozhko@salutedevices.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Pavel Bozhko <pvbozhko@salutedevices.com>
+Subject: [PATCH BlueZ] audio/avrcp: fix EVENT_VOLUME_CHANGED not supported
+Date: Mon, 2 Mar 2026 12:22:03 +0300
+Message-ID: <20260302092203.12775-1-pvbozhko@salutedevices.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 15/15] doc/qualification: l2cap-pts: add
- descriptions for LE CFC tests
-To: Christian Eggers <ceggers@arri.de>, linux-bluetooth@vger.kernel.org
-References: <20260227160022.21462-1-ceggers@arri.de>
- <20260227160022.21462-16-ceggers@arri.de>
-Content-Language: en-US
-From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
-In-Reply-To: <20260227160022.21462-16-ceggers@arri.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+X-ClientProxiedBy: p-exch-cas-a-m2.sberdevices.ru (172.24.201.210) To
+ p-exch-cas-s-m1.sberdevices.ru (172.16.210.2)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: pvbozhko@salutedevices.com
+X-KSMG-AntiSpam-Info: LuaCore: 87 0.3.87 7430d8ffafccd8879e1d8370e5b501352446c2ba, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 200957 [Mar 02 2026]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.20
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/03/02 07:03:00 #28238479
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-KATA-Status: Not Scanned
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 5
 
-Hi Christian,
+Some devices with AVRCP 1.3 may support remote volume
+control—for example, certain TV models such as:
+- LG webOS TV UM7450PLA
+- Xiaomi Mi TV 4A 43
+when they act as the audio source, provided that
+Category 2 (Monitor/Amplifier) functionality is supported.
+---
+ profiles/audio/avrcp.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-On 27/02/2026 16:54, Christian Eggers wrote:
-> All these tests depend on TSPC_L2CAP_2_46. Some tests require kernel
-> fixes.
-> ---
->   doc/qualification/l2cap-pics.rst |  10 +-
->   doc/qualification/l2cap-pts.rst  | 215 +++++++++++++++++++++++++++++++
->   2 files changed, 220 insertions(+), 5 deletions(-)
->
-> diff --git a/doc/qualification/l2cap-pics.rst b/doc/qualification/l2cap-pics.rst
-> index da7de524181f..31f60e144ac4 100644
-> --- a/doc/qualification/l2cap-pics.rst
-> +++ b/doc/qualification/l2cap-pics.rst
-> @@ -46,7 +46,7 @@ Capability Statement
->   +------------------+----------+----------------------------------------------+
->   | TSPC_L2CAP_1_5   |          | LE Data Channel Initiator (C.4)              |
->   +------------------+----------+----------------------------------------------+
-> -| TSPC_L2CAP_1_6   |          | LE Data Channel Acceptor (C.5)               |
-> +| TSPC_L2CAP_1_6   | x        | LE Data Channel Acceptor (C.5)               |
->   +------------------+----------+----------------------------------------------+
->   
->   - C.1: Mandatory IF L2CAP 0/1 "BR/EDR (includes possible support of GAP LE
-> @@ -167,11 +167,11 @@ Capability Statement
->   +------------------+----------+----------------------------------------------+
->   | TSPC_L2CAP_2_45  | x        | Send Disconnect Request Command (C.21)       |
->   +------------------+----------+----------------------------------------------+
-> -| TSPC_L2CAP_2_45a |          | Send Disconnect Request Command - LE (C.22)  |
-> +| TSPC_L2CAP_2_45a | x        | Send Disconnect Request Command - LE (C.22)  |
->   +------------------+----------+----------------------------------------------+
-> -| TSPC_L2CAP_2_46  |          | LE Credit Based Flow Control Mode (C.19)     |
-> +| TSPC_L2CAP_2_46  | x        | LE Credit Based Flow Control Mode (C.19)     |
->   +------------------+----------+----------------------------------------------+
-> -| TSPC_L2CAP_2_47  |          | LE Data Channel (C.20)                       |
-> +| TSPC_L2CAP_2_47  | x        | LE Data Channel (C.20)                       |
->   +------------------+----------+----------------------------------------------+
->   | TSPC_L2CAP_2_48  |          | Enhanced Credit Based Flow Control Mode      |
->   |                  |          | (C.23)                                       |
-> @@ -282,7 +282,7 @@ Capability Statement
->   |                  |          | 'Guaranteed' for Extended Flow Specification.|
->   |                  |          | (C.7)                                        |
->   +------------------+----------+----------------------------------------------+
-> -| TSPC_L2CAP_3_16  |          | Support Multiple Simultaneous LE Data        |
-> +| TSPC_L2CAP_3_16  | x        | Support Multiple Simultaneous LE Data        |
->   |                  |          | Channels (C.10)                              |
->   +------------------+----------+----------------------------------------------+
->   
-> diff --git a/doc/qualification/l2cap-pts.rst b/doc/qualification/l2cap-pts.rst
-> index 93adffba81f2..043b8f20cd64 100644
-> --- a/doc/qualification/l2cap-pts.rst
-> +++ b/doc/qualification/l2cap-pts.rst
-> @@ -14,6 +14,8 @@ Setup
->   
->   - In IXIT update "TSPX_psm" to "1011"
->   
-> +- echo -n 16 > /sys/kernel/debug/bluetooth/hci0/min_encrypt_key_size
-> +
->   Tests
->   =====
->   
-> @@ -89,6 +91,103 @@ for which we know the test passed.
->   |                       |        |        |       |                                                      |
->   |                       |        |        |       |   - l2test -d -P 4113                                |
->   +-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CED/BI-05-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - btmon                                            |
-> +|                       |        |        |       |                                                      |
-
-Please split running steps by adding a separator here.
-
-> +|                       |        |        |       | - Look for "frame too long"                          |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Answer PTS question with "yes"                     |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CED/BI-09-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - btmon                                            |
-> +|                       |        |        |       |                                                      |
-
-Idem
-
-> +|                       |        |        |       | - Look for "invalid signal packet size"              |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Answer PTS question with "yes"                     |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CED/BI-11-C | PASS   |    6.1 | 5.69  |                                                      |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CED/BI-13-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - btmon                                            |
-> +|                       |        |        |       |                                                      |
-
-Idem
-
-> +|                       |        |        |       | - Look for "invalid signal packet size"              |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Answer PTS question with "yes"                     |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CED/BI-16-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - btmon                                            |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Look for "invalid signal packet size"              |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Answer PTS question with "yes"                     |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CED/BI-17-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - btmon                                            |
-> +|                       |        |        |       |                                                      |
-
-Idem
-
-> +|                       |        |        |       | - Look for "invalid signal packet size"              |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Answer PTS question with "yes"                     |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CED/BI-29-C | PASS   | future | 5.69  | On request run:                                      |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - for I in $(seq 255); \                             |
-> +|                       |        |        |       |       do echo "$I/255"; \                            |
-> +|                       |        |        |       |       timeout 0.1 l2test -n -V le_public <PTS addr>;\|
-> +|                       |        |        |       |   done                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | On 2nd request run:                                  |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - l2test -n -V le_public <PTS addr>                  |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | Note: If using 'timeout' from Busybox, ensure having |
-> +|                       |        |        |       |       support for fractional timeout values (requires|
-> +|                       |        |        |       |       at leat 1.37.0 + CONFIG_FLOAT_DURATION).       |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CFC/BV-01-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -w -V le_public -P 0x0027 -C 0 -D 2000 \  |
-> +|                       |        |        |       |                                    -N 1 -b 200       |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CFC/BV-02-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -w -V le_public -P 0x0027 -C 0 -D 2000 \  |
-> +|                       |        |        |       |                                    -N 1 -b 20        |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CFC/BV-03-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -d -V le_public -P 0x0027                 |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CFC/BV-04-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -d -V le_public -P 0x0027                 |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/COS/CFC/BV-05-C | PASS   |    6.1 | 5.69  | On request run (2 times):                            |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -y -V le_public -P 0x0027 -N <PTS addr> & |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
->   | L2CAP/COS/CFD/BV-01-C | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
->   |                       |        |        |       |                                                      |
->   |                       |        |        |       | - Run:                                               |
-> @@ -399,6 +498,120 @@ for which we know the test passed.
->   +-----------------------+--------+--------+-------+------------------------------------------------------+
->   | L2CAP/FIX/BV-01-C     | PASS   |    6.1 | 5.69  | On request run: sudo l2test -z -P 4113 <bdaddr>      |
->   +-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BI-01-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027                 |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-03-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -w -P 0x0027 -V le_public                 |
-> +|                       |        |        |       |                         -e $((0x78563412)) -b 10     |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Result: 123456780A007F7F7F7F                       |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-05-C  | PASS   |    6.1 | 5.69  |                                                      |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-06-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -w -V le_public -P 0x0027 -C 0 -D 2000 \  |
-> +|                       |        |        |       |                                      -N 1 -b 200     |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-07-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027                 |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-08-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027                 |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - On request terminate l2test                        |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-09-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027                 |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-11-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x00F2 -S              |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-13-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x00F3 -W -1           |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-15-C  | PASS   | future | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x00F4 -E              |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-20-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027                 |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-23-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027                 |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-25-C  | PASS   | future | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -P 0x00F5 -V le_public -E              |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-26-C  | PASS   | future | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027 -I 100          |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-27-C  | PASS   | future | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027 -I 100          |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-28-C  | PASS   | future | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027 -I 100          |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-30-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -r -V le_public -P 0x0027                 |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-31-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       | - Run:                                               |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -d -V le_public -P 0x0027                 |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/CFC/BV-32-C  | PASS   |    6.1 | 5.69  | On request run:                                      |
-> +|                       |        |        |       |                                                      |
-> +|                       |        |        |       |   - l2test -u -V le_public -P 0x0027 <bdaddr>        |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
->   | L2CAP/LE/CPU/BV-01-C  | PASS   |    6.1 | 5.69  | Pre-condition:                                       |
->   |                       |        |        |       |                                                      |
->   |                       |        |        |       | - Request a LE only dongle for PTS                   |
-> @@ -435,3 +648,5 @@ for which we know the test passed.
->   |                       |        |        |       |                                                      |
->   |                       |        |        |       |   - l2test -r -V le_public -J 4                      |
->   +-----------------------+--------+--------+-------+------------------------------------------------------+
-> +| L2CAP/LE/REJ/BI-02-C  | PASS   |    6.1 | 5.69  |                                                      |
-> ++-----------------------+--------+--------+-------+------------------------------------------------------+
-
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 724b46c59..d501315b6 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1765,10 +1765,11 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
+-/* SetAbsoluteVolume requires at least version 1.4 and a category-2 */
++/* SetAbsoluteVolume requires at least version 1.4 and or category-2 */
+ static bool avrcp_volume_supported(struct avrcp_data *data)
+ {
+-	if (!data || data->version < 0x0104)
++	if (!data || (data->version < 0x0104 &&
++		!(data->features & AVRCP_FEATURE_CATEGORY_2)))
+ 		return false;
+ 
+ 	if (btd_opts.avrcp.volume_category &&
+@@ -4293,13 +4294,13 @@ static void target_init(struct avrcp *session)
+ 				(1 << AVRCP_EVENT_TRACK_REACHED_END) |
+ 				(1 << AVRCP_EVENT_SETTINGS_CHANGED);
+ 
+-	if (target->version < 0x0104)
+-		return;
+-
+ 	if (avrcp_volume_supported(target))
+ 		session->supported_events |=
+ 				(1 << AVRCP_EVENT_VOLUME_CHANGED);
+ 
++	if (target->version < 0x0104)
++		return;
++
+ 	session->supported_events |=
+ 				(1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
+ 				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
 -- 
-Frédéric Danis
-Senior Software Engineer
-
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
-Registered in England & Wales, no. 5513718
-
+2.50.1 (Apple Git-155)
 
