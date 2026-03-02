@@ -1,376 +1,530 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8EC3ED5CC;
-	Mon,  2 Mar 2026 20:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772484683; cv=none; b=ZBQYgJfmQm2Ex0y9W9iHnPitWVDRpqg1XqZBpI98P5mK02Q965luWfjW2EcB0+LCpLelAdDNw3pEz0La0ZdoOW2sMHOoopjSRN/H4LNq5sTLIQaK/TYjW8mFC7H0/IUfQwGRrq6WH8EtZ+XsvE0l+wwqvLWUXFSLBNZREFwjiGg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772484683; c=relaxed/simple;
-	bh=/sz7TWb/8/hX0LciA1x/Z08Sx95qZ79eor/fKNv831c=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SdlFMm0k8JwjdazHKdpzxVs1xZuj3l789QCQARTKLxKNYIVLpTDrE9wVYzzr+xR1Nc84lCcaAlJlAoeuN3A1JHqt2JtDzfCNl+1iZz02HTznYDbnJz0l/dfNPJC/fpvpFUd8pfqlOU9nDUnfL8p0tYu34KouVoinxQJt+ndH7yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T7M2jA0E; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26F01A680A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 21:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772485418; cv=pass; b=HJkQUXtodQCQR/mzr8UmrEROMgZG+ASdnoS+wQF9p/g9GIUJAHj38/8UNrnxSLgm+EOftrAzWKK8K0e1QZRcO2s1BCFOClv5vPZpSOBq3DMbh4n6p/F+A6/bkDDTsfoRk8b52uy/Vv93mYI+OJOYSCVDTl6Yg87jveVncjYzwmg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772485418; c=relaxed/simple;
+	bh=sh0zeQn5O8VzF+54Ggz1ffVzI2UaxFr3WgCHDYveM0I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VgEujXEnmzV5eD/HTwP3GhdwR03AdYilRU6o3o+YrmEkqotuXY/Z8cO8npm4ZHfUa85i5arl0lefSotVh9seBjk63aLrjcs2CUtY7U9V0Sa1LmVZ1zUTUVcCDXuHsabojasGBc+X9jiCpIbbGTDcDKIZvafcqGsxfoqbGeMs4CM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RDU1d1Tg; arc=pass smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7M2jA0E"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC98CC2BCAF;
-	Mon,  2 Mar 2026 20:51:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772484682;
-	bh=/sz7TWb/8/hX0LciA1x/Z08Sx95qZ79eor/fKNv831c=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=T7M2jA0E+nOiFu6g0V2eB4Fpg250FkkborXQ68QoO89fQRYaKtke1mCmqo5Vuf7+r
-	 wiGdNgQVLprPk5IB7mkheRRMyC+FRKyQz6ka9nPwO+kJgHBHZ43Md2Dkd9VD0/Of83
-	 ZUNAObaZI0EzCRK+rvOI+NopDu28S8zgq5QgcDyiMewHIqmRZf306wVK3dRX1tBBlm
-	 VErLvddEWB8MSYgMw/Tz8REN4YQ1FxmYNeki4O77thoNIvmMcSZ/Thb9ssZkIaaIfz
-	 KZV2FrOeEqwnH4Do1nBzSwg2vKuYdXhsUVCS3pZV7L6ke8IgQelYklF9NzLOeqoxtq
-	 8b/TRYKwQNuoQ==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Mon, 02 Mar 2026 15:25:34 -0500
-Subject: [PATCH v2 110/110] vfs: remove kino_t typedef and PRIino format
- macro
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RDU1d1Tg"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-64ad79dfb6eso4691184d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Mar 2026 13:03:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772485416; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bWoxRLNdd0NAwuUhUbTVap6o1WnkGE0xzuA0iVLqWc5VFhS0z+pZCAqTetXPgs24wQ
+         DRIz8NDty+pxdQz9pv/K5n6aR1ZaTM/B32477gMA3ieOhfxc/TYG0e3o/xgv1QZzIrBm
+         M86eRxxXdpR5QRiZNzk1nPiE0DB+Qj1wrbtXkPiKBS1P4QQDNh+pOWlH0UI+t2oeasQe
+         njeTi8+CsPtA1rujRh5JZ4e7U8mtPj0opEs6/oUsqENgmYT6JUV82PVcoB5kjITwoIwm
+         ETt0NBt75mW/VQFj/CB3e0g8V7Hdg/48fM1j82DAaAP4+OqUZgZNkyorKs9uEQFV0yIU
+         u5GA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Wd7x6jdQaF90GGHYrkwj555OpqVQJwsaHCZ8MP78tww=;
+        fh=Z9hGMtH+nV7MTezAcoX1lSU6H8xrK+zqv/aC+jUf9uk=;
+        b=aVcKTFXAadN7T8HWU3TexwswPKf56nnb2mW7Iln1AUa+c3pbL6y+e4uSF1n9N6VMaV
+         eVQJ7JA1jtw9YUkGAm6dqRc2N4b01aDA501CxaM12Yxr5OmhVrMhhKyTyiVBHx9eqj3J
+         ZQPWBQNmnXqnpKH2Hjuu32ah5Y6W5xMIEFtn4b1mB6MFB2XT5cqu15YbScp+7/SQbPlY
+         cTgDwaMlE1FRJJlhtryDcYul1H8VTws0rXoVo0FT+FoX5Ks0oihsM1gU02WhmFj/mpSz
+         PIwrq7PQk6MypN7iMgnEHraEptuz+c01v1N2hunLjIE77UX0gfwXEr2q+mWhjkBi4hbW
+         53Gg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772485416; x=1773090216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wd7x6jdQaF90GGHYrkwj555OpqVQJwsaHCZ8MP78tww=;
+        b=RDU1d1TgNc+bf/1anwLvskOIwd8yzCt2CUtZqGJLzzJtH4/YMcy5g6SQMMZw07qe5x
+         yZve+Fo/8Gkz6SsFoGPsWsy2sJneeumUUCf0HjfsbjLKbW/lLG9Xxmg63tf1Jkdx+f1K
+         Kbe/YlKn2Vl32WoWDrNISm/GaQTSY8JZe/o+vikbuSFQn6RwPKiBCp/GazVsMEpvwDGV
+         LszK32OlMlR3Aavr/xVA0hScS/T5DLRC6yZKE7Y9FfcH1w2ilrnUDdkgRenDZ82+QE5/
+         UKQc0OQiEH3F6EDrTFPbyof8fTnxohJWB8yEOKSaIohfrLX4HiDfUAiIjZsd0aM7vCv6
+         qtpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772485416; x=1773090216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Wd7x6jdQaF90GGHYrkwj555OpqVQJwsaHCZ8MP78tww=;
+        b=Rxk+OBuKQeMWQZjtXMwZJ05KfOf2Evc7LOko5dE/TnrPRfj0iaUq9vZEmJZQJMv8G5
+         Ve6cCuSlb7wdIbB67xJJFI1NRDbA0dSdZsIAG/2lFgaY+wQUCfl96ZC2AqKGGGQtLe4F
+         5WM97KmEEGpCZbUj1cMuGktfVpQ6d5CXZcm/+w7uvO+xyjCjRmmKO81yFKLs0o2V9IO+
+         xoarmgq4Lh1SS3zYV0OKqvmxX2w0VVo28iKYNv7LK2gO5B1Nyj140yMqacjdnVEqPlk+
+         /zGnLx5y3Evg0PHzU8/A0HC1HApp0CYTK/StZ2t9nVgBdhwHO7ulDYVtYkt2LgAPuo3m
+         Sgag==
+X-Gm-Message-State: AOJu0YzokgAcEh7at2WzVxFpgKrKe1Rzu3ZE0+Hotf9o5TOlb1n0Gu7E
+	7hQZOIz3z9rv+KvBQFF5G7CiQkg0LVknNaCwEkSSr9s3i1QlAyS/b4mMSB6LHwldxULJOKy27o7
+	jXjIxPOCP/yaTURU3cKFLv9nVTLIFohU=
+X-Gm-Gg: ATEYQzxuae/wDYwjww2VEUdc/aEv7KdIa0mw4UBU0m0Uxct2OMaR0QZ8r9i+9xpGVn6
+	QcJTo27V2+1nU+dSCzHg0IRz8HBJ/O9emr+qyqw8EnRtiKd2I+wFedfeIp9PUL77RRFdElupZ1F
+	H4pGfEwYLkwo+zXQgmRikRo4djXcoBueYFNe2TE9MWSt9rcB3qrjo1Unv0z9V4Ha/I0pZsKBDk9
+	+X+jxIGERu91XbyS6B2ao9Ecjfk2dcld7gn+1mP+x+S3WUdNf03PsjjH4a4suAeOyfAhkotpeSf
+	TsEDviE2ujXBExbrUWit0vOj8Tgj78W5ev6J/cAB1QP195WNNqt6Ct68Emjumo1C+/XZ+cXkwcV
+	EB3PR
+X-Received: by 2002:a05:690e:edb:b0:64c:9a08:9948 with SMTP id
+ 956f58d0204a3-64cc2302f31mr10457463d50.76.1772485415791; Mon, 02 Mar 2026
+ 13:03:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260302-iino-u64-v2-110-e5388800dae0@kernel.org>
-References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
-In-Reply-To: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
-To: Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- Dan Williams <dan.j.williams@intel.com>, 
- Matthew Wilcox <willy@infradead.org>, Eric Biggers <ebiggers@kernel.org>, 
- "Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>, 
- Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, 
- David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>, 
- Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, 
- Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, 
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>, 
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
- Shyam Prasad N <sprasad@microsoft.com>, 
- Bharath SM <bharathsm@microsoft.com>, 
- Alexander Aring <alex.aring@gmail.com>, 
- Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
- Viacheslav Dubeyko <slava@dubeyko.com>, 
- Eric Van Hensbergen <ericvh@kernel.org>, 
- Latchesar Ionkov <lucho@ionkov.net>, 
- Dominique Martinet <asmadeus@codewreck.org>, 
- Christian Schoenebeck <linux_oss@crudebyte.com>, 
- David Sterba <dsterba@suse.com>, Marc Dionne <marc.dionne@auristor.com>, 
- Ian Kent <raven@themaw.net>, Luis de Bethencourt <luisbg@kernel.org>, 
- Salah Triki <salah.triki@gmail.com>, 
- "Tigran A. Aivazian" <aivazian.tigran@gmail.com>, 
- Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, 
- Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, 
- Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>, 
- Amir Goldstein <amir73il@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
- Yangtao Li <frank.li@vivo.com>, 
- Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>, 
- David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, 
- Dave Kleikamp <shaggy@kernel.org>, 
- Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
- Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
- Joseph Qi <joseph.qi@linux.alibaba.com>, 
- Mike Marshall <hubcap@omnibond.com>, 
- Martin Brandenburg <martin@omnibond.com>, 
- Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>, 
- Zhihao Cheng <chengzhihao1@huawei.com>, Damien Le Moal <dlemoal@kernel.org>, 
- Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>, 
- John Johansen <john.johansen@canonical.com>, 
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
- "Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>, 
- Roberto Sassu <roberto.sassu@huawei.com>, 
- Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
- Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>, 
- Stephen Smalley <stephen.smalley.work@gmail.com>, 
- Ondrej Mosnacek <omosnace@redhat.com>, 
- Casey Schaufler <casey@schaufler-ca.com>, 
- Alex Deucher <alexander.deucher@amd.com>, 
- =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Sumit Semwal <sumit.semwal@linaro.org>, Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
- Arnaldo Carvalho de Melo <acme@kernel.org>, 
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
- Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
- Adrian Hunter <adrian.hunter@intel.com>, 
- James Clark <james.clark@linaro.org>, "Darrick J. Wong" <djwong@kernel.org>, 
- Martin Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>, 
- Joerg Reuter <jreuter@yaina.de>, Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Oliver Hartkopp <socketcan@hartkopp.net>, 
- Marc Kleine-Budde <mkl@pengutronix.de>, David Ahern <dsahern@kernel.org>, 
- Neal Cardwell <ncardwell@google.com>, 
- Steffen Klassert <steffen.klassert@secunet.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- Remi Denis-Courmont <courmisch@gmail.com>, 
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
- Xin Long <lucien.xin@gmail.com>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev, 
- fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev, 
- linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org, 
- v9fs@lists.linux.dev, linux-afs@lists.infradead.org, autofs@vger.kernel.org, 
- ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu, 
- ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org, 
- jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev, 
- ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org, 
- linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
- linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org, 
- selinux@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
- dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
- linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org, 
- linux-perf-users@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
- linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org, 
- linux-x25@vger.kernel.org, audit@vger.kernel.org, 
- linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, 
- linux-sctp@vger.kernel.org, bpf@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7864; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=/sz7TWb/8/hX0LciA1x/Z08Sx95qZ79eor/fKNv831c=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBppfIOWw4VpZ1f0esD0l2eblcdOGEvFuzW5qecf
- cTPMYYfwB+JAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaaXyDgAKCRAADmhBGVaC
- FSiGEADKoZsC6JwFSXz5Q8tPMZ6t8//Y5SGA/vaBUiD5D0C+kZUFc/J5USU5TJAKaXk0BTDmAT/
- 2kbSCQNocpoPv3+wT1fnN67/FnoxtqnhKqtCXlvPPR9RqXVCoIxxjy81hmMGvj5OueJeojBhBrE
- EPeNMIFty+gCEGi2dWknNkaFTtNxVknqICbKKlus5egvNmB/P/wcCwA75eyzT9Cqf8HgCQ2UWH6
- E+1UZg/P3Utcs5RWUN4LdyqwfM+nEl51pMv3R4lNJeMv6VLFYo0VBxIBSMwMwLYGA8ONx6GabD8
- h7hmuJLNcF4apD7rmibApIK+IR8kjVt7xg3Z1R/kF7WyEW+ipWCA+d5pPv4ATJrviTJ5swUDr+e
- 0fR52ir06HftVbBViJXC+/+JeBB5ygEQwwixuJf+EHIPh8Nw+eAOeSMTJT6/5J9boBSM4t53R2U
- 1uE4EroXow0SM75te/gScXwcjFowrQz/+gRU3pxfj31chpErmp6yk2ql36oF4XCRuFtyNVG3v2y
- fwmpsbHx68WQUTJbKUJrw9HuC4vvVoFx2K26sNk8Mvnxfxb/Menyn7MMrfXHs4wZ/DdlCIHP9J6
- K4FPkJfGrBW5QSCsdyluxgAY1+ed66E9Oz4M67wxOod8vTaTchUlxDXS5wJQNAd38COtoq/jHe9
- EYgFPWN/4XZNcUQ==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+References: <cover.1772282574.git.pav@iki.fi> <4fcc1157a7ca09b2a9c394cfb11f2083fecaa3e1.1772282574.git.pav@iki.fi>
+In-Reply-To: <4fcc1157a7ca09b2a9c394cfb11f2083fecaa3e1.1772282574.git.pav@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 2 Mar 2026 16:03:24 -0500
+X-Gm-Features: AaiRm53-3P14Alfj8XVk4DQtycMDy8PobtVRF4emr5TPGnDvkK5qwkZvi6-X5AY
+Message-ID: <CABBYNZJGkH4iBQbotoELVf5PUNr9tcKn0E6N87r+0TiRYmcuYQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 07/11] test-runner: use virtio-serial for
+ implementing -u device forwarding
+To: Pauli Virtanen <pav@iki.fi>, Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Now that i_ino has been widened to u64, replace the kino_t typedef with
-u64 and the PRIino format macro with the concrete format strings.
+Hi Pauli,
 
-Replace the remaining PRIino uses throughout the tree, and remove the
-typedef and #define from include/linux/fs.h. Change the i_ino field in
-struct inode from kino_t to u64.
+On Sat, Feb 28, 2026 at 7:52=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Using pci-serial to forward eg. btvirt sockets is unreliable, as qemu or
+> kernel seems to be sometimes dropping part of the sent data or insert
+> spurious \0 bytes, leading to sporadic errors like:
+>
+>     kernel: Bluetooth: hci0: command 0x0c52 tx timeout
+>     kernel: Bluetooth: hci0: Opcode 0x0c52 failed: -110
+>     btvirt: packet error, unknown type: 0
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- fs/dcache.c        |  4 ++--
- fs/eventpoll.c     |  2 +-
- fs/fserror.c       |  2 +-
- fs/inode.c         | 10 +++++-----
- fs/locks.c         |  6 +++---
- fs/nsfs.c          |  4 ++--
- fs/pipe.c          |  2 +-
- include/linux/fs.h |  5 +----
- 8 files changed, 16 insertions(+), 19 deletions(-)
+Interesting, so this comes down the pci-serial being unreliable? There
+have been occurrences of this even without attaching any controller
+with the VM, LL Privacy tests in mgmt-tester do occasionally timeout
+like above, but perhaps that is a different issue.
 
-diff --git a/fs/dcache.c b/fs/dcache.c
-index 13fb3e89cba7442c9bed74c41ca18be5e43e28c9..9ceab142896f6631017067890fd1079240448e13 100644
---- a/fs/dcache.c
-+++ b/fs/dcache.c
-@@ -1637,11 +1637,11 @@ static enum d_walk_ret umount_check(void *_data, struct dentry *dentry)
- 	if (dentry == _data && dentry->d_lockref.count == 1)
- 		return D_WALK_CONTINUE;
- 
--	WARN(1, "BUG: Dentry %p{i=%" PRIino "x,n=%pd} "
-+	WARN(1, "BUG: Dentry %p{i=%llx,n=%pd} "
- 			" still in use (%d) [unmount of %s %s]\n",
- 		       dentry,
- 		       dentry->d_inode ?
--		       dentry->d_inode->i_ino : (kino_t)0,
-+		       dentry->d_inode->i_ino : (u64)0,
- 		       dentry,
- 		       dentry->d_lockref.count,
- 		       dentry->d_sb->s_type->name,
-diff --git a/fs/eventpoll.c b/fs/eventpoll.c
-index 90fd92425492221d13bd0cf067d47579bb407a01..4ccd4d2e31adf571f939d2e777123e40302e565f 100644
---- a/fs/eventpoll.c
-+++ b/fs/eventpoll.c
-@@ -1080,7 +1080,7 @@ static void ep_show_fdinfo(struct seq_file *m, struct file *f)
- 		struct inode *inode = file_inode(epi->ffd.file);
- 
- 		seq_printf(m, "tfd: %8d events: %8x data: %16llx "
--			   " pos:%lli ino:%" PRIino "x sdev:%x\n",
-+			   " pos:%lli ino:%llx sdev:%x\n",
- 			   epi->ffd.fd, epi->event.events,
- 			   (long long)epi->event.data,
- 			   (long long)epi->ffd.file->f_pos,
-diff --git a/fs/fserror.c b/fs/fserror.c
-index b685b329b5956a639c41b25c42cfff16e6e5ab6e..1e4d11fd9562fd158a23b64ca60e9b7e01719cb8 100644
---- a/fs/fserror.c
-+++ b/fs/fserror.c
-@@ -176,7 +176,7 @@ void fserror_report(struct super_block *sb, struct inode *inode,
- lost:
- 	if (inode)
- 		pr_err_ratelimited(
-- "%s: lost file I/O error report for ino %" PRIino "u type %u pos 0x%llx len 0x%llx error %d",
-+ "%s: lost file I/O error report for ino %llu type %u pos 0x%llx len 0x%llx error %d",
- 		       sb->s_id, inode->i_ino, type, pos, len, error);
- 	else
- 		pr_err_ratelimited(
-diff --git a/fs/inode.c b/fs/inode.c
-index 24ab9fa10baf7c885244f23bfccd731efe4a14cc..5ad169d51728c260aeaabb810e59eb3ec1d1ce52 100644
---- a/fs/inode.c
-+++ b/fs/inode.c
-@@ -726,7 +726,7 @@ void dump_mapping(const struct address_space *mapping)
- 	struct dentry *dentry_ptr;
- 	struct dentry dentry;
- 	char fname[64] = {};
--	kino_t ino;
-+	u64 ino;
- 
- 	/*
- 	 * If mapping is an invalid pointer, we don't want to crash
-@@ -750,14 +750,14 @@ void dump_mapping(const struct address_space *mapping)
- 	}
- 
- 	if (!dentry_first) {
--		pr_warn("aops:%ps ino:%" PRIino "x\n", a_ops, ino);
-+		pr_warn("aops:%ps ino:%llx\n", a_ops, ino);
- 		return;
- 	}
- 
- 	dentry_ptr = container_of(dentry_first, struct dentry, d_u.d_alias);
- 	if (get_kernel_nofault(dentry, dentry_ptr) ||
- 	    !dentry.d_parent || !dentry.d_name.name) {
--		pr_warn("aops:%ps ino:%" PRIino "x invalid dentry:%px\n",
-+		pr_warn("aops:%ps ino:%llx invalid dentry:%px\n",
- 				a_ops, ino, dentry_ptr);
- 		return;
- 	}
-@@ -768,7 +768,7 @@ void dump_mapping(const struct address_space *mapping)
- 	 * Even if strncpy_from_kernel_nofault() succeeded,
- 	 * the fname could be unreliable
- 	 */
--	pr_warn("aops:%ps ino:%" PRIino "x dentry name(?):\"%s\"\n",
-+	pr_warn("aops:%ps ino:%llx dentry name(?):\"%s\"\n",
- 		a_ops, ino, fname);
- }
- 
-@@ -2641,7 +2641,7 @@ void init_special_inode(struct inode *inode, umode_t mode, dev_t rdev)
- 		/* leave it no_open_fops */
- 		break;
- 	default:
--		pr_debug("init_special_inode: bogus i_mode (%o) for inode %s:%" PRIino "u\n",
-+		pr_debug("init_special_inode: bogus i_mode (%o) for inode %s:%llu\n",
- 			 mode, inode->i_sb->s_id, inode->i_ino);
- 		break;
- 	}
-diff --git a/fs/locks.c b/fs/locks.c
-index 9c5aa23f09b6e061dc94c81cd802bb65dd0053c1..d8b066fb42108971f6b3c7449dbc9b5f8df16b13 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -234,7 +234,7 @@ locks_check_ctx_lists(struct inode *inode)
- 	if (unlikely(!list_empty(&ctx->flc_flock) ||
- 		     !list_empty(&ctx->flc_posix) ||
- 		     !list_empty(&ctx->flc_lease))) {
--		pr_warn("Leaked locks on dev=0x%x:0x%x ino=0x%" PRIino "x:\n",
-+		pr_warn("Leaked locks on dev=0x%x:0x%x ino=0x%llx:\n",
- 			MAJOR(inode->i_sb->s_dev), MINOR(inode->i_sb->s_dev),
- 			inode->i_ino);
- 		locks_dump_ctx_list(&ctx->flc_flock, "FLOCK");
-@@ -251,7 +251,7 @@ locks_check_ctx_file_list(struct file *filp, struct list_head *list, char *list_
- 
- 	list_for_each_entry(flc, list, flc_list)
- 		if (flc->flc_file == filp)
--			pr_warn("Leaked %s lock on dev=0x%x:0x%x ino=0x%" PRIino "x "
-+			pr_warn("Leaked %s lock on dev=0x%x:0x%x ino=0x%llx "
- 				" fl_owner=%p fl_flags=0x%x fl_type=0x%x fl_pid=%u\n",
- 				list_type, MAJOR(inode->i_sb->s_dev),
- 				MINOR(inode->i_sb->s_dev), inode->i_ino,
-@@ -2896,7 +2896,7 @@ static void lock_get_status(struct seq_file *f, struct file_lock_core *flc,
- 			     (type == F_RDLCK) ? "READ" : "UNLCK");
- 	if (inode) {
- 		/* userspace relies on this representation of dev_t */
--		seq_printf(f, "%d %02x:%02x:%" PRIino "u ", pid,
-+		seq_printf(f, "%d %02x:%02x:%llu ", pid,
- 				MAJOR(inode->i_sb->s_dev),
- 				MINOR(inode->i_sb->s_dev), inode->i_ino);
- 	} else {
-diff --git a/fs/nsfs.c b/fs/nsfs.c
-index 0e099ee2121f8831645c3a25d759793ef2ff9ce6..eac326b85314ac8080248347154d599c953969c7 100644
---- a/fs/nsfs.c
-+++ b/fs/nsfs.c
-@@ -46,7 +46,7 @@ static char *ns_dname(struct dentry *dentry, char *buffer, int buflen)
- 	struct ns_common *ns = inode->i_private;
- 	const struct proc_ns_operations *ns_ops = ns->ops;
- 
--	return dynamic_dname(buffer, buflen, "%s:[%" PRIino "u]",
-+	return dynamic_dname(buffer, buflen, "%s:[%llu]",
- 		ns_ops->name, inode->i_ino);
- }
- 
-@@ -394,7 +394,7 @@ static int nsfs_show_path(struct seq_file *seq, struct dentry *dentry)
- 	const struct ns_common *ns = inode->i_private;
- 	const struct proc_ns_operations *ns_ops = ns->ops;
- 
--	seq_printf(seq, "%s:[%" PRIino "u]", ns_ops->name, inode->i_ino);
-+	seq_printf(seq, "%s:[%llu]", ns_ops->name, inode->i_ino);
- 	return 0;
- }
- 
-diff --git a/fs/pipe.c b/fs/pipe.c
-index 311928e8713989747605fd79f653e36d27ce8c0e..9841648c9cf3e8e569cf6ba5c792624fe92396f5 100644
---- a/fs/pipe.c
-+++ b/fs/pipe.c
-@@ -873,7 +873,7 @@ static struct vfsmount *pipe_mnt __ro_after_init;
-  */
- static char *pipefs_dname(struct dentry *dentry, char *buffer, int buflen)
- {
--	return dynamic_dname(buffer, buflen, "pipe:[%" PRIino "u]",
-+	return dynamic_dname(buffer, buflen, "pipe:[%llu]",
- 				d_inode(dentry)->i_ino);
- }
- 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 4193817e02e8bf94f29514ca43379af21f37ac61..097443bf12e289c347651e5f3da5b67eb6b53121 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -758,9 +758,6 @@ struct inode_state_flags {
- 	enum inode_state_flags_enum __state;
- };
- 
--typedef u64		kino_t;
--#define PRIino		"ll"
--
- /*
-  * Keep mostly read-only and often accessed (especially for
-  * the RCU path lookup and 'stat' data) fields at the beginning
-@@ -786,7 +783,7 @@ struct inode {
- #endif
- 
- 	/* Stat data, not accessed from path walking */
--	kino_t			i_ino;
-+	u64			i_ino;
- 	/*
- 	 * Filesystems may only read i_nlink directly.  They shall use the
- 	 * following functions for modification:
+> This appears to occur most often when host system is under load, e.g.
+> due to multiple test-runners running at the same time.  The problem is
+> not specific to btvirt, but seems to be in the qemu serial device layer
+> vs. kernel interaction.
+>
+> Change test-runner to use virtserialport to forward the btvirt
+> connection inside the VM, as virtio-serial doesn't appear to have these
+> problems.
+>
+> Since it's not a TTY device, we have to do vport <-> tty-with-hci-ldisc
+> forwarding of the data in test-runner, so this becomes a bit more
+> involved.
 
--- 
-2.53.0
+I wonder if we could just use virtio_bt
+(https://github.com/torvalds/linux/blob/master/drivers/bluetooth/virtio_bt.=
+c)
+here, instead of using a serial, so we don't have to copy the data
+both ways? Or perhaps the problem is that this was never completed
+upstream @Marcel Holtmann?
 
+> ---
+>  tools/test-runner.c | 300 +++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 230 insertions(+), 70 deletions(-)
+>
+> diff --git a/tools/test-runner.c b/tools/test-runner.c
+> index b3e0b0cfe..576313b79 100644
+> --- a/tools/test-runner.c
+> +++ b/tools/test-runner.c
+> @@ -24,6 +24,9 @@
+>  #include <getopt.h>
+>  #include <poll.h>
+>  #include <limits.h>
+> +#include <dirent.h>
+> +#include <pty.h>
+> +#include <stdint.h>
+>  #include <sys/wait.h>
+>  #include <sys/stat.h>
+>  #include <sys/types.h>
+> @@ -306,7 +309,7 @@ static void start_qemu(void)
+>                                 testargs);
+>
+>         argv =3D alloca(sizeof(qemu_argv) +
+> -                       (sizeof(char *) * (6 + (num_devs * 4))) +
+> +                       (sizeof(char *) * (8 + (num_devs * 4))) +
+>                         (sizeof(char *) * (usb_dev ? 4 : 0)) +
+>                         (sizeof(char *) * num_extra_opts));
+>         memcpy(argv, qemu_argv, sizeof(qemu_argv));
+> @@ -330,14 +333,17 @@ static void start_qemu(void)
+>         argv[pos++] =3D "-append";
+>         argv[pos++] =3D (char *) cmdline;
+>
+> +       argv[pos++] =3D "-device";
+> +       argv[pos++] =3D "virtio-serial";
+> +
+>         for (i =3D 0; i < num_devs; i++) {
+>                 char *chrdev, *serdev;
+>
+>                 chrdev =3D alloca(48 + strlen(device_path));
+>                 sprintf(chrdev, "socket,path=3D%s,id=3Dbt%d", device_path=
+, i);
+>
+> -               serdev =3D alloca(48);
+> -               sprintf(serdev, "pci-serial,chardev=3Dbt%d", i);
+> +               serdev =3D alloca(64);
+> +               sprintf(serdev, "virtserialport,chardev=3Dbt%d,name=3Dbt.=
+%d", i, i);
+>
+>                 argv[pos++] =3D "-chardev";
+>                 argv[pos++] =3D chrdev;
+> @@ -360,65 +366,12 @@ static void start_qemu(void)
+>         execve(argv[0], argv, qemu_envp);
+>  }
+>
+> -static int open_serial(const char *path)
+> -{
+> -       struct termios ti;
+> -       int fd, saved_ldisc, ldisc =3D N_HCI;
+> -
+> -       fd =3D open(path, O_RDWR | O_NOCTTY);
+> -       if (fd < 0) {
+> -               perror("Failed to open serial port");
+> -               return -1;
+> -       }
+> -
+> -       if (tcflush(fd, TCIOFLUSH) < 0) {
+> -               perror("Failed to flush serial port");
+> -               close(fd);
+> -               return -1;
+> -       }
+> -
+> -       if (ioctl(fd, TIOCGETD, &saved_ldisc) < 0) {
+> -               perror("Failed get serial line discipline");
+> -               close(fd);
+> -               return -1;
+> -       }
+> -
+> -       /* Switch TTY to raw mode */
+> -       memset(&ti, 0, sizeof(ti));
+> -       cfmakeraw(&ti);
+> -
+> -       ti.c_cflag |=3D (B115200 | CLOCAL | CREAD);
+> -
+> -       /* Set flow control */
+> -       ti.c_cflag |=3D CRTSCTS;
+> -
+> -       if (tcsetattr(fd, TCSANOW, &ti) < 0) {
+> -               perror("Failed to set serial port settings");
+> -               close(fd);
+> -               return -1;
+> -       }
+> -
+> -       if (ioctl(fd, TIOCSETD, &ldisc) < 0) {
+> -               perror("Failed set serial line discipline");
+> -               close(fd);
+> -               return -1;
+> -       }
+> -
+> -       printf("Switched line discipline from %d to %d\n", saved_ldisc, l=
+disc);
+> -
+> -       return fd;
+> -}
+> -
+> -static int attach_proto(const char *path, unsigned int proto,
+> +static int attach_proto(int fd, unsigned int proto,
+>                                         unsigned int mandatory_flags,
+>                                         unsigned int optional_flags)
+>  {
+>         unsigned int flags =3D mandatory_flags | optional_flags;
+> -       int fd, dev_id;
+> -
+> -       fd =3D open_serial(path);
+> -       if (fd < 0)
+> -               return -1;
+> +       int dev_id;
+>
+>         if (ioctl(fd, HCIUARTSETFLAGS, flags) < 0) {
+>                 if (errno =3D=3D EINVAL) {
+> @@ -895,13 +848,222 @@ static int start_audio_server(pid_t pids[2])
+>         return 0;
+>  }
+>
+> +static bool find_attach_dev(char path[PATH_MAX])
+> +{
+> +       const char *vport_path =3D "/sys/class/virtio-ports";
+> +       struct dirent *entry;
+> +       DIR *dir;
+> +
+> +       dir =3D opendir(vport_path);
+> +       if (!dir)
+> +               return false;
+> +
+> +       while ((entry =3D readdir(dir)) !=3D NULL) {
+> +               FILE *f;
+> +               char buf[64];
+> +               size_t size;
+> +
+> +               snprintf(path, PATH_MAX, "%s/%s/name", vport_path,
+> +                                                               entry->d_=
+name);
+> +               f =3D fopen(path, "r");
+> +               if (!f)
+> +                       continue;
+> +
+> +               size =3D fread(buf, 1, sizeof(buf) - 1, f);
+> +               buf[size] =3D 0;
+> +
+> +               fclose(f);
+> +
+> +               if (strncmp(buf, "bt.", 3) =3D=3D 0) {
+> +                       snprintf(path, PATH_MAX, "/dev/%s", entry->d_name=
+);
+> +                       closedir(dir);
+> +                       return true;
+> +               }
+> +       }
+> +
+> +       closedir(dir);
+> +       return false;
+> +}
+> +
+> +static void copy_fd_bidi(int src, int dst)
+> +{
+> +       fd_set rfds, wfds;
+> +       int fd[2] =3D { src, dst };
+> +       uint8_t buf[2][4096];
+> +       size_t size[2] =3D { 0, 0 };
+> +       size_t pos[2] =3D { 0, 0 };
+> +       int i, ret;
+> +
+> +       /* Simple copying of data src <-> dst to both directions */
+> +
+> +       for (i =3D 0; i < 2; ++i) {
+> +               int flags =3D fcntl(fd[i], F_GETFL);
+> +
+> +               if (fcntl(fd[i], F_SETFL, flags | O_NONBLOCK) < 0) {
+> +                       perror("fcntl");
+> +                       goto error;
+> +               }
+> +       }
+> +
+> +       while (1) {
+> +               FD_ZERO(&rfds);
+> +               FD_ZERO(&wfds);
+> +
+> +               for (i =3D 0; i < 2; ++i) {
+> +                       if (size[i])
+> +                               FD_SET(fd[i], &wfds);
+> +                       else
+> +                               FD_SET(fd[1 - i], &rfds);
+> +               }
+> +
+> +               ret =3D select(FD_SETSIZE, &rfds, &wfds, NULL, NULL);
+> +               if (ret < 0) {
+> +                       if (errno =3D=3D EINTR)
+> +                               continue;
+> +                       perror("select");
+> +                       goto error;
+> +               }
+> +
+> +               for (i =3D 0; i < 2; ++i) {
+> +                       ssize_t s;
+> +
+> +                       if (!size[i] && FD_ISSET(fd[1 - i], &rfds)) {
+> +                               s =3D read(fd[1 - i], buf[i], sizeof(buf[=
+i]));
+> +                               if (s >=3D 0) {
+> +                                       size[i] =3D s;
+> +                                       pos[i] =3D 0;
+> +                               } else if (errno =3D=3D EINTR) {
+> +                                       /* ok */
+> +                               } else {
+> +                                       perror("read");
+> +                                       goto error;
+> +                               }
+> +
+> +                       }
+> +
+> +                       if (size[i]) {
+> +                               s =3D write(fd[i], buf[i] + pos[i], size[=
+i]);
+> +                               if (s >=3D 0) {
+> +                                       size[i] -=3D s;
+> +                                       pos[i] +=3D s;
+> +                               } else if (errno =3D=3D EINTR || errno =
+=3D=3D EAGAIN
+> +                                               || errno =3D=3D EWOULDBLO=
+CK) {
+> +                                       /* ok */
+> +                               } else {
+> +                                       perror("write");
+> +                                       goto error;
+> +                               }
+> +                       }
+> +               }
+> +       }
+> +       return;
+> +
+> +error:
+> +       fprintf(stderr, "Bluetooth controller forward terminated with err=
+or\n");
+> +       exit(1);
+> +}
+> +
+> +static int start_controller_forward(const char *path, pid_t *controller_=
+pid)
+> +{
+> +       struct termios ti;
+> +       pid_t pid;
+> +       int src =3D -1, dst =3D -1, fd =3D -1;
+> +       int ret, saved_ldisc, ldisc =3D N_HCI;
+> +
+> +       /* virtio-serial ports cannot be used for HCI line disciple, so
+> +        * openpty() serial device and forward data to/from it.
+> +        */
+> +
+> +       src =3D open(path, O_RDWR);
+> +       if (src < 0)
+> +               goto error;
+> +
+> +       /* Raw mode TTY */
+> +       memset(&ti, 0, sizeof(ti));
+> +       cfmakeraw(&ti);
+> +       ti.c_cflag |=3D B115200 | CLOCAL | CREAD;
+> +
+> +       /* With flow control */
+> +       ti.c_cflag |=3D CRTSCTS;
+> +
+> +       ret =3D openpty(&dst, &fd, NULL, &ti, NULL);
+> +       if (ret < 0)
+> +               goto error;
+> +
+> +       if (ioctl(fd, TIOCGETD, &saved_ldisc) < 0) {
+> +               perror("Failed get serial line discipline");
+> +               goto error;
+> +       }
+> +
+> +       if (ioctl(fd, TIOCSETD, &ldisc) < 0) {
+> +               perror("Failed set serial line discipline");
+> +               goto error;
+> +       }
+> +
+> +       printf("Switched line discipline from %d to %d\n", saved_ldisc, l=
+disc);
+> +
+> +       pid =3D fork();
+> +       if (pid < 0) {
+> +               perror("Failed to fork new process");
+> +               goto error;
+> +       } else if (pid =3D=3D 0) {
+> +               close(fd);
+> +               copy_fd_bidi(src, dst);
+> +               exit(0);
+> +       }
+> +
+> +       *controller_pid =3D pid;
+> +
+> +       close(src);
+> +       close(dst);
+> +       return fd;
+> +
+> +error:
+> +       if (src >=3D 0)
+> +               close(src);
+> +       if (dst >=3D 0)
+> +               close(dst);
+> +       if (fd >=3D 0)
+> +               close(fd);
+> +       return -1;
+> +}
+> +
+> +static int attach_controller(pid_t *controller_pid)
+> +{
+> +       unsigned int basic_flags, extra_flags;
+> +       char path[PATH_MAX];
+> +       int fd;
+> +
+> +       *controller_pid =3D -1;
+> +
+> +       if (!find_attach_dev(path)) {
+> +               printf("Failed to find Bluetooth controller virtio\n");
+> +               return -1;
+> +       }
+> +
+> +       printf("Forwarding Bluetooth controller from %s\n", path);
+> +
+> +       fd =3D start_controller_forward(path, controller_pid);
+> +       if (fd < 0) {
+> +               printf("Failed to forward Bluetooth controller\n");
+> +               return -1;
+> +       }
+> +
+> +       basic_flags =3D (1 << HCI_UART_RESET_ON_INIT);
+> +       extra_flags =3D (1 << HCI_UART_VND_DETECT);
+> +
+> +       printf("Attaching Bluetooth controller\n");
+> +
+> +       return attach_proto(fd, HCI_UART_H4, basic_flags, extra_flags);
+> +}
+> +
+>  static void run_command(char *cmdname, char *home)
+>  {
+>         char *argv[9], *envp[3];
+>         int pos =3D 0, idx =3D 0;
+>         int serial_fd;
+>         pid_t pid, dbus_pid, daemon_pid, monitor_pid, emulator_pid,
+> -             dbus_session_pid, audio_pid[2];
+> +               dbus_session_pid, audio_pid[2], controller_pid;
+>         int i;
+>
+>         if (!home) {
+> @@ -910,18 +1072,11 @@ static void run_command(char *cmdname, char *home)
+>         }
+>
+>         if (num_devs) {
+> -               const char *node =3D "/dev/ttyS1";
+> -               unsigned int basic_flags, extra_flags;
+> -
+> -               printf("Attaching BR/EDR controller to %s\n", node);
+> -
+> -               basic_flags =3D (1 << HCI_UART_RESET_ON_INIT);
+> -               extra_flags =3D (1 << HCI_UART_VND_DETECT);
+> -
+> -               serial_fd =3D attach_proto(node, HCI_UART_H4, basic_flags=
+,
+> -                                                               extra_fla=
+gs);
+> -       } else
+> +               serial_fd =3D attach_controller(&controller_pid);
+> +       } else {
+>                 serial_fd =3D -1;
+> +               controller_pid =3D -1;
+> +       }
+>
+>         if (start_dbus) {
+>                 create_dbus_system_conf();
+> @@ -1063,6 +1218,11 @@ start_next:
+>                         monitor_pid =3D -1;
+>                 }
+>
+> +               if (corpse =3D=3D controller_pid) {
+> +                       printf("Controller terminated\n");
+> +                       controller_pid =3D -1;
+> +               }
+> +
+>                 for (i =3D 0; i < 2; ++i) {
+>                         if (corpse =3D=3D audio_pid[i]) {
+>                                 printf("Audio server %d terminated\n", i)=
+;
+> --
+> 2.53.0
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
