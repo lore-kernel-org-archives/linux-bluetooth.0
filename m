@@ -1,43 +1,43 @@
 Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C2038CFE1
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 08:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CB638A73E
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 08:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772441941; cv=pass; b=YcbieOgPrt9gpT3Xe12W74i1sMq2LA4u17UK6BPOSCLG3FWeLTpGOmmdn/BgTsx7l9M+b7Xvq7GbBb1sPcd/t843z9G2Eu0yucTDVIA+UY80DWx1WSoiws/UdJKZxwtW31bLpRhQA+oe/glwr0YKEMLcXgZmSj6iqu7HFWlMOB0=
+	t=1772441953; cv=pass; b=SZd3KZFk8mps4TljbweMMvvU5bJatcVI9zDcZlP9h6lGf7LkdNKN7JK6qrTroHbV9tAh4Ub1Cl8Tu8iwkc7AK8SON5NjfQO2qy6iqikvwOqaTOX6oC8v34Pfg0ILrJS5Noej4rOeFKoal7/QugLfMl2izv6dyBfU4B+n0qBGAC0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772441941; c=relaxed/simple;
-	bh=TDPYbz/Gwrh/xFVXYLwJNhJ/VsSgqz+VqYWfnwEr0bg=;
+	s=arc-20240116; t=1772441953; c=relaxed/simple;
+	bh=D1PP/t81EgRbHfOmvI8KGvLBPDKtvJD8ZQC97yV87VU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=dImdSP4yhziWG03cARzM3Ur0TzmZB9WgLcIfz6dlCAXTQCdLuA6dAAkLciHDht4sWX3ijatjeInnbcLpTkRG53lvWhQY9Hcn9Iqy0apPgIIX4AQj3JeXK9tSaEWrWq6wvFqp6+BJ/o5rdoGCCUNkM02Qo8qd9RkTa+nvRNhpHiY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=TFoVNsVI; arc=pass smtp.client-ip=136.143.188.12
+	 In-Reply-To:Content-Type; b=VO3Ul/tVNranUOLxcbA/kiYSj7LCqSKFYlbyjU5CcKKQWcUVNStZVttifAtCBWvS8xxnkT3+tD7IuKcmnwlgBOPfw3RetPyftCFiffNMWTmjmHampWRIh1HkU6tbldvfvkrv7gRPZafyS2WCiSzCbfaUx+j5MKarlkZooj0zae4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=TkIqzx0G; arc=pass smtp.client-ip=136.143.188.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="TFoVNsVI"
-ARC-Seal: i=1; a=rsa-sha256; t=1772441929; cv=none; 
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="TkIqzx0G"
+ARC-Seal: i=1; a=rsa-sha256; t=1772441941; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=mx2/oe1JpBSKAFPGOp72y87R3SmCsGwmeZySxIJRuFKBvfOytcL6ogwznpPwMBeyZ5G1z8NNk/dI/bof10a57bRqDR57CtwteCGUrP+VkqSnUhkR9QF2BMZaGLtBXmVuDbVgtVPNmP1o/1dnTd0NAvoRcTB2G1pNgGI60c2nb0I=
+	b=IgVqIiBLIy1xTvTBCo7rNl8YGoV/q/XmpJXNIJoMtCLo/hmiElQbHoy254PU+Y0HRVSHrGgaxQQ4wi9DgbORM69/29XqrnK20UUfMfDhbAQ2RASAnhvfQk8h0UV05Pl2pY2nL7JSNpJJGm5h6buRmew2V/aMYVE/3CqHyCgtwj0=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1772441929; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
-	bh=Of35+XTLPOzcNnStm6qeuqRMfY0wG1xzvDmezhD61BQ=; 
-	b=aVMSQBxewaAU5hF6Om/UZ27CNa+JWjYYgxYqZB+/LGsf3vEFY6poBbiIFIm/E8t/hMj3n5cYsiBUAsZ9gMD5mdbypdneSUQbk0CW1DHoTCzEynTTD7UNx4uQMtlRF89PZY9Lztkdty4puI5OQMShH1b+XRWdhhuujPF5q4F8gPE=
+	t=1772441941; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
+	bh=HRV7KDShaf4NCqixfXdjL2y278jcSsKNvVi4TdebryI=; 
+	b=cJg4COwV4ybTLFzf5zzuCR0mxlMZAAG56Gru8V0nVqd46zB2HNglzI+uqo70ZAxWQcHr6tvGZKVjdVeIf+vrwU+n2w+0tbZwQgaCiSJp/FuqwN4IMBERQ/bLHMAkXAMhUZw8xdi2mgZxKdxGpFc09qXj2b06LnmoWfCoRIvWseE=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=collabora.com;
 	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
 	dmarc=pass header.from=<frederic.danis@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1772441929;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1772441941;
 	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
 	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
-	bh=Of35+XTLPOzcNnStm6qeuqRMfY0wG1xzvDmezhD61BQ=;
-	b=TFoVNsVIS967czyGIsRqWLs5fZElGejbJfr0Y5JoysjY727SS2rbGp7RiopJ92fj
-	Fc4PSCQL6F3dF1iiZ01Opu7A1My0CNylrUpIQSpNrifbX5ng7t9FJBXvOOQleNWSozR
-	3h2OiO/22xmHWIpzywa6EYf5r/W1XFDd10V4cBm8=
-Received: by mx.zohomail.com with SMTPS id 1772441927171468.50177784562015;
-	Mon, 2 Mar 2026 00:58:47 -0800 (PST)
-Message-ID: <e4b02d13-4992-4aaa-8631-856fa2b4812f@collabora.com>
-Date: Mon, 2 Mar 2026 09:58:44 +0100
+	bh=HRV7KDShaf4NCqixfXdjL2y278jcSsKNvVi4TdebryI=;
+	b=TkIqzx0GgM/KjVonK39xW/uLNCtlaygBJQe3iLvVU75l0fQk4vF5ZrG994XoxWwd
+	49uEb8X5BchGzMrZSogV0flsMsV3ZK1WAEXLY0zcsSM+W9ZMtl7y2KQfNKIo1GvReQ3
+	AuX7ziArvy3ED8q9Ojnd6ghFVmDB9RytJXOGZ04w=
+Received: by mx.zohomail.com with SMTPS id 1772441938810205.05938613538774;
+	Mon, 2 Mar 2026 00:58:58 -0800 (PST)
+Message-ID: <bbb4b8ae-2b85-4f43-b136-93454c9e0660@collabora.com>
+Date: Mon, 2 Mar 2026 09:58:57 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -45,14 +45,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 10/15] doc/qualification: gatt-pts: update
- description for GATT/SR/GAN/BV-01-C
+Subject: Re: [PATCH BlueZ 11/15] doc/qualification: gatt-pts: add description
+ for GATT/SR/GAN/BV-03-C
 To: Christian Eggers <ceggers@arri.de>, linux-bluetooth@vger.kernel.org
 References: <20260227160022.21462-1-ceggers@arri.de>
- <20260227160022.21462-11-ceggers@arri.de>
+ <20260227160022.21462-12-ceggers@arri.de>
 Content-Language: en-US
 From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
-In-Reply-To: <20260227160022.21462-11-ceggers@arri.de>
+In-Reply-To: <20260227160022.21462-12-ceggers@arri.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-ZohoMailClient: External
@@ -60,27 +60,21 @@ X-ZohoMailClient: External
 Hi Christian,
 
 On 27/02/2026 16:53, Christian Eggers wrote:
-> 'btgatt-server' exits after PTS disconnects and is not available when
-> PTS reconnects. Starting btgatt-server again would solve the problem,
-> but we should prefer testing with the real GATT daemon instead of using
-> debugging containers. Additionally, this solution also works for
-> GATT/SR/GAN/BV-03-C (next commit).
+> Same as for GATT/SR/GAN/BV-01-C.
 > ---
->   doc/qualification/gatt-pts.rst | 20 ++++++++++++++++++--
->   1 file changed, 18 insertions(+), 2 deletions(-)
+>   doc/qualification/gatt-pts.rst | 20 ++++++++++++++++++++
+>   1 file changed, 20 insertions(+)
 >
 > diff --git a/doc/qualification/gatt-pts.rst b/doc/qualification/gatt-pts.rst
-> index 239d7c154da7..7a2f28257338 100644
+> index 7a2f28257338..e9acba7e7cd0 100644
 > --- a/doc/qualification/gatt-pts.rst
 > +++ b/doc/qualification/gatt-pts.rst
-> @@ -1116,9 +1116,25 @@ for which we know the test passed.
+> @@ -1136,6 +1136,26 @@ for which we know the test passed.
 >   |                        |          |         |       |                                                                         |
->   |                        |          |         |       | Enter '2' when asked for handle size                                    |
+>   |                        |          |         |       | - [bluetooth]# gatt.write 2                                             |
 >   +------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-> -| GATT/SR/GAN/BV-01-C    | PASS     |     6.1 | 5.69  | Run 'bluetoothctl advertise on'                                         |
-> +| GATT/SR/GAN/BV-01-C    | PASS     |     6.1 | 5.69  | Run 'bluetoothctl':                                                     |
->   |                        |          |         |       |                                                                         |
-> -|                        |          |         |       | Run 'btgatt-server -r'                                                  |
+> +| GATT/SR/GAN/BV-03-C    | PASS     |     6.1 | 5.69  | Run 'bluetoothctl':                                                     |
+> +|                        |          |         |       |                                                                         |
 > +|                        |          |         |       | - [bluetooth]# advertise on                                             |
 > +|                        |          |         |       |                                                                         |
 > +|                        |          |         |       | - [bluetooth]# gatt.register-service 0xFFFF                             |
@@ -105,9 +99,10 @@ be use "On PTS request to send a notification:"
 
 > +|                        |          |         |       |                                                                         |
 > +|                        |          |         |       | - [bluetooth]# gatt.write 2                                             |
->   +------------------------+----------+---------+-------+-------------------------------------------------------------------------+
+> ++------------------------+----------+---------+-------+-------------------------------------------------------------------------+
 >   | GATT/SR/GAI/BV-01-C    | PASS     |     6.1 | 5.69  | Run 'bluetoothctl':                                                     |
 >   |                        |          |         |       |                                                                         |
+>   |                        |          |         |       | - [bluetooth]# gatt.register-service 0xFFFF                             |
 
 -- 
 Frédéric Danis
