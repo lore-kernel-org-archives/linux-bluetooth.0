@@ -1,145 +1,109 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.102])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A08329395
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 08:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45ED637C110
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 08:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772439951; cv=none; b=T4Vf4tap2SSr8R4ofdGrezhV/XDvr0/q09EqomE08RSDSZozfl1W46VB0ZZgy+1dM3oqiajk8exGU6diqlwiKvu/nrjHEf5FEZErNBZZJMOhVHYlUnddJDkuTS1LV+n3LSmPQNfocjOsGoyffMwsqwTG5NNdTUb1i8Wm+tOCdT8=
+	t=1772440640; cv=none; b=mSMAxgBSISCVmvdjCgkqyWgnvrqNlwRP+P2HEB7JbfgJtYI7TAotLmCdnqkUKWihdRJLv5lrEZNK37txpHQhYQXZxaEIj3EzZu8DevZaPwqtNtIQyyICLXY4c2TTpJhVk4jf44KPxs5FttDOLWsdPWPekGFgG2cHLa79QqAGMkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772439951; c=relaxed/simple;
-	bh=G4o5AhVRXu9q/KQtrP+cvkVRz+ki4ewCCkI9WkZZJoU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=RU7IGUhq8+RVkBKfQpA4CHK2PVNVtGyHVU0Nw3+SIcPWV3GLRz75ywOCcMhcOOjKpD76LxCJwJNBmaTzwbK5o2khw2XDDqyaqOH1ay/+DaImsqzjb+Lk4tNyQhZ3wCMrdbDVUSu3+nGykprbmPq2C5zEm1gkJYvEMjyOOumBAxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainphreak.net; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainphreak.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-389e139ee5eso64593281fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Mar 2026 00:25:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772439948; x=1773044748;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=trf/1mTBw3nxCTZfrwTxoSFWzFdd/2MCiJdClMbPshw=;
-        b=rjwdSOnCKFVVqaPFZnZIOKz6+2YR2lEGulCiJNzrvVWDUqg3oSjGEEIwcqb2yig93D
-         aQGYJdL1xp7pD0kN4n9naIo0BCplByG55R6Ixh1mc26WJ+Uftfn+eoZ4vv+LbO7jTEz6
-         1zdIkJs/GxdOpyILBe6FAO6EtHeXM+1LRU01I9hCQFpdrZROZnVUKP1yqy1tiLWYSmQe
-         gvHChCljvXtM4zbL/Fm4GgVFqiQtVMJrv2ddil8GjkMjtCDr06CAFOEqotkGldeIGBZX
-         fnFKCG80Qi0ME5TBb6esWXtrvrX+YACvjhUeKQjkDt84M1pQ3mYkpV57AcPnoQOn0kL2
-         Ddgw==
-X-Gm-Message-State: AOJu0YwzyI4YE4uO2rqJBRfRx12fb7vMmN7DH8bCA82pCNfnKiDOGsgH
-	5SkHLJUb9zOzjQVVqSzP4BGzzYu9gxBR23W5xdSSP7yrKX7P+6BcxBBPjzC+8A==
-X-Gm-Gg: ATEYQzxIfnxXYCgkFsol7BK7sylO3PcgIKAOkpSsy2HktRbozOp4Nn32W9M2mJuscaR
-	LHqOZkfMpUQxiWB7xPV4DdleYVPwmUDBIXFb9kQOkzsByRTZvT2KMflV2wYXDr3cVP9Ax+Jmcp6
-	4NMYpQJXmv6QdULmpzD+CKgoLWw7LJxst0FWFnsQNoeQg3JwyDpFF3abuDQNgc0w3lVXh+tAb8q
-	svlfkSmCS5CPMp8sA4T0Ne8AZTZmkb3Q2DFnT62Ch+3iNtEUiqAwJMAyZ1OTbpBrqOjgC6NbpSF
-	B4EA8KP8yBDaH005BJMrXWYNyMlBicaHe9J8//45sMlXVljUCwfqyl2isfrJk4n7LUVUm0/IWm1
-	QPKi3z4pkFPwnkkysUp82dSlFGmHUV5GjVhNwY3gmRrncmxvMU1xZnau1vaT+zy4KXnJKhXwNje
-	kregSDmjDll1o96sqF3M6JnIeYMnqeH/pZED/c3A12kd/t+wtVsIbltO6Snp/5YfJf1I6S7RMvN
-	g==
-X-Received: by 2002:a2e:9784:0:b0:387:6b1:cf4 with SMTP id 38308e7fff4ca-389ff356b6emr69565281fa.27.1772439947460;
-        Mon, 02 Mar 2026 00:25:47 -0800 (PST)
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com. [209.85.208.179])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a115bd2c94sm1494168e87.6.2026.03.02.00.25.47
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2026 00:25:47 -0800 (PST)
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-38709888abeso60080191fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Mar 2026 00:25:47 -0800 (PST)
-X-Received: by 2002:a2e:8887:0:b0:385:f547:1842 with SMTP id
- 38308e7fff4ca-389ff356fd2mr67276261fa.30.1772439946767; Mon, 02 Mar 2026
- 00:25:46 -0800 (PST)
+	s=arc-20240116; t=1772440640; c=relaxed/simple;
+	bh=hA7DOXs5zyuDimjhXxA7C85+MSxHX2pkz9YlNHCp2hM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sVTfPMPRh03NRWasvVaYTiD+Uw3JEjBGR5B02fGvWVjQ8Zjz6qXw63Cl1u7Ll+cvzjEC/wB+IpvfuhsUHKckpbsHDbgimm+JL0kuFtwE3Auuty/7+up7k6Llscj+8JEqZ2pUGN5h4tQpBF7FIYuiKux1aXN6uXU6OpC7q9IwpMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=HVhkVn4i; arc=none smtp.client-ip=188.68.63.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="HVhkVn4i"
+Received: from mors-relay-2502.netcup.net (localhost [127.0.0.1])
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4fPX9p0Z4Wz62Qn;
+	Mon,  2 Mar 2026 09:27:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1772440062;
+	bh=hA7DOXs5zyuDimjhXxA7C85+MSxHX2pkz9YlNHCp2hM=;
+	h=Date:Subject:To:Cc:References:From:Reply-To:In-Reply-To:From;
+	b=HVhkVn4ioX2ozGnkXLqlsekDHqgn810QQoYB1BAg3bXviAbzytnTxAA8Vxd4vCiKV
+	 RI4PRIvxcPtOLFLADY0sVZBgo5cWyiJAPTQBbIjZkm2ikvmHjd3xihh8ocvhkZdxQP
+	 I5LEoWpsBACVnXS5WQjFQydZvj3PRKPV2b+qw2f++Cr6tsQwRtr+i+iJBb2T48PY+D
+	 +Z13bMuaez0l3J8rGkKi2GPPfeBuzQnBMTUT33fRa5rfGdoA6GgOh8nZ99vOzrSjlL
+	 PK8/CC1KSt4YezJS1A8znABftFvpHGPEwbQpU83FH+Ii3u5ZDAFoZQVSGcPVTujp6G
+	 P8I6WXfXKM6Lg==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4fPX9n6y5gz4xSB;
+	Mon,  2 Mar 2026 09:27:41 +0100 (CET)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4fPX9n1H5pz8svW;
+	Mon,  2 Mar 2026 09:27:41 +0100 (CET)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id C0829632C5;
+	Mon,  2 Mar 2026 09:27:39 +0100 (CET)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <2107aa63-ac31-4e46-831a-21411962330f@leemhuis.info>
+Date: Mon, 2 Mar 2026 09:27:39 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Don White <brainphreak@brainphreak.net>
-Date: Mon, 2 Mar 2026 00:25:35 -0800
-X-Gmail-Original-Message-ID: <CADZ-OS_xi1nfqzMCnNRa7qB3hDx4kMGduB-svYnnbWyB1--cPg@mail.gmail.com>
-X-Gm-Features: AaiRm52CkldVFIYTi2xyUHxN9zugpOmuHu3VuJoJbqNPPbhxIm7wOlpD9mhCel0
-Message-ID: <CADZ-OS_xi1nfqzMCnNRa7qB3hDx4kMGduB-svYnnbWyB1--cPg@mail.gmail.com>
-Subject: =?UTF-8?Q?MT7921U=3A_ACL_data_misrouted_as_HCI_commands_=E2=80=94_firm?=
-	=?UTF-8?Q?ware_never_processes_bulk=2DOUT_ACL?=
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] Bluetooth: L2CAP: Fix not tracking outstanding TX
+ ident
+To: =?UTF-8?Q?Joan_Bruguera_Mic=C3=B3?= <joanbrugueram@gmail.com>,
+ linux-bluetooth@vger.kernel.org
+Cc: luiz.von.dentz@intel.com,
+ Linux kernel regressions list <regressions@lists.linux.dev>
+References: <20260126175340.3576865-1-luiz.dentz@gmail.com>
+ <20260301233619.1807980-1-joanbrugueram@gmail.com>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <20260301233619.1807980-1-joanbrugueram@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: 
+ <177244006004.2159236.16752863118894184995@mxe9fb.netcup.net>
+X-Rspamd-Server: rspamd-worker-8404
+X-Rspamd-Queue-Id: C0829632C5
+X-NC-CID: lLD1MOv0PWUG9QGXj8pMgwaOHls+QRdVWz+G+jsxs6ZDirmN/pI=
 
-Hi,
+On 3/2/26 00:36, Joan Bruguera Micó wrote:
+> I had trouble connecting my Bluetooth headphones on Linux 7.0-rc1,
+> and a bisect landed me on this commit 6c3ea155e5ee. A revert fixes it.
+> 
+> The symptom is that when connecting the headphones via bluetoothctl,
+> it either hangs or appears (in pavucontrol) as if it's using the AAC
+> codec, but there's no output. Sometimes after some time, it disconnects
+> and then re-connects successfully but using the MSBC/CVSD codecs.
+> 
+> I haven't had time to troubleshoot this further so far, mainly posting
+> if it can save someone a bisect.
+> 
+> Bluetooth chip: Intel Corp. AX210 Bluetooth (ThinkPad T14 Gen 2)
+> Device: Bose QuietComfort Ultra (bluetooth:v009Ep4066d0167)
+> Bluez 5.86-4 (Arch Linux)
+> Kconfig: That of the linux-mainline AUR package, plus UBSAN
 
-I've been debugging a Bluetooth ACL data transfer failure on a
-MediaTek MT7921U (USB ID 0e8d:7961) and have narrowed it down to what
-appears to be a firmware-level issue. HCI commands work perfectly, but
-ACL data sent from the host via USB bulk-OUT is misclassified by the
-firmware as HCI commands.
+FWIW, someone reported problems due to that commit in bugzilla, too:
 
-Hardware:
-  - MediaTek MT7921U (0e8d:7961) on USB 2.0 (EHCI, 480Mbps)
-  - MT7628AN SoC (MIPS 24KEc), OpenWrt 24.10, kernel 6.6.86
-  - Firmware: BT_RAM_CODE_MT7961_1_2_hdr.bin, build 20240219111427
-  - Reference adapter: CSR8510 USB dongle on the same host (works perfectly=
-)
+To quote https://bugzilla.kernel.org/show_bug.cgi?id=221120:
+"""
+Bug 221120 - Bluetooth headphones stop connecting properly after commit
+6c3ea155e5ee3e56606233acde8309afda66d483
 
-Symptoms:
-  - HCI commands, inquiry, and connection establishment all work
-  - ACL data sent from host never reaches the remote device
-  - Zero Number_of_Completed_Packets events returned by the controller
-  - ACL RX works (remote device can send ACL data TO the MT7921U)
+Bisected to this commit. Before this headphones can be connected using
+A2DP music profile or HSP/HFP for bidirectional (headphone and
+microphone mono). After this dependig on the model of the device it has
+only one of options available(Marshall Major iv keeps only HSP while
+Chinese no-name keep only A2DP ). Reverting just this commit from
+Linus's tree restores normal bluetooth audio.
+"""
 
-Definitive test =E2=80=94 HCI Local Loopback Mode:
-
-I enabled Write_Loopback_Mode (0x1802, param=3D0x01) and sent 3 ACL data
-packets to the loopback handle. The CSR8510 passes this test
-perfectly:
-
-  CSR8510 (hci0):
-    ACL packets sent:     3
-    ACL packets received: 3  (echoed back as ACL Data)
-    NCP events:           3
-    RESULT: PASS
-
-  MT7921U (hci1):
-    ACL packets sent:     3
-    ACL packets received: 0
-    NCP events:           0
-    RESULT: FAIL
-
-On the first run, the MT7921U returned the ACL data content inside a
-Loopback Command event (0x19) instead of as ACL Data:
-
-Event: 04 19 13 32 20 10 00 4c 4f 4f 50 54 45 53 54 30 00 00 00 00
-
-Decoding: the firmware received the ACL header (32 20 =3D handle 50,
-PB=3D0x02;10 00 =3D dlen 16) plus payload ("LOOPTEST0"), parsed it as HCI
-command opcode=3D0x2032 plen=3D16, and wrapped it in a Loopback Command
-event.
-
-This means the firmware treats data arriving on the bulk-OUT endpoint
-(EP 0x01) as HCI commands rather than ACL data.
-
-Additional observations:
-  - btmon trace during l2ping confirms: ACL TX from host is queued (TX coun=
-ter
-    increases), but remote device receives nothing and no NCP is generated
-  - EP_RST_OPT (0x74011890) was written as 0x00010001 by btusb_mtk_setup();
-    clearing it to 0 does not fix the ACL issue
-  - Newer firmware (20251223091725) causes HCI_Reset to fail with -145
-  - UDMA registers (TX_QSEL, WLCFG_0) all appear normal
-  - The issue reproduces on every boot, every hci down/up cycle
-
-Questions:
-  1. Is there a known initialization step or vendor HCI command needed
-to configure the MT7921U firmware's bulk-OUT endpoint for ACL data
-processing?
-  2. Has anyone confirmed MT7921 classic Bluetooth ACL data transfer
-working on Linux? (I could not find confirmed reports)
-  3. Could this be related to the btmtk_usb_subsys_reset() changes,
-which were added for MT7922/MT7925 but explicitly removed for MT7921?
-
-I have a simple test tool (hci_loopback) that reproduces this in ~5
-seconds if anyone with an MT7921 on a different platform (x86, xHCI)
-wants to verify.
-
-Thanks,
-- Don
+Ciao, Thorsten
