@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103354C9554
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 20:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753CB4C955F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 20:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772483407; cv=none; b=R9gZvbl/pns4HY7pCZzUhXWEq/XVuCz/5C+3EuKzCp4ZkPJfbpB5lOLNG+CtOgMFSUF/bBN4tZBxsE6TljI1maZik1+sI0ZYio+q7H9rksAoZn1ihffqKaPBNa4gFI1MQmoXu2NkTiRzgWSl8zkZk58DojuDSsu0BJC/n97R//Q=
+	t=1772483408; cv=none; b=TMnXpYHpmvRBj1P4Lsg/NRCzURbGqUsBDu2RDexzDJXdUxpkXHE6u1fg/CHbJySBAdCUfieOccz7NUq4HtxCnzLAZT1At0KaVWi5hqT1ltu818k0H5d8G81wo8/I2Ss0JUlZiIbDM7v0OnNKYLrjSdfUdHiZIIeh92JCZgj8d4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772483407; c=relaxed/simple;
-	bh=jK6qx2SA6o4gX1HqD6vWsnTsvAGbn7P0y4CDnBW7NEk=;
+	s=arc-20240116; t=1772483408; c=relaxed/simple;
+	bh=zwHA39KnEXPlq9eBI+xPmG4F1z+gYy089YyZIPiiLBg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=p0a0dgPPolF7kgm0uu98ORQZiuGvMcVOZERSbGW99nalX2oUguHo0fcHZW41mQ4+kPNkKpuHEKoSwdPbs9OWIEV52mhalN9Y2/sGznG5pMcXXndyL6oPilYFhE67iAK6MDer0qJHDn+cLLmSimxvDsVPYKfDq67ghR6ZzdvsvL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mq1XprBP; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=aQ+RNfxLUh1mAOc2cI0kmLIMyygTyVr5xeYKK0giv995rn+W6exgNIjU89Wk6nJTnUhcF/0vOdoxQ+cE+6Shj1K1bHHWyC25K9Cuz14fClV08UlDjtFInjKvw4B9n5HIplm8Hl3WLka1Ou/H6Cq7t44siW/6kqSnT00CPAeW5ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NUsWR3J3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mq1XprBP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D81C19425;
-	Mon,  2 Mar 2026 20:30:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NUsWR3J3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23AA6C19423;
+	Mon,  2 Mar 2026 20:30:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772483406;
-	bh=jK6qx2SA6o4gX1HqD6vWsnTsvAGbn7P0y4CDnBW7NEk=;
+	s=k20201202; t=1772483408;
+	bh=zwHA39KnEXPlq9eBI+xPmG4F1z+gYy089YyZIPiiLBg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mq1XprBPhzNcDuNO/pOUK6Swb8xdu+eVey30Qe5QVJe7fgbDfEGVjfsZwfskHLhae
-	 gbdE+kS+kGn7Q/iqTGgGziPeRD9qdukaVfFhmYUkluVGtqbBxBh2XfmURghl9XDp3D
-	 nYBQFKEO3S0Q/9+fEI5v9plNXlmEOsUJuLpyzQTO94x/YXYiyeuJUrkZ3d9pxWovrk
-	 BJWKbi9nLVja+JAcY/1fms+OCwIf4nNucZMxIIZ0SYrbbywSSxBbXJhZ4qQXG6hVCs
-	 b/2bZRzJYhe6uz6fT9repEwaugJwyByzaNMKaLinkZ8r4zguX6ewKmEDoXKflBbFj/
-	 1gm+GH6bGke0A==
+	b=NUsWR3J38OIO3Ec4zU/965Dk7kT9atMrlHJCP24xaRug592vpfV+CuoVwuaqLZJ1G
+	 x46WNxCxDiYpgOCCJ3LErXHfc2bmRhM5b5SWsBKGI13X9atJkUiCeZPmdJ9FpxuQ5f
+	 Lm3U22vvXpQGQSjB1Cad0vIg45Inxivc77Gq7eT/KpiRWWEqvs3oa+uuLkGT8ffCu4
+	 hox7wvy/wi6MdUUhzqRWzTZHxeLAnZH4FcBzUA/v1qoCOKMti2w/AtiupaboIqmEOl
+	 Er9xLgFKyI4Y1gpdVFbKJnArhwLMBaJSr2DPui3+yIRNFaezArxwHbaMCSy9a+JY1s
+	 Lvbw4Vgd5Uc0Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9F5F3809A80;
-	Mon,  2 Mar 2026 20:30:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FF1C3809A80;
+	Mon,  2 Mar 2026 20:30:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,53 +37,34 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 1/9] Bluetooth: btintel: Add support for hybrid
- signature
- for ScP2 onwards
+Subject: Re: [PATCH v1] Bluetooth: ISO: Fix defer tests being unstable
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177248340855.476472.6850603435737325677.git-patchwork-notify@kernel.org>
-Date: Mon, 02 Mar 2026 20:30:08 +0000
-References: <20260228091239.230284-1-kiran.k@intel.com>
-In-Reply-To: <20260228091239.230284-1-kiran.k@intel.com>
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chandrashekar.devegowda@intel.com, chethan.tumkur.narayan@intel.com
+ <177248340979.476472.976077286433311083.git-patchwork-notify@kernel.org>
+Date: Mon, 02 Mar 2026 20:30:09 +0000
+References: <20260227203506.573494-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260227203506.573494-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat, 28 Feb 2026 14:42:31 +0530 you wrote:
-> If FW image has hybrid signature (ECDSA and LMS) then send CSS header,
-> ECDSA public key, ECDSA signature, LMS public key, LMS signature and
-> command buffer to device.
+On Fri, 27 Feb 2026 15:35:06 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->  drivers/bluetooth/btintel.c | 80 +++++++++++++++++++++++++++++++++----
->  1 file changed, 72 insertions(+), 8 deletions(-)
+> iso-tester defer tests seem to fail with hci_conn_hash_lookup_cig
+> being unable to resolve a cig in set_cig_params_sync due a race
+> where it is run immediatelly before hci_bind_cis is able to set
+> the QoS settings into the hci_conn object.
+> 
+> [...]
 
 Here is the summary with links:
-  - [v3,1/9] Bluetooth: btintel: Add support for hybrid signature for ScP2 onwards
-    https://git.kernel.org/bluetooth/bluetooth-next/c/806c3369febe
-  - [v3,2/9] Bluetooth: btintel: Replace CNVi id with hardware variant
-    https://git.kernel.org/bluetooth/bluetooth-next/c/48afb18d3d40
-  - [v3,3/9] Bluetooth: btintel: Add support for Scorpious Peak2 support
-    https://git.kernel.org/bluetooth/bluetooth-next/c/444b6f088fd5
-  - [v3,4/9] Bluetooth: btintel: Add DSBR support for ScP2 onwards
-    https://git.kernel.org/bluetooth/bluetooth-next/c/bc83e129f7fc
-  - [v3,5/9] Bluetooth: btintel_pcie: Add support for exception dump for ScP2
-    https://git.kernel.org/bluetooth/bluetooth-next/c/4aa6235a0fc7
-  - [v3,6/9] Bluetooth: btintel: Add support for Scorpious Peak2F support
-    https://git.kernel.org/bluetooth/bluetooth-next/c/1beeb9ac1e2f
-  - [v3,7/9] Bluetooth: btintel_pcie: Add support for exception dump for ScP2F
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f91e668aaa9f
-  - [v3,8/9] Bluetooth: btintel_pcie: Add device id of Scorpius Peak2, Nova Lake-PCD-H
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e297775d002c
-  - [v3,9/9] Bluetooth: btintel_pcie: Add device id of Scorpious2, Nova Lake-PCD-S
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ff4941388c7e
+  - [v1] Bluetooth: ISO: Fix defer tests being unstable
+    https://git.kernel.org/bluetooth/bluetooth-next/c/094ef2d048f8
 
 You are awesome, thank you!
 -- 
