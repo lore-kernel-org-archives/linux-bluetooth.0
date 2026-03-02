@@ -1,177 +1,284 @@
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5494A3E5562
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 19:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772479512; cv=pass; b=B9IDaafkN5mV04zhgZ97iPH6oiivI0xsSm8n/rs4Ra2rHU++RSDcgN8/M1wRLI5lKD5qXTRU8vUGy+IfVrmPkyIR7xdohHRdmWv+3GgA6VBMBl25pJ316E87AHrG/EjXqa3Jj5PVz1XrHrngZ9d0/3sNFn3Fc23QElykMFxa0VY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772479512; c=relaxed/simple;
-	bh=Q7jLmGTIh923mkuBGHzsheSoBukdt3xyPV4+QvEniOE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gBR6rFIFBDAh9B3RYOL2ASVpR9nOTQXFRBEwcwO/lYDEgwJsEfxCA5HP3hYS3wKaMeaqcN+lr5hGodt+cH83YYLf2F8Oz45mco/6B3VaebxpKMvjMPtz05vN6YPB0yU4/lgLSPmh4zMNIQADzu+gLHul4lnUb05plk4uRvtXxwQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gifdil1m; arc=pass smtp.client-ip=74.125.224.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBBA2FE044
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 20:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772482751; cv=none; b=J//Vnsh3OBgp5M0EyZYSji9MOXpWdS4PyofxpsjGYIHeqWDCsNE3Cj8OTOZKd07XWziGa2JeyxfZ+i5qiwN7cL+cBi6/pwlXvz8JYdxVCxl0Yis2vnhYDPJ6zqJLL/BJFiVWrMIv7bfAZNc4/kbBaJBxN8H5Ay2g5HcFtWHjGlg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772482751; c=relaxed/simple;
+	bh=4iW3XBJ8gXBtiPbUUnqU7hSbsNqc2aE928nOTU2GmIk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=A1kMKH+MF9oVw/JT9zW5tTtXyjM8vL+TgRO7i10J2GW2E2zjOIwO1t60wWbkCyNXeOJHLUiNEqpq+pEeE0G/8QsbetH713h64yU41gdFXcS/8/gS0/Gk5K+cm+Ovx+v2jMdO+N5CrViEdGMJvFhmcPgJPMHu21V2VW2GFWZhARA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gIP/mP4D; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gifdil1m"
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64acd19e1dfso4289883d50.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Mar 2026 11:25:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772479501; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DwViKOEOdWXSfTwNSAVNDn7pdu7wtd+E5G15OgmOIwT+k0UTSzYQ9hI9fBPMQmmuyg
-         x1VCMQXdgedfjteoqt+5QU4tWrBERR3GdaHOhAMzUVW5+TCgt1i5xJSxGrLmY71OhAO+
-         VYJp5KRRC2PU/RPq/iH2a2V6e3JDXp4GgfnvSSBOe0wYaCm57FwujhHgQuMF5lnAhSBR
-         CQGGdS5SWfTEJg2D8CRy/jBAMbXipP5Ve7DU7RM2tyqopOCZ/edE2lqM1U/2ZKMLusmE
-         hyQ1mS/uwz1L6d20KeNqtCBDU8aKhxh2VKMghPbggU2RzIyZxajVrP5+EvMK0mjgPHe2
-         mRVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=grCy6W9yC5X/78KGGmw7s7WYm2DdyDWd8eCU5pSfKd8=;
-        fh=9UNKjWguJk2zMzByhnLubr3yZOG8z5kNEOmP2hGwULM=;
-        b=ZQ5cpuUbMfPr0dQxDJJrna85WtV/EV53krlVGD/mImnuza8m+4ECjamHOh0PEokG1m
-         gicjtp+4YquICB7fMtUpddfgTchHlJDLfKBrCrjhu7VCAIzay3om/TIyqIAYbXsb+OjR
-         E49FxKY4NMKDBc2nSwKYBKY5ob1xcypO8Gbo+F/Vi8f00DHEmmmOgaDCxzYStY15jEvp
-         YcC7kbAejC/kzCByGtB8IDJnR13GpTg4NOpH5g76L+nxzgAhj1Clmm9m+9ClFWI5Y6yt
-         NlTDbo9qLLuxU9lA3AC5nDDL9laqfiXxFYiQYRSGftbGlqYlcRk9wv3Y4xgLHo50SNl/
-         W1pA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772479501; x=1773084301; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=grCy6W9yC5X/78KGGmw7s7WYm2DdyDWd8eCU5pSfKd8=;
-        b=gifdil1mC2+uTxWkSjaEZrCmjJTDEUcUDT2KGNJmSMVKuYeNLEUIFSG4mpxlI5XHBg
-         ftoBLLIN4myhk43YkqW3KveJCNmnYqHFzCSM2mgj9s5J7S2F9Ck08qUU+XpZRYLaOAnL
-         QFhGx9TxOJ4Phy4efe8MUgluZRSXvPFQnD0Zd22pK1f2+CupW5dLkv1hNiXIyj+xQiVq
-         ZR7LpSPn5zS1QzhhBE2mz60wjEyZ3uRFCqSToCY9iz6S4vdtZ0DVU+Ebmm7ycYFcq2d1
-         pp1v+dOIrP5yMYNZfAdXaHzuPu/UbsNMS8xlv62O23SbvL57d0wGkHhjEQo7wtIAShYH
-         Pmug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772479501; x=1773084301;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=grCy6W9yC5X/78KGGmw7s7WYm2DdyDWd8eCU5pSfKd8=;
-        b=IvD3jm6omZRdYBEAOsGODBUVMUfhWve4n9afhdO5hjNzqVBWzTJxNhpuYqYUnNSb0G
-         sXrL4Qkw3vNwCUxpFLEv4M3FrqimuH9sanmOToyhaGXIJDEfkQGwa4i8AQkU7JK5fNa2
-         UY/u9aMH6TeJ4d97wcyy6+MbQVfcmWhrUUmOi+PCJT0VyD+I/9kZ04eAghsPqdeOprGF
-         dyK9GiCnhxQ0SS6ikNBv+HIiUw4yy1Sd2NsrylJDQhiCLql3ClK2HveMHcWndRYc/zyb
-         ylqVa+LtfvJCCbfiSNlbb6J7LUhTrkbt50Jeu5JbHEiKn9oveSdX4jALvBVl8ZqrsTEX
-         akpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8Voz41QEv3ed8j0dqSm58nVo1hSB5mAqnQguTj/XuFHlxfYfSJlGsfuWag5FatbLkKb5bDz6+gp6+Jz/yTo0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIzP1zTs6LMjtX2uy7mbj9xWnysJF/HjdHhPiecRnO0hfZHYAV
-	Ey5w+iDLewXql+eAtfGqdA0B75pMyDhCJYJNR62TSrHEVNSA+0kh7RhP8kHVqQ0MiftGY16czZ5
-	dE/oY9PT89NC6uzIcrIjae5SP7JSKkKw=
-X-Gm-Gg: ATEYQzyrQlLoU5CGBjSIbH7dBLZu/EA94DVIk+YxFE2AoC445m0hT9dDsyJPJzXrEzs
-	DJ2g8bMHqkf14l8AhMSc60Wb4RoaEeMNSpN9VTHrMMr9+Y8ePcFyKCwYrdCDjt8NYnphFj+L6fl
-	67DtT5yBp+Uy3JxGIymSkwRI0kOhggc9YffAY0NKg4ogfahFJGFI3zCWzwF184v7v8pGy4U++ks
-	GL2+4078Rc0aTPVIvXNVM1+vQWbffkGom5F7+YUKjatbahNxlh5f7AnigF442e8a91p5gCB7Pc/
-	cZCC5LaSYrYHtqyIkxEd8uTBrs0K4Xe8CFkNGgZrLaBO46xtbY7+l/CM/ExHaXUSy04=
-X-Received: by 2002:a05:690e:4105:b0:64a:f285:e673 with SMTP id
- 956f58d0204a3-64cc220ffdemr12304283d50.52.1772479500850; Mon, 02 Mar 2026
- 11:25:00 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gIP/mP4D"
+Received: from github.com (hubbernetes-node-708af72.va3-iad.github.net [10.48.220.58])
+	by smtp.github.com (Postfix) with ESMTPA id D390BE0BB5
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 12:19:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1772482748;
+	bh=FBp+5YHtjFLp3qLdoOvM0RzIygi3RWWO1riPoHIaMq4=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=gIP/mP4DHtUdu4Y359K6X5TjtaPpyux84YfbHyWZv1hzwCIb2wZG1F3MTz2p1XCxZ
+	 ffX3uFxFG96P2ELhy4kqF/nW0rgmw3f1+6nHYdxU+4kecNEsUXVFNFtTTGG7MniQ96
+	 x41+WnrM5QpUMterVxDCPchii1/15VTxnkI3i1TY=
+Date: Mon, 02 Mar 2026 12:19:08 -0800
+From: Christian Eggers <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/21e139-d99f2e@github.com>
+Subject: [bluez/bluez] 1b7e68: doc/qualification: gap-pics: add footnote for
+ TSPC...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260301152930.221472-1-martinbts@gmx.net> <20260301152930.221472-4-martinbts@gmx.net>
- <e4ef2b5dc4789347eb4f3f5005148bd68205b845.camel@hadess.net>
-In-Reply-To: <e4ef2b5dc4789347eb4f3f5005148bd68205b845.camel@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 2 Mar 2026 14:24:49 -0500
-X-Gm-Features: AaiRm5166srAuwhc8BHjgUuUvxjZIYJeGIjKp9CPkzg4fd3uKjtejx7-CG1hQ_I
-Message-ID: <CABBYNZJJSP9GC7gHZenjk6ZPSyG4xn-4kRuUC6zH89JHQJ2YFQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/5] device: Add btd_device_set_alias()
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Martin BTS <martinbts@gmx.net>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Martin, Bastien,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 1b7e682ef4b7641d12da43082fa00cfee55d4492
+      https://github.com/bluez/bluez/commit/1b7e682ef4b7641d12da43082fa00cfee55d4492
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
 
-On Mon, Mar 2, 2026 at 6:44=E2=80=AFAM Bastien Nocera <hadess@hadess.net> w=
-rote:
->
-> On Sun, 2026-03-01 at 16:29 +0100, Martin BTS wrote:
-> > Add a function that lets plugins set the device alias
-> > programmatically.  This is useful for devices whose Bluetooth name
-> > is generic (e.g. a bare BD address) but whose identity is known to
-> > the plugin after protocol-level interrogation.
-> >
-> > The function updates the in-memory alias, persists it via
-> > store_device_info(), and emits a D-Bus PropertyChanged signal.
-> > ---
-> >  src/device.c | 14 ++++++++++++++
-> >  src/device.h |  1 +
-> >  2 files changed, 15 insertions(+)
-> >
-> > diff --git a/src/device.c b/src/device.c
-> > index 3ea683667..39344579a 100644
-> > --- a/src/device.c
-> > +++ b/src/device.c
-> > @@ -5105,6 +5105,20 @@ void btd_device_device_set_name(struct
-> > btd_device *device, const char *name)
-> >                                               DEVICE_INTERFACE,
-> > "Alias");
-> >  }
-> >
-> > +void btd_device_set_alias(struct btd_device *device, const char
-> > *alias)
-> > +{
-> > +     if (g_strcmp0(device->alias, alias) =3D=3D 0)
-> > +             return;
-> > +
-> > +     g_free(device->alias);
-> > +     device->alias =3D (alias && *alias) ? g_strdup(alias) : NULL;
->
-> g_strdup(NULL) is documented as returning NULL, so no need to consider
-> alias being NULL:
-> https://docs.gtk.org/glib/func.strdup.html
->
-> More generally, is there any way to reduce code duplication with
-> set_alias() as well?
+  Changed paths:
+    M doc/qualification/gap-pics.rst
 
-Yeah, I would probably just rename set_alias to btd_device_set_alias,
-remove the id and make it public so it can be reused by plugins, etc,
-and internaly by the likes of dev_property_set_alias.
+  Log Message:
+  -----------
+  doc/qualification: gap-pics: add footnote for TSPC_GAP_21_9 feature
 
-> > +
-> > +     store_device_info(device);
-> > +
-> > +     g_dbus_emit_property_changed(dbus_conn, device->path,
-> > +                                     DEVICE_INTERFACE, "Alias");
-> > +}
-> > +
-> >  void device_get_name(struct btd_device *device, char *name, size_t
-> > len)
-> >  {
-> >       if (name !=3D NULL && len > 0) {
-> > diff --git a/src/device.h b/src/device.h
-> > index c7b8b2a16..bb51bd2f5 100644
-> > --- a/src/device.h
-> > +++ b/src/device.h
-> > @@ -22,6 +22,7 @@ char *btd_device_get_storage_path(struct btd_device
-> > *device,
-> >
-> >
-> >  void btd_device_device_set_name(struct btd_device *device, const
-> > char *name);
-> > +void btd_device_set_alias(struct btd_device *device, const char
-> > *alias);
-> >  void device_store_cached_name(struct btd_device *dev, const char
-> > *name);
-> >  void device_get_name(struct btd_device *device, char *name, size_t
-> > len);
-> >  bool device_name_known(struct btd_device *device);
->
+This feature is not supported by some host controllers (e.g. RTL8761BU)
+and must be disabled with such hardware.
 
 
---=20
-Luiz Augusto von Dentz
+  Commit: 4da5d644b884d320f755a3922e2f25336051370f
+      https://github.com/bluez/bluez/commit/4da5d644b884d320f755a3922e2f25336051370f
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/gap-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: gap-pts: fix GAP/SEC/CSIGN/* tests
+
+These tests require an additional characteristic for authenticated
+signed writes:
+
+> Couldn't find a characteristic which supports ATT Signed Write.
+
+
+  Commit: 737b2e6b106722fe929ababb94e11f15d7c08bd6
+      https://github.com/bluez/bluez/commit/737b2e6b106722fe929ababb94e11f15d7c08bd6
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/gap-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: gap-pts: fix GAP/SEC/SEM/BV-24-C test
+
+The test complains if the characteristic is created with read,write
+
+
+  Commit: 68b03755160d033d864c03c2d039029b73213a37
+      https://github.com/bluez/bluez/commit/68b03755160d033d864c03c2d039029b73213a37
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/sm-pics.rst
+
+  Log Message:
+  -----------
+  doc/qualification: sm-pics: update capabilities in table 7b
+
+Match naming with current Qualification Workspace
+
+
+  Commit: 61424fa2886f9146130b9831fb4c55a8095af7ce
+      https://github.com/bluez/bluez/commit/61424fa2886f9146130b9831fb4c55a8095af7ce
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/sm-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: sm-pts: fix SM/PER/PKE/BI-03-C and BV-02-C tests
+
+Running 'btmgmt' is not required, passkey in shown in bluetoothctl.
+
+
+  Commit: 160e9bdf20ae16102deb0c72189ecb6f00ca24c0
+      https://github.com/bluez/bluez/commit/160e9bdf20ae16102deb0c72189ecb6f00ca24c0
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/sm-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: sm-pts: fix SM/PER/SCPK/BI-03-C test
+
+Running 'btmgmt' is not required, passkey in shown in bluetoothctl.
+
+
+  Commit: 682fff74cd2aa78397f422df21e8aafbd34afaf7
+      https://github.com/bluez/bluez/commit/682fff74cd2aa78397f422df21e8aafbd34afaf7
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/sm-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: sm-pts: add description for M/PER/PIS/BV-0[1-2]-C
+
+
+  Commit: 19b050c73b60f0b7fa27d6b39eec1aa3aee2b8b9
+      https://github.com/bluez/bluez/commit/19b050c73b60f0b7fa27d6b39eec1aa3aee2b8b9
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/sm-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: sm-pts: add description for SM/PER/KDU/BI-04-C test
+
+
+  Commit: db7d1a9c770c57c815be98cf2c4841591952a2e0
+      https://github.com/bluez/bluez/commit/db7d1a9c770c57c815be98cf2c4841591952a2e0
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/gatt-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: gatt-pts: add description for GATT/SR/GAW/BI-39-C
+
+
+  Commit: a87273da5a469f7aee132f87887ddbeb27740f94
+      https://github.com/bluez/bluez/commit/a87273da5a469f7aee132f87887ddbeb27740f94
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/gatt-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: gatt-pts: update description for GATT/SR/GAN/BV-01-C
+
+'btgatt-server' exits after PTS disconnects and is not available when
+PTS reconnects. Starting btgatt-server again would solve the problem,
+but we should prefer testing with the real GATT daemon instead of using
+debugging containers. Additionally, this solution also works for
+GATT/SR/GAN/BV-03-C (next commit).
+
+
+  Commit: 268d715b80e0af4d641f91b27576b25ce905e36d
+      https://github.com/bluez/bluez/commit/268d715b80e0af4d641f91b27576b25ce905e36d
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/gatt-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: gatt-pts: add description for GATT/SR/GAN/BV-03-C
+
+Same as for GATT/SR/GAN/BV-01-C.
+
+
+  Commit: 7a2d04492f9809727786b43cbac1b2934572634d
+      https://github.com/bluez/bluez/commit/7a2d04492f9809727786b43cbac1b2934572634d
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/gatt-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: gatt-pts: update description for GATT/SR/GAI/BV-01-C
+
+This tests requires an indication on the "Service Changed"
+characteristic of the builtin "GATT" service. This indication can be
+raised by adding (or removing) a custom service. Of course we have to do
+this at the point when PTS is expecting to revice the notification.
+
+https://lore.kernel.org/linux-bluetooth/CABBYNZ+O6KbjXoxTKSaPnSd=p2CDJ7j6cBktPT4xXD=PR0CBhA@mail.gmail.com/
+
+
+  Commit: 04af0bbeca6309644c06fc9ce2399195db8f9eda
+      https://github.com/bluez/bluez/commit/04af0bbeca6309644c06fc9ce2399195db8f9eda
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/gatt-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: gatt-pts: add description for GATT/SR/GAI/BV-02-C
+
+Same as for GATT/SR/GAI/BV-01-C
+
+
+  Commit: 8a2186d6926f062f82bf0f69f64416374c053c8e
+      https://github.com/bluez/bluez/commit/8a2186d6926f062f82bf0f69f64416374c053c8e
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/l2cap-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: l2cap-pts: remove redundant test documentation
+
+L2CAP/LE/REJ/BI-01-C is documented twice
+
+
+  Commit: d99f2e129634f80843e5cdacf06f8dc9b9096ea5
+      https://github.com/bluez/bluez/commit/d99f2e129634f80843e5cdacf06f8dc9b9096ea5
+  Author: Christian Eggers <ceggers@arri.de>
+  Date:   2026-03-02 (Mon, 02 Mar 2026)
+
+  Changed paths:
+    M doc/qualification/l2cap-pics.rst
+    M doc/qualification/l2cap-pts.rst
+
+  Log Message:
+  -----------
+  doc/qualification: l2cap-pts: add descriptions for LE CFC tests
+
+All these tests depend on TSPC_L2CAP_2_46. Some tests require kernel
+fixes.
+
+
+Compare: https://github.com/bluez/bluez/compare/21e13976f2e3...d99f2e129634
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
