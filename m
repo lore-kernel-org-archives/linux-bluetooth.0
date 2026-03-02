@@ -1,111 +1,80 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C2538D012
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 08:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772441981; cv=pass; b=Ild8Mf8gbSheUbcJDxzvQ1+aedJHnaI60f2NcpGxUkYRsjwEv0CJmH+mS7ZMosEujwSuAkhc4wl6KBVKB4s/88nho++mzAqK54eu382CmFz0cdsXPiUrif1u1YI3OihDkIBPW4ieoNyfoieWS9wt/UWX8tOM1jzTi7hsOeARA7Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772441981; c=relaxed/simple;
-	bh=No26Adbjtn/SWk/sC5v6/2geabx6VMZwkde3PaDyloo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PL7LJ9HoCeos/1a61PscZBcRCcGjBtgEAH1yRNW3eoj1Wqa0x1LjxdbJtBHsMDZHHpw6r1l+xvGwARRAYxHD4u7MLlidXBj4EVsQGk951L4PeieS1s3ReyN8IhdOuQ5XE9qumm6uy+FZgF2m2r7UhdmnkStCIDiBzG4vFkrWtxI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=gTN0Wkbm; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080BF383C9E
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 08:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772441995; cv=none; b=eiVLehZCZC0nmDXFHItn9j0UB7Flre2BhlKy067yQ7eUAVuezsp3f5OQ308UJQknpc2zxysRNAdR1TTxHk3WhMCN28lyRbmjQyONvVZYDlwMwUGKhndHQ5XJeAeBbgACwzAicDQZXy5kyLiCNo83NHlMR6YHCAACiVKIZ3zwMro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772441995; c=relaxed/simple;
+	bh=SvPeN1kJrAIIVNxddrVdHl5aOSSXTPULv14zLvpdJAk=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e5myhxFBpq9fTJqoxIE1emA5ZK4K7Ku0kr3PJQ0VowxexiVrI9tBrpVHPBN5/7cvBrpYtlFdHFGccXmCpt68LXDVdQJWFYd/98xMPWDx+GuPI4pr7qfeszVoa4HCvT8wx0jmtFIksAIW+HEjVSQJq/O2o6CsO5Jq48PlQO5BYPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XOnfePRk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="gTN0Wkbm"
-ARC-Seal: i=1; a=rsa-sha256; t=1772441971; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=DtyVsDfLXo80Dj10Da98fi5MwsUXaDPPIByAS8+yuXWypqgPQ+0SsXSu9IzhReyBZIefMgu5CJxobOpWALzM6geigfJkuiKWcjjpk/JcYBWUMYUj1OOEDITduBMPfF62xmeHELWQKc1yvFlxx+1X1tyzJTzIAsUHDUFn4JPybJA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1772441971; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
-	bh=o8o4VXqG7HY2xdh9sykgYKBuRXfJpWOpODKK2EUqQFI=; 
-	b=EfzT6jggGWz4nB6SIJNfc7H3X2Rv5yYDaFH9ouSyoBzGY/9Ni0JTsJYQpCOz3cERvO2P/0phDjzVGz96zgpajGezPincq6o3iCn2oKVQr3C7cWSwjeTZQXWZ28975i/nv+74Fl94+OPVzKEiI01PrMlnFIsLt9bVbgugQhY/Lzc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
-	dmarc=pass header.from=<frederic.danis@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1772441971;
-	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
-	bh=o8o4VXqG7HY2xdh9sykgYKBuRXfJpWOpODKK2EUqQFI=;
-	b=gTN0WkbmT1Y2UpKCJ7iNXg8qKpzdQFs1tBvq1HYgwy8OIPbLHWOTW0G45g+6HTn5
-	hw2bfDxXV+WLNJqy5+8XUbVJKYmK9vb+OK/U89lTLw/4VeUpIF+Zgdec6aDI1jvMOoB
-	dG8fLWRmugKcguuSLjMrYEnxxOr5H355WlBCvNxo=
-Received: by mx.zohomail.com with SMTPS id 1772441969985718.5544663801703;
-	Mon, 2 Mar 2026 00:59:29 -0800 (PST)
-Message-ID: <a79cd039-2e82-472e-bfc5-cb987bf96f6a@collabora.com>
-Date: Mon, 2 Mar 2026 09:59:28 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XOnfePRk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1945C4AF0D
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2026 08:59:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772441994;
+	bh=SvPeN1kJrAIIVNxddrVdHl5aOSSXTPULv14zLvpdJAk=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
+	b=XOnfePRk8NIGp5OHCLJGRJuIPt0XbG9Mwq4tFtXxWbqgn0vp8jlzU9t8ZtUWv7NzR
+	 J65eRpTqpBbxJOTzh+OWRbn4+bEP7m8m+HLUvLiCZcg+LVbW0AqWpEnuGlIX4M9DS0
+	 QD/q2YKBH7eCbS8NbyglTk5Go27WDZ6edgm4ici0DVIee2JxlTHaqLMsytsVQH87aY
+	 nj4tX1xhZQYX+sdfxYuc+li+gEQ0Ia1QsJ/eJJNWzaK/3BTwVDmlM4THG9NOQXi5E6
+	 vLBoMg33OLKf+SqCSB0jx19XTCqKWhatkBhUYCY9xzsPZ9v46VEQHldrv++AbFwPs8
+	 2wslEacKD3JSw==
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-386b553c70eso63593521fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Mar 2026 00:59:54 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUEf14oNh8s/xcjT5E7aFNDjuWskO9X7uQctNQCiXibZhaZTz/7w6LKkyQ4RfxcQ8yu7kWr8LeG8JKQldbBmQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ2BYPtzb5yO8mAvJkyqNAaTLROaGlZv3GB5ujswq3ccVchlay
+	V8MyjnXPAiFhaLpB2VwpHHz5cFJKRhqopswO1xkIdMIrjc9/Pc1dKii+Q9NREpXfrTwVHazlEjg
+	s98Ilvjn+PQu2zLZoKpl4MjBTzcVQ3Oc7qHYvY7Q9uw==
+X-Received: by 2002:a2e:a10b:0:b0:388:127c:224d with SMTP id
+ 38308e7fff4ca-389ff34fa10mr77104021fa.22.1772441993417; Mon, 02 Mar 2026
+ 00:59:53 -0800 (PST)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 2 Mar 2026 00:59:52 -0800
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 2 Mar 2026 00:59:52 -0800
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260302024658.2836798-1-wei.deng@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 13/15] doc/qualification: gatt-pts: add description
- for GATT/SR/GAI/BV-02-C
-To: Christian Eggers <ceggers@arri.de>, linux-bluetooth@vger.kernel.org
-References: <20260227160022.21462-1-ceggers@arri.de>
- <20260227160022.21462-14-ceggers@arri.de>
-Content-Language: en-US
-From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
-In-Reply-To: <20260227160022.21462-14-ceggers@arri.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+References: <20260302024658.2836798-1-wei.deng@oss.qualcomm.com>
+Date: Mon, 2 Mar 2026 00:59:52 -0800
+X-Gmail-Original-Message-ID: <CAMRc=MeY0_rNT4ng0WZHOrqNDeuoaK7_n_4AC1s8hyd-Y62v7w@mail.gmail.com>
+X-Gm-Features: AaiRm50IT-IkRZbkJzPK8EJLXNS2M1eqFcgkqWrA1jntjUthioKMMjctQpL20FY
+Message-ID: <CAMRc=MeY0_rNT4ng0WZHOrqNDeuoaK7_n_4AC1s8hyd-Y62v7w@mail.gmail.com>
+Subject: Re: [PATCH V4] arm64: dts: qcom: qcs8300-ride: Enable Bluetooth support
+To: Wei Deng <wei.deng@oss.qualcomm.com>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-pm@vger.kernel.org, cheng.jiang@oss.qualcomm.com, 
+	shuai.zhang@oss.qualcomm.com, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Christian,
-
-On 27/02/2026 16:53, Christian Eggers wrote:
-> Same as for GATT/SR/GAI/BV-01-C
-> ---
->   doc/qualification/gatt-pts.rst | 16 ++++++++++++++++
->   1 file changed, 16 insertions(+)
+On Mon, 2 Mar 2026 03:46:58 +0100, Wei Deng <wei.deng@oss.qualcomm.com> said:
+> Enable BT on qcs8300-ride by adding a BT device tree node.
 >
-> diff --git a/doc/qualification/gatt-pts.rst b/doc/qualification/gatt-pts.rst
-> index 3959e70ab73d..760d78615970 100644
-> --- a/doc/qualification/gatt-pts.rst
-> +++ b/doc/qualification/gatt-pts.rst
-> @@ -1172,6 +1172,22 @@ for which we know the test passed.
->   |                        |          |         |       |                                                                         |
->   |                        |          |         |       | - [bluetooth]# gatt.register-application                                |
->   +------------------------+----------+---------+-------+-------------------------------------------------------------------------+
-> +| GATT/SR/GAI/BV-02-C    | PASS     |     6.1 | 5.69  | Run 'bluetoothctl':                                                     |
-> +|                        |          |         |       |                                                                         |
-> +|                        |          |         |       | - [bluetooth]# advertise on                                             |
-> +|                        |          |         |       |                                                                         |
-> +|                        |          |         |       | - [bluetooth]# gatt.register-service 0xFFFF                             |
-> +|                        |          |         |       |                                                                         |
-> +|                        |          |         |       |   - *yes* when asked if primary service                                 |
-> +|                        |          |         |       |                                                                         |
-> +|                        |          |         |       | - [bluetooth]# gatt.register-characteristic 0xAAAA read,write           |
-> +|                        |          |         |       |                                                                         |
-> +|                        |          |         |       |   - enter '1' when prompted                                             |
+> Since the platform uses the QCA6698 Bluetooth chip. While
+> the QCA6698 shares the same IP core as the WCN6855, it has
+> different RF components and RAM sizes, requiring new firmware
+> files. Use the firmware-name property to specify the NVM and
+> rampatch firmware to load.
+>
+> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
+> ---
 
-Shouldn't this be part of a Pre-condition?
-
-> +|                        |          |         |       |                                                                         |
-> +|                        |          |         |       | - Wait until PTS prompts for sending an indication                      |
-
-Instead of "- Wait until PTS prompts for sending a notification" you may 
-be use "On PTS request to send a notification:"
-
-> +|                        |          |         |       |                                                                         |
-> +|                        |          |         |       | - [bluetooth]# gatt.register-application                                |
-> ++------------------------+----------+---------+-------+-------------------------------------------------------------------------+
->   | GATT/SR/GAS/BV-01-C    | PASS     |     6.1 | 5.69  | In a first terminal run 'bluetoothctl':                                 |
->   |                        |          |         |       |                                                                         |
->   |                        |          |         |       | - [bluetooth]# remove <pts_addr>                                        |
-
--- 
-Frédéric Danis
-Senior Software Engineer
-
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
-Registered in England & Wales, no. 5513718
-
-
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
