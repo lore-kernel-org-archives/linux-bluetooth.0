@@ -1,167 +1,216 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998941096F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Mar 2026 00:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE81346FC3
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Mar 2026 01:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772496717; cv=none; b=jcDJLEbfnMBbsJovqw7EcEhEON8wnzO21GzCK+NMo5NCLZo2svweX2L6iAN0i+ZeYzn2QhpMTCgvEHD54EIjl2LOefLHzdrY4vECA1dSfU+L79VJCkiuY6SfIILF8HAPEmz0gce1/W4nNi+Bt+Qufpgo3M0/eAE2Cg54oMDIW2U=
+	t=1772501273; cv=none; b=n4gcA8zVreXGO7a8KsoXZZY/jxsEPkXRcdFsU/P1DYMA/AKtvb5cEjUxd0zc2pHcaSTAoX9GrKjKPwrxknyZ/dMiseLvmB+sb9mTqyBcIjmnuSTOO23IatfJbEczn+RptjuixP7eNZpVRrqrnJHVAlpTvaKRBJNmd6DCh/xbJf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772496717; c=relaxed/simple;
-	bh=6SUnXUnLNRSVDGEpntEb/q8i4MJDtXbjRjvwD1B5+IY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=LuGZIaqSJkVPGo6tSPBeKcicS8LizfBTNpzqMUbOHPdGqF62R3KGNks2Sph37GJrONJNiW2NIIQhNnsAL2i+W3/As/3C1VNj7KZpjNGkHqKoVjSecxEH5mHDG4Px9JOPOgekQjrAkqC/c1oVpdNFvm48DnCj3dOIY0RK0HdGZ6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jjV46XWU; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772501273; c=relaxed/simple;
+	bh=g+VdGlVLVkH1poZKLQaU9Z6Cz1tsg2GNZN6MfKpgxB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ujd1Y6dIQlD9Lnvr3rwgH0xyVAVm7yRu748M6KQkJTUdjJPRb5D/AKzL7bhpLvAhqlp5VZ4T3NxF3O78vpvOBVqmnCqlnqc3uMZYWpNGABz67FRu2tg/GY7JMmtbwV/xMBWJ92L9bLyGtvxOP2FoAJqXpEHIjhBUXaIK+hD6laQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=phzB0hIZ; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jjV46XWU"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cb4081e82aso670272485a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Mar 2026 16:11:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772496715; x=1773101515; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/WIu47r6Sm/S4YxCJM/A0P+752K0pMgbOQfuCqTarX0=;
-        b=jjV46XWUuI8zWBGoAJXwIxfGi1aPRLhal4duKUeaSn0OBHjNB2XWghwn/825VRkE83
-         tD9W+LKT16lmHWItFk1AF2hXb04wYwqVVwqi5INi2e1zFXmNkjgo0IbSsH2EOu74VNyR
-         jrfn5x2QuPFrlHOKZqjUp2BTcA++VlZKLNr7d18xrHgF5QObonxfY/fWp9lhDY1PxWWo
-         9q38nD4iEfhX6+G0zJqkjX8bXk6K0s0/uxOPkLIvw4wmz8e7le29pfDrrGQPqZOGjxTX
-         dhuMZWk/wfVIByxKh9IEM2rJrDTX+jNLxYfeuzQ61Ivs1y+rdvt/S+Z5zDQqeul/El3D
-         2qRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772496715; x=1773101515;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/WIu47r6Sm/S4YxCJM/A0P+752K0pMgbOQfuCqTarX0=;
-        b=eQ+2ChOu8ik0Z4IrC5J0XguU94v1F9qFvyPCeS6t/oTcc9vGwLQGwUhsd88PYOkofu
-         Bvjzr0iqj0Ww1PPtNFF6p6zHr9OdMJQgxQEWBChkGVBylJOBWlxATRkSE9CoAQkEgUe/
-         NSA4CTfVmDKyhsi00Afd0Oa7Y7gtj3OZ9gZCU+IlvdWg4Ak1RJBWQhJyjH60qvS9Zex7
-         K3EoYfabq2fMjO0AobtQ/zI3Ftva4pJWwE20Bsx/U+l1riAF75/QFbDvEzEZ5QGun3Ax
-         uUNxtay3pi4RX9BZWxry9/UIwDmYPn/5JnnSiubj83HQFH6xpG3sVLEghtFFic3SCvhE
-         XRqA==
-X-Gm-Message-State: AOJu0YzZXTlheZAiIxxsKbZbshuh4DiiB29Qh/gxg09CI6Oy93r9L2sx
-	s5XwqFw5xZFdQvB7rXykF3VcxU4tbJwBm5y44poOW1YEEpxzw0qJjLu7/aVALA==
-X-Gm-Gg: ATEYQzxLAMrdVHNp0lDeY4o8++PIampebv0YRiDPwJ7EZy8OEisz+J4KoTKksp+PCj1
-	GMxypko7vwm/7OF9JMIEdsIr1513CVtPAMfxwOXvcMbYPi9d9PFfwqnbP7Xo0sH6kV+Q2RpThPU
-	FNFcHlQAH5x2uPtAwuJ6xGvDF/GgY2VUKI8Ct3vQ3X4Fwv4rbc2+ph8axHPcrPcvZzOOLgC0Kgp
-	/tbWWgLXVK9FVsR0Aa2CsLTZuOGdt9jm9Wo/TgX3JMSG55+UOk6xio4BZXZRVbfRWn5bO8an2tn
-	xAldedrwMEoA0F+jzBkG7oXBF7/TmXs+au3c+pWCKlaOSv5N+JYq5vZ9pOeUhE+LmH8f0JqR7dt
-	lZQPzLGVfqJgIhGovrH1yDy1r8d0FsZGmnCl6AssdAw0IAC9JeF9OnCRjnltAmtHvxCYevLJ4iR
-	gaN5j673iLJFC4WwvIB7iRn0hrpbdi
-X-Received: by 2002:a05:620a:1726:b0:8ca:2e37:ad08 with SMTP id af79cd13be357-8cbc8d9d7d0mr1872813485a.34.1772496715084;
-        Mon, 02 Mar 2026 16:11:55 -0800 (PST)
-Received: from [172.17.0.2] ([20.109.38.120])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899f47819ffsm44005736d6.37.2026.03.02.16.11.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 16:11:54 -0800 (PST)
-Message-ID: <69a6274a.050a0220.ce6de.a9b7@mx.google.com>
-Date: Mon, 02 Mar 2026 16:11:54 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4061694347337142354=="
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="phzB0hIZ"
+Received: from macsyma.thunk.org (pool-173-48-102-84.bstnma.fios.verizon.net [173.48.102.84])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 6231PuA7026614
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 2 Mar 2026 20:25:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1772501166; bh=/4PzqDjQa596+Pxv5nyCAFN8lvFTxej9AhTZolOU+To=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=phzB0hIZR1Dj1lfUpzFsTr+flPNVCYM7cGga6WrO7kke29j+oI7WqbalMFREnmiFa
+	 39u6piOkvzSC+jx+skpc8xO8CzlmR1DGj4C5Alh9MmPU2lsvISyly3Iv5gOME95rCd
+	 MllEQsTefwUEgdwyTpmROazXEa7NbA5gdhjNhYqUrXL9BbLSWNcW3dyZTKAgvN+zey
+	 Zme2la752JOXjAcUBX4yGVlIoNtn+JrIRwXMG0WueOMoaTAHTCwKb+nnqitNheeRt0
+	 EdkCyXgnFyu9pvoE+gS28f2nbWvS4IP+gBRVocTthk62P+MIa/5ig5W04hcezbkVA0
+	 tLxNJsYr70ogA==
+Received: by macsyma.thunk.org (Postfix, from userid 15806)
+	id 33A7D5AC5A1E; Mon,  2 Mar 2026 20:25:56 -0500 (EST)
+Date: Mon, 2 Mar 2026 20:25:56 -0500
+From: "Theodore Tso" <tytso@mit.edu>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Muchun Song <muchun.song@linux.dev>,
+        Oscar Salvador <osalvador@suse.de>,
+        David Hildenbrand <david@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        Paulo Alcantara <pc@manguebit.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+        Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+        Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Bharath SM <bharathsm@microsoft.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        Eric Van Hensbergen <ericvh@kernel.org>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        David Sterba <dsterba@suse.com>,
+        Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>,
+        Luis de Bethencourt <luisbg@kernel.org>,
+        Salah Triki <salah.triki@gmail.com>,
+        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+        Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>,
+        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
+        Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        Yangtao Li <frank.li@vivo.com>,
+        Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Richard Weinberger <richard@nod.at>, Dave Kleikamp <shaggy@kernel.org>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
+        Zhihao Cheng <chengzhihao1@huawei.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        John Johansen <john.johansen@canonical.com>,
+        Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>,
+        Roberto Sassu <roberto.sassu@huawei.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
+        Stephen Smalley <stephen.smalley.work@gmail.com>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemb@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+        Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        James Clark <james.clark@linaro.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>,
+        Eric Paris <eparis@redhat.com>, Joerg Reuter <jreuter@yaina.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Oliver Hartkopp <socketcan@hartkopp.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Remi Denis-Courmont <courmisch@gmail.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Xin Long <lucien.xin@gmail.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+        Stanislav Fomichev <sdf@fomichev.me>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+        fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
+        v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+        autofs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        codalist@telemann.coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+        linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+        devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
+        apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+        netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-x25@vger.kernel.org,
+        audit@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-sctp@vger.kernel.org,
+        bpf@vger.kernel.org
+Subject: Re: [PATCH v2 001/110] vfs: introduce kino_t typedef and PRIino
+ format macro
+Message-ID: <20260303012556.GA6520@macsyma-wired.lan>
+References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
+ <20260302-iino-u64-v2-1-e5388800dae0@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, dajidp.morel@gmail.com
-Subject: RE: [v4] Bluetooth: Increase LE connection timeout for industrial sensors
-In-Reply-To: <20260302233756.910702-1-dajid.morel@volvo.com>
-References: <20260302233756.910702-1-dajid.morel@volvo.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260302-iino-u64-v2-1-e5388800dae0@kernel.org>
 
---===============4061694347337142354==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, Mar 02, 2026 at 03:23:45PM -0500, Jeff Layton wrote:
+> The PRIino macro is a length modifier, not a complete format specifier.
+> It is used as: "%" PRIino "u" for decimal, "%" PRIino "x" for hex, etc.
+> This follows the pattern used by userspace PRIu64/PRIx64 macros.
 
-This is automated email and please do not reply to this email!
+For the record, I really hate the inttypes.h format specifiers, but I
+agree that we should forward the example of the C99 spec, for better
+or for worse.
 
-Dear submitter,
+That being said, the userspace PRIu64, et. al macros are complete
+format specifiers, not just a length modifier.  And I think this
+results in less ugly format specifiers in our kernel code.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1060320
+---- cut here ---
+#!/bin/sh
+cat <<EOF > /tmp/blah.c
+#include <inttypes.h>
+#include <stdio.h>
 
----Test result---
+int main(int arg, char **argv)
+{
+        printf("PRIu64 is %s\n", PRIu64);
+        printf("PRId64 is %s\n", PRId64);
+        printf("PRIx64 is %s\n", PRIx64);
+        return 0;
+}
+EOF
 
-Test Summary:
-CheckPatch                    PENDING   0.25 seconds
-GitLint                       PENDING   0.31 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      26.41 seconds
-CheckAllWarning               PASS      28.62 seconds
-CheckSparse                   PASS      32.32 seconds
-BuildKernel32                 PASS      25.90 seconds
-TestRunnerSetup               PASS      560.97 seconds
-TestRunner_l2cap-tester       FAIL      32.64 seconds
-TestRunner_iso-tester         PASS      104.97 seconds
-TestRunner_bnep-tester        PASS      6.24 seconds
-TestRunner_mgmt-tester        FAIL      124.87 seconds
-TestRunner_rfcomm-tester      PASS      9.68 seconds
-TestRunner_sco-tester         FAIL      14.60 seconds
-TestRunner_ioctl-tester       PASS      11.50 seconds
-TestRunner_mesh-tester        FAIL      12.42 seconds
-TestRunner_smp-tester         PASS      8.67 seconds
-TestRunner_userchan-tester    PASS      6.74 seconds
-IncrementalBuild              PENDING   0.91 seconds
+clang -m32 -o /tmp/blah /tmp/blah.c
+/tmp/blah
+---- cut here ---
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+% /tmp/blah.sh
+PRIu64 is llu
+PRId64 is lld
+PRIx64 is llx
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+Thanks!
 
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Total: 96, Passed: 94 (97.9%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-L2CAP LE Client - Read 32k Success                   Timed out    2.441 seconds
-L2CAP LE Client - RX Timestamping 32k                Timed out    1.897 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.116 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.776 seconds
-Mesh - Send cancel - 2                               Timed out    1.994 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4061694347337142354==--
+						- Ted
