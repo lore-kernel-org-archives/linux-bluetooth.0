@@ -1,165 +1,207 @@
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012027.outbound.protection.outlook.com [52.101.66.27])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507EB375F88
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Mar 2026 10:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.27
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772533138; cv=fail; b=h/wAVUjvMjmClu4nFQz5b/YYngKSiKrh6JJNZeFgekvSbxteQpG1RKaddn+b8BxQ3dKRLrnj9hxq4TUPsWFzSo5MumApVLW844WYTvh5hPpMuvhvk+XpYFRyC/nmMOQ2CLubJyjjeI2LI3ekKh9CfwN8lgzDAN23ynfcg3iGmD4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772533138; c=relaxed/simple;
-	bh=xTeT4Sr0wy7sEOyx7fCp1wGzk27CpM0TFpUdwKoazI0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IEDWehbiU7L45pE/9iCNjkOtudUpk/Ox84GhqoZdKz6gOqfJ1H6LyRulWVkGcxDZUTpZUoG1fgbsCq0gITVbr/LxOz/+zCkePctFbBa108jBuQqz0n3wy8a9jNiXMjeMNCHGX2m4SYsWW8sHV8s915KvKXaFwFlGmY7YH2v2yrc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=kLZQ1Ycz; arc=fail smtp.client-ip=52.101.66.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721AA3A5E79
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Mar 2026 10:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772534957; cv=none; b=hfeRgDFUOuweGcr0TjFi6o8FeeTJlgA+j0EJod/rVhswhi4nKK3dma+ki756hhtwVNoh2noINpLAAJvMwGFjOpxeRyAxfLOmt/Vi2oDhItHe6qKoJHpxIroG9ulQBI4yivYYTFeoe3gryEXvNlUW1xAFTGdLyUIHd/MRVJIpZjk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772534957; c=relaxed/simple;
+	bh=ZJFR9/2OtrcnrgSTa4EHnH5JX9DBPEZCrlsYG5puECk=;
+	h=From:In-Reply-To:References:To:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=XNT+dG/FeZJ/qJnlVWY/d+tMbTK9WUktenxqBIMLS8YQ9Mu01Q5w6te2Z/Pz+NDZoK7kxbV8kyvX9/10/TiVjRojwbf20R2Pwg/tCq2ZHSCmcPe3xXZzFORQefipbAkhntJOLFUe+T4ArBXZYY3jM79jgcI44Xj7Lcd8uUZQStI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=fail (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CpcXab0Z reason="signature verification failed"; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="kLZQ1Ycz"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WMZvK+iqZsf3i3nOY+DaYpifaBMzA9PSZcsfAhd1a5acBgqN45mrYwjdwHrW2WcA6moVT5ez3k+HGZrz0zyG+Iw0e4GC2CsYEfRTokY2AejDSMdbuZFFitj4l5O/VkowLwG1M9puu6nYK/O8aOeLLnAfo9a/xRT/C4U5b6X24Y3Q8eUDMDLKgjuyHvNbhcdHFNFNOpECpc6AwHJC3me4OsaxFI/74BHnWHBCSvzz/NBHlMwz56mOhfsLDTcsFeN5N8CWkqk7n2umeJpFgOvW/r4LxO/2NGEnmUeD5rLvXHHTm+xy1YsAnaS/zNjEK4/9LAE+qi3NAypgEDgEKpHspQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g92EN5hTeeXuv1HDncIx/L9X76hdBcee7bXYo4u72KU=;
- b=UQXoAI9oXryiAcmeg6SJBDC8UsqBFO07ewlaPHurosqgdZsVL8tWKeqk1eUb4qWE8EDxtJfp8GJy3JIjuEuaVgX3aUst1Pc2SYtevfpzrvR/Wih8W4mSC6/ak2v62x/LEytXdFf4mtchCMgVBWEZK2rsh/9gpWU/2VfHJU2mDd56FqglPVcAWWHeUOipQMdPlrqtr+6epTPl1A4DSMNntphyTGWdEnFqqQMWrZ+QuW+HDoS6LmjmYIfLYz2a5x9v+qI7phuVu4KO1En/wEoVqr+qDUzqK4q64so1VzK2J8zKe+h+RR3RJIWSieSdMNOSxFa0Wz0PioGemLYHtHvGcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=intel.com smtp.mailfrom=arri.de; dmarc=fail
- (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g92EN5hTeeXuv1HDncIx/L9X76hdBcee7bXYo4u72KU=;
- b=kLZQ1YczKljdTn0FXPU7MCXIkKHjRqnS27LQlr05R55vhpOErs8lKdXmYnX481nbVZ5wh3Jqao6ssp4LtvccqKoouqih6a1ghWpzZ4ZQf6CluSMGlDImxsbw+b3Aws+wf8/NrsNIUwWZeWSJX5ZVEVugaLrn4QnuV9W4HJlBs7I=
-Received: from AS9PR07CA0009.eurprd07.prod.outlook.com (2603:10a6:20b:46c::9)
- by PAXPR03MB7968.eurprd03.prod.outlook.com (2603:10a6:102:21b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Tue, 3 Mar
- 2026 10:18:50 +0000
-Received: from AMS0EPF0000019A.eurprd05.prod.outlook.com
- (2603:10a6:20b:46c:cafe::30) by AS9PR07CA0009.outlook.office365.com
- (2603:10a6:20b:46c::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.22 via Frontend Transport; Tue,
- 3 Mar 2026 10:18:50 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- AMS0EPF0000019A.mail.protection.outlook.com (10.167.16.246) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9654.16 via Frontend Transport; Tue, 3 Mar 2026 10:18:49 +0000
-Received: from n9w6sw14.localnet (10.30.5.38) by mta.arri.de (10.10.18.5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Tue, 3 Mar
- 2026 11:18:48 +0100
-From: Christian Eggers <ceggers@arri.de>
-To: Luiz Von Dentz <luiz.von.dentz@intel.com>
-CC: <linux-bluetooth@vger.kernel.org>, <frederic.danis@collabora.com>
-Subject: Re: [PATCH BlueZ v2 00/15] doc/qualification: Updates for TCRL pkg101
-Date: Tue, 3 Mar 2026 11:18:48 +0100
-Message-ID: <2207166.9o76ZdvQCi@n9w6sw14>
-Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
-In-Reply-To: <177248280755.467971.14039615652305364969.git-patchwork-notify@kernel.org>
-References: <20260302134540.25540-1-ceggers@arri.de>
- <177248280755.467971.14039615652305364969.git-patchwork-notify@kernel.org>
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CpcXab0Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772534952;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lQfcYf0nTgw81P/IsIDOOQjFjTNPUrLYna+XMlLw958=;
+	b=CpcXab0ZhIbQK4+PkohlGzLctBNlQgtkAxEftnOkZijikgdmWHyGBcnXUCpsslLDDBZXzs
+	8PesyLMLy05ZzV5G4JOSwp1WC9xfeKmG0cvf0y3Jzgx/ylLBHnmwFppjAtlHck4//niIJ7
+	rNJznep2nQQK2txRNsfjl7ITVsoe+MY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-711-uSGAZGHOPR6NZ3KYbowoaw-1; Tue,
+ 03 Mar 2026 05:49:09 -0500
+X-MC-Unique: uSGAZGHOPR6NZ3KYbowoaw-1
+X-Mimecast-MFC-AGG-ID: uSGAZGHOPR6NZ3KYbowoaw_1772534944
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C13A1956089;
+	Tue,  3 Mar 2026 10:49:02 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.33.249])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1F8F319560A7;
+	Tue,  3 Mar 2026 10:48:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
+References: <20260302-iino-u64-v2-0-e5388800dae0@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+To: Alexander Viro <viro@zeniv.linux.org.uk>,
+    Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+    Steven Rostedt <rostedt@goodmis.org>,
+    Masami Hiramatsu <mhiramat@kernel.org>,
+    Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+    Dan Williams <dan.j.williams@intel.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Eric Biggers <ebiggers@kernel.org>,
+    "Theodore Y. Ts'o" <tytso@mit.edu>,
+    Muchun Song <muchun.song@linux.dev>,
+    Oscar Salvador <osalvador@suse.de>,
+    David Hildenbrand <david@kernel.org>,
+    David Howells <dhowells@redhat.com>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
+    Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+    Trond Myklebust <trondmy@kernel.org>,
+    Anna Schumaker <anna@kernel.org>,
+    Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+    Olga Kornievskaia <okorniev@redhat.com>,
+    Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+    Steve French <sfrench@samba.org>,
+    Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+    Shyam Prasad N <sprasad@microsoft.com>,
+    Bharath SM <bharathsm@microsoft.com>,
+    Alexander Aring <alex.aring@gmail.com>,
+    Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+    Viacheslav Dubeyko <slava@dubeyko.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Latchesar Ionkov <lucho@ionkov.net>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Christian Schoenebeck <linux_oss@crudebyte.com>,
+    David Sterba <dsterba@suse.com>,
+    Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>,
+    Luis de Bethencourt <luisbg@kernel.org>,
+    Salah Triki <salah.triki@gmail.com>,
+    "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Alex Markuze <amarkuze@redhat.com>, Jan Harkes <jaharkes@cs.cmu.edu>,
+    coda@cs.cmu.edu, Nicolas Pitre <nico@fluxnic.net>,
+    Tyler Hicks <code@tyhicks.com>, Amir Goldstein <amir73il@gmail.com>,
+    Christoph Hellwig <hch@infradead.org>,
+    John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+    Yangtao Li <frank.li@vivo.com>,
+    Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+    David Woodhouse <dwmw2@infradead.org>,
+    Richard Weinberger <richard@nod.at>,
+    Dave Kleikamp <shaggy@kernel.org>,
+    Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+    Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+    Joseph Qi <joseph.qi@linux.alibaba.com>,
+    Mike Marshall <hubcap@omnibond.com>,
+    Martin Brandenburg <martin@omnibond.com>,
+    Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
+    Zhihao Cheng <chengzhihao1@huawei.com>,
+    Damien Le Moal <dlemoal@kernel.org>,
+    Naohiro Aota <naohiro.aota@wdc.com>,
+    Johannes Thumshirn <jth@kernel.org>,
+    John Johansen <john.johansen@canonical.com>,
+    Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+    "Serge E. Hallyn" <serge@hallyn.com>,
+    Mimi Zohar <zohar@linux.ibm.com>,
+    Roberto Sassu <roberto.sassu@huawei.com>,
+    Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+    Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
+    Stephen Smalley <stephen.smalley.work@gmail.com>,
+    Ondrej Mosnacek <omosnace@redhat.com>,
+    Casey Schaufler <casey@schaufler-ca.com>,
+    Alex Deucher <alexander.deucher@amd.com>,
+    Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>,
+    David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+    Sumit Semwal <sumit.semwal@linaro.org>,
+    Eric Dumazet <edumazet@google.com>,
+    Kuniyuki Iwashima <kuniyu@google.com>,
+    Paolo Abeni <pabeni@redhat.com>,
+    Willem de Bruijn <willemb@google.com>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+    Oleg Nesterov <oleg@redhat.com>,
+    Peter Zijlstra <peterz@infradead.org>,
+    Ingo Molnar <mingo@redhat.com>,
+    Arnaldo Carvalho de Melo <acme@kernel.org>,
+    Namhyung Kim <namhyung@kernel.org>,
+    Mark Rutland <mark.rutland@arm.com>,
+    Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+    Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+    Adrian Hunter <adrian.hunter@intel.com>,
+    James Clark <james.clark@linaro.org>,
+    "Darrick J. Wong" <djwong@kernel.org>,
+    Martin Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>,
+    Joerg Reuter <jreuter@yaina.de>,
+    Marcel Holtmann <marcel@holtmann.org>,
+    Johan Hedberg <johan.hedberg@gmail.com>,
+    Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+    Oliver Hartkopp <socketcan@hartkopp.net>,
+    Marc Kleine-Budde <mkl@pengutronix.de>,
+    David Ahern <dsahern@kernel.org>,
+    Neal Cardwell <ncardwell@google.com>,
+    Steffen Klassert <steffen.klassert@secunet.com>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Remi Denis-Courmont <courmisch@gmail.com>,
+    Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+    Xin Long <lucien.xin@gmail.com>,
+    Magnus Karlsson <magnus.karlsson@intel.com>,
+    Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+    Stanislav Fomichev <sdf@fomichev.me>,
+    Alexei Starovoitov <ast@kernel.org>,
+    Daniel Borkmann <daniel@iogearbox.net>,
+    Jesper Dangaard Brouer <hawk@kernel.org>,
+    John Fastabend <john.fastabend@gmail.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+    linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+    fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
+    linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+    linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+    samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+    autofs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+    linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+    ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+    devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
+    apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+    linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
+    amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+    linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+    netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
+    linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org,
+    linux-hams@vger.kernel.org, linux-x25@vger.kernel.org,
+    audit@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+    linux-can@vger.kernel.org, linux-sctp@vger.kernel.org,
+    bpf@vger.kernel.org
+Subject: Re: [PATCH v2 000/110] vfs: change inode->i_ino from unsigned long to u64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF0000019A:EE_|PAXPR03MB7968:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ec475b5-8044-4f7a-9c49-08de790e42e3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024|13003099007|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	Rx2qzHcAsi4Twi3InZ8DYm7gD+89lOSIAn69mvV9Yj64dixWfz4g7fJOaE2UXK3RGtdQO7Jviut3Alc2R0/PeJk96rf7p2itqZr8sYCc/XlnsgY41sPur4XnH/PaP+9Cty5ic74/FtptSP4WU8WyuXC5A+ss8CPdiT+UUbx3qgIyY9pjzQVZDuEdbT5K4QY+jZgnkfaEsBuPBX85pvxGZhsAEKqkc6WZGgA6+tx1X/oAzG6pOkcrpOTO9uhgyoTHBQ6Mb2IPHg6po+hQTgCS1/F7mPhKjdS2lQgG7RfHjo0H2rfR9UVMo2wGCCmYjawZrFfnZSOCqDKMvGIIqcdP0aEz1jTBVXPnbgp4zOAdYlD6E+d5YuNUYI7l4yg6aW834/uSqJc/odhYyoaKbcMv4lMGUS0Ej+YK9T0v1ReNVQcpxIWBQ0y3Ons6VY+cDDcafKWh7ZcFclT+7STmmr/b3a6Q8m84A34SWes06UK2fiE/2YqyzYwXEfDptPqNpj2/XN+6QT/rP/mXT9g+Niin9j2uLOhSsScFmn/qUmCcjCh9qi+hSwn2q1y0Xu1Qml2T5zyT1PVGqt9Qbanl5Rkjhms6TrgaIt/II+iSUOGzfhifMcyvL9pC6YIi0lic8PyC029SzSyUMT1c7Puj/N9e18zZDkRhwGrLWvwtLxfojZ/WD7UiBwmyha/taXKUi7RXFIL5U7eqvMa9VbnBJcy18hqp8E3rYuzYw4z0lPsdAdJBpAMTg30qRhJ4aKBftV8CQ2tKgQZV40ccwnc2cnlwnzWq1lojVBujmt5oriyiFbZeQuuhBByP3+M+PXcvBEzz/gFb2h44LfYu5iJGteLReQ==
-X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024)(13003099007)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	FhWC6ic7Ir0AFEY2t21yhbnVBHTKovyQNttk2W4TybhhA/gHxV6JkRYIw8v81liNpQqAJBHjqdR6oKYtRSTX38vMeEwP/XBlxl3NYzF/MX5NVuVxm2+m+XcY6RTlx9/VfzcL7ixxmY7auNrGr0Zd7SVihbMcStSrCQ2RWnujl+AdNANslu35mRciunQMwcYwjLbALm6DnaaY0K6EO3xgX+oa51Y8w75cyhj+1ZPrdWvCtIfANCY2KnE3zdTLAn/CGlWnGq8BL/xDAJlHs4MbRhx7dKpjugJXgW+FGhKiui0k7V4IE+voxKdUuSHTQ+ateG+6/RZMzcbgh85mFNboHRrWJv1fF0qAFBcM509G/hstKIcvx4Nl8BbWDJl/7WGUxs+q09kS7Tx8PU1KmSARvabupRNatnOovMgHEebFCv+mz3nJWxKuyN5EKmFGOZi0
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 10:18:49.1428
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ec475b5-8044-4f7a-9c49-08de790e42e3
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS0EPF0000019A.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR03MB7968
+Content-Type: text/plain
+Date: Tue, 03 Mar 2026 10:48:05 +0000
+Message-ID: <1773080.1772534885@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Luiz,
+Jeff Layton <jlayton@kernel.org> wrote:
 
-it looks like v1 of this series has been applied to master (instead of v2).
+> This version splits the change up to be more bisectable. It first adds a
+> new kino_t typedef and a new "PRIino" macro to hold the width specifier
+> for format strings. The conversion is done, and then everything is
+> changed to remove the new macro and typedef.
 
-regards,
-Christian
+Why remove the typedef?  It might be better to keep it.
 
-On Monday, 2 March 2026, 21:20:07 CET, patchwork-bot+bluetooth@kernel.org wrote:
-> Hello:
-> 
-> This series was applied to bluetooth/bluez.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> 
-> On Mon, 2 Mar 2026 14:30:28 +0100 you wrote:
-> > I am working on a qualification of Linux/BlueZ for "LE / peripheral only".
-> > Due to updates on the SIG's ICS/TCMT/TCRL, some ICS options and tests
-> > have been added.
-> > 
-> > As I am not able to perform all the tests as Frederic did, these patches
-> > bring the documentation into a slightly inconsistent state (as I tested
-> > with a newer TCRL/ICS/PTS version, but only updated the test docs for
-> > the testcases I actually ran).
-> > 
-> > [...]
-> 
-> Here is the summary with links:
->   - [BlueZ,v2,01/15] doc/qualification: gap-pics: add footnote for TSPC_GAP_21_9 feature
->     (no matching commit)
->   - [BlueZ,v2,02/15] doc/qualification: gap-pts: fix GAP/SEC/CSIGN/* tests
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4da5d644b884
->   - [BlueZ,v2,03/15] doc/qualification: gap-pts: fix GAP/SEC/SEM/BV-24-C test
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=737b2e6b1067
->   - [BlueZ,v2,04/15] doc/qualification: sm-pics: update capabilities in table 7b
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=68b03755160d
->   - [BlueZ,v2,05/15] doc/qualification: sm-pts: fix SM/PER/PKE/BI-03-C and BV-02-C tests
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=61424fa2886f
->   - [BlueZ,v2,06/15] doc/qualification: sm-pts: fix SM/PER/SCPK/BI-03-C test
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=160e9bdf20ae
->   - [BlueZ,v2,07/15] doc/qualification: sm-pts: add description for M/PER/PIS/BV-0[1-2]-C
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=682fff74cd2a
->   - [BlueZ,v2,08/15] doc/qualification: sm-pts: add description for SM/PER/KDU/BI-04-C test
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=19b050c73b60
->   - [BlueZ,v2,09/15] doc/qualification: gatt-pts: add description for GATT/SR/GAW/BI-39-C
->     (no matching commit)
->   - [BlueZ,v2,10/15] doc/qualification: gatt-pts: update description for GATT/SR/GAN/BV-01-C
->     (no matching commit)
->   - [BlueZ,v2,11/15] doc/qualification: gatt-pts: add description for GATT/SR/GAN/BV-03-C
->     (no matching commit)
->   - [BlueZ,v2,12/15] doc/qualification: gatt-pts: update description for GATT/SR/GAI/BV-01-C
->     (no matching commit)
->   - [BlueZ,v2,13/15] doc/qualification: gatt-pts: add description for GATT/SR/GAI/BV-02-C
->     (no matching commit)
->   - [BlueZ,v2,14/15] doc/qualification: l2cap-pts: remove redundant test documentation
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8a2186d6926f
->   - [BlueZ,v2,15/15] doc/qualification: l2cap-pts: add descriptions for LE CFC tests
->     (no matching commit)
-> 
-> You are awesome, thank you!
-> 
-
-
-
+David
 
