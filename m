@@ -1,126 +1,327 @@
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A31633BBD1
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Mar 2026 21:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772661079; cv=none; b=BoN2ccP5OpN8s9obprtI9Gr6j+QDuIhxLab1V8h9Ej+lRR3hFmo4KY/+Xxig12mVL3vWotokX5dvaGmLbPB9i5eWQ4iCU5FGKzUCWTBK2j1U099KbUYyStTLAQOSDPxNcz4GXVkTL6sjzJ600sCEba8aB4dZlddMHP/iNvkK0kk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772661079; c=relaxed/simple;
-	bh=koMAHpO8RCDB8BmeKMTwCV0DvPpsAFSp0F9yn0+W4Qc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tR1MOpeQFrFZcOYV7X6MNtJjK6N/75Dt97Il7k501Q6nnB7DUfHzDPj2aUJGKvls8lS6z4XjsbHAynHK92pW5i9kiPG5YxJG4HbWqHeJ7Zj00YdVWM+03/pXOyGn0i8dc3MyztXtLVWJhweMYiyp6rgBuc4Tz9yEQc4ipa10ubM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NTLn70vf; arc=none smtp.client-ip=74.125.82.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E24F373C0B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Mar 2026 22:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772664632; cv=pass; b=ha6fkX8TW7HABjPrCprat048GudGtACQrRkqflsuuXdhWgMALkaZsXX+WmAjgOcGoRQSLTmJVNLth1Pm28Nuc1s9OMKQG4RPuTk9/9A3+ql12YHbJJG7M+Er/+DFecu+6h7BfSoz02xH3sH8DzoLmgKaaxn5eL6S7JLM0kCo3o8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772664632; c=relaxed/simple;
+	bh=v+jTkoOuM2NPCetAIJg46/eO2RR8iZVRxxEScOdpXlI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=teLNNvihyVr/omXsKWct8ddxkWAqHvZyPhlWnogYbwmDtxB+YgXmrAnaaJytFmRqT8uHKvQ08yAgecsegqau98meoHqkE0rbPIza2sXhyM4Om5B/D29IUbH5p48flt6ruuapfWemJfufQhrrDFcxgm7AzqlbdrOLNtlZ446GYpE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UwRdndyP; arc=pass smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NTLn70vf"
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-2b4520f6b32so8458391eec.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Mar 2026 13:51:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UwRdndyP"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-65f8c8c3a4aso13660626a12.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Mar 2026 14:50:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772664629; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HVf6/MdImjPHHFIEPxtzxdUtQGhbrCwx8e6RGhhK/dtnJbQN1ekHrnePO7xcRRfj7r
+         qd1XYD+4YBDazS8iwRJ2Q5Rg62mDPZkCnC37mURC0bg12Z4qwj0qcl5KXi91U1sJ02rb
+         JjG0ZFxjjlQApGZcOhdLlEQJ4lYPthiQdBrgEcochkr108KVtCzbQBAxxWXNKSzmQH7q
+         JJIE0YKjGc6VzO1677/TT7eh9nKfO4JfzqCOF4PEyQoMUSD1OQZhEH22mpYVGocUeu2Y
+         tB0lj3KZmzmeBP/MHevu/9odmORGv4jwrL1TC3/bL5NWmVIWabNn7OiVG6yaaSyLdL/I
+         gGrw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=u+ct/ar6co3pGOjuj6b/KCIbM7ZuozKMfkuIjZQ0p24=;
+        fh=LlAdKWylgYIQs8OagHrsmpfU6pGCyr+dpzBBfEn0TcA=;
+        b=kBgg+NniacDQ6tMYrBMfIWpAnls2s0/t4wRLSqEXuG96s4lmzbJYtp2FmNsol9ns8q
+         eh6fprW2Yf3N4i6MetdhFY9wDezWbrw3zEWP00JvvnovwwsHjLAUIKKKZfjk2tW3eNaZ
+         EeNqe1eMIQCtFnTFzAShjjw/z8GPZyurzq2hgeWsXL40Is+/6qeKV9YgWOB5B/rLI6yX
+         1r734Whi0q9emTQZoJKEz1bHNupLUzWmkohreh5mW2YuDZm+16zTp5pqXqJ1TwfQfUtz
+         IFcO04t+P6IXHCA4KMQJ7COdBkup48/QginZSv0npOB+g7VbMqhs1VwZ8sHK/ZDyyGdI
+         eDzg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772661077; x=1773265877; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5w9eCCTPo8yMcmjJPm1S49/iyAFgQIdSph63ePwW0/o=;
-        b=NTLn70vfZhwDMMRAu1i7OPbxPXJHkooVqKUqCIZFBNYgYQojPgZeY1mf8YqYHumEaa
-         mUyWx313UJpk3Uhk7S4714HQiMfgCsdm7JbBEop5QFXIzRVJ9+kF97txAAsYf8jitaFV
-         JUmFGovgWOvJTHI3Dbq7+SbS0PWx3DtlIdbBE5uyAp7VDnw5xDg5Re8RZCC61bO6jbPA
-         0Gh25NGhoAiAhGp4bHs1RGjxTDuKQhuPTSoYz2GteD50mNqsZdvaODuLSbW2FILMDNDA
-         JPbkswEIziQseUejzgvTwba3NMP4VoRQ6NumirqN5eACRiAdpplsk6+IlTEhclSavSIV
-         nN8g==
+        d=gmail.com; s=20230601; t=1772664629; x=1773269429; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=u+ct/ar6co3pGOjuj6b/KCIbM7ZuozKMfkuIjZQ0p24=;
+        b=UwRdndyPaH8oO/owV+pMvihOZYFdZPdxfZAFUf2ei+OT/8knhPLq9bMEvFcOHqAikj
+         X8kYySlbrtUgDxse6D5XCOViPseFfYn1E8eGm/jiOYKI0/V4s9KGmsBKu5CZmjzeIj1q
+         gqRCtcU5985xznjE95E4cHiOAMAWqO4NaISJ7DAKG/nrNr6gyHxaq3PIZHNXiqU8L8IL
+         5AKxh/nHzppgqwjGSe3VZhoH89bCdhYrBtBBPSbH4Cdjbe3H3JWDZi6fqzsu08Ka3eXs
+         tm+lEojdPklxRM9OmMq6paQhZ2ByLxRTDEV3eHl4whWzFZ7Z5aVl5iE3+Bap6QcAp2Sw
+         sVAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772661077; x=1773265877;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5w9eCCTPo8yMcmjJPm1S49/iyAFgQIdSph63ePwW0/o=;
-        b=WTF6NffzO5Di5eoBndjZ5x2ugPIp/e5E2d9ogmWr22meYutCURuFB4rz7T9s6r4Yrs
-         rm7mt4nTAasqQRkym8u0te70lUntSmS2Z5nNkF2Fzc1hBtdw4z64v+YXVZXKG2Cwbr4g
-         9ud+D4JFcEYZzoIDfYvsowT7kMeTZ/yyGskKWmwgJSsf+rnVo/gUH15JyY3/edqGEBBt
-         VEW7jrkUkvh5sDMUPoshkjJ96RWJiKR+HrEAqNAG7mpBjCda1Eub8n8MynIcijZHPB+z
-         u15UKxI2L4+cVTL5it3px5aHKvjEHLi9yZ0D9tNt+1dav2piWiR7McjHZanFxTHROT0P
-         7TKA==
-X-Gm-Message-State: AOJu0YzLge3Zqj61KJHT0ZWdFcWHbB9JtgrEbbjASArl/3NQGLaBHK8V
-	mgrJfuJYpb+TsgDPi1XpZGuwdtckH6gKyDhN+2xS4JPu5fo1WGOJGo/mI5StGg==
-X-Gm-Gg: ATEYQzwIhUd3EgpjiKFcAD8ISqGyx73tRiuBrNRQ+9sK6vAJeNne6voMrD2ygpPXG3Z
-	XUCaTiSCjdOIRZ4CUyfjfrBYkTk+NIJZjQkBUno/hh8vWroq70jbOCQ6litmCvyIakRxKmoTbGn
-	Ro1NllBEJNIBiNgWOHsZIb4YsOewxZbe0qkVGKHQd+xVCXkc9ZFzCBBbmUPwEGXaEfcYti+erPK
-	8HFrRDZZ1vLWAAvbhfPB+4MbfjiX+6aKpqGglCGFSQZ14rUEmpsmoynS9ERRy5v2Pp8QXW55A3C
-	mLwPrcg1oOPx7ne6VICB/3fDUK/VPOZEGCtyJSbjby5fIqAqIKCkPGJcdOCkF6DPWG/g3Btak2x
-	258ma2LNOcg+3d9JZJxbLSTwflmBeLVRiyyRcWIHv5WSxD9+skEIy7XvlGxx/rGRJNRDnbbKPtQ
-	B+bi4n9egKLxifNEe9nYoAFjs9Y1Q=
-X-Received: by 2002:a05:7300:4307:b0:2b8:6ae5:79c3 with SMTP id 5a478bee46e88-2be311df800mr1279272eec.38.1772661077217;
-        Wed, 04 Mar 2026 13:51:17 -0800 (PST)
-Received: from [172.17.0.2] ([20.25.153.48])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be2056acd1sm4675637eec.22.2026.03.04.13.51.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 13:51:16 -0800 (PST)
-Message-ID: <69a8a954.050a0220.204e62.686e@mx.google.com>
-Date: Wed, 04 Mar 2026 13:51:16 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4137119203981961606=="
+        d=1e100.net; s=20230601; t=1772664629; x=1773269429;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u+ct/ar6co3pGOjuj6b/KCIbM7ZuozKMfkuIjZQ0p24=;
+        b=qXI8ZcWo42gXKPGOMwXOHVV5eae0hQZ3SofhD3BTK8fy3FH8E28FefmDIZYUHLSC1C
+         SWpZL8rJ6mFa3ku963OCDOb12AHGRPa4UwqMIitlqt8UzRMa+S23DukOigbxHV98przY
+         gvlNYwGTF5JTfxvWEnC71wXFC2v2bQqkbes5lJfoJ66mZ/ArvpZjrKN9chqvphsiN1V5
+         oWNg/q3IXPzqheLFAhbw/eUfIGAmKQr32pMmtfUD2L3QwtsucOYlViboiHTO2dJyTAZf
+         pozC1JutO7Ru52CiYmib6iZGffXVxP9s6JL2TeAEZkmltXB5V4tySDXszvT66ywKaCSE
+         b/FA==
+X-Gm-Message-State: AOJu0YxEAQmM9fp93jVzlByBG4l32dxOYokCAblYaICY/f3QYWYZgDdz
+	1nkq8ZcIFLDhW3wb/Z+RVSC4xaLMPFm45Gr2YUYhYgDh+fqfClZfM00xrowdqogo6jherwkK8/u
+	M0pebfkMm0gPN8wvFyGsivKyTqIiiQfl7X99J6d8=
+X-Gm-Gg: ATEYQzy6hXG1USBiPmbYROsLvbvwc/fJXGS1XaGqykjZRJGY1kBo+m5RiNRk/IsUUCl
+	mmvfa1UWmTW6r63agxXDSYLVFId+0Ou3mJGA8DZ2zolsrujfE76y+gKtIGRMz9tveFuPH5cjTbB
+	9PYt3FdgS2ZMCu4i2D7nfJIMDf2H+EnMvIOP+Y8+Bu3S+xXxjqkpBo3/MwpEjG0jBQr1Pk9u813
+	QQyvzdrHPvlE2VM9lfLXXDxyZ69eU5yAHxl/n5wyqofpVMyPBw7Gz9MtRVd3hKzJLREn1POb5ec
+	l+gQCKIfxA32bkJQ1AKjkYHkdtnuxz/8tupKtG/LA5jbJF8ruvp4llHmQ+vIsZ2vqwSrqtSKKQ=
+	=
+X-Received: by 2002:a05:6402:234c:b0:65f:81be:e78d with SMTP id
+ 4fb4d7f45d1cf-660efec42e0mr2442400a12.17.1772664628867; Wed, 04 Mar 2026
+ 14:50:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] monitor: Fix -a/--analyze printing wrong connection type
-In-Reply-To: <20260304204649.309362-1-luiz.dentz@gmail.com>
-References: <20260304204649.309362-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+From: Kai Zen <kai.aizen.dev@gmail.com>
+Date: Thu, 5 Mar 2026 00:50:17 +0200
+X-Gm-Features: AaiRm51dPWTiK7tvpsxWJaLOOYYndhqkdJC86YqBJtVs9MvlXc3KRn5Kf5R_r9Y
+Message-ID: <CALynFi4pamOn3CrB+3b0PxhE2+Br_Ftep=VKceyeYSV65N7Y6g@mail.gmail.com>
+Subject: [PATCH v2] Bluetooth: hci_conn: Fix UAF in create_big_sync and create_big_complete
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.von.dentz@intel.com, stable@vger.kernel.org, marcel@holtmann.org
+Content-Type: multipart/mixed; boundary="00000000000082ab54064c3aa529"
 
---===============4137119203981961606==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+--00000000000082ab54064c3aa529
+Content-Type: multipart/alternative; boundary="00000000000082ab52064c3aa527"
 
-This is automated email and please do not reply to this email!
+--00000000000082ab52064c3aa527
+Content-Type: text/plain; charset="UTF-8"
 
-Dear submitter,
+From kai.aizen.dev@gmail.com Mon Sep 17 00:00:00 2001
+From: Kai Aizen <kai.aizen.dev@gmail.com>
+Date: Wed, 4 Mar 2026 20:00:00 +0200
+Subject: [PATCH v2] Bluetooth: hci_conn: Fix UAF in create_big_sync and
+ create_big_complete
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1061563
+create_big_sync() and create_big_complete() are queued via
+hci_cmd_sync_queue() with a raw hci_conn pointer as 'data', but unlike
+all other hci_cmd_sync_queue() callbacks that receive an hci_conn pointer
+they lack an hci_conn_valid() guard.
 
----Test result---
+If the connection is torn down after the work is queued but before (or
+during) execution, the work dereferences a freed hci_conn object.
 
-Test Summary:
-CheckPatch                    PENDING   0.37 seconds
-GitLint                       PENDING   0.33 seconds
-BuildEll                      PASS      21.31 seconds
-BluezMake                     PASS      776.60 seconds
-MakeCheck                     PASS      19.31 seconds
-MakeDistcheck                 PASS      251.25 seconds
-CheckValgrind                 PASS      307.01 seconds
-CheckSmatch                   PASS      366.42 seconds
-bluezmakeextell               PASS      184.94 seconds
-IncrementalBuild              PENDING   0.38 seconds
-ScanBuild                     PASS      1035.79 seconds
+Race path:
+ 1. hci_connect_bis() queues create_big_sync(conn) on hdev->req_workqueue
+ 2. ISO socket close() triggers hci_conn_drop(); for BIS_LINK timeo=0,
+    disc_work fires immediately on hdev->workqueue
+ 3. disc_work -> hci_abort_conn -> hci_conn_del() frees conn
+ 4. create_big_sync() dequeued and runs on req_workqueue; conn is
+    already freed -> slab-use-after-free
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+The two workqueues are distinct (req_workqueue vs workqueue). The only
+lock held by create_big_sync is hci_req_sync_lock; the deletion path
+in HCI event handlers holds only hci_dev_lock. No shared lock prevents
+concurrent execution.
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+This is the same bug class fixed for hci_enhanced_setup_sync in commit
+98ccd44002d8 ("Bluetooth: hci_conn: Fix UAF in hci_enhanced_setup_sync"),
+and for hci_le_create_conn_sync, hci_le_pa_create_sync,
+hci_le_big_create_sync, hci_acl_create_conn_sync. create_big_sync and
+create_big_complete in hci_conn.c were not included in those sweeps.
 
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Fix: add hci_conn_valid() guard at the start of both functions. In
+create_big_sync the 'qos' pointer assignment is moved past the guard
+to avoid dereferencing conn before validation.
 
-
-
+Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS
+connections")
+Cc: stable@vger.kernel.org
+Signed-off-by: Kai Aizen <kai.aizen.dev@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_conn.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index a47f5daffdbf..e7fe9cc7a4a3 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2119,10 +2119,15 @@
+ static int create_big_sync(struct hci_dev *hdev, void *data)
+ {
+        struct hci_conn *conn = data;
+-       struct bt_iso_qos *qos = &conn->iso_qos;
+        u16 interval, sync_interval = 0;
+        u32 flags = 0;
+        int err;
++       struct bt_iso_qos *qos;
++
++       if (!hci_conn_valid(hdev, conn))
++               return -ECANCELED;
++
++       qos = &conn->iso_qos;
 
---===============4137119203981961606==--
+        if (qos->bcast.out.phys == BIT(1))
+                flags |= MGMT_ADV_FLAG_SEC_2M;
+@@ -2196,6 +2201,9 @@
+ {
+        struct hci_conn *conn = data;
+
++       if (!hci_conn_valid(hdev, conn))
++               return;
++
+        bt_dev_dbg(hdev, "conn %p", conn);
+
+        if (err) {
+
+--00000000000082ab52064c3aa527
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto">From <a href=3D"mailto:kai.aizen.dev@gmail.com" target=3D=
+"_blank" rel=3D"noreferrer">kai.aizen.dev@gmail.com</a> Mon Sep 17 00:00:00=
+ 2001<br>
+From: Kai Aizen &lt;<a href=3D"mailto:kai.aizen.dev@gmail.com" target=3D"_b=
+lank" rel=3D"noreferrer">kai.aizen.dev@gmail.com</a>&gt;<br>
+Date: Wed, 4 Mar 2026 20:00:00 +0200<br>
+Subject: [PATCH v2] Bluetooth: hci_conn: Fix UAF in create_big_sync and<br>
+=C2=A0create_big_complete<br>
+<br>
+create_big_sync() and create_big_complete() are queued via<br>
+hci_cmd_sync_queue() with a raw hci_conn pointer as &#39;data&#39;, but unl=
+ike<br>
+all other hci_cmd_sync_queue() callbacks that receive an hci_conn pointer<b=
+r>
+they lack an hci_conn_valid() guard.<br>
+<br>
+If the connection is torn down after the work is queued but before (or<br>
+during) execution, the work dereferences a freed hci_conn object.<br>
+<br>
+Race path:<br>
+=C2=A01. hci_connect_bis() queues create_big_sync(conn) on hdev-&gt;req_wor=
+kqueue<br>
+=C2=A02. ISO socket close() triggers hci_conn_drop(); for BIS_LINK timeo=3D=
+0,<br>
+=C2=A0 =C2=A0 disc_work fires immediately on hdev-&gt;workqueue<br>
+=C2=A03. disc_work -&gt; hci_abort_conn -&gt; hci_conn_del() frees conn<br>
+=C2=A04. create_big_sync() dequeued and runs on req_workqueue; conn is<br>
+=C2=A0 =C2=A0 already freed -&gt; slab-use-after-free<br>
+<br>
+The two workqueues are distinct (req_workqueue vs workqueue). The only<br>
+lock held by create_big_sync is hci_req_sync_lock; the deletion path<br>
+in HCI event handlers holds only hci_dev_lock. No shared lock prevents<br>
+concurrent execution.<br>
+<br>
+This is the same bug class fixed for hci_enhanced_setup_sync in commit<br>
+98ccd44002d8 (&quot;Bluetooth: hci_conn: Fix UAF in hci_enhanced_setup_sync=
+&quot;),<br>
+and for hci_le_create_conn_sync, hci_le_pa_create_sync,<br>
+hci_le_big_create_sync, hci_acl_create_conn_sync. create_big_sync and<br>
+create_big_complete in hci_conn.c were not included in those sweeps.<br>
+<br>
+Fix: add hci_conn_valid() guard at the start of both functions. In<br>
+create_big_sync the &#39;qos&#39; pointer assignment is moved past the guar=
+d<br>
+to avoid dereferencing conn before validation.<br>
+<br>
+Fixes: eca0ae4aea66 (&quot;Bluetooth: Add initial implementation of BIS con=
+nections&quot;)<br>
+Cc: <a href=3D"mailto:stable@vger.kernel.org" target=3D"_blank" rel=3D"nore=
+ferrer">stable@vger.kernel.org</a><br>
+Signed-off-by: Kai Aizen &lt;<a href=3D"mailto:kai.aizen.dev@gmail.com" tar=
+get=3D"_blank" rel=3D"noreferrer">kai.aizen.dev@gmail.com</a>&gt;<br>
+---<br>
+=C2=A0net/bluetooth/hci_conn.c | 12 ++++++++++--<br>
+=C2=A01 file changed, 10 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c<br>
+index a47f5daffdbf..e7fe9cc7a4a3 100644<br>
+--- a/net/bluetooth/hci_conn.c<br>
++++ b/net/bluetooth/hci_conn.c<br>
+@@ -2119,10 +2119,15 @@<br>
+=C2=A0static int create_big_sync(struct hci_dev *hdev, void *data)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct hci_conn *conn =3D data;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0struct bt_iso_qos *qos =3D &amp;conn-&gt;iso_qo=
+s;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 u16 interval, sync_interval =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 u32 flags =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 int err;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct bt_iso_qos *qos;<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (!hci_conn_valid(hdev, conn))<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -ECANCELED;<=
+br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0qos =3D &amp;conn-&gt;iso_qos;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (qos-&gt;bcast.out.phys =3D=3D BIT(1))<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 flags |=3D MGMT_ADV=
+_FLAG_SEC_2M;<br>
+@@ -2196,6 +2201,9 @@<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct hci_conn *conn =3D data;<br>
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (!hci_conn_valid(hdev, conn))<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return;<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 bt_dev_dbg(hdev, &quot;conn %p&quot;, conn);<br=
+>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (err) {</div>
+
+--00000000000082ab52064c3aa527--
+--00000000000082ab54064c3aa529
+Content-Type: text/x-diff; charset="ISO-8859-1"; 
+	name="0001-v2-Bluetooth-hci_conn-Fix-UAF-in-create_big_sync.patch"
+Content-Disposition: attachment; 
+	filename="0001-v2-Bluetooth-hci_conn-Fix-UAF-in-create_big_sync.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <19cbb0b668c18bc94a61>
+X-Attachment-Id: 19cbb0b668c18bc94a61
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAA==
+--00000000000082ab54064c3aa529--
