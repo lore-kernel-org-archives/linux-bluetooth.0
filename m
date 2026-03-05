@@ -1,163 +1,197 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870D9246BD5
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Mar 2026 14:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C51246BD5;
+	Thu,  5 Mar 2026 14:25:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772720475; cv=none; b=FBvZqqh5lkhFZIGcuIbkkc6VOjTaDItVtzuEJkOgWQauTcUjLOQH3/LS0hzcSiuY74v6mRrFE5KKT9Y2GhFnvSI0/hG1Rlk6qrOcgLVwW7WnBdIvqvcbNPB9qsbprMUio/RGgpSIv002Xv9yD0Y0q2j0KldtjSgTbQ6j/VkpPpI=
+	t=1772720733; cv=none; b=NWUup/l3UGucUU4hyrr+lQTktGxlsQYPvpqkgECziydw9mocxeGFxPFBCcspaEpojOr+1O5Mz7+SFSLtZth1GmXm4cMvCKVmZGMpZwiR5BowBpJkISSbs2aZ1DgNUlTHKnSL6WMBBivgCwwiWu9HnxlQs0BVTnRA2IFJfVxCCks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772720475; c=relaxed/simple;
-	bh=FX3UQtb9HtpWO3/OIjGMbNUuXFkCZCwsSIjgkPI9pHI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=O65o/LAgfiDChFAF2Dzs2SShaKaFiST90Ba7sLjNSg6DhgPHZOqnUwPV5oyUoGM3FA7nsryxFnQyvQBze9KtU5AlQvHe3K7iZ4PvNrbuk/1pVRxLr9MZKolzVs22RCy/2/sI0kE8vlXnyw2VKew0FZUyWBnp997hVeud7swJVXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mLBQ5vvX; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772720733; c=relaxed/simple;
+	bh=Y6PxpePTzsLbcPESWCygp1WNx2YeUgvMNndi0r5hFIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YpzjCqQvg87zcKiVRlzBvBDrb6d9yO+TxYHATG8rNTly/iAGXmjgwQRCv1Gn61bnRdMgZm+Gsyy2Fyl1pnZUDFM7uo5uq7NHGNBnxuKShoAMYOmdmshux51zZd80pvkebd4TOmSYxUx4MwC9Dhvxka4drgD3MQYyoVr4K0pqXkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lH0MXtHy; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLBQ5vvX"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-506a93ba42dso84705061cf.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Mar 2026 06:21:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772720473; x=1773325273; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MAsEcGFmHO/26dfExwbOhQuvNXQqETJKRQHrc2b1PKw=;
-        b=mLBQ5vvXjWCHmp0j0aKa866LTXUHazGIY/6zskMFfdgbZ5fVoKSG2OUmoxhxMPqRCt
-         Fkb9XmM0C49XsU6gHF7pw5GmjN2k2W7kbKIr+H98FbcVtSRS5m3G4TscJWnQnzr+jUOt
-         U8cGGTbmLcXaxuvcsWmTZPsDiO637jHTGr8d5nmQX6SMguV5zKaUGGc8zbvI+Kl3X+vC
-         mozgrwVRmEhtRt7MDEhdN9/O4BkIM5GmMBAj4pDCJo78g2jPadwN+aBQx07DgTUy5+yD
-         mkudkgUamRgywVCKO/lr9ZWtcafjbpEupjLPNFgovn41mXXu/RnsvRDZQVmEJ5k2slrk
-         LgHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772720473; x=1773325273;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MAsEcGFmHO/26dfExwbOhQuvNXQqETJKRQHrc2b1PKw=;
-        b=rm/jgiTM1WW3q5n3pni1LOTUGTLvfuEr0pnBzT/x9nPu0laDv8H25L8Ex99tLlEQVu
-         TxMho5c98bc/8XgYmQFKvou/pxYlnXDduEPC8vpbz6O8omgKKfVgNz5PGjKIqddCYh5j
-         AU54MPXoogqx173NaX/X+QOlKpZ43UvVVhS/tTP8s3qprbXoRUD5s5svffvYAj9k7K6Z
-         G7bxXh+4w1ZIk4vE/koph5FutQX23IYN7pFRoWso/0CTtE2i3n9CMwhKTwA+cUSC5Xi4
-         MoYG6QicwSkHpQvQz1bJkzl5oBse5syY67pQbXu1BbCoNPmjzuJcu/KoBGda2ch6uMJj
-         Kn3A==
-X-Gm-Message-State: AOJu0Yz4jlwDlmk+awF4Y+uYlhsQv6gOlFZlVCFIrpD/CYUweOFzgjz6
-	4Svk7bchF4iluCm+nq//306I20TvOS2/0nnVCkrhunpYNuVtTra8nYUgglS3uA==
-X-Gm-Gg: ATEYQzzqij71vDpQYsvZgP53eDRYM1NYqRceGTUC0YJnE0gOwxiin99KZrPAZdfx1RA
-	4kcY737IjX/P7skrK0oERK+jSjjPPtKy/FWFXifqNrbYsYUs8V/3pPDrTo4HeAoPi+H1GbPKh8K
-	NZVgc285de7KtpkR805GsWargRZ4Ktx0cL2zlho0r4QyYavU6QJwK211zMOFvVvOoFlb9rRSDhW
-	MvXfYwGpQFgbxzdpQxf2Xj3gszIIJ6ipwo/IlqTRQgfj+7BFpOcsFCfTzv5jcKylbjT+lcxPhS6
-	4ro1Ze118jftj9sHvs+1YEHjbC+az0WTOgMFBXTiIMMHUEeQD6NezfkucBZL4UcYdJEYmtu5cnw
-	oWTTAWXav3XtYfGZhINvdn+4UJDvO83wsNi3haJQesGC4+w3EWDc5JNhAVAWFKydHPscYz516It
-	QIIbBXch+7BYfnbYErTt/hH/QfdRYo
-X-Received: by 2002:a05:622a:11cf:b0:502:f291:615e with SMTP id d75a77b69052e-508db383388mr73247521cf.52.1772720472965;
-        Thu, 05 Mar 2026 06:21:12 -0800 (PST)
-Received: from [172.17.0.2] ([68.154.54.100])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50744ad028esm180489601cf.25.2026.03.05.06.21.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 06:21:12 -0800 (PST)
-Message-ID: <69a99158.c80a0220.22582f.37fd@mx.google.com>
-Date: Thu, 05 Mar 2026 06:21:12 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6651500753454121456=="
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lH0MXtHy"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Q7WgSM2wxChLNQuC1Kvn6fELh/kLhkbo4HJpx2Cfu6A=; b=lH0MXtHysHRHd3GA37b3KZTjyP
+	uu4y4Wtum5SU6K6sPfQMgC1wjjkW4oCqsV4k/47t6pQLQeF8ZoEj/MCqcOOGspH7qzymaVtmQP+Xz
+	McOy8ppewKfneb0WSeWQnqvtEDYc/dlx8W/zl9H7IajaOG+qhDprLRbWd56Gq6X58gqQbt72A/1Fu
+	57Ga2O0/96vpcbtKCzVO+AvNbbfp5XHKwrSU0HjpCts8yao8Gtx0uNB3CTwnNFoO22s1yTa6uj5cz
+	t5l/w2CXYVAlbsn9+teUymKx7c1e2jxul2t/6h7WcREQXT8EksTsachxtLADsrQgvaMckHOQQ2x5B
+	kI8111qA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vy9ck-00000001ywt-2yR7;
+	Thu, 05 Mar 2026 14:24:22 +0000
+Date: Thu, 5 Mar 2026 06:24:22 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	David Hildenbrand <david@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	Steve French <sfrench@samba.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	David Sterba <dsterba@suse.com>,
+	Marc Dionne <marc.dionne@auristor.com>, Ian Kent <raven@themaw.net>,
+	Luis de Bethencourt <luisbg@kernel.org>,
+	Salah Triki <salah.triki@gmail.com>,
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Alex Markuze <amarkuze@redhat.com>,
+	Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
+	Nicolas Pitre <nico@fluxnic.net>, Tyler Hicks <code@tyhicks.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Yangtao Li <frank.li@vivo.com>,
+	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Richard Weinberger <richard@nod.at>,
+	Dave Kleikamp <shaggy@kernel.org>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	Miklos Szeredi <miklos@szeredi.hu>, Anders Larsen <al@alarsen.net>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>,
+	John Johansen <john.johansen@canonical.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Oleg Nesterov <oleg@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	James Clark <james.clark@linaro.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Martin Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>,
+	Joerg Reuter <jreuter@yaina.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Remi Denis-Courmont <courmisch@gmail.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+	fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+	autofs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+	ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
+	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+	linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-hams@vger.kernel.org, linux-x25@vger.kernel.org,
+	audit@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-can@vger.kernel.org, linux-sctp@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH v3 01/12] vfs: widen inode hash/lookup functions to u64
+Message-ID: <aamSFgXhrORAJLBC@infradead.org>
+References: <20260304-iino-u64-v3-0-2257ad83d372@kernel.org>
+ <20260304-iino-u64-v3-1-2257ad83d372@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, m.grzeschik@pengutronix.de
-Subject: RE: net: bluetooth: hci_sync: fix hci_le_create_conn_sync
-In-Reply-To: <20260305-bluetooth-fixes-v1-1-43effb810fba@pengutronix.de>
-References: <20260305-bluetooth-fixes-v1-1-43effb810fba@pengutronix.de>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304-iino-u64-v3-1-2257ad83d372@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
---===============6651500753454121456==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+>  extern struct inode *ilookup5_nowait(struct super_block *sb,
+> -		unsigned long hashval, int (*test)(struct inode *, void *),
+> +		u64 hashval, int (*test)(struct inode *, void *),
+>  		void *data, bool *isnew);
+> -extern struct inode *ilookup5(struct super_block *sb, unsigned long hashval,
+> +extern struct inode *ilookup5(struct super_block *sb, u64 hashval,
+>  		int (*test)(struct inode *, void *), void *data);
 
-This is automated email and please do not reply to this email!
+...
 
-Dear submitter,
+Can you please drop all these pointless externs while you're at it?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1061995
+Otherwise looks good:
 
----Test result---
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Test Summary:
-CheckPatch                    PENDING   0.41 seconds
-GitLint                       PENDING   0.31 seconds
-SubjectPrefix                 FAIL      0.41 seconds
-BuildKernel                   PASS      26.64 seconds
-CheckAllWarning               PASS      29.31 seconds
-CheckSparse                   PASS      33.22 seconds
-BuildKernel32                 PASS      25.95 seconds
-TestRunnerSetup               PASS      565.68 seconds
-TestRunner_l2cap-tester       PASS      29.13 seconds
-TestRunner_iso-tester         PASS      80.05 seconds
-TestRunner_bnep-tester        PASS      6.92 seconds
-TestRunner_mgmt-tester        FAIL      117.73 seconds
-TestRunner_rfcomm-tester      PASS      9.52 seconds
-TestRunner_sco-tester         FAIL      14.71 seconds
-TestRunner_ioctl-tester       PASS      10.29 seconds
-TestRunner_mesh-tester        FAIL      12.46 seconds
-TestRunner_smp-tester         PASS      8.86 seconds
-TestRunner_userchan-tester    PASS      6.72 seconds
-IncrementalBuild              PENDING   0.85 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.116 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.763 seconds
-Mesh - Send cancel - 2                               Timed out    1.993 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6651500753454121456==--
