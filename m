@@ -1,147 +1,169 @@
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA94A3DEAE6
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Mar 2026 17:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DE11F4174
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Mar 2026 18:34:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772731699; cv=none; b=k83k5l07n8HTBMxB6c1pgi0e1xIGZpn3lv0miGDIbzR/7kH5MbJSo+0t7v4qPtV3wpwxsvmuQ7GwNe9PzNU+zAYHdyu9Gaff19GHFxi1FVGu57gKByZyXNk8v6nX8ED6iJ0cPZdHzTJkfoLjBlMJ2TAruG6Vk7odZGJSvEb69zM=
+	t=1772735694; cv=none; b=bQaHPrWk67V7T0k13mxfxKnOjuxewX64i+4Rr4y+pMT3tzWLo2T/I6Dun2V4Jlkwat3vGYNyn6OJxU67y/qaRxy/U8nhtJTpGT6l9Jb83jDqc1buzbrHTHF3CqabwwzJroaAvApbVPfzszbArx11Sbyoq5wGK1oqnVwPUuIo7x4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772731699; c=relaxed/simple;
-	bh=A8/Tet9efscpEtLDgxSYvfR0/v1fQ1sXQMD+qmKFwdY=;
-	h=Content-Type:MIME-Version:From:To:Date:Subject:Cc:In-Reply-To:
-	 References:Message-Id; b=vC7IKaSFJNKokDRD+JVqKam2jd4I5+/fnBx4R/EGlFVGRUJLs1W/v2Vl0Frrpa5JnO1uDBBaEjhcG9nOmxOMNXWXCg42efQByauQ8CXS4a6YXwPWxj3omXgE8huoo/Rp8aVjKIDjddA3jwI130iB3Umr7/cd5Jvx7143eSzyq2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me; spf=pass smtp.mailfrom=jetm.me; dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b=Qiu+bRoQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rOgwI3V9; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jetm.me
+	s=arc-20240116; t=1772735694; c=relaxed/simple;
+	bh=h+mjXukOUyvGyjxv31ZFDJADakHPM2ESkFn0Dk0p0r0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ct2tKL4QElwvzIQphpZVn53esfpznrIn98ZpfpT5HZsdPyJ83RpZ5FUjJy3d9jLWBwSNwfmkLVnmbgG+ZIlB3lV1ghG2gTLg7XNEa2sKQN1jSq8486QsYpA3RSCEeLDohIid/g4fofuEjO0ZFBlvYW+trMbmJs2OLV8A5ZY+/Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nrTyMl7I; arc=none smtp.client-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b="Qiu+bRoQ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rOgwI3V9"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id CCCAA7A0164;
-	Thu,  5 Mar 2026 12:28:17 -0500 (EST)
-Received: from phl-imap-07 ([10.202.2.97])
-  by phl-compute-02.internal (MEProxy); Thu, 05 Mar 2026 12:28:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jetm.me; h=cc:cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1772731697;
-	 x=1772818097; bh=TQXDiP28JRv5Nfadl0wsix5nPqRMoqHns0y0Gax0+x4=; b=
-	Qiu+bRoQWebrZCbpNJHBWjTz3MUP3+C8FICqebIA4qqge8HJ8FCdDJfJAaIDmBNv
-	WeJd6LpaCD/zuLcpZM/IdcZpKDwLTHYmQJHM6zCNHPmx8gYEZwfzESXPM4Mbxd3t
-	XhWKiik9JQsDNjIgcbIi2+Qi6I4rUG94R3cKK/q9pnjgm4tCDSACTYtmHnM6mow5
-	l5hgComxIfxWClPBaw9cEjQFFJ0wbH2/XHHtzuyBSSWDxHg9gCR+pBbCPIb+k9Z7
-	LikfWOz+pkWG2msqqz0yZdBVOkOdDVBUi16OF+6I2QPNpFR2yYigzMi+yFdZctdt
-	e11niDt1mAS4oXNhy0Eo+A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1772731697; x=
-	1772818097; bh=TQXDiP28JRv5Nfadl0wsix5nPqRMoqHns0y0Gax0+x4=; b=r
-	OgwI3V9x62UvtQ6E5o5tbwVsnXRi7guVfssKJmodTBq6ZURVkiqzLl98WZQwAKVg
-	T9tfYY7+DKVmZ5MaG2GYaeXGDS9AK7hKEBH83XXjqsWCU5usX81ewq8gcYIiQT3I
-	JJNbxeSIG97m/QhzymwdKCpnBAtZ1KXVrbVsJ3+O1dC4YxWNEwnzBSJU4/zOfK9i
-	LRMujSUXXnKOlTXBrY59ebNjRPB0vDasBzERg9WGSVvAXg/AIH/MkexTHYQsHqqt
-	DoKqxYznVwtg/UaXVpHg5RaeY9ZkIH1YzhNMsKhlJeuSitIHA7putlmohHdUJWR+
-	PTMZgQ+VAqvKYzvCM7DXg==
-X-ME-Sender: <xms:Mb2padK8NS6q61x7OMWaT4ys1Das7qkfY8W4WhBMGiN-CvpHfOfjwA>
-    <xme:Mb2paT_lrP1JhqLwP_koSYVtZuZaIkV-rBsbxi3E_FxQhP5KxTe7QGEbxK3T6eJBC
-    aspNjTbxEeWRAmByGCTOr0q0CM_M2uIOgjTUxXr8_TjzFL3xC7IV98>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieeileekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegopf
-    hokfffucdluddtmdenucfjughrpefotggggffhvfffufevjghfsehtkedttdertdejnecu
-    hfhrohhmpeflrghvihgvrhcuvfhirgcuoehflhhoshhssehjvghtmhdrmhgvqeenucggtf
-    frrghtthgvrhhnpedttdeuvdefueeukefffeekgffgffeigfehjeevffehkedtueehveeh
-    udeggeelgfenucffohhmrghinhepghhithhhuhgsrdgtohhmpdhgihhtlhgrsgdrtghomh
-    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehflhho
-    shhssehjvghtmhdrmhgvpdhnsggprhgtphhtthhopeeipdhmohguvgepshhmthhpohhuth
-    dprhgtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthho
-    pehflhhoshhssehjvghtmhdrmhgvpdhrtghpthhtohepuggvrhgvnhdrfihusehmvgguih
-    grthgvkhdrtghomhdprhgtphhtthhopehmihhnghihvghnrdhhshhivghhsehmvgguihgr
-    thgvkhdrtghomhdprhgtphhtthhopehsvggrnhdrfigrnhhgsehmvgguihgrthgvkhdrtg
-    homhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhg
-X-ME-Proxy: <xmx:Mb2pac1am73L_sU4odAEkAIher-V6PtUenYj1AkFTQ5BjWvdMs1-jA>
-    <xmx:Mb2paQZHo60aLxCV4wQQCwK_SqyqWofnUGwUB3Jb8x5nFOo3SMIzmQ>
-    <xmx:Mb2pacJwUrQGC6UNFrKEnFH0HuCV4jTnAQAjWd1S9oQQy0QQMvWBVg>
-    <xmx:Mb2paXFtcJampha0J9JxWXygWqzsuizM0F9-fRDweKZPlTVobhPHtg>
-    <xmx:Mb2pacXRw0uQ2TGwtH59jbal177KBr5q5W82Suj6BXfIi7A99NGsbvXh>
-Feedback-ID: i9dde48b3:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 3B8F51EA006B; Thu,  5 Mar 2026 12:28:17 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrTyMl7I"
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2bdfd129c52so5114069eec.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Mar 2026 10:34:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772735692; x=1773340492; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=TWmutBtLEdXm6+g/GJSa6+mC3ZmNkjLKRE1j7nKfXpU=;
+        b=nrTyMl7Ijlr5S7zvc6Pu/td6qK9Kky/nbEUBLljDmP7zM4SQalVjQ16qKtYsIl5dvF
+         HhFaqf9xemInGBWzWW7rsCRHMqSdeYwp9C8DMGxDTyL7d0gPXScWIa1665bDl3KCd6aK
+         1VOCxEDKrWufPuEHcwx0vj12Iovc8hdl/xQBBCxXy5J8vezLguNllU9VENZ6mJoeWY/w
+         N3YnL3oT5HaAQqi0R/PN5+Ls3JBUuysnfyObih8Mg8TFTnTJyGC02/LVS6PzSgeZOXSB
+         URhwN4dH7vapoP9Ikt2T1pLr/Kry9bOrQrSh50/N4Nrp9y1ATb/esvTuCUm+CFobXYh8
+         yioA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772735692; x=1773340492;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TWmutBtLEdXm6+g/GJSa6+mC3ZmNkjLKRE1j7nKfXpU=;
+        b=bzvzGMkMr3ADnitBLOHyLkb0cW+9ggJxkzNmR2chtly4VshWz3v04ePbH+cjKVJb+4
+         KHRu5CwZDUhegWCrBSRTIzi30e6vTEXuxJOsIYx6LFXHriVr4tBssrOVSCw9qRQqxd0U
+         d/EpcJfUB3J6DWsKJJUnz58OUswGna1ZtqH1DX7YOzi5jS8+FlwMovAa/qtP6hkJCfbY
+         CS0YWeW38/MIeqW+eoCTgMhx/+r/bNvUqB8ia4HXE64buX974wiMRddjh1zWpdefTQZq
+         svVZ4oMhHXm9K+7wvW3WYmEI7iyWxsDvCdHMR4L9xU5ttMm7jX1NJh8OkBuMlBacruDZ
+         WzFQ==
+X-Gm-Message-State: AOJu0YyjkzPwHtoH1tACOQFU+KoIr8FOH8fM6laqV5nMQXya3KccEhAo
+	dR6SsNAW8zU/2sD6GquHDKRAO8Ra/LossrnyAW/f4xSQx1oNA+5yVfMpCy/GBQ==
+X-Gm-Gg: ATEYQzxk8tkILF947Yc0Ilbzq9W/Hlh1DwVvnSKkOt5LpHEYPIZGz5dHY/Gu/gnwG8V
+	3MU9Ub6YIcLhO4kSmdoWeILCbqhqimSU0tdHngUB/Au2RCj8oISRqAczHBtkTfbgIFGCMWhFxhX
+	Yfyg1XruSu1W4Cg4xpqwhiH29NnyZ2otlEYnw7/EtOKMCCDwbsRt1PbhjISk6Q2h9aNTotMTfi6
+	RXvthPyQOIZ84HWUubtztudPIFjvG1wJBQVpIQ8W0aURp05bEzJj7os8l20BZjW173N4fGqUW5A
+	SsYDrfeYn8Su75PU+sDM4p/3+uL0FuJ0U2Zh4cYnUNTlVX4bJfk/mM9Vuo50x0mHHE+3MMhD1wy
+	QtTrt8N32O5ItA+L9AIvnSowUfH6pnQa37zuYyGZSy+UMTF6pDlDZpQrhz3kNGFWrYd7jByk22v
+	I7MtgX4t0yjxB69GWfpe3hcr1qUQKJRA==
+X-Received: by 2002:a05:7301:1e82:b0:2b7:b7e7:9025 with SMTP id 5a478bee46e88-2be311b84e1mr2587257eec.31.1772735691420;
+        Thu, 05 Mar 2026 10:34:51 -0800 (PST)
+Received: from [172.17.0.2] ([57.151.128.137])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2be2f5f1f4dsm3842436eec.25.2026.03.05.10.34.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2026 10:34:50 -0800 (PST)
+Message-ID: <69a9ccca.050a0220.146dfc.0be1@mx.google.com>
+Date: Thu, 05 Mar 2026 10:34:50 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0755496282686589293=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Javier Tia <floss@jetm.me>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 05 Mar 2026 11:18:13 -0600
-Subject: Re: [PATCH 1/2] Bluetooth: btmtk: Add MT6639 (MT7927) Bluetooth support
-Cc: Javier Tia <floss@jetm.me>, linux-bluetooth@vger.kernel.org,
- deren.wu@mediatek.com, mingyen.hsieh@mediatek.com,
- sean.wang@mediatek.com
-In-Reply-To: CABBYNZJj0i2aNQdH2DXEnn+JBwNn+xkJU901vLFnnAzdtxtFDQ@mail.gmail.com
-References: 177272816248.352280.12453518046823439297@jetm.me 20260305162928.5E8F11EA006C@mailuser.phl.internal CABBYNZJj0i2aNQdH2DXEnn+JBwNn+xkJU901vLFnnAzdtxtFDQ@mail.gmail.com
-Message-Id: <20260305172817.3B8F51EA006B@mailuser.phl.internal>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, floss@jetm.me
+Subject: RE: Bluetooth: Add MediaTek MT7927 (MT6639) support
+In-Reply-To: <20260305162928.5E8F11EA006C@mailuser.phl.internal>
+References: <20260305162928.5E8F11EA006C@mailuser.phl.internal>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============0755496282686589293==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 5, 2026 Luiz Augusto von Dentz wrote:
-> Ditto, we will probably some evidence this was actually tested on
-> systems e.g. dmesg of the pre/post change, also in this case
-> specifically we need a mediatek engineer to confim, with a
-> Signed-off-by, that these changes works as intended.
+This is automated email and please do not reply to this email!
 
-Here is the dmesg evidence from my system (ASUS ROG Crosshair X870E
-Hero, 0489:e13a, kernel 6.19.6).
+Dear submitter,
 
-Pre-patch (vanilla 6.19.6 btusb/btmtk, no MT6639 support):
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1062069
 
-  Bluetooth: hci0: Unsupported hardware variant (00006639)
-  Bluetooth: hci0: Device setup failed (-22)
+---Test result---
 
-Post-patch (this series applied):
+Test Summary:
+CheckPatch                    PENDING   0.49 seconds
+GitLint                       PENDING   0.46 seconds
+SubjectPrefix                 PASS      0.15 seconds
+BuildKernel                   PASS      26.02 seconds
+CheckAllWarning               PASS      28.87 seconds
+CheckSparse                   WARNING   32.14 seconds
+BuildKernel32                 PASS      25.35 seconds
+TestRunnerSetup               PASS      567.94 seconds
+TestRunner_l2cap-tester       PASS      29.42 seconds
+TestRunner_iso-tester         FAIL      48.73 seconds
+TestRunner_bnep-tester        PASS      6.44 seconds
+TestRunner_mgmt-tester        FAIL      129.49 seconds
+TestRunner_rfcomm-tester      PASS      9.54 seconds
+TestRunner_sco-tester         FAIL      14.84 seconds
+TestRunner_ioctl-tester       PASS      10.25 seconds
+TestRunner_mesh-tester        FAIL      11.52 seconds
+TestRunner_smp-tester         PASS      8.58 seconds
+TestRunner_userchan-tester    PASS      6.87 seconds
+IncrementalBuild              PENDING   0.53 seconds
 
-  Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20250606201235
-  Bluetooth: hci0: Device setup in 8287370 usecs
-  Bluetooth: hci0: AOSP extensions version v1.00
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-bluetoothctl shows the controller is fully operational:
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Controller 78:46:5C:9B:C2:C2 (public)
-    Manufacturer: 0x0046 (70)
-    Name: jetm-rog-crosshair-hero-x870e
-    Powered: yes
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/btmtk.c:1536:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1537:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1538:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1539:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1540:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1540:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1541:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1542:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1543:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1544:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1545:1: error: bad constant expressiondrivers/bluetooth/btmtk.c:1546:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4681:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4682:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4684:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4685:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4687:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4688:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4690:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4691:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4693:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4694:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4695:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4696:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4696:1: error: bad constant expression
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
+Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
 
-This has been tested on 6 different boards across multiple distros.
-The DKMS package [1] has been the primary driver for all MT7927
-Bluetooth users since January.
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.114 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
 
-Deren, Mingyen, Sean - could you please review the btmtk changes in
-this patch and provide a Signed-off-by or Reviewed-by if the
-implementation looks correct? Luiz requires a MediaTek engineer to
-confirm these changes work as intended before merging.
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.819 seconds
+Mesh - Send cancel - 2                               Timed out    1.994 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
-For context: the BT firmware (BT_RAM_CODE_MT6639_2_1_hdr.bin) was
-extracted from MediaTek's mtkwlan.dat combo blob shipped in the ASUS
-Windows driver package (V5603998). The extraction uses a Python script
-that parses the container format and pulls out the BT firmware
-section. The firmware has been submitted to linux-firmware as GitLab
-MR !946 [2].
 
-The driver changes (firmware naming, section filtering, persistence
-skip, CONNV3 reset) were developed by studying the Windows driver USB
-captures and the existing btmtk code paths for MT7925/MT7961.
 
-[1] https://github.com/jetm/mediatek-mt7927-dkms
-[2] https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/946
+---
+Regards,
+Linux Bluetooth
 
-Javier
+
+--===============0755496282686589293==--
