@@ -1,46 +1,46 @@
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013017.outbound.protection.outlook.com [52.101.72.17])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013007.outbound.protection.outlook.com [40.107.159.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC49D2DCF58
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Mar 2026 16:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B5B3AE1B7
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Mar 2026 16:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.7
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772814147; cv=fail; b=uACOE47KqzV/nFfoVg4VTWXzQdkyzIOl0VqFzU4ACBCfwjZVj9uyKmjJDyPE9nqPvmwOpKnwOklVehVGsi6aNUU5v5UH8MNKqbz7Bs24Ml9JSiGGr9d5pf3MajihDrczkU6S7nzU5VyTG9qJKmo4eRFS5gqhDTZcIjEbsKyKaak=
+	t=1772814166; cv=fail; b=bFig4yYzNKbE4+dDNqmIk8/UA/nQZtAylnukSGzRISOC6wOsWB8bRhyizUpUaFgzHfr9wPiNdA/dqzvtFKpOQ0PaAkRYurJYOXajWZ9S3kQTP13/+ao74R9QkD0CGXi2VBt6m49rkXC/3jPlCGKjNLo3LfHJEy7kxQSnSM0J8+A=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772814147; c=relaxed/simple;
-	bh=o6WNEtcbJO3i1yebRvgBXRzKtMHPGE47sAlQ/J+7tO8=;
+	s=arc-20240116; t=1772814166; c=relaxed/simple;
+	bh=f3xa6sTbzmihZUue+yi0GVeqbjg0BsFIfVbCiEZIel4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=osW8Ra5o6h8EHdEeJ1mvaEDZfI0+je0MPzeNSuHuw3dmlbqq5BmIeFfjcmQNemZ+kT4dJ+o8tgfhc2yzfrhizlxm4O7AzrOfUU8EVZNC6zaZMNz0Q7iGR6pNvtgIIVWKPQpkOXURTx5DZ2zpOQeEusHN4Sk0blIKmZDKGxKs13Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=vKyewCeH; arc=fail smtp.client-ip=52.101.72.17
+	 MIME-Version:Content-Type; b=UaDC+tD8ZM1qfXv0JRfKdE6dFIjynSDQ3Dbl9Ej9HYciBHxDZk2dJ5wvz25S4W3NGCMU17rCRsBAL3AkQdjnW4FVN+q3LN97fEvyBWDkcusxzKTHHMtjITVBkuyhKi10jgbGXjh6i51zUcHwmDqXjMOh7v5x+GYChKTJFRH9T3w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=a/IZe2pR; arc=fail smtp.client-ip=40.107.159.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="vKyewCeH"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="a/IZe2pR"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mrbG3kXO7d3yY5v8PK/p6wfVsm4uAd9wtogySt/6JX35ZxiPo8UaXSE/cpyfZU28YCxjKCjXjajAFPlHxnCebl/LTnZukuGprtydxfQe2dzj/Msrg7izb6MDsMz9l8ac8JU0+Eld+EatO7gS3isUHNgENj5nwMBaD63MEKgNoYhrEZ4d6+ni7u/I8epZ7UyUb061KyFljIdoqVQLV/k6KEPDB9L/pdOiSigX8fpe5Y55n5er3tmmVcQWYvk2BvYqDB3u1PIgwRg0/LSCZozYZsFuUXSSUKqDO7KFYoLBsEH4d2EJvnrkzF9iD6V87J75h1Dt+MVHud9atp1KZrVXWQ==
+ b=y4PQhwmdL8GXU8L9Bx7BnU1yncMM2FkJNGSql9Jh7QWMxX/ffv0I+ne6iqSG9TI6z4SsRb8cxnW2n9SKAng1H3hT0Jv1Jw8LujBgLWN8kx5jwFF6GhvXoA7NQho/ZoVC7tq70YX8U/u/jFKHjR0UsrgOnErWqG4Qj+AN8iURkrgjsuA7FbOMIrJGYCzgB5g+E38uqsjtSMMGjP1Na4K6iWEhbxMtwmORgsHKJJyNiG+kHnpVwuS1EgcLW9kszvrqQMw0PzkQ38JKGBNUL0JkvOvO8NND8QWWcXQMS0pRmh/ee3bOOgLJlhTs6mtDAK4F+tGcZPUkzkER7H0lRaidCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bmS9DbFaJ3xsMrtZzYIO+JcBaGc2EwRACziOkCDsGOI=;
- b=qRZ9Ggy6i6sup99LsDNosGse0HqfGLbh+MwLXOEbChBYNym6FZoKKVOlmY7pqBCjpvevsZqM1I6lVo0QsV39hVOBb3+lEhNiyfF/MPer/kPMq3p8NAHAjwfoGSQpObX9gEzqVK22301ajMmWbOnxxCXPLvXpKFsrXOGrIizky3xWsbrRCViVbL8pcioXF4rbakvvLZidgW0v2K2ybREtZ6+friiGZr508R1/FopwrNpRnN6tKIGUEU0maIOcZqEu3Y/9s2iUfqdfyA9fUE3Se3FTRZuygRgQbRdJCLWhmpnIO3tMUIHQUUj6G32J39kLl5V27+T/fp9PITwCnEw7IA==
+ bh=yCpPBZ8nV2OdClurIfQ7JlW3eOWRWfkmbLZ06RlNf4E=;
+ b=nuFqbsyGOAKJR2W+dczRYpExzFDfvNusFotS4CU+Ct6OVnP7hmiE3z1zLvzgd3ck1B2KJsdCyXQVs2nwx3e29gSvPIL1OFD/erxg2s9gS/A8viqQSajN5VTQqu9ArE8/TFCEB1yh/yBYwvyOpXymagt4yUms+MNZMTOAfTN2s2O8/bhkHD8cIJtLH3LfVYLwjU9KBBpDM49qiYIxk/9o6rK3r4jkYgmhduuCIc2ij2ghgR8S0a45YHBPQsOE/ptywrhSYO/i4g4jmISHgaslP/9tzQRokeML6mlFN0EiWoHN95MLu7RujnKNnLWSNKiwEBRhJd7SEOeJ/yPyyCoWOw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
  dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bmS9DbFaJ3xsMrtZzYIO+JcBaGc2EwRACziOkCDsGOI=;
- b=vKyewCeHhfZVYzd08wJ+4MoLToc4z7oqKKu/BimZs7X3rs1v9OcRMVqTSvkkK+fTlJGzgI7/vD2CLJ9itaXkqTXJByntF5aOxZ5E0EvJomyllo6X0ptaoITuNWjImb0jwuDG3MzCjWvq3WZ1zsrID8SCF+XQ88r6gaShTOKhOLY=
-Received: from DU7P194CA0001.EURP194.PROD.OUTLOOK.COM (2603:10a6:10:553::16)
- by VI0PR03MB11173.eurprd03.prod.outlook.com (2603:10a6:800:2f8::21) with
+ bh=yCpPBZ8nV2OdClurIfQ7JlW3eOWRWfkmbLZ06RlNf4E=;
+ b=a/IZe2pRERiSAYXXBb5lp7PXtnzFg/f5pz2GbzJ37bSW/C+KJvflnKURBGi27vjdbopSXC6x1u4U/YL6ZrS7G6vcE9fcq53JhqgU5svq4JBy47y5VEzVxXbK6IHAZRkSqIQc1YBvAgnBNclDYDEjs9d5oGDoCj/eh3Y51uA4fQE=
+Received: from DU6P191CA0064.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:53e::24)
+ by VI1PR03MB6142.eurprd03.prod.outlook.com (2603:10a6:800:142::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.19; Fri, 6 Mar
- 2026 16:22:21 +0000
-Received: from DU6PEPF0000A7E1.eurprd02.prod.outlook.com
- (2603:10a6:10:553:cafe::11) by DU7P194CA0001.outlook.office365.com
- (2603:10a6:10:553::16) with Microsoft SMTP Server (version=TLS1_3,
+ 2026 16:22:37 +0000
+Received: from DU6PEPF0000A7DD.eurprd02.prod.outlook.com
+ (2603:10a6:10:53e:cafe::16) by DU6P191CA0064.outlook.office365.com
+ (2603:10a6:10:53e::24) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.18 via Frontend Transport; Fri,
- 6 Mar 2026 16:22:20 +0000
+ 6 Mar 2026 16:22:37 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -48,19 +48,19 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- DU6PEPF0000A7E1.mail.protection.outlook.com (10.167.8.40) with Microsoft SMTP
+ DU6PEPF0000A7DD.mail.protection.outlook.com (10.167.8.37) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9678.18 via Frontend Transport; Fri, 6 Mar 2026 16:22:19 +0000
+ 15.20.9678.18 via Frontend Transport; Fri, 6 Mar 2026 16:22:37 +0000
 Received: from N9W6SW14.arri.de (192.168.54.17) by mta.arri.de (10.10.18.5)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Fri, 6 Mar
- 2026 17:22:19 +0100
+ 2026 17:22:36 +0100
 From: Christian Eggers <ceggers@arri.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <frederic.danis@collabora.com>, <ceggers@arri.de>
-Subject: [PATCH BlueZ 3/6] doc/qualification: gatt-pts: fu: add description for GATT/SR/GAN/BV-03-C
-Date: Fri, 6 Mar 2026 17:19:18 +0100
-Message-ID: <20260306162058.15154-5-ceggers@arri.de>
+Subject: [PATCH BlueZ 4/6] doc/qualification: gatt-pts: fu: update descr. for GATT/SR/GAI/BV-01-C
+Date: Fri, 6 Mar 2026 17:19:19 +0100
+Message-ID: <20260306162058.15154-6-ceggers@arri.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260306162058.15154-2-ceggers@arri.de>
 References: <20260306162058.15154-2-ceggers@arri.de>
@@ -74,77 +74,77 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF0000A7E1:EE_|VI0PR03MB11173:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5eb5a706-2a33-4f83-1810-08de7b9c8a6d
+X-MS-TrafficTypeDiagnostic: DU6PEPF0000A7DD:EE_|VI1PR03MB6142:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0fb78cce-5272-4bdd-263f-08de7b9c94a9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700016;
+	BCL:0;ARA:13230040|1800799024|36860700016|82310400026|376014;
 X-Microsoft-Antispam-Message-Info:
-	ltqP7nSBmikOpeGi1eMDbm381PpZNQBOS5SDVsN/NNmx6rWnR+H16v6VMRNswcaZoJpVU36tVF2g5z38UJwueOoUOT5/B73Ceet9BKWPDZN3CC4gZkGLV0f+5c+KdyrECbMuI1JpsAKL1buKJm6vAL+EWvPhq8pYZNbLmRZUAfUIP6pD63LaSZOWLWR9yFYJxsnCTa2P3pxpyQqrZAy1jc76LYj7n7UIaCNoZzB9XUtkv2JPBCeMtNk99GthcgZhH2Tu10orTQxZlng6h91878oy9svnZIk2tqQN1fZPvVzRWjp8L6hUreAFZ8z5z2wvwd+3E//rU+PL9mA5qLMTu7dJQO3rdd8L3ZuX9MyDszFWMRjNKq8UPnG9SCfQTZzZgv/sN844RNjtdMBNGV2OlS1QCXbIN0ftIOOVR6ypcpE3UoBPDnTezPbis/M3ohEiOy5FgcACJCG5+RZYZWC5L6lXN0UOSj2Ei5EuSRGn+9zrIoX3PK5zXyTpYhjhxJfAKh+Z5Hkane8IWj34b1ynj3BvrveRXIly1IQWDzp8RzGk+zQejbcQbe3QperZtPc6SyrS+C/d3+mWj0bpjMIVGXqGEpaA4QvDUqnmmRIQnONEoLjELicDZPnOsIS1XTjnmH4FUSlHSe50VmIVn+HEQQ0yyFG5+zhO2UrFIJQlbOeODZAUmbR+mbK0R0ngRw8dG0w0j77dzG4Wj8obTS/xxkerhSmis8gp1eznP0IF6QRxFqqfN5pg5UC1T3BmynI7SWGFOIu5Dkq2Ub/9Ap+C9w==
+	aaI5j5TEV8auA6yrnYXhmnJq6gXLCiM58DYZsaLQ9vn8kXBT+6/GUbgsOo5sjkXJMWpff7hkaXPnKibXRWe4/PITfwzfYxrE8BHu8Gca8r6+4WiALWAWVf3mJKbQLWPGcJ3pk4zlWd8IW/m2jKpWW6YZqSDbcZ3jsTmKCRY0r2iIstYzCk/0VRo4TeUx0eoseVG6xhPoO3e2jpMnsAXQsVrBk6+MOzyWq5uh3lhqIchLXpG5CkOhDSmR8uAAVV4PDNCnQ7v0X30UwLNuTw5uwA3mZjXFdxjYhsgS8gFBfvEkmrFddNRnCaAYglG9wEnRULvyMak3VmbZgV3g55luEni6z6KSyTeiP7Kw1TxZrNPvJBdEfizBy+hchfVhyZFn1XkITUYF4zG3BRdaAN4ju1g1NaPcdpYdMRxwWV1bPe19/3ZDrtWfI5TSeMMgNqaYvORf9YROnGeaV9h9jf9OkCkt5jqIWl4VWojCt8a3rcxtcNiS2NGQqeQgNrxFe/Z53UO6li5a/bLV4xE+BvIUhmddemORBWnyc8ywnUL/21/sxTgcDma5h4tkAdroZD9MrC6wKabogWcORicz695xLqNkXF8DF03fxQEMYerZtXk+KfTx/pkZuotzrIR4Lpkhdr/jw8SdFNap60krHa8r6DIziF/Gwt9hU5Lj8NEBkG721FnaBFSOSmjaH0jjECuCKzMsGoSENNAZjoxbM6VAz9v+d0/cluM5oYYRPxWv2QyFmFsFuW1ngl/6M58QAMA1Dj4gY7jZyrvqH24IodrcCw==
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700016);DIR:OUT;SFP:1101;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(82310400026)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	16qTkqoULDHANDcb2D496qekaMJ5rp1fcbVXSdh8ZoH8LMsHxjeCXyOf9EEqoHwkoXSWhFZDYodsIdKGsVDRSd7TZCInkMXRdQXwJIaNbrn5Q8K0Oe5BcauCne0QPSLVWABdpQ+8LfCl3JRE6yXd7hOFhvShoVtsxAAIg2UVLYXUrVSCclq/eSjdkTbDdAscW/6Kp8gjTYX4e14Rr+BcUeIhFjtmXIIbW4/HW02gV6mdTwfBmVu344Q90EEQv4gxxBY5l7BdPNlyf0445HtWZBf6wwFEth6RCJaAXuc33YciFQEBhjeOJW5BNA2cRDpfSXOHtSCOCSFwxN4t522jHA1Cl6gMjFG4PRc3kLBUcQ1w/j7AtfrikKLrDAPCKC5dfYAGtMDBrJxEZghtUQCReHl/25fXqenY972G0fyNt+3VSnPf3f4IqJ9Wp7g1j5WA
+	qJ5J+7i8c+E0s8uy7mzeypIf6PbAxr/kSOVOVJE/6hBv47x2uiiT5M1RclWIPTCT2ryC1grCrRncPXsEyQqh53XW9MKFMn3fmrg7T16XEKRhjnptONFMZH1NBz/XxzJ5KUW1/nEIjq7Huc5oMytweWJWRjYhElv8YkKW31Nbm8E4FeFUkGmREYiwytK/kjqT0wEDI3fZXDkiuV0qz+eEhzrA2RRRPTpgPczSsRSWK+xEBQsDPqKpf/1/RsUqQiNDaQax6aVSwhpA1NUPrdxHphMzEbAgsDQUGXgHPpwBCzn1fN5lxN/kyAknJbQkANamr94XxQD6+NOdJSvHng/ILCPTA3oSVCqe5Uks89yh0L/qz+dvqYgHu3w2f8FKiqaFgr3bdckN7fP3erDkV5e5nVDrEMTY2CC4Y2UoYbdIeSc9CGPkcvjVXG9AhYIYM7d5
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2026 16:22:19.9989
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2026 16:22:37.1686
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5eb5a706-2a33-4f83-1810-08de7b9c8a6d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0fb78cce-5272-4bdd-263f-08de7b9c94a9
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF0000A7E1.eurprd02.prod.outlook.com
+	DU6PEPF0000A7DD.eurprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR03MB11173
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR03MB6142
 
 Unfortunately, v1 of my patch series has been applied to master. This is
-an incremental update to v2 of 268d715b80e0 ("doc/qualification:
-gatt-pts: add description for GATT/SR/GAN/BV-03-C")
+an incremental update to v2 of 7a2d04492f98 ("doc/qualification:
+gatt-pts: update description for GATT/SR/GAI/BV-01-C")
 ---
- doc/qualification/gatt-pts.rst | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ doc/qualification/gatt-pts.rst | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/doc/qualification/gatt-pts.rst b/doc/qualification/gatt-pts.rst
-index fd1fa8370d50..4749fef1d677 100644
+index 4749fef1d677..79dc75118451 100644
 --- a/doc/qualification/gatt-pts.rst
 +++ b/doc/qualification/gatt-pts.rst
-@@ -1140,23 +1140,25 @@ for which we know the test passed.
+@@ -1162,21 +1162,26 @@ for which we know the test passed.
  |                        |          |         |       |                                                                         |
  |                        |          |         |       | - [bluetooth]# gatt.write 2                                             |
  +------------------------+----------+---------+-------+-------------------------------------------------------------------------+
--| GATT/SR/GAN/BV-03-C    | PASS     |     6.1 | 5.69  | Run 'bluetoothctl':                                                     |
-+| GATT/SR/GAN/BV-03-C    | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
+-| GATT/SR/GAI/BV-01-C    | PASS     |     6.1 | 5.69  | Run 'bluetoothctl':                                                     |
++| GATT/SR/GAI/BV-01-C    | PASS     |     6.1 | 5.69  | Pre-condition:                                                          |
  |                        |          |         |       |                                                                         |
 -|                        |          |         |       | - [bluetooth]# advertise on                                             |
-+|                        |          |         |       | - Run 'bluetoothctl':                                                   |
- |                        |          |         |       |                                                                         |
+-|                        |          |         |       |                                                                         |
 -|                        |          |         |       | - [bluetooth]# gatt.register-service 0xFFFF                             |
-+|                        |          |         |       |   - [bluetooth]# advertise on                                           |
++|                        |          |         |       | - Run 'bluetoothctl':                                                   |
  |                        |          |         |       |                                                                         |
 -|                        |          |         |       |   - *yes* when asked if primary service                                 |
 +|                        |          |         |       |   - [bluetooth]# gatt.register-service 0xFFFF                           |
  |                        |          |         |       |                                                                         |
--|                        |          |         |       | - [bluetooth]# gatt.register-characteristic 0xAAAA write,notify         |
+-|                        |          |         |       | - [bluetooth]# gatt.register-characteristic 0xAAAA read,write           |
 +|                        |          |         |       |     - *yes* when asked if primary service                               |
  |                        |          |         |       |                                                                         |
 -|                        |          |         |       |   - enter '1' when prompted                                             |
-+|                        |          |         |       |   - [bluetooth]# gatt.register-characteristic 0xAAAA write,notify       |
++|                        |          |         |       |   - [bluetooth]# gatt.register-characteristic 0xAAAA read,write         |
  |                        |          |         |       |                                                                         |
--|                        |          |         |       | - [bluetooth]# gatt.register-application                                |
+-|                        |          |         |       | - Wait until PTS prompts for sending an indication                      |
 +|                        |          |         |       |     - enter '1' when prompted                                           |
- |                        |          |         |       |                                                                         |
--|                        |          |         |       | - [bluetooth]# gatt.select-attribute local 0xAAAA                       |
-+|                        |          |         |       |   - [bluetooth]# gatt.register-application                              |
- |                        |          |         |       |                                                                         |
--|                        |          |         |       | - Wait until PTS prompts for sending a notification                     |
-+|                        |          |         |       |   - [bluetooth]# gatt.select-attribute local 0xAAAA                     |
 +|                        |          |         |       +-------------------------------------------------------------------------+
 +|                        |          |         |       | On PTS request to send a notification:                                  |
  |                        |          |         |       |                                                                         |
- |                        |          |         |       | - [bluetooth]# gatt.write 2                                             |
+ |                        |          |         |       | - [bluetooth]# gatt.register-application                                |
++|                        |          |         |       |                                                                         |
++|                        |          |         |       | Enter the handle displayed for the characteristic during                |
++|                        |          |         |       | register-application on handle request                                  |
++|                        |          |         |       |                                                                         |
++|                        |          |         |       | Enter '2' when asked for handle size                                    |
  +------------------------+----------+---------+-------+-------------------------------------------------------------------------+
+ | GATT/SR/GAI/BV-02-C    | PASS     |     6.1 | 5.69  | Run 'bluetoothctl':                                                     |
+ |                        |          |         |       |                                                                         |
 -- 
 2.51.0
 
