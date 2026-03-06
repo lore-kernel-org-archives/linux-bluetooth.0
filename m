@@ -1,146 +1,323 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A574396D23;
-	Fri,  6 Mar 2026 13:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772803779; cv=none; b=bHVQ+V5PTK0pYwGFyQJlb5nMQ2j8qNrFiQZ3GpRzUauHXuVGalWyO0kyfKMvVRjw7xEMWviWzbioqD49yn25vH0cHikd11Q5Ge/TN/Y4K3dnXwV8LDcIp2iZo4xhQXeGuh8UWE88MDs3nvfFY5rDFtenD1y6w/EpEByDXK/bIH8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772803779; c=relaxed/simple;
-	bh=1ukMkvLDsKaYNY9i0ldkaZ4BWaGkqbXWQ5bDJd35Ruo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O8ECYL/mlkEN5X6SL+0/TK3d66hXWVCkmg0O2HHuDVZn+bsj2/k8LR6uM9UTUpyZKawpZFqopyAsD2d09VY7cJJAUkSHdnQ8NTKxdRtNV0B9LFyQziJ6nxME3qCUh31Xxo0x27oJI1hZqmvM1cbr1lV8ORBBfb3q9146+tAVWMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hc2G5bkz; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684502248A5
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Mar 2026 14:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772807177; cv=pass; b=dy1/z7dFeXSzCWlfZmSKCX4Ci2zl/D1sJ0GDEgQIRGCCtgFgyK0Xn4XgxjV6PtUaufiOOEUBtt/agyV++0h30mtVGqcYvxheuvsjVYvArnxkd5deQdkUs2pqusR9FmQhhiwQZ4Rw8RJDlDtJJkX7837hIBvWm0REjq79uBpzO3g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772807177; c=relaxed/simple;
+	bh=FbuTuZPPpsDIHjYeICxFmz4NrjrpvXrnGYP7fxf+5rQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jsxwXp+F0c5UoJbms0vPiFkUQ3hS1JX+qrwPbDx0CTRvOWtp/DZh/wBfWjnD1L8wC73MWK2LaKzz7NBfhsLL5M5Iofbd0TuJc/oCQjAW1AxMsPbPo5fuACe7U1sdXmmRFCwd5UvpImygXqjQb935g6HU+5p2zYjimq+UAiryDGI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jDIHavnJ; arc=pass smtp.client-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hc2G5bkz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B1A5C4CEF7;
-	Fri,  6 Mar 2026 13:29:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772803778;
-	bh=1ukMkvLDsKaYNY9i0ldkaZ4BWaGkqbXWQ5bDJd35Ruo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hc2G5bkzknQkHbaZAs4y3XyfPC7tq6CC483Y2FuPeJaJ/Ep5xih+Tc66Fpb+BwZ7W
-	 Bez8ORwfCmhbe6g0HU6oZVMi4gDWQhsfbyaFq+cVejhoWgnukuID/RZMSHViAcCVrw
-	 MjS/lDOASjuhPRZUMZ9AR3PHB2ay8/WfzKkLOdl1k1HLi42nbvUUTkPfv/+Yy3fjTm
-	 K+K4W0dOPAbSzctZ86TetwW6UIj7CcluN5pzHcCZKjAogO4Aasoss2NuBYwUN+09zw
-	 d8oApzr6/okXUUx7r5/Swj0z04/dBdcsRq0mcjW6ZaOab7H/RmnzywDdyIqKNlOri8
-	 PH0xKh9i2soEQ==
-Date: Fri, 6 Mar 2026 14:28:59 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Theodore Y. Ts'o" <tytso@mit.edu>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.org>, 
-	Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>, 
-	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
-	NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Bharath SM <bharathsm@microsoft.com>, Alexander Aring <alex.aring@gmail.com>, 
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>, Viacheslav Dubeyko <slava@dubeyko.com>, 
-	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
-	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
-	David Sterba <dsterba@suse.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Ian Kent <raven@themaw.net>, Luis de Bethencourt <luisbg@kernel.org>, 
-	Salah Triki <salah.triki@gmail.com>, "Tigran A. Aivazian" <aivazian.tigran@gmail.com>, 
-	Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, 
-	Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Nicolas Pitre <nico@fluxnic.net>, 
-	Tyler Hicks <code@tyhicks.com>, Amir Goldstein <amir73il@gmail.com>, 
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Yangtao Li <frank.li@vivo.com>, 
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>, David Woodhouse <dwmw2@infradead.org>, 
-	Richard Weinberger <richard@nod.at>, Dave Kleikamp <shaggy@kernel.org>, 
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
-	Joseph Qi <joseph.qi@linux.alibaba.com>, Mike Marshall <hubcap@omnibond.com>, 
-	Martin Brandenburg <martin@omnibond.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Anders Larsen <al@alarsen.net>, Zhihao Cheng <chengzhihao1@huawei.com>, 
-	Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>, 
-	Johannes Thumshirn <jth@kernel.org>, John Johansen <john.johansen@canonical.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Mimi Zohar <zohar@linux.ibm.com>, 
-	Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
-	Eric Snowberg <eric.snowberg@oracle.com>, Fan Wu <wufan@kernel.org>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Ondrej Mosnacek <omosnace@redhat.com>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Alex Deucher <alexander.deucher@amd.com>, 
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, James Clark <james.clark@linaro.org>, 
-	"Darrick J. Wong" <djwong@kernel.org>, Martin Schiller <ms@dev.tdt.de>, Eric Paris <eparis@redhat.com>, 
-	Joerg Reuter <jreuter@yaina.de>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Remi Denis-Courmont <courmisch@gmail.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Xin Long <lucien.xin@gmail.com>, Magnus Karlsson <magnus.karlsson@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	nvdimm@lists.linux.dev, fsverity@lists.linux.dev, linux-mm@kvack.org, 
-	netfs@lists.linux.dev, linux-ext4@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org, v9fs@lists.linux.dev, 
-	linux-afs@lists.infradead.org, autofs@vger.kernel.org, ceph-devel@vger.kernel.org, 
-	codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	jfs-discussion@lists.sourceforge.net, ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, 
-	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org, apparmor@lists.ubuntu.com, 
-	linux-security-module@vger.kernel.org, linux-integrity@vger.kernel.org, selinux@vger.kernel.org, 
-	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
-	linaro-mm-sig@lists.linaro.org, netdev@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org, linux-hams@vger.kernel.org, 
-	linux-x25@vger.kernel.org, audit@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-can@vger.kernel.org, linux-sctp@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v3 01/12] vfs: widen inode hash/lookup functions to u64
-Message-ID: <20260306-klauen-aufruf-3f79ec9cd4cb@brauner>
-References: <20260304-iino-u64-v3-0-2257ad83d372@kernel.org>
- <20260304-iino-u64-v3-1-2257ad83d372@kernel.org>
- <aamSFgXhrORAJLBC@infradead.org>
- <c1845a4b8d35d367953ac6cbfcf91ac36958ba51.camel@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jDIHavnJ"
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64ad79df972so8755090d50.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Mar 2026 06:26:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772807174; cv=none;
+        d=google.com; s=arc-20240605;
+        b=K13zzQvyEeJBGnP4uikCcAzenJKYEF+FFgjXUJna1Wt7glqn+MfhDXiV9RO0X/cAXj
+         4C2EXC9r7mI/vOnNMFt8gdFd3nnxXBnWVgkEcBDV0R7DPu4HwFzAQqRLCJ4Xd2q6FJ4t
+         kogHsegcqUfYtKntMnS/NZ05MvGHDR2whFFmnc6A6LTlStri3U3CHy6GZjKXiWDBCtBz
+         2ewTNdkj4+wABag+2yL6sOYoLcBURps/XTTtkKdQN310l7l9q0oCXulSwhuMw6BZOXui
+         YquASBcr5HiXSNVdaqBJDTCxmmi/k+tIDbM1N853rsaULyKwwCKxcoQhtRj698KQUh1G
+         2ZYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=GOTRhbe5JtJ1UvX7ZBiR3vr0JIb5AmLXv9lzENdEv1I=;
+        fh=KXcOb5vphlZLN1D9IwLcOrc/UM2jVmDyJWWf/pmWc4g=;
+        b=TN/vwqSlREa2ueq0fQ+OQWtbRLJVG8hbqtay+8oWPHTNW4smsqLgmWh0fQl4XIu44b
+         6//H8FKUqOC98KRyFXsUBXlcJbFcEswqZpKi44HlGtHXhgq3kVFcJ7xfBNcIXuR+g7o1
+         zEmIpn6tE/xGHtD2oxU3hf9WqGOSB+/e1iiIzQApBS73OEZZizlsoZsRZua411vPNhUP
+         z6QiDjyQA5hYbZfco+P/0Y6TqhUptq+c63IfFQVhZFfp0HGdxl+fxcibhiLuk61a2DSv
+         Rgq6ORhCRA061QyL4g1AcrXkZMGe0uX2349J0z4guzc9y+cTf2b6QYfCQHBJqc9dPDsD
+         rXmg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772807174; x=1773411974; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GOTRhbe5JtJ1UvX7ZBiR3vr0JIb5AmLXv9lzENdEv1I=;
+        b=jDIHavnJ5JmWLCtP/OIB3VlYcUqcotQIlX+CuXc1eVSGvOPciLXLJvlZfrl0QYChB/
+         mfC4EzJHmJAd4rhJFz0G1N5BETImb7rdxziFZ02K7kYAmlJbZD1fscDrovrtHqxx3Yo7
+         P+g2tgt00lmf8ebeZWTl2SHBQWHwXV8B8tX+vCd7SUPfOUGqhILPZSsvjYa2vUoE9hRS
+         Nnynz5AGV47JOO7sxKICPoaqjDayQY7wFcDtgwbY9oyqmSUe5QI3zkg0NSdHFiNAdksn
+         k/CcTzNuJE5ms4yuuiqIhZkx4rrNipQB/ZawgXWedMs2S+gFgfwAb91RsH0kVcXeQCNC
+         DhwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772807174; x=1773411974;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GOTRhbe5JtJ1UvX7ZBiR3vr0JIb5AmLXv9lzENdEv1I=;
+        b=scZKUUm8+7YrbX8/wgdatzm7VkHWERkwy5Iyqz0HFgXw85ghbvZeI93g9NgkBdV3aF
+         Rt2aEjfVy+pYpP008gGcjvo4qPCoF4UIk+YfIxKLeMyuXCC9m6Cizuqc9rKgr0iawy9G
+         MAGfkBGzwT0d1cUpZE5ekvbmL9mPQCVzbJWEMnsJ/i6EMSgCld6hKWMY++ITJXuXNVmd
+         OBJdGOfD19iyVFInRdXPfjErNHAg2hhc1hFsMeCuVnjN93EvfdMr2L1+c0Yp99XIXjfI
+         NC1pycfaRvUbjg+kdfGtcIIdQMd8LplCumnNjtyJpv+dkS+p/dkfpK1B09v3LxjmiFyJ
+         Rjgg==
+X-Gm-Message-State: AOJu0Yyzg6Q1NiJFcj+gcD8z5P5fpEEzr/NVSsnt34h3AhZk/lKK3z/s
+	wCRyK7Kg9TyamrBcSz7tERVZ3a8O9opvBp+937T8E5XQ9f6HYEXRoD/75rH7VpJdr+sndRYoPWt
+	KU0obSPAmK7E1bRe0z+OD7Kh7O67tGis=
+X-Gm-Gg: ATEYQzy1kW7LwEqVpaPXV1HQ9ey23fU+UxKatSE0uNvmJGwta1sA8X87ybeTm5n4r8D
+	qPZsBiQZCDgSALpqeh7AHF8qk5qyKdpR0rgZhLwGREgzz96TBAJn4yEE1oA8LBzvfSv0A8xAx/j
+	L/afpMWmBtX3RFWqCqfLjT17BloVPVBqIC0DUNE0avzvazSP13LsnBA9HcuZ7GqC2fuYzs9+Xbq
+	hxsRzwSr7EYmOsrbAe4zpOExUWEyqIHJxDtw/DO8d6gM9O7TMYavCzAx/A5W81ciRNSLzOhkUSX
+	yiwV4Z6PLnO+Sg/NyMz8qAgrILHTsNqdZ+5Fkz0Wzc09XHGsbnbodwFsxYoZH0rC0rs60Vdrr9H
+	W38Tw
+X-Received: by 2002:a53:b191:0:b0:64c:985f:9d4e with SMTP id
+ 956f58d0204a3-64d14280f5emr1597232d50.41.1772807173982; Fri, 06 Mar 2026
+ 06:26:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c1845a4b8d35d367953ac6cbfcf91ac36958ba51.camel@kernel.org>
+References: <20260302233756.910702-1-dajid.morel@volvo.com>
+ <CABBYNZJtZZ7mHJinJY9ZfhfHbYUC9aEmoRx9ACz5R4HSwepyFg@mail.gmail.com>
+ <CAM8DPm26RVUJbgA+Lutqshu+ZqkVtNaVrKdG-k1WdE0rcSe0dQ@mail.gmail.com>
+ <CABBYNZKxUJUtZTNe0+ot1JmNDyLzf3x-TyN+TqPz-o5xMmx=6A@mail.gmail.com>
+ <CAM8DPm24s+2raquaofgPoroTMECGdKeba7pnDz5X64wN66yjiw@mail.gmail.com>
+ <CABBYNZKaNmSPbCpJ-GKu2eSrgd_GcOOWkekHW0OMK8WMLESYWQ@mail.gmail.com> <CAM8DPm20Sm1t_NMoWQFZtkmdaiL1ALs8SFMqxe-QtT5wjbp6xA@mail.gmail.com>
+In-Reply-To: <CAM8DPm20Sm1t_NMoWQFZtkmdaiL1ALs8SFMqxe-QtT5wjbp6xA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 6 Mar 2026 09:26:02 -0500
+X-Gm-Features: AaiRm52XcJidngAp2RgA_0OeWU-nj_u_1Cy4w3VWHF3aipbvTYh9EmOWXbcEr7w
+Message-ID: <CABBYNZKmu3b2h2NyhhV7CwmB=h1R9uAe0HXDCP73iAvqzy7AYA@mail.gmail.com>
+Subject: Re: [PATCH v4] Bluetooth: Increase LE connection timeout for
+ industrial sensors
+To: Dajid Morel <dajidp.morel@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Dajid MOREL <dajid.morel@volvo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 06, 2026 at 07:03:15AM -0500, Jeff Layton wrote:
-> On Thu, 2026-03-05 at 06:24 -0800, Christoph Hellwig wrote:
-> > >  extern struct inode *ilookup5_nowait(struct super_block *sb,
-> > > -		unsigned long hashval, int (*test)(struct inode *, void *),
-> > > +		u64 hashval, int (*test)(struct inode *, void *),
-> > >  		void *data, bool *isnew);
-> > > -extern struct inode *ilookup5(struct super_block *sb, unsigned long hashval,
-> > > +extern struct inode *ilookup5(struct super_block *sb, u64 hashval,
-> > >  		int (*test)(struct inode *, void *), void *data);
-> > 
-> > ...
-> > 
-> > Can you please drop all these pointless externs while you're at it?
-> > 
-> 
-> I was planning to do that, but then Christian merged it!
-> 
-> I'll do a patch on top of this that does this in the range of fs.h that
-> the patch touches. Christian can throw it on top of the series, and
-> that shouldn't be too bad for backports.
+Hi Dajid,
 
-I can easily drop those so no need to resend for stuff like this as per
-the usual protocol.
+On Fri, Mar 6, 2026 at 2:15=E2=80=AFAM Dajid Morel <dajidp.morel@gmail.com>=
+ wrote:
+>
+> On Tue, Mar 3, 2026 at 10:12 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > What kernel version are you seeing this behavior? We no longer use
+> > HCI_CMD_TIMEOUT for HCI_OP_LE_CREATE_CONN:
+> > https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_s=
+ync.c#L6673
+> >
+> > It was changed some 4 years back, so it quite an old change even for
+> > stable kernel:
+> > https://github.com/bluez/bluetooth-next/commit/a56a1138cbd85e4d56535619=
+9d60e1cb94e5a77a
+>
+> Hi Luiz,
+>
+> To answer your question, our industrial environment runs on Ubuntu Core 2=
+2,
+> which uses the LTS kernel 5.15.0-1096-raspi (aarch64).
+>
+> Thank you for the detailed logs and for pointing out commit
+> a56a1138cbd85e4d565356199d60e1cb94e5a77a.
+>
+> I understand that HCI_OP_LE_CREATE_CONN itself has been decoupled from
+> HCI_CMD_TIMEOUT. However, I have conducted a deep code analysis on the
+> current bluetooth-next tree combined with an isolated empirical test on
+> our hardware, which strongly suggests that HCI_CMD_TIMEOUT is still the
+> root cause of the abort in our industrial use case.
+>
+> Here are the facts and the methodology used to verify it.
+>
+> 1. Code analysis on bluetooth-next: HCI_CMD_TIMEOUT is still widely used
+>
+> While the specific create connection command may use a different timeout,
+> the entire connection setup sequence relies on multiple synchronous HCI
+> commands. A simple grep on the current bluetooth-next tree shows extensiv=
+e
+> usage of this 2-second limit:
+>
+> $ grep -rn "HCI_CMD_TIMEOUT" net/bluetooth/ | wc -l
+> 150
+>
+> $ grep -rn "HCI_CMD_TIMEOUT" net/bluetooth/ | cut -d: -f1 | uniq -c | sor=
+t -nr
+>     124 net/bluetooth/hci_sync.c
+>       7 net/bluetooth/msft.c
+>       6 net/bluetooth/hci_core.c
+>       3 net/bluetooth/hci_conn.c
+>
+> With 124 occurrences in hci_sync.c alone, many preparatory commands
+> (e.g. HCI_OP_LE_ADD_TO_ACCEPT_LIST, HCI_OP_LE_SET_EXT_SCAN_ENABLE,
+> which are visible in the memcheck logs you provided) rely on
+> __hci_cmd_sync_sk(), which falls back to the hardcoded
+> HCI_CMD_TIMEOUT (2000 ms).
+>
+> 2. Empirical test methodology
+>
+> To verify that this global timeout is the limiting factor for our
+> 5-second advertising interval sensors, we performed an isolated test
+> in our environment.
+>
+> Environment:
+> Ubuntu Core 22 / Kernel LTS 5.15.0-1096-raspi (aarch64)
+>
+> Sensor:
+> TE Connectivity M5600 (5 s advertising interval, ~12.5 s handshake time)
+>
+> Action:
+> All previous patches were reverted, including the withdrawn v4 patch on
+> conn_timeout. We modified only the global definition in
+> include/net/bluetooth/hci.h:
+>
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@
+> -#define HCI_CMD_TIMEOUT msecs_to_jiffies(2000)
+> +#define HCI_CMD_TIMEOUT msecs_to_jiffies(15000)
+>
+> Build process:
+> To avoid any userspace interference, we rebuilt the kernel natively as an
+> immutable Snap and generated a custom Ubuntu Core OS image using
+> snapcraft pack and ubuntu-image.
+>
+> 3. Test results
+>
+> We modified only the global definition in include/net/bluetooth/hci.h and
+> observed the exact behavioral threshold.
+>
+> Phase 1 (2000 ms =E2=80=93 unmodified):
+> The connection attempt is aborted almost immediately and silently at the
+> HCI level. Userspace applications remain unaware and continue waiting,
+> which explains the ~45 s stall observed in our previous Python test.
+>
+> Phase 2 (10000 ms):
+> The kernel allows the connection sequence to progress further, but the
+> sensor requires ~12.5 s to complete the handshake. The kernel timeout
+> therefore triggers right before completion. For the first time our
+> userspace daemon logged explicit "[BLE] Disconnected" events, showing
+> that the kernel actively aborted the handshake at the 10 s mark.
+>
+> Phase 3 (15000 ms):
+> Once the kernel timeout exceeded the sensor response time, the connection
+> succeeded reliably. The full handshake consistently took ~12.5 seconds.
+>
+> Conclusion
+>
+> These observations suggest that even though HCI_OP_LE_CREATE_CONN itself
+> no longer relies on HCI_CMD_TIMEOUT, the overall connection sequence is
+> still constrained by synchronous preparatory commands in hci_sync.c that
+> use this timeout.
+>
+> Because our sensors advertise only every 5 seconds, the state machine
+> appears to hit this limit before the full sequence can complete.
+>
+> Since increasing HCI_CMD_TIMEOUT globally to ~15 seconds in the upstream
+> kernel may be too aggressive for other environments, what would be the
+> recommended approach from the BlueZ maintainers to support LE devices
+> with advertising intervals greater than 2 seconds?
+>
+> Would it be acceptable to make this synchronization timeout configurable,
+> for example through sysfs or the mgmt API?
+
+Im talking to an AI model/agent? However, it does look like the above
+was generated by an AI model that is only checking the timeout used in
+the commands without knowing the command sequence performed when
+attempting a connection. Specifically for commands that report status
+the timeout is short because the controller only needs to confirm it
+received and understood the command. In fact, most commands behave
+this way since they really need to generate a command complete or
+status as soon as possible; otherwise, the host wouldn't be able to
+continue sending the next command. Therefore, the rambling about the
+usage of HCI_CMD_TIMEOUT is nonsense.
+
+Regarding the actual problem, try using something newer, 5.15 might
+not actually contain the necessary changes to wait an arbitrary amount
+of time for the connection to complete.
+
+> Best regards,
+>
+> Dajid Morel
+> Volvo Group
+>
+> Le mar. 3 mars 2026 =C3=A0 22:12, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> a =C3=A9crit :
+> >
+> > Hi Dajid,
+> >
+> > On Tue, Mar 3, 2026 at 3:31=E2=80=AFPM Dajid Morel <dajidp.morel@gmail.=
+com> wrote:
+> > >
+> > > On Tue, Mar 3, 2026 at 8:26 PM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > That is waiting 40 seconds as expected, so I'm not sure what is
+> > > > causing it to time out in 2 seconds but that is definitely the
+> > > > expected behavior.
+> > >
+> > > Hi Luiz,
+> > >
+> > > Thank you for providing those logs. Seeing the 40.5-second delta in
+> > > your environment is very insightful and confirms that the standard
+> > > stack should wait much longer than what I am observing.
+> > >
+> > > I have finally identified the root cause of the 2-second abort in my
+> > > setup. My environment uses industrial TE Connectivity M5600 sensors,
+> > > which are designed for ultra-low power consumption with a long
+> > > advertising interval of 5 seconds.
+> > >
+> > > After auditing the kernel source, I found that HCI_CMD_TIMEOUT is
+> > > hardcoded to 2.0 seconds (#define HCI_CMD_TIMEOUT
+> > > msecs_to_jiffies(2000)).
+> > >
+> > > When the kernel issues HCI_OP_LE_CREATE_CONN, the local controller
+> > > (Broadcom on RPi4 or Rockchip on Rock 4 C+) must wait for the next
+> > > advertisement from the sensor to proceed with the connection. Since
+> > > the M5600 only wakes up every 5s, the 2-second HCI_CMD_TIMEOUT
+> > > systematically triggers before the controller can receive the
+> > > advertisement and acknowledge the command completion. This leads to a=
+n
+> > > immediate abort, even if the sensor is physically next to a high-gain
+> > > antenna (9.4dBi).
+> > >
+> > > This explains why my v4 patch (forcing conn_timeout to 20s) worked as
+> > > a side-effect: it kept the connection structure alive just long enoug=
+h
+> > > to bypass the immediate impact of the HCI command timeout, but it was
+> > > architecturally the wrong target.
+> > >
+> > > I officially withdraw this patch series.
+> > >
+> > > However, this 2-second hardcoded limit for HCI_CMD_TIMEOUT seems
+> > > fundamentally incompatible with many industrial low-duty-cycle
+> > > sensors. Many developers on various forums resort to kernel hacks to
+> > > bypass this.
+> > >
+> > > Would you consider a patch that either:
+> > > 1. Increases HCI_CMD_TIMEOUT globally to 5 or 10 seconds?
+> > > 2. Or makes the LE connection command timeout specifically
+> > > configurable via the Management API or main.conf?
+> > >
+> > > I would like to work on a cleaner solution that accommodates these
+> > > low-power industrial sleep cycles without breaking existing tools.
+> >
+> > What kernel version are you seeing this behavior? We no longer use
+> > HCI_CMD_TIMEOUT for HCI_OP_LE_CREATE_CONN:
+> >
+> > https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_s=
+ync.c#L6673
+> >
+> > It was changed some 4 years back, so it quite an old change even for
+> > stable kernel:
+> >
+> > https://github.com/bluez/bluetooth-next/commit/a56a1138cbd85e4d56535619=
+9d60e1cb94e5a77a
+
+
+
+--=20
+Luiz Augusto von Dentz
