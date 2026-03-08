@@ -1,203 +1,126 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F511E32CF
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2026 13:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC0B16F288
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2026 14:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772976692; cv=none; b=qIeRBTyMcsV5df8DVWEEMiZQIxuuP2fDXJMeLOZJVlYWC+j4cxLOfJ3NPwoo3KqU5ZwBN+FBpZ64cbeOjgteLG1HU+r65N6f0jsk643Ds7TXdDkJfFEx6KLWCObUEaYuRirNtFbgl70rZ3yuo8FT3oo3IIQr/s2MEw0zfm40lKI=
+	t=1772979540; cv=none; b=hbtq5IDX5WdmIXHp5eGQFJjrj6+hsf2GwdDLnJKCRPzKek+g9nd2Ku4ns8uvJrv8vx20GIIea7zt03Nak7z8GaJ4ci8asKle/BGxMi4EYe6FUn0qrEDON03Zm1eKNQz2MOIRd8NR4IFmJ7+b3qg3xQBqOfID+J72BA+EuiaoLrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772976692; c=relaxed/simple;
-	bh=BPDmFNixrXcHkG2aR5OWFT1h84kbWPtV/ZLs4BeYKQA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=rCKGOJRap6qnC1qHv1obQA5GcmFoJ8GlMlR/D+fRRLjWAcmieOhghoyQIXQ1dDeKcb957jf79lhBeWTN4HCh6my7dIeAzy0flEi8fXE0F9A5axsqmGhH1ujdTNUMgZnaybT+4IVITLeA7grXMV39GColYVLDqE7BI/BUZ8Yhg/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=j/s4kREJ; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1772979540; c=relaxed/simple;
+	bh=aN+TJ0bdEJP01M4g58sWIxCutZmYQdd7GdmFLv2XgmU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=G5B1lnNkTUafF2TM9Kjw0kpCz6Xmwku/GLsUL+stbPoiGVuFKYlYm3BqtQtVzXutj+Y/F+5dRPx3rK3E4wZsZOPzZCP09KBum+uLvfpdqwV3DfkO6+CP59yW0gzKMq8Qn0OdQQLLullSyda2RMardmhfFKUBp7j3mKzBkcAnIbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f5O/KUq8; arc=none smtp.client-ip=209.85.161.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="j/s4kREJ"
-Received: from github.com (hubbernetes-node-9bb3874.ac4-iad.github.net [10.52.162.37])
-	by smtp.github.com (Postfix) with ESMTPA id 8195A400009
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2026 06:31:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1772976690;
-	bh=dfVhA0CUQI1m2x0KpQn7I3TL7zPPuZYYlyJkYH1IZzI=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=j/s4kREJG/hp+e/q0jou61oFzq4QJr34d1Hnwnv+pMnpeVzV9YvDaAq9ePLbK5Yn4
-	 gYB/DNerMIhttY4E6InkY2MBmcBkbKavjsz9Y+nwpRkB7gqgmePcap7VLeJOqa+fW5
-	 pStlJ2mVVrSlYid4p+cxfJA73khEeM4/Bb8W9g9c=
-Date: Sun, 08 Mar 2026 06:31:30 -0700
-From: Martin <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1063221/000000-a3b3f1@github.com>
-Subject: [bluez/bluez] ed9e97: shared/gatt: make secondary discovery optional
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f5O/KUq8"
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-67934c83063so4153990eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Mar 2026 07:18:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772979538; x=1773584338; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=DdaeBH1Rdm6hAV49CDyhUZbu/tTBP5IMDhnUSHMJ4iU=;
+        b=f5O/KUq8rTKP0JHGYMfdeSgMNQqY0Ows04o3I73tX2eLw8x2vUizbqmAWMTKyx4xi9
+         uVpB9asyrQ2JtH/qYOH0W0xYW54mKTxK0Gnz7ufl43P+9qpbVAxLHEAgJRZCDBCHJt/8
+         Wj20wuN9MfhTLlPWC266EU8/6G0Spf7tGge+HXkommcmJJi/2MPk0InUZMb827mSDM4d
+         G14SRhGnCUyBYYbWNGQWSJ8f9aHDvoDL/+p6tIQPsy99yyubY3Wl2tP21cLir+ZA7RRP
+         6euQe9/D7RfOeYDRfkG9LBoQouGW7Ll1u/gSwabuiFdE+2kNrKQMUNlO7JJSO+Ta4gAk
+         jDcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772979538; x=1773584338;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DdaeBH1Rdm6hAV49CDyhUZbu/tTBP5IMDhnUSHMJ4iU=;
+        b=eKMBclRpSNXxMOu9xHT9hqQ+yam8cakpSdLiAoaxhxPFaMya+i+3t4BIE2hPLw/mRx
+         nbyQTKnQuVXRPTkSlFw7E1DVpTpP8A3mczMH7x73S8zPslEykFGU5aIQd3ancFTXA4w2
+         g2istT5u/oOnG+50Ns8bLjJDAmz+ZZIVDlZCK/i/ySWqWSXXpD3VBfdaAEDLI+7h1vIv
+         ZC4g4Q/6SlYuSe3KQ5QTjkzK/W8jUuDHOHgbdQOnN7S81E+a0B4ExiGyuesxGQNI9np+
+         4xC/vSeoYiKtCIDriWqIrZFDbMp5PuzefQDLK/ImyIpq3VEtDOBnAcQt2x2eYamVE4ZD
+         Qv+A==
+X-Gm-Message-State: AOJu0YzKwaXxig2LpYTnJok/ailhBKJE3tMAIajeh3w6o0fC73l+q+qY
+	VB5PK7rqX7z9HxONNam6qlNl4jsxoPg4sPmdP+c8PVsKZyKYap35+2ynjuT84w==
+X-Gm-Gg: ATEYQzxWQ0dpjP6+RwEHkIWvkpCyxXtMGOo7mUrYzzgci2FVaqS/9vnIr2AdPrSnGuf
+	9v8wrSYcB0hOb+/FKoWugRESR9HlGUDDLbINAOUlTilrbZQ24rtw1TX5lPheV1dNNjhJa3eADCV
+	RfrHsCBF04DwPkc+wg7q311598C5CERxSexAhxrG9Wh+WUoufHy7MgC6mXUMKIx8oJnSCVsjDv7
+	jW5HMtmwkHCMaDiLUY6brebXq/OolLDFWcCKW1iRoU6GEumDWPBW3J/BZKy4J0afgssoFtThBbF
+	TDHuFryDAXpOiMlwbhoR0vQBvf3rF+yFrq7cG39TQBm0dRRU/CAGbQlEyxO/cvbrOLt//vRmbA1
+	IhZT4LEjwgvAM7AkZxP4lYGGIIpunlITKEe3nSYU5iYibOxv+tbeKIjOrOOwSfvcY5oB7ZBIuUF
+	yX9S7sSfAZPP//nSNNo0fieHwSquFV9A==
+X-Received: by 2002:a05:6820:4987:b0:67a:2305:5e4f with SMTP id 006d021491bc7-67b9bc6c990mr4156141eaf.13.1772979537953;
+        Sun, 08 Mar 2026 07:18:57 -0700 (PDT)
+Received: from [172.17.0.2] ([52.165.213.180])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-416e688d587sm6361356fac.19.2026.03.08.07.18.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Mar 2026 07:18:57 -0700 (PDT)
+Message-ID: <69ad8551.050a0220.661bc.4259@mx.google.com>
+Date: Sun, 08 Mar 2026 07:18:57 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7128471520723303872=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, martinbts@gmx.net
+Subject: RE: Nintendo Switch 2 support
+In-Reply-To: <20260308124745.19248-2-martinbts@gmx.net>
+References: <20260308124745.19248-2-martinbts@gmx.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1063221
-  Home:   https://github.com/bluez/bluez
-  Commit: ed9e97a7135c45d7ae2ff9ca6acff35a3c15b08e
-      https://github.com/bluez/bluez/commit/ed9e97a7135c45d7ae2ff9ca6acff=
-35a3c15b08e
-  Author: Martin BTS <martinbts@gmx.net>
-  Date:   2026-03-08 (Sun, 08 Mar 2026)
+--===============7128471520723303872==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M src/shared/gatt-client.c
-    M src/shared/gatt-client.h
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  shared/gatt: make secondary discovery optional
+Dear submitter,
 
-BREAKING CHANGE!
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1063221
 
-* Remove gatt_client_init from bt_gatt_client_new. Consumers must now
-  call gatt_client_init themselves!
-* Remove mtu paramter from bt_gatt_client_new
-* Rename gatt_client_init to bt_gatt_client_init and make it public
-* Introduce a new bt_gatt_client field "skip_secondary", default false
-* Introduce public skip_secondary setter
-* If true, skip_secondary makes discover_primary_cb goto done
-  (instead of discoverying secondary services)
+---Test result---
 
+Test Summary:
+CheckPatch                    PENDING   0.26 seconds
+GitLint                       PENDING   0.28 seconds
+BuildEll                      PASS      21.24 seconds
+BluezMake                     PASS      642.66 seconds
+MakeCheck                     PASS      18.67 seconds
+MakeDistcheck                 PASS      246.70 seconds
+CheckValgrind                 PASS      298.72 seconds
+CheckSmatch                   PASS      364.69 seconds
+bluezmakeextell               PASS      182.79 seconds
+IncrementalBuild              PENDING   0.24 seconds
+ScanBuild                     PASS      1039.90 seconds
 
-  Commit: dee5a13a6f8c5583120287138fe6af9fbdfcb9df
-      https://github.com/bluez/bluez/commit/dee5a13a6f8c5583120287138fe6a=
-f9fbdfcb9df
-  Author: Martin BTS <martinbts@gmx.net>
-  Date:   2026-03-08 (Sun, 08 Mar 2026)
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Changed paths:
-    M src/device.c
-    M src/device.h
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Log Message:
-  -----------
-  device: allow skip secondary discovery
-
-* Introduce new btd_device field skip_secondary
-* Introduce public skip_secondary setter
-* Use new gatt client interface to push device->skip_secondary into
-  device->client->skip_secondary after new() but before init()
-* Doing secondary service discovery is now a device property that can be
-  set by device specific plugins.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: 973d13fd67acdc923b8553f3023b523a736be937
-      https://github.com/bluez/bluez/commit/973d13fd67acdc923b8553f3023b5=
-23a736be937
-  Author: Martin BTS <martinbts@gmx.net>
-  Date:   2026-03-08 (Sun, 08 Mar 2026)
 
-  Changed paths:
-    M peripheral/gatt.c
-    M tools/btgatt-client.c
-    M unit/test-bap.c
-    M unit/test-gatt.c
-    M unit/test-gmap.c
-    M unit/test-mcp.c
-    M unit/test-micp.c
-    M unit/test-tmap.c
-
-  Log Message:
-  -----------
-  fixup: propagate new gatt interface through codebase
-
-In theory we are supposed to create one patch for each affected directory=
-,
-but this patch is the immediate result of splitting gatt_client_init
-from bt_gatt_client_new.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 02b54f08aa0e1cbd835ca02ab8df416bc695b9e9
-      https://github.com/bluez/bluez/commit/02b54f08aa0e1cbd835ca02ab8df4=
-16bc695b9e9
-  Author: Martin BTS <martinbts@gmx.net>
-  Date:   2026-03-08 (Sun, 08 Mar 2026)
-
-  Changed paths:
-    M src/device.c
-    M src/device.h
-
-  Log Message:
-  -----------
-  device: Rename set_alias to btd_device_set_alias()
-
-Renamed set_alias is exposed, so that plugins and others may set
-the device alias progammatically. This is usefule for devices whose
-Bluetooth name is generic (e.g. a bare BD addess, or literally
-"DeviceName") but whose identity is known to the plugin after
-protocol-level interrogation.
-
-The signature was changed. The first parameter,
-GDBusPendingPropertySet id was dropped and
-g_dbus_pending_property_success moved to dev_property_set_alias().
-
-
-  Commit: 16218ec33d4f0b397733bb4851354f94dbb92384
-      https://github.com/bluez/bluez/commit/16218ec33d4f0b397733bb4851354=
-f94dbb92384
-  Author: Martin BTS <martinbts@gmx.net>
-  Date:   2026-03-08 (Sun, 08 Mar 2026)
-
-  Changed paths:
-    M src/dbus-common.c
-
-  Log Message:
-  -----------
-  dbus-common: Add Gaming appearance class (0x2a)
-
-Bluetooth 5.0+ defines appearance category 0x2a for gaming devices
-(generic gaming, handheld game console, game controller, etc.).
-Map it to "input-gaming" so the correct icon is exposed over D-Bus.
-
-
-  Commit: a3b3f12fa6eabdb7b7e3e8438d24d608bfd55043
-      https://github.com/bluez/bluez/commit/a3b3f12fa6eabdb7b7e3e8438d24d=
-608bfd55043
-  Author: Martin BTS <martinbts@gmx.net>
-  Date:   2026-03-08 (Sun, 08 Mar 2026)
-
-  Changed paths:
-    M Makefile.plugins
-    A plugins/switch2.c
-
-  Log Message:
-  -----------
-  plugins/switch2: Add Nintendo Switch 2 Controller plugin
-
-Add a BLE plugin for the Nintendo Switch 2 controllers.
-
-Currently this is only developed, tried and tested with the Nintendo
-Switch 2 Pro Controller (ProCon2).
-
-The controller uses a vendor-specific GATT service for all HID
-communication.  The plugin discovers the service, binds its
-characteristics, and runs an ACK-driven initialization state machine
-that sends 13 configuration commands one at a time (each waiting for
-the controller's ACK notification before proceeding).
-
-The controller requires BT_SECURITY_LOW =E2=80=94 any SMP pairing attempt=
-
-causes it to respond with "Pairing Not Supported" and drop the link.
-
-After initialization completes, input notifications are forwarded to
-userspace via a uhid device that presents a standard gamepad HID
-report descriptor.  A back channel allows the host to send commands
-back to the controller (e.g. rumble, LED control).
-
-
-Compare: https://github.com/bluez/bluez/compare/ed9e97a7135c%5E...a3b3f12=
-fa6ea
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+--===============7128471520723303872==--
