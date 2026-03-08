@@ -1,47 +1,47 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70894370D62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D295A375F9A
 	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2026 12:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772974107; cv=none; b=HrcZXTflzFxSA4uzSqkfD3mloFedu1FC1NMFpO4hghKxO5V+DO+zDhE5A1MvIcGyp9qauIlv4/WWq70xrEQH1DR4EY1nYaZF/4C/9xXQpFPlWlV/fneusthc7BQU9/y2Mq2gHFrMOwm9pMg0xWErP/XKuOcRlvB1jtKepqmpMC4=
+	t=1772974107; cv=none; b=sWXUq8oHtyBp9L5ZGbUdvax+gGZBKkAWpzMhGGLmp07nRMcb+ERP9OKbv1t7e+jfQJvcuv6bQzg/gzAwigeMXYJDC44al1U9Et15QjBTYl06Z3Hwfhwjt4b2PLHVsY+d16sHEue1i7ThFcCAjyfpYohbY4/zCszBprN+fDnNd90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772974107; c=relaxed/simple;
-	bh=1eUJeYG0CVB+h6Yf3pErieNNFEG42C60JJADElcMeEQ=;
+	bh=zh+ndFA8lyepihhwKgaHvGEOwu9HdpPouo4bIKrShA4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=obDiG9LF1Wasp4qeaAA+csAJIGTea0Ru6gXVFL5MdJ4BkRgm22JjCnIyy45D/UGtiLk9qQyEPV2wi+qbnfqJfA08pPQoyclUEdPKM6Q0viRRWx07N0Ad5U0ymu+6QcFuXZ7PwAZQXe0jqS+ygONm/zL0gA8uy6Y9sFg4uR/+Vdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b=QmIN7eLL; arc=none smtp.client-ip=212.227.15.18
+	 MIME-Version; b=XrYrVbILq3R36r0whoOvOYgKJdr56PinlDlHEPhKlmuAxoOWvZhgFcjV3TyLd0zwcGUQ2q21HbPzRvZu44tNYPYWpk/m9DPR8qV6+1eV/82hrMGcZ6XEMFh/yDnMvfXIWJGONgUUSruY7NMmj3XUNk3czUkRsr88Uxe17ZVF+Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b=qFI+ZOLe; arc=none smtp.client-ip=212.227.15.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b="QmIN7eLL"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b="qFI+ZOLe"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1772974103; x=1773578903; i=martinbts@gmx.net;
-	bh=MDk0CEx99dnMaEwnBFA/ZNjp/u2aD5G4Bi9vq2Zf+u4=;
+	s=s31663417; t=1772974102; x=1773578902; i=martinbts@gmx.net;
+	bh=AgMrbxXHIQKquoY2iehxtp8/wp2TdsvyxPTbYYNn07Q=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=QmIN7eLLY8ARwo+ZSwGB1cNm6JZ+5OdxEt/hIvPTDBVq45sFTRGQgFjytmL50rzM
-	 LgCOB07F89EIVtwWxN8wnF47Vz1Dy2mZCmCsRTw7c0G3fVU6IFmk3UAwc4bROw2lx
-	 BWfqhRzr3b05rNcHcZyjElnZ32PcjBouqLkmc8Em3HkdMoDbWh/yWSo9GF5ff/Tvz
-	 rd5i3Std8IQYHfcKCiq1PG+XOq5mXbJ6mPqJIdHBhw/T1O0g5ecUVqW7F/WOF6vYK
-	 9UXY9X4EDLw4ahfubYiT3hkmhWW8YfUXSpN0VvbNT5HkJBTYovyJDCIfPxu+KgwhC
-	 6OzIhDwVOmOVa95LVw==
+	b=qFI+ZOLePTbNweA7DSVhS102ABzC3D6W8VDtEBXoNKhnkmsOgZl60tcM22oQaQKn
+	 k+HDQ+Hg00MvDSsaaj1ANCPlo1/lObMf3ismoXFdyKQU334kTVlSo+Icy5g89ofip
+	 9/qnLwL/5APJN0UaX2NQp8XwkpwgITIwQMCd3cnzUO2kcyUJuCh7O7dO5vm1B11XB
+	 oFwmvopLfng6KoDdAACl0vPoqgWvTl6mMAAG2h9xjxT0wLm5RCf5dG5j4MHY7g5qB
+	 PUi02FnwailFC8ZsvwPaaa0sGZ2T5ZrwnzjlbRWGxSHp2v9qInf7xJvMVzR30MtXw
+	 TGW/2T1wmsPVQ+75qA==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from client.hidden.invalid by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MrhQ6-1vKbwo3rKW-00gCyX; Sun, 08
- Mar 2026 13:48:23 +0100
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mz9Yv-1vmLhN2lTX-017s58; Sun, 08
+ Mar 2026 13:48:22 +0100
 From: Martin BTS <martinbts@gmx.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: hadess@hadess.net,
 	luiz.dentz@gmail.com,
 	vi@endrift.com,
 	Martin BTS <martinbts@gmx.net>
-Subject: [PATCH BlueZ v2 5/6] dbus-common: Add Gaming appearance class (0x2a)
-Date: Sun,  8 Mar 2026 13:47:42 +0100
-Message-ID: <20260308124745.19248-6-martinbts@gmx.net>
+Subject: [PATCH BlueZ v2 4/6] device: Rename set_alias to  btd_device_set_alias()
+Date: Sun,  8 Mar 2026 13:47:41 +0100
+Message-ID: <20260308124745.19248-5-martinbts@gmx.net>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260308124745.19248-1-martinbts@gmx.net>
 References: <20260308124745.19248-1-martinbts@gmx.net>
@@ -51,108 +51,163 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:n0+suxDZpry162JXdMeYQEMhE4yFbDU7ejowwhJyLsXpQscD5hv
- RbEAgIYF0CQDqRadHexh9dZ/xUEqhzKZWT8bd9khfy9yJCip6o3qWqVkgmdAEMWoyarJnHV
- W4NOBx4Hys5YU6pOnrZFOlH2ssGE8uLWp5U/AHJJsLCPjw11uQNFCBajLyRpZwJc/h/xZwd
- 7C5T/2HZ1STjJ2AJYEjYQ==
+X-Provags-ID: V03:K1:tpI7oKZY4xvCSnHMeR2XnmPal14zpUKzUa0r5A2/TFACd6Vxd1S
+ htXs4msQSvzbVamORmsoBLeBkQs3JOtBkk93X1rbfKsT6yG4bN4h/s8CDoTJmo3UAxhcDG0
+ Biswuf4RdI2UtEBo7X/VYM5BPmQUsB02DboU/E2WNvvTtk/vffh2+D59xbwJIUGK0ebFf/t
+ oQaZfdVPgoUyfnTYFU5Ww==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:freltJ8P3u8=;SA1LHc60Tu+HW9DLCNYDytIHXgE
- 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
- g3+XZL32mtNoGuinSmYanMQGaGLNzNij0Yn8QX
+UI-OutboundReport: notjunk:1;M01:P0:W+2EE0SN6fU=;56HW0/Hhn/J+PRn+hpyiayrInD2
+ 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
+ VxKAii70=
 
-Bluetooth 5.0+ defines appearance category 0x2a for gaming devices
-(generic gaming, handheld game console, game controller, etc.).
-Map it to "input-gaming" so the correct icon is exposed over D-Bus.
+Renamed set_alias is exposed, so that plugins and others may set
+the device alias progammatically. This is usefule for devices whose
+Bluetooth name is generic (e.g. a bare BD addess, or literally
+"DeviceName") but whose identity is known to the plugin after
+protocol-level interrogation.
+
+The signature was changed. The first parameter,
+GDBusPendingPropertySet id was dropped and
+g_dbus_pending_property_success moved to dev_property_set_alias().
 =2D--
- src/dbus-common.c | 2 ++
- 1 file changed, 2 insertions(+)
+ src/device.c | 15 +++++----------
+ src/device.h |  1 +
+ 2 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/src/dbus-common.c b/src/dbus-common.c
-index 5e2c83d52..42539116a 100644
-=2D-- a/src/dbus-common.c
-+++ b/src/dbus-common.c
-@@ -144,6 +144,8 @@ const char *gap_appearance_to_icon(uint16_t appearance=
-)
- 			return "scanner";
- 		}
- 		break;
-+	case 0x2a: /* Gaming =E2=80=94 Assigned Numbers, section 2.6.2 */
-+		return "input-gaming";
- 	}
+diff --git a/src/device.c b/src/device.c
+index 4c2c0b635..ac1b7e88e 100644
+=2D-- a/src/device.c
++++ b/src/device.c
+@@ -1063,17 +1063,12 @@ static gboolean dev_property_get_alias(const GDBus=
+PropertyTable *property,
+ 	return TRUE;
+ }
 =20
- 	return NULL;
+-static void set_alias(GDBusPendingPropertySet id, const char *alias,
+-								void *data)
++void btd_device_set_alias(struct btd_device *device, const char *alias)
+ {
+-	struct btd_device *device =3D data;
+-
+ 	/* No change */
+ 	if ((device->alias =3D=3D NULL && g_str_equal(alias, "")) ||
+-					g_strcmp0(device->alias, alias) =3D=3D 0) {
+-		g_dbus_pending_property_success(id);
++					g_strcmp0(device->alias, alias) =3D=3D 0)
+ 		return;
+-	}
+=20
+ 	g_free(device->alias);
+ 	device->alias =3D g_str_equal(alias, "") ? NULL : g_strdup(alias);
+@@ -1082,8 +1077,6 @@ static void set_alias(GDBusPendingPropertySet id, co=
+nst char *alias,
+=20
+ 	g_dbus_emit_property_changed(dbus_conn, device->path,
+ 						DEVICE_INTERFACE, "Alias");
+-
+-	g_dbus_pending_property_success(id);
+ }
+=20
+ static void dev_property_set_alias(const GDBusPropertyTable *property,
+@@ -1101,7 +1094,9 @@ static void dev_property_set_alias(const GDBusProper=
+tyTable *property,
+=20
+ 	dbus_message_iter_get_basic(value, &alias);
+=20
+-	set_alias(id, alias, data);
++	btd_device_set_alias(data, alias);
++
++	g_dbus_pending_property_success(id);
+ }
+=20
+ static gboolean dev_property_exists_class(const GDBusPropertyTable *prope=
+rty,
+diff --git a/src/device.h b/src/device.h
+index 19f270388..ab9654a64 100644
+=2D-- a/src/device.h
++++ b/src/device.h
+@@ -22,6 +22,7 @@ char *btd_device_get_storage_path(struct btd_device *dev=
+ice,
+=20
+=20
+ void btd_device_device_set_name(struct btd_device *device, const char *na=
+me);
++void btd_device_set_alias(struct btd_device *device, const char *alias);
+ void btd_device_set_skip_secondary(struct btd_device *device, bool skip);
+ void device_store_cached_name(struct btd_device *dev, const char *name);
+ void device_get_name(struct btd_device *device, char *name, size_t len);
 =2D-=20
 2.47.3
 
