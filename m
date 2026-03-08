@@ -1,126 +1,92 @@
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC0B16F288
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2026 14:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31AD325771
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2026 14:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772979540; cv=none; b=hbtq5IDX5WdmIXHp5eGQFJjrj6+hsf2GwdDLnJKCRPzKek+g9nd2Ku4ns8uvJrv8vx20GIIea7zt03Nak7z8GaJ4ci8asKle/BGxMi4EYe6FUn0qrEDON03Zm1eKNQz2MOIRd8NR4IFmJ7+b3qg3xQBqOfID+J72BA+EuiaoLrI=
+	t=1772981780; cv=none; b=OfR4xWp12V173CemjQ+VhHfujRbqrPN90gJLh6oeb+qo0+4904nz0QK36/xv716LrJRWIW6QM7pf/WR7H2mzk7uEObGhggTURon7OAZkRY/qKYtw5RqX/5ihdkwx/1Acbc3SShw1q9HlfIa9WsLi3a/935bHXIKiMuIHbg1GQZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772979540; c=relaxed/simple;
-	bh=aN+TJ0bdEJP01M4g58sWIxCutZmYQdd7GdmFLv2XgmU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=G5B1lnNkTUafF2TM9Kjw0kpCz6Xmwku/GLsUL+stbPoiGVuFKYlYm3BqtQtVzXutj+Y/F+5dRPx3rK3E4wZsZOPzZCP09KBum+uLvfpdqwV3DfkO6+CP59yW0gzKMq8Qn0OdQQLLullSyda2RMardmhfFKUBp7j3mKzBkcAnIbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f5O/KUq8; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772981780; c=relaxed/simple;
+	bh=u8WdYIN+m0Movn4cX56lpeHYTjXLGH0jBvQDWCOlTdw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tip5p325ianr8yv8P4tkwA1Lc/Qv6YHlgQibVpe73D+4nJULNIfaRYfzcLOxlccgTZL0FSCAma27seLUes9Jq5FplFkavUoDaWwRn32eNqQQVfzbzAx4OgmqBO+PtWtDNDe4Y+MHjJIA0acWnbVsrm6fFmHSrhndaomKa75Z1hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X3AzcP4f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f5O/KUq8"
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-67934c83063so4153990eaf.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Mar 2026 07:18:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772979538; x=1773584338; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DdaeBH1Rdm6hAV49CDyhUZbu/tTBP5IMDhnUSHMJ4iU=;
-        b=f5O/KUq8rTKP0JHGYMfdeSgMNQqY0Ows04o3I73tX2eLw8x2vUizbqmAWMTKyx4xi9
-         uVpB9asyrQ2JtH/qYOH0W0xYW54mKTxK0Gnz7ufl43P+9qpbVAxLHEAgJRZCDBCHJt/8
-         Wj20wuN9MfhTLlPWC266EU8/6G0Spf7tGge+HXkommcmJJi/2MPk0InUZMb827mSDM4d
-         G14SRhGnCUyBYYbWNGQWSJ8f9aHDvoDL/+p6tIQPsy99yyubY3Wl2tP21cLir+ZA7RRP
-         6euQe9/D7RfOeYDRfkG9LBoQouGW7Ll1u/gSwabuiFdE+2kNrKQMUNlO7JJSO+Ta4gAk
-         jDcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772979538; x=1773584338;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DdaeBH1Rdm6hAV49CDyhUZbu/tTBP5IMDhnUSHMJ4iU=;
-        b=eKMBclRpSNXxMOu9xHT9hqQ+yam8cakpSdLiAoaxhxPFaMya+i+3t4BIE2hPLw/mRx
-         nbyQTKnQuVXRPTkSlFw7E1DVpTpP8A3mczMH7x73S8zPslEykFGU5aIQd3ancFTXA4w2
-         g2istT5u/oOnG+50Ns8bLjJDAmz+ZZIVDlZCK/i/ySWqWSXXpD3VBfdaAEDLI+7h1vIv
-         ZC4g4Q/6SlYuSe3KQ5QTjkzK/W8jUuDHOHgbdQOnN7S81E+a0B4ExiGyuesxGQNI9np+
-         4xC/vSeoYiKtCIDriWqIrZFDbMp5PuzefQDLK/ImyIpq3VEtDOBnAcQt2x2eYamVE4ZD
-         Qv+A==
-X-Gm-Message-State: AOJu0YzKwaXxig2LpYTnJok/ailhBKJE3tMAIajeh3w6o0fC73l+q+qY
-	VB5PK7rqX7z9HxONNam6qlNl4jsxoPg4sPmdP+c8PVsKZyKYap35+2ynjuT84w==
-X-Gm-Gg: ATEYQzxWQ0dpjP6+RwEHkIWvkpCyxXtMGOo7mUrYzzgci2FVaqS/9vnIr2AdPrSnGuf
-	9v8wrSYcB0hOb+/FKoWugRESR9HlGUDDLbINAOUlTilrbZQ24rtw1TX5lPheV1dNNjhJa3eADCV
-	RfrHsCBF04DwPkc+wg7q311598C5CERxSexAhxrG9Wh+WUoufHy7MgC6mXUMKIx8oJnSCVsjDv7
-	jW5HMtmwkHCMaDiLUY6brebXq/OolLDFWcCKW1iRoU6GEumDWPBW3J/BZKy4J0afgssoFtThBbF
-	TDHuFryDAXpOiMlwbhoR0vQBvf3rF+yFrq7cG39TQBm0dRRU/CAGbQlEyxO/cvbrOLt//vRmbA1
-	IhZT4LEjwgvAM7AkZxP4lYGGIIpunlITKEe3nSYU5iYibOxv+tbeKIjOrOOwSfvcY5oB7ZBIuUF
-	yX9S7sSfAZPP//nSNNo0fieHwSquFV9A==
-X-Received: by 2002:a05:6820:4987:b0:67a:2305:5e4f with SMTP id 006d021491bc7-67b9bc6c990mr4156141eaf.13.1772979537953;
-        Sun, 08 Mar 2026 07:18:57 -0700 (PDT)
-Received: from [172.17.0.2] ([52.165.213.180])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-416e688d587sm6361356fac.19.2026.03.08.07.18.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Mar 2026 07:18:57 -0700 (PDT)
-Message-ID: <69ad8551.050a0220.661bc.4259@mx.google.com>
-Date: Sun, 08 Mar 2026 07:18:57 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7128471520723303872=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X3AzcP4f"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B9D89C2BCB0
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2026 14:56:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772981779;
+	bh=u8WdYIN+m0Movn4cX56lpeHYTjXLGH0jBvQDWCOlTdw=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=X3AzcP4f9/dg7rgxKwExqa73EBIBQI8UwWjeJZym5s+cWlqFRMghL64jmz3M6P/5T
+	 02010BEnGfAPCLjL5pNSmsjSXsnF/tJNsmpKXxj3A0KbLg8I3KYxo0cc+OCABr3VsN
+	 e2TR+H+AlyKwT50NXYY8xt4J0nTFUZ1MyR4nKWzvTuJl3VKf3hBRK2oFsD3DyYiKu7
+	 acGHHwDSigN+ygTXDF58JPDkjZX9/DK86sg0bvdtFW5EM59b3GRST9snRkv5BB8kAw
+	 eH+59QoLsqJ36YbfxH7SLmWwGmt930L7UAqL4++oENVNXOmfbC2UDZcH7zSzTgHbPV
+	 94sNoBF7t6yqA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id B28A9C41612; Sun,  8 Mar 2026 14:56:19 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220344] Intel AX211 bluetooth randomly disconnects and
+ reconnects, started after kernel update
+Date: Sun, 08 Mar 2026 14:56:19 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: guyrutenberg@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-220344-62941-NrflAJrt9n@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220344-62941@https.bugzilla.kernel.org/>
+References: <bug-220344-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, martinbts@gmx.net
-Subject: RE: Nintendo Switch 2 support
-In-Reply-To: <20260308124745.19248-2-martinbts@gmx.net>
-References: <20260308124745.19248-2-martinbts@gmx.net>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============7128471520723303872==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220344
 
-This is automated email and please do not reply to this email!
+Guy Rutenberg (guyrutenberg@gmail.com) changed:
 
-Dear submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |guyrutenberg@gmail.com
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1063221
+--- Comment #8 from Guy Rutenberg (guyrutenberg@gmail.com) ---
+Hi,
 
----Test result---
+I have the exact same issue on similar hardware - Lenovo T14 Gen4. It start=
+ed a
+while ago (more than a year). The issue manifests itself only in certain
+locations: The same computer and bluetooth headset work perfectly fine in my
+office, but I get the hiccups and disconnects at home.
 
-Test Summary:
-CheckPatch                    PENDING   0.26 seconds
-GitLint                       PENDING   0.28 seconds
-BuildEll                      PASS      21.24 seconds
-BluezMake                     PASS      642.66 seconds
-MakeCheck                     PASS      18.67 seconds
-MakeDistcheck                 PASS      246.70 seconds
-CheckValgrind                 PASS      298.72 seconds
-CheckSmatch                   PASS      364.69 seconds
-bluezmakeextell               PASS      182.79 seconds
-IncrementalBuild              PENDING   0.24 seconds
-ScanBuild                     PASS      1039.90 seconds
+I've already tried everything Tal wrote down as well. I've tried various
+kernels and downgraded the iwlwifi firmware all the way back to Dec 2022 and
+couldn't find the version it worked properly with.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+I'm running kernel 6.18.15+deb14-amd64, Debian Unstable.
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+--=20
+You may reply to this email to add a comment.
 
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7128471520723303872==--
+You are receiving this mail because:
+You are the assignee for the bug.=
