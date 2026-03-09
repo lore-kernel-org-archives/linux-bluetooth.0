@@ -1,92 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31AD325771
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2026 14:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19DA1E9919
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Mar 2026 01:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772981780; cv=none; b=OfR4xWp12V173CemjQ+VhHfujRbqrPN90gJLh6oeb+qo0+4904nz0QK36/xv716LrJRWIW6QM7pf/WR7H2mzk7uEObGhggTURon7OAZkRY/qKYtw5RqX/5ihdkwx/1Acbc3SShw1q9HlfIa9WsLi3a/935bHXIKiMuIHbg1GQZ4=
+	t=1773021480; cv=none; b=FWHmJBNgXEMBFu2jH1dRHbM7FiWpF7AR5zld9VaFxiL8x1HC+83nsRkz5sPmTUS8EB9e774OTniRpvkKE5/honmeYqKc7xjj0KnDMGh1VKjV8nVYig1wvvbVYtSQWGvqpH3vkcV96RIUyVOGM63e+vQABZCRSJ7ZwWRpiESGT1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772981780; c=relaxed/simple;
-	bh=u8WdYIN+m0Movn4cX56lpeHYTjXLGH0jBvQDWCOlTdw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tip5p325ianr8yv8P4tkwA1Lc/Qv6YHlgQibVpe73D+4nJULNIfaRYfzcLOxlccgTZL0FSCAma27seLUes9Jq5FplFkavUoDaWwRn32eNqQQVfzbzAx4OgmqBO+PtWtDNDe4Y+MHjJIA0acWnbVsrm6fFmHSrhndaomKa75Z1hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X3AzcP4f; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773021480; c=relaxed/simple;
+	bh=02mtRVK1gxyrdbCVBqJ6nILDjTF8541Z9I2rQ32RhrY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iQousMj4BDPEW4nKq5nI3/vWg/BFmxUVgXt/BvQ9UgagzT/kSgAXCRdfeWNG72FrKNu92Pi5hUMx7mJswN/AKP9he2EGz/gcyNjhHIZSdfAbaRPrjj3mKn2970CIzpKhkJqC/7WHk7Xmm8uvv+odgKMVx8MgnMSYhN9w4aRBRUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cv3F+06M; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X3AzcP4f"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B9D89C2BCB0
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2026 14:56:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772981779;
-	bh=u8WdYIN+m0Movn4cX56lpeHYTjXLGH0jBvQDWCOlTdw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=X3AzcP4f9/dg7rgxKwExqa73EBIBQI8UwWjeJZym5s+cWlqFRMghL64jmz3M6P/5T
-	 02010BEnGfAPCLjL5pNSmsjSXsnF/tJNsmpKXxj3A0KbLg8I3KYxo0cc+OCABr3VsN
-	 e2TR+H+AlyKwT50NXYY8xt4J0nTFUZ1MyR4nKWzvTuJl3VKf3hBRK2oFsD3DyYiKu7
-	 acGHHwDSigN+ygTXDF58JPDkjZX9/DK86sg0bvdtFW5EM59b3GRST9snRkv5BB8kAw
-	 eH+59QoLsqJ36YbfxH7SLmWwGmt930L7UAqL4++oENVNXOmfbC2UDZcH7zSzTgHbPV
-	 94sNoBF7t6yqA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id B28A9C41612; Sun,  8 Mar 2026 14:56:19 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cv3F+06M"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-506aa685d62so61333661cf.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Mar 2026 18:57:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773021478; x=1773626278; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Pn+8Y12A59zX2llAXekOTAY5lIpuNk+pczDLY6k+nc=;
+        b=Cv3F+06McxyLqFXGaAfBiNG6Yz48z391xIG0dYtgOle1ggXx0Nz4Hv395iG9SuX00u
+         oHcHaVWhNwzpYmbyoTMREtoZLQVJ4ln+Ssq6VvGByQE3hrI0jk2MUcEdi2rAbXlRsDGe
+         /QBC3OrkLqAm1BVuiw97af0JLk0ku4y0syMiGOeHvrWpnfkh1vbfZu0BxLCL9vRDbgmf
+         c8kGGxb6tJfE40iPKORoUWZUjvWTb6Q3A/fGcvW/o8xBDn2BncSR/UvF+mqumAJlsFWm
+         6cLbo67HU9F3Hc6MgpGn7APmcuCayO2VpsDnXtx++VVOsmKTBEIEJdLYwi//deKmVgeM
+         JE8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773021478; x=1773626278;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1Pn+8Y12A59zX2llAXekOTAY5lIpuNk+pczDLY6k+nc=;
+        b=bA1gsduqU2STbylBoxoLlAr8h8A5UvwGDupg2WJq//kmpE+rAh018zM1nypxKtWIS3
+         elYzNg0Nzx4dwDgE9Mh7ebJ5zbCl0Y2sqnScplOxvv1wyOOQoE5vsMYLrnn3v+tnXKPJ
+         OC+rxiBShdySEEJHzyxduQkR1sXw8gz4g2AW2JqH2GKLCwe34PX1ks8xWWIY1P+bkgym
+         saIf61p2gnSL8Lcfi40qsB8ctoE2ortw4kO8ads65oUdk8lkwiOb/S4e56CuFatbMHx0
+         GJzmXAzJtGQ25nSKbMTDtnoe0JyldDw04itwXPDYHL2+IZqPdhL/pgEmkBBs3D+CH2ja
+         Z6/Q==
+X-Gm-Message-State: AOJu0YwNpR4RMoOM7tIlL9m0GeQq1KvcbhbOYzn5YHRPikCt8bjlk7o+
+	ODPjXydDmEsYept7LMkEWt9WKPdA/Tl00mW753XqLXpyEJDBK4FQwpdIkBwkk/odqWA=
+X-Gm-Gg: ATEYQzxAkqIvvcCKEHXistV4SARbzcL7JpwWQLj9QXWs3VFNfYB74t49kG9QQ/Th0Cz
+	v7dXYwdSJltJWCOckTeTYt5X3b0uVwMOyU0x028TBGDR25OZo+sNjiwB1eq6ol6+FvBl0h12RlW
+	h1W+gPXS7spjHg01/kzSAM0H7zkDK5aSnsckyCDZCVT4FOHLUudtCXjd8+XDkHXxNJ2B63qW/ht
+	RS6lP0KaYnGhR5m7aNObh6Z8lgfDPodvtB8d0FGs5/Wg/nDRRdT35HOhtJA4KqP/vZTaq5ZDkdo
+	XEk/wv4YyGjgnJYkr3C3X6ohZ3iK4dSVhMNb36x9cLDQUM/ejMMxXCmegx9FqrXKjiaIOq+hxMi
+	anWHwYzu8Wc6r77wl735mJp02YlJ8VA6hMQlGWBfH72ReMjl1MCi9SmJxW5LjBc5fKxC2lVgKTn
+	6qEXFWAPxknUxyZ3m0tFumTCPOgaJZzLnC6eUx
+X-Received: by 2002:ac8:5cc9:0:b0:509:481:537c with SMTP id d75a77b69052e-50904815c2cmr76980981cf.45.1773021478344;
+        Sun, 08 Mar 2026 18:57:58 -0700 (PDT)
+Received: from gabes-pc ([184.145.175.55])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-508f6695738sm58616861cf.16.2026.03.08.18.57.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Mar 2026 18:57:58 -0700 (PDT)
+From: Gabriel Woloz <wolozgabriel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220344] Intel AX211 bluetooth randomly disconnects and
- reconnects, started after kernel update
-Date: Sun, 08 Mar 2026 14:56:19 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: guyrutenberg@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-220344-62941-NrflAJrt9n@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220344-62941@https.bugzilla.kernel.org/>
-References: <bug-220344-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc: Gabriel Woloz <wolozgabriel@gmail.com>
+Subject: [PATCH BlueZ 0/2] Add missing string to list of commands in mgmt
+Date: Sun,  8 Mar 2026 21:57:43 -0400
+Message-ID: <20260309015745.1720-1-wolozgabriel@gmail.com>
+X-Mailer: git-send-email 2.53.0.windows.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220344
+The MGMT_OP_HCI_CMD_SYNC (0x005B) command was not included in mgmt_op[] in mgmt.h - it prematurely stops at command number 0x005A. I added the command to the list under the name "HCI Cmd Sync".
 
-Guy Rutenberg (guyrutenberg@gmail.com) changed:
+Gabriel Woloz (2):
+  Added missing command "HCI Cmd Sync" to mgmt_op
+  lib/bluetooth/mgmt: Added missing command "HCI Cmd Sync" to mgmt_op
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |guyrutenberg@gmail.com
+ lib/bluetooth/mgmt.h | 1 +
+ 1 file changed, 1 insertion(+)
 
---- Comment #8 from Guy Rutenberg (guyrutenberg@gmail.com) ---
-Hi,
+-- 
+2.53.0.windows.1
 
-I have the exact same issue on similar hardware - Lenovo T14 Gen4. It start=
-ed a
-while ago (more than a year). The issue manifests itself only in certain
-locations: The same computer and bluetooth headset work perfectly fine in my
-office, but I get the hiccups and disconnects at home.
-
-I've already tried everything Tal wrote down as well. I've tried various
-kernels and downgraded the iwlwifi firmware all the way back to Dec 2022 and
-couldn't find the version it worked properly with.
-
-I'm running kernel 6.18.15+deb14-amd64, Debian Unstable.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
