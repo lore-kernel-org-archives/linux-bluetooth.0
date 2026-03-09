@@ -1,502 +1,163 @@
-Received: from mail-24422.protonmail.ch (mail-24422.protonmail.ch [109.224.244.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01A11714AA
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Mar 2026 04:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A037FBAC
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Mar 2026 04:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773028956; cv=none; b=K910WdIMJiLMcZRZqc7FropK0G5w53klCoK2WbWs+KulTLsG73wtfhXv+5EjHF3JcK999vfWdJoctiDGH6wosZ+cfSQbMmQdkz5NxiWF3GbZeDCljBsEhuLBb2e4ks1tFu5iDFrI3WV/WTq/2+SJrpPiq40gvg6MhD6sNfbhYuo=
+	t=1773030048; cv=none; b=rgdzjRZkjeKp2zI8N7YuIbaqKbWWbG13uJO5s4osRxbG+tJF/2/kBiPxOld4lCelaGcWlynH8K+m/kL9BtKnek641AEvGM2td42nR08Lex1jK3FQNIjizZ2Vub39CGs6AJMsC3ZxRmxGGja27F/EZFPolr+4anucJ049LpFNnNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773028956; c=relaxed/simple;
-	bh=y9NecwuF6z1eVqZ2FBqJ79rgNZTxsiEDhIcJoGI53CA=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mfyzcyg+xOuAkr+2MzGr8ppHtGJ9S5fIEJv75nw5yFp/jj40WGeGCnDVxuNAM+8WNffZFOHbDGW73MAd4Y8F3ahUk1v61GrkFuQX4jjmhcIpEoMPqC+rq2vO2vPW2crwlTwEFLxewcBxG/BR+90igZvGSmqpE53M546JK6neHpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za; spf=pass smtp.mailfrom=deschouwer.co.za; dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b=YrrjM/h/; arc=none smtp.client-ip=109.224.244.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deschouwer.co.za
+	s=arc-20240116; t=1773030048; c=relaxed/simple;
+	bh=4z2tSmK4sxq4ViL9m62E4Ad48l6KViinDXF8rt3E4rQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ri4f5GPrqIWB86CJiSX3C5djtbDKPnc/AAwopVxoMiaf/XqzVlWJXJ/pQSOsoK6JijbCp1D6Gy3EGrKAlSTeh92BV419FTAq9uGtcIlk9CPOO54vhXGMSCatUorBbN4Qafi6ZOL6YarKa3OcFRy/NoUAvJI+m7uxDLvINmq5TrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JHgf0y7C; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b="YrrjM/h/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=deschouwer.co.za;
-	s=protonmail2; t=1773028943; x=1773288143;
-	bh=hWlGh0RE6vMkMgBw78IeMEpKsvK+SeXjH9+DUMH0hlE=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=YrrjM/h/237oSAvLcAvabjWYtkS+hWcyvhlUL3hxvDV9i5PDoZ1nUDDgPj+y8m8ul
-	 d7jb0OTyM6MEZ9Shi3s9eTTpcrDYp7fJZvKqMnUUIfOc+uIpAD2qJomkB1Hks///Rk
-	 jtonLNy5kwcN9+lJMD2s37PvXqtfO7Bi6eKtUJ7Q0meKZd7IVXAwGOuLpjXXxai/ya
-	 bGRhBDmgDn51XApOuim+r5XiqW7B5qv2XRd3oqk2O2j906Xs0ej3FRAj92m2jnIdKp
-	 XWULz3LQVP8DuHUeifpJY1gLyNq8dNpavo60P9cWVq3kwHXEXrnZQbYzhhwWK5j+Kb
-	 O7o88tJkRM19w==
-Date: Mon, 09 Mar 2026 04:02:19 +0000
-To: linux-bluetooth@vger.kernel.org
-From: berend de schouwer <berend@deschouwer.co.za>
-Cc: berend de schouwer <berend@deschouwer.co.za>
-Subject: [PATCH BlueZ 1/1] Stop and start some actions on suspend and resume
-Message-ID: <20260309040136.159073-2-berend@deschouwer.co.za>
-In-Reply-To: <20260309040136.159073-1-berend@deschouwer.co.za>
-References: <20260309040136.159073-1-berend@deschouwer.co.za>
-Feedback-ID: 50941660:user:proton
-X-Pm-Message-ID: 573eec89512d0b0bea85681659a46fdc42656744
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHgf0y7C"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8cd7284782dso122654685a.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Mar 2026 21:20:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773030046; x=1773634846; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ISbbEVuzQ6YNa4x5+ojXUhnXmA1TprDOJZESwWF0YoA=;
+        b=JHgf0y7CDWZssjTNDWmmVAd0/Gb/G58+jXQpirGPC3W2fvg1GcDdkW32mgMMaon/9u
+         0LyqxnL5Du7/V+nEkzepRcBkLNswrJyvkcFw+WKAbDpORL4Fuwg1OdNTN4rrndjHLhgr
+         vB/2yoMTbbsLe2kZmLb7tMZ5iowYBvP9VxDONIXB9UxZT6IJldVmP7ZosmAJwHVHtPIP
+         Lot/4v/Tf/CyfwnzVtS6wvHP2452J5wS5sSRvEpXGZsjIUassT8PUGZJ/eUvKlPkXIsh
+         nFK1CkY53A9arzWlydIRNv9I2mZheIvs8FsL2zuDqKZr6dJoxbsT3nQK9hvUYUOyOmHw
+         PrwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773030046; x=1773634846;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ISbbEVuzQ6YNa4x5+ojXUhnXmA1TprDOJZESwWF0YoA=;
+        b=AcOCsgKCAWDr2M6GcUJLnjtDZqw5gb5dIdHsUSp4KHBQhrfaSblO/SuQx0cCR2ZnbX
+         Jo6GEGtzoEj4gzSIAl1I5k9Q4IvgDGh3x7z16l59TYU0Ayi43V6GdS45BbBIYBGHnJ9f
+         MJoHa+/Ou+MUnHmbdCZx6J2YNjXaRNLiV7DfTnB3L9aIjzxaUCmL9/gNlYdi1HYblYW1
+         1Usp39GwjpD8M9eLe43A3n7VOOQTBzJtrcVszqTS1c2K9+ysJsLxytASUoUlP89J3yg/
+         082YzZCJL9JrtjkbIXuB6WY37kLtrhJ0lWljV4HS1VG4VWEpe+8qSS4uZNwhRI3i8M3P
+         z8iA==
+X-Gm-Message-State: AOJu0YxBQIKoXawAqI9otSTA/FmkJXA62Ozp+SzhTn3Z/KcK/yuBldUz
+	Ftw7fGd/wRC/I1vpONWYOooYEf56MFTBQt4cHOY72hPJeRUEEVg5sVQFEVOZuA==
+X-Gm-Gg: ATEYQzx/rXKW0IzxJBAP/r76+2YiwKtuaKi23VPHNQ3VQd84zoSTFGhC8ZJIQKmkbUQ
+	PYgk+AA20ksiy4byWJyfIWFhQJHLu3Phn7oAUfSv3aCUeyNGOUkIErzR0OTwgTWZOuuxwTBRYwD
+	PA4gGWYg1IsUrTWtMnDoLZSj/dGDBLAmGqk17lCGQfcq1kh/r3dY+0zXZdlpTh3wdKfMfzROh+I
+	s4ZwB6xZS90QZ9jSd3sS3A4U4P3JC3WAtmKI+egZRVtLAXLDzj58zeQpA9G0QMN+HaguNSrAGOV
+	WdaRMdjVknaBi4aMMk3ooos/2JbEFw3lbMI3fgAtwC8050YBDp7eyylQ3NrOXHgnRKxMD5dTFUz
+	gSY0cX092IonE+8MoPbpMT6aF1r0RHPQW2vSAjo7J/xoTyUhXZDs3wuUjpX9mTxlpu8bnGHuImm
+	A4iCcnq80dhDkB8+n1AflIKYNrluX2VA==
+X-Received: by 2002:a05:620a:8c8b:b0:8cd:81cc:5568 with SMTP id af79cd13be357-8cd81cc58b9mr367276685a.44.1773030045998;
+        Sun, 08 Mar 2026 21:20:45 -0700 (PDT)
+Received: from [172.17.0.2] ([145.132.100.73])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cd88bef8f6sm135799085a.17.2026.03.08.21.20.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Mar 2026 21:20:45 -0700 (PDT)
+Message-ID: <69ae4a9d.050a0220.17a91f.9da5@mx.google.com>
+Date: Sun, 08 Mar 2026 21:20:45 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8807903978258307749=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------912e4262715fca10c09f559a443f4328ca0453296feabf78d916df4bfcd258df"; charset=utf-8
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
+Subject: RE: [v1] Bluetooth: btusb: MT7922: Add VID/PID 0e8d/223c
+In-Reply-To: <20260309025850.3329543-1-chris.lu@mediatek.com>
+References: <20260309025850.3329543-1-chris.lu@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------912e4262715fca10c09f559a443f4328ca0453296feabf78d916df4bfcd258df
-Content-Type: multipart/mixed;
- boundary=deb16f07603ad3bd89f69cb99524eeae0fb2d4cea3b2880860cfc1e8793e
-From: berend de schouwer <berend@deschouwer.co.za>
-To: linux-bluetooth@vger.kernel.org
-Cc: berend de schouwer <berend@deschouwer.co.za>
-Subject: [PATCH BlueZ 1/1] Stop and start some actions on suspend and resume
-Date: Mon,  9 Mar 2026 06:01:36 +0200
-Message-ID: <20260309040136.159073-2-berend@deschouwer.co.za>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260309040136.159073-1-berend@deschouwer.co.za>
-References: <20260309040136.159073-1-berend@deschouwer.co.za>
+--===============8807903978258307749==
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
---deb16f07603ad3bd89f69cb99524eeae0fb2d4cea3b2880860cfc1e8793e
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+This is automated email and please do not reply to this email!
 
-Stop active device discovery on suspend and shutdown, and restart
-on device resume.  This uses dbus notifications, so needs a running
-login manager owner.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1063387
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.24 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      26.52 seconds
+CheckAllWarning               PASS      28.71 seconds
+CheckSparse                   WARNING   32.57 seconds
+BuildKernel32                 PASS      25.92 seconds
+TestRunnerSetup               PASS      565.01 seconds
+TestRunner_l2cap-tester       PASS      29.07 seconds
+TestRunner_iso-tester         PASS      90.57 seconds
+TestRunner_bnep-tester        PASS      6.36 seconds
+TestRunner_mgmt-tester        FAIL      124.90 seconds
+TestRunner_rfcomm-tester      PASS      9.47 seconds
+TestRunner_sco-tester         FAIL      14.52 seconds
+TestRunner_ioctl-tester       PASS      10.37 seconds
+TestRunner_mesh-tester        FAIL      11.42 seconds
+TestRunner_smp-tester         PASS      8.64 seconds
+TestRunner_userchan-tester    PASS      6.70 seconds
+IncrementalBuild              PENDING   0.44 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/btusb.c:4673:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4674:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4676:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4677:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4679:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4680:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4682:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4683:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4685:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4686:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4687:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4688:1: error: bad constant expressiondrivers/bluetooth/btusb.c:4688:1: error: bad constant expression
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.104 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.825 seconds
+Mesh - Send cancel - 2                               Timed out    1.991 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- src/adapter.c |  35 ++++++++
- src/adapter.h |   2 +
- src/main.c    | 226 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 263 insertions(+)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index 4e5ff219f..5456c7fc9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -288,6 +288,7 @@ struct btd_adapter {
- 	bool filtered_discovery;	/* we are doing filtered discovery */
- 	bool no_scan_restart_delay;	/* when this flag is set, restart scan
- 					 * without delay */
-+	bool discovering_before_sleep;	/* was discovery on before suspend? */
- 	uint8_t discovery_type;		/* current active discovery type */
- 	uint8_t discovery_enable;	/* discovery enabled/disabled */
- 	bool discovery_suspended;	/* discovery has been suspended */
-@@ -2083,6 +2084,40 @@ static void resume_discovery(struct btd_adapter *adapter)
-
- 	trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT);
- }
- 
-+void adapter_resume_discovery_sleep(void)
-+{
-+	GList *list;
-+
-+	for (list = g_list_first(adapter_list); list;
-+						list = g_list_next(list)) {
-+		struct btd_adapter *adapter = list->data;
-+
-+		if (adapter->discovering_before_sleep) {
-+			DBG("Resuming discovery on: %s", adapter->name);
-+			resume_discovery(adapter);
-+		}
-+		adapter->discovering_before_sleep = false;
-+	}
-+}
-+
-+void adapter_suspend_discovery_sleep(void)
-+{
-+	GList *list;
-+	bool was_discovering;
-+
-+	for (list = g_list_first(adapter_list); list;
-+						list = g_list_next(list)) {
-+		struct btd_adapter *adapter = list->data;
-+
-+		was_discovering = (adapter->discovery_list);
-+		if (was_discovering) {
-+			DBG("Suspending discovery on: %s", adapter->name);
-+			suspend_discovery(adapter);
-+			adapter->discovering_before_sleep = was_discovering;
-+		}
-+	}
-+}
-+
- static void discovering_callback(uint16_t index, uint16_t length,
- 
-					const void *param, void *user_data)
- {
-diff --git a/src/adapter.h b/src/adapter.h
-index 4e07f71ad..4843c04a9 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -320,3 +320,5 @@ unsigned int btd_adapter_send_cmd_event_sync(struct btd_adapter *adapter,
- 					void *user_data,
- 					btd_adapter_destroy_func_t destroy,
- 					uint8_t timeout);
-+void adapter_suspend_discovery_sleep(void);
-+void adapter_resume_discovery_sleep(void);
-diff --git a/src/main.c b/src/main.c
-index 59df0ad4c..831733f55 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -67,6 +67,9 @@
- struct btd_opts btd_opts;
- static GKeyFile *main_conf;
- static char main_conf_file_path[PATH_MAX];
-+static unsigned int prepare_sleep_id;
-+static unsigned int inhibit_lock = -1;
-+static DBusConnection *client_conn;
- 
- static const char *supported_options[] = {
- 	"Name",
-@@ -1443,6 +1446,224 @@ static GOptionEntry options[] = {
- 	{ NULL },
- };
- 
-+static void obtain_inhibit_lock(void)
-+{
-+	DBusMessage *message
-, *reply;
-+	DBusMessageIter iter;
-+	DBusError error;
-+	int fd;
-+	const char *what = "sleep";
-+	const char *who = "bluetooth manager";
-+	const char *why = "stopping device discovery";
-+	const char *mode = "delay";
-+
-+	if (!client_conn || !dbus_connection_get_is_connected(client_conn))
-+		return;
-+
-+	message = dbus_message_new_method_call("org.freedesktop.login1",
-+					"/org/freedesktop/login1",
-+					"org.freedesktop.login1.Manager",
-+					"Inhibit");
-+	if (!message) {
-+		dbus_connection_unref(client_conn);
-+		return;
-+	}
-+
-+	dbus_message_iter_init_append(message, &iter);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &what);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &who);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &why);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &mode);
-+	dbus_error_init(&error);
-+	reply = dbus_connection_send_with_reply_and_block(client_conn,
-+							message, -1, &error);
-+	dbus_m
-essage_unref(message);
-+
-+	if (dbus_error_is_set(&error)) {
-+		warn("Failed to register a suspend inhibitor (selinux?): %s",
-+			error.message);
-+		dbus_error_free(&error);
-+		return;
-+	}
-+
-+	if (!reply)
-+		return;
-+
-+	if (dbus_message_iter_init(reply, &iter) == FALSE) {
-+		dbus_message_unref(reply);
-+		return;
-+	}
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UNIX_FD) {
-+		dbus_message_unref(reply);
-+		return;
-+	}
-+
-+	dbus_message_iter_get_basic(&iter, &fd);
-+	inhibit_lock = fd;
-+
-+	dbus_message_unref(reply);
-+}
-+
-+static void release_inhibit_lock(void)
-+{
-+	if (inhibit_lock < 0)
-+		return;
-+
-+	close(inhibit_lock);
-+	inhibit_lock = -1;
-+}
-+
-+static gboolean prepare_for_sleep(DBusConnection *conn, DBusMessage *msg,
-+				  void *user_data)
-+{
-+	DBusMessageIter iter;
-+	dbus_bool_t entering;
-+
-+	DBG("preparing for sleep or resume");
-+
-+	if (dbus_message_iter_init(msg, &iter) == FALSE)
-+		return TRUE;
-+
-+	if (dbus_message_iter_ge
-t_arg_type(&iter) != DBUS_TYPE_BOOLEAN)
-+		return TRUE;
-+
-+	dbus_message_iter_get_basic(&iter, &entering);
-+
-+	if (entering) {
-+		adapter_suspend_discovery_sleep();
-+		release_inhibit_lock();
-+	} else {
-+		adapter_resume_discovery_sleep();
-+		obtain_inhibit_lock();
-+	}
-+	return TRUE;
-+}
-+
-+int connect_login_manager(void)
-+{
-+	DBusError error;
-+	dbus_bool_t login_manager_exists;
-+
-+	client_conn = btd_get_dbus_connection();
-+
-+	if (!client_conn || !dbus_connection_get_is_connected(client_conn))
-+		return -1;
-+
-+	dbus_error_init(&error);
-+	login_manager_exists = dbus_bus_name_has_owner(client_conn,
-+						"org.freedesktop.login1",
-+						&error);
-+	if (dbus_error_is_set(&error)) {
-+		dbus_error_free(&error);
-+		return -1;
-+	}
-+
-+	if (!login_manager_exists)
-+		return -1;
-+
-+	return 0;
-+}
-+
-+int connect_prepare_for_sleep(void)
-+{
-+	guint sleep_id;
-+
-+	obtain_inhibit_lock();
-+
-+	client_conn = btd_get_dbus_connection();
-+
-+	sleep_id = g_dbus_add
-_signal_watch(client_conn,
-+					"org.freedesktop.login1",
-+					"/org/freedesktop/login1",
-+					"org.freedesktop.login1.Manager",
-+					"PrepareForSleep",
-+					prepare_for_sleep,
-+					NULL,
-+					NULL);
-+
-+	if (!sleep_id) {
-+		warn("Prohibited from watching suspend events.");
-+		return -1;
-+	}
-+	prepare_sleep_id = sleep_id;
-+
-+	return 0;
-+}
-+
-+static DBusHandlerResult login_manager_changed(DBusConnection *client_conn,
-+	DBusMessage *message, void *_usr_data)
-+{
-+	const char *name;
-+	const char *old_owner;
-+	const char *new_owner;
-+
-+	if (!dbus_message_is_signal(message, "org.freedesktop.DBus",
-+				    "NameOwnerChanged")) {
-+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+	}
-+
-+	if (!dbus_message_get_args(message, NULL,
-+						DBUS_TYPE_STRING, &name,
-+						DBUS_TYPE_STRING, &old_owner,
-+						DBUS_TYPE_STRING, &new_owner,
-+						DBUS_TYPE_INVALID))
-+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+
-+	if (strcmp(name, "org.freedesktop.login1"))
-
-+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+
-+	if (!strcmp(new_owner, ""))
-+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+
-+	if (connect_prepare_for_sleep() >= 0)
-+		dbus_connection_remove_filter(client_conn,
-+						login_manager_changed, NULL);
-+
-+	return DBUS_HANDLER_RESULT_HANDLED;
-+}
-+
-+int connect_login_and_prepare_for_sleep(void)
-+{
-+	DBusError error;
-+
-+	client_conn = btd_get_dbus_connection();
-+
-+	if (connect_login_manager() < 0) {
-+		dbus_bus_add_match(client_conn,
-+					"type='signal',"
-+					"sender='org.freedesktop.DBus',"
-+					"interface='org.freedesktop.DBus',"
-+					"member='NameOwnerChanged'",
-+					&error);
-+
-+		if (dbus_error_is_set(&error)) {
-+			dbus_error_free(&error);
-+			return -1;
-+		}
-+
-+		dbus_connection_add_filter(client_conn, login_manager_changed,
-+								NULL, free);
-+		return -1;
-+	}
-+
-+	return connect_prepare_for_sleep();
-+}
-+
-+void disconnect_prepare_for_sleep(void)
-+{
-+	DBusConnection *conn = btd_get_dbus
-_connection();
-+
-+	if (!conn || !dbus_connection_get_is_connected(conn))
-+		return;
-+
-+	if (!prepare_sleep_id)
-+		return;
-+
-+	g_dbus_remove_watch(conn, prepare_sleep_id);
-+	prepare_sleep_id = 0;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	GOptionContext *context;
-@@ -1498,6 +1719,9 @@ int main(int argc, char *argv[])
- 		exit(1);
- 	}
- 
-+	if (connect_login_and_prepare_for_sleep() < 0)
-+		info("Cannot listen for suspend yet, trying again later.");
-+
- 	if (btd_opts.experimental)
- 		gdbus_flags = G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
- 
-@@ -1557,6 +1781,8 @@ int main(int argc, char *argv[])
- 	btd_agent_cleanup();
- 	btd_device_cleanup();
- 
-+	disconnect_prepare_for_sleep();
-+	adapter_suspend_discovery_sleep();
- 	adapter_cleanup();
- 
- 	rfkill_exit();
--- 
-2.53.0
+Regards,
+Linux Bluetooth
 
 
---deb16f07603ad3bd89f69cb99524eeae0fb2d4cea3b2880860cfc1e8793e
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="publickey - Berend De Schouwer -
- 0x128CD671.asc"; name="publickey - Berend De Schouwer - 0x128CD671.asc"
-Content-Type: application/pgp-keys; filename="publickey - Berend De Schouwer
- - 0x128CD671.asc"; name="publickey - Berend De Schouwer - 0x128CD671.asc"
-
-LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCkNvbW1lbnQ6IGh0dHBzOi8vZ29w
-ZW5wZ3Aub3JnClZlcnNpb246IEdvcGVuUEdQIDIuOS4wCgp4c0ZOQkZXS2tVRUJFQURYdWlFWVcx
-WUlnTm5yYXpFby8wemVsVHp4YkhDRy93V3huN0FTdWQ4eEhMMWpxWks1CnF4UVMvNldSYm5RdjVj
-NURQdmsxT2Y2RS8yWFZzRlVRSmdSMVlGeEd0TnQxUUFsNVIwdmo3cnZyOG5CYmVRaGMKbUhzdndH
-cFQ3YWJrZXZXRnZtY0hiTktmWGJjL3NmRHJDTW90UkZRQm9oYzdveW8rTnpPSk9RcEpxQ2J6d2sr
-awpWbVZoVkhwdzhZenZuRDJzVkRxYlFPeHRXbXJjb2ZtOURiMjhORTBOY04yUDlBQmJOSnV0MVFV
-Wld0WjFsbVc2CnJ5aGdLckM0dXhTei9ZTmNjNXpzMlo3NjFTR0tPU1k4UFZ6dlZrTGJLOWZiZFk3
-amNnR0NGZDZHUllPQjJJM0IKN0NPOXVhZnVUb0NEeWhscWx1Z1dYcEdvQTVCN28vYTRaMWI3cWxO
-c0VtcWxHaCtlRDk0SDhNL0xXOGR3WU5SSQpvVU5ZSWF5UkYxT1FwcmM1UHozaUN4YW9ub0lpR2Z4
-R1pxTktUOVFXb0lnOHJPQzA4dGNyOHVqNG0xUmpKcnN6ClNqdGt3c29tMFV3cEJ5Z0hlLzNCcDR4
-WlN4Z2FmTXc2ZEdTS1JzRFRBSGoyRkpGV2N0Tmx1WTRqdnhSWDdDdVcKNTlRMzVKSUU4bStPZ1li
-Z0xrR1FmRWRVeWhjUnFCMCtWUjJXUmxYNXNLVVprV2cxQWhnY0w3RmltTmxsM2YwNgp5ZS91emJy
-YVVZSFg3eGMzdjVDSjJaNnd4Nk1waFp6aGh4dUJxTGNZSkViTjlmTnNldlRPWWtFUUlzR0M3Tldv
-ClQyaHkzdWplWUJQajNjbzJOZDRpV085dHB5c0xaOGdLMTUvZE5qTUJUc3ByUys5UlBxZ3o1QnRG
-bXdBUkFRQUIKelN4Q1pYSmxibVFnUkdVZ1UyTm9iM1YzWlhJZ1BHSmxjbVZ1WkVCa1pYTmphRzkx
-ZDJWeUxtTnZMbnBoUHNMQgplQVFUQVFJQUlnVUNWWXFSUVFJYkF3WUxDUWdIQXdJR0ZRZ0NDUW9M
-QkJZQ0F3RUNIZ0VDRjRBQUNna1EyMjdnCmNaT0FvT25YZGcvOUVGZFJyL1h0T1liQmVsdGIwc05I
-YVNQN1M0dmtscWNBdE9udFRZVjN5TUZOdjlYQlhYdkYKU0thR2wwbTVMaGVOQWtJdS9ZYkFkR1h5
-U3pOVWQ3V3NmeWIrMjNpcTVVS0d0K3dEK1JvY0xaWTA5NHVBS2NRUQpUWndKS1R3NHRLSWdONHFC
-dE9hTmlKd0x1cnNOWllBUDdKSUpGUFFZNTVwYSt5ZWMzanhmVFgwYTdydWllY29zCm16YXZRMTgy
-VitMZGV2Mmtvckd2WTFjejQzclA4eGlMMURqdGNCVW5laWdiajUrTjBaOFVsam5SNlFrU1J1YWoK
-ZHNHQkFYSG1rT3NCVi9vOE04dkZXYThOODN1czFHa3k1SzU0eFFPYVZ5TlJWclI0RUlTdjh5MGkz
-M3J3R1l2UApCRCtSS2FMYWN1S2I4KzhLTlZ1UTVNMHYrNHBHci9GZVhwUCtuUHpWRGZiWlpoWDFp
-d2VRMDY5TEthOXJlZjhxCkV3NFZWdDdBdVlGU3dlSFZNSUNBMFpHeUtKNWhaejdMZEkwdkFGQU55
-VXQwS29XZWVLNjl4aWs4cnZGNzVlbzQKZnovV0p0Zi9BZG5DdVlwNjBvYm94L3NKQTdLclpyV1FO
-YkRjbEplZmlTWlY3dHVIaDdqTEpxUXVma201RDVnbwp3QUFvNWdyTS82V0FOSFZ3NWlvak0vVUc2
-ZjArdEZaWGdGTXlrMkpaeTljMnM4VlFnSTJVenJiVThKc0N0ZERqCkJVU1RDNjRSN2tsdlY1Ymt1
-MzFBbTNSUEMyOWwxaGZZKzNVTGc0dzhtbXBKMjhwcSsvejBvS0g4Q3d5aWN1RlAKRkJHOTVsbi83
-dHRlNGlmV2tmek1MOE9oMmJwdUtFYjJQV1I0NHNRMVpxOCtJQWpTMlh3TDQ1N093VTBFVllxUgpR
-UUVRQUtYYUwvaEhueXdzRnlVUVVHNVdxYm9xSHRWODNTNEc5aEpMQ25MOWhnU0J2Z2twbTRjNi85
-Mmt6Lzh5CmdvRTRjUjNHSmZsZm40OHRUNFkvWDZzTkZiSXY5VkhpWVo4aW9YVUc0bHBhMFIyN3pk
-MVZZT1pXUStvS3RjRnoKb1djVlViOHQrT1BoM2tuME5WQWxFRnlya0k5YWdUc0p1OFJ0alNpMEV6
-Wi9iQ0xaTStFMU9UQnpZUzFuelZlcgp1NVVid1FWbXAzbUlzS2JSVTRRbnpZSElWVGNFeDF5SGxC
-M1ZkZFd6M0pnenVsWlF4SDdRREVGaTVBaDhjcUVDCjJSZ2w2K2JkdVBqYnJBK2RwV2VaTGtvUGhH
-d0xZcVM0YnJxN0ZBbmtMMjFSTGVGQzkvY203dTNaMnozd1o5QXkKZWt2bmtPNnhxdGlqcDB2Y0RD
-V3kxbldiV0tpN2Y5K1NQWW5xTTNKVFBqWnlobk9CQ2pWTFhUcnlYQ3BhRGFCYgpnWGZRSlpMOWwx
-bTRqVzBoQjNEdlU5eGQ2Zi8zdW1vODMzS1BnMm5XenpnZ0tRODREUUd3L0hYdkFSdDVtR0ZTCmQv
-REtkMlliTHc5QjJKSlpqb2kzc2VGWlN6YVZKZ0FWZk9neUk0NHRnN3pJSlVUZDk2VzVpeEE3SEVP
-TkV4cG0KQ0JrZ3ArMmswZEg1SU84c1lXd1o0c3lXQk5kZ1cxeGd2Qzc1dm94TmZTZGJmcGRhMG91
-YU5xYVR0YjdzcnlVZApsTFZ3bExZZkV4NU9EeFFVY1VyNHRKUDhsR1I4dkEwemhGSEJhTEdCcjBa
-SU16UU5TcS9jS3NrNnNESXI0Wms1ClZMT0VVN3R3SFRrZjQ3bXpWTExCQmZ6alJJc2hXRnJvNnBj
-NDFBaGk5Y3ArQ3hLYkFCRUJBQUhDd1Y4RUdBRUMKQUFrRkFsV0trVUVDR3d3QUNna1EyMjdnY1pP
-QW9PbXkzUkFBdGpNMGtPQjN1OTZ0S0pieGpERnlUTjZhTk9WLwo5WXk2V2doRjJITldvN0hzbk55
-dnNRTkF1cHhWMndBTGF0UGVjUFgrL04vdWVGUUtyQTMvd3FVUTkwMkw0VXhWCnJMa1d5a2RZb09P
-cGd4TUxkUXB6Z2NRT1RTV1BDdlAwVi9jVnNYY1dKaVZFRGg5VGp1SzBLc1loRm1XR2E2bmUKNHVS
-MVY2VkJ5SUtaay9vRGthSVhCanJaU1ZUT1M2ZzZWRi9XaWhHKy9NL0MyZU94eEJZMzdqWm5xREpR
-bjNxWApoWTJjVE4wbTlrTFFQdjJqUE9LcjAzUHIvbFdIV1Rpc1EzRkNWbG1ZUTBJSUcyRlpKSmNS
-RGNELzhOOGpoMWVhCnpFQmowK1lSMitMUUxzVWN6bDBQSkM0TGV4eERTUVg4MlRlV21nUklXc3Mv
-UTM2VUNIOVNyOFl6Sk9BSkxWWEYKNUJMQXgybFlVQWk4bmN0cjhIMmdML0RQOHlOT3hBZ05QSVhy
-QjNnQk9XYTF4MmNROHNOeDMvVXVYZFIyNXQyYgo3eGpseFdlWmM5ejJnTzlyZUVKRWt6a21HVjhR
-Sk1QSFAvejZRdTZIUVlqUFlyL3I0T1FSSGFpN1RMSkZsTFBNCkJLQTJGVWlZNzFaTUxZWHRXUms1
-WG85SnVGL0F0dncwU3JxcFoyRE5PeUtLZmJzMTRNOS84RXkzUUFVTklTSXQKUDQyMlJNQUQxdzha
-WGcxWlBqSEo4TGo3Qms3RTJGN0YzVlUwSXFCSVVsc1J5eUJvMUs3SDdRT1pwdmJFeERRSgpnMWx4
-YlhhS1lrRFEwREdhb2FnT3pVYVo5ckxCdkpFNHo3QzBTZ3BjWFpaMHJuT3lkdm5GMGhCWG93djdX
-YkYrCmk0WlB5REJjM242OHJxcz0KPTlTWGwKLS0tLS1FTkQgUEdQIFBVQkxJQyBLRVkgQkxPQ0st
-LS0tLQ==
---deb16f07603ad3bd89f69cb99524eeae0fb2d4cea3b2880860cfc1e8793e--
-
---------912e4262715fca10c09f559a443f4328ca0453296feabf78d916df4bfcd258df
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
-
-wsGpBAEBCABdBYJprkZKCRDbbuBxk4Cg6TUUAAAAAAAcABBzYWx0QG5vdGF0
-aW9ucy5vcGVucGdwanMub3JnT+XIJ0gnfPvDkj8c+R5ddRYhBBKM1nGLSON6
-q6UFAttu4HGTgKDpAABepw//YI427kB+ZYW+zUjJ5J/JGCfEEkIsC8GAPKYv
-AIJSKmMdG+kHhL3+6Oh8Z5b2zyqwDe6ZQY4Jo/rvS8rOutFiXDU++cYwDXTP
-9hrtxJ4kVkjdT0+7Fu0/ojEHTc3ZULJjLGYjTm+5qp41W/u5QOvQTySnHk1x
-cVQGbpIVxoLUfD3o60tq7JEEX/8IXFZDWYe3lC6WAl4pSlAWNn65sXapVRB8
-7hnXMTqjcBBysra8dOxwtdfBLzq5/iuEAtzMyd+wj0AXlEeNKNnSMOSo8kaZ
-8FvbJ2C8Gi/6s4yp4SKz1PtQDrqt7GWWJva0jOa7jJ9dqROwule4punJ4FDc
-ClqiGY+HqvBGVK4L+QABp8d+SuZI8oxx42T+lfVt8nAIljwbXSZHjPAmvjnK
-aDPmLgd+j1vQ+TefcN/lpr/Ma96eBsQvGZLrhDXNHchs1IrCYQiPonr1rhM1
-43faaiP4KnjeYzreCeK+J6FIk/ztzPFGVw9kaZ1K4efYl8hqlMTxeH1RFIVQ
-cbuYWsl6ZR4LdJOs/AmHSxIQgtAt1G6Xwx1Zwqn2ogqImh8bFwYm+KxTH58t
-RjwiBHSNhFCoSlc+ltMO9tmc+8OLXIHP+4akHat/0Qrwu0qJ0pvpxWfVId74
-m1zns1t0C8LGeBkUP0efjl0MH1H6ZSumuRbFdOWevYJuHLQ=
-=wBgb
------END PGP SIGNATURE-----
-
-
---------912e4262715fca10c09f559a443f4328ca0453296feabf78d916df4bfcd258df--
-
+--===============8807903978258307749==--
