@@ -1,89 +1,413 @@
-Received: from mail-106117.protonmail.ch (mail-106117.protonmail.ch [79.135.106.117])
+Received: from mail-24422.protonmail.ch (mail-24422.protonmail.ch [109.224.244.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4AB1714AA
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Mar 2026 04:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01A11714AA
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Mar 2026 04:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773028924; cv=none; b=WX4iFD208iDTUPpEKkkDLj43nfTtkeZUdPZnCBC/UGzQi1Je+xog3d/MQVr/a6Jb7SKFdmuRUZ70wEs2Icl3Ke0dTdK5X/a62FCRk636cPPoBkEw5JkbJWgv551OhJcPiycEBKFunXd3G8P/orLRr1NzhLNs639ZmHDVgdwhFl8=
+	t=1773028956; cv=none; b=K910WdIMJiLMcZRZqc7FropK0G5w53klCoK2WbWs+KulTLsG73wtfhXv+5EjHF3JcK999vfWdJoctiDGH6wosZ+cfSQbMmQdkz5NxiWF3GbZeDCljBsEhuLBb2e4ks1tFu5iDFrI3WV/WTq/2+SJrpPiq40gvg6MhD6sNfbhYuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773028924; c=relaxed/simple;
-	bh=WZWYH64W49MBD5oFa9w2sXtJ+f8EEzRA+tOhM5kSub8=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=RziaxnP4cP6R+sF1oz1GXFAKvl9r4V/lIouCJVZwbQaIueJs52Zv4e4RQMt04Nl+2ZVRwXnkgHyuJbGhLpf3hmzFS+tRA4EeRghu03+EAdppRRtJs8Q+PQjvUguFXJEjrdnib+HuDKm/Emu0KTqhSDDQtMPH/dH3OZFp3H/dIz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za; spf=pass smtp.mailfrom=deschouwer.co.za; dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b=GBS41u+Q; arc=none smtp.client-ip=79.135.106.117
+	s=arc-20240116; t=1773028956; c=relaxed/simple;
+	bh=y9NecwuF6z1eVqZ2FBqJ79rgNZTxsiEDhIcJoGI53CA=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mfyzcyg+xOuAkr+2MzGr8ppHtGJ9S5fIEJv75nw5yFp/jj40WGeGCnDVxuNAM+8WNffZFOHbDGW73MAd4Y8F3ahUk1v61GrkFuQX4jjmhcIpEoMPqC+rq2vO2vPW2crwlTwEFLxewcBxG/BR+90igZvGSmqpE53M546JK6neHpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za; spf=pass smtp.mailfrom=deschouwer.co.za; dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b=YrrjM/h/; arc=none smtp.client-ip=109.224.244.22
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deschouwer.co.za
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b="GBS41u+Q"
+	dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b="YrrjM/h/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=deschouwer.co.za;
-	s=protonmail2; t=1773028910; x=1773288110;
-	bh=MqmI7xFUnH9SM2yc7l7oMuUfYJvTyDoGuKCE7AIZrH8=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=GBS41u+QAtFO7yJT6i02qw3Nj8NnsrPuuCSJyCAG/C9fQP6N8VpN0z+nxEC/WB+P/
-	 tVrrE7ngkxEVB7kl4l4c0fBanaCu9JFCnNiza4IjZzW4mg5M+CyCnhDtelODJlhRyJ
-	 K8IM/Lma7zOoHzEIzFIUhJI1VBpzx5uV9OEfPigVVfsWbf1bSf2x1MP5GfLHIPBrxb
-	 rs7AYy3nDWDNynmeBBQ/l3A/C+bnofg6JYBCsB6tM7O8YrN/83YW8N0Hs53OeTozse
-	 EIlJX+gMEHynvoknxWyyjC1rmWo03OUO6gZxNa+ZOGde7bfKniK1cEMg5c6niLjUv5
-	 pn/PDAqARmDWA==
-Date: Mon, 09 Mar 2026 04:01:47 +0000
+	s=protonmail2; t=1773028943; x=1773288143;
+	bh=hWlGh0RE6vMkMgBw78IeMEpKsvK+SeXjH9+DUMH0hlE=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=YrrjM/h/237oSAvLcAvabjWYtkS+hWcyvhlUL3hxvDV9i5PDoZ1nUDDgPj+y8m8ul
+	 d7jb0OTyM6MEZ9Shi3s9eTTpcrDYp7fJZvKqMnUUIfOc+uIpAD2qJomkB1Hks///Rk
+	 jtonLNy5kwcN9+lJMD2s37PvXqtfO7Bi6eKtUJ7Q0meKZd7IVXAwGOuLpjXXxai/ya
+	 bGRhBDmgDn51XApOuim+r5XiqW7B5qv2XRd3oqk2O2j906Xs0ej3FRAj92m2jnIdKp
+	 XWULz3LQVP8DuHUeifpJY1gLyNq8dNpavo60P9cWVq3kwHXEXrnZQbYzhhwWK5j+Kb
+	 O7o88tJkRM19w==
+Date: Mon, 09 Mar 2026 04:02:19 +0000
 To: linux-bluetooth@vger.kernel.org
 From: berend de schouwer <berend@deschouwer.co.za>
 Cc: berend de schouwer <berend@deschouwer.co.za>
-Subject: [PATCH BlueZ 0/1] pause discovery on suspend
-Message-ID: <20260309040136.159073-1-berend@deschouwer.co.za>
+Subject: [PATCH BlueZ 1/1] Stop and start some actions on suspend and resume
+Message-ID: <20260309040136.159073-2-berend@deschouwer.co.za>
+In-Reply-To: <20260309040136.159073-1-berend@deschouwer.co.za>
+References: <20260309040136.159073-1-berend@deschouwer.co.za>
 Feedback-ID: 50941660:user:proton
-X-Pm-Message-ID: 5e37de6c2c87d03e383ca3a76d66a601ebbfbc01
+X-Pm-Message-ID: 573eec89512d0b0bea85681659a46fdc42656744
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------f7ec8e37cb1d658784ec68766d1ee7a858d48e3af7c1536b3d42a01f3f4f1faa"; charset=utf-8
+Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------912e4262715fca10c09f559a443f4328ca0453296feabf78d916df4bfcd258df"; charset=utf-8
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------f7ec8e37cb1d658784ec68766d1ee7a858d48e3af7c1536b3d42a01f3f4f1faa
+--------912e4262715fca10c09f559a443f4328ca0453296feabf78d916df4bfcd258df
 Content-Type: multipart/mixed;
- boundary=d5ee2fa3bc3a17e49182f1911fe201bab85ebb4dbb067de97b91592ceb17
+ boundary=deb16f07603ad3bd89f69cb99524eeae0fb2d4cea3b2880860cfc1e8793e
 From: berend de schouwer <berend@deschouwer.co.za>
 To: linux-bluetooth@vger.kernel.org
 Cc: berend de schouwer <berend@deschouwer.co.za>
-Subject: [PATCH BlueZ 0/1] pause discovery on suspend
-Date: Mon,  9 Mar 2026 06:01:35 +0200
-Message-ID: <20260309040136.159073-1-berend@deschouwer.co.za>
+Subject: [PATCH BlueZ 1/1] Stop and start some actions on suspend and resume
+Date: Mon,  9 Mar 2026 06:01:36 +0200
+Message-ID: <20260309040136.159073-2-berend@deschouwer.co.za>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260309040136.159073-1-berend@deschouwer.co.za>
+References: <20260309040136.159073-1-berend@deschouwer.co.za>
 MIME-Version: 1.0
 
---d5ee2fa3bc3a17e49182f1911fe201bab85ebb4dbb067de97b91592ceb17
+--deb16f07603ad3bd89f69cb99524eeae0fb2d4cea3b2880860cfc1e8793e
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Some hardware will not reconnect after a suspend/resume or soft reboot
-cycle.  That hardware will need a power cycle (if it has an on/off
-button), or need to be re-paired.
-
-The symptom is mentioned repeatedly with Logitech hardware on the
-github page for bluez.
-
-Confirmed the problem with a Logitech MX Master 3, and a MediaTek
-MT7921e.  Confirmed that it happens when the adapter has discovery
-enabled on suspend or soft reboot.  Confirmed that it works fine if
-discovery is paused.
-
-berend de schouwer (1):
-  Stop and start some actions on suspend and resume
-
+Stop active device discovery on suspend and shutdown, and restart
+on device resume.  This uses dbus notifications, so needs a running
+login manager owner.
+---
  src/adapter.c |  35 ++++++++
  src/adapter.h |   2 +
  src/main.c    | 226 ++++++++++++++++++++++++++++++++++++++++++++++++++
  3 files changed, 263 insertions(+)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 4e5ff219f..5456c7fc9 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -288,6 +288,7 @@ struct btd_adapter {
+ 	bool filtered_discovery;	/* we are doing filtered discovery */
+ 	bool no_scan_restart_delay;	/* when this flag is set, restart scan
+ 					 * without delay */
++	bool discovering_before_sleep;	/* was discovery on before suspend? */
+ 	uint8_t discovery_type;		/* current active discovery type */
+ 	uint8_t discovery_enable;	/* discovery enabled/disabled */
+ 	bool discovery_suspended;	/* discovery has been suspended */
+@@ -2083,6 +2084,40 @@ static void resume_discovery(struct btd_adapter *adapter)
+
+ 	trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT);
+ }
+ 
++void adapter_resume_discovery_sleep(void)
++{
++	GList *list;
++
++	for (list = g_list_first(adapter_list); list;
++						list = g_list_next(list)) {
++		struct btd_adapter *adapter = list->data;
++
++		if (adapter->discovering_before_sleep) {
++			DBG("Resuming discovery on: %s", adapter->name);
++			resume_discovery(adapter);
++		}
++		adapter->discovering_before_sleep = false;
++	}
++}
++
++void adapter_suspend_discovery_sleep(void)
++{
++	GList *list;
++	bool was_discovering;
++
++	for (list = g_list_first(adapter_list); list;
++						list = g_list_next(list)) {
++		struct btd_adapter *adapter = list->data;
++
++		was_discovering = (adapter->discovery_list);
++		if (was_discovering) {
++			DBG("Suspending discovery on: %s", adapter->name);
++			suspend_discovery(adapter);
++			adapter->discovering_before_sleep = was_discovering;
++		}
++	}
++}
++
+ static void discovering_callback(uint16_t index, uint16_t length,
+ 
+					const void *param, void *user_data)
+ {
+diff --git a/src/adapter.h b/src/adapter.h
+index 4e07f71ad..4843c04a9 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -320,3 +320,5 @@ unsigned int btd_adapter_send_cmd_event_sync(struct btd_adapter *adapter,
+ 					void *user_data,
+ 					btd_adapter_destroy_func_t destroy,
+ 					uint8_t timeout);
++void adapter_suspend_discovery_sleep(void);
++void adapter_resume_discovery_sleep(void);
+diff --git a/src/main.c b/src/main.c
+index 59df0ad4c..831733f55 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -67,6 +67,9 @@
+ struct btd_opts btd_opts;
+ static GKeyFile *main_conf;
+ static char main_conf_file_path[PATH_MAX];
++static unsigned int prepare_sleep_id;
++static unsigned int inhibit_lock = -1;
++static DBusConnection *client_conn;
+ 
+ static const char *supported_options[] = {
+ 	"Name",
+@@ -1443,6 +1446,224 @@ static GOptionEntry options[] = {
+ 	{ NULL },
+ };
+ 
++static void obtain_inhibit_lock(void)
++{
++	DBusMessage *message
+, *reply;
++	DBusMessageIter iter;
++	DBusError error;
++	int fd;
++	const char *what = "sleep";
++	const char *who = "bluetooth manager";
++	const char *why = "stopping device discovery";
++	const char *mode = "delay";
++
++	if (!client_conn || !dbus_connection_get_is_connected(client_conn))
++		return;
++
++	message = dbus_message_new_method_call("org.freedesktop.login1",
++					"/org/freedesktop/login1",
++					"org.freedesktop.login1.Manager",
++					"Inhibit");
++	if (!message) {
++		dbus_connection_unref(client_conn);
++		return;
++	}
++
++	dbus_message_iter_init_append(message, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &what);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &who);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &why);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &mode);
++	dbus_error_init(&error);
++	reply = dbus_connection_send_with_reply_and_block(client_conn,
++							message, -1, &error);
++	dbus_m
+essage_unref(message);
++
++	if (dbus_error_is_set(&error)) {
++		warn("Failed to register a suspend inhibitor (selinux?): %s",
++			error.message);
++		dbus_error_free(&error);
++		return;
++	}
++
++	if (!reply)
++		return;
++
++	if (dbus_message_iter_init(reply, &iter) == FALSE) {
++		dbus_message_unref(reply);
++		return;
++	}
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UNIX_FD) {
++		dbus_message_unref(reply);
++		return;
++	}
++
++	dbus_message_iter_get_basic(&iter, &fd);
++	inhibit_lock = fd;
++
++	dbus_message_unref(reply);
++}
++
++static void release_inhibit_lock(void)
++{
++	if (inhibit_lock < 0)
++		return;
++
++	close(inhibit_lock);
++	inhibit_lock = -1;
++}
++
++static gboolean prepare_for_sleep(DBusConnection *conn, DBusMessage *msg,
++				  void *user_data)
++{
++	DBusMessageIter iter;
++	dbus_bool_t entering;
++
++	DBG("preparing for sleep or resume");
++
++	if (dbus_message_iter_init(msg, &iter) == FALSE)
++		return TRUE;
++
++	if (dbus_message_iter_ge
+t_arg_type(&iter) != DBUS_TYPE_BOOLEAN)
++		return TRUE;
++
++	dbus_message_iter_get_basic(&iter, &entering);
++
++	if (entering) {
++		adapter_suspend_discovery_sleep();
++		release_inhibit_lock();
++	} else {
++		adapter_resume_discovery_sleep();
++		obtain_inhibit_lock();
++	}
++	return TRUE;
++}
++
++int connect_login_manager(void)
++{
++	DBusError error;
++	dbus_bool_t login_manager_exists;
++
++	client_conn = btd_get_dbus_connection();
++
++	if (!client_conn || !dbus_connection_get_is_connected(client_conn))
++		return -1;
++
++	dbus_error_init(&error);
++	login_manager_exists = dbus_bus_name_has_owner(client_conn,
++						"org.freedesktop.login1",
++						&error);
++	if (dbus_error_is_set(&error)) {
++		dbus_error_free(&error);
++		return -1;
++	}
++
++	if (!login_manager_exists)
++		return -1;
++
++	return 0;
++}
++
++int connect_prepare_for_sleep(void)
++{
++	guint sleep_id;
++
++	obtain_inhibit_lock();
++
++	client_conn = btd_get_dbus_connection();
++
++	sleep_id = g_dbus_add
+_signal_watch(client_conn,
++					"org.freedesktop.login1",
++					"/org/freedesktop/login1",
++					"org.freedesktop.login1.Manager",
++					"PrepareForSleep",
++					prepare_for_sleep,
++					NULL,
++					NULL);
++
++	if (!sleep_id) {
++		warn("Prohibited from watching suspend events.");
++		return -1;
++	}
++	prepare_sleep_id = sleep_id;
++
++	return 0;
++}
++
++static DBusHandlerResult login_manager_changed(DBusConnection *client_conn,
++	DBusMessage *message, void *_usr_data)
++{
++	const char *name;
++	const char *old_owner;
++	const char *new_owner;
++
++	if (!dbus_message_is_signal(message, "org.freedesktop.DBus",
++				    "NameOwnerChanged")) {
++		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++	}
++
++	if (!dbus_message_get_args(message, NULL,
++						DBUS_TYPE_STRING, &name,
++						DBUS_TYPE_STRING, &old_owner,
++						DBUS_TYPE_STRING, &new_owner,
++						DBUS_TYPE_INVALID))
++		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++
++	if (strcmp(name, "org.freedesktop.login1"))
+
++		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++
++	if (!strcmp(new_owner, ""))
++		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++
++	if (connect_prepare_for_sleep() >= 0)
++		dbus_connection_remove_filter(client_conn,
++						login_manager_changed, NULL);
++
++	return DBUS_HANDLER_RESULT_HANDLED;
++}
++
++int connect_login_and_prepare_for_sleep(void)
++{
++	DBusError error;
++
++	client_conn = btd_get_dbus_connection();
++
++	if (connect_login_manager() < 0) {
++		dbus_bus_add_match(client_conn,
++					"type='signal',"
++					"sender='org.freedesktop.DBus',"
++					"interface='org.freedesktop.DBus',"
++					"member='NameOwnerChanged'",
++					&error);
++
++		if (dbus_error_is_set(&error)) {
++			dbus_error_free(&error);
++			return -1;
++		}
++
++		dbus_connection_add_filter(client_conn, login_manager_changed,
++								NULL, free);
++		return -1;
++	}
++
++	return connect_prepare_for_sleep();
++}
++
++void disconnect_prepare_for_sleep(void)
++{
++	DBusConnection *conn = btd_get_dbus
+_connection();
++
++	if (!conn || !dbus_connection_get_is_connected(conn))
++		return;
++
++	if (!prepare_sleep_id)
++		return;
++
++	g_dbus_remove_watch(conn, prepare_sleep_id);
++	prepare_sleep_id = 0;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	GOptionContext *context;
+@@ -1498,6 +1719,9 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
++	if (connect_login_and_prepare_for_sleep() < 0)
++		info("Cannot listen for suspend yet, trying again later.");
++
+ 	if (btd_opts.experimental)
+ 		gdbus_flags = G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
+ 
+@@ -1557,6 +1781,8 @@ int main(int argc, char *argv[])
+ 	btd_agent_cleanup();
+ 	btd_device_cleanup();
+ 
++	disconnect_prepare_for_sleep();
++	adapter_suspend_discovery_sleep();
+ 	adapter_cleanup();
+ 
+ 	rfkill_exit();
 -- 
 2.53.0
 
 
---d5ee2fa3bc3a17e49182f1911fe201bab85ebb4dbb067de97b91592ceb17
+--deb16f07603ad3bd89f69cb99524eeae0fb2d4cea3b2880860cfc1e8793e
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="publickey - Berend De Schouwer -
  0x128CD671.asc"; name="publickey - Berend De Schouwer - 0x128CD671.asc"
@@ -146,9 +470,9 @@ WGcxWlBqSEo4TGo3Qms3RTJGN0YzVlUwSXFCSVVsc1J5eUJvMUs3SDdRT1pwdmJFeERRSgpnMWx4
 YlhhS1lrRFEwREdhb2FnT3pVYVo5ckxCdkpFNHo3QzBTZ3BjWFpaMHJuT3lkdm5GMGhCWG93djdX
 YkYrCmk0WlB5REJjM242OHJxcz0KPTlTWGwKLS0tLS1FTkQgUEdQIFBVQkxJQyBLRVkgQkxPQ0st
 LS0tLQ==
---d5ee2fa3bc3a17e49182f1911fe201bab85ebb4dbb067de97b91592ceb17--
+--deb16f07603ad3bd89f69cb99524eeae0fb2d4cea3b2880860cfc1e8793e--
 
---------f7ec8e37cb1d658784ec68766d1ee7a858d48e3af7c1536b3d42a01f3f4f1faa
+--------912e4262715fca10c09f559a443f4328ca0453296feabf78d916df4bfcd258df
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -156,23 +480,23 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: ProtonMail
 
-wsGpBAEBCABdBYJprkYrCRDbbuBxk4Cg6TUUAAAAAAAcABBzYWx0QG5vdGF0
-aW9ucy5vcGVucGdwanMub3Jnf7ietOORwFnTJWxMf8+PShYhBBKM1nGLSON6
-q6UFAttu4HGTgKDpAAC70Q//chgyJpV5fAetGn+m8uRVmBT4apyesl1G6Dpa
-sBBlMh1wVBH2weXvF+HGHT11DjeDYwTmaA5IobOG7eqWerS/0DjoAKY/0MaP
-QWPZJJyN+MvzpktBq1re1ieofqWMtCXi7ilBbryIY3e1TSurAQxNCr0g0qPW
-NH1le8A00QYfr/wwmzh1903fYSsyWTyEpkVLeI1EYNiqbxPBtis7vbglpSlA
-mcypIiqsBXyrgsa7RW5A6vo7j4PLnZzZIROK2+CDQoTjka0xAaAqU57gez9q
-5MdTadYtN27fJ+UcWoOFxk3st3VC3NEGKVi84EQ7tQfz326K38Nz1xVkFFor
-/psJONMtavc0vfoiDCY2CqV9BND606ygbzDmCjzEkUEjzwmYE+vA5r4mCdmS
-3HRMeSoJdJ/2oMIBAOaxea36MFpH7iY8rF0LrE0GCr2pJvngFM1v7QbqyOjN
-lRNeTqff4ftGEfuz2FY4u1TtN3wuUCMuFwJxO6XN85y9R32937OlFi7HZKXE
-vPbOQ2iZSsE9sBYQjGv+rPtoZEKs66KpiEoK2UcWdBiAstLBsmrJ74MqRl3u
-7c0Dtc2a4iYpivYnymXLIJ0QlkTew+Ewl9qLPjb583rhpYTTgkZNJNf4h438
-KVqfGweczhj8Dvi+1RdkeFTsv0xzcpmmqkeHzuJ99PsJ2jA=
-=yMa6
+wsGpBAEBCABdBYJprkZKCRDbbuBxk4Cg6TUUAAAAAAAcABBzYWx0QG5vdGF0
+aW9ucy5vcGVucGdwanMub3JnT+XIJ0gnfPvDkj8c+R5ddRYhBBKM1nGLSON6
+q6UFAttu4HGTgKDpAABepw//YI427kB+ZYW+zUjJ5J/JGCfEEkIsC8GAPKYv
+AIJSKmMdG+kHhL3+6Oh8Z5b2zyqwDe6ZQY4Jo/rvS8rOutFiXDU++cYwDXTP
+9hrtxJ4kVkjdT0+7Fu0/ojEHTc3ZULJjLGYjTm+5qp41W/u5QOvQTySnHk1x
+cVQGbpIVxoLUfD3o60tq7JEEX/8IXFZDWYe3lC6WAl4pSlAWNn65sXapVRB8
+7hnXMTqjcBBysra8dOxwtdfBLzq5/iuEAtzMyd+wj0AXlEeNKNnSMOSo8kaZ
+8FvbJ2C8Gi/6s4yp4SKz1PtQDrqt7GWWJva0jOa7jJ9dqROwule4punJ4FDc
+ClqiGY+HqvBGVK4L+QABp8d+SuZI8oxx42T+lfVt8nAIljwbXSZHjPAmvjnK
+aDPmLgd+j1vQ+TefcN/lpr/Ma96eBsQvGZLrhDXNHchs1IrCYQiPonr1rhM1
+43faaiP4KnjeYzreCeK+J6FIk/ztzPFGVw9kaZ1K4efYl8hqlMTxeH1RFIVQ
+cbuYWsl6ZR4LdJOs/AmHSxIQgtAt1G6Xwx1Zwqn2ogqImh8bFwYm+KxTH58t
+RjwiBHSNhFCoSlc+ltMO9tmc+8OLXIHP+4akHat/0Qrwu0qJ0pvpxWfVId74
+m1zns1t0C8LGeBkUP0efjl0MH1H6ZSumuRbFdOWevYJuHLQ=
+=wBgb
 -----END PGP SIGNATURE-----
 
 
---------f7ec8e37cb1d658784ec68766d1ee7a858d48e3af7c1536b3d42a01f3f4f1faa--
+--------912e4262715fca10c09f559a443f4328ca0453296feabf78d916df4bfcd258df--
 
