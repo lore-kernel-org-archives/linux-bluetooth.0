@@ -1,255 +1,235 @@
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8ADB2D46C0
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Mar 2026 18:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773079405; cv=pass; b=ncJZW3+3qCjEL33Sx5E4DwVpvFv8YFONqT/AzGkh/28ykxIDfTgCygng9cr8iDnv5FbJQHwL+Mfj0SOUaTPylDWLRrZ/uzirchwPvl0XKwCFMTGq5nJrzCQ8rZiIVLGvbzUgl1CM0QDIqKcX6GK31wvV5MQA9YXwvRsftM24shU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773079405; c=relaxed/simple;
-	bh=RBNp5bYelOX6M2K6Cat2KqmEsLBgUhdLVOrm61DdXys=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mdyVDmYrizVbRHKYdswJ4G0tymvljYDYHG9Hhl8Y7Fqgd32SFIQLkzfaKw2/7RC2L72ssP1KCgPocgwikCp+D7XpUH66armc9d/qfY7vgP23fMa4it6PbEC/ALUixQ2YfWpaCo3JyvOdluYw8fAdVwuMX7PBis0YiyD/Xj4sOQ4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RIvTGwuT; arc=pass smtp.client-ip=74.125.224.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E006114A4CC;
+	Mon,  9 Mar 2026 19:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773082873; cv=none; b=aZqu906/3H8AZ1W0bOaFhhO3F1b1/f3wkfFQswIL/BTwx2Q9H3xqD2j+QlLBPm1OHEyz66wrqF5yXGEkoRhW06tJWAZ1UZM9tg2IRIDCKu/AoIrpduOw8rxyEGmgZ+aspxn+D5zoNMsthOks5PwDsdNlnFMXxxCKrJRUoAwXHrA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773082873; c=relaxed/simple;
+	bh=zuZybXxG4NWtCCamlMtgm4GPhCUwWs75GokKHhfMbyA=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=QCmBAwOLqWrnXR8eva6gXElo4OqrkXzQuB5QYgU3FvYWtoDJC7B85wjJTWwGoLp5rzxGkemZmw0E57Jvh2Atm6KSaM5c86CDvWQ/ujg1lSONgiypvYEUN/lpO0DGycqC65/yg5OSCt0zXJJXHxjsbOWwPU75UcJZPDJlQBPVqhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=d2IgH4d2; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RIvTGwuT"
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-64c9fcc24b3so9179352d50.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Mar 2026 11:03:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773079403; cv=none;
-        d=google.com; s=arc-20240605;
-        b=WyXA1jK17pDCOjoDAuD1CgPkw4M59REhIEWVj1f+q1uC5hUJEdFB90Hwwk5WreQ0B6
-         EePCcQjZKtb806eFbJ6PpXZIvCneSVkrEUEP9xIRtZ+B+28STKlncULHg153Sai92boF
-         Ozfb1ngw8XKPH7ePLgeSLLBTvSlRTdYhWWKU1parOvboghnJ9e29Df2cpmNIzHrXtIqk
-         4/GYTP+jNDYdASI8bdcQjBEDiblcuEAemIxIWyLUwjPkR1R1qoqy45SukaL51h9JynwC
-         UDgdfgS2W9D7rj97tWKmsAjOaMqezAj2S/ks2RY0IADOatClvqaz7d4C/SXfdiWUo6ld
-         M30w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3qe2hSSyyUD5QJ6eskpYQYCaCQqbFKz4DLIsfb3Qor4=;
-        fh=XpeyESMyPG1EcHWk4zVxetP78AWMv8zWnb7T6kDYEyQ=;
-        b=Sv6LCcdH9kPXNVwsgavMRH73ZxR3YYkwngbwfTRfN46IZBNnS4daZRmaXi3TOOJz/a
-         4JDCW/iK5Bi2y3DhscUdWU18Tnd36H6xMT0VvQxZDyexXymUeXxwITpQU54J9Q7qNcks
-         D/nFhIwMyY/OVoG+cYSl172EGEgxUKZ5z+Bl22d+A/wc74yCqsEq1DDTcVKYmypsOuKZ
-         CSzvp9hdTbMccFXEQ5UHi0PM6nt7JeAzneBS6ckFyNq5ny3pBAoOXo4Mp2I70tH3BJ1x
-         8gLxbfCgo/IRlWJwQQs1vUSauMTJNYyKl2G654OvJ2PWBYDFpCuJ5FG++nppO7TCMlvT
-         dUow==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773079403; x=1773684203; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3qe2hSSyyUD5QJ6eskpYQYCaCQqbFKz4DLIsfb3Qor4=;
-        b=RIvTGwuTywHHYVwcGXKIIw/K4P5lv0ZdoLgwWE4pVqQoitVKfuGh9iXEkFXW8eseJa
-         HPFc0J+UV7o3jItw8GKBhc+xJ7UmvYSGXoCCx6RYRqldRBwmpD990pYmhVwC2lx2HrMi
-         cJOFikhKZDCFNuLoZCLHqMtkNOdTAobPmlM+vHi+zpvGoIbKwcPFipfGFfZjRI2gd9BE
-         5rbdkoLBkQA7hsJRE3+rqo3Hj8yigsISdA/u8bCmir7buBin4QKIGfB6bDtKpXMmCbIE
-         Pbqq+a+lpighq+GQo51v2BEteEAvbuDvBgvvB8k6i3uxthLWNQculjdHTxpqq3yxLMV2
-         QJUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773079403; x=1773684203;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3qe2hSSyyUD5QJ6eskpYQYCaCQqbFKz4DLIsfb3Qor4=;
-        b=V78QCgvbOpUL0NSkzWz9EoPZmoPKYApAi6vk95HtwSvtiY+3VVqEex6vLR/gmv6U8W
-         kGrgIoWAga/+haUHwplnVuVj1prvZIXQPwKd6q6DHXn+hrao8L0lYyxoALIu/+PuD5bD
-         9KAHOqVcP4Xa8QfJJ9akxx/s5mj/GPmW7UyCDm68/zkhePGPw+nTu69wD8nJvZIElW+m
-         0mlmGk6+Zo9ZnV/blJaJez+1g3WyZ/NK94gILBXAGL7tnTO5Aie8kewMYgOmqoxriN2E
-         ziiOWaeuDtl/kXMQqraZgBF3gnpL4ns33+tpe4mti8hftB3mcg04vUPveloA3rq8+dfA
-         +f5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUlkS/OsONFmv/nXNw36U70KotxjSHd39WqfUtdJP7Ax5t3m/QS/IbYbOu6G54rHJUFJyYyIK94N3/coofE9HI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxZUQ5qLUTP7SbMjjJRPLJzHXPGUjsapIWfkRUqrM+BwJFNbDh
-	VedwNGKlGWXr/FJwm6gNT2vLO5FI/kyRx1qXHtCdSgfXu4gZqaL/pjm/vxJWhVdzsGQr1+vIoHg
-	yU+IuqETLe/bSK5DSFh/ihdUPy80y/6o=
-X-Gm-Gg: ATEYQzz5Qhe0L0f+p6ilyrslBGV85b4jqbUbAg/rbuWan/HKoQovoavAxMelPz0Hb+5
-	iOhk3HzygSn593XvdB19GdU2AT73TyKR4J9Iu2+1d7vKEQfmUUIi7psHcuk0D7sk1TJVkDnXssN
-	HFFlDVQ3dBiy7YCyyvUpiAxXC8v/aNXECCpe2ZF+thYUNPRiM+JbY2oCcAO2Lpe6Ae5Vc/rn2s3
-	uFJ/rzGcdNsDpUFqPkkBz9vzkgtx0OTCxfKRTmn1foFkLsvXRhGO1vLIA56sommaPu38XQZ1Cbb
-	M2NhmWDNP908Oo5RT+MruHgZJ8XOeV5odPB7qZFN8JuEa1HzDAQDiCqZGcp+SJ0YjGU=
-X-Received: by 2002:a05:690e:4486:b0:649:c7dd:d2ea with SMTP id
- 956f58d0204a3-64d141a0203mr8540153d50.39.1773079402780; Mon, 09 Mar 2026
- 11:03:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="d2IgH4d2"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 629BiYp9402979;
+	Mon, 9 Mar 2026 19:00:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=5swsN0
+	rUxxavDq9zMYnPJS2Jv47BUk07HnZRz0pbh40=; b=d2IgH4d2cI76xjXosS08+5
+	z7p4cmRM3+vsUQToHiG2nB8DP/joMF596z7727f61cqMRXeNJJpaPHxOajT8sUoA
+	4hdB+fd4u1HsuNVMFr3OsadtAG1CKvM35tVtsMpgaqqCM2ZBMMXJkpG++BlAdorh
+	a25OzV7jJWb6oFmtakhiLNn+qzaAmqYeRhvuloIidiB6X0BgKDL71O4yfuzN3RUh
+	AoqpvZ653XjMWMMwrSPrZbVK8uRNsl6RplSUCc6nWvYsnXyDf2A2VF2Up7qZowSZ
+	aJlNA2A77/MP8caSRZkmC6D9PsUx9bOXT5BvUfyuxzfxj3qWmymQF0ir3jH77L1w
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4crcun7rdb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Mar 2026 19:00:09 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 629FvaW1015771;
+	Mon, 9 Mar 2026 19:00:08 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cs121ww0t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Mar 2026 19:00:08 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 629J079s4915810
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 9 Mar 2026 19:00:08 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B444C58064;
+	Mon,  9 Mar 2026 19:00:07 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E09F35805A;
+	Mon,  9 Mar 2026 19:00:04 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.72.80])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  9 Mar 2026 19:00:04 +0000 (GMT)
+Message-ID: <c9500adc562665d44feaca9206f23a5ba07432c1.camel@linux.ibm.com>
+Subject: Re: [PATCH v3 00/12] vfs: change inode->i_ino from unsigned long
+ to u64
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+        fsverity@lists.linux.dev, linux-mm@kvack.org, netfs@lists.linux.dev,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-nilfs@vger.kernel.org,
+        v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+        autofs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+        linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
+        devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
+        apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+        netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-x25@vger.kernel.org,
+        audit@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-sctp@vger.kernel.org,
+        bpf@vger.kernel.org
+In-Reply-To: <f22758116dabd3c135a833bcb5cfcd2ea4f6ecf4.camel@kernel.org>
+References: <20260304-iino-u64-v3-0-2257ad83d372@kernel.org>
+		 <05b5d55c49b5a1bbc43a5315e3c84872e7e634b3.camel@linux.ibm.com>
+	 <f22758116dabd3c135a833bcb5cfcd2ea4f6ecf4.camel@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 09 Mar 2026 15:00:04 -0400
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260302233756.910702-1-dajid.morel@volvo.com>
- <CABBYNZJtZZ7mHJinJY9ZfhfHbYUC9aEmoRx9ACz5R4HSwepyFg@mail.gmail.com>
- <CAM8DPm26RVUJbgA+Lutqshu+ZqkVtNaVrKdG-k1WdE0rcSe0dQ@mail.gmail.com>
- <CABBYNZKxUJUtZTNe0+ot1JmNDyLzf3x-TyN+TqPz-o5xMmx=6A@mail.gmail.com>
- <CAM8DPm24s+2raquaofgPoroTMECGdKeba7pnDz5X64wN66yjiw@mail.gmail.com>
- <CABBYNZKaNmSPbCpJ-GKu2eSrgd_GcOOWkekHW0OMK8WMLESYWQ@mail.gmail.com>
- <CAM8DPm20Sm1t_NMoWQFZtkmdaiL1ALs8SFMqxe-QtT5wjbp6xA@mail.gmail.com>
- <CABBYNZKmu3b2h2NyhhV7CwmB=h1R9uAe0HXDCP73iAvqzy7AYA@mail.gmail.com>
- <CAM8DPm2z-6xUm3SyFJ9umn4=o9bBov6PhKV0TEDCBc14eMFSew@mail.gmail.com>
- <CABBYNZJZWkEy2D4WW8ODMoU-ZmsT1aN0LccOzdsCxuKnFZHnuA@mail.gmail.com>
- <CAM8DPm1fWn7jovVPgcBrApy_czP0TbnBi=oUZmhjMqDkORv2bw@mail.gmail.com>
- <CABBYNZJ6NNL26BOxV2E6HBA6D3vgOauRQ=75vRcBMA0D-vSEHw@mail.gmail.com>
- <CAM8DPm0rgZEY+aNj8-RJv7JwvMOBQuRu7qt7G+z_OpVL+zk3Gw@mail.gmail.com>
- <ea9528bd-ccde-4da3-b85b-793e370b4da1@molgen.mpg.de> <CAM8DPm20ECFZF6v19SrLwA8o92YXY_dsWvOyFDOuym5S7P2kCg@mail.gmail.com>
-In-Reply-To: <CAM8DPm20ECFZF6v19SrLwA8o92YXY_dsWvOyFDOuym5S7P2kCg@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 9 Mar 2026 14:03:11 -0400
-X-Gm-Features: AaiRm508ooyGXiPGOEgeeyCywprIjsLVBWblUczLOwusGfwGWya-cRdztjzWRSk
-Message-ID: <CABBYNZ+ePfwbc2NS-hG5g98trXOvUqRtp-ZiXD2crrvx-Lygzg@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: Increase LE connection timeout for
- industrial sensors
-To: Dajid Morel <dajidp.morel@gmail.com>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>, Dajid Morel <dajid.morel@volvo.com>, 
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IXXixi4WEaMt5ZLipHNyYmLY2v6HWLsd
+X-Authority-Analysis: v=2.4 cv=Hp172kTS c=1 sm=1 tr=0 ts=69af18ba cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VwQbUJbxAAAA:8
+ a=o9bg_TheAfZNAX0b3qsA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDE2NSBTYWx0ZWRfX6z/xa1oiKPHE
+ y5EqU++9e+D9gbPsThEA40KAIQaMNONuQFv6rphXC4UXK9hbuizpabscJIBcCstT+gR2HtuKysP
+ juuUkxGaMl7wxMTZHQleqdpaj1BApzfJEmhJlxbY5TY+zaAhKCE7FmRzIMEIOEQTi0cM+UreNNn
+ frwDdmfnFwh4sJREHHlQDdGWVECyjZbYar7Sfrv1WmeMPxeeCh8/LcWzrRHQxRnw2tvA2a4D8NR
+ c7ma8KolSpfVjNgJ0OleioMQBwEZGtoJr7jBKqVpvCDiflI9IHYr2EnI/OMDVmsDQcjOAtzHE2E
+ Cqs2ZZL0dk00OuX7g/sw5bXFEAXaWjWvfls2vJrY4HNOaz6u97184uDaehJuW5B2dmjBv87lTJU
+ mdY20MyhE/Ql/CExB+A/Xcl6KkN3u1kmsdTu44KKD0LP1RVDdsR5dGWPIvWKEchoHvJnuy6WqMG
+ FGu2ZyF+vBxNE+HNtfg==
+X-Proofpoint-ORIG-GUID: IXXixi4WEaMt5ZLipHNyYmLY2v6HWLsd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-09_05,2026-03-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 adultscore=0 malwarescore=0 impostorscore=0 suspectscore=0
+ spamscore=0 phishscore=0 clxscore=1015 priorityscore=1501 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603090165
 
-Hi Dajid,
+On Mon, 2026-03-09 at 13:59 -0400, Jeff Layton wrote:
+> On Mon, 2026-03-09 at 13:47 -0400, Mimi Zohar wrote:
+> > [ I/O socket time out.  Trimming the To list.]
+> >=20
+> > On Wed, 2026-03-04 at 10:32 -0500, Jeff Layton wrote:
+> > > This version squashes all of the format-string changes and the i_ino
+> > > type change into the same patch. This results in a giant 600+ line pa=
+tch
+> > > at the end of the series, but it does remain bisectable.  Because the
+> > > patchset was reorganized (again) some of the R-b's and A-b's have bee=
+n
+> > > dropped.
+> > >=20
+> > > The entire pile is in the "iino-u64" branch of my tree, if anyone is
+> > > interested in testing this.
+> > >=20
+> > >     https://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git=
+/
+> > >=20
+> > > Original cover letter follows:
+> > >=20
+> > > ----------------------8<-----------------------
+> > >=20
+> > > Christian said [1] to "just do it" when I proposed this, so here we a=
+re!
+> > >=20
+> > > For historical reasons, the inode->i_ino field is an unsigned long,
+> > > which means that it's 32 bits on 32 bit architectures. This has cause=
+d a
+> > > number of filesystems to implement hacks to hash a 64-bit identifier
+> > > into a 32-bit field, and deprives us of a universal identifier field =
+for
+> > > an inode.
+> > >=20
+> > > This patchset changes the inode->i_ino field from an unsigned long to=
+ a
+> > > u64. This shouldn't make any material difference on 64-bit hosts, but
+> > > 32-bit hosts will see struct inode grow by at least 4 bytes. This cou=
+ld
+> > > have effects on slabcache sizes and field alignment.
+> > >=20
+> > > The bulk of the changes are to format strings and tracepoints, since =
+the
+> > > kernel itself doesn't care that much about the i_ino field. The first
+> > > patch changes some vfs function arguments, so check that one out
+> > > carefully.
+> > >=20
+> > > With this change, we may be able to shrink some inode structures. For
+> > > instance, struct nfs_inode has a fileid field that holds the 64-bit
+> > > inode number. With this set of changes, that field could be eliminate=
+d.
+> > > I'd rather leave that sort of cleanups for later just to keep this
+> > > simple.
+> > >=20
+> > > Much of this set was generated by LLM, but I attributed it to myself
+> > > since I consider this to be in the "menial tasks" category of LLM usa=
+ge.
+> > >=20
+> > > [1]: https://lore.kernel.org/linux-fsdevel/20260219-portrait-winkt-95=
+9070cee42f@brauner/
+> > >=20
+> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> >=20
+> > Jeff, missing from this patch set is EVM.  In hmac_add_misc() EVM copie=
+s the
+> > i_ino and calculates either an HMAC or file meta-data hash, which is th=
+en
+> > signed.=20
+> >=20
+> >=20
+>=20
+> Thanks Mimi, good catch.
+>=20
+> It looks like we should just be able to change the ino field to a u64
+> alongside everything else. Something like this:
+>=20
+> diff --git a/security/integrity/evm/evm_crypto.c b/security/integrity/evm=
+/evm_crypto.c
+> index c0ca4eedb0fe..77b6c2fa345e 100644
+> --- a/security/integrity/evm/evm_crypto.c
+> +++ b/security/integrity/evm/evm_crypto.c
+> @@ -144,7 +144,7 @@ static void hmac_add_misc(struct shash_desc *desc, st=
+ruct inode *inode,
+>                           char type, char *digest)
+>  {
+>         struct h_misc {
+> -               unsigned long ino;
+> +               u64 ino;
+>                 __u32 generation;
+>                 uid_t uid;
+>                 gid_t gid;
+>=20
 
-On Mon, Mar 9, 2026 at 1:37=E2=80=AFPM Dajid Morel <dajidp.morel@gmail.com>=
- wrote:
->
-> Hi Paul,
->
-> Thank you for your feedback. I have analyzed the current bluetooth-next t=
-ree
-> (Commit: 19182348259c) as you suggested
->
-> As you pointed out, Luiz is the expert on this topic. For my part, I
-> am an apprentice student
-> majoring in Physics and Microelectronics Systems; I do not have
-> extensive expertise in the Linux kernel.
-> My analysis relies primarily on observing physical behavior and
-> experimentation on our production line.
+Agreed.
 
-One thing is discussing, another is arguing. You aren't seeking a solution =
-here.
+>=20
+> That should make no material difference on 64-bit hosts. What's the
+> effect on 32-bit? Will they just need to remeasure everything or would
+> the consequences be more dire? Do we have any clue whether anyone is
+> using EVM in 32-bit environments?
 
-> Le lun. 9 mars 2026 =C3=A0 17:02, Paul Menzel <pmenzel@molgen.mpg.de> a =
-=C3=A9crit :
-> >
-> > Dear Dajid,
-> >
-> >
-> > Sorry for chiming in. Luiz is the most knowledgeable person in this.
-> >
-> > Am 09.03.26 um 11:02 schrieb Dajid Morel:
-> > >> Yeah, you really don't know what you are talking about, there is no
-> > >> timeout on HCI_OP_LE_CREATE_CONN itself, the controller shall genera=
-te
-> > >> a command complete immediately and the connection attempt is only
-> > >> interrupted with HCI_OP_LE_CREATE_CONN_CANCEL, so lets say yo want t=
-o
-> > >> increase HCI_CMD_TIMEOUT that means HCI_OP_LE_CREATE_CONN_CANCEL
-> > >> cannot be send because it would be pending on HCI_EV_LE_CONN_COMPLET=
-E,
-> > >> anyway I fill like Im wasting my time here.
-> > >
-> > > Hi Luiz,
-> > >
-> > > I'll be brief and stick to the logs. Here is the output from a stock
-> > > 5.15 kernel (2s timeout) on the Raspberry Pi 4:
-> > >
-> > > [bluetooth]# connect E8:C0:B1:D4:A3:3C
-> > > Attempting to connect to E8:C0:B1:D4:A3:3C
-> > > Failed to connect: org.bluez.Error.Failed le-connection-abort-by-loca=
-l
-> > >
-> > > The "le-connection-abort-by-local" error is the smoking gun. It prove=
-s
-> > > the Host is aborting the sequence, not the peer.
-> > >
-> > > When I apply my patch (15s timeout) on the exact same hardware:
-> > >
-> > > - The "abort-by-local" error disappears completely.
-> > > - The connection succeeds 100% of the time.
-> > > - We can read the pressure data.
-> > >
-> > > I noticed in dmesg that the Broadcom controller is missing its firmwa=
-re patch:
-> > > [   16.357546] Bluetooth: hci0: BCM: chip id 63
-> > > [   16.360628] Bluetooth: hci0: BCM: features 0x07
-> > > [   16.378604] Bluetooth: hci0: BCM20702A
-> > > [   16.378639] Bluetooth: hci0: BCM20702A1 (001.002.014) build 0000
-> > > [   16.381695] Bluetooth: hci0: BCM: firmware Patch file not found, t=
-ried:
-> > > [   16.388662] Bluetooth: hci0: BCM: 'brcm/BCM20702A1-0a5c-21e8.hcd'
-> > > [   16.394969] Bluetooth: hci0: BCM: 'brcm/BCM-0a5c-21e8.hcd'
-> > >
-> > > This likely makes the controller slower to process sync commands when
-> > > high-latency sensors are advertising nearby. However, the system is
-> > > 100% stable with the 15s timeout patch, even without that firmware.
-> > >
-> > > If the timeout is truly decoupled, then "le-connection-abort-by-local=
-"
-> > > should not be triggered at exactly 2 seconds. The fact that it is
-> > > proves that the hardcoded limit in hci_sync.c is the blocker.
-> > >
-> > > Since this is for a Volvo production line, we need a way to support
-> > > these sensors. If you refuse the global constant change, how can we
-> > > avoid this "local abort" in the sync sequence for slow controllers?
-> >
-> > As this is the upstream list, it=E2=80=99d really help if you could tes=
-t with
-> > 6.19, 7.0-rc3 or =E2=80=93 best option =E2=80=93 with the bluetooth-nex=
-t tree, just to
-> > be sure.
-> >
-> > It=E2=80=99s definitely great, that you are looking for an upstream sol=
-ution, so
-> > please be patient, and I=E2=80=99d really be interested in your test re=
-sults.
-> > Depending on these, a way forward can be derived.
-> >
-> >
-> > Kind regards,
-> >
-> > Paul
->
-> The source code analysis of bluetooth-next confirms that the LE
-> connection preparatory
->  phase (Accept List) is still limited by the hardcoded HCI_CMD_TIMEOUT
-> (2s), which is
-> identical to my production kernel (Jammy 5.15, Commit: 7824a77711ba):
+All good questions. Unfortunately I don't know the answer to most of them. =
+What
+we do know: changing the size of the i_ino field would affect EVM file meta=
+data
+verification and would require relabeling the filesystem.  Even packages
+containing EVM portable signatures, which don't include or verify the i_ino
+number, would be affected.
 
-This is a logical jump, there is no evidence that Aceept List, or any
-other command done in preparation has timed out, just collect the
-btmon traces so we can check which command is considerer to timeout.
-
-> ubuntu@builder:~/bluetooth-next$ sed -n '2511,2514p'
-> net/bluetooth/hci_sync.c err
-> =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_ADD_TO_ACCEPT_LIST,
-> sizeof(cp), &cp, HCI_CMD_TIMEOUT);
->
-> While I cannot easily boot a 7.0-rc3 kernel on this specific
-> industrial hardware today, the
-> code at line 2511 in bluetooth-next is strictly identical to my 5.15
-> kernel. In our environment
-> with high-latency sensors (5s advertising interval), this 2s limit
-> systematically triggers a
-> "le-connection-abort-by-local" error before the final connection
-> command is even reached.
-
-Derr, you can boot a regular laptop, it doesn't need to be the
-specific industrial hardware. Since you don't claim the issue is
-hardware-related, it actully _doesn't matter_, or maybe it does and we
-don't know it yet because you never provided any traces.
-
-> What architectural approach would you recommend to allow for more
-> latency during these preparatory
-> sync commands without modifying the global kernel constant?
-
-On the recent kernels the timeout is configurable.
-
-> Best regards,
->
-> Dajid Morel
+Mimi
 
 
 
---=20
-Luiz Augusto von Dentz
+
