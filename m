@@ -1,69 +1,69 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C0B3D092C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 17:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB6C3C65FE
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 17:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773162700; cv=none; b=B4R+szFkS9B5bVEdk90wQEJ3jjh0xUMJuT0WoNGiKDi/YzbZ7MD4YBCBLEGc05psBY19e1RolcQaWIsWrh5WlF7frsfFY3E4u/oRk0ebsBuP5OpGEDJOyCwRJ+bqmAfDmu7AhCC+uj6cPrDgQAELYijkSZuOqqziIY8ZTXvTh/k=
+	t=1773162701; cv=none; b=eB81q7kd73eeqREOulx/xR9Nsh7PKbTunXT2TXbX0gPFqCgMNAw2b9v/JDoqeY96HKV/oc9IfFxkVLOeW/gjAPBR76nB8SFJLTajb0o2KbW4ehNI8B5fo1ioqRpChXeMKOe9IYJjo7s4oMtHdh/MR7PPlQ91E+T3VDJSfCmghPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773162700; c=relaxed/simple;
-	bh=G8YGd4hf7QOuePV4BdpRBN0B/UY3aY5cNhi9QsSYO00=;
+	s=arc-20240116; t=1773162701; c=relaxed/simple;
+	bh=kBoNMK7vN3RapcMGNmFCvPyiZ90GlojTtxbEE13kh90=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FcAXGw4m/xMkJHbDN0f/JfGh/+JzsmiaxbBpR2JudYVK506fDGvZ9L9hOsK22xIZHdzYRHWFGoyJSOB3XsSuVlIWFXXFoEJ8AB8jbYTtIg9t/MFiCNV+COjZCcMjmh5TeRkzETcveisnLSfiBJ8u9LTESzkaBsqEj4my+sVnA0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N4B1T+6g; arc=none smtp.client-ip=209.85.128.173
+	 MIME-Version; b=Vh/2ksfsL3XfjRwJJldUeJ5oUwblHzcew0vFCq5c285Rx1K+nafy1GW55VLnIymS1z6jNLSk5aVJOweumlxxZhiGpnYemuX67+oaoUw7iMiDK4Nk9nVexfJZhHHe27+QZ89qS5ZLE57hAWnH7XqZL0VqSpHHWP9MpitQONneRj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ts3/PRhi; arc=none smtp.client-ip=209.85.128.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N4B1T+6g"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7982c3b7da9so119579167b3.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 10:11:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts3/PRhi"
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-79900d6dc3cso21417807b3.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 10:11:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773162697; x=1773767497; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773162699; x=1773767499; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gXiIQM5+uW9tCc+XSCdIzld4IYzT/Zva9aH2LMWKoVU=;
-        b=N4B1T+6gOBiADRwmOsIlk5tKRelbEST10UB15c8w9olrzglaXQ68SHoAImovL+Ap47
-         lhmN2RFDqsNeC2Eo9VtkCTen6yMZxzG3ZYuF92MgvxBq4SbYah3KvWYYJmWlj9ESxL94
-         YftOCGIJ2MW4eXgVvSUPXbi3fGvBZyEYHusP9Diu+6PVWLgCWbu+J2h7vnz89gga0Rlk
-         OrWZwCnwidg8gAAckKMd3id6JAVKBymhq3R7mA1kIrXro6DZWH1/Lj/0ZtXK+SW06SlL
-         6Wj9gLaOnDXYkNuXF9l27EuLceHbkIcnP51KkgcYVlajwNo1+d4BeaRPzKsor0sD1Qun
-         ZvGw==
+        bh=lJ+XFwyZjMvlD2nEnm+7UckMZVq0fQ0t9u4T5vWGunY=;
+        b=Ts3/PRhiM8Z3hOAQ5S2qjV4Pi+INeg7lz+AZ3b1vqItxwPmoRW+nuBQfuqk9ISWUwf
+         VpwWJ/l81TxsomT14s/U4Tc9OwfB0RG3gi9zCcMLX0GCrvFIKjGRfrNdNUGMf3UlA3B2
+         uRb05pbIXXRchs76dv8uvNRv0rdwGFsxg7w2ChzvY5MzAo5Bfbd1cUOv9uVcxKkfQCBI
+         98O9Tr73bVpcz8GNvCpSn5n37q1JXolGCdcLBRUUuFR73Ug+GWJRqlpR3ZRGuWF+0aiG
+         DcitSRnTQuHxkthZGxOUBwslfXTF6QBko/925htHWPDLb4RumCPuHYl2HPiT5Dmi/Co4
+         zuuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773162697; x=1773767497;
+        d=1e100.net; s=20230601; t=1773162699; x=1773767499;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=gXiIQM5+uW9tCc+XSCdIzld4IYzT/Zva9aH2LMWKoVU=;
-        b=Y3ObrJZ8BQPgqOY2kL5KhWYTD6AWYG4z7NrdnhXl0dMVZvRBBBtzvDmmMAaPwqKieM
-         bJOGt4R4uTJjJYKypoxBd/G/ku/1IzAZGaZnmDy/S0aDwoLNRujYQDh38GY/fI+Np0aa
-         cNjIuVnWOo9xftpm7Cy6FPiRhOPSc4kJYRf/gcQns2kLMej2wr3Xkwk2dKuF7BAANBof
-         NpUNX4fd99nXa6AMwLptLDp/z79ih9PzGCXt+fcJOXPRaVon91dbNd2SqBfgJdN2v7cl
-         mJs0wL1SmQ7//7WxSkU3xv8sBGyD2lKsE8lMAk1vXLhCRat7GzkV4Xkl6Qag42ze4t3k
-         jV6Q==
-X-Gm-Message-State: AOJu0Yz3AiomGmhuaEvRJyl+m/FT5ZWcib/aLjzaV4+HmfKqnRRfMYIJ
-	Sj31Brn+CrzVzdJbGB9icuRioOK2Iq2wklysxxuEJJhgBM/F80ZcnvEiw7KPdA==
-X-Gm-Gg: ATEYQzwHV2C3V7izWNAM7Oc2RhjlovZkIcABcRfeuotVDmc06f2FyRUV+htqRLQ4bg1
-	C9DTZKCpo/yeEIOib3onakXeAw+1Uj8j+HZ+a9aMGVFW5b63bZhpyLi+PvW2dUEmr+Sk0yGAKWI
-	oGnIf3guMqfKNg9Jb+caTvpHtF33gz3ASLsv1gjgUUvKUtAzcgLQtg75mJoF56k96HgGUR+5L5U
-	htDHkKqFi2ROmXPv0CedTZ9GgHXCCOVnqD1wv5bOrYqSm3X0ji+2QhJB91sooIAmt9Zhs6aOZEb
-	WuwiPepSxmiUPfAcnl0RXy1tSg+nVonJikVHRHrD7fFqJkxOsOiSYwebcrq+rz0Z5MOiOxrEtOn
-	XdZugoirqPGNB/hcwwzHldarHKHxsNG3abfQs52KJoNJGdp43IhlkRU0yOUP/nAaIb5gsVt3/i2
-	AenFoTAWVlfDgC5HctLeaJun4BAKyl5sLjkmGnXxvC67tqu0uLaAzcWbGwrcZi/EJ0HUc7gWe4i
-	T4rF7d0cwpJc+mYJw==
-X-Received: by 2002:a05:690c:e3cc:b0:799:ba1:b950 with SMTP id 00721157ae682-7990ba1b99amr32343447b3.0.1773162697313;
-        Tue, 10 Mar 2026 10:11:37 -0700 (PDT)
+        bh=lJ+XFwyZjMvlD2nEnm+7UckMZVq0fQ0t9u4T5vWGunY=;
+        b=prAUdX/OeDpbWCndG25LEendQZKXhGmg/RTetgWqOsPKc25fmIPfdDHo+2kRr+plPs
+         utu8SqxX876+6ZfbMIqk7S0YiQGVJaRual9Yp318EYmC+4D2H+VVNJaIbB7iTm0uVqAv
+         s5y03DLjSOf/81eYxaiWsvk6ZeMEW2Un7bOuJej7hJcqlKtUY4NTcQKPU76zxaKbUHy7
+         LoKN5sBaZ2d207sU7zf8loYasZFkLz52dAHkwsy73XSHH3fHfNHnmm3inAiKwBEQScR9
+         YnnWCUF9rl7cyOLiDA4snW6txc5CBDmdLAtbo07YVnfpEF2Ff2fcVVeDZdrzx9NmtliR
+         ksaA==
+X-Gm-Message-State: AOJu0Ywu6uYHdRx8jxApqZPqq8rBIChgcV/TopmbdDEBdJfX21BC/qCm
+	gLQgAZrV1xJioOQsEug2crnUoMDvJJMDatgCmWp2csVpvCk0G47EHunG18lzIA==
+X-Gm-Gg: ATEYQzwF8+HWZC5RihR3RtVLiLVTEqMVAn2SYcHn+8Pmq0ECb+5cy49lZg+s5Rnffk1
+	G85APj+l+Khql4Ur8oIV7QFesjmobwzSuZ7U4HHb31RD9ywrCSypXz/2wEkGZotAtxee4mdm2lc
+	MQI8aK449i1SfypYl99/0iN3gXGL2Ek81Xptl9OAKiNNJXMhur1cfSuGSdhcOWRvviZusi9Jh6F
+	pk3wYoTo8AeG5Koq0wsa5xCjstIfYAXU+EFjys9eBIDs+TE+jnLSqVoLJH5KDpz/4wG0ZJkEpUr
+	xVv/5XokyN6tEyvhRK1P47/Tl3ETjDQHnQ6Jtyx+bJfbN4+zUh4FMpY4y7gccYPA5a2gWWmuExU
+	f+j1P2oN4g7gc1pcD4t2OLuOjcrD95B7Q4Y+3C7k+jLWp3Gv3h5dG6qhGuFzEfxDmDpogucgmW3
+	3QU22VreDtWXFT9It/GWFWfwcBPjus+nbDC2x9IRwyFhLVSeQI68ffs50dA+ZlCgtKbwUNghsPQ
+	DnMkQXX024ORmBVWw==
+X-Received: by 2002:a05:690c:398:b0:798:270:fec0 with SMTP id 00721157ae682-798dd68a7cdmr136067047b3.5.1773162698661;
+        Tue, 10 Mar 2026 10:11:38 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7990a51a245sm19745357b3.5.2026.03.10.10.11.36
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7990a51a245sm19745357b3.5.2026.03.10.10.11.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 10:11:36 -0700 (PDT)
+        Tue, 10 Mar 2026 10:11:37 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/6] doc/btmon: Add SMP pairing flow documentation
-Date: Tue, 10 Mar 2026 13:11:15 -0400
-Message-ID: <20260310171126.342447-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/6] doc/btmon: Add L2CAP channel tracking documentation
+Date: Tue, 10 Mar 2026 13:11:16 -0400
+Message-ID: <20260310171126.342447-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260310171126.342447-1-luiz.dentz@gmail.com>
 References: <20260310171126.342447-1-luiz.dentz@gmail.com>
@@ -77,342 +77,266 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add comprehensive SMP pairing documentation covering:
+Add comprehensive L2CAP channel tracking documentation covering:
 
-- Pairing Phases 1-3: Feature exchange (IO capabilities, auth
-  requirements, key distribution), authentication for both Secure
-  Connections (public key, DHKey check) and Legacy pairing
-  (confirm/random only), and key distribution (IRK, LTK, CSRK).
+- Fixed Channels: CID table (0x0001-0x0007) mapping to protocols
+  (L2CAP Signaling, ATT, SMP, AMP Manager).
 
-- Pairing Failure: Failure reason code table (0x01-0x0e) with
-  diagnostic meanings for each code.
+- Dynamic Channels (BR/EDR): Connection Request/Response flow,
+  Configure Request/Response, and PSM-to-protocol mapping table
+  (SDP, RFCOMM, BNEP, AVCTP, AVDTP, ATT, EATT).
 
-- Automating Pairing Analysis: grep patterns for identifying pairing
-  attempts, detecting SC vs Legacy, finding failures, and correlating
-  with encryption.
+- LE Credit-Based Channels: LE Connection Request/Response with
+  MTU, MPS, and credits for flow control. EATT over PSM 0x0027.
 
-- Updated Automated Trace Analysis: Added pairing/security check step
-  in the recommended workflow, SMP cross-reference in connection
-  lifecycle patterns, and pairing failure debugging scenario.
+- Connection Parameter Updates: LE peripheral parameter change
+  requests via L2CAP signaling with accept/reject handling.
+
+- Automating L2CAP Analysis: grep patterns for channel establishments,
+  PSM tracking, parameter updates, and EATT setup.
+
+- Updated Automated Trace Analysis: Added L2CAP channel check step
+  in the recommended workflow, L2CAP cross-reference in connection
+  lifecycle, and connection parameter negotiation debugging scenario.
 ---
- doc/btmon.rst | 280 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 275 insertions(+), 5 deletions(-)
+ doc/btmon.rst | 207 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 206 insertions(+), 1 deletion(-)
 
 diff --git a/doc/btmon.rst b/doc/btmon.rst
-index f769a7af6e8b..bddbd07d3c35 100644
+index bddbd07d3c35..cc4f81bed2d7 100644
 --- a/doc/btmon.rst
 +++ b/doc/btmon.rst
-@@ -1129,6 +1129,254 @@ The CCC descriptor at handle 0x000d belongs to the Service Changed
- characteristic (0x000c), because it falls between that value handle
- and the next characteristic declaration at 0x000e.
+@@ -1377,6 +1377,197 @@ appears on reconnection, the bond was lost on one side.
+ 5. Check for ``Identity Address Information`` -- reveals the device's
+    true address
  
++L2CAP CHANNEL TRACKING
++=======================
 +
-+SMP PAIRING FLOW
-+================
++L2CAP (Logical Link Control and Adaptation Protocol) multiplexes
++multiple logical channels over a single ACL connection. btmon decodes
++L2CAP signaling automatically and routes data to higher-layer protocol
++decoders based on the channel.
 +
-+The Security Manager Protocol (SMP) handles pairing, key generation,
-+and key distribution between Bluetooth devices. SMP traffic appears
-+inside L2CAP on fixed CID 0x0006 (LE) or CID 0x0007 (BR/EDR). btmon
-+decodes all SMP operations automatically.
-+
-+Pairing Phases
++Fixed Channels
 +--------------
 +
-+SMP pairing proceeds in three phases. Each phase produces a distinct
-+pattern in the btmon output.
-+
-+**Phase 1: Feature Exchange**
-+
-+Pairing begins when one device sends a Security Request (peripheral)
-+or the host initiates pairing directly. The initiator sends a Pairing
-+Request and the responder replies with a Pairing Response::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #497 [hci0] 0.026107
-+          SMP: Pairing Request (0x01) len 6
-+            IO capability: NoInputNoOutput (0x03)
-+            OOB data: Authentication data not present (0x00)
-+            Authentication requirement: Bonding, MITM, SC, CT2 (0x2d)
-+            Max encryption key size: 16
-+            Initiator key distribution: IdKey Sign (0x06)
-+            Responder key distribution: IdKey Sign (0x06)
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #499 [hci0] 0.026894
-+          SMP: Pairing Response (0x02) len 6
-+            IO capability: KeyboardDisplay (0x04)
-+            OOB data: Authentication data not present (0x00)
-+            Authentication requirement: Bonding, SC, CT2 (0x29)
-+            Max encryption key size: 16
-+            Initiator key distribution: IdKey (0x02)
-+            Responder key distribution: IdKey (0x02)
-+
-+Key fields to check:
-+
-+- **Authentication requirement** -- The ``SC`` flag indicates Secure
-+  Connections. Its absence means Legacy Pairing.
-+- **IO capability** -- Determines the association model (Just Works,
-+  Passkey Entry, Numeric Comparison, OOB).
-+- **Key distribution** -- Which keys each side will send after
-+  encryption is established. ``IdKey`` = Identity Resolving Key (IRK),
-+  ``EncKey`` = Long Term Key (legacy only), ``Sign`` = CSRK.
-+
-+**Phase 2: Authentication (Secure Connections)**
-+
-+For Secure Connections pairing (``SC`` flag set), both devices exchange
-+public keys, then perform confirm/random value exchange::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 69       #501 [hci0] 0.098224
-+          SMP: Pairing Public Key (0x0c) len 64
-+            X: 1a2b3c4d...
-+            Y: 5e6f7a8b...
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 69       #503 [hci0] 0.148556
-+          SMP: Pairing Public Key (0x0c) len 64
-+            X: 9c8d7e6f...
-+            Y: 0a1b2c3d...
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #505 [hci0] 0.149003
-+          SMP: Pairing Confirm (0x03) len 16
-+            Confirm value: a1b2c3d4e5f6...
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #507 [hci0] 0.212884
-+          SMP: Pairing Random (0x04) len 16
-+            Random value: 1122334455...
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #509 [hci0] 0.213100
-+          SMP: Pairing Random (0x04) len 16
-+            Random value: 6677889900...
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #511 [hci0] 0.278003
-+          SMP: Pairing DHKey Check (0x0d) len 16
-+            E: aabbccddee...
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #513 [hci0] 0.278450
-+          SMP: Pairing DHKey Check (0x0d) len 16
-+            E: ffeeddccbb...
-+
-+After DHKey Check, the initiator starts encryption at the HCI level::
-+
-+    < HCI Command: LE Start Encryption (0x08|0x0019) plen 28  #515 [hci0] 0.279002
-+    > HCI Event: Encryption Change (0x08) plen 4              #517 [hci0] 0.342556
-+          Status: Success (0x00)
-+          Handle: 2048
-+          Encryption: Enabled with AES-CCM (0x01)
-+
-+**Phase 2: Authentication (Legacy Pairing)**
-+
-+Legacy pairing (no ``SC`` flag) skips the Public Key and DHKey Check
-+exchanges. Only Confirm and Random values are exchanged::
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #501 [hci0] 0.098224
-+          SMP: Pairing Confirm (0x03) len 16
-+            Confirm value: ...
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #503 [hci0] 0.162556
-+          SMP: Pairing Confirm (0x03) len 16
-+            Confirm value: ...
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #505 [hci0] 0.163003
-+          SMP: Pairing Random (0x04) len 16
-+            Random value: ...
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #507 [hci0] 0.228884
-+          SMP: Pairing Random (0x04) len 16
-+            Random value: ...
-+
-+**Phase 3: Key Distribution**
-+
-+After encryption is established, each device distributes keys as
-+negotiated in Phase 1::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #519 [hci0] 0.343002
-+          SMP: Identity Information (0x08) len 16
-+            Identity resolving key: 00112233445566778899aabbccddeeff
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 12       #521 [hci0] 0.343556
-+          SMP: Identity Address Information (0x09) len 7
-+            Address type: Public (0x00)
-+            Address: 00:11:22:33:44:55
-+
-+The Identity Address Information reveals the device's true public or
-+static random address (as opposed to a Resolvable Private Address used
-+during connection).
-+
-+For Legacy Pairing, LTK distribution also appears::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #519 [hci0] 0.343002
-+          SMP: Encryption Information (0x06) len 16
-+            Long term key: 00112233...
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 15       #521 [hci0] 0.343556
-+          SMP: Central Identification (0x07) len 10
-+            EDIV: 0x1234
-+            Rand: 0x0123456789abcdef
-+
-+Pairing Failure
-+---------------
-+
-+When pairing fails, one device sends a Pairing Failed PDU::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 6        #505 [hci0] 0.213002
-+          SMP: Pairing Failed (0x05) len 1
-+            Reason: Authentication requirements (0x03)
-+
-+SMP failure reasons:
++Fixed channels have pre-assigned Channel Identifiers (CIDs) and do
++not require signaling to establish:
 +
 +.. list-table::
 +   :header-rows: 1
-+   :widths: 8 35 57
++   :widths: 10 30 60
 +
-+   * - Code
-+     - Reason
-+     - Diagnostic Meaning
-+   * - 0x01
-+     - Passkey Entry Failed
-+     - User cancelled or entered wrong passkey
-+   * - 0x02
-+     - OOB Not Available
-+     - OOB data expected but not provided
-+   * - 0x03
-+     - Authentication Requirements
-+     - Devices cannot agree on security level (e.g.,
-+       one requires MITM but IO caps only allow Just Works)
-+   * - 0x04
-+     - Confirm Value Failed
-+     - Cryptographic check failed; possible MITM attack
-+   * - 0x05
-+     - Pairing Not Supported
-+     - Remote does not support pairing
-+   * - 0x06
-+     - Encryption Key Size
-+     - Cannot agree on key size
-+   * - 0x07
-+     - Command Not Supported
-+     - Received unrecognized SMP command
-+   * - 0x08
-+     - Unspecified Reason
-+     - Generic failure
-+   * - 0x09
-+     - Repeated Attempts
-+     - Pairing rate-limited; wait before retry
-+   * - 0x0a
-+     - Invalid Parameters
-+     - Invalid fields in SMP command
-+   * - 0x0b
-+     - DHKey Check Failed
-+     - ECDH key agreement failed (SC only)
-+   * - 0x0c
-+     - Numeric Comparison Failed
-+     - User rejected numeric comparison
-+   * - 0x0d
-+     - BR/EDR Pairing In Progress
-+     - Classic pairing already active
-+   * - 0x0e
-+     - Cross-Transport Key Derivation Not Allowed
-+     - CTKD rejected by policy
++   * - CID
++     - Protocol
++     - Description
++   * - 0x0001
++     - L2CAP Signaling (BR/EDR)
++     - Channel management for classic connections
++   * - 0x0002
++     - Connectionless Reception
++     - Connectionless L2CAP data
++   * - 0x0003
++     - AMP Manager
++     - AMP (Alternate MAC/PHY) control
++   * - 0x0004
++     - ATT
++     - Attribute Protocol (GATT operations)
++   * - 0x0005
++     - L2CAP Signaling (LE)
++     - Channel management for LE connections
++   * - 0x0006
++     - SMP (LE)
++     - Security Manager Protocol
++   * - 0x0007
++     - SMP (BR/EDR)
++     - Security Manager over classic transport
 +
-+Automating Pairing Analysis
-+----------------------------
++In btmon output, fixed channel traffic is decoded directly without
++any L2CAP signaling preamble. For example, ATT on CID 0x0004 appears
++as::
 +
-+**Identify all pairing attempts**::
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 7    #494 [hci0] 0.004488
++          ATT: Exchange MTU Request (0x02) len 2
++            Client RX MTU: 517
 +
-+    grep -n "Pairing Request\|Pairing Response\|Pairing Failed\|Pairing Public Key\|DHKey Check" output.txt
++Dynamic Channels (BR/EDR)
++--------------------------
 +
-+**Check pairing method (Secure Connections vs Legacy)**:
++Classic Bluetooth uses L2CAP signaling on CID 0x0001 to establish
++dynamic channels. Each channel is identified by a PSM (Protocol/Service
++Multiplexer) that determines which protocol runs on it.
 +
-+- If ``Pairing Public Key`` appears between Request/Response and
-+  Confirm: Secure Connections.
-+- If only Confirm/Random follow Request/Response: Legacy Pairing.
-+- Check the ``Authentication requirement`` line for the ``SC`` flag.
++**Channel establishment**::
 +
-+**Detect pairing failures**::
++    > ACL Data RX: Handle 256 flags 0x02 dlen 16    #142 [hci0] 2.034556
++          L2CAP: Connection Request (0x02) ident 3 len 4
++            PSM: 25 (0x0019)
++            Source CID: 0x0040
 +
-+    grep -n "Pairing Failed" output.txt
++    < ACL Data TX: Handle 256 flags 0x00 dlen 20    #144 [hci0] 2.035002
++          L2CAP: Connection Response (0x03) ident 3 len 8
++            Destination CID: 0x0041
++            Source CID: 0x0040
++            Result: Connection successful (0x0000)
++            Status: No further information available (0x0000)
 +
-+**Correlate pairing with encryption**:
++After connection, configuration is exchanged::
 +
-+After successful pairing, expect ``Encryption Change`` with
-+``Status: Success``. Search for::
++    > ACL Data RX: Handle 256 flags 0x02 dlen 20    #146 [hci0] 2.035556
++          L2CAP: Configure Request (0x04) ident 4 len 8
++            Destination CID: 0x0041
++            Flags: 0x0000
++            Option: MTU (0x01) [2]
++              MTU: 1024
 +
-+    grep -n "Encryption Change\|Encryption:" output.txt
++    < ACL Data TX: Handle 256 flags 0x00 dlen 18    #148 [hci0] 2.036003
++          L2CAP: Configure Response (0x05) ident 4 len 6
++            Source CID: 0x0040
++            Flags: 0x0000
++            Result: Success (0x0000)
 +
-+**Identify re-pairing on reconnect**:
++Common PSM-to-protocol mappings:
 +
-+Reconnections to a bonded device should show ``Encryption Change``
-+without SMP traffic (using stored keys). If SMP Pairing Request
-+appears on reconnection, the bond was lost on one side.
++.. list-table::
++   :header-rows: 1
++   :widths: 12 25 63
 +
-+**Full pairing diagnosis pattern**:
++   * - PSM
++     - Protocol
++     - Description
++   * - 0x0001
++     - SDP
++     - Service Discovery Protocol
++   * - 0x0003
++     - RFCOMM
++     - Serial port emulation (SPP, HFP, etc.)
++   * - 0x000f
++     - BNEP
++     - Bluetooth Network Encapsulation Protocol
++   * - 0x0017
++     - AVCTP
++     - Audio/Video Control Transport (AVRCP)
++   * - 0x0019
++     - AVDTP
++     - Audio/Video Distribution Transport (A2DP)
++   * - 0x001b
++     - AVCTP Browsing
++     - AVRCP browsing channel
++   * - 0x001f
++     - ATT (BR/EDR)
++     - Attribute Protocol over classic transport
++   * - 0x0027
++     - EATT
++     - Enhanced Attribute Protocol
 +
-+1. Find ``Pairing Request`` -- note the handle, IO capabilities,
-+   auth requirements
-+2. Find ``Pairing Response`` -- compare IO capabilities to determine
-+   association model
-+3. Check for ``Pairing Failed`` -- if present, the reason code
-+   identifies the failure
-+4. Check for ``Encryption Change`` with ``Status: Success`` -- confirms
-+   pairing completed
-+5. Check for ``Identity Address Information`` -- reveals the device's
-+   true address
++LE Credit-Based Channels
++--------------------------
++
++LE connections use L2CAP signaling on CID 0x0005 for dynamic
++channels. The LE Credit Based Connection mechanism provides flow
++control::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 18   #600 [hci0] 1.824003
++          LE L2CAP: LE Connection Request (0x14) ident 1 len 10
++            PSM: 39 (0x0027)
++            Source CID: 0x0040
++            MTU: 517
++            MPS: 251
++            Credits: 10
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 18   #602 [hci0] 1.886556
++          LE L2CAP: LE Connection Response (0x15) ident 1 len 10
++            Destination CID: 0x0041
++            MTU: 517
++            MPS: 251
++            Credits: 10
++            Result: Connection successful (0x0000)
++
++EATT (Enhanced ATT) uses PSM 0x0027 over LE Credit-Based channels to
++provide multiple parallel ATT bearers.
++
++Connection Parameter Updates
++-----------------------------
++
++LE peripherals frequently request connection parameter changes via
++L2CAP signaling::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 16   #493 [hci0] 0.003915
++          LE L2CAP: Connection Parameter Update Request (0x12) ident 1 len 8
++            Min interval: 24
++            Max interval: 40
++            Peripheral latency: 0
++            Timeout multiplier: 256
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 10   #495 [hci0] 0.066003
++          LE L2CAP: Connection Parameter Update Response (0x13) ident 1 len 2
++            Result: Connection Parameters accepted (0x0000)
++
++A result of ``Connection Parameters rejected (0x0001)`` means the
++central denied the request.
++
++Automating L2CAP Analysis
++--------------------------
++
++**Find all L2CAP channel establishments**::
++
++    grep -n "Connection Request\|Connection Response\|LE Connection Request\|LE Connection Response" output.txt
++
++**Track PSM usage** (identifies which protocols are active)::
++
++    grep -n "PSM:" output.txt
++
++**Find connection parameter update issues**::
++
++    grep -n "Parameter Update Request\|Parameter Update Response\|Parameters rejected" output.txt
++
++**Find EATT channel setup**::
++
++    grep -n "PSM: 39\|Enhanced Credit" output.txt
++
++**Trace a specific L2CAP channel**: To follow traffic on a dynamic
++channel, note the Source CID and Destination CID from the Connection
++Request/Response pair. Then search for those CIDs in subsequent data
++frames.
 +
  EXAMPLES
  ========
  
-@@ -1186,17 +1434,23 @@ Recommended Workflow
-        grep -n "Disconnect Complete" output.txt
+@@ -1466,6 +1657,11 @@ Recommended Workflow
+        # Find targeted service searches
+        grep -n "Find By Type Value" output.txt
  
-    Then examine the lines following each match for the ``Reason:``
--   field.
-+   field. See `HCI ERROR AND DISCONNECT REASON CODES`_ for
-+   interpretation.
- 
--5. **Identify LE Audio**: Search for ASCS and CIS activity::
-+5. **Check pairing/security**: Search for SMP activity (see
-+   `SMP PAIRING FLOW`_)::
++9. **Check L2CAP channels**: Identify protocol usage and channel
++   issues (see `L2CAP CHANNEL TRACKING`_)::
 +
-+       grep -n "Pairing Request\|Pairing Response\|Pairing Failed\|Encryption Change" output.txt
++       grep -n "PSM:\|Connection Request\|Connection Response\|Parameter Update" output.txt
 +
-+6. **Identify LE Audio**: Search for ASCS and CIS activity::
+ Key Patterns for Connection Lifecycle
+ -------------------------------------
  
-        grep -n "ASE Control Point\|CIG Parameters\|Create Connected Isochronous\|CIS Established\|Setup ISO Data Path" output.txt
- 
--6. **Check for errors**: Search for non-success status codes::
-+7. **Check for errors**: Search for non-success status codes::
- 
-        grep -n "Status:" output.txt | grep -v "Success"
- 
--7. **Extract GATT discovery**: Filter the GATT service/characteristic
-+8. **Extract GATT discovery**: Filter the GATT service/characteristic
-    discovery traffic (see `RECONSTRUCTING A GATT DATABASE FROM SNOOP
-    TRACES`_)::
- 
-@@ -1223,7 +1477,8 @@ pattern in the trace:
- 2. ``LE Connection Update Complete`` -- connection parameters changed
-    (may occur zero or more times)
+@@ -1479,7 +1675,9 @@ pattern in the trace:
  3. ``Encryption Change`` -- link encrypted (may show encryption
--   algorithm)
-+   algorithm). See `SMP PAIRING FLOW`_ for the SMP exchange that
-+   precedes this.
- 4. ACL Data with ATT/SMP/L2CAP -- service discovery and data exchange
+    algorithm). See `SMP PAIRING FLOW`_ for the SMP exchange that
+    precedes this.
+-4. ACL Data with ATT/SMP/L2CAP -- service discovery and data exchange
++4. ACL Data with ATT/SMP/L2CAP -- service discovery and data exchange.
++   See `RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES`_ for GATT,
++   `L2CAP CHANNEL TRACKING`_ for channel setup.
  5. ``Disconnect Complete`` -- connection ended, check Reason field
  
-@@ -1238,6 +1493,21 @@ For LE Audio connections, additional steps appear between 3 and 5:
- - ``Disconnect Complete`` on CIS handle (stream ended)
- - ``LE Remove CIG`` (group removed)
+ For LE Audio connections, additional steps appear between 3 and 5:
+@@ -1508,6 +1706,13 @@ Common Debugging Scenarios
+ 5. If no SMP traffic on reconnect but ``Encryption Change`` fails,
+    the bond was lost on one side
  
-+Common Debugging Scenarios
-+---------------------------
++**Connection parameter negotiation failure**:
 +
-+**Pairing failure diagnosis**:
-+
-+1. Find ``Pairing Request`` -- note IO capabilities and auth
-+   requirements
-+2. Find ``Pairing Response`` -- compare to determine association model
-+3. If ``Pairing Failed`` appears, the reason code identifies the
-+   failure (see `SMP PAIRING FLOW`_)
-+4. If ``Encryption Change`` shows ``Status: Success``, pairing
-+   succeeded
-+5. If no SMP traffic on reconnect but ``Encryption Change`` fails,
-+   the bond was lost on one side
++1. Find ``Connection Parameter Update Request`` (L2CAP level)
++2. Check the Response -- ``rejected`` means the central denied it
++3. Alternatively, find ``LE Connection Update Complete`` (HCI level)
++4. Check Status -- non-zero means the controller rejected the update
 +
  Vendor-Specific Events
  ----------------------
