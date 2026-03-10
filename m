@@ -1,548 +1,421 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F4D355F2B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4ACC2DCF57
 	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 21:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773178408; cv=none; b=GDt4jEhZ1XvNupMDr5jn+v2a19qR2q4XIlUmWEZrjXmn0Spf82X5EEE4GbjVrxn5MGuvQbOydnBLj+hM6DDVjQwEHgKswNpmcaALpt85G7QRmdvN7mwYZtI7D0ridpFtrVmSfR7OoN2CfLMJrDFPQsJNhdANjEa8IB21sJxpha0=
+	t=1773178408; cv=none; b=sOYX4k0ds/9gB6N1KcIEIiQUHreZcoQqeqiPrUPO+H3TzbMgMckHwEfM0DmS8F4ZtrsLDjpcrQUCEvWiMuUbTFO1ZpkfV8fCslBcVWEd4ZVRTy3DRyxJ6HxQtmzYMe7/PDTe7N49qCvkUwy+i+ymXW4F/e8qNdHLETw5lKk5UHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773178408; c=relaxed/simple;
-	bh=Bja4J+g6VuJxjhymwKk4gny4ibRab8/G1NtbG1bdjRQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o7Ga45PE0A3km+OQ/PwwV6f2JExPujrzXgpKynx9462pHGq42WmOMk02QCKV6d+1l9ybB2b7OGSXc6Yo/1u38zSKrR+zC9lE2z7e9cN8hkB3tTjJZ+W67qh7HvqWtow0bfwFXU9muTJoJIx65C87t/exCojLdx7w8o+5t+YYnok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/8twZsO; arc=none smtp.client-ip=209.85.128.181
+	bh=G8YGd4hf7QOuePV4BdpRBN0B/UY3aY5cNhi9QsSYO00=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uzIXA3mozZH07+2dkBSP7fBIsepVNgpf/BmS7WoE/HN/G9OFHlmvAjETHgnT2yegIBlONTFoCAWusK92idEmnerXZajzzCWV1NpVmlgM/ft5hRzgC46xvsf+MnpNF4RNLVJ/qs/FQdmridiO8an3gOXGdbnOC4zeCgmsqID5TGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eh5Cgm4O; arc=none smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/8twZsO"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-79902e1f763so23149897b3.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eh5Cgm4O"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7927261a3acso121181827b3.0
         for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 14:33:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773178405; x=1773783205; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PhYFNcBq5IVdyuaEeS2uSQE7UTqNKjW5Gld6IQ4Nfrg=;
-        b=a/8twZsOg8DxdyP/to/ynS0tltMHtX0c5ngAZDUvJejhDZRz8KRJ1krTpmg5y/kyUg
-         1DVPy9yLxff8e96y4bpeCo5BoCTb0P68FNKkumMA07M1dRos/NW7y74HS7b/qir0AWrS
-         VJfqkG1PX+Mx720Khjp6xE99/Py6aDeh3r7Taff2nDfaROavFHwbNybMSQkmLdF6gHAA
-         EWOTGSyCC7AvN1ESE4SQtCxQEqo8KP3+Ck0lPDDBu8E1VJyCVNcuk5fap+48yGxgSwE9
-         ds4EHxTaHqCBr/ihP/gM46UPVzEB28Q1YXE6WTXrMFqBfWCQFWPF9CcwFEd4KnQ7xQ5M
-         tshw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773178405; x=1773783205;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1773178406; x=1773783206; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PhYFNcBq5IVdyuaEeS2uSQE7UTqNKjW5Gld6IQ4Nfrg=;
-        b=ehF+dqiCdmMKYX6Z9IcHy5jJ7pHggkJxDjEAQIhj4h/N96V6TZGQCBkVhWliOK/8VI
-         TxiEuPHWpsf7iBsb9+pflokarDkHJPLAuV5qsV9OR6UGJJvy42c9RPNoCAHT0JG86NVx
-         sDzzIiLxetjg9pl7o32Tdn4Caz7sIm06FSrOl0I2hcBtEp/M+iY5wPenuamU89LluZ+e
-         uK+mFQC2FQaMoE08oe1m5tRA7MWcMe44yUSqEga9IgPzzurgmcxa9mMUvTgbo4JRhhf4
-         v9wV4S702+ucG7vHCwID9h/fjSROAeKdNX7edEYxWN2wkjBXwlPtMA5L21TAVkORqCUS
-         UVog==
-X-Gm-Message-State: AOJu0YwVDo4/RXr/EbPY5g5f/vP4fONKzxQbAAzlz6urgVbaAwClVkmu
-	jmeOlaHCrxHxwqtb9oiw2LA1CrIvIsaVxmfbwN9vMeMwzrMZ0Hwh+d1Fsnl4t4zU
-X-Gm-Gg: ATEYQzyyxjGjj3blrc4s0leTwrvqfCaekpaGmPtHiodbHnNnuLMKnoRjuhF5YuDahvY
-	Iu1hJYcwdUR0B1GBZUEZSBkSOcRhr8iiKWxvVMi1L829IZfpKJTC3w7fn/ydWJ0yedUhw8idaBg
-	dHrY8hArLocWLxEMrKjU0+LBeKX7i/pbMJ6F0oGsD6v44dmoEwuEAcA53VOea0DAs254+tMZrgn
-	wBVdnh5j4vfn/zndV7vhkVnVFJy+OYGIf1zKJC5eWTKn0n7dcOyM7BsajwvtKOLv9PhbJS+0tE6
-	iK3gX+MJWlid4VS7WKqa39XwZrjLwHTPw8FAYisQYeiTGBKBuVLzW+l0APAObns7GxwSqpi/Pz/
-	xiF9Y3CJxBdCMAe9KOj3f/wRuISkXEl5jxngmqivHHY4U2AFq+A5wucn1cN5XXaQmLdHDqFWMAR
-	hyOKIDCxQUF7mFaDPBhQxt9yZ4W9NnCHuIYOloRTQ44kCfG+9O63HazTVK0OnDplOAT3gB7mBBB
-	+B9wxsinQHXJKT7DQ==
-X-Received: by 2002:a05:690c:7301:b0:797:d37d:d5a1 with SMTP id 00721157ae682-79918014624mr1557807b3.61.1773178404814;
-        Tue, 10 Mar 2026 14:33:24 -0700 (PDT)
+        bh=gXiIQM5+uW9tCc+XSCdIzld4IYzT/Zva9aH2LMWKoVU=;
+        b=Eh5Cgm4OaFa90IJbevCpkX/CxubWWeVZA1hFmC2Q1gvbG2dr5XtJehw2spVzuuhfV9
+         CW7+efa2k3JiRVySHCCu1jgoalYSIcVouChN+LISe/MdY2UlOxWDiX36Y4eFu0EQogeM
+         RkERd5dSKmNtwJwucqDJeQuVLHdWMa18SBWexee8RF+7LFvOkCsl6PzAEZaLzXGsr9/Z
+         Q0Q+tNyj3SHgPdjpNLqm3PK68wjDFyO6TjydMuofH48P2H5KXP9P0N9shH+kJ5nqZUQC
+         2Y7vbA+QNj8xxWzwntIiZ3m/I1a3cnQ6kCwGU2aaqUqGiYBF3TOOzUV00T0VS8A9CVy4
+         8/GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773178406; x=1773783206;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gXiIQM5+uW9tCc+XSCdIzld4IYzT/Zva9aH2LMWKoVU=;
+        b=q8qgTh/o/s8i/4HBj6I0BdGOcwEte7iz+at/2IisgWt4uDL9eEgn7XNaQgVHDode3/
+         GOiNXqCCTAPh35tDl1z6I44x9vQtBXbDv9xNJsMwsqMM5nLqBj/2Bl9fPcKVgHJfc1xW
+         4jHhgjQuCySLVzW/uU3NbgJsdE3Uvlgd5PLrP+DBgZvzwkkUvZ6wBwlU0LkP+mPapgj6
+         bgh9Rik9+t7X284TKKq3/hLzzPbeH6tgWZaNEJW42rOAJCw0afDGxQKRzrhiAVEAUVjN
+         7duqzAZa+DYXtrYCNgQc5bPtBEN1+cNj04joLprKRswntUwJe0rSd/4wK/c9Kcql8XzZ
+         bfQA==
+X-Gm-Message-State: AOJu0YxqUhiBnylZpuKtcUmJ37ZNKa8am9B3cFL5s5H3pzIxarnBPRTL
+	3Q1Jb5YgWSOUF3rA7uzu/E6CTCJVpPh7seG7xukvrw+Uxt2L8uA/jxKxrlPairqT
+X-Gm-Gg: ATEYQzzGAmgGqFfcYXHFQEKZ2n37Q/AghQoGDBPArb7Hgz97Kn8DQjYyctVQBAGr8gs
+	oFynqElLCz9lEJjKDCneexUKrno4LGUy9YhfJjdMOMNqE+US+bVYBAKP41zx5sthWf10xWZhNs2
+	Gv39QUHrmMKMztkAfIjoCRASEUkohB6pj0RwXXvOBj1L1g7kEUR+ZHT03WSW/WoA7M9HsAvjPNY
+	ORRc2d5zCguRH/oXCLt5s5Xczc0dGWC+xIu2jXO6dEtCG8oX0RuopJArXCUuw0mw8qD/KHp7Pzd
+	l5dnXsDJV8mpHXNooQW8/6ewVknLNn4QMKK2ONhtEbMOnL3bT7TIEv1l05z/2N+k5uLBzP9MRPu
+	rhv8XycUqw7nstoKuSw26NtDrV1XSuxH0Het687yoPzrudLGtaUZ93l0BcTQKqr9+akySsTKihs
+	Z6WcO8P78FUrOsGcGZauC952VKqsHsIsA1BR59S0rmbnCwNdIgSm93FP8kNaUAzW5WwEQU1HjHS
+	u7+M58/SAYQzPEWmQ==
+X-Received: by 2002:a05:690c:f08:b0:798:1388:e7da with SMTP id 00721157ae682-79917f8949cmr2048027b3.33.1773178405674;
+        Tue, 10 Mar 2026 14:33:25 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79917f1ecd9sm952777b3.45.2026.03.10.14.33.23
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79917f1ecd9sm952777b3.45.2026.03.10.14.33.24
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 14:33:24 -0700 (PDT)
+        Tue, 10 Mar 2026 14:33:25 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/7] doc/btmon: Add GATT database reconstruction guide
-Date: Tue, 10 Mar 2026 17:33:07 -0400
-Message-ID: <20260310213314.729718-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/7] doc/btmon: Add SMP pairing flow documentation
+Date: Tue, 10 Mar 2026 17:33:08 -0400
+Message-ID: <20260310213314.729718-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260310213314.729718-1-luiz.dentz@gmail.com>
+References: <20260310213314.729718-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add a comprehensive section explaining how to reconstruct a remote
-device's GATT database from btsnoop traces. Documents all six phases
-of GATT discovery:
+Add comprehensive SMP pairing documentation covering:
 
-- Primary/Secondary Service Discovery (Read By Group Type)
-- Included Service Discovery (Read By Type with Include UUID)
-- Characteristic Discovery (Read By Type with Characteristic UUID)
-- Descriptor Discovery (Find Information)
-- Characteristic Value Reading (Read Request/Response)
-- Targeted Service Search (Find By Type Value)
+- Pairing Phases 1-3: Feature exchange (IO capabilities, auth
+  requirements, key distribution), authentication for both Secure
+  Connections (public key, DHKey check) and Legacy pairing
+  (confirm/random only), and key distribution (IRK, LTK, CSRK).
 
-Includes annotated btmon output examples for each ATT operation,
-a characteristic properties reference table, common descriptor
-UUIDs, guidance on bidirectional discovery, and a worked example
-showing how to build the final attribute table from trace data.
+- Pairing Failure: Failure reason code table (0x01-0x0e) with
+  diagnostic meanings for each code.
+
+- Automating Pairing Analysis: grep patterns for identifying pairing
+  attempts, detecting SC vs Legacy, finding failures, and correlating
+  with encryption.
+
+- Updated Automated Trace Analysis: Added pairing/security check step
+  in the recommended workflow, SMP cross-reference in connection
+  lifecycle patterns, and pairing failure debugging scenario.
 ---
- doc/btmon.rst | 433 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 433 insertions(+)
+ doc/btmon.rst | 280 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 275 insertions(+), 5 deletions(-)
 
 diff --git a/doc/btmon.rst b/doc/btmon.rst
-index e1e362b7c1b6..f769a7af6e8b 100644
+index f769a7af6e8b..bddbd07d3c35 100644
 --- a/doc/btmon.rst
 +++ b/doc/btmon.rst
-@@ -712,6 +712,423 @@ Analyze mode reports, for each controller found in the trace:
- - **Latency plots**: If ``gnuplot`` is installed, ASCII-art latency
-   distribution plots are rendered in the terminal.
+@@ -1129,6 +1129,254 @@ The CCC descriptor at handle 0x000d belongs to the Service Changed
+ characteristic (0x000c), because it falls between that value handle
+ and the next characteristic declaration at 0x000e.
  
-+RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES
-+=================================================
 +
-+A btsnoop trace contains the complete ATT protocol exchange used by
-+GATT clients and servers to discover each other's services. By reading
-+the discovery requests and responses, it is possible to reconstruct the
-+full GATT database of a remote device -- even without access to the
-+device itself.
++SMP PAIRING FLOW
++================
 +
-+This section explains the GATT discovery procedure and how each ATT
-+operation appears in ``btmon`` output.
++The Security Manager Protocol (SMP) handles pairing, key generation,
++and key distribution between Bluetooth devices. SMP traffic appears
++inside L2CAP on fixed CID 0x0006 (LE) or CID 0x0007 (BR/EDR). btmon
++decodes all SMP operations automatically.
 +
-+Overview of GATT Discovery
-+---------------------------
++Pairing Phases
++--------------
 +
-+GATT discovery is a multi-phase process where a client queries the
-+server's attribute database using ATT protocol operations. The phases
-+are:
++SMP pairing proceeds in three phases. Each phase produces a distinct
++pattern in the btmon output.
 +
-+1. **Primary Service Discovery** -- Find all primary services and their
-+   handle ranges.
-+2. **Secondary Service Discovery** -- Find any secondary (included-only)
-+   services.
-+3. **Included Service Discovery** -- Find which services include other
-+   services.
-+4. **Characteristic Discovery** -- Find all characteristics within each
-+   service.
-+5. **Descriptor Discovery** -- Find all descriptors for each
-+   characteristic.
-+6. **Characteristic Value Reading** -- Read the values of readable
-+   characteristics.
++**Phase 1: Feature Exchange**
 +
-+Each phase uses a specific ATT operation and produces a
-+request/response pattern in the trace. The client repeats each request
-+with advancing handle ranges until the server responds with
-+``Attribute Not Found``, indicating the end of that phase.
++Pairing begins when one device sends a Security Request (peripheral)
++or the host initiates pairing directly. The initiator sends a Pairing
++Request and the responder replies with a Pairing Response::
 +
-+Phase 1: Primary Service Discovery (Read By Group Type)
-+--------------------------------------------------------
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #497 [hci0] 0.026107
++          SMP: Pairing Request (0x01) len 6
++            IO capability: NoInputNoOutput (0x03)
++            OOB data: Authentication data not present (0x00)
++            Authentication requirement: Bonding, MITM, SC, CT2 (0x2d)
++            Max encryption key size: 16
++            Initiator key distribution: IdKey Sign (0x06)
++            Responder key distribution: IdKey Sign (0x06)
 +
-+The client discovers primary services using ``Read By Group Type
-+Request`` with the ``Primary Service`` UUID (0x2800) as the group type.
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #499 [hci0] 0.026894
++          SMP: Pairing Response (0x02) len 6
++            IO capability: KeyboardDisplay (0x04)
++            OOB data: Authentication data not present (0x00)
++            Authentication requirement: Bonding, SC, CT2 (0x29)
++            Max encryption key size: 16
++            Initiator key distribution: IdKey (0x02)
++            Responder key distribution: IdKey (0x02)
 +
-+**Request**::
++Key fields to check:
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #516 [hci0] 0.124726
-+          ATT: Read By Group Type Request (0x10) len 6
-+            Handle range: 0x0001-0xffff
-+            Attribute group type: Primary Service (0x2800)
++- **Authentication requirement** -- The ``SC`` flag indicates Secure
++  Connections. Its absence means Legacy Pairing.
++- **IO capability** -- Determines the association model (Just Works,
++  Passkey Entry, Numeric Comparison, OOB).
++- **Key distribution** -- Which keys each side will send after
++  encryption is established. ``IdKey`` = Identity Resolving Key (IRK),
++  ``EncKey`` = Long Term Key (legacy only), ``Sign`` = CSRK.
 +
-+The first request always starts at handle 0x0001 and searches through
-+0xffff (the entire handle space).
++**Phase 2: Authentication (Secure Connections)**
 +
-+**Response**::
++For Secure Connections pairing (``SC`` flag set), both devices exchange
++public keys, then perform confirm/random value exchange::
 +
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 42       #523 [hci0] 0.240151
-+          ATT: Read By Group Type Response (0x11) len 37
-+            Attribute data length: 6
-+            Attribute group list: 6 entries
-+            Handle range: 0x0001-0x0009
-+            UUID: Generic Access Profile (0x1800)
-+            Handle range: 0x000a-0x0011
-+            UUID: Generic Attribute Profile (0x1801)
-+            Handle range: 0x0012-0x0014
-+            UUID: Device Information (0x180a)
-+            Handle range: 0x0015-0x0039
-+            UUID: Generic Telephony Bearer (0x184c)
-+            Handle range: 0x003a-0x0059
-+            UUID: Generic Media Control (0x1849)
-+            Handle range: 0x005a-0x005c
-+            UUID: Telephony and Media Audio (0x1855)
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 69       #501 [hci0] 0.098224
++          SMP: Pairing Public Key (0x0c) len 64
++            X: 1a2b3c4d...
++            Y: 5e6f7a8b...
 +
-+Each entry provides:
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 69       #503 [hci0] 0.148556
++          SMP: Pairing Public Key (0x0c) len 64
++            X: 9c8d7e6f...
++            Y: 0a1b2c3d...
 +
-+- **Handle range** -- The start and end handle of the service. All
-+  attributes belonging to this service (characteristics, descriptors)
-+  have handles within this range.
-+- **UUID** -- The service UUID. Standard 16-bit UUIDs are shown with
-+  their name (e.g., ``Generic Access Profile``). 128-bit vendor-specific
-+  UUIDs appear as full UUID strings.
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #505 [hci0] 0.149003
++          SMP: Pairing Confirm (0x03) len 16
++            Confirm value: a1b2c3d4e5f6...
 +
-+The client continues by sending another request starting after the last
-+handle in the response::
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #507 [hci0] 0.212884
++          SMP: Pairing Random (0x04) len 16
++            Random value: 1122334455...
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #525 [hci0] 0.240641
-+          ATT: Read By Group Type Request (0x10) len 6
-+            Handle range: 0x005d-0xffff
-+            Attribute group type: Primary Service (0x2800)
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #509 [hci0] 0.213100
++          SMP: Pairing Random (0x04) len 16
++            Random value: 6677889900...
 +
-+This continues until the server responds with ``Attribute Not Found``::
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #511 [hci0] 0.278003
++          SMP: Pairing DHKey Check (0x0d) len 16
++            E: aabbccddee...
 +
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #532 [hci0] 0.360069
-+          ATT: Error Response (0x01) len 4
-+            Read By Group Type Request (0x10)
-+            Handle: 0x005d
-+            Error: Attribute Not Found (0x0a)
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #513 [hci0] 0.278450
++          SMP: Pairing DHKey Check (0x0d) len 16
++            E: ffeeddccbb...
 +
-+This error indicates that no more primary services exist beyond handle
-+0x005d. The client now has the complete list of primary services.
++After DHKey Check, the initiator starts encryption at the HCI level::
 +
-+.. note::
++    < HCI Command: LE Start Encryption (0x08|0x0019) plen 28  #515 [hci0] 0.279002
++    > HCI Event: Encryption Change (0x08) plen 4              #517 [hci0] 0.342556
++          Status: Success (0x00)
++          Handle: 2048
++          Encryption: Enabled with AES-CCM (0x01)
 +
-+   The ``Attribute data length`` field indicates the size of each entry
-+   in the response. A value of 6 means 16-bit UUIDs (2 bytes start
-+   handle + 2 bytes end handle + 2 bytes UUID). A value of 20 means
-+   128-bit UUIDs (2 + 2 + 16). If the server has both 16-bit and
-+   128-bit service UUIDs, they are returned in separate responses
-+   because all entries in a single response must have the same length.
++**Phase 2: Authentication (Legacy Pairing)**
 +
-+Phase 2: Secondary Service Discovery
-+--------------------------------------
++Legacy pairing (no ``SC`` flag) skips the Public Key and DHKey Check
++exchanges. Only Confirm and Random values are exchanged::
 +
-+After primary services, the client may discover secondary services
-+using the same ``Read By Group Type Request`` but with the ``Secondary
-+Service`` UUID (0x2801)::
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #501 [hci0] 0.098224
++          SMP: Pairing Confirm (0x03) len 16
++            Confirm value: ...
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #534 [hci0] 0.360752
-+          ATT: Read By Group Type Request (0x10) len 6
-+            Handle range: 0x0001-0xffff
-+            Attribute group type: Secondary Service (0x2801)
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #503 [hci0] 0.162556
++          SMP: Pairing Confirm (0x03) len 16
++            Confirm value: ...
 +
-+If no secondary services exist, the server responds with
-+``Attribute Not Found``. Secondary services are not directly accessible
-+to clients -- they are only reachable via include references from
-+primary services.
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #505 [hci0] 0.163003
++          SMP: Pairing Random (0x04) len 16
++            Random value: ...
 +
-+Phase 3: Included Service Discovery (Read By Type)
-+----------------------------------------------------
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #507 [hci0] 0.228884
++          SMP: Pairing Random (0x04) len 16
++            Random value: ...
 +
-+To discover which services include other services, the client uses
-+``Read By Type Request`` with the ``Include`` UUID (0x2802)::
++**Phase 3: Key Distribution**
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #540 [hci0] 0.480731
-+          ATT: Read By Type Request (0x08) len 6
-+            Handle range: 0x0001-0x005c
-+            Attribute type: Include (0x2802)
++After encryption is established, each device distributes keys as
++negotiated in Phase 1::
 +
-+The handle range typically spans the entire discovered database. Each
-+include declaration in the response identifies a service that is
-+included by the service containing that handle.
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #519 [hci0] 0.343002
++          SMP: Identity Information (0x08) len 16
++            Identity resolving key: 00112233445566778899aabbccddeeff
 +
-+Phase 4: Characteristic Discovery (Read By Type)
-+--------------------------------------------------
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 12       #521 [hci0] 0.343556
++          SMP: Identity Address Information (0x09) len 7
++            Address type: Public (0x00)
++            Address: 00:11:22:33:44:55
 +
-+For each service, the client discovers its characteristics using
-+``Read By Type Request`` with the ``Characteristic`` UUID (0x2803).
-+The handle range is limited to the service's handle range.
++The Identity Address Information reveals the device's true public or
++static random address (as opposed to a Resolvable Private Address used
++during connection).
 +
-+**Request**::
++For Legacy Pairing, LTK distribution also appears::
 +
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #531 [hci0] 0.360063
-+          ATT: Read By Type Request (0x08) len 6
-+            Handle range: 0x0008-0x0011
-+            Attribute type: Characteristic (0x2803)
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 21       #519 [hci0] 0.343002
++          SMP: Encryption Information (0x06) len 16
++            Long term key: 00112233...
 +
-+**Response**::
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 15       #521 [hci0] 0.343556
++          SMP: Central Identification (0x07) len 10
++            EDIV: 0x1234
++            Rand: 0x0123456789abcdef
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 27       #533 [hci0] 0.360714
-+          ATT: Read By Type Response (0x09) len 22
-+            Attribute data length: 7
-+            Attribute data list: 3 entries
-+            Handle: 0x0009
-+            Value[5]: 200a00052a
-+                Properties: 0x20
-+                  Indicate (0x20)
-+                Value Handle: 0x000a
-+                Value UUID: Service Changed (0x2a05)
-+            Handle: 0x000c
-+            Value[5]: 0a0d00292b
-+                Properties: 0x0a
-+                  Read (0x02)
-+                  Write (0x08)
-+                Value Handle: 0x000d
-+                Value UUID: Client Supported Features (0x2b29)
-+            Handle: 0x000e
-+            Value[5]: 020f002a2b
-+                Properties: 0x02
-+                  Read (0x02)
-+                Value Handle: 0x000f
-+                Value UUID: Database Hash (0x2b2a)
++Pairing Failure
++---------------
 +
-+Each characteristic entry provides:
++When pairing fails, one device sends a Pairing Failed PDU::
 +
-+- **Handle** -- The handle of the characteristic declaration attribute.
-+- **Properties** -- A bitmask indicating supported operations:
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 6        #505 [hci0] 0.213002
++          SMP: Pairing Failed (0x05) len 1
++            Reason: Authentication requirements (0x03)
 +
-+  .. list-table::
-+     :header-rows: 1
-+     :widths: 10 30 60
-+
-+     * - Bit
-+       - Property
-+       - Description
-+     * - 0x01
-+       - Broadcast
-+       - Can be broadcast in advertising data
-+     * - 0x02
-+       - Read
-+       - Can be read
-+     * - 0x04
-+       - Write Without Response
-+       - Can be written without acknowledgment
-+     * - 0x08
-+       - Write
-+       - Can be written with acknowledgment
-+     * - 0x10
-+       - Notify
-+       - Server can send notifications
-+     * - 0x20
-+       - Indicate
-+       - Server can send indications
-+     * - 0x40
-+       - Authenticated Signed Writes
-+       - Supports signed write commands
-+     * - 0x80
-+       - Extended Properties
-+       - Has extended properties descriptor
-+
-+- **Value Handle** -- The handle where the characteristic's value is
-+  stored (always declaration handle + 1).
-+- **Value UUID** -- The UUID identifying the characteristic type.
-+
-+The client continues with advancing handle ranges until it receives
-+``Attribute Not Found``::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #572 [hci0] 1.200228
-+          ATT: Error Response (0x01) len 4
-+            Read By Type Request (0x08)
-+            Handle: 0x005c
-+            Error: Attribute Not Found (0x0a)
-+
-+Phase 5: Descriptor Discovery (Find Information)
-+--------------------------------------------------
-+
-+Descriptors occupy the handles between a characteristic's value handle
-+and the next characteristic declaration (or end of service). The client
-+discovers them using ``Find Information Request``.
-+
-+**Request**::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #556 [hci0] 0.959965
-+          ATT: Find Information Request (0x04) len 4
-+            Handle range: 0x000b-0x000b
-+
-+The handle range covers the gap between the characteristic value handle
-+and the next characteristic declaration handle.
-+
-+**Response**::
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 10       #561 [hci0] 0.961049
-+          ATT: Find Information Response (0x05) len 5
-+            Format: UUID-16 (0x01)
-+            Handle: 0x000b
-+            UUID: Client Characteristic Configuration (0x2902)
-+
-+Common descriptor UUIDs:
++SMP failure reasons:
 +
 +.. list-table::
 +   :header-rows: 1
-+   :widths: 15 40 45
++   :widths: 8 35 57
 +
-+   * - UUID
-+     - Name
-+     - Purpose
-+   * - 0x2900
-+     - Characteristic Extended Properties
-+     - Additional property bits
-+   * - 0x2901
-+     - Characteristic User Description
-+     - Human-readable description string
-+   * - 0x2902
-+     - Client Characteristic Configuration (CCC)
-+     - Enable/disable notifications or indications
-+   * - 0x2903
-+     - Server Characteristic Configuration
-+     - Server-side broadcast configuration
-+   * - 0x2904
-+     - Characteristic Presentation Format
-+     - Data format, exponent, unit
++   * - Code
++     - Reason
++     - Diagnostic Meaning
++   * - 0x01
++     - Passkey Entry Failed
++     - User cancelled or entered wrong passkey
++   * - 0x02
++     - OOB Not Available
++     - OOB data expected but not provided
++   * - 0x03
++     - Authentication Requirements
++     - Devices cannot agree on security level (e.g.,
++       one requires MITM but IO caps only allow Just Works)
++   * - 0x04
++     - Confirm Value Failed
++     - Cryptographic check failed; possible MITM attack
++   * - 0x05
++     - Pairing Not Supported
++     - Remote does not support pairing
++   * - 0x06
++     - Encryption Key Size
++     - Cannot agree on key size
++   * - 0x07
++     - Command Not Supported
++     - Received unrecognized SMP command
++   * - 0x08
++     - Unspecified Reason
++     - Generic failure
++   * - 0x09
++     - Repeated Attempts
++     - Pairing rate-limited; wait before retry
++   * - 0x0a
++     - Invalid Parameters
++     - Invalid fields in SMP command
++   * - 0x0b
++     - DHKey Check Failed
++     - ECDH key agreement failed (SC only)
++   * - 0x0c
++     - Numeric Comparison Failed
++     - User rejected numeric comparison
++   * - 0x0d
++     - BR/EDR Pairing In Progress
++     - Classic pairing already active
++   * - 0x0e
++     - Cross-Transport Key Derivation Not Allowed
++     - CTKD rejected by policy
 +
-+Phase 6: Reading Characteristic Values
-+----------------------------------------
++Automating Pairing Analysis
++----------------------------
 +
-+After discovery, the client may read characteristic values using
-+``Read Request``::
++**Identify all pairing attempts**::
 +
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 7        #577 [hci0] 1.380203
-+          ATT: Read Request (0x0a) len 2
-+            Handle: 0x000f
++    grep -n "Pairing Request\|Pairing Response\|Pairing Failed\|Pairing Public Key\|DHKey Check" output.txt
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #579 [hci0] 1.380774
-+          ATT: Read Response (0x0b) len 16
-+            Value[16]: a470d508da8751a2a50b79da0250bfda
++**Check pairing method (Secure Connections vs Legacy)**:
 +
-+The ``Handle`` in the request corresponds to a characteristic value
-+handle from the discovery phase. btmon shows the raw value bytes; the
-+interpretation depends on the characteristic UUID.
++- If ``Pairing Public Key`` appears between Request/Response and
++  Confirm: Secure Connections.
++- If only Confirm/Random follow Request/Response: Legacy Pairing.
++- Check the ``Authentication requirement`` line for the ``SC`` flag.
 +
-+Find By Type Value (Targeted Service Search)
-+----------------------------------------------
++**Detect pairing failures**::
 +
-+In addition to discovering all services, a client can search for a
-+specific service UUID using ``Find By Type Value Request``::
++    grep -n "Pairing Failed" output.txt
 +
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 13       #513 [hci0] 0.124195
-+          ATT: Find By Type Value Request (0x06) len 8
-+            Handle range: 0x0001-0xffff
-+            Attribute type: Primary Service (0x2800)
-+              UUID: Generic Attribute Profile (0x1801)
++**Correlate pairing with encryption**:
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #515 [hci0] 0.124684
-+          ATT: Find By Type Value Response (0x07) len 4
-+            Handle range: 0x0008-0x0011
++After successful pairing, expect ``Encryption Change`` with
++``Status: Success``. Search for::
 +
-+This returns only the handle range for the matching service, without
-+iterating through all services. If the service is not found::
++    grep -n "Encryption Change\|Encryption:" output.txt
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #524 [hci0] 0.240607
-+          ATT: Error Response (0x01) len 4
-+            Find By Type Value Request (0x06)
-+            Handle: 0x0012
-+            Error: Attribute Not Found (0x0a)
++**Identify re-pairing on reconnect**:
 +
-+Bidirectional Discovery
-+------------------------
++Reconnections to a bonded device should show ``Encryption Change``
++without SMP traffic (using stored keys). If SMP Pairing Request
++appears on reconnection, the bond was lost on one side.
 +
-+Both devices in a connection can act as GATT client and server
-+simultaneously. In a btsnoop trace, you may see interleaved discovery
-+in both directions:
++**Full pairing diagnosis pattern**:
 +
-+- **TX (``<``) requests + RX (``>``) responses** -- The local device
-+  (whose trace this is) is acting as a GATT client, discovering the
-+  remote device's services.
-+- **RX (``>``) requests + TX (``<``) responses** -- The remote device
-+  is acting as a GATT client, discovering the local device's services.
-+
-+For example, the local server responding to the remote's discovery::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #584 [hci0] 1.512006
-+          ATT: Read By Group Type Request (0x10) len 6
-+            Handle range: 0x0001-0xffff
-+            Attribute group type: Primary Service (0x2800)
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 66       #586 [hci0] 1.518778
-+          ATT: Read By Group Type Response (0x11) len 61
-+            Attribute data length: 6
-+            Attribute group list: 10 entries
-+            Handle range: 0x0001-0x0007
-+            UUID: Generic Access Profile (0x1800)
-+            Handle range: 0x0008-0x0011
-+            UUID: Generic Attribute Profile (0x1801)
-+            Handle range: 0x0012-0x0014
-+            UUID: Device Information (0x180a)
-+            Handle range: 0x0015-0x001e
-+            UUID: Coordinated Set Identification (0x1846)
-+            Handle range: 0x001f-0x0020
-+            UUID: Common Audio (0x1853)
-+            Handle range: 0x0021-0x0024
-+            UUID: Microphone Control (0x184d)
-+            Handle range: 0x0041-0x004b
-+            UUID: Volume Control (0x1844)
-+            Handle range: 0x006b-0x0073
-+            UUID: Broadcast Audio Scan (0x184f)
-+            Handle range: 0x0074-0x0086
-+            UUID: Published Audio Capabilities (0x1850)
-+            Handle range: 0x0087-0x0096
-+            UUID: Audio Stream Control (0x184e)
-+
-+This shows the local device's own GATT database as seen by the remote.
-+To reconstruct the remote device's database, focus on the TX requests
-+and RX responses (the local device acting as client).
-+
-+Building the Attribute Table
-+-----------------------------
-+
-+To reconstruct the GATT database, extract the discovery responses and
-+organize them into a table. Using the trace above as an example, the
-+remote device at address 00:11:22:33:44:55 has:
-+
-+**Services** (from Read By Group Type Response)::
-+
-+    Handle Range    UUID                            Service Name
-+    ──────────────  ──────────────────────────────  ────────────────────────────
-+    0x0001-0x0009   0x1800                          Generic Access Profile
-+    0x000a-0x0011   0x1801                          Generic Attribute Profile
-+    0x0012-0x0014   0x180a                          Device Information
-+    0x0015-0x0039   0x184c                          Generic Telephony Bearer
-+    0x003a-0x0059   0x1849                          Generic Media Control
-+    0x005a-0x005c   0x1855                          Telephony and Media Audio
-+
-+**Characteristics** (from Read By Type Response, within GAP 0x0001-0x0009)::
-+
-+    Handle  Value Handle  Properties  UUID    Name
-+    ──────  ────────────  ──────────  ──────  ────────────────────────────────
-+    0x0002  0x0003        Read        0x2a00  Device Name
-+    0x0004  0x0005        Read        0x2a01  Appearance
-+    0x0006  0x0007        Read        0x2a04  Peripheral Preferred Conn Params
-+    0x0008  0x0009        Read        0x2aa6  Central Address Resolution
-+
-+**Characteristics** (within GATT 0x000a-0x0011)::
-+
-+    Handle  Value Handle  Properties       UUID    Name
-+    ──────  ────────────  ───────────────  ──────  ────────────────────────────
-+    0x000b  0x000c        Indicate         0x2a05  Service Changed
-+    0x000e  0x000f        Read, Write      0x2b29  Client Supported Features
-+    0x0010  0x0011        Read             0x2b2a  Database Hash
-+
-+**Descriptors** (from Find Information Response)::
-+
-+    Handle  UUID    Name
-+    ──────  ──────  ────────────────────────────────────
-+    0x000d  0x2902  Client Characteristic Configuration
-+
-+The CCC descriptor at handle 0x000d belongs to the Service Changed
-+characteristic (0x000c), because it falls between that value handle
-+and the next characteristic declaration at 0x000e.
++1. Find ``Pairing Request`` -- note the handle, IO capabilities,
++   auth requirements
++2. Find ``Pairing Response`` -- compare IO capabilities to determine
++   association model
++3. Check for ``Pairing Failed`` -- if present, the reason code
++   identifies the failure
++4. Check for ``Encryption Change`` with ``Status: Success`` -- confirms
++   pairing completed
++5. Check for ``Identity Address Information`` -- reveals the device's
++   true address
 +
  EXAMPLES
  ========
  
-@@ -779,6 +1196,22 @@ Recommended Workflow
+@@ -1186,17 +1434,23 @@ Recommended Workflow
+        grep -n "Disconnect Complete" output.txt
+ 
+    Then examine the lines following each match for the ``Reason:``
+-   field.
++   field. See `HCI ERROR AND DISCONNECT REASON CODES`_ for
++   interpretation.
+ 
+-5. **Identify LE Audio**: Search for ASCS and CIS activity::
++5. **Check pairing/security**: Search for SMP activity (see
++   `SMP PAIRING FLOW`_)::
++
++       grep -n "Pairing Request\|Pairing Response\|Pairing Failed\|Encryption Change" output.txt
++
++6. **Identify LE Audio**: Search for ASCS and CIS activity::
+ 
+        grep -n "ASE Control Point\|CIG Parameters\|Create Connected Isochronous\|CIS Established\|Setup ISO Data Path" output.txt
+ 
+-6. **Check for errors**: Search for non-success status codes::
++7. **Check for errors**: Search for non-success status codes::
  
         grep -n "Status:" output.txt | grep -v "Success"
  
-+7. **Extract GATT discovery**: Filter the GATT service/characteristic
-+   discovery traffic (see `RECONSTRUCTING A GATT DATABASE FROM SNOOP
-+   TRACES`_)::
+-7. **Extract GATT discovery**: Filter the GATT service/characteristic
++8. **Extract GATT discovery**: Filter the GATT service/characteristic
+    discovery traffic (see `RECONSTRUCTING A GATT DATABASE FROM SNOOP
+    TRACES`_)::
+ 
+@@ -1223,7 +1477,8 @@ pattern in the trace:
+ 2. ``LE Connection Update Complete`` -- connection parameters changed
+    (may occur zero or more times)
+ 3. ``Encryption Change`` -- link encrypted (may show encryption
+-   algorithm)
++   algorithm). See `SMP PAIRING FLOW`_ for the SMP exchange that
++   precedes this.
+ 4. ACL Data with ATT/SMP/L2CAP -- service discovery and data exchange
+ 5. ``Disconnect Complete`` -- connection ended, check Reason field
+ 
+@@ -1238,6 +1493,21 @@ For LE Audio connections, additional steps appear between 3 and 5:
+ - ``Disconnect Complete`` on CIS handle (stream ended)
+ - ``LE Remove CIG`` (group removed)
+ 
++Common Debugging Scenarios
++---------------------------
 +
-+       # Find all service discovery responses
-+       grep -n "Read By Group Type Response\|Attribute group list\|Handle range.*UUID" output.txt
++**Pairing failure diagnosis**:
 +
-+       # Find all characteristic discovery responses
-+       grep -n "Read By Type Response\|Properties:\|Value Handle:\|Value UUID:" output.txt
++1. Find ``Pairing Request`` -- note IO capabilities and auth
++   requirements
++2. Find ``Pairing Response`` -- compare to determine association model
++3. If ``Pairing Failed`` appears, the reason code identifies the
++   failure (see `SMP PAIRING FLOW`_)
++4. If ``Encryption Change`` shows ``Status: Success``, pairing
++   succeeded
++5. If no SMP traffic on reconnect but ``Encryption Change`` fails,
++   the bond was lost on one side
 +
-+       # Find all descriptor discovery responses
-+       grep -n "Find Information Response\|Format:\|Handle:.*UUID:" output.txt
-+
-+       # Find targeted service searches
-+       grep -n "Find By Type Value" output.txt
-+
- Key Patterns for Connection Lifecycle
- -------------------------------------
+ Vendor-Specific Events
+ ----------------------
  
 -- 
 2.53.0
