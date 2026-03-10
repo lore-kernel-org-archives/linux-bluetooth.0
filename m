@@ -1,38 +1,39 @@
-Received: from mail.avm.de (mail.avm.de [212.42.244.120])
+Received: from mail.avm.de (mail.avm.de [212.42.244.119])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2247247DD49;
-	Tue, 10 Mar 2026 11:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33AEC48BD50;
+	Tue, 10 Mar 2026 11:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773143756; cv=none; b=AF8a008rQHiuzknJGtnyMWpmxJOaMJv/ai5UJfJq0PYfKVwuO2mLimKeZbI5kLmO1qeX+mBmltTqu/ao0PL96E2XlZVMdvt/+gjcwcTn1UhZE/l9gse+UQGZz8OPCElDDfeAFy+c4R6SPgEJt6n3N6r7wG2fWBbJlp9MijDaiPA=
+	t=1773143761; cv=none; b=TJUZpdmxtgQzIvdzI0xmGx9sh8CoXhr7pyBaE85+SnhH0evvd9ao3n/egne/rxXeS9weychmxZ+qKDsOKDN/0JOQWCKjr51J0tifdiJ0Rxfw57HJUgROSUQBQA3TEw9AsKZiMpHJc+hV/6tQOn4whVjoyXTvh2eeFIfJiR5yN6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773143756; c=relaxed/simple;
-	bh=xBKhBreRFiEpPz9/49OtWlCzYkq81mZihzEqekyK7xA=;
+	s=arc-20240116; t=1773143761; c=relaxed/simple;
+	bh=7QEjQvc53kHdYvJikGIe0XIqNo63J0gbffxhQyvvDmc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hONHER+x6S0PjjQWaUesWeqndINfLZ1aHhFUdmCcAztsazISGhgVBl6dowy3MPmUmA5M5xtMfvg3GH2yt0FnuVxk84+Hz71Um9KKZq7puQZ+0j6nBXUwau+f5ilEex9rDFIJQYpMrhEqsmPJVLxWem2WACN4+8qmOuy0uTZHEEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=helEnKZU; arc=none smtp.client-ip=212.42.244.120
+	 In-Reply-To:To:Cc; b=gZ0BGPF7C9T0k8NgVWoel/rEPYP43ANgX8JhywCgFJIbxjVV3nxxEcfCmJ+wrAS4OivqDo5y9prIPW36EtOyGX7ihzc901TyAOk81UDxUFsMnr8zg9J5iW+fVDBv6DRdOgnWxuWgFQuUC/lH6FTXDe8rjfvpU40g5FGbDVSmBSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=xkT1xwtn; arc=none smtp.client-ip=212.42.244.119
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="helEnKZU"
+	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="xkT1xwtn"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
-	t=1773143725; bh=xBKhBreRFiEpPz9/49OtWlCzYkq81mZihzEqekyK7xA=;
+	t=1773143727; bh=7QEjQvc53kHdYvJikGIe0XIqNo63J0gbffxhQyvvDmc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=helEnKZUDYmuyC7r9itC+dVARlXrRlYpZWzDAaAXEYc5wN1FHoKQsdSjCaomchjhv
-	 +41zqDKlH044FWtyvi2VX9TAdQF1rs14U237EegHWJogLxynx4m+2shwi9NDMEzjxe
-	 k3vCUFrBTw+1/DCUt/wn8qmUGFq+b5Q0TC9ytTvc=
-Received: from [2001:bf0:244:244::71] (helo=mail.avm.de)
+	b=xkT1xwtnaKnF5zwky80U90tVBtgjXUcX+GeykmrAvdmpppC5+8VK/cr2uIrG8dU1M
+	 7wm2m1OyU4JV6u1islMHTFtIiUXXXY5n/w/md+c+5C+f1bhtmzGNVLxiuCLq3+FykP
+	 yZ+BZpZfQ6y4Yx2gZPgoiPOharwFnkzMOEjjrW34=
+Received: from [212.42.244.71] (helo=mail.avm.de)
 	by mail.avm.de with ESMTP (eXpurgate 4.55.2)
 	(envelope-from <phahn-oss@avm.de>)
-	id 69b006ac-b734-7f0000032729-7f000001c024-1
-	for <multiple-recipients>; Tue, 10 Mar 2026 12:55:24 +0100
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [IPv6:2001:bf0:244:244::71])
+	id 69b006af-2367-7f0000032729-7f000001c9aa-1
+	for <multiple-recipients>; Tue, 10 Mar 2026 12:55:27 +0100
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
 	by mail.avm.de (Postfix) with ESMTPS;
-	Tue, 10 Mar 2026 12:55:24 +0100 (CET)
+	Tue, 10 Mar 2026 12:55:27 +0100 (CET)
 From: Philipp Hahn <phahn-oss@avm.de>
-Date: Tue, 10 Mar 2026 12:48:48 +0100
-Subject: [PATCH 22/61] md: Prefer IS_ERR_OR_NULL over manual NULL check
+Date: Tue, 10 Mar 2026 12:49:07 +0100
+Subject: [PATCH 41/61] pinctrl: Prefer IS_ERR_OR_NULL over manual NULL
+ check
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,7 +42,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260310-b4-is_err_or_null-v1-22-bd63b656022d@avm.de>
+Message-Id: <20260310-b4-is_err_or_null-v1-41-bd63b656022d@avm.de>
 References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
 In-Reply-To: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
 To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
@@ -71,23 +72,21 @@ To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
  sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
  tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, 
  Philipp Hahn <phahn-oss@avm.de>
-Cc: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
- Mikulas Patocka <mpatocka@redhat.com>, 
- Benjamin Marzinski <bmarzins@redhat.com>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1995; i=phahn-oss@avm.de;
- h=from:subject:message-id; bh=xBKhBreRFiEpPz9/49OtWlCzYkq81mZihzEqekyK7xA=;
- b=owEBbQGS/pANAwAKATQtBlPRrKzbAcsmYgBpsAYgLcFKxegL/bQqhgTo4RNQJgrnmxL3YCzsA
- NwbsOtNPYeJATMEAAEKAB0WIQQ5bPBtrWDUcDQCppg0LQZT0ays2wUCabAGIAAKCRA0LQZT0ays
- 21bACACtmD+JNOZZE2WtYGgZs+OKFUvGXg8BvTcg2nAeuTAfDV15mPSXGDJtr1bOhVuDnL/Nw9l
- YuHe1nCI3Kb5gMl9oJ6QTc/nxqpUehwIiPaszmCzsqUT9Av4+JV9tbiRExsTnWgWp8/ohC7O/t7
- 0F2HI97L08/EOhP6er3J/caSpZnOpbWXT+xXd1cfFQmhFO8426W+HbSPnqaYqXoPZvzXs04m+U7
- Y+HhZZm9gUaVM39bOf2O7FpXKP5lXlaxHXla0Syc5xOdqOCZGHEwLXH/1MeFU5JbVnp/DFE01i8
- 2gpgUDB/Kr+8ov9qYVC2ZPrR+l2cjmrUojAxw0U8eiSwxKRA
+Cc: Linus Walleij <linusw@kernel.org>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=974; i=phahn-oss@avm.de;
+ h=from:subject:message-id; bh=7QEjQvc53kHdYvJikGIe0XIqNo63J0gbffxhQyvvDmc=;
+ b=owEBbQGS/pANAwAKATQtBlPRrKzbAcsmYgBpsAZht0v/gzetsO7BqEut/SimpAgjLSUxejqDN
+ jYPITjd+qeJATMEAAEKAB0WIQQ5bPBtrWDUcDQCppg0LQZT0ays2wUCabAGYQAKCRA0LQZT0ays
+ 2w/2B/4pX609pdZXvqHfb+Vqmmi/TuKtxSLe3zgXgKoCJW/gh17vsp/T22wIBqf6SXS4OIznDwc
+ CqIbsgeOEAAlNDyBRYAY6KPNdElI/rv3fa2ORfx9RdjhIHa4x5wKb3P01gEbIVxJDT7L+eaQBY5
+ W5yNdsizunhdj+FuJcUWkiWweG/sakXiGLIkqX5NlLESVIppvEGGOaxwjbsMisZ9PSaDKihHXQV
+ LTJsTcuZgnx6Ly3LMJ0SQkiMEfMsx1Sbu6dG9rRM3ckN2uFTC5HrsnBNmmT4sZqY9FpULICBCkq
+ q7sHGVDOpWpuw1oJ3VO2Y9YZsG2cD9KHQpB9olXNSESNKBcu
 X-Developer-Key: i=phahn-oss@avm.de; a=openpgp;
  fpr=58AF7C2E007CDBE62C59E078F50EFDCF8AD04B1A
-X-purgate-ID: 149429::1773143724-71DC2A3D-384367F1/0/0
+X-purgate-ID: 149429::1773143727-86C91E1F-25F0153A/0/0
 X-purgate-type: clean
-X-purgate-size: 1997
+X-purgate-size: 976
 X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
 X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
 X-purgate: clean
@@ -97,53 +96,27 @@ check.
 
 Change generated with coccinelle.
 
-To: Alasdair Kergon <agk@redhat.com>
-To: Mike Snitzer <snitzer@kernel.org>
-To: Mikulas Patocka <mpatocka@redhat.com>
-To: Benjamin Marzinski <bmarzins@redhat.com>
-Cc: dm-devel@lists.linux.dev
+To: Linus Walleij <linusw@kernel.org>
+Cc: linux-gpio@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
 ---
- drivers/md/dm-cache-metadata.c | 2 +-
- drivers/md/dm-crypt.c          | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/pinctrl/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm-cache-metadata.c b/drivers/md/dm-cache-metadata.c
-index 57158c02d096ed38759d563bf27e7f1b3fe58ccc..32f7d25b83a181a30a78c663d48f7882cb97f7b5 100644
---- a/drivers/md/dm-cache-metadata.c
-+++ b/drivers/md/dm-cache-metadata.c
-@@ -1819,7 +1819,7 @@ int dm_cache_metadata_abort(struct dm_cache_metadata *cmd)
- 	WRITE_UNLOCK(cmd);
- 	dm_block_manager_destroy(old_bm);
- out:
--	if (new_bm && !IS_ERR(new_bm))
-+	if (!IS_ERR_OR_NULL(new_bm))
- 		dm_block_manager_destroy(new_bm);
+diff --git a/drivers/pinctrl/core.c b/drivers/pinctrl/core.c
+index b5e97689589fbf1b6750620fc193bc820012be2b..97a80989601abbe969d4b64cb0f3926fd4f291f5 100644
+--- a/drivers/pinctrl/core.c
++++ b/drivers/pinctrl/core.c
+@@ -1991,7 +1991,7 @@ static void pinctrl_init_device_debugfs(struct pinctrl_dev *pctldev)
+ 	device_root = debugfs_create_dir(debugfs_name, debugfs_root);
+ 	pctldev->device_root = device_root;
  
- 	return r;
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 54823341c9fda46b2d8e13428cbd51f3edf642d5..05eae3d3c7df6baebd0b7a4219f7b6938f6e7f87 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -2295,7 +2295,7 @@ static void crypt_free_tfms_aead(struct crypt_config *cc)
- 	if (!cc->cipher_tfm.tfms_aead)
+-	if (IS_ERR(device_root) || !device_root) {
++	if (IS_ERR_OR_NULL(device_root)) {
+ 		pr_warn("failed to create debugfs directory for %s\n",
+ 			dev_name(pctldev->dev));
  		return;
- 
--	if (cc->cipher_tfm.tfms_aead[0] && !IS_ERR(cc->cipher_tfm.tfms_aead[0])) {
-+	if (!IS_ERR_OR_NULL(cc->cipher_tfm.tfms_aead[0])) {
- 		crypto_free_aead(cc->cipher_tfm.tfms_aead[0]);
- 		cc->cipher_tfm.tfms_aead[0] = NULL;
- 	}
-@@ -2312,7 +2312,7 @@ static void crypt_free_tfms_skcipher(struct crypt_config *cc)
- 		return;
- 
- 	for (i = 0; i < cc->tfms_count; i++)
--		if (cc->cipher_tfm.tfms[i] && !IS_ERR(cc->cipher_tfm.tfms[i])) {
-+		if (!IS_ERR_OR_NULL(cc->cipher_tfm.tfms[i])) {
- 			crypto_free_skcipher(cc->cipher_tfm.tfms[i]);
- 			cc->cipher_tfm.tfms[i] = NULL;
- 		}
 
 -- 
 2.43.0
