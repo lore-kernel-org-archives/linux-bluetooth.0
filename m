@@ -1,129 +1,285 @@
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-4.smtp.github.com (out-4.smtp.github.com [192.30.252.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52A53D093C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 21:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2041F3176E0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 21:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773178850; cv=none; b=Br4nVTFtouXY9vIdQzJvqHlQ4eQZBX2YqtZkvT8ubOVHzDEqi9bgYzueIqIIvH2avxvY5hlWwwgaIWv9Gbt4GddQdZJF8hpeuguuU6DrD61+VC+/9tdbJyGG+QGzLIPqYFLzhk/pAeSrQusw1PzZr89A/CXXLiuVtgr5EOH6ATg=
+	t=1773179511; cv=none; b=DAaPeNhaqwPU1bEXtfcQQaFoSGOPfcKkffZLLLTr8ISs3cQvkVulcq3TvaT4pOy2iSM3UkIzqVMOHl0Ya8zAuDVpoTROCJK4RvdTRwFaUR96/G0IfUprEO4gQaW1Pfg4ag8dF71/LnAzNUMhKyG6qDUcI9oCg/gLPYD4nKdzNgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773178850; c=relaxed/simple;
-	bh=FG/Wc/2tK7vq79MkDHDdeYrMydAA0XozijBBFnJF4w0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=alJCxrYwe5vI1OMu/hBPbXyPq7Ot3br/zrybZLVSPH74mmrjkThSK0TunCaZmk3ufaisqFug4z0no9asMX4oyasH81Y20sietlWyMpVjhMXXUHUnaF1/jlEInCmi2mLsA+9lOYLdrClWaG8Begz/I6BSGIUpx7orsLqXksBwkQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NpHhKNDX; arc=none smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773179511; c=relaxed/simple;
+	bh=a6vxuxYnhfPhAxVr5YqPKB+KwU6O4r4NfmZQQANv4ck=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=fgZ6Y5+jWwt9VAY/Saq6spfOiYF+rOqswBPgkkObxd1V2D75kxztecRVrFU9wt0eqDKTK7vfu4VL2c0hvrskQhtonwX5ToN67Fy+tV1kT+C+GbMNvbHQQf06rM0MjCuUaT4HvKUbBWwRJ2e5eUqdYjE4igIh7LDwtEpN0GOstgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=A/tG2+4V; arc=none smtp.client-ip=192.30.252.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NpHhKNDX"
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-64c9ebd1369so12492964d50.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 14:40:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773178848; x=1773783648; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Cy8GNdVWNB2uiWikka88eCJ/5NNqHej58e2q5vzius=;
-        b=NpHhKNDXt676qoGeahKYdWy/+qrlU2yRPoIAEAeX8+pt9kY5Rk93i83xFOsqVaDq9v
-         X7TkZri1GbEL71OSJEZS3TKbFR/C7N0XUCDuWSPh6p4KQS8zHpoZ+8yOjpCVANr1FLX4
-         FNieN2OPVMKyfD21Wre2Ll3IW1oUJSO9vNUjZKuNs8InVcsKd6Ms3nufzIW5RkAVM0Pz
-         WiJXMaaIkkTY9gGvCES4YgXY0/sZvOHW4VtmVOv0wiaMwEgJjiF6udHd6BUmJ/6KcRkT
-         8KKNHpPeNXU2/7jMstUZGoKfimcgremsubQWq0m2/iOQUwvEtMgeguHsZA9u6Of7G4ZS
-         Xsxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773178848; x=1773783648;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9Cy8GNdVWNB2uiWikka88eCJ/5NNqHej58e2q5vzius=;
-        b=lhwgBU2WhCGHNRaggKY67c9Dwqb6N+8Zkd7CcZVRMBQ/B2N+4zR50tI/jllppn/w8i
-         EyJ3+8dRgDKiv6Z/Fs+pHTdmO7RjgcjbXwG0+TU/aQur7fGWrTHIxFCgQFlTFw0nojGi
-         HJ5fwe0RUwA8xlroBaGBmnyyknsJh1QKxppUdaXQDl2XGRx5NkgCofhB8MvY/7AdYJT/
-         Vrf6GzVzhFa0gWQ2rdX9PggD946BWIYgafKlnL0OpfnmH/3mf6Ol2YipinMzwJJedXZV
-         heCx3DowhpFh87TTjwLamIAdSd7jlit9EKEaT6Iom3YK9jR0b3zxBAfogAdbjf8ucsBO
-         xIDg==
-X-Gm-Message-State: AOJu0YyzGv3ChEuW+3NmKTKQpyOfr8MHaalOJgbwbzmfGV/Bs70PePio
-	SFWRSReDzfR+i8/F1pcl/DuoBU9Ck+lLlAtGFCj2CF6oN9J4SsH58Gffp9gdKJUy
-X-Gm-Gg: ATEYQzweTEY0y8d8rOPBuA36mlFUHxw3q2dvmIplTch9mv5FFB2IDmQDRt6QF+2irHo
-	Jb+tGwBsf/HxeUofHmHjPbnJTewSGUR1/Y6d4Ka/YFOI5Usu1VnBdGNy9HDuXJDqtG7/PJfhFQM
-	lHguSvibNlADAA8O3D+5KxP04lvoj1IGcWYnkzR411Fktn8QKYnIRbiTI1Z7L+eMDfiiXWH3Vy2
-	8RFt+22+WfYMBK4J4fwv6fF/8kdyhcfgzIgnYQTkIugwiC56EnBnq7TI9EmZTcNNOuLpTLAQ0WQ
-	A2SghpDp+X4Ezsf4f1jOIxJIlXDkhIjTbgQPDslGuLZP30nfrcgsoKOlZKAZeOYqqDZmxYC35d+
-	TiJkCz2FbwQH6Tn1L/0eLw7l+gLwzC7vpka/7o9I7vFX2gb6qlM+Q5GFqIc6bQZfV+flgVOCJ2d
-	YXwqwEOE4Fhh7PEo3m0e6vFUVzmK9Pq8nAv2RZpaUx8hOFALrjJZ6sD15DWfROy1B828BRcwz4J
-	Mgf+Svk6XKbRtsBug==
-X-Received: by 2002:a05:690c:2605:b0:796:3f2f:a33b with SMTP id 00721157ae682-79917ec5454mr2151407b3.18.1773178847681;
-        Tue, 10 Mar 2026 14:40:47 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79917e0c421sm1254187b3.13.2026.03.10.14.40.46
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 14:40:46 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="A/tG2+4V"
+Received: from github.com (hubbernetes-node-60b42ec.va3-iad.github.net [10.48.221.41])
+	by smtp.github.com (Postfix) with ESMTPA id 59C112C1172
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 14:51:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1773179509;
+	bh=AuVO23ZbVKgGifuaZptq2vd6/PKlTnDY0IqInUBVXsE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=A/tG2+4VxShVj0FB1KkRJOQdPwBB7q6eKj4W1vX9dGJAeyMA4nNf5AG3GCITbzwpg
+	 5cgq9oxskXfg6Is9VBajh+L3ANVK7iwTVJfrUueqqjuW6ajUx7WzafkoWVJpGYYfp8
+	 AlzvwybbQpzU2FBbfkiaCNkfaFXVyIw5pnLdN9b4=
+Date: Tue, 10 Mar 2026 14:51:49 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: L2CAP: Fix accepting multiple L2CAP_ECRED_CONN_REQ
-Date: Tue, 10 Mar 2026 17:40:37 -0400
-Message-ID: <20260310214037.732139-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
+Message-ID: <bluez/bluez/push/refs/heads/1064659/000000-3b918d@github.com>
+Subject: [bluez/bluez] 6404dc: doc/btmon: Add GATT database reconstruction
+ guide
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1064659
+  Home:   https://github.com/bluez/bluez
+  Commit: 6404dcfeaa86a5b961ea49119d30393be11e1b9c
+      https://github.com/bluez/bluez/commit/6404dcfeaa86a5b961ea49119d30393be11e1b9c
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-10 (Tue, 10 Mar 2026)
 
-Currently the code attempts to accept requests regardless of the
-command identifier which may cause multiple requests to be marked
-as pending (FLAG_DEFER_SETUP) which can cause more than
-L2CAP_ECRED_MAX_CID(5) to be allocated in l2cap_ecred_rsp_defer
-causing an overflow.
+  Changed paths:
+    M doc/btmon.rst
 
-The spec is quite clear that the same identifier shall not be used on
-subsequent requests:
+  Log Message:
+  -----------
+  doc/btmon: Add GATT database reconstruction guide
 
-'Within each signaling channel a different Identifier shall be used
-for each successive request or indication.'
-https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core-62/out/en/host/logical-link-control-and-adaptation-protocol-specification.html#UUID-32a25a06-4aa4-c6c7-77c5-dcfe3682355d
+Add a comprehensive section explaining how to reconstruct a remote
+device's GATT database from btsnoop traces. Documents all six phases
+of GATT discovery:
 
-So this attempts to check if there are any channels pending with the
-same identifier and rejects if any are found.
+- Primary/Secondary Service Discovery (Read By Group Type)
+- Included Service Discovery (Read By Type with Include UUID)
+- Characteristic Discovery (Read By Type with Characteristic UUID)
+- Descriptor Discovery (Find Information)
+- Characteristic Value Reading (Read Request/Response)
+- Targeted Service Search (Find By Type Value)
 
-Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
-Reported-by: Yiming Qian <yimingqian591@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/l2cap_core.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Includes annotated btmon output examples for each ATT operation,
+a characteristic properties reference table, common descriptor
+UUIDs, guidance on bidirectional discovery, and a worked example
+showing how to build the final attribute table from trace data.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6606d7f12534..3b65f8d605c9 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5055,7 +5055,7 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
- 	u16 mtu, mps;
- 	__le16 psm;
- 	u8 result, rsp_len = 0;
--	int i, num_scid;
-+	int i, num_scid = 0;
- 	bool defer = false;
- 
- 	if (!enable_ecred)
-@@ -5068,6 +5068,14 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
- 		goto response;
- 	}
- 
-+	/* Check if there are no pending channels with the same ident */
-+	__l2cap_chan_list_id(conn, cmd->ident, l2cap_ecred_list_defer,
-+			     &num_scid);
-+	if (num_scid) {
-+		result = L2CAP_CR_LE_INVALID_PARAMS;
-+		goto response;
-+	}
-+
- 	cmd_len -= sizeof(*req);
- 	num_scid = cmd_len / sizeof(u16);
- 
--- 
-2.53.0
 
+  Commit: 3b48aabda2da2c440c376d5ed9c5b398d43b88b7
+      https://github.com/bluez/bluez/commit/3b48aabda2da2c440c376d5ed9c5b398d43b88b7
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-10 (Tue, 10 Mar 2026)
+
+  Changed paths:
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Add SMP pairing flow documentation
+
+Add comprehensive SMP pairing documentation covering:
+
+- Pairing Phases 1-3: Feature exchange (IO capabilities, auth
+  requirements, key distribution), authentication for both Secure
+  Connections (public key, DHKey check) and Legacy pairing
+  (confirm/random only), and key distribution (IRK, LTK, CSRK).
+
+- Pairing Failure: Failure reason code table (0x01-0x0e) with
+  diagnostic meanings for each code.
+
+- Automating Pairing Analysis: grep patterns for identifying pairing
+  attempts, detecting SC vs Legacy, finding failures, and correlating
+  with encryption.
+
+- Updated Automated Trace Analysis: Added pairing/security check step
+  in the recommended workflow, SMP cross-reference in connection
+  lifecycle patterns, and pairing failure debugging scenario.
+
+
+  Commit: 67a0d77375dd4048fde9978ba035db1d5dc5058a
+      https://github.com/bluez/bluez/commit/67a0d77375dd4048fde9978ba035db1d5dc5058a
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-10 (Tue, 10 Mar 2026)
+
+  Changed paths:
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Add L2CAP channel tracking documentation
+
+Add comprehensive L2CAP channel tracking documentation covering:
+
+- Fixed Channels: CID table (0x0001-0x0007) mapping to protocols
+  (L2CAP Signaling, ATT, SMP, AMP Manager).
+
+- Dynamic Channels (BR/EDR): Connection Request/Response flow,
+  Configure Request/Response, and PSM-to-protocol mapping table
+  (SDP, RFCOMM, BNEP, AVCTP, AVDTP, ATT, EATT).
+
+- LE Credit-Based Channels: LE Connection Request/Response with
+  MTU, MPS, and credits for flow control. EATT over PSM 0x0027.
+
+- Connection Parameter Updates: LE peripheral parameter change
+  requests via L2CAP signaling with accept/reject handling.
+
+- Automating L2CAP Analysis: grep patterns for channel establishments,
+  PSM tracking, parameter updates, and EATT setup.
+
+- Updated Automated Trace Analysis: Added L2CAP channel check step
+  in the recommended workflow, L2CAP cross-reference in connection
+  lifecycle, and connection parameter negotiation debugging scenario.
+
+
+  Commit: e0f40a68b3c04b99840e489772841dd05cf2a6e6
+      https://github.com/bluez/bluez/commit/e0f40a68b3c04b99840e489772841dd05cf2a6e6
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-10 (Tue, 10 Mar 2026)
+
+  Changed paths:
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Add LE Audio protocol flow documentation
+
+Add comprehensive LE Audio protocol flow documentation covering:
+
+- PACS (Published Audio Capabilities): Sink/Source PAC reads with
+  LC3 codec capability decoding (sampling frequency, frame duration,
+  channel counts, frame length), audio locations, and available
+  audio contexts.
+
+- ASCS (Audio Stream Control): ASE state machine (Idle through
+  Streaming and Releasing), ASE Status notifications with full
+  codec config decoding, ASE Control Point operations table
+  (Config Codec, Config QoS, Enable, Disable, Release, etc.).
+
+- CIS Setup and Teardown: CIG Parameters, CIS creation, CIS
+  Established event, ISO Data Path setup, and ISO data flow.
+
+- Broadcast Audio (BIG): BASE announcements in periodic advertising,
+  BIG creation (source), BIG sync (receiver).
+
+- Automating LE Audio Analysis: grep patterns for ASE state tracking,
+  codec verification, CIS establishment, and broadcast detection.
+  8-step diagnosis pattern.
+
+- Updated Automated Trace Analysis: Added LE Audio cross-reference
+  in workflow step 6, LE Audio reference in connection lifecycle,
+  and audio streaming failure debugging scenario.
+
+
+  Commit: 972f6f199521d5e7cba94e6e12df6bb05d55f7c3
+      https://github.com/bluez/bluez/commit/972f6f199521d5e7cba94e6e12df6bb05d55f7c3
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-10 (Tue, 10 Mar 2026)
+
+  Changed paths:
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Add protocol error codes documentation
+
+Add protocol error codes reference covering:
+
+- ATT Error Codes: Complete table (0x01-0xff) with diagnostic
+  meanings for Invalid Handle, Read/Write Not Permitted,
+  Authentication/Authorization Insufficient, Attribute Not Found,
+  Insufficient Encryption, Application Errors (0x80-0x9f), and
+  profile-specific codes (0xfc-0xff).
+
+- L2CAP Connection Response Results: Result code table (0x0000-0x000c)
+  covering successful connections, pending, and all refusal reasons
+  (PSM not supported, security block, no resources, invalid CID,
+  insufficient authentication/encryption).
+
+- Automating Error Detection: grep patterns for ATT errors, security
+  errors, and L2CAP rejections.
+
+- Cross-Layer Error Correlation: Common cascading error patterns
+  across ATT, SMP, HCI, and L2CAP layers.
+
+- Updated Automated Trace Analysis: Enhanced error check step with
+  multi-layer grep commands, added error cross-references in
+  connection lifecycle, and GATT operation rejected debugging
+  scenario.
+
+
+  Commit: 1cdfd9ac1882e4cccee3a1d059ac268547768ad2
+      https://github.com/bluez/bluez/commit/1cdfd9ac1882e4cccee3a1d059ac268547768ad2
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-10 (Tue, 10 Mar 2026)
+
+  Changed paths:
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Add advertising and scanning documentation
+
+Add advertising and scanning documentation covering:
+
+- Advertising Reports: LE Extended Advertising Report decoding with
+  event type properties, address, PHY, RSSI, and advertising data.
+
+- Common AD Types: Table of AD types btmon decodes (Flags, 16/128-bit
+  UUIDs, Local Name, TX Power, Service Data, Manufacturer Specific).
+
+- Extended Advertising: Extended advertising parameter setup and
+  data commands.
+
+- Periodic Advertising (LE Audio): Periodic advertising reports
+  carrying BASE announcements for broadcast audio.
+
+- Automating Advertising Analysis: grep patterns for finding
+  advertising reports, device names, LE Audio devices by service
+  UUID, advertising setup, periodic advertising, and device
+  appearance.
+
+- Updated Automated Trace Analysis: Added advertising check step
+  in the recommended workflow and updated introduction text with
+  cross-references.
+
+
+  Commit: 3b918d568217b742199d5d31b72e351b9e1663c9
+      https://github.com/bluez/bluez/commit/3b918d568217b742199d5d31b72e351b9e1663c9
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-10 (Tue, 10 Mar 2026)
+
+  Changed paths:
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Add BIG Sync flow documentation
+
+Add comprehensive BIG Sync receiver flow documentation covering:
+- Complete prerequisite chain (PA sync -> PA Reports -> BIG Info ->
+  BIG Create Sync -> BIG Sync Established -> ISO Data Path -> ISO Data)
+- BIG Info Advertising Report as the critical gate for BIG sync
+- Without PAST (direct PA sync) flow with btmon output examples
+- With PAST (Periodic Advertising Sync Transfer) flow via BASS
+- BIG Sync teardown paths (receiver and broadcaster initiated)
+- BIG Sync failure diagnosis checklist
+- Updated broadcast grep patterns in Automating LE Audio Analysis
+- Separate unicast (CIS) and broadcast (BIG) diagnosis patterns
+
+The BIG Info documentation addresses a gap where trace analysis missed
+that no BIG Info was received and therefore no BIG Create Sync could
+be sent.
+
+
+Compare: https://github.com/bluez/bluez/compare/6404dcfeaa86%5E...3b918d568217
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
