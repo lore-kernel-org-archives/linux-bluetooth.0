@@ -1,185 +1,250 @@
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E862BE02C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 14:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773152376; cv=pass; b=Ge3bLD0zOz+7SK9sfu2KrZZl+u6p5v+b2S9lowrd+fdy9Xho1B4CdNBGOveczqsfFxeqhN33aQTyqGBGzZFuvuMThb39PRBYzJ7QBju7Bk6KPSg54TEQNyvAd/e8DH7+UOoIXqhMHKhdltGxwCCew2Wc/XLHPCnNRKWJ8Hf9ENk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773152376; c=relaxed/simple;
-	bh=FXuzSEvlfTs0Vh0BJ9So8bcs1J0N37bpJKEJ2HNewKk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TLbphvR5x60JiKZ4H1UWT4XOgBIvGWcoFgh//HSBdrDnjce3WBQpqTlXf7kV0U+EHtgbwgzsnlLiWEoHq6RE4HWVR6RDZX2iutaLKFKEZRqJdv3rBxSbD4AdUIl6XAUiCS+Tq5CkB1eqp1woDB0sUm8rkn4Yw9xP7W/uR9UPpGY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HlzM2JoE; arc=pass smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1292D3ECF
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 14:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773152672; cv=none; b=trxH1HBkU1YL2F8A9RepuiVxTTaud5FVsLTu7H4tn9jz3HZYDYPa8z5MyYSBeE80QALF9Iis5Lk5balwhaClPJwn48p+xTLnLsd6X38974ctLD5cQXRJ3vgdu/XrsG1CQEcbS+uXAHYCPjivWAyE/+hzRSY9lfeH515XFgAHAxA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773152672; c=relaxed/simple;
+	bh=XwidptKIhvR+UF4aaOLrgKMULsgr14IRJkHhby+ViXQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZIETclxC2qlWgMzGLUcwcyXsyhjjjL6Ffc6/p5AVFlHtgckiH+O4SvYjRnwC0IR5LN9SX7yE81C7kvHcOdTluv5IB5IyYYjnw65z8FVbjYt+HBnvRzh6jIK5rVP8V8FTX+HOgSk9Kbr9KKUDf6FJXY8HwF4AQ9rO+Lw/A0rW9fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=F6C5rtqO; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HlzM2JoE"
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64d5a7926cfso1149067d50.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 07:19:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773152374; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Rp+XSjDfUsb+LmpdZsS7H3gEBNd4MiRN83fNLXvpPSyeCvQIWVopLjF0uwYoqTlgrQ
-         1yTIX7zRd40gO2mvcT87lOdREXGELyCxiwMKlAo8mcXXYqIZVkIW7h3vtMOrm2Jwa6kk
-         WwGVJjH2eKvX7cClAd/fLoeWnC/nD1pJvc4FFAN7akxiW3/wtFQZwgP6q0Fz3hBDkFI9
-         3jSvHEJeFT1N/KVBapSYCXG9J3qwWMDskditMdkkGwvQOY6VUpfzVt7WPVzaPBV0FsDr
-         n5GGQY9G3Wq5JziGHR/xfeoTFOHUUg3lcoVMLv9OqDHVlUObmmv5mTfkKpbXHsC8WULL
-         uJnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=FXuzSEvlfTs0Vh0BJ9So8bcs1J0N37bpJKEJ2HNewKk=;
-        fh=XdUXspEkNvmJpqFoc43gzI/MDOH7wOs6p7Np4kwSTyA=;
-        b=PZD1tKo+wUv3YJVYQWnn0RGguDG0vbW5pCdOqOfrIL7xd5nX4wLgVoe2vLUZQ0AxE1
-         EOYU1fHDMI5LrjKWbnf7UVVfRi0s9p/PFsPJB/6dbyLOo8YpMSEN7JAC/LaCsk8DN4G5
-         /rxzF84/AFeCM0Xc3Hf+CJB2liXDF7l164QvoxwSMjvrlKhWF1cHvRyw4c5hehdqXRsO
-         LhEAWidQ3asRqazTUkUqv4CAEwSCL1fKsaNTmiFkt+mizTKvZxBxmcXZYWJVauaLZT52
-         xVStPzD5PVNlcIpOg5Uopa2kTxq+BkVeJbSdQgTYt0xH6QUXErBr21nzCmKq0oaWOz1d
-         BTMA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773152374; x=1773757174; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FXuzSEvlfTs0Vh0BJ9So8bcs1J0N37bpJKEJ2HNewKk=;
-        b=HlzM2JoEAK8acfCxAJ6Btexk9svfmILDRWH6yhifdtVDUUa3eB+GR6DxbLnZ5OgqZB
-         LJzvReFsfAl6FFqDF6Lk+j81gEyR8pdTpzFiBrkrxZlW7yYqf7RhFFOibOQMDRPRsaCt
-         xcs839pg56PmrfwAz5yjc5f49HitjR/U3iAeVGi+/19CWCetPjgQATriWRapW96J57b6
-         6fhBywxgWT5agdLcRD/IMxZJjzB/vcXt8NYMn65hY1LP1vtEp9c4W1lWm4m6qqGiRaHJ
-         QTMihDERI83KKY3vToVDv2B9nqrwJAu4mypWvkcZqKHDhIxeUbAK8uFvQN2h2goxT72Z
-         F9nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773152374; x=1773757174;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FXuzSEvlfTs0Vh0BJ9So8bcs1J0N37bpJKEJ2HNewKk=;
-        b=OzZaEl3teEmzIfBOJ88l8F/6qH6+AJnFsFefLw/EOTBLrDB+OFVy3ZgiI7ZchpzIrX
-         Xio/1639lQU8S7zW0hDb8FDitn0AmRii76eUfWpQm/YijAWte76E00MHJUvpRmHsvC6x
-         dwGmSr8/OaESkyufJzkbLbcyff/kCXP2+vIqE7k9PQdIs6yziifMg5MZ1ZP9cANMs9xj
-         apttBnAWeRyaqD0wwbMlmBZFuLNw0l9Ydj3OpnW1mfiRWJnoCLAkeu596hNuvT25VDCH
-         OPe3Ae+8ZJrV3VMSmY6xd7yZMJC84QPw0VTN4uh/98Dyp7ejQP/JcE0FBRmZEaW44xvg
-         d75A==
-X-Forwarded-Encrypted: i=1; AJvYcCW0jIQ6lUkXmY04ObmfW+36HZYqKK82avjPqGukrisBp/0Eb6sC/SEo9xoXQRAvVSlpLJOKxuVZuuDUtKh3bzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/0806OCo+A6e8g6GtKS08yz7tpzhI7QP8IIfWAqA28ZPk/OL/
-	xVsYchcd9XbJpH+rvjcYrklA7bFvgdNQTVzVVOCw18msUneEtxUPthbrSMxQswj6Y2mih2z930i
-	3iw+vErQVmfQuxcDR2e1Y+oK950TPBJ3UfA==
-X-Gm-Gg: ATEYQzxOqa1zd1KXhOUC6Xos3vdFPbHkHIf+j9ewzL5hVHfEJ19edD0QH2M53QD0o7H
-	vac/+oBHiRh2JMQUCRZlTyNFLY+j0Bnim+cvh8kAFUZ+AKlzKhTz3dXT43uOuFoDSqC7nrjsmWD
-	pZuyvjgmyON3gsIbVirdBKNFKaECxkUM9iKYop4jdi6kN8ijXPottSd+iNu4Bl/7GMbzekDD7yX
-	wgAAdsPyCPs2dF0ZVPOmdyXQCWXtGVYSimjzws4TI5PA/H2knPMRbvFhPfIPBDTXiIF/e+wfwCj
-	RX59wGWQ/GuMbjdgSlgQJEy/PrGS5evkq3f/77jTVsCJYEjEfMHjnT0MVGlXo0syjavusQ==
-X-Received: by 2002:a05:690e:449a:b0:64c:9a19:238 with SMTP id
- 956f58d0204a3-64d140d7827mr10008533d50.19.1773152373902; Tue, 10 Mar 2026
- 07:19:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="F6C5rtqO"
+Received: from macsyma.thunk.org (pool-173-48-117-133.bstnma.fios.verizon.net [173.48.117.133])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 62AENmx0023256
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Mar 2026 10:23:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1773152637; bh=4/p8AtxdJ3b4aYgpRIBgOOPVM9R5HZLzlaxPPsEZ2Q4=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=F6C5rtqODrQpEwdwVTgFCawAhLv3gwk1txjCpTf9qYEhws10oNToQIbXrBSiNnSGn
+	 HKzLPM0wlhbQz5hd3KNNbDsKNUIOcLP5D+4J1qJhv/m9AJCmBvmBntSwPXXBcrZ48c
+	 UG5I74ocwzVwmg9UHdT0hLejm00ahwJz4Tby2LgiJXvFIYDaYDAoayC1G2vaNRdttd
+	 dnaccWPVwGwuO0YYJTFV0/A1hSU2yI/onO0qlICZ11ISIKYrG0S38XY0XZ07wXHuQf
+	 SRLcsUXeYesD2NrtHf5Vg5nqM+e/voDzSfyx+6EAL02kYRxR5zwo7A3kwnstvVAN1a
+	 N4dmfF0o4YLWg==
+Received: by macsyma.thunk.org (Postfix, from userid 15806)
+	id 96A8A5C4FCED; Tue, 10 Mar 2026 10:23:48 -0400 (EDT)
+Date: Tue, 10 Mar 2026 10:23:48 -0400
+From: "Theodore Tso" <tytso@mit.edu>
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
+        bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
+        dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+        gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+        linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+        linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+        sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Nicolas Palix <nicolas.palix@imag.fr>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, Ilya Dryomov <idryomov@gmail.com>,
+        Alex Markuze <amarkuze@redhat.com>,
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+        Bharath SM <bharathsm@microsoft.com>,
+        Eric Van Hensbergen <ericvh@kernel.org>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+        Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Sandeep Dhavale <dhavale@google.com>,
+        Hongbo Li <lihongbo22@huawei.com>, Chunhai Guo <guochunhai@vivo.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>, Kees Cook <kees@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        "Guilherme G. Piccoli" <gpiccoli@igalia.com>, Jan Kara <jack@suse.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Tejun Heo <tj@kernel.org>, David Vernet <void@manifault.com>,
+        Andrea Righi <arighi@nvidia.com>, Changwoo Min <changwoo@igalia.com>,
+        Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Valentin Schneider <vschneid@redhat.com>,
+        Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
+        Daniel Gomez <da.gomez@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Aaron Tomlin <atomlin@atomlin.com>,
+        Sylwester Nawrocki <s.nawrocki@samsung.com>,
+        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+        Max Filippov <jcmvbkbc@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        John Johansen <john.johansen@canonical.com>,
+        Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Benjamin Marzinski <bmarzins@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Stanislav Fomichev <sdf@fomichev.me>,
+        Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Xin Long <lucien.xin@gmail.com>, Trond Myklebust <trondmy@kernel.org>,
+        Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+        Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
+        Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Russell King <linux@armlinux.org.uk>, John Crispin <john@phrozen.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Rich Felker <dalias@libc.org>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        Andrzej Hajda <andrzej.hajda@intel.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Robert Foss <rfoss@kernel.org>,
+        Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+        Jonas Karlman <jonas@kwiboo.se>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+        Zhenyu Wang <zhenyuw.linux@gmail.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tursulin@ursulin.net>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Sandy Huang <hjc@rock-chips.com>,
+        Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>,
+        Andy Yan <andy.yan@rock-chips.com>,
+        Igor Russkikh <irusskikh@marvell.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Pavan Chebbi <pavan.chebbi@broadcom.com>,
+        Michael Chan <mchan@broadcom.com>,
+        Potnuri Bharat Teja <bharat@chelsio.com>,
+        Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Taras Chornyi <taras.chornyi@plvision.eu>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+        Keyur Chudgar <keyur@os.amperecomputing.com>,
+        Quan Nguyen <quan@os.amperecomputing.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>, Marc Zyngier <maz@kernel.org>,
+        Thomas Gleixner <tglx@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Gregory Clement <gregory.clement@bootlin.com>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Vinod Koul <vkoul@kernel.org>, Linus Walleij <linusw@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+        Alex Williamson <alex@shazbot.org>,
+        Mark Greer <mgreer@animalcreek.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Kieran Bingham <kieran.bingham@ideasonboard.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>, Lee Jones <lee@kernel.org>,
+        Pavel Machek <pavel@kernel.org>, Dave Penkler <dpenkler@gmail.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+        Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+        Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
+        Georgi Djakov <djakov@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
+ check - refactor
+Message-ID: <20260310142348.GA41218@macsyma-wired.lan>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260302233756.910702-1-dajid.morel@volvo.com>
- <CABBYNZKaNmSPbCpJ-GKu2eSrgd_GcOOWkekHW0OMK8WMLESYWQ@mail.gmail.com>
- <CAM8DPm20Sm1t_NMoWQFZtkmdaiL1ALs8SFMqxe-QtT5wjbp6xA@mail.gmail.com>
- <CABBYNZKmu3b2h2NyhhV7CwmB=h1R9uAe0HXDCP73iAvqzy7AYA@mail.gmail.com>
- <CAM8DPm2z-6xUm3SyFJ9umn4=o9bBov6PhKV0TEDCBc14eMFSew@mail.gmail.com>
- <CABBYNZJZWkEy2D4WW8ODMoU-ZmsT1aN0LccOzdsCxuKnFZHnuA@mail.gmail.com>
- <CAM8DPm1fWn7jovVPgcBrApy_czP0TbnBi=oUZmhjMqDkORv2bw@mail.gmail.com>
- <CABBYNZJ6NNL26BOxV2E6HBA6D3vgOauRQ=75vRcBMA0D-vSEHw@mail.gmail.com>
- <CAM8DPm0rgZEY+aNj8-RJv7JwvMOBQuRu7qt7G+z_OpVL+zk3Gw@mail.gmail.com>
- <ea9528bd-ccde-4da3-b85b-793e370b4da1@molgen.mpg.de> <CAM8DPm20ECFZF6v19SrLwA8o92YXY_dsWvOyFDOuym5S7P2kCg@mail.gmail.com>
- <CABBYNZ+ePfwbc2NS-hG5g98trXOvUqRtp-ZiXD2crrvx-Lygzg@mail.gmail.com>
- <CAM8DPm1Ca6CDx3nOeJhEvTiD0510RteKd5Mw=Fg8hkZuA4oRKg@mail.gmail.com>
- <CABBYNZKtAkftUyyo4B5D7ADN80as3rE5dHHQcKoWa7tmUfBzgw@mail.gmail.com> <72946edd-fad1-4201-8c23-f36cfe925cb7@molgen.mpg.de>
-In-Reply-To: <72946edd-fad1-4201-8c23-f36cfe925cb7@molgen.mpg.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 10 Mar 2026 10:19:21 -0400
-X-Gm-Features: AaiRm52AqdKTn6RHKnWZzAe4mhbd4vV7Xu6rPTVcSXZPTUPkSxvAnX3Kvi-LfK0
-Message-ID: <CABBYNZJ31JR4ejwS68_kad6uxmNt0gBFB9eyM-yA+Ck5iiQQdQ@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: Increase LE connection timeout for
- industrial sensors
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Dajid Morel <dajidp.morel@gmail.com>, Dajid Morel <dajid.morel@volvo.com>, 
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
 
-Hi Paul,
+On Tue, Mar 10, 2026 at 12:48:26PM +0100, Philipp Hahn wrote:
+> While doing some static code analysis I stumbled over a common pattern,
+> where IS_ERR() is combined with a NULL check. For that there is
+> IS_ERR_OR_NULL().
+> 
+> I've written a Coccinelle patch to find and patch those instances.
+> The patches follow grouped by subsystem.
 
-On Tue, Mar 10, 2026 at 10:04=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de=
-> wrote:
->
-> Dear Dajid, dear Luiz,
->
->
-> Am 10.03.26 um 14:47 schrieb Luiz Augusto von Dentz:
->
-> >> Trace Analysis (failure_with_firmware.log attached): Here is the
-> >> relevant excerpt showing the host aborting the sequence on the 5.15
-> >> kernel:
-> >>
-> >> < HCI Command: LE Create Connection (0x08|0x000d) plen 25 #65 [hci0]
-> >> 13.006556 > HCI Event: Command Status (0x0f) plen 4 #66 [hci0] 13.0094=
-73
-> >> LE Create Connection (0x08|0x000d) ncmd 1 Status: Success (0x00) [=E2=
-=80=A6] <
-> >> HCI Command: LE Create Connectio.. (0x08|0x000e) plen 0 #88 [hci0]
-> >> 17.048391 > HCI Event: Command Complete (0x0e) plen 4 #89 [hci0]
-> >> 17.052037 LE Create Connection Cancel (0x08|0x000e) ncmd 1 Status:
-> >> Success (0x00) > HCI Event: LE Meta Event (0x3e) plen 19 #90 [hci0]
-> >> 17.054039 LE Connection Complete (0x01) Status: Unknown Connection
-> >> Identifier (0x02)
-> >
-> > Ok, so it is actually cancelling after 4 seconds, not 2 seconds as you
-> > repeatedly blabbed about so in the end it doesn't correspond to
-> > HCI_CMD_TIMEOUT but probably something else that sets 4 seconds.
-> >
-> >> The host systematically aborts the connection attempt after exactly 4.=
-04
-> >> seconds (17.048s - 13.006s).
-> >>
-> >> You mentioned: =E2=80=9COn the recent kernels the timeout is configura=
-ble.=E2=80=9D
-> >>
-> >> Could you point me to the specific commit/patchset or API that
-> >> introduced this configurable timeout?
-> >
-> > It is the third time already:
-> >
-> > https://github.com/bluez/bluetooth-next/commit/a56a1138cbd85e4d56535619=
-9d60e1cb94e5a77a
->
-> This entered v5.17-rc7.
+I'm going to gently suggest that you *not* try to do this as a
+tree-wide change, since we don't need to change some interface
+requiring a global, flag day change.  This is instead a cleanup, which
+maybe makes the code slightly better, but which also has a the
+downside of breaking lots of inflight development patches by
+potentially causing merge or patch conflicts.
 
-This contains a Fixes tag so it was probably considered for
-backporting, but I guess it depends if the patch applies cleanly, etc.
+So why don't you send it to each subsystem as a separate patch or
+small patch series, instead of spamming a dozen-plus mailing lists,
+are probably hundreds of developers, most of whom aren't going to
+care about changs in some far flung part of the kernel?
 
-> > But you may also need the following:
-> >
-> > https://github.com/bluez/bluetooth-next/commit/bf98feea5b65ced367a871cf=
-35fc044dedbcfb85
->
-> This entered v6.10-rc1.
->
-> Luiz, would it make sense to backport both commits to the longterm
-> stable support (LTS) series?
+Regards,
 
-It doesn't have any Fixes tag or Cc: stable, and if I recall correctly
-this was done on purpose since this introduces a change in the
-behavior as previously sockets timeout was not use as connection
-timeout, but I can see it being valuable for stable trees to align
-them both.
-
->
->
-> Kind regards,
->
-> Paul
-
-
-
---=20
-Luiz Augusto von Dentz
+						- Ted
