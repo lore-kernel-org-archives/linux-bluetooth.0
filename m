@@ -1,69 +1,69 @@
 Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB6C3C65FE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 17:11:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A843D092C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 17:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773162701; cv=none; b=eB81q7kd73eeqREOulx/xR9Nsh7PKbTunXT2TXbX0gPFqCgMNAw2b9v/JDoqeY96HKV/oc9IfFxkVLOeW/gjAPBR76nB8SFJLTajb0o2KbW4ehNI8B5fo1ioqRpChXeMKOe9IYJjo7s4oMtHdh/MR7PPlQ91E+T3VDJSfCmghPE=
+	t=1773162703; cv=none; b=dfNlsB1hAzAp8iiMjtqrplL/50ap1mBNXTjwKIFWulRNjDZfnNBMlOdzoUST8B87/UXGNbtY6adSdeePcwhc6Vta3c3b6RTU2/ikRvkO65pozKvPVWeOawI8xZhwO8rW1iZjOIsLuZHdv9KjQJzRehH2o99HKK2ZhPYq3XBuv2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773162701; c=relaxed/simple;
-	bh=kBoNMK7vN3RapcMGNmFCvPyiZ90GlojTtxbEE13kh90=;
+	s=arc-20240116; t=1773162703; c=relaxed/simple;
+	bh=3q0KeiE+LWmMVP8zqJqe1dxtXrGlDqbcbDL3Jjmc6L4=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Vh/2ksfsL3XfjRwJJldUeJ5oUwblHzcew0vFCq5c285Rx1K+nafy1GW55VLnIymS1z6jNLSk5aVJOweumlxxZhiGpnYemuX67+oaoUw7iMiDK4Nk9nVexfJZhHHe27+QZ89qS5ZLE57hAWnH7XqZL0VqSpHHWP9MpitQONneRj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ts3/PRhi; arc=none smtp.client-ip=209.85.128.180
+	 MIME-Version:Content-Type; b=SoJADofYPmvmhz4F0PtbtTYbtYfy2+58GsoKuAeq45PtnuI4cDKN4ZbDaVjh0Tvx4q3M/M8wfKY+/1XM2faW7CZf8+GSj1pJUPdcEXC0NxEITpE8Inx5lBTBTVDA8f28XPRAcwEAFbTikdwRXdyU/2EK+nIvDzR+ipRuvdaI0iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mu6JW37h; arc=none smtp.client-ip=209.85.128.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts3/PRhi"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-79900d6dc3cso21417807b3.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 10:11:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mu6JW37h"
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-79900d6dc3cso21418537b3.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 10:11:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773162699; x=1773767499; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773162700; x=1773767500; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lJ+XFwyZjMvlD2nEnm+7UckMZVq0fQ0t9u4T5vWGunY=;
-        b=Ts3/PRhiM8Z3hOAQ5S2qjV4Pi+INeg7lz+AZ3b1vqItxwPmoRW+nuBQfuqk9ISWUwf
-         VpwWJ/l81TxsomT14s/U4Tc9OwfB0RG3gi9zCcMLX0GCrvFIKjGRfrNdNUGMf3UlA3B2
-         uRb05pbIXXRchs76dv8uvNRv0rdwGFsxg7w2ChzvY5MzAo5Bfbd1cUOv9uVcxKkfQCBI
-         98O9Tr73bVpcz8GNvCpSn5n37q1JXolGCdcLBRUUuFR73Ug+GWJRqlpR3ZRGuWF+0aiG
-         DcitSRnTQuHxkthZGxOUBwslfXTF6QBko/925htHWPDLb4RumCPuHYl2HPiT5Dmi/Co4
-         zuuA==
+        bh=+3hj3ntzLagxtyiLq/POSOgVuZOwORnDNQtj4DBzdY4=;
+        b=Mu6JW37hEJGN7ktNXS7d/RnP/S2GZyWb/Oxes/ff3F8vwXPx7/IM9kC4zTmBv+kbUm
+         B75Iq7qO8ZgynVZh49iro+2c/EA/Rbr/iOUe1X2tPpzBiCxtWqf4oyZSEB8YSlqNOVu0
+         c3MdqXy4p0IZ8kZOEcBKVlSA6hroJgL2LPz3sX0xYzyM3AmHty2OD62AjBsm4addF1Uj
+         F0fPuLUHLDj/yC9jD88I1tLw9irNgkttIkCywA8R01x2fVbiY1TYbCTMf5XMdsFV6jsf
+         4doEEaWfJnI2eSbNWuuuUPcygJNRyOm5wB/F7R6vCrFvwGHPbk4oowV5Cre1eEmXadCy
+         8ncw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773162699; x=1773767499;
+        d=1e100.net; s=20230601; t=1773162700; x=1773767500;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=lJ+XFwyZjMvlD2nEnm+7UckMZVq0fQ0t9u4T5vWGunY=;
-        b=prAUdX/OeDpbWCndG25LEendQZKXhGmg/RTetgWqOsPKc25fmIPfdDHo+2kRr+plPs
-         utu8SqxX876+6ZfbMIqk7S0YiQGVJaRual9Yp318EYmC+4D2H+VVNJaIbB7iTm0uVqAv
-         s5y03DLjSOf/81eYxaiWsvk6ZeMEW2Un7bOuJej7hJcqlKtUY4NTcQKPU76zxaKbUHy7
-         LoKN5sBaZ2d207sU7zf8loYasZFkLz52dAHkwsy73XSHH3fHfNHnmm3inAiKwBEQScR9
-         YnnWCUF9rl7cyOLiDA4snW6txc5CBDmdLAtbo07YVnfpEF2Ff2fcVVeDZdrzx9NmtliR
-         ksaA==
-X-Gm-Message-State: AOJu0Ywu6uYHdRx8jxApqZPqq8rBIChgcV/TopmbdDEBdJfX21BC/qCm
-	gLQgAZrV1xJioOQsEug2crnUoMDvJJMDatgCmWp2csVpvCk0G47EHunG18lzIA==
-X-Gm-Gg: ATEYQzwF8+HWZC5RihR3RtVLiLVTEqMVAn2SYcHn+8Pmq0ECb+5cy49lZg+s5Rnffk1
-	G85APj+l+Khql4Ur8oIV7QFesjmobwzSuZ7U4HHb31RD9ywrCSypXz/2wEkGZotAtxee4mdm2lc
-	MQI8aK449i1SfypYl99/0iN3gXGL2Ek81Xptl9OAKiNNJXMhur1cfSuGSdhcOWRvviZusi9Jh6F
-	pk3wYoTo8AeG5Koq0wsa5xCjstIfYAXU+EFjys9eBIDs+TE+jnLSqVoLJH5KDpz/4wG0ZJkEpUr
-	xVv/5XokyN6tEyvhRK1P47/Tl3ETjDQHnQ6Jtyx+bJfbN4+zUh4FMpY4y7gccYPA5a2gWWmuExU
-	f+j1P2oN4g7gc1pcD4t2OLuOjcrD95B7Q4Y+3C7k+jLWp3Gv3h5dG6qhGuFzEfxDmDpogucgmW3
-	3QU22VreDtWXFT9It/GWFWfwcBPjus+nbDC2x9IRwyFhLVSeQI68ffs50dA+ZlCgtKbwUNghsPQ
-	DnMkQXX024ORmBVWw==
-X-Received: by 2002:a05:690c:398:b0:798:270:fec0 with SMTP id 00721157ae682-798dd68a7cdmr136067047b3.5.1773162698661;
-        Tue, 10 Mar 2026 10:11:38 -0700 (PDT)
+        bh=+3hj3ntzLagxtyiLq/POSOgVuZOwORnDNQtj4DBzdY4=;
+        b=UAjGOuaVhO5uB5TdCC1OUDH5yN2eTfdQjR0VzbOH3Y7GRYK9WVEfwMWbrGZ8blGKQd
+         VpoSJ9WDkzRlwYjB/o6/dIwQGiRtZF+BjBBE/Y/idXJLriHjqQ2e7SeqHSIa/WezlbKB
+         FTnSPvxqX6CE5Jgl+bf+JiwEdOnGigs7QZFjjzPrz0K7dHq66+EzEB5a9ea8zvYm47M/
+         mLD3DNMU6nX6OmDRTHZO3pu0v9BYjfCWnsS2B7+Q48xbqavVnRp9kI1U+DVNvg8VrTfm
+         5fsjOm7I8n1bbqgQWvA4xPkA7/Zx3VwQZ8M59Fo5RA+RqQFEmV0OgaJKZ4GO1baaYP2s
+         cWbQ==
+X-Gm-Message-State: AOJu0YzLqqx4YaMQdF0/ss3ZkJBGpvn4GweYY0Ybd/AaFCbR9A3rQUG0
+	GaL/ZOd3+/HKA7vtPTSM6G2L9sfdKda8Vb3yuS0VuWpMJGRVmhxqAvV5y7JZVg==
+X-Gm-Gg: ATEYQzxED3mjH8PT31xV4pxrX9bWx+0nI+iqcxVBuJtRJ6IMIc7GES74yIt4ruIWMqQ
+	ifxnUVi+wQR5y7MMrUX/xaqvRPwph1mD1LBE+4tWD2JY70xR8XFnpnnHWX3rjNQOiETRaVFfCl2
+	c2t3uqS/1j2riAo3tJs+FPDKgcE8+kWa89D4rl9ML5+8ec2OTaaCpfEA7JDlV+HrewW8v3cIRwk
+	uI05PDXgqFNabCq1AgntCW+aE4ROkmTCao7zH8NgENo4Gd3/Wdai2rDn4VWJSAZ1uhkvMic36Jl
+	Iynvf6KrPsni+gEycKASHpZSp62wlw7/mioBlSyxoFFBrOXNyZr6CRZ3oYgKW5bnd0ZygZnRup6
+	FhDD+4VZ+3My3ytApKm8PQFQQnw96obVri6msjBbo+xACryiSMjCqU4Jl1oGqhqpRvTOt1doXjh
+	OqqiuzBcYDVIQUMcOOpUFGV+US/Lqp/GhFWCFfkb6/M/MetapNhLjG0OJJdeXRN/Zi8YvWikv27
+	fw/Q1otGeWeRfeCAQ==
+X-Received: by 2002:a05:690c:6107:b0:799:ad1:d755 with SMTP id 00721157ae682-7990ad1dc19mr39777057b3.41.1773162700068;
+        Tue, 10 Mar 2026 10:11:40 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7990a51a245sm19745357b3.5.2026.03.10.10.11.37
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7990a51a245sm19745357b3.5.2026.03.10.10.11.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 10:11:37 -0700 (PDT)
+        Tue, 10 Mar 2026 10:11:39 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/6] doc/btmon: Add L2CAP channel tracking documentation
-Date: Tue, 10 Mar 2026 13:11:16 -0400
-Message-ID: <20260310171126.342447-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 4/6] doc/btmon: Add LE Audio protocol flow documentation
+Date: Tue, 10 Mar 2026 13:11:17 -0400
+Message-ID: <20260310171126.342447-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260310171126.342447-1-luiz.dentz@gmail.com>
 References: <20260310171126.342447-1-luiz.dentz@gmail.com>
@@ -73,274 +73,400 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add comprehensive L2CAP channel tracking documentation covering:
+Add comprehensive LE Audio protocol flow documentation covering:
 
-- Fixed Channels: CID table (0x0001-0x0007) mapping to protocols
-  (L2CAP Signaling, ATT, SMP, AMP Manager).
+- PACS (Published Audio Capabilities): Sink/Source PAC reads with
+  LC3 codec capability decoding (sampling frequency, frame duration,
+  channel counts, frame length), audio locations, and available
+  audio contexts.
 
-- Dynamic Channels (BR/EDR): Connection Request/Response flow,
-  Configure Request/Response, and PSM-to-protocol mapping table
-  (SDP, RFCOMM, BNEP, AVCTP, AVDTP, ATT, EATT).
+- ASCS (Audio Stream Control): ASE state machine (Idle through
+  Streaming and Releasing), ASE Status notifications with full
+  codec config decoding, ASE Control Point operations table
+  (Config Codec, Config QoS, Enable, Disable, Release, etc.).
 
-- LE Credit-Based Channels: LE Connection Request/Response with
-  MTU, MPS, and credits for flow control. EATT over PSM 0x0027.
+- CIS Setup and Teardown: CIG Parameters, CIS creation, CIS
+  Established event, ISO Data Path setup, and ISO data flow.
 
-- Connection Parameter Updates: LE peripheral parameter change
-  requests via L2CAP signaling with accept/reject handling.
+- Broadcast Audio (BIG): BASE announcements in periodic advertising,
+  BIG creation (source), BIG sync (receiver).
 
-- Automating L2CAP Analysis: grep patterns for channel establishments,
-  PSM tracking, parameter updates, and EATT setup.
+- Automating LE Audio Analysis: grep patterns for ASE state tracking,
+  codec verification, CIS establishment, and broadcast detection.
+  8-step diagnosis pattern.
 
-- Updated Automated Trace Analysis: Added L2CAP channel check step
-  in the recommended workflow, L2CAP cross-reference in connection
-  lifecycle, and connection parameter negotiation debugging scenario.
+- Updated Automated Trace Analysis: Added LE Audio cross-reference
+  in workflow step 6, LE Audio reference in connection lifecycle,
+  and audio streaming failure debugging scenario.
 ---
- doc/btmon.rst | 207 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 206 insertions(+), 1 deletion(-)
+ doc/btmon.rst | 328 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 326 insertions(+), 2 deletions(-)
 
 diff --git a/doc/btmon.rst b/doc/btmon.rst
-index bddbd07d3c35..cc4f81bed2d7 100644
+index cc4f81bed2d7..3084acad7107 100644
 --- a/doc/btmon.rst
 +++ b/doc/btmon.rst
-@@ -1377,6 +1377,197 @@ appears on reconnection, the bond was lost on one side.
- 5. Check for ``Identity Address Information`` -- reveals the device's
-    true address
+@@ -1568,6 +1568,319 @@ channel, note the Source CID and Destination CID from the Connection
+ Request/Response pair. Then search for those CIDs in subsequent data
+ frames.
  
-+L2CAP CHANNEL TRACKING
++LE AUDIO PROTOCOL FLOW
 +=======================
 +
-+L2CAP (Logical Link Control and Adaptation Protocol) multiplexes
-+multiple logical channels over a single ACL connection. btmon decodes
-+L2CAP signaling automatically and routes data to higher-layer protocol
-+decoders based on the channel.
++LE Audio uses a multi-layer protocol stack visible in btmon traces.
++The setup sequence involves ATT operations on specific GATT
++characteristics (PACS, ASCS) followed by HCI-level CIS/BIG
++management. btmon fully decodes all layers.
 +
-+Fixed Channels
-+--------------
++PACS: Published Audio Capabilities
++------------------------------------
 +
-+Fixed channels have pre-assigned Channel Identifiers (CIDs) and do
-+not require signaling to establish:
++Before audio streaming begins, devices exchange codec capabilities
++via the Published Audio Capabilities Service (PACS). The client reads
++PACS characteristics to learn what the remote device supports.
++
++**Sink PAC read** (remote device's receive capabilities)::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 7    #550 [hci0] 0.824003
++          ATT: Read Request (0x0a) len 2
++            Handle: 0x0075
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 30   #552 [hci0] 0.886556
++          ATT: Read Response (0x0b) len 25
++            Handle: 0x0075
++              Number of PAC(s): 1
++              Codec: LC3 (0x06)
++              Codec Specific Capabilities: #0
++                Sampling Frequency: 8000 Hz 16000 Hz 24000 Hz 32000 Hz 48000 Hz
++                Frame Duration: 7.5 ms 10 ms
++                Audio Channel Counts: 1
++                Frame Length: 26 - 240
++
++The PAC record shows codec capabilities using LTV (Length-Type-Value)
++encoding. Key fields:
++
++- **Codec** -- ``LC3 (0x06)`` is the mandatory LE Audio codec
++- **Sampling Frequency** -- Supported sample rates (bitmask)
++- **Frame Duration** -- Supported frame durations (7.5 ms and/or 10 ms)
++- **Audio Channel Counts** -- Supported channel counts
++- **Frame Length** -- Min and max octets per codec frame
++
++**Audio Locations** (channel assignment)::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 9    #554 [hci0] 0.948003
++          ATT: Read Response (0x0b) len 4
++            Handle: 0x0077
++              Location: Front Left
++
++**Available Audio Contexts** (current use cases)::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 9    #558 [hci0] 1.012556
++          ATT: Read Response (0x0b) len 4
++            Handle: 0x007b
++              Sink Context: Media Conversational
++              Source Context: Unspecified
++
++ASCS: Audio Stream Control
++----------------------------
++
++The Audio Stream Control Service (ASCS) manages the ASE (Audio Stream
++Endpoint) state machine. Each ASE transitions through a defined set
++of states as streaming is set up and torn down.
++
++**ASE State Machine**::
++
++    Idle ──► Codec Configured ──► QoS Configured ──► Enabling ──► Streaming
++                                                                      │
++    Idle ◄── Releasing ◄──────── Disabling ◄─────────────────────────┘
++
++**ASE Status notification** (state change)::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 20   #580 [hci0] 1.456003
++          ATT: Handle Value Notification (0x1b) len 15
++            Handle: 0x0088
++              ASE ID: 0x01
++              State: Codec Configured (0x01)
++                Framing: Unframed PDUs supported (0x00)
++                PHY: 0x02
++                  LE 2M PHY (0x02)
++                RTN: 2
++                Max Transport Latency: 10
++                Presentation Delay Min: 20000 us
++                Presentation Delay Max: 40000 us
++                Preferred Presentation Delay Min: 20000 us
++                Preferred Presentation Delay Max: 40000 us
++                Codec: LC3 (0x06)
++                  Sampling Frequency: 48000 Hz
++                  Frame Duration: 10 ms
++                  Audio Channel Allocation: Front Left
++                  Frame Length: 120
++
++**ASE Control Point operations** drive state transitions. The client
++writes to the ASE Control Point characteristic to issue commands::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 25   #582 [hci0] 1.518003
++          ATT: Write Request (0x12) len 20
++            Handle: 0x008b
++              ASE Control Point: Config Codec (0x01)
++                ASE ID: 0x01
++                Target Latency: Low Latency (0x01)
++                PHY: LE 2M PHY
++                Codec: LC3 (0x06)
++                  Sampling Frequency: 48000 Hz
++                  Frame Duration: 10 ms
++                  Audio Channel Allocation: Front Left
++                  Frame Length: 120
++
++ASE Control Point commands:
 +
 +.. list-table::
 +   :header-rows: 1
-+   :widths: 10 30 60
++   :widths: 10 25 65
 +
-+   * - CID
-+     - Protocol
-+     - Description
-+   * - 0x0001
-+     - L2CAP Signaling (BR/EDR)
-+     - Channel management for classic connections
-+   * - 0x0002
-+     - Connectionless Reception
-+     - Connectionless L2CAP data
-+   * - 0x0003
-+     - AMP Manager
-+     - AMP (Alternate MAC/PHY) control
-+   * - 0x0004
-+     - ATT
-+     - Attribute Protocol (GATT operations)
-+   * - 0x0005
-+     - L2CAP Signaling (LE)
-+     - Channel management for LE connections
-+   * - 0x0006
-+     - SMP (LE)
-+     - Security Manager Protocol
-+   * - 0x0007
-+     - SMP (BR/EDR)
-+     - Security Manager over classic transport
++   * - Opcode
++     - Command
++     - Purpose
++   * - 0x01
++     - Config Codec
++     - Select codec and parameters (Idle → Codec Configured)
++   * - 0x02
++     - Config QoS
++     - Set CIG/CIS IDs and QoS params (Codec Configured → QoS Configured)
++   * - 0x03
++     - Enable
++     - Start ASE with metadata (QoS Configured → Enabling)
++   * - 0x04
++     - Receiver Start Ready
++     - Signal receiver readiness (Enabling → Streaming, server-side)
++   * - 0x05
++     - Disable
++     - Stop streaming (Streaming → Disabling)
++   * - 0x06
++     - Receiver Stop Ready
++     - Signal receiver stopped
++   * - 0x07
++     - Update Metadata
++     - Change metadata during streaming
++   * - 0x08
++     - Release
++     - Tear down ASE (any → Releasing → Idle)
 +
-+In btmon output, fixed channel traffic is decoded directly without
-+any L2CAP signaling preamble. For example, ATT on CID 0x0004 appears
-+as::
++CIS Setup and Teardown
++------------------------
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 7    #494 [hci0] 0.004488
-+          ATT: Exchange MTU Request (0x02) len 2
-+            Client RX MTU: 517
++After ASE QoS Configuration, the host creates Connected Isochronous
++Streams (CIS) at the HCI level.
 +
-+Dynamic Channels (BR/EDR)
-+--------------------------
++**CIG Parameters** (configure the CIS group)::
 +
-+Classic Bluetooth uses L2CAP signaling on CID 0x0001 to establish
-+dynamic channels. Each channel is identified by a PSM (Protocol/Service
-+Multiplexer) that determines which protocol runs on it.
++    < HCI Command: LE Set CIG Parameters (0x08|0x0062) plen 26  #590 [hci0] 1.624003
++          CIG ID: 0x00
++          Central to Peripheral SDU Interval: 10000 us
++          Peripheral to Central SDU Interval: 10000 us
++          SCA: 0x00
++          Packing: Sequential (0x00)
++          Framing: Unframed (0x00)
++          Central to Peripheral Max Latency: 10 ms
++          Peripheral to Central Max Latency: 10 ms
++          Number of CIS: 1
++          CIS ID: 0x00
++          Central to Peripheral Max SDU: 120
++          Peripheral to Central Max SDU: 0
++          Central to Peripheral PHY: LE 2M PHY
++          Peripheral to Central PHY: LE 2M PHY
++          Central to Peripheral RTN: 2
++          Peripheral to Central RTN: 2
 +
-+**Channel establishment**::
++    > HCI Event: Command Complete (0x0e) plen 8              #592 [hci0] 1.624556
++          LE Set CIG Parameters (0x08|0x0062) ncmd 1
++            Status: Success (0x00)
++            CIG ID: 0x00
++            Number of Handles: 1
++            Connection Handle: 2064
 +
-+    > ACL Data RX: Handle 256 flags 0x02 dlen 16    #142 [hci0] 2.034556
-+          L2CAP: Connection Request (0x02) ident 3 len 4
-+            PSM: 25 (0x0019)
-+            Source CID: 0x0040
++**CIS Creation**::
 +
-+    < ACL Data TX: Handle 256 flags 0x00 dlen 20    #144 [hci0] 2.035002
-+          L2CAP: Connection Response (0x03) ident 3 len 8
-+            Destination CID: 0x0041
-+            Source CID: 0x0040
-+            Result: Connection successful (0x0000)
-+            Status: No further information available (0x0000)
++    < HCI Command: LE Create CIS (0x08|0x0064) plen 9       #594 [hci0] 1.688003
++          Number of CIS: 1
++          CIS Handle: 2064
++          ACL Handle: 2048
 +
-+After connection, configuration is exchanged::
++    > HCI Event: LE Meta Event (0x3e) plen 29                #596 [hci0] 1.756556
++          LE CIS Established (0x19)
++            Status: Success (0x00)
++            Connection Handle: 2064
++            CIG Sync Delay: 5000 us
++            CIS Sync Delay: 5000 us
++            Central to Peripheral Latency: 10000 us
++            Peripheral to Central Latency: 10000 us
++            Central to Peripheral PHY: LE 2M PHY
++            Peripheral to Central PHY: LE 2M PHY
++            NSE: 3
++            Central to Peripheral BN: 1
++            Peripheral to Central BN: 0
++            Central to Peripheral FT: 2
++            Peripheral to Central FT: 2
++            Max PDU C to P: 120
++            Max PDU P to C: 0
++            ISO Interval: 10.00 msec (0x0008)
 +
-+    > ACL Data RX: Handle 256 flags 0x02 dlen 20    #146 [hci0] 2.035556
-+          L2CAP: Configure Request (0x04) ident 4 len 8
-+            Destination CID: 0x0041
-+            Flags: 0x0000
-+            Option: MTU (0x01) [2]
-+              MTU: 1024
++Note that the CIS Handle (2064) is different from the ACL Handle
++(2048). CIS data packets use the CIS handle.
 +
-+    < ACL Data TX: Handle 256 flags 0x00 dlen 18    #148 [hci0] 2.036003
-+          L2CAP: Configure Response (0x05) ident 4 len 6
-+            Source CID: 0x0040
-+            Flags: 0x0000
-+            Result: Success (0x0000)
++**ISO Data Path Setup**::
 +
-+Common PSM-to-protocol mappings:
++    < HCI Command: LE Setup ISO Data Path (0x08|0x006e) plen 13  #598 [hci0] 1.820003
++          Handle: 2064
++          Data Path Direction: Input (Host to Controller) (0x00)
++          Data Path ID: HCI (0x00)
++          Coding Format: LC3 (0x06)
++          Company ID: 0x0000
++          Vendor Codec ID: 0x0000
++          Controller Delay: 0 us
 +
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 12 25 63
++After this, ISO data packets flow on the CIS handle::
 +
-+   * - PSM
-+     - Protocol
-+     - Description
-+   * - 0x0001
-+     - SDP
-+     - Service Discovery Protocol
-+   * - 0x0003
-+     - RFCOMM
-+     - Serial port emulation (SPP, HFP, etc.)
-+   * - 0x000f
-+     - BNEP
-+     - Bluetooth Network Encapsulation Protocol
-+   * - 0x0017
-+     - AVCTP
-+     - Audio/Video Control Transport (AVRCP)
-+   * - 0x0019
-+     - AVDTP
-+     - Audio/Video Distribution Transport (A2DP)
-+   * - 0x001b
-+     - AVCTP Browsing
-+     - AVRCP browsing channel
-+   * - 0x001f
-+     - ATT (BR/EDR)
-+     - Attribute Protocol over classic transport
-+   * - 0x0027
-+     - EATT
-+     - Enhanced Attribute Protocol
++    < ISO Data TS: Handle 2064 flags 0x02 dlen 124  #600 [hci0] 1.884003
 +
-+LE Credit-Based Channels
-+--------------------------
++Broadcast Audio (BIG)
++----------------------
 +
-+LE connections use L2CAP signaling on CID 0x0005 for dynamic
-+channels. The LE Credit Based Connection mechanism provides flow
-+control::
++Broadcast Isochronous Streams use BIG (Broadcast Isochronous Group)
++instead of CIS. The setup involves periodic advertising with BASE
++(Broadcast Audio Source Endpoint) announcements.
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 18   #600 [hci0] 1.824003
-+          LE L2CAP: LE Connection Request (0x14) ident 1 len 10
-+            PSM: 39 (0x0027)
-+            Source CID: 0x0040
-+            MTU: 517
-+            MPS: 251
-+            Credits: 10
++**BASE announcement** (in periodic advertising data)::
 +
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 18   #602 [hci0] 1.886556
-+          LE L2CAP: LE Connection Response (0x15) ident 1 len 10
-+            Destination CID: 0x0041
-+            MTU: 517
-+            MPS: 251
-+            Credits: 10
-+            Result: Connection successful (0x0000)
++    > HCI Event: LE Meta Event (0x3e) plen 80                #200 [hci0] 0.500003
++          LE Periodic Advertising Report (0x0f)
++            ...
++            Service Data: Basic Audio Announcement (0x1851)
++              Presentation Delay: 40000 us
++              Number of Subgroups: 1
++                Number of BIS: 2
++                Codec: LC3 (0x06)
++                  Sampling Frequency: 48000 Hz
++                  Frame Duration: 10 ms
++                  Frame Length: 120
++                BIS #1
++                  Audio Channel Allocation: Front Left
++                BIS #2
++                  Audio Channel Allocation: Front Right
 +
-+EATT (Enhanced ATT) uses PSM 0x0027 over LE Credit-Based channels to
-+provide multiple parallel ATT bearers.
++**BIG creation** (source side)::
 +
-+Connection Parameter Updates
-+-----------------------------
++    < HCI Command: LE Create BIG (0x08|0x0068) plen 31      #210 [hci0] 0.600003
++          BIG Handle: 0x00
++          Advertising Handle: 0x01
++          Number of BIS: 2
++          SDU Interval: 10000 us
++          Max SDU: 120
++          Max Latency: 10 ms
++          RTN: 2
++          PHY: LE 2M PHY
++          Packing: Sequential (0x00)
++          Framing: Unframed (0x00)
++          Encryption: Unencrypted (0x00)
 +
-+LE peripherals frequently request connection parameter changes via
-+L2CAP signaling::
++**BIG sync** (receiver side)::
 +
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 16   #493 [hci0] 0.003915
-+          LE L2CAP: Connection Parameter Update Request (0x12) ident 1 len 8
-+            Min interval: 24
-+            Max interval: 40
-+            Peripheral latency: 0
-+            Timeout multiplier: 256
++    < HCI Command: LE BIG Create Sync (0x08|0x006b) plen 15  #220 [hci0] 0.700003
++          BIG Handle: 0x00
++          Sync Handle: 0x0001
++          Encryption: Unencrypted (0x00)
++          Number of BIS: 2
++          BIS: 0x01
++          BIS: 0x02
 +
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 10   #495 [hci0] 0.066003
-+          LE L2CAP: Connection Parameter Update Response (0x13) ident 1 len 2
-+            Result: Connection Parameters accepted (0x0000)
++Automating LE Audio Analysis
++------------------------------
 +
-+A result of ``Connection Parameters rejected (0x0001)`` means the
-+central denied the request.
++**Identify LE Audio activity**::
 +
-+Automating L2CAP Analysis
-+--------------------------
++    grep -n "ASE Control Point\|ASE ID\|State:.*Codec Configured\|State:.*QoS Configured\|State:.*Enabling\|State:.*Streaming\|State:.*Releasing" output.txt
 +
-+**Find all L2CAP channel establishments**::
++**Track ASE state transitions** for a specific ASE::
 +
-+    grep -n "Connection Request\|Connection Response\|LE Connection Request\|LE Connection Response" output.txt
++    grep -n "ASE ID:" output.txt
 +
-+**Track PSM usage** (identifies which protocols are active)::
++Then examine the ``State:`` line following each ASE ID match.
 +
-+    grep -n "PSM:" output.txt
++**Check codec configuration**::
 +
-+**Find connection parameter update issues**::
++    grep -n "Codec: LC3\|Sampling Frequency:\|Frame Duration:\|Frame Length:\|Audio Channel" output.txt
 +
-+    grep -n "Parameter Update Request\|Parameter Update Response\|Parameters rejected" output.txt
++**Verify CIS establishment**::
 +
-+**Find EATT channel setup**::
++    grep -n "Set CIG Parameters\|Create CIS\|CIS Established\|Setup ISO Data Path" output.txt
 +
-+    grep -n "PSM: 39\|Enhanced Credit" output.txt
++**Detect CIS failures** -- check the Status field after
++``CIS Established``::
 +
-+**Trace a specific L2CAP channel**: To follow traffic on a dynamic
-+channel, note the Source CID and Destination CID from the Connection
-+Request/Response pair. Then search for those CIDs in subsequent data
-+frames.
++    grep -n "CIS Established" output.txt
++
++Then examine the following line for ``Status:``.
++
++**Detect broadcast audio**::
++
++    grep -n "Basic Audio Announcement\|Create BIG\|BIG Complete\|BIG Create Sync\|BIG Sync" output.txt
++
++**Full LE Audio diagnosis pattern**:
++
++1. Find PACS reads -- verify codec compatibility between devices
++2. Find ASE Control Point writes -- trace the Config Codec → Config
++   QoS → Enable sequence
++3. Find ASE state notifications -- verify each transition succeeds
++4. Find CIG Parameters and CIS creation -- verify HCI-level setup
++5. Find ``CIS Established`` -- check Status for success
++6. Find ``Setup ISO Data Path`` -- verify data path configuration
++7. Find ISO Data packets -- confirm audio is flowing
++8. On failure, check ASE Control Point notification responses for
++   error codes (Response Code and Response Reason fields)
 +
  EXAMPLES
  ========
  
-@@ -1466,6 +1657,11 @@ Recommended Workflow
-        # Find targeted service searches
-        grep -n "Find By Type Value" output.txt
+@@ -1633,7 +1946,8 @@ Recommended Workflow
  
-+9. **Check L2CAP channels**: Identify protocol usage and channel
-+   issues (see `L2CAP CHANNEL TRACKING`_)::
-+
-+       grep -n "PSM:\|Connection Request\|Connection Response\|Parameter Update" output.txt
-+
- Key Patterns for Connection Lifecycle
- -------------------------------------
+        grep -n "Pairing Request\|Pairing Response\|Pairing Failed\|Encryption Change" output.txt
  
-@@ -1479,7 +1675,9 @@ pattern in the trace:
- 3. ``Encryption Change`` -- link encrypted (may show encryption
-    algorithm). See `SMP PAIRING FLOW`_ for the SMP exchange that
-    precedes this.
--4. ACL Data with ATT/SMP/L2CAP -- service discovery and data exchange
-+4. ACL Data with ATT/SMP/L2CAP -- service discovery and data exchange.
-+   See `RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES`_ for GATT,
-+   `L2CAP CHANNEL TRACKING`_ for channel setup.
+-6. **Identify LE Audio**: Search for ASCS and CIS activity::
++6. **Identify LE Audio**: Search for ASCS and CIS activity (see
++   `LE AUDIO PROTOCOL FLOW`_)::
+ 
+        grep -n "ASE Control Point\|CIG Parameters\|Create Connected Isochronous\|CIS Established\|Setup ISO Data Path" output.txt
+ 
+@@ -1680,7 +1994,8 @@ pattern in the trace:
+    `L2CAP CHANNEL TRACKING`_ for channel setup.
  5. ``Disconnect Complete`` -- connection ended, check Reason field
  
- For LE Audio connections, additional steps appear between 3 and 5:
-@@ -1508,6 +1706,13 @@ Common Debugging Scenarios
+-For LE Audio connections, additional steps appear between 3 and 5:
++For LE Audio connections, additional steps appear between 3 and 5
++(see `LE AUDIO PROTOCOL FLOW`_ for full details):
+ 
+ - ATT operations on PACS/ASCS characteristics (codec negotiation)
+ - ``LE Set CIG Parameters`` command and response
+@@ -1706,6 +2021,15 @@ Common Debugging Scenarios
  5. If no SMP traffic on reconnect but ``Encryption Change`` fails,
     the bond was lost on one side
  
-+**Connection parameter negotiation failure**:
++**Audio streaming failure diagnosis** (see `LE AUDIO PROTOCOL FLOW`_):
 +
-+1. Find ``Connection Parameter Update Request`` (L2CAP level)
-+2. Check the Response -- ``rejected`` means the central denied it
-+3. Alternatively, find ``LE Connection Update Complete`` (HCI level)
-+4. Check Status -- non-zero means the controller rejected the update
++1. Check PACS reads -- do both devices support compatible codecs?
++2. Check ASE Control Point Config Codec -- was it accepted?
++3. Check ASE state notifications -- did the ASE reach Streaming?
++4. Check ``CIS Established`` -- was Status Success?
++5. Check ``Setup ISO Data Path`` -- was it configured?
++6. Check for ISO Data packets -- is audio actually flowing?
 +
- Vendor-Specific Events
- ----------------------
+ **Connection parameter negotiation failure**:
  
+ 1. Find ``Connection Parameter Update Request`` (L2CAP level)
 -- 
 2.53.0
 
