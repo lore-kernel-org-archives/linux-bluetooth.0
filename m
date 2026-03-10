@@ -1,111 +1,122 @@
-Received: from endrift.com (endrift.com [173.255.198.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.120])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ECD36C9ED
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 03:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.255.198.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D8342188A;
+	Tue, 10 Mar 2026 11:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773113905; cv=none; b=choabvv5oMNHmS5fYky+WdDBq857+BYh+ciGyJijsRgMwmxhPeRmoieBhfrbDhhJKCdxqxiEGwuKjPuNMvZ/MShQWmgbJvts6X7zqnQn25E0FZDDLC5KQtMxP/oLyixmQ2jXUWtFLPZy8RK/ozi/+uS+7XwNnNxouYfErpq2sOI=
+	t=1773143736; cv=none; b=JyjpjDNBamRX/d/0cBxhn8krCQOjexJ2vrQdxL9etQTgsSveWfmqAXU9Utungvjhf1ymk2tyTygW3eFbj9ceo2rBjCRHZq3BBsZECgAl7/pH+x9OcO6hwaUjZ7EqkgDRsUFouXu1RhYhXogSD8c1uEUyZLhZ0zSpr9skyUkgM2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773113905; c=relaxed/simple;
-	bh=ojgOvNA7PqWy7y+ckJNWFJpOrdeN1BF5Ovy3OoJe0Fo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XTGo7EfNxbl/0z5w6eFDTQ8oh91jH4SN5dqeGK82QLyURz7mE7M1NiUApQM4fxg3pAE1QURCRnNQ18btWjg0ROE/kX8IhCn/OUd+itdcwF9SfbMc392HntRd1nAJNtdPQh1fwMZ4EazSsWXzl9vWzdTx2rsuHq8kXTEHGxvytvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=endrift.com; spf=pass smtp.mailfrom=endrift.com; dkim=pass (2048-bit key) header.d=endrift.com header.i=@endrift.com header.b=0kdpOAXa; arc=none smtp.client-ip=173.255.198.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=endrift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=endrift.com
+	s=arc-20240116; t=1773143736; c=relaxed/simple;
+	bh=5P0DiWaZEPF/d3SPdMB+rZQJk1DY1mVuY8d9xffySsA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Y14YQFuhCN3Kna4n1bwdJLy6NiH7PsoBM7Us66PzPbSe668DAzp4tTo4cuQaqKhLnGId48d7VcOl3YdYa4gX896kymcYC+OJsptk56QFk5wYX8Gajg4MTVHJ9JF9m3oSlGutdRSt3+thWos4pR/PlY2QtSRm5Z/QKNjYzOak55w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=E8nt1Igf; arc=none smtp.client-ip=212.42.244.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=endrift.com header.i=@endrift.com header.b="0kdpOAXa"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=endrift.com; s=2020;
-	t=1773113408; bh=ojgOvNA7PqWy7y+ckJNWFJpOrdeN1BF5Ovy3OoJe0Fo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=0kdpOAXamL6fHhuFZcacog004xcrSI5tnPxAoFb6QcOuBGWlUqRLqW5ee23JqB4u0
-	 NCQVYwV02cjN9+xKwlzVvrtV8zmYehKwkohSpoaSxjI9hKSBYx4ODfMdA0RnHziZ1X
-	 X1Zko0z8MONtsZTJ9GlyBh5fA+RhMyX7eYLaQr+OCp7L9FtR2QlPKt/RwBXFXeVpnu
-	 jP5e1sKMjyDh6wWDeS7lfX3lD08MZQ8mFmEQudnEdZjbiTlq2LAvj58wVjJMGIUuAe
-	 3X5gdlmTatmnVj5Wz3hhN/SZdXURlnCO40pDgKTIpMNM7z40pS2x520xGQOC8GkisU
-	 D0kQRIA4GhQ1w==
-Received: from [192.168.0.22] (71-212-14-89.tukw.qwest.net [71.212.14.89])
-	by endrift.com (Postfix) with ESMTPSA id 7F9B2A0AA;
-	Mon, 09 Mar 2026 20:30:08 -0700 (PDT)
-Message-ID: <941e5399-be1c-4e19-b1d4-04ff9ec2a32b@endrift.com>
-Date: Mon, 9 Mar 2026 20:30:05 -0700
+	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="E8nt1Igf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+	t=1773143723; bh=5P0DiWaZEPF/d3SPdMB+rZQJk1DY1mVuY8d9xffySsA=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=E8nt1Igfikzg1UTgOGISAzAMiKswf2ND49bi7Kfi9UIZL/Ebzc+UJJz79rFMcVayH
+	 w+/EzW9fK7u4Bg5GlsqH3X/nHnzFmDjyW7AnMKYXmhb+RvNdMihtj8ZP/p/a51PpAe
+	 gPrdgwP6uGn176nZZmhXnabbuO0mAOF/przWQZhQ=
+Received: from [212.42.244.71] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.55.2)
+	(envelope-from <phahn-oss@avm.de>)
+	id 69b006ab-b734-7f0000032729-7f000001bfd2-1
+	for <multiple-recipients>; Tue, 10 Mar 2026 12:55:23 +0100
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Tue, 10 Mar 2026 12:55:23 +0100 (CET)
+From: Philipp Hahn <phahn-oss@avm.de>
+Date: Tue, 10 Mar 2026 12:48:39 +0100
+Subject: [PATCH 13/61] squashfs: Prefer IS_ERR_OR_NULL over manual NULL
+ check
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ v2 0/6] Nintendo Switch 2 support
-To: Martin BTS <martinbts@gmx.net>, linux-bluetooth@vger.kernel.org
-Cc: hadess@hadess.net, luiz.dentz@gmail.com
-References: <20260308124745.19248-1-martinbts@gmx.net>
-Content-Language: en-US
-From: Vicki Pfau <vi@endrift.com>
-In-Reply-To: <20260308124745.19248-1-martinbts@gmx.net>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260310-b4-is_err_or_null-v1-13-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
+ bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+ gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
+ intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+ linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-leds@vger.kernel.org, linux-media@vger.kernel.org, 
+ linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+ linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
+ linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
+ linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
+ linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
+ linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+ ntfs3@lists.linux.dev, samba-technical@lists.samba.org, 
+ sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
+ tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, 
+ Philipp Hahn <phahn-oss@avm.de>
+Cc: Phillip Lougher <phillip@squashfs.org.uk>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=775; i=phahn-oss@avm.de;
+ h=from:subject:message-id; bh=5P0DiWaZEPF/d3SPdMB+rZQJk1DY1mVuY8d9xffySsA=;
+ b=owEBbQGS/pANAwAKATQtBlPRrKzbAcsmYgBpsAYCOfXcw6nKYZXjZ+DBieT/hiu2NsAfQUre0
+ jlVRw6aXW2JATMEAAEKAB0WIQQ5bPBtrWDUcDQCppg0LQZT0ays2wUCabAGAgAKCRA0LQZT0ays
+ 213oB/sHjZoOpAMz20yPf5W58oaVS3VDOW1zZjyOZfXyKihmnOb8lV99cBPQClALjvBUcqLXemg
+ tpELfmCMWmmS2DLDh38s8m7H4SkSFm3iB+qUl+u8a8NGrDjTz2g0nlLXJ2i4mzmAqWbDldfEhAp
+ ePslhLAf6MqAOAwxF9goTetOQ472ZWbOa7vI5fCqcvwcF/q5QIEUmGs+z5b0yUklyrSflqQlQo4
+ adffOC5kl3ETGEGqBgVXEIg3h8JiDkJe6MaBbDmB/JG3IQRjeJ8YfJc6t+cVg+eXVpCRQOreMFS
+ jG7NgF/eCJBIlcELmHlOCy2pst+P0hiPrthj4RBlPC3hRS93
+X-Developer-Key: i=phahn-oss@avm.de; a=openpgp;
+ fpr=58AF7C2E007CDBE62C59E078F50EFDCF8AD04B1A
+X-purgate-ID: 149429::1773143723-265C1A3D-EB4B679C/0/0
+X-purgate-type: clean
+X-purgate-size: 777
+X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
 
-Hi Martin
+Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+check.
 
-On 3/8/26 5:47 AM, Martin BTS wrote:
-> Changes v2:
-> * Drop original patches 1 and 2 (tollerate ATT timeout)
-> * New patches 1, 2, 3 introduce a device property skip_secondary,
->   that makes secondary device discovery optional
-> * set_alias() is now public btd_device_set_alias() as suggested
-> * Fix assigned numbers reference comment
-> * Link to v1: https://lore.kernel.org/all/20260301152930.221472-1-martinbts@gmx.net/
-> 
-> v2 blurb:
-> 
-> The problem is the secondary service discovery. It will time out on the
-> Procon2 which is essentially an unrecoverable error and we cannot
-> connect the controller as a result.
-> 
-> This patchset proposes making the secondary service discovery optional,
-> so that we can prevent dealing with the Procon2's behaviour.
-> It now is a property of the device, if it wants/needs a secondary
-> discovery, or not. This allows device specific plugins to make the
-> correct configuration in time, bevor a gatt-client is created. The
-> default is the original behaviour: do a secondary services discovery.
-> 
-> I marked patch 1 as a breaking change, because of how it changes the
-> gatt-client interface. It appears this gatt-client is only used
-> internally and never exposed so it technically isn't a breaking change
-> for BlueZ, but I cannot be sure.
-> 
-> For the record: The Procon2 reports appearance 0x0A82 Portable handheld console
-> 
-> Martin BTS (6):
->   shared/gatt: make secondary discovery optional
->   device: allow skip secondary discovery
->   fixup: propagate new gatt interface through codebase
->   device: Rename set_alias to  btd_device_set_alias()
->   dbus-common: Add Gaming appearance class (0x2a)
->   plugins/switch2: Add Nintendo Switch 2 Controller plugin
-> 
->  Makefile.plugins         |    3 +
->  peripheral/gatt.c        |    5 +-
->  plugins/switch2.c        | 1070 ++++++++++++++++++++++++++++++++++++++
->  src/dbus-common.c        |    2 +
->  src/device.c             |   33 +-
->  src/device.h             |    2 +
->  src/shared/gatt-client.c |   22 +-
->  src/shared/gatt-client.h |    4 +-
->  tools/btgatt-client.c    |    5 +-
->  unit/test-bap.c          |    3 +-
->  unit/test-gatt.c         |    3 +-
->  unit/test-gmap.c         |    3 +-
->  unit/test-mcp.c          |    3 +-
->  unit/test-micp.c         |    3 +-
->  unit/test-tmap.c         |    3 +-
->  15 files changed, 1133 insertions(+), 31 deletions(-)
->  create mode 100644 plugins/switch2.c
-> 
+Change generated with coccinelle.
 
-I can't comment on the other patches, but I will say I think it's premature to be merging Switch 2 support, as I'm still working on the kernel side of this in ways that makes me want to not lay down any API that gets merged into userspace software yet. I left a comment to this end on the DKMS port of driver as well.
+To: Phillip Lougher <phillip@squashfs.org.uk>
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+---
+ fs/squashfs/cache.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Vicki
+diff --git a/fs/squashfs/cache.c b/fs/squashfs/cache.c
+index 67abd4dff222235e75d8c2b10d5e9b811d6e38d8..8888cc02966e2e33210c872c733205d4c581ecc9 100644
+--- a/fs/squashfs/cache.c
++++ b/fs/squashfs/cache.c
+@@ -198,7 +198,7 @@ void squashfs_cache_delete(struct squashfs_cache *cache)
+ {
+ 	int i, j;
+ 
+-	if (IS_ERR(cache) || cache == NULL)
++	if (IS_ERR_OR_NULL(cache))
+ 		return;
+ 
+ 	for (i = 0; i < cache->entries; i++) {
+
+-- 
+2.43.0
 
