@@ -1,125 +1,107 @@
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4ECB2FFF90;
-	Tue, 10 Mar 2026 13:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6085D38D6AB
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 14:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773150974; cv=none; b=Qk4/Xrgt5Sj9P95xXLzQSzP3bfCVB+xh5G6PbnPTyGgXknF1nIwFyDD4BheE+1PFH4RbQIJspfylvolmZBxmc2OIKLujB+PDdXK2DOn9YGSUijqFBwmAgM/niwzj+34UXZO65dOV8+5pm8gMp0V0dH61m4yTpayLAgN7r1Fjxss=
+	t=1773151466; cv=none; b=RpakbCfimZTITxnQpBkpxPXMnq9u2S2WF4vHjo3LjWowHDCFDXz2WDVzYKqNAd+XcbyEESMHOQJnROKsYzUyFF1fb0Mj6hzkIw9R5ihi0/m0POTqcTVgW8TxaUIvGrdW79CYg7HrWQPfSCd6FGcEdOQLKZvMgVr2qLe5Ii31vLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773150974; c=relaxed/simple;
-	bh=FDMwXaHKDrOM7khDAib7qUUe1UeRwowP+SR16jql6lQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZTIc6zSixu52GG6Cq6DFY5tJLrjwcodwjvew156TLPu3UZdI/AjKkUoXgOHKlz5EhlvD0JwfW9l6hkoTCobqwWX4GpFOJz/Rmhc6shERJ+T2pbqVQYjj2Ua3YEWV9POuFDCGFdks1EToRJhzERQReKQXEpnzrNJCKxMa84Jkcbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 539B3433BD;
-	Tue, 10 Mar 2026 13:55:53 +0000 (UTC)
-Message-ID: <375c7c30c184d331c199876e45920976030f3cbc.camel@hadess.net>
-Subject: Re: [PATCH 25/61] net/bluetooth: Prefer IS_ERR_OR_NULL over manual
- NULL check
-From: Bastien Nocera <hadess@hadess.net>
-To: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org, 
-	apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org,
- 	cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
- 	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
- kvm@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, 	linux-bluetooth@vger.kernel.org,
- linux-btrfs@vger.kernel.org, 	linux-cifs@vger.kernel.org,
- linux-clk@vger.kernel.org, 	linux-erofs@lists.ozlabs.org,
- linux-ext4@vger.kernel.org, 	linux-fsdevel@vger.kernel.org,
- linux-gpio@vger.kernel.org, 	linux-hyperv@vger.kernel.org,
- linux-input@vger.kernel.org, 	linux-kernel@vger.kernel.org,
- linux-leds@vger.kernel.org, 	linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mm@kvack.org, 
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- ntfs3@lists.linux.dev, 	samba-technical@lists.samba.org,
- sched-ext@lists.linux.dev, 	target-devel@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net, 	v9fs@lists.linux.dev
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	 <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 10 Mar 2026 14:55:52 +0100
-In-Reply-To: <20260310-b4-is_err_or_null-v1-25-bd63b656022d@avm.de>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
-	 <20260310-b4-is_err_or_null-v1-25-bd63b656022d@avm.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1773151466; c=relaxed/simple;
+	bh=lsGEuUQxalW8Djhqqxx7ng0yD2ezrsGQkru2T7jfURs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tm3+wLWzMHF23OrnzlizaSzolNUPeD7VrLYnUO9Hc7V0V4ar1Mp6BVQ8dWHUIj6AW2wFMZVB7E0yGBi3Gk9r0lNMq4BhioW4hsoeDMmJEmYwaf5tQvDCUE1GygRGEGkdsh9eMslP3jukAi46qukrunnt6ORnmdptKOCeu0oHYhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.13.172] (g427.RadioFreeInternet.molgen.mpg.de [141.14.13.172])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id C06D34C4431ED8;
+	Tue, 10 Mar 2026 15:04:17 +0100 (CET)
+Message-ID: <72946edd-fad1-4201-8c23-f36cfe925cb7@molgen.mpg.de>
+Date: Tue, 10 Mar 2026 15:04:17 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepieffgfehtedtgefgjeeggfffgeeuvdegveekveejfeekkedujeehteffueefffeunecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepheefleeufeegfeefueffpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepheejpdhrtghpthhtohepphhhrghhnhdqohhsshesrghvmhdruggvpdhrtghpthhtoheprghmugdqghhfgieslhhishhtshdrfhhrvggvu
- ggvshhkthhophdrohhrghdprhgtphhtthhopegrphhprghrmhhorheslhhishhtshdruhgsuhhnthhurdgtohhmpdhrtghpthhtohepsghpfhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegtvghphhdquggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohgttghisehinhhrihgrrdhfrh
-X-GND-State: clean
-X-GND-Score: -100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] Bluetooth: Increase LE connection timeout for
+ industrial sensors
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Dajid Morel <dajidp.morel@gmail.com>, Dajid Morel
+ <dajid.morel@volvo.com>, linux-bluetooth@vger.kernel.org
+References: <20260302233756.910702-1-dajid.morel@volvo.com>
+ <CABBYNZKaNmSPbCpJ-GKu2eSrgd_GcOOWkekHW0OMK8WMLESYWQ@mail.gmail.com>
+ <CAM8DPm20Sm1t_NMoWQFZtkmdaiL1ALs8SFMqxe-QtT5wjbp6xA@mail.gmail.com>
+ <CABBYNZKmu3b2h2NyhhV7CwmB=h1R9uAe0HXDCP73iAvqzy7AYA@mail.gmail.com>
+ <CAM8DPm2z-6xUm3SyFJ9umn4=o9bBov6PhKV0TEDCBc14eMFSew@mail.gmail.com>
+ <CABBYNZJZWkEy2D4WW8ODMoU-ZmsT1aN0LccOzdsCxuKnFZHnuA@mail.gmail.com>
+ <CAM8DPm1fWn7jovVPgcBrApy_czP0TbnBi=oUZmhjMqDkORv2bw@mail.gmail.com>
+ <CABBYNZJ6NNL26BOxV2E6HBA6D3vgOauRQ=75vRcBMA0D-vSEHw@mail.gmail.com>
+ <CAM8DPm0rgZEY+aNj8-RJv7JwvMOBQuRu7qt7G+z_OpVL+zk3Gw@mail.gmail.com>
+ <ea9528bd-ccde-4da3-b85b-793e370b4da1@molgen.mpg.de>
+ <CAM8DPm20ECFZF6v19SrLwA8o92YXY_dsWvOyFDOuym5S7P2kCg@mail.gmail.com>
+ <CABBYNZ+ePfwbc2NS-hG5g98trXOvUqRtp-ZiXD2crrvx-Lygzg@mail.gmail.com>
+ <CAM8DPm1Ca6CDx3nOeJhEvTiD0510RteKd5Mw=Fg8hkZuA4oRKg@mail.gmail.com>
+ <CABBYNZKtAkftUyyo4B5D7ADN80as3rE5dHHQcKoWa7tmUfBzgw@mail.gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CABBYNZKtAkftUyyo4B5D7ADN80as3rE5dHHQcKoWa7tmUfBzgw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 2026-03-10 at 12:48 +0100, Philipp Hahn wrote:
-> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> check.
->=20
-> Change generated with coccinelle.
->=20
-> To: Marcel Holtmann <marcel@holtmann.org>
-> To: Johan Hedberg <johan.hedberg@gmail.com>
-> To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+Dear Dajid, dear Luiz,
 
-Reviewed-by: Bastien Nocera <hadess@hadess.net>
 
-> ---
-> =C2=A0net/bluetooth/mgmt.c | 6 +++---
-> =C2=A01 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index
-> a7238fd3b03bb54f39af1afee74dc1acd931c324..06d2da67bbe14e17ee478aa939d
-> e26526c333d91 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -4169,7 +4169,7 @@ static void set_default_phy_complete(struct
-> hci_dev *hdev, void *data, int err)
-> =C2=A0		mgmt_phy_configuration_changed(hdev, cmd->sk);
-> =C2=A0	}
-> =C2=A0
-> -	if (skb && !IS_ERR(skb))
-> +	if (!IS_ERR_OR_NULL(skb))
-> =C2=A0		kfree_skb(skb);
-> =C2=A0
-> =C2=A0	mgmt_pending_free(cmd);
-> @@ -5730,7 +5730,7 @@ static void read_local_oob_data_complete(struct
-> hci_dev *hdev, void *data,
-> =C2=A0			=C2=A0 MGMT_STATUS_SUCCESS, &mgmt_rp, rp_size);
-> =C2=A0
-> =C2=A0remove:
-> -	if (skb && !IS_ERR(skb))
-> +	if (!IS_ERR_OR_NULL(skb))
-> =C2=A0		kfree_skb(skb);
-> =C2=A0
-> =C2=A0	mgmt_pending_free(cmd);
-> @@ -8277,7 +8277,7 @@ static void
-> read_local_oob_ext_data_complete(struct hci_dev *hdev, void *data,
-> =C2=A0				 mgmt_rp, sizeof(*mgmt_rp) +
-> eir_len,
-> =C2=A0				 HCI_MGMT_OOB_DATA_EVENTS, cmd->sk);
-> =C2=A0done:
-> -	if (skb && !IS_ERR(skb))
-> +	if (!IS_ERR_OR_NULL(skb))
-> =C2=A0		kfree_skb(skb);
-> =C2=A0
-> =C2=A0	kfree(mgmt_rp);
+Am 10.03.26 um 14:47 schrieb Luiz Augusto von Dentz:
+
+>> Trace Analysis (failure_with_firmware.log attached): Here is the
+>> relevant excerpt showing the host aborting the sequence on the 5.15
+>> kernel:
+>>
+>> < HCI Command: LE Create Connection (0x08|0x000d) plen 25 #65 [hci0]
+>> 13.006556 > HCI Event: Command Status (0x0f) plen 4 #66 [hci0] 13.009473
+>> LE Create Connection (0x08|0x000d) ncmd 1 Status: Success (0x00) […] <
+>> HCI Command: LE Create Connectio.. (0x08|0x000e) plen 0 #88 [hci0]
+>> 17.048391 > HCI Event: Command Complete (0x0e) plen 4 #89 [hci0]
+>> 17.052037 LE Create Connection Cancel (0x08|0x000e) ncmd 1 Status:
+>> Success (0x00) > HCI Event: LE Meta Event (0x3e) plen 19 #90 [hci0]
+>> 17.054039 LE Connection Complete (0x01) Status: Unknown Connection
+>> Identifier (0x02)
+> 
+> Ok, so it is actually cancelling after 4 seconds, not 2 seconds as you
+> repeatedly blabbed about so in the end it doesn't correspond to
+> HCI_CMD_TIMEOUT but probably something else that sets 4 seconds.
+> 
+>> The host systematically aborts the connection attempt after exactly 4.04
+>> seconds (17.048s - 13.006s).
+>>
+>> You mentioned: “On the recent kernels the timeout is configurable.”
+>>
+>> Could you point me to the specific commit/patchset or API that
+>> introduced this configurable timeout?
+> 
+> It is the third time already:
+> 
+> https://github.com/bluez/bluetooth-next/commit/a56a1138cbd85e4d565356199d60e1cb94e5a77a
+
+This entered v5.17-rc7.
+
+> But you may also need the following:
+> 
+> https://github.com/bluez/bluetooth-next/commit/bf98feea5b65ced367a871cf35fc044dedbcfb85
+
+This entered v6.10-rc1.
+
+Luiz, would it make sense to backport both commits to the longterm 
+stable support (LTS) series?
+
+
+Kind regards,
+
+Paul
