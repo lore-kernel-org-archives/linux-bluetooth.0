@@ -1,245 +1,549 @@
-Received: from mout.web.de (mout.web.de [212.227.17.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A743A7855;
-	Tue, 10 Mar 2026 15:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B47F392C27
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 17:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773157673; cv=none; b=DlxFjJ4y2tA3BLQQzXRINZ7hR9advuDjTcK2YuZY1s21SghLya3PSHkzW5B1rcEIrcOJvM8M43OwswZSVZXO/h2sTPO5/tP3bacCWDRkf6fTZt1xivbhU+r+mWN/fv8mZDRmKf1zFQu3fBwOlYR6hiEr9FAwcQXj3/3M5q2RbPo=
+	t=1773162699; cv=none; b=dPmcdPjnKl0+8+QIIwgu8lTrVpuaulI+16Wk9Jk2FvSPq1UqZJN/He7f/cqpLMB5twFyT/hSnjeOXkvzpBiCGPoE3V6SlJGnEwsM7vGXnOhzgyF+nGrseJHrlmf/yopozhBA5BmhH1V2cb/+6OP6PBDcv1djyFhq05M04bD/0/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773157673; c=relaxed/simple;
-	bh=nIfgenJGac4O6CqM8mWCtdayOts9dS1D2FhHmYYRcn4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=VmRzxWdtuxNUzcu8Umc2r6Uugq/ZVDmaj8JBIGmk+Ej5oBT4gwyYtVSXybj5bv6fzSXl/iURGHDousF5kwWAWMv22/4RhcZgP3/P0Se+dYOZB+irCRKbMCUUAZ3mSTZDCGaGKu4PXV9su4KRCFQgGnUXPTOkw9vBdv/J1M6yD6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=h7K0qFC8; arc=none smtp.client-ip=212.227.17.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1773162699; c=relaxed/simple;
+	bh=Bja4J+g6VuJxjhymwKk4gny4ibRab8/G1NtbG1bdjRQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=taBrP01HFMF/0vHfh7wya4U8mo3yce1ijtDsRAKcvG7pP+QxaxNHJ/rmPebTT4U+LZ5GX+fiACloSrfYmvmepHiMIX1+QB58dADpF9tXeg71ZM3KTzajUTPfRDSQG4YTpdprIVdAO0sXREByNqy/wUBGYjMff4Ie3fDYcjiONAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BHy9E98E; arc=none smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="h7K0qFC8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1773157662; x=1773762462; i=markus.elfring@web.de;
-	bh=ViIdeWt5br4rBsrGxHUMEkJDkD/ERSvSv/UV5SzvttY=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=h7K0qFC8lui0M3aEG2yhHOptmzLeK24S79cZCRktla9iVPsdh7MMZY9IQ+0fNsjy
-	 1Jmj8tPDjUYGV0N31jChpPIbrmEGAAiLmOFKWubyE3NTttjDE8UYZYzPrHWHwqRbT
-	 ZmJLoNHR6+mwIgea1XMDsroKD1VkpdbtDpYP5RQOlLeXbFM1sGNyCjcqO4VGv6oH0
-	 or7WNvOJCD7wct+ITkk6hEn2pz09hvl0HnH1IXkz/NhmxM4+GPG6PRDdXRWJwhNqD
-	 E/CyuUCmqvUAopwe+bMtAzI3unk/5Tnu7dsxuDhsN1+B/BFgi6IvYkOUfIHgIX1fz
-	 IDA+/KUXvW7fGiboiQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from client.hidden.invalid by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N5lj7-1vYM6w3zfn-012TrV; Tue, 10
- Mar 2026 16:41:18 +0100
-Message-ID: <924acf71-45df-4ea2-9bbd-b6f5ff262b2b@web.de>
-Date: Tue, 10 Mar 2026 16:41:12 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BHy9E98E"
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64c9a6d68e5so9798640d50.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2026 10:11:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773162696; x=1773767496; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PhYFNcBq5IVdyuaEeS2uSQE7UTqNKjW5Gld6IQ4Nfrg=;
+        b=BHy9E98E39wEU0dvRo90NpBb19mn5VraBASQXg1vJQKPH48uUSrzFovzd04H2iLAD0
+         llW599OVgv8SzNAmOprQNmzgbKXEuodkse2NOsB9GdIh4EszjN+/WssdM6fqcWIf8C7E
+         A9COFor7GD87AAwSBSgxvtZdE98JCL/FoYkx6eSqvISpLFLNgZxKX2jYOcarxuMwHRtB
+         S9KNVtRKg9GUmep49zlSzPbKnJyayqNXsCqnu42JplfrRANFEhud+61IOvTsV+sf5oks
+         jzhzADcW1Y27x5wxiCHc6zqGzpLVxT0s2qrxyJEoYwNywKvoIVQJUAOUwSyV4wUwbAMD
+         6azw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773162696; x=1773767496;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PhYFNcBq5IVdyuaEeS2uSQE7UTqNKjW5Gld6IQ4Nfrg=;
+        b=bUTR+t2F39IKSRzHJMaqouIFCBX6yh3EYe5FGsWYqkmSkFALVuNKH4ne2EM7YVU0of
+         Bpn3s5bfFE2CHuBV1wljhSH5hVGJRMCt6LUK3a+K7lMxEuSKgUNfoTui2HTxvgpp3Sr6
+         GDkmYIJFzwkb5JbnfjMOla4NF2Db6u+Q8EtdWyJuIosUc4iTupex7SgUTntucCWINTuy
+         E8+S2TnlpOxjH4fEY03ttL7lOAb6VZV6f/3dzJElV24AAK3yT/FhPJwddYS644KwgNd8
+         ubW2YVFF0eKJWsNPXw78c40phEKT7UZcDY5FwQZIDv1ngdFdMDkcHMw8i5+6dBQADzbm
+         V4oA==
+X-Gm-Message-State: AOJu0YzrgQOU4UBjRfN9l7ucJeK8SAUtQuSaZNqRjCvkH1kfA17y96ut
+	pn5AbBG8HOA2IRTnkz11/8mcL+n5VPOWRXHZOvtc5gjhhQyiTRdG83rqh6Ye0Q==
+X-Gm-Gg: ATEYQzzTSxum3HOotAOrx+edG/hWf2MyJl6/zvwT2vI0vTkTC7MGFKIQsUVNXfm4WdV
+	lkAIQK3LWb+plPI65R9tp3RbwA086+9HBd0bifd1cwZuh+WTmNOK1j1vBmcNXJtwe2Fq6N3ef+Q
+	aO+8VMs71yj4heqVRPgFPvIJC8nDOQGJjZeWg+dgTJN9Q4mUWpud7vWta1NduBOZZCEDy2fAn0k
+	LjUT9Hkts0SY7CyOwzt5Y106DtE8+hkWcKXyhXU3qSFHuElDkraLL+W/bNiBMEMDLiinKkMEG7m
+	Ps3dXaby1sFHvMzXQSvqsk+ptoRCG2AW1ELKvx5EsB45GbccCQ2mnBn7EAE0MpxWoHZHjdHZ9vX
+	tIURFvv6QPhcE2TiueIYehwROBymDgRwggyOCNiZPRmagHDB0ypJkl6NO9Bm+5GdXIxr7dheWto
+	Z2FqPX3yzkLJjIZndY2Eyj9He7Nqmyhd0l2J4XhyiU70SHpXas7+xy/dMOh3NQgihoZ7lodDEB3
+	gXMmE7rJbh8kGfBvw==
+X-Received: by 2002:a05:690c:f08:b0:794:ef94:1222 with SMTP id 00721157ae682-798dd79adf8mr150237777b3.55.1773162695761;
+        Tue, 10 Mar 2026 10:11:35 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7990a51a245sm19745357b3.5.2026.03.10.10.11.34
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2026 10:11:34 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/6] doc/btmon: Add GATT database reconstruction guide
+Date: Tue, 10 Mar 2026 13:11:14 -0400
+Message-ID: <20260310171126.342447-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Philipp Hahn <phahn-oss@avm.de>, cocci@inria.fr,
- Julia Lawall <Julia.Lawall@inria.fr>
-Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
- bpf@vger.kernel.org, ceph-devel@vger.kernel.org, dm-devel@lists.linux.dev,
- dri-devel@lists.freedesktop.org, gfs2@lists.linux.dev,
- intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
- iommu@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org,
- linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
- linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- nicolas.palix@imag.fr, ntfs3@lists.linux.dev,
- samba-technical@lists.samba.org, sched-ext@lists.linux.dev,
- target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
- v9fs@lists.linux.dev
-References: <20260310-b4-is_err_or_null-v1-1-bd63b656022d@avm.de>
-Subject: Re: [PATCH 01/61] Coccinelle: Prefer IS_ERR_OR_NULL over manual NULL
- check
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20260310-b4-is_err_or_null-v1-1-bd63b656022d@avm.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:I49ufsxpBKiFBze+2Qm04f+elx94DZSymOaZcQTAnyd9Dy18WSZ
- l5PlqGBdCeQJnqXYHB7LM8JEThQzWaqt46DhF3JOnbIEKCtwYJeZnzJMAXhMu3h78zedo+b
- 2MDr9yfDF5xiOPbOsnoVg9HvEpZouoV7eAA1AasOX+/8mAaWp7eICgl3FZXuUGMMgTPEUmo
- 9zEXJmftCILFnPJ5epBUQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:04WXpfHKV24=;XM8484Tl0Gel7LmfPFVAhD+GUiz
- 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
- WH56U++o=
+Content-Transfer-Encoding: 8bit
 
-> Find and convert uses of IS_ERR() plus NULL check to IS_ERR_OR_NULL().
-=E2=80=A6
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Can this information trigger any more consequences on corresponding summar=
-y phrases?
+Add a comprehensive section explaining how to reconstruct a remote
+device's GATT database from btsnoop traces. Documents all six phases
+of GATT discovery:
 
+- Primary/Secondary Service Discovery (Read By Group Type)
+- Included Service Discovery (Read By Type with Include UUID)
+- Characteristic Discovery (Read By Type with Characteristic UUID)
+- Descriptor Discovery (Find Information)
+- Characteristic Value Reading (Read Request/Response)
+- Targeted Service Search (Find By Type Value)
 
-=E2=80=A6
-> +++ b/scripts/coccinelle/api/is_err_or_null.cocci
-> @@ -0,0 +1,125 @@
-=E2=80=A6
-> +virtual patch
-> +virtual report
-> +virtual org
+Includes annotated btmon output examples for each ATT operation,
+a characteristic properties reference table, common descriptor
+UUIDs, guidance on bidirectional discovery, and a worked example
+showing how to build the final attribute table from trace data.
+---
+ doc/btmon.rst | 433 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 433 insertions(+)
 
-How will interests evolve further for the support of the operation mode =
-=E2=80=9Ccontext=E2=80=9D?
+diff --git a/doc/btmon.rst b/doc/btmon.rst
+index e1e362b7c1b6..f769a7af6e8b 100644
+--- a/doc/btmon.rst
++++ b/doc/btmon.rst
+@@ -712,6 +712,423 @@ Analyze mode reports, for each controller found in the trace:
+ - **Latency plots**: If ``gnuplot`` is installed, ASCII-art latency
+   distribution plots are rendered in the terminal.
+ 
++RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES
++=================================================
++
++A btsnoop trace contains the complete ATT protocol exchange used by
++GATT clients and servers to discover each other's services. By reading
++the discovery requests and responses, it is possible to reconstruct the
++full GATT database of a remote device -- even without access to the
++device itself.
++
++This section explains the GATT discovery procedure and how each ATT
++operation appears in ``btmon`` output.
++
++Overview of GATT Discovery
++---------------------------
++
++GATT discovery is a multi-phase process where a client queries the
++server's attribute database using ATT protocol operations. The phases
++are:
++
++1. **Primary Service Discovery** -- Find all primary services and their
++   handle ranges.
++2. **Secondary Service Discovery** -- Find any secondary (included-only)
++   services.
++3. **Included Service Discovery** -- Find which services include other
++   services.
++4. **Characteristic Discovery** -- Find all characteristics within each
++   service.
++5. **Descriptor Discovery** -- Find all descriptors for each
++   characteristic.
++6. **Characteristic Value Reading** -- Read the values of readable
++   characteristics.
++
++Each phase uses a specific ATT operation and produces a
++request/response pattern in the trace. The client repeats each request
++with advancing handle ranges until the server responds with
++``Attribute Not Found``, indicating the end of that phase.
++
++Phase 1: Primary Service Discovery (Read By Group Type)
++--------------------------------------------------------
++
++The client discovers primary services using ``Read By Group Type
++Request`` with the ``Primary Service`` UUID (0x2800) as the group type.
++
++**Request**::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #516 [hci0] 0.124726
++          ATT: Read By Group Type Request (0x10) len 6
++            Handle range: 0x0001-0xffff
++            Attribute group type: Primary Service (0x2800)
++
++The first request always starts at handle 0x0001 and searches through
++0xffff (the entire handle space).
++
++**Response**::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 42       #523 [hci0] 0.240151
++          ATT: Read By Group Type Response (0x11) len 37
++            Attribute data length: 6
++            Attribute group list: 6 entries
++            Handle range: 0x0001-0x0009
++            UUID: Generic Access Profile (0x1800)
++            Handle range: 0x000a-0x0011
++            UUID: Generic Attribute Profile (0x1801)
++            Handle range: 0x0012-0x0014
++            UUID: Device Information (0x180a)
++            Handle range: 0x0015-0x0039
++            UUID: Generic Telephony Bearer (0x184c)
++            Handle range: 0x003a-0x0059
++            UUID: Generic Media Control (0x1849)
++            Handle range: 0x005a-0x005c
++            UUID: Telephony and Media Audio (0x1855)
++
++Each entry provides:
++
++- **Handle range** -- The start and end handle of the service. All
++  attributes belonging to this service (characteristics, descriptors)
++  have handles within this range.
++- **UUID** -- The service UUID. Standard 16-bit UUIDs are shown with
++  their name (e.g., ``Generic Access Profile``). 128-bit vendor-specific
++  UUIDs appear as full UUID strings.
++
++The client continues by sending another request starting after the last
++handle in the response::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #525 [hci0] 0.240641
++          ATT: Read By Group Type Request (0x10) len 6
++            Handle range: 0x005d-0xffff
++            Attribute group type: Primary Service (0x2800)
++
++This continues until the server responds with ``Attribute Not Found``::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #532 [hci0] 0.360069
++          ATT: Error Response (0x01) len 4
++            Read By Group Type Request (0x10)
++            Handle: 0x005d
++            Error: Attribute Not Found (0x0a)
++
++This error indicates that no more primary services exist beyond handle
++0x005d. The client now has the complete list of primary services.
++
++.. note::
++
++   The ``Attribute data length`` field indicates the size of each entry
++   in the response. A value of 6 means 16-bit UUIDs (2 bytes start
++   handle + 2 bytes end handle + 2 bytes UUID). A value of 20 means
++   128-bit UUIDs (2 + 2 + 16). If the server has both 16-bit and
++   128-bit service UUIDs, they are returned in separate responses
++   because all entries in a single response must have the same length.
++
++Phase 2: Secondary Service Discovery
++--------------------------------------
++
++After primary services, the client may discover secondary services
++using the same ``Read By Group Type Request`` but with the ``Secondary
++Service`` UUID (0x2801)::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #534 [hci0] 0.360752
++          ATT: Read By Group Type Request (0x10) len 6
++            Handle range: 0x0001-0xffff
++            Attribute group type: Secondary Service (0x2801)
++
++If no secondary services exist, the server responds with
++``Attribute Not Found``. Secondary services are not directly accessible
++to clients -- they are only reachable via include references from
++primary services.
++
++Phase 3: Included Service Discovery (Read By Type)
++----------------------------------------------------
++
++To discover which services include other services, the client uses
++``Read By Type Request`` with the ``Include`` UUID (0x2802)::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #540 [hci0] 0.480731
++          ATT: Read By Type Request (0x08) len 6
++            Handle range: 0x0001-0x005c
++            Attribute type: Include (0x2802)
++
++The handle range typically spans the entire discovered database. Each
++include declaration in the response identifies a service that is
++included by the service containing that handle.
++
++Phase 4: Characteristic Discovery (Read By Type)
++--------------------------------------------------
++
++For each service, the client discovers its characteristics using
++``Read By Type Request`` with the ``Characteristic`` UUID (0x2803).
++The handle range is limited to the service's handle range.
++
++**Request**::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #531 [hci0] 0.360063
++          ATT: Read By Type Request (0x08) len 6
++            Handle range: 0x0008-0x0011
++            Attribute type: Characteristic (0x2803)
++
++**Response**::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 27       #533 [hci0] 0.360714
++          ATT: Read By Type Response (0x09) len 22
++            Attribute data length: 7
++            Attribute data list: 3 entries
++            Handle: 0x0009
++            Value[5]: 200a00052a
++                Properties: 0x20
++                  Indicate (0x20)
++                Value Handle: 0x000a
++                Value UUID: Service Changed (0x2a05)
++            Handle: 0x000c
++            Value[5]: 0a0d00292b
++                Properties: 0x0a
++                  Read (0x02)
++                  Write (0x08)
++                Value Handle: 0x000d
++                Value UUID: Client Supported Features (0x2b29)
++            Handle: 0x000e
++            Value[5]: 020f002a2b
++                Properties: 0x02
++                  Read (0x02)
++                Value Handle: 0x000f
++                Value UUID: Database Hash (0x2b2a)
++
++Each characteristic entry provides:
++
++- **Handle** -- The handle of the characteristic declaration attribute.
++- **Properties** -- A bitmask indicating supported operations:
++
++  .. list-table::
++     :header-rows: 1
++     :widths: 10 30 60
++
++     * - Bit
++       - Property
++       - Description
++     * - 0x01
++       - Broadcast
++       - Can be broadcast in advertising data
++     * - 0x02
++       - Read
++       - Can be read
++     * - 0x04
++       - Write Without Response
++       - Can be written without acknowledgment
++     * - 0x08
++       - Write
++       - Can be written with acknowledgment
++     * - 0x10
++       - Notify
++       - Server can send notifications
++     * - 0x20
++       - Indicate
++       - Server can send indications
++     * - 0x40
++       - Authenticated Signed Writes
++       - Supports signed write commands
++     * - 0x80
++       - Extended Properties
++       - Has extended properties descriptor
++
++- **Value Handle** -- The handle where the characteristic's value is
++  stored (always declaration handle + 1).
++- **Value UUID** -- The UUID identifying the characteristic type.
++
++The client continues with advancing handle ranges until it receives
++``Attribute Not Found``::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #572 [hci0] 1.200228
++          ATT: Error Response (0x01) len 4
++            Read By Type Request (0x08)
++            Handle: 0x005c
++            Error: Attribute Not Found (0x0a)
++
++Phase 5: Descriptor Discovery (Find Information)
++--------------------------------------------------
++
++Descriptors occupy the handles between a characteristic's value handle
++and the next characteristic declaration (or end of service). The client
++discovers them using ``Find Information Request``.
++
++**Request**::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #556 [hci0] 0.959965
++          ATT: Find Information Request (0x04) len 4
++            Handle range: 0x000b-0x000b
++
++The handle range covers the gap between the characteristic value handle
++and the next characteristic declaration handle.
++
++**Response**::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 10       #561 [hci0] 0.961049
++          ATT: Find Information Response (0x05) len 5
++            Format: UUID-16 (0x01)
++            Handle: 0x000b
++            UUID: Client Characteristic Configuration (0x2902)
++
++Common descriptor UUIDs:
++
++.. list-table::
++   :header-rows: 1
++   :widths: 15 40 45
++
++   * - UUID
++     - Name
++     - Purpose
++   * - 0x2900
++     - Characteristic Extended Properties
++     - Additional property bits
++   * - 0x2901
++     - Characteristic User Description
++     - Human-readable description string
++   * - 0x2902
++     - Client Characteristic Configuration (CCC)
++     - Enable/disable notifications or indications
++   * - 0x2903
++     - Server Characteristic Configuration
++     - Server-side broadcast configuration
++   * - 0x2904
++     - Characteristic Presentation Format
++     - Data format, exponent, unit
++
++Phase 6: Reading Characteristic Values
++----------------------------------------
++
++After discovery, the client may read characteristic values using
++``Read Request``::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 7        #577 [hci0] 1.380203
++          ATT: Read Request (0x0a) len 2
++            Handle: 0x000f
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #579 [hci0] 1.380774
++          ATT: Read Response (0x0b) len 16
++            Value[16]: a470d508da8751a2a50b79da0250bfda
++
++The ``Handle`` in the request corresponds to a characteristic value
++handle from the discovery phase. btmon shows the raw value bytes; the
++interpretation depends on the characteristic UUID.
++
++Find By Type Value (Targeted Service Search)
++----------------------------------------------
++
++In addition to discovering all services, a client can search for a
++specific service UUID using ``Find By Type Value Request``::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 13       #513 [hci0] 0.124195
++          ATT: Find By Type Value Request (0x06) len 8
++            Handle range: 0x0001-0xffff
++            Attribute type: Primary Service (0x2800)
++              UUID: Generic Attribute Profile (0x1801)
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #515 [hci0] 0.124684
++          ATT: Find By Type Value Response (0x07) len 4
++            Handle range: 0x0008-0x0011
++
++This returns only the handle range for the matching service, without
++iterating through all services. If the service is not found::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #524 [hci0] 0.240607
++          ATT: Error Response (0x01) len 4
++            Find By Type Value Request (0x06)
++            Handle: 0x0012
++            Error: Attribute Not Found (0x0a)
++
++Bidirectional Discovery
++------------------------
++
++Both devices in a connection can act as GATT client and server
++simultaneously. In a btsnoop trace, you may see interleaved discovery
++in both directions:
++
++- **TX (``<``) requests + RX (``>``) responses** -- The local device
++  (whose trace this is) is acting as a GATT client, discovering the
++  remote device's services.
++- **RX (``>``) requests + TX (``<``) responses** -- The remote device
++  is acting as a GATT client, discovering the local device's services.
++
++For example, the local server responding to the remote's discovery::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #584 [hci0] 1.512006
++          ATT: Read By Group Type Request (0x10) len 6
++            Handle range: 0x0001-0xffff
++            Attribute group type: Primary Service (0x2800)
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 66       #586 [hci0] 1.518778
++          ATT: Read By Group Type Response (0x11) len 61
++            Attribute data length: 6
++            Attribute group list: 10 entries
++            Handle range: 0x0001-0x0007
++            UUID: Generic Access Profile (0x1800)
++            Handle range: 0x0008-0x0011
++            UUID: Generic Attribute Profile (0x1801)
++            Handle range: 0x0012-0x0014
++            UUID: Device Information (0x180a)
++            Handle range: 0x0015-0x001e
++            UUID: Coordinated Set Identification (0x1846)
++            Handle range: 0x001f-0x0020
++            UUID: Common Audio (0x1853)
++            Handle range: 0x0021-0x0024
++            UUID: Microphone Control (0x184d)
++            Handle range: 0x0041-0x004b
++            UUID: Volume Control (0x1844)
++            Handle range: 0x006b-0x0073
++            UUID: Broadcast Audio Scan (0x184f)
++            Handle range: 0x0074-0x0086
++            UUID: Published Audio Capabilities (0x1850)
++            Handle range: 0x0087-0x0096
++            UUID: Audio Stream Control (0x184e)
++
++This shows the local device's own GATT database as seen by the remote.
++To reconstruct the remote device's database, focus on the TX requests
++and RX responses (the local device acting as client).
++
++Building the Attribute Table
++-----------------------------
++
++To reconstruct the GATT database, extract the discovery responses and
++organize them into a table. Using the trace above as an example, the
++remote device at address 00:11:22:33:44:55 has:
++
++**Services** (from Read By Group Type Response)::
++
++    Handle Range    UUID                            Service Name
++    ──────────────  ──────────────────────────────  ────────────────────────────
++    0x0001-0x0009   0x1800                          Generic Access Profile
++    0x000a-0x0011   0x1801                          Generic Attribute Profile
++    0x0012-0x0014   0x180a                          Device Information
++    0x0015-0x0039   0x184c                          Generic Telephony Bearer
++    0x003a-0x0059   0x1849                          Generic Media Control
++    0x005a-0x005c   0x1855                          Telephony and Media Audio
++
++**Characteristics** (from Read By Type Response, within GAP 0x0001-0x0009)::
++
++    Handle  Value Handle  Properties  UUID    Name
++    ──────  ────────────  ──────────  ──────  ────────────────────────────────
++    0x0002  0x0003        Read        0x2a00  Device Name
++    0x0004  0x0005        Read        0x2a01  Appearance
++    0x0006  0x0007        Read        0x2a04  Peripheral Preferred Conn Params
++    0x0008  0x0009        Read        0x2aa6  Central Address Resolution
++
++**Characteristics** (within GATT 0x000a-0x0011)::
++
++    Handle  Value Handle  Properties       UUID    Name
++    ──────  ────────────  ───────────────  ──────  ────────────────────────────
++    0x000b  0x000c        Indicate         0x2a05  Service Changed
++    0x000e  0x000f        Read, Write      0x2b29  Client Supported Features
++    0x0010  0x0011        Read             0x2b2a  Database Hash
++
++**Descriptors** (from Find Information Response)::
++
++    Handle  UUID    Name
++    ──────  ──────  ────────────────────────────────────
++    0x000d  0x2902  Client Characteristic Configuration
++
++The CCC descriptor at handle 0x000d belongs to the Service Changed
++characteristic (0x000c), because it falls between that value handle
++and the next characteristic declaration at 0x000e.
++
+ EXAMPLES
+ ========
+ 
+@@ -779,6 +1196,22 @@ Recommended Workflow
+ 
+        grep -n "Status:" output.txt | grep -v "Success"
+ 
++7. **Extract GATT discovery**: Filter the GATT service/characteristic
++   discovery traffic (see `RECONSTRUCTING A GATT DATABASE FROM SNOOP
++   TRACES`_)::
++
++       # Find all service discovery responses
++       grep -n "Read By Group Type Response\|Attribute group list\|Handle range.*UUID" output.txt
++
++       # Find all characteristic discovery responses
++       grep -n "Read By Type Response\|Properties:\|Value Handle:\|Value UUID:" output.txt
++
++       # Find all descriptor discovery responses
++       grep -n "Find Information Response\|Format:\|Handle:.*UUID:" output.txt
++
++       # Find targeted service searches
++       grep -n "Find By Type Value" output.txt
++
+ Key Patterns for Connection Lifecycle
+ -------------------------------------
+ 
+-- 
+2.53.0
 
-
-> +@p1 depends on patch@
-> +expression E;
-> +@@
-> +(
-> +-	E !=3D NULL && !IS_ERR(E)
-> ++	!IS_ERR_OR_NULL(E)
-> +|
-> +-	E =3D=3D NULL || IS_ERR(E)
-> ++	IS_ERR_OR_NULL(E)
-> +|
-> +-	!IS_ERR(E) && E !=3D NULL
-> ++	!IS_ERR_OR_NULL(E)
-> +|
-> +-	IS_ERR(E) || E =3D=3D NULL
-> ++	IS_ERR_OR_NULL(E)
-> +)
-
-Did you eventually check probabilities for the occurrence of mentioned cas=
-e distinctions?
-
-
-> +@p2 depends on patch@
-=E2=80=A6
-
-I suggest to reconsider =E2=80=9Cside effects=E2=80=9D according to the sp=
-litting of these SmPL rules
-once more.
-
-
-=E2=80=A6
-> +@r2 depends on report || org@
-> +identifier I;
-> +expression E;
-> +position p;
-> +@@
-> +(
-> +*	(I =3D E) !=3D NULL && ... && !IS_ERR@p(I)
-> +|
-> +*	(I =3D E) =3D=3D NULL || ... || IS_ERR@p(I)
-> +)
-
-I doubt that the usage of SmPL asterisks fits to these two operation modes=
-.
-
-
-=E2=80=A6
-> +@p5 depends on patch disable unlikely @
-> +expression E;
-> +@@
-> +-\( likely \| unlikely \)(
-> +(
-> + IS_ERR_OR_NULL(E)
-> +|
-> + !IS_ERR_OR_NULL(E)
-> +)
-> +-)
-
-* Would it be nicer to move such SmPL code to the end of the patch rule li=
-sting?
-
-* Can this source code search pattern matter also for further operation mo=
-des?
-
-
-Regards,
-Markus
