@@ -1,166 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp86.cstnet.cn [159.226.251.86])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8F63009D4;
-	Wed, 11 Mar 2026 05:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1949729405
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 06:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773206020; cv=none; b=Cc7hQV9GgodxTlVcTtxHKIymC1Xg4S0sMHu/0bcoaO7Gq27+PQp0tT1IwvetCitf5qCuu9qpBN0dKefptjwkA/5DWg59iRKEdggDTw4Lv2QAqPrnjj4R2yP2TCu8J12b1em5zrfekZXLbZMFLLQqd8QLr5zreiqjWd6sPmjjd9c=
+	t=1773209394; cv=none; b=RfCCpA5P5yCOOUI0KntZg+EItQe1tT/uY4q8DhKtCWypNzwdZiI1y/Sf+hGEJNRYMYbhw+IIOZlaoyHuOB8fe02ujOlTx2ccY6MgRBl8XOXNn22ia6huSg98cxog3wopk3tKUboaABew+zIO/ux1dTYXXMy6XzkjpYGwP4VyjFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773206020; c=relaxed/simple;
-	bh=28by/08L5sQfVInnpnws13wBN8rSRzXkYuFZbXIDejE=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=HwyY7YfRAzZm5jwvgo6Fo7N57zCkXx+eASOsgnSNAfyEpcRa/Zi77VD7VkcFsy7idT0U2jjdLC1UDxvKJONFTEB5zDzVxAZXKHq3TvPq0HeGTwIq4E4CIbMxJ1eJxMogQGbEpJsXyqSURpVwuGgH4vFyNA37VgX9rlYgK49cw9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fBD8jk+A; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fBD8jk+A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B290C4CEF7;
-	Wed, 11 Mar 2026 05:13:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773206020;
-	bh=28by/08L5sQfVInnpnws13wBN8rSRzXkYuFZbXIDejE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fBD8jk+Az9XLzjQybetTno+W1ryvU+pJL+N7BKChPP4rEV9IYqgPEFF2K1MPy7V+I
-	 icuIUfL/Dg5/kgC+Hmy6YXnokVmu1zBps2v+geMH037tafu9KbfbPBt55PGuheVQJI
-	 z4qBbYgbztbgPszs8uOt3DWOo4BLsomiZb502AAVr8RGodlkXenJkrZoPQ7T4PM4Oz
-	 vrK0XegnvMjvVzXWSmVe1LK/JeGbm1OZeYQWd07yKlzuY4gn+/WuMImks+j3fST4ms
-	 212iplG27c78T1c+7zhxUp3BWeQ6jYmUF3g5aNFDkxAetR3pCSSickOn/0/x8U56nb
-	 McVwjAbkgnZAA==
-Date: Wed, 11 Mar 2026 14:13:32 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
- apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org,
- cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
- gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
- intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mm@kvack.org,
- linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
- linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
- sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, Masami
- Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>
-Subject: Re: [PATCH 15/61] trace: Prefer IS_ERR_OR_NULL over manual NULL
- check
-Message-Id: <20260311141332.b611237d36b61b2409e66cb3@kernel.org>
-In-Reply-To: <20260310100750.303af303@gandalf.local.home>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
-	<20260310-b4-is_err_or_null-v1-15-bd63b656022d@avm.de>
-	<20260310100750.303af303@gandalf.local.home>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1773209394; c=relaxed/simple;
+	bh=7prYcyHtuBmv6LxaxJnIi4WRyPULpW7rNbiGUZM6h4E=;
+	h=Date:From:To:Subject:Content-Type:MIME-Version:Message-ID; b=XVTAPo6jwsPP82ZobZGQ3JCkRfHO1fkpDJ0bTRY7ImpG4KmIap7ahhnPVKpQgYjR1qRYF3C7mFpBBZftoGVlZ8VKGTWTLYHN8VJeJLDnW/ijSsjHblenbTDQoNkvdQQu9aO38U2ibtdH5D99zCTENXRmBLI8aS2Q3PcOArgPUpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from pengpeng$iscas.ac.cn ( [23.249.16.216] ) by
+ ajax-webmail-APP-16 (Coremail) ; Wed, 11 Mar 2026 14:09:47 +0800
+ (GMT+08:00)
+Date: Wed, 11 Mar 2026 14:09:47 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5L6v5pyL5pyL?= <pengpeng@iscas.ac.cn>
+To: linux-bluetooth@vger.kernel.org
+Subject: [BUG] `ad_replace_name()` copies AD name payloads up to 254 bytes
+ into `utf8_name[250]`
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.1-cmXT5 build
+ 20240627(e6c6db66) Copyright (c) 2002-2026 www.mailtech.cn cnic.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Message-ID: <1d62d5cd.57f7e.19cdb8402e8.Coremail.pengpeng@iscas.ac.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:sQCowABXfLAsB7FpdTUWAA--.49623W
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/1tbiCRADBWmw+gUkbQABsx
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On Tue, 10 Mar 2026 10:07:50 -0400
-Steven Rostedt <rostedt@goodmis.org> wrote:
-
-> On Tue, 10 Mar 2026 12:48:41 +0100
-> Philipp Hahn <phahn-oss@avm.de> wrote:
-> 
-> > Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> > check.
-> 
-> Why?
-> 
-> > 
-> > Change generated with coccinelle.
-> > 
-> > To: Steven Rostedt <rostedt@goodmis.org>
-> > To: Masami Hiramatsu <mhiramat@kernel.org>
-> > To: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-> > Cc: linux-kernel@vger.kernel.org
-> > Cc: linux-trace-kernel@vger.kernel.org
-> > Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
-> > ---
-> >  kernel/trace/fprobe.c                | 2 +-
-> >  kernel/trace/kprobe_event_gen_test.c | 2 +-
-> >  kernel/trace/trace_events_hist.c     | 2 +-
-> >  3 files changed, 3 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/kernel/trace/fprobe.c b/kernel/trace/fprobe.c
-> > index dcadf1d23b8a31f571392d0c49cbd22df1716b4f..a94ce810d83b90f55d1178a9bd29c78fd068df4c 100644
-> > --- a/kernel/trace/fprobe.c
-> > +++ b/kernel/trace/fprobe.c
-> > @@ -607,7 +607,7 @@ static int fprobe_module_callback(struct notifier_block *nb,
-> >  	do {
-> >  		rhashtable_walk_start(&iter);
-> >  
-> > -		while ((node = rhashtable_walk_next(&iter)) && !IS_ERR(node))
-> > +		while (!IS_ERR_OR_NULL((node = rhashtable_walk_next(&iter))))
-> 
-> Ug, No!
-> 
-> That looks so much worse than the original.
-
-Hmm, now IS_ERR_OR_NULL() is an inline function, so it is safe.
-But if you want to use IS_ERR_OR_NULL() here, it will be better something like
-
-node = rhashtable_walk_next(&iter);
-while (!IS_ERR_OR_NULL(node)) {
-	fprobe_remove_node_in_module(mod, node, &alist);
-	node = rhashtable_walk_next(&iter);
-}
-
-Thanks,
-
-> 
-> -- Steve
-> 
-> >  			fprobe_remove_node_in_module(mod, node, &alist);
-> >  
-> >  		rhashtable_walk_stop(&iter);
-> > diff --git a/kernel/trace/kprobe_event_gen_test.c b/kernel/trace/kprobe_event_gen_test.c
-> > index 5a4b722b50451bfdee42769a6d3be39c055690d1..a1735ca273f0b756aa1fcfcdab30ddad9bc51c5f 100644
-> > --- a/kernel/trace/kprobe_event_gen_test.c
-> > +++ b/kernel/trace/kprobe_event_gen_test.c
-> > @@ -75,7 +75,7 @@ static struct trace_event_file *gen_kretprobe_test;
-> >  
-> >  static bool trace_event_file_is_valid(struct trace_event_file *input)
-> >  {
-> > -	return input && !IS_ERR(input);
-> > +	return !IS_ERR_OR_NULL(input);
-> >  }
-> >  
-> >  /*
-> > diff --git a/kernel/trace/trace_events_hist.c b/kernel/trace/trace_events_hist.c
-> > index 73ea180cad555898693e92ee397a1c9493c7c167..59df215e1dfd9349eca1c0823ed709ec7285f766 100644
-> > --- a/kernel/trace/trace_events_hist.c
-> > +++ b/kernel/trace/trace_events_hist.c
-> > @@ -3973,7 +3973,7 @@ trace_action_create_field_var(struct hist_trigger_data *hist_data,
-> >  	 */
-> >  	field_var = create_target_field_var(hist_data, system, event, var);
-> >  
-> > -	if (field_var && !IS_ERR(field_var)) {
-> > +	if (!IS_ERR_OR_NULL(field_var)) {
-> >  		save_field_var(hist_data, field_var);
-> >  		hist_field = field_var->var;
-> >  	} else {
-> > 
-> 
-
-
--- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
+SGVsbG8gQmx1ZVogbWFpbnRhaW5lcnMsCgpJIHdvdWxkIGxpa2UgdG8gcmVwb3J0IHdoYXQgYXBw
+ZWFycyB0byBiZSBhIHJlYWwgY3VycmVudC1oZWFkIGJvdW5kZWQgc3RhY2sgb3ZlcmZsb3cgaW4g
+dGhlIGFkdmVydGlzaW5nLWRhdGEgbmFtZSBwYXJzZXIuIEkgcmVjaGVja2VkIGN1cnJlbnQgdXBz
+dHJlYW0gaGVhZCBvbiAyMDI2LTAzLTEwIGJlZm9yZSB3cml0aW5nIHRoaXMgcmVwb3J0LgoKVGhl
+IGRlc3RpbmF0aW9uIGJ1ZmZlciBpczoKCmBgYGMKY2hhciB1dGY4X25hbWVbSENJX01BWF9OQU1F
+X0xFTkdUSCArIDJdOwpgYGAKCndpdGg6CgpgYGBjCiNkZWZpbmUgSENJX01BWF9OQU1FX0xFTkdU
+SCAyNDgKYGBgCgpzbyB0aGUgdG90YWwgc3RhY2sgYnVmZmVyIHNpemUgaXMgYDI1MGAgYnl0ZXMu
+CgpUaGUgdnVsbmVyYWJsZSBjb3B5IGlzOgoKYGBgYwptZW1zZXQodXRmOF9uYW1lLCAwLCBzaXpl
+b2YodXRmOF9uYW1lKSk7CnN0cm5jcHkodXRmOF9uYW1lLCAoY29uc3QgY2hhciAqKWlvdi0+aW92
+X2Jhc2UsIGlvdi0+aW92X2xlbik7CmBgYAoKVGhlIGxlbmd0aCBwYXNzZWQgdG8gdGhpcyBoZWxw
+ZXIgY29tZXMgZnJvbSBgYnRfYWRfbmV3X3dpdGhfZGF0YSgpYCwgd2hlcmUgdGhlIEFEIGVsZW1l
+bnQgbGVuZ3RoIGlzIHJlYWQgYXMgYSBgdWludDhfdGAsIHRoZW4gZGVjcmVtZW50ZWQgb25jZSBm
+b3IgdGhlIHR5cGUgYnl0ZToKCmBgYGMKd2hpbGUgKHV0aWxfaW92X3B1bGxfdTgoJmlvdiwgJmVs
+ZW4pKSB7CiAgICAuLi4KICAgIGlmICghdXRpbF9pb3ZfcHVsbF91OCgmaW92LCAmdHlwZSkpCiAg
+ICAgICAgZ290byBmYWlsZWQ7CiAgICBlbGVuLS07CiAgICAuLi4KICAgIGRhdGEgPSB1dGlsX2lv
+dl9wdWxsX21lbSgmaW92LCBlbGVuKTsKYGBgCgpTbyB0aGUgcGF5bG9hZCBsZW5ndGggZGVsaXZl
+cmVkIHRvIGBhZF9yZXBsYWNlX25hbWUoKWAgY2FuIGJlIGFzIGxhcmdlIGFzIGAyNTRgLCB3aGls
+ZSB0aGUgZGVzdGluYXRpb24gYnVmZmVyIGlzIG9ubHkgYDI1MGAgYnl0ZXMuCgpJIGFtIGRlbGli
+ZXJhdGVseSBub3Qgb3ZlcnN0YXRpbmcgdGhpczoKCi0gdGhpcyBpcyBwcm90b2NvbC1ib3VuZGVk
+LCBub3QgYXJiaXRyYXJ5IGxlbmd0aAotIHRoZSBtYXhpbXVtIG92ZXJ3cml0ZSBhbXBsaXR1ZGUg
+aXMgc21hbGwsIGFib3V0IDQgYnl0ZXMKCkJ1dCBpdCBzdGlsbCBsb29rcyBsaWtlIGEgcmVhbCBj
+dXJyZW50LWhlYWQgYnVnOgoKLSBmaXhlZCBzdGFjayBidWZmZXIgb2YgMjUwIGJ5dGVzCi0gY29w
+eSBsZW5ndGggY2FuIHJlYWNoIDI1NAotIG5vIGxvY2FsIGd1YXJkIGBpb3YtPmlvdl9sZW4gPD0g
+c2l6ZW9mKHV0ZjhfbmFtZSlgCgpUaGUgZml4IHNlZW1zIHN0cmFpZ2h0Zm9yd2FyZDogY2xhbXAg
+b3IgcmVqZWN0IGBpb3YtPmlvdl9sZW4gPiBzaXplb2YodXRmOF9uYW1lKSAtIDFgIGJlZm9yZSB0
+aGUgY29weSwgYW5kIHByZXNlcnZlIGV4cGxpY2l0IHRlcm1pbmF0aW9uLgoKQmVzdCByZWdhcmRz
+LApQZW5ncGVuZyBIb3U=
