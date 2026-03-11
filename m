@@ -1,256 +1,148 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666D13C0630;
-	Wed, 11 Mar 2026 08:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF03F3659E4;
+	Wed, 11 Mar 2026 09:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773219345; cv=none; b=l4swx8Tr3IzyBB0V+3w8Kc2Fi3OTgyTlB5VYm54X9xJuRtnKU+G58VI7Da+6N7Kg/ellqx1kX22cN1Tf/C/65MGnjfDU/Itw2MuIraUZQHuhRQ/cMzbBhAjcLvkG3QQ3GaD9if7rGSrnUYSbg7h5jO4CTfrnyOv21Q0IGueif5w=
+	t=1773220177; cv=none; b=I1hoHdX7qblGWcz1fx9y4BjhnpZRrSGVKgrBk9IN6kpVrizapc8OYc0QIJqqZkzJkIsx50hhWYDxuV757BnA4IhX0JCqJS5zE5LU2IRUn2NSU+1PXDe3sjPCPKEY2J3BWz9in0XAt7wSqGWjjjbmwJ7UMtxMQJSshcH8Hea7xwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773219345; c=relaxed/simple;
-	bh=9uyyFVC+dEr2i7ZqlE+cIRl9d4bFHWF9vTTuUqpF34A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bwps5svajYrnon5uZ5LwuAJcu329ACUIEVrfOJSzRwCPF/ftZ8ky7fTzJeKEabBIwtIgzsf4/u81JVbRM5qLTa9vVANr1KgyQbSjRboTGUxk0agLUJBUutog4+DPyhULIRqNLa2wi2NkB3+f2f+C8EuKX6vvkhdiq//GEnBJzbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.228] (p57bd9914.dip0.t-ipconnect.de [87.189.153.20])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2088E4C2C37D70;
-	Wed, 11 Mar 2026 09:54:40 +0100 (CET)
-Message-ID: <9199a462-09be-402a-a47a-447e51a2f5a4@molgen.mpg.de>
-Date: Wed, 11 Mar 2026 09:54:38 +0100
+	s=arc-20240116; t=1773220177; c=relaxed/simple;
+	bh=AU9ivEX+BuCYMmmOUFin+6rA4mF5dW4/KhPoli36HY4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YoX4jUyGtp3b2tIqtY+J24sZcaTZUlQFwsxxSLZS3LQJaUjmKrjH/g2i2oVeWNjwCi+xu77ZFenPMxXcQ/Ee/xvpzzDoWK/WNpmdFT8upnXGuOo0EuMuzfKEAOB0VxnqEjTw9raCVdCRhcWSe5g0uTScnavmzIvzKnk1enRGzWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=FPZ5GUWX; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="FPZ5GUWX"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62B7Q4oc2030858;
+	Wed, 11 Mar 2026 09:09:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=Qc72zRMJYB5xfq+4VzWzfmUItq0LEYA1CWF
+	7Rm7OGwE=; b=FPZ5GUWXdf+8RVAaqZUEy9PcSZuHVzv6g7INjrqsX/7K4pSA4kw
+	zBwdbn6DQsgnAFIxU2d5VNm3BnD8CMAObty/DV3s4pw2he/8eXDcfH4FD39hnrsO
+	NcxP3nkaD509Agu2OU/uxDlsgB81OSoz2OAtNRkE2SRHS5qhaXMDwByy+zpuKDGa
+	VVYzTcgo8PwBnCQZ6ULlFPaV5PAgzzCa6MJyY9VGMwphRUxtyceTlvJpZsnASycf
+	q6Mqd8OXMwRYdP2IzNlLgdHCrDixS2TmV3nPVFsmwmen50PanchSIU7MZUA8brRI
+	PjTrEPiYRRa/H+dTRuvUG40A9ZRB380t4hA==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cu40h0cf5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Mar 2026 09:09:26 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 62B99Oqc030582;
+	Wed, 11 Mar 2026 09:09:24 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4crd3mftwq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Mar 2026 09:09:24 +0000
+Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 62B99OtF030575;
+	Wed, 11 Mar 2026 09:09:24 GMT
+Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 62B99NV2030571
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Mar 2026 09:09:24 +0000
+Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
+	id 01AC15D6; Wed, 11 Mar 2026 17:09:22 +0800 (CST)
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
+        wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
+        mengshi.wu@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com
+Subject: [PATCH v1] arm64: dts: qcom: hamoa-iot-evk: support Bluetooth over both USB and UART
+Date: Wed, 11 Mar 2026 17:09:21 +0800
+Message-Id: <20260311090921.1892191-1-shuai.zhang@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: ISO: add timestamp for outgoing HCI ISO packet
-To: Tailu Shi <tailu.shi@samsung.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Pauli Virtanen <pav@iki.fi>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <CGME20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326@epcas5p4.samsung.com>
- <20260311081401.3832000-1-tailu.shi@samsung.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260311081401.3832000-1-tailu.shi@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzExMDA3NiBTYWx0ZWRfX9EZqZ65lQ4dW
+ hoWkRhhyYJbMdCaKNMRqJ26/9OusFhRCaKXxhW9THFvGMr/qpbSl04Ml7RCk3fCWfb1trhLmYEi
+ 6LHXApdBi4Kbfmzcqy702cp2GwS3B7lu+4JCOJUxYmJATlQ5sQzX177DfFKPlp0A4immulxIoa1
+ Rqb/bnF6dGlytMlcDpZQS1zGZv6R0hPy75jLBefC4e4NGtKXUaRwe7go2LHxtZkNY8m4UpCmLC5
+ lmj4Zi4cuSlJE7wPecAgtWWWk2Y53JCglsHvYPDAxJTCmTRbpQX1Wcf6kKAaKgXrfk5bF0DiXy0
+ 4GhQ0zsL03F+28CKRBQctrt0STi4/WTMBYkFKcD2f30d0XmjHsMwM1YZ1QS8CDAT5x0B34QUe+k
+ ykArT3OQylLid7LTxAOOsqV4s2t2m3q7si8xtciq83GZHiZVxCDvKUKfB8eCDLVsXsH6kd3XOO9
+ LzBFhT6+EenZEtVx+iA==
+X-Proofpoint-ORIG-GUID: ocC8inIoh1FTXDsfk_aNHGRV609KUNZK
+X-Authority-Analysis: v=2.4 cv=YJ+SCBGx c=1 sm=1 tr=0 ts=69b13146 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=eoimf2acIAo5FJnRuUoq:22 a=EUspDBNiAAAA:8 a=HMaGmTrOzvxuP8ZxLMIA:9
+X-Proofpoint-GUID: ocC8inIoh1FTXDsfk_aNHGRV609KUNZK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-11_01,2026-03-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 phishscore=0 clxscore=1011 lowpriorityscore=0 adultscore=0
+ spamscore=0 bulkscore=0 priorityscore=1501 malwarescore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603110076
 
-Dear Tailu,
+When Bluetooth supports both USB and UART, the BT UART driver is
+always loaded, while USB is hot-pluggable. As a result, when Bluetooth
+is used over USB, the UART driver still be probed and drive BT_EN low,
+which causes the Bluetooth device on USB to be disconnected.
 
+Configure BT_EN as a GPIO hog so that it is controlled by the platform
+instead of the UART driver, preventing BT over USB from being
+unintentionally powered down.
 
-Thank you for your patch. A formal request at the beginning to please 
-spell your name without the dot/period – maybe: Tailu Shi.
+Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+---
+ arch/arm64/boot/dts/qcom/hamoa-iot-evk.dts | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-     git config --global user.name "Tailu Shi"
-     git commit --amend -s --author="Tailu Shi <tailu.shi@samsung.com>"
+diff --git a/arch/arm64/boot/dts/qcom/hamoa-iot-evk.dts b/arch/arm64/boot/dts/qcom/hamoa-iot-evk.dts
+index 630642baa435..60a0b3ecbc1b 100644
+--- a/arch/arm64/boot/dts/qcom/hamoa-iot-evk.dts
++++ b/arch/arm64/boot/dts/qcom/hamoa-iot-evk.dts
+@@ -647,10 +647,9 @@ wcn7850-pmu {
+ 		vddrfa1p2-supply = <&vreg_wcn_1p9>;
+ 		vddrfa1p8-supply = <&vreg_wcn_1p9>;
+ 
+-		bt-enable-gpios = <&tlmm 116 GPIO_ACTIVE_HIGH>;
+ 		wlan-enable-gpios = <&tlmm 117 GPIO_ACTIVE_HIGH>;
+ 
+-		pinctrl-0 = <&wcn_bt_en>, <&wcn_wlan_en>;
++		pinctrl-0 = <&wcn_wlan_en>;
+ 		pinctrl-names = "default";
+ 
+ 		regulators {
+@@ -1398,11 +1397,12 @@ wcd_default: wcd-reset-n-active-state {
+ 		output-low;
+ 	};
+ 
+-	wcn_bt_en: wcn-bt-en-state {
+-		pins = "gpio116";
+-		function = "gpio";
+-		drive-strength = <2>;
+-		bias-disable;
++	wcn_bt_en_hog: wcn-bt-en-state-hog {
++		gpio-hog;
++		gpios = <116 GPIO_ACTIVE_HIGH>;
++		output-high;
++		input-disable;
++		link-name = "BT_EN";
+ 	};
+ 
+ 	wcn_wlan_en: wcn-wlan-en-state {
+-- 
+2.34.1
 
-Am 11.03.26 um 09:14 schrieb tailu.shi:
-> The Bluetooth Core Specification defines the 'Time_Stamp' field of
-> an HCI ISO packet as optional. However, it's mandatory to include
-> the 'Time_Stamp' field when using HCI ISO packets per section 3.3
-> 'HCI Feature Support Requirement' of TMAP specification.
-> https://www.bluetooth.com/specifications/specs/html/?src=TMAP_v1.0.1/out/en/index-en.html#UUID-68138fa8-fd1f-1a1b-e552-ddcd8fede9ec
-> 
-> To comply with TMAP, introduce a new socket option BT_PKT_ISO_TIMESTAMP
-> that allows user application (e.g. PipeWire) to attach timestamp to the
-> data it sends to the ISO socket within BT_SCM_PKT_ISO_TIMESTAMP CMSG.
-> 
-> When the option is enabled, the kernel extracts the timestamp and copies
-> it into the 'Time_Stamp' field of the outgoing HCI ISO packet.
-> 
-> This also gives the controller the reference timing information
-> required for ISO stream synchronization.
-> 
-> A corresponding userspace change is required for full functionality.
-> A reference implementation is available in PipeWire:
-> https://gitlab.freedesktop.org/shitailu/pipewire/-/commit/5b3bd74e15febb974c8737a64f31fd17e18cd11b
-
-Is the timestamp correctly visible in the btmon trace?
-
-> Signed-off-by: tailu.shi <tailu.shi@samsung.com>
-> ---
->   include/net/bluetooth/bluetooth.h |  5 ++++
->   include/net/bluetooth/hci_core.h  |  1 +
->   net/bluetooth/hci_core.c          |  2 +-
->   net/bluetooth/iso.c               | 49 +++++++++++++++++++++++++++----
->   4 files changed, 50 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 69eed69f7f26..f88c83d21c5e 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -259,6 +259,10 @@ struct bt_codecs {
->   
->   #define BT_SCM_PKT_SEQNUM	0x05
->   
-> +#define BT_PKT_ISO_TIMESTAMP     23
-> +
-> +#define BT_SCM_PKT_ISO_TIMESTAMP 0x06
-> +
->   __printf(1, 2)
->   void bt_info(const char *fmt, ...);
->   __printf(1, 2)
-> @@ -409,6 +413,7 @@ enum {
->   	BT_SK_SUSPEND,
->   	BT_SK_PKT_STATUS,
->   	BT_SK_PKT_SEQNUM,
-> +	BT_SK_PKT_ISO_TIMESTAMP,
->   };
->   
->   struct bt_sock_list {
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a7bffb908c1e..e39d192f8ef6 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -740,6 +740,7 @@ struct hci_conn {
->   	struct bt_iso_qos iso_qos;
->   	__u8		num_bis;
->   	__u8		bis[HCI_MAX_ISO_BIS];
-> +	bool		iso_pkt_ts;
->   
->   	unsigned long	flags;
->   
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 31308c1de4ec..4264c0229dfb 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3335,7 +3335,7 @@ static void hci_queue_iso(struct hci_conn *conn, struct sk_buff_head *queue,
->   
->   	list = skb_shinfo(skb)->frag_list;
->   
-> -	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, 0x00);
-> +	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, conn->iso_pkt_ts ? 0x01 : 0x00);
->   	hci_add_iso_hdr(skb, conn->handle, flags);
->   
->   	if (!list) {
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index be145e2736b7..dd4d198bab4c 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -73,6 +73,9 @@ struct iso_pinfo {
->   	__u8			base_len;
->   	__u8			base[BASE_MAX_LENGTH];
->   	struct iso_conn		*conn;
-> +	bool			ts_flag;
-> +	__u32			ts;
-> +
->   };
->   
->   static struct bt_iso_qos default_qos;
-> @@ -542,6 +545,7 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
->   	struct iso_conn *conn = iso_pi(sk)->conn;
->   	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
->   	struct hci_iso_data_hdr *hdr;
-> +	struct hci_iso_ts_data_hdr *hdr_ts;
->   	int len = 0;
->   
->   	BT_DBG("sk %p len %d", sk, skb->len);
-> @@ -552,13 +556,20 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
->   	len = skb->len;
->   
->   	/* Push ISO data header */
-> -	hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
-> -	hdr->sn = cpu_to_le16(conn->tx_sn++);
-> -	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
-> -						      HCI_ISO_STATUS_VALID));
-> +	if (iso_pi(sk)->ts_flag) {
-> +		hdr_ts = skb_push(skb, HCI_ISO_TS_DATA_HDR_SIZE);
-> +		hdr_ts->ts = cpu_to_le32(iso_pi(sk)->ts);
-> +		hdr_ts->sn = cpu_to_le16(conn->tx_sn++);
-> +		hdr_ts->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
-> +	} else {
-> +		hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
-> +		hdr->sn = cpu_to_le16(conn->tx_sn++);
-> +		hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
-> +	}
->   
->   	if (sk->sk_state == BT_CONNECTED) {
->   		hci_setup_tx_timestamp(skb, 1, sockc);
-> +		conn->hcon->iso_pkt_ts = iso_pi(sk)->ts_flag;
->   		hci_send_iso(conn->hcon, skb);
->   	} else {
->   		len = -ENOTCONN;
-> @@ -1471,7 +1482,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
->   	struct sock *sk = sock->sk;
->   	struct sk_buff *skb, **frag;
->   	struct sockcm_cookie sockc;
-> -	size_t mtu;
-> +	struct cmsghdr *cm;
-> +	size_t mtu, hlen;
->   	int err;
->   
->   	BT_DBG("sock %p, sk %p", sock, sk);
-> @@ -1485,10 +1497,23 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
->   
->   	hci_sockcm_init(&sockc, sk);
->   
-> +	iso_pi(sk)->ts_flag = false;
->   	if (msg->msg_controllen) {
->   		err = sock_cmsg_send(sk, msg, &sockc);
->   		if (err)
->   			return err;
-> +
-> +		for (cm = CMSG_FIRSTHDR(msg); cm; cm = CMSG_NXTHDR(msg, cm)) {
-> +			if (cm->cmsg_level != SOL_BLUETOOTH)
-> +				continue;
-> +			if (test_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags) &&
-> +			    cm->cmsg_type == BT_SCM_PKT_ISO_TIMESTAMP &&
-> +			    cm->cmsg_len == CMSG_LEN(sizeof(u32))) {
-> +				iso_pi(sk)->ts_flag = true;
-> +				iso_pi(sk)->ts = *(u32 *)CMSG_DATA(cm);
-> +				break;
-> +			}
-> +		}
->   	}
->   
->   	lock_sock(sk);
-> @@ -1502,7 +1527,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
->   
->   	release_sock(sk);
->   
-> -	skb = bt_skb_sendmsg(sk, msg, len, mtu, HCI_ISO_DATA_HDR_SIZE, 0);
-> +	hlen = iso_pi(sk)->ts_flag ? HCI_ISO_TS_DATA_HDR_SIZE : HCI_ISO_DATA_HDR_SIZE;
-> +	skb = bt_skb_sendmsg(sk, msg, len, mtu, hlen, 0);
->   	if (IS_ERR(skb))
->   		return PTR_ERR(skb);
->   
-> @@ -1840,6 +1866,17 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
->   
->   		break;
->   
-> +	case BT_PKT_ISO_TIMESTAMP:
-> +		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
-> +		if (err)
-> +			break;
-> +
-> +		if (opt)
-> +			set_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
-> +		else
-> +			clear_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
-> +		break;
-> +
->   	default:
->   		err = -ENOPROTOOPT;
->   		break;
-
-The diff looks good.
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
