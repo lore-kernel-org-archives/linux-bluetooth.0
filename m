@@ -1,85 +1,121 @@
-Received: from cstnet.cn (smtp86.cstnet.cn [159.226.251.86])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E605286891
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 02:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A6A23ABA8;
+	Wed, 11 Mar 2026 04:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773197101; cv=none; b=c2ed9JGKELtMWfzcV7D+wiw9AOU62DnTuE1+m5RccFQLcSBxE1KuLS0ao7lSTd1s/XBdVjCAKkvO0zUW811mR9dpKj59LRZqR2Xeu/QVkOm9KXpVSCALTVOkvkc/KIXTumIu3ABHsk8ev+YolEC08Emck43h1o3kbcEGbsNa9qA=
+	t=1773205159; cv=none; b=AfUOn7Xr22tdivnqiMJmXtugg75clXxy/ixinW+84d9P9bQcU6XygWynS5vcLY1bvg0ClT+/FZLNRV3acp/hmfB7bGKfikZIxgb4DM7rG+GfxYVjjZgSZlcXDJ+WHdNfJlM6MXdJ14xAjKoxZwyPwj2kpc1le2hoxL9iMo6ym0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773197101; c=relaxed/simple;
-	bh=WGZAqI4HfrvCjv2HDUtQ7RDy1cjHeS3iqAH0TJ8hkjI=;
-	h=Date:From:To:Subject:Content-Type:MIME-Version:Message-ID; b=TbGSiUpTpSsDFrnm826iUIaweoxYiPquLZawMO7gH2zXCTvd5vAZ0ukzDD/0egY9AH6fI/eiXR5N7j+/ZYMS9f6UjdkJJJwUTA1RrdUbG+H+K1Fy80qeZyEt1Em6nkqkI9PKFmXdHe6f/2xQlMiJEhiDvg+KzAulImJqbGd9J+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from pengpeng$iscas.ac.cn ( [23.249.16.216] ) by
- ajax-webmail-APP-16 (Coremail) ; Wed, 11 Mar 2026 10:44:54 +0800
- (GMT+08:00)
-Date: Wed, 11 Mar 2026 10:44:54 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5L6v5pyL5pyL?= <pengpeng@iscas.ac.cn>
-To: linux-bluetooth@vger.kernel.org
-Subject: [BUG] bluez: Buffer overflow in emulator/bthost.c
- (bthost_set_pin_code)
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.1-cmXT5 build
- 20240627(e6c6db66) Copyright (c) 2002-2026 www.mailtech.cn cnic.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1773205159; c=relaxed/simple;
+	bh=hs7h01zebVZ3Cw5TSlyQoCCjwzUa+l8Cgq+3i/i+v4I=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=d+XpBF8R6hSjSTcMBfmH4ILegC+T+VFU6cnWCeL1UynvVuQvwhGK9HU46EbLxpSuUjgEosLLNlyp/vWQRByhJqvaUVytBWX5j1mOlK0gjr5ZpJ0vTdvEsR3BRMdUbUK3k1H4T5bY1NHCoXs6ClvsiRYESo1PnmzsuR0fJZq8vHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R7QWHNq5; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R7QWHNq5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7C9CC4CEF7;
+	Wed, 11 Mar 2026 04:59:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773205158;
+	bh=hs7h01zebVZ3Cw5TSlyQoCCjwzUa+l8Cgq+3i/i+v4I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R7QWHNq5KYIpTwVo6Up5GHHSOdSE2gpk5GaKkIBbqjAR4gbzmNPFWIlQW10KkTPof
+	 EwepFELDieEhDwLa7MFg7ekO96kgeq0l/+LlK0SmYNrKgD9B5JFn2p8cKdN19q4bAB
+	 ZH5nM61a+EeP1bfo59H2leGLnAv8MA9DVbVTjKyoY75UQZCsrcqb+6U4ml2aryZAOd
+	 53HkEOSnemZkK807SePgE6JYJ0qIK9ypnQbQrEKCx7cEo9CjlroOKs6BchxOV0buhD
+	 E4Ehzc8FteV6XUFhu9KE6nGI0Pkr7s204WVgcSsEwXmzro7D3LuhuKd0AU39V1R3Ja
+	 2cWkRLISF31UQ==
+Date: Wed, 11 Mar 2026 13:59:11 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
+ bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+ intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mm@kvack.org,
+ linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+ sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, Philipp Zabel
+ <p.zabel@pengutronix.de>
+Subject: Re: [PATCH 57/61] reset: Prefer IS_ERR_OR_NULL over manual NULL
+ check
+Message-Id: <20260311135911.ced50d67e940cdf933a98d1a@kernel.org>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-57-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+	<20260310-b4-is_err_or_null-v1-57-bd63b656022d@avm.de>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-ID: <230f49fc.5755b.19cdac87040.Coremail.pengpeng@iscas.ac.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:sQCowAAXO68n17BpcyUWAA--.10902W
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/1tbiCREDBWmwubglDwAEso
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-RGVhciBCbHVlWiBEZXZlbG9wZXJzLAoKICBJIGFtIHJlcG9ydGluZyBhIGJ1ZmZlciBvdmVyZmxv
-dyAoaW50cmEtb2JqZWN0IG92ZXJmbG93KSBkaXNjb3ZlcmVkIGluIHRoZSBCbHVlWiBlbXVsYXRv
-ciBjb2RlIHdpdGhpbiBlbXVsYXRvci9idGhvc3QuYy4gVGhpcyBpc3N1ZSBhbGxvd3MgYSBjYWxs
-ZXIgb2YgdGhlIGVtdWxhdG9yIEFQSSB0bwogIG92ZXJ3cml0ZSBpbnRlcm5hbCBzdGF0ZSBvZiB0
-aGUgYnRob3N0IHN0cnVjdHVyZSBkdWUgdG8gbWlzc2luZyBib3VuZHMgY2hlY2tpbmcuCgogIFZ1
-bG5lcmFiaWxpdHkgQW5hbHlzaXMKCiAgSW4gZW11bGF0b3IvYnRob3N0LmMsIHRoZSBmdW5jdGlv
-biBidGhvc3Rfc2V0X3Bpbl9jb2RlKCkgY29waWVzIGEgUElOIGNvZGUgaW50byBhIGZpeGVkLXNp
-emUgYnVmZmVyIHdpdGhpbiB0aGUgc3RydWN0IGJ0aG9zdC4gSG93ZXZlciwgaXQgZG9lcyBub3Qg
-dmVyaWZ5IGlmIHRoZSBwcm92aWRlZAogIHBpbl9sZW4gZXhjZWVkcyB0aGUgZGVzdGluYXRpb24g
-YnVmZmVyJ3MgY2FwYWNpdHkuCgogIFJlbGV2YW50IFN0cnVjdHVyZSBEZWZpbml0aW9uOgoKICAg
-MSBzdHJ1Y3QgYnRob3N0IHsKICAgMiAgICAgLi4uCiAgIDMgICAgIHVpbnQ4X3QgcGluWzE2XTsg
-ICAgICAgLy8gRml4ZWQgc2l6ZTogMTYgYnl0ZXMKICAgNCAgICAgdWludDhfdCBwaW5fbGVuOyAg
-ICAgICAvLyBBZGphY2VudCBtZW1iZXIKICAgNSAgICAgdWludDhfdCBpb19jYXBhYmlsaXR5OyAv
-LyBBZGphY2VudCBtZW1iZXIKICAgNiAgICAgdWludDhfdCBhdXRoX3JlcTsgICAgICAvLyBBZGph
-Y2VudCBtZW1iZXIKICAgNyAgICAgLi4uCiAgIDggfTsKCiAgVnVsbmVyYWJsZSBGdW5jdGlvbiAo
-c3JjL2VtdWxhdG9yL2J0aG9zdC5jOjQwNjQpOgoKICAgMSB2b2lkIGJ0aG9zdF9zZXRfcGluX2Nv
-ZGUoc3RydWN0IGJ0aG9zdCAqYnRob3N0LCBjb25zdCB1aW50OF90ICpwaW4sCiAgIDIgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHVpbnQ4X3QgcGluX2xlbikKICAgMyB7CiAgIDQgICAgIC8v
-IHBpbl9sZW4gaXMgdWludDhfdCAoMC0yNTUpLCBidGhvc3QtPnBpbiBpcyBvbmx5IDE2IGJ5dGVz
-LgogICA1ICAgICAvLyBOTyBjaGVjazogaWYgKHBpbl9sZW4gPiBzaXplb2YoYnRob3N0LT5waW4p
-KQogICA2ICAgICBtZW1jcHkoYnRob3N0LT5waW4sIHBpbiwgcGluX2xlbik7CiAgIDcgICAgIGJ0
-aG9zdC0+cGluX2xlbiA9IHBpbl9sZW47CiAgIDggfQoKICBJbXBhY3QKCiAgSWYgYW4gZXh0ZXJu
-YWwgdGVzdCB0b29sIG9yIGFuIGF1dG9tYXRlZCB0ZXN0IGNhc2UgcGFzc2VzIGEgcGluX2xlbiBn
-cmVhdGVyIHRoYW4gMTYgKHVwIHRvIDI1NSkgdG8gdGhpcyBmdW5jdGlvbjoKICAgMS4gTWVtb3J5
-IENvcnJ1cHRpb246IG1lbWNweSB3aWxsIG92ZXJmbG93IHRoZSBidGhvc3QtPnBpbiBhcnJheS4K
-ICAgMi4gU3RhdGUgQ29ycnVwdGlvbjogSXQgd2lsbCBvdmVyd3JpdGUgYWRqYWNlbnQgbWVtYmVy
-cyBpbiB0aGUgc3RydWN0IGJ0aG9zdCwgc3BlY2lmaWNhbGx5IHBpbl9sZW4sIGlvX2NhcGFiaWxp
-dHksIGFuZCBhdXRoX3JlcS4KICAgMy4gVW5kZWZpbmVkIEJlaGF2aW9yOiBUaGlzIGNvcnJ1cHRp
-b24gY2FuIGxlYWQgdG8gdW5wcmVkaWN0YWJsZSBiZWhhdmlvciBpbiB0aGUgZW11bGF0b3Igb3Ig
-Y3Jhc2hlcyBkdXJpbmcgdGhlIGV4ZWN1dGlvbiBvZiB0ZXN0IHN1aXRlcy4KCiAgU3VnZ2VzdGVk
-IEZpeAoKICBJIHJlY29tbWVuZCBhZGRpbmcgYSBib3VuZHMgY2hlY2sgdG8gZW5zdXJlIHRoZSBw
-aW5fbGVuIGRvZXMgbm90IGV4Y2VlZCB0aGUgc2l6ZSBvZiB0aGUgcGluIGFycmF5OgoKCiAgIDEg
-dm9pZCBidGhvc3Rfc2V0X3Bpbl9jb2RlKHN0cnVjdCBidGhvc3QgKmJ0aG9zdCwgY29uc3QgdWlu
-dDhfdCAqcGluLAogICAyICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50OF90IHBpbl9s
-ZW4pCiAgIDMgewogICA0ICAgICBpZiAocGluX2xlbiA+IHNpemVvZihidGhvc3QtPnBpbikpCiAg
-IDUgICAgICAgICBwaW5fbGVuID0gc2l6ZW9mKGJ0aG9zdC0+cGluKTsKICAgNgogICA3ICAgICBt
-ZW1jcHkoYnRob3N0LT5waW4sIHBpbiwgcGluX2xlbik7CiAgIDggICAgIGJ0aG9zdC0+cGluX2xl
-biA9IHBpbl9sZW47CiAgIDkgfQoKICBJIGhhdmUgdmVyaWZpZWQgdGhpcyBpc3N1ZSB1c2luZyBh
-IHJlcHJvZHVjdGlvbiBjYXNlIHdpdGhpbiB0aGUgZW11bGF0b3IgZW52aXJvbm1lbnQsIGNvbmZp
-cm1pbmcgdGhhdCBwcm92aWRlZCBQSU5zIGxvbmdlciB0aGFuIDE2IGJ5dGVzIGltbWVkaWF0ZWx5
-IGNvcnJ1cHQgdGhlCiAgaW9fY2FwYWJpbGl0eSBmaWVsZC4KCkJlc3QgcmVnYXJkcywKUGVuZ3Bl
-bmcgSG91CnBlbmdwZW5nQGlzY2FzLmFjLmNuCg==
+On Tue, 10 Mar 2026 12:49:23 +0100
+Philipp Hahn <phahn-oss@avm.de> wrote:
+
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
+> 
+> Semantich change: Previously the code only printed the warning on error,
+> but not when the pointer was NULL. Now the warning is printed in both
+> cases!
+> 
+> Change found with coccinelle.
+> 
+> To: Philipp Zabel <p.zabel@pengutronix.de>
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> ---
+>  drivers/reset/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/reset/core.c b/drivers/reset/core.c
+> index fceec45c8afc1e74fe46311bdc023ff257e8d770..649bb4ebabb20a09349ccbfc62f8280621df450e 100644
+> --- a/drivers/reset/core.c
+> +++ b/drivers/reset/core.c
+> @@ -715,7 +715,7 @@ EXPORT_SYMBOL_GPL(reset_control_bulk_acquire);
+>   */
+>  void reset_control_release(struct reset_control *rstc)
+>  {
+> -	if (!rstc || WARN_ON(IS_ERR(rstc)))
+> +	if (WARN_ON(IS_ERR_OR_NULL(rstc)))
+
+This changes the behavior when rstc == NULL.
+WARN_ON does not hit when rstc == NULL in the original code.
+
+Thanks,
+
+>  		return;
+>  
+>  	if (reset_control_is_array(rstc))
+> 
+> -- 
+> 2.43.0
+> 
+> 
+
+
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
