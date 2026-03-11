@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0F3372B44
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 16:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08AA20C029
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 16:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773245788; cv=pass; b=Tq8Ju/LX8bUEwyRtqM1ODD2CIHiJba00mhYNQlOGZuICueS3vOcdK++tFkmOc/KRMFERl0F6eHkf8+T4nWAkfkjAtdsqERoCbMy5NBeEBIVoILlQbv0F9wA/4cGHnn6ElTM7CUqCBnRdifTVNHe4xYHXd6Q4JPjxysb2ZcqDl0M=
+	t=1773245789; cv=pass; b=Z4IDHJPg8EEu9bMpI3t6lLO4VeWWywE7jhASPynAUocubiKkiyltqt6BQWkMtqeJe7eyoZlXeVfSNpZol9qeTu000L3VvpJ5pgtMV27M52wgU7fsUC4zcz7JBGEHJVmjIZ9X1Nl2IDY4Fz+IurxQav0kJ72I97q0U+uZa6O0OLo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773245788; c=relaxed/simple;
-	bh=1fLln2td069EBYmkdMtJtaIwPgp6zyoHvJgsOLt+lZk=;
+	s=arc-20240116; t=1773245789; c=relaxed/simple;
+	bh=6leTHRnlbJfG3KHnyyoXghV+pPVwTBHSaP8/EjVYSIY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pC6iERxFi83lIIvIyceWuFgSGD8FYk/UEhkUAK2DqmMs/y/Ed2It2La8C2pseVwJj0edDwMD4NcnifpU1ENHKo/GfJWXkCunufF5WRhX0BigfpUf9y1eF1erivNRM67ga9XWeg3jg4KOx0/icQnRQem+I9BZ2UDl3NsUniEHD8s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=up5trVJN; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=RDQujjJVRRXZYOqJ17rhJeIpk24DQOySO13bMSbkYc4StnxY67X63JcuE8maSJr+FO5Oc0m1O9ZvhuiHoAJeYauWqtF3UhU4rJGDqKHU9zJuKidcoaK2DqW3gm4rO6Qpz0fkPYQpzE9O0Dc6uSMmXh8JEwWi8Y4IGyuaCxKeFjM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=ZOHrt9K/; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="up5trVJN"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="ZOHrt9K/"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fWG8T0K0mzyw9;
-	Wed, 11 Mar 2026 18:16:24 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fWG8R5rzNzyXV;
+	Wed, 11 Mar 2026 18:16:23 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1773245785;
+	t=1773245784;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=g7u6QDPOZ/84xkSgw6FTKJkXAmYOMHjksTJyAQ/6zIU=;
-	b=up5trVJNxxkw1U3xDjaHp9/72q6YC1+erSVGd2mW02IXmVf1TCeZuhVK4kJXL60+nrs0KK
-	KqlV5QkW1VV22WSoie9YhWFEUG5k09QBidthtx7ylXrL0escmBNtn0ZhjOrSsIa/xqP7q5
-	/U94X2W7mF7+QuMHlhh8efa8A+mVpfE=
+	bh=ZinvHRQO0d4jy0rclmI0cTjTnMI0cBWcGhRTQXXBvcY=;
+	b=ZOHrt9K/gbTbg5UTev2p8j2ypejt4zFZFaS9tartNdY4wkRAojA3FNg/JxZIoPLB7lsz1G
+	z8FMdPOueYfnijPyffJzQqW/emVQjmBuw2eSOZsT5UTwEMMzgxlUihuTjiSlFa7hnlNUmb
+	73zEInZaA30JsrwhuUWzp5PAjG1MgTI=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1773245785;
+	s=meesny; t=1773245784;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=g7u6QDPOZ/84xkSgw6FTKJkXAmYOMHjksTJyAQ/6zIU=;
-	b=whmQ04y+vMvCl5TSw8qCzxEsR6c676MY9W8Lp2/6wgumcBO1gx6rgJF7iZyMPdLMLIpxPM
-	cTcDvPxqB45QZ7h5YLGF7Mlswq9IrkdzkdZy0E5zv2SwpZWL0Pk/YiOdv8fZTqulnwC056
-	WR8MmqlZlwMyc5FsH9xMDCGytVh3Zic=
+	bh=ZinvHRQO0d4jy0rclmI0cTjTnMI0cBWcGhRTQXXBvcY=;
+	b=IJ1ObuNAYmN7NBqE4E7qZsFQxFpX+/7C/IzPQUaGUN2CKtP4kTZx5yEWkanIieVU7Lsp3B
+	fKaPHSQVyz+TY641qoBel42IC2X3mGFLknxA0YdXilxzkfS8IACDDqQIW38UWa+9jIHYJr
+	qFHFfkwdJnXkMquIyJUHxRyfmqJeo7w=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1773245785;
-	b=AYSd2oTmgPUpqjzPbYxFQo8Mwt8euuZQG+ZGpfNZCmC0w0PExE+XwfklUC32ZpnrO/yPCd
-	mUuUF3oh4wSM/UTGUhjahLyvmnXEFR93ZykLl2qr3P9McxOLVftBeA17yoTwz3vaOZkmoM
-	EF5EFP1tbnKnrA2JZv47e82XFuNpiZ8=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1773245784;
+	b=IL3IRxZBYQ4I0LpjJxBbhpWsJNS3AjqxtmqRwe8bQVFB0wavFZmxlRHFGWwMWso/Kvn43W
+	g3RDalHNWC+qjU7vZ7hG9FW5kTWAcdfDC3srR8apzImWhIF8A2JnyBGw4ygskejPkewM+v
+	r7PIHy9qYQIy3xqOjPERPITP1S3da8E=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [RFC PATCH BlueZ 3/4] iso-tester: add tests for ISO HW timestamps
-Date: Wed, 11 Mar 2026 18:16:19 +0200
-Message-ID: <095ffc4c52e432c97b7a2ca4c2541c216e3bb450.1773245672.git.pav@iki.fi>
+Subject: [RFC PATCH BlueZ 1/4] bthost: fix receiving timestamped ISO packets
+Date: Wed, 11 Mar 2026 18:16:17 +0200
+Message-ID: <3c9b3d899d6e4b042e532abdb99048d1e04ff99b.1773245672.git.pav@iki.fi>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1773245672.git.pav@iki.fi>
 References: <cover.1773245672.git.pav@iki.fi>
@@ -67,268 +67,207 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add tests that check LE Read ISO TX Sync handling in kernel
-
-ISO Send - HW Timestamping
-ISO Send - SWHW Timestamping
+Parse timestamped ISO packets correctly. Pass sequence number and
+timestamp to the hook callback.
 ---
- tools/iso-tester.c   | 36 +++++++++++++++++++++++++-
- tools/l2cap-tester.c |  2 +-
- tools/sco-tester.c   |  2 +-
- tools/tester.h       | 60 +++++++++++++++++++++++++++++++++++++-------
- 4 files changed, 88 insertions(+), 12 deletions(-)
+ emulator/bthost.c  | 83 ++++++++++++++++++++++++++++++----------------
+ emulator/bthost.h  |  2 +-
+ tools/iso-tester.c |  3 +-
+ 3 files changed, 58 insertions(+), 30 deletions(-)
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 2ddb29a00..fb04ab642 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -1051,6 +1051,31 @@ static const struct iso_client_data connect_send_tx_cmsg_timestamping = {
- 	.cmsg_timestamping = true,
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index b913c8015..7056dd8d1 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -47,6 +47,8 @@
+ #define iso_flags_pb(f)		(f & 0x0003)
+ #define iso_flags_ts(f)		((f >> 2) & 0x0001)
+ #define iso_flags_pack(pb, ts)	(((pb) & 0x03) | (((ts) & 0x01) << 2))
++#define iso_data_len(h)		((h) & 0x3fff)
++#define iso_data_flags(h)	((h) >> 14)
+ #define iso_data_len_pack(h, f)	((uint16_t) ((h) | ((f) << 14)))
+ 
+ #define L2CAP_FEAT_FIXED_CHAN	0x00000080
+@@ -173,6 +175,11 @@ struct btconn {
+ 	uint16_t recv_len;
+ 	uint16_t data_len;
+ 	void *recv_data;
++	struct {
++		uint16_t sn;
++		bool ts;
++		uint32_t tstamp;
++	} recv_iso;
  };
  
-+static const struct iso_client_data connect_send_hw_timestamping = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.send = &send_16_2_1,
-+	.so_timestamping = (SOF_TIMESTAMPING_RAW_HARDWARE |
-+					SOF_TIMESTAMPING_OPT_ID |
-+					SOF_TIMESTAMPING_TX_HARDWARE),
-+	.repeat_send = 1,
-+	.repeat_send_pre_ts = 2,
-+};
-+
-+static const struct iso_client_data connect_send_swhw_timestamping = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.send = &send_16_2_1,
-+	.so_timestamping = (SOF_TIMESTAMPING_RAW_HARDWARE |
-+					SOF_TIMESTAMPING_SOFTWARE |
-+					SOF_TIMESTAMPING_OPT_ID |
-+					SOF_TIMESTAMPING_TX_HARDWARE |
-+					SOF_TIMESTAMPING_TX_SOFTWARE |
-+					SOF_TIMESTAMPING_OPT_TX_SWHW),
-+	.repeat_send = 1,
-+	.repeat_send_pre_ts = 2,
-+};
-+
- static const struct iso_client_data listen_16_2_1_recv = {
- 	.qos = QOS_16_2_1,
- 	.expect_err = 0,
-@@ -2604,13 +2629,15 @@ static void iso_tx_timestamping(struct test_data *data, GIOChannel *io)
- 	int sk;
- 	int err;
- 	unsigned int count;
-+	int64_t interval = 10000000ULL;
- 
- 	if (!(isodata->so_timestamping & TS_TX_RECORD_MASK))
- 		return;
- 
- 	tester_print("Enabling TX timestamping");
- 
--	tx_tstamp_init(&data->tx_ts, isodata->so_timestamping, false);
-+	tx_tstamp_init(&data->tx_ts, isodata->so_timestamping, false,
-+			(isodata->repeat_send_pre_ts + 1)*interval, interval);
- 
- 	for (count = 0; count < isodata->repeat_send + 1; ++count)
- 		data->step += tx_tstamp_expect(&data->tx_ts, 0);
-@@ -4092,6 +4119,13 @@ int main(int argc, char *argv[])
- 			&connect_send_tx_cmsg_timestamping, setup_powered,
- 			test_connect);
- 
-+	test_iso("ISO Send - HW Timestamping", &connect_send_hw_timestamping,
-+						setup_powered, test_connect);
-+
-+	test_iso("ISO Send - SWHW Timestamping",
-+			&connect_send_swhw_timestamping, setup_powered,
-+			test_connect);
-+
- 	test_iso("ISO Receive - Success", &listen_16_2_1_recv, setup_powered,
- 							test_listen);
- 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index c3aa96f84..5fd1f058f 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -1810,7 +1810,7 @@ static void l2cap_tx_timestamping(struct test_data *data, GIOChannel *io)
- 	tester_print("Enabling TX timestamping");
- 
- 	tx_tstamp_init(&data->tx_ts, l2data->so_timestamping,
--					l2data->sock_type == SOCK_STREAM);
-+					l2data->sock_type == SOCK_STREAM, 0, 0);
- 
- 	for (count = 0; count < l2data->repeat_send + 1; ++count)
- 		data->step += tx_tstamp_expect(&data->tx_ts, l2data->data_len);
-diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-index 3d6b59092..a4483cfdc 100644
---- a/tools/sco-tester.c
-+++ b/tools/sco-tester.c
-@@ -882,7 +882,7 @@ static void sco_tx_timestamping(struct test_data *data, GIOChannel *io)
- 
- 	tester_print("Enabling TX timestamping");
- 
--	tx_tstamp_init(&data->tx_ts, scodata->so_timestamping, false);
-+	tx_tstamp_init(&data->tx_ts, scodata->so_timestamping, false, 0, 0);
- 
- 	for (count = 0; count < scodata->repeat_send + 1; ++count)
- 		data->step += tx_tstamp_expect(&data->tx_ts, 0);
-diff --git a/tools/tester.h b/tools/tester.h
-index 9df600f90..cb28e9cea 100644
---- a/tools/tester.h
-+++ b/tools/tester.h
-@@ -38,50 +38,73 @@ struct tx_tstamp_data {
- 	struct {
- 		uint32_t id;
- 		uint32_t type;
-+		int64_t value;
-+		bool sw;
- 	} expect[16];
- 	unsigned int pos;
- 	unsigned int count;
- 	unsigned int sent;
- 	uint32_t so_timestamping;
- 	bool stream;
-+	int64_t hw_base;
-+	int64_t hw_step;
- };
- 
- static inline void tx_tstamp_init(struct tx_tstamp_data *data,
--				uint32_t so_timestamping, bool stream)
-+			uint32_t so_timestamping, bool stream,
-+			int64_t hw_base, int64_t hw_step)
- {
- 	memset(data, 0, sizeof(*data));
- 	memset(data->expect, 0xff, sizeof(data->expect));
- 
- 	data->so_timestamping = so_timestamping;
- 	data->stream = stream;
-+	data->hw_base = hw_base;
-+	data->hw_step = hw_step;
+ enum l2cap_mode {
+@@ -3356,60 +3363,67 @@ static void process_sco(struct bthost *bthost, const void *data, uint16_t len)
  }
  
- static inline int tx_tstamp_expect(struct tx_tstamp_data *data, size_t len)
+ static void process_iso_data(struct bthost *bthost, struct btconn *conn,
+-					const void *data, uint16_t len)
++					bool ts, uint16_t sn, uint32_t tstamp,
++					const struct iovec *iov)
  {
-+	uint32_t ts = data->so_timestamping;
- 	unsigned int pos = data->count;
- 	int steps;
+-	const struct bt_hci_iso_data_start *data_hdr = data;
+-	uint16_t data_len;
+ 	struct iso_hook *hook;
  
- 	if (data->stream && len)
- 		data->sent += len - 1;
+-	data_len = le16_to_cpu(data_hdr->slen);
+-	if (len != sizeof(*data_hdr) + data_len) {
+-		bthost_debug(bthost, "ISO invalid length: %u != %zu",
+-					len, sizeof(*data_hdr) + data_len);
+-		return;
+-	}
+-
+-	bthost_debug(bthost, "ISO data: %u bytes (%u)", data_len, data_hdr->sn);
++	bthost_debug(bthost, "ISO data: %zu bytes ts %u sn %u tstamp %u",
++						iov->iov_len, ts, sn, tstamp);
  
--	if (data->so_timestamping & SOF_TIMESTAMPING_TX_SCHED) {
-+	if (ts & SOF_TIMESTAMPING_TX_SCHED) {
- 		g_assert(pos < ARRAY_SIZE(data->expect));
- 		data->expect[pos].type = SCM_TSTAMP_SCHED;
- 		data->expect[pos].id = data->sent;
-+		data->expect[pos].sw = true;
- 		pos++;
- 	}
+ 	hook = conn->iso_hook;
+ 	if (!hook)
+ 		return;
  
--	if (data->so_timestamping & SOF_TIMESTAMPING_TX_SOFTWARE) {
-+	if ((ts & SOF_TIMESTAMPING_TX_SOFTWARE) &&
-+					(!(ts & SOF_TIMESTAMPING_TX_HARDWARE) ||
-+					(ts & SOF_TIMESTAMPING_OPT_TX_SWHW))) {
- 		g_assert(pos < ARRAY_SIZE(data->expect));
- 		data->expect[pos].type = SCM_TSTAMP_SND;
- 		data->expect[pos].id = data->sent;
-+		data->expect[pos].sw = true;
- 		pos++;
- 	}
+-	hook->func(data_hdr->data, data_len, hook->user_data);
++	hook->func(iov->iov_base, iov->iov_len, ts, sn, tstamp,
++							hook->user_data);
+ }
  
--	if (data->so_timestamping & SOF_TIMESTAMPING_TX_COMPLETION) {
-+	if (ts & SOF_TIMESTAMPING_TX_COMPLETION) {
- 		g_assert(pos < ARRAY_SIZE(data->expect));
- 		data->expect[pos].type = SCM_TSTAMP_COMPLETION;
- 		data->expect[pos].id = data->sent;
-+		data->expect[pos].sw = true;
-+		pos++;
-+	}
+ static void append_iso_data(struct bthost *bthost, struct btconn *conn,
+-				uint8_t flags, const void *data, uint16_t len)
++				uint8_t flags, const struct iovec *iov)
+ {
+-	append_recv_data(bthost, conn, "ISO", flags, data, len);
++	struct iovec data;
 +
-+	if (ts & SOF_TIMESTAMPING_TX_HARDWARE) {
-+		g_assert(pos < ARRAY_SIZE(data->expect));
-+		data->expect[pos].type = SCM_TSTAMP_SND;
-+		data->expect[pos].value = data->hw_base +
-+			data->sent * data->hw_step;
-+		data->expect[pos].id = data->sent;
-+		data->expect[pos].sw = false;
- 		pos++;
++	append_recv_data(bthost, conn, "ISO", flags, iov->iov_base,
++								iov->iov_len);
+ 
+ 	if (conn->recv_len < conn->data_len) {
+-		if (flags == 0x03) {
++		if (iso_flags_pb(flags) == 0x03) {
+ 			bthost_debug(bthost, "Unexpected ISO end frame");
+ 			free_recv_data(conn);
+ 		}
+ 		return;
  	}
  
-@@ -105,6 +128,7 @@ static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
- 	struct sock_extended_err *serr = NULL;
- 	struct timespec now;
- 	unsigned int i;
-+	bool sw = true;
+-	process_iso_data(bthost, conn, conn->recv_data, conn->recv_len);
++	data.iov_base = conn->recv_data;
++	data.iov_len = conn->recv_len;
++	process_iso_data(bthost, conn, conn->recv_iso.ts, conn->recv_iso.sn,
++						conn->recv_iso.tstamp, &data);
  
- 	iov.iov_base = buf;
- 	iov.iov_len = sizeof(buf);
-@@ -156,6 +180,9 @@ static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
- 		return -EINVAL;
- 	}
+ 	free_recv_data(conn);
+ }
  
-+	if (!TS_NSEC(tss->ts))
-+		sw = false;
+ static void process_iso(struct bthost *bthost, const void *data, uint16_t len)
+ {
+-	const struct bt_hci_iso_hdr *iso_hdr = data;
++	struct iovec in = { .iov_base = (void *)data, .iov_len = len };
++	const struct bt_hci_iso_hdr *iso_hdr;
+ 	const struct bt_hci_iso_data_start *data_hdr;
+ 	uint16_t handle, iso_len, data_len;
+-	uint8_t flags;
++	uint8_t flags, pb, ts;
+ 	struct btconn *conn;
+ 
++	iso_hdr = util_iov_pull_mem(&in, sizeof(*iso_hdr));
++	if (!iso_hdr)
++		return;
 +
- 	if (serr->ee_errno != ENOMSG ||
- 				serr->ee_origin != SO_EE_ORIGIN_TIMESTAMPING) {
- 		tester_warn("BT_SCM_ERROR wrong for timestamping");
-@@ -164,8 +191,9 @@ static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
+ 	iso_len = le16_to_cpu(iso_hdr->dlen);
+ 	if (len != sizeof(*iso_hdr) + iso_len)
+ 		return;
  
- 	clock_gettime(CLOCK_REALTIME, &now);
+ 	handle = acl_handle(iso_hdr->handle);
+-	flags = iso_flags_pb(acl_flags(iso_hdr->handle));
++	flags = acl_flags(iso_hdr->handle);
++	pb = iso_flags_pb(flags);
++	ts = iso_flags_ts(flags);
  
--	if (TS_NSEC(&now) < TS_NSEC(tss->ts) ||
--			TS_NSEC(&now) > TS_NSEC(tss->ts) + SEC_NSEC(10)) {
-+	/* SW timestamp */
-+	if (sw && (TS_NSEC(&now) < TS_NSEC(tss->ts) ||
-+			TS_NSEC(&now) > TS_NSEC(tss->ts) + SEC_NSEC(10))) {
- 		tester_warn("nonsense in timestamp");
- 		return -EINVAL;
+ 	conn = bthost_find_conn(bthost, handle);
+ 	if (!conn) {
+@@ -3417,9 +3431,7 @@ static void process_iso(struct bthost *bthost, const void *data, uint16_t len)
+ 		return;
  	}
-@@ -180,6 +208,9 @@ static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
- 		if (data->expect[i].type >= 0xffff)
- 			continue;
  
-+		if (sw != data->expect[i].sw)
-+			continue;
+-	data_hdr = (void *) data + sizeof(*iso_hdr);
+-
+-	switch (flags) {
++	switch (pb) {
+ 	case 0x00:
+ 	case 0x02:
+ 		if (conn->recv_data) {
+@@ -3427,13 +3439,28 @@ static void process_iso(struct bthost *bthost, const void *data, uint16_t len)
+ 			free_recv_data(conn);
+ 		}
+ 
+-		data_len = le16_to_cpu(data_hdr->slen) + sizeof(*data_hdr);
++		conn->recv_iso.ts = ts;
++		conn->recv_iso.tstamp = 0;
++		if (ts) {
++			if (!util_iov_pull_le32(&in, &conn->recv_iso.tstamp)) {
++				bthost_debug(bthost, "Invalid ISO ts");
++				return;
++			}
++		}
+ 
+-		bthost_debug(bthost, "iso_len %u data_len %u", iso_len,
+-								data_len);
++		data_hdr = util_iov_pull_mem(&in, sizeof(*data_hdr));
++		if (!data_hdr) {
++			bthost_debug(bthost, "Invalid ISO frame header");
++			return;
++		}
+ 
+-		if (iso_len == data_len) {
+-			process_iso_data(bthost, conn, iso_hdr->data, iso_len);
++		conn->recv_iso.sn = le16_to_cpu(data_hdr->sn);
++		data_len = iso_data_len(le16_to_cpu(data_hdr->slen));
 +
- 		if (serr->ee_info == data->expect[i].type) {
- 			data->expect[i].type = 0xffff;
++		if (in.iov_len == data_len) {
++			process_iso_data(bthost, conn, conn->recv_iso.ts,
++						conn->recv_iso.sn,
++						conn->recv_iso.tstamp, &in);
  			break;
-@@ -190,14 +221,22 @@ static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
- 		return -EINVAL;
+ 		}
+ 
+@@ -3441,7 +3468,7 @@ static void process_iso(struct bthost *bthost, const void *data, uint16_t len)
+ 		/* fall through */
+ 	case 0x01:
+ 	case 0x03:
+-		append_iso_data(bthost, conn, flags, iso_hdr->data, iso_len);
++		append_iso_data(bthost, conn, flags, &in);
+ 		break;
+ 	default:
+ 		bthost_debug(bthost, "Invalid ISO frame flags 0x%2.2x", flags);
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index c88ea0329..1f8b32d64 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -86,7 +86,7 @@ void bthost_add_sco_hook(struct bthost *bthost, uint16_t handle,
+ 				bthost_destroy_func_t destroy);
+ 
+ typedef void (*bthost_iso_hook_func_t)(const void *data, uint16_t len,
+-							void *user_data);
++		bool ts, uint16_t sn, uint32_t timestamp, void *user_data);
+ 
+ void bthost_add_iso_hook(struct bthost *bthost, uint16_t handle,
+ 				bthost_iso_hook_func_t func, void *user_data,
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index b851d2cd8..2ddb29a00 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -1669,7 +1669,8 @@ static void client_connectable_complete(uint16_t opcode, uint8_t status,
  	}
+ }
  
-+	/* Note: +1 is kernel-provided offset since can't report 0 tstamp */
-+	if (!sw && TS_NSEC(&tss->ts[2]) != data->expect[i].value + 1) {
-+		tester_print("Bad HW timestamp %u != %u",
-+					(unsigned int)TS_NSEC(&tss->ts[2]),
-+					(unsigned int)data->expect[i].value);
-+		return -EINVAL;
-+	}
-+
- 	if ((data->so_timestamping & SOF_TIMESTAMPING_OPT_ID) &&
--				serr->ee_data != data->expect[i].id) {
-+					serr->ee_data != data->expect[i].id) {
- 		tester_warn("Bad timestamp id %u", serr->ee_data);
- 		return -EINVAL;
- 	}
- 
--	tester_print("Got valid TX timestamp %u (type %u, id %u)", i,
--						serr->ee_info, serr->ee_data);
-+	tester_print("Got valid TX timestamp %u (type %u, %s, id %u)", i,
-+				serr->ee_info, sw ? "SW" : "HW", serr->ee_data);
- 
- 	++data->pos;
- 
-@@ -318,6 +357,9 @@ static inline void test_ethtool_get_ts_info(unsigned int index, int proto,
- 		SOF_TIMESTAMPING_TX_COMPLETION;
- 	int sk;
- 
-+	if (proto == BTPROTO_ISO)
-+		so_timestamping |= SOF_TIMESTAMPING_TX_HARDWARE;
-+
- 	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, proto);
- 	if (sk < 0) {
- 		if (sk == -EPROTONOSUPPORT)
+-static void bthost_recv_data(const void *buf, uint16_t len, void *user_data)
++static void bthost_recv_data(const void *buf, uint16_t len, bool ts,
++			uint16_t sn, uint32_t timestamp, void *user_data)
+ {
+ 	struct test_data *data = user_data;
+ 	const struct iso_client_data *isodata = data->test_data;
 -- 
 2.53.0
 
