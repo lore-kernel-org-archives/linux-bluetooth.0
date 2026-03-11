@@ -1,172 +1,140 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39D333987
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 17:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9A32116E0;
+	Wed, 11 Mar 2026 18:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773251537; cv=none; b=TB2eSWijL8JAEFPOURuZ80umBf2PR9FwlYgNSVcSqAagLxS6DEbB1+wKW3sSOXVgRAYgA2flJsH2ni/5Yhqgtjl7GfNOaUJ3Eez+LsIEx3I62ExVk/7ShnYLD17vvBburW5p9LWCHOasmtPm8JFOURjGGBIDdSk0GS3TewKmZqA=
+	t=1773252099; cv=none; b=JfdRYlG43Kj0DiW37aeBOrVv7jiO3Fo/fTiTXVyfrxjHTRN/wKIOin1rVXZiM4iaKrNQWf6HEIRwrOz29CnIIvHm80yYpUH/7fUv26stE8eMXpqbU+0x4BCgrCwWVQY9IGEtTO3fRWgZ1aaGn/cuJr4THPQ+51GkNy2COV5xW5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773251537; c=relaxed/simple;
-	bh=7TBumYQz10zUQcAAat+fL6zOSU0jgQQHBAvrKDfs/fQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Iqh1nQu+qoH4mlM7CCd+SdC7lYsziY/Cs+S7+COL9DFGcw5MDDopoAyBMPMeMhDvW7ruqZgqMtM4K4237j6QxkGRZJ4T11VwZa296sHOzGzye1KaPyqhY9lClNAqhGsCe6HnrhSOKJpYvpQutQeKvBWoxzGSW1pxrgNf9I8PdP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PNZy+jZI; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773252099; c=relaxed/simple;
+	bh=3yWJLZ6GD/dmWHpKPnwlQPmYIRRZb9sfs9HOE709OMk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WugJjzmzFUSwdO9W/IJokIo/NZ3FhydKT/LmFpwL+aZp5/gUfqLieJ4fWcmHEJ8W0X0Qhfz5fJRRKVdu/5nYjZHxSnVbxMl+Ck8A7Mu5Y7Db11MXSVOTtcMCIpdT/LWZnHJazD3Y4gAECg3O6pcTPbwPATHi6KEr3juIIN3ulRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=frk/CePd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PNZy+jZI"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-899fbf92bdbso1936016d6.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 10:52:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773251534; x=1773856334; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gr5Llnqv8XSNYb8d3JgfzUdFzYFQ3aVGljtxKnGqdzQ=;
-        b=PNZy+jZInVZIfAJz39nEJCQcTDy7VVNHuZINmUFQ5QndHHuhvL/ANt/uCaQgGwVeGJ
-         tl+hIugJOgS2bOIJzjbyybLeDDVr+necqFRPeqayosmugzaEkT+GyAE5Ti6k6U+bUxPF
-         YbLg4dfkujs0IBc3ZFERUFRwS+e45pBlD5TPVH2Y6Le6MuBuJ13eXvptTIGFjscxuUN9
-         rqE6d9JmBS6OkdeAJ5YzEyecNwNaj4x3cX/WmXwHm5wKN4jkO8hmEvw0aaE07nobxIEh
-         21PZBAxFG053LctS4+OSypswIKZoVLu8sZXwDGWB2IGVnWlkoBRv7lo1rOsMEKX7mE9J
-         0mNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773251534; x=1773856334;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gr5Llnqv8XSNYb8d3JgfzUdFzYFQ3aVGljtxKnGqdzQ=;
-        b=uxdphDWSws70N6PaJIiQhqyMHWWoqAQcWPA1PcBQR7unTaQIWYp7iXW5s70X2GIs7+
-         92ZTpihwplBTTKLmqUUO0beIW+7KoqTJk7Z9CakOBJYTPbv8BoBD7Uqc/w3L4SzEF0Tx
-         9+wy5ZXca/W4ntEpeo/FFYEHyjoh8DpYl+1rtOJBvtdVZ4Pzj1qnTuwC1qe8EEtcbqe1
-         CnEWbo28yI2M0/jU34YkWsy9HFcDhNhai/U3yuUpJA28hdjnkxnxQBpHzAMbRcBm6vw8
-         RAoUCF1TJT3kC8GB0wX4cMNHe3YFBVwtW2QbAL825z0nlqz/RnfCNU6P+HTADyYyJgNR
-         ksCA==
-X-Gm-Message-State: AOJu0YxekzeOkd0bWVbJ08fhldIwjeZkdT6QZoKK6agGFKdiS4P9C5Vc
-	KpuWqmpqnPCGywr93a1tKVRwsvZomN035uQCuDHpyBsPYeevnWSADX1VcaUpvA==
-X-Gm-Gg: ATEYQzyVxwSN+xia/wbmRG83JnIsBKB7aERgcEoE+wnwbJ4srUe9HVx9YDZFsq7PvDl
-	SZtxpPy+tem6f1oe9XVvs6kOr33NipN1MmG2HtcTX27DnyaPxU1fH74/OD6dZi5/FFKtfU6koZo
-	hDQPLU14m6wjVY5ZLOiA5Iw7fy+vHuNaQtzDIOJJ88zLWLykdLUFInlWQBxY6UB8+jYev6Hcp0v
-	bbVwQP/RB41ezcjvRx3vUMk0JhDJNXkAte477OnMlU99eA1fXYG2eRsRAbB3ZmaUsaWhIsXhWLC
-	CeRIciMqNG1vxpC8DHuwxBc6oO1/E0ewocBZHaCDdHYvB6oBglFFVuTljFaFDZtgjfj48FYQPcK
-	E+BB0wsNsKdqxKawsV8GgWFxxMQrjua8qBSM1lKRi4VF2HhM4I9++NXIyjnii97eAUQdB9SrMwe
-	Jdxc5HQ358tnevpc+XpD89QSRT6ZAJ
-X-Received: by 2002:a05:6214:528b:b0:89a:1ec:5304 with SMTP id 6a1803df08f44-89a66a18b5emr42809916d6.29.1773251534307;
-        Wed, 11 Mar 2026 10:52:14 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.45.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65beb4b3sm18754616d6.14.2026.03.11.10.52.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 10:52:13 -0700 (PDT)
-Message-ID: <69b1abcd.050a0220.95dae.0e51@mx.google.com>
-Date: Wed, 11 Mar 2026 10:52:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0431800169430870315=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="frk/CePd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B20AFC4CEF7;
+	Wed, 11 Mar 2026 18:01:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773252099;
+	bh=3yWJLZ6GD/dmWHpKPnwlQPmYIRRZb9sfs9HOE709OMk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=frk/CePd+U5812zAX29sI8YOCqz8vMR9Ia7CzLsw0NNdHN4DlpSmRpXI5m4qdxm2S
+	 QibXU93M97zLnR2UTk7XBWuVBHBzo1lpdmjlZHxwRj06iZcB2vmCV8RGTI+VszQfqn
+	 blhKo0EbHk4gm9TVSUs/L4l4d0lfE0S7YjkOwdiZFYa6huKB7K+Reyw9AteNN18mOx
+	 oxTCdorLYp7VgtX5tpxAzGa3ydWpWn5sPEjs4QzsivX7Sgzk0Ik0pr4z/j4Qsker3P
+	 PMYtx+UejyOrWHNLkhjjPf44IwR6tQr+A3Tr63BSy8W4XFHpJiFm9YyX2diN9JSQOq
+	 AiNGBrzarfsAg==
+Date: Wed, 11 Mar 2026 18:01:33 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Luca Weiss <luca.weiss@fairphone.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] arm64: dts: qcom: sm7225-fairphone-fp4: Add
+ Bluetooth
+Message-ID: <20260311-come-olive-7bbc8f6536e1@spud>
+References: <20230421-fp4-bluetooth-v2-0-3de840d5483e@fairphone.com>
+ <20230421-fp4-bluetooth-v2-4-3de840d5483e@fairphone.com>
+ <20260310-maritime-silly-05e7b7e03aa6@spud>
+ <DGZSPC64B8K5.3HBPHWMWXR482@fairphone.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: Bluetooth: ISO: support setting send Time_Stamp and LE Read ISO TX Sync
-In-Reply-To: <08692f3273776c975e6bf5974c77673a28dd0236.1773245666.git.pav@iki.fi>
-References: <08692f3273776c975e6bf5974c77673a28dd0236.1773245666.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0431800169430870315==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1065140
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.33 seconds
-GitLint                       PENDING   0.26 seconds
-SubjectPrefix                 PASS      0.25 seconds
-BuildKernel                   PASS      26.20 seconds
-CheckAllWarning               PASS      28.57 seconds
-CheckSparse                   WARNING   32.83 seconds
-BuildKernel32                 PASS      26.03 seconds
-TestRunnerSetup               PASS      574.85 seconds
-TestRunner_l2cap-tester       PASS      29.62 seconds
-TestRunner_iso-tester         FAIL      59.66 seconds
-TestRunner_bnep-tester        PASS      6.62 seconds
-TestRunner_mgmt-tester        FAIL      127.39 seconds
-TestRunner_rfcomm-tester      PASS      9.87 seconds
-TestRunner_sco-tester         FAIL      14.85 seconds
-TestRunner_ioctl-tester       PASS      10.71 seconds
-TestRunner_mesh-tester        FAIL      12.96 seconds
-TestRunner_smp-tester         PASS      8.92 seconds
-TestRunner_userchan-tester    PASS      6.89 seconds
-IncrementalBuild              PENDING   0.63 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_core.c:85:9: warning: context imbalance in '__hci_dev_get' - different lock contexts for basic blocknet/bluetooth/hci_core.c: note: in included file (through include/linux/notifier.h, include/linux/memory_hotplug.h, include/linux/mmzone.h, include/linux/gfp.h, include/linux/xarray.h, include/linux/radix-tree.h, ...):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
-Total: 141, Passed: 140 (99.3%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-ISO Ethtool Get Ts Info - Success                    Failed       0.071 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.114 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.478 seconds
-Mesh - Send cancel - 2                               Timed out    1.995 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="0kPLRKqAFXYbgZvV"
+Content-Disposition: inline
+In-Reply-To: <DGZSPC64B8K5.3HBPHWMWXR482@fairphone.com>
 
 
+--0kPLRKqAFXYbgZvV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----
-Regards,
-Linux Bluetooth
+On Wed, Mar 11, 2026 at 09:04:20AM +0100, Luca Weiss wrote:
+> On Tue Mar 10, 2026 at 7:02 PM CET, Conor Dooley wrote:
+> > On Fri, May 12, 2023 at 03:58:26PM +0200, Luca Weiss wrote:
+> >
+> >> +&qup_uart1_cts {
+> >> +	/*
+> >> +	 * Configure a bias-bus-hold on CTS to lower power
+> >> +	 * usage when Bluetooth is turned off. Bus hold will
+> >> +	 * maintain a low power state regardless of whether
+> >> +	 * the Bluetooth module drives the pin in either
+> >> +	 * direction or leaves the pin fully unpowered.
+> >> +	 */
+> >> +	bias-bus-hold;
+> >> +};
+> >> +
+> >> +&qup_uart1_rts {
+> >> +	/* We'll drive RTS, so no pull */
+> >> +	drive-strength =3D <2>;
+> >> +	bias-disable;
+> >> +};
+> >> +
+> >> +&qup_uart1_rx {
+> >> +	/*
+> >> +	 * Configure a pull-up on RX. This is needed to avoid
+> >> +	 * garbage data when the TX pin of the Bluetooth module is
+> >> +	 * in tri-state (module powered off or not driving the
+> >> +	 * signal yet).
+> >> +	 */
+> >> +	bias-pull-up;
+> >> +};
+> >> +
+> >> +&qup_uart1_tx {
+> >> +	/* We'll drive TX, so no pull */
+> >> +	drive-strength =3D <2>;
+> >> +	bias-disable;
+> >> +};
+> >
+> > I recently made some changes to pincfg-node.yaml to detect if there's
+> > conflicting properties used, and these got detected. Should these not
+> > do what has been done on the msm8998-xiaomi-sagit, and delete the
+> > inherited bias-foo from the dtsi?
+> > &blsp1_i2c5_sleep {
+> > 	/delete-property/ bias-pull-up;
+> > 	bias-disable;
+> > };
+>=20
+> Yes, you're completely right.
+>=20
+> In the final dtb qup-uart1-{cts,rts,rx,tx}-default-state contain two
+> bias-* properties, this must be wrong.
+>=20
+> Thanks for pointing this out, I'll prepare a patch soon!
 
 
---===============0431800169430870315==--
+Cool, guess it just worked for you because of either property ordering
+or how linux parsed it.
+
+--0kPLRKqAFXYbgZvV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCabGt/QAKCRB4tDGHoIJi
+0tHSAP9RJhZFjBy79D1QA4/Y8GvUh6dcjQSJvmheIyZevV3mgwEAkrgsg1dqN3vO
+SUrSbqWC3nY+WuhQ8enPQB6kw6udSAM=
+=RVbj
+-----END PGP SIGNATURE-----
+
+--0kPLRKqAFXYbgZvV--
