@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08AA20C029
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 16:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7C93CF034
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 16:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773245789; cv=pass; b=Z4IDHJPg8EEu9bMpI3t6lLO4VeWWywE7jhASPynAUocubiKkiyltqt6BQWkMtqeJe7eyoZlXeVfSNpZol9qeTu000L3VvpJ5pgtMV27M52wgU7fsUC4zcz7JBGEHJVmjIZ9X1Nl2IDY4Fz+IurxQav0kJ72I97q0U+uZa6O0OLo=
+	t=1773245789; cv=pass; b=kpQQmbPjFQrNiz37GMRw4Rlg9jdZNWEAZzzOKcCTLhern1adf+qgzNXRPGwo4jaePyvVsWsBVcQPR2wGgWWwSs/EaIOtlJ1l1PYbZv2k2yLIQehv5/ASux8ksjididHbZsmOxaFqMXHhEOTTQEutptlHykSm5jmdai/r4pjCtsA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773245789; c=relaxed/simple;
-	bh=6leTHRnlbJfG3KHnyyoXghV+pPVwTBHSaP8/EjVYSIY=;
+	bh=MJSPH6SlKMqvRb90oPI4isyLrX/zd5zIVsOV1Ggu6x0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RDQujjJVRRXZYOqJ17rhJeIpk24DQOySO13bMSbkYc4StnxY67X63JcuE8maSJr+FO5Oc0m1O9ZvhuiHoAJeYauWqtF3UhU4rJGDqKHU9zJuKidcoaK2DqW3gm4rO6Qpz0fkPYQpzE9O0Dc6uSMmXh8JEwWi8Y4IGyuaCxKeFjM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=ZOHrt9K/; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=q43jXjNHyf/4/p98/otYkwdICvLofuqHT3wjtPUL52KwIt8FrDK0MAxOojxVXYq8ZkmtBFHEc249VyfTa/zW8ZysKVQ0JDNqsN1JTcJ+8PsJUV+6u/wGzkUE6gWeUEKxl/wPe/oo1I0rPQ3xPU9FVpORlu/9ESDLtfREUBnrLz8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=W8OmFb/0; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="ZOHrt9K/"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="W8OmFb/0"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fWG8R5rzNzyXV;
-	Wed, 11 Mar 2026 18:16:23 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fWG8T5JMBzywH;
+	Wed, 11 Mar 2026 18:16:25 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1773245784;
+	t=1773245786;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZinvHRQO0d4jy0rclmI0cTjTnMI0cBWcGhRTQXXBvcY=;
-	b=ZOHrt9K/gbTbg5UTev2p8j2ypejt4zFZFaS9tartNdY4wkRAojA3FNg/JxZIoPLB7lsz1G
-	z8FMdPOueYfnijPyffJzQqW/emVQjmBuw2eSOZsT5UTwEMMzgxlUihuTjiSlFa7hnlNUmb
-	73zEInZaA30JsrwhuUWzp5PAjG1MgTI=
+	bh=UzGxNlR5Z6FXUVKqq4r+guokM8IO1FOL1GqXoY47Wpc=;
+	b=W8OmFb/0ncOQYnGUbjBc7qpkPmmoq6UaIT++zDYT6ApY+J66FDsdMyqIcocJqN1P1d28di
+	1UKyNLnjtm+BZym+eniNTfaMM5dg+7JhJUsc8kTVOguGAubvEd6DXUOH/hL0u08Iv59t99
+	1jrLlE6Xt+ByR1N98jA80rwAFr+RK6I=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1773245784;
+	s=meesny; t=1773245786;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZinvHRQO0d4jy0rclmI0cTjTnMI0cBWcGhRTQXXBvcY=;
-	b=IJ1ObuNAYmN7NBqE4E7qZsFQxFpX+/7C/IzPQUaGUN2CKtP4kTZx5yEWkanIieVU7Lsp3B
-	fKaPHSQVyz+TY641qoBel42IC2X3mGFLknxA0YdXilxzkfS8IACDDqQIW38UWa+9jIHYJr
-	qFHFfkwdJnXkMquIyJUHxRyfmqJeo7w=
+	bh=UzGxNlR5Z6FXUVKqq4r+guokM8IO1FOL1GqXoY47Wpc=;
+	b=DmrdcAyt0ZQxufmdtSahdpihdgfrQ3yDBiMU1EeXWlQc1hvBgmEkYJEzJ7l6JlQ8SkF+4g
+	CZVDjQeux8XJzwhSyy/wGApIvitr4vwwVEOrtNCqGz8/n919hHpWW6sBdirHo/kH2tbZ9Q
+	jOF85gCS1SMDqsdzALFE/OA0NdsGJg0=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1773245784;
-	b=IL3IRxZBYQ4I0LpjJxBbhpWsJNS3AjqxtmqRwe8bQVFB0wavFZmxlRHFGWwMWso/Kvn43W
-	g3RDalHNWC+qjU7vZ7hG9FW5kTWAcdfDC3srR8apzImWhIF8A2JnyBGw4ygskejPkewM+v
-	r7PIHy9qYQIy3xqOjPERPITP1S3da8E=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1773245786;
+	b=Tp2tmL0gqv/vn9pgP8hAYaffbGGvCVovtimPNNaZ/jWDNddqTKucortfNKwMHnOT6UMflP
+	1oDKa0Gv3Jbxu/kGVl0PfbYYoDSKiRs01MWT8WImRb275UENw+J297JMx5Njz969WEDDpM
+	fSkVGWHIT8bznvbBx90FBnloRrnv+/A=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [RFC PATCH BlueZ 1/4] bthost: fix receiving timestamped ISO packets
-Date: Wed, 11 Mar 2026 18:16:17 +0200
-Message-ID: <3c9b3d899d6e4b042e532abdb99048d1e04ff99b.1773245672.git.pav@iki.fi>
+Subject: [RFC PATCH BlueZ 4/4] iso-tester: Add test for sending ISO packets with set timestamps
+Date: Wed, 11 Mar 2026 18:16:20 +0200
+Message-ID: <4b9b7c88c31e7c391ff6a0cc1eb1ead1a5dc6a31.1773245673.git.pav@iki.fi>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1773245672.git.pav@iki.fi>
 References: <cover.1773245672.git.pav@iki.fi>
@@ -67,207 +67,175 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Parse timestamped ISO packets correctly. Pass sequence number and
-timestamp to the hook callback.
----
- emulator/bthost.c  | 83 ++++++++++++++++++++++++++++++----------------
- emulator/bthost.h  |  2 +-
- tools/iso-tester.c |  3 +-
- 3 files changed, 58 insertions(+), 30 deletions(-)
+Add test
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index b913c8015..7056dd8d1 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -47,6 +47,8 @@
- #define iso_flags_pb(f)		(f & 0x0003)
- #define iso_flags_ts(f)		((f >> 2) & 0x0001)
- #define iso_flags_pack(pb, ts)	(((pb) & 0x03) | (((ts) & 0x01) << 2))
-+#define iso_data_len(h)		((h) & 0x3fff)
-+#define iso_data_flags(h)	((h) >> 14)
- #define iso_data_len_pack(h, f)	((uint16_t) ((h) | ((f) << 14)))
- 
- #define L2CAP_FEAT_FIXED_CHAN	0x00000080
-@@ -173,6 +175,11 @@ struct btconn {
- 	uint16_t recv_len;
- 	uint16_t data_len;
- 	void *recv_data;
-+	struct {
-+		uint16_t sn;
-+		bool ts;
-+		uint32_t tstamp;
-+	} recv_iso;
- };
- 
- enum l2cap_mode {
-@@ -3356,60 +3363,67 @@ static void process_sco(struct bthost *bthost, const void *data, uint16_t len)
- }
- 
- static void process_iso_data(struct bthost *bthost, struct btconn *conn,
--					const void *data, uint16_t len)
-+					bool ts, uint16_t sn, uint32_t tstamp,
-+					const struct iovec *iov)
- {
--	const struct bt_hci_iso_data_start *data_hdr = data;
--	uint16_t data_len;
- 	struct iso_hook *hook;
- 
--	data_len = le16_to_cpu(data_hdr->slen);
--	if (len != sizeof(*data_hdr) + data_len) {
--		bthost_debug(bthost, "ISO invalid length: %u != %zu",
--					len, sizeof(*data_hdr) + data_len);
--		return;
--	}
--
--	bthost_debug(bthost, "ISO data: %u bytes (%u)", data_len, data_hdr->sn);
-+	bthost_debug(bthost, "ISO data: %zu bytes ts %u sn %u tstamp %u",
-+						iov->iov_len, ts, sn, tstamp);
- 
- 	hook = conn->iso_hook;
- 	if (!hook)
- 		return;
- 
--	hook->func(data_hdr->data, data_len, hook->user_data);
-+	hook->func(iov->iov_base, iov->iov_len, ts, sn, tstamp,
-+							hook->user_data);
- }
- 
- static void append_iso_data(struct bthost *bthost, struct btconn *conn,
--				uint8_t flags, const void *data, uint16_t len)
-+				uint8_t flags, const struct iovec *iov)
- {
--	append_recv_data(bthost, conn, "ISO", flags, data, len);
-+	struct iovec data;
-+
-+	append_recv_data(bthost, conn, "ISO", flags, iov->iov_base,
-+								iov->iov_len);
- 
- 	if (conn->recv_len < conn->data_len) {
--		if (flags == 0x03) {
-+		if (iso_flags_pb(flags) == 0x03) {
- 			bthost_debug(bthost, "Unexpected ISO end frame");
- 			free_recv_data(conn);
- 		}
- 		return;
- 	}
- 
--	process_iso_data(bthost, conn, conn->recv_data, conn->recv_len);
-+	data.iov_base = conn->recv_data;
-+	data.iov_len = conn->recv_len;
-+	process_iso_data(bthost, conn, conn->recv_iso.ts, conn->recv_iso.sn,
-+						conn->recv_iso.tstamp, &data);
- 
- 	free_recv_data(conn);
- }
- 
- static void process_iso(struct bthost *bthost, const void *data, uint16_t len)
- {
--	const struct bt_hci_iso_hdr *iso_hdr = data;
-+	struct iovec in = { .iov_base = (void *)data, .iov_len = len };
-+	const struct bt_hci_iso_hdr *iso_hdr;
- 	const struct bt_hci_iso_data_start *data_hdr;
- 	uint16_t handle, iso_len, data_len;
--	uint8_t flags;
-+	uint8_t flags, pb, ts;
- 	struct btconn *conn;
- 
-+	iso_hdr = util_iov_pull_mem(&in, sizeof(*iso_hdr));
-+	if (!iso_hdr)
-+		return;
-+
- 	iso_len = le16_to_cpu(iso_hdr->dlen);
- 	if (len != sizeof(*iso_hdr) + iso_len)
- 		return;
- 
- 	handle = acl_handle(iso_hdr->handle);
--	flags = iso_flags_pb(acl_flags(iso_hdr->handle));
-+	flags = acl_flags(iso_hdr->handle);
-+	pb = iso_flags_pb(flags);
-+	ts = iso_flags_ts(flags);
- 
- 	conn = bthost_find_conn(bthost, handle);
- 	if (!conn) {
-@@ -3417,9 +3431,7 @@ static void process_iso(struct bthost *bthost, const void *data, uint16_t len)
- 		return;
- 	}
- 
--	data_hdr = (void *) data + sizeof(*iso_hdr);
--
--	switch (flags) {
-+	switch (pb) {
- 	case 0x00:
- 	case 0x02:
- 		if (conn->recv_data) {
-@@ -3427,13 +3439,28 @@ static void process_iso(struct bthost *bthost, const void *data, uint16_t len)
- 			free_recv_data(conn);
- 		}
- 
--		data_len = le16_to_cpu(data_hdr->slen) + sizeof(*data_hdr);
-+		conn->recv_iso.ts = ts;
-+		conn->recv_iso.tstamp = 0;
-+		if (ts) {
-+			if (!util_iov_pull_le32(&in, &conn->recv_iso.tstamp)) {
-+				bthost_debug(bthost, "Invalid ISO ts");
-+				return;
-+			}
-+		}
- 
--		bthost_debug(bthost, "iso_len %u data_len %u", iso_len,
--								data_len);
-+		data_hdr = util_iov_pull_mem(&in, sizeof(*data_hdr));
-+		if (!data_hdr) {
-+			bthost_debug(bthost, "Invalid ISO frame header");
-+			return;
-+		}
- 
--		if (iso_len == data_len) {
--			process_iso_data(bthost, conn, iso_hdr->data, iso_len);
-+		conn->recv_iso.sn = le16_to_cpu(data_hdr->sn);
-+		data_len = iso_data_len(le16_to_cpu(data_hdr->slen));
-+
-+		if (in.iov_len == data_len) {
-+			process_iso_data(bthost, conn, conn->recv_iso.ts,
-+						conn->recv_iso.sn,
-+						conn->recv_iso.tstamp, &in);
- 			break;
- 		}
- 
-@@ -3441,7 +3468,7 @@ static void process_iso(struct bthost *bthost, const void *data, uint16_t len)
- 		/* fall through */
- 	case 0x01:
- 	case 0x03:
--		append_iso_data(bthost, conn, flags, iso_hdr->data, iso_len);
-+		append_iso_data(bthost, conn, flags, &in);
- 		break;
- 	default:
- 		bthost_debug(bthost, "Invalid ISO frame flags 0x%2.2x", flags);
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index c88ea0329..1f8b32d64 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -86,7 +86,7 @@ void bthost_add_sco_hook(struct bthost *bthost, uint16_t handle,
- 				bthost_destroy_func_t destroy);
- 
- typedef void (*bthost_iso_hook_func_t)(const void *data, uint16_t len,
--							void *user_data);
-+		bool ts, uint16_t sn, uint32_t timestamp, void *user_data);
- 
- void bthost_add_iso_hook(struct bthost *bthost, uint16_t handle,
- 				bthost_iso_hook_func_t func, void *user_data,
+ISO Send - Set HW Timestamp
+---
+ tools/iso-tester.c | 68 +++++++++++++++++++++++++++++++++++++++-------
+ tools/tester.h     | 10 +++++++
+ 2 files changed, 68 insertions(+), 10 deletions(-)
+
 diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index b851d2cd8..2ddb29a00 100644
+index fb04ab642..2d4408d56 100644
 --- a/tools/iso-tester.c
 +++ b/tools/iso-tester.c
-@@ -1669,7 +1669,8 @@ static void client_connectable_complete(uint16_t opcode, uint8_t status,
- 	}
+@@ -522,6 +522,9 @@ struct iso_client_data {
+ 	 * Used for testing TX timestamping OPT_ID.
+ 	 */
+ 	unsigned int repeat_send;
++
++	/* Set HW timestamp on sent packets */
++	bool set_hw_tstamp;
+ };
+ 
+ typedef bool (*iso_defer_accept_t)(struct test_data *data, GIOChannel *io,
+@@ -1076,6 +1079,16 @@ static const struct iso_client_data connect_send_swhw_timestamping = {
+ 	.repeat_send_pre_ts = 2,
+ };
+ 
++static const struct iso_client_data connect_send_set_hw_timestamp = {
++	.qos = QOS_16_2_1,
++	.expect_err = 0,
++	.send = &send_16_2_1,
++	.so_timestamping = (SOF_TIMESTAMPING_RAW_HARDWARE |
++					SOF_TIMESTAMPING_OPT_ID |
++					SOF_TIMESTAMPING_TX_HARDWARE),
++	.set_hw_tstamp = true,
++};
++
+ static const struct iso_client_data listen_16_2_1_recv = {
+ 	.qos = QOS_16_2_1,
+ 	.expect_err = 0,
+@@ -1710,6 +1723,9 @@ static void bthost_recv_data(const void *buf, uint16_t len, bool ts,
+ 			tester_test_failed();
+ 	} else if (!data->step)
+ 		tester_test_passed();
++
++	if (isodata->set_hw_tstamp && (timestamp != 0x1234 || sn != 1234))
++		tester_test_failed();
  }
  
--static void bthost_recv_data(const void *buf, uint16_t len, void *user_data)
-+static void bthost_recv_data(const void *buf, uint16_t len, bool ts,
-+			uint16_t sn, uint32_t timestamp, void *user_data)
+ static void bthost_iso_disconnected(void *user_data)
+@@ -2629,15 +2645,24 @@ static void iso_tx_timestamping(struct test_data *data, GIOChannel *io)
+ 	int sk;
+ 	int err;
+ 	unsigned int count;
+-	int64_t interval = 10000000ULL;
++	int64_t interval = 10000000ULL, hw_base;
+ 
+ 	if (!(isodata->so_timestamping & TS_TX_RECORD_MASK))
+ 		return;
+ 
+ 	tester_print("Enabling TX timestamping");
+ 
++	/* Note: these depend on emulator/btdev.c details */
++	if (!isodata->set_hw_tstamp) {
++		interval = 10000000ULL;
++		hw_base = (isodata->repeat_send_pre_ts + 1)*interval;
++	} else {
++		hw_base = 0x1234 * 1000 + 10000000ULL;
++		interval = 0;
++	}
++
+ 	tx_tstamp_init(&data->tx_ts, isodata->so_timestamping, false,
+-			(isodata->repeat_send_pre_ts + 1)*interval, interval);
++			hw_base, interval);
+ 
+ 	for (count = 0; count < isodata->repeat_send + 1; ++count)
+ 		data->step += tx_tstamp_expect(&data->tx_ts, 0);
+@@ -2661,12 +2686,12 @@ static void iso_tx_timestamping(struct test_data *data, GIOChannel *io)
+ static void iso_send_data(struct test_data *data, GIOChannel *io)
  {
- 	struct test_data *data = user_data;
  	const struct iso_client_data *isodata = data->test_data;
+-	char control[CMSG_SPACE(sizeof(uint32_t))];
++	char control[3 * CMSG_SPACE(sizeof(uint32_t))];
+ 	struct msghdr msg = {
+ 		.msg_iov = (struct iovec *)isodata->send,
+ 		.msg_iovlen = 1,
+ 	};
+-	struct cmsghdr *cmsg;
++	struct cmsghdr *cmsg = NULL;
+ 	ssize_t ret;
+ 	int sk;
+ 
+@@ -2674,20 +2699,39 @@ static void iso_send_data(struct test_data *data, GIOChannel *io)
+ 
+ 	sk = g_io_channel_unix_get_fd(io);
+ 
+-	if (isodata->cmsg_timestamping) {
+-		memset(control, 0, sizeof(control));
+-		msg.msg_control = control;
+-		msg.msg_controllen = sizeof(control);
++	memset(control, 0, sizeof(control));
++	msg.msg_control = control;
++	msg.msg_controllen = 0;
++
++	if (isodata->cmsg_timestamping) {
++		msg.msg_controllen += CMSG_SPACE(sizeof(uint32_t));
++		cmsg = cmsg ? CMSG_NXTHDR(&msg, cmsg) : CMSG_FIRSTHDR(&msg);
+ 
+-		cmsg = CMSG_FIRSTHDR(&msg);
+ 		cmsg->cmsg_level = SOL_SOCKET;
+ 		cmsg->cmsg_type = SO_TIMESTAMPING;
+ 		cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
+-
+ 		*((uint32_t *)CMSG_DATA(cmsg)) = (isodata->so_timestamping &
+ 					TS_TX_RECORD_MASK);
+ 	}
+ 
++	if (isodata->set_hw_tstamp) {
++		msg.msg_controllen += CMSG_SPACE(sizeof(uint32_t));
++		cmsg = cmsg ? CMSG_NXTHDR(&msg, cmsg) : CMSG_FIRSTHDR(&msg);
++
++		cmsg->cmsg_level = SOL_BLUETOOTH;
++		cmsg->cmsg_type = BT_SCM_PKT_ISO_TS;
++		cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
++		*((uint32_t *)CMSG_DATA(cmsg)) = 0x1234;
++
++		msg.msg_controllen += CMSG_SPACE(sizeof(uint16_t));
++		cmsg = CMSG_NXTHDR(&msg, cmsg);
++
++		cmsg->cmsg_level = SOL_BLUETOOTH;
++		cmsg->cmsg_type = BT_SCM_PKT_SEQNUM;
++		cmsg->cmsg_len = CMSG_LEN(sizeof(uint16_t));
++		*((uint16_t *)CMSG_DATA(cmsg)) = 1234;
++	}
++
+ 	ret = sendmsg(sk, &msg, 0);
+ 	if (ret < 0 || isodata->send->iov_len != (size_t) ret) {
+ 		tester_warn("Failed to write %zu bytes: %s (%d)",
+@@ -4126,6 +4170,10 @@ int main(int argc, char *argv[])
+ 			&connect_send_swhw_timestamping, setup_powered,
+ 			test_connect);
+ 
++	test_iso("ISO Send - Set HW Timestamp",
++			&connect_send_set_hw_timestamp, setup_powered,
++			test_connect);
++
+ 	test_iso("ISO Receive - Success", &listen_16_2_1_recv, setup_powered,
+ 							test_listen);
+ 
+diff --git a/tools/tester.h b/tools/tester.h
+index cb28e9cea..d1ade4603 100644
+--- a/tools/tester.h
++++ b/tools/tester.h
+@@ -34,6 +34,16 @@
+ #define TS_TX_RECORD_MASK		(SOF_TIMESTAMPING_TX_RECORD_MASK | \
+ 						SOF_TIMESTAMPING_TX_COMPLETION)
+ 
++#ifndef BT_PKT_SEQNUM
++#define BT_PKT_SEQNUM		22
++#endif
++#ifndef BT_SCM_PKT_SEQNUM
++#define BT_SCM_PKT_SEQNUM	0x05
++#endif
++#ifndef BT_SCM_PKT_ISO_TS
++#define BT_SCM_PKT_ISO_TS	0x06
++#endif
++
+ struct tx_tstamp_data {
+ 	struct {
+ 		uint32_t id;
 -- 
 2.53.0
 
