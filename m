@@ -1,147 +1,258 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90A42E8B98
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 08:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA534CB5B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 08:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773216265; cv=none; b=VhkRmuy2Y8moUuu5OKwt9LzSTV6ONgFw3u4crak9L9vmJ/aIq3acDYeVWcb4VlkmFaU7NSSVQUCUxldBOUrtjCU1Bu3UDp5venbEr4qfdoI31zasB3npAoDOav2axN7yPO4jz7BQPmQG+q0yKeb5x9XKn42UIZ3i5aiQxULjRsk=
+	t=1773216923; cv=none; b=mnzC43sjU6xV1bwUrAi47D3MZQqT9K/OfY6Ezhi1AMBLTm23FIDK1SFGyRDvRnPhZn/Mj1MnrtJx7agPPXLr3Ue51spK0r0xXjkMlfYRm4cmW3jE02rKeHgkfGZ/GztCi4lcc7NdgESY+FhfjlZe4vrb/cagBDpyuexLOlx3LTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773216265; c=relaxed/simple;
-	bh=khDVMinyRktjp81VmTv78vhuR5dfLwAEQX0dFp8erl4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=Y+VTiKaGqg0iwp9I5//dFV4eaI9TrPwrHVO7ASDM8TODKyqN/DGaxi8R4LO4TZ+ZVVV6c7jSSHO0OfqeNG/XcWoov+aBFhCnc9xy6SY/Eol4/S39jf/hhFcuJO9ahJET76ifkscZFsrRvzkmpXRPfDaO3mwBxdlNOZ9uizMGZ4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=oUqoX8kq; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	s=arc-20240116; t=1773216923; c=relaxed/simple;
+	bh=Ibv6mxb85Vjx6GR5bQ/iXScyrnppslxrk2BO6HTNO9Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=FkBGc5pulugopaj99KTko8W1RHJ1tFVYqoPW5NgaNkd7v2yJ560XzHh767phvN+UswTu8+Y+DP0BS5pjsa80ONb/EjhHDxt3fOYe+T+QyotGCBBJIlsqfBkvFpIbFgZRryeFevmEESuhZuqYaX5eytptNYx/Pn7oR+Fh7PfglWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=aDt0qd9W; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="oUqoX8kq"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b95c0fc928bso724019566b.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 01:04:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1773216262; x=1773821062; darn=vger.kernel.org;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MSG8jCrZgvSAYH3ST0w7E15BQnOuBJZtxXBK3xYNciI=;
-        b=oUqoX8kqAP89jNayDviF3q4pftyP1lM14c5hxiJpdKaU9ScxErvL8+kNw/uZrRFBFJ
-         HzZWhtoEzEu3bHw/CkOX29AXUMUO1dJGGdhJ+/gEG0D9QD4JA4IVLoV0EAz/uBCRnF7w
-         svTFaOFM8EMKKb/8/n1dz5/xzHbzzY6OUm7cW2rGzrk+N6x8a2QIz76lDwjOjdjaPyFW
-         16PqMotxrtSDONDngnDtikJRVJaIWvQhmeAC5w/Cga0nczajBEwibTIvtDNG8zn3PBbQ
-         5mk5BGgwpMGzKWOOhZ8IZwg75OKNVGCbQBZcLFrtVfGGbNrxAFyNUDKb2JAAYT4nkPB1
-         HXDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773216262; x=1773821062;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MSG8jCrZgvSAYH3ST0w7E15BQnOuBJZtxXBK3xYNciI=;
-        b=Qbo/Gt0px2u8P27sAKOjHV5OQdmhxlVWnnEjCB03s1pYS8u9wsU3dtAc+x1rYHeR9V
-         6ZAfqNjUvRplTEMIDNxyXvEQtEQrTYCtbRcepyhVxDqfeQ7iB51cK020/l6acOaHofIL
-         +chK4R6C7VhyqafPtaazNI77uBwZuMWKJ06TTrbk6e1LQsxnxTgqJJh9x/Vh4z+VSc8y
-         Nh7sSR/klTCIu7yzXb8vztILwh3oXXHc0UO1sNdQOgjIlUHPnGB3IruXWWku5pk06OP8
-         wuposkc3ur6SuklyZAOKWm6ym0+pznxM+duysiJjttM2O7TuOruUDrmF+XZp5JgQxYo/
-         LMkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVcR9/Ho4uAF5pC50Ad9CfnLFQQ0zATKiGf+e8QueJyAuj12VmnHEXznazEnleD0mCUQHH46Hna0BImDJLd2Oo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWSSvpN+TtFy39rA+vq+JKrvfEY0FvNXYKqEjHYASrkhjX/CMR
-	GIIc7gz2QNmZC+r/JzejFOqsxXSgIq4jpc0aS3Eb8kRcKb9IRzVVErAHUyf7JeckDls=
-X-Gm-Gg: ATEYQzzGybV7NNSq2laMBw81xINc5n5a7jpo+0c2zaUgQrFbSgAtmkm4Mma7COYXsgQ
-	hUrUnEGtI7BgDgkLKrBxsrD65vjI5MGLd9nKZpHiYxcHjsC+5oGzlFuUzt351gRREj59hWCN14X
-	KF61fS9mc24ZzOGtjNidEW6X1Y4ZTK2jvx859E1g2GPBgA3DpGmn5E+qU0YPRca+CCO6AYs8aEa
-	1Z7e6OQ55DM/bwFzJ6Xn7LW22JkJZ5/bAH0GcP2atY7yH0NP7ienjVFMB0YQX7EFjA3Sn34KVLf
-	KHnM0p6t4thFrHI8quut856fO0uM2lNKgSt36SzV74siWMteUjm2YB71FFKDxx31bwQZOh9+6+2
-	O5BHzjjXNuvluvAk1Zl1QyplGziCR9TH0nZH8HVYOdYLJmCwvbAPQ42yDYUmLJOTorsIbV4J6iL
-	VBNru5J8J54NwYtACFIUEIFuEkaRoupKMlGVyiuleha2fNWL4Jivm7opAk//J6YtYZGJBH
-X-Received: by 2002:a17:906:7314:b0:b97:23c7:2b54 with SMTP id a640c23a62f3a-b972e61897bmr85765466b.49.1773216261981;
-        Wed, 11 Mar 2026 01:04:21 -0700 (PDT)
-Received: from localhost (144-178-202-139.static.ef-service.nl. [144.178.202.139])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b972de0bd42sm37527166b.9.2026.03.11.01.04.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Mar 2026 01:04:21 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="aDt0qd9W"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260311081516epoutp03e8f2985da183c67edfd9cd271d8974d4~bu2P-1Y1l0258302583epoutp03Z
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 08:15:16 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260311081516epoutp03e8f2985da183c67edfd9cd271d8974d4~bu2P-1Y1l0258302583epoutp03Z
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1773216916;
+	bh=h9QCX6BKlj6YsGEm1cfpdulcqfYz926u/2gberIih6I=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=aDt0qd9WcLNkF5kPaX0dJhZt9jVb010HlptXuMT71Zyfwwnreu3JnXn0lle7mOTuv
+	 81iCdQxI/oQJw8SfWwvR50GBfeJN0Vd77OuWWIcE45oLhMR1RM68u8/FxHTZj1UxaS
+	 A2bt8hQ+Zl6Mq4VufwS/0ecN9j4M4Qnl6cb1kCIA=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
+	20260311081516epcas5p4a92c7912401b6fc8d7b9b7e362c12bb9~bu2PlYVg92240022400epcas5p4L;
+	Wed, 11 Mar 2026 08:15:16 +0000 (GMT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4fW3TH740Cz6B9m9; Wed, 11 Mar
+	2026 08:15:15 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326~bu2PKsr952652726527epcas5p4f;
+	Wed, 11 Mar 2026 08:15:15 +0000 (GMT)
+Received: from localhost.localdomain (unknown [109.144.5.214]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260311081514epsmtip1152ce47e14e910fee9d10d443392fbbc~bu2OTGv5w2716427164epsmtip1K;
+	Wed, 11 Mar 2026 08:15:14 +0000 (GMT)
+From: "tailu.shi" <tailu.shi@samsung.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>, Pauli Virtanen <pav@iki.fi>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, "tailu.shi" <tailu.shi@samsung.com>
+Subject: [PATCH] Bluetooth: ISO: add timestamp for outgoing HCI ISO packet
+Date: Wed, 11 Mar 2026 16:14:01 +0800
+Message-Id: <20260311081401.3832000-1-tailu.shi@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 11 Mar 2026 09:04:20 +0100
-Message-Id: <DGZSPC64B8K5.3HBPHWMWXR482@fairphone.com>
-To: "Conor Dooley" <conor@kernel.org>, "Luca Weiss"
- <luca.weiss@fairphone.com>
-Cc: "David S. Miller" <davem@davemloft.net>, "Eric Dumazet"
- <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "Rob Herring" <robh+dt@kernel.org>, "Krzysztof
- Kozlowski" <krzysztof.kozlowski+dt@linaro.org>, "Marcel Holtmann"
- <marcel@holtmann.org>, "Johan Hedberg" <johan.hedberg@gmail.com>, "Luiz
- Augusto von Dentz" <luiz.dentz@gmail.com>, "Andy Gross"
- <agross@kernel.org>, "Bjorn Andersson" <andersson@kernel.org>, "Konrad
- Dybcio" <konrad.dybcio@linaro.org>, "Conor Dooley" <conor+dt@kernel.org>,
- <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
- <linux-arm-msm@vger.kernel.org>
-Subject: Re: [PATCH v2 4/4] arm64: dts: qcom: sm7225-fairphone-fp4: Add
- Bluetooth
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20230421-fp4-bluetooth-v2-0-3de840d5483e@fairphone.com>
- <20230421-fp4-bluetooth-v2-4-3de840d5483e@fairphone.com>
- <20260310-maritime-silly-05e7b7e03aa6@spud>
-In-Reply-To: <20260310-maritime-silly-05e7b7e03aa6@spud>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326
+References: <CGME20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326@epcas5p4.samsung.com>
 
-On Tue Mar 10, 2026 at 7:02 PM CET, Conor Dooley wrote:
-> On Fri, May 12, 2023 at 03:58:26PM +0200, Luca Weiss wrote:
->
->> +&qup_uart1_cts {
->> +	/*
->> +	 * Configure a bias-bus-hold on CTS to lower power
->> +	 * usage when Bluetooth is turned off. Bus hold will
->> +	 * maintain a low power state regardless of whether
->> +	 * the Bluetooth module drives the pin in either
->> +	 * direction or leaves the pin fully unpowered.
->> +	 */
->> +	bias-bus-hold;
->> +};
->> +
->> +&qup_uart1_rts {
->> +	/* We'll drive RTS, so no pull */
->> +	drive-strength =3D <2>;
->> +	bias-disable;
->> +};
->> +
->> +&qup_uart1_rx {
->> +	/*
->> +	 * Configure a pull-up on RX. This is needed to avoid
->> +	 * garbage data when the TX pin of the Bluetooth module is
->> +	 * in tri-state (module powered off or not driving the
->> +	 * signal yet).
->> +	 */
->> +	bias-pull-up;
->> +};
->> +
->> +&qup_uart1_tx {
->> +	/* We'll drive TX, so no pull */
->> +	drive-strength =3D <2>;
->> +	bias-disable;
->> +};
->
-> I recently made some changes to pincfg-node.yaml to detect if there's
-> conflicting properties used, and these got detected. Should these not
-> do what has been done on the msm8998-xiaomi-sagit, and delete the
-> inherited bias-foo from the dtsi?
-> &blsp1_i2c5_sleep {
-> 	/delete-property/ bias-pull-up;
-> 	bias-disable;
-> };
+The Bluetooth Core Specification defines the 'Time_Stamp' field of
+an HCI ISO packet as optional. However, it's mandatory to include
+the 'Time_Stamp' field when using HCI ISO packets per section 3.3
+'HCI Feature Support Requirement' of TMAP specification.
+https://www.bluetooth.com/specifications/specs/html/?src=TMAP_v1.0.1/out/en/index-en.html#UUID-68138fa8-fd1f-1a1b-e552-ddcd8fede9ec
 
-Yes, you're completely right.
+To comply with TMAP, introduce a new socket option BT_PKT_ISO_TIMESTAMP
+that allows user application (e.g. PipeWire) to attach timestamp to the
+data it sends to the ISO socket within BT_SCM_PKT_ISO_TIMESTAMP CMSG.
 
-In the final dtb qup-uart1-{cts,rts,rx,tx}-default-state contain two
-bias-* properties, this must be wrong.
+When the option is enabled, the kernel extracts the timestamp and copies
+it into the 'Time_Stamp' field of the outgoing HCI ISO packet.
 
-Thanks for pointing this out, I'll prepare a patch soon!
+This also gives the controller the reference timing information
+required for ISO stream synchronization.
 
-Regards
-Luca
+A corresponding userspace change is required for full functionality.
+A reference implementation is available in PipeWire:
+https://gitlab.freedesktop.org/shitailu/pipewire/-/commit/5b3bd74e15febb974c8737a64f31fd17e18cd11b
+
+Signed-off-by: tailu.shi <tailu.shi@samsung.com>
+---
+ include/net/bluetooth/bluetooth.h |  5 ++++
+ include/net/bluetooth/hci_core.h  |  1 +
+ net/bluetooth/hci_core.c          |  2 +-
+ net/bluetooth/iso.c               | 49 +++++++++++++++++++++++++++----
+ 4 files changed, 50 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 69eed69f7f26..f88c83d21c5e 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -259,6 +259,10 @@ struct bt_codecs {
+ 
+ #define BT_SCM_PKT_SEQNUM	0x05
+ 
++#define BT_PKT_ISO_TIMESTAMP     23
++
++#define BT_SCM_PKT_ISO_TIMESTAMP 0x06
++
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
+@@ -409,6 +413,7 @@ enum {
+ 	BT_SK_SUSPEND,
+ 	BT_SK_PKT_STATUS,
+ 	BT_SK_PKT_SEQNUM,
++	BT_SK_PKT_ISO_TIMESTAMP,
+ };
+ 
+ struct bt_sock_list {
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7bffb908c1e..e39d192f8ef6 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -740,6 +740,7 @@ struct hci_conn {
+ 	struct bt_iso_qos iso_qos;
+ 	__u8		num_bis;
+ 	__u8		bis[HCI_MAX_ISO_BIS];
++	bool		iso_pkt_ts;
+ 
+ 	unsigned long	flags;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 31308c1de4ec..4264c0229dfb 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3335,7 +3335,7 @@ static void hci_queue_iso(struct hci_conn *conn, struct sk_buff_head *queue,
+ 
+ 	list = skb_shinfo(skb)->frag_list;
+ 
+-	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, 0x00);
++	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, conn->iso_pkt_ts ? 0x01 : 0x00);
+ 	hci_add_iso_hdr(skb, conn->handle, flags);
+ 
+ 	if (!list) {
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index be145e2736b7..dd4d198bab4c 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -73,6 +73,9 @@ struct iso_pinfo {
+ 	__u8			base_len;
+ 	__u8			base[BASE_MAX_LENGTH];
+ 	struct iso_conn		*conn;
++	bool			ts_flag;
++	__u32			ts;
++
+ };
+ 
+ static struct bt_iso_qos default_qos;
+@@ -542,6 +545,7 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
+ 	struct iso_conn *conn = iso_pi(sk)->conn;
+ 	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
+ 	struct hci_iso_data_hdr *hdr;
++	struct hci_iso_ts_data_hdr *hdr_ts;
+ 	int len = 0;
+ 
+ 	BT_DBG("sk %p len %d", sk, skb->len);
+@@ -552,13 +556,20 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
+ 	len = skb->len;
+ 
+ 	/* Push ISO data header */
+-	hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
+-	hdr->sn = cpu_to_le16(conn->tx_sn++);
+-	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
+-						      HCI_ISO_STATUS_VALID));
++	if (iso_pi(sk)->ts_flag) {
++		hdr_ts = skb_push(skb, HCI_ISO_TS_DATA_HDR_SIZE);
++		hdr_ts->ts = cpu_to_le32(iso_pi(sk)->ts);
++		hdr_ts->sn = cpu_to_le16(conn->tx_sn++);
++		hdr_ts->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
++	} else {
++		hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
++		hdr->sn = cpu_to_le16(conn->tx_sn++);
++		hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
++	}
+ 
+ 	if (sk->sk_state == BT_CONNECTED) {
+ 		hci_setup_tx_timestamp(skb, 1, sockc);
++		conn->hcon->iso_pkt_ts = iso_pi(sk)->ts_flag;
+ 		hci_send_iso(conn->hcon, skb);
+ 	} else {
+ 		len = -ENOTCONN;
+@@ -1471,7 +1482,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	struct sock *sk = sock->sk;
+ 	struct sk_buff *skb, **frag;
+ 	struct sockcm_cookie sockc;
+-	size_t mtu;
++	struct cmsghdr *cm;
++	size_t mtu, hlen;
+ 	int err;
+ 
+ 	BT_DBG("sock %p, sk %p", sock, sk);
+@@ -1485,10 +1497,23 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	hci_sockcm_init(&sockc, sk);
+ 
++	iso_pi(sk)->ts_flag = false;
+ 	if (msg->msg_controllen) {
+ 		err = sock_cmsg_send(sk, msg, &sockc);
+ 		if (err)
+ 			return err;
++
++		for (cm = CMSG_FIRSTHDR(msg); cm; cm = CMSG_NXTHDR(msg, cm)) {
++			if (cm->cmsg_level != SOL_BLUETOOTH)
++				continue;
++			if (test_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags) &&
++			    cm->cmsg_type == BT_SCM_PKT_ISO_TIMESTAMP &&
++			    cm->cmsg_len == CMSG_LEN(sizeof(u32))) {
++				iso_pi(sk)->ts_flag = true;
++				iso_pi(sk)->ts = *(u32 *)CMSG_DATA(cm);
++				break;
++			}
++		}
+ 	}
+ 
+ 	lock_sock(sk);
+@@ -1502,7 +1527,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	release_sock(sk);
+ 
+-	skb = bt_skb_sendmsg(sk, msg, len, mtu, HCI_ISO_DATA_HDR_SIZE, 0);
++	hlen = iso_pi(sk)->ts_flag ? HCI_ISO_TS_DATA_HDR_SIZE : HCI_ISO_DATA_HDR_SIZE;
++	skb = bt_skb_sendmsg(sk, msg, len, mtu, hlen, 0);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+@@ -1840,6 +1866,17 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		break;
+ 
++	case BT_PKT_ISO_TIMESTAMP:
++		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
++		if (err)
++			break;
++
++		if (opt)
++			set_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
++		else
++			clear_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+-- 
+2.25.1
+
