@@ -1,140 +1,76 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9A32116E0;
-	Wed, 11 Mar 2026 18:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4902175A8F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 20:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773252099; cv=none; b=JfdRYlG43Kj0DiW37aeBOrVv7jiO3Fo/fTiTXVyfrxjHTRN/wKIOin1rVXZiM4iaKrNQWf6HEIRwrOz29CnIIvHm80yYpUH/7fUv26stE8eMXpqbU+0x4BCgrCwWVQY9IGEtTO3fRWgZ1aaGn/cuJr4THPQ+51GkNy2COV5xW5M=
+	t=1773259809; cv=none; b=JBRdZZPn1rZhTAuQhjZ1WuitqBseNH6AP0rIzBkwVWW+XzchI6Dlim66PgqGKYV/XjELISqi3pl90sY2ftGTRGz44WX41ucNQ+HQOQYVYiZ0JAmO9N+xlEC+FwFVy9/X9nBndnz96ledtGrqmGnv1KotYhGnHDZvr+evq+arN2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773252099; c=relaxed/simple;
-	bh=3yWJLZ6GD/dmWHpKPnwlQPmYIRRZb9sfs9HOE709OMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WugJjzmzFUSwdO9W/IJokIo/NZ3FhydKT/LmFpwL+aZp5/gUfqLieJ4fWcmHEJ8W0X0Qhfz5fJRRKVdu/5nYjZHxSnVbxMl+Ck8A7Mu5Y7Db11MXSVOTtcMCIpdT/LWZnHJazD3Y4gAECg3O6pcTPbwPATHi6KEr3juIIN3ulRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=frk/CePd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773259809; c=relaxed/simple;
+	bh=SKc579dLlu4kCkOFcNgq5Al3fwUVGbOdnPPGoV1jbQk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=C4XzH6dMU1H4KK5BPfCJ0pGMLvBupX9R5oPYxkVU3zOYdHKqli4KUqDOGCFqBuMBIvJtkQCvBynrQOohP5DiiTsBXsdaHbXOS046+tZOklQCBuD+cV/OGsha+we6UP7kGKX002SelpjQJ3Zrros36v0237wUasbWKeKFNLPxCbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pVpTKJbj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="frk/CePd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B20AFC4CEF7;
-	Wed, 11 Mar 2026 18:01:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pVpTKJbj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FAC4C4CEF7;
+	Wed, 11 Mar 2026 20:10:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773252099;
-	bh=3yWJLZ6GD/dmWHpKPnwlQPmYIRRZb9sfs9HOE709OMk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=frk/CePd+U5812zAX29sI8YOCqz8vMR9Ia7CzLsw0NNdHN4DlpSmRpXI5m4qdxm2S
-	 QibXU93M97zLnR2UTk7XBWuVBHBzo1lpdmjlZHxwRj06iZcB2vmCV8RGTI+VszQfqn
-	 blhKo0EbHk4gm9TVSUs/L4l4d0lfE0S7YjkOwdiZFYa6huKB7K+Reyw9AteNN18mOx
-	 oxTCdorLYp7VgtX5tpxAzGa3ydWpWn5sPEjs4QzsivX7Sgzk0Ik0pr4z/j4Qsker3P
-	 PMYtx+UejyOrWHNLkhjjPf44IwR6tQr+A3Tr63BSy8W4XFHpJiFm9YyX2diN9JSQOq
-	 AiNGBrzarfsAg==
-Date: Wed, 11 Mar 2026 18:01:33 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Luca Weiss <luca.weiss@fairphone.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] arm64: dts: qcom: sm7225-fairphone-fp4: Add
- Bluetooth
-Message-ID: <20260311-come-olive-7bbc8f6536e1@spud>
-References: <20230421-fp4-bluetooth-v2-0-3de840d5483e@fairphone.com>
- <20230421-fp4-bluetooth-v2-4-3de840d5483e@fairphone.com>
- <20260310-maritime-silly-05e7b7e03aa6@spud>
- <DGZSPC64B8K5.3HBPHWMWXR482@fairphone.com>
+	s=k20201202; t=1773259808;
+	bh=SKc579dLlu4kCkOFcNgq5Al3fwUVGbOdnPPGoV1jbQk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pVpTKJbjOFU7Dn4fqVCAw5aszyMMG2ecl9VClFRmmqsj13VHurVHjb/c4EpmE5R1N
+	 8bYVb0OjnloQSwhTJ6uvhmtlg0x++dkpB486s5mztEX9TuisZ4gLevyKgwgk04/oDf
+	 AIXSXLRUM3dhWVBQJKTC50q07ZKA9VMnVp4vHhpj457vvvVBFtmHcDl+SXReMMw6m/
+	 77RptB2Vm22ksIsR8xaltjSZ/Iby3fYNJCb/xKSpy3w3tw89QSnGRxJtUhsoqVMGvU
+	 DkDRLnpo9d0t92mTXIQnwVAgoP/bMSt3T0uHdNoueiX2s5WoKzgwd/AnnkHiXD2qcu
+	 AJlLgCONjttrw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA2643808200;
+	Wed, 11 Mar 2026 20:10:05 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="0kPLRKqAFXYbgZvV"
-Content-Disposition: inline
-In-Reply-To: <DGZSPC64B8K5.3HBPHWMWXR482@fairphone.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4] Bluetooth: L2CAP: Fix accepting multiple
+ L2CAP_ECRED_CONN_REQ
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177325980455.3817440.16082168650744075592.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Mar 2026 20:10:04 +0000
+References: <20260310214037.732139-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260310214037.732139-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+
+Hello:
+
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Tue, 10 Mar 2026 17:40:37 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Currently the code attempts to accept requests regardless of the
+> command identifier which may cause multiple requests to be marked
+> as pending (FLAG_DEFER_SETUP) which can cause more than
+> L2CAP_ECRED_MAX_CID(5) to be allocated in l2cap_ecred_rsp_defer
+> causing an overflow.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v4] Bluetooth: L2CAP: Fix accepting multiple L2CAP_ECRED_CONN_REQ
+    https://git.kernel.org/bluetooth/bluetooth-next/c/19ba9c64840d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---0kPLRKqAFXYbgZvV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Mar 11, 2026 at 09:04:20AM +0100, Luca Weiss wrote:
-> On Tue Mar 10, 2026 at 7:02 PM CET, Conor Dooley wrote:
-> > On Fri, May 12, 2023 at 03:58:26PM +0200, Luca Weiss wrote:
-> >
-> >> +&qup_uart1_cts {
-> >> +	/*
-> >> +	 * Configure a bias-bus-hold on CTS to lower power
-> >> +	 * usage when Bluetooth is turned off. Bus hold will
-> >> +	 * maintain a low power state regardless of whether
-> >> +	 * the Bluetooth module drives the pin in either
-> >> +	 * direction or leaves the pin fully unpowered.
-> >> +	 */
-> >> +	bias-bus-hold;
-> >> +};
-> >> +
-> >> +&qup_uart1_rts {
-> >> +	/* We'll drive RTS, so no pull */
-> >> +	drive-strength =3D <2>;
-> >> +	bias-disable;
-> >> +};
-> >> +
-> >> +&qup_uart1_rx {
-> >> +	/*
-> >> +	 * Configure a pull-up on RX. This is needed to avoid
-> >> +	 * garbage data when the TX pin of the Bluetooth module is
-> >> +	 * in tri-state (module powered off or not driving the
-> >> +	 * signal yet).
-> >> +	 */
-> >> +	bias-pull-up;
-> >> +};
-> >> +
-> >> +&qup_uart1_tx {
-> >> +	/* We'll drive TX, so no pull */
-> >> +	drive-strength =3D <2>;
-> >> +	bias-disable;
-> >> +};
-> >
-> > I recently made some changes to pincfg-node.yaml to detect if there's
-> > conflicting properties used, and these got detected. Should these not
-> > do what has been done on the msm8998-xiaomi-sagit, and delete the
-> > inherited bias-foo from the dtsi?
-> > &blsp1_i2c5_sleep {
-> > 	/delete-property/ bias-pull-up;
-> > 	bias-disable;
-> > };
->=20
-> Yes, you're completely right.
->=20
-> In the final dtb qup-uart1-{cts,rts,rx,tx}-default-state contain two
-> bias-* properties, this must be wrong.
->=20
-> Thanks for pointing this out, I'll prepare a patch soon!
-
-
-Cool, guess it just worked for you because of either property ordering
-or how linux parsed it.
-
---0kPLRKqAFXYbgZvV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCabGt/QAKCRB4tDGHoIJi
-0tHSAP9RJhZFjBy79D1QA4/Y8GvUh6dcjQSJvmheIyZevV3mgwEAkrgsg1dqN3vO
-SUrSbqWC3nY+WuhQ8enPQB6kw6udSAM=
-=RVbj
------END PGP SIGNATURE-----
-
---0kPLRKqAFXYbgZvV--
