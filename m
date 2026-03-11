@@ -1,258 +1,282 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA534CB5B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 08:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773216923; cv=none; b=mnzC43sjU6xV1bwUrAi47D3MZQqT9K/OfY6Ezhi1AMBLTm23FIDK1SFGyRDvRnPhZn/Mj1MnrtJx7agPPXLr3Ue51spK0r0xXjkMlfYRm4cmW3jE02rKeHgkfGZ/GztCi4lcc7NdgESY+FhfjlZe4vrb/cagBDpyuexLOlx3LTc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773216923; c=relaxed/simple;
-	bh=Ibv6mxb85Vjx6GR5bQ/iXScyrnppslxrk2BO6HTNO9Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=FkBGc5pulugopaj99KTko8W1RHJ1tFVYqoPW5NgaNkd7v2yJ560XzHh767phvN+UswTu8+Y+DP0BS5pjsa80ONb/EjhHDxt3fOYe+T+QyotGCBBJIlsqfBkvFpIbFgZRryeFevmEESuhZuqYaX5eytptNYx/Pn7oR+Fh7PfglWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=aDt0qd9W; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9C535A3B5;
+	Wed, 11 Mar 2026 08:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773217019; cv=fail; b=Kkwq9NonuFeZtqeBRf7hXav4KVV/Jg8j/JV0KXFFvR3jW+ZaywS2MpokjFeKRIPz9XcBpRuPa9HPOUTcW6JePVwKHN+XYdxv9wiiXQLvm+26LbVnSo/TtsBxYEdsv7c7lY25s0Gq0f8Bqd1jObC/N9vWCiAJnIIcKyu3zBJvChg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773217019; c=relaxed/simple;
+	bh=Mh00NQrg2lIKNWkDXvNhPe2GMjEhYIMI8kQ4tCuMao4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ef8HHaDQ5eEn3LaC52nhnsl4aNCvHoy4rGiNKgesiET/Cdpksb+wCW+TMd2RX7+u3QBT+NrwpUvKpRZENUTmFw5NSZxBX3Sl9qsbLsikx76ZVXST1RH65ILfAQw7m7pZobiFZhhvqjqt06+6HqoQBctPXMb2F0mjX8Zy1HNpuTc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DsILeU5r; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="aDt0qd9W"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260311081516epoutp03e8f2985da183c67edfd9cd271d8974d4~bu2P-1Y1l0258302583epoutp03Z
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 08:15:16 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260311081516epoutp03e8f2985da183c67edfd9cd271d8974d4~bu2P-1Y1l0258302583epoutp03Z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1773216916;
-	bh=h9QCX6BKlj6YsGEm1cfpdulcqfYz926u/2gberIih6I=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=aDt0qd9WcLNkF5kPaX0dJhZt9jVb010HlptXuMT71Zyfwwnreu3JnXn0lle7mOTuv
-	 81iCdQxI/oQJw8SfWwvR50GBfeJN0Vd77OuWWIcE45oLhMR1RM68u8/FxHTZj1UxaS
-	 A2bt8hQ+Zl6Mq4VufwS/0ecN9j4M4Qnl6cb1kCIA=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20260311081516epcas5p4a92c7912401b6fc8d7b9b7e362c12bb9~bu2PlYVg92240022400epcas5p4L;
-	Wed, 11 Mar 2026 08:15:16 +0000 (GMT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4fW3TH740Cz6B9m9; Wed, 11 Mar
-	2026 08:15:15 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326~bu2PKsr952652726527epcas5p4f;
-	Wed, 11 Mar 2026 08:15:15 +0000 (GMT)
-Received: from localhost.localdomain (unknown [109.144.5.214]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260311081514epsmtip1152ce47e14e910fee9d10d443392fbbc~bu2OTGv5w2716427164epsmtip1K;
-	Wed, 11 Mar 2026 08:15:14 +0000 (GMT)
-From: "tailu.shi" <tailu.shi@samsung.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>, Pauli Virtanen <pav@iki.fi>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, "tailu.shi" <tailu.shi@samsung.com>
-Subject: [PATCH] Bluetooth: ISO: add timestamp for outgoing HCI ISO packet
-Date: Wed, 11 Mar 2026 16:14:01 +0800
-Message-Id: <20260311081401.3832000-1-tailu.shi@samsung.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DsILeU5r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773217017; x=1804753017;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Mh00NQrg2lIKNWkDXvNhPe2GMjEhYIMI8kQ4tCuMao4=;
+  b=DsILeU5rV0fPJi+km4xx5Ps63KhDRKsSsZOv9uaJFx/hrotbAgIMaQYr
+   8EJ2sESMFdk6eLRDwLME1PQZg2v2BuMvZ2kChElVJTjXQJaY8Rt92R0yw
+   4FL0jjdyct9zXzSe6yQSBCojhB9ClFK7tIJABDexaP9hVw2ZzC4TSqqcD
+   YLsD8g0LWPJXclMl+vUxB10AyBFtAWSGom4RfakHdB7MQvI7n1GsjOyXM
+   pZ9udvY7H1zjAnaQj4PLTc/BLSMUejVZKRaatBqIdGs9kxRjDG9/+cCQd
+   vreAaCyyFuF+2GAOSwkIaxiew0NyofhB+QPPxPYfN+HkUG7MkqzGxhmJ9
+   A==;
+X-CSE-ConnectionGUID: sv405qvoRK2ohHqE3+wYpg==
+X-CSE-MsgGUID: xaHTp5MlS4ysg3j3HlnVvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11725"; a="74467598"
+X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
+   d="scan'208";a="74467598"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 01:16:55 -0700
+X-CSE-ConnectionGUID: BMGoJHUZRWmghWNXe/Zk3Q==
+X-CSE-MsgGUID: g5YTB1s2Sqi+a6FaJQciMg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,113,1770624000"; 
+   d="scan'208";a="217077384"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2026 01:16:52 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 11 Mar 2026 01:16:51 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 11 Mar 2026 01:16:51 -0700
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.26)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 11 Mar 2026 01:16:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Opo9MpRJtwx0zLgDgZOZFJvPXyHqHHtJzkUiUwVJCsz4tKEKo07LreqxtnrsCjwVojH4U+UwLGvLUj6tWPkc6m4pF4S6tJD49D6pQ27s7xGcfs0lsvws5Mc4Crewz36bF2iEdApjb3wgDXOINHplZ8RrYmMyGB9KiYtvU5ZM7+8PPHQ4D+mLJZuIVu46F87G8kMLHuO5LzweNhPlt1T0hwPb8bjCxWtbmFufuecYQPnZ5Losrc+UeFJp5bjwsqeLk92kr09MQxsBmElWGC1C55jrobnIuiBTr7MkzzIlRr7ETHdfc04dd2ppiR3SK20FP0U+KXkotq1HmCcVeC5k6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Mh00NQrg2lIKNWkDXvNhPe2GMjEhYIMI8kQ4tCuMao4=;
+ b=PvZIA67maJcJZMl8ktUdh9e+oCmpUPO8uwMtDhImWg/7I0jtaQ97c2U03ZqEoY5MA8kxm/yaPjMOIZv/MRKJR5724vKgt3Zy0JtPGquxl+oby5wgXKR+gL5+Or5WdIAw4vi7PIP0s32fyfKM3StEJoqnrE68jqMTix3K03Ob2M8ClebhUzWxUWTTpgzEU+9ptB0YRzkwnLjf3Gbc5uI4fJXkLyhlVjPmb83qjchjgoQt/KAwPjnhtyjdlxnRgmuNmCsuQLP2UvSKZFbsiecOE8S+TAZM+vodeF7mGh4J2QrbQPRzL3dwaH393UaCBjVAY6A3gLotIzLPB/B5adEJOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by IA0PR11MB8379.namprd11.prod.outlook.com (2603:10b6:208:488::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Wed, 11 Mar
+ 2026 08:16:43 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9700.010; Wed, 11 Mar 2026
+ 08:16:43 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Philipp Hahn <phahn-oss@avm.de>, "amd-gfx@lists.freedesktop.org"
+	<amd-gfx@lists.freedesktop.org>, "apparmor@lists.ubuntu.com"
+	<apparmor@lists.ubuntu.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>, "cocci@inria.fr"
+	<cocci@inria.fr>, "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"gfs2@lists.linux.dev" <gfs2@lists.linux.dev>,
+	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "linux-btrfs@vger.kernel.org"
+	<linux-btrfs@vger.kernel.org>, "linux-cifs@vger.kernel.org"
+	<linux-cifs@vger.kernel.org>, "linux-clk@vger.kernel.org"
+	<linux-clk@vger.kernel.org>, "linux-erofs@lists.ozlabs.org"
+	<linux-erofs@lists.ozlabs.org>, "linux-ext4@vger.kernel.org"
+	<linux-ext4@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-gpio@vger.kernel.org"
+	<linux-gpio@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "linux-input@vger.kernel.org"
+	<linux-input@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-leds@vger.kernel.org"
+	<linux-leds@vger.kernel.org>, "linux-media@vger.kernel.org"
+	<linux-media@vger.kernel.org>, "linux-mips@vger.kernel.org"
+	<linux-mips@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
+	"linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
+	"linux-phy@lists.infradead.org" <linux-phy@lists.infradead.org>,
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+	"linux-rockchip@lists.infradead.org" <linux-rockchip@lists.infradead.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+	"linux-security-module@vger.kernel.org"
+	<linux-security-module@vger.kernel.org>, "linux-sh@vger.kernel.org"
+	<linux-sh@vger.kernel.org>, "linux-sound@vger.kernel.org"
+	<linux-sound@vger.kernel.org>, "linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "ntfs3@lists.linux.dev"
+	<ntfs3@lists.linux.dev>, "samba-technical@lists.samba.org"
+	<samba-technical@lists.samba.org>, "sched-ext@lists.linux.dev"
+	<sched-ext@lists.linux.dev>, "target-devel@vger.kernel.org"
+	<target-devel@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "v9fs@lists.linux.dev"
+	<v9fs@lists.linux.dev>
+CC: Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>
+Subject: RE: [Intel-wired-lan] [PATCH 03/61] ceph: Prefer IS_ERR_OR_NULL over
+ manual NULL check
+Thread-Topic: [Intel-wired-lan] [PATCH 03/61] ceph: Prefer IS_ERR_OR_NULL over
+ manual NULL check
+Thread-Index: AQHcsKJtosLQvJfHUESbmHNNZ0gghLWo/XCg
+Date: Wed, 11 Mar 2026 08:16:43 +0000
+Message-ID: <IA3PR11MB89868EDCF9D093C501E01FA3E547A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+ <20260310-b4-is_err_or_null-v1-3-bd63b656022d@avm.de>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-3-bd63b656022d@avm.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|IA0PR11MB8379:EE_
+x-ms-office365-filtering-correlation-id: e34e8a58-dab4-497e-6b65-08de7f4687c7
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020|38070700021|22082099003|18002099003|56012099003;
+x-microsoft-antispam-message-info: jQMLhYHNcc8rWLFFel/x2sMvHTNauRhuYBG4bf+v7DsJZFhupIQte49LtN3UoUBak4B1IEWtI5P1CmysS1a+awGpSJz1r40isgFFN6L4/mibvFUKClT/MHdIMjSE4HQukbYf0M2IxFRTmvLUaDZO/+OqT2RCKgtSBSNwPfxfWkRyzOeF2hz7VqpT/bP5wowbzNc66q4wL8xr7nzirI6YWKRsmxf1DWqNzDJq0ZDssnFrN3NJVD+DmQgHzvk6oU6znVEUc7rJrNuDvx5SfI22I0vk5YAHgZS3r3GWilsK/mH0/G6jWruqtyFazGqdS4YPo4VggHYRFgUF4hMOlNHdsU7DcnNMARrbZ0SGm+HoHpUKEXC4slgRMBk4pTRlS1bNRHmu7dctE53a4eld7MfvX4/VCisN7uIrH3H7wkgEnlsZFrITVWlYj6tCEICkv95CBNqOFL+vcNYaZDnlXRN4h4ieBBAs4bkxgJo51IR6odZkbLzjMXpzGcqsI/mt6RfxXqC8AL1RcxFJ07fcXv73zoGCVGHcwPZIItHDvtrPE46pL/lO0UByfnfuhJKRNACe4ge0dP0jWubYBPg4uKPCBIlEiu1E9lLwYWDODI+MxWMdCnw7Hi6ZWZe7Crnx98PGgc8WM8q+qFjTlWci6orACn3nPHmShktAHNmKZLfzUy4xRYweFBtNzgWrA73evyHgmwW3MabvCgHgm+V/f7BaRNGziMylCelvMtY5LRr3SVkxqtpuIWlU2tl6maVXxD/6Zma/pAGcxVD3vEAJpHEREdZUf+Id82qWyMcEFNe8aBamRKZIZReDd6IYnkL9aw8J
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?L0JnUUFIYlQxQkxQM3YrYlVCSThmZkoyOGZMejBVUmpSTW1IdDhLdTdBRVBI?=
+ =?utf-8?B?MjRuT09YQWdUSjNsclQ2Yi8wSDZBQjdiVzhCZmxXZkhQSTkxNjhXWExvNkZB?=
+ =?utf-8?B?dGNLYlNJbi9SNlMwSG1HNTd0RmVRT2NJRmVYMklXdjdDNFI0Rnd4dWtKUFZk?=
+ =?utf-8?B?YnZQVDBHelJaTmluU1FFQXZTelZZUlRNblJGMjVPT3Q5VkFpQXFLeW9UNmNJ?=
+ =?utf-8?B?Vmc0bEkwVVBOSk5xcVJJMzh3b3NNWlI0MnVPVmE4SGxuUVJiaXF1NkNkUXBK?=
+ =?utf-8?B?NmFLa2tEeWU4UEVPWERuTzVsVFZzREQyYnArUWdRVWRTRW5OK3FQcXZWRHpZ?=
+ =?utf-8?B?MXdxUmtzUC9uS011RnlNZmYydWZHSVMrcDl6b3JnWEl1MnpIZk13eFZpVHda?=
+ =?utf-8?B?UXJpT3RRRmtyOFdkUHVyKzZUN2s3NVMzNkZIU0ozUUgxNzRES3pjOHZaRTlw?=
+ =?utf-8?B?YXBqeUMwaUg4WmNTWkdUWlpaV29vWVVVSWk4Rzhnb0dDeGlZWVVPbVZHN2lm?=
+ =?utf-8?B?VUFobVB5cDM5K1ptdG5kcFFJUXd0aEJhNVFYanZKUkRIOFJKZUlweGZvWGxW?=
+ =?utf-8?B?SVRwaEpvQk5nQmJTVCtPQ2RGZ0NnNWNiYWRaQzkyWmlpMzVzbThGZ3B6RFVX?=
+ =?utf-8?B?UGxTOHJUSWFyeWZDSlZWSmtSM2Uwc3BEQ0dsM3hJS3J1S3FObTVvOW5sVzQz?=
+ =?utf-8?B?YWRoekI0Wk40R1Z0Smh6VHpwZlRCRlBXc3BqQzgzZmZVYVd1ZXRtL3NHc0Jk?=
+ =?utf-8?B?YWtqTEFtSHh2ODd6a29LYkpwSS9nUlQxU0xjdVA0c2JqUG9pT2VxMHloakNK?=
+ =?utf-8?B?NnZmMTZXOGczQzBZLzhyWDNna1dmdWtXVUFaTlZnTHM5c3kvektGNEg5TG51?=
+ =?utf-8?B?M2tieDF4dTBhUUJaRUJvQkNqcGkyMTJSYVl6eUpDNEZsbG42SCs0YWRNT3hp?=
+ =?utf-8?B?UFQvVzJTTis5RnFEWE1WWjlSZVdFSFAwb0dLQkIvNlpUODdtdHFlT3JKeXhJ?=
+ =?utf-8?B?cUN6em01SW5RQ0p2djM2NDR6UUxiQis2OGJGSHBzY3VURTZ2enhCT3Y0aDlC?=
+ =?utf-8?B?aEZNeWdVTmlBK3hBUHBuWjRVSmRFZmJNWE40NVJ0RE9mc1IydUJmYlU5WitW?=
+ =?utf-8?B?WVZKUXk4dUJGaE9tNUd1WmJ2ckN1V0VveVpqOGhXekxZeUxTcVRENWVFeVhr?=
+ =?utf-8?B?V3dpSWZYajNPZWdZTkdpTWlta3RtK25uTTBpZENMUTU2NE9YeS80bE1uQi9D?=
+ =?utf-8?B?SmFQdDQ3bUpRWmJwT3lKcVRFdEpHd1VwSHU3cXlBbnAraVBaR1NVQ2lSblVo?=
+ =?utf-8?B?aVN4eXBTcmRHSHJNaFhITWpCeG81dFl0dE1VTUwraTc5SVBmTEFBMzR4eFJ1?=
+ =?utf-8?B?bHZFYk1EZEYyaEVDTjlPUlBxN0ZhQmRRRms3YUdlZGpwTmVNMGp2UlJLS3h3?=
+ =?utf-8?B?UVBhZzZJLy9XQ1FVVElVeHBVTzRBTHRPNXQwam92ZGFJaXlLQXp4TWxaMkxY?=
+ =?utf-8?B?d1hGU1M1ck0yZkF4WVQxaXJaTlhjTGxXSTE1dUVwMVhzMmhmbC9JRk1yV0Yy?=
+ =?utf-8?B?RDhWQThtL2xpT1E4aEt3OFBVcnU4bHJrVDBvVXpMM0RhSXNqSDdpcjVSVzFh?=
+ =?utf-8?B?SWYyZDVLWUtBMExrcmQzdmJZYkhaN2c1VVR6SXUyWWVKNFE1Vit1dHdLcWF5?=
+ =?utf-8?B?RTRaWUF2YkdtVGxHSVFTakRabXU4Y0lYOVMyMURmb3FrK1lPRVQvQ1NQZFpC?=
+ =?utf-8?B?YWgzeEhPTjB0TjRNZ1NkVTZBeE1IMG9FelU3Qk8yYkRML3dwQ2RuTXJWdU43?=
+ =?utf-8?B?ZFZPUS85bmw0dnc5cmFGWDlxbm5PbGlOdzJKTWhTSUk3clNXNTc4NW9NQWIy?=
+ =?utf-8?B?MlJTR2JkQ0xiYkYrdE5LbXF2RkVERllYMzFZWCt2RFB3SlV3K0ZSeFJ1VTMz?=
+ =?utf-8?B?ODA1bk45VERFZ2hiRXlWeFNJOUJLZ1AzTk9DSDJVMEZSYXNxWnlqalU4b0tP?=
+ =?utf-8?B?K3RtZTFCb1VRK2l2K29abWdZZFpRWFl5d25GYmRURUlPbGxtTUJWWWpVem1a?=
+ =?utf-8?B?bXcvR054UUd5WUVTNnlKUFAxdzdaa1NtN1BJSjJXWFFjY3h6eWp0TmdDS1A3?=
+ =?utf-8?B?MWlybnExWTFMRytzeTVXNytOcFRNME42eU9wNk9xc3pQd05tNk42V0hhQm1L?=
+ =?utf-8?B?dTl3YTBjbGxkYjUvMDdmV2NTNnlPdjl4Y09Ec2VrNXZZYW01amJOM3pZdWp6?=
+ =?utf-8?B?YVAwSjFoV0FydDhMS0J0VWNWUmFDNVBtTXRnUEVKNnJ3R0N3RnJHNk42SEN0?=
+ =?utf-8?B?eDA3ajdsQ0EzTkVhcXhBV0lsOU9vdk0rU0gwWmpnYzNnMHdBcjM0TXViZ2Yv?=
+ =?utf-8?Q?pmu1iw0JdmpqlrD8=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-X-CMS-RootMailID: 20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326
-References: <CGME20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326@epcas5p4.samsung.com>
+X-Exchange-RoutingPolicyChecked: lS2x9ZIERkqgSn6Qc2Rfme6olSfFFxn2kmThqyIUm9Tyig3CNDNpPt1RwVWn7smwbBGJOzGfzCUuSOp27IHdik5xKs6rWV3ymJopLnDQSlVKAM6dlmNiDO3CJSy8X/IwO/YZdVRbsCsLTnoDX/jQ7pe8NGHKIbWh/d/7lgxquo77YLgktOmX9UtHTSiUFZKVZNxDUkmF1ReoboNIUri7zvoUg3oS177Awk4d+KM4Mj0dBehbim9Vu9HmZcBLy7DO0/CV06JdE98SmKBKqBbfyaW51ogywi/q2lMNh4w0K3qwNL6po5vnFnNYH1EUfdnz2mU2G/+qIrH7ce+ltJ6kWg==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e34e8a58-dab4-497e-6b65-08de7f4687c7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Mar 2026 08:16:43.5293
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ICks5v4abd3Mi47kJZ/Surb/+jNIrlILUiXV7SvcOuIRk0/oIphN5Js5Fof8QKa29fKfn+Kf31+5teG4Pxt9Lzf6o71UCRgFr4PD3RuzL9E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8379
+X-OriginatorOrg: intel.com
 
-The Bluetooth Core Specification defines the 'Time_Stamp' field of
-an HCI ISO packet as optional. However, it's mandatory to include
-the 'Time_Stamp' field when using HCI ISO packets per section 3.3
-'HCI Feature Support Requirement' of TMAP specification.
-https://www.bluetooth.com/specifications/specs/html/?src=TMAP_v1.0.1/out/en/index-en.html#UUID-68138fa8-fd1f-1a1b-e552-ddcd8fede9ec
-
-To comply with TMAP, introduce a new socket option BT_PKT_ISO_TIMESTAMP
-that allows user application (e.g. PipeWire) to attach timestamp to the
-data it sends to the ISO socket within BT_SCM_PKT_ISO_TIMESTAMP CMSG.
-
-When the option is enabled, the kernel extracts the timestamp and copies
-it into the 'Time_Stamp' field of the outgoing HCI ISO packet.
-
-This also gives the controller the reference timing information
-required for ISO stream synchronization.
-
-A corresponding userspace change is required for full functionality.
-A reference implementation is available in PipeWire:
-https://gitlab.freedesktop.org/shitailu/pipewire/-/commit/5b3bd74e15febb974c8737a64f31fd17e18cd11b
-
-Signed-off-by: tailu.shi <tailu.shi@samsung.com>
----
- include/net/bluetooth/bluetooth.h |  5 ++++
- include/net/bluetooth/hci_core.h  |  1 +
- net/bluetooth/hci_core.c          |  2 +-
- net/bluetooth/iso.c               | 49 +++++++++++++++++++++++++++----
- 4 files changed, 50 insertions(+), 7 deletions(-)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 69eed69f7f26..f88c83d21c5e 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -259,6 +259,10 @@ struct bt_codecs {
- 
- #define BT_SCM_PKT_SEQNUM	0x05
- 
-+#define BT_PKT_ISO_TIMESTAMP     23
-+
-+#define BT_SCM_PKT_ISO_TIMESTAMP 0x06
-+
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
- __printf(1, 2)
-@@ -409,6 +413,7 @@ enum {
- 	BT_SK_SUSPEND,
- 	BT_SK_PKT_STATUS,
- 	BT_SK_PKT_SEQNUM,
-+	BT_SK_PKT_ISO_TIMESTAMP,
- };
- 
- struct bt_sock_list {
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a7bffb908c1e..e39d192f8ef6 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -740,6 +740,7 @@ struct hci_conn {
- 	struct bt_iso_qos iso_qos;
- 	__u8		num_bis;
- 	__u8		bis[HCI_MAX_ISO_BIS];
-+	bool		iso_pkt_ts;
- 
- 	unsigned long	flags;
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 31308c1de4ec..4264c0229dfb 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3335,7 +3335,7 @@ static void hci_queue_iso(struct hci_conn *conn, struct sk_buff_head *queue,
- 
- 	list = skb_shinfo(skb)->frag_list;
- 
--	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, 0x00);
-+	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, conn->iso_pkt_ts ? 0x01 : 0x00);
- 	hci_add_iso_hdr(skb, conn->handle, flags);
- 
- 	if (!list) {
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index be145e2736b7..dd4d198bab4c 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -73,6 +73,9 @@ struct iso_pinfo {
- 	__u8			base_len;
- 	__u8			base[BASE_MAX_LENGTH];
- 	struct iso_conn		*conn;
-+	bool			ts_flag;
-+	__u32			ts;
-+
- };
- 
- static struct bt_iso_qos default_qos;
-@@ -542,6 +545,7 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
- 	struct iso_conn *conn = iso_pi(sk)->conn;
- 	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
- 	struct hci_iso_data_hdr *hdr;
-+	struct hci_iso_ts_data_hdr *hdr_ts;
- 	int len = 0;
- 
- 	BT_DBG("sk %p len %d", sk, skb->len);
-@@ -552,13 +556,20 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
- 	len = skb->len;
- 
- 	/* Push ISO data header */
--	hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
--	hdr->sn = cpu_to_le16(conn->tx_sn++);
--	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
--						      HCI_ISO_STATUS_VALID));
-+	if (iso_pi(sk)->ts_flag) {
-+		hdr_ts = skb_push(skb, HCI_ISO_TS_DATA_HDR_SIZE);
-+		hdr_ts->ts = cpu_to_le32(iso_pi(sk)->ts);
-+		hdr_ts->sn = cpu_to_le16(conn->tx_sn++);
-+		hdr_ts->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
-+	} else {
-+		hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
-+		hdr->sn = cpu_to_le16(conn->tx_sn++);
-+		hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VALID));
-+	}
- 
- 	if (sk->sk_state == BT_CONNECTED) {
- 		hci_setup_tx_timestamp(skb, 1, sockc);
-+		conn->hcon->iso_pkt_ts = iso_pi(sk)->ts_flag;
- 		hci_send_iso(conn->hcon, skb);
- 	} else {
- 		len = -ENOTCONN;
-@@ -1471,7 +1482,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	struct sock *sk = sock->sk;
- 	struct sk_buff *skb, **frag;
- 	struct sockcm_cookie sockc;
--	size_t mtu;
-+	struct cmsghdr *cm;
-+	size_t mtu, hlen;
- 	int err;
- 
- 	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -1485,10 +1497,23 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 
- 	hci_sockcm_init(&sockc, sk);
- 
-+	iso_pi(sk)->ts_flag = false;
- 	if (msg->msg_controllen) {
- 		err = sock_cmsg_send(sk, msg, &sockc);
- 		if (err)
- 			return err;
-+
-+		for (cm = CMSG_FIRSTHDR(msg); cm; cm = CMSG_NXTHDR(msg, cm)) {
-+			if (cm->cmsg_level != SOL_BLUETOOTH)
-+				continue;
-+			if (test_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags) &&
-+			    cm->cmsg_type == BT_SCM_PKT_ISO_TIMESTAMP &&
-+			    cm->cmsg_len == CMSG_LEN(sizeof(u32))) {
-+				iso_pi(sk)->ts_flag = true;
-+				iso_pi(sk)->ts = *(u32 *)CMSG_DATA(cm);
-+				break;
-+			}
-+		}
- 	}
- 
- 	lock_sock(sk);
-@@ -1502,7 +1527,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 
- 	release_sock(sk);
- 
--	skb = bt_skb_sendmsg(sk, msg, len, mtu, HCI_ISO_DATA_HDR_SIZE, 0);
-+	hlen = iso_pi(sk)->ts_flag ? HCI_ISO_TS_DATA_HDR_SIZE : HCI_ISO_DATA_HDR_SIZE;
-+	skb = bt_skb_sendmsg(sk, msg, len, mtu, hlen, 0);
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
-@@ -1840,6 +1866,17 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
- 
- 		break;
- 
-+	case BT_PKT_ISO_TIMESTAMP:
-+		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
-+		if (err)
-+			break;
-+
-+		if (opt)
-+			set_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
-+		else
-+			clear_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
-+		break;
-+
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
--- 
-2.25.1
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSW50ZWwtd2lyZWQtbGFu
+IDxpbnRlbC13aXJlZC1sYW4tYm91bmNlc0Bvc3Vvc2wub3JnPiBPbiBCZWhhbGYNCj4gT2YgUGhp
+bGlwcCBIYWhuDQo+IFNlbnQ6IFR1ZXNkYXksIE1hcmNoIDEwLCAyMDI2IDEyOjQ4IFBNDQo+IFRv
+OiBhbWQtZ2Z4QGxpc3RzLmZyZWVkZXNrdG9wLm9yZzsgYXBwYXJtb3JAbGlzdHMudWJ1bnR1LmNv
+bTsNCj4gYnBmQHZnZXIua2VybmVsLm9yZzsgY2VwaC1kZXZlbEB2Z2VyLmtlcm5lbC5vcmc7IGNv
+Y2NpQGlucmlhLmZyOyBkbS0NCj4gZGV2ZWxAbGlzdHMubGludXguZGV2OyBkcmktZGV2ZWxAbGlz
+dHMuZnJlZWRlc2t0b3Aub3JnOw0KPiBnZnMyQGxpc3RzLmxpbnV4LmRldjsgaW50ZWwtZ2Z4QGxp
+c3RzLmZyZWVkZXNrdG9wLm9yZzsgaW50ZWwtd2lyZWQtDQo+IGxhbkBsaXN0cy5vc3Vvc2wub3Jn
+OyBpb21tdUBsaXN0cy5saW51eC5kZXY7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4LWFy
+bS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZzsgbGludXgtYmxvY2tAdmdlci5rZXJuZWwub3Jn
+Ow0KPiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnOyBsaW51eC1idHJmc0B2Z2VyLmtl
+cm5lbC5vcmc7IGxpbnV4LQ0KPiBjaWZzQHZnZXIua2VybmVsLm9yZzsgbGludXgtY2xrQHZnZXIu
+a2VybmVsLm9yZzsgbGludXgtDQo+IGVyb2ZzQGxpc3RzLm96bGFicy5vcmc7IGxpbnV4LWV4dDRA
+dmdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4gZnNkZXZlbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4
+LWdwaW9Admdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4gaHlwZXJ2QHZnZXIua2VybmVsLm9yZzsg
+bGludXgtaW5wdXRAdmdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4ga2VybmVsQHZnZXIua2VybmVs
+Lm9yZzsgbGludXgtbGVkc0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiBtZWRpYUB2Z2VyLmtl
+cm5lbC5vcmc7IGxpbnV4LW1pcHNAdmdlci5rZXJuZWwub3JnOyBsaW51eC1tbUBrdmFjay5vcmc7
+DQo+IGxpbnV4LW1vZHVsZXNAdmdlci5rZXJuZWwub3JnOyBsaW51eC1tdGRAbGlzdHMuaW5mcmFk
+ZWFkLm9yZzsgbGludXgtDQo+IG5mc0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LW9tYXBAdmdlci5r
+ZXJuZWwub3JnOyBsaW51eC0NCj4gcGh5QGxpc3RzLmluZnJhZGVhZC5vcmc7IGxpbnV4LXBtQHZn
+ZXIua2VybmVsLm9yZzsgbGludXgtDQo+IHJvY2tjaGlwQGxpc3RzLmluZnJhZGVhZC5vcmc7IGxp
+bnV4LXMzOTBAdmdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4gc2NzaUB2Z2VyLmtlcm5lbC5vcmc7
+IGxpbnV4LXNjdHBAdmdlci5rZXJuZWwub3JnOyBsaW51eC1zZWN1cml0eS0NCj4gbW9kdWxlQHZn
+ZXIua2VybmVsLm9yZzsgbGludXgtc2hAdmdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4gc291bmRA
+dmdlci5rZXJuZWwub3JnOyBsaW51eC1zdG0zMkBzdC1tZC1tYWlsbWFuLnN0b3JtcmVwbHkuY29t
+Ow0KPiBsaW51eC10cmFjZS1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBsaW51eC11c2JAdmdlci5r
+ZXJuZWwub3JnOyBsaW51eC0NCj4gd2lyZWxlc3NAdmdlci5rZXJuZWwub3JnOyBuZXRkZXZAdmdl
+ci5rZXJuZWwub3JnOw0KPiBudGZzM0BsaXN0cy5saW51eC5kZXY7IHNhbWJhLXRlY2huaWNhbEBs
+aXN0cy5zYW1iYS5vcmc7IHNjaGVkLQ0KPiBleHRAbGlzdHMubGludXguZGV2OyB0YXJnZXQtZGV2
+ZWxAdmdlci5rZXJuZWwub3JnOyB0aXBjLQ0KPiBkaXNjdXNzaW9uQGxpc3RzLnNvdXJjZWZvcmdl
+Lm5ldDsgdjlmc0BsaXN0cy5saW51eC5kZXY7IFBoaWxpcHAgSGFobg0KPiA8cGhhaG4tb3NzQGF2
+bS5kZT4NCj4gQ2M6IElseWEgRHJ5b21vdiA8aWRyeW9tb3ZAZ21haWwuY29tPjsgQWxleCBNYXJr
+dXplDQo+IDxhbWFya3V6ZUByZWRoYXQuY29tPjsgVmlhY2hlc2xhdiBEdWJleWtvIDxzbGF2YUBk
+dWJleWtvLmNvbT4NCj4gU3ViamVjdDogW0ludGVsLXdpcmVkLWxhbl0gW1BBVENIIDAzLzYxXSBj
+ZXBoOiBQcmVmZXIgSVNfRVJSX09SX05VTEwNCj4gb3ZlciBtYW51YWwgTlVMTCBjaGVjaw0KPiAN
+Cj4gUHJlZmVyIHVzaW5nIElTX0VSUl9PUl9OVUxMKCkgb3ZlciB1c2luZyBJU19FUlIoKSBhbmQg
+YSBtYW51YWwgTlVMTA0KPiBjaGVjay4NCj4gDQo+IENoYW5nZSBnZW5lcmF0ZWQgd2l0aCBjb2Nj
+aW5lbGxlLg0KPiANCj4gVG86IElseWEgRHJ5b21vdiA8aWRyeW9tb3ZAZ21haWwuY29tPg0KPiBU
+bzogQWxleCBNYXJrdXplIDxhbWFya3V6ZUByZWRoYXQuY29tPg0KPiBUbzogVmlhY2hlc2xhdiBE
+dWJleWtvIDxzbGF2YUBkdWJleWtvLmNvbT4NCj4gQ2M6IGNlcGgtZGV2ZWxAdmdlci5rZXJuZWwu
+b3JnDQo+IENjOiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+IFNpZ25lZC1vZmYtYnk6
+IFBoaWxpcHAgSGFobiA8cGhhaG4tb3NzQGF2bS5kZT4NCj4gLS0tDQo+ICBmcy9jZXBoL2Rpci5j
+ICB8IDIgKy0NCj4gIGZzL2NlcGgvc25hcC5jIHwgMiArLQ0KPiAgMiBmaWxlcyBjaGFuZ2VkLCAy
+IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZnMvY2Vw
+aC9kaXIuYyBiL2ZzL2NlcGgvZGlyLmMgaW5kZXgNCj4gODZkN2FhNTk0ZWE5OTMzNWFmM2U5MWE5
+NWMwYTQxOGZkYzFiOGE4YS4uOTM0MjUwNzQ4YWU0ZmQ0YzE0OGZkMjdiZGY5MQ0KPiAxNzUwNDdj
+Mjg3N2QgMTAwNjQ0DQo+IC0tLSBhL2ZzL2NlcGgvZGlyLmMNCj4gKysrIGIvZnMvY2VwaC9kaXIu
+Yw0KPiBAQCAtODg5LDcgKzg4OSw3IEBAIGludCBjZXBoX2hhbmRsZV9ub3RyYWNlX2NyZWF0ZShz
+dHJ1Y3QgaW5vZGUgKmRpciwNCj4gc3RydWN0IGRlbnRyeSAqZGVudHJ5KSAgew0KPiAgCXN0cnVj
+dCBkZW50cnkgKnJlc3VsdCA9IGNlcGhfbG9va3VwKGRpciwgZGVudHJ5LCAwKTsNCj4gDQo+IC0J
+aWYgKHJlc3VsdCAmJiAhSVNfRVJSKHJlc3VsdCkpIHsNCj4gKwlpZiAoIUlTX0VSUl9PUl9OVUxM
+KHJlc3VsdCkpIHsNCj4gIAkJLyoNCj4gIAkJICogV2UgY3JlYXRlZCB0aGUgaXRlbSwgdGhlbiBk
+aWQgYSBsb29rdXAsIGFuZCBmb3VuZA0KPiAgCQkgKiBpdCB3YXMgYWxyZWFkeSBsaW5rZWQgdG8g
+YW5vdGhlciBpbm9kZSB3ZSBhbHJlYWR5DQo+IGRpZmYgLS1naXQgYS9mcy9jZXBoL3NuYXAuYyBi
+L2ZzL2NlcGgvc25hcC5jIGluZGV4DQo+IDUyYjRjMjY4NGY5MjJiZmVkMzk1NTAzMTFlNzkzYmZl
+MzYyMmNkMjYuLjUyOGFkNTgxYmUxNjA3MTNmOTE0MTYxMTU2NTkNCj4gZTJkYzZmMjU5NTc2IDEw
+MDY0NA0KPiAtLS0gYS9mcy9jZXBoL3NuYXAuYw0KPiArKysgYi9mcy9jZXBoL3NuYXAuYw0KPiBA
+QCAtOTAyLDcgKzkwMiw3IEBAIGludCBjZXBoX3VwZGF0ZV9zbmFwX3RyYWNlKHN0cnVjdCBjZXBo
+X21kc19jbGllbnQNCj4gKm1kc2MsDQo+ICBiYWQ6DQo+ICAJZXJyID0gLUVJTzsNCj4gIGZhaWw6
+DQo+IC0JaWYgKHJlYWxtICYmICFJU19FUlIocmVhbG0pKQ0KPiArCWlmICghSVNfRVJSX09SX05V
+TEwocmVhbG0pKQ0KPiAgCQljZXBoX3B1dF9zbmFwX3JlYWxtKG1kc2MsIHJlYWxtKTsNCj4gIAlp
+ZiAoZmlyc3RfcmVhbG0pDQo+ICAJCWNlcGhfcHV0X3NuYXBfcmVhbG0obWRzYywgZmlyc3RfcmVh
+bG0pOw0KPiANCj4gLS0NCj4gMi40My4wDQoNClJldmlld2VkLWJ5OiBBbGVrc2FuZHIgTG9rdGlv
+bm92IDxhbGVrc2FuZHIubG9rdGlvbm92QGludGVsLmNvbT4NCg==
