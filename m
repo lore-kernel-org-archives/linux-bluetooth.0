@@ -1,116 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DA23C8714;
-	Wed, 11 Mar 2026 10:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8623D9DCE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 11:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773224340; cv=none; b=fR/+MkHV+JArbx12LwrrFL8FHqlFnD8G63gvsxNX4DAm9FLbWgT1DEQptnL0waWzudboF5dj2Bx3GvOk7+4vxQqmyeqa3ARLc7mZz2p0EW4k9X4kNDXagdhlhhWw4VP7f/hjGqKd2E2NURHABx9ku0c5X6ItQ/LlNI6vx5i1ytA=
+	t=1773227753; cv=none; b=cCXkODT/XxniO5/+sJL9o8EUjzuyQa6vECkQ/fdtP0shabx5hTJ9GNUwvlsOQtqCywBaYIstEzt4HokeoAzOaNo9gD/Gyxg/P16jsdQOlEItKy8Lt/tjKx+O4SA0KDvt426LFJ+3avD414c+bP5o/3RjxLYRoXhLkbtDaBwAflk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773224340; c=relaxed/simple;
-	bh=LO2VOvF1JlLCFxrelSPybMAGAFqWDl+KQZmD1Nb+jIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UzKpOoDVnv3B7svYE/1u2Zfg1DOQ4umMlGdPFhv2t406yRWeuJUplbOsedC0FAaWwTARULhj7Ou2eywebuufivoYIxImbm6HTL21w4R5lBmJoiAovoAPR41WoBenaeVfK8HapaPC7N4Ip1V5SdqW8biB4t67ch/EjGVnqQ5RfEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1wvr1+r; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1wvr1+r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91B27C4CEF7;
-	Wed, 11 Mar 2026 10:18:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773224340;
-	bh=LO2VOvF1JlLCFxrelSPybMAGAFqWDl+KQZmD1Nb+jIU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y1wvr1+rtBne8iqFrgnqwJzLowdvA6bEy/oMfWVeMCnUlLB9YDXfDrtjYbS6hVhsE
-	 /JmA7krlaTKBv/jCl2tVQs5v7dtUQOtHcwccVNSYRB2XjTJgj+oNlb2NzqG5oBGBVi
-	 taMRFRhjP4AqClhXJ7h6BYeDvH5HRHVw2B3qvyedEVy/1R6jf79ZE4cYU41Kj6OwOe
-	 ahbxJLr0e2Ouq+aOL+tBnqfybyLEaWinTpNtBsn8JSP4zKyp8tZW8sznP/0Z119zPE
-	 fPpTjabUQg4HXY/2iQDBtRdKXfVxRTrIHiclm6wyQXUbsVLabpHEkiVDzmSQ54ahn2
-	 Ub/zbmEJ//f7w==
-Date: Wed, 11 Mar 2026 11:18:22 +0100
-From: Benjamin Tissoires <bentiss@kernel.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Eric-Terminal <ericterminal@gmail.com>, marcel@holtmann.org, 
-	johan.hedberg@gmail.com, luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: HIDP: cap report descriptor size in HID
- setup
-Message-ID: <abFA9nm_fBqw8mNS@beelink>
-References: <CABBYNZ+9Z8Yd9mRhgz0N9kSSvLR-6euPf9CRA1Sop_D8zV8wqQ@mail.gmail.com>
- <20260228172657.53040-1-ericterminal@gmail.com>
- <ee5fc583c7d6dad138db759cddd84e409190d1ae.camel@hadess.net>
+	s=arc-20240116; t=1773227753; c=relaxed/simple;
+	bh=C51c2FMaeT0t4Ry/dGlekGZo7JyOeDt+HVYz333zwJU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WMA79BKnCv/2QoVSlwEQlkWfIzEiC7PJYAN3p0sCvAQqVoS4fnz4zU+BW5a5cY1LPWnFJiE06cWxbbqMK9Yy6hPoOevVtNoMZ1wYgTfeVl/m/ejpwnjS0RcxHRCs4GNiqQ5+aUjO1Vp90qZNhZB4hT3b0xhqP45JtAMXoxWWp1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7772441CCC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 11:15:49 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 0/1] tools/btmgmt: Fix btmgmt --help hanging
+Date: Wed, 11 Mar 2026 12:14:12 +0100
+Message-ID: <20260311111540.2170373-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ee5fc583c7d6dad138db759cddd84e409190d1ae.camel@hadess.net>
+X-GND-Sasl: hadess@hadess.net
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvkeefjeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeffudfgkeffjeekieeivddtfeevvdelffejudfhhfehueehueefkeefueethfevfeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepjeejjedvgeegudevveevpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-State: clean
 
-On Mar 01 2026, Bastien Nocera wrote:
-> On Sun, 2026-03-01 at 01:26 +0800, Eric-Terminal wrote:
-> > From: Yufan Chen <ericterminal@gmail.com>
-> > 
-> > hidp_setup_hid() duplicates the report descriptor from userspace
-> > based on
-> > req->rd_size. Large values can trigger oversized copies.
-> > 
-> > Do not reject the connection when rd_size exceeds
-> > HID_MAX_DESCRIPTOR_SIZE. Instead, cap rd_size in hidp_setup_hid()
-> > and use the capped value for memdup_user() and session->rd_size.
-> > 
-> > This keeps compatibility with existing userspace behavior while
-> > bounding memory usage in the HID setup path.
-> 
-> Cross-sending this to linux-input@ for review, they would know the best
-> way to deal with oversized HID descriptors.
+Another one of those. Wrote a test case again to avoid regressions :)
 
-AFAICT the hid-core code would be fine with it (it would parse it), but
-there will be some issues (hidraw will not be able to export the entire
-rdesc, so is the sysfs).
+https://github.com/hadess/bluez/commit/81dcf1794b510a41c7b9b6ec53376cb5322b0bd2
 
-For reference, usbhid just returns -EINVAL for oversize report
-descriptors.
+Bastien Nocera (1):
+  tools/btmgmt: Fix btmgmt --help hanging
 
-Anyway, if the report descriptor is truncated, like in this patch, the
-hid core parse will fail if the data is not correct, so I thing this
-should be safe.
+ tools/btmgmt.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Cheers,
-Benjamin
+-- 
+2.53.0
 
-> 
-> > 
-> > Signed-off-by: Yufan Chen <ericterminal@gmail.com>
-> > ---
-> >  net/bluetooth/hidp/core.c | 7 +++++--
-> >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> > index 6fe815241..31aeffa39 100644
-> > --- a/net/bluetooth/hidp/core.c
-> > +++ b/net/bluetooth/hidp/core.c
-> > @@ -755,13 +755,16 @@ static int hidp_setup_hid(struct hidp_session
-> > *session,
-> >  				const struct hidp_connadd_req *req)
-> >  {
-> >  	struct hid_device *hid;
-> > +	unsigned int rd_size;
-> >  	int err;
-> >  
-> > -	session->rd_data = memdup_user(req->rd_data, req->rd_size);
-> > +	rd_size = min_t(unsigned int, req->rd_size,
-> > HID_MAX_DESCRIPTOR_SIZE);
-> > +
-> > +	session->rd_data = memdup_user(req->rd_data, rd_size);
-> >  	if (IS_ERR(session->rd_data))
-> >  		return PTR_ERR(session->rd_data);
-> >  
-> > -	session->rd_size = req->rd_size;
-> > +	session->rd_size = rd_size;
-> >  
-> >  	hid = hid_allocate_device();
-> >  	if (IS_ERR(hid)) {
-> 
