@@ -1,126 +1,133 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B56C3D9DB0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 16:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B5F30EF8F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 17:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773246924; cv=none; b=SEh44hWBAcc3lhzrVeIloE8dhG+1+4PvqnsV4qcXPf3CI1jmAQ3hvuyhW/7wu1zIx6o6w2+YZhKDllyRq19ZG2bjka+om+aJIf+AXZMRXDlT3Fo2eE5odCwshxaJ3cuqnDUOeUF8s1+YngoIviCI10zQUJBImntS3BwW6BibWe8=
+	t=1773249781; cv=none; b=VIkWtDyCZ+DTGe4sqX+CCmT1HVvPD+olcNR9u2un9OdbMumzyJyuiHRaxmhkjbr9DBdZvIz2AXojeFG2u28TpH1C76JhlI4ABkeuYr0iLJx/dqivjvPIDBK7ACyahHqO+1Jm2sMuJOYiU0v+Ty1qp9qoVydbcEEq03LyWCy7INA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773246924; c=relaxed/simple;
-	bh=vgBBGA94UuSorrYZet6DzF/XE8COkTzD6P8r2bdhpjs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=dKFcUb5oBdwxO6xmSnHd7Yk4U31SqR+Bfq7JErMnKLvbe86SDEaBpVj04Ukyr4eGmLoBHVrfahQobX15JUnyxJW4l2juZmS3lbBLhmTLnuyiE7pa0/gs35jkKfmwXzHDxauemeaIz57c5RW8tI+CNeg07R1jyYoOAbmkCAwm7g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=O8W/RwfB; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1773249781; c=relaxed/simple;
+	bh=M5uwNUAf2khhD1Ey3R7oNMo3xtYUyZI6lbiEsgM5Lh4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=WZmLxiUOg9nUcVxxVimVB8u4izvjccpN9SES4Xp2jTacTZ5cJman3P2aJ+orhMbJlv+NCw5Y0E8F8JJ3NGTAyoXsNkxqIQjx8tisKaBgm9+t7yFbBII/jugT5zS0SIkLi8HJ6AUwj9ZLybQTqerb21z2zW/mxJHvYHhiJta9l5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ADPr92ej; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="O8W/RwfB"
-Received: from github.com (hubbernetes-node-df451ee.ac4-iad.github.net [10.52.220.37])
-	by smtp.github.com (Postfix) with ESMTPA id 486DB640544
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 09:35:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1773246921;
-	bh=A3FedaUt0yIK1NblPMhi8RaMei5DWa8V6sMFH7TY9wc=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=O8W/RwfBOtNBod3amXqKulx78NqjY+V3YvgJo5shlTAWiCuVx6j+vQUvBnzIb3Nma
-	 r0Y91pzFAPfrypWYfV1Fo94/NMco99v3koXE+rp6FUH7PPOU/OiURNqMvHEAZC6JV5
-	 rPkde9VkOou5edvfyq6J84uxyU/IDL2HIaQ0yO2w=
-Date: Wed, 11 Mar 2026 09:35:21 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1065141/000000-6e61a1@github.com>
-Subject: [bluez/bluez] 3c4727: bthost: fix receiving timestamped ISO packets
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ADPr92ej"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cd71fb9f06so4539585a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 10:23:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773249779; x=1773854579; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6QbIolgzW5Dlof54mN5QLfKohyrVPmACidhBT1g9qds=;
+        b=ADPr92ejSGzrtx31Q3puuPshOkdZNctuOFAI0XTn/Q0rlbiGM1ASLXbWfYvfQDTZzi
+         FIn8vn3d1q+P3E+iag31ZA4zyZZSbmAmVsGhfng3MEtPp5pG6oYn0cVGkMY3i/rnieSA
+         WtK2miiEEISuKgxA7xYYrYE0lPvnln5XL6F9YbC18l7PQr+vIGBO07pSADPLt9lmKVPD
+         jSGRrMohUxERhSB+YjyLZcD3v+MTv8plknt+TnMKtLoLTTsWr+6S74sdLj4Dm/qkRhbL
+         2Q502pAOLdhe3kOnNMcAZT04b9Gn9ylSrc9dKUJjBJcEAi7BUtInTvA6tT5/yJw7qDmw
+         Dedw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773249779; x=1773854579;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6QbIolgzW5Dlof54mN5QLfKohyrVPmACidhBT1g9qds=;
+        b=utuZJC4a1J6ZeCUmDsGhfFhf1WzA8ZbwCUaMfda+ZnacQbhCM18vtfGLiyr8WQ0UJl
+         5tvJ7y8CGtNoqyXPnTcRP/OpZc9w/xjFqS5+/4PeISIanmJAbbJplIiQCUk41xT9XNA7
+         3gVXv9PhtAxgHMYS4bf9KABuzUvV8oy8K5q2gTQI65naTPhECHtS8cT8ViPf2MmksEJ5
+         AyX5dxmprCS0yPD4cYs60KWXyuTsmg9Y7nDnC4UDWd1aBQRbt5CXFeXghvji4q0W9R1B
+         qBM7Of5PAgfkcsq/P9HRjdfwgsnUHgZDQ18maRLifS++YL0M4Gzx/TZxKbmUHWsKbcbM
+         7nWg==
+X-Gm-Message-State: AOJu0YzkcAoN9XMLjNUYEfqVAmbGqb1E9lJ3PrsYJP/gB70FGxDdPF8I
+	iG8KQDXvNn12LNdsjDFCWEQJuxpeMTup9fLOh/GftU2ztqjpGAanl8GHANhivA==
+X-Gm-Gg: ATEYQzwm3rLrfkX4MvH6mYWzunluOp9sGR0Y70l9imfTpC1TJNEP4GAneSOzOA6EfsK
+	4uglCItOgSRymBX7Tm6ySUt165WfCdfyktY5oWs9MmpkixN5T9+UhbRmiH1Os8v3+fTMXnKO4Tb
+	3+BOdYWlebdLjHyhlPaouQ7r4+KlLB6TdcsID+FaoE0XfkVX4j6ZevFCI0K4ERpsJ2JbIcnkNox
+	6r4rkbRWZrvWyRgt272bSncBOk3URf7gZ3RgaBh9Ruz7NEVeYgGhtqOZivCbnJSIgDhkLRBHdXk
+	XJYsWpBSOlw3JuYBjxck53APmd+QUBJg8RYaKFDhPKbawW/dNx1WwyR/0PWyLihXb1rd8CvTXAy
+	N5uUniXT8J1Q5xx84v4/33KeWZ3TtdmOdgcyAGyCVHua7YxoHiAWvjMXoVspTfnuIY9gDL1TG2S
+	PA2snkvG3LvLyBWsfYYcSWiYCNETo=
+X-Received: by 2002:a05:620a:470f:b0:8cd:9938:9809 with SMTP id af79cd13be357-8cda195695amr419655285a.26.1773249779290;
+        Wed, 11 Mar 2026 10:22:59 -0700 (PDT)
+Received: from [172.17.0.2] ([64.236.169.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cda1fc2725sm175609785a.8.2026.03.11.10.22.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Mar 2026 10:22:58 -0700 (PDT)
+Message-ID: <69b1a4f2.050a0220.3b4a0f.8ae3@mx.google.com>
+Date: Wed, 11 Mar 2026 10:22:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5263083495225487986=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: iso-tester: add tests for set & receive ISO HW timestamps
+In-Reply-To: <3c9b3d899d6e4b042e532abdb99048d1e04ff99b.1773245672.git.pav@iki.fi>
+References: <3c9b3d899d6e4b042e532abdb99048d1e04ff99b.1773245672.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5263083495225487986==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1065141
-  Home:   https://github.com/bluez/bluez
-  Commit: 3c4727b1b14125a6d168a515de6806dcae1d99c4
-      https://github.com/bluez/bluez/commit/3c4727b1b14125a6d168a515de6806dcae1d99c4
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-03-11 (Wed, 11 Mar 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M emulator/bthost.c
-    M emulator/bthost.h
-    M tools/iso-tester.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  bthost: fix receiving timestamped ISO packets
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1065141
 
-Parse timestamped ISO packets correctly. Pass sequence number and
-timestamp to the hook callback.
+---Test result---
 
+Test Summary:
+CheckPatch                    PENDING   0.42 seconds
+GitLint                       PENDING   0.45 seconds
+BuildEll                      PASS      20.88 seconds
+BluezMake                     PASS      655.27 seconds
+MakeCheck                     PASS      18.55 seconds
+MakeDistcheck                 PASS      246.14 seconds
+CheckValgrind                 PASS      295.94 seconds
+CheckSmatch                   WARNING   360.92 seconds
+bluezmakeextell               PASS      183.99 seconds
+IncrementalBuild              PENDING   0.36 seconds
+ScanBuild                     PASS      1034.66 seconds
 
-  Commit: 9dbe3541d45a7e6ca8ca2eef40afd7c498f156ab
-      https://github.com/bluez/bluez/commit/9dbe3541d45a7e6ca8ca2eef40afd7c498f156ab
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-03-11 (Wed, 11 Mar 2026)
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Changed paths:
-    M emulator/btdev.c
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Log Message:
-  -----------
-  btdev: implement LE Read ISO TX Sync command
-
-Parse incoming ISO packets and implement LE Read ISO TX Sync.
-
-The timestamps and sequence numbers are just some values; the emulator
-does not have real ISOAL or clock, and we don't attempt to add them
-here.  The last transmitted numbers are tracked in struct iso_data
-attached to each ISO connection.
-
-
-  Commit: 6abb1ae2b88769c9c25cfedb5b6115d8ad892644
-      https://github.com/bluez/bluez/commit/6abb1ae2b88769c9c25cfedb5b6115d8ad892644
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-03-11 (Wed, 11 Mar 2026)
-
-  Changed paths:
-    M tools/iso-tester.c
-    M tools/l2cap-tester.c
-    M tools/sco-tester.c
-    M tools/tester.h
-
-  Log Message:
-  -----------
-  iso-tester: add tests for ISO HW timestamps
-
-Add tests that check LE Read ISO TX Sync handling in kernel
-
-ISO Send - HW Timestamping
-ISO Send - SWHW Timestamping
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/bthost.c:710:28: warning: Variable length array is used.emulator/bthost.c:711:32: warning: Variable length array is used.emulator/bthost.c:952:28: warning: Variable length array is used.emulator/bthost.c:986:28: warning: Variable length array is used.emulator/bthost.c:987:32: warning: Variable length array is used.emulator/btdev.c:482:29: warning: Variable length array is used.tools/sco-tester.c: note: in included file:./lib/bluetooth/bluetooth.h:232:15: warning: array of flexible structures./lib/bluetooth/bluetooth.h:237:31: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: 6e61a1bb2b22927045cb9f40b98610e5525cd948
-      https://github.com/bluez/bluez/commit/6e61a1bb2b22927045cb9f40b98610e5525cd948
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-03-11 (Wed, 11 Mar 2026)
 
-  Changed paths:
-    M tools/iso-tester.c
-    M tools/tester.h
+https://github.com/bluez/bluez/pull/1956/checks
 
-  Log Message:
-  -----------
-  iso-tester: Add test for sending ISO packets with set timestamps
-
-Add test
-
-ISO Send - Set HW Timestamp
+---
+Regards,
+Linux Bluetooth
 
 
-Compare: https://github.com/bluez/bluez/compare/3c4727b1b141%5E...6e61a1bb2b22
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============5263083495225487986==--
