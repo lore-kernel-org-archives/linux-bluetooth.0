@@ -1,241 +1,323 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7C93CF034
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 16:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26574175A8F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 16:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773245789; cv=pass; b=kpQQmbPjFQrNiz37GMRw4Rlg9jdZNWEAZzzOKcCTLhern1adf+qgzNXRPGwo4jaePyvVsWsBVcQPR2wGgWWwSs/EaIOtlJ1l1PYbZv2k2yLIQehv5/ASux8ksjididHbZsmOxaFqMXHhEOTTQEutptlHykSm5jmdai/r4pjCtsA=
+	t=1773246278; cv=pass; b=ZSGoIeQSkwcO+pDr6hg8+Er5O98aUbL36zrx12uF4/avdBiD0HzwF9/KgKSi00FSr6iswNVMxSL4cO+wCSxC7n4FW6vZ6zTiR4kySl3QnzdTrhf02is5N8LLCk04S8f+SVprdKjgB3lTBssXOjabCZhOHOxxeOhq3ivhWI/T+co=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773245789; c=relaxed/simple;
-	bh=MJSPH6SlKMqvRb90oPI4isyLrX/zd5zIVsOV1Ggu6x0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q43jXjNHyf/4/p98/otYkwdICvLofuqHT3wjtPUL52KwIt8FrDK0MAxOojxVXYq8ZkmtBFHEc249VyfTa/zW8ZysKVQ0JDNqsN1JTcJ+8PsJUV+6u/wGzkUE6gWeUEKxl/wPe/oo1I0rPQ3xPU9FVpORlu/9ESDLtfREUBnrLz8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=W8OmFb/0; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1773246278; c=relaxed/simple;
+	bh=NG1O3B+wuRA4vyQPtJB5G4kHP/9zQUoaYrndhE5bGNM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=a3nYbxFQGJF4PhcO9KqN4x5vb7qMQ/JkwIsZYsBAsHMHoy/FzCNp39GAFpIc6vj45UUNSMkt4WImLLqK1Gv96JYnPMOYINTEcsHtB6b18CpgK7TOm3qpYfMiW1eP3sDKgzky2yRLPZ45FiiPgMO2+HCOQlv/B63bsRc983JkdGQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=IqmSfdIR; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="W8OmFb/0"
-Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="IqmSfdIR"
+Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:d:f011:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fWG8T5JMBzywH;
-	Wed, 11 Mar 2026 18:16:25 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1773245786;
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4fWGKh4zXHz49Px6;
+	Wed, 11 Mar 2026 18:24:24 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1773246265;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UzGxNlR5Z6FXUVKqq4r+guokM8IO1FOL1GqXoY47Wpc=;
-	b=W8OmFb/0ncOQYnGUbjBc7qpkPmmoq6UaIT++zDYT6ApY+J66FDsdMyqIcocJqN1P1d28di
-	1UKyNLnjtm+BZym+eniNTfaMM5dg+7JhJUsc8kTVOguGAubvEd6DXUOH/hL0u08Iv59t99
-	1jrLlE6Xt+ByR1N98jA80rwAFr+RK6I=
+	bh=GOzRcbvj1YIv7v0fU8ybxcTG8gURhLcunvlwB4geBHQ=;
+	b=IqmSfdIR9du3ql2w4YApEGnB61U4vBZwgiiXfc8zpLH5gMbmWQ3Iur5dgSPgwpiYz6TR8H
+	6PavK2MctrOJVG9+hzs6Fx1JUsnGdhAH0I1FpHMaXjpwr3UMVD7J1LUFy52iDbisfzb4Vg
+	M4u2Ax3uCxJm0CIITfhT+6A8qKXvGKJ6s3RISRHlNiOR8M/ZYWDYmnXxVrc2CuTw98Uw1F
+	4pk74x+4cRix4++hU3t+dTLvTvCL3F+8lquPXoBUEyfe7SV1+SYt5PMXElMUu58Zg5kaKr
+	Tr4PGz2zU+bsZeao4xwReCFUh6l8J58hWcdoOv7gjf/jHPL0qsRbYcYxqamwpw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1773245786;
+	s=lahtoruutu; t=1773246265;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UzGxNlR5Z6FXUVKqq4r+guokM8IO1FOL1GqXoY47Wpc=;
-	b=DmrdcAyt0ZQxufmdtSahdpihdgfrQ3yDBiMU1EeXWlQc1hvBgmEkYJEzJ7l6JlQ8SkF+4g
-	CZVDjQeux8XJzwhSyy/wGApIvitr4vwwVEOrtNCqGz8/n919hHpWW6sBdirHo/kH2tbZ9Q
-	jOF85gCS1SMDqsdzALFE/OA0NdsGJg0=
+	bh=GOzRcbvj1YIv7v0fU8ybxcTG8gURhLcunvlwB4geBHQ=;
+	b=GTTTMf86WtvO+gbKIgL2v3UA5O3p3YfTzyYwC8JUUDToCTjvBW8XTuZLIigFpaGWsue/eC
+	u0x1Lige0ehXuXFzPiYfn1f4bk5GLm4f0o05s/Q810CbBQ8G32NtGngW3s0jCSSIJwPQT/
+	12AFIlbFq3l05bKKmOJda9drl2VRjvDugoaP0Vt8J17SQ3UX++W6ktKnr1gmNf/oe5ACYX
+	Q9pQbPJ8YjDPKV53k86f+gdO5tE+71Y6LSFvQ7+5Q+z3ACkX4SHe9AQ7ZeGd4WG8fIf3Ss
+	GKm6Ge+VRkH6FhzU4+B6R3yET9tveWDTsBXC8WdzICcxO4bMthh/xb7/3NwhLw==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1773245786;
-	b=Tp2tmL0gqv/vn9pgP8hAYaffbGGvCVovtimPNNaZ/jWDNddqTKucortfNKwMHnOT6UMflP
-	1oDKa0Gv3Jbxu/kGVl0PfbYYoDSKiRs01MWT8WImRb275UENw+J297JMx5Njz969WEDDpM
-	fSkVGWHIT8bznvbBx90FBnloRrnv+/A=
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1773246265;
+	b=ltzAkYHS6oqf5afYWpJCf+I19AciVvz9xtSbDuuGn++ShtIKfoLyRcugPhkEaiqTEiPgtE
+	OIGCBchl5NCBlyIZ7GwBgC/Zkdx/e+0Xvk3OWsBkSet0bhbCngbNAcHtXkgndABU1y1Blb
+	lSBR+g+ovfq3Pd73tkuJ1UAGStlW2R+Eo4ISMVJxHBRp31kEfdX2mgFW17pB72jyX9wEM0
+	IT3Xwk71D55+Q2h5MdWqmLB1+ISMLOCgRdInEoCuC2Qi8O+zL2Fp2l8V4BASKvON+SScNt
+	MDonNfKmAW9tH1M5LR/+RK0ku4kWNfM2O+Wqm6Ow0/03DhRqIiwZWFrWbx6hZg==
+Message-ID: <6b523ff37391a685be2fc08ee88e1fbde3a2142b.camel@iki.fi>
+Subject: Re: [PATCH] Bluetooth: ISO: add timestamp for outgoing HCI ISO
+ packet
 From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [RFC PATCH BlueZ 4/4] iso-tester: Add test for sending ISO packets with set timestamps
-Date: Wed, 11 Mar 2026 18:16:20 +0200
-Message-ID: <4b9b7c88c31e7c391ff6a0cc1eb1ead1a5dc6a31.1773245673.git.pav@iki.fi>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1773245672.git.pav@iki.fi>
-References: <cover.1773245672.git.pav@iki.fi>
+To: "tailu.shi" <tailu.shi@samsung.com>, Marcel Holtmann
+ <marcel@holtmann.org>,  Luiz Augusto von Dentz	 <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 11 Mar 2026 18:24:23 +0200
+In-Reply-To: <20260311081401.3832000-1-tailu.shi@samsung.com>
+References: 
+	<CGME20260311081515epcas5p44f035a61a5c6738cd6017d961bf68326@epcas5p4.samsung.com>
+	 <20260311081401.3832000-1-tailu.shi@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Add test
+Hi,
 
-ISO Send - Set HW Timestamp
----
- tools/iso-tester.c | 68 +++++++++++++++++++++++++++++++++++++++-------
- tools/tester.h     | 10 +++++++
- 2 files changed, 68 insertions(+), 10 deletions(-)
+ke, 2026-03-11 kello 16:14 +0800, tailu.shi kirjoitti:
+> The Bluetooth Core Specification defines the 'Time_Stamp' field of
+> an HCI ISO packet as optional. However, it's mandatory to include
+> the 'Time_Stamp' field when using HCI ISO packets per section 3.3
+> 'HCI Feature Support Requirement' of TMAP specification.
+> https://www.bluetooth.com/specifications/specs/html/?src=3DTMAP_v1.0.1/ou=
+t/en/index-en.html#UUID-68138fa8-fd1f-1a1b-e552-ddcd8fede9ec
+>=20
+> To comply with TMAP, introduce a new socket option BT_PKT_ISO_TIMESTAMP
+> that allows user application (e.g. PipeWire) to attach timestamp to the
+> data it sends to the ISO socket within BT_SCM_PKT_ISO_TIMESTAMP CMSG.
+>=20
+> When the option is enabled, the kernel extracts the timestamp and copies
+> it into the 'Time_Stamp' field of the outgoing HCI ISO packet.
+>=20
+> This also gives the controller the reference timing information
+> required for ISO stream synchronization.
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index fb04ab642..2d4408d56 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -522,6 +522,9 @@ struct iso_client_data {
- 	 * Used for testing TX timestamping OPT_ID.
- 	 */
- 	unsigned int repeat_send;
-+
-+	/* Set HW timestamp on sent packets */
-+	bool set_hw_tstamp;
- };
- 
- typedef bool (*iso_defer_accept_t)(struct test_data *data, GIOChannel *io,
-@@ -1076,6 +1079,16 @@ static const struct iso_client_data connect_send_swhw_timestamping = {
- 	.repeat_send_pre_ts = 2,
- };
- 
-+static const struct iso_client_data connect_send_set_hw_timestamp = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.send = &send_16_2_1,
-+	.so_timestamping = (SOF_TIMESTAMPING_RAW_HARDWARE |
-+					SOF_TIMESTAMPING_OPT_ID |
-+					SOF_TIMESTAMPING_TX_HARDWARE),
-+	.set_hw_tstamp = true,
-+};
-+
- static const struct iso_client_data listen_16_2_1_recv = {
- 	.qos = QOS_16_2_1,
- 	.expect_err = 0,
-@@ -1710,6 +1723,9 @@ static void bthost_recv_data(const void *buf, uint16_t len, bool ts,
- 			tester_test_failed();
- 	} else if (!data->step)
- 		tester_test_passed();
-+
-+	if (isodata->set_hw_tstamp && (timestamp != 0x1234 || sn != 1234))
-+		tester_test_failed();
- }
- 
- static void bthost_iso_disconnected(void *user_data)
-@@ -2629,15 +2645,24 @@ static void iso_tx_timestamping(struct test_data *data, GIOChannel *io)
- 	int sk;
- 	int err;
- 	unsigned int count;
--	int64_t interval = 10000000ULL;
-+	int64_t interval = 10000000ULL, hw_base;
- 
- 	if (!(isodata->so_timestamping & TS_TX_RECORD_MASK))
- 		return;
- 
- 	tester_print("Enabling TX timestamping");
- 
-+	/* Note: these depend on emulator/btdev.c details */
-+	if (!isodata->set_hw_tstamp) {
-+		interval = 10000000ULL;
-+		hw_base = (isodata->repeat_send_pre_ts + 1)*interval;
-+	} else {
-+		hw_base = 0x1234 * 1000 + 10000000ULL;
-+		interval = 0;
-+	}
-+
- 	tx_tstamp_init(&data->tx_ts, isodata->so_timestamping, false,
--			(isodata->repeat_send_pre_ts + 1)*interval, interval);
-+			hw_base, interval);
- 
- 	for (count = 0; count < isodata->repeat_send + 1; ++count)
- 		data->step += tx_tstamp_expect(&data->tx_ts, 0);
-@@ -2661,12 +2686,12 @@ static void iso_tx_timestamping(struct test_data *data, GIOChannel *io)
- static void iso_send_data(struct test_data *data, GIOChannel *io)
- {
- 	const struct iso_client_data *isodata = data->test_data;
--	char control[CMSG_SPACE(sizeof(uint32_t))];
-+	char control[3 * CMSG_SPACE(sizeof(uint32_t))];
- 	struct msghdr msg = {
- 		.msg_iov = (struct iovec *)isodata->send,
- 		.msg_iovlen = 1,
- 	};
--	struct cmsghdr *cmsg;
-+	struct cmsghdr *cmsg = NULL;
- 	ssize_t ret;
- 	int sk;
- 
-@@ -2674,20 +2699,39 @@ static void iso_send_data(struct test_data *data, GIOChannel *io)
- 
- 	sk = g_io_channel_unix_get_fd(io);
- 
--	if (isodata->cmsg_timestamping) {
--		memset(control, 0, sizeof(control));
--		msg.msg_control = control;
--		msg.msg_controllen = sizeof(control);
-+	memset(control, 0, sizeof(control));
-+	msg.msg_control = control;
-+	msg.msg_controllen = 0;
-+
-+	if (isodata->cmsg_timestamping) {
-+		msg.msg_controllen += CMSG_SPACE(sizeof(uint32_t));
-+		cmsg = cmsg ? CMSG_NXTHDR(&msg, cmsg) : CMSG_FIRSTHDR(&msg);
- 
--		cmsg = CMSG_FIRSTHDR(&msg);
- 		cmsg->cmsg_level = SOL_SOCKET;
- 		cmsg->cmsg_type = SO_TIMESTAMPING;
- 		cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
--
- 		*((uint32_t *)CMSG_DATA(cmsg)) = (isodata->so_timestamping &
- 					TS_TX_RECORD_MASK);
- 	}
- 
-+	if (isodata->set_hw_tstamp) {
-+		msg.msg_controllen += CMSG_SPACE(sizeof(uint32_t));
-+		cmsg = cmsg ? CMSG_NXTHDR(&msg, cmsg) : CMSG_FIRSTHDR(&msg);
-+
-+		cmsg->cmsg_level = SOL_BLUETOOTH;
-+		cmsg->cmsg_type = BT_SCM_PKT_ISO_TS;
-+		cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+		*((uint32_t *)CMSG_DATA(cmsg)) = 0x1234;
-+
-+		msg.msg_controllen += CMSG_SPACE(sizeof(uint16_t));
-+		cmsg = CMSG_NXTHDR(&msg, cmsg);
-+
-+		cmsg->cmsg_level = SOL_BLUETOOTH;
-+		cmsg->cmsg_type = BT_SCM_PKT_SEQNUM;
-+		cmsg->cmsg_len = CMSG_LEN(sizeof(uint16_t));
-+		*((uint16_t *)CMSG_DATA(cmsg)) = 1234;
-+	}
-+
- 	ret = sendmsg(sk, &msg, 0);
- 	if (ret < 0 || isodata->send->iov_len != (size_t) ret) {
- 		tester_warn("Failed to write %zu bytes: %s (%d)",
-@@ -4126,6 +4170,10 @@ int main(int argc, char *argv[])
- 			&connect_send_swhw_timestamping, setup_powered,
- 			test_connect);
- 
-+	test_iso("ISO Send - Set HW Timestamp",
-+			&connect_send_set_hw_timestamp, setup_powered,
-+			test_connect);
-+
- 	test_iso("ISO Receive - Success", &listen_16_2_1_recv, setup_powered,
- 							test_listen);
- 
-diff --git a/tools/tester.h b/tools/tester.h
-index cb28e9cea..d1ade4603 100644
---- a/tools/tester.h
-+++ b/tools/tester.h
-@@ -34,6 +34,16 @@
- #define TS_TX_RECORD_MASK		(SOF_TIMESTAMPING_TX_RECORD_MASK | \
- 						SOF_TIMESTAMPING_TX_COMPLETION)
- 
-+#ifndef BT_PKT_SEQNUM
-+#define BT_PKT_SEQNUM		22
-+#endif
-+#ifndef BT_SCM_PKT_SEQNUM
-+#define BT_SCM_PKT_SEQNUM	0x05
-+#endif
-+#ifndef BT_SCM_PKT_ISO_TS
-+#define BT_SCM_PKT_ISO_TS	0x06
-+#endif
-+
- struct tx_tstamp_data {
- 	struct {
- 		uint32_t id;
--- 
-2.53.0
+These timestamps are in controller clock domain, so generic host like
+Linux appears to need to perform clock synchronization via
+HCI_OP_LE_READ_ISO_TX_SYNC to be able to provide timestamps.=C2=A0
 
+I had in the works a not fully finished patch series adding the same
+thing + LE Read ISO TX Sync + tests. I sent these now to the list in
+their current state, maybe they are useful if you are working on this
+
+https://lore.kernel.org/linux-bluetooth/cover.1773245666.git.pav@iki.fi/T/
+
+https://lore.kernel.org/linux-bluetooth/cover.1773245672.git.pav@iki.fi/T/
+
+The tests pass, but not really tested to satisfaction on real
+controllers.
+
+From what I saw, it seems several controllers like Intel AX210 and some
+Realtek ones don't implement LE Read ISO TX Sync correctly (returns 0
+timestamp), so in those cases it AFAICS it's not possible to provide
+host timestamps.
+
+Getting the clock sync via LE Read ISO TX Sync to work properly across
+controllers is maybe not so easy, as it appears the Core Specification
+is somewhat unclear how it should work.
+
+> A corresponding userspace change is required for full functionality.
+> A reference implementation is available in PipeWire:
+> https://gitlab.freedesktop.org/shitailu/pipewire/-/commit/5b3bd74e15febb9=
+74c8737a64f31fd17e18cd11b
+
+This sends timestamps in host clock domain and has no clock sync, but I
+guess this is just for testing.
+
+> Signed-off-by: tailu.shi <tailu.shi@samsung.com>
+> ---
+>  include/net/bluetooth/bluetooth.h |  5 ++++
+>  include/net/bluetooth/hci_core.h  |  1 +
+>  net/bluetooth/hci_core.c          |  2 +-
+>  net/bluetooth/iso.c               | 49 +++++++++++++++++++++++++++----
+>  4 files changed, 50 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
+uetooth.h
+> index 69eed69f7f26..f88c83d21c5e 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -259,6 +259,10 @@ struct bt_codecs {
+> =20
+>  #define BT_SCM_PKT_SEQNUM	0x05
+> =20
+> +#define BT_PKT_ISO_TIMESTAMP     23
+> +
+> +#define BT_SCM_PKT_ISO_TIMESTAMP 0x06
+> +
+>  __printf(1, 2)
+>  void bt_info(const char *fmt, ...);
+>  __printf(1, 2)
+> @@ -409,6 +413,7 @@ enum {
+>  	BT_SK_SUSPEND,
+>  	BT_SK_PKT_STATUS,
+>  	BT_SK_PKT_SEQNUM,
+> +	BT_SK_PKT_ISO_TIMESTAMP,
+>  };
+> =20
+>  struct bt_sock_list {
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index a7bffb908c1e..e39d192f8ef6 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -740,6 +740,7 @@ struct hci_conn {
+>  	struct bt_iso_qos iso_qos;
+>  	__u8		num_bis;
+>  	__u8		bis[HCI_MAX_ISO_BIS];
+> +	bool		iso_pkt_ts;
+> =20
+>  	unsigned long	flags;
+> =20
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 31308c1de4ec..4264c0229dfb 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3335,7 +3335,7 @@ static void hci_queue_iso(struct hci_conn *conn, st=
+ruct sk_buff_head *queue,
+> =20
+>  	list =3D skb_shinfo(skb)->frag_list;
+> =20
+> -	flags =3D hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, 0x00);
+> +	flags =3D hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, conn->iso_p=
+kt_ts ? 0x01 : 0x00);
+>  	hci_add_iso_hdr(skb, conn->handle, flags);
+> =20
+>  	if (!list) {
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index be145e2736b7..dd4d198bab4c 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -73,6 +73,9 @@ struct iso_pinfo {
+>  	__u8			base_len;
+>  	__u8			base[BASE_MAX_LENGTH];
+>  	struct iso_conn		*conn;
+> +	bool			ts_flag;
+> +	__u32			ts;
+
+I think these are not needed, they can be passed as arguments to
+iso_send_frame().
+
+Adding them to iso_pinfo() probably causes a data race if two processes
+sendmsg() at the same time.
+
+> +
+>  };
+> =20
+>  static struct bt_iso_qos default_qos;
+> @@ -542,6 +545,7 @@ static int iso_send_frame(struct sock *sk, struct sk_=
+buff *skb,
+>  	struct iso_conn *conn =3D iso_pi(sk)->conn;
+>  	struct bt_iso_qos *qos =3D iso_sock_get_qos(sk);
+>  	struct hci_iso_data_hdr *hdr;
+> +	struct hci_iso_ts_data_hdr *hdr_ts;
+>  	int len =3D 0;
+> =20
+>  	BT_DBG("sk %p len %d", sk, skb->len);
+> @@ -552,13 +556,20 @@ static int iso_send_frame(struct sock *sk, struct s=
+k_buff *skb,
+>  	len =3D skb->len;
+> =20
+>  	/* Push ISO data header */
+> -	hdr =3D skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
+> -	hdr->sn =3D cpu_to_le16(conn->tx_sn++);
+> -	hdr->slen =3D cpu_to_le16(hci_iso_data_len_pack(len,
+> -						      HCI_ISO_STATUS_VALID));
+> +	if (iso_pi(sk)->ts_flag) {
+> +		hdr_ts =3D skb_push(skb, HCI_ISO_TS_DATA_HDR_SIZE);
+> +		hdr_ts->ts =3D cpu_to_le32(iso_pi(sk)->ts);
+> +		hdr_ts->sn =3D cpu_to_le16(conn->tx_sn++);
+> +		hdr_ts->slen =3D cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS=
+_VALID));
+> +	} else {
+> +		hdr =3D skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
+> +		hdr->sn =3D cpu_to_le16(conn->tx_sn++);
+> +		hdr->slen =3D cpu_to_le16(hci_iso_data_len_pack(len, HCI_ISO_STATUS_VA=
+LID));
+> +	}
+> =20
+>  	if (sk->sk_state =3D=3D BT_CONNECTED) {
+>  		hci_setup_tx_timestamp(skb, 1, sockc);
+> +		conn->hcon->iso_pkt_ts =3D iso_pi(sk)->ts_flag;
+>  		hci_send_iso(conn->hcon, skb);
+>  	} else {
+>  		len =3D -ENOTCONN;
+> @@ -1471,7 +1482,8 @@ static int iso_sock_sendmsg(struct socket *sock, st=
+ruct msghdr *msg,
+>  	struct sock *sk =3D sock->sk;
+>  	struct sk_buff *skb, **frag;
+>  	struct sockcm_cookie sockc;
+> -	size_t mtu;
+> +	struct cmsghdr *cm;
+> +	size_t mtu, hlen;
+>  	int err;
+> =20
+>  	BT_DBG("sock %p, sk %p", sock, sk);
+> @@ -1485,10 +1497,23 @@ static int iso_sock_sendmsg(struct socket *sock, =
+struct msghdr *msg,
+> =20
+>  	hci_sockcm_init(&sockc, sk);
+> =20
+> +	iso_pi(sk)->ts_flag =3D false;
+>  	if (msg->msg_controllen) {
+>  		err =3D sock_cmsg_send(sk, msg, &sockc);
+>  		if (err)
+>  			return err;
+> +
+> +		for (cm =3D CMSG_FIRSTHDR(msg); cm; cm =3D CMSG_NXTHDR(msg, cm)) {
+> +			if (cm->cmsg_level !=3D SOL_BLUETOOTH)
+> +				continue;
+> +			if (test_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags) &&
+> +			    cm->cmsg_type =3D=3D BT_SCM_PKT_ISO_TIMESTAMP &&
+> +			    cm->cmsg_len =3D=3D CMSG_LEN(sizeof(u32))) {
+> +				iso_pi(sk)->ts_flag =3D true;
+> +				iso_pi(sk)->ts =3D *(u32 *)CMSG_DATA(cm);
+> +				break;
+> +			}
+> +		}
+
+I would put this in a separate function.
+
+>  	}
+> =20
+>  	lock_sock(sk);
+> @@ -1502,7 +1527,8 @@ static int iso_sock_sendmsg(struct socket *sock, st=
+ruct msghdr *msg,
+> =20
+>  	release_sock(sk);
+> =20
+> -	skb =3D bt_skb_sendmsg(sk, msg, len, mtu, HCI_ISO_DATA_HDR_SIZE, 0);
+> +	hlen =3D iso_pi(sk)->ts_flag ? HCI_ISO_TS_DATA_HDR_SIZE : HCI_ISO_DATA_=
+HDR_SIZE;
+> +	skb =3D bt_skb_sendmsg(sk, msg, len, mtu, hlen, 0);
+>  	if (IS_ERR(skb))
+>  		return PTR_ERR(skb);
+> =20
+> @@ -1840,6 +1866,17 @@ static int iso_sock_setsockopt(struct socket *sock=
+, int level, int optname,
+> =20
+>  		break;
+> =20
+> +	case BT_PKT_ISO_TIMESTAMP:
+> +		err =3D copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
+> +		if (err)
+> +			break;
+> +
+> +		if (opt)
+> +			set_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
+> +		else
+> +			clear_bit(BT_SK_PKT_ISO_TIMESTAMP, &bt_sk(sk)->flags);
+> +		break;
+> +
+>  	default:
+>  		err =3D -ENOPROTOOPT;
+>  		break;
+
+--=20
+Pauli Virtanen
