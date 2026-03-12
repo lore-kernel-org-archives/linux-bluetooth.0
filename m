@@ -1,149 +1,136 @@
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44990320CAD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 02:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E8531F99A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 09:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773281671; cv=none; b=d+hEPI97ccDunm6wt+3kdj/dRaaYAPJN04FO5tOfksZUuWbDSZpKVqokAX0bIbwoFgvc5xfzAnPe3zKRyroYgrjN2mTrKb68Knlkha8eMgIZjbJ0MdOqz0no9EMaLqmN6hYQRH/pPLnlqMcdJCDdJPBzSqDADi5R5YUvMbTF3lY=
+	t=1773308370; cv=none; b=iIYVloql/ScnPryDY4ZcFhiRTIGzCqG0UU6BVddiy2ZEFCPZPHJpEzUC92sj5JyY87/xnTgPzlRgXGXF68VPDBUdU6cv65f/EGIcc3nv3zEloG4nTcpFQTnygcJCyRL275ZH/24bF19aGB3RUi7fTPZhr3KELBNdWMQn56tTsPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773281671; c=relaxed/simple;
-	bh=iBiLAC4oK/v6IvNt12XprCZuSZo8vQ/vzCm0xpABvxw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=czH1WFtOhImceNo1/AYi/yREAELqgJhKSF9ATLzNtWtE/zjkgWroKJmbThT95iq6yPvw/9geZPMf+HpuFijZaYnpiFiF5zzwghmoiuKErnXscoeN/l8ma1tgEMYKGVdrbf/7WiC6Hf3ECCWQKqzpQnuZogXdjlm/JpEBqFf0FjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7d74ab502b0so3924639a34.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2026 19:14:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773281669; x=1773886469;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9yUdTLorfMfl6e+pVf9RnpCNvkB22mXGi6n1wgyWYyE=;
-        b=L7Iy0UW9s+QW44ASCgczfs6XDUO+EU3JmRIwp7qnYWvsVUjTPwFQshnxdvwTAfkSOf
-         FayGUSWqWLhJxM/lmo0IUVmIsBvd9XyCSnL5uaQX6AwO/al5nc8RrnnLUVJBgynl/5mQ
-         XX2TcwvY6eCh6wd+qjvGW9TmN7wUSqG+dCMI244p5WWudwRRxFnMqpVnLtsHL8CI/K0w
-         KPRHuj55365YUKaAqpDCh/mbQ4y171xeMYJZR+04Z3sXff+Q6EImSHP25yLpCuVdWOIF
-         dL4Jl/brR01F0dC3vhLmeVMgm/2zyw/tDV3avL9tY0VNfjmVaLP2DPvoX7ZfNXUXQYu6
-         i6yA==
-X-Gm-Message-State: AOJu0YxGKRwLyyM6ofhm2G542jVlKjM+TqRMjNKaUdwouaa6riOX0uub
-	Xk9Jjcwr1+oE+cVzQ1E/bNpSSlgLK7bxnO2Cc/uhJGy6TRa1a4Fl00w5oTtlbZqKCm38U8tEbay
-	dIIIsVFSlv7Ndg3cAHIB+C9lflT5FLdwNmEJbMZwavFXhZwAH3AJj1jFNo7k=
+	s=arc-20240116; t=1773308370; c=relaxed/simple;
+	bh=waxn5lg1OkJ81vpAot4XqDo5U1E/0wIZF/8vzZgbHvs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=DIGxcg4O+HrWwdIFUenoFkyH1FHFqqYmj8RqfwIeeYOBQouQU+JjNYvqowZqxsHhI5LHtJu74ReGSlH2lmi3lM5Rcydb0SpHL0JlGqOXFjTkPGr2R06NGMmhQA2zwLZjpzK9WlcyUG5rvbUXxGKi5zseLX3Mm/laviDu0hn4SHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=C6Lu4bsi; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="C6Lu4bsi"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260312093920epoutp0286a63b49984be39f6ed5cf11195b7848~cDo7liD-G1713617136epoutp02n
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 09:39:20 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260312093920epoutp0286a63b49984be39f6ed5cf11195b7848~cDo7liD-G1713617136epoutp02n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1773308360;
+	bh=+ZCOO/9RglT0wYm4eT3M6QGG29/m5LTiAuu9agdSCWw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=C6Lu4bsi862/eA3NtwBvQZ3YYKfhG1rK74VVYv6ysaofKo2mdUerjIodggNuKlHzq
+	 OAXGHnBoXzzqkbCLieGC4YTlx5fA8o6lYK8QJe4oZQjkhlwb+ohw6OvsmRnQwSq/jI
+	 449A7fkSf7JBlePWKUvfWfr21z7tE01q+LlW+Uws=
+Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
+	20260312093919epcas5p3050fcddf5a6bf90112f9dacf8a2916c4~cDo6yA-re3207032070epcas5p37;
+	Thu, 12 Mar 2026 09:39:19 +0000 (GMT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40]) by
+	epsnrtp02.localdomain (Postfix) with ESMTP id 4fWjHq1vCfz2SSKk; Thu, 12 Mar
+	2026 09:39:19 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20260312093918epcas5p31e466058a69bd8e2c585baeddd333f3c~cDo6Q6MOD3207032070epcas5p36;
+	Thu, 12 Mar 2026 09:39:18 +0000 (GMT)
+Received: from localhost.localdomain (unknown [109.144.5.214]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260312093917epsmtip1c7daa8092ffae22297f8b5d120014f0a~cDo5VCk461145611456epsmtip1Z;
+	Thu, 12 Mar 2026 09:39:17 +0000 (GMT)
+From: Tailu Shi <tailu.shi@samsung.com>
+To: Tailu Shi <tailu.shi@samsung.com>, Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>, Pauli Virtanen <pav@iki.fi>, Johan Hedberg
+	<johan.hedberg@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric
+	Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: ISO: add timestamp for outgoing HCI ISO
+ packet
+Date: Thu, 12 Mar 2026 17:38:49 +0800
+Message-Id: <20260312165734.8ff3927d@samsung.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <9199a462-09be-402a-a47a-447e51a2f5a4@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:7083:10b0:67b:c8c4:43bd with SMTP id
- 006d021491bc7-67bc8c44adamr2049838eaf.72.1773281669297; Wed, 11 Mar 2026
- 19:14:29 -0700 (PDT)
-Date: Wed, 11 Mar 2026 19:14:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69b22185.a00a0220.707e5.000c.GAE@google.com>
-Subject: [syzbot] [bluetooth?] WARNING in l2cap_conn_start
-From: syzbot <syzbot+5a3ffe8f0bd0f1dead8e@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260312093918epcas5p31e466058a69bd8e2c585baeddd333f3c
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20260312093918epcas5p31e466058a69bd8e2c585baeddd333f3c
+References: <CGME20260312093918epcas5p31e466058a69bd8e2c585baeddd333f3c@epcas5p3.samsung.com>
 
-Hello,
+Hi Paul,
 
-syzbot found the following issue on:
+Thank you for the review and the helpful suggestion about my name.
 
-HEAD commit:    b29fb8829bff Merge tag 'v7.0-rc3-ksmbd-server-fixes' of gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12289806580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c5c49ee0942d1cdb
-dashboard link: https://syzkaller.appspot.com/bug?extid=5a3ffe8f0bd0f1dead8e
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+I have updated my Git configuration and amended the commit as you advised:
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-b29fb882.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4fd392c86ab5/vmlinux-b29fb882.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/32f95fb6f35f/bzImage-b29fb882.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5a3ffe8f0bd0f1dead8e@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-workqueue: cannot queue hci_tx_work on wq hci0
-WARNING: kernel/workqueue.c:2271 at __queue_work+0xd53/0x1020 kernel/workqueue.c:2269, CPU#0: kworker/0:1/10
-Modules linked in:
-CPU: 0 UID: 0 PID: 10 Comm: kworker/0:1 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Workqueue: events l2cap_info_timeout
-RIP: 0010:__queue_work+0xd7e/0x1020 kernel/workqueue.c:2269
-Code: 83 c5 18 4c 89 e8 48 c1 e8 03 42 80 3c 20 00 74 08 4c 89 ef e8 83 14 a4 00 49 8b 75 00 49 81 c7 78 01 00 00 4c 89 f7 4c 89 fa <67> 48 0f b9 3a 48 83 c4 58 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc
-RSP: 0018:ffffc9000023f838 EFLAGS: 00010086
-RAX: 1ffff1100244618d RBX: 0000000000000008 RCX: ffff88801b78a4c0
-RDX: ffff888012691178 RSI: ffffffff8aa0db00 RDI: ffffffff9014a6c0
-RBP: 0000000000000020 R08: ffff888012230c57 R09: 1ffff1100244618a
-R10: dffffc0000000000 R11: ffffed100244618b R12: dffffc0000000000
-R13: ffff888012230c68 R14: ffffffff9014a6c0 R15: ffff888012691178
-FS:  0000000000000000(0000) GS:ffff88808ca58000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffd708e5e80 CR3: 00000000420ff000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- queue_work_on+0x106/0x1d0 kernel/workqueue.c:2405
- l2cap_send_conn_req net/bluetooth/l2cap_core.c:1230 [inline]
- l2cap_start_connection net/bluetooth/l2cap_core.c:1385 [inline]
- l2cap_conn_start+0xc6a/0xff0 net/bluetooth/l2cap_core.c:1526
- l2cap_info_timeout+0x68/0xa0 net/bluetooth/l2cap_core.c:1662
- process_one_work kernel/workqueue.c:3275 [inline]
- process_scheduled_works+0xb02/0x1830 kernel/workqueue.c:3358
- worker_thread+0xa50/0xfc0 kernel/workqueue.c:3439
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	83 c5 18             	add    $0x18,%ebp
-   3:	4c 89 e8             	mov    %r13,%rax
-   6:	48 c1 e8 03          	shr    $0x3,%rax
-   a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1)
-   f:	74 08                	je     0x19
-  11:	4c 89 ef             	mov    %r13,%rdi
-  14:	e8 83 14 a4 00       	call   0xa4149c
-  19:	49 8b 75 00          	mov    0x0(%r13),%rsi
-  1d:	49 81 c7 78 01 00 00 	add    $0x178,%r15
-  24:	4c 89 f7             	mov    %r14,%rdi
-  27:	4c 89 fa             	mov    %r15,%rdx
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	48 83 c4 58          	add    $0x58,%rsp
-  33:	5b                   	pop    %rbx
-  34:	41 5c                	pop    %r12
-  36:	41 5d                	pop    %r13
-  38:	41 5e                	pop    %r14
-  3a:	41 5f                	pop    %r15
-  3c:	5d                   	pop    %rbp
-  3d:	c3                   	ret
-  3e:	cc                   	int3
-  3f:	cc                   	int3
+    git config --global user.name "Tailu Shi"
+    git commit --amend -s --author="Tailu Shi <tailu.shi@samsung.com>"
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+On Wed, 11 Mar 2026 09:54:38 +0100 Paul Menzel wrote:
+>> A corresponding userspace change is required for full functionality.
+>> A reference implementation is available in PipeWire:
+>> https://gitlab.freedesktop.org/shitailu/pipewire/-/commit/5b3bd74e15febb974c8737a64f31fd17e18cd11b
+> 
+> Is the timestamp correctly visible in the btmon trace?
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Yes, it can be seen in the btmon trace. The test was performed on the
+kernel 7.0.0‑rc1+, using BlueZ 5.85 and PipeWire 1.5.84 with the
+'bluez5.iso-tx-timestamp' configuration option enabled.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+But seems the btmon v5.85 and v5.86 fails to parse it directly with
+the command. However, the 'ts' field can be seen clearly with Wireshark.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+The things are like below:
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+1) btmon v5.86
+ $ btmon -r dump.btsnoop -I |grep -A1 'ISO Data TX: Handle 2563'
+ < ISO Data TX: Handle 2563 [5/18] SN 2                 #10999 [hci0] 128.571172
+         02 00 3c 00 00 00 00 00 00 00 00 00 00 00 00 00  ..<.............
+ --
 
-If you want to undo deduplication, reply with:
-#syz undup
+2) Wireshark
+ Frame 19604: 72 bytes on wire (576 bits), 72 bytes captured (576 bits)
+ Bluetooth
+ Bluetooth Linux Monitor Transport
+ Bluetooth HCI ISO Packet
+     .... 1010 0000 0011 = Connection Handle: 0xa03
+     ..10 .... .... .... = PB Flag: Complete SDU (0x2)
+     .1.. .... .... .... = Timestamp present: True
+     0... .... .... .... = Reserved: 0x0
+     ..00 0000 0100 0100 = Data Length: 68
+     Data
+     [Connect in frame: 18836]
+ Bluetooth ISO Data
+     Timestamp: 805103660µs
+     Sequence Number: 84
+     .... 0000 0011 1100 = SDU Length: 60
+     SDU
+
+Raw data:
+ 0000   03 6a 44 00 2c e8 fc 2f 54 00 3c 00 00 00 00 00   .jD.,../T.<.....
+ 0010   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+ 0020   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+ 0030   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+ 0040   38 24 f9 4a 0d 00 00 03                           8$.J....
+
+
+Thanks for your time again!
+
+Best regards,
+
+Tailu Shi
