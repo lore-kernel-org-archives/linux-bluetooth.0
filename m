@@ -1,129 +1,493 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8413C345B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 12:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773320257; cv=none; b=Kj78HxoGCxS1JmUZxdjPaNAcZV2c0tI1cy8CbtldAU85Wm+wODbHMoi0iJEBwt4qn8s4vMPmcxhpYeCzjbLX+mMQx62hANYMoXHQ7F2RX/UzFalGgLDHnb62dCFCG5vBMeaNdJdnLLbxv/DjrfZ38AlBN3P5lypiouUJb5m1rlU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773320257; c=relaxed/simple;
-	bh=Rr1jkAP22lZkLvo3o90a9fRSWh9+kilNKtAarSScWFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oJI5n+aVpjQyl0zTECMn/uIU6ubbfYsRMb82XyHZsooEhpwafpnPgxIkxdDVA5Y8wssuQTaS9lpwWvtgNNREuhlLr2mTtySVQdr6OHf4VFR5yeCIb683M56l7DxJ4QyFKaJ4cKA1Oa3gMX1QB9uHkZEp6YHulz7rUS+0ja6lkTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fHqxjqGD; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506BD3B2FFE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 13:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773321246; cv=pass; b=SsPDPlruWCIYJNmr4TIjLXeSOP3AkBoP/iAL+cROfJkFRxvJtZxwALPWXp/JGpy4DEAWg9r9qLn0LAtRrfu5ZeskLoY93InvCVgzFhkz8RfEJxLORCt2fkqaxzO2HYxpMjbwtUKkAyOsP2PxrXXkihYmhRObLkWArfF6B2Lnx6o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773321246; c=relaxed/simple;
+	bh=T6rO7d65f41kMj6WQRUIVq6JGwMd1PCVYCu83/SL9HU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PNrtoaP/L+OGyheIKdS38zt3JOS8jMhD3pkohcm4OhIHW82kHc/zQMGc4D1mniNduFUUxD+lfBz1XWZutHjA1SpTvfJ83PPma2tHBB2dli32VMLIgpu4ZAcCTZRDyAaLM/Yf860XFaDSzs8VScBey0lhJl95jWrBLR34UQiS9Cc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DY5MP9Tb; arc=pass smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fHqxjqGD"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-5094b54a250so5475781cf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 05:57:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DY5MP9Tb"
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64caaacb9bcso1099905d50.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 06:14:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773321242; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VySGg+ojBZXi6nPMe4hcK0/hJyitsGW6SYKkEzDOSUNOQSBnCDuU957OhMiMNcs+6g
+         LD8MofUW0JWepCVFbqsgdsRKadrlrAjUTkDZgBux1PqmvqLDi+Ch1gtlb+YArAdRyfuy
+         SSRI035Jc00THWsBSdWsMQzxi9t9H8TU3ldziRHlLJpbmPX/GFcxMK2iPNkIWV3Awrdz
+         m+SfUgs6UkKa2w899Xokyz2XRTnjIgLUJFKfSZ3hsNSnu6PFMZDBfFJIzLtRSSReYDB4
+         vTqhgJAKyQHfVUR3QGONvY2Wy8eC3g07QaDRBh2x6BJhQ1IUJxqpRoM1vIKARMgUUZmx
+         /E8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3tSuA+sGz5IXT2VFr0lP0RbCzL1+XTHpjx46nvlU3s0=;
+        fh=YfIR0xVwKzmzUegeZomM0N7NpuXyo4CnoUmYcDIV87s=;
+        b=gY8m8q9oahN0lo3THJM3b8VhtyUt73q8jcc+2z6U4w4YCTYPQU4IJAYhYQyZeFcud1
+         i3K3FcjyGvMlGg5evIcx8ufwZ6Fls22K/rUYKBru+D2ga/Gah7XyWzA6lmon1XL0XGJh
+         oIsyO/bEttgxWhLSMKaVA6YDztgsBxpYgB69jAERDowrdyest+U4CF3V0eB/kIRdWYCO
+         7W/wpx+P2OvQ3sHNetnY4w27mfmxyGCG8g3tp0G1nx5d3xcwb5UcHuhSlOQJMPGssZYY
+         Tgq5mnCZfRGFF8JIByXFh1issr19yITI+SMdNIiGLDiPTOfb4dSqd95Zv4a2BYkRVA6r
+         1Aig==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1773320252; x=1773925052; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
-        b=fHqxjqGD7mReR8MT2yBowt9MuNKPAKQc++mWcb4ZOttX6YldICO+OnnxWIQjO0C8L5
-         wjOw0Gg7MqV4U+G9pES+s6h1NtZIjaKrBXMW81hrLyc8SxWYHtvQK3FlTjqiyroZskXE
-         jYj0kUENL7Yhu5zg+0UQ91XYlYYlozX9U8uAqBEFaih0fSnDo8kprjTDRYJ58gzKRExo
-         MSUW+Q+e0P2WpZGotx0DuVRaUqq4vGsUUSX1YbPnOxmRUKlXFY/aNRmXMXDbAEfx0Lnn
-         e41FpuPSZjTSuTkWfTMW8e1MvewVXC2p6zLd4GrSZjvSKS4Q06nDQYaSimUW3qR5RhoY
-         JV6A==
+        d=gmail.com; s=20230601; t=1773321242; x=1773926042; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3tSuA+sGz5IXT2VFr0lP0RbCzL1+XTHpjx46nvlU3s0=;
+        b=DY5MP9TbCTME1XbIRoUcwuoWmKEyZmF54kOXjIopsMCfew9KslAx6Pnc8MmIw5z9Ig
+         0lE5NY60cTq36lMS3cueRW/E3fcblh3nJdpxz2CzXwjXSnqkEb+EFbwpLCeDPpvt+lQ+
+         ZwIjM4gm5hftCNDiRBm6huwQVSfJqf7IPAT88Ya+K4uw/5wm3nNukw6rBJUI7tDsd1i0
+         YpsC71uf+5cOl4UuIYNwJQ2cHs0AlTI4okl8MfgJN9F04cnwlj1ASkNL3+Y0UnJC3U9L
+         1TbG7AHQcxAQ8ObbeROTG0kNLcqZNz4uJoLFYGIhUSdrt+SUpfxIPwMjVl0bGHE5Fa7e
+         0HRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773320252; x=1773925052;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
-        b=g9UhDnek/zuAUBo/SlewAzEGpT6nSfuXtuvW0UBiV6i3q785eFMU4s4nzjvRKyheuJ
-         fmKFlhq1jC2gRTpJ6dG62ZjavHHYItrqUXKj5MrHOcWfGHAf/0bAQQ1gGtu/g5Ndj73U
-         wjj0+bpT1kEiR77GCCE6VwQEhm5rwWDk0wjbwLjRdnZbqhtQ2Rt/CxE+ncrnH7pgUnS9
-         4kD2BKro8c836KK0DU4wX/hDc95AuPoqRfFdpSHT8eGmaRGFOFh23kbUO+/7s8py3hgM
-         ONujFRiOhO9gH8CNqEAyzbUz2Ba2+WKJ8y53mZNw4oz5sJBIzo4wdLZx3tSsUIQaIOFd
-         OT6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXiVJ9pj2/xUeCdWmmR9P29L0uXJMErVhpUMN7qrCKo4bH13dxm7ruTzG5jQ/bF+uDVARM1zuDlStN2GgZi/gE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy133tq3jBtyzeVQzJjnRlP6nM1e399Ft/FlSc7QowR/ICek9jH
-	kIF/PivRE1ZkyUKS2YU6ZTyJDjiaY/u5A6hlvFbZMljkXXHKu1hqHnFmYxZrnkF82gI=
-X-Gm-Gg: ATEYQzzjK7HjDrSkgcm83IlIqn1ILYfsYf7nc61rMBNmmkJYeqnV5HR/0KUamKGomqM
-	xsmsHY06Yth30Xp7zlPBweV6ivHxbRuCIgn1WcDwu496DD1RjDheNIZeBbmSdKdTM3mBzsVR4RG
-	Lx1/2PXaphcqBWrd0MhQIz4/BYRriqlnjBxTOkT0ys4iFMnbM8G41WXzy5TzhL6bpxJ1T80Q6vS
-	ukIth2kDuhJZQHqc+YcEREXoU0kU1QeZ/cvWvqNPIbsEZWjhSHbgis/eYgAzbvGSMPwpw77yws/
-	zEQ+eR7OW3ZmlM06+WdpCwhPBQauPzH+fguGkJZ5AUQ/WMabKUjStGFunUNX7RGmE/1LoGAjvBy
-	HG9A3ZkVZcV5sXHT5QIQSRgJbe7dvWhL9brc43xs6cUD5AfAoLVvi9O0xzBXUyE7K6fE8bqpclS
-	m/KwsWbhanSHK4/Qe3DnXZxyO7LugDYvpZ8IPWemXZwwsrksvNQevFwpPS3owp+iC8v8c/7eHrr
-	FXAn1RM
-X-Received: by 2002:ac8:5d4d:0:b0:509:cbc:127b with SMTP id d75a77b69052e-5093a1bd58fmr77950521cf.60.1773320251710;
-        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65bd318fsm33341196d6.8.2026.03.12.05.57.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1w0fbW-00000006fKD-1POa;
-	Thu, 12 Mar 2026 09:57:30 -0300
-Date: Thu, 12 Mar 2026 09:57:30 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Kuan-Wei Chiu <visitorckw@gmail.com>
-Cc: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
-	apparmor@lists.ubuntu.com, bpf@vger.kernel.org,
-	ceph-devel@vger.kernel.org, cocci@inria.fr,
-	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
-	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
-Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
- check - refactor
-Message-ID: <20260312125730.GI1469476@ziepe.ca>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <abBlpGKO842B3yl9@google.com>
+        d=1e100.net; s=20230601; t=1773321242; x=1773926042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3tSuA+sGz5IXT2VFr0lP0RbCzL1+XTHpjx46nvlU3s0=;
+        b=EoLNffWSF4SKUZ2ZcvN8x8IGGHd31tSHdA5ubU+kHmGPgyyhUfAarXEvNyo1SKsfF/
+         7UhDHXiXW+FgExCjJmkd0GlpcYJVvC9dfYVQNN6uKzmW/pgp9ZDh5dBMuH56Db9rIjcg
+         XjOBjqc+DP5wr7GsPpdwHMolcTEXGw+VI5b6C+qcWCZI7qcHb+GbX2GxL/iAuTrlmO8M
+         HOdhlsztFfh/5JiX/EeJy90AZZqKCUu0N7gZS15zZ3T8ItWCV+enCppYzcAvPEUlKyqp
+         bd7WMb8FYg18nO0MVwKoWtJgcFfzHuIehK1I5/CLcbakYXIehAtJZzsQTVy92qyuUFa7
+         aDzw==
+X-Gm-Message-State: AOJu0Yy2fdWoTgqFQGSi6fODyKW3D+gHiZoDISpLulCM+1gtmzJFMAAN
+	v+d7gz+A1FmCYxRp1PQpdZEQ6P8Q/UVBWXapIDDr4L5KYNuG6tzgawb8U5M3LF7uimEp7nyCqfD
+	8+YTJw1c+tcEFy8SUl98FhDL2TdLWf34zWCOf
+X-Gm-Gg: ATEYQzx5D2yImROIs54k9HhYjJE956hxlzsUlQatYUUx9lhQTxX2s9fU2rk0xN4JGIn
+	WNWN+jzHKgT7/9GnYI2XaR45d4pNLCnlYWZBcG7EFiVtulZdU9FfMOXrOFbYgcsq68+QTtaefxi
+	E+SPSfdHfhr/sg9ryMU9Id9jzoXnk/2vflw1qKNSmZ9upmayqOHkRgkDBo3sttT4U70vBiz8MeV
+	HqJUcv60eAHXthb1ntmELRS8FpMdsNsPh0kmM92wPfgcNBkKbmvoSBXt/yZS8BTW1UsVB5LZX91
+	Lw6YlPgWyALEdI7LLCYLUxcDydBSwl/Z0L4CrilACE/ThNuSCqUgNg1hGb8eJ4y7v45wkw==
+X-Received: by 2002:a05:690e:2499:b0:649:f0e5:fab1 with SMTP id
+ 956f58d0204a3-64d656f7580mr4898956d50.23.1773321241796; Thu, 12 Mar 2026
+ 06:14:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abBlpGKO842B3yl9@google.com>
+References: <20260309040136.159073-1-berend@deschouwer.co.za> <20260309040136.159073-2-berend@deschouwer.co.za>
+In-Reply-To: <20260309040136.159073-2-berend@deschouwer.co.za>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 12 Mar 2026 09:13:50 -0400
+X-Gm-Features: AaiRm51Sn9WOgK00qvv33fm_rc6Fsnn9PkXyc33pIeekw2CBaRep1GnJwf0tGTU
+Message-ID: <CABBYNZ+6mVQFhLBd6KaFfKLvOC2D8F-Pt6W+y5TT_hAC3Pu2sw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/1] Stop and start some actions on suspend and resume
+To: berend de schouwer <berend@deschouwer.co.za>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 11, 2026 at 02:40:36AM +0800, Kuan-Wei Chiu wrote:
+Hi Berend,
 
-> IMHO, the necessity of IS_ERR_OR_NULL() often highlights a confusing or
-> flawed API design. It usually implies that the caller is unsure whether
-> a failure results in an error pointer or a NULL pointer. 
+On Mon, Mar 9, 2026 at 12:02=E2=80=AFAM berend de schouwer
+<berend@deschouwer.co.za> wrote:
+>
+> Stop active device discovery on suspend and shutdown, and restart
+> on device resume.  This uses dbus notifications, so needs a running
+> login manager owner.
 
-+1
+I guess this is implementing the following functionality:
 
-IS_ERR_OR_NULL() should always be looked on with suspicion. Very
-little should be returning some tri-state 'ERR' 'NULL' 'SUCCESS'
-pointer. What does the middle condition even mean? IS_ERR_OR_NULL()
-implies ERR and NULL are semanticly the same, so fix the things to
-always use ERR.
+https://systemd.io/INHIBITOR_LOCKS/
 
-If you want to improve things work to get rid of the NULL checks this
-script identifies. Remove ERR or NULL because only one can ever
-happen, or fix the source to consistently return ERR.
+My question is, is this really necessary? The kernel already has
+handling that detects if an active discovery is ongoing, pauses it,
+and then resumes the discovery state upon resumption:
 
-Jason
+https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_sync.=
+c#L6239
+https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_sync.=
+c#L6132
+https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_sync.=
+c#L6371
+https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_sync.=
+c#L6292
+
+Maybe this is not working in your system for some reason?
+
+> ---
+>  src/adapter.c |  35 ++++++++
+>  src/adapter.h |   2 +
+>  src/main.c    | 226 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 263 insertions(+)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 4e5ff219f..5456c7fc9 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -288,6 +288,7 @@ struct btd_adapter {
+>         bool filtered_discovery;        /* we are doing filtered discover=
+y */
+>         bool no_scan_restart_delay;     /* when this flag is set, restart=
+ scan
+>                                          * without delay */
+> +       bool discovering_before_sleep;  /* was discovery on before suspen=
+d? */
+>         uint8_t discovery_type;         /* current active discovery type =
+*/
+>         uint8_t discovery_enable;       /* discovery enabled/disabled */
+>         bool discovery_suspended;       /* discovery has been suspended *=
+/
+> @@ -2083,6 +2084,40 @@ static void resume_discovery(struct btd_adapter *a=
+dapter)
+>
+>         trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT);
+>  }
+>
+> +void adapter_resume_discovery_sleep(void)
+> +{
+> +       GList *list;
+> +
+> +       for (list =3D g_list_first(adapter_list); list;
+> +                                               list =3D g_list_next(list=
+)) {
+> +               struct btd_adapter *adapter =3D list->data;
+> +
+> +               if (adapter->discovering_before_sleep) {
+> +                       DBG("Resuming discovery on: %s", adapter->name);
+> +                       resume_discovery(adapter);
+> +               }
+> +               adapter->discovering_before_sleep =3D false;
+> +       }
+> +}
+> +
+> +void adapter_suspend_discovery_sleep(void)
+> +{
+> +       GList *list;
+> +       bool was_discovering;
+> +
+> +       for (list =3D g_list_first(adapter_list); list;
+> +                                               list =3D g_list_next(list=
+)) {
+> +               struct btd_adapter *adapter =3D list->data;
+> +
+> +               was_discovering =3D (adapter->discovery_list);
+> +               if (was_discovering) {
+> +                       DBG("Suspending discovery on: %s", adapter->name)=
+;
+> +                       suspend_discovery(adapter);
+> +                       adapter->discovering_before_sleep =3D was_discove=
+ring;
+> +               }
+> +       }
+> +}
+> +
+>  static void discovering_callback(uint16_t index, uint16_t length,
+>
+>                                         const void *param, void *user_dat=
+a)
+>  {
+> diff --git a/src/adapter.h b/src/adapter.h
+> index 4e07f71ad..4843c04a9 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -320,3 +320,5 @@ unsigned int btd_adapter_send_cmd_event_sync(struct b=
+td_adapter *adapter,
+>                                         void *user_data,
+>                                         btd_adapter_destroy_func_t destro=
+y,
+>                                         uint8_t timeout);
+> +void adapter_suspend_discovery_sleep(void);
+> +void adapter_resume_discovery_sleep(void);
+> diff --git a/src/main.c b/src/main.c
+> index 59df0ad4c..831733f55 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -67,6 +67,9 @@
+>  struct btd_opts btd_opts;
+>  static GKeyFile *main_conf;
+>  static char main_conf_file_path[PATH_MAX];
+> +static unsigned int prepare_sleep_id;
+> +static unsigned int inhibit_lock =3D -1;
+> +static DBusConnection *client_conn;
+>
+>  static const char *supported_options[] =3D {
+>         "Name",
+> @@ -1443,6 +1446,224 @@ static GOptionEntry options[] =3D {
+>         { NULL },
+>  };
+>
+> +static void obtain_inhibit_lock(void)
+> +{
+> +       DBusMessage *message
+> , *reply;
+> +       DBusMessageIter iter;
+> +       DBusError error;
+> +       int fd;
+> +       const char *what =3D "sleep";
+> +       const char *who =3D "bluetooth manager";
+> +       const char *why =3D "stopping device discovery";
+> +       const char *mode =3D "delay";
+> +
+> +       if (!client_conn || !dbus_connection_get_is_connected(client_conn=
+))
+> +               return;
+> +
+> +       message =3D dbus_message_new_method_call("org.freedesktop.login1"=
+,
+> +                                       "/org/freedesktop/login1",
+> +                                       "org.freedesktop.login1.Manager",
+> +                                       "Inhibit");
+> +       if (!message) {
+> +               dbus_connection_unref(client_conn);
+> +               return;
+> +       }
+> +
+> +       dbus_message_iter_init_append(message, &iter);
+> +       dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &what);
+> +       dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &who);
+> +       dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &why);
+> +       dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &mode);
+> +       dbus_error_init(&error);
+> +       reply =3D dbus_connection_send_with_reply_and_block(client_conn,
+> +                                                       message, -1, &err=
+or);
+> +       dbus_m
+> essage_unref(message);
+> +
+> +       if (dbus_error_is_set(&error)) {
+> +               warn("Failed to register a suspend inhibitor (selinux?): =
+%s",
+> +                       error.message);
+> +               dbus_error_free(&error);
+> +               return;
+> +       }
+> +
+> +       if (!reply)
+> +               return;
+> +
+> +       if (dbus_message_iter_init(reply, &iter) =3D=3D FALSE) {
+> +               dbus_message_unref(reply);
+> +               return;
+> +       }
+> +
+> +       if (dbus_message_iter_get_arg_type(&iter) !=3D DBUS_TYPE_UNIX_FD)=
+ {
+> +               dbus_message_unref(reply);
+> +               return;
+> +       }
+> +
+> +       dbus_message_iter_get_basic(&iter, &fd);
+> +       inhibit_lock =3D fd;
+> +
+> +       dbus_message_unref(reply);
+> +}
+> +
+> +static void release_inhibit_lock(void)
+> +{
+> +       if (inhibit_lock < 0)
+> +               return;
+> +
+> +       close(inhibit_lock);
+> +       inhibit_lock =3D -1;
+> +}
+> +
+> +static gboolean prepare_for_sleep(DBusConnection *conn, DBusMessage *msg=
+,
+> +                                 void *user_data)
+> +{
+> +       DBusMessageIter iter;
+> +       dbus_bool_t entering;
+> +
+> +       DBG("preparing for sleep or resume");
+> +
+> +       if (dbus_message_iter_init(msg, &iter) =3D=3D FALSE)
+> +               return TRUE;
+> +
+> +       if (dbus_message_iter_ge
+> t_arg_type(&iter) !=3D DBUS_TYPE_BOOLEAN)
+> +               return TRUE;
+> +
+> +       dbus_message_iter_get_basic(&iter, &entering);
+> +
+> +       if (entering) {
+> +               adapter_suspend_discovery_sleep();
+> +               release_inhibit_lock();
+> +       } else {
+> +               adapter_resume_discovery_sleep();
+> +               obtain_inhibit_lock();
+> +       }
+> +       return TRUE;
+> +}
+> +
+> +int connect_login_manager(void)
+> +{
+> +       DBusError error;
+> +       dbus_bool_t login_manager_exists;
+> +
+> +       client_conn =3D btd_get_dbus_connection();
+> +
+> +       if (!client_conn || !dbus_connection_get_is_connected(client_conn=
+))
+> +               return -1;
+> +
+> +       dbus_error_init(&error);
+> +       login_manager_exists =3D dbus_bus_name_has_owner(client_conn,
+> +                                               "org.freedesktop.login1",
+> +                                               &error);
+> +       if (dbus_error_is_set(&error)) {
+> +               dbus_error_free(&error);
+> +               return -1;
+> +       }
+> +
+> +       if (!login_manager_exists)
+> +               return -1;
+> +
+> +       return 0;
+> +}
+> +
+> +int connect_prepare_for_sleep(void)
+> +{
+> +       guint sleep_id;
+> +
+> +       obtain_inhibit_lock();
+> +
+> +       client_conn =3D btd_get_dbus_connection();
+> +
+> +       sleep_id =3D g_dbus_add
+> _signal_watch(client_conn,
+> +                                       "org.freedesktop.login1",
+> +                                       "/org/freedesktop/login1",
+> +                                       "org.freedesktop.login1.Manager",
+> +                                       "PrepareForSleep",
+> +                                       prepare_for_sleep,
+> +                                       NULL,
+> +                                       NULL);
+> +
+> +       if (!sleep_id) {
+> +               warn("Prohibited from watching suspend events.");
+> +               return -1;
+> +       }
+> +       prepare_sleep_id =3D sleep_id;
+> +
+> +       return 0;
+> +}
+> +
+> +static DBusHandlerResult login_manager_changed(DBusConnection *client_co=
+nn,
+> +       DBusMessage *message, void *_usr_data)
+> +{
+> +       const char *name;
+> +       const char *old_owner;
+> +       const char *new_owner;
+> +
+> +       if (!dbus_message_is_signal(message, "org.freedesktop.DBus",
+> +                                   "NameOwnerChanged")) {
+> +               return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+> +       }
+> +
+> +       if (!dbus_message_get_args(message, NULL,
+> +                                               DBUS_TYPE_STRING, &name,
+> +                                               DBUS_TYPE_STRING, &old_ow=
+ner,
+> +                                               DBUS_TYPE_STRING, &new_ow=
+ner,
+> +                                               DBUS_TYPE_INVALID))
+> +               return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+> +
+> +       if (strcmp(name, "org.freedesktop.login1"))
+>
+> +               return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+> +
+> +       if (!strcmp(new_owner, ""))
+> +               return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+> +
+> +       if (connect_prepare_for_sleep() >=3D 0)
+> +               dbus_connection_remove_filter(client_conn,
+> +                                               login_manager_changed, NU=
+LL);
+> +
+> +       return DBUS_HANDLER_RESULT_HANDLED;
+> +}
+> +
+> +int connect_login_and_prepare_for_sleep(void)
+> +{
+> +       DBusError error;
+> +
+> +       client_conn =3D btd_get_dbus_connection();
+> +
+> +       if (connect_login_manager() < 0) {
+> +               dbus_bus_add_match(client_conn,
+> +                                       "type=3D'signal',"
+> +                                       "sender=3D'org.freedesktop.DBus',=
+"
+> +                                       "interface=3D'org.freedesktop.DBu=
+s',"
+> +                                       "member=3D'NameOwnerChanged'",
+> +                                       &error);
+> +
+> +               if (dbus_error_is_set(&error)) {
+> +                       dbus_error_free(&error);
+> +                       return -1;
+> +               }
+> +
+> +               dbus_connection_add_filter(client_conn, login_manager_cha=
+nged,
+> +                                                               NULL, fre=
+e);
+> +               return -1;
+> +       }
+> +
+> +       return connect_prepare_for_sleep();
+> +}
+> +
+> +void disconnect_prepare_for_sleep(void)
+> +{
+> +       DBusConnection *conn =3D btd_get_dbus
+> _connection();
+> +
+> +       if (!conn || !dbus_connection_get_is_connected(conn))
+> +               return;
+> +
+> +       if (!prepare_sleep_id)
+> +               return;
+> +
+> +       g_dbus_remove_watch(conn, prepare_sleep_id);
+> +       prepare_sleep_id =3D 0;
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>         GOptionContext *context;
+> @@ -1498,6 +1719,9 @@ int main(int argc, char *argv[])
+>                 exit(1);
+>         }
+>
+> +       if (connect_login_and_prepare_for_sleep() < 0)
+> +               info("Cannot listen for suspend yet, trying again later."=
+);
+> +
+>         if (btd_opts.experimental)
+>                 gdbus_flags =3D G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
+>
+> @@ -1557,6 +1781,8 @@ int main(int argc, char *argv[])
+>         btd_agent_cleanup();
+>         btd_device_cleanup();
+>
+> +       disconnect_prepare_for_sleep();
+> +       adapter_suspend_discovery_sleep();
+>         adapter_cleanup();
+>
+>         rfkill_exit();
+> --
+> 2.53.0
+>
+
+
+--=20
+Luiz Augusto von Dentz
