@@ -1,48 +1,129 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9510538D009
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 10:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8413C345B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 12:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773312993; cv=none; b=c/w34ZrETB58VRaXIvTmMydL0/OJtLkRAXasVXyqn44aH/lddWWPMqV5DvPCovWzM6NAwDB/lDMZlRyFy359Apg6WgYcZm6BiCmgrUsoAqMm5npW9M46fbd67ERF04U67EHuji3iF1pfKPmLO22hZwglvhG/Xv57OosjTgryAq4=
+	t=1773320257; cv=none; b=Kj78HxoGCxS1JmUZxdjPaNAcZV2c0tI1cy8CbtldAU85Wm+wODbHMoi0iJEBwt4qn8s4vMPmcxhpYeCzjbLX+mMQx62hANYMoXHQ7F2RX/UzFalGgLDHnb62dCFCG5vBMeaNdJdnLLbxv/DjrfZ38AlBN3P5lypiouUJb5m1rlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773312993; c=relaxed/simple;
-	bh=xDKBMFrWVbb9mPBYIckSPzcErZ4DyRIVXzUo6yhaUx4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=J52K6hIDloqUVnjms7Poxfj/pZ6dcG/w/vsSQ3dW67jlaLt8BWyu+IAO77l6SSEOo1zpPHs7nvnPM7utT7zGBE4v3A0iKuLmRt/hO2qnxKiSv8GtZ07tP7NTg6txpIEpwNiHfnuIbHqfGH2TAGTQXL8OCp43lwRJ23zoiAtveE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=UcFVuaNd; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1773320257; c=relaxed/simple;
+	bh=Rr1jkAP22lZkLvo3o90a9fRSWh9+kilNKtAarSScWFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oJI5n+aVpjQyl0zTECMn/uIU6ubbfYsRMb82XyHZsooEhpwafpnPgxIkxdDVA5Y8wssuQTaS9lpwWvtgNNREuhlLr2mTtySVQdr6OHf4VFR5yeCIb683M56l7DxJ4QyFKaJ4cKA1Oa3gMX1QB9uHkZEp6YHulz7rUS+0ja6lkTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fHqxjqGD; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="UcFVuaNd"
-Received: from github.com (hubbernetes-node-1cb2d6b.ash1-iad.github.net [10.56.170.26])
-	by smtp.github.com (Postfix) with ESMTPA id E4F27140415
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 03:56:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1773312991;
-	bh=pDW7wb3xnve1+Mes8rfAK00cSxp/lZvof8AqMRUVn3A=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=UcFVuaNdj2OjXPvg3UJTqfKpALMtaIlBGNinWQG4sMpHWN0wC1gTUL3TGgdotZ1jb
-	 Re31sYD5S6bxiIGUPjZoTjNA+xhjIyepivyOTVEJsp5p/dxbWf3BayZLhD1QD3VIiQ
-	 uRR1v8HpPR6GbogU2M91O/nXIAFk6CkfNit1YqIc=
-Date: Thu, 12 Mar 2026 03:56:31 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/826174/994184-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fHqxjqGD"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-5094b54a250so5475781cf.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 05:57:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1773320252; x=1773925052; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
+        b=fHqxjqGD7mReR8MT2yBowt9MuNKPAKQc++mWcb4ZOttX6YldICO+OnnxWIQjO0C8L5
+         wjOw0Gg7MqV4U+G9pES+s6h1NtZIjaKrBXMW81hrLyc8SxWYHtvQK3FlTjqiyroZskXE
+         jYj0kUENL7Yhu5zg+0UQ91XYlYYlozX9U8uAqBEFaih0fSnDo8kprjTDRYJ58gzKRExo
+         MSUW+Q+e0P2WpZGotx0DuVRaUqq4vGsUUSX1YbPnOxmRUKlXFY/aNRmXMXDbAEfx0Lnn
+         e41FpuPSZjTSuTkWfTMW8e1MvewVXC2p6zLd4GrSZjvSKS4Q06nDQYaSimUW3qR5RhoY
+         JV6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773320252; x=1773925052;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
+        b=g9UhDnek/zuAUBo/SlewAzEGpT6nSfuXtuvW0UBiV6i3q785eFMU4s4nzjvRKyheuJ
+         fmKFlhq1jC2gRTpJ6dG62ZjavHHYItrqUXKj5MrHOcWfGHAf/0bAQQ1gGtu/g5Ndj73U
+         wjj0+bpT1kEiR77GCCE6VwQEhm5rwWDk0wjbwLjRdnZbqhtQ2Rt/CxE+ncrnH7pgUnS9
+         4kD2BKro8c836KK0DU4wX/hDc95AuPoqRfFdpSHT8eGmaRGFOFh23kbUO+/7s8py3hgM
+         ONujFRiOhO9gH8CNqEAyzbUz2Ba2+WKJ8y53mZNw4oz5sJBIzo4wdLZx3tSsUIQaIOFd
+         OT6g==
+X-Forwarded-Encrypted: i=1; AJvYcCXiVJ9pj2/xUeCdWmmR9P29L0uXJMErVhpUMN7qrCKo4bH13dxm7ruTzG5jQ/bF+uDVARM1zuDlStN2GgZi/gE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy133tq3jBtyzeVQzJjnRlP6nM1e399Ft/FlSc7QowR/ICek9jH
+	kIF/PivRE1ZkyUKS2YU6ZTyJDjiaY/u5A6hlvFbZMljkXXHKu1hqHnFmYxZrnkF82gI=
+X-Gm-Gg: ATEYQzzjK7HjDrSkgcm83IlIqn1ILYfsYf7nc61rMBNmmkJYeqnV5HR/0KUamKGomqM
+	xsmsHY06Yth30Xp7zlPBweV6ivHxbRuCIgn1WcDwu496DD1RjDheNIZeBbmSdKdTM3mBzsVR4RG
+	Lx1/2PXaphcqBWrd0MhQIz4/BYRriqlnjBxTOkT0ys4iFMnbM8G41WXzy5TzhL6bpxJ1T80Q6vS
+	ukIth2kDuhJZQHqc+YcEREXoU0kU1QeZ/cvWvqNPIbsEZWjhSHbgis/eYgAzbvGSMPwpw77yws/
+	zEQ+eR7OW3ZmlM06+WdpCwhPBQauPzH+fguGkJZ5AUQ/WMabKUjStGFunUNX7RGmE/1LoGAjvBy
+	HG9A3ZkVZcV5sXHT5QIQSRgJbe7dvWhL9brc43xs6cUD5AfAoLVvi9O0xzBXUyE7K6fE8bqpclS
+	m/KwsWbhanSHK4/Qe3DnXZxyO7LugDYvpZ8IPWemXZwwsrksvNQevFwpPS3owp+iC8v8c/7eHrr
+	FXAn1RM
+X-Received: by 2002:ac8:5d4d:0:b0:509:cbc:127b with SMTP id d75a77b69052e-5093a1bd58fmr77950521cf.60.1773320251710;
+        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65bd318fsm33341196d6.8.2026.03.12.05.57.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1w0fbW-00000006fKD-1POa;
+	Thu, 12 Mar 2026 09:57:30 -0300
+Date: Thu, 12 Mar 2026 09:57:30 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
+Cc: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
+	apparmor@lists.ubuntu.com, bpf@vger.kernel.org,
+	ceph-devel@vger.kernel.org, cocci@inria.fr,
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-mm@kvack.org,
+	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
+Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
+ check - refactor
+Message-ID: <20260312125730.GI1469476@ziepe.ca>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+ <abBlpGKO842B3yl9@google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abBlpGKO842B3yl9@google.com>
 
-  Branch: refs/heads/826174
-  Home:   https://github.com/bluez/bluez
+On Wed, Mar 11, 2026 at 02:40:36AM +0800, Kuan-Wei Chiu wrote:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+> IMHO, the necessity of IS_ERR_OR_NULL() often highlights a confusing or
+> flawed API design. It usually implies that the caller is unsure whether
+> a failure results in an error pointer or a NULL pointer. 
+
++1
+
+IS_ERR_OR_NULL() should always be looked on with suspicion. Very
+little should be returning some tri-state 'ERR' 'NULL' 'SUCCESS'
+pointer. What does the middle condition even mean? IS_ERR_OR_NULL()
+implies ERR and NULL are semanticly the same, so fix the things to
+always use ERR.
+
+If you want to improve things work to get rid of the NULL checks this
+script identifies. Remove ERR or NULL because only one can ever
+happen, or fix the source to consistently return ERR.
+
+Jason
