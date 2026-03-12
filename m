@@ -1,201 +1,106 @@
-Received: from mail-106100.protonmail.ch (mail-106100.protonmail.ch [79.135.106.100])
+Received: from lithops.sigma-star.at (mailout.nod.at [116.203.167.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A20E3A381C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 18:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EED3AC0E2;
+	Thu, 12 Mar 2026 19:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.167.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773339747; cv=none; b=EK2P+N6HFTU4jFp0Al+hx5xeSS6BI9weOAoO7MqEspd5mnkZhmet6gpJjL+dJDds/BgUgrT+vNO+05WBCkwMrq3/gejAOfhi/QtLHenQE9Mvw9hw/i9ZtZZac6hBY2/cPeHuKeViH2ino74CQqWKQvxgEB7OlfHb8JnBk1ePhyk=
+	t=1773344034; cv=none; b=j33607n42e689OLFpqcE53xFh+mXzT0DHyFuURweRJDCnHcwW3FtYJuTwAwE7ZtTqn92an8BownNrtmHLhnnlR6hLvKAuI+SoVXShgoz/FNRyMB49rWOhUxMnrt0E5LHZZe0uYfRusDdVxUM+4AJvAJQujoLYUQ8fY7Cwp76ZKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773339747; c=relaxed/simple;
-	bh=4Dw10nOg+v0a8N+IQ1UF7oe32/mVLej8kZSbdQvcWi0=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JVOsLifytd5RQe6XfMWkJbZgSJLOenKiHi6KaXVLSh33eSCP7L1hpNMXCbtf/pHkUuR9hMGLqZGAV1K3tjsXZ1kw7p0WbHU9T5VNX0i58dmcMm76ULLzewavjwaisUeLJyFnSXLSn6EfDuE1L0+2JnuGA4Q1d1eH0/QNGL660tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za; spf=pass smtp.mailfrom=deschouwer.co.za; dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b=fOmraTLN; arc=none smtp.client-ip=79.135.106.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deschouwer.co.za
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b="fOmraTLN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=deschouwer.co.za;
-	s=protonmail2; t=1773339730; x=1773598930;
-	bh=51WJrzgHCYIYAXvjLflXI5RIE5RLxS9zJEBL+QhYFNE=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=fOmraTLNwoNLfw9rVQllvjukoykinrLbYXTA5Ghv+9+h7svvIkXu2QvYWgb3Se0vh
-	 h1D+kSgJWe5YbDqgGS60h520ZKwo7ifiC7x/pOdkQvGlQk/9rfpoxtzJOGX7SsJ/yx
-	 QuJcxbtcKA6Pjv94D/Vg2r46jq0dpLS50GGA3LF+2LBzyFJ+Vi1jGftcpIwNc97DBX
-	 776rMtcxUDMPjReN6TRPcWi/OwTlSrpcSLYJKB6CSluba/e53Xp7cmbVQiIwCocKke
-	 5//HNBt22Ktn+EaY5HfuUAzQXxLYyg5FzqeEdjiEr709Vzl0XY18QSQIEf8sqXxrrH
-	 eFlYB4n3OOuww==
-Date: Thu, 12 Mar 2026 18:22:04 +0000
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-From: berend <berend@deschouwer.co.za>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/1] Stop and start some actions on suspend and resume
-Message-ID: <1cadd6cce1846e3c9c9cadb44a8ba1764b623a37.camel@deschouwer.co.za>
-In-Reply-To: <CABBYNZ+6mVQFhLBd6KaFfKLvOC2D8F-Pt6W+y5TT_hAC3Pu2sw@mail.gmail.com>
-References: <20260309040136.159073-1-berend@deschouwer.co.za> <20260309040136.159073-2-berend@deschouwer.co.za> <CABBYNZ+6mVQFhLBd6KaFfKLvOC2D8F-Pt6W+y5TT_hAC3Pu2sw@mail.gmail.com>
-Feedback-ID: 50941660:user:proton
-X-Pm-Message-ID: 1261b5ff7a0f22ca727073f5d0b4f69987d2d522
+	s=arc-20240116; t=1773344034; c=relaxed/simple;
+	bh=VQ4I1//oujMg/wMbvtHZ1fNg62i5rEhIWcPKRohhj4U=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=ddy2a7nze40y2XOq6AzX5P+yK/YAMZEsZCu4is1ZBhMnJKS9vFgMZWqpirXNxVgz6pZsokw/214XhfsoPaQlvyfIqpgQ2GBgjj20XFkl4eJeH0Ugf3RmPz5wDBJf3rAKd+aMd7liJ/M4aSZTOFN9EXdHYYjti5z0jySqd1deAiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at; spf=fail smtp.mailfrom=nod.at; arc=none smtp.client-ip=116.203.167.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nod.at
+Received: from localhost (localhost [127.0.0.1])
+	by lithops.sigma-star.at (Postfix) with ESMTP id 4DE582C14A8;
+	Thu, 12 Mar 2026 20:33:44 +0100 (CET)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id yCwNT8mwVvHB; Thu, 12 Mar 2026 20:33:43 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by lithops.sigma-star.at (Postfix) with ESMTP id 8A34D2C14AA;
+	Thu, 12 Mar 2026 20:33:43 +0100 (CET)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 3HN7guaAFMsE; Thu, 12 Mar 2026 20:33:43 +0100 (CET)
+Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
+	by lithops.sigma-star.at (Postfix) with ESMTP id ABF4A2C14A6;
+	Thu, 12 Mar 2026 20:33:42 +0100 (CET)
+Date: Thu, 12 Mar 2026 20:33:42 +0100 (CET)
+From: Richard Weinberger <richard@nod.at>
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx <amd-gfx@lists.freedesktop.org>, 
+	apparmor <apparmor@lists.ubuntu.com>, bpf <bpf@vger.kernel.org>, 
+	ceph-devel <ceph-devel@vger.kernel.org>, cocci <cocci@inria.fr>, 
+	dm-devel@lists.linux.dev, 
+	DRI mailing list <dri-devel@lists.freedesktop.org>, 
+	gfs2 <gfs2@lists.linux.dev>, 
+	intel-gfx <intel-gfx@lists.freedesktop.org>, 
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
+	kvm@vger.kernel.org, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	linux-block <linux-block@vger.kernel.org>, 
+	linux-bluetooth@vger.kernel.org, 
+	linux-btrfs <linux-btrfs@vger.kernel.org>, 
+	linux-cifs <linux-cifs@vger.kernel.org>, linux-clk@vger.kernel.org, 
+	linux-erofs <linux-erofs@lists.ozlabs.org>, 
+	linux-ext4 <linux-ext4@vger.kernel.org>, 
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
+	linux-gpio@vger.kernel.org, 
+	linux-hyperv <linux-hyperv@vger.kernel.org>, 
+	linux-input@vger.kernel.org, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-leds@vger.kernel.org, 
+	linux-media <linux-media@vger.kernel.org>, 
+	linux-mips <linux-mips@vger.kernel.org>, 
+	linux-mm <linux-mm@kvack.org>, linux-modules@vger.kernel.org, 
+	linux-mtd <linux-mtd@lists.infradead.org>, 
+	linux-nfs <linux-nfs@vger.kernel.org>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	linux-phy@lists.infradead.org, linux-pm <linux-pm@vger.kernel.org>, 
+	linux-rockchip <linux-rockchip@lists.infradead.org>, 
+	linux-s390 <linux-s390@vger.kernel.org>, 
+	linux-scsi <linux-scsi@vger.kernel.org>, linux-sctp@vger.kernel.org, 
+	LSM <linux-security-module@vger.kernel.org>, 
+	linux-sh <linux-sh@vger.kernel.org>, 
+	linux-sound <linux-sound@vger.kernel.org>, 
+	linux-stm32 <linux-stm32@st-md-mailman.stormreply.com>, 
+	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>, 
+	linux-usb@vger.kernel.org, 
+	linux-wireless <linux-wireless@vger.kernel.org>, 
+	netdev <netdev@vger.kernel.org>, ntfs3 <ntfs3@lists.linux.dev>, 
+	samba-technical <samba-technical@lists.samba.org>, 
+	sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, v9fs <v9fs@lists.linux.dev>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>
+Message-ID: <1584421372.26258.1773344022512.JavaMail.zimbra@nod.at>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-48-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de> <20260310-b4-is_err_or_null-v1-48-bd63b656022d@avm.de>
+Subject: Re: [PATCH 48/61] mtd: Prefer IS_ERR_OR_NULL over manual NULL check
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------9fb1268b60c6e7b6bed3bfc7086fdbb7bd6f037a373a69a6f3c72a240315c069"; charset=utf-8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF148 (Linux)/8.8.12_GA_3809)
+Thread-Topic: Prefer IS_ERR_OR_NULL over manual NULL check
+Thread-Index: 0l8CyewQmrWlgaG6N3QgQFfukutRbA==
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------9fb1268b60c6e7b6bed3bfc7086fdbb7bd6f037a373a69a6f3c72a240315c069
-Content-Type: multipart/mixed;
- boundary=0e7ed7e64df74757d210604d4ae0669c3919ac2502781261d49b01c8acfe
-Message-ID: <1cadd6cce1846e3c9c9cadb44a8ba1764b623a37.camel@deschouwer.co.za>
-Subject: Re: [PATCH BlueZ 1/1] Stop and start some actions on suspend and
- resume
-From: berend <berend@deschouwer.co.za>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 12 Mar 2026 20:22:00 +0200
-In-Reply-To: <CABBYNZ+6mVQFhLBd6KaFfKLvOC2D8F-Pt6W+y5TT_hAC3Pu2sw@mail.gmail.com>
-References: <20260309040136.159073-1-berend@deschouwer.co.za>
-	 <20260309040136.159073-2-berend@deschouwer.co.za>
-	 <ZThhTEFtFvfPZplRIDL7Zxnng6uEqr3kXlkpt6JhCowLobNPzjNJcJmleNDCke_WCTnGNg81cXfhZhuyo5F6Sg==@protonmail.internalid>
-	 <CABBYNZ+6mVQFhLBd6KaFfKLvOC2D8F-Pt6W+y5TT_hAC3Pu2sw@mail.gmail.com>
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
-MIME-Version: 1.0
+----- Urspr=C3=BCngliche Mail -----
+> Von: "Philipp Hahn" <phahn-oss@avm.de>
+> -=09if (gpiomtd->nwp && !IS_ERR(gpiomtd->nwp))
+> +=09if (!IS_ERR_OR_NULL(gpiomtd->nwp))
 
---0e7ed7e64df74757d210604d4ae0669c3919ac2502781261d49b01c8acfe
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+No, please don't.
 
-T24gVGh1LCAyMDI2LTAzLTEyIGF0IDA5OjEzIC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
-IHdyb3RlOg0KPiBIaSBCZXJlbmQsDQo+IA0KPiBPbiBNb24sIE1hciA5LCAyMDI2IGF0IDEyOjAy
-4oCvQU0gYmVyZW5kIGRlIHNjaG91d2VyDQo+IDxiZXJlbmRAZGVzY2hvdXdlci5jby56YT4gd3Jv
-dGU6DQo+ID4gDQo+ID4gU3RvcCBhY3RpdmUgZGV2aWNlIGRpc2NvdmVyeSBvbiBzdXNwZW5kIGFu
-ZCBzaHV0ZG93biwgYW5kIHJlc3RhcnQNCj4gPiBvbiBkZXZpY2UgcmVzdW1lLsKgIFRoaXMgdXNl
-cyBkYnVzIG5vdGlmaWNhdGlvbnMsIHNvIG5lZWRzIGEgcnVubmluZw0KPiA+IGxvZ2luIG1hbmFn
-ZXIgb3duZXIuDQo+IA0KPiBJIGd1ZXNzIHRoaXMgaXMgaW1wbGVtZW50aW5nIHRoZSBmb2xsb3dp
-bmcgZnVuY3Rpb25hbGl0eToNCj4gDQo+IGh0dHBzOi8vc3lzdGVtZC5pby9JTkhJQklUT1JfTE9D
-S1MvDQoNCnllcC4NCg0KPiBNeSBxdWVzdGlvbiBpcywgaXMgdGhpcyByZWFsbHkgbmVjZXNzYXJ5
-PyBUaGUga2VybmVsIGFscmVhZHkgaGFzDQo+IGhhbmRsaW5nIHRoYXQgZGV0ZWN0cyBpZiBhbiBh
-Y3RpdmUgZGlzY292ZXJ5IGlzIG9uZ29pbmcsIHBhdXNlcyBpdCwNCj4gYW5kIHRoZW4gcmVzdW1l
-cyB0aGUgZGlzY292ZXJ5IHN0YXRlIHVwb24gcmVzdW1wdGlvbjoNCj4gDQo+IGh0dHBzOi8vZ2l0
-aHViLmNvbS9ibHVlei9ibHVldG9vdGgtbmV4dC9ibG9iL21hc3Rlci9uZXQvYmx1ZXRvb3RoL2hj
-aV9zeW5jLmMjTDYyMzkNCj4gaHR0cHM6Ly9naXRodWIuY29tL2JsdWV6L2JsdWV0b290aC1uZXh0
-L2Jsb2IvbWFzdGVyL25ldC9ibHVldG9vdGgvaGNpX3N5bmMuYyNMNjEzMg0KPiBodHRwczovL2dp
-dGh1Yi5jb20vYmx1ZXovYmx1ZXRvb3RoLW5leHQvYmxvYi9tYXN0ZXIvbmV0L2JsdWV0b290aC9o
-Y2lfc3luYy5jI0w2MzcxDQo+IGh0dHBzOi8vZ2l0aHViLmNvbS9ibHVlei9ibHVldG9vdGgtbmV4
-dC9ibG9iL21hc3Rlci9uZXQvYmx1ZXRvb3RoL2hjaV9zeW5jLmMjTDYyOTINCj4gDQo+IE1heWJl
-IHRoaXMgaXMgbm90IHdvcmtpbmcgaW4geW91ciBzeXN0ZW0gZm9yIHNvbWUgcmVhc29uPw0KDQpJ
-dCdzIG5vdCwgaW4gYmx1ZXogNS44NiwgYW5kIDYuMTgsIGFzc3VtaW5nIHRob3NlIGxpbmVzIGFw
-cGx5Lg0KDQpJIHdvdWxkIGJlIGhhcHB5IHRvIGFjY2VwdCB0aGF0IHRoaXMgaXMgdGhlICJ3cm9u
-ZyBwbGFjZSIgdG8gZml4IGl0LCBhcw0KbG9uZyBhcyBJIGNhbiBoZWxwIGZpbmQgdGhlICJyaWdo
-dCBwbGFjZS4iDQoNCkl0IGFsc28gaGFwcGVucyBvbiByZWJvb3QsIGFzIGxvbmcgYXMgdGhlIHBv
-d2VyIGlzbid0IGN5Y2xlZC4gIFRoYXQNCm1ha2VzIG1lIHN1c3BlY3QgdGhlIGFkYXB0ZXIgaGFy
-ZHdhcmUgb3IgZmlybXdhcmUuICBPciBtYXliZSBBQ1BJLg0KDQpJJ20gcXVpdGUgaGFwcHkgdG8g
-Z2V0IGRlYnVnIGluZm8gb3IgbG9ncyBpbiBibHVleiwgYnR1c2IsIG9yIGJ0bXRrLCBvcg0KZmly
-bXdhcmUsIG9yIGFueSBvdGhlciBwbGFjZS4gIElmIHRoZXJlJ3MgYSBiZXR0ZXIgd2F5IHRvIGZp
-eCB0aGlzDQpwcm9ibGVtLCB0aGF0J3MgZ3JlYXQuICBJIGhhdmUgbm8gaWRlYSBhdCB3aGljaCBs
-ZXZlbCBpdCdzIGJyb2tlbiwgc28gSQ0KZml4ZWQgaXQgaW4gdGhlIG9ubHkgcGxhY2UgSSBjb3Vs
-ZC4NCg0KVGhlIGN1cnJlbnQgc29sdXRpb24gaXNuJ3Qgd29ya2luZywgYW5kIHRoZXJlJ3MgcmVw
-ZWF0ZWQgcHJvYmxlbXMNCnJlcG9ydHMgYnkgdmFyaW91cyBwZW9wbGUsIGZvciBhIG51bWJlciBv
-ZiB5ZWFycy4gIFNlYXJjaCBmb3IgTG9naXRlY2gNCmluIHRoZSBibHVleiBpc3N1ZXMuICBJIHdh
-cyBoYXBweSB0byBmaW5kIGl0IGhhZCB0byBkbyB3aXRoIGRpc2NvdmVyeSwNCmFuZCBoYXBweSB0
-byB3cml0ZSB0aGlzIHBhdGNoIHRvIHByb3ZlIGl0IHNvbHZlZCB0aGUgcHJvYmxlbS4gIFRvIC0t
-DQpmaW5hbGx5IC0tIGNvbWUgd2l0aCBhIHNvbHV0aW9uIGFuZCBub3QganVzdCBhIHZhZ3VlLCB1
-bnJlcGVhdGFibGUsDQpwcm9ibGVtIHJlcG9ydC4NCg0KVGhlIHRlc3QgaXMgZWFzeSB3aXRoIHRo
-ZSBoYXJkd2FyZTogb3BlbiBkaXNjb3ZlcnksIHN1c3BlbmQgYW5kIHJlc3VtZS4NCg==
---0e7ed7e64df74757d210604d4ae0669c3919ac2502781261d49b01c8acfe
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="publickey - Berend De Schouwer -
- 0x128CD671.asc"; name="publickey - Berend De Schouwer - 0x128CD671.asc"
-Content-Type: application/pgp-keys; filename="publickey - Berend De Schouwer
- - 0x128CD671.asc"; name="publickey - Berend De Schouwer - 0x128CD671.asc"
+This makes reading the code not easier.
 
-LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCkNvbW1lbnQ6IGh0dHBzOi8vZ29w
-ZW5wZ3Aub3JnClZlcnNpb246IEdvcGVuUEdQIDIuOS4wCgp4c0ZOQkZXS2tVRUJFQURYdWlFWVcx
-WUlnTm5yYXpFby8wemVsVHp4YkhDRy93V3huN0FTdWQ4eEhMMWpxWks1CnF4UVMvNldSYm5RdjVj
-NURQdmsxT2Y2RS8yWFZzRlVRSmdSMVlGeEd0TnQxUUFsNVIwdmo3cnZyOG5CYmVRaGMKbUhzdndH
-cFQ3YWJrZXZXRnZtY0hiTktmWGJjL3NmRHJDTW90UkZRQm9oYzdveW8rTnpPSk9RcEpxQ2J6d2sr
-awpWbVZoVkhwdzhZenZuRDJzVkRxYlFPeHRXbXJjb2ZtOURiMjhORTBOY04yUDlBQmJOSnV0MVFV
-Wld0WjFsbVc2CnJ5aGdLckM0dXhTei9ZTmNjNXpzMlo3NjFTR0tPU1k4UFZ6dlZrTGJLOWZiZFk3
-amNnR0NGZDZHUllPQjJJM0IKN0NPOXVhZnVUb0NEeWhscWx1Z1dYcEdvQTVCN28vYTRaMWI3cWxO
-c0VtcWxHaCtlRDk0SDhNL0xXOGR3WU5SSQpvVU5ZSWF5UkYxT1FwcmM1UHozaUN4YW9ub0lpR2Z4
-R1pxTktUOVFXb0lnOHJPQzA4dGNyOHVqNG0xUmpKcnN6ClNqdGt3c29tMFV3cEJ5Z0hlLzNCcDR4
-WlN4Z2FmTXc2ZEdTS1JzRFRBSGoyRkpGV2N0Tmx1WTRqdnhSWDdDdVcKNTlRMzVKSUU4bStPZ1li
-Z0xrR1FmRWRVeWhjUnFCMCtWUjJXUmxYNXNLVVprV2cxQWhnY0w3RmltTmxsM2YwNgp5ZS91emJy
-YVVZSFg3eGMzdjVDSjJaNnd4Nk1waFp6aGh4dUJxTGNZSkViTjlmTnNldlRPWWtFUUlzR0M3Tldv
-ClQyaHkzdWplWUJQajNjbzJOZDRpV085dHB5c0xaOGdLMTUvZE5qTUJUc3ByUys5UlBxZ3o1QnRG
-bXdBUkFRQUIKelN4Q1pYSmxibVFnUkdVZ1UyTm9iM1YzWlhJZ1BHSmxjbVZ1WkVCa1pYTmphRzkx
-ZDJWeUxtTnZMbnBoUHNMQgplQVFUQVFJQUlnVUNWWXFSUVFJYkF3WUxDUWdIQXdJR0ZRZ0NDUW9M
-QkJZQ0F3RUNIZ0VDRjRBQUNna1EyMjdnCmNaT0FvT25YZGcvOUVGZFJyL1h0T1liQmVsdGIwc05I
-YVNQN1M0dmtscWNBdE9udFRZVjN5TUZOdjlYQlhYdkYKU0thR2wwbTVMaGVOQWtJdS9ZYkFkR1h5
-U3pOVWQ3V3NmeWIrMjNpcTVVS0d0K3dEK1JvY0xaWTA5NHVBS2NRUQpUWndKS1R3NHRLSWdONHFC
-dE9hTmlKd0x1cnNOWllBUDdKSUpGUFFZNTVwYSt5ZWMzanhmVFgwYTdydWllY29zCm16YXZRMTgy
-VitMZGV2Mmtvckd2WTFjejQzclA4eGlMMURqdGNCVW5laWdiajUrTjBaOFVsam5SNlFrU1J1YWoK
-ZHNHQkFYSG1rT3NCVi9vOE04dkZXYThOODN1czFHa3k1SzU0eFFPYVZ5TlJWclI0RUlTdjh5MGkz
-M3J3R1l2UApCRCtSS2FMYWN1S2I4KzhLTlZ1UTVNMHYrNHBHci9GZVhwUCtuUHpWRGZiWlpoWDFp
-d2VRMDY5TEthOXJlZjhxCkV3NFZWdDdBdVlGU3dlSFZNSUNBMFpHeUtKNWhaejdMZEkwdkFGQU55
-VXQwS29XZWVLNjl4aWs4cnZGNzVlbzQKZnovV0p0Zi9BZG5DdVlwNjBvYm94L3NKQTdLclpyV1FO
-YkRjbEplZmlTWlY3dHVIaDdqTEpxUXVma201RDVnbwp3QUFvNWdyTS82V0FOSFZ3NWlvak0vVUc2
-ZjArdEZaWGdGTXlrMkpaeTljMnM4VlFnSTJVenJiVThKc0N0ZERqCkJVU1RDNjRSN2tsdlY1Ymt1
-MzFBbTNSUEMyOWwxaGZZKzNVTGc0dzhtbXBKMjhwcSsvejBvS0g4Q3d5aWN1RlAKRkJHOTVsbi83
-dHRlNGlmV2tmek1MOE9oMmJwdUtFYjJQV1I0NHNRMVpxOCtJQWpTMlh3TDQ1N093VTBFVllxUgpR
-UUVRQUtYYUwvaEhueXdzRnlVUVVHNVdxYm9xSHRWODNTNEc5aEpMQ25MOWhnU0J2Z2twbTRjNi85
-Mmt6Lzh5CmdvRTRjUjNHSmZsZm40OHRUNFkvWDZzTkZiSXY5VkhpWVo4aW9YVUc0bHBhMFIyN3pk
-MVZZT1pXUStvS3RjRnoKb1djVlViOHQrT1BoM2tuME5WQWxFRnlya0k5YWdUc0p1OFJ0alNpMEV6
-Wi9iQ0xaTStFMU9UQnpZUzFuelZlcgp1NVVid1FWbXAzbUlzS2JSVTRRbnpZSElWVGNFeDF5SGxC
-M1ZkZFd6M0pnenVsWlF4SDdRREVGaTVBaDhjcUVDCjJSZ2w2K2JkdVBqYnJBK2RwV2VaTGtvUGhH
-d0xZcVM0YnJxN0ZBbmtMMjFSTGVGQzkvY203dTNaMnozd1o5QXkKZWt2bmtPNnhxdGlqcDB2Y0RD
-V3kxbldiV0tpN2Y5K1NQWW5xTTNKVFBqWnlobk9CQ2pWTFhUcnlYQ3BhRGFCYgpnWGZRSlpMOWwx
-bTRqVzBoQjNEdlU5eGQ2Zi8zdW1vODMzS1BnMm5XenpnZ0tRODREUUd3L0hYdkFSdDVtR0ZTCmQv
-REtkMlliTHc5QjJKSlpqb2kzc2VGWlN6YVZKZ0FWZk9neUk0NHRnN3pJSlVUZDk2VzVpeEE3SEVP
-TkV4cG0KQ0JrZ3ArMmswZEg1SU84c1lXd1o0c3lXQk5kZ1cxeGd2Qzc1dm94TmZTZGJmcGRhMG91
-YU5xYVR0YjdzcnlVZApsTFZ3bExZZkV4NU9EeFFVY1VyNHRKUDhsR1I4dkEwemhGSEJhTEdCcjBa
-SU16UU5TcS9jS3NrNnNESXI0Wms1ClZMT0VVN3R3SFRrZjQ3bXpWTExCQmZ6alJJc2hXRnJvNnBj
-NDFBaGk5Y3ArQ3hLYkFCRUJBQUhDd1Y4RUdBRUMKQUFrRkFsV0trVUVDR3d3QUNna1EyMjdnY1pP
-QW9PbXkzUkFBdGpNMGtPQjN1OTZ0S0pieGpERnlUTjZhTk9WLwo5WXk2V2doRjJITldvN0hzbk55
-dnNRTkF1cHhWMndBTGF0UGVjUFgrL04vdWVGUUtyQTMvd3FVUTkwMkw0VXhWCnJMa1d5a2RZb09P
-cGd4TUxkUXB6Z2NRT1RTV1BDdlAwVi9jVnNYY1dKaVZFRGg5VGp1SzBLc1loRm1XR2E2bmUKNHVS
-MVY2VkJ5SUtaay9vRGthSVhCanJaU1ZUT1M2ZzZWRi9XaWhHKy9NL0MyZU94eEJZMzdqWm5xREpR
-bjNxWApoWTJjVE4wbTlrTFFQdjJqUE9LcjAzUHIvbFdIV1Rpc1EzRkNWbG1ZUTBJSUcyRlpKSmNS
-RGNELzhOOGpoMWVhCnpFQmowK1lSMitMUUxzVWN6bDBQSkM0TGV4eERTUVg4MlRlV21nUklXc3Mv
-UTM2VUNIOVNyOFl6Sk9BSkxWWEYKNUJMQXgybFlVQWk4bmN0cjhIMmdML0RQOHlOT3hBZ05QSVhy
-QjNnQk9XYTF4MmNROHNOeDMvVXVYZFIyNXQyYgo3eGpseFdlWmM5ejJnTzlyZUVKRWt6a21HVjhR
-Sk1QSFAvejZRdTZIUVlqUFlyL3I0T1FSSGFpN1RMSkZsTFBNCkJLQTJGVWlZNzFaTUxZWHRXUms1
-WG85SnVGL0F0dncwU3JxcFoyRE5PeUtLZmJzMTRNOS84RXkzUUFVTklTSXQKUDQyMlJNQUQxdzha
-WGcxWlBqSEo4TGo3Qms3RTJGN0YzVlUwSXFCSVVsc1J5eUJvMUs3SDdRT1pwdmJFeERRSgpnMWx4
-YlhhS1lrRFEwREdhb2FnT3pVYVo5ckxCdkpFNHo3QzBTZ3BjWFpaMHJuT3lkdm5GMGhCWG93djdX
-YkYrCmk0WlB5REJjM242OHJxcz0KPTlTWGwKLS0tLS1FTkQgUEdQIFBVQkxJQyBLRVkgQkxPQ0st
-LS0tLQ==
---0e7ed7e64df74757d210604d4ae0669c3919ac2502781261d49b01c8acfe--
-
---------9fb1268b60c6e7b6bed3bfc7086fdbb7bd6f037a373a69a6f3c72a240315c069
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
-
-wsGpBAEBCABdBYJpswRLCRDbbuBxk4Cg6TUUAAAAAAAcABBzYWx0QG5vdGF0
-aW9ucy5vcGVucGdwanMub3JnRxGS+mGwMsC1QeNSUaBx6xYhBBKM1nGLSON6
-q6UFAttu4HGTgKDpAADtPRAAjk4aRUCiuwMt4qiaiYESZDWNEMtxHgqvNT7f
-i7X0gbuurZE0nNZzhUJ/nt6EM4cUDFPdTVJbXo8inTCoq9BVmwE72YwNsVSy
-lTkTH/2z8GOt9d54Hc2X7kC7jiAs9lx5Np2JBzl5IFc3mpXi+oCI/o7Nfq90
-cNqGFrMJ78BmJ2w0WkZsu2MaHmwHd/7Ugp3fawCyTeeFZaARMNx7pkS1C6c5
-7AU22XSZTrvwAPC38Yd4H6b+8ptB/lK6GjH1zx14gkOWAxhPqk/Fpr6cR6Dz
-kQ5NhJ9uyiAfRZPfER5eCtS8c8zHnqUvsYQJJiVbZTDi8V9reTfANPZmY9Oz
-J7BLtfnk4M5CTa/lyUaY+z82nR4GYeHSGBnlO1S9YIB26wF0ZOL7JTI8ZVgZ
-XuF2AP1ODUU/Ne+ISL0AVAwM3p4U95yQSOy9jEs/w6Ar7gPX+aJJWB7FI4QS
-EA41MtOCZ9MBHSX9CVdCd8Co6H88M9o1mZRNlHiWldZJ44jxoZcjvvDnRRWu
-fxNDx5C4c1eM3MhjeX8VehZygtK1vkn2CrHbpkuCp5Al9/M7fQoqAzRhaHeO
-I8uokbfqgDfv/70koI6XukjUPfwm5ZfxFQyqRlLr2k/e/hwWu1clh2jEBuOA
-fwTU0jxiA2wXeWWBbdeE8EvIxsKFs465cdFlon1azznXMuk=
-=QxTC
------END PGP SIGNATURE-----
-
-
---------9fb1268b60c6e7b6bed3bfc7086fdbb7bd6f037a373a69a6f3c72a240315c069--
-
+Thanks,
+//richard
