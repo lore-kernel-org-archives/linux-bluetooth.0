@@ -1,69 +1,69 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4DA3E5585
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857DF3F7A92
 	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 17:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773335762; cv=none; b=fXIcGMADkSmvozugFIqnTXqdFA1rleCMiACSZpR5JXcQz/bBsrMk9FRMhfRyiIKBnOlnbYzDIZrSXzfbIgIZkp4lIkhn4FKkmlc+lCe6EuG5or/ot1FDvcb8Pmuq63KQkvRvYdlrkwMkoyt33xfwOvbixPgq3v5hOp3LK4XJzLc=
+	t=1773335763; cv=none; b=hsDQvS3kzwv3PF2J84GMYm8JGQYkyNcv9qvUnBWU7pKhiyIZqLyG7uiQEUa5dq/ATYc237c8hL42hb/C2nU+QB+4ffsbrIemouqcQWiA3tcjP6xRF8KBRe12v8atupxA+KTR0U8rcAxlf7TpBG60/MKaz5nd5IlNcEj6T9zaohc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773335762; c=relaxed/simple;
-	bh=T/qrEhB2B0tDJ510iQ1uKhS+ObjX/yA38UMbRV4scZg=;
+	s=arc-20240116; t=1773335763; c=relaxed/simple;
+	bh=TOZMAH5NUpUZXNkl5adpBu2Y41iyPSIJJlrLpQ8cLPk=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JKY0mm8AXM2/GDnS1k8m/47oXfKY/pUjZzoyyo06Y2xdnrw0vtCPkPnSPoiNpsurRBNs0RF3kTSdaxRXpjFXvpPBXcAmsO0ELGF2VOCu2858fnDCtdXOXbcxRS5HDd3AaYSubkH90A1sBPvE7nN/LoPWlHP2R4OxmS7/7W58lrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2scbtN3; arc=none smtp.client-ip=74.125.224.48
+	 MIME-Version:Content-Type; b=fbn/b11Xl1Z/gn4X4LesLauiSblsPH2CMbjyliRqiCtRvGK/rUuK182a8Gzs7nw7r6nmKr+vVo+GP2bRrKNKDdm6h0EqETBDcv6bHGM7VoTcTWYaNQmF64Lt4mykwVI1lT4rY0YLdUNYn8IS2MLyKxvv/QUv9i1Q1+2aEdnx0CM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H9l3U3If; arc=none smtp.client-ip=74.125.224.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2scbtN3"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-64c97997b0fso1071975d50.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9l3U3If"
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-64ad8435f46so1567278d50.1
         for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 10:15:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773335757; x=1773940557; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773335756; x=1773940556; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ds5IHmvBqk0CmCKgOPrUsJ7B0frrkdxPl4q8owCaeHc=;
-        b=U2scbtN3ARx9NDsIRxp3GqjPiUb30iW0kv89XhH8M5lwrzUHCNzI/K2EoTn150hbqx
-         e4lrRAwhCAnCgaWJUrWx3cF90zF2bxHCunNbbPQ5xEfV17KhtCmIaY344En773Uo60aM
-         Svb/vlpqwIXYI+qlfoxmhS+vaZvMERZOF/wdr1fwrXSGbh5NGrtf1ioG9Z2UU6HhsiFs
-         dcjG3OGaqW6iwfoRLVtSUg0ycahaFS7Baiuy4cgcfiT37j79YQooKdGj08by02O1T2lj
-         ILl7HQVs8KsvBfC2pVrnLiJezpENRvbOABCO51bXymn/JYQJx33/rEEPLhGvWty8FqGx
-         u1yw==
+        bh=Ae8AH8Wha3G6fNJCc3e0xQZpwtjzem/TRumZA3Morvg=;
+        b=H9l3U3IfGGkpVVe3dzfRVTx2wvoDXEIjLEmnsVsQogSgsk8H8MOSOUWnVxQe002wh+
+         DbaOJp3eIZQ9WMoEsWgIFPw73+KYEOQu7yYUCFnqmVg56M3xnZKXhoJ1shoIPhZPRzXp
+         YZcHa9TkpBqKVwTVrEEfyIxiVuE22/YY4YZy5yDiJ8DDe7oZlocXSsPSAyaZoNieHA9f
+         +G4yw3ImZV3y2Zawq0fqWYvepcTo3aXtIMqcpceegUeJSfuc7I4dRW10PyATK+u2mgVq
+         98nifTfmJxA20CqCstPprIAgMqIed7nlv+zsyLPx3O9jzigflJEYqGCuU/FXYteIwrpp
+         P3lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773335757; x=1773940557;
+        d=1e100.net; s=20230601; t=1773335756; x=1773940556;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Ds5IHmvBqk0CmCKgOPrUsJ7B0frrkdxPl4q8owCaeHc=;
-        b=HG/5h8YgwAbwHicNkGmnZMj0zEv2N0p5EYD3BYAt9JiqIublDnH2IEFMaEsT/To2kN
-         k0df91f2cmGMaseli+1v14cFyAxF/AlCXQBFQKymUzmH5Bv7CPqKbgRloA2yl29b6vQ4
-         eozhs0m8+D9TEstomuvK8XP/4uyw6S6kxkTDSvpPUtQIn24ZoKzE8twqIWWh8MjCKq1R
-         k6Q/UOkiewqsAmApstfiPjEjmcbPqtI7nl11xnbz4bCM6RuWOhchEdXNQWwW1AIdiVbd
-         iIhgh24wW7r16Z1T/RrS/lZyYD/t+5zEu5vJYNr19A7DwO25Jd9FeWVNa9Cgc+Gqb+Fc
-         59Ew==
-X-Gm-Message-State: AOJu0YwtEu/s6lYGt5y5Tgl7aTcWuA0dWT5g9k6Razgdelzx+fYz61vT
-	Zm4OYEE79v0P4JZn48EIAt6PhC/rZxyG8a2dgNx0kuVscotf5DaUzb9DksJEOw==
-X-Gm-Gg: ATEYQzyXKMizIYv9YHhbD56zqstzAdQ7mloSf6r0PDuYrzAoVsfrr9AlGI1E4Rom2Fp
-	3YYJw2uDTzDghiuJVRxaaHB0j6EahUT01rkXf9ORjeP/a4WlH9ePfAdVbBKju0DcdPb9Zxrpsk+
-	AfrWSgH/KnCsqntZQMtwV+iQQKLnE/XOciGibP6uidgbNIbRgFtLe9INMol+fXIwjW7ESpmz/t7
-	Qit+8XS2Ze+q+Ly93C9qqWuDVIuoAWzCG9hsTLj6cZhz1Iy5LdMMtxEgmJuTy/JBP/35usnnV0p
-	kyW+NVFh1cxpl3DfJaRzByz1+evu/c2eueZ31V9KJlPmV5xTM9lXCDZEpAZppe2MRpT/vMKC45E
-	jPcC5p0jEzSpNgCegBZ4D6dbMbQUm93CKjYyIVIzLsXpX+V/RgME1kOysADTTPveUxn0/bXum9C
-	bKQQHC5ueeXcR10n+2FNOiOb10OxMlmFKD9MPDqhvrN1xYyUw2ohBqAjlAXpuIFBotq6L9QY+tG
-	yF4IK4nUDjx4FSaog==
-X-Received: by 2002:a05:690e:4cc:b0:64c:ef6e:ef7f with SMTP id 956f58d0204a3-64e62f797bbmr252126d50.28.1773335756572;
-        Thu, 12 Mar 2026 10:15:56 -0700 (PDT)
+        bh=Ae8AH8Wha3G6fNJCc3e0xQZpwtjzem/TRumZA3Morvg=;
+        b=aDHe9hsuNXf60bWz7orPWVdEoqfFuCnRDcfkmSE8QKH8eSotVH9ce0MFcb5QNpYybi
+         q0GsEmVPvL51sJW0Y8gT7HFFExcifv6k8Pfx8XsGh5gKCYPJmxgjovkg4X2pu2yYpn9/
+         dqj3XnuqV5/K//ZiEE6WNBsZCATVh6aWXkd87ARJMQd471ciC7BE/rSymGz/x2RfJhOQ
+         fqkTdUh/L2Q7PvV8IF7bTCGAxliiNrDww1JBlV7vVy6TGl16T/BwQ2SgZkr055oTq9LD
+         P32l/VMmseLBjLc+rSmNLzy5jR25xg1t2JSG15SpKGQ6l/5bf/r7malJqO+/j8ZmPpc8
+         yipQ==
+X-Gm-Message-State: AOJu0YxcLc9d/ZNkCsG/C6K811dQ0AMcKuxWE6FQn2K9Bu9Kkoo0uuXV
+	/EjPMkj+6GyG7ulSdE7nklp8Z8lwWx8vxb3DIjp3yq8Dm4jb1Y910qF68n8cmw==
+X-Gm-Gg: ATEYQzyKAivEd6TkgbbH4qEA4qXpLLjYcl+EXqQspNX0dGjEVLbZd+j0NUEbbpG6842
+	tOXd9v5QyuQNSHYuIC6CWRU2G+T9rMnGgZVVvBwELfZsWm/9+vVk293la9L16ejE75Ul4rZr4YD
+	a5lQgGbd9qCFmDAf2rx5toSYOVrmIR6VdjcCRxpT40fD1uK56fA4CG/zJkDgop/ANZ8n9Mpfa08
+	+TJuijUNAJ5sBf9F1EVgTUR6SG6tEl3x3aHzEGxh3h4iH1v9pay2u+6hq6v/8EE1BC4o7BTmLwe
+	iZIlyidwp/jNJ/fMtPdWy5cXuoq1TukwyQWPEBXxscOUXG8iDE1/hE5461jtOG1P9jyK/gyS7dl
+	vrTOCVZJnIussywJ90l3nWJO/Eiv7FPLjGFoPMGlrxZojA40Dhh6NZ8y7LqkhII4bdT6QHBp8lf
+	p0zR/VREDF4wCxFmNZJXIZ6lY3lVWg9tsbfZ5RFzaU8+OxjRsvrASH2R4sKggAAAPjbGvaq/Iqy
+	xs6rQ2rvfAqxdwIww==
+X-Received: by 2002:a05:690e:18a:b0:64e:5f44:243c with SMTP id 956f58d0204a3-64e62fa895amr247265d50.34.1773335755536;
+        Thu, 12 Mar 2026 10:15:55 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64d65117a82sm3442572d50.15.2026.03.12.10.15.55
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64d65117a82sm3442572d50.15.2026.03.12.10.15.54
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 10:15:55 -0700 (PDT)
+        Thu, 12 Mar 2026 10:15:54 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 6/6] doc/btmon: Split Connection Tracking into btmon-connections.rst
-Date: Thu, 12 Mar 2026 13:15:39 -0400
-Message-ID: <20260312171540.1065212-6-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 5/6] doc/btmon: Split GATT Database Reconstruction into btmon-gatt.rst
+Date: Thu, 12 Mar 2026 13:15:38 -0400
+Message-ID: <20260312171540.1065212-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260312171540.1065212-1-luiz.dentz@gmail.com>
 References: <20260312171540.1065212-1-luiz.dentz@gmail.com>
@@ -73,323 +73,876 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Move the CONNECTION TRACKING and HCI ERROR AND DISCONNECT REASON CODES
-sections into a standalone file and replace them with an RST include
-directive.
+Move the RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES section
+into a standalone file and replace it with an RST include directive.
 ---
- doc/btmon-connections.rst | 146 ++++++++++++++++++++++++++++++++++++++
- doc/btmon.rst             | 141 +-----------------------------------
- 2 files changed, 147 insertions(+), 140 deletions(-)
- create mode 100644 doc/btmon-connections.rst
+ doc/btmon-gatt.rst | 423 +++++++++++++++++++++++++++++++++++++++++++++
+ doc/btmon.rst      | 417 +-------------------------------------------
+ 2 files changed, 424 insertions(+), 416 deletions(-)
+ create mode 100644 doc/btmon-gatt.rst
 
-diff --git a/doc/btmon-connections.rst b/doc/btmon-connections.rst
+diff --git a/doc/btmon-gatt.rst b/doc/btmon-gatt.rst
 new file mode 100644
-index 000000000000..eb6a88ceadbd
+index 000000000000..cbd6b7acf543
 --- /dev/null
-+++ b/doc/btmon-connections.rst
-@@ -0,0 +1,146 @@
-+==============================
-+btmon: Connection Tracking
-+==============================
++++ b/doc/btmon-gatt.rst
+@@ -0,0 +1,423 @@
++=======================================
++btmon: GATT Database Reconstruction
++=======================================
 +
 +.. This file is included by btmon.rst.
 +
-+CONNECTION TRACKING
-+===================
++RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES
++=================================================
 +
-+HCI uses **connection handles** (16-bit integers) to identify individual
-+connections. Understanding how handles map to devices is essential for
-+reading traces.
++A btsnoop trace contains the complete ATT protocol exchange used by
++GATT clients and servers to discover each other's services. By reading
++the discovery requests and responses, it is possible to reconstruct the
++full GATT database of a remote device -- even without access to the
++device itself.
 +
-+Handle Types
-+------------
++This section explains the GATT discovery procedure and how each ATT
++operation appears in ``btmon`` output.
 +
-+Different connection types use different handle ranges, but these ranges
-+are controller-specific and not standardized. The connection type can be
-+determined by looking at the event that created the handle:
++Overview of GATT Discovery
++---------------------------
++
++GATT discovery is a multi-phase process where a client queries the
++server's attribute database using ATT protocol operations. The phases
++are:
++
++1. **Primary Service Discovery** -- Find all primary services and their
++   handle ranges.
++2. **Secondary Service Discovery** -- Find any secondary (included-only)
++   services.
++3. **Included Service Discovery** -- Find which services include other
++   services.
++4. **Characteristic Discovery** -- Find all characteristics within each
++   service.
++5. **Descriptor Discovery** -- Find all descriptors for each
++   characteristic.
++6. **Characteristic Value Reading** -- Read the values of readable
++   characteristics.
++
++Each phase uses a specific ATT operation and produces a
++request/response pattern in the trace. The client repeats each request
++with advancing handle ranges until the server responds with
++``Attribute Not Found``, indicating the end of that phase.
++
++Phase 1: Primary Service Discovery (Read By Group Type)
++--------------------------------------------------------
++
++The client discovers primary services using ``Read By Group Type
++Request`` with the ``Primary Service`` UUID (0x2800) as the group type.
++
++**Request**::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #516 [hci0] 0.124726
++          ATT: Read By Group Type Request (0x10) len 6
++            Handle range: 0x0001-0xffff
++            Attribute group type: Primary Service (0x2800)
++
++The first request always starts at handle 0x0001 and searches through
++0xffff (the entire handle space).
++
++**Response**::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 42       #523 [hci0] 0.240151
++          ATT: Read By Group Type Response (0x11) len 37
++            Attribute data length: 6
++            Attribute group list: 6 entries
++            Handle range: 0x0001-0x0009
++            UUID: Generic Access Profile (0x1800)
++            Handle range: 0x000a-0x0011
++            UUID: Generic Attribute Profile (0x1801)
++            Handle range: 0x0012-0x0014
++            UUID: Device Information (0x180a)
++            Handle range: 0x0015-0x0039
++            UUID: Generic Telephony Bearer (0x184c)
++            Handle range: 0x003a-0x0059
++            UUID: Generic Media Control (0x1849)
++            Handle range: 0x005a-0x005c
++            UUID: Telephony and Media Audio (0x1855)
++
++Each entry provides:
++
++- **Handle range** -- The start and end handle of the service. All
++  attributes belonging to this service (characteristics, descriptors)
++  have handles within this range.
++- **UUID** -- The service UUID. Standard 16-bit UUIDs are shown with
++  their name (e.g., ``Generic Access Profile``). 128-bit vendor-specific
++  UUIDs appear as full UUID strings.
++
++The client continues by sending another request starting after the last
++handle in the response::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #525 [hci0] 0.240641
++          ATT: Read By Group Type Request (0x10) len 6
++            Handle range: 0x005d-0xffff
++            Attribute group type: Primary Service (0x2800)
++
++This continues until the server responds with ``Attribute Not Found``::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #532 [hci0] 0.360069
++          ATT: Error Response (0x01) len 4
++            Read By Group Type Request (0x10)
++            Handle: 0x005d
++            Error: Attribute Not Found (0x0a)
++
++This error indicates that no more primary services exist beyond handle
++0x005d. The client now has the complete list of primary services.
++
++.. note::
++
++   The ``Attribute data length`` field indicates the size of each entry
++   in the response. A value of 6 means 16-bit UUIDs (2 bytes start
++   handle + 2 bytes end handle + 2 bytes UUID). A value of 20 means
++   128-bit UUIDs (2 + 2 + 16). If the server has both 16-bit and
++   128-bit service UUIDs, they are returned in separate responses
++   because all entries in a single response must have the same length.
++
++Phase 2: Secondary Service Discovery
++--------------------------------------
++
++After primary services, the client may discover secondary services
++using the same ``Read By Group Type Request`` but with the ``Secondary
++Service`` UUID (0x2801)::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #534 [hci0] 0.360752
++          ATT: Read By Group Type Request (0x10) len 6
++            Handle range: 0x0001-0xffff
++            Attribute group type: Secondary Service (0x2801)
++
++If no secondary services exist, the server responds with
++``Attribute Not Found``. Secondary services are not directly accessible
++to clients -- they are only reachable via include references from
++primary services.
++
++Phase 3: Included Service Discovery (Read By Type)
++----------------------------------------------------
++
++To discover which services include other services, the client uses
++``Read By Type Request`` with the ``Include`` UUID (0x2802)::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #540 [hci0] 0.480731
++          ATT: Read By Type Request (0x08) len 6
++            Handle range: 0x0001-0x005c
++            Attribute type: Include (0x2802)
++
++The handle range typically spans the entire discovered database. Each
++include declaration in the response identifies a service that is
++included by the service containing that handle.
++
++Phase 4: Characteristic Discovery (Read By Type)
++--------------------------------------------------
++
++For each service, the client discovers its characteristics using
++``Read By Type Request`` with the ``Characteristic`` UUID (0x2803).
++The handle range is limited to the service's handle range.
++
++**Request**::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #531 [hci0] 0.360063
++          ATT: Read By Type Request (0x08) len 6
++            Handle range: 0x0008-0x0011
++            Attribute type: Characteristic (0x2803)
++
++**Response**::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 27       #533 [hci0] 0.360714
++          ATT: Read By Type Response (0x09) len 22
++            Attribute data length: 7
++            Attribute data list: 3 entries
++            Handle: 0x0009
++            Value[5]: 200a00052a
++                Properties: 0x20
++                  Indicate (0x20)
++                Value Handle: 0x000a
++                Value UUID: Service Changed (0x2a05)
++            Handle: 0x000c
++            Value[5]: 0a0d00292b
++                Properties: 0x0a
++                  Read (0x02)
++                  Write (0x08)
++                Value Handle: 0x000d
++                Value UUID: Client Supported Features (0x2b29)
++            Handle: 0x000e
++            Value[5]: 020f002a2b
++                Properties: 0x02
++                  Read (0x02)
++                Value Handle: 0x000f
++                Value UUID: Database Hash (0x2b2a)
++
++Each characteristic entry provides:
++
++- **Handle** -- The handle of the characteristic declaration attribute.
++- **Properties** -- A bitmask indicating supported operations:
++
++  .. list-table::
++     :header-rows: 1
++     :widths: 10 30 60
++
++     * - Bit
++       - Property
++       - Description
++     * - 0x01
++       - Broadcast
++       - Can be broadcast in advertising data
++     * - 0x02
++       - Read
++       - Can be read
++     * - 0x04
++       - Write Without Response
++       - Can be written without acknowledgment
++     * - 0x08
++       - Write
++       - Can be written with acknowledgment
++     * - 0x10
++       - Notify
++       - Server can send notifications
++     * - 0x20
++       - Indicate
++       - Server can send indications
++     * - 0x40
++       - Authenticated Signed Writes
++       - Supports signed write commands
++     * - 0x80
++       - Extended Properties
++       - Has extended properties descriptor
++
++- **Value Handle** -- The handle where the characteristic's value is
++  stored (always declaration handle + 1).
++- **Value UUID** -- The UUID identifying the characteristic type.
++
++The client continues with advancing handle ranges until it receives
++``Attribute Not Found``::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #572 [hci0] 1.200228
++          ATT: Error Response (0x01) len 4
++            Read By Type Request (0x08)
++            Handle: 0x005c
++            Error: Attribute Not Found (0x0a)
++
++Phase 5: Descriptor Discovery (Find Information)
++--------------------------------------------------
++
++Descriptors occupy the handles between a characteristic's value handle
++and the next characteristic declaration (or end of service). The client
++discovers them using ``Find Information Request``.
++
++**Request**::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #556 [hci0] 0.959965
++          ATT: Find Information Request (0x04) len 4
++            Handle range: 0x000b-0x000b
++
++The handle range covers the gap between the characteristic value handle
++and the next characteristic declaration handle.
++
++**Response**::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 10       #561 [hci0] 0.961049
++          ATT: Find Information Response (0x05) len 5
++            Format: UUID-16 (0x01)
++            Handle: 0x000b
++            UUID: Client Characteristic Configuration (0x2902)
++
++Common descriptor UUIDs:
 +
 +.. list-table::
 +   :header-rows: 1
-+   :widths: 15 25 60
++   :widths: 15 40 45
 +
-+   * - Type
-+     - Creation Event
-+     - Description
-+   * - BR/EDR ACL
-+     - Connection Complete
-+     - Classic Bluetooth data connection
-+   * - LE ACL
-+     - LE (Enhanced) Connection Complete
-+     - Low Energy data connection
-+   * - CIS
-+     - LE CIS Established
-+     - Connected Isochronous Stream (LE Audio)
-+   * - BIS
-+     - LE BIG Complete
-+     - Broadcast Isochronous Stream (LE Audio)
-+   * - SCO/eSCO
-+     - Synchronous Connection Complete
-+     - Voice/audio synchronous connection (classic)
-+
-+A single device may have multiple handles simultaneously. For example,
-+an LE Audio device will have an LE ACL handle for control traffic and
-+one or more CIS handles for audio streams. The ``LE CIS Established``
-+event includes the ACL connection handle that the CIS is associated
-+with.
-+
-+Controller Buffer Tracking
-+--------------------------
-+
-+Buffer tracking may show a indicator in square brackets::
-+
-+    < ACL: Handle 2048 [1/6] flags 0x00 dlen 16
-+
-+The ``[1/6]`` means this is buffer slot 1 of 6 available controller
-+ACL buffers. This reflects the host-side HCI flow control: the host
-+tracks how many buffers the controller has available and shows the
-+current usage. When the controller sends ``Number of Completed Packets``
-+events, buffers are freed and the count decreases.
-+
-+HCI ERROR AND DISCONNECT REASON CODES
-+======================================
-+
-+HCI status and disconnect reason codes use the same code space. These
-+appear in ``Status:`` and ``Reason:`` fields throughout the trace.
-+btmon decodes them automatically, but the hex values are useful for
-+searching and filtering.
-+
-+Common Disconnect Reasons
-+-------------------------
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 8 40 52
-+
-+   * - Code
++   * - UUID
 +     - Name
-+     - Diagnostic Meaning
-+   * - 0x05
-+     - Authentication Failure
-+     - Pairing or encryption setup failed. Key may be
-+       stale or devices have mismatched security databases.
-+   * - 0x08
-+     - Connection Timeout
-+     - The supervision timer expired. The remote device
-+       moved out of range or stopped responding. This is
-+       an RF link loss.
-+   * - 0x13
-+     - Remote User Terminated Connection
-+     - The remote device intentionally disconnected.
-+       This is the normal graceful disconnect.
-+   * - 0x14
-+     - Remote Device Terminated due to Low Resources
-+     - The remote device ran out of resources (memory,
-+       connection slots).
-+   * - 0x15
-+     - Remote Device Terminated due to Power Off
-+     - The remote device is powering down.
-+   * - 0x16
-+     - Connection Terminated By Local Host
-+     - The local BlueZ stack intentionally disconnected.
-+       Normal when bluetoothd initiates disconnect.
-+   * - 0x1f
-+     - Unspecified Error
-+     - Generic error. Often indicates a firmware issue.
-+   * - 0x22
-+     - LMP/LL Response Timeout
-+     - Link layer procedure timed out. The remote device
-+       stopped responding to LL control PDUs.
-+   * - 0x28
-+     - Instant Passed
-+     - A timing-critical operation missed its deadline.
-+       Often seen with connection parameter updates.
-+   * - 0x2f
-+     - Insufficient Security
-+     - The required security level (encryption, MITM
-+       protection) was not met.
-+   * - 0x3b
-+     - Unacceptable Connection Parameters
-+     - The remote rejected a connection parameter update.
-+   * - 0x3d
-+     - Connection Terminated due to MIC Failure
-+     - Encryption integrity check failed. Possible key
-+       mismatch or corruption.
-+   * - 0x3e
-+     - Connection Failed to be Established
-+     - Connection attempt failed entirely (e.g., the
-+       remote device did not respond to connection
-+       requests).
-+   * - 0x3f
-+     - MAC Connection Failed
-+     - MAC-level connection failure.
-+   * - 0x44
-+     - Operation Cancelled by Host
-+     - The host cancelled the operation before it
-+       completed.
++     - Purpose
++   * - 0x2900
++     - Characteristic Extended Properties
++     - Additional property bits
++   * - 0x2901
++     - Characteristic User Description
++     - Human-readable description string
++   * - 0x2902
++     - Client Characteristic Configuration (CCC)
++     - Enable/disable notifications or indications
++   * - 0x2903
++     - Server Characteristic Configuration
++     - Server-side broadcast configuration
++   * - 0x2904
++     - Characteristic Presentation Format
++     - Data format, exponent, unit
 +
-+Full Error Code Table
-+---------------------
++Phase 6: Reading Characteristic Values
++----------------------------------------
 +
-+The complete set of HCI error codes (0x00-0x45) is defined in the
-+Bluetooth Core Specification, Volume 1, Part F. btmon decodes all
-+of them automatically in ``Status:`` and ``Reason:`` fields. The
-+source mapping is in ``monitor/packet.c`` (``error2str_table``).
++After discovery, the client may read characteristic values using
++``Read Request``::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 7        #577 [hci0] 1.380203
++          ATT: Read Request (0x0a) len 2
++            Handle: 0x000f
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #579 [hci0] 1.380774
++          ATT: Read Response (0x0b) len 16
++            Value[16]: a470d508da8751a2a50b79da0250bfda
++
++The ``Handle`` in the request corresponds to a characteristic value
++handle from the discovery phase. btmon shows the raw value bytes; the
++interpretation depends on the characteristic UUID.
++
++Find By Type Value (Targeted Service Search)
++----------------------------------------------
++
++In addition to discovering all services, a client can search for a
++specific service UUID using ``Find By Type Value Request``::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 13       #513 [hci0] 0.124195
++          ATT: Find By Type Value Request (0x06) len 8
++            Handle range: 0x0001-0xffff
++            Attribute type: Primary Service (0x2800)
++              UUID: Generic Attribute Profile (0x1801)
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #515 [hci0] 0.124684
++          ATT: Find By Type Value Response (0x07) len 4
++            Handle range: 0x0008-0x0011
++
++This returns only the handle range for the matching service, without
++iterating through all services. If the service is not found::
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #524 [hci0] 0.240607
++          ATT: Error Response (0x01) len 4
++            Find By Type Value Request (0x06)
++            Handle: 0x0012
++            Error: Attribute Not Found (0x0a)
++
++Bidirectional Discovery
++------------------------
++
++Both devices in a connection can act as GATT client and server
++simultaneously. In a btsnoop trace, you may see interleaved discovery
++in both directions:
++
++- **TX (``<``) requests + RX (``>``) responses** -- The local device
++  (whose trace this is) is acting as a GATT client, discovering the
++  remote device's services.
++- **RX (``>``) requests + TX (``<``) responses** -- The remote device
++  is acting as a GATT client, discovering the local device's services.
++
++For example, the local server responding to the remote's discovery::
++
++    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #584 [hci0] 1.512006
++          ATT: Read By Group Type Request (0x10) len 6
++            Handle range: 0x0001-0xffff
++            Attribute group type: Primary Service (0x2800)
++
++    < ACL Data TX: Handle 2048 flags 0x00 dlen 66       #586 [hci0] 1.518778
++          ATT: Read By Group Type Response (0x11) len 61
++            Attribute data length: 6
++            Attribute group list: 10 entries
++            Handle range: 0x0001-0x0007
++            UUID: Generic Access Profile (0x1800)
++            Handle range: 0x0008-0x0011
++            UUID: Generic Attribute Profile (0x1801)
++            Handle range: 0x0012-0x0014
++            UUID: Device Information (0x180a)
++            Handle range: 0x0015-0x001e
++            UUID: Coordinated Set Identification (0x1846)
++            Handle range: 0x001f-0x0020
++            UUID: Common Audio (0x1853)
++            Handle range: 0x0021-0x0024
++            UUID: Microphone Control (0x184d)
++            Handle range: 0x0041-0x004b
++            UUID: Volume Control (0x1844)
++            Handle range: 0x006b-0x0073
++            UUID: Broadcast Audio Scan (0x184f)
++            Handle range: 0x0074-0x0086
++            UUID: Published Audio Capabilities (0x1850)
++            Handle range: 0x0087-0x0096
++            UUID: Audio Stream Control (0x184e)
++
++This shows the local device's own GATT database as seen by the remote.
++To reconstruct the remote device's database, focus on the TX requests
++and RX responses (the local device acting as client).
++
++Building the Attribute Table
++-----------------------------
++
++To reconstruct the GATT database, extract the discovery responses and
++organize them into a table. Using the trace above as an example, the
++remote device at address 00:11:22:33:44:55 has:
++
++**Services** (from Read By Group Type Response)::
++
++    Handle Range    UUID                            Service Name
++    ──────────────  ──────────────────────────────  ────────────────────────────
++    0x0001-0x0009   0x1800                          Generic Access Profile
++    0x000a-0x0011   0x1801                          Generic Attribute Profile
++    0x0012-0x0014   0x180a                          Device Information
++    0x0015-0x0039   0x184c                          Generic Telephony Bearer
++    0x003a-0x0059   0x1849                          Generic Media Control
++    0x005a-0x005c   0x1855                          Telephony and Media Audio
++
++**Characteristics** (from Read By Type Response, within GAP 0x0001-0x0009)::
++
++    Handle  Value Handle  Properties  UUID    Name
++    ──────  ────────────  ──────────  ──────  ────────────────────────────────
++    0x0002  0x0003        Read        0x2a00  Device Name
++    0x0004  0x0005        Read        0x2a01  Appearance
++    0x0006  0x0007        Read        0x2a04  Peripheral Preferred Conn Params
++    0x0008  0x0009        Read        0x2aa6  Central Address Resolution
++
++**Characteristics** (within GATT 0x000a-0x0011)::
++
++    Handle  Value Handle  Properties       UUID    Name
++    ──────  ────────────  ───────────────  ──────  ────────────────────────────
++    0x000b  0x000c        Indicate         0x2a05  Service Changed
++    0x000e  0x000f        Read, Write      0x2b29  Client Supported Features
++    0x0010  0x0011        Read             0x2b2a  Database Hash
++
++**Descriptors** (from Find Information Response)::
++
++    Handle  UUID    Name
++    ──────  ──────  ────────────────────────────────────
++    0x000d  0x2902  Client Characteristic Configuration
++
++The CCC descriptor at handle 0x000d belongs to the Service Changed
++characteristic (0x000c), because it falls between that value handle
++and the next characteristic declaration at 0x000e.
++
 diff --git a/doc/btmon.rst b/doc/btmon.rst
-index c9e13c839026..7668bcc5a9c4 100644
+index 799066e83e74..c9e13c839026 100644
 --- a/doc/btmon.rst
 +++ b/doc/btmon.rst
-@@ -534,146 +534,7 @@ The kernel forwarded this as a MGMT Device Connected event. bluetoothd
- logged its ``connected_callback()``. Then data exchange began -- an L2CAP
- parameter update and ATT MTU negotiation over the new ACL connection.
+@@ -712,422 +712,7 @@ Analyze mode reports, for each controller found in the trace:
+ - **Latency plots**: If ``gnuplot`` is installed, ASCII-art latency
+   distribution plots are rendered in the terminal.
  
--CONNECTION TRACKING
--===================
+-RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES
+-=================================================
 -
--HCI uses **connection handles** (16-bit integers) to identify individual
--connections. Understanding how handles map to devices is essential for
--reading traces.
+-A btsnoop trace contains the complete ATT protocol exchange used by
+-GATT clients and servers to discover each other's services. By reading
+-the discovery requests and responses, it is possible to reconstruct the
+-full GATT database of a remote device -- even without access to the
+-device itself.
 -
--Handle Types
--------------
+-This section explains the GATT discovery procedure and how each ATT
+-operation appears in ``btmon`` output.
 -
--Different connection types use different handle ranges, but these ranges
--are controller-specific and not standardized. The connection type can be
--determined by looking at the event that created the handle:
+-Overview of GATT Discovery
+----------------------------
+-
+-GATT discovery is a multi-phase process where a client queries the
+-server's attribute database using ATT protocol operations. The phases
+-are:
+-
+-1. **Primary Service Discovery** -- Find all primary services and their
+-   handle ranges.
+-2. **Secondary Service Discovery** -- Find any secondary (included-only)
+-   services.
+-3. **Included Service Discovery** -- Find which services include other
+-   services.
+-4. **Characteristic Discovery** -- Find all characteristics within each
+-   service.
+-5. **Descriptor Discovery** -- Find all descriptors for each
+-   characteristic.
+-6. **Characteristic Value Reading** -- Read the values of readable
+-   characteristics.
+-
+-Each phase uses a specific ATT operation and produces a
+-request/response pattern in the trace. The client repeats each request
+-with advancing handle ranges until the server responds with
+-``Attribute Not Found``, indicating the end of that phase.
+-
+-Phase 1: Primary Service Discovery (Read By Group Type)
+---------------------------------------------------------
+-
+-The client discovers primary services using ``Read By Group Type
+-Request`` with the ``Primary Service`` UUID (0x2800) as the group type.
+-
+-**Request**::
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #516 [hci0] 0.124726
+-          ATT: Read By Group Type Request (0x10) len 6
+-            Handle range: 0x0001-0xffff
+-            Attribute group type: Primary Service (0x2800)
+-
+-The first request always starts at handle 0x0001 and searches through
+-0xffff (the entire handle space).
+-
+-**Response**::
+-
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 42       #523 [hci0] 0.240151
+-          ATT: Read By Group Type Response (0x11) len 37
+-            Attribute data length: 6
+-            Attribute group list: 6 entries
+-            Handle range: 0x0001-0x0009
+-            UUID: Generic Access Profile (0x1800)
+-            Handle range: 0x000a-0x0011
+-            UUID: Generic Attribute Profile (0x1801)
+-            Handle range: 0x0012-0x0014
+-            UUID: Device Information (0x180a)
+-            Handle range: 0x0015-0x0039
+-            UUID: Generic Telephony Bearer (0x184c)
+-            Handle range: 0x003a-0x0059
+-            UUID: Generic Media Control (0x1849)
+-            Handle range: 0x005a-0x005c
+-            UUID: Telephony and Media Audio (0x1855)
+-
+-Each entry provides:
+-
+-- **Handle range** -- The start and end handle of the service. All
+-  attributes belonging to this service (characteristics, descriptors)
+-  have handles within this range.
+-- **UUID** -- The service UUID. Standard 16-bit UUIDs are shown with
+-  their name (e.g., ``Generic Access Profile``). 128-bit vendor-specific
+-  UUIDs appear as full UUID strings.
+-
+-The client continues by sending another request starting after the last
+-handle in the response::
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #525 [hci0] 0.240641
+-          ATT: Read By Group Type Request (0x10) len 6
+-            Handle range: 0x005d-0xffff
+-            Attribute group type: Primary Service (0x2800)
+-
+-This continues until the server responds with ``Attribute Not Found``::
+-
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #532 [hci0] 0.360069
+-          ATT: Error Response (0x01) len 4
+-            Read By Group Type Request (0x10)
+-            Handle: 0x005d
+-            Error: Attribute Not Found (0x0a)
+-
+-This error indicates that no more primary services exist beyond handle
+-0x005d. The client now has the complete list of primary services.
+-
+-.. note::
+-
+-   The ``Attribute data length`` field indicates the size of each entry
+-   in the response. A value of 6 means 16-bit UUIDs (2 bytes start
+-   handle + 2 bytes end handle + 2 bytes UUID). A value of 20 means
+-   128-bit UUIDs (2 + 2 + 16). If the server has both 16-bit and
+-   128-bit service UUIDs, they are returned in separate responses
+-   because all entries in a single response must have the same length.
+-
+-Phase 2: Secondary Service Discovery
+---------------------------------------
+-
+-After primary services, the client may discover secondary services
+-using the same ``Read By Group Type Request`` but with the ``Secondary
+-Service`` UUID (0x2801)::
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #534 [hci0] 0.360752
+-          ATT: Read By Group Type Request (0x10) len 6
+-            Handle range: 0x0001-0xffff
+-            Attribute group type: Secondary Service (0x2801)
+-
+-If no secondary services exist, the server responds with
+-``Attribute Not Found``. Secondary services are not directly accessible
+-to clients -- they are only reachable via include references from
+-primary services.
+-
+-Phase 3: Included Service Discovery (Read By Type)
+-----------------------------------------------------
+-
+-To discover which services include other services, the client uses
+-``Read By Type Request`` with the ``Include`` UUID (0x2802)::
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #540 [hci0] 0.480731
+-          ATT: Read By Type Request (0x08) len 6
+-            Handle range: 0x0001-0x005c
+-            Attribute type: Include (0x2802)
+-
+-The handle range typically spans the entire discovered database. Each
+-include declaration in the response identifies a service that is
+-included by the service containing that handle.
+-
+-Phase 4: Characteristic Discovery (Read By Type)
+---------------------------------------------------
+-
+-For each service, the client discovers its characteristics using
+-``Read By Type Request`` with the ``Characteristic`` UUID (0x2803).
+-The handle range is limited to the service's handle range.
+-
+-**Request**::
+-
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #531 [hci0] 0.360063
+-          ATT: Read By Type Request (0x08) len 6
+-            Handle range: 0x0008-0x0011
+-            Attribute type: Characteristic (0x2803)
+-
+-**Response**::
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 27       #533 [hci0] 0.360714
+-          ATT: Read By Type Response (0x09) len 22
+-            Attribute data length: 7
+-            Attribute data list: 3 entries
+-            Handle: 0x0009
+-            Value[5]: 200a00052a
+-                Properties: 0x20
+-                  Indicate (0x20)
+-                Value Handle: 0x000a
+-                Value UUID: Service Changed (0x2a05)
+-            Handle: 0x000c
+-            Value[5]: 0a0d00292b
+-                Properties: 0x0a
+-                  Read (0x02)
+-                  Write (0x08)
+-                Value Handle: 0x000d
+-                Value UUID: Client Supported Features (0x2b29)
+-            Handle: 0x000e
+-            Value[5]: 020f002a2b
+-                Properties: 0x02
+-                  Read (0x02)
+-                Value Handle: 0x000f
+-                Value UUID: Database Hash (0x2b2a)
+-
+-Each characteristic entry provides:
+-
+-- **Handle** -- The handle of the characteristic declaration attribute.
+-- **Properties** -- A bitmask indicating supported operations:
+-
+-  .. list-table::
+-     :header-rows: 1
+-     :widths: 10 30 60
+-
+-     * - Bit
+-       - Property
+-       - Description
+-     * - 0x01
+-       - Broadcast
+-       - Can be broadcast in advertising data
+-     * - 0x02
+-       - Read
+-       - Can be read
+-     * - 0x04
+-       - Write Without Response
+-       - Can be written without acknowledgment
+-     * - 0x08
+-       - Write
+-       - Can be written with acknowledgment
+-     * - 0x10
+-       - Notify
+-       - Server can send notifications
+-     * - 0x20
+-       - Indicate
+-       - Server can send indications
+-     * - 0x40
+-       - Authenticated Signed Writes
+-       - Supports signed write commands
+-     * - 0x80
+-       - Extended Properties
+-       - Has extended properties descriptor
+-
+-- **Value Handle** -- The handle where the characteristic's value is
+-  stored (always declaration handle + 1).
+-- **Value UUID** -- The UUID identifying the characteristic type.
+-
+-The client continues with advancing handle ranges until it receives
+-``Attribute Not Found``::
+-
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #572 [hci0] 1.200228
+-          ATT: Error Response (0x01) len 4
+-            Read By Type Request (0x08)
+-            Handle: 0x005c
+-            Error: Attribute Not Found (0x0a)
+-
+-Phase 5: Descriptor Discovery (Find Information)
+---------------------------------------------------
+-
+-Descriptors occupy the handles between a characteristic's value handle
+-and the next characteristic declaration (or end of service). The client
+-discovers them using ``Find Information Request``.
+-
+-**Request**::
+-
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #556 [hci0] 0.959965
+-          ATT: Find Information Request (0x04) len 4
+-            Handle range: 0x000b-0x000b
+-
+-The handle range covers the gap between the characteristic value handle
+-and the next characteristic declaration handle.
+-
+-**Response**::
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 10       #561 [hci0] 0.961049
+-          ATT: Find Information Response (0x05) len 5
+-            Format: UUID-16 (0x01)
+-            Handle: 0x000b
+-            UUID: Client Characteristic Configuration (0x2902)
+-
+-Common descriptor UUIDs:
 -
 -.. list-table::
 -   :header-rows: 1
--   :widths: 15 25 60
+-   :widths: 15 40 45
 -
--   * - Type
--     - Creation Event
--     - Description
--   * - BR/EDR ACL
--     - Connection Complete
--     - Classic Bluetooth data connection
--   * - LE ACL
--     - LE (Enhanced) Connection Complete
--     - Low Energy data connection
--   * - CIS
--     - LE CIS Established
--     - Connected Isochronous Stream (LE Audio)
--   * - BIS
--     - LE BIG Complete
--     - Broadcast Isochronous Stream (LE Audio)
--   * - SCO/eSCO
--     - Synchronous Connection Complete
--     - Voice/audio synchronous connection (classic)
--
--A single device may have multiple handles simultaneously. For example,
--an LE Audio device will have an LE ACL handle for control traffic and
--one or more CIS handles for audio streams. The ``LE CIS Established``
--event includes the ACL connection handle that the CIS is associated
--with.
--
--Controller Buffer Tracking
----------------------------
--
--Buffer tracking may show a indicator in square brackets::
--
--    < ACL: Handle 2048 [1/6] flags 0x00 dlen 16
--
--The ``[1/6]`` means this is buffer slot 1 of 6 available controller
--ACL buffers. This reflects the host-side HCI flow control: the host
--tracks how many buffers the controller has available and shows the
--current usage. When the controller sends ``Number of Completed Packets``
--events, buffers are freed and the count decreases.
--
--HCI ERROR AND DISCONNECT REASON CODES
--======================================
--
--HCI status and disconnect reason codes use the same code space. These
--appear in ``Status:`` and ``Reason:`` fields throughout the trace.
--btmon decodes them automatically, but the hex values are useful for
--searching and filtering.
--
--Common Disconnect Reasons
---------------------------
--
--.. list-table::
--   :header-rows: 1
--   :widths: 8 40 52
--
--   * - Code
+-   * - UUID
 -     - Name
--     - Diagnostic Meaning
--   * - 0x05
--     - Authentication Failure
--     - Pairing or encryption setup failed. Key may be
--       stale or devices have mismatched security databases.
--   * - 0x08
--     - Connection Timeout
--     - The supervision timer expired. The remote device
--       moved out of range or stopped responding. This is
--       an RF link loss.
--   * - 0x13
--     - Remote User Terminated Connection
--     - The remote device intentionally disconnected.
--       This is the normal graceful disconnect.
--   * - 0x14
--     - Remote Device Terminated due to Low Resources
--     - The remote device ran out of resources (memory,
--       connection slots).
--   * - 0x15
--     - Remote Device Terminated due to Power Off
--     - The remote device is powering down.
--   * - 0x16
--     - Connection Terminated By Local Host
--     - The local BlueZ stack intentionally disconnected.
--       Normal when bluetoothd initiates disconnect.
--   * - 0x1f
--     - Unspecified Error
--     - Generic error. Often indicates a firmware issue.
--   * - 0x22
--     - LMP/LL Response Timeout
--     - Link layer procedure timed out. The remote device
--       stopped responding to LL control PDUs.
--   * - 0x28
--     - Instant Passed
--     - A timing-critical operation missed its deadline.
--       Often seen with connection parameter updates.
--   * - 0x2f
--     - Insufficient Security
--     - The required security level (encryption, MITM
--       protection) was not met.
--   * - 0x3b
--     - Unacceptable Connection Parameters
--     - The remote rejected a connection parameter update.
--   * - 0x3d
--     - Connection Terminated due to MIC Failure
--     - Encryption integrity check failed. Possible key
--       mismatch or corruption.
--   * - 0x3e
--     - Connection Failed to be Established
--     - Connection attempt failed entirely (e.g., the
--       remote device did not respond to connection
--       requests).
--   * - 0x3f
--     - MAC Connection Failed
--     - MAC-level connection failure.
--   * - 0x44
--     - Operation Cancelled by Host
--     - The host cancelled the operation before it
--       completed.
+-     - Purpose
+-   * - 0x2900
+-     - Characteristic Extended Properties
+-     - Additional property bits
+-   * - 0x2901
+-     - Characteristic User Description
+-     - Human-readable description string
+-   * - 0x2902
+-     - Client Characteristic Configuration (CCC)
+-     - Enable/disable notifications or indications
+-   * - 0x2903
+-     - Server Characteristic Configuration
+-     - Server-side broadcast configuration
+-   * - 0x2904
+-     - Characteristic Presentation Format
+-     - Data format, exponent, unit
 -
--Full Error Code Table
-----------------------
+-Phase 6: Reading Characteristic Values
+-----------------------------------------
 -
--The complete set of HCI error codes (0x00-0x45) is defined in the
--Bluetooth Core Specification, Volume 1, Part F. btmon decodes all
--of them automatically in ``Status:`` and ``Reason:`` fields. The
--source mapping is in ``monitor/packet.c`` (``error2str_table``).
-+.. include:: btmon-connections.rst
+-After discovery, the client may read characteristic values using
+-``Read Request``::
+-
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 7        #577 [hci0] 1.380203
+-          ATT: Read Request (0x0a) len 2
+-            Handle: 0x000f
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #579 [hci0] 1.380774
+-          ATT: Read Response (0x0b) len 16
+-            Value[16]: a470d508da8751a2a50b79da0250bfda
+-
+-The ``Handle`` in the request corresponds to a characteristic value
+-handle from the discovery phase. btmon shows the raw value bytes; the
+-interpretation depends on the characteristic UUID.
+-
+-Find By Type Value (Targeted Service Search)
+-----------------------------------------------
+-
+-In addition to discovering all services, a client can search for a
+-specific service UUID using ``Find By Type Value Request``::
+-
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 13       #513 [hci0] 0.124195
+-          ATT: Find By Type Value Request (0x06) len 8
+-            Handle range: 0x0001-0xffff
+-            Attribute type: Primary Service (0x2800)
+-              UUID: Generic Attribute Profile (0x1801)
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #515 [hci0] 0.124684
+-          ATT: Find By Type Value Response (0x07) len 4
+-            Handle range: 0x0008-0x0011
+-
+-This returns only the handle range for the matching service, without
+-iterating through all services. If the service is not found::
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #524 [hci0] 0.240607
+-          ATT: Error Response (0x01) len 4
+-            Find By Type Value Request (0x06)
+-            Handle: 0x0012
+-            Error: Attribute Not Found (0x0a)
+-
+-Bidirectional Discovery
+-------------------------
+-
+-Both devices in a connection can act as GATT client and server
+-simultaneously. In a btsnoop trace, you may see interleaved discovery
+-in both directions:
+-
+-- **TX (``<``) requests + RX (``>``) responses** -- The local device
+-  (whose trace this is) is acting as a GATT client, discovering the
+-  remote device's services.
+-- **RX (``>``) requests + TX (``<``) responses** -- The remote device
+-  is acting as a GATT client, discovering the local device's services.
+-
+-For example, the local server responding to the remote's discovery::
+-
+-    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #584 [hci0] 1.512006
+-          ATT: Read By Group Type Request (0x10) len 6
+-            Handle range: 0x0001-0xffff
+-            Attribute group type: Primary Service (0x2800)
+-
+-    < ACL Data TX: Handle 2048 flags 0x00 dlen 66       #586 [hci0] 1.518778
+-          ATT: Read By Group Type Response (0x11) len 61
+-            Attribute data length: 6
+-            Attribute group list: 10 entries
+-            Handle range: 0x0001-0x0007
+-            UUID: Generic Access Profile (0x1800)
+-            Handle range: 0x0008-0x0011
+-            UUID: Generic Attribute Profile (0x1801)
+-            Handle range: 0x0012-0x0014
+-            UUID: Device Information (0x180a)
+-            Handle range: 0x0015-0x001e
+-            UUID: Coordinated Set Identification (0x1846)
+-            Handle range: 0x001f-0x0020
+-            UUID: Common Audio (0x1853)
+-            Handle range: 0x0021-0x0024
+-            UUID: Microphone Control (0x184d)
+-            Handle range: 0x0041-0x004b
+-            UUID: Volume Control (0x1844)
+-            Handle range: 0x006b-0x0073
+-            UUID: Broadcast Audio Scan (0x184f)
+-            Handle range: 0x0074-0x0086
+-            UUID: Published Audio Capabilities (0x1850)
+-            Handle range: 0x0087-0x0096
+-            UUID: Audio Stream Control (0x184e)
+-
+-This shows the local device's own GATT database as seen by the remote.
+-To reconstruct the remote device's database, focus on the TX requests
+-and RX responses (the local device acting as client).
+-
+-Building the Attribute Table
+------------------------------
+-
+-To reconstruct the GATT database, extract the discovery responses and
+-organize them into a table. Using the trace above as an example, the
+-remote device at address 00:11:22:33:44:55 has:
+-
+-**Services** (from Read By Group Type Response)::
+-
+-    Handle Range    UUID                            Service Name
+-    ──────────────  ──────────────────────────────  ────────────────────────────
+-    0x0001-0x0009   0x1800                          Generic Access Profile
+-    0x000a-0x0011   0x1801                          Generic Attribute Profile
+-    0x0012-0x0014   0x180a                          Device Information
+-    0x0015-0x0039   0x184c                          Generic Telephony Bearer
+-    0x003a-0x0059   0x1849                          Generic Media Control
+-    0x005a-0x005c   0x1855                          Telephony and Media Audio
+-
+-**Characteristics** (from Read By Type Response, within GAP 0x0001-0x0009)::
+-
+-    Handle  Value Handle  Properties  UUID    Name
+-    ──────  ────────────  ──────────  ──────  ────────────────────────────────
+-    0x0002  0x0003        Read        0x2a00  Device Name
+-    0x0004  0x0005        Read        0x2a01  Appearance
+-    0x0006  0x0007        Read        0x2a04  Peripheral Preferred Conn Params
+-    0x0008  0x0009        Read        0x2aa6  Central Address Resolution
+-
+-**Characteristics** (within GATT 0x000a-0x0011)::
+-
+-    Handle  Value Handle  Properties       UUID    Name
+-    ──────  ────────────  ───────────────  ──────  ────────────────────────────
+-    0x000b  0x000c        Indicate         0x2a05  Service Changed
+-    0x000e  0x000f        Read, Write      0x2b29  Client Supported Features
+-    0x0010  0x0011        Read             0x2b2a  Database Hash
+-
+-**Descriptors** (from Find Information Response)::
+-
+-    Handle  UUID    Name
+-    ──────  ──────  ────────────────────────────────────
+-    0x000d  0x2902  Client Characteristic Configuration
+-
+-The CCC descriptor at handle 0x000d belongs to the Service Changed
+-characteristic (0x000c), because it falls between that value handle
+-and the next characteristic declaration at 0x000e.
++.. include:: btmon-gatt.rst
  
- ANALYZE MODE
- ============
+ .. include:: btmon-smp.rst
+ 
 -- 
 2.53.0
 
