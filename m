@@ -1,948 +1,158 @@
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857DF3F7A92
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 17:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C95239022D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 17:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773335763; cv=none; b=hsDQvS3kzwv3PF2J84GMYm8JGQYkyNcv9qvUnBWU7pKhiyIZqLyG7uiQEUa5dq/ATYc237c8hL42hb/C2nU+QB+4ffsbrIemouqcQWiA3tcjP6xRF8KBRe12v8atupxA+KTR0U8rcAxlf7TpBG60/MKaz5nd5IlNcEj6T9zaohc=
+	t=1773336573; cv=none; b=pU6yESOn7x20L17QRmMw6W9dpw0DgJoNh/AzOd9TXQHUJ74PUq9Hnk0TxshkjnIaLO9JdP+vbQN5BA+hrFlqHBAe+bGSFnShlJqJIDEPydwTSYupDomdYO+OVxCi87WLfADMNaEPTBbmiKKpcZ9OuWXJQH6EyHztYX2l4fb6x/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773335763; c=relaxed/simple;
-	bh=TOZMAH5NUpUZXNkl5adpBu2Y41iyPSIJJlrLpQ8cLPk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fbn/b11Xl1Z/gn4X4LesLauiSblsPH2CMbjyliRqiCtRvGK/rUuK182a8Gzs7nw7r6nmKr+vVo+GP2bRrKNKDdm6h0EqETBDcv6bHGM7VoTcTWYaNQmF64Lt4mykwVI1lT4rY0YLdUNYn8IS2MLyKxvv/QUv9i1Q1+2aEdnx0CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H9l3U3If; arc=none smtp.client-ip=74.125.224.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773336573; c=relaxed/simple;
+	bh=KN3092uO7M/LZHMfUEcBko5yq38y/DDri+mfmO1rEDQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Yc1+MneqaYzsM19VBp7V9Wt5ylNgvnzafz6yeWvp+g/OfTHrmmPygMg0GAuwcM1cdR58TLDzTxYLts3wH7sy841cVlJW6Zj0zohZ3HAfaY3pbPjtetQdMQuFiVB/LEhsgjdk9Df8N/pyxPbP9ozThtfq7RRKlJVQq1nteR08Kk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=WqJ/H7GE; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9l3U3If"
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-64ad8435f46so1567278d50.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 10:15:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773335756; x=1773940556; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ae8AH8Wha3G6fNJCc3e0xQZpwtjzem/TRumZA3Morvg=;
-        b=H9l3U3IfGGkpVVe3dzfRVTx2wvoDXEIjLEmnsVsQogSgsk8H8MOSOUWnVxQe002wh+
-         DbaOJp3eIZQ9WMoEsWgIFPw73+KYEOQu7yYUCFnqmVg56M3xnZKXhoJ1shoIPhZPRzXp
-         YZcHa9TkpBqKVwTVrEEfyIxiVuE22/YY4YZy5yDiJ8DDe7oZlocXSsPSAyaZoNieHA9f
-         +G4yw3ImZV3y2Zawq0fqWYvepcTo3aXtIMqcpceegUeJSfuc7I4dRW10PyATK+u2mgVq
-         98nifTfmJxA20CqCstPprIAgMqIed7nlv+zsyLPx3O9jzigflJEYqGCuU/FXYteIwrpp
-         P3lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773335756; x=1773940556;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Ae8AH8Wha3G6fNJCc3e0xQZpwtjzem/TRumZA3Morvg=;
-        b=aDHe9hsuNXf60bWz7orPWVdEoqfFuCnRDcfkmSE8QKH8eSotVH9ce0MFcb5QNpYybi
-         q0GsEmVPvL51sJW0Y8gT7HFFExcifv6k8Pfx8XsGh5gKCYPJmxgjovkg4X2pu2yYpn9/
-         dqj3XnuqV5/K//ZiEE6WNBsZCATVh6aWXkd87ARJMQd471ciC7BE/rSymGz/x2RfJhOQ
-         fqkTdUh/L2Q7PvV8IF7bTCGAxliiNrDww1JBlV7vVy6TGl16T/BwQ2SgZkr055oTq9LD
-         P32l/VMmseLBjLc+rSmNLzy5jR25xg1t2JSG15SpKGQ6l/5bf/r7malJqO+/j8ZmPpc8
-         yipQ==
-X-Gm-Message-State: AOJu0YxcLc9d/ZNkCsG/C6K811dQ0AMcKuxWE6FQn2K9Bu9Kkoo0uuXV
-	/EjPMkj+6GyG7ulSdE7nklp8Z8lwWx8vxb3DIjp3yq8Dm4jb1Y910qF68n8cmw==
-X-Gm-Gg: ATEYQzyKAivEd6TkgbbH4qEA4qXpLLjYcl+EXqQspNX0dGjEVLbZd+j0NUEbbpG6842
-	tOXd9v5QyuQNSHYuIC6CWRU2G+T9rMnGgZVVvBwELfZsWm/9+vVk293la9L16ejE75Ul4rZr4YD
-	a5lQgGbd9qCFmDAf2rx5toSYOVrmIR6VdjcCRxpT40fD1uK56fA4CG/zJkDgop/ANZ8n9Mpfa08
-	+TJuijUNAJ5sBf9F1EVgTUR6SG6tEl3x3aHzEGxh3h4iH1v9pay2u+6hq6v/8EE1BC4o7BTmLwe
-	iZIlyidwp/jNJ/fMtPdWy5cXuoq1TukwyQWPEBXxscOUXG8iDE1/hE5461jtOG1P9jyK/gyS7dl
-	vrTOCVZJnIussywJ90l3nWJO/Eiv7FPLjGFoPMGlrxZojA40Dhh6NZ8y7LqkhII4bdT6QHBp8lf
-	p0zR/VREDF4wCxFmNZJXIZ6lY3lVWg9tsbfZ5RFzaU8+OxjRsvrASH2R4sKggAAAPjbGvaq/Iqy
-	xs6rQ2rvfAqxdwIww==
-X-Received: by 2002:a05:690e:18a:b0:64e:5f44:243c with SMTP id 956f58d0204a3-64e62fa895amr247265d50.34.1773335755536;
-        Thu, 12 Mar 2026 10:15:55 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64d65117a82sm3442572d50.15.2026.03.12.10.15.54
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 10:15:54 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="WqJ/H7GE"
+Received: from github.com (hubbernetes-node-42c3309.ash1-iad.github.net [10.56.128.74])
+	by smtp.github.com (Postfix) with ESMTPA id C3ABA140BC9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2026 10:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1773336571;
+	bh=R/hEyy1L2n/8c+0vpgras6KHgLT7VAYIIHvjuVGgmdM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=WqJ/H7GESyL+ubSzIba1JYNiAX7ondz/PR2R6nyW40ifPO/FqUJuD4K6hh53BGwT9
+	 Zyw79W7rseTIAwuCMSuSIAZsPhs7CXsGzx5DfVUuIUwBu7EWal0mzRG8DQmADlSn0t
+	 4GmTnlHR0FBCm6hA131e+yNCCfo5lHSOnO2r7EXI=
+Date: Thu, 12 Mar 2026 10:29:31 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 5/6] doc/btmon: Split GATT Database Reconstruction into btmon-gatt.rst
-Date: Thu, 12 Mar 2026 13:15:38 -0400
-Message-ID: <20260312171540.1065212-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260312171540.1065212-1-luiz.dentz@gmail.com>
-References: <20260312171540.1065212-1-luiz.dentz@gmail.com>
+Message-ID: <bluez/bluez/push/refs/heads/1065807/000000-15e0d8@github.com>
+Subject: [bluez/bluez] 2d5745: doc/btmon: Split Advertising and Scanning into
+ btm...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1065807
+  Home:   https://github.com/bluez/bluez
+  Commit: 2d5745dafdbd10ed703654b2081585c9ca81e6f2
+      https://github.com/bluez/bluez/commit/2d5745dafdbd10ed703654b2081585c9ca81e6f2
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-12 (Thu, 12 Mar 2026)
+
+  Changed paths:
+    A doc/btmon-advertising.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split Advertising and Scanning into btmon-advertising.rst
+
+Move the ADVERTISING AND SCANNING section into a standalone file and
+replace it with an RST include directive. This allows the
+btsnoop-analyzer to load only the relevant documentation for
+advertising/scanning focus-area analysis instead of the full btmon.rst.
+
+
+  Commit: e2d0b187f95a1cac8dde6b33dfadce786cb5c299
+      https://github.com/bluez/bluez/commit/e2d0b187f95a1cac8dde6b33dfadce786cb5c299
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-12 (Thu, 12 Mar 2026)
+
+  Changed paths:
+    A doc/btmon-le-audio.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split LE Audio Protocol Flow into btmon-le-audio.rst
+
+Move the LE AUDIO PROTOCOL FLOW section (including CIS unicast,
+BIS broadcast, and BIG sync flows) into a standalone file and
+replace it with an RST include directive. This is the largest
+split section (660 lines) and was being truncated away in
+context-limited analysis.
+
+
+  Commit: 4e6201f92c9e327337cb940cbcc76f10707e1512
+      https://github.com/bluez/bluez/commit/4e6201f92c9e327337cb940cbcc76f10707e1512
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-12 (Thu, 12 Mar 2026)
+
+  Changed paths:
+    A doc/btmon-l2cap.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split L2CAP Channel Tracking into btmon-l2cap.rst
+
+Move the L2CAP CHANNEL TRACKING section into a standalone file and
+replace it with an RST include directive.
+
+
+  Commit: 891e162ae7036a0125e96a740cb331a4d25866c2
+      https://github.com/bluez/bluez/commit/891e162ae7036a0125e96a740cb331a4d25866c2
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-12 (Thu, 12 Mar 2026)
+
+  Changed paths:
+    A doc/btmon-smp.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split SMP Pairing Flow into btmon-smp.rst
+
+Move the SMP PAIRING FLOW section into a standalone file and replace
+it with an RST include directive.
+
+
+  Commit: 67f1ef63c968e5c9f2260a19da86802a0e6bc6be
+      https://github.com/bluez/bluez/commit/67f1ef63c968e5c9f2260a19da86802a0e6bc6be
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-12 (Thu, 12 Mar 2026)
+
+  Changed paths:
+    A doc/btmon-gatt.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split GATT Database Reconstruction into btmon-gatt.rst
 
 Move the RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES section
 into a standalone file and replace it with an RST include directive.
----
- doc/btmon-gatt.rst | 423 +++++++++++++++++++++++++++++++++++++++++++++
- doc/btmon.rst      | 417 +-------------------------------------------
- 2 files changed, 424 insertions(+), 416 deletions(-)
- create mode 100644 doc/btmon-gatt.rst
 
-diff --git a/doc/btmon-gatt.rst b/doc/btmon-gatt.rst
-new file mode 100644
-index 000000000000..cbd6b7acf543
---- /dev/null
-+++ b/doc/btmon-gatt.rst
-@@ -0,0 +1,423 @@
-+=======================================
-+btmon: GATT Database Reconstruction
-+=======================================
-+
-+.. This file is included by btmon.rst.
-+
-+RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES
-+=================================================
-+
-+A btsnoop trace contains the complete ATT protocol exchange used by
-+GATT clients and servers to discover each other's services. By reading
-+the discovery requests and responses, it is possible to reconstruct the
-+full GATT database of a remote device -- even without access to the
-+device itself.
-+
-+This section explains the GATT discovery procedure and how each ATT
-+operation appears in ``btmon`` output.
-+
-+Overview of GATT Discovery
-+---------------------------
-+
-+GATT discovery is a multi-phase process where a client queries the
-+server's attribute database using ATT protocol operations. The phases
-+are:
-+
-+1. **Primary Service Discovery** -- Find all primary services and their
-+   handle ranges.
-+2. **Secondary Service Discovery** -- Find any secondary (included-only)
-+   services.
-+3. **Included Service Discovery** -- Find which services include other
-+   services.
-+4. **Characteristic Discovery** -- Find all characteristics within each
-+   service.
-+5. **Descriptor Discovery** -- Find all descriptors for each
-+   characteristic.
-+6. **Characteristic Value Reading** -- Read the values of readable
-+   characteristics.
-+
-+Each phase uses a specific ATT operation and produces a
-+request/response pattern in the trace. The client repeats each request
-+with advancing handle ranges until the server responds with
-+``Attribute Not Found``, indicating the end of that phase.
-+
-+Phase 1: Primary Service Discovery (Read By Group Type)
-+--------------------------------------------------------
-+
-+The client discovers primary services using ``Read By Group Type
-+Request`` with the ``Primary Service`` UUID (0x2800) as the group type.
-+
-+**Request**::
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #516 [hci0] 0.124726
-+          ATT: Read By Group Type Request (0x10) len 6
-+            Handle range: 0x0001-0xffff
-+            Attribute group type: Primary Service (0x2800)
-+
-+The first request always starts at handle 0x0001 and searches through
-+0xffff (the entire handle space).
-+
-+**Response**::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 42       #523 [hci0] 0.240151
-+          ATT: Read By Group Type Response (0x11) len 37
-+            Attribute data length: 6
-+            Attribute group list: 6 entries
-+            Handle range: 0x0001-0x0009
-+            UUID: Generic Access Profile (0x1800)
-+            Handle range: 0x000a-0x0011
-+            UUID: Generic Attribute Profile (0x1801)
-+            Handle range: 0x0012-0x0014
-+            UUID: Device Information (0x180a)
-+            Handle range: 0x0015-0x0039
-+            UUID: Generic Telephony Bearer (0x184c)
-+            Handle range: 0x003a-0x0059
-+            UUID: Generic Media Control (0x1849)
-+            Handle range: 0x005a-0x005c
-+            UUID: Telephony and Media Audio (0x1855)
-+
-+Each entry provides:
-+
-+- **Handle range** -- The start and end handle of the service. All
-+  attributes belonging to this service (characteristics, descriptors)
-+  have handles within this range.
-+- **UUID** -- The service UUID. Standard 16-bit UUIDs are shown with
-+  their name (e.g., ``Generic Access Profile``). 128-bit vendor-specific
-+  UUIDs appear as full UUID strings.
-+
-+The client continues by sending another request starting after the last
-+handle in the response::
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #525 [hci0] 0.240641
-+          ATT: Read By Group Type Request (0x10) len 6
-+            Handle range: 0x005d-0xffff
-+            Attribute group type: Primary Service (0x2800)
-+
-+This continues until the server responds with ``Attribute Not Found``::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #532 [hci0] 0.360069
-+          ATT: Error Response (0x01) len 4
-+            Read By Group Type Request (0x10)
-+            Handle: 0x005d
-+            Error: Attribute Not Found (0x0a)
-+
-+This error indicates that no more primary services exist beyond handle
-+0x005d. The client now has the complete list of primary services.
-+
-+.. note::
-+
-+   The ``Attribute data length`` field indicates the size of each entry
-+   in the response. A value of 6 means 16-bit UUIDs (2 bytes start
-+   handle + 2 bytes end handle + 2 bytes UUID). A value of 20 means
-+   128-bit UUIDs (2 + 2 + 16). If the server has both 16-bit and
-+   128-bit service UUIDs, they are returned in separate responses
-+   because all entries in a single response must have the same length.
-+
-+Phase 2: Secondary Service Discovery
-+--------------------------------------
-+
-+After primary services, the client may discover secondary services
-+using the same ``Read By Group Type Request`` but with the ``Secondary
-+Service`` UUID (0x2801)::
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #534 [hci0] 0.360752
-+          ATT: Read By Group Type Request (0x10) len 6
-+            Handle range: 0x0001-0xffff
-+            Attribute group type: Secondary Service (0x2801)
-+
-+If no secondary services exist, the server responds with
-+``Attribute Not Found``. Secondary services are not directly accessible
-+to clients -- they are only reachable via include references from
-+primary services.
-+
-+Phase 3: Included Service Discovery (Read By Type)
-+----------------------------------------------------
-+
-+To discover which services include other services, the client uses
-+``Read By Type Request`` with the ``Include`` UUID (0x2802)::
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #540 [hci0] 0.480731
-+          ATT: Read By Type Request (0x08) len 6
-+            Handle range: 0x0001-0x005c
-+            Attribute type: Include (0x2802)
-+
-+The handle range typically spans the entire discovered database. Each
-+include declaration in the response identifies a service that is
-+included by the service containing that handle.
-+
-+Phase 4: Characteristic Discovery (Read By Type)
-+--------------------------------------------------
-+
-+For each service, the client discovers its characteristics using
-+``Read By Type Request`` with the ``Characteristic`` UUID (0x2803).
-+The handle range is limited to the service's handle range.
-+
-+**Request**::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #531 [hci0] 0.360063
-+          ATT: Read By Type Request (0x08) len 6
-+            Handle range: 0x0008-0x0011
-+            Attribute type: Characteristic (0x2803)
-+
-+**Response**::
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 27       #533 [hci0] 0.360714
-+          ATT: Read By Type Response (0x09) len 22
-+            Attribute data length: 7
-+            Attribute data list: 3 entries
-+            Handle: 0x0009
-+            Value[5]: 200a00052a
-+                Properties: 0x20
-+                  Indicate (0x20)
-+                Value Handle: 0x000a
-+                Value UUID: Service Changed (0x2a05)
-+            Handle: 0x000c
-+            Value[5]: 0a0d00292b
-+                Properties: 0x0a
-+                  Read (0x02)
-+                  Write (0x08)
-+                Value Handle: 0x000d
-+                Value UUID: Client Supported Features (0x2b29)
-+            Handle: 0x000e
-+            Value[5]: 020f002a2b
-+                Properties: 0x02
-+                  Read (0x02)
-+                Value Handle: 0x000f
-+                Value UUID: Database Hash (0x2b2a)
-+
-+Each characteristic entry provides:
-+
-+- **Handle** -- The handle of the characteristic declaration attribute.
-+- **Properties** -- A bitmask indicating supported operations:
-+
-+  .. list-table::
-+     :header-rows: 1
-+     :widths: 10 30 60
-+
-+     * - Bit
-+       - Property
-+       - Description
-+     * - 0x01
-+       - Broadcast
-+       - Can be broadcast in advertising data
-+     * - 0x02
-+       - Read
-+       - Can be read
-+     * - 0x04
-+       - Write Without Response
-+       - Can be written without acknowledgment
-+     * - 0x08
-+       - Write
-+       - Can be written with acknowledgment
-+     * - 0x10
-+       - Notify
-+       - Server can send notifications
-+     * - 0x20
-+       - Indicate
-+       - Server can send indications
-+     * - 0x40
-+       - Authenticated Signed Writes
-+       - Supports signed write commands
-+     * - 0x80
-+       - Extended Properties
-+       - Has extended properties descriptor
-+
-+- **Value Handle** -- The handle where the characteristic's value is
-+  stored (always declaration handle + 1).
-+- **Value UUID** -- The UUID identifying the characteristic type.
-+
-+The client continues with advancing handle ranges until it receives
-+``Attribute Not Found``::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #572 [hci0] 1.200228
-+          ATT: Error Response (0x01) len 4
-+            Read By Type Request (0x08)
-+            Handle: 0x005c
-+            Error: Attribute Not Found (0x0a)
-+
-+Phase 5: Descriptor Discovery (Find Information)
-+--------------------------------------------------
-+
-+Descriptors occupy the handles between a characteristic's value handle
-+and the next characteristic declaration (or end of service). The client
-+discovers them using ``Find Information Request``.
-+
-+**Request**::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #556 [hci0] 0.959965
-+          ATT: Find Information Request (0x04) len 4
-+            Handle range: 0x000b-0x000b
-+
-+The handle range covers the gap between the characteristic value handle
-+and the next characteristic declaration handle.
-+
-+**Response**::
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 10       #561 [hci0] 0.961049
-+          ATT: Find Information Response (0x05) len 5
-+            Format: UUID-16 (0x01)
-+            Handle: 0x000b
-+            UUID: Client Characteristic Configuration (0x2902)
-+
-+Common descriptor UUIDs:
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 15 40 45
-+
-+   * - UUID
-+     - Name
-+     - Purpose
-+   * - 0x2900
-+     - Characteristic Extended Properties
-+     - Additional property bits
-+   * - 0x2901
-+     - Characteristic User Description
-+     - Human-readable description string
-+   * - 0x2902
-+     - Client Characteristic Configuration (CCC)
-+     - Enable/disable notifications or indications
-+   * - 0x2903
-+     - Server Characteristic Configuration
-+     - Server-side broadcast configuration
-+   * - 0x2904
-+     - Characteristic Presentation Format
-+     - Data format, exponent, unit
-+
-+Phase 6: Reading Characteristic Values
-+----------------------------------------
-+
-+After discovery, the client may read characteristic values using
-+``Read Request``::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 7        #577 [hci0] 1.380203
-+          ATT: Read Request (0x0a) len 2
-+            Handle: 0x000f
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #579 [hci0] 1.380774
-+          ATT: Read Response (0x0b) len 16
-+            Value[16]: a470d508da8751a2a50b79da0250bfda
-+
-+The ``Handle`` in the request corresponds to a characteristic value
-+handle from the discovery phase. btmon shows the raw value bytes; the
-+interpretation depends on the characteristic UUID.
-+
-+Find By Type Value (Targeted Service Search)
-+----------------------------------------------
-+
-+In addition to discovering all services, a client can search for a
-+specific service UUID using ``Find By Type Value Request``::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 13       #513 [hci0] 0.124195
-+          ATT: Find By Type Value Request (0x06) len 8
-+            Handle range: 0x0001-0xffff
-+            Attribute type: Primary Service (0x2800)
-+              UUID: Generic Attribute Profile (0x1801)
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #515 [hci0] 0.124684
-+          ATT: Find By Type Value Response (0x07) len 4
-+            Handle range: 0x0008-0x0011
-+
-+This returns only the handle range for the matching service, without
-+iterating through all services. If the service is not found::
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #524 [hci0] 0.240607
-+          ATT: Error Response (0x01) len 4
-+            Find By Type Value Request (0x06)
-+            Handle: 0x0012
-+            Error: Attribute Not Found (0x0a)
-+
-+Bidirectional Discovery
-+------------------------
-+
-+Both devices in a connection can act as GATT client and server
-+simultaneously. In a btsnoop trace, you may see interleaved discovery
-+in both directions:
-+
-+- **TX (``<``) requests + RX (``>``) responses** -- The local device
-+  (whose trace this is) is acting as a GATT client, discovering the
-+  remote device's services.
-+- **RX (``>``) requests + TX (``<``) responses** -- The remote device
-+  is acting as a GATT client, discovering the local device's services.
-+
-+For example, the local server responding to the remote's discovery::
-+
-+    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #584 [hci0] 1.512006
-+          ATT: Read By Group Type Request (0x10) len 6
-+            Handle range: 0x0001-0xffff
-+            Attribute group type: Primary Service (0x2800)
-+
-+    < ACL Data TX: Handle 2048 flags 0x00 dlen 66       #586 [hci0] 1.518778
-+          ATT: Read By Group Type Response (0x11) len 61
-+            Attribute data length: 6
-+            Attribute group list: 10 entries
-+            Handle range: 0x0001-0x0007
-+            UUID: Generic Access Profile (0x1800)
-+            Handle range: 0x0008-0x0011
-+            UUID: Generic Attribute Profile (0x1801)
-+            Handle range: 0x0012-0x0014
-+            UUID: Device Information (0x180a)
-+            Handle range: 0x0015-0x001e
-+            UUID: Coordinated Set Identification (0x1846)
-+            Handle range: 0x001f-0x0020
-+            UUID: Common Audio (0x1853)
-+            Handle range: 0x0021-0x0024
-+            UUID: Microphone Control (0x184d)
-+            Handle range: 0x0041-0x004b
-+            UUID: Volume Control (0x1844)
-+            Handle range: 0x006b-0x0073
-+            UUID: Broadcast Audio Scan (0x184f)
-+            Handle range: 0x0074-0x0086
-+            UUID: Published Audio Capabilities (0x1850)
-+            Handle range: 0x0087-0x0096
-+            UUID: Audio Stream Control (0x184e)
-+
-+This shows the local device's own GATT database as seen by the remote.
-+To reconstruct the remote device's database, focus on the TX requests
-+and RX responses (the local device acting as client).
-+
-+Building the Attribute Table
-+-----------------------------
-+
-+To reconstruct the GATT database, extract the discovery responses and
-+organize them into a table. Using the trace above as an example, the
-+remote device at address 00:11:22:33:44:55 has:
-+
-+**Services** (from Read By Group Type Response)::
-+
-+    Handle Range    UUID                            Service Name
-+    ──────────────  ──────────────────────────────  ────────────────────────────
-+    0x0001-0x0009   0x1800                          Generic Access Profile
-+    0x000a-0x0011   0x1801                          Generic Attribute Profile
-+    0x0012-0x0014   0x180a                          Device Information
-+    0x0015-0x0039   0x184c                          Generic Telephony Bearer
-+    0x003a-0x0059   0x1849                          Generic Media Control
-+    0x005a-0x005c   0x1855                          Telephony and Media Audio
-+
-+**Characteristics** (from Read By Type Response, within GAP 0x0001-0x0009)::
-+
-+    Handle  Value Handle  Properties  UUID    Name
-+    ──────  ────────────  ──────────  ──────  ────────────────────────────────
-+    0x0002  0x0003        Read        0x2a00  Device Name
-+    0x0004  0x0005        Read        0x2a01  Appearance
-+    0x0006  0x0007        Read        0x2a04  Peripheral Preferred Conn Params
-+    0x0008  0x0009        Read        0x2aa6  Central Address Resolution
-+
-+**Characteristics** (within GATT 0x000a-0x0011)::
-+
-+    Handle  Value Handle  Properties       UUID    Name
-+    ──────  ────────────  ───────────────  ──────  ────────────────────────────
-+    0x000b  0x000c        Indicate         0x2a05  Service Changed
-+    0x000e  0x000f        Read, Write      0x2b29  Client Supported Features
-+    0x0010  0x0011        Read             0x2b2a  Database Hash
-+
-+**Descriptors** (from Find Information Response)::
-+
-+    Handle  UUID    Name
-+    ──────  ──────  ────────────────────────────────────
-+    0x000d  0x2902  Client Characteristic Configuration
-+
-+The CCC descriptor at handle 0x000d belongs to the Service Changed
-+characteristic (0x000c), because it falls between that value handle
-+and the next characteristic declaration at 0x000e.
-+
-diff --git a/doc/btmon.rst b/doc/btmon.rst
-index 799066e83e74..c9e13c839026 100644
---- a/doc/btmon.rst
-+++ b/doc/btmon.rst
-@@ -712,422 +712,7 @@ Analyze mode reports, for each controller found in the trace:
- - **Latency plots**: If ``gnuplot`` is installed, ASCII-art latency
-   distribution plots are rendered in the terminal.
- 
--RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES
--=================================================
--
--A btsnoop trace contains the complete ATT protocol exchange used by
--GATT clients and servers to discover each other's services. By reading
--the discovery requests and responses, it is possible to reconstruct the
--full GATT database of a remote device -- even without access to the
--device itself.
--
--This section explains the GATT discovery procedure and how each ATT
--operation appears in ``btmon`` output.
--
--Overview of GATT Discovery
-----------------------------
--
--GATT discovery is a multi-phase process where a client queries the
--server's attribute database using ATT protocol operations. The phases
--are:
--
--1. **Primary Service Discovery** -- Find all primary services and their
--   handle ranges.
--2. **Secondary Service Discovery** -- Find any secondary (included-only)
--   services.
--3. **Included Service Discovery** -- Find which services include other
--   services.
--4. **Characteristic Discovery** -- Find all characteristics within each
--   service.
--5. **Descriptor Discovery** -- Find all descriptors for each
--   characteristic.
--6. **Characteristic Value Reading** -- Read the values of readable
--   characteristics.
--
--Each phase uses a specific ATT operation and produces a
--request/response pattern in the trace. The client repeats each request
--with advancing handle ranges until the server responds with
--``Attribute Not Found``, indicating the end of that phase.
--
--Phase 1: Primary Service Discovery (Read By Group Type)
----------------------------------------------------------
--
--The client discovers primary services using ``Read By Group Type
--Request`` with the ``Primary Service`` UUID (0x2800) as the group type.
--
--**Request**::
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #516 [hci0] 0.124726
--          ATT: Read By Group Type Request (0x10) len 6
--            Handle range: 0x0001-0xffff
--            Attribute group type: Primary Service (0x2800)
--
--The first request always starts at handle 0x0001 and searches through
--0xffff (the entire handle space).
--
--**Response**::
--
--    > ACL Data RX: Handle 2048 flags 0x02 dlen 42       #523 [hci0] 0.240151
--          ATT: Read By Group Type Response (0x11) len 37
--            Attribute data length: 6
--            Attribute group list: 6 entries
--            Handle range: 0x0001-0x0009
--            UUID: Generic Access Profile (0x1800)
--            Handle range: 0x000a-0x0011
--            UUID: Generic Attribute Profile (0x1801)
--            Handle range: 0x0012-0x0014
--            UUID: Device Information (0x180a)
--            Handle range: 0x0015-0x0039
--            UUID: Generic Telephony Bearer (0x184c)
--            Handle range: 0x003a-0x0059
--            UUID: Generic Media Control (0x1849)
--            Handle range: 0x005a-0x005c
--            UUID: Telephony and Media Audio (0x1855)
--
--Each entry provides:
--
--- **Handle range** -- The start and end handle of the service. All
--  attributes belonging to this service (characteristics, descriptors)
--  have handles within this range.
--- **UUID** -- The service UUID. Standard 16-bit UUIDs are shown with
--  their name (e.g., ``Generic Access Profile``). 128-bit vendor-specific
--  UUIDs appear as full UUID strings.
--
--The client continues by sending another request starting after the last
--handle in the response::
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #525 [hci0] 0.240641
--          ATT: Read By Group Type Request (0x10) len 6
--            Handle range: 0x005d-0xffff
--            Attribute group type: Primary Service (0x2800)
--
--This continues until the server responds with ``Attribute Not Found``::
--
--    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #532 [hci0] 0.360069
--          ATT: Error Response (0x01) len 4
--            Read By Group Type Request (0x10)
--            Handle: 0x005d
--            Error: Attribute Not Found (0x0a)
--
--This error indicates that no more primary services exist beyond handle
--0x005d. The client now has the complete list of primary services.
--
--.. note::
--
--   The ``Attribute data length`` field indicates the size of each entry
--   in the response. A value of 6 means 16-bit UUIDs (2 bytes start
--   handle + 2 bytes end handle + 2 bytes UUID). A value of 20 means
--   128-bit UUIDs (2 + 2 + 16). If the server has both 16-bit and
--   128-bit service UUIDs, they are returned in separate responses
--   because all entries in a single response must have the same length.
--
--Phase 2: Secondary Service Discovery
----------------------------------------
--
--After primary services, the client may discover secondary services
--using the same ``Read By Group Type Request`` but with the ``Secondary
--Service`` UUID (0x2801)::
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #534 [hci0] 0.360752
--          ATT: Read By Group Type Request (0x10) len 6
--            Handle range: 0x0001-0xffff
--            Attribute group type: Secondary Service (0x2801)
--
--If no secondary services exist, the server responds with
--``Attribute Not Found``. Secondary services are not directly accessible
--to clients -- they are only reachable via include references from
--primary services.
--
--Phase 3: Included Service Discovery (Read By Type)
------------------------------------------------------
--
--To discover which services include other services, the client uses
--``Read By Type Request`` with the ``Include`` UUID (0x2802)::
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 11       #540 [hci0] 0.480731
--          ATT: Read By Type Request (0x08) len 6
--            Handle range: 0x0001-0x005c
--            Attribute type: Include (0x2802)
--
--The handle range typically spans the entire discovered database. Each
--include declaration in the response identifies a service that is
--included by the service containing that handle.
--
--Phase 4: Characteristic Discovery (Read By Type)
----------------------------------------------------
--
--For each service, the client discovers its characteristics using
--``Read By Type Request`` with the ``Characteristic`` UUID (0x2803).
--The handle range is limited to the service's handle range.
--
--**Request**::
--
--    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #531 [hci0] 0.360063
--          ATT: Read By Type Request (0x08) len 6
--            Handle range: 0x0008-0x0011
--            Attribute type: Characteristic (0x2803)
--
--**Response**::
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 27       #533 [hci0] 0.360714
--          ATT: Read By Type Response (0x09) len 22
--            Attribute data length: 7
--            Attribute data list: 3 entries
--            Handle: 0x0009
--            Value[5]: 200a00052a
--                Properties: 0x20
--                  Indicate (0x20)
--                Value Handle: 0x000a
--                Value UUID: Service Changed (0x2a05)
--            Handle: 0x000c
--            Value[5]: 0a0d00292b
--                Properties: 0x0a
--                  Read (0x02)
--                  Write (0x08)
--                Value Handle: 0x000d
--                Value UUID: Client Supported Features (0x2b29)
--            Handle: 0x000e
--            Value[5]: 020f002a2b
--                Properties: 0x02
--                  Read (0x02)
--                Value Handle: 0x000f
--                Value UUID: Database Hash (0x2b2a)
--
--Each characteristic entry provides:
--
--- **Handle** -- The handle of the characteristic declaration attribute.
--- **Properties** -- A bitmask indicating supported operations:
--
--  .. list-table::
--     :header-rows: 1
--     :widths: 10 30 60
--
--     * - Bit
--       - Property
--       - Description
--     * - 0x01
--       - Broadcast
--       - Can be broadcast in advertising data
--     * - 0x02
--       - Read
--       - Can be read
--     * - 0x04
--       - Write Without Response
--       - Can be written without acknowledgment
--     * - 0x08
--       - Write
--       - Can be written with acknowledgment
--     * - 0x10
--       - Notify
--       - Server can send notifications
--     * - 0x20
--       - Indicate
--       - Server can send indications
--     * - 0x40
--       - Authenticated Signed Writes
--       - Supports signed write commands
--     * - 0x80
--       - Extended Properties
--       - Has extended properties descriptor
--
--- **Value Handle** -- The handle where the characteristic's value is
--  stored (always declaration handle + 1).
--- **Value UUID** -- The UUID identifying the characteristic type.
--
--The client continues with advancing handle ranges until it receives
--``Attribute Not Found``::
--
--    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #572 [hci0] 1.200228
--          ATT: Error Response (0x01) len 4
--            Read By Type Request (0x08)
--            Handle: 0x005c
--            Error: Attribute Not Found (0x0a)
--
--Phase 5: Descriptor Discovery (Find Information)
----------------------------------------------------
--
--Descriptors occupy the handles between a characteristic's value handle
--and the next characteristic declaration (or end of service). The client
--discovers them using ``Find Information Request``.
--
--**Request**::
--
--    > ACL Data RX: Handle 2048 flags 0x02 dlen 9        #556 [hci0] 0.959965
--          ATT: Find Information Request (0x04) len 4
--            Handle range: 0x000b-0x000b
--
--The handle range covers the gap between the characteristic value handle
--and the next characteristic declaration handle.
--
--**Response**::
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 10       #561 [hci0] 0.961049
--          ATT: Find Information Response (0x05) len 5
--            Format: UUID-16 (0x01)
--            Handle: 0x000b
--            UUID: Client Characteristic Configuration (0x2902)
--
--Common descriptor UUIDs:
--
--.. list-table::
--   :header-rows: 1
--   :widths: 15 40 45
--
--   * - UUID
--     - Name
--     - Purpose
--   * - 0x2900
--     - Characteristic Extended Properties
--     - Additional property bits
--   * - 0x2901
--     - Characteristic User Description
--     - Human-readable description string
--   * - 0x2902
--     - Client Characteristic Configuration (CCC)
--     - Enable/disable notifications or indications
--   * - 0x2903
--     - Server Characteristic Configuration
--     - Server-side broadcast configuration
--   * - 0x2904
--     - Characteristic Presentation Format
--     - Data format, exponent, unit
--
--Phase 6: Reading Characteristic Values
------------------------------------------
--
--After discovery, the client may read characteristic values using
--``Read Request``::
--
--    > ACL Data RX: Handle 2048 flags 0x02 dlen 7        #577 [hci0] 1.380203
--          ATT: Read Request (0x0a) len 2
--            Handle: 0x000f
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 21       #579 [hci0] 1.380774
--          ATT: Read Response (0x0b) len 16
--            Value[16]: a470d508da8751a2a50b79da0250bfda
--
--The ``Handle`` in the request corresponds to a characteristic value
--handle from the discovery phase. btmon shows the raw value bytes; the
--interpretation depends on the characteristic UUID.
--
--Find By Type Value (Targeted Service Search)
------------------------------------------------
--
--In addition to discovering all services, a client can search for a
--specific service UUID using ``Find By Type Value Request``::
--
--    > ACL Data RX: Handle 2048 flags 0x02 dlen 13       #513 [hci0] 0.124195
--          ATT: Find By Type Value Request (0x06) len 8
--            Handle range: 0x0001-0xffff
--            Attribute type: Primary Service (0x2800)
--              UUID: Generic Attribute Profile (0x1801)
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #515 [hci0] 0.124684
--          ATT: Find By Type Value Response (0x07) len 4
--            Handle range: 0x0008-0x0011
--
--This returns only the handle range for the matching service, without
--iterating through all services. If the service is not found::
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 9        #524 [hci0] 0.240607
--          ATT: Error Response (0x01) len 4
--            Find By Type Value Request (0x06)
--            Handle: 0x0012
--            Error: Attribute Not Found (0x0a)
--
--Bidirectional Discovery
--------------------------
--
--Both devices in a connection can act as GATT client and server
--simultaneously. In a btsnoop trace, you may see interleaved discovery
--in both directions:
--
--- **TX (``<``) requests + RX (``>``) responses** -- The local device
--  (whose trace this is) is acting as a GATT client, discovering the
--  remote device's services.
--- **RX (``>``) requests + TX (``<``) responses** -- The remote device
--  is acting as a GATT client, discovering the local device's services.
--
--For example, the local server responding to the remote's discovery::
--
--    > ACL Data RX: Handle 2048 flags 0x02 dlen 11       #584 [hci0] 1.512006
--          ATT: Read By Group Type Request (0x10) len 6
--            Handle range: 0x0001-0xffff
--            Attribute group type: Primary Service (0x2800)
--
--    < ACL Data TX: Handle 2048 flags 0x00 dlen 66       #586 [hci0] 1.518778
--          ATT: Read By Group Type Response (0x11) len 61
--            Attribute data length: 6
--            Attribute group list: 10 entries
--            Handle range: 0x0001-0x0007
--            UUID: Generic Access Profile (0x1800)
--            Handle range: 0x0008-0x0011
--            UUID: Generic Attribute Profile (0x1801)
--            Handle range: 0x0012-0x0014
--            UUID: Device Information (0x180a)
--            Handle range: 0x0015-0x001e
--            UUID: Coordinated Set Identification (0x1846)
--            Handle range: 0x001f-0x0020
--            UUID: Common Audio (0x1853)
--            Handle range: 0x0021-0x0024
--            UUID: Microphone Control (0x184d)
--            Handle range: 0x0041-0x004b
--            UUID: Volume Control (0x1844)
--            Handle range: 0x006b-0x0073
--            UUID: Broadcast Audio Scan (0x184f)
--            Handle range: 0x0074-0x0086
--            UUID: Published Audio Capabilities (0x1850)
--            Handle range: 0x0087-0x0096
--            UUID: Audio Stream Control (0x184e)
--
--This shows the local device's own GATT database as seen by the remote.
--To reconstruct the remote device's database, focus on the TX requests
--and RX responses (the local device acting as client).
--
--Building the Attribute Table
-------------------------------
--
--To reconstruct the GATT database, extract the discovery responses and
--organize them into a table. Using the trace above as an example, the
--remote device at address 00:11:22:33:44:55 has:
--
--**Services** (from Read By Group Type Response)::
--
--    Handle Range    UUID                            Service Name
--    ──────────────  ──────────────────────────────  ────────────────────────────
--    0x0001-0x0009   0x1800                          Generic Access Profile
--    0x000a-0x0011   0x1801                          Generic Attribute Profile
--    0x0012-0x0014   0x180a                          Device Information
--    0x0015-0x0039   0x184c                          Generic Telephony Bearer
--    0x003a-0x0059   0x1849                          Generic Media Control
--    0x005a-0x005c   0x1855                          Telephony and Media Audio
--
--**Characteristics** (from Read By Type Response, within GAP 0x0001-0x0009)::
--
--    Handle  Value Handle  Properties  UUID    Name
--    ──────  ────────────  ──────────  ──────  ────────────────────────────────
--    0x0002  0x0003        Read        0x2a00  Device Name
--    0x0004  0x0005        Read        0x2a01  Appearance
--    0x0006  0x0007        Read        0x2a04  Peripheral Preferred Conn Params
--    0x0008  0x0009        Read        0x2aa6  Central Address Resolution
--
--**Characteristics** (within GATT 0x000a-0x0011)::
--
--    Handle  Value Handle  Properties       UUID    Name
--    ──────  ────────────  ───────────────  ──────  ────────────────────────────
--    0x000b  0x000c        Indicate         0x2a05  Service Changed
--    0x000e  0x000f        Read, Write      0x2b29  Client Supported Features
--    0x0010  0x0011        Read             0x2b2a  Database Hash
--
--**Descriptors** (from Find Information Response)::
--
--    Handle  UUID    Name
--    ──────  ──────  ────────────────────────────────────
--    0x000d  0x2902  Client Characteristic Configuration
--
--The CCC descriptor at handle 0x000d belongs to the Service Changed
--characteristic (0x000c), because it falls between that value handle
--and the next characteristic declaration at 0x000e.
-+.. include:: btmon-gatt.rst
- 
- .. include:: btmon-smp.rst
- 
--- 
-2.53.0
 
+  Commit: 15e0d85021e6dab3546f960a4a900231b8380be2
+      https://github.com/bluez/bluez/commit/15e0d85021e6dab3546f960a4a900231b8380be2
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-12 (Thu, 12 Mar 2026)
+
+  Changed paths:
+    A doc/btmon-connections.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split Connection Tracking into btmon-connections.rst
+
+Move the CONNECTION TRACKING and HCI ERROR AND DISCONNECT REASON CODES
+sections into a standalone file and replace them with an RST include
+directive.
+
+
+Compare: https://github.com/bluez/bluez/compare/2d5745dafdbd%5E...15e0d85021e6
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
