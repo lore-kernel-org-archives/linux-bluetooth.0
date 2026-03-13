@@ -1,128 +1,171 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C9131F9A5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Mar 2026 11:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED682DA755
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Mar 2026 12:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773400671; cv=none; b=fOQXdoVhZTg7KQgZMfBxyIwtrH9yVX0j7NToB02J4/SqPi6V6P0MYaB7S1/CJzSWXdbmy+KaXBZP+4Ew62hY3KV5tusyr8LDEPbQYntzP0ihnNOzcepAzX+rlv3jbRjzdQpEAile1NvvYCwg54JXpTPj6E7pG18aTOF8GHbbuPE=
+	t=1773403333; cv=none; b=QnbIxwrewxJLjx/VCOiPKruCqU7GsA8fvVsrexgwHJk8nZP4w/Vr9rt29Hpwy1eHOMqavRgQmqjlp6Cv6XqDG4PP6bbpRqsQqbDsFsJ2eu7lIMDjGdTZej24Mn3gkGuEJaY40o+guYa6YF3g8AjNJrmiFOhK0mCx/Ko1hlmvVuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773400671; c=relaxed/simple;
-	bh=/hO3HYQMcexGe15VyzU9YMmSTuSeGQw6eQ0Wm1+FV1g=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ZHjIpm1ZkuIaVjN1tC3OlrAI3B1fYPrYmk1rUFOOANsbTPkXxM3eQkqrRV0zn5hUQ12Rxwnxg1v8tzzGImas2d9pyVbXwURgq4YEEUicpjpi5gtoroJXr93WjaTW8Jqd1XwCKF3FbbgpdbcPt4SnLgcVE/6VPas3GghwZqTgsM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gixl0aFD; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773403333; c=relaxed/simple;
+	bh=aDC3Usxs7zxLRzmTsJrKrI9VqfDkhg5LJkjW4l9NMd4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=PV7S49uEcXHC7iwApVqiMSLBhiXPU69Urv1RPZCcn60+4YejrSU40KUI3rYtpI9oySb/5R4jirgxITvNJ5lDph1b2smu8K6ssnh1CP/yOd9MKN8dulCfBohsJAu1UhVS+iHtInWxbdPmF/KBPC9CgkWAoBjTXKHr97wVZ/3hvS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=TaWPu62/; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gixl0aFD"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-505a1789a27so11332571cf.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Mar 2026 04:17:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773400669; x=1774005469; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jFZ8fXeBcWy2LfM6iJRuyI2ikmNdQOEK62O1kBbdLA4=;
-        b=gixl0aFDzIT2Ud3rVwHUWPu5aNdE8O2E0pZx2lmpsJdYYkEeBGxXzuX9iWdpualO3k
-         RTs3R6kID7MqK8FN8kjbsLkGBxTdMjP4Vf0YpyGIs2F8ISeaoXF2cCpEnp1Jqg/zWYYx
-         Qdg5f9VE4WFu4uZob0YYU2yFDIIslRYUEpVd00nfxDl+6m22SWHJw0MVDDcWDX0ei8er
-         cbfQ+kFQGVy69gtzZ4SRfaH8avynF85cKe4kR93x3iUCoScwcimSjdk1aUAQmCSxpCKY
-         NvE+0A14q05OZd5XaUjfvHsQVfRJLZ2JuyOQHoF7rUSMOYTx3jUoQk/pIUrGOOP7eLlW
-         1NgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773400669; x=1774005469;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jFZ8fXeBcWy2LfM6iJRuyI2ikmNdQOEK62O1kBbdLA4=;
-        b=QstFS+GecUw38fhMoOBSmYCWVBaSvqv4nvPfvvXht5x+hLq0Gh4Mz2Yp6I4DY1Thlj
-         m/dBBY0m1LUhsGb4keVR9bzBzKzsrg8O2zg+iVvdDNO4ODNH0IK1i03BfizFhWQWgFzk
-         0qQEkbfVP0ut839/lgC/mCRi0hx/etG13EtOF/axmmPKZIdYnXE3bukhWXFDfuwralkb
-         w0GAbgfq9PwyZp2j6kTLc1A8NSCJXjMwMW/D2AkcIS2VCFtrQ6FzrlS1f+wHhj0lDkHb
-         4layQCiMln2jvZnSoBKwLJS8TRACplIpvlrWcgVllhiBg1lsdS7IRk5wOWiwXx91Lem3
-         WwLA==
-X-Gm-Message-State: AOJu0YwKMxvlZS/TDork3jyWnRDQZ/vVL1E5CTLkXzSAPdpvBoB6y/Do
-	zZina9lNtD7BTumHw4sehiNds3rFoB7UTGcpzPEs3L/r0OmLirrihvC+Yw+XVQ==
-X-Gm-Gg: ATEYQzzP3BRigE2On1Y3MoCYd9B6hPdpHPvARbFTC8asAM62nNpJjDd0B9CZFQEWpfJ
-	kpxlvrs+WLsikhC7a/cTNId/2hFcKxskHOTbyYqXzHrgmBKFyeBnTlEyHs8G0Vh8HaA3DF1tLUu
-	QdZPH1uoAjneM5Ux5Y2pPPDCIVtVDUMTwvwC8iCJnlWSLCGeXiNUGDyaf3w/dIwEvPZoDBYWd45
-	lt81rBOZ8od2LkBJqEeTG8Jf54PqIbyqzZKZEgFWASRRQ6D4hIG2DDwF6MuAeMtTy0VZXlUf4Zi
-	iGbnFw9vunNYqY0qkjs1kRB3t4BLeYX6UfwRWeiNYlVOwougxX+yoi68dOwkvEZL/mgWshVMK95
-	d8bj4vVpfAJ/qLEnG5RobUi0wzrJrVqTJBIBKsTVKJZ9H6CgWIGiUpCJAf4Lzjp6ZF/DW5ZOy+u
-	kd1XH5WgqoLtc7vNkhv5EROber+mj/Wg==
-X-Received: by 2002:a05:622a:60b:b0:509:45fc:c88c with SMTP id d75a77b69052e-50957d09944mr35294771cf.19.1773400669296;
-        Fri, 13 Mar 2026 04:17:49 -0700 (PDT)
-Received: from [172.17.0.2] ([52.162.137.101])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65cfc409sm54987776d6.35.2026.03.13.04.17.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Mar 2026 04:17:48 -0700 (PDT)
-Message-ID: <69b3f25c.d40a0220.24ca0b.7b64@mx.google.com>
-Date: Fri, 13 Mar 2026 04:17:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1950178520944332981=="
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="TaWPu62/"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260313120201epoutp03f9b56f8995de88e0ee155008a0418353~cZOzdcyBB1042910429epoutp03f
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Mar 2026 12:02:01 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260313120201epoutp03f9b56f8995de88e0ee155008a0418353~cZOzdcyBB1042910429epoutp03f
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1773403321;
+	bh=JtR/tPeSjnEA5n1/nVAdVMKstWMFoX0nTClR5rknjbY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TaWPu62/htJ3XdAKer59Hhz4spyu0bAggfW1LcNnfTeFnJ0uw80JpNszPnXQmkgTv
+	 axsGFxKDg2CI57rIocQHlNklxyssTvS6HLjTDridkltlx0V7tJkPp79W0NKRPxnNEm
+	 +pvEnjXCrKx4Yhh8W5/dEi3P+z4QKrBMmCeHdrvA=
+Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
+	20260313120201epcas5p4c5ed216958483e3a0b69aa46e9f75c82~cZOzKiW651634516345epcas5p4B;
+	Fri, 13 Mar 2026 12:02:01 +0000 (GMT)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39]) by
+	epsnrtp02.localdomain (Postfix) with ESMTP id 4fXNQ12vJLz2SSKY; Fri, 13 Mar
+	2026 12:02:01 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20260313120201epcas5p3e57284d5bb295b1f9040478d96fa95b9~cZOy-NYdi1116711167epcas5p3X;
+	Fri, 13 Mar 2026 12:02:01 +0000 (GMT)
+Received: from localhost.localdomain (unknown [109.144.5.214]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260313120200epsmtip1a98a36650dea4a213fd1391d2f30717d~cZOyf1Zf32933729337epsmtip1M;
+	Fri, 13 Mar 2026 12:02:00 +0000 (GMT)
+From: Tailu Shi <tailu.shi@samsung.com>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: Tailu Shi <tailu.shi@samsung.com>, Marcel Holtmann
+	<marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Paul
+	Menzel <pmenzel@molgen.mpg.de>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: ISO: add timestamp for outgoing HCI ISO
+ packet
+Date: Fri, 13 Mar 2026 20:01:54 +0800
+Message-Id: <20260313120154.1254129-1-tailu.shi@samsung.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <6b523ff37391a685be2fc08ee88e1fbde3a2142b.camel@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, raghavendra.rao@collabora.com
-Subject: RE: client: add bluetoothctl broadcast-name helper
-In-Reply-To: <20260313101805.46784-2-raghavendra.rao@collabora.com>
-References: <20260313101805.46784-2-raghavendra.rao@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260313120201epcas5p3e57284d5bb295b1f9040478d96fa95b9
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20260313120201epcas5p3e57284d5bb295b1f9040478d96fa95b9
+References: <CGME20260313120201epcas5p3e57284d5bb295b1f9040478d96fa95b9@epcas5p3.samsung.com>
 
---===============1950178520944332981==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Pauli,
 
-This is automated email and please do not reply to this email!
+Thanks for the detailed review and for sharing your RFC patches.
 
-Dear submitter,
+On Wed, 11 Mar 2026 18:24:23 +0200 Pauli Virtanen wrote:
+> These timestamps are in controller clock domain, so generic host like
+> Linux appears to need to perform clock synchronization via
+> HCI_OP_LE_READ_ISO_TX_SYNC to be able to provide timestamps.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1066232
+I agree that, according to Core v6.2 Vol 6 Part G Section 3, the timestamp
+must be derived from the Controller's clock. However, Section 3.3 also defines
+a falllback where the controller decides the CIS/BIS event when the
+host‑supplied timestamp is not based on the Controller's clock. It looks
+contradictory.
 
----Test result---
+Section 3.3 further states that the host may retrieve the timestamp via
+HCI_LE_Read_ISO_TX_Sync command. The wording makes it optional. And also
+as you have noted, many controller returns 0 for it, leaving the practical
+challenges to make it work properly.
 
-Test Summary:
-CheckPatch                    PENDING   0.41 seconds
-GitLint                       PENDING   0.33 seconds
-BuildEll                      PASS      21.33 seconds
-BluezMake                     PASS      650.00 seconds
-MakeCheck                     PASS      18.82 seconds
-MakeDistcheck                 PASS      252.05 seconds
-CheckValgrind                 PASS      299.86 seconds
-CheckSmatch                   PASS      363.83 seconds
-bluezmakeextell               PASS      185.51 seconds
-IncrementalBuild              PENDING   0.42 seconds
-ScanBuild                     PASS      1046.56 seconds
+That's why we considered leaving it to the userspace application.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+> I had in the works a not fully finished patch series adding the same
+> thing + LE Read ISO TX Sync + tests. I sent these now to the list in
+> their current state, maybe they are useful if you are working on this
+>
+> https://lore.kernel.org/linux-bluetooth/cover.1773245666.git.pav@iki.fi/T/
+> 
+> https://lore.kernel.org/linux-bluetooth/cover.1773245672.git.pav@iki.fi/T/
+> 
+> The tests pass, but not really tested to satisfaction on real
+> controllers.
+> 
+> From what I saw, it seems several controllers like Intel AX210 and some
+> Realtek ones don't implement LE Read ISO TX Sync correctly (returns 0
+> timestamp), so in those cases it AFAICS it's not possible to provide
+> host timestamps.
+> 
+> Getting the clock sync via LE Read ISO TX Sync to work properly across
+> controllers is maybe not so easy, as it appears the Core Specification
+> is somewhat unclear how it should work.
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+I have reviewed the series you posted and I think it both complete and
+elegant. Since my earlier work is now covered by your commit (08692f3...),
+I will withdraw my patch.
 
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+I've cherry-picked your series and kept the PipeWire logic that passes the
+timestamp via BT_SCM_PKT_ISO_TIMESTAMP CMSG. The implementation works on my
+platform (based on the Kernel 7.0.0-rc1, BlueZ 5.85 and PipeWire 1.5.84).
+The timestamp can be observed in the btmon trace.
+
+Partial HCI parsed by Wireshark:
+ Frame 32436: 72 bytes on wire (576 bits), 72 bytes captured (576 bits)
+ Bluetooth
+ Bluetooth Linux Monitor Transport
+ Bluetooth HCI ISO Packet
+     .... 1010 0000 0101 = Connection Handle: 0xa05
+     ..10 .... .... .... = PB Flag: Complete SDU (0x2)
+     .1.. .... .... .... = Timestamp present: True
+     0... .... .... .... = Reserved: 0x0
+     ..00 0000 0100 0100 = Data Length: 68
+     Data
+     [Connect in frame: 9436]
+ Bluetooth ISO Data
+     Timestamp: 469412333us
+     Sequence Number: 3595
+     .... 0000 0011 1100 = SDU Length: 60
+     SDU
+
+Please feel free to add the following Tested-by line if it helps:
+Tested-by: Tailu Shi <tailu.shi@samsung.com>
+
+May I know if you have any plan to merge this series? And also please feel
+free to let me know if there's anything I can help to move this forward.
+
+> This sends timestamps in host clock domain and has no clock sync, but I
+> guess this is just for testing.
+
+I think it's better to have a complete implementation solution. So if possible,
+I would like to improve it and push it forward. Please feel free to let me
+know if you have any other opinions.
+
+> I think these are not needed, they can be passed as arguments to
+> iso_send_frame().
+> 
+> Adding them to iso_pinfo() probably causes a data race if two processes
+> sendmsg() at the same time.
+
+Thank you for identifying this potential data race issue. It was not considered
+in the current patch, and I will incorporate your suggestion in future development.
+
+> I would put this in a separate function.
+
+Agreed. It will make code clear. I will keep this code style in future development.
 
 
+Thank you again for the detailed review!
 
-https://github.com/bluez/bluez/pull/1961/checks
+Best regards!
 
----
-Regards,
-Linux Bluetooth
-
-
---===============1950178520944332981==--
+Tailu
