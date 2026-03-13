@@ -1,48 +1,82 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF761DF248
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Mar 2026 09:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1806C309F1D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Mar 2026 10:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773395955; cv=none; b=BQJ4K5kbpOkFU02nK8eCrDayZ76y8doYNXMmno40j9JpwfrV2oJ8izCGEJULagQl/Wh8VhCG66jyLJqhY0XlFVRTqbp7+KD8mc27HfXd8wbNuL/ygKsLRY09r83Qs8sjGosaE2sXuJk/cbcj3gFkJMYg2cCkZ8USvcndF8H9Co8=
+	t=1773397162; cv=none; b=OpvGGgbkpVsrQFGdKhiBqERqUHg4NsfIHINW2JWkOXzIgAyTTJMCpg2Dm9RVlIoGC05anOOMRTcOJoHx15RB78aclwCtcQbNTjUgNoq2iRpZfjQXMas04AQ6RV5sAgSjUhmLtQ1Nk+aDM5OHozr/CrcSkIEaE1zDk842yyhvlZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773395955; c=relaxed/simple;
-	bh=UNvH/O1in6FEjlZ7DghI9xUztn+lXlO5Mrf6QmBkh9U=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iXvDk+jmvTLqXsxak264tnbuVVNvEtEx9t90zdXK5wHCmDxaX12c9WZdb70CTqtCP+jUTWrztAEfzUxiSP3d7zrtiDfFY5njNNSWK0QUsaOnbIr4pRePaoFXu+1C75GhlZTS1yhw75K9YVmeWdzOH2exbByKvOt926vFTWJ2/hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dylpD0Zv; arc=none smtp.client-ip=192.30.252.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1773397162; c=relaxed/simple;
+	bh=rDlR1R5pHP5D3uldpREn/18L40Lo7uxBXqgYSWAXZGc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SiN5dylGyM3l6XT2ag9mi43m9d7TkAioxhIo5SCbMxpFZ+ok2Gd6yuyl38Z/bnk2t0jW0GgVqE1vSEnUtkyepK2aAPeDmHJrNqKDPHYdnTulGtOzhHvLPdlBXLkRbhVcKgUXA07qB7lxzkvRSROzKU3co6ks5//JZVQB1NFYvSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=M36JBmsD; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dylpD0Zv"
-Received: from github.com (hubbernetes-node-b416239.va3-iad.github.net [10.48.200.76])
-	by smtp.github.com (Postfix) with ESMTPA id 7879A1C11D0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Mar 2026 02:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1773395953;
-	bh=GgqbQ61QjjPeH5NvyIf7yVEuwCE5hzeuRIU1dHyExfI=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=dylpD0ZvKeyS7ncInpvOUh6mY1tbii/A7oh8kwepnEyjlPOMIRG/SsD3HjHaZl2XX
-	 Lc3lHqY99VNmnSqyBAxZxpcZLO5uHl27jtqCJdmlqLnQIgZRhmwGXPRx34A4cDOM4p
-	 SU/Qrm27FnnSB1mx28EeWYeCoCGSxuM1cYmd4QDQ=
-Date: Fri, 13 Mar 2026 02:59:13 -0700
-From: BluezTestBot <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="M36JBmsD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1773397157;
+	bh=rDlR1R5pHP5D3uldpREn/18L40Lo7uxBXqgYSWAXZGc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=M36JBmsDjfFBRHYUVH67t3pqytOKIHXnQiwAzHKHT9aiY8VfvB327ZQqnLbjHHV3R
+	 59WqihKIsZIQbDpHoEjJZgsj4OdrJ1T69SYk3ew2uOFc2p77INOF9WyrX/m9tkW8DD
+	 mghYQWdxgo81TYZkV/uLYb5yA5zbzYWYzEFG/ttYXrPlHafIx+WLGLqyjQ9Hpnh7yJ
+	 VxWP8Yzc+0lJx9DgAE6/WMKPG3Azsu80XydU44W65V/ohyuJr7g9/eMNOoKhebdXvN
+	 UZrR1wNSlyMkMJiT0S++sj/mzNmkiwz4JWUFIJVbori8Z81MxLqPObGauM3nDKmAZy
+	 AZsOeN5ShjmKg==
+Received: from fedora.localdomain (unknown [49.37.146.119])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: raghavendra)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1D8F917E026C;
+	Fri, 13 Mar 2026 11:19:15 +0100 (CET)
+From: raghava447 <raghavendra.rao@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1053057/95aab8-000000@github.com>
-Subject: [bluez/bluez]
+Cc: raghava447 <raghavendra.rao@collabora.com>
+Subject: [PATCH BlueZ 0/1] client: add bluetoothctl broadcast-name helper
+Date: Fri, 13 Mar 2026 15:48:04 +0530
+Message-ID: <20260313101805.46784-1-raghavendra.rao@collabora.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1053057
-  Home:   https://github.com/bluez/bluez
+This patch adds a bluetoothctl advertise helper for BLE Audio
+Broadcast Name staging.
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+The new `broadcast-name <string>` command stages the provided string
+through the existing raw advertising Data field using AD type 0x30.
+
+This patch:
+- reuses the existing advertisement staging/update flow
+- supports multi-word names
+- makes sure that the empty input is rejected
+- adds the relevant bluetoothctl advertise documentation describing the
+  new command.
+
+Testing:
+- built client/bluetoothctl
+- verified AD type 0x30 staging
+- verified multi-word names
+- verified empty-string rejection
+- verified coexistence with `data 0x30 ...`
+
+
+raghava447 (1):
+  client: add advertise broadcast-name helper
+
+ client/advertising.c           | 52 ++++++++++++++++++++++++++++++++++
+ client/advertising.h           |  1 +
+ client/main.c                  |  7 +++++
+ doc/bluetoothctl-advertise.rst | 18 ++++++++++++
+ 4 files changed, 78 insertions(+)
+
+-- 
+2.52.0
+
