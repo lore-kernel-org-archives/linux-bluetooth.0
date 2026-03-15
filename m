@@ -1,158 +1,219 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6521C19CD0A
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Mar 2026 11:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F9534EEE7
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Mar 2026 12:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773573514; cv=none; b=Fi1HZmFr8VxuxBuspfyNEgYy3qxUOWe/haIWqplWSCbi6oxqlaHwPzgLF/lyHH4ZlboVh2pJc5MHv9SI++7AJeB5VSaiAV6isFo9UHm6x2wvAeVPlm1afODobv5ttx8/yRVtdSmPHuX/oRkgT8tF8DXbBzmTyOAzo0ZiudFQqLo=
+	t=1773577427; cv=none; b=YT5AJTnRDr+AsOJ8VEtaurMqm7J1ociHhPMhQn8cgEP5lHY4HcPhwamQrmY1RLBENq1IIXEhJLvl/7mnaG4qgRfX69NDc1Yt76f19FkArj6id2RaLRKzSIsFrvNXTyAxizWYOg6zhCu+x5mFyFcZqYVeZ4Dc9jS9MEfOPZz8Bf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773573514; c=relaxed/simple;
-	bh=En/8g7nnRNllqvYbWgWkb9v+SdxDj4tBl39OZEilIeE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=c20hfoy9fN7v11tYsyF6tCkf+IHIGfiT4u4bZDbtrmYvVmquaen+gMoJJT76So39mrxF7F21bpSSx+xAHuhxl+NnnxkzkPGg8IAA0GQKRpW9i7kUVkZXx1MrOKTMSiSGZu38wJkB2nMk/eMik/oynG3Zyl+93dIhif2CitPLbIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l1wrqjFD; arc=none smtp.client-ip=209.85.160.175
+	s=arc-20240116; t=1773577427; c=relaxed/simple;
+	bh=mTsAFaXacqnW48UkKN6ehxn0iOX+CEp8wT75dIpaAmY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sA/d5r3Pfv5aryrztM9UVSOOsOhdgur4odZb2x6b7+YgIjYswKyJudc5gOWYyKOhOAXb3zZQSToxeHNH+542WMY9x3TAx37g/ddS6TjQ8vBf3Uw9OB6/ah8wDcjynACf/XeAfaSHYXuVSlkwSCvpGUaZY0E8ynzeunXaS3a60b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PqOiWl3R; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l1wrqjFD"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-509149ab7d7so30691831cf.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Mar 2026 04:18:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PqOiWl3R"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c7384f5a9cdso1499380a12.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Mar 2026 05:23:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773573512; x=1774178312; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ta9Aq2gGaKDRP7d1X09CPZ8EqgKBHV4z4EtWoeYXneo=;
-        b=l1wrqjFDFY8qrnntHHeDLRxhzJ49OksA3z1mcNVKy7YuzE1zw3cu1GPOLoqrO1ldZA
-         PE7ImCmB/Sp1IHYd29WUUBaYyndfhpLS7ivnDgQyVSZjXwkGH9SpLWQbsMIizr5nh/6e
-         Rzz9WuSe7gAv00zFi5aJ6uWQIuCYIysPNemDL3+r8z/bRWoD5xOfANPm76sJmkdy6Kh1
-         zsmAuud6SCWxBaHC21+XkQK8OquJLU7/InJtX4S2O6NarZ2udKi8LEBilr8lsVjHDKZK
-         IJ9xlA0Cv7JrkC4rCBMYBC+eQ7EfERgheKl+VNF2x49fAQ2P+JjJMV4mhLAK9LHCSq/v
-         sU7w==
+        d=gmail.com; s=20230601; t=1773577424; x=1774182224; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ev7olukrabSeI4uImqOW82xjRpOYvekb7Hyttgv7/9Q=;
+        b=PqOiWl3RJkTIRK/FtDQ70zUr/hGR+DcqoR61LtGGrcdCgOHg1G9X7jhOXflZEt+aDs
+         hFYfT82ZYD3SnGPXiQMqHcRIrLgUDCH9UnzpOzWba/NsvV2aJs9e3+yC7x5/8AMVTpX0
+         BWuJCgh+9SY/Jr0Ayh2qgiyp7+dZPvUa7XDtTyoW7sbXbu2/jVLtn67D966VYVNNmHRe
+         ZeHSvqpNXFBC+P7gaYUwQ8DlhqMWj6mEhtdv7YNq98J37kgEmOkCA1WUMk9eYoPSWEBE
+         Ml+qOWglfLDpu89BxIaZhtuwySBCDh6CXVsgJLQ7WXyTc1Vnot0lTFZtImUcqks3i9b3
+         io4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773573512; x=1774178312;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1773577424; x=1774182224;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ta9Aq2gGaKDRP7d1X09CPZ8EqgKBHV4z4EtWoeYXneo=;
-        b=ssas/bnAkUkCsAcYAXB03+LNHv4uBiCChag6dc7q51g4MJ0A9bxhqExLrqnIcYAVC/
-         D4VZJ4nBBQrq3OlUg74xkkMqIK0jmncmjYNe+lK9HrJd4fC9bRYVDXcDbcQeVgPWGL5z
-         WsMxiSVPJJ8iwAnU/2OH2ctEMHMnLBx3i1U4whJWCFvsvU1DYuDFC4okv2/11egfjJpy
-         ak668qkh/50ZasE0msEsRfWpUYUK8bEOTbkdUbtY394U7g3JtrC6uzLea+3E8MXcr8Fl
-         yGpcdlvo7Rtd18maV9dXgqF8Q8FFT5F9fzs7xqf0WggEeqKgi7Cgkd4LCmCb0Bu4hwsu
-         ieVQ==
-X-Gm-Message-State: AOJu0Yx9txG6DdcYBymOOglMGC6GNLiD4BYtPbJn+Ph7LLt0jx34j8IR
-	LbGLf5lIRaZ0HRcYPqdaO0KLmD5vYKO1OL4HtFrrKrQoenlSpmE6MzweaCuOcw==
-X-Gm-Gg: ATEYQzyuobVEBsVwfZ9FP0KcQIHchaPofIsS0wt+SltFAC05p/ThWOX2ewv796gcOaC
-	l7ectWTVIBUS1vmdwC+/27A1DSA/7znx63Ul68691zM7BBFrANhnRlPJhN9Z4jHBfkm4moGFPWQ
-	9dVJMQEgAD+Qh4xntG0NS1P113fbRae1LZDiE64ihtTH3MfLEQJuRgsPm9bOmocRFXQKb22Thr+
-	v8FCD6Q5z267V7eh0xK82Nq8frwgfZIRovkeGIj1zALOdvdRgXFhyyyzT3C3jITvLst6qqn2+Gv
-	YZ4ITCItWOkYwo76jSIGHQb/4PF5NBlApMrDU7dhtuqEKS9YOH2fItouNUdcxrcEPLPFpYSUeMh
-	+84CZlf9hYiP3awZrqTRG65pLlrrBfhnBCXwVuH7vQqlVQCmB+7RdnA2PnYkQqGQGcWig0qsDDD
-	GEyHwnXx3hqDfS3zwk8pKbJBZwCtcY0w==
-X-Received: by 2002:a05:622a:60d:b0:4f1:b742:35c2 with SMTP id d75a77b69052e-50957d12848mr116476861cf.22.1773573512169;
-        Sun, 15 Mar 2026 04:18:32 -0700 (PDT)
-Received: from [172.17.0.2] ([172.203.38.240])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89c45c272d9sm19608826d6.3.2026.03.15.04.18.31
+        bh=Ev7olukrabSeI4uImqOW82xjRpOYvekb7Hyttgv7/9Q=;
+        b=NznWA6viX6sh3g81EuNG+FZkx8XRh0EEsNY66cmBNHGfssIslroG0DdgBenUUqtKZ6
+         fkyu13b6ixuKhTEupbzZ5d5uvFvW/6k6lncmfIHh3XHtDgwogEuFDZmiVn5/37YOJk4v
+         qx6qLoAFeE038zmbGLfVcxl/1s0NTRudjOIh+fKsPCPD3LE+gp1UzK7Qlek3/dDRLIRw
+         Cj14ZAgVIWomYQQFtWwb73HnC12PNSfy6GKHxqVrS3Z0CxcJ0R1+g22EzeHuIaZSJrh8
+         5oDe3WarzAY/zmEqZqadFokv863sXfV3d1nwGoJvpE5j0aNnNDuqG2vCTIAKrx+ehX2C
+         586Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVaKC2uKTTIey3sIv/0WS9XDgvpfxoiVzanp3j1TU+jqYu4laxHDfO71bCtlsfOLyfv/AKIXLVRgPWrckm6jPY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydMgjhRSdL6uym78ORqPMDMhXpKjAny4VuTnBY3kls9gHltLHi
+	j8s3JrUkERNVrDr6Cl18UEVTiq0txGYvBDhYoRXLXbAG5UDEYdqiflie
+X-Gm-Gg: ATEYQzxP+6FRufsV4t7yWh/tvVenGHnYe79qQYL52VL7QEHW6ZEvgGyJO8/eT7gi79S
+	gDqSKaY0r+L+/oMvWJbf3OknY01dklFxUjGNTahUKaUtST5MpjSt8WVhTjOpXuoNxA49BJW9lAW
+	HeiCdJxzQYc46/hF6Q2p4Xs/giO3OWIu6InJOFe0fKHgezKiT2oqPf4Mc7ATfEh435iJImHdw+x
+	KPSiglkbnOZhscLk7lW79l+NouKsIcPBW38cCPhkgVFnQZ9xRpqHC08ASNDJVTL3WcuDAd2ygV3
+	BCw+3Paih2ql+tQBMWrQ8wX/++KUF3xYMCSueK9D11NSSIEATztWx7tBDU0a6IvrP+ItSymuNcl
+	TjBmT3xz4Vo8g7TVktk0oznhu1cYYDGhzfwvEkvJFvFH7wiKsT0YCks3wi5jGN1ZJabWYwpVe6d
+	Do5MnLHMbGrP32lH/H82W2Be2HemNL
+X-Received: by 2002:a17:903:3850:b0:2ae:cb0e:fd5e with SMTP id d9443c01a7336-2aecb0f01cdmr103020325ad.23.1773577424164;
+        Sun, 15 Mar 2026 05:23:44 -0700 (PDT)
+Received: from lavm-prs74opxn5.. ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aece7ee1d8sm81749935ad.55.2026.03.15.05.23.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Mar 2026 04:18:31 -0700 (PDT)
-Message-ID: <69b69587.050a0220.1dbb83.ba5f@mx.google.com>
-Date: Sun, 15 Mar 2026 04:18:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8542455598330708502=="
+        Sun, 15 Mar 2026 05:23:43 -0700 (PDT)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: luiz.dentz@gmail.com,
+	johan.hedberg@gmail.com,
+	marcel@holtmann.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	r33s3n6@gmail.com,
+	gality369@gmail.com,
+	zhenghaoran154@gmail.com,
+	hanguidong02@gmail.com,
+	ziyuzhang201@gmail.com,
+	Cen Zhang <zzzccc427@gmail.com>
+Subject: [PATCH] Bluetooth: hci_sync: annotate data-races around hdev->req_status
+Date: Sun, 15 Mar 2026 20:07:26 +0800
+Message-Id: <20260315120726.2772382-1-zzzccc427@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, mohd.abd.6602@gmail.com
-Subject: RE: [v2] Bluetooth: hci_ll: Fix firmware leak on error path
-In-Reply-To: <20260315105138.1693-1-mohd.abd.6602@gmail.com>
-References: <20260315105138.1693-1-mohd.abd.6602@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8542455598330708502==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+__hci_cmd_sync_sk() sets hdev->req_status under hdev->req_lock:
 
-This is automated email and please do not reply to this email!
+    hdev->req_status = HCI_REQ_PEND;
 
-Dear submitter,
+However, several other functions read or write hdev->req_status without
+holding any lock:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1066882
+  - hci_send_cmd_sync() reads req_status in hci_cmd_work (workqueue)
+  - hci_cmd_sync_complete() reads/writes from HCI event completion
+  - hci_cmd_sync_cancel() / hci_cmd_sync_cancel_sync() read/write
+  - hci_abort_conn() reads in connection abort path
 
----Test result---
+Since __hci_cmd_sync_sk() runs on hdev->req_workqueue while
+hci_send_cmd_sync() runs on hdev->workqueue, these are different
+workqueues that can execute concurrently on different CPUs. The plain
+C accesses constitute a data race.
 
-Test Summary:
-CheckPatch                    PENDING   0.31 seconds
-GitLint                       PENDING   0.22 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      26.00 seconds
-CheckAllWarning               PASS      28.36 seconds
-CheckSparse                   PASS      31.97 seconds
-BuildKernel32                 PASS      25.34 seconds
-TestRunnerSetup               PASS      558.92 seconds
-TestRunner_l2cap-tester       PASS      29.29 seconds
-TestRunner_iso-tester         PASS      82.40 seconds
-TestRunner_bnep-tester        PASS      6.39 seconds
-TestRunner_mgmt-tester        FAIL      115.38 seconds
-TestRunner_rfcomm-tester      PASS      9.65 seconds
-TestRunner_sco-tester         FAIL      14.87 seconds
-TestRunner_ioctl-tester       PASS      10.42 seconds
-TestRunner_mesh-tester        FAIL      12.47 seconds
-TestRunner_smp-tester         PASS      8.82 seconds
-TestRunner_userchan-tester    PASS      9.44 seconds
-IncrementalBuild              PENDING   0.50 seconds
+Add READ_ONCE()/WRITE_ONCE() annotations on all concurrent accesses
+to hdev->req_status to prevent potential compiler optimizations that
+could affect correctness (e.g., load fusing in the wait_event
+condition or store reordering).
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.104 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.767 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_conn.c |  2 +-
+ net/bluetooth/hci_core.c |  2 +-
+ net/bluetooth/hci_sync.c | 20 ++++++++++----------
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 4719dac07190..81c4df0ade0f 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -3095,7 +3095,7 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 	 * hci_connect_le serializes the connection attempts so only one
+ 	 * connection can be in BT_CONNECT at time.
+ 	 */
+-	if (conn->state == BT_CONNECT && hdev->req_status == HCI_REQ_PEND) {
++	if (conn->state == BT_CONNECT && READ_ONCE(hdev->req_status) == HCI_REQ_PEND) {
+ 		switch (hci_skb_event(hdev->sent_cmd)) {
+ 		case HCI_EV_CONN_COMPLETE:
+ 		case HCI_EV_LE_CONN_COMPLETE:
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 31308c1de4ec..01f8ceeb1c0c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4126,7 +4126,7 @@ static int hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
+ 		kfree_skb(skb);
+ 	}
+ 
+-	if (hdev->req_status == HCI_REQ_PEND &&
++	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND &&
+ 	    !hci_dev_test_and_set_flag(hdev, HCI_CMD_PENDING)) {
+ 		kfree_skb(hdev->req_skb);
+ 		hdev->req_skb = skb_clone(hdev->sent_cmd, GFP_KERNEL);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 121dbc8208ec..335ec52a8e99 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -25,11 +25,11 @@ static void hci_cmd_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
+ {
+ 	bt_dev_dbg(hdev, "result 0x%2.2x", result);
+ 
+-	if (hdev->req_status != HCI_REQ_PEND)
++	if (READ_ONCE(hdev->req_status) != HCI_REQ_PEND)
+ 		return;
+ 
+ 	hdev->req_result = result;
+-	hdev->req_status = HCI_REQ_DONE;
++	WRITE_ONCE(hdev->req_status, HCI_REQ_DONE);
+ 
+ 	/* Free the request command so it is not used as response */
+ 	kfree_skb(hdev->req_skb);
+@@ -167,20 +167,20 @@ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 
+ 	hci_cmd_sync_add(&req, opcode, plen, param, event, sk);
+ 
+-	hdev->req_status = HCI_REQ_PEND;
++	WRITE_ONCE(hdev->req_status, HCI_REQ_PEND);
+ 
+ 	err = hci_req_sync_run(&req);
+ 	if (err < 0)
+ 		return ERR_PTR(err);
+ 
+ 	err = wait_event_interruptible_timeout(hdev->req_wait_q,
+-					       hdev->req_status != HCI_REQ_PEND,
++					       READ_ONCE(hdev->req_status) != HCI_REQ_PEND,
+ 					       timeout);
+ 
+ 	if (err == -ERESTARTSYS)
+ 		return ERR_PTR(-EINTR);
+ 
+-	switch (hdev->req_status) {
++	switch (READ_ONCE(hdev->req_status)) {
+ 	case HCI_REQ_DONE:
+ 		err = -bt_to_errno(hdev->req_result);
+ 		break;
+@@ -194,7 +194,7 @@ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 		break;
+ 	}
+ 
+-	hdev->req_status = 0;
++	WRITE_ONCE(hdev->req_status, 0);
+ 	hdev->req_result = 0;
+ 	skb = hdev->req_rsp;
+ 	hdev->req_rsp = NULL;
+@@ -665,9 +665,9 @@ void hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
+ {
+ 	bt_dev_dbg(hdev, "err 0x%2.2x", err);
+ 
+-	if (hdev->req_status == HCI_REQ_PEND) {
++	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND) {
+ 		hdev->req_result = err;
+-		hdev->req_status = HCI_REQ_CANCELED;
++		WRITE_ONCE(hdev->req_status, HCI_REQ_CANCELED);
+ 
+ 		queue_work(hdev->workqueue, &hdev->cmd_sync_cancel_work);
+ 	}
+@@ -683,12 +683,12 @@ void hci_cmd_sync_cancel_sync(struct hci_dev *hdev, int err)
+ {
+ 	bt_dev_dbg(hdev, "err 0x%2.2x", err);
+ 
+-	if (hdev->req_status == HCI_REQ_PEND) {
++	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND) {
+ 		/* req_result is __u32 so error must be positive to be properly
+ 		 * propagated.
+ 		 */
+ 		hdev->req_result = err < 0 ? -err : err;
+-		hdev->req_status = HCI_REQ_CANCELED;
++		WRITE_ONCE(hdev->req_status, HCI_REQ_CANCELED);
+ 
+ 		wake_up_interruptible(&hdev->req_wait_q);
+ 	}
+-- 
+2.34.1
 
---===============8542455598330708502==--
