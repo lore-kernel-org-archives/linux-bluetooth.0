@@ -1,118 +1,138 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B44B3988EE;
-	Mon, 16 Mar 2026 13:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773667835; cv=none; b=dMmWbQcH9JXXE3dVUgMNW4DFLAhgCEZhhlhpCenx9HwWxkTmE1uTzwVMrvrtGunNs1VrPWP5rZM4lkGQSP7FsIOJODAJxpbrEmTA5eCCzSOxYC5y/ou/ovFowog2PpdEUnuaZZ3pNPDtvj+wqVD6PA4W2aQFgtQyVmbqVOi490o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773667835; c=relaxed/simple;
-	bh=12QmHVFW6kvGAsAEHlRgc6k9FaOX+eCOvB+1XSjB85g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bbj9i3OmX6tLHsLG9LsVUer8BMIseUV+cewr4p5b4W0GLlnwPuU7seL8aE/at0nXm72aSd8dJNxLetLzuHHuYyH1LmmKQGBoR67oCN6y9fm4gvzOaf7ZCgi6tFdE7Nt15YoWXaTLjQ3vkM5D8UeKzGqO7h9DPbsmd2QLdRgsNKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 357291477;
-	Mon, 16 Mar 2026 06:30:25 -0700 (PDT)
-Received: from [10.57.61.116] (unknown [10.57.61.116])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D4953F778;
-	Mon, 16 Mar 2026 06:30:22 -0700 (PDT)
-Message-ID: <2c7466f5-d952-4356-9b55-9d2ebb3471f2@arm.com>
-Date: Mon, 16 Mar 2026 13:30:19 +0000
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46C139A041
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Mar 2026 13:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773668268; cv=pass; b=NXSSPDxQ3odn8bD2euP9DvK9SM2xrxoCv8roGZCzdtj1mKNmAEZzKitLNpD1nbh8itLLigFeiI/wgHiof5n31NLqw3+hsaiVMMyHbpyDxAU7ploktFEug1JH+Ph0rmipVMUoZe+KDFOOZiyEN4Q80gM7nFfOKWqN6ssuZ8SRFCg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773668268; c=relaxed/simple;
+	bh=ZQbJdw4m7a7vr9wG2YCSdkMWBugt8y6G8mKfL4tly3A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OrwC/el8HA3bRdqEPGR9F3ZUX4lyG9KxQ3pRcTSGmRgdMytiEpzJZ+xuneKv1CPV2caHqlvKu+bTUJs0qEa4Q3RyZB7eifh76J6Zkr4OFhse3kpNB8PIhohLCEjwmvbSalHW2FsAzBRGGPkt83m8HZ+fJFEBuVSWWd072V6I+90=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KVRCXpDS; arc=pass smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KVRCXpDS"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-64c9a6d6b70so3747039d50.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Mar 2026 06:37:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773668267; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TnrKb3O3gkzutqKOvO131z2kBGswCq1/t9KCt2y/hcDPGg9G/Se3nm3xDOb0pR6Yut
+         9kkDxmdGC1BHzHsSHZSzLE6yixqJwGBB6xv50mN2Qvae8SNX24GYDMSU/X1COjRjuq1E
+         RaFaDiqfakCG5wYwoJOFxI6j9Z2K7b/xr1cfT2CCoT8qj/Npk212O5blZlXDSv27dUzf
+         N62BAdL9IixBjxDrZaltmjfasJRA+Zv2kqNL1e6+BezKxNI086c6NcC0r2omzPXvtpzE
+         QCx0HqnMjCIjMwGygkjCG/0uvi3x8fvYb51a7MMBUr9vswgjfv/VyJrKoT60FKeqO65U
+         8Ggw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZQbJdw4m7a7vr9wG2YCSdkMWBugt8y6G8mKfL4tly3A=;
+        fh=AE/deCm8l1jGpeAuwk+JoIx4YWXoq/5XlnkrXft/D50=;
+        b=emKOXar2Y7bQsSQBR74FsUctlJTFr7BxxXj2c/QhVeMmBTbDnJuOg/iCKzbVjn+Ks9
+         ZL9+a3mzaZntC3LdHe/RpL9KNIiU3w/fvLMmOdLBd0mNihSHAVRVR0eLB+npr2s4/IH+
+         X5g3rBeIxx+r4K8D/WaZfKmCbm9OQ5TzxUlQJxslc/5nPBz5VA8muRS5Oq6quAyxOoX8
+         asfTYgL+1xz/Y/XB/ajP2+26elEiDIDCPjoAwO/odMrmCQZhg0Of3upQj+lMl8swL27T
+         AVwa7U5TgyASvO89cfFG+nl6nLKfDCSuApEi8avpc66J3TaZ6ZXhOSSbhLGH7gFVyuzq
+         oNvQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773668267; x=1774273067; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZQbJdw4m7a7vr9wG2YCSdkMWBugt8y6G8mKfL4tly3A=;
+        b=KVRCXpDSDq5NJXZZRWqJCrOgdE4UNQk36Zmcd2X7xIpbDJhZ5XMmk0UY7RyqSwLFTU
+         VXpMCoU49JPz6iwfnmvoiPy7Gn1QxfLV4VDGUE1GgaNSzyDpLXjf/0c2VLN/cvMprtFl
+         /HTys2QOAEEaoComgFubzW3pCk1nD4b5YmpSajjL1DHHVbVv0AYHb3Ax9pK3c0W+CaEt
+         U0chCqtOIX5snK3Lh8bhv0K2j7J4NS4NkwgeWlzw+7wP6PjyKrsfLl6/wceONfuPj37X
+         dBadPiFSogrgq/gFeGGh+2BZvXoyETE5WpvCDsZ8prZGqyT969nOI2gVTxFcu3P2c5zi
+         nKVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773668267; x=1774273067;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZQbJdw4m7a7vr9wG2YCSdkMWBugt8y6G8mKfL4tly3A=;
+        b=KAYGEhOx6V1gJQ9djfqpDgetsNZ7Iv2mmrduiheA7smCX3zBwrWcxyjV5+jOZzTwjO
+         HLHluojpZwuulmDOkptKetPeQBxX/i8IENMPoNcmFlQCEM967NHIVVGJIhb/8bKxUzjB
+         d14x54wewWbB8SWOdoRFbw2VHx0KOCIRyl1SWBu0Z5VtN6fkzFaXAPkdc0J8JUuSeqUx
+         bviho/4/Gg5AW99qud3PDrpCQZR80A7+nBez6ESO1A4gzF4NmpXPrPq9RfsXUfpyZv3u
+         onqGCkRHkF5jnCS4oq39E6SxdxrOBIHqeEJhbqobyDqh4bwYpj0ZcLtxtwtFUU/za7CZ
+         Rb8w==
+X-Gm-Message-State: AOJu0Yy472U7ToMB6R66P6MVQJjiU9bKE7M3s+N3Hpb20c8xSuuOusLz
+	SIOKazm3re3urvn+r+Qkg3w/HKCkGs2f9BQG4ScjeWSF9xCcPMM3OeL1ILKNepeJRoQ+JYLYSbD
+	rQkgUvP42UuCzVWrt2H0P/jabREsiG9f76TcHKZ0=
+X-Gm-Gg: ATEYQzwG1sqV5rRwoZC+y9vmiqhShW7hoxa+PY4OYIBks1hGgwvbtJ2yfBN/wkPWnqx
+	Fh9cT7oJmLtrBxe+i3/1II4Btu2BARrIB2PiJr2X5S6fpcXoAUlI/ytaxPyWXkr2KvzBzoeb3HM
+	lK33X5tsD4J50H6ElV6Y3hJZgyPqaKAIQLb7HUiKSwjAr2m/n2y4EPh6ToKen7gzbD4VXVh1cg2
+	WeW7d6itFZyNk9n2RSLUDy2b2k2jcklRvf/HwJ8QP7UU4bh0vLd7eHX8TE+B5Z8l5yLgiungVPo
+	Jr8E+qy0qQJ1uVn1Da7cux/vtA+LIRbL44D/wR/btq3v6dko+niNG8Q5TiBp8bxD9Fw=
+X-Received: by 2002:a05:690e:ca:b0:64a:d672:dafb with SMTP id
+ 956f58d0204a3-64e62f59bc7mr10734861d50.8.1773668266553; Mon, 16 Mar 2026
+ 06:37:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 50/61] iommu: Prefer IS_ERR_OR_NULL over manual NULL check
-To: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
- apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org,
- cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
- gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
- intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mm@kvack.org,
- linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
- linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
- sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <20260310-b4-is_err_or_null-v1-50-bd63b656022d@avm.de>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20260310-b4-is_err_or_null-v1-50-bd63b656022d@avm.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CABBYNZL3W4+eF5ap7dS9ZSPmYkTLgmAEJ0H=OkC04x0LfXuqLA@mail.gmail.com>
+ <20260315194407.13904-1-joanbrugueram@gmail.com>
+In-Reply-To: <20260315194407.13904-1-joanbrugueram@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 16 Mar 2026 09:37:34 -0400
+X-Gm-Features: AaiRm522YGnUJeXBGw7loaBvQ8NVLPghHbWdJSWDyuBtNp80Ntjh4o6XGfRKzkg
+Message-ID: <CABBYNZ+reKNjLhs5f_xjqdDP-jz3jjkoDpm67XUOw7QUjhKTmA@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: L2CAP: Fix not tracking outstanding TX ident
+To: =?UTF-8?Q?Joan_Bruguera_Mic=C3=B3?= <joanbrugueram@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com, 
+	Linux regression tracking <regressions@leemhuis.info>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2026-03-10 11:49 am, Philipp Hahn wrote:
-> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> check.
+Hi Joan,
 
-AFAICS it doesn't look possible for the argument to be anything other 
-than valid at both callsites, so *both* conditions here seem in fact to 
-be entirely redundant.
+On Sun, Mar 15, 2026 at 3:44=E2=80=AFPM Joan Bruguera Mic=C3=B3
+<joanbrugueram@gmail.com> wrote:
+>
+> Hi Luiz,
+>
+> > > I had trouble connecting my Bluetooth headphones on Linux 7.0-rc1,
+> > > and a bisect landed me on this commit 6c3ea155e5ee. A revert fixes it=
+.
+> > Weird, there shouldn't be any logical difference but perhaps it's
+> > device-specific. Can you collect the btmon traces? Actually it would
+> > be great to have the before and after traces for comparison.
+>
+> I have attached btmon traces (bad/good) to the open Bugzilla bug.
+> (https://bugzilla.kernel.org/show_bug.cgi?id=3D221120), hopefully they
+> are helpful in diagnosing the issue.
+>
+> I have also done experiments and found that the regression goes away
+> if the IDs are not re-used, for example by commenting out the `ida_free`
+> line, or by replacing `ida_alloc_range` (returns smallest available ID)
+> with `idr_alloc_cyclic` (returns all IDs before wrapping around).
 
-> Change generated with coccinelle.
+Interesting, I didn't consider that the implementation would care
+about reusing the identifier as long as it is not outstanding, but if
+making it cyclic resolves the issue, that's probably the case.
 
-Please use coccinelle responsibly. Mechanical changes are great for 
-scripted API updates, but for cleanup, whilst it's ideal for *finding* 
-areas of code that are worth looking at, the code then wants actually 
-looking at, in its whole context, because meaningful cleanup often goes 
-deeper than trivial replacement.
+> Though I'm not sure if that is just masking a Kernel bug (e.g. IDs
+> getting released/reused too early), or if that's necessary for my
+> hardware to not get confused by the same IDs being quickly reused.
 
-In particular, anywhere IS_ERR_OR_NULL() is genuinely relevant is 
-usually a sign of bad interface design, so if you're looking at this 
-then you really should be looking first and foremost to remove any 
-checks that are already unnecessary, and for the remainder, to see if 
-the thing being checked can be improved to not mix the two different 
-styles. That would be constructive and (usually) welcome cleanup. Simply 
-churning a bunch of code with this ugly macro that's arguably less 
-readable than what it replaces, not so much.
+Even if it is a bug in the remote side I guess we don't want to just
+break support, we will just need to make sure using idr_alloc_cyclic
+doesn't break L2CAP/COS/CED/BI-29-C qualification test.
 
-Thanks,
-Robin.
+> Regards,
+> - Joan
 
-> To: Joerg Roedel <joro@8bytes.org>
-> To: Will Deacon <will@kernel.org>
-> To: Robin Murphy <robin.murphy@arm.com>
-> Cc: iommu@lists.linux.dev
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
-> ---
->   drivers/iommu/omap-iommu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/iommu/omap-iommu.c b/drivers/iommu/omap-iommu.c
-> index 8231d7d6bb6a9202025643639a6b28e6faa84659..500a42b57a997696ff37c76f028a717ab71d01f9 100644
-> --- a/drivers/iommu/omap-iommu.c
-> +++ b/drivers/iommu/omap-iommu.c
-> @@ -881,7 +881,7 @@ static int omap_iommu_attach(struct omap_iommu *obj, u32 *iopgd)
->    **/
->   static void omap_iommu_detach(struct omap_iommu *obj)
->   {
-> -	if (!obj || IS_ERR(obj))
-> +	if (IS_ERR_OR_NULL(obj))
->   		return;
->   
->   	spin_lock(&obj->iommu_lock);
-> 
 
+
+--=20
+Luiz Augusto von Dentz
