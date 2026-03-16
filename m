@@ -1,72 +1,35 @@
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115BE3ED136
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Mar 2026 19:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7303ED135;
+	Mon, 16 Mar 2026 19:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773688208; cv=none; b=OKfXCg6sHeHISKEaKjJAyphMdmKARepJEyQC1Tlcb2rUEF1EQPI05vx28jY6iAPC80OxwjNeJiRBPdEujLcjV0a6+oP0uGV/zlOrTfMUsj/4RqkisrbJusEL8QZubF41vitvPLn1ovju/uO9dZQAjCeA8LLunzB0C4eH03npi5Q=
+	t=1773690180; cv=none; b=tBiTZSPQorlJ37EO1FmaTEybyAg2G2h5xrkwwRx7BaNiPJx1wZTvOY2PwOPkcBsluczTTYFPbiHKL9xa+HWGnVhXtZXsvb9SRwyoK9K2RIYzhRwxPy+a2UhiBAMXAXrlFORBJnJc45W2vYm2d2oGbwsdBMhJ5XY8FTwuBNCy3hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773688208; c=relaxed/simple;
-	bh=GVb0ztjOUXWnrH5NexARCwkrEFPZVrjoVppR3xf+STc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U44doR8aGebc5IOhW8l7HFZcFpmmMC8IxwrkLuCCreSmyM+ma4vse+/IXlb42XTzhtwZGRipEPglzDMbNoydJlFLgB/yQ/f4rBa4s76mTVSG/f6jScZeIzod9/QT4jxA0agWdilh5UXTEW+gFSrNCxcU9cFY63xcu4A2wsnHDBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dzy449kX; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773690180; c=relaxed/simple;
+	bh=Jj6BbcYzraXFOQXQwjXzFEHRPAjsRRQvZZ0ky/jjEPQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=OJoaRbE9Tj5VbEHFb3VuYD/OeLQDMfVZXMsDgcDfJLOtc0tvpKmL/u2gkc32Ql1CNjRD81Z8AnvOegm3bIHf/zJX+woJqHe103mnxNPuuWCxzQk0kdmLgounqAl9bLf4RHxj9onXQUFTS7YbByKc7apMJER4ALK8a5fTKylNNdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C3HhHyZ5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dzy449kX"
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5674d8be45eso1885966e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Mar 2026 12:10:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773688206; x=1774293006; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BQimjbrXgpkN01+pztM5a7uiBs+raarAuuNJUaUsAFM=;
-        b=dzy449kXxP9BDG+JbQdn0l9SLkKJkFi7ZJ03SnEMFYRC0lA4qtSGY7UKsCQZCX3fAp
-         E1taCEROIEYkxDFi5i+SQX8VDg07CmltDFXc+M4JF9ZKlLUffnddlBYl6UImd/CGt8kf
-         lY0Colps3lRdb1QAC5OluHFi98pBiJbXoGVA/MWmydvOybKKzljsiit5o6kjZetBgbAm
-         O5XdwmEhEg5OJD82TUzmst816bhAVYzvmULrU5Gm6GVS/Z+AMIj9YSHedOJ8SwTr8CzU
-         cSX6EdMDiNLXy7uRipZDBA3yJ0OniEa71RUhgewu9esu77ppKeFTqa6vzTL0uq+3JkmU
-         BlcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773688206; x=1774293006;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BQimjbrXgpkN01+pztM5a7uiBs+raarAuuNJUaUsAFM=;
-        b=F9z9T09F0K7pvgKBLtksAzGtX1YqIfL6UO2xIZa4BdLtRpGs4YUcVfZ35VfaVyBUhd
-         vZr5XPSjoCQe2Ld9UbykmO3V8W52gLnekWdQjqNoKqm662NViis+pMioqlVJWxtL2Mr7
-         kY2peJckLnatGrMhKpnpk6e4UXfwyGa1OehpOfiaV8HhIauFMy2jnNP7+docQWoGEfBI
-         9XBn8gFlFvwHiIPs/9zk52S2kPsB35Of9WeUBI2ylxCoIZfI884VKUevGVvVR6a/K6QX
-         7QaCqEbRVQGQOw2xwn0qNk6wal0IlzyzvdNtWV4fUXvjQyyCRqtFVtfjg+9ACEZgZqA8
-         CJrg==
-X-Gm-Message-State: AOJu0YwjS8aGvLKsThFKoPrZKhzqY6IOeU/2mBUF+i/66YlQu8x0Z3HN
-	9ozeJAyiIsgV2Pl3JjToRI7GT+xl0/Y5f1SY08JteFv7wEejXRarJqo+TLH5ccJu
-X-Gm-Gg: ATEYQzzSWLomt8KGzetduzk49Ectg+sSuuSjClbAGLC6eFPTh6QD+kO4JISaicU6XAe
-	TKCFPEiTOmcdBPPV/DbXo89IomaqmhbIhs79qAF3hwsMRZgSyYk3naiCc5YERqmFTYziy6CzfMm
-	tQ57xbDB1COUeiGpPHAkRO2nyShpZylXUHgF69NkR0Jt1TesiG4y4+qffyA2qmwAmXJXpCyGO0v
-	PNm1w+m1V5Edzw7jdOpOkm2c3g+QSnXmWfMbTNvrEBFF/BCY1JtUqsxAeAwvBCRg7F/A+OEfQ42
-	6XjVqD+9yx/OiWzBL12I0beh1wtXHasyocJ1IRxEQZPyY1CNSuA9C4C980Nz8llzxDvYxekHvna
-	GwtS2GfFIsM4hnYnjgEkowptiGoNHvQprkrEdtlguu4Nsd3lsHJYsmRPfEn5din1UTHVdwEtkLx
-	mE/MVkvAehlS8gisTgA9+VZkxdIrFKs+P0z8SM0i2mzt7WM9aN1mJbAHSSmoP4qSvqPQH1a0Uwd
-	ZIFP9/ubnxdCn33+3GMJ5VcKAiU
-X-Received: by 2002:a05:6122:1d91:b0:56a:f979:a9d1 with SMTP id 71dfb90a1353d-56b627e7ec6mr5188039e0c.1.1773688205644;
-        Mon, 16 Mar 2026 12:10:05 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56b6bb4191fsm4695082e0c.1.2026.03.16.12.10.04
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 12:10:05 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 2/2] Bluetooth: MGMT: Fix dangling pointer on mgmt_add_adv_patterns_monitor_complete
-Date: Mon, 16 Mar 2026 15:09:57 -0400
-Message-ID: <20260316190957.8433-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260316190957.8433-1-luiz.dentz@gmail.com>
-References: <20260316190957.8433-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C3HhHyZ5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC1DEC2BCB0;
+	Mon, 16 Mar 2026 19:42:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773690179;
+	bh=Jj6BbcYzraXFOQXQwjXzFEHRPAjsRRQvZZ0ky/jjEPQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=C3HhHyZ54egvtz8+FJBDghgxje6T76yCcWpZHD6G+GktO7Oi7hlX2jZlW/iq13AMM
+	 CT+929EtO+r78lV3oA/zWNrHCqHitEBSTZ6hJvN5hIHM/FF5rU1Pnj5LUgoIw0RDlY
+	 1gYtRSq68tyHSkf9W/PU2YzAOueJ9IacrFdIiZQHbBmKN55mFk20QbDKaqehoW0BUq
+	 PgbZfNWA0qd3QwifvsLNX4D8A9m7A5KDaWJeXZCy360NntjSyYNXHeV5qz6j2+6eI7
+	 WVYw1J3qsj9EbtPn+K2a3NQ4QkOOHbSj0kjF/66rwEqD7dkE9OyHZ0bPOTvnuOCMb5
+	 0IuNmv6+QqzSA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02F8A3808200;
+	Mon, 16 Mar 2026 19:42:54 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,35 +37,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] bluetooth 2026-02-23
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177369017279.3255020.15622951635181819157.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Mar 2026 19:42:52 +0000
+References: <20260223211634.3800315-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260223211634.3800315-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-This fixes the condition checking so mgmt_pending_valid is executed
-whenever status != -ECANCELED otherwise Calling mgmt_pending_free(cmd)
-would kfree(cmd) without unlinking it from the list first, leaving a
-dangling pointer. Any subsequent list traversal (e.g.,
-mgmt_pending_foreach during __mgmt_power_off, or another
-mgmt_pending_valid call) would dereference freed memory.
+This pull request was applied to bluetooth/bluetooth-next.git (master)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Fixes: 302a1f674c00 ("Bluetooth: MGMT: Fix possible UAFs")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, 23 Feb 2026 16:16:34 -0500 you wrote:
+> The following changes since commit d4f687fbbce45b5e88438e89b5e26c0c15847992:
+> 
+>   ovpn: tcp - fix packet extraction from stream (2026-02-21 07:04:08 +0000)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-02-23
+> 
+> [...]
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d52238ce6a9a..e5f9287fb826 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5355,7 +5355,7 @@ static void mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev,
- 	 * hci_adv_monitors_clear is about to be called which will take care of
- 	 * freeing the adv_monitor instances.
- 	 */
--	if (status == -ECANCELED && !mgmt_pending_valid(hdev, cmd))
-+	if (status == -ECANCELED || !mgmt_pending_valid(hdev, cmd))
- 		return;
- 
- 	monitor = cmd->user_data;
+Here is the summary with links:
+  - [GIT,PULL] bluetooth 2026-02-23
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1348659dc92e
+
+You are awesome, thank you!
 -- 
-2.53.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
