@@ -1,65 +1,71 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E1B26F293
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 16:07:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9321A2F25F3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 16:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773763644; cv=none; b=QG6vNF4nMHB0CRN79H7dgbOtWoL4VQFoaqkgJNGjXTw/daSONtLTdcwqGkP8xKKTiGf2u7/ffGPgsLeyoT4G6hBE4XknnbVp9d0Dx8fOZdyDsYQdd6G3WJkhhykLIo7BwTCMEQmDzGXEOKQjU41PTlUY2TAcQ+Be+PslDV6gcNQ=
+	t=1773763661; cv=none; b=Sa3Mrqc543CeE9XMs4a15SnePRucaoMfr88o5o4yF8ZKVO+xI7h/Kef3xhoMH8hdTRGh0z3gyQQ/dq6eRlCnKtyzD9HdtcUhHpnnBlF62ymdt1VfKu4czbKA1AVvWl6tyjzInSPX6ry3d8kl2skVQUFLdBYfwYM5baZgejyQMjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773763644; c=relaxed/simple;
-	bh=wlPY1QPZ2y6MlnArLVtPjZmSV9LTnzN4uKbmslCGEJU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ZCclahNWJZIxMUNiBYsuyP8sDBcF8+W2v+hfsLkeSE5uHcfc0cf5ej25yq1lxjKjXP+v7fMeDbLYJ84Ls7j4/Ob55TXfDaEXBcCoSnDq3aJsz41tEdtgD3bIWBZ6A3WKMCVf0A8QIyFDbj86woCt53m2ICrOvg4rZJDbFDXxrrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Q43p7hiM; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Q43p7hiM"
-Received: from github.com (hubbernetes-node-4b454f7.ac4-iad.github.net [10.52.145.53])
-	by smtp.github.com (Postfix) with ESMTPA id DBB0A640866
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 09:07:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1773763642;
-	bh=wYa5hhlunyOvjPVj1k5ztbn7L7nlq5OaYfuHwEgBVYQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Q43p7hiMihlTCu9sswIZEeXkxoDlOxcMyaldO9iH+rhvi+1glQO/6B5Io0rzz9Pwq
-	 GmJ5QdV9zbzUVudzdPjXhIL/4kXHN9O8rpW3zDaxZ2kIRHSQCVITbEDjnteeNsJYwo
-	 kWcGl7+FZHjilP+cj8E7EIqn6ywOw6erTjRk3HCA=
-Date: Tue, 17 Mar 2026 09:07:22 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/a035be-11d05e@github.com>
-Subject: [bluez/bluez] 11d05e: shared/ad: Fix not checking length on
+	s=arc-20240116; t=1773763661; c=relaxed/simple;
+	bh=OJhzxl3vGfw9Wv7+Vt7jelqganMVmgdI6DCr7lUWDuY=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hU2RiSgjv6/VNkZTN41Lyqj5xEQ5+M+eExB73OPF1h8b+XJC7WQJvB4mlguG6HGK9wLJnBkBQadZZwgM45P4MIiDyEggHBUBuh7VMW16b2tY/IvNP9amPd48fo1/2ZzuFEEk9NqocPf2G+uPzfnb/KsmPmAElyUfqaclCm6sEoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 82A8A3EC43;
+	Tue, 17 Mar 2026 16:07:37 +0000 (UTC)
+Message-ID: <9388604ecf44cfb629f68e25d2357a9772e86dd9.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v1] shared/ad: Fix not checking length on
  ad_replace_name
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 17 Mar 2026 17:07:37 +0100
+In-Reply-To: <20260316204320.57220-1-luiz.dentz@gmail.com>
+References: <20260316204320.57220-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdduieelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfffjghftgfgfgggsehtqhertddtreejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeeuveeivdetkeekgfefffeftefhjeeikeetffdvteejheefieeltedtvdeuleduleenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeekvdetkeetfefgveegfedpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheplhhuihiiuggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvg
+ hgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-State: clean
+X-GND-Score: -100
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 11d05ece674fa1a31da50bf505bf744628ad9078
-      https://github.com/bluez/bluez/commit/11d05ece674fa1a31da50bf505bf744628ad9078
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-03-16 (Mon, 16 Mar 2026)
+On Mon, 2026-03-16 at 16:43 -0400, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>=20
+> iov may carry move then HCI_MAX_NAME_LENGTH in which case it is
+> truncated so it doesn't overflow utf8_name.
+> ---
+> =C2=A0src/shared/ad.c | 3 ++-
+> =C2=A01 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/src/shared/ad.c b/src/shared/ad.c
+> index ac238014bcea..b1d1b84611aa 100644
+> --- a/src/shared/ad.c
+> +++ b/src/shared/ad.c
+> @@ -278,7 +278,8 @@ static bool ad_replace_name(struct bt_ad *ad,
+> struct iovec *iov)
+> =C2=A0	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
+> =C2=A0
+> =C2=A0	memset(utf8_name, 0, sizeof(utf8_name));
+> -	strncpy(utf8_name, (const char *)iov->iov_base, iov-
+> >iov_len);
+> +	strncpy(utf8_name, (const char *)iov->iov_base,
+> +			MIN(iov->iov_len, HCI_MAX_NAME_LENGTH));
 
-  Changed paths:
-    M src/shared/ad.c
+As I mentioned in my review, utf8_name could also have been shrunk by
+one byte.
 
-  Log Message:
-  -----------
-  shared/ad: Fix not checking length on ad_replace_name
-
-iov may carry move then HCI_MAX_NAME_LENGTH in which case it is
-truncated so it doesn't overflow utf8_name.
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+> =C2=A0
+> =C2=A0	if (strisutf8(utf8_name, iov->iov_len))
+> =C2=A0		goto done;
