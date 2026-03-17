@@ -1,222 +1,164 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01413264D6;
-	Tue, 17 Mar 2026 06:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE523815D5
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 07:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773729782; cv=none; b=YqcRpVHp1nkc1XYyo7m9qHJQjxXOAkVs21CFTQsCiSNfBuw6SL1Dv67gpworaYBWn7ZYlHhQSNmw1udVjtsOHX/IU1zFluLsH+gA8Y9YxIap8ktlOQZtyqU2ayOdd09g6HFGtgmdIPGT5SwYhfh3+rPAv5LH2fFlf/ML9AH8EXQ=
+	t=1773730822; cv=none; b=aySJAjWqvxKEvG5xDN5RrNsSLwrPornRfPayx86CYit+MPDNNY2XcWbzdvHmqiPnkQ8ksVXhV6xSLnpS8ix+FrXbpcSKk8f6nt7dw9ntlCSi5tycP62gyi/ToHZ3vAJjToQg3YqsL03+dhhD2koHnRQT97Rkm0+GfQiKD1Am7Yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773729782; c=relaxed/simple;
-	bh=RV36HArRQD5WpIrbL59QzOUQbECg2GUM/eOEhUB92hM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KNqhIjHkA5zdAYWXVZBRGg8Qf0LutVTgF6E+hIM7kfyaP6D2OfQTuXY7dzBKmQ87fixSovpN39rZoCcjsGw8A3CWncwwUduUizHuDOIGQ0hTSvcJnOCz40GkAk2kJpMCh1YKZaSkUiSM3KQlXNYpGBebqHJTcKsp+XeVlPp5RBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HDLoxxDA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773730822; c=relaxed/simple;
+	bh=dwIIqGU6pQhLQ0yAeFRe8wQnUfb1QFdyR7Vk0xbBZLw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=FdWPL/Mna/dMXYmGLkzgKdH7c0yvGwr+nZmQoX5EaLGW7gDYRiuuSiNvTO2Mc8V6UTvqSL4egUXDz7bywDs7ToAKBdLs6eyiHGa8sTHWOpqLiySMRr+n57BLG6rGl4NFo8msi2SkzMf3quJ/7y4NoRWZhXbwC99OAF0qVUXOJCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DE/hReNO; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HDLoxxDA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63198C4CEF7;
-	Tue, 17 Mar 2026 06:42:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773729782;
-	bh=RV36HArRQD5WpIrbL59QzOUQbECg2GUM/eOEhUB92hM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HDLoxxDAvu4KFUNvAqr4AoRhunOfAF7ryj5X+FkO/ws53gVxJpwBMbTZW5AFZUpJR
-	 4hAOlGRX4ydTnfmdQOre3kaAoseauWJfbCaMCo0fGoU21FVGE+jAB40WTbhOMC5+9T
-	 ErNhQvhjHYdHbrfbP63w/qkuLXj6EhEKuDP4RVkKvMpdaJyyJVzi31p95Kq/jmF49E
-	 6F/fNWuSiU2CpW5KhdHIT5uJn5lsaZK7fdOoizcTUyuilvHDlILIZ0TWpgfxU5eX2K
-	 FxuQW09NlZULK7mC9C9aXh1t85izuhK//XTJ6BaUuyiukIIYlxPxM5KtDX4S3h779U
-	 gXw7KOGtZcW0w==
-Date: Tue, 17 Mar 2026 12:12:49 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: manivannan.sadhasivam@oss.qualcomm.com, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Bartosz Golaszewski <brgl@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org, 
-	Hans de Goede <johannes.goede@oss.qualcomm.com>
-Subject: Re: [PATCH v6 9/9] power: sequencing: pcie-m2: Create serdev device
- for WCN7850 bluetooth
-Message-ID: <adtnsxel2lh2hgftqplvd3slfk3x5zx7xyfroxgdbmoz4qticp@lkx6iplaawoe>
-References: <20260317-pci-m2-e-v6-0-9c898f108d3d@oss.qualcomm.com>
- <20260317-pci-m2-e-v6-9-9c898f108d3d@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DE/hReNO"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8c70b5594f4so57249185a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 00:00:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773730820; x=1774335620; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=i2wTxBb4nL5T1kh3wM2Th/ab6XmkJ2L0wTuSQq++FxY=;
+        b=DE/hReNOZfp1GtG2VfMYD7820VsL74w/+ap+Mtqn1fH64k1OMSotVxhMazwsYVSu+/
+         6J71M/iqCZ/Zgr172SdwcNU6d25VJqdA8lXXyq65+s3lO5MdjgZ7wdY75+5AGIRKOD7i
+         eD75oyDQ8rCIb7CTQotuAWRKxylo2wBRtHiBb9roTv5SH5bfbijyLCHV4OzBQXMtxmOg
+         FQZWNOufLBl7kIOXL+LbFGoeO9lodTTVN6qF3MTbNsbkKa/rQXSZUmnsIh4NkzmuUum9
+         N+F1553X+AvHK3dZ2fBGOmRY2MmNpu51w+mScF4u5Cyuut28Wsc07BLOTt2PctlFAQvl
+         7QQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773730820; x=1774335620;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i2wTxBb4nL5T1kh3wM2Th/ab6XmkJ2L0wTuSQq++FxY=;
+        b=suWiAM+NKMsp6+DTKbgvKPSUArSyhgJTjuE3MLmtGQ/mx9IHuLCqNcgCyw19LsZmQz
+         Zk/MclPpZ9Tg64+K+b0RbLS8Avj1c47wEiZXAgZAC0oaW/Xo6impbHrqri1mfMEzo7pF
+         IKGQueJ5U/qk1ddlatQa2fp9uw+sRfnvakqkf3nyFiSRzPPclpLfxLsVW+4FM2E48746
+         dqIwc0zpfuciegEPfdLJm5t6IfBvMX9WDOGkhRaUh7l7j0ys9WdJwWzyvSmUrLknpCRt
+         lu+qdb+QW6ILfnQuKTomEWW1eVP+rG+ZNTGCPqTvJmch329pS6u0YxLOHYkMzfZNnCEt
+         IqPg==
+X-Gm-Message-State: AOJu0YyjXt1HmlJcbHzmmD0AdPsY7E0idty8/wCsPwUFWeM/CwuyYgWt
+	x8ia16csvptrm/A68f0/2hXfgbEr06HMvf9Kw3w55k8r7Zzr2J2EXhyTsq6s0Q==
+X-Gm-Gg: ATEYQzzqLkCzSfy0kbJsBzk6EDGbDgqCBZayjCxAcizq2uBtHLfgKFsjEZzGw8drmIk
+	xq1auKJCJ33VTlwzabElxydb8xWIpkMa0Lfg7ED52/vLK/PlXp9cNQt9nSzMSqPCDUg4QV08Qhi
+	56P2EI8LF8Tnv+MaLVHPQXq59eZQS8HuANmkq2mHHAVWBixoKEoKOaJJatzDilpnWLWBGdMXqAd
+	VXiEr0TMaOQiYiQ5UvN+T1W3UoTcYaYN3g72o4dhkYW/eP8SpeUBUGxcvoeQc+rgaFBHMFZlnHU
+	ac8eJrzBrG0Xmu1X3oS9d103O4z6ohdHOnCjU2c1zozK17NXW+WsIT2q4ejf0wEaO5lGh6fEs0V
+	7Nab223dXlK7qiJ9ix+NXxFfnAw79+6NChaZwwRlIgaxW66NnuenVmHVASwRMcHzKqSwxIkw0WR
+	IkloX8Fiq+u1SQSqlz7NmwP3ktRxj86iZJDsTjiac=
+X-Received: by 2002:a05:620a:4050:b0:8cd:a828:fef7 with SMTP id af79cd13be357-8cde14bcc5bmr290949885a.30.1773730820081;
+        Tue, 17 Mar 2026 00:00:20 -0700 (PDT)
+Received: from [172.17.0.2] ([40.76.117.229])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cda1fbcd23sm1593050385a.1.2026.03.17.00.00.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Mar 2026 00:00:15 -0700 (PDT)
+Message-ID: <69b8fbff.050a0220.a09fb.a440@mx.google.com>
+Date: Tue, 17 Mar 2026 00:00:15 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6884394527225419745=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260317-pci-m2-e-v6-9-9c898f108d3d@oss.qualcomm.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, moonafterrain@outlook.com
+Subject: RE: Bluetooth: btintel_pcie: validate RX packet length against buffer size
+In-Reply-To: <SYBPR01MB7881DD95CE054BC53AED4A21AF41A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+References: <SYBPR01MB7881DD95CE054BC53AED4A21AF41A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 17, 2026 at 09:59:59AM +0530, Manivannan Sadhasivam via B4 Relay wrote:
-> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> 
-> For supporting bluetooth over the non-discoverable UART interface of
-> WCN7850, create the serdev device after enumerating the PCIe interface.
-> This is mandatory since the device ID is only known after the PCIe
-> enumeration and the ID is used for creating the serdev device.
-> 
-> Since by default there is no OF or ACPI node for the created serdev,
-> create a dynamic OF 'bluetooth' node with the 'compatible' property and
-> attach it to the serdev device. This will allow the serdev device to bind
-> to the existing bluetooth driver.
-> 
-> Tested-by: Hans de Goede <johannes.goede@oss.qualcomm.com> # ThinkPad T14s gen6 (arm64)
-> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> ---
->  drivers/power/sequencing/Kconfig          |   3 +-
->  drivers/power/sequencing/pwrseq-pcie-m2.c | 178 +++++++++++++++++++++++++++++-
->  2 files changed, 177 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/power/sequencing/Kconfig b/drivers/power/sequencing/Kconfig
-> index f5fff84566ba..55aeef125e6f 100644
-> --- a/drivers/power/sequencing/Kconfig
-> +++ b/drivers/power/sequencing/Kconfig
-> @@ -37,7 +37,8 @@ config POWER_SEQUENCING_TH1520_GPU
->  
->  config POWER_SEQUENCING_PCIE_M2
->  	tristate "PCIe M.2 connector power sequencing driver"
-> -	depends on OF || COMPILE_TEST
-> +	depends on (PCI && OF) || COMPILE_TEST
-> +	select OF_DYNAMIC
->  	help
->  	  Say Y here to enable the power sequencing driver for PCIe M.2
->  	  connectors. This driver handles the power sequencing for the M.2
-> diff --git a/drivers/power/sequencing/pwrseq-pcie-m2.c b/drivers/power/sequencing/pwrseq-pcie-m2.c
-> index 3507cdcb1e7b..77357439ba81 100644
-> --- a/drivers/power/sequencing/pwrseq-pcie-m2.c
-> +++ b/drivers/power/sequencing/pwrseq-pcie-m2.c
-> @@ -12,9 +12,11 @@
->  #include <linux/of.h>
->  #include <linux/of_graph.h>
->  #include <linux/of_platform.h>
-> +#include <linux/pci.h>
->  #include <linux/platform_device.h>
->  #include <linux/pwrseq/provider.h>
->  #include <linux/regulator/consumer.h>
-> +#include <linux/serdev.h>
->  #include <linux/slab.h>
->  
->  struct pwrseq_pcie_m2_pdata {
-> @@ -30,6 +32,9 @@ struct pwrseq_pcie_m2_ctx {
->  	struct notifier_block nb;
->  	struct gpio_desc *w_disable1_gpio;
->  	struct gpio_desc *w_disable2_gpio;
-> +	struct serdev_device *serdev;
-> +	struct of_changeset *ocs;
-> +	struct device *dev;
->  };
->  
->  static int pwrseq_pcie_m2_vregs_enable(struct pwrseq_device *pwrseq)
-> @@ -172,13 +177,176 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
->  	return PWRSEQ_NO_MATCH;
->  }
->  
-> -static void pwrseq_pcie_m2_free_regulators(void *data)
-> +static void pwrseq_pcie_m2_free_resources(void *data)
->  {
->  	struct pwrseq_pcie_m2_ctx *ctx = data;
->  
-> +	serdev_device_remove(ctx->serdev);
-> +	bus_unregister_notifier(&pci_bus_type, &ctx->nb);
-> +	of_changeset_revert(ctx->ocs);
-> +	of_changeset_destroy(ctx->ocs);
->  	regulator_bulk_free(ctx->num_vregs, ctx->regs);
->  }
->  
-> +static int pwrseq_m2_pcie_create_bt_node(struct pwrseq_pcie_m2_ctx *ctx,
-> +					struct device_node *parent)
-> +{
-> +	struct device *dev = ctx->dev;
-> +	struct device_node *np;
-> +	int ret;
-> +
-> +	ctx->ocs = devm_kzalloc(dev, sizeof(*ctx->ocs), GFP_KERNEL);
-> +	if (!ctx->ocs)
-> +		return -ENOMEM;
-> +
-> +	of_changeset_init(ctx->ocs);
-> +
-> +	np = of_changeset_create_node(ctx->ocs, parent, "bluetooth");
-> +	if (!np) {
-> +		dev_err(dev, "Failed to create bluetooth node\n");
-> +		ret = -ENODEV;
-> +		goto err_destroy_changeset;
-> +	}
-> +
-> +	ret = of_changeset_add_prop_string(ctx->ocs, np, "compatible", "qcom,wcn7850-bt");
-> +	if (ret) {
-> +		dev_err(dev, "Failed to add bluetooth compatible: %d\n", ret);
-> +		goto err_destroy_changeset;
-> +	}
-> +
-> +	ret = of_changeset_apply(ctx->ocs);
-> +	if (ret) {
-> +		dev_err(dev, "Failed to apply changeset: %d\n", ret);
-> +		goto err_destroy_changeset;
-> +	}
-> +
-> +	ret = device_add_of_node(&ctx->serdev->dev, np);
-> +	if (ret) {
-> +		dev_err(dev, "Failed to add OF node: %d\n", ret);
-> +		goto err_revert_changeset;
-> +	}
-> +
-> +	return 0;
-> +
-> +err_revert_changeset:
-> +	of_changeset_revert(ctx->ocs);
-> +err_destroy_changeset:
-> +	of_changeset_destroy(ctx->ocs);
-> +
-> +	return ret;
-> +}
-> +
-> +static int pwrseq_m2_pcie_notify(struct notifier_block *nb, unsigned long action,
-> +			      void *data)
-> +{
-> +	struct pwrseq_pcie_m2_ctx *ctx = container_of(nb, struct pwrseq_pcie_m2_ctx, nb);
-> +	struct pci_dev *pdev = to_pci_dev(data);
-> +	struct serdev_controller *serdev_ctrl;
-> +	struct device *dev = ctx->dev;
-> +	int ret;
-> +
-> +	/*
-> +	 * Check whether the PCI device is associated with this M.2 connector or
-> +	 * not, by comparing the OF node of the PCI device parent and the Port 0
-> +	 * (PCIe) remote node parent OF node.
-> +	 */
-> +	struct device_node *pci_parent __free(device_node) =
-> +			of_graph_get_remote_node(dev_of_node(ctx->dev), 0, 0);
-> +	if (!pci_parent || (pci_parent != pdev->dev.parent->of_node))
-> +		return NOTIFY_DONE;
-> +
-> +	switch (action) {
-> +	case BUS_NOTIFY_ADD_DEVICE:
-> +		/* Create serdev device for WCN7850 */
-> +		if (pdev->vendor == PCI_VENDOR_ID_QCOM && pdev->device == 0x1107) {
-> +			struct device_node *serdev_parent __free(device_node) =
-> +				of_graph_get_remote_node(dev_of_node(ctx->dev), 1, 1);
+--===============6884394527225419745==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Typo. This should be:
+This is automated email and please do not reply to this email!
 
-	of_graph_get_remote_node(dev_of_node(ctx->dev), 3, 0);
+Dear submitter,
 
-Bartosz, could you please fix it while applying?
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1067754
 
-- Mani
+---Test result---
 
--- 
-மணிவண்ணன் சதாசிவம்
+Test Summary:
+CheckPatch                    PENDING   0.33 seconds
+GitLint                       PENDING   0.22 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      26.42 seconds
+CheckAllWarning               PASS      28.71 seconds
+CheckSparse                   PASS      27.52 seconds
+BuildKernel32                 PASS      25.53 seconds
+TestRunnerSetup               PASS      573.77 seconds
+TestRunner_l2cap-tester       PASS      28.55 seconds
+TestRunner_iso-tester         FAIL      36.80 seconds
+TestRunner_bnep-tester        PASS      6.50 seconds
+TestRunner_mgmt-tester        FAIL      115.39 seconds
+TestRunner_rfcomm-tester      PASS      9.53 seconds
+TestRunner_sco-tester         FAIL      14.39 seconds
+TestRunner_ioctl-tester       PASS      10.27 seconds
+TestRunner_mesh-tester        FAIL      12.58 seconds
+TestRunner_smp-tester         PASS      8.90 seconds
+TestRunner_userchan-tester    PASS      6.87 seconds
+IncrementalBuild              PENDING   0.47 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
+Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.105 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.676 seconds
+Mesh - Send cancel - 2                               Timed out    1.992 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6884394527225419745==--
