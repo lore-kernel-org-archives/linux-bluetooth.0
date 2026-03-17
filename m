@@ -1,149 +1,114 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp86.cstnet.cn [159.226.251.86])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C334C3A5E76
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 10:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95F63A451B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 10:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773741704; cv=none; b=L6jCAsxHF/lm4ydBHAneAVmbhG3PoNJsyJpfKz9Gka9ywGh2BBKS7Tdi5m/jO/1HWTdPMu2OsBi+7cdXCeTW+rtJQRBlcPA6V037xiwJ8jhYmzcbH0OvZ8gIxgfeGjJWV6t+MNLpvK3UAgxOJlaxqImzyt0h5XBq/zUHoQ7Tivw=
+	t=1773742642; cv=none; b=Aslu7pn/+r3+TAKe5BhItoXkDQZah4yjTXr/EU86zMVreHLom1haoJCtsYJBrdwsgLfJv5H0RWo8gX7mjaI2tvX1NOTnKzH4NeNTObcl5PbNjw7F5RTUEO8kj32vDbGWjaN9FvRmcHRx1B47dOkTTELnJXIqYh1I1Qrqjw9gJbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773741704; c=relaxed/simple;
-	bh=g/2gq8MhfhRsJaazRpX6U/r6uj/VyZc0k/zaN6cBAiI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bk2Ox5+xZgYedN96Ka0b4lRWUs1WkKWtynfZ0f6JVfIA6g3cjAOF/Y/DPy0vWQ+F1p4EjABXYDk8YMH0LDMTN8NWRBkQpn4LxoGmTXY8E9IGBxt+tfHyRtL81jSsmFhf7ElHBBQGGROEFYHtxyhmnQiy2Qj6XufDpasHbHh4MbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id C62B0582793
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 09:50:12 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C1F553E97A;
-	Tue, 17 Mar 2026 09:50:03 +0000 (UTC)
-Message-ID: <d054c110dc64a6278e052259bc315d442828228c.camel@hadess.net>
-Subject: Re: [BUG] `ad_replace_name()` copies AD name payloads up to 254
+	s=arc-20240116; t=1773742642; c=relaxed/simple;
+	bh=7u2LNeEcNFmcTOC10rwOAG+zAt5p3ggpeOlsp778n8c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=hdfUCMxKCkue1qxal1otiRxo2K27+2nhHJLnm8Q1Q6UOv6rsK76BbXpac1N74lafgqgTYnZUi7YyQMYF4euuvbR2vdvGVB8yv0/ePSnzS2oiISmjdMC6et2IK5IeXefKJuLE2AodoSJmw9h75NSqcd0Mv5HtehRZToue2FYIZrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from pengpeng$iscas.ac.cn ( [111.196.246.205] ) by
+ ajax-webmail-APP-16 (Coremail) ; Tue, 17 Mar 2026 18:17:09 +0800
+ (GMT+08:00)
+Date: Tue, 17 Mar 2026 18:17:09 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5L6v5pyL5pyL?= <pengpeng@iscas.ac.cn>
+To: "Bastien Nocera" <hadess@hadess.net>
+Cc: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Re: [BUG] `ad_replace_name()` copies AD name payloads up to 254
  bytes into `utf8_name[250]`
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- =?UTF-8?Q?=E4=BE=AF=E6=9C=8B=E6=9C=8B?=
-	 <pengpeng@iscas.ac.cn>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 17 Mar 2026 10:50:03 +0100
-In-Reply-To: <CABBYNZ+PDWDN2Bn8=Trwu3PP4_qYzKa0P4tj0aqGNYu_zSFqrA@mail.gmail.com>
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.1-cmXT5 build
+ 20240627(e6c6db66) Copyright (c) 2002-2026 www.mailtech.cn cnic.cn
+In-Reply-To: <d054c110dc64a6278e052259bc315d442828228c.camel@hadess.net>
 References: <1d62d5cd.57f7e.19cdb8402e8.Coremail.pengpeng@iscas.ac.cn>
-	 <CABBYNZ+PDWDN2Bn8=Trwu3PP4_qYzKa0P4tj0aqGNYu_zSFqrA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+ <CABBYNZ+PDWDN2Bn8=Trwu3PP4_qYzKa0P4tj0aqGNYu_zSFqrA@mail.gmail.com>
+ <d054c110dc64a6278e052259bc315d442828228c.camel@hadess.net>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftddtleegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepieffgfehtedtgefgjeeggfffgeeuvdegveekveejfeekkedujeehteffueefffeunecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepveduhfehheefgfeljeetpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepfedprhgtphhtthhopehluhhiiiguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtohepphgvnhhgphgvnhhgsehishgtrghsrdgrt
- gdrtghnpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-State: clean
-X-GND-Score: -100
+Message-ID: <2e8a13cf.72bc.19cfb4ca3af.Coremail.pengpeng@iscas.ac.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:sQCowAD3Gq8lKrlprg4YAA--.20805W
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/1tbiCREJBWm5Ce570wABsK
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On Mon, 2026-03-16 at 16:38 -0400, Luiz Augusto von Dentz wrote:
-> Hi,
->=20
-> On Wed, Mar 11, 2026 at 2:12=E2=80=AFAM =E4=BE=AF=E6=9C=8B=E6=9C=8B <peng=
-peng@iscas.ac.cn> wrote:
-> >=20
-> > Hello BlueZ maintainers,
-> >=20
-> > I would like to report what appears to be a real current-head
-> > bounded stack overflow in the advertising-data name parser. I
-> > rechecked current upstream head on 2026-03-10 before writing this
-> > report.
-> >=20
-> > The destination buffer is:
-> >=20
-> > ```c
-> > char utf8_name[HCI_MAX_NAME_LENGTH + 2];
-> > ```
-> >=20
-> > with:
-> >=20
-> > ```c
-> > #define HCI_MAX_NAME_LENGTH 248
-> > ```
-> >=20
-> > so the total stack buffer size is `250` bytes.
-> >=20
-> > The vulnerable copy is:
-> >=20
-> > ```c
-> > memset(utf8_name, 0, sizeof(utf8_name));
-> > strncpy(utf8_name, (const char *)iov->iov_base, iov->iov_len);
-> > ```
-> >=20
-> > The length passed to this helper comes from
-> > `bt_ad_new_with_data()`, where the AD element length is read as a
-> > `uint8_t`, then decremented once for the type byte:
-> >=20
-> > ```c
-> > while (util_iov_pull_u8(&iov, &elen)) {
-> > =C2=A0=C2=A0=C2=A0 ...
-> > =C2=A0=C2=A0=C2=A0 if (!util_iov_pull_u8(&iov, &type))
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto failed;
-> > =C2=A0=C2=A0=C2=A0 elen--;
-> > =C2=A0=C2=A0=C2=A0 ...
-> > =C2=A0=C2=A0=C2=A0 data =3D util_iov_pull_mem(&iov, elen);
-> > ```
-> >=20
-> > So the payload length delivered to `ad_replace_name()` can be as
-> > large as `254`, while the destination buffer is only `250` bytes.
-> >=20
-> > I am deliberately not overstating this:
-> >=20
-> > - this is protocol-bounded, not arbitrary length
-> > - the maximum overwrite amplitude is small, about 4 bytes
-> >=20
-> > But it still looks like a real current-head bug:
-> >=20
-> > - fixed stack buffer of 250 bytes
-> > - copy length can reach 254
-> > - no local guard `iov->iov_len <=3D sizeof(utf8_name)`
-> >=20
-> > The fix seems straightforward: clamp or reject `iov->iov_len >
-> > sizeof(utf8_name) - 1` before the copy, and preserve explicit
-> > termination.
->=20
-> So something like:
->=20
-> diff --git a/src/shared/ad.c b/src/shared/ad.c
-> index ac238014bcea..b1d1b84611aa 100644
-> --- a/src/shared/ad.c
-> +++ b/src/shared/ad.c
-> @@ -278,7 +278,8 @@ static bool ad_replace_name(struct bt_ad *ad,
-> struct iovec *iov)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char utf8_name[HCI_MAX_NAME_LE=
-NGTH + 2];
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(utf8_name, 0, sizeof(ut=
-f8_name));
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 strncpy(utf8_name, (const char *)io=
-v->iov_base, iov-
-> >iov_len);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 strncpy(utf8_name, (const char *)io=
-v->iov_base,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MIN(iov->iov_l=
-en, HCI_MAX_NAME_LENGTH));
-
-In which case you'll want to also shorten "utf8_name" to
-HCI_MAX_NAME_LENGTH+1.
-
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (strisutf8(utf8_name, iov->=
-iov_len))
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 goto done;
->=20
-> > Best regards,
-> > Pengpeng Hou
->=20
->=20
+SGkgQmFzdGllbiBhbmQgTHVpeiwKClRoYW5rIHlvdSBmb3IgdGhlIGZlZWRiYWNrLgoKSSBzZW50
+IGFuIHVwZGF0ZWQgcGF0Y2ggdG8gbGludXgtYmx1ZXRvb3RoIGZvbGxvd2luZyBMdWl6J3Mgc3Vn
+Z2VzdGlvbiBhbmQgYWxzbyB0aWdodGVuZWQgdGhlIGxlbmd0aCBoYW5kbGluZyBzbyB0aGF0IHRo
+ZSBzYW1lIGJvdW5kZWQgbGVuZ3RoIGlzIHVzZWQgY29uc2lzdGVudGx5IGZvciB0aGUgY29weSwg
+VVRGLTggdmFsaWRhdGlvbiwgYW5kIGNvbnZlcnNpb24gcGF0aC4KClBhdGNoIHN1YmplY3Q6CltQ
+QVRDSCBCbHVlWl0gc3JjL3NoYXJlZDogQ2xhbXAgYWR2ZXJ0aXNpbmcgbmFtZSBsZW5ndGgKCgpC
+ZXN0IHJlZ2FyZHMsClBlbmdwZW5nIEhvdQoKCgo+IC0tLS0t5Y6f5aeL6YKu5Lu2LS0tLS0KPiDl
+j5Hku7bkuro6ICJCYXN0aWVuIE5vY2VyYSIgPGhhZGVzc0BoYWRlc3MubmV0Pgo+IOWPkemAgeaX
+tumXtDogMjAyNi0wMy0xNyAxNzo1MDowMyAo5pif5pyf5LqMKQo+IOaUtuS7tuS6ujogIkx1aXog
+QXVndXN0byB2b24gRGVudHoiIDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4sIOS+r+aci+aciyA8cGVu
+Z3BlbmdAaXNjYXMuYWMuY24+Cj4g5oqE6YCBOiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwu
+b3JnCj4g5Li76aKYOiBSZTogW0JVR10gYGFkX3JlcGxhY2VfbmFtZSgpYCBjb3BpZXMgQUQgbmFt
+ZSBwYXlsb2FkcyB1cCB0byAyNTQgYnl0ZXMgaW50byBgdXRmOF9uYW1lWzI1MF1gCj4gCj4gT24g
+TW9uLCAyMDI2LTAzLTE2IGF0IDE2OjM4IC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IHdy
+b3RlOgo+ID4gSGksCj4gPiAKPiA+IE9uIFdlZCwgTWFyIDExLCAyMDI2IGF0IDI6MTLigK9BTSDk
+vq/mnIvmnIsgPHBlbmdwZW5nQGlzY2FzLmFjLmNuPiB3cm90ZToKPiA+ID4gCj4gPiA+IEhlbGxv
+IEJsdWVaIG1haW50YWluZXJzLAo+ID4gPiAKPiA+ID4gSSB3b3VsZCBsaWtlIHRvIHJlcG9ydCB3
+aGF0IGFwcGVhcnMgdG8gYmUgYSByZWFsIGN1cnJlbnQtaGVhZAo+ID4gPiBib3VuZGVkIHN0YWNr
+IG92ZXJmbG93IGluIHRoZSBhZHZlcnRpc2luZy1kYXRhIG5hbWUgcGFyc2VyLiBJCj4gPiA+IHJl
+Y2hlY2tlZCBjdXJyZW50IHVwc3RyZWFtIGhlYWQgb24gMjAyNi0wMy0xMCBiZWZvcmUgd3JpdGlu
+ZyB0aGlzCj4gPiA+IHJlcG9ydC4KPiA+ID4gCj4gPiA+IFRoZSBkZXN0aW5hdGlvbiBidWZmZXIg
+aXM6Cj4gPiA+IAo+ID4gPiBgYGBjCj4gPiA+IGNoYXIgdXRmOF9uYW1lW0hDSV9NQVhfTkFNRV9M
+RU5HVEggKyAyXTsKPiA+ID4gYGBgCj4gPiA+IAo+ID4gPiB3aXRoOgo+ID4gPiAKPiA+ID4gYGBg
+Ywo+ID4gPiAjZGVmaW5lIEhDSV9NQVhfTkFNRV9MRU5HVEggMjQ4Cj4gPiA+IGBgYAo+ID4gPiAK
+PiA+ID4gc28gdGhlIHRvdGFsIHN0YWNrIGJ1ZmZlciBzaXplIGlzIGAyNTBgIGJ5dGVzLgo+ID4g
+PiAKPiA+ID4gVGhlIHZ1bG5lcmFibGUgY29weSBpczoKPiA+ID4gCj4gPiA+IGBgYGMKPiA+ID4g
+bWVtc2V0KHV0ZjhfbmFtZSwgMCwgc2l6ZW9mKHV0ZjhfbmFtZSkpOwo+ID4gPiBzdHJuY3B5KHV0
+ZjhfbmFtZSwgKGNvbnN0IGNoYXIgKilpb3YtPmlvdl9iYXNlLCBpb3YtPmlvdl9sZW4pOwo+ID4g
+PiBgYGAKPiA+ID4gCj4gPiA+IFRoZSBsZW5ndGggcGFzc2VkIHRvIHRoaXMgaGVscGVyIGNvbWVz
+IGZyb20KPiA+ID4gYGJ0X2FkX25ld193aXRoX2RhdGEoKWAsIHdoZXJlIHRoZSBBRCBlbGVtZW50
+IGxlbmd0aCBpcyByZWFkIGFzIGEKPiA+ID4gYHVpbnQ4X3RgLCB0aGVuIGRlY3JlbWVudGVkIG9u
+Y2UgZm9yIHRoZSB0eXBlIGJ5dGU6Cj4gPiA+IAo+ID4gPiBgYGBjCj4gPiA+IHdoaWxlICh1dGls
+X2lvdl9wdWxsX3U4KCZpb3YsICZlbGVuKSkgewo+ID4gPiDCoMKgwqAgLi4uCj4gPiA+IMKgwqDC
+oCBpZiAoIXV0aWxfaW92X3B1bGxfdTgoJmlvdiwgJnR5cGUpKQo+ID4gPiDCoMKgwqDCoMKgwqDC
+oCBnb3RvIGZhaWxlZDsKPiA+ID4gwqDCoMKgIGVsZW4tLTsKPiA+ID4gwqDCoMKgIC4uLgo+ID4g
+PiDCoMKgwqAgZGF0YSA9IHV0aWxfaW92X3B1bGxfbWVtKCZpb3YsIGVsZW4pOwo+ID4gPiBgYGAK
+PiA+ID4gCj4gPiA+IFNvIHRoZSBwYXlsb2FkIGxlbmd0aCBkZWxpdmVyZWQgdG8gYGFkX3JlcGxh
+Y2VfbmFtZSgpYCBjYW4gYmUgYXMKPiA+ID4gbGFyZ2UgYXMgYDI1NGAsIHdoaWxlIHRoZSBkZXN0
+aW5hdGlvbiBidWZmZXIgaXMgb25seSBgMjUwYCBieXRlcy4KPiA+ID4gCj4gPiA+IEkgYW0gZGVs
+aWJlcmF0ZWx5IG5vdCBvdmVyc3RhdGluZyB0aGlzOgo+ID4gPiAKPiA+ID4gLSB0aGlzIGlzIHBy
+b3RvY29sLWJvdW5kZWQsIG5vdCBhcmJpdHJhcnkgbGVuZ3RoCj4gPiA+IC0gdGhlIG1heGltdW0g
+b3ZlcndyaXRlIGFtcGxpdHVkZSBpcyBzbWFsbCwgYWJvdXQgNCBieXRlcwo+ID4gPiAKPiA+ID4g
+QnV0IGl0IHN0aWxsIGxvb2tzIGxpa2UgYSByZWFsIGN1cnJlbnQtaGVhZCBidWc6Cj4gPiA+IAo+
+ID4gPiAtIGZpeGVkIHN0YWNrIGJ1ZmZlciBvZiAyNTAgYnl0ZXMKPiA+ID4gLSBjb3B5IGxlbmd0
+aCBjYW4gcmVhY2ggMjU0Cj4gPiA+IC0gbm8gbG9jYWwgZ3VhcmQgYGlvdi0+aW92X2xlbiA8PSBz
+aXplb2YodXRmOF9uYW1lKWAKPiA+ID4gCj4gPiA+IFRoZSBmaXggc2VlbXMgc3RyYWlnaHRmb3J3
+YXJkOiBjbGFtcCBvciByZWplY3QgYGlvdi0+aW92X2xlbiA+Cj4gPiA+IHNpemVvZih1dGY4X25h
+bWUpIC0gMWAgYmVmb3JlIHRoZSBjb3B5LCBhbmQgcHJlc2VydmUgZXhwbGljaXQKPiA+ID4gdGVy
+bWluYXRpb24uCj4gPiAKPiA+IFNvIHNvbWV0aGluZyBsaWtlOgo+ID4gCj4gPiBkaWZmIC0tZ2l0
+IGEvc3JjL3NoYXJlZC9hZC5jIGIvc3JjL3NoYXJlZC9hZC5jCj4gPiBpbmRleCBhYzIzODAxNGJj
+ZWEuLmIxZDFiODQ2MTFhYSAxMDA2NDQKPiA+IC0tLSBhL3NyYy9zaGFyZWQvYWQuYwo+ID4gKysr
+IGIvc3JjL3NoYXJlZC9hZC5jCj4gPiBAQCAtMjc4LDcgKzI3OCw4IEBAIHN0YXRpYyBib29sIGFk
+X3JlcGxhY2VfbmFtZShzdHJ1Y3QgYnRfYWQgKmFkLAo+ID4gc3RydWN0IGlvdmVjICppb3YpCj4g
+PiDCoMKgwqDCoMKgwqDCoCBjaGFyIHV0ZjhfbmFtZVtIQ0lfTUFYX05BTUVfTEVOR1RIICsgMl07
+Cj4gPiAKPiA+IMKgwqDCoMKgwqDCoMKgIG1lbXNldCh1dGY4X25hbWUsIDAsIHNpemVvZih1dGY4
+X25hbWUpKTsKPiA+IC3CoMKgwqDCoMKgwqAgc3RybmNweSh1dGY4X25hbWUsIChjb25zdCBjaGFy
+ICopaW92LT5pb3ZfYmFzZSwgaW92LQo+ID4gPmlvdl9sZW4pOwo+ID4gK8KgwqDCoMKgwqDCoCBz
+dHJuY3B5KHV0ZjhfbmFtZSwgKGNvbnN0IGNoYXIgKilpb3YtPmlvdl9iYXNlLAo+ID4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIE1JTihpb3YtPmlvdl9sZW4s
+IEhDSV9NQVhfTkFNRV9MRU5HVEgpKTsKPiAKPiBJbiB3aGljaCBjYXNlIHlvdSdsbCB3YW50IHRv
+IGFsc28gc2hvcnRlbiAidXRmOF9uYW1lIiB0bwo+IEhDSV9NQVhfTkFNRV9MRU5HVEgrMS4KPiAK
+PiA+IAo+ID4gwqDCoMKgwqDCoMKgwqAgaWYgKHN0cmlzdXRmOCh1dGY4X25hbWUsIGlvdi0+aW92
+X2xlbikpCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ290byBkb25lOwo+ID4g
+Cj4gPiA+IEJlc3QgcmVnYXJkcywKPiA+ID4gUGVuZ3BlbmcgSG91Cj4gPiAKPiA+IAo=
