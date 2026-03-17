@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC09926463A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 19:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1B24C6D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 19:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773774614; cv=none; b=VW9/gv0eouURy57nYixphUo5O16etPfFgVzDpP78zOQmLDIfZ1Gh6WP6UCkqJ1U7tnjRa5VxKZ9+0TovSFEGGPfbC4QyLRXwFgkqU7MGFN6S/CTNqfV1BLk6ccKWAatD/JDy3F6A0PnrVUmbFh6QcoMcWdtZKTJ20p9CM6ZvNJI=
+	t=1773777012; cv=none; b=mdKYipYJ+dJthyFMFgw4iz2dQqtgkHf24PPxc79o6Sa13j9noTNmwNPJ+j0MW/MVe4WfPUfMR1bZRSjDsHYRpqcSayIpHW5FvBo9U7ZqtyLLI6REkTrq5BsKaFNvrzGA25n82y8FvA+ya1wD+RS15cwFy85ZSeNyBru7jYAP85k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773774614; c=relaxed/simple;
-	bh=qRJJUAwn2nWJfhtca2w2kpn6mlT68D9A3eFeHFGObSs=;
+	s=arc-20240116; t=1773777012; c=relaxed/simple;
+	bh=F1w6PfLy9rEO+O38Fju0QloLFS7KvqJzes6kvu2EVQU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=F6PNh65i4nHh5BH0CkteGUV+Yq9fX00+UUdk/QxnAhUFmiEjMCeuxXLcD/NCSWoAXwN2B3AzG5Uv7tryu/chRso7ePqh67e/mr5F1FQjhemlN8pFnPED2GSTN+fcix13FK30ksvscLvGYOId1OXDewkmryQk1JAKXXmCyffLyCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIZxg6L/; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=eD0ew9NBPikascUFGPksXpR6gvuZ2UwaVvRlkDGPCkuO5VlYWI3ikFSvVLq2xtb3KwxPa0x6ZZI0HBJ6QzAgBbUHfGSPEmmG2fpER5MLselRh5nbLDz3UYL/9puyV5OKQcVThycS61buhAEBh+YvDcjQdwzFj99u9qxhnAylumk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uRFQVvWQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIZxg6L/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DA5AC4CEF7;
-	Tue, 17 Mar 2026 19:10:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uRFQVvWQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E308C4CEF7;
+	Tue, 17 Mar 2026 19:50:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773774614;
-	bh=qRJJUAwn2nWJfhtca2w2kpn6mlT68D9A3eFeHFGObSs=;
+	s=k20201202; t=1773777012;
+	bh=F1w6PfLy9rEO+O38Fju0QloLFS7KvqJzes6kvu2EVQU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dIZxg6L/qUSPUGis5ifDJbRa+ECZQvrkF7qz8H/H4r732S2+ucfFUnxJVGhhEnZo4
-	 lA3LNU6o1/e74aLeKbYdLMUm+culd2dAF4KHTrmTdA/fO6Q8CeY3WIOWqs04jA4R3t
-	 GU5dZVWl+64Kl199xCOk4HZtI1Z5phwFf0f6wfuK25jITfE6HnM6HmzxIrmleuhlDB
-	 N9aJYUXjVmp14uE1R6Mdo00KHwt0PRqMopJkoyoMkUFwLhjC4+f9lNCEIovnCIWzx4
-	 nx8K3FMqD+cHo5aKcXrGTefC2Su0P7jcI5C2BxmPVijjydTrLM3/RosNNWkYoVkQfC
-	 1GCEnVKbygkAg==
+	b=uRFQVvWQxcvryiV/ACphvFwrO7PaMNO+FgotozbQUEWNI51TVd36exRs3IaJ1qsvS
+	 3W83RcJhhhQcuJmUAA0rOoGPxKAz2EWEdh8I+Hth0uTcI908+3+OddV8geA8kzuGA+
+	 NhlpM83Yf4rlj6SE7I42cEMJ6HjTwHQhfPq1OTh64h6faFNlNIdcAGfKnb7yRgMyL0
+	 LXTO6tmJiMQTljoF7WQXrw/0UGPtQG5hmF7SCYufFSb7I5aTmy9hfQud/mlr/bKujg
+	 /EzomytP+OZux+GqPn2PuhQS2gHLyMSC8dcFlCqV9XyTtsYHGvQSq9KLAfR54bCi1S
+	 wEX+6sMU9AXjg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DFD3808200;
-	Tue, 17 Mar 2026 19:10:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CDCB3808200;
+	Tue, 17 Mar 2026 19:50:05 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,39 +37,34 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 1/2] Bluetooth: L2CAP: Fix printing wrong information
- if
- SDU length exceeds MTU
+Subject: Re: [PATCH BlueZ 0/1] tools/btmgmt: Fix btmgmt --help hanging
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177377460661.4165784.3650560546141444320.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Mar 2026 19:10:06 +0000
-References: <20260316190957.8433-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260316190957.8433-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+ <177377700429.4177599.8238187139543348466.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Mar 2026 19:50:04 +0000
+References: <20260311111540.2170373-1-hadess@hadess.net>
+In-Reply-To: <20260311111540.2170373-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 16 Mar 2026 15:09:56 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, 11 Mar 2026 12:14:12 +0100 you wrote:
+> Another one of those. Wrote a test case again to avoid regressions :)
 > 
-> The code was printing skb->len and sdu_len in the places where it should
-> be sdu_len and chan->imtu respectively to match the if conditions.
+> https://github.com/hadess/bluez/commit/81dcf1794b510a41c7b9b6ec53376cb5322b0bd2
 > 
-> Fixes: fa768fce4aae ("Bluetooth: LE L2CAP: Disconnect if received packet's SDU exceeds IMTU")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Bastien Nocera (1):
+>   tools/btmgmt: Fix btmgmt --help hanging
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1,1/2] Bluetooth: L2CAP: Fix printing wrong information if SDU length exceeds MTU
-    https://git.kernel.org/bluetooth/bluetooth-next/c/013598897448
-  - [v1,2/2] Bluetooth: MGMT: Fix dangling pointer on mgmt_add_adv_patterns_monitor_complete
-    https://git.kernel.org/bluetooth/bluetooth-next/c/3c2dbfa16ca6
+  - [BlueZ,1/1] tools/btmgmt: Fix btmgmt --help hanging
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=52c2b37d90c0
 
 You are awesome, thank you!
 -- 
