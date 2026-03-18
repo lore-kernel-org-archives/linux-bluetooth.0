@@ -1,172 +1,195 @@
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C013258EC1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 19:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D50936A038
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 19:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773861588; cv=none; b=qrqVUvEUt/KLnfGdp/jagkzFAMzX+VEijP1IXps5li2gkrAbq3ZybXwauBqfqYgRgoZKDwgyK3p8BDUwKjnjLlQemtc7TOlXLiWbnaKH8xz58/ybziem7E+Pwc+o1ZezoUbziz2T/793N2awA1n72dY0S7ggYRuOJWOCoqMcCSY=
+	t=1773863513; cv=none; b=EfcElcbM9WQ81P/COjzO7LplnbsWz2nyYoN6MJsq6+ytyqdZZNNQY7m0sGMQEPyFeY4YpFBZU2ekWSsv9FcB/teEvwkFJXgVZknZTDE9mGb+uFx2g+O4Os0qUfMDBTO70YRcFPULoHQ+Y+OYHdXe1xdCuM1amTcdwUJXa2OuP4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773861588; c=relaxed/simple;
-	bh=eldBkQQK1ZXi1VWsANEbbwtaCSwBVZVJZ0fkZ0Z1tlU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Rtl4ASC5ki5iwoa2BnBDYy/4axBM2ZLEe8HlewjeEM4RTNMzTuDrH8rWLxjtN8XC3xsrcjoEd6mx7FpFUwhgr8OFmTzQXkqfAxHsYkJUwUCRylUPWWEv2mqarFnoGieOfaZj8XcO6j9VWtjMXLqGmDq4NqTwXHNp3x7atMwokkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S7iSlP6P; arc=none smtp.client-ip=74.125.82.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773863513; c=relaxed/simple;
+	bh=tqPRzMtHOIZLjWEVwhds2hAjNGs4sUGuk1r2OLRtmBw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M1qdULrqCmD1MrD+sfyBDidqHSoPfmqz7+iKJfQYZq2KqnXZH1zTy+NQu4AWRTnUFhq6+3k9DAU7Ff5cQiN79h8+8T0iAVjuZz5RFG7bKPrmF3wMIhRKzGuk+Fjf0vTjP0Dc8A4fCbW9Lg26k82AuMDDJq3o74gM8NLOPCqjuZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems; spf=pass smtp.mailfrom=starlabs.systems; dkim=pass (2048-bit key) header.d=starlabs-systems.20230601.gappssmtp.com header.i=@starlabs-systems.20230601.gappssmtp.com header.b=gP+aopfS; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starlabs.systems
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S7iSlP6P"
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-12a695044a4so75536c88.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 12:19:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=starlabs-systems.20230601.gappssmtp.com header.i=@starlabs-systems.20230601.gappssmtp.com header.b="gP+aopfS"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-48628ce9ab5so2750595e9.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 12:51:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773861586; x=1774466386; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=IcPKVDrQBJH74Pj4lMUHmrlmnepxajEMOdrDSonmjPM=;
-        b=S7iSlP6PZi1PaogEBHz5fPuFx3Dijcb+SI78/vKC7m6tS8WH3RzLOFQ0t+RtJzL4p9
-         MqQATjcXu8hkHZ3wnm0mXYw908/i4NVA/HnOdiCPjozpyDdX7IFQxL2NMozp3zmPmzvM
-         W/Fe8xeBoq90wlFt9CbAhAs7Lv9JyvQdyi26/DuYxpgf3GbjYbEzVcjKQjCR/Tw/0LVw
-         b+2ns9Rr/fuCPKuqRyB8LPBR023IzKSMvTcZ58sI0fou4yian+MSdJA3FpaUz/dFb5Ck
-         v4U0MRY72T7E6zWN37C7LTqEN5d5OqU4SYoACR0UzV33HUNiJvzzxabnjWd076aCIEfQ
-         fzvA==
+        d=starlabs-systems.20230601.gappssmtp.com; s=20230601; t=1773863508; x=1774468308; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9diUOv++hsh458hLzcUOWkiK9bUzXbhl4P/hLWU7Ycs=;
+        b=gP+aopfSXKRgqHiewyipTkAY++67j2AbebWUQz+WNkR0EWQoylFASJBwiEyaIJWpJ1
+         GQ8+Ad8wQD2qPOc8S1d6Qi91V2AGFH+MfY63Z7e62mnVuX03m5Q/JZnd0yTTpePIxJsq
+         UxpSO/tje30H9qFPEDqf2hbHYJ5AmtueoYi3xasH6AgNbhtI01i+mfUW22yezsOoRVXs
+         lrrWhosPSgi4vC5vHe+tErVRrdHCAUj7h3e6cFfBbUmYymwRnYcWAndXdK+DAoaZjEhE
+         lfSxJSnD9+zz/Oe/zDM8r5ejmgRd0x9nOcGPHeyKUHJyQYt3mRF6whd/20qEPHgZEBxT
+         TlEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773861586; x=1774466386;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1773863508; x=1774468308;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IcPKVDrQBJH74Pj4lMUHmrlmnepxajEMOdrDSonmjPM=;
-        b=X+aR6HSY81MXWWc+kDiZbCMVqkFrXQwTq6qfbH7ou8nNI6QdnROF+T/uwTTBVGU8S1
-         XlnagRkemtSJG75b/5lyPXD9ird8XhoRMhFPJ7+d7Y6bVCXzaXyp73FhSkAMsE9NMQIn
-         Jt80VDDBk+XV71FgMYns20FrZRmJHSmc2G4kX5N608dyPFw71IQh5phRaEZPQqnGknR4
-         Z4gMDoMUXpPdXFmfI4qQf7voFVwiRisDmPZh1VTx+7nZFtC6ptYYQQU2kXdc+U3ttdYo
-         jFEpBlQTmWlACz7+HVlMZsf9r1IkHUp7HIhTnXGJmJJcXnXJOzUEVnZl7B2rYMm6IDoh
-         wR6w==
-X-Gm-Message-State: AOJu0Yw5s6pc4NLkhiNhJJbBQKz1TOpTXTlST9ux/bqy6gECtX0b9IA6
-	gOdUBlGAtsWzWD85toulsEwuaAa2RanmWusDBgrv7c3kFPxj8aNIPJswXklbOw==
-X-Gm-Gg: ATEYQzyIRMqv0b6GWqNPsKrw2IbQ9jF8YtSzAw3JEorfD7w7DJ2GIQzWiCoyhX2JP2A
-	KZZULd0uDxqC9qUqxdsyFv1/YPvsJ55+q1F9xwIKHm716dWg0gopJ1IL8zh+kd8F+ARTjCQAnAs
-	IG0uu1Wk73Xubut9gipT79DS5nK22+z1MhCvGQML2fOgq7bgIWo83Lrx34ip7vEGa2A8fSPe4Zn
-	rE0R0ei7XgjBcnZ2WpNlARV+ckpnHqeqNKVtC/UXmJn6QUCfo14c38YLB3PBVdWtJbkpA6xLtlr
-	HAjp5ZDHG8Rs+2m0CTYeyOT6cbdHsdtio3iaaHqhwkXMVRO6stov/goiZvuj5qLNMcNqfQGpYOx
-	Vs9TXn+3ZhypPdoTcudEkcQcIAuBYGOo8yJ+jK1J9WgJstkRA09JEwbQfiWUaGQjjxaBRnHqTlC
-	INfQyFwJcwWlCmob6gyfLYhZTb2iYQjw==
-X-Received: by 2002:a05:7022:3885:b0:12a:6902:ddb8 with SMTP id a92af1059eb24-12a6902dec6mr167875c88.4.1773861585766;
-        Wed, 18 Mar 2026 12:19:45 -0700 (PDT)
-Received: from [172.17.0.2] ([57.151.136.178])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-129b41271aasm4183023c88.11.2026.03.18.12.19.45
+        bh=9diUOv++hsh458hLzcUOWkiK9bUzXbhl4P/hLWU7Ycs=;
+        b=Pa5nOIyzaWt4Znmoz5f9DOEv0XFsEEYeF+vMHT01IKAbygFt+Pw1pPRt6IpROhKCYG
+         8LZFNO8Rsmc9Y9XPKbc0SLMLMI0a55DNiw3ExIL5yeR8o5m1ee3jfKGO2U4rl8YG2wno
+         jp7pjtvN1GBDyQ+kcwv+Hv74dQrb1Bp7KH1pwRh+U8n0+/K1ApNEjoANeA5GAXLMf2ru
+         ribDQLXZcgYTRB9Ua4UOLrhnlJQbG+5C0MO3M5mY0SZAGqT1hhmDcqvn5BXI0jowQQYb
+         xmXDDHAbYSWz5q9l3+OEkA4wQacTk1Pse9z8lyVgcHg3nTgTuNpOP8f7abw4xHn9zL/2
+         O5iA==
+X-Forwarded-Encrypted: i=1; AJvYcCWz/CJoe3Be1pfLVLub7qHsYmsmkn2vWARA5yRt4npoh0N+OYX7Kmujq4Xa80qJ62EoT38H6N4fG2FrZjtVjCA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxY6ZxB33f8ttKJ+664ApesqM9RoX293cFyA2mpR8ixKyr5r1Vb
+	pHC6miHhA3DPLTUhGDJqpIqMGp0CjQUPnIP9CGPc7OxkKn0pJ3mmSwqszrJCOfGquhdNzPRcE2F
+	zYNp/2g==
+X-Gm-Gg: ATEYQzwIYwEVcC0zLx94zXlMCTb01/sadO25Uill4PkadIDap9+lCQmy0m8WHJ5y4ua
+	cnXVHx1xZTAExjDBKiFVhMxSQTq6l/8xZSvAeCyJmg8olkgfXyakU/0L5QXr1Ix2SL4O9I8Z8kl
+	lza++w9z5x/ozXQyxl4rGtWfOsfdf+p5mDjHRDTzxKJrk4jzoSBe95VYQYz6RgjyCXUd0oQROzq
+	JPghTovnAOcReU3hCKNwZTVPBVLdRWTZ+D4bBoxIcbDviNGnfCwTNyN5aWybkrO6zHiaJ4dHCvt
+	TwRm66d5uN4iWWBhmr6VM/ZxdjSKaS1aRbUw5R41T9UoPhxXfVNev88yAwL4mq9zr1EPzGB1Rh8
+	f4rcMUZRvq6iLaeFdgXueKz56KYUDBkhWlQgqhEMzfoCTviRZpy0XT86nBouv5bR6gWmfFwmD3X
+	0seSjJ+Z8xyNBlroLR1pQjrHBL0aWSGAnwP8BfOIRWSuTQpDQBU9U=
+X-Received: by 2002:a05:600c:4710:b0:485:4526:ee06 with SMTP id 5b1f17b1804b1-486f44375aemr74930775e9.11.1773863507756;
+        Wed, 18 Mar 2026 12:51:47 -0700 (PDT)
+Received: from starbook ([217.155.46.38])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f45d8e3dsm27252465e9.0.2026.03.18.12.51.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 12:19:45 -0700 (PDT)
-Message-ID: <69bafad1.050a0220.346817.917d@mx.google.com>
-Date: Wed, 18 Mar 2026 12:19:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6796520415244282767=="
+        Wed, 18 Mar 2026 12:51:47 -0700 (PDT)
+From: Sean Rhodes <sean@starlabs.systems>
+To: linux-kernel@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: clear remote wake on idle Intel ACPI paths
+Date: Wed, 18 Mar 2026 19:51:45 +0000
+Message-ID: <4863e9725130166fdfcea77298f70500dcc03b02.1773863497.git.sean@starlabs.systems>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2] Bluetooth: L2CAP: Fix regressions caused by reusing ident
-In-Reply-To: <20260318180116.288242-1-luiz.dentz@gmail.com>
-References: <20260318180116.288242-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6796520415244282767==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Commit 6953217d9f44 ("usb: core: allow ACPI-managed hard-wired ports
+to power off") allows internal USB devices on ACPI-managed hard-wired
+ports to use the existing runtime power-off path. For Intel combined USB
+Bluetooth controllers, btusb still keeps runtime remote wake enabled for
+as long as the adapter is open, which prevents the USB PM core from
+dropping the last child reference and powering the port off while idle.
 
-This is automated email and please do not reply to this email!
+Only keep runtime remote wake enabled while the controller is expected
+to signal activity on its own: established links, discovery, LE scan,
+LE advertising, or BR/EDR page/inquiry scan. When those are idle, clear
+needs_remote_wakeup so autosuspend can power-manage the port and a later
+host-initiated command can resume the device again.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1068801
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.58 seconds
-GitLint                       PENDING   0.53 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      26.30 seconds
-CheckAllWarning               PASS      28.95 seconds
-CheckSparse                   PASS      27.74 seconds
-BuildKernel32                 PASS      25.37 seconds
-TestRunnerSetup               PASS      575.66 seconds
-TestRunner_l2cap-tester       FAIL      28.85 seconds
-TestRunner_iso-tester         FAIL      38.39 seconds
-TestRunner_bnep-tester        PASS      6.31 seconds
-TestRunner_mgmt-tester        FAIL      114.59 seconds
-TestRunner_rfcomm-tester      PASS      9.44 seconds
-TestRunner_sco-tester         FAIL      14.43 seconds
-TestRunner_ioctl-tester       PASS      10.12 seconds
-TestRunner_mesh-tester        FAIL      12.53 seconds
-TestRunner_smp-tester         PASS      8.55 seconds
-TestRunner_userchan-tester    PASS      6.62 seconds
-IncrementalBuild              PENDING   0.91 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Total: 96, Passed: 95 (99.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-L2CAP BR/EDR Server - Set PHY 3M                     Failed       0.119 seconds
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
-Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.111 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.769 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Sean Rhodes <sean@starlabs.systems>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 48 insertions(+), 2 deletions(-)
 
-
---===============6796520415244282767==--
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5e9ebf0c5312..9df8a7c3254b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -901,6 +901,7 @@ struct btusb_data {
+ 	unsigned long flags;
+ 
+ 	bool poll_sync;
++	bool intel_combined;
+ 	int intr_interval;
+ 	struct work_struct  work;
+ 	struct work_struct  waker;
+@@ -958,6 +959,9 @@ struct btusb_data {
+ 	struct qca_dump_info qca_dump;
+ };
+ 
++static bool btusb_intel_idle_power_manageable(struct btusb_data *data);
++static bool btusb_needs_runtime_remote_wakeup(struct btusb_data *data);
++
+ static void btusb_reset(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data;
+@@ -1151,12 +1155,19 @@ static inline void btusb_free_frags(struct btusb_data *data)
+ 
+ static int btusb_recv_event(struct btusb_data *data, struct sk_buff *skb)
+ {
++	int err;
++
+ 	if (data->intr_interval) {
+ 		/* Trigger dequeue immediately if an event is received */
+ 		schedule_delayed_work(&data->rx_work, 0);
+ 	}
+ 
+-	return data->recv_event(data->hdev, skb);
++	err = data->recv_event(data->hdev, skb);
++	if (!err)
++		data->intf->needs_remote_wakeup =
++			btusb_needs_runtime_remote_wakeup(data);
++
++	return err;
+ }
+ 
+ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+@@ -1924,7 +1935,8 @@ static int btusb_open(struct hci_dev *hdev)
+ 			goto setup_fail;
+ 	}
+ 
+-	data->intf->needs_remote_wakeup = 1;
++	data->intf->needs_remote_wakeup =
++		btusb_needs_runtime_remote_wakeup(data);
+ 
+ 	if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
+ 		goto done;
+@@ -1967,6 +1979,38 @@ static void btusb_stop_traffic(struct btusb_data *data)
+ 	usb_kill_anchored_urbs(&data->ctrl_anchor);
+ }
+ 
++static bool btusb_intel_idle_power_manageable(struct btusb_data *data)
++{
++	struct usb_device *udev = data->udev;
++
++	return data->intel_combined && udev->parent &&
++	       usb_acpi_power_manageable(udev->parent, udev->portnum - 1);
++}
++
++static bool btusb_needs_runtime_remote_wakeup(struct btusb_data *data)
++{
++	struct hci_dev *hdev = data->hdev;
++
++	if (!btusb_intel_idle_power_manageable(data))
++		return true;
++
++	if (hci_conn_count(hdev))
++		return true;
++
++	if (hdev->discovery.state == DISCOVERY_FINDING ||
++	    hdev->discovery.state == DISCOVERY_RESOLVING)
++		return true;
++
++	if (hci_dev_test_flag(hdev, HCI_LE_SCAN) ||
++	    hci_dev_test_flag(hdev, HCI_LE_ADV) ||
++	    hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
++	    test_bit(HCI_PSCAN, &hdev->flags) ||
++	    test_bit(HCI_ISCAN, &hdev->flags))
++		return true;
++
++	return false;
++}
++
+ static int btusb_close(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -4041,6 +4085,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	data->recv_bulk = btusb_recv_bulk;
+ 
+ 	if (id->driver_info & BTUSB_INTEL_COMBINED) {
++		data->intel_combined = true;
++
+ 		/* Allocate extra space for Intel device */
+ 		priv_size += sizeof(struct btintel_data);
+ 
