@@ -1,67 +1,67 @@
 Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA636352F9B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 18:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDCB2F744F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 18:09:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773856886; cv=none; b=GFxQ9GH5DzsHFqu/gYnHke141ax6pZsVOYeAuiTG2FeRbFj0ZMfHLahKKdlTFPOhCOF/Aiw6oR+hMpdekRz9OeMFQDTiwISkNj8WTTYVltOkX620xmGlwO33DBj9QKjDhLvonBt7JqLrdgd0LYhGnTSxBgXgGh8Qp0dppBcEhBg=
+	t=1773857374; cv=none; b=BeSjNzhiH1gsu5ZSuNHMQuDqC/v1RWOv19BfBvA60dSd9WQnwh5TeuFLxisPeJHEYMzwHFOGaqkhkHtqVLtb1vMHjEYifL14lXmbHHF56xDvUOh54syAZWbjmgJ/PyGjNewe5Uy/fUAvMiLoDvpfx+1X0rK99/vDEdedvD/dGHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773856886; c=relaxed/simple;
-	bh=hkJ8E3cp4SBNINPkoP8sohfLkIrPZ9GEPh/h5TuqQKk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=idDVhk+hQSBeY7640UsD1rAaHjATWPAnAas9ZC2MBMMde7UO0HpW36hwt/ln+JMvp24PbApxFyEII4ly2C5hR+1PkUTvlXC9XXEyPxItaeeSFYZMFLLJsADhOA2DPWd5Weajz87CWuPQ0n9I++Dp/y2nGc98GEboXJCPzLkIUio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XbiJm2/0; arc=none smtp.client-ip=209.85.221.181
+	s=arc-20240116; t=1773857374; c=relaxed/simple;
+	bh=TJCzmAS5rQ03YD6bHrVLgQgShJ41FsfuiETBU+VkHyI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Aq1+Cue/1PBUSK4xyc0RmrqT8O4ud88NrZYJt3o+grv9JxmYcXgbpGXjUUTtAAXAGlasyfEpdSM5OKm6e63OIPJ/6Rm4HC41gfZvp5y7q5bvUX/rM6Tv8SqQTo9O3pj20TUW7s+rQjhLakUQLxZTGof0Ln5SmW/HlJitEn+g174=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEBecmgc; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XbiJm2/0"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-56a86f0a23bso36330e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 11:01:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEBecmgc"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-56cc8a021e2so82622e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 11:09:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773856883; x=1774461683; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773857372; x=1774462172; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bxq8QgCUzxDc2TZDeQPk6H+WTSLdAdWbzwCHQ/VJV3w=;
-        b=XbiJm2/0eYjmrcFFbd9rQZN/0zzChBW9lW/dCOvTJGZYdMbmBF24xBYD6uifaE4P7D
-         aeN9ifSTgqSeR9sJRPbdj7ma4EWIb16Y5nkj5pCB7iq8kVN4MH7mZx80ZMi+Ms/9Skq0
-         KkJoVQ7Oa7W6bLV58NQF9YEG1CawtuRPBk7f2oZPHBC5CCWWA0OG/4VqNUUN2Lw3L+t/
-         cR3+wsfAaly+0jhWMM1rS6lV7uPDnvVX9JbJbH2fR/6nXfloAG3jHwrgBRuIIzLNDQnF
-         36PFt0rjpRKINfMWetun2LwP1oNXQI7ETrU2VTGn+rNqtAop4atb17CUX5ViOUcHKw4j
-         zizw==
+        bh=wIPYt7mdGt8Qnb09HDa1O2ltrO76tPPdh0yGZf5Dt2k=;
+        b=dEBecmgcqYb7fpfiMzC5+1sx7xbXQBwDnF3DywU0bpFHtpTGYa0hNR8cvv8G/86aJU
+         IU7TpfcRO69/cDBjWE/+05jE5hv+LgrX3FvnLWcfdy9939xIGG/rlz9JbQv7F5wCIgVf
+         nFFQxtyes+5auNehGHtnoYeJDpiHZPgS7zWT/1PoACFQsx/UfWm0tDMT6TIfCCBfvc+I
+         FWhYC1P/RoJFGWNvq3RS+Uojj9GMWvnYdKMMpc+dk3rsrCXaLXVwte7Ihl4BZ8pSN+rs
+         zclo05Tf8RakCNa/6erx6+56nMHpFCwWpm31fbGKz0NOpD6boyYwZHlwwXcyoDqA2qau
+         7lyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773856883; x=1774461683;
+        d=1e100.net; s=20251104; t=1773857372; x=1774462172;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bxq8QgCUzxDc2TZDeQPk6H+WTSLdAdWbzwCHQ/VJV3w=;
-        b=qOyax3tVM2lM5g4F59lgUMOQgCGm37X9JD3MtpqbjqsqgsaARR8ClW65UV2C/lTx3D
-         A46PfD5OzZi4yByC6XjI6byig/U1Ua8QWIEOMT1xtFS53soRl2C+rFOaeiFsZWRQGL4d
-         VVjIsjKLZNp50PwLt9ZmK5twu9qXBxOBQpZ2/O+mSaSKz2mVwjCdnFJjCzGXk8F9e9N2
-         cf6n8PG4pbOQGrGU8n3mUtPxpUiopy5ot2zsJB4ACuZIPLkFhx8d9hnX5pB997Te6I3a
-         /br7qSVo3/rLmjw6gtFCwdaJjTQVjvzZQUcv0YivvOdcMjRbe1+/Mwn8ENm8irAPAMLi
-         cUDw==
-X-Gm-Message-State: AOJu0YyQmtA0JRDoGRtd2u+6/tAyFx2WhNO80CbYimGAxN1pdQNzPiPR
-	XBUHL3krCmhkO4IOH75H6///fbe7YNPltLN8MCj1lz5Vf5Xc71z72vm3n45WHa56
-X-Gm-Gg: ATEYQzz+KbZiQkR/LXAwwsWR7QiJZoSDDUeS4WwNjCVXDtTuPuyRUg1DeOljiqKkgy5
-	TA/eQpGLWjekqhlatJIsqOK6fFln5oNHWnbk/jiYPF3Ptp6ofIq+NiPIOjXv017BO2EIgDzD3ZO
-	T6PYTkND8Bv1smVIj8yTkv5s/A68bSs8jPbZ2XCwjnOhWpqc/dPT+dKBRh6KzGruithy1wTxPBB
-	NeRbCFRQmI0o7ZZMe8XEE/uQRYTo7hJNMQISRHrZ14+au9UG99OZ8o9NwF0mtYPb+lsY2iqFNYq
-	iHa0lfWd6t4HhtLJC76zIww0PxFuUEuEKY2u0bCC9qoaYmIsqcCuvPK5VYnHN13CA4o8tWtJpu6
-	Dd4FzhLk8R09nsU6XyRGI/jNbQzlKxsUJGHvE7GQifCYRm5QIawJHiDzNc8/m8oNvt4pXmNB3zZ
-	BpI0kfHGF2zAX4Cy54QtZm7loIh60WwJQB3WoijnhHwqUX6cSYd2z8KpS+iZhTiifrL+krIrryu
-	3qXhXwfdn5lnIJ8Gw==
-X-Received: by 2002:a05:6122:4d05:b0:567:44ba:bd8a with SMTP id 71dfb90a1353d-56ba7143f15mr2578544e0c.9.1773856883028;
-        Wed, 18 Mar 2026 11:01:23 -0700 (PDT)
+        bh=wIPYt7mdGt8Qnb09HDa1O2ltrO76tPPdh0yGZf5Dt2k=;
+        b=YC7X1zGZzywCany2xQ5UYiBzd91BVD4Tt6CDuEZ8U8BiG1ReGct/ewuf9UV/X5mSwF
+         m7nxiSRDFpjbyGpnJuUkK8nYI8p7RBJFtuEsgamchT+HRigjbO9tUNLCNygLKElyIrpX
+         Mdrz94Pg2RQAVHmltQsBze189LcZo6cHducJz0LxkPfr7UQ2n0BXBbFNIYLXARNuzjTT
+         glzCNneTgUicOwlpDPgW6b1a/p6k1JDU4HgBtcCpfLLzF4RC7nMDbBRltgvB0+TepODL
+         94XTqIwSiT+1D9RRA48R8CIB2eGRGqjmD5NR2uZf7AVKs0TiYTmRwgCrhMFWEXb7lm3G
+         X0LA==
+X-Gm-Message-State: AOJu0Yybr8J958IMB0cQmkC4nHggqCBCHrdxd9nFNCYMehcZjfhZim8+
+	e+RLa5JaiIGH3RuiqzM/7JYIG7r6e5K8yhjZ8JCZlusNfAhUnq4FxHZAmhziICiR
+X-Gm-Gg: ATEYQzzo1rN7/n30U1ER4eXqZ1sIJDT0x0xoFF7T1VvOmjfJvocvTpiALtFkjaLrRn8
+	WuOpJQbQGAx06RlojVEWjuPAsgHt2OhC3KcHsqvlaxx8SvgReqerIdSdhWHvNV06kbspqU3RkmT
+	mp5P79y1c+46nQLILCsbDAi5cm5XrUDd0DEqZdBpIhwR526HbZ0CsSghhyZceT507QtD+kGQF5U
+	6p79l7rV85rWboqrL+O+XEhjtGlkNDIf1OZRjXtM2a/W7vvzKkSxhOirTBoervTgEnckck4SmH7
+	48IraLHkK/IgkRx1lwwm/Qpb/A/bLIrIhv+zS7ikF+oKFgX3Fw8O1D5/LkmkB7CHZAfu9MNnVsN
+	FYmbdLTgisH60tb4daN2F3FsdYsTvOee19odKqRFWaja49tlXXoG8BTlqAbni9MN1CSC2cPvBNT
+	ThjPWP+rm5Y361k+h5KuwR0hvIjyNkM9tmUwG/0hhA+4vdBFNnKnE59KRl2gr3qbug0JjwFdT3M
+	XL//nxwMcvx05merYQXS1IZgwTc
+X-Received: by 2002:ac5:c76d:0:b0:56a:e3c7:7ed7 with SMTP id 71dfb90a1353d-56ccff113e5mr233448e0c.6.1773857372222;
+        Wed, 18 Mar 2026 11:09:32 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-951034737d0sm1636563241.13.2026.03.18.11.01.22
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56ba6e30ec6sm2218111e0c.1.2026.03.18.11.09.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 11:01:22 -0700 (PDT)
+        Wed, 18 Mar 2026 11:09:31 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: L2CAP: Fix regressions caused by reusing ident
-Date: Wed, 18 Mar 2026 14:01:16 -0400
-Message-ID: <20260318180116.288242-1-luiz.dentz@gmail.com>
+Subject: [PATCH v3] Bluetooth: L2CAP: Fix regressions caused by reusing ident
+Date: Wed, 18 Mar 2026 14:09:22 -0400
+Message-ID: <20260318180922.307838-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -85,8 +85,8 @@ Fixes: 6c3ea155e5ee ("Bluetooth: L2CAP: Fix not tracking outstanding TX ident")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
  include/net/bluetooth/l2cap.h |  1 +
- net/bluetooth/l2cap_core.c    | 41 +++++++++++++++++++++++++++--------
- 2 files changed, 33 insertions(+), 9 deletions(-)
+ net/bluetooth/l2cap_core.c    | 23 ++++++++++++++++++++---
+ 2 files changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
 index 010f1a8fd15f..5172afee5494 100644
@@ -101,48 +101,36 @@ index 010f1a8fd15f..5172afee5494 100644
  	struct sk_buff_head	pending_rx;
  	struct work_struct	pending_rx_work;
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ead51dc0f3f1..c7f1f817a8ea 100644
+index ead51dc0f3f1..a818a58362d5 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -926,16 +926,39 @@ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator)
+@@ -926,16 +926,33 @@ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator)
  
  static int l2cap_get_ident(struct l2cap_conn *conn)
  {
--	/* LE link does not support tools like l2ping so use the full range */
--	if (conn->hcon->type == LE_LINK)
--		return ida_alloc_range(&conn->tx_ida, 1, 255, GFP_ATOMIC);
++	u8 max;
 +	int ident;
- 
--	/* Get next available identificator.
--	 *    1 - 128 are used by kernel.
--	 *  129 - 199 are reserved.
--	 *  200 - 254 are used by utilities like l2ping, etc.
--	 */
--	return ida_alloc_range(&conn->tx_ida, 1, 128, GFP_ATOMIC);
-+	/* LE link does not support tools like l2ping so use the full range */
-+	if (conn->hcon->type == LE_LINK) {
-+		/* Allocate ident using min as last used + 1 (cyclic) */
-+		ident = ida_alloc_range(&conn->tx_ida, conn->tx_ident + 1,
-+					255, GFP_ATOMIC);
-+		/* Force min 1 to start over */
-+		if (ident <= 0)
-+			ident = ida_alloc_range(&conn->tx_ida, 1, 255,
-+						GFP_ATOMIC);
-+	} else {
-+		/* Get next available identificator.
-+		 *    1 - 128 are used by kernel.
-+		 *  129 - 199 are reserved.
-+		 *  200 - 254 are used by utilities like l2ping, etc.
-+		 */
 +
-+		/* Allocate ident using min as last used + 1 (cyclic) */
-+		ident = ida_alloc_range(&conn->tx_ida, conn->tx_ident + 1,
-+					128, GFP_ATOMIC);
-+		/* Force min 1 to start over */
-+		if (ident <= 0)
-+			ident = ida_alloc_range(&conn->tx_ida, 1, 128,
-+						GFP_ATOMIC);
-+	}
+ 	/* LE link does not support tools like l2ping so use the full range */
+ 	if (conn->hcon->type == LE_LINK)
+-		return ida_alloc_range(&conn->tx_ida, 1, 255, GFP_ATOMIC);
+-
++		max = 255;
+ 	/* Get next available identificator.
+ 	 *    1 - 128 are used by kernel.
+ 	 *  129 - 199 are reserved.
+ 	 *  200 - 254 are used by utilities like l2ping, etc.
+ 	 */
+-	return ida_alloc_range(&conn->tx_ida, 1, 128, GFP_ATOMIC);
++	else
++		max = 128;
++
++	/* Allocate ident using min as last used + 1 (cyclic) */
++	ident = ida_alloc_range(&conn->tx_ida, conn->tx_ident + 1, max,
++				GFP_ATOMIC);
++	/* Force min 1 to start over */
++	if (ident <= 0)
++		ident = ida_alloc_range(&conn->tx_ida, 1, max, GFP_ATOMIC);
 +
 +	if (ident > 0)
 +		conn->tx_ident = ident;
