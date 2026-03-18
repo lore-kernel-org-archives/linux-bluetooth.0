@@ -1,165 +1,384 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011025.outbound.protection.outlook.com [40.107.130.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501303D6CDE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 13:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773839445; cv=none; b=Z8GsePsg1qPQ0KqQg43heIpruFMnZup4M9ST7yppBioqSlsJb5rNM6a6yHATHpWoEnfP9XecaGqxl7dgmhK4euaBwBqARP4yGoVhnDYVuBFL8G5maGxweXDsFj2ahDI8kjWjqh1JRgJUs7LHCrcM6yew32v9MFbY3SC6WByPjBs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773839445; c=relaxed/simple;
-	bh=uxE93Pe0ME5mOyr5t6zmafzx7pZv4pe6U6PYEgUF9Ug=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YUB2pYdtQk45nfec550OXVAV+tb1OT5ifVjuO9oHA9EVhehxqHl1a3lqGigNdhxe/lKZ1yWcMyjT2TomWfKTHW0a5AcpMUorg7PH/7LS1wW8w1bawHPW0jE77mTIPkTDNUJ2ogExGfX4OJ6+GejqAAOb6XaxsYbKcNgJmay3FNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F9TX4pY+; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6950122541C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 13:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773840797; cv=fail; b=OoP53/Wy+iZxO9IhXimDHwqBnA1Xm6j1YJx2x8UNykD3jVhH5pIDyDRZVv9S3F0zdp4uuvaPVO7thbvEVnTwYA1kGpSivIP5TxoPxywldF9IsfURypLBC9NngVPgsrgmIAGOTY97AnOrKPu4itFJFuZbCl0iL7xDFoz0+kyEeeY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773840797; c=relaxed/simple;
+	bh=qp2yXaOnrs7mLE3b7XASZtlkjyNoS0M9/nKwv+Zwydo=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d/Xcr9cu1N8+FGvHHCXR4KES/5YVTp/9E7trkU7xxjGJ3cs7/4/9/wopYtjJAxF/7xmd6IRp5HBGRg0f/P3TzmkgYue8FrB8rnmOL6QgViZGNi04HVIhVf1f8w0X31t32aYOabhpeLRXIHbUpJmg0IE8nmO4zbnVnmiv2pc+kbc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=q/YtlLGk; arc=fail smtp.client-ip=40.107.130.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F9TX4pY+"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82a655cfab5so1372673b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 06:10:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773839444; x=1774444244; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mo7QqskrwYsU9/pVIbj151+YfplqmaufFzUar9GGUWU=;
-        b=F9TX4pY+V5FdoYcX0H6Gud4qF2tikmj5dkFvWz6a+QBIrF247ZWVK1wFuzpIMPq/pb
-         lmQdKacJ2vI6QzMIq7Rph+saz3gRaVjOsn5bjHnwc2Izqe8FBwtTIJ6pjlIgnnQqfmE6
-         KUYx9Xx2KjpLcfyUXvdG1M1JQTmwKUIuqYVe/wdWv3WaOig6UtzAZ9YVwUYJPMbUA/q8
-         iBpcjHBlXgKBtXzbwUNMVQ3rZ9pnxJNic8iuVZ+sz5AmtG4qqlOFsbXciPcO/UdDLBuu
-         CE5Wd8yyrgw4ESOSiilNoeX7VGmNrUtKNJW6EBbiVr0950YtK7EB1kwJGGhjrUd5rxCY
-         bGCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773839444; x=1774444244;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mo7QqskrwYsU9/pVIbj151+YfplqmaufFzUar9GGUWU=;
-        b=W4RJGfe67i8lNKp2EhCt9ZY70xIaxxOgOmdI7ilSmQ/8wBdBdljbj41ZjPxH4dCYWg
-         CcIvmGQ0Ka9n5VrHL3RXEUEjofRfQux4X78y1e2nXGF5ENUBAkGqJH+KSvlucRyrkthg
-         eLAZ6MYYAyjQBGyJaDuJgbVne4EsssDVA3YMIS1m8CAhSYHNAmwkpEbXj9xXZIChZh1o
-         5+MSmhmdkkMK+iaoCVYFE1GREby0RwMpvbjC0x2mMQWto2ukrE8bQIHvC3uSTW+hzlHl
-         qa8O/9bAAqWCqWtAxwbuzmxCCMkwaN6uUkCbTjJH1dHJD8IkZ0LdeoN4RFbSoo7ROTVE
-         N4eQ==
-X-Gm-Message-State: AOJu0YyY/34dqEZ+prq1p1MW3cXNq89TF1FTBNPGUO2CgeJPDpBU9sR2
-	XhheME8Y0GtqBbM0ZLDjQQnLM50k1CH5uR2KXQekb1E55byxTDI7/vdj
-X-Gm-Gg: ATEYQzzAx6ZzndIAQFdplLQsE/YFRH+v5oHk+vitJu8VmeqiBbdtKZi9FU6HCiR86uj
-	yB7izy/PdmKDwbeiCEUS+CrmN1lVw2cfYdBWSTa4DeICgx/8FvHBSOEBS4be6RMd761/zd5X/uN
-	M7XkbLlwv3DrFmSRf4c9Sqe8EGP8vcD1/MRqb7SbDdtGKZtV0HAJXEWvQ349UIvG89129tOnW1m
-	Mjf5taRxW9wSKUTUbqg/UXiif2HKCsmtU37Mqn5rzKFuEg6ok32TelMAktRd6MSDKbJlgYx5t8s
-	eCJhZHDutVSNbAAWolNOk6rQ5iX9GH82TRFhgUsWWqGmu/bDxxcKTC6XPOWEdaf0i2mk1U43Pb2
-	IoHBJAx2FBSV48588FHRdivjFyh1sKfH5P+ssTEqzuqtzm6/YzoFvWufgpWCWYxGUKMbpawv3m0
-	ojzY3LdtKItPqc57uXwX5C9B/vg0uh
-X-Received: by 2002:a05:6a20:748b:b0:395:d214:a531 with SMTP id adf61e73a8af0-39b99dd3633mr3071594637.28.1773839443397;
-        Wed, 18 Mar 2026 06:10:43 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c741dfd4090sm2574579a12.0.2026.03.18.06.10.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 06:10:43 -0700 (PDT)
-From: Cen Zhang <zzzccc427@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	Cen Zhang <zzzccc427@gmail.com>
-Subject: [PATCH v2] Bluetooth: btintel: serialize btintel_hw_error() with hci_req_sync_lock
-Date: Wed, 18 Mar 2026 20:54:03 +0800
-Message-Id: <20260318125403.3135972-1-zzzccc427@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="q/YtlLGk"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BAJIzpdXcjPziI8ygMr6MrTScIogUN6fGJJ1l6EveYPKZrx1yIYpGLVp93AOsTxayPFwXKBP+ljxBTvfMAHMIij69GWmbz1eJlh1hDWZpWMQ3vJpleqyCfuQXVCJVgXqy+7OgkbuwBw6nomZu7OVY0neTgTkf6bejlgt/C7Y48XRC70JiBu5sZnNpjKTZ3pA7GAQ0UcOTZ6YnobcTDvn7G+5TOdpFINyFfrnLx9kCcTwZPqR3ZtfibMstYO2jGiEnbqj/sYlvv5hczjmbsLEMuL1J47j+SvKFFoek6x7ie/V0VMcHPJo51i4YZ1cQfYMI4badU8wdJsG6X/2mIOBVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CYdUdp1pwocldBTfagHBdpBGzcOH5XS6K9G5CYXuOcA=;
+ b=QdBOoeo27rwYB4DhHrZDVCii8M4tVq8No1cXN9EJJD5yr9AQhZcUTa1glQqFdjFvBGZaHyq3aQ18NB0b55zCX7vvWVoGz+okKhtXCjsiKo5+IsC2HuX+bPu4d/fVwJ5b7c7ULRId+mI/CYssbqjXDpRjHANsnFzRoxOsi6MpCTf0cjvmpRiSrNFLUSESpcc1t0XykCzNWtqCLhb2qPBJcZb5VzDw9CnsOlw55UAtBCGzwSgxr8embudsPaYfHMserzgHamibaKaQ2R2BrKaOMDH6WNIMLOHkrWR1GnJ3CoABgA5omOPT0KDojuwKGA7U7zsKMgVCFjJox33p1UJp6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CYdUdp1pwocldBTfagHBdpBGzcOH5XS6K9G5CYXuOcA=;
+ b=q/YtlLGk4wuBK3zDavi7rf3G/y0/i5Maf5eY8IbdluCW9+L2UgPWDrJUmSojOXPEMmwEvTLFb5FYkKZl3vwfNwSDRS5HB5SlxvsxvVVgUwSciuW1duFsaP0Seucn09br1Qmk2b2vYfjIYB6zXy9bw6aqOD9mZglaEEqk2YXdFME=
+Received: from AS4P251CA0030.EURP251.PROD.OUTLOOK.COM (2603:10a6:20b:5d3::18)
+ by GV2PR03MB8607.eurprd03.prod.outlook.com (2603:10a6:150:77::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Wed, 18 Mar
+ 2026 13:33:05 +0000
+Received: from AMS1EPF00000044.eurprd04.prod.outlook.com
+ (2603:10a6:20b:5d3:cafe::25) by AS4P251CA0030.outlook.office365.com
+ (2603:10a6:20b:5d3::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9700.27 via Frontend Transport; Wed,
+ 18 Mar 2026 13:33:05 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ AMS1EPF00000044.mail.protection.outlook.com (10.167.16.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9700.17 via Frontend Transport; Wed, 18 Mar 2026 13:33:05 +0000
+Received: from n9w6sw14.localnet (10.30.5.38) by mta.arri.de (10.10.18.5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 18 Mar
+ 2026 14:33:05 +0100
+From: Christian Eggers <ceggers@arri.de>
+To: <linux-bluetooth@vger.kernel.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: L2CAP: Fix regressions caused by reusing ident
+Date: Wed, 18 Mar 2026 14:33:04 +0100
+Message-ID: <2351187.vFx2qVVIhK@n9w6sw14>
+Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+In-Reply-To: <CABBYNZLJe1CkOntxtvRUviTZwo4=O_x3jn9EM_8AYBN9ojPBfA@mail.gmail.com>
+References: <20260317160258.194853-1-luiz.dentz@gmail.com>
+ <CABBYNZLJe1CkOntxtvRUviTZwo4=O_x3jn9EM_8AYBN9ojPBfA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS1EPF00000044:EE_|GV2PR03MB8607:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1845791-3d8c-4322-9619-08de84f2e2de
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700016|376014|13003099007|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	GjVsCxv24CKCJSE4ufTUyZ7hSNAIF6HB7huuCQUQcglp+TgpIC2zyczhZfxOrnDpYUH6lsypog74wJarEWm1fxuwWFYDBL2MTmOVD5B9xtWQvrPOEKNZ4tjLaAIDszV1puhWsNuPhVLEJR288JXdnlZe5ofbARzVReKdFSnOyrh7vlU7YWr47BPkqM21toeLCLeaoUAicsWANOZPslhVPVzDt/x+5pwv7z7UWZI69wyz9Kwgu5t1a61Ubph+6aJSo2aDE+kUcWhnRPP5mCX06B9eAesFQi2io9QY+j7+pKR3ACPwyBcrlFgB1zj7nHH+XJqcIZilYVBLyXPUy306iPeNPBdSqRsYXPDIzlpC1qMiw66RhEuPHeZFussEEGFkc/5F+F0iuzlTJ8iV5B2SIY6OecRvHgG26a8fp0NmxFW5ropgiZEaS3fzuzBdEwLEym7gY5dNtuyIO+LcIM3PcStSMAZs4sIsU7Z9kaLgT+evCvej1E1QzwZLj00W6Mdl6ea1QXgtC9fwAX4CHQQwmvlmara4ELFIBBSEQd9EAXBJp65LkM1LfYCTam3cxbEkRzdeg5dJxvBFGBNOSEsrdQHzJe15n1xrs2T/mA4Rfzj3z3aHynbjcTr4m8yB3s0+1E1wK4SZoD40+dX0fQV4GmT56sTldHZ/DKk/ESdLDxM0qJtdcq9SE+SzZYh+xsRFQAug9wxZblbHYj6ms+fQg6giwTdB6+PKlZFwzGUAoDClPvd410JzJG1vAeBvJX26oZI6584fYux9ABIqbVmivQ==
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700016)(376014)(13003099007)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	FF0NBCrmLYbTGgfd5Xz4N+Kjdr9uvscc28/mPLZmc421RMg2KRH0C5CFCHri+XUhcpfhSkIwfA3VUENMb+p9sRgvsdqj96srTqzgBzW9dVzVSwo5QhtepGBG/GmO3hJbLTvGu2p1s21FWpDl30ffmH1s8g8R5QrDUNSkQLMXFJhszWHYOb8WkcUr6CJMs7WVbnqEb3oEnmwH/eCksNgylwcIYtuIFJxkWFlTuu8AAE1POPEyJDkEhMzPoKQbGDyeL0xuzgnD8HcWIfeNK8u3qvcpqzkfosOGQ9Ef95Bq3Z80rMZD2K+DI6WJrZ+GscG6ozG5yC+53ufXRCTgxyj1v1h2RdYJcfL1wfbxyuNikuWPTABaAjNqVVmslNcxaIRJ8aJLDbpsswrfQNR8Yu5RDD6HX3mUcUJlXOVWokhr8kgVtTBa5diC90Nkt781Oghu
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2026 13:33:05.5916
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1845791-3d8c-4322-9619-08de84f2e2de
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS1EPF00000044.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR03MB8607
 
-btintel_hw_error() issues two __hci_cmd_sync() calls (HCI_OP_RESET
-and Intel exception-info retrieval) without holding
-hci_req_sync_lock().  This lets it race against
-hci_dev_do_close() -> btintel_shutdown_combined(), which also runs
-__hci_cmd_sync() under the same lock.  When both paths manipulate
-hdev->req_status/req_rsp concurrently, the close path may free the
-response skb first, and the still-running hw_error path hits a
-slab-use-after-free in kfree_skb().
+Hi Luiz,
 
-Wrap the whole recovery sequence in hci_req_sync_lock/unlock so it
-is serialized with every other synchronous HCI command issuer.
+On Tuesday, 17 March 2026, 18:57:27 CET, Luiz Augusto von Dentz wrote:
+> Hi Christian,
+>=20
+> On Tue, Mar 17, 2026 at 12:03=E2=80=AFPM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This attempt to fix regressions caused by reusing ident which apparently
+> > is not handled well on certain stacks causing the stack to not respond =
+to
+> > requests, so instead of simple returning the first unallocated id this
+> > stores the last used tx_ident and then attempt to use the next until all
+> > available ids are exausted and then cycle starting over to 1.
+> >
+> > Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D221120
+> > Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D221177
+> > Fixes: 6c3ea155e5ee ("Bluetooth: L2CAP: Fix not tracking outstanding TX=
+ ident")
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> >  include/net/bluetooth/l2cap.h |  1 +
+> >  net/bluetooth/l2cap_core.c    | 39 +++++++++++++++++++++++++++--------
+> >  2 files changed, 31 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2ca=
+p.h
+> > index 010f1a8fd15f..5172afee5494 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -658,6 +658,7 @@ struct l2cap_conn {
+> >         struct sk_buff          *rx_skb;
+> >         __u32                   rx_len;
+> >         struct ida              tx_ida;
+> > +       __u8                    tx_ident;
+> >
+> >         struct sk_buff_head     pending_rx;
+> >         struct work_struct      pending_rx_work;
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index ead51dc0f3f1..4dbd7b1bd72f 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -926,16 +926,37 @@ int l2cap_chan_check_security(struct l2cap_chan *=
+chan, bool initiator)
+> >
+> >  static int l2cap_get_ident(struct l2cap_conn *conn)
+> >  {
+> > -       /* LE link does not support tools like l2ping so use the full r=
+ange */
+> > -       if (conn->hcon->type =3D=3D LE_LINK)
+> > -               return ida_alloc_range(&conn->tx_ida, 1, 255, GFP_ATOMI=
+C);
+> > +       int ident;
+> >
+> > -       /* Get next available identificator.
+> > -        *    1 - 128 are used by kernel.
+> > -        *  129 - 199 are reserved.
+> > -        *  200 - 254 are used by utilities like l2ping, etc.
+> > -        */
+> > -       return ida_alloc_range(&conn->tx_ida, 1, 128, GFP_ATOMIC);
+> > +       /* LE link does not support tools like l2ping so use the full r=
+ange */
+> > +       if (conn->hcon->type =3D=3D LE_LINK) {
+> > +               /* Allocate ident using min as last used + 1 (cyclic) */
+> > +               ident =3D ida_alloc_range(&conn->tx_ida, ++conn->tx_ide=
+nt,
+> > +                                       255, GFP_ATOMIC);
+> > +               /* Force min 1 to start over */
+> > +               if (ident < 0)
+> > +                       ident =3D ida_alloc_range(&conn->tx_ida, 1, 255,
+> > +                                               GFP_ATOMIC);
+> > +       } else {
+> > +               /* Get next available identificator.
+> > +                *    1 - 128 are used by kernel.
+> > +                *  129 - 199 are reserved.
+> > +                *  200 - 254 are used by utilities like l2ping, etc.
+> > +                */
+> > +
+> > +               /* Allocate ident using min as last used + 1 (cyclic) */
+> > +               ident =3D ida_alloc_range(&conn->tx_ida, ++conn->tx_ide=
+nt,
+> > +                                       128, GFP_ATOMIC);
+> > +               /* Force min 1 to start over */
+> > +               if (ident < 0)
+> > +                       ident =3D ida_alloc_range(&conn->tx_ida, 1, 128,
+> > +                                               GFP_ATOMIC);
+> > +       }
+> > +
+> > +       if (ident > 0)
+> > +               conn->tx_ident =3D ident;
+> > +
+> > +       return ident;
+> >  }
+> >
+> >  static void l2cap_send_acl(struct l2cap_conn *conn, struct sk_buff *sk=
+b,
+> > --
+> > 2.53.0
+> >
+>=20
+> Do you have any capacity to test the above with L2CAP/COS/CED/BI-29-C?
 
-Below is the data race report and the kasan report:
+Today my test system seems a little bit bitchy, so L2CAP/COS/CED/BI-29-C ev=
+en
+doesn't complete with my latest working version...
 
-  BUG: data-race in __hci_cmd_sync_sk / btintel_shutdown_combined
+After applying this patch on top of my latest version (6.19.9 +=20
+the BT patches I already submitted), I see a new error (log is below).
+At 40344 ms, the connection request sent by the IUT has an identifier value=
+ of
+'0' (just after wrapping around) which is not a valid identifier as of=20
+Core Vol 3, part A, chapter 4 (page 1122):
 
-  read of hdev->req_rsp at net/bluetooth/hci_sync.c:199
-  by task kworker/u17:1/83:
-   __hci_cmd_sync_sk+0x12f2/0x1c30 net/bluetooth/hci_sync.c:200
-   __hci_cmd_sync+0x55/0x80 net/bluetooth/hci_sync.c:223
-   btintel_hw_error+0x114/0x670 drivers/bluetooth/btintel.c:254
-   hci_error_reset+0x348/0xa30 net/bluetooth/hci_core.c:1030
+"Signaling identifier 0x00 is an invalid identifier and shall never be used=
+ in any
+command."
 
-  write/free by task ioctl/22580:
-   btintel_shutdown_combined+0xd0/0x360
-    drivers/bluetooth/btintel.c:3648
-   hci_dev_close_sync+0x9ae/0x2c10 net/bluetooth/hci_sync.c:5246
-   hci_dev_do_close+0x232/0x460 net/bluetooth/hci_core.c:526
+Any idea why the identifier used by the IUT wraps around from 255 to 0
+instead of 1?
 
-  BUG: KASAN: slab-use-after-free in
-   sk_skb_reason_drop+0x43/0x380 net/core/skbuff.c:1202
-  Read of size 4 at addr ffff888144a738dc
-  by task kworker/u17:1/83:
-   __hci_cmd_sync_sk+0x12f2/0x1c30 net/bluetooth/hci_sync.c:200
-   __hci_cmd_sync+0x55/0x80 net/bluetooth/hci_sync.c:223
-   btintel_hw_error+0x186/0x670 drivers/bluetooth/btintel.c:260
+regards,
+Christian
 
-Fixes: 973bb97e5aee ("Bluetooth: btintel: Add generic function for handling hardware errors")
-Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
----
- drivers/bluetooth/btintel.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 246b6205c5e0..ab146894ba4e 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -251,11 +251,13 @@ void btintel_hw_error(struct hci_dev *hdev, u8 code)
- 
- 	bt_dev_err(hdev, "Hardware error 0x%2.2x", code);
- 
-+	hci_req_sync_lock(hdev);
-+
- 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
- 		bt_dev_err(hdev, "Reset after hardware error failed (%ld)",
- 			   PTR_ERR(skb));
--		return;
-+		goto unlock;
- 	}
- 	kfree_skb(skb);
- 
-@@ -263,18 +265,21 @@ void btintel_hw_error(struct hci_dev *hdev, u8 code)
- 	if (IS_ERR(skb)) {
- 		bt_dev_err(hdev, "Retrieving Intel exception info failed (%ld)",
- 			   PTR_ERR(skb));
--		return;
-+		goto unlock;
- 	}
- 
- 	if (skb->len != 13) {
- 		bt_dev_err(hdev, "Exception info size mismatch");
- 		kfree_skb(skb);
--		return;
-+		goto unlock;
- 	}
- 
- 	bt_dev_err(hdev, "Exception info %s", (char *)(skb->data + 1));
- 
- 	kfree_skb(skb);
-+
-+unlock:
-+	hci_req_sync_unlock(hdev);
- }
- EXPORT_SYMBOL_GPL(btintel_hw_error);
- 
--- 
-2.34.1
+
++40078 ms
+Verdict Description:     Received CMD:LE Credit Based Connection REQ:=20
+    Code: [20 (0x14)] Code
+    Identifier: [254 (0xFE)]
+    Length: [10 (0x000A)]
+    SPSM: [128 (0x0080)]
+    Source CID: [64 (0x0040)]
+    MTU: [672 (0x02A0)]
+    MPS: [23 (0x0017)]
+    Initial Credits: [30 (0x001E)]
+
+
+
++40078 ms
+Verdict Description:     Sent=3DLE Credit Based Connection RSP:=20
+    Code: [21 (0x15)] Code
+    Identifier: [0 (0x00)]
+    Length: [10 (0x000A)]
+    Destination CID: [79 (0x004F)]
+    MTU: [64 (0x0040)]
+    MPS: [64 (0x0040)]
+    Initial Credits: [2 (0x0002)]
+    Result: [0 (0x0000)] Connection Successful
+
+
+
++40078 ms
+Send Event               HCI!ACL_DATA_REQ{
+                           connectionHandle=3D0x0010,
+                           boundary=3D0x00,
+                           broadcasting=3D0x00,
+                           length=3D0x0012,
+                           p_data[0]=3D0x0E
+                         }
+
+
++40250 ms
+Receive Event            HCI?ACL_DATA{
+                           connHandle=3D0x0010,
+                           length=3D18,
+                           boundaryFlag=3D0x02,
+                           broadcastFlag=3D0x00
+                         }
+
+
++40250 ms
+Verdict Description:     ReceivePacket!
+receive=3D0E00050014FF0A0080004000A00217001E00, CID=3D5
+
+
+
++40250 ms
+Verdict Description:     Received CMD:LE Credit Based Connection REQ:=20
+    Code: [20 (0x14)] Code
+    Identifier: [255 (0xFF)]
+    Length: [10 (0x000A)]
+    SPSM: [128 (0x0080)]
+    Source CID: [64 (0x0040)]
+    MTU: [672 (0x02A0)]
+    MPS: [23 (0x0017)]
+    Initial Credits: [30 (0x001E)]
+
+
+
++40250 ms
+Verdict Description:     Sent=3DLE Credit Based Connection RSP:=20
+    Code: [21 (0x15)] Code
+    Identifier: [0 (0x00)]
+    Length: [10 (0x000A)]
+    Destination CID: [80 (0x0050)]
+    MTU: [64 (0x0040)]
+    MPS: [64 (0x0040)]
+    Initial Credits: [2 (0x0002)]
+    Result: [0 (0x0000)] Connection Successful
+
+
+
++40250 ms
+Send Event               HCI!ACL_DATA_REQ{
+                           connectionHandle=3D0x0010,
+                           boundary=3D0x00,
+                           broadcasting=3D0x00,
+                           length=3D0x0012,
+                           p_data[0]=3D0x0E
+                         }
+
+
++40344 ms
+Receive Event            HCI?ACL_DATA{
+                           connHandle=3D0x0010,
+                           length=3D18,
+                           boundaryFlag=3D0x02,
+                           broadcastFlag=3D0x00
+                         }
+
+
++40344 ms
+Verdict Description:     ReceivePacket!
+receive=3D0E00050014000A0080004000A00217001E00, CID=3D5
+
+
+
++40344 ms
+Verdict Description:     Received CMD:LE Credit Based Connection REQ:=20
+    Code: [20 (0x14)] Code
+    Identifier: [0 (0x00)]
+    Length: [10 (0x000A)]
+    SPSM: [128 (0x0080)]
+    Source CID: [64 (0x0040)]
+    MTU: [672 (0x02A0)]
+    MPS: [23 (0x0017)]
+    Initial Credits: [30 (0x001E)]
+
+
+
++40344 ms
+Verdict Description:     Sent=3DLE Credit Based Connection RSP:=20
+    Code: [21 (0x15)] Code
+    Identifier: [0 (0x00)]
+    Length: [10 (0x000A)]
+    Destination CID: [81 (0x0051)]
+    MTU: [64 (0x0040)]
+    MPS: [64 (0x0040)]
+    Initial Credits: [2 (0x0002)]
+    Result: [0 (0x0000)] Connection Successful
+
+
+
++40344 ms
+Send Event               HCI!ACL_DATA_REQ{
+                           connectionHandle=3D0x0010,
+                           boundary=3D0x00,
+                           broadcasting=3D0x00,
+                           length=3D0x0012,
+                           p_data[0]=3D0x0E
+                         }
+
+
++40422 ms
+Indecisive:              Received Identifier is not unique. Received=3D0
+
+
+
++40422 ms
+Verdict Description:     Received Identifier is not unique. Received=3D0
+
+
+
++40625 ms
+Send Event               HCI!HCI_RESET
+
+
+
+
 
