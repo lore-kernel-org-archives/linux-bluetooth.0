@@ -1,309 +1,182 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1603533121E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 21:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB0C184540
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 21:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773869760; cv=pass; b=Qx6QkTbGT0hXZgRq8+XpGn40tQN+tAWwn4iVbq9wehX0lL8QeC36KCHNxZ/kX9Wfs5jQlFjboRMUFOmFX9St9L8x4d1XoYXdha6aHPMPjZZsdAD6a70YWI08OM/iECpj2ubkvNo+8GmlA79Clhz4WIB0ZZ1PkMp++5XXL7a1FBY=
+	t=1773870979; cv=pass; b=Iq5VWgZDrf6ZmPN9mT9bBS0BycPyoGOwIUq7quNt4CElvzlWEot13D1oZbgQyF25atp0PAdlbJIN+Yj8L0OHmp79/R/zfvpLgR3EwTXKGGgq4YyPa0WyWdq6XGP5ibm6tYgiMk5dzsv1f7IOe/QIlrv/pCoofO//DUdgeYm4rVk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773869760; c=relaxed/simple;
-	bh=Q1zi0meOvmHf3bkXvpqAYNmpovQS7TwyqTX/2jsLUuI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kcTGMtRfNNDG4gcHlyFijCF/4M9lvaj2dF/UHlos3yvojJsW9WW2G08xadSOHEv+qPbcZGIbsWYUS3fHeeNk33u9hZtSiT4pNnBI/lpHs/poN5GnUOitTNr9JyiF6UTjUJxwggB99BCjABVIoK7CMFH6bmL+3tZnEHCxs+bSL4E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=MNjgA5r9; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1773870979; c=relaxed/simple;
+	bh=R2UrJw0RZ+c3RlCfg8obuufqYjsA00SyP55Jh4kXjGU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=oYx4gHZ3YUUl8UftvSc/AO+D0InIiAjxdBN/xaRUe6R7zZqslE4zDZh9X7R6yC6/CX1GSCoubhBGNxLreGmnnupRSRe2tnMjkKLaSa1FDq2EFl9U4azt4k7l0bKWu3NgbG3Aj7aVB1HFFRsu33i28QuqdGa8lkyXc8ZbhWIsZW0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=msbd+NiL; arc=pass smtp.client-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="MNjgA5r9"
-Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:d:f011:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4fbhvb5Jjvz49PwP;
-	Wed, 18 Mar 2026 23:35:39 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1773869746;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ef9DlqdlQcQetaIsdytkvqmQzdfRJdcFyVs0H4KDFbY=;
-	b=MNjgA5r9VRbCVtNdrBRFc5UWkWQR9ZLpTmH06uH34TSYqxL6c6juHlvnik5XAoZ8jGjNW/
-	+jC1enYkf64soH7yjUlCwK9IAkc9ZylXdxpVvCTCNujzmXnLmM1+hg5z1kZJ1pgd99f9+j
-	1KYRxJ0utsYvxSrptv3Y4IvkPFseTx5K3+m2gE4KFiG5dZE71q1lLUHDRa7jIxcx4wUT55
-	9I32pfJwn4Vv80W6sm2XFPQkZTK4hmIQmQsGiuZK+gn6aYFCnmaZGQQfIDe9RAqCIqn7eV
-	VTho4kUl4WnCCAVsWd8IS8MZ7nm1BZedcHLuIPH3FJ1RIftoNW2l85QRqKqs8w==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1773869746;
-	b=eL+fPoe24kdpCZlqbj2YKHna1cNuW0L703SQxTiAD6RwY1hghLws/zfYTMICbh+jJp9ZwZ
-	KPVO9Dv1n0yfxYa++8YmbGpjCdQ4q/954AK9+C4wrr8PtK7fknswQ8aQqoC6+bCVVDnKC2
-	8uORr8cCfydKg5CQoIGdzRezh7vSw1lmAKvrLzMDpWs9d5STMyhCahSl3pfA9VrMZvRy18
-	ccXp++Q+KBMhOpFXyhOM9HMQppvokGnhUGIOjs+O4KBjhAw0V3kj4WedDDn3EnePvPxsMd
-	sFMJpwUuLr6X+QtJDyync/vglu1tn0SIKdVQg+C9h36+67U3T2aCn5Jwsb9lag==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pauli.virtanen@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1773869745;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ef9DlqdlQcQetaIsdytkvqmQzdfRJdcFyVs0H4KDFbY=;
-	b=LX+z4TLjfK7CL/Ht1qAWHFTjIpm7jfDknNTWiefH8Ib/4tMXMgEPavRLS1jJ7yY0XFWHcl
-	QBB9N8iKiwy3q96XKbDbdLwKL4VTzdHN74kF9DfAul2QCuivw3QI8/yCoWoUbWg3gpaw0V
-	18p/A8iF9YEsAp+OsJ7uuqQBTf+7z3ZJDKjIDdsSk1rVF3Dx/0F0KXmoirGh1sdtylslVh
-	VhR6gboM6mIO+S5FzOSXwWWK3ps4AOMoMSa/oQESbX4ahZrekqkGqkQRoiNo1rbPu2cbZY
-	itbo2b8z+ysr5Le1AShz02pJgH3SoR0LAnuMrvGJctbnFkvcFzFzV4yi9XmePA==
-Message-ID: <b6508eb975a31a10542682e71ed99bc175fedc27.camel@iki.fi>
-Subject: Re: [PATCH] Bluetooth: ISO: add timestamp for outgoing HCI ISO
-From: Pauli Virtanen <pauli.virtanen@iki.fi>
-To: Tailu Shi <tailu.shi@samsung.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org
-Date: Wed, 18 Mar 2026 23:35:37 +0200
-In-Reply-To: <20260318110935.3859683-1-tailu.shi@samsung.com>
-References: 
-	<CGME20260318110941epcas5p14254ccd641695fb7715ec1c10776ae27@epcas5p1.samsung.com>
-	 <20260318110935.3859683-1-tailu.shi@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msbd+NiL"
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64ca6595c8aso449979d50.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 14:56:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773870977; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bKE5OU8kQOWQFbcV2/BElOa7JeonfASpDhQEKOEaR86sWILZLyDOPOXuaWa6+xjMUk
+         8OUO7B2wAD/4L1IMtsedxP50qm6/fIVQT0s2wz4lBvwiVfjjy/SRvi61KHUMHWypVr/M
+         x1m2vNWJ8+eduy2QCEMU1DXakdO2YXX/l82QkeN3uhQC4ERZeNi1Zom6R6ElrtE+6GHA
+         wqNCXzu8Kp4487K60jL8Hs56HQRTJBfpXn843SsaOAu/gTtC4iUhAE18vpFsknGfjZmd
+         eg1hFQ/7RUM6xGO1pEPU58+XYti8rGUkk3K5tWhvf7apqBRIuO3+04Q1MrArY9z3k3Go
+         gzyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=2NBocKYwYMdkCxg0sDCYE+VGL7hfHbVS1QJdb3ts1cA=;
+        fh=I08MVYRFsk3ianfGT74oyN+ut5eeUUw/nGErTUmy/QY=;
+        b=HMtJQ5bDXF0r5LavC3jWnhFKymMV+KIXdPoQz25pemMtRnP5wokNM8jXRnkZD5Scxq
+         58lFI3QzPTBG4x9l6tYYZaXX2K+glK28q0nZQrt2n5jf7R3fs7l66T8rNAf6E04fky5L
+         GJGgU+jA4bhO+MredK8Q9v6Wm3OSmiiBAwu7xmIty8AEMjH8XeJKP1okRaTR3B28U0vZ
+         DE0VM+0kbd9Gu77AzlRRg+FNNrOEdknBwokm+O/8mzOUUOM21a3mY5WGraSM4AQkeNqc
+         GT5hsusWrvm0lPuisFr7GT01C4QvxqJn+ugQ25jHnVTlNYB1Jk0uASIR5OHApQ+VQaRw
+         wPag==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773870977; x=1774475777; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2NBocKYwYMdkCxg0sDCYE+VGL7hfHbVS1QJdb3ts1cA=;
+        b=msbd+NiLnsPKq1fQQDdg9ukukeuIbPEvRV06lMvcBxjoQQMiCP7kfTCUq9uzd3v2EG
+         LIqlbBA48EgffcQVnxXc6pGyxDd1A6olGDocvmf5b/rBVEPNp83a+B21BkPnoJSU/SEf
+         osdYapnEdnwYBgvEWQrApkcgs/yqelj/YcZo5aiFz3YIrYyu29qLGpchiR5M5nbuCy9E
+         xvNG3gGujFscCvKxTG/hHxhAMcgNx2guOKJnljpVgIpYmSckmsua5cJf6wUvYBMQ0A1p
+         i1/PydqFIbnUOQ2i38YeVxSdYoGtVKO2JPZ0gC1bd7GcOMDWZ8EOaS8yuLskn2eJ2Mju
+         mlyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773870977; x=1774475777;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2NBocKYwYMdkCxg0sDCYE+VGL7hfHbVS1QJdb3ts1cA=;
+        b=d/4uiBCZT48QYYTCG/4rIS1fd5eVepvQEB5uLu1bFakBp6U+po/xpXK1I9ZnBp3f4a
+         s08MccOed6uhYNBt1FVGBODWh0ZrGmFCAeLImUbxJ7tP+dQRGhoR74+ezJX4HqUDwrgI
+         5ojBnqVOse5AL/qbRPW90XehWO3iqZrmNEVesYdMc3VEYoXU5RU3rnIyQIaUrhydYX1X
+         5//YTOL8Y10bTH92OJO7W8Z4kZSFRAowwoJhWLiMy2YbeOmD0V6I8Lb1gx75F7Sff+kv
+         yMUjTwzFYmy9OMe/NWpK0IyDI3UlNSxc2ijdaAPTostlpB+IZnXbs5Y8cuIAeHFn4yrI
+         ZjpA==
+X-Gm-Message-State: AOJu0Yyh1CyDsoGk8ZYR/o5sAgpbKBamc5/Ha88il4CK4lWjRQB9B2Ee
+	3S/xv1BsqNPBR2S9NJi73C525MKG0fqdIR1YgyCDIob3c2EGd7zgBvXKTHjJiNzeYJj5pctkWYQ
+	ZWNdzEIAzeSaffpKvccFpdKGZ7Bpv9m+4FHG6
+X-Gm-Gg: ATEYQzx8BhxcOig10ZscVl74kJaqaixmbmYu5fVoz3Cd2NF6Q1TYnr2o5FozRw6L5HA
+	00aOzvkjSA5h7V+rcP7E60I9ETKO5hDxmo/3Ty+6dTUXvnOdZzH01e/OI3sIx3um4N2z65c1q1n
+	1XlxJ/FSr/sYtpY+Up1TGfvsHUInxes+z9M1IZI77djxURYJ3HanJgSotsVhO7YufXwsyxvG6f8
+	qNja65eakAjwMhQ3p6ao59yPX5kWl9eXSUMhQa+c4U+zDFl+ZIgTGvcbEZH1VSYCRJNVvFtJRuS
+	4eLPLJjF7TX68bQnNDUG2yBzy9NHvH/4FqdRuq+Nd4cIIOAEwS8MCyspo8dy7s1CAic=
+X-Received: by 2002:a53:a7cc:0:b0:64d:6813:6869 with SMTP id
+ 956f58d0204a3-64e9161093bmr3926615d50.73.1773870977251; Wed, 18 Mar 2026
+ 14:56:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260318180922.307838-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260318180922.307838-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 18 Mar 2026 17:56:05 -0400
+X-Gm-Features: AaiRm52SlDEA1rxy1n4hcZlkDeozOxAxbDqQm2D8G6anEZt1n0E_I-LoqHbziOo
+Message-ID: <CABBYNZKdB2i-zB4ZZmLda8ZShwi4P_RzjutzhDYMV6SGWtiKPg@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: L2CAP: Fix regressions caused by reusing ident
+To: linux-bluetooth@vger.kernel.org, Christian Eggers <ceggers@arri.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Christian,
 
-ke, 2026-03-18 kello 19:09 +0800, Tailu Shi kirjoitti:
-> Hi Pauli,
->=20
-> Thanks for your valuable feedback in your previous email.
->=20
-> On Fri, 13 Mar 2026 22:50:33 +0200, Pauli worte:
-> > TMAP likely assumes the controller implements the specification so that
-> > providing correct time stamps would be possible, but when they in
-> > practice don't, spec compliance seems dubious and not setting known-
-> > wrong Time_Stamp on packets sounds safer.
->=20
-> Okay! I see. Thank you.
->=20
-> > I think we will want LE Read ISO TX Sync support at least, as this will
-> > solve the CIS/BIS synchronization problem, as user application can then
-> > know what ISO packets controller considers are playing at the same time
-> > (if controller actually implements this command properly).
-> >=20
-> > It would be good to have information how different manufacturers have
-> > interpreted the specification vs. LE Read ISO TX Sync. Right now, I can
-> > only read what Zephyr is doing, and tested some other controllers
-> > return zeros. If you have access to controllers that implement this
-> > command, it would be very useful to know their precise interpretation.
->=20
-> Yes, I can confirm that we have a working controller that implements this
-> command. However, I am unable to disclose any specific hardware details
-> due to our company's confidentiality policy. I appreciate your understand=
-ing.
->=20
-> To facilitate upstream integration, I can give a concise overview of the
-> implementation of the LE Read ISO TX Sync command on the controller side.
+On Wed, Mar 18, 2026 at 2:09=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> The controller returns information about the currently ongoing CIG/BIG.
-> - The sequence number is tied to the currently active CIG or BIG event.
->   It originates from the HOST and is extracted from ISO packet.
-> - The timestamp is the reference point of the ongoing CIG (or the anchor
->   point of the BIG). It is taken from the controller's free running clock=
-.
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This attempt to fix regressions caused by reusing ident which apparently
+> is not handled well on certain stacks causing the stack to not respond to
+> requests, so instead of simple returning the first unallocated id this
+> stores the last used tx_ident and then attempt to use the next until all
+> available ids are exausted and then cycle starting over to 1.
+>
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D221120
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D221177
+> Fixes: 6c3ea155e5ee ("Bluetooth: L2CAP: Fix not tracking outstanding TX i=
+dent")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  include/net/bluetooth/l2cap.h |  1 +
+>  net/bluetooth/l2cap_core.c    | 23 ++++++++++++++++++++---
+>  2 files changed, 21 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.=
+h
+> index 010f1a8fd15f..5172afee5494 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -658,6 +658,7 @@ struct l2cap_conn {
+>         struct sk_buff          *rx_skb;
+>         __u32                   rx_len;
+>         struct ida              tx_ida;
+> +       __u8                    tx_ident;
+>
+>         struct sk_buff_head     pending_rx;
+>         struct work_struct      pending_rx_work;
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index ead51dc0f3f1..a818a58362d5 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -926,16 +926,33 @@ int l2cap_chan_check_security(struct l2cap_chan *ch=
+an, bool initiator)
+>
+>  static int l2cap_get_ident(struct l2cap_conn *conn)
+>  {
+> +       u8 max;
+> +       int ident;
+> +
+>         /* LE link does not support tools like l2ping so use the full ran=
+ge */
+>         if (conn->hcon->type =3D=3D LE_LINK)
+> -               return ida_alloc_range(&conn->tx_ida, 1, 255, GFP_ATOMIC)=
+;
+> -
+> +               max =3D 255;
+>         /* Get next available identificator.
+>          *    1 - 128 are used by kernel.
+>          *  129 - 199 are reserved.
+>          *  200 - 254 are used by utilities like l2ping, etc.
+>          */
+> -       return ida_alloc_range(&conn->tx_ida, 1, 128, GFP_ATOMIC);
+> +       else
+> +               max =3D 128;
+> +
+> +       /* Allocate ident using min as last used + 1 (cyclic) */
+> +       ident =3D ida_alloc_range(&conn->tx_ida, conn->tx_ident + 1, max,
+> +                               GFP_ATOMIC);
+> +       /* Force min 1 to start over */
+> +       if (ident <=3D 0)
+> +               ident =3D ida_alloc_range(&conn->tx_ida, 1, max, GFP_ATOM=
+IC);
+> +
+> +       if (ident > 0)
+> +               conn->tx_ident =3D ident;
+> +       else
+> +               BT_ERR("Uanble to allocate ident: %d", ident);
+> +
+> +       return conn->tx_ident;
+>  }
+>
+>  static void l2cap_send_acl(struct l2cap_conn *conn, struct sk_buff *skb,
+> --
+> 2.53.0
 
-Thank you, this is very useful, and probably sufficient information for
-implementation. I'll still need to check MT7925 behavior on this, but
-it is probably enough to start with.
+Give this a try.
 
->  Partial btsnoop output:
->=20
->  *No.* -- *Time* ----------------------*Info* -------------------------*S=
-ource* ------------- *Destination* --------- *Protocol*
->  46971 | 72.066457 | Sent LE Read ISO Tx Sync                   | host   =
-           | controller                      | HCI_CMD
->  46972 | 72.067106 | Handle: 0xa01, SeqNo: 4408, SDU length: 60 | 44:67:9=
-3:7e:00:9d | e4:e3:a6:e7:45:45 (INZONE Buds) | ISO Data
->  46973 | 72.067118 | Handle: 0xa02, SeqNo: 4408, SDU length: 60 | 44:67:9=
-3:7e:00:9d | e4:ec:1a:c4:cf:01 (INZONE Buds) | ISO Data
->=20
->  46981 | 72.072452 | Rcvd Command Complete (LE Read ISO Tx Sync)| control=
-ler        | host                            | HCI_EVT
->  46982 | 72.072462 | Sent LE Read ISO Tx Sync                   | host   =
-           | controller                      | HCI_CMD
->  46984 | 72.074644 | Handle: 0xa01, SeqNo: 4409, SDU length: 60 | 44:67:9=
-3:7e:00:9d | e4:e3:a6:e7:45:45 (INZONE Buds) | ISO Data
->  46985 | 72.074683 | Handle: 0xa01, SeqNo: 4410, SDU length: 60 | 44:67:9=
-3:7e:00:9d | e4:e3:a6:e7:45:45 (INZONE Buds) | ISO Data
->  46986 | 72.074695 | Handle: 0xa02, SeqNo: 4409, SDU length: 60 | 44:67:9=
-3:7e:00:9d | e4:ec:1a:c4:cf:01 (INZONE Buds) | ISO Data
->  46987 | 72.074701 | Handle: 0xa02, SeqNo: 4410, SDU length: 60 | 44:67:9=
-3:7e:00:9d | e4:ec:1a:c4:cf:01 (INZONE Buds) | ISO Data
-> =20
->  46992 | 72.077452 | Rcvd Command Complete (LE Read ISO Tx Sync)| control=
-ler        | host                            | HCI_EVT
->  46993 | 72.077461 | Sent LE Read ISO Tx Sync                   | host   =
-           | controller                      | HCI_CMD
->  46994 | 72.079450 | Rcvd Command Complete (LE Read ISO Tx Sync)| control=
-ler        | host                            | HCI_EVT
->=20
-> // sdu_interval: 7.5ms, Packing: Sequential, Unframed.
-> // HOST transmits SDU, SeqNum =3D 4408, handle =3D 0x0a01
->  Frame 46972: 72 bytes on wire (576 bits), 72 bytes captured (576 bits)
->  Bluetooth HCI ISO Packet
->      .... 1010 0000 0001 =3D Connection Handle: 0xa01
->      ..10 .... .... .... =3D PB Flag: Complete SDU (0x2)
->      .1.. .... .... .... =3D Timestamp present: True
->      0... .... .... .... =3D Reserved: 0x0
->      ..00 0000 0100 0100 =3D Data Length: 68
->      Data
->      [Connect in frame: 6122]
->      Bluetooth ISO Data
->      Timestamp: 193973666=C2=B5s
->      Sequence Number: 4408
->      .... 0000 0011 1100 =3D SDU Length: 60
->      SDU
->=20
-> // CMPLT reported in frame frame #46981 for the command issued in frame #=
-46971=20
->  Frame 46981: 17 bytes on wire (136 bits), 17 bytes captured (136 bits)
->  Bluetooth HCI Event - Command Complete
->      Event Code: Command Complete (0x0e)
->      Parameter Total Length: 15
->      Number of Allowed Command Packets: 1
->      Command Opcode: LE Read ISO Tx Sync (0x2061)
->      Status: Success (0x00)
->      CIS/BIS Handle: 0x0a01
->      SDU Packet Sequence Number: 4407
->      SDU Packet Timestamp: 212355139=C2=B5s
->      SDU Packet Offset: 0=C2=B5s
->      [Command in frame: 46971]
->      [Command-Response Delta: 5.995ms]
->=20
-> // CMPLT reported in frame frame #46992 for the command issued in frame #=
-46982=20
->  Frame 46992: 17 bytes on wire (136 bits), 17 bytes captured (136 bits)
->  Bluetooth HCI Event - Command Complete
->      Event Code: Command Complete (0x0e)
->      Parameter Total Length: 15
->      Number of Allowed Command Packets: 1
->      Command Opcode: LE Read ISO Tx Sync (0x2061)
->      Status: Success (0x00)
->      CIS/BIS Handle: 0x0a01
->      SDU Packet Sequence Number: 4408
->      SDU Packet Timestamp: 212362639=C2=B5s
->      SDU Packet Offset: 0=C2=B5s
->      [Command in frame: 46982]
->      [Command-Response Delta: 4.99ms]
->=20
-> // CMPLT reported in frame frame #46994 for the command issued in frame #=
-46993=20
->  Frame 46994: 17 bytes on wire (136 bits), 17 bytes captured (136 bits)
->  Bluetooth HCI Event - Command Complete
->      Event Code: Command Complete (0x0e)
->      Parameter Total Length: 15
->      Number of Allowed Command Packets: 1
->      Command Opcode: LE Read ISO Tx Sync (0x2061)
->      Status: Success (0x00)
->      CIS/BIS Handle: 0x0a02
->      SDU Packet Sequence Number: 4408
->      SDU Packet Timestamp: 212356039=C2=B5s
->      SDU Packet Offset: 0=C2=B5s
->      [Command in frame: 46993]
->      [Command-Response Delta: 1.989ms]
->=20
-> I hope this information will be of some help.
->=20
-> > @Luiz: thoughts on the below?
-> >=20
-> > For setting Time_Stamp, I think there should be plan how userspace
-> > application uses the new APIs to produce working sound on different
-> > controllers, without having to maintain a quirk list for each
-> > controller. I think quirk lists should be in the kernel driver.
-> >=20
-> > Depending on what hardware is doing, we could add driver quirks along
-> > the lines of
-> >=20
-> > HCI_QUIRK_BROKEN_LE_READ_ISO_TX_SYNC, /* always zero / dummy value */
-> > HCI_QUIRK_LE_READ_ISO_TX_SYNC_HOST_PREV, /* most recent from host */
-> > HCI_QUIRK_LE_READ_ISO_TX_SYNC_NOCP, /* most recent completed */
-> > HCI_QUIRK_LE_READ_ISO_TX_SYNC_HOST_SEQ, /* uses host seqnum */
-> >=20
-> > and should affect what skb is reported in hci_cc_le_read_iso_tx_sync(),
-> > and if SOF_TIMESTAMPING_TX_HARDWARE capability is reported in ethtool.
-> >=20
-> > (Eg. IIUC Zephyr HCI appears to interpret LE Read ISO TX Sync meaning
-> > as follows:
-> >=20
-> > - The sequence number is controller-assigned.
-> > - The response corresponds to the ISO data packet that
-> > the controller *most recently received from host*.
-> >=20
-> > This interpretation makes sense, but is different from my patch and
-> > iiuc also different from what Luiz had in mind.)
-> >=20
-> > If no quirk is set but the command is supported, probably should emit
-> > visible error in kernel log, or something along such lines, so the
-> > driver authors can see something is not right.
-> >=20
-> > But knowing what is the precise hardware behavior for each
-> > chip/firmware seems a bit involved, probably should have some testing
-> > tool for this.
-> >=20
-> > ***
-> >=20
-> > What it seems userspace can do:
-> >=20
-> > Userspace application would check via ethtool
-> > SOF_TIMESTAMPING_TX_HARDWARE capability to know whether controller
-> > handles Time_Stamp in a non-broken way. (For testing, there could be a
-> > switch to force it to use timestamps regardless.)
-> >=20
-> > It could then rely that the HW timestamp corresponds to specific packet
-> > it sent earlier. It could assume that in its clock domain, the HW
-> > timestamp is after SND timestamp, before COMPLETION timestamp, and
-> > likely close to COMPLETION.
-> >=20
-> > Since it doesn't know the exact correspondence, probably it would
-> > always have to ensure a few packets are always queued in controller.
-> >=20
-> > There also needs to be a way to recover from a situation where the
-> > application is setting timestamps that are in the past in controller
-> > clock domain.
-> >=20
-> > The controller does not necessarily send them I think, but will report
-> > them completed immediately (after older ones get flushed from its
-> > buffers).
-> >=20
-> > In this case LE Read ISO TX Sync timestamp would not advance, as no
-> > packets get sent. Kernel would also not send HW timestamps to user
-> > application in this case.
-> >=20
-> > If the application when it doesn't receive HW timestamps from kernel,
-> > just increments its send timestamp by SDU interval for each packet, it
-> > eventually catches up the controller clock, and receives HW timestamp
-> > and can resync.
-> >=20
-> > Alternatively the user application may stop setting timestamps, in
-> > which case controller shall send it in next SDU interval, and in this
-> > case HW timestamp is received and user application can resync.
-> >=20
-> > Or, alternatively, controller will decide the clock is out of sync and
-> > send the SDU regardless, in which case user application will receive a
-> > new HW timestamp and can again resync.=20
-> =20
->=20
-> Thanks!
->=20
-> Best regards!
->=20
-> Tailu
 
 --=20
-Pauli Virtanen
+Luiz Augusto von Dentz
