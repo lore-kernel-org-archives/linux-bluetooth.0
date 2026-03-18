@@ -1,179 +1,202 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD12270EC3
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 02:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B982274FEB
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 02:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773801553; cv=none; b=oiUBLQ12WlZaegvdBaTz+pgYCVijhuAh5X2n1+/YSFcQymTmfqfH5EDmGlP/oI4SQI/SnRufbwyQWaINnH7greREiEfWzMPkjw11Tbnlr+KgqT8eXlrEbvDlGPYTOGzh+jJ1SvoKshN8ZCQ6eIkShF+Uf3grynNUKSLLI16taxI=
+	t=1773802740; cv=none; b=Yb9bWAUnqQhjgLeVodclQCbWYqnGevi4DksczE430M+QNrp/D240IbtHAgXxqF1msXzY5+dxD1KxXN3J3EdmwkfEDaxM7Be+dWbCNHs4L34ihYNb6hlv81BErv9NebNtYV6lhLRNJt1niUfyLo19ljaT2AQKN+ITZjivWyi2dZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773801553; c=relaxed/simple;
-	bh=jFGeopBZPQsRok1FIlD1DbqC9aGHt4P59acUQ5h3hfI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nWRqRDnpRnuq8lUIbM5TX2aotTCm3++xXuYhLZJlU9y9F7JxL5d7WO7rkEYCCiQJlCDEM56ZTfpRsQt1MCI6M37EUg5PvjS9asK+BKSn2IVUstfY2sr7blMucEozWz4D4sAh1EBR9fvHitHJXoq2Hi4OGmChPaF4lrIcQwN6KX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=EVzNt4Md; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=B072wxnk; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1773802740; c=relaxed/simple;
+	bh=T9KFNHfNA/c1421yKwLI9yjNdXiijp6CmQJtYqehCfk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cfe3AWfF+PMLBAjpwpnGdIO/+5yKyPuvMu3/fGS1HCOF83WVbAF6/uFKVxxoVKI4+jeO0w/9pFrEraZxtkA8CLNRPG5nGxOquqILnX/ojTiHu6Sa2WIFkKpTwBrwDEvin/73Rq3wADYMtnMAv1JunMaBKDpC3SpO0D9uHjVicbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=k1eKJovs; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="EVzNt4Md";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="B072wxnk"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62HIJD372730120
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 02:39:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	21i545n9MI16ugockY6mfvxsGYXy84KbkzbH+BLNxSU=; b=EVzNt4MdqTBhV936
-	k3/p8HHx6OErn+EXF+fVcfsaw8swJN+a7DfnuvW+fBKU+CSiKYgMmqt4qDvIZfGN
-	KNqrh16Z47wpI8Jyrx60GHFMJVZp50SGukp7zr9StwhXhnTMeTn21s63+XUKRikA
-	Bsxi/9x0MwHcNYWV9ZMc9XN3544P7ROE1/rmiy6sRzWOydbjF7t9gbtc7ghGuqxv
-	KevM315fdII3g76xZrtrp0UNSbDHJ5l+BDswfm/slVuCcSb/yRIwGh5wOu7239Wu
-	VjTv7rjqz+DH8UbzCqOpK5JwqWEHOZI6FTcB0GUmIw5D/M/L2Yq4V+Lrruw7bV8Y
-	XooHrQ==
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cy8kjtn6t-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 02:39:11 +0000 (GMT)
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-35b991171deso2491131a91.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Mar 2026 19:39:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773801551; x=1774406351; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=21i545n9MI16ugockY6mfvxsGYXy84KbkzbH+BLNxSU=;
-        b=B072wxnkrMo0v2Kw2G/4RqUJCnzoiUDEni2pDxueTUWl2VkiAG1LpE2BB/pbRgZ38y
-         fMXCWL1CDJ9wcf0rlDbJnhj7Ry0zo5Zv3ws7xCPEzu5VhgAj9g/gQMMkP2Xs09RoDiZw
-         adUg1ybMNzyQ81pRc1ovhAc4iWCv1sd9irwdQhpH1y6yqjx3TYHKtjq5qmddjLD7Z528
-         AGScFKEbv855ETzYsH/wG/eeBOyVzr3f/pFENT+OBeoCBbsVD6P25j0ScVRt4Ex6yuWD
-         k56eMAiB6Dr1r43AVIi77UmE0hUVRdB4H+QNfiCYkpFsP5zS+A2D5/xnyeebNoYgPpBo
-         j4Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773801551; x=1774406351;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=21i545n9MI16ugockY6mfvxsGYXy84KbkzbH+BLNxSU=;
-        b=LMFkaOD1TgcWbNZzKRT6aJYmLmW+DcW92EBwKv5gRRU0WjHTcS06LHi4e7TJkOoQlM
-         ZP629E8BfE50iDGIP1m5KkD5mvRwzHl6a/N3bfq4ySX5yv8OgseCqo3RUmFR9h7Cfhx0
-         eIzhNzm/HvbaWLzi4QUbbkYIewQm7Eg77U+QeS/l3nST4D0tICZB7GLPIvu9vfhycS4j
-         Z2F8fKxlHBU9eeTS4l30dmyluCYGJpB4e83je2u/p/pPi2gx7hK5wVIEyFG3NWbhlz2W
-         9rj/+PwI0Twen9/Od1cVmlaukmQp5RVt8yIoAZmHs1aqk9gM+6SWJFJ4KrOajohnceCv
-         2HHg==
-X-Forwarded-Encrypted: i=1; AJvYcCW8ONcKt6mHr4bKaNs6c1XgWzMPVLf13Wk4ILDQheIBPJVyjm5erMssaDnd6d3kIelQwBQxXhvYvrlg9qPf2Y0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBEtjguyRXCo7y6Ku1yN66YCJJF7cmIU3+U+RmwWOcflD2n/OO
-	tVC97iE44WxTJhPVShkzRaslBekLbrVWCizcmZyNgdxjwg1JUNGzwKrpjujq6ZB3ZXt0CumbFur
-	MRgTerfHRJo1NOi4+IzqHDBgpfw5AHl5pJqONbDBcVs2uxE/KMnDBIw8FP/zk/k7VYfyVaOY=
-X-Gm-Gg: ATEYQzwyLCnGKp11YkeaSF07QIgZZKmc72cU5kojgpY/e3VeQVtBZ00JclokrT9rmgA
-	f/KIoOOa37XuznbBbq7Jg7KjW9lMe2yfJlNlMShSTCcU7Vjt6eCv1ZXov7RXN/VHVUdFyc0XPgo
-	MSlmc/HgWbbWVOZ8p2ZEZRRu/xvxTOsjws6S+O5t7pAFnXueTWrDMKMskd+ZCbUzAqBNRVx00SN
-	uv8JagF+B0FHaZhnQAvbBA/GO3xisxdhNzLadJQ/TjNV4mRhFboHU2MlrueGRThOXP8g8P+28IN
-	c1aqEhND7Ng6o+YCNE/WtRL7JrJF1q5KkzOvKxC9ZEpWvc1OTdH9lOqVhcK1Y8UcSMRgVQpzWG/
-	kjcUxRL1aYep1uezl0G6RqFrzJl6aaqzaMt8Ifk+RBbdwgnD/
-X-Received: by 2002:a17:90b:2691:b0:35b:9ab6:1d4e with SMTP id 98e67ed59e1d1-35bb9f24ecamr1376919a91.28.1773801550647;
-        Tue, 17 Mar 2026 19:39:10 -0700 (PDT)
-X-Received: by 2002:a17:90b:2691:b0:35b:9ab6:1d4e with SMTP id 98e67ed59e1d1-35bb9f24ecamr1376887a91.28.1773801550166;
-        Tue, 17 Mar 2026 19:39:10 -0700 (PDT)
-Received: from [10.239.97.158] ([114.94.8.21])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bbad9e5d7sm263439a91.5.2026.03.17.19.39.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Mar 2026 19:39:09 -0700 (PDT)
-Message-ID: <f036e127-3291-4928-838e-1ad301010196@oss.qualcomm.com>
-Date: Wed, 18 Mar 2026 10:39:04 +0800
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="k1eKJovs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Go
+	rFROAI8URQKXNATon1Gt2eHbVdn164+Ooav0/gAHA=; b=k1eKJovsopnQPNnqDY
+	EO7ddGN4QtX0WIMepuKqWAudevUR1WSQn//Zymlsor7HrPfRaN82rgyXAkmsAkBg
+	4ZK3p0ZKwMy8+Hv6cRO4loQCw4l+PL911Y850DIQORuinsad+kEw95uFXZpo5ZmR
+	q/cypz7nzUxTZurzrpTa9Wv4Q=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wD3P3eXFLppCWcUBw--.23043S2;
+	Wed, 18 Mar 2026 10:57:29 +0800 (CST)
+From: zhangchen200426@163.com
+To: luiz.von.dentz@intel.com,
+	pav@iki.fi,
+	pmenzel@molgen.mpg.de,
+	kuniyu@google.com,
+	yang.li@amlogic.com,
+	kees@kernel.org,
+	ceggers@arri.de,
+	marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Zhang Chen <zhangchen01@kylinos.cn>
+Subject: [PATCH] Bluetooth: HCI: Fix hci0 not release in usb disconnect process
+Date: Wed, 18 Mar 2026 10:57:24 +0800
+Message-Id: <20260318025724.1431313-1-zhangchen200426@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] arm64: dts: qcom: hamoa-iot-evk: support Bluetooth
- over both USB and UART
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
-        wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com
-References: <20260311090921.1892191-1-shuai.zhang@oss.qualcomm.com>
- <cffdb8ab-a293-4535-860c-378a4b8a3d33@oss.qualcomm.com>
- <97a3f3f2-e9e2-44ac-a682-0e0f0c100a45@oss.qualcomm.com>
- <eefb75dd-95f9-477b-9251-dcabfae47c8b@oss.qualcomm.com>
-Content-Language: en-US
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-In-Reply-To: <eefb75dd-95f9-477b-9251-dcabfae47c8b@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE4MDAyMCBTYWx0ZWRfX53od7pCYUTsl
- 7lxcoGIdj0qa+a2nhN+bbkxVLZXLMlXnoH8FcHgRMCple0t2+6CbaGiWM7RDJEFGvRIpYbM1Aop
- 8qb7A7hx1wHC3Q55yTXkN/kOIJyqth9K0AdazA4jejkIMFghuuga5rq3eMgLaLKkf+UyaOxzZUp
- LjD3VHOEala2TC9E3VsTRcwrg8g/iC0KDUzmqGRxSLmAOiwg+rcnMHcydEyZJRtFlOyPq4RL+vn
- oq2NEx3+VL2j6f45RIAN6XOt/aqMRe7NO8vDDWdo6iz+xtN/KrAw5pq4RHCWUzcg0+joUn6TkrM
- I3n7ahlbxJgfy3s2he7i+/kFCl25fVAFEMtp/XsK9b5nkKP5oIvP5tSNTh910ZawRHP83+fnjJo
- N4a2Un26MVWRZpgJynwl4rIxDMAIvNa0BnZOcOegYfAYoC9uqOUSHwZNaNZzVurB/nC+VqUQpVG
- TpqO/UCol5oVifzyXug==
-X-Authority-Analysis: v=2.4 cv=P8I3RyAu c=1 sm=1 tr=0 ts=69ba104f cx=c_pps
- a=RP+M6JBNLl+fLTcSJhASfg==:117 a=Uz3yg00KUFJ2y2WijEJ4bw==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=8MRJ8AJfQqww6RVhRvMA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=iS9zxrgQBfv6-_F4QbHw:22
-X-Proofpoint-ORIG-GUID: FXuKCYO9QNgjPuQ1OKOTbgUK4YjrlOd5
-X-Proofpoint-GUID: FXuKCYO9QNgjPuQ1OKOTbgUK4YjrlOd5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-17_05,2026-03-17_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
- lowpriorityscore=0 adultscore=0 spamscore=0 malwarescore=0 bulkscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
- definitions=main-2603180020
+X-CM-TRANSID:_____wD3P3eXFLppCWcUBw--.23043S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWF4xKr4fXFy3Cw48JF4fKrg_yoW7Jryxpa
+	9IyFyFyry8XrWfWry8Aa18AFyYkw4I93y7ArW5G3sxC390vw48tr1UAryYqF9xZrWDJw1D
+	ZF4vqw4a93WUWw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jn4SrUUUUU=
+X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbC6Bk00Gm6FJl7pQAA3V
 
-Hi Konrad
+From: Zhang Chen <zhangchen01@kylinos.cn>
 
-Thanks for your review.
+If hci_resume_dev before hci_unregister_dev, the hci command will
+timeout and the reference count of hdev will not reset to zero.
+Then the node "hci0" will not release.
 
-On 3/13/2026 8:34 PM, Konrad Dybcio wrote:
-> On 3/13/26 7:37 AM, Shuai Zhang wrote:
->> Hi Konrad
->>
->> On 3/11/2026 9:07 PM, Konrad Dybcio wrote:
->>> On 3/11/26 10:09 AM, Shuai Zhang wrote:
->>>> When Bluetooth supports both USB and UART, the BT UART driver is
->>>> always loaded, while USB is hot-pluggable. As a result, when Bluetooth
->>>> is used over USB, the UART driver still be probed and drive BT_EN low,
->>>> which causes the Bluetooth device on USB to be disconnected.
->>> Is bluetooth connected over UART *and* USB simultaneously?
->> BT uses either UART or USB, never both at the same time.
->>
->> On platforms supporting both, the UART driver is always probed, while USB is hot‑pluggable.
->>
->> As a result, when BT runs over USB, the UART driver still probes and pulls BT_EN low,
->>
->> unintentionally powering off the USB BT device.
-> Please describe in more detail how that difference can appear in practice.
->
-> Is there an M.2 slot, into which different kinds of cards (i.e. ones with
-> BT-over-USB vs BT-over-UART) may be plugged in?
+The output in question is as follows:
+Bluetooth: hci0: command 0x0c01 tx timeout
+Bluetooth: hci0: Opcode 0x0c01 failed: -110
+Bluetooth: hci0: command 0x0c01 tx timeout
+Bluetooth: hci0: Opcode 0x0c1a failed: -110
+usb 10-1: new full-speed USB device number 95 using xhci-hcd
+usb 10-1: Product: Bluetooth Radio
+usb 10-1: Manufacturer: Realtek
+usb 10-1: SerialNumber: 00e04c000001
+Bluetooth: hci1: RTL: rom_version status=0 version=1
+Bluetooth: hci1: RTL: loading rtl_bt/rtl8852bu_fw.bin
+Bluetooth: hci1: RTL: loading rtl_bt/rtl8852bu_config.bin
+Bluetooth: hci1: RTL: cfg_sz 6, total sz 65603
 
-Yes, this is an M.2 slot that can accommodate different types of cards.
-Additionally, the maintainer proposed option [1], which should be able 
-to resolve my issue.
+The call sequence in question is as follows:
+usb disconnect:
+  btusb_disconnect
+   hci_unregister_dev
+    hci_dev_set_flag
+    hci_cmd_sync_clear
+    hci_unregister_suspend_notifier
+    hci_dev_do_close
+    device_del
 
-I am currently evaluating it.
+device resume:
+  hci_suspend_notifier
+   hci_resume_dev
+    hci_resume_sync
+     hci_set_event_mask_sync
+      __hci_cmd_sync_status
+       __hci_cmd_sync_status_sk
+        __hci_cmd_sync_sk
+         wait_event_interruptible_timeout
 
-[1]https://lore.kernel.org/r/20260224-pci-m2-e-v5-9-dd9b9501d33c@oss.qualcomm.com
+This patch add hci_cancel_cmd_sync in hci_unregister_dev to wake up
+hdev->req_wait_q, and stop __hci_cmd_sync_sk by judging the
+HCI_UNREGISTER flag. Then stopping hci_resume_dev process based on the
+returned error code.
 
->
-> Konrad
+Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
+Cc: linux-bluetooth@vger.kernel.org
+Signed-off-by: Zhang Chen <zhangchen01@kylinos.cn>
+---
+ net/bluetooth/hci_core.c |  6 ++++++
+ net/bluetooth/hci_sync.c | 22 ++++++++++++++++------
+ 2 files changed, 22 insertions(+), 6 deletions(-)
 
-
-Thanks,
-Shuai
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 22598581b1ad..c6238a69a0d5 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -50,6 +50,7 @@
+ static void hci_rx_work(struct work_struct *work);
+ static void hci_cmd_work(struct work_struct *work);
+ static void hci_tx_work(struct work_struct *work);
++static void hci_cancel_cmd_sync(struct hci_dev *hdev, int err);
+ 
+ /* HCI device list */
+ LIST_HEAD(hci_dev_list);
+@@ -2696,6 +2697,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_dev_set_flag(hdev, HCI_UNREGISTER);
+ 	mutex_unlock(&hdev->unregister_lock);
+ 
++	hci_cancel_cmd_sync(hdev, EINTR);
++
+ 	write_lock(&hci_dev_list_lock);
+ 	list_del(&hdev->list);
+ 	write_unlock(&hci_dev_list_lock);
+@@ -2878,6 +2881,9 @@ int hci_resume_dev(struct hci_dev *hdev)
+ 	ret = hci_resume_sync(hdev);
+ 	hci_req_sync_unlock(hdev);
+ 
++	if (ret && hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return 0;
++
+ 	mgmt_resuming(hdev, hdev->wake_reason, &hdev->wake_addr,
+ 		      hdev->wake_addr_type);
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 3166914b0d6c..ac4c973dd976 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -174,10 +174,11 @@ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 		return ERR_PTR(err);
+ 
+ 	err = wait_event_interruptible_timeout(hdev->req_wait_q,
+-					       hdev->req_status != HCI_REQ_PEND,
++					       hdev->req_status != HCI_REQ_PEND ||
++					       hci_dev_test_flag(hdev, HCI_UNREGISTER),
+ 					       timeout);
+ 
+-	if (err == -ERESTARTSYS)
++	if (err == -ERESTARTSYS || hci_dev_test_flag(hdev, HCI_UNREGISTER))
+ 		return ERR_PTR(-EINTR);
+ 
+ 	switch (hdev->req_status) {
+@@ -6346,6 +6347,7 @@ static int hci_resume_scan_sync(struct hci_dev *hdev)
+  */
+ int hci_resume_sync(struct hci_dev *hdev)
+ {
++	int err;
+ 	/* If not marked as suspended there nothing to do */
+ 	if (!hdev->suspended)
+ 		return 0;
+@@ -6353,10 +6355,14 @@ int hci_resume_sync(struct hci_dev *hdev)
+ 	hdev->suspended = false;
+ 
+ 	/* Restore event mask */
+-	hci_set_event_mask_sync(hdev);
++	err = hci_set_event_mask_sync(hdev);
++	if (err && hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return err;
+ 
+ 	/* Clear any event filters and restore scan state */
+-	hci_clear_event_filter_sync(hdev);
++	err = hci_clear_event_filter_sync(hdev);
++	if (err && hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return err;
+ 
+ 	/* Resume scanning */
+ 	hci_resume_scan_sync(hdev);
+@@ -6365,10 +6371,14 @@ int hci_resume_sync(struct hci_dev *hdev)
+ 	hci_resume_monitor_sync(hdev);
+ 
+ 	/* Resume other advertisements */
+-	hci_resume_advertising_sync(hdev);
++	err = hci_resume_advertising_sync(hdev);
++	if (err && hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return err;
+ 
+ 	/* Resume discovery */
+-	hci_resume_discovery_sync(hdev);
++	err = hci_resume_discovery_sync(hdev);
++	if (err && hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return err;
+ 
+ 	return 0;
+ }
+-- 
+2.25.1
 
