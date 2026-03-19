@@ -1,154 +1,274 @@
-Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B1C3A75B2
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 23:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E1333D6D8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 23:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773962450; cv=none; b=TFXdnJGMrnVkNa4qU5SpT0Y9FRdNb5DUyOBC+l3kws3nf1HT9y8j2XLB9KuhLUIMhcf/yVOcPTzrzoEEnKvQN8PbDDsxvUDP7XSMise6Jai1jYdlG0iSE61zfokNig9RdPZEsXEGKDGpN/Xq6s5cBR6KiuP5jOJDgFYHHHsyTx0=
+	t=1773964249; cv=none; b=HbzQ4/miS1H2ML9anF2OV5sHogBMuUdqvDdCcpY/n1QhUMRbza0heKMBhHkvCZgDWQl0z9DSKZirQMVYIGLy6NlOSll08UWvGzRh/2xzj1ETCX/sQfdggS5N0XFR0qbOVHCBXok4Mlm6iIYykI9M2uq9XL2hbXPHRgiVu3D60Bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773962450; c=relaxed/simple;
-	bh=i/ZHP3nIoR1Lrccv6ggi1m62foVVsgKFwZ85KWaAgMk=;
-	h=Content-Type:MIME-Version:From:To:Date:Subject:Cc:In-Reply-To:
-	 References:Message-Id; b=Ed6EWA0zhj+N9k+xlbKa2q6n0ev0IqRFHr5TPICCGhMTuqpxBhFoEYYasf592R/BKJAhnGiLrpo0Ho0+P9/Cyj19Q3SKuKUj7p9Y4sYGwvUHB8jgXE20v5QgS82J4rcFkKsoVd/TT7hQU/VW7sV8aIs/3mJOIAdqW7ZWwEidEWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me; spf=pass smtp.mailfrom=jetm.me; dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b=EptwHYR4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MnY8U9pM; arc=none smtp.client-ip=202.12.124.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jetm.me
+	s=arc-20240116; t=1773964249; c=relaxed/simple;
+	bh=Z9h6fjZG3YaQ2kLMt73hzovxg5plFZQZHkK2ImFNAGE=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=sDltK0gZXXq/dJG5WGWmkEZKmI2qPixuPi4jF4aJRr3NaNvFE+Xp4UqRPKZCNcRaoWWbpZVzBwRFuQqmX2pgdQYZf6q8TeiBODVW8LhxNgvCn9Ur+20nKg48AbNoKlt+cK3fXMtUKZCBJUB07hpKJQQ6QLOOXJYoZHkTlbac9nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aJ18MQqB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b="EptwHYR4";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MnY8U9pM"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.stl.internal (Postfix) with ESMTP id 9C73D1D00211;
-	Thu, 19 Mar 2026 19:20:47 -0400 (EDT)
-Received: from phl-imap-07 ([10.202.2.97])
-  by phl-compute-02.internal (MEProxy); Thu, 19 Mar 2026 19:20:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jetm.me; h=cc:cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1773962447;
-	 x=1774048847; bh=bPJ6Lyfn7yPn7UuxN3CPtATH7ID+bUNGaaGcyG0DoZw=; b=
-	EptwHYR4QaamRWF0cBFOUqX7GlTJjobjA8QT0AIDLXEa0HpcJ3aCq+0QtNNIkj6w
-	30KzMj4o4zUl4EaMHqFtmear2zcjV2WfMQXQhPYr4h2M7Xlg3k6V8qH/PsC3XCT1
-	8VO6xdmHyrq6NjhiRqcsKbXCb+8NIo4MjkKGoPTCaA/taJNbbu91XOFnP9eu+KYF
-	oyCYL8bltkahlLXT434oWsEaRul9sFYx9+i2ACG9vIT2HtWqvwnR4j6NqvK7yViC
-	OFNsV+bZz4gfNPr0qZY4RAgWmoNFSJy7guEQ8U0XJSYvEZx0P+Ukmec0H+zsEJmv
-	JQ3rjhjP7zkI9widKAMhaA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773962447; x=
-	1774048847; bh=bPJ6Lyfn7yPn7UuxN3CPtATH7ID+bUNGaaGcyG0DoZw=; b=M
-	nY8U9pMcRw5ZyYEmLY/SmoJVIqAZC5OYZ/YPQNwfn15Thl/v7K+lL+1LxrI3gUMu
-	3Bz90tl0hEBAo+CCX85WraWFs4moRzbLN7EqW8yytSu7YpiqXO2PYeoKxLIjPZ/d
-	xPGP7GfD9oBX3aK1KvRLzkDJcqg+5OFUO8VbY3uqt9Zo6ZBCCWXEIEoZXQsREUpq
-	cLWjVCAbZfaAD70OwzIhWTjp2Vnq0h3xYh4RNsIDRJsNfdQcfIU0cQvrUOb6I8WU
-	rwCoj4TvblDCT/nweyzBcX85FQEG6fkvI0xjH2r0XKMjQPkfgod5MtQ0IrgvRLE8
-	XmKdjg1nk4igKpzeuFVSw==
-X-ME-Sender: <xms:z4S8aYDMSyak7F72ds5pBV30zlhPe89XjAqvUGXiqOdEv3ximihRfQ>
-    <xme:z4S8aVXmj8ksKa_vesdGmHf8KXYJPBy57TzCUvMkSo4suIZfMB_5p4R36kOZpiP8W
-    bwcEUAq7O1PlzwM1stq7IC-sAS4WoYhj3YgYAd8oFM19ciyKB6pCF_x>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdekfeduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegopf
-    hokfffucdluddtmdenucfjughrpefotggggffhvfffufevjghfsehtkedttdertdejnecu
-    hfhrohhmpeflrghvihgvrhcuvfhirgcuoehflhhoshhssehjvghtmhdrmhgvqeenucggtf
-    frrghtthgvrhhnpeektdffveejhfeffeevgfefhffhuedvvdfgfffhieetleefvefgfeek
-    tedvffffgfenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuih
-    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepfhhlohhsshesjhgvthhmrdhmvgdp
-    nhgspghrtghpthhtohepgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhuih
-    iirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtohepshgvrghnrdifrghnghes
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqmhgvughirghtvghksehlih
-    hsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqsghluhgv
-    thhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:z4S8aRoLbIB86xOUchVrPgnbHyOYABS0b5iEC_oG8uItdgmbssfXWQ>
-    <xmx:z4S8afFjiNb-yTUG2lhv4DmDyX-tJJJPmyRZZxgDgeyW-4fsKz_OTw>
-    <xmx:z4S8aRsn9ImPVSAhLoohRepPUPFs6zFX98HYlAs8jc1MtxzFefTdew>
-    <xmx:z4S8aRXPJ6o3yMDUsE-j_EUKTIVSzpvBCAsxRZcETvP0vX27gEUQDw>
-    <xmx:z4S8aTvanKQl1XiweKSpUrG5WWlhlhbo5VuW7QF07AMG0i2EJhLGQKk3>
-Feedback-ID: i9dde48b3:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id E361D1EA006B; Thu, 19 Mar 2026 19:20:46 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJ18MQqB"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 07799C19424
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 23:50:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773964249;
+	bh=Z9h6fjZG3YaQ2kLMt73hzovxg5plFZQZHkK2ImFNAGE=;
+	h=From:To:Subject:Date:From;
+	b=aJ18MQqBRn9Bi7YnbrbQv1ggvqryNazTidBnjU0LcGdtl0bA0rKU2q1hPmafUy92K
+	 Cxl4eRGq7m99R+fp7y24LF9w41k3/Zxz5kXDf6Wn3ofAulRZJBlirF7X1QwWHjajgB
+	 rhTd8ZCQN5UHH403TQEOTvmGrHFRVTYi/aC4f+TXSqCQZBQbLF735gIwUIJW58i9AB
+	 lYe1ixgg5znrFKUYbml263TloExjbWYVMxszQDBVClZr4+XjyOLIrMN7ZP/8E96duj
+	 +uNm6YIk0TLoIaeZ8fMo5+4lABvOni6Lc9V7P2tHnVaL37UE9CIStuCIRgjC2kMjOD
+	 Ym5bSKtmvsZ8A==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id EB145C3279F; Thu, 19 Mar 2026 23:50:48 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221263] New: HID: Apple Magic Mouse 2 (BT 0x004C:0x0323)
+ reports wrong battery percentage -- hidinput_query_battery_capacity() reads
+ buf[1]    (status byte) instead of buf[2] (AbsoluteStateOfCharge)
+Date: Thu, 19 Mar 2026 23:50:48 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: wh6cyy@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-221263-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Javier Tia <floss@jetm.me>
-To: Sean Wang <sean.wang@kernel.org>
-Date: Thu, 19 Mar 2026 17:18:10 -0600
-Subject: Re: [PATCH 1/2] Bluetooth: btmtk: Add MT6639 (MT7927) Bluetooth support
-Cc: linux-bluetooth@vger.kernel.org, "moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-In-Reply-To: CAGp9Lzrysz8Tyh2KUMWVgHMsfUqojiJgPseG+CTULTqH=QQhaw@mail.gmail.com
-References: 177272816248.352280.12453518046823439297@jetm.me 20260305162928.5E8F11EA006C@mailuser.phl.internal CAGp9Lzrysz8Tyh2KUMWVgHMsfUqojiJgPseG+CTULTqH=QQhaw@mail.gmail.com
-Message-Id: <20260319232046.E361D1EA006B@mailuser.phl.internal>
 
-Hi Sean,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221263
 
-Thank you for the review. I have a few questions before
-preparing v2.
+            Bug ID: 221263
+           Summary: HID: Apple Magic Mouse 2 (BT 0x004C:0x0323) reports
+                    wrong battery percentage --
+                    hidinput_query_battery_capacity() reads buf[1]
+                    (status byte) instead of buf[2]
+                    (AbsoluteStateOfCharge)
+           Product: Drivers
+           Version: 2.5
+          Hardware: ARM
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: wh6cyy@gmail.com
+        Regression: No
 
-On Fri, Mar 7, 2026 Sean Wang wrote:
-> BT and WiFi use separate firmware.
-> I'm not sure why those WiFi sections are included in the binary.
-> Another concern is whether it is appropriate to upload the firmware
-> used in Windows to the linux-firmware repository,
-> The firmware files are probably intended for dedicated OEMs.
+Hi,
 
-Understood. The BT firmware we have came from an ASUS Windows
-driver package because no official Linux firmware exists yet
-for MT6639.
+  I am reporting a confirmed bug in the HID battery subsystem that causes t=
+he
+  Apple Magic Mouse 2 to permanently show 4% battery at boot when connected=
+ via
+  Bluetooth.  The root cause has been isolated to a hardcoded byte-index
+  assumption in hidinput_query_battery_capacity() (drivers/hid/hid-input.c)
+  that is incompatible with the Magic Mouse 2's multi-field report 0x90
+structure.
 
-Regarding the section filtering: the MT6639 is a combo chip,
-and the firmware binary we have contains 9 sections - some BT,
-some not. Without filtering on (dlmodecrctype & 0xff) == 0x01,
-the chip hangs irreversibly during download. I'd argue the
-driver should handle mixed-section firmware correctly regardless
-of source, since combo chip firmware may inherently contain
-sections for multiple subsystems. But if MediaTek provides a
-clean BT-only binary, the filtering becomes a no-op and can
-be dropped.
 
-Three questions:
+  --- System information ---
 
-1. Is MediaTek planning to release official MT6639/MT7927 BT
-   firmware for linux-firmware? A clean BT-only binary would
-   simplify the driver code.
+    Kernel:   6.18.15-400.asahi.fc43.aarch64+16k (Asahi Linux on Apple Sili=
+con)
+    Device:   Apple Magic Mouse 2, "William's Magic Mouse #2"
+    BT MAC:   D0:C0:50:CF:DF:F1
+    HID IDs:  Bus=3D0x0005 (Bluetooth), Vendor=3D0x004C (Apple BT),
+              Product=3D0x0323
+    Driver:   hid-magicmouse (BT path)
 
-2. The WiFi side has the same firmware dependency. The WiFi
-   series I sent to linux-wireless [1] uses
-   WIFI_MT6639_PATCH_MCU_2_1_hdr.bin and
-   WIFI_RAM_CODE_MT6639_2_1.bin under mediatek/mt6639/. Is
-   there a plan for official WiFi firmware submission, and
-   would the path be mediatek/mt6639/ or something else
-   (e.g. mediatek/mt7927/)?
 
-3. Luiz requires a MediaTek engineer Signed-off-by on the
-   btmtk patch confirming the changes work as intended. Would
-   you be able to review and sign off on v2, or point me to
-   the right person at MediaTek for BT driver changes?
+  --- Observed vs. expected behaviour ---
 
-I plan to decouple the driver patches from firmware
-availability - the btmtk/btusb changes are valid independent
-of which firmware binary ends up in linux-firmware. The
-linux-firmware MR !946 can track separately.
+    /sys/class/power_supply/hid-d0:c0:50:cf:df:f1-battery/capacity
+    reports: 4
 
-> This is common logic for the other mediatek chips. It only takes
-> longer on the first power-on.
+    macOS reports 94% for the same mouse simultaneously (confirmed ground
+truth).
+    Occasional spontaneous correct readings (~95%) are observed at boot bef=
+ore
+    the first sysfs read (see Race Condition section below), confirming the
+    device transmits the correct value.
 
-> If the firmware download is properly handled in
-> btmtk_setup_firmware_79xx, we don't need the extra bit.
+    UPower sysfs snapshot:
 
-Got it. I'll drop the BTMTK_FIRMWARE_LOADED flag in v2 and
-let btmtk_setup_firmware_79xx handle persistence the same way
-it does for other chips.
+      POWER_SUPPLY_NAME=3Dhid-d0:c0:50:cf:df:f1-battery
+      POWER_SUPPLY_TYPE=3DBattery
+      POWER_SUPPLY_STATUS=3DDischarging
+      POWER_SUPPLY_CAPACITY=3D4
+      POWER_SUPPLY_SCOPE=3DDevice
+      POWER_SUPPLY_MODEL_NAME=3DWilliam's Magic Mouse #2
 
-[1] https://lore.kernel.org/linux-wireless/20260319-mt7927-wifi-support-v2-v2-0-d627a7fad70d@jetm.me/
 
-Best,
-Javier
+  --- HID Report Descriptor (battery collection) ---
+
+  Full raw descriptor (from hid-recorder):
+    R: 135 05 01 09 02 a1 01 85 12 05 09 19 01 29 02 15 00 25 01 95 02 75 01
+    81 02 95 01 75 06 81 03 05 01 09 01 a1 00 16 01 f8 26 ff 07 36 01 fb 46
+    ff 04 65 13 55 0d 09 30 09 31 75 10 95 02 81 06 75 08 95 02 81 01 c0 06
+    02 ff 09 55 85 55 15 00 26 ff 00 75 08 95 40 b1 a2 c0 06 00 ff 09 14 a1
+    01 85 90 05 84 75 01 95 03 15 00 25 01 09 61 05 85 09 44 09 46 81 02 95
+    05 81 01 75 08 95 01 15 00 26 ff 00 09 65 81 02 c0
+
+  Battery Application Collection (report 0x90):
+
+    85 90          -- Report ID 0x90
+    05 84          -- Usage Page: Power Device (0x84)
+    75 01 95 03    -- Report Size 1, Count 3
+    15 00 25 01    -- Logical Min 0, Max 1
+    09 61          -- Usage: PresentStatus (0x61)          [bit 0]
+    05 85          -- Usage Page: Battery System (0x85)
+    09 44          -- Usage: Charging (0x44)               [bit 1]
+    09 46          -- Usage: Discharging (0x46)            [bit 2]
+    81 02          -- Input (FIELD 0: 3 x 1-bit status)
+    95 05 81 01    -- 5-bit padding
+    75 08 95 01    -- Report Size 8, Count 1
+    15 00 26 ff 00 -- Logical Min 0, Max 255
+    09 65          -- Usage: AbsoluteStateOfCharge (0x65)
+    81 02          -- Input (FIELD 1: 8-bit charge)
+    c0             -- End Collection
+
+  Raw buffer layout for report 0x90 (as seen by the kernel):
+
+    buf[0] =3D 0x90  -- report ID
+    buf[1] =3D 0x04  -- FIELD 0: status byte (bit2=3DDischarging=3D1, rest=
+=3D0)
+    buf[2] =3D 0x5F  -- FIELD 1: AbsoluteStateOfCharge =3D 95 decimal
+
+
+  --- Bluetooth traffic capture (btmon) ---
+
+  The kernel queries:  41 90  (GET_REPORT, INPUT type, report ID 0x90)
+
+  The mouse consistently responds:  a1 90 04 5f
+
+    a1 =3D BT HID DATA INPUT header
+    90 =3D report ID
+    04 =3D status byte =3D 0b00000100 (bit2=3DDischarging)
+    5f =3D AbsoluteStateOfCharge =3D 95 decimal  =E2=86=90 matches macOS 94%
+
+  The value 0x5f=3D95 is stable across every captured report.
+
+
+  --- Root cause ---
+
+  hidinput_query_battery_capacity() in drivers/hid/hid-input.c:
+
+    ret =3D hidinput_scale_battery_capacity(dev, buf[1]);   /* BUG */
+
+  It hardcodes buf[1] as the battery byte.  For reports where the battery
+  field is the first (and only) data field, buf[1] is correct.  For report
+  0x90 on the Magic Mouse 2, buf[1] is the status byte (0x04 =3D 4) and the
+  AbsoluteStateOfCharge is at buf[2] (0x5F =3D 95).
+
+  Arithmetic confirming the bug:
+
+    Observed: buf[1] =3D 0x04 =3D 4 =E2=86=92 scale(4, 0, 100) =3D 4%  =E2=
+=9C=93 matches sysfs
+    Correct:  buf[2] =3D 0x5F =3D 95 =E2=86=92 scale(95, 0, 100) =3D 95%  =
+=E2=9C=93 matches macOS
+
+  The correct byte offset is deterministic from the descriptor:
+    1 + (field->report_offset / 8) =3D 1 + (8/8) =3D 2  =E2=86=92  buf[2]
+
+  The leading 1 accounts for the report-ID byte prepended by
+hid_hw_raw_request().
+
+
+  --- Race condition / intermittent correct readings ---
+
+  hidinput_get_battery_property() has two paths:
+
+    A. Query path (buggy): when battery_status !=3D HID_BATTERY_REPORTED, c=
+alls
+       hidinput_query_battery_capacity() =E2=86=92 reads buf[1] =3D 4 =E2=
+=86=92 returns 4%.
+
+    B. Event-driven path (correct): after the first spontaneous HID INPUT
+       event for report 0x90 processes the AbsoluteStateOfCharge usage via
+       hid_input_var_field() (which correctly bit-extracts each usage's val=
+ue
+       per the descriptor), hidinput_update_battery() caches 95 in
+       dev->battery_capacity and sets battery_status =3D HID_BATTERY_REPORT=
+ED.
+       Subsequent sysfs reads return 95%.
+
+  The race: if UPower reads sysfs before the first mouse input event (which=
+ is
+  typical at boot), path A fires =E2=86=92 4%.  If the user moves the mouse=
+ before
+  UPower reads =E2=86=92 path B fires first =E2=86=92 95%.
+
+  This explains the "sometimes correct at boot" behaviour: it is a genuine
+  race between UPower's enumeration and the first spontaneous HID report.
+
+
+  --- Why magicmouse_fetch_battery() does not apply ---
+
+  magicmouse_fetch_battery() checks is_usb_magicmouse2() which tests:
+    vendor =3D=3D USB_VENDOR_ID_APPLE  /* 0x05AC */
+
+  A BT-connected Magic Mouse 2 presents vendor=3D0x004C (Apple BT vendor ID=
+),
+  not 0x05AC.  is_usb_magicmouse2() returns false; the battery timer is nev=
+er
+  armed; all battery handling falls through to hid-input.c where the bug li=
+ves.
+
+
+  --- Proposed fix direction ---
+
+  Option A (general fix): Store the AbsoluteStateOfCharge field's byte offs=
+et
+  at hidinput_configure_usage() time (e.g., in a new hdev->battery_field_of=
+fset
+  member) and use it in hidinput_query_battery_capacity() instead of the
+  hardcoded 1.
+
+  Option B (device-specific): Extend is_usb_magicmouse2() to also accept
+  BT_VENDOR_ID_APPLE (0x004C), arming the existing battery timer for BT-path
+  devices so magicmouse_fetch_battery() runs and primes battery_status befo=
+re
+  the first sysfs read, bypassing the hid-input.c query path entirely.
+
+  I do not have a tested patch yet.  I am happy to test patches.
+
+  Regards,
+  Will
+
+  --
+  Kernel: 6.18.15-400.asahi.fc43.aarch64+16k
+  Platform: Apple Silicon (Asahi Linux / Fedora 43)
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
