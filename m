@@ -1,101 +1,55 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B8F3C1994
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 11:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0411F3815C8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 11:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773918509; cv=none; b=seqHH/ILQSmlVx7AWd4Cm2f1Y2STLxNH73BJBPYjh4zDCIa6GUMBqPw4bxrdN9+7S3csRzLd2edxP+VFeuPexMFdbYCSdE0z0lJtKlHBpKRg+x0jwHGiakHrvzLf1vihlX78NKyuf6k+VXUk90wzHiFQuSIzd9i1F+wvPmL+a5M=
+	t=1773918518; cv=none; b=lSRtuQwwK3mKUy9auuYRNnO1t41OJl2fB7GdqzzpRp8zMy8njXwAAahWq/X5SfHI//GLB0z4giG7B2L5IUDFzTvtiDgQcyZZuO/liUYKv6trnpygoxlEcob7Z9Odq9jE3GFyjVoR8MO1XL7fDV/oY49ZlrVAisobKQq2rM6xN20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773918509; c=relaxed/simple;
-	bh=3CjVAAy2Pf43s5RUXTCp4KmX0yKxC+dBy77QytmHkJg=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=H/un0Qm9MfhKuHRQj6YuOpLTejpftWfsHt8EXx5T8q6F3o7xj3B1SdXedy6+6uOl+yspNqZavm6Gt1Ue4Tb3vA1t3sJLFSrtGvm4IjKEHO2w/5eDIHWMSZHrkrMUuMFs40i500DYmuc6U89JcvaJLt0GLTOkoooQytJFQ9pkXWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
+	s=arc-20240116; t=1773918518; c=relaxed/simple;
+	bh=Wkyb8/tg6FQRySseZC8eQB8w7p+JlM3YH9VJrI/1544=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YFH4seLyBxm22meD1Y5qgsIbm+cg7hq2OlzTqU/4cUm55UhA3XwD1O1rTbbEd2WxlHP5z/zqtuXZIgOT6j69XfDfhWa1Powf/DVdpNciuJlIOR+sMggA3vOi/ZgMBuXTfI5KR1vIDdx3jpjbMnfXcbOidW1NQ7ePm65Ak19uMd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 45A083EBC2;
-	Thu, 19 Mar 2026 11:08:24 +0000 (UTC)
-Message-ID: <d0395481e127f9a9324ae515c94e3bf869eb4fe6.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 1/1] shared/shell: Fix SIGSEGV on invalid input
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 5C2025802FC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 10:55:13 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CADE53E982;
+	Thu, 19 Mar 2026 10:55:05 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
-To: Wouter <wouter@xesxen.nl>, linux-bluetooth@vger.kernel.org
-Date: Thu, 19 Mar 2026 12:08:24 +0100
-In-Reply-To: <20260319021645.2137513-2-wouter@xesxen.nl>
-References: <20260319021645.2137513-1-wouter@xesxen.nl>
-	 <20260319021645.2137513-2-wouter@xesxen.nl>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Stefan=20S=C3=B8rensen?= <ssorensen@roku.com>
+Subject: [PATCH BlueZ 0/1] adapter: Fix "Failed to set default system config" startup warning
+Date: Thu, 19 Mar 2026 11:52:05 +0100
+Message-ID: <20260319105457.1381098-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdeikedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepgffgtdekffelheekleelvedugeeijeejtefghfettdefiedttdfhueduudekjedunecuffhomhgrihhnpehgihhthhhusgdrtghomhdpihhnthgvghhrrghtihhonhdqthgvshhtrdhphienucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeevteffgfehfefgleekvddpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsshhorhgvnhhsvghnsehrohhkuhdrtghomh
 X-GND-State: clean
 X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdeikeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhepkffuhffvffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepueeviedvteekkefgfefffeethfejieekteffvdetjeehfeeileettddvueeludelnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugepgeehtedtkeefgfeuvedvpdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepvddprhgtphhtthhopeifohhuthgvrhesgigvshigvghnrdhnlhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
 
-On Thu, 2026-03-19 at 03:16 +0100, Wouter wrote:
-> This fixes a crash when handling "<space><tab>"
+I wonder if the original report swapped one warning for another, or if
+the problem didn't happen for the majority of folks due to command
+processing in hardware specific drivers/firmware.
 
-That looks good to me, but is there any chance you could add the
-valgrind output when reproducing this crash?
+Regression test added to the meson tree:
+https://github.com/hadess/bluez/blob/wip/hadess/add-meson-ell-wrap/unit/integration-test.py#L215
 
-This should show the exact line where the problem is.
+Bastien Nocera (1):
+  adapter: Fix "Failed to set default system config" startup warning
 
-I would also add an explanation to the commit message like:
-"Make sure to check w.we_wordc (word count) before accessing w.we_wordv
-(word array)"
+ src/adapter.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Cheers
+-- 
+2.53.0
 
-> ---
-> =C2=A0src/shared/shell.c | 18 ++++++++++--------
-> =C2=A01 file changed, 10 insertions(+), 8 deletions(-)
->=20
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index b061f8001..57bba0977 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -1174,15 +1174,17 @@ static char **shell_completion(const char
-> *text, int start, int end)
-> =C2=A0		if (wordexp(rl_line_buffer, &w, WRDE_NOCMD))
-> =C2=A0			return NULL;
-> =C2=A0
-> -		matches =3D menu_completion(default_menu.entries,
-> text,
-> -						w.we_wordc,
-> w.we_wordv[0]);
-> -		if (!matches) {
-> -			matches =3D menu_completion(data.menu-
-> >entries, text,
-> -							w.we_wordc,
-> -
-> 							w.we_wordv[0]);
-> -			if (!matches)
-> -				matches =3D submenu_completion(text,
-> w.we_wordc,
-> +		if (w.we_wordc !=3D 0) {
-> +			matches =3D
-> menu_completion(default_menu.entries, text,
-> +							w.we_wordc,
-> w.we_wordv[0]);
-> +			if (!matches) {
-> +				matches =3D menu_completion(data.menu-
-> >entries, text,
-> +								w.we
-> _wordc,
-> =C2=A0								w.we
-> _wordv[0]);
-> +				if (!matches)
-> +					matches =3D
-> submenu_completion(text, w.we_wordc,
-> +							=09
-> 	w.we_wordv[0]);
-> +			}
-> =C2=A0		}
-> =C2=A0
-> =C2=A0		wordfree(&w);
