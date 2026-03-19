@@ -1,159 +1,164 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CAB3CD8A2;
-	Thu, 19 Mar 2026 11:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7763D1715
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 12:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773921503; cv=none; b=cUFQb7PM/CpGvdzqnrMtbfAn56eRjRwcMgMFGwC0ZmhuFtOC3jHMZa3rsL43kCnDczZOX057SAagSJl3vlc9eVMNTq5Jo8Ri50TG1+5aLG02+Qn0Ytpd/TFXG4wPOpN9JMAYZKYZNgh9du/4Kzn+qYpwntAgYIX/iQCr+Yt3Ii4=
+	t=1773923191; cv=none; b=XzKB9jTC48sSZl9wfObMLJpP+EsQ4cxCogiLbknKvR5ZPCb40MBJekN3Sk62eP7G7yCYLcEuP5ne4OFEEYwoJAcFeeyRQeGgREGeOhuaZardvEy6hYaEQV6qShB+YgMgofulFsnHQZH4mOJwMkI9Co802BOR/DWYhXaCj4zlsHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773921503; c=relaxed/simple;
-	bh=lWiLrxfXSYxlXLz2aCbhGDvBxpvBuXECYLQBlLcSmmI=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=LYUx5+tB77nHutVvP48DQ5vnSSKtP3jwtHtmDV1F9E1E04Zn6TO93798iKrdaEFW/9cnI+8m9mAdau4Yp5VayuhttXEs5fZMMpRUPKMEt4P0lXTZ6ma9DmbMrDCwJC+Wj0EvQUugNwmOiZTprpLErjyACPhf3QKqWIzOTWzv+i4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=jslOjTRI; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1773923191; c=relaxed/simple;
+	bh=uJOdQQ7B2yCLklkbjpNQvwCWdPJqRBFiuWYsmYK9PZg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=acDzN9E0HH8qdS+85cDsH+YCRv8rredKj9RS+2x2eT0QMHzmHbImAkIhcSQzg+hFEBXbvM0DIcmmgcfrjk5xjtmMadmUy6FGZwqVR5gcIPKI/y61ivZ1yfrD/bEE/05MKxecVfIhlar9hAcbFiQBTuOar5f4N42o7qTfrKpNv3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PtWLUtlx; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="jslOjTRI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	To:From:Sender:Reply-To:Cc:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=EBajOp9/kB7wsFpe24mAOzDoKioWPwtiSWktZUZopPk=; b=jslOjTRI54lOFKHKQbteBgFlG8
-	bx9p9J7KB+Im+Ev4O25QoRfjiRai47zUwMIB1mFd2KlWB6LjkVq1u0iHgkrl2gul9bA5RUwiaNecV
-	qM+sY6puqYk1LxE7tVClenfw9oE/UTjcStzADll7mkunp+d/IE2Ut0+bBmvbRQt/uz9V5tAver5fX
-	6eLmWyU/Q5HL8BFqhyquqAqiNV/SijlLZIZKJZOwawye57B4azuzfDcm2BxYhp9F+olSUHUnQT5yi
-	58E4mLQ3Ws42s1NtUwV0uy4kkgKxzFL2jibjEsWWkstYGfqw4hnBj4jTgIY9L9oGVg3xKtTbvVHZ1
-	ekmmwk3g==;
-Received: from [187.106.45.161] (helo=toolbx)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1w3C10-003KKh-U9; Thu, 19 Mar 2026 12:58:15 +0100
-From: Helen Koike <koike@igalia.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-dev@igalia.com,
-	koike@igalia.com
-Subject: [PATCH] Bluetooth: L2CAP: Fix null-ptr-deref on l2cap_sock_ready_cb
-Date: Thu, 19 Mar 2026 08:58:01 -0300
-Message-ID: <20260319115804.2160822-1-koike@igalia.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PtWLUtlx"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8cb20bcff5aso54728385a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 05:26:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773923187; x=1774527987; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wn4wwfL3xd1gqZtCjIVYVaH7kmNIpYyS5p7yJSi6f+M=;
+        b=PtWLUtlxTthECn3EXE6yYMLbewzgRr8/J58X3/my65CYxWh7jbuVvhbnHm4ZXVMRK1
+         70fgdyqAc5j32grYeY1RgW/4RmAsKl1cRSQGahfS2X9JJ2jSNOKqB6I3X0rRDRxd/Phk
+         pws7X6cRv7MSbmeqNf+WvT3Tlfal1lzd5G2j1B7IdIUxrqj0YX6Vu3oVTTcWB8K4OKL4
+         ySWuVsCho0Iu0CgwzYAt/B81/0ai7Wm0VkzC5TZNJ987Lvxt9TQ5Z+KRva3wrvzXVqUp
+         2ByEApNQlXo35A+WcXc7LcdiQIYO7VkvpPI0QEkz8FUfQ6AmkXSPCqYqQAmE7rV2WE9u
+         cj9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773923187; x=1774527987;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wn4wwfL3xd1gqZtCjIVYVaH7kmNIpYyS5p7yJSi6f+M=;
+        b=TuD5LKHPLjtjZf7QPmrknLsToa/27g44gRZ6FAhalPSHWVH0NXg6f1eev8xkTiKzAJ
+         3NxxwPrF7bXxhkYj5Et/BawPPymaCI5pIE7pSmc20voC3OMzIfbuTxkc9sHN9amJvn0y
+         EO4dkSQhOPwJuJcx1awOFMqtYGhNB7Zdc4leFlpkfYqEmEdauDXQzOtcg0ZlUCbqQANR
+         r2/73QZgcpHdeb3uWHlk2m9Cs3rLjg4N7xDkjZlTCJa+jeJrH77cdcv9gXbrAkhQIFRU
+         AikWqUzFnPl1CzNrm2VtCp97FWLgy0/Qw+eP22k32u4Sem2jiRBQbEIKxj766bgtc1G6
+         Jz+g==
+X-Gm-Message-State: AOJu0YwowwHY4eGO38Gv6SMDlXdJ/AGSvefzkv1tOgLZeKI/a2B8aH9O
+	l3qq5/aBSTinIZtjWwbkB2O18x96Nmiv4br7yUQvbzw3tKYttRSiWymstE4RfA==
+X-Gm-Gg: ATEYQzwYUAgREN25alUjH5jN8NmSqv1OOOmxbVP6IQdLG7ovl6I2yq6tTnZmVzEqEcv
+	VIPv0TcB4PErekYzAmPUUgvZVmY44XOtTOiiFYS1Q0e7kIGgMKcogqjyBUVKCI1N816ZjBdJbEx
+	kdhvjNzRwMcITTBQ+Dex3L0f/8kBmuJBTS7400OrdeyEV9wa3mQQ0KbCdvnL/cTfaihd32iIg5q
+	jHpOB4XS5TTeQvKL4PZ/ltpxgWUO0TKIHvPIBR7cM++gO+AglFG2DO4jzK0M4v4M+1PQH4P723+
+	Txm4/G9Z+11Vmz+X3hry+5JLS8HmSPRVQJ2bxyG4wGjN3i/gmyjUFHM6DdUZ/Cdtc9qTn+/CxWX
+	a5ORLXUSG0j16FjRiuPubJJVmXIiKr6RvfT4GpqL7HrsqILxf0yjg2PlSf90bSyncy0RoL7hrxg
+	/iu7jE17vPep/QzZKi+v8mdKWnvXqqjw==
+X-Received: by 2002:a05:622a:14d1:b0:509:2414:6f79 with SMTP id d75a77b69052e-50b14753418mr91390491cf.2.1773923186776;
+        Thu, 19 Mar 2026 05:26:26 -0700 (PDT)
+Received: from [172.17.0.2] ([64.236.141.200])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89c6b9eb253sm45744926d6.41.2026.03.19.05.26.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 05:26:26 -0700 (PDT)
+Message-ID: <69bbeb72.050a0220.2f06c6.3aa6@mx.google.com>
+Date: Thu, 19 Mar 2026 05:26:26 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3865933083702877192=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, koike@igalia.com
+Subject: RE: Bluetooth: L2CAP: Fix null-ptr-deref on l2cap_sock_ready_cb
+In-Reply-To: <20260319115804.2160822-1-koike@igalia.com>
+References: <20260319115804.2160822-1-koike@igalia.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Before using sk pointer, check if it is null.
+--===============3865933083702877192==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fix the following:
+This is automated email and please do not reply to this email!
 
- KASAN: null-ptr-deref in range [0x0000000000000260-0x0000000000000267]
- CPU: 0 UID: 0 PID: 5985 Comm: kworker/0:5 Not tainted 7.0.0-rc4-00029-ga989fde763f4 #1 PREEMPT(full)
- Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.17.0-9.fc43 06/10/2025
- Workqueue: events l2cap_info_timeout
- RIP: 0010:kasan_byte_accessible+0x12/0x30
- Code: 79 ff ff ff 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 40 d6 48 c1 ef 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 07 3c 08 0f 92 c0 c3 cc cce
- veth0_macvtap: entered promiscuous mode
- RSP: 0018:ffffc90006e0f808 EFLAGS: 00010202
- RAX: dffffc0000000000 RBX: ffffffff89746018 RCX: 0000000080000001
- RDX: 0000000000000000 RSI: ffffffff89746018 RDI: 000000000000004c
- RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
- R10: dffffc0000000000 R11: ffffffff8aae3e70 R12: 0000000000000000
- R13: 0000000000000260 R14: 0000000000000260 R15: 0000000000000001
- FS:  0000000000000000(0000) GS:ffff8880983c2000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: 00005582615a5008 CR3: 000000007007e000 CR4: 0000000000752ef0
- PKRU: 55555554
- Call Trace:
-  <TASK>
-  __kasan_check_byte+0x12/0x40
-  lock_acquire+0x79/0x2e0
-  lock_sock_nested+0x48/0x100
-  ? l2cap_sock_ready_cb+0x46/0x160
-  l2cap_sock_ready_cb+0x46/0x160
-  l2cap_conn_start+0x779/0xff0
-  ? __pfx_l2cap_conn_start+0x10/0x10
-  ? l2cap_info_timeout+0x60/0xa0
-  ? __pfx___mutex_lock+0x10/0x10
-  l2cap_info_timeout+0x68/0xa0
-  ? process_scheduled_works+0xa8d/0x18c0
-  process_scheduled_works+0xb6e/0x18c0
-  ? __pfx_process_scheduled_works+0x10/0x10
-  ? assign_work+0x3d5/0x5e0
-  worker_thread+0xa53/0xfc0
-  kthread+0x388/0x470
-  ? __pfx_worker_thread+0x10/0x10
-  ? __pfx_kthread+0x10/0x10
-  ret_from_fork+0x51e/0xb90
-  ? __pfx_ret_from_fork+0x10/0x10
- veth1_macvtap: entered promiscuous mode
-  ? __switch_to+0xc7d/0x1450
-  ? __pfx_kthread+0x10/0x10
-  ret_from_fork_asm+0x1a/0x30
-  </TASK>
- Modules linked in:
- ---[ end trace 0000000000000000 ]---
- batman_adv: batadv0: Interface activated: batadv_slave_0
- batman_adv: batadv0: Interface activated: batadv_slave_1
- netdevsim netdevsim7 netdevsim0: set [1, 0] type 2 family 0 port 6081 - 0
- netdevsim netdevsim7 netdevsim1: set [1, 0] type 2 family 0 port 6081 - 0
- netdevsim netdevsim7 netdevsim2: set [1, 0] type 2 family 0 port 6081 - 0
- netdevsim netdevsim7 netdevsim3: set [1, 0] type 2 family 0 port 6081 - 0
- RIP: 0010:kasan_byte_accessible+0x12/0x30
- Code: 79 ff ff ff 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 40 d6 48 c1 ef 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 07 3c 08 0f 92 c0 c3 cc cce
- ieee80211 phy39: Selected rate control algorithm 'minstrel_ht'
- RSP: 0018:ffffc90006e0f808 EFLAGS: 00010202
- RAX: dffffc0000000000 RBX: ffffffff89746018 RCX: 0000000080000001
- RDX: 0000000000000000 RSI: ffffffff89746018 RDI: 000000000000004c
- RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
- R10: dffffc0000000000 R11: ffffffff8aae3e70 R12: 0000000000000000
- R13: 0000000000000260 R14: 0000000000000260 R15: 0000000000000001
- FS:  0000000000000000(0000) GS:ffff8880983c2000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: 00007f7e16139e9c CR3: 000000000e74e000 CR4: 0000000000752ef0
- PKRU: 55555554
- Kernel panic - not syncing: Fatal exception
+Dear submitter,
 
-Signed-off-by: Helen Koike <koike@igalia.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1069250
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.34 seconds
+GitLint                       PENDING   0.28 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      25.99 seconds
+CheckAllWarning               PASS      28.48 seconds
+CheckSparse                   PASS      27.29 seconds
+BuildKernel32                 PASS      25.16 seconds
+TestRunnerSetup               PASS      564.86 seconds
+TestRunner_l2cap-tester       PASS      27.38 seconds
+TestRunner_iso-tester         FAIL      31.73 seconds
+TestRunner_bnep-tester        PASS      6.26 seconds
+TestRunner_mgmt-tester        FAIL      115.57 seconds
+TestRunner_rfcomm-tester      PASS      9.29 seconds
+TestRunner_sco-tester         FAIL      14.10 seconds
+TestRunner_ioctl-tester       PASS      10.28 seconds
+TestRunner_mesh-tester        FAIL      11.48 seconds
+TestRunner_smp-tester         PASS      8.45 seconds
+TestRunner_userchan-tester    PASS      6.65 seconds
+IncrementalBuild              PENDING   0.99 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
+Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.108 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.980 seconds
+Mesh - Send cancel - 2                               Timed out    2.006 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
+Regards,
+Linux Bluetooth
 
-Hi all,
 
-I noticed this check is used through out the code, and it fixes the
-issue I'm hitting.
-
-I'm not very familiar with the Bluetooth subsystem, so please let me
-know if I should follow another path to correct this and I can dig
-further.
-
-Thanks
-Helen
----
- net/bluetooth/l2cap_sock.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 597686790371..71e8c1b45bce 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1698,6 +1698,9 @@ static void l2cap_sock_ready_cb(struct l2cap_chan *chan)
- 	struct sock *sk = chan->data;
- 	struct sock *parent;
- 
-+	if (!sk)
-+		return;
-+
- 	lock_sock(sk);
- 
- 	parent = bt_sk(sk)->parent;
--- 
-2.53.0
-
+--===============3865933083702877192==--
