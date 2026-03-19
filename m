@@ -1,94 +1,50 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF703CCFAB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 13:22:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0093D5226
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 13:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773926544; cv=none; b=pNpPSFlNu7+Vq/jV6r2mgYMpaYE82mMWRITTEYg3+dGDahI8tFzpb6g3eL1KJj+CuRfHTDCuuuta3Pxg/F6kRN9TmPa1RVtIw6JebZOonkXNBJZZGmN+bIY9uUlaa3cqxRbkTs0ZOGjnaA+E0F1iQxGYLc2H+2tzyckBu4C5644=
+	t=1773926859; cv=none; b=VNbCG6wKF+3jT+o/dpcqhgYeaesp3wcIdF7/wERI8A6K6UrT4v7xY7WcPaq1c9UekYZbPXSH+tIM6Rb9o/edbtk6Ay7eNMNGmze2Q8OGVWR4nvQ1+CNiC+HKZ4+jLx7IIKmk6PDcWpKJm5zGNW23jpSxoIWa79lVE9mn1B1bPKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773926544; c=relaxed/simple;
-	bh=onzrOYEYgeK9puwSj7RmBF9bSxmOLmUBbpb5z+/Xdmc=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=SHGDohEGHNS1ezcn5uGFLWF5PKnEn2jaF84ozkxGfhyNButcRK4x+dQuvf3UX0p71EPScwlqxKyDDrbrLNZ9COuPlFvcuPUL0w01rNyQWPA96CAb/D4MWHbwjM7l65aK6PXiO7qcC0EDekeikSLGD+voO49ZLlWbRx4rvGdut58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rHmzbm3G; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rHmzbm3G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE7C6C19424;
-	Thu, 19 Mar 2026 13:22:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773926544;
-	bh=onzrOYEYgeK9puwSj7RmBF9bSxmOLmUBbpb5z+/Xdmc=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=rHmzbm3GWZXrwS5OWFIxkRZ64fnuOCbERdmkGVj8rerxfuwovXOpH/A3wno2tbDe/
-	 Ap+CD/yB5Q9L4x0I7RDhmSYjtK2v0FH+J6q1Jze0r38GZqNiZVqDHfFr7IvCxaykpz
-	 xTjfttlqN1WRiTF/4CTuhDKj5bksn5T90jWxRUX5oVwfkRSMWQCjKRdA98u9bNh2/o
-	 eMC7PDDXhC420uyRRyDY1jkqQXyD86wud3xDFS5LXYrKbUsBtNflPSe28GnY+tZBW8
-	 amRVaauS12z4R+V0fMKASEhncu8R71dP73XON5pwiu1PqyMWSkXvoxnuWTfq9Yj1VZ
-	 1EJHz9BhPCQSQ==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 9C1ECF40074;
-	Thu, 19 Mar 2026 09:22:22 -0400 (EDT)
-Received: from phl-imap-18 ([10.202.2.89])
-  by phl-compute-01.internal (MEProxy); Thu, 19 Mar 2026 09:22:22 -0400
-X-ME-Sender: <xms:jvi7acqR1gW8AeruRdVYm6SNmhJzXxlWlrA2UUXhhYTNUu4jcaw1Kw>
-    <xme:jvi7addiHrEW_kL40-nfMjqgqQKvigYSjFEJd8yF9d3VG2_1xdSo8uhHHkAZlG5C1
-    UjM7ZUZ3h5bTWHEgp_TS6eOTNMP1T7sQa-lhiRhY_7-9JdsoFHeYo4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdejuddvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfmfhonhhs
-    thgrnhhtihhnucfthigrsghithhsvghvfdcuoehmrhhitghonheskhgvrhhnvghlrdhorh
-    hgqeenucggtffrrghtthgvrhhnpedufeekteeugeevveeklefgudeifefhhfekkeeliefg
-    jeeugfdvveffheffudduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehmrhhitghonhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihht
-    hidqudeigedttdduvdeifedqvddutdegjedtleeiqdhmrhhitghonheppehkvghrnhgvlh
-    drohhrgheskhgvrhhnvghlmhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvg
-    htpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthht
-    ohephhgvlhhpuggvshhksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhg
-    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:jvi7aXq1KC_KVjIACPQ9JqMvME1Z6EgYcQZEg4nxn-ybNrerdqn97g>
-    <xmx:jvi7acn_CE_S1-2mgi1JFf4eWguTp3EpCo4FkzEluUPY-HevtOI5Fw>
-    <xmx:jvi7aTP19-W3q0O0InWngmisXfpe2tKenDoobLUNbOMT-u5ytQpPcg>
-    <xmx:jvi7aQM9sfTZR_m8MAsTASt2cqi-Gq1QmYJBVmqhLTrfnLgSsjdBhw>
-    <xmx:jvi7aUiITzBL6UWVrraB0vDggSs1EJf5hHkWYUV_tgBXYKu4_Tf-Zyi0>
-Feedback-ID: i40364868:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7931815C008E; Thu, 19 Mar 2026 09:22:22 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1773926859; c=relaxed/simple;
+	bh=tSqwhEeZY1ooXEWte1jUw+Lh6Zxy/cYRZadR85cJeXI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eiai9K4ykUB+FHJPXqinIr5/qbJL0mxteJlGHSJIZtHREzjLO+QaBI6RrLe8RConxxd8dK3lq9UhRMp91k+3Rh7vDDeq6fmhtZ2tjirp8sDNDRwRFLdg4m1lHoce7c2F70Yh1g5OaH/qAXS6Eullr2YNJ0HGL5WYhXHU2Txat5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8EF003EBF1;
+	Thu, 19 Mar 2026 13:27:28 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Cc: Wouter <wouter@xesxen.nl>
+Subject: [PATCH BlueZ 0/1] shared/shell: Fix crash on bluetoothctl command completion
+Date: Thu, 19 Mar 2026 14:25:38 +0100
+Message-ID: <20260319132720.1517783-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A5V-PA_1cc6R
-Date: Thu, 19 Mar 2026 09:21:58 -0400
-From: "Konstantin Ryabitsev" <mricon@kernel.org>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, helpdesk@kernel.org,
- davem@davemloft.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Message-Id: <6aec1245-d290-4d81-9a98-355bc8c3ca59@app.fastmail.com>
-In-Reply-To: <20260318194822.434c0485@kernel.org>
-References: <20260312200655.1215688-1-luiz.dentz@gmail.com>
- <20260314104436.31bcf68b@kernel.org>
- <20260315-majestic-beluga-of-fragrance-cf42c6@lemur>
- <20260315132013.75ab40c5@kernel.org> <20260318194822.434c0485@kernel.org>
-Subject: Re: [GIT PULL] bluetooth 2026-03-12
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdejudefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepgffgtdekffelheekleelvedugeeijeejtefghfettdefiedttdfhueduudekjedunecuffhomhgrihhnpehgihhthhhusgdrtghomhdpihhnthgvghhrrghtihhonhdqthgvshhtrdhphienucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmegsrgegfeemrgeijeeimegtvdgufeemjegrheefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhqihgupeekgffhtddtfefguefhuddpmhhouggvpehsmhhtphhouhhtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopeifohhuthgvrhesgigvshigvghnrdhnlh
+X-GND-State: clean
 
-On Wed, Mar 18, 2026, at 22:48, Jakub Kicinski wrote:
->> > It won't work retroactively, but it should find future pull requests
->> > (hopefully!)  
->> 
->> Thank you! I'll report back in a couple of days.
->
-> Since I promised - pw-bot replies to pulls seem to be working fine now
+Based on report by Wouter <wouter@xesxen.nl>
 
-Great, thanks for following up. 
+Test case at:
+https://github.com/hadess/bluez/blob/wip/hadess/add-meson-ell-wrap/unit/integration-test.py#L258
 
--K
+Bastien Nocera (1):
+  shared/shell: Fix crash on bluetoothctl command completion
+
+ src/shared/shell.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+-- 
+2.53.0
+
