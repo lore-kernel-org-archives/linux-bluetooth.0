@@ -1,162 +1,78 @@
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4152E3C8700
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 11:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926E133F589
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 11:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773918942; cv=none; b=Evh7wEl3KbsLF2bFgMUlzczw/0VcGUU2STFKgB0c6Gv4xhwBzPeeD9zSpLfsThvprCT3nxOFTRffiL+unaVR6a4JMGL/ztjR+/X7XFyOXvzrxFFpgWtAT84eY6doCauSJGc5H+0uidUxqQHu8Xjl+yKu/gz1FtsBrht+WObb3JE=
+	t=1773920974; cv=none; b=L1TPp6DGLoGcl5QdS3WfoXMPVHa+MusRHeyQa/IenX72DgTTwqR2CHob7aDTgDxBM7abKvnItoTGdWURuCCiFmNWTQWVxCtqY/E1/MY8sQyqxFShdN/EHl1ey92dNpR1FFBQwc5jq2Z0aGq+uWdgQzXmk5BZB1/YgtRCQI3/zW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773918942; c=relaxed/simple;
-	bh=oJaKNdRMoY6Bp7pOkZfOs4V9gnZyCBlb3iizCv/ahhE=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=twO5begmNiGMIGCsHJPcWgva669ObJLGlkmBdhSeYrloogzHbZ/Rj9qwXiW1YP/UWXSS1Y/UMuGctcFl87YQkX9IPBB/YmIKKwgVqAECeld3QBYL4+y2wMUiry96/AHv8VEpsAvF6fDU7ErcjHhOXiSE4bBBcQW9/k76Ug62riw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F3C243E97B;
-	Thu, 19 Mar 2026 11:15:33 +0000 (UTC)
-Message-ID: <1b00ec2d4091980aac843f65a72c40752436aed9.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 1/1] shared/shell: Fix SIGSEGV on invalid input
-From: Bastien Nocera <hadess@hadess.net>
-To: Wouter <wouter@xesxen.nl>, linux-bluetooth@vger.kernel.org
-Date: Thu, 19 Mar 2026 12:15:33 +0100
-In-Reply-To: <d0395481e127f9a9324ae515c94e3bf869eb4fe6.camel@hadess.net>
-References: <20260319021645.2137513-1-wouter@xesxen.nl>
-		 <20260319021645.2137513-2-wouter@xesxen.nl>
-	 <d0395481e127f9a9324ae515c94e3bf869eb4fe6.camel@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1773920974; c=relaxed/simple;
+	bh=y87gQ1l4hsul9Sa1g80eX8oaG4aa+H7IY/QyddmwMY8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=apw0i5u7h0636BSgLDTe1IA+evraNeI5I+bNJEjqzUdowxAYLtOwB0FWGNhjXPvMuMJdcJNUMQV1FwXB6ctxTidvUBagguAkBSY+jTcqQFohRwFPvHrqIIerWZWT56hUuEd7QHetvjKy6aznAERLbM7XnO/xd3NrC4V16zh0Osg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hbm0rtrT; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hbm0rtrT"
+Received: from github.com (hubbernetes-node-ac6b7f7.va3-iad.github.net [10.51.90.37])
+	by smtp.github.com (Postfix) with ESMTPA id C124C9211DF
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 04:49:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1773920972;
+	bh=a/tlGCY7fiQ9FkSC6mXhop4H3EsNLAymN5ZaoPAcqtc=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=hbm0rtrTGfDZ6KZsILB5PBURR3Ul2v3HRrkrV+FSILfCQcdoiPGCcO+Vbqk10QRvr
+	 qtC8oXKtB0pzT2J2ojZfELOcW/fdrCWU5iZGwqM7rYYLV/NjDTd3MY6Dr66XI9ED8F
+	 QQe7D3JshOLkGMQJQFjPQlsP8k3GHlXAjMkwZrgY=
+Date: Thu, 19 Mar 2026 04:49:32 -0700
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1069215/000000-46937f@github.com>
+Subject: [bluez/bluez] 46937f: adapter: Fix "Failed to set default system
+ config"...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdeikeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhepkffuhffvffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepueeviedvteekkefgfefffeethfejieekteffvdetjeehfeeileettddvueeludelnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemsggrgeefmegrieejieemtgdvugefmeejrgehfegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpqhhiugephfefvedvgeefgfeljeeupdhmohguvgepshhmthhpohhuthdpnhgspghrtghpthhtohepvddprhgtphhtthhopeifohhuthgvrhesgigvshigvghnrdhnlhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-State: clean
-X-GND-Score: 0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Thu, 2026-03-19 at 12:08 +0100, Bastien Nocera wrote:
-> On Thu, 2026-03-19 at 03:16 +0100, Wouter wrote:
-> > This fixes a crash when handling "<space><tab>"
->=20
-> That looks good to me, but is there any chance you could add the
-> valgrind output when reproducing this crash?
->=20
-> This should show the exact line where the problem is.
->=20
-> I would also add an explanation to the commit message like:
-> "Make sure to check w.we_wordc (word count) before accessing
-> w.we_wordv
-> (word array)"
+  Branch: refs/heads/1069215
+  Home:   https://github.com/bluez/bluez
+  Commit: 46937fd52f67f7a9dca9fd1cc367dabb4f029715
+      https://github.com/bluez/bluez/commit/46937fd52f67f7a9dca9fd1cc367dabb4f029715
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-03-19 (Thu, 19 Mar 2026)
 
-Actually, looking at the valgrind output:
-=3D=3D1430873=3D=3D Invalid read of size 1
-=3D=3D1430873=3D=3D    at 0x484BC77: strcmp (vg_replace_strmem.c:941)
-=3D=3D1430873=3D=3D    by 0x435063: menu_completion (shell.c:1126)
-=3D=3D1430873=3D=3D    by 0x4352F0: shell_completion (shell.c:1177)
-=3D=3D1430873=3D=3D    by 0x4A2542B: gen_completion_matches (complete.c:128=
-2)
-=3D=3D1430873=3D=3D    by 0x4A2E9CD: rl_complete_internal (complete.c:2104)
-=3D=3D1430873=3D=3D    by 0x4A257C2: _rl_dispatch_subseq (readline.c:944)
-=3D=3D1430873=3D=3D    by 0x4A26ADF: readline_internal_char (readline.c:693=
-)
-=3D=3D1430873=3D=3D    by 0x4A46CE4: rl_callback_read_char (callback.c:275)
-=3D=3D1430873=3D=3D    by 0x435E54: bt_shell_input_line (shell.c:309)
-=3D=3D1430873=3D=3D    by 0x436A34: watch_callback (io-glib.c:173)
-=3D=3D1430873=3D=3D    by 0x490A322: g_main_dispatch (gmain.c:3565)
-=3D=3D1430873=3D=3D    by 0x490A322:
-g_main_context_dispatch_unlocked.lto_priv.0 (gmain.c:4425)
-=3D=3D1430873=3D=3D    by 0x4913277: g_main_context_iterate_unlocked.isra.0
-(gmain.c:4490)
-=3D=3D1430873=3D=3D  Address 0x0 is not stack'd, malloc'd or (recently) fre=
-e'd
+  Changed paths:
+    M src/adapter.c
 
-I think that a check in src/shared/shell.c might be better (and would
-avoid having to fix the bug in 6 other places). Something like this?
+  Log Message:
+  -----------
+  adapter: Fix "Failed to set default system config" startup warning
 
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -1122,6 +1122,9 @@ static char **menu_completion(const struct bt_shell_m=
-enu_entry *entry,
- {
-        char **matches =3D NULL;
-=20
-+       if (argc =3D=3D 0)
-+               return NULL;
-+
-        for (; entry->cmd; entry++) {
-                if (strcmp(entry->cmd, input_cmd))
-                        continue;
-@@ -1146,6 +1149,8 @@ static char **submenu_completion(const char *text, in=
-t argc, char *input_cmd)
-=20
-        if (data.main !=3D data.menu)
-                return NULL;
-+       if (!input_cmd)
-+               return NULL;
-=20
-        cmd =3D strrchr(input_cmd, '.');
-        if (!cmd)
+When using a stock configuration, there will be nothing in the list of
+configuration changes to apply to the Bluetooth adapter, which since
+5e5b46c5c0cc ("adapter: Do not send empty default system parameter
+list") would throw an error, as sending an empty list to the adapter
+didn't generate one.
 
-Let me know if you want to send a v2 with the mentioned changes instead.
+bluetoothd[3291147]: Bluetooth daemon 5.86
+bluetoothd[3291147]: Starting SDP server
+bluetoothd[3291147]: Using external plugins is not officially supported.
+bluetoothd[3291147]: Consider upstreaming your plugins into the BlueZ project.
+bluetoothd[3291147]: Bluetooth management interface 1.23 initialized
+bluetoothd[3291147]: Battery Provider Manager created
+bluetoothd[3291147]: Failed to set default system config for hci0
 
->=20
-> Cheers
->=20
-> > ---
-> > =C2=A0src/shared/shell.c | 18 ++++++++++--------
-> > =C2=A01 file changed, 10 insertions(+), 8 deletions(-)
-> >=20
-> > diff --git a/src/shared/shell.c b/src/shared/shell.c
-> > index b061f8001..57bba0977 100644
-> > --- a/src/shared/shell.c
-> > +++ b/src/shared/shell.c
-> > @@ -1174,15 +1174,17 @@ static char **shell_completion(const char
-> > *text, int start, int end)
-> > =C2=A0		if (wordexp(rl_line_buffer, &w, WRDE_NOCMD))
-> > =C2=A0			return NULL;
-> > =C2=A0
-> > -		matches =3D menu_completion(default_menu.entries,
-> > text,
-> > -						w.we_wordc,
-> > w.we_wordv[0]);
-> > -		if (!matches) {
-> > -			matches =3D menu_completion(data.menu-
-> > > entries, text,
-> > -
-> > 							w.we_wordc,
-> > -
-> > 							w.we_wordv
-> > [0]);
-> > -			if (!matches)
-> > -				matches =3D submenu_completion(text,
-> > w.we_wordc,
-> > +		if (w.we_wordc !=3D 0) {
-> > +			matches =3D
-> > menu_completion(default_menu.entries, text,
-> > +							w.we_wordc
-> > ,
-> > w.we_wordv[0]);
-> > +			if (!matches) {
-> > +				matches =3D
-> > menu_completion(data.menu-
-> > > entries, text,
-> > +								w.
-> > we
-> > _wordc,
-> > =C2=A0								w.
-> > we
-> > _wordv[0]);
-> > +				if (!matches)
-> > +					matches =3D
-> > submenu_completion(text, w.we_wordc,
-> > +							=09
-> > 	w.we_wordv[0]);
-> > +			}
-> > =C2=A0		}
-> > =C2=A0
-> > =C2=A0		wordfree(&w);
+Fixes: 5e5b46c5c0cc ("adapter: Do not send empty default system parameter list")
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
