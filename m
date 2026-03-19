@@ -1,163 +1,172 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC643793C2
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 09:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593803BBA09
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 10:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773913725; cv=none; b=UaV3MEnD8g8fr0e+aC20qYSZ0SgJWfef1jqlK2RahtlhEqgjd1VFilnhaD7QLy31xPejWFKLas7PXHai3o7Pt7VP+832fksvoGXQ+Y5j+pwfLAhRVWqJ2X0QSvo/6ndmlWVbBK+0f4YeYd+IjLliFiEcrozuSfsjfN8tVhD6fDA=
+	t=1773914964; cv=none; b=fXz6gMN7QB3cVSSFIa4eTRaClaSIjQJrI/Ikl0ZVexG7/kicJ0/ljQHm2rsvNfPbEClNt/fs0cbXLdcq9t7240+TDryDRqLITPzUJvV/d5CphGMdoRCQ1VOtOxJG+/7ChE/0Zd6WT045jQi7Lwkr2l+rdeUxIqDjmsc6NheK1V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773913725; c=relaxed/simple;
-	bh=yK3hmx64z7i0/cHqvhJED58JSXNvxIoNHD2ELb77V4M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F/5yxv7mu3FQckWyPA4jBsjqNKM36cUrPRtooP8fPlZRkoInYxEZsAVa/i77D8IW0tYguY/dXkr6wvf8iGs4TAdj/iOFI0Wd0jgPkKAk7ExCNdaoytMsIJ6eXnGWMKiZQLQbn4L3IOBt9viWCU0Pfb2a4yuDuQ7+8ZZGaj7kfwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=aApKDXeE; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=OB+BuxPZ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1773914964; c=relaxed/simple;
+	bh=Q5I68627WT+fSeM/QgIW8F8CYaQCE+Y0uzrA8y9/XYM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Z7gR5SerQtSzZSa/Xf6d0bqDEjk4whpE69fOXUUK4AAM8UeJH0aGHVWi3xSNJCKSd/hfuQeyId2bo+VeRq0VeX9w+ziq58sQvnkBgFJiLj8eaHUiEiDiFECU3SufLHBQgQ9fe+DQRJxlb0NCFj8iodM182dE1Y0AySnyGPZyz5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e0TvRCq+; arc=none smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="aApKDXeE";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="OB+BuxPZ"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62J74HFG3369997
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 09:48:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	g5icMpeKSq4HWdTCpQ6cHRjSImJbwCnTwsfsfwuFFIc=; b=aApKDXeEFHAKK8b7
-	QuShCV3dhM63yyTfAr0aK5g+JsoRVFkXHFzZY9J9Fbiy2ya6AfYu0u+pkBqUWTg9
-	PZEKeGF7MWLJNU2pvqrq1fp/urkmeM3TivNn8c1jZRLHewAfUIa2KM1izYS5gAI/
-	cPtMpU2lvRHFwA5TirILrSgSdlT2B5kHetzCBjXI7MLHyGPQTd30MK8Ky9xbJteo
-	fYZcGBqjKjldIKgpv7Bx0+/S0vaxjyudNHpZUqdUWLF1tz61Nye3QedkNYG7VGF1
-	Tt3cPfgB6OefwdgK0Ih6N20uE1uRHjZWG0BeKBXoTYQVPdUZtYAG6Z+u1hGecc2T
-	PkOHLQ==
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d00f9jp22-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 09:48:43 +0000 (GMT)
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-35842aa350fso3704941a91.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 02:48:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0TvRCq+"
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-12a695044a4so1236471c88.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 03:09:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773913722; x=1774518522; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g5icMpeKSq4HWdTCpQ6cHRjSImJbwCnTwsfsfwuFFIc=;
-        b=OB+BuxPZN9riT9pKF231svjSF+IxYyCpYzhg+8KYiUkA+g2yk15LOo0k9dbFEVi8YF
-         0vLW4fj8mHp5KoclDVTzNIAUDk5exwdRan2zOWAKSIfhKuI0jnPeWhp3BgzKJ/NSZ9Qw
-         ZYtp7/i3yS6mmHw0sXst511baxQB6MyN8ZhAZ6EMSpGcDMnbqhFjLyUaGDcmqdFrBw9p
-         cSymYszB4ya5oU5h6/PV1WQjx0xUkFuuUgFG9gqd7tISdg9ynlyDm3ICATLI80s+e4tD
-         0f+vN+pZTNhMEL55kck6/lohEhQ4cU3fmSy5xKAGk1WZc9K/vN9N77w98yS1K7iZKzH2
-         jQ2Q==
+        d=gmail.com; s=20230601; t=1773914962; x=1774519762; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=CUkyRZeHWISGV8kFBFLZGfe8wXftA2cEzw1Kda8ONrc=;
+        b=e0TvRCq+hMrO/XPk4MnJ3vZiDhE/GmPywXG7mT6Pc3msBQQAoQteT76YvGHwNH3aE5
+         FeFFWWe3d0Djgv0LWF+xmEpg0W3JzG1E9xvA+yFbBPttE9qkjueCYCHf5ofCnxjw999w
+         09aCqz1k7Fn21ru6XEmjla8IhoPCWIrpdDPBna2nDFs2+pXosGc4K6kELWTfHscSFxhi
+         MFy1NGpGeTFPWfLfuHOuzPRKVDFPX4LEqvFzaMhSkQsKljKosE2qH/xjriBY62kfgghf
+         OWNzg0obKVGhZQ9pA4DvDiQ6E0YtTcwDHApGNsSXNrg3Zx0LCnLU2kIRUJWwuZIAGGmz
+         iwjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773913722; x=1774518522;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g5icMpeKSq4HWdTCpQ6cHRjSImJbwCnTwsfsfwuFFIc=;
-        b=LfcNmgR9tzJSwi6QstpiopqCcxvi3ya9wW/H40x/pOrEXo0vZeN2blK45ulG2KXtjp
-         gGInb0NGkwQvekfhwmV7elP51gkCuFz4gg2zTYX6/hHTFzqgVG7jgaqFPowj5vAIx3N+
-         w3OP94VE6ZHRmIuR4hWs+7wXs7UkDpDC4dwClbGeCnQGbSaR8+8H5tgAshYSOB6s4xOz
-         Q8B2jQftdW2RzTZFlueAAzAQem9YcY6vTvnpAkalaJRf8nzEw97bQyXKwjOuFDhZHOnz
-         l647d2XEVuF8ouj7TPovTLyEs9rpopggXNu5MQINhomk0Ve124rafrJHJNJoMkQgfguI
-         fO4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUbwxR2CNPqngSEIrSwG+P7No2bZgMaaEliam6mD4QGTv5oWJ6LXBzHkB0jIdqKLczLttgaSFaCmf7nK7L+mYI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ3Tp07hf3QQCmrL8F2fWvsihAsZKT9ldfq5d00UaorNpqqZaU
-	De6/f3E02wP3Uetwyc/UjH7KVOwON2g0Oi6pTs9xuffz2h69sL59VOno66ksA379202d7ZxYEc6
-	UacdpIDK+SSbI+O1Zao8nEnJ5nZNFAWN9OuJ1900du9ruCfGzb7NFnlMgxrW4q41/pq02oE8=
-X-Gm-Gg: ATEYQzyRYDLhpBM+xO7RSRwti7QAXOTOymKCFfh1rJi4WgwDcL7s+umpJ7Q+1lqTwf0
-	Zt81dy6gjLIoXa8NV5AjTm0qCNbzsPIOAZ50eHyW3BvZhqHJnFw057vUIQxv7WOpwO4u0nU+nxp
-	5NqGM764SCzjmDzusJHKIPKyslRvvlU3yp+AYgSAGVisqV9iC+j63Cgr5+6V/OT+GrxPUNbbgKL
-	nmaBRsbjxSb3a4wuTy/ecESvbt2DEtLTAJQImhIdAgJpN0XhnaFRWUsJQ30Qutb7TIfXNkqNbX6
-	LXxmMK14t+p9wfdlZkfM5EJ+wLL7LqwuqHp2OQ7GpQiE9XakRKwUdqjDzUakoGHE70YD/wtyAd2
-	zUY8ab6RmwHCUOv606qZP+ZHk6KY50G+Uc23cMgnkHJ6rF4ezcJxHLLL/BOXvRLbTg/HCSfSJuI
-	FJYg==
-X-Received: by 2002:a17:90b:2687:b0:35b:9a4b:24e7 with SMTP id 98e67ed59e1d1-35bb9eac31dmr5712198a91.14.1773913722164;
-        Thu, 19 Mar 2026 02:48:42 -0700 (PDT)
-X-Received: by 2002:a17:90b:2687:b0:35b:9a4b:24e7 with SMTP id 98e67ed59e1d1-35bb9eac31dmr5712180a91.14.1773913721746;
-        Thu, 19 Mar 2026 02:48:41 -0700 (PDT)
-Received: from [10.110.95.239] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b07a508f00sm17197835ad.80.2026.03.19.02.48.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Mar 2026 02:48:41 -0700 (PDT)
-Message-ID: <1faac95b-4c67-46d5-9c59-da4963e7e8de@oss.qualcomm.com>
-Date: Thu, 19 Mar 2026 17:48:37 +0800
+        d=1e100.net; s=20251104; t=1773914962; x=1774519762;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CUkyRZeHWISGV8kFBFLZGfe8wXftA2cEzw1Kda8ONrc=;
+        b=AusNhwyaI3+FHY4xdPBuDi1l7WwkhhPgLwV6nRnUOZLJut7ZpRKks4NW5jXA6y+Ud+
+         dGjzuORKFjMcSwfEIdZJUFfO9i9LI8au9Xm3bsoUpWy/S1tIGSSHB06SHUnk0K+l1arZ
+         br/ccUra5s+sju+irPv2VLW2YFZbAHdefgQs7iFJ5yLzatuiLygCZSkWwwbTo5BkVDhG
+         BjP8ALudTP6Im3ok8Yx602GCSrqdg6OoZ8Ggd1SpDEE58FEhQkYXmQTw72UQLKjnuDPQ
+         B5agk+madL+y0u0xNf8ajZsh4ZQjZ0X11Ids0iQstW1au9pHxwqMraScByR79MUx6Scq
+         Ldtw==
+X-Gm-Message-State: AOJu0YzkMbE3a/NvZnoZX0v2tc9lWhS5gIriKmhHEqvHYozNVm7zCEn5
+	afY8dpyxFR+N8kYK6AojvqRDMiQ4xhH3HaJrgVO64GNapOGvhYX1apTHohjiZA==
+X-Gm-Gg: ATEYQzwpj/ZHjdXfoxUtcZU3kEfywtHBaKNAQK0BvrN8wR/gzU9wPGFIfsUoIDXsKIA
+	rV5xwFzEWW8IB9Zn2vgJwAH+uCJmApOJJT8GENQbXBSOq+0vDF0E6T+YFjg+wyYcwV2jIEldJdQ
+	WsJ+A5/Uga20A3MyHiTNg14qiBOXXM98m0dqbluSGqltHkcprdvPl/rZazcUn1W8xRHYNQdlWQj
+	q11PbT2Z+JARDVoCpX5Qf6Ab9Jqvg3X5Cy1sYqt974l1pv67wilex8nFB76qrjIpUEjehZbsOcI
+	MbiaDeE7Hg1UejGyOfvatlJP8BO+tPEHPsVgRizixF08/i2xXyEvihiiEdx4Tq3osmUBFaHLO58
+	VDjzT8uWe7LGMY+nbAYGEsN5sp14pwHsiMq6CP+ShZA7w9yZDVt2FrLmz73hY/YWBvDZZZKU7UQ
+	ISu2LTguyX7aaGLt92mhBHe6QIiK2JqIIArvGMVoaRlA==
+X-Received: by 2002:a05:7022:f317:b0:12a:6c84:6054 with SMTP id a92af1059eb24-12a6c8470d1mr218766c88.35.1773914961924;
+        Thu, 19 Mar 2026 03:09:21 -0700 (PDT)
+Received: from [172.17.0.2] ([172.184.210.165])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-129b4136c9esm5861804c88.12.2026.03.19.03.09.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 03:09:21 -0700 (PDT)
+Message-ID: <69bbcb51.050a0220.30520.fb76@mx.google.com>
+Date: Thu, 19 Mar 2026 03:09:21 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0102752183690622597=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: hci_qca: disable power control for WCN7850
- when bt_en is not defined
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com
-References: <20260319075125.76539-1-shuai.zhang@oss.qualcomm.com>
- <CAMRc=MdRGdR=FyQHWC7yfAgpAFxiK6QGjEQXVr7mavWLOPS14g@mail.gmail.com>
-Content-Language: en-US
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-In-Reply-To: <CAMRc=MdRGdR=FyQHWC7yfAgpAFxiK6QGjEQXVr7mavWLOPS14g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE5MDA3NyBTYWx0ZWRfXyq9QacnF3Rqm
- H5ujvH9k5RgLBbXVj4maNwUNKxF1Q0txoFo30lMqpomQcnx0/J99EQbeF75aC+2M7A3I/ee0R9g
- 9g2FrJFABST2b37qhwu5hTYkD/Mbeey2cjxOYibRuRggnfcNoyKCKfdOH7Va4bAmWOcRuQDGpkB
- k/6X8RCDtabv73RB2my9QRyTYI73YvZ8ZD+07e8aff8NnRKYxGM82iAUdscsrI42AONlWzcliHg
- DNk+8ZKNU27Aa/SR18bh5h+YfJayIkFQn3nA+x5YEb8SdzJ7ge8xTyDCt5+SflZ3UemCHJ4LVOq
- Cl8FnfR1X9Od5YJY2gULv9vOCj/+fWwWY5CavzxG0anRVdatYJBdZTs6NNzthAnORBPsT+/qbK3
- i8C872XPXZEDWbp3etPt3ME5tzBwCYn+Hznc+0cjGivPA8P66HTae3nV2SxxFGNmMiGAQJvGJtJ
- oyWY6+MFb4TC92/P3Jg==
-X-Proofpoint-GUID: nI_8w2IgUX4O4TIM_dbEnf80VUb2SnZl
-X-Proofpoint-ORIG-GUID: nI_8w2IgUX4O4TIM_dbEnf80VUb2SnZl
-X-Authority-Analysis: v=2.4 cv=MJttWcZl c=1 sm=1 tr=0 ts=69bbc67b cx=c_pps
- a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
- a=EUspDBNiAAAA:8 a=xvFTm4SV79vVDnvSsuIA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=uKXjsCUrEbL0IQVhDsJ9:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-19_01,2026-03-17_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 phishscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501
- suspectscore=0 bulkscore=0 malwarescore=0 impostorscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603190077
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zhangchen200426@163.com
+Subject: RE: Bluetooth: L2CAP: Fix send LE flow credits in ACL link
+In-Reply-To: <20260319093211.2239158-1-zhangchen200426@163.com>
+References: <20260319093211.2239158-1-zhangchen200426@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi  Bartosz
+--===============0102752183690622597==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On 3/19/2026 5:35 PM, Bartosz Golaszewski wrote:
-> On Thu, Mar 19, 2026 at 8:51 AM Shuai Zhang
-> <shuai.zhang@oss.qualcomm.com> wrote:
->> On platforms using an M.2 slot with both UART and USB support, bt_en is
->> pulled high by hardware. In this case, software-based power control
->> should be disabled. The current platforms are Lemans-EVK and Monaco-EVK.
->>
->> Add QCA_WCN7850 to the existing condition so that power_ctrl_enabled is
->> cleared when bt_en is not software-controlled (or absent), aligning its
->> behavior with WCN6750 and WCN6855
->>
->> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
->> ---
-> What are the changes in v2?
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1069160
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.48 seconds
+GitLint                       PENDING   0.50 seconds
+SubjectPrefix                 PASS      0.05 seconds
+BuildKernel                   PASS      27.19 seconds
+CheckAllWarning               PASS      29.27 seconds
+CheckSparse                   PASS      28.12 seconds
+BuildKernel32                 PASS      25.99 seconds
+TestRunnerSetup               PASS      570.00 seconds
+TestRunner_l2cap-tester       FAIL      28.05 seconds
+TestRunner_iso-tester         FAIL      30.47 seconds
+TestRunner_bnep-tester        PASS      6.47 seconds
+TestRunner_mgmt-tester        FAIL      114.83 seconds
+TestRunner_rfcomm-tester      PASS      9.41 seconds
+TestRunner_sco-tester         FAIL      14.62 seconds
+TestRunner_ioctl-tester       PASS      10.18 seconds
+TestRunner_mesh-tester        FAIL      11.63 seconds
+TestRunner_smp-tester         PASS      8.59 seconds
+TestRunner_userchan-tester    PASS      6.64 seconds
+IncrementalBuild              PENDING   0.99 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
+Total: 96, Passed: 95 (99.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+L2CAP BR/EDR Server - Set PHY 1M                     Failed       0.114 seconds
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
+Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.111 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.882 seconds
+Mesh - Send cancel - 2                               Timed out    1.993 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Sorry, I forgot to include the version update differences. v2 only 
-updates the commit content
-and adds explanations regarding hardware management.
+
+---
+Regards,
+Linux Bluetooth
 
 
->
-> Bartosz
-
-
-Thanks,
-
-Shuai
-
+--===============0102752183690622597==--
