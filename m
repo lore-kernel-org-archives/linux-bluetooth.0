@@ -1,120 +1,167 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E085038B157;
-	Thu, 19 Mar 2026 18:10:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773943816; cv=none; b=P9SEl+d38pMHCco2mScBFVp5jNpmcXhYvTJ4lKJDpEWMsvkJxLswpOlevDrHIwcp+XHL0TISe/gbici0vGmU+2gB1xV7upCRG7CS8OE1GTTzlenrMR/atSL7uCTGqzwyz2lXd26MocHiNUyU+U1ei1ST1/dZ+Q8rrQeLFWq6VZg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773943816; c=relaxed/simple;
-	bh=sZiTmYrsUk3RUBvFsAAi3lyghGzQyivIt5Xa9sQA0w0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tmE2kLPL/gyAel+uUFiE5p0SZ6hfvZgeIgiiIhb3xymHaijITOulbGnyA7qpNP7asCTT0dRyOPUR1gl8zJuxYV/2VKfhIYPZ2qgStw7VZOCo1MRChu8tz79B/+EC/teaQe035w7m3ex7+tRyDvDcCC4uiFFSUitmpQzNz8VUAhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XrUjU9eW; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4108F36EA9F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 18:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773944188; cv=pass; b=fJDWzzZsu41bHjbuuD++FDM9PsZuXQNMyHZ1RIwAwKDS50cC8AeB7VIaV2nnftiFZjpOrA1fzcXAhC6RLdXNG+dDE2xg8h6Ngkx2odS0h7skzRISDeflFY834L7sJd8WC99HVY+W3MT0o3xjbLjkd1/04aLM/mOioIXPdXCU7v0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773944188; c=relaxed/simple;
+	bh=P3NDAgx6xNsTbwbbYw2hKGRdwP3I5f+Fq3KHalSd4dE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hA7qn8LqHSkscaZVXgdtRxaleDBC1tQK36kgXl1+MpMKXqcKgQM1hbo0Ucj0hgr3CUpuAFMffzhOtXDrl1pKAyCca8eoH7nvaeeTLvEPHGj1cE7GdAmr0R1xj6Nlxwf2x010jk/cI7YBZSvszthBORStDLEW69SIEDBiiTUfcI0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TZJt95yV; arc=pass smtp.client-ip=74.125.224.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XrUjU9eW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B3FDC19425;
-	Thu, 19 Mar 2026 18:10:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773943815;
-	bh=sZiTmYrsUk3RUBvFsAAi3lyghGzQyivIt5Xa9sQA0w0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XrUjU9eWB2CmormeHBPILWeJtReOLMP3805sfI1GQU2UHsJlzfqQepN7zeb+K2PZJ
-	 iTdzfALjlgFNmpy7eq+vTsiFrkGdTlFyJfDZ6d7I7q6yckPFuAtfexpWmJWR6qwAat
-	 SXS9ias7Z5SjzDLrTPzx1u6b2GSNJhwbKd+el1O6kjKrpv4CImWDM0yxYedO4UjYB5
-	 QKmeV86WOBLE/BEDyTrjG6142jtHRNTyvDHYgKyQ29y2/qdMCTMnhCY/u78jQ5Wra4
-	 34G2jpc/Dx7fRBryhF1s+V2VT+6ax8J3aGDRADl198YKsn8A0KZlSsAnEQeADCZEiw
-	 0rB5Tz1uh2oXg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9FD239302E2;
-	Thu, 19 Mar 2026 18:10:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZJt95yV"
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-64ad9fabd08so1001071d50.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 11:16:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773944186; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ZjqkEvgbcJZUzVnU5p97yAQTuIfn0DlV0J7zHmwJGaYbJB4JO/V9goRx6zlE0Kn8ir
+         MrYTVbAgLVONEpor/2EooX7PKnOMuNDM156IESQt4tmkazGFRbnWQTb7MUBNPfnmz7lJ
+         7X0SGeHh9e4dCDHicVjC5hgnyE1/1MPv08rAuzVRidWomwUwofpLXcMWhHpw9Y/nNS3t
+         Gx1q+W40l/VoK6MzN19p2in4nw3pZ3YDVBr+ZwWrSKCx3QnNbvo2ZsA0XUZwF4WZYCM3
+         Em+mS5RF2amfEzaKCGhnQ7N+N3sRxrJ5NY+BOBtiHFLKoxUSpJZlXyMMcGzD3LjhYqRR
+         NWhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=V0xPoDNSumQ/Zq8nYny7A+LxHxVOobX/PsEPA7eYzWI=;
+        fh=nHh+hsOePOe0lFIyPstZ6/GlCRWAQa6XkXL/mqDy5x0=;
+        b=gQ71oQvvkFKuEC+gEy6kcLpJibl3mqrb27II9Z8ng31EQ4fsaJEFZIO1g0QdRl8Rsl
+         D4YbotfJZ8Rl565KsTEVV/2cpRSjBhml2L3zoqNRrpY2hhDpRyJGK2UQMUJFjHa1uOU5
+         aQb9qfKsObefXivbBTkGkl2nUqgLu2CZ9P7nbCcOKlYatnWJtXb+ucMfwG1E4bSAIpXT
+         usUwwa6OEeheA7/1eZHJxWGEX1gb5cEEHWeiirNu3ZiUV0hyvnzq2xXXQiv7rkdAeUo1
+         yt0FD+PRNM1y0SCjLfwP0zYaPCPgQHOI1+JyIMxbpE5tqTG6Po5CWfAuP0EwqIeNKLA2
+         MSJw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773944186; x=1774548986; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V0xPoDNSumQ/Zq8nYny7A+LxHxVOobX/PsEPA7eYzWI=;
+        b=TZJt95yV/X4E+a5P461HxuYP05a5gKdb/C8cfAJT9bQfHsCcUbVQCHtNCz5BO6WidW
+         1YvgBNFeM62Dt9QeuRxrrNmLbU5WhtsvNB24H5UPeTVQP9TjPqPxsDjO/pUuws1eQq5A
+         sXrw7pvbFSqugmj7zFa5WGgGEhoGhF4bus3zeHDg/vAN4T4Sc+Ubnj43wpADxvJ3L7RK
+         hW4GWNv2hs+DjiO0d2CgyxA+tVPzAZG3DTpn+RounmNGJG+J9Ybhzf99LdoW4UDW70QO
+         AGstt3eyQtgdoSfBk9ERFhSAvIIVm0w3Mshn3LHM7odr1AIQStyOl8sfMjj+OdisR1sQ
+         WJuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773944186; x=1774548986;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=V0xPoDNSumQ/Zq8nYny7A+LxHxVOobX/PsEPA7eYzWI=;
+        b=fe8QZKniQ+KPkX+HIIu4DT+rXLYlSDqOhIthRTistz1urY8d9SRZFxmYHpJvXwYrlb
+         3NmaQyMhJCxWR4ktZ0VnMZtDK+FnkRbXvdbGHks2JaaWVZEI6qbWo1Qwm0D+VJqKOaaq
+         26EExwSzQQ7HSpxO8RAG3OLCpeWPL95sF9bYTqXwgVdLzMUgIdRxxHbEqQil+cBekhCa
+         hQ7ynrZPNNrl2YwcmsYLLbCLrXKTcjl0ecbkDqsel3ZrYqKD1vB8/pGb+MwsUezAxcps
+         au84ejpbUUtC2WsFX+zMyZ1SXknlHnEN82FgvDXOOSiOZbxEltAxZA2OpmV8GS29Ej9o
+         WxIA==
+X-Forwarded-Encrypted: i=1; AJvYcCXzEA2yGPnaxLtmo/j1Fc2V/NBZdXrXlQs6lOeWxFn9oRwpN/bQdRgj5PPNmkLJjcuXquHEU3r3k22IT9qK1AM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybI7fmL6w90RF3DVqCpsORx5w22lkHUtGLVgSZcAEtZAk4qA2p
+	tNwy2Iwvd4G8SxYtub/t1WMmSRQ5TGkPL4hdFsIzGmx+RZCUEQioO5APOgbmsG37+0eRtowcAME
+	eyIzJ+B7yEfR72VX14KWuCWUsVECc+zUPJaqg808=
+X-Gm-Gg: ATEYQzxO7o6nXrcIbadGz6zwlKPV4B7KbEdJQNSV0tQ6JcdM8y7VtdBIV06jhwGiNPu
+	sI4jbNxdUAjH0KTG/71fOOZe1vaHN5MlFqBTgviHW35zBk6opUDB3DxplF/zWYVOk8l4TE4QFVy
+	qEnl3njqihg3wkMjNOJjNKuF3TqB6EdOJkA7YXB+vr+PG8kWSuELnCL98d18keDMi32K3XzR4th
+	4jrLvHILgklknqCgNT57mxNgd2cTcoYpftVijSgo63GzDISJTYMfvoGimsXGno1Y+62QawuTeoe
+	jMQcI3/eSwfazv52MyUzZ7rzC+RFjEb3o5e3oBKv2owMEJ0/DiRyc1qK1QF7UAwiSo/Cdw==
+X-Received: by 2002:a05:690e:1181:b0:64e:a853:624d with SMTP id
+ 956f58d0204a3-64eaa6b5ab4mr570729d50.19.1773944186126; Thu, 19 Mar 2026
+ 11:16:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix null-ptr-deref on
- l2cap_sock_ready_cb
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177394380653.1743613.2960784486260115087.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Mar 2026 18:10:06 +0000
-References: <20260319115804.2160822-1-koike@igalia.com>
-In-Reply-To: <20260319115804.2160822-1-koike@igalia.com>
-To: Helen Koike <koike@igalia.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-dev@igalia.com
+References: <abwTQVhyDv0_x26G@v4bel>
+In-Reply-To: <abwTQVhyDv0_x26G@v4bel>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 19 Mar 2026 14:16:14 -0400
+X-Gm-Features: AaiRm51LXjDBL1K5YN9zay5q9RigStZaGS74diFuXhaaFyaxebuFMaMpVe8bLI0
+Message-ID: <CABBYNZJLueWZcdUX2jL9rhKKRCBq01fehh+SgeV_GNVKyXHrig@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: Fix deadlock in l2cap_conn_del()
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Hyunwoo,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Thu, Mar 19, 2026 at 11:16=E2=80=AFAM Hyunwoo Kim <imv4bel@gmail.com> wr=
+ote:
+>
+> l2cap_conn_del() calls cancel_delayed_work_sync() for both info_timer
+> and id_addr_timer while holding conn->lock. However, the work functions
+> l2cap_info_timeout() and l2cap_conn_update_id_addr() both acquire
+> conn->lock, creating a potential AB-BA deadlock if the work is already
+> executing when l2cap_conn_del() takes the lock.
+>
+> Move the cancel_delayed_work_sync() calls before acquiring conn->lock
+> to break the lock inversion.
+>
+> Fixes: ab4eedb790ca ("Bluetooth: L2CAP: Fix corrupted list in hci_chan_de=
+l")
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> ---
+>  net/bluetooth/l2cap_core.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index a6ce09781083..68bc65b1c12a 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1752,6 +1752,13 @@ static void l2cap_conn_del(struct hci_conn *hcon, =
+int err)
+>
+>         BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+>
+> +       /* Cancel timers before acquiring conn->lock to prevent AB-BA
+> +        * deadlock with l2cap_info_timeout() and
+> +        * l2cap_conn_update_id_addr() which also acquire conn->lock.
+> +        */
+> +       cancel_delayed_work_sync(&conn->info_timer);
+> +       cancel_delayed_work_sync(&conn->id_addr_timer);
+> +
 
-On Thu, 19 Mar 2026 08:58:01 -0300 you wrote:
-> Before using sk pointer, check if it is null.
-> 
-> Fix the following:
-> 
->  KASAN: null-ptr-deref in range [0x0000000000000260-0x0000000000000267]
->  CPU: 0 UID: 0 PID: 5985 Comm: kworker/0:5 Not tainted 7.0.0-rc4-00029-ga989fde763f4 #1 PREEMPT(full)
->  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.17.0-9.fc43 06/10/2025
->  Workqueue: events l2cap_info_timeout
->  RIP: 0010:kasan_byte_accessible+0x12/0x30
->  Code: 79 ff ff ff 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 40 d6 48 c1 ef 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 07 3c 08 0f 92 c0 c3 cc cce
->  veth0_macvtap: entered promiscuous mode
->  RSP: 0018:ffffc90006e0f808 EFLAGS: 00010202
->  RAX: dffffc0000000000 RBX: ffffffff89746018 RCX: 0000000080000001
->  RDX: 0000000000000000 RSI: ffffffff89746018 RDI: 000000000000004c
->  RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
->  R10: dffffc0000000000 R11: ffffffff8aae3e70 R12: 0000000000000000
->  R13: 0000000000000260 R14: 0000000000000260 R15: 0000000000000001
->  FS:  0000000000000000(0000) GS:ffff8880983c2000(0000) knlGS:0000000000000000
->  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->  CR2: 00005582615a5008 CR3: 000000007007e000 CR4: 0000000000752ef0
->  PKRU: 55555554
->  Call Trace:
->   <TASK>
->   __kasan_check_byte+0x12/0x40
->   lock_acquire+0x79/0x2e0
->   lock_sock_nested+0x48/0x100
->   ? l2cap_sock_ready_cb+0x46/0x160
->   l2cap_sock_ready_cb+0x46/0x160
->   l2cap_conn_start+0x779/0xff0
->   ? __pfx_l2cap_conn_start+0x10/0x10
->   ? l2cap_info_timeout+0x60/0xa0
->   ? __pfx___mutex_lock+0x10/0x10
->   l2cap_info_timeout+0x68/0xa0
->   ? process_scheduled_works+0xa8d/0x18c0
->   process_scheduled_works+0xb6e/0x18c0
->   ? __pfx_process_scheduled_works+0x10/0x10
->   ? assign_work+0x3d5/0x5e0
->   worker_thread+0xa53/0xfc0
->   kthread+0x388/0x470
->   ? __pfx_worker_thread+0x10/0x10
->   ? __pfx_kthread+0x10/0x10
->   ret_from_fork+0x51e/0xb90
->   ? __pfx_ret_from_fork+0x10/0x10
->  veth1_macvtap: entered promiscuous mode
->   ? __switch_to+0xc7d/0x1450
->   ? __pfx_kthread+0x10/0x10
->   ret_from_fork_asm+0x1a/0x30
->   </TASK>
->  Modules linked in:
-> 
-> [...]
+While at it we might want to update this to use disable_delayed_work_sync
 
-Here is the summary with links:
-  - Bluetooth: L2CAP: Fix null-ptr-deref on l2cap_sock_ready_cb
-    https://git.kernel.org/bluetooth/bluetooth-next/c/bc280a5ed9ef
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>         mutex_lock(&conn->lock);
+>
+>         kfree_skb(conn->rx_skb);
+> @@ -1767,8 +1774,6 @@ static void l2cap_conn_del(struct hci_conn *hcon, i=
+nt err)
+>
+>         ida_destroy(&conn->tx_ida);
+>
+> -       cancel_delayed_work_sync(&conn->id_addr_timer);
+> -
+>         l2cap_unregister_all_users(conn);
+>
+>         /* Force the connection to be immediately dropped */
+> @@ -1787,9 +1792,6 @@ static void l2cap_conn_del(struct hci_conn *hcon, i=
+nt err)
+>                 l2cap_chan_put(chan);
+>         }
+>
+> -       if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+> -               cancel_delayed_work_sync(&conn->info_timer);
+> -
+>         hci_chan_del(conn->hchan);
+>         conn->hchan =3D NULL;
+>
+> --
+> 2.43.0
+>
 
 
+--=20
+Luiz Augusto von Dentz
