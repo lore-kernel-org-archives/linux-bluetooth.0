@@ -1,153 +1,133 @@
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942333009E8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 15:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381C63E928D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 15:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773933777; cv=none; b=gt1Isfk2jTRd7uLfyMGKbovfMYu5WJms7E+K2oWPEuy5eKCP346SzB3o2xwgfjYlfmWptEK4QPaPLHal/8kcC9QN72Lml/bnc58wY+aRCVg+SJRcIkyTx7N4EnU59IEUj96q6ef5yHi8+X+eK5ToLhNC3Sc2rYcwY1CIVTBUKao=
+	t=1773935649; cv=none; b=JQg08jgSIQuYH8sL0ObCZG3FBZzdkYEl+fTdl3b3JMX2oU2sURU7Dl17thNFCjbsTkc4PcJLXPXiFbZydHM1otegDOQ8+DI2M6yE/svKeocCiohk7S9Zd+KceADLB3KKiP6aS0wCX97QrgTt0Ewm1yu+ANQIU9FxnM114uaT1js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773933777; c=relaxed/simple;
-	bh=w9dJHMk3Zx4V131RrxDqxML9cBTv4gELDwC7vd5+8l8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=n78DbFqiTVyLZc29yYs3i6CBuULoPAHs4bWjgcR1FWBbi2mIhMjIDyNgVt+S4XyPbt8Ht8Y+EOifZUyRgoin+SLscA7Sy3/uYeuDLuQlzRolCwsptVKbTUTF63/hik5dvnLLuNkCjFzGvumyqtxFiv1Ok4+F0yPoUDFILMFQ+l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X2IbnWuP; arc=none smtp.client-ip=209.85.222.45
+	s=arc-20240116; t=1773935649; c=relaxed/simple;
+	bh=2OwAB2zlDzQOY4mZKttDY5bGXE1s8Xhlf2Rx2TuVNjI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Aa4tOFzWg39+ev7qHQcoaTLyd9G8BIqNYGtnNq59o2dhFNmMPWfKcnt1bHYbCLYmkCRSF34GxdYMiA8XzauOtc8hceHemunKYXNBoshb2vp+3b6XmyUg4fIIzj2IHyO108xmI3BFFENi/nKlbEHwC2hSXGhw8JpJVIsgURQ/zdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AnfFFMl2; arc=none smtp.client-ip=209.85.219.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X2IbnWuP"
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-94dd7178d63so424107241.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 08:22:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AnfFFMl2"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-899ed41208fso17780246d6.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 08:54:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773933774; x=1774538574; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0dd8M2mD90F2rxm2sWFKk5kZjBTgRUA3+2uVhFpXuKg=;
-        b=X2IbnWuPV0l8R+0usCEnUkTEQaf20XKIFvZJHgsdeutbET130LjXyHk96jjrD8ZtLl
-         Bumeshxvybozcv19xZ9Fqv0VMUAYMuXNoPFqx+m+qTaVXP8V9iw0m3CpzDT1a6AMX4Jz
-         +hRYO2uZTOrxgyydHldnNtsxLNmtR68h8v4guJyZ0iEmROmJlvNiaO9kBUrbB1prVCm+
-         r5c19pHNm9+oP8QWi9+HW5dSEbyQ+WD9zmEB+6xyRXyOueEcJOcip1WKG1xTKT/dLV8b
-         34JDZvSmEMn0eSSNWGuUMhw5AOxBY9L84xhEGWhBDZSLUNAsA4cFJU0HXAxRLK49kY1E
-         COyQ==
+        d=gmail.com; s=20230601; t=1773935647; x=1774540447; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=uI/bFSFP8VKEkzzcVyHjpsCVmBN88yqBtwwhFMTDaVk=;
+        b=AnfFFMl2smy60Jsja0chRqBngmhEQHc0HsVrSrF41fAMS/X6Hpj0Y/nKgmZOrY/xVC
+         bCwpweKkzEq6DBqXxMr76SKwY2irxrYXBZF5DyQnk8SrNDK62eB/pUA2LRGR4RnVVDU1
+         G49Sxqb8qwOT75WqQ+TpecXLk7e44EUoMCJAXBFOfkyEVUZ+qE6wjuCT+NTpPeiHdlR3
+         azEk7qU6d3ThFVcfL9ZKaTAUkrIRxEkwuwGFS2gz8ZIb2XbmIoHvl+1QVEwfPjxsdAz5
+         j9c03QQ/nuKwRWXhVXh6HAEUs7CttQnuu/LhzUEMvsgngq16RTEjFvheSnFvJexExvGX
+         I72g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773933774; x=1774538574;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0dd8M2mD90F2rxm2sWFKk5kZjBTgRUA3+2uVhFpXuKg=;
-        b=LbuhpTvo8qzDIsOzEKqLgP6WDDoCw224wpGp0/Ut0gJbfsuLHdiA7ABVcQTm5BTKIG
-         mQv7NWR7lKFbC2u69UD/aMn63hMbggCwvfA04BkyAymlPxCwQSxYrJaeIiVq++g2w/sW
-         SxvDoB2rF4qwdVJhDGnWbRI9xUP+zBQt6FuIfsE2GnTvgPLq0k5Kr0NBbMCUrJg+zJYa
-         HgEDJPsr40u5e/3Yjef8S0MycPLH9/k/Q2vrkm0xXvzoBUszbt6+bFBDW/QNBVx59tqz
-         hIX6Cnee3uYPRVutg9befl9BJ/eq7bXOev7oM/RjKVLzLnSEde4KhmPgY0Wb//spKsKC
-         3oOQ==
-X-Gm-Message-State: AOJu0YxOJEIUZj1JiaYWFd+rTgi+S3Ljrm/7QDDJ0CeqJTSPx14dtbMC
-	+JQXae4utb9MZs0UDa/f55tXv13SQd+yfX0QYOR33sN0wxJ1Q3tXrfzZ8gETK82hGzU=
-X-Gm-Gg: ATEYQzxKFDFFwIneE+AZ0RrtA/oimMAb1KqWtJ3lrghdl+IjGQRlaM93p/2ZZq28l3g
-	FsRON/ttms4vje/i83CDPMXvT7SIw36J5PyvZ1Y+xgEQHObNMHDA6nbXpa+5ZsjYaEHyeJE0NiY
-	2xkaH1h6ugLQq+0CYnPDpK7sjM4R+C27k6zSY6/flYgf47kDioYpsp0wYbsK3xWuzfN9U1NnY9U
-	s753D3nB2Ih/O0FWTbfcdn68RZGglTl0gtsonYb0D2l6+W0lphscIBSJCFHhCXUJuDdXvPY7HPD
-	sCt1YsKrQQDz0/zxu9TmRCZzBcfeyKZSYTIY0PsWsmH9832G8SeZVEEoXBAcm7FoBpT6sfB7gE0
-	d2qcEn0qoptzKh59g33xWbwd5SmZhfX3GjgmHLa5oNbfrnuRwYzZS6iig6tyfG85P231eJYaczE
-	ukswGuAwx00FxmUoCSkUi9B/Aa+8DCN8cjWodT9fRjjtxfvZODQOcUGungkBAXqbQ/DmrorAcDc
-	tU/V3BnzEMp4YFQUyiDJuquVSEy
-X-Received: by 2002:a05:6102:3908:b0:5fd:f2ad:c653 with SMTP id ada2fe7eead31-6027d13f529mr4210006137.16.1773933774220;
-        Thu, 19 Mar 2026 08:22:54 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9510344384csm2844877241.11.2026.03.19.08.22.53
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20251104; t=1773935647; x=1774540447;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uI/bFSFP8VKEkzzcVyHjpsCVmBN88yqBtwwhFMTDaVk=;
+        b=l3ycrGD9Hdlh9hag7pFWdnw1tlSAEm8yrITgTxQ+4BSKX9FA/NqdhPBBxELN07lrhv
+         HsQgRR7rZFQ7t8n9L9mpkHQQEl/UVNTsPGqVmuQrx3MPFODI66RHuHdd1CwiXW74C+yk
+         2BSBPvMQc07pG1Arcsse0G8FIyTJvgti2+pcbaBHYKkmQ78EG2vFMrDKrAZyPy52+HZk
+         j+4zmsWG/xlf1k9b8XtU2yVWckHCO5alaAAvIQOtWKSuf8sLHv0FTX0evNxUFlaTLOq7
+         w1ie5AZKTa9yoI6fo7dK+QvBPiJkpnqBl1wI3g2CJEN2tY03dmyWrF6QtjJ2hk7fB1US
+         6qSQ==
+X-Gm-Message-State: AOJu0YzY4g7SkIqC9gAn9irsWpBQoDjS8ILNNakLeelCJuiWJ51k+9gU
+	5I1h5H65QJe26bxXNhd0I7M4lpIRcKWMCh1lQxt+YR4LCJPisaDYK+XuJY5zhg==
+X-Gm-Gg: ATEYQzwuyCNu5MHiLUVZsIOT5Rk76svl8vGGBkdZrrA385kUZ5xUrcbS4kbu9rsnE5G
+	ByRK2dgH9O4so1BDOFBvZnW9LZNovj+7KT9IstfRhcGJn0yUgIGhijT8/kjkE1dEDvaA5GT4zpS
+	UtW802jUztIcIl/6ZbAniunsiqsktKC7oUQNpCG1ufab/TpvWaD8zMPpAE9HpLlfIzt+uUICe9J
+	JkU/MMEd64mRRxEJuoxEBVkTAEx9F9LCvJfK6ijuEvvvS22NzldQRatngCx2y+176dAqMHHG7qQ
+	riD+CrzF1sNgaGhZw2kJ9cbIqDPXWMmzrSLMitxADBpVfC0gQ+yJSkULVCBOGp7knffAT5GjuI6
+	yPdAeTnGYfcPyqnMbsNVi1Ff5pym7TkXtp1/ExPetYoSvsa6ukMbKv5la1/ADKuhfX9+dmi1odX
+	Yi0234oNVbaF73hJxAkpBndWRBSVizrg==
+X-Received: by 2002:a05:6214:3a86:b0:89a:a0a:c0fa with SMTP id 6a1803df08f44-89c6b700f74mr121454956d6.63.1773935646912;
+        Thu, 19 Mar 2026 08:54:06 -0700 (PDT)
+Received: from [172.17.0.2] ([135.232.216.51])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89c6b8e2382sm50944736d6.2.2026.03.19.08.54.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 08:22:53 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: L2CAP: Fix regressions caused by reusing ident
-Date: Thu, 19 Mar 2026 11:22:47 -0400
-Message-ID: <20260319152247.13225-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        Thu, 19 Mar 2026 08:54:06 -0700 (PDT)
+Message-ID: <69bc1c1e.050a0220.13f04b.79a5@mx.google.com>
+Date: Thu, 19 Mar 2026 08:54:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1535755900845336050=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, wouter@xesxen.nl
+Subject: RE: shared/shell: Fix SIGSEGV on invalid input
+In-Reply-To: <20260319141435.83060-2-wouter@xesxen.nl>
+References: <20260319141435.83060-2-wouter@xesxen.nl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1535755900845336050==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This attempt to fix regressions caused by reusing ident which apparently
-is not handled well on certain stacks causing the stack to not respond to
-requests, so instead of simple returning the first unallocated id this
-stores the last used tx_ident and then attempt to use the next until all
-available ids are exausted and then cycle starting over to 1.
+This is automated email and please do not reply to this email!
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=221120
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=221177
-Fixes: 6c3ea155e5ee ("Bluetooth: L2CAP: Fix not tracking outstanding TX ident")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Tested-by: Christian Eggers <ceggers@arri.de>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1069318
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.44 seconds
+GitLint                       PENDING   0.42 seconds
+BuildEll                      PASS      21.16 seconds
+BluezMake                     PASS      643.79 seconds
+MakeCheck                     PASS      18.66 seconds
+MakeDistcheck                 PASS      250.30 seconds
+CheckValgrind                 PASS      294.96 seconds
+CheckSmatch                   WARNING   354.79 seconds
+bluezmakeextell               PASS      183.27 seconds
+IncrementalBuild              PENDING   0.33 seconds
+ScanBuild                     PASS      1032.91 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+https://github.com/bluez/bluez/pull/1975/checks
+
 ---
- include/net/bluetooth/l2cap.h |  1 +
- net/bluetooth/l2cap_core.c    | 29 ++++++++++++++++++++++++++---
- 2 files changed, 27 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 010f1a8fd15f..5172afee5494 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -658,6 +658,7 @@ struct l2cap_conn {
- 	struct sk_buff		*rx_skb;
- 	__u32			rx_len;
- 	struct ida		tx_ida;
-+	__u8			tx_ident;
- 
- 	struct sk_buff_head	pending_rx;
- 	struct work_struct	pending_rx_work;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ead51dc0f3f1..2a8851f36b1f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -926,16 +926,39 @@ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator)
- 
- static int l2cap_get_ident(struct l2cap_conn *conn)
- {
-+	u8 max;
-+	int ident;
-+
- 	/* LE link does not support tools like l2ping so use the full range */
- 	if (conn->hcon->type == LE_LINK)
--		return ida_alloc_range(&conn->tx_ida, 1, 255, GFP_ATOMIC);
--
-+		max = 255;
- 	/* Get next available identificator.
- 	 *    1 - 128 are used by kernel.
- 	 *  129 - 199 are reserved.
- 	 *  200 - 254 are used by utilities like l2ping, etc.
- 	 */
--	return ida_alloc_range(&conn->tx_ida, 1, 128, GFP_ATOMIC);
-+	else
-+		max = 128;
-+
-+	/* Allocate ident using min as last used + 1 (cyclic) */
-+	ident = ida_alloc_range(&conn->tx_ida, READ_ONCE(conn->tx_ident) + 1,
-+				max, GFP_ATOMIC);
-+	/* Force min 1 to start over */
-+	if (ident <= 0) {
-+		ident = ida_alloc_range(&conn->tx_ida, 1, max, GFP_ATOMIC);
-+		if (ident <= 0) {
-+			/* If all idents are in use, log an error, this is
-+			 * extremely unlikely to happen and would indicate a bug
-+			 * in the code that idents are not being freed properly.
-+			 */
-+			BT_ERR("Unable to allocate ident: %d", ident);
-+			return 0;
-+		}
-+	}
-+
-+	WRITE_ONCE(conn->tx_ident, ident);
-+
-+	return ident;
- }
- 
- static void l2cap_send_acl(struct l2cap_conn *conn, struct sk_buff *skb,
--- 
-2.53.0
 
+--===============1535755900845336050==--
