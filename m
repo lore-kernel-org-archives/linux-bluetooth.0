@@ -1,63 +1,135 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68202E65D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 03:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773891498; cv=none; b=sJWbUR1xtWwHj+33MlqV9InclczTI3WeSLlRF23FkN0pGDIMalYaQsf7msWeH5A4Wmi4ZRm0D74V9pbOUhw4fDecXqk9I0VnlRow/VADSB252KAgZJVKdwk4/MUb39S5A2CHcc/jf+tijY+/zLQKxzZ8XkrAwr/R3DuiBQ7+35U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773891498; c=relaxed/simple;
-	bh=eS6aDVKpNScIg7LxEWLFFAs/igMMAdTQfgN41mWJTsw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=NX1lpPpnFT9CS3p9zBv7H4pnwhwf18Lqmm0e+TVNmqyUQ5JkftrzL+nLCLjNDkCuwZG59E/74zaxmTnANZYoHJomdp+8eEffZ182UAq5mYkHBnhL4OX5lOTP1GXgq5Cj2i3yNRzs+W6TNLAkoweRgzKj54wLcvrw6mzj4x2NN9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DLtPa8Yd; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8DB1DE2D8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 03:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773891993; cv=pass; b=OxCaO+PJYr+9qvywo0hESAIsveBQKCJeDpBYjjlNT32BYkv4JAj3aUhXrWk0rswcSluQQlbrmTsl6BrkEJXRpMq1WlOFZ34y6wh/DKnvnHHVyABdOKYIYilA6Qn7/AM2SBkWPAFlJWVXpM8VZGbC724bEZUPyOEhdLuRvSD2SQk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773891993; c=relaxed/simple;
+	bh=8Emb/Kg+pt/RSRzTC+SY84EsEWOHwSAuapsVwfQOLnM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=bB5fbOu0TKqfOoerlnH0fE9/+emMDvfAtn8hIP4vGmmS+9Cd7Yv+jKnduSCVWE1v9chZx3YEPSlwJrbglcMiPtn5a65nlf2a/Aw9t8iaZVo8kF5O20/JcF9lKSj6dmutTePfwxHclgi5OLTScBUlI8Zv/VITQPO0zBGFpq2zomg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=atzNnOTC; arc=pass smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DLtPa8Yd"
-Received: from github.com (hubbernetes-node-4144358.va3-iad.github.net [10.48.15.71])
-	by smtp.github.com (Postfix) with ESMTPA id 0FFB04E037C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 20:38:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1773891496;
-	bh=kIwfEIDq5EIlEWnoTgKEhRDdYiRdKumfmTm1cAWMiII=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=DLtPa8Ydwcabx60lEZIxBKwDGtIWUpVZwfrDPFswba0aWjq77FNCywF+TYYGjJLQP
-	 LHVHGMmf2D0y8MmwR6MwQ596tc7BUWx3rZxw/NGCxaprVYVD0FmOTKr+o1uskuShJg
-	 p7Wj60+Pii/aOCcuSbxX8/o0t/9vtefJNmT5YiSs=
-Date: Wed, 18 Mar 2026 20:38:16 -0700
-From: Wouter <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1068955/000000-bb6234@github.com>
-Subject: [bluez/bluez] bb6234: shared/shell: Fix SIGSEGV on invalid input
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="atzNnOTC"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64ad9fabd08so169353d50.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 20:46:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773891991; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gsqrueTeG9ihz/y0vNC4a2Kc4oSCRICtymus+gkHhFQH9ta/gdzxYiHfSD9CjJMzKg
+         ACNNwYeq0YJM41ziUu0Wm1pk4UZ4pJe7adjrGwiFLCjYC+PVk87p4PXRYBzgJW1zdRAQ
+         0QYm68AccrOA+8b2wNuQg7LQQ41GitLyS2b/VNhA8O1KPMZxs6Knas68tnFjlbOA6dgV
+         kEbMBaHI3Q4LrR3s/wzj+rjhzntWwBfj5NJZ2ksTUIuTBlj98CtbB+dAvac2420hGJlU
+         oiPAjtSMxzGq9q4m/jAhIq12kaUmy+h5tE0xCjLNK5RfRiIZrTw8RI5lHHKLCwlJCOan
+         aJKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=uKgAFC1J4GFx4uDPHtRJFpAJmHoySreu6J3whTlcfWw=;
+        fh=+7AvWv71ofgQoUyp5cG+RWtiQboLefNwN7zaXrtLsbI=;
+        b=bb34S6cShuD5+f0sk1J1M4hCKeWfKw1Ant+28KSKLy+VFdyq1olIH4mxm8DhCbrwvd
+         nJb3+iYfQMNSVXeTriVjeu4BxMUnRdtL85//Zfr+4EQmtUTh4O6Nb8Z6YUKt9+5RoFpZ
+         iTGYVDRoIThslIosyXwhr6NlIhNawEKext97ZhKycNSk19RdCYuF7kUmU72LZ5AYBru6
+         6D05uqwLVzLuojBYxp4Z6g81laGF3uPksZA/ne1EvJTS93HaqZsGymdQ3VHOC+S6DOuG
+         iln8lNycS4scPdKn8Ki3T09AM4rGW7vVIaHpyhTGdkl43MvcFpBQq5L2ifiWmDVXgjpv
+         +omw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773891991; x=1774496791; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uKgAFC1J4GFx4uDPHtRJFpAJmHoySreu6J3whTlcfWw=;
+        b=atzNnOTCyjOMjU2GdIndchbVBvrukEWErzFoKGaXqghyk1Ur0wtCmUQonbpvQjKxTD
+         2xpF6pmba6w3Rid4Sg2E4W7RxTQWoVJxL+h3E1gJyFw0OZ0LqrYOAObd1CDIBtbH/sgB
+         xQClIyFpLh2YyTBkXfI++6eJrVH+UtkHprHfOiENS2iS/A6MSGg/y5WWgIVlxjHH7NZp
+         kNsz7n+rKAwbAdw0ECExeV5vIhrh37LQ/0oDJDZsRuwMkeYFef6mAbVik/r0HT/81+Nf
+         EzYUGumth71+U+8ygeGlBA4uX0UY/FlifttxnhHC3MUJiJwAhKIFKhdaaqAFe3VUsMXk
+         TnkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773891991; x=1774496791;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uKgAFC1J4GFx4uDPHtRJFpAJmHoySreu6J3whTlcfWw=;
+        b=H7MpgediYcsWsJai1X854u7hB0MUNjE7R0cOEUkNmhl0JnNB8Udet57dzE+vC6K1kL
+         6szbMBhEgnUIKkfCFPmXt5I/OJDjtcufYxQZnNSkEca84clkhhMLRZ5LrdwTwWGWfwg6
+         6VCZHqmC7Oeoh9im1w2eR48fO08XesFB8SLj5lXtVRsj9xR31Ss1RTgaETlgQwmLYH0w
+         DXc9sB/yctxrhHJliLyop5s4LqCUChqBGZcQWLVRA9M6ZhepuiIGVGvawb4BF0Dw3M5t
+         czfuBvU2nrjBmljxtg6W1ciGWDeVFp87cHi7dC6rWmJedZK+VpqiBzL1DQOhoUKFWrnt
+         LTsw==
+X-Gm-Message-State: AOJu0Yx2T59VCVsvIh24X3cjdyi3rQ3+5gD/I+IfMou0XBVCEgsa4++t
+	5fzkjol/5I+pDmNpwEnsp2NFyTm9o29P5e8L8wTH69Lng64WMM/ViRfH68SPZBeWaghzEhMStjO
+	58tr+7vNjwpXQ+lDE8GBDAWtTtYBr4oP8NIw5P90=
+X-Gm-Gg: ATEYQzytl0LJ+vr+IoyikvckMhvaWUAS+V+evYzOmTMnXO32cz+5/E0ZJ9BpS+6c1L4
+	8vbrOor2OxOmdorm9Hl5Mk4c5IIPvA0kQlkY7kKLrbIMW0LtyMh9uSuFnLqFp6RUNfoeVACLmLl
+	hqNwOmfGjAomd+qmaLoSfPlCKkD+j+vsnzDDV2cuywAGP9Pl0PIsW12dBWPduYTSXh4cvaaMu5L
+	ObFOkCjm5212O6wBFjDI3FYc0nANGNIrbr97kDiXPwMNvrP2Ci34TTJ4M1JONmxDpA+QbvEf6V6
+	aMmq8es=
+X-Received: by 2002:a05:690c:d89:b0:79a:3a33:948 with SMTP id
+ 00721157ae682-79a7188dc82mr57176087b3.9.1773891991567; Wed, 18 Mar 2026
+ 20:46:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: Anthony jo <anthonyjo671@gmail.com>
+Date: Wed, 18 Mar 2026 23:46:20 -0400
+X-Gm-Features: AaiRm53Q5oV1OL5BgZUGBIfRCRXZ4GNtj2R0Yz9XrKZy06f_KHl5PndhQwnGE6s
+Message-ID: <CADx-YRB9srPzKCP4tn7FD_RWpgiMd_+fgHbLCdkoCjJ7Hcu8CQ@mail.gmail.com>
+Subject: BUG] RTL8852CE (IMC Networks 13d3:3612) Bluetooth not detected -
+ missing btrtl support
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-  Branch: refs/heads/1068955
-  Home:   https://github.com/bluez/bluez
-  Commit: bb6234006c0af44bbb2f575d7f87a3b995795784
-      https://github.com/bluez/bluez/commit/bb6234006c0af44bbb2f575d7f87a3b995795784
-  Author: Wouter <wouter@xesxen.nl>
-  Date:   2026-03-19 (Thu, 19 Mar 2026)
+Hello,
 
-  Changed paths:
-    M src/shared/shell.c
+I am reporting a Bluetooth issue with the Realtek RTL8852CE chip on Linux.
 
-  Log Message:
-  -----------
-  shared/shell: Fix SIGSEGV on invalid input
+--- HARDWARE ---
+Laptop : ASUS TUF Gaming A18 FA808UH
+BT Chip : Realtek RTL8852CE
+USB ID : 13d3:3612 (IMC Networks Bluetooth Radio)
+Kernel : 6.17.0-1012-oem
+Distro : Zorin OS 18 (Ubuntu 24.04 base)
 
-This fixes a crash when handling "<space><tab>"
+--- PROBLEM ---
+The Bluetooth controller is detected and shows UP RUNNING in hciconfig,
+but scanning detects no devices at all (BR/EDR and LE).
 
+btrtl does not list rtl8852ce in its supported firmware list:
+$ modinfo btrtl | grep firmware
+(rtl8852ce_fw.bin and rtl8852ce_config.bin are absent)
 
+No firmware files exist for this chip in linux-firmware:
+$ ls /lib/firmware/rtl_bt/ | grep 8852ce
+(empty)
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+btmon confirms the scan starts successfully (SetDiscoveryFilter success,
+Discovery started) but receives zero HCI events from any nearby device.
+
+--- RELEVANT LOGS ---
+lsusb:
+Bus 001 Device 003: ID 13d3:3612 IMC Networks Bluetooth Radio
+
+hciconfig -a:
+hci0: Type: Primary Bus: USB
+  BD Address: F0:68:E3:6E:36:1F
+  HCI Version: 5.3 LMP Version: 5.3
+  Manufacturer: Realtek Semiconductor Corporation (93)
+  UP RUNNING
+
+dmesg:
+Bluetooth: hci0: Failed to read codec capabilities (-22)
+
+--- WHAT IS NEEDED ---
+1. Add device ID 13d3:3612 to btusb/btrtl driver
+2. Add rtl8852ce_fw.bin and rtl8852ce_config.bin to linux-firmware
+
+Thank you for your help.
+
+Best regards,
+Anthony
